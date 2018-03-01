@@ -421,4 +421,33 @@ SatStatsCrdsaPacketCollisionHelper::GetTypeId ()
 }
 
 
+// E-SSA //////////////////////////////////////////////////////////////
+
+NS_OBJECT_ENSURE_REGISTERED (SatStatsEssaPacketCollisionHelper);
+
+SatStatsEssaPacketCollisionHelper::SatStatsEssaPacketCollisionHelper (Ptr<const SatHelper> satHelper)
+  : SatStatsPacketCollisionHelper (satHelper)
+{
+  NS_LOG_FUNCTION (this << satHelper);
+  SetTraceSourceName ("EssaRxCollision");
+  SetValidCarrierType (SatPhyRxCarrier::RA_ESSA);
+}
+
+
+SatStatsEssaPacketCollisionHelper::~SatStatsEssaPacketCollisionHelper ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsEssaPacketCollisionHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsEssaPacketCollisionHelper")
+    .SetParent<SatStatsPacketCollisionHelper> ()
+  ;
+  return tid;
+}
+
+
 } // end of namespace ns3

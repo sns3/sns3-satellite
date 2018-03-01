@@ -349,6 +349,10 @@ SatStatsHelperContainer::GetTypeId ()
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (CrdsaPacketCollision,
                                         "Random Access CRDSA packet collision rate statistics")
 
+    // Random Access E-SSA packet collision rate statistics.
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (EssaPacketCollision,
+                                        "Random Access E-SSA packet collision rate statistics")
+
     // Capacity request statistics.
     ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalCapacityRequest,
                                   "global capacity request statistics")
@@ -876,6 +880,12 @@ SAT_STATS_GLOBAL_METHOD_DEFINITION      (CrdsaPacketCollision, "crdsa-collision"
 SAT_STATS_PER_GW_METHOD_DEFINITION      (CrdsaPacketCollision, "crdsa-collision")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION    (CrdsaPacketCollision, "crdsa-collision")
 SAT_STATS_PER_UT_METHOD_DEFINITION      (CrdsaPacketCollision, "crdsa-collision")
+
+// Random Access E-SSA packet collision rate statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (EssaPacketCollision, "essa-collision")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (EssaPacketCollision, "essa-collision")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (EssaPacketCollision, "essa-collision")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (EssaPacketCollision, "essa-collision")
 
 // Capacity request statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (CapacityRequest, "capacity-request")
