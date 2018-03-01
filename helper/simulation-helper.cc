@@ -324,7 +324,7 @@ SimulationHelper::SetDefaultValues ()
   ConfigureFrame (0, 5e5, 5e5, 0.2, 0.3, false);
 
   SetErrorModel (SatPhyRxCarrierConf::EM_AVI);
-  SetInterferenceModel (SatPhyRxCarrierConf::IF_PER_PACKET, SatPhyRxCarrierConf::SIC_RESIDUAL);
+  SetInterferenceModel (SatPhyRxCarrierConf::IF_PER_PACKET);
 
   // ACM enabled
   EnableAcm (SatEnums::LD_FORWARD);
@@ -562,7 +562,7 @@ SimulationHelper::SetIdealPhyParameterization ()
   Config::SetDefault ("ns3::SatBeamHelper::RaCollisionModel", StringValue ("RaCollisionNotDefined"));
 
   SetErrorModel (SatPhyRxCarrierConf::EM_NONE);
-  SetInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT, SatPhyRxCarrierConf::SIC_PERFECT);
+  SetInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT);
 }
 
 
