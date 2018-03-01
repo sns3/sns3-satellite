@@ -29,6 +29,7 @@
 #include "satellite-phy.h"
 #include "satellite-phy-rx.h"
 #include "satellite-phy-rx-carrier.h"
+#include "satellite-phy-rx-carrier-per-window.h"
 #include "satellite-phy-rx-carrier-per-frame.h"
 #include "satellite-phy-rx-carrier-per-slot.h"
 #include "satellite-phy-rx-carrier-uplink.h"
@@ -344,6 +345,12 @@ SatPhyRx::ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatS
             else if (raModel == SatEnums::RA_MODEL_CRDSA || raModel == SatEnums::RA_MODEL_RCS2_SPECIFICATION)
               {
                 rxc = CreateObject<SatPhyRxCarrierPerFrame> (i, carrierConf, waveformConf, true);
+                DynamicCast<SatPhyRxCarrierPerSlot> (rxc)->
+                SetRandomAccessAllocationChannelId (superFrameConf->GetRaChannel (i));
+              }
+            else if (raModel == SatEnums::RA_MODEL_ESSA)
+              {
+                rxc = CreateObject<SatPhyRxCarrierPerWindow> (i, carrierConf, waveformConf, true);
                 DynamicCast<SatPhyRxCarrierPerSlot> (rxc)->
                 SetRandomAccessAllocationChannelId (superFrameConf->GetRaChannel (i));
               }

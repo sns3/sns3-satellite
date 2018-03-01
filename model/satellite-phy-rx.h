@@ -39,6 +39,7 @@ class SatPhyRxCarrierConf;
 class SatPhyRxCarrier;
 class SatPhyRxCarrierPerSlot;
 class SatPhyRxCarrierPerFrame;
+class SatPhyRxCarrierPerWindow;
 class SatPhyRxCarrierUplink;
 
 /**

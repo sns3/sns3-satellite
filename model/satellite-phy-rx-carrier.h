@@ -140,7 +140,7 @@ public:
    */
   enum CarrierType
   {
-    BASE, DEDICATED_ACCESS, RA_SLOTTED_ALOHA, RA_CRDSA
+    BASE, DEDICATED_ACCESS, RA_SLOTTED_ALOHA, RA_CRDSA, RA_ESSA
   };
 
   /**
