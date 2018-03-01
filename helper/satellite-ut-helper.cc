@@ -140,6 +140,7 @@ SatUtHelper::SatUtHelper ()
   m_llsConf (),
   m_enableChannelEstimationError (false),
   m_crdsaOnlyForControl (false),
+  m_asyncAccess (false),
   m_raSettings ()
 {
   NS_LOG_FUNCTION (this);
@@ -296,12 +297,15 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   mac->SetReserveCtrlCallback (m_reserveCtrlCb);
   mac->SetSendCtrlCallback (m_sendCtrlCb);
 
-  // Set timing advance callback to mac.
-  Ptr<SatMobilityObserver> observer = n->GetObject<SatMobilityObserver> ();
-  NS_ASSERT (observer != NULL);
+  // Set timing advance callback to mac (if not asynchronous access)
+  if (m_raSettings.m_randomAccessModel != SatEnums::RA_MODEL_ESSA)
+    {
+      Ptr<SatMobilityObserver> observer = n->GetObject<SatMobilityObserver> ();
+      NS_ASSERT (observer != NULL);
 
-  SatUtMac::TimingAdvanceCallback timingCb = MakeCallback (&SatMobilityObserver::GetTimingAdvance, observer);
-  mac->SetTimingAdvanceCallback (timingCb);
+      SatUtMac::TimingAdvanceCallback timingCb = MakeCallback (&SatMobilityObserver::GetTimingAdvance, observer);
+      mac->SetTimingAdvanceCallback (timingCb);
+    }
 
   // Attach the Mac layer receiver to Phy
   SatPhy::ReceiveCallback recCb = MakeCallback (&SatUtMac::Receive, mac);

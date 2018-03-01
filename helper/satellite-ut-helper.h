@@ -232,6 +232,13 @@ private:
   bool m_crdsaOnlyForControl;
 
   /**
+   * Asynchronous access on the return channel:
+   * - true -> asynchronous
+   * - false -> synchronous
+   */
+  bool m_asyncAccess;
+
+  /**
    * The used random access model settings
    */
   RandomAccessSettings_s m_raSettings;

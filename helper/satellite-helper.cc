@@ -170,7 +170,7 @@ SatHelper::SatHelper (std::string scenarioName)
   NS_LOG_FUNCTION (this);
 
   // uncomment next line, if attributes are needed already in construction phase
-  //ObjectBase::ConstructSelf(AttributeConstructionList ());
+  ObjectBase::ConstructSelf(AttributeConstructionList ());
 
   std::string satConf = scenarioName + "Conf.txt";
   std::string gwPos = scenarioName + "GwPos.txt";
