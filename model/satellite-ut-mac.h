@@ -145,6 +145,15 @@ public:
   virtual void ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint8_t rcIndex);
 
   /**
+   * Receive a queue event:
+   * - FIRST_BUFFER_RCVD
+   * - BUFFER_EMPTY
+   * /param event Queue event from SatQueue
+   * /param rcIndex Identifier of the queue
+   */
+  virtual void ReceiveQueueEventEssa (SatQueue::QueueEvent_t event, uint8_t rcIndex);
+
+  /**
    * Set address of the GW (or its MAC) serving this UT.
    *
    * \param gwAddress Address of the GW.

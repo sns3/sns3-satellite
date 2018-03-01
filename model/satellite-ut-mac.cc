@@ -246,6 +246,13 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
    * at correct time.
    */
 
+  /// If using asynchronous access (no timeslots), return
+  /// TODO find better way of doing this
+  if (m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE)->GetConfigType () == SatSuperframeConf::CONFIG_TYPE_4)
+    {
+      return;
+    }
+
   Time timingAdvance = m_timingAdvanceCb ();
   Time txTime = Singleton<SatRtnLinkTime>::Get ()->GetSuperFrameTxTime (tbtp->GetSuperframeSeqId (), tbtp->GetSuperframeCounter (), timingAdvance);
 
@@ -443,7 +450,6 @@ SatUtMac::DoEssaTransmit (Time duration, Ptr<SatWaveform> waveform, uint32_t car
       txInfo.crdsaUniquePacketId = m_crdsaUniquePacketId; // reuse the crdsaUniquePacketId to identify ESSA frames
 
       TransmitPackets (packets, duration, carrierId, txInfo);
-
       m_crdsaUniquePacketId++;
       /// update m_nextPacketTime
       m_nextPacketTime = Now () + duration; // TODO: this doesn't take into account the guard bands !!
@@ -451,6 +457,10 @@ SatUtMac::DoEssaTransmit (Time duration, Ptr<SatWaveform> waveform, uint32_t car
       /// ( schedule DoRandomAccess in case there is a back-off to compute )
       Simulator::Schedule (duration, &SatUtMac::DoRandomAccess, this, SatEnums::RA_TRIGGER_TYPE_ESSA);
       m_isRandomAccessScheduled = true;
+    }
+  else
+    {
+      m_isRandomAccessScheduled = false;
     }
 }
 
@@ -775,6 +785,9 @@ SatUtMac::DoRandomAccess (SatEnums::RandomAccessTriggerType_t randomAccessTrigge
   else if (txOpportunities.txOpportunityType == SatEnums::RA_TX_OPPORTUNITY_ESSA)
     {
       NS_LOG_INFO ("SatUtMac::DoRandomAccess - Processing ESSA results");
+      /// set the is RA scheduled
+      /// TODO: if there are no Tx opportunities there'll be no scheduling until a new event arrives
+      m_isRandomAccessScheduled = true;
       Time txOpportunity = Time::FromInteger (txOpportunities.slottedAlohaTxOpportunity, Time::MS);
 
       /// schedule the transmission
@@ -943,7 +956,7 @@ SatUtMac::FindNextAvailableRandomAccessSlot (Time opportunityOffset,
 }
 
 void
-SatUtMac::ScheduleEssaTransmission (uint32_t allocationChannel, SatRandomAccess::RandomAccessTxOpportunities_s txOpportunities)
+SatUtMac::ScheduleEssaTransmission (uint32_t allocationChannel)
 {
   // TODO: do we really need the allocationChannel ???
   NS_LOG_FUNCTION (this << allocationChannel);
@@ -951,15 +964,20 @@ SatUtMac::ScheduleEssaTransmission (uint32_t allocationChannel, SatRandomAccess:
   NS_LOG_INFO ("SatUtMac::ScheduleEssaTransmission - UT: " << m_nodeInfo->GetMacAddress () << " time: " << Now ().GetSeconds () << " AC: " << allocationChannel);
 
   /// start time
-  Time offset = m_nextPacketTime () - Now ();
+  Time offset = m_nextPacketTime - Now ();
 
   if (offset.IsStrictlyNegative ())
     {
       /// not transmiting at the moment, transmit now
-      offset = 0;
+      offset = Seconds (0);
     }
 
   /// duration
+  Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE);
+  uint8_t frameId = superframeConf->GetRaChannelFrameId (allocationChannel);
+  Ptr<SatFrameConf> frameConf = superframeConf->GetFrameConf (frameId);
+  Ptr<SatTimeSlotConf> timeSlotConf = frameConf->GetTimeSlotConf ( 0 ); // only one timeslot on ESSA
+
   Ptr<SatWaveform> wf = m_superframeSeq->GetWaveformConf ()->GetWaveform (timeSlotConf->GetWaveFormId ());
   Time duration = wf->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
 
