@@ -71,6 +71,13 @@ SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf,
       NS_FATAL_ERROR ("SatRandomAccessConf::SatRandomAccessConf - No random access allocation channel");
     }
 
+  /// If SUPERFRAME CONF 5 (E-SSA), don't check configuration for SA or CRDSA
+  /// TODO: refactor this
+  if (superframeSeq->GetSuperframeConf (0)->GetConfigType () == SatSuperframeConf::CONFIG_TYPE_4)
+    {
+      return;
+    }
+
   m_slottedAlohaControlRandomizationIntervalInMilliSeconds = (llsConf->GetDefaultControlRandomizationInterval ()).GetMilliSeconds ();
   DoSlottedAlohaVariableSanityCheck ();
 

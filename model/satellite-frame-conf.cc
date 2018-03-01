@@ -735,17 +735,18 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
     case CONFIG_TYPE_0:
     case CONFIG_TYPE_1:
     case CONFIG_TYPE_2:
+    case CONFIG_TYPE_4: // need timeslot configuration to store waveform conf
       {
         m_raChannels.clear ();
         m_frames.clear ();
         m_carrierCount = 0;
 
-        if ( m_configType == CONFIG_TYPE_0 )
+        if ( m_configType == CONFIG_TYPE_0 || m_configType == CONFIG_TYPE_4)
           {
             useDefaultWaveform = true;
           }
 
-        if ( m_configType == CONFIG_TYPE_2)
+        if ( m_configType == CONFIG_TYPE_2 || m_configType == CONFIG_TYPE_4)
           {
             checkSlotLimit = false;
           }
@@ -786,10 +787,6 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
 
     case CONFIG_TYPE_3:
       NS_FATAL_ERROR ("Configuration type 3 is not supported!!!");
-      break;
-
-    case CONFIG_TYPE_4:
-      // Timeslot configuration is not needed for ESSA (asynchronous)
       break;
 
     default:
@@ -1247,7 +1244,8 @@ SatSuperframeConf4::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatSuperframeConf4")
     .SetParent<ns3::SatSuperframeConf> ()
     .AddConstructor<SatSuperframeConf4> ()
-    ADD_SUPER_FRAME_ATTRIBUTES (0, SatSuperframeConf::CONFIG_TYPE_4)
+    ADD_SUPER_FRAME_ATTRIBUTES (1, SatSuperframeConf::CONFIG_TYPE_4)
+    ADD_FRAME_ATTRIBUTES (0, 2.4e5, 2.4e5, 0.0, 0.0, true) // create frame only to store waveformconf
   ;
 
   return tid;

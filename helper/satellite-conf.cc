@@ -87,7 +87,8 @@ SatConf::GetTypeId (void)
                    MakeEnumChecker (SatSuperframeConf::SUPER_FRAME_CONFIG_0, "Configuration_0",
                                     SatSuperframeConf::SUPER_FRAME_CONFIG_1, "Configuration_1",
                                     SatSuperframeConf::SUPER_FRAME_CONFIG_2, "Configuration_2",
-                                    SatSuperframeConf::SUPER_FRAME_CONFIG_3, "Configuration_3"))
+                                    SatSuperframeConf::SUPER_FRAME_CONFIG_3, "Configuration_3",
+                                    SatSuperframeConf::SUPER_FRAME_CONFIG_4, "Configuration_4"))
     .AddAttribute ("FwdCarrierAllocatedBandwidth",
                    "The allocated carrier bandwidth for forward link carriers [Hz].",
                    DoubleValue (0.125e9),

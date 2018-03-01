@@ -188,7 +188,7 @@ SatRandomAccess::DoRandomAccess (uint32_t allocationChannelId, SatEnums::RandomA
         }
     }
   /// Do ESSA
-  else if (m_randomAccessModel == SatEnums::RA_MODEL_ESSA && triggerType == SatEnums::RA_TRIGGER_ESSA)
+  else if (m_randomAccessModel == SatEnums::RA_MODEL_ESSA && triggerType == SatEnums::RA_TRIGGER_TYPE_ESSA)
     {
       NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Only ESSA enabled, checking allocation channel");
 
@@ -304,6 +304,10 @@ SatRandomAccess::DoRandomAccess (uint32_t allocationChannelId, SatEnums::RandomA
   else if (txOpportunities.txOpportunityType == SatEnums::RA_TX_OPPORTUNITY_SLOTTED_ALOHA)
     {
       NS_LOG_INFO ("SA minimum time to wait: " << txOpportunities.slottedAlohaTxOpportunity << " milliseconds");
+    }
+  else if (txOpportunities.txOpportunityType == SatEnums::RA_TX_OPPORTUNITY_ESSA)
+    {
+      NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - ESSA minimum time to wait: " << txOpportunities.slottedAlohaTxOpportunity << " milliseconds");
     }
   else if (txOpportunities.txOpportunityType == SatEnums::RA_TX_OPPORTUNITY_DO_NOTHING)
     {

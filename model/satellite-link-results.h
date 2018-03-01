@@ -151,7 +151,7 @@ protected:
   /**
    * \brief Initialize by loading DVB-RCS2 look up tables.
    */
-  void DoInitialize ();
+  virtual void DoInitialize ();
 
   /**
    * \brief Map of satellite link result look up tables.
