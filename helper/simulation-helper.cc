@@ -1370,20 +1370,21 @@ SimulationHelper::SetBeams (const std::string& enabledBeams)
   NS_LOG_FUNCTION (this << enabledBeams);
 
   m_enabledBeamsStr = enabledBeams;
-  const char * input = m_enabledBeamsStr.c_str ();
-  std::string number;
+  std::stringstream bss (enabledBeams);
 
-  for (uint32_t i = 0; i <= m_enabledBeamsStr.size (); i++)
+  while (!bss.eof ())
     {
-      if (input[i] >= '0' && input[i] <= '9')
+      uint32_t beamId;
+      bss >> beamId;
+      if (bss.fail ())
         {
-          number.append (1, input[i]);
+          bss.clear ();
+          std::string garbage;
+          bss >> garbage;
         }
       else
         {
-          uint32_t beamId = std::atoi (number.c_str ());
           m_enabledBeams.insert (beamId);
-          number = std::string ();
         }
     }
 }
