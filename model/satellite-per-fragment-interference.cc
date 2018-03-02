@@ -77,17 +77,26 @@ SatPerFragmentInterference::DoCalculate (Ptr<SatInterference::InterferenceChange
   m_ifPowerAtEventChangeW.clear ();
 
   std::vector< std::pair<double, double> > ifPowerPerFragment = SatPerPacketInterference::DoCalculate (event);
-  ifPowerPerFragment.clear ();
-  ifPowerPerFragment.reserve (m_ifPowerAtEventChangeW.size ());
 
-  std::map<double, double>::const_iterator iter = m_ifPowerAtEventChangeW.begin ();
-  std::pair<double, double> eventChangeInPower = *iter;
-  for (++iter; iter != m_ifPowerAtEventChangeW.end (); ++iter)
+  std::size_t fragmentsCount = m_ifPowerAtEventChangeW.size ();
+  if (fragmentsCount)
     {
-      ifPowerPerFragment.emplace_back (iter->first - eventChangeInPower.first, eventChangeInPower.second);
-      eventChangeInPower = *iter;
+      ifPowerPerFragment.clear ();
+      ifPowerPerFragment.reserve (fragmentsCount);
+
+      std::map<double, double>::const_iterator iter = m_ifPowerAtEventChangeW.begin ();
+      std::pair<double, double> eventChangeInPower = *iter;
+      for (++iter; iter != m_ifPowerAtEventChangeW.end (); ++iter)
+        {
+          ifPowerPerFragment.emplace_back (iter->first - eventChangeInPower.first, eventChangeInPower.second);
+          eventChangeInPower = *iter;
+        }
+
+      if (eventChangeInPower.first != 1.0)
+        {
+          ifPowerPerFragment.emplace_back (1.0 - eventChangeInPower.first, eventChangeInPower.second);
+        }
     }
-  ifPowerPerFragment.emplace_back (1.0 - eventChangeInPower.first, eventChangeInPower.second);
 
   return ifPowerPerFragment;
 }
