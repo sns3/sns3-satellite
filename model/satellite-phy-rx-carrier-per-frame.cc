@@ -51,7 +51,7 @@ SatPhyRxCarrierPerFrame::SatPhyRxCarrierPerFrame (uint32_t carrierId,
 }
 
 void
-SatPhyRxCarrierPerFrame::BeginFrameEndScheduling ()
+SatPhyRxCarrierPerFrame::BeginEndScheduling ()
 {
   NS_LOG_FUNCTION (this);
   if (!m_frameEndSchedulingInitialized)

@@ -68,6 +68,11 @@ SatPhyRxCarrierPerSlot::~SatPhyRxCarrierPerSlot ()
   NS_LOG_FUNCTION (this);
 }
 
+void
+SatPhyRxCarrierPerSlot::BeginEndScheduling ()
+{
+}
+
 TypeId
 SatPhyRxCarrierPerSlot::GetTypeId (void)
 {

@@ -194,6 +194,11 @@ public:
     return BASE;
   }
 
+  /**
+   * \brief Function for initializing the frame/window end scheduling
+   */
+  virtual void BeginEndScheduling ();
+
   //////////// Set callbacks ///////////////
 
   /**

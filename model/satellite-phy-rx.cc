@@ -201,7 +201,7 @@ SatPhyRx::SetNodeInfo (const Ptr<SatNodeInfo> nodeInfo)
 }
 
 void
-SatPhyRx::BeginFrameEndScheduling ()
+SatPhyRx::BeginEndScheduling ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -209,11 +209,7 @@ SatPhyRx::BeginFrameEndScheduling ()
        it != m_rxCarriers.end ();
        ++it)
     {
-      Ptr<SatPhyRxCarrierPerFrame> crdsaPrxc = (*it)->GetObject<SatPhyRxCarrierPerFrame> ();
-      if (crdsaPrxc != 0)
-        {
-          crdsaPrxc->BeginFrameEndScheduling ();
-        }
+      (*it)->BeginEndScheduling ();
     }
 }
 

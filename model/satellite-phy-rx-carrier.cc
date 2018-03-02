@@ -201,6 +201,10 @@ SatPhyRxCarrier::~SatPhyRxCarrier ()
   NS_LOG_FUNCTION (this);
 }
 
+void
+SatPhyRxCarrier::BeginEndScheduling (void)
+{
+}
 
 TypeId
 SatPhyRxCarrier::GetTypeId (void)
