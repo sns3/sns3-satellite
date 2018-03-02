@@ -48,6 +48,23 @@ class SatPhyRxCarrierPerWindow : public SatPhyRxCarrierPerSlot
 {
 public:
   /**
+   * \brief Struct for storing the E-SSA packet specific Rx parameters
+   */
+  typedef struct
+  {
+    Ptr<SatSignalParameters> rxParams;
+    Mac48Address destAddress;
+    Mac48Address sourceAddress;
+    bool packetHasBeenProcessed;
+    double meanSinr;
+    double preambleMeanSinr;
+    std::vector< std::pair<double, double> > gamma;
+    bool phyError;
+    Time arrivalTime;
+    Time duration;
+  } essaPacketRxParams_s;
+
+  /**
    * Constructor.
    * \param carrierId ID of the carrier
    * \param carrierConf Carrier configuration
@@ -66,6 +83,11 @@ public:
    * \return TypeId
    */
   static TypeId GetTypeId (void);
+
+  /**
+   * \brief Function for initializing the window end scheduling
+   */
+  void BeginEndScheduling ();
 
   /**
    * \brief Method for querying the type of the carrier
@@ -100,6 +122,48 @@ protected:
   virtual void DoDispose ();
 
 private:
+  typedef std::list<SatPhyRxCarrierPerWindow::essaPacketRxParams_s> packetList_t;
+  /**
+   * \brief Function for storing the received E-SSA packets
+   */
+  void AddEssaPacket (SatPhyRxCarrierPerWindow::essaPacketRxParams_s essaPacketParams);
+
+  /**
+   * \brief Calculate gamma and Interference vectors for a single packet
+   */
+  void CalculatePacketInterferenceVectors (SatPhyRxCarrierPerWindow::essaPacketRxParams_s &packet);
+
+  /**
+   * \brief Remove old packets from packet container
+   */
+  void CleanOldPackets (const Time windowStartTime);
+
+  /**
+   * \brief Function called when a window ends
+   */
+  void DoWindowEnd ();
+
+  /**
+   * \brief Get the packet with the highst SNIR on the list
+   * \return True if a packet is returned, False otherwise
+   */
+  packetList_t::iterator GetHighestSnirPacket (const std::pair<packetList_t::iterator, packetList_t::iterator> windowBounds);
+
+  /**
+   * \brief Get a pair of iterators, pointing to the first element in the window, and to the first after the window
+   */
+  std::pair<packetList_t::iterator, packetList_t::iterator> GetWindowBounds ();
+
+  /**
+   * \brief Function for processing a window
+   */
+  bool PacketCanBeDetected (const SatPhyRxCarrierPerWindow::essaPacketRxParams_s &packet);
+
+  /**
+   * \brief Function for processing a window
+   */
+  void ProcessWindow (Time startTime, Time endTime);
+
   /**
    * The duration of the sliding window
    */
@@ -115,6 +179,15 @@ private:
    */
   uint32_t m_windowSicIterations;
 
+  /**
+   * \brief Has the window end scheduling been initialized
+   */
+  bool m_windowEndSchedulingInitialized;
+
+  /**
+   * \brief ESSA packet container
+   */
+  packetList_t m_essaPacketContainer;
 };
 
 

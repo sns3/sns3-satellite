@@ -457,6 +457,15 @@ protected:
   }
 
   /**
+   * \brief Get pointer to the waveform configuration.
+   * \return Waveform Configuration
+   */
+  inline Ptr<SatWaveformConf> GetWaveformConf ()
+  {
+    return m_waveformConf;
+  }
+
+  /**
    * \brief Get a pointer to the channel estimation error container of the carrier.
    * \return channel estimation error containe pointer
    */
@@ -611,6 +620,7 @@ private:
   Ptr<SatNodeInfo> m_nodeInfo;                                                                  //< NodeInfo of the node where carrier is attached
   SatEnums::ChannelType_t m_channelType;                                //< Channel type
   Ptr<SatLinkResults> m_linkResults;                                            //< Link results from the carrier configuration
+  Ptr<SatWaveformConf> m_waveformConf; // Waveform configuration
   Ptr<UniformRandomVariable> m_uniformVariable; //< Uniform helper random variable
   SatPhyRxCarrierConf::ErrorModel m_errorModel; //< Error model
   double m_constantErrorRate;                                                                           //< Error rate for constant error model

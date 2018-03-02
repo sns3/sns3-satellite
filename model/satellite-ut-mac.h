@@ -455,7 +455,7 @@ private:
   /**
    * CRDSA packet ID (per frame)
    */
-  uint8_t m_crdsaUniquePacketId;
+  uint32_t m_crdsaUniquePacketId;
 
   /**
    * Planned CRDSA usage:
