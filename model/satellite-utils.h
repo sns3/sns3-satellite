@@ -395,6 +395,21 @@ public:
     return y0 + relY;
   }
 
+  /**
+   * \brief Scalar product
+   * \param vector Array of pairs of doubles
+   * \return Sum of the product of each pair elements
+   */
+  static inline double ScalarProduct (const std::vector<std::pair<double, double> >& vector)
+  {
+    double scalarProduct = 0.0;
+    for (const std::pair<double, double>& element: vector)
+      {
+        scalarProduct += element.first * element.second;
+      }
+    return scalarProduct;
+  }
+
 private:
   /**
    * Destructor

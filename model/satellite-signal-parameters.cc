@@ -102,16 +102,5 @@ SatSignalParameters::GetTypeId (void)
   return tid;
 }
 
-double
-SatSignalParameters::ComputeIfPowerFromFragments (const std::vector< std::pair<double, double> >& ifPowerPerFragment)
-{
-  double ifPower = 0.0;
-  for (const std::pair<double, double>& interferenceLevel : ifPowerPerFragment)
-    {
-      ifPower += interferenceLevel.first * interferenceLevel.second;
-    }
-  return ifPower;
-}
-
 
 } // namespace ns3
