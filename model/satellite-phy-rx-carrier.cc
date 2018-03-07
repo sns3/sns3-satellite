@@ -105,7 +105,7 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
   // Configured channel estimation error
   m_channelEstimationError = carrierConf->GetChannelEstimatorErrorContainer ();
 
-  NS_LOG_INFO ("SatPhyRxCarrier::SatPhyRxCarrier - Carrier ID: " << m_carrierId <<
+  NS_LOG_INFO ("Carrier ID: " << m_carrierId <<
                ", channel type: " << SatEnums::GetChannelTypeName (GetChannelType ()));
 }
 
@@ -394,7 +394,6 @@ void
 SatPhyRxCarrier::DoCompositeSinrOutputTrace (double cSinr)
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_INFO ("SatPhyRxCarrier::DoCompositeSinrOutputTrace");
 
   std::vector<double> tempVector;
   tempVector.push_back (Now ().GetSeconds ());
@@ -408,7 +407,6 @@ bool
 SatPhyRxCarrier::CheckAgainstLinkResults (double cSinr, Ptr<SatSignalParameters> rxParams)
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_INFO ("SatPhyRxCarrier::CheckAgainstLinkResults");
 
   /// Initialize with no errors
   bool error = false;
@@ -595,8 +593,6 @@ SatPhyRxCarrier::IncreaseNumOfRxState (SatEnums::PacketType_t packetType)
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_INFO ("SatPhyRxCarrier::IncreaseNumOfRxState - Time: " << Now ().GetSeconds ());
-
   m_numOfOngoingRx++;
   ChangeState (RX);
 
@@ -612,8 +608,6 @@ void
 SatPhyRxCarrier::DecreaseNumOfRxState (SatEnums::PacketType_t packetType)
 {
   NS_LOG_FUNCTION (this);
-
-  NS_LOG_INFO ("SatPhyRxCarrier::DecreaseNumOfRxState - Time: " << Now ().GetSeconds ());
 
   if (m_numOfOngoingRx > 0)
     {
@@ -638,8 +632,6 @@ SatPhyRxCarrier::CheckRxStateSanity ()
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_INFO ("SatPhyRxCarrier::CheckRxStateSanity - Time: " << Now ().GetSeconds ());
-
   if (m_numOfOngoingRx > 0 && m_state == IDLE)
     {
       NS_FATAL_ERROR ("SatPhyRxCarrier::CheckStateSanity - State mismatch");
@@ -656,7 +648,6 @@ void
 SatPhyRxCarrier::SetAverageNormalizedOfferedLoadCallback (SatPhyRx::AverageNormalizedOfferedLoadCallback callback)
 {
   NS_LOG_FUNCTION (this << &callback);
-  NS_LOG_INFO ("SatPhyRxCarrier::SetAverageNormalizedOfferedLoadCallback - Time: " << Now ().GetSeconds ());
 
   m_avgNormalizedOfferedLoadCallback = callback;
 }

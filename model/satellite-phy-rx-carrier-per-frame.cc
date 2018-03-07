@@ -130,7 +130,7 @@ SatPhyRxCarrierPerFrame::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams
       return;
     }
 
-  NS_LOG_INFO ("Time: " << Now ().GetSeconds () << " - CRDSA packet received");
+  NS_LOG_INFO ("CRDSA packet received");
   SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s params;
 
   params.destAddress = packetRxParams.destAddress;
@@ -156,7 +156,6 @@ void
 SatPhyRxCarrierPerFrame::DoFrameEnd ()
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_INFO ("Time: " << Now ().GetSeconds ());
 
   if (!m_crdsaPacketContainer.empty ())
     {
@@ -283,7 +282,6 @@ void
 SatPhyRxCarrierPerFrame::MeasureRandomAccessLoad ()
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_INFO ("Time: " << Now ().GetSeconds ());
 
   /// calculate the load for this frame
   double normalizedOfferedLoad = CalculateNormalizedOfferedRandomAccessLoad ();
@@ -303,16 +301,15 @@ double
 SatPhyRxCarrierPerFrame::CalculateNormalizedOfferedRandomAccessLoad ()
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_INFO ("Time: " << Now ().GetSeconds ());
 
   Time superFrameDuration = Singleton<SatRtnLinkTime>::Get ()->GetSuperFrameDuration (SatConstVariables::SUPERFRAME_SEQUENCE);
 
   double normalizedOfferedLoad = (m_randomAccessBitsInFrame / superFrameDuration.GetSeconds ()) / m_rxBandwidthHz;
 
-  NS_LOG_INFO ("SatPhyRxCarrierUt::CalculateNormalizedOfferedRandomAccessLoad - bits: " << m_randomAccessBitsInFrame
-                                                                                        << ", frame length in seconds: " << superFrameDuration.GetSeconds ()
-                                                                                        << ", bandwidth in Hz: " << m_rxBandwidthHz
-                                                                                        << ", normalized offered load (bps/Hz): " << normalizedOfferedLoad);
+  NS_LOG_INFO ("Bits: " << m_randomAccessBitsInFrame <<
+               ", frame length in seconds: " << superFrameDuration.GetSeconds () <<
+               ", bandwidth in Hz: " << m_rxBandwidthHz <<
+               ", normalized offered load (bps/Hz): " << normalizedOfferedLoad);
 
   /// reset the counter
   m_randomAccessBitsInFrame = 0;
@@ -324,8 +321,6 @@ void
 SatPhyRxCarrierPerFrame::AddCrdsaPacket (SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s crdsaPacketParams)
 {
   NS_LOG_FUNCTION (this);
-
-  NS_LOG_INFO ("Time: " << Now ().GetSeconds ());
 
   if (crdsaPacketParams.rxParams->m_packetsInBurst.size () > 0)
     {
@@ -639,7 +634,6 @@ void
 SatPhyRxCarrierPerFrame::FindAndRemoveReplicas (SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s packet)
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_INFO ("Time: " << Now ().GetSeconds ());
 
   for (uint32_t i = 0; i < packet.slotIdsForOtherReplicas.size (); i++)
     {
@@ -744,7 +738,6 @@ SatPhyRxCarrierPerFrame::IsReplica (const SatPhyRxCarrierPerFrame::crdsaPacketRx
                                     const SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s& otherPacket) const
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_INFO ("Time: " << Now ().GetSeconds ());
 
   NS_LOG_INFO ("Checking the source addresses");
 
@@ -768,7 +761,6 @@ SatPhyRxCarrierPerFrame::HaveSameSlotIds (const SatPhyRxCarrierPerFrame::crdsaPa
                                           const SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s& otherPacket) const
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_INFO ("SatPhyRxCarrierUt::HaveSameSlotIds - Time: " << Now ().GetSeconds ());
 
   std::set<uint16_t> firstSet;
   std::set<uint16_t> secondSet;
@@ -785,7 +777,7 @@ SatPhyRxCarrierPerFrame::HaveSameSlotIds (const SatPhyRxCarrierPerFrame::crdsaPa
       NS_FATAL_ERROR ("SatPhyRxCarrierUt::HaveSameSlotIds - The amount of replicas does not match");
     }
 
-  NS_LOG_INFO ("SatPhyRxCarrierUt::HaveSameSlotIds - Comparing slot IDs");
+  NS_LOG_INFO ("Comparing slot IDs");
 
   /// form sets
   for (uint32_t i = 0; i < otherPacket.slotIdsForOtherReplicas.size (); i++)

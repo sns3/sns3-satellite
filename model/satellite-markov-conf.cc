@@ -95,8 +95,6 @@ SatMarkovConf::SatMarkovConf ()
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatMarkovConf::SatMarkovConf - Creating SatMarkovConf");
-
   for (uint32_t i = 0; i < m_elevationCount; i++)
     {
       std::vector<std::vector<double> > states;
@@ -180,7 +178,6 @@ SatMarkovConf::GetElevationProbabilities (uint32_t set)
       NS_FATAL_ERROR ("SatMarkovConf::GetElevationProbabilities - Invalid set");
     }
 
-  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatMarkovConf::GetElevationProbabilities - Getting elevation probabilities for set ID " << set);
   return m_markovProbabilities[set];
 }
 
@@ -209,8 +206,8 @@ SatMarkovConf::GetProbabilitySetID (double elevation)
           smallestDifferenceIndex = iter->second;
         }
     }
-  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatMarkovConf::GetProbabilitySetID - New ID for elevation " << elevation << " is " << smallestDifferenceIndex);
 
+  NS_LOG_INFO ("New ID for elevation " << elevation << " is " << smallestDifferenceIndex);
   return smallestDifferenceIndex;
 }
 

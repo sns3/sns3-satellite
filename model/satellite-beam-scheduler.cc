@@ -315,7 +315,7 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCall
   m_raChRandomIndex->SetAttribute ("Max", DoubleValue (maxIndex));
   m_superframeAllocator = CreateObject<SatSuperframeAllocator> (m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE));
 
-  NS_LOG_INFO ("Initialize SatBeamScheduler at " << Simulator::Now ().GetSeconds ());
+  NS_LOG_INFO ("Initialized SatBeamScheduler");
 
   Time delay;
   Time txTime = Singleton<SatRtnLinkTime>::Get ()->GetNextSuperFrameStartTime (SatConstVariables::SUPERFRAME_SEQUENCE);
@@ -398,8 +398,6 @@ SatBeamScheduler::UtCrReceived (Address utId, Ptr<SatCrMessage> crMsg)
   UtInfoMap_t::iterator result = m_utInfos.find (utId);
   NS_ASSERT (result != m_utInfos.end ());
 
-  NS_LOG_INFO ("SatBeamScheduler::UtCrReceived - UT: " << utId << " @ " << Now ().GetSeconds ());
-
   m_utInfos[utId]->AddCrMsg (crMsg);
 }
 
@@ -471,7 +469,7 @@ SatBeamScheduler::Schedule ()
           Send (*it);
         }
 
-      NS_LOG_INFO ("TBTP sent at: " << Simulator::Now ().GetSeconds ());
+      NS_LOG_INFO ("TBTP sent");
     }
 
   uint32_t usableCapacity = std::min (offeredKbpsSum, requestedKbpsSum);

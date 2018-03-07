@@ -145,7 +145,7 @@ SatInterference::Calculate (Ptr<SatInterference::InterferenceChangeEvent> event)
         }
       if (!wasCollisionReported)
         {
-          NS_LOG_INFO ("SatInterference::Calculate - Time: " << Now ().GetSeconds () << " - Packet collision!");
+          NS_LOG_INFO ("Packet collision!");
         }
     }
 

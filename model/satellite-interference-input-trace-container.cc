@@ -113,7 +113,7 @@ SatInterferenceInputTraceContainer::AddNode (key_t key)
           NS_FATAL_ERROR ("SatInterferenceInputTraceContainer::AddNode failed");
         }
 
-      NS_LOG_INFO ("SatInterferenceInputTraceContainer::AddNode: Added node with MAC " << key.first << " channel type " << key.second);
+      NS_LOG_INFO ("Added node with MAC " << key.first << " channel type " << key.second);
 
       return result.first->second;
     }

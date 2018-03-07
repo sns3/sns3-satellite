@@ -47,19 +47,19 @@ NS_LOG_COMPONENT_DEFINE ("sat-rtn-system-test-example");
 // Callback called when RBDC CR has been sent by request manager
 static void RbcdRcvdCb (uint32_t value)
 {
-  NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s RBDC request generated with " << value << " kbps");
+  NS_LOG_INFO ("RBDC request generated with " << value << " kbps");
 }
 
 // Callback called when AVBDC CR has been sent by request manager
 static void AvbcdRcvdCb (uint32_t value)
 {
-  NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s AVBDC request generated with " << value << " Bytes");
+  NS_LOG_INFO ("AVBDC request generated with " << value << " Bytes");
 }
 
 // Callback called when VBDC CR has been sent by request manager
 static void VbcdRcvdCb (uint32_t value)
 {
-  NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s VBDC request generated with " << value << " Bytes");
+  NS_LOG_INFO ("VBDC request generated with " << value << " Bytes");
 }
 
 // Callback called when VBDC CR has been sent by request manager
@@ -67,7 +67,7 @@ static void TbtpResources (uint32_t value)
 {
   if (value > 0)
     {
-      NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s " << value << " Bytes allocated within TBTP");
+      NS_LOG_INFO ("" << value << " Bytes allocated within TBTP");
     }
 }
 

@@ -200,7 +200,10 @@ SatInputFileStreamTimeDoubleContainer::FindNextClosest (uint32_t lastValidPositi
   NS_ASSERT (m_container.size () > 0);
   NS_ASSERT (lastValidPosition >= 0 && lastValidPosition < m_container.size ());
 
-  NS_LOG_INFO ("SatInputFileStreamDoubleContainer::FindNextClosest: lastValidPosition " << lastValidPosition << " column " << m_timeColumn << " timeShiftValue " << timeShiftValue << " comparisonTimeValue " << comparisonTimeValue);
+  NS_LOG_INFO ("LastValidPosition " << lastValidPosition <<
+               " column " << m_timeColumn <<
+               " timeShiftValue " << timeShiftValue <<
+               " comparisonTimeValue " << comparisonTimeValue);
 
   bool valueFound = false;
 

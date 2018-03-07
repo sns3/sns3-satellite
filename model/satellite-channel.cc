@@ -318,7 +318,7 @@ SatChannel::ScheduleRx (Ptr<SatSignalParameters> txParams, Ptr<SatPhyRx> receive
       NS_FATAL_ERROR ("SatChannel::ScheduleRx - propagation delay model not set!");
     }
 
-  NS_LOG_INFO ("Time: " << Simulator::Now ().GetSeconds () << ": setting propagation delay: " << delay);
+  NS_LOG_INFO ("Setting propagation delay: " << delay);
 
   Ptr<NetDevice> netDev = receiver->GetDevice ();
   uint32_t dstNodeId =  netDev->GetNode ()->GetId ();
@@ -370,7 +370,7 @@ SatChannel::DoRxPowerOutputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyR
   // Get the bandwidth of the currently used carrier
   double carrierBandwidthHz = m_carrierBandwidthConverter (m_channelType, rxParams->m_carrierId, SatEnums::EFFECTIVE_BANDWIDTH );
 
-  NS_LOG_INFO ("SatChannel::DoRxPowerOutputTrace - carrier bw: " << carrierBandwidthHz <<
+  NS_LOG_INFO ("Carrier bw: " << carrierBandwidthHz <<
                ", rxPower: " << SatUtils::LinearToDb (rxParams->m_rxPower_W) <<
                ", carrierId: " << rxParams->m_carrierId <<
                ", channelType: " << SatEnums::GetChannelTypeName (m_channelType));
@@ -435,7 +435,7 @@ SatChannel::DoRxPowerInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx
       }
     }
 
-  NS_LOG_INFO ("SatChannel::DoRxPowerOutputTrace - carrier bw: " << carrierBandwidthHz <<
+  NS_LOG_INFO ("Carrier bw: " << carrierBandwidthHz <<
                ", rxPower: " << SatUtils::LinearToDb (rxParams->m_rxPower_W) <<
                ", carrierId: " << rxParams->m_carrierId <<
                ", channelType: " << SatEnums::GetChannelTypeName (m_channelType));

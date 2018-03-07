@@ -1040,7 +1040,7 @@ SatBeamHelper::PopulateRoutings (NodeContainer ut, NetDeviceContainer utNd, Ptr<
   Address macAddressGw = gwNd->GetAddress ();
   Ptr<SatArpCache> utArpCache = CreateObject<SatArpCache> ();
   utArpCache->Add (gwAddr, macAddressGw);
-  NS_LOG_INFO ("SatBeamHelper::PopulateRoutings, UT arp entry:  " << gwAddr << " - " << macAddressGw );
+  NS_LOG_INFO ("UT ARP entry:  " << gwAddr << " - " << macAddressGw );
 
   // Add the ARP entries of all the UTs in this beam
   // - MAC address vs. IPv4 address
@@ -1051,13 +1051,13 @@ SatBeamHelper::PopulateRoutings (NodeContainer ut, NetDeviceContainer utNd, Ptr<
       Ptr<NetDevice> nd = utNd.Get (i);
       Ipv4Address ipv4Addr = utIfs.GetAddress (i);
       gwArpCache->Add (ipv4Addr, nd->GetAddress ());
-      NS_LOG_INFO ("SatBeamHelper::PopulateRoutings, GW arp entry:  " << ipv4Addr << " - " << nd->GetAddress ());
+      NS_LOG_INFO ("GW ARP entry:  " << ipv4Addr << " - " << nd->GetAddress ());
     }
 
   // Set the ARP cache to the proper GW IPv4Interface (the one for satellite
   // link). ARP cache contains the entries for all UTs within this spot-beam.
   ipv4Gw->GetInterface (gwNd->GetIfIndex ())->SetArpCache (gwArpCache);
-  NS_LOG_INFO ("SatBeamHelper::PopulateRoutings, Add ARP cache to GW: " << gw->GetId () );
+  NS_LOG_INFO ("Add ARP cache to GW " << gw->GetId () );
 
   uint32_t utAddressIndex = 0;
 
@@ -1076,11 +1076,11 @@ SatBeamHelper::PopulateRoutings (NodeContainer ut, NetDeviceContainer utNd, Ptr<
             {
               Ptr<Ipv4StaticRouting> srUt = ipv4RoutingHelper.GetStaticRouting (ipv4Ut);
               srUt->SetDefaultRoute (gwAddr, j);
-              NS_LOG_INFO ("SatBeamHelper::PopulateRoutings, UT default route: " << gwAddr);
+              NS_LOG_INFO ("UT default route: " << gwAddr);
 
               // Set the ARP cache (including the ARP entry for the default GW) to the UT
               ipv4Ut->GetInterface (j)->SetArpCache (utArpCache);
-              NS_LOG_INFO ("SatBeamHelper::PopulateRoutings, add the ARP cache to UT " << (*i)->GetId () );
+              NS_LOG_INFO ("Add the ARP cache to UT " << (*i)->GetId () );
 
             }
           else  // add other interface route to GW's Satellite interface
@@ -1089,7 +1089,7 @@ SatBeamHelper::PopulateRoutings (NodeContainer ut, NetDeviceContainer utNd, Ptr<
               Ipv4Mask mask = ipv4Ut->GetAddress (j, 0).GetMask ();
 
               srGw->AddNetworkRouteTo (address.CombineMask (mask), mask, utIfs.GetAddress (utAddressIndex), gwNd->GetIfIndex ());
-              NS_LOG_INFO ("SatBeamHelper::PopulateRoutings, GW Network route:  " << address.CombineMask (mask) <<
+              NS_LOG_INFO ("GW Network route:  " << address.CombineMask (mask) <<
                            ", " << mask << ", " << utIfs.GetAddress (utAddressIndex));
             }
         }

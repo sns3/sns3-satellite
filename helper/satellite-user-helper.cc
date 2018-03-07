@@ -177,7 +177,7 @@ SatUserHelper::InstallUt (Ptr<Node> ut, uint32_t userCount )
       // Set default route for users toward satellite (UTs address)
       Ptr<Ipv4StaticRouting> routing = ipv4RoutingHelper.GetStaticRouting (ipv4);
       routing->SetDefaultRoute (addresses.GetAddress (0), 1);
-      NS_LOG_INFO ("SatUserHelper::InstallUt, User default route: " << addresses.GetAddress (0) );
+      NS_LOG_INFO ("User default route: " << addresses.GetAddress (0) );
     }
 
   m_ipv4Ut.NewNetwork ();
@@ -223,7 +223,7 @@ SatUserHelper::InstallGw (NodeContainer gw, uint32_t userCount )
   uint32_t lastRouterIf = ipv4Router->GetNInterfaces () - 1;
   Ptr<Ipv4StaticRouting> routingRouter = ipv4RoutingHelper.GetStaticRouting (ipv4Router);
   routingRouter->SetDefaultRoute (addresses.GetAddress (1), lastRouterIf);
-  NS_LOG_INFO ("SatUserHelper::InstallGw, Router default route: " << addresses.GetAddress (1) );
+  NS_LOG_INFO ("Router default route: " << addresses.GetAddress (1) );
 
   for (NodeContainer::Iterator i = users.Begin (); i != users.End (); i++)
     {
@@ -240,7 +240,7 @@ SatUserHelper::InstallGw (NodeContainer gw, uint32_t userCount )
       // Set default route toward router (GW) for users
       Ptr<Ipv4StaticRouting> routing = ipv4RoutingHelper.GetStaticRouting (ipv4);
       routing->SetDefaultRoute (addresses.GetAddress (0), 1);
-      NS_LOG_INFO ("SatUserHelper::InstallGw, User default route: " << addresses.GetAddress (0));
+      NS_LOG_INFO ("User default route: " << addresses.GetAddress (0));
     }
 
   m_gwUsers.Add (users);
@@ -372,7 +372,7 @@ SatUserHelper::InstallRouter (NodeContainer gw, Ptr<Node> router)
       uint32_t lastGwIf = ipv4Gw->GetNInterfaces () - 1;
       Ptr<Ipv4StaticRouting> routingGw = ipv4RoutingHelper.GetStaticRouting (ipv4Gw);
       routingGw->SetDefaultRoute (addresses.GetAddress (1), lastGwIf);
-      NS_LOG_INFO ("SatUserHelper::InstallRouter  GW default route: " << addresses.GetAddress (1) );
+      NS_LOG_INFO ("GW default route: " << addresses.GetAddress (1) );
 
       for (uint32_t  routeIndex = 0; routeIndex < routingGw->GetNRoutes (); routeIndex++)
         {
@@ -388,8 +388,9 @@ SatUserHelper::InstallRouter (NodeContainer gw, Ptr<Node> router)
           if ((interface != 0) && (interface != lastGwIf))
             {
               routingRouter->AddNetworkRouteTo (route.GetDest (), route.GetDestNetworkMask (), addresses.GetAddress (0), lastRouterIf);
-              NS_LOG_INFO ("SatUserHelper::InstallRouter, Router network route:" << route.GetDest ()
-                                                                                 << ", " << route.GetDestNetworkMask () << ", " << addresses.GetAddress (0));
+              NS_LOG_INFO ("Router network route:" << route.GetDest () <<
+                           ", " << route.GetDestNetworkMask () <<
+                           ", " << addresses.GetAddress (0));
             }
         }
 

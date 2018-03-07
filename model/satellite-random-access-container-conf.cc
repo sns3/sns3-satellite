@@ -120,7 +120,7 @@ SatRandomAccessConf::DoSlottedAlohaVariableSanityCheck ()
       NS_FATAL_ERROR ("SatRandomAccessConf::DoSlottedAlohaVariableSanityCheck - m_slottedAlohaControlRandomizationIntervalInMilliSeconds < 1");
     }
 
-  NS_LOG_INFO ("SatRandomAccessConf::DoSlottedAlohaVariableSanityCheck - Variable sanity check done");
+  NS_LOG_INFO ("Variable sanity check done");
 }
 
 } // namespace ns3

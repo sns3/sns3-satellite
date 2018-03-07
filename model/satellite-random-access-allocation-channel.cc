@@ -85,7 +85,7 @@ SatRandomAccessAllocationChannel::DoCrdsaVariableSanityCheck ()
       NS_FATAL_ERROR ("SatRandomAccessAllocationChannel::CrdsaDoVariableSanityCheck - m_crdsaBackoffProbability < 0.0 || m_crdsaBackoffProbability > 1.0");
     }
 
-  NS_LOG_INFO ("SatRandomAccessAllocationChannel::DoCrdsaVariableSanityCheck - Variable sanity check done");
+  NS_LOG_INFO ("Variable sanity check done");
 }
 
 } // namespace ns3

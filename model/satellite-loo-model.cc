@@ -196,7 +196,7 @@ SatLooModel::GetChannelGainDb ()
   NS_LOG_FUNCTION (this);
 
   double tempChannelGainDb = 10.0 * std::log10 (GetChannelGain ());
-  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " " << tempChannelGainDb);
+  NS_LOG_INFO ("Channel gain: " << tempChannelGainDb);
   return tempChannelGainDb;
 }
 

@@ -249,17 +249,17 @@ SatEnvVariables::GetCurrentWorkingDirectory ()
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_INFO ("SatEnvVariables::GetCurrentWorkingDirectory - Current working directory: " << m_currentWorkingDirectory);
-  NS_LOG_INFO ("SatEnvVariables::GetCurrentWorkingDirectory - Current working directory (attribute): " << m_currentWorkingDirectoryFromAttribute);
+  NS_LOG_INFO ("Current working directory: " << m_currentWorkingDirectory);
+  NS_LOG_INFO ("Current working directory (attribute): " << m_currentWorkingDirectoryFromAttribute);
 
   if (m_currentWorkingDirectoryFromAttribute.empty ())
     {
-      NS_LOG_INFO ("SatEnvVariables::GetCurrentWorkingDirectory - Attribute string is empty, using detected working directory");
+      NS_LOG_INFO ("Attribute string is empty, using detected working directory");
       return m_currentWorkingDirectory;
     }
   else
     {
-      NS_LOG_INFO ("SatEnvVariables::GetCurrentWorkingDirectory - Using attributed working directory");
+      NS_LOG_INFO ("Using attributed working directory");
       return m_currentWorkingDirectoryFromAttribute;
     }
 }
@@ -269,17 +269,17 @@ SatEnvVariables::GetPathToExecutable ()
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_INFO ("SatEnvVariables::GetPathToExecutable - Path to executable: " << m_pathToExecutable);
-  NS_LOG_INFO ("SatEnvVariables::GetPathToExecutable - Path to executable (attribute): " << m_pathToExecutableFromAttribute);
+  NS_LOG_INFO ("Path to executable: " << m_pathToExecutable);
+  NS_LOG_INFO ("Path to executable (attribute): " << m_pathToExecutableFromAttribute);
 
   if (m_pathToExecutableFromAttribute.empty ())
     {
-      NS_LOG_INFO ("SatEnvVariables::GetPathToExecutable - Attribute string is empty, using detected path to executable");
+      NS_LOG_INFO ("Attribute string is empty, using detected path to executable");
       return m_pathToExecutable;
     }
   else
     {
-      NS_LOG_INFO ("SatEnvVariables::GetPathToExecutable - Using attributed path to executable");
+      NS_LOG_INFO ("Using attributed path to executable");
       return m_pathToExecutableFromAttribute;
     }
 }
@@ -300,7 +300,7 @@ SatEnvVariables::IsValidDirectory (std::string path)
         }
     }
 
-  NS_LOG_INFO ("SatEnvVariables::IsValidDirectory - " << path << " validity: " << validDirectory);
+  NS_LOG_INFO ("" << path << " validity: " << validDirectory);
 
   return validDirectory;
 }
@@ -313,7 +313,7 @@ SatEnvVariables::IsValidFile (std::string pathToFile)
   struct stat st;
   bool validFile = (stat (pathToFile.c_str (), &st) == 0);
 
-  NS_LOG_INFO ("SatEnvVariables::IsValidFile - " << pathToFile << " validity: " << validFile);
+  NS_LOG_INFO ("" << pathToFile << " validity: " << validFile);
 
   return validFile;
 }
@@ -334,7 +334,7 @@ SatEnvVariables::LocateDirectory (std::string initialPath)
   std::string path;
   bool directoryFound = false;
 
-  NS_LOG_INFO ("SatEnvVariables::LocateDirectory - Initial path " << initialPath);
+  NS_LOG_INFO ("Initial path " << initialPath);
 
   for (uint32_t i = 0; i < m_levelsToCheck; i++)
     {
@@ -347,11 +347,11 @@ SatEnvVariables::LocateDirectory (std::string initialPath)
 
       dataPath << initialPath;
 
-      NS_LOG_INFO ("SatEnvVariables::LocateDirectory - Checking " << dataPath.str ());
+      NS_LOG_INFO ("Checking " << dataPath.str ());
 
       if (IsValidDirectory (dataPath.str ()))
         {
-          NS_LOG_INFO ("SatEnvVariables::LocateDirectory - Data directory located in " << dataPath.str ());
+          NS_LOG_INFO ("Data directory located in " << dataPath.str ());
           path = dataPath.str ();
           directoryFound = true;
           break;
@@ -374,7 +374,7 @@ SatEnvVariables::LocateFile (std::string initialPath)
   std::string path;
   bool fileFound = false;
 
-  NS_LOG_INFO ("SatEnvVariables::LocateDirectory - Initial path " << initialPath);
+  NS_LOG_INFO ("Initial path " << initialPath);
 
   for (uint32_t i = 0; i < m_levelsToCheck; i++)
     {
@@ -387,11 +387,11 @@ SatEnvVariables::LocateFile (std::string initialPath)
 
       dataPath << initialPath;
 
-      NS_LOG_INFO ("SatEnvVariables::LocateFile - Checking " << dataPath.str ());
+      NS_LOG_INFO ("Checking " << dataPath.str ());
 
       if (IsValidFile (dataPath.str ()))
         {
-          NS_LOG_INFO ("SatEnvVariables::LocateDirectory - Data directory located in " << dataPath.str ());
+          NS_LOG_INFO ("Data directory located in " << dataPath.str ());
           path = dataPath.str ();
           fileFound = true;
           break;
@@ -411,7 +411,7 @@ SatEnvVariables::InitializeOutputFolders (std::string campaignName, std::string 
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_INFO ("SatEnvVariables::CreateOutputDirectory - Creating output directory");
+  NS_LOG_INFO ("Creating output directory");
 
   uint32_t safety = 0;
   std::string safetyTag = "";
@@ -448,7 +448,7 @@ SatEnvVariables::InitializeOutputFolders (std::string campaignName, std::string 
         {
           safety++;
 
-          NS_LOG_INFO ("SatEnvVariables::CreateOutputDirectory - Directory " << outputPath << " exists, increasing safety number to " << safety);
+          NS_LOG_INFO ("Directory " << outputPath << " exists, increasing safety number to " << safety);
 
           std::stringstream ss;
           ss << safety;
@@ -483,7 +483,7 @@ SatEnvVariables::FormOutputPath (std::string simRootPath, std::string campaignNa
   outputPath = AddToPath (outputPath, campaignName);
   outputPath = AddToPath (outputPath, tempTag.str ());
 
-  NS_LOG_INFO ("SatEnvVariables::FormOutputPath - Formed path " + outputPath);
+  NS_LOG_INFO ("Formed path " + outputPath);
 
   return outputPath;
 }
@@ -515,7 +515,7 @@ SatEnvVariables::CreateDirectory (std::string path)
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_INFO ("SatEnvVariables::CreateDirectory - Creating directory " + path);
+  NS_LOG_INFO ("Creating directory " + path);
 
   mkdir (path.c_str (), 0777);
 }
@@ -535,7 +535,7 @@ SatEnvVariables::GetCurrentDateAndTime ()
   strftime (buffer, 80, "%d-%m-%Y %I:%M:%S", timeinfo);
   std::string str (buffer);
 
-  NS_LOG_INFO ("SatEnvVariables::GetCurrentRealDateAndTime - " + str);
+  NS_LOG_INFO ("Date is " << str);
 
   return str;
 }

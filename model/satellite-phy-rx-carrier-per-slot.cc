@@ -165,7 +165,6 @@ SatPhyRxCarrierPerSlot::ProcessSlottedAlohaCollisions (double cSinr,
                                                        Ptr<SatInterference::InterferenceChangeEvent> interferenceEvent)
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_INFO ("SatPhyRxCarrier::ProcessSlottedAlohaCollisions");
 
   bool phyError = false;
 
@@ -173,13 +172,13 @@ SatPhyRxCarrierPerSlot::ProcessSlottedAlohaCollisions (double cSinr,
     {
       /// check whether the packet has collided. This mode is intended to be used with constant interference and traced interference
       phyError = GetInterferenceModel ()->HasCollision (interferenceEvent);
-      NS_LOG_INFO ("SatPhyRxCarrier::ProcessSlottedAlohaCollisions - Time: " << Now ().GetSeconds () << " - Strict collision mode, phyError: " << phyError);
+      NS_LOG_INFO ("Strict collision mode, phyError: " << phyError);
     }
   else if (m_randomAccessCollisionModel == SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR)
     {
       /// check cSinr against link results
       phyError = CheckAgainstLinkResults (cSinr, rxParams);
-      NS_LOG_INFO ("SatPhyRxCarrier::ProcessSlottedAlohaCollisions - Time: " << Now ().GetSeconds () << " - Composite SINR mode, phyError: " << phyError);
+      NS_LOG_INFO ("Composite SINR mode, phyError: " << phyError);
     }
   else if (m_randomAccessCollisionModel == SatPhyRxCarrierConf::RA_CONSTANT_COLLISION_PROBABILITY)
     {
@@ -188,7 +187,7 @@ SatPhyRxCarrierPerSlot::ProcessSlottedAlohaCollisions (double cSinr,
         {
           phyError = true;
         }
-      NS_LOG_INFO ("SatPhyRxCarrier::ProcessSlottedAlohaCollisions - Time: " << Now ().GetSeconds () << " - Constant collision probability mode, phyError: " << phyError);
+      NS_LOG_INFO ("Constant collision probability mode, phyError: " << phyError);
     }
   else
     {
@@ -231,7 +230,7 @@ SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams,
 
   if (packetRxParams.rxParams->m_txInfo.packetType == SatEnums::PACKET_TYPE_SLOTTED_ALOHA)
     {
-      NS_LOG_INFO ("SatPhyRxCarrier::EndRxDataNormal - Time: " << Now ().GetSeconds () << " - Slotted ALOHA packet received");
+      NS_LOG_INFO ("Slotted ALOHA packet received");
 
       // Update the load with FEC block size!
       m_randomAccessBitsInFrame += packetRxParams.rxParams->m_txInfo.fecBlockSizeInBytes * SatConstVariables::BITS_PER_BYTE;
@@ -317,9 +316,6 @@ void
 SatPhyRxCarrierPerSlot::SaveMeasuredRandomAccessLoad (double measuredRandomAccessLoad)
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_INFO ("SatPhyRxCarrier::SaveMeasuredRandomAccessLoad");
-
-  NS_LOG_INFO ("SatPhyRxCarrier::SaveMeasuredRandomAccessLoad - Time: " << Now ().GetSeconds ());
 
   m_randomAccessDynamicLoadControlNormalizedOfferedLoad.push_back (measuredRandomAccessLoad);
 
@@ -334,9 +330,6 @@ double
 SatPhyRxCarrierPerSlot::CalculateAverageNormalizedOfferedRandomAccessLoad ()
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_INFO ("SatPhyRxCarrier::CalculateAverageNormalizedOfferedRandomAccessLoad");
-
-  NS_LOG_INFO ("SatPhyRxCarrier::CalculateAverageNormalizedOfferedRandomAccessLoad - Time: " << Now ().GetSeconds ());
 
   double sum = 0.0;
   double averageNormalizedOfferedLoad = 0.0;
@@ -352,7 +345,7 @@ SatPhyRxCarrierPerSlot::CalculateAverageNormalizedOfferedRandomAccessLoad ()
       averageNormalizedOfferedLoad = sum / m_randomAccessDynamicLoadControlNormalizedOfferedLoad.size ();
     }
 
-  NS_LOG_INFO ("SatPhyRxCarrier::CalculateAverageNormalizedOfferedRandomAccessLoad - average normalized offered load: " << averageNormalizedOfferedLoad);
+  NS_LOG_INFO ("Average normalized offered load: " << averageNormalizedOfferedLoad);
 
   return averageNormalizedOfferedLoad;
 }

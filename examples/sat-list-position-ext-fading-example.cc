@@ -61,13 +61,12 @@ static void LinkBudgetTraceCb ( std::string context, Ptr<SatSignalParameters> pa
   // print only unicast message to prevent printing control messages like TBTP messages
   if ( !destAdd.IsBroadcast () )
     {
-      NS_LOG_INFO ( Simulator::Now () << " "
-                                      << params->m_channelType << " "
-                                      << ownAdd << " "
-                                      << destAdd << " "
-                                      << params->m_beamId << " "
-                                      << SatUtils::LinearToDb (params->m_sinr) << " "
-                                      << SatUtils::LinearToDb (cSinr) );
+      NS_LOG_INFO ( "" << params->m_channelType <<
+                    " " << ownAdd <<
+                    " " << destAdd <<
+                    " " << params->m_beamId <<
+                    " " << SatUtils::LinearToDb (params->m_sinr) <<
+                    " " << SatUtils::LinearToDb (cSinr) );
     }
 }
 

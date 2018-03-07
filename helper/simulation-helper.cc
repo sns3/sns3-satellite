@@ -1423,12 +1423,10 @@ void SimulationHelper::RunSimulation ()
   NS_LOG_FUNCTION (this);
 
   NS_LOG_INFO ("--- " << m_simulationName << "---");
-  //NS_LOG_INFO ("  Packet size in bytes: " << packetSizeMin << " - " << packetSizeMax);
   NS_LOG_INFO ("  Simulation length: " << m_simTime.GetSeconds ());
   NS_LOG_INFO ("  Enabled beams: " << m_enabledBeamsStr);
-  //NS_LOG_INFO ("  Number of UTs: " << m_satHelper->GetGwUsers ().GetN());
+  NS_LOG_INFO ("  Number of UTs: " << m_satHelper->GetGwUsers ().GetN ());
   NS_LOG_INFO ("  Number of end users: " << m_satHelper->GetUtUsers ().GetN ());
-  NS_LOG_INFO ("  ");
 
   Simulator::Stop (m_simTime);
   Simulator::Run ();

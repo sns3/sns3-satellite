@@ -132,7 +132,7 @@ SatRayleighModel::GetChannelGainDb ()
 
   std::complex<double> complexGain = GetComplexGain ();
   double tempChannelGainDb = (10 * std::log10 ((std::pow (complexGain.real (), 2) + std::pow (complexGain.imag (), 2)) / 2));
-  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " " << tempChannelGainDb);
+  NS_LOG_INFO ("Computed channel gain: " << tempChannelGainDb);
   return tempChannelGainDb;
 }
 
@@ -144,7 +144,7 @@ SatRayleighModel::GetChannelGain ()
   std::complex<double> complexGain = GetComplexGain ();
 
   double tempChannelGain = ((std::pow (complexGain.real (), 2) + std::pow (complexGain.imag (), 2)) / 2);
-  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " " << tempChannelGain);
+  NS_LOG_INFO ("Computed channel gain: " << tempChannelGain);
   return tempChannelGain;
 }
 
