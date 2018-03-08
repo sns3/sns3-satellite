@@ -57,8 +57,9 @@ public:
    * \param modcod ModCod
    * \param payloadBytes Payload in bytes
    * \param lengthInSymbols Duration in symbols
+   * \param preambleLengthInSymbols Preamble duration in symbols
    */
-  SatWaveform (uint32_t wfId, uint32_t modulatedBits, double codingRate, SatEnums::SatModcod_t modcod, uint32_t payloadBytes, uint32_t lengthInSymbols);
+  SatWaveform (uint32_t wfId, uint32_t modulatedBits, double codingRate, SatEnums::SatModcod_t modcod, uint32_t payloadBytes, uint32_t lengthInSymbols, uint32_t preambleLengthInSymbols);
 
   /**
    * \brief Get waveform id
@@ -79,10 +80,23 @@ public:
   uint32_t GetPayloadInBytes () const;
 
   /**
+   * \brief Get preamble length of the waveform in symbols
+   * \return Burst length
+   */
+  uint32_t GetPreambleLengthInSymbols () const;
+
+  /**
    * \brief Get burst length of the waveform in symbols
    * \return Burst length
    */
   uint32_t GetBurstLengthInSymbols () const;
+
+  /**
+   * \brief Get/calculate the preamble duration of a waveform based on symbol rate
+   * \param symbolRateInBaud Symbol rate
+   * \return Preamble duration
+   */
+  Time GetPreambleDuration (double symbolRateInBaud) const;
 
   /**
    * \brief Get/calculate the burst duration of a waveform based on symbol rate
@@ -161,6 +175,11 @@ private:
    * Length of the burst in symbols
    */
   uint32_t m_lengthInSymbols;
+
+  /**
+   * Length of the preamble in symbols
+   */
+  uint32_t m_preambleLengthInSymbols;
 
   /**
    * Eb/No threshold calculated with a certain BLER target
