@@ -54,6 +54,42 @@ public:
   static TypeId GetTypeId (void);
 
   /**
+   * \brief Function for getting the status of Slotted Aloha allowance
+   * \return Is Slotted Aloha allowed
+   */
+  bool GetSlottedAlohaAllowed ()
+  {
+    return m_slottedAlohaAllowed;
+  }
+
+  /**
+   * \brief Function for setting the status of Slotted Aloha allowance
+   * \param isSlottedAlohaAllowed Is Slotted Aloha allowed
+   */
+  void SetSlottedAlohaAllowed (bool isSlottedAlohaAllowed)
+  {
+    m_slottedAlohaAllowed = isSlottedAlohaAllowed;
+  }
+
+  /**
+   * \brief Function for getting the status of CRDSA allowance
+   * \return Is CRDSA allowed
+   */
+  bool GetCrdsaAllowed ()
+  {
+    return m_crdsaAllowed;
+  }
+
+  /**
+   * \brief Function for setting the status of CRDSA allowance
+   * \param isCrdsaAllowed Is CRDSA allowed
+   */
+  void SetCrdsaAllowed (bool isCrdsaAllowed)
+  {
+    m_crdsaAllowed = isCrdsaAllowed;
+  }
+
+  /**
    * \brief Function for getting the CRDSA backoff time
    * \return CRDSA  backoff time
    */
@@ -257,6 +293,16 @@ public:
   void DoCrdsaVariableSanityCheck ();
 
 private:
+  /**
+   * \brief Slotted Aloha allowed
+   */
+  bool m_slottedAlohaAllowed;
+
+  /**
+   * \brief CRDSA allowed
+   */
+  bool m_crdsaAllowed;
+
   /**
    * \brief CRDSA minimum randomization value
    */

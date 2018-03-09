@@ -423,10 +423,6 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
           randomAccess->SetAreBuffersEmptyCallback (MakeCallback (&SatLlc::BuffersEmpty, llc));
         }
 
-      /// define which allocation channels should be used with each of the random access models
-      randomAccess->AddCrdsaAllocationChannel (SatConstVariables::CRDSA_ALLOCATION_CHANNEL);
-      randomAccess->AddSlottedAlohaAllocationChannel (SatConstVariables::SLOTTED_ALOHA_ALLOCATION_CHANNEL);
-
       /// attach the RA module
       mac->SetRandomAccess (randomAccess);
     }

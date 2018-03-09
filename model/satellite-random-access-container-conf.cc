@@ -74,19 +74,21 @@ SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf,
       Ptr<SatRandomAccessAllocationChannel> allocationChannel = CreateObject<SatRandomAccessAllocationChannel> ();
       m_allocationChannelConf.insert (std::make_pair (i, allocationChannel));
 
-      GetAllocationChannelConfiguration (i)->SetCrdsaMaxUniquePayloadPerBlock (llsConf->GetRaMaximumUniquePayloadPerBlock (i));
-      GetAllocationChannelConfiguration (i)->SetCrdsaMaxConsecutiveBlocksAccessed (llsConf->GetRaMaximumConsecutiveBlockAccessed (i));
-      GetAllocationChannelConfiguration (i)->SetCrdsaMinIdleBlocks (llsConf->GetRaMinimumIdleBlock (i));
-      GetAllocationChannelConfiguration (i)->SetCrdsaNumOfInstances (llsConf->GetRaNumberOfInstances (i));
-      GetAllocationChannelConfiguration (i)->SetCrdsaBackoffProbability (llsConf->GetRaBackOffProbability (i));
-      GetAllocationChannelConfiguration (i)->SetCrdsaBackoffTimeInMilliSeconds (llsConf->GetRaBackOffTimeInMilliSeconds (i));
+      allocationChannel->SetSlottedAlohaAllowed (llsConf->GetRaIsSlottedAlohaAllowed (i));
+      allocationChannel->SetCrdsaAllowed (llsConf->GetRaIsCrdsaAllowed (i));
+      allocationChannel->SetCrdsaMaxUniquePayloadPerBlock (llsConf->GetRaMaximumUniquePayloadPerBlock (i));
+      allocationChannel->SetCrdsaMaxConsecutiveBlocksAccessed (llsConf->GetRaMaximumConsecutiveBlockAccessed (i));
+      allocationChannel->SetCrdsaMinIdleBlocks (llsConf->GetRaMinimumIdleBlock (i));
+      allocationChannel->SetCrdsaNumOfInstances (llsConf->GetRaNumberOfInstances (i));
+      allocationChannel->SetCrdsaBackoffProbability (llsConf->GetRaBackOffProbability (i));
+      allocationChannel->SetCrdsaBackoffTimeInMilliSeconds (llsConf->GetRaBackOffTimeInMilliSeconds (i));
       /// this assumes that the slot IDs for each allocation channel start at 0
-      GetAllocationChannelConfiguration (i)->SetCrdsaMinRandomizationValue (0);
+      allocationChannel->SetCrdsaMinRandomizationValue (0);
       /// TODO Get rid of the hard coded 0 in GetSuperframeConf
       /// this assumes that the slot IDs for each allocation channel start at 0
-      GetAllocationChannelConfiguration (i)->SetCrdsaMaxRandomizationValue (superframeSeq->GetSuperframeConf (0)->GetRaSlotCount (i) - 1);
+      allocationChannel->SetCrdsaMaxRandomizationValue (superframeSeq->GetSuperframeConf (0)->GetRaSlotCount (i) - 1);
 
-      GetAllocationChannelConfiguration (i)->DoCrdsaVariableSanityCheck ();
+      allocationChannel->DoCrdsaVariableSanityCheck ();
     }
 }
 

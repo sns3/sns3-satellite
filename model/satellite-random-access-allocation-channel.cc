@@ -35,7 +35,9 @@ SatRandomAccessAllocationChannel::GetTypeId (void)
 }
 
 SatRandomAccessAllocationChannel::SatRandomAccessAllocationChannel ()
-  : m_crdsaMinRandomizationValue (),
+  : m_slottedAlohaAllowed (false),
+  m_crdsaAllowed (false),
+  m_crdsaMinRandomizationValue (),
   m_crdsaMaxRandomizationValue (),
   m_crdsaNumOfInstances (),
   m_crdsaMinIdleBlocks (),
@@ -59,6 +61,12 @@ void
 SatRandomAccessAllocationChannel::DoCrdsaVariableSanityCheck ()
 {
   NS_LOG_FUNCTION (this);
+
+  if (!m_crdsaAllowed)
+    {
+      NS_LOG_INFO ("CRDSA disallowed: skipping sanity check");
+      return;
+    }
 
   if (m_crdsaMaxRandomizationValue < 1)
     {

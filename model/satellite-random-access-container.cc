@@ -88,9 +88,6 @@ SatRandomAccess::~SatRandomAccess ()
     {
       m_areBuffersEmptyCb.Nullify ();
     }
-
-  m_crdsaAllocationChannels.clear ();
-  m_slottedAlohaAllocationChannels.clear ();
 }
 
 void
@@ -110,9 +107,6 @@ SatRandomAccess::DoDispose ()
     {
       m_areBuffersEmptyCb.Nullify ();
     }
-
-  m_crdsaAllocationChannels.clear ();
-  m_slottedAlohaAllocationChannels.clear ();
 }
 
 ///---------------------------------------
@@ -127,74 +121,33 @@ SatRandomAccess::SetRandomAccessModel (SatEnums::RandomAccessModel_t randomAcces
   m_randomAccessModel = randomAccessModel;
 }
 
-void
-SatRandomAccess::AddCrdsaAllocationChannel (uint32_t allocationChannel)
-{
-  NS_LOG_FUNCTION (this);
-
-  std::pair<std::set<uint32_t>::iterator, bool> result = m_crdsaAllocationChannels.insert (allocationChannel);
-
-  if (!result.second)
-    {
-      NS_FATAL_ERROR ("SatRandomAccess::AddCrdsaAllocationChannel - insert failed, this allocation channel is already set");
-    }
-}
-
-void
-SatRandomAccess::AddSlottedAlohaAllocationChannel (uint32_t allocationChannel)
-{
-  NS_LOG_FUNCTION (this);
-
-  std::pair<std::set<uint32_t>::iterator, bool> result = m_slottedAlohaAllocationChannels.insert (allocationChannel);
-
-  if (!result.second)
-    {
-      NS_FATAL_ERROR ("SatRandomAccess::AddSlottedAlohaAllocationChannel - insert failed, this allocation channel is already set");
-    }
-}
-
 bool
 SatRandomAccess::IsCrdsaAllocationChannel (uint32_t allocationChannel)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << allocationChannel);
 
-  std::set<uint32_t>::iterator iter;
-  iter = m_crdsaAllocationChannels.find (allocationChannel);
-
-  if (iter == m_crdsaAllocationChannels.end ())
-    {
-      return false;
-    }
-  return true;
+  return m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetCrdsaAllowed ();
 }
 
 bool
 SatRandomAccess::IsSlottedAlohaAllocationChannel (uint32_t allocationChannel)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << allocationChannel);
 
-  std::set<uint32_t>::iterator iter;
-  iter = m_slottedAlohaAllocationChannels.find (allocationChannel);
-
-  if (iter == m_slottedAlohaAllocationChannels.end ())
-    {
-      return false;
-    }
-  return true;
+  return m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetSlottedAlohaAllowed ();
 }
 
 SatRandomAccess::RandomAccessTxOpportunities_s
-SatRandomAccess::DoRandomAccess (uint32_t allocationChannel, SatEnums::RandomAccessTriggerType_t triggerType)
+SatRandomAccess::DoRandomAccess (uint32_t allocationChannelId, SatEnums::RandomAccessTriggerType_t triggerType)
 {
-  NS_LOG_FUNCTION (this);
-
-  NS_LOG_INFO ("AC: " << allocationChannel << " trigger type: " << SatEnums::GetRandomAccessTriggerTypeName (triggerType));
+  NS_LOG_FUNCTION (this << allocationChannelId << SatEnums::GetRandomAccessTriggerTypeName (triggerType));
 
   /// return variable initialization
   RandomAccessTxOpportunities_s txOpportunities;
 
   txOpportunities.txOpportunityType = SatEnums::RA_TX_OPPORTUNITY_DO_NOTHING;
-  txOpportunities.allocationChannel = allocationChannel;
+  txOpportunities.allocationChannel = allocationChannelId;
+  uint32_t allocationChannel = GetConfigurationIdForAllocationChannel (allocationChannelId);
 
   NS_LOG_INFO ("------------------------------------");
   NS_LOG_INFO ("------ Starting Random Access ------");
@@ -370,6 +323,15 @@ SatRandomAccess::PrintVariables ()
       NS_LOG_INFO ("Number of consecutive blocks accessed: " << allocationChannel->GetCrdsaNumOfConsecutiveBlocksUsed () << "/" << allocationChannel->GetCrdsaMaxConsecutiveBlocksAccessed ());
       NS_LOG_INFO ("Number of idle blocks left: " << allocationChannel->GetCrdsaIdleBlocksLeft () << "/" << allocationChannel->GetCrdsaMinIdleBlocks ());
     }
+}
+
+uint32_t
+SatRandomAccess::GetConfigurationIdForAllocationChannel (uint32_t allocationChannelId)
+{
+  // Assign each carrier to the first channel configuration for now.
+  // TODO A way to configure which carrier uses which configuration should be
+  // thought through to allow for better flexibility.
+  return 0;
 }
 
 ///-------------------------------
