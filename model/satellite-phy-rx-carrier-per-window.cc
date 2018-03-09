@@ -25,6 +25,8 @@
 
 #include "satellite-utils.h"
 #include "satellite-wave-form-conf.h"
+#include "satellite-link-results.h"
+#include "satellite-mutual-information-table.h"
 #include "satellite-phy-rx-carrier-per-window.h"
 
 #include <algorithm>
@@ -46,7 +48,8 @@ SatPhyRxCarrierPerWindow::SatPhyRxCarrierPerWindow (uint32_t carrierId,
   m_windowDuration (Seconds (0.004)),
   m_windowStep (Seconds (0.0005)),
   m_windowSicIterations (10),
-  m_windowEndSchedulingInitialized (false)
+  m_windowEndSchedulingInitialized (false),
+  m_detectionThreshold (0.0)
 {
   NS_LOG_FUNCTION (this);
   NS_LOG_INFO ("Constructor called with arguments " << carrierId << ", " << carrierConf << ", and " << randomAccessEnabled);
@@ -98,6 +101,11 @@ SatPhyRxCarrierPerWindow::GetTypeId (void)
                     UintegerValue (10),
                     MakeUintegerAccessor (&SatPhyRxCarrierPerWindow::m_windowSicIterations),
                     MakeUintegerChecker<uint32_t> ())
+    .AddAttribute ( "DetectionThreshold",
+                    "The SNIR Detection Threshold (in magnitude) for a packet",
+                    DoubleValue (0.0),
+                    MakeDoubleAccessor (&SatPhyRxCarrierPerWindow::m_detectionThreshold),
+                    MakeDoubleChecker<double> (0, std::numeric_limits<double>::max ()))
     .AddTraceSource ("EssaRxCollision",
                      "Received a packet through Random Access ESSA",
                      MakeTraceSourceAccessor (&SatPhyRxCarrierPerWindow::m_essaRxCollisionTrace),
@@ -228,25 +236,61 @@ SatPhyRxCarrierPerWindow::ProcessWindow (Time startTime, Time endTime)
   /// Get packets in window
   std::pair<packetList_t::iterator, packetList_t::iterator> windowBounds = GetWindowBounds ();
 
-  for (uint32_t i = 0; i < m_windowSicIterations; i++)
+  uint32_t i = 0;
+  while (i < m_windowSicIterations)
     {
       /// Select packet to decode (block 2)
       packetList_t::iterator packet_it = GetHighestSnirPacket (windowBounds);
       if (packet_it == windowBounds.second)
         {
+          // No more packets to decode
           break;
         }
       NS_LOG_INFO ("SatPhyRxCarrierPerWindow::DoWindowEnd - Process packet " << packet_it->rxParams->m_txInfo.crdsaUniquePacketId << " from " << packet_it->sourceAddress);
       /// MIESM (block 3)
-      /// SIC (block 4)
+      /// Get effective SINR
+      double sinrEffective = GetEffectiveSnir (*packet_it);
+      // TODO: check if BER/PER/Snir table is correct
+      bool phyError = CheckAgainstLinkResults (sinrEffective, packet_it->rxParams);
+      if (!phyError)
+        {
+          /// SIC (block 4)
+        }
+      else
+        {
+          /// Update iteration
+          i++;
+        }
       /// send packet upwards
-      m_rxCallback (packet_it->rxParams, false); // TODO set phyerror flag
+      m_rxCallback (packet_it->rxParams, phyError);
       /// Packet could now be deleted, since interference information
-      /// is stored on each packet; but for logging purposes we'll leave it
+      /// is stored on each packet; but for logging purposes we'll keep it
       packet_it->packetHasBeenProcessed = true;
     }
 
   NS_LOG_INFO ("SatPhyRxCarrierPerWindow::DoWindowEnd - Window processing finished");
+}
+
+double
+SatPhyRxCarrierPerWindow::GetEffectiveSnir (const SatPhyRxCarrierPerWindow::essaPacketRxParams_s &packet)
+{
+  NS_LOG_FUNCTION (this);
+  NS_LOG_INFO ("SatPhyRxCarrierPerWindow::GetEffectiveSnir");
+
+  Ptr<SatMutualInformationTable> mutualInformationTable = (GetLinkResults ()->GetObject <SatLinkResultsFSim> ())->GetMutualInformationTable ();
+  double beta = mutualInformationTable->GetBeta ();
+
+  double meanMutualInformation = 0.0;
+  for (std::vector< std::pair<double, double> >::const_iterator it = packet.gamma.begin (); it != packet.gamma.end (); it++)
+    {
+      meanMutualInformation += it->first * mutualInformationTable->GetNormalizedSymbolInformation (SatUtils::LinearToDb (it->second / beta));
+    }
+
+  double effectiveSnir = SatUtils::DbToLinear (beta * mutualInformationTable->GetSnirDb (meanMutualInformation));
+
+  NS_LOG_INFO ("SatPhyRxCarrierPerWindow::GetEffectiveSnir - Effective SNIR : " << effectiveSnir);
+
+  return effectiveSnir;
 }
 
 void
@@ -339,8 +383,7 @@ SatPhyRxCarrierPerWindow::PacketCanBeDetected (const SatPhyRxCarrierPerWindow::e
   NS_LOG_FUNCTION (this);
   NS_LOG_INFO ("SatPhyRxCarrierPerWindow::PacketCanBeDetected");
 
-  /// TODO: add detection Threshold
-  return (packet.preambleMeanSinr >= 0.0);
+  return (packet.preambleMeanSinr >= m_detectionThreshold);
 }
 
 void

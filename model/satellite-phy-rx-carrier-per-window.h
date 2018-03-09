@@ -144,6 +144,11 @@ private:
   void DoWindowEnd ();
 
   /**
+   * \brief Get the effective SNIR of the packet using the Mutual Information function
+   */
+  double GetEffectiveSnir (const SatPhyRxCarrierPerWindow::essaPacketRxParams_s &packet);
+
+  /**
    * \brief Get the packet with the highst SNIR on the list
    * \return True if a packet is returned, False otherwise
    */
@@ -183,6 +188,12 @@ private:
    * \brief Has the window end scheduling been initialized
    */
   bool m_windowEndSchedulingInitialized;
+
+  /**
+   * \brief SNIR detection threshold for a packet (in magnitude)
+   */
+  // TODO: find a more appropiate place for this parameter
+  double m_detectionThreshold;
 
   /**
    * \brief ESSA packet container

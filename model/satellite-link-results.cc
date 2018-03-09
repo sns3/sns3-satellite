@@ -156,6 +156,9 @@ SatLinkResultsFSim::DoInitialize ()
       std::string filePathName = m_inputPath + "fsim_waveformat" + ss.str () + ".txt";
       m_table.insert (std::make_pair (i, CreateObject<SatLookUpTable> (filePathName)));
     }
+
+  // Initialize Mutual Information table
+  m_mutualInformationTable = CreateObject<SatMutualInformationTable> (m_inputPath + "mutualInformationTable.txt");
 } // end of void SatLinkResultsFSim::DoInitialize
 
 /*
