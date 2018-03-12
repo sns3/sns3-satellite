@@ -549,7 +549,6 @@ SimulationHelper::EnableSlottedAloha ()
 
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_NumberOfInstances", UintegerValue (1));
   EnableRandomAccess ();
-  Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_SLOTTED_ALOHA));
 }
 
 void
@@ -565,7 +564,6 @@ SimulationHelper::EnableCrdsa ()
   Config::SetDefault ("ns3::SatUtHelper::UseCrdsaOnlyForControlPackets", BooleanValue (false));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_NumberOfInstances", UintegerValue (3));
   EnableRandomAccess ();
-  Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_CRDSA));
 }
 
 void
@@ -762,10 +760,17 @@ SimulationHelper::CreateDefaultRtnLinkStats ()
   m_statContainer->AddGlobalRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddGlobalRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
+  m_statContainer->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
   // Granted resources
   m_statContainer->AddGlobalResourcesGranted (SatStatsHelper::OUTPUT_SCATTER_FILE);
   m_statContainer->AddGlobalResourcesGranted (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddGlobalResourcesGranted (SatStatsHelper::OUTPUT_CDF_FILE);
+  m_statContainer->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_CDF_FILE);
+  m_statContainer->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_CDF_PLOT);
   m_statContainer->AddPerUtResourcesGranted (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   // Frame load
@@ -778,16 +783,34 @@ SimulationHelper::CreateDefaultRtnLinkStats ()
   // SINR
   m_statContainer->AddGlobalRtnCompositeSinr (SatStatsHelper::OUTPUT_CDF_FILE);
   m_statContainer->AddGlobalRtnCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddPerBeamRtnCompositeSinr (SatStatsHelper::OUTPUT_CDF_FILE);
+  m_statContainer->AddPerBeamRtnCompositeSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
 
   // Delay
   m_statContainer->AddGlobalRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddGlobalRtnAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
 
+  m_statContainer->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamRtnDevDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamRtnPhyDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamRtnMacDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+  m_statContainer->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+  m_statContainer->AddPerBeamRtnDevDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+  m_statContainer->AddPerBeamRtnPhyDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+  m_statContainer->AddPerBeamRtnMacDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+
   // Packet error
   m_statContainer->AddGlobalRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamCrdsaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamCrdsaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   // Waveform
   m_statContainer->AddPerBeamWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFrameSymbolLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   // Capacity request
   m_statContainer->AddPerUtCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
