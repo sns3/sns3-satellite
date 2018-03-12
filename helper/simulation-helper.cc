@@ -45,6 +45,63 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SimulationHelperConf);
 
+/**
+ * SIM_ADD_TRAFFIC_MODEL_ATTRIBUTES macro helps defining specific attribute
+ * for traffic models in method GetTypeId.
+ *
+ * \param index Name of the traffic model which attributes are added to the configuration.
+ * \param a1    'Percentage of users' attribute value
+ * \param a2    'Transport layer protocol' attribute value
+ * \param a3    'Traffic direction' attribute value
+ * \param a4    'Start time' attribute value
+ * \param a5    'Stop time' attribute value
+ * \param a6    'Start delay' attribute value
+ *
+ * \return TypeId
+ */
+#define SIM_ADD_TRAFFIC_MODEL_ATTRIBUTES(index, a1, a2, a3, a4, a5, a6) \
+  AddAttribute ("Traffic" TOSTRING (index) "Percentage", \
+                "Percentage of final users that will use this traffic model", \
+                DoubleValue (a1), \
+                MakeDoubleAccessor (&SimulationHelperConf::SetTraffic ## index ## Percentage, \
+                                    &SimulationHelperConf::GetTraffic ## index ## Percentage), \
+                MakeDoubleChecker<double> (0, 1)) \
+  .AddAttribute ("Traffic" TOSTRING (index) "Protocol", \
+                 "Network protocol that this traffic model will use", \
+                 EnumValue (a2), \
+                 MakeEnumAccessor (&SimulationHelperConf::SetTraffic ## index ## Protocol, \
+                                   &SimulationHelperConf::GetTraffic ## index ## Protocol), \
+                 MakeEnumChecker (SimulationHelperConf::PROTOCOL_UDP, "UDP", \
+                                  SimulationHelperConf::PROTOCOL_TCP, "TCP", \
+                                  SimulationHelperConf::PROTOCOL_BOTH, "BothTcpAndUdp")) \
+  .AddAttribute ("Traffic" TOSTRING (index) "Direction", \
+                 "Satellite link direction that this traffic model will use", \
+                 EnumValue (a3), \
+                 MakeEnumAccessor (&SimulationHelperConf::SetTraffic ## index ## Direction, \
+                                   &SimulationHelperConf::GetTraffic ## index ## Direction), \
+                 MakeEnumChecker (SimulationHelperConf::RTN_LINK, "ReturnLink", \
+                                  SimulationHelperConf::FWD_LINK, "ForwardLink", \
+                                  SimulationHelperConf::BOTH_LINK, "ReturnAndForwardLink")) \
+  .AddAttribute ("Traffic" TOSTRING (index) "StartTime", \
+                 "Time into the simulation when this traffic model will be started on each user", \
+                 TimeValue (a4), \
+                 MakeTimeAccessor (&SimulationHelperConf::SetTraffic ## index ## StartTime, \
+                                   &SimulationHelperConf::GetTraffic ## index ## StartTime), \
+                 MakeTimeChecker (Seconds (0))) \
+  .AddAttribute ("Traffic" TOSTRING (index) "StopTime", \
+                 "Time into the simulation when this traffic model will be stopped " \
+                 "on each user. 0 means endless traffic generation.", \
+                 TimeValue (a5), \
+                 MakeTimeAccessor (&SimulationHelperConf::SetTraffic ## index ## StopTime, \
+                                   &SimulationHelperConf::GetTraffic ## index ## StopTime), \
+                 MakeTimeChecker (Seconds (0))) \
+  .AddAttribute ("Traffic" TOSTRING (index) "StartDelay", \
+                 "Cummulative delay for each user before starting this traffic model", \
+                 TimeValue (a6), \
+                 MakeTimeAccessor (&SimulationHelperConf::SetTraffic ## index ## StartDelay, \
+                                   &SimulationHelperConf::GetTraffic ## index ## StartDelay), \
+                 MakeTimeChecker (Seconds (0)))
+
 TypeId
 SimulationHelperConf::GetTypeId (void)
 {
@@ -81,14 +138,10 @@ SimulationHelperConf::GetTypeId (void)
                    BooleanValue (true),
                    MakeBooleanAccessor (&SimulationHelperConf::m_activateProgressLogging),
                    MakeBooleanChecker ())
-    .AddAttribute ("TrafficLoad",
-                   "Load for predifined traffic models",
-                   EnumValue (SimulationHelper::TRAFFIC_MODEL_LIGHT),
-                   MakeEnumAccessor (&SimulationHelperConf::m_trafficModelLoad),
-                   MakeEnumChecker (SimulationHelper::TRAFFIC_MODEL_NONE, "Off",
-                                    SimulationHelper::TRAFFIC_MODEL_LIGHT, "Light",
-                                    SimulationHelper::TRAFFIC_MODEL_MEDIUM, "Medium",
-                                    SimulationHelper::TRAFFIC_MODEL_HEAVY, "Heavy"))
+    .SIM_ADD_TRAFFIC_MODEL_ATTRIBUTES (Cbr, 1.0, PROTOCOL_UDP, RTN_LINK, Seconds (0.1), Seconds (0), MilliSeconds (10))
+    .SIM_ADD_TRAFFIC_MODEL_ATTRIBUTES (Http, 0, PROTOCOL_TCP, RTN_LINK, Seconds (0.1), Seconds (0), MilliSeconds (10))
+    .SIM_ADD_TRAFFIC_MODEL_ATTRIBUTES (OnOff, 0, PROTOCOL_UDP, RTN_LINK, Seconds (0.1), Seconds (0), MilliSeconds (10))
+    .SIM_ADD_TRAFFIC_MODEL_ATTRIBUTES (Nrtv, 0, PROTOCOL_TCP, RTN_LINK, Seconds (0.1), Seconds (0), MilliSeconds (10))
   ;
   return tid;
 }
@@ -1085,16 +1138,28 @@ SimulationHelper::InstallTrafficModel (TrafficModel_t trafficModel,
                                        TrafficDirection_t direction,
                                        Time startTime,
                                        Time stopTime,
-                                       Time startDelay)
+                                       Time startDelay,
+                                       double percentage)
 {
   NS_LOG_FUNCTION (this);
 
   std::string socketFactory = protocol == SimulationHelper::TCP ? "ns3::TcpSocketFactory" : "ns3::UdpSocketFactory";
 
   // get users
-  NodeContainer utUsers = m_satHelper->GetUtUsers ();
+  NodeContainer utAllUsers = m_satHelper->GetUtUsers ();
   NodeContainer gwUsers = m_satHelper->GetGwUsers ();
   NS_ASSERT_MSG (m_gwUserId < gwUsers.GetN (), "The number of GW users configured was too low.");
+
+  // Filter UT users to keep only a given percentage on which installing the application
+  Ptr<UniformRandomVariable> rng = CreateObject<UniformRandomVariable> ();
+  NodeContainer utUsers;
+  for (uint32_t i = 0; i < utAllUsers.GetN (); ++i)
+    {
+      if (rng->GetValue (0.0, 1.0) < percentage)
+        {
+          utUsers.Add (utAllUsers.Get (i));
+        }
+    }
 
   switch (trafficModel)
     {
@@ -1272,67 +1337,6 @@ SimulationHelper::InstallTrafficModel (TrafficModel_t trafficModel,
 }
 
 void
-SimulationHelper::ConfigureTrafficModel (TrafficModelLoad_t trafficModelLoad)
-{
-  NS_LOG_FUNCTION (this);
-
-  if (m_satHelper == NULL)
-    {
-      NS_FATAL_ERROR (
-        "Configuration of traffic model called without any SatHelper. "
-        "Please call CreateSatScenario before ConfigureTrafficModel!");
-    }
-
-  switch (trafficModelLoad)
-    {
-    case TRAFFIC_MODEL_NONE:
-      break;
-    case TRAFFIC_MODEL_LIGHT:
-      {
-        InstallTrafficModel (
-          SimulationHelper::HTTP,
-          SimulationHelper::TCP,
-          SimulationHelper::RTN_LINK,
-          MilliSeconds (3));
-        break;
-      }
-    case TRAFFIC_MODEL_MEDIUM:
-      {
-        InstallTrafficModel (
-          SimulationHelper::HTTP,
-          SimulationHelper::TCP,
-          SimulationHelper::RTN_LINK,
-          MilliSeconds (3));
-        InstallTrafficModel (
-          SimulationHelper::CBR,
-          SimulationHelper::TCP,
-          SimulationHelper::RTN_LINK,
-          MilliSeconds (3));
-        break;
-      }
-    case TRAFFIC_MODEL_HEAVY:
-      {
-        InstallTrafficModel (
-          SimulationHelper::HTTP,
-          SimulationHelper::TCP,
-          SimulationHelper::RTN_LINK,
-          MilliSeconds (3));
-        InstallTrafficModel (
-          SimulationHelper::CBR,
-          SimulationHelper::TCP,
-          SimulationHelper::RTN_LINK,
-          MilliSeconds (3));
-        break;
-      }
-    default:
-      {
-        NS_FATAL_ERROR ("Invalid traffic model load");
-        break;
-      }
-    }
-}
-
-void
 SimulationHelper::SetCrTxConf (CrTxConf_t crTxConf)
 {
   switch (crTxConf)
@@ -1469,6 +1473,7 @@ SimulationHelper::ConfigureAttributesFromFile (std::string filePath)
   ReadInputAttributesFromFile (filePath);
   Ptr<SimulationHelperConf> simulationConf = CreateObject<SimulationHelperConf> ();
 
+  Time simulationTime = simulationConf->m_simTime;
   SetBeams (simulationConf->m_enabledBeams);
   SetUtCountPerBeam (simulationConf->m_utCount);
   SetUserCountPerUt (simulationConf->m_utUserCount);
@@ -1483,7 +1488,110 @@ SimulationHelper::ConfigureAttributesFromFile (std::string filePath)
     {
       EnableProgressLogs ();
     }
-  ConfigureTrafficModel (simulationConf->m_trafficModelLoad);
+
+  for (const std::pair<std::string, SimulationHelperConf::TrafficConfiguration_t>& trafficModel : simulationConf->m_trafficModel)
+    {
+      TrafficModel_t modelName;
+      if (trafficModel.first == "Cbr")
+        {
+          modelName = CBR;
+        }
+      else if (trafficModel.first == "OnOff")
+        {
+          modelName = ONOFF;
+        }
+      else if (trafficModel.first == "Http")
+        {
+          modelName = HTTP;
+        }
+      else if (trafficModel.first == "Nrtv")
+        {
+          modelName = NRTV;
+        }
+      else
+        {
+          NS_FATAL_ERROR ("Unknown traffic model has been configured: " << trafficModel.first);
+        }
+
+      std::vector<SimulationHelper::TransportLayerProtocol_t> protocols;
+      switch (trafficModel.second.m_protocol)
+        {
+        case SimulationHelperConf::PROTOCOL_UDP:
+          {
+            protocols.push_back (SimulationHelper::UDP);
+            break;
+          }
+        case SimulationHelperConf::PROTOCOL_TCP:
+          {
+            protocols.push_back (SimulationHelper::TCP);
+            break;
+          }
+        case SimulationHelperConf::PROTOCOL_BOTH:
+          {
+            protocols.push_back (SimulationHelper::TCP);
+            protocols.push_back (SimulationHelper::UDP);
+            break;
+          }
+        default:
+          {
+            NS_FATAL_ERROR ("Unknown traffic protocol");
+          }
+        }
+
+      std::vector<SimulationHelper::TrafficDirection_t> directions;
+      switch (trafficModel.second.m_direction)
+        {
+        case SimulationHelperConf::RTN_LINK:
+          {
+            directions.push_back (SimulationHelper::RTN_LINK);
+            break;
+          }
+        case SimulationHelperConf::FWD_LINK:
+          {
+            directions.push_back (SimulationHelper::FWD_LINK);
+            break;
+          }
+        case SimulationHelperConf::BOTH_LINK:
+          {
+            directions.push_back (SimulationHelper::FWD_LINK);
+            directions.push_back (SimulationHelper::RTN_LINK);
+            break;
+          }
+        default:
+          {
+            NS_FATAL_ERROR ("Unknown traffic protocol");
+          }
+        }
+
+      if (trafficModel.second.m_percentage > 0.0)
+        {
+          Time startTime = trafficModel.second.m_startTime;
+          if (startTime > simulationTime)
+            {
+              NS_FATAL_ERROR ("Traffic model " << trafficModel.first << " configured to start after the simulation ended");
+            }
+
+          Time stopTime = trafficModel.second.m_stopTime;
+          if (stopTime == Seconds (0))
+            {
+              stopTime = simulationTime + Seconds (1);
+            }
+          if (stopTime < startTime)
+            {
+              NS_FATAL_ERROR ("Traffic model " << trafficModel.first << " configured to stop before it is started");
+            }
+
+          for (auto& protocol : protocols)
+            {
+              for (auto& direction : directions)
+                {
+                  InstallTrafficModel (modelName, protocol, direction,
+                                       startTime, stopTime,
+                                       trafficModel.second.m_startDelay);
+                }
+            }
+        }
+    }
 }
 
 void

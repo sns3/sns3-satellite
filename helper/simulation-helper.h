@@ -28,6 +28,10 @@
 #include <ns3/satellite-stats-helper-container.h>
 #include <ns3/satellite-enums.h>
 
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY (x)
+
+
 namespace ns3 {
 
 /**
@@ -449,13 +453,27 @@ public:
    * \param startTime Application Start time
    * \param stopTime Application stop time
    * \param startDelay application start delay between each user
+   * \param percentage ratio of users on which this traffic model will be installed
    */
   void InstallTrafficModel (TrafficModel_t trafficModel,
                             TransportLayerProtocol_t protocol,
                             TrafficDirection_t direction,
                             Time startTime,
                             Time stopTime,
-                            Time startDelay);
+                            Time startDelay,
+                            double percentage);
+
+  void InstallTrafficModel (TrafficModel_t trafficModel,
+                            TransportLayerProtocol_t protocol,
+                            TrafficDirection_t direction,
+                            Time startTime,
+                            Time stopTime,
+                            Time startDelay)
+  {
+    InstallTrafficModel (
+      trafficModel, protocol, direction,
+      startTime, stopTime, startDelay, 1.0);
+  }
 
   void InstallTrafficModel (TrafficModel_t trafficModel,
                             TransportLayerProtocol_t protocol,
@@ -495,21 +513,7 @@ public:
 
   typedef enum
   {
-    TRAFFIC_MODEL_NONE,
-    TRAFFIC_MODEL_LIGHT,
-    TRAFFIC_MODEL_MEDIUM,
-    TRAFFIC_MODEL_HEAVY,
-  } TrafficModelLoad_t;
-
-  /**
-   * \brief Configure simple traffic load from GW users to UT users
-   * or vice versa from a predefined set.
-   * \param trafficModelLoad the traffic load to configure.
-   */
-  void ConfigureTrafficModel (TrafficModelLoad_t trafficModelLoad);
-
-  typedef enum
-  {
+    CR_NOT_CONFIGURED,
     CR_PERIODIC_CONTROL,
     CR_SLOTTED_ALOHA,
     CR_CRDSA_LOOSE_RC_0,
@@ -620,13 +624,234 @@ public:
    */
   TypeId GetInstanceTypeId (void) const;
 
-  Time                                  m_simTime;
-  std::string                           m_enabledBeams;
-  Ptr<RandomVariableStream>             m_utCount;
-  Ptr<RandomVariableStream>             m_utUserCount;
-  bool                                  m_activateStatistics;
-  bool                                  m_activateProgressLogging;
-  SimulationHelper::TrafficModelLoad_t  m_trafficModelLoad;
+  typedef enum
+  {
+    PROTOCOL_UDP, PROTOCOL_TCP, PROTOCOL_BOTH
+  } TransportLayerProtocol_t;
+
+  typedef enum
+  {
+    RTN_LINK, FWD_LINK, BOTH_LINK
+  } TrafficDirection_t;
+
+  typedef struct TrafficConfiguration_t
+  {
+    double m_percentage;
+    TransportLayerProtocol_t m_protocol;
+    TrafficDirection_t m_direction;
+    Time m_startTime;
+    Time m_stopTime;
+    Time m_startDelay;
+
+    TrafficConfiguration_t ()
+      : m_percentage (0.0),
+      m_protocol (SimulationHelperConf::PROTOCOL_UDP),
+      m_direction (SimulationHelperConf::RTN_LINK),
+      m_startTime (0),
+      m_stopTime (0),
+      m_startDelay (0)
+    {
+      // do nothing
+    }
+  } TrafficConfiguration_t;
+
+  Time                                           m_simTime;
+  std::string                                    m_enabledBeams;
+  Ptr<RandomVariableStream>                      m_utCount;
+  Ptr<RandomVariableStream>                      m_utUserCount;
+  bool                                           m_activateStatistics;
+  bool                                           m_activateProgressLogging;
+  SimulationHelper::CrTxConf_t                   m_crTxConf;
+  std::map<std::string, TrafficConfiguration_t>  m_trafficModel;
+
+private:
+  void SetTrafficPercentage (std::string trafficModel, double percentage)
+  {
+    std::map<std::string, TrafficConfiguration_t>::iterator it = m_trafficModel.find (trafficModel);
+    if (it == m_trafficModel.end ())
+      {
+        TrafficConfiguration_t traffic;
+        traffic.m_percentage = percentage;
+        m_trafficModel.emplace (trafficModel, traffic);
+      }
+    else
+      {
+        it->second.m_percentage = percentage;
+      }
+  }
+
+  double GetTrafficPercentage (std::string trafficModel) const
+  {
+    std::map<std::string, TrafficConfiguration_t>::const_iterator it = m_trafficModel.find (trafficModel);
+    if (it == m_trafficModel.end ())
+      {
+        NS_FATAL_ERROR ("Traffic model " << trafficModel << " has not been configured");
+      }
+
+    return it->second.m_percentage;
+  }
+
+  void SetTrafficProtocol (std::string trafficModel, TransportLayerProtocol_t protocol)
+  {
+    std::map<std::string, TrafficConfiguration_t>::iterator it = m_trafficModel.find (trafficModel);
+    if (it == m_trafficModel.end ())
+      {
+        TrafficConfiguration_t traffic;
+        traffic.m_protocol = protocol;
+        m_trafficModel.emplace (trafficModel, traffic);
+      }
+    else
+      {
+        it->second.m_protocol = protocol;
+      }
+  }
+
+  TransportLayerProtocol_t GetTrafficProtocol (std::string trafficModel) const
+  {
+    std::map<std::string, TrafficConfiguration_t>::const_iterator it = m_trafficModel.find (trafficModel);
+    if (it == m_trafficModel.end ())
+      {
+        NS_FATAL_ERROR ("Traffic model " << trafficModel << " has not been configured");
+      }
+
+    return it->second.m_protocol;
+  }
+
+  void SetTrafficDirection (std::string trafficModel, TrafficDirection_t direction)
+  {
+    std::map<std::string, TrafficConfiguration_t>::iterator it = m_trafficModel.find (trafficModel);
+    if (it == m_trafficModel.end ())
+      {
+        TrafficConfiguration_t traffic;
+        traffic.m_direction = direction;
+        m_trafficModel.emplace (trafficModel, traffic);
+      }
+    else
+      {
+        it->second.m_direction = direction;
+      }
+  }
+
+  TrafficDirection_t GetTrafficDirection (std::string trafficModel) const
+  {
+    std::map<std::string, TrafficConfiguration_t>::const_iterator it = m_trafficModel.find (trafficModel);
+    if (it == m_trafficModel.end ())
+      {
+        NS_FATAL_ERROR ("Traffic model " << trafficModel << " has not been configured");
+      }
+
+    return it->second.m_direction;
+  }
+
+  void SetTrafficStartTime (std::string trafficModel, Time startTime)
+  {
+    std::map<std::string, TrafficConfiguration_t>::iterator it = m_trafficModel.find (trafficModel);
+    if (it == m_trafficModel.end ())
+      {
+        TrafficConfiguration_t traffic;
+        traffic.m_startTime = startTime;
+        m_trafficModel.emplace (trafficModel, traffic);
+      }
+    else
+      {
+        it->second.m_startTime = startTime;
+      }
+  }
+
+  Time GetTrafficStartTime (std::string trafficModel) const
+  {
+    std::map<std::string, TrafficConfiguration_t>::const_iterator it = m_trafficModel.find (trafficModel);
+    if (it == m_trafficModel.end ())
+      {
+        NS_FATAL_ERROR ("Traffic model " << trafficModel << " has not been configured");
+      }
+
+    return it->second.m_startTime;
+  }
+
+  void SetTrafficStopTime (std::string trafficModel, Time stopTime)
+  {
+    std::map<std::string, TrafficConfiguration_t>::iterator it = m_trafficModel.find (trafficModel);
+    if (it == m_trafficModel.end ())
+      {
+        TrafficConfiguration_t traffic;
+        traffic.m_startTime = stopTime;
+        m_trafficModel.emplace (trafficModel, traffic);
+      }
+    else
+      {
+        it->second.m_stopTime = stopTime;
+      }
+  }
+
+  Time GetTrafficStopTime (std::string trafficModel) const
+  {
+    std::map<std::string, TrafficConfiguration_t>::const_iterator it = m_trafficModel.find (trafficModel);
+    if (it == m_trafficModel.end ())
+      {
+        NS_FATAL_ERROR ("Traffic model " << trafficModel << " has not been configured");
+      }
+
+    return it->second.m_stopTime;
+  }
+
+  void SetTrafficStartDelay (std::string trafficModel, Time startDelay)
+  {
+    std::map<std::string, TrafficConfiguration_t>::iterator it = m_trafficModel.find (trafficModel);
+    if (it == m_trafficModel.end ())
+      {
+        TrafficConfiguration_t traffic;
+        traffic.m_startDelay = startDelay;
+        m_trafficModel.emplace (trafficModel, traffic);
+      }
+    else
+      {
+        it->second.m_startDelay = startDelay;
+      }
+  }
+
+  Time GetTrafficStartDelay (std::string trafficModel) const
+  {
+    std::map<std::string, TrafficConfiguration_t>::const_iterator it = m_trafficModel.find (trafficModel);
+    if (it == m_trafficModel.end ())
+      {
+        NS_FATAL_ERROR ("Traffic model " << trafficModel << " has not been configured");
+      }
+
+    return it->second.m_startDelay;
+  }
+
+#define TRAFFIC_MODEL_ATTRIBUTE_ACCESSOR_DEFINE(index) \
+  inline void SetTraffic ## index ## Percentage (double value) \
+  { return SetTrafficPercentage (TOSTRING (index), value); \
+  } \
+  inline double GetTraffic ## index ## Percentage () const \
+  { return GetTrafficPercentage (TOSTRING (index)); } \
+  inline void SetTraffic ## index ## Protocol (TransportLayerProtocol_t value) \
+  { return SetTrafficProtocol (TOSTRING (index), value); } \
+  inline TransportLayerProtocol_t GetTraffic ## index ## Protocol () const \
+  { return GetTrafficProtocol (TOSTRING (index)); } \
+  inline void SetTraffic ## index ## Direction (TrafficDirection_t value) \
+  { return SetTrafficDirection (TOSTRING (index), value); } \
+  inline TrafficDirection_t GetTraffic ## index ## Direction () const \
+  { return GetTrafficDirection (TOSTRING (index)); } \
+  inline void SetTraffic ## index ## StartTime (Time value) \
+  { return SetTrafficStartTime (TOSTRING (index), value); } \
+  inline Time GetTraffic ## index ## StartTime () const \
+  { return GetTrafficStartTime (TOSTRING (index)); } \
+  inline void SetTraffic ## index ## StopTime (Time value) \
+  { return SetTrafficStopTime (TOSTRING (index), value); } \
+  inline Time GetTraffic ## index ## StopTime () const \
+  { return GetTrafficStopTime (TOSTRING (index)); } \
+  inline void SetTraffic ## index ## StartDelay (Time value) \
+  { return SetTrafficStartDelay (TOSTRING (index), value); } \
+  inline Time GetTraffic ## index ## StartDelay () const \
+  { return GetTrafficStartDelay (TOSTRING (index)); }
+
+  TRAFFIC_MODEL_ATTRIBUTE_ACCESSOR_DEFINE (Cbr);
+  TRAFFIC_MODEL_ATTRIBUTE_ACCESSOR_DEFINE (Http);
+  TRAFFIC_MODEL_ATTRIBUTE_ACCESSOR_DEFINE (OnOff);
+  TRAFFIC_MODEL_ATTRIBUTE_ACCESSOR_DEFINE (Nrtv);
 };
 
 } // namespace ns3
