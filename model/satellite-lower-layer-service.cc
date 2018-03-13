@@ -189,10 +189,11 @@ SatLowerLayerServiceConf::GetIndexAsRaServiceName (uint8_t index)
  * \param a9    'Average normalized offered load threshold' attribute value
  * \param a10   'Is Slotted Aloha allowed' attribute value
  * \param a11   'Is CRDSA allowed' attribute value
+ * \param a12   'Assigned Carriers IDs' attribute value
  *
  * \return TypeId
  */
-#define SAT_ADD_RA_SERVICE_ATTRIBUTES(index, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11) \
+#define SAT_ADD_RA_SERVICE_ATTRIBUTES(index, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12) \
   AddAttribute ( GetIndexAsRaServiceName (index) + "_MaximumUniquePayloadPerBlock", \
                  "Maximum unique payload per block for RA " + GetIndexAsRaServiceName (index), \
                  UintegerValue (a1), \
@@ -255,10 +256,15 @@ SatLowerLayerServiceConf::GetIndexAsRaServiceName (uint8_t index)
                   MakeBooleanChecker ()) \
   .AddAttribute ( GetIndexAsRaServiceName (index) + "_CrdsaAllowed", \
                   "CRDSA allowed for RA " + GetIndexAsRaServiceName (index), \
-                  BooleanValue (a10), \
+                  BooleanValue (a11), \
                   MakeBooleanAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## IsCrdsaAllowed, \
                                        &SatLowerLayerServiceConf::GetRaServ ## index ## IsCrdsaAllowed), \
-                  MakeBooleanChecker ())
+                  MakeBooleanChecker ()) \
+  .AddAttribute ( GetIndexAsRaServiceName (index) + "_AssignedCarriersIds", \
+                  "Assigned carriers IDs for RA " + GetIndexAsRaServiceName (index), \
+                  StringValue (a12), \
+                  MakeStringAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## AssignedRaCarriersId), \
+                  MakeStringChecker ())
 
 TypeId
 SatLowerLayerServiceConf::GetTypeId (void)
@@ -276,6 +282,11 @@ SatLowerLayerServiceConf::GetTypeId (void)
                     UintegerValue (1),
                     MakeUintegerAccessor (&SatLowerLayerServiceConf::m_raServiceEntryCount),
                     MakeUintegerChecker<uint8_t> (SatLowerLayerServiceConf::m_minRaServiceEntries, SatLowerLayerServiceConf::m_maxRaServiceEntries))
+    .AddAttribute ( "RaServiceDefault",
+                    "Index of the RA service to use as a default for carriers with no explicitly assigned services.",
+                    UintegerValue (0),
+                    MakeUintegerAccessor (&SatLowerLayerServiceConf::m_raServiceIndexDefault),
+                    MakeUintegerChecker<uint8_t> (0, SatLowerLayerServiceConf::m_maxRaServiceEntries - 1))
     .AddAttribute ( "DynamicRatePersistence",
                     "Dynamic rate persistence for the lower layer service.",
                     UintegerValue (5),
@@ -302,9 +313,9 @@ SatLowerLayerServiceConf::GetTypeId (void)
     /*
      * Max payload per block, Max consecutive blocks, Min IDLE block, Backoff time, High load Backoff time, Backoff probability, High load Backoff probability, Replicas, Average load threshold
      */
-    .SAT_ADD_RA_SERVICE_ATTRIBUTES (0, 3, 4, 2, 250, 500, 10000, 30000, 3, 0.5, true, true)
-    .SAT_ADD_RA_SERVICE_ATTRIBUTES (1, 3, 4, 2, 250, 500, 10000, 30000, 2, 0.5, true, true)
-    .SAT_ADD_RA_SERVICE_ATTRIBUTES (2, 3, 4, 2, 250, 500, 10000, 30000, 5, 0.5, true, true)
+    .SAT_ADD_RA_SERVICE_ATTRIBUTES (0, 3, 4, 2, 250, 500, 10000, 30000, 3, 0.5, true, true, "")
+    .SAT_ADD_RA_SERVICE_ATTRIBUTES (1, 3, 4, 2, 250, 500, 10000, 30000, 2, 0.5, true, true, "")
+    .SAT_ADD_RA_SERVICE_ATTRIBUTES (2, 3, 4, 2, 250, 500, 10000, 30000, 5, 0.5, true, true, "")
   ;
 
   return tid;
@@ -794,6 +805,49 @@ SatLowerLayerServiceConf::SetRaIsCrdsaAllowed (uint8_t index, bool isCrdsaAllowe
     }
 
   m_raServiceEntries[index].SetIsCrdsaAllowed (isCrdsaAllowed);
+}
+
+std::unordered_set<uint32_t>
+SatLowerLayerServiceConf::GetAssignedRaCarriersId (uint8_t index) const
+{
+  NS_LOG_FUNCTION (this << (uint32_t) index);
+
+  if (index >= m_maxRaServiceEntries)
+    {
+      NS_FATAL_ERROR ("Service index out of range!!!");
+    }
+
+  return m_raServiceEntries[index].GetAssignedRaCarriersId ();
+}
+
+void
+SatLowerLayerServiceConf::SetAssignedRaCarriersId (uint8_t index, std::string raCarriersIds)
+{
+  NS_LOG_FUNCTION (this << (uint32_t) index << raCarriersIds);
+
+  if (index >= m_maxRaServiceEntries)
+    {
+      NS_FATAL_ERROR ("Service index out of range!!!");
+    }
+
+  m_raServiceEntries[index].SetAssignedRaCarriersId (raCarriersIds);
+}
+
+void
+SatLowerLayerServiceRaEntry::SetAssignedRaCarriersId (std::string raCarriersIds)
+{
+  m_carriersIds.clear ();
+  std::stringstream parser (raCarriersIds);
+  while (true)
+    {
+      uint32_t token;
+      parser >> token;
+      if (parser.fail ())
+        {
+          break;
+        }
+      m_carriersIds.insert (token);
+    }
 }
 
 } // namespace ns3

@@ -22,6 +22,7 @@
 #define SATELLITE_LOWER_LAYER_SERIVICE_H
 
 #include <vector>
+#include <unordered_set>
 #include "ns3/object.h"
 #include "ns3/nstime.h"
 #include "ns3/random-variable-stream.h"
@@ -238,6 +239,7 @@ private:
   double m_averageNormalizedOfferedLoadThreshold;
   bool m_isCrdsaAllowed;
   bool m_isSlottedAlohaAllowed;
+  std::unordered_set<uint32_t> m_carriersIds;
 
   /**
    * Get maximum unique payload per block.
@@ -458,6 +460,23 @@ private:
   {
     m_isCrdsaAllowed = isCrdsaAllowed;
   }
+
+  /**
+   * Set carriers that should be configured using the provided service
+   *
+   * \param raCarriersIds Indices of carriers that should use this service
+   */
+  inline std::unordered_set<uint32_t> GetAssignedRaCarriersId () const
+  {
+    return m_carriersIds;
+  }
+
+  /**
+   * Set carriers that should be configured using the provided service
+   *
+   * \param raCarriersIds Indices of carriers that should use this service
+   */
+  inline void SetAssignedRaCarriersId (std::string raCarriersIds);
 };
 
 /**
@@ -700,12 +719,21 @@ public:
    */
   bool GetRaIsCrdsaAllowed (uint8_t index) const;
 
+  /**
+   * Set carriers that should be configured using the provided service
+   *
+   * \param index Index of the service
+   * \param raCarriersIds Indices of carriers that should use this service
+   */
+  std::unordered_set<uint32_t> GetAssignedRaCarriersId (uint8_t index) const;
+
 private:
   uint8_t                                  m_dynamicRatePersistence;
   uint8_t                                  m_volumeBacklogPersistence;
   Time                                     m_defaultControlRandomizationInterval;
   uint8_t                                  m_daServiceEntryCount;
   SatLowerLayerServiceDaEntry              m_daServiceEntries[m_maxDaServiceEntries];
+  uint8_t                                  m_raServiceIndexDefault;
   uint8_t                                  m_raServiceEntryCount;
   SatLowerLayerServiceRaEntry              m_raServiceEntries[m_maxRaServiceEntries];
 
@@ -883,6 +911,14 @@ private:
    */
   void SetRaIsCrdsaAllowed (uint8_t index, bool isCrdsaAllowed);
 
+  /**
+   * Set carriers that should be configured using the provided service
+   *
+   * \param index Index of the service
+   * \param raCarriersIds Indices of carriers that should use this service
+   */
+  void SetAssignedRaCarriersId (uint8_t index, std::string raCarriersIds);
+
 /**
  * SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE macro helps to define DA service entry
  * attribute access method.
@@ -965,6 +1001,8 @@ private:
  *  - GetRaServ0IsSlottedAlohaAllowed, see @SatLowerLayerServiceRaEntry::GetIsSlottedAlohaAllowed
  *  - SetRaServ0IsCrdsaAllowed, see @SatLowerLayerServiceRaEntry::SetIsCrdsaAllowed
  *  - GetRaServ0IsCrdsaAllowed, see @SatLowerLayerServiceRaEntry::GetIsCrdsaAllowed
+ *  - SetRaServ0AssignedRaCarriersId, see @SatLowerLayerServiceRaEntry::SetAssignedRaCarriersId
+ *  - GetRaServ0AssignedRaCarriersId, see @SatLowerLayerServiceRaEntry::GetAssignedRaCarriersId
  *
  * \param index Index of the service which attribute access methods are defined
  */
@@ -1012,7 +1050,11 @@ private:
   inline void SetRaServ ## index ## IsCrdsaAllowed (bool value)  \
   { return SetRaIsCrdsaAllowed (index, value); } \
   inline bool GetRaServ ## index ## IsCrdsaAllowed () const  \
-  { return GetRaIsCrdsaAllowed (index); }
+  { return GetRaIsCrdsaAllowed (index); } \
+  inline void SetRaServ ## index ## AssignedRaCarriersId (std::string value)  \
+  { return SetAssignedRaCarriersId (index, value); } \
+  inline std::unordered_set<uint32_t> GetRaServ ## index ## AssignedRaCarriersId () const  \
+  { return GetAssignedRaCarriersId (index); }
 
   SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE (0);
   SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE (1);
