@@ -63,7 +63,8 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
   m_satInterferenceElimination (),
   m_enableCompositeSinrOutputTrace (false),
   m_numOfOngoingRx (0),
-  m_rxPacketCounter (0)
+  m_rxPacketCounter (0),
+  m_waveformConf (waveformConf)
 {
   NS_LOG_FUNCTION (this << carrierId);
 
