@@ -55,7 +55,7 @@ SatRandomAccess::SatRandomAccess (Ptr<SatRandomAccessConf> randomAccessConf, Sat
   : m_uniformRandomVariable (),
   m_randomAccessModel (randomAccessModel),
   m_randomAccessConf (randomAccessConf),
-  m_numOfAllocationChannels (randomAccessConf->GetNumOfAllocationChannels ()),
+  m_numOfAllocationChannels (randomAccessConf->GetNumOfAllocationChannelsConfigurations ()),
 
   /// CRDSA variables
   m_crdsaNewData (true)
@@ -328,10 +328,7 @@ SatRandomAccess::PrintVariables ()
 uint32_t
 SatRandomAccess::GetConfigurationIdForAllocationChannel (uint32_t allocationChannelId)
 {
-  // Assign each carrier to the first channel configuration for now.
-  // TODO A way to configure which carrier uses which configuration should be
-  // thought through to allow for better flexibility.
-  return 0;
+  return m_randomAccessConf->GetAllocationChannelConfigurationId (allocationChannelId);
 }
 
 ///-------------------------------

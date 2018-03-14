@@ -66,6 +66,10 @@ SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf,
       NS_FATAL_ERROR ("SatRandomAccessConf::SatRandomAccessConf - No random access allocation channel");
     }
 
+  // TODO Get rid of the hard coded 0 in GetSuperframeConf
+  uint32_t raChannelsCount = superframeSeq->GetSuperframeConf (0)->GetRaChannelCount ();
+  m_configurationIdPerAllocationChannel.resize (raChannelsCount, llsConf->GetRaDefaultService ());
+
   m_slottedAlohaControlRandomizationIntervalInMilliSeconds = (llsConf->GetDefaultControlRandomizationInterval ()).GetMilliSeconds ();
   DoSlottedAlohaVariableSanityCheck ();
 
@@ -89,6 +93,14 @@ SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf,
       allocationChannel->SetCrdsaMaxRandomizationValue (superframeSeq->GetSuperframeConf (0)->GetRaSlotCount (i) - 1);
 
       allocationChannel->DoCrdsaVariableSanityCheck ();
+
+      for (const uint32_t carrierId : llsConf->GetAssignedRaCarriersId (i))
+        {
+          if (carrierId < raChannelsCount)
+            {
+              m_configurationIdPerAllocationChannel[carrierId] = i;
+            }
+        }
     }
 }
 
@@ -123,6 +135,19 @@ SatRandomAccessConf::DoSlottedAlohaVariableSanityCheck ()
     }
 
   NS_LOG_INFO ("Variable sanity check done");
+}
+
+uint32_t
+SatRandomAccessConf::GetAllocationChannelConfigurationId (uint32_t allocationChannel)
+{
+  NS_LOG_FUNCTION (this << allocationChannel);
+
+  if (allocationChannel >= m_configurationIdPerAllocationChannel.size ())
+    {
+      NS_FATAL_ERROR ("SatRandomAccessConf::GetAllocationChannelConfigurationId -Invalid allocation channel");
+    }
+
+  return m_configurationIdPerAllocationChannel[allocationChannel];
 }
 
 } // namespace ns3

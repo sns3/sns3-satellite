@@ -568,6 +568,16 @@ public:
   }
 
   /**
+   * Get index of default RA service.
+   *
+   * \return index of default RA service.
+   */
+  inline uint8_t GetRaDefaultService () const
+  {
+    return m_raServiceIndexDefault;
+  }
+
+  /**
    * Get state, if constant assignment is provided for a DA service.
    *
    * \param index Index of the service

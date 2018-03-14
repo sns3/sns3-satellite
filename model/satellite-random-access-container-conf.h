@@ -89,13 +89,20 @@ public:
   }
 
   /**
-   * \brief Function for getting the number of available allocation channels
-   * \return number of allocation channels
+   * \brief Function for getting the number of available allocation channels configurations
+   * \return number of allocation channels configurations
    */
-  uint32_t GetNumOfAllocationChannels ()
+  uint32_t GetNumOfAllocationChannelsConfigurations ()
   {
     return m_allocationChannelCount;
   }
+
+  /**
+   * \brief Function for retrieving the configuration ID of a given allocation channel
+   * \param allocationChannel allocation channel ID
+   * \return allocation channel configuration ID
+   */
+  uint32_t GetAllocationChannelConfigurationId (uint32_t allocationChannel);
 
   /**
    * \brief Function for getting the CRDSA signaling overhead in bytes
@@ -125,6 +132,11 @@ private:
    * \brief Map containing the allocation channel configurations
    */
   std::map<uint32_t, Ptr<SatRandomAccessAllocationChannel> > m_allocationChannelConf;
+
+  /**
+   * \brief Mapping between an allocation channel and its associated configuration index
+   */
+  std::vector<uint32_t> m_configurationIdPerAllocationChannel;
 
   /**
    * \brief Slotted ALOHA control randomization interval in milliseconds
