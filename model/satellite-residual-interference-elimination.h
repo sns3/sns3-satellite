@@ -60,16 +60,30 @@ public:
   ~SatResidualInterferenceElimination ();
 
   /**
-   * Calculate residual power of interference for the given packets
+   * Eliminate the residual power of interference for the given packets
    * \param packetInterferedWith Parameters of the packet whose interference level should be lowered
    * \param processedPacket Parameters of the packet we want to remove interference from
    */
   void EliminateInterferences (Ptr<SatSignalParameters> packetInterferedWith, Ptr<SatSignalParameters> processedPacket, double EsNo);
 
+  /**
+   * Calculate residual power of interference for the given packets
+   * \param packetInterferedWith Parameters of the packet whose interference level should be lowered
+   * \param processedPacket Parameters of the packet we want to remove interference from
+   * \param startTime Normalized start time of the interference, with respect to packetInterferedWith
+   * \param startTime Normalized end time of the interference, with respect to packetInterferedWith
+   */
+  void EliminateInterferences (Ptr<SatSignalParameters> packetInterferedWith, Ptr<SatSignalParameters> processedPacket, double EsNo, double startTime, double endTime);
+
   inline uint32_t GetBurstLengthInSymbols (uint32_t waveformId) const
   {
     return m_waveformConf->GetWaveform (waveformId)->GetBurstLengthInSymbols ();
   }
+
+  /**
+   * \brief Calculate the residual power of interference for a given packet
+   */
+  double GetResidualPower (Ptr<SatSignalParameters> processedPacket, double EsNo);
 
 private:
   Ptr<SatWaveformConf> m_waveformConf;

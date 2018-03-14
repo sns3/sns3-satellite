@@ -89,4 +89,20 @@ SatPerfectInterferenceElimination::EliminateInterferences (
                packetInterferedWith->GetInterferencePowerInSatellite ());
 }
 
+void
+SatPerfectInterferenceElimination::EliminateInterferences (
+  Ptr<SatSignalParameters> packetInterferedWith,
+  Ptr<SatSignalParameters> processedPacket,
+  double EsNo, double startTime, double endTime)
+{
+  NS_ASSERT (false);
+}
+
+double
+SatPerfectInterferenceElimination::GetResidualPower (Ptr<SatSignalParameters> processedPacket, double EsNo)
+{
+  NS_ASSERT (false);
+}
+
+
 }  // namespace ns3
