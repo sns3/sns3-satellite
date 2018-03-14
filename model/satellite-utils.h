@@ -241,6 +241,11 @@ public:
   {
     switch (modcod)
       {
+      case SatEnums::SAT_MODCOD_BPSK_1_TO_3:
+        {
+          return 1;
+          break;
+        }
       case SatEnums::SAT_MODCOD_QPSK_1_TO_3:
       case SatEnums::SAT_MODCOD_QPSK_1_TO_2:
       case SatEnums::SAT_MODCOD_QPSK_3_TO_5:
@@ -303,6 +308,7 @@ public:
   {
     switch (modcod)
       {
+      case SatEnums::SAT_MODCOD_BPSK_1_TO_3:
       case SatEnums::SAT_MODCOD_QPSK_1_TO_3:
         {
           return 1.0 / 3.0;
