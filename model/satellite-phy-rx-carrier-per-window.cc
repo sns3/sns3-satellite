@@ -142,6 +142,7 @@ SatPhyRxCarrierPerWindow::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParam
   params.arrivalTime = Now () - params.duration; // arrival time is the start of reception
   params.rxParams = packetRxParams.rxParams;
   params.packetHasBeenProcessed = false;
+  params.sicFlag = false;
 
   // Calculate SINR, gamma and ifPowerPerFragment
   CalculatePacketInterferenceVectors (params);
@@ -184,11 +185,12 @@ SatPhyRxCarrierPerWindow::CalculatePacketInterferenceVectors (SatPhyRxCarrierPer
   double cSnr = CalculateCompositeSinr (snr, snrSatellite);
 
   /// Calculate the gamma vector
-  for (std::vector< std::pair<double, double> >::iterator it = packet.rxParams->GetInterferencePowerPerFragment ().begin (); it != packet.rxParams->GetInterferencePowerPerFragment ().end (); it++)
+  packet.gamma.clear ();
+  for (std::pair<double, double>& interference : packet.rxParams->GetInterferencePowerPerFragment ())
     {
-      /// gamma[k] = ( SNR^-1 + (Interference[k]/C)^-1 )^-1
-      double gamma = 1.0 / (1.0 / cSnr + packet.rxParams->m_rxPower_W / it->second);
-      packet.gamma.emplace_back (it->first, gamma);
+      /// gamma[k] = ( SNR^-1 + (C/Interference[k])^-1 )^-1
+      double gamma = (packet.rxParams->m_rxPower_W * cSnr) / (cSnr * interference.second + packet.rxParams->m_rxPower_W);
+      packet.gamma.emplace_back (interference.first, gamma);
     }
 
   /// Calculate the gamma vector for the preamble
@@ -250,11 +252,12 @@ SatPhyRxCarrierPerWindow::ProcessWindow (Time startTime, Time endTime)
       /// MIESM (block 3)
       /// Get effective SINR
       double sinrEffective = GetEffectiveSnir (*packet_it);
-      // TODO: check if BER/PER/Snir table is correct
+      /// Check against link results
       bool phyError = CheckAgainstLinkResults (sinrEffective, packet_it->rxParams);
       if (!phyError)
         {
           /// SIC (block 4)
+          DoSic (packet_it, windowBounds);
         }
       else
         {
@@ -264,11 +267,90 @@ SatPhyRxCarrierPerWindow::ProcessWindow (Time startTime, Time endTime)
       /// send packet upwards
       m_rxCallback (packet_it->rxParams, phyError);
       /// Packet could now be deleted, since interference information
-      /// is stored on each packet; but for logging purposes we'll keep it
+      /// is stored in each packet; but we'll keep it for logging purposes
       packet_it->packetHasBeenProcessed = true;
     }
 
   NS_LOG_INFO ("SatPhyRxCarrierPerWindow::DoWindowEnd - Window processing finished");
+}
+
+void
+SatPhyRxCarrierPerWindow::DoSic (packetList_t::iterator processedPacket, std::pair<packetList_t::iterator, packetList_t::iterator> windowBounds)
+{
+  NS_LOG_FUNCTION (this);
+  NS_LOG_INFO ("SatPhyRxCarrierPerWindow::DoSic");
+
+  /// Get residual SIC power
+  double residualSicPower = GetInterferenceEliminationModel ()->GetResidualPower (processedPacket->rxParams, processedPacket->meanSinr);
+
+  /// Update SIC on interfering packets
+  for (packetList_t::iterator packet_it = windowBounds.first; packet_it != windowBounds.second; packet_it++)
+    {
+      /// Stop iterating for packets arriving after the processed packet
+      if (packet_it->arrivalTime > processedPacket->arrivalTime + processedPacket->duration)
+        {
+          break;
+        }
+      /// Except previous packets
+      if (packet_it->arrivalTime + packet_it->duration < processedPacket->arrivalTime)
+        {
+          continue;
+        }
+      /// Except already processed packets, and the packet being currently processed
+      if (packet_it == processedPacket || packet_it->sicFlag || packet_it->packetHasBeenProcessed)
+        {
+          continue;
+        }
+      /// Get normalized start and end time
+      std::pair<double, double> normalizedTimes = GetNormalizedPacketInterferenceTime (*packet_it, *processedPacket);
+      /// Eliminate residual interference and recalculate the packets vectors
+      GetInterferenceEliminationModel ()->EliminateInterferences (packet_it->rxParams, processedPacket->rxParams, processedPacket->meanSinr, normalizedTimes.first, normalizedTimes.second);
+      CalculatePacketInterferenceVectors (*packet_it);
+    }
+
+  /// Update packet Rx power and set the SIC flag
+  processedPacket->rxParams->m_rxPower_W *= residualSicPower;
+  CalculatePacketInterferenceVectors (*processedPacket);
+  processedPacket->sicFlag = true;
+}
+
+std::pair<double, double>
+SatPhyRxCarrierPerWindow::GetNormalizedPacketInterferenceTime (const SatPhyRxCarrierPerWindow::essaPacketRxParams_s &packet, const SatPhyRxCarrierPerWindow::essaPacketRxParams_s &interferingPacket)
+{
+  NS_LOG_FUNCTION (this);
+  NS_LOG_INFO ("SatPhyRxCarrierPwerWindow::GetNormalizedPacketInterferenceTime");
+
+  /// Get a first approach of the values
+  /// (must redo calculations in the exact same order as they were
+  //   done when calculating the interference vector).
+  double startTime = std::max ( 0.0, 1.0 - (1.0 + ((packet.arrivalTime.GetDouble () - interferingPacket.arrivalTime.GetDouble ()) / packet.duration.GetDouble ())));
+  double endTime = std::min ( 1.0, 1.0 - (1.0 + (packet.arrivalTime.GetDouble () - interferingPacket.arrivalTime.GetDouble () - interferingPacket.duration.GetDouble ()) / packet.duration.GetDouble ()));
+
+  /// Now get the actual values from the Interference vector (there may be
+  //  some rounding errors)
+  double normalizedTime = 0.0;
+  double exactStartTime = (startTime == 0.0) ? 0.0 : -1.0;
+  double exactEndTime = -1.0;
+  auto ifPowerPerFragment = packet.rxParams->GetInterferencePowerInSatellitePerFragment ();
+  for (std::pair<double, double>& ifPower : ifPowerPerFragment)
+    {
+      normalizedTime += ifPower.first;
+      if ((exactStartTime < 0) && (startTime == normalizedTime))
+        {
+          exactStartTime = normalizedTime;
+        }
+      if ((exactEndTime < 0) && (endTime == normalizedTime))
+        {
+          exactEndTime = normalizedTime;
+        }
+    }
+
+  if ((exactStartTime < 0) || (exactEndTime < 0))
+    {
+      NS_FATAL_ERROR ("Cannot find exact interference time between two packets");
+    }
+
+  return std::make_pair (exactStartTime, exactEndTime);
 }
 
 double

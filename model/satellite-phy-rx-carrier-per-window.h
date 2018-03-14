@@ -56,6 +56,7 @@ public:
     Mac48Address destAddress;
     Mac48Address sourceAddress;
     bool packetHasBeenProcessed;
+    bool sicFlag;
     double meanSinr;
     double preambleMeanSinr;
     std::vector< std::pair<double, double> > gamma;
@@ -144,6 +145,11 @@ private:
   void DoWindowEnd ();
 
   /**
+   * \brief Perform SIC for a given decoded packet
+   */
+  void DoSic (packetList_t::iterator processedPacket, std::pair<packetList_t::iterator, packetList_t::iterator> windowBounds);
+
+  /**
    * \brief Get the effective SNIR of the packet using the Mutual Information function
    */
   double GetEffectiveSnir (const SatPhyRxCarrierPerWindow::essaPacketRxParams_s &packet);
@@ -153,6 +159,11 @@ private:
    * \return True if a packet is returned, False otherwise
    */
   packetList_t::iterator GetHighestSnirPacket (const std::pair<packetList_t::iterator, packetList_t::iterator> windowBounds);
+
+  /**
+   * \brief Get the normalized start and end time between two interfering packets
+   */
+  std::pair<double, double> GetNormalizedPacketInterferenceTime (const SatPhyRxCarrierPerWindow::essaPacketRxParams_s &packet, const SatPhyRxCarrierPerWindow::essaPacketRxParams_s &interferingPacket);
 
   /**
    * \brief Get a pair of iterators, pointing to the first element in the window, and to the first after the window
