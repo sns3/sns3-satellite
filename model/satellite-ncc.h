@@ -128,9 +128,10 @@ public:
    * \param utId ID (mac address) of the UT to be added
    * \param llsConf Lower layer service configuration for the UT to be added.
    * \param beamId ID of the beam where UT is connected.
-   * \return RA channel index assigned to added UT.
+   * \param setRaChannelCallback  callback to invoke whenever the UT to be
+   *        added should change its RA allocation channel
    */
-  uint32_t AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf, uint32_t beamId);
+  void AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf, uint32_t beamId, Callback<void, uint32_t> setRaChannelCallback);
 
   /**
    * \brief Function for setting the random access allocation channel specific high load backoff probabilities

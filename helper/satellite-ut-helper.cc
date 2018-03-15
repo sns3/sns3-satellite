@@ -384,10 +384,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   llc->SetReceiveCallback (MakeCallback (&SatNetDevice::Receive, dev));
 
   // Add UT to NCC
-  uint32_t raChannel = ncc->AddUt (dev->GetAddress (), m_llsConf, beamId);
-
-  // set RA channel given by NCC to MAC
-  mac->SetRaChannel (raChannel);
+  ncc->AddUt (dev->GetAddress (), m_llsConf, beamId, MakeCallback (&SatUtMac::SetRaChannel, mac));
 
   phy->Initialize ();
 
