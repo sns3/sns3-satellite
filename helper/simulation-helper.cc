@@ -73,7 +73,7 @@ NS_OBJECT_ENSURE_REGISTERED (SimulationHelperConf);
                                    &SimulationHelperConf::GetTraffic ## index ## Protocol), \
                  MakeEnumChecker (SimulationHelperConf::PROTOCOL_UDP, "UDP", \
                                   SimulationHelperConf::PROTOCOL_TCP, "TCP", \
-                                  SimulationHelperConf::PROTOCOL_BOTH, "BothTcpAndUdp")) \
+                                  SimulationHelperConf::PROTOCOL_BOTH, "BOTH")) \
   .AddAttribute ("Traffic" TOSTRING (index) "Direction", \
                  "Satellite link direction that this traffic model will use", \
                  EnumValue (a3), \
@@ -81,7 +81,7 @@ NS_OBJECT_ENSURE_REGISTERED (SimulationHelperConf);
                                    &SimulationHelperConf::GetTraffic ## index ## Direction), \
                  MakeEnumChecker (SimulationHelperConf::RTN_LINK, "ReturnLink", \
                                   SimulationHelperConf::FWD_LINK, "ForwardLink", \
-                                  SimulationHelperConf::BOTH_LINK, "ReturnAndForwardLink")) \
+                                  SimulationHelperConf::BOTH_LINK, "BothLinks")) \
   .AddAttribute ("Traffic" TOSTRING (index) "StartTime", \
                  "Time into the simulation when this traffic model will be started on each user", \
                  TimeValue (a4), \
