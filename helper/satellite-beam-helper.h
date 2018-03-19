@@ -390,6 +390,11 @@ private:
   Ptr<SatPacketTrace> m_packetTrace;
 
   /**
+   * Helper flag to activate packet traces on the return link only
+   */
+  bool m_enableTracesOnReturnLink;
+
+  /**
    * Creates info of the beam.
    * \return info for beams as std::string.
    */

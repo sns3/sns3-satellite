@@ -130,6 +130,11 @@ SatBeamHelper::GetTypeId (void)
                    TimeValue (MilliSeconds (1000)),
                    MakeTimeAccessor (&SatBeamHelper::m_ctrlMsgStoreTimeRtnLink),
                    MakeTimeChecker ())
+    .AddAttribute ("EnableTracesOnUserReturnLink",
+                   "Use traces files on the user return channel only",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatBeamHelper::m_enableTracesOnReturnLink),
+                   MakeBooleanChecker ())
     .AddTraceSource ("Creation", "Creation traces",
                      MakeTraceSourceAccessor (&SatBeamHelper::m_creationTrace),
                      "ns3::SatTypedefs::CreationCallback")
@@ -216,7 +221,7 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
 
   SatUtHelper::RandomAccessSettings_s utRaSettings;
   utRaSettings.m_randomAccessModel = m_randomAccessModel;
-  utRaSettings.m_raInterferenceModel = m_raInterferenceModel;
+  utRaSettings.m_raInterferenceModel = m_enableTracesOnReturnLink ? SatPhyRxCarrierConf::IF_TRACE : m_raInterferenceModel;
   utRaSettings.m_raInterferenceEliminationModel = m_raInterferenceEliminationModel;
   utRaSettings.m_raCollisionModel = m_raCollisionModel;
 
@@ -354,6 +359,10 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
 
   // next it is found user link channels and if not found channels are created and saved to map
   ChannelPair_t userLink = GetChannelPair (m_ulChannels, ulFreqId, true);
+  if (m_enableTracesOnReturnLink)
+    {
+      userLink.second->SetAttribute ("RxPowerCalculationMode", EnumValue (SatEnums::RX_PWR_INPUT_TRACE));
+    }
 
   // next it is found feeder link channels and if not found channels are created nd saved to map
   ChannelPair_t feederLink = GetChannelPair (m_flChannels, flFreqId, false);
