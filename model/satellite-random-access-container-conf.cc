@@ -54,7 +54,8 @@ SatRandomAccessConf::SatRandomAccessConf ()
 }
 
 SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf, Ptr<SatSuperframeSeq> superframeSeq)
-  : m_slottedAlohaControlRandomizationIntervalInMilliSeconds (),
+  : m_configurationIdPerAllocationChannel (),
+  m_slottedAlohaControlRandomizationIntervalInMilliSeconds (),
   m_allocationChannelCount (llsConf->GetRaServiceCount ()),
   m_crdsaSignalingOverheadInBytes (5),
   m_slottedAlohaSignalingOverheadInBytes (3)
@@ -65,10 +66,6 @@ SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf,
     {
       NS_FATAL_ERROR ("SatRandomAccessConf::SatRandomAccessConf - No random access allocation channel");
     }
-
-  // TODO Get rid of the hard coded 0 in GetSuperframeConf
-  uint32_t raChannelsCount = superframeSeq->GetSuperframeConf (0)->GetRaChannelCount ();
-  m_configurationIdPerAllocationChannel.resize (raChannelsCount, llsConf->GetRaDefaultService ());
 
   m_slottedAlohaControlRandomizationIntervalInMilliSeconds = (llsConf->GetDefaultControlRandomizationInterval ()).GetMilliSeconds ();
   DoSlottedAlohaVariableSanityCheck ();
@@ -88,19 +85,35 @@ SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf,
       allocationChannel->SetCrdsaBackoffTimeInMilliSeconds (llsConf->GetRaBackOffTimeInMilliSeconds (i));
       /// this assumes that the slot IDs for each allocation channel start at 0
       allocationChannel->SetCrdsaMinRandomizationValue (0);
-      /// TODO Get rid of the hard coded 0 in GetSuperframeConf
+      allocationChannel->SetCrdsaMaxRandomizationValue (std::numeric_limits<uint16_t>::max ());
+    }
+
+  /// TODO Get rid of the hard coded 0 in GetSuperframeConf
+  Ptr<SatSuperframeConf> superframeConf = superframeSeq->GetSuperframeConf (0);
+  for (uint32_t i = 0; i < superframeConf->GetRaChannelCount (); ++i)
+    {
+      uint8_t allocationChannel = superframeConf->GetRaChannelAllocationChannelId (i);
       /// this assumes that the slot IDs for each allocation channel start at 0
-      allocationChannel->SetCrdsaMaxRandomizationValue (superframeSeq->GetSuperframeConf (0)->GetRaSlotCount (i) - 1);
+      uint16_t raSlotCount = superframeConf->GetRaSlotCount (i) - 1;
 
-      allocationChannel->DoCrdsaVariableSanityCheck ();
-
-      for (const uint32_t carrierId : llsConf->GetAssignedRaCarriersId (i))
+      if (allocationChannel < m_allocationChannelCount)
         {
-          if (carrierId < raChannelsCount)
+          m_configurationIdPerAllocationChannel.push_back (allocationChannel);
+          auto allocationChannelConf = m_allocationChannelConf[allocationChannel];
+          if (raSlotCount < allocationChannelConf->GetCrdsaMaxRandomizationValue ())
             {
-              m_configurationIdPerAllocationChannel[carrierId] = i;
+              allocationChannelConf->SetCrdsaMaxRandomizationValue (raSlotCount);
             }
         }
+      else
+        {
+          NS_FATAL_ERROR ("Allocation channel for frame " << superframeConf->GetRaChannelFrameId (i) << " is out of range");
+        }
+    }
+
+  for (auto& allocationChannelConf : m_allocationChannelConf)
+    {
+      allocationChannelConf.second->DoCrdsaVariableSanityCheck ();
     }
 }
 
@@ -112,7 +125,7 @@ SatRandomAccessConf::~SatRandomAccessConf ()
 Ptr<SatRandomAccessAllocationChannel>
 SatRandomAccessConf::GetAllocationChannelConfiguration (uint32_t allocationChannel)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << allocationChannel);
 
   std::map<uint32_t, Ptr<SatRandomAccessAllocationChannel> >::iterator iter = m_allocationChannelConf.find (allocationChannel);
 
@@ -144,7 +157,7 @@ SatRandomAccessConf::GetAllocationChannelConfigurationId (uint32_t allocationCha
 
   if (allocationChannel >= m_configurationIdPerAllocationChannel.size ())
     {
-      NS_FATAL_ERROR ("SatRandomAccessConf::GetAllocationChannelConfigurationId -Invalid allocation channel");
+      NS_FATAL_ERROR ("SatRandomAccessConf::GetAllocationChannelConfigurationId - allocation channel " << allocationChannel << " has no associated configuration.");
     }
 
   return m_configurationIdPerAllocationChannel[allocationChannel];

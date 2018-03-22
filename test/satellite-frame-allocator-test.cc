@@ -146,7 +146,16 @@ void SatFrameAllocatorTestCase::InitFrame (SatSuperframeConf::ConfigType_t confi
       checkSlotLimit = false;
     }
 
-  m_frameConf = Create<SatFrameConf> (10e4 * 2, MilliSeconds (125), btu, m_waveFormConf, false, defaultWaveformInUse, checkSlotLimit );
+  SatFrameConf::SatFrameConfParams_t frameConfParameters;
+  frameConfParameters.m_bandwidthHz = 10.4 * 2;
+  frameConfParameters.m_targetDuration = MilliSeconds (125);
+  frameConfParameters.m_btuConf = btu;
+  frameConfParameters.m_waveformConf = m_waveFormConf;
+  frameConfParameters.m_allocationChannel = 0;
+  frameConfParameters.m_isRandomAccess = false;
+  frameConfParameters.m_defaultWaveformInUse = defaultWaveformInUse;
+  frameConfParameters.m_checkSlotLimit = checkSlotLimit;
+  m_frameConf = Create<SatFrameConf> (frameConfParameters);
   m_frameAllocator = Create<SatFrameAllocator> (m_frameConf, 0, configType);
 }
 
