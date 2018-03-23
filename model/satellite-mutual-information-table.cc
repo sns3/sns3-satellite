@@ -91,6 +91,7 @@ double
 SatMutualInformationTable::GetNormalizedSymbolInformation (double snirDb) const
 {
   NS_LOG_FUNCTION (this << snirDb);
+  NS_LOG_INFO ("SatMutualInformationTable::GetNormalizedSymbolInformation - SNIR dB=" << snirDb);
 
   uint16_t n = m_snirDb.size ();
 
@@ -142,6 +143,7 @@ double
 SatMutualInformationTable::GetSnirDb (double symbolInformationTarget) const
 {
   NS_LOG_FUNCTION (this << symbolInformationTarget);
+  NS_LOG_INFO ("SatMutualInformationTable::GetSnirDb - Symbol Information Target=" << symbolInformationTarget);
 
   uint16_t n = m_symbolInformation.size ();
 
@@ -149,10 +151,10 @@ SatMutualInformationTable::GetSnirDb (double symbolInformationTarget) const
   NS_ASSERT (m_snirDb.size () == n);
 
   // If the requested Symbol Information is smaller than the smallest Symbol Information entry
-  // in the look-up-table
-  if (symbolInformationTarget < m_symbolInformation[0])
+  // in the look-up-table. Return small value
+  if (symbolInformationTarget <= m_symbolInformation[0])
     {
-      return m_snirDb[0];
+      return -100.0;
     }
 
   // The requested Symbol Information is higher than the highest Symbol Information entry
@@ -173,7 +175,7 @@ SatMutualInformationTable::GetSnirDb (double symbolInformationTarget) const
   // Go through the list from end to beginning
   for (uint32_t i = 0; i < n; ++i)
     {
-      if (symbolInformationTarget >= m_symbolInformation[i])
+      if (symbolInformationTarget <= m_symbolInformation[i])
         {
           snir = SatUtils::Interpolate (symbolInformationTarget, m_symbolInformation[i - 1], m_symbolInformation[i], m_snirDb[i - 1], m_snirDb[i]);
           NS_LOG_INFO (this << " Interpolate: " << symbolInformationTarget << " to snir = " << snir << "(symbolInformation0: " << m_symbolInformation[i - 1] << ", symbolInformation1: " << m_symbolInformation[i] << ", snir0: " << m_snirDb[i - 1] << ", snir1: " << m_snirDb[i] << ")");

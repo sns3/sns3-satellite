@@ -102,6 +102,8 @@ double
 SatPerfectInterferenceElimination::GetResidualPower (Ptr<SatSignalParameters> processedPacket, double EsNo)
 {
   NS_ASSERT (false);
+
+  return 0.0;
 }
 
 
