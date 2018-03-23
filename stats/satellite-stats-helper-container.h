@@ -47,7 +47,7 @@ namespace ns3 {
  * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] [Dev, Mac, Phy] Throughput
  * - AddAverage [Beam, Ut, UtUser] [Fwd, Rtn] AppThroughput
  * - AddAverage [Beam, Ut] [Fwd, Rtn] [Dev, Mac, Phy] Throughput
- * - Add [Global, PerGw, PerBeam, PerUt] [FwdDa, RtnDa, SlottedAloha, Crdsa] PacketError
+ * - Add [Global, PerGw, PerBeam, PerUt] [FwdDa, RtnDa, SlottedAloha, Crdsa, Essa] PacketError
  * - Add [Global, PerGw, PerBeam, PerUt] [SlottedAloha, Crdsa, Essa] PacketCollision
  * - Add [Global, PerGw, PerBeam, PerUt] CapacityRequest
  * - Add [Global, PerGw, PerBeam, PerUt] ResourcesGranted
@@ -251,6 +251,9 @@ public:
 
   // Random Access CRDSA packet collision rate statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (CrdsaPacketCollision)
+
+  // Random Access E-SSA packet error rate statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (EssaPacketError)
 
   // Random Access E-SSA packet collision rate statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (EssaPacketCollision)

@@ -55,12 +55,10 @@ public:
     Ptr<SatSignalParameters> rxParams;
     Mac48Address destAddress;
     Mac48Address sourceAddress;
-    bool packetHasBeenProcessed;
     bool sicFlag;
     double meanSinr;
     double preambleMeanSinr;
     std::vector< std::pair<double, double> > gamma;
-    bool phyError;
     Time arrivalTime;
     Time duration;
   } essaPacketRxParams_s;
@@ -106,14 +104,26 @@ protected:
 
   ///////// TRACED CALLBACKS /////////
   /**
-   * \brief `EssaRxCollision` trace source.
+   * \brief `EssaRxError` trace source.
    *
-   * Fired when a packet is received through Random Access ESSA.
+   * Fired when a packet is decoded through Random Access ESSA.
    *
    * Contains the following information:
    * - number of upper layer packets in the received packet.
    * - the MAC48 address of the sender; and
-   * - whether a collision has occured.
+   * - whether a physical error has occured.
+   */
+  TracedCallback<uint32_t, const Address &, bool> m_essaRxErrorTrace;
+
+  /**
+   * \brief `EssaRxError` trace source.
+   *
+   * Fired when a packet is treated through Random Access ESSA.
+   *
+   * Contains the following information:
+   * - number of upper layer packets in the received packet.
+   * - the MAC48 address of the sender; and
+   * - whether a it was treated or not (not detected).
    */
   TracedCallback<uint32_t, const Address &, bool> m_essaRxCollisionTrace;
 

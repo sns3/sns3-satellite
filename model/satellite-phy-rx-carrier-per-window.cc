@@ -110,6 +110,10 @@ SatPhyRxCarrierPerWindow::GetTypeId (void)
                      "Received a packet through Random Access ESSA",
                      MakeTraceSourceAccessor (&SatPhyRxCarrierPerWindow::m_essaRxCollisionTrace),
                      "ns3::SatPhyRxCarrierPacketProbe::RxStatusCallback")
+    .AddTraceSource ("EssaRxError",
+                     "Received a packet through Random Access ESSA",
+                     MakeTraceSourceAccessor (&SatPhyRxCarrierPerWindow::m_essaRxErrorTrace),
+                     "ns3::SatPhyRxCarrierPacketProbe::RxStatusCallback")
   ;
   return tid;
 }
@@ -141,19 +145,12 @@ SatPhyRxCarrierPerWindow::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParam
   params.duration = packetRxParams.rxParams->m_duration;
   params.arrivalTime = Now () - params.duration; // arrival time is the start of reception
   params.rxParams = packetRxParams.rxParams;
-  params.packetHasBeenProcessed = false;
   params.sicFlag = false;
+  params.meanSinr = -1.0;
+  params.preambleMeanSinr = -1.0;
 
   // Calculate SINR, gamma and ifPowerPerFragment
   CalculatePacketInterferenceVectors (params);
-
-  if (nPackets > 0)
-    {
-      // TODO
-      m_essaRxCollisionTrace (nPackets,                     // number of packets
-                              params.sourceAddress,         // sender address
-                              false);         // collision flag
-    }
 
   AddEssaPacket (params);
 }
@@ -184,19 +181,68 @@ SatPhyRxCarrierPerWindow::CalculatePacketInterferenceVectors (SatPhyRxCarrierPer
 
   double cSnr = CalculateCompositeSinr (snr, snrSatellite);
 
+  /// Update probes (only the first time we access this method for this packet)
+  if (packet.meanSinr < 0.0)
+    {
+      // Update link specific SINR trace
+      m_linkSinrTrace (SatUtils::LinearToDb (snr));
+
+      // Update composite SNR trace for DAMA and Slotted ALOHA packets
+      // m_sinrTrace (SatUtils::LinearToDb (cSnr), packet.sourceAddress); // Done with effective SINR
+
+      m_linkBudgetTrace (packet.rxParams, GetOwnAddress (),
+                         packet.destAddress,
+                         0.0, cSnr);
+
+      /// composite sinr output trace
+      if (IsCompositeSinrOutputTraceEnabled () && (packet.meanSinr == 0.0))
+        {
+          DoCompositeSinrOutputTrace (cSnr);
+        }
+
+      NS_LOG_INFO ("SatPhyRxCarrierPerWindow::CalculatePacketInterferenceVectors - Received packet SNR dB = " << SatUtils::LinearToDb (cSnr));
+    }
+
   /// Calculate the gamma vector
   packet.gamma.clear ();
-  for (std::pair<double, double>& interference : packet.rxParams->GetInterferencePowerPerFragment ())
+  /// Consider both the interference per fragment in the satellite, and the
+  /// interference per fragment in the feeder. Since interference at the
+  /// feeder does not consider intrabeam interference, the fragments
+  /// will always be a subset of fragments in satellite (TODO: CHECK THIS).
+  /// TODO: optimize. Find a way to do this without creating copy.
+  std::vector< std::pair<double, double> > interferencePowerPerFragment = packet.rxParams->GetInterferencePowerPerFragment ();
+  std::vector< std::pair<double, double> > interferencePowerPerFragmentInSatellite = packet.rxParams->GetInterferencePowerInSatellitePerFragment ();
+  std::vector< std::pair<double, double> >::iterator interferencePower = interferencePowerPerFragment.begin ();
+  double normalizedTime = interferencePower->first, normalizedTimeInSatellite = 0.0;
+  for (std::vector< std::pair<double, double> >::iterator interferencePowerInSatellite = interferencePowerPerFragmentInSatellite.begin (); interferencePowerInSatellite != interferencePowerPerFragmentInSatellite.end (); interferencePowerInSatellite++)
     {
+      normalizedTimeInSatellite += interferencePowerInSatellite->first;
+      /// TODO: verify. Since Interference in feeder is a subset,
+      /// fragments will never be smaller than those in satellite.
+      if (normalizedTimeInSatellite > normalizedTime)
+        {
+          interferencePower++;
+          normalizedTime += interferencePower->first;
+        }
+
+      /// For each iteration:
       /// gamma[k] = ( SNR^-1 + (C/Interference[k])^-1 )^-1
-      double gamma = (packet.rxParams->m_rxPower_W * cSnr) / (cSnr * interference.second + packet.rxParams->m_rxPower_W);
-      packet.gamma.emplace_back (interference.first, gamma);
+
+      /// Calculate composite C/I = (C_u/I_u^-1 + C_d/I_d^-1)^-1
+      double cI = (packet.rxParams->m_rxPowerInSatellite_W * packet.rxParams->m_rxPower_W) / (interferencePowerInSatellite->second * packet.rxParams->m_rxPower_W + interferencePower->second * packet.rxParams->m_rxPowerInSatellite_W);
+
+      /// Calculate gamma[k]
+      double gamma = 1 / (1 / cI + 1 / cSnr);
+      packet.gamma.emplace_back (interferencePowerInSatellite->first, gamma);
+
+      NS_LOG_INFO ("SatPhyRxCarrierPerWindow::CalculatePacketInterferenceVectors - Gamma fragment of duration " << interferencePowerInSatellite->first << " : " << gamma);
     }
+
 
   /// Calculate the gamma vector for the preamble
   std::vector< std::pair<double, double> > gammaPreamble;
   Ptr<SatWaveform> wf = GetWaveformConf ()->GetWaveform (packet.rxParams->m_txInfo.waveformId);
-  double normalizedTime = 0.0;
+  normalizedTime = 0.0;
   double normalizedPreambleTime = wf->GetPreambleLengthInSymbols () / wf->GetBurstLengthInSymbols (); // This asumes that preamble and burst have the same symbol rate
   for (std::vector< std::pair<double, double> >::iterator it = packet.gamma.begin (); it != packet.gamma.end (); it++)
     {
@@ -252,8 +298,13 @@ SatPhyRxCarrierPerWindow::ProcessWindow (Time startTime, Time endTime)
       /// MIESM (block 3)
       /// Get effective SINR
       double sinrEffective = GetEffectiveSnir (*packet_it);
+      m_sinrTrace (SatUtils::LinearToDb (sinrEffective), packet_it->sourceAddress);
       /// Check against link results
       bool phyError = CheckAgainstLinkResults (sinrEffective, packet_it->rxParams);
+      // Trace if the packet has been decoded or not
+      m_essaRxErrorTrace (1,                        // number of packets
+                          packet_it->sourceAddress, // sender address
+                          phyError);                // error flag
       if (!phyError)
         {
           /// SIC (block 4)
@@ -268,7 +319,6 @@ SatPhyRxCarrierPerWindow::ProcessWindow (Time startTime, Time endTime)
       m_rxCallback (packet_it->rxParams, phyError);
       /// Packet could now be deleted, since interference information
       /// is stored in each packet; but we'll keep it for logging purposes
-      packet_it->packetHasBeenProcessed = true;
     }
 
   NS_LOG_INFO ("SatPhyRxCarrierPerWindow::DoWindowEnd - Window processing finished");
@@ -297,7 +347,7 @@ SatPhyRxCarrierPerWindow::DoSic (packetList_t::iterator processedPacket, std::pa
           continue;
         }
       /// Except already processed packets, and the packet being currently processed
-      if (packet_it == processedPacket || packet_it->sicFlag || packet_it->packetHasBeenProcessed)
+      if (packet_it == processedPacket || packet_it->sicFlag)
         {
           continue;
         }
@@ -323,23 +373,25 @@ SatPhyRxCarrierPerWindow::GetNormalizedPacketInterferenceTime (const SatPhyRxCar
   /// Get a first approach of the values
   /// (must redo calculations in the exact same order as they were
   //   done when calculating the interference vector).
-  double startTime = std::max ( 0.0, 1.0 - (1.0 + ((packet.arrivalTime.GetDouble () - interferingPacket.arrivalTime.GetDouble ()) / packet.duration.GetDouble ())));
-  double endTime = std::min ( 1.0, 1.0 - (1.0 + (packet.arrivalTime.GetDouble () - interferingPacket.arrivalTime.GetDouble () - interferingPacket.duration.GetDouble ()) / packet.duration.GetDouble ()));
+  double startTimeA = std::max ( 0.0, 1.0 - ((packet.duration.GetDouble () + packet.arrivalTime.GetDouble () - interferingPacket.arrivalTime.GetDouble ()) / packet.duration.GetDouble ()));
+  double endTimeA = std::min ( 1.0, 1.0 - (packet.arrivalTime.GetDouble () - interferingPacket.arrivalTime.GetDouble ()) / packet.duration.GetDouble ());
+  double startTimeB = std::max ( 0.0, (interferingPacket.arrivalTime.GetDouble () - packet.arrivalTime.GetDouble ()) / packet.duration.GetDouble ());
+  double endTimeB = std::min ( 1.0, 1.0 - (packet.arrivalTime.GetDouble () - interferingPacket.arrivalTime.GetDouble ()) / packet.duration.GetDouble ());
 
   /// Now get the actual values from the Interference vector (there may be
   //  some rounding errors)
   double normalizedTime = 0.0;
-  double exactStartTime = (startTime == 0.0) ? 0.0 : -1.0;
+  double exactStartTime = (startTimeA == 0.0) ? 0.0 : -1.0;
   double exactEndTime = -1.0;
   auto ifPowerPerFragment = packet.rxParams->GetInterferencePowerInSatellitePerFragment ();
   for (std::pair<double, double>& ifPower : ifPowerPerFragment)
     {
       normalizedTime += ifPower.first;
-      if ((exactStartTime < 0) && (startTime == normalizedTime))
+      if ((exactStartTime < 0) && (normalizedTime == startTimeA || normalizedTime == startTimeB))
         {
           exactStartTime = normalizedTime;
         }
-      if ((exactEndTime < 0) && (endTime == normalizedTime))
+      if ((exactEndTime < 0) && (normalizedTime == endTimeA || normalizedTime == endTimeB))
         {
           exactEndTime = normalizedTime;
         }
@@ -368,9 +420,9 @@ SatPhyRxCarrierPerWindow::GetEffectiveSnir (const SatPhyRxCarrierPerWindow::essa
       meanMutualInformation += it->first * mutualInformationTable->GetNormalizedSymbolInformation (SatUtils::LinearToDb (it->second / beta));
     }
 
-  double effectiveSnir = SatUtils::DbToLinear (beta * mutualInformationTable->GetSnirDb (meanMutualInformation));
+  double effectiveSnir = beta * SatUtils::DbToLinear (mutualInformationTable->GetSnirDb (meanMutualInformation));
 
-  NS_LOG_INFO ("SatPhyRxCarrierPerWindow::GetEffectiveSnir - Effective SNIR : " << effectiveSnir);
+  NS_LOG_INFO ("SatPhyRxCarrierPerWindow::GetEffectiveSnir - Effective SNIR dB: " << SatUtils::LinearToDb (effectiveSnir));
 
   return effectiveSnir;
 }
@@ -394,6 +446,10 @@ SatPhyRxCarrierPerWindow::CleanOldPackets (const Time windowStartTime)
       offset = it->arrivalTime + it->duration - windowStartTime;
       if (!offset.IsStrictlyPositive ())
         {
+          // Trace if the packet has been decoded or not
+          m_essaRxCollisionTrace (1,                        // number of packets
+                                  it->sourceAddress, // sender address
+                                  !(it->sicFlag));                // error flag
           // Delete element from list
           NS_LOG_INFO ("SatPhyRxCarrierPerWindow::CleanOldPackets - Remove packet " << it->rxParams->m_txInfo.crdsaUniquePacketId << " from " << it->sourceAddress);
           it->rxParams = NULL;
@@ -440,13 +496,14 @@ SatPhyRxCarrierPerWindow::GetHighestSnirPacket (const std::pair<SatPhyRxCarrierP
   SatPhyRxCarrierPerWindow::packetList_t::iterator it, max = windowBounds.second;
   for (it = windowBounds.first; it != windowBounds.second; it++)
     {
-      if (it->packetHasBeenProcessed)
+      if (it->sicFlag)
         {
           continue;
         }
       /// Check If packet can be detected
       if (!PacketCanBeDetected (*it))
         {
+          NS_LOG_INFO ("SatPhyRxCarrierPerWindow::GetHighestSnirPacket - Packet " << it->rxParams->m_txInfo.crdsaUniquePacketId << " cannot be detected");
           continue;
         }
       /// Check if bigger SINR
@@ -463,7 +520,6 @@ bool
 SatPhyRxCarrierPerWindow::PacketCanBeDetected (const SatPhyRxCarrierPerWindow::essaPacketRxParams_s &packet)
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_INFO ("SatPhyRxCarrierPerWindow::PacketCanBeDetected");
 
   return (packet.preambleMeanSinr >= m_detectionThreshold);
 }
