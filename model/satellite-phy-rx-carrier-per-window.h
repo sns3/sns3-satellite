@@ -56,6 +56,7 @@ public:
     Mac48Address destAddress;
     Mac48Address sourceAddress;
     bool sicFlag;
+    bool hasBeenUpdated;
     double meanSinr;
     double preambleMeanSinr;
     std::vector< std::pair<double, double> > gamma;

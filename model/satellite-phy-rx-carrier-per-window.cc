@@ -146,6 +146,7 @@ SatPhyRxCarrierPerWindow::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParam
   params.arrivalTime = Now () - params.duration; // arrival time is the start of reception
   params.rxParams = packetRxParams.rxParams;
   params.sicFlag = false;
+  params.hasBeenUpdated = false;
   params.meanSinr = -1.0;
   params.preambleMeanSinr = -1.0;
 
@@ -159,7 +160,7 @@ void
 SatPhyRxCarrierPerWindow::CalculatePacketInterferenceVectors (SatPhyRxCarrierPerWindow::essaPacketRxParams_s &packet)
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_INFO ("SatPhyRxCarrierPerWindow::CalculatePacketInterferenceVectors");
+  NS_LOG_INFO ("SatPhyRxCarrierPerWindow::CalculatePacketInterferenceVectors - Packet " << packet.rxParams->m_txInfo.crdsaUniquePacketId << " from " << packet.sourceAddress);
 
   // TODO: should we check the interference model used ?
   // TODO: should we check the collision model used (check against sinr, collision always drops, etc) ?
@@ -259,6 +260,7 @@ SatPhyRxCarrierPerWindow::CalculatePacketInterferenceVectors (SatPhyRxCarrierPer
   packet.meanSinr = SatUtils::ScalarProduct (packet.gamma);
   packet.preambleMeanSinr = SatUtils::ScalarProduct (gammaPreamble);
 
+  packet.hasBeenUpdated = true;
 }
 
 void
@@ -287,40 +289,43 @@ SatPhyRxCarrierPerWindow::ProcessWindow (Time startTime, Time endTime)
   uint32_t i = 0;
   while (i < m_windowSicIterations)
     {
-      /// Select packet to decode (block 2)
-      packetList_t::iterator packet_it = GetHighestSnirPacket (windowBounds);
-      if (packet_it == windowBounds.second)
+      while (true)
         {
-          // No more packets to decode
-          break;
+          /// Select packet to decode (block 2)
+          packetList_t::iterator packet_it = GetHighestSnirPacket (windowBounds);
+          if (packet_it == windowBounds.second)
+            {
+              NS_LOG_INFO ("SatPhyRxCarrierPerWindow::DoWindowEnd - No more packets to decode");
+              break;
+            }
+          NS_LOG_INFO ("SatPhyRxCarrierPerWindow::DoWindowEnd - Process packet " << packet_it->rxParams->m_txInfo.crdsaUniquePacketId << " from " << packet_it->sourceAddress);
+          /// MIESM (block 3)
+          packet_it->hasBeenUpdated = false;
+          /// Get effective SINR
+          double sinrEffective = GetEffectiveSnir (*packet_it);
+          m_sinrTrace (SatUtils::LinearToDb (sinrEffective), packet_it->sourceAddress);
+          NS_LOG_WARN (SatUtils::LinearToDb (packet_it->meanSinr) << " " << SatUtils::LinearToDb (sinrEffective) << " " << std::abs (SatUtils::LinearToDb (packet_it->meanSinr) - SatUtils::LinearToDb (sinrEffective)));
+          /// Check against link results
+          bool phyError = CheckAgainstLinkResults (sinrEffective, packet_it->rxParams);
+          // Trace if the packet has been decoded or not
+          m_essaRxErrorTrace (1,                        // number of packets
+                              packet_it->sourceAddress, // sender address
+                              phyError);                // error flag
+          if (!phyError)
+            {
+              NS_LOG_WARN (SatUtils::LinearToDb (packet_it->meanSinr) << " " << SatUtils::LinearToDb (sinrEffective) << " " << std::abs (SatUtils::LinearToDb (packet_it->meanSinr) - SatUtils::LinearToDb (sinrEffective)) << " " << SatUtils::LinearToDb (GetInterferenceEliminationModel ()->GetResidualPower (packet_it->rxParams, 256 * packet_it->meanSinr)));
+              /// SIC (block 4)
+              DoSic (packet_it, windowBounds);
+            }
+          /// send packet upwards
+          m_rxCallback (packet_it->rxParams, phyError);
+          /// If decoded, Packet could be deleted, since interference information
+          /// is stored in each packet; but we'll keep it for logging purposes
         }
-      NS_LOG_INFO ("SatPhyRxCarrierPerWindow::DoWindowEnd - Process packet " << packet_it->rxParams->m_txInfo.crdsaUniquePacketId << " from " << packet_it->sourceAddress);
-      /// MIESM (block 3)
-      /// Get effective SINR
-      double sinrEffective = GetEffectiveSnir (*packet_it);
-      m_sinrTrace (SatUtils::LinearToDb (sinrEffective), packet_it->sourceAddress);
-      /// Check against link results
-      bool phyError = CheckAgainstLinkResults (sinrEffective, packet_it->rxParams);
-      // Trace if the packet has been decoded or not
-      m_essaRxErrorTrace (1,                        // number of packets
-                          packet_it->sourceAddress, // sender address
-                          phyError);                // error flag
-      if (!phyError)
-        {
-          /// SIC (block 4)
-          DoSic (packet_it, windowBounds);
-        }
-      else
-        {
-          /// Update iteration
-          i++;
-        }
-      /// send packet upwards
-      m_rxCallback (packet_it->rxParams, phyError);
-      /// Packet could now be deleted, since interference information
-      /// is stored in each packet; but we'll keep it for logging purposes
-    }
 
+      // increase iteration number
+      i++;
+    }
   NS_LOG_INFO ("SatPhyRxCarrierPerWindow::DoWindowEnd - Window processing finished");
 }
 
@@ -328,21 +333,25 @@ void
 SatPhyRxCarrierPerWindow::DoSic (packetList_t::iterator processedPacket, std::pair<packetList_t::iterator, packetList_t::iterator> windowBounds)
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_INFO ("SatPhyRxCarrierPerWindow::DoSic");
+  NS_LOG_INFO ("SatPhyRxCarrierPerWindow::DoSic - eliminate interference from packet " << processedPacket->rxParams->m_txInfo.crdsaUniquePacketId << " from " << processedPacket->sourceAddress);
+
+  // TODO: remove
+//  processedPacket->sicFlag = true;
+//  return;
 
   /// Get residual SIC power
-  double residualSicPower = GetInterferenceEliminationModel ()->GetResidualPower (processedPacket->rxParams, processedPacket->meanSinr);
+  // double residualSicPower = GetInterferenceEliminationModel ()->GetResidualPower (processedPacket->rxParams, processedPacket->meanSinr);
 
   /// Update SIC on interfering packets
   for (packetList_t::iterator packet_it = windowBounds.first; packet_it != windowBounds.second; packet_it++)
     {
       /// Stop iterating for packets arriving after the processed packet
-      if (packet_it->arrivalTime > processedPacket->arrivalTime + processedPacket->duration)
+      if (packet_it->arrivalTime >= processedPacket->arrivalTime + processedPacket->duration)
         {
           break;
         }
       /// Except previous packets
-      if (packet_it->arrivalTime + packet_it->duration < processedPacket->arrivalTime)
+      if (packet_it->arrivalTime + packet_it->duration <= processedPacket->arrivalTime)
         {
           continue;
         }
@@ -351,16 +360,18 @@ SatPhyRxCarrierPerWindow::DoSic (packetList_t::iterator processedPacket, std::pa
         {
           continue;
         }
+      NS_LOG_INFO ("SatPhyRxCarrierPerWindow::DoSic - eliminate interference with packet " << packet_it->rxParams->m_txInfo.crdsaUniquePacketId << " from " << packet_it->sourceAddress);
       /// Get normalized start and end time
       std::pair<double, double> normalizedTimes = GetNormalizedPacketInterferenceTime (*packet_it, *processedPacket);
       /// Eliminate residual interference and recalculate the packets vectors
-      GetInterferenceEliminationModel ()->EliminateInterferences (packet_it->rxParams, processedPacket->rxParams, processedPacket->meanSinr, normalizedTimes.first, normalizedTimes.second);
+      /// TODO: replace 256 by spreading factor
+      GetInterferenceEliminationModel ()->EliminateInterferences (packet_it->rxParams, processedPacket->rxParams, 16.0 * processedPacket->meanSinr, normalizedTimes.first, normalizedTimes.second);
       CalculatePacketInterferenceVectors (*packet_it);
     }
 
-  /// Update packet Rx power and set the SIC flag
-  processedPacket->rxParams->m_rxPower_W *= residualSicPower;
-  CalculatePacketInterferenceVectors (*processedPacket);
+  /// Update packet Rx power and set the SIC flag (what for ??)
+  // processedPacket->rxParams->m_rxPowerInSatellite_W = residualSicPower;
+  // CalculatePacketInterferenceVectors (*processedPacket);
   processedPacket->sicFlag = true;
 }
 
@@ -368,7 +379,6 @@ std::pair<double, double>
 SatPhyRxCarrierPerWindow::GetNormalizedPacketInterferenceTime (const SatPhyRxCarrierPerWindow::essaPacketRxParams_s &packet, const SatPhyRxCarrierPerWindow::essaPacketRxParams_s &interferingPacket)
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_INFO ("SatPhyRxCarrierPwerWindow::GetNormalizedPacketInterferenceTime");
 
   /// Get a first approach of the values
   /// (must redo calculations in the exact same order as they were
@@ -417,12 +427,14 @@ SatPhyRxCarrierPerWindow::GetEffectiveSnir (const SatPhyRxCarrierPerWindow::essa
   double meanMutualInformation = 0.0;
   for (std::vector< std::pair<double, double> >::const_iterator it = packet.gamma.begin (); it != packet.gamma.end (); it++)
     {
+      // TODO: REMOVE !
+      NS_LOG_INFO ("gamma vector : " << it->first << " " << it->second );
       meanMutualInformation += it->first * mutualInformationTable->GetNormalizedSymbolInformation (SatUtils::LinearToDb (it->second / beta));
     }
 
   double effectiveSnir = beta * SatUtils::DbToLinear (mutualInformationTable->GetSnirDb (meanMutualInformation));
 
-  NS_LOG_INFO ("SatPhyRxCarrierPerWindow::GetEffectiveSnir - Effective SNIR dB: " << SatUtils::LinearToDb (effectiveSnir));
+  NS_LOG_INFO ("SatPhyRxCarrierPerWindow::GetEffectiveSnir - Packet " << packet.rxParams->m_txInfo.crdsaUniquePacketId << " from " << packet.sourceAddress << " - Effective SNIR dB: " << SatUtils::LinearToDb (effectiveSnir));
 
   return effectiveSnir;
 }
@@ -496,7 +508,7 @@ SatPhyRxCarrierPerWindow::GetHighestSnirPacket (const std::pair<SatPhyRxCarrierP
   SatPhyRxCarrierPerWindow::packetList_t::iterator it, max = windowBounds.second;
   for (it = windowBounds.first; it != windowBounds.second; it++)
     {
-      if (it->sicFlag)
+      if (it->sicFlag || !(it->hasBeenUpdated))
         {
           continue;
         }
@@ -512,7 +524,6 @@ SatPhyRxCarrierPerWindow::GetHighestSnirPacket (const std::pair<SatPhyRxCarrierP
           max = it;
         }
     }
-
   return max;
 }
 
