@@ -49,8 +49,9 @@ SatBtuConf::SatBtuConf ()
   NS_ASSERT (false);
 }
 
-SatBtuConf::SatBtuConf (double bandwidthInHz, double rollOff, double spacing)
-  : m_allocatedBandwidthInHz (bandwidthInHz)
+SatBtuConf::SatBtuConf (double bandwidthInHz, double rollOff, double spacing, uint32_t spreadingFactor)
+  : m_allocatedBandwidthInHz (bandwidthInHz),
+  m_spreadingFactor (spreadingFactor)
 {
   NS_LOG_FUNCTION (this);
 
@@ -64,8 +65,8 @@ SatBtuConf::SatBtuConf (double bandwidthInHz, double rollOff, double spacing)
       NS_FATAL_ERROR ("Roll-off for BTU is out of range. Check frame configuration parameters (attributes)!!!");
     }
 
-  m_occupiedBandwidthInHz = m_allocatedBandwidthInHz / (rollOff + 1.00);
-  m_effectiveBandwidthInHz = m_allocatedBandwidthInHz / ((spacing + 1.00) * (rollOff + 1.00));
+  m_occupiedBandwidthInHz = spreadingFactor * m_allocatedBandwidthInHz / (rollOff + 1.00);
+  m_effectiveBandwidthInHz = spreadingFactor * m_allocatedBandwidthInHz / ((spacing + 1.00) * (rollOff + 1.00));
 
   m_duration = Seconds (1 / m_effectiveBandwidthInHz);
 }
@@ -597,6 +598,19 @@ SatSuperframeConf::SetFrameCarrierRollOff (uint8_t frameIndex, double rollOff)
 }
 
 void
+SatSuperframeConf::SetFrameCarrierSpreadingFactor (uint8_t frameIndex, uint32_t spreadingFactor)
+{
+  NS_LOG_FUNCTION (this << frameIndex << spreadingFactor);
+
+  if ( frameIndex >= m_maxFrameCount )
+    {
+      NS_FATAL_ERROR ("Frame index out of range!!!");
+    }
+
+  m_frameCarrierSpreadingFactor[frameIndex] = spreadingFactor;
+}
+
+void
 SatSuperframeConf::SetFrameRandomAccess (uint8_t frameIndex, bool randomAccess)
 {
   NS_LOG_FUNCTION (this << frameIndex << randomAccess);
@@ -672,6 +686,19 @@ SatSuperframeConf::GetFrameCarrierRollOff (uint8_t frameIndex) const
     }
 
   return m_frameCarrierRollOff[frameIndex];
+}
+
+uint32_t
+SatSuperframeConf::GetFrameCarrierSpreadingFactor (uint8_t frameIndex) const
+{
+  NS_LOG_FUNCTION (this << frameIndex);
+
+  if ( frameIndex >= m_maxFrameCount )
+    {
+      NS_FATAL_ERROR ("Frame index out of range!!!");
+    }
+
+  return m_frameCarrierSpreadingFactor[frameIndex];
 }
 
 bool
@@ -757,7 +784,8 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
             Ptr<SatBtuConf> btuConf = Create<SatBtuConf> (
                 m_frameCarrierAllocatedBandwidth[frameIndex],
                 m_frameCarrierRollOff[frameIndex],
-                m_frameCarrierSpacing[frameIndex]);
+                m_frameCarrierSpacing[frameIndex],
+                m_frameCarrierSpreadingFactor[frameIndex]);
 
             // Create frame utilizing earlier created BTU
             SatFrameConf::SatFrameConfParams_t frameConfParameters;
@@ -919,7 +947,7 @@ SatSuperframeConf::GetIndexAsFrameName (uint32_t index)
 #define GetIndexAsFrameName(index) SatSuperframeConf::GetIndexAsFrameName (index)
 
 // macro to ease definition of attributes for several frames
-#define ADD_FRAME_ATTRIBUTES(index, frameBandwidth, carrierBandwidth, carrierSpacing, carrierRollOff, randomAccess, lowerLayerService ) \
+#define ADD_FRAME_ATTRIBUTES(index, frameBandwidth, carrierBandwidth, carrierSpacing, carrierRollOff, spreadingFactor, randomAccess, lowerLayerService ) \
   .AddAttribute ( GetIndexAsFrameName (index) + "_AllocatedBandwidthHz", \
                   std::string ("The allocated bandwidth [Hz] for ") + GetIndexAsFrameName (index), \
                   TypeId::ATTR_CONSTRUCT, \
@@ -948,6 +976,13 @@ SatSuperframeConf::GetIndexAsFrameName (uint32_t index)
                   MakeDoubleAccessor (&SatSuperframeConf::SetFrame ## index ## CarrierSpacing, \
                                       &SatSuperframeConf::GetFrame ## index ## CarrierSpacing), \
                   MakeDoubleChecker<double> (0.00, 1.00)) \
+  .AddAttribute ( GetIndexAsFrameName (index) + std::string ("_SpreadingFactor"), \
+                  std::string ("The carrier spreading factor for ") + GetIndexAsFrameName (index), \
+                  TypeId::ATTR_CONSTRUCT, \
+                  UintegerValue (spreadingFactor), \
+                  MakeUintegerAccessor (&SatSuperframeConf::SetFrame ## index ## SpreadingFactor, \
+                                        &SatSuperframeConf::GetFrame ## index ## SpreadingFactor), \
+                  MakeUintegerChecker<uint32_t> (1, std::numeric_limits<uint32_t>::max ())) \
   .AddAttribute ( GetIndexAsFrameName (index) + std::string ("_RandomAccessFrame"), \
                   std::string ("Flag to tell if ") + GetIndexAsFrameName (index) + std::string (" is used for random access"), \
                   TypeId::ATTR_CONSTRUCT, \
@@ -1051,16 +1086,16 @@ SatSuperframeConf0::GetTypeId (void)
     .SetParent<ns3::SatSuperframeConf> ()
     .AddConstructor<SatSuperframeConf0> ()
     ADD_SUPER_FRAME_ATTRIBUTES (10, SatSuperframeConf::CONFIG_TYPE_0 )
-    ADD_FRAME_ATTRIBUTES (0, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (1, 1.25e6, 1.25e6, 0.20, 0.30, true, 0)
-    ADD_FRAME_ATTRIBUTES (2, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (3, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (4, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (5, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (6, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (7, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (8, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (9, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
+    ADD_FRAME_ATTRIBUTES (0, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (1, 1.25e6, 1.25e6, 0.20, 0.30, 1, true, 0)
+    ADD_FRAME_ATTRIBUTES (2, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (3, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (4, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (5, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (6, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (7, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (8, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (9, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
   ;
 
   return tid;
@@ -1100,16 +1135,16 @@ SatSuperframeConf1::GetTypeId (void)
     .SetParent<ns3::SatSuperframeConf> ()
     .AddConstructor<SatSuperframeConf1> ()
     ADD_SUPER_FRAME_ATTRIBUTES (10, SatSuperframeConf::CONFIG_TYPE_1)
-    ADD_FRAME_ATTRIBUTES (0, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (1, 1.25e6, 1.25e6, 0.20, 0.30, true, 0)
-    ADD_FRAME_ATTRIBUTES (2, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (3, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (4, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (5, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (6, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (7, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (8, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (9, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
+    ADD_FRAME_ATTRIBUTES (0, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (1, 1.25e6, 1.25e6, 0.20, 0.30, 1, true, 0)
+    ADD_FRAME_ATTRIBUTES (2, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (3, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (4, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (5, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (6, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (7, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (8, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (9, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
   ;
 
   return tid;
@@ -1149,16 +1184,16 @@ SatSuperframeConf2::GetTypeId (void)
     .SetParent<ns3::SatSuperframeConf> ()
     .AddConstructor<SatSuperframeConf2> ()
     ADD_SUPER_FRAME_ATTRIBUTES (10, SatSuperframeConf::CONFIG_TYPE_2)
-    ADD_FRAME_ATTRIBUTES (0, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (1, 1.25e6, 1.25e6, 0.20, 0.30, true, 0)
-    ADD_FRAME_ATTRIBUTES (2, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (3, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (4, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (5, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (6, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (7, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (8, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (9, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
+    ADD_FRAME_ATTRIBUTES (0, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (1, 1.25e6, 1.25e6, 0.20, 0.30, 1, true, 0)
+    ADD_FRAME_ATTRIBUTES (2, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (3, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (4, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (5, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (6, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (7, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (8, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (9, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
   ;
 
   return tid;
@@ -1198,16 +1233,16 @@ SatSuperframeConf3::GetTypeId (void)
     .SetParent<ns3::SatSuperframeConf> ()
     .AddConstructor<SatSuperframeConf3> ()
     ADD_SUPER_FRAME_ATTRIBUTES (10, SatSuperframeConf::CONFIG_TYPE_2)
-    ADD_FRAME_ATTRIBUTES (0, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (1, 1.25e6, 1.25e6, 0.20, 0.30, true, 0)
-    ADD_FRAME_ATTRIBUTES (2, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (3, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (4, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (5, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (6, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (7, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (8, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (9, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
+    ADD_FRAME_ATTRIBUTES (0, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (1, 1.25e6, 1.25e6, 0.20, 0.30, 1, true, 0)
+    ADD_FRAME_ATTRIBUTES (2, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (3, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (4, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (5, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (6, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (7, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (8, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (9, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
   ;
 
   return tid;
@@ -1246,7 +1281,7 @@ SatSuperframeConf4::GetTypeId (void)
     .SetParent<ns3::SatSuperframeConf> ()
     .AddConstructor<SatSuperframeConf4> ()
     ADD_SUPER_FRAME_ATTRIBUTES (1, SatSuperframeConf::CONFIG_TYPE_4)
-    ADD_FRAME_ATTRIBUTES (0, 2.4e5, 2.4e5, 0.0, 0.0, true) // create frame only to store waveformconf
+    ADD_FRAME_ATTRIBUTES (0, 3.0e5, 3.0e5, 0.25, 0.0, 16, true, 0) // create frame only to store waveformconf
   ;
 
   return tid;

@@ -54,8 +54,9 @@ public:
    * \param bandwidthInHz     Allocated bandwidth of BTU in Hertz
    * \param rollOff           Roll-off factor
    * \param spacing           Spacing factor
+   * \param spreadingFactor   Spreading factor
    */
-  SatBtuConf (double bandwidthInHz, double rollOff, double spacing);
+  SatBtuConf (double bandwidthInHz, double rollOff, double spacing, uint32_t spreadingFactor);
 
   /**
    * Destructor for SatBtuConf
@@ -93,19 +94,30 @@ public:
   }
 
   /**
+   * Get spreading factor of BTU.
+   *
+   * \return The spreading factor of BTU.
+   */
+  inline double GetSpreadingFactor () const
+  {
+    return m_spreadingFactor;
+  }
+
+  /**
    * Get symbol rate of BTU.
    *
    * \return The symbol rate of BTU in bauds.
    */
   inline double GetSymbolRateInBauds () const
   {
-    return GetEffectiveBandwidthInHz ();
+    return GetEffectiveBandwidthInHz () / GetSpreadingFactor ();
   }
 
 private:
   double m_allocatedBandwidthInHz;
   double m_occupiedBandwidthInHz;
   double m_effectiveBandwidthInHz;  // i.e. symbol rate
+  double m_spreadingFactor;
   Time m_duration;                  // duration field reserved, but not used currently
 };
 
@@ -727,6 +739,7 @@ public:
   void SetFrameCarrierAllocatedBandwidthHz (uint8_t frameIndex, double bandwidthHz);
   void SetFrameCarrierSpacing (uint8_t frameIndex, double spacing);
   void SetFrameCarrierRollOff (uint8_t frameIndex, double rollOff);
+  void SetFrameCarrierSpreadingFactor (uint8_t frameIndex, uint32_t spreadingFactor);
   void SetFrameRandomAccess (uint8_t frameIndex, bool randomAccess);
   void SetFrameAllocationChannelId (uint8_t frameIndex, uint8_t allocationChannel);
 
@@ -734,6 +747,7 @@ public:
   double GetFrameCarrierAllocatedBandwidthHz (uint8_t frameIndex) const;
   double GetFrameCarrierSpacing (uint8_t frameIndex) const;
   double GetFrameCarrierRollOff (uint8_t frameIndex) const;
+  uint32_t GetFrameCarrierSpreadingFactor (uint8_t frameIndex) const;
   bool IsFrameRandomAccess (uint8_t frameIndex) const;
   uint8_t GetFrameAllocationChannelId (uint8_t frameIndex) const;
 
@@ -751,6 +765,7 @@ private:
   double    m_frameCarrierAllocatedBandwidth[m_maxFrameCount];
   double    m_frameCarrierSpacing[m_maxFrameCount];
   double    m_frameCarrierRollOff[m_maxFrameCount];
+  uint32_t  m_frameCarrierSpreadingFactor[m_maxFrameCount];
   bool      m_frameIsRandomAccess[m_maxFrameCount];
   uint8_t   m_frameAllocationChannel[m_maxFrameCount];
 
@@ -793,6 +808,10 @@ public:
   { return SetFrameCarrierRollOff (index, value); } \
   inline double GetFrame ## index ## CarrierRollOff () const      \
   { return GetFrameCarrierRollOff (index); } \
+  inline void SetFrame ## index ## SpreadingFactor (uint32_t value)  \
+  { return SetFrameCarrierSpreadingFactor (index, value); } \
+  inline double GetFrame ## index ## SpreadingFactor () const      \
+  { return GetFrameCarrierSpreadingFactor (index); } \
   inline void SetFrame ## index ## RandomAccess (bool value)  \
   { return SetFrameRandomAccess (index, value); } \
   inline double IsFrame ## index ## RandomAccess () const      \
