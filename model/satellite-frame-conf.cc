@@ -1226,6 +1226,7 @@ SatSuperframeConf3::DoConfigure ()
   NS_LOG_FUNCTION (this);
 }
 
+NS_OBJECT_ENSURE_REGISTERED (SatSuperframeConf4);
 // Super frame configuration 4.
 
 SatSuperframeConf4::SatSuperframeConf4 ()

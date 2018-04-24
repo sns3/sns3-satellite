@@ -148,8 +148,8 @@ SatLinkResultsFSim::DoInitialize ()
 {
   NS_LOG_FUNCTION (this);
 
-  // Waveform ids 1 currently supported
-  for (uint32_t i = 1; i <= 1; ++i)
+  // Waveform ids 1-2 currently supported
+  for (uint32_t i = 1; i <= 2; ++i)
     {
       std::ostringstream ss;
       ss << i;
