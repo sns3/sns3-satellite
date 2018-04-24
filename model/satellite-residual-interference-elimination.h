@@ -71,7 +71,7 @@ public:
    * \param packetInterferedWith Parameters of the packet whose interference level should be lowered
    * \param processedPacket Parameters of the packet we want to remove interference from
    * \param startTime Normalized start time of the interference, with respect to packetInterferedWith
-   * \param startTime Normalized end time of the interference, with respect to packetInterferedWith
+   * \param endTime Normalized end time of the interference, with respect to packetInterferedWith
    */
   void EliminateInterferences (Ptr<SatSignalParameters> packetInterferedWith, Ptr<SatSignalParameters> processedPacket, double EsNo, double startTime, double endTime);
 

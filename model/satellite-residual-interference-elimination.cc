@@ -96,7 +96,8 @@ SatResidualInterferenceElimination::EliminateInterferences (
 
   NS_LOG_INFO ("Removing interference power of packet from Beam[Carrier] " <<
                processedPacket->m_beamId <<
-               "[" << processedPacket->m_carrierId << "]");
+               "[" << processedPacket->m_carrierId << "] between " <<
+               startTime << " and " << endTime);
   double oldIfPower = packetInterferedWith->GetInterferencePowerInSatellite ();
   double ifPowerToRemove = processedPacket->m_rxPowerInSatellite_W;
 
