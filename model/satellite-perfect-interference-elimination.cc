@@ -63,14 +63,38 @@ SatPerfectInterferenceElimination::EliminateInterferences (
 {
   NS_LOG_FUNCTION (this);
 
+  return EliminateInterferences (packetInterferedWith, processedPacket, EsNo, 0.0, 1.0);
+}
+
+void
+SatPerfectInterferenceElimination::EliminateInterferences (
+  Ptr<SatSignalParameters> packetInterferedWith,
+  Ptr<SatSignalParameters> processedPacket,
+  double EsNo, double startTime, double endTime)
+{
+  NS_LOG_FUNCTION (this);
+
   NS_LOG_INFO ("Removing interference power of packet from Beam[Carrier] " <<
                processedPacket->m_beamId <<
-               "[" << processedPacket->m_carrierId << "]");
+               "[" << processedPacket->m_carrierId << "] between " <<
+               startTime << " and " << endTime);
   double oldIfPower = packetInterferedWith->GetInterferencePowerInSatellite ();
+
+  double normalizedTime = 0.0;
 
   auto ifPowerPerFragment = packetInterferedWith->GetInterferencePowerInSatellitePerFragment ();
   for (std::pair<double, double>& ifPower : ifPowerPerFragment)
     {
+      normalizedTime += ifPower.first;
+      if (startTime >= normalizedTime)
+        {
+          continue;
+        }
+      else if (endTime < normalizedTime)
+        {
+          break;
+        }
+
       ifPower.second -= processedPacket->m_rxPowerInSatellite_W;
       if (std::abs (ifPower.second) < std::numeric_limits<double>::epsilon ())
         {
@@ -89,20 +113,9 @@ SatPerfectInterferenceElimination::EliminateInterferences (
                packetInterferedWith->GetInterferencePowerInSatellite ());
 }
 
-void
-SatPerfectInterferenceElimination::EliminateInterferences (
-  Ptr<SatSignalParameters> packetInterferedWith,
-  Ptr<SatSignalParameters> processedPacket,
-  double EsNo, double startTime, double endTime)
-{
-  NS_ASSERT (false);
-}
-
 double
 SatPerfectInterferenceElimination::GetResidualPower (Ptr<SatSignalParameters> processedPacket, double EsNo)
 {
-  NS_ASSERT (false);
-
   return 0.0;
 }
 
