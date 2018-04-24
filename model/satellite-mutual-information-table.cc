@@ -154,7 +154,8 @@ SatMutualInformationTable::GetSnirDb (double symbolInformationTarget) const
   // in the look-up-table. Return small value
   if (symbolInformationTarget <= m_symbolInformation[0])
     {
-      return -100.0;
+      NS_LOG_INFO ("SatMutualInformationTable::GetSnirDb - SNIR dB=" << -1.0e10);
+      return -1.0e10;
     }
 
   // The requested Symbol Information is higher than the highest Symbol Information entry
@@ -168,6 +169,7 @@ SatMutualInformationTable::GetSnirDb (double symbolInformationTarget) const
   // in the look-up-table
   if (symbolInformationTarget > m_symbolInformation[n - 1])
     {
+      NS_LOG_INFO ("SatMutualInformationTable::GetSnirDb - SNIR dB=" << m_snirDb [n - 1]);
       return m_snirDb[n - 1];
     }
 
@@ -209,7 +211,7 @@ SatMutualInformationTable::Load (std::string mutualInformationPath)
         }
     }
 
-  double lastSnirDb = -100.0; // very low value
+  double lastSnirDb = -1.0e100; // very low value
   double lastSymbolInformation = 0.0; // minimum value
 
   double snirDb, symbolInformation;
