@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2013 Magister Solutions Ltd.
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -75,12 +75,15 @@ SatPerFragmentInterference::DoCalculate (Ptr<SatInterference::InterferenceChange
   NS_LOG_FUNCTION (this);
 
   m_ifPowerAtEventChangeW.clear ();
-
+  // Use the per packet interference computation hooks to store
+  // interferences at each event associated to the current packet
   std::vector< std::pair<double, double> > ifPowerPerFragment = SatPerPacketInterference::DoCalculate (event);
 
+  // Account for rxPower being null for some packets, thus leading to bogus interferences being computed
   std::size_t fragmentsCount = m_ifPowerAtEventChangeW.size ();
   if (fragmentsCount)
     {
+      // Otherwise convert time ratio into durations
       ifPowerPerFragment.clear ();
       ifPowerPerFragment.reserve (fragmentsCount);
 
@@ -105,6 +108,8 @@ SatPerFragmentInterference::DoCalculate (Ptr<SatInterference::InterferenceChange
 void
 SatPerFragmentInterference::onOwnStartReached (double ifPowerW)
 {
+  // Hook into per packet interference computation to store
+  // interference level at the beginning of the packet
   m_ifPowerAtEventChangeW[0.0] = ifPowerW;
 }
 
@@ -112,6 +117,8 @@ SatPerFragmentInterference::onOwnStartReached (double ifPowerW)
 void
 SatPerFragmentInterference::onInterferentEvent (long double timeRatio, double interferenceValue, double& ifPowerW)
 {
+  // Hook into per packet interference computation to store
+  // interference level at each event change
   ifPowerW += interferenceValue;
   m_ifPowerAtEventChangeW[1.0 - timeRatio] = ifPowerW;
 }

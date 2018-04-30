@@ -51,10 +51,10 @@ NS_LOG_COMPONENT_DEFINE ("sat-cbr-user-defined-example");
 static void CrTraceCb (Time now, Mac48Address addr, Ptr<SatCrMessage> crMsg)
 {
 
-  NS_LOG_INFO ( "General info: " << addr << 
-                " " << crMsg->GetNumCapacityRequestElements () <<
-                " " << crMsg->GetSizeInBytes () <<
-                " " << crMsg->GetCnoEstimate () );
+  NS_LOG_INFO ("General info: " << addr <<
+               " " << crMsg->GetNumCapacityRequestElements () <<
+               " " << crMsg->GetSizeInBytes () <<
+               " " << crMsg->GetCnoEstimate ());
 
   SatCrMessage::RequestContainer_t c = crMsg->GetCapacityRequestContent ();
   for (SatCrMessage::RequestContainer_t::const_iterator it = c.begin ();
