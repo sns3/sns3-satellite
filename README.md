@@ -104,12 +104,13 @@ You will need to:
 *  get NS3 (either by [downloading](https://www.nsnam.org/release/) it, [cloning it using mercurial](http://code.nsnam.org/) or [cloning it using git](https///github.com/nsnam/ns-3-dev-git));
 *  get the ''satellite'' module (either by [downloading it](https:github.com/sns3/sns3-satellite/repository/archive.tar.gz?ref=master) or [cloning it using git](https://github.com/sns3/sns3-satellite));
 
-*  get the ''traffic'' and ''magister-stats'' modules (needed until they are integrated into NS3) as dependencies of the ''satellite'' module by cloning them using mercurial:
+*  get the ''traffic'' and ''magister-stats'' modules (needed until they are integrated into NS3) as dependencies of the ''satellite'' module by cloning them :
 
 
 ```
-    $ hg clone ssh://hg@codebasehq.com/magrepos/stats/magister-stats-module-1_0.hg magister-stats
-    $ hg clone ssh://hg@codebasehq.com/magrepos/traffic/traffic-module-1_0.hg traffic
+    $ git clone git@github.com:sns3/traffic.git
+    $ git clone git@github.com:sns3/stats.git
+    
 ```
 
 *note : When retrieving the ''satellite'', ''traffic'' and ''magister-stats'' modules, you should put 
