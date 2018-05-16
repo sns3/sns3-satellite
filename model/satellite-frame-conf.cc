@@ -445,7 +445,7 @@ SatSuperframeConf::AddFrameConf (Ptr<SatFrameConf> conf)
               NS_FATAL_ERROR ("RA channels maximum count is exceeded!!!");
             }
 
-          m_raChannels.push_back (std::make_tuple (frameId, raBaseIndex + i, conf->GetAllocationChannelId ()));
+          m_raChannels.push_back (std::make_tuple (frameId, i, conf->GetAllocationChannelId ()));
         }
     }
 

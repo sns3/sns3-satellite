@@ -692,7 +692,7 @@ SatUtMac::GetNextRandomAccessAllocationChannel ()
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_INFO ("UT: " << m_nodeInfo->GetMacAddress ());
+  NS_LOG_INFO ("UT: " << m_nodeInfo->GetMacAddress () << " has allocation channel " << m_raChannel);
 
   /// TODO at the moment only one allocation channel is supported
   return m_raChannel;
