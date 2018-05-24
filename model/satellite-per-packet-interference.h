@@ -150,7 +150,7 @@ private:
   /**
    *
    */
-  typedef std::pair <uint32_t, long double > InterferenceChange;
+  typedef std::tuple <uint32_t, long double, bool> InterferenceChange;
 
   /**
    *

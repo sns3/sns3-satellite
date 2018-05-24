@@ -77,28 +77,30 @@ SatPerFragmentInterference::DoCalculate (Ptr<SatInterference::InterferenceChange
   m_ifPowerAtEventChangeW.clear ();
   // Use the per packet interference computation hooks to store
   // interferences at each event associated to the current packet
-  std::vector< std::pair<double, double> > ifPowerPerFragment = SatPerPacketInterference::DoCalculate (event);
+  SatPerPacketInterference::DoCalculate (event);
 
-  // Account for rxPower being null for some packets, thus leading to bogus interferences being computed
   std::size_t fragmentsCount = m_ifPowerAtEventChangeW.size ();
-  if (fragmentsCount)
+  if (!fragmentsCount)
     {
-      // Otherwise convert time ratio into durations
-      ifPowerPerFragment.clear ();
-      ifPowerPerFragment.reserve (fragmentsCount);
+      NS_FATAL_ERROR ("Interference computation did not find a single fragment");
+    }
 
-      std::map<double, double>::const_iterator iter = m_ifPowerAtEventChangeW.begin ();
-      std::pair<double, double> eventChangeInPower = *iter;
-      for (++iter; iter != m_ifPowerAtEventChangeW.end (); ++iter)
-        {
-          ifPowerPerFragment.emplace_back (iter->first - eventChangeInPower.first, eventChangeInPower.second);
-          eventChangeInPower = *iter;
-        }
+  // Convert time ratio into durations
+  std::vector< std::pair<double, double> > ifPowerPerFragment;
+  ifPowerPerFragment.reserve (fragmentsCount);
 
-      if (eventChangeInPower.first != 1.0)
-        {
-          ifPowerPerFragment.emplace_back (1.0 - eventChangeInPower.first, eventChangeInPower.second);
-        }
+  std::map<double, double>::const_iterator iter = m_ifPowerAtEventChangeW.begin ();
+  std::pair<double, double> eventChangeInPower = *iter;
+  for (++iter; iter != m_ifPowerAtEventChangeW.end (); ++iter)
+    {
+      ifPowerPerFragment.emplace_back (iter->first - eventChangeInPower.first, eventChangeInPower.second);
+      eventChangeInPower = *iter;
+    }
+
+  // Account for the last fragment duration
+  if (eventChangeInPower.first != 1.0)
+    {
+      ifPowerPerFragment.emplace_back (1.0 - eventChangeInPower.first, eventChangeInPower.second);
     }
 
   return ifPowerPerFragment;
