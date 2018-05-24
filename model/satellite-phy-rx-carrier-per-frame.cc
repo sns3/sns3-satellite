@@ -399,10 +399,14 @@ SatPhyRxCarrierPerFrame::ProcessFrame ()
   std::map<uint32_t, std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> >::iterator iter;
   std::vector<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> combinedPacketsForFrame;
 
+  // Perform SIC in its entirety, until no more packets can be decoded
   PerformSicCycles (combinedPacketsForFrame);
 
   NS_LOG_INFO ("All successfully received packets processed, packets left in container: " << m_crdsaPacketContainer.size ());
 
+  // Cleanup: remove remaining packets from the receive container
+  // and add them to the resulting vector by ensuring that their
+  // phyError is set to true.
   do
     {
       /// go through the packets

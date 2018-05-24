@@ -68,18 +68,21 @@ SatPhyRxCarrierMarsala::PerformSicCycles (
 
   do
     {
+      // Perform CRDSA SIC in its entirety, until no more packets can be decoded
       SatPhyRxCarrierPerFrame::PerformSicCycles (combinedPacketsForFrame);
     }
+  // Try to decode one more packet using MARSALA
   while (PerformMarsala (combinedPacketsForFrame));
 }
 
 
-bool
-SatPhyRxCarrierMarsala::CheckReplicaInSlot (
+SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s
+SatPhyRxCarrierMarsala::FindReplicaInSlot (
   const std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s>& slotContent,
   const SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s& packet) const
 {
   bool replicaFound = false;
+  SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s replica;
 
   for (const SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s& currentPacket : slotContent)
     {
@@ -90,10 +93,16 @@ SatPhyRxCarrierMarsala::CheckReplicaInSlot (
               NS_FATAL_ERROR ("Found more than one replica in the same slot!");
             }
           replicaFound = true;
+          replica = currentPacket;
         }
     }
 
-  return replicaFound;
+  if (!replicaFound)
+    {
+      NS_FATAL_ERROR ("Could not find a replica of a packet in the given slot!");
+    }
+
+  return replica;
 }
 
 
@@ -123,8 +132,22 @@ SatPhyRxCarrierMarsala::PerformMarsala (
           NS_LOG_INFO ("Iterating packet in slot: " << currentPacket->ownSlotId);
 
           // process the packet
+          uint32_t otherReplicasCount = currentPacket->slotIdsForOtherReplicas.size ();
+          uint32_t replicasCount = 1 + otherReplicasCount;
+          uint32_t replicasCountSquared = replicasCount * replicasCount;
           uint32_t packetsInSlotsCount = slotContent.size ();
 
+          double replicasIfPower = currentPacket->rxParams->GetInterferencePower ();
+          double replicasNoisePower = replicasCount * m_rxNoisePowerW;
+          double replicasAciIfPower = replicasCount * m_rxAciIfPowerW;
+          double replicasExtNoisePower = replicasCount * m_rxExtNoisePowerW;
+
+          double replicasIfPowerInSatellite = currentPacket->rxParams->GetInterferencePowerInSatellite ();
+          double replicasNoisePowerInSatellite = currentPacket->rxParams->m_rxNoisePowerInSatellite_W;
+          double replicasAciIfPowerInSatellite = currentPacket->rxParams->m_rxAciIfPowerInSatellite_W;
+          double replicasExtNoisePowerInSatellite = currentPacket->rxParams->m_rxExtNoisePowerInSatellite_W;
+
+          // add informations from other replicas
           for (uint16_t& replicaSlotId : currentPacket->slotIdsForOtherReplicas)
             {
               NS_LOG_INFO ("Processing replica in slot: " << replicaSlotId);
@@ -135,37 +158,44 @@ SatPhyRxCarrierMarsala::PerformMarsala (
                 {
                   NS_FATAL_ERROR ("Slot " << replicaSlotId << " not found in frame!");
                 }
-
-              if (!CheckReplicaInSlot (replicaSlot->second, *currentPacket))
-                {
-                  NS_FATAL_ERROR ("Slot " << replicaSlotId << " does not contain a replica of the current packet!");
-                }
-
               packetsInSlotsCount += replicaSlot->second.size ();
+
+              SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s replica = FindReplicaInSlot (replicaSlot->second, *currentPacket);
+              replicasIfPower += replica.rxParams->GetInterferencePower ();
+              replicasIfPowerInSatellite += replica.rxParams->GetInterferencePowerInSatellite ();
+              replicasNoisePowerInSatellite += replica.rxParams->m_rxNoisePowerInSatellite_W;
+              replicasAciIfPowerInSatellite += replica.rxParams->m_rxAciIfPowerInSatellite_W;
+              replicasExtNoisePowerInSatellite += replica.rxParams->m_rxExtNoisePowerInSatellite_W;
             }
 
-          uint32_t otherReplicasCount = currentPacket->slotIdsForOtherReplicas.size ();
-          uint32_t replicasCount = 1 + otherReplicasCount;
-          // Account for the fact that we use the size of each slot so we must remove each replica
-          // ratio = N_interferent / N_replicas = (N_packets_in_slots - N_replicas) / N_replicas
-          double ratioOfInterferentPerReplica = (double (packetsInSlotsCount) / replicasCount) - 1;
+          // Calculate correlated SINR
+          double sinrSatellite = CalculateSinr ( replicasCountSquared * currentPacket->rxParams->m_rxPowerInSatellite_W,
+                                                 replicasIfPowerInSatellite,
+                                                 replicasNoisePowerInSatellite,
+                                                 replicasAciIfPowerInSatellite,
+                                                 replicasExtNoisePowerInSatellite,
+                                                 currentPacket->rxParams->m_sinrCalculate);
+          double sinr = CalculateSinr ( replicasCountSquared * currentPacket->rxParams->m_rxPower_W,
+                                        replicasIfPower,
+                                        replicasNoisePower,
+                                        replicasAciIfPower,
+                                        replicasExtNoisePower,
+                                        m_sinrCalculate);
 
-          double sinr = CalculatePacketCompositeSinr (*currentPacket);
+          double cSinr = CalculateCompositeSinr (sinr, sinrSatellite);
+
           /*
            * Update link specific SINR trace for the RETURN_FEEDER link. The RETURN_USER
            * link SINR is already updated at the SatPhyRxCarrier::EndRxDataTransparent ()
            * method!
            */
-          m_linkSinrTrace (SatUtils::LinearToDb (sinr));
-
-          double correlatedSinr = replicasCount / (ratioOfInterferentPerReplica + (1 / sinr));
+          m_linkSinrTrace (SatUtils::LinearToDb (cSinr));
 
           NS_LOG_INFO ("MARSALA correlation computation, Replicas: " << replicasCount <<
                        " Interferents: " << (packetsInSlotsCount - replicasCount) <<
-                       " Packet SINR: " << sinr <<
-                       " Correlated SINR: " << correlatedSinr);
+                       " Correlated SINR: " << cSinr);
 
-          currentPacket->phyError = CheckAgainstLinkResults (correlatedSinr, currentPacket->rxParams);
+          currentPacket->phyError = CheckAgainstLinkResults (cSinr, currentPacket->rxParams);
 
           uint32_t correlations = 1;
           for (uint32_t i = nbSlots - otherReplicasCount; i < nbSlots; ++i)

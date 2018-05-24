@@ -76,8 +76,9 @@ private:
    * \param packet  The packet whose replica should be searched for
    * \return Whether or not a replica of the packet has been found in the slot
    */
-  bool CheckReplicaInSlot (const std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s>& slotContent,
-                           const SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s& packet) const;
+  SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s FindReplicaInSlot (
+    const std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s>& slotContent,
+    const SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s& packet) const;
 
   /**
    * \brief `MarsalaCorrelationRx` trace source.
