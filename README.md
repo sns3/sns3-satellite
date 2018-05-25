@@ -5,7 +5,7 @@ SNS3 was initially developed by Magister Solutions under ESA contact.
 
 # Installation Manual
 
-SNS3 is built as an extension module to the [NS3](https///www.nsnam.org/) network simulator; so their [installation instructions](https///www.nsnam.org/docs/release/3.28/tutorial/html/getting-started.html) apply. They are repeated here for convenience and proper integration of SNS3.
+SNS3 is built as an extension module to the [NS3](https://www.nsnam.org/) network simulator; so their [installation instructions](https://www.nsnam.org/docs/release/3.28/tutorial/html/getting-started.html) apply. They are repeated here for convenience and proper integration of SNS3.
 
 There are 2 methods to download and build (S)NS3:
 
@@ -19,7 +19,7 @@ There are 2 methods to download and build (S)NS3:
 
 [Bake](http://planete.inria.fr/software/bake/index.html) is a tool developed to simplify the download and install process of NS3. It can be extended to make it aware of external modules to NS3 such as SNS3. You will first need to get bake.
 
-Bake is hosted on a [mercurial](https///www.mercurial-scm.org/) repository. You can either [download an archive](http://code.nsnam.org/bake/archive/tip.tar.gz) or clone the repository on your machine:
+Bake is hosted on a [mercurial](https://www.mercurial-scm.org/) repository. You can either [download an archive](http://code.nsnam.org/bake/archive/tip.tar.gz) or clone the repository on your machine:
 
 ```
 	$ hg clone http://code.nsnam.org/bake bake
@@ -37,21 +37,21 @@ Before installing NS3, you will need to tell Bake how to find and download the S
 ```
 
 
-and drop the following file in this ''contrib'' folder:
+and drop the following file ''sns3.xml'' in this ''contrib'' folder:
 
 ```xml
 <configuration>
     <modules>
     <module name="sns3-stats" type="ns-contrib" min_version="ns-3.26">
-      <source type="mercurial">
-        <attribute name="url" value="ssh://hg@codebasehq.com/magrepos/stats/magister-stats-module-1_0.hg" />
+      <source type="git">
+        <attribute name="url" value="git@github.com:sns3/stats.git" />
         <attribute name="module_directory" value="magister-stats" />
       </source>
       <build type="none" />
     </module>
     <module name="sns3-traffic" type="ns-contrib" min_version="ns-3.26">
-      <source type="mercurial">
-        <attribute name="url" value="ssh://hg@codebasehq.com/magrepos/traffic/traffic-module-1_0.hg" />
+      <source type="git">
+        <attribute name="url" value="git@github.com:sns3/traffic.git" />
         <attribute name="module_directory" value="traffic" />
       </source>
       <build type="none" />
@@ -70,11 +70,6 @@ and drop the following file in this ''contrib'' folder:
 ```
 
 Now you’re ready to use bake.
-
-*note : For now, the SNS3 module still depend on the ''traffic'' and ''magister-stats'' modules that are 
-hosted by [Magister](https///magrepos.codebasehq.com/login). You will need to [ask for an access](http://satellite-ns3.com/#contact) 
-before being able to clone the code from their repository. These two modules are in the 
-process of being integrated into the core of NS3 and their dependency will be dropped from this file once done*
 
 ### Installation
 
@@ -101,8 +96,8 @@ control over what is being compiled, you can handle the download process of the 
 You will need to:
 
 
-*  get NS3 (either by [downloading](https://www.nsnam.org/release/) it, [cloning it using mercurial](http://code.nsnam.org/) or [cloning it using git](https///github.com/nsnam/ns-3-dev-git));
-*  get the ''satellite'' module (either by [downloading it](https:github.com/sns3/sns3-satellite/repository/archive.tar.gz?ref=master) or [cloning it using git](https://github.com/sns3/sns3-satellite));
+*  get NS3 (either by [downloading](https://www.nsnam.org/release/) it, [cloning it using mercurial](http://code.nsnam.org/) or [cloning it using git](https://github.com/nsnam/ns-3-dev-git));
+*  get the ''satellite'' module (either by [downloading it](https://github.com/sns3/sns3-satellite/repository/archive.tar.gz?ref=master) or [cloning it using git](https://github.com/sns3/sns3-satellite));
 
 *  get the ''traffic'' and ''magister-stats'' modules (needed until they are integrated into NS3) as dependencies of the ''satellite'' module by cloning them :
 
