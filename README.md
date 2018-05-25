@@ -9,8 +9,8 @@ SNS3 is built as an extension module to the [NS3](https://www.nsnam.org/) networ
 
 There are 2 methods to download and build (S)NS3:
 
-*  the automated one using [bake](bake);
-*  the manual one using [waf](waf).
+*  the automated one using [bake](#bake);
+*  the manual one using [waf](#waf).
 
 ## Bake
 
