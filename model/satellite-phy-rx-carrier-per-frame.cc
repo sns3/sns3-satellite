@@ -660,6 +660,10 @@ SatPhyRxCarrierPerFrame::FindAndRemoveReplicas (SatPhyRxCarrierPerFrame::crdsaPa
           /// check for the same UT & same slots
           if (IsReplica (packet, *iterList))
             {
+              if (replicaFound)
+                {
+                  NS_FATAL_ERROR ("Found two replica of the same packet in the same slot");
+                }
               /// replica found for removal
               replicaFound = true;
               removedPacket = *iterList;
