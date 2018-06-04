@@ -1633,7 +1633,7 @@ SimulationHelper::ReadInputAttributesFromFile (std::string filePath)
 }
 
 std::string
-SimulationHelper::StoreAttributesToFile (std::string fileName)
+SimulationHelper::StoreAttributesToFile (std::string fileName, bool outputAttributes)
 {
   NS_LOG_FUNCTION (this);
 
@@ -1646,7 +1646,11 @@ SimulationHelper::StoreAttributesToFile (std::string fileName)
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
   ConfigStore outputConfig;
   outputConfig.ConfigureDefaults ();
-  outputConfig.ConfigureAttributes ();
+
+  if (outputAttributes)
+    {
+      outputConfig.ConfigureAttributes ();
+    }
 
   return outputPath;
 }

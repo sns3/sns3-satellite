@@ -373,9 +373,11 @@ public:
   /**
    * \brief Store all used attributes
    * \param fileName Output filename
+   * \param outputAttributes Whether or not to store
+   *   individual objects attributes to file
    * \return string Output path
    */
-  std::string StoreAttributesToFile (std::string fileName);
+  std::string StoreAttributesToFile (std::string fileName, bool outputAttributes = false);
 
   /**
    * \brief Get simulation time
