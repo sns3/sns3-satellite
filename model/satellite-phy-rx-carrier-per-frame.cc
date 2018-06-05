@@ -395,7 +395,6 @@ std::vector<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s>
 SatPhyRxCarrierPerFrame::ProcessFrame ()
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_INFO ("Time: " << Now ().GetSeconds ());
 
   std::map<uint32_t, std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> >::iterator iter;
   std::vector<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> combinedPacketsForFrame;
@@ -549,7 +548,6 @@ SatPhyRxCarrierPerFrame::ProcessReceivedCrdsaPacket (SatPhyRxCarrierPerFrame::cr
                                                      uint32_t numOfPacketsForThisSlot)
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_INFO ("Time: " << Now ().GetSeconds ());
 
   NS_LOG_INFO ("Processing a packet in slot: " << packet.ownSlotId <<
                " number of packets in this slot: " << numOfPacketsForThisSlot);
@@ -612,6 +610,8 @@ SatPhyRxCarrierPerFrame::ProcessReceivedCrdsaPacket (SatPhyRxCarrierPerFrame::cr
 double
 SatPhyRxCarrierPerFrame::CalculatePacketCompositeSinr (SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s& packet)
 {
+  NS_LOG_FUNCTION (this);
+
   double sinrSatellite = CalculateSinr ( packet.rxParams->m_rxPowerInSatellite_W,
                                          packet.rxParams->GetInterferencePowerInSatellite (),
                                          packet.rxParams->m_rxNoisePowerInSatellite_W,
@@ -626,7 +626,11 @@ SatPhyRxCarrierPerFrame::CalculatePacketCompositeSinr (SatPhyRxCarrierPerFrame::
                                 m_rxExtNoisePowerW,
                                 m_sinrCalculate);
 
-  packet.cSinr = CalculateCompositeSinr (sinr, sinrSatellite);
+  double cSinr = CalculateCompositeSinr (sinr, sinrSatellite);
+
+  NS_LOG_INFO ("Computed cSINR for packet: " << cSinr);
+
+  packet.cSinr = cSinr;
   packet.ifPower = packet.rxParams->GetInterferencePower ();
 
   return sinr;
