@@ -41,32 +41,37 @@ and drop the following file ''sns3.xml'' in this ''contrib'' folder:
 
 ```xml
 <configuration>
-    <modules>
+  <modules>
+    <module name="sns3-satellite" type="ns-contrib" min_version="ns-3.26">
+      <source type="git">
+        <attribute name="url" value="https://github.com/sns3/sns3-satellite.git"/>
+        <attribute name="module_directory" value="satellite"/>
+      </source>
+      <build type="none">
+      </build>
+    </module>
     <module name="sns3-stats" type="ns-contrib" min_version="ns-3.26">
       <source type="git">
-        <attribute name="url" value="git@github.com:sns3/stats.git" />
-        <attribute name="module_directory" value="magister-stats" />
+        <attribute name="url" value="https://github.com/sns3/stats.git"/>
+        <attribute name="module_directory" value="magister-stats"/>
       </source>
-      <build type="none" />
+      <build type="none">
+      </build>
     </module>
     <module name="sns3-traffic" type="ns-contrib" min_version="ns-3.26">
       <source type="git">
-        <attribute name="url" value="git@github.com:sns3/traffic.git" />
-        <attribute name="module_directory" value="traffic" />
+        <attribute name="url" value="https://github.com/sns3/traffic.git" />
+        <attribute name="module_directory" value="traffic"/>
       </source>
-      <build type="none" />
-      <depends_on name="sns3-stats" optional="False" />
+      <build type="none">
+      </build>
     </module>
-    <module name="sns3-satellite" type="ns-contrib" min_version="ns-3.26">
-      <source type="git">
-        <attribute name="url" value="https://github.com/sns3/sns3-satellite.git" />
-        <attribute name="module_directory" value="sns3-satellite" />
-      </source>
-      <build type="none" />
-      <depends_on name="sns3-traffic" optional="False" />
-    </module>
-    </modules>
+  </modules>
 </configuration>
+```
+It might be necessary to remove the default bake configuration one in order to install sns3:
+```
+	$ rm bakefile.xml
 ```
 
 Now you’re ready to use bake.
@@ -76,8 +81,10 @@ Now you’re ready to use bake.
 Now that everything is in place, you can tell bake that you want to install SNS3 (i.e.: ''ns-3'' plus the ''sns3-satellite'' module):
 
 ```
-	$ ./bake.py configure -e ns-3.28 -e sns3-satellite
-	$ ./bake.py deploy
+	$ ./bake.py configure -c
+	$ ./bake.py configure -e ns-3.28
+	$ ./bake.py configure -e sns3-satellite -e sns3-stats -e sns3-traffic
+	$ ./bake.py download
 ```
 
 This will download the needed dependencies into a ''source'' folder and call the various build tools on each target. 
