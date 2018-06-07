@@ -205,7 +205,7 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
   SatMac::SendCtrlMsgCallback fwdSendCtrlCb = MakeCallback (&SatControlMsgContainer::Send, fwdCtrlMsgContainer);
 
   SatGeoHelper::RandomAccessSettings_s geoRaSettings;
-  geoRaSettings.m_raInterferenceModel = m_raInterferenceModel;
+  geoRaSettings.m_raInterferenceModel = m_raInterferenceModel;  // TODO: somewhat use m_enableTracesOnReturnLink to modify this on return feeder link
   geoRaSettings.m_raInterferenceEliminationModel = m_raInterferenceEliminationModel;
   geoRaSettings.m_randomAccessModel = m_randomAccessModel;
   geoRaSettings.m_raCollisionModel = m_raCollisionModel;
@@ -359,13 +359,16 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
 
   // next it is found user link channels and if not found channels are created and saved to map
   ChannelPair_t userLink = GetChannelPair (m_ulChannels, ulFreqId, true);
-  if (m_enableTracesOnReturnLink)
-    {
-      userLink.second->SetAttribute ("RxPowerCalculationMode", EnumValue (SatEnums::RX_PWR_INPUT_TRACE));
-    }
 
   // next it is found feeder link channels and if not found channels are created nd saved to map
   ChannelPair_t feederLink = GetChannelPair (m_flChannels, flFreqId, false);
+
+  // Set trace files if options ask for it
+  if (m_enableTracesOnReturnLink)
+    {
+      userLink.second->SetAttribute ("RxPowerCalculationMode", EnumValue (SatEnums::RX_PWR_INPUT_TRACE));
+      feederLink.second->SetAttribute ("RxPowerCalculationMode", EnumValue (SatEnums::RX_PWR_INPUT_TRACE));
+    }
 
   NS_ASSERT (m_geoNode != NULL);
 
