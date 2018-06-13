@@ -205,7 +205,8 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
   SatMac::SendCtrlMsgCallback fwdSendCtrlCb = MakeCallback (&SatControlMsgContainer::Send, fwdCtrlMsgContainer);
 
   SatGeoHelper::RandomAccessSettings_s geoRaSettings;
-  geoRaSettings.m_raInterferenceModel = m_raInterferenceModel;  // TODO: somewhat use m_enableTracesOnReturnLink to modify this on return feeder link
+  geoRaSettings.m_raFwdInterferenceModel = m_raInterferenceModel;
+  geoRaSettings.m_raRtnInterferenceModel = m_raInterferenceModel;
   geoRaSettings.m_raInterferenceEliminationModel = m_raInterferenceEliminationModel;
   geoRaSettings.m_randomAccessModel = m_randomAccessModel;
   geoRaSettings.m_raCollisionModel = m_raCollisionModel;
@@ -221,9 +222,17 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
 
   SatUtHelper::RandomAccessSettings_s utRaSettings;
   utRaSettings.m_randomAccessModel = m_randomAccessModel;
-  utRaSettings.m_raInterferenceModel = m_enableTracesOnReturnLink ? SatPhyRxCarrierConf::IF_TRACE : m_raInterferenceModel;
+  utRaSettings.m_raInterferenceModel = m_raInterferenceModel;
   utRaSettings.m_raInterferenceEliminationModel = m_raInterferenceEliminationModel;
   utRaSettings.m_raCollisionModel = m_raCollisionModel;
+
+  if (m_enableTracesOnReturnLink)
+    {
+      geoRaSettings.m_raRtnInterferenceModel = SatPhyRxCarrierConf::IF_TRACE;
+      gwRaSettings.m_raInterferenceModel = SatPhyRxCarrierConf::IF_TRACE;
+      Config::SetDefault ("ns3::SatGeoHelper::DaRtnLinkInterferenceModel", StringValue ("Trace"));
+      Config::SetDefault ("ns3::SatGwHelper::DaRtnLinkInterferenceModel", StringValue ("Trace"));
+    }
 
   // create needed low level satellite helpers
   m_geoHelper = CreateObject<SatGeoHelper> (bandwidthConverterCb, rtnLinkCarrierCount, fwdLinkCarrierCount, seq, geoRaSettings);

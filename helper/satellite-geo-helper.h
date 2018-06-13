@@ -52,7 +52,8 @@ public:
   typedef struct
   {
     SatEnums::RandomAccessModel_t m_randomAccessModel;
-    SatPhyRxCarrierConf::InterferenceModel m_raInterferenceModel;
+    SatPhyRxCarrierConf::InterferenceModel m_raFwdInterferenceModel;
+    SatPhyRxCarrierConf::InterferenceModel m_raRtnInterferenceModel;
     SatPhyRxCarrierConf::InterferenceEliminationModel m_raInterferenceEliminationModel;
     SatPhyRxCarrierConf::RandomAccessCollisionModel m_raCollisionModel;
   } RandomAccessSettings_s;

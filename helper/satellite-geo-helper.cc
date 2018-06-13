@@ -215,7 +215,7 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
 
   SatPhyRxCarrierConf::RxCarrierCreateParams_s parametersUser = SatPhyRxCarrierConf::RxCarrierCreateParams_s ();
   parametersUser.m_daIfModel = m_daRtnLinkInterferenceModel;
-  parametersUser.m_raIfModel = m_raSettings.m_raInterferenceModel;
+  parametersUser.m_raIfModel = m_raSettings.m_raRtnInterferenceModel;
   parametersUser.m_raIfEliminateModel = m_raSettings.m_raInterferenceEliminationModel;
   parametersUser.m_bwConverter = m_carrierBandwidthConverter;
   parametersUser.m_carrierCount = m_rtnLinkCarrierCount;
@@ -225,7 +225,7 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
 
   SatPhyRxCarrierConf::RxCarrierCreateParams_s parametersFeeder = SatPhyRxCarrierConf::RxCarrierCreateParams_s ();
   parametersFeeder.m_daIfModel = m_daFwdLinkInterferenceModel;
-  parametersFeeder.m_raIfModel = m_raSettings.m_raInterferenceModel;
+  parametersFeeder.m_raIfModel = m_raSettings.m_raFwdInterferenceModel;
   parametersFeeder.m_raIfEliminateModel = m_raSettings.m_raInterferenceEliminationModel;
   parametersFeeder.m_bwConverter = m_carrierBandwidthConverter;
   parametersFeeder.m_carrierCount = m_fwdLinkCarrierCount;
