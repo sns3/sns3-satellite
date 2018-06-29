@@ -33,6 +33,7 @@
 
 #include "ns3/satellite-ncc.h"
 #include "ns3/satellite-antenna-gain-pattern-container.h"
+#include "ns3/satellite-beam-channel-pair.h"
 #include "ns3/satellite-phy-rx-carrier-conf.h"
 #include "ns3/satellite-mobility-observer.h"
 #include "ns3/satellite-markov-container.h"
@@ -67,7 +68,6 @@ public:
    */
   typedef SatTypedefs::CarrierBandwidthConverter_t CarrierBandwidthConverter;
 
-  typedef std::pair<Ptr<SatChannel>, Ptr<SatChannel> >  ChannelPair_t;    //forward = first, return  = second
   typedef std::pair<uint32_t, uint32_t >                FrequencyPair_t;  // user = first, feeder = second
   typedef std::pair<uint32_t, uint32_t>                 GwLink_t;         // first GW ID, second feeder link frequency id
 
@@ -309,8 +309,8 @@ private:
   std::set<GwLink_t >                       m_gwLinks;     // gateway links (GW id and feeder frequency id pairs).
   std::map<uint32_t, Ptr<Node> >            m_gwNode;      // first GW ID, second node pointer
   std::multimap<uint32_t, Ptr<Node> >       m_utNode;      // first Beam ID, second node pointer of the UT
-  std::map<uint32_t, ChannelPair_t >        m_ulChannels;  // user link ID, channel pointers pair
-  std::map<uint32_t, ChannelPair_t >        m_flChannels;  // feeder link ID, channel pointers pair
+  Ptr<SatChannelPair>                       m_ulChannels;  // user link ID, channel pointers pair
+  Ptr<SatChannelPair>                       m_flChannels;  // feeder link ID, channel pointers pair
   std::map<uint32_t, FrequencyPair_t >      m_beamFreqs;   // first beam ID, channel frequency IDs pair
 
 
@@ -403,12 +403,15 @@ private:
   /**
    * Gets satellite channel pair from requested map.
    * In case that channel pair is not found, new is created and returned.
-   * \param chPairMap map where channel pair is get
+   * \param chPairs SatChannelPair where channel pair is get
    * \param frequencyId ID of the frequency
    * \param isUserLink flag indicating if link user link is requested (otherwise feeder link).
-   * \return satellite channel pair from requested map
+   * \return satellite channel pair from requested SatChannelPair
    */
-  ChannelPair_t GetChannelPair (std::map<uint32_t, ChannelPair_t >& chPairMap, uint32_t frequencyId, bool isUserLink);
+  SatChannelPair::ChannelPair_t GetChannelPair (Ptr<SatChannelPair> chPairs,
+                                                uint32_t beamId,
+                                                uint32_t frequencyId,
+                                                bool isUserLink);
 
   /**
    * Creates GW node according to given id and stores GW to map.

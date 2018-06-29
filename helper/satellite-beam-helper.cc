@@ -192,6 +192,10 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
 
   m_channelFactory.SetTypeId ("ns3::SatChannel");
 
+  // create SatChannel containers
+  m_ulChannels = Create <SatChannelPair> ();
+  m_flChannels = Create <SatChannelPair> ();
+
   // create link specific control message containers
   Ptr<SatControlMsgContainer> rtnCtrlMsgContainer = Create <SatControlMsgContainer> (m_ctrlMsgStoreTimeRtnLink, true);
   Ptr<SatControlMsgContainer> fwdCtrlMsgContainer = Create <SatControlMsgContainer> (m_ctrlMsgStoreTimeFwdLink, false);
@@ -310,8 +314,8 @@ SatBeamHelper::DoDispose ()
 
   m_beam.clear ();
   m_gwNode.clear ();
-  m_ulChannels.clear ();
-  m_flChannels.clear ();
+  m_ulChannels = NULL;
+  m_flChannels = NULL;
   m_beamFreqs.clear ();
   m_markovConf = NULL;
   m_ncc = NULL;
@@ -367,10 +371,10 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
   m_beamFreqs.insert (std::pair<uint32_t, FrequencyPair_t > (beamId, freqPair));
 
   // next it is found user link channels and if not found channels are created and saved to map
-  ChannelPair_t userLink = GetChannelPair (m_ulChannels, ulFreqId, true);
+  SatChannelPair::ChannelPair_t userLink = GetChannelPair (m_ulChannels, beamId, ulFreqId, true);
 
   // next it is found feeder link channels and if not found channels are created nd saved to map
-  ChannelPair_t feederLink = GetChannelPair (m_flChannels, flFreqId, false);
+  SatChannelPair::ChannelPair_t feederLink = GetChannelPair (m_flChannels, beamId, flFreqId, false);
 
   // Set trace files if options ask for it
   if (m_enableTracesOnReturnLink)
@@ -955,15 +959,16 @@ SatBeamHelper::CreateBeamInfo () const
   return oss.str ();
 }
 
-SatBeamHelper::ChannelPair_t
-SatBeamHelper::GetChannelPair (std::map<uint32_t, ChannelPair_t > & chPairMap, uint32_t frequencyId, bool isUserLink)
+SatChannelPair::ChannelPair_t
+SatBeamHelper::GetChannelPair (Ptr<SatChannelPair> chPairs, uint32_t beamId, uint32_t frequencyId, bool isUserLink)
 {
-  NS_LOG_FUNCTION (this << frequencyId << isUserLink);
+  NS_LOG_FUNCTION (this << chPairs << beamId << frequencyId << isUserLink);
 
-  ChannelPair_t channelPair;
-  std::map<uint32_t, ChannelPair_t >::iterator mapIterator = chPairMap.find (frequencyId);
-
-  if ( mapIterator == chPairMap.end ())
+  if (chPairs->HasChannelPair (frequencyId))
+    {
+      chPairs->UpdateBeamsForFrequency (beamId, frequencyId);
+    }
+  else
     {
       Ptr<SatChannel> forwardCh = m_channelFactory.Create<SatChannel> ();
       Ptr<SatChannel> returnCh = m_channelFactory.Create<SatChannel> ();
@@ -1012,17 +1017,11 @@ SatBeamHelper::GetChannelPair (std::map<uint32_t, ChannelPair_t > & chPairMap, u
       forwardCh->SetFreeSpaceLoss (pFsl);
       returnCh->SetFreeSpaceLoss (pFsl);
 
-      channelPair.first = forwardCh;
-      channelPair.second = returnCh;
-
-      chPairMap.insert (std::pair<uint32_t, ChannelPair_t > (frequencyId, channelPair));
-    }
-  else
-    {
-      channelPair = mapIterator->second;
+      SatChannelPair::ChannelPair_t channelPair = std::make_pair (forwardCh, returnCh);
+      chPairs->StoreChannelPair (beamId, frequencyId, channelPair);
     }
 
-  return channelPair;
+  return chPairs->GetChannelPair (beamId);
 }
 
 bool
