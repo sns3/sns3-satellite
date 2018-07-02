@@ -212,7 +212,7 @@ SatUtHelper::SetPhyAttribute (std::string n1, const AttributeValue &v1)
 }
 
 NetDeviceContainer
-SatUtHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc)
+SatUtHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc, SatPhy::ChannelPairGetterCallback cb)
 {
   NS_LOG_FUNCTION (this << beamId << fCh << rCh );
 
@@ -220,14 +220,14 @@ SatUtHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
     {
-      devs.Add (Install (*i, beamId, fCh, rCh, gwNd, ncc));
+      devs.Add (Install (*i, beamId, fCh, rCh, gwNd, ncc, cb));
     }
 
   return devs;
 }
 
 Ptr<NetDevice>
-SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc)
+SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc, SatPhy::ChannelPairGetterCallback cb)
 {
   NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
 
@@ -279,6 +279,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
                                               m_linkResults,
                                               parameters,
                                               m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE));
+  phy->SetChannelPairGetterCallback (cb);
 
   // Set fading
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());

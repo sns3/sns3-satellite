@@ -448,4 +448,13 @@ SatPhy::AverageNormalizedOfferedRandomAccessLoadInfo (uint32_t beamId, uint32_t 
 }
 
 
+void
+SatPhy::SetChannelPairGetterCallback (SatPhy::ChannelPairGetterCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+
+  m_retrieveChannelPair = cb;
+}
+
+
 } // namespace ns3

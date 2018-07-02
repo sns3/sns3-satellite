@@ -464,7 +464,8 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
                                                  userLink.first,
                                                  userLink.second,
                                                  DynamicCast<SatNetDevice> (gwNd),
-                                                 m_ncc);
+                                                 m_ncc,
+                                                 MakeCallback (&SatChannelPair::GetChannelPair, m_ulChannels));
 
   Ipv4InterfaceContainer utAddress = m_ipv4Helper.Assign (utNd);
 

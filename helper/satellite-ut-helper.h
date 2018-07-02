@@ -33,8 +33,9 @@
 #include "ns3/satellite-channel.h"
 #include "ns3/satellite-link-results.h"
 #include "ns3/satellite-ncc.h"
-#include "ns3/satellite-superframe-sequence.h"
 #include "ns3/satellite-mac.h"
+#include "ns3/satellite-phy.h"
+#include "ns3/satellite-superframe-sequence.h"
 #include "ns3/satellite-random-access-container.h"
 #include "ns3/satellite-random-access-container-conf.h"
 #include "ns3/satellite-typedefs.h"
@@ -151,7 +152,7 @@ public:
    * a queue for this ns3::NetDevice, and associate the resulting
    * ns3::NetDevice with the ns3::Node and ns3::SatChannel.
    */
-  NetDeviceContainer Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc);
+  NetDeviceContainer Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc, SatPhy::ChannelPairGetterCallback cb);
 
   /**
    * \param n node
@@ -164,7 +165,7 @@ public:
    *
    * Saves you from having to construct a temporary NodeContainer.
    */
-  Ptr<NetDevice> Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc);
+  Ptr<NetDevice> Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc, SatPhy::ChannelPairGetterCallback cb);
 
   /**
    * Enables creation traces to be written in given file
