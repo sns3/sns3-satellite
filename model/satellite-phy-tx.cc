@@ -44,7 +44,7 @@ NS_OBJECT_ENSURE_REGISTERED (SatPhyTx);
 
 SatPhyTx::SatPhyTx ()
   : m_maxAntennaGain (),
-  m_state (IDLE),
+  m_state (RECONFIGURING),
   m_beamId (),
   m_txMode (),
   m_defaultFadingValue ()
@@ -195,6 +195,17 @@ SatPhyTx::SetChannel (Ptr<SatChannel> c)
   NS_ASSERT (m_channel == 0);
 
   m_channel = c;
+  ChangeState (IDLE);
+}
+
+void
+SatPhyTx::ClearChannel ()
+{
+  NS_LOG_FUNCTION (this);
+  NS_ASSERT (m_channel != 0);
+
+  m_channel = NULL;
+  ChangeState (RECONFIGURING);
 }
 
 Ptr<SatChannel>
@@ -250,6 +261,9 @@ SatPhyTx::StartTx (Ptr<SatSignalParameters> txParams)
             Simulator::Schedule (txParams->m_duration, &SatPhyTx::EndTx, this);
           }
       }
+      break;
+
+    case RECONFIGURING:
       break;
 
     default:

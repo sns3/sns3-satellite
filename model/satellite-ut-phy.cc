@@ -185,4 +185,38 @@ SatUtPhy::CalculateSinr (double sinr)
   return (finalSinr);
 }
 
+
+void
+SatUtPhy::PerformHandover (uint32_t beamId)
+{
+  NS_LOG_FUNCTION (this << beamId);
+
+  // disconnect current SatChannels
+  SatChannelPair::ChannelPair_t channels = m_retrieveChannelPair (m_beamId);
+  m_phyTx->ClearChannel ();
+  channels.first->RemoveRx (m_phyRx);
+
+  // perform "physical" beam handover
+  m_beamId = beamId;
+  m_phyTx->SetBeamId (m_beamId);
+  m_phyRx->SetBeamId (m_beamId);
+  Simulator::Schedule (Seconds (0.0), &SatUtPhy::AssignNewSatChannels, this);
+}
+
+
+void
+SatUtPhy::AssignNewSatChannels ()
+{
+  NS_LOG_FUNCTION (this);
+
+  // Fetch channels for current beam
+  SatChannelPair::ChannelPair_t channels = m_retrieveChannelPair (m_beamId);
+  Ptr<SatChannel> forwardLink = channels.first;
+  Ptr<SatChannel> returnLink = channels.second;
+
+  // Assign channels
+  m_phyTx->SetChannel (returnLink);
+  forwardLink->AddRx (m_phyRx);
+}
+
 } // namespace ns3

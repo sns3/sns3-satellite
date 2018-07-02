@@ -520,16 +520,16 @@ protected:
   Ptr<SatPhyRx> m_phyRx;
 
   /**
+   * Beam ID
+   */
+  uint32_t m_beamId;
+
+  /**
    * Calculated EIRP without gain in W.
    */
   double m_eirpWoGainW;
 
 private:
-  /**
-   * Beam ID
-   */
-  uint32_t m_beamId;
-
   /**
    * The C/N0 info callback
    */

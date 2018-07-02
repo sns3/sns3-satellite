@@ -47,8 +47,8 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatPhy);
 
 SatPhy::SatPhy (void)
-  : m_eirpWoGainW (0),
-  m_beamId (0),
+  : m_beamId (0),
+  m_eirpWoGainW (0),
   m_isStatisticsTagsEnabled (false),
   m_rxNoiseTemperatureDbk (0),
   m_rxMaxAntennaGainDb (0),
@@ -66,8 +66,8 @@ SatPhy::SatPhy (void)
 }
 
 SatPhy::SatPhy (CreateParam_t & params)
-  : m_eirpWoGainW (0),
-  m_beamId (0),
+  : m_beamId (0),
+  m_eirpWoGainW (0),
   m_isStatisticsTagsEnabled (false),
   m_rxNoiseTemperatureDbk (0),
   m_rxMaxAntennaGainDb (0),

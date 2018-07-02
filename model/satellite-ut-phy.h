@@ -94,7 +94,19 @@ public:
    */
   virtual double CalculateSinr (double sinr);
 
+  /**
+   * \brief Change underlying SatChannel to send and receive data from a new beam
+   * \param beamId the new beam to listen/send to
+   */
+  void PerformHandover (uint32_t beamId);
+
 private:
+  /**
+   * \brief Update the underlying SatChannel to send and receive data from
+   * the current beam (as described in the m_beamId attribute).
+   */
+  void AssignNewSatChannels ();
+
   /**
    * Configured other system interference in dB.
    */

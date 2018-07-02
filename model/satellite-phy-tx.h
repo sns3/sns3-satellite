@@ -68,7 +68,7 @@ public:
    */
   enum State
   {
-    IDLE, TX
+    IDLE, TX, RECONFIGURING
   };
 
 
@@ -83,6 +83,7 @@ public:
   virtual void DoDispose ();
 
   void SetChannel (Ptr<SatChannel> c);
+  void ClearChannel ();
   Ptr<SatChannel> GetChannel ();
 
   void SetMobility (Ptr<MobilityModel> m);
