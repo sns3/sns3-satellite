@@ -65,7 +65,7 @@ public:
   /**
    * Define type CarrierBandwidthConverter
    */
-  typedef SatTypedefs::CarrierBandwidthConverter_t CarrierBandwidthConverter;
+  typedef SatTypedefs::CarrierBandwidthConverter_t      CarrierBandwidthConverter;
 
   typedef std::map<std::pair<SatEnums::ChannelType_t,
                    uint32_t>, Ptr<SatChannel> >         ChannelContainer_t;
@@ -113,6 +113,12 @@ public:
   virtual ~SatBeamHelper ()
   {
   }
+
+  /**
+   * \brief Init method is called after all the initial configurations
+   * have been done by the SatHelper and SatBeamHelper.
+   */
+  void Init ();
 
   /**
    * Set the antenna gain patterns to be used when configuring the beams

@@ -308,6 +308,17 @@ SatBeamHelper::DoDispose ()
 }
 
 void
+SatBeamHelper::Init ()
+{
+  NS_LOG_FUNCTION (this);
+
+  if (m_bstpController)
+    {
+      m_bstpController->Initialize ();
+    }
+}
+
+void
 SatBeamHelper::SetAntennaGainPatterns (Ptr<SatAntennaGainPatternContainer> antennaPatterns)
 {
   NS_LOG_FUNCTION (this << antennaPatterns);

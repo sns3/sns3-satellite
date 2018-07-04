@@ -56,14 +56,20 @@ SatBstpController::SatBstpController ()
     {
       NS_FATAL_ERROR ("Beam hopping supports currently only STATIC mode!");
     }
-
-  DoBstpConfiguration ();
 }
 
 
 SatBstpController::~SatBstpController ()
 {
   m_staticBstp = NULL;
+}
+
+void
+SatBstpController::Initialize ()
+{
+  NS_LOG_FUNCTION (this);
+
+  DoBstpConfiguration ();
 }
 
 TypeId
@@ -80,12 +86,12 @@ SatBstpController::GetTypeId (void)
                                     SatBstpController::BH_DYNAMIC, "Dynamic"))
     .AddAttribute ("StaticBeamHoppingConfigFileName",
                    "Configuration file name for static beam hopping.",
-                   StringValue ("SatBstpConf.txt"),
+                   StringValue ("SatBstpConf_GW1.txt"),
                    MakeStringAccessor (&SatBstpController::m_configFileName),
                    MakeStringChecker ())
     .AddAttribute ("SuperframeDuration",
                    "Superframe duration in Time.",
-                   TimeValue (MilliSeconds (100)),
+                   TimeValue (MilliSeconds (10)),
                    MakeTimeAccessor (&SatBstpController::m_superFrameDuration),
                    MakeTimeChecker ())
   ;
@@ -146,7 +152,7 @@ SatBstpController::DoBstpConfiguration ()
       // Read next BSTP configuration
       std::vector<uint32_t> nextConf = m_staticBstp->GetNextConf ();
 
-      if (CheckValidity (nextConf))
+      if (!CheckValidity (nextConf))
         {
           NS_FATAL_ERROR ("BSTP configuration did not succeed through validity check!");
         }

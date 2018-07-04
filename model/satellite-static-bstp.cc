@@ -119,7 +119,7 @@ SatStaticBstp::GetNextConf () const
    * we run out of samples in the BSTP.
    */
   m_currentIterator++;
-  if (m_currentIterator > m_bstp.size ())
+  if (m_currentIterator >= m_bstp.size ())
     {
       m_currentIterator = 0;
     }

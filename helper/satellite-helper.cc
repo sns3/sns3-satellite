@@ -531,6 +531,8 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
 
       m_scenarioCreated = true;
     }
+
+  m_beamHelper->Init ();
 }
 
 void

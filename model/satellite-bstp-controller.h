@@ -54,6 +54,11 @@ public:
   virtual ~SatBstpController ();
 
   /**
+   * \brief Initialize the beam hopping configurations.
+   */
+  void Initialize ();
+
+  /**
    * inherited from Object
    */
   static TypeId GetTypeId (void);

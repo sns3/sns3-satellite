@@ -740,8 +740,9 @@ SimulationHelper::ConfigureFwdLinkBeamHopping ()
   // Channel configuration for 500 MHz user link bandwidth
   Config::SetDefault ("ns3::SatHelper::SatFwdConfFileName", StringValue ("Scenario72FwdConf_BH.txt"));
 
-  Config::SetDefault ("SatBstpController::BeamHoppingMode", StringValue ("Static"));
-  Config::SetDefault ("SatBstpController::StaticBeamHoppingConfigFileName", StringValue ("SatBstpConf_GW1.txt"));
+  Config::SetDefault ("ns3::SatBstpController::BeamHoppingMode", EnumValue (SatBstpController::BH_STATIC));
+  Config::SetDefault ("ns3::SatBstpController::StaticBeamHoppingConfigFileName", StringValue ("SatBstpConf_GW1.txt"));
+  Config::SetDefault ("ns3::SatBstpController::SuperframeDuration", TimeValue (MilliSeconds (10)));
 
   // Frequency configuration for 500 MHz user link bandwidth
   Config::SetDefault ("ns3::SatConf::FwdFeederLinkBandwidth", DoubleValue (2e+09));
