@@ -47,88 +47,59 @@ int
 main (int argc, char *argv[])
 {
   uint32_t endUsersPerUt (1);
-  uint32_t utsPerBeam (3);
   bool enableBeamHopping (true);
-  Time simLength (Seconds (50.0));
+  Time simLength (Seconds (3.0));
+  bool scaleDown (true);
 
   std::string simulationName ("sat-fwd-link-beam-hopping-example");
-  std::string outputPath ("");
+  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> (simulationName);
 
   // read command line parameters given by user
   CommandLine cmd;
-  cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
   cmd.AddValue ("enableBeamHopping", "Enable FWD link beam hopping", enableBeamHopping);
-  cmd.AddValue ("OutputPath", "Output path for statistics files.", outputPath);
+  cmd.AddValue ("simTime", "Length of simulation", simLength);
+  simulationHelper->AddDefaultUiArguments(cmd);
   cmd.Parse (argc, argv);
 
-  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> (simulationName);
-
   simulationHelper->SetDefaultValues ();
-  simulationHelper->SetUtCountPerBeam (utsPerBeam);
   simulationHelper->SetUserCountPerUt (endUsersPerUt);
-  simulationHelper->ConfigureFwdLinkBeamHopping ();
+  if (enableBeamHopping) simulationHelper->ConfigureFwdLinkBeamHopping ();
+  if (scaleDown)
+  {
+    Config::SetDefault ("ns3::SatConf::FwdCarrierAllocatedBandwidth", DoubleValue (enableBeamHopping ?  1e+08 : 2.5e+07));
+  }
   simulationHelper->SetSimulationTime (simLength.GetSeconds());
 
   // All spot-beams of GW-1 (14 in total)
   simulationHelper->SetBeams ("1 2 3 4 11 12 13 14 25 26 27 28 40 41");
+  std::map<uint32_t, uint32_t> utsInBeam = {{1, 30}, {2, 9}, {3, 15}, {4, 30},
+                                            {11, 15}, {12, 30}, {13, 9}, {14, 18},
+                                            {25, 9}, {26, 15}, {27, 18}, {28, 30},
+                                            {40, 9}, {41, 15}};
 
-  /* Simulation tags *****************************************************************/
-
-  uint32_t bhInt = (enableBeamHopping == true) ? 1 : 0;
-  std::stringstream sstag;
-  sstag << simulationName << "UTs=" << utsPerBeam << "BH=" << bhInt;
-  simulationHelper->SetOutputTag (sstag.str ());
-
-  if (outputPath != "")
+  // Set users unevenly in different beams
+  for (const auto it : utsInBeam)
   {
-      simulationHelper->SetOutputPath (outputPath);
+    simulationHelper->SetUtCountPerBeam (it.first, it.second);
   }
 
-  Ptr<SatHelper> helper = simulationHelper->CreateSatScenario ();
+  // Create the scenario
+  simulationHelper->CreateSatScenario ();
 
-  // get users
-  NodeContainer utUsers = helper->GetUtUsers ();
-  NodeContainer gwUsers = helper->GetGwUsers ();
+  // Install traffic model
+  Config::SetDefault ("ns3::CbrApplication::Interval", TimeValue (MilliSeconds (1)));
+  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (512) );
+  simulationHelper->InstallTrafficModel (SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
+                                         Seconds (0.001), simLength, Seconds (0.001));
 
-  // >>> Start of actual test using Full scenario >>>
+  auto stats = simulationHelper->GetStatisticsContainer ();
+  stats->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  stats->AddPerBeamFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  stats->AddPerBeamBeamServiceTime (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  stats->AddGlobalFwdAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
+  stats->AddGlobalFwdCompositeSinr (SatStatsHelper::OUTPUT_CDF_FILE);
 
-  // port used for packet delivering
-  uint16_t port = 9; // Discard port (RFC 863)
-
-  CbrHelper cbrHelper ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
-  cbrHelper.SetAttribute ("Interval", TimeValue (MilliSeconds (5)));
-  cbrHelper.SetAttribute ("PacketSize", UintegerValue (128) );
-
-  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (0)), port)));
-
-  // initialized time values for simulation
-  uint32_t maxTransmitters = utUsers.GetN ();
-
-  ApplicationContainer gwApps;
-  ApplicationContainer utApps;
-
-  Time cbrStartDelay = Seconds (1);
-
-  // Cbr and Sink applications creation
-  for ( uint32_t i = 0; i < maxTransmitters; i++)
-    {
-      cbrHelper.SetAttribute ("Remote", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port))));
-      sinkHelper.SetAttribute ("Local", AddressValue (Address (InetSocketAddress (helper->GetUserAddress (utUsers.Get (i)), port))));
-
-      gwApps.Add (cbrHelper.Install (gwUsers.Get (0)));
-      utApps.Add (sinkHelper.Install (utUsers.Get (i)));
-
-      cbrStartDelay += Seconds (0.05);
-
-      utApps.Get (i)->SetStartTime (cbrStartDelay);
-      utApps.Get (i)->SetStopTime (simLength);
-    }
-
-  utApps.Start (Seconds (1));
-  utApps.Stop (simLength);
-
-  simulationHelper->CreateDefaultFwdLinkStats ();
-  simulationHelper->EnableProgressLogging ();
+  simulationHelper->EnableProgressLogs ();
   simulationHelper->RunSimulation ();
 
   return 0;
