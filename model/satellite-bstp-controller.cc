@@ -69,6 +69,11 @@ SatBstpController::Initialize ()
 {
   NS_LOG_FUNCTION (this);
 
+  if (m_staticBstp)
+    {
+      m_staticBstp->CheckValidity ();
+    }
+
   DoBstpConfiguration ();
 }
 
@@ -137,6 +142,11 @@ SatBstpController::AddNetDeviceCallback (uint32_t beamId,
   NS_LOG_INFO ("Add beam: " << beamId << ", userFreqId: " << userFreqId <<
                ", feederFreqId: " << feederFreqId << ", gwId: " << gwId);
 
+  if (m_staticBstp)
+    {
+      m_staticBstp->AddEnabledBeamInfo (beamId, userFreqId, feederFreqId, gwId);
+    }
+
   m_gwNdCallbacks.insert (std::make_pair (beamId, cb));
 }
 
@@ -151,11 +161,6 @@ SatBstpController::DoBstpConfiguration ()
     {
       // Read next BSTP configuration
       std::vector<uint32_t> nextConf = m_staticBstp->GetNextConf ();
-
-      if (!CheckValidity (nextConf))
-        {
-          NS_FATAL_ERROR ("BSTP configuration did not succeed through validity check!");
-        }
 
       // First column is the validity
       validityInSuperframes = nextConf.front ();
@@ -192,30 +197,6 @@ SatBstpController::DoBstpConfiguration ()
    */
   Time nextConfigurationDuration (validityInSuperframes * m_superFrameDuration);
   Simulator::Schedule (nextConfigurationDuration, &SatBstpController::DoBstpConfiguration, this);
-}
-
-bool
-SatBstpController::CheckValidity (std::vector<uint32_t> &bstpConf) const
-{
-  NS_LOG_FUNCTION (this << bstpConf.size ());
-
-  if (bstpConf.size () <= 1)
-    {
-      return false;
-    }
-
-  /**
-   * TODO: Add checks here related to that the spot-beams are reasonable to
-   * be enabled at the same time.
-   * - Each beam is allocated a GW, thus beam hopping need to be done within the GW beam "service area".
-   *   Each beam is also allocated with a feeder frequency id (1-4).
-   * - Each GW can enable only one beam for each feeder link frequency id at the same time.
-   * - All feeder link frequency ids should always be in use (100% resource usage).
-   * - Consecutive user link beams should not be scheduled at the same time.
-   * - Each beam should be scheduled at least once within a BSTP pattern.
-   */
-
-  return true;
 }
 
 }

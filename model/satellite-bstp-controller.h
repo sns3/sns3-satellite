@@ -30,7 +30,14 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief SatBstpController
+ * \brief SatBstpController class is responsible of enabling and
+ * disabling configurable spot-beams defined by a Beam Switching
+ * Time Plan (BSTP). Currently the SatBstpController supports only
+ * static beam hopping patterns, where the BSTP is defined by
+ * SatStaticBstp class by means of external configuration file.
+ * SatBstpController use ideal callbacks to GW's SatNetDevice
+ * Toggle method, which enables or disables the MAC layer of the
+ * GW.
  */
 class SatBstpController : public Object
 {
@@ -102,12 +109,6 @@ protected:
    */
   void DoBstpConfiguration ();
 
-  /**
-   * \brief Check validity of the individual BSTP configuration line
-   * \param bstpConf BSTP configuration item vector
-   */
-  bool CheckValidity (std::vector<uint32_t> &bstpConf) const;
-
 private:
 
   typedef std::map<uint32_t, ToggleCallback> CallbackContainer_t;
@@ -127,7 +128,6 @@ private:
    * Beam switching time plan
    */
   Ptr<SatStaticBstp> m_staticBstp;
-
 };
 
 } // namespace

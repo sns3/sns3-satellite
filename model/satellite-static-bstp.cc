@@ -18,14 +18,15 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
+#include <algorithm>
 #include <istream>
 #include <sstream>
-
-#include "satellite-static-bstp.h"
 
 #include "ns3/log.h"
 #include "ns3/singleton.h"
 #include "ns3/satellite-env-variables.h"
+
+#include "satellite-static-bstp.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatStaticBstp");
 
@@ -33,7 +34,10 @@ namespace ns3 {
 
 SatStaticBstp::SatStaticBstp ()
 :m_bstp (),
- m_currentIterator (0)
+ m_currentIterator (0),
+ m_beamGwMap (),
+ m_beamFeederFreqIdMap (),
+ m_enabledBeams ()
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT (false);
@@ -127,6 +131,118 @@ SatStaticBstp::GetNextConf () const
   return m_bstp.at (iter);
 }
 
+void
+SatStaticBstp::AddEnabledBeamInfo (uint32_t beamId,
+                                   uint32_t userFreqId,
+                                   uint32_t feederFreqId,
+                                   uint32_t gwId)
+{
+  NS_LOG_FUNCTION (this << beamId << userFreqId << feederFreqId << gwId);
+
+  NS_ASSERT (userFreqId == 1);
+
+  m_beamGwMap.insert (std::make_pair (beamId, gwId));
+  m_beamFeederFreqIdMap.insert (std::make_pair (beamId, feederFreqId));
+
+  m_enabledBeams.push_back (beamId);
+}
+
+void
+SatStaticBstp::CheckValidity ()
+{
+  NS_LOG_FUNCTION (this);
+
+  if (m_bstp.empty ())
+    {
+      NS_FATAL_ERROR ("BSTP container is empty!");
+    }
+
+  std::vector<uint32_t> enabledBeams = m_enabledBeams;
+  std::map<uint32_t, uint32_t> beamIds;
+  std::map<uint32_t, std::vector<uint32_t> > gwFeederFreqs;
+
+  // All lines
+  for (uint32_t i = 0; i < m_bstp.size (); i++)
+    {
+      beamIds.clear ();
+      gwFeederFreqs.clear ();
+
+      // A single BSTP configuration
+      std::vector<uint32_t> confEntry = m_bstp.at (i);
+      for (uint32_t j = 1; j < confEntry.size (); j++)
+        {
+          uint32_t beamId = confEntry.at (j);
+
+          std::vector<uint32_t>::iterator eIt =
+              std::find (enabledBeams.begin (), enabledBeams.end (), beamId);
+          if (eIt != enabledBeams.end ())
+            {
+              enabledBeams.erase (eIt);
+            }
+
+          // One beam id can only exist once at each line
+          if ((beamIds.insert (std::make_pair (beamId, 0))).second == false)
+            {
+              NS_FATAL_ERROR ("Beam id: " << confEntry.at (j) <<
+                              " is located twice in the BSTP line: " << i);
+            }
+
+          // Find the GW and feeder freq for this beamId
+          std::map<uint32_t, uint32_t>::iterator ffIt =
+              m_beamFeederFreqIdMap.find (beamId);
+          std::map<uint32_t, uint32_t>::iterator gwIt =
+              m_beamGwMap.find (beamId);
+
+          // Check that the beam is enabled!
+          if (ffIt != m_beamFeederFreqIdMap.end () && gwIt != m_beamGwMap.end ())
+            {
+              uint32_t feederFreqId = ffIt->second;
+              uint32_t gwId = gwIt->second;
+
+              // Find GW and add this feeder freq for it.
+              std::map<uint32_t, std::vector<uint32_t> >::iterator findGw =
+                  gwFeederFreqs.find (gwId);
+
+              // If it is not found, add a proper vector for it.
+              if (findGw == gwFeederFreqs.end ())
+                {
+                  std::vector <uint32_t> ffIds;
+                  ffIds.push_back (feederFreqId);
+                  gwFeederFreqs.insert (std::make_pair (gwId, ffIds));
+                }
+              else
+                {
+                  // Find whether we have already stored this feeder freq for
+                  // this GW!
+                  std::vector<uint32_t>::iterator findFfIt =
+                      std::find(findGw->second.begin (), findGw->second.end (), feederFreqId);
+
+                  // If we have, we should trigger a fatal error since GW cannot serve
+                  // two beams with the same feeder freq at the same time.
+                  if (findFfIt != findGw->second.end ())
+                    {
+                      NS_FATAL_ERROR ("Feeder link freq id: " << feederFreqId <<
+                                      " already found for GW: " << findGw->first);
+                    }
+
+                  // Otherwise just store the feeder freq
+                  findGw->second.push_back (feederFreqId);
+                }
+            }
+          else
+            {
+              NS_LOG_WARN ("Beam id: " << beamId << " is not enabled, but it located at BSTP!");
+            }
+        }
+    }
+
+  // All enabled spot-beams need to have at least one
+  // scheduling entry
+  if (enabledBeams.size () > 0)
+    {
+      NS_FATAL_ERROR ("All enabled beams are not in the BSTP configuration!");
+    }
+}
 
 } // namespace ns3
 
