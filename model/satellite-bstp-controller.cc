@@ -18,7 +18,8 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include <cmath>
+#include <algorithm>
+
 #include "ns3/boolean.h"
 #include "ns3/double.h"
 #include "ns3/enum.h"
@@ -28,6 +29,7 @@
 #include "ns3/string.h"
 
 #include "satellite-bstp-controller.h"
+#include "satellite-static-bstp.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatBstpController");
 
@@ -38,13 +40,19 @@ NS_OBJECT_ENSURE_REGISTERED (SatBstpController);
 SatBstpController::SatBstpController ()
   :m_gwNdCallbacks (),
    m_bhMode (SatBstpController::BH_STATIC),
-   m_configFileName ("SatBstpConf.txt")
+   m_configFileName ("SatBstpConf.txt"),
+   m_superFrameDuration (MilliSeconds (100)),
+   m_staticBstp ()
 {
   NS_LOG_FUNCTION (this);
 
   ObjectBase::ConstructSelf (AttributeConstructionList ());
 
-  if (m_bhMode == SatBstpController::BH_DYNAMIC)
+  if (m_bhMode == SatBstpController::BH_STATIC)
+    {
+      m_staticBstp = Create<SatStaticBstp> (m_configFileName);
+    }
+  else if (m_bhMode == SatBstpController::BH_DYNAMIC)
     {
       NS_FATAL_ERROR ("Beam hopping supports currently only STATIC mode!");
     }
@@ -55,7 +63,7 @@ SatBstpController::SatBstpController ()
 
 SatBstpController::~SatBstpController ()
 {
-
+  m_staticBstp = NULL;
 }
 
 TypeId
@@ -75,6 +83,11 @@ SatBstpController::GetTypeId (void)
                    StringValue ("SatBstpConf.txt"),
                    MakeStringAccessor (&SatBstpController::m_configFileName),
                    MakeStringChecker ())
+    .AddAttribute ("SuperframeDuration",
+                   "Superframe duration in Time.",
+                   TimeValue (MilliSeconds (100)),
+                   MakeTimeAccessor (&SatBstpController::m_superFrameDuration),
+                   MakeTimeChecker ())
   ;
   return tid;
 }
@@ -124,19 +137,79 @@ SatBstpController::AddNetDeviceCallback (uint32_t beamId,
 void
 SatBstpController::DoBstpConfiguration ()
 {
-  // Read BSTP entry and do configuration
-  for (CallbackContainer_t::iterator it = m_gwNdCallbacks.begin ();
-       it != m_gwNdCallbacks.end ();
-       ++it)
+  NS_LOG_FUNCTION (this);
+
+  uint32_t validityInSuperframes (1);
+
+  if (m_staticBstp)
     {
-      (*it).second (true);
+      // Read next BSTP configuration
+      std::vector<uint32_t> nextConf = m_staticBstp->GetNextConf ();
+
+      if (CheckValidity (nextConf))
+        {
+          NS_FATAL_ERROR ("BSTP configuration did not succeed through validity check!");
+        }
+
+      // First column is the validity
+      validityInSuperframes = nextConf.front ();
+
+      // Read BSTP entry and do configuration
+      for (CallbackContainer_t::iterator it = m_gwNdCallbacks.begin ();
+           it != m_gwNdCallbacks.end ();
+           ++it)
+        {
+          uint32_t beamId = (*it).first;
+
+          /**
+           * Try to find the enabled beam id from the next BSTP configuration!
+           * If found, enable it, if not, disable it. Note, search from the second
+           * item of the vector, since the first column is the validity!
+           */
+          if (std::find(nextConf.begin()+1, nextConf.end(), beamId) != nextConf.end())
+            {
+              (*it).second (true);
+            }
+          else
+            {
+              (*it).second (false);
+            }
+        }
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Dynamic beam switching time plan not yet supported!");
     }
 
-  // TODO: change the duration of being a multiple of superframe
-  // duration
-  Time nextConfigurationDuration (MilliSeconds (500));
+  /**
+   * Next BSTP configuration time is the validity * superframe duration
+   */
+  Time nextConfigurationDuration (validityInSuperframes * m_superFrameDuration);
   Simulator::Schedule (nextConfigurationDuration, &SatBstpController::DoBstpConfiguration, this);
 }
 
+bool
+SatBstpController::CheckValidity (std::vector<uint32_t> &bstpConf) const
+{
+  NS_LOG_FUNCTION (this << bstpConf.size ());
+
+  if (bstpConf.size () <= 1)
+    {
+      return false;
+    }
+
+  /**
+   * TODO: Add checks here related to that the spot-beams are reasonable to
+   * be enabled at the same time.
+   * - Each beam is allocated a GW, thus beam hopping need to be done within the GW beam "service area".
+   *   Each beam is also allocated with a feeder frequency id (1-4).
+   * - Each GW can enable only one beam for each feeder link frequency id at the same time.
+   * - All feeder link frequency ids should always be in use (100% resource usage).
+   * - Consecutive user link beams should not be scheduled at the same time.
+   * - Each beam should be scheduled at least once within a BSTP pattern.
+   */
+
+  return true;
 }
 
+}

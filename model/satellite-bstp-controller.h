@@ -21,9 +21,10 @@
 #ifndef SATELLITE_BSTP_CONTROLLER_H_
 #define SATELLITE_BSTP_CONTROLLER_H_
 
-#include <deque>
 #include "ns3/object.h"
 #include "ns3/callback.h"
+
+#include "satellite-static-bstp.h"
 
 namespace ns3 {
 
@@ -96,6 +97,12 @@ protected:
    */
   void DoBstpConfiguration ();
 
+  /**
+   * \brief Check validity of the individual BSTP configuration line
+   * \param bstpConf BSTP configuration item vector
+   */
+  bool CheckValidity (std::vector<uint32_t> &bstpConf) const;
+
 private:
 
   typedef std::map<uint32_t, ToggleCallback> CallbackContainer_t;
@@ -103,6 +110,18 @@ private:
   CallbackContainer_t m_gwNdCallbacks;
   BeamHoppingType_t m_bhMode;
   std::string m_configFileName;
+
+  /**
+   * Superframe duration in Time. This is a simple way of modeling the
+   * DVB-S2x superframe, since it affects only to the beam hopping
+   * configuration.
+   */
+  Time m_superFrameDuration;
+
+  /**
+   * Beam switching time plan
+   */
+  Ptr<SatStaticBstp> m_staticBstp;
 
 };
 
