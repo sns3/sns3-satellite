@@ -598,6 +598,14 @@ SimulationHelper::CreateDefaultFwdLinkStats ()
   m_statContainer->AddGlobalFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddGlobalFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
+  m_statContainer->AddPerBeamFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  Config::SetDefault ("ns3::SatStatsThroughputHelper::AveragingMode", BooleanValue (true));
+  m_statContainer->AddPerBeamFwdAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
+  m_statContainer->AddPerBeamFwdMacThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
+  m_statContainer->AddPerBeamFwdPhyThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
+
   // SINR
   m_statContainer->AddGlobalFwdCompositeSinr (SatStatsHelper::OUTPUT_CDF_FILE);
   m_statContainer->AddGlobalFwdCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
@@ -614,6 +622,9 @@ SimulationHelper::CreateDefaultFwdLinkStats ()
   m_statContainer->AddGlobalFrameTypeUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddPerGwFrameTypeUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddPerBeamFrameTypeUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+  // Beam service time
+  m_statContainer->AddPerBeamBeamServiceTime (SatStatsHelper::OUTPUT_SCALAR_FILE);
 }
 
 void

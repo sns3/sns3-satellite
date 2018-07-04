@@ -279,6 +279,11 @@ protected:
   TracedCallback<const Time &, const Address &> m_rxDelayTrace;
 
   /**
+   * Traced callback for beam being disabled and including service time.
+   */
+  TracedCallback<Time> m_beamServiceTrace;
+
+  /**
    * Node info containing node related information, such as
    * node type, node id and MAC address (of the SatNetDevice)
    */
@@ -295,6 +300,11 @@ protected:
    * is only supported currently, thus, it is set to true by default.
    */
   bool m_txEnabled;
+
+  /**
+   * Time of the last beam enable event.
+   */
+  Time m_beamEnabledTime;
 };
 
 } // namespace ns3

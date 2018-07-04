@@ -280,8 +280,11 @@ public:
   void AddGlobalRtnFeederLinkRxPower (SatStatsHelper::OutputType_t outputType);
   void AddGlobalRtnUserLinkRxPower (SatStatsHelper::OutputType_t outputType);
 
-  // Waveform usage statistics.
+  // Frame type usage statistics.
 	SAT_STATS_REDUCED_SCOPE_METHOD_DECLARATION (FrameTypeUsage)
+
+  // Beam service time statistics
+  void AddPerBeamBeamServiceTime (SatStatsHelper::OutputType_t outputType);
 
   /**
    * \param outputType an arbitrary output type.

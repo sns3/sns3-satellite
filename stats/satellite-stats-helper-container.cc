@@ -39,6 +39,7 @@
 #include <ns3/satellite-stats-throughput-helper.h>
 #include <ns3/satellite-stats-waveform-usage-helper.h>
 #include <ns3/satellite-stats-frame-type-usage-helper.h>
+#include <ns3/satellite-stats-beam-service-time-helper.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatStatsHelperContainer");
 
@@ -88,6 +89,7 @@ SatStatsHelperContainer::DoDispose ()
  * - Global [Fwd,Rtn] [Feeder,User] LinkSinr
  * - Global [Fwd,Rtn] [Feeder,User] LinkRxPower
  * - [Global,PerGw,PerBeam] FrameTypeUsage
+ * - [PerBeam] BeamServiceTime
  *
  * Also check the Doxygen documentation of this class for more information.
  */
@@ -465,6 +467,12 @@ SatStatsHelperContainer::GetTypeId ()
                      SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
     ADD_SAT_STATS_ATTRIBUTE_HEAD (PerBeamFrameTypeUsage,
                                   "per beam frame type usage statistics")
+		MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
+										 SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
+
+		// Beam service time statistics
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerBeamBeamServiceTime,
+                                  "per beam service time statistics")
 		MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
 										 SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
   ;
@@ -938,6 +946,9 @@ SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnUserLinkRxPower,   "rtn-user-link-rx
 SAT_STATS_GLOBAL_METHOD_DEFINITION			(FrameTypeUsage, "frame-type-usage")
 SAT_STATS_PER_GW_METHOD_DEFINITION			(FrameTypeUsage, "frame-type-usage")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION		(FrameTypeUsage, "frame-type-usage")
+
+// Beam service time statistics
+SAT_STATS_PER_BEAM_METHOD_DEFINITION 		(BeamServiceTime, "beam-service-time")
 
 
 std::string // static
