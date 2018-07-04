@@ -192,7 +192,8 @@ private:
   /**
    * Configuration file names as attributes of this class
    */
-  std::string m_satConfFileName;
+  std::string m_rtnConfFileName;
+  std::string m_fwdConfFileName;
   std::string m_gwPosFileName;
   std::string m_geoPosFileName;
   std::string m_waveformConfFileName;

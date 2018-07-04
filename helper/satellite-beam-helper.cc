@@ -296,10 +296,9 @@ SatBeamHelper::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
 
+  m_channels.clear ();
   m_beam.clear ();
   m_gwNode.clear ();
-  m_ulChannels.clear ();
-  m_flChannels.clear ();
   m_beamFreqs.clear ();
   m_markovConf = NULL;
   m_ncc = NULL;
@@ -338,27 +337,25 @@ void SatBeamHelper::SetBaseAddress (const Ipv4Address& network, const Ipv4Mask& 
 }
 
 Ptr<Node>
-SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint32_t beamId, uint32_t ulFreqId, uint32_t flFreqId)
+SatBeamHelper::Install (NodeContainer ut,
+                        Ptr<Node> gwNode,
+                        uint32_t gwId,
+                        uint32_t beamId,
+                        uint32_t rtnUlFreqId,
+                        uint32_t rtnFlFreqId,
+                        uint32_t fwdUlFreqId,
+                        uint32_t fwdFlFreqId)
 {
-  NS_LOG_FUNCTION (this << gwNode << gwId << beamId << ulFreqId << flFreqId);
+  NS_LOG_FUNCTION (this << gwNode << gwId << beamId << rtnUlFreqId << rtnFlFreqId << fwdUlFreqId << fwdFlFreqId);
 
   // add beamId as key and gwId as value pair to beam map. In case it's there already, assertion failure is caused
   std::pair<std::map<uint32_t,uint32_t >::iterator, bool> beam = m_beam.insert (std::make_pair (beamId, gwId));
   NS_ASSERT (beam.second == true);
 
-  // add gwId and flFreqId pair to GW link set. In case it's there already, assertion failure is caused
-  std::pair<std::set<GwLink_t >::iterator, bool>  gw = m_gwLinks.insert (GwLink_t (gwId, flFreqId));
-  NS_ASSERT (gw.second == true);
-
-  // save frequency pair to map with beam ID
-  FrequencyPair_t freqPair = FrequencyPair_t (ulFreqId, flFreqId);
-  m_beamFreqs.insert (std::pair<uint32_t, FrequencyPair_t > (beamId, freqPair));
-
-  // next it is found user link channels and if not found channels are created and saved to map
-  ChannelPair_t userLink = GetChannelPair (m_ulChannels, ulFreqId, true);
-
-  // next it is found feeder link channels and if not found channels are created nd saved to map
-  ChannelPair_t feederLink = GetChannelPair (m_flChannels, flFreqId, false);
+  Ptr<SatChannel> rtnUserLink = GetChannel (SatEnums::RETURN_USER_CH, rtnUlFreqId);
+  Ptr<SatChannel> rtnFeederLink = GetChannel (SatEnums::RETURN_FEEDER_CH, rtnFlFreqId);
+  Ptr<SatChannel> fwdUserLink = GetChannel (SatEnums::FORWARD_USER_CH, fwdUlFreqId);
+  Ptr<SatChannel> fwdFeederLink = GetChannel (SatEnums::FORWARD_FEEDER_CH, fwdFlFreqId);
 
   NS_ASSERT (m_geoNode != NULL);
 
@@ -370,10 +367,10 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
 
   // attach channels to geo satellite device
   m_geoHelper->AttachChannels ( m_geoNode->GetDevice (0),
-                                feederLink.first,
-                                feederLink.second,
-                                userLink.first,
-                                userLink.second,
+                                fwdFeederLink,
+                                rtnFeederLink,
+                                fwdUserLink,
+                                rtnUserLink,
                                 m_antennaGainPatterns->GetAntennaGainPattern (beamId),
                                 m_antennaGainPatterns->GetAntennaGainPattern (feederBeamId),
                                 beamId);
@@ -398,9 +395,9 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
 
       Ptr<SatMobilityObserver> observer = (*i)->GetObject<SatMobilityObserver> ();
       NS_ASSERT (observer != NULL);
-
-      observer->ObserveTimingAdvance (userLink.second->GetPropagationDelayModel (),
-                                      feederLink.second->GetPropagationDelayModel (), gwMobility);
+      observer->ObserveTimingAdvance (rtnUserLink->GetPropagationDelayModel (),
+                                      rtnFeederLink->GetPropagationDelayModel (),
+                                      gwMobility);
 
       if (m_fadingModel != SatEnums::FADING_OFF)
         {
@@ -415,8 +412,8 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
   Ptr<NetDevice> gwNd = m_gwHelper->Install (gwNode,
                                              gwId,
                                              beamId,
-                                             feederLink.first,
-                                             feederLink.second,
+                                             fwdFeederLink,
+                                             rtnFeederLink,
                                              m_ncc);
 
   Ipv4InterfaceContainer gwAddress = m_ipv4Helper.Assign (gwNd);
@@ -441,8 +438,8 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
           MakeCallback (&SatNetDevice::ToggleState, DynamicCast<SatNetDevice> (gwNd));
 
       m_bstpController->AddNetDeviceCallback (beamId,
-                                              ulFreqId,
-                                              flFreqId,
+                                              fwdUlFreqId,
+                                              fwdFlFreqId,
                                               gwId,
                                               gwNdCb);
     }
@@ -450,8 +447,8 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
   // install UTs
   NetDeviceContainer utNd = m_utHelper->Install (ut,
                                                  beamId,
-                                                 userLink.first,
-                                                 userLink.second,
+                                                 fwdUserLink,
+                                                 rtnUserLink,
                                                  DynamicCast<SatNetDevice> (gwNd),
                                                  m_ncc);
 
@@ -948,38 +945,21 @@ SatBeamHelper::CreateBeamInfo () const
   return oss.str ();
 }
 
-SatBeamHelper::ChannelPair_t
-SatBeamHelper::GetChannelPair (std::map<uint32_t, ChannelPair_t > & chPairMap, uint32_t frequencyId, bool isUserLink)
+Ptr<SatChannel>
+SatBeamHelper::GetChannel (SatEnums::ChannelType_t channelType, uint32_t freqId)
 {
-  NS_LOG_FUNCTION (this << frequencyId << isUserLink);
+  NS_LOG_FUNCTION (this << channelType << freqId);
 
-  ChannelPair_t channelPair;
-  std::map<uint32_t, ChannelPair_t >::iterator mapIterator = chPairMap.find (frequencyId);
+  std::pair<SatEnums::ChannelType_t, uint32_t> key = std::make_pair (channelType, freqId);
+  ChannelContainer_t::iterator it = m_channels.find (key);
 
-  if ( mapIterator == chPairMap.end ())
+  if (it == m_channels.end ())
     {
-      Ptr<SatChannel> forwardCh = m_channelFactory.Create<SatChannel> ();
-      Ptr<SatChannel> returnCh = m_channelFactory.Create<SatChannel> ();
-
-      if ( isUserLink )
-        {
-          forwardCh->SetChannelType (SatEnums::FORWARD_USER_CH);
-          returnCh->SetChannelType (SatEnums::RETURN_USER_CH);
-        }
-      else
-        {
-          forwardCh->SetChannelType (SatEnums::FORWARD_FEEDER_CH);
-          returnCh->SetChannelType (SatEnums::RETURN_FEEDER_CH);
-        }
-
-      forwardCh->SetFrequencyConverter (m_carrierFreqConverter);
-      returnCh->SetFrequencyConverter (m_carrierFreqConverter);
-
-      forwardCh->SetBandwidthConverter (m_carrierBandwidthConverter);
-      returnCh->SetBandwidthConverter (m_carrierBandwidthConverter);
-
-      forwardCh->SetFrequencyId (frequencyId);
-      returnCh->SetFrequencyId (frequencyId);
+      Ptr<SatChannel> channel = m_channelFactory.Create<SatChannel> ();
+      channel->SetChannelType (channelType);
+      channel->SetFrequencyConverter (m_carrierFreqConverter);
+      channel->SetBandwidthConverter (m_carrierBandwidthConverter);
+      channel->SetFrequencyId (freqId);
 
       Ptr<PropagationDelayModel> pDelay;
       // Signal propagates at the speed of light
@@ -998,24 +978,17 @@ SatBeamHelper::GetChannelPair (std::map<uint32_t, ChannelPair_t > & chPairMap, u
           NS_FATAL_ERROR ("Unsupported propagation delay model!");
         }
 
-      forwardCh->SetPropagationDelayModel (pDelay);
-      returnCh->SetPropagationDelayModel (pDelay);
+      channel->SetPropagationDelayModel (pDelay);
 
       Ptr<SatFreeSpaceLoss> pFsl =  CreateObject<SatFreeSpaceLoss> ();
-      forwardCh->SetFreeSpaceLoss (pFsl);
-      returnCh->SetFreeSpaceLoss (pFsl);
+      channel->SetFreeSpaceLoss (pFsl);
 
-      channelPair.first = forwardCh;
-      channelPair.second = returnCh;
+      m_channels.insert (std::make_pair (key, channel));
 
-      chPairMap.insert (std::pair<uint32_t, ChannelPair_t > (frequencyId, channelPair));
-    }
-  else
-    {
-      channelPair = mapIterator->second;
+      return channel;
     }
 
-  return channelPair;
+  return (*it).second;
 }
 
 bool

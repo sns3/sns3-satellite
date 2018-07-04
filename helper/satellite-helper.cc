@@ -50,10 +50,15 @@ SatHelper::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatHelper")
     .SetParent<Object> ()
     .AddConstructor<SatHelper> ()
-    .AddAttribute ("SatConfFileName",
-                   "Name of the satellite network configuration file.",
-                   StringValue ("Scenario72Conf.txt"),
-                   MakeStringAccessor (&SatHelper::m_satConfFileName),
+    .AddAttribute ("SatRtnConfFileName",
+                   "Name of the satellite network RTN link configuration file.",
+                   StringValue ("Scenario72RtnConf.txt"),
+                   MakeStringAccessor (&SatHelper::m_rtnConfFileName),
+                   MakeStringChecker ())
+    .AddAttribute ("SatFwdConfFileName",
+                   "Name of the satellite network FWD link configuration file.",
+                   StringValue ("Scenario72FwdConf.txt"),
+                   MakeStringAccessor (&SatHelper::m_fwdConfFileName),
                    MakeStringChecker ())
     .AddAttribute ("GwPosFileName",
                    "Name of the GW positions configuration file.",
@@ -163,7 +168,8 @@ SatHelper::GetInstanceTypeId (void) const
 }
 
 SatHelper::SatHelper ()
-  : m_satConfFileName ("Scenario72Conf.txt"),
+  : m_rtnConfFileName ("Scenario72RtnConf.txt"),
+    m_fwdConfFileName ("Scenario72FwdConf.txt"),
     m_gwPosFileName ("Scenario72GwPos.txt"),
     m_geoPosFileName ("Scenario72GeoPos.txt"),
     m_waveformConfFileName ("dvbRcs2Waveforms.txt"),
@@ -184,7 +190,11 @@ SatHelper::SatHelper ()
 
   m_satConf = CreateObject<SatConf> ();
 
-  m_satConf->Initialize (m_satConfFileName, m_gwPosFileName, m_geoPosFileName, m_waveformConfFileName);
+  m_satConf->Initialize (m_rtnConfFileName,
+                         m_fwdConfFileName,
+                         m_gwPosFileName,
+                         m_geoPosFileName,
+                         m_waveformConfFileName);
 
   // Create antenna gain patterns
   m_antennaGainPatterns = CreateObject<SatAntennaGainPatternContainer> ();
@@ -490,11 +500,26 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
               m_userHelper->InstallUt (uts.Get (i), info->second.GetUtUserCount (i));
             }
 
-          std::vector<uint32_t> conf = m_satConf->GetBeamConfiguration (info->first);
+          std::vector<uint32_t> rtnConf = m_satConf->GetBeamConfiguration (info->first, SatEnums::LD_RETURN);
+          std::vector<uint32_t> fwdConf = m_satConf->GetBeamConfiguration (info->first, SatEnums::LD_FORWARD);
+
+          /**
+           * GW and beam ids are assumed to be the same for both directions
+           * currently!
+           */
+          NS_ASSERT (rtnConf[SatConf::GW_ID_INDEX] == fwdConf[SatConf::GW_ID_INDEX]);
+          NS_ASSERT (rtnConf[SatConf::BEAM_ID_INDEX] == fwdConf[SatConf::BEAM_ID_INDEX]);
 
           // gw index starts from 1 and we have stored them starting from 0
-          Ptr<Node> gwNode = gwNodes.Get (conf[SatConf::GW_ID_INDEX] - 1);
-          m_beamHelper->Install (uts, gwNode, conf[SatConf::GW_ID_INDEX], conf[SatConf::BEAM_ID_INDEX], conf[SatConf::U_FREQ_ID_INDEX], conf[SatConf::F_FREQ_ID_INDEX]);
+          Ptr<Node> gwNode = gwNodes.Get (rtnConf[SatConf::GW_ID_INDEX] - 1);
+          m_beamHelper->Install (uts,
+                                 gwNode,
+                                 rtnConf[SatConf::GW_ID_INDEX],
+                                 rtnConf[SatConf::BEAM_ID_INDEX],
+                                 rtnConf[SatConf::U_FREQ_ID_INDEX],
+                                 rtnConf[SatConf::F_FREQ_ID_INDEX],
+                                 fwdConf[SatConf::U_FREQ_ID_INDEX],
+                                 fwdConf[SatConf::F_FREQ_ID_INDEX]);
         }
 
       m_userHelper->InstallGw (m_beamHelper->GetGwNodes (), gwUsers);

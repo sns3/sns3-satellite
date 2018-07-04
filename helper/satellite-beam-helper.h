@@ -67,7 +67,8 @@ public:
    */
   typedef SatTypedefs::CarrierBandwidthConverter_t CarrierBandwidthConverter;
 
-  typedef std::pair<Ptr<SatChannel>, Ptr<SatChannel> >  ChannelPair_t;    //forward = first, return  = second
+  typedef std::map<std::pair<SatEnums::ChannelType_t,
+                   uint32_t>, Ptr<SatChannel> >         ChannelContainer_t;
   typedef std::pair<uint32_t, uint32_t >                FrequencyPair_t;  // user = first, feeder = second
   typedef std::pair<uint32_t, uint32_t>                 GwLink_t;         // first GW ID, second feeder link frequency id
 
@@ -164,14 +165,23 @@ public:
    * \param gwNode pointer of GW node
    * \param gwId id of the GW
    * \param beamId  id of the beam
-   * \param ulFreqId id of the user link frequency
-   * \param flFreqId id of the feeder link frequency
+   * \param rtnUlFreqId id of the return user link frequency
+   * \param rtnFlFreqId id of the return feeder link frequency
+   * \param fwdUlFreqId id of the forward user link frequency
+   * \param fwdFlFreqId id of the forward feeder link frequency
    *
    * This method creates a beam  with the requested attributes
    * and associate the resulting ns3::NetDevices with the ns3::Nodes.
    * \return node GW node of the beam.
    */
-  Ptr<Node> Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint32_t beamId, uint32_t ulFreqId, uint32_t flFreqId );
+  Ptr<Node> Install (NodeContainer ut,
+                     Ptr<Node> gwNode,
+                     uint32_t gwId,
+                     uint32_t beamId,
+                     uint32_t rtnUlFreqId,
+                     uint32_t rtnFlFreqId,
+                     uint32_t fwdUlFreqId,
+                     uint32_t fwdFlFreqId);
 
   /**
    * \param beamId beam ID
@@ -309,10 +319,9 @@ private:
   std::set<GwLink_t >                       m_gwLinks;     // gateway links (GW id and feeder frequency id pairs).
   std::map<uint32_t, Ptr<Node> >            m_gwNode;      // first GW ID, second node pointer
   std::multimap<uint32_t, Ptr<Node> >       m_utNode;      // first Beam ID, second node pointer of the UT
-  std::map<uint32_t, ChannelPair_t >        m_ulChannels;  // user link ID, channel pointers pair
-  std::map<uint32_t, ChannelPair_t >        m_flChannels;  // feeder link ID, channel pointers pair
   std::map<uint32_t, FrequencyPair_t >      m_beamFreqs;   // first beam ID, channel frequency IDs pair
 
+  ChannelContainer_t m_channels;
 
   /**
    * Trace callback for creation traces
@@ -404,14 +413,13 @@ private:
   std::string CreateBeamInfo () const;
 
   /**
-   * Gets satellite channel pair from requested map.
-   * In case that channel pair is not found, new is created and returned.
-   * \param chPairMap map where channel pair is get
-   * \param frequencyId ID of the frequency
-   * \param isUserLink flag indicating if link user link is requested (otherwise feeder link).
-   * \return satellite channel pair from requested map
+   * \brief Get channel of a certain channel type and frequency id. If it
+   * is not found, the method creates and stores such for future purposes.
+   * \param channelType Channel type, i.e. RTN user, RTN feeder, FWD user, FWD feeder
+   * \param freqId Frequency id
+   * \return Channel pointer
    */
-  ChannelPair_t GetChannelPair (std::map<uint32_t, ChannelPair_t >& chPairMap, uint32_t frequencyId, bool isUserLink);
+  Ptr<SatChannel> GetChannel (SatEnums::ChannelType_t channelType, uint32_t freqId);
 
   /**
    * Creates GW node according to given id and stores GW to map.

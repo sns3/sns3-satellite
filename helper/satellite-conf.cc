@@ -143,14 +143,22 @@ SatConf::SatConf ()
   // Nothing done here
 }
 
-void SatConf::Initialize (std::string satConf, std::string gwPos, std::string satPos, std::string wfConf)
+void SatConf::Initialize (std::string rtnConf,
+                          std::string fwdConf,
+                          std::string gwPos,
+                          std::string satPos,
+                          std::string wfConf)
 {
   NS_LOG_FUNCTION (this);
 
   std::string dataPath = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory () + "/";
 
   // Load satellite configuration file
-  LoadSatConf (dataPath + satConf);
+  m_rtnConf = LoadSatConf (dataPath + rtnConf);
+  m_fwdConf = LoadSatConf (dataPath + fwdConf);
+
+  NS_ASSERT (m_rtnConf.size () == m_fwdConf.size ());
+  m_beamCount = m_rtnConf.size ();
 
   // Load GW positions
   LoadPositions (dataPath + gwPos, m_gwPositions);
@@ -304,7 +312,7 @@ SatConf::GetCarrierBandwidthHz ( SatEnums::ChannelType_t chType, uint32_t carrie
   return carrierBandwidthHz;
 }
 
-std::ifstream* SatConf::OpenFile (std::string filePathName)
+std::ifstream* SatConf::OpenFile (std::string filePathName) const
 {
   NS_LOG_FUNCTION (this << filePathName);
 
@@ -326,10 +334,12 @@ std::ifstream* SatConf::OpenFile (std::string filePathName)
   return ifs;
 }
 
-void
-SatConf::LoadSatConf (std::string filePathName)
+std::vector <std::vector <uint32_t> >
+SatConf::LoadSatConf (std::string filePathName) const
 {
   NS_LOG_FUNCTION (this << filePathName);
+
+  std::vector <std::vector <uint32_t> > conf;
 
   // READ FROM THE SPECIFIED INPUT FILE
   std::ifstream *ifs = OpenFile (filePathName);
@@ -353,16 +363,16 @@ SatConf::LoadSatConf (std::string filePathName)
       beamConf.push_back (gwId);
       beamConf.push_back (feederChannelId);
 
-      m_conf.push_back (beamConf);
+      conf.push_back (beamConf);
 
       // get next row
       *ifs >> beamId >> userChannelId >> gwId >> feederChannelId;
     }
 
-  m_beamCount = m_conf.size ();
-
   ifs->close ();
   delete ifs;
+
+  return conf;
 }
 
 void
@@ -420,12 +430,14 @@ SatConf::GetUtCount () const
 }
 
 std::vector <uint32_t>
-SatConf::GetBeamConfiguration (uint32_t beamId) const
+SatConf::GetBeamConfiguration (uint32_t beamId, SatEnums::SatLinkDir_t dir) const
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT ((beamId > 0) && (beamId <=  m_beamCount));
 
-  return m_conf[beamId - 1];
+  return (dir == SatEnums::LD_RETURN) ?
+      m_rtnConf[beamId - 1] :
+      m_fwdConf[beamId - 1];
 }
 
 uint32_t
