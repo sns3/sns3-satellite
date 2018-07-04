@@ -58,6 +58,7 @@ main (int argc, char *argv[])
   CommandLine cmd;
   cmd.AddValue ("enableBeamHopping", "Enable FWD link beam hopping", enableBeamHopping);
   cmd.AddValue ("simTime", "Length of simulation", simLength);
+  cmd.AddValue ("scaleDown", "Scale down the bandwidth to see differences with less traffic", scaleDown);
   simulationHelper->AddDefaultUiArguments(cmd);
   cmd.Parse (argc, argv);
 
