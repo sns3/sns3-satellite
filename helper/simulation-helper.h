@@ -249,6 +249,14 @@ public:
   void ConfigureFrequencyBands ();
 
   /**
+   * \brief Configure the beam hopping functionality for
+   * the FWD link. This includes also setup of the proper
+   * frequency configuration related to reuse one in
+   * FWD link beam hopping.
+   */
+  void ConfigureFwdLinkBeamHopping ();
+
+  /**
    * \brief Enable external fading input.
    */
   void EnableExternalFadingInputTrace ();

@@ -730,6 +730,34 @@ SimulationHelper::ConfigureFrequencyBands ()
 }
 
 void
+SimulationHelper::ConfigureFwdLinkBeamHopping ()
+{
+  NS_LOG_FUNCTION (this);
+
+  // Enable flag
+  Config::SetDefault ("ns3::SatBeamHelper::EnableFwdLinkBeamHopping", BooleanValue (true));
+
+  // Channel configuration for 500 MHz user link bandwidth
+  Config::SetDefault ("ns3::SatHelper::SatFwdConfFileName", StringValue ("Scenario72FwdConf_BH.txt"));
+
+  Config::SetDefault ("SatBstpController::BeamHoppingMode", StringValue ("Static"));
+  Config::SetDefault ("SatBstpController::StaticBeamHoppingConfigFileName", StringValue ("SatBstpConf_GW1.txt"));
+
+  // Frequency configuration for 500 MHz user link bandwidth
+  Config::SetDefault ("ns3::SatConf::FwdFeederLinkBandwidth", DoubleValue (2e+09));
+  Config::SetDefault ("ns3::SatConf::FwdFeederLinkBaseFrequency", DoubleValue (2.75e+10));
+  Config::SetDefault ("ns3::SatConf::FwdUserLinkBandwidth", DoubleValue (5e+08));
+  Config::SetDefault ("ns3::SatConf::FwdUserLinkBaseFrequency", DoubleValue (1.97e+10));
+
+  Config::SetDefault ("ns3::SatConf::FwdUserLinkChannels", UintegerValue (1));
+  Config::SetDefault ("ns3::SatConf::FwdFeederLinkChannels", UintegerValue (4));
+
+  Config::SetDefault ("ns3::SatConf::FwdCarrierAllocatedBandwidth", DoubleValue (5e+08));
+  Config::SetDefault ("ns3::SatConf::FwdCarrierRollOff", DoubleValue (0.2));
+  Config::SetDefault ("ns3::SatConf::FwdCarrierSpacing", DoubleValue (0.0));
+}
+
+void
 SimulationHelper::EnableOutputTraces ()
 {
   NS_LOG_FUNCTION (this);
