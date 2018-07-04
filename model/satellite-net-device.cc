@@ -206,6 +206,15 @@ SatNetDevice::SetNodeInfo (Ptr<SatNodeInfo> nodeInfo)
 }
 
 void
+SatNetDevice::ToggleState (bool enabled)
+{
+  NS_LOG_FUNCTION (this << enabled);
+
+
+}
+
+
+void
 SatNetDevice::SetReceiveErrorModel (Ptr<ErrorModel> em)
 {
   NS_LOG_FUNCTION (this << em);

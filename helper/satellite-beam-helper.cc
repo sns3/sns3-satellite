@@ -27,6 +27,7 @@
 #include "ns3/enum.h"
 #include "ns3/pointer.h"
 #include "ns3/config.h"
+#include "../model/satellite-bstp-controller.h"
 #include "../model/satellite-const-variables.h"
 #include "../model/satellite-channel.h"
 #include "../model/satellite-phy.h"
@@ -122,6 +123,11 @@ SatBeamHelper::GetTypeId (void)
                    TimeValue (MilliSeconds (1000)),
                    MakeTimeAccessor (&SatBeamHelper::m_ctrlMsgStoreTimeRtnLink),
                    MakeTimeChecker ())
+    .AddAttribute ("EnableFwdLinkBeamHopping",
+                   "Enable beam hopping in forward link.",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatBeamHelper::m_enableFwdLinkBeamHopping),
+                   MakeBooleanChecker ())
     .AddTraceSource ("Creation", "Creation traces",
                      MakeTraceSourceAccessor (&SatBeamHelper::m_creationTrace),
                      "ns3::SatTypedefs::CreationCallback")
@@ -145,7 +151,9 @@ SatBeamHelper::SatBeamHelper ()
     m_randomAccessModel (SatEnums::RA_MODEL_OFF),
     m_raInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
     m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED),
-    m_raConstantErrorRate (0.0)
+    m_raConstantErrorRate (0.0),
+    m_enableFwdLinkBeamHopping (false),
+    m_bstpController ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -167,7 +175,9 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
     m_randomAccessModel (SatEnums::RA_MODEL_OFF),
     m_raInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
     m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR),
-    m_raConstantErrorRate (0.0)
+    m_raConstantErrorRate (0.0),
+    m_enableFwdLinkBeamHopping (false),
+    m_bstpController ()
 {
   NS_LOG_FUNCTION (this << geoNode << rtnLinkCarrierCount << fwdLinkCarrierCount << seq);
 
@@ -273,6 +283,11 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
         m_markovConf = NULL;
         break;
       }
+    }
+
+  if (m_enableFwdLinkBeamHopping)
+    {
+      m_bstpController = CreateObject<SatBstpController> ();
     }
 }
 
@@ -419,6 +434,18 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
   uint32_t maxBbFrameDataSizeInBytes = ( bbFrameConf->GetBbFramePayloadBits (bbFrameConf->GetMostRobustModcod (frameType), frameType) / SatConstVariables::BITS_PER_BYTE ) - bbFrameConf->GetBbFrameHeaderSizeInBytes ();
 
   m_ncc->AddBeam (beamId, MakeCallback (&SatNetDevice::SendControlMsg, DynamicCast<SatNetDevice> (gwNd)), m_superframeSeq, maxBbFrameDataSizeInBytes );
+
+  if (m_bstpController)
+    {
+      SatBstpController::ToggleCallback gwNdCb =
+          MakeCallback (&SatNetDevice::ToggleState, DynamicCast<SatNetDevice> (gwNd));
+
+      m_bstpController->AddNetDeviceCallback (beamId,
+                                              ulFreqId,
+                                              flFreqId,
+                                              gwId,
+                                              gwNdCb);
+    }
 
   // install UTs
   NetDeviceContainer utNd = m_utHelper->Install (ut,

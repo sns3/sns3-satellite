@@ -31,6 +31,7 @@
 
 #include "ns3/satellite-ncc.h"
 #include "ns3/satellite-antenna-gain-pattern-container.h"
+#include "ns3/satellite-bstp-controller.h"
 #include "ns3/satellite-phy-rx-carrier-conf.h"
 #include "ns3/satellite-mobility-observer.h"
 #include "ns3/satellite-markov-container.h"
@@ -377,6 +378,19 @@ private:
    * model is RA_CONSTANT_COLLISION_PROBABILITY.
    */
   double m_raConstantErrorRate;
+
+  /**
+   * Flag indicating whether beam hopping is enabled in
+   * FWD link. If enabled, SatBstpController is created with
+   * proper callbacks and reuse 1 is configured for FWD link.
+   */
+  bool m_enableFwdLinkBeamHopping;
+
+  /**
+   * Beam Switching Time Plan controller, which is created
+   * if FWD link beam hopping is enabled (m_enableFwdLinkBeamHopping).
+   */
+  Ptr<SatBstpController> m_bstpController;
 
   /**
    * Packet trace
