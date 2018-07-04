@@ -149,12 +149,6 @@ private:
   Ptr<SatFwdLinkScheduler> m_fwdScheduler;
 
   /**
-   * Flag indicating if Dummy Frames are sent or not.
-   * false means that only transmission time is simulated without sending.
-   */
-  bool m_dummyFrameSendingEnabled;
-
-  /**
    * Guard time for BB frames. The guard time is modeled by shortening
    * the duration of a BB frame by a m_guardTime set by an attribute.
    */
@@ -163,7 +157,7 @@ private:
   /**
    * Trace for transmitted BB frames.
    */
-  TracedCallback<Ptr<SatBbFrame> > m_bbFrameTxTrace;
+  TracedCallback<SatEnums::SatBbFrameType_t> m_bbFrameTxTrace;
 
   /**
    * Capacity request receive callback.

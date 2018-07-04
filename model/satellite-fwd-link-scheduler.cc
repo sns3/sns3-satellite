@@ -111,6 +111,11 @@ SatFwdLinkScheduler::GetTypeId (void)
                    PointerValue (),
                    MakePointerAccessor (&SatFwdLinkScheduler::m_bbFrameConf),
                    MakePointerChecker<SatBbFrameConf> ())
+    .AddAttribute ("DummyFrameSendingEnabled",
+                   "Flag to tell, if dummy frames are sent or not.",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatFwdLinkScheduler::m_dummyFrameSendingEnabled),
+                   MakeBooleanChecker ())
     .AddAttribute ("SchedulingStartThresholdTime",
                    "Threshold time of total transmissions in BB Frame container to trigger a scheduling round.",
                    TimeValue (MilliSeconds (5)),
@@ -209,7 +214,7 @@ SatFwdLinkScheduler::SetTxOpportunityCallback (SatFwdLinkScheduler::TxOpportunit
 }
 
 
-Ptr<SatBbFrame>
+std::pair<Ptr<SatBbFrame>, const Time>
 SatFwdLinkScheduler::GetNextFrame ()
 {
   NS_LOG_FUNCTION (this);
@@ -220,9 +225,10 @@ SatFwdLinkScheduler::GetNextFrame ()
     }
 
   Ptr<SatBbFrame> frame = m_bbFrameContainer->GetNextFrame ();
+  Time frameDuration;
 
-  // create dummy frame
-  if ( frame == NULL )
+  // If no bb frame available and dummy frames enabled
+  if (m_dummyFrameSendingEnabled && frame == NULL)
     {
       frame = Create<SatBbFrame> (m_bbFrameConf->GetDefaultModCod (), SatEnums::DUMMY_FRAME, m_bbFrameConf);
 
@@ -237,9 +243,21 @@ SatFwdLinkScheduler::GetNextFrame ()
 
       // Add dummy packet to dummy frame
       frame->AddPayload (dummyPacket);
+
+      frameDuration = frame->GetDuration ();
+    }
+  // If no bb frame available and dummy frames disabled
+  else if (frame == NULL)
+    {
+      frameDuration = m_bbFrameConf->GetDummyBbFrameDuration ();
+    }
+  // If bb frame available
+  else
+    {
+      frameDuration = frame->GetDuration ();
     }
 
-  return frame;
+  return std::make_pair(frame, frameDuration);
 }
 
 void

@@ -138,7 +138,7 @@ public:
    *
    * \return Pointer to frame
    */
-  virtual Ptr<SatBbFrame> GetNextFrame ();
+  virtual std::pair<Ptr<SatBbFrame>, const Time> GetNextFrame ();
 
   /**
    * Callback to get scheduling contexts from upper layer
@@ -250,6 +250,12 @@ private:
    * MAC address of the this instance (node)
    */
   Mac48Address m_macAddress;
+
+  /**
+   * Flag indicating if Dummy Frames are sent or not.
+   * false means that only transmission time is simulated without sending.
+   */
+  bool m_dummyFrameSendingEnabled;
 
   /**
    * Random variable used in FWD link scheduling

@@ -269,7 +269,7 @@ SimulationHelper::SetDefaultValues ()
   Config::SetDefault ("ns3::SatUtHelper::EnableChannelEstimationError", BooleanValue (true));
   Config::SetDefault ("ns3::SatGwHelper::EnableChannelEstimationError", BooleanValue (true));
 
-  Config::SetDefault ("ns3::SatGwMac::DummyFrameSendingEnabled", BooleanValue (false));
+  Config::SetDefault ("ns3::SatFwdLinkScheduler::DummyFrameSendingEnabled", BooleanValue (false));
 
   Config::SetDefault ("ns3::SatQueue::MaxPackets", UintegerValue (10000));
 }
@@ -608,6 +608,12 @@ SimulationHelper::CreateDefaultFwdLinkStats ()
 
   // Packet error
   m_statContainer->AddGlobalFwdDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+  // Frame type usage
+  Config::SetDefault ("ns3::SatStatsFrameTypeUsageHelper::Percentage", BooleanValue (true));
+  m_statContainer->AddGlobalFrameTypeUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerGwFrameTypeUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFrameTypeUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
 }
 
 void

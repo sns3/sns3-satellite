@@ -38,6 +38,7 @@
 #include <ns3/satellite-stats-signalling-load-helper.h>
 #include <ns3/satellite-stats-throughput-helper.h>
 #include <ns3/satellite-stats-waveform-usage-helper.h>
+#include <ns3/satellite-stats-frame-type-usage-helper.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatStatsHelperContainer");
 
@@ -86,6 +87,7 @@ SatStatsHelperContainer::DoDispose ()
  * - [Global,PerGw,PerBeam] WaveformUsage
  * - Global [Fwd,Rtn] [Feeder,User] LinkSinr
  * - Global [Fwd,Rtn] [Feeder,User] LinkRxPower
+ * - [Global,PerGw,PerBeam] FrameTypeUsage
  *
  * Also check the Doxygen documentation of this class for more information.
  */
@@ -451,6 +453,20 @@ SatStatsHelperContainer::GetTypeId ()
     ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalRtnUserLinkRxPower,
                                   "global return user link Rx power statistics")
     ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
+
+    // Frame type usage statistics.
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalFrameTypeUsage,
+                                  "global frame type usage statistics")
+    MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
+                     SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerGwFrameTypeUsage,
+                                  "per GW frame type usage statistics")
+    MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
+                     SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerBeamFrameTypeUsage,
+                                  "per beam frame type usage statistics")
+		MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
+										 SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
   ;
   return tid;
 }
@@ -917,6 +933,11 @@ SAT_STATS_GLOBAL_METHOD_DEFINITION      (FwdFeederLinkRxPower, "fwd-feeder-link-
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (FwdUserLinkRxPower,   "fwd-user-link-rx-power")
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnFeederLinkRxPower, "rtn-feeder-link-rx-power")
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnUserLinkRxPower,   "rtn-user-link-rx-power")
+
+// Frame type usage statistics
+SAT_STATS_GLOBAL_METHOD_DEFINITION			(FrameTypeUsage, "frame-type-usage")
+SAT_STATS_PER_GW_METHOD_DEFINITION			(FrameTypeUsage, "frame-type-usage")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION		(FrameTypeUsage, "frame-type-usage")
 
 
 std::string // static

@@ -248,7 +248,7 @@ SatPerPacketFwdLinkUserTestCase::DoRun (void)
   Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (em));
 
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (m_fading));
-  Config::SetDefault ("ns3::SatGwMac::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));
+  Config::SetDefault ("ns3::SatFwdLinkScheduler::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));
 
   Config::SetDefault ("ns3::SatHelper::UtCount", UintegerValue (1));
   Config::SetDefault ("ns3::SatHelper::UtUsers", UintegerValue (1));
@@ -403,7 +403,7 @@ SatPerPacketFwdLinkFullTestCase::DoRun (void)
 
 
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (m_fading));
-  Config::SetDefault ("ns3::SatGwMac::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));
+  Config::SetDefault ("ns3::SatFwdLinkScheduler::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));
 
   Config::SetDefault ("ns3::SatHelper::UtCount", UintegerValue (1));
   Config::SetDefault ("ns3::SatHelper::UtUsers", UintegerValue (1));
@@ -548,7 +548,7 @@ SatPerPacketRtnLinkUserTestCase::DoRun (void)
 
 
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (m_fading));
-  Config::SetDefault ("ns3::SatGwMac::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));
+  Config::SetDefault ("ns3::SatFwdLinkScheduler::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));
 
   Config::SetDefault ("ns3::SatHelper::UtCount", UintegerValue (1));
   Config::SetDefault ("ns3::SatHelper::UtUsers", UintegerValue (1));
@@ -679,7 +679,7 @@ SatPerPacketRtnLinkFullTestCase::DoRun (void)
   Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-per-packet-if", m_extName, true);
 
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (m_fading));
-  Config::SetDefault ("ns3::SatGwMac::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));
+  Config::SetDefault ("ns3::SatFwdLinkScheduler::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));
 
   Config::SetDefault ("ns3::SatHelper::UtCount", UintegerValue (1));
   Config::SetDefault ("ns3::SatHelper::UtUsers", UintegerValue (1));

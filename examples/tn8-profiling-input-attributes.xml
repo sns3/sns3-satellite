@@ -276,7 +276,7 @@
  <default name="ns3::SatGeoUserPhy::DefaultFadingValue" value="1"/>
  <default name="ns3::SatGeoUserPhy::OtherSysIfCOverIDb" value="27.5"/>
  <default name="ns3::SatGeoUserPhy::AciIfCOverIDb" value="17"/>
- <default name="ns3::SatGwMac::DummyFrameSendingEnabled" value="false"/>
+ <default name="ns3::SatFwdLinkScheduler::DummyFrameSendingEnabled" value="false"/>
  <default name="ns3::SatGwMac::GuardTime" value="+1000.0ns"/>
  <default name="ns3::SatMac::EnableStatisticsTags" value="false"/>
  <default name="ns3::SatGwPhy::RxTemperatureDbk" value="24.62"/>
