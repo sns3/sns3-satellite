@@ -428,6 +428,10 @@
  <default name="ns3::SatGwHelper::RtnLinkErrorModel" value="AVI"/>
  <default name="ns3::SatGwHelper::DaRtnLinkInterferenceModel" value="Constant"/>
  <default name="ns3::SatGwHelper::EnableChannelEstimationError" value="true"/>
+ <default name="ns3::SatHelper::SatConfFileName" value="Scenario72Conf.txt"/>
+ <default name="ns3::SatHelper::GwPosFileName" value="Scenario72GwPos.txt"/>
+ <default name="ns3::SatHelper::GeoSatPosFileName" value="Scenario72GeoPos.txt"/>
+ <default name="ns3::SatHelper::RtnLinkWaveformConfFileName" value="dvbRcs2Waveforms.txt"/>
  <default name="ns3::SatHelper::UtCount" value="3"/>
  <default name="ns3::SatHelper::GwUsers" value="1"/>
  <default name="ns3::SatHelper::UtUsers" value="1"/>

@@ -99,13 +99,8 @@ SimpleUnicast1::DoRun (void)
   Config::SetDefault ("ns3::SatUtHelper::FwdLinkErrorModel", EnumValue (em));
   Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (em));
 
-  // Creating the reference system. Note, currently the satellite module supports
-  // only one reference system, which is named as "Scenario72". The string is utilized
-  // in mapping the scenario to the needed reference system configuration files. Arbitrary
-  // scenario name results in fatal error.
-  std::string scenarioName = "Scenario72";
-
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
+  // Creating the reference system.
+  Ptr<SatHelper> helper = CreateObject<SatHelper> ();
   helper->CreatePredefinedScenario (SatHelper::SIMPLE);
 
   NodeContainer utUsers = helper->GetUtUsers ();
@@ -202,13 +197,8 @@ SimpleUnicast2::DoRun (void)
   Config::SetDefault ("ns3::SatUtHelper::FwdLinkErrorModel", EnumValue (em));
   Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (em));
 
-  // Creating the reference system. Note, currently the satellite module supports
-  // only one reference system, which is named as "Scenario72". The string is utilized
-  // in mapping the scenario to the needed reference system configuration files. Arbitrary
-  // scenario name results in fatal error.
-  std::string scenarioName = "Scenario72";
-
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
+  // Creating the reference system.
+  Ptr<SatHelper> helper = CreateObject<SatHelper> ();
   helper->CreatePredefinedScenario (SatHelper::LARGER);
 
   NodeContainer utUsers = helper->GetUtUsers ();
@@ -327,13 +317,8 @@ SimpleUnicast3::DoRun (void)
   Config::SetDefault ("ns3::SatUtHelper::FwdLinkErrorModel", EnumValue (em));
   Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (em));
 
-  // Creating the reference system. Note, currently the satellite module supports
-  // only one reference system, which is named as "Scenario72". The string is utilized
-  // in mapping the scenario to the needed reference system configuration files. Arbitrary
-  // scenario name results in fatal error.
-  std::string scenarioName = "Scenario72";
-
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
+  // Creating the reference system.
+  Ptr<SatHelper> helper = CreateObject<SatHelper> ();
   helper->CreatePredefinedScenario (SatHelper::FULL);
 
   NodeContainer utUsers = helper->GetUtUsers ();
@@ -456,13 +441,8 @@ SimpleUnicast4::DoRun (void)
   Config::SetDefault ("ns3::SatUtHelper::FwdLinkErrorModel", EnumValue (em));
   Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (em));
 
-  // Creating the reference system. Note, currently the satellite module supports
-  // only one reference system, which is named as "Scenario72". The string is utilized
-  // in mapping the scenario to the needed reference system configuration files. Arbitrary
-  // scenario name results in fatal error.
-  std::string scenarioName = "Scenario72";
-
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
+  // Creating the reference system.
+  Ptr<SatHelper> helper = CreateObject<SatHelper> ();
   helper->CreatePredefinedScenario (SatHelper::SIMPLE);
 
   // >>> Start of actual test using Simple scenario >>>
@@ -560,13 +540,8 @@ SimpleUnicast5::DoRun (void)
   Config::SetDefault ("ns3::SatUtHelper::FwdLinkErrorModel", EnumValue (em));
   Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (em));
 
-  // Creating the reference system. Note, currently the satellite module supports
-  // only one reference system, which is named as "Scenario72". The string is utilized
-  // in mapping the scenario to the needed reference system configuration files. Arbitrary
-  // scenario name results in fatal error.
-  std::string scenarioName = "Scenario72";
-
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
+  // Creating the reference system.
+  Ptr<SatHelper> helper = CreateObject<SatHelper> ();
   helper->CreatePredefinedScenario (SatHelper::LARGER);
 
   // >>> Start of actual test using Larger scenario >>>
@@ -673,13 +648,8 @@ SimpleUnicast6::DoRun (void)
   Config::SetDefault ("ns3::SatUtHelper::FwdLinkErrorModel", EnumValue (em));
   Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (em));
 
-  // Creating the reference system. Note, currently the satellite module supports
-  // only one reference system, which is named as "Scenario72". The string is utilized
-  // in mapping the scenario to the needed reference system configuration files. Arbitrary
-  // scenario name results in fatal error.
-  std::string scenarioName = "Scenario72";
-
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
+  // Creating the reference system.
+  Ptr<SatHelper> helper = CreateObject<SatHelper> ();
   helper->CreatePredefinedScenario (SatHelper::FULL);
 
   // >>> Start of actual test using Full scenario >>>
@@ -805,13 +775,8 @@ SimpleUnicast7::DoRun (void)
   Config::SetDefault ("ns3::SatUtHelper::FwdLinkErrorModel", EnumValue (em));
   Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (em));
 
-  // Creating the reference system. Note, currently the satellite module supports
-  // only one reference system, which is named as "Scenario72". The string is utilized
-  // in mapping the scenario to the needed reference system configuration files. Arbitrary
-  // scenario name results in fatal error.
-  std::string scenarioName = "Scenario72";
-
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
+  // Creating the reference system.
+  Ptr<SatHelper> helper = CreateObject<SatHelper> ();
   helper->CreatePredefinedScenario (SatHelper::SIMPLE);
 
   NodeContainer utUsers = helper->GetUtUsers ();
@@ -929,13 +894,8 @@ SimpleUnicast8::DoRun (void)
   Config::SetDefault ("ns3::SatUtHelper::FwdLinkErrorModel", EnumValue (em));
   Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (em));
 
-  // Creating the reference system. Note, currently the satellite module supports
-  // only one reference system, which is named as "Scenario72". The string is utilized
-  // in mapping the scenario to the needed reference system configuration files. Arbitrary
-  // scenario name results in fatal error.
-  std::string scenarioName = "Scenario72";
-
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
+  // Creating the reference system.
+  Ptr<SatHelper> helper = CreateObject<SatHelper> ();
   helper->CreatePredefinedScenario (SatHelper::LARGER);
 
   NodeContainer utUsers = helper->GetUtUsers ();

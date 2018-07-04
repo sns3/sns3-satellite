@@ -50,6 +50,26 @@ SatHelper::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatHelper")
     .SetParent<Object> ()
     .AddConstructor<SatHelper> ()
+    .AddAttribute ("SatConfFileName",
+                   "Name of the satellite network configuration file.",
+                   StringValue ("Scenario72Conf.txt"),
+                   MakeStringAccessor (&SatHelper::m_satConfFileName),
+                   MakeStringChecker ())
+    .AddAttribute ("GwPosFileName",
+                   "Name of the GW positions configuration file.",
+                   StringValue ("Scenario72GwPos.txt"),
+                   MakeStringAccessor (&SatHelper::m_gwPosFileName),
+                   MakeStringChecker ())
+    .AddAttribute ("GeoSatPosFileName",
+                   "Name of the geostationary satellite position configuration file.",
+                   StringValue ("Scenario72GeoPos.txt"),
+                   MakeStringAccessor (&SatHelper::m_geoPosFileName),
+                   MakeStringChecker ())
+    .AddAttribute ("RtnLinkWaveformConfFileName",
+                   "Name of the RTN link waveform configuration file.",
+                   StringValue ("dvbRcs2Waveforms.txt"),
+                   MakeStringAccessor (&SatHelper::m_waveformConfFileName),
+                   MakeStringChecker ())
     .AddAttribute ("UtCount", "The count of created UTs in beam (full or user-defined scenario)",
                    UintegerValue (3),
                    MakeUintegerAccessor (&SatHelper::m_utsInBeam),
@@ -143,7 +163,11 @@ SatHelper::GetInstanceTypeId (void) const
 }
 
 SatHelper::SatHelper ()
-  : m_scenarioCreated (false),
+  : m_satConfFileName ("Scenario72Conf.txt"),
+    m_gwPosFileName ("Scenario72GwPos.txt"),
+    m_geoPosFileName ("Scenario72GeoPos.txt"),
+    m_waveformConfFileName ("dvbRcs2Waveforms.txt"),
+    m_scenarioCreated (false),
     m_creationTraces (false),
     m_detailedCreationTraces (false),
     m_packetTraces (false),
@@ -154,29 +178,13 @@ SatHelper::SatHelper ()
 {
   NS_LOG_FUNCTION (this);
 
-  // Do nothing here
-  NS_ASSERT (true);
-}
-
-SatHelper::SatHelper (std::string scenarioName)
-  : m_scenarioCreated (false),
-    m_detailedCreationTraces (false)
-{
-  NS_LOG_FUNCTION (this);
-
-  // uncomment next line, if attributes are needed already in construction phase
-  //ObjectBase::ConstructSelf(AttributeConstructionList ());
-
-  std::string satConf = scenarioName + "Conf.txt";
-  std::string gwPos = scenarioName + "GwPos.txt";
-  std::string satPos = scenarioName + "GeoPos.txt";
-  std::string wfConf = "dvbRcs2Waveforms.txt";
+  ObjectBase::ConstructSelf(AttributeConstructionList ());
 
   Singleton<SatEnvVariables>::Get ()->Initialize ();
 
   m_satConf = CreateObject<SatConf> ();
 
-  m_satConf->Initialize (satConf, gwPos, satPos, wfConf);
+  m_satConf->Initialize (m_satConfFileName, m_gwPosFileName, m_geoPosFileName, m_waveformConfFileName);
 
   // Create antenna gain patterns
   m_antennaGainPatterns = CreateObject<SatAntennaGainPatternContainer> ();

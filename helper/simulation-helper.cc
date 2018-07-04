@@ -897,8 +897,7 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario)
   // Set final output path
   SetupOutputPath ();
 
-  std::string scenarioName = "Scenario72";
-  m_satHelper = CreateObject<SatHelper> (scenarioName);
+  m_satHelper = CreateObject<SatHelper> ();
 
   // Set UT position allocators, if any
   if (!m_enableInputFileUtListPositions)

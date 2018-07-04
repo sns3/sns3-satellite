@@ -880,7 +880,7 @@ The first step is to instantiate the class into an object instance. This is done
 ``SatHelper`` instance used in the simulation as an input argument to the constructor, as follows.
 ::
 
-  Ptr<SatHelper> h = CreateObject<SatHelper> ("Scenario72");
+  Ptr<SatHelper> h = CreateObject<SatHelper> ();
   h->CreateScenario (SatHelper::SIMPLE);
   
   // ... (snip) ...

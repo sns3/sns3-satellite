@@ -80,14 +80,9 @@ public:
   TypeId GetInstanceTypeId (void) const;
 
   /**
-   * \brief Default constructor
-   */
-  SatHelper ();
-
-  /**
    * \brief Create a base SatHelper for creating customized Satellite topologies.
    */
-  SatHelper (std::string scenarioName);
+  SatHelper ();
 
   /**
    * Destructor for SatHelper
@@ -193,6 +188,14 @@ private:
 
   typedef SatBeamHelper::MulticastBeamInfoItem_t  MulticastBeamInfoItem_t;
   typedef SatBeamHelper::MulticastBeamInfo_t      MulticastBeamInfo_t;
+
+  /**
+   * Configuration file names as attributes of this class
+   */
+  std::string m_satConfFileName;
+  std::string m_gwPosFileName;
+  std::string m_geoPosFileName;
+  std::string m_waveformConfFileName;
 
   /**
    * User helper
