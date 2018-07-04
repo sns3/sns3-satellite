@@ -77,7 +77,7 @@ SimulationHelper::SimulationHelper ()
 	m_enabledBeamsStr (""),
 	m_enabledBeams (),
 	m_outputPath (""),
-	m_utCount (0),
+	m_utCount (),
 	m_utUserCount (0),
 	m_simTime (0),
 	m_numberOfConfiguredFrames (0),
@@ -100,7 +100,7 @@ SimulationHelper::SimulationHelper (std::string simulationName)
 	m_enabledBeamsStr (""),
 	m_enabledBeams (),
 	m_outputPath (""),
-	m_utCount (0),
+	m_utCount (),
 	m_utUserCount (0),
 	m_simTime (0),
 	m_numberOfConfiguredFrames (0),
@@ -140,8 +140,10 @@ SimulationHelper::SetUtCountPerBeam (uint32_t count)
 {
   NS_LOG_FUNCTION (this << count);
 
-  m_utCount = CreateObject<ConstantRandomVariable> ();
-  m_utCount->SetAttribute("Constant", DoubleValue (count));
+  Ptr<RandomVariableStream> utCount = CreateObject<ConstantRandomVariable> ();
+  utCount->SetAttribute("Constant", DoubleValue (count));
+
+  m_utCount.insert (std::make_pair (0, utCount));
 }
 
 void
@@ -149,7 +151,26 @@ SimulationHelper::SetUtCountPerBeam (Ptr<RandomVariableStream> rs)
 {
   NS_LOG_FUNCTION (this << &rs);
 
-  m_utCount = rs;
+  m_utCount.insert (std::make_pair (0, rs));
+}
+
+void
+SimulationHelper::SetUtCountPerBeam (uint32_t beamId, uint32_t count)
+{
+  NS_LOG_FUNCTION (this << beamId << count);
+
+  Ptr<RandomVariableStream> utCount = CreateObject<ConstantRandomVariable> ();
+  utCount->SetAttribute("Constant", DoubleValue (count));
+
+  m_utCount.insert (std::make_pair (beamId, utCount));
+}
+
+void
+SimulationHelper::SetUtCountPerBeam (uint32_t beamId, Ptr<RandomVariableStream> rs)
+{
+  NS_LOG_FUNCTION (this << &rs);
+
+  m_utCount.insert (std::make_pair (beamId, rs));
 }
 
 void
@@ -231,7 +252,7 @@ SimulationHelper::SetDefaultValues ()
   Config::SetDefault ("ns3::SatBbFrameConf::BBFrameUsageMode", StringValue ("NormalFrames"));
 
   ConfigureFrequencyBands ();
-  ConfigureFrame (0, 5e5, 5e5, 0.2, 0.3, false);
+  ConfigureFrame (0, 20e5, 5e5, 0.2, 0.3, false);
 
   SetErrorModel(SatPhyRxCarrierConf::EM_AVI);
   SetInterferenceModel (SatPhyRxCarrierConf::IF_PER_PACKET);
@@ -569,7 +590,6 @@ SimulationHelper::CreateDefaultFwdLinkStats ()
   m_statContainer->AddAverageUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
   m_statContainer->AddAverageUtFwdPhyThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
   m_statContainer->AddAverageBeamFwdAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
-  m_statContainer->AddPerUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   m_statContainer->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
@@ -742,7 +762,7 @@ SimulationHelper::ConfigureFwdLinkBeamHopping ()
 
   Config::SetDefault ("ns3::SatBstpController::BeamHoppingMode", EnumValue (SatBstpController::BH_STATIC));
   Config::SetDefault ("ns3::SatBstpController::StaticBeamHoppingConfigFileName", StringValue ("SatBstpConf_GW1.txt"));
-  Config::SetDefault ("ns3::SatBstpController::SuperframeDuration", TimeValue (MilliSeconds (10)));
+  Config::SetDefault ("ns3::SatBstpController::SuperframeDuration", TimeValue (MilliSeconds (1)));
 
   // Frequency configuration for 500 MHz user link bandwidth
   Config::SetDefault ("ns3::SatConf::FwdFeederLinkBandwidth", DoubleValue (2e+09));
@@ -948,7 +968,7 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario)
 					if (IsBeamEnabled (i))
 						{
 							SatBeamUserInfo info;
-							uint32_t utCount = GetNextUtCount ();
+							uint32_t utCount = GetNextUtCount (i);
 
 							ss << "  Beam " << i << ": UT count= " << utCount;
 
@@ -1226,6 +1246,14 @@ SimulationHelper::SetBeamSet (std::set<uint32_t> beamSet)
   m_enabledBeamsStr = bss.str ();
 }
 
+const std::set<uint32_t>&
+SimulationHelper::GetBeams ()
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_enabledBeams;
+}
+
 bool
 SimulationHelper::IsBeamEnabled (uint32_t beamId) const
 {
@@ -1239,6 +1267,20 @@ SimulationHelper::IsBeamEnabled (uint32_t beamId) const
     }
 
   return beamEnabled;
+}
+
+uint32_t
+SimulationHelper::GetNextUtCount (uint32_t beamId) const
+{
+  NS_LOG_FUNCTION (this << beamId);
+
+  auto iter = m_utCount.find (beamId);
+  if (iter != m_utCount.end())
+    {
+      return m_utCount.at (beamId)->GetInteger ();
+    }
+
+  return m_utCount.at (0)->GetInteger ();
 }
 
 void SimulationHelper::RunSimulation ()
