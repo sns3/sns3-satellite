@@ -180,6 +180,14 @@ public:
    */
   void CnoInfoUpdated (Mac48Address utAddress, double cnoEstimate);
 
+  /**
+   * \brief Return the BB frame duration of the default frame format, i.e.
+   * default MODCOD and NORMAL frame type. This is used by the GW MAC to
+   * schedule next txop events if it is disabled.
+   * \return Default frame duration in Time
+   */
+  Time GetDefaultFrameDuration () const;
+
 private:
   typedef std::map<Mac48Address, Ptr<SatCnoEstimator> > CnoEstimatorMap_t;
 

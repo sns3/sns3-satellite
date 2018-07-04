@@ -265,6 +265,14 @@ SatFwdLinkScheduler::CnoInfoUpdated (Mac48Address utAddress, double cnoEstimate)
   it->second->AddSample (cnoEstimate);
 }
 
+Time
+SatFwdLinkScheduler::GetDefaultFrameDuration () const
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_bbFrameConf->GetBbFrameDuration (m_bbFrameConf->GetDefaultModCod (), SatEnums::NORMAL_FRAME);
+}
+
 void
 SatFwdLinkScheduler::PeriodicTimerExpired ()
 {

@@ -210,7 +210,14 @@ SatNetDevice::ToggleState (bool enabled)
 {
   NS_LOG_FUNCTION (this << enabled);
 
-
+  if (enabled)
+    {
+      m_mac->Enable ();
+    }
+  else
+    {
+      m_mac->Disable ();
+    }
 }
 
 

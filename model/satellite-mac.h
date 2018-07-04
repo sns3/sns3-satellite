@@ -180,6 +180,18 @@ public:
    */
   virtual void ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint8_t flowIndex);
 
+  /**
+   * \brief Enable the MAC layer, i.e. allow it to send data to the PHY layer.
+   * This is used in beam hopping implementation.
+   */
+  virtual void Enable ();
+
+  /**
+   * \brief Disable the MAC layer, i.e. disallow it to send data to the PHY layer.
+   * This is used in beam hopping implementation.
+   */
+  virtual void Disable ();
+
 private:
   SatMac& operator = (const SatMac &);
   SatMac (const SatMac &);
@@ -270,6 +282,13 @@ protected:
    * The ID of the beam where mac belongs.
    */
   uint32_t m_beamId;
+
+  /**
+   * Flag indicating whether the MAC is enabled, i.e. it is capable/allowed to
+   * transmit data to PHY layer. This is used for beam hopping, where forward link
+   * is only supported currently, thus, it is set to true by default.
+   */
+  bool m_txEnabled;
 };
 
 } // namespace ns3

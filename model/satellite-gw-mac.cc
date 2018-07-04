@@ -197,41 +197,56 @@ SatGwMac::StartTransmission (uint32_t carrierId)
 {
   NS_LOG_FUNCTION (this);
 
-  Ptr<SatBbFrame> bbFrame = m_fwdScheduler->GetNextFrame ();
+  Time txDuration;
 
-  if ( bbFrame == NULL )
+  if (m_txEnabled)
     {
-      NS_FATAL_ERROR ("BB Frame is missing!!!");
+      Ptr<SatBbFrame> bbFrame = m_fwdScheduler->GetNextFrame ();
+
+    if ( bbFrame == NULL )
+      {
+        NS_FATAL_ERROR ("BB Frame is missing!!!");
+      }
+
+    txDuration = bbFrame->GetDuration ();
+
+    // Always sent if non dummy frame in question. Dummy frames sent only when sending is enabled
+    if ( ( bbFrame->GetFrameType () != SatEnums::DUMMY_FRAME ) || m_dummyFrameSendingEnabled )
+      {
+        // trace out BB frames sent.
+        m_bbFrameTxTrace (bbFrame);
+
+        // Add packet trace entry:
+        m_packetTrace (Simulator::Now (),
+                       SatEnums::PACKET_SENT,
+                       m_nodeInfo->GetNodeType (),
+                       m_nodeInfo->GetNodeId (),
+                       m_nodeInfo->GetMacAddress (),
+                       SatEnums::LL_MAC,
+                       SatEnums::LD_FORWARD,
+                       SatUtils::GetPacketInfo (bbFrame->GetPayload ()));
+
+        SatSignalParameters::txInfo_s txInfo;
+        txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
+        txInfo.modCod = bbFrame->GetModcod ();
+        txInfo.frameType = bbFrame->GetFrameType ();
+        txInfo.waveformId = 0;
+
+        /**
+         * Decrease a guard time from BB frame duration.
+         */
+        SendPacket (bbFrame->GetPayload (), carrierId, txDuration - m_guardTime, txInfo);
+      }
     }
-
-  Time txDuration = bbFrame->GetDuration ();
-
-  // Always sent if non dummy frame in question. Dummy frames sent only when sending is enabled
-  if ( ( bbFrame->GetFrameType () != SatEnums::DUMMY_FRAME ) || m_dummyFrameSendingEnabled )
+  else
     {
-      // trace out BB frames sent.
-      m_bbFrameTxTrace (bbFrame);
-
-      // Add packet trace entry:
-      m_packetTrace (Simulator::Now (),
-                     SatEnums::PACKET_SENT,
-                     m_nodeInfo->GetNodeType (),
-                     m_nodeInfo->GetNodeId (),
-                     m_nodeInfo->GetMacAddress (),
-                     SatEnums::LL_MAC,
-                     SatEnums::LD_FORWARD,
-                     SatUtils::GetPacketInfo (bbFrame->GetPayload ()));
-
-      SatSignalParameters::txInfo_s txInfo;
-      txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
-      txInfo.modCod = bbFrame->GetModcod ();
-      txInfo.frameType = bbFrame->GetFrameType ();
-      txInfo.waveformId = 0;
-
       /**
-       * Decrease a guard time from BB frame duration.
+       * GW MAC is disabled, thus get the duration of the default BB frame
+       * and try again then.
        */
-      SendPacket (bbFrame->GetPayload (), carrierId, txDuration - m_guardTime, txInfo);
+
+      NS_LOG_INFO ("Beam id: " << m_beamId << " is disabled, thus nothing is transmitted!");
+      txDuration = m_fwdScheduler->GetDefaultFrameDuration ();
     }
 
   /**
