@@ -719,8 +719,10 @@ SimulationHelper::ConfigureFrequencyBands ()
   Config::SetDefault ("ns3::SatConf::RtnUserLinkBandwidth", DoubleValue (5e+08));
   Config::SetDefault ("ns3::SatConf::RtnUserLinkBaseFrequency", DoubleValue (2.95e+10));
 
-  Config::SetDefault ("ns3::SatConf::UserLinkChannels", UintegerValue (4));
-  Config::SetDefault ("ns3::SatConf::FeederLinkChannels", UintegerValue (16));
+  Config::SetDefault ("ns3::SatConf::FwdUserLinkChannels", UintegerValue (4));
+  Config::SetDefault ("ns3::SatConf::FwdFeederLinkChannels", UintegerValue (16));
+  Config::SetDefault ("ns3::SatConf::RtnUserLinkChannels", UintegerValue (4));
+  Config::SetDefault ("ns3::SatConf::RtnFeederLinkChannels", UintegerValue (16));
 
   Config::SetDefault ("ns3::SatConf::FwdCarrierAllocatedBandwidth", DoubleValue (1.25e+08));
   Config::SetDefault ("ns3::SatConf::FwdCarrierRollOff", DoubleValue (0.2));

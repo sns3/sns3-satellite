@@ -149,20 +149,6 @@ public:
   GeoCoordinate GetGeoSatPosition () const;
 
   /**
-   * Get the number of the user frequencies.
-   *
-   * \return The number of the user frequencies.
-   */
-  uint32_t GetUserFreqCount () const;
-
-  /**
-   * Get the number of the feeder frequencies.
-   *
-   * \return The number of the feeder frequencies.
-   */
-  uint32_t GetFeederFreqCount () const;
-
-  /**
    * Convert carrier id, sequency id and frequency id to real frequency value.
    *
    * \param chType    Type of channel.
@@ -303,14 +289,14 @@ private:
   double m_rtnUserLinkBandwidthHz;
 
   /**
-   *  The number of the channels in user link.
+   *  The number of the channels in different satellite
+   *  links: forward user, return user, forward feeder,
+   *  return feeder.
    */
-  uint32_t m_userLinkChannelCount;
-
-  /**
-   *  The number of the channels in user link.
-   */
-  uint32_t m_feederLinkChannelCount;
+  uint32_t m_fwdUserLinkChannelCount;
+  uint32_t m_rtnUserLinkChannelCount;
+  uint32_t m_fwdFeederLinkChannelCount;
+  uint32_t m_rtnFeederLinkChannelCount;
 
   /**
    *  The super frame configuration used for sequence 0.

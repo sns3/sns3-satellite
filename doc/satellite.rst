@@ -954,11 +954,11 @@ set separately per each link. The :ref:`tab-bandwidth-conf` describes all these 
 	ns3::SatConf:: RtnUserLinkBaseFrequency                            Defines the lower boundary frequency of the return user link band (in Hertz).
 	=========================================                          ================================================================================
 
-User link bandwidth is divided to equal channels by attribute ``ns3::SatConf::UserLinkChannels`` for 
-both direction, forward and return. Feeder link is divided to channels same way for both direction 
-by attribute ``ns3::SatConf::FeederLinkChannels``. Satellite module verifies correctness of the configuration 
-by checking that bandwidths of the channels are same for both links in one direction (forward or return). 
-In case of error simulation is terminated by causing fatal error.
+User link bandwidth is divided to equal channels by attributes ``ns3::SatConf::FwdUserLinkChannels`` and 
+``ns3::SatConf::RtnUserLinkChannels`` for forward and return directions. Feeder link is divided to channels 
+same way for both direction by attributes ``ns3::SatConf::FwdFeederLinkChannels`` and ``ns3::SatConf::RtnFeederLinkChannels``. 
+Satellite module verifies correctness of the configuration by checking that bandwidths of the channels are same 
+for both links in one direction (forward or return). In case of error simulation is terminated by causing fatal error.
 
 Return link frame configuration
 ###############################

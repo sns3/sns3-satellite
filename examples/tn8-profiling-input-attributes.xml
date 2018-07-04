@@ -414,8 +414,10 @@
  <default name="ns3::SatConf::FwdUserLinkBaseFrequency" value="1.97e+10"/>
  <default name="ns3::SatConf::RtnUserLinkBandwidth" value="5e+08"/>
  <default name="ns3::SatConf::RtnUserLinkBaseFrequency" value="2.95e+10"/>
- <default name="ns3::SatConf::UserLinkChannels" value="4"/>
- <default name="ns3::SatConf::FeederLinkChannels" value="16"/>
+ <default name="ns3::SatConf::FwdUserLinkChannels" value="4"/>
+ <default name="ns3::SatConf::RtnUserLinkChannels" value="4"/>
+ <default name="ns3::SatConf::FwdFeederLinkChannels" value="16"/>
+ <default name="ns3::SatConf::RtnFeederLinkChannels" value="16"/>
  <default name="ns3::SatConf::SuperFrameConfForSeq0" value="Configuration_0"/>
  <default name="ns3::SatConf::FwdCarrierAllocatedBandwidth" value="1.25e+08"/>
  <default name="ns3::SatConf::FwdCarrierRollOff" value="0.2"/>
