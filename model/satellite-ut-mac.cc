@@ -130,11 +130,19 @@ SatUtMac::DoDispose (void)
   NS_LOG_FUNCTION (this);
 
   m_timingAdvanceCb.Nullify ();
+  m_handoverCallback.Nullify ();
   m_tbtpContainer->DoDispose ();
   m_utScheduler->DoDispose ();
   m_utScheduler = NULL;
 
   SatMac::DoDispose ();
+}
+
+void
+SatUtMac::SetHandoverCallback (SatUtMac::HandoverCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_handoverCallback = cb;
 }
 
 void
@@ -641,9 +649,34 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
 
         break;
       }
-    case SatControlMsgTag::SAT_CR_CTRL_MSG:
+    case SatControlMsgTag::SAT_TIMU_CTRL_MSG:
       {
-        NS_FATAL_ERROR ("SatUtMac received a non-supported control packet!");
+        uint32_t timuCtrlId = ctrlTag.GetMsgId ();
+        Ptr<SatTimuMessage> timuMsg = DynamicCast<SatTimuMessage> (m_readCtrlCallback (timuCtrlId));
+
+        if (timuMsg != NULL)
+          {
+            uint32_t beamId = timuMsg->GetAllocatedBeamId ();
+            NS_LOG_INFO ("UT: " << m_nodeInfo->GetMacAddress () <<
+                         " switching from beam " << m_beamId << " to beam " << beamId);
+            if (m_beamId != beamId)
+              {
+                m_beamId = beamId;
+                m_handoverCallback (beamId);
+              }
+          }
+        else
+          {
+            /**
+             * Control message NOT found in container anymore! This means, that the
+             * SatBeamHelper::CtrlMsgStoreTimeInFwdLink attribute may be set to too short value
+             * or there are something wrong in the FWD link RRM.
+             */
+            std::stringstream msg;
+            msg << "Control message " << ctrlTag.GetMsgType () << " is not found from the FWD link control msg container!";
+            msg << " at: " << Now ().GetSeconds () << "s";
+            Singleton<SatLog>::Get ()->AddToLog (SatLog::LOG_WARNING, "", msg.str ());
+          }
         break;
       }
     default:

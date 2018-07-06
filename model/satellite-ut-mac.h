@@ -193,6 +193,18 @@ public:
    */
   typedef void (* TbtpResourcesTraceCallback)(uint32_t size);
 
+  /**
+   * \brief Callback to reconfigure physical layer during handover.
+   * \param uint32_t new beam Id
+   */
+  typedef Callback<void, uint32_t> HandoverCallback;
+
+  /**
+   * \brief Method to set handover callback.
+   * \param cb callback to invoke whenever a TIM-U is received prompting us to switch beams
+   */
+  void SetHandoverCallback (SatUtMac::HandoverCallback cb);
+
 protected:
   /**
    * Dispose of SatUtMac
@@ -437,6 +449,11 @@ private:
    * - false -> for control and user data
    */
   bool m_crdsaOnlyForControl;
+
+  /**
+   * The physical layer handover callback
+   */
+  SatUtMac::HandoverCallback m_handoverCallback;
 };
 
 } // namespace ns3

@@ -378,6 +378,9 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   // Attach the transmit callback to PHY
   mac->SetTransmitCallback (MakeCallback (&SatPhy::SendPdu, phy));
 
+  // Attach the PHY handover callback to SatMac
+  mac->SetHandoverCallback (MakeCallback (&SatUtPhy::PerformHandover, phy));
+
   // Attach the LLC receive callback to SatMac
   mac->SetReceiveCallback (MakeCallback (&SatLlc::Receive, llc));
 
