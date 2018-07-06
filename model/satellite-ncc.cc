@@ -51,6 +51,11 @@ SatNcc::GetTypeId (void)
                      "Trace source indicating a TBTP has sent by NCC",
                      MakeTraceSourceAccessor (&SatNcc::m_nccTxTrace),
                      "ns3::Packet::TracedCallback")
+    .AddAttribute ("HandoverDelay",
+                   "Delay between handover acceptance and effective information transfer",
+                   TimeValue (Seconds (0.0)),
+                   MakeTimeAccessor (&SatNcc::m_utHandoverDelay),
+                   MakeTimeChecker ())
   ;
   return tid;
 }
@@ -64,6 +69,7 @@ SatNcc::GetInstanceTypeId (void) const
 }
 
 SatNcc::SatNcc ()
+  : m_utHandoverDelay (Seconds (0.0))
 {
   NS_LOG_FUNCTION (this);
 }
@@ -333,6 +339,32 @@ SatNcc::GetBeamScheduler (uint32_t beamId) const
     {
       return it->second;
     }
+}
+
+void
+SatNcc::MoveUtBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamId)
+{
+  Ptr<SatBeamScheduler> srcScheduler = GetBeamScheduler (srcBeamId);
+  Ptr<SatBeamScheduler> destScheduler = GetBeamScheduler (destBeamId);
+
+  if (!srcScheduler || !destScheduler)
+    {
+      NS_FATAL_ERROR ("Source or destination beam not configured");
+    }
+
+  srcScheduler->TransferUtToBeam (utId, destScheduler);
+}
+
+bool
+SatNcc::CanUtMoveBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamId)
+{
+  if (!GetBeamScheduler (destBeamId))
+    {
+      return false;
+    }
+
+  Simulator::Schedule (m_utHandoverDelay, &SatNcc::MoveUtBetweenBeams, this, utId, srcBeamId, destBeamId);
+  return true;
 }
 
 } // namespace ns3

@@ -176,6 +176,10 @@ public:
    */
   Ptr<SatBeamScheduler> GetBeamScheduler (uint32_t beamId) const;
 
+  void MoveUtBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamId);
+
+  bool CanUtMoveBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamId);
+
 private:
   SatNcc& operator = (const SatNcc &);
   SatNcc (const SatNcc &);
@@ -239,6 +243,11 @@ private:
    * Map for random access allocation channel specific high load backoff time
    */
   std::map<uint8_t, uint16_t> m_highLoadBackOffTime;
+
+  /**
+   * Delay between handover acceptance and effective information transfer
+   */
+  Time m_utHandoverDelay;
 };
 
 } // namespace ns3

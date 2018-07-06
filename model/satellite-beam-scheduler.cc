@@ -699,5 +699,23 @@ SatBeamScheduler::UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoCon
   return offeredCraRbdcKbps;
 }
 
+void
+SatBeamScheduler::TransferUtToBeam (Address utId, Ptr<SatBeamScheduler> destination)
+{
+  UtInfoMap_t::iterator utIterator = m_utInfos.find (utId);
+  if (utIterator == m_utInfos.end ())
+    {
+      NS_FATAL_ERROR ("UT is not part of the source beam");
+    }
+
+  std::pair<UtInfoMap_t::iterator, bool> inserted = destination->m_utInfos.insert (std::make_pair (utId, utIterator->second));
+  if (!inserted.second)
+    {
+      NS_FATAL_ERROR ("UT is already part of the destination beam");
+    }
+
+  // TODO: reset Cno and capacity requests
+}
+
 } // namespace ns3
 

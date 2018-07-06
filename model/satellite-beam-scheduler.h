@@ -184,6 +184,8 @@ public:
    */
   typedef void (*ExceedingCapacityTraceCallback)(uint32_t exceedingCapacity);
 
+  void TransferUtToBeam (Address utId, Ptr<SatBeamScheduler> destination);
+
 private:
   /**
    * \brief UT information helper class for SatBeamScheduler.
