@@ -118,6 +118,11 @@ private:
    * Other system interference in linear.
    */
   double m_otherSysInterferenceCOverI;
+
+  /**
+   * Delay of antenna reconfiguration when performing handover
+   */
+  Time m_antennaReconfigurationDelay;
 };
 
 }

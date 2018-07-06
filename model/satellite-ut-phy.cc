@@ -96,11 +96,16 @@ SatUtPhy::GetTypeId (void)
                    DoubleValue (1.00),
                    MakeDoubleAccessor (&SatPhy::GetDefaultFading, &SatPhy::SetDefaultFading),
                    MakeDoubleChecker<double_t> ())
-    .AddAttribute ( "OtherSysIfCOverIDb",
-                    "Other system interference, C over I in dB.",
-                    DoubleValue (24.7),
-                    MakeDoubleAccessor (&SatUtPhy::m_otherSysInterferenceCOverIDb),
-                    MakeDoubleChecker<double> ())
+    .AddAttribute ("OtherSysIfCOverIDb",
+                   "Other system interference, C over I in dB.",
+                   DoubleValue (24.7),
+                   MakeDoubleAccessor (&SatUtPhy::m_otherSysInterferenceCOverIDb),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute ("AntennaReconfigurationDelay",
+                   "Delay of antenna reconfiguration when performing handover",
+                   TimeValue (Seconds (0.0)),
+                   MakeTimeAccessor (&SatUtPhy::m_antennaReconfigurationDelay),
+                   MakeTimeChecker ())
   ;
   return tid;
 }
@@ -114,7 +119,8 @@ SatUtPhy::GetInstanceTypeId (void) const
 
 SatUtPhy::SatUtPhy (void)
   : m_otherSysInterferenceCOverIDb (24.7),
-  m_otherSysInterferenceCOverI (SatUtils::DbToLinear (m_otherSysInterferenceCOverIDb))
+  m_otherSysInterferenceCOverI (SatUtils::DbToLinear (m_otherSysInterferenceCOverIDb)),
+  m_antennaReconfigurationDelay (Seconds (0.0))
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("SatUtPhy default constructor is not allowed to be used");
@@ -124,7 +130,8 @@ SatUtPhy::SatUtPhy (SatPhy::CreateParam_t &params,
                     Ptr<SatLinkResults> linkResults,
                     SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
                     Ptr<SatSuperframeConf> superFrameConf)
-  : SatPhy (params)
+  : SatPhy (params),
+  m_antennaReconfigurationDelay (Seconds (0.0))
 {
   NS_LOG_FUNCTION (this);
 
@@ -202,7 +209,7 @@ SatUtPhy::PerformHandover (uint32_t beamId)
   m_beamId = beamId;
   m_phyTx->SetBeamId (m_beamId);
   m_phyRx->SetBeamId (m_beamId);
-  Simulator::Schedule (Seconds (0.0), &SatUtPhy::AssignNewSatChannels, this);
+  Simulator::Schedule (m_antennaReconfigurationDelay, &SatUtPhy::AssignNewSatChannels, this);
 }
 
 
