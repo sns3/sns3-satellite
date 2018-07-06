@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2013 Magister Solutions Ltd
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.com>
  */
 
 #ifndef SATELLITE_CONTROL_MESSAGE_H
@@ -55,7 +57,9 @@ public:
     SAT_CR_CTRL_MSG,      //!< SAT_CR_CTRL_MSG
     SAT_RA_CTRL_MSG,      //!< SAT_RA_CTRL_MSG
     SAT_ARQ_ACK,          //!< SAT_ARQ_ACK
-    SAT_CN0_REPORT        //!< SAT_CN0_REPORT
+    SAT_CN0_REPORT,       //!< SAT_CN0_REPORT
+    SAT_TIMU_CTRL_MSG,    //!< SAT_TIMU_CTRL_MSG
+    SAT_HR_CTRL_MSG       //!< SAT_HR_CTRL_MSG
   } SatControlMsgType_t;
 
   /**
@@ -761,6 +765,138 @@ private:
    * Backoff time
    */
   uint16_t m_backoffTime;
+};
+
+/**
+ * \ingroup satellite
+ * \brief TIM unicast control message
+ * (Tagged by SatControlMsgTag with type value SAT_TIMU_CTRL_MSG)
+ */
+
+class SatTimuMessage : public SatControlMessage
+{
+public:
+  /**
+   * Constructor for SatRaMessage
+   */
+  SatTimuMessage ();
+
+  /**
+   * Destructor for SatRaMessage
+   */
+  ~SatTimuMessage ();
+
+
+  /**
+   * methods derived from base classes
+   */
+  static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
+  virtual TypeId GetInstanceTypeId (void) const;
+
+  /**
+   * \brief Get type of the message.
+   *
+   * \return SatControlMsgTag::SAT_TIMU_CTRL_MSG
+   */
+  inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const
+  {
+    return SatControlMsgTag::SAT_TIMU_CTRL_MSG;
+  }
+
+  /**
+   * \brief Get the allocated beam ID
+   * \return Allocated beam ID
+   */
+  uint32_t GetAllocatedBeamId () const;
+
+  /**
+   * Set allocated beam ID
+   * \param beamId Allocated beam ID
+   */
+  void SetAllocatedBeamId (uint32_t beamId);
+
+  /**
+   * \brief Get real size of the random access message, which can be used to e.g. simulate real size.
+   * \return Real size of the random access message.
+   */
+  virtual uint32_t GetSizeInBytes () const;
+
+private:
+  /**
+   * Allocated beam ID
+   */
+  uint32_t m_beamId;
+};
+
+/**
+ * \ingroup satellite
+ * \brief Handover recommendation control message
+ * (Tagged by SatControlMsgTag with type value SAT_HR_CTRL_MSG)
+ */
+
+class SatHandoverRecommendationMessage : public SatControlMessage
+{
+public:
+  /**
+   * Constructor for SatRaMessage
+   */
+  SatHandoverRecommendationMessage ();
+
+  /**
+   * Destructor for SatRaMessage
+   */
+  ~SatHandoverRecommendationMessage ();
+
+
+  /**
+   * methods derived from base classes
+   */
+  static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
+  virtual TypeId GetInstanceTypeId (void) const;
+
+  /**
+   * \brief Get type of the message.
+   *
+   * \return SatControlMsgTag::SAT_HR_CTRL_MSG
+   */
+  inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const
+  {
+    return SatControlMsgTag::SAT_HR_CTRL_MSG;
+  }
+
+  /**
+   * \brief Get the recommended beam ID
+   * \return Recommended beam ID
+   */
+  uint32_t GetRecommendedBeamId () const;
+
+  /**
+   * Set recommended beam ID
+   * \param beamId Recommended beam ID
+   */
+  void SetRecommendedBeamId (uint32_t beamId);
+
+  /**
+   * \brief Get real size of the random access message, which can be used to e.g. simulate real size.
+   * \return Real size of the random access message.
+   */
+  virtual uint32_t GetSizeInBytes () const;
+
+private:
+  /**
+   * Recommended beam ID
+   */
+  uint32_t m_beamId;
 };
 
 
