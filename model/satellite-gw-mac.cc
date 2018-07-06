@@ -102,6 +102,8 @@ SatGwMac::DoDispose ()
   NS_LOG_FUNCTION (this);
 
   m_txOpportunityCallback.Nullify ();
+  m_crReceiveCallback.Nullify ();
+  m_handoverCallback.Nullify ();
 
   SatMac::DoDispose ();
 }
@@ -329,10 +331,29 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
         m_rxCallback (packet, macTag.GetSourceAddress (), macTag.GetDestAddress ());
         break;
       }
-    case SatControlMsgTag::SAT_TBTP_CTRL_MSG:
-    case SatControlMsgTag::SAT_RA_CTRL_MSG:
+    case SatControlMsgTag::SAT_HR_CTRL_MSG:
       {
-        NS_FATAL_ERROR ("SatGwMac received a non-supported control packet!");
+        uint32_t msgId = ctrlTag.GetMsgId ();
+        Ptr<SatHandoverRecommendationMessage> handoverRecommendation = DynamicCast<SatHandoverRecommendationMessage> ( m_readCtrlCallback (msgId) );
+
+        if ( handoverRecommendation != NULL )
+          {
+            uint32_t beamId = handoverRecommendation->GetRecommendedBeamId ();
+            m_handoverCallback (macTag.GetSourceAddress (), m_beamId, beamId);
+          }
+        else
+          {
+            /**
+             * Control message NOT found in container anymore! This means, that the
+             * SatBeamHelper::CtrlMsgStoreTimeInRtnLink attribute may be set to too short value
+             * or there are something wrong in the RTN link RRM.
+             */
+            std::stringstream msg;
+            msg << "Control message " << ctrlTag.GetMsgType () << " is not found from the RTN link control msg container!";
+            msg << " at: " << Now ().GetSeconds () << "s";
+            Singleton<SatLog>::Get ()->AddToLog (SatLog::LOG_WARNING, "", msg.str ());
+          }
+
         break;
       }
     default:
@@ -348,6 +369,13 @@ SatGwMac::SetCrReceiveCallback (SatGwMac::CrReceiveCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);
   m_crReceiveCallback = cb;
+}
+
+void
+SatGwMac::SetHandoverCallback (SatGwMac::HandoverCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_handoverCallback = cb;
 }
 
 } // namespace ns3

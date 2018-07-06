@@ -355,16 +355,18 @@ SatNcc::MoveUtBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamI
   srcScheduler->TransferUtToBeam (utId, destScheduler);
 }
 
-bool
+void
 SatNcc::CanUtMoveBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamId)
 {
-  if (!GetBeamScheduler (destBeamId))
+  Ptr<SatBeamScheduler> scheduler = GetBeamScheduler (destBeamId);
+  if (scheduler)
     {
-      return false;
-    }
+      Ptr<SatTimuMessage> timuMsg = CreateObject<SatTimuMessage> ();
+      timuMsg->SetAllocatedBeamId (destBeamId);
+      scheduler->SendTo (timuMsg, utId);
 
-  Simulator::Schedule (m_utHandoverDelay, &SatNcc::MoveUtBetweenBeams, this, utId, srcBeamId, destBeamId);
-  return true;
+      Simulator::Schedule (m_utHandoverDelay, &SatNcc::MoveUtBetweenBeams, this, utId, srcBeamId, destBeamId);
+    }
 }
 
 } // namespace ns3

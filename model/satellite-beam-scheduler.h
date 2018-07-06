@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2014 Magister Solutions Ltd
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.com>
  */
 
 #ifndef SAT_BEAM_SCHEDULER_H
@@ -141,6 +143,15 @@ public:
    * \return true if sending is success, false otherwise.
    */
   bool Send (Ptr<SatControlMessage> message);
+
+  /**
+   * Send control message to an UT into the beam.
+   *
+   * \param message Pointer of control message to send.
+   * \param utId Address of the UT to the the message to.
+   * \return true if sending is success, false otherwise.
+   */
+  bool SendTo (Ptr<SatControlMessage> message, Address utId);
 
   /**
    * Callback signature for `BacklogRequestsTrace` trace source.

@@ -178,7 +178,7 @@ public:
 
   void MoveUtBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamId);
 
-  bool CanUtMoveBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamId);
+  void CanUtMoveBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamId);
 
 private:
   SatNcc& operator = (const SatNcc &);
