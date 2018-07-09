@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2013 Magister Solutions Ltd.
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.com>
  */
 
 #ifndef SATELLITE_REQUEST_MANAGER_H_
@@ -292,6 +294,12 @@ private:
    * \brief Send the C/N0 report message via txCallback to SatNetDevice.
    */
   void SendCnoReport ();
+
+  /**
+   * \brief Send a handover recommendation message to the gateway.
+   * \param beamId The beam ID to switch to
+   */
+  void SendHandoverRecommendation (uint32_t beamId);
 
   /**
    * \brief Reset the assigned resources counter

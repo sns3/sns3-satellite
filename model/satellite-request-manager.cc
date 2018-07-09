@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2013 Magister Solutions Ltd.
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.com>
  */
 
 #include <cmath>
@@ -768,6 +770,23 @@ SatRequestManager::SendCnoReport ()
     }
 
   m_cnoReportEvent = Simulator::Schedule (m_cnoReportInterval, &SatRequestManager::SendCnoReport, this);
+}
+
+void
+SatRequestManager::SendHandoverRecommendation (uint32_t beamId)
+{
+  NS_LOG_FUNCTION (this);
+
+  // Check if we have the possiblity to send a ctrl msg
+  if (!m_ctrlCallback.IsNull () && m_ctrlMsgTxPossibleCallback ())
+    {
+      NS_LOG_INFO ("Send handover recommendation to GW: " << m_gwAddress);
+
+      Ptr<SatHandoverRecommendationMessage> hoRecommendation = CreateObject<SatHandoverRecommendationMessage> ();
+      hoRecommendation->SetRecommendedBeamId (beamId);
+
+      m_ctrlCallback (hoRecommendation, m_gwAddress);
+    }
 }
 
 void
