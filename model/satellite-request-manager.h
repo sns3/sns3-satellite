@@ -198,6 +198,12 @@ public:
    */
   typedef void (*AvbdcTraceCallback)(uint32_t requestSize);
 
+  /**
+   * \brief Send a handover recommendation message to the gateway.
+   * \param beamId The beam ID to switch to
+   */
+  void SendHandoverRecommendation (uint32_t beamId);
+
 private:
   typedef std::map<uint8_t, QueueCallback> CallbackContainer_t;
 
@@ -294,12 +300,6 @@ private:
    * \brief Send the C/N0 report message via txCallback to SatNetDevice.
    */
   void SendCnoReport ();
-
-  /**
-   * \brief Send a handover recommendation message to the gateway.
-   * \param beamId The beam ID to switch to
-   */
-  void SendHandoverRecommendation (uint32_t beamId);
 
   /**
    * \brief Reset the assigned resources counter

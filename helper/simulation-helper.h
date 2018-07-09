@@ -361,8 +361,10 @@ public:
   /**
    * \brief Configure this instance after reading input attributes from XML file
    * \param filePath full path to an Input XML file
+   * \param overrideManualConfiguration whether or not to read some configuration (beams,
+   * UT count per beam, user count per UT, simulation time) from XML file
    */
-  void ConfigureAttributesFromFile (std::string filePath);
+  void ConfigureAttributesFromFile (std::string filePath, bool overrideManualConfiguration = true);
 
   /**
    * \brief Read input attributes from XML file

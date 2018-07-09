@@ -145,3 +145,6 @@ def build(bld):
 
     obj = bld.create_ns3_program('sat-generic-launcher', ['satellite'])
     obj.source = 'sat-generic-launcher.cc'
+
+    obj = bld.create_ns3_program('sat-mobility-scenario1', ['satellite'])
+    obj.source = 'sat-mobility-validation-scenario1.cc'

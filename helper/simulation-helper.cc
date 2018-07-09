@@ -1493,16 +1493,18 @@ SimulationHelper::DisableProgressLogs ()
 }
 
 void
-SimulationHelper::ConfigureAttributesFromFile (std::string filePath)
+SimulationHelper::ConfigureAttributesFromFile (std::string filePath, bool overrideManualConfiguration)
 {
   ReadInputAttributesFromFile (filePath);
   Ptr<SimulationHelperConf> simulationConf = CreateObject<SimulationHelperConf> ();
 
-  Time simulationTime = simulationConf->m_simTime;
-  SetBeams (simulationConf->m_enabledBeams);
-  SetUtCountPerBeam (simulationConf->m_utCount);
-  SetUserCountPerUt (simulationConf->m_utUserCount);
-  SetSimulationTime (simulationConf->m_simTime);
+  if (overrideManualConfiguration)
+    {
+      SetBeams (simulationConf->m_enabledBeams);
+      SetUtCountPerBeam (simulationConf->m_utCount);
+      SetUserCountPerUt (simulationConf->m_utUserCount);
+      SetSimulationTime (simulationConf->m_simTime);
+    }
 
   CreateSatScenario ();
   if (simulationConf->m_activateStatistics)
@@ -1591,7 +1593,7 @@ SimulationHelper::ConfigureAttributesFromFile (std::string filePath)
       if (trafficModel.second.m_percentage > 0.0)
         {
           Time startTime = trafficModel.second.m_startTime;
-          if (startTime > simulationTime)
+          if (startTime > m_simTime)
             {
               NS_FATAL_ERROR ("Traffic model " << trafficModel.first << " configured to start after the simulation ended");
             }
@@ -1599,7 +1601,7 @@ SimulationHelper::ConfigureAttributesFromFile (std::string filePath)
           Time stopTime = trafficModel.second.m_stopTime;
           if (stopTime == Seconds (0))
             {
-              stopTime = simulationTime + Seconds (1);
+              stopTime = m_simTime + Seconds (1);
             }
           if (stopTime < startTime)
             {
