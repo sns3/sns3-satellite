@@ -206,9 +206,7 @@ SatUtPhy::PerformHandover (uint32_t beamId)
   channels.first->RemoveRx (m_phyRx);
 
   // perform "physical" beam handover
-  m_beamId = beamId;
-  m_phyTx->SetBeamId (m_beamId);
-  m_phyRx->SetBeamId (m_beamId);
+  SetBeamId (beamId);
   Simulator::Schedule (m_antennaReconfigurationDelay, &SatUtPhy::AssignNewSatChannels, this);
 }
 

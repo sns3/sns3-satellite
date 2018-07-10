@@ -248,7 +248,7 @@ SatNcc::UtCrReceived (uint32_t beamId, Address utId, Ptr<SatCrMessage> crMsg)
 }
 
 void
-SatNcc::AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq> seq, uint32_t maxFrameSize)
+SatNcc::AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq> seq, uint32_t maxFrameSize, Ptr<SatBeamScheduler::SatGwInfo> gwInfo)
 {
   NS_LOG_FUNCTION (this << &cb);
 
@@ -261,7 +261,7 @@ SatNcc::AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq>
     }
 
   scheduler = CreateObject<SatBeamScheduler> ();
-  scheduler->Initialize (beamId, cb, seq, maxFrameSize );
+  scheduler->Initialize (beamId, cb, seq, maxFrameSize, gwInfo);
 
   m_beamSchedulers.insert (std::make_pair (beamId, scheduler));
 }
@@ -364,7 +364,7 @@ SatNcc::CanUtMoveBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBe
 {
   NS_LOG_FUNCTION (this << utId << srcBeamId << destBeamId);
 
-  Ptr<SatBeamScheduler> scheduler = GetBeamScheduler (destBeamId);
+  Ptr<SatBeamScheduler> scheduler = GetBeamScheduler (srcBeamId);
   if (scheduler)
     {
       Ptr<SatTimuMessage> timuMsg = CreateObject<SatTimuMessage> ();

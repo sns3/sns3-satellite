@@ -122,8 +122,9 @@ public:
    *        be forwarded to the Beam UTs.
    * \param seq Super frame sequence
    * \param maxFrameSizeInBytes Maximum non fragmented BB frame size with most robust ModCod
+   * \param gwInfo Address information of the gateway responsible for this beam
    */
-  void AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq> seq, uint32_t maxFrameSizeInBytes);
+  void AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq> seq, uint32_t maxFrameSizeInBytes, Ptr<SatBeamScheduler::SatGwInfo> gwInfo);
 
   /**
    * \brief Function for adding the UT

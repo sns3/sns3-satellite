@@ -35,6 +35,7 @@
 #include <ns3/satellite-frame-user-load-probe.h>
 #include <ns3/address.h>
 #include <ns3/mac48-address.h>
+#include <ns3/ipv4-address.h>
 #include <ns3/satellite-superframe-sequence.h>
 #include <ns3/satellite-superframe-allocator.h>
 #include <ns3/satellite-dama-entry.h>
@@ -166,6 +167,31 @@ SatBeamScheduler::SatUtInfo::SetControlSlotGenerationTime (Time offset)
   m_controlSlotGenerationTime =  Simulator::Now () + offset;
 }
 
+
+SatBeamScheduler::SatGwInfo::SatGwInfo (Address macAddress, Ipv4Address ipAddress)
+  : m_macAddress (macAddress),
+  m_ipAddress (ipAddress)
+{
+  NS_LOG_FUNCTION (this << macAddress << ipAddress);
+}
+
+Address
+SatBeamScheduler::SatGwInfo::GetAddress () const
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_macAddress;
+}
+
+Ipv4Address
+SatBeamScheduler::SatGwInfo::GetIpAddress () const
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_ipAddress;
+}
+
+
 // SatBeamScheduler
 
 NS_OBJECT_ENSURE_REGISTERED (SatBeamScheduler);
@@ -291,7 +317,7 @@ SatBeamScheduler::SendTo (Ptr<SatControlMessage> msg, Address utId)
 }
 
 void
-SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCallback cb, Ptr<SatSuperframeSeq> seq, uint32_t maxFrameSizeInBytes)
+SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCallback cb, Ptr<SatSuperframeSeq> seq, uint32_t maxFrameSizeInBytes, Ptr<SatBeamScheduler::SatGwInfo> gwInfo)
 {
   NS_LOG_FUNCTION (this << beamId << &cb);
 
@@ -299,6 +325,7 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCall
   m_txCallback = cb;
   m_superframeSeq = seq;
   m_maxBbFrameSize = maxFrameSizeInBytes;
+  m_gwInfo = gwInfo;
 
   /**
    * Calculating to start time for super frame counts to start the scheduling from.

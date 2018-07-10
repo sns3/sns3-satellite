@@ -372,8 +372,8 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   llc->SetMacQueueEventCallback (macCb);
 
   // set serving GW MAC address to RM
-  rm->SetGwAddress (gwAddr);
-  llc->SetGwAddress (gwAddr);
+  mac->SetGatewayUpdateCallback (MakeCallback (&SatUtLlc::SetGwAddress, llc));
+  mac->SetGwAddress (gwAddr);
 
   // Attach the transmit callback to PHY
   mac->SetTransmitCallback (MakeCallback (&SatPhy::SendPdu, phy));

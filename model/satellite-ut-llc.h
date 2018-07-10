@@ -142,6 +142,12 @@ public:
    */
   void SetMacQueueEventCallback (SatQueue::QueueEventCallback cb);
 
+  /**
+   * \brief Set the GW address
+   * \param address GW MAC address
+   */
+  void SetGwAddress (Mac48Address address);
+
 protected:
   /**
    * Dispose of SatUtLLc

@@ -361,6 +361,14 @@ SatUtLlc::SetMacQueueEventCallback (SatQueue::QueueEventCallback cb)
 
   m_macQueueEventCb = cb;
 }
-} // namespace ns3
 
+void
+SatUtLlc::SetGwAddress (Mac48Address address)
+{
+  NS_LOG_FUNCTION (this << address);
+  SatLlc::SetGwAddress (address);
+  m_requestManager->SetGwAddress (address);
+}
+
+} // namespace ns3
 

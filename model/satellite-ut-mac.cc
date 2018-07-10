@@ -131,6 +131,7 @@ SatUtMac::DoDispose (void)
 
   m_timingAdvanceCb.Nullify ();
   m_handoverCallback.Nullify ();
+  m_gatewayUpdateCallback.Nullify ();
   m_tbtpContainer->DoDispose ();
   m_utScheduler->DoDispose ();
   m_utScheduler = NULL;
@@ -143,6 +144,21 @@ SatUtMac::SetHandoverCallback (SatUtMac::HandoverCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);
   m_handoverCallback = cb;
+}
+
+void
+SatUtMac::SetGatewayUpdateCallback (SatUtMac::GatewayUpdateCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_gatewayUpdateCallback = cb;
+}
+
+void
+SatUtMac::SetGwAddress (Mac48Address gwAddress)
+{
+  NS_LOG_FUNCTION (this << gwAddress);
+
+  m_gatewayUpdateCallback (gwAddress);
 }
 
 void

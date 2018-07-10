@@ -205,6 +205,10 @@ public:
    */
   void SetHandoverCallback (SatUtMac::HandoverCallback cb);
 
+  typedef Callback<void, Mac48Address> GatewayUpdateCallback;
+
+  void SetGatewayUpdateCallback (SatUtMac::GatewayUpdateCallback cb);
+
 protected:
   /**
    * Dispose of SatUtMac
@@ -454,6 +458,8 @@ private:
    * The physical layer handover callback
    */
   SatUtMac::HandoverCallback m_handoverCallback;
+
+  SatUtMac::GatewayUpdateCallback m_gatewayUpdateCallback;
 };
 
 } // namespace ns3
