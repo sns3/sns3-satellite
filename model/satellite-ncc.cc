@@ -329,6 +329,8 @@ SatNcc::SetRandomAccessAverageNormalizedOfferedLoadThreshold (uint8_t allocation
 Ptr<SatBeamScheduler>
 SatNcc::GetBeamScheduler (uint32_t beamId) const
 {
+  NS_LOG_FUNCTION (this << beamId);
+
   std::map<uint32_t, Ptr<SatBeamScheduler> >::const_iterator it = m_beamSchedulers.find (beamId);
 
   if (it == m_beamSchedulers.end ())
@@ -344,6 +346,8 @@ SatNcc::GetBeamScheduler (uint32_t beamId) const
 void
 SatNcc::MoveUtBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamId)
 {
+  NS_LOG_FUNCTION (this << utId << srcBeamId << destBeamId);
+
   Ptr<SatBeamScheduler> srcScheduler = GetBeamScheduler (srcBeamId);
   Ptr<SatBeamScheduler> destScheduler = GetBeamScheduler (destBeamId);
 
@@ -358,6 +362,8 @@ SatNcc::MoveUtBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamI
 void
 SatNcc::CanUtMoveBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamId)
 {
+  NS_LOG_FUNCTION (this << utId << srcBeamId << destBeamId);
+
   Ptr<SatBeamScheduler> scheduler = GetBeamScheduler (destBeamId);
   if (scheduler)
     {

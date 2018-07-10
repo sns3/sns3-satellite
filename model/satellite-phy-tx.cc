@@ -79,6 +79,9 @@ std::ostream& operator<< (std::ostream& os, SatPhyTx::State s)
     case SatPhyTx::TX:
       os << "TX";
       break;
+    case SatPhyTx::RECONFIGURING:
+      os << "RECONFIGURING";
+      break;
     default:
       os << "UNKNOWN";
       break;
