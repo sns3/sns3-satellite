@@ -38,6 +38,7 @@
 
 namespace ns3 {
 
+class Ipv4Address;
 
 /**
  * \ingroup satellite
@@ -820,6 +821,14 @@ public:
    */
   void SetAllocatedBeamId (uint32_t beamId);
 
+  Address GetGwMacAddress () const;
+
+  void SetGwMacAddress (Address address);
+
+  Ipv4Address GetGwIpAddress () const;
+
+  void SetGwIpAddress (Ipv4Address address);
+
   /**
    * \brief Get real size of the random access message, which can be used to e.g. simulate real size.
    * \return Real size of the random access message.
@@ -831,6 +840,10 @@ private:
    * Allocated beam ID
    */
   uint32_t m_beamId;
+
+  Address m_gwAddress;
+
+  Ipv4Address m_gwIpAddress;
 };
 
 /**

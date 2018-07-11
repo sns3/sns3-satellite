@@ -42,6 +42,7 @@ class Ipv4Address;
 class SatControlMessage;
 class SatCrMessage;
 class SatTbtpMessage;
+class SatTimuMessage;
 class SatSuperframeSeq;
 class SatSuperframeAllocator;
 class SatLowerLayerServiceConf;
@@ -233,6 +234,8 @@ private:
    *                          requested, in kbps.
    */
   typedef void (*ExceedingCapacityTraceCallback)(uint32_t exceedingCapacity);
+
+  Ptr<SatTimuMessage> CreateTimu () const;
 
   void TransferUtToBeam (Address utId, Ptr<SatBeamScheduler> destination);
 

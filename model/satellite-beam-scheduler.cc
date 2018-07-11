@@ -745,6 +745,8 @@ SatBeamScheduler::UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoCon
 void
 SatBeamScheduler::TransferUtToBeam (Address utId, Ptr<SatBeamScheduler> destination)
 {
+  NS_LOG_FUNCTION (this << utId << destination->m_beamId);
+
   UtInfoMap_t::iterator utIterator = m_utInfos.find (utId);
   if (utIterator == m_utInfos.end ())
     {
@@ -758,6 +760,18 @@ SatBeamScheduler::TransferUtToBeam (Address utId, Ptr<SatBeamScheduler> destinat
     }
 
   // TODO: reset Cno and capacity requests
+}
+
+Ptr<SatTimuMessage>
+SatBeamScheduler::CreateTimu () const
+{
+  NS_LOG_FUNCTION (this);
+
+  Ptr<SatTimuMessage> timuMsg = CreateObject<SatTimuMessage> ();
+  timuMsg->SetAllocatedBeamId (m_beamId);
+  timuMsg->SetGwMacAddress (m_gwInfo->GetAddress ());
+  timuMsg->SetGwIpAddress (m_gwInfo->GetIpAddress ());
+  return timuMsg;
 }
 
 } // namespace ns3

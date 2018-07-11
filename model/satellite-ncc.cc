@@ -365,10 +365,11 @@ SatNcc::CanUtMoveBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBe
   NS_LOG_FUNCTION (this << utId << srcBeamId << destBeamId);
 
   Ptr<SatBeamScheduler> scheduler = GetBeamScheduler (srcBeamId);
-  if (scheduler)
+  Ptr<SatBeamScheduler> destination = GetBeamScheduler (destBeamId);
+  if (scheduler && destination)
     {
-      Ptr<SatTimuMessage> timuMsg = CreateObject<SatTimuMessage> ();
-      timuMsg->SetAllocatedBeamId (destBeamId);
+
+      Ptr<SatTimuMessage> timuMsg = destination->CreateTimu ();
       scheduler->SendTo (timuMsg, utId);
 
       Simulator::Schedule (m_utHandoverDelay, &SatNcc::MoveUtBetweenBeams, this, utId, srcBeamId, destBeamId);

@@ -678,6 +678,7 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
             if (m_beamId != beamId)
               {
                 m_beamId = beamId;
+                SetGwAddress (Mac48Address::ConvertFrom (timuMsg->GetGwMacAddress ()));
                 m_handoverCallback (beamId);
               }
           }

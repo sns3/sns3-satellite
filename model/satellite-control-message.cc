@@ -25,6 +25,7 @@
 #include "ns3/uinteger.h"
 #include "ns3/enum.h"
 #include "ns3/address-utils.h"
+#include "ns3/ipv4-address.h"
 #include "satellite-enums.h"
 
 #include "satellite-control-message.h"
@@ -725,7 +726,36 @@ SatTimuMessage::SetAllocatedBeamId (uint32_t beamId)
 uint32_t
 SatTimuMessage::GetAllocatedBeamId () const
 {
+  NS_LOG_FUNCTION (this);
   return m_beamId;
+}
+
+void
+SatTimuMessage::SetGwMacAddress (Address address)
+{
+  NS_LOG_FUNCTION (this);
+  m_gwAddress = address;
+}
+
+Address
+SatTimuMessage::GetGwMacAddress () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_gwAddress;
+}
+
+void
+SatTimuMessage::SetGwIpAddress (Ipv4Address address)
+{
+  NS_LOG_FUNCTION (this);
+  m_gwIpAddress = address;
+}
+
+Ipv4Address
+SatTimuMessage::GetGwIpAddress () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_gwIpAddress;
 }
 
 uint32_t
@@ -733,7 +763,7 @@ SatTimuMessage::GetSizeInBytes () const
 {
   NS_LOG_FUNCTION (this);
 
-  uint32_t size = 1 * sizeof (uint32_t);
+  uint32_t size = sizeof (uint32_t) + sizeof (Address) + sizeof (Ipv4Address);
   return size;
 }
 
