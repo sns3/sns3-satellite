@@ -26,17 +26,18 @@
 #include "ns3/type-id.h"
 #include "ns3/csma-helper.h"
 #include "ns3/internet-stack-helper.h"
+#include "ns3/ipv4-static-routing-helper.h"
 #include "ns3/mobility-helper.h"
 #include "ns3/singleton.h"
 #include "ns3/ipv4-static-routing-helper.h"
 #include "ns3/ipv4-routing-table-entry.h"
+#include <ns3/satellite-typedefs.h>
+
 #include "../model/satellite-position-allocator.h"
 #include "../model/satellite-rtn-link-time.h"
-#include "satellite-helper.h"
 #include "../model/satellite-log.h"
-#include "ns3/singleton.h"
 #include "../utils/satellite-env-variables.h"
-#include <ns3/satellite-typedefs.h>
+#include "satellite-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatHelper");
 
@@ -486,7 +487,14 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
 
           // gw index starts from 1 and we have stored them starting from 0
           Ptr<Node> gwNode = gwNodes.Get (conf[SatConf::GW_ID_INDEX] - 1);
-          m_beamHelper->Install (uts, gwNode, conf[SatConf::GW_ID_INDEX], conf[SatConf::BEAM_ID_INDEX], conf[SatConf::U_FREQ_ID_INDEX], conf[SatConf::F_FREQ_ID_INDEX]);
+          std::pair<Ptr<NetDevice>, NetDeviceContainer> netDevices = m_beamHelper->Install (
+            uts, gwNode,
+            conf[SatConf::GW_ID_INDEX],
+            conf[SatConf::BEAM_ID_INDEX],
+            conf[SatConf::U_FREQ_ID_INDEX],
+            conf[SatConf::F_FREQ_ID_INDEX],
+            MakeCallback (&SatUserHelper::UpdateUtRoutes, m_userHelper));
+          m_userHelper->PopulateBeamRoutings (uts, netDevices.second, gwNode, netDevices.first);
         }
 
       m_userHelper->InstallGw (m_beamHelper->GetGwNodes (), gwUsers);
@@ -960,7 +968,7 @@ SatHelper::SetNetworkAddresses (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers) 
   CheckNetwork ("UT", m_utNetworkAddress, m_utNetworkMask, networkAddresses, utNetworkAddressCount, utHostAddressCount);
 
   // set base addresses of the sub-helpers
-  m_beamHelper->SetBaseAddress (m_beamNetworkAddress, m_beamNetworkMask);
+  m_userHelper->SetBeamBaseAddress (m_beamNetworkAddress, m_beamNetworkMask);
   m_userHelper->SetGwBaseAddress (m_gwNetworkAddress, m_gwNetworkMask);
   m_userHelper->SetUtBaseAddress (m_utNetworkAddress, m_utNetworkMask);
 }

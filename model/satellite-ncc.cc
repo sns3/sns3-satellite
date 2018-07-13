@@ -248,7 +248,7 @@ SatNcc::UtCrReceived (uint32_t beamId, Address utId, Ptr<SatCrMessage> crMsg)
 }
 
 void
-SatNcc::AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq> seq, uint32_t maxFrameSize, Ptr<SatBeamScheduler::SatGwInfo> gwInfo)
+SatNcc::AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq> seq, uint32_t maxFrameSize, Address gwAddress)
 {
   NS_LOG_FUNCTION (this << &cb);
 
@@ -261,7 +261,7 @@ SatNcc::AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq>
     }
 
   scheduler = CreateObject<SatBeamScheduler> ();
-  scheduler->Initialize (beamId, cb, seq, maxFrameSize, gwInfo);
+  scheduler->Initialize (beamId, cb, seq, maxFrameSize, gwAddress);
 
   m_beamSchedulers.insert (std::make_pair (beamId, scheduler));
 }

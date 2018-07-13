@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2013 Magister Solutions Ltd
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.com>
  */
 
 #ifndef SAT_USER_HELPER_H
@@ -150,6 +152,19 @@ public:
   void SetGwBaseAddress (const Ipv4Address& network, const Ipv4Mask& mask, Ipv4Address base = "0.0.0.1");
 
   /**
+  * \param network The Ipv4Address containing the initial network number to
+  * use for satellite network allocation. The bits outside the network mask are not used.
+  *
+  * \param mask The Ipv4Mask containing one bits in each bit position of the
+  * network number.
+  *
+  * \param base An optional Ipv4Address containing the initial address used for
+  * IP address allocation.  Will be combined (ORed) with the network number to
+  * generate the first IP address.  Defaults to 0.0.0.1.
+  */
+  void SetBeamBaseAddress (const Ipv4Address& network, const Ipv4Mask& mask, Ipv4Address base = "0.0.0.1");
+
+  /**
    * \param ut a set of UT nodes
    * \param users number of users to install for every UT
    *
@@ -255,6 +270,34 @@ public:
    */
   Ptr<Node> GetRouter () const;
 
+  /**
+   * Set needed routings of satellite network and fill ARP cache for the network.
+   * \param ut    container having UTs of the beam
+   * \param utNd  container having UT netdevices of the beam
+   * \param gw    pointer to gateway node
+   * \param gwNd  pointer to gateway netdevice
+   */
+  void PopulateBeamRoutings (NodeContainer ut, NetDeviceContainer utNd,
+                             Ptr<Node> gw, Ptr<NetDevice> gwNd);
+
+  /**
+   * \brief Update ARP cache and default route on an UT
+   * so packets are properly routed to the new GW as their
+   * next hop.
+   * \param ut Address of the UT for which tables should be updated
+   * \param newGateway Address of the newly assigned GW for this UT
+   */
+  void UpdateUtRoutes (Address ut, Address newGateway);
+
+  /**
+   * \brief Update ARP cache and default route on the terrestrial
+   * network so packets are properly routed to the UT handed over.
+   * \param ut Address of the UT which was just handed over
+   * \param oldGateway Address of the GW the UT was assigned to
+   * \param newGateway Address of the GW the UT is newly assigned to
+   */
+  void UpdateGwRoutes (Address ut, Address oldGateway, Address newGateway);
+
 private:
   /**
    * Install network between UT and its users
@@ -291,6 +334,7 @@ private:
   CsmaHelper        m_csma;
   Ipv4AddressHelper m_ipv4Ut;
   Ipv4AddressHelper m_ipv4Gw;
+  Ipv4AddressHelper m_ipv4Beam;
 
   NodeContainer       m_gwUsers;
   UtUsersContainer_t  m_utUsers;

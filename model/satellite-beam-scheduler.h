@@ -75,37 +75,6 @@ public:
    *
    * Stores L2 and L3 addresses information of the GW responsible of this beam.
    */
-  class SatGwInfo : public SimpleRefCount<SatGwInfo>
-  {
-public:
-    /**
-     * Construct SatGwInfo.
-     *
-     * \param damaEntry DamaEntry for created UT info.
-     * \param cnoEstimator C/N0 estimator for the UT info.
-     * \param controlSlotOffset Offset of the current moment to generate control slot.
-     * \param controlSlotsEnabled Flag to tell if control slots generation is enabled according to controlSlotOffset
-     */
-    SatGwInfo (Address macAddress, Ipv4Address ipAddress);
-
-    /**
-     * Get mac address of the GW info.
-     *
-     * \return mac address of the GW info.
-     */
-    Address GetAddress () const;
-
-    /**
-     * Get IP address of the GW info.
-     *
-     * \return IP address of the GW info.
-     */
-    Ipv4Address GetIpAddress () const;
-
-private:
-    Address m_macAddress;
-    Ipv4Address m_ipAddress;
-  };
 
   /**
    * \brief Get the type ID
@@ -147,9 +116,9 @@ private:
    *        be forwarded to the Beam UTs.
    * \param seq Superframe sequence.
    * \param maxFrameSizeInBytes Maximum non fragmented BB frame size with most robust ModCod
-   * \param gwInfo Address information of the gateway responsible for this beam
+   * \param gwAddress Mac address of the gateway responsible for this beam
    */
-  void Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCallback cb, Ptr<SatSuperframeSeq> seq, uint32_t maxFrameSizeInBytes, Ptr<SatBeamScheduler::SatGwInfo> gwInfo);
+  void Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCallback cb, Ptr<SatSuperframeSeq> seq, uint32_t maxFrameSizeInBytes, Address gwAddress);
 
   /**
    * Add UT to scheduler.
@@ -557,7 +526,7 @@ private:
    */
   Ptr<SatCnoEstimator> CreateCnoEstimator ();
 
-  Ptr<SatGwInfo> m_gwInfo;
+  Address m_gwAddress;
 };
 
 } // namespace ns3

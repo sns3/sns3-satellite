@@ -29,7 +29,6 @@
 #include <stdint.h>
 
 #include "ns3/node-container.h"
-#include "ns3/ipv4-address-helper.h"
 
 #include "ns3/satellite-ncc.h"
 #include "ns3/satellite-antenna-gain-pattern-container.h"
@@ -149,29 +148,25 @@ public:
   void SetChannelAttribute (std::string name, const AttributeValue &value);
 
   /**
-  * \param network The Ipv4Address containing the initial network number to
-  * use for satellite network allocation. The bits outside the network mask are not used.
-  * \param mask The Ipv4Mask containing one bits in each bit position of the
-  * network number.
-  * \param base An optional Ipv4Address containing the initial address used for
-  * IP address allocation.  Will be combined (ORed) with the network number to
-  * generate the first IP address.  Defaults to 0.0.0.1.
-  */
-  void SetBaseAddress (const Ipv4Address& network, const Ipv4Mask& mask, Ipv4Address base = "0.0.0.1");
-
-  /**
    * \param ut a set of UT nodes
    * \param gwNode pointer of GW node
    * \param gwId id of the GW
    * \param beamId  id of the beam
    * \param ulFreqId id of the user link frequency
    * \param flFreqId id of the feeder link frequency
+   * \param routingCallback the callback UT mac layers should
+   * call to update the node routes when receiving handover orders
    *
    * This method creates a beam  with the requested attributes
    * and associate the resulting ns3::NetDevices with the ns3::Nodes.
-   * \return node GW node of the beam.
+   * \return a pair containing the new SatNetDevice of the gateway
+   * and a NetDeviceContainer of all SatNetDevice for the UTs
    */
-  Ptr<Node> Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint32_t beamId, uint32_t ulFreqId, uint32_t flFreqId );
+  std::pair<Ptr<NetDevice>, NetDeviceContainer> Install (
+    NodeContainer ut, Ptr<Node> gwNode,
+    uint32_t gwId, uint32_t beamId,
+    uint32_t ulFreqId, uint32_t flFreqId,
+    SatUtMac::RoutingUpdateCallback routingCallback);
 
   /**
    * \param beamId beam ID
@@ -299,7 +294,6 @@ private:
   Ptr<SatGeoHelper>     m_geoHelper;
   Ptr<SatGwHelper>      m_gwHelper;
   Ptr<SatUtHelper>      m_utHelper;
-  Ipv4AddressHelper     m_ipv4Helper;
   Ptr<Node>             m_geoNode;
   Ptr<SatNcc>           m_ncc;
 
@@ -422,18 +416,6 @@ private:
    * \return result of storing
    */
   bool StoreGwNode (uint32_t id, Ptr<Node> node);
-
-  /**
-   * Set needed routings of satellite network and fill ARC cache for the network.
-   * \param ut    container having UTs of the beam
-   * \param utNd  container having UT netdevices of the beam
-   * \param gw    pointer to gateway node
-   * \param gwNd  pointer to gateway netdevice
-   * \param gwAddr address of the gateway
-   * \param utIfs container having UT ipv2 interfaces (for addresses)
-   */
-  void PopulateRoutings (NodeContainer ut, NetDeviceContainer utNd, Ptr<Node> gw,
-                         Ptr<NetDevice> gwNd, Ipv4Address gwAddr, Ipv4InterfaceContainer utIfs);
 
   /**
    * Install fading model to node, if fading model doesn't exist already in node

@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2013 Magister Solutions Ltd
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,19 +17,22 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.com>
  */
 
-#include "ns3/log.h"
-#include "ns3/enum.h"
-#include "ns3/ipv4-static-routing-helper.h"
-#include "ns3/ipv4-routing-table-entry.h"
-#include "ns3/internet-stack-helper.h"
-#include "ns3/csma-helper.h"
-#include "../model/satellite-simple-net-device.h"
-#include "satellite-user-helper.h"
+#include <ns3/log.h>
+#include <ns3/enum.h>
+#include <ns3/ipv4-interface.h>
+#include <ns3/ipv4-static-routing-helper.h>
+#include <ns3/ipv4-routing-table-entry.h>
+#include <ns3/internet-stack-helper.h>
+#include <ns3/csma-helper.h>
 #include <ns3/singleton.h>
+#include <ns3/satellite-arp-cache.h>
 #include <ns3/satellite-id-mapper.h>
 #include <ns3/satellite-typedefs.h>
+#include <ns3/satellite-simple-net-device.h>
+#include "satellite-user-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatUserHelper");
 
@@ -105,18 +109,28 @@ SatUserHelper::SetCsmaChannelAttribute (std::string name,
   m_csma.SetChannelAttribute (name, value);
 }
 
-void SatUserHelper::SetUtBaseAddress (const Ipv4Address& network, const Ipv4Mask& mask, const Ipv4Address address)
+void
+SatUserHelper::SetUtBaseAddress (const Ipv4Address& network, const Ipv4Mask& mask, const Ipv4Address address)
 {
   NS_LOG_FUNCTION (this);
 
   m_ipv4Ut.SetBase (network, mask, address);
 }
 
-void SatUserHelper::SetGwBaseAddress (const Ipv4Address& network, const Ipv4Mask& mask, const Ipv4Address address)
+void
+SatUserHelper::SetGwBaseAddress (const Ipv4Address& network, const Ipv4Mask& mask, const Ipv4Address address)
 {
   NS_LOG_FUNCTION (this);
 
   m_ipv4Gw.SetBase (network, mask, address);
+}
+
+void
+SatUserHelper::SetBeamBaseAddress (const Ipv4Address& network, const Ipv4Mask& mask, const Ipv4Address address)
+{
+  NS_LOG_FUNCTION (this);
+
+  m_ipv4Beam.SetBase (network, mask, address);
 }
 
 NodeContainer
@@ -502,6 +516,105 @@ SatUserHelper::GetRouter () const
   NS_LOG_FUNCTION (this);
 
   return m_router;
+}
+
+void
+SatUserHelper::PopulateBeamRoutings (NodeContainer ut, NetDeviceContainer utNd,
+                                     Ptr<Node> gw, Ptr<NetDevice> gwNd)
+{
+  Ipv4InterfaceContainer gwAddress = m_ipv4Beam.Assign (gwNd);
+  Ipv4Address gwAddr = gwAddress.GetAddress (0);
+  NS_LOG_FUNCTION (this << gw << gwNd << gwAddr);
+
+  Ipv4InterfaceContainer utIfs = m_ipv4Beam.Assign (utNd);
+
+  Ipv4StaticRoutingHelper ipv4RoutingHelper;
+  Ptr<Ipv4L3Protocol> ipv4Gw = gw->GetObject<Ipv4L3Protocol> ();
+  Ptr<Ipv4StaticRouting> srGw = ipv4RoutingHelper.GetStaticRouting (ipv4Gw);
+
+  // Create an ARP entry of the default GW for the UTs in this beam
+  Address macAddressGw = gwNd->GetAddress ();
+  Ptr<SatArpCache> utArpCache = CreateObject<SatArpCache> ();
+  utArpCache->Add (gwAddr, macAddressGw);
+  NS_LOG_INFO ("UT ARP entry:  " << gwAddr << " - " << macAddressGw );
+
+  // Add the ARP entries of all the UTs in this beam
+  // - MAC address vs. IPv4 address
+  Ptr<SatArpCache> gwArpCache = CreateObject<SatArpCache> ();
+  for (uint32_t i = 0; i < utIfs.GetN (); ++i)
+    {
+      NS_ASSERT (utIfs.GetN () == utNd.GetN ());
+      Ptr<NetDevice> nd = utNd.Get (i);
+      Ipv4Address ipv4Addr = utIfs.GetAddress (i);
+      gwArpCache->Add (ipv4Addr, nd->GetAddress ());
+      NS_LOG_INFO ("GW ARP entry:  " << ipv4Addr << " - " << nd->GetAddress ());
+    }
+
+  // Set the ARP cache to the proper GW IPv4Interface (the one for satellite
+  // link). ARP cache contains the entries for all UTs within this spot-beam.
+  ipv4Gw->GetInterface (gwNd->GetIfIndex ())->SetArpCache (gwArpCache);
+  NS_LOG_INFO ("Add ARP cache to GW " << gw->GetId () );
+
+  uint32_t utAddressIndex = 0;
+
+  for (NodeContainer::Iterator i = ut.Begin (); i != ut.End (); i++)
+    {
+      Ptr<Ipv4L3Protocol> ipv4Ut = (*i)->GetObject<Ipv4L3Protocol> ();
+
+      uint32_t count = ipv4Ut->GetNInterfaces ();
+
+      for (uint32_t j = 1; j < count; j++)
+        {
+          std::string devName = ipv4Ut->GetNetDevice (j)->GetInstanceTypeId ().GetName ();
+
+          // If SatNetDevice interface, add default route to towards GW of the beam on UTs
+          if ( devName == "ns3::SatNetDevice" )
+            {
+              Ptr<Ipv4StaticRouting> srUt = ipv4RoutingHelper.GetStaticRouting (ipv4Ut);
+              srUt->SetDefaultRoute (gwAddr, j);
+              NS_LOG_INFO ("UT default route: " << gwAddr);
+
+              // Set the ARP cache (including the ARP entry for the default GW) to the UT
+              ipv4Ut->GetInterface (j)->SetArpCache (utArpCache);
+              NS_LOG_INFO ("Add the ARP cache to UT " << (*i)->GetId () );
+
+            }
+          else  // add other interface route to GW's Satellite interface
+            {
+              Ipv4Address address = ipv4Ut->GetAddress (j, 0).GetLocal ();
+              Ipv4Mask mask = ipv4Ut->GetAddress (j, 0).GetMask ();
+
+              srGw->AddNetworkRouteTo (address.CombineMask (mask), mask, utIfs.GetAddress (utAddressIndex), gwNd->GetIfIndex ());
+              NS_LOG_INFO ("GW Network route:  " << address.CombineMask (mask) <<
+                           ", " << mask << ", " << utIfs.GetAddress (utAddressIndex));
+            }
+        }
+
+      utAddressIndex++;
+    }
+
+  m_ipv4Beam.NewNetwork ();
+}
+
+void
+SatUserHelper::UpdateUtRoutes (Address utAddress, Address gwAddress)
+{
+  NS_LOG_FUNCTION (this << utAddress << gwAddress);
+
+  //TODO store UT and GW nodes.
+  /*
+  Ptr<Ipv4L3Protocol> protocol = GetNode ()->GetObject<Ipv4L3Protocol> ();
+  ArpCache::Entry *entry = protocol->GetInterface (m_ifIndex)->GetArpCache ()->Add (ip);
+  entry->SetMacAddress (mac);
+  entry->MarkPermanent ();
+
+  Ipv4StaticRoutingHelper ipv4RoutingHelper;
+  Ptr<Ipv4StaticRouting> routing = ipv4RoutingHelper.GetStaticRouting (protocol);
+  if (routing != NULL)
+    {
+      routing->SetDefaultRoute (ip, m_ifIndex);
+    }
+  */
 }
 
 } // namespace ns3

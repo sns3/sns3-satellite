@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2013 Magister Solutions Ltd
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
 #ifndef SATELLITE_UT_MAC_H
@@ -208,6 +210,10 @@ public:
   typedef Callback<void, Mac48Address> GatewayUpdateCallback;
 
   void SetGatewayUpdateCallback (SatUtMac::GatewayUpdateCallback cb);
+
+  typedef Callback<void, Address, Address> RoutingUpdateCallback;
+
+  void SetRoutingUpdateCallback (SatUtMac::RoutingUpdateCallback cb);
 
 protected:
   /**
@@ -454,12 +460,32 @@ private:
    */
   bool m_crdsaOnlyForControl;
 
+  class SatTimuInfo : public SimpleRefCount<SatTimuInfo>
+  {
+public:
+    SatTimuInfo (uint32_t beamId, Address address);
+
+    uint32_t GetBeamId () const;
+
+    Address GetGwAddress () const;
+
+private:
+    uint32_t m_beamId;
+    Address m_gwAddress;
+  };
+
+  Ptr<SatTimuInfo> m_timuInfo;
+
+  Mac48Address m_gwAddress;
+
   /**
    * The physical layer handover callback
    */
   SatUtMac::HandoverCallback m_handoverCallback;
 
   SatUtMac::GatewayUpdateCallback m_gatewayUpdateCallback;
+
+  SatUtMac::RoutingUpdateCallback m_routingUpdateCallback;
 };
 
 } // namespace ns3

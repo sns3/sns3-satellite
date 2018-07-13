@@ -162,10 +162,6 @@ public:
    */
   void SetNodeInfo (Ptr<SatNodeInfo> nodeInfo);
 
-  void UpdateRoutingToGateway (Address mac, Ipv4Address ip);
-
-  void UpdateRoutingToGateway (Address mac, Ipv6Address ip);
-
 protected:
   /**
    * Dispose of this class instance

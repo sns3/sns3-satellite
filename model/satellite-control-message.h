@@ -38,8 +38,6 @@
 
 namespace ns3 {
 
-class Ipv4Address;
-
 /**
  * \ingroup satellite
  * \brief This class implements a tag that is used to identify
@@ -821,13 +819,9 @@ public:
    */
   void SetAllocatedBeamId (uint32_t beamId);
 
-  Address GetGwMacAddress () const;
+  Address GetGwAddress () const;
 
-  void SetGwMacAddress (Address address);
-
-  Ipv4Address GetGwIpAddress () const;
-
-  void SetGwIpAddress (Ipv4Address address);
+  void SetGwAddress (Address address);
 
   /**
    * \brief Get real size of the random access message, which can be used to e.g. simulate real size.
@@ -841,9 +835,10 @@ private:
    */
   uint32_t m_beamId;
 
+  /**
+   * Mac address of the new gateway
+   */
   Address m_gwAddress;
-
-  Ipv4Address m_gwIpAddress;
 };
 
 /**

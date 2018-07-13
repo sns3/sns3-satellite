@@ -212,7 +212,11 @@ SatUtHelper::SetPhyAttribute (std::string n1, const AttributeValue &v1)
 }
 
 NetDeviceContainer
-SatUtHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc, SatPhy::ChannelPairGetterCallback cb)
+SatUtHelper::Install (NodeContainer c, uint32_t beamId,
+                      Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
+                      Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
+                      SatPhy::ChannelPairGetterCallback cbChannel,
+                      SatUtMac::RoutingUpdateCallback cbRouting)
 {
   NS_LOG_FUNCTION (this << beamId << fCh << rCh );
 
@@ -220,14 +224,18 @@ SatUtHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
     {
-      devs.Add (Install (*i, beamId, fCh, rCh, gwNd, ncc, cb));
+      devs.Add (Install (*i, beamId, fCh, rCh, gwNd, ncc, cbChannel, cbRouting));
     }
 
   return devs;
 }
 
 Ptr<NetDevice>
-SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc, SatPhy::ChannelPairGetterCallback cb)
+SatUtHelper::Install (Ptr<Node> n, uint32_t beamId,
+                      Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
+                      Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
+                      SatPhy::ChannelPairGetterCallback cbChannel,
+                      SatUtMac::RoutingUpdateCallback cbRouting)
 {
   NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
 
@@ -279,7 +287,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
                                               m_linkResults,
                                               parameters,
                                               m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE));
-  phy->SetChannelPairGetterCallback (cb);
+  phy->SetChannelPairGetterCallback (cbChannel);
 
   // Set fading
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());
@@ -372,6 +380,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   llc->SetMacQueueEventCallback (macCb);
 
   // set serving GW MAC address to RM
+  mac->SetRoutingUpdateCallback (cbRouting);
   mac->SetGatewayUpdateCallback (MakeCallback (&SatUtLlc::SetGwAddress, llc));
   mac->SetGwAddress (gwAddr);
 

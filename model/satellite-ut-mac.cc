@@ -93,7 +93,8 @@ SatUtMac::SatUtMac ()
   m_guardTime (MicroSeconds (1)),
   m_raChannel (0),
   m_crdsaUniquePacketId (1),
-  m_crdsaOnlyForControl (false)
+  m_crdsaOnlyForControl (false),
+  m_timuInfo (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -122,6 +123,7 @@ SatUtMac::~SatUtMac ()
 
   m_randomAccess = NULL;
   m_tbtpContainer = NULL;
+  m_timuInfo = NULL;
 }
 
 void
@@ -132,6 +134,7 @@ SatUtMac::DoDispose (void)
   m_timingAdvanceCb.Nullify ();
   m_handoverCallback.Nullify ();
   m_gatewayUpdateCallback.Nullify ();
+  m_routingUpdateCallback.Nullify ();
   m_tbtpContainer->DoDispose ();
   m_utScheduler->DoDispose ();
   m_utScheduler = NULL;
@@ -154,11 +157,19 @@ SatUtMac::SetGatewayUpdateCallback (SatUtMac::GatewayUpdateCallback cb)
 }
 
 void
+SatUtMac::SetRoutingUpdateCallback (SatUtMac::RoutingUpdateCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_routingUpdateCallback = cb;
+}
+
+void
 SatUtMac::SetGwAddress (Mac48Address gwAddress)
 {
   NS_LOG_FUNCTION (this << gwAddress);
 
   m_gatewayUpdateCallback (gwAddress);
+  m_gwAddress = gwAddress;
 }
 
 void
@@ -677,9 +688,8 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
                          " switching from beam " << m_beamId << " to beam " << beamId);
             if (m_beamId != beamId)
               {
-                m_beamId = beamId;
-                SetGwAddress (Mac48Address::ConvertFrom (timuMsg->GetGwMacAddress ()));
-                m_handoverCallback (beamId);
+                NS_LOG_INFO ("Storing TIM-U information internally for later");
+                m_timuInfo = Create<SatTimuInfo> (beamId, timuMsg->GetGwAddress ());
               }
           }
         else
@@ -1186,6 +1196,28 @@ SatUtMac::DoFrameStart ()
 
   NS_LOG_INFO ("UT: " << m_nodeInfo->GetMacAddress ());
 
+  if (m_timuInfo != NULL)
+    {
+      NS_LOG_INFO ("Applying TIM-U parameters received during the previous frame");
+
+      m_beamId = m_timuInfo->GetBeamId ();
+      Address gwAddress = m_timuInfo->GetGwAddress ();
+      Mac48Address gwAddress48 = Mac48Address::ConvertFrom (gwAddress);
+      if (gwAddress48 != m_gwAddress)
+        {
+          SetGwAddress (gwAddress48);
+          m_routingUpdateCallback (m_nodeInfo->GetMacAddress (), gwAddress);
+        }
+      m_handoverCallback (m_beamId);
+
+      m_timuInfo = NULL;
+      // Reschedule this function in case reconfiguration of TX is instantaneous
+      Simulator::Schedule (Seconds (0.0), &SatUtMac::DoFrameStart, this);
+      return;
+    }
+
+  // TODO: (Mobility) check if TX is possible
+
   if (m_randomAccess != NULL)
     {
       /// reset packet ID counter for this frame
@@ -1205,6 +1237,30 @@ SatUtMac::DoFrameStart ()
   Time schedulingDelay = nextSuperFrameTxTime - Now ();
 
   Simulator::Schedule (schedulingDelay, &SatUtMac::DoFrameStart, this);
+}
+
+
+SatUtMac::SatTimuInfo::SatTimuInfo (uint32_t beamId, Address address)
+  : m_beamId (beamId),
+  m_gwAddress (address)
+{
+  NS_LOG_FUNCTION (this << beamId << address);
+}
+
+
+uint32_t
+SatUtMac::SatTimuInfo::GetBeamId () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_beamId;
+}
+
+
+Address
+SatUtMac::SatTimuInfo::GetGwAddress () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_gwAddress;
 }
 
 

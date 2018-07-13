@@ -25,16 +25,7 @@
 #include <ns3/boolean.h>
 #include <ns3/error-model.h>
 #include <ns3/trace-source-accessor.h>
-#include <ns3/ipv4-interface.h>
 #include <ns3/ipv4-l3-protocol.h>
-#include <ns3/ipv4-static-routing.h>
-#include <ns3/ipv4-static-routing-helper.h>
-#include <ns3/ipv6-interface.h>
-#include <ns3/ipv6-l3-protocol.h>
-#include <ns3/ipv6-static-routing.h>
-#include <ns3/ipv6-static-routing-helper.h>
-#include <ns3/arp-cache.h>
-#include <ns3/ndisc-cache.h>
 #include <ns3/channel.h>
 
 #include "satellite-net-device.h"
@@ -532,42 +523,6 @@ SatNetDevice::GetChannel (void) const
    * directly any channels, but they are attached to Phy layers.
    */
   return 0;
-}
-
-void
-SatNetDevice::UpdateRoutingToGateway (Address mac, Ipv4Address ip)
-{
-  NS_LOG_FUNCTION (this << mac << ip);
-
-  Ptr<Ipv4L3Protocol> protocol = GetNode ()->GetObject<Ipv4L3Protocol> ();
-  ArpCache::Entry *entry = protocol->GetInterface (m_ifIndex)->GetArpCache ()->Add (ip);
-  entry->SetMacAddress (mac);
-  entry->MarkPermanent ();
-
-  Ipv4StaticRoutingHelper ipv4RoutingHelper;
-  Ptr<Ipv4StaticRouting> routing = ipv4RoutingHelper.GetStaticRouting (protocol);
-  if (routing != NULL)
-    {
-      routing->SetDefaultRoute (ip, m_ifIndex);
-    }
-}
-
-void
-SatNetDevice::UpdateRoutingToGateway (Address mac, Ipv6Address ip)
-{
-  NS_LOG_FUNCTION (this << mac << ip);
-
-  Ptr<Ipv6L3Protocol> protocol = GetNode ()->GetObject<Ipv6L3Protocol> ();
-  NdiscCache::Entry *entry = protocol->GetInterface (m_ifIndex)->GetNdiscCache ()->Add (ip);
-  entry->SetMacAddress (mac);
-  entry->MarkPermanent ();
-
-  Ipv6StaticRoutingHelper ipv6RoutingHelper;
-  Ptr<Ipv6StaticRouting> routing = ipv6RoutingHelper.GetStaticRouting (protocol);
-  if (routing != NULL)
-    {
-      routing->SetDefaultRoute (ip, m_ifIndex);
-    }
 }
 
 } // namespace ns3
