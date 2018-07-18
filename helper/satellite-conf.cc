@@ -72,13 +72,21 @@ SatConf::GetTypeId (void)
                    DoubleValue (29.5e9),
                    MakeDoubleAccessor (&SatConf::m_rtnUserLinkFreqHz),
                    MakeDoubleChecker<double> ())
-    .AddAttribute ("UserLinkChannels", "The number of channels in user link",
+    .AddAttribute ("FwdUserLinkChannels", "The number of channels in forward user link",
                    UintegerValue (4),
-                   MakeUintegerAccessor (&SatConf::m_userLinkChannelCount),
+                   MakeUintegerAccessor (&SatConf::m_fwdUserLinkChannelCount),
                    MakeUintegerChecker<uint32_t> (1))
-    .AddAttribute ("FeederLinkChannels", "The number of channels in feeder link",
+    .AddAttribute ("RtnUserLinkChannels", "The number of channels in return user link",
+                   UintegerValue (4),
+                   MakeUintegerAccessor (&SatConf::m_rtnUserLinkChannelCount),
+                   MakeUintegerChecker<uint32_t> (1))
+    .AddAttribute ("FwdFeederLinkChannels", "The number of channels in forward feeder link",
                    UintegerValue (16),
-                   MakeUintegerAccessor (&SatConf::m_feederLinkChannelCount),
+                   MakeUintegerAccessor (&SatConf::m_fwdFeederLinkChannelCount),
+                   MakeUintegerChecker<uint32_t> (1))
+    .AddAttribute ("RtnFeederLinkChannels", "The number of channels in return feeder link",
+                   UintegerValue (16),
+                   MakeUintegerAccessor (&SatConf::m_rtnFeederLinkChannelCount),
                    MakeUintegerChecker<uint32_t> (1))
     .AddAttribute ("SuperFrameConfForSeq0",
                    "Super frame configuration used for super frame sequence 0.",
@@ -131,8 +139,10 @@ SatConf::SatConf ()
     m_rtnFeederLinkBandwidthHz (0.0),
     m_rtnUserLinkFreqHz (0.0),
     m_rtnUserLinkBandwidthHz (0.0),
-    m_userLinkChannelCount (0),
-    m_feederLinkChannelCount (0),
+    m_fwdUserLinkChannelCount (0),
+    m_rtnUserLinkChannelCount (0),
+    m_fwdFeederLinkChannelCount (0),
+    m_rtnFeederLinkChannelCount (0),
     m_SuperFrameConfForSeq0 (SatSuperframeConf::SUPER_FRAME_CONFIG_0),
     m_fwdCarrierAllocatedBandwidthHz (0.0),
     m_fwdCarrierRollOffFactor (0.0),
@@ -143,14 +153,22 @@ SatConf::SatConf ()
   // Nothing done here
 }
 
-void SatConf::Initialize (std::string satConf, std::string gwPos, std::string satPos, std::string wfConf)
+void SatConf::Initialize (std::string rtnConf,
+                          std::string fwdConf,
+                          std::string gwPos,
+                          std::string satPos,
+                          std::string wfConf)
 {
   NS_LOG_FUNCTION (this);
 
   std::string dataPath = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory () + "/";
 
   // Load satellite configuration file
-  LoadSatConf (dataPath + satConf);
+  m_rtnConf = LoadSatConf (dataPath + rtnConf);
+  m_fwdConf = LoadSatConf (dataPath + fwdConf);
+
+  NS_ASSERT (m_rtnConf.size () == m_fwdConf.size ());
+  m_beamCount = m_rtnConf.size ();
 
   // Load GW positions
   LoadPositions (dataPath + gwPos, m_gwPositions);
@@ -172,8 +190,8 @@ SatConf::Configure (std::string wfConf)
   // *** configure forward link ***
 
   // currently only one carrier in forward link is used.
-  double fwdFeederLinkChannelBandwidthHz = m_fwdFeederLinkBandwidthHz / m_feederLinkChannelCount;
-  double fwdUserLinkChannelBandwidthHz = m_fwdUserLinkBandwidthHz / m_userLinkChannelCount;
+  double fwdFeederLinkChannelBandwidthHz = m_fwdFeederLinkBandwidthHz / m_fwdFeederLinkChannelCount;
+  double fwdUserLinkChannelBandwidthHz = m_fwdUserLinkBandwidthHz / m_fwdUserLinkChannelCount;
 
   // channel bandwidths for the forward feeder and user links is expected to be equal
   if ( fwdFeederLinkChannelBandwidthHz != fwdUserLinkChannelBandwidthHz )
@@ -193,8 +211,8 @@ SatConf::Configure (std::string wfConf)
 
   // *** configure return link ***
 
-  double rtnFeederLinkBandwidthHz = m_rtnFeederLinkBandwidthHz / m_feederLinkChannelCount;
-  double rtnUserLinkBandwidthHz = m_rtnUserLinkBandwidthHz / m_userLinkChannelCount;
+  double rtnFeederLinkBandwidthHz = m_rtnFeederLinkBandwidthHz / m_rtnFeederLinkChannelCount;
+  double rtnUserLinkBandwidthHz = m_rtnUserLinkBandwidthHz / m_rtnUserLinkChannelCount;
 
   // bandwidths of the return feeder and user links is expected to be equal
   if ( rtnFeederLinkBandwidthHz != rtnUserLinkBandwidthHz )
@@ -233,7 +251,7 @@ SatConf::GetCarrierFrequencyHz ( SatEnums::ChannelType_t chType, uint32_t freqId
           NS_FATAL_ERROR ("Fwd Carrier id out of the range!!");
         }
 
-      channelBandwidthHz = m_fwdFeederLinkBandwidthHz / m_feederLinkChannelCount;
+      channelBandwidthHz = m_fwdFeederLinkBandwidthHz / m_fwdFeederLinkChannelCount;
       carrierBandwidthHz = m_forwardLinkCarrierConf[carrierId]->GetAllocatedBandwidthInHz ();
       baseFreqHz = m_fwdFeederLinkFreqHz + ( channelBandwidthHz * (freqId - 1) );
       centerFrequencyHz = baseFreqHz + (carrierBandwidthHz * carrierId) + (carrierBandwidthHz / 2);
@@ -245,20 +263,20 @@ SatConf::GetCarrierFrequencyHz ( SatEnums::ChannelType_t chType, uint32_t freqId
           NS_FATAL_ERROR ("Fwd Carrier id out of the range!!");
         }
 
-      channelBandwidthHz = m_fwdUserLinkBandwidthHz / m_userLinkChannelCount;
+      channelBandwidthHz = m_fwdUserLinkBandwidthHz / m_fwdUserLinkChannelCount;
       carrierBandwidthHz = m_forwardLinkCarrierConf[carrierId]->GetAllocatedBandwidthInHz ();
       baseFreqHz = m_fwdUserLinkFreqHz + ( channelBandwidthHz * (freqId - 1) );
       centerFrequencyHz = baseFreqHz + (carrierBandwidthHz * carrierId) + (carrierBandwidthHz / 2);
       break;
 
     case SatEnums::RETURN_FEEDER_CH:
-      channelBandwidthHz = m_rtnFeederLinkBandwidthHz / m_feederLinkChannelCount;
+      channelBandwidthHz = m_rtnFeederLinkBandwidthHz / m_rtnFeederLinkChannelCount;
       baseFreqHz = m_rtnFeederLinkFreqHz + ( channelBandwidthHz * (freqId - 1) );
       centerFrequencyHz = baseFreqHz + m_superframeSeq->GetCarrierFrequencyHz (carrierId);
       break;
 
     case SatEnums::RETURN_USER_CH:
-      channelBandwidthHz = m_rtnUserLinkBandwidthHz / m_userLinkChannelCount;
+      channelBandwidthHz = m_rtnUserLinkBandwidthHz / m_rtnUserLinkChannelCount;
       baseFreqHz = m_rtnUserLinkFreqHz + ( channelBandwidthHz * (freqId - 1) );
       centerFrequencyHz = baseFreqHz + m_superframeSeq->GetCarrierFrequencyHz (carrierId);
       break;
@@ -304,7 +322,7 @@ SatConf::GetCarrierBandwidthHz ( SatEnums::ChannelType_t chType, uint32_t carrie
   return carrierBandwidthHz;
 }
 
-std::ifstream* SatConf::OpenFile (std::string filePathName)
+std::ifstream* SatConf::OpenFile (std::string filePathName) const
 {
   NS_LOG_FUNCTION (this << filePathName);
 
@@ -326,10 +344,12 @@ std::ifstream* SatConf::OpenFile (std::string filePathName)
   return ifs;
 }
 
-void
-SatConf::LoadSatConf (std::string filePathName)
+std::vector <std::vector <uint32_t> >
+SatConf::LoadSatConf (std::string filePathName) const
 {
   NS_LOG_FUNCTION (this << filePathName);
+
+  std::vector <std::vector <uint32_t> > conf;
 
   // READ FROM THE SPECIFIED INPUT FILE
   std::ifstream *ifs = OpenFile (filePathName);
@@ -353,16 +373,16 @@ SatConf::LoadSatConf (std::string filePathName)
       beamConf.push_back (gwId);
       beamConf.push_back (feederChannelId);
 
-      m_conf.push_back (beamConf);
+      conf.push_back (beamConf);
 
       // get next row
       *ifs >> beamId >> userChannelId >> gwId >> feederChannelId;
     }
 
-  m_beamCount = m_conf.size ();
-
   ifs->close ();
   delete ifs;
+
+  return conf;
 }
 
 void
@@ -420,12 +440,14 @@ SatConf::GetUtCount () const
 }
 
 std::vector <uint32_t>
-SatConf::GetBeamConfiguration (uint32_t beamId) const
+SatConf::GetBeamConfiguration (uint32_t beamId, SatEnums::SatLinkDir_t dir) const
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT ((beamId > 0) && (beamId <=  m_beamCount));
 
-  return m_conf[beamId - 1];
+  return (dir == SatEnums::LD_RETURN) ?
+      m_rtnConf[beamId - 1] :
+      m_fwdConf[beamId - 1];
 }
 
 uint32_t

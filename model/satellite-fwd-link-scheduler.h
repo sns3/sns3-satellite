@@ -138,7 +138,7 @@ public:
    *
    * \return Pointer to frame
    */
-  virtual Ptr<SatBbFrame> GetNextFrame ();
+  virtual std::pair<Ptr<SatBbFrame>, const Time> GetNextFrame ();
 
   /**
    * Callback to get scheduling contexts from upper layer
@@ -179,6 +179,14 @@ public:
    * \param cnoEstimate Value of the estimated C/N0.
    */
   void CnoInfoUpdated (Mac48Address utAddress, double cnoEstimate);
+
+  /**
+   * \brief Return the BB frame duration of the default frame format, i.e.
+   * default MODCOD and NORMAL frame type. This is used by the GW MAC to
+   * schedule next txop events if it is disabled.
+   * \return Default frame duration in Time
+   */
+  Time GetDefaultFrameDuration () const;
 
 private:
   typedef std::map<Mac48Address, Ptr<SatCnoEstimator> > CnoEstimatorMap_t;
@@ -242,6 +250,12 @@ private:
    * MAC address of the this instance (node)
    */
   Mac48Address m_macAddress;
+
+  /**
+   * Flag indicating if Dummy Frames are sent or not.
+   * false means that only transmission time is simulated without sending.
+   */
+  bool m_dummyFrameSendingEnabled;
 
   /**
    * Random variable used in FWD link scheduling

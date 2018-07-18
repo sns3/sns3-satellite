@@ -61,6 +61,10 @@ SatMac::GetTypeId (void)
                      "A packet is received with delay information",
                      MakeTraceSourceAccessor (&SatMac::m_rxDelayTrace),
                      "ns3::SatTypedefs::PacketDelayAddressCallback")
+		.AddTraceSource ("BeamServiceTime",
+										 "A beam was disabled. Transmits length of last beam service time.",
+										 MakeTraceSourceAccessor (&SatMac::m_beamServiceTrace),
+										 "ns3::SatTypedefs::ServiceTimeCallback")
   ;
   return tid;
 }
@@ -68,7 +72,9 @@ SatMac::GetTypeId (void)
 SatMac::SatMac ()
   : m_isStatisticsTagsEnabled (false),
     m_nodeInfo (),
-    m_beamId (0)
+    m_beamId (0),
+    m_txEnabled (true),
+		m_beamEnabledTime (Seconds (0))
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT (false); // this version of the constructor should not been used
@@ -77,7 +83,9 @@ SatMac::SatMac ()
 SatMac::SatMac (uint32_t beamId)
   : m_isStatisticsTagsEnabled (false),
     m_nodeInfo (),
-    m_beamId (beamId)
+    m_beamId (beamId),
+    m_txEnabled (true),
+		m_beamEnabledTime (Seconds (0))
 {
   NS_LOG_FUNCTION (this);
 }
@@ -91,6 +99,8 @@ void
 SatMac::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
+  if (m_txEnabled) m_beamServiceTrace (Simulator::Now () - m_beamEnabledTime);
+
   m_txCallback.Nullify ();
   m_rxCallback.Nullify ();
   m_readCtrlCallback.Nullify ();
@@ -147,6 +157,22 @@ void
 SatMac::ReceiveQueueEvent (SatQueue::QueueEvent_t /*event*/, uint8_t /*flowIndex*/)
 {
   NS_LOG_FUNCTION (this);
+}
+
+void
+SatMac::Enable ()
+{
+  NS_LOG_FUNCTION (this);
+  if (!m_txEnabled) m_beamEnabledTime = Simulator::Now ();
+  m_txEnabled = true;
+}
+
+void
+SatMac::Disable ()
+{
+  NS_LOG_FUNCTION (this);
+  if (m_txEnabled) m_beamServiceTrace (Simulator::Now () - m_beamEnabledTime);
+  m_txEnabled = false;
 }
 
 void
