@@ -5,7 +5,7 @@ SNS3 was initially developed by Magister Solutions under ESA contact.
 
 # Installation Manual
 
-SNS3 is built as an extension module to the [NS3](https://www.nsnam.org/) network simulator; so their [installation instructions](https://www.nsnam.org/docs/release/3.28/tutorial/html/getting-started.html) apply. They are repeated here for convenience and proper integration of SNS3.
+SNS3 is built as an extension module to the [NS3](https://www.nsnam.org/) network simulator; so their [installation instructions](https://www.nsnam.org/docs/release/3.28/tutorial/html/getting-started.html) apply, particularly concerning the dependencies. They are repeated here for convenience and proper integration of SNS3.
 
 There are 2 methods to download and build (S)NS3:
 
@@ -84,7 +84,7 @@ Now that everything is in place, you can tell bake that you want to install SNS3
 	$ ./bake.py configure -c
 	$ ./bake.py configure -e ns-3.28
 	$ ./bake.py configure -e sns3-satellite -e sns3-stats -e sns3-traffic
-	$ ./bake.py download
+	$ ./bake.py deploy
 ```
 
 This will download the needed dependencies into a ''source'' folder and call the various build tools on each target. 
