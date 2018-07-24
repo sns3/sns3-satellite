@@ -234,7 +234,7 @@ void
 SatPhyTx::StartTx (Ptr<SatSignalParameters> txParams)
 {
   NS_LOG_FUNCTION (this << txParams);
-  NS_LOG_INFO (this << " state: " << m_state);
+  NS_LOG_INFO ("State: " << m_state);
 
   switch (m_state)
     {

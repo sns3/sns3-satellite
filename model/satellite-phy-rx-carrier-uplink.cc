@@ -57,14 +57,15 @@ SatPhyRxCarrierUplink::GetTypeId (void)
 Ptr<SatInterference::InterferenceChangeEvent>
 SatPhyRxCarrierUplink::CreateInterference (Ptr<SatSignalParameters> rxParams, Address senderAddress)
 {
+  NS_LOG_FUNCTION (this << rxParams << senderAddress);
   return GetInterferenceModel ()->Add (rxParams->m_duration, rxParams->m_rxPower_W, senderAddress);
 }
 
 void
 SatPhyRxCarrierUplink::EndRxData (uint32_t key)
 {
-  NS_LOG_FUNCTION (this);
-  NS_LOG_INFO (this << " state: " << GetState ());
+  NS_LOG_FUNCTION (this << key);
+  NS_LOG_INFO ("State: " << GetState ());
 
   NS_ASSERT (GetState () == RX);
 

@@ -158,8 +158,11 @@ SatPerPacketInterference::DoCalculate (Ptr<SatInterference::InterferenceChangeEv
   double rxEndTime = event->GetEndTime ().GetDouble ();
   bool ownStartReached = false;
 
-  NS_LOG_INFO ( "Calculate: IfPower (W)= " << ifPowerW << ", Duration= " << event->GetDuration () <<
-                ", StartTime= " << event->GetStartTime () << ", EndTime= " << event->GetEndTime () );
+  NS_LOG_INFO ("Calculate: IfPower (W)= " << ifPowerW <<
+               ", Event ID= " << event->GetId () <<
+               ", Duration= " << event->GetDuration () <<
+               ", StartTime= " << event->GetStartTime () <<
+               ", EndTime= " << event->GetEndTime ());
 
   InterferenceChanges::iterator currentItem = m_interferenceChanges.begin ();
 
@@ -175,6 +178,7 @@ SatPerPacketInterference::DoCalculate (Ptr<SatInterference::InterferenceChangeEv
         {
           if (isEndEvent)
             {
+              NS_LOG_INFO ( "IfPower after end event: " << ifPowerW );
               break;
             }
           // stop increasing power value fully, when own 'start' event is reached

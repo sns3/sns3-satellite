@@ -532,6 +532,9 @@ SatUserHelper::PopulateBeamRoutings (NodeContainer ut, NetDeviceContainer utNd,
   Ptr<Ipv4L3Protocol> ipv4Gw = gw->GetObject<Ipv4L3Protocol> ();
   Ptr<Ipv4StaticRouting> srGw = ipv4RoutingHelper.GetStaticRouting (ipv4Gw);
 
+  // Store GW NetDevice for updating routing during handover
+  m_gwDevices.insert (std::make_pair (gwNd->GetAddress (), gwNd));
+
   // Create an ARP entry of the default GW for the UTs in this beam
   Address macAddressGw = gwNd->GetAddress ();
   Ptr<SatArpCache> utArpCache = CreateObject<SatArpCache> ();
@@ -548,6 +551,8 @@ SatUserHelper::PopulateBeamRoutings (NodeContainer ut, NetDeviceContainer utNd,
       Ipv4Address ipv4Addr = utIfs.GetAddress (i);
       gwArpCache->Add (ipv4Addr, nd->GetAddress ());
       NS_LOG_INFO ("GW ARP entry:  " << ipv4Addr << " - " << nd->GetAddress ());
+      // Store UT NetDevice for updating routing during handover
+      m_utDevices.insert (std::make_pair (nd->GetAddress (), nd));
     }
 
   // Set the ARP cache to the proper GW IPv4Interface (the one for satellite
@@ -601,20 +606,178 @@ SatUserHelper::UpdateUtRoutes (Address utAddress, Address gwAddress)
 {
   NS_LOG_FUNCTION (this << utAddress << gwAddress);
 
-  //TODO store UT and GW nodes.
-  /*
-  Ptr<Ipv4L3Protocol> protocol = GetNode ()->GetObject<Ipv4L3Protocol> ();
-  ArpCache::Entry *entry = protocol->GetInterface (m_ifIndex)->GetArpCache ()->Add (ip);
-  entry->SetMacAddress (mac);
+  std::map<Address, Ptr<NetDevice> >::iterator gwNdIterator = m_gwDevices.find (gwAddress);
+  if (gwNdIterator == m_gwDevices.end ())
+    {
+      NS_FATAL_ERROR ("Unknown GW with MAC address " << gwAddress);
+    }
+
+  Ipv4Address ip = gwNdIterator->second->GetNode ()->GetObject<Ipv4L3Protocol> ()->GetAddress (gwNdIterator->second->GetIfIndex (), 0).GetLocal ();
+
+  std::map<Address, Ptr<NetDevice> >::iterator utNdIterator = m_utDevices.find (utAddress);
+  if (utNdIterator == m_utDevices.end ())
+    {
+      NS_FATAL_ERROR ("Unknown UT with MAC address " << utAddress);
+    }
+
+  Ptr<Ipv4L3Protocol> protocol = utNdIterator->second->GetNode ()->GetObject<Ipv4L3Protocol> ();
+  uint32_t utIfIndex = utNdIterator->second->GetIfIndex ();
+
+  NS_LOG_INFO ("Adding ARP cache entry to UT " << utAddress <<
+               " pointing to " << ip << " through " << gwAddress);
+  ArpCache::Entry *entry = protocol->GetInterface (utIfIndex)->GetArpCache ()->Add (ip);
+  entry->SetMacAddress (gwAddress);
   entry->MarkPermanent ();
 
   Ipv4StaticRoutingHelper ipv4RoutingHelper;
   Ptr<Ipv4StaticRouting> routing = ipv4RoutingHelper.GetStaticRouting (protocol);
-  if (routing != NULL)
+  routing->SetDefaultRoute (ip, utIfIndex);
+}
+
+void
+SatUserHelper::UpdateGwRoutes (Address ut, Address oldGateway, Address newGateway)
+{
+  NS_LOG_FUNCTION (this << ut << oldGateway << newGateway);
+
+  std::map<Address, Ptr<NetDevice> >::iterator utNdIterator = m_utDevices.find (ut);
+  if (utNdIterator == m_utDevices.end ())
     {
-      routing->SetDefaultRoute (ip, m_ifIndex);
+      NS_FATAL_ERROR ("Unknown UT with MAC address " << ut);
     }
-  */
+
+  std::map<Address, Ptr<NetDevice> >::iterator oldGwNdIterator = m_gwDevices.find (oldGateway);
+  if (oldGwNdIterator == m_gwDevices.end ())
+    {
+      NS_FATAL_ERROR ("Unknown GW with MAC address " << oldGateway);
+    }
+
+  std::map<Address, Ptr<NetDevice> >::iterator newGwNdIterator = m_gwDevices.find (newGateway);
+  if (newGwNdIterator == m_gwDevices.end ())
+    {
+      NS_FATAL_ERROR ("Unknown GW with MAC address " << newGateway);
+    }
+
+  uint32_t utIfIndex = utNdIterator->second->GetIfIndex ();
+  Ptr<Ipv4L3Protocol> utProtocol = utNdIterator->second->GetNode ()->GetObject<Ipv4L3Protocol> ();
+  Ipv4Address utIpAddress = utProtocol->GetAddress (utIfIndex, 0).GetLocal ();
+
+  Ptr<Node> oldGatewayNode = oldGwNdIterator->second->GetNode ();
+  uint32_t oldIfIndex = oldGwNdIterator->second->GetIfIndex ();
+  Ptr<Node> newGatewayNode = newGwNdIterator->second->GetNode ();
+  uint32_t newIfIndex = newGwNdIterator->second->GetIfIndex ();
+
+  Ptr<ArpCache> arpCache;
+  // Clear old ARP cache
+  arpCache = oldGatewayNode->GetObject<Ipv4L3Protocol> ()->GetInterface (oldIfIndex)->GetArpCache ();
+  for (ArpCache::Entry *entry : arpCache->LookupInverse (ut))
+    {
+      arpCache->Remove (entry);
+    }
+  // Add entry in new ARP cache
+  arpCache = newGatewayNode->GetObject<Ipv4L3Protocol> ()->GetInterface (newIfIndex)->GetArpCache ();
+  ArpCache::Entry *entry = arpCache->Add (utIpAddress);
+  entry->SetMacAddress (ut);
+  entry->MarkPermanent ();
+
+  // Change routes on GW
+  Ipv4StaticRoutingHelper ipv4RoutingHelper;
+  if (oldGatewayNode == newGatewayNode)
+    {
+      // intra-GW handover
+      Ptr<Ipv4StaticRouting> routing = ipv4RoutingHelper.GetStaticRouting (oldGatewayNode->GetObject<Ipv4L3Protocol> ());
+
+      // purge old routes
+      for (uint32_t routeIndex = routing->GetNRoutes () - 1; routeIndex >= 0; --routeIndex)
+        {
+          if (routing->GetRoute (routeIndex).GetGateway () == utIpAddress)
+            {
+              routing->RemoveRoute (routeIndex);
+            }
+        }
+
+      // add new ones
+      for (uint32_t ifIndex = 1; ifIndex < utProtocol->GetNInterfaces (); ++ifIndex)
+        {
+          Ipv4Address address = utProtocol->GetAddress (ifIndex, 0).GetLocal ();
+          Ipv4Mask mask = utProtocol->GetAddress (ifIndex, 0).GetMask ();
+
+          if (ifIndex == utIfIndex)
+            {
+              mask = Ipv4Mask ("/32");
+            }
+
+          routing->AddNetworkRouteTo (address.CombineMask (mask), mask, utIpAddress, newIfIndex);
+        }
+    }
+  else
+    {
+      // inter-GW handover
+      Ptr<Ipv4StaticRouting> routing = ipv4RoutingHelper.GetStaticRouting (oldGatewayNode->GetObject<Ipv4L3Protocol> ());
+      Ptr<Ipv4StaticRouting> routingRouter = ipv4RoutingHelper.GetStaticRouting (m_router->GetObject<Ipv4L3Protocol> ());
+
+      // purge old routes
+      for (uint32_t routeIndex = routing->GetNRoutes () - 1; routeIndex >= 0; --routeIndex)
+        {
+          Ipv4RoutingTableEntry gwRoute = routing->GetRoute (routeIndex);
+          if (gwRoute.GetGateway () == utIpAddress)
+            {
+              routing->RemoveRoute (routeIndex);
+              // search for corresponding route on terrestrial router
+              for (uint32_t routerIndex = 0; routerIndex < routingRouter->GetNRoutes (); ++routerIndex)
+                {
+                  Ipv4RoutingTableEntry route = routingRouter->GetRoute (routerIndex);
+                  if (route.GetDestNetwork () == gwRoute.GetDestNetwork () && route.GetDestNetworkMask () == gwRoute.GetDestNetworkMask ())
+                    {
+                      routingRouter->RemoveRoute (routerIndex);
+                      break;
+                    }
+                }
+            }
+        }
+
+      // add new ones
+      Ptr<Ipv4L3Protocol> gwProtocol = newGatewayNode->GetObject<Ipv4L3Protocol> ();
+
+      // start by looking up GW IP as seen by the terrestrial router
+      Ipv4Address gwAddress;
+      for (uint32_t ifIndex = 1; ifIndex < gwProtocol->GetNInterfaces (); ++ifIndex)
+        {
+          Ptr<NetDevice> gwNd = gwProtocol->GetNetDevice (ifIndex);
+          if (gwNd->GetInstanceTypeId ().GetName () != "ns3::SatNetDevice")
+            {
+              gwAddress = gwProtocol->GetAddress (ifIndex, 0).GetLocal ();
+              break;
+            }
+        }
+
+      // find interface on the terrestrial router to send messages to GW
+      uint32_t routingIfIndex;
+      for (uint32_t routeIndex = 0; routeIndex < routingRouter->GetNRoutes (); ++routeIndex)
+        {
+          Ipv4RoutingTableEntry route = routingRouter->GetRoute (routeIndex);
+          if (route.GetGateway () == gwAddress)
+            {
+              routingIfIndex = route.GetInterface ();
+              break;
+            }
+        }
+
+      // add routes to the new GW and the terrestrial router
+      routing = ipv4RoutingHelper.GetStaticRouting (gwProtocol);
+      for (uint32_t ifIndex = 1; ifIndex < utProtocol->GetNInterfaces (); ++ifIndex)
+        {
+          Ipv4Address address = utProtocol->GetAddress (ifIndex, 0).GetLocal ();
+          Ipv4Mask mask = utProtocol->GetAddress (ifIndex, 0).GetMask ();
+
+          if (ifIndex == utIfIndex)
+            {
+              mask = Ipv4Mask ("/32");
+            }
+
+          routing->AddNetworkRouteTo (address.CombineMask (mask), mask, utIpAddress, newIfIndex);
+          routingRouter->AddNetworkRouteTo (address.CombineMask (mask), mask, gwAddress, routingIfIndex);
+        }
+    }
 }
 
 } // namespace ns3

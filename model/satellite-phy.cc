@@ -292,7 +292,7 @@ void
 SatPhy::SendPdu (PacketContainer_t p, uint32_t carrierId, Time duration, SatSignalParameters::txInfo_s txInfo)
 {
   NS_LOG_FUNCTION (this << carrierId << duration);
-  NS_LOG_INFO (this << " sending a packet with carrierId: " << carrierId << " duration: " << duration);
+  NS_LOG_INFO ("Sending a packet with carrierId: " << carrierId << " duration: " << duration);
 
   // Add a SatPhyTimeTag tag for packet delay computation at the receiver end.
   if (m_isStatisticsTagsEnabled)

@@ -331,7 +331,7 @@ void
 SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
 {
   NS_LOG_FUNCTION (this << rxParams);
-  NS_LOG_INFO (this << " state: " << m_state);
+  NS_LOG_INFO ("State: " << m_state);
   NS_ASSERT (rxParams->m_carrierId == m_carrierId);
 
   uint32_t key;

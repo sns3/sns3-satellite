@@ -222,6 +222,7 @@ SatUtPhy::AssignNewSatChannels ()
   Ptr<SatChannel> returnLink = channels.second;
 
   // Assign channels
+  NS_LOG_INFO ("Setting new Tx on channel " << returnLink);
   m_phyTx->SetChannel (returnLink);
   forwardLink->AddRx (m_phyRx);
 }

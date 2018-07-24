@@ -105,6 +105,9 @@ void
 SatMac::SetNodeInfo (Ptr<SatNodeInfo> nodeInfo)
 {
   NS_LOG_FUNCTION (this << nodeInfo);
+  NS_LOG_INFO ("Node (id)= " << nodeInfo->GetNodeId () <<
+               " Node (type)= " << nodeInfo->GetNodeType () <<
+               " Address= " << nodeInfo->GetMacAddress ());
   m_nodeInfo = nodeInfo;
 }
 

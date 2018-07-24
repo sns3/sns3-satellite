@@ -364,6 +364,19 @@ private:
    */
   TracedCallback<std::string> m_creationTrace;
 
+  /**
+   * \brief Container of UT SatNetDevice accessible by MAC address
+   *
+   * Used to update routing during handover
+   */
+  std::map<Address, Ptr<NetDevice> > m_utDevices;
+
+  /**
+   * \brief Container of GW SatNetDevice accessible by MAC address
+   *
+   * Used to update routing during handover
+   */
+  std::map<Address, Ptr<NetDevice> > m_gwDevices;
 };
 
 } // namespace ns3
