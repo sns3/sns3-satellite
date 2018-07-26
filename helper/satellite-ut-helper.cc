@@ -20,46 +20,50 @@
  * Author: Mathias Ettinger <mettinger@viveris.toulouse.fr>
  */
 
-#include "ns3/config.h"
-#include "ns3/log.h"
-#include "ns3/names.h"
-#include "ns3/enum.h"
-#include "ns3/double.h"
-#include "ns3/pointer.h"
-#include "ns3/uinteger.h"
-#include "ns3/string.h"
-#include "ns3/callback.h"
-#include "ns3/config.h"
-#include "ns3/nstime.h"
-#include "../model/satellite-const-variables.h"
-#include "../model/satellite-utils.h"
-#include "../model/satellite-channel.h"
-#include "../model/satellite-mobility-observer.h"
-#include "../model/satellite-gw-llc.h"
-#include "../model/satellite-ut-llc.h"
-#include "../model/satellite-ut-mac.h"
-#include "../model/satellite-net-device.h"
-#include "../model/satellite-ut-phy.h"
-#include "../model/satellite-phy-tx.h"
-#include "../model/satellite-phy-rx.h"
-#include "../model/satellite-phy-rx-carrier-conf.h"
-#include "../model/satellite-base-encapsulator.h"
-#include "../model/satellite-generic-stream-encapsulator.h"
-#include "../model/satellite-generic-stream-encapsulator-arq.h"
-#include "../model/satellite-return-link-encapsulator.h"
-#include "../model/satellite-return-link-encapsulator-arq.h"
-#include "../model/satellite-net-device.h"
-#include "../model/satellite-node-info.h"
-#include "../model/satellite-enums.h"
-#include "../model/satellite-request-manager.h"
-#include "../model/satellite-queue.h"
-#include "../model/satellite-ut-scheduler.h"
-#include "../model/satellite-channel-estimation-error-container.h"
-#include "../model/satellite-packet-classifier.h"
-#include "satellite-ut-helper.h"
-#include "ns3/singleton.h"
-#include "ns3/satellite-id-mapper.h"
+#include <ns3/config.h>
+#include <ns3/log.h>
+#include <ns3/names.h>
+#include <ns3/enum.h>
+#include <ns3/double.h>
+#include <ns3/pointer.h>
+#include <ns3/uinteger.h>
+#include <ns3/string.h>
+#include <ns3/callback.h>
+#include <ns3/config.h>
+#include <ns3/nstime.h>
+#include <ns3/singleton.h>
+
+#include <ns3/satellite-const-variables.h>
+#include <ns3/satellite-utils.h>
+#include <ns3/satellite-channel.h>
+#include <ns3/satellite-mobility-observer.h>
+#include <ns3/satellite-traced-mobility-model.h>
+#include <ns3/satellite-gw-llc.h>
+#include <ns3/satellite-ut-llc.h>
+#include <ns3/satellite-ut-mac.h>
+#include <ns3/satellite-net-device.h>
+#include <ns3/satellite-ut-phy.h>
+#include <ns3/satellite-phy-tx.h>
+#include <ns3/satellite-phy-rx.h>
+#include <ns3/satellite-phy-rx-carrier-conf.h>
+#include <ns3/satellite-base-encapsulator.h>
+#include <ns3/satellite-generic-stream-encapsulator.h>
+#include <ns3/satellite-generic-stream-encapsulator-arq.h>
+#include <ns3/satellite-return-link-encapsulator.h>
+#include <ns3/satellite-return-link-encapsulator-arq.h>
+#include <ns3/satellite-net-device.h>
+#include <ns3/satellite-node-info.h>
+#include <ns3/satellite-enums.h>
+#include <ns3/satellite-request-manager.h>
+#include <ns3/satellite-queue.h>
+#include <ns3/satellite-ut-scheduler.h>
+#include <ns3/satellite-channel-estimation-error-container.h>
+#include <ns3/satellite-packet-classifier.h>
+#include <ns3/satellite-id-mapper.h>
 #include <ns3/satellite-typedefs.h>
+
+#include "satellite-ut-helper.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatUtHelper");
 
@@ -301,6 +305,12 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId,
   mac->SetSendCtrlCallback (m_sendCtrlCb);
 
   // Set timing advance callback to mac.
+  Ptr<SatTracedMobilityModel> mobility = n->GetObject<SatTracedMobilityModel> ();
+  if (mobility != NULL)
+    {
+      mobility->SetAddress (dev->GetAddress ());
+    }
+
   Ptr<SatMobilityObserver> observer = n->GetObject<SatMobilityObserver> ();
   NS_ASSERT (observer != NULL);
 

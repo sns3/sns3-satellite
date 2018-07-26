@@ -110,10 +110,20 @@ SatTracedMobilityModel::DoGetVelocity (void) const
 void
 SatTracedMobilityModel::UpdateGeoPositionFromFile (void)
 {
-  GeoCoordinate newPosition = Singleton<SatPositionInputTraceContainer>::Get ()->GetPosition (Address (), m_refEllipsoid);
+  NS_LOG_FUNCTION (this);
+
+  GeoCoordinate newPosition = Singleton<SatPositionInputTraceContainer>::Get ()->GetPosition (m_ownAddress, m_refEllipsoid);
   DoSetGeoPosition (newPosition);
 
   Simulator::Schedule (m_updateInterval, &SatTracedMobilityModel::UpdateGeoPositionFromFile, this);
+}
+
+void
+SatTracedMobilityModel::SetAddress (Address address)
+{
+  NS_LOG_FUNCTION (this);
+
+  m_ownAddress = address;
 }
 
 }

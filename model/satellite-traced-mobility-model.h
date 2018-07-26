@@ -22,6 +22,7 @@
 #define SATELLITE_TRACED_MOBILITY_MODEL_H
 
 #include <ns3/nstime.h>
+#include <ns3/address.h>
 #include "satellite-mobility-model.h"
 
 namespace ns3 {
@@ -52,6 +53,12 @@ public:
    */
   virtual ~SatTracedMobilityModel ();
 
+  /**
+   * \brief Set the UT address this mobility model is associated to
+   * \param address The address to set
+   */
+  void SetAddress (Address address);
+
 private:
   /**
    * \return the current velocity.
@@ -70,6 +77,7 @@ private:
 
   void UpdateGeoPositionFromFile (void);
 
+  Address m_ownAddress;
   Time m_updateInterval;
   GeoCoordinate::ReferenceEllipsoid_t m_refEllipsoid;
   GeoCoordinate m_geoPosition;
