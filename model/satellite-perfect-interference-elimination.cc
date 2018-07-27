@@ -96,10 +96,10 @@ SatPerfectInterferenceElimination::EliminateInterferences (
         }
 
       ifPower.second -= processedPacket->m_rxPowerInSatellite_W;
-      if (std::abs (ifPower.second) < std::numeric_limits<double>::epsilon ())
-        {
-          ifPower.second = 0.0;
-        }
+//      if (std::abs (ifPower.second) < std::numeric_limits<double>::epsilon ())
+//        {
+//          ifPower.second = 0.0;
+//        }
 
       if (ifPower.second < 0)
         {

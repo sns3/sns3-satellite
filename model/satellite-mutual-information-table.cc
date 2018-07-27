@@ -211,7 +211,7 @@ SatMutualInformationTable::Load (std::string mutualInformationPath)
         }
     }
 
-  double lastSnirDb = -1.0e100; // very low value
+  double lastSnirDb = -100.0; //-1.0e100; // very low value
   double lastSymbolInformation = 0.0; // minimum value
 
   double snirDb, symbolInformation;

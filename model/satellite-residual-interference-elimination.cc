@@ -21,6 +21,7 @@
 #include "ns3/simulator.h"
 #include "ns3/log.h"
 #include "ns3/double.h"
+#include "satellite-utils.h"
 #include "satellite-signal-parameters.h"
 #include "satellite-residual-interference-elimination.h"
 
@@ -122,7 +123,7 @@ SatResidualInterferenceElimination::EliminateInterferences (
 
       ifPower.second -= ifPowerToRemove;
       ifPower.second += residualPower;
-      if (std::abs (ifPower.second) < std::numeric_limits<double>::epsilon ())
+      if (std::abs (ifPower.second) < 1.0e-30)//std::numeric_limits<double>::epsilon ())
         {
           ifPower.second = 0.0;
         }
