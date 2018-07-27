@@ -18,26 +18,29 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include "ns3/double.h"
-#include "ns3/log.h"
-#include "ns3/names.h"
-#include "ns3/queue.h"
-#include "ns3/string.h"
-#include "ns3/type-id.h"
-#include "ns3/csma-helper.h"
-#include "ns3/internet-stack-helper.h"
-#include "ns3/ipv4-static-routing-helper.h"
-#include "ns3/mobility-helper.h"
-#include "ns3/singleton.h"
-#include "ns3/ipv4-static-routing-helper.h"
-#include "ns3/ipv4-routing-table-entry.h"
-#include <ns3/satellite-typedefs.h>
+#include <ns3/double.h>
+#include <ns3/log.h>
+#include <ns3/names.h>
+#include <ns3/queue.h>
+#include <ns3/string.h>
+#include <ns3/type-id.h>
+#include <ns3/csma-helper.h>
+#include <ns3/internet-stack-helper.h>
+#include <ns3/ipv4-static-routing-helper.h>
+#include <ns3/mobility-helper.h>
+#include <ns3/singleton.h>
+#include <ns3/system-path.h>
+#include <ns3/ipv4-static-routing-helper.h>
+#include <ns3/ipv4-routing-table-entry.h>
 
-#include "../model/satellite-position-allocator.h"
-#include "../model/satellite-rtn-link-time.h"
-#include "../model/satellite-log.h"
-#include "../utils/satellite-env-variables.h"
+#include <ns3/satellite-typedefs.h>
+#include <ns3/satellite-position-allocator.h>
+#include <ns3/satellite-rtn-link-time.h>
+#include <ns3/satellite-log.h>
+#include <ns3/satellite-env-variables.h>
+#include <ns3/satellite-traced-mobility-model.h>
 #include "satellite-helper.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatHelper");
 
@@ -151,7 +154,8 @@ SatHelper::SatHelper ()
   m_utsInBeam (0),
   m_gwUsers (0),
   m_utUsers (0),
-  m_utPositionsByBeam ()
+  m_utPositionsByBeam (),
+  m_mobileUtsByBeam ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -471,10 +475,20 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
 
       for ( BeamUserInfoMap_t::iterator info = beamInfos.begin (); info != beamInfos.end (); info++)
         {
-          // create UTs of the beam, set mobility to them and install to Internet
+          // create UTs of the beam, set mobility to them
           NodeContainer uts;
           uts.Create (info->second.GetUtCount ());
           SetUtMobility (uts, info->first);
+
+          // Add mobile UTs starting at this beam
+          std::map<uint32_t, NodeContainer>::iterator mobileUts = m_mobileUtsByBeam.find (info->first);
+          if (mobileUts != m_mobileUtsByBeam.end ())
+            {
+              uts.Add (mobileUts->second);
+              m_mobileUtsByBeam.erase (mobileUts);
+            }
+
+          // install the whole fleet to Internet
           internet.Install (uts);
 
           for ( uint32_t i = 0; i < info->second.GetUtCount (); i++ )
@@ -497,6 +511,8 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
           m_userHelper->PopulateBeamRoutings (uts, netDevices.second, gwNode, netDevices.first);
         }
 
+      // TODO: Install mobile UT starting from other beams
+
       m_userHelper->InstallGw (m_beamHelper->GetGwNodes (), gwUsers);
 
       if (m_packetTraces)
@@ -505,6 +521,31 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
         }
 
       m_scenarioCreated = true;
+    }
+}
+
+void
+SatHelper::LoadMobileUTsFromFolder (const std::string& folderName)
+{
+  for (std::string& filename : SystemPath::ReadFiles (folderName))
+    {
+      // Create Node, Mobility and aggregate them
+      Ptr<SatTracedMobilityModel> mobility = CreateObject<SatTracedMobilityModel> (filename, m_antennaGainPatterns);
+      uint32_t bestBeamId = mobility->GetBestBeamId ();
+      Ptr<Node> utNode = CreateObject<Node> ();
+      utNode->AggregateObject (mobility);
+
+      // Store Node in the container for the starting beam
+      std::map<uint32_t, NodeContainer>::iterator it = m_mobileUtsByBeam.find (bestBeamId);
+      if (it == m_mobileUtsByBeam.end ())
+        {
+          std::pair<std::map<uint32_t, NodeContainer>::iterator, bool> inserted = m_mobileUtsByBeam.insert (std::make_pair (bestBeamId, NodeContainer (utNode)));
+          NS_ASSERT_MSG (inserted.second, "Failed to create a new beam when reading UT mobility files");
+        }
+      else
+        {
+          it->second.Add (utNode);
+        }
     }
 }
 
@@ -736,6 +777,7 @@ SatHelper::DoDispose ()
   NS_LOG_FUNCTION (this);
 
   m_utPositionsByBeam.clear ();
+  m_mobileUtsByBeam.clear ();
 }
 
 bool

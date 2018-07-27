@@ -63,10 +63,17 @@ SatTracedMobilityModel::GetInstanceTypeId (void) const
 }
 
 SatTracedMobilityModel::SatTracedMobilityModel ()
-  : m_updateInterval (MilliSeconds (1)),
+{
+  NS_FATAL_ERROR ("SatTracedMobilityModel default constructor should not be used");
+}
+
+SatTracedMobilityModel::SatTracedMobilityModel (const std::string& filename, Ptr<SatAntennaGainPatternContainer> agp)
+  : m_traceFilename (filename),
+  m_updateInterval (MilliSeconds (1)),
   m_refEllipsoid (GeoCoordinate::SPHERE),
   m_geoPosition (0.0, 0.0, 0.0),
-  m_velocity (0.0, 0.0, 0.0)
+  m_velocity (0.0, 0.0, 0.0),
+  m_antennaGainPatterns (agp)
 {
   NS_LOG_FUNCTION (this);
 
@@ -112,18 +119,16 @@ SatTracedMobilityModel::UpdateGeoPositionFromFile (void)
 {
   NS_LOG_FUNCTION (this);
 
-  GeoCoordinate newPosition = Singleton<SatPositionInputTraceContainer>::Get ()->GetPosition (m_ownAddress, m_refEllipsoid);
+  GeoCoordinate newPosition = Singleton<SatPositionInputTraceContainer>::Get ()->GetPosition (m_traceFilename, m_refEllipsoid);
   DoSetGeoPosition (newPosition);
 
   Simulator::Schedule (m_updateInterval, &SatTracedMobilityModel::UpdateGeoPositionFromFile, this);
 }
 
-void
-SatTracedMobilityModel::SetAddress (Address address)
+uint32_t
+SatTracedMobilityModel::GetBestBeamId (void) const
 {
-  NS_LOG_FUNCTION (this);
-
-  m_ownAddress = address;
+  return m_antennaGainPatterns->GetBestBeamId (m_geoPosition);
 }
 
 }

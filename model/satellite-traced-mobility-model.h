@@ -22,7 +22,7 @@
 #define SATELLITE_TRACED_MOBILITY_MODEL_H
 
 #include <ns3/nstime.h>
-#include <ns3/address.h>
+#include "satellite-antenna-gain-pattern-container.h"
 #include "satellite-mobility-model.h"
 
 namespace ns3 {
@@ -44,9 +44,14 @@ public:
   TypeId GetInstanceTypeId (void) const;
 
   /**
-   * Default constructor.
+   * Default constructor. Unused.
    */
   SatTracedMobilityModel ();
+
+  /**
+   * Constructor.
+   */
+  SatTracedMobilityModel (const std::string& filename, Ptr<SatAntennaGainPatternContainer> agp);
 
   /**
    * Destructor for SatMobilityModel
@@ -54,10 +59,9 @@ public:
   virtual ~SatTracedMobilityModel ();
 
   /**
-   * \brief Set the UT address this mobility model is associated to
-   * \param address The address to set
+   * \brief Return the best beam ID based on the current position
    */
-  void SetAddress (Address address);
+  uint32_t GetBestBeamId (void) const;
 
 private:
   /**
@@ -77,11 +81,12 @@ private:
 
   void UpdateGeoPositionFromFile (void);
 
-  Address m_ownAddress;
+  std::string m_traceFilename;
   Time m_updateInterval;
   GeoCoordinate::ReferenceEllipsoid_t m_refEllipsoid;
   GeoCoordinate m_geoPosition;
   Vector m_velocity;
+  Ptr<SatAntennaGainPatternContainer> m_antennaGainPatterns;
 };
 
 } // namespace ns3

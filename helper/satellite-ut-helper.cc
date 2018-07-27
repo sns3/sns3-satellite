@@ -37,7 +37,6 @@
 #include <ns3/satellite-utils.h>
 #include <ns3/satellite-channel.h>
 #include <ns3/satellite-mobility-observer.h>
-#include <ns3/satellite-traced-mobility-model.h>
 #include <ns3/satellite-gw-llc.h>
 #include <ns3/satellite-ut-llc.h>
 #include <ns3/satellite-ut-mac.h>
@@ -305,12 +304,6 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId,
   mac->SetSendCtrlCallback (m_sendCtrlCb);
 
   // Set timing advance callback to mac.
-  Ptr<SatTracedMobilityModel> mobility = n->GetObject<SatTracedMobilityModel> ();
-  if (mobility != NULL)
-    {
-      mobility->SetAddress (dev->GetAddress ());
-    }
-
   Ptr<SatMobilityObserver> observer = n->GetObject<SatMobilityObserver> ();
   NS_ASSERT (observer != NULL);
 

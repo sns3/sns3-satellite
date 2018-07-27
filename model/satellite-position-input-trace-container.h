@@ -22,7 +22,7 @@
 #define SATELLITE_POSITION_INPUT_TRACE_CONTAINER_H
 
 #include <ns3/satellite-input-fstream-time-double-container.h>
-#include <ns3/mac48-address.h>
+#include "satellite-antenna-gain-pattern-container.h"
 #include "satellite-base-trace-container.h"
 #include "geo-coordinate.h"
 
@@ -40,7 +40,7 @@ public:
   /**
    * \brief typedef for map of containers
    */
-  typedef std::map <Address, Ptr<SatInputFileStreamTimeDoubleContainer> > container_t;
+  typedef std::map <std::string, Ptr<SatInputFileStreamTimeDoubleContainer> > container_t;
 
   /**
    * \brief Constructor
@@ -74,7 +74,7 @@ public:
    * \param key key
    * \return Rx power density
    */
-  GeoCoordinate GetPosition (Address key, GeoCoordinate::ReferenceEllipsoid_t refEllipsoid);
+  GeoCoordinate GetPosition (const std::string& key, GeoCoordinate::ReferenceEllipsoid_t refEllipsoid);
 
   /**
    * \brief Function for resetting the variables
@@ -84,17 +84,17 @@ public:
 private:
   /**
    * \brief Function for adding the node to the map
-   * \param key key
+   * \param key filename to read positions from
    * \return pointer to the added container
    */
-  Ptr<SatInputFileStreamTimeDoubleContainer> AddNode (Address key);
+  Ptr<SatInputFileStreamTimeDoubleContainer> AddNode (const std::string& key);
 
   /**
    * \brief Function for finding the container matching the key
    * \param key key
    * \return matching container
    */
-  Ptr<SatInputFileStreamTimeDoubleContainer> FindNode (Address key);
+  Ptr<SatInputFileStreamTimeDoubleContainer> FindNode (const std::string& key);
 
   /**
    * \brief Map for containers

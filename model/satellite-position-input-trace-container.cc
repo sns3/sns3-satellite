@@ -19,9 +19,8 @@
  */
 
 #include <ns3/satellite-env-variables.h>
-#include <ns3/singleton.h>
 #include "satellite-position-input-trace-container.h"
-#include "satellite-id-mapper.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatPositionInputTraceContainer");
 
@@ -80,41 +79,22 @@ SatPositionInputTraceContainer::Reset ()
 }
 
 Ptr<SatInputFileStreamTimeDoubleContainer>
-SatPositionInputTraceContainer::AddNode (Address key)
+SatPositionInputTraceContainer::AddNode (const std::string& filename)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << filename);
 
-  std::stringstream filename;
-  std::string dataPath = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory ();
+  std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair (filename, CreateObject<SatInputFileStreamTimeDoubleContainer> (filename.c_str (), std::ios::in, SatBaseTraceContainer::POSITION_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
 
-  int32_t gwId = Singleton<SatIdMapper>::Get ()->GetGwIdWithMac (key);
-  NS_ASSERT_MSG (gwId < 0, "Gateways can't be assigned mobile positions");
-
-  int32_t utId = Singleton<SatIdMapper>::Get ()->GetUtIdWithMac (key);
-  int32_t beamId = Singleton<SatIdMapper>::Get ()->GetBeamIdWithMac (key);
-
-  if (beamId >= 0 && utId >= 0)
+  if (result.second == false)
     {
-      filename << dataPath << "/utpositions/input/BEAM_" << beamId << "_UT_" << utId;
-
-      std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair (key, CreateObject<SatInputFileStreamTimeDoubleContainer> (filename.str ().c_str (), std::ios::in, SatBaseTraceContainer::POSITION_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
-
-      if (result.second == false)
-        {
-          NS_FATAL_ERROR ("SatPositionInputTraceContainer::AddNode failed");
-        }
-
-      NS_LOG_INFO ("Added node with MAC " << key);
-
-      return result.first->second;
+      NS_FATAL_ERROR ("SatPositionInputTraceContainer::AddNode failed");
     }
 
-  NS_FATAL_ERROR ("SatPositionInputTraceContainer::AddNode failed");
-  return NULL;
+  return result.first->second;
 }
 
 Ptr<SatInputFileStreamTimeDoubleContainer>
-SatPositionInputTraceContainer::FindNode (Address key)
+SatPositionInputTraceContainer::FindNode (const std::string& key)
 {
   NS_LOG_FUNCTION (this);
 
@@ -129,7 +109,7 @@ SatPositionInputTraceContainer::FindNode (Address key)
 }
 
 GeoCoordinate
-SatPositionInputTraceContainer::GetPosition (Address key, GeoCoordinate::ReferenceEllipsoid_t refEllipsoid)
+SatPositionInputTraceContainer::GetPosition (const std::string& key, GeoCoordinate::ReferenceEllipsoid_t refEllipsoid)
 {
   NS_LOG_FUNCTION (this);
 

@@ -160,6 +160,14 @@ public:
   void SetUtPositionAllocatorForBeam (uint32_t beamId, Ptr<SatListPositionAllocator> posAllocator);
 
   /**
+   * \brief Load UTs with a SatTracedMobilityModel associated to them from the
+   * files found in the given folder. Each UT will be associated to the beam it
+   * is at it's starting position.
+   * \param folderName Name of the folder to search for mobility trace files
+   */
+  void LoadMobileUTsFromFolder (const std::string& folderName);
+
+  /**
    * Set multicast group to satellite network and IP router. Add needed routes to net devices.
    *
    * \param source Source node of the multicast group (GW or UT connected user node)
@@ -312,6 +320,11 @@ private:
    * User defined UT positions from SatConf (or manually set)
    */
   Ptr<SatListPositionAllocator> m_utPositions;
+
+  /**
+   * List of mobile UTs by beam ID.
+   */
+  std::map<uint32_t, NodeContainer> m_mobileUtsByBeam;
 
   /**
    * Enables creation traces to be written in given file

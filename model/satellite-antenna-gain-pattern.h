@@ -86,6 +86,13 @@ public:
    */
   GeoCoordinate GetValidRandomPosition () const;
 
+  /**
+   * \brief Check if a given position is under this spot-beam coverage.
+   * \param coord The position to check for validity
+   * \return Whether or not the given position is valid for this spot-beam
+   */
+  bool IsValidPosition (GeoCoordinate coord) const;
+
 private:
   /**
    * \brief Read the antenna gain pattern from a file
