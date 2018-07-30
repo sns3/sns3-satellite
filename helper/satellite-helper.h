@@ -164,8 +164,9 @@ public:
    * files found in the given folder. Each UT will be associated to the beam it
    * is at it's starting position.
    * \param folderName Name of the folder to search for mobility trace files
+   * \param utUsers Stream to generate the number of users associated to each loaded UT
    */
-  void LoadMobileUTsFromFolder (const std::string& folderName);
+  void LoadMobileUTsFromFolder (const std::string& folderName, Ptr<RandomVariableStream> utUsers);
 
   /**
    * Set multicast group to satellite network and IP router. Add needed routes to net devices.
@@ -325,6 +326,11 @@ private:
    * List of mobile UTs by beam ID.
    */
   std::map<uint32_t, NodeContainer> m_mobileUtsByBeam;
+
+  /**
+   * List of users by mobile UT by beam ID.
+   */
+  std::multimap<uint32_t, uint32_t> m_mobileUtsUsersByBeam;
 
   /**
    * Enables creation traces to be written in given file

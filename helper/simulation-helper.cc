@@ -125,6 +125,11 @@ SimulationHelperConf::GetTypeId (void)
                    StringValue ("ns3::ConstantRandomVariable[Constant=1]"),
                    MakePointerAccessor (&SimulationHelperConf::m_utUserCount),
                    MakePointerChecker<RandomVariableStream> ())
+    .AddAttribute ("UserCountPerMobileUt",
+                   "Amount of user per mobile User Terminal",
+                   StringValue ("ns3::ConstantRandomVariable[Constant=1]"),
+                   MakePointerAccessor (&SimulationHelperConf::m_utMobileUserCount),
+                   MakePointerChecker<RandomVariableStream> ())
     .AddAttribute ("UtCountPerBeam",
                    "Amount of User Terminal associated to each Beam",
                    StringValue ("ns3::ConstantRandomVariable[Constant=1]"),
@@ -140,6 +145,11 @@ SimulationHelperConf::GetTypeId (void)
                    BooleanValue (true),
                    MakeBooleanAccessor (&SimulationHelperConf::m_activateProgressLogging),
                    MakeBooleanChecker ())
+    .AddAttribute ("MobileUtsFolder",
+                   "Select the folder where mobile UTs traces should be found",
+                   StringValue (Singleton<SatEnvVariables>::Get ()->LocateDataDirectory () + "/utpositions/mobiles/"),
+                   MakeStringAccessor (&SimulationHelperConf::m_mobileUtsFolder),
+                   MakeStringChecker ())
     .SIM_ADD_TRAFFIC_MODEL_ATTRIBUTES (Cbr, 1.0, PROTOCOL_UDP, RTN_LINK, Seconds (0.1), Seconds (0), MilliSeconds (10))
     .SIM_ADD_TRAFFIC_MODEL_ATTRIBUTES (Http, 0, PROTOCOL_TCP, RTN_LINK, Seconds (0.1), Seconds (0), MilliSeconds (10))
     .SIM_ADD_TRAFFIC_MODEL_ATTRIBUTES (OnOff, 0, PROTOCOL_UDP, RTN_LINK, Seconds (0.1), Seconds (0), MilliSeconds (10))
@@ -163,6 +173,7 @@ SimulationHelperConf::SimulationHelperConf ()
   m_enabledBeams (""),
   m_utCount (0),
   m_utUserCount (0),
+  m_utMobileUserCount (0),
   m_activateStatistics (false),
   m_activateProgressLogging (false)
 {
@@ -207,6 +218,7 @@ SimulationHelper::SimulationHelper ()
   m_outputPath (""),
   m_utCount (0),
   m_utUserCount (0),
+  m_utMobileUserCount (0),
   m_simTime (0),
   m_numberOfConfiguredFrames (0),
   m_randomAccessConfigured (false),
@@ -230,6 +242,7 @@ SimulationHelper::SimulationHelper (std::string simulationName)
   m_outputPath (""),
   m_utCount (0),
   m_utUserCount (0),
+  m_utMobileUserCount (0),
   m_simTime (0),
   m_numberOfConfiguredFrames (0),
   m_randomAccessConfigured (false),
@@ -304,6 +317,23 @@ SimulationHelper::SetUserCountPerUt (Ptr<RandomVariableStream> rs)
   NS_LOG_FUNCTION (this << &rs);
 
   m_utUserCount = rs;
+}
+
+void
+SimulationHelper::SetUserCountPerMobileUt (uint32_t count)
+{
+  NS_LOG_FUNCTION (this << count);
+
+  m_utMobileUserCount = CreateObject<ConstantRandomVariable> ();
+  m_utMobileUserCount->SetAttribute ("Constant", DoubleValue (count));
+}
+
+void
+SimulationHelper::SetUserCountPerMobileUt (Ptr<RandomVariableStream> rs)
+{
+  NS_LOG_FUNCTION (this << &rs);
+
+  m_utMobileUserCount = rs;
 }
 
 void
@@ -1060,7 +1090,7 @@ SimulationHelper::SetupOutputPath ()
 }
 
 Ptr<SatHelper>
-SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario)
+SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario, const std::string& mobileUtsFolder)
 {
   NS_LOG_FUNCTION (this);
 
@@ -1112,6 +1142,11 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario)
 
               ss << std::endl;
             }
+        }
+
+      if (mobileUtsFolder != "")
+        {
+          m_satHelper->LoadMobileUTsFromFolder (mobileUtsFolder, m_utMobileUserCount);
         }
 
       // Now, create either a scenario based on list positions in input file
@@ -1503,10 +1538,11 @@ SimulationHelper::ConfigureAttributesFromFile (std::string filePath, bool overri
       SetBeams (simulationConf->m_enabledBeams);
       SetUtCountPerBeam (simulationConf->m_utCount);
       SetUserCountPerUt (simulationConf->m_utUserCount);
+      SetUserCountPerMobileUt (simulationConf->m_utMobileUserCount);
       SetSimulationTime (simulationConf->m_simTime);
     }
 
-  CreateSatScenario ();
+  CreateSatScenario (SatHelper::NONE, simulationConf->m_mobileUtsFolder);
   if (simulationConf->m_activateStatistics)
     {
       CreateDefaultStats ();
