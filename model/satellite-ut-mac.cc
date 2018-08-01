@@ -135,6 +135,7 @@ SatUtMac::DoDispose (void)
   m_handoverCallback.Nullify ();
   m_gatewayUpdateCallback.Nullify ();
   m_routingUpdateCallback.Nullify ();
+  m_beamCheckerCallback.Nullify ();
   m_tbtpContainer->DoDispose ();
   m_utScheduler->DoDispose ();
   m_utScheduler = NULL;
@@ -161,6 +162,13 @@ SatUtMac::SetRoutingUpdateCallback (SatUtMac::RoutingUpdateCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);
   m_routingUpdateCallback = cb;
+}
+
+void
+SatUtMac::SetBeamCheckerCallback (SatUtMac::BeamCheckerCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_beamCheckerCallback = cb;
 }
 
 void
@@ -1217,6 +1225,11 @@ SatUtMac::DoFrameStart ()
     }
 
   // TODO: (Mobility) check if TX is possible
+
+  if (!m_beamCheckerCallback.IsNull ())
+    {
+      m_beamCheckerCallback (m_beamId);
+    }
 
   if (m_randomAccess != NULL)
     {

@@ -25,6 +25,9 @@
 #include <ns3/object.h>
 #include <ns3/callback.h>
 
+#include <ns3/satellite-antenna-gain-pattern-container.h>
+
+
 namespace ns3 {
 
 /**
@@ -34,6 +37,12 @@ namespace ns3 {
 class SatUtHandoverModule : public Object
 {
 public:
+  /**
+   * \brief Handover recommendation message sending callback
+   * \param uint32_t The beam ID this UT want to change to
+   */
+  typedef Callback<void, uint32_t> HandoverRequestCallback;
+
   /**
    * Derived from Object
    */
@@ -51,14 +60,32 @@ public:
 
   /**
    * Construct a SatUtHandoverModule
-   * \param
+   * \param agpContainer the antenna gain patterns of the simulation
    */
-  // SatUtHandoverModule ();
+  SatUtHandoverModule (Ptr<SatAntennaGainPatternContainer> agpContainer);
 
   /**
    * Destroy a SatUtHandoverModule
    */
   ~SatUtHandoverModule ();
+
+  /**
+   * \brief Set the handover recommendation message sending callback.
+   * \param cb callback to send handover recommendation messages
+   */
+  void SetHandoverRequestCallback (SatUtHandoverModule::HandoverRequestCallback cb);
+
+  /**
+   * \brief Inspect whether or not the given beam is still suitable for
+   * the underlying mobility model.
+   * \param beamId The current beam ID the underlying mobility model is emitting in
+   */
+  void CheckForHandoverRecommendation (uint32_t beamId);
+
+private:
+  HandoverRequestCallback m_handoverCallback;
+
+  Ptr<SatAntennaGainPatternContainer> m_antennaGainPatterns;
 };
 
 }

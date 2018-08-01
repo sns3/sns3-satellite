@@ -39,6 +39,7 @@
 #include <ns3/satellite-log.h>
 #include <ns3/satellite-env-variables.h>
 #include <ns3/satellite-traced-mobility-model.h>
+#include <ns3/satellite-ut-handover-module.h>
 #include "satellite-helper.h"
 
 
@@ -580,6 +581,7 @@ SatHelper::LoadMobileUTsFromFolder (const std::string& folderName, Ptr<RandomVar
       uint32_t bestBeamId = mobility->GetBestBeamId ();
       Ptr<Node> utNode = CreateObject<Node> ();
       utNode->AggregateObject (mobility);
+      utNode->AggregateObject (CreateObject<SatUtHandoverModule> ());
 
       // Store Node in the container for the starting beam
       std::map<uint32_t, NodeContainer>::iterator it = m_mobileUtsByBeam.find (bestBeamId);

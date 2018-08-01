@@ -38,9 +38,10 @@
 #include <ns3/satellite-channel.h>
 #include <ns3/satellite-mobility-observer.h>
 #include <ns3/satellite-gw-llc.h>
+#include <ns3/satellite-net-device.h>
 #include <ns3/satellite-ut-llc.h>
 #include <ns3/satellite-ut-mac.h>
-#include <ns3/satellite-net-device.h>
+#include <ns3/satellite-ut-handover-module.h>
 #include <ns3/satellite-ut-phy.h>
 #include <ns3/satellite-phy-tx.h>
 #include <ns3/satellite-phy-rx.h>
@@ -438,6 +439,13 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId,
 
       /// attach the RA module
       mac->SetRandomAccess (randomAccess);
+    }
+
+  Ptr<SatUtHandoverModule> utHandoverModule = n->GetObject<SatUtHandoverModule> ();
+  if (utHandoverModule != NULL)
+    {
+      utHandoverModule->SetHandoverRequestCallback (MakeCallback (&SatRequestManager::SendHandoverRecommendation, rm));
+      mac->SetBeamCheckerCallback (MakeCallback (&SatUtHandoverModule::CheckForHandoverRecommendation, utHandoverModule));
     }
 
   return dev;

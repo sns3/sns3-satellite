@@ -207,13 +207,43 @@ public:
    */
   void SetHandoverCallback (SatUtMac::HandoverCallback cb);
 
+  /**
+   * \brief Callback to update gateway address after handover
+   * \param Mac48Address the address of the new gateway
+   */
   typedef Callback<void, Mac48Address> GatewayUpdateCallback;
 
+  /**
+   * \brief Method to set the gateway address update callback
+   * \param cb callback to invoke to update gateway address
+   */
   void SetGatewayUpdateCallback (SatUtMac::GatewayUpdateCallback cb);
 
+  /**
+   * \brief Callback to update routing and ARP tables after handover
+   * \param Address the address of this device
+   * \param Address the address of the new gateway
+   */
   typedef Callback<void, Address, Address> RoutingUpdateCallback;
 
+  /**
+   * \brief Method to set the routing update callback
+   * \param cb callback to invoke to update routing
+   */
   void SetRoutingUpdateCallback (SatUtMac::RoutingUpdateCallback cb);
+
+  /**
+   * \brief Callback to check whether the current beam is still the best one
+   * to use for sending data; and sending handover recommendation if not
+   * \param uint32_t the current beam ID
+   */
+  typedef Callback<void, uint32_t> BeamCheckerCallback;
+
+  /**
+   * \brief Method to set the beam checker callback
+   * \param cb callback to invoke to check beams and recommend handover
+   */
+  void SetBeamCheckerCallback (SatUtMac::BeamCheckerCallback cb);
 
 protected:
   /**
@@ -483,9 +513,20 @@ private:
    */
   SatUtMac::HandoverCallback m_handoverCallback;
 
+  /**
+   * Gateway address update callback
+   */
   SatUtMac::GatewayUpdateCallback m_gatewayUpdateCallback;
 
+  /**
+   * Callback to update routing and ARP tables after a beam handover
+   */
   SatUtMac::RoutingUpdateCallback m_routingUpdateCallback;
+
+  /**
+   * Beam checker and handover recommendation sending callback
+   */
+  SatUtMac::BeamCheckerCallback m_beamCheckerCallback;
 };
 
 } // namespace ns3
