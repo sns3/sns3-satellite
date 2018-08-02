@@ -475,6 +475,7 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
       SetGwMobility (gwNodes);
       internet.Install (gwNodes);
 
+      // Create beams explicitly required for this scenario
       for (BeamUserInfoMap_t::iterator info = beamInfos.begin (); info != beamInfos.end (); info++)
         {
           // create UTs of the beam, set mobility to them
@@ -522,21 +523,27 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
           m_userHelper->PopulateBeamRoutings (uts, netDevices.second, gwNode, netDevices.first);
         }
 
-      for (std::map<uint32_t, NodeContainer>::iterator nodeIt = m_mobileUtsByBeam.begin (); nodeIt != m_mobileUtsByBeam.end (); ++nodeIt)
+      // Create other beams, most likely empty, or filled with mobile UTs
+      for (uint32_t beamId = 1; beamId <= m_antennaGainPatterns->GetNAntennaGainPatterns (); ++beamId)
         {
-          BeamUserInfoMap_t::iterator beamAlreadyProcessed = beamInfos.find (nodeIt->first);
+          BeamUserInfoMap_t::iterator beamAlreadyProcessed = beamInfos.find (beamId);
           if (beamAlreadyProcessed != beamInfos.end ())
             {
-              // Do not process mobile UTs already setup in the previous loop
+              // Do not process beams already setup in the previous loop
               continue;
             }
 
           // Retrieve UTs of the beam and install them to Internet
-          NodeContainer uts = nodeIt->second;
+          NodeContainer uts;
+          std::map<uint32_t, NodeContainer>::iterator utNodes = m_mobileUtsByBeam.find (beamId);
+          if (utNodes != m_mobileUtsByBeam.end ())
+            {
+              uts = utNodes->second;
+            }
           internet.Install (uts);
 
           std::pair<std::multimap<uint32_t, uint32_t>::iterator, std::multimap<uint32_t, uint32_t>::iterator> mobileUsers;
-          mobileUsers = m_mobileUtsUsersByBeam.equal_range (nodeIt->first);
+          mobileUsers = m_mobileUtsUsersByBeam.equal_range (beamId);
           std::multimap<uint32_t, uint32_t>::iterator it = mobileUsers.first;
           for (uint32_t i = 0; i < uts.GetN () && it != mobileUsers.second; ++i, ++it)
             {
@@ -544,7 +551,7 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
               m_userHelper->InstallUt (uts.Get (i), it->second);
             }
 
-          std::vector<uint32_t> conf = m_satConf->GetBeamConfiguration (nodeIt->first);
+          std::vector<uint32_t> conf = m_satConf->GetBeamConfiguration (beamId);
 
           // gw index starts from 1 and we have stored them starting from 0
           Ptr<Node> gwNode = gwNodes.Get (conf[SatConf::GW_ID_INDEX] - 1);
@@ -564,8 +571,6 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
         {
           EnablePacketTrace ();
         }
-
-      // TODO: Enable all beams
 
       m_scenarioCreated = true;
     }

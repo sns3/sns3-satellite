@@ -50,14 +50,7 @@ public:
    * Default constructor.
    */
   SatAntennaGainPatternContainer ();
-  ~SatAntennaGainPatternContainer ()
-  {
-  }
-
-  /**
-   * Definition of number of beams (72-beam reference scenario)
-   */
-  typedef std::map<uint32_t, Ptr<SatAntennaGainPattern> >::const_iterator gpIterator;
+  ~SatAntennaGainPatternContainer ();
 
   /**
    * \brief Get the antenna pattern of a specified beam id
@@ -65,6 +58,12 @@ public:
    * \return The antenna gain pattern instance of the specified beam id
    */
   Ptr<SatAntennaGainPattern> GetAntennaGainPattern (uint32_t beamId) const;
+
+  /**
+   * \brief Get the number of stored antenna pattern
+   * \return The total number of antenna gain pattern instance
+   */
+  uint32_t GetNAntennaGainPatterns () const;
 
   /**
    * \brief Get the best beam id based on the antenna patterns in a
