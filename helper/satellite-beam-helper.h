@@ -28,17 +28,17 @@
 #include <map>
 #include <stdint.h>
 
-#include "ns3/node-container.h"
+#include <ns3/node-container.h>
 
-#include "ns3/satellite-ncc.h"
-#include "ns3/satellite-antenna-gain-pattern-container.h"
-#include "ns3/satellite-beam-channel-pair.h"
-#include "ns3/satellite-phy-rx-carrier-conf.h"
-#include "ns3/satellite-mobility-observer.h"
-#include "ns3/satellite-markov-container.h"
-#include "ns3/satellite-packet-trace.h"
-#include "ns3/satellite-superframe-sequence.h"
-#include "ns3/satellite-typedefs.h"
+#include <ns3/satellite-ncc.h>
+#include <ns3/satellite-antenna-gain-pattern-container.h>
+#include <ns3/satellite-beam-channel-pair.h>
+#include <ns3/satellite-phy-rx-carrier-conf.h>
+#include <ns3/satellite-mobility-observer.h>
+#include <ns3/satellite-markov-container.h>
+#include <ns3/satellite-packet-trace.h>
+#include <ns3/satellite-superframe-sequence.h>
+#include <ns3/satellite-typedefs.h>
 #include "satellite-geo-helper.h"
 #include "satellite-gw-helper.h"
 #include "satellite-ut-helper.h"
@@ -146,6 +146,12 @@ public:
    * by SatBeamHelper::Install
    */
   void SetChannelAttribute (std::string name, const AttributeValue &value);
+
+  /**
+   * \brief Attach an update routing callback to the NCC of this simulation
+   * \param cb the callback to update routing after a terminal handover
+   */
+  void SetNccRoutingCallback (SatNcc::UpdateRoutingCallback cb);
 
   /**
    * \param ut a set of UT nodes

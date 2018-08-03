@@ -204,9 +204,26 @@ public:
    */
   typedef void (*ExceedingCapacityTraceCallback)(uint32_t exceedingCapacity);
 
+  /**
+   * \brief Create a TIM unicast message containing enough data for a
+   * terminal to connect to the beam handled by this SatBeamScheduler
+   */
   Ptr<SatTimuMessage> CreateTimu () const;
 
+  /**
+   * \brief Transfer ownership of a terminal to the given SatBeamScheduler
+   * \param utId the terminal that is leaving this beam
+   * \param destination the beam that should accept the terminal
+   */
   void TransferUtToBeam (Address utId, Ptr<SatBeamScheduler> destination);
+
+  /**
+   * \brief Return the address of the gateway responsible of this beam
+   */
+  inline Address GetGwAddress (void) const
+  {
+    return m_gwAddress;
+  }
 
 private:
   /**

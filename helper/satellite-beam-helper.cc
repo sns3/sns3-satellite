@@ -344,6 +344,14 @@ SatBeamHelper::SetChannelAttribute (std::string n1, const AttributeValue &v1)
   m_channelFactory.Set (n1, v1);
 }
 
+void
+SatBeamHelper::SetNccRoutingCallback (SatNcc::UpdateRoutingCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+
+  m_ncc->SetUpdateRoutingCallback (cb);
+}
+
 std::pair<Ptr<NetDevice>, NetDeviceContainer>
 SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode,
                         uint32_t gwId, uint32_t beamId, uint32_t ulFreqId, uint32_t flFreqId,

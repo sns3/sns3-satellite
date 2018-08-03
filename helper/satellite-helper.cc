@@ -467,6 +467,8 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
           EnableCreationTraces ();
         }
 
+      m_beamHelper->SetNccRoutingCallback (MakeCallback (&SatUserHelper::UpdateGwRoutes, m_userHelper));
+
       InternetStackHelper internet;
 
       // create all possible GW nodes, set mobility to them and install to Internet

@@ -177,9 +177,28 @@ public:
    */
   Ptr<SatBeamScheduler> GetBeamScheduler (uint32_t beamId) const;
 
-  void MoveUtBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamId);
-
+  /**
+   * \brief Check if a terminal can be moved between two beams. If yes, schedule
+   * the actual move at a later point in time.
+   * \param utId the UT wanting to move between beams
+   * \param srcBeamId the beam ID this UT is moving from
+   * \param destBeamId the beam ID this UT is moving to
+   */
   void CanUtMoveBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamId);
+
+  /**
+   * \brief Update routes and ARP tables on gateways after a terminal handover
+   * \param Address address of the UT whose handover is completed
+   * \param Address address of the GW handling this UT before handover
+   * \param Address address of the GW handling this UT after handover
+   */
+  typedef Callback<void, Address, Address, Address> UpdateRoutingCallback;
+
+  /**
+   * \brief Set the callback used to update routes and APR tables after a terminal handover
+   * \param cb the routing update callback
+   */
+  void SetUpdateRoutingCallback (SatNcc::UpdateRoutingCallback cb);
 
 private:
   SatNcc& operator = (const SatNcc &);
@@ -195,6 +214,14 @@ private:
    * \param allocationChannelId Allocation channel ID
    */
   void CreateRandomAccessLoadControlMessage (uint16_t backoffProbability, uint16_t backoffTime, uint32_t beamId, uint8_t allocationChannelId);
+
+  /**
+   * \brief Perform terminal handover on the terestrial network
+   * \param utId the UT moving between beams
+   * \param srcBeamId the beam ID this UT is moving from
+   * \param destBeamId the beam ID this UT is moving to
+   */
+  void MoveUtBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamId);
 
   /**
    * The map containing beams in use (set).
@@ -249,6 +276,12 @@ private:
    * Delay between handover acceptance and effective information transfer
    */
   Time m_utHandoverDelay;
+
+  /**
+   * Callback to update routing tables and ARP tables on gateways
+   * once a handover request has been accepted and treated
+   */
+  UpdateRoutingCallback m_updateRoutingCallback;
 };
 
 } // namespace ns3

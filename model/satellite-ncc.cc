@@ -84,6 +84,7 @@ SatNcc::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
 
+  m_updateRoutingCallback.Nullify ();
   m_isLowRandomAccessLoad.clear ();
 
   Object::DoDispose ();
@@ -357,6 +358,7 @@ SatNcc::MoveUtBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamI
     }
 
   srcScheduler->TransferUtToBeam (utId, destScheduler);
+  m_updateRoutingCallback (utId, srcScheduler->GetGwAddress (), destScheduler->GetGwAddress ());
 }
 
 void
@@ -374,6 +376,14 @@ SatNcc::CanUtMoveBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBe
 
       Simulator::Schedule (m_utHandoverDelay, &SatNcc::MoveUtBetweenBeams, this, utId, srcBeamId, destBeamId);
     }
+}
+
+void
+SatNcc::SetUpdateRoutingCallback (SatNcc::UpdateRoutingCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+
+  m_updateRoutingCallback = cb;
 }
 
 } // namespace ns3
