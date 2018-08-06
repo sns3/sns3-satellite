@@ -111,6 +111,11 @@ public:
    */
   void SetBeamSet (std::set<uint32_t> beamSet);
 
+  inline std::set<uint32_t> GetBeamSet (void) const
+  {
+    return m_enabledBeams;
+  }
+
   /**
    * \brief Set UT count per beam.
    * \param count Number of UTs per beam.

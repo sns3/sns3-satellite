@@ -583,12 +583,18 @@ SatHelper::LoadMobileUTsFromFolder (const std::string& folderName, Ptr<RandomVar
 {
   for (std::string& filename : SystemPath::ReadFiles (folderName))
     {
+      if (filename == "" || filename[0] == '.')
+        {
+          NS_LOG_INFO ("Skipping hidden file '" << filename << "'");
+          continue;
+        }
+
       // Create Node, Mobility and aggregate them
-      Ptr<SatTracedMobilityModel> mobility = CreateObject<SatTracedMobilityModel> (filename, m_antennaGainPatterns);
+      Ptr<SatTracedMobilityModel> mobility = CreateObject<SatTracedMobilityModel> (folderName + "/" + filename, m_antennaGainPatterns);
       uint32_t bestBeamId = mobility->GetBestBeamId ();
       Ptr<Node> utNode = CreateObject<Node> ();
       utNode->AggregateObject (mobility);
-      utNode->AggregateObject (CreateObject<SatUtHandoverModule> ());
+      utNode->AggregateObject (CreateObject<SatUtHandoverModule> (m_antennaGainPatterns));
 
       // Store Node in the container for the starting beam
       std::map<uint32_t, NodeContainer>::iterator it = m_mobileUtsByBeam.find (bestBeamId);
@@ -604,6 +610,12 @@ SatHelper::LoadMobileUTsFromFolder (const std::string& folderName, Ptr<RandomVar
 
       // Store amount of users for this UT
       m_mobileUtsUsersByBeam.insert (std::make_pair (bestBeamId, utUsers->GetInteger ()));
+    }
+
+  for (auto& mobileUtsForBeam : m_mobileUtsByBeam)
+    {
+      NS_LOG_INFO ("Installing Mobility Observers for mobile UTs starting in beam " << mobileUtsForBeam.first);
+      InstallMobilityObserver (mobileUtsForBeam.second);
     }
 }
 
@@ -651,14 +663,7 @@ SatHelper::SetUtMobility (NodeContainer uts, uint32_t beamId)
   else
     {
       // Create new position allocator
-      Ptr<SatSpotBeamPositionAllocator> beamAllocator = CreateObject<SatSpotBeamPositionAllocator> (beamId, m_antennaGainPatterns, m_satConf->GetGeoSatPosition ());
-
-      Ptr<UniformRandomVariable> altRnd = CreateObject<UniformRandomVariable> ();
-      altRnd->SetAttribute ("Min", DoubleValue (0.0));
-      altRnd->SetAttribute ("Max", DoubleValue (500.0));
-      beamAllocator->SetAltitude (altRnd);
-
-      allocator = beamAllocator;
+      allocator = GetBeamAllocator (beamId);
     }
 
   mobility.SetPositionAllocator (allocator);
@@ -666,6 +671,18 @@ SatHelper::SetUtMobility (NodeContainer uts, uint32_t beamId)
   mobility.Install (uts);
 
   InstallMobilityObserver (uts);
+}
+
+Ptr<SatSpotBeamPositionAllocator>
+SatHelper::GetBeamAllocator (uint32_t beamId)
+{
+  Ptr<SatSpotBeamPositionAllocator> beamAllocator = CreateObject<SatSpotBeamPositionAllocator> (beamId, m_antennaGainPatterns, m_satConf->GetGeoSatPosition ());
+
+  Ptr<UniformRandomVariable> altRnd = CreateObject<UniformRandomVariable> ();
+  altRnd->SetAttribute ("Min", DoubleValue (0.0));
+  altRnd->SetAttribute ("Max", DoubleValue (500.0));
+  beamAllocator->SetAltitude (altRnd);
+  return beamAllocator;
 }
 
 void

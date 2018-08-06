@@ -22,24 +22,24 @@
 
 #include <string>
 
-#include "ns3/object.h"
-#include "ns3/trace-helper.h"
-#include "ns3/output-stream-wrapper.h"
-#include "ns3/node-container.h"
-#include "ns3/ipv4-address-helper.h"
-#include "ns3/csma-helper.h"
-#include "ns3/satellite-antenna-gain-pattern-container.h"
+#include <ns3/object.h>
+#include <ns3/trace-helper.h>
+#include <ns3/output-stream-wrapper.h>
+#include <ns3/node-container.h>
+#include <ns3/ipv4-address-helper.h>
+#include <ns3/csma-helper.h>
+#include <ns3/satellite-antenna-gain-pattern-container.h>
+#include <ns3/satellite-position-allocator.h>
+#include <ns3/satellite-rx-power-input-trace-container.h>
+#include <ns3/satellite-rx-power-output-trace-container.h>
+#include <ns3/satellite-interference-input-trace-container.h>
+#include <ns3/satellite-interference-output-trace-container.h>
+#include <ns3/satellite-fading-output-trace-container.h>
+#include <ns3/satellite-fading-input-trace-container.h>
 #include "satellite-user-helper.h"
 #include "satellite-beam-helper.h"
 #include "satellite-beam-user-info.h"
 #include "satellite-conf.h"
-#include "ns3/satellite-position-allocator.h"
-#include "ns3/satellite-rx-power-input-trace-container.h"
-#include "ns3/satellite-rx-power-output-trace-container.h"
-#include "ns3/satellite-interference-input-trace-container.h"
-#include "ns3/satellite-interference-output-trace-container.h"
-#include "ns3/satellite-fading-output-trace-container.h"
-#include "ns3/satellite-fading-input-trace-container.h"
 
 namespace ns3 {
 
@@ -195,6 +195,14 @@ public:
    * Dispose of this class instance
    */
   void DoDispose ();
+
+  /**
+   * Create a SatSpotBeamPositionAllocator able to generate
+   * random position within the given beam.
+   *
+   * \param beamId the beam for which the position allocator should be configured
+   */
+  Ptr<SatSpotBeamPositionAllocator> GetBeamAllocator (uint32_t beamId);
 
 private:
   static const uint16_t MIN_ADDRESS_PREFIX_LENGTH = 1;
