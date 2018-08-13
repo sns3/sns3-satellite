@@ -34,6 +34,7 @@
 
 namespace ns3 {
 
+class PropagationDelayModel;
 class NetDevice;
 class Node;
 
@@ -70,9 +71,7 @@ public:
    * Create a SatUserHelper to make life easier when creating Users and their connections to satellite network.
    */
   SatUserHelper ();
-  virtual ~SatUserHelper ()
-  {
-  }
+  virtual ~SatUserHelper ();
 
   /**
    * \brief Set the type and the attribute values to be associated with each
@@ -286,6 +285,7 @@ public:
    * next hop.
    * \param ut Address of the UT for which tables should be updated
    * \param newGateway Address of the newly assigned GW for this UT
+   * \param ulDelayModel The delay model used by the UT return link
    */
   void UpdateUtRoutes (Address ut, Address newGateway);
 
@@ -297,6 +297,8 @@ public:
    * \param newGateway Address of the GW the UT is newly assigned to
    */
   void UpdateGwRoutes (Address ut, Address oldGateway, Address newGateway);
+
+  typedef Callback<Ptr<PropagationDelayModel>, uint32_t, SatEnums::ChannelType_t> PropagationDelayCallback;
 
 private:
   /**
@@ -377,6 +379,8 @@ private:
    * Used to update routing during handover
    */
   std::map<Address, Ptr<NetDevice> > m_gwDevices;
+
+  SatUserHelper::PropagationDelayCallback m_propagationDelayCallback;
 };
 
 } // namespace ns3

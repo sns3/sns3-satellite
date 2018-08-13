@@ -174,8 +174,6 @@ SatUtHelper::SatUtHelper (SatTypedefs::CarrierBandwidthConverter_t carrierBandwi
   m_channelFactory.SetTypeId ("ns3::SatChannel");
 
   m_llsConf = CreateObject<SatLowerLayerServiceConf>  ();
-
-  //LogComponentEnable ("SatUtHelper", LOG_LEVEL_INFO);
 }
 
 void

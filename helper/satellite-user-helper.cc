@@ -28,10 +28,13 @@
 #include <ns3/internet-stack-helper.h>
 #include <ns3/csma-helper.h>
 #include <ns3/singleton.h>
+#include <ns3/satellite-net-device.h>
 #include <ns3/satellite-arp-cache.h>
 #include <ns3/satellite-id-mapper.h>
 #include <ns3/satellite-typedefs.h>
 #include <ns3/satellite-simple-net-device.h>
+#include <ns3/satellite-mac.h>
+#include <ns3/satellite-mobility-observer.h>
 #include "satellite-user-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatUserHelper");
@@ -58,6 +61,11 @@ SatUserHelper::GetTypeId (void)
                    MakeEnumAccessor (&SatUserHelper::m_subscriberNetworkType),
                    MakeEnumChecker (SatUserHelper::NETWORK_TYPE_SAT_SIMPLE, "SatSimple",
                                     SatUserHelper::NETWORK_TYPE_CSMA, "Csma"))
+    .AddAttribute ("PropagationDelayGetter",
+                   "Callback to retrieve propagation delay models from beam IDs",
+                   CallbackValue (),
+                   MakeCallbackAccessor (&SatUserHelper::m_propagationDelayCallback),
+                   MakeCallbackChecker ())
     .AddTraceSource ("Creation", "Creation traces",
                      MakeTraceSourceAccessor (&SatUserHelper::m_creationTrace),
                      "ns3::SatTypedefs::CreationCallback")
@@ -75,7 +83,11 @@ SatUserHelper::SatUserHelper ()
   : m_backboneNetworkType (SatUserHelper::NETWORK_TYPE_SAT_SIMPLE),
   m_subscriberNetworkType (SatUserHelper::NETWORK_TYPE_CSMA),
   m_router (0)
+{
+  NS_LOG_FUNCTION (this);
+}
 
+SatUserHelper::~SatUserHelper ()
 {
   NS_LOG_FUNCTION (this);
 }
@@ -607,20 +619,18 @@ SatUserHelper::UpdateUtRoutes (Address utAddress, Address gwAddress)
   NS_LOG_FUNCTION (this << utAddress << gwAddress);
 
   std::map<Address, Ptr<NetDevice> >::iterator gwNdIterator = m_gwDevices.find (gwAddress);
-  if (gwNdIterator == m_gwDevices.end ())
-    {
-      NS_FATAL_ERROR ("Unknown GW with MAC address " << gwAddress);
-    }
+  NS_ASSERT_MSG (gwNdIterator != m_gwDevices.end (), "Unknown GW with MAC address " << gwAddress);
 
-  Ipv4Address ip = gwNdIterator->second->GetNode ()->GetObject<Ipv4L3Protocol> ()->GetAddress (gwNdIterator->second->GetIfIndex (), 0).GetLocal ();
+  Ptr<SatNetDevice> gwNd = DynamicCast<SatNetDevice> (gwNdIterator->second);
+  NS_ASSERT (gwNd != NULL);
+  Ipv4Address ip = gwNd->GetNode ()->GetObject<Ipv4L3Protocol> ()->GetAddress (gwNd->GetIfIndex (), 0).GetLocal ();
 
   std::map<Address, Ptr<NetDevice> >::iterator utNdIterator = m_utDevices.find (utAddress);
-  if (utNdIterator == m_utDevices.end ())
-    {
-      NS_FATAL_ERROR ("Unknown UT with MAC address " << utAddress);
-    }
+  NS_ASSERT_MSG (utNdIterator != m_utDevices.end (), "Unknown UT with MAC address " << utAddress);
 
-  Ptr<Ipv4L3Protocol> protocol = utNdIterator->second->GetNode ()->GetObject<Ipv4L3Protocol> ();
+  Ptr<SatNetDevice> utNd = DynamicCast<SatNetDevice> (utNdIterator->second);
+  NS_ASSERT (utNd != NULL);
+  Ptr<Ipv4L3Protocol> protocol = utNd->GetNode ()->GetObject<Ipv4L3Protocol> ();
   uint32_t utIfIndex = utNdIterator->second->GetIfIndex ();
 
   NS_LOG_INFO ("Adding ARP cache entry to UT " << utAddress <<
@@ -632,6 +642,12 @@ SatUserHelper::UpdateUtRoutes (Address utAddress, Address gwAddress)
   Ipv4StaticRoutingHelper ipv4RoutingHelper;
   Ptr<Ipv4StaticRouting> routing = ipv4RoutingHelper.GetStaticRouting (protocol);
   routing->SetDefaultRoute (ip, utIfIndex);
+
+  uint32_t beamId = gwNd->GetMac ()->GetBeamId ();
+  Ptr<PropagationDelayModel> flDelayModel = m_propagationDelayCallback (beamId, SatEnums::RETURN_FEEDER_CH);
+  Ptr<PropagationDelayModel> ulDelayModel = m_propagationDelayCallback (beamId, SatEnums::RETURN_USER_CH);
+  Ptr<SatMobilityObserver> observer = utNd->GetNode ()->GetObject<SatMobilityObserver> ();
+  observer->ObserveTimingAdvance (ulDelayModel, flDelayModel, gwNd->GetNode ()->GetObject<SatMobilityModel> ());
 }
 
 void
@@ -687,11 +703,12 @@ SatUserHelper::UpdateGwRoutes (Address ut, Address oldGateway, Address newGatewa
       Ptr<Ipv4StaticRouting> routing = ipv4RoutingHelper.GetStaticRouting (oldGatewayNode->GetObject<Ipv4L3Protocol> ());
 
       // purge old routes
-      for (uint32_t routeIndex = routing->GetNRoutes () - 1; routeIndex >= 0; --routeIndex)
+      for (uint32_t routeIndex = routing->GetNRoutes (); routeIndex > 0; --routeIndex)
         {
-          if (routing->GetRoute (routeIndex).GetGateway () == utIpAddress)
+          // Note: keeping routeIndex 1-off because we are using unsigned values
+          if (routing->GetRoute (routeIndex - 1).GetGateway () == utIpAddress)
             {
-              routing->RemoveRoute (routeIndex);
+              routing->RemoveRoute (routeIndex - 1);
             }
         }
 
@@ -716,12 +733,13 @@ SatUserHelper::UpdateGwRoutes (Address ut, Address oldGateway, Address newGatewa
       Ptr<Ipv4StaticRouting> routingRouter = ipv4RoutingHelper.GetStaticRouting (m_router->GetObject<Ipv4L3Protocol> ());
 
       // purge old routes
-      for (uint32_t routeIndex = routing->GetNRoutes () - 1; routeIndex >= 0; --routeIndex)
+      for (uint32_t routeIndex = routing->GetNRoutes (); routeIndex > 0; --routeIndex)
         {
-          Ipv4RoutingTableEntry gwRoute = routing->GetRoute (routeIndex);
+          // Note: keeping routeIndex 1-off because we are using unsigned values
+          Ipv4RoutingTableEntry gwRoute = routing->GetRoute (routeIndex - 1);
           if (gwRoute.GetGateway () == utIpAddress)
             {
-              routing->RemoveRoute (routeIndex);
+              routing->RemoveRoute (routeIndex - 1);
               // search for corresponding route on terrestrial router
               for (uint32_t routerIndex = 0; routerIndex < routingRouter->GetNRoutes (); ++routerIndex)
                 {

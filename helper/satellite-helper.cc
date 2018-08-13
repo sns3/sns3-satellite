@@ -205,6 +205,8 @@ SatHelper::SatHelper (std::string scenarioName)
   m_beamHelper->SetAttribute ("CarrierFrequencyConverter", CallbackValue (converterCb) );
 
   m_userHelper = CreateObject<SatUserHelper> ();
+  SatUserHelper::PropagationDelayCallback delayModelCb = MakeCallback (&SatBeamHelper::GetPropagationDelayModel, m_beamHelper);
+  m_userHelper->SetAttribute ("PropagationDelayGetter", CallbackValue (delayModelCb));
 
   // Set the antenna patterns to beam helper
   m_beamHelper->SetAntennaGainPatterns (m_antennaGainPatterns);

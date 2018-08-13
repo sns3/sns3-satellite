@@ -370,11 +370,23 @@ SatNcc::CanUtMoveBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBe
   Ptr<SatBeamScheduler> destination = GetBeamScheduler (destBeamId);
   if (scheduler && destination)
     {
+      if (scheduler->HasUt (utId) && !destination->HasUt (utId))
+        {
+          NS_LOG_INFO ("Performing handover!");
 
-      Ptr<SatTimuMessage> timuMsg = destination->CreateTimu ();
-      scheduler->SendTo (timuMsg, utId);
+          Ptr<SatTimuMessage> timuMsg = destination->CreateTimu ();
+          scheduler->SendTo (timuMsg, utId);
 
-      Simulator::Schedule (m_utHandoverDelay, &SatNcc::MoveUtBetweenBeams, this, utId, srcBeamId, destBeamId);
+          Simulator::Schedule (m_utHandoverDelay, &SatNcc::MoveUtBetweenBeams, this, utId, srcBeamId, destBeamId);
+        }
+      else if (!scheduler->HasUt (utId) && destination->HasUt (utId))
+        {
+          NS_LOG_INFO ("Handover already performed, dropping request!");
+        }
+      else
+        {
+          NS_FATAL_ERROR ("Inconsistent handover state: UT is neither in source nor destination beam; or in both");
+        }
     }
 }
 

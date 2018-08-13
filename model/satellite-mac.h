@@ -77,6 +77,11 @@ public:
    */
   ~SatMac ();
 
+  inline uint32_t GetBeamId (void) const
+  {
+    return m_beamId;
+  }
+
   /**
    * \brief Callback to send packet to lower layer.
    * \param Container of the pointers to the packets received

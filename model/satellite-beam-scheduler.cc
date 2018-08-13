@@ -271,10 +271,8 @@ bool
 SatBeamScheduler::Send (Ptr<SatControlMessage> msg)
 {
   NS_LOG_FUNCTION (this << msg);
-  NS_LOG_INFO ("p=" << msg );
 
   m_txCallback (msg, Mac48Address::GetBroadcast ());
-
   return true;
 }
 
@@ -283,7 +281,7 @@ SatBeamScheduler::SendTo (Ptr<SatControlMessage> msg, Address utId)
 {
   NS_LOG_FUNCTION (this << msg << utId);
 
-  if (m_utInfos.find (utId) == m_utInfos.end ())
+  if (!HasUt (utId))
     {
       return false;
     }
@@ -396,14 +394,21 @@ SatBeamScheduler::AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf)
   return m_raChRandomIndex->GetInteger ();
 }
 
+bool
+SatBeamScheduler::HasUt (Address utId)
+{
+  NS_LOG_FUNCTION (this << utId);
+
+  UtInfoMap_t::iterator result = m_utInfos.find (utId);
+  return result != m_utInfos.end ();
+}
+
 void
 SatBeamScheduler::UpdateUtCno (Address utId, double cno)
 {
   NS_LOG_FUNCTION (this << utId << cno);
 
-  // check that UT is added to this scheduler.
-  UtInfoMap_t::iterator result = m_utInfos.find (utId);
-  NS_ASSERT (result != m_utInfos.end ());
+  NS_ASSERT (HasUt (utId));
 
   m_utInfos[utId]->AddCnoSample (cno);
 }
@@ -413,9 +418,7 @@ SatBeamScheduler::UtCrReceived (Address utId, Ptr<SatCrMessage> crMsg)
 {
   NS_LOG_FUNCTION (this << utId << crMsg);
 
-  // check that UT is added to this scheduler.
-  UtInfoMap_t::iterator result = m_utInfos.find (utId);
-  NS_ASSERT (result != m_utInfos.end ());
+  NS_ASSERT (HasUt (utId));
 
   m_utInfos[utId]->AddCrMsg (crMsg);
 }
@@ -461,7 +464,7 @@ SatBeamScheduler::Schedule ()
 
       // generate time slots
       Ptr<SatTbtpMessage> firstTbtp = CreateObject<SatTbtpMessage> (SatConstVariables::SUPERFRAME_SEQUENCE);
-      firstTbtp->SetSuperframeCounter (m_superFrameCounter++);
+      firstTbtp->SetSuperframeCounter (m_superFrameCounter);
 
       std::vector<Ptr<SatTbtpMessage> > tbtps;
       tbtps.push_back (firstTbtp);
@@ -497,6 +500,7 @@ SatBeamScheduler::Schedule ()
   m_usableCapacityTrace (usableCapacity);
   m_unmetCapacityTrace (unmetCapacity);
   m_exceedingCapacityTrace (exceedingCapacity);
+  ++m_superFrameCounter;
 
   // re-schedule next TBTP sending (call of this function)
   Simulator::Schedule ( m_superframeSeq->GetDuration (SatConstVariables::SUPERFRAME_SEQUENCE), &SatBeamScheduler::Schedule, this);
@@ -726,16 +730,33 @@ SatBeamScheduler::TransferUtToBeam (Address utId, Ptr<SatBeamScheduler> destinat
   UtInfoMap_t::iterator utIterator = m_utInfos.find (utId);
   if (utIterator == m_utInfos.end ())
     {
-      NS_FATAL_ERROR ("UT is not part of the source beam");
+      // Check if handover already happened
+      NS_ASSERT_MSG (destination->HasUt (utId), "UT is not part of the source beam");
     }
-
-  std::pair<UtInfoMap_t::iterator, bool> inserted = destination->m_utInfos.insert (std::make_pair (utId, utIterator->second));
-  if (!inserted.second)
+  else
     {
-      NS_FATAL_ERROR ("UT is already part of the destination beam");
-    }
+      std::pair<UtInfoMap_t::iterator, bool> inserted = destination->m_utInfos.insert (std::make_pair (utId, utIterator->second));
+      NS_ASSERT_MSG (inserted.second, "UT is already part of the destination beam");
 
-  // TODO: reset Cno and capacity requests
+      m_utInfos.erase (utIterator);
+
+      // Removing capacity requests left
+      // TODO: move them to the new beam?
+      UtReqInfoContainer_t::iterator it = m_utRequestInfos.begin ();
+      while (it != m_utRequestInfos.end ())
+        {
+          if (it->first == utId)
+            {
+              it = m_utRequestInfos.erase (it);
+            }
+          else
+            {
+              ++it;
+            }
+        }
+
+      // TODO: reset Cno?
+    }
 }
 
 Ptr<SatTimuMessage>

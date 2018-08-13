@@ -46,6 +46,8 @@
 
 namespace ns3 {
 
+class PropagationDelayModel;
+
 /**
  * \brief SatBeamHelper builds a set Satellite beams with needed objects and configuration.
  *        It utilizes SatUtHelper, SatGwHelper and SatGeoHelper to create needed objects.
@@ -289,6 +291,8 @@ public:
    *
    */
   void EnablePacketTrace ();
+
+  Ptr<PropagationDelayModel> GetPropagationDelayModel (uint32_t beamId, SatEnums::ChannelType_t channelType);
 
 private:
   CarrierFreqConverter m_carrierFreqConverter;

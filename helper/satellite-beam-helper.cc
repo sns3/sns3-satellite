@@ -1144,4 +1144,40 @@ SatBeamHelper::AddMulticastRouteToUt (Ptr<Node> utNode, Ipv4Address sourceAddres
 }
 
 
+Ptr<PropagationDelayModel>
+SatBeamHelper::GetPropagationDelayModel (uint32_t beamId, SatEnums::ChannelType_t channelType)
+{
+  Ptr<SatChannel> channel = NULL;
+  switch (channelType)
+    {
+    case SatEnums::FORWARD_FEEDER_CH:
+      {
+        channel = m_flChannels->GetChannelPair (beamId).first;
+        break;
+      }
+    case SatEnums::FORWARD_USER_CH:
+      {
+        channel = m_ulChannels->GetChannelPair (beamId).first;
+        break;
+      }
+    case SatEnums::RETURN_USER_CH:
+      {
+        channel = m_ulChannels->GetChannelPair (beamId).second;
+        break;
+      }
+    case SatEnums::RETURN_FEEDER_CH:
+      {
+        channel = m_flChannels->GetChannelPair (beamId).second;
+        break;
+      }
+    default:
+      {
+        return NULL;
+      }
+    }
+
+  return channel->GetPropagationDelayModel ();
+}
+
+
 } // namespace ns3

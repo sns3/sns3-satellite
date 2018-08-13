@@ -130,6 +130,14 @@ public:
   uint32_t AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf);
 
   /**
+   * Check whether an UT is handled by this scheduler
+   *
+   * \param utId ID (mac address) of the UT to be searched for
+   * \return Whether or not this UT is in this beam
+   */
+  bool HasUt (Address utId);
+
+  /**
    * Update UT C/N0 info with the latest value.
    *
    * \param utId Id of the UT (address).
