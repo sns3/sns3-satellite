@@ -527,47 +527,7 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
           m_userHelper->PopulateBeamRoutings (uts, netDevices.second, gwNode, netDevices.first);
         }
 
-      // Create other beams, most likely empty, or filled with mobile UTs
-      for (uint32_t beamId = 1; beamId <= m_antennaGainPatterns->GetNAntennaGainPatterns (); ++beamId)
-        {
-          BeamUserInfoMap_t::iterator beamAlreadyProcessed = beamInfos.find (beamId);
-          if (beamAlreadyProcessed != beamInfos.end ())
-            {
-              // Do not process beams already setup in the previous loop
-              continue;
-            }
-
-          // Retrieve UTs of the beam and install them to Internet
-          NodeContainer uts;
-          std::map<uint32_t, NodeContainer>::iterator utNodes = m_mobileUtsByBeam.find (beamId);
-          if (utNodes != m_mobileUtsByBeam.end ())
-            {
-              uts = utNodes->second;
-            }
-          internet.Install (uts);
-
-          std::pair<std::multimap<uint32_t, uint32_t>::iterator, std::multimap<uint32_t, uint32_t>::iterator> mobileUsers;
-          mobileUsers = m_mobileUtsUsersByBeam.equal_range (beamId);
-          std::multimap<uint32_t, uint32_t>::iterator it = mobileUsers.first;
-          for (uint32_t i = 0; i < uts.GetN () && it != mobileUsers.second; ++i, ++it)
-            {
-              // create and install needed mobile users
-              m_userHelper->InstallUt (uts.Get (i), it->second);
-            }
-
-          std::vector<uint32_t> conf = m_satConf->GetBeamConfiguration (beamId);
-
-          // gw index starts from 1 and we have stored them starting from 0
-          Ptr<Node> gwNode = gwNodes.Get (conf[SatConf::GW_ID_INDEX] - 1);
-          std::pair<Ptr<NetDevice>, NetDeviceContainer> netDevices = m_beamHelper->Install (
-            uts, gwNode,
-            conf[SatConf::GW_ID_INDEX],
-            conf[SatConf::BEAM_ID_INDEX],
-            conf[SatConf::U_FREQ_ID_INDEX],
-            conf[SatConf::F_FREQ_ID_INDEX],
-            MakeCallback (&SatUserHelper::UpdateUtRoutes, m_userHelper));
-          m_userHelper->PopulateBeamRoutings (uts, netDevices.second, gwNode, netDevices.first);
-        }
+      m_mobileUtsByBeam.clear ();  // Release unused resources (mobile UTs starting in non-existent beams)
 
       m_userHelper->InstallGw (m_beamHelper->GetGwNodes (), gwUsers);
 
