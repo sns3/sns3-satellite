@@ -58,7 +58,7 @@ SatArpCache::Add (Ipv4Address to, Address macAddress)
 
   // Add a new entry
   ArpCache::Entry *entry = ArpCache::Add (to);
-  entry->SetMacAddresss (macAddress);
+  entry->SetMacAddress (macAddress);
   entry->MarkPermanent ();
 
   NS_LOG_INFO ( "IP: " << to << ", MAC: " << macAddress );

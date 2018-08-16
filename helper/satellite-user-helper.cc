@@ -769,7 +769,7 @@ SatUserHelper::UpdateGwRoutes (Address ut, Address oldGateway, Address newGatewa
         }
 
       // find interface on the terrestrial router to send messages to GW
-      uint32_t routingIfIndex;
+      uint32_t routingIfIndex = routingRouter->GetNRoutes ();
       for (uint32_t routeIndex = 0; routeIndex < routingRouter->GetNRoutes (); ++routeIndex)
         {
           Ipv4RoutingTableEntry route = routingRouter->GetRoute (routeIndex);
@@ -779,6 +779,8 @@ SatUserHelper::UpdateGwRoutes (Address ut, Address oldGateway, Address newGatewa
               break;
             }
         }
+
+      NS_ASSERT_MSG (routingIfIndex != routingRouter->GetNRoutes (), "Couldn't find interface on the terrestrial router to the new gateway.");
 
       // add routes to the new GW and the terrestrial router
       routing = ipv4RoutingHelper.GetStaticRouting (gwProtocol);

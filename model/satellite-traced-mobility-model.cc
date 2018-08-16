@@ -102,6 +102,8 @@ SatTracedMobilityModel::DoSetGeoPosition (const GeoCoordinate &position)
   Vector distance = position.ToVector () - m_geoPosition.ToVector ();
   m_velocity = Vector (distance.x / time, distance.y / time, distance.z / time);
 
+  NS_LOG_INFO ("Changing position from " << m_geoPosition << " to " << position << ". Velocity is " << m_velocity << " (" << m_velocity.GetLength () << ")");
+
   m_geoPosition = position;
   NotifyGeoCourseChange ();
 }

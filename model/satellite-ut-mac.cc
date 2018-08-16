@@ -925,6 +925,10 @@ SatUtMac::ScheduleCrdsaTransmission (uint32_t allocationChannel, SatRandomAccess
   /// get current superframe ID
   uint32_t superFrameId = Singleton<SatRtnLinkTime>::Get ()->GetCurrentSuperFrameCount (SatConstVariables::SUPERFRAME_SEQUENCE, m_timingAdvanceCb ());
 
+  // TODO: check we didn't already scheduled packets for this superframe
+  // (because we are moving so fast, for instance, that we are now at the end of the
+  // window for this "past" superframe instead of the beginning of the next one)
+
   NS_LOG_INFO ("UT: " << m_nodeInfo->GetMacAddress () <<
                " AC: " << allocationChannel <<
                ", SF: " << superFrameId <<
@@ -941,11 +945,11 @@ SatUtMac::ScheduleCrdsaTransmission (uint32_t allocationChannel, SatRandomAccess
       for (iterSet = iter->second.begin (); iterSet != iter->second.end (); iterSet++)
         {
           /// check and update used slots
-          if (!UpdateUsedRandomAccessSlots (superFrameId, allocationChannel, (*iterSet)))
+          if (!UpdateUsedRandomAccessSlots (superFrameId, allocationChannel, *iterSet))
             {
               /// TODO this needs to be handled when multiple allocation channels are implemented
               /// In that case a slot exclusion list should be used when randomizing the Tx slots
-              NS_FATAL_ERROR ("SatUtMac::ScheduleCrdsaTransmission - Slot unavailable");
+              NS_FATAL_ERROR ("SatUtMac::ScheduleCrdsaTransmission - Slot unavailable: " << *iterSet);
             }
         }
 
@@ -1124,17 +1128,18 @@ SatUtMac::UpdateUsedRandomAccessSlots (uint32_t superFrameId, uint32_t allocatio
 
   if (iter == m_usedRandomAccessSlots.end ())
     {
-      std::set<uint32_t> txOpportunities;
+      std::set<uint32_t> txOpportunities {{slotId}};
       std::pair <std::map < std::pair <uint32_t, uint32_t>, std::set<uint32_t> >::iterator, bool> result;
-
-      txOpportunities.insert (slotId);
-
       result = m_usedRandomAccessSlots.insert (std::make_pair (key, txOpportunities));
 
       if (result.second)
         {
           isSlotFree = true;
           NS_LOG_INFO ("No saved SF, slot " << slotId << " saved in SF " << superFrameId);
+        }
+      else
+        {
+          NS_LOG_WARN ("No saved SF but unable to create one");
         }
     }
   else
@@ -1147,6 +1152,10 @@ SatUtMac::UpdateUsedRandomAccessSlots (uint32_t superFrameId, uint32_t allocatio
           isSlotFree = true;
           NS_LOG_INFO ("Saved SF exist, slot " << slotId << " saved in SF " << superFrameId);
         }
+      else
+        {
+          NS_LOG_WARN ("Saved SF exist but unable to add slot " << slotId);
+        }
     }
   return isSlotFree;
 }
@@ -1158,23 +1167,19 @@ SatUtMac::RemovePastRandomAccessSlots (uint32_t superFrameId)
 
   NS_LOG_INFO ("UT: " << m_nodeInfo->GetMacAddress () << " SF: " << superFrameId);
 
-  //PrintUsedRandomAccessSlots ();
-
   std::map < std::pair <uint32_t, uint32_t>, std::set<uint32_t> >::iterator iter;
 
   for (iter = m_usedRandomAccessSlots.begin (); iter != m_usedRandomAccessSlots.end (); )
     {
       if (iter->first.first < superFrameId)
         {
-          m_usedRandomAccessSlots.erase (iter++);
+          iter = m_usedRandomAccessSlots.erase (iter);
         }
       else
         {
           ++iter;
         }
     }
-
-  //PrintUsedRandomAccessSlots ();
 }
 
 void
@@ -1183,16 +1188,13 @@ SatUtMac::PrintUsedRandomAccessSlots ()
   NS_LOG_FUNCTION (this);
 
   NS_LOG_INFO ("UT: " << m_nodeInfo->GetMacAddress ());
+  std::cout << "UT: " << m_nodeInfo->GetMacAddress () << std::endl;
 
-  std::map < std::pair <uint32_t, uint32_t>, std::set<uint32_t> >::iterator iter;
-
-  for (iter = m_usedRandomAccessSlots.begin (); iter != m_usedRandomAccessSlots.end (); iter++)
+  for (auto& iter : m_usedRandomAccessSlots)
     {
-      std::set<uint32_t>::iterator iterSet;
-
-      for (iterSet = iter->second.begin (); iterSet != iter->second.end (); iterSet++)
+      for (auto& slot : iter.second)
         {
-          std::cout << "SF: " << iter->first.first << " AC: " << iter->first.second << " slot: " << *iterSet << std::endl;
+          std::cout << "SF: " << iter.first.first << " AC: " << iter.first.second << " slot: " << slot << std::endl;
         }
     }
 }
@@ -1241,14 +1243,9 @@ SatUtMac::DoFrameStart ()
     }
 
   Time nextSuperFrameTxTime = GetNextSuperFrameTxTime (SatConstVariables::SUPERFRAME_SEQUENCE);
-
-  if (Now () >= nextSuperFrameTxTime)
-    {
-      NS_FATAL_ERROR ("Scheduling next superframe start time to the past!");
-    }
+  NS_ASSERT_MSG (Now () < nextSuperFrameTxTime, "Scheduling next superframe start time to the past!");
 
   Time schedulingDelay = nextSuperFrameTxTime - Now ();
-
   Simulator::Schedule (schedulingDelay, &SatUtMac::DoFrameStart, this);
 }
 
