@@ -184,7 +184,7 @@ public:
    * \param srcBeamId the beam ID this UT is moving from
    * \param destBeamId the beam ID this UT is moving to
    */
-  void CanUtMoveBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamId);
+  void MoveUtBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamId);
 
   /**
    * \brief Update routes and ARP tables on gateways after a terminal handover
@@ -221,7 +221,7 @@ private:
    * \param srcBeamId the beam ID this UT is moving from
    * \param destBeamId the beam ID this UT is moving to
    */
-  void MoveUtBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamId);
+  void DoMoveUtBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamId);
 
   /**
    * The map containing beams in use (set).

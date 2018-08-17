@@ -345,7 +345,7 @@ SatNcc::GetBeamScheduler (uint32_t beamId) const
 }
 
 void
-SatNcc::MoveUtBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamId)
+SatNcc::DoMoveUtBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamId)
 {
   NS_LOG_FUNCTION (this << utId << srcBeamId << destBeamId);
 
@@ -362,7 +362,7 @@ SatNcc::MoveUtBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamI
 }
 
 void
-SatNcc::CanUtMoveBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamId)
+SatNcc::MoveUtBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamId)
 {
   NS_LOG_FUNCTION (this << utId << srcBeamId << destBeamId);
 
@@ -381,7 +381,10 @@ SatNcc::CanUtMoveBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBe
         }
       else if (!scheduler->HasUt (utId) && destination->HasUt (utId))
         {
-          NS_LOG_INFO ("Handover already performed, dropping request!");
+          NS_LOG_INFO ("Handover already performed, sending back TIM-U just in case!");
+
+          Ptr<SatTimuMessage> timuMsg = destination->CreateTimu ();
+          scheduler->SendTo (timuMsg, utId);
         }
       else
         {
