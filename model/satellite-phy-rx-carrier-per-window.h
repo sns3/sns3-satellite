@@ -56,7 +56,9 @@ public:
     Mac48Address destAddress;
     Mac48Address sourceAddress;
     bool sicFlag;
+    bool failedSic;
     bool hasBeenUpdated;
+    bool isInsideWindow;
     double meanSinr;
     double preambleMeanSinr;
     std::vector< std::pair<double, double> > gamma;
@@ -143,6 +145,11 @@ private:
   /**
    * \brief Calculate gamma and Interference vectors for a single packet
    */
+  void EliminatePreviousInterferences (SatPhyRxCarrierPerWindow::essaPacketRxParams_s &packet);
+
+  /**
+   * \brief Calculate gamma and Interference vectors for a single packet
+   */
   void CalculatePacketInterferenceVectors (SatPhyRxCarrierPerWindow::essaPacketRxParams_s &packet);
 
   /**
@@ -179,7 +186,7 @@ private:
   /**
    * \brief Get a pair of iterators, pointing to the first element in the window, and to the first after the window
    */
-  std::pair<packetList_t::iterator, packetList_t::iterator> GetWindowBounds ();
+  std::pair<packetList_t::iterator, packetList_t::iterator> GetWindowBounds (Time startTime, Time endTime);
 
   /**
    * \brief Function for processing a window
@@ -202,9 +209,25 @@ private:
   Time m_windowStep;
 
   /**
+   * The delay before processing a sliding window
+   */
+  Time m_windowDelay;
+
+  /**
+   * The time of the first window
+   */
+  Time m_firstWindow;
+
+  /**
    * The number of SIC iterations performed on each window
    */
   uint32_t m_windowSicIterations;
+
+  // TODO: REMOVE!
+  /**
+   * The spreading factor of packets
+   */
+  uint32_t m_spreadingFactor;
 
   /**
    * \brief Has the window end scheduling been initialized

@@ -33,6 +33,7 @@
 #include <ostream>
 #include <limits>
 #include <utility>
+#include <iomanip>
 
 NS_LOG_COMPONENT_DEFINE ("SatPhyRxCarrierPerWindow");
 
@@ -45,9 +46,12 @@ SatPhyRxCarrierPerWindow::SatPhyRxCarrierPerWindow (uint32_t carrierId,
                                                     Ptr<SatWaveformConf> waveformConf,
                                                     bool randomAccessEnabled)
   : SatPhyRxCarrierPerSlot (carrierId, carrierConf, waveformConf, randomAccessEnabled),
-  m_windowDuration (Seconds (0.004)),
-  m_windowStep (Seconds (0.0005)),
+  m_windowDuration (MilliSeconds (60)),
+  m_windowStep (MilliSeconds (20)),
+  m_windowDelay (Seconds (0)),
+  m_firstWindow (Seconds (0)),
   m_windowSicIterations (10),
+  m_spreadingFactor (0),
   m_windowEndSchedulingInitialized (false),
   m_detectionThreshold (0.0)
 {
@@ -70,7 +74,8 @@ SatPhyRxCarrierPerWindow::BeginEndScheduling ()
 
       m_windowEndSchedulingInitialized = true;
 
-      Simulator::ScheduleWithContext (GetNodeInfo ()->GetNodeId (), m_windowDuration, &SatPhyRxCarrierPerWindow::DoWindowEnd, this);
+      /// WARNING: if firstWindow is too large, too many packets may be stored before the first CleanOldPackets is called
+      Simulator::ScheduleWithContext (GetNodeInfo ()->GetNodeId (), m_firstWindow + m_windowDuration, &SatPhyRxCarrierPerWindow::DoWindowEnd, this);
     }
 }
 
@@ -88,18 +93,35 @@ SatPhyRxCarrierPerWindow::GetTypeId (void)
     .SetParent<SatPhyRxCarrierPerSlot> ()
     .AddAttribute ( "WindowDuration",
                     "The duration of the sliding window",
-                    TimeValue (Seconds (0.004)),
+                    TimeValue (MilliSeconds (60)),
                     MakeTimeAccessor (&SatPhyRxCarrierPerWindow::m_windowDuration),
                     MakeTimeChecker ())
     .AddAttribute ( "WindowStep",
                     "The length of the step between two window iterations",
-                    TimeValue (Seconds (0.0005)),
+                    TimeValue (MilliSeconds (20)),
                     MakeTimeAccessor (&SatPhyRxCarrierPerWindow::m_windowStep),
+                    MakeTimeChecker ())
+    .AddAttribute ( "WindowDelay",
+                    "The delay before processing a sliding window, waiting for incomplete packets",
+                    TimeValue (Seconds (0)),
+                    MakeTimeAccessor (&SatPhyRxCarrierPerWindow::m_windowDelay),
+                    MakeTimeChecker ())
+    .AddAttribute ( "FirstWindow",
+                    "The time at which the first window is processed",
+                    TimeValue (Seconds (0)),
+                    MakeTimeAccessor (&SatPhyRxCarrierPerWindow::m_firstWindow),
                     MakeTimeChecker ())
     .AddAttribute ( "WindowSICIterations",
                     "The number of SIC iterations performed on each window",
                     UintegerValue (10),
                     MakeUintegerAccessor (&SatPhyRxCarrierPerWindow::m_windowSicIterations),
+                    MakeUintegerChecker<uint32_t> ())
+    // TODO: this shouldn't be here!! find a way to retrieve SF from SuperFrameConf,
+    // maybe store SF in waveform.
+    .AddAttribute ( "SpreadingFactor",
+                    "The spreading factor of the packets",
+                    UintegerValue (1),
+                    MakeUintegerAccessor (&SatPhyRxCarrierPerWindow::m_spreadingFactor),
                     MakeUintegerChecker<uint32_t> ())
     .AddAttribute ( "DetectionThreshold",
                     "The SNIR Detection Threshold (in magnitude) for a packet",
@@ -146,14 +168,64 @@ SatPhyRxCarrierPerWindow::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParam
   params.arrivalTime = Now () - params.duration; // arrival time is the start of reception
   params.rxParams = packetRxParams.rxParams;
   params.sicFlag = false;
+  params.failedSic = false;
   params.hasBeenUpdated = false;
+  params.isInsideWindow = false;
   params.meanSinr = -1.0;
   params.preambleMeanSinr = -1.0;
 
   // Calculate SINR, gamma and ifPowerPerFragment
   CalculatePacketInterferenceVectors (params);
 
+  // Check if packet can be detected
+  if (!PacketCanBeDetected (params))
+    {
+      NS_LOG_INFO ("SatPhyRxCarrierPerWindow::ReceiveSlot - Packet " << params.rxParams->m_txInfo.crdsaUniquePacketId << " from " << params.sourceAddress << " cannot be detected. Ignore it.");
+      /// TODO: make DeletePacket function, and use it in CleanOldPackets as well
+      m_essaRxCollisionTrace (1,                    // number of packets
+                              params.sourceAddress, // sender address
+                              1);                   // error flag
+      return;
+    }
+
+  // Eliminate interference from already decoded packets
+  // WARNING: with some combinations of window size and step, it may be possible that
+  // previously decoded packets have already been cleaned.
+  EliminatePreviousInterferences (params);
+
+  // Calculate SINR, gamma and ifPowerPerFragment
+  CalculatePacketInterferenceVectors (params);
+
   AddEssaPacket (params);
+}
+
+void
+SatPhyRxCarrierPerWindow::EliminatePreviousInterferences (SatPhyRxCarrierPerWindow::essaPacketRxParams_s &packet)
+{
+  NS_LOG_FUNCTION (this);
+  NS_LOG_INFO ("SatPhyRxCarrierPerWindow::EliminatePreviousInterferences - Eliminate interferences from packet " << packet.rxParams->m_txInfo.crdsaUniquePacketId << " from " << packet.sourceAddress);
+
+  // Get which packets that have been decoded interfere with this packet
+  packetList_t::iterator packet_it;
+  for (packet_it = m_essaPacketContainer.begin (); packet_it != m_essaPacketContainer.end (); packet_it++)
+    {
+      /// Check first if packet interferes with received packet
+      if ((packet_it->arrivalTime + packet_it->duration) <= packet.arrivalTime)
+        {
+          continue;
+        }
+      /// Check if packet has been decoded
+      if (!(packet_it->sicFlag))
+        {
+          continue;
+        }
+      /// Get normalized times
+      std::pair<double, double> normalizedTimes = GetNormalizedPacketInterferenceTime (packet, *packet_it);
+
+      NS_LOG_INFO ("SatPhyRxCarrierPerWindow::EliminatePreviousInterferences - eliminate interference with packet " << packet_it->rxParams->m_txInfo.crdsaUniquePacketId << " from " << packet_it->sourceAddress);
+      /// Eliminate the interferences
+      GetInterferenceEliminationModel ()->EliminateInterferences (packet.rxParams, packet_it->rxParams, packet_it->meanSinr * m_spreadingFactor, normalizedTimes.first, normalizedTimes.second);
+    }
 }
 
 void
@@ -196,7 +268,7 @@ SatPhyRxCarrierPerWindow::CalculatePacketInterferenceVectors (SatPhyRxCarrierPer
                          0.0, cSnr);
 
       /// composite sinr output trace
-      if (IsCompositeSinrOutputTraceEnabled () && (packet.meanSinr == 0.0))
+      if (IsCompositeSinrOutputTraceEnabled ())
         {
           DoCompositeSinrOutputTrace (cSnr);
         }
@@ -236,9 +308,7 @@ SatPhyRxCarrierPerWindow::CalculatePacketInterferenceVectors (SatPhyRxCarrierPer
       double gamma = 1 / (1 / cI + 1 / cSnr);
       packet.gamma.emplace_back (interferencePowerInSatellite->first, gamma);
 
-      NS_LOG_INFO ("SatPhyRxCarrierPerWindow::CalculatePacketInterferenceVectors - Gamma fragment of duration " << interferencePowerInSatellite->first << " : " << gamma);
     }
-
 
   /// Calculate the gamma vector for the preamble
   std::vector< std::pair<double, double> > gammaPreamble;
@@ -269,7 +339,8 @@ SatPhyRxCarrierPerWindow::DoWindowEnd ()
   NS_LOG_FUNCTION (this);
   NS_LOG_INFO ("SatPhyRxCarrierPerWindow::DoWindowEnd");
 
-  ProcessWindow (Now () - m_windowDuration, Now ());
+  //ProcessWindow (Now () - m_windowDuration, Now ());
+  Simulator::Schedule (m_windowDelay, &SatPhyRxCarrierPerWindow::ProcessWindow, this, Now () - m_windowDuration, Now ());
 
   // Advance the window (schedule DoWindowEnd for m_windowStep)
   Simulator::Schedule (m_windowStep, &SatPhyRxCarrierPerWindow::DoWindowEnd, this);
@@ -284,7 +355,7 @@ SatPhyRxCarrierPerWindow::ProcessWindow (Time startTime, Time endTime)
   CleanOldPackets (startTime);
 
   /// Get packets in window
-  std::pair<packetList_t::iterator, packetList_t::iterator> windowBounds = GetWindowBounds ();
+  std::pair<packetList_t::iterator, packetList_t::iterator> windowBounds = GetWindowBounds (startTime, endTime);
 
   uint32_t i = 0;
   while (i < m_windowSicIterations)
@@ -298,13 +369,13 @@ SatPhyRxCarrierPerWindow::ProcessWindow (Time startTime, Time endTime)
               NS_LOG_INFO ("SatPhyRxCarrierPerWindow::DoWindowEnd - No more packets to decode");
               break;
             }
+
           NS_LOG_INFO ("SatPhyRxCarrierPerWindow::DoWindowEnd - Process packet " << packet_it->rxParams->m_txInfo.crdsaUniquePacketId << " from " << packet_it->sourceAddress);
           /// MIESM (block 3)
           packet_it->hasBeenUpdated = false;
           /// Get effective SINR
           double sinrEffective = GetEffectiveSnir (*packet_it);
           m_sinrTrace (SatUtils::LinearToDb (sinrEffective), packet_it->sourceAddress);
-          NS_LOG_WARN (SatUtils::LinearToDb (packet_it->meanSinr) << " " << SatUtils::LinearToDb (sinrEffective) << " " << std::abs (SatUtils::LinearToDb (packet_it->meanSinr) - SatUtils::LinearToDb (sinrEffective)));
           /// Check against link results
           bool phyError = CheckAgainstLinkResults (sinrEffective, packet_it->rxParams);
           // Trace if the packet has been decoded or not
@@ -313,9 +384,13 @@ SatPhyRxCarrierPerWindow::ProcessWindow (Time startTime, Time endTime)
                               phyError);                // error flag
           if (!phyError)
             {
-              NS_LOG_WARN (SatUtils::LinearToDb (packet_it->meanSinr) << " " << SatUtils::LinearToDb (sinrEffective) << " " << std::abs (SatUtils::LinearToDb (packet_it->meanSinr) - SatUtils::LinearToDb (sinrEffective)) << " " << SatUtils::LinearToDb (GetInterferenceEliminationModel ()->GetResidualPower (packet_it->rxParams, 256 * packet_it->meanSinr)));
               /// SIC (block 4)
               DoSic (packet_it, windowBounds);
+            }
+          else
+            {
+              NS_LOG_INFO ("Failed to decode packet " << packet_it->sourceAddress << "-" << packet_it->rxParams->m_txInfo.crdsaUniquePacketId);
+              packet_it->failedSic = true;
             }
           /// send packet upwards
           m_rxCallback (packet_it->rxParams, phyError);
@@ -334,13 +409,6 @@ SatPhyRxCarrierPerWindow::DoSic (packetList_t::iterator processedPacket, std::pa
 {
   NS_LOG_FUNCTION (this);
   NS_LOG_INFO ("SatPhyRxCarrierPerWindow::DoSic - eliminate interference from packet " << processedPacket->rxParams->m_txInfo.crdsaUniquePacketId << " from " << processedPacket->sourceAddress);
-
-  // TODO: remove
-//  processedPacket->sicFlag = true;
-//  return;
-
-  /// Get residual SIC power
-  // double residualSicPower = GetInterferenceEliminationModel ()->GetResidualPower (processedPacket->rxParams, processedPacket->meanSinr);
 
   /// Update SIC on interfering packets
   for (packetList_t::iterator packet_it = windowBounds.first; packet_it != windowBounds.second; packet_it++)
@@ -364,8 +432,8 @@ SatPhyRxCarrierPerWindow::DoSic (packetList_t::iterator processedPacket, std::pa
       /// Get normalized start and end time
       std::pair<double, double> normalizedTimes = GetNormalizedPacketInterferenceTime (*packet_it, *processedPacket);
       /// Eliminate residual interference and recalculate the packets vectors
-      /// TODO: replace 256 by spreading factor
-      GetInterferenceEliminationModel ()->EliminateInterferences (packet_it->rxParams, processedPacket->rxParams, 16.0 * processedPacket->meanSinr, normalizedTimes.first, normalizedTimes.second);
+      GetInterferenceEliminationModel ()->EliminateInterferences (packet_it->rxParams, processedPacket->rxParams, processedPacket->meanSinr * m_spreadingFactor, normalizedTimes.first, normalizedTimes.second);
+
       CalculatePacketInterferenceVectors (*packet_it);
     }
 
@@ -382,11 +450,11 @@ SatPhyRxCarrierPerWindow::GetNormalizedPacketInterferenceTime (const SatPhyRxCar
 
   /// Get a first approach of the values
   /// (must redo calculations in the exact same order as they were
-  //   done when calculating the interference vector).
+  ///  done when calculating the interference vector).
   double startTimeA = std::max ( 0.0, 1.0 - ((packet.duration.GetDouble () + packet.arrivalTime.GetDouble () - interferingPacket.arrivalTime.GetDouble ()) / packet.duration.GetDouble ()));
   double endTimeA = std::min ( 1.0, 1.0 - (packet.arrivalTime.GetDouble () - interferingPacket.arrivalTime.GetDouble ()) / packet.duration.GetDouble ());
   double startTimeB = std::max ( 0.0, (interferingPacket.arrivalTime.GetDouble () - packet.arrivalTime.GetDouble ()) / packet.duration.GetDouble ());
-  double endTimeB = std::min ( 1.0, 1.0 - (packet.arrivalTime.GetDouble () - interferingPacket.arrivalTime.GetDouble ()) / packet.duration.GetDouble ());
+  double endTimeB = std::min ( 1.0, 2.0 - (packet.arrivalTime.GetDouble () - interferingPacket.arrivalTime.GetDouble () + packet.duration.GetDouble ()) / packet.duration.GetDouble ());
 
   /// Now get the actual values from the Interference vector (there may be
   //  some rounding errors)
@@ -419,7 +487,6 @@ double
 SatPhyRxCarrierPerWindow::GetEffectiveSnir (const SatPhyRxCarrierPerWindow::essaPacketRxParams_s &packet)
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_INFO ("SatPhyRxCarrierPerWindow::GetEffectiveSnir");
 
   Ptr<SatMutualInformationTable> mutualInformationTable = (GetLinkResults ()->GetObject <SatLinkResultsFSim> ())->GetMutualInformationTable ();
   double beta = mutualInformationTable->GetBeta ();
@@ -427,8 +494,6 @@ SatPhyRxCarrierPerWindow::GetEffectiveSnir (const SatPhyRxCarrierPerWindow::essa
   double meanMutualInformation = 0.0;
   for (std::vector< std::pair<double, double> >::const_iterator it = packet.gamma.begin (); it != packet.gamma.end (); it++)
     {
-      // TODO: REMOVE !
-      NS_LOG_INFO ("gamma vector : " << it->first << " " << it->second );
       meanMutualInformation += it->first * mutualInformationTable->GetNormalizedSymbolInformation (SatUtils::LinearToDb (it->second / beta));
     }
 
@@ -458,10 +523,24 @@ SatPhyRxCarrierPerWindow::CleanOldPackets (const Time windowStartTime)
       offset = it->arrivalTime + it->duration - windowStartTime;
       if (!offset.IsStrictlyPositive ())
         {
-          // Trace if the packet has been decoded or not
-          m_essaRxCollisionTrace (1,                        // number of packets
-                                  it->sourceAddress, // sender address
-                                  !(it->sicFlag));                // error flag
+          // Only trace packets that arrived after first Window
+          if (it->arrivalTime >= m_firstWindow)
+            {
+              if (!(it->sicFlag))
+                {
+                }
+              else
+                {
+                  m_daRxTrace (1,                  // number of packets
+                               it->sourceAddress,  // sender address
+                               it->failedSic       // error flag
+                               );
+                }
+              // Trace if the packet has been decoded or not
+              m_essaRxCollisionTrace (1,                        // number of packets
+                                      it->sourceAddress, // sender address
+                                      !(it->sicFlag));                // error flag
+            }
           // Delete element from list
           NS_LOG_INFO ("SatPhyRxCarrierPerWindow::CleanOldPackets - Remove packet " << it->rxParams->m_txInfo.crdsaUniquePacketId << " from " << it->sourceAddress);
           it->rxParams = NULL;
@@ -475,7 +554,7 @@ SatPhyRxCarrierPerWindow::CleanOldPackets (const Time windowStartTime)
 }
 
 std::pair<SatPhyRxCarrierPerWindow::packetList_t::iterator, SatPhyRxCarrierPerWindow::packetList_t::iterator>
-SatPhyRxCarrierPerWindow::GetWindowBounds ()
+SatPhyRxCarrierPerWindow::GetWindowBounds (Time startTime, Time endTime)
 {
   NS_LOG_FUNCTION (this);
   NS_LOG_INFO ("SatPhyRxCarrierPerWindow::GetWindowBounds");
@@ -484,13 +563,19 @@ SatPhyRxCarrierPerWindow::GetWindowBounds ()
 
   for (last = m_essaPacketContainer.begin (); last != m_essaPacketContainer.end (); last++)
     {
-      const Time windowStartTime = Now () - m_windowDuration;
+      /// By default, we consider packet is not inside window
+      last->isInsideWindow = false;
       /// Check first if packet is not after window
-      Time offset = last->arrivalTime - Now ();
-      if (offset.IsStrictlyPositive ())
+      if (last->arrivalTime > endTime)
         {
           break;
         }
+      /// Check if whole packet is inside window
+      if ((last->arrivalTime >= startTime) && (last->arrivalTime + last->duration <= endTime))
+        {
+          last->isInsideWindow = true;
+        }
+
       NS_LOG_INFO ("SatPhyRxCarrierPerWindow::GetWindowBounds - Packet " << last->rxParams->m_txInfo.crdsaUniquePacketId << " from " << last->sourceAddress << " is inside the window");
     }
 
@@ -508,14 +593,8 @@ SatPhyRxCarrierPerWindow::GetHighestSnirPacket (const std::pair<SatPhyRxCarrierP
   SatPhyRxCarrierPerWindow::packetList_t::iterator it, max = windowBounds.second;
   for (it = windowBounds.first; it != windowBounds.second; it++)
     {
-      if (it->sicFlag || !(it->hasBeenUpdated))
+      if (it->sicFlag || !(it->hasBeenUpdated) || !(it->isInsideWindow))
         {
-          continue;
-        }
-      /// Check If packet can be detected
-      if (!PacketCanBeDetected (*it))
-        {
-          NS_LOG_INFO ("SatPhyRxCarrierPerWindow::GetHighestSnirPacket - Packet " << it->rxParams->m_txInfo.crdsaUniquePacketId << " cannot be detected");
           continue;
         }
       /// Check if bigger SINR
@@ -539,8 +618,6 @@ void
 SatPhyRxCarrierPerWindow::AddEssaPacket (SatPhyRxCarrierPerWindow::essaPacketRxParams_s essaPacketParams)
 {
   NS_LOG_FUNCTION (this);
-
-  NS_LOG_INFO ("SatPhyRxCarrierPerWindow::AddEssaPacket - Time: " << Now ().GetSeconds ());
 
   NS_LOG_INFO ("SatPhyRxCarrierPerWindow::AddEssaPacket - Add packet " << essaPacketParams.rxParams->m_txInfo.crdsaUniquePacketId << " from " << essaPacketParams.sourceAddress << " Arrival Time: " << essaPacketParams.arrivalTime.GetSeconds () << " Duration: " << essaPacketParams.duration.GetSeconds ());
 
