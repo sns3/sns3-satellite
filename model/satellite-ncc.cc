@@ -377,7 +377,7 @@ SatNcc::MoveUtBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamI
           Ptr<SatTimuMessage> timuMsg = destination->CreateTimu ();
           scheduler->SendTo (timuMsg, utId);
 
-          Simulator::Schedule (m_utHandoverDelay, &SatNcc::MoveUtBetweenBeams, this, utId, srcBeamId, destBeamId);
+          Simulator::Schedule (m_utHandoverDelay, &SatNcc::DoMoveUtBetweenBeams, this, utId, srcBeamId, destBeamId);
         }
       else if (!scheduler->HasUt (utId) && destination->HasUt (utId))
         {
