@@ -22,6 +22,7 @@
 #define SATELLITE_UT_HANDOVER_MODULE_H
 
 #include <ns3/ptr.h>
+#include <ns3/nstime.h>
 #include <ns3/object.h>
 #include <ns3/callback.h>
 
@@ -86,6 +87,11 @@ private:
   HandoverRequestCallback m_handoverCallback;
 
   Ptr<SatAntennaGainPatternContainer> m_antennaGainPatterns;
+
+  Time m_lastMessageSentAt;
+  Time m_repeatRequestTimeout;
+  bool m_hasPendingRequest;
+  uint32_t m_askedBeamId;
 };
 
 }

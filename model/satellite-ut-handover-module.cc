@@ -19,6 +19,7 @@
  */
 
 #include <ns3/log.h>
+#include <ns3/simulator.h>
 
 #include "geo-coordinate.h"
 #include "satellite-mobility-model.h"
@@ -38,6 +39,11 @@ SatUtHandoverModule::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatUtHandoverModule")
     .SetParent<Object> ()
     .AddConstructor<SatUtHandoverModule> ()
+    .AddAttribute ("Timeout",
+                   "Amount of time to wait before sending a new handover recommendation if no TIM-U is received",
+                   TimeValue (MilliSeconds (600)),
+                   MakeTimeAccessor (&SatUtHandoverModule::m_repeatRequestTimeout),
+                   MakeTimeChecker ())
   ;
   return tid;
 }
@@ -53,7 +59,11 @@ SatUtHandoverModule::GetInstanceTypeId (void) const
 
 
 SatUtHandoverModule::SatUtHandoverModule ()
-  : m_antennaGainPatterns (NULL)
+  : m_antennaGainPatterns (NULL),
+  m_lastMessageSentAt (0),
+  m_repeatRequestTimeout (600),
+  m_hasPendingRequest (false),
+  m_askedBeamId (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -86,6 +96,13 @@ SatUtHandoverModule::SetHandoverRequestCallback (HandoverRequestCallback cb)
 void
 SatUtHandoverModule::CheckForHandoverRecommendation (uint32_t beamId)
 {
+  if (m_askedBeamId == beamId)
+    {
+      // In case TIM-U was received successfuly, the last asked beam should
+      // match the current beamId. So reset the timeout feature.
+      m_hasPendingRequest = false;
+    }
+
   Ptr<SatMobilityModel> mobilityModel = GetObject<SatMobilityModel> ();
   if (!mobilityModel)
     {
@@ -96,12 +113,25 @@ SatUtHandoverModule::CheckForHandoverRecommendation (uint32_t beamId)
   GeoCoordinate coords = mobilityModel->GetGeoPosition ();
   if (m_antennaGainPatterns->GetAntennaGainPattern (beamId)->IsValidPosition (coords))
     {
+      m_hasPendingRequest = false;
       return;
     }
 
   // Current beam ID is no longer valid, check for better beam and ask for handover
-  uint32_t bestBeamId = m_antennaGainPatterns->GetBestBeamId (coords);
-  m_handoverCallback (bestBeamId);
+  uint32_t bestBeamId = m_askedBeamId;
+  if (!m_hasPendingRequest)
+    {
+      bestBeamId = m_antennaGainPatterns->GetBestBeamId (coords);
+    }
+
+  Time now = Simulator::Now ();
+  if (bestBeamId != beamId && (!m_hasPendingRequest || now - m_lastMessageSentAt > m_repeatRequestTimeout))
+    {
+      m_handoverCallback (bestBeamId);
+      m_lastMessageSentAt = now;
+      m_hasPendingRequest = true;
+      m_askedBeamId = bestBeamId;
+    }
 }
 
 }
