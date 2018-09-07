@@ -32,23 +32,35 @@
 using namespace ns3;
 
 
+std::set<uint32_t> visitedBeams;
+static void
+SatCourseChange (std::string context, Ptr<const SatMobilityModel> position)
+{
+  auto tracedPosition = DynamicCast<const SatTracedMobilityModel> (position);
+  NS_ASSERT_MSG (tracedPosition != NULL, "Course changed for a non-mobile UT");
+
+  uint32_t beam = tracedPosition->GetBestBeamId ();
+  visitedBeams.insert (beam);
+}
+
 /**
- * \file sat-mobility-position-generator.cc
+ * \file sat-mobility-beam-tracer.cc
  * \ingroup satellite
  *
  * \brief Simulation script to run example simulation results with
  * a high degree of customization through XML file.
  *
- * execute command -> ./waf --run "sat-mobility-position-generator --PrintHelp"
+ * execute command -> ./waf --run "sat-mobility-beam-tracer --PrintHelp"
  */
 
-NS_LOG_COMPONENT_DEFINE ("sat-mobility-position-generator");
+NS_LOG_COMPONENT_DEFINE ("sat-mobility-beam-tracer");
 
 
 int
 main (int argc, char *argv[])
 {
   std::string inputFileNameWithPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory ("contrib/satellite/examples") + "/generic-input-attributes.xml";
+  std::string mobileUtTraceFile ("");
 
   Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("sat-mobility-position-generator");
   simulationHelper->DisableAllCapacityAssignmentCategories ();
@@ -56,15 +68,27 @@ main (int argc, char *argv[])
 
   // Parse command-line and XML file
   CommandLine cmd;
+  cmd.AddValue ("TraceFile", "Path to the trace file to check beams from", mobileUtTraceFile);
   simulationHelper->AddDefaultUiArguments (cmd, inputFileNameWithPath);
   cmd.Parse (argc, argv);
-  simulationHelper->ConfigureAttributesFromFile (inputFileNameWithPath);
+  simulationHelper->ReadInputAttributesFromFile (inputFileNameWithPath);
 
-  Ptr<SatHelper> satHelper = simulationHelper->GetSatelliteHelper ();
-  for (uint32_t beamId : simulationHelper->GetBeamSet ())
+  Ptr<SatHelper> satHelper = CreateObject<SatHelper> ("Scenario72");
+  if (mobileUtTraceFile != "")
     {
-      Ptr<SatSpotBeamPositionAllocator> positions = satHelper->GetBeamAllocator (beamId);
-      GeoCoordinate coords = positions->GetNextGeoPosition ();
-      std::cout << "[" << beamId << "] " << coords << std::endl;
+      Ptr<Node> node = satHelper->LoadMobileUtFromFile (mobileUtTraceFile);
+      node->GetObject<SatMobilityModel> ()->TraceConnect ("SatCourseChange", "BeamTracer", MakeCallback (SatCourseChange));
+
+      Ptr<SimulationHelperConf> simulationConf = CreateObject<SimulationHelperConf> ();
+      Simulator::Stop (simulationConf->m_simTime);
+      Simulator::Run ();
+      Simulator::Destroy ();
+
+      std::cout << "Visited beams are:";
+      for (auto& beam : visitedBeams)
+        {
+          std::cout << " " << beam;
+        }
+      std::cout << std::endl;
     }
 }
