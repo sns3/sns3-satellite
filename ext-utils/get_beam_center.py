@@ -6,59 +6,16 @@
 get_beam_center.py - Get the GPS location of beam center
 """
 
-import argparse
-import math
 import os
-import bisect
+import math
+import operator
+import argparse
+from contextlib import suppress
 
 
-def get_max_antenna_gain_location(filepath):
-    '''
-    Get max antenna gains.
+def command_line_parser():
+    """Define a parser for command line arguments"""
 
-    Args:
-        filepath:  the antenna gains file
-
-    Returns:
-        location of the max gain, and gain
-    '''
-    max_item = None
-    with open(filepath, 'r') as fd:
-        for line in fd:
-            line = line.split()
-            if len(line) == 0 or not line[0] or line[0][0] == '#':
-                continue
-            if math.isnan(float(line[2])):
-                continue
-            if max_item is None:
-                max_item = {}
-                max_item['lat'] = float(line[0])
-                max_item['lon'] = float(line[1])
-                max_item['gain'] = float(line[2])
-            elif max_item['gain'] < float(line[2]):
-                dummy = max_item['gain']
-                max_item['lat'] = float(line[0])
-                max_item['lon'] = float(line[1])
-                max_item['gain'] = float(line[2])
-    return max_item
-
-
-def get_beam_id(filepath):
-    '''
-    Get the beam id from the antenna gain file name.
-
-    Args:
-        filepath: the antenna gain file path
-
-    Returns:
-        the beam id
-    '''
-    return int(filepath[filepath.index('_') + 1:filepath.index('.txt')])
-
-
-if __name__ == "__main__":
-    
-    # Define arguments
     parser = argparse.ArgumentParser(
         description='Get the center of beam (based on max antenna gain)',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -70,24 +27,72 @@ if __name__ == "__main__":
         help='the directory containing the antenna gain for each beam',
     )
 
-    # Parse arguments
-    args = parser.parse_args()
+    return parser
 
-    # Prepare data to check beams
-    beam_files = os.listdir(args.beams_dir)
-    beam_files.sort(key=get_beam_id)
+
+def parse_file(filepath):
+    """
+    Parse an antenna gains file.
+
+    Args:
+        filepath:  the antenna gains file
+
+    Yields:
+        latitude, longitude and gain of entries in the file
+    """
+    with open(filepath) as antenna_gain_pattern:
+        for line in antenna_gain_pattern:
+            with suppress(ValueError):
+                lat, lon, gain = map(float, line.split())
+                yield lat, lon, gain
+
+
+def get_max_antenna_gain_location(filepath):
+    """
+    Get max antenna gains.
+
+    Args:
+        filepath:  the antenna gains file
+
+    Returns:
+        location of the max gain, and gain
+    """
+    return max(
+            (item for item in parse_file(filepath) if not math.isnan(item[2])),
+            key=operator.itemgetter(2)
+    )
+
+
+def get_beam_id(filepath):
+    """
+    Get the beam id from the antenna gain file name.
+
+    Args:
+        filepath: the antenna gain file path
+
+    Returns:
+        the beam id
+    """
+    return int(filepath[filepath.index('_') + 1:filepath.index('.txt')])
+
+
+def main(beam_directory):
+    """Print the position and gain of the center of each beam in beam_directory"""
+
+    # List beam files indexed by their beam ID
+    beam_files = {
+            get_beam_id(filename): filename
+            for filename in os.listdir(beam_directory)
+    }
 
     # Parse each beam and check each GPS positions
     print('beam,lat,lon,gain')
-    for beam_file in beam_files:
-        # Load beam file
-        beam_id = get_beam_id(beam_file)
-        item = get_max_antenna_gain_location(
-            os.path.join(args.beams_dir, beam_file)
-        )
-        print('{},{},{},{}'.format(
-            beam_id,
-            item['lat'],
-            item['lon'],
-            item['gain'],
-        ))
+    for beam_id in sorted(beam_files):
+        beam_path = os.path.join(beam_directory, beam_files[beam_id])
+        center = get_max_antenna_gain_location(beam_path)
+        print(beam_id, *center, sep=',')
+
+
+if __name__ == "__main__":
+    args = command_line_parser().parse_args()
+    main(args.beams_dir)
