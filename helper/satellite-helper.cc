@@ -551,12 +551,8 @@ SatHelper::LoadMobileUTsFromFolder (const std::string& folderName, Ptr<RandomVar
           continue;
         }
 
-      // Create Node, Mobility and aggregate them
-      Ptr<SatTracedMobilityModel> mobility = CreateObject<SatTracedMobilityModel> (folderName + "/" + filename, m_antennaGainPatterns);
-      uint32_t bestBeamId = mobility->GetBestBeamId ();
-      Ptr<Node> utNode = CreateObject<Node> ();
-      utNode->AggregateObject (mobility);
-      utNode->AggregateObject (CreateObject<SatUtHandoverModule> (m_antennaGainPatterns));
+      Ptr<Node> utNode = LoadMobileUtFromFile (folderName + "/" + filename);
+      uint32_t bestBeamId = utNode->GetObject<SatTracedMobilityModel> ()->GetBestBeamId ();
 
       // Store Node in the container for the starting beam
       std::map<uint32_t, NodeContainer>::iterator it = m_mobileUtsByBeam.find (bestBeamId);
@@ -579,6 +575,17 @@ SatHelper::LoadMobileUTsFromFolder (const std::string& folderName, Ptr<RandomVar
       NS_LOG_INFO ("Installing Mobility Observers for mobile UTs starting in beam " << mobileUtsForBeam.first);
       InstallMobilityObserver (mobileUtsForBeam.second);
     }
+}
+
+Ptr<Node>
+SatHelper::LoadMobileUtFromFile (const std::string& filename)
+{
+  // Create Node, Mobility and aggregate them
+  Ptr<SatTracedMobilityModel> mobility = CreateObject<SatTracedMobilityModel> (filename, m_antennaGainPatterns);
+  Ptr<Node> utNode = CreateObject<Node> ();
+  utNode->AggregateObject (mobility);
+  utNode->AggregateObject (CreateObject<SatUtHandoverModule> (m_antennaGainPatterns));
+  return utNode;
 }
 
 void

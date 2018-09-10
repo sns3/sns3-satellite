@@ -250,6 +250,11 @@ public:
   Ptr<Node> GetUtNode (Ptr<Node> utUserNode) const;
 
   /**
+   * \return All UT nodes in satellite network
+   */
+  NodeContainer GetUtNodes () const;
+
+  /**
    * Enables creation traces to be written in given file
    *
    * \param stream  stream for creation trace outputs

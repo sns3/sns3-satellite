@@ -169,6 +169,13 @@ public:
   void LoadMobileUTsFromFolder (const std::string& folderName, Ptr<RandomVariableStream> utUsers);
 
   /**
+   * \brief Load an UT with a SatTracedMobilityModel associated to
+   * them from the given file.
+   * \param filename Name of the trace file containing UT positions
+   */
+  Ptr<Node> LoadMobileUtFromFile (const std::string& filename);
+
+  /**
    * Set multicast group to satellite network and IP router. Add needed routes to net devices.
    *
    * \param source Source node of the multicast group (GW or UT connected user node)

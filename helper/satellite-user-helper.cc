@@ -372,6 +372,18 @@ SatUserHelper::GetUtNode (Ptr<Node> utUserNode) const
     }
 }
 
+NodeContainer
+SatUserHelper::GetUtNodes () const
+{
+  NodeContainer nodes;
+  for (auto& nodeInfo : m_utUsers)
+    {
+      nodes.Add (nodeInfo.first);
+    }
+
+  return nodes;
+}
+
 void
 SatUserHelper::EnableCreationTraces (Ptr<OutputStreamWrapper> stream, CallbackBase &cb)
 {
