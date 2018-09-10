@@ -71,10 +71,14 @@ class SatBeamScheduler : public Object
 {
 public:
   /**
-   * \brief GW information helper class for SatBeamScheduler.
-   *
-   * Stores L2 and L3 addresses information of the GW responsible of this beam.
+   * \enum HandoverInformationForward_t
+   * \brief Strategies to exchange informations between beams
    */
+  typedef enum
+  {
+    BASIC,
+    CHECK_GATEWAY
+  } HandoverInformationForward_t;
 
   /**
    * \brief Get the type ID
@@ -552,6 +556,8 @@ private:
   Ptr<SatCnoEstimator> CreateCnoEstimator ();
 
   Address m_gwAddress;
+
+  HandoverInformationForward_t m_handoverStrategy;
 };
 
 } // namespace ns3

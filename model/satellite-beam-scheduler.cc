@@ -210,6 +210,12 @@ SatBeamScheduler::GetTypeId (void)
                     TimeValue (MilliSeconds (1000)),
                     MakeTimeAccessor (&SatBeamScheduler::m_controlSlotInterval),
                     MakeTimeChecker ())
+    .AddAttribute ( "HandoverStrategy",
+                    "Strategy used when performing handover to transfer capacity requests and C/No informations",
+                    EnumValue (SatBeamScheduler::BASIC),
+                    MakeEnumAccessor (&SatBeamScheduler::m_handoverStrategy),
+                    MakeEnumChecker (SatBeamScheduler::BASIC, "Basic",
+                                     SatBeamScheduler::CHECK_GATEWAY, "CheckGateway"))
     .AddTraceSource ("BacklogRequestsTrace",
                      "Trace for backlog requests done to beam scheduler.",
                      MakeTraceSourceAccessor (&SatBeamScheduler::m_backlogRequestsTrace),
@@ -740,22 +746,49 @@ SatBeamScheduler::TransferUtToBeam (Address utId, Ptr<SatBeamScheduler> destinat
 
       m_utInfos.erase (utIterator);
 
-      // Removing capacity requests left
-      // TODO: move them to the new beam?
-      UtReqInfoContainer_t::iterator it = m_utRequestInfos.begin ();
-      while (it != m_utRequestInfos.end ())
+      // Handling capacity requests left and C/No estimations
+      switch (m_handoverStrategy)
         {
-          if (it->first == utId)
-            {
-              it = m_utRequestInfos.erase (it);
-            }
-          else
-            {
-              ++it;
-            }
+        case BASIC:
+          {
+            UtReqInfoContainer_t::iterator it = m_utRequestInfos.begin ();
+            while (it != m_utRequestInfos.end ())
+              {
+                if (it->first == utId)
+                  {
+                    it = m_utRequestInfos.erase (it);
+                  }
+                else
+                  {
+                    ++it;
+                  }
+              }
+            break;
+          }
+        case CHECK_GATEWAY:
+          {
+            bool isSameGateway = m_gwAddress == destination->m_gwAddress;
+            UtReqInfoContainer_t::iterator it = m_utRequestInfos.begin ();
+            while (it != m_utRequestInfos.end ())
+              {
+                if (it->first == utId)
+                  {
+                    if (isSameGateway)
+                      {
+                        destination->m_utRequestInfos.push_back (*it);
+                      }
+                    it = m_utRequestInfos.erase (it);
+                  }
+                else
+                  {
+                    ++it;
+                  }
+              }
+            break;
+          }
+        default:
+          NS_FATAL_ERROR ("Unknown handover strategy");
         }
-
-      // TODO: reset Cno?
     }
 }
 
