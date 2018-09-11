@@ -35,6 +35,7 @@
 namespace ns3 {
 
 class PropagationDelayModel;
+class SatArpCache;
 class NetDevice;
 class Node;
 
@@ -384,6 +385,13 @@ private:
    * Used to update routing during handover
    */
   std::map<Address, Ptr<NetDevice> > m_gwDevices;
+
+  /**
+   * \brief Container of ARP tables to reach a gateway accessible by MAC address
+   *
+   * Used to update routing during handover
+   */
+  std::map<Address, Ptr<SatArpCache> > m_arpCachesToGateway;
 
   SatUserHelper::PropagationDelayCallback m_propagationDelayCallback;
 };

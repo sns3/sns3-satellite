@@ -564,6 +564,8 @@ SatUserHelper::PopulateBeamRoutings (NodeContainer ut, NetDeviceContainer utNd,
   Ptr<SatArpCache> utArpCache = CreateObject<SatArpCache> ();
   utArpCache->Add (gwAddr, macAddressGw);
   NS_LOG_INFO ("UT ARP entry:  " << gwAddr << " - " << macAddressGw );
+  // Store ARP cache for retrieval during handovers
+  m_arpCachesToGateway.emplace (macAddressGw, utArpCache);
 
   // Add the ARP entries of all the UTs in this beam
   // - MAC address vs. IPv4 address
@@ -640,16 +642,16 @@ SatUserHelper::UpdateUtRoutes (Address utAddress, Address gwAddress)
   std::map<Address, Ptr<NetDevice> >::iterator utNdIterator = m_utDevices.find (utAddress);
   NS_ASSERT_MSG (utNdIterator != m_utDevices.end (), "Unknown UT with MAC address " << utAddress);
 
+  std::map<Address, Ptr<SatArpCache> >::iterator arpCacheIterator = m_arpCachesToGateway.find (gwAddress);
+  NS_ASSERT_MSG (arpCacheIterator != m_arpCachesToGateway.end (), "ARP cache not found to gateway " << gwAddress);
+
   Ptr<SatNetDevice> utNd = DynamicCast<SatNetDevice> (utNdIterator->second);
   NS_ASSERT (utNd != NULL);
   Ptr<Ipv4L3Protocol> protocol = utNd->GetNode ()->GetObject<Ipv4L3Protocol> ();
   uint32_t utIfIndex = utNdIterator->second->GetIfIndex ();
 
-  NS_LOG_INFO ("Adding ARP cache entry to UT " << utAddress <<
-               " pointing to " << ip << " through " << gwAddress);
-  ArpCache::Entry *entry = protocol->GetInterface (utIfIndex)->GetArpCache ()->Add (ip);
-  entry->SetMacAddress (gwAddress);
-  entry->MarkPermanent ();
+  NS_LOG_INFO ("Changing ARP cache for UT " << utAddress << " pointing to " << ip << " through " << gwAddress);
+  protocol->GetInterface (utIfIndex)->SetArpCache (arpCacheIterator->second);
 
   Ipv4StaticRoutingHelper ipv4RoutingHelper;
   Ptr<Ipv4StaticRouting> routing = ipv4RoutingHelper.GetStaticRouting (protocol);
