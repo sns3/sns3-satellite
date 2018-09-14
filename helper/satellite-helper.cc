@@ -18,6 +18,8 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
+#include <sys/stat.h>
+
 #include <ns3/double.h>
 #include <ns3/log.h>
 #include <ns3/names.h>
@@ -41,6 +43,14 @@
 #include <ns3/satellite-traced-mobility-model.h>
 #include <ns3/satellite-ut-handover-module.h>
 #include "satellite-helper.h"
+
+
+bool
+IsDirectory (const std::string& filepath)
+{
+  struct stat sb;
+  return (stat (filepath.c_str (), &sb) == 0 && S_ISDIR (sb.st_mode));
+}
 
 
 NS_LOG_COMPONENT_DEFINE ("SatHelper");
@@ -545,13 +555,14 @@ SatHelper::LoadMobileUTsFromFolder (const std::string& folderName, Ptr<RandomVar
 {
   for (std::string& filename : SystemPath::ReadFiles (folderName))
     {
-      if (filename == "" || filename[0] == '.')
+      std::string filepath = folderName + "/" + filename;
+      if (IsDirectory (filepath))
         {
-          NS_LOG_INFO ("Skipping hidden file '" << filename << "'");
+          NS_LOG_INFO ("Skipping directory '" << filename << "'");
           continue;
         }
 
-      Ptr<Node> utNode = LoadMobileUtFromFile (folderName + "/" + filename);
+      Ptr<Node> utNode = LoadMobileUtFromFile (filepath);
       uint32_t bestBeamId = utNode->GetObject<SatTracedMobilityModel> ()->GetBestBeamId ();
 
       // Store Node in the container for the starting beam
