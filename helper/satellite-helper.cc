@@ -640,6 +640,14 @@ SatHelper::SetUtMobility (NodeContainer uts, uint32_t beamId)
   mobility.Install (uts);
 
   InstallMobilityObserver (uts);
+
+  for (uint32_t i = 0; i < uts.GetN (); ++i)
+    {
+      GeoCoordinate position = uts.Get (i)->GetObject<SatMobilityModel> ()->GetGeoPosition ();
+      NS_LOG_INFO ("Installing mobility observer on Ut Node at " <<
+                   position << " with antenna gain of " <<
+                   m_antennaGainPatterns->GetAntennaGainPattern (beamId)->GetAntennaGain_lin (position));
+    }
 }
 
 Ptr<SatSpotBeamPositionAllocator>

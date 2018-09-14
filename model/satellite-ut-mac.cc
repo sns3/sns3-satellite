@@ -1230,6 +1230,7 @@ SatUtMac::DoFrameStart ()
 
   if (!m_beamCheckerCallback.IsNull ())
     {
+      NS_LOG_INFO ("UT checking for beam handover recommendation");
       m_beamCheckerCallback (m_beamId);
     }
 
