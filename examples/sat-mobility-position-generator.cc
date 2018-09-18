@@ -49,6 +49,7 @@ int
 main (int argc, char *argv[])
 {
   std::string inputFileNameWithPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory ("contrib/satellite/examples") + "/generic-input-attributes.xml";
+  uint32_t posCount = 1;
 
   Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("sat-mobility-position-generator");
   simulationHelper->DisableAllCapacityAssignmentCategories ();
@@ -56,6 +57,7 @@ main (int argc, char *argv[])
 
   // Parse command-line and XML file
   CommandLine cmd;
+  cmd.AddValue ("PosCount", "Amount of positions to generate per beam", posCount);
   simulationHelper->AddDefaultUiArguments (cmd, inputFileNameWithPath);
   cmd.Parse (argc, argv);
   simulationHelper->ConfigureAttributesFromFile (inputFileNameWithPath);
@@ -63,8 +65,11 @@ main (int argc, char *argv[])
   Ptr<SatHelper> satHelper = simulationHelper->GetSatelliteHelper ();
   for (uint32_t beamId : simulationHelper->GetBeamSet ())
     {
-      Ptr<SatSpotBeamPositionAllocator> positions = satHelper->GetBeamAllocator (beamId);
-      GeoCoordinate coords = positions->GetNextGeoPosition ();
-      std::cout << "[" << beamId << "] " << coords << std::endl;
+      for (uint32_t posId = 0; posId < posCount; ++posId)
+        {
+          Ptr<SatSpotBeamPositionAllocator> positions = satHelper->GetBeamAllocator (beamId);
+          GeoCoordinate coords = positions->GetNextGeoPosition ();
+          std::cout << "[" << beamId << "] " << coords << std::endl;
+        }
     }
 }
