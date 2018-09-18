@@ -128,12 +128,48 @@ public:
   }
 
   /**
+   * \brief Function for getting the F-SIM backoff time
+   * \return F-SIM backoff time
+   */
+  uint32_t GetFSimBackoffTimeInMilliSeconds ()
+  {
+    return m_fSimBackoffTimeInMilliSeconds;
+  }
+
+  /**
+   * \brief Function for setting the F-SIM backoff time
+   * \param fSimBackoffTimeInFrames F-SIM backoff time in milliseconds
+   */
+  void SetFSimBackoffTimeInMilliSeconds (uint32_t fSimBackoffTimeInMilliSeconds)
+  {
+    m_fSimBackoffTimeInMilliSeconds = fSimBackoffTimeInMilliSeconds;
+  }
+
+  /**
+   * \brief Function for setting the F-SIM backoff time
+   * \param fSimBackoffTimeInFrames F-SIM backoff time in frames
+   */
+  void SetFSimBackoffTimeInFrames (uint32_t fSimBackoffTimeInFrames)
+  {
+    m_fSimBackoffTimeInMilliSeconds = fSimBackoffTimeInFrames * m_fSimPhysicalLayerFrameInMilliSeconds;
+  }
+
+  /**
    * \brief Function for getting the CRDSA backoff release time
    * \return CRDSA backoff release time
    */
   Time GetCrdsaBackoffReleaseTime ()
   {
     return m_crdsaBackoffReleaseTime;
+  }
+
+  /**
+   * \brief Function for setting the F-SIM physical layer frame duration
+   * \param fSimPhysicalLayerFrameInMilliSeconds F-SIM physical layer frame in milliseconds
+   */
+  void SetFSimPhysicalLayerFrameInMilliSeconds (uint32_t fSimPhysicalLayerFrameInMilliSeconds)
+  {
+    m_fSimPhysicalLayerFrameInMilliSeconds = fSimPhysicalLayerFrameInMilliSeconds;
   }
 
   /**
@@ -161,6 +197,24 @@ public:
   void SetCrdsaBackoffProbability (uint16_t crdsaBackoffProbability)
   {
     m_crdsaBackoffProbability = (crdsaBackoffProbability + 1) * (1 / (std::pow (2, 16)));
+  }
+
+  /**
+   * \brief Function for getting the F-SIM backoff probability
+   * \return F-SIM backoff probability
+   */
+  double GetFSimBackoffProbability ()
+  {
+    return m_fSimBackoffProbability;
+  }
+
+  /**
+   * \brief Function for setting the F-SIM backoff probability
+   * \param fSimPersistence F-SIM persistence
+   */
+  void SetFSimBackoffProbability (uint16_t fSimPersistence)
+  {
+    m_fSimBackoffProbability = 1.0 / (std::pow (2.0, fSimPersistence / 2.0));
   }
 
   /**
@@ -382,6 +436,23 @@ private:
    * \brief CRDSA backoff release time
    */
   Time m_crdsaBackoffReleaseTime;
+
+  /**
+   * \brief F-SIM Backoff Time in physical layer frame units
+   */
+  uint32_t m_fSimBackoffTimeInMilliSeconds;
+
+  /**
+   * \brief F-SIM Backoff Probability
+   */
+  double m_fSimBackoffProbability;
+
+  /**
+   * \brief F-SIM physical layer frame duration in milliseconds
+   *        TODO: maybe this shouldn't be here
+   */
+  uint32_t m_fSimPhysicalLayerFrameInMilliSeconds;
+
 };
 
 } // namespace ns3

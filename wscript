@@ -156,6 +156,7 @@ def build(bld):
         'stats/satellite-stats-signalling-load-helper.cc',
         'stats/satellite-stats-throughput-helper.cc',
         'stats/satellite-stats-waveform-usage-helper.cc',
+        'stats/satellite-stats-window-load-helper.cc',
         'stats/satellite-stats-helper-container.cc',
         ]
 
@@ -348,6 +349,7 @@ def build(bld):
         'stats/satellite-stats-signalling-load-helper.h',
         'stats/satellite-stats-throughput-helper.h',
         'stats/satellite-stats-waveform-usage-helper.h',
+        'stats/satellite-stats-window-load-helper.h',
         'stats/satellite-stats-helper-container.h',
         ]
 

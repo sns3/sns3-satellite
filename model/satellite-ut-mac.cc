@@ -711,8 +711,8 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
                          "  Updating RA backoff probability for AC: " << allocationChannelId <<
                          " to: " << backoffProbability);
 
-            m_randomAccess->SetCrdsaBackoffProbability (allocationChannelId, backoffProbability);
-            m_randomAccess->SetCrdsaBackoffTimeInMilliSeconds (allocationChannelId, backoffTime);
+            m_randomAccess->SetBackoffProbability (allocationChannelId, backoffProbability);
+            m_randomAccess->SetBackoffTime (allocationChannelId, backoffTime);
 
             packet->RemovePacketTag (macTag);
             packet->RemovePacketTag (ctrlTag);

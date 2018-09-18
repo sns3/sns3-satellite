@@ -99,6 +99,11 @@ public:
     return CarrierType::RA_ESSA;
   }
 
+  /**
+   * \brief Callback signature for `WindowLoadTrace` trace source.
+   */
+  typedef void (*WindowLoadTraceCallback) (double windowLoad);
+
 protected:
   /**
    * Receive a slot.
@@ -131,6 +136,16 @@ protected:
   TracedCallback<uint32_t, const Address &, bool> m_essaRxCollisionTrace;
 
   /**
+   * \brief `WindowLoad` trace source.
+   *
+   *  Fired when a Window Load measurement is performed.
+   *
+   *  Contains te following information:
+   *  - The load of the current window.
+   */
+  TracedCallback<double> m_windowLoadTrace;
+
+  /**
    * \brief Dispose implementation
    */
   virtual void DoDispose ();
@@ -141,6 +156,17 @@ private:
    * \brief Function for storing the received E-SSA packets
    */
   void AddEssaPacket (SatPhyRxCarrierPerWindow::essaPacketRxParams_s essaPacketParams);
+
+  /**
+   * \brief Function for calculating the normalized offered random access load
+   * \return Normalized offered load
+   */
+  double CalculateNormalizedOfferedRandomAccessLoad ();
+
+  /**
+   * \brief Function for measuring the random access load
+   */
+  void MeasureRandomAccessLoad ();
 
   /**
    * \brief Calculate gamma and Interference vectors for a single packet
@@ -244,6 +270,11 @@ private:
    * \brief ESSA packet container
    */
   packetList_t m_essaPacketContainer;
+
+  /**
+   * \brief The number of payload bytes in the window
+   */
+  uint32_t m_payloadBytesInWindow;
 };
 
 

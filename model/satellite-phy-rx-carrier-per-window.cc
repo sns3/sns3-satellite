@@ -136,6 +136,10 @@ SatPhyRxCarrierPerWindow::GetTypeId (void)
                      "Received a packet through Random Access ESSA",
                      MakeTraceSourceAccessor (&SatPhyRxCarrierPerWindow::m_essaRxErrorTrace),
                      "ns3::SatPhyRxCarrierPacketProbe::RxStatusCallback")
+    .AddTraceSource ("WindowLoad",
+                     "Performed a window load measurement",
+                     MakeTraceSourceAccessor (&SatPhyRxCarrierPerWindow::m_windowLoadTrace),
+                     "ns3::SatPhyRxCarrierPerWindow::WindowLoadTraceCallback")
   ;
   return tid;
 }
@@ -401,6 +405,11 @@ SatPhyRxCarrierPerWindow::ProcessWindow (Time startTime, Time endTime)
       // increase iteration number
       i++;
     }
+  /// measure random access load in window
+  if (IsRandomAccessDynamicLoadControlEnabled ())
+    {
+      MeasureRandomAccessLoad ();
+    }
   NS_LOG_INFO ("SatPhyRxCarrierPerWindow::DoWindowEnd - Window processing finished");
 }
 
@@ -560,6 +569,7 @@ SatPhyRxCarrierPerWindow::GetWindowBounds (Time startTime, Time endTime)
   NS_LOG_INFO ("SatPhyRxCarrierPerWindow::GetWindowBounds");
 
   packetList_t::iterator last;
+  m_payloadBytesInWindow = 0;
 
   for (last = m_essaPacketContainer.begin (); last != m_essaPacketContainer.end (); last++)
     {
@@ -574,6 +584,8 @@ SatPhyRxCarrierPerWindow::GetWindowBounds (Time startTime, Time endTime)
       if ((last->arrivalTime >= startTime) && (last->arrivalTime + last->duration <= endTime))
         {
           last->isInsideWindow = true;
+          /// update number of bytes in the window
+          m_payloadBytesInWindow += GetWaveformConf ()->GetWaveform (last->rxParams->m_txInfo.waveformId)->GetPayloadInBytes ();
         }
 
       NS_LOG_INFO ("SatPhyRxCarrierPerWindow::GetWindowBounds - Packet " << last->rxParams->m_txInfo.crdsaUniquePacketId << " from " << last->sourceAddress << " is inside the window");
@@ -623,6 +635,43 @@ SatPhyRxCarrierPerWindow::AddEssaPacket (SatPhyRxCarrierPerWindow::essaPacketRxP
 
   /// Insert received packet in packets container
   m_essaPacketContainer.push_back (essaPacketParams);
+}
+
+void
+SatPhyRxCarrierPerWindow::MeasureRandomAccessLoad ()
+{
+  NS_LOG_FUNCTION (this);
+
+  /// calculate the load for this window
+  double normalizedOfferedLoad = CalculateNormalizedOfferedRandomAccessLoad ();
+
+  /// save the load for this window
+  SaveMeasuredRandomAccessLoad (normalizedOfferedLoad);
+
+  /// calculate the average load over the measurement window
+  double averageNormalizedOfferedLoad = CalculateAverageNormalizedOfferedRandomAccessLoad ();
+
+  NS_LOG_INFO ("Average normalized offered load: " << averageNormalizedOfferedLoad);
+
+  /// upload trace with normalized offered load
+  m_windowLoadTrace (normalizedOfferedLoad);
+
+  m_avgNormalizedOfferedLoadCallback (GetBeamId (), GetCarrierId (), GetRandomAccessAllocationChannelId (), averageNormalizedOfferedLoad);
+}
+
+double
+SatPhyRxCarrierPerWindow::CalculateNormalizedOfferedRandomAccessLoad ()
+{
+  NS_LOG_FUNCTION (this);
+
+  double normalizedOfferedLoad = m_payloadBytesInWindow * SatConstVariables::BITS_PER_BYTE / m_windowDuration.GetSeconds () / m_rxBandwidthHz;
+
+  NS_LOG_WARN ("Payload Bytes in Window: " << m_payloadBytesInWindow <<
+               ", Window duration in seconds: " << m_windowDuration.GetSeconds () <<
+               ", Bandwidth in Hz: " << m_rxBandwidthHz <<
+               ", normalized offered load (bps/Hz): " << normalizedOfferedLoad);
+
+  return normalizedOfferedLoad;
 }
 
 }

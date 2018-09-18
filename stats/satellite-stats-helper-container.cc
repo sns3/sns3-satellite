@@ -39,6 +39,7 @@
 #include <ns3/satellite-stats-signalling-load-helper.h>
 #include <ns3/satellite-stats-throughput-helper.h>
 #include <ns3/satellite-stats-waveform-usage-helper.h>
+#include <ns3/satellite-stats-window-load-helper.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatStatsHelperContainer");
 
@@ -459,6 +460,17 @@ SatStatsHelperContainer::GetTypeId ()
     ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
     ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalRtnUserLinkRxPower,
                                   "global return user link Rx power statistics")
+    ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
+
+    // Window load statistics.
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalRtnFeederWindowLoad,
+                                  "global return feeder window load statistics")
+    ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerGwRtnFeederWindowLoad,
+                                  "per gw return feeder window load statistics")
+    ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerBeamRtnFeederWindowLoad,
+                                  "per beam return feeder window load statistics")
     ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
   ;
   return tid;
@@ -939,6 +951,10 @@ SAT_STATS_GLOBAL_METHOD_DEFINITION      (FwdUserLinkRxPower,   "fwd-user-link-rx
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnFeederLinkRxPower, "rtn-feeder-link-rx-power")
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnUserLinkRxPower,   "rtn-user-link-rx-power")
 
+// Link Window load statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnFeederWindowLoad, "rtn-feeder-window-load")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (RtnFeederWindowLoad, "rtn-feeder-window-load")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (RtnFeederWindowLoad, "rtn-feeder-window-load")
 
 std::string // static
 SatStatsHelperContainer::GetOutputTypeSuffix (SatStatsHelper::OutputType_t outputType)

@@ -50,7 +50,10 @@ SatRandomAccessAllocationChannel::SatRandomAccessAllocationChannel ()
   m_crdsaMaxUniquePayloadPerBlock (),
   m_crdsaMaxConsecutiveBlocksAccessed (),
   m_crdsaNumOfConsecutiveBlocksUsed (0),
-  m_crdsaBackoffReleaseTime (0)
+  m_crdsaBackoffReleaseTime (0),
+  m_fSimBackoffTimeInMilliSeconds (),
+  m_fSimBackoffProbability (),
+  m_fSimPhysicalLayerFrameInMilliSeconds ()
 {
   NS_LOG_FUNCTION (this);
 }

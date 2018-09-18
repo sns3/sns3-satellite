@@ -71,13 +71,6 @@ SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf,
       NS_FATAL_ERROR ("SatRandomAccessConf::SatRandomAccessConf - No random access allocation channel");
     }
 
-  /// If SUPERFRAME CONF 5 (E-SSA), don't check configuration for SA or CRDSA
-  /// TODO: refactor this
-  if (superframeSeq->GetSuperframeConf (0)->GetConfigType () == SatSuperframeConf::CONFIG_TYPE_4)
-    {
-      return;
-    }
-
   m_slottedAlohaControlRandomizationIntervalInMilliSeconds = (llsConf->GetDefaultControlRandomizationInterval ()).GetMilliSeconds ();
   DoSlottedAlohaVariableSanityCheck ();
 
@@ -88,12 +81,17 @@ SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf,
 
       allocationChannel->SetSlottedAlohaAllowed (llsConf->GetRaIsSlottedAlohaAllowed (i));
       allocationChannel->SetCrdsaAllowed (llsConf->GetRaIsCrdsaAllowed (i));
+      allocationChannel->SetEssaAllowed (llsConf->GetRaIsEssaAllowed (i));
       allocationChannel->SetCrdsaMaxUniquePayloadPerBlock (llsConf->GetRaMaximumUniquePayloadPerBlock (i));
       allocationChannel->SetCrdsaMaxConsecutiveBlocksAccessed (llsConf->GetRaMaximumConsecutiveBlockAccessed (i));
       allocationChannel->SetCrdsaMinIdleBlocks (llsConf->GetRaMinimumIdleBlock (i));
       allocationChannel->SetCrdsaNumOfInstances (llsConf->GetRaNumberOfInstances (i));
       allocationChannel->SetCrdsaBackoffProbability (llsConf->GetRaBackOffProbability (i));
       allocationChannel->SetCrdsaBackoffTimeInMilliSeconds (llsConf->GetRaBackOffTimeInMilliSeconds (i));
+      allocationChannel->SetFSimBackoffProbability (llsConf->GetRaBackOffProbability (i));
+      allocationChannel->SetFSimBackoffTimeInMilliSeconds (llsConf->GetRaBackOffTimeInMilliSeconds (i));
+      allocationChannel->SetFSimPhysicalLayerFrameInMilliSeconds ((superframeSeq->GetSuperframeConf (0)->GetDuration ()).GetMilliSeconds ());
+
       /// this assumes that the slot IDs for each allocation channel start at 0
       allocationChannel->SetCrdsaMinRandomizationValue (0);
       allocationChannel->SetCrdsaMaxRandomizationValue (std::numeric_limits<uint16_t>::max ());
@@ -124,7 +122,10 @@ SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf,
 
   for (auto& allocationChannelConf : m_allocationChannelConf)
     {
-      allocationChannelConf.second->DoCrdsaVariableSanityCheck ();
+      if (allocationChannelConf.second->GetCrdsaAllowed ())
+        {
+          allocationChannelConf.second->DoCrdsaVariableSanityCheck ();
+        }
     }
 }
 

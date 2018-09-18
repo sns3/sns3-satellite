@@ -56,6 +56,7 @@ namespace ns3 {
  * - Add [Global, PerGw, PerBeam] WaveformUsage
  * - AddGlobal [Fwd, Rtn] [Feeder, User] LinkSinr
  * - AddGlobal [Fwd, Rtn] [Feeder, User] LinkRxPower
+ * - Add [Global, PerGw, PerBeam] RtnFeederWindowLoad
  *
  * Also check the Doxygen documentation of this class for more information.
  */
@@ -285,6 +286,11 @@ public:
   void AddGlobalFwdUserLinkRxPower (SatStatsHelper::OutputType_t outputType);
   void AddGlobalRtnFeederLinkRxPower (SatStatsHelper::OutputType_t outputType);
   void AddGlobalRtnUserLinkRxPower (SatStatsHelper::OutputType_t outputType);
+
+  // Window load statistics
+  void AddGlobalRtnFeederWindowLoad (SatStatsHelper::OutputType_t outputType);
+  void AddPerGwRtnFeederWindowLoad (SatStatsHelper::OutputType_t outputType);
+  void AddPerBeamRtnFeederWindowLoad (SatStatsHelper::OutputType_t outputType);
 
   /**
    * \param outputType an arbitrary output type.
