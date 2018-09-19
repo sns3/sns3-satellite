@@ -313,6 +313,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId,
   SatPhy::ReceiveCallback recCb = MakeCallback (&SatUtMac::Receive, mac);
 
   phy->SetAttribute ("ReceiveCb", CallbackValue (recCb));
+  mac->SetTxCheckCallback (MakeCallback (&SatUtPhy::IsTxPossible, phy));
 
   // Create Logical Link Control (LLC) layer
   Ptr<SatUtLlc> llc = CreateObject<SatUtLlc> ();

@@ -102,6 +102,11 @@ public:
    */
   void PerformHandover (uint32_t beamId);
 
+  /**
+   * \brief Inform whether or not the underlying Tx channel is properly configured for transmission
+   */
+  bool IsTxPossible (void) const;
+
 private:
   /**
    * \brief Update the underlying SatChannel to send and receive data from

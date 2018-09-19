@@ -131,6 +131,17 @@ public:
   void SetAssignedDaResourcesCallback (SatUtMac::AssignedDaResourcesCallback cb);
 
   /**
+   * Callback to check if TX is operational
+   */
+  typedef Callback<bool> TxCheckCallback;
+
+  /**
+   * \brief Set the TX check callback
+   * \param cb callback to invoke when checking if TX is enabled
+   */
+  void SetTxCheckCallback (SatUtMac::TxCheckCallback cb);
+
+  /**
    * Get Tx time for the next possible superframe.
    * \param superFrameSeqId Superframe sequence id
    * \return Time Time to transmit
@@ -527,6 +538,11 @@ private:
    * Beam checker and handover recommendation sending callback
    */
   SatUtMac::BeamCheckerCallback m_beamCheckerCallback;
+
+  /**
+   * Tx checking callback
+   */
+  SatUtMac::TxCheckCallback m_txCheckCallback;
 };
 
 } // namespace ns3

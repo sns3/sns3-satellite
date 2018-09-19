@@ -298,4 +298,11 @@ SatPhyTx::SetBeamId (uint32_t beamId)
   m_beamId = beamId;
 }
 
+bool
+SatPhyTx::CanTransmit (void) const
+{
+  NS_LOG_FUNCTION (this);
+  return m_state != RECONFIGURING;
+}
+
 } // namespace ns3

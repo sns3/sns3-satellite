@@ -94,7 +94,12 @@ SatUtMac::SatUtMac ()
   m_raChannel (0),
   m_crdsaUniquePacketId (1),
   m_crdsaOnlyForControl (false),
-  m_timuInfo (0)
+  m_timuInfo (0),
+  m_handoverCallback (0),
+  m_gatewayUpdateCallback (0),
+  m_routingUpdateCallback (0),
+  m_beamCheckerCallback (0),
+  m_txCheckCallback (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -109,7 +114,13 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, bool crdsaOnlyFo
   m_guardTime (MicroSeconds (1)),
   m_raChannel (0),
   m_crdsaUniquePacketId (1),
-  m_crdsaOnlyForControl (crdsaOnlyForControl)
+  m_crdsaOnlyForControl (crdsaOnlyForControl),
+  m_timuInfo (0),
+  m_handoverCallback (0),
+  m_gatewayUpdateCallback (0),
+  m_routingUpdateCallback (0),
+  m_beamCheckerCallback (0),
+  m_txCheckCallback (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -136,6 +147,7 @@ SatUtMac::DoDispose (void)
   m_gatewayUpdateCallback.Nullify ();
   m_routingUpdateCallback.Nullify ();
   m_beamCheckerCallback.Nullify ();
+  m_txCheckCallback.Nullify ();
   m_tbtpContainer->DoDispose ();
   m_utScheduler->DoDispose ();
   m_utScheduler = NULL;
@@ -169,6 +181,14 @@ SatUtMac::SetBeamCheckerCallback (SatUtMac::BeamCheckerCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);
   m_beamCheckerCallback = cb;
+}
+
+void
+SatUtMac::SetTxCheckCallback (SatUtMac::TxCheckCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+
+  m_txCheckCallback = cb;
 }
 
 void
@@ -1226,21 +1246,28 @@ SatUtMac::DoFrameStart ()
       return;
     }
 
-  // TODO: (Mobility) check if TX is possible
-
-  if (!m_beamCheckerCallback.IsNull ())
+  if (m_txCheckCallback ())
     {
-      NS_LOG_INFO ("UT checking for beam handover recommendation");
-      m_beamCheckerCallback (m_beamId);
+      NS_LOG_INFO ("Tx is permitted");
+
+      if (!m_beamCheckerCallback.IsNull ())
+        {
+          NS_LOG_INFO ("UT checking for beam handover recommendation");
+          m_beamCheckerCallback (m_beamId);
+        }
+
+      if (m_randomAccess != NULL)
+        {
+          // reset packet ID counter for this frame
+          m_crdsaUniquePacketId = 1;
+
+          // execute CRDSA trigger
+          DoRandomAccess (SatEnums::RA_TRIGGER_TYPE_CRDSA);
+        }
     }
-
-  if (m_randomAccess != NULL)
+  else
     {
-      /// reset packet ID counter for this frame
-      m_crdsaUniquePacketId = 1;
-
-      /// execute CRDSA trigger
-      DoRandomAccess (SatEnums::RA_TRIGGER_TYPE_CRDSA);
+      NS_LOG_INFO ("Tx is disabled");
     }
 
   Time nextSuperFrameTxTime = GetNextSuperFrameTxTime (SatConstVariables::SUPERFRAME_SEQUENCE);

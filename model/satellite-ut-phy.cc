@@ -227,4 +227,12 @@ SatUtPhy::AssignNewSatChannels ()
   forwardLink->AddRx (m_phyRx);
 }
 
+
+bool
+SatUtPhy::IsTxPossible (void) const
+{
+  NS_LOG_FUNCTION (this);
+  return m_phyTx->CanTransmit ();
+}
+
 } // namespace ns3

@@ -144,6 +144,11 @@ public:
    */
   void SetBeamId (uint32_t beamId);
 
+  /**
+   * Tell whether or not this channel can transmit data
+   */
+  bool CanTransmit (void) const;
+
 private:
   void ChangeState (State newState);
   void EndTx ();
