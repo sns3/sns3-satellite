@@ -391,6 +391,13 @@ void
 SatUtMac::DoTransmit (Time duration, uint32_t carrierId, Ptr<SatWaveform> wf, Ptr<SatTimeSlotConf> tsConf, SatUtScheduler::SatCompliancePolicy_t policy)
 {
   NS_LOG_FUNCTION (this << duration.GetSeconds () << wf->GetPayloadInBytes () << carrierId << (uint32_t)(tsConf->GetRcIndex ()));
+
+  if (!m_txCheckCallback ())
+    {
+      NS_LOG_INFO ("Tx is unavailable");
+      return;
+    }
+
   NS_LOG_INFO ("DA Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () <<
                " duration: " << duration.GetSeconds () <<
                ", payload: " << wf->GetPayloadInBytes () <<
@@ -942,8 +949,13 @@ SatUtMac::ScheduleCrdsaTransmission (uint32_t allocationChannel, SatRandomAccess
 {
   NS_LOG_FUNCTION (this << allocationChannel);
 
-  /// get current superframe ID
+  // get current superframe ID
+  Time now = Simulator::Now ();
+  Time superFrameStart = GetCurrentSuperFrameStartTime (SatConstVariables::SUPERFRAME_SEQUENCE);
   uint32_t superFrameId = Singleton<SatRtnLinkTime>::Get ()->GetCurrentSuperFrameCount (SatConstVariables::SUPERFRAME_SEQUENCE, m_timingAdvanceCb ());
+  NS_LOG_INFO ("Checking for CRDSA transmission at " <<
+               now.GetMilliSeconds () - superFrameStart.GetMilliSeconds () <<
+               " milliseconds into superframe " << superFrameId);
 
   // TODO: check we didn't already scheduled packets for this superframe
   // (because we are moving so fast, for instance, that we are now at the end of the
@@ -1241,12 +1253,8 @@ SatUtMac::DoFrameStart ()
       m_handoverCallback (m_beamId);
 
       m_timuInfo = NULL;
-      // Reschedule this function in case reconfiguration of TX is instantaneous
-      Simulator::Schedule (Seconds (0.0), &SatUtMac::DoFrameStart, this);
-      return;
     }
-
-  if (m_txCheckCallback ())
+  else if (m_txCheckCallback ())
     {
       NS_LOG_INFO ("Tx is permitted");
 
