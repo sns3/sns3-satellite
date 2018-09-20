@@ -1543,10 +1543,6 @@ SimulationHelper::ConfigureAttributesFromFile (std::string filePath, bool overri
     }
 
   CreateSatScenario (SatHelper::NONE, simulationConf->m_mobileUtsFolder);
-  if (simulationConf->m_activateStatistics)
-    {
-      CreateDefaultStats ();
-    }
   if (simulationConf->m_activateProgressLogging)
     {
       EnableProgressLogs ();
@@ -1654,6 +1650,11 @@ SimulationHelper::ConfigureAttributesFromFile (std::string filePath, bool overri
                 }
             }
         }
+    }
+
+  if (simulationConf->m_activateStatistics)
+    {
+      CreateDefaultStats ();
     }
 }
 
