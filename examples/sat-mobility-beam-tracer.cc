@@ -32,7 +32,10 @@
 using namespace ns3;
 
 
+Ptr<SatMobilityModel> satMobility = nullptr;
 std::set<uint32_t> visitedBeams;
+std::vector<double> relativeSpeeds;
+
 static void
 SatCourseChange (std::string context, Ptr<const SatMobilityModel> position)
 {
@@ -41,6 +44,7 @@ SatCourseChange (std::string context, Ptr<const SatMobilityModel> position)
 
   uint32_t beam = tracedPosition->GetBestBeamId ();
   visitedBeams.insert (beam);
+  relativeSpeeds.push_back (tracedPosition->GetRelativeSpeed (satMobility));
 }
 
 /**
@@ -73,9 +77,10 @@ main (int argc, char *argv[])
   cmd.Parse (argc, argv);
   simulationHelper->ReadInputAttributesFromFile (inputFileNameWithPath);
 
-  Ptr<SatHelper> satHelper = CreateObject<SatHelper> ("Scenario72");
   if (mobileUtTraceFile != "")
     {
+      Ptr<SatHelper> satHelper = CreateObject<SatHelper> ("Scenario72");
+      satMobility = satHelper->GetBeamHelper ()->GetGeoSatNode ()->GetObject<SatMobilityModel> ();
       Ptr<Node> node = satHelper->LoadMobileUtFromFile (mobileUtTraceFile);
       node->GetObject<SatMobilityModel> ()->TraceConnect ("SatCourseChange", "BeamTracer", MakeCallback (SatCourseChange));
 
@@ -90,5 +95,23 @@ main (int argc, char *argv[])
           std::cout << " " << beam;
         }
       std::cout << std::endl;
+
+      double minSpeed = 0.0, maxSpeed = 0.0, totalSpeed = 0.0;
+      uint32_t valuesCount = 0;
+      for (double& speed : relativeSpeeds)
+        {
+          if (!minSpeed)
+            {
+              minSpeed = speed;
+            }
+          if (speed)
+            {
+              minSpeed = std::min (minSpeed, speed);
+              maxSpeed = std::max (maxSpeed, speed);
+              totalSpeed += speed;
+              ++valuesCount;
+            }
+        }
+      std::cout << "Speeding stats (m/s):\n\tmin: " << minSpeed << "\n\tmax: " << maxSpeed << "\n\tmean: " << totalSpeed / valuesCount << std::endl;
     }
 }
