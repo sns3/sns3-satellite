@@ -162,6 +162,17 @@ SatEnvVariables::DoInitialize ()
         }
       pathToExecutable[sizeof (pathToExecutable) - 1] = '\0';
       m_pathToExecutable = std::string (pathToExecutable);
+
+      if (m_enableSimInfoOutput)
+        {
+          if (!m_isOutputPathInitialized)
+            {
+              InitializeOutputFolders (m_campaignName, m_simTag, m_enableOutputOverwrite);
+            }
+
+          DumpSimulationInformation ();
+        }
+
       m_isInitialized = true;
     }
 }
@@ -173,16 +184,6 @@ SatEnvVariables::DoDispose ()
 
   if (m_isInitialized)
     {
-      if (m_enableSimInfoOutput)
-        {
-          if (!m_isOutputPathInitialized)
-            {
-              InitializeOutputFolders (m_campaignName, m_simTag, m_enableOutputOverwrite);
-            }
-
-          DumpSimulationInformation ();
-        }
-
       m_currentWorkingDirectory = "";
       m_pathToExecutable = "";
       m_isOutputPathInitialized = false;

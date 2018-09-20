@@ -727,8 +727,17 @@ SimulationHelper::CreateDefaultStats ()
       m_statContainer = CreateObject<SatStatsHelperContainer> (m_satHelper);
     }
 
-  CreateDefaultFwdLinkStats ();
-  CreateDefaultRtnLinkStats ();
+  // CreateDefaultFwdLinkStats ();
+  // CreateDefaultRtnLinkStats ();
+  m_statContainer->AddPerUtCrdsaPacketError (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddPerUtRtnMacDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddPerUtFwdMacDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddPerUtRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddPerUtFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 }
 
 
@@ -1220,6 +1229,8 @@ SimulationHelper::InstallTrafficModel (TrafficModel_t trafficModel,
           utUsers.Add (utAllUsers.Get (i));
         }
     }
+
+  std::cout << "Installing traffic model on " << utUsers.GetN () << "/" << utAllUsers.GetN () << " UT users" << std::endl;
 
   switch (trafficModel)
     {
