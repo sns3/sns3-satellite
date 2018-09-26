@@ -291,6 +291,12 @@ public:
     void AddCrMsg (Ptr<SatCrMessage> crMsg);
 
     /**
+     * Remove all CR messages from UT info to reset capacity requests in
+     * case of handover.
+     */
+    void ClearCrMsgs ();
+
+    /**
      * Check if time is expired to send control slot.
      *
      * \return Status of control slot generation time.

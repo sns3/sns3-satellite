@@ -248,7 +248,7 @@ public:
    * to use for sending data; and sending handover recommendation if not
    * \param uint32_t the current beam ID
    */
-  typedef Callback<void, uint32_t> BeamCheckerCallback;
+  typedef Callback<bool, uint32_t> BeamCheckerCallback;
 
   /**
    * \brief Method to set the beam checker callback
@@ -269,6 +269,8 @@ private:
    * \return Time Time to transmit
    */
   Time GetCurrentSuperFrameStartTime (uint8_t superFrameSeqId) const;
+
+  uint32_t GetCurrentSuperFrameId (uint8_t superFrameSeqId) const;
 
   /**
    * \brief Do random access evaluation for Tx opportunities
@@ -410,6 +412,22 @@ private:
   SatPhy::PacketContainer_t FetchPackets (uint32_t payloadBytes, SatTimeSlotConf::SatTimeSlotType_t type, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy);
 
   /**
+   * \brief Extract packets from the underlying queue and put them in the provided container
+   * \param packets Container for the packets to extract
+   * \param payloadBytes Tx opportunity payload
+   * \param type Time slot type
+   * \param rcIndex RC index
+   * \param policy Scheduler policy
+   * \param randomAccessChannel whether the packets are to be sent on RA or DA
+   */
+  void ExtractPacketsToSchedule (SatPhy::PacketContainer_t& packets,
+                                 uint32_t payloadBytes,
+                                 SatTimeSlotConf::SatTimeSlotType_t type,
+                                 uint8_t rcIndex,
+                                 SatUtScheduler::SatCompliancePolicy_t policy,
+                                 bool randomAccessChannel);
+
+  /**
    *
    * \param packets
    * \param duration
@@ -518,6 +536,17 @@ private:
   Ptr<SatTimuInfo> m_timuInfo;
 
   Mac48Address m_gwAddress;
+
+  typedef enum
+  {
+    NO_HANDOVER,
+    HANDOVER_RECOMMENDATION_SENT,
+    WAITING_FOR_TBTP,
+  } HandoverState_t;
+
+  HandoverState_t m_handoverState;
+
+  uint32_t m_firstTransmittableSuperframeId;
 
   /**
    * The physical layer handover callback

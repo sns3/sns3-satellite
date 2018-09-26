@@ -144,6 +144,14 @@ SatBeamScheduler::SatUtInfo::AddCrMsg (Ptr<SatCrMessage> crMsg)
   m_crContainer.push_back (crMsg);
 }
 
+void
+SatBeamScheduler::SatUtInfo::ClearCrMsgs ()
+{
+  NS_LOG_FUNCTION (this);
+
+  m_crContainer.clear ();
+}
+
 bool
 SatBeamScheduler::SatUtInfo::IsControlSlotGenerationTime () const
 {
@@ -415,7 +423,6 @@ SatBeamScheduler::UpdateUtCno (Address utId, double cno)
   NS_LOG_FUNCTION (this << utId << cno);
 
   NS_ASSERT (HasUt (utId));
-
   m_utInfos[utId]->AddCnoSample (cno);
 }
 
@@ -425,7 +432,6 @@ SatBeamScheduler::UtCrReceived (Address utId, Ptr<SatCrMessage> crMsg)
   NS_LOG_FUNCTION (this << utId << crMsg);
 
   NS_ASSERT (HasUt (utId));
-
   m_utInfos[utId]->AddCrMsg (crMsg);
 }
 
@@ -571,7 +577,6 @@ SatBeamScheduler::UpdateDamaEntriesWithReqs ()
   for (UtReqInfoContainer_t::iterator it = m_utRequestInfos.begin (); it != m_utRequestInfos.end (); it++)
     {
       // estimation of the C/N0 is done when scheduling UT
-
       Ptr<SatDamaEntry> damaEntry = m_utInfos.at (it->first)->GetDamaEntry ();
 
       // process received CRs
@@ -741,48 +746,41 @@ SatBeamScheduler::TransferUtToBeam (Address utId, Ptr<SatBeamScheduler> destinat
     }
   else
     {
-      std::pair<UtInfoMap_t::iterator, bool> inserted = destination->m_utInfos.insert (std::make_pair (utId, utIterator->second));
+      // Moving UT infos between beams
+      std::pair<UtInfoMap_t::iterator, bool> inserted = destination->m_utInfos.emplace (utId, utIterator->second);
       NS_ASSERT_MSG (inserted.second, "UT is already part of the destination beam");
 
       m_utInfos.erase (utIterator);
+      Ptr<SatUtInfo> utInfos = inserted.first->second;
+
+      // Moving Requests infos between beams
+      UtReqInfoContainer_t::iterator it = m_utRequestInfos.begin ();
+      while (it != m_utRequestInfos.end ())
+        {
+          if (it->first == utId)
+            {
+              destination->m_utRequestInfos.emplace_back (utId, it->second);
+              it = m_utRequestInfos.erase (it);
+            }
+          else
+            {
+              ++it;
+            }
+        }
 
       // Handling capacity requests left and C/No estimations
       switch (m_handoverStrategy)
         {
         case BASIC:
           {
-            UtReqInfoContainer_t::iterator it = m_utRequestInfos.begin ();
-            while (it != m_utRequestInfos.end ())
-              {
-                if (it->first == utId)
-                  {
-                    it = m_utRequestInfos.erase (it);
-                  }
-                else
-                  {
-                    ++it;
-                  }
-              }
+            utInfos->ClearCrMsgs ();
             break;
           }
         case CHECK_GATEWAY:
           {
-            bool isSameGateway = m_gwAddress == destination->m_gwAddress;
-            UtReqInfoContainer_t::iterator it = m_utRequestInfos.begin ();
-            while (it != m_utRequestInfos.end ())
+            if (m_gwAddress != destination->m_gwAddress)
               {
-                if (it->first == utId)
-                  {
-                    if (isSameGateway)
-                      {
-                        destination->m_utRequestInfos.push_back (*it);
-                      }
-                    it = m_utRequestInfos.erase (it);
-                  }
-                else
-                  {
-                    ++it;
-                  }
+                utInfos->ClearCrMsgs ();
               }
             break;
           }

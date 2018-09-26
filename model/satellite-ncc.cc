@@ -368,28 +368,38 @@ SatNcc::MoveUtBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamI
 
   Ptr<SatBeamScheduler> scheduler = GetBeamScheduler (srcBeamId);
   Ptr<SatBeamScheduler> destination = GetBeamScheduler (destBeamId);
-  if (scheduler && destination)
+
+  if (!scheduler)
     {
-      if (scheduler->HasUt (utId) && !destination->HasUt (utId))
-        {
-          NS_LOG_INFO ("Performing handover!");
+      NS_FATAL_ERROR ("Source beam does not exist!");
+    }
 
-          Ptr<SatTimuMessage> timuMsg = destination->CreateTimu ();
-          scheduler->SendTo (timuMsg, utId);
+  if (!destination)
+    {
+      NS_LOG_INFO ("Destination beam does not exist, cancel handover");
 
-          Simulator::Schedule (m_utHandoverDelay, &SatNcc::DoMoveUtBetweenBeams, this, utId, srcBeamId, destBeamId);
-        }
-      else if (!scheduler->HasUt (utId) && destination->HasUt (utId))
-        {
-          NS_LOG_INFO ("Handover already performed, sending back TIM-U just in case!");
+      Ptr<SatTimuMessage> timuMsg = scheduler->CreateTimu ();
+      scheduler->SendTo (timuMsg, utId);
+    }
+  else if (scheduler->HasUt (utId) && !destination->HasUt (utId))
+    {
+      NS_LOG_INFO ("Performing handover!");
 
-          Ptr<SatTimuMessage> timuMsg = destination->CreateTimu ();
-          scheduler->SendTo (timuMsg, utId);
-        }
-      else
-        {
-          NS_FATAL_ERROR ("Inconsistent handover state: UT is neither in source nor destination beam; or in both");
-        }
+      Ptr<SatTimuMessage> timuMsg = destination->CreateTimu ();
+      scheduler->SendTo (timuMsg, utId);
+
+      Simulator::Schedule (m_utHandoverDelay, &SatNcc::DoMoveUtBetweenBeams, this, utId, srcBeamId, destBeamId);
+    }
+  else if (!scheduler->HasUt (utId) && destination->HasUt (utId))
+    {
+      NS_LOG_INFO ("Handover already performed, sending back TIM-U just in case!");
+
+      Ptr<SatTimuMessage> timuMsg = destination->CreateTimu ();
+      scheduler->SendTo (timuMsg, utId);
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Inconsistent handover state: UT is neither in source nor destination beam; or in both");
     }
 }
 

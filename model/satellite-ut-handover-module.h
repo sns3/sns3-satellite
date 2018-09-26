@@ -80,8 +80,9 @@ public:
    * \brief Inspect whether or not the given beam is still suitable for
    * the underlying mobility model.
    * \param beamId The current beam ID the underlying mobility model is emitting in
+   * \return whether or not an handover recommendation has been sent
    */
-  void CheckForHandoverRecommendation (uint32_t beamId);
+  bool CheckForHandoverRecommendation (uint32_t beamId);
 
 private:
   HandoverRequestCallback m_handoverCallback;

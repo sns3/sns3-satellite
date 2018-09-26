@@ -93,9 +93,11 @@ SatUtHandoverModule::SetHandoverRequestCallback (HandoverRequestCallback cb)
 }
 
 
-void
+bool
 SatUtHandoverModule::CheckForHandoverRecommendation (uint32_t beamId)
 {
+  NS_LOG_FUNCTION (this << beamId);
+
   if (m_askedBeamId == beamId)
     {
       // In case TIM-U was received successfuly, the last asked beam should
@@ -106,15 +108,17 @@ SatUtHandoverModule::CheckForHandoverRecommendation (uint32_t beamId)
   Ptr<SatMobilityModel> mobilityModel = GetObject<SatMobilityModel> ();
   if (!mobilityModel)
     {
-      return;
+      NS_LOG_FUNCTION ("Bailing out for lack of mobility model");
+      return false;
     }
 
   // If current beam is still valid, do nothing
   GeoCoordinate coords = mobilityModel->GetGeoPosition ();
   if (m_antennaGainPatterns->GetAntennaGainPattern (beamId)->IsValidPosition (coords))
     {
+      NS_LOG_FUNCTION ("Current beam is good, do nothing");
       m_hasPendingRequest = false;
-      return;
+      return false;
     }
 
   // Current beam ID is no longer valid, check for better beam and ask for handover
@@ -127,11 +131,15 @@ SatUtHandoverModule::CheckForHandoverRecommendation (uint32_t beamId)
   Time now = Simulator::Now ();
   if (bestBeamId != beamId && (!m_hasPendingRequest || now - m_lastMessageSentAt > m_repeatRequestTimeout))
     {
+      NS_LOG_FUNCTION ("Sending handover recommendation for beam " << bestBeamId);
       m_handoverCallback (bestBeamId);
       m_lastMessageSentAt = now;
       m_hasPendingRequest = true;
       m_askedBeamId = bestBeamId;
+      return true;
     }
+
+  return false;
 }
 
 }
