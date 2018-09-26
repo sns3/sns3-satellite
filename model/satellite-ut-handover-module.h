@@ -93,6 +93,8 @@ private:
   Time m_repeatRequestTimeout;
   bool m_hasPendingRequest;
   uint32_t m_askedBeamId;
+
+  TracedCallback<double> m_antennaGainTrace;
 };
 
 }

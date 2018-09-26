@@ -44,6 +44,10 @@ SatUtHandoverModule::GetTypeId (void)
                    TimeValue (MilliSeconds (600)),
                    MakeTimeAccessor (&SatUtHandoverModule::m_repeatRequestTimeout),
                    MakeTimeChecker ())
+    .AddTraceSource ("AntennaGainTrace",
+                     "Trace antenna gains when checking for beam compliance",
+                     MakeTraceSourceAccessor (&SatUtHandoverModule::m_antennaGainTrace),
+                     "ns3::SatAntennaGainPattern::AntennaGainTrace")
   ;
   return tid;
 }
@@ -114,7 +118,7 @@ SatUtHandoverModule::CheckForHandoverRecommendation (uint32_t beamId)
 
   // If current beam is still valid, do nothing
   GeoCoordinate coords = mobilityModel->GetGeoPosition ();
-  if (m_antennaGainPatterns->GetAntennaGainPattern (beamId)->IsValidPosition (coords))
+  if (m_antennaGainPatterns->GetAntennaGainPattern (beamId)->IsValidPosition (coords, m_antennaGainTrace))
     {
       NS_LOG_FUNCTION ("Current beam is good, do nothing");
       m_hasPendingRequest = false;

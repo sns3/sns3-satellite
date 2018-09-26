@@ -23,8 +23,9 @@
 
 #include <vector>
 #include <fstream>
-#include "ns3/random-variable-stream.h"
-#include "ns3/object.h"
+#include <ns3/object.h>
+#include <ns3/traced-callback.h>
+#include <ns3/random-variable-stream.h>
 #include "geo-coordinate.h"
 
 namespace ns3 {
@@ -91,7 +92,7 @@ public:
    * \param coord The position to check for validity
    * \return Whether or not the given position is valid for this spot-beam
    */
-  bool IsValidPosition (GeoCoordinate coord) const;
+  bool IsValidPosition (GeoCoordinate coord, TracedCallback<double> cb) const;
 
 private:
   /**

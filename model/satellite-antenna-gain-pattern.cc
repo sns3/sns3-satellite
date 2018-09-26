@@ -272,12 +272,13 @@ GeoCoordinate SatAntennaGainPattern::GetValidRandomPosition () const
 }
 
 
-bool SatAntennaGainPattern::IsValidPosition (GeoCoordinate coord) const
+bool SatAntennaGainPattern::IsValidPosition (GeoCoordinate coord, TracedCallback<double> cb) const
 {
   NS_LOG_FUNCTION (this << coord.GetLatitude () << coord.GetLongitude ());
 
-  double antennaGainLinear = GetAntennaGain_lin (coord);
-  return SatUtils::LinearToDb (antennaGainLinear) >= m_minAcceptableAntennaGainInDb;
+  double antennaGain = SatUtils::LinearToDb (GetAntennaGain_lin (coord));
+  cb (antennaGain);
+  return antennaGain >= m_minAcceptableAntennaGainInDb;
 }
 
 

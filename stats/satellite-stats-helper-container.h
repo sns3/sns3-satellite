@@ -280,6 +280,11 @@ public:
   void AddGlobalRtnFeederLinkRxPower (SatStatsHelper::OutputType_t outputType);
   void AddGlobalRtnUserLinkRxPower (SatStatsHelper::OutputType_t outputType);
 
+  // Antenna Gain statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (AntennaGain)
+  void AddAverageBeamAntennaGain (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtAntennaGain (SatStatsHelper::OutputType_t outputType);
+
   /**
    * \param outputType an arbitrary output type.
    * \return a string suffix to be appended at the end of the corresponding
