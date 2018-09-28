@@ -370,9 +370,6 @@ SatBeamScheduler::AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf)
 
   Ptr<SatDamaEntry> damaEntry = Create<SatDamaEntry> (llsConf);
 
-  // this method call acts as CAC check, if allocation fails fatal error is occurred.
-  m_superframeAllocator->ReserveMinimumRate (damaEntry->GetMinRateBasedBytes (m_superframeAllocator->GetSuperframeDuration ()), m_controlSlotsEnabled);
-
   Time firstCtrlSlotInterval = m_controlSlotInterval;
 
   if (m_superframeSeq->GetDuration (SatConstVariables::SUPERFRAME_SEQUENCE) < m_controlSlotInterval  )
@@ -385,12 +382,29 @@ SatBeamScheduler::AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf)
 
   Ptr<SatCnoEstimator> cnoEstimator = CreateCnoEstimator ();
   Ptr<SatUtInfo> utInfo = Create<SatUtInfo> (damaEntry, cnoEstimator, firstCtrlSlotInterval, m_controlSlotsEnabled);
+  AddUtInfo (utId, utInfo);
+
+  m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE)->GetRaChannelCount ();
+
+  // return random RA channel index for the UT.
+  return m_raChRandomIndex->GetInteger ();
+}
+
+void
+SatBeamScheduler::AddUtInfo (Address utId, Ptr<SatUtInfo> utInfo)
+{
+  NS_LOG_FUNCTION (this << utId << utInfo);
+
+  Ptr<SatDamaEntry> damaEntry = utInfo->GetDamaEntry ();
+
+  // this method call acts as CAC check, if allocation fails fatal error is occurred.
+  m_superframeAllocator->ReserveMinimumRate (damaEntry->GetMinRateBasedBytes (m_superframeAllocator->GetSuperframeDuration ()), m_controlSlotsEnabled);
 
   std::pair<UtInfoMap_t::iterator, bool > result = m_utInfos.insert (std::make_pair (utId, utInfo));
 
   if (result.second)
     {
-      SatFrameAllocator::SatFrameAllocReqItemContainer_t reqContainer (damaEntry->GetRcCount (), SatFrameAllocator::SatFrameAllocReqItem () );
+      SatFrameAllocator::SatFrameAllocReqItemContainer_t reqContainer (damaEntry->GetRcCount (), SatFrameAllocator::SatFrameAllocReqItem ());
       SatFrameAllocator::SatFrameAllocReq allocReq (reqContainer);
       allocReq.m_cno = NAN;
       allocReq.m_address = utId;
@@ -401,11 +415,29 @@ SatBeamScheduler::AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf)
     {
       NS_FATAL_ERROR ("UT (Address: " << utId << ") already added to Beam scheduler.");
     }
+}
 
-  m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE)->GetRaChannelCount ();
+void
+SatBeamScheduler::RemoveUtInfo (UtInfoMap_t::iterator iterator)
+{
+  Address utId = iterator->first;
+  Ptr<SatUtInfo> utInfo = iterator->second;
+  m_utInfos.erase (iterator);
 
-  // return random RA channel index for the UT.
-  return m_raChRandomIndex->GetInteger ();
+  UtReqInfoContainer_t::iterator it = m_utRequestInfos.begin ();
+  for (; it != m_utRequestInfos.end (); ++it)
+    {
+      if (it->first == utId)
+        {
+          m_utRequestInfos.erase (it);
+          break;
+        }
+    }
+
+  Ptr<SatDamaEntry> damaEntry = utInfo->GetDamaEntry ();
+  m_superframeAllocator->ReleaseMinimumRate (
+    damaEntry->GetMinRateBasedBytes (m_superframeAllocator->GetSuperframeDuration ()),
+    m_controlSlotsEnabled);
 }
 
 bool
@@ -747,40 +779,23 @@ SatBeamScheduler::TransferUtToBeam (Address utId, Ptr<SatBeamScheduler> destinat
   else
     {
       // Moving UT infos between beams
-      std::pair<UtInfoMap_t::iterator, bool> inserted = destination->m_utInfos.emplace (utId, utIterator->second);
-      NS_ASSERT_MSG (inserted.second, "UT is already part of the destination beam");
-
-      m_utInfos.erase (utIterator);
-      Ptr<SatUtInfo> utInfos = inserted.first->second;
-
-      // Moving Requests infos between beams
-      UtReqInfoContainer_t::iterator it = m_utRequestInfos.begin ();
-      while (it != m_utRequestInfos.end ())
-        {
-          if (it->first == utId)
-            {
-              destination->m_utRequestInfos.emplace_back (utId, it->second);
-              it = m_utRequestInfos.erase (it);
-            }
-          else
-            {
-              ++it;
-            }
-        }
+      Ptr<SatUtInfo> utInfo = utIterator->second;
+      destination->AddUtInfo (utId, utInfo);
+      RemoveUtInfo (utIterator);
 
       // Handling capacity requests left and C/No estimations
       switch (m_handoverStrategy)
         {
         case BASIC:
           {
-            utInfos->ClearCrMsgs ();
+            utInfo->ClearCrMsgs ();
             break;
           }
         case CHECK_GATEWAY:
           {
             if (m_gwAddress != destination->m_gwAddress)
               {
-                utInfos->ClearCrMsgs ();
+                utInfo->ClearCrMsgs ();
               }
             break;
           }

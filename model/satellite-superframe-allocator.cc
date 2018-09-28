@@ -183,6 +183,27 @@ void SatSuperframeAllocator::ReserveMinimumRate (uint32_t minimumRateBytes, bool
     }
 }
 
+void SatSuperframeAllocator::ReleaseMinimumRate (uint32_t minimumRateBytes, bool controlSlotsEnabled)
+{
+  NS_LOG_FUNCTION (this << minimumRateBytes);
+
+  uint32_t rateBasedByteToCheck = minimumRateBytes;
+
+  if ( controlSlotsEnabled )
+    {
+      rateBasedByteToCheck += m_mostRobustSlotPayloadInBytes;
+    }
+
+  if ( rateBasedByteToCheck > m_minCarrierPayloadInBytes )
+    {
+      NS_FATAL_ERROR ("Minimum released bytes (" << minimumRateBytes << ") for UT is greater than bytes in minimum carrier (" << m_minCarrierPayloadInBytes << ")");
+    }
+  else
+    {
+      m_minimumRateBasedBytesLeft += minimumRateBytes;
+    }
+}
+
 bool
 SatSuperframeAllocator::AllocateToFrame (SatFrameAllocator::SatFrameAllocReq * allocReq)
 {

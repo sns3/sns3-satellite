@@ -555,6 +555,9 @@ private:
    */
   void AddRaChannels (std::vector <Ptr<SatTbtpMessage> >& tbtpContainer);
 
+  void AddUtInfo (Address utId, Ptr<SatUtInfo> utInfo);
+  void RemoveUtInfo (UtInfoMap_t::iterator iterator);
+
   /**
    * Create estimator for the UT according to set attributes.
    * \return pointer to created estimator
