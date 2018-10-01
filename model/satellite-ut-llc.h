@@ -161,6 +161,13 @@ protected:
   virtual void CreateEncap (Ptr<EncapKey> key);
 
   /**
+   * \brief Virtual method to create a new encapsulator 'on-a-need-basis' dynamically.
+   * \param key Encapsulator key class
+   * \param providedQueue Existing queue to use for this encapsulator, if need be
+   */
+  virtual void CreateEncap (Ptr<EncapKey> key, Ptr<SatQueue> providedQueue);
+
+  /**
    * \brief Virtual method to create a new decapsulator 'on-a-need-basis' dynamically.
    * \param key Encapsulator key class
    */

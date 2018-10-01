@@ -237,6 +237,12 @@ SatUtLlc::SetNodeInfo (Ptr<SatNodeInfo> nodeInfo)
 void
 SatUtLlc::CreateEncap (Ptr<EncapKey> key)
 {
+  CreateEncap (key, NULL);
+}
+
+void
+SatUtLlc::CreateEncap (Ptr<EncapKey> key, Ptr<SatQueue> providedQueue)
+{
   NS_LOG_FUNCTION (this << key->m_source << key->m_destination << (uint32_t)(key->m_flowId));
 
   Ptr<SatBaseEncapsulator> utEncap;
@@ -250,13 +256,17 @@ SatUtLlc::CreateEncap (Ptr<EncapKey> key)
       utEncap = CreateObject<SatReturnLinkEncapsulator> (key->m_source, key->m_destination, key->m_flowId);
     }
 
-  Ptr<SatQueue> queue = CreateObject<SatQueue> (key->m_flowId);
-  queue->AddQueueEventCallback (m_macQueueEventCb);
-  queue->AddQueueEventCallback (MakeCallback (&SatRequestManager::ReceiveQueueEvent, m_requestManager));
+  Ptr<SatQueue> queue = providedQueue;
+  if (!queue)
+    {
+      queue = CreateObject<SatQueue> (key->m_flowId);
+      queue->AddQueueEventCallback (m_macQueueEventCb);
+      queue->AddQueueEventCallback (MakeCallback (&SatRequestManager::ReceiveQueueEvent, m_requestManager));
 
-  // Set the callback for each RLE queue
-  SatRequestManager::QueueCallback queueCb = MakeCallback (&SatQueue::GetQueueStatistics, queue);
-  m_requestManager->AddQueueCallback (key->m_flowId, queueCb);
+      // Set the callback for each RLE queue
+      SatRequestManager::QueueCallback queueCb = MakeCallback (&SatQueue::GetQueueStatistics, queue);
+      m_requestManager->AddQueueCallback (key->m_flowId, queueCb);
+    }
 
   utEncap->SetQueue (queue);
 
@@ -366,6 +376,35 @@ void
 SatUtLlc::SetGwAddress (Mac48Address address)
 {
   NS_LOG_FUNCTION (this << address);
+
+  if (m_nodeInfo && m_nodeInfo->GetMacAddress () != address)
+    {
+      // Move queue from the old gateway to the new one
+      for (uint8_t rcIndex = 0;; ++rcIndex)
+        {
+          Ptr<EncapKey> peek = Create<EncapKey> (m_nodeInfo->GetMacAddress (), m_gwAddress, rcIndex);
+          EncapContainer_t::iterator it = m_encaps.find (peek);
+
+          if (it != m_encaps.end ())
+            {
+              Ptr<EncapKey> key = Create<EncapKey> (m_nodeInfo->GetMacAddress (), address, rcIndex);
+              CreateEncap (key, it->second->GetQueue ());
+              m_encaps.erase (it);
+              NS_LOG_INFO ("Queue from key " << peek->m_source << ", "
+                                             << peek->m_destination << ", "
+                                             << (uint32_t)(peek->m_flowId)
+                                             << " moved to key " << key->m_source << ", "
+                                             << key->m_destination << ", "
+                                             << (uint32_t)(key->m_flowId));
+            }
+
+          if (rcIndex == 255)
+            {
+              break;
+            }
+        }
+    }
+
   SatLlc::SetGwAddress (address);
   m_requestManager->SetGwAddress (address);
 }
