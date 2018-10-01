@@ -36,6 +36,7 @@
 #include <ns3/satellite-stats-packet-collision-helper.h>
 #include <ns3/satellite-stats-packet-error-helper.h>
 #include <ns3/satellite-stats-queue-helper.h>
+#include <ns3/satellite-stats-rbdc-request-helper.h>
 #include <ns3/satellite-stats-resources-granted-helper.h>
 #include <ns3/satellite-stats-signalling-load-helper.h>
 #include <ns3/satellite-stats-throughput-helper.h>
@@ -883,6 +884,12 @@ SAT_STATS_GLOBAL_METHOD_DEFINITION      (CapacityRequest, "capacity-request")
 SAT_STATS_PER_GW_METHOD_DEFINITION      (CapacityRequest, "capacity-request")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION    (CapacityRequest, "capacity-request")
 SAT_STATS_PER_UT_METHOD_DEFINITION      (CapacityRequest, "capacity-request")
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (RbdcRequest, "rbdc-request")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (RbdcRequest, "rbdc-request")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (RbdcRequest, "rbdc-request")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (RbdcRequest, "rbdc-request")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RbdcRequest, "rbdc-request")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RbdcRequest, "rbdc-request")
 
 // Resources granted statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (ResourcesGranted, "resources-granted")

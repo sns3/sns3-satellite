@@ -18,8 +18,8 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.com>
  */
 
-#ifndef SATELLITE_STATS_ANTENNA_GAIN_HELPER_H
-#define SATELLITE_STATS_ANTENNA_GAIN_HELPER_H
+#ifndef SATELLITE_STATS_RBDC_REQUEST_HELPER_H
+#define SATELLITE_STATS_RBDC_REQUEST_HELPER_H
 
 #include <ns3/satellite-stats-helper.h>
 #include <ns3/ptr.h>
@@ -40,18 +40,18 @@ class DistributionCollector;
 
 /**
  * \ingroup satstats
- * \brief Base class for antenna gain statistics helpers.
+ * \brief Base class for RBDC requests statistics helpers.
  */
-class SatStatsAntennaGainHelper : public SatStatsHelper
+class SatStatsRbdcRequestHelper : public SatStatsHelper
 {
 public:
   // inherited from SatStatsHelper base class
-  SatStatsAntennaGainHelper (Ptr<const SatHelper> satHelper);
+  SatStatsRbdcRequestHelper (Ptr<const SatHelper> satHelper);
 
   /**
    * / Destructor.
    */
-  virtual ~SatStatsAntennaGainHelper ();
+  virtual ~SatStatsRbdcRequestHelper ();
 
   /**
    * inherited from ObjectBase base class
@@ -77,9 +77,9 @@ public:
   /**
    * \brief Receive inputs from trace sources
    * \param identifier the source ID as a context string.
-   * \param gain the antenna gain collected.
+   * \param rbdcTraceKbps the requested RBDC capacity collected.
    */
-  void AntennaGainCallback (std::string identifier, double gain);
+  void RbdcRateCallback (std::string identifier, uint32_t rbdcTraceKbps);
 
 protected:
   // inherited from SatStatsHelper base class
@@ -97,9 +97,9 @@ protected:
 private:
   bool m_averagingMode;  ///< `AveragingMode` attribute.
 
-}; // end of class SatStatsAntennaGainHelper
+}; // end of class SatStatsRbdcRequestHelper
 
 }
 
 
-#endif /* SATELLITE_STATS_ANTENNA_GAIN_HELPER_H */
+#endif /* SATELLITE_STATS_RBDC_REQUEST_HELPER_H */

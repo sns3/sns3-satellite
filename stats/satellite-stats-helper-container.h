@@ -254,6 +254,9 @@ public:
 
   // Capacity request statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (CapacityRequest)
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RbdcRequest)
+  void AddAverageBeamRbdcRequest (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRbdcRequest (SatStatsHelper::OutputType_t outputType);
 
   // Resources granted statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (ResourcesGranted)

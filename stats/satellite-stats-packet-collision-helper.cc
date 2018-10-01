@@ -247,8 +247,7 @@ SatStatsPacketCollisionHelper::DoInstall ()
                   continue;
                 }
 
-              const bool ret = itCarrier->second->TraceConnectWithoutContext (
-                  GetTraceSourceName (), callback);
+              const bool ret = itCarrier->second->TraceConnectWithoutContext (GetTraceSourceName (), callback);
               if (ret)
                 {
                   NS_LOG_INFO (this << " successfully connected with node ID "
