@@ -314,7 +314,7 @@ SatStatsRbdcRequestHelper::DoInstall ()
         NS_ASSERT (plotAggregator != 0);
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Time (in seconds)",
-                                   "Packet delay (in seconds)");
+                                   "RBDC requested (in kbps)");
         plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
 
         // Setup collectors.
@@ -348,7 +348,7 @@ SatStatsRbdcRequestHelper::DoInstall ()
               = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
             NS_ASSERT (plotAggregator != 0);
             //plot->SetTitle ("");
-            plotAggregator->SetLegend ("Packet delay (in seconds)",
+            plotAggregator->SetLegend ("RBDC requested (in kbps)",
                                        "Frequency");
             plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
             plotAggregator->Add2dDataset (GetName (), GetName ());
@@ -400,7 +400,7 @@ SatStatsRbdcRequestHelper::DoInstall ()
               = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
             NS_ASSERT (plotAggregator != 0);
             //plot->SetTitle ("");
-            plotAggregator->SetLegend ("Packet delay (in seconds)",
+            plotAggregator->SetLegend ("RBDC requested (in kbps)",
                                        "Frequency");
             plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
 

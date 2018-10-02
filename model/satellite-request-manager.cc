@@ -775,7 +775,7 @@ SatRequestManager::SendCnoReport ()
 void
 SatRequestManager::SendHandoverRecommendation (uint32_t beamId)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << beamId);
 
   // Check if we have the possiblity to send a ctrl msg
   if (!m_ctrlCallback.IsNull () && m_ctrlMsgTxPossibleCallback ())

@@ -313,7 +313,7 @@ SatStatsAntennaGainHelper::DoInstall ()
         NS_ASSERT (plotAggregator != 0);
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Time (in seconds)",
-                                   "Packet delay (in seconds)");
+                                   "Antenna Gain (in dB)");
         plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
 
         // Setup collectors.
@@ -347,7 +347,7 @@ SatStatsAntennaGainHelper::DoInstall ()
               = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
             NS_ASSERT (plotAggregator != 0);
             //plot->SetTitle ("");
-            plotAggregator->SetLegend ("Packet delay (in seconds)",
+            plotAggregator->SetLegend ("Antenna gain (in dB)",
                                        "Frequency");
             plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
             plotAggregator->Add2dDataset (GetName (), GetName ());
@@ -399,7 +399,7 @@ SatStatsAntennaGainHelper::DoInstall ()
               = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
             NS_ASSERT (plotAggregator != 0);
             //plot->SetTitle ("");
-            plotAggregator->SetLegend ("Packet delay (in seconds)",
+            plotAggregator->SetLegend ("Antenna gain (in dB)",
                                        "Frequency");
             plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
 
