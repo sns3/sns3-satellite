@@ -45,14 +45,6 @@
 #include "satellite-helper.h"
 
 
-bool
-IsDirectory (const std::string& filepath)
-{
-  struct stat sb;
-  return (stat (filepath.c_str (), &sb) == 0 && S_ISDIR (sb.st_mode));
-}
-
-
 NS_LOG_COMPONENT_DEFINE ("SatHelper");
 
 namespace ns3 {
@@ -553,10 +545,16 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
 void
 SatHelper::LoadMobileUTsFromFolder (const std::string& folderName, Ptr<RandomVariableStream> utUsers)
 {
+  if (!(Singleton<SatEnvVariables>::Get ()->IsValidDirectory (folderName)))
+    {
+      NS_LOG_INFO ("Directory '" << folderName << "' does not exist, no mobile UTs will be created.");
+      return;
+    }
+
   for (std::string& filename : SystemPath::ReadFiles (folderName))
     {
       std::string filepath = folderName + "/" + filename;
-      if (IsDirectory (filepath))
+      if (Singleton<SatEnvVariables>::Get ()->IsValidDirectory (filepath))
         {
           NS_LOG_INFO ("Skipping directory '" << filename << "'");
           continue;
