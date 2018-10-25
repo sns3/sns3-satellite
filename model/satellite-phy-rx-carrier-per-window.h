@@ -55,7 +55,8 @@ public:
     Ptr<SatSignalParameters> rxParams;
     Mac48Address destAddress;
     Mac48Address sourceAddress;
-    bool sicFlag;
+    bool hasBeenDecoded;
+    bool hasBeenTreatedInWindow;
     bool failedSic;
     bool hasBeenUpdated;
     bool isInsideWindow;
@@ -275,6 +276,11 @@ private:
    * \brief The number of payload bytes in the window
    */
   uint32_t m_payloadBytesInWindow;
+
+  /**
+   * \brief Enable Sic
+   */
+  uint32_t m_sicEnabled;
 };
 
 

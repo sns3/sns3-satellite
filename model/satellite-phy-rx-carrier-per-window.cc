@@ -53,7 +53,8 @@ SatPhyRxCarrierPerWindow::SatPhyRxCarrierPerWindow (uint32_t carrierId,
   m_windowSicIterations (10),
   m_spreadingFactor (0),
   m_windowEndSchedulingInitialized (false),
-  m_detectionThreshold (0.0)
+  m_detectionThreshold (0.0),
+  m_sicEnabled (true)
 {
   NS_LOG_FUNCTION (this);
   NS_LOG_INFO ("Constructor called with arguments " << carrierId << ", " << carrierConf << ", and " << randomAccessEnabled);
@@ -128,6 +129,11 @@ SatPhyRxCarrierPerWindow::GetTypeId (void)
                     DoubleValue (0.0),
                     MakeDoubleAccessor (&SatPhyRxCarrierPerWindow::m_detectionThreshold),
                     MakeDoubleChecker<double> (0, std::numeric_limits<double>::max ()))
+    .AddAttribute ( "EnableSIC",
+                    "Use SIC when decoding a packet",
+                    BooleanValue (true),
+                    MakeBooleanAccessor (&SatPhyRxCarrierPerWindow::m_sicEnabled),
+                    MakeBooleanChecker ())
     .AddTraceSource ("EssaRxCollision",
                      "Received a packet through Random Access ESSA",
                      MakeTraceSourceAccessor (&SatPhyRxCarrierPerWindow::m_essaRxCollisionTrace),
@@ -171,7 +177,7 @@ SatPhyRxCarrierPerWindow::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParam
   params.duration = packetRxParams.rxParams->m_duration;
   params.arrivalTime = Now () - params.duration; // arrival time is the start of reception
   params.rxParams = packetRxParams.rxParams;
-  params.sicFlag = false;
+  params.hasBeenDecoded = false;
   params.failedSic = false;
   params.hasBeenUpdated = false;
   params.isInsideWindow = false;
@@ -207,6 +213,12 @@ void
 SatPhyRxCarrierPerWindow::EliminatePreviousInterferences (SatPhyRxCarrierPerWindow::essaPacketRxParams_s &packet)
 {
   NS_LOG_FUNCTION (this);
+
+  if (!m_sicEnabled)
+    {
+      return;
+    }
+
   NS_LOG_INFO ("SatPhyRxCarrierPerWindow::EliminatePreviousInterferences - Eliminate interferences from packet " << packet.rxParams->m_txInfo.crdsaUniquePacketId << " from " << packet.sourceAddress);
 
   // Get which packets that have been decoded interfere with this packet
@@ -219,7 +231,7 @@ SatPhyRxCarrierPerWindow::EliminatePreviousInterferences (SatPhyRxCarrierPerWind
           continue;
         }
       /// Check if packet has been decoded
-      if (!(packet_it->sicFlag))
+      if (!(packet_it->hasBeenDecoded))
         {
           continue;
         }
@@ -373,6 +385,7 @@ SatPhyRxCarrierPerWindow::ProcessWindow (Time startTime, Time endTime)
               NS_LOG_INFO ("SatPhyRxCarrierPerWindow::DoWindowEnd - No more packets to decode");
               break;
             }
+          packet_it->hasBeenTreatedInWindow = true;
 
           NS_LOG_INFO ("SatPhyRxCarrierPerWindow::DoWindowEnd - Process packet " << packet_it->rxParams->m_txInfo.crdsaUniquePacketId << " from " << packet_it->sourceAddress);
           /// MIESM (block 3)
@@ -388,22 +401,34 @@ SatPhyRxCarrierPerWindow::ProcessWindow (Time startTime, Time endTime)
                               phyError);                // error flag
           if (!phyError)
             {
+              packet_it->hasBeenDecoded = true;
               /// SIC (block 4)
               DoSic (packet_it, windowBounds);
+              /// REMOVE
+              NS_LOG_WARN ("received " << packet_it->sourceAddress << " " << packet_it->rxParams->m_txInfo.crdsaUniquePacketId << " " << " INFO " << *(packet_it->rxParams->m_packetsInBurst[0]));
             }
           else
             {
               NS_LOG_INFO ("Failed to decode packet " << packet_it->sourceAddress << "-" << packet_it->rxParams->m_txInfo.crdsaUniquePacketId);
               packet_it->failedSic = true;
             }
-          /// send packet upwards
-          m_rxCallback (packet_it->rxParams, phyError);
-          /// If decoded, Packet could be deleted, since interference information
-          /// is stored in each packet; but we'll keep it for logging purposes
         }
 
       // increase iteration number
       i++;
+    }
+  /// send treated packets upward
+  for (packetList_t::iterator packet_it = windowBounds.first;
+       packet_it != windowBounds.second; packet_it++)
+    {
+      /// consider only packets that have been treated this window
+      if (!packet_it->isInsideWindow || !packet_it->hasBeenTreatedInWindow)
+        {
+          continue;
+        }
+      m_rxCallback (packet_it->rxParams, !packet_it->hasBeenDecoded);
+      /// If decoded, Packet could be deleted, since interference information
+      /// is stored in each packet; but we'll keep it for logging purposes
     }
   /// measure random access load in window
   if (IsRandomAccessDynamicLoadControlEnabled ())
@@ -417,6 +442,12 @@ void
 SatPhyRxCarrierPerWindow::DoSic (packetList_t::iterator processedPacket, std::pair<packetList_t::iterator, packetList_t::iterator> windowBounds)
 {
   NS_LOG_FUNCTION (this);
+
+  if (!m_sicEnabled)
+    {
+      return;
+    }
+
   NS_LOG_INFO ("SatPhyRxCarrierPerWindow::DoSic - eliminate interference from packet " << processedPacket->rxParams->m_txInfo.crdsaUniquePacketId << " from " << processedPacket->sourceAddress);
 
   /// Update SIC on interfering packets
@@ -433,7 +464,7 @@ SatPhyRxCarrierPerWindow::DoSic (packetList_t::iterator processedPacket, std::pa
           continue;
         }
       /// Except already processed packets, and the packet being currently processed
-      if (packet_it == processedPacket || packet_it->sicFlag)
+      if (packet_it == processedPacket || packet_it->hasBeenDecoded)
         {
           continue;
         }
@@ -449,7 +480,6 @@ SatPhyRxCarrierPerWindow::DoSic (packetList_t::iterator processedPacket, std::pa
   /// Update packet Rx power and set the SIC flag (what for ??)
   // processedPacket->rxParams->m_rxPowerInSatellite_W = residualSicPower;
   // CalculatePacketInterferenceVectors (*processedPacket);
-  processedPacket->sicFlag = true;
 }
 
 std::pair<double, double>
@@ -535,7 +565,7 @@ SatPhyRxCarrierPerWindow::CleanOldPackets (const Time windowStartTime)
           // Only trace packets that arrived after first Window
           if (it->arrivalTime >= m_firstWindow)
             {
-              if (!(it->sicFlag))
+              if (!(it->hasBeenDecoded))
                 {
                 }
               else
@@ -548,7 +578,7 @@ SatPhyRxCarrierPerWindow::CleanOldPackets (const Time windowStartTime)
               // Trace if the packet has been decoded or not
               m_essaRxCollisionTrace (1,                        // number of packets
                                       it->sourceAddress, // sender address
-                                      !(it->sicFlag));                // error flag
+                                      !(it->hasBeenDecoded));                // error flag
             }
           // Delete element from list
           NS_LOG_INFO ("SatPhyRxCarrierPerWindow::CleanOldPackets - Remove packet " << it->rxParams->m_txInfo.crdsaUniquePacketId << " from " << it->sourceAddress);
@@ -584,6 +614,7 @@ SatPhyRxCarrierPerWindow::GetWindowBounds (Time startTime, Time endTime)
       if ((last->arrivalTime >= startTime) && (last->arrivalTime + last->duration <= endTime))
         {
           last->isInsideWindow = true;
+          last->hasBeenTreatedInWindow = false;
           /// update number of bytes in the window
           m_payloadBytesInWindow += GetWaveformConf ()->GetWaveform (last->rxParams->m_txInfo.waveformId)->GetPayloadInBytes ();
         }
@@ -605,7 +636,7 @@ SatPhyRxCarrierPerWindow::GetHighestSnirPacket (const std::pair<SatPhyRxCarrierP
   SatPhyRxCarrierPerWindow::packetList_t::iterator it, max = windowBounds.second;
   for (it = windowBounds.first; it != windowBounds.second; it++)
     {
-      if (it->sicFlag || !(it->hasBeenUpdated) || !(it->isInsideWindow))
+      if (it->hasBeenDecoded || !(it->hasBeenUpdated) || !(it->isInsideWindow))
         {
           continue;
         }
@@ -666,7 +697,7 @@ SatPhyRxCarrierPerWindow::CalculateNormalizedOfferedRandomAccessLoad ()
 
   double normalizedOfferedLoad = m_payloadBytesInWindow * SatConstVariables::BITS_PER_BYTE / m_windowDuration.GetSeconds () / m_rxBandwidthHz;
 
-  NS_LOG_WARN ("Payload Bytes in Window: " << m_payloadBytesInWindow <<
+  NS_LOG_INFO ("Payload Bytes in Window: " << m_payloadBytesInWindow <<
                ", Window duration in seconds: " << m_windowDuration.GetSeconds () <<
                ", Bandwidth in Hz: " << m_rxBandwidthHz <<
                ", normalized offered load (bps/Hz): " << normalizedOfferedLoad);
