@@ -320,6 +320,7 @@ SatBeamHelper::DoDispose ()
   m_geoHelper = NULL;
   m_gwHelper = NULL;
   m_utHelper = NULL;
+  m_antennaGainPatterns = NULL;
 }
 
 void

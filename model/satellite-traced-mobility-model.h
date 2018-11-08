@@ -44,6 +44,11 @@ public:
   TypeId GetInstanceTypeId (void) const;
 
   /**
+   * Dispose of this class instance
+   */
+  virtual void DoDispose ();
+
+  /**
    * Default constructor. Unused.
    */
   SatTracedMobilityModel ();

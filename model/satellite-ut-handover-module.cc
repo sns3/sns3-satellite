@@ -62,6 +62,18 @@ SatUtHandoverModule::GetInstanceTypeId (void) const
 }
 
 
+void
+SatUtHandoverModule::DoDispose ()
+{
+  NS_LOG_FUNCTION (this);
+
+  m_handoverCallback.Nullify ();
+  m_antennaGainPatterns = NULL;
+
+  Object::DoDispose ();
+}
+
+
 SatUtHandoverModule::SatUtHandoverModule ()
   : m_antennaGainPatterns (NULL),
   m_lastMessageSentAt (0),
@@ -76,7 +88,8 @@ SatUtHandoverModule::SatUtHandoverModule ()
 
 
 SatUtHandoverModule::SatUtHandoverModule (Ptr<SatAntennaGainPatternContainer> agpContainer)
-  : m_antennaGainPatterns (agpContainer)
+  : m_antennaGainPatterns (agpContainer),
+  m_askedBeamId (0)
 {
   NS_LOG_FUNCTION (this << agpContainer);
 }

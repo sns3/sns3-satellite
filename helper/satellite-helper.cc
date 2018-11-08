@@ -837,6 +837,10 @@ SatHelper::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
 
+  m_userHelper = NULL;
+  m_beamHelper->DoDispose ();
+  m_beamHelper = NULL;
+  m_antennaGainPatterns = NULL;
   m_utPositionsByBeam.clear ();
   m_mobileUtsByBeam.clear ();
   m_mobileUtsUsersByBeam.clear ();

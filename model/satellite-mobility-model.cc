@@ -59,7 +59,8 @@ SatMobilityModel::GetInstanceTypeId (void) const
 }
 
 SatMobilityModel::SatMobilityModel ()
-  : m_GetAsGeoCoordinates (true)
+  : m_cartesianPositionOutdated (false),
+  m_GetAsGeoCoordinates (true)
 {
 
 }

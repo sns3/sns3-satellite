@@ -62,6 +62,14 @@ SatTracedMobilityModel::GetInstanceTypeId (void) const
   return GetTypeId ();
 }
 
+void
+SatTracedMobilityModel::DoDispose ()
+{
+  m_antennaGainPatterns = NULL;
+
+  Object::DoDispose ();
+}
+
 SatTracedMobilityModel::SatTracedMobilityModel ()
 {
   NS_FATAL_ERROR ("SatTracedMobilityModel default constructor should not be used");
