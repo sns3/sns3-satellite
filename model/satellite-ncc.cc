@@ -376,7 +376,7 @@ SatNcc::MoveUtBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamI
 
   if (!destination)
     {
-      NS_LOG_INFO ("Destination beam does not exist, cancel handover");
+      NS_LOG_WARN ("Destination beam does not exist, cancel handover");
 
       Ptr<SatTimuMessage> timuMsg = scheduler->CreateTimu ();
       scheduler->SendTo (timuMsg, utId);
