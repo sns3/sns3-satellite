@@ -296,7 +296,7 @@ SatEnvVariables::IsValidDirectory (std::string path)
 
   if (stat (path.c_str (), &st) == 0)
     {
-      if (st.st_mode && S_IFDIR != 0)
+      if (S_ISDIR (st.st_mode))
         {
           validDirectory = true;
         }
