@@ -63,21 +63,30 @@ SatPerfectInterferenceElimination::EliminateInterferences (
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_INFO (
-    "Removing interference power of packet from Beam[Carrier] " <<
-      processedPacket->m_beamId <<
-      "[" << processedPacket->m_carrierId << "]");
-  auto oldIfPower = packetInterferedWith->m_ifPowerInSatellite_W;
-  packetInterferedWith->m_ifPowerInSatellite_W -= processedPacket->m_rxPowerInSatellite_W;
+  NS_LOG_INFO ("Removing interference power of packet from Beam[Carrier] " <<
+               processedPacket->m_beamId <<
+               "[" << processedPacket->m_carrierId << "]");
+  double oldIfPower = packetInterferedWith->GetInterferencePowerInSatellite ();
 
-  if (std::abs (packetInterferedWith->m_ifPowerInSatellite_W) < std::numeric_limits<double>::epsilon ())
+  auto ifPowerPerFragment = packetInterferedWith->GetInterferencePowerInSatellitePerFragment ();
+  for (std::pair<double, double>& ifPower : ifPowerPerFragment)
     {
-      packetInterferedWith->m_ifPowerInSatellite_W = 0;
-    }
+      ifPower.second -= processedPacket->m_rxPowerInSatellite_W;
+      if (std::abs (ifPower.second) < std::numeric_limits<double>::epsilon ())
+        {
+          ifPower.second = 0.0;
+        }
 
-  NS_LOG_INFO (
-    "Interfered packet ifPower went from " << oldIfPower <<
-      " to " << packetInterferedWith->m_ifPowerInSatellite_W);
+      if (ifPower.second < 0)
+        {
+          NS_FATAL_ERROR ("Negative interference");
+        }
+    }
+  packetInterferedWith->SetInterferencePowerInSatellite (ifPowerPerFragment);
+
+  NS_LOG_INFO ("Interfered packet ifPower went from " <<
+               oldIfPower << " to " <<
+               packetInterferedWith->GetInterferencePowerInSatellite ());
 }
 
 }  // namespace ns3

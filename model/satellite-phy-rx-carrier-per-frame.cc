@@ -616,21 +616,21 @@ double
 SatPhyRxCarrierPerFrame::CalculatePacketCompositeSinr (SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s& packet)
 {
   double sinrSatellite = CalculateSinr ( packet.rxParams->m_rxPowerInSatellite_W,
-                                         packet.rxParams->m_ifPowerInSatellite_W,
+                                         packet.rxParams->GetInterferencePowerInSatellite (),
                                          packet.rxParams->m_rxNoisePowerInSatellite_W,
                                          packet.rxParams->m_rxAciIfPowerInSatellite_W,
                                          packet.rxParams->m_rxExtNoisePowerInSatellite_W,
                                          packet.rxParams->m_sinrCalculate);
 
   double sinr = CalculateSinr ( packet.rxParams->m_rxPower_W,
-                                packet.rxParams->m_ifPower_W,
+                                packet.rxParams->GetInterferencePower (),
                                 m_rxNoisePowerW,
                                 m_rxAciIfPowerW,
                                 m_rxExtNoisePowerW,
                                 m_sinrCalculate);
 
   packet.cSinr = CalculateCompositeSinr (sinr, sinrSatellite);
-  packet.ifPower = packet.rxParams->m_ifPower_W;
+  packet.ifPower = packet.rxParams->GetInterferencePower ();
 
   return sinr;
 }
@@ -723,14 +723,12 @@ SatPhyRxCarrierPerFrame::EliminateInterference (
           /// In addition, as the interference values are extremely small, the use of long double (instead
           /// of double) should be considered to improve the accuracy.
 
-          GetInterferenceEliminationModel ()->EliminateInterferences (iterList->rxParams, processedPacket.rxParams, processedPacket.cSinr);
-
-              if (iterList->rxParams->GetInterferencePower () < 0 || ifPower.second < 0)
-                {
-                  NS_FATAL_ERROR ("SatPhyRxCarrierPerFrame::EliminateInterference - Negative interference");
-                }
+          if (iterList->rxParams->GetInterferencePower () < 0)
+            {
+              NS_FATAL_ERROR ("SatPhyRxCarrierPerFrame::EliminateInterference - Negative interference");
             }
-          iterList->rxParams->SetInterferencePowerInSatellite (ifPowerPerFragment);
+
+          GetInterferenceEliminationModel ()->EliminateInterferences (iterList->rxParams, processedPacket.rxParams, processedPacket.cSinr);
 
           NS_LOG_INFO ("SatPhyRxCarrierPerFrame::EliminateInterference- AFTER INTERFERENCE ELIMINATION, RX sat: " <<
                        iterList->rxParams->m_rxPowerInSatellite_W <<
