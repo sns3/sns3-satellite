@@ -72,14 +72,14 @@ SatSimpleChannel::Add (Ptr<SatSimpleNetDevice> device)
   m_devices.push_back (device);
 }
 
-uint32_t
+std::size_t
 SatSimpleChannel::GetNDevices (void) const
 {
   NS_LOG_FUNCTION (this);
   return m_devices.size ();
 }
 Ptr<NetDevice>
-SatSimpleChannel::GetDevice (uint32_t i) const
+SatSimpleChannel::GetDevice (std::size_t i) const
 {
   NS_LOG_FUNCTION (this << i);
   return m_devices[i];
