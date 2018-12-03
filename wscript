@@ -1,7 +1,7 @@
 # -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
 
 def build(bld):
-    module = bld.create_ns3_module('satellite', ['internet', 'propagation', 'antenna', 'csma', 'stats', 'traffic', 'flow-monitor'])
+    module = bld.create_ns3_module('satellite', ['internet', 'propagation', 'antenna', 'csma', 'stats', 'traffic', 'flow-monitor', 'applications'])
     module.source = [
         'model/geo-coordinate.cc',
         'model/satellite-address-tag.cc',

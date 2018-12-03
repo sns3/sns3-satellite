@@ -16,6 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Lauri Sormunen <lauri.sormunen@magister.fi>
+ *
+ * Modified by: Patrice Raveneau <patrice.raveneau@cnes.fr>
  */
 
 #include "simulation-helper.h"
@@ -36,7 +38,7 @@
 #include <ns3/cbr-helper.h>
 #include <ns3/satellite-on-off-helper.h>
 #include <ns3/nrtv-helper.h>
-#include <ns3/three-gpp-http-helper.h>
+#include <ns3/three-gpp-http-satellite-helper.h>
 #include <ns3/random-variable-stream.h>
 #include <ns3/satellite-enums.h>
 
