@@ -20,6 +20,7 @@
 
 #include <cmath>
 #include "ns3/log.h"
+#include "ns3/enum.h"
 #include "ns3/double.h"
 #include "ns3/simulator.h"
 #include "ns3/boolean.h"
@@ -54,7 +55,9 @@ SatRequestManager::SatRequestManager ()
   m_lastVbdcCrSent (Seconds (0)),
   m_superFrameDuration (Seconds (0)),
   m_forcedAvbdcUpdate (false),
-  m_numValues (256)
+  m_numValues (256),
+  m_rbdcCapacityRequestAlgorithm (SatEnums::CR_RBDC_LEGACY),
+  m_vbdcCapacityRequestAlgorithm (SatEnums::CR_VBDC_LEGACY)
 {
   NS_LOG_FUNCTION (this);
 
@@ -124,6 +127,16 @@ SatRequestManager::GetTypeId (void)
                     DoubleValue (1.0),
                     MakeDoubleAccessor (&SatRequestManager::m_gainValueK),
                     MakeDoubleChecker<double_t> ())
+    .AddAttribute ( "RbdcCapacityRequestAlgorithm",
+                    "Algorithm to calculate RBDC capacity requests.",
+                    EnumValue (SatEnums::CR_RBDC_LEGACY),
+                    MakeEnumAccessor (&SatRequestManager::m_rbdcCapacityRequestAlgorithm),
+                    MakeEnumChecker (SatEnums::CR_RBDC_LEGACY, "Legacy"))
+    .AddAttribute ( "VbdcCapacityRequestAlgorithm",
+                    "Algorithm to calculate VBDC capacity requests.",
+                    EnumValue (SatEnums::CR_VBDC_LEGACY),
+                    MakeEnumAccessor (&SatRequestManager::m_vbdcCapacityRequestAlgorithm),
+                    MakeEnumChecker (SatEnums::CR_VBDC_LEGACY, "Legacy"))
     .AddTraceSource ("CrTrace",
                      "Capacity request trace",
                      MakeTraceSourceAccessor (&SatRequestManager::m_crTrace),
@@ -402,6 +415,27 @@ SatRequestManager::CnoUpdated (uint32_t beamId, Address /*utId*/, Address /*gwId
 uint32_t
 SatRequestManager::DoRbdc (uint8_t rc, const SatQueue::QueueStats_t &stats)
 {
+  NS_LOG_FUNCTION (this);
+
+  switch (m_rbdcCapacityRequestAlgorithm)
+    {
+    case SatEnums::CR_RBDC_LEGACY:
+      {
+        return DoRbdcLegacy (rc, stats);
+      }
+    default:
+      {
+        NS_FATAL_ERROR ("SatRequestManager::DoRbdc - Invalid RBDC algorithm!");
+      }
+    }
+
+  NS_FATAL_ERROR ("SatRequestManager::DoRbdc - Invalid RBDC algorithm!");
+  return 0;
+}
+
+uint32_t
+SatRequestManager::DoRbdcLegacy (uint8_t rc, const SatQueue::QueueStats_t &stats)
+{
   NS_LOG_FUNCTION (this << (uint32_t)(rc));
 
   // Duration from last evaluation time
@@ -440,7 +474,7 @@ SatRequestManager::DoRbdc (uint8_t rc, const SatQueue::QueueStats_t &stats)
 
       if (m_llsConf->GetDaConstantServiceRateInKbps (rc) > m_llsConf->GetDaMaximumServiceRateInKbps (rc))
         {
-          NS_FATAL_ERROR ("SatRequestManager::DoRbdc - configured CRA is bigger than maximum RBDC for RC: " << uint32_t (rc));
+          NS_FATAL_ERROR ("SatRequestManager::DoRbdcLegacy - configured CRA is bigger than maximum RBDC for RC: " << uint32_t (rc));
         }
 
       // CRA + RBDC is too much
@@ -469,6 +503,27 @@ SatRequestManager::DoRbdc (uint8_t rc, const SatQueue::QueueStats_t &stats)
 
 SatEnums::SatCapacityAllocationCategory_t
 SatRequestManager::DoVbdc (uint8_t rc, const SatQueue::QueueStats_t &stats, uint32_t &rcVbdcBytes)
+{
+  NS_LOG_FUNCTION (this);
+
+  switch (m_vbdcCapacityRequestAlgorithm)
+    {
+    case SatEnums::CR_VBDC_LEGACY:
+      {
+        return DoVbdcLegacy (rc, stats, rcVbdcBytes);
+      }
+    default:
+      {
+        NS_FATAL_ERROR ("SatRequestManager::DoVbdc - Invalid VBDC algorithm!");
+      }
+    }
+
+  NS_FATAL_ERROR ("SatRequestManager::DoVbdc - Invalid VBDC algorithm!");
+  return SatEnums::DA_UNKNOWN;
+}
+
+SatEnums::SatCapacityAllocationCategory_t
+SatRequestManager::DoVbdcLegacy (uint8_t rc, const SatQueue::QueueStats_t &stats, uint32_t &rcVbdcBytes)
 {
   NS_LOG_FUNCTION (this << (uint32_t)(rc));
 
