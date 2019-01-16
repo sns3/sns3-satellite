@@ -3,6 +3,10 @@
 Satellite Network Simulator 3 (SNS3) is a satellite network extension to Network Simulator 3 (ns-3) platform.
 SNS3 was initially developed by Magister Solutions under ESA contact.
 
+# License
+
+SNS3 is distributed under the GPLv3 license.
+
 # Installation Manual
 
 SNS3 is built as an extension module to the [NS3](https://www.nsnam.org/) network simulator; so their [installation instructions](https://www.nsnam.org/docs/release/3.28/tutorial/html/getting-started.html) apply, particularly concerning the dependencies. They are repeated here for convenience and proper integration of SNS3.
@@ -103,7 +107,7 @@ control over what is being compiled, you can handle the download process of the 
 You will need to:
 
 
-*  get NS3 (either by [downloading](https://www.nsnam.org/release/) it, [cloning it using mercurial](http://code.nsnam.org/) or [cloning it using git](https://github.com/nsnam/ns-3-dev-git));
+*  get NS3 (either by [downloading](https://www.nsnam.org/release/) it, [cloning it using mercurial](http://code.nsnam.org/) or [cloning it using git](https://gitlab.com/nsnam/ns-3-dev.git));
 *  get the ''satellite'' module (by [cloning it using git](https://github.com/sns3/sns3-satellite));
 *  get the ''traffic'' and ''magister-stats'' modules (needed until they are integrated into NS3) as dependencies of the ''satellite'' module by cloning them :
 
