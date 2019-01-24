@@ -127,19 +127,22 @@ main (int argc, char *argv[])
   // select pre-defined super frame configuration wanted to use.
   Config::SetDefault ("ns3::SatConf::SuperFrameConfForSeq0", StringValue (preDefinedFrameConfig));
 
+  // use the default SuperframeAllocator
+  Config::SetDefault ("ns3::SatBeamScheduler::SuperFrameAllocatorType", StringValue ("Default"));
+
   switch (testCase)
     {
     case 0: // scheduler, CRA, ACM is selected by command line arguments ( --"ns3::SatWaveformConf::AcmEnabled=true" or --"ns3::SatWaveformConf::AcmEnabled=false" )
       Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (true));
       Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantServiceRate", StringValue ("ns3::ConstantRandomVariable[Constant=2]"));
-      Config::SetDefault ("ns3::SatSuperframeAllocator::FcaEnabled", BooleanValue (false));
+      Config::SetDefault ("ns3::SatDefaultSuperframeAllocator::FcaEnabled", BooleanValue (false));
       break;
 
     case 1: // scheduler, FCA (CRA + VBDC), ACM is selected by command line arguments ( --"ns3::SatWaveformConf::AcmEnabled=true" or --"ns3::SatWaveformConf::AcmEnabled=false" )
       Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (true));
       Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantServiceRate", StringValue ("ns3::ConstantRandomVariable[Constant=2]"));
       Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (true));
-      Config::SetDefault ("ns3::SatSuperframeAllocator::FcaEnabled", BooleanValue (true));
+      Config::SetDefault ("ns3::SatDefaultSuperframeAllocator::FcaEnabled", BooleanValue (true));
       break;
 
     case 2: // ACM, one UT with one user, MARKOV fading on, external fading on

@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2014 Magister Solutions Ltd
+ * Copyright (c) 2019 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ * Author: Joaquin Muguerza <jmuguerza@viveris.fr>
  */
 
 #ifndef SAT_SUPERFRAME_ALLOCATOR_H
@@ -53,7 +53,7 @@ public:
   /**
    * Destruct SatSuperframeAllocator
    */
-  ~SatSuperframeAllocator ();
+  virtual ~SatSuperframeAllocator ();
 
 
   /**
@@ -83,13 +83,13 @@ public:
    * \param minimumRateBytes Minimum rate based bytes needed to reserve
    * \param controlSlotsEnabled Flag indicating if control slot generation is enabled
    */
-  void ReserveMinimumRate (uint32_t minimumRateBytes, bool controlSlotsEnabled);
+  virtual void ReserveMinimumRate (uint32_t minimumRateBytes, bool controlSlotsEnabled) = 0;
 
   /**
    * \brief Preallocate symbols for given to UTs in superframe.
    * Pre-allocation is done in fairly manner between UTs and RCs.
    */
-  void PreAllocateSymbols (SatFrameAllocator::SatFrameAllocContainer_t& allocReqs);
+  virtual void PreAllocateSymbols (SatFrameAllocator::SatFrameAllocContainer_t& allocReqs) = 0;
 
   /**
    * \brief Generate time slots in TBTP(s) for the UT/RC.
@@ -101,67 +101,12 @@ public:
    * \param utLoadTrace UT load per the frame trace callback
    * \param loadTrace Load per the frame trace callback
    */
-  void GenerateTimeSlots (SatFrameAllocator::TbtpMsgContainer_t& tbtpContainer, uint32_t maxSizeInBytes, SatFrameAllocator::UtAllocInfoContainer_t& utAllocContainer,
-                          TracedCallback<uint32_t> waveformTrace, TracedCallback<uint32_t, uint32_t> utLoadTrace, TracedCallback<uint32_t, double> loadTrace);
+  virtual void GenerateTimeSlots (SatFrameAllocator::TbtpMsgContainer_t& tbtpContainer, uint32_t maxSizeInBytes, SatFrameAllocator::UtAllocInfoContainer_t& utAllocContainer,
+                          TracedCallback<uint32_t> waveformTrace, TracedCallback<uint32_t, uint32_t> utLoadTrace, TracedCallback<uint32_t, double> loadTrace) = 0;
 
-private:
-  /**
-   * Container for SatFrameInfo items.
-   */
-  typedef std::vector< Ptr<SatFrameAllocator> > FrameAllocatorContainer_t;
-
-  /**
-   * Container for the supported SatFrameAllocator (frames).
-   */
-  typedef std::map<Ptr<SatFrameAllocator>, uint32_t> SupportedFramesMap_t;
-
-  // Frame info container.
-  FrameAllocatorContainer_t    m_frameAllocators;
-
+protected:
   // super frame  configuration
   Ptr<SatSuperframeConf>  m_superframeConf;
-
-  // target load for the frame
-  double  m_targetLoad;
-
-  // flag telling if FCA (free capacity allocation) is on
-  bool  m_fcaEnabled;
-
-  // minimum carrier payload in bytes
-  uint32_t  m_minCarrierPayloadInBytes;
-
-  // minimum rate based bytes left can been guaranteed by frame allocator
-  uint32_t  m_minimumRateBasedBytesLeft;
-
-  // The flag telling if time slot generation is done per RC based symbols
-  // instead of UT based symbols
-  bool m_rcBasedAllocationEnabled;
-
-  // the most robust
-  uint32_t m_mostRobustSlotPayloadInBytes;
-
-  /**
-   *  Allocate given request according to type.
-   *
-   * \param ccLevel CC level of the request
-   * \param allocReq Requested bytes
-   * \param frames Information of the possibles frames to allocate.
-   * \return
-   */
-  bool AllocateBasedOnCc (SatFrameAllocator::CcLevel_t ccLevel, SatFrameAllocator::SatFrameAllocReq * allocReq, const SupportedFramesMap_t &frames);
-
-  /**
-   * Allocate a request to a frame.
-   *
-   * \param allocReq  Allocation request parameters for RC/CCs
-   * \return true when allocation is successful, false otherwise
-   */
-  bool AllocateToFrame (SatFrameAllocator::SatFrameAllocReq * allocReq);
-
-  /**
-   * Remove allocations from all frames maintained by frame allocator.
-   */
-  void RemoveAllocations ();
 };
 
 } // namespace ns3

@@ -783,6 +783,17 @@ public:
     NS_FATAL_ERROR ("SatEnums::GetVbdcCapacityRequestAlgorithmName - Invalid algorithm name");
     return "";
   }
+
+
+  /**
+   * \enum SatSuperframeAllocatorType_t
+   * \brief SuperframeAllocator type to use
+   */
+  typedef enum
+  {
+    DEFAULT_SUPERFRAME_ALLOCATOR = 0,
+  } SuperframeAllocatorType_t;
+
 private:
   /**
    * Destructor

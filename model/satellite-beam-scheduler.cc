@@ -34,6 +34,7 @@
 #include <ns3/address.h>
 #include <ns3/mac48-address.h>
 #include <ns3/satellite-superframe-sequence.h>
+#include <ns3/satellite-default-superframe-allocator.h>
 #include <ns3/satellite-superframe-allocator.h>
 #include <ns3/satellite-dama-entry.h>
 #include <ns3/satellite-control-message.h>
@@ -206,6 +207,11 @@ SatBeamScheduler::GetTypeId (void)
                     TimeValue (MilliSeconds (1000)),
                     MakeTimeAccessor (&SatBeamScheduler::m_controlSlotInterval),
                     MakeTimeChecker ())
+    .AddAttribute ("SuperFrameAllocatorType",
+                   "Type of SuperFrameAllocator",
+                   EnumValue (SatEnums::DEFAULT_SUPERFRAME_ALLOCATOR),
+                   MakeEnumAccessor (&SatBeamScheduler::m_superframeAllocatorType),
+                   MakeEnumChecker (SatEnums::DEFAULT_SUPERFRAME_ALLOCATOR, "Default"))
     .AddTraceSource ("BacklogRequestsTrace",
                      "Trace for backlog requests done to beam scheduler.",
                      MakeTraceSourceAccessor (&SatBeamScheduler::m_backlogRequestsTrace),
@@ -245,7 +251,8 @@ SatBeamScheduler::SatBeamScheduler ()
   m_txCallback (0),
   m_cnoEstimatorMode (SatCnoEstimator::LAST),
   m_maxBbFrameSize (0),
-  m_controlSlotsEnabled (false)
+  m_controlSlotsEnabled (false),
+  m_superframeAllocatorType (SatEnums::DEFAULT_SUPERFRAME_ALLOCATOR)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -313,7 +320,21 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCall
     }
 
   m_raChRandomIndex->SetAttribute ("Max", DoubleValue (maxIndex));
-  m_superframeAllocator = CreateObject<SatSuperframeAllocator> (m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE));
+
+  // Create the superframeAllocator object
+  switch (m_superframeAllocatorType)
+    {
+    case SatEnums::DEFAULT_SUPERFRAME_ALLOCATOR:
+      {
+        Ptr<SatDefaultSuperframeAllocator> superframeAllocator = CreateObject<SatDefaultSuperframeAllocator> (m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE));
+        m_superframeAllocator = DynamicCast<SatSuperframeAllocator> (superframeAllocator);
+        break;
+      }
+    default:
+      {
+        NS_FATAL_ERROR ("Invalid SuperframeAllocatorType");
+      }
+    }
 
   NS_LOG_INFO ("Initialized SatBeamScheduler");
 
