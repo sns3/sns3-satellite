@@ -9,7 +9,7 @@ SNS3 is distributed under the GPLv3 license.
 
 # Installation Manual
 
-SNS3 is built as an extension module to the [NS3](https://www.nsnam.org/) network simulator; so their [installation instructions](https://www.nsnam.org/docs/release/3.28/tutorial/html/getting-started.html) apply, particularly concerning the dependencies. They are repeated here for convenience and proper integration of SNS3.
+SNS3 is built as an extension module to the [NS3](https://www.nsnam.org/) network simulator; so their [installation instructions](https://www.nsnam.org/docs/release/3.29/tutorial/html/getting-started.html) apply, particularly concerning the dependencies. They are repeated here for convenience and proper integration of SNS3.
 
 There are 2 methods to download and build (S)NS3:
 
@@ -46,7 +46,7 @@ and drop the following file ''sns3.xml'' in this ''contrib'' folder:
 ```xml
 <configuration>
   <modules>
-    <module name="sns3-satellite" type="ns-contrib" min_version="ns-3.26">
+    <module name="sns3-satellite" type="ns-contrib" min_version="ns-3.29">
       <source type="git">
         <attribute name="url" value="https://github.com/sns3/sns3-satellite.git"/>
         <attribute name="module_directory" value="satellite"/>
@@ -54,7 +54,7 @@ and drop the following file ''sns3.xml'' in this ''contrib'' folder:
       <build type="none">
       </build>
     </module>
-    <module name="sns3-stats" type="ns-contrib" min_version="ns-3.26">
+    <module name="sns3-stats" type="ns-contrib" min_version="ns-3.29">
       <source type="git">
         <attribute name="url" value="https://github.com/sns3/stats.git"/>
         <attribute name="module_directory" value="magister-stats"/>
@@ -62,7 +62,7 @@ and drop the following file ''sns3.xml'' in this ''contrib'' folder:
       <build type="none">
       </build>
     </module>
-    <module name="sns3-traffic" type="ns-contrib" min_version="ns-3.26">
+    <module name="sns3-traffic" type="ns-contrib" min_version="ns-3.29">
       <source type="git">
         <attribute name="url" value="https://github.com/sns3/traffic.git" />
         <attribute name="module_directory" value="traffic"/>
@@ -85,9 +85,7 @@ Now you’re ready to use bake.
 Now that everything is in place, you can tell bake that you want to install SNS3 (i.e.: ''ns-3'' plus the ''sns3-satellite'' module):
 
 ```
-	$ ./bake.py configure -c
-	$ ./bake.py configure -e ns-3.28
-	$ ./bake.py configure -e sns3-satellite -e sns3-stats -e sns3-traffic
+	$ ./bake.py configure -e ns-3.29 -e sns3-satellite -e sns3-stats -e sns3-traffic
 	$ ./bake.py deploy
 ```
 
@@ -125,7 +123,7 @@ extracting them here, copying the files afterwards or using symbolic links.*
 Then you need to configure waf and ask it to build NS3. It will automatically build all modules found in contrib:
 
 ```
-	$ cd ns-3.28
+	$ cd ns-3.29
 	$ ./waf configure -d optimized --enable-examples --enable-tests
 	$ ./waf build -j 6
 ```
@@ -140,8 +138,8 @@ You can also check waf options to customize it at will:
 
 Once you compiled SNS-3 successfully, you will need an extra step before being able to run any simulation: download the data defining the reference scenario of the simulation.
 
-In order to do so, an helper script is available in the root folder of the SNS-3 sources:
+These data are available as a separate repository and bundled as a submodule in SNS-3. You can download them afterwards in the ''satellite'' repository using:
 
 ```
-	$ ./install-sns3-default-data-package.sh
+	$ git submodule update --init --recursive
 ```
