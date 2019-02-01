@@ -31,7 +31,7 @@ Bake is hosted on a [mercurial](https://www.mercurial-scm.org/) repository. You 
 
 *note : Installing mercurial will be necessary anyway if you plan on installing NS3 using Bake.*
 
-Before installing NS3, you will need to tell Bake how to find and download the SNS3 extension module. To do so, you will have to create a ''contrib'' folder inside the newly acquired ''bake'' folder:
+Before installing NS3, you will need to tell Bake how to find and download the SNS3 extension module. To do so, you will have to create a **contrib** folder inside the newly acquired **bake** folder:
 
 ```
 	$ cd bake
@@ -41,7 +41,7 @@ Before installing NS3, you will need to tell Bake how to find and download the S
 ```
 
 
-and drop the following file ''sns3.xml'' in this ''contrib'' folder:
+and drop the following file **sns3.xml** in this **contrib** folder:
 
 ```xml
 <configuration>
@@ -116,8 +116,8 @@ You will need to:
     
 ```
 
-*note : When retrieving the ''satellite'', ''traffic'' and ''magister-stats'' modules, you should put 
-them under the ''ns-3.28/contrib/'' folder. You can do so by cloning them directly in this folder, 
+*note : When retrieving the **satellite**, **traffic** and **magister-stats** modules, you should put 
+them under the **ns-3.29/contrib/** folder. You can do so by cloning them directly in this folder, 
 extracting them here, copying the files afterwards or using symbolic links.*
 
 Then you need to configure waf and ask it to build NS3. It will automatically build all modules found in contrib:
