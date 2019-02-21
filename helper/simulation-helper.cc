@@ -729,7 +729,7 @@ SimulationHelper::CreateDefaultStats ()
 
   // CreateDefaultFwdLinkStats ();
   // CreateDefaultRtnLinkStats ();
-  m_statContainer->AddPerUtCrdsaPacketError (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  //m_statContainer->AddPerUtCrdsaPacketError (SatStatsHelper::OUTPUT_SCATTER_FILE);
   m_statContainer->AddPerUtRtnMacDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
   m_statContainer->AddPerUtFwdMacDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
   m_statContainer->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
@@ -738,6 +738,11 @@ SimulationHelper::CreateDefaultStats ()
   m_statContainer->AddPerUtFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
   m_statContainer->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   m_statContainer->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  m_statContainer->AddPerUtRtnCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddPerUtAntennaGain (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddPerUtResourcesGranted (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddPerUtRbdcRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
 }
 
 
