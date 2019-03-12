@@ -23,13 +23,19 @@ There are 2 methods to download and build (S)NS3:
 
 [Bake](http://planete.inria.fr/software/bake/index.html) is a tool developed to simplify the download and install process of NS3. It can be extended to make it aware of external modules to NS3 such as SNS3. You will first need to get bake.
 
-Bake is hosted on a [mercurial](https://www.mercurial-scm.org/) repository. You can either [download an archive](http://code.nsnam.org/bake/archive/tip.tar.gz) or clone the repository on your machine:
+First you need to download Bake using Git, go to where you want Bake to be installed and call 
 
 ```
-	$ hg clone http://code.nsnam.org/bake bake
+	$ git clone https://gitlab.com/nsnam/bake
 ```
 
-*note : Installing mercurial will be necessary anyway if you plan on installing NS3 using Bake.*
+It is advisable to add bake to your path
+
+```
+	$ export BAKE_HOME=`pwd`/bake 
+	$ export PATH=$PATH:$BAKE_HOME
+	$ export PYTHONPATH=$PYTHONPATH:$BAKE_HOME
+```
 
 Before installing NS3, you will need to tell Bake how to find and download the SNS3 extension module. To do so, you will have to create a **contrib** folder inside the newly acquired **bake** folder:
 
