@@ -1505,14 +1505,6 @@ SimulationHelper::ConfigureAttributesFromFile (std::string filePath)
   SetSimulationTime (simulationConf->m_simTime);
 
   CreateSatScenario ();
-  if (simulationConf->m_activateStatistics)
-    {
-      CreateDefaultStats ();
-    }
-  if (simulationConf->m_activateProgressLogging)
-    {
-      EnableProgressLogs ();
-    }
 
   for (const std::pair<std::string, SimulationHelperConf::TrafficConfiguration_t>& trafficModel : simulationConf->m_trafficModel)
     {
@@ -1616,6 +1608,15 @@ SimulationHelper::ConfigureAttributesFromFile (std::string filePath)
                 }
             }
         }
+    }
+
+  if (simulationConf->m_activateStatistics)
+    {
+      CreateDefaultStats ();
+    }
+  if (simulationConf->m_activateProgressLogging)
+    {
+      EnableProgressLogs ();
     }
 }
 
