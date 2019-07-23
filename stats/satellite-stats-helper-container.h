@@ -257,6 +257,9 @@ public:
 
   // Capacity request statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (CapacityRequest)
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RbdcRequest)
+  void AddAverageBeamRbdcRequest (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRbdcRequest (SatStatsHelper::OutputType_t outputType);
 
   // Resources granted statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (ResourcesGranted)
@@ -282,6 +285,11 @@ public:
   void AddGlobalFwdUserLinkRxPower (SatStatsHelper::OutputType_t outputType);
   void AddGlobalRtnFeederLinkRxPower (SatStatsHelper::OutputType_t outputType);
   void AddGlobalRtnUserLinkRxPower (SatStatsHelper::OutputType_t outputType);
+
+  // Antenna Gain statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (AntennaGain)
+  void AddAverageBeamAntennaGain (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtAntennaGain (SatStatsHelper::OutputType_t outputType);
 
   /**
    * \param outputType an arbitrary output type.

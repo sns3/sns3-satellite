@@ -93,7 +93,15 @@ SatUtMac::SatUtMac ()
   m_guardTime (MicroSeconds (1)),
   m_raChannel (0),
   m_crdsaUniquePacketId (1),
-  m_crdsaOnlyForControl (false)
+  m_crdsaOnlyForControl (false),
+  m_timuInfo (0),
+  m_handoverState (NO_HANDOVER),
+  m_firstTransmittableSuperframeId (0),
+  m_handoverCallback (0),
+  m_gatewayUpdateCallback (0),
+  m_routingUpdateCallback (0),
+  m_beamCheckerCallback (0),
+  m_txCheckCallback (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -108,7 +116,15 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, bool crdsaOnlyFo
   m_guardTime (MicroSeconds (1)),
   m_raChannel (0),
   m_crdsaUniquePacketId (1),
-  m_crdsaOnlyForControl (crdsaOnlyForControl)
+  m_crdsaOnlyForControl (crdsaOnlyForControl),
+  m_timuInfo (0),
+  m_handoverState (NO_HANDOVER),
+  m_firstTransmittableSuperframeId (0),
+  m_handoverCallback (0),
+  m_gatewayUpdateCallback (0),
+  m_routingUpdateCallback (0),
+  m_beamCheckerCallback (0),
+  m_txCheckCallback (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -122,6 +138,7 @@ SatUtMac::~SatUtMac ()
 
   m_randomAccess = NULL;
   m_tbtpContainer = NULL;
+  m_timuInfo = NULL;
 }
 
 void
@@ -130,11 +147,61 @@ SatUtMac::DoDispose (void)
   NS_LOG_FUNCTION (this);
 
   m_timingAdvanceCb.Nullify ();
+  m_handoverCallback.Nullify ();
+  m_gatewayUpdateCallback.Nullify ();
+  m_routingUpdateCallback.Nullify ();
+  m_beamCheckerCallback.Nullify ();
+  m_txCheckCallback.Nullify ();
   m_tbtpContainer->DoDispose ();
   m_utScheduler->DoDispose ();
   m_utScheduler = NULL;
 
   SatMac::DoDispose ();
+}
+
+void
+SatUtMac::SetHandoverCallback (SatUtMac::HandoverCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_handoverCallback = cb;
+}
+
+void
+SatUtMac::SetGatewayUpdateCallback (SatUtMac::GatewayUpdateCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_gatewayUpdateCallback = cb;
+}
+
+void
+SatUtMac::SetRoutingUpdateCallback (SatUtMac::RoutingUpdateCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_routingUpdateCallback = cb;
+}
+
+void
+SatUtMac::SetBeamCheckerCallback (SatUtMac::BeamCheckerCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_beamCheckerCallback = cb;
+}
+
+void
+SatUtMac::SetTxCheckCallback (SatUtMac::TxCheckCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+
+  m_txCheckCallback = cb;
+}
+
+void
+SatUtMac::SetGwAddress (Mac48Address gwAddress)
+{
+  NS_LOG_FUNCTION (this << gwAddress);
+
+  m_gatewayUpdateCallback (gwAddress);
+  m_gwAddress = gwAddress;
 }
 
 void
@@ -229,6 +296,14 @@ SatUtMac::GetCurrentSuperFrameStartTime (uint8_t superFrameSeqId) const
   Time timingAdvance = m_timingAdvanceCb ();
   Time txTime = Singleton<SatRtnLinkTime>::Get ()->GetCurrentSuperFrameTxTime (superFrameSeqId, timingAdvance);
   return txTime;
+}
+
+uint32_t
+SatUtMac::GetCurrentSuperFrameId (uint8_t superFrameSeqId) const
+{
+  NS_LOG_FUNCTION (this << (uint32_t) superFrameSeqId);
+
+  return Singleton<SatRtnLinkTime>::Get ()->GetCurrentSuperFrameCount (superFrameSeqId, m_timingAdvanceCb ());
 }
 
 void
@@ -328,6 +403,13 @@ void
 SatUtMac::DoTransmit (Time duration, uint32_t carrierId, Ptr<SatWaveform> wf, Ptr<SatTimeSlotConf> tsConf, SatUtScheduler::SatCompliancePolicy_t policy)
 {
   NS_LOG_FUNCTION (this << duration.GetSeconds () << wf->GetPayloadInBytes () << carrierId << (uint32_t)(tsConf->GetRcIndex ()));
+
+  if (!m_txCheckCallback ())
+    {
+      NS_LOG_INFO ("Tx is unavailable");
+      return;
+    }
+
   NS_LOG_INFO ("DA Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () <<
                " duration: " << duration.GetSeconds () <<
                ", payload: " << wf->GetPayloadInBytes () <<
@@ -367,7 +449,7 @@ SatUtMac::DoSlottedAlohaTransmit (Time duration, Ptr<SatWaveform> waveform, uint
       NS_FATAL_ERROR ("SatUtMac::DoSlottedAlohaTransmit - Not enough capacity in Slotted ALOHA payload");
     }
 
-  m_utScheduler->DoScheduling (packets, payloadBytes, SatTimeSlotConf::SLOT_TYPE_C, rcIndex, policy);
+  ExtractPacketsToSchedule (packets, payloadBytes, SatTimeSlotConf::SLOT_TYPE_C, rcIndex, policy, true);
 
   if ( !packets.empty () )
     {
@@ -415,7 +497,7 @@ SatUtMac::FetchPackets (uint32_t payloadBytes, SatTimeSlotConf::SatTimeSlotType_
       NS_FATAL_ERROR ("SatUtMac::FetchPackets - unvalid slot payload: " << payloadBytes);
     }
 
-  m_utScheduler->DoScheduling (packets, payloadBytes, type, rcIndex, policy);
+  ExtractPacketsToSchedule (packets, payloadBytes, type, rcIndex, policy, false);
 
   // A valid packet received
   if ( !packets.empty () )
@@ -592,6 +674,11 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
             NS_FATAL_ERROR ("TBTP not found, check SatBeamHelper::CtrlMsgStoreTimeInFwdLink attribute is long enough!");
           }
 
+        if (m_handoverState == WAITING_FOR_TBTP)
+          {
+            m_handoverState = NO_HANDOVER;
+            m_firstTransmittableSuperframeId = tbtp->GetSuperframeCounter ();
+          }
         ScheduleTimeSlots (tbtp);
 
         packet->RemovePacketTag (macTag);
@@ -641,9 +728,34 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
 
         break;
       }
-    case SatControlMsgTag::SAT_CR_CTRL_MSG:
+    case SatControlMsgTag::SAT_TIMU_CTRL_MSG:
       {
-        NS_FATAL_ERROR ("SatUtMac received a non-supported control packet!");
+        uint32_t timuCtrlId = ctrlTag.GetMsgId ();
+        Ptr<SatTimuMessage> timuMsg = DynamicCast<SatTimuMessage> (m_readCtrlCallback (timuCtrlId));
+
+        if (timuMsg != NULL)
+          {
+            uint32_t beamId = timuMsg->GetAllocatedBeamId ();
+            NS_LOG_INFO ("UT: " << m_nodeInfo->GetMacAddress () <<
+                         " switching from beam " << m_beamId << " to beam " << beamId);
+            if (m_beamId != beamId)
+              {
+                NS_LOG_INFO ("Storing TIM-U information internally for later");
+                m_timuInfo = Create<SatTimuInfo> (beamId, timuMsg->GetGwAddress ());
+              }
+          }
+        else
+          {
+            /**
+             * Control message NOT found in container anymore! This means, that the
+             * SatBeamHelper::CtrlMsgStoreTimeInFwdLink attribute may be set to too short value
+             * or there are something wrong in the FWD link RRM.
+             */
+            std::stringstream msg;
+            msg << "Control message " << ctrlTag.GetMsgType () << " is not found from the FWD link control msg container!";
+            msg << " at: " << Now ().GetSeconds () << "s";
+            Singleton<SatLog>::Get ()->AddToLog (SatLog::LOG_WARNING, "", msg.str ());
+          }
         break;
       }
     default:
@@ -727,7 +839,7 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
           NS_FATAL_ERROR ("SatUtMac::ScheduleSlottedAlohaTransmission - Invalid SF start time");
         }
 
-      uint32_t superFrameId = Singleton<SatRtnLinkTime>::Get ()->GetCurrentSuperFrameCount (0, m_timingAdvanceCb ());
+      uint32_t superFrameId = GetCurrentSuperFrameId (SatConstVariables::SUPERFRAME_SEQUENCE);
 
       NS_LOG_INFO ("Searching for next available slot");
 
@@ -854,8 +966,17 @@ SatUtMac::ScheduleCrdsaTransmission (uint32_t allocationChannel, SatRandomAccess
 {
   NS_LOG_FUNCTION (this << allocationChannel);
 
-  /// get current superframe ID
-  uint32_t superFrameId = Singleton<SatRtnLinkTime>::Get ()->GetCurrentSuperFrameCount (SatConstVariables::SUPERFRAME_SEQUENCE, m_timingAdvanceCb ());
+  // get current superframe ID
+  Time now = Simulator::Now ();
+  Time superFrameStart = GetCurrentSuperFrameStartTime (SatConstVariables::SUPERFRAME_SEQUENCE);
+  uint32_t superFrameId = GetCurrentSuperFrameId (SatConstVariables::SUPERFRAME_SEQUENCE);
+  NS_LOG_INFO ("Checking for CRDSA transmission at " <<
+               now.GetMilliSeconds () - superFrameStart.GetMilliSeconds () <<
+               " milliseconds into superframe " << superFrameId);
+
+  // TODO: check we didn't already scheduled packets for this superframe
+  // (because we are moving so fast, for instance, that we are now at the end of the
+  // window for this "past" superframe instead of the beginning of the next one)
 
   NS_LOG_INFO ("UT: " << m_nodeInfo->GetMacAddress () <<
                " AC: " << allocationChannel <<
@@ -873,11 +994,11 @@ SatUtMac::ScheduleCrdsaTransmission (uint32_t allocationChannel, SatRandomAccess
       for (iterSet = iter->second.begin (); iterSet != iter->second.end (); iterSet++)
         {
           /// check and update used slots
-          if (!UpdateUsedRandomAccessSlots (superFrameId, allocationChannel, (*iterSet)))
+          if (!UpdateUsedRandomAccessSlots (superFrameId, allocationChannel, *iterSet))
             {
               /// TODO this needs to be handled when multiple allocation channels are implemented
               /// In that case a slot exclusion list should be used when randomizing the Tx slots
-              NS_FATAL_ERROR ("SatUtMac::ScheduleCrdsaTransmission - Slot unavailable");
+              NS_FATAL_ERROR ("SatUtMac::ScheduleCrdsaTransmission - Slot unavailable: " << *iterSet);
             }
         }
 
@@ -927,7 +1048,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
 
   /// get the next packet
   SatPhy::PacketContainer_t uniq;
-  m_utScheduler->DoScheduling (uniq, payloadBytes, SatTimeSlotConf::SLOT_TYPE_TRC, uint8_t (SatEnums::CONTROL_FID), policy);
+  ExtractPacketsToSchedule (uniq, payloadBytes, SatTimeSlotConf::SLOT_TYPE_TRC, uint8_t (SatEnums::CONTROL_FID), policy, true);
 
   NS_LOG_INFO ("Processing the packet container, fragments: " << uniq.size ());
 
@@ -1056,17 +1177,18 @@ SatUtMac::UpdateUsedRandomAccessSlots (uint32_t superFrameId, uint32_t allocatio
 
   if (iter == m_usedRandomAccessSlots.end ())
     {
-      std::set<uint32_t> txOpportunities;
+      std::set<uint32_t> txOpportunities {{slotId}};
       std::pair <std::map < std::pair <uint32_t, uint32_t>, std::set<uint32_t> >::iterator, bool> result;
-
-      txOpportunities.insert (slotId);
-
       result = m_usedRandomAccessSlots.insert (std::make_pair (key, txOpportunities));
 
       if (result.second)
         {
           isSlotFree = true;
           NS_LOG_INFO ("No saved SF, slot " << slotId << " saved in SF " << superFrameId);
+        }
+      else
+        {
+          NS_LOG_WARN ("No saved SF but unable to create one");
         }
     }
   else
@@ -1079,6 +1201,10 @@ SatUtMac::UpdateUsedRandomAccessSlots (uint32_t superFrameId, uint32_t allocatio
           isSlotFree = true;
           NS_LOG_INFO ("Saved SF exist, slot " << slotId << " saved in SF " << superFrameId);
         }
+      else
+        {
+          NS_LOG_WARN ("Saved SF exist but unable to add slot " << slotId);
+        }
     }
   return isSlotFree;
 }
@@ -1090,23 +1216,19 @@ SatUtMac::RemovePastRandomAccessSlots (uint32_t superFrameId)
 
   NS_LOG_INFO ("UT: " << m_nodeInfo->GetMacAddress () << " SF: " << superFrameId);
 
-  //PrintUsedRandomAccessSlots ();
-
   std::map < std::pair <uint32_t, uint32_t>, std::set<uint32_t> >::iterator iter;
 
   for (iter = m_usedRandomAccessSlots.begin (); iter != m_usedRandomAccessSlots.end (); )
     {
       if (iter->first.first < superFrameId)
         {
-          m_usedRandomAccessSlots.erase (iter++);
+          iter = m_usedRandomAccessSlots.erase (iter);
         }
       else
         {
           ++iter;
         }
     }
-
-  //PrintUsedRandomAccessSlots ();
 }
 
 void
@@ -1115,16 +1237,13 @@ SatUtMac::PrintUsedRandomAccessSlots ()
   NS_LOG_FUNCTION (this);
 
   NS_LOG_INFO ("UT: " << m_nodeInfo->GetMacAddress ());
+  std::cout << "UT: " << m_nodeInfo->GetMacAddress () << std::endl;
 
-  std::map < std::pair <uint32_t, uint32_t>, std::set<uint32_t> >::iterator iter;
-
-  for (iter = m_usedRandomAccessSlots.begin (); iter != m_usedRandomAccessSlots.end (); iter++)
+  for (auto& iter : m_usedRandomAccessSlots)
     {
-      std::set<uint32_t>::iterator iterSet;
-
-      for (iterSet = iter->second.begin (); iterSet != iter->second.end (); iterSet++)
+      for (auto& slot : iter.second)
         {
-          std::cout << "SF: " << iter->first.first << " AC: " << iter->first.second << " slot: " << *iterSet << std::endl;
+          std::cout << "SF: " << iter.first.first << " AC: " << iter.first.second << " slot: " << slot << std::endl;
         }
     }
 }
@@ -1136,25 +1255,121 @@ SatUtMac::DoFrameStart ()
 
   NS_LOG_INFO ("UT: " << m_nodeInfo->GetMacAddress ());
 
-  if (m_randomAccess != NULL)
+  if (m_timuInfo != NULL)
     {
-      /// reset packet ID counter for this frame
-      m_crdsaUniquePacketId = 1;
+      NS_LOG_INFO ("Applying TIM-U parameters received during the previous frame");
 
-      /// execute CRDSA trigger
-      DoRandomAccess (SatEnums::RA_TRIGGER_TYPE_CRDSA);
+      m_beamId = m_timuInfo->GetBeamId ();
+      Address gwAddress = m_timuInfo->GetGwAddress ();
+      Mac48Address gwAddress48 = Mac48Address::ConvertFrom (gwAddress);
+      if (gwAddress48 != m_gwAddress)
+        {
+          SetGwAddress (gwAddress48);
+          m_routingUpdateCallback (m_nodeInfo->GetMacAddress (), gwAddress);
+        }
+      m_handoverCallback (m_beamId);
+
+      m_tbtpContainer->Clear ();
+      m_handoverState = WAITING_FOR_TBTP;
+      m_timuInfo = NULL;
+    }
+  else if (m_txCheckCallback ())
+    {
+      NS_LOG_INFO ("Tx is permitted");
+
+      if (!m_beamCheckerCallback.IsNull ())
+        {
+          NS_LOG_INFO ("UT checking for beam handover recommendation");
+          if (m_beamCheckerCallback (m_beamId) && m_handoverState == NO_HANDOVER)
+            {
+              m_handoverState = HANDOVER_RECOMMENDATION_SENT;
+            }
+        }
+
+      if (m_randomAccess != NULL)
+        {
+          // reset packet ID counter for this frame
+          m_crdsaUniquePacketId = 1;
+
+          // execute CRDSA trigger
+          DoRandomAccess (SatEnums::RA_TRIGGER_TYPE_CRDSA);
+        }
+    }
+  else
+    {
+      NS_LOG_INFO ("Tx is disabled");
     }
 
   Time nextSuperFrameTxTime = GetNextSuperFrameTxTime (SatConstVariables::SUPERFRAME_SEQUENCE);
-
-  if (Now () >= nextSuperFrameTxTime)
-    {
-      NS_FATAL_ERROR ("Scheduling next superframe start time to the past!");
-    }
+  NS_ASSERT_MSG (Now () < nextSuperFrameTxTime, "Scheduling next superframe start time to the past!");
 
   Time schedulingDelay = nextSuperFrameTxTime - Now ();
-
   Simulator::Schedule (schedulingDelay, &SatUtMac::DoFrameStart, this);
+}
+
+
+SatUtMac::SatTimuInfo::SatTimuInfo (uint32_t beamId, Address address)
+  : m_beamId (beamId),
+  m_gwAddress (address)
+{
+  NS_LOG_FUNCTION (this << beamId << address);
+}
+
+
+uint32_t
+SatUtMac::SatTimuInfo::GetBeamId () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_beamId;
+}
+
+
+Address
+SatUtMac::SatTimuInfo::GetGwAddress () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_gwAddress;
+}
+
+
+void
+SatUtMac::ExtractPacketsToSchedule (SatPhy::PacketContainer_t& packets,
+                                    uint32_t payloadBytes,
+                                    SatTimeSlotConf::SatTimeSlotType_t type,
+                                    uint8_t rcIndex,
+                                    SatUtScheduler::SatCompliancePolicy_t policy,
+                                    bool randomAccessChannel)
+{
+  NS_LOG_INFO (this << payloadBytes << type << rcIndex << policy << randomAccessChannel);
+
+  uint32_t superFrameId = GetCurrentSuperFrameId (SatConstVariables::SUPERFRAME_SEQUENCE);
+  if ((m_handoverState == NO_HANDOVER && (randomAccessChannel || m_firstTransmittableSuperframeId <= superFrameId)) || (randomAccessChannel && m_handoverState != HANDOVER_RECOMMENDATION_SENT))
+    {
+      NS_LOG_INFO ("Regular scheduling");
+      m_utScheduler->DoScheduling (packets, payloadBytes, type, rcIndex, policy);
+    }
+  else
+    {
+      NS_LOG_INFO ("Handover recommendation sent, force control packets only");
+      m_utScheduler->DoScheduling (packets, payloadBytes, SatTimeSlotConf::SLOT_TYPE_C, SatEnums::CONTROL_FID, SatUtScheduler::STRICT);
+
+      // Remove every control packets except handover requests
+      SatPhy::PacketContainer_t::iterator it = packets.begin ();
+      while (it != packets.end ())
+        {
+          SatControlMsgTag ctrlTag;
+          bool success = (*it)->PeekPacketTag (ctrlTag);
+
+          if (success && ctrlTag.GetMsgType () == SatControlMsgTag::SAT_HR_CTRL_MSG)
+            {
+              ++it;
+            }
+          else
+            {
+              it = packets.erase (it);
+            }
+        }
+    }
 }
 
 

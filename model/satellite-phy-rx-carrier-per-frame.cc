@@ -570,7 +570,7 @@ SatPhyRxCarrierPerFrame::ProcessReceivedCrdsaPacket (SatPhyRxCarrierPerFrame::cr
 
   /*
    * Update link specific SINR trace for the RETURN_FEEDER link. The RETURN_USER
-   * link SINR is already updated at the SatPhyRxCarrier::EndRxDataTransparent ()
+   * link SINR is already updated at the SatPhyRxCarrierUplink::EndRxData ()
    * method!
    */
   m_linkSinrTrace (SatUtils::LinearToDb (sinr));

@@ -105,6 +105,8 @@ public:
    */
   void Add (Time startTime, Ptr<SatTbtpMessage> tbtp);
 
+  void Clear ();
+
   /**
    * \brief Method of checking whether the UT has been scheduled time
    * slots into the future.

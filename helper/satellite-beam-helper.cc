@@ -20,34 +20,32 @@
  * Author: Mathias Ettinger <mettinger@viveris.toulouse.fr>
  */
 
-#include "ns3/log.h"
-#include "ns3/string.h"
-#include "ns3/ipv4-static-routing-helper.h"
-#include "ns3/internet-stack-helper.h"
-#include "ns3/ipv4-interface.h"
-#include "ns3/mobility-helper.h"
-#include "ns3/enum.h"
-#include "ns3/pointer.h"
-#include "ns3/config.h"
-#include "../model/satellite-const-variables.h"
-#include "../model/satellite-channel.h"
-#include "../model/satellite-phy.h"
-#include "../model/satellite-phy-tx.h"
-#include "../model/satellite-phy-rx.h"
-#include "../model/satellite-arp-cache.h"
-#include "../model/satellite-mobility-model.h"
-#include "../model/satellite-propagation-delay-model.h"
-#include "../model/satellite-antenna-gain-pattern-container.h"
-#include "../model/satellite-packet-trace.h"
-#include "../model/satellite-utils.h"
-#include "../model/satellite-enums.h"
-#include "../model/satellite-typedefs.h"
-#include "satellite-beam-helper.h"
-#include "ns3/satellite-fading-input-trace-container.h"
-#include "ns3/satellite-fading-input-trace.h"
-#include "ns3/singleton.h"
-#include "ns3/satellite-id-mapper.h"
+#include <ns3/log.h>
+#include <ns3/string.h>
+#include <ns3/ipv4-static-routing-helper.h>
+#include <ns3/mobility-helper.h>
+#include <ns3/enum.h>
+#include <ns3/pointer.h>
+#include <ns3/config.h>
+#include <ns3/singleton.h>
+#include <ns3/satellite-const-variables.h>
+#include <ns3/satellite-channel.h>
+#include <ns3/satellite-phy.h>
+#include <ns3/satellite-phy-tx.h>
+#include <ns3/satellite-phy-rx.h>
+#include <ns3/satellite-arp-cache.h>
+#include <ns3/satellite-mobility-model.h>
+#include <ns3/satellite-propagation-delay-model.h>
+#include <ns3/satellite-antenna-gain-pattern-container.h>
+#include <ns3/satellite-packet-trace.h>
+#include <ns3/satellite-utils.h>
+#include <ns3/satellite-enums.h>
 #include <ns3/satellite-typedefs.h>
+#include <ns3/satellite-fading-input-trace-container.h>
+#include <ns3/satellite-fading-input-trace.h>
+#include <ns3/satellite-id-mapper.h>
+#include <ns3/satellite-typedefs.h>
+#include "satellite-beam-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatBeamHelper");
 
@@ -193,6 +191,10 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
 
   m_channelFactory.SetTypeId ("ns3::SatChannel");
 
+  // create SatChannel containers
+  m_ulChannels = Create <SatChannelPair> ();
+  m_flChannels = Create <SatChannelPair> ();
+
   // create link specific control message containers
   Ptr<SatControlMsgContainer> rtnCtrlMsgContainer = Create <SatControlMsgContainer> (m_ctrlMsgStoreTimeRtnLink, true);
   Ptr<SatControlMsgContainer> fwdCtrlMsgContainer = Create <SatControlMsgContainer> (m_ctrlMsgStoreTimeFwdLink, false);
@@ -311,14 +313,15 @@ SatBeamHelper::DoDispose ()
 
   m_beam.clear ();
   m_gwNode.clear ();
-  m_ulChannels.clear ();
-  m_flChannels.clear ();
+  m_ulChannels = NULL;
+  m_flChannels = NULL;
   m_beamFreqs.clear ();
   m_markovConf = NULL;
   m_ncc = NULL;
   m_geoHelper = NULL;
   m_gwHelper = NULL;
   m_utHelper = NULL;
+  m_antennaGainPatterns = NULL;
 }
 
 void
@@ -343,15 +346,18 @@ SatBeamHelper::SetChannelAttribute (std::string n1, const AttributeValue &v1)
   m_channelFactory.Set (n1, v1);
 }
 
-void SatBeamHelper::SetBaseAddress (const Ipv4Address& network, const Ipv4Mask& mask, const Ipv4Address address)
+void
+SatBeamHelper::SetNccRoutingCallback (SatNcc::UpdateRoutingCallback cb)
 {
-  NS_LOG_FUNCTION (this << network << mask << address);
+  NS_LOG_FUNCTION (this << &cb);
 
-  m_ipv4Helper.SetBase (network, mask, address);
+  m_ncc->SetUpdateRoutingCallback (cb);
 }
 
-Ptr<Node>
-SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint32_t beamId, uint32_t ulFreqId, uint32_t flFreqId)
+std::pair<Ptr<NetDevice>, NetDeviceContainer>
+SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode,
+                        uint32_t gwId, uint32_t beamId, uint32_t ulFreqId, uint32_t flFreqId,
+                        SatUtMac::RoutingUpdateCallback routingCallback)
 {
   NS_LOG_FUNCTION (this << gwNode << gwId << beamId << ulFreqId << flFreqId);
 
@@ -368,10 +374,10 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
   m_beamFreqs.insert (std::pair<uint32_t, FrequencyPair_t > (beamId, freqPair));
 
   // next it is found user link channels and if not found channels are created and saved to map
-  ChannelPair_t userLink = GetChannelPair (m_ulChannels, ulFreqId, true);
+  SatChannelPair::ChannelPair_t userLink = GetChannelPair (m_ulChannels, beamId, ulFreqId, true);
 
   // next it is found feeder link channels and if not found channels are created nd saved to map
-  ChannelPair_t feederLink = GetChannelPair (m_flChannels, flFreqId, false);
+  SatChannelPair::ChannelPair_t feederLink = GetChannelPair (m_flChannels, beamId, flFreqId, false);
 
   // Set trace files if options ask for it
   if (m_enableTracesOnReturnLink)
@@ -439,8 +445,6 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
                                              feederLink.second,
                                              m_ncc);
 
-  Ipv4InterfaceContainer gwAddress = m_ipv4Helper.Assign (gwNd);
-
   // calculate maximum size of the BB frame with the most robust MODCOD
   Ptr<SatBbFrameConf> bbFrameConf = m_gwHelper->GetBbFrameConf ();
 
@@ -453,7 +457,12 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
 
   uint32_t maxBbFrameDataSizeInBytes = ( bbFrameConf->GetBbFramePayloadBits (bbFrameConf->GetMostRobustModcod (frameType), frameType) / SatConstVariables::BITS_PER_BYTE ) - bbFrameConf->GetBbFrameHeaderSizeInBytes ();
 
-  m_ncc->AddBeam (beamId, MakeCallback (&SatNetDevice::SendControlMsg, DynamicCast<SatNetDevice> (gwNd)), m_superframeSeq, maxBbFrameDataSizeInBytes );
+
+  m_ncc->AddBeam (beamId,
+                  MakeCallback (&SatNetDevice::SendControlMsg, DynamicCast<SatNetDevice> (gwNd)),
+                  m_superframeSeq,
+                  maxBbFrameDataSizeInBytes,
+                  gwNd->GetAddress ());
 
   // install UTs
   NetDeviceContainer utNd = m_utHelper->Install (ut,
@@ -461,16 +470,11 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode, uint32_t gwId, uint3
                                                  userLink.first,
                                                  userLink.second,
                                                  DynamicCast<SatNetDevice> (gwNd),
-                                                 m_ncc);
+                                                 m_ncc,
+                                                 MakeCallback (&SatChannelPair::GetChannelPair, m_ulChannels),
+                                                 routingCallback);
 
-  Ipv4InterfaceContainer utAddress = m_ipv4Helper.Assign (utNd);
-
-  // set needed routings and fill ARP cache
-  PopulateRoutings (ut, utNd, gwNode, gwNd, gwAddress.GetAddress (0), utAddress );
-
-  m_ipv4Helper.NewNetwork ();
-
-  return gwNode;
+  return std::make_pair (gwNd, utNd);
 }
 
 uint32_t
@@ -956,15 +960,16 @@ SatBeamHelper::CreateBeamInfo () const
   return oss.str ();
 }
 
-SatBeamHelper::ChannelPair_t
-SatBeamHelper::GetChannelPair (std::map<uint32_t, ChannelPair_t > & chPairMap, uint32_t frequencyId, bool isUserLink)
+SatChannelPair::ChannelPair_t
+SatBeamHelper::GetChannelPair (Ptr<SatChannelPair> chPairs, uint32_t beamId, uint32_t frequencyId, bool isUserLink)
 {
-  NS_LOG_FUNCTION (this << frequencyId << isUserLink);
+  NS_LOG_FUNCTION (this << chPairs << beamId << frequencyId << isUserLink);
 
-  ChannelPair_t channelPair;
-  std::map<uint32_t, ChannelPair_t >::iterator mapIterator = chPairMap.find (frequencyId);
-
-  if ( mapIterator == chPairMap.end ())
+  if (chPairs->HasChannelPair (frequencyId))
+    {
+      chPairs->UpdateBeamsForFrequency (beamId, frequencyId);
+    }
+  else
     {
       Ptr<SatChannel> forwardCh = m_channelFactory.Create<SatChannel> ();
       Ptr<SatChannel> returnCh = m_channelFactory.Create<SatChannel> ();
@@ -1013,17 +1018,11 @@ SatBeamHelper::GetChannelPair (std::map<uint32_t, ChannelPair_t > & chPairMap, u
       forwardCh->SetFreeSpaceLoss (pFsl);
       returnCh->SetFreeSpaceLoss (pFsl);
 
-      channelPair.first = forwardCh;
-      channelPair.second = returnCh;
-
-      chPairMap.insert (std::pair<uint32_t, ChannelPair_t > (frequencyId, channelPair));
-    }
-  else
-    {
-      channelPair = mapIterator->second;
+      SatChannelPair::ChannelPair_t channelPair = std::make_pair (forwardCh, returnCh);
+      chPairs->StoreChannelPair (beamId, frequencyId, channelPair);
     }
 
-  return channelPair;
+  return chPairs->GetChannelPair (beamId);
 }
 
 bool
@@ -1049,77 +1048,6 @@ SatBeamHelper::StoreGwNode (uint32_t id, Ptr<Node> node)
     }
 
   return storingSuccess;
-}
-
-void
-SatBeamHelper::PopulateRoutings (NodeContainer ut, NetDeviceContainer utNd, Ptr<Node> gw, Ptr<NetDevice> gwNd, Ipv4Address gwAddr, Ipv4InterfaceContainer utIfs)
-{
-  NS_LOG_FUNCTION (this << gw << gwNd << gwAddr);
-
-  Ipv4StaticRoutingHelper ipv4RoutingHelper;
-  Ptr<Ipv4L3Protocol> ipv4Gw = gw->GetObject<Ipv4L3Protocol> ();
-  Ptr<Ipv4StaticRouting> srGw = ipv4RoutingHelper.GetStaticRouting (ipv4Gw);
-
-  // Create an ARP entry of the default GW for the UTs in this beam
-  Address macAddressGw = gwNd->GetAddress ();
-  Ptr<SatArpCache> utArpCache = CreateObject<SatArpCache> ();
-  utArpCache->Add (gwAddr, macAddressGw);
-  NS_LOG_INFO ("UT ARP entry:  " << gwAddr << " - " << macAddressGw );
-
-  // Add the ARP entries of all the UTs in this beam
-  // - MAC address vs. IPv4 address
-  Ptr<SatArpCache> gwArpCache = CreateObject<SatArpCache> ();
-  for (uint32_t i = 0; i < utIfs.GetN (); ++i)
-    {
-      NS_ASSERT (utIfs.GetN () == utNd.GetN ());
-      Ptr<NetDevice> nd = utNd.Get (i);
-      Ipv4Address ipv4Addr = utIfs.GetAddress (i);
-      gwArpCache->Add (ipv4Addr, nd->GetAddress ());
-      NS_LOG_INFO ("GW ARP entry:  " << ipv4Addr << " - " << nd->GetAddress ());
-    }
-
-  // Set the ARP cache to the proper GW IPv4Interface (the one for satellite
-  // link). ARP cache contains the entries for all UTs within this spot-beam.
-  ipv4Gw->GetInterface (gwNd->GetIfIndex ())->SetArpCache (gwArpCache);
-  NS_LOG_INFO ("Add ARP cache to GW " << gw->GetId () );
-
-  uint32_t utAddressIndex = 0;
-
-  for (NodeContainer::Iterator i = ut.Begin (); i != ut.End (); i++)
-    {
-      Ptr<Ipv4L3Protocol> ipv4Ut = (*i)->GetObject<Ipv4L3Protocol> ();
-
-      uint32_t count = ipv4Ut->GetNInterfaces ();
-
-      for (uint32_t j = 1; j < count; j++)
-        {
-          std::string devName = ipv4Ut->GetNetDevice (j)->GetInstanceTypeId ().GetName ();
-
-          // If SatNetDevice interface, add default route to towards GW of the beam on UTs
-          if ( devName == "ns3::SatNetDevice" )
-            {
-              Ptr<Ipv4StaticRouting> srUt = ipv4RoutingHelper.GetStaticRouting (ipv4Ut);
-              srUt->SetDefaultRoute (gwAddr, j);
-              NS_LOG_INFO ("UT default route: " << gwAddr);
-
-              // Set the ARP cache (including the ARP entry for the default GW) to the UT
-              ipv4Ut->GetInterface (j)->SetArpCache (utArpCache);
-              NS_LOG_INFO ("Add the ARP cache to UT " << (*i)->GetId () );
-
-            }
-          else  // add other interface route to GW's Satellite interface
-            {
-              Ipv4Address address = ipv4Ut->GetAddress (j, 0).GetLocal ();
-              Ipv4Mask mask = ipv4Ut->GetAddress (j, 0).GetMask ();
-
-              srGw->AddNetworkRouteTo (address.CombineMask (mask), mask, utIfs.GetAddress (utAddressIndex), gwNd->GetIfIndex ());
-              NS_LOG_INFO ("GW Network route:  " << address.CombineMask (mask) <<
-                           ", " << mask << ", " << utIfs.GetAddress (utAddressIndex));
-            }
-        }
-
-      utAddressIndex++;
-    }
 }
 
 Ptr<SatBaseFading>
@@ -1215,6 +1143,42 @@ SatBeamHelper::AddMulticastRouteToUt (Ptr<Node> utNode, Ipv4Address sourceAddres
     {
       NS_FATAL_ERROR ("Input of output device not found in UT node!!!");
     }
+}
+
+
+Ptr<PropagationDelayModel>
+SatBeamHelper::GetPropagationDelayModel (uint32_t beamId, SatEnums::ChannelType_t channelType)
+{
+  Ptr<SatChannel> channel = NULL;
+  switch (channelType)
+    {
+    case SatEnums::FORWARD_FEEDER_CH:
+      {
+        channel = m_flChannels->GetChannelPair (beamId).first;
+        break;
+      }
+    case SatEnums::FORWARD_USER_CH:
+      {
+        channel = m_ulChannels->GetChannelPair (beamId).first;
+        break;
+      }
+    case SatEnums::RETURN_USER_CH:
+      {
+        channel = m_ulChannels->GetChannelPair (beamId).second;
+        break;
+      }
+    case SatEnums::RETURN_FEEDER_CH:
+      {
+        channel = m_flChannels->GetChannelPair (beamId).second;
+        break;
+      }
+    default:
+      {
+        return NULL;
+      }
+    }
+
+  return channel->GetPropagationDelayModel ();
 }
 
 

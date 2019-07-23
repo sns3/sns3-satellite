@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2014 Magister Solutions Ltd
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.com>
  */
 
 #ifndef SAT_BEAM_SCHEDULER_H
@@ -36,9 +38,11 @@
 namespace ns3 {
 
 class Address;
+class Ipv4Address;
 class SatControlMessage;
 class SatCrMessage;
 class SatTbtpMessage;
+class SatTimuMessage;
 class SatSuperframeSeq;
 class SatSuperframeAllocator;
 class SatLowerLayerServiceConf;
@@ -66,6 +70,16 @@ class SatDamaEntry;
 class SatBeamScheduler : public Object
 {
 public:
+  /**
+   * \enum HandoverInformationForward_t
+   * \brief Strategies to exchange informations between beams
+   */
+  typedef enum
+  {
+    BASIC,
+    CHECK_GATEWAY
+  } HandoverInformationForward_t;
+
   /**
    * \brief Get the type ID
    * \return the object TypeId
@@ -106,8 +120,9 @@ public:
    *        be forwarded to the Beam UTs.
    * \param seq Superframe sequence.
    * \param maxFrameSizeInBytes Maximum non fragmented BB frame size with most robust ModCod
+   * \param gwAddress Mac address of the gateway responsible for this beam
    */
-  void Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCallback cb, Ptr<SatSuperframeSeq> seq, uint32_t maxFrameSizeInBytes);
+  void Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCallback cb, Ptr<SatSuperframeSeq> seq, uint32_t maxFrameSizeInBytes, Address gwAddress);
 
   /**
    * Add UT to scheduler.
@@ -117,6 +132,14 @@ public:
    * \return Index of the RA channel allocated to added UT
    */
   uint32_t AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf);
+
+  /**
+   * Check whether an UT is handled by this scheduler
+   *
+   * \param utId ID (mac address) of the UT to be searched for
+   * \return Whether or not this UT is in this beam
+   */
+  bool HasUt (Address utId);
 
   /**
    * Update UT C/N0 info with the latest value.
@@ -141,6 +164,15 @@ public:
    * \return true if sending is success, false otherwise.
    */
   bool Send (Ptr<SatControlMessage> message);
+
+  /**
+   * Send control message to an UT into the beam.
+   *
+   * \param message Pointer of control message to send.
+   * \param utId Address of the UT to the the message to.
+   * \return true if sending is success, false otherwise.
+   */
+  bool SendTo (Ptr<SatControlMessage> message, Address utId);
 
   /**
    * Callback signature for `BacklogRequestsTrace` trace source.
@@ -183,6 +215,27 @@ public:
    *                          requested, in kbps.
    */
   typedef void (*ExceedingCapacityTraceCallback)(uint32_t exceedingCapacity);
+
+  /**
+   * \brief Create a TIM unicast message containing enough data for a
+   * terminal to connect to the beam handled by this SatBeamScheduler
+   */
+  Ptr<SatTimuMessage> CreateTimu () const;
+
+  /**
+   * \brief Transfer ownership of a terminal to the given SatBeamScheduler
+   * \param utId the terminal that is leaving this beam
+   * \param destination the beam that should accept the terminal
+   */
+  void TransferUtToBeam (Address utId, Ptr<SatBeamScheduler> destination);
+
+  /**
+   * \brief Return the address of the gateway responsible of this beam
+   */
+  inline Address GetGwAddress (void) const
+  {
+    return m_gwAddress;
+  }
 
 private:
   /**
@@ -236,6 +289,12 @@ public:
      * \param crMsg
      */
     void AddCrMsg (Ptr<SatCrMessage> crMsg);
+
+    /**
+     * Remove all CR messages from UT info to reset capacity requests in
+     * case of handover.
+     */
+    void ClearCrMsgs ();
 
     /**
      * Check if time is expired to send control slot.
@@ -496,11 +555,18 @@ private:
    */
   void AddRaChannels (std::vector <Ptr<SatTbtpMessage> >& tbtpContainer);
 
+  void AddUtInfo (Address utId, Ptr<SatUtInfo> utInfo);
+  void RemoveUtInfo (UtInfoMap_t::iterator iterator);
+
   /**
    * Create estimator for the UT according to set attributes.
    * \return pointer to created estimator
    */
   Ptr<SatCnoEstimator> CreateCnoEstimator ();
+
+  Address m_gwAddress;
+
+  HandoverInformationForward_t m_handoverStrategy;
 };
 
 } // namespace ns3

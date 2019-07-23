@@ -47,8 +47,8 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatPhy);
 
 SatPhy::SatPhy (void)
-  : m_eirpWoGainW (0),
-  m_beamId (0),
+  : m_beamId (0),
+  m_eirpWoGainW (0),
   m_isStatisticsTagsEnabled (false),
   m_rxNoiseTemperatureDbk (0),
   m_rxMaxAntennaGainDb (0),
@@ -66,8 +66,8 @@ SatPhy::SatPhy (void)
 }
 
 SatPhy::SatPhy (CreateParam_t & params)
-  : m_eirpWoGainW (0),
-  m_beamId (0),
+  : m_beamId (0),
+  m_eirpWoGainW (0),
   m_isStatisticsTagsEnabled (false),
   m_rxNoiseTemperatureDbk (0),
   m_rxMaxAntennaGainDb (0),
@@ -292,7 +292,7 @@ void
 SatPhy::SendPdu (PacketContainer_t p, uint32_t carrierId, Time duration, SatSignalParameters::txInfo_s txInfo)
 {
   NS_LOG_FUNCTION (this << carrierId << duration);
-  NS_LOG_INFO (this << " sending a packet with carrierId: " << carrierId << " duration: " << duration);
+  NS_LOG_INFO ("Sending a packet with carrierId: " << carrierId << " duration: " << duration);
 
   // Add a SatPhyTimeTag tag for packet delay computation at the receiver end.
   if (m_isStatisticsTagsEnabled)
@@ -445,6 +445,15 @@ SatPhy::AverageNormalizedOfferedRandomAccessLoadInfo (uint32_t beamId, uint32_t 
 {
   NS_LOG_FUNCTION (this << beamId << carrierId << allocationChannelId << averageNormalizedOfferedLoad);
   m_avgNormalizedOfferedLoadCallback (beamId, carrierId, allocationChannelId, averageNormalizedOfferedLoad);
+}
+
+
+void
+SatPhy::SetChannelPairGetterCallback (SatPhy::ChannelPairGetterCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+
+  m_retrieveChannelPair = cb;
 }
 
 

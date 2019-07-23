@@ -51,6 +51,11 @@ SatNcc::GetTypeId (void)
                      "Trace source indicating a TBTP has sent by NCC",
                      MakeTraceSourceAccessor (&SatNcc::m_nccTxTrace),
                      "ns3::Packet::TracedCallback")
+    .AddAttribute ("HandoverDelay",
+                   "Delay between handover acceptance and effective information transfer",
+                   TimeValue (Seconds (0.0)),
+                   MakeTimeAccessor (&SatNcc::m_utHandoverDelay),
+                   MakeTimeChecker ())
   ;
   return tid;
 }
@@ -64,6 +69,7 @@ SatNcc::GetInstanceTypeId (void) const
 }
 
 SatNcc::SatNcc ()
+  : m_utHandoverDelay (Seconds (0.0))
 {
   NS_LOG_FUNCTION (this);
 }
@@ -78,6 +84,7 @@ SatNcc::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
 
+  m_updateRoutingCallback.Nullify ();
   m_isLowRandomAccessLoad.clear ();
 
   Object::DoDispose ();
@@ -242,7 +249,7 @@ SatNcc::UtCrReceived (uint32_t beamId, Address utId, Ptr<SatCrMessage> crMsg)
 }
 
 void
-SatNcc::AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq> seq, uint32_t maxFrameSize)
+SatNcc::AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq> seq, uint32_t maxFrameSize, Address gwAddress)
 {
   NS_LOG_FUNCTION (this << &cb);
 
@@ -255,7 +262,7 @@ SatNcc::AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq>
     }
 
   scheduler = CreateObject<SatBeamScheduler> ();
-  scheduler->Initialize (beamId, cb, seq, maxFrameSize );
+  scheduler->Initialize (beamId, cb, seq, maxFrameSize, gwAddress);
 
   m_beamSchedulers.insert (std::make_pair (beamId, scheduler));
 }
@@ -323,6 +330,8 @@ SatNcc::SetRandomAccessAverageNormalizedOfferedLoadThreshold (uint8_t allocation
 Ptr<SatBeamScheduler>
 SatNcc::GetBeamScheduler (uint32_t beamId) const
 {
+  NS_LOG_FUNCTION (this << beamId);
+
   std::map<uint32_t, Ptr<SatBeamScheduler> >::const_iterator it = m_beamSchedulers.find (beamId);
 
   if (it == m_beamSchedulers.end ())
@@ -333,6 +342,73 @@ SatNcc::GetBeamScheduler (uint32_t beamId) const
     {
       return it->second;
     }
+}
+
+void
+SatNcc::DoMoveUtBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamId)
+{
+  NS_LOG_FUNCTION (this << utId << srcBeamId << destBeamId);
+
+  Ptr<SatBeamScheduler> srcScheduler = GetBeamScheduler (srcBeamId);
+  Ptr<SatBeamScheduler> destScheduler = GetBeamScheduler (destBeamId);
+
+  if (!srcScheduler || !destScheduler)
+    {
+      NS_FATAL_ERROR ("Source or destination beam not configured");
+    }
+
+  srcScheduler->TransferUtToBeam (utId, destScheduler);
+  m_updateRoutingCallback (utId, srcScheduler->GetGwAddress (), destScheduler->GetGwAddress ());
+}
+
+void
+SatNcc::MoveUtBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamId)
+{
+  NS_LOG_FUNCTION (this << utId << srcBeamId << destBeamId);
+
+  Ptr<SatBeamScheduler> scheduler = GetBeamScheduler (srcBeamId);
+  Ptr<SatBeamScheduler> destination = GetBeamScheduler (destBeamId);
+
+  if (!scheduler)
+    {
+      NS_FATAL_ERROR ("Source beam does not exist!");
+    }
+
+  if (!destination)
+    {
+      NS_LOG_WARN ("Destination beam does not exist, cancel handover");
+
+      Ptr<SatTimuMessage> timuMsg = scheduler->CreateTimu ();
+      scheduler->SendTo (timuMsg, utId);
+    }
+  else if (scheduler->HasUt (utId) && !destination->HasUt (utId))
+    {
+      NS_LOG_INFO ("Performing handover!");
+
+      Ptr<SatTimuMessage> timuMsg = destination->CreateTimu ();
+      scheduler->SendTo (timuMsg, utId);
+
+      Simulator::Schedule (m_utHandoverDelay, &SatNcc::DoMoveUtBetweenBeams, this, utId, srcBeamId, destBeamId);
+    }
+  else if (!scheduler->HasUt (utId) && destination->HasUt (utId))
+    {
+      NS_LOG_INFO ("Handover already performed, sending back TIM-U just in case!");
+
+      Ptr<SatTimuMessage> timuMsg = destination->CreateTimu ();
+      scheduler->SendTo (timuMsg, utId);
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Inconsistent handover state: UT is neither in source nor destination beam; or in both");
+    }
+}
+
+void
+SatNcc::SetUpdateRoutingCallback (SatNcc::UpdateRoutingCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+
+  m_updateRoutingCallback = cb;
 }
 
 } // namespace ns3

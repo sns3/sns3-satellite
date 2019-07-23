@@ -25,6 +25,7 @@
 #include <ns3/enum.h>
 #include <ns3/string.h>
 #include <ns3/satellite-helper.h>
+#include <ns3/satellite-stats-antenna-gain-helper.h>
 #include <ns3/satellite-stats-backlogged-request-helper.h>
 #include <ns3/satellite-stats-capacity-request-helper.h>
 #include <ns3/satellite-stats-composite-sinr-helper.h>
@@ -36,6 +37,7 @@
 #include <ns3/satellite-stats-packet-collision-helper.h>
 #include <ns3/satellite-stats-packet-error-helper.h>
 #include <ns3/satellite-stats-queue-helper.h>
+#include <ns3/satellite-stats-rbdc-request-helper.h>
 #include <ns3/satellite-stats-resources-granted-helper.h>
 #include <ns3/satellite-stats-signalling-load-helper.h>
 #include <ns3/satellite-stats-throughput-helper.h>
@@ -889,6 +891,12 @@ SAT_STATS_GLOBAL_METHOD_DEFINITION      (CapacityRequest, "capacity-request")
 SAT_STATS_PER_GW_METHOD_DEFINITION      (CapacityRequest, "capacity-request")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION    (CapacityRequest, "capacity-request")
 SAT_STATS_PER_UT_METHOD_DEFINITION      (CapacityRequest, "capacity-request")
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (RbdcRequest, "rbdc-request")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (RbdcRequest, "rbdc-request")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (RbdcRequest, "rbdc-request")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (RbdcRequest, "rbdc-request")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RbdcRequest, "rbdc-request")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RbdcRequest, "rbdc-request")
 
 // Resources granted statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (ResourcesGranted, "resources-granted")
@@ -925,6 +933,14 @@ SAT_STATS_GLOBAL_METHOD_DEFINITION      (FwdFeederLinkRxPower, "fwd-feeder-link-
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (FwdUserLinkRxPower,   "fwd-user-link-rx-power")
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnFeederLinkRxPower, "rtn-feeder-link-rx-power")
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (RtnUserLinkRxPower,   "rtn-user-link-rx-power")
+
+// Antenna Gain statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (AntennaGain, "antenna-gain")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (AntennaGain, "antenna-gain")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (AntennaGain, "antenna-gain")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (AntennaGain, "antenna-gain")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (AntennaGain, "antenna-gain")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (AntennaGain, "antenna-gain")
 
 
 std::string // static

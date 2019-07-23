@@ -297,6 +297,19 @@ ARQ
 ARQ is not a part of DVB-RCS2 specifications. However, for research objectives, selective repeats ARQ was implemented 
 to the satellite module. ARQ works at the LLC level and with GSE (FWD link) or RLE (RTN link) packets.
 
+Mobility and Handover
+#####################
+
+Two mobility models are implemented for UTs: a static one and one based on trace files of successive positions.
+For moving UTs, intermediate positions are computed as needed by use of a linear interpolation over the two
+closest positions in the file. Once the UT reaches the position described at the end of the file, it stays static
+until the end of the simulation.
+
+A handover module has been developped that can be attached to any UT. When this handover module exist on a UT,
+it will monitor the carriers power around it. When the carrier it is locked to has a power that drop below a
+defined threshold, it will send a message asking the NCC the authorization to perform a handover to another, given,
+carrier/beam.
+
 Architecture references
 #######################
 
@@ -365,7 +378,6 @@ and satellite module specific input files.
 Limitations:
 
 - Configured reference system (Ka-band over Europe, 5 GWs, frequency configuration)
-- No mobility nor handovers
 - Only one geostationary satellite; no LEO/MEO support
 - No regenerative payload at the satellite
 - Satellite module uses currently only IPv4, thus IPv6 is not supported by the satellite helpers.

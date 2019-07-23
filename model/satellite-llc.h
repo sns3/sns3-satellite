@@ -303,7 +303,7 @@ public:
    * \brief Set the GW address
    * \param address GW MAC address
    */
-  void SetGwAddress (Mac48Address address);
+  virtual void SetGwAddress (Mac48Address address);
 
 protected:
   /**

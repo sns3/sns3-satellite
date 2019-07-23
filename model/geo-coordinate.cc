@@ -104,7 +104,8 @@ GeoCoordinate::Construct (double latitude, double longitude, double altitude)
   m_altitude = altitude;
 }
 
-Vector GeoCoordinate::ToVector ()
+Vector
+GeoCoordinate::ToVector () const
 {
   NS_LOG_FUNCTION (this);
 
@@ -265,7 +266,7 @@ void GeoCoordinate::ConstructFromVector (const Vector &v)
     }
 }
 double
-GeoCoordinate::GetRadiusCurvature (double latitude)
+GeoCoordinate::GetRadiusCurvature (double latitude) const
 {
   return ( m_equatorRadius / std::sqrt (1 - m_e2Param * std::sin (latitude) * std::sin (latitude)) );
 }

@@ -34,6 +34,8 @@
 #include "satellite-signal-parameters.h"
 #include "satellite-node-info.h"
 #include "ns3/satellite-frame-conf.h"
+#include "ns3/satellite-beam-channel-pair.h"
+
 
 namespace ns3 {
 
@@ -452,11 +454,29 @@ public:
    */
   void BeginFrameEndScheduling ();
 
+  /**
+   * \brief Callback for retrieving a pair of SatChannel associated to a beam
+   * \param uint32_t  beam ID
+   * \return A pair of SatChannel to use as communication channel in this beam
+   */
+  typedef Callback<SatChannelPair::ChannelPair_t, uint32_t> ChannelPairGetterCallback;
+
+  /**
+   * \brief Set the channel pair getter callback
+   * \param cb callback to invoke whenever a SatChannel pair for a beam is required.
+   */
+  void SetChannelPairGetterCallback (SatPhy::ChannelPairGetterCallback cb);
+
 protected:
   /**
    * The upper layer package receive callback.
    */
   SatPhy::ReceiveCallback m_rxCallback;
+
+  /**
+   * Callback for retrieving SatChannel pairs by beam
+   */
+  SatPhy::ChannelPairGetterCallback m_retrieveChannelPair;
 
   /**
    * Trace callback used for packet tracing:
@@ -500,16 +520,16 @@ protected:
   Ptr<SatPhyRx> m_phyRx;
 
   /**
+   * Beam ID
+   */
+  uint32_t m_beamId;
+
+  /**
    * Calculated EIRP without gain in W.
    */
   double m_eirpWoGainW;
 
 private:
-  /**
-   * Beam ID
-   */
-  uint32_t m_beamId;
-
   /**
    * The C/N0 info callback
    */

@@ -272,6 +272,16 @@ GeoCoordinate SatAntennaGainPattern::GetValidRandomPosition () const
 }
 
 
+bool SatAntennaGainPattern::IsValidPosition (GeoCoordinate coord, TracedCallback<double> cb) const
+{
+  NS_LOG_FUNCTION (this << coord.GetLatitude () << coord.GetLongitude ());
+
+  double antennaGain = SatUtils::LinearToDb (GetAntennaGain_lin (coord));
+  cb (antennaGain);
+  return antennaGain >= m_minAcceptableAntennaGainInDb;
+}
+
+
 double SatAntennaGainPattern::GetAntennaGain_lin (GeoCoordinate coord) const
 {
   NS_LOG_FUNCTION (this << coord.GetLatitude () << coord.GetLongitude ());
@@ -286,7 +296,7 @@ double SatAntennaGainPattern::GetAntennaGain_lin (GeoCoordinate coord) const
       || m_minLon > longitude
       || longitude > m_maxLon)
     {
-      NS_FATAL_ERROR (this << " given latitude and longitude out of range!");
+      NS_FATAL_ERROR ("Given latitude and longitude out of range!");
     }
 
   // Calculate the minimum grid point {minLatIndex, minLonIndex} for the given {latitude, longitude} point

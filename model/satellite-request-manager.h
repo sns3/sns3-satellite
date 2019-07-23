@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2013 Magister Solutions Ltd.
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.com>
  */
 
 #ifndef SATELLITE_REQUEST_MANAGER_H_
@@ -195,6 +197,12 @@ public:
    * \param requestSize amount of requested size via AVBDC (in bytes).
    */
   typedef void (*AvbdcTraceCallback)(uint32_t requestSize);
+
+  /**
+   * \brief Send a handover recommendation message to the gateway.
+   * \param beamId The beam ID to switch to
+   */
+  void SendHandoverRecommendation (uint32_t beamId);
 
 private:
   typedef std::map<uint8_t, QueueCallback> CallbackContainer_t;

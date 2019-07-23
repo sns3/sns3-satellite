@@ -20,46 +20,50 @@
  * Author: Mathias Ettinger <mettinger@viveris.toulouse.fr>
  */
 
-#include "ns3/config.h"
-#include "ns3/log.h"
-#include "ns3/names.h"
-#include "ns3/enum.h"
-#include "ns3/double.h"
-#include "ns3/pointer.h"
-#include "ns3/uinteger.h"
-#include "ns3/string.h"
-#include "ns3/callback.h"
-#include "ns3/config.h"
-#include "ns3/nstime.h"
-#include "../model/satellite-const-variables.h"
-#include "../model/satellite-utils.h"
-#include "../model/satellite-channel.h"
-#include "../model/satellite-mobility-observer.h"
-#include "../model/satellite-gw-llc.h"
-#include "../model/satellite-ut-llc.h"
-#include "../model/satellite-ut-mac.h"
-#include "../model/satellite-net-device.h"
-#include "../model/satellite-ut-phy.h"
-#include "../model/satellite-phy-tx.h"
-#include "../model/satellite-phy-rx.h"
-#include "../model/satellite-phy-rx-carrier-conf.h"
-#include "../model/satellite-base-encapsulator.h"
-#include "../model/satellite-generic-stream-encapsulator.h"
-#include "../model/satellite-generic-stream-encapsulator-arq.h"
-#include "../model/satellite-return-link-encapsulator.h"
-#include "../model/satellite-return-link-encapsulator-arq.h"
-#include "../model/satellite-net-device.h"
-#include "../model/satellite-node-info.h"
-#include "../model/satellite-enums.h"
-#include "../model/satellite-request-manager.h"
-#include "../model/satellite-queue.h"
-#include "../model/satellite-ut-scheduler.h"
-#include "../model/satellite-channel-estimation-error-container.h"
-#include "../model/satellite-packet-classifier.h"
-#include "satellite-ut-helper.h"
-#include "ns3/singleton.h"
-#include "ns3/satellite-id-mapper.h"
+#include <ns3/config.h>
+#include <ns3/log.h>
+#include <ns3/names.h>
+#include <ns3/enum.h>
+#include <ns3/double.h>
+#include <ns3/pointer.h>
+#include <ns3/uinteger.h>
+#include <ns3/string.h>
+#include <ns3/callback.h>
+#include <ns3/config.h>
+#include <ns3/nstime.h>
+#include <ns3/singleton.h>
+
+#include <ns3/satellite-const-variables.h>
+#include <ns3/satellite-utils.h>
+#include <ns3/satellite-channel.h>
+#include <ns3/satellite-mobility-observer.h>
+#include <ns3/satellite-gw-llc.h>
+#include <ns3/satellite-net-device.h>
+#include <ns3/satellite-ut-llc.h>
+#include <ns3/satellite-ut-mac.h>
+#include <ns3/satellite-ut-handover-module.h>
+#include <ns3/satellite-ut-phy.h>
+#include <ns3/satellite-phy-tx.h>
+#include <ns3/satellite-phy-rx.h>
+#include <ns3/satellite-phy-rx-carrier-conf.h>
+#include <ns3/satellite-base-encapsulator.h>
+#include <ns3/satellite-generic-stream-encapsulator.h>
+#include <ns3/satellite-generic-stream-encapsulator-arq.h>
+#include <ns3/satellite-return-link-encapsulator.h>
+#include <ns3/satellite-return-link-encapsulator-arq.h>
+#include <ns3/satellite-net-device.h>
+#include <ns3/satellite-node-info.h>
+#include <ns3/satellite-enums.h>
+#include <ns3/satellite-request-manager.h>
+#include <ns3/satellite-queue.h>
+#include <ns3/satellite-ut-scheduler.h>
+#include <ns3/satellite-channel-estimation-error-container.h>
+#include <ns3/satellite-packet-classifier.h>
+#include <ns3/satellite-id-mapper.h>
 #include <ns3/satellite-typedefs.h>
+
+#include "satellite-ut-helper.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatUtHelper");
 
@@ -170,8 +174,6 @@ SatUtHelper::SatUtHelper (SatTypedefs::CarrierBandwidthConverter_t carrierBandwi
   m_channelFactory.SetTypeId ("ns3::SatChannel");
 
   m_llsConf = CreateObject<SatLowerLayerServiceConf>  ();
-
-  //LogComponentEnable ("SatUtHelper", LOG_LEVEL_INFO);
 }
 
 void
@@ -212,7 +214,11 @@ SatUtHelper::SetPhyAttribute (std::string n1, const AttributeValue &v1)
 }
 
 NetDeviceContainer
-SatUtHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc)
+SatUtHelper::Install (NodeContainer c, uint32_t beamId,
+                      Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
+                      Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
+                      SatPhy::ChannelPairGetterCallback cbChannel,
+                      SatUtMac::RoutingUpdateCallback cbRouting)
 {
   NS_LOG_FUNCTION (this << beamId << fCh << rCh );
 
@@ -220,14 +226,18 @@ SatUtHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
     {
-      devs.Add (Install (*i, beamId, fCh, rCh, gwNd, ncc));
+      devs.Add (Install (*i, beamId, fCh, rCh, gwNd, ncc, cbChannel, cbRouting));
     }
 
   return devs;
 }
 
 Ptr<NetDevice>
-SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc)
+SatUtHelper::Install (Ptr<Node> n, uint32_t beamId,
+                      Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
+                      Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
+                      SatPhy::ChannelPairGetterCallback cbChannel,
+                      SatUtMac::RoutingUpdateCallback cbRouting)
 {
   NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
 
@@ -279,6 +289,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
                                               m_linkResults,
                                               parameters,
                                               m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE));
+  phy->SetChannelPairGetterCallback (cbChannel);
 
   // Set fading
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());
@@ -302,6 +313,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   SatPhy::ReceiveCallback recCb = MakeCallback (&SatUtMac::Receive, mac);
 
   phy->SetAttribute ("ReceiveCb", CallbackValue (recCb));
+  mac->SetTxCheckCallback (MakeCallback (&SatUtPhy::IsTxPossible, phy));
 
   // Create Logical Link Control (LLC) layer
   Ptr<SatUtLlc> llc = CreateObject<SatUtLlc> ();
@@ -371,11 +383,15 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   llc->SetMacQueueEventCallback (macCb);
 
   // set serving GW MAC address to RM
-  rm->SetGwAddress (gwAddr);
-  llc->SetGwAddress (gwAddr);
+  mac->SetRoutingUpdateCallback (cbRouting);
+  mac->SetGatewayUpdateCallback (MakeCallback (&SatUtLlc::SetGwAddress, llc));
+  mac->SetGwAddress (gwAddr);
 
   // Attach the transmit callback to PHY
   mac->SetTransmitCallback (MakeCallback (&SatPhy::SendPdu, phy));
+
+  // Attach the PHY handover callback to SatMac
+  mac->SetHandoverCallback (MakeCallback (&SatUtPhy::PerformHandover, phy));
 
   // Attach the LLC receive callback to SatMac
   mac->SetReceiveCallback (MakeCallback (&SatLlc::Receive, llc));
@@ -422,6 +438,13 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 
       /// attach the RA module
       mac->SetRandomAccess (randomAccess);
+    }
+
+  Ptr<SatUtHandoverModule> utHandoverModule = n->GetObject<SatUtHandoverModule> ();
+  if (utHandoverModule != NULL)
+    {
+      utHandoverModule->SetHandoverRequestCallback (MakeCallback (&SatRequestManager::SendHandoverRecommendation, rm));
+      mac->SetBeamCheckerCallback (MakeCallback (&SatUtHandoverModule::CheckForHandoverRecommendation, utHandoverModule));
     }
 
   return dev;

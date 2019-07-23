@@ -111,6 +111,11 @@ public:
    */
   void SetBeamSet (std::set<uint32_t> beamSet);
 
+  inline std::set<uint32_t> GetBeamSet (void) const
+  {
+    return m_enabledBeams;
+  }
+
   /**
    * \brief Set UT count per beam.
    * \param count Number of UTs per beam.
@@ -134,6 +139,18 @@ public:
    * \param rs RandomVariableStream to be used, must implement GetInteger.
    */
   void SetUserCountPerUt (Ptr<RandomVariableStream> rs);
+
+  /**
+   * \brief Set user count per mobile UT.
+   * \param count Number of users per mobile UT.
+   */
+  void SetUserCountPerMobileUt (uint32_t count);
+
+  /**
+   * \brief Set mobile UT count per beam to be taken from a random variable stream.
+   * \param rs RandomVariableStream to be used, must implement GetInteger.
+   */
+  void SetUserCountPerMobileUt (Ptr<RandomVariableStream> rs);
 
   /**
    * \brief Set the number of GW users in the scenario.
@@ -322,9 +339,11 @@ public:
 
   /**
    * \brief Create the satellite scenario.
+   * \param scenario Kind of scenario to create, if any
+   * \param mobileUtsFolder Folder from which to load mobile UT traces, if any
    * \return satHelper Satellite helper, which provides e.g. nodes for application installation.
    */
-  Ptr<SatHelper> CreateSatScenario (SatHelper::PreDefinedScenario_t scenario = SatHelper::NONE);
+  Ptr<SatHelper> CreateSatScenario (SatHelper::PreDefinedScenario_t scenario = SatHelper::NONE, const std::string& mobileUtsFolder = "");
 
   /**
    * \brief Create stats collectors and set default statistics settings
@@ -361,8 +380,10 @@ public:
   /**
    * \brief Configure this instance after reading input attributes from XML file
    * \param filePath full path to an Input XML file
+   * \param overrideManualConfiguration whether or not to read some configuration (beams,
+   * UT count per beam, user count per UT, simulation time) from XML file
    */
-  void ConfigureAttributesFromFile (std::string filePath);
+  void ConfigureAttributesFromFile (std::string filePath, bool overrideManualConfiguration = true);
 
   /**
    * \brief Read input attributes from XML file
@@ -420,6 +441,7 @@ public:
    */
   inline Ptr<SatHelper> GetSatelliteHelper ()
   {
+    NS_ASSERT_MSG (m_satHelper != NULL, "CreateSatScenario not called before calling GetSatelliteHelper");
     return m_satHelper;
   }
 
@@ -592,6 +614,7 @@ private:
   std::string                  m_outputPath;
   Ptr<RandomVariableStream>    m_utCount;
   Ptr<RandomVariableStream>    m_utUserCount;
+  Ptr<RandomVariableStream>    m_utMobileUserCount;
   Time                         m_simTime;
   uint32_t                     m_numberOfConfiguredFrames;
   bool                         m_randomAccessConfigured;
@@ -663,10 +686,12 @@ public:
   std::string                                    m_enabledBeams;
   Ptr<RandomVariableStream>                      m_utCount;
   Ptr<RandomVariableStream>                      m_utUserCount;
+  Ptr<RandomVariableStream>                      m_utMobileUserCount;
   bool                                           m_activateStatistics;
   bool                                           m_activateProgressLogging;
   SimulationHelper::CrTxConf_t                   m_crTxConf;
   std::map<std::string, TrafficConfiguration_t>  m_trafficModel;
+  std::string                                    m_mobileUtsFolder;
 
 private:
   void SetTrafficPercentage (std::string trafficModel, double percentage)

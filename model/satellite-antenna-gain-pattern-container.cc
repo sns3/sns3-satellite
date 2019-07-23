@@ -42,6 +42,8 @@ SatAntennaGainPatternContainer::GetTypeId (void)
 
 SatAntennaGainPatternContainer::SatAntennaGainPatternContainer ()
 {
+  NS_LOG_FUNCTION (this);
+
   /**
    * TODO: To change the reference system, these hard coded paths
    * and filenames may have to be changed! One way could be to hard
@@ -69,19 +71,23 @@ SatAntennaGainPatternContainer::SatAntennaGainPatternContainer ()
     }
 }
 
+SatAntennaGainPatternContainer::~SatAntennaGainPatternContainer ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
 Ptr<SatAntennaGainPattern>
 SatAntennaGainPatternContainer::GetAntennaGainPattern (uint32_t beamId) const
 {
   NS_LOG_FUNCTION (this << beamId);
 
-  if (beamId > m_antennaPatternMap.size ())
+  std::map<uint32_t, Ptr<SatAntennaGainPattern> >::const_iterator agp = m_antennaPatternMap.find (beamId);
+  if (agp == m_antennaPatternMap.end ())
     {
       NS_FATAL_ERROR ("SatAntennaGainPatternContainer::GetAntennaGainPattern - unvalid beam id: " << beamId);
     }
 
-  // Note, that now we assume that all the antenna patterns are created
-  // regardless of how many beams are actually simulated.
-  return m_antennaPatternMap.at (beamId);
+  return agp->second;
 }
 
 uint32_t
@@ -110,6 +116,14 @@ SatAntennaGainPatternContainer::GetBestBeamId (GeoCoordinate coord) const
     }
 
   return bestId;
+}
+
+uint32_t
+SatAntennaGainPatternContainer::GetNAntennaGainPatterns () const
+{
+  // Note, that now we assume that all the antenna patterns are created
+  // regardless of how many beams are actually simulated.
+  return m_antennaPatternMap.size ();
 }
 
 } // namespace ns3

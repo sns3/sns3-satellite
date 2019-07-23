@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2013 Magister Solutions Ltd.
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.com>
  */
 
 #ifndef SATELLITE_PHY_TX_H
@@ -68,7 +70,7 @@ public:
    */
   enum State
   {
-    IDLE, TX
+    IDLE, TX, RECONFIGURING
   };
 
 
@@ -83,6 +85,7 @@ public:
   virtual void DoDispose ();
 
   void SetChannel (Ptr<SatChannel> c);
+  void ClearChannel ();
   Ptr<SatChannel> GetChannel ();
 
   void SetMobility (Ptr<MobilityModel> m);
@@ -140,6 +143,11 @@ public:
    * \param beamId the Beam Identifier
    */
   void SetBeamId (uint32_t beamId);
+
+  /**
+   * Tell whether or not this channel can transmit data
+   */
+  bool CanTransmit (void) const;
 
 private:
   void ChangeState (State newState);

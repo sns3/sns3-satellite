@@ -84,7 +84,7 @@ SatBaseEncapsulator::DoDispose ()
 void
 SatBaseEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address dest)
 {
-  NS_LOG_FUNCTION (this << p->GetSize ());
+  NS_LOG_FUNCTION (this << p->GetSize () << dest);
 
   // Add flow id tag
   SatFlowIdTag flowIdTag;

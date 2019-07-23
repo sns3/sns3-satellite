@@ -820,6 +820,17 @@ and ``ns3::SatUtHelper::EnableFwdLinkArq.`` The ARQ specific attributes are desc
 	===========================================================        ===========================================================================================================================================================
 
 
+Mobility and Handover Configuration
+###################################
+
+The Simulation Helper class defines the attribute ``MobileUtsFolder``, which defaults to
+``data/utpositions/mobiles/`` to automatically provide trace files for mobile UTs.
+
+Files in the given folder, if any, are parsed and UTs are created for each of them. These
+UTs are bound to a ``SatTracedMobilityModel`` and a ``SatUtHandoverModule``. If the starting
+position of these UTs is in a beam that is not defined for the simulation, they are discarded
+and not simulated at all.
+
 
 Examples
 ========

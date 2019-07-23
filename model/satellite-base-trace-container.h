@@ -80,6 +80,26 @@ public:
   static const uint32_t CSINR_TRACE_DEFAULT_NUMBER_OF_COLUMNS = 2;
 
   /**
+   * \brief Default latitude value index for positions traces
+   */
+  static const uint32_t POSITION_TRACE_DEFAULT_LATITUDE_INDEX = 1;
+
+  /**
+   * \brief Default longitude value index for positions traces
+   */
+  static const uint32_t POSITION_TRACE_DEFAULT_LONGITUDE_INDEX = 2;
+
+  /**
+   * \brief Default altitude value index for positions traces
+   */
+  static const uint32_t POSITION_TRACE_DEFAULT_ALTITUDE_INDEX = 3;
+
+  /**
+   * \brief Default number of columns for position traces
+   */
+  static const uint32_t POSITION_TRACE_DEFAULT_NUMBER_OF_COLUMNS = 4;
+
+  /**
    * \brief Constructor
    */
   SatBaseTraceContainer ();

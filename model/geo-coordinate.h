@@ -134,7 +134,7 @@ public:
    * Converts Geodetic coordinates to Cartesian coordinates
    * \return Vector containing Cartesian coordinates
    */
-  Vector ToVector ();
+  Vector ToVector () const;
 
   // Definitions for reference Earth Ellipsoid parameters.
   // Sphere, WGS84 and GRS80 reference ellipsoides supported.
@@ -153,7 +153,7 @@ private:
    * \param latitude latitude in radians at to get the radius of curvature.
    * \return value of the radius of curvature (meters)
    */
-  double GetRadiusCurvature (double latitude);
+  double GetRadiusCurvature (double latitude) const;
   /**
    * Checks if longtitude is in valid range
    *

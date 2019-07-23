@@ -22,24 +22,24 @@
 
 #include <string>
 
-#include "ns3/object.h"
-#include "ns3/trace-helper.h"
-#include "ns3/output-stream-wrapper.h"
-#include "ns3/node-container.h"
-#include "ns3/ipv4-address-helper.h"
-#include "ns3/csma-helper.h"
-#include "ns3/satellite-antenna-gain-pattern-container.h"
+#include <ns3/object.h>
+#include <ns3/trace-helper.h>
+#include <ns3/output-stream-wrapper.h>
+#include <ns3/node-container.h>
+#include <ns3/ipv4-address-helper.h>
+#include <ns3/csma-helper.h>
+#include <ns3/satellite-antenna-gain-pattern-container.h>
+#include <ns3/satellite-position-allocator.h>
+#include <ns3/satellite-rx-power-input-trace-container.h>
+#include <ns3/satellite-rx-power-output-trace-container.h>
+#include <ns3/satellite-interference-input-trace-container.h>
+#include <ns3/satellite-interference-output-trace-container.h>
+#include <ns3/satellite-fading-output-trace-container.h>
+#include <ns3/satellite-fading-input-trace-container.h>
 #include "satellite-user-helper.h"
 #include "satellite-beam-helper.h"
 #include "satellite-beam-user-info.h"
 #include "satellite-conf.h"
-#include "ns3/satellite-position-allocator.h"
-#include "ns3/satellite-rx-power-input-trace-container.h"
-#include "ns3/satellite-rx-power-output-trace-container.h"
-#include "ns3/satellite-interference-input-trace-container.h"
-#include "ns3/satellite-interference-output-trace-container.h"
-#include "ns3/satellite-fading-output-trace-container.h"
-#include "ns3/satellite-fading-input-trace-container.h"
 
 namespace ns3 {
 
@@ -160,6 +160,22 @@ public:
   void SetUtPositionAllocatorForBeam (uint32_t beamId, Ptr<SatListPositionAllocator> posAllocator);
 
   /**
+   * \brief Load UTs with a SatTracedMobilityModel associated to them from the
+   * files found in the given folder. Each UT will be associated to the beam it
+   * is at it's starting position.
+   * \param folderName Name of the folder to search for mobility trace files
+   * \param utUsers Stream to generate the number of users associated to each loaded UT
+   */
+  void LoadMobileUTsFromFolder (const std::string& folderName, Ptr<RandomVariableStream> utUsers);
+
+  /**
+   * \brief Load an UT with a SatTracedMobilityModel associated to
+   * them from the given file.
+   * \param filename Name of the trace file containing UT positions
+   */
+  Ptr<Node> LoadMobileUtFromFile (const std::string& filename);
+
+  /**
    * Set multicast group to satellite network and IP router. Add needed routes to net devices.
    *
    * \param source Source node of the multicast group (GW or UT connected user node)
@@ -186,6 +202,14 @@ public:
    * Dispose of this class instance
    */
   void DoDispose ();
+
+  /**
+   * Create a SatSpotBeamPositionAllocator able to generate
+   * random position within the given beam.
+   *
+   * \param beamId the beam for which the position allocator should be configured
+   */
+  Ptr<SatSpotBeamPositionAllocator> GetBeamAllocator (uint32_t beamId);
 
 private:
   static const uint16_t MIN_ADDRESS_PREFIX_LENGTH = 1;
@@ -312,6 +336,16 @@ private:
    * User defined UT positions from SatConf (or manually set)
    */
   Ptr<SatListPositionAllocator> m_utPositions;
+
+  /**
+   * List of mobile UTs by beam ID.
+   */
+  std::map<uint32_t, NodeContainer> m_mobileUtsByBeam;
+
+  /**
+   * List of users by mobile UT by beam ID.
+   */
+  std::multimap<uint32_t, uint32_t> m_mobileUtsUsersByBeam;
 
   /**
    * Enables creation traces to be written in given file

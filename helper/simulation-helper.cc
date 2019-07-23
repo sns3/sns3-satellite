@@ -125,6 +125,11 @@ SimulationHelperConf::GetTypeId (void)
                    StringValue ("ns3::ConstantRandomVariable[Constant=1]"),
                    MakePointerAccessor (&SimulationHelperConf::m_utUserCount),
                    MakePointerChecker<RandomVariableStream> ())
+    .AddAttribute ("UserCountPerMobileUt",
+                   "Amount of user per mobile User Terminal",
+                   StringValue ("ns3::ConstantRandomVariable[Constant=1]"),
+                   MakePointerAccessor (&SimulationHelperConf::m_utMobileUserCount),
+                   MakePointerChecker<RandomVariableStream> ())
     .AddAttribute ("UtCountPerBeam",
                    "Amount of User Terminal associated to each Beam",
                    StringValue ("ns3::ConstantRandomVariable[Constant=1]"),
@@ -140,6 +145,11 @@ SimulationHelperConf::GetTypeId (void)
                    BooleanValue (true),
                    MakeBooleanAccessor (&SimulationHelperConf::m_activateProgressLogging),
                    MakeBooleanChecker ())
+    .AddAttribute ("MobileUtsFolder",
+                   "Select the folder where mobile UTs traces should be found",
+                   StringValue (Singleton<SatEnvVariables>::Get ()->LocateDataDirectory () + "/utpositions/mobiles/"),
+                   MakeStringAccessor (&SimulationHelperConf::m_mobileUtsFolder),
+                   MakeStringChecker ())
     .SIM_ADD_TRAFFIC_MODEL_ATTRIBUTES (Cbr, 1.0, PROTOCOL_UDP, RTN_LINK, Seconds (0.1), Seconds (0), MilliSeconds (10))
     .SIM_ADD_TRAFFIC_MODEL_ATTRIBUTES (Http, 0, PROTOCOL_TCP, RTN_LINK, Seconds (0.1), Seconds (0), MilliSeconds (10))
     .SIM_ADD_TRAFFIC_MODEL_ATTRIBUTES (OnOff, 0, PROTOCOL_UDP, RTN_LINK, Seconds (0.1), Seconds (0), MilliSeconds (10))
@@ -163,6 +173,7 @@ SimulationHelperConf::SimulationHelperConf ()
   m_enabledBeams (""),
   m_utCount (0),
   m_utUserCount (0),
+  m_utMobileUserCount (0),
   m_activateStatistics (false),
   m_activateProgressLogging (false)
 {
@@ -207,6 +218,7 @@ SimulationHelper::SimulationHelper ()
   m_outputPath (""),
   m_utCount (0),
   m_utUserCount (0),
+  m_utMobileUserCount (0),
   m_simTime (0),
   m_numberOfConfiguredFrames (0),
   m_randomAccessConfigured (false),
@@ -230,6 +242,7 @@ SimulationHelper::SimulationHelper (std::string simulationName)
   m_outputPath (""),
   m_utCount (0),
   m_utUserCount (0),
+  m_utMobileUserCount (0),
   m_simTime (0),
   m_numberOfConfiguredFrames (0),
   m_randomAccessConfigured (false),
@@ -304,6 +317,23 @@ SimulationHelper::SetUserCountPerUt (Ptr<RandomVariableStream> rs)
   NS_LOG_FUNCTION (this << &rs);
 
   m_utUserCount = rs;
+}
+
+void
+SimulationHelper::SetUserCountPerMobileUt (uint32_t count)
+{
+  NS_LOG_FUNCTION (this << count);
+
+  m_utMobileUserCount = CreateObject<ConstantRandomVariable> ();
+  m_utMobileUserCount->SetAttribute ("Constant", DoubleValue (count));
+}
+
+void
+SimulationHelper::SetUserCountPerMobileUt (Ptr<RandomVariableStream> rs)
+{
+  NS_LOG_FUNCTION (this << &rs);
+
+  m_utMobileUserCount = rs;
 }
 
 void
@@ -697,8 +727,22 @@ SimulationHelper::CreateDefaultStats ()
       m_statContainer = CreateObject<SatStatsHelperContainer> (m_satHelper);
     }
 
-  CreateDefaultFwdLinkStats ();
-  CreateDefaultRtnLinkStats ();
+  // CreateDefaultFwdLinkStats ();
+  // CreateDefaultRtnLinkStats ();
+  //m_statContainer->AddPerUtCrdsaPacketError (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddPerUtRtnMacDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddPerUtFwdMacDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddPerUtRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddPerUtFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  m_statContainer->AddPerUtRtnCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddPerUtAntennaGain (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddPerUtResourcesGranted (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddPerUtRbdcRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
 }
 
 
@@ -1069,7 +1113,7 @@ SimulationHelper::SetupOutputPath ()
 }
 
 Ptr<SatHelper>
-SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario)
+SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario, const std::string& mobileUtsFolder)
 {
   NS_LOG_FUNCTION (this);
 
@@ -1121,6 +1165,11 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario)
 
               ss << std::endl;
             }
+        }
+
+      if (mobileUtsFolder != "")
+        {
+          m_satHelper->LoadMobileUTsFromFolder (mobileUtsFolder, m_utMobileUserCount);
         }
 
       // Now, create either a scenario based on list positions in input file
@@ -1194,6 +1243,8 @@ SimulationHelper::InstallTrafficModel (TrafficModel_t trafficModel,
           utUsers.Add (utAllUsers.Get (i));
         }
     }
+
+  std::cout << "Installing traffic model on " << utUsers.GetN () << "/" << utAllUsers.GetN () << " UT users" << std::endl;
 
   switch (trafficModel)
     {
@@ -1502,18 +1553,25 @@ SimulationHelper::DisableProgressLogs ()
 }
 
 void
-SimulationHelper::ConfigureAttributesFromFile (std::string filePath)
+SimulationHelper::ConfigureAttributesFromFile (std::string filePath, bool overrideManualConfiguration)
 {
   ReadInputAttributesFromFile (filePath);
   Ptr<SimulationHelperConf> simulationConf = CreateObject<SimulationHelperConf> ();
 
-  Time simulationTime = simulationConf->m_simTime;
-  SetBeams (simulationConf->m_enabledBeams);
-  SetUtCountPerBeam (simulationConf->m_utCount);
-  SetUserCountPerUt (simulationConf->m_utUserCount);
-  SetSimulationTime (simulationConf->m_simTime);
+  if (overrideManualConfiguration)
+    {
+      SetBeams (simulationConf->m_enabledBeams);
+      SetUtCountPerBeam (simulationConf->m_utCount);
+      SetUserCountPerUt (simulationConf->m_utUserCount);
+      SetUserCountPerMobileUt (simulationConf->m_utMobileUserCount);
+      SetSimulationTime (simulationConf->m_simTime);
+    }
 
-  CreateSatScenario ();
+  CreateSatScenario (SatHelper::NONE, simulationConf->m_mobileUtsFolder);
+  if (simulationConf->m_activateProgressLogging)
+    {
+      EnableProgressLogs ();
+    }
 
   for (const std::pair<std::string, SimulationHelperConf::TrafficConfiguration_t>& trafficModel : simulationConf->m_trafficModel)
     {
@@ -1592,7 +1650,7 @@ SimulationHelper::ConfigureAttributesFromFile (std::string filePath)
       if (trafficModel.second.m_percentage > 0.0)
         {
           Time startTime = trafficModel.second.m_startTime;
-          if (startTime > simulationTime)
+          if (startTime > m_simTime)
             {
               NS_FATAL_ERROR ("Traffic model " << trafficModel.first << " configured to start after the simulation ended");
             }
@@ -1600,7 +1658,7 @@ SimulationHelper::ConfigureAttributesFromFile (std::string filePath)
           Time stopTime = trafficModel.second.m_stopTime;
           if (stopTime == Seconds (0))
             {
-              stopTime = simulationTime + Seconds (1);
+              stopTime = m_simTime + Seconds (1);
             }
           if (stopTime < startTime)
             {
@@ -1622,10 +1680,6 @@ SimulationHelper::ConfigureAttributesFromFile (std::string filePath)
   if (simulationConf->m_activateStatistics)
     {
       CreateDefaultStats ();
-    }
-  if (simulationConf->m_activateProgressLogging)
-    {
-      EnableProgressLogs ();
     }
 }
 

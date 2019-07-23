@@ -191,6 +191,55 @@ SatInputFileStreamTimeLongDoubleContainer::ProceedToNextClosestTimeSample ()
   return m_container[m_lastValidPosition];
 }
 
+std::vector<long double>
+SatInputFileStreamTimeLongDoubleContainer::InterpolateBetweenClosestTimeSamples ()
+{
+  NS_LOG_FUNCTION (this);
+
+  long double currentTime = Now ().GetSeconds ();
+  FindNextClosest (m_lastValidPosition, m_timeShiftValue, currentTime);
+
+  std::vector<long double> selectedPosition = m_container[m_lastValidPosition];
+  long double selectedTime = selectedPosition.at (m_timeColumn);
+
+  // Easy case: a time sample for the current time exist
+  if (selectedTime == currentTime)
+    {
+      return selectedPosition;
+    }
+
+  // Fetch the second position to perform linear interpolation
+  std::vector<long double> closestPosition;
+  if (selectedTime > currentTime)
+    {
+      if (m_lastValidPosition == 0)
+        {
+          // No previous position available, abort
+          return selectedPosition;
+        }
+      closestPosition = m_container[m_lastValidPosition - 1];
+    }
+  else
+    {
+      if (m_lastValidPosition == m_container.size () - 1)
+        {
+          // No next position available, abort
+          return selectedPosition;
+        }
+      closestPosition = m_container[m_lastValidPosition + 1];
+    }
+
+  long double linearCoefficient = (currentTime - selectedTime) / (closestPosition.at (m_timeColumn) - selectedTime);
+  std::size_t rowSize = selectedPosition.size ();
+  std::vector<long double> interpolatedPosition (rowSize);
+  for (std::size_t i = 0; i < rowSize; ++i)
+    {
+      interpolatedPosition[i] = selectedPosition[i] + linearCoefficient * (closestPosition[i] - selectedPosition[i]);
+    }
+
+  return interpolatedPosition;
+}
+
 bool
 SatInputFileStreamTimeLongDoubleContainer::FindNextClosest (uint32_t lastValidPosition, long double timeShiftValue, long double comparisonTimeValue)
 {

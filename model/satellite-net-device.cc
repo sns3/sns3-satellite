@@ -25,7 +25,6 @@
 #include <ns3/boolean.h>
 #include <ns3/error-model.h>
 #include <ns3/trace-source-accessor.h>
-#include <ns3/ipv4-header.h>
 #include <ns3/ipv4-l3-protocol.h>
 #include <ns3/channel.h>
 
@@ -525,6 +524,5 @@ SatNetDevice::GetChannel (void) const
    */
   return 0;
 }
-
 
 } // namespace ns3

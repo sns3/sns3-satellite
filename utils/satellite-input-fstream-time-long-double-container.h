@@ -78,6 +78,12 @@ public:
   std::vector<long double> ProceedToNextClosestTimeSample ();
 
   /**
+   * \brief Function for locating time samples enclosing the current time and a linear interpolation between these samples
+   * \return linear interpolation of the current time value between the two closest time samples
+   */
+  std::vector<long double> InterpolateBetweenClosestTimeSamples ();
+
+  /**
    * \brief Do needed dispose actions
    */
   void DoDispose ();

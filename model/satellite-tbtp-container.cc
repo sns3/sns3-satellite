@@ -107,6 +107,14 @@ SatTbtpContainer::Add (Time startTime, Ptr<SatTbtpMessage> tbtp)
 }
 
 void
+SatTbtpContainer::Clear ()
+{
+  NS_LOG_FUNCTION (this);
+
+  m_tbtps.clear ();
+}
+
+void
 SatTbtpContainer::RemovePastTbtps ()
 {
   NS_LOG_FUNCTION (this);

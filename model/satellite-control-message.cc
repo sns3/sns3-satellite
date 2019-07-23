@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2014 Magister Solutions Ltd
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,15 +17,16 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.com>
  */
 
 #include <map>
-#include "ns3/log.h"
-#include "ns3/uinteger.h"
-#include "ns3/enum.h"
-#include "ns3/address-utils.h"
-#include "satellite-enums.h"
+#include <ns3/log.h>
+#include <ns3/uinteger.h>
+#include <ns3/enum.h>
+#include <ns3/address-utils.h>
 
+#include "satellite-enums.h"
 #include "satellite-control-message.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatCtrlMessage");
@@ -679,6 +681,132 @@ SatArqAckMessage::GetSizeInBytes () const
   uint32_t size = 2 * sizeof (uint8_t);
   return size;
 }
+
+
+
+NS_OBJECT_ENSURE_REGISTERED (SatTimuMessage);
+
+TypeId
+SatTimuMessage::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatTimuMessage")
+    .SetParent<SatControlMessage> ()
+    .AddConstructor<SatTimuMessage> ()
+  ;
+  return tid;
+}
+
+TypeId
+SatTimuMessage::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
+}
+
+SatTimuMessage::SatTimuMessage ()
+  : m_beamId (0)
+{
+  NS_LOG_FUNCTION (this);
+}
+
+SatTimuMessage::~SatTimuMessage ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+void
+SatTimuMessage::SetAllocatedBeamId (uint32_t beamId)
+{
+  NS_LOG_FUNCTION (this);
+  m_beamId = beamId;
+}
+
+uint32_t
+SatTimuMessage::GetAllocatedBeamId () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_beamId;
+}
+
+void
+SatTimuMessage::SetGwAddress (Address address)
+{
+  NS_LOG_FUNCTION (this);
+  m_gwAddress = address;
+}
+
+Address
+SatTimuMessage::GetGwAddress () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_gwAddress;
+}
+
+uint32_t
+SatTimuMessage::GetSizeInBytes () const
+{
+  NS_LOG_FUNCTION (this);
+
+  uint32_t size = sizeof (uint32_t) + sizeof (Address);
+  return size;
+}
+
+
+
+NS_OBJECT_ENSURE_REGISTERED (SatHandoverRecommendationMessage);
+
+TypeId
+SatHandoverRecommendationMessage::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatHandoverRecommendationMessage")
+    .SetParent<SatControlMessage> ()
+    .AddConstructor<SatHandoverRecommendationMessage> ()
+  ;
+  return tid;
+}
+
+TypeId
+SatHandoverRecommendationMessage::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
+}
+
+SatHandoverRecommendationMessage::SatHandoverRecommendationMessage ()
+  : m_beamId (0)
+{
+  NS_LOG_FUNCTION (this);
+}
+
+SatHandoverRecommendationMessage::~SatHandoverRecommendationMessage ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+void
+SatHandoverRecommendationMessage::SetRecommendedBeamId (uint32_t beamId)
+{
+  NS_LOG_FUNCTION (this);
+  m_beamId = beamId;
+}
+
+uint32_t
+SatHandoverRecommendationMessage::GetRecommendedBeamId () const
+{
+  return m_beamId;
+}
+
+uint32_t
+SatHandoverRecommendationMessage::GetSizeInBytes () const
+{
+  NS_LOG_FUNCTION (this);
+
+  uint32_t size = 1 * sizeof (uint32_t);
+  return size;
+}
+
 
 // Control message container
 
