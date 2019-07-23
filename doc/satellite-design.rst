@@ -220,14 +220,19 @@ the full 72-beam scenario is illustrated.
 Random access
 #############
 
-There are two supported random access modes: Slotted ALOHA `[dvb12-p2]`_ and Contention Resolution Diversity Slotted ALOHA (CRDSA) `[aloha07]`_. 
+There are three supported random access modes: Slotted ALOHA `[dvb12-p2]`_, Contention Resolution Diversity Slotted ALOHA (CRDSA) `[aloha07]`_,
+and Multi-Replica Decoding using Correlation based Localisation (MARSALA) `[marsala]`_. 
+
 Slotted ALOHA is utilized only for control 
 messages due to its small payload capabilities. Capacity Request (CR) and ARQ ACK control messages are implemented to 
 the satellite module, which may be transmitted through slotted ALOHA.
+
 CRDSA algorithms are based on `[dvb12-p2]`_ and `[aloha07]`_. DVB-RCS2 guidelines define six use cases 
 for CRDSA: RA cold start, RA-DAMA top-up, RA-DAMA back-up, RA IP queue, RA capacity requests and RA for SCADA. In addition 
 to “RA capacity requests”, the satellite module supports “RA cold start” use case to improve the throughput and reduce the packet 
 delays in case where UT does not have any DA resources available.
+
+MARSALA algorithm is based on `[marsala]`_ and aims at improving CRDSA when its SIC cycle finishes.
 
 Return link packet scheduling
 #############################
@@ -340,6 +345,13 @@ Indoor and Mobile Radio Communications, 2005.
 
 \ 
 
+.. _`[marsala]`:
+
+[marsala] K. Zidane,
+“Improving Synchronous Random Access Schemes for Satellite Communications” PhD Thesis,
+Université de Toulouse, ISAE, 2016
+
+\
 
 Scope and Limitations
 =====================

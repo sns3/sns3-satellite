@@ -735,7 +735,16 @@ SimulationHelper::CreateDefaultFwdLinkStats ()
   m_statContainer->AddGlobalFwdAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
 
   // Packet error
-  m_statContainer->AddGlobalFwdDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFwdDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamCrdsaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamCrdsaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+  // Marsala
+  m_statContainer->AddPerBeamMarsalaCorrelation (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamMarsalaCorrelation (SatStatsHelper::OUTPUT_SCATTER_FILE);
 }
 
 void
