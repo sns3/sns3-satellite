@@ -1,5 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
+ * Copyright (c) 2014 Magister Solutions Ltd
  * Copyright (c) 2019 CNES
  *
  * This program is free software; you can redistribute it and/or modify
@@ -15,48 +16,106 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
+ * Author: Sami Rantanen <sami.rantanen@magister.fi>
  * Author: Joaquin Muguerza <jmuguerza@viveris.fr>
  */
 
-#include <map>
+#include <algorithm>
+#include <limits>
 #include "ns3/log.h"
-#include "satellite-superframe-allocator.h"
+#include "ns3/double.h"
+#include "ns3/boolean.h"
+#include "satellite-utils.h"
+#include "satellite-default-superframe-allocator.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatSuperframeAllocator");
+NS_LOG_COMPONENT_DEFINE ("SatDefaultSuperframeAllocator");
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (SatSuperframeAllocator);
+NS_OBJECT_ENSURE_REGISTERED (SatDefaultSuperframeAllocator);
 
 TypeId
-SatSuperframeAllocator::GetTypeId (void)
+SatDefaultSuperframeAllocator::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::SatSuperframeAllocator")
-    .SetParent<Object> ();
+  static TypeId tid = TypeId ("ns3::SatDefaultSuperframeAllocator")
+    .SetParent<SatSuperframeAllocator> ()
+    .AddAttribute ("TargetLoad",
+                   "Target load limits upper bound of the symbols in a frame.",
+                   DoubleValue (0.9),
+                   MakeDoubleAccessor (&SatDefaultSuperframeAllocator::m_targetLoad),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute ("FcaEnabled",
+                   "Free capacity allocation (FCA) enable status.",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatDefaultSuperframeAllocator::m_fcaEnabled),
+                   MakeBooleanChecker ())
+    .AddAttribute ("RcBasedAllocationEnabled",
+                   "Time slot generated per RC symbols instead of sum of UT symbols.",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatDefaultSuperframeAllocator::m_rcBasedAllocationEnabled),
+                   MakeBooleanChecker ())
+  ;
   return tid;
 }
 
 TypeId
-SatSuperframeAllocator::GetInstanceTypeId (void) const
+SatDefaultSuperframeAllocator::GetInstanceTypeId (void) const
 {
   NS_LOG_FUNCTION (this);
 
   return GetTypeId ();
 }
 
-SatSuperframeAllocator::SatSuperframeAllocator (Ptr<SatSuperframeConf> superFrameConf):
-  m_superframeConf(superFrameConf)
+SatDefaultSuperframeAllocator::SatDefaultSuperframeAllocator (Ptr<SatSuperframeConf> superFrameConf)
+  : SatSuperframeAllocator (superFrameConf),
+  m_targetLoad (0.0),
+  m_fcaEnabled (false),
+  m_minCarrierPayloadInBytes (0),
+  m_minimumRateBasedBytesLeft (0),
+  m_rcBasedAllocationEnabled (false)
 {
   NS_LOG_FUNCTION (this);
+
+  uint32_t currentMinCarrierPayloadInBytes = std::numeric_limits<uint32_t>::max ();
+  uint32_t currentMostRobustSlotPayloadInBytes = std::numeric_limits<uint32_t>::max ();
+
+  for (uint8_t i = 0; i < superFrameConf->GetFrameCount (); i++ )
+    {
+      Ptr<SatFrameConf> frameConf = superFrameConf->GetFrameConf (i);
+
+      if (frameConf->IsRandomAccess () == false )
+        {
+          Ptr<SatFrameAllocator> frameAllocator = Create<SatFrameAllocator> (frameConf, i, superFrameConf->GetConfigType ());
+          m_frameAllocators.push_back ( frameAllocator );
+
+          uint32_t minCarrierPayloadInBytes = frameAllocator->GetCarrierMinPayloadInBytes ();
+
+          if ( minCarrierPayloadInBytes < currentMinCarrierPayloadInBytes )
+            {
+              currentMinCarrierPayloadInBytes = minCarrierPayloadInBytes;
+              m_minCarrierPayloadInBytes = minCarrierPayloadInBytes;
+            }
+
+          uint32_t mostRobustSlotPayloadInBytes = frameAllocator->GetMostRobustWaveform ()->GetPayloadInBytes ();
+
+          if ( mostRobustSlotPayloadInBytes < currentMostRobustSlotPayloadInBytes )
+            {
+              currentMostRobustSlotPayloadInBytes = mostRobustSlotPayloadInBytes;
+              m_mostRobustSlotPayloadInBytes = mostRobustSlotPayloadInBytes;
+            }
+
+          m_minimumRateBasedBytesLeft += frameConf->GetCarrierCount () * minCarrierPayloadInBytes;
+        }
+    }
 }
 
-SatSuperframeAllocator::~SatSuperframeAllocator ()
+SatDefaultSuperframeAllocator::~SatDefaultSuperframeAllocator ()
 {
   NS_LOG_FUNCTION (this);
 }
 
 void
-SatSuperframeAllocator::RemoveAllocations ()
+SatDefaultSuperframeAllocator::RemoveAllocations ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -67,7 +126,7 @@ SatSuperframeAllocator::RemoveAllocations ()
 }
 
 void
-SatSuperframeAllocator::GenerateTimeSlots (SatFrameAllocator::TbtpMsgContainer_t& tbtpContainer, uint32_t maxSizeInBytes, SatFrameAllocator::UtAllocInfoContainer_t& utAllocContainer,
+SatDefaultSuperframeAllocator::GenerateTimeSlots (SatFrameAllocator::TbtpMsgContainer_t& tbtpContainer, uint32_t maxSizeInBytes, SatFrameAllocator::UtAllocInfoContainer_t& utAllocContainer,
                                            TracedCallback<uint32_t> waveformTrace, TracedCallback<uint32_t, uint32_t> utLoadTrace, TracedCallback<uint32_t, double> loadTrace)
 {
   NS_LOG_FUNCTION (this);
@@ -84,7 +143,7 @@ SatSuperframeAllocator::GenerateTimeSlots (SatFrameAllocator::TbtpMsgContainer_t
 }
 
 void
-SatSuperframeAllocator::PreAllocateSymbols (SatFrameAllocator::SatFrameAllocContainer_t& allocReqs)
+SatDefaultSuperframeAllocator::PreAllocateSymbols (SatFrameAllocator::SatFrameAllocContainer_t& allocReqs)
 {
   NS_LOG_FUNCTION (this);
 
@@ -101,7 +160,7 @@ SatSuperframeAllocator::PreAllocateSymbols (SatFrameAllocator::SatFrameAllocCont
     }
 }
 
-void SatSuperframeAllocator::ReserveMinimumRate (uint32_t minimumRateBytes, bool controlSlotsEnabled)
+void SatDefaultSuperframeAllocator::ReserveMinimumRate (uint32_t minimumRateBytes, bool controlSlotsEnabled)
 {
   NS_LOG_FUNCTION (this << minimumRateBytes);
 
@@ -126,29 +185,8 @@ void SatSuperframeAllocator::ReserveMinimumRate (uint32_t minimumRateBytes, bool
     }
 }
 
-void SatSuperframeAllocator::ReleaseMinimumRate (uint32_t minimumRateBytes, bool controlSlotsEnabled)
-{
-  NS_LOG_FUNCTION (this << minimumRateBytes);
-
-  uint32_t rateBasedByteToCheck = minimumRateBytes;
-
-  if ( controlSlotsEnabled )
-    {
-      rateBasedByteToCheck += m_mostRobustSlotPayloadInBytes;
-    }
-
-  if ( rateBasedByteToCheck > m_minCarrierPayloadInBytes )
-    {
-      NS_FATAL_ERROR ("Minimum released bytes (" << minimumRateBytes << ") for UT is greater than bytes in minimum carrier (" << m_minCarrierPayloadInBytes << ")");
-    }
-  else
-    {
-      m_minimumRateBasedBytesLeft += minimumRateBytes;
-    }
-}
-
 bool
-SatSuperframeAllocator::AllocateToFrame (SatFrameAllocator::SatFrameAllocReq * allocReq)
+SatDefaultSuperframeAllocator::AllocateToFrame (SatFrameAllocator::SatFrameAllocReq * allocReq)
 {
   NS_LOG_FUNCTION (this);
 
@@ -195,7 +233,7 @@ SatSuperframeAllocator::AllocateToFrame (SatFrameAllocator::SatFrameAllocReq * a
 }
 
 bool
-SatSuperframeAllocator::AllocateBasedOnCc (SatFrameAllocator::CcLevel_t ccLevel, SatFrameAllocator::SatFrameAllocReq * allocReq, const SupportedFramesMap_t &frames)
+SatDefaultSuperframeAllocator::AllocateBasedOnCc (SatFrameAllocator::CcLevel_t ccLevel, SatFrameAllocator::SatFrameAllocReq * allocReq, const SupportedFramesMap_t &frames)
 {
   NS_LOG_FUNCTION (this << ccLevel);
 

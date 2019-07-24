@@ -729,6 +729,72 @@ public:
     return "";
   }
 
+  /**
+   * \enum RbcdCapacityRequestAlgorithm_t
+   * \brief The defined RBDC capacity request algorithms. These help determine
+   * which algorithm to use when calculating RBDC requests.
+   */
+  typedef enum
+  {
+    CR_RBDC_LEGACY = 0,
+  } RbdcCapacityRequestAlgorithm_t;
+
+  static inline std::string GetRbdcCapacityRequestAlgorithmName (RbdcCapacityRequestAlgorithm_t rbdcAlgorithm)
+  {
+    switch (rbdcAlgorithm)
+      {
+      case CR_RBDC_LEGACY:
+        {
+          return "CR_RBDC_LEGACY";
+        }
+      default:
+        {
+          NS_FATAL_ERROR ("SatEnums::GetRbdcCapacityRequestAlgorithmName - Invalid algorithm name");
+          break;
+        }
+      }
+    NS_FATAL_ERROR ("SatEnums::GetRbdcCapacityRequestAlgorithmName - Invalid algorithm name");
+    return "";
+  }
+
+  /**
+   * \enum VbcdCapacityRequestAlgorithm_t
+   * \brief The defined VBDC capacity request algorithms. These help determine
+   * which algorithm to use when calculating VBDC requests.
+   */
+  typedef enum
+  {
+    CR_VBDC_LEGACY = 0,
+  } VbdcCapacityRequestAlgorithm_t;
+
+  static inline std::string GetVbdcCapacityRequestAlgorithmName (VbdcCapacityRequestAlgorithm_t vbdcAlgorithm)
+  {
+    switch (vbdcAlgorithm)
+      {
+      case CR_VBDC_LEGACY:
+        {
+          return "CR_VBDC_LEGACY";
+        }
+      default:
+        {
+          NS_FATAL_ERROR ("SatEnums::GetVbdcCapacityRequestAlgorithmName - Invalid algorithm name");
+          break;
+        }
+      }
+    NS_FATAL_ERROR ("SatEnums::GetVbdcCapacityRequestAlgorithmName - Invalid algorithm name");
+    return "";
+  }
+
+
+  /**
+   * \enum SatSuperframeAllocatorType_t
+   * \brief SuperframeAllocator type to use
+   */
+  typedef enum
+  {
+    DEFAULT_SUPERFRAME_ALLOCATOR = 0,
+  } SuperframeAllocatorType_t;
+
 private:
   /**
    * Destructor

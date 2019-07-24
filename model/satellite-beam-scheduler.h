@@ -33,6 +33,7 @@
 #include <ns3/nstime.h>
 #include <ns3/traced-callback.h>
 #include <ns3/satellite-cno-estimator.h>
+#include <ns3/satellite-enums.h>
 #include <ns3/satellite-frame-allocator.h>
 
 namespace ns3 {
@@ -567,6 +568,11 @@ private:
   Address m_gwAddress;
 
   HandoverInformationForward_t m_handoverStrategy;
+
+  /**
+   * Type of SatSuperframeAllocator class to use
+   */
+  SatEnums::SuperframeAllocatorType_t m_superframeAllocatorType;
 };
 
 } // namespace ns3

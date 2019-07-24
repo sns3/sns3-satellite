@@ -228,6 +228,14 @@ private:
   uint32_t DoRbdc (uint8_t rc, const SatQueue::QueueStats_t &stats);
 
   /**
+   * \brief Legacy algorithm to do RBDC calculation for a RC
+   * \param rc Request class index
+   * \param stats Queue statistics
+   * \return uint32_t Requested bytes
+   */
+  uint32_t DoRbdcLegacy (uint8_t rc, const SatQueue::QueueStats_t &stats);
+
+	/**
    * \brief Do VBDC calculation for a RC
    * \param rc Request class index
    * \param stats Queue statistics
@@ -235,6 +243,15 @@ private:
    * \return SatCapacityAllocationCategory_t Capacity allocation category
    */
   SatEnums::SatCapacityAllocationCategory_t DoVbdc (uint8_t rc, const SatQueue::QueueStats_t &stats, uint32_t &rcVbdcBytes);
+
+	/**
+   * \brief Legacy algorithm to do VBDC calculation for a RC
+   * \param rc Request class index
+   * \param stats Queue statistics
+   * \param &vbdcBytes Reference to vbdcBytes
+   * \return SatCapacityAllocationCategory_t Capacity allocation category
+   */
+  SatEnums::SatCapacityAllocationCategory_t DoVbdcLegacy (uint8_t rc, const SatQueue::QueueStats_t &stats, uint32_t &rcVbdcBytes);
 
   /**
    * \brief Calculate the needed VBDC bytes for a RC
@@ -471,6 +488,16 @@ private:
   TracedCallback< uint32_t> m_rbdcTrace;
   TracedCallback< uint32_t> m_vbdcTrace;
   TracedCallback< uint32_t> m_aVbdcTrace;
+
+  /**
+   * The RBDC capacity algorithm to use
+   */
+	SatEnums::RbdcCapacityRequestAlgorithm_t m_rbdcCapacityRequestAlgorithm;
+
+  /**
+   * The VBDC capacity algorithm to use
+   */
+	SatEnums::VbdcCapacityRequestAlgorithm_t m_vbdcCapacityRequestAlgorithm;
 };
 
 } // namespace
