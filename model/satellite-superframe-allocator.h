@@ -91,7 +91,7 @@ public:
    * \param minimumRateBytes Minimum rate based bytes needed to reserve
    * \param controlSlotsEnabled Flag indicating if control slot generation is enabled
    */
-  void ReleaseMinimumRate (uint32_t minimumRateBytes, bool controlSlotsEnabled);
+  virtual void ReleaseMinimumRate (uint32_t minimumRateBytes, bool controlSlotsEnabled) = 0;
 
   /**
    * \brief Preallocate symbols for given to UTs in superframe.

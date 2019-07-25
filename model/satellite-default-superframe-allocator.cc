@@ -126,8 +126,12 @@ SatDefaultSuperframeAllocator::RemoveAllocations ()
 }
 
 void
-SatDefaultSuperframeAllocator::GenerateTimeSlots (SatFrameAllocator::TbtpMsgContainer_t& tbtpContainer, uint32_t maxSizeInBytes, SatFrameAllocator::UtAllocInfoContainer_t& utAllocContainer,
-                                           TracedCallback<uint32_t> waveformTrace, TracedCallback<uint32_t, uint32_t> utLoadTrace, TracedCallback<uint32_t, double> loadTrace)
+SatDefaultSuperframeAllocator::GenerateTimeSlots (SatFrameAllocator::TbtpMsgContainer_t& tbtpContainer,
+                                                  uint32_t maxSizeInBytes,
+                                                  SatFrameAllocator::UtAllocInfoContainer_t& utAllocContainer,
+                                                  TracedCallback<uint32_t> waveformTrace,
+                                                  TracedCallback<uint32_t, uint32_t> utLoadTrace,
+                                                  TracedCallback<uint32_t, double> loadTrace)
 {
   NS_LOG_FUNCTION (this);
 
@@ -160,7 +164,8 @@ SatDefaultSuperframeAllocator::PreAllocateSymbols (SatFrameAllocator::SatFrameAl
     }
 }
 
-void SatDefaultSuperframeAllocator::ReserveMinimumRate (uint32_t minimumRateBytes, bool controlSlotsEnabled)
+void
+SatDefaultSuperframeAllocator::ReserveMinimumRate (uint32_t minimumRateBytes, bool controlSlotsEnabled)
 {
   NS_LOG_FUNCTION (this << minimumRateBytes);
 
@@ -182,6 +187,28 @@ void SatDefaultSuperframeAllocator::ReserveMinimumRate (uint32_t minimumRateByte
   else
     {
       m_minimumRateBasedBytesLeft -= minimumRateBytes;
+    }
+}
+
+void
+SatDefaultSuperframeAllocator::ReleaseMinimumRate (uint32_t minimumRateBytes, bool controlSlotsEnabled)
+{
+  NS_LOG_FUNCTION (this << minimumRateBytes);
+
+  uint32_t rateBasedByteToCheck = minimumRateBytes;
+
+  if ( controlSlotsEnabled )
+    {
+      rateBasedByteToCheck += m_mostRobustSlotPayloadInBytes;
+    }
+
+  if ( rateBasedByteToCheck > m_minCarrierPayloadInBytes )
+    {
+      NS_FATAL_ERROR ("Minimum released bytes (" << minimumRateBytes << ") for UT is greater than bytes in minimum carrier (" << m_minCarrierPayloadInBytes << ")");
+    }
+  else
+    {
+      m_minimumRateBasedBytesLeft += minimumRateBytes;
     }
 }
 

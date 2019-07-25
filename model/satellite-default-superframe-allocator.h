@@ -80,6 +80,14 @@ public:
   void ReserveMinimumRate (uint32_t minimumRateBytes, bool controlSlotsEnabled);
 
   /**
+   * \brief Release minimum rate from the allocator. This method is called when a UT leaves the beam using this allocator.
+   *
+   * \param minimumRateBytes Minimum rate based bytes needed to reserve
+   * \param controlSlotsEnabled Flag indicating if control slot generation is enabled
+   */
+  void ReleaseMinimumRate (uint32_t minimumRateBytes, bool controlSlotsEnabled);
+
+  /**
    * \brief Preallocate symbols for given to UTs in superframe.
    * Pre-allocation is done in fairly manner between UTs and RCs.
    */
