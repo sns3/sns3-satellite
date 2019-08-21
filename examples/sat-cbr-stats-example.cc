@@ -1,4 +1,4 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2014 Magister Solutions
  *
@@ -146,7 +146,7 @@ main (int argc, char *argv[])
   Ptr<SatHelper> helper = simulationHelper->CreateSatScenario (satScenario);
 
   // get users
- // NodeContainer utUsers = helper->GetUtUsers ();
+  // NodeContainer utUsers = helper->GetUtUsers ();
   NodeContainer gwUsers = helper->GetGwUsers ();
 
   //uint16_t port = 9;
@@ -157,15 +157,15 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
 
   for (uint32_t i = 0; i < gwUsers.GetN (); i++)
-		{
-  		simulationHelper->SetGwUserId (i);
-			simulationHelper->InstallTrafficModel (
-					SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
-					Seconds (0.1), Seconds (duration), Seconds (0.001));
-			simulationHelper->InstallTrafficModel (
-								SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
-								Seconds (0.1), Seconds (duration), Seconds (0.001));
-		}
+    {
+      simulationHelper->SetGwUserId (i);
+      simulationHelper->InstallTrafficModel (
+        SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
+        Seconds (0.1), Seconds (duration), Seconds (0.001));
+      simulationHelper->InstallTrafficModel (
+        SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
+        Seconds (0.1), Seconds (duration), Seconds (0.001));
+    }
 
   /*for (NodeContainer::Iterator itGw = gwUsers.Begin ();
        itGw != gwUsers.End (); ++itGw)

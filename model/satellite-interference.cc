@@ -28,10 +28,10 @@ namespace ns3 {
 
 SatInterference::InterferenceChangeEvent::InterferenceChangeEvent (uint32_t id, Time rxDuration, double rxPower, Address satEarthStationAddress)
   : m_startTime (Simulator::Now ()),
-    m_endTime (m_startTime + rxDuration),
-    m_rxPower (rxPower),
-    m_id (id),
-    m_satEarthStationAddress (satEarthStationAddress)
+  m_endTime (m_startTime + rxDuration),
+  m_rxPower (rxPower),
+  m_id (id),
+  m_satEarthStationAddress (satEarthStationAddress)
 {
 }
 SatInterference::InterferenceChangeEvent::~InterferenceChangeEvent ()
@@ -125,7 +125,7 @@ SatInterference::Add (Time duration, double power, Address rxAddress)
   return DoAdd (duration, power, rxAddress);
 }
 
-double
+std::vector< std::pair<double, double> >
 SatInterference::Calculate (Ptr<SatInterference::InterferenceChangeEvent> event)
 {
   NS_LOG_FUNCTION (this);
@@ -145,7 +145,7 @@ SatInterference::Calculate (Ptr<SatInterference::InterferenceChangeEvent> event)
         }
       if (!wasCollisionReported)
         {
-          NS_LOG_INFO ("SatInterference::Calculate - Time: " << Now ().GetSeconds () << " - Packet collision!");
+          NS_LOG_INFO ("Packet collision!");
         }
     }
 
@@ -170,8 +170,8 @@ SatInterference::NotifyRxStart (Ptr<SatInterference::InterferenceChangeEvent> ev
 
   m_currentlyReceiving++;
 
-  std::pair<std::map<Ptr<SatInterference::InterferenceChangeEvent>, bool>::iterator,bool> result;
-  result = m_packetCollisions.insert (std::make_pair (event,false));
+  std::pair<std::map<Ptr<SatInterference::InterferenceChangeEvent>, bool>::iterator, bool> result;
+  result = m_packetCollisions.insert (std::make_pair (event, false));
 
   if (!result.second)
     {

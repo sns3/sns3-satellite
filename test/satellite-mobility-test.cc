@@ -100,7 +100,7 @@ SatMobilityRandomTestCase::DoRun (void)
   MobilityHelper mobility;
   mobility.SetPositionAllocator ("ns3::SatRandomBoxPositionAllocator",
                                  "Latitude", StringValue ("ns3::UniformRandomVariable[Min=-45.0|Max=80.0]"),
-                                 "Longitude",StringValue ("ns3::UniformRandomVariable[Min=-10.0|Max=180.0]"),
+                                 "Longitude", StringValue ("ns3::UniformRandomVariable[Min=-10.0|Max=180.0]"),
                                  "Altitude", StringValue ("ns3::UniformRandomVariable[Min=0.0|Max=100.0]"));
 
 

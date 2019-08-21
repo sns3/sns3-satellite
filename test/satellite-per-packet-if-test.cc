@@ -91,13 +91,13 @@ protected:
 
 SatPerPacketBaseTestCase::SatPerPacketBaseTestCase ()
   : TestCase (""),
-    m_Interval1 (),
-    m_Interval2 (),
-    m_PackageSize1 (),
-    m_PackageSize2 (),
-    m_extName (),
-    m_fading (),
-    m_dummyFrames (false)
+  m_Interval1 (),
+  m_Interval2 (),
+  m_PackageSize1 (),
+  m_PackageSize2 (),
+  m_extName (),
+  m_fading (),
+  m_dummyFrames (false)
 {
 
 }
@@ -105,13 +105,13 @@ SatPerPacketBaseTestCase::SatPerPacketBaseTestCase ()
 SatPerPacketBaseTestCase::SatPerPacketBaseTestCase (std::string name, std::string extName, SatEnums::FadingModel_t fading, bool dummyFrames,
                                                     StringValue ival1, UintegerValue pSize1, StringValue ival2, UintegerValue pSize2)
   : TestCase (name),
-    m_Interval1 (ival1),
-    m_Interval2 (ival2),
-    m_PackageSize1 (pSize1),
-    m_PackageSize2 (pSize2),
-    m_extName (extName),
-    m_fading (fading),
-    m_dummyFrames (dummyFrames)
+  m_Interval1 (ival1),
+  m_Interval2 (ival2),
+  m_PackageSize1 (pSize1),
+  m_PackageSize2 (pSize2),
+  m_extName (extName),
+  m_fading (fading),
+  m_dummyFrames (dummyFrames)
 {
 
 }
@@ -260,7 +260,7 @@ SatPerPacketFwdLinkUserTestCase::DoRun (void)
   Ptr<SatHelper> helper = CreateObject<SatHelper> ();
 
   // create user defined scenario with beams 1 and 5
-  SatBeamUserInfo beamInfo = SatBeamUserInfo (1,1);
+  SatBeamUserInfo beamInfo = SatBeamUserInfo (1, 1);
   std::map<uint32_t, SatBeamUserInfo > beamMap;
   beamMap[1] = beamInfo;
   beamMap[5] = beamInfo;
@@ -409,7 +409,7 @@ SatPerPacketFwdLinkFullTestCase::DoRun (void)
   Config::SetDefault ("ns3::SatHelper::UtUsers", UintegerValue (1));
   Config::SetDefault ("ns3::SatGeoHelper::DaFwdLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
   Config::SetDefault ("ns3::SatUtHelper::DaFwdLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
-  Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace",BooleanValue (true));
+  Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace", BooleanValue (true));
 
   // Creating the reference system.
   Ptr<SatHelper> helper = CreateObject<SatHelper> ();
@@ -558,15 +558,15 @@ SatPerPacketRtnLinkUserTestCase::DoRun (void)
   Config::SetDefault ("ns3::SatSuperframeConf0::Frame0_AllocatedBandwidthHz", DoubleValue (1.25e6));
   Config::SetDefault ("ns3::SatSuperframeConf0::Frame0_CarrierAllocatedBandwidthHz", DoubleValue (1.25e6));
   Config::SetDefault ("ns3::SatWaveformConf::DefaultWfId", UintegerValue (13));
-  Config::SetDefault ("ns3::SatGwHelper::DaRtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
-  Config::SetDefault ("ns3::SatGeoHelper::DaRtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
-  Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace",BooleanValue (true));
+  Config::SetDefault ("ns3::SatGwHelper::DaRtnLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+  Config::SetDefault ("ns3::SatGeoHelper::DaRtnLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+  Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace", BooleanValue (true));
 
   // Creating the reference system.
   Ptr<SatHelper> helper = CreateObject<SatHelper> ();
 
   // create user defined scenario with beams 1 and 5
-  SatBeamUserInfo beamInfo = SatBeamUserInfo (1,1);
+  SatBeamUserInfo beamInfo = SatBeamUserInfo (1, 1);
   std::map<uint32_t, SatBeamUserInfo > beamMap;
   beamMap[1] = beamInfo;
   beamMap[5] = beamInfo;
@@ -689,9 +689,9 @@ SatPerPacketRtnLinkFullTestCase::DoRun (void)
   Config::SetDefault ("ns3::SatSuperframeConf0::Frame0_AllocatedBandwidthHz", DoubleValue (1.25e6));
   Config::SetDefault ("ns3::SatSuperframeConf0::Frame0_CarrierAllocatedBandwidthHz", DoubleValue (1.25e6));
   Config::SetDefault ("ns3::SatWaveformConf::DefaultWfId", UintegerValue (13));
-  Config::SetDefault ("ns3::SatGwHelper::DaRtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
-  Config::SetDefault ("ns3::SatGeoHelper::DaRtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
-  Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace",BooleanValue (true));
+  Config::SetDefault ("ns3::SatGwHelper::DaRtnLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+  Config::SetDefault ("ns3::SatGeoHelper::DaRtnLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+  Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace", BooleanValue (true));
 
   // Creating the reference system.
   Ptr<SatHelper> helper = CreateObject<SatHelper> ();

@@ -38,9 +38,9 @@ static const double g_RayleighParameters[SatMarkovConf::DEFAULT_ELEVATION_COUNT]
   /// TODO: The elevation values should eventually be formed from attributes for each state!
 
   /* Elevation 30 degrees */
-  {{10,10},
-   {10,10},
-   {10,10}}
+  {{10, 10},
+   {10, 10},
+   {10, 10}}
 };
 
 TypeId
@@ -62,11 +62,9 @@ SatRayleighConf::GetTypeId (void)
 
 SatRayleighConf::SatRayleighConf ()
   : m_elevationCount (SatMarkovConf::DEFAULT_ELEVATION_COUNT),
-    m_stateCount (SatMarkovConf::DEFAULT_STATE_COUNT)
+  m_stateCount (SatMarkovConf::DEFAULT_STATE_COUNT)
 {
   NS_LOG_FUNCTION (this);
-
-  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatRayleighConf::SatRayleighConf - Creating SatRayleighConf...");
 
   for (uint32_t i = 0; i < m_elevationCount; i++)
     {
@@ -103,7 +101,6 @@ SatRayleighConf::GetParameters (uint32_t set)
       NS_FATAL_ERROR ("SatRayleighConf::GetParameters - Invalid set");
     }
 
-  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatRayleighConf::GetParameters - Getting Rayleigh parameters for set ID " << set);
   return m_rayleighParameters[set];
 }
 

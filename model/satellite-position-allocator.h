@@ -39,7 +39,6 @@ namespace ns3 {
 class SatPositionAllocator : public PositionAllocator
 {
 public:
-
   /**
    * \brief Get the type ID
    * \return the object TypeId
@@ -86,7 +85,6 @@ private:
 class SatListPositionAllocator : public SatPositionAllocator
 {
 public:
-
   /**
    * \brief Get the type ID
    * \return the object TypeId
@@ -131,7 +129,6 @@ private:
 class SatRandomBoxPositionAllocator : public SatPositionAllocator
 {
 public:
-
   /**
    * \brief Get the type ID
    * \return the object TypeId
@@ -172,7 +169,6 @@ private:
 class SatSpotBeamPositionAllocator : public SatPositionAllocator
 {
 public:
-
   /**
    * \brief Get the type ID
    * \return the object TypeId

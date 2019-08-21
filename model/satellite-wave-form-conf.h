@@ -181,7 +181,6 @@ private:
 class SatWaveformConf : public Object
 {
 public:
-
   /**
    * Define BurstLengthContainer
    */

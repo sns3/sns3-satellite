@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2013 Magister Solutions Ltd.
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
 #ifndef SATELLITE_TRACED_INTERFERENCE_H
@@ -97,7 +99,7 @@ private:
    *
    * \return Final power value at end of receiving
    */
-  virtual double DoCalculate (Ptr<SatInterference::InterferenceChangeEvent> event);
+  virtual std::vector< std::pair<double, double> > DoCalculate (Ptr<SatInterference::InterferenceChangeEvent> event);
 
   /**
    * Resets current interference.

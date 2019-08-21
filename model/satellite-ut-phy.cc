@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2013 Magister Solutions Ltd.
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.com>
  */
 
 #include "ns3/log.h"
@@ -94,11 +96,16 @@ SatUtPhy::GetTypeId (void)
                    DoubleValue (1.00),
                    MakeDoubleAccessor (&SatPhy::GetDefaultFading, &SatPhy::SetDefaultFading),
                    MakeDoubleChecker<double_t> ())
-    .AddAttribute ( "OtherSysIfCOverIDb",
-                    "Other system interference, C over I in dB.",
-                    DoubleValue (24.7),
-                    MakeDoubleAccessor (&SatUtPhy::m_otherSysInterferenceCOverIDb),
-                    MakeDoubleChecker<double> ())
+    .AddAttribute ("OtherSysIfCOverIDb",
+                   "Other system interference, C over I in dB.",
+                   DoubleValue (24.7),
+                   MakeDoubleAccessor (&SatUtPhy::m_otherSysInterferenceCOverIDb),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute ("AntennaReconfigurationDelay",
+                   "Delay of antenna reconfiguration when performing handover",
+                   TimeValue (Seconds (0.0)),
+                   MakeTimeAccessor (&SatUtPhy::m_antennaReconfigurationDelay),
+                   MakeTimeChecker ())
   ;
   return tid;
 }
@@ -112,7 +119,8 @@ SatUtPhy::GetInstanceTypeId (void) const
 
 SatUtPhy::SatUtPhy (void)
   : m_otherSysInterferenceCOverIDb (24.7),
-    m_otherSysInterferenceCOverI (SatUtils::DbToLinear (m_otherSysInterferenceCOverIDb))
+  m_otherSysInterferenceCOverI (SatUtils::DbToLinear (m_otherSysInterferenceCOverIDb)),
+  m_antennaReconfigurationDelay (Seconds (0.0))
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("SatUtPhy default constructor is not allowed to be used");
@@ -122,7 +130,8 @@ SatUtPhy::SatUtPhy (SatPhy::CreateParam_t &params,
                     Ptr<SatLinkResults> linkResults,
                     SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
                     Ptr<SatSuperframeConf> superFrameConf)
-  :SatPhy (params)
+  : SatPhy (params),
+  m_antennaReconfigurationDelay (Seconds (0.0))
 {
   NS_LOG_FUNCTION (this);
 
@@ -183,6 +192,47 @@ SatUtPhy::CalculateSinr (double sinr)
   double finalSinr = 1 / ( (1 / sinr) + (1 / m_otherSysInterferenceCOverI) );
 
   return (finalSinr);
+}
+
+
+void
+SatUtPhy::PerformHandover (uint32_t beamId)
+{
+  NS_LOG_FUNCTION (this << beamId);
+
+  // disconnect current SatChannels
+  SatChannelPair::ChannelPair_t channels = m_retrieveChannelPair (m_beamId);
+  m_phyTx->ClearChannel ();
+  channels.first->RemoveRx (m_phyRx);
+
+  // perform "physical" beam handover
+  SetBeamId (beamId);
+  Simulator::Schedule (m_antennaReconfigurationDelay, &SatUtPhy::AssignNewSatChannels, this);
+}
+
+
+void
+SatUtPhy::AssignNewSatChannels ()
+{
+  NS_LOG_FUNCTION (this);
+
+  // Fetch channels for current beam
+  SatChannelPair::ChannelPair_t channels = m_retrieveChannelPair (m_beamId);
+  Ptr<SatChannel> forwardLink = channels.first;
+  Ptr<SatChannel> returnLink = channels.second;
+
+  // Assign channels
+  NS_LOG_INFO ("Setting new Tx on channel " << returnLink);
+  m_phyTx->SetChannel (returnLink);
+  forwardLink->AddRx (m_phyRx);
+}
+
+
+bool
+SatUtPhy::IsTxPossible (void) const
+{
+  NS_LOG_FUNCTION (this);
+  return m_phyTx->CanTransmit ();
 }
 
 } // namespace ns3

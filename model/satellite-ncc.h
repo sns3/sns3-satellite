@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2013 Magister Solutions Ltd
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
 #ifndef SAT_NCC_H
@@ -47,7 +49,6 @@ class SatLowerLayerServiceConf;
 class SatNcc : public Object
 {
 public:
-
   /**
    * \brief Get the type ID
    * \return the object TypeId
@@ -121,17 +122,19 @@ public:
    *        be forwarded to the Beam UTs.
    * \param seq Super frame sequence
    * \param maxFrameSizeInBytes Maximum non fragmented BB frame size with most robust ModCod
+   * \param gwAddress Mac address of the gateway responsible for this beam
    */
-  void AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq> seq, uint32_t maxFrameSizeInBytes);
+  void AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq> seq, uint32_t maxFrameSizeInBytes, Address gwAddress);
 
   /**
    * \brief Function for adding the UT
    * \param utId ID (mac address) of the UT to be added
    * \param llsConf Lower layer service configuration for the UT to be added.
    * \param beamId ID of the beam where UT is connected.
-   * \return RA channel index assigned to added UT.
+   * \param setRaChannelCallback  callback to invoke whenever the UT to be
+   *        added should change its RA allocation channel
    */
-  uint32_t AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf, uint32_t beamId);
+  void AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf, uint32_t beamId, Callback<void, uint32_t> setRaChannelCallback);
 
   /**
    * \brief Function for setting the random access allocation channel specific high load backoff probabilities
@@ -174,6 +177,29 @@ public:
    */
   Ptr<SatBeamScheduler> GetBeamScheduler (uint32_t beamId) const;
 
+  /**
+   * \brief Check if a terminal can be moved between two beams. If yes, schedule
+   * the actual move at a later point in time.
+   * \param utId the UT wanting to move between beams
+   * \param srcBeamId the beam ID this UT is moving from
+   * \param destBeamId the beam ID this UT is moving to
+   */
+  void MoveUtBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamId);
+
+  /**
+   * \brief Update routes and ARP tables on gateways after a terminal handover
+   * \param Address address of the UT whose handover is completed
+   * \param Address address of the GW handling this UT before handover
+   * \param Address address of the GW handling this UT after handover
+   */
+  typedef Callback<void, Address, Address, Address> UpdateRoutingCallback;
+
+  /**
+   * \brief Set the callback used to update routes and APR tables after a terminal handover
+   * \param cb the routing update callback
+   */
+  void SetUpdateRoutingCallback (SatNcc::UpdateRoutingCallback cb);
+
 private:
   SatNcc& operator = (const SatNcc &);
   SatNcc (const SatNcc &);
@@ -188,6 +214,14 @@ private:
    * \param allocationChannelId Allocation channel ID
    */
   void CreateRandomAccessLoadControlMessage (uint16_t backoffProbability, uint16_t backoffTime, uint32_t beamId, uint8_t allocationChannelId);
+
+  /**
+   * \brief Perform terminal handover on the terestrial network
+   * \param utId the UT moving between beams
+   * \param srcBeamId the beam ID this UT is moving from
+   * \param destBeamId the beam ID this UT is moving to
+   */
+  void DoMoveUtBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamId);
 
   /**
    * The map containing beams in use (set).
@@ -211,32 +245,43 @@ private:
   /**
    * Map for keeping track of the load status of each random access allocation channel
    */
-  std::map<std::pair<uint32_t,uint8_t>,bool> m_isLowRandomAccessLoad;
+  std::map<std::pair<uint32_t, uint8_t>, bool> m_isLowRandomAccessLoad;
 
   /**
    * Map for random access allocation channel specific load thresholds
    */
-  std::map<uint8_t,double> m_randomAccessAverageNormalizedOfferedLoadThreshold;
+  std::map<uint8_t, double> m_randomAccessAverageNormalizedOfferedLoadThreshold;
 
   /**
    * Map for random access allocation channel specific low load backoff probabilities
    */
-  std::map<uint8_t,uint16_t> m_lowLoadBackOffProbability;
+  std::map<uint8_t, uint16_t> m_lowLoadBackOffProbability;
 
   /**
    * Map for random access allocation channel specific high load backoff probabilities
    */
-  std::map<uint8_t,uint16_t> m_highLoadBackOffProbability;
+  std::map<uint8_t, uint16_t> m_highLoadBackOffProbability;
 
   /**
    * Map for random access allocation channel specific low load backoff time
    */
-  std::map<uint8_t,uint16_t> m_lowLoadBackOffTime;
+  std::map<uint8_t, uint16_t> m_lowLoadBackOffTime;
 
   /**
    * Map for random access allocation channel specific high load backoff time
    */
-  std::map<uint8_t,uint16_t> m_highLoadBackOffTime;
+  std::map<uint8_t, uint16_t> m_highLoadBackOffTime;
+
+  /**
+   * Delay between handover acceptance and effective information transfer
+   */
+  Time m_utHandoverDelay;
+
+  /**
+   * Callback to update routing tables and ARP tables on gateways
+   * once a handover request has been accepted and treated
+   */
+  UpdateRoutingCallback m_updateRoutingCallback;
 };
 
 } // namespace ns3

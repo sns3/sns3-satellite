@@ -42,12 +42,12 @@ namespace ns3 {
 
 SatWaveform::SatWaveform ()
   : m_waveformId (0),
-    m_modulatedBits (0),
-    m_codingRate (0.0),
-    m_modCod (SatEnums::SAT_NONVALID_MODCOD),
-    m_payloadBytes (0),
-    m_lengthInSymbols (0),
-    m_ebnoRequirement (0.0)
+  m_modulatedBits (0),
+  m_codingRate (0.0),
+  m_modCod (SatEnums::SAT_NONVALID_MODCOD),
+  m_payloadBytes (0),
+  m_lengthInSymbols (0),
+  m_ebnoRequirement (0.0)
 {
   NS_ASSERT (false);
 }
@@ -55,12 +55,12 @@ SatWaveform::SatWaveform ()
 
 SatWaveform::SatWaveform (uint32_t wfId, uint32_t modulatedBits, double codingRate, SatEnums::SatModcod_t modcod, uint32_t payloadBytes, uint32_t lengthInSymbols)
   : m_waveformId (wfId),
-    m_modulatedBits (modulatedBits),
-    m_codingRate (codingRate),
-    m_modCod (modcod),
-    m_payloadBytes (payloadBytes),
-    m_lengthInSymbols (lengthInSymbols),
-    m_ebnoRequirement (0.0)
+  m_modulatedBits (modulatedBits),
+  m_codingRate (codingRate),
+  m_modCod (modcod),
+  m_payloadBytes (payloadBytes),
+  m_lengthInSymbols (lengthInSymbols),
+  m_ebnoRequirement (0.0)
 {
 
 }
@@ -125,9 +125,9 @@ SatWaveform::GetCNoThreshold (double symbolRateInBaud) const
    * Eb/No = (Es/log2M)/No = (Es/No)*(1/log2M)  = C/N * (1/log2M) = C/No * (1/fs) * (1/log2M)
    */
   double cnoRequirement = m_ebnoRequirement *
-                           symbolRateInBaud *
-                           m_codingRate *
-                           m_modulatedBits;
+    symbolRateInBaud *
+    m_codingRate *
+    m_modulatedBits;
 
   return cnoRequirement;
 }
@@ -145,12 +145,12 @@ SatWaveform::Dump (double carrierBandwidthInHz, double symbolRateInBaud) const
   NS_LOG_FUNCTION (this << carrierBandwidthInHz << symbolRateInBaud);
 
   std::cout << "ModulatedBits: " << m_modulatedBits << ", CodingRate: " << m_codingRate <<
-  ", Payload: " << m_payloadBytes << ", BurstLength: " << m_lengthInSymbols <<
-  ", EbNoRequirement: " << SatUtils::LinearToDb (m_ebnoRequirement) <<
-  ", BurstDuration: " << GetBurstDuration (symbolRateInBaud) <<
-  ", Throughput: " << GetThroughputInBitsPerSecond (symbolRateInBaud) <<
-  ", SpectralEfficiency: " << GetSpectralEfficiency (carrierBandwidthInHz, symbolRateInBaud) <<
-  ", C/No threshold: " << SatUtils::LinearToDb (GetCNoThreshold (symbolRateInBaud)) << std::endl;
+    ", Payload: " << m_payloadBytes << ", BurstLength: " << m_lengthInSymbols <<
+    ", EbNoRequirement: " << SatUtils::LinearToDb (m_ebnoRequirement) <<
+    ", BurstDuration: " << GetBurstDuration (symbolRateInBaud) <<
+    ", Throughput: " << GetThroughputInBitsPerSecond (symbolRateInBaud) <<
+    ", SpectralEfficiency: " << GetSpectralEfficiency (carrierBandwidthInHz, symbolRateInBaud) <<
+    ", C/No threshold: " << SatUtils::LinearToDb (GetCNoThreshold (symbolRateInBaud)) << std::endl;
 }
 
 NS_OBJECT_ENSURE_REGISTERED (SatWaveformConf);
@@ -158,11 +158,11 @@ NS_OBJECT_ENSURE_REGISTERED (SatWaveformConf);
 
 SatWaveformConf::SatWaveformConf ()
   : m_waveforms (),
-    m_targetBLER (0.00001),
-    m_acmEnabled (false),
-    m_defaultWfId (3),
-    m_minWfId (0),
-    m_maxWfId (23)
+  m_targetBLER (0.00001),
+  m_acmEnabled (false),
+  m_defaultWfId (3),
+  m_minWfId (0),
+  m_maxWfId (23)
 {
   // default constructor should not be used
   NS_ASSERT (false);
@@ -171,11 +171,11 @@ SatWaveformConf::SatWaveformConf ()
 
 SatWaveformConf::SatWaveformConf (std::string filePathName)
   : m_waveforms (),
-    m_targetBLER (0.00001),
-    m_acmEnabled (false),
-    m_defaultWfId (3),
-    m_minWfId (0),
-    m_maxWfId (23)
+  m_targetBLER (0.00001),
+  m_acmEnabled (false),
+  m_defaultWfId (3),
+  m_minWfId (0),
+  m_maxWfId (23)
 {
   NS_LOG_FUNCTION (this);
   ReadFromFile (filePathName);
@@ -370,7 +370,7 @@ SatWaveformConf::GetBestWaveformId (double cno, double symbolRateInBaud, uint32_
         }
     }
 
-  NS_LOG_INFO ("Get best waveform in RTN link (ACM)! CNo: " << SatUtils::LinearToDb(cno) << ", Symbol rate: " << symbolRateInBaud << ", burst length: " << burstLength << ", WF: " << wfId);
+  NS_LOG_INFO ("Get best waveform in RTN link (ACM)! CNo: " << SatUtils::LinearToDb (cno) << ", Symbol rate: " << symbolRateInBaud << ", burst length: " << burstLength << ", WF: " << wfId);
 
   return success;
 }
@@ -531,4 +531,4 @@ SatWaveformConf::ConvertToModCod (uint32_t modulatedBits, uint32_t codingRateNum
 
 
 
-}; // namespace ns3
+}  // namespace ns3

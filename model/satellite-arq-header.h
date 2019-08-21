@@ -108,6 +108,6 @@ private:
 };
 
 
-}; // namespace ns3
+}  // namespace ns3
 
 #endif // SATELLITE_ARQ_HEADER_H

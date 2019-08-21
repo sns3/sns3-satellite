@@ -1,4 +1,4 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2014 Magister Solutions
  *
@@ -52,7 +52,7 @@ NS_OBJECT_ENSURE_REGISTERED (SatStatsLinkRxPowerHelper);
 
 SatStatsLinkRxPowerHelper::SatStatsLinkRxPowerHelper (Ptr<const SatHelper> satHelper)
   : SatStatsHelper (satHelper),
-    m_traceSinkCallback (MakeCallback (&SatStatsLinkRxPowerHelper::RxPowerCallback, this))
+  m_traceSinkCallback (MakeCallback (&SatStatsLinkRxPowerHelper::RxPowerCallback, this))
 {
   NS_LOG_FUNCTION (this << satHelper);
 }

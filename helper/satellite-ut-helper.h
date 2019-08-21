@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2013 Magister Solutions Ltd
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@viveris.toulouse.fr>
  */
 
 #ifndef SATELLITE_UT_HELPER_H
@@ -31,8 +33,9 @@
 #include "ns3/satellite-channel.h"
 #include "ns3/satellite-link-results.h"
 #include "ns3/satellite-ncc.h"
+#include "ns3/satellite-ut-mac.h"
+#include "ns3/satellite-phy.h"
 #include "ns3/satellite-superframe-sequence.h"
-#include "ns3/satellite-mac.h"
 #include "ns3/satellite-random-access-container.h"
 #include "ns3/satellite-random-access-container-conf.h"
 #include "ns3/satellite-typedefs.h"
@@ -47,7 +50,6 @@ namespace ns3 {
 class SatUtHelper : public Object
 {
 public:
-
   /**
    * Define RandomAccessSettings as a struct
    */
@@ -55,6 +57,7 @@ public:
   {
     SatEnums::RandomAccessModel_t m_randomAccessModel;
     SatPhyRxCarrierConf::InterferenceModel m_raInterferenceModel;
+    SatPhyRxCarrierConf::InterferenceEliminationModel m_raInterferenceEliminationModel;
     SatPhyRxCarrierConf::RandomAccessCollisionModel m_raCollisionModel;
   } RandomAccessSettings_s;
 
@@ -149,8 +152,11 @@ public:
    * a queue for this ns3::NetDevice, and associate the resulting
    * ns3::NetDevice with the ns3::Node and ns3::SatChannel.
    */
-  NetDeviceContainer Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc);
-
+  NetDeviceContainer Install (NodeContainer c, uint32_t beamId,
+                              Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
+                              Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
+                              SatPhy::ChannelPairGetterCallback cbChannel,
+                              SatUtMac::RoutingUpdateCallback cbRouting);
   /**
    * \param n node
    * \param beamId  id of the beam
@@ -162,7 +168,11 @@ public:
    *
    * Saves you from having to construct a temporary NodeContainer.
    */
-  Ptr<NetDevice> Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc);
+  Ptr<NetDevice> Install (Ptr<Node> n, uint32_t beamId,
+                          Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
+                          Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
+                          SatPhy::ChannelPairGetterCallback cbChannel,
+                          SatUtMac::RoutingUpdateCallback cbRouting);
 
   /**
    * Enables creation traces to be written in given file

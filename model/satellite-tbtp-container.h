@@ -65,7 +65,6 @@ public:
 class SatTbtpContainer : public Object
 {
 public:
-
   /**
    * Default constructor.
    */
@@ -73,7 +72,7 @@ public:
 
   /**
    * Constructor with initialization parameters.
-   * \param seq 
+   * \param seq
    */
   SatTbtpContainer (Ptr<SatSuperframeSeq> seq);
 
@@ -105,6 +104,8 @@ public:
    * \param tbtp TBTP message
    */
   void Add (Time startTime, Ptr<SatTbtpMessage> tbtp);
+
+  void Clear ();
 
   /**
    * \brief Method of checking whether the UT has been scheduled time

@@ -39,7 +39,6 @@ namespace ns3 {
 class SatArqSequenceNumber : public SimpleRefCount<SatArqSequenceNumber>
 {
 public:
-
   /**
    * Default constructor.
    */
@@ -47,7 +46,7 @@ public:
 
   /**
    * Constructor with initialization parameters.
-   * \param windowSize 
+   * \param windowSize
    */
   SatArqSequenceNumber (uint8_t windowSize);
 

@@ -18,25 +18,32 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include "ns3/double.h"
-#include "ns3/log.h"
-#include "ns3/names.h"
-#include "ns3/queue.h"
-#include "ns3/string.h"
-#include "ns3/type-id.h"
-#include "ns3/csma-helper.h"
-#include "ns3/internet-stack-helper.h"
-#include "ns3/mobility-helper.h"
-#include "ns3/singleton.h"
-#include "ns3/ipv4-static-routing-helper.h"
-#include "ns3/ipv4-routing-table-entry.h"
-#include "../model/satellite-position-allocator.h"
-#include "../model/satellite-rtn-link-time.h"
-#include "satellite-helper.h"
-#include "../model/satellite-log.h"
-#include "ns3/singleton.h"
-#include "../utils/satellite-env-variables.h"
+#include <sys/stat.h>
+
+#include <ns3/double.h>
+#include <ns3/log.h>
+#include <ns3/names.h>
+#include <ns3/queue.h>
+#include <ns3/string.h>
+#include <ns3/type-id.h>
+#include <ns3/csma-helper.h>
+#include <ns3/internet-stack-helper.h>
+#include <ns3/ipv4-static-routing-helper.h>
+#include <ns3/mobility-helper.h>
+#include <ns3/singleton.h>
+#include <ns3/system-path.h>
+#include <ns3/ipv4-static-routing-helper.h>
+#include <ns3/ipv4-routing-table-entry.h>
+
 #include <ns3/satellite-typedefs.h>
+#include <ns3/satellite-position-allocator.h>
+#include <ns3/satellite-rtn-link-time.h>
+#include <ns3/satellite-log.h>
+#include <ns3/satellite-env-variables.h>
+#include <ns3/satellite-traced-mobility-model.h>
+#include <ns3/satellite-ut-handover-module.h>
+#include "satellite-helper.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatHelper");
 
@@ -169,18 +176,20 @@ SatHelper::GetInstanceTypeId (void) const
 
 SatHelper::SatHelper ()
   : m_rtnConfFileName ("Scenario72RtnConf.txt"),
-    m_fwdConfFileName ("Scenario72FwdConf.txt"),
-    m_gwPosFileName ("Scenario72GwPos.txt"),
-    m_geoPosFileName ("Scenario72GeoPos.txt"),
-    m_waveformConfFileName ("dvbRcs2Waveforms.txt"),
-    m_scenarioCreated (false),
-    m_creationTraces (false),
-    m_detailedCreationTraces (false),
-    m_packetTraces (false),
-    m_utsInBeam (0),
-    m_gwUsers (0),
-    m_utUsers (0),
-		m_utPositionsByBeam ()
+  m_fwdConfFileName ("Scenario72FwdConf.txt"),
+  m_gwPosFileName ("Scenario72GwPos.txt"),
+  m_geoPosFileName ("Scenario72GeoPos.txt"),
+  m_waveformConfFileName ("dvbRcs2Waveforms.txt"),
+  m_scenarioCreated (false),
+  m_creationTraces (false),
+  m_detailedCreationTraces (false),
+  m_packetTraces (false),
+  m_utsInBeam (0),
+  m_gwUsers (0),
+  m_utUsers (0),
+  m_utPositionsByBeam (),
+  m_mobileUtsByBeam (),
+  m_mobileUtsUsersByBeam ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -216,6 +225,8 @@ SatHelper::SatHelper ()
   m_beamHelper->SetAttribute ("CarrierFrequencyConverter", CallbackValue (converterCb) );
 
   m_userHelper = CreateObject<SatUserHelper> ();
+  SatUserHelper::PropagationDelayCallback delayModelCb = MakeCallback (&SatBeamHelper::GetPropagationDelayModel, m_beamHelper);
+  m_userHelper->SetAttribute ("PropagationDelayGetter", CallbackValue (delayModelCb));
 
   // Set the antenna patterns to beam helper
   m_beamHelper->SetAntennaGainPatterns (m_antennaGainPatterns);
@@ -329,7 +340,7 @@ SatHelper::CreateSimpleScenario ()
 {
   NS_LOG_FUNCTION (this);
 
-  SatBeamUserInfo beamInfo = SatBeamUserInfo (1,1);
+  SatBeamUserInfo beamInfo = SatBeamUserInfo (1, 1);
   BeamUserInfoMap_t beamUserInfos;
   beamUserInfos[8] = beamInfo;
 
@@ -344,14 +355,14 @@ SatHelper::CreateLargerScenario ()
   NS_LOG_FUNCTION (this);
 
   // install one user for UTs in beams 12 and 22
-  SatBeamUserInfo beamInfo = SatBeamUserInfo (1,1);
+  SatBeamUserInfo beamInfo = SatBeamUserInfo (1, 1);
   BeamUserInfoMap_t beamUserInfos;
 
   beamUserInfos[12] = beamInfo;
   beamUserInfos[22] = beamInfo;
 
   // install two users for UT1 and one for UT2 in beam 3
-  beamInfo.SetUtUserCount (0,2);
+  beamInfo.SetUtUserCount (0, 2);
   beamInfo.AppendUt (1);
 
   beamUserInfos[3] = beamInfo;
@@ -405,15 +416,15 @@ SatHelper::CreateUserDefinedScenario (BeamUserInfoMap_t& infos)
 void
 SatHelper::SetCustomUtPositionAllocator (Ptr<SatListPositionAllocator> posAllocator)
 {
-	NS_LOG_FUNCTION (this);
-	m_utPositions = posAllocator;
+  NS_LOG_FUNCTION (this);
+  m_utPositions = posAllocator;
 }
 
 void
 SatHelper::SetUtPositionAllocatorForBeam (uint32_t beamId, Ptr<SatListPositionAllocator> posAllocator)
 {
-	NS_LOG_FUNCTION (this << beamId);
-	m_utPositionsByBeam[beamId] = posAllocator;
+  NS_LOG_FUNCTION (this << beamId);
+  m_utPositionsByBeam[beamId] = posAllocator;
 }
 
 void
@@ -478,6 +489,8 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
           EnableCreationTraces ();
         }
 
+      m_beamHelper->SetNccRoutingCallback (MakeCallback (&SatUserHelper::UpdateGwRoutes, m_userHelper));
+
       InternetStackHelper internet;
 
       // create all possible GW nodes, set mobility to them and install to Internet
@@ -486,18 +499,38 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
       SetGwMobility (gwNodes);
       internet.Install (gwNodes);
 
-      for ( BeamUserInfoMap_t::iterator info = beamInfos.begin (); info != beamInfos.end (); info++)
+      // Create beams explicitly required for this scenario
+      for (BeamUserInfoMap_t::iterator info = beamInfos.begin (); info != beamInfos.end (); info++)
         {
-          // create UTs of the beam, set mobility to them and install to Internet
+          // create UTs of the beam, set mobility to them
           NodeContainer uts;
           uts.Create (info->second.GetUtCount ());
           SetUtMobility (uts, info->first);
+
+          // Add mobile UTs starting at this beam
+          std::map<uint32_t, NodeContainer>::iterator mobileUts = m_mobileUtsByBeam.find (info->first);
+          if (mobileUts != m_mobileUtsByBeam.end ())
+            {
+              uts.Add (mobileUts->second);
+              m_mobileUtsByBeam.erase (mobileUts);
+            }
+
+          // install the whole fleet to Internet
           internet.Install (uts);
 
-          for ( uint32_t i = 0; i < info->second.GetUtCount (); i++ )
+          for (uint32_t i = 0; i < info->second.GetUtCount (); ++i)
             {
               // create and install needed users
               m_userHelper->InstallUt (uts.Get (i), info->second.GetUtUserCount (i));
+            }
+
+          std::pair<std::multimap<uint32_t, uint32_t>::iterator, std::multimap<uint32_t, uint32_t>::iterator> mobileUsers;
+          mobileUsers = m_mobileUtsUsersByBeam.equal_range (info->first);
+          std::multimap<uint32_t, uint32_t>::iterator it = mobileUsers.first;
+          for (uint32_t i = info->second.GetUtCount (); i < uts.GetN () && it != mobileUsers.second; ++i, ++it)
+            {
+              // create and install needed mobile users
+              m_userHelper->InstallUt (uts.Get (i), it->second);
             }
 
           std::vector<uint32_t> rtnConf = m_satConf->GetBeamConfiguration (info->first, SatEnums::LD_RETURN);
@@ -512,15 +545,19 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
 
           // gw index starts from 1 and we have stored them starting from 0
           Ptr<Node> gwNode = gwNodes.Get (rtnConf[SatConf::GW_ID_INDEX] - 1);
-          m_beamHelper->Install (uts,
-                                 gwNode,
-                                 rtnConf[SatConf::GW_ID_INDEX],
-                                 rtnConf[SatConf::BEAM_ID_INDEX],
-                                 rtnConf[SatConf::U_FREQ_ID_INDEX],
-                                 rtnConf[SatConf::F_FREQ_ID_INDEX],
-                                 fwdConf[SatConf::U_FREQ_ID_INDEX],
-                                 fwdConf[SatConf::F_FREQ_ID_INDEX]);
+          std::pair<Ptr<NetDevice>, NetDeviceContainer> netDevices = m_beamHelper->Install (
+              uts, gwNode,
+              rtnConf[SatConf::GW_ID_INDEX],
+              rtnConf[SatConf::BEAM_ID_INDEX],
+              rtnConf[SatConf::U_FREQ_ID_INDEX],
+              rtnConf[SatConf::F_FREQ_ID_INDEX],
+              fwdConf[SatConf::U_FREQ_ID_INDEX],
+              fwdConf[SatConf::F_FREQ_ID_INDEX],
+              MakeCallback (&SatUserHelper::UpdateUtRoutes, m_userHelper));
+          m_userHelper->PopulateBeamRoutings (uts, netDevices.second, gwNode, netDevices.first);
         }
+
+      m_mobileUtsByBeam.clear ();  // Release unused resources (mobile UTs starting in non-existent beams)
 
       m_userHelper->InstallGw (m_beamHelper->GetGwNodes (), gwUsers);
 
@@ -533,6 +570,61 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
     }
 
   m_beamHelper->Init ();
+}
+
+void
+SatHelper::LoadMobileUTsFromFolder (const std::string& folderName, Ptr<RandomVariableStream> utUsers)
+{
+  if (!(Singleton<SatEnvVariables>::Get ()->IsValidDirectory (folderName)))
+    {
+      NS_LOG_INFO ("Directory '" << folderName << "' does not exist, no mobile UTs will be created.");
+      return;
+    }
+
+  for (std::string& filename : SystemPath::ReadFiles (folderName))
+    {
+      std::string filepath = folderName + "/" + filename;
+      if (Singleton<SatEnvVariables>::Get ()->IsValidDirectory (filepath))
+        {
+          NS_LOG_INFO ("Skipping directory '" << filename << "'");
+          continue;
+        }
+
+      Ptr<Node> utNode = LoadMobileUtFromFile (filepath);
+      uint32_t bestBeamId = utNode->GetObject<SatTracedMobilityModel> ()->GetBestBeamId ();
+
+      // Store Node in the container for the starting beam
+      std::map<uint32_t, NodeContainer>::iterator it = m_mobileUtsByBeam.find (bestBeamId);
+      if (it == m_mobileUtsByBeam.end ())
+        {
+          std::pair<std::map<uint32_t, NodeContainer>::iterator, bool> inserted = m_mobileUtsByBeam.insert (std::make_pair (bestBeamId, NodeContainer (utNode)));
+          NS_ASSERT_MSG (inserted.second, "Failed to create a new beam when reading UT mobility files");
+        }
+      else
+        {
+          it->second.Add (utNode);
+        }
+
+      // Store amount of users for this UT
+      m_mobileUtsUsersByBeam.insert (std::make_pair (bestBeamId, utUsers->GetInteger ()));
+    }
+
+  for (auto& mobileUtsForBeam : m_mobileUtsByBeam)
+    {
+      NS_LOG_INFO ("Installing Mobility Observers for mobile UTs starting in beam " << mobileUtsForBeam.first);
+      InstallMobilityObserver (mobileUtsForBeam.second);
+    }
+}
+
+Ptr<Node>
+SatHelper::LoadMobileUtFromFile (const std::string& filename)
+{
+  // Create Node, Mobility and aggregate them
+  Ptr<SatTracedMobilityModel> mobility = CreateObject<SatTracedMobilityModel> (filename, m_antennaGainPatterns);
+  Ptr<Node> utNode = CreateObject<Node> ();
+  utNode->AggregateObject (mobility);
+  utNode->AggregateObject (CreateObject<SatUtHandoverModule> (m_antennaGainPatterns));
+  return utNode;
 }
 
 void
@@ -570,7 +662,7 @@ SatHelper::SetUtMobility (NodeContainer uts, uint32_t beamId)
   // in other case use the spot beam position allocator
   if (m_utPositionsByBeam.find (beamId) != m_utPositionsByBeam.end ())
     {
-    	allocator = m_utPositionsByBeam[beamId];
+      allocator = m_utPositionsByBeam[beamId];
     }
   else if ( m_utPositions != NULL )
     {
@@ -579,14 +671,7 @@ SatHelper::SetUtMobility (NodeContainer uts, uint32_t beamId)
   else
     {
       // Create new position allocator
-      Ptr<SatSpotBeamPositionAllocator> beamAllocator = CreateObject<SatSpotBeamPositionAllocator> (beamId, m_antennaGainPatterns, m_satConf->GetGeoSatPosition ());
-
-      Ptr<UniformRandomVariable> altRnd = CreateObject<UniformRandomVariable> ();
-      altRnd->SetAttribute ("Min", DoubleValue (0.0));
-      altRnd->SetAttribute ("Max", DoubleValue (500.0));
-      beamAllocator->SetAltitude (altRnd);
-
-      allocator = beamAllocator;
+      allocator = GetBeamAllocator (beamId);
     }
 
   mobility.SetPositionAllocator (allocator);
@@ -594,6 +679,26 @@ SatHelper::SetUtMobility (NodeContainer uts, uint32_t beamId)
   mobility.Install (uts);
 
   InstallMobilityObserver (uts);
+
+  for (uint32_t i = 0; i < uts.GetN (); ++i)
+    {
+      GeoCoordinate position = uts.Get (i)->GetObject<SatMobilityModel> ()->GetGeoPosition ();
+      NS_LOG_INFO ("Installing mobility observer on Ut Node at " <<
+                   position << " with antenna gain of " <<
+                   m_antennaGainPatterns->GetAntennaGainPattern (beamId)->GetAntennaGain_lin (position));
+    }
+}
+
+Ptr<SatSpotBeamPositionAllocator>
+SatHelper::GetBeamAllocator (uint32_t beamId)
+{
+  Ptr<SatSpotBeamPositionAllocator> beamAllocator = CreateObject<SatSpotBeamPositionAllocator> (beamId, m_antennaGainPatterns, m_satConf->GetGeoSatPosition ());
+
+  Ptr<UniformRandomVariable> altRnd = CreateObject<UniformRandomVariable> ();
+  altRnd->SetAttribute ("Min", DoubleValue (0.0));
+  altRnd->SetAttribute ("Max", DoubleValue (500.0));
+  beamAllocator->SetAltitude (altRnd);
+  return beamAllocator;
 }
 
 void
@@ -690,7 +795,7 @@ SatHelper::SetMulticastGroupRoutes (Ptr<Node> source, NodeContainer receivers, I
           // traffic is coming form user network (some GW user)
 
           // find matching device using source node
-          std::pair<Ptr<NetDevice>,Ptr<NetDevice> > devices;
+          std::pair<Ptr<NetDevice>, Ptr<NetDevice> > devices;
 
           if ( FindMatchingDevices (source, routerNode, devices) )
             {
@@ -762,7 +867,13 @@ SatHelper::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
 
+  m_userHelper = NULL;
+  m_beamHelper->DoDispose ();
+  m_beamHelper = NULL;
+  m_antennaGainPatterns = NULL;
   m_utPositionsByBeam.clear ();
+  m_mobileUtsByBeam.clear ();
+  m_mobileUtsUsersByBeam.clear ();
 }
 
 bool
@@ -995,7 +1106,7 @@ SatHelper::SetNetworkAddresses (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers) 
   CheckNetwork ("UT", m_utNetworkAddress, m_utNetworkMask, networkAddresses, utNetworkAddressCount, utHostAddressCount);
 
   // set base addresses of the sub-helpers
-  m_beamHelper->SetBaseAddress (m_beamNetworkAddress, m_beamNetworkMask);
+  m_userHelper->SetBeamBaseAddress (m_beamNetworkAddress, m_beamNetworkMask);
   m_userHelper->SetGwBaseAddress (m_gwNetworkAddress, m_gwNetworkMask);
   m_userHelper->SetUtBaseAddress (m_utNetworkAddress, m_utNetworkMask);
 }
@@ -1014,9 +1125,9 @@ SatHelper::CheckNetwork (std::string networkName,
 
   // test that configured mask is valid (address prefix length is in valid range)
   if ((addressPrefixLength < MIN_ADDRESS_PREFIX_LENGTH) || (addressPrefixLength > MAX_ADDRESS_PREFIX_LENGTH))
-      {
-        NS_FATAL_ERROR (networkName << " network mask value out of range (0xFFFFFF70 to 0x10000000).");
-      }
+    {
+      NS_FATAL_ERROR (networkName << " network mask value out of range (0xFFFFFF70 to 0x10000000).");
+    }
 
   // test that configured initial network number (prefix) is valid, consistent with mask
   if ((firstNetwork.Get () & mask.GetInverse ()) != 0)
@@ -1039,8 +1150,8 @@ SatHelper::CheckNetwork (std::string networkName,
 
       // test in the case that checked address space is not last ('highest') in the
       // given address container that the address space doesn't overlap with other configured address spaces
-      if ( (currentAddressIt != networkAddresses.end ()) &&
-           (firstAddressValue + (networkCount  << (32 - addressPrefixLength))) >= *currentAddressIt)
+      if ( (currentAddressIt != networkAddresses.end ())
+           && (firstAddressValue + (networkCount << (32 - addressPrefixLength))) >= *currentAddressIt)
         {
           NS_FATAL_ERROR (networkName << " network's addresses overlaps with some other network)");
         }

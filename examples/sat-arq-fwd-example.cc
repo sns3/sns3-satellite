@@ -1,4 +1,4 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2014 Magister Solutions
  *
@@ -43,7 +43,7 @@ NS_LOG_COMPONENT_DEFINE ("sat-arq-fwd-example");
 int
 main (int argc, char *argv[])
 {
-	uint32_t beamId (1);
+  uint32_t beamId (1);
   uint32_t endUsersPerUt (3);
   uint32_t utsPerBeam (3);
   uint32_t packetSize (128);
@@ -75,7 +75,8 @@ main (int argc, char *argv[])
   simulationHelper->SetUserCountPerUt (endUsersPerUt);
   simulationHelper->SetSimulationTime (simLength);
 
-  std::stringstream beamsEnabled; beamsEnabled  << beamId;
+  std::stringstream beamsEnabled;
+  beamsEnabled << beamId;
   simulationHelper->SetBeams (beamsEnabled.str ());
 
 
@@ -112,10 +113,10 @@ main (int argc, char *argv[])
 
       /// Create applicationa on GW user
       simulationHelper->InstallTrafficModel (
-      		SimulationHelper::CBR,
-    			SimulationHelper::UDP,
-    			SimulationHelper::FWD_LINK,
-					appStartTime, Seconds (simLength), Seconds (0.001));
+        SimulationHelper::CBR,
+        SimulationHelper::UDP,
+        SimulationHelper::FWD_LINK,
+        appStartTime, Seconds (simLength), Seconds (0.001));
 
     }
   //---- Stop CBR application definitions

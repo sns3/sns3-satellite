@@ -61,11 +61,9 @@ SatLooConf::GetTypeId (void)
 
 SatLooConf::SatLooConf ()
   : m_elevationCount (SatMarkovConf::DEFAULT_ELEVATION_COUNT),
-    m_stateCount (SatMarkovConf::DEFAULT_STATE_COUNT)
+  m_stateCount (SatMarkovConf::DEFAULT_STATE_COUNT)
 {
   NS_LOG_FUNCTION (this);
-
-  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatLooConf::SatLooConf - Creating SatLooConf...");
 
   for (uint32_t i = 0; i < m_elevationCount; i++)
     {
@@ -102,7 +100,6 @@ SatLooConf::GetParameters (uint32_t set)
       NS_FATAL_ERROR ("SatLooConf::GetParameters - Invalid set");
     }
 
-  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " SatLooConf::GetParameters - Getting Loo parameters for set ID " << set);
   return m_looParameters[set];
 }
 

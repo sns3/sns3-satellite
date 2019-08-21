@@ -47,19 +47,19 @@ NS_LOG_COMPONENT_DEFINE ("sat-rtn-system-test-example");
 // Callback called when RBDC CR has been sent by request manager
 static void RbcdRcvdCb (uint32_t value)
 {
-  NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s RBDC request generated with " << value << " kbps");
+  NS_LOG_INFO ("RBDC request generated with " << value << " kbps");
 }
 
 // Callback called when AVBDC CR has been sent by request manager
 static void AvbcdRcvdCb (uint32_t value)
 {
-  NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s AVBDC request generated with " << value << " Bytes");
+  NS_LOG_INFO ("AVBDC request generated with " << value << " Bytes");
 }
 
 // Callback called when VBDC CR has been sent by request manager
 static void VbcdRcvdCb (uint32_t value)
 {
-  NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s VBDC request generated with " << value << " Bytes");
+  NS_LOG_INFO ("VBDC request generated with " << value << " Bytes");
 }
 
 // Callback called when VBDC CR has been sent by request manager
@@ -67,7 +67,7 @@ static void TbtpResources (uint32_t value)
 {
   if (value > 0)
     {
-      NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s " << value << " Bytes allocated within TBTP");
+      NS_LOG_INFO ("" << value << " Bytes allocated within TBTP");
     }
 }
 
@@ -93,7 +93,7 @@ main (int argc, char *argv[])
 
   /// Set simulation output details
   std::string simulationName = "example-rtn-system-test";
-	auto simulationHelper = CreateObject<SimulationHelper> (simulationName);
+  auto simulationHelper = CreateObject<SimulationHelper> (simulationName);
 
   // set default values for traffic model apps here
   // attributes can be overridden by command line arguments or input xml when needed
@@ -127,19 +127,22 @@ main (int argc, char *argv[])
   // select pre-defined super frame configuration wanted to use.
   Config::SetDefault ("ns3::SatConf::SuperFrameConfForSeq0", StringValue (preDefinedFrameConfig));
 
+  // use the default SuperframeAllocator
+  Config::SetDefault ("ns3::SatBeamScheduler::SuperFrameAllocatorType", StringValue ("Default"));
+
   switch (testCase)
     {
     case 0: // scheduler, CRA, ACM is selected by command line arguments ( --"ns3::SatWaveformConf::AcmEnabled=true" or --"ns3::SatWaveformConf::AcmEnabled=false" )
       Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (true));
       Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantServiceRate", StringValue ("ns3::ConstantRandomVariable[Constant=2]"));
-      Config::SetDefault ("ns3::SatSuperframeAllocator::FcaEnabled", BooleanValue (false));
+      Config::SetDefault ("ns3::SatDefaultSuperframeAllocator::FcaEnabled", BooleanValue (false));
       break;
 
     case 1: // scheduler, FCA (CRA + VBDC), ACM is selected by command line arguments ( --"ns3::SatWaveformConf::AcmEnabled=true" or --"ns3::SatWaveformConf::AcmEnabled=false" )
       Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (true));
       Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantServiceRate", StringValue ("ns3::ConstantRandomVariable[Constant=2]"));
       Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (true));
-      Config::SetDefault ("ns3::SatSuperframeAllocator::FcaEnabled", BooleanValue (true));
+      Config::SetDefault ("ns3::SatDefaultSuperframeAllocator::FcaEnabled", BooleanValue (true));
       break;
 
     case 2: // ACM, one UT with one user, MARKOV fading on, external fading on
@@ -305,26 +308,26 @@ main (int argc, char *argv[])
    */
   SimulationHelper::TrafficModel_t model;
 
-	switch (trafficModel)
-		{
-		case 0:   // CBR
-			model = SimulationHelper::CBR;
-			break;
+  switch (trafficModel)
+    {
+    case 0:               // CBR
+      model = SimulationHelper::CBR;
+      break;
 
-		case 1:   // On-Off
-			model = SimulationHelper::ONOFF;
-			break;
+    case 1:               // On-Off
+      model = SimulationHelper::ONOFF;
+      break;
 
-		default:
-			NS_FATAL_ERROR ("Not Supported Traffic Model!");
-			break;
-		};
+    default:
+      NS_FATAL_ERROR ("Not Supported Traffic Model!");
+      break;
+    }
 
   simulationHelper->InstallTrafficModel (
-  		model,
-			SimulationHelper::UDP,
-			SimulationHelper::RTN_LINK,
-			utAppStartTime, Seconds (simLength+1), Seconds (0.1));
+    model,
+    SimulationHelper::UDP,
+    SimulationHelper::RTN_LINK,
+    utAppStartTime, Seconds (simLength + 1), Seconds (0.1));
 
   /**
    * Set-up statistics

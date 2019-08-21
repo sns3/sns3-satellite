@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2014 Magister Solutions Ltd
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
 /**
@@ -146,7 +148,16 @@ void SatFrameAllocatorTestCase::InitFrame (SatSuperframeConf::ConfigType_t confi
       checkSlotLimit = false;
     }
 
-  m_frameConf = Create<SatFrameConf> (10e4 * 2, MilliSeconds (125), btu, m_waveFormConf, false, defaultWaveformInUse, checkSlotLimit );
+  SatFrameConf::SatFrameConfParams_t frameConfParameters;
+  frameConfParameters.m_bandwidthHz = 10.4 * 2;
+  frameConfParameters.m_targetDuration = MilliSeconds (125);
+  frameConfParameters.m_btuConf = btu;
+  frameConfParameters.m_waveformConf = m_waveFormConf;
+  frameConfParameters.m_allocationChannel = 0;
+  frameConfParameters.m_isRandomAccess = false;
+  frameConfParameters.m_defaultWaveformInUse = defaultWaveformInUse;
+  frameConfParameters.m_checkSlotLimit = checkSlotLimit;
+  m_frameConf = Create<SatFrameConf> (frameConfParameters);
   m_frameAllocator = Create<SatFrameAllocator> (m_frameConf, 0, configType);
 }
 
@@ -168,7 +179,7 @@ SatFrameAllocatorTestCase::RunSingleUtTest (SatSuperframeConf::ConfigType_t conf
                 {
                   uint32_t bytesReq = 0;
 
-                  SatFrameAllocator::SatFrameAllocReq req = ContructRequestForUt (bytesReq, i, j, k, l, 1,(bool) std::rand () % 2 );
+                  SatFrameAllocator::SatFrameAllocReq req = ContructRequestForUt (bytesReq, i, j, k, l, 1, (bool) std::rand () % 2 );
 
                   // repeat with all CC levels
                   for (uint32_t o = 0; o < m_ccLevelCount; o++ )
@@ -311,7 +322,7 @@ SatFrameAllocatorTestCase::CheckSingleUtTestResults (uint32_t bytesReq, SatFrame
     }
   else
     {
-      NS_TEST_ASSERT_MSG_EQ (utAllocContainer.empty (), true,"No allocations expected!");
+      NS_TEST_ASSERT_MSG_EQ (utAllocContainer.empty (), true, "No allocations expected!");
       NS_ASSERT (utAllocContainer.empty () == true);
     }
 

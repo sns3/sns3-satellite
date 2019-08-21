@@ -39,7 +39,6 @@ namespace ns3 {
 class SatChannelEstimationError : public Object
 {
 public:
-
   /**
    * Default constructor.
    */

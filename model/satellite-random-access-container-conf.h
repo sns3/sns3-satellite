@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2014 Magister Solutions Ltd.
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,7 +17,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
+
+
 #ifndef SATELLITE_RANDOM_ACCESS_CONF_H
 #define SATELLITE_RANDOM_ACCESS_CONF_H
 
@@ -89,13 +93,20 @@ public:
   }
 
   /**
-   * \brief Function for getting the number of available allocation channels
-   * \return number of allocation channels
+   * \brief Function for getting the number of available allocation channels configurations
+   * \return number of allocation channels configurations
    */
-  uint32_t GetNumOfAllocationChannels ()
+  uint32_t GetNumOfAllocationChannelsConfigurations ()
   {
     return m_allocationChannelCount;
   }
+
+  /**
+   * \brief Function for retrieving the configuration ID of a given allocation channel
+   * \param allocationChannel allocation channel ID
+   * \return allocation channel configuration ID
+   */
+  uint32_t GetAllocationChannelConfigurationId (uint32_t allocationChannel);
 
   /**
    * \brief Function for getting the CRDSA signaling overhead in bytes
@@ -124,7 +135,12 @@ private:
   /**
    * \brief Map containing the allocation channel configurations
    */
-  std::map<uint32_t,Ptr<SatRandomAccessAllocationChannel> > m_allocationChannelConf;
+  std::map<uint32_t, Ptr<SatRandomAccessAllocationChannel> > m_allocationChannelConf;
+
+  /**
+   * \brief Mapping between an allocation channel and its associated configuration index
+   */
+  std::vector<uint32_t> m_configurationIdPerAllocationChannel;
 
   /**
    * \brief Slotted ALOHA control randomization interval in milliseconds

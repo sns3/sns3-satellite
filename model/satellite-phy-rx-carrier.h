@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2013 Magister Solutions Ltd.
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
 
@@ -29,9 +31,11 @@
 #include <ns3/satellite-enums.h>
 #include <ns3/satellite-utils.h>
 #include <ns3/satellite-interference.h>
+#include <ns3/satellite-interference-elimination.h>
 #include <ns3/satellite-phy.h>
 #include <ns3/satellite-phy-rx.h>
 #include <ns3/satellite-phy-rx-carrier-conf.h>
+#include <ns3/satellite-wave-form-conf.h>
 #include <vector>
 #include <map>
 #include <list>
@@ -73,12 +77,11 @@ public:
    * \param interference interference power (in W)
    * \param sinr composite SINR (in linear unit)
    */
-  typedef void (*LinkBudgetTraceCallback)
-    (Ptr<SatSignalParameters> rxParams,
-    Mac48Address receiverAddress,
-    Mac48Address destinationAddress,
-    double interference,
-    double sinr);
+  typedef void (*LinkBudgetTraceCallback)(Ptr<SatSignalParameters> rxParams,
+                                          Mac48Address receiverAddress,
+                                          Mac48Address destinationAddress,
+                                          double interference,
+                                          double sinr);
 
   /**
    * \brief Callback signature for `RxPowerTrace` trace source.
@@ -99,8 +102,7 @@ public:
    * \param from the MAC48 address of the sender of the packets.
    * \param isError whether a PHY error has occurred.
    */
-  typedef void (*PhyRxErrorCallback)
-    (uint32_t nPackets, const Address &from, bool isError);
+  typedef void (*PhyRxErrorCallback)(uint32_t nPackets, const Address &from, bool isError);
 
   /**
    * \brief Common callback signature for trace sources related to packets
@@ -109,16 +111,16 @@ public:
    * \param from the MAC48 address of the sender of the packets.
    * \param isCollided whether a collision has occurred.
    */
-  typedef void (*PhyRxCollisionCallback)
-    (uint32_t nPackets, const Address &from, bool isCollided);
+  typedef void (*PhyRxCollisionCallback)(uint32_t nPackets, const Address &from, bool isCollided);
 
   /**
    * Constructor
    * \param carrierId
    * \param carrierConf
+   * \param waveformConf
    * \param isRandomAccessEnabled
    */
-  SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> carrierConf, bool isRandomAccessEnabled);
+  SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatWaveformConf> waveformConf, bool isRandomAccessEnabled);
 
   /**
    * \brief Destructor
@@ -137,9 +139,9 @@ public:
    * \brief Possible carrier types
    */
   enum CarrierType
-	{
-  	BASE, DEDICATED_ACCESS, RA_SLOTTED_ALOHA, RA_CRDSA
-	};
+  {
+    BASE, DEDICATED_ACCESS, RA_SLOTTED_ALOHA, RA_CRDSA
+  };
 
   /**
    * \brief Function for gettign the NS-3 type ID
@@ -157,13 +159,19 @@ public:
    * \brief Function for setting the beam id for all the transmissions from this SatPhyTx
    * \param beamId the Beam Identifier
    */
-  inline void SetBeamId (uint32_t beamId) { m_beamId = beamId; };
+  inline void SetBeamId (uint32_t beamId)
+  {
+    m_beamId = beamId;
+  }
 
   /**
    * \brief Get ID the ID of the beam this carrier is attached to
    * \return Beam ID
    */
-  inline uint32_t GetBeamId () { return m_beamId; };
+  inline uint32_t GetBeamId ()
+  {
+    return m_beamId;
+  }
 
 
   /**
@@ -181,7 +189,10 @@ public:
   /**
    * \brief Method for querying the type of the carrier
    */
-  inline virtual CarrierType GetCarrierType () { return BASE; }
+  inline virtual CarrierType GetCarrierType ()
+  {
+    return BASE;
+  }
 
   //////////// Set callbacks ///////////////
 
@@ -204,67 +215,99 @@ public:
   void SetAverageNormalizedOfferedLoadCallback (SatPhyRx::AverageNormalizedOfferedLoadCallback callback);
 
 protected:
-
   /**
    * Get the default receive mode for the carrier. In satellite nodes, this will
    * be overrided to always receive packets.
    * \return True or false, false by default in base class
    */
-  inline virtual const bool GetDefaultReceiveMode () { return false; };
+  inline virtual const bool GetDefaultReceiveMode ()
+  {
+    return false;
+  }
 
   /**
    * \brief Check if the carrier is receiving a dedicated access packet
    * \return true or false
    */
-  inline bool IsReceivingDedicatedAccess () { return m_receivingDedicatedAccess; };
+  inline bool IsReceivingDedicatedAccess ()
+  {
+    return m_receivingDedicatedAccess;
+  }
 
   /**
    * \brief Get pointer to the current interference model.
    * \return interference model
    */
-  inline Ptr<SatInterference> GetInterferenceModel () { return m_satInterference; };
+  inline Ptr<SatInterference> GetInterferenceModel ()
+  {
+    return m_satInterference;
+  }
+
+  /**
+   * \brief Get pointer to the current interference elimination model.
+   * \return interference elimination model
+   */
+  inline Ptr<SatInterferenceElimination> GetInterferenceEliminationModel ()
+  {
+    return m_satInterferenceElimination;
+  }
 
   /**
    * \brief Create an interference event based on Rx parameters and address.
-   * 				Implemented by child classes.
+   *                            Implemented by child classes.
    *
    * \return Pointer to the interference event.
    */
-	virtual Ptr<SatInterference::InterferenceChangeEvent>
-	  CreateInterference (Ptr<SatSignalParameters> rxParams, Address rxAddress) = 0;
+  virtual Ptr<SatInterference::InterferenceChangeEvent>
+  CreateInterference (Ptr<SatSignalParameters> rxParams, Address rxAddress) = 0;
 
-	/**
-	 * Rx parameter storage methods
-	 */
+  /**
+   * Rx parameter storage methods
+   */
 
-	/**
-	 * Get receive parameters from signal parameters.
-	 * \param rxParams SatSignalParameters
-	 * \return A pair of boolean and rxParams_s struct. Boolean tells if we are about to receive a packet
-	 * 				 and struct contains all receiveing info.
-	 */
-	std::pair<bool, SatPhyRxCarrier::rxParams_s> GetReceiveParams (Ptr<SatSignalParameters> rxParams);
+  /**
+   * Get receive parameters from signal parameters.
+   * \param rxParams SatSignalParameters
+   * \return A pair of boolean and rxParams_s struct. Boolean tells if we are about to receive a packet
+   *                             and struct contains all receiveing info.
+   */
+  std::pair<bool, SatPhyRxCarrier::rxParams_s> GetReceiveParams (Ptr<SatSignalParameters> rxParams);
 
-	/// Get stored rxParams under a key
-  inline rxParams_s GetStoredRxParams (uint32_t key) { return m_rxParamsMap[key]; }
+  /// Get stored rxParams under a key
+  inline rxParams_s GetStoredRxParams (uint32_t key)
+  {
+    return m_rxParamsMap[key];
+  }
 
   /// Store rxParams under a key
-  inline void StoreRxParams (uint32_t key, rxParams_s rxParams) { m_rxParamsMap[key] = rxParams; }
+  inline void StoreRxParams (uint32_t key, rxParams_s rxParams)
+  {
+    m_rxParamsMap[key] = rxParams;
+  }
 
   /// Remove stored rxParams under a key
-  inline void RemoveStoredRxParams (uint32_t key) { m_rxParamsMap.erase (key); }
+  inline void RemoveStoredRxParams (uint32_t key)
+  {
+    m_rxParamsMap.erase (key);
+  }
 
   /**
    * Get the MAC address of the carrier
    * \return MAC address
    */
-  inline Mac48Address GetOwnAddress () { return m_ownAddress; };
+  inline Mac48Address GetOwnAddress ()
+  {
+    return m_ownAddress;
+  }
 
   /**
    * Get the satellite node info.
    * \return SatNodeInfo pointer
    */
-  inline Ptr<SatNodeInfo> GetNodeInfo () { return m_nodeInfo; };
+  inline Ptr<SatNodeInfo> GetNodeInfo ()
+  {
+    return m_nodeInfo;
+  }
 
   /**
    * \brief Function for composite SINR output tracing
@@ -282,17 +325,31 @@ protected:
   virtual void DoCreateInterferenceModel (Ptr<SatPhyRxCarrierConf> carrierConf, uint32_t carrierId, double rxBandwidthHz);
 
   /**
+   * Create an interference cancelation model for this carrier.
+   * \param carrierConf
+   * \param carrierId
+   * \param frameConf
+   */
+  virtual void DoCreateInterferenceEliminationModel (Ptr<SatPhyRxCarrierConf> carrierConf, uint32_t carrierId, Ptr<SatWaveformConf> waveformConf);
+
+  /**
    * \brief Get the channel type. Base class has undefined channel type, while child classes have
-   * 				can have other channel types.
+   *                            can have other channel types.
    * \return Channel type
    */
-  inline virtual SatEnums::ChannelType_t GetChannelType () { return m_channelType; };
+  inline virtual SatEnums::ChannelType_t GetChannelType ()
+  {
+    return m_channelType;
+  }
 
   /**
    * \brief Set the channel type for the carrier
    * \param channelType Channel type.
    */
-  inline void SetChannelType (SatEnums::ChannelType_t channelType) { m_channelType = channelType; };
+  inline void SetChannelType (SatEnums::ChannelType_t channelType)
+  {
+    m_channelType = channelType;
+  }
 
   /**
    * \brief Function for changing the receiver state
@@ -304,7 +361,10 @@ protected:
    * \brief Get the state of the carrier
    * \return State of the carrier.
    */
-  inline State GetState () { return m_state; }
+  inline State GetState ()
+  {
+    return m_state;
+  }
 
   /**
    * \brief Function for checking the SINR against the link results
@@ -376,14 +436,20 @@ protected:
    * \brief Get the ID of the carrier
    * \return Carrier ID
    */
-  inline uint32_t GetCarrierId () const { return m_carrierId; }
+  inline uint32_t GetCarrierId () const
+  {
+    return m_carrierId;
+  }
 
   /**
    * \brief Get pointer to the link results given by the carrier
-   * 				creation configuration.
+   *                            creation configuration.
    * \return Link results
    */
-  inline Ptr<SatLinkResults> GetLinkResults () { return m_linkResults; };
+  inline Ptr<SatLinkResults> GetLinkResults ()
+  {
+    return m_linkResults;
+  }
 
   /**
    * \brief Get a pointer to the channel estimation error container of the carrier.
@@ -391,13 +457,16 @@ protected:
    */
   inline Ptr<SatChannelEstimationErrorContainer> GetChannelEstimationErrorContainer ()
   {
-  	return m_channelEstimationError;
-  };
+    return m_channelEstimationError;
+  }
 
   /**
    * \brief Check if composite SINR output trace is enabled.
    */
-  inline bool IsCompositeSinrOutputTraceEnabled () const { return m_enableCompositeSinrOutputTrace; };
+  inline bool IsCompositeSinrOutputTraceEnabled () const
+  {
+    return m_enableCompositeSinrOutputTrace;
+  }
 
   /**
    * \brief A helper method for getting values form a uniform random variable in child classes.
@@ -405,7 +474,10 @@ protected:
    * \param max Maximum value
    * \return Double between min and max
    */
-  inline double GetUniformRandomValue (double min, double max) { return m_uniformVariable->GetValue (min, max); };
+  inline double GetUniformRandomValue (double min, double max)
+  {
+    return m_uniformVariable->GetValue (min, max);
+  }
 
   ///// CALCULATION VARIABLES //////////
   /**
@@ -503,7 +575,6 @@ protected:
   SatPhy::AverageNormalizedOfferedLoadCallback m_avgNormalizedOfferedLoadCallback;
 
 private:
-
   /**
    * \brief Function for checking the SINR against the link results
    * \param cSinr composite SINR
@@ -512,12 +583,13 @@ private:
    */
   bool CheckAgainstLinkResultsErrorModelAvi (double cSinr, Ptr<SatSignalParameters> rxParams);
 
-  State m_state; 																//< Current state of the carrier
-  uint32_t m_beamId; 														//< Beam ID
-  uint32_t m_carrierId; 												//< Carrier ID
-  bool m_receivingDedicatedAccess; 							//< Is the carrier receiving a dedicated access packet
-  Ptr<SatInterference> m_satInterference; 			//< Interference model
-  bool m_enableCompositeSinrOutputTrace;				//< Enable composite SINR output tracing
+  State m_state;                                                                                                                                //< Current state of the carrier
+  uint32_t m_beamId;                                                                                                            //< Beam ID
+  uint32_t m_carrierId;                                                                                                 //< Carrier ID
+  bool m_receivingDedicatedAccess;                                      //< Is the carrier receiving a dedicated access packet
+  Ptr<SatInterference> m_satInterference;                               //< Interference model
+  Ptr<SatInterferenceElimination> m_satInterferenceElimination;         //< Interference model
+  bool m_enableCompositeSinrOutputTrace;                                //< Enable composite SINR output tracing
 
   /**
    * \brief Contains information about how many ongoing Rx events there are
@@ -530,19 +602,18 @@ private:
   uint32_t m_rxPacketCounter;
 
   std::map<uint32_t, rxParams_s> m_rxParamsMap; //< Storage for Rx parameters by ID
-  Mac48Address m_ownAddress; 										//< Carrier address
-  Ptr<SatNodeInfo> m_nodeInfo; 									//< NodeInfo of the node where carrier is attached
-  SatEnums::ChannelType_t m_channelType;				//< Channel type
-  Ptr<SatLinkResults> m_linkResults; 						//< Link results from the carrier configuration
-  Ptr<UniformRandomVariable> m_uniformVariable;	//< Uniform helper random variable
-  SatPhyRxCarrierConf::ErrorModel m_errorModel;	//< Error model
-  double m_constantErrorRate;										//< Error rate for constant error model
+  Mac48Address m_ownAddress;                                                                            //< Carrier address
+  Ptr<SatNodeInfo> m_nodeInfo;                                                                  //< NodeInfo of the node where carrier is attached
+  SatEnums::ChannelType_t m_channelType;                                //< Channel type
+  Ptr<SatLinkResults> m_linkResults;                                            //< Link results from the carrier configuration
+  Ptr<UniformRandomVariable> m_uniformVariable; //< Uniform helper random variable
+  SatPhyRxCarrierConf::ErrorModel m_errorModel; //< Error model
+  double m_constantErrorRate;                                                                           //< Error rate for constant error model
 
   /**
    * \brief Channel estimation error container
    */
   Ptr<SatChannelEstimationErrorContainer> m_channelEstimationError;
-
 };
 
 }

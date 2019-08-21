@@ -57,9 +57,9 @@ SatSimpleNetDevice::GetTypeId (void)
 
 SatSimpleNetDevice::SatSimpleNetDevice ()
   : m_channel (0),
-    m_node (0),
-    m_mtu (0xffff),
-    m_ifIndex (0)
+  m_node (0),
+  m_mtu (0xffff),
+  m_ifIndex (0)
 {
   NS_LOG_FUNCTION (this);
 }

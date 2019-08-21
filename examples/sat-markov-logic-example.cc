@@ -80,7 +80,7 @@ main (int argc, char *argv[])
   SatBaseFading::VelocityCallback velocityCb = MakeCallback (&GetVelocity);
 
   /// Create fading container based on default configuration
-  Ptr<SatMarkovContainer> markovContainer = CreateObject<SatMarkovContainer> (markovConf,elevationCb,velocityCb);
+  Ptr<SatMarkovContainer> markovContainer = CreateObject<SatMarkovContainer> (markovConf, elevationCb, velocityCb);
 
   Address macAddress;
 

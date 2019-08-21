@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2013 Magister Solutions Ltd.
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
 #ifndef SATELLITE_PHY_RX_CARRIER_PER_FRAME_H
@@ -42,7 +44,7 @@ class SatCrdsaReplicaTag;
 /**
  * \ingroup satellite
  * \brief Inherited the functionality of ground station SatPhyRxCarriers
- * 				and extended it with CRDSA functionality.
+ *                              and extended it with CRDSA functionality.
  */
 class SatPhyRxCarrierPerFrame : public SatPhyRxCarrierPerSlot
 {
@@ -64,12 +66,14 @@ public:
     bool phyError;
   } crdsaPacketRxParams_s;
 
-	/**
-	 * Constructor.
-	 * \param carrierId ID of the carrier
-	 * \param carrierConf Carrier configuration
-	 */
-	SatPhyRxCarrierPerFrame (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> carrierConf, bool randomAccessEnabled);
+  /**
+   * Constructor.
+   * \param carrierId ID of the carrier
+   * \param carrierConf Carrier configuration
+   * \param waveformConf Waveform configuration
+   * \param randomAccessEnabled Is this a RA carrier
+   */
+  SatPhyRxCarrierPerFrame (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatWaveformConf> waveformConf, bool randomAccessEnabled);
 
   /**
    * \brief Destructor
@@ -89,7 +93,7 @@ public:
    * \return Comparison result
    */
   static bool CompareCrdsaPacketId (SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s obj1,
-  		SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s obj2);
+                                    SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s obj2);
 
   /**
    * \brief Function for initializing the frame end scheduling
@@ -101,31 +105,65 @@ public:
    */
   inline virtual CarrierType GetCarrierType ()
   {
-  	return CarrierType::RA_CRDSA;
+    return CarrierType::RA_CRDSA;
   }
 
 protected:
-
-	/**
-	 * Receive a slot.
-	 */
+  /**
+   * Receive a slot.
+   */
   virtual void ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams, const uint32_t nPackets);
 
-	/**
-	 * \brief Dispose implementation
-	 */
+  /**
+   * \brief Dispose implementation
+   */
   virtual void DoDispose ();
 
-private:
+  /**
+   * \brief Function for receiving decodable packets and removing their
+   * interference from the other packets in the slots they’re in; perform
+   * as many cycles as needed to try to decode each packet.
+   * \param combinedPacketsForFrame  container to store packets
+   * as they are decoded and removed from the frame
+   */
+  virtual void PerformSicCycles (std::vector<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s>& combinedPacketsForFrame);
+
+  /**
+   * \brief Function for identifying whether the packet is a replica of another packet
+   * \param packet A packet
+   * \param otherPacket A packet that we want to check if it is a duplicate
+   * \return Is the packet a replica
+   */
+  bool IsReplica (const SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s& packet,
+                  const SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s& otherPacket) const;
+
+  /**
+   * \brief Function for computing the composite SINR of the given packet
+   * \param packet  The packet whose composite SINR should be updated
+   * \return SINR for the given packet
+   */
+  double CalculatePacketCompositeSinr (crdsaPacketRxParams_s& packet);
 
   /**
    * \brief Function for eliminating the interference to other packets in the slot from the correctly received packet
    * \param iter Packets in the slot
    * \param processedPacket Correctly received processed packet
    */
-  void EliminateInterference (std::map<uint32_t,std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> >::iterator iter,
-  		SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s processedPacket);
+  void EliminateInterference (std::map<uint32_t, std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> >::iterator iter,
+                              SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s processedPacket);
 
+  /**
+   * \brief Function for finding and removing the replicas of the CRDSA packet
+   * \param packet CRDSA packet
+   */
+  void FindAndRemoveReplicas (SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s packet);
+
+  inline std::map<uint32_t, std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> >& GetCrdsaPacketContainer ()
+  {
+    return m_crdsaPacketContainer;
+  }
+
+private:
   /**
    * \brief Function for storing the received CRDSA packets
    * \param Rx parameters of the packet
@@ -164,28 +202,13 @@ private:
   std::vector<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> ProcessFrame ();
 
   /**
-   * \brief Function for finding and removing the replicas of the CRDSA packet
-   * \param packet CRDSA packet
-   */
-  void FindAndRemoveReplicas (SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s packet);
-
-  /**
-   * \brief Function for identifying whether the packet is a replica of another packet
-   * \param packet Packet
-   * \param iter A packet in certain slot
-   * \return Is the packet a replica
-   */
-  bool IsReplica (SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s packet,
-  		std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s>::iterator iter);
-
-  /**
    * \brief Function for checking do the packets have identical slots
-   * \param packet Packet
-   * \param iter A packet in certain slot
+   * \param packet A packet
+   * \param otherPacket A packet that we want to check if it has identical slots
    * \return Have the packets identical slots
    */
-  bool HaveSameSlotIds (SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s packet,
-  		std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s>::iterator iter);
+  bool HaveSameSlotIds (const SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s& packet,
+                        const SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s& otherPacket) const;
 
   /**
    * \brief Function for calculating the normalized offered random access load
@@ -213,7 +236,7 @@ private:
    * Process received CRDSA packet.
    */
   SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s
-	ProcessReceivedCrdsaPacket (SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s packet,
+  ProcessReceivedCrdsaPacket (SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s packet,
                               uint32_t numOfPacketsForThisSlot);
 
 

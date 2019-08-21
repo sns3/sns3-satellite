@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2013 Magister Solutions Ltd.
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
 #ifndef SATELLITE_PHY_RX_CARRIER_CONF_H_
@@ -71,7 +73,15 @@ public:
    */
   enum InterferenceModel
   {
-    IF_PER_PACKET, IF_TRACE, IF_CONSTANT
+    IF_PER_PACKET, IF_PER_FRAGMENT, IF_TRACE, IF_CONSTANT
+  };
+
+  /**
+   * \brief Interference cancelation model enum
+   */
+  enum InterferenceEliminationModel
+  {
+    SIC_NONE, SIC_PERFECT,
   };
 
   /**
@@ -89,6 +99,7 @@ public:
    * \param errorModel Used error model
    * \param daIfModel Used interference model for dedicated access
    * \param raIfModel Used interference model for random access
+   * \param raIfEliminateModel Used interference elimination model for random access
    * \param rxMode RX mode used in carrier
    * \param chType RX channel type
    * \param converter Bandwidth converter
@@ -104,6 +115,7 @@ public:
     double                                   m_daConstantErrorRate;
     InterferenceModel                        m_daIfModel;
     InterferenceModel                        m_raIfModel;
+    InterferenceEliminationModel             m_raIfEliminateModel;
     RxMode                                   m_rxMode;
     SatEnums::ChannelType_t                  m_chType;
     SatTypedefs::CarrierBandwidthConverter_t m_bwConverter;
@@ -115,20 +127,21 @@ public:
 
     RxCarrierCreateParams_s ()
       : m_rxTemperatureK (0.0),
-        m_extNoiseDensityWhz (0.0),
-        m_aciIfWrtNoiseFactor (0.0),
-        m_errorModel (SatPhyRxCarrierConf::EM_NONE),
-        m_daConstantErrorRate (0.0),
-        m_daIfModel (SatPhyRxCarrierConf::IF_CONSTANT),
-        m_raIfModel (SatPhyRxCarrierConf::IF_CONSTANT),
-        m_rxMode (SatPhyRxCarrierConf::TRANSPARENT),
-        m_chType (SatEnums::RETURN_USER_CH),
-        m_bwConverter (),
-        m_carrierCount (0),
-        m_cec (NULL),
-        m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR),
-        m_raConstantErrorRate (0.0),
-				m_randomAccessModel (SatEnums::RA_MODEL_OFF)
+      m_extNoiseDensityWhz (0.0),
+      m_aciIfWrtNoiseFactor (0.0),
+      m_errorModel (SatPhyRxCarrierConf::EM_NONE),
+      m_daConstantErrorRate (0.0),
+      m_daIfModel (SatPhyRxCarrierConf::IF_CONSTANT),
+      m_raIfModel (SatPhyRxCarrierConf::IF_CONSTANT),
+      m_raIfEliminateModel (SatPhyRxCarrierConf::SIC_PERFECT),
+      m_rxMode (SatPhyRxCarrierConf::TRANSPARENT),
+      m_chType (SatEnums::RETURN_USER_CH),
+      m_bwConverter (),
+      m_carrierCount (0),
+      m_cec (NULL),
+      m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR),
+      m_raConstantErrorRate (0.0),
+      m_randomAccessModel (SatEnums::RA_MODEL_OFF)
     {
       // do nothing
     }
@@ -192,6 +205,13 @@ public:
    * \return configured interference model
    */
   InterferenceModel GetInterferenceModel (bool isRandomAccessCarrier) const;
+
+  /**
+   * \brief Get configured interference cancelation model
+   * \param isRandomAccessCarrier Do we want RA or DA SIC model
+   * \return configured interference cancelation model
+   */
+  InterferenceEliminationModel GetInterferenceEliminationModel (bool isRandomAccessCarrier) const;
 
   /**
    * \brief Get configured link results
@@ -292,7 +312,10 @@ public:
    */
   bool IsRandomAccessDynamicLoadControlEnabled () const;
 
-  inline SatEnums::RandomAccessModel_t GetRandomAccessModel () const { return m_randomAccessModel; };
+  inline SatEnums::RandomAccessModel_t GetRandomAccessModel () const
+  {
+    return m_randomAccessModel;
+  }
 
 private:
   /*
@@ -303,6 +326,7 @@ private:
    */
   InterferenceModel m_daIfModel;
   InterferenceModel m_raIfModel;
+  InterferenceEliminationModel m_raIfEliminateModel;
   ErrorModel m_errorModel;
   double m_daConstantErrorRate;
   double m_rxTemperatureK;

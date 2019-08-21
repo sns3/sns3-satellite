@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2014 Magister Solutions Ltd.
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 #include "satellite-random-access-allocation-channel.h"
 
@@ -35,17 +37,19 @@ SatRandomAccessAllocationChannel::GetTypeId (void)
 }
 
 SatRandomAccessAllocationChannel::SatRandomAccessAllocationChannel ()
-  : m_crdsaMinRandomizationValue (),
-    m_crdsaMaxRandomizationValue (),
-    m_crdsaNumOfInstances (),
-    m_crdsaMinIdleBlocks (),
-    m_crdsaIdleBlocksLeft (0),
-    m_crdsaBackoffTimeInMilliSeconds (),
-    m_crdsaBackoffProbability (),
-    m_crdsaMaxUniquePayloadPerBlock (),
-    m_crdsaMaxConsecutiveBlocksAccessed (),
-    m_crdsaNumOfConsecutiveBlocksUsed (0),
-    m_crdsaBackoffReleaseTime (0)
+  : m_slottedAlohaAllowed (false),
+  m_crdsaAllowed (false),
+  m_crdsaMinRandomizationValue (),
+  m_crdsaMaxRandomizationValue (),
+  m_crdsaNumOfInstances (),
+  m_crdsaMinIdleBlocks (),
+  m_crdsaIdleBlocksLeft (0),
+  m_crdsaBackoffTimeInMilliSeconds (),
+  m_crdsaBackoffProbability (),
+  m_crdsaMaxUniquePayloadPerBlock (),
+  m_crdsaMaxConsecutiveBlocksAccessed (),
+  m_crdsaNumOfConsecutiveBlocksUsed (0),
+  m_crdsaBackoffReleaseTime (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -59,6 +63,12 @@ void
 SatRandomAccessAllocationChannel::DoCrdsaVariableSanityCheck ()
 {
   NS_LOG_FUNCTION (this);
+
+  if (!m_crdsaAllowed)
+    {
+      NS_LOG_INFO ("CRDSA disallowed: skipping sanity check");
+      return;
+    }
 
   if (m_crdsaMaxRandomizationValue < 1)
     {
@@ -85,7 +95,7 @@ SatRandomAccessAllocationChannel::DoCrdsaVariableSanityCheck ()
       NS_FATAL_ERROR ("SatRandomAccessAllocationChannel::CrdsaDoVariableSanityCheck - m_crdsaBackoffProbability < 0.0 || m_crdsaBackoffProbability > 1.0");
     }
 
-  NS_LOG_INFO ("SatRandomAccessAllocationChannel::DoCrdsaVariableSanityCheck - Variable sanity check done");
+  NS_LOG_INFO ("Variable sanity check done");
 }
 
 } // namespace ns3

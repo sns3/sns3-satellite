@@ -31,14 +31,14 @@ NS_OBJECT_ENSURE_REGISTERED (SatPPduHeader);
 
 SatPPduHeader::SatPPduHeader ()
   : m_startIndicator (0),
-    m_endIndicator (0),
-    m_ppduLengthInBytes (0),
-    m_fragmentId (0),
-    m_totalLengthInBytes (0),
-    m_fullPpduHeaderSize (2),
-    m_startPpduHeaderSize (4),
-    m_endPpduHeaderSize (2),
-    m_continuationPpduHeaderSize (2)
+  m_endIndicator (0),
+  m_ppduLengthInBytes (0),
+  m_fragmentId (0),
+  m_totalLengthInBytes (0),
+  m_fullPpduHeaderSize (2),
+  m_startPpduHeaderSize (4),
+  m_endPpduHeaderSize (2),
+  m_continuationPpduHeaderSize (2)
 {
 }
 
@@ -282,4 +282,4 @@ uint32_t SatPPduHeader::GetMaxHeaderSizeInBytes () const
 }
 
 
-}; // namespace ns3
+}  // namespace ns3

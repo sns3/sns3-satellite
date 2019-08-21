@@ -38,15 +38,15 @@ SatInputFileStreamTimeLongDoubleContainer::GetTypeId (void)
 
 SatInputFileStreamTimeLongDoubleContainer::SatInputFileStreamTimeLongDoubleContainer (std::string filename, std::ios::openmode filemode, uint32_t valuesInRow)
   : m_inputFileStreamWrapper (),
-    m_inputFileStream (),
-    m_container (),
-    m_fileName (filename),
-    m_fileMode (filemode),
-    m_valuesInRow (valuesInRow),
-    m_lastValidPosition (0),
-    m_numOfPasses (0),
-    m_timeShiftValue (0),
-    m_timeColumn (0)
+  m_inputFileStream (),
+  m_container (),
+  m_fileName (filename),
+  m_fileMode (filemode),
+  m_valuesInRow (valuesInRow),
+  m_lastValidPosition (0),
+  m_numOfPasses (0),
+  m_timeShiftValue (0),
+  m_timeColumn (0)
 {
   NS_LOG_FUNCTION (this << m_fileName << m_fileMode);
 
@@ -55,15 +55,15 @@ SatInputFileStreamTimeLongDoubleContainer::SatInputFileStreamTimeLongDoubleConta
 
 SatInputFileStreamTimeLongDoubleContainer::SatInputFileStreamTimeLongDoubleContainer ()
   : m_inputFileStreamWrapper (),
-    m_inputFileStream (),
-    m_container (),
-    m_fileName (),
-    m_fileMode (),
-    m_valuesInRow (),
-    m_lastValidPosition (),
-    m_numOfPasses (),
-    m_timeShiftValue (),
-    m_timeColumn ()
+  m_inputFileStream (),
+  m_container (),
+  m_fileName (),
+  m_fileMode (),
+  m_valuesInRow (),
+  m_lastValidPosition (),
+  m_numOfPasses (),
+  m_timeShiftValue (),
+  m_timeColumn ()
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("SatInputFileStreamTimeLongDoubleContainer::SatInputFileStreamTimeLongDoubleContainer - Constructor not in use");
@@ -96,7 +96,7 @@ SatInputFileStreamTimeLongDoubleContainer::UpdateContainer (std::string filename
   m_fileMode = filemode;
   m_valuesInRow = valuesInRow;
 
-  m_inputFileStreamWrapper = new SatInputFileStreamWrapper (filename,filemode);
+  m_inputFileStreamWrapper = new SatInputFileStreamWrapper (filename, filemode);
   m_inputFileStream = m_inputFileStreamWrapper->GetStream ();
 
   if (m_inputFileStream->is_open ())
@@ -173,7 +173,7 @@ SatInputFileStreamTimeLongDoubleContainer::ProceedToNextClosestTimeSample ()
 {
   NS_LOG_FUNCTION (this);
 
-  while (!FindNextClosest (m_lastValidPosition,m_timeShiftValue, Now ().GetSeconds ()))
+  while (!FindNextClosest (m_lastValidPosition, m_timeShiftValue, Now ().GetSeconds ()))
     {
       m_lastValidPosition = 0;
       m_numOfPasses++;
@@ -191,6 +191,55 @@ SatInputFileStreamTimeLongDoubleContainer::ProceedToNextClosestTimeSample ()
   return m_container[m_lastValidPosition];
 }
 
+std::vector<long double>
+SatInputFileStreamTimeLongDoubleContainer::InterpolateBetweenClosestTimeSamples ()
+{
+  NS_LOG_FUNCTION (this);
+
+  long double currentTime = Now ().GetSeconds ();
+  FindNextClosest (m_lastValidPosition, m_timeShiftValue, currentTime);
+
+  std::vector<long double> selectedPosition = m_container[m_lastValidPosition];
+  long double selectedTime = selectedPosition.at (m_timeColumn);
+
+  // Easy case: a time sample for the current time exist
+  if (selectedTime == currentTime)
+    {
+      return selectedPosition;
+    }
+
+  // Fetch the second position to perform linear interpolation
+  std::vector<long double> closestPosition;
+  if (selectedTime > currentTime)
+    {
+      if (m_lastValidPosition == 0)
+        {
+          // No previous position available, abort
+          return selectedPosition;
+        }
+      closestPosition = m_container[m_lastValidPosition - 1];
+    }
+  else
+    {
+      if (m_lastValidPosition == m_container.size () - 1)
+        {
+          // No next position available, abort
+          return selectedPosition;
+        }
+      closestPosition = m_container[m_lastValidPosition + 1];
+    }
+
+  long double linearCoefficient = (currentTime - selectedTime) / (closestPosition.at (m_timeColumn) - selectedTime);
+  std::size_t rowSize = selectedPosition.size ();
+  std::vector<long double> interpolatedPosition (rowSize);
+  for (std::size_t i = 0; i < rowSize; ++i)
+    {
+      interpolatedPosition[i] = selectedPosition[i] + linearCoefficient * (closestPosition[i] - selectedPosition[i]);
+    }
+
+  return interpolatedPosition;
+}
+
 bool
 SatInputFileStreamTimeLongDoubleContainer::FindNextClosest (uint32_t lastValidPosition, long double timeShiftValue, long double comparisonTimeValue)
 {
@@ -200,7 +249,10 @@ SatInputFileStreamTimeLongDoubleContainer::FindNextClosest (uint32_t lastValidPo
   NS_ASSERT (m_container.size () > 0);
   NS_ASSERT (lastValidPosition >= 0 && lastValidPosition < m_container.size ());
 
-  NS_LOG_INFO ("SatInputFileStreamTimeLongDoubleContainer::FindNextClosest: lastValidPosition " << lastValidPosition << " column " << m_timeColumn << " timeShiftValue " << timeShiftValue << " comparisonTimeValue " << comparisonTimeValue);
+  NS_LOG_INFO ("LastValidPosition " << lastValidPosition <<
+               " column " << m_timeColumn <<
+               " timeShiftValue " << timeShiftValue <<
+               " comparisonTimeValue " << comparisonTimeValue);
 
   bool valueFound = false;
 

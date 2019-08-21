@@ -78,19 +78,19 @@ main (int argc, char *argv[])
   cmd.Parse (argc, argv);
 
   Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (inputFileNameWithPath));
-	Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
-	Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
-	ConfigStore inputConfig;
-	inputConfig.ConfigureDefaults ();
+  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
+  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
+  ConfigStore inputConfig;
+  inputConfig.ConfigureDefaults ();
 
   // Enable Random Access with all available modules
-  Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel",EnumValue (SatEnums::RA_MODEL_RCS2_SPECIFICATION));
+  Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_RCS2_SPECIFICATION));
 
   // Set Random Access interference model
-  Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+  Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
 
   // Set Random Access collision model
-  Config::SetDefault ("ns3::SatBeamHelper::RaCollisionModel",EnumValue (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
+  Config::SetDefault ("ns3::SatBeamHelper::RaCollisionModel", EnumValue (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
 
   // Set dynamic load control parameters
   Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableRandomAccessDynamicLoadControl", BooleanValue (false));
@@ -166,7 +166,7 @@ main (int argc, char *argv[])
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_VolumeAllowed", BooleanValue (false));
         Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (true));
 
-        Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel",EnumValue (SatEnums::RA_MODEL_OFF));
+        Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_OFF));
 
         Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (true));
         break;
@@ -217,10 +217,10 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::OnOffApplication::OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + onTime + "]"));
   Config::SetDefault ("ns3::OnOffApplication::OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + offTime + "]"));
   sh->InstallTrafficModel (
-  		SimulationHelper::ONOFF,
-			SimulationHelper::UDP,
-			SimulationHelper::RTN_LINK,
-			Seconds (0), Seconds (simLength - 2.0));
+    SimulationHelper::ONOFF,
+    SimulationHelper::UDP,
+    SimulationHelper::RTN_LINK,
+    Seconds (0), Seconds (simLength - 2.0));
 
   /**
    * Set-up statistics

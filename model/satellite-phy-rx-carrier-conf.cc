@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2013 Magister Solutions Ltd.
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
 #include "ns3/log.h"
@@ -35,50 +37,52 @@ NS_OBJECT_ENSURE_REGISTERED (SatPhyRxCarrierConf);
 
 SatPhyRxCarrierConf::SatPhyRxCarrierConf ()
   : m_daIfModel (),
-    m_raIfModel (),
-    m_errorModel (),
-    m_daConstantErrorRate (0.0),
-    m_rxTemperatureK (),
-    m_rxAciIfWrtNoiseFactor (),
-    m_rxMode (),
-    m_carrierCount (),
-    m_carrierBandwidthConverter (),
-    m_channelType (),
-    m_channelEstimationError (),
-    m_sinrCalculate (),
-    m_linkResults (),
-    m_rxExtNoiseDensityWhz (0),
-    m_enableIntfOutputTrace (false),
-    m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (10),
-    m_raCollisionModel (RA_COLLISION_NOT_DEFINED),
-    m_raConstantErrorRate (0.0),
-    m_enableRandomAccessDynamicLoadControl (true),
-		m_randomAccessModel ()
+  m_raIfModel (),
+  m_raIfEliminateModel (),
+  m_errorModel (),
+  m_daConstantErrorRate (0.0),
+  m_rxTemperatureK (),
+  m_rxAciIfWrtNoiseFactor (),
+  m_rxMode (),
+  m_carrierCount (),
+  m_carrierBandwidthConverter (),
+  m_channelType (),
+  m_channelEstimationError (),
+  m_sinrCalculate (),
+  m_linkResults (),
+  m_rxExtNoiseDensityWhz (0),
+  m_enableIntfOutputTrace (false),
+  m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (10),
+  m_raCollisionModel (RA_COLLISION_NOT_DEFINED),
+  m_raConstantErrorRate (0.0),
+  m_enableRandomAccessDynamicLoadControl (true),
+  m_randomAccessModel ()
 {
   NS_FATAL_ERROR ("SatPhyRxCarrierConf::SatPhyRxCarrierConf - Constructor not in use");
 }
 
 SatPhyRxCarrierConf::SatPhyRxCarrierConf (RxCarrierCreateParams_s createParams)
   : m_daIfModel (createParams.m_daIfModel),
-    m_raIfModel (createParams.m_raIfModel),
-    m_errorModel (createParams.m_errorModel),
-    m_daConstantErrorRate (createParams.m_daConstantErrorRate),
-    m_rxTemperatureK (createParams.m_rxTemperatureK),
-    m_rxAciIfWrtNoiseFactor (createParams.m_aciIfWrtNoiseFactor),
-    m_rxMode (createParams.m_rxMode),
-    m_carrierCount (createParams.m_carrierCount),
-    m_carrierBandwidthConverter (createParams.m_bwConverter),
-    m_channelType (createParams.m_chType),
-    m_channelEstimationError (createParams.m_cec),
-    m_sinrCalculate (),
-    m_linkResults (),
-    m_rxExtNoiseDensityWhz (createParams.m_extNoiseDensityWhz),
-    m_enableIntfOutputTrace (false),
-    m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (10),
-    m_raCollisionModel (createParams.m_raCollisionModel),
-    m_raConstantErrorRate (createParams.m_raConstantErrorRate),
-    m_enableRandomAccessDynamicLoadControl (true),
-		m_randomAccessModel (createParams.m_randomAccessModel)
+  m_raIfModel (createParams.m_raIfModel),
+  m_raIfEliminateModel (createParams.m_raIfEliminateModel),
+  m_errorModel (createParams.m_errorModel),
+  m_daConstantErrorRate (createParams.m_daConstantErrorRate),
+  m_rxTemperatureK (createParams.m_rxTemperatureK),
+  m_rxAciIfWrtNoiseFactor (createParams.m_aciIfWrtNoiseFactor),
+  m_rxMode (createParams.m_rxMode),
+  m_carrierCount (createParams.m_carrierCount),
+  m_carrierBandwidthConverter (createParams.m_bwConverter),
+  m_channelType (createParams.m_chType),
+  m_channelEstimationError (createParams.m_cec),
+  m_sinrCalculate (),
+  m_linkResults (),
+  m_rxExtNoiseDensityWhz (createParams.m_extNoiseDensityWhz),
+  m_enableIntfOutputTrace (false),
+  m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (10),
+  m_raCollisionModel (createParams.m_raCollisionModel),
+  m_raConstantErrorRate (createParams.m_raConstantErrorRate),
+  m_enableRandomAccessDynamicLoadControl (true),
+  m_randomAccessModel (createParams.m_randomAccessModel)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -104,7 +108,7 @@ SatPhyRxCarrierConf::GetTypeId (void)
                    MakeBooleanAccessor (&SatPhyRxCarrierConf::m_enableRandomAccessDynamicLoadControl),
                    MakeBooleanChecker ())
     .AddConstructor<SatPhyRxCarrierConf> ()
-    ;
+  ;
   return tid;
 }
 
@@ -155,6 +159,19 @@ SatPhyRxCarrierConf::GetInterferenceModel (bool isRandomAccessCarrier) const
   else
     {
       return m_daIfModel;
+    }
+}
+
+SatPhyRxCarrierConf::InterferenceEliminationModel
+SatPhyRxCarrierConf::GetInterferenceEliminationModel (bool isRandomAccessCarrier) const
+{
+  if (isRandomAccessCarrier)
+    {
+      return m_raIfEliminateModel;
+    }
+  else
+    {
+      return SatPhyRxCarrierConf::SIC_NONE;
     }
 }
 
@@ -215,7 +232,7 @@ SatPhyRxCarrierConf::GetChannelEstimatorErrorContainer () const
 SatPhyRxCarrierConf::RandomAccessCollisionModel
 SatPhyRxCarrierConf::GetRandomAccessCollisionModel () const
 {
-  if (m_raIfModel == IF_PER_PACKET)
+  if (m_raIfModel == IF_PER_PACKET || m_raIfModel == IF_PER_FRAGMENT)
     {
       return m_raCollisionModel;
     }

@@ -48,7 +48,6 @@ class SatSchedulingObject;
 class SortByMetric
 {
 public:
-
   /**
    * Sort a vector available RC indices based on unallocated load.
    * \param m Vector to be sorted.

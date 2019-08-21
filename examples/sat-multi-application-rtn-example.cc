@@ -1,4 +1,4 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2014 Magister Solutions
  *
@@ -81,7 +81,7 @@ main (int argc, char *argv[])
 
   simulationHelper->SetUtCountPerBeam (1);
   simulationHelper->SetUserCountPerUt (1);
-  simulationHelper->SetBeamSet ({12,22});
+  simulationHelper->SetBeamSet ({12, 22});
   simulationHelper->SetSimulationTime (simLength);
 
   // No PHY errors
@@ -184,9 +184,9 @@ main (int argc, char *argv[])
       cbrHelper.SetAttribute ("Interval", StringValue (interval));
       cbrHelper.SetAttribute ("PacketSize", UintegerValue (packetSize));
 
-  	  // Set destination addresses
-  	  InetSocketAddress cbrDest (helper->GetUserAddress (gwUsers.Get (cbrGwUserId)), port);
-  	  cbrDest.SetTos (cbrTos);
+      // Set destination addresses
+      InetSocketAddress cbrDest (helper->GetUserAddress (gwUsers.Get (cbrGwUserId)), port);
+      cbrDest.SetTos (cbrTos);
 
       // Cbr and Sink applications creation. CBR to UT users and sinks to GW users.
       gwCbrSinkApps.Add (cbrSinkHelper.Install (gwUsers.Get (cbrGwUserId)));
@@ -233,9 +233,9 @@ main (int argc, char *argv[])
 
       startDelay = appStartTime;
 
-  	  // Set destination addresses
-  	  InetSocketAddress onOffDest (helper->GetUserAddress (gwUsers.Get (onOffGwUserId)), port);
-  	  onOffDest.SetTos (onOffTos);
+      // Set destination addresses
+      InetSocketAddress onOffDest (helper->GetUserAddress (gwUsers.Get (onOffGwUserId)), port);
+      onOffDest.SetTos (onOffTos);
 
       // Cbr and Sink applications creation
       gwOnOffSinkApps.Add (onOffSinkHelper.Install (gwUsers.Get (onOffGwUserId)));

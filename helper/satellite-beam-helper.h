@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2013 Magister Solutions Ltd
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@viveris.toulouse.fr>
  */
 
 #ifndef SATELLITE_BEAM_HELPER_H
@@ -26,24 +28,27 @@
 #include <map>
 #include <stdint.h>
 
-#include "ns3/node-container.h"
-#include "ns3/ipv4-address-helper.h"
+#include <ns3/node-container.h>
+#include <ns3/ipv4-address-helper.h>
 
-#include "ns3/satellite-ncc.h"
-#include "ns3/satellite-antenna-gain-pattern-container.h"
-#include "ns3/satellite-bstp-controller.h"
-#include "ns3/satellite-phy-rx-carrier-conf.h"
-#include "ns3/satellite-mobility-observer.h"
-#include "ns3/satellite-markov-container.h"
-#include "ns3/satellite-packet-trace.h"
-#include "ns3/satellite-superframe-sequence.h"
-#include "ns3/satellite-typedefs.h"
+#include <ns3/satellite-ncc.h>
+#include <ns3/satellite-antenna-gain-pattern-container.h>
+#include <ns3/satellite-beam-channel-pair.h>
+#include <ns3/satellite-bstp-controller.h>
+#include <ns3/satellite-phy-rx-carrier-conf.h>
+#include <ns3/satellite-mobility-observer.h>
+#include <ns3/satellite-markov-container.h>
+#include <ns3/satellite-packet-trace.h>
+#include <ns3/satellite-superframe-sequence.h>
+#include <ns3/satellite-typedefs.h>
 #include "satellite-geo-helper.h"
 #include "satellite-gw-helper.h"
 #include "satellite-ut-helper.h"
 
 
 namespace ns3 {
+
+class PropagationDelayModel;
 
 /**
  * \brief SatBeamHelper builds a set Satellite beams with needed objects and configuration.
@@ -56,7 +61,6 @@ namespace ns3 {
 class SatBeamHelper : public Object
 {
 public:
-
   /**
    * Define type CarrierFreqConverter
    */
@@ -67,9 +71,7 @@ public:
    */
   typedef SatTypedefs::CarrierBandwidthConverter_t      CarrierBandwidthConverter;
 
-  typedef std::map<std::pair<SatEnums::ChannelType_t,
-                   uint32_t>, Ptr<SatChannel> >         ChannelContainer_t;
-  typedef std::pair<uint32_t, uint32_t >                FrequencyPair_t;  // user = first, feeder = second
+  typedef std::pair<uint32_t, uint32_t>                 FrequencyPair_t;  // user = first, feeder = second
   typedef std::pair<uint32_t, uint32_t>                 GwLink_t;         // first GW ID, second feeder link frequency id
 
   typedef std::set<Ptr<Node> >                          MulticastBeamInfoItem_t;  // set container having receiving UT nodes in beam
@@ -156,15 +158,10 @@ public:
   void SetChannelAttribute (std::string name, const AttributeValue &value);
 
   /**
-  * \param network The Ipv4Address containing the initial network number to
-  * use for satellite network allocation. The bits outside the network mask are not used.
-  * \param mask The Ipv4Mask containing one bits in each bit position of the
-  * network number.
-  * \param base An optional Ipv4Address containing the initial address used for
-  * IP address allocation.  Will be combined (ORed) with the network number to
-  * generate the first IP address.  Defaults to 0.0.0.1.
-  */
-  void SetBaseAddress (const Ipv4Address& network, const Ipv4Mask& mask, Ipv4Address base = "0.0.0.1");
+   * \brief Attach an update routing callback to the NCC of this simulation
+   * \param cb the callback to update routing after a terminal handover
+   */
+  void SetNccRoutingCallback (SatNcc::UpdateRoutingCallback cb);
 
   /**
    * \param ut a set of UT nodes
@@ -175,19 +172,23 @@ public:
    * \param rtnFlFreqId id of the return feeder link frequency
    * \param fwdUlFreqId id of the forward user link frequency
    * \param fwdFlFreqId id of the forward feeder link frequency
+   * \param routingCallback the callback UT mac layers should
+   * call to update the node routes when receiving handover orders
    *
    * This method creates a beam  with the requested attributes
    * and associate the resulting ns3::NetDevices with the ns3::Nodes.
-   * \return node GW node of the beam.
+   * \return a pair containing the new SatNetDevice of the gateway
+   * and a NetDeviceContainer of all SatNetDevice for the UTs
    */
-  Ptr<Node> Install (NodeContainer ut,
+  std::pair<Ptr<NetDevice>, NetDeviceContainer> Install (NodeContainer ut,
                      Ptr<Node> gwNode,
                      uint32_t gwId,
                      uint32_t beamId,
                      uint32_t rtnUlFreqId,
                      uint32_t rtnFlFreqId,
                      uint32_t fwdUlFreqId,
-                     uint32_t fwdFlFreqId);
+                     uint32_t fwdFlFreqId,
+                     SatUtMac::RoutingUpdateCallback routingCallback);
 
   /**
    * \param beamId beam ID
@@ -305,6 +306,8 @@ public:
    */
   void EnablePacketTrace ();
 
+  Ptr<PropagationDelayModel> GetPropagationDelayModel (uint32_t beamId, SatEnums::ChannelType_t channelType);
+
 private:
   CarrierFreqConverter m_carrierFreqConverter;
   SatTypedefs::CarrierBandwidthConverter_t m_carrierBandwidthConverter;
@@ -315,19 +318,17 @@ private:
   Ptr<SatGeoHelper>     m_geoHelper;
   Ptr<SatGwHelper>      m_gwHelper;
   Ptr<SatUtHelper>      m_utHelper;
-  Ipv4AddressHelper     m_ipv4Helper;
   Ptr<Node>             m_geoNode;
   Ptr<SatNcc>           m_ncc;
 
   Ptr<SatAntennaGainPatternContainer>   m_antennaGainPatterns;
 
   std::map<uint32_t, uint32_t >             m_beam;        // first beam ID, second GW ID
-  std::set<GwLink_t >                       m_gwLinks;     // gateway links (GW id and feeder frequency id pairs).
   std::map<uint32_t, Ptr<Node> >            m_gwNode;      // first GW ID, second node pointer
   std::multimap<uint32_t, Ptr<Node> >       m_utNode;      // first Beam ID, second node pointer of the UT
+  Ptr<SatChannelPair>                       m_ulChannels;  // user link ID, channel pointers pair
+  Ptr<SatChannelPair>                       m_flChannels;  // feeder link ID, channel pointers pair
   std::map<uint32_t, FrequencyPair_t >      m_beamFreqs;   // first beam ID, channel frequency IDs pair
-
-  ChannelContainer_t m_channels;
 
   /**
    * Trace callback for creation traces
@@ -384,6 +385,11 @@ private:
   SatPhyRxCarrierConf::InterferenceModel m_raInterferenceModel;
 
   /**
+   * The used interference model for random access
+   */
+  SatPhyRxCarrierConf::InterferenceEliminationModel m_raInterferenceEliminationModel;
+
+  /**
    * The used collision model for random access
    */
   SatPhyRxCarrierConf::RandomAccessCollisionModel m_raCollisionModel;
@@ -413,19 +419,28 @@ private:
   Ptr<SatPacketTrace> m_packetTrace;
 
   /**
+   * Helper flag to activate packet traces on the return link only
+   */
+  bool m_enableTracesOnReturnLink;
+
+  /**
    * Creates info of the beam.
    * \return info for beams as std::string.
    */
   std::string CreateBeamInfo () const;
 
   /**
-   * \brief Get channel of a certain channel type and frequency id. If it
-   * is not found, the method creates and stores such for future purposes.
-   * \param channelType Channel type, i.e. RTN user, RTN feeder, FWD user, FWD feeder
-   * \param freqId Frequency id
-   * \return Channel pointer
+   * Gets satellite channel pair from requested map.
+   * In case that channel pair is not found, new is created and returned.
+   * \param fwdFrequencyId ID of the frequency
+   * \param rtnFrequencyId ID of the frequency
+   * \param isUserLink flag indicating if link user link is requested (otherwise feeder link).
+   * \return satellite channel pair from requested SatChannelPair
    */
-  Ptr<SatChannel> GetChannel (SatEnums::ChannelType_t channelType, uint32_t freqId);
+  SatChannelPair::ChannelPair_t GetChannelPair (uint32_t beamId,
+                                                uint32_t fwdFrequencyId,
+                                                uint32_t rtnFrequencyId,
+                                                bool isUserLink);
 
   /**
    * Creates GW node according to given id and stores GW to map.
@@ -436,18 +451,6 @@ private:
    * \return result of storing
    */
   bool StoreGwNode (uint32_t id, Ptr<Node> node);
-
-  /**
-   * Set needed routings of satellite network and fill ARC cache for the network.
-   * \param ut    container having UTs of the beam
-   * \param utNd  container having UT netdevices of the beam
-   * \param gw    pointer to gateway node
-   * \param gwNd  pointer to gateway netdevice
-   * \param gwAddr address of the gateway
-   * \param utIfs container having UT ipv2 interfaces (for addresses)
-   */
-  void PopulateRoutings (NodeContainer ut, NetDeviceContainer utNd, Ptr<Node> gw,
-                         Ptr<NetDevice> gwNd, Ipv4Address gwAddr, Ipv4InterfaceContainer utIfs);
 
   /**
    * Install fading model to node, if fading model doesn't exist already in node

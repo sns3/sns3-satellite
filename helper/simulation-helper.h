@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2016 Magister Solutions
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Lauri Sormunen <lauri.sormunen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@viveris.toulouse.fr>
  */
 
 #ifndef SIMULATION_HELPER_H
@@ -27,6 +29,10 @@
 #include <ns3/satellite-helper.h>
 #include <ns3/satellite-stats-helper-container.h>
 #include <ns3/satellite-enums.h>
+
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY (x)
+
 
 namespace ns3 {
 
@@ -52,7 +58,6 @@ namespace ns3 {
 class SimulationHelper : public Object
 {
 public:
-
   /**
    * Default constructor, which is not used.
    */
@@ -96,7 +101,7 @@ public:
    * \example simulationHelper->SetBeams ("1 5 20 71")
    *          enables beams 1, 5, 20 and 71.
    */
-  void SetBeams (std::string beamList);
+  void SetBeams (const std::string& beamList);
 
   /**
    * \brief Set enabled beams (1-72) as a set.
@@ -105,6 +110,11 @@ public:
    *          enables beams 1, 2 and 3..
    */
   void SetBeamSet (std::set<uint32_t> beamSet);
+
+  inline std::set<uint32_t> GetBeamSet (void) const
+  {
+    return m_enabledBeams;
+  }
 
   /**
    * \brief Get enabled beams in integer format.
@@ -149,6 +159,18 @@ public:
   void SetUserCountPerUt (Ptr<RandomVariableStream> rs);
 
   /**
+   * \brief Set user count per mobile UT.
+   * \param count Number of users per mobile UT.
+   */
+  void SetUserCountPerMobileUt (uint32_t count);
+
+  /**
+   * \brief Set mobile UT count per beam to be taken from a random variable stream.
+   * \param rs RandomVariableStream to be used, must implement GetInteger.
+   */
+  void SetUserCountPerMobileUt (Ptr<RandomVariableStream> rs);
+
+  /**
    * \brief Set the number of GW users in the scenario.
    * Must be called before creation of satellite scenario.
    * \param gwUserCount
@@ -165,7 +187,10 @@ public:
    * \brief Set simulation time
    * \param time
    */
-  inline void SetSimulationTime (Time time) { m_simTime = time; };
+  inline void SetSimulationTime (Time time)
+  {
+    m_simTime = time;
+  }
 
   /**
    * \brief Set ideal channel/physical layer parameterization.
@@ -300,10 +325,12 @@ public:
   /**
    * \brief Set simulation interference model.
    * \param ifModel Interference model.
+   * \param ifEliminationModel Interference elimination model.
    * \param constantIf Static interference if constant interference model used
+   * \param residualSamplingError Sampling error if residual interference elimination model used
    */
-  void SetInterferenceModel(SatPhyRxCarrierConf::InterferenceModel ifModel,
-                            double constantIf = 0.0);
+  void SetInterferenceModel (SatPhyRxCarrierConf::InterferenceModel ifModel,
+                             double constantIf = 0.0);
 
   /**
    * \brief Enables simulation progress logging.
@@ -338,9 +365,11 @@ public:
 
   /**
    * \brief Create the satellite scenario.
+   * \param scenario Kind of scenario to create, if any
+   * \param mobileUtsFolder Folder from which to load mobile UT traces, if any
    * \return satHelper Satellite helper, which provides e.g. nodes for application installation.
    */
-  Ptr<SatHelper> CreateSatScenario (SatHelper::PreDefinedScenario_t scenario = SatHelper::NONE);
+  Ptr<SatHelper> CreateSatScenario (SatHelper::PreDefinedScenario_t scenario = SatHelper::NONE, const std::string& mobileUtsFolder = "");
 
   /**
    * \brief Create stats collectors and set default statistics settings
@@ -375,24 +404,37 @@ public:
   void SetOutputPath (std::string path);
 
   /**
-   * \brief Read input attributes from XML file
-   * \param fileName Input XML file name
+   * \brief Configure this instance after reading input attributes from XML file
+   * \param filePath full path to an Input XML file
+   * \param overrideManualConfiguration whether or not to read some configuration (beams,
+   * UT count per beam, user count per UT, simulation time) from XML file
    */
-  void ReadInputAttributesFromFile (std::string fileName);
+  void ConfigureAttributesFromFile (std::string filePath, bool overrideManualConfiguration = true);
+
+  /**
+   * \brief Read input attributes from XML file
+   * \param filePath full path to an Input XML file
+   */
+  void ReadInputAttributesFromFile (std::string filePath);
 
   /**
    * \brief Store all used attributes
    * \param fileName Output filename
+   * \param outputAttributes Whether or not to store
+   *   individual objects attributes to file
    * \return string Output path
    */
-  std::string StoreAttributesToFile (std::string fileName);
+  std::string StoreAttributesToFile (std::string fileName, bool outputAttributes = false);
 
   /**
    * \brief Get simulation time
    * \return errorRate Simulation time
    */
 
-  inline Time& GetSimTime () { return m_simTime; }
+  inline Time& GetSimTime ()
+  {
+    return m_simTime;
+  }
 
   /**
    * \brief Set common UT position allocator for all beams.
@@ -423,7 +465,11 @@ public:
    * \brief If lower layer API access is required, use this to access SatHelper.
    * You MUST have called CreateSatScenario before calling this method.
    */
-  inline Ptr<SatHelper> GetSatelliteHelper () { return m_satHelper; };
+  inline Ptr<SatHelper> GetSatelliteHelper ()
+  {
+    NS_ASSERT_MSG (m_satHelper != NULL, "CreateSatScenario not called before calling GetSatelliteHelper");
+    return m_satHelper;
+  }
 
   /**
    * \brief Get the statistics container of this helper. If does not exist, one is created.
@@ -433,20 +479,20 @@ public:
 
   typedef enum
   {
-  	CBR,
-		ONOFF,
-  	HTTP,
-		NRTV,
+    CBR,
+    ONOFF,
+    HTTP,
+    NRTV,
   } TrafficModel_t;
 
   typedef enum
   {
-  	UDP, TCP
+    UDP, TCP
   } TransportLayerProtocol_t;
 
   typedef enum
   {
-  	RTN_LINK, FWD_LINK
+    RTN_LINK, FWD_LINK
   } TrafficDirection_t;
 
   /**
@@ -459,58 +505,84 @@ public:
    * \param startTime Application Start time
    * \param stopTime Application stop time
    * \param startDelay application start delay between each user
+   * \param percentage ratio of users on which this traffic model will be installed
    */
   void InstallTrafficModel (TrafficModel_t trafficModel,
-														TransportLayerProtocol_t protocol,
-														TrafficDirection_t direction,
-														Time startTime,
-														Time stopTime,
-														Time startDelay);
+                            TransportLayerProtocol_t protocol,
+                            TrafficDirection_t direction,
+                            Time startTime,
+                            Time stopTime,
+                            Time startDelay,
+                            double percentage);
 
   void InstallTrafficModel (TrafficModel_t trafficModel,
-  		                      TransportLayerProtocol_t protocol,
-			                      TrafficDirection_t direction,
-														Time startTime,
-														Time stopTime)
+                            TransportLayerProtocol_t protocol,
+                            TrafficDirection_t direction,
+                            Time startTime,
+                            Time stopTime,
+                            Time startDelay)
   {
-  	InstallTrafficModel (
-  			trafficModel, protocol, direction,
-				startTime,
-				stopTime,
-				Seconds (0));
+    InstallTrafficModel (
+      trafficModel, protocol, direction,
+      startTime, stopTime, startDelay, 1.0);
   }
 
   void InstallTrafficModel (TrafficModel_t trafficModel,
-  		                      TransportLayerProtocol_t protocol,
-			                      TrafficDirection_t direction,
-														Time startTime)
+                            TransportLayerProtocol_t protocol,
+                            TrafficDirection_t direction,
+                            Time startTime,
+                            Time stopTime)
   {
-  	InstallTrafficModel (
-  			trafficModel, protocol, direction,
-				startTime,
-				m_simTime + Seconds (1),
-				Seconds (0));
+    InstallTrafficModel (
+      trafficModel, protocol, direction,
+      startTime,
+      stopTime,
+      Seconds (0));
   }
 
   void InstallTrafficModel (TrafficModel_t trafficModel,
-														TransportLayerProtocol_t protocol,
-														TrafficDirection_t direction)
+                            TransportLayerProtocol_t protocol,
+                            TrafficDirection_t direction,
+                            Time startTime)
   {
-  	InstallTrafficModel (
-  			trafficModel, protocol, direction,
-  			Seconds (0.001),
-				m_simTime + Seconds (1),
-				Seconds (0));
+    InstallTrafficModel (
+      trafficModel, protocol, direction,
+      startTime,
+      m_simTime + Seconds (1),
+      Seconds (0));
   }
+
+  void InstallTrafficModel (TrafficModel_t trafficModel,
+                            TransportLayerProtocol_t protocol,
+                            TrafficDirection_t direction)
+  {
+    InstallTrafficModel (
+      trafficModel, protocol, direction,
+      Seconds (0.001),
+      m_simTime + Seconds (1),
+      Seconds (0));
+  }
+
+  typedef enum
+  {
+    CR_NOT_CONFIGURED,
+    CR_PERIODIC_CONTROL,
+    CR_SLOTTED_ALOHA,
+    CR_CRDSA_LOOSE_RC_0,
+  } CrTxConf_t;
+
+  void SetCrTxConf (CrTxConf_t crTxConf);
 
   /**
    * \brief Set the ID of the GW user for traffic models.
    * \param gwUserId GW user's ID
    */
-  inline void SetGwUserId (uint32_t gwUserId) { m_gwUserId = gwUserId; };
+  inline void SetGwUserId (uint32_t gwUserId)
+  {
+    m_gwUserId = gwUserId;
+  }
 
 protected:
-
   /**
    * \brief Enable random access
    */
@@ -552,7 +624,6 @@ protected:
   void SetupOutputPath ();
 
 private:
-
   Ptr<SatHelper> m_satHelper;
   Ptr<SatStatsHelperContainer> m_statContainer;
   Ptr<SatListPositionAllocator> m_commonUtPositions;
@@ -567,6 +638,7 @@ private:
   std::map<uint32_t, Ptr<RandomVariableStream> > m_utCount;
 
   Ptr<RandomVariableStream>    m_utUserCount;
+  Ptr<RandomVariableStream>    m_utMobileUserCount;
   Time                         m_simTime;
   uint32_t                     m_numberOfConfiguredFrames;
   bool                         m_randomAccessConfigured;
@@ -575,8 +647,264 @@ private:
   uint32_t                     m_gwUserId;
 
   bool                         m_progressLoggingEnabled;
-  Time 												 m_progressUpdateInterval;
+  Time                         m_progressUpdateInterval;
   EventId                      m_progressReportEvent;
+};
+
+
+class SimulationHelperConf : public Object
+{
+public:
+  /**
+   * Default constructor.
+   */
+  SimulationHelperConf ();
+
+  /**
+   * \brief Destructor.
+   */
+  virtual ~SimulationHelperConf ();
+
+  /**
+   * \brief Derived from Object.
+   */
+  static TypeId GetTypeId (void);
+
+  /**
+   * \brief Derived from Object.
+   */
+  TypeId GetInstanceTypeId (void) const;
+
+  typedef enum
+  {
+    PROTOCOL_UDP, PROTOCOL_TCP, PROTOCOL_BOTH
+  } TransportLayerProtocol_t;
+
+  typedef enum
+  {
+    RTN_LINK, FWD_LINK, BOTH_LINK
+  } TrafficDirection_t;
+
+  typedef struct TrafficConfiguration_t
+  {
+    double m_percentage;
+    TransportLayerProtocol_t m_protocol;
+    TrafficDirection_t m_direction;
+    Time m_startTime;
+    Time m_stopTime;
+    Time m_startDelay;
+
+    TrafficConfiguration_t ()
+      : m_percentage (0.0),
+      m_protocol (SimulationHelperConf::PROTOCOL_UDP),
+      m_direction (SimulationHelperConf::RTN_LINK),
+      m_startTime (0),
+      m_stopTime (0),
+      m_startDelay (0)
+    {
+      // do nothing
+    }
+  } TrafficConfiguration_t;
+
+  Time                                           m_simTime;
+  std::string                                    m_enabledBeams;
+  Ptr<RandomVariableStream>                      m_utCount;
+  Ptr<RandomVariableStream>                      m_utUserCount;
+  Ptr<RandomVariableStream>                      m_utMobileUserCount;
+  bool                                           m_activateStatistics;
+  bool                                           m_activateProgressLogging;
+  SimulationHelper::CrTxConf_t                   m_crTxConf;
+  std::map<std::string, TrafficConfiguration_t>  m_trafficModel;
+  std::string                                    m_mobileUtsFolder;
+
+private:
+  void SetTrafficPercentage (std::string trafficModel, double percentage)
+  {
+    std::map<std::string, TrafficConfiguration_t>::iterator it = m_trafficModel.find (trafficModel);
+    if (it == m_trafficModel.end ())
+      {
+        TrafficConfiguration_t traffic;
+        traffic.m_percentage = percentage;
+        m_trafficModel.emplace (trafficModel, traffic);
+      }
+    else
+      {
+        it->second.m_percentage = percentage;
+      }
+  }
+
+  double GetTrafficPercentage (std::string trafficModel) const
+  {
+    std::map<std::string, TrafficConfiguration_t>::const_iterator it = m_trafficModel.find (trafficModel);
+    if (it == m_trafficModel.end ())
+      {
+        NS_FATAL_ERROR ("Traffic model " << trafficModel << " has not been configured");
+      }
+
+    return it->second.m_percentage;
+  }
+
+  void SetTrafficProtocol (std::string trafficModel, TransportLayerProtocol_t protocol)
+  {
+    std::map<std::string, TrafficConfiguration_t>::iterator it = m_trafficModel.find (trafficModel);
+    if (it == m_trafficModel.end ())
+      {
+        TrafficConfiguration_t traffic;
+        traffic.m_protocol = protocol;
+        m_trafficModel.emplace (trafficModel, traffic);
+      }
+    else
+      {
+        it->second.m_protocol = protocol;
+      }
+  }
+
+  TransportLayerProtocol_t GetTrafficProtocol (std::string trafficModel) const
+  {
+    std::map<std::string, TrafficConfiguration_t>::const_iterator it = m_trafficModel.find (trafficModel);
+    if (it == m_trafficModel.end ())
+      {
+        NS_FATAL_ERROR ("Traffic model " << trafficModel << " has not been configured");
+      }
+
+    return it->second.m_protocol;
+  }
+
+  void SetTrafficDirection (std::string trafficModel, TrafficDirection_t direction)
+  {
+    std::map<std::string, TrafficConfiguration_t>::iterator it = m_trafficModel.find (trafficModel);
+    if (it == m_trafficModel.end ())
+      {
+        TrafficConfiguration_t traffic;
+        traffic.m_direction = direction;
+        m_trafficModel.emplace (trafficModel, traffic);
+      }
+    else
+      {
+        it->second.m_direction = direction;
+      }
+  }
+
+  TrafficDirection_t GetTrafficDirection (std::string trafficModel) const
+  {
+    std::map<std::string, TrafficConfiguration_t>::const_iterator it = m_trafficModel.find (trafficModel);
+    if (it == m_trafficModel.end ())
+      {
+        NS_FATAL_ERROR ("Traffic model " << trafficModel << " has not been configured");
+      }
+
+    return it->second.m_direction;
+  }
+
+  void SetTrafficStartTime (std::string trafficModel, Time startTime)
+  {
+    std::map<std::string, TrafficConfiguration_t>::iterator it = m_trafficModel.find (trafficModel);
+    if (it == m_trafficModel.end ())
+      {
+        TrafficConfiguration_t traffic;
+        traffic.m_startTime = startTime;
+        m_trafficModel.emplace (trafficModel, traffic);
+      }
+    else
+      {
+        it->second.m_startTime = startTime;
+      }
+  }
+
+  Time GetTrafficStartTime (std::string trafficModel) const
+  {
+    std::map<std::string, TrafficConfiguration_t>::const_iterator it = m_trafficModel.find (trafficModel);
+    if (it == m_trafficModel.end ())
+      {
+        NS_FATAL_ERROR ("Traffic model " << trafficModel << " has not been configured");
+      }
+
+    return it->second.m_startTime;
+  }
+
+  void SetTrafficStopTime (std::string trafficModel, Time stopTime)
+  {
+    std::map<std::string, TrafficConfiguration_t>::iterator it = m_trafficModel.find (trafficModel);
+    if (it == m_trafficModel.end ())
+      {
+        TrafficConfiguration_t traffic;
+        traffic.m_startTime = stopTime;
+        m_trafficModel.emplace (trafficModel, traffic);
+      }
+    else
+      {
+        it->second.m_stopTime = stopTime;
+      }
+  }
+
+  Time GetTrafficStopTime (std::string trafficModel) const
+  {
+    std::map<std::string, TrafficConfiguration_t>::const_iterator it = m_trafficModel.find (trafficModel);
+    if (it == m_trafficModel.end ())
+      {
+        NS_FATAL_ERROR ("Traffic model " << trafficModel << " has not been configured");
+      }
+
+    return it->second.m_stopTime;
+  }
+
+  void SetTrafficStartDelay (std::string trafficModel, Time startDelay)
+  {
+    std::map<std::string, TrafficConfiguration_t>::iterator it = m_trafficModel.find (trafficModel);
+    if (it == m_trafficModel.end ())
+      {
+        TrafficConfiguration_t traffic;
+        traffic.m_startDelay = startDelay;
+        m_trafficModel.emplace (trafficModel, traffic);
+      }
+    else
+      {
+        it->second.m_startDelay = startDelay;
+      }
+  }
+
+  Time GetTrafficStartDelay (std::string trafficModel) const
+  {
+    std::map<std::string, TrafficConfiguration_t>::const_iterator it = m_trafficModel.find (trafficModel);
+    if (it == m_trafficModel.end ())
+      {
+        NS_FATAL_ERROR ("Traffic model " << trafficModel << " has not been configured");
+      }
+
+    return it->second.m_startDelay;
+  }
+
+#define TRAFFIC_MODEL_ATTRIBUTE_ACCESSOR_DEFINE(index) \
+  inline void SetTraffic ## index ## Percentage (double value) \
+  { return SetTrafficPercentage (TOSTRING (index), value); \
+  } \
+  inline double GetTraffic ## index ## Percentage () const \
+  { return GetTrafficPercentage (TOSTRING (index)); } \
+  inline void SetTraffic ## index ## Protocol (TransportLayerProtocol_t value) \
+  { return SetTrafficProtocol (TOSTRING (index), value); } \
+  inline TransportLayerProtocol_t GetTraffic ## index ## Protocol () const \
+  { return GetTrafficProtocol (TOSTRING (index)); } \
+  inline void SetTraffic ## index ## Direction (TrafficDirection_t value) \
+  { return SetTrafficDirection (TOSTRING (index), value); } \
+  inline TrafficDirection_t GetTraffic ## index ## Direction () const \
+  { return GetTrafficDirection (TOSTRING (index)); } \
+  inline void SetTraffic ## index ## StartTime (Time value) \
+  { return SetTrafficStartTime (TOSTRING (index), value); } \
+  inline Time GetTraffic ## index ## StartTime () const \
+  { return GetTrafficStartTime (TOSTRING (index)); } \
+  inline void SetTraffic ## index ## StopTime (Time value) \
+  { return SetTrafficStopTime (TOSTRING (index), value); } \
+  inline Time GetTraffic ## index ## StopTime () const \
+  { return GetTrafficStopTime (TOSTRING (index)); } \
+  inline void SetTraffic ## index ## StartDelay (Time value) \
+  { return SetTrafficStartDelay (TOSTRING (index), value); } \
+  inline Time GetTraffic ## index ## StartDelay () const \
+  { return GetTrafficStartDelay (TOSTRING (index)); }
+
+  TRAFFIC_MODEL_ATTRIBUTE_ACCESSOR_DEFINE (Cbr);
+  TRAFFIC_MODEL_ATTRIBUTE_ACCESSOR_DEFINE (Http);
+  TRAFFIC_MODEL_ATTRIBUTE_ACCESSOR_DEFINE (OnOff);
+  TRAFFIC_MODEL_ATTRIBUTE_ACCESSOR_DEFINE (Nrtv);
 };
 
 } // namespace ns3

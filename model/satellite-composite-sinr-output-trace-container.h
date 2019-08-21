@@ -39,7 +39,7 @@ public:
   /**
    * \brief typedef for map key
    */
-  typedef std::pair<Address,SatEnums::ChannelType_t> key_t;
+  typedef std::pair<Address, SatEnums::ChannelType_t> key_t;
 
   /**
    * \brief typedef for map of containers
@@ -100,7 +100,7 @@ private:
    * \param key key
    * \return pointer to the added container
    */
-  Ptr<SatOutputFileStreamDoubleContainer> AddNode (std::pair<Address,SatEnums::ChannelType_t> key);
+  Ptr<SatOutputFileStreamDoubleContainer> AddNode (std::pair<Address, SatEnums::ChannelType_t> key);
 
   /**
    * \brief Function for finding the container matching the key

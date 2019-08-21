@@ -38,10 +38,9 @@ namespace ns3 {
 class SatLookUpTable : public Object
 {
 public:
-
   /**
    * Constructor with initialization parameters.
-   * \param linkResultPath 
+   * \param linkResultPath
    */
   SatLookUpTable (std::string linkResultPath);
 

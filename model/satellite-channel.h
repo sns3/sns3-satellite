@@ -61,7 +61,6 @@ namespace ns3 {
 class SatChannel : public Channel
 {
 public:
-
   /**
    * Default constructor.
    */
@@ -153,6 +152,12 @@ public:
    * \param delay Ptr to the propagation delay model to be used.
    */
   virtual void SetFreeSpaceLoss (Ptr<SatFreeSpaceLoss> delay);
+
+  /**
+   * \brief Get the  propagation delay model used in the SatChannel
+   * \return Ptr to the propagation delay model used.
+   */
+  virtual Ptr<SatFreeSpaceLoss> GetFreeSpaceLoss () const;
 
   /**
    * \brief Used by attached SatPhyTx instances to transmit signals to the channel

@@ -99,7 +99,7 @@ SatLog::CreateLog (LogType_t logType, std::string fileTag)
       NS_FATAL_ERROR ("SatLog::CreateLog failed");
     }
 
-  NS_LOG_INFO ("SatLog::CreateLog - Created type " << logType << " log with file tag " << fileTag);
+  NS_LOG_INFO ("Created type " << logType << " log with file tag " << fileTag);
 
   return result.first->second;
 }
@@ -146,7 +146,7 @@ SatLog::AddToLog (LogType_t logType, std::string fileTag, std::string message)
 
   Ptr<SatOutputFileStreamStringContainer> log = FindLog (logType, fileTag);
 
-  NS_LOG_INFO ("SatLog::AddToLog - Type: " << logType << ", file tag: " << fileTag << ", message: " << message);
+  NS_LOG_INFO ("Type: " << logType << ", file tag: " << fileTag << ", message: " << message);
 
   if (log != NULL)
     {

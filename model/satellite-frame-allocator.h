@@ -88,9 +88,9 @@ public:
     uint32_t  m_vbdcBytes;
 
     SatFrameAllocReqItem () : m_craBytes (0),
-                              m_minRbdcBytes (0),
-                              m_rbdcBytes (0),
-                              m_vbdcBytes (0)
+      m_minRbdcBytes (0),
+      m_rbdcBytes (0),
+      m_vbdcBytes (0)
     {
     }
   };
@@ -113,7 +113,7 @@ public:
     SatFrameAllocReqItemContainer_t   m_reqPerRc;
 
     SatFrameAllocReq () : m_generateCtrlSlot (false),
-                          m_cno (NAN)
+      m_cno (NAN)
     {
     }
 
@@ -123,8 +123,8 @@ public:
      * \param req Allocation request per RC/CC
      */
     SatFrameAllocReq (SatFrameAllocReqItemContainer_t req) : m_generateCtrlSlot (false),
-                                                             m_cno (NAN),
-                                                             m_reqPerRc (req)
+      m_cno (NAN),
+      m_reqPerRc (req)
     {
     }
   };
@@ -249,9 +249,9 @@ public:
      * Construct SatFrameAllocInfoItem.
      */
     SatFrameAllocInfoItem () : m_craSymbols (0.0),
-                               m_minRbdcSymbols (0.0),
-                               m_rbdcSymbols (0.0),
-                               m_vbdcSymbols (0.0)
+      m_minRbdcSymbols (0.0),
+      m_rbdcSymbols (0.0),
+      m_vbdcSymbols (0.0)
     {
     }
 

@@ -35,8 +35,8 @@ NS_OBJECT_ENSURE_REGISTERED (SatBaseEncapsulator);
 
 SatBaseEncapsulator::SatBaseEncapsulator ()
   : m_sourceAddress (),
-    m_destAddress (),
-    m_flowId (0)
+  m_destAddress (),
+  m_flowId (0)
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT (false);
@@ -48,8 +48,8 @@ SatBaseEncapsulator::SatBaseEncapsulator ()
 
 SatBaseEncapsulator::SatBaseEncapsulator (Mac48Address source, Mac48Address dest, uint8_t flowId)
   : m_sourceAddress (source),
-    m_destAddress (dest),
-    m_flowId (flowId)
+  m_destAddress (dest),
+  m_flowId (flowId)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -84,7 +84,7 @@ SatBaseEncapsulator::DoDispose ()
 void
 SatBaseEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address dest)
 {
-  NS_LOG_FUNCTION (this << p->GetSize ());
+  NS_LOG_FUNCTION (this << p->GetSize () << dest);
 
   // Add flow id tag
   SatFlowIdTag flowIdTag;

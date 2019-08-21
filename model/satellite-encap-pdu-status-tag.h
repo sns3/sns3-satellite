@@ -41,7 +41,6 @@ namespace ns3 {
 class SatEncapPduStatusTag : public Tag
 {
 public:
-
   /**
    * Default constructor.
    */
@@ -98,7 +97,8 @@ public:
   /**
    * Fragmentation enums
    */
-  typedef enum {
+  typedef enum
+  {
     FULL_PDU          = 0,
     START_PDU         = 1,
     CONTINUATION_PDU  = 2,
@@ -111,6 +111,6 @@ private:
 };
 
 
-}; // namespace ns3
+}  // namespace ns3
 
 #endif // SATELLITE_ENCAP_PDU_STATUS_TAG_H

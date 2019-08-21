@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2014 Magister Solutions Ltd.
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
 #include <ns3/log.h>
@@ -30,10 +32,11 @@ NS_OBJECT_ENSURE_REGISTERED (SatPhyRxCarrierUplink);
 
 SatPhyRxCarrierUplink::SatPhyRxCarrierUplink (uint32_t carrierId,
                                               Ptr<SatPhyRxCarrierConf> carrierConf,
+                                              Ptr<SatWaveformConf> waveformConf,
                                               bool randomAccessEnabled)
-: SatPhyRxCarrier (carrierId, carrierConf, randomAccessEnabled)
+  : SatPhyRxCarrier (carrierId, carrierConf, waveformConf, randomAccessEnabled)
 {
-	NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this);
 }
 
 SatPhyRxCarrierUplink::~SatPhyRxCarrierUplink ()
@@ -46,22 +49,23 @@ TypeId
 SatPhyRxCarrierUplink::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatPhyRxCarrierUplink")
-	.SetParent<SatPhyRxCarrier> ()
-	;
+    .SetParent<SatPhyRxCarrier> ()
+  ;
   return tid;
 }
 
 Ptr<SatInterference::InterferenceChangeEvent>
 SatPhyRxCarrierUplink::CreateInterference (Ptr<SatSignalParameters> rxParams, Address senderAddress)
 {
-	return GetInterferenceModel()->Add (rxParams->m_duration, rxParams->m_rxPower_W, senderAddress);
+  NS_LOG_FUNCTION (this << rxParams << senderAddress);
+  return GetInterferenceModel ()->Add (rxParams->m_duration, rxParams->m_rxPower_W, senderAddress);
 }
 
 void
 SatPhyRxCarrierUplink::EndRxData (uint32_t key)
 {
-  NS_LOG_FUNCTION (this);
-  NS_LOG_INFO (this << " state: " << GetState ());
+  NS_LOG_FUNCTION (this << key);
+  NS_LOG_INFO ("State: " << GetState ());
 
   NS_ASSERT (GetState () == RX);
 
@@ -69,10 +73,10 @@ SatPhyRxCarrierUplink::EndRxData (uint32_t key)
 
   DecreaseNumOfRxState (packetRxParams.rxParams->m_txInfo.packetType);
 
-  packetRxParams.rxParams->m_ifPower_W = GetInterferenceModel ()->Calculate (packetRxParams.interferenceEvent);
+  packetRxParams.rxParams->SetInterferencePower (GetInterferenceModel ()->Calculate (packetRxParams.interferenceEvent));
 
   /// save values for CRDSA receiver
-  packetRxParams.rxParams->m_ifPowerInSatellite_W = packetRxParams.rxParams->m_ifPower_W;
+  packetRxParams.rxParams->SetInterferencePowerInSatellite (packetRxParams.rxParams->GetInterferencePowerPerFragment ());
   packetRxParams.rxParams->m_rxPowerInSatellite_W = packetRxParams.rxParams->m_rxPower_W;
   packetRxParams.rxParams->m_rxNoisePowerInSatellite_W = m_rxNoisePowerW;
   packetRxParams.rxParams->m_rxAciIfPowerInSatellite_W = m_rxAciIfPowerW;
@@ -81,7 +85,7 @@ SatPhyRxCarrierUplink::EndRxData (uint32_t key)
 
   /// calculates sinr for 1st link
   double sinr = CalculateSinr ( packetRxParams.rxParams->m_rxPower_W,
-  															packetRxParams.rxParams->m_ifPower_W,
+                                packetRxParams.rxParams->GetInterferencePower (),
                                 m_rxNoisePowerW,
                                 m_rxAciIfPowerW,
                                 m_rxExtNoisePowerW,
@@ -101,7 +105,8 @@ SatPhyRxCarrierUplink::EndRxData (uint32_t key)
 
   /// uses 1st link sinr
   m_linkBudgetTrace (packetRxParams.rxParams, GetOwnAddress (),
-  		packetRxParams.destAddress, packetRxParams.rxParams->m_ifPower_W, sinr);
+                     packetRxParams.destAddress,
+                     packetRxParams.rxParams->GetInterferencePower (), sinr);
 
   /// Send packet upwards
   m_rxCallback ( packetRxParams.rxParams, phyError );

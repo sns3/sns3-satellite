@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2013 Magister Solutions Ltd
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@viveris.toulouse.fr>
  */
 
 #include "ns3/log.h"
@@ -65,7 +67,8 @@ SatGwHelper::GetTypeId (void)
                    MakeEnumAccessor (&SatGwHelper::m_daInterferenceModel),
                    MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
                                     SatPhyRxCarrierConf::IF_TRACE, "Trace",
-                                    SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
+                                    SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket",
+                                    SatPhyRxCarrierConf::IF_PER_FRAGMENT, "PerFragment"))
     .AddAttribute ("RtnLinkErrorModel",
                    "Return link error model for",
                    EnumValue (SatPhyRxCarrierConf::EM_AVI),
@@ -99,12 +102,12 @@ SatGwHelper::GetInstanceTypeId (void) const
 
 SatGwHelper::SatGwHelper ()
   : m_rtnLinkCarrierCount (0),
-    m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
-    m_errorModel (SatPhyRxCarrierConf::EM_AVI),
-    m_daConstantErrorRate (0.0),
-    m_symbolRate (0.0),
-    m_enableChannelEstimationError (false),
-    m_raSettings ()
+  m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+  m_errorModel (SatPhyRxCarrierConf::EM_AVI),
+  m_daConstantErrorRate (0.0),
+  m_symbolRate (0.0),
+  m_enableChannelEstimationError (false),
+  m_raSettings ()
 {
   // this default constructor should be never called
   NS_FATAL_ERROR ("Default constructor not supported!!!");
@@ -118,17 +121,17 @@ SatGwHelper::SatGwHelper (SatTypedefs::CarrierBandwidthConverter_t carrierBandwi
                           SatMac::SendCtrlMsgCallback sendCb,
                           RandomAccessSettings_s randomAccessSettings)
   : m_carrierBandwidthConverter (carrierBandwidthConverter),
-    m_rtnLinkCarrierCount (rtnLinkCarrierCount),
-    m_superframeSeq (seq),
-    m_readCtrlCb (readCb),
-    m_reserveCtrlCb (reserveCb),
-    m_sendCtrlCb (sendCb),
-    m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
-    m_errorModel (SatPhyRxCarrierConf::EM_AVI),
-    m_daConstantErrorRate (0.0),
-    m_symbolRate (0.0),
-    m_enableChannelEstimationError (false),
-    m_raSettings (randomAccessSettings)
+  m_rtnLinkCarrierCount (rtnLinkCarrierCount),
+  m_superframeSeq (seq),
+  m_readCtrlCb (readCb),
+  m_reserveCtrlCb (reserveCb),
+  m_sendCtrlCb (sendCb),
+  m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+  m_errorModel (SatPhyRxCarrierConf::EM_AVI),
+  m_daConstantErrorRate (0.0),
+  m_symbolRate (0.0),
+  m_enableChannelEstimationError (false),
+  m_raSettings (randomAccessSettings)
 {
   NS_LOG_FUNCTION (this << rtnLinkCarrierCount);
 
@@ -253,6 +256,7 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   parameters.m_daConstantErrorRate = m_daConstantErrorRate;
   parameters.m_daIfModel = m_daInterferenceModel;
   parameters.m_raIfModel = m_raSettings.m_raInterferenceModel;
+  parameters.m_raIfEliminateModel = m_raSettings.m_raInterferenceEliminationModel;
   parameters.m_bwConverter = m_carrierBandwidthConverter;
   parameters.m_carrierCount = m_rtnLinkCarrierCount;
   parameters.m_cec = cec;
@@ -277,6 +281,8 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   mac->SetSendCtrlCallback (m_sendCtrlCb);
 
   mac->SetCrReceiveCallback (MakeCallback (&SatNcc::UtCrReceived, ncc));
+
+  mac->SetHandoverCallback (MakeCallback (&SatNcc::MoveUtBetweenBeams, ncc));
 
   // Attach the Mac layer receiver to Phy
   SatPhy::ReceiveCallback recCb = MakeCallback (&SatGwMac::Receive, mac);

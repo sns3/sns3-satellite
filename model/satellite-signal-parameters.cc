@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2013 Magister Solutions Ltd.
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
 #include "ns3/log.h"
@@ -30,21 +32,23 @@ namespace ns3 {
 
 SatSignalParameters::SatSignalParameters ()
   : m_beamId (),
-    m_carrierId (),
-    m_carrierFreq_hz (),
-    m_duration (),
-    m_txPower_W (),
-    m_rxPower_W (),
-    m_phyTx (),
-    m_sinr (),
-    m_channelType (),
-    m_rxPowerInSatellite_W (),
-    m_ifPower_W (),
-    m_ifPowerInSatellite_W (),
-    m_rxNoisePowerInSatellite_W (),
-    m_rxAciIfPowerInSatellite_W (),
-    m_rxExtNoisePowerInSatellite_W (),
-    m_sinrCalculate ()
+  m_carrierId (),
+  m_carrierFreq_hz (),
+  m_duration (),
+  m_txPower_W (),
+  m_rxPower_W (),
+  m_phyTx (),
+  m_sinr (),
+  m_channelType (),
+  m_rxPowerInSatellite_W (),
+  m_rxNoisePowerInSatellite_W (),
+  m_rxAciIfPowerInSatellite_W (),
+  m_rxExtNoisePowerInSatellite_W (),
+  m_sinrCalculate (),
+  m_ifPower_W (),
+  m_ifPowerInSatellite_W (),
+  m_ifPowerPerFragment_W (),
+  m_ifPowerInSatellitePerFragment_W ()
 {
   NS_LOG_FUNCTION (this);
 }
@@ -72,12 +76,12 @@ SatSignalParameters::SatSignalParameters ( const SatSignalParameters& p )
   m_txInfo.packetType = p.m_txInfo.packetType;
   m_txInfo.crdsaUniquePacketId = p.m_txInfo.crdsaUniquePacketId;
   m_rxPowerInSatellite_W = p.m_rxPowerInSatellite_W;
-  m_ifPower_W = p.m_ifPower_W;
-  m_ifPowerInSatellite_W = p.m_ifPowerInSatellite_W;
   m_rxNoisePowerInSatellite_W = p.m_rxNoisePowerInSatellite_W;
   m_rxAciIfPowerInSatellite_W = p.m_rxAciIfPowerInSatellite_W;
   m_rxExtNoisePowerInSatellite_W = p.m_rxExtNoisePowerInSatellite_W;
   m_sinrCalculate = p.m_sinrCalculate;
+  SetInterferencePowerInSatellite (p.m_ifPowerInSatellitePerFragment_W);
+  SetInterferencePower (p.m_ifPowerPerFragment_W);
 }
 
 Ptr<SatSignalParameters>
@@ -96,6 +100,17 @@ SatSignalParameters::GetTypeId (void)
     .SetParent<Object> ()
   ;
   return tid;
+}
+
+double
+SatSignalParameters::ComputeIfPowerFromFragments (const std::vector< std::pair<double, double> >& ifPowerPerFragment)
+{
+  double ifPower = 0.0;
+  for (const std::pair<double, double>& interferenceLevel : ifPowerPerFragment)
+    {
+      ifPower += interferenceLevel.first * interferenceLevel.second;
+    }
+  return ifPower;
 }
 
 

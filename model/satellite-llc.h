@@ -53,8 +53,8 @@ public:
 
   EncapKey (const Mac48Address source, const Mac48Address dest, const uint8_t flowId)
     : m_source (source),
-      m_destination (dest),
-      m_flowId (flowId)
+    m_destination (dest),
+    m_flowId (flowId)
   {
   }
 };
@@ -144,7 +144,7 @@ public:
    * \brief Receive callback used for sending packet to netdevice layer.
     * \param packet the packet received
     */
-  typedef Callback<void,Ptr<const Packet> > ReceiveCallback;
+  typedef Callback<void, Ptr<const Packet> > ReceiveCallback;
 
   /**
    * \brief Callback to read control messages from container storing control messages.
@@ -303,10 +303,9 @@ public:
    * \brief Set the GW address
    * \param address GW MAC address
    */
-  void SetGwAddress (Mac48Address address);
+  virtual void SetGwAddress (Mac48Address address);
 
 protected:
-
   /**
    * Dispose of this class instance
    */

@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2013 Magister Solutions Ltd.
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.com>
  */
 
 #ifndef SATELLITE_REQUEST_MANAGER_H_
@@ -43,7 +45,6 @@ namespace ns3 {
 class SatRequestManager : public Object
 {
 public:
-
   /**
    * Default constructor.
    */
@@ -163,8 +164,7 @@ public:
    * \param address the MAC address of the current node.
    * \param message the CR message to be transmitted.
    */
-  typedef void (*CapacityRequestTraceCallback)
-    (Time time, Mac48Address address, Ptr<SatCrMessage> message);
+  typedef void (*CapacityRequestTraceCallback)(Time time, Mac48Address address, Ptr<SatCrMessage> message);
 
   /**
    * \brief Callback signature for `CrLogTrace` trace source.
@@ -178,29 +178,31 @@ public:
    *                      and
    *                    - queue size (in bytes).
    */
-  typedef void (*CapacityRequestTraceLogCallback)
-    (std::string traceLog);
+  typedef void (*CapacityRequestTraceLogCallback)(std::string traceLog);
 
   /**
    * \brief Callback signature for `RbdcTrace` trace source.
    * \param requestSize amount of requested size via RBDC (in kbps).
    */
-  typedef void (*RbdcTraceCallback)
-    (uint32_t requestSize);
+  typedef void (*RbdcTraceCallback)(uint32_t requestSize);
 
   /**
    * \brief Callback signature for `VbdcTrace` trace source.
    * \param requestSize amount of requested size via VBDC (in bytes).
    */
-  typedef void (*VbdcTraceCallback)
-    (uint32_t requestSize);
+  typedef void (*VbdcTraceCallback)(uint32_t requestSize);
 
   /**
    * \brief Callback signature for `AvbdcTrace` trace source.
    * \param requestSize amount of requested size via AVBDC (in bytes).
    */
-  typedef void (*AvbdcTraceCallback)
-    (uint32_t requestSize);
+  typedef void (*AvbdcTraceCallback)(uint32_t requestSize);
+
+  /**
+   * \brief Send a handover recommendation message to the gateway.
+   * \param beamId The beam ID to switch to
+   */
+  void SendHandoverRecommendation (uint32_t beamId);
 
 private:
   typedef std::map<uint8_t, QueueCallback> CallbackContainer_t;
@@ -226,6 +228,14 @@ private:
   uint32_t DoRbdc (uint8_t rc, const SatQueue::QueueStats_t &stats);
 
   /**
+   * \brief Legacy algorithm to do RBDC calculation for a RC
+   * \param rc Request class index
+   * \param stats Queue statistics
+   * \return uint32_t Requested bytes
+   */
+  uint32_t DoRbdcLegacy (uint8_t rc, const SatQueue::QueueStats_t &stats);
+
+	/**
    * \brief Do VBDC calculation for a RC
    * \param rc Request class index
    * \param stats Queue statistics
@@ -233,6 +243,15 @@ private:
    * \return SatCapacityAllocationCategory_t Capacity allocation category
    */
   SatEnums::SatCapacityAllocationCategory_t DoVbdc (uint8_t rc, const SatQueue::QueueStats_t &stats, uint32_t &rcVbdcBytes);
+
+	/**
+   * \brief Legacy algorithm to do VBDC calculation for a RC
+   * \param rc Request class index
+   * \param stats Queue statistics
+   * \param &vbdcBytes Reference to vbdcBytes
+   * \return SatCapacityAllocationCategory_t Capacity allocation category
+   */
+  SatEnums::SatCapacityAllocationCategory_t DoVbdcLegacy (uint8_t rc, const SatQueue::QueueStats_t &stats, uint32_t &rcVbdcBytes);
 
   /**
    * \brief Calculate the needed VBDC bytes for a RC
@@ -469,6 +488,16 @@ private:
   TracedCallback< uint32_t> m_rbdcTrace;
   TracedCallback< uint32_t> m_vbdcTrace;
   TracedCallback< uint32_t> m_aVbdcTrace;
+
+  /**
+   * The RBDC capacity algorithm to use
+   */
+	SatEnums::RbdcCapacityRequestAlgorithm_t m_rbdcCapacityRequestAlgorithm;
+
+  /**
+   * The VBDC capacity algorithm to use
+   */
+	SatEnums::VbdcCapacityRequestAlgorithm_t m_vbdcCapacityRequestAlgorithm;
 };
 
 } // namespace

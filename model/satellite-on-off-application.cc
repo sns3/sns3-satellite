@@ -51,7 +51,7 @@ SatOnOffApplication::GetTypeId (void)
 
 SatOnOffApplication::SatOnOffApplication ()
   : m_isStatisticsTagsEnabled (false),
-    m_isConnectedWithTraceSource (false)
+  m_isConnectedWithTraceSource (false)
 {
   NS_LOG_FUNCTION (this);
 }

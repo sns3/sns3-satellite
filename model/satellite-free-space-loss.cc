@@ -53,7 +53,7 @@ SatFreeSpaceLoss::GetFsldB (Ptr<MobilityModel> a, Ptr<MobilityModel> b, double f
 
   double fsl_dB;
 
-  fsl_dB = SatUtils::LinearToDb ( GetFsl (a,b, frequencyHz) );
+  fsl_dB = SatUtils::LinearToDb ( GetFsl (a, b, frequencyHz) );
 
   return fsl_dB;
 }

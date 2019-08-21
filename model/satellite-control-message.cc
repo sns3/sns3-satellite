@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2014 Magister Solutions Ltd
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,15 +17,16 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.com>
  */
 
 #include <map>
-#include "ns3/log.h"
-#include "ns3/uinteger.h"
-#include "ns3/enum.h"
-#include "ns3/address-utils.h"
-#include "satellite-enums.h"
+#include <ns3/log.h>
+#include <ns3/uinteger.h>
+#include <ns3/enum.h>
+#include <ns3/address-utils.h>
 
+#include "satellite-enums.h"
 #include "satellite-control-message.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatCtrlMessage");
@@ -37,7 +39,7 @@ NS_OBJECT_ENSURE_REGISTERED (SatControlMsgTag);
 
 SatControlMsgTag::SatControlMsgTag ()
   : m_msgType (SAT_NON_CTRL_MSG),
-    m_msgId (0)
+  m_msgId (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -144,16 +146,16 @@ NS_OBJECT_ENSURE_REGISTERED (SatTbtpMessage);
 
 SatTbtpMessage::SatTbtpMessage ( )
   : m_superframeCounter (0),
-    m_superframeSeqId (0),
-    m_assignmentFormat (0)
+  m_superframeSeqId (0),
+  m_assignmentFormat (0)
 {
   NS_LOG_FUNCTION (this);
 }
 
 SatTbtpMessage::SatTbtpMessage ( uint8_t seqId )
   : m_superframeCounter (0),
-    m_superframeSeqId (seqId),
-    m_assignmentFormat (0)
+  m_superframeSeqId (seqId),
+  m_assignmentFormat (0)
 {
   NS_LOG_FUNCTION (this << (uint32_t) seqId);
 }
@@ -358,8 +360,8 @@ uint32_t SatTbtpMessage::GetSizeInBytes () const
 void SatTbtpMessage::Dump () const
 {
   std::cout << "Superframe counter: " << m_superframeCounter <<
-  ", superframe sequence id: " << m_superframeSeqId <<
-  ", assignment format: " << m_assignmentFormat << std::endl;
+    ", superframe sequence id: " << m_superframeSeqId <<
+    ", assignment format: " << m_assignmentFormat << std::endl;
 
   for (DaTimeSlotMap_t::const_iterator mit = m_daTimeSlots.begin ();
        mit != m_daTimeSlots.end ();
@@ -401,7 +403,7 @@ SatCrMessage::GetInstanceTypeId (void) const
 
 SatCrMessage::SatCrMessage ()
   : m_crBlockSizeType (SatCrMessage::CR_BLOCK_SMALL),
-    m_forwardLinkCNo (NAN)
+  m_forwardLinkCNo (NAN)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -546,8 +548,8 @@ SatRaMessage::GetInstanceTypeId (void) const
 
 SatRaMessage::SatRaMessage ()
   : m_allocationChannelId (0),
-    m_backoffProbability (0),
-    m_backoffTime (0)
+  m_backoffProbability (0),
+  m_backoffTime (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -634,7 +636,7 @@ SatArqAckMessage::GetInstanceTypeId (void) const
 
 SatArqAckMessage::SatArqAckMessage ()
   : m_sequenceNumber (0),
-    m_flowId (0)
+  m_flowId (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -680,24 +682,150 @@ SatArqAckMessage::GetSizeInBytes () const
   return size;
 }
 
+
+
+NS_OBJECT_ENSURE_REGISTERED (SatTimuMessage);
+
+TypeId
+SatTimuMessage::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatTimuMessage")
+    .SetParent<SatControlMessage> ()
+    .AddConstructor<SatTimuMessage> ()
+  ;
+  return tid;
+}
+
+TypeId
+SatTimuMessage::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
+}
+
+SatTimuMessage::SatTimuMessage ()
+  : m_beamId (0)
+{
+  NS_LOG_FUNCTION (this);
+}
+
+SatTimuMessage::~SatTimuMessage ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+void
+SatTimuMessage::SetAllocatedBeamId (uint32_t beamId)
+{
+  NS_LOG_FUNCTION (this);
+  m_beamId = beamId;
+}
+
+uint32_t
+SatTimuMessage::GetAllocatedBeamId () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_beamId;
+}
+
+void
+SatTimuMessage::SetGwAddress (Address address)
+{
+  NS_LOG_FUNCTION (this);
+  m_gwAddress = address;
+}
+
+Address
+SatTimuMessage::GetGwAddress () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_gwAddress;
+}
+
+uint32_t
+SatTimuMessage::GetSizeInBytes () const
+{
+  NS_LOG_FUNCTION (this);
+
+  uint32_t size = sizeof (uint32_t) + sizeof (Address);
+  return size;
+}
+
+
+
+NS_OBJECT_ENSURE_REGISTERED (SatHandoverRecommendationMessage);
+
+TypeId
+SatHandoverRecommendationMessage::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatHandoverRecommendationMessage")
+    .SetParent<SatControlMessage> ()
+    .AddConstructor<SatHandoverRecommendationMessage> ()
+  ;
+  return tid;
+}
+
+TypeId
+SatHandoverRecommendationMessage::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
+}
+
+SatHandoverRecommendationMessage::SatHandoverRecommendationMessage ()
+  : m_beamId (0)
+{
+  NS_LOG_FUNCTION (this);
+}
+
+SatHandoverRecommendationMessage::~SatHandoverRecommendationMessage ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+void
+SatHandoverRecommendationMessage::SetRecommendedBeamId (uint32_t beamId)
+{
+  NS_LOG_FUNCTION (this);
+  m_beamId = beamId;
+}
+
+uint32_t
+SatHandoverRecommendationMessage::GetRecommendedBeamId () const
+{
+  return m_beamId;
+}
+
+uint32_t
+SatHandoverRecommendationMessage::GetSizeInBytes () const
+{
+  NS_LOG_FUNCTION (this);
+
+  uint32_t size = 1 * sizeof (uint32_t);
+  return size;
+}
+
+
 // Control message container
 
 NS_LOG_COMPONENT_DEFINE ("SatControlMsgContainer");
 
 SatControlMsgContainer::SatControlMsgContainer ()
   : m_sendId (0),
-    m_recvId (0),
-    m_storeTime (MilliSeconds (300)),
-    m_deleteOnRead (false)
+  m_recvId (0),
+  m_storeTime (MilliSeconds (300)),
+  m_deleteOnRead (false)
 {
   NS_LOG_FUNCTION (this);
 }
 
 SatControlMsgContainer::SatControlMsgContainer (Time storeTime, bool deleteOnRead)
   : m_sendId (0),
-    m_recvId (0),
-    m_storeTime (storeTime),
-    m_deleteOnRead (deleteOnRead)
+  m_recvId (0),
+  m_storeTime (storeTime),
+  m_deleteOnRead (deleteOnRead)
 
 {
   NS_LOG_FUNCTION (this);
@@ -713,7 +841,7 @@ SatControlMsgContainer::ReserveIdAndStore (Ptr<SatControlMessage> ctrlMsg)
 {
   NS_LOG_FUNCTION (this << ctrlMsg);
 
-  NS_LOG_INFO ("At: " << Now ().GetSeconds () << " reserve id (send id): " << m_sendId);
+  NS_LOG_INFO ("Reserve id (send id): " << m_sendId);
 
   uint32_t id = m_sendId;
   m_sendId++;
@@ -737,7 +865,7 @@ SatControlMsgContainer::Send (uint32_t sendId)
     {
       Time now = Simulator::Now ();
 
-      NS_LOG_INFO ("At: " << Now ().GetSeconds () << " send id: " << sendId << ", recv id: " << m_recvId);
+      NS_LOG_INFO ("Send id: " << sendId << ", recv id: " << m_recvId);
 
       CtrlMsgMapValue_t mapValue = std::make_pair (now, it->second);
       std::pair<CtrlMsgMap_t::iterator, bool> cResult = m_ctrlMsgs.insert (std::make_pair (recvId, mapValue));
@@ -793,7 +921,7 @@ SatControlMsgContainer::Read (uint32_t recvId)
 
   CtrlMsgMap_t::iterator it = m_ctrlMsgs.find (recvId);
 
-  NS_LOG_INFO ("At: " << Now ().GetSeconds () << " receive id: " << recvId);
+  NS_LOG_INFO ("Receive id: " << recvId);
 
   if (it != m_ctrlMsgs.end ())
     {
@@ -812,7 +940,7 @@ SatControlMsgContainer::Read (uint32_t recvId)
             }
           else
             {
-              NS_LOG_INFO ("At: " << Now ().GetSeconds () << " remove id: " << recvId);
+              NS_LOG_INFO ("Remove id: " << recvId);
               CleanUpIdMap (recvId);
               m_ctrlMsgs.erase (it);
             }
@@ -862,4 +990,4 @@ SatControlMsgContainer::CleanUpIdMap (uint32_t recvId)
     }
 }
 
-}; // namespace ns3
+}  // namespace ns3

@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2013 Magister Solutions Ltd.
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
 #include <algorithm>
@@ -50,22 +52,22 @@ SatPerPacketInterference::GetInstanceTypeId (void) const
 
 SatPerPacketInterference::SatPerPacketInterference ()
   : m_residualPowerW (0.0),
-    m_rxing (false),
-    m_nextEventId (0),
-    m_enableTraceOutput (false),
-    m_channelType (),
-    m_rxBandwidth_Hz ()
+  m_rxing (false),
+  m_nextEventId (0),
+  m_enableTraceOutput (false),
+  m_channelType (),
+  m_rxBandwidth_Hz ()
 {
   NS_LOG_FUNCTION (this);
 }
 
 SatPerPacketInterference::SatPerPacketInterference (SatEnums::ChannelType_t channelType, double rxBandwidthHz)
   : m_residualPowerW (0.0),
-    m_rxing (false),
-    m_nextEventId (0),
-    m_enableTraceOutput (true),
-    m_channelType (channelType),
-    m_rxBandwidth_Hz (rxBandwidthHz)
+  m_rxing (false),
+  m_nextEventId (0),
+  m_enableTraceOutput (true),
+  m_channelType (channelType),
+  m_rxBandwidth_Hz (rxBandwidthHz)
 {
   NS_LOG_FUNCTION (this << channelType << rxBandwidthHz);
 
@@ -101,9 +103,13 @@ SatPerPacketInterference::DoAdd (Time duration, double power, Address rxAddress)
 
       for (InterferenceChanges::iterator i = m_interferenceChanges.begin (); i != nowIterator; i++)
         {
-          NS_LOG_INFO ( "Change to erase: Time= " << i->first << ", Id= " << i->second.first << ", PowerValue= " << i->second.second);
+          uint32_t eventID;
+          long double powerValue;
+          std::tie (eventID, powerValue, std::ignore) = i->second;
 
-          m_residualPowerW += i->second.second;
+          NS_LOG_INFO ( "Change to erase: Time= " << i->first << ", Id= " << eventID << ", PowerValue= " << powerValue);
+
+          m_residualPowerW += powerValue;
 
           NS_LOG_INFO ( "First power after erase: " << m_residualPowerW);
         }
@@ -123,8 +129,8 @@ SatPerPacketInterference::DoAdd (Time duration, double power, Address rxAddress)
         }
     }
 
-  m_interferenceChanges.insert (std::make_pair (now, InterferenceChange (event->GetId (), power)));
-  m_interferenceChanges.insert (std::make_pair (event->GetEndTime (), InterferenceChange (event->GetId (), -power)));
+  m_interferenceChanges.insert (std::make_pair (now, InterferenceChange (event->GetId (), power, false)));
+  m_interferenceChanges.insert (std::make_pair (event->GetEndTime (), InterferenceChange (event->GetId (), -power, true)));
 
   NS_LOG_INFO ( "Change count after addition: " << m_interferenceChanges.size () );
 
@@ -137,7 +143,7 @@ SatPerPacketInterference::DoAdd (Time duration, double power, Address rxAddress)
   return event;
 }
 
-double
+std::vector< std::pair<double, double> >
 SatPerPacketInterference::DoCalculate (Ptr<SatInterference::InterferenceChangeEvent> event)
 {
   NS_LOG_FUNCTION (this);
@@ -152,39 +158,52 @@ SatPerPacketInterference::DoCalculate (Ptr<SatInterference::InterferenceChangeEv
   double rxEndTime = event->GetEndTime ().GetDouble ();
   bool ownStartReached = false;
 
-  NS_LOG_INFO ( "Calculate: IfPower (W)= " << ifPowerW << ", Duration= " << event->GetDuration () <<
-                 ", StartTime= " << event->GetStartTime () << ", EndTime= " << event->GetEndTime () );
+  NS_LOG_INFO ("Calculate: IfPower (W)= " << ifPowerW <<
+               ", Event ID= " << event->GetId () <<
+               ", Duration= " << event->GetDuration () <<
+               ", StartTime= " << event->GetStartTime () <<
+               ", EndTime= " << event->GetEndTime ());
 
   InterferenceChanges::iterator currentItem = m_interferenceChanges.begin ();
 
   // calculate power values until own "stop" event found (own negative power event)
-  while ( (currentItem != m_interferenceChanges.end ())
-          && !( (event->GetId () == currentItem->second.first) && (event->GetRxPower () == -currentItem->second.second)) )
+  while (currentItem != m_interferenceChanges.end ())
     {
-      if (event->GetId () == currentItem->second.first)
+      uint32_t eventID;
+      long double powerValue;
+      bool isEndEvent;
+      std::tie (eventID, powerValue, isEndEvent) = currentItem->second;
+
+      if (event->GetId () == eventID)
         {
+          if (isEndEvent)
+            {
+              NS_LOG_INFO ( "IfPower after end event: " << ifPowerW );
+              break;
+            }
           // stop increasing power value fully, when own 'start' event is reached
           // needed to support multiple simultaneous receiving (currently not supported)
           // own event is not updated to ifPower
           ownStartReached = true;
+          onOwnStartReached (ifPowerW);
         }
       else if (ownStartReached)
         {
           // increase/decrease interference power with relative part of duration of power change in list
           double itemTime = currentItem->first.GetDouble ();
-          ifPowerW += ((rxEndTime - itemTime) / rxDuration) * currentItem->second.second;
+          onInterferentEvent (((rxEndTime - itemTime) / rxDuration), powerValue, ifPowerW);
 
-          NS_LOG_INFO ( "Update (partial): ID: " << currentItem->second.first << ", Power (W)= " << currentItem->second.second <<
-                         ", Time= " << currentItem->first << ", DeltaTime= " << (rxEndTime - itemTime) );
+          NS_LOG_INFO ( "Update (partial): ID: " << eventID << ", Power (W)= " << powerValue <<
+                        ", Time= " << currentItem->first << ", DeltaTime= " << (rxEndTime - itemTime) );
 
           NS_LOG_INFO ( "IfPower after update: " << ifPowerW );
         }
       else
         {
           // increase/decrease interference power with full power change in list
-          ifPowerW += currentItem->second.second;
+          ifPowerW += powerValue;
 
-          NS_LOG_INFO ( "Update (full): ID: " << currentItem->second.first << ", Power (W)= " << currentItem->second.second );
+          NS_LOG_INFO ( "Update (full): ID: " << eventID << ", Power (W)= " << powerValue );
           NS_LOG_INFO ( "IfPower after update: " << ifPowerW );
         }
 
@@ -199,7 +218,22 @@ SatPerPacketInterference::DoCalculate (Ptr<SatInterference::InterferenceChangeEv
       Singleton<SatInterferenceOutputTraceContainer>::Get ()->AddToContainer (std::make_pair (event->GetSatEarthStationAddress (), m_channelType), tempVector);
     }
 
-  return ifPowerW;
+  std::vector< std::pair<double, double> > ifPowerPerFragment;
+  ifPowerPerFragment.emplace_back (1.0, ifPowerW);
+
+  return ifPowerPerFragment;
+}
+
+void
+SatPerPacketInterference::onOwnStartReached (double ifPowerW)
+{
+  // do nothing, meant for subclasses to override
+}
+
+void
+SatPerPacketInterference::onInterferentEvent (long double timeRatio, double interferenceValue, double& ifPowerW)
+{
+  ifPowerW += timeRatio * interferenceValue;
 }
 
 void

@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2013 Magister Solutions Ltd
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,12 +17,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
 #ifndef SATELLITE_LOWER_LAYER_SERIVICE_H
 #define SATELLITE_LOWER_LAYER_SERIVICE_H
 
 #include <vector>
+#include <unordered_set>
 #include "ns3/object.h"
 #include "ns3/nstime.h"
 #include "ns3/random-variable-stream.h"
@@ -236,6 +239,8 @@ private:
   uint16_t m_highLoadBackOffProbability;
   uint8_t m_numberOfInstances;
   double m_averageNormalizedOfferedLoadThreshold;
+  bool m_isCrdsaAllowed;
+  bool m_isSlottedAlohaAllowed;
 
   /**
    * Get maximum unique payload per block.
@@ -416,6 +421,46 @@ private:
   {
     m_averageNormalizedOfferedLoadThreshold = averageNormalizedOfferedLoadThreshold;
   }
+
+  /**
+   * Get Slotted Aloha allowance
+   *
+   * \return Is Slotted Aloha allowed
+   */
+  inline bool GetIsSlottedAlohaAllowed () const
+  {
+    return m_isSlottedAlohaAllowed;
+  }
+
+  /**
+   * Set Slotted Aloha allowance
+   *
+   * \param isSlottedAlohaAllowed Is Slotted Aloha allowed
+   */
+  inline void SetIsSlottedAlohaAllowed (bool isSlottedAlohaAllowed)
+  {
+    m_isSlottedAlohaAllowed = isSlottedAlohaAllowed;
+  }
+
+  /**
+   * Get CRDSA allowance
+   *
+   * \return Is CRDSA allowed
+   */
+  inline bool GetIsCrdsaAllowed () const
+  {
+    return m_isCrdsaAllowed;
+  }
+
+  /**
+   * Set CRDSA allowance
+   *
+   * \param isCrdsaAllowed Is CRDSA allowed
+   */
+  inline void SetIsCrdsaAllowed (bool isCrdsaAllowed)
+  {
+    m_isCrdsaAllowed = isCrdsaAllowed;
+  }
 };
 
 /**
@@ -432,7 +477,7 @@ public:
   static const uint8_t m_minRaServiceEntries = 1;
 
   static const uint8_t m_maxDaServiceEntries = 4;
-  static const uint8_t m_maxRaServiceEntries = 1;
+  static const uint8_t m_maxRaServiceEntries = 3;
 
   /**
    * Constructor for SatLowerLayerServiceConf.
@@ -504,6 +549,16 @@ public:
   Time GetDefaultControlRandomizationInterval () const
   {
     return m_defaultControlRandomizationInterval;
+  }
+
+  /**
+   * Get index of default RA service.
+   *
+   * \return index of default RA service.
+   */
+  inline uint8_t GetRaDefaultService () const
+  {
+    return m_raServiceIndexDefault;
   }
 
   /**
@@ -642,12 +697,29 @@ public:
    */
   double GetRaAverageNormalizedOfferedLoadThreshold (uint8_t index) const;
 
+  /**
+   * Get Slotted Aloha allowance
+   *
+   * \param index Index of the service
+   * \return Is Slotted Aloha allowed
+   */
+  bool GetRaIsSlottedAlohaAllowed (uint8_t index) const;
+
+  /**
+   * Get CRDSA allowance
+   *
+   * \param index Index of the service
+   * \return Is CRDSA allowed
+   */
+  bool GetRaIsCrdsaAllowed (uint8_t index) const;
+
 private:
   uint8_t                                  m_dynamicRatePersistence;
   uint8_t                                  m_volumeBacklogPersistence;
   Time                                     m_defaultControlRandomizationInterval;
   uint8_t                                  m_daServiceEntryCount;
   SatLowerLayerServiceDaEntry              m_daServiceEntries[m_maxDaServiceEntries];
+  uint8_t                                  m_raServiceIndexDefault;
   uint8_t                                  m_raServiceEntryCount;
   SatLowerLayerServiceRaEntry              m_raServiceEntries[m_maxRaServiceEntries];
 
@@ -809,6 +881,22 @@ private:
    */
   void SetRaAverageNormalizedOfferedLoadThreshold (uint8_t index, double averageNormalizedOfferedLoadThreshold);
 
+  /**
+   * Set Slotted Aloha allowance
+   *
+   * \param index Index of the service
+   * \param isSlottedAlohaAllowed Is Slotted Aloha allowed
+   */
+  void SetRaIsSlottedAlohaAllowed (uint8_t index, bool isSlottedAlohaAllowed);
+
+  /**
+   * Set CRDSA allowance
+   *
+   * \param index Index of the service
+   * \param isCrdsaAllowed Is CRDSA allowed
+   */
+  void SetRaIsCrdsaAllowed (uint8_t index, bool isCrdsaAllowed);
+
 /**
  * SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE macro helps to define DA service entry
  * attribute access method.
@@ -874,19 +962,23 @@ private:
  *  - SetRaServ0MaximumConsecutiveBlockAccessed, see @SatLowerLayerServiceRaEntry::SetMaximumConsecutiveBlockAccessed
  *  - GetRaServ0MaximumConsecutiveBlockAccessed, see @SatLowerLayerServiceRaEntry::GetMaximumConsecutiveBlockAccessed
  *  - SetRaServ0MinimumIdleBlock, see @SatLowerLayerServiceRaEntry::SetMinimumIdleBlock
- *  - GetRaServ0VMinimumIdleBlock, see @SatLowerLayerServiceRaEntry::GetMinimumIdleBlock
+ *  - GetRaServ0MinimumIdleBlock, see @SatLowerLayerServiceRaEntry::GetMinimumIdleBlock
  *  - SetRaServ0BackOffTimeInMilliSeconds, see @SatLowerLayerServiceRaEntry::SetBackOffTimeInMilliSeconds
- *  - GetRaServ0VBackOffTimeInMilliSeconds, see @SatLowerLayerServiceRaEntry::GetBackOffTimeInMilliSeconds
+ *  - GetRaServ0BackOffTimeInMilliSeconds, see @SatLowerLayerServiceRaEntry::GetBackOffTimeInMilliSeconds
  *  - SetRaServ0HighLoadBackOffTimeInMilliSeconds, see @SatLowerLayerServiceRaEntry::SetHighLoadBackOffTimeInMilliSeconds
- *  - GetRaServ0VHighLoadBackOffTimeInMilliSeconds, see @SatLowerLayerServiceRaEntry::GetHighLoadBackOffTimeInMilliSeconds
+ *  - GetRaServ0HighLoadBackOffTimeInMilliSeconds, see @SatLowerLayerServiceRaEntry::GetHighLoadBackOffTimeInMilliSeconds
  *  - SetRaServ0BackOffProbability, see @SatLowerLayerServiceRaEntry::SetBackOffProbability
- *  - GetRaServ0VBackOffProbability, see @SatLowerLayerServiceRaEntry::GetBackOffProbability
+ *  - GetRaServ0BackOffProbability, see @SatLowerLayerServiceRaEntry::GetBackOffProbability
  *  - SetRaServ0HighLoadBackOffProbability, see @SatLowerLayerServiceRaEntry::SetHighLoadBackOffProbability
- *  - GetRaServ0VHighLoadBackOffProbability, see @SatLowerLayerServiceRaEntry::GetHighLoadBackOffProbability
+ *  - GetRaServ0HighLoadBackOffProbability, see @SatLowerLayerServiceRaEntry::GetHighLoadBackOffProbability
  *  - SetRaServ0NumberOfInstances, see @SatLowerLayerServiceRaEntry::SetNumberOfInstances
- *  - GetRaServ0VNumberOfInstances, see @SatLowerLayerServiceRaEntry::GetNumberOfInstances
+ *  - GetRaServ0NumberOfInstances, see @SatLowerLayerServiceRaEntry::GetNumberOfInstances
  *  - SetRaServ0AverageNormalizedOfferedLoadThreshold, see @SatLowerLayerServiceRaEntry::SetAverageNormalizedOfferedLoadThreshold
- *  - GetRaServ0VAverageNormalizedOfferedLoadThreshold, see @SatLowerLayerServiceRaEntry::GetAverageNormalizedOfferedLoadThreshold
+ *  - GetRaServ0AverageNormalizedOfferedLoadThreshold, see @SatLowerLayerServiceRaEntry::GetAverageNormalizedOfferedLoadThreshold
+ *  - SetRaServ0IsSlottedAlohaAllowed, see @SatLowerLayerServiceRaEntry::SetIsSlottedAlohaAllowed
+ *  - GetRaServ0IsSlottedAlohaAllowed, see @SatLowerLayerServiceRaEntry::GetIsSlottedAlohaAllowed
+ *  - SetRaServ0IsCrdsaAllowed, see @SatLowerLayerServiceRaEntry::SetIsCrdsaAllowed
+ *  - GetRaServ0IsCrdsaAllowed, see @SatLowerLayerServiceRaEntry::GetIsCrdsaAllowed
  *
  * \param index Index of the service which attribute access methods are defined
  */
@@ -926,7 +1018,15 @@ private:
   inline void SetRaServ ## index ## AverageNormalizedOfferedLoadThreshold (double value)  \
   { return SetRaAverageNormalizedOfferedLoadThreshold (index, value); } \
   inline double GetRaServ ## index ## AverageNormalizedOfferedLoadThreshold () const  \
-  { return GetRaAverageNormalizedOfferedLoadThreshold (index); }
+  { return GetRaAverageNormalizedOfferedLoadThreshold (index); } \
+  inline void SetRaServ ## index ## IsSlottedAlohaAllowed (bool value)  \
+  { return SetRaIsSlottedAlohaAllowed (index, value); } \
+  inline bool GetRaServ ## index ## IsSlottedAlohaAllowed () const  \
+  { return GetRaIsSlottedAlohaAllowed (index); } \
+  inline void SetRaServ ## index ## IsCrdsaAllowed (bool value)  \
+  { return SetRaIsCrdsaAllowed (index, value); } \
+  inline bool GetRaServ ## index ## IsCrdsaAllowed () const  \
+  { return GetRaIsCrdsaAllowed (index); } \
 
   SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE (0);
   SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE (1);
@@ -934,9 +1034,8 @@ private:
   SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE (3);
 
   SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE (0);
-  //SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(1);
-  //SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(2);
-  //SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(3);
+  SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE (1);
+  SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE (2);
 };
 
 } // namespace ns3

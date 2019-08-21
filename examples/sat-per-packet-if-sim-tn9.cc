@@ -1,4 +1,4 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2014 Magister Solutions
  *
@@ -162,22 +162,22 @@ main (int argc, char *argv[])
     }
 
   simulationHelper->SetSimulationTime (simLength);
-	simulationHelper->SetUtCountPerBeam (utsPerBeam);
-	simulationHelper->SetUserCountPerUt (endUsersPerUt);
+  simulationHelper->SetUtCountPerBeam (utsPerBeam);
+  simulationHelper->SetUserCountPerUt (endUsersPerUt);
   switch (beamConf)
     {
     // Single beam
     case 0:
       {
         // Spot-beam over Finland
-      	simulationHelper->SetBeamSet ({18});
+        simulationHelper->SetBeamSet ({18});
         break;
       }
     // All co-channel beams (e.g., color 1 with 72/4 = 18 beams)
     case 1:
       {
-      	// choose beams from user link frequency ID = 1 (TN3 appendix A)
-      	simulationHelper->SetBeamSet ({1,3,5,7,9,22,24,26,28,30,44,46,48,50,59,61,70,72});
+        // choose beams from user link frequency ID = 1 (TN3 appendix A)
+        simulationHelper->SetBeamSet ({1, 3, 5, 7, 9, 22, 24, 26, 28, 30, 44, 46, 48, 50, 59, 61, 70, 72});
         break;
       }
     default:
@@ -196,13 +196,13 @@ main (int argc, char *argv[])
    * Set-up CBR traffic
    */
   simulationHelper->InstallTrafficModel (
-  		SimulationHelper::ONOFF,
-			SimulationHelper::UDP,
-			SimulationHelper::RTN_LINK,
-			appStartTime,
-			Seconds (simLength+1),
-			MilliSeconds (50)
-			);
+    SimulationHelper::ONOFF,
+    SimulationHelper::UDP,
+    SimulationHelper::RTN_LINK,
+    appStartTime,
+    Seconds (simLength + 1),
+    MilliSeconds (50)
+    );
 
   /**
    * Set-up statistics

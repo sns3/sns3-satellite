@@ -37,7 +37,6 @@ class Socket;
 class SatOnOffApplication : public OnOffApplication
 {
 public:
-
   /**
    */
   static TypeId GetTypeId (void);

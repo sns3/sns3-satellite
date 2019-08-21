@@ -25,7 +25,6 @@
 #include <ns3/boolean.h>
 #include <ns3/error-model.h>
 #include <ns3/trace-source-accessor.h>
-#include <ns3/ipv4-header.h>
 #include <ns3/ipv4-l3-protocol.h>
 #include <ns3/channel.h>
 
@@ -108,12 +107,12 @@ SatNetDevice::GetTypeId (void)
 
 SatNetDevice::SatNetDevice ()
   : m_phy (0),
-    m_mac (0),
-    m_llc (0),
-    m_isStatisticsTagsEnabled (false),
-    m_node (0),
-    m_mtu (0xffff),
-    m_ifIndex (0)
+  m_mac (0),
+  m_llc (0),
+  m_isStatisticsTagsEnabled (false),
+  m_node (0),
+  m_mtu (0xffff),
+  m_ifIndex (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -122,7 +121,7 @@ void
 SatNetDevice::Receive (Ptr<const Packet> packet)
 {
   NS_LOG_FUNCTION (this << packet);
-  NS_LOG_INFO ("Time " << Simulator::Now ().GetSeconds () << ": receiving a packet: " << packet->GetUid ());
+  NS_LOG_INFO ("Receiving a packet: " << packet->GetUid ());
 
   // Add packet trace entry:
   SatEnums::SatLinkDir_t ld =
@@ -541,6 +540,5 @@ SatNetDevice::GetChannel (void) const
    */
   return 0;
 }
-
 
 } // namespace ns3

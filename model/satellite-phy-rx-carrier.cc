@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2014 Magister Solutions Ltd.
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
 #include <ns3/log.h>
@@ -23,8 +25,10 @@
 #include <ns3/boolean.h>
 #include <ns3/satellite-utils.h>
 #include <ns3/satellite-constant-interference.h>
+#include <ns3/satellite-per-fragment-interference.h>
 #include <ns3/satellite-per-packet-interference.h>
 #include <ns3/satellite-traced-interference.h>
+#include <ns3/satellite-perfect-interference-elimination.h>
 #include <ns3/satellite-mac-tag.h>
 #include <ns3/singleton.h>
 #include <ns3/satellite-composite-sinr-output-trace-container.h>
@@ -48,26 +52,28 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatPhyRxCarrier);
 
-SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> carrierConf, bool isRandomAccessEnabled)
+SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatWaveformConf> waveformConf, bool isRandomAccessEnabled)
   : m_randomAccessEnabled (isRandomAccessEnabled),
-		m_state (IDLE),
-    m_beamId (),
-    m_carrierId (carrierId),
-    m_receivingDedicatedAccess (false),
-    m_satInterference (),
-    m_enableCompositeSinrOutputTrace (false),
-    m_numOfOngoingRx (0),
-    m_rxPacketCounter (0)
+  m_state (IDLE),
+  m_beamId (),
+  m_carrierId (carrierId),
+  m_receivingDedicatedAccess (false),
+  m_satInterference (),
+  m_satInterferenceElimination (),
+  m_enableCompositeSinrOutputTrace (false),
+  m_numOfOngoingRx (0),
+  m_rxPacketCounter (0)
 {
   NS_LOG_FUNCTION (this << carrierId);
 
   m_rxBandwidthHz = carrierConf->GetCarrierBandwidthHz (carrierId, SatEnums::EFFECTIVE_BANDWIDTH);
 
   // Set channel type
-  SetChannelType (carrierConf->GetChannelType());
+  SetChannelType (carrierConf->GetChannelType ());
 
   // Create proper interference object for carrier i
   DoCreateInterferenceModel (carrierConf, carrierId, m_rxBandwidthHz);
+  DoCreateInterferenceEliminationModel (carrierConf, carrierId, waveformConf);
 
   m_rxExtNoisePowerW = carrierConf->GetExtPowerDensityWhz () * m_rxBandwidthHz;
 
@@ -101,7 +107,7 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
   // Configured channel estimation error
   m_channelEstimationError = carrierConf->GetChannelEstimatorErrorContainer ();
 
-  NS_LOG_INFO ("SatPhyRxCarrier::SatPhyRxCarrier - Carrier ID: " << m_carrierId <<
+  NS_LOG_INFO ("Carrier ID: " << m_carrierId <<
                ", channel type: " << SatEnums::GetChannelTypeName (GetChannelType ()));
 }
 
@@ -132,6 +138,19 @@ SatPhyRxCarrier::DoCreateInterferenceModel (Ptr<SatPhyRxCarrierConf> carrierConf
           }
         break;
       }
+    case SatPhyRxCarrierConf::IF_PER_FRAGMENT:
+      {
+        NS_LOG_INFO (this << " Per fragment interference model created for carrier: " << carrierId);
+        if (carrierConf->IsIntfOutputTraceEnabled ())
+          {
+            m_satInterference = CreateObject<SatPerFragmentInterference> (GetChannelType (), rxBandwidthHz);
+          }
+        else
+          {
+            m_satInterference = CreateObject<SatPerFragmentInterference> ();
+          }
+        break;
+      }
     case SatPhyRxCarrierConf::IF_TRACE:
       {
         NS_LOG_INFO (this << " Traced interference model created for carrier: " << carrierId);
@@ -141,6 +160,29 @@ SatPhyRxCarrier::DoCreateInterferenceModel (Ptr<SatPhyRxCarrierConf> carrierConf
     default:
       {
         NS_LOG_ERROR (this << " Not a valid interference model!");
+        break;
+      }
+    }
+}
+
+
+void
+SatPhyRxCarrier::DoCreateInterferenceEliminationModel (
+  Ptr<SatPhyRxCarrierConf> carrierConf,
+  uint32_t carrierId,
+  Ptr<SatWaveformConf> waveformConf)
+{
+  switch (carrierConf->GetInterferenceEliminationModel (m_randomAccessEnabled))
+    {
+    case SatPhyRxCarrierConf::SIC_PERFECT:
+      {
+        NS_LOG_INFO (this << " Perfect interference elimination model created for carrier: " << carrierId);
+        m_satInterferenceElimination = CreateObject<SatPerfectInterferenceElimination> ();
+        break;
+      }
+    default:
+      {
+        NS_LOG_ERROR (this << " Not a valid interference elimination model!");
         break;
       }
     }
@@ -198,6 +240,7 @@ SatPhyRxCarrier::DoDispose ()
   m_sinrCalculate.Nullify ();
   m_avgNormalizedOfferedLoadCallback.Nullify ();
   m_satInterference = NULL;
+  m_satInterferenceElimination = NULL;
   m_uniformVariable = NULL;
 
   Object::DoDispose ();
@@ -247,9 +290,9 @@ SatPhyRxCarrier::ChangeState (State newState)
 std::pair<bool, SatPhyRxCarrier::rxParams_s>
 SatPhyRxCarrier::GetReceiveParams (Ptr<SatSignalParameters> rxParams)
 {
-	SatPhyRxCarrier::rxParams_s params;
-	params.rxParams = rxParams;
-	// Receive packet by default in satellite, discard in UT
+  SatPhyRxCarrier::rxParams_s params;
+  params.rxParams = rxParams;
+  // Receive packet by default in satellite, discard in UT
   bool receivePacket = GetDefaultReceiveMode ();
   bool ownAddressFound = false;
 
@@ -280,7 +323,7 @@ SatPhyRxCarrier::GetReceiveParams (Ptr<SatSignalParameters> rxParams)
           receivePacket = true;
         }
     }
-	return std::make_pair (receivePacket, params);
+  return std::make_pair (receivePacket, params);
 }
 
 
@@ -288,14 +331,14 @@ void
 SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
 {
   NS_LOG_FUNCTION (this << rxParams);
-  NS_LOG_INFO (this << " state: " << m_state);
+  NS_LOG_INFO ("State: " << m_state);
   NS_ASSERT (rxParams->m_carrierId == m_carrierId);
 
   uint32_t key;
 
   NS_LOG_INFO ("Node: " << m_nodeInfo->GetMacAddress ()
-								<< " starts receiving packet at: " << Simulator::Now ().GetSeconds ()
-								<< " in carrier: " << rxParams->m_carrierId);
+                        << " starts receiving packet at: " << Simulator::Now ().GetSeconds ()
+                        << " in carrier: " << rxParams->m_carrierId);
   NS_LOG_INFO ("Sender: " << rxParams->m_phyTx);
 
   switch (m_state)
@@ -303,7 +346,7 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
     case IDLE:
     case RX:
       {
-      	auto receiveParamTuple = GetReceiveParams (rxParams);
+        auto receiveParamTuple = GetReceiveParams (rxParams);
 
         bool receivePacket = receiveParamTuple.first;
         rxParams_s rxParamsStruct = receiveParamTuple.second;
@@ -353,7 +396,6 @@ void
 SatPhyRxCarrier::DoCompositeSinrOutputTrace (double cSinr)
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_INFO ("SatPhyRxCarrier::DoCompositeSinrOutputTrace");
 
   std::vector<double> tempVector;
   tempVector.push_back (Now ().GetSeconds ());
@@ -367,7 +409,6 @@ bool
 SatPhyRxCarrier::CheckAgainstLinkResults (double cSinr, Ptr<SatSignalParameters> rxParams)
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_INFO ("SatPhyRxCarrier::CheckAgainstLinkResults");
 
   /// Initialize with no errors
   bool error = false;
@@ -406,94 +447,94 @@ SatPhyRxCarrier::CheckAgainstLinkResults (double cSinr, Ptr<SatSignalParameters>
 bool
 SatPhyRxCarrier::CheckAgainstLinkResultsErrorModelAvi (double cSinr, Ptr<SatSignalParameters> rxParams)
 {
-	bool error = false;
-	switch (GetChannelType ())
-	{
-		case SatEnums::FORWARD_USER_CH:
-		{
-			/**
-			 * In forward link the link results are in Es/No format, thus here we need
-			 * to convert the SINR into Es/No:
-			 *
-			 * C/No = C/N * fs
-			 * Es/No = C/N * B/fs = (C/No / fs) * B/fs
-			 * Es/No = (C*Ts)/No = C/No * (1/fs) = C/N
-			 *
-			 * where
-			 * C/No = carrier to noise density
-			 * C/N = signal to noise ratio (= SINR in the simulator)
-			 * Es/No = energy per symbol per noise density
-			 * B = channel bandwidth in Hz
-			 * fs = symbol rate in baud
-			*/
+  bool error = false;
+  switch (GetChannelType ())
+    {
+    case SatEnums::FORWARD_USER_CH:
+      {
+        /**
+         * In forward link the link results are in Es/No format, thus here we need
+         * to convert the SINR into Es/No:
+         *
+         * C/No = C/N * fs
+         * Es/No = C/N * B/fs = (C/No / fs) * B/fs
+         * Es/No = (C*Ts)/No = C/No * (1/fs) = C/N
+         *
+         * where
+         * C/No = carrier to noise density
+         * C/N = signal to noise ratio (= SINR in the simulator)
+         * Es/No = energy per symbol per noise density
+         * B = channel bandwidth in Hz
+         * fs = symbol rate in baud
+        */
 
-			double ber = (GetLinkResults ()->GetObject <SatLinkResultsDvbS2> ())->GetBler (rxParams->m_txInfo.modCod,
-																																								 rxParams->m_txInfo.frameType,
-																																								 SatUtils::LinearToDb (cSinr));
-			double r = GetUniformRandomValue (0, 1);
+        double ber = (GetLinkResults ()->GetObject <SatLinkResultsDvbS2> ())->GetBler (rxParams->m_txInfo.modCod,
+                                                                                       rxParams->m_txInfo.frameType,
+                                                                                       SatUtils::LinearToDb (cSinr));
+        double r = GetUniformRandomValue (0, 1);
 
-			if ( r < ber )
-				{
-					error = true;
-				}
+        if ( r < ber )
+          {
+            error = true;
+          }
 
-			NS_LOG_INFO ("FORWARD cSinr (dB): " << SatUtils::LinearToDb (cSinr)
-									 << " esNo (dB): " << SatUtils::LinearToDb (cSinr)
-									 << " rand: " << r
-									 << " ber: " << ber
-									 << " error: " << error);
-			break;
-		}
+        NS_LOG_INFO ("FORWARD cSinr (dB): " << SatUtils::LinearToDb (cSinr)
+                                            << " esNo (dB): " << SatUtils::LinearToDb (cSinr)
+                                            << " rand: " << r
+                                            << " ber: " << ber
+                                            << " error: " << error);
+        break;
+      }
 
-		case SatEnums::RETURN_FEEDER_CH:
-		{
-			/**
-			 * In return link the link results are in Eb/No format, thus here we need
-			 * to convert the SINR into Eb/No:
-			 * Eb/No = C/N * B/fb = (C/No / fs) * B/fb
-			 * Eb/No = (Es/log2M)/No = (Es/No)*(1/log2M)  = C/N * (1/log2M) = C/No * (1/fs) * (1/log2M)
-			 *
-			 * where
-			 * C/No = carrier to noise density
-			 * C/N = signal to noise ratio (= SINR in the simulator)
-			 * Es/No = energy per symbol per noise density
-			 * Eb/No = energy per bit per noise density
-			 * B = channel bandwidth in Hz
-			 * fs = symbol rate in baud
-			 * fb = channel bitrate (after FEC) in bps (i.e. burst payloadInBits / burstDurationInSec)
-			*/
+    case SatEnums::RETURN_FEEDER_CH:
+      {
+        /**
+         * In return link the link results are in Eb/No format, thus here we need
+         * to convert the SINR into Eb/No:
+         * Eb/No = C/N * B/fb = (C/No / fs) * B/fb
+         * Eb/No = (Es/log2M)/No = (Es/No)*(1/log2M)  = C/N * (1/log2M) = C/No * (1/fs) * (1/log2M)
+         *
+         * where
+         * C/No = carrier to noise density
+         * C/N = signal to noise ratio (= SINR in the simulator)
+         * Es/No = energy per symbol per noise density
+         * Eb/No = energy per bit per noise density
+         * B = channel bandwidth in Hz
+         * fs = symbol rate in baud
+         * fb = channel bitrate (after FEC) in bps (i.e. burst payloadInBits / burstDurationInSec)
+        */
 
-			double ebNo = cSinr / (SatUtils::GetCodingRate (rxParams->m_txInfo.modCod) *
-														 SatUtils::GetModulatedBits (rxParams->m_txInfo.modCod));
+        double ebNo = cSinr / (SatUtils::GetCodingRate (rxParams->m_txInfo.modCod) *
+                               SatUtils::GetModulatedBits (rxParams->m_txInfo.modCod));
 
-			double ber = (GetLinkResults ()->GetObject <SatLinkResultsDvbRcs2> ())->GetBler (rxParams->m_txInfo.waveformId,
-																																									 SatUtils::LinearToDb (ebNo));
-			double r = GetUniformRandomValue (0, 1);
+        double ber = (GetLinkResults ()->GetObject <SatLinkResultsDvbRcs2> ())->GetBler (rxParams->m_txInfo.waveformId,
+                                                                                         SatUtils::LinearToDb (ebNo));
+        double r = GetUniformRandomValue (0, 1);
 
-			if ( r < ber )
-				{
-					error = true;
-				}
+        if ( r < ber )
+          {
+            error = true;
+          }
 
-			NS_LOG_INFO ("RETURN cSinr (dB): " << SatUtils::LinearToDb (cSinr)
-									 << " ebNo (dB): " << SatUtils::LinearToDb (ebNo)
-									 << " modulated bits: " << SatUtils::GetModulatedBits (rxParams->m_txInfo.modCod)
-									 << " rand: " << r
-									 << " ber: " << ber
-									 << " error: " << error);
-			break;
-		}
-		case SatEnums::RETURN_USER_CH:
-		case SatEnums::FORWARD_FEEDER_CH:
-		case SatEnums::UNKNOWN_CH:
-		default:
-		{
-			NS_FATAL_ERROR ("SatPhyRxCarrier::CheckAgainstLinkResultsErrorModelAvi - Invalid channel type!");
-			break;
-		}
+        NS_LOG_INFO ("RETURN cSinr (dB): " << SatUtils::LinearToDb (cSinr)
+                                           << " ebNo (dB): " << SatUtils::LinearToDb (ebNo)
+                                           << " modulated bits: " << SatUtils::GetModulatedBits (rxParams->m_txInfo.modCod)
+                                           << " rand: " << r
+                                           << " ber: " << ber
+                                           << " error: " << error);
+        break;
+      }
+    case SatEnums::RETURN_USER_CH:
+    case SatEnums::FORWARD_FEEDER_CH:
+    case SatEnums::UNKNOWN_CH:
+    default:
+      {
+        NS_FATAL_ERROR ("SatPhyRxCarrier::CheckAgainstLinkResultsErrorModelAvi - Invalid channel type!");
+        break;
+      }
 
-	}
-	return error;
+    }
+  return error;
 }
 
 
@@ -554,8 +595,6 @@ SatPhyRxCarrier::IncreaseNumOfRxState (SatEnums::PacketType_t packetType)
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_INFO ("SatPhyRxCarrier::IncreaseNumOfRxState - Time: " << Now ().GetSeconds ());
-
   m_numOfOngoingRx++;
   ChangeState (RX);
 
@@ -571,8 +610,6 @@ void
 SatPhyRxCarrier::DecreaseNumOfRxState (SatEnums::PacketType_t packetType)
 {
   NS_LOG_FUNCTION (this);
-
-  NS_LOG_INFO ("SatPhyRxCarrier::DecreaseNumOfRxState - Time: " << Now ().GetSeconds ());
 
   if (m_numOfOngoingRx > 0)
     {
@@ -597,8 +634,6 @@ SatPhyRxCarrier::CheckRxStateSanity ()
 {
   NS_LOG_FUNCTION (this);
 
-  NS_LOG_INFO ("SatPhyRxCarrier::CheckRxStateSanity - Time: " << Now ().GetSeconds ());
-
   if (m_numOfOngoingRx > 0 && m_state == IDLE)
     {
       NS_FATAL_ERROR ("SatPhyRxCarrier::CheckStateSanity - State mismatch");
@@ -615,7 +650,6 @@ void
 SatPhyRxCarrier::SetAverageNormalizedOfferedLoadCallback (SatPhyRx::AverageNormalizedOfferedLoadCallback callback)
 {
   NS_LOG_FUNCTION (this << &callback);
-  NS_LOG_INFO ("SatPhyRxCarrier::SetAverageNormalizedOfferedLoadCallback - Time: " << Now ().GetSeconds ());
 
   m_avgNormalizedOfferedLoadCallback = callback;
 }

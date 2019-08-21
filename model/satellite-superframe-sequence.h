@@ -40,7 +40,6 @@ namespace ns3 {
 class SatSuperframeSeq : public Object
 {
 public:
-
   /**
    * Define type SatSuperframeConfList
    */

@@ -47,38 +47,38 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatPhy);
 
 SatPhy::SatPhy (void)
-  : m_eirpWoGainW (0),
-    m_beamId (0),
-    m_isStatisticsTagsEnabled (false),
-    m_rxNoiseTemperatureDbk (0),
-    m_rxMaxAntennaGainDb (0),
-    m_rxAntennaLossDb (0),
-    m_txMaxAntennaGainDb (0),
-    m_txMaxPowerDbw (0),
-    m_txOutputLossDb (0),
-    m_txPointingLossDb (0),
-    m_txOboLossDb (0),
-    m_txAntennaLossDb (0),
-    m_defaultFadingValue (1.0)
+  : m_beamId (0),
+  m_eirpWoGainW (0),
+  m_isStatisticsTagsEnabled (false),
+  m_rxNoiseTemperatureDbk (0),
+  m_rxMaxAntennaGainDb (0),
+  m_rxAntennaLossDb (0),
+  m_txMaxAntennaGainDb (0),
+  m_txMaxPowerDbw (0),
+  m_txOutputLossDb (0),
+  m_txPointingLossDb (0),
+  m_txOboLossDb (0),
+  m_txAntennaLossDb (0),
+  m_defaultFadingValue (1.0)
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("SatPhy default constructor is not allowed to use");
 }
 
 SatPhy::SatPhy (CreateParam_t & params)
-  : m_eirpWoGainW (0),
-    m_beamId (0),
-    m_isStatisticsTagsEnabled (false),
-    m_rxNoiseTemperatureDbk (0),
-    m_rxMaxAntennaGainDb (0),
-    m_rxAntennaLossDb (0),
-    m_txMaxAntennaGainDb (0),
-    m_txMaxPowerDbw (0),
-    m_txOutputLossDb (0),
-    m_txPointingLossDb (0),
-    m_txOboLossDb (0),
-    m_txAntennaLossDb (0),
-    m_defaultFadingValue (1.0)
+  : m_beamId (0),
+  m_eirpWoGainW (0),
+  m_isStatisticsTagsEnabled (false),
+  m_rxNoiseTemperatureDbk (0),
+  m_rxMaxAntennaGainDb (0),
+  m_rxAntennaLossDb (0),
+  m_txMaxAntennaGainDb (0),
+  m_txMaxPowerDbw (0),
+  m_txOutputLossDb (0),
+  m_txPointingLossDb (0),
+  m_txOboLossDb (0),
+  m_txAntennaLossDb (0),
+  m_defaultFadingValue (1.0)
 {
   NS_LOG_FUNCTION (this << params.m_beamId);
   ObjectBase::ConstructSelf (AttributeConstructionList ());
@@ -292,7 +292,7 @@ void
 SatPhy::SendPdu (PacketContainer_t p, uint32_t carrierId, Time duration, SatSignalParameters::txInfo_s txInfo)
 {
   NS_LOG_FUNCTION (this << carrierId << duration);
-  NS_LOG_INFO (this << " sending a packet with carrierId: " << carrierId << " duration: " << duration);
+  NS_LOG_INFO ("Sending a packet with carrierId: " << carrierId << " duration: " << duration);
 
   // Add a SatPhyTimeTag tag for packet delay computation at the receiver end.
   if (m_isStatisticsTagsEnabled)
@@ -381,7 +381,7 @@ SatPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
     {
       // If there was a PHY error, the packet is dropped here.
       NS_LOG_INFO (this << " dropped " << rxParams->m_packetsInBurst.size ()
-                         << " packets because of PHY error.");
+                        << " packets because of PHY error.");
     }
   else
     {
@@ -445,6 +445,15 @@ SatPhy::AverageNormalizedOfferedRandomAccessLoadInfo (uint32_t beamId, uint32_t 
 {
   NS_LOG_FUNCTION (this << beamId << carrierId << allocationChannelId << averageNormalizedOfferedLoad);
   m_avgNormalizedOfferedLoadCallback (beamId, carrierId, allocationChannelId, averageNormalizedOfferedLoad);
+}
+
+
+void
+SatPhy::SetChannelPairGetterCallback (SatPhy::ChannelPairGetterCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+
+  m_retrieveChannelPair = cb;
 }
 
 

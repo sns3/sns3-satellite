@@ -78,10 +78,10 @@ main (int argc, char *argv[])
 
 
   /// Enable interference density input trace
-  Config::SetDefault ("ns3::SatGwHelper::DaRtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_TRACE));
-  Config::SetDefault ("ns3::SatGeoHelper::DaRtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_TRACE));
-  Config::SetDefault ("ns3::SatGeoHelper::DaFwdLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_TRACE));
-  Config::SetDefault ("ns3::SatUtHelper::DaFwdLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_TRACE));
+  Config::SetDefault ("ns3::SatGwHelper::DaRtnLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_TRACE));
+  Config::SetDefault ("ns3::SatGeoHelper::DaRtnLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_TRACE));
+  Config::SetDefault ("ns3::SatGeoHelper::DaFwdLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_TRACE));
+  Config::SetDefault ("ns3::SatUtHelper::DaFwdLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_TRACE));
 
   /// Set simulation output details
   simulationHelper->SetOutputTag (scenario);
@@ -122,17 +122,17 @@ main (int argc, char *argv[])
 
   /// Create application on GW user
   simulationHelper->InstallTrafficModel (
-  		SimulationHelper::CBR,
-			SimulationHelper::UDP,
-			SimulationHelper::FWD_LINK,
-			Seconds (3.0), Seconds (5.1));
+    SimulationHelper::CBR,
+    SimulationHelper::UDP,
+    SimulationHelper::FWD_LINK,
+    Seconds (3.0), Seconds (5.1));
 
   /// Create application on UT user
   simulationHelper->InstallTrafficModel (
-    		SimulationHelper::CBR,
-  			SimulationHelper::UDP,
-  			SimulationHelper::RTN_LINK,
-  			Seconds (7.0), Seconds (9.1));
+    SimulationHelper::CBR,
+    SimulationHelper::UDP,
+    SimulationHelper::RTN_LINK,
+    Seconds (7.0), Seconds (9.1));
 
   NS_LOG_INFO ("--- Trace-input-interference-example ---");
   NS_LOG_INFO ("  Scenario used: " << scenario);

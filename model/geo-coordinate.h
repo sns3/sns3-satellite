@@ -65,16 +65,16 @@ public:
   GeoCoordinate (double latitude, double longitude, double altitude, ReferenceEllipsoid_t refEllipsoid);
 
   /**
-   * Create GeoCoordinate from given vector (x,y,z). Reference ellipsoid to be used is sphere.
+   * Create GeoCoordinate from given vector (x, y, z). Reference ellipsoid to be used is sphere.
    *
-   * \param vector coordinates as Vector (x,y,z) (Cartesian)
+   * \param vector coordinates as Vector (x, y, z) (Cartesian)
    */
   GeoCoordinate (Vector vector);
 
   /**
-   * Create GeoCoordinate from given vector (x,y,z) and reference ellipsoid.
+   * Create GeoCoordinate from given vector (x, y, z) and reference ellipsoid.
    *
-   * \param vector coordinates as Vector (x,y,z) (Cartesian)
+   * \param vector coordinates as Vector (x, y, z) (Cartesian)
    * \param refEllipsoid Reference ellipsoid to be used
    */
   GeoCoordinate (Vector vector, ReferenceEllipsoid_t refEllipsoid);
@@ -134,7 +134,7 @@ public:
    * Converts Geodetic coordinates to Cartesian coordinates
    * \return Vector containing Cartesian coordinates
    */
-  Vector ToVector ();
+  Vector ToVector () const;
 
   // Definitions for reference Earth Ellipsoid parameters.
   // Sphere, WGS84 and GRS80 reference ellipsoides supported.
@@ -153,7 +153,7 @@ private:
    * \param latitude latitude in radians at to get the radius of curvature.
    * \return value of the radius of curvature (meters)
    */
-  double GetRadiusCurvature (double latitude);
+  double GetRadiusCurvature (double latitude) const;
   /**
    * Checks if longtitude is in valid range
    *

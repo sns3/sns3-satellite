@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2013 Magister Solutions Ltd.
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
 
@@ -40,16 +42,17 @@ class SatPhyRxCarrier;
 class SatPhyRxCarrierUplink : public SatPhyRxCarrier
 {
 public:
-
-	/**
-	 * Constructor.
-	 * \param carrierId ID of the carrier
-	 * \param carrierConf Carrier configuration
-	 * \param randomAccessEnabled Is this a RA carrier
-	 */
-	SatPhyRxCarrierUplink (uint32_t carrierId,
-	                       Ptr<SatPhyRxCarrierConf> carrierConf,
-	                       bool randomAccessEnabled);
+  /**
+   * Constructor.
+   * \param carrierId ID of the carrier
+   * \param carrierConf Carrier configuration
+   * \param waveformConf Waveform configuration
+   * \param randomAccessEnabled Is this a RA carrier
+   */
+  SatPhyRxCarrierUplink (uint32_t carrierId,
+                         Ptr<SatPhyRxCarrierConf> carrierConf,
+                         Ptr<SatWaveformConf> waveformConf,
+                         bool randomAccessEnabled);
 
   /**
    * \brief Destructor
@@ -65,27 +68,32 @@ public:
   /**
    * \brief Method for querying the type of the carrier
    */
-  inline virtual CarrierType GetCarrierType () { return CarrierType::DEDICATED_ACCESS; }
+  inline virtual CarrierType GetCarrierType ()
+  {
+    return CarrierType::DEDICATED_ACCESS;
+  }
 
 protected:
-
   /**
    * Get the default receive mode. In satellite node always true.
    */
-  inline virtual const bool GetDefaultReceiveMode () { return true; };
+  inline virtual const bool GetDefaultReceiveMode ()
+  {
+    return true;
+  }
 
   /**
    * \brief Function for ending the packet reception from the SatChannel
    * \param key Key for Rx params map
    */
-	virtual void EndRxData (uint32_t key);
+  virtual void EndRxData (uint32_t key);
 
   /**
    * \brief Create an interference event based on Rx parameters and address.
    *
    * \return Pointer to the interference event.
    */
-	virtual Ptr<SatInterference::InterferenceChangeEvent> CreateInterference (Ptr<SatSignalParameters> rxParams, Address rxAddress);
+  virtual Ptr<SatInterference::InterferenceChangeEvent> CreateInterference (Ptr<SatSignalParameters> rxParams, Address rxAddress);
 };
 
 }

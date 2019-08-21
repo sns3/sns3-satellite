@@ -49,7 +49,7 @@ main (int argc, char *argv[])
 
   /// Create fader
   Ptr<SatRayleighConf> rayleighConf = CreateObject<SatRayleighConf> ();
-  Ptr<SatRayleighModel> rayleighFader = CreateObject<SatRayleighModel> (rayleighConf,0,0);
+  Ptr<SatRayleighModel> rayleighFader = CreateObject<SatRayleighModel> (rayleighConf, 0, 0);
 
   /// Run simulation
   for (uint32_t i = 0; i < 1000; i++)

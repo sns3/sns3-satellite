@@ -32,17 +32,17 @@ NS_OBJECT_ENSURE_REGISTERED (SatGseHeader);
 
 SatGseHeader::SatGseHeader ()
   : m_startIndicator (0),
-    m_endIndicator (0),
-    m_gsePduLengthInBytes (0),
-    m_fragmentId (0),
-    m_totalLengthInBytes (0),
-    m_protocolType (0),
-    m_labelByte (0),
-    m_crc (0),
-    m_fullGseHeaderSize (8),
-    m_startGseHeaderSize (8),
-    m_endGseHeaderSize (8),
-    m_continuationGseHeaderSize (3)
+  m_endIndicator (0),
+  m_gsePduLengthInBytes (0),
+  m_fragmentId (0),
+  m_totalLengthInBytes (0),
+  m_protocolType (0),
+  m_labelByte (0),
+  m_crc (0),
+  m_fullGseHeaderSize (8),
+  m_startGseHeaderSize (8),
+  m_endGseHeaderSize (8),
+  m_continuationGseHeaderSize (3)
 {
 
 }
@@ -296,4 +296,4 @@ uint32_t SatGseHeader::GetMaxGseHeaderSizeInBytes () const
                                m_continuationGseHeaderSize)));
 }
 
-}; // namespace ns3
+}  // namespace ns3

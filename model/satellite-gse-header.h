@@ -187,6 +187,6 @@ private:
   static const uint32_t m_labelFieldLengthInBytes = 3;
 };
 
-}; // namespace ns3
+}  // namespace ns3
 
 #endif // SATELLITE_GSE_HEADERS_H

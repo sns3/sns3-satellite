@@ -39,7 +39,6 @@ namespace ns3 {
 class SatMobilityModel : public MobilityModel
 {
 public:
-
   /**
    * \brief Get the type ID
    * \return the object TypeId
@@ -73,8 +72,7 @@ public:
    *
    * \param model the SatMobilityModel which is changing course
    */
-  typedef void (*CourseChangeCallback)
-    (const Ptr<const SatMobilityModel> model);
+  typedef void (*CourseChangeCallback)(const Ptr<const SatMobilityModel> model);
 
 private:
   /**

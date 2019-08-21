@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2014 Magister Solutions Ltd.
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,7 +17,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
+
+
 #ifndef SATELLITE_RANDOM_ACCESS_H
 #define SATELLITE_RANDOM_ACCESS_H
 
@@ -63,7 +67,7 @@ public:
   {
     SatEnums::RandomAccessTxOpportunityType_t txOpportunityType;
     uint32_t slottedAlohaTxOpportunity;
-    std::map <uint32_t,std::set<uint32_t> > crdsaTxOpportunities;
+    std::map <uint32_t, std::set<uint32_t> > crdsaTxOpportunities;
     uint32_t allocationChannel;
   } RandomAccessTxOpportunities_s;
 
@@ -162,18 +166,6 @@ public:
   void SetAreBuffersEmptyCallback (SatRandomAccess::AreBuffersEmptyCallback callback);
 
   /**
-   * \brief Function for adding a Slotted ALOHA allocation channel
-   * \param allocationChannel
-   */
-  void AddSlottedAlohaAllocationChannel (uint32_t allocationChannel);
-
-  /**
-   * \brief Function for adding a CRDSA allocation channel
-   * \param allocationChannel
-   */
-  void AddCrdsaAllocationChannel (uint32_t allocationChannel);
-
-  /**
    * \brief Function for getting the CRDSA signaling overhead in bytes
    * \return CRDSA signaling overhead in bytes
    */
@@ -203,6 +195,13 @@ private:
    * \brief Function for printing out various module variables to console
    */
   void PrintVariables ();
+
+  /**
+   * \brief Function to convert a carrier allocation channel ID into its allocation channel configuration ID
+   * \param allocationChannelId The carrier allocation channel ID
+   * \return The carrier allocation channel configuration ID
+   */
+  uint32_t GetConfigurationIdForAllocationChannel (uint32_t allocationChannelId);
 
   /**
    * \brief Main function for Slotted ALOHA
@@ -350,16 +349,6 @@ private:
     * \brief Callback for buffer status
    */
   AreBuffersEmptyCallback m_areBuffersEmptyCb;
-
-  /**
-   * \brief Defines the allocation channels which are enabled for Slotted ALOHA
-   */
-  std::set<uint32_t> m_slottedAlohaAllocationChannels;
-
-  /**
-   * \brief Defines the allocation channels which are enabled for CRDSA
-   */
-  std::set<uint32_t> m_crdsaAllocationChannels;
 };
 
 } // namespace ns3

@@ -44,15 +44,15 @@ namespace ns3 {
 const uint32_t payloadConf[4][3] = { { 2, 360, 90 },
                                      { 3, 240, 60 },
                                      { 4, 180, 45 },
-                                     { 5, 144, 36 },};
+                                     { 5, 144, 36 }, };
 
 
 SatDvbS2Waveform::SatDvbS2Waveform ()
   : m_modcod (SatEnums::SAT_MODCOD_QPSK_1_TO_2),
-    m_frameType (SatEnums::NORMAL_FRAME),
-    m_frameDuration (Seconds (0.0)),
-    m_payloadBits (0),
-    m_cnoRequirement (0.0)
+  m_frameType (SatEnums::NORMAL_FRAME),
+  m_frameDuration (Seconds (0.0)),
+  m_payloadBits (0),
+  m_cnoRequirement (0.0)
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT (false);
@@ -64,10 +64,10 @@ SatDvbS2Waveform::SatDvbS2Waveform ()
 
 SatDvbS2Waveform::SatDvbS2Waveform (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t fType, Time frameDur, uint32_t payloadBits)
   : m_modcod (modcod),
-    m_frameType (fType),
-    m_frameDuration (frameDur),
-    m_payloadBits (payloadBits),
-    m_cnoRequirement (0.0)
+  m_frameType (fType),
+  m_frameDuration (frameDur),
+  m_payloadBits (payloadBits),
+  m_cnoRequirement (0.0)
 {
 
 }
@@ -120,10 +120,10 @@ SatDvbS2Waveform::Dump () const
   NS_LOG_FUNCTION (this);
 
   std::cout << "Modcod, " << SatEnums::GetModcodTypeName (m_modcod) <<
-  ", frameType, " << m_frameType <<
-  ", payloadBits, " << m_payloadBits <<
-  ", frameDuration, " << m_frameDuration <<
-  ", cnoRequirement, " << m_cnoRequirement << std::endl;
+    ", frameType, " << m_frameType <<
+    ", payloadBits, " << m_payloadBits <<
+    ", frameDuration, " << m_frameDuration <<
+    ", cnoRequirement, " << m_cnoRequirement << std::endl;
 }
 
 NS_OBJECT_ENSURE_REGISTERED (SatBbFrameConf);
@@ -131,23 +131,23 @@ NS_OBJECT_ENSURE_REGISTERED (SatBbFrameConf);
 
 SatBbFrameConf::SatBbFrameConf ()
   : m_symbolRate (100000000.0),
-    m_symbolsPerSlot (90),
-    m_pilotBlockInSymbols (0),
-    m_pilotBlockIntervalInSlots (36),
-    m_plHeaderInSlots (1),
-    m_dummyFrameInSlots (36),
-    m_bbFrameHeaderSizeInBytes (10),
-    m_bbFrameHighOccupancyThreshold (0.9),
-    m_bbFrameLowOccupancyThreshold (0.5),
-    m_targetBler (0.00001),
-    m_acmEnabled (false),
-    m_defaultModCod (SatEnums::SAT_MODCOD_QPSK_1_TO_2),
-    m_shortFramePayloadInSlots (),
-    m_normalFramePayloadInSlots (),
-    m_waveforms (),
-    m_bbFrameUsageMode (NORMAL_FRAMES),
-    m_mostRobustShortFrameModcod (SatEnums::SAT_NONVALID_MODCOD),
-    m_mostRobustNormalFrameModcod (SatEnums::SAT_NONVALID_MODCOD)
+  m_symbolsPerSlot (90),
+  m_pilotBlockInSymbols (0),
+  m_pilotBlockIntervalInSlots (36),
+  m_plHeaderInSlots (1),
+  m_dummyFrameInSlots (36),
+  m_bbFrameHeaderSizeInBytes (10),
+  m_bbFrameHighOccupancyThreshold (0.9),
+  m_bbFrameLowOccupancyThreshold (0.5),
+  m_targetBler (0.00001),
+  m_acmEnabled (false),
+  m_defaultModCod (SatEnums::SAT_MODCOD_QPSK_1_TO_2),
+  m_shortFramePayloadInSlots (),
+  m_normalFramePayloadInSlots (),
+  m_waveforms (),
+  m_bbFrameUsageMode (NORMAL_FRAMES),
+  m_mostRobustShortFrameModcod (SatEnums::SAT_NONVALID_MODCOD),
+  m_mostRobustNormalFrameModcod (SatEnums::SAT_NONVALID_MODCOD)
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("Default constructor not supported!!!");
@@ -155,23 +155,23 @@ SatBbFrameConf::SatBbFrameConf ()
 
 SatBbFrameConf::SatBbFrameConf (double symbolRate)
   : m_symbolRate (symbolRate),
-    m_symbolsPerSlot (90),
-    m_pilotBlockInSymbols (0),
-    m_pilotBlockIntervalInSlots (36),
-    m_plHeaderInSlots (1),
-    m_dummyFrameInSlots (36),
-    m_bbFrameHeaderSizeInBytes (10),
-    m_bbFrameHighOccupancyThreshold (0.9),
-    m_bbFrameLowOccupancyThreshold (0.5),
-    m_targetBler (0.00001),
-    m_acmEnabled (false),
-    m_defaultModCod (SatEnums::SAT_MODCOD_QPSK_1_TO_2),
-    m_shortFramePayloadInSlots (),
-    m_normalFramePayloadInSlots (),
-    m_waveforms (),
-    m_bbFrameUsageMode (NORMAL_FRAMES),
-    m_mostRobustShortFrameModcod (SatEnums::SAT_NONVALID_MODCOD),
-    m_mostRobustNormalFrameModcod (SatEnums::SAT_NONVALID_MODCOD)
+  m_symbolsPerSlot (90),
+  m_pilotBlockInSymbols (0),
+  m_pilotBlockIntervalInSlots (36),
+  m_plHeaderInSlots (1),
+  m_dummyFrameInSlots (36),
+  m_bbFrameHeaderSizeInBytes (10),
+  m_bbFrameHighOccupancyThreshold (0.9),
+  m_bbFrameLowOccupancyThreshold (0.5),
+  m_targetBler (0.00001),
+  m_acmEnabled (false),
+  m_defaultModCod (SatEnums::SAT_MODCOD_QPSK_1_TO_2),
+  m_shortFramePayloadInSlots (),
+  m_normalFramePayloadInSlots (),
+  m_waveforms (),
+  m_bbFrameUsageMode (NORMAL_FRAMES),
+  m_mostRobustShortFrameModcod (SatEnums::SAT_NONVALID_MODCOD),
+  m_mostRobustNormalFrameModcod (SatEnums::SAT_NONVALID_MODCOD)
 {
   ObjectBase::ConstructSelf (AttributeConstructionList ());
 
@@ -544,4 +544,4 @@ SatBbFrameConf::GetDefaultModCod () const
 }
 
 
-}; // namespace ns3
+}  // namespace ns3

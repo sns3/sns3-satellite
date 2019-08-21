@@ -245,8 +245,8 @@ main (int argc, char *argv[])
   cmd.Parse (argc, argv);
 
   /// Set network types which support multicast
-  Config::SetDefault ("ns3::SatUserHelper::BackboneNetworkType",EnumValue (SatUserHelper::NETWORK_TYPE_CSMA));
-  Config::SetDefault ("ns3::SatUserHelper::SubscriberNetworkType",EnumValue (SatUserHelper::NETWORK_TYPE_CSMA));
+  Config::SetDefault ("ns3::SatUserHelper::BackboneNetworkType", EnumValue (SatUserHelper::NETWORK_TYPE_CSMA));
+  Config::SetDefault ("ns3::SatUserHelper::SubscriberNetworkType", EnumValue (SatUserHelper::NETWORK_TYPE_CSMA));
 
   Time startTime = Seconds (1.2);
   simulationHelper->SetOutputTag (scenario);

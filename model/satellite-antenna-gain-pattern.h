@@ -23,8 +23,9 @@
 
 #include <vector>
 #include <fstream>
-#include "ns3/random-variable-stream.h"
-#include "ns3/object.h"
+#include <ns3/object.h>
+#include <ns3/traced-callback.h>
+#include <ns3/random-variable-stream.h>
 #include "geo-coordinate.h"
 
 namespace ns3 {
@@ -48,7 +49,6 @@ namespace ns3 {
 class SatAntennaGainPattern : public Object
 {
 public:
-
   /**
    * \brief Get the type ID
    * \return the object TypeId
@@ -68,7 +68,7 @@ public:
 
   /**
    * Constructor with initialization parameters.
-   * \param filePathName 
+   * \param filePathName
    */
   SatAntennaGainPattern (std::string filePathName);
   ~SatAntennaGainPattern ()
@@ -86,6 +86,13 @@ public:
    * \return A valid random GeoCoordinate
    */
   GeoCoordinate GetValidRandomPosition () const;
+
+  /**
+   * \brief Check if a given position is under this spot-beam coverage.
+   * \param coord The position to check for validity
+   * \return Whether or not the given position is valid for this spot-beam
+   */
+  bool IsValidPosition (GeoCoordinate coord, TracedCallback<double> cb) const;
 
 private:
   /**

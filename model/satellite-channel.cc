@@ -49,23 +49,23 @@ NS_OBJECT_ENSURE_REGISTERED (SatChannel);
 
 SatChannel::SatChannel ()
   : m_fwdMode (SatChannel::ALL_BEAMS),
-    m_phyRxContainer (),
-    m_channelType (SatEnums::UNKNOWN_CH),
-    m_carrierFreqConverter (),
-    m_freqId (),
-    m_propagationDelay (),
-    m_freeSpaceLoss (),
-    m_rxPowerCalculationMode (SatEnums::RX_PWR_CALCULATION),
-    /*
-     * Currently, the Rx power calculation mode is fully independent of other
-     * possible satellite network configurations, e.g. fading, antenna patterns.
-     * TODO optimization: Tie Rx power calculation mode to other PHY/channel level
-     * configurations. If using input Rx trace, there is no need to enable e.g. Markov
-     * fading, nor antenna patterns.
-     */
-    m_enableRxPowerOutputTrace (false),
-    m_enableFadingOutputTrace (false),
-    m_enableExternalFadingInputTrace (false)
+  m_phyRxContainer (),
+  m_channelType (SatEnums::UNKNOWN_CH),
+  m_carrierFreqConverter (),
+  m_freqId (),
+  m_propagationDelay (),
+  m_freeSpaceLoss (),
+  m_rxPowerCalculationMode (SatEnums::RX_PWR_CALCULATION),
+  /*
+   * Currently, the Rx power calculation mode is fully independent of other
+   * possible satellite network configurations, e.g. fading, antenna patterns.
+   * TODO optimization: Tie Rx power calculation mode to other PHY/channel level
+   * configurations. If using input Rx trace, there is no need to enable e.g. Markov
+   * fading, nor antenna patterns.
+   */
+  m_enableRxPowerOutputTrace (false),
+  m_enableFadingOutputTrace (false),
+  m_enableExternalFadingInputTrace (false)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -318,7 +318,7 @@ SatChannel::ScheduleRx (Ptr<SatSignalParameters> txParams, Ptr<SatPhyRx> receive
       NS_FATAL_ERROR ("SatChannel::ScheduleRx - propagation delay model not set!");
     }
 
-  NS_LOG_INFO ("Time: " << Simulator::Now ().GetSeconds () << ": setting propagation delay: " << delay);
+  NS_LOG_INFO ("Setting propagation delay: " << delay);
 
   Ptr<NetDevice> netDev = receiver->GetDevice ();
   uint32_t dstNodeId =  netDev->GetNode ()->GetId ();
@@ -370,10 +370,10 @@ SatChannel::DoRxPowerOutputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyR
   // Get the bandwidth of the currently used carrier
   double carrierBandwidthHz = m_carrierBandwidthConverter (m_channelType, rxParams->m_carrierId, SatEnums::EFFECTIVE_BANDWIDTH );
 
-  NS_LOG_INFO ("SatChannel::DoRxPowerOutputTrace - carrier bw: " << carrierBandwidthHz <<
-                ", rxPower: " << SatUtils::LinearToDb (rxParams->m_rxPower_W) <<
-                ", carrierId: " << rxParams->m_carrierId <<
-                ", channelType: " << SatEnums::GetChannelTypeName (m_channelType));
+  NS_LOG_INFO ("Carrier bw: " << carrierBandwidthHz <<
+               ", rxPower: " << SatUtils::LinearToDb (rxParams->m_rxPower_W) <<
+               ", carrierId: " << rxParams->m_carrierId <<
+               ", channelType: " << SatEnums::GetChannelTypeName (m_channelType));
 
   std::vector<double> tempVector;
   tempVector.push_back (Now ().GetSeconds ());
@@ -435,10 +435,10 @@ SatChannel::DoRxPowerInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx
       }
     }
 
-  NS_LOG_INFO ("SatChannel::DoRxPowerOutputTrace - carrier bw: " << carrierBandwidthHz <<
-                ", rxPower: " << SatUtils::LinearToDb (rxParams->m_rxPower_W) <<
-                ", carrierId: " << rxParams->m_carrierId <<
-                ", channelType: " << SatEnums::GetChannelTypeName (m_channelType));
+  NS_LOG_INFO ("Carrier bw: " << carrierBandwidthHz <<
+               ", rxPower: " << SatUtils::LinearToDb (rxParams->m_rxPower_W) <<
+               ", carrierId: " << rxParams->m_carrierId <<
+               ", channelType: " << SatEnums::GetChannelTypeName (m_channelType));
 
   // get external fading input trace
   if (m_enableExternalFadingInputTrace)
@@ -677,6 +677,14 @@ SatChannel::SetFreeSpaceLoss (Ptr<SatFreeSpaceLoss> loss)
   NS_LOG_FUNCTION (this << loss);
   NS_ASSERT (m_freeSpaceLoss == 0);
   m_freeSpaceLoss = loss;
+}
+
+Ptr<SatFreeSpaceLoss>
+SatChannel::GetFreeSpaceLoss () const
+{
+  NS_LOG_FUNCTION (this);
+  NS_ASSERT (m_freeSpaceLoss != 0);
+  return m_freeSpaceLoss;
 }
 
 std::size_t

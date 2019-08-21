@@ -1,4 +1,4 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2014 Magister Solutions
  *
@@ -265,7 +265,6 @@ protected:
   void DoPoll ();
 
 private:
-
   /// Maintains a list of UT LLC and its identifier.
   std::list<std::pair<Ptr<SatLlc>, uint32_t> > m_llc;
 

@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2014 Magister Solutions Ltd
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.com>
  */
 
 #include <algorithm>
@@ -33,7 +35,9 @@
 #include <ns3/satellite-frame-user-load-probe.h>
 #include <ns3/address.h>
 #include <ns3/mac48-address.h>
+#include <ns3/ipv4-address.h>
 #include <ns3/satellite-superframe-sequence.h>
+#include <ns3/satellite-default-superframe-allocator.h>
 #include <ns3/satellite-superframe-allocator.h>
 #include <ns3/satellite-dama-entry.h>
 #include <ns3/satellite-control-message.h>
@@ -48,8 +52,8 @@ namespace ns3 {
 // UtInfo class declarations for SatBeamScheduler
 SatBeamScheduler::SatUtInfo::SatUtInfo ( Ptr<SatDamaEntry> damaEntry, Ptr<SatCnoEstimator> cnoEstimator, Time controlSlotOffset, bool controlSlotsEnabled )
   : m_damaEntry (damaEntry),
-    m_cnoEstimator (cnoEstimator),
-    m_controlSlotsEnabled (controlSlotsEnabled)
+  m_cnoEstimator (cnoEstimator),
+  m_controlSlotsEnabled (controlSlotsEnabled)
 {
   NS_LOG_FUNCTION (this);
 
@@ -141,6 +145,14 @@ SatBeamScheduler::SatUtInfo::AddCrMsg (Ptr<SatCrMessage> crMsg)
   m_crContainer.push_back (crMsg);
 }
 
+void
+SatBeamScheduler::SatUtInfo::ClearCrMsgs ()
+{
+  NS_LOG_FUNCTION (this);
+
+  m_crContainer.clear ();
+}
+
 bool
 SatBeamScheduler::SatUtInfo::IsControlSlotGenerationTime () const
 {
@@ -163,6 +175,7 @@ SatBeamScheduler::SatUtInfo::SetControlSlotGenerationTime (Time offset)
 
   m_controlSlotGenerationTime =  Simulator::Now () + offset;
 }
+
 
 // SatBeamScheduler
 
@@ -206,6 +219,17 @@ SatBeamScheduler::GetTypeId (void)
                     TimeValue (MilliSeconds (1000)),
                     MakeTimeAccessor (&SatBeamScheduler::m_controlSlotInterval),
                     MakeTimeChecker ())
+    .AddAttribute ( "HandoverStrategy",
+                    "Strategy used when performing handover to transfer capacity requests and C/No informations",
+                    EnumValue (SatBeamScheduler::BASIC),
+                    MakeEnumAccessor (&SatBeamScheduler::m_handoverStrategy),
+                    MakeEnumChecker (SatBeamScheduler::BASIC, "Basic",
+                                     SatBeamScheduler::CHECK_GATEWAY, "CheckGateway"))
+    .AddAttribute ("SuperFrameAllocatorType",
+                   "Type of SuperFrameAllocator",
+                   EnumValue (SatEnums::DEFAULT_SUPERFRAME_ALLOCATOR),
+                   MakeEnumAccessor (&SatBeamScheduler::m_superframeAllocatorType),
+                   MakeEnumChecker (SatEnums::DEFAULT_SUPERFRAME_ALLOCATOR, "Default"))
     .AddTraceSource ("BacklogRequestsTrace",
                      "Trace for backlog requests done to beam scheduler.",
                      MakeTraceSourceAccessor (&SatBeamScheduler::m_backlogRequestsTrace),
@@ -240,12 +264,13 @@ SatBeamScheduler::GetTypeId (void)
 
 SatBeamScheduler::SatBeamScheduler ()
   : m_beamId (0),
-    m_superframeSeq (0),
-    m_superFrameCounter (0),
-    m_txCallback (0),
-    m_cnoEstimatorMode (SatCnoEstimator::LAST),
-    m_maxBbFrameSize (0),
-    m_controlSlotsEnabled (false)
+  m_superframeSeq (0),
+  m_superFrameCounter (0),
+  m_txCallback (0),
+  m_cnoEstimatorMode (SatCnoEstimator::LAST),
+  m_maxBbFrameSize (0),
+  m_controlSlotsEnabled (false),
+  m_superframeAllocatorType (SatEnums::DEFAULT_SUPERFRAME_ALLOCATOR)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -267,15 +292,27 @@ bool
 SatBeamScheduler::Send (Ptr<SatControlMessage> msg)
 {
   NS_LOG_FUNCTION (this << msg);
-  NS_LOG_INFO ("p=" << msg );
 
   m_txCallback (msg, Mac48Address::GetBroadcast ());
+  return true;
+}
 
+bool
+SatBeamScheduler::SendTo (Ptr<SatControlMessage> msg, Address utId)
+{
+  NS_LOG_FUNCTION (this << msg << utId);
+
+  if (!HasUt (utId))
+    {
+      return false;
+    }
+
+  m_txCallback (msg, utId);
   return true;
 }
 
 void
-SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCallback cb, Ptr<SatSuperframeSeq> seq, uint32_t maxFrameSizeInBytes)
+SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCallback cb, Ptr<SatSuperframeSeq> seq, uint32_t maxFrameSizeInBytes, Address gwAddress)
 {
   NS_LOG_FUNCTION (this << beamId << &cb);
 
@@ -283,6 +320,7 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCall
   m_txCallback = cb;
   m_superframeSeq = seq;
   m_maxBbFrameSize = maxFrameSizeInBytes;
+  m_gwAddress = gwAddress;
 
   /**
    * Calculating to start time for super frame counts to start the scheduling from.
@@ -313,9 +351,23 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCall
     }
 
   m_raChRandomIndex->SetAttribute ("Max", DoubleValue (maxIndex));
-  m_superframeAllocator = CreateObject<SatSuperframeAllocator> (m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE));
 
-  NS_LOG_INFO ("Initialize SatBeamScheduler at " << Simulator::Now ().GetSeconds ());
+  // Create the superframeAllocator object
+  switch (m_superframeAllocatorType)
+    {
+    case SatEnums::DEFAULT_SUPERFRAME_ALLOCATOR:
+      {
+        Ptr<SatDefaultSuperframeAllocator> superframeAllocator = CreateObject<SatDefaultSuperframeAllocator> (m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE));
+        m_superframeAllocator = DynamicCast<SatSuperframeAllocator> (superframeAllocator);
+        break;
+      }
+    default:
+      {
+        NS_FATAL_ERROR ("Invalid SuperframeAllocatorType");
+      }
+    }
+
+  NS_LOG_INFO ("Initialized SatBeamScheduler");
 
   Time delay;
   Time txTime = Singleton<SatRtnLinkTime>::Get ()->GetNextSuperFrameStartTime (SatConstVariables::SUPERFRAME_SEQUENCE);
@@ -339,9 +391,6 @@ SatBeamScheduler::AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf)
 
   Ptr<SatDamaEntry> damaEntry = Create<SatDamaEntry> (llsConf);
 
-  // this method call acts as CAC check, if allocation fails fatal error is occurred.
-  m_superframeAllocator->ReserveMinimumRate (damaEntry->GetMinRateBasedBytes (m_superframeAllocator->GetSuperframeDuration ()), m_controlSlotsEnabled);
-
   Time firstCtrlSlotInterval = m_controlSlotInterval;
 
   if (m_superframeSeq->GetDuration (SatConstVariables::SUPERFRAME_SEQUENCE) < m_controlSlotInterval  )
@@ -354,12 +403,29 @@ SatBeamScheduler::AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf)
 
   Ptr<SatCnoEstimator> cnoEstimator = CreateCnoEstimator ();
   Ptr<SatUtInfo> utInfo = Create<SatUtInfo> (damaEntry, cnoEstimator, firstCtrlSlotInterval, m_controlSlotsEnabled);
+  AddUtInfo (utId, utInfo);
+
+  m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE)->GetRaChannelCount ();
+
+  // return random RA channel index for the UT.
+  return m_raChRandomIndex->GetInteger ();
+}
+
+void
+SatBeamScheduler::AddUtInfo (Address utId, Ptr<SatUtInfo> utInfo)
+{
+  NS_LOG_FUNCTION (this << utId << utInfo);
+
+  Ptr<SatDamaEntry> damaEntry = utInfo->GetDamaEntry ();
+
+  // this method call acts as CAC check, if allocation fails fatal error is occurred.
+  m_superframeAllocator->ReserveMinimumRate (damaEntry->GetMinRateBasedBytes (m_superframeAllocator->GetSuperframeDuration ()), m_controlSlotsEnabled);
 
   std::pair<UtInfoMap_t::iterator, bool > result = m_utInfos.insert (std::make_pair (utId, utInfo));
 
   if (result.second)
     {
-      SatFrameAllocator::SatFrameAllocReqItemContainer_t reqContainer (damaEntry->GetRcCount (), SatFrameAllocator::SatFrameAllocReqItem () );
+      SatFrameAllocator::SatFrameAllocReqItemContainer_t reqContainer (damaEntry->GetRcCount (), SatFrameAllocator::SatFrameAllocReqItem ());
       SatFrameAllocator::SatFrameAllocReq allocReq (reqContainer);
       allocReq.m_cno = NAN;
       allocReq.m_address = utId;
@@ -370,11 +436,38 @@ SatBeamScheduler::AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf)
     {
       NS_FATAL_ERROR ("UT (Address: " << utId << ") already added to Beam scheduler.");
     }
+}
 
-  m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE)->GetRaChannelCount ();
+void
+SatBeamScheduler::RemoveUtInfo (UtInfoMap_t::iterator iterator)
+{
+  Address utId = iterator->first;
+  Ptr<SatUtInfo> utInfo = iterator->second;
+  m_utInfos.erase (iterator);
 
-  // return random RA channel index for the UT.
-  return m_raChRandomIndex->GetInteger ();
+  UtReqInfoContainer_t::iterator it = m_utRequestInfos.begin ();
+  for (; it != m_utRequestInfos.end (); ++it)
+    {
+      if (it->first == utId)
+        {
+          m_utRequestInfos.erase (it);
+          break;
+        }
+    }
+
+  Ptr<SatDamaEntry> damaEntry = utInfo->GetDamaEntry ();
+  m_superframeAllocator->ReleaseMinimumRate (
+    damaEntry->GetMinRateBasedBytes (m_superframeAllocator->GetSuperframeDuration ()),
+    m_controlSlotsEnabled);
+}
+
+bool
+SatBeamScheduler::HasUt (Address utId)
+{
+  NS_LOG_FUNCTION (this << utId);
+
+  UtInfoMap_t::iterator result = m_utInfos.find (utId);
+  return result != m_utInfos.end ();
 }
 
 void
@@ -382,10 +475,7 @@ SatBeamScheduler::UpdateUtCno (Address utId, double cno)
 {
   NS_LOG_FUNCTION (this << utId << cno);
 
-  // check that UT is added to this scheduler.
-  UtInfoMap_t::iterator result = m_utInfos.find (utId);
-  NS_ASSERT (result != m_utInfos.end ());
-
+  NS_ASSERT (HasUt (utId));
   m_utInfos[utId]->AddCnoSample (cno);
 }
 
@@ -394,12 +484,7 @@ SatBeamScheduler::UtCrReceived (Address utId, Ptr<SatCrMessage> crMsg)
 {
   NS_LOG_FUNCTION (this << utId << crMsg);
 
-  // check that UT is added to this scheduler.
-  UtInfoMap_t::iterator result = m_utInfos.find (utId);
-  NS_ASSERT (result != m_utInfos.end ());
-
-  NS_LOG_INFO ("SatBeamScheduler::UtCrReceived - UT: " << utId << " @ " << Now ().GetSeconds ());
-
+  NS_ASSERT (HasUt (utId));
   m_utInfos[utId]->AddCrMsg (crMsg);
 }
 
@@ -444,7 +529,7 @@ SatBeamScheduler::Schedule ()
 
       // generate time slots
       Ptr<SatTbtpMessage> firstTbtp = CreateObject<SatTbtpMessage> (SatConstVariables::SUPERFRAME_SEQUENCE);
-      firstTbtp->SetSuperframeCounter (m_superFrameCounter++);
+      firstTbtp->SetSuperframeCounter (m_superFrameCounter);
 
       std::vector<Ptr<SatTbtpMessage> > tbtps;
       tbtps.push_back (firstTbtp);
@@ -471,7 +556,7 @@ SatBeamScheduler::Schedule ()
           Send (*it);
         }
 
-      NS_LOG_INFO ("TBTP sent at: " << Simulator::Now ().GetSeconds ());
+      NS_LOG_INFO ("TBTP sent");
     }
 
   uint32_t usableCapacity = std::min (offeredKbpsSum, requestedKbpsSum);
@@ -480,6 +565,7 @@ SatBeamScheduler::Schedule ()
   m_usableCapacityTrace (usableCapacity);
   m_unmetCapacityTrace (unmetCapacity);
   m_exceedingCapacityTrace (exceedingCapacity);
+  ++m_superFrameCounter;
 
   // re-schedule next TBTP sending (call of this function)
   Simulator::Schedule ( m_superframeSeq->GetDuration (SatConstVariables::SUPERFRAME_SEQUENCE), &SatBeamScheduler::Schedule, this);
@@ -544,7 +630,6 @@ SatBeamScheduler::UpdateDamaEntriesWithReqs ()
   for (UtReqInfoContainer_t::iterator it = m_utRequestInfos.begin (); it != m_utRequestInfos.end (); it++)
     {
       // estimation of the C/N0 is done when scheduling UT
-
       Ptr<SatDamaEntry> damaEntry = m_utInfos.at (it->first)->GetDamaEntry ();
 
       // process received CRs
@@ -657,8 +742,8 @@ SatBeamScheduler::UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoCon
               offeredCraRbdcKbps += (uint32_t)((allocInfo->second.first[i] * (double)(SatConstVariables::BITS_PER_BYTE) / superFrameDurationInSeconds / (double)(SatConstVariables::BITS_IN_KBIT)) + 0.5);
 
               NS_LOG_INFO ("UT: " << allocInfo->first << " RC index: " << i <<
-                            " rate based bytes: " << rateBasedBytes <<
-                            " allocated bytes: " << allocInfo->second.first[i]);
+                           " rate based bytes: " << rateBasedBytes <<
+                           " allocated bytes: " << allocInfo->second.first[i]);
 
               // The scheduler has allocated more than the rate based bytes (CRA+RBDC)
               if ( rateBasedBytes < allocInfo->second.first[i] )
@@ -666,7 +751,7 @@ SatBeamScheduler::UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoCon
                   // Requested VBDC
                   uint32_t vbdcBytes = damaEntry->GetVbdcInBytes (i);
 
-                  NS_LOG_INFO ("UT: " << allocInfo->first << " RC index: " << i <<" requested VBDC bytes: " << vbdcBytes);
+                  NS_LOG_INFO ("UT: " << allocInfo->first << " RC index: " << i << " requested VBDC bytes: " << vbdcBytes);
 
                   // Allocated VBDC for this RC index
                   uint32_t allocVbdcBytes = allocInfo->second.first[i] - rateBasedBytes;
@@ -677,8 +762,8 @@ SatBeamScheduler::UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoCon
                       uint32_t remainingVbdcBytes = vbdcBytes - allocVbdcBytes;
 
                       NS_LOG_INFO ("UT: " << allocInfo->first << " RC index: " << i <<
-                                    " VBDC allocation: " << allocVbdcBytes <<
-                                    " remaining VBDC bytes: " << remainingVbdcBytes);
+                                   " VBDC allocation: " << allocVbdcBytes <<
+                                   " remaining VBDC bytes: " << remainingVbdcBytes);
 
                       damaEntry->SetVbdcInBytes (i, remainingVbdcBytes);
                     }
@@ -686,8 +771,8 @@ SatBeamScheduler::UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoCon
                   else
                     {
                       NS_LOG_INFO ("UT: " << allocInfo->first << " RC index: " << i <<
-                                    " VBDC allocation: " << allocVbdcBytes <<
-                                    " remaining VBDC bytes: " << 0);
+                                   " VBDC allocation: " << allocVbdcBytes <<
+                                   " remaining VBDC bytes: " << 0);
 
                       damaEntry->SetVbdcInBytes (i, 0);
                     }
@@ -699,6 +784,57 @@ SatBeamScheduler::UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoCon
       damaEntry->DecrementVolumeBacklogPersistence ();
     }
   return offeredCraRbdcKbps;
+}
+
+void
+SatBeamScheduler::TransferUtToBeam (Address utId, Ptr<SatBeamScheduler> destination)
+{
+  NS_LOG_FUNCTION (this << utId << destination->m_beamId);
+
+  UtInfoMap_t::iterator utIterator = m_utInfos.find (utId);
+  if (utIterator == m_utInfos.end ())
+    {
+      // Check if handover already happened
+      NS_ASSERT_MSG (destination->HasUt (utId), "UT is not part of the source beam");
+    }
+  else
+    {
+      // Moving UT infos between beams
+      Ptr<SatUtInfo> utInfo = utIterator->second;
+      destination->AddUtInfo (utId, utInfo);
+      RemoveUtInfo (utIterator);
+
+      // Handling capacity requests left and C/No estimations
+      switch (m_handoverStrategy)
+        {
+        case BASIC:
+          {
+            utInfo->ClearCrMsgs ();
+            break;
+          }
+        case CHECK_GATEWAY:
+          {
+            if (m_gwAddress != destination->m_gwAddress)
+              {
+                utInfo->ClearCrMsgs ();
+              }
+            break;
+          }
+        default:
+          NS_FATAL_ERROR ("Unknown handover strategy");
+        }
+    }
+}
+
+Ptr<SatTimuMessage>
+SatBeamScheduler::CreateTimu () const
+{
+  NS_LOG_FUNCTION (this);
+
+  Ptr<SatTimuMessage> timuMsg = CreateObject<SatTimuMessage> ();
+  timuMsg->SetAllocatedBeamId (m_beamId);
+  timuMsg->SetGwAddress (m_gwAddress);
+  return timuMsg;
 }
 
 } // namespace ns3

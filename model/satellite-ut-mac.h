@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2013 Magister Solutions Ltd
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
 #ifndef SATELLITE_UT_MAC_H
@@ -129,6 +131,17 @@ public:
   void SetAssignedDaResourcesCallback (SatUtMac::AssignedDaResourcesCallback cb);
 
   /**
+   * Callback to check if TX is operational
+   */
+  typedef Callback<bool> TxCheckCallback;
+
+  /**
+   * \brief Set the TX check callback
+   * \param cb callback to invoke when checking if TX is enabled
+   */
+  void SetTxCheckCallback (SatUtMac::TxCheckCallback cb);
+
+  /**
    * Get Tx time for the next possible superframe.
    * \param superFrameSeqId Superframe sequence id
    * \return Time Time to transmit
@@ -193,8 +206,57 @@ public:
    */
   typedef void (* TbtpResourcesTraceCallback)(uint32_t size);
 
-protected:
+  /**
+   * \brief Callback to reconfigure physical layer during handover.
+   * \param uint32_t new beam Id
+   */
+  typedef Callback<void, uint32_t> HandoverCallback;
 
+  /**
+   * \brief Method to set handover callback.
+   * \param cb callback to invoke whenever a TIM-U is received prompting us to switch beams
+   */
+  void SetHandoverCallback (SatUtMac::HandoverCallback cb);
+
+  /**
+   * \brief Callback to update gateway address after handover
+   * \param Mac48Address the address of the new gateway
+   */
+  typedef Callback<void, Mac48Address> GatewayUpdateCallback;
+
+  /**
+   * \brief Method to set the gateway address update callback
+   * \param cb callback to invoke to update gateway address
+   */
+  void SetGatewayUpdateCallback (SatUtMac::GatewayUpdateCallback cb);
+
+  /**
+   * \brief Callback to update routing and ARP tables after handover
+   * \param Address the address of this device
+   * \param Address the address of the new gateway
+   */
+  typedef Callback<void, Address, Address> RoutingUpdateCallback;
+
+  /**
+   * \brief Method to set the routing update callback
+   * \param cb callback to invoke to update routing
+   */
+  void SetRoutingUpdateCallback (SatUtMac::RoutingUpdateCallback cb);
+
+  /**
+   * \brief Callback to check whether the current beam is still the best one
+   * to use for sending data; and sending handover recommendation if not
+   * \param uint32_t the current beam ID
+   */
+  typedef Callback<bool, uint32_t> BeamCheckerCallback;
+
+  /**
+   * \brief Method to set the beam checker callback
+   * \param cb callback to invoke to check beams and recommend handover
+   */
+  void SetBeamCheckerCallback (SatUtMac::BeamCheckerCallback cb);
+
+protected:
   /**
    * Dispose of SatUtMac
    */
@@ -207,6 +269,8 @@ private:
    * \return Time Time to transmit
    */
   Time GetCurrentSuperFrameStartTime (uint8_t superFrameSeqId) const;
+
+  uint32_t GetCurrentSuperFrameId (uint8_t superFrameSeqId) const;
 
   /**
    * \brief Do random access evaluation for Tx opportunities
@@ -262,11 +326,11 @@ private:
    * \param allocationChannel
    * \return
    */
-  std::pair<bool,uint32_t> FindNextAvailableRandomAccessSlot (Time opportunityOffset,
-                                                              Ptr<SatFrameConf> frameConf,
-                                                              uint32_t timeSlotCount,
-                                                              uint32_t superFrameId,
-                                                              uint32_t allocationChannel);
+  std::pair<bool, uint32_t> FindNextAvailableRandomAccessSlot (Time opportunityOffset,
+                                                               Ptr<SatFrameConf> frameConf,
+                                                               uint32_t timeSlotCount,
+                                                               uint32_t superFrameId,
+                                                               uint32_t allocationChannel);
 
   /**
    *
@@ -277,11 +341,11 @@ private:
    * \param allocationChannel
    * \return
    */
-  std::pair<bool,uint32_t> SearchFrameForAvailableSlot (Time superframeStartTime,
-                                                        Ptr<SatFrameConf> frameConf,
-                                                        uint32_t timeSlotCount,
-                                                        uint32_t superFrameId,
-                                                        uint32_t allocationChannel);
+  std::pair<bool, uint32_t> SearchFrameForAvailableSlot (Time superframeStartTime,
+                                                         Ptr<SatFrameConf> frameConf,
+                                                         uint32_t timeSlotCount,
+                                                         uint32_t superFrameId,
+                                                         uint32_t allocationChannel);
 
   /**
    *
@@ -346,6 +410,22 @@ private:
    * \return
    */
   SatPhy::PacketContainer_t FetchPackets (uint32_t payloadBytes, SatTimeSlotConf::SatTimeSlotType_t type, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy);
+
+  /**
+   * \brief Extract packets from the underlying queue and put them in the provided container
+   * \param packets Container for the packets to extract
+   * \param payloadBytes Tx opportunity payload
+   * \param type Time slot type
+   * \param rcIndex RC index
+   * \param policy Scheduler policy
+   * \param randomAccessChannel whether the packets are to be sent on RA or DA
+   */
+  void ExtractPacketsToSchedule (SatPhy::PacketContainer_t& packets,
+                                 uint32_t payloadBytes,
+                                 SatTimeSlotConf::SatTimeSlotType_t type,
+                                 uint8_t rcIndex,
+                                 SatUtScheduler::SatCompliancePolicy_t policy,
+                                 bool randomAccessChannel);
 
   /**
    *
@@ -438,6 +518,60 @@ private:
    * - false -> for control and user data
    */
   bool m_crdsaOnlyForControl;
+
+  class SatTimuInfo : public SimpleRefCount<SatTimuInfo>
+  {
+public:
+    SatTimuInfo (uint32_t beamId, Address address);
+
+    uint32_t GetBeamId () const;
+
+    Address GetGwAddress () const;
+
+private:
+    uint32_t m_beamId;
+    Address m_gwAddress;
+  };
+
+  Ptr<SatTimuInfo> m_timuInfo;
+
+  Mac48Address m_gwAddress;
+
+  typedef enum
+  {
+    NO_HANDOVER,
+    HANDOVER_RECOMMENDATION_SENT,
+    WAITING_FOR_TBTP,
+  } HandoverState_t;
+
+  HandoverState_t m_handoverState;
+
+  uint32_t m_firstTransmittableSuperframeId;
+
+  /**
+   * The physical layer handover callback
+   */
+  SatUtMac::HandoverCallback m_handoverCallback;
+
+  /**
+   * Gateway address update callback
+   */
+  SatUtMac::GatewayUpdateCallback m_gatewayUpdateCallback;
+
+  /**
+   * Callback to update routing and ARP tables after a beam handover
+   */
+  SatUtMac::RoutingUpdateCallback m_routingUpdateCallback;
+
+  /**
+   * Beam checker and handover recommendation sending callback
+   */
+  SatUtMac::BeamCheckerCallback m_beamCheckerCallback;
+
+  /**
+   * Tx checking callback
+   */
+  SatUtMac::TxCheckCallback m_txCheckCallback;
 };
 
 } // namespace ns3

@@ -131,7 +131,7 @@ private:
    * \param event Reference event which for interference is calculated.
    * \return Calculated power value at end of receiving
    */
-  double Calculate (Ptr<SatInterference::InterferenceChangeEvent> event );
+  std::vector< std::pair<double, double> > Calculate (Ptr<SatInterference::InterferenceChangeEvent> event );
 
   /**
    * Resets current interference.
@@ -180,7 +180,7 @@ private:
    *
    * Concrete subclasses of this base class must implement this method.
    */
-  virtual double DoCalculate (Ptr<SatInterference::InterferenceChangeEvent> event) = 0;
+  virtual std::vector< std::pair<double, double> > DoCalculate (Ptr<SatInterference::InterferenceChangeEvent> event) = 0;
 
   /**
    * Resets current interference.

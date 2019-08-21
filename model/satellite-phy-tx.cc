@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2014 Magister Solutions Ltd.
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.com>
  */
 
 #include <cmath>
@@ -44,10 +46,10 @@ NS_OBJECT_ENSURE_REGISTERED (SatPhyTx);
 
 SatPhyTx::SatPhyTx ()
   : m_maxAntennaGain (),
-    m_state (IDLE),
-    m_beamId (),
-    m_txMode (),
-    m_defaultFadingValue ()
+  m_state (RECONFIGURING),
+  m_beamId (),
+  m_txMode (),
+  m_defaultFadingValue ()
 {
   NS_LOG_FUNCTION (this);
 }
@@ -76,6 +78,9 @@ std::ostream& operator<< (std::ostream& os, SatPhyTx::State s)
       break;
     case SatPhyTx::TX:
       os << "TX";
+      break;
+    case SatPhyTx::RECONFIGURING:
+      os << "RECONFIGURING";
       break;
     default:
       os << "UNKNOWN";
@@ -195,6 +200,17 @@ SatPhyTx::SetChannel (Ptr<SatChannel> c)
   NS_ASSERT (m_channel == 0);
 
   m_channel = c;
+  ChangeState (IDLE);
+}
+
+void
+SatPhyTx::ClearChannel ()
+{
+  NS_LOG_FUNCTION (this);
+  NS_ASSERT (m_channel != 0);
+
+  m_channel = NULL;
+  ChangeState (RECONFIGURING);
 }
 
 Ptr<SatChannel>
@@ -218,7 +234,7 @@ void
 SatPhyTx::StartTx (Ptr<SatSignalParameters> txParams)
 {
   NS_LOG_FUNCTION (this << txParams);
-  NS_LOG_INFO (this << " state: " << m_state);
+  NS_LOG_INFO ("State: " << m_state);
 
   switch (m_state)
     {
@@ -252,6 +268,9 @@ SatPhyTx::StartTx (Ptr<SatSignalParameters> txParams)
       }
       break;
 
+    case RECONFIGURING:
+      break;
+
     default:
       NS_FATAL_ERROR ("unknown state");
       break;
@@ -277,6 +296,13 @@ SatPhyTx::SetBeamId (uint32_t beamId)
 {
   NS_LOG_FUNCTION (this << beamId);
   m_beamId = beamId;
+}
+
+bool
+SatPhyTx::CanTransmit (void) const
+{
+  NS_LOG_FUNCTION (this);
+  return m_state != RECONFIGURING;
 }
 
 } // namespace ns3

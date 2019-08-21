@@ -35,8 +35,8 @@ TypeId SatRayleighModel::GetTypeId (void)
 
 SatRayleighModel::SatRayleighModel ()
   : m_currentSet (),
-    m_currentState (),
-    m_rayleighConf ()
+  m_currentState (),
+  m_rayleighConf ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -45,8 +45,8 @@ SatRayleighModel::SatRayleighModel ()
 
 SatRayleighModel::SatRayleighModel (Ptr<SatRayleighConf> rayleighConf, uint32_t initialSet, uint32_t initialState)
   : m_currentSet (initialSet),
-    m_currentState (initialState),
-    m_rayleighConf (rayleighConf)
+  m_currentState (initialState),
+  m_rayleighConf (rayleighConf)
 {
   NS_LOG_FUNCTION (this);
 
@@ -98,7 +98,7 @@ SatRayleighModel::ConstructOscillators ()
     {
       uint32_t n = i + 1;
       /// 1. Rotation speed
-      /// 1a. Initiate \f[ \alpha_n = \frac{2\pi n - \pi + \theta}{4M},  n=1,2, \ldots,M\f], n is oscillatorNumber, M is m_nOscillators
+      /// 1a. Initiate \f[ \alpha_n = \frac{2\pi n - \pi + \theta}{4M},  n=1, 2, \ldots, M\f], n is oscillatorNumber, M is m_nOscillators
       double alpha = (2.0 * M_PI * n - M_PI + theta) / (4.0 * m_rayleighParameters[0][1]);
       /// 1b. Initiate rotation speed:
       double omega = 2.0 * m_rayleighParameters[0][0] * M_PI * std::cos (alpha);
@@ -117,7 +117,7 @@ SatRayleighModel::GetComplexGain ()
 
   double timeInSeconds = Now ().GetSeconds ();
 
-  std::complex<double> sumAmplitude = std::complex<double> (0,0);
+  std::complex<double> sumAmplitude = std::complex<double> (0, 0);
   for (uint32_t i = 0; i < m_oscillators.size (); i++)
     {
       sumAmplitude += m_oscillators[i]->GetComplexValueAt (timeInSeconds);
@@ -132,7 +132,7 @@ SatRayleighModel::GetChannelGainDb ()
 
   std::complex<double> complexGain = GetComplexGain ();
   double tempChannelGainDb = (10 * std::log10 ((std::pow (complexGain.real (), 2) + std::pow (complexGain.imag (), 2)) / 2));
-  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " " << tempChannelGainDb);
+  NS_LOG_INFO ("Computed channel gain: " << tempChannelGainDb);
   return tempChannelGainDb;
 }
 
@@ -144,7 +144,7 @@ SatRayleighModel::GetChannelGain ()
   std::complex<double> complexGain = GetComplexGain ();
 
   double tempChannelGain = ((std::pow (complexGain.real (), 2) + std::pow (complexGain.imag (), 2)) / 2);
-  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " " << tempChannelGain);
+  NS_LOG_INFO ("Computed channel gain: " << tempChannelGain);
   return tempChannelGain;
 }
 

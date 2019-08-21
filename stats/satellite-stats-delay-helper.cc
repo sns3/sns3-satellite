@@ -1,4 +1,4 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2014 Magister Solutions
  *
@@ -63,7 +63,7 @@ NS_OBJECT_ENSURE_REGISTERED (SatStatsDelayHelper);
 
 SatStatsDelayHelper::SatStatsDelayHelper (Ptr<const SatHelper> satHelper)
   : SatStatsHelper (satHelper),
-    m_averagingMode (false)
+  m_averagingMode (false)
 {
   NS_LOG_FUNCTION (this << satHelper);
 }
@@ -1235,7 +1235,7 @@ SatStatsRtnAppDelayHelper::SaveIpv4AddressAndIdentifier (Ptr<Node> utUserNode)
   if (ipv4 == 0)
     {
       NS_LOG_INFO (this << " Node " << utUserNode->GetId ()
-                         << " does not support IPv4 protocol");
+                        << " does not support IPv4 protocol");
     }
   else if (ipv4->GetNInterfaces () >= 2)
     {

@@ -112,7 +112,7 @@ SatFadingInputTraceContainer::AddNode (key_t key)
           NS_FATAL_ERROR ("SatFadingInputTraceContainer::AddNode failed");
         }
 
-      NS_LOG_INFO ("SatFadingInputTraceContainer::AddNode: Added node with MAC " << key.first << " channel type " << key.second);
+      NS_LOG_INFO ("Added node with MAC " << key.first << " channel type " << key.second);
 
       return result.first->second;
     }

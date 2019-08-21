@@ -33,20 +33,20 @@ NS_OBJECT_ENSURE_REGISTERED (SatChannelEstimationError);
 
 SatChannelEstimationError::SatChannelEstimationError ()
   : m_lastSampleIndex (0),
-    m_normalRandomVariable (),
-    m_sinrsDb (),
-    m_mueCesDb (),
-    m_stdCesDb ()
+  m_normalRandomVariable (),
+  m_sinrsDb (),
+  m_mueCesDb (),
+  m_stdCesDb ()
 {
   m_normalRandomVariable = CreateObject<NormalRandomVariable> ();
 }
 
 SatChannelEstimationError::SatChannelEstimationError (std::string filePathName)
   : m_lastSampleIndex (0),
-    m_normalRandomVariable (),
-    m_sinrsDb (),
-    m_mueCesDb (),
-    m_stdCesDb ()
+  m_normalRandomVariable (),
+  m_sinrsDb (),
+  m_mueCesDb (),
+  m_stdCesDb ()
 {
   m_normalRandomVariable = CreateObject<NormalRandomVariable> ();
   ReadFile (filePathName);

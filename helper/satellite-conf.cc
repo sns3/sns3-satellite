@@ -131,22 +131,22 @@ SatConf::GetInstanceTypeId (void) const
 
 SatConf::SatConf ()
   : m_beamCount (0),
-    m_fwdFeederLinkFreqHz (0.0),
-    m_fwdFeederLinkBandwidthHz (0.0),
-    m_fwdUserLinkFreqHz (0.0),
-    m_fwdUserLinkBandwidthHz (0.0),
-    m_rtnFeederLinkFreqHz (0.0),
-    m_rtnFeederLinkBandwidthHz (0.0),
-    m_rtnUserLinkFreqHz (0.0),
-    m_rtnUserLinkBandwidthHz (0.0),
-    m_fwdUserLinkChannelCount (0),
-    m_rtnUserLinkChannelCount (0),
-    m_fwdFeederLinkChannelCount (0),
-    m_rtnFeederLinkChannelCount (0),
-    m_SuperFrameConfForSeq0 (SatSuperframeConf::SUPER_FRAME_CONFIG_0),
-    m_fwdCarrierAllocatedBandwidthHz (0.0),
-    m_fwdCarrierRollOffFactor (0.0),
-    m_fwdCarrierSpacingFactor (0.0)
+  m_fwdFeederLinkFreqHz (0.0),
+  m_fwdFeederLinkBandwidthHz (0.0),
+  m_fwdUserLinkFreqHz (0.0),
+  m_fwdUserLinkBandwidthHz (0.0),
+  m_rtnFeederLinkFreqHz (0.0),
+  m_rtnFeederLinkBandwidthHz (0.0),
+  m_rtnUserLinkFreqHz (0.0),
+  m_rtnUserLinkBandwidthHz (0.0),
+  m_fwdUserLinkChannelCount (0),
+  m_rtnUserLinkChannelCount (0),
+  m_fwdFeederLinkChannelCount (0),
+  m_rtnFeederLinkChannelCount (0),
+  m_SuperFrameConfForSeq0 (SatSuperframeConf::SUPER_FRAME_CONFIG_0),
+  m_fwdCarrierAllocatedBandwidthHz (0.0),
+  m_fwdCarrierRollOffFactor (0.0),
+  m_fwdCarrierSpacingFactor (0.0)
 {
   NS_LOG_FUNCTION (this);
 

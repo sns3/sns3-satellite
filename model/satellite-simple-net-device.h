@@ -46,7 +46,6 @@ namespace ns3 {
 class SatSimpleNetDevice : public NetDevice
 {
 public:
-
   /**
    * \brief Get the type ID
    * \return the object TypeId
@@ -125,7 +124,6 @@ public:
   virtual bool SupportsSendFrom (void) const;
 
 protected:
-
   /**
    * Dispose of this class instance
    */

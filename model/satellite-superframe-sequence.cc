@@ -202,4 +202,4 @@ SatSuperframeSeq::GetCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierBa
   return m_superframe[currentSuperframe]->GetCarrierBandwidthHz ( carrierIdInSuperframe, bandwidthType );
 }
 
-}; // namespace ns3
+}  // namespace ns3

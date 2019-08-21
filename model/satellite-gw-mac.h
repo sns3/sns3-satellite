@@ -48,7 +48,6 @@ class SatFwdLinkScheduler;
 class SatGwMac : public SatMac
 {
 public:
-
   /**
    * \brief Get the type ID
    * \return the object TypeId
@@ -119,6 +118,20 @@ public:
    */
   void SetTxOpportunityCallback (SatGwMac::TxOpportunityCallback cb);
 
+  /**
+   * Callback to query/apply handover on the terrestrial network
+   * \param Address identification of the UT originating the request
+   * \param uint32_t source beam ID the UT is still in
+   * \param uint32_t destination beam ID the UT would like to go in
+   */
+  typedef Callback<void, Address, uint32_t, uint32_t> HandoverCallback;
+
+  /**
+   * Method to set handover callback
+   * \param cb callback to invoke whenever a handover recommendation is received
+   */
+  void SetHandoverCallback (SatGwMac::HandoverCallback cb);
+
 private:
   SatGwMac& operator = (const SatGwMac &);
   SatGwMac (const SatGwMac &);
@@ -170,6 +183,11 @@ private:
    * Attributes: payload in bytes
    */
   SatGwMac::TxOpportunityCallback m_txOpportunityCallback;
+
+  /**
+   * Callback to query/apply handover on the terrestrial network
+   */
+  SatGwMac::HandoverCallback m_handoverCallback;
 };
 
 } // namespace ns3

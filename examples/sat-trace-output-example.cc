@@ -63,35 +63,35 @@ main (int argc, char *argv[])
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::SIMPLE;
 
   Config::SetDefault ("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue (true));
-	std::string simulationName = "example-trace-output";
-	auto simulationHelper = CreateObject<SimulationHelper> (simulationName);
+  std::string simulationName = "example-trace-output";
+  auto simulationHelper = CreateObject<SimulationHelper> (simulationName);
 
 
-	/// Read command line parameters given by user
-	CommandLine cmd;
-	cmd.AddValue ("packetSize", "Size of constant packet (bytes)", packetSize);
-	cmd.AddValue ("interval", "Interval to sent packets in seconds, (e.g. (1s)", interval);
-	cmd.AddValue ("scenario", "Test scenario to use. (simple, larger or full", scenario);
-	simulationHelper->AddDefaultUiArguments (cmd);
-	cmd.Parse (argc, argv);
+  /// Read command line parameters given by user
+  CommandLine cmd;
+  cmd.AddValue ("packetSize", "Size of constant packet (bytes)", packetSize);
+  cmd.AddValue ("interval", "Interval to sent packets in seconds, (e.g. (1s)", interval);
+  cmd.AddValue ("scenario", "Test scenario to use. (simple, larger or full", scenario);
+  simulationHelper->AddDefaultUiArguments (cmd);
+  cmd.Parse (argc, argv);
 
   /// Enable Rx power calculation & Rx power density output trace
-  Config::SetDefault ("ns3::SatChannel::RxPowerCalculationMode",EnumValue (SatEnums::RX_PWR_CALCULATION));
-  Config::SetDefault ("ns3::SatChannel::EnableRxPowerOutputTrace",BooleanValue (true));
+  Config::SetDefault ("ns3::SatChannel::RxPowerCalculationMode", EnumValue (SatEnums::RX_PWR_CALCULATION));
+  Config::SetDefault ("ns3::SatChannel::EnableRxPowerOutputTrace", BooleanValue (true));
 
   /// Enable Markov fading calculation & fading output trace
-  Config::SetDefault ("ns3::SatBeamHelper::FadingModel",EnumValue (SatEnums::FADING_MARKOV));
-  Config::SetDefault ("ns3::SatChannel::EnableFadingOutputTrace",BooleanValue (true));
+  Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (SatEnums::FADING_MARKOV));
+  Config::SetDefault ("ns3::SatChannel::EnableFadingOutputTrace", BooleanValue (true));
 
   /// Enable per packet interference & interference density output trace
-  Config::SetDefault ("ns3::SatGwHelper::DaRtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
-  Config::SetDefault ("ns3::SatGeoHelper::DaRtnLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
-  Config::SetDefault ("ns3::SatGeoHelper::DaFwdLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
-  Config::SetDefault ("ns3::SatUtHelper::DaFwdLinkInterferenceModel",EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
-  Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace",BooleanValue (true));
+  Config::SetDefault ("ns3::SatGwHelper::DaRtnLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+  Config::SetDefault ("ns3::SatGeoHelper::DaRtnLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+  Config::SetDefault ("ns3::SatGeoHelper::DaFwdLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+  Config::SetDefault ("ns3::SatUtHelper::DaFwdLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+  Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace", BooleanValue (true));
 
   /// Enable composite SINR output trace
-  Config::SetDefault ("ns3::SatPhyRxCarrier::EnableCompositeSinrOutputTrace",BooleanValue (true));
+  Config::SetDefault ("ns3::SatPhyRxCarrier::EnableCompositeSinrOutputTrace", BooleanValue (true));
 
   /// Set simulation output details
   simulationHelper->SetOutputTag (scenario);
@@ -136,17 +136,17 @@ main (int argc, char *argv[])
 
   /// Create application on GW user
   simulationHelper->InstallTrafficModel (
-  		SimulationHelper::CBR,
-			SimulationHelper::UDP,
-			SimulationHelper::FWD_LINK,
-			Seconds (3.0), Seconds (5.1));
+    SimulationHelper::CBR,
+    SimulationHelper::UDP,
+    SimulationHelper::FWD_LINK,
+    Seconds (3.0), Seconds (5.1));
 
   /// Create application on UT user
   simulationHelper->InstallTrafficModel (
-    		SimulationHelper::CBR,
-  			SimulationHelper::UDP,
-  			SimulationHelper::RTN_LINK,
-  			Seconds (7.0), Seconds (9.1));
+    SimulationHelper::CBR,
+    SimulationHelper::UDP,
+    SimulationHelper::RTN_LINK,
+    Seconds (7.0), Seconds (9.1));
 
   NS_LOG_INFO ("--- Trace-output-example ---");
   NS_LOG_INFO ("  Scenario used: " << scenario);

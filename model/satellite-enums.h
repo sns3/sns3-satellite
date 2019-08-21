@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2013 Magister Solutions Ltd
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,7 +17,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
+
 #ifndef SATELLITE_ENUMS_H
 #define SATELLITE_ENUMS_H
 
@@ -617,7 +620,8 @@ public:
     RA_MODEL_OFF = 0,
     RA_MODEL_SLOTTED_ALOHA = 1,
     RA_MODEL_CRDSA = 2,
-    RA_MODEL_RCS2_SPECIFICATION = 3
+    RA_MODEL_RCS2_SPECIFICATION = 3,
+    RA_MODEL_MARSALA = 4,
   } RandomAccessModel_t;
 
   static inline std::string GetRandomAccessModelName (RandomAccessModel_t model)
@@ -724,6 +728,72 @@ public:
     NS_FATAL_ERROR ("SatEnums::GetPacketTypeName - Invalid packet type");
     return "";
   }
+
+  /**
+   * \enum RbcdCapacityRequestAlgorithm_t
+   * \brief The defined RBDC capacity request algorithms. These help determine
+   * which algorithm to use when calculating RBDC requests.
+   */
+  typedef enum
+  {
+    CR_RBDC_LEGACY = 0,
+  } RbdcCapacityRequestAlgorithm_t;
+
+  static inline std::string GetRbdcCapacityRequestAlgorithmName (RbdcCapacityRequestAlgorithm_t rbdcAlgorithm)
+  {
+    switch (rbdcAlgorithm)
+      {
+      case CR_RBDC_LEGACY:
+        {
+          return "CR_RBDC_LEGACY";
+        }
+      default:
+        {
+          NS_FATAL_ERROR ("SatEnums::GetRbdcCapacityRequestAlgorithmName - Invalid algorithm name");
+          break;
+        }
+      }
+    NS_FATAL_ERROR ("SatEnums::GetRbdcCapacityRequestAlgorithmName - Invalid algorithm name");
+    return "";
+  }
+
+  /**
+   * \enum VbcdCapacityRequestAlgorithm_t
+   * \brief The defined VBDC capacity request algorithms. These help determine
+   * which algorithm to use when calculating VBDC requests.
+   */
+  typedef enum
+  {
+    CR_VBDC_LEGACY = 0,
+  } VbdcCapacityRequestAlgorithm_t;
+
+  static inline std::string GetVbdcCapacityRequestAlgorithmName (VbdcCapacityRequestAlgorithm_t vbdcAlgorithm)
+  {
+    switch (vbdcAlgorithm)
+      {
+      case CR_VBDC_LEGACY:
+        {
+          return "CR_VBDC_LEGACY";
+        }
+      default:
+        {
+          NS_FATAL_ERROR ("SatEnums::GetVbdcCapacityRequestAlgorithmName - Invalid algorithm name");
+          break;
+        }
+      }
+    NS_FATAL_ERROR ("SatEnums::GetVbdcCapacityRequestAlgorithmName - Invalid algorithm name");
+    return "";
+  }
+
+
+  /**
+   * \enum SatSuperframeAllocatorType_t
+   * \brief SuperframeAllocator type to use
+   */
+  typedef enum
+  {
+    DEFAULT_SUPERFRAME_ALLOCATOR = 0,
+  } SuperframeAllocatorType_t;
 
 private:
   /**

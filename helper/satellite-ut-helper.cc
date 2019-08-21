@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2013 Magister Solutions Ltd
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,48 +17,53 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@viveris.toulouse.fr>
  */
 
-#include "ns3/config.h"
-#include "ns3/log.h"
-#include "ns3/names.h"
-#include "ns3/enum.h"
-#include "ns3/double.h"
-#include "ns3/pointer.h"
-#include "ns3/uinteger.h"
-#include "ns3/string.h"
-#include "ns3/callback.h"
-#include "ns3/config.h"
-#include "ns3/nstime.h"
-#include "../model/satellite-const-variables.h"
-#include "../model/satellite-utils.h"
-#include "../model/satellite-channel.h"
-#include "../model/satellite-mobility-observer.h"
-#include "../model/satellite-gw-llc.h"
-#include "../model/satellite-ut-llc.h"
-#include "../model/satellite-ut-mac.h"
-#include "../model/satellite-net-device.h"
-#include "../model/satellite-ut-phy.h"
-#include "../model/satellite-phy-tx.h"
-#include "../model/satellite-phy-rx.h"
-#include "../model/satellite-phy-rx-carrier-conf.h"
-#include "../model/satellite-base-encapsulator.h"
-#include "../model/satellite-generic-stream-encapsulator.h"
-#include "../model/satellite-generic-stream-encapsulator-arq.h"
-#include "../model/satellite-return-link-encapsulator.h"
-#include "../model/satellite-return-link-encapsulator-arq.h"
-#include "../model/satellite-net-device.h"
-#include "../model/satellite-node-info.h"
-#include "../model/satellite-enums.h"
-#include "../model/satellite-request-manager.h"
-#include "../model/satellite-queue.h"
-#include "../model/satellite-ut-scheduler.h"
-#include "../model/satellite-channel-estimation-error-container.h"
-#include "../model/satellite-packet-classifier.h"
-#include "satellite-ut-helper.h"
-#include "ns3/singleton.h"
-#include "ns3/satellite-id-mapper.h"
+#include <ns3/config.h>
+#include <ns3/log.h>
+#include <ns3/names.h>
+#include <ns3/enum.h>
+#include <ns3/double.h>
+#include <ns3/pointer.h>
+#include <ns3/uinteger.h>
+#include <ns3/string.h>
+#include <ns3/callback.h>
+#include <ns3/config.h>
+#include <ns3/nstime.h>
+#include <ns3/singleton.h>
+
+#include <ns3/satellite-const-variables.h>
+#include <ns3/satellite-utils.h>
+#include <ns3/satellite-channel.h>
+#include <ns3/satellite-mobility-observer.h>
+#include <ns3/satellite-gw-llc.h>
+#include <ns3/satellite-net-device.h>
+#include <ns3/satellite-ut-llc.h>
+#include <ns3/satellite-ut-mac.h>
+#include <ns3/satellite-ut-handover-module.h>
+#include <ns3/satellite-ut-phy.h>
+#include <ns3/satellite-phy-tx.h>
+#include <ns3/satellite-phy-rx.h>
+#include <ns3/satellite-phy-rx-carrier-conf.h>
+#include <ns3/satellite-base-encapsulator.h>
+#include <ns3/satellite-generic-stream-encapsulator.h>
+#include <ns3/satellite-generic-stream-encapsulator-arq.h>
+#include <ns3/satellite-return-link-encapsulator.h>
+#include <ns3/satellite-return-link-encapsulator-arq.h>
+#include <ns3/satellite-net-device.h>
+#include <ns3/satellite-node-info.h>
+#include <ns3/satellite-enums.h>
+#include <ns3/satellite-request-manager.h>
+#include <ns3/satellite-queue.h>
+#include <ns3/satellite-ut-scheduler.h>
+#include <ns3/satellite-channel-estimation-error-container.h>
+#include <ns3/satellite-packet-classifier.h>
+#include <ns3/satellite-id-mapper.h>
 #include <ns3/satellite-typedefs.h>
+
+#include "satellite-ut-helper.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatUtHelper");
 
@@ -77,7 +83,8 @@ SatUtHelper::GetTypeId (void)
                    MakeEnumAccessor (&SatUtHelper::m_daInterferenceModel),
                    MakeEnumChecker (SatPhyRxCarrierConf::IF_CONSTANT, "Constant",
                                     SatPhyRxCarrierConf::IF_TRACE, "Trace",
-                                    SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket"))
+                                    SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket",
+                                    SatPhyRxCarrierConf::IF_PER_FRAGMENT, "PerFragment"))
     .AddAttribute ("FwdLinkErrorModel",
                    "Forward link error model",
                    EnumValue (SatPhyRxCarrierConf::EM_AVI),
@@ -123,16 +130,16 @@ SatUtHelper::GetInstanceTypeId (void) const
 
 SatUtHelper::SatUtHelper ()
   : m_carrierBandwidthConverter (),
-    m_fwdLinkCarrierCount (),
-    m_superframeSeq (),
-    m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
-    m_errorModel (SatPhyRxCarrierConf::EM_AVI),
-    m_daConstantErrorRate (0.0),
-    m_linkResults (),
-    m_llsConf (),
-    m_enableChannelEstimationError (false),
-    m_crdsaOnlyForControl (false),
-    m_raSettings ()
+  m_fwdLinkCarrierCount (),
+  m_superframeSeq (),
+  m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+  m_errorModel (SatPhyRxCarrierConf::EM_AVI),
+  m_daConstantErrorRate (0.0),
+  m_linkResults (),
+  m_llsConf (),
+  m_enableChannelEstimationError (false),
+  m_crdsaOnlyForControl (false),
+  m_raSettings ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -148,27 +155,25 @@ SatUtHelper::SatUtHelper (SatTypedefs::CarrierBandwidthConverter_t carrierBandwi
                           SatMac::SendCtrlMsgCallback sendCb,
                           RandomAccessSettings_s randomAccessSettings)
   : m_carrierBandwidthConverter (carrierBandwidthConverter),
-    m_fwdLinkCarrierCount (fwdLinkCarrierCount),
-    m_superframeSeq (seq),
-    m_readCtrlCb (readCb),
-    m_reserveCtrlCb (reserveCb),
-    m_sendCtrlCb (sendCb),
-    m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
-    m_errorModel (SatPhyRxCarrierConf::EM_AVI),
-    m_daConstantErrorRate (0.0),
-    m_linkResults (),
-    m_llsConf (),
-    m_enableChannelEstimationError (false),
-    m_crdsaOnlyForControl (false),
-    m_raSettings (randomAccessSettings)
+  m_fwdLinkCarrierCount (fwdLinkCarrierCount),
+  m_superframeSeq (seq),
+  m_readCtrlCb (readCb),
+  m_reserveCtrlCb (reserveCb),
+  m_sendCtrlCb (sendCb),
+  m_daInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
+  m_errorModel (SatPhyRxCarrierConf::EM_AVI),
+  m_daConstantErrorRate (0.0),
+  m_linkResults (),
+  m_llsConf (),
+  m_enableChannelEstimationError (false),
+  m_crdsaOnlyForControl (false),
+  m_raSettings (randomAccessSettings)
 {
   NS_LOG_FUNCTION (this << fwdLinkCarrierCount << seq );
   m_deviceFactory.SetTypeId ("ns3::SatNetDevice");
   m_channelFactory.SetTypeId ("ns3::SatChannel");
 
   m_llsConf = CreateObject<SatLowerLayerServiceConf>  ();
-
-  //LogComponentEnable ("SatUtHelper", LOG_LEVEL_INFO);
 }
 
 void
@@ -209,7 +214,11 @@ SatUtHelper::SetPhyAttribute (std::string n1, const AttributeValue &v1)
 }
 
 NetDeviceContainer
-SatUtHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc)
+SatUtHelper::Install (NodeContainer c, uint32_t beamId,
+                      Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
+                      Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
+                      SatPhy::ChannelPairGetterCallback cbChannel,
+                      SatUtMac::RoutingUpdateCallback cbRouting)
 {
   NS_LOG_FUNCTION (this << beamId << fCh << rCh );
 
@@ -217,14 +226,18 @@ SatUtHelper::Install (NodeContainer c, uint32_t beamId, Ptr<SatChannel> fCh, Ptr
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
     {
-      devs.Add (Install (*i, beamId, fCh, rCh, gwNd, ncc));
+      devs.Add (Install (*i, beamId, fCh, rCh, gwNd, ncc, cbChannel, cbRouting));
     }
 
   return devs;
 }
 
 Ptr<NetDevice>
-SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc)
+SatUtHelper::Install (Ptr<Node> n, uint32_t beamId,
+                      Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
+                      Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
+                      SatPhy::ChannelPairGetterCallback cbChannel,
+                      SatUtMac::RoutingUpdateCallback cbRouting)
 {
   NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
 
@@ -265,6 +278,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   parameters.m_daConstantErrorRate = m_daConstantErrorRate;
   parameters.m_daIfModel = m_daInterferenceModel;
   parameters.m_raIfModel = m_raSettings.m_raInterferenceModel;
+  parameters.m_raIfEliminateModel = m_raSettings.m_raInterferenceEliminationModel;
   parameters.m_bwConverter = m_carrierBandwidthConverter;
   parameters.m_carrierCount = m_fwdLinkCarrierCount;
   parameters.m_cec = cec;
@@ -275,6 +289,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
                                               m_linkResults,
                                               parameters,
                                               m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE));
+  phy->SetChannelPairGetterCallback (cbChannel);
 
   // Set fading
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());
@@ -298,6 +313,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   SatPhy::ReceiveCallback recCb = MakeCallback (&SatUtMac::Receive, mac);
 
   phy->SetAttribute ("ReceiveCb", CallbackValue (recCb));
+  mac->SetTxCheckCallback (MakeCallback (&SatUtPhy::IsTxPossible, phy));
 
   // Create Logical Link Control (LLC) layer
   Ptr<SatUtLlc> llc = CreateObject<SatUtLlc> ();
@@ -338,7 +354,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
 
   Singleton<SatIdMapper>::Get ()->AttachMacToTraceId (dev->GetAddress ());
   Singleton<SatIdMapper>::Get ()->AttachMacToUtId (dev->GetAddress ());
-  Singleton<SatIdMapper>::Get ()->AttachMacToBeamId (dev->GetAddress (),beamId);
+  Singleton<SatIdMapper>::Get ()->AttachMacToBeamId (dev->GetAddress (), beamId);
 
   // Create encapsulator and add it to UT's LLC
   Mac48Address gwAddr = Mac48Address::ConvertFrom (gwNd->GetAddress ());
@@ -367,11 +383,15 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   llc->SetMacQueueEventCallback (macCb);
 
   // set serving GW MAC address to RM
-  rm->SetGwAddress (gwAddr);
-  llc->SetGwAddress (gwAddr);
+  mac->SetRoutingUpdateCallback (cbRouting);
+  mac->SetGatewayUpdateCallback (MakeCallback (&SatUtLlc::SetGwAddress, llc));
+  mac->SetGwAddress (gwAddr);
 
   // Attach the transmit callback to PHY
   mac->SetTransmitCallback (MakeCallback (&SatPhy::SendPdu, phy));
+
+  // Attach the PHY handover callback to SatMac
+  mac->SetHandoverCallback (MakeCallback (&SatUtPhy::PerformHandover, phy));
 
   // Attach the LLC receive callback to SatMac
   mac->SetReceiveCallback (MakeCallback (&SatLlc::Receive, llc));
@@ -380,10 +400,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
   llc->SetReceiveCallback (MakeCallback (&SatNetDevice::Receive, dev));
 
   // Add UT to NCC
-  uint32_t raChannel = ncc->AddUt (dev->GetAddress (), m_llsConf, beamId);
-
-  // set RA channel given by NCC to MAC
-  mac->SetRaChannel (raChannel);
+  ncc->AddUt (dev->GetAddress (), m_llsConf, beamId, MakeCallback (&SatUtMac::SetRaChannel, mac));
 
   phy->Initialize ();
 
@@ -419,12 +436,15 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<Sat
           randomAccess->SetAreBuffersEmptyCallback (MakeCallback (&SatLlc::BuffersEmpty, llc));
         }
 
-      /// define which allocation channels should be used with each of the random access models
-      randomAccess->AddCrdsaAllocationChannel (SatConstVariables::CRDSA_ALLOCATION_CHANNEL);
-      randomAccess->AddSlottedAlohaAllocationChannel (SatConstVariables::SLOTTED_ALOHA_ALLOCATION_CHANNEL);
-
       /// attach the RA module
       mac->SetRandomAccess (randomAccess);
+    }
+
+  Ptr<SatUtHandoverModule> utHandoverModule = n->GetObject<SatUtHandoverModule> ();
+  if (utHandoverModule != NULL)
+    {
+      utHandoverModule->SetHandoverRequestCallback (MakeCallback (&SatRequestManager::SendHandoverRecommendation, rm));
+      mac->SetBeamCheckerCallback (MakeCallback (&SatUtHandoverModule::CheckForHandoverRecommendation, utHandoverModule));
     }
 
   return dev;

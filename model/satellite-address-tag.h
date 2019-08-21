@@ -34,7 +34,6 @@ namespace ns3 {
 class SatAddressTag : public Tag
 {
 public:
-
   /**
    * / Creates a SatAddressTag instance with an invalid source address.
    */

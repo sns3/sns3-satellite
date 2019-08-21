@@ -105,7 +105,7 @@ SatGwPhy::GetTypeId (void)
                    DoubleValue (10.0),
                    MakeDoubleAccessor (&SatGwPhy::m_aciIfWrtNoisePercent),
                    MakeDoubleChecker<double> (0, 100))
-                   ;
+  ;
   return tid;
 }
 
@@ -119,8 +119,8 @@ SatGwPhy::GetInstanceTypeId (void) const
 
 SatGwPhy::SatGwPhy (void)
   : m_aciIfWrtNoisePercent (10.0),
-    m_imInterferenceCOverIDb (22.0),
-    m_imInterferenceCOverI (SatUtils::DbToLinear (m_imInterferenceCOverIDb))
+  m_imInterferenceCOverIDb (22.0),
+  m_imInterferenceCOverI (SatUtils::DbToLinear (m_imInterferenceCOverIDb))
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("SatGwPhy default constructor is not allowed to use");
@@ -131,9 +131,9 @@ SatGwPhy::SatGwPhy (SatPhy::CreateParam_t& params,
                     SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
                     Ptr<SatSuperframeConf> superFrameConf)
   : SatPhy (params),
-    m_aciIfWrtNoisePercent (10.0),
-    m_imInterferenceCOverIDb (22.0),
-    m_imInterferenceCOverI (SatUtils::DbToLinear (m_imInterferenceCOverIDb))
+  m_aciIfWrtNoisePercent (10.0),
+  m_imInterferenceCOverIDb (22.0),
+  m_imInterferenceCOverI (SatUtils::DbToLinear (m_imInterferenceCOverIDb))
 {
   NS_LOG_FUNCTION (this);
 

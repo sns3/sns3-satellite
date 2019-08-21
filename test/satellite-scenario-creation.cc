@@ -297,8 +297,7 @@ ScenarioCreationUser::DoRun (void)
 
   // Creating the reference system.
   Ptr<SatHelper> helper = CreateObject<SatHelper> ();
-
-  SatBeamUserInfo beamInfo = SatBeamUserInfo (1,1);
+  SatBeamUserInfo beamInfo = SatBeamUserInfo (1, 1);
   std::map<uint32_t, SatBeamUserInfo > beamMap;
   beamMap[8] = beamInfo;
   beamMap[3] = beamInfo;

@@ -156,8 +156,8 @@ SatFwdLinkScheduler::GetTypeId (void)
 
 SatFwdLinkScheduler::SatFwdLinkScheduler ()
   : m_additionalSortCriteria (SatFwdLinkScheduler::NO_SORT),
-    m_cnoEstimatorMode (SatCnoEstimator::LAST),
-    m_carrierBandwidthInHz (0.0)
+  m_cnoEstimatorMode (SatCnoEstimator::LAST),
+  m_carrierBandwidthInHz (0.0)
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("Default constructor for SatFwdLinkScheduler not supported");
@@ -165,10 +165,10 @@ SatFwdLinkScheduler::SatFwdLinkScheduler ()
 
 SatFwdLinkScheduler::SatFwdLinkScheduler (Ptr<SatBbFrameConf> conf, Mac48Address address, double carrierBandwidthInHz)
   : m_macAddress (address),
-    m_bbFrameConf (conf),
-    m_additionalSortCriteria (SatFwdLinkScheduler::NO_SORT),
-    m_cnoEstimatorMode (SatCnoEstimator::LAST),
-    m_carrierBandwidthInHz (carrierBandwidthInHz)
+  m_bbFrameConf (conf),
+  m_additionalSortCriteria (SatFwdLinkScheduler::NO_SORT),
+  m_cnoEstimatorMode (SatCnoEstimator::LAST),
+  m_carrierBandwidthInHz (carrierBandwidthInHz)
 {
   NS_LOG_FUNCTION (this);
 

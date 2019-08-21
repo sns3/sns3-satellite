@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2013 Magister Solutions Ltd.
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
 
@@ -44,13 +46,14 @@ class SatPhyRxCarrier;
 class SatPhyRxCarrierPerSlot : public SatPhyRxCarrier
 {
 public:
-
-	/**
-	 * Constructor.
-	 * \param carrierId ID of the carrier
-	 * \param carrierConf Carrier configuration
-	 */
-	SatPhyRxCarrierPerSlot (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> carrierConf, bool randomAccessEnabled);
+  /**
+   * Constructor.
+   * \param carrierId ID of the carrier
+   * \param carrierConf Carrier configuration
+   * \param waveformConf Waveform configuration
+   * \param randomAccessEnabled Is this a RA carrier
+   */
+  SatPhyRxCarrierPerSlot (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatWaveformConf> waveformConf, bool randomAccessEnabled);
 
   /**
    * \brief Destructor
@@ -67,52 +70,60 @@ public:
    * \brief Function for setting the random access allocation channel ID
    * \param randomAccessAllocationChannelId
    */
-  inline void SetRandomAccessAllocationChannelId (uint8_t randomAccessAllocationChannelId) { m_randomAccessAllocationChannelId = randomAccessAllocationChannelId; };
+  inline void SetRandomAccessAllocationChannelId (uint8_t randomAccessAllocationChannelId)
+  {
+    m_randomAccessAllocationChannelId = randomAccessAllocationChannelId;
+  }
 
   /**
    * \brief Function for getting the random access allocation channel ID
    * \return randomAccessAllocationChannelId
    */
-  inline uint8_t GetRandomAccessAllocationChannelId () const { return m_randomAccessAllocationChannelId; };
+  inline uint8_t GetRandomAccessAllocationChannelId () const
+  {
+    return m_randomAccessAllocationChannelId;
+  }
 
   /**
    * \brief Method for querying the type of the carrier
    */
   inline virtual CarrierType GetCarrierType ()
   {
-  	return m_randomAccessEnabled ? CarrierType::RA_SLOTTED_ALOHA : CarrierType::DEDICATED_ACCESS;
+    return m_randomAccessEnabled ? CarrierType::RA_SLOTTED_ALOHA : CarrierType::DEDICATED_ACCESS;
   }
 
 protected:
-
   /**
    * \brief Function for ending the packet reception from the SatChannel
    * \param key Key for Rx params map
    */
-	virtual void EndRxData (uint32_t key);
+  virtual void EndRxData (uint32_t key);
 
-	/**
-	 * \brief Dispose implementation.
-	 */
-	virtual void DoDispose ();
+  /**
+   * \brief Dispose implementation.
+   */
+  virtual void DoDispose ();
 
-	/**
-	 * Receive a slot. Overridable by child classes.
-	 */
-	virtual void ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams, const uint32_t nPackets);
+  /**
+   * Receive a slot. Overridable by child classes.
+   */
+  virtual void ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams, const uint32_t nPackets);
 
-	/**
-	 * \brief Get the random access collision model of the carrier
-	 */
-	inline SatPhyRxCarrierConf::RandomAccessCollisionModel GetRandomAccessCollisionModel () const
-	{
-		return m_randomAccessCollisionModel;
-	};
+  /**
+   * \brief Get the random access collision model of the carrier
+   */
+  inline SatPhyRxCarrierConf::RandomAccessCollisionModel GetRandomAccessCollisionModel () const
+  {
+    return m_randomAccessCollisionModel;
+  }
 
-	/**
-	 * \brief Check if random access dynamic load control is enabled.
-	 */
-	inline bool IsRandomAccessDynamicLoadControlEnabled () const { return m_enableRandomAccessDynamicLoadControl; };
+  /**
+   * \brief Check if random access dynamic load control is enabled.
+   */
+  inline bool IsRandomAccessDynamicLoadControlEnabled () const
+  {
+    return m_enableRandomAccessDynamicLoadControl;
+  }
 
   /**
    * \brief Function for calculating the average normalized offered random access load
@@ -131,16 +142,16 @@ protected:
    *
    * \return Pointer to the interference event.
    */
-	virtual Ptr<SatInterference::InterferenceChangeEvent>
-	  CreateInterference (Ptr<SatSignalParameters> rxParams, Address rxAddress);
+  virtual Ptr<SatInterference::InterferenceChangeEvent>
+  CreateInterference (Ptr<SatSignalParameters> rxParams, Address rxAddress);
 
-	/**
-	 * \brief The number of random access bits in current frame.
-	 * 				Protected so that child classes are able to alter this.
-	 */
-	uint32_t m_randomAccessBitsInFrame;
+  /**
+   * \brief The number of random access bits in current frame.
+   *                            Protected so that child classes are able to alter this.
+   */
+  uint32_t m_randomAccessBitsInFrame;
 
-	////////// TRACED CALLBACKS /////////
+  ////////// TRACED CALLBACKS /////////
   /**
    * \brief `SlottedAlohaRxCollision` trace source.
    *
@@ -166,7 +177,6 @@ protected:
   TracedCallback<uint32_t, const Address &, bool> m_slottedAlohaRxErrorTrace;
 
 private:
-
   /**
    * \brief Function for processing the Slotted ALOHA collisions
    * \param cSinr Composite SINR
@@ -180,11 +190,11 @@ private:
 
   /// PRIVATE MEMBER VARIABLES
 
-	uint8_t m_randomAccessAllocationChannelId; 		//< Random access allocation ID
-  SatPhyRxCarrierConf::RandomAccessCollisionModel m_randomAccessCollisionModel;	//< Random access collision model
-  double m_randomAccessConstantErrorRate; 			//< Constant error rate if collision model is RA_CONSTANT_COLLISION_PROBABILITY
-  uint32_t m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize;	//< Random access average normalized offered load measurement window size
-  bool m_enableRandomAccessDynamicLoadControl;	//< Is random access dynamic load control enabled
+  uint8_t m_randomAccessAllocationChannelId;                    //< Random access allocation ID
+  SatPhyRxCarrierConf::RandomAccessCollisionModel m_randomAccessCollisionModel; //< Random access collision model
+  double m_randomAccessConstantErrorRate;                       //< Constant error rate if collision model is RA_CONSTANT_COLLISION_PROBABILITY
+  uint32_t m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize;     //< Random access average normalized offered load measurement window size
+  bool m_enableRandomAccessDynamicLoadControl;  //< Is random access dynamic load control enabled
   std::deque<double> m_randomAccessDynamicLoadControlNormalizedOfferedLoad; //< Container for calculated normalized offered loads
 
 

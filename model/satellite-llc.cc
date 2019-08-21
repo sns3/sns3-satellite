@@ -64,11 +64,11 @@ SatLlc::GetTypeId (void)
 
 SatLlc::SatLlc ()
   : m_nodeInfo (),
-    m_encaps (),
-    m_decaps (),
-    m_fwdLinkArqEnabled (false),
-    m_rtnLinkArqEnabled (false),
-    m_gwAddress ()
+  m_encaps (),
+  m_decaps (),
+  m_fwdLinkArqEnabled (false),
+  m_rtnLinkArqEnabled (false),
+  m_gwAddress ()
 {
   NS_LOG_FUNCTION (this);
 }

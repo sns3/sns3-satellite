@@ -34,7 +34,6 @@ namespace ns3 {
 class SatFreeSpaceLoss : public Object
 {
 public:
-
   /**
    * \brief Get the type ID
    * \return the object TypeId

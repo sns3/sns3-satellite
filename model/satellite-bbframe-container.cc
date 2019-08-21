@@ -33,7 +33,7 @@ NS_OBJECT_ENSURE_REGISTERED (SatBbFrameContainer);
 
 SatBbFrameContainer::SatBbFrameContainer ()
   : m_totalDuration (Seconds (0)),
-    m_defaultBbFrameType (SatEnums::NORMAL_FRAME)
+  m_defaultBbFrameType (SatEnums::NORMAL_FRAME)
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("Default constructor of SatBbFrameContainer not supported.");
@@ -41,7 +41,7 @@ SatBbFrameContainer::SatBbFrameContainer ()
 
 SatBbFrameContainer::SatBbFrameContainer (std::vector<SatEnums::SatModcod_t>& modcodsInUse, Ptr<SatBbFrameConf> conf)
   : m_totalDuration (Seconds (0)),
-    m_bbFrameConf (conf)
+  m_bbFrameConf (conf)
 {
   NS_LOG_FUNCTION (this);
 

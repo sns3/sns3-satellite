@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2013 Magister Solutions Ltd.
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
 #include "ns3/simulator.h"
@@ -52,7 +54,7 @@ SatConstantInterference::GetInstanceTypeId (void) const
 
 SatConstantInterference::SatConstantInterference ()
   : m_power (0.0),
-    m_rxing (false)
+  m_rxing (false)
 {
 
 }
@@ -73,7 +75,7 @@ SatConstantInterference::DoAdd (Time duration, double power, Address rxAddress)
   return event;
 }
 
-double
+std::vector< std::pair<double, double> >
 SatConstantInterference::DoCalculate (Ptr<SatInterference::InterferenceChangeEvent> event)
 {
   NS_LOG_FUNCTION (this);
@@ -81,10 +83,13 @@ SatConstantInterference::DoCalculate (Ptr<SatInterference::InterferenceChangeEve
   if (m_rxing == false)
     {
       NS_LOG_WARN ("Most likely two overlapping receptions! With random access carrier"
-          " this should be fine, but with dedicated access prohibited!");
+                   " this should be fine, but with dedicated access prohibited!");
     }
 
-  return m_power;
+  std::vector< std::pair<double, double> > ifPowerPerFragment;
+  ifPowerPerFragment.emplace_back (1.0, m_power);
+
+  return ifPowerPerFragment;
 }
 
 void

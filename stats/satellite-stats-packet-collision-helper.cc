@@ -1,4 +1,4 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2014 Magister Solutions
  *
@@ -241,11 +241,13 @@ SatStatsPacketCollisionHelper::DoInstall ()
           for (ObjectVectorValue::Iterator itCarrier = carriers.Begin ();
                itCarrier != carriers.End (); ++itCarrier)
             {
-          		SatPhyRxCarrier::CarrierType ct = DynamicCast<SatPhyRxCarrier> (itCarrier->second)->GetCarrierType ();
-          		if (ct != GetValidCarrierType ()) continue;
+              SatPhyRxCarrier::CarrierType ct = DynamicCast<SatPhyRxCarrier> (itCarrier->second)->GetCarrierType ();
+              if (ct != GetValidCarrierType ())
+                {
+                  continue;
+                }
 
-              const bool ret = itCarrier->second->TraceConnectWithoutContext (
-                  GetTraceSourceName (), callback);
+              const bool ret = itCarrier->second->TraceConnectWithoutContext (GetTraceSourceName (), callback);
               if (ret)
                 {
                   NS_LOG_INFO (this << " successfully connected with node ID "

@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2014 Magister Solutions Ltd.
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 #ifndef SATELLITE_RANDOM_ACCESS_ALLOCATION_CHANNEL_H
 #define SATELLITE_RANDOM_ACCESS_ALLOCATION_CHANNEL_H
@@ -52,6 +54,42 @@ public:
    * \return type id
    */
   static TypeId GetTypeId (void);
+
+  /**
+   * \brief Function for getting the status of Slotted Aloha allowance
+   * \return Is Slotted Aloha allowed
+   */
+  bool GetSlottedAlohaAllowed ()
+  {
+    return m_slottedAlohaAllowed;
+  }
+
+  /**
+   * \brief Function for setting the status of Slotted Aloha allowance
+   * \param isSlottedAlohaAllowed Is Slotted Aloha allowed
+   */
+  void SetSlottedAlohaAllowed (bool isSlottedAlohaAllowed)
+  {
+    m_slottedAlohaAllowed = isSlottedAlohaAllowed;
+  }
+
+  /**
+   * \brief Function for getting the status of CRDSA allowance
+   * \return Is CRDSA allowed
+   */
+  bool GetCrdsaAllowed ()
+  {
+    return m_crdsaAllowed;
+  }
+
+  /**
+   * \brief Function for setting the status of CRDSA allowance
+   * \param isCrdsaAllowed Is CRDSA allowed
+   */
+  void SetCrdsaAllowed (bool isCrdsaAllowed)
+  {
+    m_crdsaAllowed = isCrdsaAllowed;
+  }
 
   /**
    * \brief Function for getting the CRDSA backoff time
@@ -104,7 +142,7 @@ public:
    */
   void SetCrdsaBackoffProbability (uint16_t crdsaBackoffProbability)
   {
-    m_crdsaBackoffProbability = (crdsaBackoffProbability + 1) * (1 / (std::pow (2,16)));
+    m_crdsaBackoffProbability = (crdsaBackoffProbability + 1) * (1 / (std::pow (2, 16)));
   }
 
   /**
@@ -257,6 +295,16 @@ public:
   void DoCrdsaVariableSanityCheck ();
 
 private:
+  /**
+   * \brief Slotted Aloha allowed
+   */
+  bool m_slottedAlohaAllowed;
+
+  /**
+   * \brief CRDSA allowed
+   */
+  bool m_crdsaAllowed;
+
   /**
    * \brief CRDSA minimum randomization value
    */

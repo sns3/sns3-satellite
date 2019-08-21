@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2014 Magister Solutions Ltd.
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,7 +17,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
+
+
 #include "satellite-random-access-container-conf.h"
 #include "ns3/uinteger.h"
 #include "ns3/double.h"
@@ -45,19 +49,20 @@ SatRandomAccessConf::GetTypeId (void)
 }
 SatRandomAccessConf::SatRandomAccessConf ()
   : m_slottedAlohaControlRandomizationIntervalInMilliSeconds (),
-    m_allocationChannelCount (),
-    m_crdsaSignalingOverheadInBytes (),
-    m_slottedAlohaSignalingOverheadInBytes ()
+  m_allocationChannelCount (),
+  m_crdsaSignalingOverheadInBytes (),
+  m_slottedAlohaSignalingOverheadInBytes ()
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("SatRandomAccessConf::SatRandomAccessConf - Constructor not in use");
 }
 
 SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf, Ptr<SatSuperframeSeq> superframeSeq)
-  : m_slottedAlohaControlRandomizationIntervalInMilliSeconds (),
-    m_allocationChannelCount (llsConf->GetRaServiceCount ()),
-    m_crdsaSignalingOverheadInBytes (5),
-    m_slottedAlohaSignalingOverheadInBytes (3)
+  : m_configurationIdPerAllocationChannel (),
+  m_slottedAlohaControlRandomizationIntervalInMilliSeconds (),
+  m_allocationChannelCount (llsConf->GetRaServiceCount ()),
+  m_crdsaSignalingOverheadInBytes (5),
+  m_slottedAlohaSignalingOverheadInBytes (3)
 {
   NS_LOG_FUNCTION (this);
 
@@ -72,21 +77,47 @@ SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf,
   for (uint32_t i = 0; i < m_allocationChannelCount; i++)
     {
       Ptr<SatRandomAccessAllocationChannel> allocationChannel = CreateObject<SatRandomAccessAllocationChannel> ();
-      m_allocationChannelConf.insert (std::make_pair (i,allocationChannel));
+      m_allocationChannelConf.insert (std::make_pair (i, allocationChannel));
 
-      GetAllocationChannelConfiguration (i)->SetCrdsaMaxUniquePayloadPerBlock (llsConf->GetRaMaximumUniquePayloadPerBlock (i));
-      GetAllocationChannelConfiguration (i)->SetCrdsaMaxConsecutiveBlocksAccessed (llsConf->GetRaMaximumConsecutiveBlockAccessed (i));
-      GetAllocationChannelConfiguration (i)->SetCrdsaMinIdleBlocks (llsConf->GetRaMinimumIdleBlock (i));
-      GetAllocationChannelConfiguration (i)->SetCrdsaNumOfInstances (llsConf->GetRaNumberOfInstances (i));
-      GetAllocationChannelConfiguration (i)->SetCrdsaBackoffProbability (llsConf->GetRaBackOffProbability (i));
-      GetAllocationChannelConfiguration (i)->SetCrdsaBackoffTimeInMilliSeconds (llsConf->GetRaBackOffTimeInMilliSeconds (i));
+      allocationChannel->SetSlottedAlohaAllowed (llsConf->GetRaIsSlottedAlohaAllowed (i));
+      allocationChannel->SetCrdsaAllowed (llsConf->GetRaIsCrdsaAllowed (i));
+      allocationChannel->SetCrdsaMaxUniquePayloadPerBlock (llsConf->GetRaMaximumUniquePayloadPerBlock (i));
+      allocationChannel->SetCrdsaMaxConsecutiveBlocksAccessed (llsConf->GetRaMaximumConsecutiveBlockAccessed (i));
+      allocationChannel->SetCrdsaMinIdleBlocks (llsConf->GetRaMinimumIdleBlock (i));
+      allocationChannel->SetCrdsaNumOfInstances (llsConf->GetRaNumberOfInstances (i));
+      allocationChannel->SetCrdsaBackoffProbability (llsConf->GetRaBackOffProbability (i));
+      allocationChannel->SetCrdsaBackoffTimeInMilliSeconds (llsConf->GetRaBackOffTimeInMilliSeconds (i));
       /// this assumes that the slot IDs for each allocation channel start at 0
-      GetAllocationChannelConfiguration (i)->SetCrdsaMinRandomizationValue (0);
-      /// TODO Get rid of the hard coded 0 in GetSuperframeConf
-      /// this assumes that the slot IDs for each allocation channel start at 0
-      GetAllocationChannelConfiguration (i)->SetCrdsaMaxRandomizationValue (superframeSeq->GetSuperframeConf (0)->GetRaSlotCount (i) - 1);
+      allocationChannel->SetCrdsaMinRandomizationValue (0);
+      allocationChannel->SetCrdsaMaxRandomizationValue (std::numeric_limits<uint16_t>::max ());
+    }
 
-      GetAllocationChannelConfiguration (i)->DoCrdsaVariableSanityCheck ();
+  /// TODO Get rid of the hard coded 0 in GetSuperframeConf
+  Ptr<SatSuperframeConf> superframeConf = superframeSeq->GetSuperframeConf (0);
+  for (uint32_t i = 0; i < superframeConf->GetRaChannelCount (); ++i)
+    {
+      uint8_t allocationChannel = superframeConf->GetRaChannelAllocationChannelId (i);
+      /// this assumes that the slot IDs for each allocation channel start at 0
+      uint16_t raSlotCount = superframeConf->GetRaSlotCount (i) - 1;
+
+      if (allocationChannel < m_allocationChannelCount)
+        {
+          m_configurationIdPerAllocationChannel.push_back (allocationChannel);
+          auto allocationChannelConf = m_allocationChannelConf[allocationChannel];
+          if (raSlotCount < allocationChannelConf->GetCrdsaMaxRandomizationValue ())
+            {
+              allocationChannelConf->SetCrdsaMaxRandomizationValue (raSlotCount);
+            }
+        }
+      else
+        {
+          NS_FATAL_ERROR ("Allocation channel for frame " << superframeConf->GetRaChannelFrameId (i) << " is out of range");
+        }
+    }
+
+  for (auto& allocationChannelConf : m_allocationChannelConf)
+    {
+      allocationChannelConf.second->DoCrdsaVariableSanityCheck ();
     }
 }
 
@@ -98,9 +129,9 @@ SatRandomAccessConf::~SatRandomAccessConf ()
 Ptr<SatRandomAccessAllocationChannel>
 SatRandomAccessConf::GetAllocationChannelConfiguration (uint32_t allocationChannel)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << allocationChannel);
 
-  std::map<uint32_t,Ptr<SatRandomAccessAllocationChannel> >::iterator iter = m_allocationChannelConf.find (allocationChannel);
+  std::map<uint32_t, Ptr<SatRandomAccessAllocationChannel> >::iterator iter = m_allocationChannelConf.find (allocationChannel);
 
   if (iter == m_allocationChannelConf.end ())
     {
@@ -120,7 +151,20 @@ SatRandomAccessConf::DoSlottedAlohaVariableSanityCheck ()
       NS_FATAL_ERROR ("SatRandomAccessConf::DoSlottedAlohaVariableSanityCheck - m_slottedAlohaControlRandomizationIntervalInMilliSeconds < 1");
     }
 
-  NS_LOG_INFO ("SatRandomAccessConf::DoSlottedAlohaVariableSanityCheck - Variable sanity check done");
+  NS_LOG_INFO ("Variable sanity check done");
+}
+
+uint32_t
+SatRandomAccessConf::GetAllocationChannelConfigurationId (uint32_t allocationChannel)
+{
+  NS_LOG_FUNCTION (this << allocationChannel);
+
+  if (allocationChannel >= m_configurationIdPerAllocationChannel.size ())
+    {
+      NS_FATAL_ERROR ("SatRandomAccessConf::GetAllocationChannelConfigurationId - allocation channel " << allocationChannel << " has no associated configuration.");
+    }
+
+  return m_configurationIdPerAllocationChannel[allocationChannel];
 }
 
 } // namespace ns3

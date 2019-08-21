@@ -51,11 +51,10 @@ NS_LOG_COMPONENT_DEFINE ("sat-cbr-user-defined-example");
 static void CrTraceCb (Time now, Mac48Address addr, Ptr<SatCrMessage> crMsg)
 {
 
-  NS_LOG_INFO ( "General info: " << Simulator::Now ().GetSeconds () << " "
-                                 << addr << " "
-                                 << crMsg->GetNumCapacityRequestElements () << " "
-                                 << crMsg->GetSizeInBytes () << " "
-                                 << crMsg->GetCnoEstimate () );
+  NS_LOG_INFO ("General info: " << addr <<
+               " " << crMsg->GetNumCapacityRequestElements () <<
+               " " << crMsg->GetSizeInBytes () <<
+               " " << crMsg->GetCnoEstimate ());
 
   SatCrMessage::RequestContainer_t c = crMsg->GetCapacityRequestContent ();
   for (SatCrMessage::RequestContainer_t::const_iterator it = c.begin ();
@@ -107,7 +106,8 @@ main (int argc, char *argv[])
   simulationHelper->SetUtCountPerBeam (utsPerBeam);
 
   // Set beam ID
-  std::stringstream beamsEnabled; beamsEnabled  << beamId;
+  std::stringstream beamsEnabled;
+  beamsEnabled << beamId;
   simulationHelper->SetBeams (beamsEnabled.str ());
 
   // Configure error model
@@ -129,8 +129,8 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
 
   simulationHelper->InstallTrafficModel (
-  					SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
-  					appStartTime, Seconds (simLength), Seconds (0.05));
+    SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
+    appStartTime, Seconds (simLength), Seconds (0.05));
 
   NS_LOG_INFO ("--- sat-cbr-user-defined-example ---");
   NS_LOG_INFO ("  Packet size in bytes: " << packetSize);

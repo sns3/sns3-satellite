@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2013 Magister Solutions Ltd.
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
 #ifndef SATELLITE_PHY_H
@@ -32,6 +34,8 @@
 #include "satellite-signal-parameters.h"
 #include "satellite-node-info.h"
 #include "ns3/satellite-frame-conf.h"
+#include "ns3/satellite-beam-channel-pair.h"
+
 
 namespace ns3 {
 
@@ -58,6 +62,10 @@ public:
    * Define InterferenceModel in SatPhy
    */
   typedef SatPhyRxCarrierConf::InterferenceModel InterferenceModel;
+  /**
+   * Define InterferenceEliminationModel in SatPhy
+   */
+  typedef SatPhyRxCarrierConf::InterferenceEliminationModel InterferenceEliminationModel;
   /**
    * Define ErrorModel in SatPhy
    */
@@ -87,7 +95,7 @@ public:
    * \param allocation channel Id
    * \param average normalized offered load
    */
-  typedef Callback<void,uint32_t,uint32_t,uint8_t,double> AverageNormalizedOfferedLoadCallback;
+  typedef Callback<void, uint32_t, uint32_t, uint8_t, double> AverageNormalizedOfferedLoadCallback;
 
   /**
    * \brief Creation parameters for base PHY object
@@ -446,11 +454,29 @@ public:
    */
   void BeginFrameEndScheduling ();
 
+  /**
+   * \brief Callback for retrieving a pair of SatChannel associated to a beam
+   * \param uint32_t  beam ID
+   * \return A pair of SatChannel to use as communication channel in this beam
+   */
+  typedef Callback<SatChannelPair::ChannelPair_t, uint32_t> ChannelPairGetterCallback;
+
+  /**
+   * \brief Set the channel pair getter callback
+   * \param cb callback to invoke whenever a SatChannel pair for a beam is required.
+   */
+  void SetChannelPairGetterCallback (SatPhy::ChannelPairGetterCallback cb);
+
 protected:
   /**
    * The upper layer package receive callback.
    */
   SatPhy::ReceiveCallback m_rxCallback;
+
+  /**
+   * Callback for retrieving SatChannel pairs by beam
+   */
+  SatPhy::ChannelPairGetterCallback m_retrieveChannelPair;
 
   /**
    * Trace callback used for packet tracing:
@@ -494,16 +520,16 @@ protected:
   Ptr<SatPhyRx> m_phyRx;
 
   /**
+   * Beam ID
+   */
+  uint32_t m_beamId;
+
+  /**
    * Calculated EIRP without gain in W.
    */
   double m_eirpWoGainW;
 
 private:
-  /**
-   * Beam ID
-   */
-  uint32_t m_beamId;
-
   /**
    * The C/N0 info callback
    */

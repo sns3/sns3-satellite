@@ -91,11 +91,11 @@ SatMobilityObserver::SatMobilityObserver ()
 
 SatMobilityObserver::SatMobilityObserver (Ptr<SatMobilityModel> ownMobility, Ptr<SatMobilityModel> geoSatMobility)
   : m_ownMobility (ownMobility),
-    m_anotherMobility (NULL),
-    m_geoSatMobility (geoSatMobility),
-    m_ownProgDelayModel (NULL),
-    m_anotherProgDelayModel (NULL),
-    m_initialized (false)
+  m_anotherMobility (NULL),
+  m_geoSatMobility (geoSatMobility),
+  m_ownProgDelayModel (NULL),
+  m_anotherProgDelayModel (NULL),
+  m_initialized (false)
 {
   NS_LOG_FUNCTION (this << ownMobility << geoSatMobility);
 
@@ -153,6 +153,12 @@ SatMobilityObserver::ObserveTimingAdvance (Ptr<PropagationDelayModel> ownDelayMo
   NS_ASSERT ( anotherDelayModel != NULL );
   NS_ASSERT ( anotherMobility != NULL );
 
+  auto cb = MakeCallback (&SatMobilityObserver::PositionChanged, this);
+  if (m_anotherMobility != NULL)
+    {
+      m_anotherMobility->TraceDisconnect ("SatCourseChange", "Another", cb);
+    }
+
   m_ownProgDelayModel = ownDelayModel;
   m_anotherProgDelayModel = anotherDelayModel;
   m_anotherMobility = anotherMobility;
@@ -160,7 +166,7 @@ SatMobilityObserver::ObserveTimingAdvance (Ptr<PropagationDelayModel> ownDelayMo
   // same reference ellipsoide must be used by mobilities
   NS_ASSERT (m_anotherMobility->GetGeoPosition ().GetRefEllipsoid () == m_ownMobility->GetGeoPosition ().GetRefEllipsoid () );
 
-  m_anotherMobility->TraceConnect ("SatCourseChange", "Another", MakeCallback (&SatMobilityObserver::PositionChanged, this));
+  m_anotherMobility->TraceConnect ("SatCourseChange", "Another", cb);
 }
 
 double

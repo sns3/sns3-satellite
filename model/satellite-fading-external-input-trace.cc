@@ -32,15 +32,15 @@ namespace ns3 {
 
 SatFadingExternalInputTrace::SatFadingExternalInputTrace ()
   : m_traceFileType (),
-    m_startTime (),
-    m_timeInterval ()
+  m_startTime (),
+  m_timeInterval ()
 {
   NS_FATAL_ERROR ("SatFadingExternalInputTrace::SatFadingExternalInputTrace - Constructor not in use");
 }
 
 SatFadingExternalInputTrace::SatFadingExternalInputTrace (TraceFileType_e type, std::string fileName)
   : m_startTime (-1.0),
-    m_timeInterval (-1.0)
+  m_timeInterval (-1.0)
 {
   NS_LOG_FUNCTION (this);
 

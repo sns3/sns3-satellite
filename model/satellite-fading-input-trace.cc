@@ -58,7 +58,7 @@ SatFadingInputTrace::DoGetFading (Address macAddress, SatEnums::ChannelType_t ch
 {
   NS_LOG_FUNCTION (this);
 
-  return m_satFadingInputTraceContainer->GetFadingValue (std::make_pair (macAddress,channelType));
+  return m_satFadingInputTraceContainer->GetFadingValue (std::make_pair (macAddress, channelType));
 }
 
 } // namespace ns3

@@ -1,6 +1,7 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2014 Magister Solutions
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Budiarto Herman <budiarto.herman@magister.fi>
- *
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
 #ifndef SATELLITE_STATS_HELPER_CONTAINER_H
@@ -35,27 +36,27 @@ namespace ns3 {
  * majority of methods in this class. Below is the list of the class methods
  * created using this C++ pre-processing approach.
  *
- * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppDelay
- * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Delay
- * - AddAverage [Beam,Ut,UtUser] [Fwd,Rtn] AppDelay
- * - AddAverage [Beam,Ut] [Fwd,Rtn] [Dev,Mac,Phy] Delay
- * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] Queue [Bytes,Packets]
- * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] SignallingLoad
- * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] CompositeSinr
- * - Add [Global,PerGw,PerBeam,PerUt,PerUtUser] [Fwd,Rtn] AppThroughput
- * - Add [Global,PerGw,PerBeam,PerUt] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
- * - AddAverage [Beam,Ut,UtUser] [Fwd,Rtn] AppThroughput
- * - AddAverage [Beam,Ut] [Fwd,Rtn] [Dev,Mac,Phy] Throughput
- * - Add [Global,PerGw,PerBeam,PerUt] [FwdDa,RtnDa,SlottedAloha,Crdsa] PacketError
- * - Add [Global,PerGw,PerBeam,PerUt] [SlottedAloha,Crdsa] PacketCollision
- * - Add [Global,PerGw,PerBeam,PerUt] CapacityRequest
- * - Add [Global,PerGw,PerBeam,PerUt] ResourcesGranted
- * - Add [Global,PerGw,PerBeam] BackloggedRequest
- * - Add [Global,PerGw,PerBeam] Frame [Symbol,User] Load
- * - Add [Global,PerGw,PerBeam] WaveformUsage
- * - AddGlobal [Fwd,Rtn] [Feeder,User] LinkSinr
- * - AddGlobal [Fwd,Rtn] [Feeder,User] LinkRxPower
- * - Add [Global,PerGw,PerBeam] FrameTypeUsage
+ * - Add [Global, PerGw, PerBeam, PerUt, PerUtUser] [Fwd, Rtn] AppDelay
+ * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] [Dev, Mac, Phy] Delay
+ * - AddAverage [Beam, Ut, UtUser] [Fwd, Rtn] AppDelay
+ * - AddAverage [Beam, Ut] [Fwd, Rtn] [Dev, Mac, Phy] Delay
+ * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] Queue [Bytes, Packets]
+ * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] SignallingLoad
+ * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] CompositeSinr
+ * - Add [Global, PerGw, PerBeam, PerUt, PerUtUser] [Fwd, Rtn] AppThroughput
+ * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] [Dev, Mac, Phy] Throughput
+ * - AddAverage [Beam, Ut, UtUser] [Fwd, Rtn] AppThroughput
+ * - AddAverage [Beam, Ut] [Fwd, Rtn] [Dev, Mac, Phy] Throughput
+ * - Add [Global, PerGw, PerBeam, PerUt] [FwdDa, RtnDa, SlottedAloha, Crdsa] PacketError
+ * - Add [Global, PerGw, PerBeam, PerUt] [SlottedAloha, Crdsa] PacketCollision
+ * - Add [Global, PerGw, PerBeam, PerUt] CapacityRequest
+ * - Add [Global, PerGw, PerBeam, PerUt] ResourcesGranted
+ * - Add [Global, PerGw, PerBeam] BackloggedRequest
+ * - Add [Global, PerGw, PerBeam] Frame [Symbol, User] Load
+ * - Add [Global, PerGw, PerBeam] WaveformUsage
+ * - AddGlobal [Fwd, Rtn] [Feeder, User] LinkSinr
+ * - AddGlobal [Fwd, Rtn] [Feeder, User] LinkRxPower
+ * - Add [Global, PerGw, PerBeam] FrameTypeUsage
  *
  * Also check the Doxygen documentation of this class for more information.
  */
@@ -251,9 +252,15 @@ public:
 
   // Random Access CRDSA packet collision rate statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (CrdsaPacketCollision)
+  //
+  // Random Access Marsala packet collision rate statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (MarsalaCorrelation)
 
   // Capacity request statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (CapacityRequest)
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RbdcRequest)
+  void AddAverageBeamRbdcRequest (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRbdcRequest (SatStatsHelper::OutputType_t outputType);
 
   // Resources granted statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (ResourcesGranted)
@@ -281,10 +288,15 @@ public:
   void AddGlobalRtnUserLinkRxPower (SatStatsHelper::OutputType_t outputType);
 
   // Frame type usage statistics.
-	SAT_STATS_REDUCED_SCOPE_METHOD_DECLARATION (FrameTypeUsage)
+  SAT_STATS_REDUCED_SCOPE_METHOD_DECLARATION (FrameTypeUsage)
 
   // Beam service time statistics
   void AddPerBeamBeamServiceTime (SatStatsHelper::OutputType_t outputType);
+
+  // Antenna Gain statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (AntennaGain)
+  void AddAverageBeamAntennaGain (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtAntennaGain (SatStatsHelper::OutputType_t outputType);
 
   /**
    * \param outputType an arbitrary output type.
@@ -294,7 +306,6 @@ public:
   static std::string GetOutputTypeSuffix (SatStatsHelper::OutputType_t outputType);
 
 protected:
-
   /**
    * Inherited from Object base class
    */

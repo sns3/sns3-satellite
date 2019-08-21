@@ -81,7 +81,7 @@ public:
    * \brief Get beam ID of the object
    * \return beam ID
    */
-  inline uint32_t GetBeamId () const { return m_beamId; };
+  inline uint32_t GetBeamId () const { return m_beamId; }
 
   /**
    * \brief Callback to send packet to lower layer.

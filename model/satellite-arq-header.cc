@@ -96,4 +96,4 @@ void SatArqHeader::SetSeqNo (uint8_t seqNo)
 
 
 
-}; // namespace ns3
+}  // namespace ns3

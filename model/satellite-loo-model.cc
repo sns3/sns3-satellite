@@ -37,11 +37,11 @@ TypeId SatLooModel::GetTypeId (void)
 
 SatLooModel::SatLooModel ()
   : m_numOfStates (0),
-    m_currentSet (0),
-    m_currentState (0),
-    m_looConf (NULL),
-    m_normalRandomVariable (NULL),
-    m_uniformVariable (NULL)
+  m_currentSet (0),
+  m_currentState (0),
+  m_looConf (NULL),
+  m_normalRandomVariable (NULL),
+  m_uniformVariable (NULL)
 {
   NS_LOG_FUNCTION (this);
 
@@ -50,11 +50,11 @@ SatLooModel::SatLooModel ()
 
 SatLooModel::SatLooModel (Ptr<SatLooConf> looConf, uint32_t numOfStates, uint32_t initialSet, uint32_t initialState)
   : m_numOfStates (numOfStates),
-    m_currentSet (initialSet),
-    m_currentState (initialState),
-    m_looConf (looConf),
-    m_normalRandomVariable (NULL),
-    m_uniformVariable (NULL)
+  m_currentSet (initialSet),
+  m_currentState (initialState),
+  m_looConf (looConf),
+  m_normalRandomVariable (NULL),
+  m_uniformVariable (NULL)
 {
   NS_LOG_FUNCTION (this << numOfStates << " " << initialSet << " " << initialState);
 
@@ -138,7 +138,7 @@ SatLooModel::ConstructDirectSignalOscillators ()
         {
           uint32_t n = j + 1;
           /// 1. Rotation speed
-          /// 1a. Initiate \f[ \alpha_n = \frac{2\pi n - \pi + \theta}{4M},  n=1,2, \ldots,M\f], n is oscillatorNumber, M is m_nOscillators
+          /// 1a. Initiate \f[ \alpha_n = \frac{2\pi n - \pi + \theta}{4M},  n=1, 2, \ldots, M\f], n is oscillatorNumber, M is m_nOscillators
           double alpha = (2.0 * M_PI * n - M_PI + theta) / (4.0 * m_looParameters[i][3]);
           /// 1b. Initiate rotation speed:
           double omega = 2.0 * M_PI * m_looParameters[i][5] * std::cos (alpha);
@@ -150,7 +150,7 @@ SatLooModel::ConstructDirectSignalOscillators ()
           /// these averages these and may result in too small std. dev with the combined
           /// value.
           double amplitude = m_normalRandomVariable->GetValue (m_looParameters[i][0], m_looParameters[i][1]);
-          amplitude = pow (10,amplitude / 10) / m_looParameters[i][3];
+          amplitude = pow (10, amplitude / 10) / m_looParameters[i][3];
 
           /// 3. Construct oscillator:
           oscillators.push_back (CreateObject<SatFadingOscillator> (amplitude, phi, omega));
@@ -176,7 +176,7 @@ SatLooModel::ConstructMultipathOscillators ()
         {
           uint32_t n = j + 1;
           /// 1. Rotation speed
-          /// 1a. Initiate \f[ \alpha_n = \frac{2\pi n - \pi + \theta}{4M},  n=1,2, \ldots,M\f], n is oscillatorNumber, M is m_nOscillators
+          /// 1a. Initiate \f[ \alpha_n = \frac{2\pi n - \pi + \theta}{4M},  n=1, 2, \ldots, M\f], n is oscillatorNumber, M is m_nOscillators
           double alpha = (2.0 * M_PI * n - M_PI + theta) / (4.0 * m_looParameters[i][4]);
           /// 1b. Initiate rotation speed:
           double omega = 2.0 * M_PI * m_looParameters[i][6] * std::cos (alpha);
@@ -196,7 +196,7 @@ SatLooModel::GetChannelGainDb ()
   NS_LOG_FUNCTION (this);
 
   double tempChannelGainDb = 10.0 * std::log10 (GetChannelGain ());
-  NS_LOG_INFO ("Time " << Now ().GetSeconds () << " " << tempChannelGainDb);
+  NS_LOG_INFO ("Channel gain: " << tempChannelGainDb);
   return tempChannelGainDb;
 }
 
@@ -322,7 +322,7 @@ SatLooModel::CalculateSigma ()
 
   for (uint32_t i = 0; i < m_numOfStates; i++)
     {
-      m_sigma.push_back (sqrt (0.5 * pow (10,(m_looParameters[i][2] / 10))));
+      m_sigma.push_back (sqrt (0.5 * pow (10, (m_looParameters[i][2] / 10))));
     }
 }
 

@@ -81,8 +81,8 @@ TypeId SatFadingExternalInputTraceContainer::GetInstanceTypeId (void) const
 
 SatFadingExternalInputTraceContainer::SatFadingExternalInputTraceContainer ()
   : m_utInputMode (LIST_MODE),
-    m_indexFilesLoaded (false),
-    m_maxDistanceToFading (0)
+  m_indexFilesLoaded (false),
+  m_maxDistanceToFading (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -377,7 +377,7 @@ SatFadingExternalInputTraceContainer::CreateFadingTrace (SatFadingExternalInputT
       break;
     }
 
-  NS_LOG_INFO ("SatFadingExternalInputTraceContainer -> Creation info: Mode=" << m_utInputMode << ", ID (GW/UT)=" << id << ", FileName=" << fileName);
+  NS_LOG_INFO ("Creation info: Mode=" << m_utInputMode << ", ID (GW/UT)=" << id << ", FileName=" << fileName);
 
   // find from loaded list
 
@@ -424,7 +424,7 @@ SatFadingExternalInputTraceContainer::FindSourceBasedOnPosition (TraceFileContai
     }
   else
     {
-      NS_LOG_INFO ("SatFadingExternalInputTraceContainer -> Minimum distance to fading trace source: " << currentDistanceToFading);
+      NS_LOG_INFO ("Minimum distance to fading trace source: " << currentDistanceToFading);
     }
 
   return fileName;

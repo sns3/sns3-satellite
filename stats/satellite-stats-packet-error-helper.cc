@@ -1,4 +1,4 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2014 Magister Solutions
  *
@@ -59,8 +59,8 @@ NS_OBJECT_ENSURE_REGISTERED (SatStatsPacketErrorHelper);
 
 SatStatsPacketErrorHelper::SatStatsPacketErrorHelper (Ptr<const SatHelper> satHelper)
   : SatStatsHelper (satHelper),
-    m_traceSourceName (""),
-    m_linkDirection (SatEnums::LD_UNDEFINED)
+  m_traceSourceName (""),
+  m_linkDirection (SatEnums::LD_UNDEFINED)
 {
   NS_LOG_FUNCTION (this << satHelper);
 }
@@ -379,10 +379,11 @@ SatStatsPacketErrorHelper::InstallProbeOnGw (Ptr<Node> gwNode)
       for (ObjectVectorValue::Iterator itCarrier = carriers.Begin ();
            itCarrier != carriers.End (); ++itCarrier)
         {
-					if (DynamicCast<SatPhyRxCarrier> (itCarrier->second)->GetCarrierType () != GetValidCarrierType ())
-						continue;
-          const bool ret = itCarrier->second->TraceConnectWithoutContext (
-              GetTraceSourceName (), callback);
+          if (DynamicCast<SatPhyRxCarrier> (itCarrier->second)->GetCarrierType () != GetValidCarrierType ())
+            {
+              continue;
+            }
+          const bool ret = itCarrier->second->TraceConnectWithoutContext (GetTraceSourceName (), callback);
           if (ret)
             {
               NS_LOG_INFO (this << " successfully connected with node ID "
@@ -439,8 +440,10 @@ SatStatsPacketErrorHelper::InstallProbeOnUt (Ptr<Node> utNode)
   for (ObjectVectorValue::Iterator itCarrier = carriers.Begin ();
        itCarrier != carriers.End (); ++itCarrier)
     {
-  		if (DynamicCast<SatPhyRxCarrier> (itCarrier->second)->GetCarrierType () != GetValidCarrierType ())
-  			continue;
+      if (DynamicCast<SatPhyRxCarrier> (itCarrier->second)->GetCarrierType () != GetValidCarrierType ())
+        {
+          continue;
+        }
       // Connect the object to the probe.
       if (probe->ConnectByObject (GetTraceSourceName (), itCarrier->second))
         {

@@ -183,6 +183,6 @@ private:
 };
 
 
-}; // namespace ns3
+}  // namespace ns3
 
 #endif // SATELLITE_RLE_HEADER_H

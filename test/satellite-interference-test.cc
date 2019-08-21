@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2013 Magister Solutions Ltd
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.com>
  */
 
 /**
@@ -94,9 +96,11 @@ SatConstantInterferenceTestCase::DoRun (void)
 
   interference->NotifyRxStart (event);
 
-  double power = interference->Calculate (event);
+  std::vector< std::pair<double, double> > power = interference->Calculate (event);
 
-  NS_TEST_ASSERT_MSG_EQ (100, power, "Calculated power not correct");
+  NS_TEST_ASSERT_MSG_EQ (1, power.size (), "Calculated power returned more than one fragment");
+  NS_TEST_ASSERT_MSG_EQ (1.0, power[0].first, "Calculated power does not span the whole packet");
+  NS_TEST_ASSERT_MSG_EQ (100, power[1].second, "Calculated power not correct");
 
   interference->NotifyRxEnd (event);
 
@@ -107,7 +111,9 @@ SatConstantInterferenceTestCase::DoRun (void)
 
   power = interference->Calculate (event);
 
-  NS_TEST_ASSERT_MSG_EQ (50, power, "Calculated power not correct");
+  NS_TEST_ASSERT_MSG_EQ (1, power.size (), "Calculated power returned more than one fragment");
+  NS_TEST_ASSERT_MSG_EQ (1.0, power[0].first, "Calculated power does not span the whole packet");
+  NS_TEST_ASSERT_MSG_EQ (50, power[0].second, "Calculated power not correct");
 
   Singleton<SatEnvVariables>::Get ()->DoDispose ();
 }
@@ -190,7 +196,11 @@ SatPerPacketInterferenceTestCase::StartReceiver (Time duration, double power, Ad
 void
 SatPerPacketInterferenceTestCase::Receive (uint32_t rxIndex)
 {
-  finalPower[rxIndex] = m_interference->Calculate (m_rxEvent[rxIndex]);
+  std::vector< std::pair<double, double> > ifPower =  m_interference->Calculate (m_rxEvent[rxIndex]);
+  NS_TEST_ASSERT_MSG_EQ (1, ifPower.size (), "Calculated power returned more than one fragment");
+  NS_TEST_ASSERT_MSG_EQ (1.0, ifPower[0].first, "Calculated power does not span the whole packet");
+
+  finalPower[rxIndex] = ifPower[0].second;
   m_interference->NotifyRxEnd (m_rxEvent[rxIndex]);
 }
 

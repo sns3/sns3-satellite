@@ -88,4 +88,4 @@ SatEncapPduStatusTag::Print (std::ostream &os) const
   os << "PPDU Status=" << (uint32_t) m_pduStatus;
 }
 
-}; // namespace ns3
+}  // namespace ns3

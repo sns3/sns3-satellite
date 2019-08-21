@@ -1,4 +1,4 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2014 Magister Solutions
  *
@@ -121,11 +121,11 @@ main (int argc, char *argv[])
   uint32_t i = 0;
   std::vector<Ptr<ClientRxTracePlot> > plots;
   for (auto app = apps.Begin (); app != apps.End (); app++, i++)
-  {
-    std::stringstream plotName;
-    plotName << "NRTV-TCP-client-" << i << "-trace";
-  	plots.push_back (CreateObject<ClientRxTracePlot> (*app, plotName.str ()));
-  }
+    {
+      std::stringstream plotName;
+      plotName << "NRTV-TCP-client-" << i << "-trace";
+      plots.push_back (CreateObject<ClientRxTracePlot> (*app, plotName.str ()));
+    }
 
 
   NS_LOG_INFO ("--- sat-nrtv-example ---");
@@ -133,7 +133,7 @@ main (int argc, char *argv[])
   NS_LOG_INFO ("  ");
 
   simulationHelper->RunSimulation ();
-  plots.clear();
+  plots.clear ();
 
   return 0;
 

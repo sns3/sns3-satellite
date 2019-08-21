@@ -45,7 +45,6 @@ namespace ns3 {
 class SatQueue : public Object
 {
 public:
-
   /**
    * \brief Get the type ID
    * \return the object TypeId
@@ -60,10 +59,10 @@ public:
   {
     QueueStats_t ()
       : m_incomingRateKbps (0.0),
-        m_outgoingRateKbps (0.0),
-        m_volumeInBytes (0),
-        m_volumeOutBytes (0),
-        m_queueSizeBytes (0)
+      m_outgoingRateKbps (0.0),
+      m_volumeInBytes (0),
+      m_volumeOutBytes (0),
+      m_queueSizeBytes (0)
     {
     }
     double   m_incomingRateKbps;

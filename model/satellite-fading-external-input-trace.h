@@ -48,8 +48,8 @@ public:
 
   /**
    * Constructor with initialization parameters.
-   * \param type 
-   * \param filePathName 
+   * \param type
+   * \param filePathName
    */
   SatFadingExternalInputTrace (TraceFileType_e type, std::string filePathName);
 

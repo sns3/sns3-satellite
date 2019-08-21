@@ -48,7 +48,7 @@ SatBaseFading::GetFading (Address macAddress, SatEnums::ChannelType_t channelTyp
 {
   NS_LOG_FUNCTION (this);
 
-  return DoGetFading (macAddress,channelType);
+  return DoGetFading (macAddress, channelType);
 }
 
 } // namespace ns3

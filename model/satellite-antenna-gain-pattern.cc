@@ -58,18 +58,18 @@ SatAntennaGainPattern::GetInstanceTypeId (void) const
 
 SatAntennaGainPattern::SatAntennaGainPattern ()
   : m_antennaPattern (),
-    m_validPositions (),
-    m_minAcceptableAntennaGainInDb (40.0),
-    m_uniformRandomVariable (),
-    m_latitudes (),
-    m_longitudes (),
-    m_minLat (0.0),
-    m_minLon (0.0),
-    m_maxLat (0.0),
-    m_maxLon (0.0),
-    m_latInterval (0.0),
-    m_lonInterval (0.0),
-    m_nanStrings ()
+  m_validPositions (),
+  m_minAcceptableAntennaGainInDb (40.0),
+  m_uniformRandomVariable (),
+  m_latitudes (),
+  m_longitudes (),
+  m_minLat (0.0),
+  m_minLon (0.0),
+  m_maxLat (0.0),
+  m_maxLon (0.0),
+  m_latInterval (0.0),
+  m_lonInterval (0.0),
+  m_nanStrings ()
 {
   // Do nothing here
 }
@@ -272,6 +272,16 @@ GeoCoordinate SatAntennaGainPattern::GetValidRandomPosition () const
 }
 
 
+bool SatAntennaGainPattern::IsValidPosition (GeoCoordinate coord, TracedCallback<double> cb) const
+{
+  NS_LOG_FUNCTION (this << coord.GetLatitude () << coord.GetLongitude ());
+
+  double antennaGain = SatUtils::LinearToDb (GetAntennaGain_lin (coord));
+  cb (antennaGain);
+  return antennaGain >= m_minAcceptableAntennaGainInDb;
+}
+
+
 double SatAntennaGainPattern::GetAntennaGain_lin (GeoCoordinate coord) const
 {
   NS_LOG_FUNCTION (this << coord.GetLatitude () << coord.GetLongitude ());
@@ -286,7 +296,7 @@ double SatAntennaGainPattern::GetAntennaGain_lin (GeoCoordinate coord) const
       || m_minLon > longitude
       || longitude > m_maxLon)
     {
-      NS_FATAL_ERROR (this << " given latitude and longitude out of range!");
+      NS_FATAL_ERROR ("Given latitude and longitude out of range!");
     }
 
   // Calculate the minimum grid point {minLatIndex, minLonIndex} for the given {latitude, longitude} point
@@ -306,9 +316,9 @@ double SatAntennaGainPattern::GetAntennaGain_lin (GeoCoordinate coord) const
 
   /**
    * 4-point bilinear interpolation
-   * R(x,y1) = (x2 - x)/(x2 - x1) * Q(x1,y1)) + (x - x1)/(x2 - x1) * Q(x2,y1);
-   * R(x,y2) = (x2 - x)/(x2 - x1) * Q(x1,y2)) + (x - x1)/(x2 - x1) * Q(x2,y2);
-   * R = (y2 - y)/(y2 - y1) * R(x,y1) + (y - y1)/(y2 - y1) * R(x,y2);
+   * R(x, y1) = (x2 - x)/(x2 - x1) * Q(x1, y1)) + (x - x1)/(x2 - x1) * Q(x2, y1);
+   * R(x, y2) = (x2 - x)/(x2 - x1) * Q(x1, y2)) + (x - x1)/(x2 - x1) * Q(x2, y2);
+   * R = (y2 - y)/(y2 - y1) * R(x, y1) + (y - y1)/(y2 - y1) * R(x, y2);
    */
 
   // Longitude direction with latitude minLatIndex
@@ -340,10 +350,10 @@ double SatAntennaGainPattern::GetAntennaGain_lin (GeoCoordinate coord) const
       ", y1 = " << m_latitudes[minLatIndex] <<
       ", x2 = " << m_longitudes[minLonIndex+1] <<
       ", y2 = " << m_latitudes[minLatIndex+1] <<
-      ", G(x1,y1) = " << m_antennaPattern[minLatIndex][minLonIndex] <<
-      ", G(x1,y2) = " << m_antennaPattern[minLatIndex+1][minLonIndex] <<
-      ", G(x2,y1) = " << m_antennaPattern[minLatIndex][minLonIndex+1] <<
-      ", G(x2,y2) = " << m_antennaPattern[minLatIndex+1][minLonIndex+1] <<
+      ", G(x1, y1) = " << m_antennaPattern[minLatIndex][minLonIndex] <<
+      ", G(x1, y2) = " << m_antennaPattern[minLatIndex+1][minLonIndex] <<
+      ", G(x2, y1) = " << m_antennaPattern[minLatIndex][minLonIndex+1] <<
+      ", G(x2, y2) = " << m_antennaPattern[minLatIndex+1][minLonIndex+1] <<
       ", x = " << longitude <<
       ", y = " << latitude <<
       ", interpolated gain: " << gain << std::endl;

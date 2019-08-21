@@ -63,7 +63,7 @@ private:
 
   double m_elevation;
   double m_velocity;
-  std::vector <std::pair<double,double> > m_fadingValues;
+  std::vector <std::pair<double, double> > m_fadingValues;
 };
 
 NS_OBJECT_ENSURE_REGISTERED (SatMarkovFadingExamplePlot);
@@ -87,7 +87,7 @@ void
 SatMarkovFadingExamplePlot::FadingTraceCb (std::string context, double time, SatEnums::ChannelType_t chType, double fadingValue)
 {
   std::cout << time << " " << chType << " " << 10 * log10 (fadingValue) << std::endl;
-  m_fadingValues.push_back (std::make_pair (time,10 * log10 (fadingValue)));
+  m_fadingValues.push_back (std::make_pair (time, 10 * log10 (fadingValue)));
 }
 
 double
@@ -140,13 +140,13 @@ SatMarkovFadingExamplePlot::Run ()
   /// Create default Markov & Loo configurations
   Ptr<SatMarkovConf> markovConf = CreateObject<SatMarkovConf> ();
 
-  SatBaseFading::ElevationCallback elevationCb = MakeCallback (&SatMarkovFadingExamplePlot::GetElevation,this);
-  SatBaseFading::VelocityCallback velocityCb = MakeCallback (&SatMarkovFadingExamplePlot::GetVelocity,this);
+  SatBaseFading::ElevationCallback elevationCb = MakeCallback (&SatMarkovFadingExamplePlot::GetElevation, this);
+  SatBaseFading::VelocityCallback velocityCb = MakeCallback (&SatMarkovFadingExamplePlot::GetVelocity, this);
 
   /// Create fading container based on default configuration
-  Ptr<SatMarkovContainer> markovContainer = CreateObject<SatMarkovContainer> (markovConf,elevationCb,velocityCb);
+  Ptr<SatMarkovContainer> markovContainer = CreateObject<SatMarkovContainer> (markovConf, elevationCb, velocityCb);
 
-  markovContainer->TraceConnect ("FadingTrace","The trace for fading values",MakeCallback (&SatMarkovFadingExamplePlot::FadingTraceCb,this));
+  markovContainer->TraceConnect ("FadingTrace", "The trace for fading values", MakeCallback (&SatMarkovFadingExamplePlot::FadingTraceCb, this));
 
   Address macAddress;
 
@@ -156,11 +156,11 @@ SatMarkovFadingExamplePlot::Run ()
       Simulator::Schedule (MilliSeconds (1 * i), &SatMarkovContainer::DoGetFading, markovContainer, macAddress, SatEnums::FORWARD_USER_CH);
     }
 
-  Simulator::Schedule (MilliSeconds (0), &SatMarkovContainer::LockToSetAndState, markovContainer, 0,0);
-  Simulator::Schedule (MilliSeconds (20000), &SatMarkovContainer::LockToSetAndState, markovContainer, 0,1);
-  Simulator::Schedule (MilliSeconds (40000), &SatMarkovContainer::LockToSetAndState, markovContainer, 0,2);
-  Simulator::Schedule (MilliSeconds (60000), &SatMarkovContainer::LockToSetAndState, markovContainer, 0,0);
-  Simulator::Schedule (MilliSeconds (80000), &SatMarkovContainer::LockToSetAndState, markovContainer, 0,1);
+  Simulator::Schedule (MilliSeconds (0), &SatMarkovContainer::LockToSetAndState, markovContainer, 0, 0);
+  Simulator::Schedule (MilliSeconds (20000), &SatMarkovContainer::LockToSetAndState, markovContainer, 0, 1);
+  Simulator::Schedule (MilliSeconds (40000), &SatMarkovContainer::LockToSetAndState, markovContainer, 0, 2);
+  Simulator::Schedule (MilliSeconds (60000), &SatMarkovContainer::LockToSetAndState, markovContainer, 0, 0);
+  Simulator::Schedule (MilliSeconds (80000), &SatMarkovContainer::LockToSetAndState, markovContainer, 0, 1);
 
   Simulator::Run ();
 

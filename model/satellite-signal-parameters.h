@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2013 Magister Solutions Ltd.
+ * Copyright (c) 2018 CNES
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
+ * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
 #ifndef SATELLITE_SIGNAL_PARAMETERS_H
@@ -145,16 +147,6 @@ public:
   double m_rxPowerInSatellite_W;
 
   /**
-   * Interference power (I)
-   */
-  double m_ifPower_W;
-
-  /**
-   * Interference power in the satellite (I)
-   */
-  double m_ifPowerInSatellite_W;
-
-  /**
    * Rx noise power in satellite
    */
   double m_rxNoisePowerInSatellite_W;
@@ -173,6 +165,99 @@ public:
    * Callback for SINR calculation
    */
   Callback<double, double> m_sinrCalculate;
+
+  /**
+   * \brief Set interference power based on packet fragment
+   * \param ifPowerPerFragment
+   */
+  inline void SetInterferencePower (std::vector< std::pair<double, double> > ifPowerPerFragment)
+  {
+    m_ifPowerPerFragment_W = ifPowerPerFragment;
+    m_ifPower_W = ComputeIfPowerFromFragments (m_ifPowerPerFragment_W);
+  }
+
+  /**
+   * \brief Get interference power (I)
+   */
+  inline double GetInterferencePower ()
+  {
+    return m_ifPower_W;
+  }
+
+  /**
+   * \brief Get interference power per packet fragment
+   */
+  inline std::vector< std::pair<double, double> > GetInterferencePowerPerFragment ()
+  {
+    return m_ifPowerPerFragment_W;
+  }
+
+  /**
+   * \brief Set interference power in satellite based on packet fragment
+   * \param ifPowerPerFragment
+   */
+  inline void SetInterferencePowerInSatellite (std::vector< std::pair<double, double> > ifPowerPerFragment)
+  {
+    m_ifPowerInSatellitePerFragment_W = ifPowerPerFragment;
+    m_ifPowerInSatellite_W = ComputeIfPowerFromFragments (m_ifPowerInSatellitePerFragment_W);
+  }
+
+  /**
+   * \brief Get interference power in satellite (I)
+   */
+  inline double GetInterferencePowerInSatellite ()
+  {
+    return m_ifPowerInSatellite_W;
+  }
+
+  /**
+   * \brief Get interference power in satellite per packet fragment
+   */
+  inline std::vector< std::pair<double, double> > GetInterferencePowerInSatellitePerFragment ()
+  {
+    return m_ifPowerInSatellitePerFragment_W;
+  }
+
+private:
+  /**
+   * Interference power (I)
+   */
+  double m_ifPower_W;
+
+  /**
+   * Interference power in the satellite (I)
+   */
+  double m_ifPowerInSatellite_W;
+
+  /**
+   * Interference power (I) per packet fragment.
+   *
+   * A pair p represent:
+   *  - p.first The percentage of time of the packet the interference is applicable
+   *  - p.second The value of the interference for the given amount of time
+   *
+   * As an example, the following values {(0.25, x), (0.5, y), (0.25, z)}
+   * represent the following interferences on the packet:
+   *
+   *  +---+-----+---+
+   *  | x |  y  | z |
+   *  +---+-----+---+
+   *  0   ¼     ¾   1
+   */
+  std::vector< std::pair<double, double> > m_ifPowerPerFragment_W;
+
+  /**
+   * Interference power in the satellite (I) per packet fragment.
+   *
+   * See m_ifPowerPerFragment_W for full description
+   */
+  std::vector< std::pair<double, double> > m_ifPowerInSatellitePerFragment_W;
+
+  /**
+   * \brief Compute the interference power value for the whole packet
+   * based off of individual values per fragment of packet.
+   */
+  double ComputeIfPowerFromFragments (const std::vector< std::pair<double, double> >& ifPowerPerFragment);
 };
 
 
