@@ -720,6 +720,16 @@ public:
     return m_configType;
   }
 
+  inline void SetMaxSubdivision (uint32_t maximumCarrierSubdivision)
+  {
+    m_maxCarrierSubdivision = maximumCarrierSubdivision;
+  }
+
+  inline uint32_t GetMaxSubdivision () const
+  {
+    return m_maxCarrierSubdivision;
+  }
+
   // Frame specific getter and setter method for attributes (called by methods of objects derived from this object)
   void SetFrameAllocatedBandwidthHz (uint8_t frameIndex, double bandwidthHz);
   void SetFrameCarrierAllocatedBandwidthHz (uint8_t frameIndex, double bandwidthHz);
@@ -744,6 +754,7 @@ private:
 
   uint8_t       m_frameCount;
   ConfigType_t  m_configType;
+  uint32_t      m_maxCarrierSubdivision;
 
   double    m_frameAllocatedBandwidth[m_maxFrameCount];
   double    m_frameCarrierAllocatedBandwidth[m_maxFrameCount];

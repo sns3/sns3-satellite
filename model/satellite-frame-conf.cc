@@ -959,7 +959,7 @@ SatSuperframeConf::GetIndexAsFrameName (uint32_t index)
                   MakeUintegerChecker<uint8_t> ())
 
 // macro to ease definition of attributes for several super frames
-#define ADD_SUPER_FRAME_ATTRIBUTES( frameCount, configType ) \
+#define ADD_SUPER_FRAME_ATTRIBUTES( frameCount, configType, maxSubdivision ) \
   .AddAttribute ("FrameCount", "The number of frames in super frame.", \
                  TypeId::ATTR_CONSTRUCT, \
                  UintegerValue (frameCount), \
@@ -973,7 +973,14 @@ SatSuperframeConf::GetIndexAsFrameName (uint32_t index)
                                     &SatSuperframeConf::GetConfigType), \
                  MakeEnumChecker ( SatSuperframeConf::CONFIG_TYPE_0, "ConfigType_0", \
                                    SatSuperframeConf::CONFIG_TYPE_1, "ConfigType_1", \
-                                   SatSuperframeConf::CONFIG_TYPE_2, "ConfigType_2"))
+                                   SatSuperframeConf::CONFIG_TYPE_2, "ConfigType_2", \
+                                   SatSuperframeConf::CONFIG_TYPE_3, "ConfigType_3")) \
+  .AddAttribute ("MaxCarrierSubdivision", "The maximum amount of subdivision for a single carrier (ConfigType_3 only).", \
+                 TypeId::ATTR_CONSTRUCT, \
+                 UintegerValue (maxSubdivision), \
+                 MakeUintegerAccessor (&SatSuperframeConf::SetMaxSubdivision, \
+                                       &SatSuperframeConf::GetMaxSubdivision), \
+                 MakeUintegerChecker<uint32_t> (0))
 
 
 uint8_t
@@ -1044,7 +1051,7 @@ SatSuperframeConf0::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatSuperframeConf0")
     .SetParent<ns3::SatSuperframeConf> ()
     .AddConstructor<SatSuperframeConf0> ()
-    ADD_SUPER_FRAME_ATTRIBUTES (10, SatSuperframeConf::CONFIG_TYPE_0 )
+    ADD_SUPER_FRAME_ATTRIBUTES (10, SatSuperframeConf::CONFIG_TYPE_0, 5)
     ADD_FRAME_ATTRIBUTES (0, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
     ADD_FRAME_ATTRIBUTES (1, 1.25e6, 1.25e6, 0.20, 0.30, true, 0)
     ADD_FRAME_ATTRIBUTES (2, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
@@ -1093,7 +1100,7 @@ SatSuperframeConf1::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatSuperframeConf1")
     .SetParent<ns3::SatSuperframeConf> ()
     .AddConstructor<SatSuperframeConf1> ()
-    ADD_SUPER_FRAME_ATTRIBUTES (10, SatSuperframeConf::CONFIG_TYPE_1)
+    ADD_SUPER_FRAME_ATTRIBUTES (10, SatSuperframeConf::CONFIG_TYPE_1, 5)
     ADD_FRAME_ATTRIBUTES (0, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
     ADD_FRAME_ATTRIBUTES (1, 1.25e6, 1.25e6, 0.20, 0.30, true, 0)
     ADD_FRAME_ATTRIBUTES (2, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
@@ -1142,7 +1149,7 @@ SatSuperframeConf2::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatSuperframeConf2")
     .SetParent<ns3::SatSuperframeConf> ()
     .AddConstructor<SatSuperframeConf2> ()
-    ADD_SUPER_FRAME_ATTRIBUTES (10, SatSuperframeConf::CONFIG_TYPE_2)
+    ADD_SUPER_FRAME_ATTRIBUTES (10, SatSuperframeConf::CONFIG_TYPE_2, 5)
     ADD_FRAME_ATTRIBUTES (0, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
     ADD_FRAME_ATTRIBUTES (1, 1.25e6, 1.25e6, 0.20, 0.30, true, 0)
     ADD_FRAME_ATTRIBUTES (2, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
@@ -1191,7 +1198,7 @@ SatSuperframeConf3::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatSuperframeConf3")
     .SetParent<ns3::SatSuperframeConf> ()
     .AddConstructor<SatSuperframeConf3> ()
-    ADD_SUPER_FRAME_ATTRIBUTES (10, SatSuperframeConf::CONFIG_TYPE_2)
+    ADD_SUPER_FRAME_ATTRIBUTES (10, SatSuperframeConf::CONFIG_TYPE_2, 5)
     ADD_FRAME_ATTRIBUTES (0, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
     ADD_FRAME_ATTRIBUTES (1, 1.25e6, 1.25e6, 0.20, 0.30, true, 0)
     ADD_FRAME_ATTRIBUTES (2, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
