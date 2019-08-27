@@ -395,8 +395,7 @@ SatSuperframeConf::SatSuperframeConf ()
   : m_usedBandwidthHz (0.0),
   m_duration (0.0),
   m_frameCount (0),
-  m_configType (CONFIG_TYPE_0),
-  m_carrierCount (0)
+  m_configType (CONFIG_TYPE_0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -425,14 +424,15 @@ SatSuperframeConf::GetInstanceTypeId (void) const
 }
 
 void
-SatSuperframeConf::AddFrameConf (Ptr<SatFrameConf> conf)
+SatSuperframeConf::AddFrameConf (Ptr<SatFrameConf> conf, uint8_t subdivisionLevel)
 {
   NS_LOG_FUNCTION (this);
+  uint32_t frameId = m_frames.size ();
+  m_frames.push_back (std::vector<Ptr<SatFrameConf> > ());
 
   // in case of random access frame, store carriers to RA channel container
   if ( conf->IsRandomAccess () )
     {
-      uint32_t frameId = m_frames.size ();
       uint16_t raBaseIndex = m_raChannels.size ();
 
       for ( uint32_t i = 0; i < conf->GetCarrierCount (); i++)
@@ -447,18 +447,34 @@ SatSuperframeConf::AddFrameConf (Ptr<SatFrameConf> conf)
 
           m_raChannels.push_back (std::make_tuple (frameId, i, conf->GetAllocationChannelId ()));
         }
-    }
 
-  m_frames.push_back (conf);
-  m_carrierCount += conf->GetCarrierCount ();
+      m_frames.back ().push_back (conf);
+    }
+  else
+    {
+      for (uint8_t i = 0; i < subdivisionLevel; ++i)
+        {
+          // TODO: actually subdivide stuff
+          m_frames.back ().push_back (conf);
+        }
+    }
 }
 
 Ptr<SatFrameConf>
 SatSuperframeConf::GetFrameConf (uint8_t index) const
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << (uint32_t) index);
 
-  return m_frames[index];
+  uint8_t subdivisionLevel = m_subdivisionLevels[index];
+  return m_frames[index][subdivisionLevel];
+}
+
+void
+SatSuperframeConf::SetCarrierSubdivisionLevel (uint8_t frameId, uint8_t subdivisionLevel)
+{
+  NS_LOG_FUNCTION (this << (uint32_t) frameId << (uint32_t) subdivisionLevel);
+
+  m_subdivisionLevels[frameId] = subdivisionLevel;
 }
 
 uint32_t
@@ -466,7 +482,17 @@ SatSuperframeConf::GetCarrierCount () const
 {
   NS_LOG_FUNCTION (this);
 
-  return m_carrierCount;
+  uint32_t carrierCount = 0;
+
+  for (auto& subdividedCarriers : m_frames)
+    {
+      for (auto& frameConf : subdividedCarriers)
+        {
+          carrierCount += frameConf->GetCarrierCount ();
+        }
+    }
+
+  return carrierCount;
 }
 
 uint32_t
@@ -474,16 +500,19 @@ SatSuperframeConf::GetCarrierId ( uint8_t frameId, uint16_t frameCarrierId ) con
 {
   NS_LOG_FUNCTION (this);
 
+  if (frameId > m_frames.size())
+    {
+      NS_FATAL_ERROR ("Frame ID out of range.");
+    }
+
   uint32_t carrierId = frameCarrierId;
 
   for (uint8_t i = 0; i < frameId; i++)
     {
-      if ( i >= m_frames.size ())
+      for (auto& frameConf : m_frames[i])
         {
-          NS_FATAL_ERROR ("Carrier ID out of range.");
+          carrierId += frameConf->GetCarrierCount ();
         }
-
-      carrierId += m_frames[i]->GetCarrierCount ();
     }
 
   return carrierId;
@@ -497,15 +526,24 @@ SatSuperframeConf::GetCarrierFrequencyHz (uint32_t carrierId) const
   double frameStartFrequency = 0.0;
   uint32_t carrierIdInFrame = carrierId;
 
-  uint8_t frameId = GetCarrierFrame (carrierId);
+  uint8_t frameId, subdivisionLevel;
+  std::tie (frameId, subdivisionLevel) = GetCarrierFrameAndSubdivisionLevel (carrierId);
 
-  for ( uint8_t i = 0; i < frameId; i++ )
+  for (uint8_t i = 0; i < frameId; ++i)
     {
-      carrierIdInFrame -= m_frames[i]->GetCarrierCount ();
-      frameStartFrequency += m_frames[i]->GetBandwidthHz ();
+      for (auto& frameConf : m_frames[i])
+        {
+          carrierIdInFrame -= frameConf->GetCarrierCount ();
+        }
+      frameStartFrequency += m_frames[i][0]->GetBandwidthHz ();
     }
 
-  double carrierFrequencyInFrame = m_frames[frameId]->GetCarrierFrequencyHz (carrierIdInFrame);
+  for (uint8_t i = 0; i < subdivisionLevel; ++i)
+    {
+      carrierIdInFrame -= m_frames[frameId][i]->GetCarrierCount ();
+    }
+
+  double carrierFrequencyInFrame = m_frames[frameId][subdivisionLevel]->GetCarrierFrequencyHz (carrierIdInFrame);
 
   return frameStartFrequency + carrierFrequencyInFrame;
 }
@@ -515,9 +553,10 @@ SatSuperframeConf::GetCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierB
 {
   NS_LOG_FUNCTION (this);
 
-  uint8_t frameId = GetCarrierFrame (carrierId);
+  uint8_t frameId, subdivisionLevel;
+  std::tie (frameId, subdivisionLevel) = GetCarrierFrameAndSubdivisionLevel (carrierId);
 
-  return m_frames[frameId]->GetCarrierBandwidthHz (bandwidthType);
+  return m_frames[frameId][subdivisionLevel]->GetCarrierBandwidthHz (bandwidthType);
 }
 
 Ptr<SatFrameConf>
@@ -525,9 +564,10 @@ SatSuperframeConf::GetCarrierFrameConf (uint32_t carrierId) const
 {
   NS_LOG_FUNCTION (this << carrierId);
 
-  uint8_t frameId = GetCarrierFrame (carrierId);
+  uint8_t frameId, subdivisionLevel;
+  std::tie (frameId, subdivisionLevel) = GetCarrierFrameAndSubdivisionLevel (carrierId);
 
-  return m_frames[frameId];
+  return m_frames[frameId][subdivisionLevel];
 }
 
 bool
@@ -535,7 +575,8 @@ SatSuperframeConf::IsRandomAccessCarrier (uint32_t carrierId) const
 {
   NS_LOG_FUNCTION (this);
 
-  uint8_t frameId = GetCarrierFrame (carrierId);
+  uint8_t frameId;
+  std::tie (frameId, std::ignore) = GetCarrierFrameAndSubdivisionLevel (carrierId);
 
   return m_frameIsRandomAccess[frameId];
 }
@@ -716,6 +757,7 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
 
   bool useDefaultWaveform = false;
   bool checkSlotLimit = true;
+  uint8_t subdivisionLevels = 1;
 
   /**
    * Note, that the superframe duration may be a bit longer than the frame
@@ -729,64 +771,56 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
   switch (m_configType)
     {
     case CONFIG_TYPE_0:
+      useDefaultWaveform = true;
+      break;
     case CONFIG_TYPE_1:
+      break;
     case CONFIG_TYPE_2:
-      {
-        m_raChannels.clear ();
-        m_frames.clear ();
-        m_carrierCount = 0;
-
-        if ( m_configType == CONFIG_TYPE_0)
-          {
-            useDefaultWaveform = true;
-          }
-
-        if ( m_configType == CONFIG_TYPE_2)
-          {
-            checkSlotLimit = false;
-          }
-
-        for (uint8_t frameIndex = 0; frameIndex < m_frameCount; frameIndex++)
-          {
-            // Create BTU conf according to given attributes
-            Ptr<SatBtuConf> btuConf = Create<SatBtuConf> (
-                m_frameCarrierAllocatedBandwidth[frameIndex],
-                m_frameCarrierRollOff[frameIndex],
-                m_frameCarrierSpacing[frameIndex]);
-
-            // Create frame utilizing earlier created BTU
-            SatFrameConf::SatFrameConfParams_t frameConfParameters;
-            frameConfParameters.m_bandwidthHz = m_frameAllocatedBandwidth[frameIndex];
-            frameConfParameters.m_targetDuration = targetDuration;
-            frameConfParameters.m_btuConf = btuConf;
-            frameConfParameters.m_waveformConf = waveformConf;
-            frameConfParameters.m_allocationChannel = m_frameAllocationChannel[frameIndex];
-            frameConfParameters.m_isRandomAccess = m_frameIsRandomAccess[frameIndex];
-            frameConfParameters.m_defaultWaveformInUse = useDefaultWaveform;
-            frameConfParameters.m_checkSlotLimit = checkSlotLimit;
-            Ptr<SatFrameConf> frameConf = Create<SatFrameConf> (frameConfParameters);
-
-            m_usedBandwidthHz += m_frameAllocatedBandwidth[frameIndex];
-
-            // Add created frame to super frame configuration
-            AddFrameConf (frameConf);
-          }
-
-        // check if configured frames exceeds given band
-        if ( m_usedBandwidthHz > allocatedBandwidthHz )
-          {
-            NS_FATAL_ERROR ("Bandwidth of super frame exceeds allocated bandwidth");
-          }
-      }
+      checkSlotLimit = false;
       break;
-
     case CONFIG_TYPE_3:
-      NS_FATAL_ERROR ("Configuration type 3 is not supported!!!");
+      checkSlotLimit = false;
+      subdivisionLevels = m_maxCarrierSubdivision;
       break;
-
     default:
       NS_FATAL_ERROR ("Not supported configuration type!!!");
       break;
+    }
+
+  m_raChannels.clear ();
+  m_subdivisionLevels.clear ();
+  m_frames.clear ();
+
+  for (uint8_t frameIndex = 0; frameIndex < m_frameCount; frameIndex++)
+    {
+      // Create BTU conf according to given attributes
+      Ptr<SatBtuConf> btuConf = Create<SatBtuConf> (
+          m_frameCarrierAllocatedBandwidth[frameIndex],
+          m_frameCarrierRollOff[frameIndex],
+          m_frameCarrierSpacing[frameIndex]);
+
+      // Create frame utilizing earlier created BTU
+      SatFrameConf::SatFrameConfParams_t frameConfParameters;
+      frameConfParameters.m_bandwidthHz = m_frameAllocatedBandwidth[frameIndex];
+      frameConfParameters.m_targetDuration = targetDuration;
+      frameConfParameters.m_btuConf = btuConf;
+      frameConfParameters.m_waveformConf = waveformConf;
+      frameConfParameters.m_allocationChannel = m_frameAllocationChannel[frameIndex];
+      frameConfParameters.m_isRandomAccess = m_frameIsRandomAccess[frameIndex];
+      frameConfParameters.m_defaultWaveformInUse = useDefaultWaveform;
+      frameConfParameters.m_checkSlotLimit = checkSlotLimit;
+      Ptr<SatFrameConf> frameConf = Create<SatFrameConf> (frameConfParameters);
+
+      m_usedBandwidthHz += m_frameAllocatedBandwidth[frameIndex];
+
+      // Add created frame to super frame configuration
+      AddFrameConf (frameConf, subdivisionLevels);
+    }
+
+  // check if configured frames exceeds given band
+  if ( m_usedBandwidthHz > allocatedBandwidthHz )
+    {
+      NS_FATAL_ERROR ("Bandwidth of super frame exceeds allocated bandwidth");
     }
 }
 
@@ -802,7 +836,7 @@ SatSuperframeConf::GetRaSlots (uint8_t raChannel)
       uint8_t frameId = std::get<0> (m_raChannels[raChannel]);
       uint32_t carrierId = std::get<1> (m_raChannels[raChannel]);
 
-      timeSlots = m_frames[frameId]->GetTimeSlotConfs (carrierId);
+      timeSlots = m_frames[frameId][0]->GetTimeSlotConfs (carrierId);
     }
   else
     {
@@ -824,7 +858,7 @@ SatSuperframeConf::GetRaSlotCount (uint8_t raChannel)
       uint8_t frameId = std::get<0> (m_raChannels[raChannel]);
       uint32_t carrierId = std::get<1> (m_raChannels[raChannel]);
 
-      slotCount = m_frames[frameId]->GetTimeSlotConfs (carrierId).size ();
+      slotCount = m_frames[frameId][0]->GetTimeSlotConfs (carrierId).size ();
     }
   else
     {
@@ -889,8 +923,8 @@ SatSuperframeConf::GetRaChannelTimeSlotPayloadInBytes (uint8_t raChannel) const
   if ( raChannel < m_raChannels.size ())
     {
       uint8_t frameId = std::get<0> (m_raChannels[raChannel]);
-      Ptr<SatTimeSlotConf> timeSlotConf = (*m_frames[frameId]->GetTimeSlotConfs (0).begin ());
-      Ptr<SatWaveform> waveform = m_frames[frameId]->GetWaveformConf ()->GetWaveform ( timeSlotConf->GetWaveFormId ());
+      Ptr<SatTimeSlotConf> timeSlotConf = (*m_frames[frameId][0]->GetTimeSlotConfs (0).begin ());
+      Ptr<SatWaveform> waveform = m_frames[frameId][0]->GetWaveformConf ()->GetWaveform ( timeSlotConf->GetWaveFormId ());
 
       payloadInBytes = waveform->GetPayloadInBytes ();
     }
@@ -980,24 +1014,34 @@ SatSuperframeConf::GetIndexAsFrameName (uint32_t index)
                  UintegerValue (maxSubdivision), \
                  MakeUintegerAccessor (&SatSuperframeConf::SetMaxSubdivision, \
                                        &SatSuperframeConf::GetMaxSubdivision), \
-                 MakeUintegerChecker<uint32_t> (0))
+                 MakeUintegerChecker<uint8_t> (0))
 
 
-uint8_t
-SatSuperframeConf::GetCarrierFrame (uint32_t carrierId) const
+std::pair<uint8_t, uint8_t>
+SatSuperframeConf::GetCarrierFrameAndSubdivisionLevel (uint32_t carrierId) const
 {
   NS_LOG_FUNCTION (this);
 
   uint32_t currentFrame = 0;
-  uint32_t lastIdInFrame = m_frames[0]->GetCarrierCount () - 1;
+  uint8_t currentSubdivisionLevel = 0;
+  uint32_t totalCarriers = 0;
 
-  while (carrierId > lastIdInFrame)
+  for (auto& subdivisionLevels : m_frames)
     {
-      currentFrame++;
-      lastIdInFrame += m_frames[currentFrame]->GetCarrierCount ();
+      currentSubdivisionLevel = 0;
+      for (auto& frameConf : subdivisionLevels)
+        {
+          totalCarriers += frameConf->GetCarrierCount ();
+          if (carrierId < totalCarriers)
+            {
+              return std::make_pair (currentFrame, currentSubdivisionLevel);
+            }
+          ++currentSubdivisionLevel;
+        }
+      ++currentFrame;
     }
 
-  return currentFrame;
+  NS_FATAL_ERROR ("Carrier ID out of range");
 }
 
 uint8_t
@@ -1006,20 +1050,29 @@ SatSuperframeConf::GetRaChannel (uint32_t carrierId) const
   NS_LOG_FUNCTION (this);
 
   uint8_t raChannelId = 0;
-  uint8_t frameId = GetCarrierFrame (carrierId);
+  uint8_t frameId, subdivisionLevel;
+  std::tie (frameId, subdivisionLevel) = GetCarrierFrameAndSubdivisionLevel (carrierId);
 
-  if ( m_frames[frameId]->IsRandomAccess () )
+  if ( m_frames[frameId][subdivisionLevel]->IsRandomAccess () )
     {
+      NS_ASSERT_MSG (subdivisionLevel == 0, "Incorrect handling of subdivision level on RA frame");
+
       uint32_t carrierIdInFrame = carrierId;
 
       for ( uint8_t i = 0; i < frameId; i++ )
         {
-          carrierIdInFrame -= m_frames[i]->GetCarrierCount ();
+          uint32_t carrierCountInCurrentFrame = 0;
+          for (auto& frameConf : m_frames[i])
+            {
+              carrierCountInCurrentFrame += frameConf->GetCarrierCount ();
+            }
+
+          carrierIdInFrame -= carrierCountInCurrentFrame;
 
           // increase RA channel id (index) by count of RA carriers before asked carrier/frame
-          if ( m_frames[i]->IsRandomAccess () )
+          if ( m_frames[i][0]->IsRandomAccess () )
             {
-              raChannelId += m_frames[i]->GetCarrierCount ();
+              raChannelId += carrierCountInCurrentFrame;
             }
         }
 

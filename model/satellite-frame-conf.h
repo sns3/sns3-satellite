@@ -463,7 +463,7 @@ public:
   /**
    * Define type SatFrameConfList_t
    */
-  typedef std::vector<Ptr<SatFrameConf> > SatFrameConfList_t;
+  typedef std::vector<std::vector<Ptr<SatFrameConf> > > SatFrameConfList_t;
 
   /**
    * Enum for configuration types
@@ -557,6 +557,8 @@ public:
    * \return      The requested frame conf of the super frame.
    */
   Ptr<SatFrameConf> GetFrameConf (uint8_t id) const;
+
+  void SetCarrierSubdivisionLevel (uint8_t frameId, uint8_t subdivisionLevel);
 
   /**
    * Get carrier id of the super frame. Converts frame specific id to super frame specific id.
@@ -720,12 +722,12 @@ public:
     return m_configType;
   }
 
-  inline void SetMaxSubdivision (uint32_t maximumCarrierSubdivision)
+  inline void SetMaxSubdivision (uint8_t maximumCarrierSubdivision)
   {
     m_maxCarrierSubdivision = maximumCarrierSubdivision;
   }
 
-  inline uint32_t GetMaxSubdivision () const
+  inline uint8_t GetMaxSubdivision () const
   {
     return m_maxCarrierSubdivision;
   }
@@ -754,7 +756,7 @@ private:
 
   uint8_t       m_frameCount;
   ConfigType_t  m_configType;
-  uint32_t      m_maxCarrierSubdivision;
+  uint8_t       m_maxCarrierSubdivision;
 
   double    m_frameAllocatedBandwidth[m_maxFrameCount];
   double    m_frameCarrierAllocatedBandwidth[m_maxFrameCount];
@@ -764,8 +766,8 @@ private:
   uint8_t   m_frameAllocationChannel[m_maxFrameCount];
 
   SatFrameConfList_t            m_frames;
+  std::vector<uint8_t>          m_subdivisionLevels;
   std::vector<RaChannelInfo_t>  m_raChannels;
-  uint32_t                      m_carrierCount;
 
   /**
    * Get frame id where given global carrier ID belongs to.
@@ -773,14 +775,14 @@ private:
    * \param carrierId Carried ID which frame ID is requested.
    * \return frame id where given global carrier ID belongs to.
    */
-  uint8_t GetCarrierFrame (uint32_t carrierId) const;
+  std::pair<uint8_t, uint8_t> GetCarrierFrameAndSubdivisionLevel (uint32_t carrierId) const;
 
   /**
    * Add frame configuration to super frame configuration.
    *
    * \param conf  Frame configuration to add super frame configuration
    */
-  void AddFrameConf (Ptr<SatFrameConf> conf);
+  void AddFrameConf (Ptr<SatFrameConf> conf, uint8_t subdivisionLevel);
 
 public:
   // macro to ease definition of access methods for frame specific attributes
