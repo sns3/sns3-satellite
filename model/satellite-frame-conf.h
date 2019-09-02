@@ -371,9 +371,24 @@ public:
    *
    * \return The carrier count of the frame.
    */
-  inline uint16_t GetCarrierCount ()
+  inline uint16_t GetCarrierCount () const
   {
     return m_carrierCount;
+  }
+
+  /**
+   * Set used carrier count of the frame.
+   */
+  void SetCarrierUsed (uint16_t count);
+
+  /**
+   * Get used carrier count of the frame.
+   *
+   * \return The count of carrier used in the frame.
+   */
+  inline uint16_t GetCarrierUsed () const
+  {
+    return m_carrierInUseCount;
   }
 
   /**
@@ -428,6 +443,7 @@ private:
   Ptr<SatWaveformConf>  m_waveformConf;
   uint8_t               m_allocationChannel;
   uint16_t              m_carrierCount;
+  uint16_t              m_carrierInUseCount;
   uint32_t              m_maxSymbolsPerCarrier;
   uint32_t              m_minPayloadPerCarrierInBytes;
   SatTimeSlotConfMap_t  m_timeSlotConfMap;
@@ -463,7 +479,7 @@ public:
   /**
    * Define type SatFrameConfList_t
    */
-  typedef std::vector<std::vector<Ptr<SatFrameConf> > > SatFrameConfList_t;
+  typedef std::vector<Ptr<SatFrameConf> > SatFrameConfList_t;
 
   /**
    * Enum for configuration types
@@ -558,7 +574,7 @@ public:
    */
   Ptr<SatFrameConf> GetFrameConf (uint8_t id) const;
 
-  void SetCarrierSubdivisionLevel (uint8_t frameId, uint8_t subdivisionLevel);
+  void SetCarrierUsedInFrame (uint8_t frameId, uint16_t carrierCount);
 
   /**
    * Get carrier id of the super frame. Converts frame specific id to super frame specific id.
@@ -766,8 +782,8 @@ private:
   uint8_t   m_frameAllocationChannel[m_maxFrameCount];
 
   SatFrameConfList_t            m_frames;
-  std::vector<uint8_t>          m_subdivisionLevels;
   std::vector<RaChannelInfo_t>  m_raChannels;
+  uint32_t                      m_carrierCount;
 
   /**
    * Get frame id where given global carrier ID belongs to.
@@ -775,14 +791,18 @@ private:
    * \param carrierId Carried ID which frame ID is requested.
    * \return frame id where given global carrier ID belongs to.
    */
-  std::pair<uint8_t, uint8_t> GetCarrierFrameAndSubdivisionLevel (uint32_t carrierId) const;
+  uint8_t GetCarrierFrame (uint32_t carrierId) const;
 
   /**
    * Add frame configuration to super frame configuration.
    *
    * \param conf  Frame configuration to add super frame configuration
    */
-  void AddFrameConf (Ptr<SatFrameConf> conf, uint8_t subdivisionLevel);
+  void AddFrameConf (SatFrameConf::SatFrameConfParams_t frameConfParameters,
+                     double bandwidthInHz,
+                     double rollOff,
+                     double spacing,
+                     uint8_t subdivisionLevel);
 
 public:
   // macro to ease definition of access methods for frame specific attributes

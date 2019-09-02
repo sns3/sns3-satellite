@@ -115,16 +115,16 @@ SatSuperframeSeq::GetCarrierCount ( uint8_t seqId ) const
 }
 
 void
-SatSuperframeSeq::SetCarrierSubdivisionLevel (uint8_t seqId, uint8_t frameId, uint8_t subdivisionLevel)
+SatSuperframeSeq::SetCarrierUsedInFrame (uint8_t seqId, uint8_t frameId, uint16_t carrierCount)
 {
-  NS_LOG_FUNCTION (this << (uint32_t) seqId << (uint32_t) frameId << (uint32_t) subdivisionLevel);
+  NS_LOG_FUNCTION (this << (uint32_t) seqId << (uint32_t) frameId << carrierCount);
 
   if (seqId >= m_superframe.size ())
     {
       NS_FATAL_ERROR ("SatSuperframeSeq::SetCarrierSubdivisionLevel - unsupported sequenc id: " << (uint32_t) seqId);
     }
 
-  return m_superframe[seqId]->SetCarrierSubdivisionLevel (frameId, subdivisionLevel);
+  return m_superframe[seqId]->SetCarrierUsedInFrame (frameId, carrierCount);
 }
 
 Time
