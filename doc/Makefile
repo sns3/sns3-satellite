@@ -113,7 +113,7 @@ create-build-dir:
 	@mkdir -p $(BUILDDIR)
 
 clean:
-	-rm -rf $(BUILDDIR)/*
+	-rm -rf $(BUILDDIR)
 	-rm -rf $(SOURCETEMP)
 
 html: copy-sources $(IMAGES) 
