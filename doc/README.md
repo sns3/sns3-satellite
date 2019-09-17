@@ -17,3 +17,11 @@ make SPHINXOPTS=-N -k doxygen html singlehtml latexpdf
 
 
 All generated documentation will be stored in a new folder named `build`
+
+---
+
+In case `ImageMagic` complains that you cannot generate some of the required
+images, you can refer to the following thread to get insights of how to solve
+the issue:
+
+https://stackoverflow.com/q/52998331/5069029
