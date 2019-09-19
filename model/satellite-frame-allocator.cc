@@ -173,6 +173,7 @@ SatFrameAllocator::SatFrameAllocator ()
   m_preAllocatedRdbcSymbols (0.0),
   m_preAllocatedVdbcSymbols (0.0),
   m_maxSymbolsPerCarrier (0),
+  m_maxCarrierCount (0),
   m_configType (SatSuperframeConf::CONFIG_TYPE_0),
   m_frameId (0)
 {
@@ -182,15 +183,21 @@ SatFrameAllocator::SatFrameAllocator ()
 
 SatFrameAllocator::SatFrameAllocator (Ptr<SatFrameConf> frameConf, uint8_t frameId, SatSuperframeConf::ConfigType_t configType)
   : m_allocationDenied (true),
+  m_maxCarrierCount (0),
   m_configType (configType),
   m_frameId (frameId),
   m_frameConf (frameConf)
 {
   NS_LOG_FUNCTION (this << (uint32_t) frameId);
 
+  if (!m_frameConf->GetParent ())
+    {
+      m_maxCarrierCount = m_frameConf->GetCarrierCount ();
+    }
+
   m_waveformConf = m_frameConf->GetWaveformConf ();
   m_maxSymbolsPerCarrier = frameConf->GetCarrierMaxSymbols ();
-  m_totalSymbolsInFrame = m_maxSymbolsPerCarrier * m_frameConf->GetCarrierCount ();
+  m_totalSymbolsInFrame = m_maxSymbolsPerCarrier * m_maxCarrierCount;
 
   switch ( m_configType )
     {
@@ -219,6 +226,7 @@ SatFrameAllocator::SatFrameAllocator (Ptr<SatFrameConf> frameConf, uint8_t frame
       }
 
     case SatSuperframeConf::CONFIG_TYPE_2:
+    case SatSuperframeConf::CONFIG_TYPE_3:
       {
         if ( frameConf->GetWaveformConf ()->IsAcmEnabled () )
           {
@@ -255,6 +263,7 @@ SatFrameAllocator::Reset ()
 {
   NS_LOG_FUNCTION (this);
 
+  m_totalSymbolsInFrame = m_maxSymbolsPerCarrier * m_maxCarrierCount;
   m_availableSymbolsInFrame = m_totalSymbolsInFrame;
   m_preAllocatedCraSymbols = 0;
   m_preAllocatedMinRdbcSymbols = 0;
@@ -265,6 +274,19 @@ SatFrameAllocator::Reset ()
   m_rcAllocs.clear ();
 
   m_allocationDenied = false;
+}
+
+void
+SatFrameAllocator::SetCarrierCount (uint16_t count)
+{
+  NS_LOG_FUNCTION (this << count);
+
+  if (count > m_frameConf->GetCarrierCount ())
+    {
+      NS_FATAL_ERROR ("SatFrameAllocator::SetCarrierCount: Amount of carriers in use is greater than the amount of carriers in frame.");
+    }
+
+  m_maxCarrierCount = count;
 }
 
 double
@@ -319,6 +341,7 @@ SatFrameAllocator::GetBestWaveform (double cno, uint32_t & waveFormId) const
       break;
 
     case SatSuperframeConf::CONFIG_TYPE_2:
+    case SatSuperframeConf::CONFIG_TYPE_3:
       cnoSupported = m_waveformConf->GetBestWaveformId ( cno, m_frameConf->GetBtuConf ()->GetSymbolRateInBauds (), waveFormId, SatWaveformConf::SHORT_BURST_LENGTH);
       break;
 
@@ -835,13 +858,13 @@ SatFrameAllocator::CreateTimeSlot (uint16_t carrierId, int64_t& utSymbolsToUse, 
 
         case SatSuperframeConf::CONFIG_TYPE_1:
         case SatSuperframeConf::CONFIG_TYPE_2:
+        case SatSuperframeConf::CONFIG_TYPE_3:
           {
             Time startTime = Seconds ( (m_maxSymbolsPerCarrier - carrierSymbolsToUse) / m_frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
             timeSlotConf = Create<SatTimeSlotConf> (startTime, waveformId, carrierId, SatTimeSlotConf::SLOT_TYPE_TRC);
           }
           break;
 
-        case SatSuperframeConf::CONFIG_TYPE_3:
         default:
           NS_FATAL_ERROR ("Not supported configuration type!!!");
           break;
@@ -1133,7 +1156,7 @@ SatFrameAllocator::SortCarriers ()
 
   std::vector<uint16_t> carriers;
 
-  for ( uint16_t i = 0; i < m_frameConf->GetCarrierCount (); i++ )
+  for ( uint16_t i = 0; i < m_maxCarrierCount; i++ )
     {
       carriers.push_back (i);
     }

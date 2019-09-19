@@ -120,8 +120,6 @@ public:
    */
   uint32_t GetCarrierCount ( uint8_t seqId ) const;
 
-  void SetCarrierUsedInFrame (uint8_t seqId, uint8_t frameId, uint16_t carrierCount);
-
   /**
    * \brief Get duration of the super frame.
    *

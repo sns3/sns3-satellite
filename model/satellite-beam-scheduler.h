@@ -546,6 +546,11 @@ private:
   uint32_t UpdateDamaEntriesWithAllocs (SatFrameAllocator::UtAllocInfoContainer_t& utAllocContainer);
 
   /**
+   * Do carriers selection, before time slot generation. Used when dynamic frequency plan is requested.
+   */
+  void DoCarriersSelection ();
+
+  /**
    * Do pre-allocation of the symbols per UT/RC, before time slot generation.
    */
   void DoPreResourceAllocation ();

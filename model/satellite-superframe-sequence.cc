@@ -114,19 +114,6 @@ SatSuperframeSeq::GetCarrierCount ( uint8_t seqId ) const
   return m_superframe[seqId]->GetCarrierCount ();
 }
 
-void
-SatSuperframeSeq::SetCarrierUsedInFrame (uint8_t seqId, uint8_t frameId, uint16_t carrierCount)
-{
-  NS_LOG_FUNCTION (this << (uint32_t) seqId << (uint32_t) frameId << carrierCount);
-
-  if (seqId >= m_superframe.size ())
-    {
-      NS_FATAL_ERROR ("SatSuperframeSeq::SetCarrierSubdivisionLevel - unsupported sequenc id: " << (uint32_t) seqId);
-    }
-
-  return m_superframe[seqId]->SetCarrierUsedInFrame (frameId, carrierCount);
-}
-
 Time
 SatSuperframeSeq::GetDuration ( uint8_t seqId ) const
 {

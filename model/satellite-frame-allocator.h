@@ -180,6 +180,21 @@ public:
   }
 
   /**
+   * Get the amount of carriers used in this frame.
+   *
+   * \return The carrier count of the frame.
+   */
+  inline uint16_t GetCarrierCount () const
+  {
+    return m_maxCarrierCount;
+  }
+
+  /**
+   * Set the amount of carriers used in this frame.
+   */
+  void SetCarrierCount (uint16_t count);
+
+  /**
    * Reset frame allocator.
    */
   void Reset ();
@@ -417,6 +432,9 @@ private:
 
   // maximum symbols available in frame
   double  m_maxSymbolsPerCarrier;
+
+  // maximum carriers available in frame
+  uint16_t m_maxCarrierCount;
 
   // configuration type of the frame
   SatSuperframeConf::ConfigType_t  m_configType;

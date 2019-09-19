@@ -114,7 +114,6 @@ SatFrameConf::SatFrameConf ()
   m_btuConf (0),
   m_allocationChannel (0),
   m_carrierCount (0),
-  m_carrierInUseCount (0),
   m_maxSymbolsPerCarrier (0),
   m_minPayloadPerCarrierInBytes (0)
 {
@@ -133,7 +132,7 @@ SatFrameConf::SatFrameConf (SatFrameConfParams_t parameters)
 {
   NS_LOG_FUNCTION (this);
 
-  m_carrierCount = m_carrierInUseCount = m_bandwidthHz / m_btuConf->GetAllocatedBandwidthInHz ();
+  m_carrierCount = m_bandwidthHz / m_btuConf->GetAllocatedBandwidthInHz ();
 
   if ( m_carrierCount == 0 )
     {
@@ -244,19 +243,6 @@ SatFrameConf::GetCarrierBandwidthHz (SatEnums::CarrierBandwidthType_t bandwidthT
     }
 
   return bandwidth;
-}
-
-void
-SatFrameConf::SetCarrierUsed (uint16_t count)
-{
-  NS_LOG_FUNCTION (this << count);
-
-  if (count > m_carrierCount)
-    {
-      NS_FATAL_ERROR ("SatFrameConf::SetCarrierUsed: Trying to use more carriers than available");
-    }
-
-  m_carrierInUseCount = count;
 }
 
 uint16_t
@@ -474,21 +460,24 @@ SatSuperframeConf::AddFrameConf (SatFrameConf::SatFrameConfParams_t frameConfPar
     }
   else
     {
+      Ptr<SatFrameConf> parent = nullptr;
+
       for (uint8_t i = 0; i <= subdivisionLevel; ++i)
         {
           SatFrameConf::SatFrameConfParams_t currentFrameConfParameters = frameConfParameters;
-          double subdivisionAmount = std::pow (2.0, static_cast<double> (subdivisionLevel - i));
+          double subdivisionAmount = std::pow (2.0, static_cast<double> (subdivisionLevel));
 
           // Create BTU conf according to given attributes
+          currentFrameConfParameters.m_parent = parent;
           currentFrameConfParameters.m_btuConf = Create<SatBtuConf> (bandwidthInHz / subdivisionAmount, rollOff, spacing);
           Ptr<SatFrameConf> frameConf = Create<SatFrameConf> (currentFrameConfParameters);
-          if (i != subdivisionLevel)
+          if (!parent)
             {
-              frameConf->SetCarrierUsed (0);
+              parent = frameConf;
             }
 
           m_frames.push_back (frameConf);
-          m_carrierCount += frameConf->GetCarrierUsed ();
+          m_carrierCount += frameConf->GetCarrierCount ();
         }
     }
 }
@@ -499,14 +488,6 @@ SatSuperframeConf::GetFrameConf (uint8_t index) const
   NS_LOG_FUNCTION (this << (uint32_t) index);
 
   return m_frames[index];
-}
-
-void
-SatSuperframeConf::SetCarrierUsedInFrame (uint8_t frameId, uint16_t carrierCount)
-{
-  NS_LOG_FUNCTION (this << (uint32_t) frameId << carrierCount);
-
-  m_frames[frameId]->SetCarrierUsed (carrierCount);
 }
 
 uint32_t
@@ -804,6 +785,7 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
       SatFrameConf::SatFrameConfParams_t frameConfParameters;
       frameConfParameters.m_bandwidthHz = m_frameAllocatedBandwidth[frameIndex];
       frameConfParameters.m_targetDuration = targetDuration;
+      frameConfParameters.m_parent = nullptr;
       frameConfParameters.m_btuConf = nullptr;
       frameConfParameters.m_waveformConf = waveformConf;
       frameConfParameters.m_allocationChannel = m_frameAllocationChannel[frameIndex];

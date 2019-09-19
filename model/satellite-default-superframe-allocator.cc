@@ -104,7 +104,7 @@ SatDefaultSuperframeAllocator::SatDefaultSuperframeAllocator (Ptr<SatSuperframeC
               m_mostRobustSlotPayloadInBytes = mostRobustSlotPayloadInBytes;
             }
 
-          m_minimumRateBasedBytesLeft += frameConf->GetCarrierCount () * minCarrierPayloadInBytes;
+          m_minimumRateBasedBytesLeft += frameAllocator->GetCarrierCount () * minCarrierPayloadInBytes;
         }
     }
 }
@@ -112,6 +112,21 @@ SatDefaultSuperframeAllocator::SatDefaultSuperframeAllocator (Ptr<SatSuperframeC
 SatDefaultSuperframeAllocator::~SatDefaultSuperframeAllocator ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+void
+SatDefaultSuperframeAllocator::SelectCarriers ()
+{
+  NS_LOG_FUNCTION (this);
+
+  switch (m_superframeConf->GetConfigType ())
+    {
+      case SatSuperframeConf::CONFIG_TYPE_3:
+        NS_LOG_DEBUG ("Should select carriers here");
+        break;
+      default:
+        break;
+    }
 }
 
 void
