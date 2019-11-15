@@ -338,11 +338,11 @@ SatWaveformConf::GetDefaultWaveformId () const
 }
 
 bool
-SatWaveformConf::GetBestWaveformId (double cno, double symbolRateInBaud, uint32_t& wfId, uint32_t burstLength) const
+SatWaveformConf::GetBestWaveformId (double cno, double symbolRateInBaud, uint32_t& wfId, double& cnoThreshold, uint32_t burstLength) const
 {
-  NS_LOG_FUNCTION (this << cno << symbolRateInBaud << wfId << burstLength);
+  NS_LOG_FUNCTION (this << cno << symbolRateInBaud << wfId << cnoThreshold << burstLength);
 
-  bool success (false);
+  bool success = false;
 
   // If ACM is disabled, return the default waveform
   if (!m_acmEnabled || std::isnan (cno))
@@ -364,13 +364,14 @@ SatWaveformConf::GetBestWaveformId (double cno, double symbolRateInBaud, uint32_
           if (cnoThr <= cno)
             {
               wfId = rit->first;
+              cnoThreshold = cnoThr;
               success = true;
               break;
             }
         }
     }
 
-  NS_LOG_INFO ("Get best waveform in RTN link (ACM)! CNo: " << SatUtils::LinearToDb (cno) << ", Symbol rate: " << symbolRateInBaud << ", burst length: " << burstLength << ", WF: " << wfId);
+  NS_LOG_INFO ("Get best waveform in RTN link (ACM)! CNo: " << SatUtils::LinearToDb (cno) << ", Symbol rate: " << symbolRateInBaud << ", burst length: " << burstLength << ", WF: " << wfId << ", CNo threshold: " << SatUtils::LinearToDb (cnoThreshold));
 
   return success;
 }

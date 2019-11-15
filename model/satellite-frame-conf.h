@@ -358,14 +358,23 @@ class SatFrameConf : public SimpleRefCount<SatFrameConf>
     double GetCarrierBandwidthHz (SatEnums::CarrierBandwidthType_t bandwidthType) const;
 
     /**
-     * Get parent configuration of this subdivided frame.
+     * Get wether this frame is subdivided or not.
      *
-     * \return the parent SatFrameConf of frame or NULL if the frame is not subdivided.
+     * \return true if this frame is subdivided, false otherwise.
      */
-    inline Ptr<SatFrameConf> GetParent () const
+    inline bool IsSubdivided () const
     {
-      return m_parent;
+      return m_parent != nullptr;;
     }
+
+    /**
+     * Get the subdivision level of this frame.
+     *
+     * \return the amount of time this frame add its carriers split in two.
+     */
+    uint8_t GetSubdivisionLevel () const;
+
+    inline Ptr<SatFrameConf> GetParent () const { return m_parent; }
 
     /**
      * Get BTU conf of the frame.

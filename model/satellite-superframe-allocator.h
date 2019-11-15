@@ -78,13 +78,6 @@ public:
   }
 
   /**
-   * \brief Select which carriers to use from the underlying frames. This method is called to perform
-   * dynamic frequency plan functionality. It should be a no-op if the superframe configuration is not
-   * of the CONFIG_TYPE_3 type.
-   */
-  virtual void SelectCarriers () = 0;
-
-  /**
    * \brief Reserve minimum rate from the allocator. This method is called to perform CAC functionality.
    *
    * \param minimumRateBytes Minimum rate based bytes needed to reserve

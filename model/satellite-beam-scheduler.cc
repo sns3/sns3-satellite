@@ -525,8 +525,6 @@ SatBeamScheduler::Schedule ()
     {
       requestedKbpsSum = UpdateDamaEntriesWithReqs ();
 
-      DoCarriersSelection ();
-
       DoPreResourceAllocation ();
 
       // generate time slots
@@ -691,13 +689,6 @@ SatBeamScheduler::UpdateDamaEntriesWithReqs ()
     }
 
   return requestedCraRbdcKbps;
-}
-
-void SatBeamScheduler::DoCarriersSelection ()
-{
-  NS_LOG_FUNCTION (this);
-
-  m_superframeAllocator->SelectCarriers ();
 }
 
 void SatBeamScheduler::DoPreResourceAllocation ()

@@ -168,6 +168,8 @@ SatFrameAllocatorTestCase::RunSingleUtTest (SatSuperframeConf::ConfigType_t conf
 
   InitFrame (configType);
 
+  double cnoThreshold = std::numeric_limits<double>::quiet_NAN();
+
   // Test with one UT and one RC
   for ( uint32_t i = 0; i < 11; i += 2) // CRAs
     {
@@ -188,7 +190,7 @@ SatFrameAllocatorTestCase::RunSingleUtTest (SatSuperframeConf::ConfigType_t conf
                       m_frameAllocator->Reset ();
 
                       uint32_t waveformId = m_waveFormConf->GetDefaultWaveformId ();
-                      m_frameAllocator->GetBestWaveform (req.m_cno, waveformId);
+                      m_frameAllocator->GetBestWaveform (req.m_cno, waveformId, cnoThreshold);
 
                       // do allocation and check that result is what expected
                       bool allocationResult = m_frameAllocator->Allocate (m_ccLevels[o], &req, waveformId );
@@ -239,7 +241,7 @@ SatFrameAllocatorTestCase::RunSingleUtTest (SatSuperframeConf::ConfigType_t conf
               m_frameAllocator->Reset ();
 
               uint32_t waveformId = m_waveFormConf->GetDefaultWaveformId ();
-              m_frameAllocator->GetBestWaveform (req.m_cno, waveformId);
+              m_frameAllocator->GetBestWaveform (req.m_cno, waveformId, cnoThreshold);
 
               // do allocation and check that result is what expected
               bool allocationResult = m_frameAllocator->Allocate (m_ccLevels[o], &req, waveformId );
@@ -399,11 +401,12 @@ SatFrameAllocatorTestCase::RunMultiUtTest ()
   req[5] = ContructRequestForUt (utBytesReq[5], 1, 1, 1, 1, 1, false );
 
   uint32_t waveformId[6];
+  double cnoThreshold = std::numeric_limits<double>::quiet_NAN();
 
   for (uint32_t i = 0; i < 6; i++ )
     {
       waveformId[i] = m_waveFormConf->GetDefaultWaveformId ();
-      m_frameAllocator->GetBestWaveform (req[i].m_cno, waveformId[i]);
+      m_frameAllocator->GetBestWaveform (req[i].m_cno, waveformId[i], cnoThreshold);
     }
 
   bool allocationResult;

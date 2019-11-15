@@ -30,9 +30,12 @@
 
 NS_LOG_COMPONENT_DEFINE ("SatDefaultSuperframeAllocator");
 
+
 namespace ns3 {
 
+
 NS_OBJECT_ENSURE_REGISTERED (SatDefaultSuperframeAllocator);
+
 
 TypeId
 SatDefaultSuperframeAllocator::GetTypeId (void)
@@ -79,14 +82,28 @@ SatDefaultSuperframeAllocator::SatDefaultSuperframeAllocator (Ptr<SatSuperframeC
   uint32_t currentMinCarrierPayloadInBytes = std::numeric_limits<uint32_t>::max ();
   uint32_t currentMostRobustSlotPayloadInBytes = std::numeric_limits<uint32_t>::max ();
 
+  Ptr<SatFrameConf> parentFrameConf = nullptr;
+  Ptr<SatFrameAllocator> parentFrameAllocator = nullptr;
   for (uint8_t i = 0; i < superFrameConf->GetFrameCount (); i++ )
     {
       Ptr<SatFrameConf> frameConf = superFrameConf->GetFrameConf (i);
-
       if (frameConf->IsRandomAccess () == false )
         {
-          Ptr<SatFrameAllocator> frameAllocator = Create<SatFrameAllocator> (frameConf, i, superFrameConf->GetConfigType ());
+          Ptr<SatFrameConf> parentConf = frameConf->GetParent ();
+          if (parentConf != parentFrameConf)
+            {
+              NS_ASSERT_MSG (parentConf == nullptr, "Wrong ordering of frame confs. Need to have subdivided ones right after their parents.");
+              parentFrameAllocator = nullptr;
+            }
+          parentFrameConf = frameConf;
+
+          Ptr<SatFrameAllocator> frameAllocator = Create<SatFrameAllocator> (
+                  frameConf,
+                  i,
+                  superFrameConf->GetConfigType (),
+                  parentFrameAllocator);
           m_frameAllocators.push_back ( frameAllocator );
+          parentFrameAllocator = frameAllocator;
 
           uint32_t minCarrierPayloadInBytes = frameAllocator->GetCarrierMinPayloadInBytes ();
 
@@ -115,17 +132,109 @@ SatDefaultSuperframeAllocator::~SatDefaultSuperframeAllocator ()
 }
 
 void
-SatDefaultSuperframeAllocator::SelectCarriers ()
+SatDefaultSuperframeAllocator::SelectCarriers (SatFrameAllocator::SatFrameAllocContainer_t& allocReqs)
 {
   NS_LOG_FUNCTION (this);
 
-  switch (m_superframeConf->GetConfigType ())
+  std::map<Address, std::pair<Ptr<SatFrameAllocator>, uint32_t>> term_wsr;
+  // iterate allocReqs to determine best waveform 
+  for (auto& allocRequest : allocReqs)
     {
-      case SatSuperframeConf::CONFIG_TYPE_3:
-        NS_LOG_DEBUG ("Should select carriers here");
-        break;
-      default:
-        break;
+      double cno = allocRequest->m_cno;
+      double cnoDiff = 0.0;
+      uint32_t bestWaveFormId = 0;
+      Ptr<SatFrameAllocator> selectedFrameAllocator = nullptr;
+      bool found = false;
+
+      for (auto& frameAllocator : m_frameAllocators)
+        {
+          uint32_t waveFormId;
+          double waveformCNo;
+          if (frameAllocator->GetBestWaveform (cno, waveFormId, waveformCNo))
+            {
+              double diff = cno - waveformCNo;
+              if (!found || diff < cnoDiff)
+                {
+                  found = true;
+                  cnoDiff = diff;
+                  bestWaveFormId = waveFormId;
+                  selectedFrameAllocator = frameAllocator;
+                }
+            }
+        }
+
+      if (found)
+        {
+          term_wsr[allocRequest->m_address] = std::make_pair (selectedFrameAllocator, bestWaveFormId);
+        }
+      else
+        {
+          NS_LOG_WARN ("SatDefaultSuperframeAllocator::SelectCarriers: No suitable frame and waveform found for terminal at " << allocRequest->m_address << " with C/N0 of " << cno << ". Ignoring this terminal in carrier selection.");
+        }
+    }
+
+  std::map<Ptr<SatFrameAllocator>, uint32_t> wsrDemand;
+  // calculate agregate demand per frameAllocator
+  for (auto& allocRequest : allocReqs)
+    {
+      Ptr<SatFrameAllocator> allocator = term_wsr[allocRequest->m_address].first;
+      for (auto& request : allocRequest->m_reqPerRc)
+        {
+          wsrDemand[allocator] += request.m_craBytes + std::max(request.m_minRbdcBytes, request.m_rbdcBytes) + request.m_vbdcBytes;
+        }
+    }
+
+  double requestedBandwidth = 0.0;
+  // calculate load coefficient
+  for (auto& demand : wsrDemand)
+    {
+      requestedBandwidth += demand.first->GetBandwidthHz () * demand.second / demand.first->GetVolumeBytes ();
+    }
+  double totalBandwidth = 0.0;
+  for (auto& frameAllocator : m_frameAllocators)
+    {
+      totalBandwidth += frameAllocator->GetBandwidthHz (true);
+    }
+  double loadCoefficient = std::min(std::max(0.1, requestedBandwidth / totalBandwidth), 10.0);
+
+  std::map<Ptr<SatFrameAllocator>, double, SatFrameAllocator::BandwidthComparator> scaledDemand;
+  for (auto& demand : wsrDemand)
+    {
+      scaledDemand[demand.first] = loadCoefficient * demand.second / demand.first->GetVolumeBytes ();
+    }
+
+  // zero-out old carrier selection
+  for (auto& frameAllocator : m_frameAllocators)
+    {
+      frameAllocator->SelectCarriers (0, 0);
+    }
+
+  // select which carriers to use
+  double remainingBandwidth = totalBandwidth;
+  while (!scaledDemand.empty ())
+    {
+      Ptr<SatFrameAllocator> frameAllocator = scaledDemand.begin()->first;
+      uint16_t offset = 0;
+      do
+        {
+          auto frameDemand = scaledDemand.find (frameAllocator);
+          double demand = 0.0;
+          if (frameDemand != scaledDemand.end ())
+            {
+              demand = frameDemand->second;
+              scaledDemand.erase (frameDemand);
+            }
+          // TODO: need to adapt remaining bandwidth to more than 1 original frame
+          uint16_t carriersCount = std::max (uint16_t (0), uint16_t (std::min (demand, remainingBandwidth / frameAllocator->GetBandwidthHz ())));
+          uint16_t totalCarriers = frameAllocator->SelectCarriers (carriersCount, offset);
+
+          offset = totalCarriers / 2;
+          frameAllocator = frameAllocator->GetParent ();
+        }
+      while (frameAllocator != nullptr);
+
+      // Make sure to select remaining carriers of the original frame
+      frameAllocator->SelectCarriers (0, offset);
     }
 }
 
@@ -165,6 +274,11 @@ void
 SatDefaultSuperframeAllocator::PreAllocateSymbols (SatFrameAllocator::SatFrameAllocContainer_t& allocReqs)
 {
   NS_LOG_FUNCTION (this);
+
+  if (m_superframeConf->GetConfigType () == SatSuperframeConf::CONFIG_TYPE_3)
+    {
+      SelectCarriers (allocReqs);
+    }
 
   RemoveAllocations ();
 
@@ -240,8 +354,8 @@ SatDefaultSuperframeAllocator::AllocateToFrame (SatFrameAllocator::SatFrameAlloc
   for (FrameAllocatorContainer_t::iterator it = m_frameAllocators.begin (); it != m_frameAllocators.end (); it++  )
     {
       uint32_t waveformId = 0;
-
-      if ( (*it)->GetBestWaveform (allocReq->m_cno, waveformId) )
+      double cnoThreshold = std::numeric_limits<double>::quiet_NaN();
+      if ( (*it)->GetBestWaveform (allocReq->m_cno, waveformId, cnoThreshold) )
         {
           supportedFrames.insert (std::make_pair (*it, waveformId));
         }

@@ -126,6 +126,7 @@ SatFrameConf::SatFrameConf ()
 SatFrameConf::SatFrameConf (SatFrameConfParams_t parameters)
   : m_bandwidthHz (parameters.m_bandwidthHz),
   m_isRandomAccess (parameters.m_isRandomAccess),
+  m_parent (parameters.m_parent),
   m_btuConf (parameters.m_btuConf),
   m_waveformConf (parameters.m_waveformConf),
   m_allocationChannel (parameters.m_allocationChannel)
@@ -243,6 +244,24 @@ SatFrameConf::GetCarrierBandwidthHz (SatEnums::CarrierBandwidthType_t bandwidthT
     }
 
   return bandwidth;
+}
+
+uint8_t
+SatFrameConf::GetSubdivisionLevel () const
+{
+  NS_LOG_FUNCTION (this);
+
+  uint8_t subdivisionLevel = 0;
+  Ptr<SatFrameConf> parent = m_parent;
+
+  while (parent != nullptr)
+    {
+      ++subdivisionLevel;
+      parent = parent->m_parent;
+    }
+
+  NS_LOG_INFO ("Subdivision level is " << (uint32_t) subdivisionLevel);
+  return subdivisionLevel;
 }
 
 uint16_t
@@ -460,24 +479,20 @@ SatSuperframeConf::AddFrameConf (SatFrameConf::SatFrameConfParams_t frameConfPar
     }
   else
     {
-      Ptr<SatFrameConf> parent = nullptr;
-
       for (uint8_t i = 0; i <= subdivisionLevel; ++i)
         {
           SatFrameConf::SatFrameConfParams_t currentFrameConfParameters = frameConfParameters;
           double subdivisionAmount = std::pow (2.0, static_cast<double> (subdivisionLevel));
 
           // Create BTU conf according to given attributes
-          currentFrameConfParameters.m_parent = parent;
           currentFrameConfParameters.m_btuConf = Create<SatBtuConf> (bandwidthInHz / subdivisionAmount, rollOff, spacing);
           Ptr<SatFrameConf> frameConf = Create<SatFrameConf> (currentFrameConfParameters);
-          if (!parent)
-            {
-              parent = frameConf;
-            }
 
           m_frames.push_back (frameConf);
           m_carrierCount += frameConf->GetCarrierCount ();
+
+          // Update parent for the next subdivided frame conf
+          currentFrameConfParameters.m_parent = frameConf;
         }
     }
 }
