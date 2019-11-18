@@ -136,7 +136,7 @@ SatDefaultSuperframeAllocator::SelectCarriers (SatFrameAllocator::SatFrameAllocC
 {
   NS_LOG_FUNCTION (this);
 
-  std::map<Address, std::pair<Ptr<SatFrameAllocator>, uint32_t>> term_wsr;
+  std::map<Address, std::pair<Ptr<SatFrameAllocator>, uint32_t>> termWSR;
   // iterate allocReqs to determine best waveform 
   for (auto& allocRequest : allocReqs)
     {
@@ -165,7 +165,7 @@ SatDefaultSuperframeAllocator::SelectCarriers (SatFrameAllocator::SatFrameAllocC
 
       if (found)
         {
-          term_wsr[allocRequest->m_address] = std::make_pair (selectedFrameAllocator, bestWaveFormId);
+          termWSR[allocRequest->m_address] = std::make_pair (selectedFrameAllocator, bestWaveFormId);
         }
       else
         {
@@ -177,10 +177,14 @@ SatDefaultSuperframeAllocator::SelectCarriers (SatFrameAllocator::SatFrameAllocC
   // calculate agregate demand per frameAllocator
   for (auto& allocRequest : allocReqs)
     {
-      Ptr<SatFrameAllocator> allocator = term_wsr[allocRequest->m_address].first;
-      for (auto& request : allocRequest->m_reqPerRc)
+      auto allocatorIterator = termWSR.find(allocRequest->m_address);
+      if (allocatorIterator != termWSR.end ())
         {
-          wsrDemand[allocator] += request.m_craBytes + std::max(request.m_minRbdcBytes, request.m_rbdcBytes) + request.m_vbdcBytes;
+          Ptr<SatFrameAllocator> allocator = allocatorIterator->second.first;
+          for (auto& request : allocRequest->m_reqPerRc)
+            {
+              wsrDemand[allocator] += request.m_craBytes + std::max(request.m_minRbdcBytes, request.m_rbdcBytes) + request.m_vbdcBytes;
+            }
         }
     }
 
@@ -210,31 +214,51 @@ SatDefaultSuperframeAllocator::SelectCarriers (SatFrameAllocator::SatFrameAllocC
     }
 
   // select which carriers to use
-  double remainingBandwidth = totalBandwidth;
   while (!scaledDemand.empty ())
     {
+      // Find bandwidth of the original frame
       Ptr<SatFrameAllocator> frameAllocator = scaledDemand.begin()->first;
+      while (frameAllocator->GetParent () != nullptr)
+        {
+          frameAllocator = frameAllocator->GetParent ();
+        }
+      double remainingBandwidth = frameAllocator->GetBandwidthHz (true);;
+      NS_ASSERT_MSG (remainingBandwidth != 0.0, "Could not find bandwidth of original frame");
+
+      // Select carriers from the most subdivided version of the frame up to the original
+      frameAllocator = scaledDemand.begin()->first;
       uint16_t offset = 0;
-      do
+      while (frameAllocator != nullptr)
         {
           auto frameDemand = scaledDemand.find (frameAllocator);
-          double demand = 0.0;
+          uint16_t demand = 0;
           if (frameDemand != scaledDemand.end ())
             {
               demand = frameDemand->second;
               scaledDemand.erase (frameDemand);
             }
-          // TODO: need to adapt remaining bandwidth to more than 1 original frame
-          uint16_t carriersCount = std::max (uint16_t (0), uint16_t (std::min (demand, remainingBandwidth / frameAllocator->GetBandwidthHz ())));
-          uint16_t totalCarriers = frameAllocator->SelectCarriers (carriersCount, offset);
 
+          uint16_t totalCarriers = 0;
+          double carrierBandwidth = frameAllocator->GetBandwidthHz ();
+          if (frameAllocator->GetParent () != nullptr)
+            {
+              // Select requested carriers of subdivided frames
+              uint16_t remainingCarriers = remainingBandwidth / carrierBandwidth;
+              uint16_t carriersCount = std::max (uint16_t (0), std::min (demand, remainingCarriers));
+              totalCarriers = frameAllocator->SelectCarriers (carriersCount, offset);
+            }
+          else
+            {
+              // Select remaining carriers of parent frame
+              totalCarriers = frameAllocator->SelectCarriers (0, offset);
+            }
+
+          remainingBandwidth -= totalCarriers * carrierBandwidth;
           offset = totalCarriers / 2;
           frameAllocator = frameAllocator->GetParent ();
         }
-      while (frameAllocator != nullptr);
 
-      // Make sure to select remaining carriers of the original frame
-      frameAllocator->SelectCarriers (0, offset);
+      // TODO? Check that remainingBandwidth is close to 0.0
     }
 }
 

@@ -149,6 +149,9 @@ def build(bld):
     obj = bld.create_ns3_program('sat-generic-launcher', ['satellite'])
     obj.source = 'sat-generic-launcher.cc'
 
+    obj = bld.create_ns3_program('sat-dynamic-frequency-plan-example', ['satellite'])
+    obj.source = 'sat-dynamic-frequency-plan-example.cc' 
+
     obj = bld.create_ns3_program('sat-mobility-position-generator', ['satellite'])
     obj.source = 'sat-mobility-position-generator.cc'
 
