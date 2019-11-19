@@ -139,6 +139,9 @@ private:
   // the most robust
   uint32_t m_mostRobustSlotPayloadInBytes;
 
+  // the total bandwidth for all configured frames
+  double m_totalBandwidth;
+
   /**
    *  Allocate given request according to type.
    *
@@ -169,6 +172,14 @@ private:
    * configuration is of the CONFIG_TYPE_3 type.
    */
   void SelectCarriers (SatFrameAllocator::SatFrameAllocContainer_t& allocReqs);
+
+  /**
+   * \brief Select which carrier is the best suited for handling requests
+   * of a terminal communicating at the given C/N0.
+   * \return The SatFrameAllocator suitable for such carriers or nullptr if
+   * none can be found.
+   */
+  Ptr<SatFrameAllocator> SelectBestCarrier (double cno, uint32_t& bestWaveFormId);
 };
 
 } // namespace ns3
