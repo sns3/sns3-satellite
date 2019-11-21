@@ -88,7 +88,7 @@ SatDefaultSuperframeAllocator::SatDefaultSuperframeAllocator (Ptr<SatSuperframeC
   for (uint8_t i = 0; i < superFrameConf->GetFrameCount (); i++ )
     {
       Ptr<SatFrameConf> frameConf = superFrameConf->GetFrameConf (i);
-      if (frameConf->IsRandomAccess () == false )
+      if (!frameConf->IsRandomAccess ())
         {
           Ptr<SatFrameConf> parentConf = frameConf->GetParent ();
           if (parentConf != parentFrameConf)
