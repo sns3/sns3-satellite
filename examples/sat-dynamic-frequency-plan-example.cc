@@ -57,19 +57,32 @@ main (int argc, char *argv[])
   simulationHelper->AddDefaultUiArguments (cmd, inputFileNameWithPath);
   cmd.Parse (argc, argv);
 
-  // Disable traffic from XML before configuring the simulation
-  Config::SetDefault ("ns3::SimulationHelperConf::TrafficCbrPercentage", DoubleValue (0.0));
-  Config::SetDefault ("ns3::SimulationHelperConf::TrafficHttpPercentage", DoubleValue (0.0));
-  Config::SetDefault ("ns3::SimulationHelperConf::TrafficOnOffPercentage", DoubleValue (0.0));
-  Config::SetDefault ("ns3::SimulationHelperConf::TrafficNrtvPercentage", DoubleValue (0.0));
-  simulationHelper->ConfigureAttributesFromFile (inputFileNameWithPath);
+  simulationHelper->ReadInputAttributesFromFile (inputFileNameWithPath);
   simulationHelper->StoreAttributesToFile ("parametersUsed.xml");
+
+  // Manual configuration of the simulation to avoid creating unnecessary traffic
+  Ptr<SimulationHelperConf> simulationConf = CreateObject<SimulationHelperConf> ();
+  simulationHelper->SetBeams (simulationConf->m_enabledBeams);
+  simulationHelper->SetUtCountPerBeam (simulationConf->m_utCount);
+  simulationHelper->SetUserCountPerUt (simulationConf->m_utUserCount);
+  simulationHelper->SetUserCountPerMobileUt (simulationConf->m_utMobileUserCount);
+  simulationHelper->SetSimulationTime (simulationConf->m_simTime);
+  simulationHelper->CreateSatScenario (SatHelper::NONE, simulationConf->m_mobileUtsFolder);
+  if (simulationConf->m_activateProgressLogging)
+    {
+      simulationHelper->EnableProgressLogs ();
+    }
 
   // Configure our own kind of traffic
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (40));
   simulationHelper->InstallTrafficModel (
       SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
       Seconds (0), Seconds (60), MilliSeconds (50), 1.0);
+
+  if (simulationConf->m_activateStatistics)
+    {
+      // simulationHelper->CreateDefaultStats ();
+    }
 
   simulationHelper->RunSimulation ();
 }
