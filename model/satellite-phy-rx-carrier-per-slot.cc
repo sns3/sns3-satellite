@@ -202,6 +202,8 @@ SatPhyRxCarrierPerSlot::ProcessSlottedAlohaCollisions (double cSinr,
 void
 SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams, const uint32_t nPackets)
 {
+  NS_LOG_FUNCTION (this << &packetRxParams << nPackets);
+
   NS_ASSERT (packetRxParams.rxParams->m_txInfo.packetType != SatEnums::PACKET_TYPE_CRDSA);
   /// calculates sinr for 2nd link
   double sinr = CalculateSinr ( packetRxParams.rxParams->m_rxPower_W,
