@@ -44,13 +44,15 @@ using namespace ns3;
 NS_LOG_COMPONENT_DEFINE ("sat-generic-launcher");
 
 
-static double g_txMaxPower = -8.98;
+static double g_txMaxPower = -9.0;
 static bool g_ascending = false;
+static Time g_cnoInterval = MilliSeconds (100);
+static Time g_simulationTime = Minutes (1);
 
 
 static void ChangeCno (const std::vector<Ptr<SatUtPhy>>& utsPhysicalLayers)
 {
-  g_txMaxPower += g_ascending ? 0.01 : -0.01;
+  g_txMaxPower += g_ascending ? 2.0 : -2.0;
   g_ascending = (g_ascending && g_txMaxPower < 30.0) || (!g_ascending && g_txMaxPower < -30.0);
 
   for (auto& phy : utsPhysicalLayers)
@@ -58,7 +60,7 @@ static void ChangeCno (const std::vector<Ptr<SatUtPhy>>& utsPhysicalLayers)
       phy->SetAttribute ("TxMaxPowerDbw", DoubleValue (g_txMaxPower));
     }
 
-  Simulator::Schedule (MilliSeconds (100), &ChangeCno, utsPhysicalLayers);
+  Simulator::Schedule (g_cnoInterval, &ChangeCno, utsPhysicalLayers);
 }
 
 
@@ -83,7 +85,7 @@ main (int argc, char *argv[])
   cmd.Parse (argc, argv);
 
   Config::SetDefault ("ns3::SimulationHelperConf::BeamsIDs", StringValue ("12"));
-  Config::SetDefault ("ns3::SimulationHelperConf::UtCountPerBeam", StringValue ("ns3::ConstantRandomVariable[Constant=1]"));
+  Config::SetDefault ("ns3::SimulationHelperConf::UtCountPerBeam", StringValue ("ns3::ConstantRandomVariable[Constant=30]"));
   Config::SetDefault ("ns3::SimulationHelperConf::UserCountPerUt", StringValue ("ns3::ConstantRandomVariable[Constant=1]"));
 
   Config::SetDefault ("ns3::SatSuperframeConf0::FrameCount", UintegerValue (1));
@@ -96,6 +98,16 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatSuperframeConf0::Frame0_RandomAccessFrame", BooleanValue (false));
 
   Config::SetDefault ("ns3::SatSuperframeSeq::TargetDuration", TimeValue (superframeDuration));
+  Config::SetDefault ("ns3::CbrApplication::Interval", TimeValue (superframeDuration));
+
+  Config::SetDefault ("ns3::SatFwdLinkScheduler::CnoEstimationWindow", TimeValue (MilliSeconds (500)));
+  Config::SetDefault ("ns3::SatRequestManager::CnoReportInterval", TimeValue (g_cnoInterval));
+  Config::SetDefault ("ns3::SatBeamScheduler::CnoEstimationMode", StringValue ("MinimumValueInWindow"));
+  Config::SetDefault ("ns3::SatBeamScheduler::CnoEstimationWindow", TimeValue (g_cnoInterval));
+
+  Config::SetDefault ("ns3::SatUtPhy::TxMaxPowerDbw", DoubleValue (g_txMaxPower));
+  Config::SetDefault ("ns3::SatGeoUserPhy::TxMaxPowerDbw", DoubleValue (15.0));
+  Config::SetDefault ("ns3::SatGeoFeederPhy::FixedAmplificationGainDb", DoubleValue (200.0));
 
   simulationHelper->ReadInputAttributesFromFile (inputFileNameWithPath);
 
@@ -105,7 +117,7 @@ main (int argc, char *argv[])
   simulationHelper->SetUtCountPerBeam (simulationConf->m_utCount);
   simulationHelper->SetUserCountPerUt (simulationConf->m_utUserCount);
   simulationHelper->SetUserCountPerMobileUt (simulationConf->m_utMobileUserCount);
-  simulationHelper->SetSimulationTime (/* simulationConf->m_simTime */ Seconds (60));
+  simulationHelper->SetSimulationTime (g_simulationTime);
   simulationHelper->CreateSatScenario (SatHelper::NONE, simulationConf->m_mobileUtsFolder);
   if (simulationConf->m_activateProgressLogging)
     {
@@ -135,15 +147,73 @@ main (int argc, char *argv[])
             }
         }
       Simulator::Schedule (Seconds (0), &ChangeCno, utsPhysicalLayers);
+
+      simulationHelper->InstallTrafficModel (
+          SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
+          Seconds (0), g_simulationTime, MilliSeconds (50), 1.0);
     }
   else
     {
       // Configure our own kind of traffic
-      Config::SetDefault ("ns3::CbrApplication::Interval", TimeValue (superframeDuration));
       Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (40));
       simulationHelper->InstallTrafficModel (
           SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
-          Seconds (0), Seconds (60), MilliSeconds (50), 1.0);
+          Seconds (0), g_simulationTime, MilliSeconds (50), 1.0);
+
+      Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (25600));
+      simulationHelper->InstallTrafficModel (
+          SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
+          Seconds (0), Seconds (10), MilliSeconds (50), 0.3);
+
+      Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (1000));
+      simulationHelper->InstallTrafficModel (
+          SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
+          Seconds (5), Seconds (15), MilliSeconds (50), 0.4);
+
+      Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (1000));
+      simulationHelper->InstallTrafficModel (
+          SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
+          Seconds (10), Seconds (20), MilliSeconds (50), 0.5);
+
+      Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (40000));
+      simulationHelper->InstallTrafficModel (
+          SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
+          Seconds (15), Seconds (25), MilliSeconds (50), 0.2);
+
+      Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (1));
+      simulationHelper->InstallTrafficModel (
+          SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
+          Seconds (20), Seconds (30), MilliSeconds (50), 0.7);
+
+      Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (100));
+      simulationHelper->InstallTrafficModel (
+          SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
+          Seconds (25), Seconds (35), MilliSeconds (50), 0.45);
+
+      Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (3000));
+      simulationHelper->InstallTrafficModel (
+          SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
+          Seconds (30), Seconds (40), MilliSeconds (50), 0.55);
+
+      Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (40000));
+      simulationHelper->InstallTrafficModel (
+          SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
+          Seconds (35), Seconds (45), MilliSeconds (50), 0.2);
+
+      Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (30000));
+      simulationHelper->InstallTrafficModel (
+          SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
+          Seconds (40), Seconds (50), MilliSeconds (50), 0.3);
+
+      Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (1500));
+      simulationHelper->InstallTrafficModel (
+          SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
+          Seconds (45), Seconds (55), MilliSeconds (50), 0.6);
+
+      Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (800));
+      simulationHelper->InstallTrafficModel (
+          SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
+          Seconds (50), Seconds (60), MilliSeconds (50), 0.9);
     }
 
   if (simulationConf->m_activateStatistics)
