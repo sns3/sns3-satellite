@@ -585,7 +585,7 @@ SatSuperframeConf::IsRandomAccessCarrier (uint32_t carrierId) const
 
   uint8_t frameId = GetCarrierFrame (carrierId);
 
-  return m_frameIsRandomAccess[frameId];
+  return m_frames[frameId]->IsRandomAccess ();
 }
 
 void
@@ -723,12 +723,12 @@ SatSuperframeConf::IsFrameRandomAccess (uint8_t frameIndex) const
 {
   NS_LOG_FUNCTION (this << (uint32_t)frameIndex);
 
-  if ( frameIndex >= m_maxFrameCount )
+  if ( frameIndex >= m_frames.size() )
     {
       NS_FATAL_ERROR ("Frame index out of range!!!");
     }
 
-  return m_frameIsRandomAccess[frameIndex];
+  return m_frames[frameIndex]->IsRandomAccess ();
 }
 
 uint8_t

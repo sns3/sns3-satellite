@@ -849,7 +849,7 @@ Ptr<SatTimeSlotConf>
 SatFrameAllocator::CreateTimeSlot (uint16_t carrierId, int64_t& utSymbolsToUse, int64_t& carrierSymbolsToUse,
                                    int64_t& utSymbolsLeft, int64_t& rcSymbolsLeft, double cno, bool rcBasedAllocationEnabled)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << carrierId << cno << rcBasedAllocationEnabled);
 
   Ptr<SatTimeSlotConf> timeSlotConf = NULL;
   int64_t symbolsToUse = std::min<int64_t> (carrierSymbolsToUse, utSymbolsToUse);
