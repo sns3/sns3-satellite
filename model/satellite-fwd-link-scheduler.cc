@@ -140,11 +140,6 @@ SatFwdLinkScheduler::GetTypeId (void)
                     TimeValue (Seconds (5000)),
                     MakeTimeAccessor (&SatFwdLinkScheduler::m_cnoEstimationWindow),
                     MakeTimeChecker ())
-    .AddAttribute ( "BBFrameContainer",
-                    "BB frame container of this scheduler.",
-                    PointerValue (),
-                    MakePointerAccessor (&SatFwdLinkScheduler::m_bbFrameContainer),
-                    MakePointerChecker<SatBbFrameContainer> ())
   ;
   return tid;
 }
@@ -167,16 +162,8 @@ SatFwdLinkScheduler::SatFwdLinkScheduler (Ptr<SatBbFrameConf> conf, Mac48Address
 {
   NS_LOG_FUNCTION (this);
 
-  //
-  std::vector<SatEnums::SatModcod_t> modCods;
-  SatEnums::GetAvailableModcodsFwdLink (modCods);
-
-  m_bbFrameContainer = CreateObject<SatBbFrameContainer> (modCods, m_bbFrameConf);
-
   // Random variable used in scheduling
   m_random = CreateObject<UniformRandomVariable> ();
-
-  Simulator::Schedule (m_periodicInterval, &SatFwdLinkScheduler::PeriodicTimerExpired, this);
 }
 
 SatFwdLinkScheduler::~SatFwdLinkScheduler ()
@@ -190,7 +177,6 @@ SatFwdLinkScheduler::DoDispose ()
   NS_LOG_FUNCTION (this);
   m_schedContextCallback.Nullify ();
   m_txOpportunityCallback.Nullify ();
-  m_bbFrameContainer = NULL;
   m_cnoEstimatorContainer.clear ();
 }
 
@@ -212,34 +198,9 @@ SatFwdLinkScheduler::SetTxOpportunityCallback (SatFwdLinkScheduler::TxOpportunit
 Ptr<SatBbFrame>
 SatFwdLinkScheduler::GetNextFrame ()
 {
-  NS_LOG_FUNCTION (this);
+  NS_FATAL_ERROR ("SatFwdLinkScheduler::GetNextFrame: should not be here");
 
-  if ( m_bbFrameContainer->GetTotalDuration () < m_schedulingStartThresholdTime )
-    {
-      ScheduleBbFrames ();
-    }
-
-  Ptr<SatBbFrame> frame = m_bbFrameContainer->GetNextFrame ();
-
-  // create dummy frame
-  if ( frame == NULL )
-    {
-      frame = Create<SatBbFrame> (m_bbFrameConf->GetDefaultModCod (), SatEnums::DUMMY_FRAME, m_bbFrameConf);
-
-      // create dummy packet
-      Ptr<Packet> dummyPacket = Create<Packet> (1);
-
-      // Add MAC tag
-      SatMacTag tag;
-      tag.SetDestAddress (Mac48Address::GetBroadcast ());
-      tag.SetSourceAddress (m_macAddress);
-      dummyPacket->AddPacketTag (tag);
-
-      // Add dummy packet to dummy frame
-      frame->AddPayload (dummyPacket);
-    }
-
-  return frame;
+  return NULL;
 }
 
 void
@@ -268,79 +229,19 @@ SatFwdLinkScheduler::CnoInfoUpdated (Mac48Address utAddress, double cnoEstimate)
 void
 SatFwdLinkScheduler::PeriodicTimerExpired ()
 {
-  NS_LOG_FUNCTION (this);
-
-  ScheduleBbFrames ();
-
-  Simulator::Schedule (m_periodicInterval, &SatFwdLinkScheduler::PeriodicTimerExpired, this);
+  NS_FATAL_ERROR ("SatFwdLinkScheduler::ScheduleBbFrames: should not be here");
 }
 
 void
 SatFwdLinkScheduler::ScheduleBbFrames ()
 {
-  NS_LOG_FUNCTION (this);
-
-  // Get scheduling objects from LLC
-  std::vector< Ptr<SatSchedulingObject> > so;
-  GetSchedulingObjects (so);
-
-  for ( std::vector< Ptr<SatSchedulingObject> >::const_iterator it = so.begin ();
-        ( it != so.end () ) && ( m_bbFrameContainer->GetTotalDuration () < m_schedulingStopThresholdTime ); it++ )
-    {
-      uint32_t currentObBytes = (*it)->GetBufferedBytes ();
-      uint32_t currentObMinReqBytes = (*it)->GetMinTxOpportunityInBytes ();
-      uint8_t flowId = (*it)->GetFlowId ();
-      SatEnums::SatModcod_t modcod = m_bbFrameContainer->GetModcod ( flowId, GetSchedulingObjectCno (*it));
-
-      uint32_t frameBytes = m_bbFrameContainer->GetBytesLeftInTailFrame (flowId, modcod);
-
-      while ( ( (m_bbFrameContainer->GetTotalDuration () < m_schedulingStopThresholdTime ))
-              && (currentObBytes > 0) )
-        {
-          if ( frameBytes < currentObMinReqBytes)
-            {
-              frameBytes = m_bbFrameContainer->GetMaxFramePayloadInBytes (flowId, modcod);
-
-              // if frame bytes still too small, we must have too long control message, so let's crash
-              if ( frameBytes < currentObMinReqBytes )
-                {
-                  NS_FATAL_ERROR ("Control package too probably too long!!!");
-                }
-            }
-
-          Ptr<Packet> p = m_txOpportunityCallback (frameBytes, (*it)->GetMacAddress (), flowId, currentObBytes, currentObMinReqBytes);
-
-          if ( p )
-            {
-              m_bbFrameContainer->AddData (flowId, modcod, p);
-              frameBytes = m_bbFrameContainer->GetBytesLeftInTailFrame (flowId, modcod);
-            }
-          else if ( m_bbFrameContainer->GetMaxFramePayloadInBytes (flowId, modcod ) != m_bbFrameContainer->GetBytesLeftInTailFrame (flowId, modcod))
-            {
-              frameBytes = m_bbFrameContainer->GetMaxFramePayloadInBytes (flowId, modcod);
-            }
-          else
-            {
-              NS_FATAL_ERROR ("Packet does not fit in empty BB Frame. Control package too long or fragmentation problem in user package!!!");
-            }
-        }
-
-      m_bbFrameContainer->MergeBbFrames (m_carrierBandwidthInHz);
-    }
+  NS_FATAL_ERROR ("SatFwdLinkScheduler::ScheduleBbFrames: should not be here");
 }
 
 void
 SatFwdLinkScheduler::GetSchedulingObjects (std::vector< Ptr<SatSchedulingObject> > & output)
 {
-  NS_LOG_FUNCTION (this);
-
-  if ( m_bbFrameContainer->GetTotalDuration () < m_schedulingStopThresholdTime )
-    {
-      // Get scheduling objects from LLC
-      m_schedContextCallback (output);
-
-      SortSchedulingObjects (output);
-    }
+  NS_FATAL_ERROR ("SatFwdLinkScheduler::GetSchedulingObjects: should not be here");
 }
 
 void

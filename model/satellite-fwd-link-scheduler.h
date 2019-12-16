@@ -180,7 +180,7 @@ public:
    */
   void CnoInfoUpdated (Mac48Address utAddress, double cnoEstimate);
 
-private:
+protected:
   typedef std::map<Mac48Address, Ptr<SatCnoEstimator> > CnoEstimatorMap_t;
 
   SatFwdLinkScheduler& operator = (const SatFwdLinkScheduler &);
@@ -272,11 +272,6 @@ private:
    * Additional sorting criteria for scheduling objects received from LLC.
    */
   ScheduleSortingCriteria_t m_additionalSortCriteria;
-
-  /**
-   * The container for BB Frames.
-   */
-  Ptr<SatBbFrameContainer> m_bbFrameContainer;
 
   /**
    * Callback to notify the txOpportunity to upper layer

@@ -47,6 +47,7 @@
 #include "ns3/singleton.h"
 #include "ns3/satellite-id-mapper.h"
 #include <ns3/satellite-fwd-link-scheduler.h>
+#include <ns3/satellite-fwd-link-scheduler-base.h>
 #include <ns3/satellite-typedefs.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatGwHelper");
@@ -357,7 +358,7 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
 
   // TODO: When multiple carriers are supported. Multiple scheduler are needed too.
   double carrierBandwidth = m_carrierBandwidthConverter (SatEnums::FORWARD_FEEDER_CH, 0, SatEnums::EFFECTIVE_BANDWIDTH);
-  Ptr<SatFwdLinkScheduler> fdwLinkScheduler = CreateObject<SatFwdLinkScheduler> (m_bbFrameConf, addr, carrierBandwidth);
+  Ptr<SatFwdLinkScheduler> fdwLinkScheduler = CreateObject<SatFwdLinkSchedulerBase> (m_bbFrameConf, addr, carrierBandwidth);
 
   // Attach the LLC Tx opportunity and scheduling context getter callbacks to SatFwdLinkScheduler
   fdwLinkScheduler->SetTxOpportunityCallback (MakeCallback (&SatGwLlc::NotifyTxOpportunity, llc));
