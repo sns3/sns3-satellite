@@ -84,6 +84,17 @@ public:
   } FadingModel_t;
 
   /**
+   * \enum FwdSchedulingAlgorithm_t
+   * \brief The scheduling algorithm used to fill the BBFrames.
+   *        Right now, the DVB_S2X adds the time-slicing feature.
+   */
+  typedef enum
+  {
+    DVB_S2,
+    DVB_S2X
+  } FwdSchedulingAlgorithm_t;
+
+  /**
    * \enum SatModcod_t
    * \brief Modulation scheme and coding rate for DVB-S2.
    */

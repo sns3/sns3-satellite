@@ -18,8 +18,8 @@
  * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#ifndef SAT_FWD_LINK_SCHEDULER_BASE_H
-#define SAT_FWD_LINK_SCHEDULER_BASE_H
+#ifndef SAT_FWD_LINK_SCHEDULER_DEFAULT_H
+#define SAT_FWD_LINK_SCHEDULER_DEFAULT_H
 
 #include "ns3/satellite-fwd-link-scheduler.h"
 #include "ns3/pointer.h"
@@ -28,18 +28,17 @@ namespace ns3 {
 
 /**
  * \ingroup satellite
- * \brief SatFwdLinkScheduler schedules BB frames for forward link. In every GW MAC is assigned own
- *        instance of the SatFwdLinkScheduler. To handle BB frames and maintain queues for the them,
- *        it utilizes BB frame container given as attribute.
+ * \brief SatFwdLinkSchedulerDefault schedules BB frames for forward link. This is the reference case of the
+ *        scheduler, without separation between slices. It uses only one instance of BbFrameContainer.
  *
- *        SatFwdLinkScheduler communicated through callback functions to request scheduling objects and
+ *        SatFwdLinkSchedulerDefault communicated through callback functions to request scheduling objects and
  *        notifying TX opportunities.
  *
  *        GW MAC requests frames from scheduler through method GetNextFrame.
  *
  */
 
-class SatFwdLinkSchedulerBase : public SatFwdLinkScheduler
+class SatFwdLinkSchedulerDefault : public SatFwdLinkScheduler
 {
 public:
   /**
@@ -54,7 +53,7 @@ public:
    * This the default constructor for the SatFwdLinkScheduler is not supported.
    *
    */
-  SatFwdLinkSchedulerBase ();
+  SatFwdLinkSchedulerDefault ();
 
   /**
    * Actual constructor of a SatFwdLinkScheduler
@@ -63,14 +62,14 @@ public:
    * \param address MAC address
    * \param carrierBandwidthInHz Carrier bandwidth where scheduler is associated to [Hz].
    */
-  SatFwdLinkSchedulerBase (Ptr<SatBbFrameConf> conf, Mac48Address address, double carrierBandwidthInHz);
+  SatFwdLinkSchedulerDefault (Ptr<SatBbFrameConf> conf, Mac48Address address, double carrierBandwidthInHz);
 
   /**
    * Destroy a SatFwdLinkScheduler
    *
    * This is the destructor for the SatFwdLinkScheduler.
    */
-  ~SatFwdLinkSchedulerBase ();
+  ~SatFwdLinkSchedulerDefault ();
 
   /**
    * Get next frame to be transmitted.
@@ -113,4 +112,4 @@ private:
 
 } // namespace ns3
 
-#endif /* SAT_FWD_LINK_SCHEDULER_BASE_H */
+#endif /* SAT_FWD_LINK_SCHEDULER_DEFAULT_H */

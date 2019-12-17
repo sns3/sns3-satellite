@@ -47,7 +47,8 @@
 #include "ns3/singleton.h"
 #include "ns3/satellite-id-mapper.h"
 #include <ns3/satellite-fwd-link-scheduler.h>
-#include <ns3/satellite-fwd-link-scheduler-base.h>
+#include <ns3/satellite-fwd-link-scheduler-default.h>
+#include <ns3/satellite-fwd-link-scheduler-time-slicing.h>
 #include <ns3/satellite-typedefs.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatGwHelper");
@@ -77,6 +78,12 @@ SatGwHelper::GetTypeId (void)
                    MakeEnumChecker (SatPhyRxCarrierConf::EM_NONE, "None",
                                     SatPhyRxCarrierConf::EM_CONSTANT, "Constant",
                                     SatPhyRxCarrierConf::EM_AVI, "AVI"))
+    .AddAttribute ("FwdSchedulingAlgorithm",
+                   "The scheduling algorithm used to fill the BBFrames",
+                   EnumValue (SatEnums::DVB_S2),
+                   MakeEnumAccessor (&SatGwHelper::m_fwdSchedulingAlgorithm),
+                   MakeEnumChecker (SatEnums::DVB_S2, "DVB_S2",
+                                    SatEnums::DVB_S2X, "DVB_S2X"))
     .AddAttribute ("RtnLinkConstantErrorRate",
                    "Constant error rate",
                    DoubleValue (0.01),
@@ -358,7 +365,19 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
 
   // TODO: When multiple carriers are supported. Multiple scheduler are needed too.
   double carrierBandwidth = m_carrierBandwidthConverter (SatEnums::FORWARD_FEEDER_CH, 0, SatEnums::EFFECTIVE_BANDWIDTH);
-  Ptr<SatFwdLinkScheduler> fdwLinkScheduler = CreateObject<SatFwdLinkSchedulerBase> (m_bbFrameConf, addr, carrierBandwidth);
+
+  Ptr<SatFwdLinkScheduler> fdwLinkScheduler;
+  switch (m_fwdSchedulingAlgorithm)
+    {
+    case SatEnums::DVB_S2:
+      fdwLinkScheduler = CreateObject<SatFwdLinkSchedulerDefault> (m_bbFrameConf, addr, carrierBandwidth);
+      break;
+    case SatEnums::DVB_S2X:
+      fdwLinkScheduler = CreateObject<SatFwdLinkSchedulerTimeSlicing> (m_bbFrameConf, addr, carrierBandwidth);
+      break;
+    default:
+      NS_FATAL_ERROR ("Forward scheduling algorithm is not implemented");
+    }
 
   // Attach the LLC Tx opportunity and scheduling context getter callbacks to SatFwdLinkScheduler
   fdwLinkScheduler->SetTxOpportunityCallback (MakeCallback (&SatGwLlc::NotifyTxOpportunity, llc));

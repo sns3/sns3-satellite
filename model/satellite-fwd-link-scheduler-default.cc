@@ -18,37 +18,37 @@
  * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "satellite-fwd-link-scheduler-base.h"
+#include "satellite-fwd-link-scheduler-default.h"
 
 
-NS_LOG_COMPONENT_DEFINE ("SatFwdLinkSchedulerBase");
+NS_LOG_COMPONENT_DEFINE ("SatFwdLinkSchedulerDefault");
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (SatFwdLinkSchedulerBase);
+NS_OBJECT_ENSURE_REGISTERED (SatFwdLinkSchedulerDefault);
 
 TypeId
-SatFwdLinkSchedulerBase::GetTypeId (void)
+SatFwdLinkSchedulerDefault::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::SatFwdLinkSchedulerBase")
+  static TypeId tid = TypeId ("ns3::SatFwdLinkSchedulerDefault")
     .SetParent<SatFwdLinkScheduler> ()
-    .AddConstructor<SatFwdLinkSchedulerBase> ()
+    .AddConstructor<SatFwdLinkSchedulerDefault> ()
     .AddAttribute ( "BBFrameContainer",
                     "BB frame container of this scheduler.",
                     PointerValue (),
-                    MakePointerAccessor (&SatFwdLinkSchedulerBase::m_bbFrameContainer),
+                    MakePointerAccessor (&SatFwdLinkSchedulerDefault::m_bbFrameContainer),
                     MakePointerChecker<SatBbFrameContainer> ())
   ;
   return tid;
 }
 
-SatFwdLinkSchedulerBase::SatFwdLinkSchedulerBase () : SatFwdLinkScheduler ()
+SatFwdLinkSchedulerDefault::SatFwdLinkSchedulerDefault () : SatFwdLinkScheduler ()
 {
   NS_LOG_FUNCTION (this);
-  NS_FATAL_ERROR ("Default constructor for SatFwdLinkScheduler not supported");
+  NS_FATAL_ERROR ("Default constructor for SatFwdLinkSchedulerDefault not supported");
 }
 
-SatFwdLinkSchedulerBase::SatFwdLinkSchedulerBase (Ptr<SatBbFrameConf> conf, Mac48Address address, double carrierBandwidthInHz) :
+SatFwdLinkSchedulerDefault::SatFwdLinkSchedulerDefault (Ptr<SatBbFrameConf> conf, Mac48Address address, double carrierBandwidthInHz) :
     SatFwdLinkScheduler (conf, address, carrierBandwidthInHz)
 {
   NS_LOG_FUNCTION (this);
@@ -57,16 +57,16 @@ SatFwdLinkSchedulerBase::SatFwdLinkSchedulerBase (Ptr<SatBbFrameConf> conf, Mac4
   SatEnums::GetAvailableModcodsFwdLink (modCods);
   m_bbFrameContainer = CreateObject<SatBbFrameContainer> (modCods, m_bbFrameConf);
 
-  Simulator::Schedule (m_periodicInterval, &SatFwdLinkSchedulerBase::PeriodicTimerExpired, this);
+  Simulator::Schedule (m_periodicInterval, &SatFwdLinkSchedulerDefault::PeriodicTimerExpired, this);
 }
 
-SatFwdLinkSchedulerBase::~SatFwdLinkSchedulerBase ()
+SatFwdLinkSchedulerDefault::~SatFwdLinkSchedulerDefault ()
 {
   NS_LOG_FUNCTION (this);
 }
 
 void
-SatFwdLinkSchedulerBase::DoDispose ()
+SatFwdLinkSchedulerDefault::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
   SatFwdLinkScheduler::DoDispose ();
@@ -75,7 +75,7 @@ SatFwdLinkSchedulerBase::DoDispose ()
 
 
 Ptr<SatBbFrame>
-SatFwdLinkSchedulerBase::GetNextFrame ()
+SatFwdLinkSchedulerDefault::GetNextFrame ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -108,17 +108,17 @@ SatFwdLinkSchedulerBase::GetNextFrame ()
 }
 
 void
-SatFwdLinkSchedulerBase::PeriodicTimerExpired ()
+SatFwdLinkSchedulerDefault::PeriodicTimerExpired ()
 {
   NS_LOG_FUNCTION (this);
 
   ScheduleBbFrames ();
 
-  Simulator::Schedule (m_periodicInterval, &SatFwdLinkSchedulerBase::PeriodicTimerExpired, this);
+  Simulator::Schedule (m_periodicInterval, &SatFwdLinkSchedulerDefault::PeriodicTimerExpired, this);
 }
 
 void
-SatFwdLinkSchedulerBase::ScheduleBbFrames ()
+SatFwdLinkSchedulerDefault::ScheduleBbFrames ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -172,7 +172,7 @@ SatFwdLinkSchedulerBase::ScheduleBbFrames ()
 }
 
 void
-SatFwdLinkSchedulerBase::GetSchedulingObjects (std::vector< Ptr<SatSchedulingObject> > & output)
+SatFwdLinkSchedulerDefault::GetSchedulingObjects (std::vector< Ptr<SatSchedulingObject> > & output)
 {
   NS_LOG_FUNCTION (this);
 
