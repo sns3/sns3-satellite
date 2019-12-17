@@ -104,6 +104,12 @@ private:
    */
   void GetSchedulingObjects (std::vector< Ptr<SatSchedulingObject> > & output);
 
+  /*
+   * Give the total sending time of all the BBFrames in all the slices.
+   * \return The total duration.
+   */
+  Time GetTotalDuration ();
+
   /**
    * The containers for BB Frames. The keys are the slices and the values the associated container
    */
@@ -118,6 +124,12 @@ private:
    * The number of slices
    */
   uint8_t m_numberOfSlices;
+
+  /**
+   * The slice of the last MAC address discovered. Used to associated destination MAC address
+   * to a slice following a Round Robin law.
+   */
+  uint8_t m_lastSliceAssigned;
 
 };
 

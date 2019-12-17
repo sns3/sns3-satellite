@@ -57,7 +57,8 @@ SatFwdLinkSchedulerTimeSlicing::SatFwdLinkSchedulerTimeSlicing () : SatFwdLinkSc
 }
 
 SatFwdLinkSchedulerTimeSlicing::SatFwdLinkSchedulerTimeSlicing (Ptr<SatBbFrameConf> conf, Mac48Address address, double carrierBandwidthInHz) :
-    SatFwdLinkScheduler (conf, address, carrierBandwidthInHz)
+    SatFwdLinkScheduler (conf, address, carrierBandwidthInHz),
+    m_lastSliceAssigned (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -97,12 +98,12 @@ SatFwdLinkSchedulerTimeSlicing::GetNextFrame ()
 {
   NS_LOG_FUNCTION (this);
 
-  if ( m_bbFrameContainers.at (0)->GetTotalDuration () < m_schedulingStartThresholdTime )
+  if ( GetTotalDuration () < m_schedulingStartThresholdTime )
     {
       ScheduleBbFrames ();
     }
 
-  Ptr<SatBbFrame> frame = m_bbFrameContainers.at (0)->GetNextFrame ();
+  Ptr<SatBbFrame> frame = m_bbFrameContainers.at (0)->GetNextFrame (); // TODO change here
 
   // create dummy frame
   if ( frame == NULL )
@@ -145,21 +146,32 @@ SatFwdLinkSchedulerTimeSlicing::ScheduleBbFrames ()
   GetSchedulingObjects (so);
 
   for ( std::vector< Ptr<SatSchedulingObject> >::const_iterator it = so.begin ();
-        ( it != so.end () ) && ( m_bbFrameContainers.at (0)->GetTotalDuration () < m_schedulingStopThresholdTime ); it++ )
+        ( it != so.end () ) && ( GetTotalDuration () < m_schedulingStopThresholdTime ); it++ )
     {
       uint32_t currentObBytes = (*it)->GetBufferedBytes ();
       uint32_t currentObMinReqBytes = (*it)->GetMinTxOpportunityInBytes ();
       uint8_t flowId = (*it)->GetFlowId ();
-      SatEnums::SatModcod_t modcod = m_bbFrameContainers.at (0)->GetModcod ( flowId, GetSchedulingObjectCno (*it));
+      Mac48Address address = (*it)->GetMacAddress ();
 
-      uint32_t frameBytes = m_bbFrameContainers.at (0)->GetBytesLeftInTailFrame (flowId, modcod);
+      if ( m_slicesMapping.find(address) == m_slicesMapping.end() )
+        {
+          std::cout << "First occurence of MAC address " << address;
+          m_slicesMapping.insert (std::pair<Mac48Address, uint8_t> (address, m_lastSliceAssigned));
+          m_lastSliceAssigned++;
+          m_lastSliceAssigned %= m_numberOfSlices;
+          std::cout << ". Got slice " << (uint32_t) m_slicesMapping.at (address) << std::endl;
+          // TODO send control message to UT
+        }
+      uint8_t slice = m_slicesMapping.at (address);
+      SatEnums::SatModcod_t modcod = m_bbFrameContainers.at (slice)->GetModcod ( flowId, GetSchedulingObjectCno (*it));
 
-      while ( ( (m_bbFrameContainers.at (0)->GetTotalDuration () < m_schedulingStopThresholdTime ))
-              && (currentObBytes > 0) )
+      uint32_t frameBytes = m_bbFrameContainers.at (slice)->GetBytesLeftInTailFrame (flowId, modcod);
+
+      while ( (GetTotalDuration () < m_schedulingStopThresholdTime) && (currentObBytes > 0) )
         {
           if ( frameBytes < currentObMinReqBytes)
             {
-              frameBytes = m_bbFrameContainers.at (0)->GetMaxFramePayloadInBytes (flowId, modcod);
+              frameBytes = m_bbFrameContainers.at (slice)->GetMaxFramePayloadInBytes (flowId, modcod);
 
               // if frame bytes still too small, we must have too long control message, so let's crash
               if ( frameBytes < currentObMinReqBytes )
@@ -168,16 +180,16 @@ SatFwdLinkSchedulerTimeSlicing::ScheduleBbFrames ()
                 }
             }
 
-          Ptr<Packet> p = m_txOpportunityCallback (frameBytes, (*it)->GetMacAddress (), flowId, currentObBytes, currentObMinReqBytes);
+          Ptr<Packet> p = m_txOpportunityCallback (frameBytes, address, flowId, currentObBytes, currentObMinReqBytes);
 
           if ( p )
             {
-              m_bbFrameContainers.at (0)->AddData (flowId, modcod, p);
-              frameBytes = m_bbFrameContainers.at (0)->GetBytesLeftInTailFrame (flowId, modcod);
+              m_bbFrameContainers.at (slice)->AddData (flowId, modcod, p);
+              frameBytes = m_bbFrameContainers.at (slice)->GetBytesLeftInTailFrame (flowId, modcod);
             }
-          else if ( m_bbFrameContainers.at (0)->GetMaxFramePayloadInBytes (flowId, modcod ) != m_bbFrameContainers.at (0)->GetBytesLeftInTailFrame (flowId, modcod))
+          else if ( m_bbFrameContainers.at (slice)->GetMaxFramePayloadInBytes (flowId, modcod ) != m_bbFrameContainers.at (slice)->GetBytesLeftInTailFrame (flowId, modcod))
             {
-              frameBytes = m_bbFrameContainers.at (0)->GetMaxFramePayloadInBytes (flowId, modcod);
+              frameBytes = m_bbFrameContainers.at (slice)->GetMaxFramePayloadInBytes (flowId, modcod);
             }
           else
             {
@@ -185,7 +197,7 @@ SatFwdLinkSchedulerTimeSlicing::ScheduleBbFrames ()
             }
         }
 
-      m_bbFrameContainers.at (0)->MergeBbFrames (m_carrierBandwidthInHz);
+      m_bbFrameContainers.at (slice)->MergeBbFrames (m_carrierBandwidthInHz);
     }
 }
 
@@ -194,13 +206,27 @@ SatFwdLinkSchedulerTimeSlicing::GetSchedulingObjects (std::vector< Ptr<SatSchedu
 {
   NS_LOG_FUNCTION (this);
 
-  if ( m_bbFrameContainers.at (0)->GetTotalDuration () < m_schedulingStopThresholdTime )
+  if ( GetTotalDuration () < m_schedulingStopThresholdTime )
     {
       // Get scheduling objects from LLC
       m_schedContextCallback (output);
 
       SortSchedulingObjects (output);
     }
+}
+
+Time
+SatFwdLinkSchedulerTimeSlicing::GetTotalDuration ()
+{
+  NS_LOG_FUNCTION (this);
+
+  Time duration = Time (0);
+  for (std::map<uint8_t, Ptr<SatBbFrameContainer>>::iterator it = m_bbFrameContainers.begin(); it != m_bbFrameContainers.end(); it++ )
+    {
+        duration += it->second->GetTotalDuration ();
+    }
+
+  return duration;
 }
 
 } // namespace ns3
