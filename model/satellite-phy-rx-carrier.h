@@ -554,6 +554,8 @@ protected:
    */
   TracedCallback<uint32_t, const Address &, bool> m_daRxTrace;
 
+  TracedCallback<uint32_t, const Address &> m_daRxCarrierIdTrace;
+
   /**
    * \brief Callback to calculate SINR.
    */

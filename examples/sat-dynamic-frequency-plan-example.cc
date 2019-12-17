@@ -219,6 +219,17 @@ main (int argc, char *argv[])
   if (simulationConf->m_activateStatistics)
     {
       simulationHelper->CreateDefaultStats ();
+      Ptr<SatStatsHelperContainer> stats = simulationHelper->GetStatisticsContainer ();
+      stats->AddGlobalRtnFeederLinkSinr (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      stats->AddGlobalRtnFeederLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      stats->AddGlobalRtnUserLinkSinr (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      stats->AddGlobalRtnUserLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      stats->AddGlobalRtnFeederLinkRxPower (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      stats->AddGlobalRtnFeederLinkRxPower (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      stats->AddGlobalRtnUserLinkRxPower (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      stats->AddGlobalRtnUserLinkRxPower (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      stats->AddPerUtCarrierId (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      stats->AddPerUtCarrierId (SatStatsHelper::OUTPUT_SCATTER_FILE);
     }
 
   simulationHelper->RunSimulation ();

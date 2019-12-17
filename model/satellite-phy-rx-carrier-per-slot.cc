@@ -267,6 +267,9 @@ SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams,
                        phyError                       // error flag
                        );
         }
+
+      m_daRxCarrierIdTrace (GetCarrierId (),
+                            packetRxParams.sourceAddress);
     }
 
   /// save 2nd link sinr value

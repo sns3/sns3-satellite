@@ -225,6 +225,10 @@ SatPhyRxCarrier::GetTypeId (void)
                      "Received a packet burst through Dedicated Channel",
                      MakeTraceSourceAccessor (&SatPhyRxCarrier::m_daRxTrace),
                      "ns3::SatPhyRxCarrierPacketProbe::RxStatusCallback")
+    .AddTraceSource ("DaRxCarrierId",
+                     "Received a packet burst though DAMA",
+                     MakeTraceSourceAccessor (&SatPhyRxCarrier::m_daRxCarrierIdTrace),
+                     "ns3::SatTypedefs::DataSenderAddressCallback")
   ;
   return tid;
 }

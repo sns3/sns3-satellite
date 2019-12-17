@@ -28,6 +28,7 @@
 #include <ns3/satellite-stats-antenna-gain-helper.h>
 #include <ns3/satellite-stats-backlogged-request-helper.h>
 #include <ns3/satellite-stats-capacity-request-helper.h>
+#include <ns3/satellite-stats-carrier-id-helper.h>
 #include <ns3/satellite-stats-composite-sinr-helper.h>
 #include <ns3/satellite-stats-delay-helper.h>
 #include <ns3/satellite-stats-frame-load-helper.h>
@@ -909,6 +910,12 @@ SAT_STATS_GLOBAL_METHOD_DEFINITION       (MarsalaCorrelation, "marsala-correlati
 SAT_STATS_PER_GW_METHOD_DEFINITION       (MarsalaCorrelation, "marsala-correlation")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION     (MarsalaCorrelation, "marsala-correlation")
 SAT_STATS_PER_UT_METHOD_DEFINITION       (MarsalaCorrelation, "marsala-correlation")
+
+// Dedicated Access carrier ID statistics
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (CarrierId, "carrier-id")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (CarrierId, "carrier-id")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (CarrierId, "carrier-id")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (CarrierId, "carrier-id")
 
 // Capacity request statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (CapacityRequest, "capacity-request")
