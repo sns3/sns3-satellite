@@ -116,17 +116,21 @@ SatFwdLinkSchedulerTimeSlicing::GetNextFrame ()
           ScheduleBbFrames ();
         }
 
-      uint8_t lastDeque = m_lastSliceDequeued;
+      uint8_t firstDeque = m_lastSliceDequeued;
       do
         {
           frame = m_bbFrameContainers.at (m_lastSliceDequeued)->GetNextFrame ();
+          if (frame != NULL)
+            {
+              frame->SetSliceId (m_lastSliceDequeued);
+            }
           if (m_lastSliceDequeued == m_numberOfSlices)
             {
               m_lastSliceDequeued = 0;
             }
           m_lastSliceDequeued++;
         }
-      while (frame == NULL && m_lastSliceDequeued != lastDeque);
+      while (frame == NULL && m_lastSliceDequeued != firstDeque);
     }
 
   // create dummy frame

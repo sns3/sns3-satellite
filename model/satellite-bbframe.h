@@ -174,6 +174,24 @@ public:
   }
 
   /**
+   * Get the slice ID of the BBFrame
+   * \return The slice ID of the BBFrame
+   */
+  inline uint8_t GetSliceId () const
+  {
+    return m_sliceId;
+  }
+
+  /**
+   * Set the slice ID of the BBFrame
+   * \param sliceId The slice ID of the BBFrame
+   */
+  void SetSliceId (uint8_t sliceId)
+  {
+    m_sliceId = sliceId;
+  }
+
+  /**
    * Get header size of the frame.
    * \return Header size in bytes.
    */
@@ -197,6 +215,7 @@ public:
 
 private:
   SatEnums::SatModcod_t m_modCod;
+  uint8_t m_sliceId;
   uint32_t m_freeSpaceInBytes;
   uint32_t m_maxSpaceInBytes;
   uint32_t m_headerSizeInBytes;

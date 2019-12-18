@@ -327,6 +327,7 @@ SatPhy::SendPdu (PacketContainer_t p, uint32_t carrierId, Time duration, SatSign
   txParams->m_sinr = 0;
   txParams->m_txPower_W = m_eirpWoGainW;
   txParams->m_txInfo.modCod = txInfo.modCod;
+  txParams->m_txInfo.sliceId = txInfo.sliceId;
   txParams->m_txInfo.fecBlockSizeInBytes = txInfo.fecBlockSizeInBytes;
   txParams->m_txInfo.frameType = txInfo.frameType;
   txParams->m_txInfo.waveformId = txInfo.waveformId;
@@ -365,6 +366,11 @@ SatPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
   // Add packet trace entry:
   SatEnums::SatLinkDir_t ld =
     (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_FORWARD : SatEnums::LD_RETURN;
+
+  if (ld == SatEnums::LD_FORWARD)
+    {
+      std::cout << "Receive slice ID " << (uint32_t) rxParams->m_txInfo.sliceId << std::endl;
+    }
 
   SatEnums::SatPacketEvent_t event = (phyError) ? SatEnums::PACKET_DROP : SatEnums::PACKET_RECV;
 

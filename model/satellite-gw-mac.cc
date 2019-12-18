@@ -227,6 +227,7 @@ SatGwMac::StartTransmission (uint32_t carrierId)
       SatSignalParameters::txInfo_s txInfo;
       txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
       txInfo.modCod = bbFrame->GetModcod ();
+      txInfo.sliceId = bbFrame->GetSliceId ();
       txInfo.frameType = bbFrame->GetFrameType ();
       txInfo.waveformId = 0;
 
