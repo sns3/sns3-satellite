@@ -758,6 +758,16 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
           }
         break;
       }
+    case SatControlMsgTag::SAT_SLICE_CTRL_MSG:
+      {
+        std::cout << "receive control message time-slicing" << std::endl;
+
+        uint32_t sliceCtrlId = ctrlTag.GetMsgId ();
+        Ptr<SatSliceSubscriptionMessage> sliceMsg = DynamicCast<SatSliceSubscriptionMessage> (m_readCtrlCallback (sliceCtrlId));
+
+        std::cout << "UT " << m_nodeInfo->GetMacAddress () << " subscribe to slice " << sliceMsg->GetSliceId () << std::endl;
+        break;
+      }
     default:
       {
         NS_FATAL_ERROR ("SatUtMac received a non-supported control packet!");

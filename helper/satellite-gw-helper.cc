@@ -366,25 +366,26 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   // TODO: When multiple carriers are supported. Multiple scheduler are needed too.
   double carrierBandwidth = m_carrierBandwidthConverter (SatEnums::FORWARD_FEEDER_CH, 0, SatEnums::EFFECTIVE_BANDWIDTH);
 
-  Ptr<SatFwdLinkScheduler> fdwLinkScheduler;
+  Ptr<SatFwdLinkScheduler> fwdLinkScheduler;
   switch (m_fwdSchedulingAlgorithm)
     {
     case SatEnums::DVB_S2:
-      fdwLinkScheduler = CreateObject<SatFwdLinkSchedulerDefault> (m_bbFrameConf, addr, carrierBandwidth);
+      fwdLinkScheduler = CreateObject<SatFwdLinkSchedulerDefault> (m_bbFrameConf, addr, carrierBandwidth);
       break;
     case SatEnums::DVB_S2X:
-      fdwLinkScheduler = CreateObject<SatFwdLinkSchedulerTimeSlicing> (m_bbFrameConf, addr, carrierBandwidth, mac);
+      fwdLinkScheduler = CreateObject<SatFwdLinkSchedulerTimeSlicing> (m_bbFrameConf, addr, carrierBandwidth);
+      (DynamicCast<SatFwdLinkSchedulerTimeSlicing> (fwdLinkScheduler))->SetSendControlMsgCallback (MakeCallback (&SatNetDevice::SendControlMsg, dev));
       break;
     default:
       NS_FATAL_ERROR ("Forward scheduling algorithm is not implemented");
     }
 
   // Attach the LLC Tx opportunity and scheduling context getter callbacks to SatFwdLinkScheduler
-  fdwLinkScheduler->SetTxOpportunityCallback (MakeCallback (&SatGwLlc::NotifyTxOpportunity, llc));
-  fdwLinkScheduler->SetSchedContextCallback (MakeCallback (&SatLlc::GetSchedulingContexts, llc));
+  fwdLinkScheduler->SetTxOpportunityCallback (MakeCallback (&SatGwLlc::NotifyTxOpportunity, llc));
+  fwdLinkScheduler->SetSchedContextCallback (MakeCallback (&SatLlc::GetSchedulingContexts, llc));
 
   // set scheduler to Mac
-  mac->SetAttribute ("Scheduler", PointerValue (fdwLinkScheduler));
+  mac->SetAttribute ("Scheduler", PointerValue (fwdLinkScheduler));
 
   mac->StartPeriodicTransmissions ();
 
