@@ -808,6 +808,62 @@ SatHandoverRecommendationMessage::GetSizeInBytes () const
 }
 
 
+
+NS_OBJECT_ENSURE_REGISTERED (SatSliceSubscriptionMessage);
+
+TypeId
+SatSliceSubscriptionMessage::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatSliceSubscriptionMessage")
+    .SetParent<SatControlMessage> ()
+    .AddConstructor<SatSliceSubscriptionMessage> ()
+  ;
+  return tid;
+}
+
+TypeId
+SatSliceSubscriptionMessage::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
+}
+
+SatSliceSubscriptionMessage::SatSliceSubscriptionMessage ()
+  : m_sliceId (0)
+{
+  NS_LOG_FUNCTION (this);
+}
+
+SatSliceSubscriptionMessage::~SatSliceSubscriptionMessage ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+void
+SatSliceSubscriptionMessage::SetSliceId (uint8_t sliceId)
+{
+  NS_LOG_FUNCTION (this);
+  m_sliceId = sliceId;
+}
+
+uint32_t
+SatSliceSubscriptionMessage::GetSliceId () const
+{
+  return m_sliceId;
+}
+
+uint32_t
+SatSliceSubscriptionMessage::GetSizeInBytes () const
+{
+  NS_LOG_FUNCTION (this);
+
+  uint32_t size = 1 * sizeof (uint8_t);
+  return size;
+}
+
+
+
 // Control message container
 
 NS_LOG_COMPONENT_DEFINE ("SatControlMsgContainer");

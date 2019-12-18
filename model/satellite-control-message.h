@@ -58,7 +58,8 @@ public:
     SAT_ARQ_ACK,          //!< SAT_ARQ_ACK
     SAT_CN0_REPORT,       //!< SAT_CN0_REPORT
     SAT_TIMU_CTRL_MSG,    //!< SAT_TIMU_CTRL_MSG
-    SAT_HR_CTRL_MSG       //!< SAT_HR_CTRL_MSG
+    SAT_HR_CTRL_MSG,      //!< SAT_HR_CTRL_MSG
+    SAT_SLICE_CTRL_MSG    //!< SAT_SLICE_CTRL_MSG
   } SatControlMsgType_t;
 
   /**
@@ -905,6 +906,72 @@ private:
    * Recommended beam ID
    */
   uint32_t m_beamId;
+};
+
+/**
+ * \ingroup satellite
+ * \brief This control message is used to inform the UT it has to subscribe to a new slice.
+ * (Tagged by SatControlMsgTag with type value SAT_SLICE_CTRL_MSG)
+ */
+
+class SatSliceSubscriptionMessage : public SatControlMessage
+{
+public:
+  /**
+   * Constructor for SatRaMessage
+   */
+  SatSliceSubscriptionMessage ();
+
+  /**
+   * Destructor for SatRaMessage
+   */
+  ~SatSliceSubscriptionMessage ();
+
+
+  /**
+   * methods derived from base classes
+   */
+  static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
+  virtual TypeId GetInstanceTypeId (void) const;
+
+  /**
+   * \brief Get type of the message.
+   *
+   * \return SatControlMsgTag::SAT_SLICE_CTRL_MSG
+   */
+  inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const
+  {
+    return SatControlMsgTag::SAT_SLICE_CTRL_MSG;
+  }
+
+  /**
+   * \brief Get the new slice to subscribe. Zero means reset the slices already subscribed.
+   * \return The new slice id
+   */
+  uint32_t GetSliceId () const;
+
+  /**
+   * Set the new slice to subscribe. Zero means reset the slices already subscribed.
+   * \param sliceId The new slice id
+   */
+  void SetSliceId (uint8_t sliceId);
+
+  /**
+   * \brief Get real size of the message.
+   * \return Real size of the message.
+   */
+  virtual uint32_t GetSizeInBytes () const;
+
+private:
+  /**
+   * New slice to subscribe. Zero means reset the slices already subscribed.
+   */
+  uint8_t m_sliceId;
 };
 
 

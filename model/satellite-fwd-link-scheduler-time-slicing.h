@@ -63,7 +63,7 @@ public:
    * \param address MAC address
    * \param carrierBandwidthInHz Carrier bandwidth where scheduler is associated to [Hz].
    */
-  SatFwdLinkSchedulerTimeSlicing (Ptr<SatBbFrameConf> conf, Mac48Address address, double carrierBandwidthInHz);
+  SatFwdLinkSchedulerTimeSlicing (Ptr<SatBbFrameConf> conf, Mac48Address address, double carrierBandwidthInHz, Ptr<SatMac> mac);
 
   /**
    * Destroy a SatFwdLinkScheduler
@@ -110,10 +110,22 @@ private:
    */
   Time GetTotalDuration ();
 
+  /*
+   * Send a control packet to the UT to inform which slices to subscribe
+   * \param address The MAC address of the UT
+   * \param slices The slices id the destination must subscribe to.
+   */
+  void SendTimeSliceSubscription (Mac48Address address, std::vector<uint8_t> slices);
+
   /**
-   * The containers for BB Frames. The keys are the slices and the values the associated container
+   * The containers for BBFrames. The keys are the slices and the values the associated container
    */
   std::map<uint8_t, Ptr<SatBbFrameContainer>> m_bbFrameContainers;
+
+  /**
+   * The container for control BBFrames that are broadcasted to all UT
+   */
+  Ptr<SatBbFrameContainer> m_bbFrameCtrlContainer;
 
   /**
    * The association between a destination MAC address and its slice.
@@ -130,6 +142,16 @@ private:
    * to a slice following a Round Robin law.
    */
   uint8_t m_lastSliceAssigned;
+
+  /**
+   * The last slice from which a BBFrame has been sent. used for Round Robin scheduling.
+   */
+  uint8_t m_lastSliceDequeued;
+
+  /**
+   * The GW MAC layer, needed to send control messages
+   */
+  Ptr<SatMac> m_mac;
 
 };
 

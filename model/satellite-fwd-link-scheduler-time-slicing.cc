@@ -56,13 +56,16 @@ SatFwdLinkSchedulerTimeSlicing::SatFwdLinkSchedulerTimeSlicing () : SatFwdLinkSc
   NS_FATAL_ERROR ("Default constructor for SatFwdLinkSchedulerTimeSlicing not supported");
 }
 
-SatFwdLinkSchedulerTimeSlicing::SatFwdLinkSchedulerTimeSlicing (Ptr<SatBbFrameConf> conf, Mac48Address address, double carrierBandwidthInHz) :
+SatFwdLinkSchedulerTimeSlicing::SatFwdLinkSchedulerTimeSlicing (Ptr<SatBbFrameConf> conf, Mac48Address address, double carrierBandwidthInHz, Ptr<SatMac> mac) :
     SatFwdLinkScheduler (conf, address, carrierBandwidthInHz),
-    m_lastSliceAssigned (0)
+    m_lastSliceAssigned (1),
+    m_lastSliceDequeued (1)
 {
   NS_LOG_FUNCTION (this);
 
   ObjectBase::ConstructSelf (AttributeConstructionList ());
+
+  m_mac = mac;
 
   std::vector<SatEnums::SatModcod_t> modCods;
   SatEnums::GetAvailableModcodsFwdLink (modCods);
@@ -71,9 +74,11 @@ SatFwdLinkSchedulerTimeSlicing::SatFwdLinkSchedulerTimeSlicing (Ptr<SatBbFrameCo
   uint32_t maxModulatedBits = SatUtils::GetModulatedBits (modCods.back ());
   m_numberOfSlices = 1;*/
 
+  m_bbFrameCtrlContainer = CreateObject<SatBbFrameContainer> (modCods, m_bbFrameConf);
+
   for(uint8_t i = 0; i < m_numberOfSlices; i++)
     {
-      m_bbFrameContainers.insert (std::pair<uint8_t, Ptr<SatBbFrameContainer>> (i, CreateObject<SatBbFrameContainer> (modCods, m_bbFrameConf)));
+      m_bbFrameContainers.insert (std::pair<uint8_t, Ptr<SatBbFrameContainer>> (i+1, CreateObject<SatBbFrameContainer> (modCods, m_bbFrameConf)));
     }
 
   Simulator::Schedule (m_periodicInterval, &SatFwdLinkSchedulerTimeSlicing::PeriodicTimerExpired, this);
@@ -98,12 +103,32 @@ SatFwdLinkSchedulerTimeSlicing::GetNextFrame ()
 {
   NS_LOG_FUNCTION (this);
 
-  if ( GetTotalDuration () < m_schedulingStartThresholdTime )
-    {
-      ScheduleBbFrames ();
-    }
+  Ptr<SatBbFrame> frame;
 
-  Ptr<SatBbFrame> frame = m_bbFrameContainers.at (0)->GetNextFrame (); // TODO change here
+  // Send slice control messages first if there is any.
+  if (m_bbFrameCtrlContainer->GetTotalDuration () > 0)
+    {
+      frame = m_bbFrameCtrlContainer->GetNextFrame ();
+    }
+  else
+    {
+      if ( GetTotalDuration () < m_schedulingStartThresholdTime )
+        {
+          ScheduleBbFrames ();
+        }
+
+      uint8_t lastDeque = m_lastSliceDequeued;
+      do
+        {
+          frame = m_bbFrameContainers.at (m_lastSliceDequeued)->GetNextFrame ();
+          if (m_lastSliceDequeued == m_numberOfSlices)
+            {
+              m_lastSliceDequeued = 0;
+            }
+          m_lastSliceDequeued++;
+        }
+      while (frame == NULL && m_lastSliceDequeued != lastDeque);
+    }
 
   // create dummy frame
   if ( frame == NULL )
@@ -155,12 +180,16 @@ SatFwdLinkSchedulerTimeSlicing::ScheduleBbFrames ()
 
       if ( m_slicesMapping.find(address) == m_slicesMapping.end() )
         {
-          std::cout << "First occurence of MAC address " << address;
+          std::cout << "First occurence of MAC address " << address; //TODO handle address ff:ff:ff:ff:ff:ff
           m_slicesMapping.insert (std::pair<Mac48Address, uint8_t> (address, m_lastSliceAssigned));
+          if (m_lastSliceAssigned == m_numberOfSlices)
+            {
+              m_lastSliceAssigned = 0;
+            }
           m_lastSliceAssigned++;
-          m_lastSliceAssigned %= m_numberOfSlices;
           std::cout << ". Got slice " << (uint32_t) m_slicesMapping.at (address) << std::endl;
-          // TODO send control message to UT
+
+          SendTimeSliceSubscription (address, std::vector<uint8_t> {m_slicesMapping.at (address)});
         }
       uint8_t slice = m_slicesMapping.at (address);
       SatEnums::SatModcod_t modcod = m_bbFrameContainers.at (slice)->GetModcod ( flowId, GetSchedulingObjectCno (*it));
@@ -227,6 +256,29 @@ SatFwdLinkSchedulerTimeSlicing::GetTotalDuration ()
     }
 
   return duration;
+}
+
+void
+SatFwdLinkSchedulerTimeSlicing::SendTimeSliceSubscription (Mac48Address address, std::vector<uint8_t> slices)
+{
+  NS_LOG_FUNCTION (this);
+
+  std::cout << "Create control message" << std::endl;
+
+  for(std::vector<uint8_t>::iterator it = slices.begin(); it != slices.end(); ++it)
+    {
+      Ptr<SatSliceSubscriptionMessage> sliceSubscription = CreateObject<SatSliceSubscriptionMessage> ();
+      sliceSubscription->SetSliceId(*it);
+
+      Ptr<Packet> packet = Create<Packet> (sliceSubscription->GetSizeInBytes ());
+      SatControlMsgTag tag;
+      uint32_t id = m_mac->ReserveIdAndStoreCtrlMsgToContainer (sliceSubscription);
+      tag.SetMsgId (id);
+      tag.SetMsgType (sliceSubscription->GetMsgType ());
+      packet->AddPacketTag (tag);
+
+      m_bbFrameCtrlContainer->AddData (0, m_bbFrameConf->GetDefaultModCod (), packet);
+    }
 }
 
 } // namespace ns3
