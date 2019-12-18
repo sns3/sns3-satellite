@@ -760,12 +760,15 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
       }
     case SatControlMsgTag::SAT_SLICE_CTRL_MSG:
       {
-        std::cout << "receive control message time-slicing" << std::endl;
-
         uint32_t sliceCtrlId = ctrlTag.GetMsgId ();
         Ptr<SatSliceSubscriptionMessage> sliceMsg = DynamicCast<SatSliceSubscriptionMessage> (m_readCtrlCallback (sliceCtrlId));
 
         std::cout << "UT " << m_nodeInfo->GetMacAddress () << " subscribe to slice " << sliceMsg->GetSliceId () << std::endl;
+
+        // TODO-> if zero reset
+        // TODO -> else subscribe
+        // TODO -> callback to lower layers
+
         break;
       }
     default:

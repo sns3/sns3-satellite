@@ -276,6 +276,12 @@ SatFwdLinkSchedulerTimeSlicing::SendTimeSliceSubscription (Mac48Address address,
 {
   NS_LOG_FUNCTION (this);
 
+  if (address == Mac48Address::GetBroadcast ())
+    {
+      std::cout << "ignoring broadact address" << std::endl;
+      return;
+    }
+
   std::cout << "Create control message to " << address << std::endl;
 
   for(std::vector<uint8_t>::iterator it = slices.begin(); it != slices.end(); ++it)

@@ -154,6 +154,18 @@ SatGwHelper::Initialize (Ptr<SatLinkResultsDvbRcs2> lrRcs2, Ptr<SatLinkResultsDv
 {
   NS_LOG_FUNCTION (this);
 
+  switch (m_fwdSchedulingAlgorithm)
+    {
+    case SatEnums::DVB_S2:
+      Config::SetDefault ("ns3::SatBbFrameConf::PlHeaderInSlots", UintegerValue (1));
+      break;
+    case SatEnums::DVB_S2X:
+      Config::SetDefault ("ns3::SatBbFrameConf::PlHeaderInSlots", UintegerValue (2));
+      break;
+    default:
+      NS_FATAL_ERROR ("Forward scheduling algorithm is not implemented");
+    }
+
   // TODO: Usage of multiple carriers needed to take into account, now only one carrier assumed to be used.
   // TODO: Symbol rate needed to check.
   m_symbolRate = m_carrierBandwidthConverter (SatEnums::FORWARD_FEEDER_CH, 0, SatEnums::EFFECTIVE_BANDWIDTH);
