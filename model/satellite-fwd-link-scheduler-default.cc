@@ -104,6 +104,11 @@ SatFwdLinkSchedulerDefault::GetNextFrame ()
       frame->AddPayload (dummyPacket);
     }
 
+  if (frame != NULL)
+    {
+      frame->SetSliceId (0);
+    }
+
   return frame;
 }
 

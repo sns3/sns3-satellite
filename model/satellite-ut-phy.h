@@ -107,6 +107,21 @@ public:
    */
   bool IsTxPossible (void) const;
 
+  /**
+   * \brief Receives packets from lower layer.
+   * \param rxParams Packet reception parameters
+   * \param phyError Boolean indicating whether the packet successfully
+   * received or not?
+   */
+  void Receive (Ptr<SatSignalParameters> rxParams, bool phyError);
+
+  /**
+   * \brief Updates the slices subscription list.
+   * \param slice The new slice to subscribe. If zero, reset the subscription list
+   * (except slice zero used for control messages).
+   */
+  void UpdateSliceSubscription(uint8_t slice);
+
 private:
   /**
    * \brief Update the underlying SatChannel to send and receive data from
@@ -128,6 +143,11 @@ private:
    * Delay of antenna reconfiguration when performing handover
    */
   Time m_antennaReconfigurationDelay;
+
+  /**
+   * The list of slices subscribed for this UT.
+   */
+  std::set<uint8_t> m_slicesSubscribed;
 };
 
 }

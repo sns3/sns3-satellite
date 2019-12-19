@@ -108,6 +108,10 @@ SatFwdLinkSchedulerTimeSlicing::GetNextFrame ()
     {
       std::cout << "Send control message" << std::endl;
       frame = m_bbFrameCtrlContainer->GetNextFrame ();
+      if (frame != NULL)
+        {
+          frame->SetSliceId (0);
+        }
     }
   else
     {
@@ -195,8 +199,7 @@ SatFwdLinkSchedulerTimeSlicing::ScheduleBbFrames ()
           if (address == Mac48Address::GetBroadcast ())
             {
               // TODO handle address ff:ff:ff:ff:ff:ff
-              // ask enverybody to subscribe
-              // TODO make slice 0 broadcast ? or copy the message to all slices ?
+              // TODO copy the message to all slices ?
             }
             m_slicesMapping.insert (std::pair<Mac48Address, uint8_t> (address, m_lastSliceAssigned));
             if (m_lastSliceAssigned == m_numberOfSlices)
@@ -211,7 +214,7 @@ SatFwdLinkSchedulerTimeSlicing::ScheduleBbFrames ()
       uint8_t slice = m_slicesMapping.at (address);
       SatEnums::SatModcod_t modcod = m_bbFrameContainers.at (slice)->GetModcod ( flowId, GetSchedulingObjectCno (*it));
 
-      uint32_t frameBytes = m_bbFrameContainers.at (slice)->GetBytesLeftInTailFrame (flowId, modcod);
+      uint32_t frameBytes = m_bbFrameContainers.at (slice)->GetBytesLeftInTailFrame (flowId, modcod); // TODO cannot use it anymore...
 
       while ( (GetTotalDuration () < m_schedulingStopThresholdTime) && (currentObBytes > 0) )
         {
@@ -230,8 +233,15 @@ SatFwdLinkSchedulerTimeSlicing::ScheduleBbFrames ()
 
           if ( p )
             {
-              m_bbFrameContainers.at (slice)->AddData (flowId, modcod, p);
-              frameBytes = m_bbFrameContainers.at (slice)->GetBytesLeftInTailFrame (flowId, modcod);
+              if (flowId == 0)
+                {
+                  m_bbFrameCtrlContainer->AddData (flowId, modcod, p);
+                }
+              else
+                {
+                  m_bbFrameContainers.at (slice)->AddData (flowId, modcod, p);
+                  frameBytes = m_bbFrameContainers.at (slice)->GetBytesLeftInTailFrame (flowId, modcod);
+                }
             }
           else if ( m_bbFrameContainers.at (slice)->GetMaxFramePayloadInBytes (flowId, modcod ) != m_bbFrameContainers.at (slice)->GetBytesLeftInTailFrame (flowId, modcod))
             {

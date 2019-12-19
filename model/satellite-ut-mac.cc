@@ -196,6 +196,14 @@ SatUtMac::SetTxCheckCallback (SatUtMac::TxCheckCallback cb)
 }
 
 void
+SatUtMac::SetSliceSubscriptionCallback (SatUtMac::SliceSubscriptionCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+
+  m_sliceSubscriptionCallback = cb;
+}
+
+void
 SatUtMac::SetGwAddress (Mac48Address gwAddress)
 {
   NS_LOG_FUNCTION (this << gwAddress);
@@ -765,9 +773,7 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
 
         std::cout << "UT " << m_nodeInfo->GetMacAddress () << " subscribe to slice " << sliceMsg->GetSliceId () << std::endl;
 
-        // TODO-> if zero reset
-        // TODO -> else subscribe
-        // TODO -> callback to lower layers
+        m_sliceSubscriptionCallback (sliceMsg->GetSliceId ());
 
         break;
       }

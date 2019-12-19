@@ -367,11 +367,6 @@ SatPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
   SatEnums::SatLinkDir_t ld =
     (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_FORWARD : SatEnums::LD_RETURN;
 
-  if (ld == SatEnums::LD_FORWARD)
-    {
-      std::cout << "Receive slice ID " << (uint32_t) rxParams->m_txInfo.sliceId << std::endl;
-    }
-
   SatEnums::SatPacketEvent_t event = (phyError) ? SatEnums::PACKET_DROP : SatEnums::PACKET_RECV;
 
   m_packetTrace (Simulator::Now (),
