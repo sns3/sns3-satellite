@@ -70,6 +70,15 @@ public:
   virtual ~SatBbFrameContainer ();
 
   /**
+   * Indicates if the container for a ModCod and priority is empty (no BBFrame).
+   *
+   * \param priorityClass Priority class of the container
+   * \param modcod MODCOD of the container. MODCOD is ignored when priorityClass is 0.
+   * \param true if a BBFrame is already open
+   */
+  bool IsEmpty (uint32_t priorityClass, SatEnums::SatModcod_t modcod);
+
+  /**
    * Add data according to given priority class and MODCOD to container.
    *
    * \param priorityClass Priority class of the data (packet) to be added
@@ -118,6 +127,20 @@ public:
    * \return Total transmission duration of the frames.
    */
   Time GetTotalDuration () const;
+
+  /**
+   * Get number of symbols needed to send all the BBFrames in the container.
+   * \return Total number of symbols of the frames.
+   */
+  uint32_t GetTotalSymbols ();
+
+  /**
+   * Get the total number of symbols, incuding headers, when creating a new BBFrame.
+   *
+   * \param modcod MODOCOD of the queue requested.
+   * \return The number of symbols in the BBFrame.
+   */
+  uint32_t GetFrameSymbols (SatEnums::SatModcod_t modcod);
 
 private:
   typedef std::map<SatEnums::SatModcod_t, std::deque<Ptr<SatBbFrame> > > FrameContainer_t;

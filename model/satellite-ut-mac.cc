@@ -771,8 +771,6 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
         uint32_t sliceCtrlId = ctrlTag.GetMsgId ();
         Ptr<SatSliceSubscriptionMessage> sliceMsg = DynamicCast<SatSliceSubscriptionMessage> (m_readCtrlCallback (sliceCtrlId));
 
-        std::cout << "UT " << m_nodeInfo->GetMacAddress () << " subscribe to slice " << sliceMsg->GetSliceId () << std::endl;
-
         m_sliceSubscriptionCallback (sliceMsg->GetSliceId ());
 
         break;

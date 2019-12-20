@@ -243,6 +243,13 @@ public:
   Time GetBbFrameDuration (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType) const;
 
   /**
+   * \brief Symbol rate in baud
+   *
+   * \return Symbol rate in baud
+   */
+  double GetSymbolRate ();
+
+  /**
    * \brief Get the BB frame payload in bits.
    * \param modcod MODCOD
    * \param frameType BB frame type: short, normal

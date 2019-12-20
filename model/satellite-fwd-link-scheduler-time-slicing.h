@@ -131,18 +131,23 @@ private:
    */
   void SendTimeSliceSubscription (Mac48Address address, std::vector<uint8_t> slices);
 
+  /*
+   * Compute if a new BBFrame can be openned while respecting symbol rate constraints.
+   * \param address The MAC destination address of the BBFrame
+   * \param priorityClass The priority class of the new BBFrame
+   * \param modcod The modcod of the new BBFrame
+   * \return true if a new BBFrame can be openned
+   */
+  bool CanOpenBbFrame (Mac48Address address, uint32_t priorityClass, SatEnums::SatModcod_t modcod);
+
   /**
    * The containers for BBFrames. The keys are the slices and the values the associated container
    */
   std::map<uint8_t, Ptr<SatBbFrameContainer>> m_bbFrameContainers;
 
   /**
-   * The container for control BBFrames that are broadcasted to all UT
-   */
-  Ptr<SatBbFrameContainer> m_bbFrameCtrlContainer;
-
-  /**
    * The association between a destination MAC address and its slice.
+   * Slice 0 is the container for control BBFrames that are broadcasted to all UT.
    */
   std::map<Mac48Address, uint8_t> m_slicesMapping;
 

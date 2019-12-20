@@ -72,7 +72,7 @@ SatFwdLinkSchedulerTimeSlicing::SatFwdLinkSchedulerTimeSlicing (Ptr<SatBbFrameCo
   uint32_t maxModulatedBits = SatUtils::GetModulatedBits (modCods.back ());
   m_numberOfSlices = 1;*/
 
-  m_bbFrameCtrlContainer = CreateObject<SatBbFrameContainer> (modCods, m_bbFrameConf);
+  m_bbFrameContainers.insert (std::pair<uint8_t, Ptr<SatBbFrameContainer>> (0, CreateObject<SatBbFrameContainer> (modCods, m_bbFrameConf)));
 
   for(uint8_t i = 0; i < m_numberOfSlices; i++)
     {
@@ -104,10 +104,9 @@ SatFwdLinkSchedulerTimeSlicing::GetNextFrame ()
   Ptr<SatBbFrame> frame;
 
   // Send slice control messages first if there is any.
-  if (m_bbFrameCtrlContainer->GetTotalDuration () > 0)
+  if (m_bbFrameContainers.at (0)->GetTotalDuration () > 0)
     {
-      std::cout << "Send control message" << std::endl;
-      frame = m_bbFrameCtrlContainer->GetNextFrame ();
+      frame = m_bbFrameContainers.at (0)->GetNextFrame ();
       if (frame != NULL)
         {
           frame->SetSliceId (0);
@@ -194,33 +193,44 @@ SatFwdLinkSchedulerTimeSlicing::ScheduleBbFrames ()
 
       if ( m_slicesMapping.find(address) == m_slicesMapping.end() )
         {
-          std::cout << "First occurence of MAC address " << address;
-
           if (address == Mac48Address::GetBroadcast ())
             {
               // TODO handle address ff:ff:ff:ff:ff:ff
               // TODO copy the message to all slices ?
             }
-            m_slicesMapping.insert (std::pair<Mac48Address, uint8_t> (address, m_lastSliceAssigned));
-            if (m_lastSliceAssigned == m_numberOfSlices)
-              {
-                m_lastSliceAssigned = 0;
-              }
-            m_lastSliceAssigned++;
-            std::cout << ". Got slice " << (uint32_t) m_slicesMapping.at (address) << std::endl;
+          m_slicesMapping.insert (std::pair<Mac48Address, uint8_t> (address, m_lastSliceAssigned));
+          if (m_lastSliceAssigned == m_numberOfSlices)
+            {
+              m_lastSliceAssigned = 0;
+            }
+          m_lastSliceAssigned++;
 
-            SendTimeSliceSubscription (address, std::vector<uint8_t> {m_slicesMapping.at (address)});
+          SendTimeSliceSubscription (address, std::vector<uint8_t> {m_slicesMapping.at (address)});
+
+          // Begin again scheduling to insert slice subscription control packet.
+          Simulator::Schedule (Seconds (0), &SatFwdLinkSchedulerTimeSlicing::ScheduleBbFrames, this);
+          return;
         }
       uint8_t slice = m_slicesMapping.at (address);
       SatEnums::SatModcod_t modcod = m_bbFrameContainers.at (slice)->GetModcod ( flowId, GetSchedulingObjectCno (*it));
 
-      uint32_t frameBytes = m_bbFrameContainers.at (slice)->GetBytesLeftInTailFrame (flowId, modcod); // TODO cannot use it anymore...
+      uint32_t frameBytes = m_bbFrameContainers.at (slice)->GetBytesLeftInTailFrame (flowId, modcod);
+
+      if ((m_bbFrameContainers.at (slice)->IsEmpty (flowId, modcod)) && (currentObBytes > 0) && !CanOpenBbFrame (address, flowId, modcod))
+        {
+          continue;
+        }
 
       while ( (GetTotalDuration () < m_schedulingStopThresholdTime) && (currentObBytes > 0) )
         {
           if ( frameBytes < currentObMinReqBytes)
             {
               frameBytes = m_bbFrameContainers.at (slice)->GetMaxFramePayloadInBytes (flowId, modcod);
+
+              if (!CanOpenBbFrame (address, flowId, modcod))
+                {
+                  break;
+                }
 
               // if frame bytes still too small, we must have too long control message, so let's crash
               if ( frameBytes < currentObMinReqBytes )
@@ -235,7 +245,7 @@ SatFwdLinkSchedulerTimeSlicing::ScheduleBbFrames ()
             {
               if (flowId == 0)
                 {
-                  m_bbFrameCtrlContainer->AddData (flowId, modcod, p);
+                  m_bbFrameContainers.at (0)->AddData (flowId, modcod, p);
                 }
               else
                 {
@@ -246,6 +256,11 @@ SatFwdLinkSchedulerTimeSlicing::ScheduleBbFrames ()
           else if ( m_bbFrameContainers.at (slice)->GetMaxFramePayloadInBytes (flowId, modcod ) != m_bbFrameContainers.at (slice)->GetBytesLeftInTailFrame (flowId, modcod))
             {
               frameBytes = m_bbFrameContainers.at (slice)->GetMaxFramePayloadInBytes (flowId, modcod);
+
+              if (!CanOpenBbFrame (address, flowId, modcod))
+                {
+                  break;
+                }
             }
           else
             {
@@ -292,11 +307,8 @@ SatFwdLinkSchedulerTimeSlicing::SendTimeSliceSubscription (Mac48Address address,
 
   if (address == Mac48Address::GetBroadcast ())
     {
-      std::cout << "ignoring broadact address" << std::endl;
       return;
     }
-
-  std::cout << "Create control message to " << address << std::endl;
 
   for(std::vector<uint8_t>::iterator it = slices.begin(); it != slices.end(); ++it)
     {
@@ -305,6 +317,31 @@ SatFwdLinkSchedulerTimeSlicing::SendTimeSliceSubscription (Mac48Address address,
 
       m_sendControlMsgCallback (sliceSubscription, address);
     }
+}
+
+bool
+SatFwdLinkSchedulerTimeSlicing::CanOpenBbFrame (Mac48Address address, uint32_t priorityClass, SatEnums::SatModcod_t modcod)
+{
+  NS_LOG_FUNCTION (this);
+
+  // Add control symbols
+  uint32_t symbolsReceived = m_bbFrameContainers.at (0)->GetTotalSymbols ();
+  symbolsReceived += m_bbFrameContainers.at (0)->GetFrameSymbols(modcod);
+
+  // Add slice symbols
+  if (priorityClass != 0)
+    {
+      symbolsReceived += m_bbFrameContainers.at (m_slicesMapping.at (address))->GetTotalSymbols ();
+      symbolsReceived += m_bbFrameContainers.at (m_slicesMapping.at (address))->GetFrameSymbols(modcod);
+    }
+
+  // Actual symbol rate if we send all the BBFrames to the destination during m_periodicInterval.
+  double symbolRate = symbolsReceived / m_periodicInterval.GetSeconds ();
+
+  // Maximum allowed symbol rate
+  double maxSymbolRate = m_bbFrameConf->GetSymbolRate () / m_numberOfSlices;
+
+  return symbolRate < maxSymbolRate;
 }
 
 } // namespace ns3
