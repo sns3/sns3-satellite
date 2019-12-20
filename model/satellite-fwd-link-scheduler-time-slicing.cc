@@ -68,11 +68,15 @@ SatFwdLinkSchedulerTimeSlicing::SatFwdLinkSchedulerTimeSlicing (Ptr<SatBbFrameCo
   std::vector<SatEnums::SatModcod_t> modCods;
   SatEnums::GetAvailableModcodsFwdLink (modCods);
 
-  /* TODO compute number of slices depending on decoding capacity
-  uint32_t maxModulatedBits = SatUtils::GetModulatedBits (modCods.back ());
-  m_numberOfSlices = 1;*/
-
   m_bbFrameContainers.insert (std::pair<uint8_t, Ptr<SatBbFrameContainer>> (0, CreateObject<SatBbFrameContainer> (modCods, m_bbFrameConf)));
+
+  uint32_t slicesMax = m_bbFrameConf->GetSymbolRate ()*m_periodicInterval.GetSeconds ()
+      /m_bbFrameContainers.at (0)->GetFrameSymbols(m_bbFrameConf->GetMostRobustModcod (SatEnums::NORMAL_FRAME));
+  if (m_numberOfSlices >= slicesMax)
+    {
+      NS_FATAL_ERROR ("Number of slices too big to allow at least one BBFrame of the most robust ModCod per slice. Cannot be equal or higher than "
+          + std::to_string(slicesMax) + " with the current configuration");
+    }
 
   for(uint8_t i = 0; i < m_numberOfSlices; i++)
     {
@@ -248,7 +252,7 @@ SatFwdLinkSchedulerTimeSlicing::ScheduleBbFrames ()
                   frameBytes = m_bbFrameContainers.at (slice)->GetBytesLeftInTailFrame (flowId, modcod);
                 }
             }
-          else if ( m_bbFrameContainers.at (slice)->GetMaxFramePayloadInBytes (flowId, modcod ) != m_bbFrameContainers.at (slice)->GetBytesLeftInTailFrame (flowId, modcod))
+          else if (m_bbFrameContainers.at(slice)->GetMaxFramePayloadInBytes (flowId, modcod ) != m_bbFrameContainers.at(slice)->GetBytesLeftInTailFrame (flowId, modcod))
             {
               frameBytes = m_bbFrameContainers.at (slice)->GetMaxFramePayloadInBytes (flowId, modcod);
 
