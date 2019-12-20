@@ -104,7 +104,7 @@ SatFwdLinkSchedulerTimeSlicing::GetNextFrame ()
   Ptr<SatBbFrame> frame;
 
   // Send slice control messages first if there is any.
-  if (m_bbFrameContainers.at (0)->GetTotalDuration () > 0)
+  if (!m_bbFrameContainers.at (0)->IsEmpty (0, m_bbFrameConf->GetDefaultModCod ()))
     {
       frame = m_bbFrameContainers.at (0)->GetNextFrame ();
       if (frame != NULL)
@@ -129,7 +129,7 @@ SatFwdLinkSchedulerTimeSlicing::GetNextFrame ()
             }
           if (m_lastSliceDequeued == m_numberOfSlices)
             {
-              m_lastSliceDequeued = 0;
+              m_lastSliceDequeued = -1;
             }
           m_lastSliceDequeued++;
         }
@@ -191,13 +191,8 @@ SatFwdLinkSchedulerTimeSlicing::ScheduleBbFrames ()
       uint8_t flowId = (*it)->GetFlowId ();
       Mac48Address address = (*it)->GetMacAddress ();
 
-      if ( m_slicesMapping.find(address) == m_slicesMapping.end() )
+      if ( (m_slicesMapping.find(address) == m_slicesMapping.end()) && (address != Mac48Address::GetBroadcast ()) )
         {
-          if (address == Mac48Address::GetBroadcast ())
-            {
-              // TODO handle address ff:ff:ff:ff:ff:ff
-              // TODO copy the message to all slices ?
-            }
           m_slicesMapping.insert (std::pair<Mac48Address, uint8_t> (address, m_lastSliceAssigned));
           if (m_lastSliceAssigned == m_numberOfSlices)
             {
@@ -211,7 +206,7 @@ SatFwdLinkSchedulerTimeSlicing::ScheduleBbFrames ()
           Simulator::Schedule (Seconds (0), &SatFwdLinkSchedulerTimeSlicing::ScheduleBbFrames, this);
           return;
         }
-      uint8_t slice = m_slicesMapping.at (address);
+      uint8_t slice = (address == Mac48Address::GetBroadcast ()) ? 0 : m_slicesMapping.at (address);
       SatEnums::SatModcod_t modcod = m_bbFrameContainers.at (slice)->GetModcod ( flowId, GetSchedulingObjectCno (*it));
 
       uint32_t frameBytes = m_bbFrameContainers.at (slice)->GetBytesLeftInTailFrame (flowId, modcod);
@@ -243,7 +238,7 @@ SatFwdLinkSchedulerTimeSlicing::ScheduleBbFrames ()
 
           if ( p )
             {
-              if (flowId == 0)
+              if ((flowId == 0) || (address == Mac48Address::GetBroadcast ()))
                 {
                   m_bbFrameContainers.at (0)->AddData (flowId, modcod, p);
                 }
@@ -304,11 +299,6 @@ void
 SatFwdLinkSchedulerTimeSlicing::SendTimeSliceSubscription (Mac48Address address, std::vector<uint8_t> slices)
 {
   NS_LOG_FUNCTION (this);
-
-  if (address == Mac48Address::GetBroadcast ())
-    {
-      return;
-    }
 
   for(std::vector<uint8_t>::iterator it = slices.begin(); it != slices.end(); ++it)
     {

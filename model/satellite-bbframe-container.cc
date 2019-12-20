@@ -172,12 +172,10 @@ SatBbFrameContainer::AddData (uint32_t priorityClass, SatEnums::SatModcod_t modc
     {
       if ( m_container.at (modcod).empty ())
         {
-          //std::cout << "Empty" << std::endl;
           CreateFrameToTail (priorityClass, modcod);
         }
       if ( GetBytesLeftInTailFrame (priorityClass, modcod) < data->GetSize () )
         {
-          //std::cout << "Size" << std::endl;
           CreateFrameToTail (priorityClass, modcod);
         }
       else if ( ( m_bbFrameConf->GetBbFrameUsageMode () == SatBbFrameConf::SHORT_AND_NORMAL_FRAMES )
@@ -265,8 +263,6 @@ void
 SatBbFrameContainer::CreateFrameToTail (uint32_t priorityClass, SatEnums::SatModcod_t modcod)
 {
   NS_LOG_FUNCTION (this << modcod );
-
-  //std::cout << "Open new frame" << std::endl;
 
   Ptr<SatBbFrame> frame = Create<SatBbFrame> (modcod, m_defaultBbFrameType, m_bbFrameConf);
 
