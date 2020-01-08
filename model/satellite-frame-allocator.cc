@@ -293,8 +293,8 @@ SatFrameAllocator::Reset ()
   m_allocationDenied = false;
 }
 
-uint16_t
-SatFrameAllocator::SelectCarriers (uint16_t count, uint16_t offset)
+void
+SatFrameAllocator::SelectCarriers (uint16_t& count, uint16_t offset)
 {
   NS_LOG_FUNCTION (this << count << offset);
 
@@ -319,8 +319,6 @@ SatFrameAllocator::SelectCarriers (uint16_t count, uint16_t offset)
   m_carriersOffset = offset;
 
   NS_LOG_INFO ("Frame " << (uint32_t) m_frameId << " selected " << count << " carriers from carrier ID " << offset);
-
-  return m_maxCarrierCount + m_carriersOffset;
 }
 
 double

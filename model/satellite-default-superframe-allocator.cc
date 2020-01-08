@@ -123,7 +123,7 @@ SatDefaultSuperframeAllocator::SatDefaultSuperframeAllocator (Ptr<SatSuperframeC
             }
 
           m_minimumRateBasedBytesLeft += frameAllocator->GetCarrierCount () * minCarrierPayloadInBytes;
-          m_totalBandwidth += frameAllocator->GetBandwidthHz (true);
+          m_totalBandwidth += frameAllocator->GetCarrierBandwidthHz (true);
         }
     }
 }
@@ -164,7 +164,7 @@ SatDefaultSuperframeAllocator::SelectCarriers (SatFrameAllocator::SatFrameAllocC
   double requestedBandwidth = 0.0;
   for (auto& demand : wsrDemand)
     {
-      requestedBandwidth += demand.first->GetBandwidthHz () * demand.second / demand.first->GetVolumeBytes ();
+      requestedBandwidth += demand.first->GetCarrierBandwidthHz () * demand.second / demand.first->GetVolumeBytes ();
     }
   double loadCoefficient = std::min(std::max(0.1, requestedBandwidth / m_totalBandwidth), 10.0);
   NS_LOG_INFO ("" << allocReqs.size () << " requested " << requestedBandwidth << "Hz through " <<
@@ -179,7 +179,8 @@ SatDefaultSuperframeAllocator::SelectCarriers (SatFrameAllocator::SatFrameAllocC
   NS_LOG_LOGIC ("Zero-out old carrier selection");
   for (auto& frameAllocator : m_frameAllocators)
     {
-      frameAllocator->SelectCarriers (0, 0);
+      uint16_t zeroReference = 0;
+      frameAllocator->SelectCarriers (zeroReference, 0);
     }
 
   NS_LOG_LOGIC ("Allocate carriers in subdivision levels");
@@ -191,7 +192,7 @@ SatDefaultSuperframeAllocator::SelectCarriers (SatFrameAllocator::SatFrameAllocC
         {
           frameAllocator = frameAllocator->GetParent ();
         }
-      double remainingBandwidth = frameAllocator->GetBandwidthHz (true);
+      double remainingBandwidth = frameAllocator->GetCarrierBandwidthHz (true);
       NS_ASSERT_MSG (remainingBandwidth != 0.0, "Could not find bandwidth of original frame");
       NS_LOG_INFO ("Remaining bandwidth on non-subdivided frame: " << remainingBandwidth);
 
@@ -209,27 +210,25 @@ SatDefaultSuperframeAllocator::SelectCarriers (SatFrameAllocator::SatFrameAllocC
             }
           NS_LOG_LOGIC (demand << " carriers requested on (subdivided) frame " << frameAllocator);
 
-          uint16_t totalCarriers = 0;
-          double carrierBandwidth = frameAllocator->GetBandwidthHz ();
+          uint16_t carriersCount = 0;
+          double carrierBandwidth = frameAllocator->GetCarrierBandwidthHz ();
           if (frameAllocator->GetParent () != nullptr)
             {
               // Select requested carriers of subdivided frames
               uint16_t remainingCarriers = remainingBandwidth / carrierBandwidth;
-              uint16_t carriersCount = std::max (uint16_t (0), std::min (demand, remainingCarriers));
-              totalCarriers = frameAllocator->SelectCarriers (carriersCount, offset);
-            }
-          else
-            {
-              // Select remaining carriers of parent frame
-              totalCarriers = frameAllocator->SelectCarriers (0, offset);
+              carriersCount = std::max (uint16_t (0), std::min (demand, remainingCarriers));
             }
 
-          remainingBandwidth -= totalCarriers * carrierBandwidth;
-          offset = totalCarriers / 2;
+          frameAllocator->SelectCarriers (carriersCount, offset);
+          remainingBandwidth -= carriersCount * carrierBandwidth;
+          offset = (carriersCount + offset) / 2;
           frameAllocator = frameAllocator->GetParent ();
         }
 
-      // TODO? Check that remainingBandwidth is close to 0.0
+      if (remainingBandwidth < 0.0)
+        {
+          NS_FATAL_ERROR ("SatDefaultSuperframeAllocator::SelectCarriers: remaining bandwidth is negative");
+        }
     }
 }
 

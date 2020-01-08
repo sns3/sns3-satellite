@@ -201,17 +201,16 @@ public:
   /**
    * Set the amount of carriers used in this frame.
    * 
-   * \param amount   number of carriers to select in this frame
-   * \param offset   number of carriers already selected for subdivided versions of the frame
-   * \return actual amount of carriers selected including offset and potential padding to round to an even number of selected carriers.
+   * \param amount   number of carriers to select in this frame. This parameter may be updated to include padding to round to an even number of selected carriers.
+   * \param offset   number of carriers already selected for subdivided versions of the frame.
    */
-  uint16_t SelectCarriers (uint16_t amount, uint16_t offset);
+  void SelectCarriers (uint16_t& amount, uint16_t offset);
 
-  inline double GetBandwidthHz (bool checkParent = false) const
+  inline double GetCarrierBandwidthHz (bool checkParent = false) const
   {
     if (checkParent && m_frameConf->IsSubdivided ())
       return 0.0;
-    return m_frameConf->GetBandwidthHz ();
+    return m_frameConf->GetCarrierBandwidthHz (SatEnums::EFFECTIVE_BANDWIDTH);
   }
 
   inline double GetVolumeBytes () const
