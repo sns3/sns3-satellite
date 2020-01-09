@@ -44,7 +44,7 @@ using namespace ns3;
 NS_LOG_COMPONENT_DEFINE ("sat-generic-launcher");
 
 
-static double g_txMaxPower = -9.0;
+static double g_txMaxPower = 5.0;
 static bool g_ascending = false;
 static Time g_cnoInterval = MilliSeconds (100);
 static Time g_simulationTime = Minutes (1);
@@ -52,12 +52,13 @@ static Time g_simulationTime = Minutes (1);
 
 static void ChangeCno (const std::vector<Ptr<SatUtPhy>>& utsPhysicalLayers)
 {
-  g_txMaxPower += g_ascending ? 2.0 : -2.0;
+  g_txMaxPower += g_ascending ? 0.2 : -0.2;
   g_ascending = (g_ascending && g_txMaxPower < 30.0) || (!g_ascending && g_txMaxPower < -30.0);
 
   for (auto& phy : utsPhysicalLayers)
     {
       phy->SetAttribute ("TxMaxPowerDbw", DoubleValue (g_txMaxPower));
+      phy->Initialize ();
     }
 
   Simulator::Schedule (g_cnoInterval, &ChangeCno, utsPhysicalLayers);
@@ -220,16 +221,18 @@ main (int argc, char *argv[])
     {
       simulationHelper->CreateDefaultStats ();
       Ptr<SatStatsHelperContainer> stats = simulationHelper->GetStatisticsContainer ();
-      stats->AddGlobalRtnFeederLinkSinr (SatStatsHelper::OUTPUT_SCALAR_FILE);
-      stats->AddGlobalRtnFeederLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
-      stats->AddGlobalRtnUserLinkSinr (SatStatsHelper::OUTPUT_SCALAR_FILE);
-      stats->AddGlobalRtnUserLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
       stats->AddGlobalRtnFeederLinkRxPower (SatStatsHelper::OUTPUT_SCALAR_FILE);
       stats->AddGlobalRtnFeederLinkRxPower (SatStatsHelper::OUTPUT_SCATTER_FILE);
       stats->AddGlobalRtnUserLinkRxPower (SatStatsHelper::OUTPUT_SCALAR_FILE);
       stats->AddGlobalRtnUserLinkRxPower (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      stats->AddPerUtRtnMacDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      stats->AddPerUtRtnMacDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      stats->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      stats->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
       stats->AddPerUtCarrierId (SatStatsHelper::OUTPUT_SCALAR_FILE);
       stats->AddPerUtCarrierId (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      stats->AddPerUtRtnCompositeSinr (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      stats->AddPerUtRtnCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
     }
 
   simulationHelper->RunSimulation ();
