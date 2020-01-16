@@ -49,7 +49,8 @@ SatFwdLinkSchedulerDefault::SatFwdLinkSchedulerDefault () : SatFwdLinkScheduler 
 }
 
 SatFwdLinkSchedulerDefault::SatFwdLinkSchedulerDefault (Ptr<SatBbFrameConf> conf, Mac48Address address, double carrierBandwidthInHz) :
-    SatFwdLinkScheduler (conf, address, carrierBandwidthInHz)
+    SatFwdLinkScheduler (conf, address, carrierBandwidthInHz),
+    m_symbolsSent (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -107,6 +108,7 @@ SatFwdLinkSchedulerDefault::GetNextFrame ()
   if (frame != NULL)
     {
       frame->SetSliceId (0);
+      m_symbolsSent += ceil(frame->GetDuration ().GetSeconds ()*m_carrierBandwidthInHz);
     }
 
   return frame;
@@ -117,9 +119,20 @@ SatFwdLinkSchedulerDefault::PeriodicTimerExpired ()
 {
   NS_LOG_FUNCTION (this);
 
+  SendAndClearSymbolsSentStat ();
   ScheduleBbFrames ();
 
   Simulator::Schedule (m_periodicInterval, &SatFwdLinkSchedulerDefault::PeriodicTimerExpired, this);
+}
+
+void
+SatFwdLinkSchedulerDefault::SendAndClearSymbolsSentStat ()
+{
+  NS_LOG_FUNCTION (this);
+
+  m_schedulingSymbolRateTrace (0, m_symbolsSent / Seconds (1).GetSeconds ());
+
+  m_symbolsSent = 0;
 }
 
 void

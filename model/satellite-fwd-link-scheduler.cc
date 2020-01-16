@@ -140,8 +140,21 @@ SatFwdLinkScheduler::GetTypeId (void)
                     TimeValue (Seconds (5000)),
                     MakeTimeAccessor (&SatFwdLinkScheduler::m_cnoEstimationWindow),
                     MakeTimeChecker ())
+    .AddTraceSource ( "SymbolRate",
+                      "Scheduler symbol rate for a given packet",
+                      MakeTraceSourceAccessor (&SatFwdLinkScheduler::m_schedulingSymbolRateTrace),
+                      "ns3::SatTypedefs::FwdLinkSchedulerSymbolRateCallback")
+
   ;
   return tid;
+}
+
+TypeId
+SatFwdLinkScheduler::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
 }
 
 SatFwdLinkScheduler::SatFwdLinkScheduler ()
@@ -161,6 +174,8 @@ SatFwdLinkScheduler::SatFwdLinkScheduler (Ptr<SatBbFrameConf> conf, Mac48Address
   m_carrierBandwidthInHz (carrierBandwidthInHz)
 {
   NS_LOG_FUNCTION (this);
+
+  ObjectBase::ConstructSelf (AttributeConstructionList ());
 
   // Random variable used in scheduling
   m_random = CreateObject<UniformRandomVariable> ();
@@ -230,6 +245,12 @@ void
 SatFwdLinkScheduler::PeriodicTimerExpired ()
 {
   NS_FATAL_ERROR ("SatFwdLinkScheduler::ScheduleBbFrames: should not be here");
+}
+
+void
+SatFwdLinkScheduler::SendAndClearSymbolsSentStat ()
+{
+  NS_FATAL_ERROR ("SatFwdLinkScheduler::SendAndClearSymbolsSentStat: should not be here");
 }
 
 void

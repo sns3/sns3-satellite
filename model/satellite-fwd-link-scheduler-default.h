@@ -96,6 +96,11 @@ private:
   void PeriodicTimerExpired ();
 
   /**
+   * Send stats and reset all the symbols sent count for each slice to zero.
+   */
+  void SendAndClearSymbolsSentStat ();
+
+  /**
    * Gets scheduling object in sorted order according to configured sorting criteria.
    *
    * \param output reference to a vector which will be filled with pointers to
@@ -107,6 +112,11 @@ private:
    * The container for BB Frames.
    */
   Ptr<SatBbFrameContainer> m_bbFrameContainer;
+
+  /**
+   * The number of symbols sent for each slice during an allocation cycle.
+   */
+  uint32_t m_symbolsSent;
 
 };
 

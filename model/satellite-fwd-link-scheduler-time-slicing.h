@@ -111,6 +111,11 @@ private:
   void PeriodicTimerExpired ();
 
   /**
+   * Send stats and reset all the symbols sent count for each slice to zero.
+   */
+  void SendAndClearSymbolsSentStat ();
+
+  /**
    * Gets scheduling object in sorted order according to configured sorting criteria.
    *
    * \param output reference to a vector which will be filled with pointers to
@@ -140,6 +145,14 @@ private:
    */
   bool CanOpenBbFrame (Mac48Address address, uint32_t priorityClass, SatEnums::SatModcod_t modcod);
 
+  /*
+   * Compute the number of symbols to send for a slice, including a new BBFrame to be open
+   * \param sliceId The slice tested.
+   * \param modcod The modcod of the new BBFrame. If is SAT_NONVALID_MODCOD, the new BBFrame is ignored.
+   * \return The total number of symbols for all the BBFrames.
+   */
+  uint32_t GetSymbols (uint8_t sliceId, SatEnums::SatModcod_t modcod);
+
   /**
    * The containers for BBFrames. The keys are the slices and the values the associated container
    */
@@ -150,6 +163,11 @@ private:
    * Slice 0 is the container for control BBFrames that are broadcasted to all UT.
    */
   std::map<Mac48Address, uint8_t> m_slicesMapping;
+
+  /**
+   * The number of symbols sent for each slice during an allocation cycle.
+   */
+  std::map<uint8_t, uint32_t> m_symbolsSent;
 
   /**
    * The number of slices

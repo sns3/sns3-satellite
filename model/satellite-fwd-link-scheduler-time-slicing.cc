@@ -39,7 +39,7 @@ SatFwdLinkSchedulerTimeSlicing::GetTypeId (void)
                     "Number of slices used.",
                     UintegerValue (1),
                     MakeUintegerAccessor (&SatFwdLinkSchedulerTimeSlicing::m_numberOfSlices),
-                    MakeUintegerChecker<uint8_t> ())
+                    MakeUintegerChecker<uint8_t> (1,255))
   ;
   return tid;
 }
@@ -70,7 +70,7 @@ SatFwdLinkSchedulerTimeSlicing::SatFwdLinkSchedulerTimeSlicing (Ptr<SatBbFrameCo
 
   m_bbFrameContainers.insert (std::pair<uint8_t, Ptr<SatBbFrameContainer>> (0, CreateObject<SatBbFrameContainer> (modCods, m_bbFrameConf)));
 
-  uint32_t slicesMax = m_bbFrameConf->GetSymbolRate ()*m_periodicInterval.GetSeconds ()
+  uint32_t slicesMax = m_carrierBandwidthInHz*m_periodicInterval.GetSeconds ()
       /m_bbFrameContainers.at (0)->GetFrameSymbols(m_bbFrameConf->GetMostRobustModcod (SatEnums::NORMAL_FRAME));
   if (m_numberOfSlices >= slicesMax)
     {
@@ -80,7 +80,14 @@ SatFwdLinkSchedulerTimeSlicing::SatFwdLinkSchedulerTimeSlicing (Ptr<SatBbFrameCo
 
   for(uint8_t i = 0; i < m_numberOfSlices; i++)
     {
-      m_bbFrameContainers.insert (std::pair<uint8_t, Ptr<SatBbFrameContainer>> (i+1, CreateObject<SatBbFrameContainer> (modCods, m_bbFrameConf)));
+      Ptr <SatBbFrameContainer> container = CreateObject<SatBbFrameContainer> (modCods, m_bbFrameConf);
+      container->SetMaxSymbolRate (m_carrierBandwidthInHz / m_numberOfSlices);
+      m_bbFrameContainers.insert (std::pair<uint8_t, Ptr<SatBbFrameContainer>> (i+1, container));
+    }
+
+  for(uint8_t i = 0; i <= m_numberOfSlices; i++)
+    {
+      m_symbolsSent.insert (std::pair<uint8_t, uint32_t> (i, 0));
     }
 
   Simulator::Schedule (m_periodicInterval, &SatFwdLinkSchedulerTimeSlicing::PeriodicTimerExpired, this);
@@ -114,6 +121,7 @@ SatFwdLinkSchedulerTimeSlicing::GetNextFrame ()
       if (frame != NULL)
         {
           frame->SetSliceId (0);
+          m_symbolsSent.at(0) += ceil(frame->GetDuration ().GetSeconds ()*m_carrierBandwidthInHz);
         }
     }
   else
@@ -126,10 +134,17 @@ SatFwdLinkSchedulerTimeSlicing::GetNextFrame ()
       uint8_t firstDeque = m_lastSliceDequeued;
       do
         {
-          frame = m_bbFrameContainers.at (m_lastSliceDequeued)->GetNextFrame ();
-          if (frame != NULL)
+          uint32_t symbols = m_symbolsSent.at(m_lastSliceDequeued) + m_symbolsSent.at(0);
+
+          double maxSymbolRate = m_bbFrameContainers.at (m_lastSliceDequeued)->GetMaxSymbolRate ();
+          if (symbols/m_periodicInterval.GetSeconds () <= maxSymbolRate)
             {
-              frame->SetSliceId (m_lastSliceDequeued);
+              frame = m_bbFrameContainers.at (m_lastSliceDequeued)->GetNextFrame ();
+              if (frame != NULL)
+                {
+                  m_symbolsSent.at(m_lastSliceDequeued) += ceil(frame->GetDuration ().GetSeconds ()*m_carrierBandwidthInHz);
+                  frame->SetSliceId (m_lastSliceDequeued);
+                }
             }
           if (m_lastSliceDequeued == m_numberOfSlices)
             {
@@ -173,9 +188,28 @@ SatFwdLinkSchedulerTimeSlicing::PeriodicTimerExpired ()
 {
   NS_LOG_FUNCTION (this);
 
+  SendAndClearSymbolsSentStat ();
   ScheduleBbFrames ();
 
   Simulator::Schedule (m_periodicInterval, &SatFwdLinkSchedulerTimeSlicing::PeriodicTimerExpired, this);
+}
+
+void
+SatFwdLinkSchedulerTimeSlicing::SendAndClearSymbolsSentStat ()
+{
+  NS_LOG_FUNCTION (this);
+
+  for (std::map<uint8_t, uint32_t>::iterator it = m_symbolsSent.begin(); it != m_symbolsSent.end(); it++ )
+    {
+      m_schedulingSymbolRateTrace (it->first, it->second / Seconds (1).GetSeconds ());
+    }
+
+  m_symbolsSent.clear ();
+
+  for(uint8_t i = 0; i <= m_numberOfSlices; i++)
+    {
+      m_symbolsSent.insert (std::pair<uint8_t, uint32_t> (i, 0));
+    }
 }
 
 void
@@ -318,24 +352,57 @@ SatFwdLinkSchedulerTimeSlicing::CanOpenBbFrame (Mac48Address address, uint32_t p
 {
   NS_LOG_FUNCTION (this);
 
-  // Add control symbols
-  uint32_t symbolsReceived = m_bbFrameContainers.at (0)->GetTotalSymbols ();
-  symbolsReceived += m_bbFrameContainers.at (0)->GetFrameSymbols(modcod);
-
-  // Add slice symbols
-  if (priorityClass != 0)
+  if (priorityClass == 0)
     {
-      symbolsReceived += m_bbFrameContainers.at (m_slicesMapping.at (address))->GetTotalSymbols ();
-      symbolsReceived += m_bbFrameContainers.at (m_slicesMapping.at (address))->GetFrameSymbols(modcod);
+      // Always allow control messages to be send
+      // TODO add a margin to take this into account ?
+      return true;
     }
 
-  // Actual symbol rate if we send all the BBFrames to the destination during m_periodicInterval.
-  double symbolRate = symbolsReceived / m_periodicInterval.GetSeconds ();
+  uint8_t sliceId = (address == Mac48Address::GetBroadcast ()) ? 0 : m_slicesMapping.at (address);
+  double maxSymbolRate = m_bbFrameContainers.at (sliceId)->GetMaxSymbolRate ();
 
-  // Maximum allowed symbol rate
-  double maxSymbolRate = m_bbFrameConf->GetSymbolRate () / m_numberOfSlices;
+  if (sliceId == 0)
+    {
+      // This is broadcast -> need to test all slices >= 1
+      uint32_t symbols = GetSymbols (0, modcod);
+        for (std::map<uint8_t, Ptr<SatBbFrameContainer>>::iterator it = m_bbFrameContainers.begin(); it != m_bbFrameContainers.end(); it++ )
+          {
+            if (it->first == 0)
+              {
+                continue;
+              }
+            double symbolRate = (symbols + GetSymbols (it->first, SatEnums::SAT_NONVALID_MODCOD))/ m_periodicInterval.GetSeconds ();
+            if (symbolRate > maxSymbolRate)
+              {
+                // One slice will not respect constraints
+                return false;
+              }
+          }
+      // Constraints are respected for all slices
+      return true;
+    }
+  else
+    {
+      uint32_t symbols = GetSymbols (sliceId, modcod) + GetSymbols (0, SatEnums::SAT_NONVALID_MODCOD);
+      double symbolRate = symbols/ m_periodicInterval.GetSeconds ();
+      return symbolRate < maxSymbolRate;
+    }
+}
 
-  return symbolRate < maxSymbolRate;
+uint32_t
+SatFwdLinkSchedulerTimeSlicing::GetSymbols (uint8_t sliceId, SatEnums::SatModcod_t modcod)
+{
+  NS_LOG_FUNCTION (this);
+
+  uint32_t symbols = m_bbFrameContainers.at (sliceId)->GetTotalDuration ().GetSeconds ()*m_carrierBandwidthInHz;
+
+  if (modcod != SatEnums::SAT_NONVALID_MODCOD)
+    {
+      symbols += m_bbFrameContainers.at (sliceId)->GetFrameSymbols(modcod);
+    }
+
+  return symbols;
 }
 
 } // namespace ns3

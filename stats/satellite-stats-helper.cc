@@ -60,6 +60,8 @@ SatStatsHelper::GetIdentifierTypeName (SatStatsHelper::IdentifierType_t identifi
       return "IDENTIFIER_UT";
     case SatStatsHelper::IDENTIFIER_UT_USER:
       return "IDENTIFIER_UT_USER";
+    case SatStatsHelper::IDENTIFIER_SLICE:
+      return "IDENTIFIER_SLICE";
     default:
       NS_FATAL_ERROR ("SatStatsHelper - Invalid identifier type");
       break;
@@ -144,7 +146,8 @@ SatStatsHelper::GetTypeId ()
                                     SatStatsHelper::IDENTIFIER_GW,      "GW",
                                     SatStatsHelper::IDENTIFIER_BEAM,    "BEAM",
                                     SatStatsHelper::IDENTIFIER_UT,      "UT",
-                                    SatStatsHelper::IDENTIFIER_UT_USER, "UT_USER"))
+                                    SatStatsHelper::IDENTIFIER_UT_USER, "UT_USER",
+                                    SatStatsHelper::IDENTIFIER_UT_USER, "SLICE"))
     .AddAttribute ("OutputType",
                    "Determines the type and format of the output.",
                    EnumValue (SatStatsHelper::OUTPUT_SCATTER_FILE),
@@ -371,6 +374,20 @@ SatStatsHelper::CreateCollectorPerIdentifier (CollectorMap &collectorMap) const
         break;
       }
 
+    case SatStatsHelper::IDENTIFIER_SLICE:
+      {
+        for (uint32_t sliceId = 0; sliceId < 256; sliceId++)
+          {
+            std::ostringstream name;
+            name << sliceId;
+            collectorMap.SetAttribute ("Name", StringValue (name.str ()));
+            collectorMap.Create (sliceId);
+            n++;
+          }
+        break;
+      }
+
+
     default:
       NS_FATAL_ERROR ("SatStatsHelper - Invalid identifier type");
       break;
@@ -418,6 +435,9 @@ SatStatsHelper::GetIdentifierHeading (std::string dataLabel) const
 
     case SatStatsHelper::IDENTIFIER_UT_USER:
       return "% ut_user_id " + dataLabel;
+
+    case SatStatsHelper::IDENTIFIER_SLICE:
+      return "% slice_id " + dataLabel;
 
     default:
       NS_FATAL_ERROR ("SatStatsHelper - Invalid identifier type");

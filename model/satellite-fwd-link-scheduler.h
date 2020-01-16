@@ -22,6 +22,7 @@
 #define SAT_FWD_LINK_SCHEDULER_H
 
 #include <cstring>
+#include <math.h>
 
 #include "ns3/address.h"
 #include "ns3/ptr.h"
@@ -108,6 +109,12 @@ public:
    * \return the object TypeId
    */
   static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
+  virtual TypeId GetInstanceTypeId (void) const;
 
   /**
    * Construct a SatFwdLinkScheduler
@@ -213,6 +220,11 @@ protected:
   double GetSchedulingObjectCno (Ptr<SatSchedulingObject> ob);
 
   /**
+   * Send stats and reset all the symbols sent count for each slice to zero.
+   */
+  virtual void SendAndClearSymbolsSentStat ();
+
+  /**
    *  Handles periodic timer timeouts.
    */
   void PeriodicTimerExpired ();
@@ -304,6 +316,12 @@ protected:
    * Carrier bandwidth in hertz where scheduler is associated to.
    */
   double m_carrierBandwidthInHz;
+
+  /**
+   * Traced callback for symbol rate, with flowId, requested Modcod info
+   */
+  TracedCallback<uint8_t, double> m_schedulingSymbolRateTrace;
+
 
 };
 

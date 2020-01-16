@@ -129,18 +129,24 @@ public:
   Time GetTotalDuration () const;
 
   /**
-   * Get number of symbols needed to send all the BBFrames in the container.
-   * \return Total number of symbols of the frames.
-   */
-  uint32_t GetTotalSymbols ();
-
-  /**
    * Get the total number of symbols, incuding headers, when creating a new BBFrame.
    *
    * \param modcod MODOCOD of the queue requested.
    * \return The number of symbols in the BBFrame.
    */
   uint32_t GetFrameSymbols (SatEnums::SatModcod_t modcod);
+
+  /**
+   * Set the maximum symbol rate of this container, used for time-slicing.
+   * \param maxSymbolRate The new symbol rate.
+   */
+  void SetMaxSymbolRate (uint32_t maxSymbolRate);
+
+  /**
+   * Set the maximum symbol rate of this container, used for time-slicing.
+   * \return The maximum symbol rate.
+   */
+  uint32_t GetMaxSymbolRate ();
 
 private:
   typedef std::map<SatEnums::SatModcod_t, std::deque<Ptr<SatBbFrame> > > FrameContainer_t;
@@ -150,6 +156,7 @@ private:
   Time                          m_totalDuration;
   Ptr<SatBbFrameConf>           m_bbFrameConf;
   SatEnums::SatBbFrameType_t    m_defaultBbFrameType;
+  uint32_t                      m_maxSymbolRate;
 
   /**
    * Trace for merged BB frames.

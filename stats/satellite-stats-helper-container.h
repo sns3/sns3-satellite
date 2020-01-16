@@ -54,8 +54,10 @@ namespace ns3 {
  * - Add [Global, PerGw, PerBeam] BackloggedRequest
  * - Add [Global, PerGw, PerBeam] Frame [Symbol, User] Load
  * - Add [Global, PerGw, PerBeam] WaveformUsage
+ * - Add [Global, PerSlice] FwdLinkSchedulerSymbolRate
  * - AddGlobal [Fwd, Rtn] [Feeder, User] LinkSinr
  * - AddGlobal [Fwd, Rtn] [Feeder, User] LinkRxPower
+
  *
  * Also check the Doxygen documentation of this class for more information.
  */
@@ -290,6 +292,10 @@ public:
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (AntennaGain)
   void AddAverageBeamAntennaGain (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtAntennaGain (SatStatsHelper::OutputType_t outputType);
+
+  // Fwd Link Scheduler SymbolRate statistics.
+  void AddPerSliceFwdLinkSchedulerSymbolRate (SatStatsHelper::OutputType_t outputType);
+  void AddGlobalFwdLinkSchedulerSymbolRate (SatStatsHelper::OutputType_t outputType);
 
   /**
    * \param outputType an arbitrary output type.

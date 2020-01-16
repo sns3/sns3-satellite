@@ -99,7 +99,8 @@ public:
     IDENTIFIER_GW,
     IDENTIFIER_BEAM,
     IDENTIFIER_UT,
-    IDENTIFIER_UT_USER
+    IDENTIFIER_UT_USER,
+    IDENTIFIER_SLICE
   } IdentifierType_t;
 
   /**

@@ -165,6 +165,7 @@ def build(bld):
         'stats/satellite-stats-throughput-helper.cc',
         'stats/satellite-stats-waveform-usage-helper.cc',
         'stats/satellite-stats-helper-container.cc',
+        'stats/satellite-stats-fwd-link-scheduler-symbol-rate-helper.cc',
         ]
 
     module_test = bld.create_ns3_module_test_library('satellite')
@@ -365,6 +366,7 @@ def build(bld):
         'stats/satellite-stats-throughput-helper.h',
         'stats/satellite-stats-waveform-usage-helper.h',
         'stats/satellite-stats-helper-container.h',
+        'stats/satellite-stats-fwd-link-scheduler-symbol-rate-helper.h',
         ]
 
     if (bld.env['ENABLE_EXAMPLES']):
