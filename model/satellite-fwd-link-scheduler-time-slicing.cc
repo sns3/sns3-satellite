@@ -118,6 +118,7 @@ SatFwdLinkSchedulerTimeSlicing::GetNextFrame ()
   if (!m_bbFrameContainers.at (0)->IsEmpty (0, m_bbFrameConf->GetDefaultModCod ()))
     {
       frame = m_bbFrameContainers.at (0)->GetNextFrame ();
+      std::cout << "Send control" << std::endl;
       if (frame != NULL)
         {
           frame->SetSliceId (0);
@@ -135,6 +136,7 @@ SatFwdLinkSchedulerTimeSlicing::GetNextFrame ()
       do
         {
           uint32_t symbols = m_symbolsSent.at(m_lastSliceDequeued) + m_symbolsSent.at(0);
+          symbols += m_bbFrameContainers.at (m_lastSliceDequeued)->GetFrameSymbols(m_bbFrameConf->GetMostRobustModcod (SatEnums::NORMAL_FRAME));
 
           double maxSymbolRate = m_bbFrameContainers.at (m_lastSliceDequeued)->GetMaxSymbolRate ();
           if (symbols/m_periodicInterval.GetSeconds () <= maxSymbolRate)
@@ -171,6 +173,7 @@ SatFwdLinkSchedulerTimeSlicing::GetNextFrame ()
 
       // Add dummy packet to dummy frame
       frame->AddPayload (dummyPacket);
+      frame->SetSliceId (0);
     }
 
   return frame;
@@ -338,12 +341,15 @@ SatFwdLinkSchedulerTimeSlicing::SendTimeSliceSubscription (Mac48Address address,
 {
   NS_LOG_FUNCTION (this);
 
+  std::cout << address << " " << (uint32_t) slices.at(0) << std::endl;
+
   for(std::vector<uint8_t>::iterator it = slices.begin(); it != slices.end(); ++it)
     {
       Ptr<SatSliceSubscriptionMessage> sliceSubscription = CreateObject<SatSliceSubscriptionMessage> ();
       sliceSubscription->SetSliceId(*it);
+      sliceSubscription->SetAddress(address);
 
-      m_sendControlMsgCallback (sliceSubscription, address);
+      m_sendControlMsgCallback (sliceSubscription, Mac48Address::GetBroadcast ());
     }
 }
 

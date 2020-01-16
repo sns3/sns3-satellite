@@ -853,6 +853,18 @@ SatSliceSubscriptionMessage::GetSliceId () const
   return m_sliceId;
 }
 
+Mac48Address
+SatSliceSubscriptionMessage::GetAddress () const
+{
+  return m_address;
+}
+
+void
+SatSliceSubscriptionMessage::SetAddress (Mac48Address address)
+{
+  m_address = address;
+}
+
 uint32_t
 SatSliceSubscriptionMessage::GetSizeInBytes () const
 {

@@ -254,13 +254,14 @@ SatUtPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
     }
   else
     {
-      std::cout << "----- BBFrame dropped " << (uint32_t) slice << " " << m_slicesSubscribed.size () << " " << (uint32_t) *(m_slicesSubscribed.begin()) << " -----" << std::endl;
+      std::cout << "BBFrame dropped " << this << " " << (uint32_t) slice << " " << m_slicesSubscribed.size () << " " << (uint32_t) *(m_slicesSubscribed.begin()) << std::endl;
     }
 }
 
 void
 SatUtPhy::UpdateSliceSubscription(uint8_t slice)
 {
+  std::cout << this << " subcribes to slice " << (uint32_t) slice << std::endl;
   if (slice == 0)
     {
       m_slicesSubscribed.clear ();

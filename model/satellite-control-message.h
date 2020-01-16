@@ -962,6 +962,18 @@ public:
   void SetSliceId (uint8_t sliceId);
 
   /**
+   * \brief Get the ddress associated to this slice.
+   * \return The MAC address
+   */
+  Mac48Address GetAddress () const;
+
+  /**
+   * Set the address associated to this slice.
+   * \param address The MAC address
+   */
+  void SetAddress (Mac48Address address);
+
+  /**
    * \brief Get real size of the message.
    * \return Real size of the message.
    */
@@ -972,6 +984,11 @@ private:
    * New slice to subscribe. Zero means reset the slices already subscribed.
    */
   uint8_t m_sliceId;
+
+  /**
+   * Address associated to this slice.
+   */
+  Mac48Address m_address;
 };
 
 
