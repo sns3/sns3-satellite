@@ -87,6 +87,11 @@ SatFwdLinkSchedulerDefault::GetNextFrame ()
 
   Ptr<SatBbFrame> frame = m_bbFrameContainer->GetNextFrame ();
 
+  if (frame != NULL)
+    {
+      m_symbolsSent += ceil(frame->GetDuration ().GetSeconds ()*m_carrierBandwidthInHz);
+    }
+
   // create dummy frame
   if ( frame == NULL )
     {
@@ -108,7 +113,6 @@ SatFwdLinkSchedulerDefault::GetNextFrame ()
   if (frame != NULL)
     {
       frame->SetSliceId (0);
-      m_symbolsSent += ceil(frame->GetDuration ().GetSeconds ()*m_carrierBandwidthInHz);
     }
 
   return frame;
