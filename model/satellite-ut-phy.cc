@@ -242,12 +242,12 @@ SatUtPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
 
   uint8_t slice = rxParams->m_txInfo.sliceId;
 
-  if ((slice == 0))
+  if (slice == 0)
     {
       // Slice is zero
       SatPhy::Receive (rxParams, phyError);
     }
-  else if ((m_slicesSubscribed.count(slice) != 0))
+  else if (m_slicesSubscribed.count(slice) != 0)
     {
       // Slice is in the subscription list, we decode and forward to upper layers
       SatPhy::Receive (rxParams, phyError);
@@ -261,7 +261,6 @@ SatUtPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
 void
 SatUtPhy::UpdateSliceSubscription(uint8_t slice)
 {
-  std::cout << this << " subcribes to slice " << (uint32_t) slice << std::endl;
   if (slice == 0)
     {
       m_slicesSubscribed.clear ();

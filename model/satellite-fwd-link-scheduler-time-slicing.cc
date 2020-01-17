@@ -118,7 +118,6 @@ SatFwdLinkSchedulerTimeSlicing::GetNextFrame ()
   if (!m_bbFrameContainers.at (0)->IsEmpty (0, m_bbFrameConf->GetDefaultModCod ()))
     {
       frame = m_bbFrameContainers.at (0)->GetNextFrame ();
-      std::cout << "Send control" << std::endl;
       if (frame != NULL)
         {
           frame->SetSliceId (0);
@@ -340,8 +339,6 @@ void
 SatFwdLinkSchedulerTimeSlicing::SendTimeSliceSubscription (Mac48Address address, std::vector<uint8_t> slices)
 {
   NS_LOG_FUNCTION (this);
-
-  std::cout << address << " " << (uint32_t) slices.at(0) << std::endl;
 
   for(std::vector<uint8_t>::iterator it = slices.begin(); it != slices.end(); ++it)
     {
