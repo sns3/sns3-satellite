@@ -254,7 +254,7 @@ SatUtPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
     }
   else
     {
-      std::cout << "BBFrame dropped " << this << " " << (uint32_t) slice << " " << m_slicesSubscribed.size () << " " << (uint32_t) *(m_slicesSubscribed.begin()) << std::endl;
+      NS_LOG_INFO ("Slice of BBFrame (" << (uint32_t) slice << ") not in list of subscriptions: BBFrame dropped");
     }
 }
 
