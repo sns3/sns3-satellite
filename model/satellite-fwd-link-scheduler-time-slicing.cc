@@ -68,16 +68,11 @@ SatFwdLinkSchedulerTimeSlicing::SatFwdLinkSchedulerTimeSlicing (Ptr<SatBbFrameCo
   std::vector<SatEnums::SatModcod_t> modCods;
   SatEnums::GetAvailableModcodsFwdLink (modCods);
 
+  // Create control and broadcast container
   m_bbFrameContainers.insert (std::pair<uint8_t, Ptr<SatBbFrameContainer>> (0, CreateObject<SatBbFrameContainer> (modCods, m_bbFrameConf)));
+  m_bbFrameContainers.at (0)->SetMaxSymbolRate (m_carrierBandwidthInHz);
 
-  uint32_t slicesMax = m_carrierBandwidthInHz*m_periodicInterval.GetSeconds ()
-      /m_bbFrameContainers.at (0)->GetFrameSymbols(m_bbFrameConf->GetMostRobustModcod (SatEnums::NORMAL_FRAME));
-  if (m_numberOfSlices >= slicesMax)
-    {
-      NS_FATAL_ERROR ("Number of slices too big to allow at least one BBFrame of the most robust ModCod per slice. Cannot be equal or higher than "
-          + std::to_string(slicesMax) + " with the current configuration");
-    }
-
+  // Initialize containers
   for(uint8_t i = 0; i < m_numberOfSlices; i++)
     {
       Ptr <SatBbFrameContainer> container = CreateObject<SatBbFrameContainer> (modCods, m_bbFrameConf);
@@ -85,9 +80,23 @@ SatFwdLinkSchedulerTimeSlicing::SatFwdLinkSchedulerTimeSlicing (Ptr<SatBbFrameCo
       m_bbFrameContainers.insert (std::pair<uint8_t, Ptr<SatBbFrameContainer>> (i+1, container));
     }
 
+  // Initialize number of symbols sent per slice
   for(uint8_t i = 0; i <= m_numberOfSlices; i++)
     {
       m_symbolsSent.insert (std::pair<uint8_t, uint32_t> (i, 0));
+    }
+
+  // Check if all symbol rates are high enough
+  for (std::map<uint8_t, Ptr <SatBbFrameContainer>>::iterator it = m_bbFrameContainers.begin(); it != m_bbFrameContainers.end(); it++ )
+    {
+      uint32_t maxSymbolPerCycle = it->second->GetMaxSymbolRate ()*m_periodicInterval.GetSeconds ();
+      uint32_t symbolsMostRobustModcod = it->second->GetFrameSymbols(m_bbFrameConf->GetMostRobustModcod (SatEnums::NORMAL_FRAME));
+      if (symbolsMostRobustModcod > maxSymbolPerCycle)
+        {
+          NS_FATAL_ERROR ("Symbol rate of slice " + std::to_string(it->first) + " (" + std::to_string(it->second->GetMaxSymbolRate ())
+              + " Baud) is too low to allow at least one BBFrame of the most robust ModCod. Must be at least "
+              + std::to_string((uint32_t) (symbolsMostRobustModcod / m_periodicInterval.GetSeconds ())) + " Baud");
+        }
     }
 
   Simulator::Schedule (m_periodicInterval, &SatFwdLinkSchedulerTimeSlicing::PeriodicTimerExpired, this);
