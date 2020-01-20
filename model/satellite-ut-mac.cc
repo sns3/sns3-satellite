@@ -101,7 +101,8 @@ SatUtMac::SatUtMac ()
   m_gatewayUpdateCallback (0),
   m_routingUpdateCallback (0),
   m_beamCheckerCallback (0),
-  m_txCheckCallback (0)
+  m_txCheckCallback (0),
+  m_sliceSubscriptionCallback (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -124,7 +125,8 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, bool crdsaOnlyFo
   m_gatewayUpdateCallback (0),
   m_routingUpdateCallback (0),
   m_beamCheckerCallback (0),
-  m_txCheckCallback (0)
+  m_txCheckCallback (0),
+  m_sliceSubscriptionCallback (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -152,6 +154,7 @@ SatUtMac::DoDispose (void)
   m_routingUpdateCallback.Nullify ();
   m_beamCheckerCallback.Nullify ();
   m_txCheckCallback.Nullify ();
+  m_sliceSubscriptionCallback.Nullify ();
   m_tbtpContainer->DoDispose ();
   m_utScheduler->DoDispose ();
   m_utScheduler = NULL;
