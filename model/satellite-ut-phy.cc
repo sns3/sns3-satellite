@@ -242,14 +242,9 @@ SatUtPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
 
   uint8_t slice = rxParams->m_txInfo.sliceId;
 
-  if (slice == 0)
+  if ((slice == 0) || (m_slicesSubscribed.count(slice) != 0))
     {
-      // Slice is zero
-      SatPhy::Receive (rxParams, phyError);
-    }
-  else if (m_slicesSubscribed.count(slice) != 0)
-    {
-      // Slice is in the subscription list, we decode and forward to upper layers
+      // Slice is zero or is in the subscription list, we decode and forward to upper layers
       SatPhy::Receive (rxParams, phyError);
     }
   else

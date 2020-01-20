@@ -171,11 +171,7 @@ SatBbFrameContainer::AddData (uint32_t priorityClass, SatEnums::SatModcod_t modc
 
   if ( priorityClass > 0)
     {
-      if ( m_container.at (modcod).empty ())
-        {
-          CreateFrameToTail (priorityClass, modcod);
-        }
-      if ( GetBytesLeftInTailFrame (priorityClass, modcod) < data->GetSize () )
+      if ( (m_container.at (modcod).empty ()) || (GetBytesLeftInTailFrame (priorityClass, modcod) < data->GetSize ()))
         {
           CreateFrameToTail (priorityClass, modcod);
         }
