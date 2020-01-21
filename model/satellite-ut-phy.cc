@@ -242,11 +242,7 @@ SatUtPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
 
   uint8_t slice = rxParams->m_txInfo.sliceId;
 
-  if (rxParams->m_txInfo.frameType == SatEnums::DUMMY_FRAME)
-    {
-      NS_LOG_INFO ("Dummy frame receive, it is not decoded");
-    }
-  else if ((slice == 0) || (m_slicesSubscribed.count(slice) != 0))
+  if ((slice == 0) || (m_slicesSubscribed.count(slice) != 0))
     {
       // Slice is zero or is in the subscription list, we decode and forward to upper layers
       SatPhy::Receive (rxParams, phyError);

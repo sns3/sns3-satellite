@@ -71,7 +71,6 @@ SatSignalParameters::SatSignalParameters ( const SatSignalParameters& p )
   m_carrierFreq_hz = p.m_carrierFreq_hz;
   m_txInfo.modCod = p.m_txInfo.modCod;
   m_txInfo.sliceId = p.m_txInfo.sliceId;
-  m_txInfo.numberSymbols = p.m_txInfo.numberSymbols;
   m_txInfo.fecBlockSizeInBytes = p.m_txInfo.fecBlockSizeInBytes;
   m_txInfo.frameType = p.m_txInfo.frameType;
   m_txInfo.waveformId = p.m_txInfo.waveformId;

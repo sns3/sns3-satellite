@@ -130,7 +130,7 @@ SatFwdLinkSchedulerTimeSlicing::GetNextFrame ()
       if (frame != NULL)
         {
           frame->SetSliceId (0);
-          m_symbolsSent.at(0) += frame->GetDuration ().GetSeconds ()*m_carrierBandwidthInHz;
+          m_symbolsSent.at(0) += ceil(frame->GetDuration ().GetSeconds ()*m_carrierBandwidthInHz);
         }
     }
   else
@@ -183,8 +183,6 @@ SatFwdLinkSchedulerTimeSlicing::GetNextFrame ()
       frame->AddPayload (dummyPacket);
       frame->SetSliceId (0);
     }
-
-  frame->SetNumberSymbols (frame->GetDuration ().GetSeconds ()*m_carrierBandwidthInHz);
 
   return frame;
 }

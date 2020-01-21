@@ -113,7 +113,6 @@ SatFwdLinkSchedulerDefault::GetNextFrame ()
   if (frame != NULL)
     {
       frame->SetSliceId (0);
-      frame->SetNumberSymbols (frame->GetDuration ().GetSeconds ()*m_carrierBandwidthInHz);
     }
 
   return frame;

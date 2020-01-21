@@ -51,7 +51,6 @@ public:
     SatEnums::PacketType_t packetType;
     SatEnums::SatModcod_t modCod;
     uint8_t sliceId;
-    uint32_t numberSymbols;
     uint32_t fecBlockSizeInBytes;
     SatEnums::SatBbFrameType_t frameType;
     uint32_t waveformId;

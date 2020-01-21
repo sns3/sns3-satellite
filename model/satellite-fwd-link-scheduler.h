@@ -22,6 +22,7 @@
 #define SAT_FWD_LINK_SCHEDULER_H
 
 #include <cstring>
+#include <math.h>
 
 #include "ns3/address.h"
 #include "ns3/ptr.h"
