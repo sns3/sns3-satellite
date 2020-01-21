@@ -192,6 +192,24 @@ public:
   }
 
   /**
+   * Get the number of symbols of the BBFrame
+   * \return The number of symbols of the BBFrame
+   */
+  inline uint32_t GetNumberSymbols () const
+  {
+    return m_numberSymbols;
+  }
+
+  /**
+   * Set the number of symbols of the BBFrame
+   * \param nbSymbols The number of symbols of the BBFrame
+   */
+  void SetNumberSymbols (uint32_t nbSymbols)
+  {
+    m_numberSymbols = nbSymbols;
+  }
+
+  /**
    * Get header size of the frame.
    * \return Header size in bytes.
    */
@@ -216,6 +234,7 @@ public:
 private:
   SatEnums::SatModcod_t m_modCod;
   uint8_t m_sliceId;
+  uint32_t m_numberSymbols;
   uint32_t m_freeSpaceInBytes;
   uint32_t m_maxSpaceInBytes;
   uint32_t m_headerSizeInBytes;
