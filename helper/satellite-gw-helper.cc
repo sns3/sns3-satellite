@@ -80,10 +80,10 @@ SatGwHelper::GetTypeId (void)
                                     SatPhyRxCarrierConf::EM_AVI, "AVI"))
     .AddAttribute ("FwdSchedulingAlgorithm",
                    "The scheduling algorithm used to fill the BBFrames",
-                   EnumValue (SatEnums::DVB_S2),
+                   EnumValue (SatEnums::NO_TIME_SLICING),
                    MakeEnumAccessor (&SatGwHelper::m_fwdSchedulingAlgorithm),
-                   MakeEnumChecker (SatEnums::DVB_S2, "DVB_S2",
-                                    SatEnums::DVB_S2X, "DVB_S2X"))
+                   MakeEnumChecker (SatEnums::NO_TIME_SLICING, "NoTimeSlicing",
+                                    SatEnums::TIME_SLICING, "TimeSlicing"))
     .AddAttribute ("RtnLinkConstantErrorRate",
                    "Constant error rate",
                    DoubleValue (0.01),
@@ -156,10 +156,10 @@ SatGwHelper::Initialize (Ptr<SatLinkResultsDvbRcs2> lrRcs2, Ptr<SatLinkResultsDv
 
   switch (m_fwdSchedulingAlgorithm)
     {
-    case SatEnums::DVB_S2:
+    case SatEnums::NO_TIME_SLICING:
       Config::SetDefault ("ns3::SatBbFrameConf::PlHeaderInSlots", UintegerValue (1));
       break;
-    case SatEnums::DVB_S2X:
+    case SatEnums::TIME_SLICING:
       Config::SetDefault ("ns3::SatBbFrameConf::PlHeaderInSlots", UintegerValue (2));
       break;
     default:
@@ -381,10 +381,10 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   Ptr<SatFwdLinkScheduler> fwdLinkScheduler;
   switch (m_fwdSchedulingAlgorithm)
     {
-    case SatEnums::DVB_S2:
+    case SatEnums::NO_TIME_SLICING:
       fwdLinkScheduler = CreateObject<SatFwdLinkSchedulerDefault> (m_bbFrameConf, addr, carrierBandwidth);
       break;
-    case SatEnums::DVB_S2X:
+    case SatEnums::TIME_SLICING:
       fwdLinkScheduler = CreateObject<SatFwdLinkSchedulerTimeSlicing> (m_bbFrameConf, addr, carrierBandwidth);
       (DynamicCast<SatFwdLinkSchedulerTimeSlicing> (fwdLinkScheduler))->SetSendControlMsgCallback (MakeCallback (&SatNetDevice::SendControlMsg, dev));
       break;

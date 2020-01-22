@@ -86,12 +86,11 @@ public:
   /**
    * \enum FwdSchedulingAlgorithm_t
    * \brief The scheduling algorithm used to fill the BBFrames.
-   *        Right now, the DVB_S2X adds the time-slicing feature.
    */
   typedef enum
   {
-    DVB_S2,
-    DVB_S2X
+    NO_TIME_SLICING,
+    TIME_SLICING
   } FwdSchedulingAlgorithm_t;
 
   /**
