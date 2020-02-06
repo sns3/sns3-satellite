@@ -111,16 +111,6 @@ SatFwdLinkScheduler::GetTypeId (void)
                    PointerValue (),
                    MakePointerAccessor (&SatFwdLinkScheduler::m_bbFrameConf),
                    MakePointerChecker<SatBbFrameConf> ())
-    .AddAttribute ("SchedulingStartThresholdTime",
-                   "Threshold time of total transmissions in BB Frame container to trigger a scheduling round.",
-                   TimeValue (MilliSeconds (5)),
-                   MakeTimeAccessor (&SatFwdLinkScheduler::m_schedulingStartThresholdTime),
-                   MakeTimeChecker ())
-    .AddAttribute ("SchedulingStopThresholdTime",
-                   "Threshold time of total transmissions in BB Frame container to stop a scheduling round.",
-                   TimeValue (MilliSeconds (15)),
-                   MakeTimeAccessor (&SatFwdLinkScheduler::m_schedulingStopThresholdTime),
-                   MakeTimeChecker ())
     .AddAttribute ("AdditionalSortCriteria",
                    "Sorting criteria after priority for scheduling objects from LLC.",
                    EnumValue (SatFwdLinkScheduler::NO_SORT),

@@ -271,16 +271,6 @@ protected:
   Ptr<SatBbFrameConf> m_bbFrameConf;
 
   /**
-   * Threshold time of total transmissions in BB Frame container to trigger a scheduling round.
-   */
-  Time m_schedulingStartThresholdTime;
-
-  /**
-   * Threshold time of total transmissions in BB Frame container to stop a scheduling round.
-   */
-  Time m_schedulingStopThresholdTime;
-
-  /**
    * Additional sorting criteria for scheduling objects received from LLC.
    */
   ScheduleSortingCriteria_t m_additionalSortCriteria;

@@ -135,25 +135,24 @@ SatFwdLinkSchedulerTimeSlicing::GetNextFrame ()
     }
   else
     {
-      if ( GetTotalDuration () < m_schedulingStartThresholdTime )
-        {
-          ScheduleBbFrames ();
-        }
-
       uint8_t firstDeque = m_lastSliceDequeued;
       do
         {
           uint32_t symbols = m_symbolsSent.at(m_lastSliceDequeued) + m_symbolsSent.at(0);
-          symbols += m_bbFrameContainers.at (m_lastSliceDequeued)->GetFrameSymbols(m_bbFrameConf->GetMostRobustModcod (SatEnums::NORMAL_FRAME));
-
           double maxSymbolRate = m_bbFrameContainers.at (m_lastSliceDequeued)->GetMaxSymbolRate ();
-          if (symbols/m_periodicInterval.GetSeconds () <= maxSymbolRate)
+
+          frame = m_bbFrameContainers.at (m_lastSliceDequeued)->GetNextFrame ();
+          if (frame != NULL)
             {
-              frame = m_bbFrameContainers.at (m_lastSliceDequeued)->GetNextFrame ();
-              if (frame != NULL)
+              m_symbolsSent.at(m_lastSliceDequeued) += ceil(frame->GetDuration ().GetSeconds ()*m_carrierBandwidthInHz);
+              symbols += ceil(frame->GetDuration ().GetSeconds ()*m_carrierBandwidthInHz);
+              frame->SetSliceId (m_lastSliceDequeued);
+
+              if (symbols/m_periodicInterval.GetSeconds () > maxSymbolRate)
                 {
-                  m_symbolsSent.at(m_lastSliceDequeued) += ceil(frame->GetDuration ().GetSeconds ()*m_carrierBandwidthInHz);
-                  frame->SetSliceId (m_lastSliceDequeued);
+                  NS_LOG_WARN ("Symbol rate not respected for slice " + std::to_string(m_lastSliceDequeued)
+                    + ". Got " + std::to_string(symbols/m_periodicInterval.GetSeconds ()) + "Baud"
+                    + " while max is " + std::to_string (maxSymbolRate) + " Baud");
                 }
             }
           if (m_lastSliceDequeued == m_numberOfSlices)
@@ -233,7 +232,7 @@ SatFwdLinkSchedulerTimeSlicing::ScheduleBbFrames ()
   GetSchedulingObjects (so);
 
   for ( std::vector< Ptr<SatSchedulingObject> >::const_iterator it = so.begin ();
-        ( it != so.end () ) && ( GetTotalDuration () < m_schedulingStopThresholdTime ); it++ )
+        ( it != so.end () ) && ( GetTotalDuration () < m_periodicInterval ); it++ )
     {
       uint32_t currentObBytes = (*it)->GetBufferedBytes ();
       uint32_t currentObMinReqBytes = (*it)->GetMinTxOpportunityInBytes ();
@@ -265,7 +264,7 @@ SatFwdLinkSchedulerTimeSlicing::ScheduleBbFrames ()
           continue;
         }
 
-      while ( (GetTotalDuration () < m_schedulingStopThresholdTime) && (currentObBytes > 0) )
+      while ( (GetTotalDuration () < m_periodicInterval) && (currentObBytes > 0) )
         {
           if ( frameBytes < currentObMinReqBytes)
             {
@@ -321,7 +320,7 @@ SatFwdLinkSchedulerTimeSlicing::GetSchedulingObjects (std::vector< Ptr<SatSchedu
 {
   NS_LOG_FUNCTION (this);
 
-  if ( GetTotalDuration () < m_schedulingStopThresholdTime )
+  if ( GetTotalDuration () < m_periodicInterval )
     {
       // Get scheduling objects from LLC
       m_schedContextCallback (output);

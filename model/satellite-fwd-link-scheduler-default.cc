@@ -33,6 +33,16 @@ SatFwdLinkSchedulerDefault::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatFwdLinkSchedulerDefault")
     .SetParent<SatFwdLinkScheduler> ()
     .AddConstructor<SatFwdLinkSchedulerDefault> ()
+    .AddAttribute ("SchedulingStartThresholdTime",
+                   "Threshold time of total transmissions in BB Frame container to trigger a scheduling round.",
+                   TimeValue (MilliSeconds (5)),
+                   MakeTimeAccessor (&SatFwdLinkSchedulerDefault::m_schedulingStartThresholdTime),
+                   MakeTimeChecker ())
+    .AddAttribute ("SchedulingStopThresholdTime",
+                   "Threshold time of total transmissions in BB Frame container to stop a scheduling round.",
+                   TimeValue (MilliSeconds (15)),
+                   MakeTimeAccessor (&SatFwdLinkSchedulerDefault::m_schedulingStopThresholdTime),
+                   MakeTimeChecker ())
     .AddAttribute ( "BBFrameContainer",
                     "BB frame container of this scheduler.",
                     PointerValue (),
@@ -40,6 +50,14 @@ SatFwdLinkSchedulerDefault::GetTypeId (void)
                     MakePointerChecker<SatBbFrameContainer> ())
   ;
   return tid;
+}
+
+TypeId
+SatFwdLinkSchedulerDefault::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
 }
 
 SatFwdLinkSchedulerDefault::SatFwdLinkSchedulerDefault () : SatFwdLinkScheduler ()
@@ -53,6 +71,8 @@ SatFwdLinkSchedulerDefault::SatFwdLinkSchedulerDefault (Ptr<SatBbFrameConf> conf
     m_symbolsSent (0)
 {
   NS_LOG_FUNCTION (this);
+
+  ObjectBase::ConstructSelf (AttributeConstructionList ());
 
   std::vector<SatEnums::SatModcod_t> modCods;
   SatEnums::GetAvailableModcodsFwdLink (modCods);

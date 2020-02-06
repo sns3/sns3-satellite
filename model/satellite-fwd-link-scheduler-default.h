@@ -48,6 +48,12 @@ public:
   static TypeId GetTypeId (void);
 
   /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
+  virtual TypeId GetInstanceTypeId (void) const;
+
+  /**
    * Construct a SatFwdLinkScheduler
    *
    * This the default constructor for the SatFwdLinkScheduler is not supported.
@@ -112,6 +118,16 @@ private:
    * The container for BB Frames.
    */
   Ptr<SatBbFrameContainer> m_bbFrameContainer;
+
+  /**
+   * Threshold time of total transmissions in BB Frame container to trigger a scheduling round.
+   */
+  Time m_schedulingStartThresholdTime;
+
+  /**
+   * Threshold time of total transmissions in BB Frame container to stop a scheduling round.
+   */
+  Time m_schedulingStopThresholdTime;
 
   /**
    * The number of symbols sent for each slice during an allocation cycle.

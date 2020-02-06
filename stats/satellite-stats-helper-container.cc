@@ -672,7 +672,7 @@ SatStatsHelperContainer::GetName () const
     {                                                                                   \
       Ptr<SatStats ## id ## Helper> stat                                                \
         = CreateObject<SatStats ## id ## Helper> (m_satHelper);                         \
-      stat->SetName (m_name + "-per-slice" + name                                       \
+      stat->SetName (m_name + "-per-slice-" + name                                       \
                      + GetOutputTypeSuffix (type));                                     \
       stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_SLICE);                       \
       stat->SetOutputType (type);                                                       \
