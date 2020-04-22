@@ -112,12 +112,12 @@ SatFrameAllocatorTestCase::SatFrameAllocatorTestCase ()
   m_cnoValues[0] = SatUtils::DbToLinear (125.0);
   m_cnoValues[1] = SatUtils::DbToLinear (35.0);
   m_cnoValues[2] = SatUtils::DbToLinear (120.0);
-  m_cnoValues[3] = NAN;
+  m_cnoValues[3] = std::numeric_limits<double>::quiet_NaN();
   m_cnoValues[4] = SatUtils::DbToLinear (77.0);
   m_cnoValues[5] = SatUtils::DbToLinear (10.0);
   m_cnoValues[6] = SatUtils::DbToLinear (66.0);
   m_cnoValues[7] = SatUtils::DbToLinear (135.0);
-  m_cnoValues[8] = NAN;
+  m_cnoValues[8] = std::numeric_limits<double>::quiet_NaN();
   m_cnoValues[9] = SatUtils::DbToLinear (60.0);
 
   std::string dataPath = Singleton<SatEnvVariables>::Get ()->GetDataPath ();
@@ -158,7 +158,7 @@ void SatFrameAllocatorTestCase::InitFrame (SatSuperframeConf::ConfigType_t confi
   frameConfParameters.m_defaultWaveformInUse = defaultWaveformInUse;
   frameConfParameters.m_checkSlotLimit = checkSlotLimit;
   m_frameConf = Create<SatFrameConf> (frameConfParameters);
-  m_frameAllocator = Create<SatFrameAllocator> (m_frameConf, 0, configType);
+  m_frameAllocator = Create<SatFrameAllocator> (m_frameConf, 0, configType, nullptr);
 }
 
 void
@@ -168,7 +168,7 @@ SatFrameAllocatorTestCase::RunSingleUtTest (SatSuperframeConf::ConfigType_t conf
 
   InitFrame (configType);
 
-  double cnoThreshold = std::numeric_limits<double>::quiet_NAN();
+  double cnoThreshold = std::numeric_limits<double>::quiet_NaN();
 
   // Test with one UT and one RC
   for ( uint32_t i = 0; i < 11; i += 2) // CRAs
@@ -401,7 +401,7 @@ SatFrameAllocatorTestCase::RunMultiUtTest ()
   req[5] = ContructRequestForUt (utBytesReq[5], 1, 1, 1, 1, 1, false );
 
   uint32_t waveformId[6];
-  double cnoThreshold = std::numeric_limits<double>::quiet_NAN();
+  double cnoThreshold = std::numeric_limits<double>::quiet_NaN();
 
   for (uint32_t i = 0; i < 6; i++ )
     {

@@ -106,7 +106,7 @@ SatDvbRcs2WaveformTableTestCase::DoRun (void)
   for (double d = 60.0; d <= 70.0; d += 0.5)
     {
       uint32_t wfid (0);
-      double cnoThreshold = std::numeric_limits<double>::quiet_NAN();
+      double cnoThreshold = std::numeric_limits<double>::quiet_NaN();
       bool success = wf->GetBestWaveformId (SatUtils::DbToLinear (d), symbolRate, wfid, cnoThreshold);
 
       NS_TEST_ASSERT_MSG_EQ (success, true, "A suitable waveform not found");
