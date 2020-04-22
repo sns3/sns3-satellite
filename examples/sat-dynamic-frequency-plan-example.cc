@@ -114,6 +114,7 @@ main (int argc, char *argv[])
 
   // Manual configuration of the simulation to avoid creating unnecessary traffic
   Ptr<SimulationHelperConf> simulationConf = CreateObject<SimulationHelperConf> ();
+  g_simulationTime = simulationConf->m_simTime;
   simulationHelper->SetBeams (simulationConf->m_enabledBeams);
   simulationHelper->SetUtCountPerBeam (simulationConf->m_utCount);
   simulationHelper->SetUserCountPerUt (simulationConf->m_utUserCount);
@@ -225,6 +226,8 @@ main (int argc, char *argv[])
       stats->AddGlobalRtnFeederLinkRxPower (SatStatsHelper::OUTPUT_SCATTER_FILE);
       stats->AddGlobalRtnUserLinkRxPower (SatStatsHelper::OUTPUT_SCALAR_FILE);
       stats->AddGlobalRtnUserLinkRxPower (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      stats->AddPerUtRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      stats->AddPerUtRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
       stats->AddPerUtRtnMacDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
       stats->AddPerUtRtnMacDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
       stats->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
