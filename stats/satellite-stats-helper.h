@@ -63,7 +63,7 @@ class DataCollectionObject;
  * have been set, the statistics can be started into action by invoking
  * Install(). For example:
  * \code
- *     Ptr<SatHelper> satHelper = CreateObject<SatHelper> ("Scenario72");
+ *     Ptr<SatHelper> satHelper = CreateObject<SatHelper> ();
  *     satHelper->CreateScenario (SatHelper::SIMPLE);
  *     // ... (snip) ...
  *     Ptr<SatStatsFwdSinrHelper> fwdFinr

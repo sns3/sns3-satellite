@@ -57,7 +57,7 @@ namespace ns3 {
  * - Add [Global, PerSlice] FwdLinkSchedulerSymbolRate
  * - AddGlobal [Fwd, Rtn] [Feeder, User] LinkSinr
  * - AddGlobal [Fwd, Rtn] [Feeder, User] LinkRxPower
-
+ * - Add [Global, PerGw, PerBeam] FrameTypeUsage
  *
  * Also check the Doxygen documentation of this class for more information.
  */
@@ -287,6 +287,12 @@ public:
   void AddGlobalFwdUserLinkRxPower (SatStatsHelper::OutputType_t outputType);
   void AddGlobalRtnFeederLinkRxPower (SatStatsHelper::OutputType_t outputType);
   void AddGlobalRtnUserLinkRxPower (SatStatsHelper::OutputType_t outputType);
+
+  // Frame type usage statistics.
+  SAT_STATS_REDUCED_SCOPE_METHOD_DECLARATION (FrameTypeUsage)
+
+  // Beam service time statistics
+  void AddPerBeamBeamServiceTime (SatStatsHelper::OutputType_t outputType);
 
   // Antenna Gain statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (AntennaGain)

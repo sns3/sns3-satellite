@@ -82,7 +82,7 @@ public:
    *
    * \return Pointer to frame
    */
-  virtual Ptr<SatBbFrame> GetNextFrame ();
+  virtual std::pair<Ptr<SatBbFrame>, const Time> GetNextFrame ();
 
 private:
 

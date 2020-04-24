@@ -1,7 +1,7 @@
 # -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
 
 def build(bld):
-    module = bld.create_ns3_module('satellite', ['internet', 'propagation', 'antenna', 'csma', 'stats', 'traffic', 'flow-monitor'])
+    module = bld.create_ns3_module('satellite', ['internet', 'propagation', 'antenna', 'csma', 'stats', 'traffic', 'flow-monitor', 'applications'])
     module.source = [
         'model/geo-coordinate.cc',
         'model/satellite-address-tag.cc',
@@ -21,6 +21,7 @@ def build(bld):
         'model/satellite-bbframe-container.cc',
         'model/satellite-beam-channel-pair.cc',
         'model/satellite-beam-scheduler.cc',
+        'model/satellite-bstp-controller.cc',
         'model/satellite-channel.cc',
         'model/satellite-channel-estimation-error.cc',
         'model/satellite-channel-estimation-error-container.cc',
@@ -112,6 +113,7 @@ def build(bld):
         'model/satellite-signal-parameters.cc',
         'model/satellite-simple-channel.cc',
         'model/satellite-simple-net-device.cc',
+        'model/satellite-static-bstp.cc',
         'model/satellite-superframe-allocator.cc',
         'model/satellite-superframe-sequence.cc',
         'model/satellite-tbtp-container.cc',
@@ -149,10 +151,12 @@ def build(bld):
         'stats/satellite-stats-helper.cc',
         'stats/satellite-stats-antenna-gain-helper.cc',
         'stats/satellite-stats-backlogged-request-helper.cc',
+        'stats/satellite-stats-beam-service-time-helper.cc',
         'stats/satellite-stats-capacity-request-helper.cc',
         'stats/satellite-stats-composite-sinr-helper.cc',
         'stats/satellite-stats-delay-helper.cc',
         'stats/satellite-stats-frame-load-helper.cc',
+        'stats/satellite-stats-frame-type-usage-helper.cc',
         'stats/satellite-stats-link-rx-power-helper.cc',
         'stats/satellite-stats-link-sinr-helper.cc',
         'stats/satellite-stats-marsala-correlation-helper.cc',
@@ -218,6 +222,7 @@ def build(bld):
         'model/satellite-bbframe-container.h',
         'model/satellite-beam-channel-pair.h',
         'model/satellite-beam-scheduler.h',
+        'model/satellite-bstp-controller.h',
         'model/satellite-channel.h',
         'model/satellite-channel-estimation-error.h',
         'model/satellite-channel-estimation-error-container.h',
@@ -310,7 +315,8 @@ def build(bld):
         'model/satellite-scheduling-object.h',
         'model/satellite-signal-parameters.h',
         'model/satellite-simple-channel.h',
-        'model/satellite-simple-net-device.h',
+        'model/satellite-simple-net-device.h',  
+        'model/satellite-static-bstp.h',      
         'model/satellite-superframe-allocator.h',
         'model/satellite-superframe-sequence.h',
         'model/satellite-tbtp-container.h',
@@ -350,10 +356,12 @@ def build(bld):
         'stats/satellite-stats-helper.h',
         'stats/satellite-stats-antenna-gain-helper.h',
         'stats/satellite-stats-backlogged-request-helper.h',
+        'stats/satellite-stats-beam-service-time-helper.h',
         'stats/satellite-stats-capacity-request-helper.h',
         'stats/satellite-stats-composite-sinr-helper.h',
         'stats/satellite-stats-delay-helper.h',
         'stats/satellite-stats-frame-load-helper.h',
+        'stats/satellite-stats-frame-type-usage-helper.h',
         'stats/satellite-stats-link-rx-power-helper.h',
         'stats/satellite-stats-link-sinr-helper.h',
         'stats/satellite-stats-marsala-correlation-helper.h',

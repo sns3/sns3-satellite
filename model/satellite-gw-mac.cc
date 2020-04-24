@@ -199,7 +199,7 @@ SatGwMac::StartTransmission (uint32_t carrierId)
 {
   NS_LOG_FUNCTION (this);
 
-  Ptr<SatBbFrame> bbFrame = m_fwdScheduler->GetNextFrame ();
+  Ptr<SatBbFrame> bbFrame = m_fwdScheduler->GetNextFrame ().first;
 
   if ( bbFrame == NULL )
     {
@@ -246,6 +246,7 @@ SatGwMac::StartTransmission (uint32_t carrierId)
    */
   Simulator::Schedule (txDuration, &SatGwMac::StartTransmission, this, 0);
 }
+
 
 void
 SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)

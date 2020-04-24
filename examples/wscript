@@ -36,7 +36,10 @@ def build(bld):
     obj.source = 'sat-environmental-variables-example.cc'
 
     obj = bld.create_ns3_program('sat-list-position-ext-fading-example', ['satellite'])
-    obj.source = 'sat-list-position-ext-fading-example.cc'    
+    obj.source = 'sat-list-position-ext-fading-example.cc'
+
+    obj = bld.create_ns3_program('sat-fwd-link-beam-hopping-example', ['satellite'])
+    obj.source = 'sat-fwd-link-beam-hopping-example.cc'
 
     obj = bld.create_ns3_program('sat-fwd-system-test', ['satellite'])
     obj.source = 'sat-fwd-system-test-example.cc'

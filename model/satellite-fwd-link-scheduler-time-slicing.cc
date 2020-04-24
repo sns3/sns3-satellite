@@ -116,12 +116,13 @@ SatFwdLinkSchedulerTimeSlicing::DoDispose ()
 }
 
 
-Ptr<SatBbFrame>
+std::pair<Ptr<SatBbFrame>, const Time>
 SatFwdLinkSchedulerTimeSlicing::GetNextFrame ()
 {
   NS_LOG_FUNCTION (this);
 
   Ptr<SatBbFrame> frame;
+  Time frameDuration;
 
   // Send slice control messages first if there is any.
   if (!m_bbFrameContainers.at (0)->IsEmpty (0, m_bbFrameConf->GetDefaultModCod ()))
@@ -130,7 +131,12 @@ SatFwdLinkSchedulerTimeSlicing::GetNextFrame ()
       if (frame != NULL)
         {
           frame->SetSliceId (0);
+          frameDuration = frame->GetDuration ();
           m_symbolsSent.at(0) += ceil(frame->GetDuration ().GetSeconds ()*m_carrierBandwidthInHz);
+        }
+      else
+        {
+          frameDuration = m_bbFrameConf->GetDummyBbFrameDuration ();
         }
     }
   else
@@ -147,6 +153,7 @@ SatFwdLinkSchedulerTimeSlicing::GetNextFrame ()
               m_symbolsSent.at(m_lastSliceDequeued) += ceil(frame->GetDuration ().GetSeconds ()*m_carrierBandwidthInHz);
               symbols += ceil(frame->GetDuration ().GetSeconds ()*m_carrierBandwidthInHz);
               frame->SetSliceId (m_lastSliceDequeued);
+              frameDuration = frame->GetDuration ();
 
               if (symbols/m_periodicInterval.GetSeconds () > maxSymbolRate)
                 {
@@ -165,7 +172,7 @@ SatFwdLinkSchedulerTimeSlicing::GetNextFrame ()
     }
 
   // create dummy frame
-  if ( frame == NULL )
+  if ( m_dummyFrameSendingEnabled && frame == NULL )
     {
       frame = Create<SatBbFrame> (m_bbFrameConf->GetDefaultModCod (), SatEnums::DUMMY_FRAME, m_bbFrameConf);
 
@@ -182,8 +189,13 @@ SatFwdLinkSchedulerTimeSlicing::GetNextFrame ()
       frame->AddPayload (dummyPacket);
       frame->SetSliceId (0);
     }
+  // If no bb frame available and dummy frames disabled
+  else if (frame == NULL)
+    {
+      frameDuration = m_bbFrameConf->GetDummyBbFrameDuration ();
+    }
 
-  return frame;
+  return std::make_pair(frame, frameDuration);
 }
 
 void

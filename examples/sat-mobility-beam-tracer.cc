@@ -79,7 +79,7 @@ main (int argc, char *argv[])
 
   if (mobileUtTraceFile != "")
     {
-      Ptr<SatHelper> satHelper = CreateObject<SatHelper> ("Scenario72");
+      Ptr<SatHelper> satHelper = CreateObject<SatHelper> ();
       satMobility = satHelper->GetBeamHelper ()->GetGeoSatNode ()->GetObject<SatMobilityModel> ();
       Ptr<Node> node = satHelper->LoadMobileUtFromFile (mobileUtTraceFile);
       node->GetObject<SatMobilityModel> ()->TraceConnect ("SatCourseChange", "BeamTracer", MakeCallback (SatCourseChange));

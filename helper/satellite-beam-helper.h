@@ -29,10 +29,12 @@
 #include <stdint.h>
 
 #include <ns3/node-container.h>
+#include <ns3/ipv4-address-helper.h>
 
 #include <ns3/satellite-ncc.h>
 #include <ns3/satellite-antenna-gain-pattern-container.h>
 #include <ns3/satellite-beam-channel-pair.h>
+#include <ns3/satellite-bstp-controller.h>
 #include <ns3/satellite-phy-rx-carrier-conf.h>
 #include <ns3/satellite-mobility-observer.h>
 #include <ns3/satellite-markov-container.h>
@@ -67,9 +69,9 @@ public:
   /**
    * Define type CarrierBandwidthConverter
    */
-  typedef SatTypedefs::CarrierBandwidthConverter_t CarrierBandwidthConverter;
+  typedef SatTypedefs::CarrierBandwidthConverter_t      CarrierBandwidthConverter;
 
-  typedef std::pair<uint32_t, uint32_t >                FrequencyPair_t;  // user = first, feeder = second
+  typedef std::pair<uint32_t, uint32_t>                 FrequencyPair_t;  // user = first, feeder = second
   typedef std::pair<uint32_t, uint32_t>                 GwLink_t;         // first GW ID, second feeder link frequency id
 
   typedef std::set<Ptr<Node> >                          MulticastBeamInfoItem_t;  // set container having receiving UT nodes in beam
@@ -113,6 +115,12 @@ public:
   virtual ~SatBeamHelper ()
   {
   }
+
+  /**
+   * \brief Init method is called after all the initial configurations
+   * have been done by the SatHelper and SatBeamHelper.
+   */
+  void Init ();
 
   /**
    * Set the antenna gain patterns to be used when configuring the beams
@@ -160,8 +168,10 @@ public:
    * \param gwNode pointer of GW node
    * \param gwId id of the GW
    * \param beamId  id of the beam
-   * \param ulFreqId id of the user link frequency
-   * \param flFreqId id of the feeder link frequency
+   * \param rtnUlFreqId id of the return user link frequency
+   * \param rtnFlFreqId id of the return feeder link frequency
+   * \param fwdUlFreqId id of the forward user link frequency
+   * \param fwdFlFreqId id of the forward feeder link frequency
    * \param routingCallback the callback UT mac layers should
    * call to update the node routes when receiving handover orders
    *
@@ -170,11 +180,15 @@ public:
    * \return a pair containing the new SatNetDevice of the gateway
    * and a NetDeviceContainer of all SatNetDevice for the UTs
    */
-  std::pair<Ptr<NetDevice>, NetDeviceContainer> Install (
-    NodeContainer ut, Ptr<Node> gwNode,
-    uint32_t gwId, uint32_t beamId,
-    uint32_t ulFreqId, uint32_t flFreqId,
-    SatUtMac::RoutingUpdateCallback routingCallback);
+  std::pair<Ptr<NetDevice>, NetDeviceContainer> Install (NodeContainer ut,
+                     Ptr<Node> gwNode,
+                     uint32_t gwId,
+                     uint32_t beamId,
+                     uint32_t rtnUlFreqId,
+                     uint32_t rtnFlFreqId,
+                     uint32_t fwdUlFreqId,
+                     uint32_t fwdFlFreqId,
+                     SatUtMac::RoutingUpdateCallback routingCallback);
 
   /**
    * \param beamId beam ID
@@ -310,13 +324,11 @@ private:
   Ptr<SatAntennaGainPatternContainer>   m_antennaGainPatterns;
 
   std::map<uint32_t, uint32_t >             m_beam;        // first beam ID, second GW ID
-  std::set<GwLink_t >                       m_gwLinks;     // gateway links (GW id and feeder frequency id pairs).
   std::map<uint32_t, Ptr<Node> >            m_gwNode;      // first GW ID, second node pointer
   std::multimap<uint32_t, Ptr<Node> >       m_utNode;      // first Beam ID, second node pointer of the UT
   Ptr<SatChannelPair>                       m_ulChannels;  // user link ID, channel pointers pair
   Ptr<SatChannelPair>                       m_flChannels;  // feeder link ID, channel pointers pair
   std::map<uint32_t, FrequencyPair_t >      m_beamFreqs;   // first beam ID, channel frequency IDs pair
-
 
   /**
    * Trace callback for creation traces
@@ -389,6 +401,19 @@ private:
   double m_raConstantErrorRate;
 
   /**
+   * Flag indicating whether beam hopping is enabled in
+   * FWD link. If enabled, SatBstpController is created with
+   * proper callbacks and reuse 1 is configured for FWD link.
+   */
+  bool m_enableFwdLinkBeamHopping;
+
+  /**
+   * Beam Switching Time Plan controller, which is created
+   * if FWD link beam hopping is enabled (m_enableFwdLinkBeamHopping).
+   */
+  Ptr<SatBstpController> m_bstpController;
+
+  /**
    * Packet trace
    */
   Ptr<SatPacketTrace> m_packetTrace;
@@ -407,14 +432,14 @@ private:
   /**
    * Gets satellite channel pair from requested map.
    * In case that channel pair is not found, new is created and returned.
-   * \param chPairs SatChannelPair where channel pair is get
-   * \param frequencyId ID of the frequency
+   * \param fwdFrequencyId ID of the frequency
+   * \param rtnFrequencyId ID of the frequency
    * \param isUserLink flag indicating if link user link is requested (otherwise feeder link).
    * \return satellite channel pair from requested SatChannelPair
    */
-  SatChannelPair::ChannelPair_t GetChannelPair (Ptr<SatChannelPair> chPairs,
-                                                uint32_t beamId,
-                                                uint32_t frequencyId,
+  SatChannelPair::ChannelPair_t GetChannelPair (uint32_t beamId,
+                                                uint32_t fwdFrequencyId,
+                                                uint32_t rtnFrequencyId,
                                                 bool isUserLink);
 
   /**

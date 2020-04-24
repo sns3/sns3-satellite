@@ -248,7 +248,7 @@ SatPerPacketFwdLinkUserTestCase::DoRun (void)
   Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (em));
 
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (m_fading));
-  Config::SetDefault ("ns3::SatGwMac::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));
+  Config::SetDefault ("ns3::SatFwdLinkScheduler::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));
 
   Config::SetDefault ("ns3::SatHelper::UtCount", UintegerValue (1));
   Config::SetDefault ("ns3::SatHelper::UtUsers", UintegerValue (1));
@@ -256,10 +256,8 @@ SatPerPacketFwdLinkUserTestCase::DoRun (void)
   Config::SetDefault ("ns3::SatUtHelper::DaFwdLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
   Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace", BooleanValue (true));
 
-  std::string scenarioName = "Scenario72";
-
-  // create helpers
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
+  // Creating the reference system.
+  Ptr<SatHelper> helper = CreateObject<SatHelper> ();
 
   // create user defined scenario with beams 1 and 5
   SatBeamUserInfo beamInfo = SatBeamUserInfo (1, 1);
@@ -405,7 +403,7 @@ SatPerPacketFwdLinkFullTestCase::DoRun (void)
 
 
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (m_fading));
-  Config::SetDefault ("ns3::SatGwMac::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));
+  Config::SetDefault ("ns3::SatFwdLinkScheduler::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));
 
   Config::SetDefault ("ns3::SatHelper::UtCount", UintegerValue (1));
   Config::SetDefault ("ns3::SatHelper::UtUsers", UintegerValue (1));
@@ -413,14 +411,8 @@ SatPerPacketFwdLinkFullTestCase::DoRun (void)
   Config::SetDefault ("ns3::SatUtHelper::DaFwdLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
   Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace", BooleanValue (true));
 
-  // Creating the reference system. Note, currently the satellite module supports
-  // only one reference system, which is named as "Scenario72". The string is utilized
-  // in mapping the scenario to the needed reference system configuration files. Arbitrary
-  // scenario name results in fatal error.
-  std::string scenarioName = "Scenario72";
-
-  // create helpers
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
+  // Creating the reference system.
+  Ptr<SatHelper> helper = CreateObject<SatHelper> ();
 
   helper->CreatePredefinedScenario (SatHelper::FULL);
 
@@ -556,7 +548,7 @@ SatPerPacketRtnLinkUserTestCase::DoRun (void)
 
 
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (m_fading));
-  Config::SetDefault ("ns3::SatGwMac::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));
+  Config::SetDefault ("ns3::SatFwdLinkScheduler::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));
 
   Config::SetDefault ("ns3::SatHelper::UtCount", UintegerValue (1));
   Config::SetDefault ("ns3::SatHelper::UtUsers", UintegerValue (1));
@@ -570,10 +562,8 @@ SatPerPacketRtnLinkUserTestCase::DoRun (void)
   Config::SetDefault ("ns3::SatGeoHelper::DaRtnLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
   Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace", BooleanValue (true));
 
-  std::string scenarioName = "Scenario72";
-
-  // create helpers
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
+  // Creating the reference system.
+  Ptr<SatHelper> helper = CreateObject<SatHelper> ();
 
   // create user defined scenario with beams 1 and 5
   SatBeamUserInfo beamInfo = SatBeamUserInfo (1, 1);
@@ -689,7 +679,7 @@ SatPerPacketRtnLinkFullTestCase::DoRun (void)
   Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-per-packet-if", m_extName, true);
 
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", EnumValue (m_fading));
-  Config::SetDefault ("ns3::SatGwMac::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));
+  Config::SetDefault ("ns3::SatFwdLinkScheduler::DummyFrameSendingEnabled", BooleanValue (m_dummyFrames));
 
   Config::SetDefault ("ns3::SatHelper::UtCount", UintegerValue (1));
   Config::SetDefault ("ns3::SatHelper::UtUsers", UintegerValue (1));
@@ -703,10 +693,8 @@ SatPerPacketRtnLinkFullTestCase::DoRun (void)
   Config::SetDefault ("ns3::SatGeoHelper::DaRtnLinkInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
   Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace", BooleanValue (true));
 
-  std::string scenarioName = "Scenario72";
-
-  // create helpers
-  Ptr<SatHelper> helper = CreateObject<SatHelper> (scenarioName);
+  // Creating the reference system.
+  Ptr<SatHelper> helper = CreateObject<SatHelper> ();
   helper->CreatePredefinedScenario (SatHelper::FULL);
 
   // set callback traces where we want results out

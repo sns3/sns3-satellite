@@ -62,24 +62,30 @@ public:
 
   /**
    * Initialize the configuration
-   * \param satConf
-   * \param gwPos
-   * \param satPos
-   * \param wfConf
+   * \param rtnConf RTN link configuration file name
+   * \param fwdConf FWD link configuration file name
+   * \param gwPos GW position file name
+   * \param satPos Satellie position file name
+   * \param wfConf Waveform configuration file name
    */
-  void Initialize (std::string satConf, std::string gwPos, std::string satPos, std::string wfConf);
+  void Initialize (std::string rtnConf,
+                   std::string fwdConf,
+                   std::string gwPos,
+                   std::string satPos,
+                   std::string wfConf);
 
   /**
    * Try to open a file from a given path
    * \param filePathName
    */
-  std::ifstream* OpenFile (std::string filePathName);
+  std::ifstream* OpenFile (std::string filePathName) const;
 
   /**
    * Load satellite configuration from a file
    * \param filePathName
+   * \return Container of the configuration data
    */
-  void LoadSatConf (std::string filePathName);
+  std::vector <std::vector <uint32_t> > LoadSatConf (std::string filePathName) const;
 
   /**
    * Get count of the beams (configurations).
@@ -94,7 +100,7 @@ public:
    * \param beamId id of the beam
    * \return the configuration vector for a given satellite beam id
    */
-  std::vector <uint32_t> GetBeamConfiguration (uint32_t beamId) const;
+  std::vector <uint32_t> GetBeamConfiguration (uint32_t beamId, SatEnums::SatLinkDir_t dir) const;
 
   /**
    * \return The number of the carriers in return link.
@@ -140,20 +146,6 @@ public:
    * \return Geo satellite position.
    */
   GeoCoordinate GetGeoSatPosition () const;
-
-  /**
-   * Get the number of the user frequencies.
-   *
-   * \return The number of the user frequencies.
-   */
-  uint32_t GetUserFreqCount () const;
-
-  /**
-   * Get the number of the feeder frequencies.
-   *
-   * \return The number of the feeder frequencies.
-   */
-  uint32_t GetFeederFreqCount () const;
 
   /**
    * Convert carrier id, sequency id and frequency id to real frequency value.
@@ -211,7 +203,8 @@ private:
    *  3. GW id
    *  4. Feeder frequency id
    */
-  std::vector <std::vector <uint32_t> > m_conf;
+  std::vector <std::vector <uint32_t> > m_rtnConf;
+  std::vector <std::vector <uint32_t> > m_fwdConf;
 
   /**
    * Beam count.
@@ -295,14 +288,14 @@ private:
   double m_rtnUserLinkBandwidthHz;
 
   /**
-   *  The number of the channels in user link.
+   *  The number of the channels in different satellite
+   *  links: forward user, return user, forward feeder,
+   *  return feeder.
    */
-  uint32_t m_userLinkChannelCount;
-
-  /**
-   *  The number of the channels in user link.
-   */
-  uint32_t m_feederLinkChannelCount;
+  uint32_t m_fwdUserLinkChannelCount;
+  uint32_t m_rtnUserLinkChannelCount;
+  uint32_t m_fwdFeederLinkChannelCount;
+  uint32_t m_rtnFeederLinkChannelCount;
 
   /**
    *  The super frame configuration used for sequence 0.

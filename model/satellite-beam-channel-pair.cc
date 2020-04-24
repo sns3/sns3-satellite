@@ -44,7 +44,9 @@ SatChannelPair::GetTypeId (void)
 
 
 SatChannelPair::SatChannelPair ()
-  : m_channels ()
+  : m_frequencies (),
+  m_fwdChannels (),
+  m_rtnChannels ()
 {
   NS_LOG_FUNCTION (this);
 }
@@ -53,25 +55,48 @@ SatChannelPair::SatChannelPair ()
 SatChannelPair::~SatChannelPair ()
 {
   NS_LOG_FUNCTION (this);
+  m_frequencies.clear ();
+  m_fwdChannels.clear ();
+  m_rtnChannels.clear ();
 }
 
 
 SatChannelPair::ChannelPair_t
-SatChannelPair::GetChannelPair (uint32_t beamId)
+SatChannelPair::GetChannelPair (uint32_t beamId) const
 {
   NS_LOG_FUNCTION (this << beamId);
 
-  std::map<uint32_t, uint32_t>::iterator frequencyIterator = m_frequencies.find (beamId);
+  std::map<uint32_t, std::pair<uint32_t, uint32_t> >::const_iterator frequencyIterator = m_frequencies.find (beamId);
   if (frequencyIterator == m_frequencies.end ())
     {
       NS_FATAL_ERROR ("No SatChannel stored for this beam");
     }
 
-  uint32_t frequencyId = frequencyIterator->second;
-  std::map<uint32_t, ChannelPair_t >::iterator channelIterator = m_channels.find (frequencyId);
-  if (channelIterator == m_channels.end ())
+  std::pair<uint32_t, uint32_t> frequenciesIds = frequencyIterator->second;
+  return std::make_pair (GetForwardChannel (frequenciesIds.first), GetReturnChannel (frequenciesIds.second));
+}
+
+
+Ptr<SatChannel>
+SatChannelPair::GetForwardChannel (uint32_t frequencyId) const
+{
+  std::map<uint32_t, Ptr<SatChannel>>::const_iterator channelIterator = m_fwdChannels.find (frequencyId);
+  if (channelIterator == m_fwdChannels.end ())
     {
-      NS_FATAL_ERROR ("No SatChannel stored for the frequency ID this beam is associated to");
+      NS_FATAL_ERROR ("No SatChannel stored for the forward frequency " << frequencyId);
+    }
+
+  return channelIterator->second;
+}
+
+
+Ptr<SatChannel>
+SatChannelPair::GetReturnChannel (uint32_t frequencyId) const
+{
+  std::map<uint32_t, Ptr<SatChannel>>::const_iterator channelIterator = m_rtnChannels.find (frequencyId);
+  if (channelIterator == m_rtnChannels.end ())
+    {
+      NS_FATAL_ERROR ("No SatChannel stored for the return frequency " << frequencyId);
     }
 
   return channelIterator->second;
@@ -79,22 +104,33 @@ SatChannelPair::GetChannelPair (uint32_t beamId)
 
 
 bool
-SatChannelPair::HasChannelPair (uint32_t frequencyId)
+SatChannelPair::HasFwdChannel (uint32_t frequencyId) const
 {
   NS_LOG_FUNCTION (this << frequencyId);
 
-  std::map<uint32_t, ChannelPair_t>::iterator channel = m_channels.find (frequencyId);
-  return channel != m_channels.end ();
+  std::map<uint32_t, Ptr<SatChannel> >::const_iterator channel = m_fwdChannels.find (frequencyId);
+  return channel != m_fwdChannels.end ();
+}
+
+
+bool
+SatChannelPair::HasRtnChannel (uint32_t frequencyId) const
+{
+  NS_LOG_FUNCTION (this << frequencyId);
+
+  std::map<uint32_t, Ptr<SatChannel> >::const_iterator channel = m_rtnChannels.find (frequencyId);
+  return channel != m_rtnChannels.end ();
 }
 
 
 void
-SatChannelPair::UpdateBeamsForFrequency (uint32_t beamId, uint32_t frequencyId)
+SatChannelPair::UpdateBeamsForFrequency (uint32_t beamId, uint32_t fwdFrequencyId, uint32_t rtnFrequencyId)
 {
-  NS_LOG_FUNCTION (this << beamId << frequencyId);
+  NS_LOG_FUNCTION (this << beamId << fwdFrequencyId << rtnFrequencyId);
 
-  std::pair<uint32_t, uint32_t> frequencyKey = std::make_pair (beamId, frequencyId);
-  std::pair<std::map<uint32_t, uint32_t>::iterator, bool> frequencyCreated = m_frequencies.insert (frequencyKey);
+  std::pair<uint32_t, uint32_t> frequenciesIds = std::make_pair (fwdFrequencyId, rtnFrequencyId);
+  std::pair<uint32_t, std::pair<uint32_t, uint32_t>> frequencyKey = std::make_pair (beamId, frequenciesIds);
+  std::pair<std::map<uint32_t, std::pair<uint32_t, uint32_t>>::iterator, bool> frequencyCreated = m_frequencies.insert (frequencyKey);
   if (!frequencyCreated.second)
     {
       NS_FATAL_ERROR ("SatChannel pair already created for this beam");
@@ -103,18 +139,30 @@ SatChannelPair::UpdateBeamsForFrequency (uint32_t beamId, uint32_t frequencyId)
 
 
 void
-SatChannelPair::StoreChannelPair (uint32_t beamId, uint32_t frequencyId, ChannelPair_t channelPair)
+SatChannelPair::StoreChannelPair (uint32_t beamId,
+                                  uint32_t fwdFrequencyId,
+                                  Ptr<SatChannel> fwdChannel,
+                                  uint32_t rtnFrequencyId,
+                                  Ptr<SatChannel> rtnChannel)
 {
-  NS_LOG_FUNCTION (this << beamId << frequencyId);
+  NS_LOG_FUNCTION (this << beamId << fwdFrequencyId << fwdChannel << rtnFrequencyId << rtnChannel);
 
-  std::pair<uint32_t, ChannelPair_t> channelsKey = std::make_pair (frequencyId, channelPair);
-  std::pair<std::map<uint32_t, ChannelPair_t>::iterator, bool> channelsCreated = m_channels.insert (channelsKey);
-  if (!channelsCreated.second)
+  std::map<uint32_t, Ptr<SatChannel>>::iterator fwdChannelIterator = m_fwdChannels.find (fwdFrequencyId);
+  if (fwdChannelIterator != m_fwdChannels.end () && fwdChannelIterator->second != fwdChannel)
     {
-      NS_FATAL_ERROR ("SatChannel pair already created for this frequency");
+      NS_FATAL_ERROR ("SatChannel already created for the forward frequency " << fwdFrequencyId);
     }
 
-  UpdateBeamsForFrequency (beamId, frequencyId);
+  std::map<uint32_t, Ptr<SatChannel>>::iterator rtnChannelIterator = m_rtnChannels.find (rtnFrequencyId);
+  if (rtnChannelIterator != m_rtnChannels.end () && rtnChannelIterator->second != rtnChannel)
+    {
+      NS_FATAL_ERROR ("SatChannel already created for the return frequency " << rtnFrequencyId);
+    }
+
+  m_fwdChannels.emplace (fwdFrequencyId, fwdChannel);
+  m_rtnChannels.emplace (rtnFrequencyId, rtnChannel);
+
+  UpdateBeamsForFrequency (beamId, fwdFrequencyId, rtnFrequencyId);
 }
 
 }

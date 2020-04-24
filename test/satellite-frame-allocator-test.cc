@@ -149,7 +149,7 @@ void SatFrameAllocatorTestCase::InitFrame (SatSuperframeConf::ConfigType_t confi
     }
 
   SatFrameConf::SatFrameConfParams_t frameConfParameters;
-  frameConfParameters.m_bandwidthHz = 10.4 * 2;
+  frameConfParameters.m_bandwidthHz = 10e4 * 2;
   frameConfParameters.m_targetDuration = MilliSeconds (125);
   frameConfParameters.m_btuConf = btu;
   frameConfParameters.m_waveformConf = m_waveFormConf;

@@ -200,12 +200,14 @@ SatFwdLinkScheduler::SetTxOpportunityCallback (SatFwdLinkScheduler::TxOpportunit
 }
 
 
-Ptr<SatBbFrame>
+std::pair<Ptr<SatBbFrame>, const Time>
 SatFwdLinkScheduler::GetNextFrame ()
 {
   NS_FATAL_ERROR ("SatFwdLinkScheduler::GetNextFrame: should not be here");
 
-  return NULL;
+  Ptr<SatBbFrame> f = NULL;
+
+  return std::make_pair(f, m_bbFrameConf->GetDummyBbFrameDuration ());
 }
 
 void
@@ -229,6 +231,14 @@ SatFwdLinkScheduler::CnoInfoUpdated (Mac48Address utAddress, double cnoEstimate)
     }
 
   it->second->AddSample (cnoEstimate);
+}
+
+Time
+SatFwdLinkScheduler::GetDefaultFrameDuration () const
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_bbFrameConf->GetBbFrameDuration (m_bbFrameConf->GetDefaultModCod (), SatEnums::NORMAL_FRAME);
 }
 
 void

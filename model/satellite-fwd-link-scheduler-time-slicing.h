@@ -77,7 +77,7 @@ public:
    *
    * \return Pointer to frame
    */
-  virtual Ptr<SatBbFrame> GetNextFrame ();
+  virtual std::pair<Ptr<SatBbFrame>, const Time> GetNextFrame ();
 
   /**
    * Callback to notify upper layer about Tx opportunity.

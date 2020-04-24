@@ -117,6 +117,12 @@ public:
   }
 
   /**
+   * \brief Get enabled beams in integer format.
+   * \return const set of integers representing beam ids
+   */
+  const std::set<uint32_t>& GetBeams ();
+
+  /**
    * \brief Set UT count per beam.
    * \param count Number of UTs per beam.
    */
@@ -127,6 +133,18 @@ public:
    * \param rs RandomVariableStream to be used, must implement GetInteger.
    */
   void SetUtCountPerBeam (Ptr<RandomVariableStream> rs);
+
+  /**
+   * \brief Set UT count per beam.
+   * \param count Number of UTs per beam.
+   */
+  void SetUtCountPerBeam (uint32_t beamId, uint32_t count);
+
+  /**
+   * \brief Set UT count per beam to be taken from a random variable stream.
+   * \param rs RandomVariableStream to be used, must implement GetInteger.
+   */
+  void SetUtCountPerBeam (uint32_t beamId, Ptr<RandomVariableStream> rs);
 
   /**
    * \brief Set user count per UT.
@@ -272,6 +290,14 @@ public:
    * and return link frequencies.
    */
   void ConfigureFrequencyBands ();
+
+  /**
+   * \brief Configure the beam hopping functionality for
+   * the FWD link. This includes also setup of the proper
+   * frequency configuration related to reuse one in
+   * FWD link beam hopping.
+   */
+  void ConfigureFwdLinkBeamHopping ();
 
   /**
    * \brief Enable external fading input.
@@ -575,19 +601,15 @@ protected:
   /**
    * \brief Get next UT count from internal random variable stream.
    */
-  inline uint32_t GetNextUtCount () const
-  {
-    NS_ASSERT_MSG (m_utCount != NULL, "UT count per beam not set");
-    return m_utCount->GetInteger ();
-  }
+  uint32_t GetNextUtCount (uint32_t beamId = 0) const;
 
   /**
    * \brief Get next UT user count from internal random variable stream.
    */
   inline uint32_t GetNextUtUserCount () const
   {
-    NS_ASSERT_MSG (m_utCount != NULL, "User count per UT not set");
-    return m_utUserCount->GetInteger ();
+  	NS_ASSERT_MSG (m_utUserCount != NULL, "User count per UT not set");
+  	return m_utUserCount->GetInteger ();
   }
 
   /**
@@ -612,7 +634,9 @@ private:
   std::string                  m_enabledBeamsStr;
   std::set<uint32_t>           m_enabledBeams;
   std::string                  m_outputPath;
-  Ptr<RandomVariableStream>    m_utCount;
+
+  std::map<uint32_t, Ptr<RandomVariableStream> > m_utCount;
+
   Ptr<RandomVariableStream>    m_utUserCount;
   Ptr<RandomVariableStream>    m_utMobileUserCount;
   Time                         m_simTime;

@@ -162,6 +162,13 @@ public:
    */
   void SetNodeInfo (Ptr<SatNodeInfo> nodeInfo);
 
+  /**
+   * \brief Toggle the state of the device. This is used for beam hopping
+   * purposes only, thus by default the netdevice is assumed to be enabled.
+   * \param enabled Flag indicating whether the ND is considered enabled or disabled
+   */
+  void ToggleState (bool enabled);
+
 protected:
   /**
    * Dispose of this class instance

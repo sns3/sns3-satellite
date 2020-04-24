@@ -679,7 +679,15 @@ SatChannel::SetFreeSpaceLoss (Ptr<SatFreeSpaceLoss> loss)
   m_freeSpaceLoss = loss;
 }
 
-uint32_t
+Ptr<SatFreeSpaceLoss>
+SatChannel::GetFreeSpaceLoss () const
+{
+  NS_LOG_FUNCTION (this);
+  NS_ASSERT (m_freeSpaceLoss != 0);
+  return m_freeSpaceLoss;
+}
+
+std::size_t
 SatChannel::GetNDevices (void) const
 {
   NS_LOG_FUNCTION (this);
@@ -687,7 +695,7 @@ SatChannel::GetNDevices (void) const
 }
 
 Ptr<NetDevice>
-SatChannel::GetDevice (uint32_t i) const
+SatChannel::GetDevice (std::size_t i) const
 {
   NS_LOG_FUNCTION (this << i);
   return m_phyRxContainer.at (i)->GetDevice ()->GetObject<NetDevice> ();

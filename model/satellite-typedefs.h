@@ -102,6 +102,8 @@ public:
    */
   typedef void (*CreationCallback)(std::string trace);
 
+  typedef void (*ServiceTimeCallback) (Time serviceTime);
+
 private:
   /**
    * Destructor

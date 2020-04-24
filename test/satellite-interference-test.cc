@@ -100,7 +100,7 @@ SatConstantInterferenceTestCase::DoRun (void)
 
   NS_TEST_ASSERT_MSG_EQ (1, power.size (), "Calculated power returned more than one fragment");
   NS_TEST_ASSERT_MSG_EQ (1.0, power[0].first, "Calculated power does not span the whole packet");
-  NS_TEST_ASSERT_MSG_EQ (100, power[1].second, "Calculated power not correct");
+  NS_TEST_ASSERT_MSG_EQ (100, power[0].second, "Calculated power not correct");
 
   interference->NotifyRxEnd (event);
 

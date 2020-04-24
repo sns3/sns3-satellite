@@ -23,11 +23,14 @@
 #include <ns3/log.h>
 #include <ns3/string.h>
 #include <ns3/ipv4-static-routing-helper.h>
+#include <ns3/internet-stack-helper.h>
+#include <ns3/ipv4-interface.h>
 #include <ns3/mobility-helper.h>
 #include <ns3/enum.h>
 #include <ns3/pointer.h>
 #include <ns3/config.h>
 #include <ns3/singleton.h>
+#include <ns3/satellite-bstp-controller.h>
 #include <ns3/satellite-const-variables.h>
 #include <ns3/satellite-channel.h>
 #include <ns3/satellite-phy.h>
@@ -44,7 +47,6 @@
 #include <ns3/satellite-fading-input-trace-container.h>
 #include <ns3/satellite-fading-input-trace.h>
 #include <ns3/satellite-id-mapper.h>
-#include <ns3/satellite-typedefs.h>
 #include "satellite-beam-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatBeamHelper");
@@ -129,6 +131,11 @@ SatBeamHelper::GetTypeId (void)
                    TimeValue (MilliSeconds (1000)),
                    MakeTimeAccessor (&SatBeamHelper::m_ctrlMsgStoreTimeRtnLink),
                    MakeTimeChecker ())
+    .AddAttribute ("EnableFwdLinkBeamHopping",
+                   "Enable beam hopping in forward link.",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatBeamHelper::m_enableFwdLinkBeamHopping),
+                   MakeBooleanChecker ())
     .AddAttribute ("EnableTracesOnUserReturnLink",
                    "Use traces files on the user return channel only",
                    BooleanValue (false),
@@ -158,7 +165,9 @@ SatBeamHelper::SatBeamHelper ()
   m_raInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
   m_raInterferenceEliminationModel (SatPhyRxCarrierConf::SIC_PERFECT),
   m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED),
-  m_raConstantErrorRate (0.0)
+  m_raConstantErrorRate (0.0),
+  m_enableFwdLinkBeamHopping (false),
+  m_bstpController ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -181,7 +190,9 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
   m_raInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
   m_raInterferenceEliminationModel (SatPhyRxCarrierConf::SIC_PERFECT),
   m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR),
-  m_raConstantErrorRate (0.0)
+  m_raConstantErrorRate (0.0),
+  m_enableFwdLinkBeamHopping (false),
+  m_bstpController ()
 {
   NS_LOG_FUNCTION (this << geoNode << rtnLinkCarrierCount << fwdLinkCarrierCount << seq);
 
@@ -304,6 +315,11 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
         break;
       }
     }
+
+  if (m_enableFwdLinkBeamHopping)
+    {
+      m_bstpController = CreateObject<SatBstpController> ();
+    }
 }
 
 void
@@ -322,6 +338,17 @@ SatBeamHelper::DoDispose ()
   m_gwHelper = NULL;
   m_utHelper = NULL;
   m_antennaGainPatterns = NULL;
+}
+
+void
+SatBeamHelper::Init ()
+{
+  NS_LOG_FUNCTION (this);
+
+  if (m_bstpController)
+    {
+      m_bstpController->Initialize ();
+    }
 }
 
 void
@@ -355,29 +382,32 @@ SatBeamHelper::SetNccRoutingCallback (SatNcc::UpdateRoutingCallback cb)
 }
 
 std::pair<Ptr<NetDevice>, NetDeviceContainer>
-SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode,
-                        uint32_t gwId, uint32_t beamId, uint32_t ulFreqId, uint32_t flFreqId,
+SatBeamHelper::Install (NodeContainer ut,
+                        Ptr<Node> gwNode,
+                        uint32_t gwId,
+                        uint32_t beamId,
+                        uint32_t rtnUlFreqId,
+                        uint32_t rtnFlFreqId,
+                        uint32_t fwdUlFreqId,
+                        uint32_t fwdFlFreqId,
                         SatUtMac::RoutingUpdateCallback routingCallback)
 {
-  NS_LOG_FUNCTION (this << gwNode << gwId << beamId << ulFreqId << flFreqId);
+  NS_LOG_FUNCTION (this << gwNode << gwId << beamId << rtnUlFreqId << rtnFlFreqId << fwdUlFreqId << fwdFlFreqId);
 
   // add beamId as key and gwId as value pair to beam map. In case it's there already, assertion failure is caused
   std::pair<std::map<uint32_t, uint32_t >::iterator, bool> beam = m_beam.insert (std::make_pair (beamId, gwId));
   NS_ASSERT (beam.second == true);
 
-  // add gwId and flFreqId pair to GW link set. In case it's there already, assertion failure is caused
-  std::pair<std::set<GwLink_t >::iterator, bool>  gw = m_gwLinks.insert (GwLink_t (gwId, flFreqId));
-  NS_ASSERT (gw.second == true);
-
+  // TODO: Update to store 4 frequency ID
   // save frequency pair to map with beam ID
-  FrequencyPair_t freqPair = FrequencyPair_t (ulFreqId, flFreqId);
-  m_beamFreqs.insert (std::pair<uint32_t, FrequencyPair_t > (beamId, freqPair));
+  // FrequencyPair_t freqPair = FrequencyPair_t (ulFreqId, flFreqId);
+  // m_beamFreqs.insert (std::pair<uint32_t, FrequencyPair_t > (beamId, freqPair));
 
   // next it is found user link channels and if not found channels are created and saved to map
-  SatChannelPair::ChannelPair_t userLink = GetChannelPair (m_ulChannels, beamId, ulFreqId, true);
+  SatChannelPair::ChannelPair_t userLink = GetChannelPair (beamId, fwdUlFreqId, rtnUlFreqId, true);
 
   // next it is found feeder link channels and if not found channels are created nd saved to map
-  SatChannelPair::ChannelPair_t feederLink = GetChannelPair (m_flChannels, beamId, flFreqId, false);
+  SatChannelPair::ChannelPair_t feederLink = GetChannelPair (beamId, fwdFlFreqId, rtnFlFreqId, false);
 
   // Set trace files if options ask for it
   if (m_enableTracesOnReturnLink)
@@ -424,9 +454,9 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode,
 
       Ptr<SatMobilityObserver> observer = (*i)->GetObject<SatMobilityObserver> ();
       NS_ASSERT (observer != NULL);
-
       observer->ObserveTimingAdvance (userLink.second->GetPropagationDelayModel (),
-                                      feederLink.second->GetPropagationDelayModel (), gwMobility);
+                                      feederLink.second->GetPropagationDelayModel (),
+                                      gwMobility);
 
       if (m_fadingModel != SatEnums::FADING_OFF)
         {
@@ -463,6 +493,18 @@ SatBeamHelper::Install (NodeContainer ut, Ptr<Node> gwNode,
                   m_superframeSeq,
                   maxBbFrameDataSizeInBytes,
                   gwNd->GetAddress ());
+
+  if (m_bstpController)
+    {
+      SatBstpController::ToggleCallback gwNdCb =
+          MakeCallback (&SatNetDevice::ToggleState, DynamicCast<SatNetDevice> (gwNd));
+
+      m_bstpController->AddNetDeviceCallback (beamId,
+                                              fwdUlFreqId,
+                                              fwdFlFreqId,
+                                              gwId,
+                                              gwNdCb);
+    }
 
   // install UTs
   NetDeviceContainer utNd = m_utHelper->Install (ut,
@@ -961,65 +1003,81 @@ SatBeamHelper::CreateBeamInfo () const
 }
 
 SatChannelPair::ChannelPair_t
-SatBeamHelper::GetChannelPair (Ptr<SatChannelPair> chPairs, uint32_t beamId, uint32_t frequencyId, bool isUserLink)
+SatBeamHelper::GetChannelPair (uint32_t beamId, uint32_t fwdFrequencyId, uint32_t rtnFrequencyId, bool isUserLink)
 {
-  NS_LOG_FUNCTION (this << chPairs << beamId << frequencyId << isUserLink);
+  NS_LOG_FUNCTION (this << beamId << fwdFrequencyId << rtnFrequencyId << isUserLink);
+  Ptr<SatChannelPair> chPairs = isUserLink ? m_ulChannels : m_flChannels;
 
-  if (chPairs->HasChannelPair (frequencyId))
+	bool hasFwdChannel = chPairs->HasFwdChannel (fwdFrequencyId);
+  bool hasRtnChannel = chPairs->HasRtnChannel (rtnFrequencyId);
+
+  if (hasFwdChannel && hasRtnChannel)
     {
-      chPairs->UpdateBeamsForFrequency (beamId, frequencyId);
+      chPairs->UpdateBeamsForFrequency (beamId, fwdFrequencyId, rtnFrequencyId);
     }
   else
     {
-      Ptr<SatChannel> forwardCh = m_channelFactory.Create<SatChannel> ();
-      Ptr<SatChannel> returnCh = m_channelFactory.Create<SatChannel> ();
-
-      if ( isUserLink )
-        {
-          forwardCh->SetChannelType (SatEnums::FORWARD_USER_CH);
-          returnCh->SetChannelType (SatEnums::RETURN_USER_CH);
-        }
-      else
-        {
-          forwardCh->SetChannelType (SatEnums::FORWARD_FEEDER_CH);
-          returnCh->SetChannelType (SatEnums::RETURN_FEEDER_CH);
-        }
-
-      forwardCh->SetFrequencyConverter (m_carrierFreqConverter);
-      returnCh->SetFrequencyConverter (m_carrierFreqConverter);
-
-      forwardCh->SetBandwidthConverter (m_carrierBandwidthConverter);
-      returnCh->SetBandwidthConverter (m_carrierBandwidthConverter);
-
-      forwardCh->SetFrequencyId (frequencyId);
-      returnCh->SetFrequencyId (frequencyId);
-
+			Ptr<SatFreeSpaceLoss> pFsl;
       Ptr<PropagationDelayModel> pDelay;
-      // Signal propagates at the speed of light
-      if (m_propagationDelayModel == SatEnums::PD_CONSTANT_SPEED)
-        {
-          pDelay = CreateObject<ConstantSpeedPropagationDelayModel> ();
-          DynamicCast<ConstantSpeedPropagationDelayModel> (pDelay)->SetSpeed (SatConstVariables::SPEED_OF_LIGHT);
-        }
-      else if (m_propagationDelayModel == SatEnums::PD_CONSTANT)
-        {
-          pDelay = CreateObject<SatConstantPropagationDelayModel> ();
-          DynamicCast<SatConstantPropagationDelayModel> (pDelay)->SetDelay (m_constantPropagationDelay);
-        }
-      else
-        {
-          NS_FATAL_ERROR ("Unsupported propagation delay model!");
-        }
+			Ptr<SatChannel> forwardCh;
+			Ptr<SatChannel> returnCh;
 
-      forwardCh->SetPropagationDelayModel (pDelay);
-      returnCh->SetPropagationDelayModel (pDelay);
+      if (hasFwdChannel)
+        {
+					forwardCh = chPairs->GetForwardChannel (fwdFrequencyId);
+					pDelay = forwardCh->GetPropagationDelayModel ();
+					pFsl = forwardCh->GetFreeSpaceLoss ();
+				}
+			else if (hasRtnChannel)
+        {
+					returnCh = chPairs->GetReturnChannel (rtnFrequencyId);
+					pDelay = returnCh->GetPropagationDelayModel ();
+					pFsl = returnCh->GetFreeSpaceLoss ();
+				}
+			else
+				{
+					if (m_propagationDelayModel == SatEnums::PD_CONSTANT_SPEED)
+						{
+							// Signal propagates at the speed of light
+							pDelay = CreateObject<ConstantSpeedPropagationDelayModel> ();
+							DynamicCast<ConstantSpeedPropagationDelayModel> (pDelay)->SetSpeed (SatConstVariables::SPEED_OF_LIGHT);
+						}
+					else if (m_propagationDelayModel == SatEnums::PD_CONSTANT)
+						{
+							pDelay = CreateObject<SatConstantPropagationDelayModel> ();
+							DynamicCast<SatConstantPropagationDelayModel> (pDelay)->SetDelay (m_constantPropagationDelay);
+						}
+					else
+						{
+							NS_FATAL_ERROR ("Unsupported propagation delay model!");
+						}
 
-      Ptr<SatFreeSpaceLoss> pFsl =  CreateObject<SatFreeSpaceLoss> ();
-      forwardCh->SetFreeSpaceLoss (pFsl);
-      returnCh->SetFreeSpaceLoss (pFsl);
+					pFsl =  CreateObject<SatFreeSpaceLoss> ();
+				}
 
-      SatChannelPair::ChannelPair_t channelPair = std::make_pair (forwardCh, returnCh);
-      chPairs->StoreChannelPair (beamId, frequencyId, channelPair);
+			if (!hasFwdChannel)
+				{
+					forwardCh = m_channelFactory.Create<SatChannel> ();
+          forwardCh->SetChannelType (isUserLink ? SatEnums::FORWARD_USER_CH : SatEnums::FORWARD_FEEDER_CH);
+					forwardCh->SetFrequencyConverter (m_carrierFreqConverter);
+					forwardCh->SetBandwidthConverter (m_carrierBandwidthConverter);
+					forwardCh->SetFrequencyId (fwdFrequencyId);
+					forwardCh->SetPropagationDelayModel (pDelay);
+					forwardCh->SetFreeSpaceLoss (pFsl);
+				}
+
+			if (!hasRtnChannel)
+				{
+					returnCh = m_channelFactory.Create<SatChannel> ();
+          returnCh->SetChannelType (isUserLink ? SatEnums::RETURN_USER_CH : SatEnums::RETURN_FEEDER_CH);
+					returnCh->SetFrequencyConverter (m_carrierFreqConverter);
+					returnCh->SetBandwidthConverter (m_carrierBandwidthConverter);
+					returnCh->SetFrequencyId (rtnFrequencyId);
+					returnCh->SetPropagationDelayModel (pDelay);
+					returnCh->SetFreeSpaceLoss (pFsl);
+				}
+
+      chPairs->StoreChannelPair (beamId, fwdFrequencyId, forwardCh, rtnFrequencyId, returnCh);
     }
 
   return chPairs->GetChannelPair (beamId);
