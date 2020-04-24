@@ -199,42 +199,54 @@ SatGwMac::StartTransmission (uint32_t carrierId)
 {
   NS_LOG_FUNCTION (this);
 
-  Ptr<SatBbFrame> bbFrame = m_fwdScheduler->GetNextFrame ().first;
+  Time txDuration;
 
-  if ( bbFrame == NULL )
+  if (m_txEnabled)
     {
-      NS_FATAL_ERROR ("BB Frame is missing!!!");
+      std::pair<Ptr<SatBbFrame>, const Time> bbFrameInfo = m_fwdScheduler->GetNextFrame ();
+      Ptr<SatBbFrame> bbFrame = bbFrameInfo.first;
+      txDuration = bbFrameInfo.second;
+
+      // Handle both dummy frames and normal frames
+      if ( bbFrame != NULL )
+        {
+          // trace out BB frames sent.
+          m_bbFrameTxTrace (bbFrame->GetFrameType ());
+
+          // Add packet trace entry:
+          m_packetTrace (Simulator::Now (),
+                         SatEnums::PACKET_SENT,
+                         m_nodeInfo->GetNodeType (),
+                         m_nodeInfo->GetNodeId (),
+                         m_nodeInfo->GetMacAddress (),
+                         SatEnums::LL_MAC,
+                         SatEnums::LD_FORWARD,
+                         SatUtils::GetPacketInfo (bbFrame->GetPayload ()));
+
+          SatSignalParameters::txInfo_s txInfo;
+          txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
+          txInfo.modCod = bbFrame->GetModcod ();
+          txInfo.sliceId = bbFrame->GetSliceId ();
+          txInfo.frameType = bbFrame->GetFrameType ();
+          txInfo.waveformId = 0;
+
+          /**
+           * Decrease a guard time from BB frame duration.
+           */
+          SendPacket (bbFrame->GetPayload (), carrierId, txDuration - m_guardTime, txInfo);
+        }
+      // Pass information of dummy frame even if dummy frames are not generated
+      else m_bbFrameTxTrace (SatEnums::DUMMY_FRAME);
     }
-
-  Time txDuration = bbFrame->GetDuration ();
-
-  // Always sent if non dummy frame in question. Dummy frames sent only when sending is enabled
-  if ( ( bbFrame->GetFrameType () != SatEnums::DUMMY_FRAME ) || m_dummyFrameSendingEnabled )
+  else
     {
-      // trace out BB frames sent.
-      m_bbFrameTxTrace (bbFrame);
-
-      // Add packet trace entry:
-      m_packetTrace (Simulator::Now (),
-                     SatEnums::PACKET_SENT,
-                     m_nodeInfo->GetNodeType (),
-                     m_nodeInfo->GetNodeId (),
-                     m_nodeInfo->GetMacAddress (),
-                     SatEnums::LL_MAC,
-                     SatEnums::LD_FORWARD,
-                     SatUtils::GetPacketInfo (bbFrame->GetPayload ()));
-
-      SatSignalParameters::txInfo_s txInfo;
-      txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
-      txInfo.modCod = bbFrame->GetModcod ();
-      txInfo.sliceId = bbFrame->GetSliceId ();
-      txInfo.frameType = bbFrame->GetFrameType ();
-      txInfo.waveformId = 0;
-
       /**
-       * Decrease a guard time from BB frame duration.
+       * GW MAC is disabled, thus get the duration of the default BB frame
+       * and try again then.
        */
-      SendPacket (bbFrame->GetPayload (), carrierId, txDuration - m_guardTime, txInfo);
+
+      NS_LOG_INFO ("Beam id: " << m_beamId << " is disabled, thus nothing is transmitted!");
+      txDuration = m_fwdScheduler->GetDefaultFrameDuration ();
     }
 
   /**
@@ -246,7 +258,6 @@ SatGwMac::StartTransmission (uint32_t carrierId)
    */
   Simulator::Schedule (txDuration, &SatGwMac::StartTransmission, this, 0);
 }
-
 
 void
 SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
