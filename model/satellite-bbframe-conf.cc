@@ -470,6 +470,13 @@ SatBbFrameConf::GetBbFramePayloadBits (SatEnums::SatModcod_t modcod, SatEnums::S
   return m_waveforms.at (std::make_pair (modcod, frameType))->GetPayloadInBits ();
 }
 
+double
+SatBbFrameConf::GetSymbolRate ()
+{
+  NS_LOG_FUNCTION (this);
+  return m_symbolRate;
+}
+
 Time
 SatBbFrameConf::GetBbFrameDuration (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType) const
 {

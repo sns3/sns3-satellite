@@ -42,6 +42,7 @@
 #include <ns3/satellite-stats-signalling-load-helper.h>
 #include <ns3/satellite-stats-throughput-helper.h>
 #include <ns3/satellite-stats-waveform-usage-helper.h>
+#include <ns3/satellite-stats-fwd-link-scheduler-symbol-rate-helper.h>
 #include <ns3/satellite-stats-frame-type-usage-helper.h>
 #include <ns3/satellite-stats-beam-service-time-helper.h>
 
@@ -125,8 +126,8 @@ SatStatsHelperContainer::DoDispose ()
       SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT",         \
       SatStatsHelper::OUTPUT_CDF_PLOT,       "CDF_PLOT"))
 
-#define ADD_SAT_STATS_ATTRIBUTE_HEAD(id, desc)                                \
-  .AddAttribute (# id,                                                         \
+#define ADD_SAT_STATS_ATTRIBUTE_HEAD(id, desc)                     \
+  .AddAttribute (# id,                                             \
       std::string ("Enable the output of ") + desc,                \
       EnumValue (SatStatsHelper::OUTPUT_NONE),                     \
       MakeEnumAccessor (&SatStatsHelperContainer::Add ## id),      \
@@ -531,6 +532,7 @@ SatStatsHelperContainer::GetName () const
  * - Add [Global, PerGw, PerBeam] BackloggedRequest
  * - Add [Global, PerGw, PerBeam] Frame [Symbol, User] Load
  * - Add [Global, PerGw, PerBeam] WaveformUsage
+ * - Add [Global, PerSlice] SymbolRate
  * - AddGlobal [Fwd, Rtn] [Feeder, User] LinkSinr
  * - AddGlobal [Fwd, Rtn] [Feeder, User] LinkRxPower
  *
@@ -683,6 +685,25 @@ SatStatsHelperContainer::GetName () const
     m_stats.push_back (stat);                                                       \
   }                                                                                 \
 }
+
+  #define SAT_STATS_PER_SLICE_METHOD_DEFINITION(id, name)                               \
+  void                                                                                  \
+  SatStatsHelperContainer::AddPerSlice ## id (SatStatsHelper::OutputType_t type)        \
+  {                                                                                     \
+    NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));                 \
+    if (type != SatStatsHelper::OUTPUT_NONE)                                            \
+    {                                                                                   \
+      Ptr<SatStats ## id ## Helper> stat                                                \
+        = CreateObject<SatStats ## id ## Helper> (m_satHelper);                         \
+      stat->SetName (m_name + "-per-slice-" + name                                       \
+                     + GetOutputTypeSuffix (type));                                     \
+      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_SLICE);                       \
+      stat->SetOutputType (type);                                                       \
+      stat->Install ();                                                                 \
+      m_stats.push_back (stat);                                                         \
+    }                                                                                   \
+  }
+
 
 // Forward link application-level packet delay statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdAppDelay, "fwd-app-delay")
@@ -973,6 +994,11 @@ SAT_STATS_PER_BEAM_METHOD_DEFINITION     (AntennaGain, "antenna-gain")
 SAT_STATS_PER_UT_METHOD_DEFINITION       (AntennaGain, "antenna-gain")
 SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (AntennaGain, "antenna-gain")
 SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (AntennaGain, "antenna-gain")
+
+// Fwd Link Scheduler symbol rate statistics
+SAT_STATS_PER_SLICE_METHOD_DEFINITION   (FwdLinkSchedulerSymbolRate, "fwd-link-scheduler-symbol-rate")
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (FwdLinkSchedulerSymbolRate, "fwd-link-scheduler-symbol-rate")
+
 
 
 std::string // static

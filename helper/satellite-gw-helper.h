@@ -225,6 +225,11 @@ private:
    * \brief The used random access model settings
    */
   RandomAccessSettings_s m_raSettings;
+
+  /**
+   * \brief The forward link algorithm used
+   */
+  SatEnums::FwdSchedulingAlgorithm_t m_fwdSchedulingAlgorithm;
 };
 
 } // namespace ns3

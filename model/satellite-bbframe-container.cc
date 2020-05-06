@@ -41,7 +41,8 @@ SatBbFrameContainer::SatBbFrameContainer ()
 
 SatBbFrameContainer::SatBbFrameContainer (std::vector<SatEnums::SatModcod_t>& modcodsInUse, Ptr<SatBbFrameConf> conf)
   : m_totalDuration (Seconds (0)),
-  m_bbFrameConf (conf)
+  m_bbFrameConf (conf),
+  m_maxSymbolRate (conf->GetSymbolRate ())
 {
   NS_LOG_FUNCTION (this);
 
@@ -148,6 +149,21 @@ SatBbFrameContainer::GetBytesLeftInTailFrame (uint32_t priorityClass, SatEnums::
   return bytesLeft;
 }
 
+bool
+SatBbFrameContainer::IsEmpty (uint32_t priorityClass, SatEnums::SatModcod_t modcod)
+{
+  NS_LOG_FUNCTION (this);
+
+  if ( priorityClass > 0)
+    {
+      return m_container.at (modcod).empty ();
+    }
+  else
+    {
+      return m_ctrlContainer.empty ();
+    }
+}
+
 void
 SatBbFrameContainer::AddData (uint32_t priorityClass, SatEnums::SatModcod_t modcod, Ptr<Packet> data)
 {
@@ -155,8 +171,7 @@ SatBbFrameContainer::AddData (uint32_t priorityClass, SatEnums::SatModcod_t modc
 
   if ( priorityClass > 0)
     {
-      if ( m_container.at (modcod).empty ()
-           || GetBytesLeftInTailFrame (priorityClass, modcod) < data->GetSize () )
+      if ( (m_container.at (modcod).empty ()) || (GetBytesLeftInTailFrame (priorityClass, modcod) < data->GetSize ()))
         {
           CreateFrameToTail (priorityClass, modcod);
         }
@@ -191,6 +206,24 @@ Time
 SatBbFrameContainer::GetTotalDuration () const
 {
   return m_totalDuration;
+}
+
+uint32_t
+SatBbFrameContainer::GetFrameSymbols (SatEnums::SatModcod_t modcod)
+{
+  return m_bbFrameConf->GetBbFrameDuration (modcod, m_defaultBbFrameType).GetSeconds () * m_bbFrameConf->GetSymbolRate ();
+}
+
+void
+SatBbFrameContainer::SetMaxSymbolRate (uint32_t maxSymbolRate)
+{
+  m_maxSymbolRate = maxSymbolRate;
+}
+
+uint32_t
+SatBbFrameContainer::GetMaxSymbolRate ()
+{
+  return m_maxSymbolRate;
 }
 
 Ptr<SatBbFrame>

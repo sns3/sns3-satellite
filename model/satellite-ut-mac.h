@@ -142,6 +142,17 @@ public:
   void SetTxCheckCallback (SatUtMac::TxCheckCallback cb);
 
   /**
+   * Callback to check if TX is operational
+   */
+  typedef Callback<void, uint8_t> SliceSubscriptionCallback;
+
+  /**
+   * \brief Get sliec subscription info from MAC layer
+   * \param cb callback to invoke slices subscription changes
+   */
+  void SetSliceSubscriptionCallback (SatUtMac::SliceSubscriptionCallback cb);
+
+  /**
    * Get Tx time for the next possible superframe.
    * \param superFrameSeqId Superframe sequence id
    * \return Time Time to transmit
@@ -572,6 +583,11 @@ private:
    * Tx checking callback
    */
   SatUtMac::TxCheckCallback m_txCheckCallback;
+
+  /**
+   * Tx checking callback
+   */
+  SatUtMac::SliceSubscriptionCallback m_sliceSubscriptionCallback;
 };
 
 } // namespace ns3

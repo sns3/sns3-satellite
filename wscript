@@ -42,6 +42,8 @@ def build(bld):
         'model/satellite-fading-oscillator.cc',
         'model/satellite-fwd-carrier-conf.cc',
         'model/satellite-fwd-link-scheduler.cc',
+        'model/satellite-fwd-link-scheduler-default.cc',
+        'model/satellite-fwd-link-scheduler-time-slicing.cc',
         'model/satellite-frame-allocator.cc',
         'model/satellite-frame-conf.cc',
         'model/satellite-free-space-loss.cc',
@@ -167,6 +169,7 @@ def build(bld):
         'stats/satellite-stats-throughput-helper.cc',
         'stats/satellite-stats-waveform-usage-helper.cc',
         'stats/satellite-stats-helper-container.cc',
+        'stats/satellite-stats-fwd-link-scheduler-symbol-rate-helper.cc',
         ]
 
     module_test = bld.create_ns3_module_test_library('satellite')
@@ -245,6 +248,8 @@ def build(bld):
         'model/satellite-free-space-loss.h',
         'model/satellite-fwd-carrier-conf.h',
         'model/satellite-fwd-link-scheduler.h',
+        'model/satellite-fwd-link-scheduler-default.h',
+        'model/satellite-fwd-link-scheduler-time-slicing.h',
         'model/satellite-generic-stream-encapsulator.h',
         'model/satellite-generic-stream-encapsulator-arq.h',
         'model/satellite-geo-feeder-phy.h',
@@ -369,6 +374,7 @@ def build(bld):
         'stats/satellite-stats-throughput-helper.h',
         'stats/satellite-stats-waveform-usage-helper.h',
         'stats/satellite-stats-helper-container.h',
+        'stats/satellite-stats-fwd-link-scheduler-symbol-rate-helper.h',
         ]
 
     if (bld.env['ENABLE_EXAMPLES']):

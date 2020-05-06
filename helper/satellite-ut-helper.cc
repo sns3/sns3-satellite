@@ -315,6 +315,9 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId,
   phy->SetAttribute ("ReceiveCb", CallbackValue (recCb));
   mac->SetTxCheckCallback (MakeCallback (&SatUtPhy::IsTxPossible, phy));
 
+  // Create callback to inform phy layer slices subscription
+  mac->SetSliceSubscriptionCallback (MakeCallback (&SatUtPhy::UpdateSliceSubscription, phy));
+
   // Create Logical Link Control (LLC) layer
   Ptr<SatUtLlc> llc = CreateObject<SatUtLlc> ();
 

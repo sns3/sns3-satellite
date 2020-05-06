@@ -84,6 +84,16 @@ public:
   } FadingModel_t;
 
   /**
+   * \enum FwdSchedulingAlgorithm_t
+   * \brief The scheduling algorithm used to fill the BBFrames.
+   */
+  typedef enum
+  {
+    NO_TIME_SLICING,
+    TIME_SLICING
+  } FwdSchedulingAlgorithm_t;
+
+  /**
    * \enum SatModcod_t
    * \brief Modulation scheme and coding rate for DVB-S2.
    */

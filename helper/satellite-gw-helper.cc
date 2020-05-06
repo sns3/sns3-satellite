@@ -47,6 +47,8 @@
 #include "ns3/singleton.h"
 #include "ns3/satellite-id-mapper.h"
 #include <ns3/satellite-fwd-link-scheduler.h>
+#include <ns3/satellite-fwd-link-scheduler-default.h>
+#include <ns3/satellite-fwd-link-scheduler-time-slicing.h>
 #include <ns3/satellite-typedefs.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatGwHelper");
@@ -76,6 +78,12 @@ SatGwHelper::GetTypeId (void)
                    MakeEnumChecker (SatPhyRxCarrierConf::EM_NONE, "None",
                                     SatPhyRxCarrierConf::EM_CONSTANT, "Constant",
                                     SatPhyRxCarrierConf::EM_AVI, "AVI"))
+    .AddAttribute ("FwdSchedulingAlgorithm",
+                   "The scheduling algorithm used to fill the BBFrames",
+                   EnumValue (SatEnums::NO_TIME_SLICING),
+                   MakeEnumAccessor (&SatGwHelper::m_fwdSchedulingAlgorithm),
+                   MakeEnumChecker (SatEnums::NO_TIME_SLICING, "NoTimeSlicing",
+                                    SatEnums::TIME_SLICING, "TimeSlicing"))
     .AddAttribute ("RtnLinkConstantErrorRate",
                    "Constant error rate",
                    DoubleValue (0.01),
@@ -145,6 +153,18 @@ void
 SatGwHelper::Initialize (Ptr<SatLinkResultsDvbRcs2> lrRcs2, Ptr<SatLinkResultsDvbS2> lrS2)
 {
   NS_LOG_FUNCTION (this);
+
+  switch (m_fwdSchedulingAlgorithm)
+    {
+    case SatEnums::NO_TIME_SLICING:
+      Config::SetDefault ("ns3::SatBbFrameConf::PlHeaderInSlots", UintegerValue (1));
+      break;
+    case SatEnums::TIME_SLICING:
+      Config::SetDefault ("ns3::SatBbFrameConf::PlHeaderInSlots", UintegerValue (2));
+      break;
+    default:
+      NS_FATAL_ERROR ("Forward scheduling algorithm is not implemented");
+    }
 
   // TODO: Usage of multiple carriers needed to take into account, now only one carrier assumed to be used.
   // TODO: Symbol rate needed to check.
@@ -357,14 +377,27 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
 
   // TODO: When multiple carriers are supported. Multiple scheduler are needed too.
   double carrierBandwidth = m_carrierBandwidthConverter (SatEnums::FORWARD_FEEDER_CH, 0, SatEnums::EFFECTIVE_BANDWIDTH);
-  Ptr<SatFwdLinkScheduler> fdwLinkScheduler = CreateObject<SatFwdLinkScheduler> (m_bbFrameConf, addr, carrierBandwidth);
+
+  Ptr<SatFwdLinkScheduler> fwdLinkScheduler;
+  switch (m_fwdSchedulingAlgorithm)
+    {
+    case SatEnums::NO_TIME_SLICING:
+      fwdLinkScheduler = CreateObject<SatFwdLinkSchedulerDefault> (m_bbFrameConf, addr, carrierBandwidth);
+      break;
+    case SatEnums::TIME_SLICING:
+      fwdLinkScheduler = CreateObject<SatFwdLinkSchedulerTimeSlicing> (m_bbFrameConf, addr, carrierBandwidth);
+      (DynamicCast<SatFwdLinkSchedulerTimeSlicing> (fwdLinkScheduler))->SetSendControlMsgCallback (MakeCallback (&SatNetDevice::SendControlMsg, dev));
+      break;
+    default:
+      NS_FATAL_ERROR ("Forward scheduling algorithm is not implemented");
+    }
 
   // Attach the LLC Tx opportunity and scheduling context getter callbacks to SatFwdLinkScheduler
-  fdwLinkScheduler->SetTxOpportunityCallback (MakeCallback (&SatGwLlc::NotifyTxOpportunity, llc));
-  fdwLinkScheduler->SetSchedContextCallback (MakeCallback (&SatLlc::GetSchedulingContexts, llc));
+  fwdLinkScheduler->SetTxOpportunityCallback (MakeCallback (&SatGwLlc::NotifyTxOpportunity, llc));
+  fwdLinkScheduler->SetSchedContextCallback (MakeCallback (&SatLlc::GetSchedulingContexts, llc));
 
   // set scheduler to Mac
-  mac->SetAttribute ("Scheduler", PointerValue (fdwLinkScheduler));
+  mac->SetAttribute ("Scheduler", PointerValue (fwdLinkScheduler));
 
   mac->StartPeriodicTransmissions ();
 

@@ -235,4 +235,40 @@ SatUtPhy::IsTxPossible (void) const
   return m_phyTx->CanTransmit ();
 }
 
+void
+SatUtPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
+{
+  NS_LOG_FUNCTION (this << rxParams << phyError);
+
+  uint8_t slice = rxParams->m_txInfo.sliceId;
+
+  if (rxParams->m_txInfo.frameType == SatEnums::DUMMY_FRAME)
+    {
+      NS_LOG_INFO ("Dummy frame receive, it is not decoded");
+    }
+  else if ((slice == 0) || (m_slicesSubscribed.count(slice) != 0))
+
+    {
+      // Slice is zero or is in the subscription list, we decode and forward to upper layers
+      SatPhy::Receive (rxParams, phyError);
+    }
+  else
+    {
+      NS_LOG_INFO ("Slice of BBFrame (" << (uint32_t) slice << ") not in list of subscriptions: BBFrame dropped");
+    }
+}
+
+void
+SatUtPhy::UpdateSliceSubscription(uint8_t slice)
+{
+  if (slice == 0)
+    {
+      m_slicesSubscribed.clear ();
+    }
+  else
+    {
+      m_slicesSubscribed.insert (slice);
+    }
+}
+
 } // namespace ns3

@@ -22,6 +22,7 @@
 #define SAT_FWD_LINK_SCHEDULER_H
 
 #include <cstring>
+#include <math.h>
 
 #include "ns3/address.h"
 #include "ns3/ptr.h"
@@ -110,6 +111,12 @@ public:
   static TypeId GetTypeId (void);
 
   /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
+  virtual TypeId GetInstanceTypeId (void) const;
+
+  /**
    * Construct a SatFwdLinkScheduler
    *
    * This the default constructor for the SatFwdLinkScheduler is not supported.
@@ -188,7 +195,8 @@ public:
    */
   Time GetDefaultFrameDuration () const;
 
-private:
+protected:
+
   typedef std::map<Mac48Address, Ptr<SatCnoEstimator> > CnoEstimatorMap_t;
 
   SatFwdLinkScheduler& operator = (const SatFwdLinkScheduler &);
@@ -219,6 +227,11 @@ private:
    * \return C/N0 estimated for object. NAN, if estimate is not available.
    */
   double GetSchedulingObjectCno (Ptr<SatSchedulingObject> ob);
+
+  /**
+   * Send stats and reset all the symbols sent count for each slice to zero.
+   */
+  virtual void SendAndClearSymbolsSentStat ();
 
   /**
    *  Handles periodic timer timeouts.
@@ -273,24 +286,9 @@ private:
   Ptr<SatBbFrameConf> m_bbFrameConf;
 
   /**
-   * Threshold time of total transmissions in BB Frame container to trigger a scheduling round.
-   */
-  Time m_schedulingStartThresholdTime;
-
-  /**
-   * Threshold time of total transmissions in BB Frame container to stop a scheduling round.
-   */
-  Time m_schedulingStopThresholdTime;
-
-  /**
    * Additional sorting criteria for scheduling objects received from LLC.
    */
   ScheduleSortingCriteria_t m_additionalSortCriteria;
-
-  /**
-   * The container for BB Frames.
-   */
-  Ptr<SatBbFrameContainer> m_bbFrameContainer;
 
   /**
    * Callback to notify the txOpportunity to upper layer
@@ -323,6 +321,12 @@ private:
    * Carrier bandwidth in hertz where scheduler is associated to.
    */
   double m_carrierBandwidthInHz;
+
+  /**
+   * Traced callback for symbol rate, with flowId, requested Modcod info
+   */
+  TracedCallback<uint8_t, double> m_schedulingSymbolRateTrace;
+
 
 };
 

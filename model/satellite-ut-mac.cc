@@ -101,7 +101,8 @@ SatUtMac::SatUtMac ()
   m_gatewayUpdateCallback (0),
   m_routingUpdateCallback (0),
   m_beamCheckerCallback (0),
-  m_txCheckCallback (0)
+  m_txCheckCallback (0),
+  m_sliceSubscriptionCallback (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -124,7 +125,8 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, bool crdsaOnlyFo
   m_gatewayUpdateCallback (0),
   m_routingUpdateCallback (0),
   m_beamCheckerCallback (0),
-  m_txCheckCallback (0)
+  m_txCheckCallback (0),
+  m_sliceSubscriptionCallback (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -152,6 +154,7 @@ SatUtMac::DoDispose (void)
   m_routingUpdateCallback.Nullify ();
   m_beamCheckerCallback.Nullify ();
   m_txCheckCallback.Nullify ();
+  m_sliceSubscriptionCallback.Nullify ();
   m_tbtpContainer->DoDispose ();
   m_utScheduler->DoDispose ();
   m_utScheduler = NULL;
@@ -193,6 +196,14 @@ SatUtMac::SetTxCheckCallback (SatUtMac::TxCheckCallback cb)
   NS_LOG_FUNCTION (this << &cb);
 
   m_txCheckCallback = cb;
+}
+
+void
+SatUtMac::SetSliceSubscriptionCallback (SatUtMac::SliceSubscriptionCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+
+  m_sliceSubscriptionCallback = cb;
 }
 
 void
@@ -758,6 +769,18 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
           }
         break;
       }
+    case SatControlMsgTag::SAT_SLICE_CTRL_MSG:
+      {
+        uint32_t sliceCtrlId = ctrlTag.GetMsgId ();
+        Ptr<SatSliceSubscriptionMessage> sliceMsg = DynamicCast<SatSliceSubscriptionMessage> (m_readCtrlCallback (sliceCtrlId));
+
+        if (m_nodeInfo->GetMacAddress () == sliceMsg->GetAddress ())
+          {
+            m_sliceSubscriptionCallback (sliceMsg->GetSliceId ());
+          }
+
+        break;
+      }
     default:
       {
         NS_FATAL_ERROR ("SatUtMac received a non-supported control packet!");
@@ -1142,6 +1165,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
           SatSignalParameters::txInfo_s txInfo;
           txInfo.packetType = SatEnums::PACKET_TYPE_CRDSA;
           txInfo.modCod = wf->GetModCod ();
+          txInfo.sliceId = 0;
           txInfo.fecBlockSizeInBytes = wf->GetPayloadInBytes ();
           txInfo.frameType = SatEnums::UNDEFINED_FRAME;
           txInfo.waveformId = wf->GetWaveformId ();
