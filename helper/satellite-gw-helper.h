@@ -89,9 +89,9 @@ public:
   /*
    * Initializes the GW helper based on attributes
    * \param lrRcs2 DVB-RCS2 link results
-   * \param lrS2 DVB-S2 link results
+   * \param lrFwd DVB-S2 or DVB-S2X link results
    */
-  void Initialize (Ptr<SatLinkResultsDvbRcs2> lrRcs2, Ptr<SatLinkResultsDvbS2> lrS2);
+  void Initialize (Ptr<SatLinkResultsDvbRcs2> lrRcs2, Ptr<SatLinkResultsFwd> lrFwd);
 
   /**
    * Get BB frame configuration.

@@ -84,6 +84,16 @@ public:
   } FadingModel_t;
 
   /**
+   * \enum DvbVersion_t
+   * \brief The scheduling algorithm used to fill the BBFrames.
+   */
+  typedef enum
+  {
+    DVB_S2,
+    DVB_S2X
+  } DvbVersion_t;
+
+  /**
    * \enum FwdSchedulingAlgorithm_t
    * \brief The scheduling algorithm used to fill the BBFrames.
    */
@@ -126,7 +136,9 @@ public:
     SAT_MODCOD_32APSK_3_TO_4,  // 0.75
     SAT_MODCOD_32APSK_4_TO_5,  // 0.80
     SAT_MODCOD_32APSK_5_TO_6,  // 0.83
-    SAT_MODCOD_32APSK_8_TO_9   // 0.89
+    SAT_MODCOD_32APSK_8_TO_9,   // 0.89
+
+    SAT_MODCOD_QPSK_1_TO_4   // 0.89
   } SatModcod_t;
 
 
@@ -167,6 +179,19 @@ public:
     modcods.push_back (SAT_MODCOD_32APSK_4_TO_5);
     modcods.push_back (SAT_MODCOD_32APSK_5_TO_6);
     modcods.push_back (SAT_MODCOD_32APSK_8_TO_9);
+  }
+
+
+  static inline void GetAvailableModcodsFwdLinkS2X (std::vector<SatModcod_t>& modcods)
+  {
+    /**
+     * Note that the order of MODCODs have a meaning in ACM.
+     * The MODCODs should be in decreasing order based on
+     * coding rate.
+     */
+
+    modcods.push_back (SAT_MODCOD_QPSK_1_TO_4);
+    modcods.push_back (SAT_MODCOD_QPSK_1_TO_2);
   }
 
   static inline void GetAvailableModcodsRtnLink (std::vector<SatModcod_t>& modcods)

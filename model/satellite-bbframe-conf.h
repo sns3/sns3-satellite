@@ -27,6 +27,7 @@
 #include <ns3/simple-ref-count.h>
 #include <ns3/nstime.h>
 #include <ns3/satellite-enums.h>
+#include <ns3/satellite-link-results.h>
 
 namespace ns3 {
 
@@ -223,9 +224,9 @@ public:
   /**
    * \brief Initialize the C/No requirements for a given BLER target.
    *
-   * \param linkResults DVB-S2 link results
+   * \param linkResults DVB-S2 pr DVB-S2X link results
    */
-  void InitializeCNoRequirements ( Ptr<SatLinkResultsDvbS2> linkResults );
+  void InitializeCNoRequirements ( Ptr<SatLinkResultsFwd> linkResults );
 
   /**
    * \brief Get the dummy frame duration in Time.
@@ -281,6 +282,13 @@ public:
    * \brief Dump waveform details for debugging purposes
    */
   void DumpWaveforms () const;
+
+  /**
+   * \brief Indicates if using DVB-S2 or DVB-S2X
+   *
+   * \return The DVB version chosen
+   */
+  SatEnums::DvbVersion_t GetDvbVersion ();
 
 private:
   /**
@@ -390,6 +398,11 @@ private:
    * The most robust MODCOD for long frame.
    */
   SatEnums::SatModcod_t m_mostRobustNormalFrameModcod;
+
+  /**
+   * Indicates if using DVB-S2 or DVB-S2X
+   */
+  SatEnums::DvbVersion_t m_dvbVersion;
 };
 
 } // namespace ns3

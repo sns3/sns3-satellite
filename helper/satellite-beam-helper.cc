@@ -264,16 +264,16 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
   // - Packet reception at the UT
   // - FWD link packet scheduling at the GW
   //
-  Ptr<SatLinkResultsDvbS2> linkResultsS2 = CreateObject<SatLinkResultsDvbS2> ();
+  Ptr<SatLinkResultsFwd> linkResultsFwd = CreateObject<SatLinkResultsDvbS2X> ();
   Ptr<SatLinkResultsDvbRcs2> linkResultsRcs2 = CreateObject<SatLinkResultsDvbRcs2> ();
-  linkResultsS2->Initialize ();
+  linkResultsFwd->Initialize ();
   linkResultsRcs2->Initialize ();
 
   // DVB-S2 link results for packet decoding at the UT
-  m_utHelper->Initialize (linkResultsS2);
+  m_utHelper->Initialize (linkResultsFwd);
   // DVB-RCS2 link results for packet decoding at the GW +
   // DVB-S2 link results for FWD link RRM
-  m_gwHelper->Initialize (linkResultsRcs2, linkResultsS2);
+  m_gwHelper->Initialize (linkResultsRcs2, linkResultsFwd);
   // DVB-RCS2 link results for RTN link waveform configurations
   m_superframeSeq->GetWaveformConf ()->InitializeEbNoRequirements (linkResultsRcs2);
 

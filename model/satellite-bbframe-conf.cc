@@ -28,7 +28,6 @@
 #include <ns3/uinteger.h>
 #include <ns3/boolean.h>
 #include <ns3/enum.h>
-#include <ns3/satellite-link-results.h>
 #include <ns3/satellite-utils.h>
 #include "satellite-bbframe-conf.h"
 
@@ -147,7 +146,8 @@ SatBbFrameConf::SatBbFrameConf ()
   m_waveforms (),
   m_bbFrameUsageMode (NORMAL_FRAMES),
   m_mostRobustShortFrameModcod (SatEnums::SAT_NONVALID_MODCOD),
-  m_mostRobustNormalFrameModcod (SatEnums::SAT_NONVALID_MODCOD)
+  m_mostRobustNormalFrameModcod (SatEnums::SAT_NONVALID_MODCOD),
+  m_dvbVersion (SatEnums::DVB_S2)
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("Default constructor not supported!!!");
@@ -171,7 +171,8 @@ SatBbFrameConf::SatBbFrameConf (double symbolRate)
   m_waveforms (),
   m_bbFrameUsageMode (NORMAL_FRAMES),
   m_mostRobustShortFrameModcod (SatEnums::SAT_NONVALID_MODCOD),
-  m_mostRobustNormalFrameModcod (SatEnums::SAT_NONVALID_MODCOD)
+  m_mostRobustNormalFrameModcod (SatEnums::SAT_NONVALID_MODCOD),
+  m_dvbVersion (SatEnums::DVB_S2)
 {
   ObjectBase::ConstructSelf (AttributeConstructionList ());
 
@@ -184,7 +185,16 @@ SatBbFrameConf::SatBbFrameConf (double symbolRate)
 
   // Available MODCODs
   std::vector<SatEnums::SatModcod_t> modcods;
-  SatEnums::GetAvailableModcodsFwdLink (modcods);
+
+  switch(m_dvbVersion)
+  {
+    case SatEnums::DVB_S2:
+      SatEnums::GetAvailableModcodsFwdLink (modcods);
+      break;
+    case SatEnums::DVB_S2X:
+      SatEnums::GetAvailableModcodsFwdLinkS2X (modcods);
+      break;
+  }
 
   // Available frame types
   std::vector<SatEnums::SatBbFrameType_t> frameTypes;
@@ -317,7 +327,7 @@ SatBbFrameConf::GetTypeId (void)
                                      SatEnums::SAT_MODCOD_16APSK_8_TO_9,  "16APSK_8_TO_9",
                                      SatEnums::SAT_MODCOD_16APSK_9_TO_10, "16APSK_9_TO_10",
                                      SatEnums::SAT_MODCOD_32APSK_3_TO_4,  "32APSK_3_TO_4",
-                                     SatEnums::SAT_MODCOD_32APSK_4_TO_5,  "32APSK_4_TO_5"))
+                                     SatEnums::SAT_MODCOD_32APSK_4_TO_5,  "32APSK_4_TO_5")) // TODO add new MODCODS
     .AddAttribute ( "BbFrameHeaderInBytes",
                     "BB Frame header size in bytes",
                     UintegerValue (10), // ETSI EN 302 307 V1.3.1 specified 80 bits
@@ -340,6 +350,12 @@ SatBbFrameConf::GetTypeId (void)
                    MakeEnumChecker (SatBbFrameConf::SHORT_FRAMES, "ShortFrames",
                                     SatBbFrameConf::NORMAL_FRAMES, "NormalFrames",
                                     SatBbFrameConf::SHORT_AND_NORMAL_FRAMES, "ShortAndNormalFrames"))
+    .AddAttribute ("DvbVersion",
+                   "Indicates if using DVB-S2 or DVB-S2X.",
+                   EnumValue (SatEnums::DVB_S2),
+                   MakeEnumAccessor (&SatBbFrameConf::m_dvbVersion),
+                   MakeEnumChecker (SatEnums::DVB_S2, "DVB_S2",
+                                    SatEnums::DVB_S2X, "DVB_S2X"))
     .AddConstructor<SatBbFrameConf> ()
   ;
   return tid;
@@ -357,7 +373,7 @@ SatBbFrameConf::~SatBbFrameConf ()
 }
 
 void
-SatBbFrameConf::InitializeCNoRequirements ( Ptr<SatLinkResultsDvbS2> linkResults )
+SatBbFrameConf::InitializeCNoRequirements ( Ptr<SatLinkResultsFwd> linkResults )
 {
   NS_LOG_FUNCTION (this);
 
@@ -392,6 +408,12 @@ SatBbFrameConf::DumpWaveforms () const
     {
       it->second->Dump ();
     }
+}
+
+SatEnums::DvbVersion_t
+SatBbFrameConf::GetDvbVersion ()
+{
+  return m_dvbVersion;
 }
 
 uint32_t

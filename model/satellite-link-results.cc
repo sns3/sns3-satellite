@@ -126,11 +126,12 @@ SatLinkResultsDvbRcs2::GetEbNoDb (uint32_t waveformId, double blerTarget) const
 }
 
 /*
- * SATLINKRESULTSDVBS2 CHILD CLASS
+ * SATLINKRESULTSFWD ABSTRACT CLASS
  */
-NS_OBJECT_ENSURE_REGISTERED (SatLinkResultsDvbS2);
 
-SatLinkResultsDvbS2::SatLinkResultsDvbS2 ()
+NS_OBJECT_ENSURE_REGISTERED (SatLinkResultsFwd);
+
+SatLinkResultsFwd::SatLinkResultsFwd ()
   : SatLinkResults (),
   m_table (),
   m_shortFrameOffsetInDb (0.0)
@@ -139,17 +140,78 @@ SatLinkResultsDvbS2::SatLinkResultsDvbS2 ()
 }
 
 TypeId
-SatLinkResultsDvbS2::GetTypeId ()
+SatLinkResultsFwd::GetTypeId ()
 {
-  static TypeId tid = TypeId ("ns3::SatLinkResultsDvbS2")
+  static TypeId tid = TypeId ("ns3::SatLinkResultsFwd")
     .SetParent<SatLinkResults> ()
     .AddAttribute ( "EsNoOffsetForShortFrame",
                     "EsNo increase offset for short BB frame with a given BLER",
                     DoubleValue (0.4),
-                    MakeDoubleAccessor (&SatLinkResultsDvbS2::m_shortFrameOffsetInDb),
+                    MakeDoubleAccessor (&SatLinkResultsFwd::m_shortFrameOffsetInDb),
                     MakeDoubleChecker <double_t> ())
   ;
   return tid;
+}
+
+double
+SatLinkResultsFwd::GetBler (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType, double esNoDb) const
+{
+  NS_LOG_FUNCTION (this << modcod << esNoDb);
+
+  if (!m_isInitialized)
+    {
+      NS_FATAL_ERROR ("Error retrieving link results, call Initialize first");
+    }
+
+  /**
+   * Short BB frame is assumed to be requiring m_shortFrameOffsetInDb dB
+   * higher Es/No if compared to normal BB frame.
+   * TODO: Proper link results need to be added for short BB frame in FWD link.
+   */
+  if (frameType == SatEnums::SHORT_FRAME)
+    {
+      esNoDb -= m_shortFrameOffsetInDb;
+    }
+
+  return m_table.at (modcod)->GetBler (esNoDb);
+}
+
+double
+SatLinkResultsFwd::GetEsNoDb (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType, double blerTarget) const
+{
+  NS_LOG_FUNCTION (this << modcod << blerTarget);
+
+  if (!m_isInitialized)
+    {
+      NS_FATAL_ERROR ("Error retrieving link results, call Initialize first");
+    }
+
+  // Get Es/No requirement for normal BB frame
+  double esno = m_table.at (modcod)->GetEsNoDb (blerTarget);
+
+  /**
+   * Short BB frame is assumed to be requiring "m_shortFrameOffsetInDb" dB
+   * higher Es/No if compared to normal BB frame.
+   * TODO: Proper link results need to be added for short BB frame in FWD link.
+   */
+  if (frameType == SatEnums::SHORT_FRAME)
+    {
+      esno += m_shortFrameOffsetInDb;
+    }
+
+  return esno;
+}
+
+
+/*
+ * SATLINKRESULTSDVBS2 CHILD CLASS
+ */
+NS_OBJECT_ENSURE_REGISTERED (SatLinkResultsDvbS2);
+
+SatLinkResultsDvbS2::SatLinkResultsDvbS2 ()
+  : SatLinkResultsFwd ()
+{
+
 }
 
 void
@@ -191,53 +253,27 @@ SatLinkResultsDvbS2::DoInitialize ()
 
 } // end of void SatLinkResultsDvbS2::DoInitialize
 
-double
-SatLinkResultsDvbS2::GetBler (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType, double esNoDb) const
+
+/*
+ * SATLINKRESULTSDVBS2X CHILD CLASS
+ */
+NS_OBJECT_ENSURE_REGISTERED (SatLinkResultsDvbS2X);
+
+SatLinkResultsDvbS2X::SatLinkResultsDvbS2X ()
+  : SatLinkResultsFwd ()
 {
-  NS_LOG_FUNCTION (this << modcod << esNoDb);
 
-  if (!m_isInitialized)
-    {
-      NS_FATAL_ERROR ("Error retrieving link results, call Initialize first");
-    }
-
-  /**
-   * Short BB frame is assumed to be requiring m_shortFrameOffsetInDb dB
-   * higher Es/No if compared to normal BB frame.
-   * TODO: Proper link results need to be added for short BB frame in FWD link.
-   */
-  if (frameType == SatEnums::SHORT_FRAME)
-    {
-      esNoDb -= m_shortFrameOffsetInDb;
-    }
-
-  return m_table.at (modcod)->GetBler (esNoDb);
 }
 
-double
-SatLinkResultsDvbS2::GetEsNoDb (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType, double blerTarget) const
+void
+SatLinkResultsDvbS2X::DoInitialize ()
 {
-  NS_LOG_FUNCTION (this << modcod << blerTarget);
+  NS_LOG_FUNCTION (this);
 
-  if (!m_isInitialized)
-    {
-      NS_FATAL_ERROR ("Error retrieving link results, call Initialize first");
-    }
+  // QPSK
+  m_table[SatEnums::SAT_MODCOD_QPSK_1_TO_2] = CreateObject<SatLookUpTable> (m_inputPath + "s2_qpsk_1_to_2.txt");
+  m_table[SatEnums::SAT_MODCOD_QPSK_1_TO_4] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_1_to_4.txt");
 
-  // Get Es/No requirement for normal BB frame
-  double esno = m_table.at (modcod)->GetEsNoDb (blerTarget);
-
-  /**
-   * Short BB frame is assumed to be requiring "m_shortFrameOffsetInDb" dB
-   * higher Es/No if compared to normal BB frame.
-   * TODO: Proper link results need to be added for short BB frame in FWD link.
-   */
-  if (frameType == SatEnums::SHORT_FRAME)
-    {
-      esno += m_shortFrameOffsetInDb;
-    }
-
-  return esno;
-}
+} // end of void SatLinkResultsDvbS2X::DoInitialize
 
 } // end of namespace ns3
