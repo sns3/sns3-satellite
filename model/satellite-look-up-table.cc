@@ -150,7 +150,7 @@ SatLookUpTable::GetEsNoDb (double blerTarget) const
 
   // The requested BLER is higher than the highest BLER entry
   // in the look-up-table
-  if (blerTarget > m_bler[1])
+  if (blerTarget > m_bler[0])
     {
       NS_FATAL_ERROR ("The BLER target is set to be too high!");
     }
