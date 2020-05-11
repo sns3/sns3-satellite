@@ -153,7 +153,7 @@ SatBbFrameConf::SatBbFrameConf ()
   NS_FATAL_ERROR ("Default constructor not supported!!!");
 }
 
-SatBbFrameConf::SatBbFrameConf (double symbolRate)
+SatBbFrameConf::SatBbFrameConf (double symbolRate, SatEnums::DvbVersion_t dvbVersion)
   : m_symbolRate (symbolRate),
   m_symbolsPerSlot (90),
   m_pilotBlockInSymbols (0),
@@ -172,7 +172,7 @@ SatBbFrameConf::SatBbFrameConf (double symbolRate)
   m_bbFrameUsageMode (NORMAL_FRAMES),
   m_mostRobustShortFrameModcod (SatEnums::SAT_NONVALID_MODCOD),
   m_mostRobustNormalFrameModcod (SatEnums::SAT_NONVALID_MODCOD),
-  m_dvbVersion (SatEnums::DVB_S2)
+  m_dvbVersion (dvbVersion)
 {
   ObjectBase::ConstructSelf (AttributeConstructionList ());
 
@@ -189,9 +189,11 @@ SatBbFrameConf::SatBbFrameConf (double symbolRate)
   switch(m_dvbVersion)
   {
     case SatEnums::DVB_S2:
+      m_defaultModCod = m_defaultModCodS2;
       SatEnums::GetAvailableModcodsFwdLink (modcods);
       break;
     case SatEnums::DVB_S2X:
+      m_defaultModCod = m_defaultModCodS2X;
       SatEnums::GetAvailableModcodsFwdLinkS2X (modcods);
       break;
   }
@@ -301,10 +303,10 @@ SatBbFrameConf::GetTypeId (void)
                     BooleanValue (false),
                     MakeBooleanAccessor (&SatBbFrameConf::m_acmEnabled),
                     MakeBooleanChecker ())
-    .AddAttribute ( "DefaultModCod",
+    .AddAttribute ( "DefaultModCodS2",
                     "Default MODCOD",
                     EnumValue (SatEnums::SAT_MODCOD_QPSK_1_TO_2),
-                    MakeEnumAccessor (&SatBbFrameConf::m_defaultModCod),
+                    MakeEnumAccessor (&SatBbFrameConf::m_defaultModCodS2),
                     // only the top 22 valid MODCODs are included below
                     MakeEnumChecker (SatEnums::SAT_MODCOD_QPSK_1_TO_2,    "QPSK_1_TO_2",
                                      SatEnums::SAT_MODCOD_QPSK_3_TO_5,    "QPSK_3_TO_5",
@@ -327,7 +329,13 @@ SatBbFrameConf::GetTypeId (void)
                                      SatEnums::SAT_MODCOD_16APSK_8_TO_9,  "16APSK_8_TO_9",
                                      SatEnums::SAT_MODCOD_16APSK_9_TO_10, "16APSK_9_TO_10",
                                      SatEnums::SAT_MODCOD_32APSK_3_TO_4,  "32APSK_3_TO_4",
-                                     SatEnums::SAT_MODCOD_32APSK_4_TO_5,  "32APSK_4_TO_5")) // TODO add new MODCODS
+                                     SatEnums::SAT_MODCOD_32APSK_4_TO_5,  "32APSK_4_TO_5"))
+    .AddAttribute ( "DefaultModCodS2X",
+                    "Default MODCOD",
+                    EnumValue (SatEnums::SAT_MODCOD_QPSK_1_TO_4),
+                    MakeEnumAccessor (&SatBbFrameConf::m_defaultModCodS2X),
+                    MakeEnumChecker (SatEnums::SAT_MODCOD_QPSK_1_TO_4,    "QPSK_1_TO_4",
+                                     SatEnums::SAT_MODCOD_QPSK_1_TO_2,    "QPSK_1_TO_2"))
     .AddAttribute ( "BbFrameHeaderInBytes",
                     "BB Frame header size in bytes",
                     UintegerValue (10), // ETSI EN 302 307 V1.3.1 specified 80 bits
@@ -350,12 +358,6 @@ SatBbFrameConf::GetTypeId (void)
                    MakeEnumChecker (SatBbFrameConf::SHORT_FRAMES, "ShortFrames",
                                     SatBbFrameConf::NORMAL_FRAMES, "NormalFrames",
                                     SatBbFrameConf::SHORT_AND_NORMAL_FRAMES, "ShortAndNormalFrames"))
-    .AddAttribute ("DvbVersion",
-                   "Indicates if using DVB-S2 or DVB-S2X.",
-                   EnumValue (SatEnums::DVB_S2),
-                   MakeEnumAccessor (&SatBbFrameConf::m_dvbVersion),
-                   MakeEnumChecker (SatEnums::DVB_S2, "DVB_S2",
-                                    SatEnums::DVB_S2X, "DVB_S2X"))
     .AddConstructor<SatBbFrameConf> ()
   ;
   return tid;

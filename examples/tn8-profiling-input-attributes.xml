@@ -8,7 +8,7 @@
  <default name="ns3::SatBbFrameConf::DummyFrameInSlots" value="36"/>
  <default name="ns3::SatBbFrameConf::TargetBLER" value="1e-05"/>
  <default name="ns3::SatBbFrameConf::AcmEnabled" value="false"/>
- <default name="ns3::SatBbFrameConf::DefaultModCod" value="QPSK_1_TO_2"/>
+ <default name="ns3::SatBbFrameConf::DefaultModCodS2" value="QPSK_1_TO_2"/>
  <default name="ns3::SatBbFrameConf::BbFrameHeaderInBytes" value="10"/>
  <default name="ns3::SatBbFrameConf::BbFrameHighOccupancyThreshold" value="0.9"/>
  <default name="ns3::SatBbFrameConf::BbFrameLowOccupancyThreshold" value="0.5"/>
@@ -30,8 +30,8 @@
  <default name="ns3::SatTbtpMessage::AssigmentFormat" value="0"/>
  <default name="ns3::SatCrMessage::CrBlockType" value="Small"/>
  <default name="ns3::SatFwdLinkScheduler::Interval" value="+20000000.0ns"/>
- <default name="ns3::SatFwdLinkScheduler::SchedulingStartThresholdTime" value="+5000000.0ns"/>
- <default name="ns3::SatFwdLinkScheduler::SchedulingStopThresholdTime" value="+15000000.0ns"/>
+ <default name="ns3::SatFwdLinkSchedulerDefault::SchedulingStartThresholdTime" value="+5000000.0ns"/>
+ <default name="ns3::SatFwdLinkSchedulerDefault::SchedulingStopThresholdTime" value="+15000000.0ns"/>
  <default name="ns3::SatFwdLinkScheduler::AdditionalSortCriteria" value="NoSorting"/>
  <default name="ns3::SatFwdLinkScheduler::CnoEstimationMode" value="LastValueInWindow"/>
  <default name="ns3::SatFwdLinkScheduler::CnoEstimationWindow" value="+500000000.0ns"/>
@@ -292,7 +292,7 @@
  <default name="ns3::SatGwPhy::DefaultFadingValue" value="1"/>
  <default name="ns3::SatGwPhy::ImIfCOverIDb" value="22"/>
  <default name="ns3::SatGwPhy::AciIfWrtNoisePercent" value="10"/>
- <default name="ns3::SatLinkResultsDvbS2::EsNoOffsetForShortFrame" value="0.4"/>
+ <default name="ns3::SatLinkResultsFwd::EsNoOffsetForShortFrame" value="0.4"/>
  <default name="ns3::SatLooConf::ElevationCount" value="1"/>
  <default name="ns3::SatLooConf::StateCount" value="3"/>
  <default name="ns3::SatLowerLayerServiceConf::DaServiceCount" value="4"/>

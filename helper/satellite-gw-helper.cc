@@ -150,7 +150,7 @@ SatGwHelper::SatGwHelper (SatTypedefs::CarrierBandwidthConverter_t carrierBandwi
 }
 
 void
-SatGwHelper::Initialize (Ptr<SatLinkResultsDvbRcs2> lrRcs2, Ptr<SatLinkResultsFwd> lrFwd)
+SatGwHelper::Initialize (Ptr<SatLinkResultsDvbRcs2> lrRcs2, Ptr<SatLinkResultsFwd> lrFwd, SatEnums::DvbVersion_t dvbVersion)
 {
   NS_LOG_FUNCTION (this);
 
@@ -178,7 +178,7 @@ SatGwHelper::Initialize (Ptr<SatLinkResultsDvbRcs2> lrRcs2, Ptr<SatLinkResultsFw
       m_linkResults = lrRcs2;
     }
 
-  m_bbFrameConf = CreateObject<SatBbFrameConf> (m_symbolRate);
+  m_bbFrameConf = CreateObject<SatBbFrameConf> (m_symbolRate, dvbVersion);
   m_bbFrameConf->InitializeCNoRequirements (lrFwd);
 
   //m_bbFrameConf->DumpWaveforms ();

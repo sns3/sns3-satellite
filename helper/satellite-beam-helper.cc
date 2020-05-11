@@ -141,6 +141,12 @@ SatBeamHelper::GetTypeId (void)
                    BooleanValue (false),
                    MakeBooleanAccessor (&SatBeamHelper::m_enableTracesOnReturnLink),
                    MakeBooleanChecker ())
+    .AddAttribute ("DvbVersion",
+                   "Indicates if using DVB-S2 or DVB-S2X.",
+                   EnumValue (SatEnums::DVB_S2),
+                   MakeEnumAccessor (&SatBeamHelper::m_dvbVersion),
+                   MakeEnumChecker (SatEnums::DVB_S2, "DVB_S2",
+                                    SatEnums::DVB_S2X, "DVB_S2X"))
     .AddTraceSource ("Creation", "Creation traces",
                      MakeTraceSourceAccessor (&SatBeamHelper::m_creationTrace),
                      "ns3::SatTypedefs::CreationCallback")
@@ -264,7 +270,18 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
   // - Packet reception at the UT
   // - FWD link packet scheduling at the GW
   //
-  Ptr<SatLinkResultsFwd> linkResultsFwd = CreateObject<SatLinkResultsDvbS2X> ();
+  Ptr<SatLinkResultsFwd> linkResultsFwd;
+  switch (m_dvbVersion)
+  {
+    case SatEnums::DVB_S2:
+      linkResultsFwd = CreateObject<SatLinkResultsDvbS2> ();
+      break;
+    case SatEnums::DVB_S2X:
+      linkResultsFwd = CreateObject<SatLinkResultsDvbS2X> ();
+      break;
+    default:
+      NS_FATAL_ERROR ("The DVB version does not exist");
+  }
   Ptr<SatLinkResultsDvbRcs2> linkResultsRcs2 = CreateObject<SatLinkResultsDvbRcs2> ();
   linkResultsFwd->Initialize ();
   linkResultsRcs2->Initialize ();
@@ -273,7 +290,7 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
   m_utHelper->Initialize (linkResultsFwd);
   // DVB-RCS2 link results for packet decoding at the GW +
   // DVB-S2 link results for FWD link RRM
-  m_gwHelper->Initialize (linkResultsRcs2, linkResultsFwd);
+  m_gwHelper->Initialize (linkResultsRcs2, linkResultsFwd, m_dvbVersion);
   // DVB-RCS2 link results for RTN link waveform configurations
   m_superframeSeq->GetWaveformConf ()->InitializeEbNoRequirements (linkResultsRcs2);
 

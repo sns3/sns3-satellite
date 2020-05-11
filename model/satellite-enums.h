@@ -220,6 +220,8 @@ public:
       {
       case SAT_NONVALID_MODCOD:
         return "SAT_NONVALID_MODCOD";
+      case SAT_MODCOD_QPSK_1_TO_4:
+        return "QPSK_1_TO_4";
       case SAT_MODCOD_QPSK_1_TO_3:
         return "QPSK_1_TO_3";
       case SAT_MODCOD_QPSK_1_TO_2:

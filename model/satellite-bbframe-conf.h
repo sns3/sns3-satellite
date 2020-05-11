@@ -157,7 +157,7 @@ public:
    * SatBbFrameConf constructor
    * \param symbolRate Symbol rate in baud
    */
-  SatBbFrameConf (double symbolRate);
+  SatBbFrameConf (double symbolRate, SatEnums::DvbVersion_t dvbVersion);
 
   /**
    * Destructor for SatBbFrameConf
@@ -366,10 +366,23 @@ private:
   bool m_acmEnabled;
 
   /**
+   * Default MODCOD for DVB-S2
+   */
+  SatEnums::SatModcod_t m_defaultModCodS2;
+
+  /**
+   * Default MODCOD for DVB-S2X
+   */
+  SatEnums::SatModcod_t m_defaultModCodS2X;
+
+  /**
    * Default MODCOD is used
    * - For broadcast control messages
    * - When ACM is disabled
    * - When there is not valid C/No information
+   *
+   * It will be m_defaultModCodS2 or m_defaultModCodS2X depending on the DVB version
+   * chosen: DVB-S2 or DVB-S2X.
    *
    * TODO: The attribute for m_defaultModCod does not currently accept
    * all MODCODs due to maximum arguments limitation (<=22) of MakeEnumChecker (...)
