@@ -50,11 +50,6 @@ SatGwMac::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatGwMac")
     .SetParent<SatMac> ()
     .AddConstructor<SatGwMac> ()
-    .AddAttribute ("DummyFrameSendingEnabled",
-                   "Flag to tell, if dummy frames are sent or not.",
-                   BooleanValue (false),
-                   MakeBooleanAccessor (&SatGwMac::m_dummyFrameSendingEnabled),
-                   MakeBooleanChecker ())
     .AddAttribute ("Scheduler",
                    "Forward link scheduler used by this Sat GW MAC.",
                    PointerValue (),
@@ -76,7 +71,6 @@ SatGwMac::GetTypeId (void)
 SatGwMac::SatGwMac ()
   : SatMac (),
   m_fwdScheduler (),
-  m_dummyFrameSendingEnabled (false),
   m_guardTime (MicroSeconds (1))
 {
   NS_LOG_FUNCTION (this);
@@ -85,7 +79,6 @@ SatGwMac::SatGwMac ()
 SatGwMac::SatGwMac (uint32_t beamId)
   : SatMac (beamId),
   m_fwdScheduler (),
-  m_dummyFrameSendingEnabled (false),
   m_guardTime (MicroSeconds (1))
 {
   NS_LOG_FUNCTION (this);
