@@ -332,10 +332,10 @@ SatBbFrameConf::GetTypeId (void)
                                      SatEnums::SAT_MODCOD_32APSK_4_TO_5,  "32APSK_4_TO_5"))
     .AddAttribute ( "DefaultModCodS2X",
                     "Default MODCOD",
-                    EnumValue (SatEnums::SAT_MODCOD_QPSK_1_TO_4),
+                    EnumValue (SatEnums::SAT_MODCOD_S2X_QPSK_11_TO_45_SHORT_NOPILOTS),
                     MakeEnumAccessor (&SatBbFrameConf::m_defaultModCodS2X),
-                    MakeEnumChecker (SatEnums::SAT_MODCOD_QPSK_1_TO_4,    "QPSK_1_TO_4",
-                                     SatEnums::SAT_MODCOD_QPSK_1_TO_2,    "QPSK_1_TO_2"))
+                    MakeEnumChecker (SatEnums::SAT_MODCOD_S2X_QPSK_11_TO_45_SHORT_NOPILOTS,  "QPSK_11_TO_45_SHORT_NOPILOTS",
+                                     SatEnums::SAT_MODCOD_S2X_QPSK_11_TO_45_SHORT_PILOTS,    "QPSK_11_TO_45_SHORT_PILOTS"))
     .AddAttribute ( "BbFrameHeaderInBytes",
                     "BB Frame header size in bytes",
                     UintegerValue (10), // ETSI EN 302 307 V1.3.1 specified 80 bits

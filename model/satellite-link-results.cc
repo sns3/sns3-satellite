@@ -271,8 +271,8 @@ SatLinkResultsDvbS2X::DoInitialize ()
   NS_LOG_FUNCTION (this);
 
   // QPSK
-  m_table[SatEnums::SAT_MODCOD_QPSK_1_TO_2] = CreateObject<SatLookUpTable> (m_inputPath + "s2_qpsk_1_to_2.txt");
-  m_table[SatEnums::SAT_MODCOD_QPSK_1_TO_4] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_1_to_4.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_11_TO_45_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2_qpsk_1_to_2.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_11_TO_45_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_1_to_4.txt");
 
 } // end of void SatLinkResultsDvbS2X::DoInitialize
 
