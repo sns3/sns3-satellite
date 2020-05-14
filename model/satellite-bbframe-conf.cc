@@ -40,10 +40,13 @@ namespace ns3 {
  * 2nd col = payload slots per normal frame
  * 3rnd col = payload slots per short frame
  */
-const uint32_t payloadConf[4][3] = { { 2, 360, 90 },
+const uint32_t payloadConf[7][3] = { { 2, 360, 90 },
                                      { 3, 240, 60 },
                                      { 4, 180, 45 },
-                                     { 5, 144, 36 }, };
+                                     { 5, 144, 36 },
+                                     { 6, 120, 30 },
+                                     { 7, 102, 25 },
+                                     { 8,  90, 22 }, };
 
 
 SatDvbS2Waveform::SatDvbS2Waveform ()
@@ -177,7 +180,7 @@ SatBbFrameConf::SatBbFrameConf (double symbolRate, SatEnums::DvbVersion_t dvbVer
   ObjectBase::ConstructSelf (AttributeConstructionList ());
 
   // Initialize the payloads
-  for (uint32_t i = 0; i < 4; ++i)
+  for (uint32_t i = 0; i < 7; ++i)
     {
       m_normalFramePayloadInSlots.insert (std::make_pair (payloadConf[i][0], payloadConf[i][1]));
       m_shortFramePayloadInSlots.insert (std::make_pair (payloadConf[i][0], payloadConf[i][2]));
@@ -207,19 +210,35 @@ SatBbFrameConf::SatBbFrameConf (double symbolRate, SatEnums::DvbVersion_t dvbVer
        mit != modcods.end ();
        ++mit)
     {
-      for (std::vector<SatEnums::SatBbFrameType_t>::const_iterator fit = frameTypes.begin ();
-           fit != frameTypes.end ();
-           ++fit)
+      switch(m_dvbVersion)
         {
-          // Calculate the payload
-          uint32_t pl = CalculateBbFramePayloadBits (*mit, *fit);
+          case SatEnums::DVB_S2:
+            for (std::vector<SatEnums::SatBbFrameType_t>::const_iterator fit = frameTypes.begin ();
+                   fit != frameTypes.end ();
+                   ++fit)
+                {
+                  // Calculate the payload
+                  uint32_t pl = CalculateBbFramePayloadBits (*mit, *fit);
 
-          // Calculate the frame length
-          Time len = CalculateBbFrameDuration (*mit, *fit);
+                  // Calculate the frame length
+                  Time len = CalculateBbFrameDuration (*mit, *fit);
 
-          Ptr<SatDvbS2Waveform> wf = Create<SatDvbS2Waveform> (*mit, *fit, len, pl);
-          m_waveforms.insert (std::make_pair (std::make_pair (*mit, *fit), wf));
-          wfCount++;
+                  Ptr<SatDvbS2Waveform> wf = Create<SatDvbS2Waveform> (*mit, *fit, len, pl);
+                  m_waveforms.insert (std::make_pair (std::make_pair (*mit, *fit), wf));
+                  wfCount++;
+                }
+            break;
+          case SatEnums::DVB_S2X:
+            SatEnums::SatBbFrameType_t fit = SatUtils::GetFrameTypeS2X (*mit);
+            uint32_t pl = CalculateBbFramePayloadBits (*mit, fit);
+
+            // Calculate the frame length
+            Time len = CalculateBbFrameDuration (*mit, fit);
+
+            Ptr<SatDvbS2Waveform> wf = Create<SatDvbS2Waveform> (*mit, fit, len, pl);
+            m_waveforms.insert (std::make_pair (std::make_pair (*mit, fit), wf));
+            wfCount++;
+            break;
         }
     }
 

@@ -260,6 +260,12 @@ public:
   {
   }
 
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
+  static TypeId GetTypeId ();
+
 protected:
   /**
    * \brief Initialize by loading DVB-S2 look up tables.
@@ -288,6 +294,12 @@ public:
   ~SatLinkResultsDvbS2X ()
   {
   }
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
+  static TypeId GetTypeId ();
 
 protected:
   /**

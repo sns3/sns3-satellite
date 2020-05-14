@@ -110,8 +110,16 @@ SatLookUpTable::GetBler (double esNoDb) const
   if (i >= n)
     {
       // edge case: very high SINR, return minimum BLER (100% success rate)
-      NS_LOG_INFO (this << " Very high SINR -> BLER = 0.0");
-      return 0.0;
+      if (n == 1)
+        {
+          NS_LOG_INFO (this << " Very high SINR -> BLER = " << m_bler[0]);
+          return m_bler[0];
+        }
+      else
+        {
+          NS_LOG_INFO (this << " Very high SINR -> BLER = 0.0");
+          return 0.0;
+        }
     }
   else // sinrDb <= m_esNoDb[i]
     {

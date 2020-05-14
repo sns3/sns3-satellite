@@ -214,6 +214,14 @@ SatLinkResultsDvbS2::SatLinkResultsDvbS2 ()
 
 }
 
+TypeId
+SatLinkResultsDvbS2::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatLinkResultsDvbS2")
+    .SetParent<SatLinkResultsFwd> ();
+  return tid;
+}
+
 void
 SatLinkResultsDvbS2::DoInitialize ()
 {
@@ -263,6 +271,14 @@ SatLinkResultsDvbS2X::SatLinkResultsDvbS2X ()
   : SatLinkResultsFwd ()
 {
 
+}
+
+TypeId
+SatLinkResultsDvbS2X::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatLinkResultsDvbS2")
+    .SetParent<SatLinkResultsFwd> ();
+  return tid;
 }
 
 void
