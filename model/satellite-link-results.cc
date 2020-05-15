@@ -276,7 +276,7 @@ SatLinkResultsDvbS2X::SatLinkResultsDvbS2X ()
 TypeId
 SatLinkResultsDvbS2X::GetTypeId ()
 {
-  static TypeId tid = TypeId ("ns3::SatLinkResultsDvbS2")
+  static TypeId tid = TypeId ("ns3::SatLinkResultsDvbS2X")
     .SetParent<SatLinkResultsFwd> ();
   return tid;
 }

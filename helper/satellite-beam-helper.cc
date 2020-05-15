@@ -497,7 +497,7 @@ SatBeamHelper::Install (NodeContainer ut,
 
   SatEnums::SatBbFrameType_t frameType = SatEnums::NORMAL_FRAME;
 
-  if (bbFrameConf->GetBbFrameUsageMode () == SatBbFrameConf::SHORT_FRAMES)
+  if (bbFrameConf->GetBbFrameUsageMode () == SatEnums::SHORT_FRAMES)
     {
       frameType = SatEnums::SHORT_FRAME;
     }

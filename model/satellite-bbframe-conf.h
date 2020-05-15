@@ -138,15 +138,6 @@ private:
 class SatBbFrameConf : public Object
 {
 public:
-  /**
-   * BBFrame usage modes.
-   */
-  typedef enum
-  {
-    SHORT_FRAMES,          //!< SHORT_FRAMES
-    NORMAL_FRAMES,         //!< NORMAL_FRAMES
-    SHORT_AND_NORMAL_FRAMES //!< SHORT_AND_NORMAL_FRAMES
-  } BbFrameUsageMode_t;
 
   /**
    * Default constructor
@@ -216,7 +207,7 @@ public:
    *
    * \return BB frame usage mode
    */
-  inline SatBbFrameConf::BbFrameUsageMode_t GetBbFrameUsageMode () const
+  inline SatEnums::BbFrameUsageMode_t GetBbFrameUsageMode () const
   {
     return m_bbFrameUsageMode;
   }
@@ -371,9 +362,14 @@ private:
   SatEnums::SatModcod_t m_defaultModCodS2;
 
   /**
-   * Default MODCOD for DVB-S2X
+   * Default MODCOD for DVB-S2X short Frames
    */
-  SatEnums::SatModcod_t m_defaultModCodS2X;
+  SatEnums::SatModcod_t m_defaultModCodShortFrameS2X;
+
+  /**
+   * Default MODCOD for DVB-S2X normal Frames
+   */
+  SatEnums::SatModcod_t m_defaultModCodNormalFrameS2X;
 
   /**
    * Default MODCOD is used
@@ -400,7 +396,7 @@ private:
   /**
    * BBFrame usage mode.
    */
-  BbFrameUsageMode_t m_bbFrameUsageMode;
+  SatEnums::BbFrameUsageMode_t m_bbFrameUsageMode;
 
   /**
    * The most robust MODCOD for short frame.

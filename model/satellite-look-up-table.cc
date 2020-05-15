@@ -151,7 +151,7 @@ SatLookUpTable::GetEsNoDb (double blerTarget) const
 
   // If the requested BLER is smaller than the smallest BLER entry
   // in the look-up-table
-  if (blerTarget < m_bler[n - 1])
+  if (blerTarget <= m_bler[n - 1])
     {
       return m_esNoDb[n - 1];
     }

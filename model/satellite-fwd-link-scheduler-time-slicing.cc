@@ -73,7 +73,7 @@ SatFwdLinkSchedulerTimeSlicing::SatFwdLinkSchedulerTimeSlicing (Ptr<SatBbFrameCo
       SatEnums::GetAvailableModcodsFwdLink (modCods);
       break;
     case SatEnums::DVB_S2X:
-      SatEnums::GetAvailableModcodsFwdLinkS2X (modCods);
+      SatEnums::GetAvailableModcodsFwdLinkS2X (modCods, conf->GetBbFrameUsageMode ());
       break;
   }
 
