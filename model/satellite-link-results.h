@@ -266,7 +266,7 @@ public:
    */
   static TypeId GetTypeId ();
 
-protected:
+private:
   /**
    * \brief Initialize by loading DVB-S2 look up tables.
    */
@@ -301,7 +301,7 @@ public:
    */
   static TypeId GetTypeId ();
 
-protected:
+private:
   /**
    * \brief Initialize by loading DVB-S2 look up tables.
    */
