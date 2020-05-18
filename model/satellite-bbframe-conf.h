@@ -257,6 +257,12 @@ public:
   SatEnums::SatModcod_t GetBestModcod (double cNo, SatEnums::SatBbFrameType_t frameType) const;
 
   /**
+   * Get the default MODCOD for short DVB-S2X frames
+   * \return SatModcod_t The default MODCOD for short DVB-S2X frames
+   */
+  SatEnums::SatModcod_t GetDefaultModCodShortFramesS2X () const;
+
+  /**
    * Get the default MODCOD
    * \return SatModcod_t The default MODCOD
    */

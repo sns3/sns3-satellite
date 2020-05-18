@@ -197,6 +197,7 @@ SatFwdLinkSchedulerTimeSlicing::GetNextFrame ()
       // Add dummy packet to dummy frame
       frame->AddPayload (dummyPacket);
       frame->SetSliceId (0);
+      frameDuration = frame->GetDuration ();
     }
   // If no bb frame available and dummy frames disabled
   else if (frame == NULL)

@@ -245,6 +245,24 @@ SatBbFrameConf::SatBbFrameConf (double symbolRate, SatEnums::DvbVersion_t dvbVer
         }
     }
 
+  /* New to add waveform for short frame with Default ModCod when using
+   * DVB-S2X and Normal Frames.
+   * Used to create dummy frames which are short frames.
+   */
+  if (m_dvbVersion == SatEnums::DVB_S2X && m_bbFrameUsageMode == SatEnums::NORMAL_FRAMES)
+    {
+      SatEnums::SatBbFrameType_t fit = SatEnums::SHORT_FRAME;
+      SatEnums::SatModcod_t mit = m_defaultModCodShortFrameS2X;
+      uint32_t pl = CalculateBbFramePayloadBits (mit, fit);
+
+      // Calculate the frame length
+      Time len = CalculateBbFrameDuration (mit, fit);
+
+      Ptr<SatDvbS2Waveform> wf = Create<SatDvbS2Waveform> (mit, fit, len, pl);
+      m_waveforms.insert (std::make_pair (std::make_pair (mit, fit), wf));
+      wfCount++;
+    }
+
   uint32_t payloadBitsForShortFrame = std::numeric_limits<uint32_t>::max ();
   uint32_t payloadBitsForNormalFrame = std::numeric_limits<uint32_t>::max ();
 
@@ -623,6 +641,13 @@ SatBbFrameConf::GetDefaultModCod () const
 {
   NS_LOG_FUNCTION (this);
   return m_defaultModCod;
+}
+
+SatEnums::SatModcod_t
+SatBbFrameConf::GetDefaultModCodShortFramesS2X () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_defaultModCodShortFrameS2X;
 }
 
 

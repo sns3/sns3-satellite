@@ -46,6 +46,7 @@ SatBbFrame::SatBbFrame (SatEnums::SatModcod_t modCod, SatEnums::SatBbFrameType_t
 {
   NS_LOG_FUNCTION (this << modCod << type);
 
+
   switch (type)
     {
     case SatEnums::SHORT_FRAME:
@@ -60,7 +61,18 @@ SatBbFrame::SatBbFrame (SatEnums::SatModcod_t modCod, SatEnums::SatBbFrameType_t
       /**
        * Dummy frame is assumed to be a short frame but with no valid data.
        */
-      m_maxSpaceInBytes = conf->GetBbFramePayloadBits (modCod, SatEnums::SHORT_FRAME) / SatConstVariables::BITS_PER_BYTE;
+      switch (conf->GetDvbVersion ())
+        {
+          case SatEnums::DVB_S2:
+            m_maxSpaceInBytes = conf->GetBbFramePayloadBits (modCod, SatEnums::SHORT_FRAME) / SatConstVariables::BITS_PER_BYTE;
+            break;
+          case SatEnums::DVB_S2X:
+            m_maxSpaceInBytes = conf->GetBbFramePayloadBits (conf->GetDefaultModCodShortFramesS2X (), SatEnums::SHORT_FRAME) / SatConstVariables::BITS_PER_BYTE;
+            break;
+          default:
+            NS_FATAL_ERROR ("Unknown DVB version");
+        }
+
       m_headerSizeInBytes = conf->GetBbFrameHeaderSizeInBytes ();
       m_freeSpaceInBytes = m_maxSpaceInBytes - m_headerSizeInBytes;
       m_duration = conf->GetDummyBbFrameDuration ();
