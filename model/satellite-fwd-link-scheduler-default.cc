@@ -192,7 +192,7 @@ SatFwdLinkSchedulerDefault::ScheduleBbFrames ()
         {
           if ( frameBytes < currentObMinReqBytes)
             {
-              frameBytes = m_bbFrameContainer->GetMaxFramePayloadInBytes (flowId, modcod);
+              frameBytes = m_bbFrameContainer->GetMaxFramePayloadInBytes (flowId, modcod) - m_bbFrameConf->GetBbFrameHeaderSizeInBytes ();
 
               // if frame bytes still too small, we must have too long control message, so let's crash
               if ( frameBytes < currentObMinReqBytes )

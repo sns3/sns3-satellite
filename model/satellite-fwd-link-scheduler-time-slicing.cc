@@ -281,7 +281,7 @@ SatFwdLinkSchedulerTimeSlicing::ScheduleBbFrames ()
         {
           if ( frameBytes < currentObMinReqBytes)
             {
-              frameBytes = m_bbFrameContainers.at (slice)->GetMaxFramePayloadInBytes (flowId, modcod);
+              frameBytes = m_bbFrameContainers.at (slice)->GetMaxFramePayloadInBytes (flowId, modcod) - m_bbFrameConf->GetBbFrameHeaderSizeInBytes ();
 
               if (!CanOpenBbFrame (address, flowId, modcod))
                 {
