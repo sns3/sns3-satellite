@@ -137,12 +137,20 @@ SatBbFrameContainer::GetBytesLeftInTailFrame (uint32_t priorityClass, SatEnums::
         {
           bytesLeft -= m_container.at (modcod).back ()->GetSpaceUsedInBytes ();
         }
+      else
+        {
+          bytesLeft -= m_bbFrameConf->GetBbFrameHeaderSizeInBytes ();
+        }
     }
   else
     {
       if ( m_ctrlContainer.empty () != true )
         {
           bytesLeft -= m_ctrlContainer.back ()->GetSpaceUsedInBytes ();
+        }
+      else
+        {
+          bytesLeft -= m_bbFrameConf->GetBbFrameHeaderSizeInBytes ();
         }
     }
 
@@ -180,7 +188,6 @@ SatBbFrameContainer::AddData (uint32_t priorityClass, SatEnums::SatModcod_t modc
         {
           m_totalDuration += m_container.at (modcod).back ()->Extend (m_bbFrameConf);
         }
-
       m_container.at (modcod).back ()->AddPayload (data);
 
     }
@@ -197,7 +204,6 @@ SatBbFrameContainer::AddData (uint32_t priorityClass, SatEnums::SatModcod_t modc
         {
           m_totalDuration += m_ctrlContainer.back ()->Extend (m_bbFrameConf);
         }
-
       m_ctrlContainer.back ()->AddPayload (data);
     }
 }
