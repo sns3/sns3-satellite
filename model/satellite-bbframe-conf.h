@@ -287,6 +287,13 @@ public:
    */
   SatEnums::DvbVersion_t GetDvbVersion ();
 
+  /**
+   * \brief Indicates if using pilots on BBFrames when DVB-S2X is chosen
+   *
+   * \return True if pilots are used
+   */
+  bool IsBbFrameS2XPilots ();
+
 private:
   /**
    * \brief Calculate the BBrame higher layer payload in bits.
@@ -304,6 +311,11 @@ private:
    * \return The BBFrame duration in Time
    */
   Time CalculateBbFrameDuration (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType) const;
+
+  /**
+   * \brief Get the list of ModCods from their string representation.
+   */
+  void GetModCodsList ();
 
   /**
    * Symbol rate in baud
@@ -368,14 +380,24 @@ private:
   SatEnums::SatModcod_t m_defaultModCodS2;
 
   /**
-   * Default MODCOD for DVB-S2X short Frames
+   * Default MODCOD for DVB-S2X short Frames and no pilots.
    */
-  SatEnums::SatModcod_t m_defaultModCodShortFrameS2X;
+  SatEnums::SatModcod_t m_defaultModCodShortFrameS2XNoPilots;
 
   /**
-   * Default MODCOD for DVB-S2X normal Frames
+   * Default MODCOD for DVB-S2X normal Frames and no pilots.
    */
-  SatEnums::SatModcod_t m_defaultModCodNormalFrameS2X;
+  SatEnums::SatModcod_t m_defaultModCodNormalFrameS2XNoPilots;
+
+  /**
+   * Default MODCOD for DVB-S2X short Frames and pilots.
+   */
+  SatEnums::SatModcod_t m_defaultModCodShortFrameS2XPilots;
+
+  /**
+   * Default MODCOD for DVB-S2X normal Frames and pilots.
+   */
+  SatEnums::SatModcod_t m_defaultModCodNormalFrameS2XPilots;
 
   /**
    * Default MODCOD is used
@@ -415,9 +437,24 @@ private:
   SatEnums::SatModcod_t m_mostRobustNormalFrameModcod;
 
   /**
-   * Indicates if using DVB-S2 or DVB-S2X
+   * Indicates if using DVB-S2 or DVB-S2X.
    */
   SatEnums::DvbVersion_t m_dvbVersion;
+
+  /**
+   * Indicates if using pilots in BBFrames when DVB-S2X is chosen.
+   */
+  bool m_bbFrameS2XPilots;
+
+  /**
+   * List of DVB-S2X ModCods used.
+   */
+  std::vector<SatEnums::SatModcod_t> m_s2XModCodsUsed;
+
+  /**
+   * String containing all DVB-S2X ModCods used.
+   */
+  std::string m_s2XModCodsUsedStr;
 };
 
 } // namespace ns3

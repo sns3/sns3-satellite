@@ -82,7 +82,7 @@ SatFwdLinkSchedulerDefault::SatFwdLinkSchedulerDefault (Ptr<SatBbFrameConf> conf
       SatEnums::GetAvailableModcodsFwdLink (modCods);
       break;
     case SatEnums::DVB_S2X:
-      SatEnums::GetAvailableModcodsFwdLinkS2X (modCods, conf->GetBbFrameUsageMode ());
+      SatEnums::GetAvailableModcodsFwdLinkS2X (modCods, conf->GetBbFrameUsageMode (), conf->IsBbFrameS2XPilots ());
       break;
   }
 

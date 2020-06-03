@@ -404,25 +404,24 @@ public:
     modcods.push_back (SAT_MODCOD_32APSK_8_TO_9);
   }
 
-  static inline void GetAvailableModcodsFwdLinkS2X (std::vector<SatModcod_t>& modcods, SatEnums::BbFrameUsageMode_t type)
+  static inline void GetAvailableModcodsFwdLinkS2X (std::vector<SatModcod_t>& modcods, SatEnums::BbFrameUsageMode_t type, bool pilots)
   {
     switch(type)
       {
         case SatEnums::NORMAL_FRAMES:
-          GetAvailableModcodsFwdLinkS2XNormalFrames (modcods);
+          GetAvailableModcodsFwdLinkS2XNormalFrames (modcods, pilots);
           break;
         case SatEnums::SHORT_FRAMES:
-          GetAvailableModcodsFwdLinkS2XShortFrames (modcods);
+          GetAvailableModcodsFwdLinkS2XShortFrames (modcods, pilots);
           break;
         case SatEnums::SHORT_AND_NORMAL_FRAMES:
-          GetAvailableModcodsFwdLinkS2XNormalAndShortFrames (modcods);
-          break;
+          NS_FATAL_ERROR ("Cannot use SHORT_AND_NORMAL_FRAMES mode in DVB-S2X");
         default:
           NS_FATAL_ERROR ("Unknown SatEnums::BbFrameUsageMode_t type");
       }
   }
 
-  static inline void GetAvailableModcodsFwdLinkS2XNormalFrames (std::vector<SatModcod_t>& modcods)
+  static inline void GetAvailableModcodsFwdLinkS2XNormalFrames (std::vector<SatModcod_t>& modcods, bool pilots)
   {
     /**
      * Note that the order of MODCODs have a meaning in ACM.
@@ -430,141 +429,147 @@ public:
      * coding rate.
      */
 
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_1_TO_4_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_1_TO_4_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_13_TO_45_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_13_TO_45_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_1_TO_3_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_1_TO_3_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_2_TO_5_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_2_TO_5_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_9_TO_20_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_9_TO_20_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_1_TO_2_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_1_TO_2_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_11_TO_20_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_11_TO_20_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_3_TO_5_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_3_TO_5_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_2_TO_3_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_2_TO_3_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_3_TO_4_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_3_TO_4_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_4_TO_5_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_4_TO_5_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_5_TO_6_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_5_TO_6_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_8_TO_9_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_8_TO_9_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_9_TO_10_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_9_TO_10_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_3_TO_5_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_3_TO_5_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_23_TO_36_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_23_TO_36_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_2_TO_3_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_2_TO_3_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_25_TO_36_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_25_TO_36_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_13_TO_18_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_13_TO_18_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_3_TO_4_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_3_TO_4_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_5_TO_6_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_5_TO_6_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_8_TO_9_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_8_TO_9_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_9_TO_10_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_9_TO_10_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8APSK_5_TO_9_L_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8APSK_5_TO_9_L_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8APSK_26_TO_45_L_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8APSK_26_TO_45_L_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_1_TO_2_L_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_1_TO_2_L_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_8_TO_15_L_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_8_TO_15_L_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_5_TO_9_L_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_5_TO_9_L_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_26_TO_45_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_26_TO_45_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_3_TO_5_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_3_TO_5_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_3_TO_5_L_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_3_TO_5_L_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_28_TO_45_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_28_TO_45_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_23_TO_36_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_23_TO_36_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_2_TO_3_L_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_2_TO_3_L_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_2_TO_3_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_2_TO_3_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_25_TO_36_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_25_TO_36_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_13_TO_18_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_13_TO_18_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_3_TO_4_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_3_TO_4_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_7_TO_9_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_7_TO_9_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_4_TO_5_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_4_TO_5_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_5_TO_6_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_5_TO_6_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_77_TO_90_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_77_TO_90_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_8_TO_9_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_8_TO_9_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_9_TO_10_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_9_TO_10_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_2_TO_3_L_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_2_TO_3_L_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_32_TO_45_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_32_TO_45_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_11_TO_15_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_11_TO_15_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_3_TO_4_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_3_TO_4_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_7_TO_9_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_7_TO_9_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_4_TO_5_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_4_TO_5_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_5_TO_6_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_5_TO_6_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_8_TO_9_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_8_TO_9_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_9_TO_10_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_9_TO_10_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_64APSK_32_TO_45_L_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_64APSK_32_TO_45_L_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_64APSK_11_TO_15_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_64APSK_11_TO_15_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_64APSK_7_TO_9_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_64APSK_7_TO_9_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_64APSK_4_TO_5_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_64APSK_4_TO_5_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_64APSK_5_TO_6_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_64APSK_5_TO_6_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_128APSK_3_TO_4_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_128APSK_3_TO_4_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_128APSK_7_TO_9_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_128APSK_7_TO_9_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_256APSK_29_TO_45_L_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_256APSK_29_TO_45_L_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_256APSK_2_TO_3_L_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_256APSK_2_TO_3_L_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_256APSK_31_TO_45_L_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_256APSK_31_TO_45_L_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_256APSK_32_TO_45_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_256APSK_32_TO_45_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_256APSK_11_TO_15_L_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_256APSK_11_TO_15_L_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_256APSK_3_TO_4_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_256APSK_3_TO_4_NORMAL_PILOTS);
+    if (pilots)
+      {
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_1_TO_4_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_13_TO_45_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_1_TO_3_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_2_TO_5_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_9_TO_20_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_1_TO_2_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_11_TO_20_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_3_TO_5_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_2_TO_3_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_3_TO_4_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_4_TO_5_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_5_TO_6_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_8_TO_9_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_9_TO_10_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_3_TO_5_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_23_TO_36_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_2_TO_3_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_25_TO_36_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_13_TO_18_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_3_TO_4_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_5_TO_6_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_8_TO_9_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_9_TO_10_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8APSK_5_TO_9_L_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8APSK_26_TO_45_L_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_1_TO_2_L_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_8_TO_15_L_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_5_TO_9_L_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_26_TO_45_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_3_TO_5_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_3_TO_5_L_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_28_TO_45_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_23_TO_36_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_2_TO_3_L_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_2_TO_3_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_25_TO_36_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_13_TO_18_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_3_TO_4_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_7_TO_9_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_4_TO_5_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_5_TO_6_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_77_TO_90_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_8_TO_9_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_9_TO_10_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_32APSK_2_TO_3_L_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_32APSK_32_TO_45_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_32APSK_11_TO_15_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_32APSK_3_TO_4_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_32APSK_7_TO_9_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_32APSK_4_TO_5_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_32APSK_5_TO_6_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_32APSK_8_TO_9_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_32APSK_9_TO_10_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_64APSK_32_TO_45_L_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_64APSK_11_TO_15_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_64APSK_7_TO_9_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_64APSK_4_TO_5_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_64APSK_5_TO_6_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_128APSK_3_TO_4_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_128APSK_7_TO_9_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_256APSK_29_TO_45_L_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_256APSK_2_TO_3_L_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_256APSK_31_TO_45_L_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_256APSK_32_TO_45_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_256APSK_11_TO_15_L_NORMAL_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_256APSK_3_TO_4_NORMAL_PILOTS);
+      }
+    else
+      {
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_1_TO_4_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_13_TO_45_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_1_TO_3_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_2_TO_5_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_9_TO_20_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_1_TO_2_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_11_TO_20_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_3_TO_5_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_2_TO_3_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_3_TO_4_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_4_TO_5_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_5_TO_6_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_8_TO_9_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_9_TO_10_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_3_TO_5_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_23_TO_36_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_2_TO_3_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_25_TO_36_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_13_TO_18_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_3_TO_4_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_5_TO_6_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_8_TO_9_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_9_TO_10_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8APSK_5_TO_9_L_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8APSK_26_TO_45_L_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_1_TO_2_L_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_8_TO_15_L_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_5_TO_9_L_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_26_TO_45_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_3_TO_5_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_3_TO_5_L_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_28_TO_45_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_23_TO_36_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_2_TO_3_L_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_2_TO_3_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_25_TO_36_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_13_TO_18_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_3_TO_4_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_7_TO_9_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_4_TO_5_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_5_TO_6_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_77_TO_90_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_8_TO_9_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_9_TO_10_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_32APSK_2_TO_3_L_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_32APSK_32_TO_45_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_32APSK_11_TO_15_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_32APSK_3_TO_4_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_32APSK_7_TO_9_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_32APSK_4_TO_5_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_32APSK_5_TO_6_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_32APSK_8_TO_9_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_32APSK_9_TO_10_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_64APSK_32_TO_45_L_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_64APSK_11_TO_15_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_64APSK_7_TO_9_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_64APSK_4_TO_5_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_64APSK_5_TO_6_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_128APSK_3_TO_4_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_128APSK_7_TO_9_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_256APSK_29_TO_45_L_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_256APSK_2_TO_3_L_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_256APSK_31_TO_45_L_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_256APSK_32_TO_45_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_256APSK_11_TO_15_L_NORMAL_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_256APSK_3_TO_4_NORMAL_NOPILOTS);
+      }
   }
 
-  static inline void GetAvailableModcodsFwdLinkS2XShortFrames (std::vector<SatModcod_t>& modcods)
+  static inline void GetAvailableModcodsFwdLinkS2XShortFrames (std::vector<SatModcod_t>& modcods, bool pilots)
   {
     /**
      * Note that the order of MODCODs have a meaning in ACM.
@@ -572,155 +577,94 @@ public:
      * coding rate.
      */
 
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_11_TO_45_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_11_TO_45_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_1_TO_4_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_1_TO_4_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_4_TO_15_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_4_TO_15_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_14_TO_45_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_14_TO_45_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_1_TO_3_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_1_TO_3_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_2_TO_5_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_2_TO_5_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_7_TO_15_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_7_TO_15_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_1_TO_2_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_1_TO_2_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_8_TO_15_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_8_TO_15_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_3_TO_5_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_3_TO_5_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_2_TO_3_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_2_TO_3_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_32_TO_45_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_32_TO_45_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_3_TO_4_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_3_TO_4_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_4_TO_5_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_4_TO_5_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_5_TO_6_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_5_TO_6_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_8_TO_9_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_8_TO_9_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_7_TO_15_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_7_TO_15_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_8_TO_15_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_8_TO_15_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_26_TO_45_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_26_TO_45_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_3_TO_5_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_3_TO_5_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_2_TO_3_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_2_TO_3_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_32_TO_45_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_32_TO_45_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_3_TO_4_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_3_TO_4_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_5_TO_6_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_5_TO_6_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_8_TO_9_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_8_TO_9_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_7_TO_15_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_7_TO_15_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_8_TO_15_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_8_TO_15_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_26_TO_45_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_26_TO_45_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_3_TO_5_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_3_TO_5_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_2_TO_3_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_2_TO_3_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_32_TO_45_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_32_TO_45_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_3_TO_4_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_3_TO_4_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_4_TO_5_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_4_TO_5_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_5_TO_6_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_5_TO_6_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_8_TO_9_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_8_TO_9_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_2_TO_3_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_2_TO_3_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_32_TO_45_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_32_TO_45_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_3_TO_4_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_3_TO_4_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_4_TO_5_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_4_TO_5_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_5_TO_6_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_5_TO_6_SHORT_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_8_TO_9_SHORT_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_8_TO_9_SHORT_PILOTS);
-  }
-
-  static inline void GetAvailableModcodsFwdLinkS2XNormalAndShortFrames (std::vector<SatModcod_t>& modcods)
-  {
-    /**
-     * Note that the order of MODCODs have a meaning in ACM.
-     * The MODCODs should be in decreasing order based on
-     * coding rate.
-     *
-     * This function should not be used actually as the working EsNo are not the
-     * same for short and long frames of same Modulation and Coding Rate.
-     */
-
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_1_TO_4_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_1_TO_4_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_1_TO_3_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_1_TO_3_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_2_TO_5_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_2_TO_5_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_1_TO_2_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_1_TO_2_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_3_TO_5_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_3_TO_5_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_2_TO_3_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_2_TO_3_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_3_TO_4_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_3_TO_4_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_4_TO_5_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_4_TO_5_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_5_TO_6_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_5_TO_6_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_8_TO_9_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_QPSK_8_TO_9_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_3_TO_5_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_3_TO_5_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_2_TO_3_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_2_TO_3_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_3_TO_4_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_3_TO_4_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_5_TO_6_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_5_TO_6_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_8_TO_9_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_8PSK_8_TO_9_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_26_TO_45_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_26_TO_45_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_3_TO_5_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_3_TO_5_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_2_TO_3_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_2_TO_3_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_3_TO_4_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_3_TO_4_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_4_TO_5_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_4_TO_5_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_5_TO_6_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_5_TO_6_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_8_TO_9_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_16APSK_8_TO_9_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_32_TO_45_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_32_TO_45_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_3_TO_4_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_3_TO_4_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_4_TO_5_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_4_TO_5_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_5_TO_6_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_5_TO_6_NORMAL_PILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_8_TO_9_NORMAL_NOPILOTS);
-    modcods.push_back (SAT_MODCOD_S2X_32APSK_8_TO_9_NORMAL_PILOTS);
+    if (pilots)
+      {
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_11_TO_45_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_1_TO_4_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_4_TO_15_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_14_TO_45_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_1_TO_3_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_2_TO_5_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_7_TO_15_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_1_TO_2_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_8_TO_15_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_3_TO_5_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_2_TO_3_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_32_TO_45_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_3_TO_4_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_4_TO_5_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_5_TO_6_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_8_TO_9_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_7_TO_15_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_8_TO_15_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_26_TO_45_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_3_TO_5_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_2_TO_3_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_32_TO_45_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_3_TO_4_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_5_TO_6_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_8_TO_9_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_7_TO_15_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_8_TO_15_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_26_TO_45_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_3_TO_5_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_2_TO_3_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_32_TO_45_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_3_TO_4_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_4_TO_5_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_5_TO_6_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_8_TO_9_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_32APSK_2_TO_3_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_32APSK_32_TO_45_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_32APSK_3_TO_4_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_32APSK_4_TO_5_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_32APSK_5_TO_6_SHORT_PILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_32APSK_8_TO_9_SHORT_PILOTS);
+      }
+    else
+      {
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_11_TO_45_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_1_TO_4_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_4_TO_15_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_14_TO_45_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_1_TO_3_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_2_TO_5_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_7_TO_15_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_1_TO_2_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_8_TO_15_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_3_TO_5_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_2_TO_3_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_32_TO_45_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_3_TO_4_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_4_TO_5_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_5_TO_6_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_QPSK_8_TO_9_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_7_TO_15_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_8_TO_15_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_26_TO_45_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_3_TO_5_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_2_TO_3_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_32_TO_45_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_3_TO_4_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_5_TO_6_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_8PSK_8_TO_9_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_7_TO_15_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_8_TO_15_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_26_TO_45_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_3_TO_5_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_2_TO_3_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_32_TO_45_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_3_TO_4_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_4_TO_5_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_5_TO_6_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_16APSK_8_TO_9_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_32APSK_2_TO_3_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_32APSK_32_TO_45_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_32APSK_3_TO_4_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_32APSK_4_TO_5_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_32APSK_5_TO_6_SHORT_NOPILOTS);
+        modcods.push_back (SAT_MODCOD_S2X_32APSK_8_TO_9_SHORT_NOPILOTS);
+      }
   }
 
   static inline void GetAvailableModcodsRtnLink (std::vector<SatModcod_t>& modcods)
@@ -1240,6 +1184,496 @@ public:
     NS_FATAL_ERROR ("SatEnums::GetModcodTypeName - Invalid modcod type");
     return "";
   }
+
+  static inline SatModcod_t GetModcodFromName (const std::string name)
+  {
+    if (name == "SAT_NONVALID_MODCOD")
+      return SAT_NONVALID_MODCOD;
+    if (name == "SAT_MODCOD_QPSK_1_TO_3")
+      return SAT_MODCOD_QPSK_1_TO_3;
+    if (name == "SAT_MODCOD_QPSK_1_TO_2")
+      return SAT_MODCOD_QPSK_1_TO_2;
+    if (name == "SAT_MODCOD_QPSK_2_TO_3")
+      return SAT_MODCOD_QPSK_2_TO_3;
+    if (name == "SAT_MODCOD_QPSK_3_TO_4")
+      return SAT_MODCOD_QPSK_3_TO_4;
+    if (name == "SAT_MODCOD_QPSK_3_TO_5")
+      return SAT_MODCOD_QPSK_3_TO_5;
+    if (name == "SAT_MODCOD_QPSK_4_TO_5")
+      return SAT_MODCOD_QPSK_4_TO_5;
+    if (name == "SAT_MODCOD_QPSK_5_TO_6")
+      return SAT_MODCOD_QPSK_5_TO_6;
+    if (name == "SAT_MODCOD_QPSK_8_TO_9")
+      return SAT_MODCOD_QPSK_8_TO_9;
+    if (name == "SAT_MODCOD_QPSK_9_TO_10")
+      return SAT_MODCOD_QPSK_9_TO_10;
+    if (name == "SAT_MODCOD_8PSK_2_TO_3")
+      return SAT_MODCOD_8PSK_2_TO_3;
+    if (name == "SAT_MODCOD_8PSK_3_TO_4")
+      return SAT_MODCOD_8PSK_3_TO_4;
+    if (name == "SAT_MODCOD_8PSK_3_TO_5")
+      return SAT_MODCOD_8PSK_3_TO_5;
+    if (name == "SAT_MODCOD_8PSK_5_TO_6")
+      return SAT_MODCOD_8PSK_5_TO_6;
+    if (name == "SAT_MODCOD_8PSK_8_TO_9")
+      return SAT_MODCOD_8PSK_8_TO_9;
+    if (name == "SAT_MODCOD_8PSK_9_TO_10")
+      return SAT_MODCOD_8PSK_9_TO_10;
+    if (name == "SAT_MODCOD_16APSK_2_TO_3")
+      return SAT_MODCOD_16APSK_2_TO_3;
+    if (name == "SAT_MODCOD_16APSK_3_TO_4")
+      return SAT_MODCOD_16APSK_3_TO_4;
+    if (name == "SAT_MODCOD_16APSK_4_TO_5")
+      return SAT_MODCOD_16APSK_4_TO_5;
+    if (name == "SAT_MODCOD_16APSK_5_TO_6")
+      return SAT_MODCOD_16APSK_5_TO_6;
+    if (name == "SAT_MODCOD_16APSK_8_TO_9")
+      return SAT_MODCOD_16APSK_8_TO_9;
+    if (name == "SAT_MODCOD_16APSK_9_TO_10")
+      return SAT_MODCOD_16APSK_9_TO_10;
+    if (name == "SAT_MODCOD_16QAM_3_TO_4")
+      return SAT_MODCOD_16QAM_3_TO_4;
+    if (name == "SAT_MODCOD_16QAM_5_TO_6")
+      return SAT_MODCOD_16QAM_5_TO_6;
+    if (name == "SAT_MODCOD_32APSK_3_TO_4")
+      return SAT_MODCOD_32APSK_3_TO_4;
+    if (name == "SAT_MODCOD_32APSK_4_TO_5")
+      return SAT_MODCOD_32APSK_4_TO_5;
+    if (name == "SAT_MODCOD_32APSK_5_TO_6")
+      return SAT_MODCOD_32APSK_5_TO_6;
+    if (name == "SAT_MODCOD_32APSK_8_TO_9")
+      return SAT_MODCOD_32APSK_8_TO_9;
+    if (name == "SAT_MODCOD_S2X_QPSK_11_TO_45_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_QPSK_11_TO_45_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_11_TO_45_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_QPSK_11_TO_45_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_1_TO_4_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_QPSK_1_TO_4_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_1_TO_4_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_QPSK_1_TO_4_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_1_TO_4_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_QPSK_1_TO_4_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_1_TO_4_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_QPSK_1_TO_4_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_4_TO_15_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_QPSK_4_TO_15_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_4_TO_15_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_QPSK_4_TO_15_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_13_TO_45_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_QPSK_13_TO_45_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_13_TO_45_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_QPSK_13_TO_45_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_14_TO_45_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_QPSK_14_TO_45_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_14_TO_45_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_QPSK_14_TO_45_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_1_TO_3_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_QPSK_1_TO_3_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_1_TO_3_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_QPSK_1_TO_3_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_1_TO_3_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_QPSK_1_TO_3_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_1_TO_3_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_QPSK_1_TO_3_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_2_TO_5_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_QPSK_2_TO_5_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_2_TO_5_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_QPSK_2_TO_5_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_2_TO_5_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_QPSK_2_TO_5_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_2_TO_5_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_QPSK_2_TO_5_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_9_TO_20_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_QPSK_9_TO_20_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_9_TO_20_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_QPSK_9_TO_20_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_7_TO_15_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_QPSK_7_TO_15_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_7_TO_15_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_QPSK_7_TO_15_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_1_TO_2_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_QPSK_1_TO_2_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_1_TO_2_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_QPSK_1_TO_2_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_1_TO_2_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_QPSK_1_TO_2_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_1_TO_2_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_QPSK_1_TO_2_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_8_TO_15_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_QPSK_8_TO_15_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_8_TO_15_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_QPSK_8_TO_15_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_11_TO_20_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_QPSK_11_TO_20_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_11_TO_20_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_QPSK_11_TO_20_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_3_TO_5_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_QPSK_3_TO_5_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_3_TO_5_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_QPSK_3_TO_5_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_3_TO_5_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_QPSK_3_TO_5_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_3_TO_5_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_QPSK_3_TO_5_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_2_TO_3_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_QPSK_2_TO_3_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_2_TO_3_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_QPSK_2_TO_3_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_2_TO_3_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_QPSK_2_TO_3_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_2_TO_3_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_QPSK_2_TO_3_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_32_TO_45_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_QPSK_32_TO_45_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_32_TO_45_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_QPSK_32_TO_45_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_3_TO_4_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_QPSK_3_TO_4_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_3_TO_4_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_QPSK_3_TO_4_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_3_TO_4_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_QPSK_3_TO_4_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_3_TO_4_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_QPSK_3_TO_4_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_4_TO_5_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_QPSK_4_TO_5_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_4_TO_5_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_QPSK_4_TO_5_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_4_TO_5_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_QPSK_4_TO_5_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_4_TO_5_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_QPSK_4_TO_5_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_5_TO_6_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_QPSK_5_TO_6_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_5_TO_6_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_QPSK_5_TO_6_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_5_TO_6_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_QPSK_5_TO_6_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_5_TO_6_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_QPSK_5_TO_6_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_8_TO_9_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_QPSK_8_TO_9_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_8_TO_9_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_QPSK_8_TO_9_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_8_TO_9_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_QPSK_8_TO_9_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_8_TO_9_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_QPSK_8_TO_9_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_9_TO_10_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_QPSK_9_TO_10_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_QPSK_9_TO_10_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_QPSK_9_TO_10_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_7_TO_15_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_8PSK_7_TO_15_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_7_TO_15_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_8PSK_7_TO_15_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_8_TO_15_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_8PSK_8_TO_15_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_8_TO_15_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_8PSK_8_TO_15_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_26_TO_45_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_8PSK_26_TO_45_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_26_TO_45_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_8PSK_26_TO_45_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_3_TO_5_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_8PSK_3_TO_5_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_3_TO_5_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_8PSK_3_TO_5_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_3_TO_5_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_8PSK_3_TO_5_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_3_TO_5_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_8PSK_3_TO_5_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_23_TO_36_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_8PSK_23_TO_36_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_23_TO_36_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_8PSK_23_TO_36_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_2_TO_3_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_8PSK_2_TO_3_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_2_TO_3_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_8PSK_2_TO_3_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_2_TO_3_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_8PSK_2_TO_3_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_2_TO_3_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_8PSK_2_TO_3_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_25_TO_36_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_8PSK_25_TO_36_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_25_TO_36_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_8PSK_25_TO_36_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_32_TO_45_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_8PSK_32_TO_45_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_32_TO_45_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_8PSK_32_TO_45_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_13_TO_18_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_8PSK_13_TO_18_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_13_TO_18_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_8PSK_13_TO_18_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_3_TO_4_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_8PSK_3_TO_4_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_3_TO_4_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_8PSK_3_TO_4_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_3_TO_4_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_8PSK_3_TO_4_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_3_TO_4_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_8PSK_3_TO_4_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_5_TO_6_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_8PSK_5_TO_6_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_5_TO_6_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_8PSK_5_TO_6_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_5_TO_6_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_8PSK_5_TO_6_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_5_TO_6_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_8PSK_5_TO_6_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_8_TO_9_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_8PSK_8_TO_9_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_8_TO_9_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_8PSK_8_TO_9_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_8_TO_9_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_8PSK_8_TO_9_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_8_TO_9_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_8PSK_8_TO_9_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_9_TO_10_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_8PSK_9_TO_10_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_8PSK_9_TO_10_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_8PSK_9_TO_10_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_8APSK_5_TO_9_L_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_8APSK_5_TO_9_L_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_8APSK_5_TO_9_L_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_8APSK_5_TO_9_L_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_8APSK_26_TO_45_L_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_8APSK_26_TO_45_L_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_8APSK_26_TO_45_L_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_8APSK_26_TO_45_L_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_7_TO_15_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_16APSK_7_TO_15_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_7_TO_15_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_16APSK_7_TO_15_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_1_TO_2_L_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_16APSK_1_TO_2_L_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_1_TO_2_L_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_16APSK_1_TO_2_L_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_8_TO_15_L_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_16APSK_8_TO_15_L_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_8_TO_15_L_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_16APSK_8_TO_15_L_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_8_TO_15_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_16APSK_8_TO_15_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_8_TO_15_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_16APSK_8_TO_15_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_5_TO_9_L_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_16APSK_5_TO_9_L_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_5_TO_9_L_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_16APSK_5_TO_9_L_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_26_TO_45_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_16APSK_26_TO_45_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_26_TO_45_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_16APSK_26_TO_45_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_26_TO_45_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_16APSK_26_TO_45_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_26_TO_45_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_16APSK_26_TO_45_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_3_TO_5_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_16APSK_3_TO_5_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_3_TO_5_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_16APSK_3_TO_5_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_3_TO_5_L_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_16APSK_3_TO_5_L_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_3_TO_5_L_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_16APSK_3_TO_5_L_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_3_TO_5_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_16APSK_3_TO_5_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_3_TO_5_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_16APSK_3_TO_5_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_28_TO_45_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_16APSK_28_TO_45_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_28_TO_45_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_16APSK_28_TO_45_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_23_TO_36_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_16APSK_23_TO_36_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_23_TO_36_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_16APSK_23_TO_36_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_2_TO_3_L_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_16APSK_2_TO_3_L_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_2_TO_3_L_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_16APSK_2_TO_3_L_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_2_TO_3_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_16APSK_2_TO_3_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_2_TO_3_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_16APSK_2_TO_3_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_2_TO_3_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_16APSK_2_TO_3_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_2_TO_3_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_16APSK_2_TO_3_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_25_TO_36_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_16APSK_25_TO_36_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_25_TO_36_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_16APSK_25_TO_36_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_32_TO_45_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_16APSK_32_TO_45_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_32_TO_45_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_16APSK_32_TO_45_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_13_TO_18_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_16APSK_13_TO_18_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_13_TO_18_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_16APSK_13_TO_18_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_3_TO_4_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_16APSK_3_TO_4_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_3_TO_4_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_16APSK_3_TO_4_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_3_TO_4_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_16APSK_3_TO_4_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_3_TO_4_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_16APSK_3_TO_4_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_7_TO_9_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_16APSK_7_TO_9_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_7_TO_9_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_16APSK_7_TO_9_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_4_TO_5_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_16APSK_4_TO_5_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_4_TO_5_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_16APSK_4_TO_5_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_4_TO_5_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_16APSK_4_TO_5_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_4_TO_5_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_16APSK_4_TO_5_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_5_TO_6_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_16APSK_5_TO_6_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_5_TO_6_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_16APSK_5_TO_6_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_5_TO_6_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_16APSK_5_TO_6_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_5_TO_6_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_16APSK_5_TO_6_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_77_TO_90_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_16APSK_77_TO_90_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_77_TO_90_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_16APSK_77_TO_90_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_8_TO_9_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_16APSK_8_TO_9_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_8_TO_9_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_16APSK_8_TO_9_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_8_TO_9_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_16APSK_8_TO_9_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_8_TO_9_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_16APSK_8_TO_9_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_9_TO_10_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_16APSK_9_TO_10_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_16APSK_9_TO_10_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_16APSK_9_TO_10_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_32APSK_2_TO_3_L_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_32APSK_2_TO_3_L_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_32APSK_2_TO_3_L_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_32APSK_2_TO_3_L_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_32APSK_2_TO_3_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_32APSK_2_TO_3_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_32APSK_2_TO_3_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_32APSK_2_TO_3_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_32APSK_32_TO_45_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_32APSK_32_TO_45_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_32APSK_32_TO_45_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_32APSK_32_TO_45_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_32APSK_32_TO_45_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_32APSK_32_TO_45_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_32APSK_32_TO_45_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_32APSK_32_TO_45_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_32APSK_11_TO_15_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_32APSK_11_TO_15_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_32APSK_11_TO_15_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_32APSK_11_TO_15_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_32APSK_3_TO_4_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_32APSK_3_TO_4_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_32APSK_3_TO_4_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_32APSK_3_TO_4_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_32APSK_3_TO_4_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_32APSK_3_TO_4_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_32APSK_3_TO_4_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_32APSK_3_TO_4_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_32APSK_7_TO_9_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_32APSK_7_TO_9_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_32APSK_7_TO_9_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_32APSK_7_TO_9_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_32APSK_4_TO_5_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_32APSK_4_TO_5_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_32APSK_4_TO_5_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_32APSK_4_TO_5_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_32APSK_4_TO_5_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_32APSK_4_TO_5_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_32APSK_4_TO_5_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_32APSK_4_TO_5_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_32APSK_5_TO_6_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_32APSK_5_TO_6_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_32APSK_5_TO_6_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_32APSK_5_TO_6_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_32APSK_5_TO_6_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_32APSK_5_TO_6_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_32APSK_5_TO_6_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_32APSK_5_TO_6_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_32APSK_8_TO_9_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_32APSK_8_TO_9_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_32APSK_8_TO_9_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_32APSK_8_TO_9_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_32APSK_8_TO_9_SHORT_NOPILOTS")
+      return SAT_MODCOD_S2X_32APSK_8_TO_9_SHORT_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_32APSK_8_TO_9_SHORT_PILOTS")
+      return SAT_MODCOD_S2X_32APSK_8_TO_9_SHORT_PILOTS;
+    if (name == "SAT_MODCOD_S2X_32APSK_9_TO_10_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_32APSK_9_TO_10_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_32APSK_9_TO_10_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_32APSK_9_TO_10_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_64APSK_32_TO_45_L_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_64APSK_32_TO_45_L_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_64APSK_32_TO_45_L_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_64APSK_32_TO_45_L_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_64APSK_11_TO_15_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_64APSK_11_TO_15_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_64APSK_11_TO_15_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_64APSK_11_TO_15_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_64APSK_7_TO_9_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_64APSK_7_TO_9_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_64APSK_7_TO_9_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_64APSK_7_TO_9_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_64APSK_4_TO_5_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_64APSK_4_TO_5_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_64APSK_4_TO_5_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_64APSK_4_TO_5_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_64APSK_5_TO_6_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_64APSK_5_TO_6_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_64APSK_5_TO_6_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_64APSK_5_TO_6_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_128APSK_3_TO_4_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_128APSK_3_TO_4_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_128APSK_3_TO_4_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_128APSK_3_TO_4_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_128APSK_7_TO_9_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_128APSK_7_TO_9_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_128APSK_7_TO_9_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_128APSK_7_TO_9_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_256APSK_29_TO_45_L_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_256APSK_29_TO_45_L_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_256APSK_29_TO_45_L_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_256APSK_29_TO_45_L_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_256APSK_2_TO_3_L_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_256APSK_2_TO_3_L_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_256APSK_2_TO_3_L_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_256APSK_2_TO_3_L_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_256APSK_31_TO_45_L_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_256APSK_31_TO_45_L_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_256APSK_31_TO_45_L_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_256APSK_31_TO_45_L_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_256APSK_32_TO_45_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_256APSK_32_TO_45_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_256APSK_32_TO_45_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_256APSK_32_TO_45_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_256APSK_11_TO_15_L_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_256APSK_11_TO_15_L_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_256APSK_11_TO_15_L_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_256APSK_11_TO_15_L_NORMAL_PILOTS;
+    if (name == "SAT_MODCOD_S2X_256APSK_3_TO_4_NORMAL_NOPILOTS")
+      return SAT_MODCOD_S2X_256APSK_3_TO_4_NORMAL_NOPILOTS;
+    if (name == "SAT_MODCOD_S2X_256APSK_3_TO_4_NORMAL_PILOTS")
+      return SAT_MODCOD_S2X_256APSK_3_TO_4_NORMAL_PILOTS;
+  NS_FATAL_ERROR ("Cannot fing ModCod: " + name);
+  return SAT_NONVALID_MODCOD;
+}
 
   /**
    * \enum SatBbFrameType_t

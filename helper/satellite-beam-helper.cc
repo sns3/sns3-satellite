@@ -142,7 +142,7 @@ SatBeamHelper::GetTypeId (void)
                    MakeBooleanAccessor (&SatBeamHelper::m_enableTracesOnReturnLink),
                    MakeBooleanChecker ())
     .AddAttribute ("DvbVersion",
-                   "Indicates if using DVB-S2 or DVB-S2X.",
+                   "Indicates if using DVB-S2 or DVB-S2X",
                    EnumValue (SatEnums::DVB_S2),
                    MakeEnumAccessor (&SatBeamHelper::m_dvbVersion),
                    MakeEnumChecker (SatEnums::DVB_S2, "DVB_S2",
