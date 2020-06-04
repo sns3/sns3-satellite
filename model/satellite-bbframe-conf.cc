@@ -23,6 +23,7 @@
 #include <limits>
 #include <utility>
 #include <vector>
+#include <algorithm>
 #include <ns3/log.h>
 #include <ns3/string.h>
 #include <ns3/double.h>
@@ -618,36 +619,28 @@ SatBbFrameConf::CalculateBbFrameDuration (SatEnums::SatModcod_t modcod, SatEnums
 void
 SatBbFrameConf::GetModCodsList ()
 {
+  m_s2XModCodsUsed.clear ();
   if (m_s2XModCodsUsedStr.size () == 0)
   {
     SatEnums::GetAvailableModcodsFwdLinkS2X (m_s2XModCodsUsed, m_bbFrameUsageMode, m_bbFrameS2XPilots);
     return;
   }
+
   std::stringstream strm (m_s2XModCodsUsedStr);
-  while (!strm.eof ())
+  std::string name;
+
+  while (getline(strm, name, ' '))
     {
-      std::string name;
-      strm >> name;
-      if (strm.fail ())
-        {
-          strm.clear ();
-          std::string garbage;
-          strm >> garbage;
-        }
-      else
-        {
-          std::cout << name << std::endl;
-          m_s2XModCodsUsed.push_back (SatEnums::GetModcodFromName ("SAT_MODCOD_S2X_" + name +
-            "_" + (m_bbFrameUsageMode == SatEnums::NORMAL_FRAMES ? "NORMAL" : "SHORT") +
-            "_" + (m_bbFrameS2XPilots ? "PILOTS" : "NOPILOTS")));
-          // TODO check if correct: DVB version, pilots, size, etc.
-        }
+      SatEnums::SatModcod_t mc = SatEnums::GetModcodFromName ("SAT_MODCOD_S2X_" + name +
+        "_" + (m_bbFrameUsageMode == SatEnums::NORMAL_FRAMES ? "NORMAL" : "SHORT") +
+        "_" + (m_bbFrameS2XPilots ? "PILOTS" : "NOPILOTS"));
+      m_s2XModCodsUsed.push_back (mc);
     }
+  std::sort (m_s2XModCodsUsed.begin (), m_s2XModCodsUsed.end ());
   for (SatEnums::SatModcod_t mc : m_s2XModCodsUsed)
     {
-      std::cout << SatEnums::GetModcodTypeName (mc) << std::endl;
+      std::cout << SatEnums::GetModcodTypeName (mc) << " " << mc << std::endl;
     }
-  // TODO sort ModCods
 }
 
 uint32_t

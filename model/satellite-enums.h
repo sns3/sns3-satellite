@@ -1189,60 +1189,7 @@ public:
   {
     if (name == "SAT_NONVALID_MODCOD")
       return SAT_NONVALID_MODCOD;
-    if (name == "SAT_MODCOD_QPSK_1_TO_3")
-      return SAT_MODCOD_QPSK_1_TO_3;
-    if (name == "SAT_MODCOD_QPSK_1_TO_2")
-      return SAT_MODCOD_QPSK_1_TO_2;
-    if (name == "SAT_MODCOD_QPSK_2_TO_3")
-      return SAT_MODCOD_QPSK_2_TO_3;
-    if (name == "SAT_MODCOD_QPSK_3_TO_4")
-      return SAT_MODCOD_QPSK_3_TO_4;
-    if (name == "SAT_MODCOD_QPSK_3_TO_5")
-      return SAT_MODCOD_QPSK_3_TO_5;
-    if (name == "SAT_MODCOD_QPSK_4_TO_5")
-      return SAT_MODCOD_QPSK_4_TO_5;
-    if (name == "SAT_MODCOD_QPSK_5_TO_6")
-      return SAT_MODCOD_QPSK_5_TO_6;
-    if (name == "SAT_MODCOD_QPSK_8_TO_9")
-      return SAT_MODCOD_QPSK_8_TO_9;
-    if (name == "SAT_MODCOD_QPSK_9_TO_10")
-      return SAT_MODCOD_QPSK_9_TO_10;
-    if (name == "SAT_MODCOD_8PSK_2_TO_3")
-      return SAT_MODCOD_8PSK_2_TO_3;
-    if (name == "SAT_MODCOD_8PSK_3_TO_4")
-      return SAT_MODCOD_8PSK_3_TO_4;
-    if (name == "SAT_MODCOD_8PSK_3_TO_5")
-      return SAT_MODCOD_8PSK_3_TO_5;
-    if (name == "SAT_MODCOD_8PSK_5_TO_6")
-      return SAT_MODCOD_8PSK_5_TO_6;
-    if (name == "SAT_MODCOD_8PSK_8_TO_9")
-      return SAT_MODCOD_8PSK_8_TO_9;
-    if (name == "SAT_MODCOD_8PSK_9_TO_10")
-      return SAT_MODCOD_8PSK_9_TO_10;
-    if (name == "SAT_MODCOD_16APSK_2_TO_3")
-      return SAT_MODCOD_16APSK_2_TO_3;
-    if (name == "SAT_MODCOD_16APSK_3_TO_4")
-      return SAT_MODCOD_16APSK_3_TO_4;
-    if (name == "SAT_MODCOD_16APSK_4_TO_5")
-      return SAT_MODCOD_16APSK_4_TO_5;
-    if (name == "SAT_MODCOD_16APSK_5_TO_6")
-      return SAT_MODCOD_16APSK_5_TO_6;
-    if (name == "SAT_MODCOD_16APSK_8_TO_9")
-      return SAT_MODCOD_16APSK_8_TO_9;
-    if (name == "SAT_MODCOD_16APSK_9_TO_10")
-      return SAT_MODCOD_16APSK_9_TO_10;
-    if (name == "SAT_MODCOD_16QAM_3_TO_4")
-      return SAT_MODCOD_16QAM_3_TO_4;
-    if (name == "SAT_MODCOD_16QAM_5_TO_6")
-      return SAT_MODCOD_16QAM_5_TO_6;
-    if (name == "SAT_MODCOD_32APSK_3_TO_4")
-      return SAT_MODCOD_32APSK_3_TO_4;
-    if (name == "SAT_MODCOD_32APSK_4_TO_5")
-      return SAT_MODCOD_32APSK_4_TO_5;
-    if (name == "SAT_MODCOD_32APSK_5_TO_6")
-      return SAT_MODCOD_32APSK_5_TO_6;
-    if (name == "SAT_MODCOD_32APSK_8_TO_9")
-      return SAT_MODCOD_32APSK_8_TO_9;
+    // DVB-S2X ModCods
     if (name == "SAT_MODCOD_S2X_QPSK_11_TO_45_SHORT_NOPILOTS")
       return SAT_MODCOD_S2X_QPSK_11_TO_45_SHORT_NOPILOTS;
     if (name == "SAT_MODCOD_S2X_QPSK_11_TO_45_SHORT_PILOTS")
@@ -1671,6 +1618,61 @@ public:
       return SAT_MODCOD_S2X_256APSK_3_TO_4_NORMAL_NOPILOTS;
     if (name == "SAT_MODCOD_S2X_256APSK_3_TO_4_NORMAL_PILOTS")
       return SAT_MODCOD_S2X_256APSK_3_TO_4_NORMAL_PILOTS;
+    // DVB-S2 ModCods
+    if (name == "SAT_MODCOD_QPSK_1_TO_3")
+      return SAT_MODCOD_QPSK_1_TO_3;
+    if (name == "SAT_MODCOD_QPSK_1_TO_2")
+      return SAT_MODCOD_QPSK_1_TO_2;
+    if (name == "SAT_MODCOD_QPSK_2_TO_3")
+      return SAT_MODCOD_QPSK_2_TO_3;
+    if (name == "SAT_MODCOD_QPSK_3_TO_4")
+      return SAT_MODCOD_QPSK_3_TO_4;
+    if (name == "SAT_MODCOD_QPSK_3_TO_5")
+      return SAT_MODCOD_QPSK_3_TO_5;
+    if (name == "SAT_MODCOD_QPSK_4_TO_5")
+      return SAT_MODCOD_QPSK_4_TO_5;
+    if (name == "SAT_MODCOD_QPSK_5_TO_6")
+      return SAT_MODCOD_QPSK_5_TO_6;
+    if (name == "SAT_MODCOD_QPSK_8_TO_9")
+      return SAT_MODCOD_QPSK_8_TO_9;
+    if (name == "SAT_MODCOD_QPSK_9_TO_10")
+      return SAT_MODCOD_QPSK_9_TO_10;
+    if (name == "SAT_MODCOD_8PSK_2_TO_3")
+      return SAT_MODCOD_8PSK_2_TO_3;
+    if (name == "SAT_MODCOD_8PSK_3_TO_4")
+      return SAT_MODCOD_8PSK_3_TO_4;
+    if (name == "SAT_MODCOD_8PSK_3_TO_5")
+      return SAT_MODCOD_8PSK_3_TO_5;
+    if (name == "SAT_MODCOD_8PSK_5_TO_6")
+      return SAT_MODCOD_8PSK_5_TO_6;
+    if (name == "SAT_MODCOD_8PSK_8_TO_9")
+      return SAT_MODCOD_8PSK_8_TO_9;
+    if (name == "SAT_MODCOD_8PSK_9_TO_10")
+      return SAT_MODCOD_8PSK_9_TO_10;
+    if (name == "SAT_MODCOD_16APSK_2_TO_3")
+      return SAT_MODCOD_16APSK_2_TO_3;
+    if (name == "SAT_MODCOD_16APSK_3_TO_4")
+      return SAT_MODCOD_16APSK_3_TO_4;
+    if (name == "SAT_MODCOD_16APSK_4_TO_5")
+      return SAT_MODCOD_16APSK_4_TO_5;
+    if (name == "SAT_MODCOD_16APSK_5_TO_6")
+      return SAT_MODCOD_16APSK_5_TO_6;
+    if (name == "SAT_MODCOD_16APSK_8_TO_9")
+      return SAT_MODCOD_16APSK_8_TO_9;
+    if (name == "SAT_MODCOD_16APSK_9_TO_10")
+      return SAT_MODCOD_16APSK_9_TO_10;
+    if (name == "SAT_MODCOD_16QAM_3_TO_4")
+      return SAT_MODCOD_16QAM_3_TO_4;
+    if (name == "SAT_MODCOD_16QAM_5_TO_6")
+      return SAT_MODCOD_16QAM_5_TO_6;
+    if (name == "SAT_MODCOD_32APSK_3_TO_4")
+      return SAT_MODCOD_32APSK_3_TO_4;
+    if (name == "SAT_MODCOD_32APSK_4_TO_5")
+      return SAT_MODCOD_32APSK_4_TO_5;
+    if (name == "SAT_MODCOD_32APSK_5_TO_6")
+      return SAT_MODCOD_32APSK_5_TO_6;
+    if (name == "SAT_MODCOD_32APSK_8_TO_9")
+      return SAT_MODCOD_32APSK_8_TO_9;
   NS_FATAL_ERROR ("Cannot fing ModCod: " + name);
   return SAT_NONVALID_MODCOD;
 }
