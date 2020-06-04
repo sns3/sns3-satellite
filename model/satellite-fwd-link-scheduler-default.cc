@@ -74,17 +74,7 @@ SatFwdLinkSchedulerDefault::SatFwdLinkSchedulerDefault (Ptr<SatBbFrameConf> conf
 
   ObjectBase::ConstructSelf (AttributeConstructionList ());
 
-  std::vector<SatEnums::SatModcod_t> modCods;
-
-  switch(conf->GetDvbVersion ())
-  {
-    case SatEnums::DVB_S2:
-      SatEnums::GetAvailableModcodsFwdLink (modCods);
-      break;
-    case SatEnums::DVB_S2X:
-      SatEnums::GetAvailableModcodsFwdLinkS2X (modCods, conf->GetBbFrameUsageMode (), conf->IsBbFrameS2XPilots ());
-      break;
-  }
+  std::vector<SatEnums::SatModcod_t> modCods = conf->GetModCodsUsed ();
 
   m_bbFrameContainer = CreateObject<SatBbFrameContainer> (modCods, m_bbFrameConf);
 

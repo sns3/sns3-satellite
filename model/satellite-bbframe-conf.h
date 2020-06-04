@@ -288,11 +288,11 @@ public:
   SatEnums::DvbVersion_t GetDvbVersion ();
 
   /**
-   * \brief Indicates if using pilots on BBFrames when DVB-S2X is chosen
+   * \brief Get the list of ModCods used.
    *
-   * \return True if pilots are used
+   * \return All the ModCods used in this conf.
    */
-  bool IsBbFrameS2XPilots ();
+  std::vector<SatEnums::SatModcod_t> GetModCodsUsed ();
 
 private:
   /**
@@ -447,9 +447,9 @@ private:
   bool m_bbFrameS2XPilots;
 
   /**
-   * List of DVB-S2X ModCods used.
+   * List of ModCods used.
    */
-  std::vector<SatEnums::SatModcod_t> m_s2XModCodsUsed;
+  std::vector<SatEnums::SatModcod_t> m_modCodsUsed;
 
   /**
    * String containing all DVB-S2X ModCods used.

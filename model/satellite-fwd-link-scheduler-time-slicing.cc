@@ -65,17 +65,12 @@ SatFwdLinkSchedulerTimeSlicing::SatFwdLinkSchedulerTimeSlicing (Ptr<SatBbFrameCo
 
   ObjectBase::ConstructSelf (AttributeConstructionList ());
 
-  std::vector<SatEnums::SatModcod_t> modCods;
+  std::vector<SatEnums::SatModcod_t> modCods = conf->GetModCodsUsed ();
 
-  switch(conf->GetDvbVersion ())
-  {
-    case SatEnums::DVB_S2:
-      SatEnums::GetAvailableModcodsFwdLink (modCods);
-      break;
-    case SatEnums::DVB_S2X:
-      SatEnums::GetAvailableModcodsFwdLinkS2X (modCods, conf->GetBbFrameUsageMode (), conf->IsBbFrameS2XPilots ());
-      break;
-  }
+  for (SatEnums::SatModcod_t mc : modCods)
+    {
+      std::cout << SatEnums::GetModcodTypeName (mc) << std::endl;
+    }
 
   // Create control and broadcast container
   m_bbFrameContainers.insert (std::pair<uint8_t, Ptr<SatBbFrameContainer>> (0, CreateObject<SatBbFrameContainer> (modCods, m_bbFrameConf)));
