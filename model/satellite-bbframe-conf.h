@@ -260,7 +260,7 @@ public:
    * Get the default MODCOD for short DVB-S2X frames
    * \return SatModcod_t The default MODCOD for short DVB-S2X frames
    */
-  SatEnums::SatModcod_t GetDefaultModCodShortFramesS2X () const;
+  SatEnums::SatModcod_t GetDefaultModCodDummyFramesS2X () const;
 
   /**
    * Get the default MODCOD
@@ -375,29 +375,18 @@ private:
   bool m_acmEnabled;
 
   /**
-   * Default MODCOD for DVB-S2
+   * Default MODCOD for DVB-S2X dummy Frames. This must be a short frame.
    */
-  SatEnums::SatModcod_t m_defaultModCodS2;
+  SatEnums::SatModcod_t m_defaultModCodDummyFramesS2X;
 
   /**
-   * Default MODCOD for DVB-S2X short Frames and no pilots.
+   * String representation of default ModCod for DVB-S2X Dummy Frames.
+   * Must be only modulation and coding rate in the string.
+   * This must exist in short Frame format.
+   * Used in the attributes and converted into correct m_defaultModCodDummyFramesS2X.
+   * In DVB-S2, Dummy Frames use m_defaultModCod.
    */
-  SatEnums::SatModcod_t m_defaultModCodShortFrameS2XNoPilots;
-
-  /**
-   * Default MODCOD for DVB-S2X normal Frames and no pilots.
-   */
-  SatEnums::SatModcod_t m_defaultModCodNormalFrameS2XNoPilots;
-
-  /**
-   * Default MODCOD for DVB-S2X short Frames and pilots.
-   */
-  SatEnums::SatModcod_t m_defaultModCodShortFrameS2XPilots;
-
-  /**
-   * Default MODCOD for DVB-S2X normal Frames and pilots.
-   */
-  SatEnums::SatModcod_t m_defaultModCodNormalFrameS2XPilots;
+  std::string m_defaultModCodDummyFramesS2XStr;
 
   /**
    * Default MODCOD is used
@@ -412,6 +401,13 @@ private:
    * all MODCODs due to maximum arguments limitation (<=22) of MakeEnumChecker (...)
    */
   SatEnums::SatModcod_t m_defaultModCod;
+
+  /**
+   * The string representation of default ModCod.
+   * Should be only modulation and coding rate.
+   * Used in the attributes and converted into correct m_defaultModCod.
+   */
+  std::string m_defaultModCodStr;
 
   std::map<uint32_t, uint32_t> m_shortFramePayloadInSlots;
   std::map<uint32_t, uint32_t> m_normalFramePayloadInSlots;

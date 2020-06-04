@@ -67,7 +67,7 @@ SatBbFrame::SatBbFrame (SatEnums::SatModcod_t modCod, SatEnums::SatBbFrameType_t
             m_maxSpaceInBytes = conf->GetBbFramePayloadBits (modCod, SatEnums::SHORT_FRAME) / SatConstVariables::BITS_PER_BYTE;
             break;
           case SatEnums::DVB_S2X:
-            m_maxSpaceInBytes = conf->GetBbFramePayloadBits (conf->GetDefaultModCodShortFramesS2X (), SatEnums::SHORT_FRAME) / SatConstVariables::BITS_PER_BYTE;
+            m_maxSpaceInBytes = conf->GetBbFramePayloadBits (conf->GetDefaultModCodDummyFramesS2X (), SatEnums::SHORT_FRAME) / SatConstVariables::BITS_PER_BYTE;
             break;
           default:
             NS_FATAL_ERROR ("Unknown DVB version");

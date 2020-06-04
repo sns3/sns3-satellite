@@ -67,11 +67,6 @@ SatFwdLinkSchedulerTimeSlicing::SatFwdLinkSchedulerTimeSlicing (Ptr<SatBbFrameCo
 
   std::vector<SatEnums::SatModcod_t> modCods = conf->GetModCodsUsed ();
 
-  for (SatEnums::SatModcod_t mc : modCods)
-    {
-      std::cout << SatEnums::GetModcodTypeName (mc) << std::endl;
-    }
-
   // Create control and broadcast container
   m_bbFrameContainers.insert (std::pair<uint8_t, Ptr<SatBbFrameContainer>> (0, CreateObject<SatBbFrameContainer> (modCods, m_bbFrameConf)));
   m_bbFrameContainers.at (0)->SetMaxSymbolRate (m_carrierBandwidthInHz);
