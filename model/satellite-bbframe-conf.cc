@@ -270,11 +270,10 @@ SatBbFrameConf::SatBbFrameConf (double symbolRate, SatEnums::DvbVersion_t dvbVer
         }
     }
 
-  /* New to add waveform for short frame with Default ModCod when using
-   * DVB-S2X and Normal Frames.
-   * Used to create dummy frames which are short frames.
+  /* Add waveform with Default Dummy Frames ModCod when using DVB-S2X.
+   * Added if not already in ModCods list.
    */
-  if (m_dvbVersion == SatEnums::DVB_S2X && m_bbFrameUsageMode == SatEnums::NORMAL_FRAMES)
+  if (m_dvbVersion == SatEnums::DVB_S2X && std::find(m_modCodsUsed.begin(), m_modCodsUsed.end(), m_defaultModCodDummyFramesS2X) == m_modCodsUsed.end())
     {
       SatEnums::SatBbFrameType_t fit = SatEnums::SHORT_FRAME;
       SatEnums::SatModcod_t mit = m_defaultModCodDummyFramesS2X;
