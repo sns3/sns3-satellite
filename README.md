@@ -120,15 +120,15 @@ $ git clone https://gitlab.com/nsnam/ns-3-dev.git ns-3.29
 *  get the ''satellite'' module (by [cloning it using git](https://github.com/sns3/sns3-satellite));
 ```shell
 $ cd ns-3.29/contrib
-$ git clone https://github.com/sns3/sns3-satellite satellite
+$ git clone https://forge.net4sat.org/sns3/sns-3-satellite.git satellite
 
 ```
 *  get the ''traffic'' and ''magister-stats'' modules (needed until they are integrated into NS3) as dependencies of the ''satellite'' module by cloning them :
 
 
 ```shell
-$ git clone https://github.com/sns3/traffic.git traffic
-$ git clone https://github.com/sns3/stats.git magister-stats
+$ git clone https://forge.net4sat.org/sns3/magister-traffic.git traffic
+$ git clone https://forge.net4sat.org/sns3/magister-stats.git magister-stats
     
 ```
 
