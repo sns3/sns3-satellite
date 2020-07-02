@@ -111,6 +111,11 @@ SatFwdLinkScheduler::GetTypeId (void)
                    PointerValue (),
                    MakePointerAccessor (&SatFwdLinkScheduler::m_bbFrameConf),
                    MakePointerChecker<SatBbFrameConf> ())
+    .AddAttribute ("DummyFrameSendingEnabled",
+                   "Flag to tell, if dummy frames are sent or not.",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatFwdLinkScheduler::m_dummyFrameSendingEnabled),
+                   MakeBooleanChecker ())
     .AddAttribute ("AdditionalSortCriteria",
                    "Sorting criteria after priority for scheduling objects from LLC.",
                    EnumValue (SatFwdLinkScheduler::NO_SORT),
