@@ -8,7 +8,7 @@
  <default name="ns3::SatBbFrameConf::DummyFrameInSlots" value="36"/>
  <default name="ns3::SatBbFrameConf::TargetBLER" value="1e-05"/>
  <default name="ns3::SatBbFrameConf::AcmEnabled" value="true"/>
- <default name="ns3::SatBbFrameConf::DefaultModCodS2" value="QPSK_1_TO_2"/>
+ <default name="ns3::SatBbFrameConf::DefaultModCod" value="QPSK_1_TO_2"/>
  <default name="ns3::SatBbFrameConf::BbFrameHeaderInBytes" value="10"/>
  <default name="ns3::SatBbFrameConf::BbFrameHighOccupancyThreshold" value="0.9"/>
  <default name="ns3::SatBbFrameConf::BbFrameLowOccupancyThreshold" value="0.5"/>

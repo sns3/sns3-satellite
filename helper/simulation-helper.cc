@@ -682,8 +682,7 @@ SimulationHelper::EnableAcm (SatEnums::SatLinkDir_t dir)
     case SatEnums::LD_FORWARD:
       {
         Config::SetDefault ("ns3::SatBbFrameConf::AcmEnabled", BooleanValue (true));
-        Config::SetDefault ("ns3::SatBbFrameConf::DefaultModCodS2", StringValue ("QPSK_1_TO_2"));
-        Config::SetDefault ("ns3::SatBbFrameConf::DefaultModCodS2X", StringValue ("QPSK_1_TO_2"));
+        Config::SetDefault ("ns3::SatBbFrameConf::DefaultModCod", StringValue ("QPSK_1_TO_2"));
         Config::SetDefault ("ns3::SatRequestManager::CnoReportInterval", TimeValue (Seconds (0.1)));
         Config::SetDefault ("ns3::SatFwdLinkScheduler::CnoEstimationMode", StringValue ("AverageValueInWindow"));
         Config::SetDefault ("ns3::SatFwdLinkScheduler::CnoEstimationWindow", TimeValue (Seconds (2)));
@@ -715,8 +714,7 @@ SimulationHelper::DisableAcm (SatEnums::SatLinkDir_t dir)
     case SatEnums::LD_FORWARD:
       {
         Config::SetDefault ("ns3::SatBbFrameConf::AcmEnabled", BooleanValue (false));
-        Config::SetDefault ("ns3::SatBbFrameConf::DefaultModCodS2", StringValue ("QPSK_1_TO_2"));
-        Config::SetDefault ("ns3::SatBbFrameConf::DefaultModCodS2X", StringValue ("QPSK_1_TO_2"));
+        Config::SetDefault ("ns3::SatBbFrameConf::DefaultModCod", StringValue ("QPSK_1_TO_2"));
         Config::SetDefault ("ns3::SatRequestManager::CnoReportInterval", TimeValue (Seconds (100)));
         break;
       }
