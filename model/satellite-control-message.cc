@@ -808,7 +808,6 @@ SatHandoverRecommendationMessage::GetSizeInBytes () const
 }
 
 
-
 NS_OBJECT_ENSURE_REGISTERED (SatSliceSubscriptionMessage);
 
 TypeId
@@ -874,6 +873,99 @@ SatSliceSubscriptionMessage::GetSizeInBytes () const
   return size;
 }
 
+
+NS_OBJECT_ENSURE_REGISTERED (SatLogonMessage);
+
+TypeId
+SatLogonMessage::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatLogonMessage")
+    .SetParent<SatControlMessage> ()
+    .AddConstructor<SatLogonMessage> ()
+  ;
+  return tid;
+}
+
+TypeId
+SatLogonMessage::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
+}
+
+SatLogonMessage::SatLogonMessage ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+SatLogonMessage::~SatLogonMessage ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+uint32_t
+SatLogonMessage::GetSizeInBytes () const
+{
+  NS_LOG_FUNCTION (this);
+
+  uint32_t size = 1 * sizeof (uint8_t);
+  return size;
+}
+
+
+NS_OBJECT_ENSURE_REGISTERED (SatLogonResponseMessage);
+
+TypeId
+SatLogonResponseMessage::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatLogonResponseMessage")
+    .SetParent<SatControlMessage> ()
+    .AddConstructor<SatLogonResponseMessage> ()
+  ;
+  return tid;
+}
+
+TypeId
+SatLogonResponseMessage::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
+}
+
+SatLogonResponseMessage::SatLogonResponseMessage ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+SatLogonResponseMessage::~SatLogonResponseMessage ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+void
+SatLogonResponseMessage::SetRaChannel (uint32_t raChannel)
+{
+  NS_LOG_FUNCTION (this << raChannel);
+  m_raChannel = raChannel;
+}
+
+uint32_t
+SatLogonResponseMessage::GetRaChannel () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_raChannel;
+}
+
+uint32_t
+SatLogonResponseMessage::GetSizeInBytes () const
+{
+  NS_LOG_FUNCTION (this);
+
+  uint32_t size = 1 * sizeof (uint8_t);
+  return size;
+}
 
 
 // Control message container

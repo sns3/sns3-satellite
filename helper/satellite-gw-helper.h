@@ -150,7 +150,7 @@ public:
    * a queue for this ns3::SatNetDevice, and associate the resulting
    * ns3::SatNetDevice with the ns3::Node and ns3::SatChannel.
    */
-  NetDeviceContainer Install (NodeContainer c, uint32_t gwId, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc );
+  NetDeviceContainer Install (NodeContainer c, uint32_t gwId, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc, Ptr<SatLowerLayerServiceConf> llsConf);
 
   /**
    * \param n node
@@ -162,7 +162,7 @@ public:
    *
    * Saves you from having to construct a temporary NodeContainer.
    */
-  Ptr<NetDevice> Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc );
+  Ptr<NetDevice> Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc, Ptr<SatLowerLayerServiceConf> llsConf);
 
   /**
    * Enables creation traces to be written in given file

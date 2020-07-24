@@ -268,7 +268,7 @@ SatNcc::AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq>
 }
 
 void
-SatNcc::AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf, uint32_t beamId, Callback<void, uint32_t> setRaChannelCallback)
+SatNcc::AddUt (Ptr<SatLowerLayerServiceConf> llsConf, Address utId, uint32_t beamId, Callback<void, uint32_t> setRaChannelCallback)
 {
   NS_LOG_FUNCTION (this << utId << beamId);
 
@@ -409,6 +409,17 @@ SatNcc::SetUpdateRoutingCallback (SatNcc::UpdateRoutingCallback cb)
   NS_LOG_FUNCTION (this << &cb);
 
   m_updateRoutingCallback = cb;
+}
+
+void
+SatNcc::ReserveLogonChannel (uint32_t logonChannelId)
+{
+  NS_LOG_FUNCTION (this << logonChannelId);
+
+  for (auto& beamScheduler : m_beamSchedulers)
+    {
+      beamScheduler.second->ReserveLogonChannel (logonChannelId);
+    }
 }
 
 } // namespace ns3

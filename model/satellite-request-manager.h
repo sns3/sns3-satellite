@@ -204,6 +204,11 @@ public:
    */
   void SendHandoverRecommendation (uint32_t beamId);
 
+  /**
+   * \brief Send a logon message to the gateway.
+   */
+  void SendLogonMessage ();
+
 private:
   typedef std::map<uint8_t, QueueCallback> CallbackContainer_t;
 

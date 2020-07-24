@@ -85,6 +85,16 @@ SatUtHelper::GetTypeId (void)
                                     SatPhyRxCarrierConf::IF_TRACE, "Trace",
                                     SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket",
                                     SatPhyRxCarrierConf::IF_PER_FRAGMENT, "PerFragment"))
+    .AddAttribute ("EnableLogon",
+                   "Start simulations with UT logged off",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatUtHelper::m_enableLogon),
+                   MakeBooleanChecker ())
+    .AddAttribute ("LogonChannelId",
+                   "Channel Id of the logon carrier",
+                   UintegerValue (0),
+                   MakeUintegerAccessor (&SatUtHelper::m_logonChannelId),
+                   MakeUintegerChecker<uint32_t> ())
     .AddAttribute ("FwdLinkErrorModel",
                    "Forward link error model",
                    EnumValue (SatPhyRxCarrierConf::EM_AVI),
@@ -335,6 +345,9 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId,
   // Set TBTP callback to UT MAC
   mac->SetAssignedDaResourcesCallback (MakeCallback (&SatRequestManager::AssignedDaResources, rm));
 
+  // Set Send Logon callback to UT MAC
+  mac->SetSendLogonCallback (MakeCallback (&SatRequestManager::SendLogonMessage, rm));
+
   // Attach the PHY layer to SatNetDevice
   dev->SetPhy (phy);
 
@@ -403,7 +416,14 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId,
   llc->SetReceiveCallback (MakeCallback (&SatNetDevice::Receive, dev));
 
   // Add UT to NCC
-  ncc->AddUt (dev->GetAddress (), m_llsConf, beamId, MakeCallback (&SatUtMac::SetRaChannel, mac));
+  if (m_enableLogon)
+    {
+      ncc->ReserveLogonChannel (m_logonChannelId);
+    }
+  else
+    {
+      ncc->AddUt (m_llsConf, dev->GetAddress (), beamId, MakeCallback (&SatUtMac::SetRaChannel, mac));
+    }
 
   phy->Initialize ();
 
@@ -441,6 +461,15 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId,
 
       /// attach the RA module
       mac->SetRandomAccess (randomAccess);
+      if (m_enableLogon)
+        {
+          mac->SetLogonChannel (m_logonChannelId);
+          mac->LogOff ();
+        }
+    }
+  else if (m_enableLogon)
+    {
+      NS_FATAL_ERROR ("Cannot simulate logon without a RA frame");
     }
 
   Ptr<SatUtHandoverModule> utHandoverModule = n->GetObject<SatUtHandoverModule> ();

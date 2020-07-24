@@ -134,7 +134,7 @@ public:
    * \param setRaChannelCallback  callback to invoke whenever the UT to be
    *        added should change its RA allocation channel
    */
-  void AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf, uint32_t beamId, Callback<void, uint32_t> setRaChannelCallback);
+  void AddUt (Ptr<SatLowerLayerServiceConf> llsConf, Address utId, uint32_t beamId, Callback<void, uint32_t> setRaChannelCallback);
 
   /**
    * \brief Function for setting the random access allocation channel specific high load backoff probabilities
@@ -199,6 +199,8 @@ public:
    * \param cb the routing update callback
    */
   void SetUpdateRoutingCallback (SatNcc::UpdateRoutingCallback cb);
+
+  void ReserveLogonChannel (uint32_t logonChannelId);
 
 private:
   SatNcc& operator = (const SatNcc &);

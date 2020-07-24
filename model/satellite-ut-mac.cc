@@ -55,6 +55,10 @@ SatUtMac::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatUtMac")
     .SetParent<SatMac> ()
     .AddConstructor<SatUtMac> ()
+    .AddAttribute ("MaxHandoverMessages", "Max amount of handover messages to send without a handover response before loging off",
+                   UintegerValue (20),
+                   MakeUintegerAccessor (&SatUtMac::m_maxHandoverMessagesSent),
+                   MakeUintegerChecker<uint32_t> ())
     .AddAttribute ("SuperframeSequence", "Superframe sequence containing information of superframes.",
                    PointerValue (),
                    MakePointerAccessor (&SatUtMac::m_superframeSeq),
@@ -92,17 +96,23 @@ SatUtMac::SatUtMac ()
   m_randomAccess (NULL),
   m_guardTime (MicroSeconds (1)),
   m_raChannel (0),
+  m_logonChannel (0),
+  m_loggedOn (true),
+  m_useLogon (false),
   m_crdsaUniquePacketId (1),
   m_crdsaOnlyForControl (false),
   m_timuInfo (0),
   m_handoverState (NO_HANDOVER),
+  m_handoverMessagesCount (0),
+  m_maxHandoverMessagesSent (20),
   m_firstTransmittableSuperframeId (0),
   m_handoverCallback (0),
   m_gatewayUpdateCallback (0),
   m_routingUpdateCallback (0),
   m_beamCheckerCallback (0),
   m_txCheckCallback (0),
-  m_sliceSubscriptionCallback (0)
+  m_sliceSubscriptionCallback (0),
+  m_sendLogonCallback (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -116,17 +126,23 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, bool crdsaOnlyFo
   m_timingAdvanceCb (0),
   m_guardTime (MicroSeconds (1)),
   m_raChannel (0),
+  m_logonChannel (0),
+  m_loggedOn (true),
+  m_useLogon (false),
   m_crdsaUniquePacketId (1),
   m_crdsaOnlyForControl (crdsaOnlyForControl),
   m_timuInfo (0),
   m_handoverState (NO_HANDOVER),
+  m_handoverMessagesCount (0),
+  m_maxHandoverMessagesSent (20),
   m_firstTransmittableSuperframeId (0),
   m_handoverCallback (0),
   m_gatewayUpdateCallback (0),
   m_routingUpdateCallback (0),
   m_beamCheckerCallback (0),
   m_txCheckCallback (0),
-  m_sliceSubscriptionCallback (0)
+  m_sliceSubscriptionCallback (0),
+  m_sendLogonCallback (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -155,6 +171,7 @@ SatUtMac::DoDispose (void)
   m_beamCheckerCallback.Nullify ();
   m_txCheckCallback.Nullify ();
   m_sliceSubscriptionCallback.Nullify ();
+  m_sendLogonCallback.Nullify ();
   m_tbtpContainer->DoDispose ();
   m_utScheduler->DoDispose ();
   m_utScheduler = NULL;
@@ -207,6 +224,14 @@ SatUtMac::SetSliceSubscriptionCallback (SatUtMac::SliceSubscriptionCallback cb)
 }
 
 void
+SatUtMac::SetSendLogonCallback (SatUtMac::SendLogonCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+
+  m_sendLogonCallback = cb;
+}
+
+void
 SatUtMac::SetGwAddress (Mac48Address gwAddress)
 {
   NS_LOG_FUNCTION (this << gwAddress);
@@ -223,6 +248,22 @@ SatUtMac::SetNodeInfo (Ptr<SatNodeInfo> nodeInfo)
   m_tbtpContainer->SetMacAddress (nodeInfo->GetMacAddress ());
   m_utScheduler->SetNodeInfo (nodeInfo);
   SatMac::SetNodeInfo (nodeInfo);
+}
+
+void
+SatUtMac::LogOff ()
+{
+  NS_LOG_FUNCTION (this);
+  m_loggedOn = false;
+  m_raChannel = m_logonChannel;
+}
+
+void
+SatUtMac::SetLogonChannel (uint32_t channelId)
+{
+  NS_LOG_FUNCTION (this);
+  m_logonChannel = channelId;
+  m_useLogon = true;
 }
 
 void
@@ -257,6 +298,10 @@ SatUtMac::ControlMsgTransmissionPossible () const
 
   bool da = m_tbtpContainer->HasScheduledTimeSlots ();
   bool ra = (m_randomAccess != NULL);
+  if (m_useLogon)
+    {
+      ra = ra && (m_raChannel != m_logonChannel);
+    }
   return da || ra;
 }
 
@@ -736,7 +781,6 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
             msg << " at: " << Now ().GetSeconds () << "s";
             Singleton<SatLog>::Get ()->AddToLog (SatLog::LOG_WARNING, "", msg.str ());
           }
-
         break;
       }
     case SatControlMsgTag::SAT_TIMU_CTRL_MSG:
@@ -774,12 +818,49 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
         uint32_t sliceCtrlId = ctrlTag.GetMsgId ();
         Ptr<SatSliceSubscriptionMessage> sliceMsg = DynamicCast<SatSliceSubscriptionMessage> (m_readCtrlCallback (sliceCtrlId));
 
-        if (m_nodeInfo->GetMacAddress () == sliceMsg->GetAddress ())
+        if (sliceMsg != NULL)
           {
-            m_sliceSubscriptionCallback (sliceMsg->GetSliceId ());
+            if (m_nodeInfo->GetMacAddress () == sliceMsg->GetAddress ())
+              {
+                m_sliceSubscriptionCallback (sliceMsg->GetSliceId ());
+              }
           }
-
+        else
+          {
+            /**
+             * Control message NOT found in container anymore! This means, that the
+             * SatBeamHelper::CtrlMsgStoreTimeInFwdLink attribute may be set to too short value
+             * or there are something wrong in the FWD link RRM.
+             */
+            std::stringstream msg;
+            msg << "Control message " << ctrlTag.GetMsgType () << " is not found from the FWD link control msg container!";
+            msg << " at: " << Now ().GetSeconds () << "s";
+            Singleton<SatLog>::Get ()->AddToLog (SatLog::LOG_WARNING, "", msg.str ());
+          }
         break;
+      }
+    case SatControlMsgTag::SAT_LOGON_RESPONSE_CTRL_MSG:
+      {
+        uint32_t logonId = ctrlTag.GetMsgId ();
+        Ptr<SatLogonResponseMessage> logonMsg = DynamicCast<SatLogonResponseMessage> (m_readCtrlCallback (logonId));
+
+        if (logonMsg != NULL)
+          {
+            m_raChannel = logonMsg->GetRaChannel ();
+            m_loggedOn = true;
+          }
+        else
+          {
+            /**
+             * Control message NOT found in container anymore! This means, that the
+             * SatBeamHelper::CtrlMsgStoreTimeInFwdLink attribute may be set to too short value
+             * or there are something wrong in the FWD link RRM.
+             */
+            std::stringstream msg;
+            msg << "Control message " << ctrlTag.GetMsgType () << " is not found from the FWD link control msg container!";
+            msg << " at: " << Now ().GetSeconds () << "s";
+            Singleton<SatLog>::Get ()->AddToLog (SatLog::LOG_WARNING, "", msg.str ());
+          }
       }
     default:
       {
@@ -800,6 +881,12 @@ SatUtMac::DoRandomAccess (SatEnums::RandomAccessTriggerType_t randomAccessTrigge
 
   /// select the RA allocation channel
   uint32_t allocationChannel = GetNextRandomAccessAllocationChannel ();
+
+  if (m_useLogon && allocationChannel == m_logonChannel)
+    {
+      NS_LOG_INFO ("Logon channel cannot be used for RA transmition");
+      return;
+    }
 
   /// run random access algorithm
   txOpportunities = m_randomAccess->DoRandomAccess (allocationChannel, randomAccessTriggerType);
@@ -1301,22 +1388,43 @@ SatUtMac::DoFrameStart ()
     {
       NS_LOG_INFO ("Tx is permitted");
 
-      if (!m_beamCheckerCallback.IsNull ())
+      if (m_loggedOn && !m_beamCheckerCallback.IsNull ())
         {
           NS_LOG_INFO ("UT checking for beam handover recommendation");
-          if (m_beamCheckerCallback (m_beamId) && m_handoverState == NO_HANDOVER)
+          if (m_beamCheckerCallback (m_beamId))
             {
-              m_handoverState = HANDOVER_RECOMMENDATION_SENT;
+              if (m_handoverState == NO_HANDOVER)
+                {
+                  m_handoverState = HANDOVER_RECOMMENDATION_SENT;
+                  m_handoverMessagesCount = 0;
+                }
+              else if (m_handoverState == HANDOVER_RECOMMENDATION_SENT)
+                {
+                  ++m_handoverMessagesCount;
+                }
+              if (m_useLogon && m_handoverMessagesCount > m_maxHandoverMessagesSent)
+                {
+                  m_handoverMessagesCount = 0;
+                  LogOff ();
+                }
             }
         }
 
       if (m_randomAccess != NULL)
         {
-          // reset packet ID counter for this frame
-          m_crdsaUniquePacketId = 1;
+          if (m_loggedOn)
+            {
+              // reset packet ID counter for this frame
+              m_crdsaUniquePacketId = 1;
 
-          // execute CRDSA trigger
-          DoRandomAccess (SatEnums::RA_TRIGGER_TYPE_CRDSA);
+              // execute CRDSA trigger
+              DoRandomAccess (SatEnums::RA_TRIGGER_TYPE_CRDSA);
+            }
+          else if (m_useLogon)
+            {
+              // Do Logon
+              m_sendLogonCallback ();
+            }
         }
     }
   else

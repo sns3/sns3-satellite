@@ -845,6 +845,21 @@ SatRequestManager::SendHandoverRecommendation (uint32_t beamId)
 }
 
 void
+SatRequestManager::SendLogonMessage ()
+{
+  NS_LOG_FUNCTION (this);
+
+  // Check if we have the possiblity to send a ctrl msg
+  if (!m_ctrlCallback.IsNull () && m_ctrlMsgTxPossibleCallback ())
+    {
+      NS_LOG_INFO ("Send logon message to GW: " << m_gwAddress);
+
+      Ptr<SatLogonMessage> logonMessage = CreateObject<SatLogonMessage> ();
+      m_ctrlCallback (logonMessage, m_gwAddress);
+    }
+}
+
+void
 SatRequestManager::AssignedDaResources (uint8_t rcIndex, uint32_t bytes)
 {
   NS_LOG_FUNCTION (this << (uint32_t)(rcIndex) << bytes);

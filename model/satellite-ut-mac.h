@@ -153,6 +153,17 @@ public:
   void SetSliceSubscriptionCallback (SatUtMac::SliceSubscriptionCallback cb);
 
   /**
+   * Callback to send a logon message to the gateway
+   */
+  typedef Callback<void> SendLogonCallback;
+
+  /**
+   * \brief Set the logon callback
+   * \param cb callback to invoke when sending a logon message
+   */
+  void SetSendLogonCallback (SatUtMac::SendLogonCallback cb);
+
+  /**
    * Get Tx time for the next possible superframe.
    * \param superFrameSeqId Superframe sequence id
    * \return Time Time to transmit
@@ -266,6 +277,10 @@ public:
    * \param cb callback to invoke to check beams and recommend handover
    */
   void SetBeamCheckerCallback (SatUtMac::BeamCheckerCallback cb);
+
+  void LogOff ();
+
+  void SetLogonChannel (uint32_t channelId);
 
 protected:
   /**
@@ -509,6 +524,21 @@ private:
   uint32_t m_raChannel;
 
   /**
+   * RA channel dedicated to logon messages
+   */
+  uint32_t m_logonChannel;
+
+  /**
+   * UT is logged on
+   */
+  bool m_loggedOn;
+
+  /**
+   * Should logon be simulated?
+   */
+  bool m_useLogon;
+
+  /**
    * UT scheduler
    */
   Ptr<SatUtScheduler> m_utScheduler;
@@ -557,6 +587,9 @@ private:
 
   HandoverState_t m_handoverState;
 
+  uint32_t m_handoverMessagesCount;
+  uint32_t m_maxHandoverMessagesSent;
+
   uint32_t m_firstTransmittableSuperframeId;
 
   /**
@@ -588,6 +621,11 @@ private:
    * Tx checking callback
    */
   SatUtMac::SliceSubscriptionCallback m_sliceSubscriptionCallback;
+
+  /**
+   * Callback for sending a logon message
+   */
+  SatUtMac::SendLogonCallback m_sendLogonCallback;
 };
 
 } // namespace ns3

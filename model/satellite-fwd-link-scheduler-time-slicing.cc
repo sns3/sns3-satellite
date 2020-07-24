@@ -200,13 +200,6 @@ SatFwdLinkSchedulerTimeSlicing::GetNextFrame ()
 }
 
 void
-SatFwdLinkSchedulerTimeSlicing::SetSendControlMsgCallback (SatFwdLinkSchedulerTimeSlicing::SendControlMsgCallback cb)
-{
-  NS_LOG_FUNCTION (this << &cb);
-  m_sendControlMsgCallback = cb;
-}
-
-void
 SatFwdLinkSchedulerTimeSlicing::PeriodicTimerExpired ()
 {
   NS_LOG_FUNCTION (this);

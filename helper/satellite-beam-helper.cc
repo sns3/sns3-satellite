@@ -468,12 +468,15 @@ SatBeamHelper::Install (NodeContainer ut,
     }
 
   //install GW
+  PointerValue llsConf;
+  m_utHelper->GetAttribute ("LowerLayerServiceConf", llsConf);
   Ptr<NetDevice> gwNd = m_gwHelper->Install (gwNode,
                                              gwId,
                                              beamId,
                                              feederLink.first,
                                              feederLink.second,
-                                             m_ncc);
+                                             m_ncc,
+                                             llsConf.Get<SatLowerLayerServiceConf> ());
 
   // calculate maximum size of the BB frame with the most robust MODCOD
   Ptr<SatBbFrameConf> bbFrameConf = m_gwHelper->GetBbFrameConf ();

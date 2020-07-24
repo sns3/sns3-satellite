@@ -59,7 +59,9 @@ public:
     SAT_CN0_REPORT,       //!< SAT_CN0_REPORT
     SAT_TIMU_CTRL_MSG,    //!< SAT_TIMU_CTRL_MSG
     SAT_HR_CTRL_MSG,      //!< SAT_HR_CTRL_MSG
-    SAT_SLICE_CTRL_MSG    //!< SAT_SLICE_CTRL_MSG
+    SAT_SLICE_CTRL_MSG,   //!< SAT_SLICE_CTRL_MSG
+    SAT_LOGON_CTRL_MSG,   //!< SAT_LOGON_CTRL_MSG
+    SAT_LOGON_RESPONSE_CTRL_MSG    //!< SAT_LOGON_RESPONSE_CTRL_MSG
   } SatControlMsgType_t;
 
   /**
@@ -913,7 +915,6 @@ private:
  * \brief This control message is used to inform the UT it has to subscribe to a new slice.
  * (Tagged by SatControlMsgTag with type value SAT_SLICE_CTRL_MSG)
  */
-
 class SatSliceSubscriptionMessage : public SatControlMessage
 {
 public:
@@ -989,6 +990,119 @@ private:
    * Address associated to this slice.
    */
   Mac48Address m_address;
+};
+
+
+/**
+ * \ingroup satellite
+ * \brief This control message is used to inform the GW that a UT wants to connect
+ * (Tagged by SatControlMsgTag with type value SAT_LOGON_CTRL_MSG)
+ */
+class SatLogonMessage : public SatControlMessage
+{
+public:
+  /**
+   * Constructor for SatLogonMessage
+   */
+  SatLogonMessage ();
+
+  /**
+   * Destructor for SatLogonMessage
+   */
+  ~SatLogonMessage ();
+
+
+  /**
+   * methods derived from base classes
+   */
+  static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
+  virtual TypeId GetInstanceTypeId (void) const;
+
+  /**
+   * \brief Get type of the message.
+   *
+   * \return SatControlMsgTag::SAT_SLICE_CTRL_MSG
+   */
+  inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const
+  {
+    return SatControlMsgTag::SAT_LOGON_CTRL_MSG;
+  }
+
+  /**
+   * \brief Get real size of the message.
+   * \return Real size of the message.
+   */
+  virtual uint32_t GetSizeInBytes () const;
+
+private:
+};
+
+
+/**
+ * \ingroup satellite
+ * \brief This control message is used to inform the UT of a connection success
+ * (Tagged by SatControlMsgTag with type value SAT_LOGON_RESPONSE_CTRL_MSG)
+ */
+class SatLogonResponseMessage : public SatControlMessage
+{
+public:
+  /**
+   * Constructor for SatLogonResponseMessage
+   */
+  SatLogonResponseMessage ();
+
+  /**
+   * Destructor for SatLogonResponseMessage
+   */
+  ~SatLogonResponseMessage ();
+
+
+  /**
+   * methods derived from base classes
+   */
+  static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
+  virtual TypeId GetInstanceTypeId (void) const;
+
+  /**
+   * \brief Get type of the message.
+   *
+   * \return SatControlMsgTag::SAT_SLICE_CTRL_MSG
+   */
+  inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const
+  {
+    return SatControlMsgTag::SAT_LOGON_RESPONSE_CTRL_MSG;
+  }
+
+  /**
+   * \brief Get the RA channel to talk into.
+   * \return The RA channel
+   */
+  uint32_t GetRaChannel () const;
+
+  /**
+   * Set the RA channel to talk into.
+   * \param raChannel The new RA channel
+   */
+  void SetRaChannel (uint32_t raChannel);
+
+  /**
+   * \brief Get real size of the message.
+   * \return Real size of the message.
+   */
+  virtual uint32_t GetSizeInBytes () const;
+
+private:
+  uint32_t m_raChannel;
 };
 
 

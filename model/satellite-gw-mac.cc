@@ -97,6 +97,7 @@ SatGwMac::DoDispose ()
   m_txOpportunityCallback.Nullify ();
   m_crReceiveCallback.Nullify ();
   m_handoverCallback.Nullify ();
+  m_logonCallback.Nullify ();
 
   SatMac::DoDispose ();
 }
@@ -362,12 +363,51 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
 
         break;
       }
+    case SatControlMsgTag::SAT_LOGON_CTRL_MSG:
+      {
+        uint32_t msgId = ctrlTag.GetMsgId ();
+        Ptr<SatLogonMessage> logonMessage = DynamicCast<SatLogonMessage> ( m_readCtrlCallback (msgId) );
+
+        if ( logonMessage != NULL )
+          {
+            Address utId = macTag.GetSourceAddress ();
+            Callback<void, uint32_t> raChannelCallback = MakeBoundCallback (&SatGwMac::SendLogonResponseHelper, this, utId);
+            m_logonCallback (utId, m_beamId, raChannelCallback);
+          }
+        else
+          {
+            /**
+             * Control message NOT found in container anymore! This means, that the
+             * SatBeamHelper::CtrlMsgStoreTimeInRtnLink attribute may be set to too short value
+             * or there are something wrong in the RTN link RRM.
+             */
+            std::stringstream msg;
+            msg << "Control message " << ctrlTag.GetMsgType () << " is not found from the RTN link control msg container!";
+            msg << " at: " << Now ().GetSeconds () << "s";
+            Singleton<SatLog>::Get ()->AddToLog (SatLog::LOG_WARNING, "", msg.str ());
+          }
+      }
     default:
       {
         NS_FATAL_ERROR ("SatGwMac received a non-supported control packet!");
         break;
       }
     }
+}
+
+void
+SatGwMac::SendLogonResponse (Address utId, uint32_t raChannel)
+{
+  NS_LOG_FUNCTION (this << utId << raChannel);
+  Ptr<SatLogonResponseMessage> logonResponse = CreateObject<SatLogonResponseMessage> ();
+  logonResponse->SetRaChannel (raChannel);
+  m_fwdScheduler->SendControlMsg (logonResponse, utId);
+}
+
+void
+SatGwMac::SendLogonResponseHelper (SatGwMac* self, Address utId, uint32_t raChannel)
+{
+  self->SendLogonResponse (utId, raChannel);
 }
 
 void
@@ -382,6 +422,13 @@ SatGwMac::SetHandoverCallback (SatGwMac::HandoverCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);
   m_handoverCallback = cb;
+}
+
+void
+SatGwMac::SetLogonCallback (SatGwMac::LogonCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_logonCallback = cb;
 }
 
 } // namespace ns3

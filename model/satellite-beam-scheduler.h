@@ -230,6 +230,8 @@ public:
    */
   void TransferUtToBeam (Address utId, Ptr<SatBeamScheduler> destination);
 
+  void ReserveLogonChannel (uint32_t logonChannelId);
+
   /**
    * \brief Return the address of the gateway responsible of this beam
    */
@@ -443,6 +445,11 @@ private:
    * Random variable stream to select RA channel for a UT.
    */
   Ptr<RandomVariableStream> m_raChRandomIndex;
+
+  /**
+   * Logon channel ID to exclude it from the RA channel selection
+   */
+  uint32_t m_logonChannelIndex;
 
   /**
    * Mode used for C/N0 estimator.

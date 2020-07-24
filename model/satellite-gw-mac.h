@@ -132,6 +132,20 @@ public:
    */
   void SetHandoverCallback (SatGwMac::HandoverCallback cb);
 
+  /**
+   * Callback to register UT logon
+   * \param Address identification of the UT originating the request
+   * \param uint32_t beam ID the UT is requesting logon on
+   * \param Callback setRaChannelCallback the callback to call when RA channel has been selected
+   */
+  typedef Callback<void, Address, uint32_t, Callback<void, uint32_t> > LogonCallback;
+
+  /**
+   * Method to set logon callback
+   * \param cb callback to invoke whenever a logon is received
+   */
+  void SetLogonCallback (SatGwMac::LogonCallback cb);
+
 private:
   SatGwMac& operator = (const SatGwMac &);
   SatGwMac (const SatGwMac &);
@@ -155,6 +169,9 @@ private:
    * \param packet Received signaling packet
    */
   void ReceiveSignalingPacket (Ptr<Packet> packet);
+
+  void SendLogonResponse (Address utId, uint32_t raChannel);
+  static void SendLogonResponseHelper (SatGwMac* self,Address utId, uint32_t raChannel);
 
   /**
    * Scheduler for the forward link.
@@ -188,6 +205,11 @@ private:
    * Callback to query/apply handover on the terrestrial network
    */
   SatGwMac::HandoverCallback m_handoverCallback;
+
+  /**
+   * Callback to log a terminal on
+   */
+  SatGwMac::LogonCallback m_logonCallback;
 };
 
 } // namespace ns3

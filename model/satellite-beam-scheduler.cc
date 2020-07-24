@@ -267,6 +267,7 @@ SatBeamScheduler::SatBeamScheduler ()
   m_superframeSeq (0),
   m_superFrameCounter (0),
   m_txCallback (0),
+  m_logonChannelIndex (1),
   m_cnoEstimatorMode (SatCnoEstimator::LAST),
   m_maxBbFrameSize (0),
   m_controlSlotsEnabled (false),
@@ -351,6 +352,7 @@ SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCall
     }
 
   m_raChRandomIndex->SetAttribute ("Max", DoubleValue (maxIndex));
+  m_logonChannelIndex = maxIndex + 1;
 
   // Create the superframeAllocator object
   switch (m_superframeAllocatorType)
@@ -408,7 +410,14 @@ SatBeamScheduler::AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf)
   m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE)->GetRaChannelCount ();
 
   // return random RA channel index for the UT.
-  return m_raChRandomIndex->GetInteger ();
+  uint32_t raChannel;
+  do
+    {
+      raChannel = m_raChRandomIndex->GetInteger ();
+    }
+  while (raChannel == m_logonChannelIndex);
+
+  return raChannel;
 }
 
 void
@@ -835,6 +844,28 @@ SatBeamScheduler::CreateTimu () const
   timuMsg->SetAllocatedBeamId (m_beamId);
   timuMsg->SetGwAddress (m_gwAddress);
   return timuMsg;
+}
+
+void
+SatBeamScheduler::ReserveLogonChannel (uint32_t logonChannelId)
+{
+  NS_LOG_FUNCTION (this << logonChannelId);
+
+  DoubleValue maxId;
+  m_raChRandomIndex->GetAttribute ("Max", maxId);
+  uint32_t maxIndex = maxId.Get();
+
+  if (logonChannelId > maxIndex)
+    {
+      NS_FATAL_ERROR ("Cannot use channel ID " << logonChannelId << " for logon as it doesn't exist");
+    }
+
+  if (maxIndex != 0)
+    {
+      // Allows to still return the channel 0 as the random access
+      // channel for UTs without entering in an infinite loop in AddUt
+      m_logonChannelIndex = logonChannelId;
+    }
 }
 
 } // namespace ns3

@@ -43,6 +43,7 @@
 #include "../model/satellite-enums.h"
 #include "../model/satellite-channel-estimation-error-container.h"
 #include "../model/satellite-packet-classifier.h"
+#include "../model/satellite-lower-layer-service.h"
 #include "ns3/satellite-gw-helper.h"
 #include "ns3/singleton.h"
 #include "ns3/satellite-id-mapper.h"
@@ -54,6 +55,14 @@
 NS_LOG_COMPONENT_DEFINE ("SatGwHelper");
 
 namespace ns3 {
+
+
+void
+logonCallbackHelper (Ptr<SatNcc> ncc, Ptr<SatLowerLayerServiceConf> llsConf, Address utId, uint32_t beamId, Callback<void, uint32_t> setRaChannelCallback)
+{
+  ncc->AddUt (llsConf, utId, beamId, setRaChannelCallback);
+}
+
 
 NS_OBJECT_ENSURE_REGISTERED (SatGwHelper);
 
@@ -218,7 +227,7 @@ SatGwHelper::SetPhyAttribute (std::string n1, const AttributeValue &v1)
 }
 
 NetDeviceContainer
-SatGwHelper::Install (NodeContainer c, uint32_t gwId, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc )
+SatGwHelper::Install (NodeContainer c, uint32_t gwId, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc, Ptr<SatLowerLayerServiceConf> llsConf)
 {
   NS_LOG_FUNCTION (this << beamId << fCh << rCh );
 
@@ -226,14 +235,14 @@ SatGwHelper::Install (NodeContainer c, uint32_t gwId, uint32_t beamId, Ptr<SatCh
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
     {
-      devs.Add (Install (*i, gwId, beamId, fCh, rCh, ncc));
+      devs.Add (Install (*i, gwId, beamId, fCh, rCh, ncc, llsConf));
     }
 
   return devs;
 }
 
 Ptr<NetDevice>
-SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc )
+SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc, Ptr<SatLowerLayerServiceConf> llsConf)
 {
   NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
 
@@ -343,6 +352,9 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
 
   // Attach the device receive callback to SatLlc
   mac->SetReceiveCallback (MakeCallback (&SatLlc::Receive, llc));
+
+  // Attach the logon receive callback to SatNcc
+  mac->SetLogonCallback (MakeBoundCallback (&logonCallbackHelper, ncc, llsConf));
 
   // Set the device address and pass it to MAC as well
   Mac48Address addr = Mac48Address::Allocate ();

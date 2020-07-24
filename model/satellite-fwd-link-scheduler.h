@@ -165,6 +165,14 @@ public:
   typedef Callback< Ptr<Packet>, uint32_t, Mac48Address, uint8_t, uint32_t&, uint32_t&> TxOpportunityCallback;
 
   /**
+   * Callback to notify upper layer about Tx opportunity.
+   * \param Ptr<SatControlMessage> The control message to send.
+   * \param Address& the destination MAC address.
+   * \return True
+   */
+  typedef Callback<bool, Ptr<SatControlMessage>, const Address& > SendControlMsgCallback;
+
+  /**
    * Method to set Tx opportunity callback.
     * \param cb callback to invoke whenever a packet has been received and must
     *        be forwarded to the higher layers.
@@ -178,6 +186,19 @@ public:
    *        be forwarded to the higher layers.
    */
   void SetTxOpportunityCallback (SatFwdLinkScheduler::TxOpportunityCallback cb);
+
+  /**
+   * Method to set the control message sender callback.
+   * \param cb callback to invoke whenever a control packet has to be sent.
+   */
+  void SetSendControlMsgCallback (SatFwdLinkScheduler::SendControlMsgCallback cb);
+
+  /**
+   * Method te send a control message to a destination
+   * \param message The control message to send
+   * \param dest The destination mac address
+   */
+  bool SendControlMsg (Ptr<SatControlMessage> message, const Address& dest) const;
 
   /**
    * Called when UT's C/N0 estimation is updated.
@@ -301,6 +322,11 @@ protected:
    * The scheduling context getter callback.
    */
   SatFwdLinkScheduler::SchedContextCallback m_schedContextCallback;
+
+  /**
+   * The control message sender callback.
+   */
+  SatFwdLinkScheduler::SendControlMsgCallback m_sendControlMsgCallback;
 
   /**
    * C/N0 estimator per UT.

@@ -240,6 +240,16 @@ private:
   bool m_crdsaOnlyForControl;
 
   /**
+   * Logon simulation
+   */
+  bool m_enableLogon;
+
+  /**
+   * Logon carrier
+   */
+  bool m_logonChannelId;
+
+  /**
    * The used random access model settings
    */
   RandomAccessSettings_s m_raSettings;
