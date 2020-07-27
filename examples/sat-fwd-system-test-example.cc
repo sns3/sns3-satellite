@@ -44,6 +44,12 @@ NS_LOG_COMPONENT_DEFINE ("sat-fwd-sys-test");
 
 static void PrintBbFrameInfo (Ptr<SatBbFrame> bbFrame)
 {
+  if (!bbFrame)
+    {
+      std::cout << "[BBFrameTx] Time: " << Now ().GetSeconds () << ", Frame Type: DUMMY_FRAME" << std::endl;
+      return;
+    }
+
   std::cout
     << "[BBFrameTx] "
     << "Time: " << Now ().GetSeconds ()

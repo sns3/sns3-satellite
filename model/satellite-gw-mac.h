@@ -170,7 +170,7 @@ private:
   /**
    * Trace for transmitted BB frames.
    */
-  TracedCallback<SatEnums::SatBbFrameType_t> m_bbFrameTxTrace;
+  TracedCallback<Ptr<SatBbFrame>> m_bbFrameTxTrace;
 
   /**
    * Capacity request receive callback.

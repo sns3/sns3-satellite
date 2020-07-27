@@ -200,12 +200,12 @@ SatGwMac::StartTransmission (uint32_t carrierId)
       Ptr<SatBbFrame> bbFrame = bbFrameInfo.first;
       txDuration = bbFrameInfo.second;
 
+      // trace out BB frames sent.
+      m_bbFrameTxTrace (bbFrame);
+
       // Handle both dummy frames and normal frames
       if ( bbFrame != NULL )
         {
-          // trace out BB frames sent.
-          m_bbFrameTxTrace (bbFrame->GetFrameType ());
-
           // Add packet trace entry:
           m_packetTrace (Simulator::Now (),
                          SatEnums::PACKET_SENT,
@@ -227,8 +227,6 @@ SatGwMac::StartTransmission (uint32_t carrierId)
            */
           SendPacket (bbFrame->GetPayload (), carrierId, txDuration - m_guardTime, txInfo);
         }
-      // Pass information of dummy frame even if dummy frames are not generated
-      else m_bbFrameTxTrace (SatEnums::DUMMY_FRAME);
     }
   else
     {
