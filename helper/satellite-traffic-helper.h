@@ -23,8 +23,14 @@
 #define __SATELLITE_TRAFFIC_HELPER_H__
 
 #include <ns3/object.h>
+#include <ns3/config.h>
+#include <ns3/string.h>
+
+#include <ns3/satellite-helper.h>
 
 namespace ns3 {
+
+class SimulationHelper;
 
 /**
  * \brief Creates pre-defined trafics.
@@ -39,6 +45,7 @@ public:
   typedef enum
   {
     NONE, //TODO
+    CBR, //TODO
     CUSTOM, //TODO
     POISSON, //TODO
     HTTP, //TODO
@@ -60,9 +67,14 @@ public:
   TypeId GetInstanceTypeId (void) const;
 
   /**
-   * \brief Create a base SatTrafficHelper for creating customized traffics.
+   * \brief Default constructor. Not used.
    */
   SatTrafficHelper ();
+
+  /**
+   * \brief Create a base SatTrafficHelper for creating customized traffics.
+   */
+  SatTrafficHelper (Ptr<SatHelper> satHelper);
 
   /**
    * Destructor for SatTrafficHelper
@@ -70,6 +82,27 @@ public:
   virtual ~SatTrafficHelper ()
   {
   }
+
+  /**
+   * Add a new traffic between GWs and UTs
+   * \param interval Wait time between transmission of two packets
+   * \param packetSize Packet size in bytes
+   * \param gws The Gateways
+   * \param uts The User Terminals
+   * \param startTime Application Start time
+   * \param stopTime Application stop time
+   * \param startDelay application start delay between each user
+   */
+  void AddCbrTraffic (std::string interval, uint32_t packetSize, NodeContainer gws, NodeContainer uts, Time startTime, Time stopTime, Time startDelay);
+
+private:
+
+  Ptr<SatHelper> m_satHelper;			// Pointer to the SatHelper objet
+
+  /**
+   * \brief Check if node has a PacketSink installed at certain port.
+   */
+  bool HasSinkInstalled (Ptr<Node> node, uint16_t port);
 
 };
 

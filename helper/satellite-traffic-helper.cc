@@ -19,10 +19,14 @@
  * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
+#include "satellite-traffic-helper.h"
+
 #include <ns3/type-id.h>
 #include <ns3/log.h>
 
-#include "satellite-traffic-helper.h"
+#include <ns3/packet-sink.h>
+#include <ns3/packet-sink-helper.h>
+#include <ns3/cbr-helper.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatelliteTrafficHelper");
 
@@ -48,8 +52,73 @@ SatTrafficHelper::GetInstanceTypeId (void) const
 }
 
 SatTrafficHelper::SatTrafficHelper ()
+  : m_satHelper (NULL)
 {
-	//TODO
+}
+
+SatTrafficHelper::SatTrafficHelper (Ptr<SatHelper> satHelper)
+  : m_satHelper (satHelper)
+{
+}
+
+
+void
+SatTrafficHelper::AddCbrTraffic (std::string interval, uint32_t packetSize, NodeContainer gws, NodeContainer uts, Time startTime, Time stopTime, Time startDelay)
+{
+  NS_LOG_FUNCTION (this);
+
+  Config::SetDefault ("ns3::CbrApplication::Interval", StringValue (interval));
+  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
+
+  std::string socketFactory = "ns3::UdpSocketFactory";
+  uint16_t port = 9;
+
+  PacketSinkHelper sinkHelper (socketFactory, Address ());
+  CbrHelper cbrHelper (socketFactory, Address ());
+  ApplicationContainer sinkContainer;
+  ApplicationContainer cbrContainer;
+
+  // create CBR applications from GWs to UT users
+  for (uint32_t j = 0; j < gws.GetN (); j++)
+    {
+      for (uint32_t i = 0; i < uts.GetN (); i++)
+        {
+          InetSocketAddress utUserAddr = InetSocketAddress (m_satHelper->GetUserAddress (uts.Get (i)), port);
+          if (!HasSinkInstalled (uts.Get (i), port))
+            {
+              sinkHelper.SetAttribute ("Local", AddressValue (Address (utUserAddr)));
+              sinkContainer.Add (sinkHelper.Install (uts.Get (i)));
+            }
+
+          cbrHelper.SetAttribute ("Remote", AddressValue (Address (utUserAddr)));
+          auto app = cbrHelper.Install (gws.Get (j)).Get (0);
+          app->SetStartTime (startTime + (i + 1) * startDelay);
+          cbrContainer.Add (app);
+        }
+    }
+  sinkContainer.Start (startTime);
+  sinkContainer.Stop (stopTime);
+}
+
+bool
+SatTrafficHelper::HasSinkInstalled (Ptr<Node> node, uint16_t port)
+{
+  NS_LOG_FUNCTION (this << node->GetId () << port);
+
+  for (uint32_t i = 0; i < node->GetNApplications (); i++)
+    {
+      auto sink = DynamicCast<PacketSink> (node->GetApplication (i));
+      if (sink != NULL)
+        {
+          AddressValue av;
+          sink->GetAttribute ("Local", av);
+          if (InetSocketAddress::ConvertFrom (av.Get ()).GetPort () == port)
+            {
+              return true;
+            }
+        }
+    }
+  return false;
 }
 
 } // namespace ns3

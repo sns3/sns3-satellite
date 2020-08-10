@@ -27,6 +27,7 @@
 #include <ns3/random-variable-stream.h>
 #include <ns3/command-line.h>
 #include <ns3/satellite-helper.h>
+#include <ns3/satellite-traffic-helper.h>
 #include <ns3/satellite-stats-helper-container.h>
 #include <ns3/satellite-enums.h>
 
@@ -477,6 +478,12 @@ public:
    */
   Ptr<SatStatsHelperContainer> GetStatisticsContainer ();
 
+  /**
+   * \brief Get the traffic helper to create more complex traffics. If does not exist, one is created.
+   * \return Traffic Helper
+   */
+  Ptr<SatTrafficHelper> GetTrafficHelper ();
+
   typedef enum
   {
     CBR,
@@ -626,6 +633,7 @@ protected:
 private:
   Ptr<SatHelper> m_satHelper;
   Ptr<SatStatsHelperContainer> m_statContainer;
+  Ptr<SatTrafficHelper> m_trafficHelper;
   Ptr<SatListPositionAllocator> m_commonUtPositions;
   std::map<uint32_t, Ptr<SatListPositionAllocator> > m_utPositionsByBeam;
 

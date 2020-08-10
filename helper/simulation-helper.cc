@@ -1141,6 +1141,19 @@ SimulationHelper::GetStatisticsContainer ()
   return m_statContainer;
 }
 
+Ptr<SatTrafficHelper>
+SimulationHelper::GetTrafficHelper ()
+{
+  NS_LOG_FUNCTION (this);
+
+  if (!m_trafficHelper)
+    {
+      m_trafficHelper = CreateObject<SatTrafficHelper> (m_satHelper);
+    }
+
+  return m_trafficHelper;
+}
+
 void
 SimulationHelper::SetupOutputPath ()
 {
