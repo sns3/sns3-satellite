@@ -27,6 +27,7 @@
 #include <ns3/packet-sink.h>
 #include <ns3/packet-sink-helper.h>
 #include <ns3/cbr-helper.h>
+#include <ns3/satellite-on-off-helper.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatelliteTrafficHelper");
 
@@ -67,9 +68,6 @@ SatTrafficHelper::AddCbrTraffic (std::string interval, uint32_t packetSize, Node
 {
   NS_LOG_FUNCTION (this);
 
-  Config::SetDefault ("ns3::CbrApplication::Interval", StringValue (interval));
-  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
-
   std::string socketFactory = "ns3::UdpSocketFactory";
   uint16_t port = 9;
 
@@ -90,10 +88,47 @@ SatTrafficHelper::AddCbrTraffic (std::string interval, uint32_t packetSize, Node
               sinkContainer.Add (sinkHelper.Install (uts.Get (i)));
             }
 
+          cbrHelper.SetConstantTraffic (Time (interval), packetSize);
           cbrHelper.SetAttribute ("Remote", AddressValue (Address (utUserAddr)));
           auto app = cbrHelper.Install (gws.Get (j)).Get (0);
           app->SetStartTime (startTime + (i + 1) * startDelay);
           cbrContainer.Add (app);
+        }
+    }
+  sinkContainer.Start (startTime);
+  sinkContainer.Stop (stopTime);
+}
+
+void
+SatTrafficHelper::AddPoissonTraffic (double onTime, double offTimeExpMean, std::string rate, uint32_t packetSize, NodeContainer gws, NodeContainer uts, Time startTime, Time stopTime, Time startDelay)
+{
+  std::string socketFactory = "ns3::UdpSocketFactory";
+
+  uint16_t port = 9;
+
+  PacketSinkHelper sinkHelper (socketFactory, Address ());
+  SatOnOffHelper onOffHelper (socketFactory, Address ());
+  ApplicationContainer sinkContainer;
+  ApplicationContainer onOffContainer;
+
+  // create CBR applications from GWs to UT users
+  for (uint32_t j = 0; j < gws.GetN (); j++)
+    {
+      for (uint32_t i = 0; i < uts.GetN (); i++)
+        {
+          InetSocketAddress utUserAddr = InetSocketAddress (m_satHelper->GetUserAddress (uts.Get (i)), port);
+
+          if (!HasSinkInstalled (uts.Get (i), port))
+            {
+              sinkHelper.SetAttribute ("Local", AddressValue (Address (utUserAddr)));
+              sinkContainer.Add (sinkHelper.Install (uts.Get (i)));
+            }
+
+          onOffHelper.SetPoissonRate (onTime, offTimeExpMean, DataRate (rate), 512);
+          onOffHelper.SetAttribute ("Remote", AddressValue (Address (utUserAddr)));
+          auto app = onOffHelper.Install (gws.Get (j)).Get (0);
+          app->SetStartTime (startTime + (i + 1) * startDelay);
+          onOffContainer.Add (app);
         }
     }
   sinkContainer.Start (startTime);

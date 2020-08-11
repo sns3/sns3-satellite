@@ -71,6 +71,18 @@ public:
   void SetConstantRate (DataRate dataRate, uint32_t packetSize = 512);
 
   /**
+   * Helper function to set a constant rate source.  Equivalent to
+   * setting the attributes OnTime to constant 1000 seconds, OffTime to
+   * constant 0 seconds, and the DataRate and PacketSize set accordingly
+   *
+   * \param onTime On time duration in seconds
+   * \param offTimeExpMean Off time mean in seconds. The off time follows an exponential law of mean offTimeExpMean
+   * \param dataRate DataRate object for the sending rate
+   * \param packetSize size in bytes of the packet payloads generated
+   */
+  void SetPoissonRate (double onTime, double offTimeExpMean, DataRate dataRate, uint32_t packetSize = 512);
+
+  /**
    * Install an ns3::SatOnOffApplication on each node of the input container
    * configured with all the attributes set with SetAttribute.
    *

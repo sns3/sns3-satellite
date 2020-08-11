@@ -73,4 +73,14 @@ SatOnOffHelper::SetConstantRate (DataRate dataRate, uint32_t packetSize)
   m_factory.Set ("PacketSize", UintegerValue (packetSize));
 }
 
+void
+SatOnOffHelper::SetPoissonRate (double onTime, double offTimeExpMean, DataRate dataRate, uint32_t packetSize)
+{
+  m_factory.Set ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + std::to_string(onTime) + "]"));
+  m_factory.Set ("OffTime", StringValue ("ns3::ExponentialRandomVariable[Mean=" + std::to_string(offTimeExpMean) + "]"));
+  m_factory.Set ("DataRate", DataRateValue (dataRate));
+  m_factory.Set ("PacketSize", UintegerValue (packetSize));
+}
+
+
 } // namespace ns3

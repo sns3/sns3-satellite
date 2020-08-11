@@ -30,7 +30,7 @@
 using namespace ns3;
 
 /**
- * \file traffic-helper-test.cc
+ * \file traffic-helper-example.cc
  * \ingroup satellite
  *
  * \brief  Test of satellite-traffic-helper module.
@@ -45,12 +45,9 @@ main (int argc, char *argv[])
   uint32_t nb_gw = 1;
   uint32_t endUsersPerUt = 1;
   uint32_t utsPerBeam = 10;
-  //uint32_t utsPerBeam = 1;
   uint32_t packetSize = 1000;
-  //std::string interval = "2ms";
   std::string interval = "10ms";
-  double simLength = 10.0;
-  //double simLength = 60.0;
+  double simLength = 60.0;
 
   Time appStartTime = Seconds (0.001);
 
@@ -60,14 +57,12 @@ main (int argc, char *argv[])
   //Config::SetDefault ("ns3::SatBeamHelper::FadingModel", StringValue ("FadingMarkov"));
 
   /// Enable packet trace
-  //Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
+  Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
 
   Config::SetDefault ("ns3::SatConf::FwdUserLinkBandwidth", DoubleValue (2e+09));
   Config::SetDefault ("ns3::SatConf::FwdFeederLinkBandwidth", DoubleValue (8e+09));
   Config::SetDefault ("ns3::SatConf::FwdCarrierAllocatedBandwidth", DoubleValue (500e+06));
   Config::SetDefault ("ns3::SatConf::FwdCarrierRollOff", DoubleValue (0.05));
-
-  //Config::SetDefault ("ns3::SatBbFrameConf::DefaultModCod", StringValue ("QPSK_1_TO_2"));
 
   Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("sat-traffic-helper");
   simulationHelper->SetSimulationTime (simLength);
@@ -78,8 +73,9 @@ main (int argc, char *argv[])
   simulationHelper->SetUserCountPerUt (endUsersPerUt);
   simulationHelper->SetBeams (beams);
 
-  Config::SetDefault ("ns3::CbrApplication::Interval", StringValue (interval));
-  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
+  //TODO cancel some changes made in TrafficHelper...
+  //Config::SetDefault ("ns3::CbrApplication::Interval", StringValue (interval));
+  //Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
 
   simulationHelper->CreateSatScenario ();
 
@@ -89,7 +85,7 @@ main (int argc, char *argv[])
 
   Ptr<SatTrafficHelper> trafficHelper = simulationHelper->GetTrafficHelper ();
   Ptr<SatHelper> satHelper = simulationHelper->GetSatelliteHelper ();
-  trafficHelper->AddCbrTraffic (interval, packetSize, satHelper->GetGwUsers (), satHelper->GetUtUsers (), appStartTime, Seconds (simLength), Seconds (0.001));
+  trafficHelper->AddPoissonTraffic (0.1, 0.1, "10Mbps", packetSize, satHelper->GetGwUsers (), satHelper->GetUtUsers (), appStartTime, Seconds (simLength), Seconds (0.001));
 
   //simulationHelper->CreateDefaultFwdLinkStats ();
   simulationHelper->EnableProgressLogs ();
@@ -115,6 +111,10 @@ main (int argc, char *argv[])
   s->AddPerUtFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+  s->AddPerUtFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   simulationHelper->RunSimulation ();
 
