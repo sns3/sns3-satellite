@@ -61,6 +61,12 @@ public:
     G_729_3
   } VoipCodec_t;
 
+  typedef enum
+  {
+    RTN_LINK,
+    FWD_LINK
+  } TrafficDirection_t;
+
   /**
    * \brief Get the type ID
    * \return the object TypeId
@@ -92,6 +98,7 @@ public:
 
   /**
    * Add a new CBR traffic between chosen GWs and UTs
+   * \param direction Direction of traffic
    * \param interval Wait time between transmission of two packets
    * \param packetSize Packet size in bytes
    * \param gws The Gateways
@@ -100,10 +107,18 @@ public:
    * \param stopTime Application stop time
    * \param startDelay application start delay between each user
    */
-  void AddCbrTraffic (std::string interval, uint32_t packetSize, NodeContainer gws, NodeContainer uts, Time startTime, Time stopTime, Time startDelay);
+  void AddCbrTraffic (TrafficDirection_t direction,
+                      std::string interval,
+                      uint32_t packetSize,
+                      NodeContainer gws,
+                      NodeContainer uts,
+                      Time startTime,
+                      Time stopTime,
+                      Time startDelay);
 
   /**
    * Add a new Poisson traffic between chosen GWs and UTs
+   * \param direction Direction of traffic
    * \param onTime On time duration in seconds
    * \param offTimeExpMean Off time mean in seconds. The off time follows an exponential law of mean offTimeExpMean
    * \param rate The rate with the unit
@@ -114,7 +129,16 @@ public:
    * \param stopTime Application stop time
    * \param startDelay application start delay between each user
    */
-  void AddPoissonTraffic (double onTime, double offTimeExpMean, std::string rate, uint32_t packetSize, NodeContainer gws, NodeContainer uts, Time startTime, Time stopTime, Time startDelay);
+  void AddPoissonTraffic (TrafficDirection_t direction,
+                          Time onTime,
+                          Time offTimeExpMean,
+                          std::string rate,
+                          uint32_t packetSize,
+                          NodeContainer gws,
+                          NodeContainer uts,
+                          Time startTime,
+                          Time stopTime,
+                          Time startDelay);
 
 // VoIP (cf Fractal Analysis and Modeling of VoIP Traffic)
 // Pkt size = 210B TODO with header ?
@@ -124,6 +148,7 @@ public:
 // Idle time = 50ms (G.711.1)
   /**
    * Add a new Poisson traffic between chosen GWs and UTs
+   * \param direction Direction of traffic
    * \param codec the Codec used
    * \param gws The Gateways
    * \param uts The User Terminals
@@ -131,7 +156,13 @@ public:
    * \param stopTime Application stop time
    * \param startDelay application start delay between each user
    */
-  void AddVoipTraffic (VoipCodec_t codec, NodeContainer gws, NodeContainer uts, Time startTime, Time stopTime, Time startDelay);
+  void AddVoipTraffic (TrafficDirection_t direction,
+                       VoipCodec_t codec,
+                       NodeContainer gws,
+                       NodeContainer uts,
+                       Time startTime,
+                       Time stopTime,
+                       Time startDelay);
 
 private:
 

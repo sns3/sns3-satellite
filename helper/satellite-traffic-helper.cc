@@ -62,9 +62,15 @@ SatTrafficHelper::SatTrafficHelper (Ptr<SatHelper> satHelper)
 {
 }
 
-
 void
-SatTrafficHelper::AddCbrTraffic (std::string interval, uint32_t packetSize, NodeContainer gws, NodeContainer uts, Time startTime, Time stopTime, Time startDelay)
+SatTrafficHelper::AddCbrTraffic (TrafficDirection_t direction,
+                                 std::string interval,
+                                 uint32_t packetSize,
+                                 NodeContainer gws,
+                                 NodeContainer uts,
+                                 Time startTime,
+                                 Time stopTime,
+                                 Time startDelay)
 {
   NS_LOG_FUNCTION (this);
 
@@ -81,26 +87,54 @@ SatTrafficHelper::AddCbrTraffic (std::string interval, uint32_t packetSize, Node
     {
       for (uint32_t i = 0; i < uts.GetN (); i++)
         {
-          InetSocketAddress utUserAddr = InetSocketAddress (m_satHelper->GetUserAddress (uts.Get (i)), port);
-          if (!HasSinkInstalled (uts.Get (i), port))
+          if (direction == RTN_LINK)
             {
-              sinkHelper.SetAttribute ("Local", AddressValue (Address (utUserAddr)));
-              sinkContainer.Add (sinkHelper.Install (uts.Get (i)));
-            }
+              InetSocketAddress gwUserAddr = InetSocketAddress (m_satHelper->GetUserAddress (gws.Get (j)), port);
+              if (!HasSinkInstalled (gws.Get (j), port))
+                {
+                  sinkHelper.SetAttribute ("Local", AddressValue (Address (gwUserAddr)));
+                  sinkContainer.Add (sinkHelper.Install (gws.Get (j)));
+                }
 
-          cbrHelper.SetConstantTraffic (Time (interval), packetSize);
-          cbrHelper.SetAttribute ("Remote", AddressValue (Address (utUserAddr)));
-          auto app = cbrHelper.Install (gws.Get (j)).Get (0);
-          app->SetStartTime (startTime + (i + 1) * startDelay);
-          cbrContainer.Add (app);
+              cbrHelper.SetConstantTraffic (Time (interval), packetSize);
+              cbrHelper.SetAttribute ("Remote", AddressValue (Address (gwUserAddr)));
+              auto app = cbrHelper.Install (uts.Get (i)).Get (0);
+              app->SetStartTime (startTime + (i + j*gws.GetN () + 1) * startDelay);
+              cbrContainer.Add (app);
+            }
+          else if (direction == FWD_LINK)
+            {
+              InetSocketAddress utUserAddr = InetSocketAddress (m_satHelper->GetUserAddress (uts.Get (i)), port);
+              if (!HasSinkInstalled (uts.Get (i), port))
+                {
+                  sinkHelper.SetAttribute ("Local", AddressValue (Address (utUserAddr)));
+                  sinkContainer.Add (sinkHelper.Install (uts.Get (i)));
+                }
+
+              cbrHelper.SetConstantTraffic (Time (interval), packetSize);
+              cbrHelper.SetAttribute ("Remote", AddressValue (Address (utUserAddr)));
+              auto app = cbrHelper.Install (gws.Get (j)).Get (0);
+              app->SetStartTime (startTime + (i + j*gws.GetN () + 1) * startDelay);
+              cbrContainer.Add (app);
+            }
         }
     }
+
   sinkContainer.Start (startTime);
   sinkContainer.Stop (stopTime);
 }
 
 void
-SatTrafficHelper::AddPoissonTraffic (double onTime, double offTimeExpMean, std::string rate, uint32_t packetSize, NodeContainer gws, NodeContainer uts, Time startTime, Time stopTime, Time startDelay)
+SatTrafficHelper::AddPoissonTraffic (TrafficDirection_t direction,
+                                     Time onTime,
+                                     Time offTimeExpMean,
+                                     std::string rate,
+                                     uint32_t packetSize,
+                                     NodeContainer gws,
+                                     NodeContainer uts,
+                                     Time startTime,
+                                     Time stopTime,
+                                     Time startDelay)
 {
   std::string socketFactory = "ns3::UdpSocketFactory";
 
@@ -116,23 +150,46 @@ SatTrafficHelper::AddPoissonTraffic (double onTime, double offTimeExpMean, std::
     {
       for (uint32_t i = 0; i < uts.GetN (); i++)
         {
-          InetSocketAddress utUserAddr = InetSocketAddress (m_satHelper->GetUserAddress (uts.Get (i)), port);
-
-          if (!HasSinkInstalled (uts.Get (i), port))
+          if (direction == RTN_LINK)
             {
-              sinkHelper.SetAttribute ("Local", AddressValue (Address (utUserAddr)));
-              sinkContainer.Add (sinkHelper.Install (uts.Get (i)));
+              InetSocketAddress gwUserAddr = InetSocketAddress (m_satHelper->GetUserAddress (gws.Get (j)), port);
+
+              if (!HasSinkInstalled (gws.Get (j), port))
+                {
+                  sinkHelper.SetAttribute ("Local", AddressValue (Address (gwUserAddr)));
+                  sinkContainer.Add (sinkHelper.Install (gws.Get (j)));
+                }
+
+              onOffHelper.SetAttribute ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + std::to_string (onTime.GetSeconds ()) + "]"));
+              onOffHelper.SetAttribute ("OffTime", StringValue ("ns3::ExponentialRandomVariable[Mean=" + std::to_string (offTimeExpMean.GetSeconds ()) + "]"));
+              onOffHelper.SetAttribute ("DataRate", DataRateValue (rate));
+              onOffHelper.SetAttribute ("PacketSize", UintegerValue (packetSize));
+              onOffHelper.SetAttribute ("Remote", AddressValue (Address (gwUserAddr)));
+
+              auto app = onOffHelper.Install (uts.Get (i)).Get (0);
+              app->SetStartTime (startTime + (i + j*gws.GetN () + 1) * startDelay);
+              onOffContainer.Add (app);
             }
+          else if (direction == FWD_LINK)
+            {
+              InetSocketAddress utUserAddr = InetSocketAddress (m_satHelper->GetUserAddress (uts.Get (i)), port);
 
-          onOffHelper.SetAttribute ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + std::to_string(onTime) + "]"));
-          onOffHelper.SetAttribute ("OffTime", StringValue ("ns3::ExponentialRandomVariable[Mean=" + std::to_string(offTimeExpMean) + "]"));
-          onOffHelper.SetAttribute ("DataRate", DataRateValue (rate));
-          onOffHelper.SetAttribute ("PacketSize", UintegerValue (packetSize));
-          onOffHelper.SetAttribute ("Remote", AddressValue (Address (utUserAddr)));
+              if (!HasSinkInstalled (uts.Get (i), port))
+                {
+                  sinkHelper.SetAttribute ("Local", AddressValue (Address (utUserAddr)));
+                  sinkContainer.Add (sinkHelper.Install (uts.Get (i)));
+                }
 
-          auto app = onOffHelper.Install (gws.Get (j)).Get (0);
-          app->SetStartTime (startTime + (i + 1) * startDelay);
-          onOffContainer.Add (app);
+              onOffHelper.SetAttribute ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + std::to_string (onTime.GetSeconds ()) + "]"));
+              onOffHelper.SetAttribute ("OffTime", StringValue ("ns3::ExponentialRandomVariable[Mean=" + std::to_string (offTimeExpMean.GetSeconds ()) + "]"));
+              onOffHelper.SetAttribute ("DataRate", DataRateValue (rate));
+              onOffHelper.SetAttribute ("PacketSize", UintegerValue (packetSize));
+              onOffHelper.SetAttribute ("Remote", AddressValue (Address (utUserAddr)));
+
+              auto app = onOffHelper.Install (gws.Get (j)).Get (0);
+              app->SetStartTime (startTime + (i + j*gws.GetN () + 1) * startDelay);
+              onOffContainer.Add (app);
+            }
         }
     }
   sinkContainer.Start (startTime);
@@ -140,7 +197,13 @@ SatTrafficHelper::AddPoissonTraffic (double onTime, double offTimeExpMean, std::
 }
 
 void
-SatTrafficHelper::AddVoipTraffic (VoipCodec_t codec, NodeContainer gws, NodeContainer uts, Time startTime, Time stopTime, Time startDelay)
+SatTrafficHelper::AddVoipTraffic (TrafficDirection_t direction,
+                                  VoipCodec_t codec,
+                                  NodeContainer gws,
+                                  NodeContainer uts,
+                                  Time startTime,
+                                  Time stopTime,
+                                  Time startDelay)
 {
   std::string socketFactory = "ns3::UdpSocketFactory";
   uint16_t port = 9;
@@ -173,23 +236,46 @@ SatTrafficHelper::AddVoipTraffic (VoipCodec_t codec, NodeContainer gws, NodeCont
     {
       for (uint32_t i = 0; i < uts.GetN (); i++)
         {
-          InetSocketAddress utUserAddr = InetSocketAddress (m_satHelper->GetUserAddress (uts.Get (i)), port);
-
-          if (!HasSinkInstalled (uts.Get (i), port))
+          if (direction == RTN_LINK)
             {
-              sinkHelper.SetAttribute ("Local", AddressValue (Address (utUserAddr)));
-              sinkContainer.Add (sinkHelper.Install (uts.Get (i)));
+              InetSocketAddress gwUserAddr = InetSocketAddress (m_satHelper->GetUserAddress (gws.Get (j)), port);
+
+              if (!HasSinkInstalled (gws.Get (j), port))
+                {
+                  sinkHelper.SetAttribute ("Local", AddressValue (Address (gwUserAddr)));
+                  sinkContainer.Add (sinkHelper.Install (gws.Get (j)));
+                }
+
+              onOffHelper.SetAttribute ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + std::to_string(onTime) + "]"));
+              onOffHelper.SetAttribute ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + std::to_string(offTime) + "]"));
+              onOffHelper.SetAttribute ("DataRate", DataRateValue (rate));
+              onOffHelper.SetAttribute ("PacketSize", UintegerValue (packetSize));
+              onOffHelper.SetAttribute ("Remote", AddressValue (Address (gwUserAddr)));
+
+              auto app = onOffHelper.Install (uts.Get (i)).Get (0);
+              app->SetStartTime (startTime + (i + j*gws.GetN () + 1) * startDelay);
+              onOffContainer.Add (app);
             }
+          else if (direction == FWD_LINK)
+            {
+              InetSocketAddress utUserAddr = InetSocketAddress (m_satHelper->GetUserAddress (uts.Get (i)), port);
 
-          onOffHelper.SetAttribute ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + std::to_string(onTime) + "]"));
-          onOffHelper.SetAttribute ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + std::to_string(offTime) + "]"));
-          onOffHelper.SetAttribute ("DataRate", DataRateValue (rate));
-          onOffHelper.SetAttribute ("PacketSize", UintegerValue (packetSize));
-          onOffHelper.SetAttribute ("Remote", AddressValue (Address (utUserAddr)));
+              if (!HasSinkInstalled (uts.Get (i), port))
+                {
+                  sinkHelper.SetAttribute ("Local", AddressValue (Address (utUserAddr)));
+                  sinkContainer.Add (sinkHelper.Install (uts.Get (i)));
+                }
 
-          auto app = onOffHelper.Install (gws.Get (j)).Get (0);
-          app->SetStartTime (startTime + (i + 1) * startDelay);
-          onOffContainer.Add (app);
+              onOffHelper.SetAttribute ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + std::to_string(onTime) + "]"));
+              onOffHelper.SetAttribute ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + std::to_string(offTime) + "]"));
+              onOffHelper.SetAttribute ("DataRate", DataRateValue (rate));
+              onOffHelper.SetAttribute ("PacketSize", UintegerValue (packetSize));
+              onOffHelper.SetAttribute ("Remote", AddressValue (Address (utUserAddr)));
+
+              auto app = onOffHelper.Install (gws.Get (j)).Get (0);
+              app->SetStartTime (startTime + (i + j*gws.GetN () + 1) * startDelay);
+              onOffContainer.Add (app);
+            }
         }
     }
   sinkContainer.Start (startTime);

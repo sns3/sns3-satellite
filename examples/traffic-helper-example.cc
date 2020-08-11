@@ -46,7 +46,7 @@ main (int argc, char *argv[])
   uint32_t endUsersPerUt = 1;
   uint32_t utsPerBeam = 10;
   //uint32_t packetSize = 1000;
-  std::string interval = "10ms";
+  //std::string interval = "10ms";
   double simLength = 60.0;
 
   Time appStartTime = Seconds (0.001);
@@ -85,7 +85,33 @@ main (int argc, char *argv[])
 
   Ptr<SatTrafficHelper> trafficHelper = simulationHelper->GetTrafficHelper ();
   Ptr<SatHelper> satHelper = simulationHelper->GetSatelliteHelper ();
-  trafficHelper->AddVoipTraffic (SatTrafficHelper::G_711_1, satHelper->GetGwUsers (), satHelper->GetUtUsers (), appStartTime, Seconds (simLength), Seconds (0.001));
+  /*trafficHelper->AddCbrTraffic (SatTrafficHelper::FWD_LINK,
+                                "10ms",
+                                1000,
+                                satHelper->GetGwUsers (),
+                                satHelper->GetUtUsers (),
+                                appStartTime,
+                                Seconds (simLength),
+                                Seconds (0.001));*/
+
+  /*trafficHelper->AddPoissonTraffic (SatTrafficHelper::RTN_LINK,
+                                    Seconds (0.1),
+                                    Seconds (1),
+                                    "10Mbps",
+                                    1000,
+                                    satHelper->GetGwUsers (),
+                                    satHelper->GetUtUsers (),
+                                    appStartTime,
+                                    Seconds (simLength),
+                                    Seconds (0.001));*/
+
+  trafficHelper->AddVoipTraffic (SatTrafficHelper::FWD_LINK,
+                                  SatTrafficHelper::G_711_1,
+                                  satHelper->GetGwUsers (),
+                                  satHelper->GetUtUsers (),
+                                  appStartTime,
+                                  Seconds (simLength),
+                                  Seconds (0.001));
 
   //simulationHelper->CreateDefaultFwdLinkStats ();
   simulationHelper->EnableProgressLogs ();
@@ -115,6 +141,14 @@ main (int argc, char *argv[])
   s->AddPerUtFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddPerUtRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+  s->AddPerUtRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   simulationHelper->RunSimulation ();
 
