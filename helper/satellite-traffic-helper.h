@@ -45,12 +45,21 @@ public:
     NONE, //TODO
     CBR, //TODO -> implemented
     CUSTOM, //TODO
-    POISSON, //TODO -> implemented, but verify formula and pb rate incorrect
+    POISSON, //TODO -> implemented, but verify formula and repartition of offTime
     HTTP, //TODO
     NRTV, //TODO
     VISIO, //TODO
-    VOIP //TODO
+    VOIP //TODO -> set codecs
   } TrafficType_t;
+
+  typedef enum
+  {
+    G_711_1,
+    G_711_2,
+    G_723_1,
+    G_729_2,
+    G_729_3
+  } VoipCodec_t;
 
   /**
    * \brief Get the type ID
@@ -107,6 +116,23 @@ public:
    */
   void AddPoissonTraffic (double onTime, double offTimeExpMean, std::string rate, uint32_t packetSize, NodeContainer gws, NodeContainer uts, Time startTime, Time stopTime, Time startDelay);
 
+// VoIP (cf Fractal Analysis and Modeling of VoIP Traffic)
+// Pkt size = 210B TODO with header ?
+// Rate = 64kb/s
+// Distribution pareto (ATM it is constant -> TODO change)
+// Burst time = 500ms (G.711.1)
+// Idle time = 50ms (G.711.1)
+  /**
+   * Add a new Poisson traffic between chosen GWs and UTs
+   * \param codec the Codec used
+   * \param gws The Gateways
+   * \param uts The User Terminals
+   * \param startTime Application Start time
+   * \param stopTime Application stop time
+   * \param startDelay application start delay between each user
+   */
+  void AddVoipTraffic (VoipCodec_t codec, NodeContainer gws, NodeContainer uts, Time startTime, Time stopTime, Time startDelay);
+
 private:
 
   Ptr<SatHelper> m_satHelper;	// Pointer to the SatHelper objet
@@ -121,3 +147,10 @@ private:
 } // namespace ns3
 
 #endif /* __SATELLITE_TRAFFIC_HELPER_H__ */
+
+
+
+// More generic
+// call functons AddVoipTraffic, AddPoissonTraffic, etc.
+// each one call a generic function (with for loops). Has a additionnal function -> subfunction, for traffic with parameters
+// Subfunction (private) call GW*UT times

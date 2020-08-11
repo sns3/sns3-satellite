@@ -124,8 +124,69 @@ SatTrafficHelper::AddPoissonTraffic (double onTime, double offTimeExpMean, std::
               sinkContainer.Add (sinkHelper.Install (uts.Get (i)));
             }
 
-          onOffHelper.SetPoissonRate (onTime, offTimeExpMean, DataRate (rate), 512);
+          onOffHelper.SetAttribute ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + std::to_string(onTime) + "]"));
+          onOffHelper.SetAttribute ("OffTime", StringValue ("ns3::ExponentialRandomVariable[Mean=" + std::to_string(offTimeExpMean) + "]"));
+          onOffHelper.SetAttribute ("DataRate", DataRateValue (rate));
+          onOffHelper.SetAttribute ("PacketSize", UintegerValue (packetSize));
           onOffHelper.SetAttribute ("Remote", AddressValue (Address (utUserAddr)));
+
+          auto app = onOffHelper.Install (gws.Get (j)).Get (0);
+          app->SetStartTime (startTime + (i + 1) * startDelay);
+          onOffContainer.Add (app);
+        }
+    }
+  sinkContainer.Start (startTime);
+  sinkContainer.Stop (stopTime);
+}
+
+void
+SatTrafficHelper::AddVoipTraffic (VoipCodec_t codec, NodeContainer gws, NodeContainer uts, Time startTime, Time stopTime, Time startDelay)
+{
+  std::string socketFactory = "ns3::UdpSocketFactory";
+  uint16_t port = 9;
+
+  double onTime;
+  double offTime;
+  std::string rate;
+  uint32_t packetSize;
+
+  switch(codec)
+    {
+      case G_711_1:
+        onTime = 0.5;
+        offTime = 0.05;
+        rate = "64kbps";
+        packetSize = 210;
+        break;
+      default:
+        NS_FATAL_ERROR ("Not implemented yet");
+        // TODO do it
+    }
+
+  PacketSinkHelper sinkHelper (socketFactory, Address ());
+  SatOnOffHelper onOffHelper (socketFactory, Address ());
+  ApplicationContainer sinkContainer;
+  ApplicationContainer onOffContainer;
+
+  // create CBR applications from GWs to UT users
+  for (uint32_t j = 0; j < gws.GetN (); j++)
+    {
+      for (uint32_t i = 0; i < uts.GetN (); i++)
+        {
+          InetSocketAddress utUserAddr = InetSocketAddress (m_satHelper->GetUserAddress (uts.Get (i)), port);
+
+          if (!HasSinkInstalled (uts.Get (i), port))
+            {
+              sinkHelper.SetAttribute ("Local", AddressValue (Address (utUserAddr)));
+              sinkContainer.Add (sinkHelper.Install (uts.Get (i)));
+            }
+
+          onOffHelper.SetAttribute ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + std::to_string(onTime) + "]"));
+          onOffHelper.SetAttribute ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + std::to_string(offTime) + "]"));
+          onOffHelper.SetAttribute ("DataRate", DataRateValue (rate));
+          onOffHelper.SetAttribute ("PacketSize", UintegerValue (packetSize));
+          onOffHelper.SetAttribute ("Remote", AddressValue (Address (utUserAddr)));
+
           auto app = onOffHelper.Install (gws.Get (j)).Get (0);
           app->SetStartTime (startTime + (i + 1) * startDelay);
           onOffContainer.Add (app);

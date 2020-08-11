@@ -45,7 +45,7 @@ main (int argc, char *argv[])
   uint32_t nb_gw = 1;
   uint32_t endUsersPerUt = 1;
   uint32_t utsPerBeam = 10;
-  uint32_t packetSize = 1000;
+  //uint32_t packetSize = 1000;
   std::string interval = "10ms";
   double simLength = 60.0;
 
@@ -85,7 +85,7 @@ main (int argc, char *argv[])
 
   Ptr<SatTrafficHelper> trafficHelper = simulationHelper->GetTrafficHelper ();
   Ptr<SatHelper> satHelper = simulationHelper->GetSatelliteHelper ();
-  trafficHelper->AddPoissonTraffic (0.1, 0.1, "10Mbps", packetSize, satHelper->GetGwUsers (), satHelper->GetUtUsers (), appStartTime, Seconds (simLength), Seconds (0.001));
+  trafficHelper->AddVoipTraffic (SatTrafficHelper::G_711_1, satHelper->GetGwUsers (), satHelper->GetUtUsers (), appStartTime, Seconds (simLength), Seconds (0.001));
 
   //simulationHelper->CreateDefaultFwdLinkStats ();
   simulationHelper->EnableProgressLogs ();
