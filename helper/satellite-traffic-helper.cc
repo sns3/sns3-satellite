@@ -55,11 +55,13 @@ SatTrafficHelper::GetInstanceTypeId (void) const
 SatTrafficHelper::SatTrafficHelper ()
   : m_satHelper (NULL)
 {
+  m_last_custom_application.created = false;
 }
 
 SatTrafficHelper::SatTrafficHelper (Ptr<SatHelper> satHelper)
   : m_satHelper (satHelper)
 {
+  m_last_custom_application.created = false;
 }
 
 void
@@ -72,7 +74,7 @@ SatTrafficHelper::AddCbrTraffic (TrafficDirection_t direction,
                                  Time stopTime,
                                  Time startDelay)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << interval << packetSize << startTime << stopTime << startDelay);
 
   std::string socketFactory = "ns3::UdpSocketFactory";
   uint16_t port = 9;
@@ -136,6 +138,8 @@ SatTrafficHelper::AddPoissonTraffic (TrafficDirection_t direction,
                                      Time stopTime,
                                      Time startDelay)
 {
+  NS_LOG_FUNCTION (this << direction << onTime << offTimeExpMean << rate << packetSize << startTime << stopTime << startDelay);
+
   std::string socketFactory = "ns3::UdpSocketFactory";
 
   uint16_t port = 9;
@@ -205,6 +209,8 @@ SatTrafficHelper::AddVoipTraffic (TrafficDirection_t direction,
                                   Time stopTime,
                                   Time startDelay)
 {
+  NS_LOG_FUNCTION (this << direction << codec << startTime << stopTime << startDelay);
+
   std::string socketFactory = "ns3::UdpSocketFactory";
   uint16_t port = 9;
 
@@ -281,6 +287,121 @@ SatTrafficHelper::AddVoipTraffic (TrafficDirection_t direction,
   sinkContainer.Start (startTime);
   sinkContainer.Stop (stopTime);
 }
+
+void
+SatTrafficHelper::AddCustomTraffic (TrafficDirection_t direction,
+                                    std::string interval,
+                                    uint32_t packetSize,
+                                    NodeContainer gws,
+                                    NodeContainer uts,
+                                    Time startTime,
+                                    Time stopTime,
+                                    Time startDelay)
+{
+  NS_LOG_FUNCTION (this << direction << interval << packetSize << startTime << stopTime << startDelay);
+
+  std::string socketFactory = "ns3::UdpSocketFactory";
+  uint16_t port = 9;
+
+  PacketSinkHelper sinkHelper (socketFactory, Address ());
+
+  ObjectFactory factory;
+  factory.SetTypeId ("ns3::CbrApplication");
+  factory.Set ("Protocol", StringValue (socketFactory));
+  ApplicationContainer sinkContainer;
+  ApplicationContainer cbrContainer;
+
+  // create CBR applications from GWs to UT users
+  for (uint32_t j = 0; j < gws.GetN (); j++)
+    {
+      for (uint32_t i = 0; i < uts.GetN (); i++)
+        {
+          if (direction == RTN_LINK)
+            {
+              InetSocketAddress gwUserAddr = InetSocketAddress (m_satHelper->GetUserAddress (gws.Get (j)), port);
+              if (!HasSinkInstalled (gws.Get (j), port))
+                {
+                  sinkHelper.SetAttribute ("Local", AddressValue (Address (gwUserAddr)));
+                  sinkContainer.Add (sinkHelper.Install (gws.Get (j)));
+                }
+
+              factory.Set ("Interval", TimeValue (Time (interval)));
+              factory.Set ("PacketSize", UintegerValue (packetSize));
+              factory.Set ("Remote", AddressValue (Address (gwUserAddr)));
+              Ptr<CbrApplication> p_app = factory.Create<CbrApplication> ();
+              uts.Get (i)->AddApplication (p_app);
+              auto app = ApplicationContainer (p_app).Get (0);
+              app->SetStartTime (startTime + (i + j*gws.GetN () + 1) * startDelay);
+              cbrContainer.Add (app);
+            }
+          else if (direction == FWD_LINK)
+            {
+              InetSocketAddress utUserAddr = InetSocketAddress (m_satHelper->GetUserAddress (uts.Get (i)), port);
+              if (!HasSinkInstalled (uts.Get (i), port))
+                {
+                  sinkHelper.SetAttribute ("Local", AddressValue (Address (utUserAddr)));
+                  sinkContainer.Add (sinkHelper.Install (uts.Get (i)));
+                }
+
+              factory.Set ("Interval", TimeValue (Time (interval)));
+              factory.Set ("PacketSize", UintegerValue (packetSize));
+              factory.Set ("Remote", AddressValue (Address (utUserAddr)));
+              Ptr<CbrApplication> p_app = factory.Create<CbrApplication> ();
+              gws.Get (j)->AddApplication (p_app);
+              auto app = ApplicationContainer (p_app).Get (0);
+              app->SetStartTime (startTime + (i + j*gws.GetN () + 1) * startDelay);
+              cbrContainer.Add (app);
+            }
+        }
+    }
+
+  sinkContainer.Start (startTime);
+  sinkContainer.Stop (stopTime);
+
+  m_last_custom_application.application = cbrContainer;
+  m_last_custom_application.start = startTime;
+  m_last_custom_application.stop = stopTime;
+  m_last_custom_application.created = true;
+}
+
+  /**
+   * Change the parameters of the last traffic created
+   * \param time Time to apply the changes
+   * \param interval New wait time between transmission of two packets
+   * \param packetSize New packet size in bytes
+   */
+void
+SatTrafficHelper::ChangeCustomTraffic (Time delay,
+                                       std::string interval,
+                                       uint32_t packetSize)
+{
+  NS_LOG_FUNCTION (this << delay << interval << packetSize);
+
+  if (!m_last_custom_application.created)
+    {
+      NS_FATAL_ERROR ("No custom traffic created when calling the method SatTrafficHelper::ChangeCustomTraffic for the first time.");
+    }
+  if (m_last_custom_application.start + delay > m_last_custom_application.stop)
+    {
+      NS_FATAL_ERROR ("Custom traffic updated after its stop time.");
+    }
+  for (auto i = m_last_custom_application.application.Begin (); i != m_last_custom_application.application.End (); ++i)
+    {
+      Ptr<CbrApplication> app = (dynamic_cast<CbrApplication*> (PeekPointer (*i)));
+      Simulator::Schedule (m_last_custom_application.start + delay, &SatTrafficHelper::UpdateAttribute, this, app, interval, packetSize);
+    }
+}
+
+void
+SatTrafficHelper::UpdateAttribute (Ptr<CbrApplication> application, std::string interval, uint32_t packetSize)
+{
+  NS_LOG_FUNCTION (this << application << interval << packetSize);
+
+  application->SetInterval (Time (interval));
+  application->SetPacketSize (packetSize);
+}
+
+//TODO same with add/remove nodes ?
 
 bool
 SatTrafficHelper::HasSinkInstalled (Ptr<Node> node, uint16_t port)

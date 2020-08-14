@@ -27,6 +27,8 @@
 #include <ns3/string.h>
 
 #include <ns3/satellite-helper.h>
+#include <ns3/cbr-application.h>
+#include <ns3/application-container.h>
 
 namespace ns3 {
 
@@ -164,9 +166,66 @@ public:
                        Time stopTime,
                        Time startDelay);
 
+
+  /**
+   * Add a new CBR traffic between chosen GWs and UTs that can be customized
+   * \param direction Direction of traffic
+   * \param interval Initial wait time between transmission of two packets
+   * \param packetSize Packet size in bytes
+   * \param gws The Gateways
+   * \param uts The User Terminals
+   * \param startTime Application Start time
+   * \param stopTime Application stop time
+   * \param startDelay application start delay between each user
+   */
+  void AddCustomTraffic (TrafficDirection_t direction,
+                         std::string interval,
+                         uint32_t packetSize,
+                         NodeContainer gws,
+                         NodeContainer uts,
+                         Time startTime,
+                         Time stopTime,
+                         Time startDelay);
+
+  /**
+   * Change the parameters of the last traffic created
+   * \param time Delay after traffic launch to apply the changes
+   * \param interval New wait time between transmission of two packets
+   * \param packetSize New packet size in bytes
+   */
+  void ChangeCustomTraffic (Time delay,
+                            std::string interval,
+                            uint32_t packetSize);
+
+//TODO same with add/remove nodes ?
+
+//TODO check if correct if several GWs -> stats per GW
+
 private:
 
+  /**
+   * \brief Struct for info on last custom trafic created
+   */
+  typedef struct
+    {
+      ApplicationContainer application;
+      Time start;
+      Time stop;
+      bool created;
+    } CustomTrafficInfo_s;
+
   Ptr<SatHelper> m_satHelper;	// Pointer to the SatHelper objet
+
+  CustomTrafficInfo_s m_last_custom_application; // Last application container of custom traffic
+
+  /**
+   * TODO where I put this ?
+   * Update the chosen attribute of a custom traffic
+   * \param application The CBR application to update
+   * \param interval The new interval
+   * \param packetSize the new packet size
+   */
+  void UpdateAttribute (Ptr<CbrApplication> application, std::string interval, uint32_t packetSize);
 
   /**
    * \brief Check if node has a PacketSink installed at certain port.

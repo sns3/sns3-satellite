@@ -85,16 +85,16 @@ main (int argc, char *argv[])
 
   Ptr<SatTrafficHelper> trafficHelper = simulationHelper->GetTrafficHelper ();
   Ptr<SatHelper> satHelper = simulationHelper->GetSatelliteHelper ();
-  /*trafficHelper->AddCbrTraffic (SatTrafficHelper::FWD_LINK,
+  trafficHelper->AddCustomTraffic (SatTrafficHelper::FWD_LINK,
                                 "10ms",
                                 1000,
                                 satHelper->GetGwUsers (),
                                 satHelper->GetUtUsers (),
                                 appStartTime,
                                 Seconds (simLength),
-                                Seconds (0.001));*/
+                                Seconds (0.001));
 
-  /*trafficHelper->AddPoissonTraffic (SatTrafficHelper::RTN_LINK,
+  /*trafficHelper->AddPoissonTraffic (SatTrafficHelper::FWD_LINK,
                                     Seconds (0.1),
                                     Seconds (1),
                                     "10Mbps",
@@ -105,13 +105,27 @@ main (int argc, char *argv[])
                                     Seconds (simLength),
                                     Seconds (0.001));*/
 
-  trafficHelper->AddVoipTraffic (SatTrafficHelper::FWD_LINK,
+  /*trafficHelper->AddVoipTraffic (SatTrafficHelper::FWD_LINK,
                                   SatTrafficHelper::G_711_1,
                                   satHelper->GetGwUsers (),
                                   satHelper->GetUtUsers (),
                                   appStartTime,
                                   Seconds (simLength),
-                                  Seconds (0.001));
+                                  Seconds (0.001));*/
+
+  trafficHelper->ChangeCustomTraffic (Seconds (4), "20ms", 1000);
+  trafficHelper->ChangeCustomTraffic (Seconds (30), "10ms", 2000);
+
+  trafficHelper->AddCustomTraffic (SatTrafficHelper::FWD_LINK,
+                                "10ms",
+                                1000,
+                                satHelper->GetGwUsers (),
+                                satHelper->GetUtUsers (),
+                                Seconds (15),
+                                Seconds (simLength),
+                                Seconds (0.001));
+
+  trafficHelper->ChangeCustomTraffic (Seconds (25), "20ms", 1000);
 
   //simulationHelper->CreateDefaultFwdLinkStats ();
   simulationHelper->EnableProgressLogs ();
@@ -149,6 +163,22 @@ main (int argc, char *argv[])
   s->AddPerUtRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddPerGwFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerGwFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerGwFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+  s->AddPerGwFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerGwFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerGwFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddPerGwRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerGwRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerGwRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+  s->AddPerGwRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerGwRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerGwRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   simulationHelper->RunSimulation ();
 
