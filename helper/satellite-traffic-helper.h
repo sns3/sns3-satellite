@@ -46,7 +46,7 @@ public:
   {
     NONE, //TODO
     CBR, //TODO -> implemented
-    CUSTOM, //TODO
+    CUSTOM, //TODO -> implemented
     POISSON, //TODO -> implemented, but verify formula and repartition of offTime
     HTTP, //TODO
     NRTV, //TODO
