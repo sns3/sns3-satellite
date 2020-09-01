@@ -30,41 +30,72 @@
 using namespace ns3;
 
 /**
- * \file traffic-helper-example.cc
+ * \file vhts-example.cc
  * \ingroup satellite
  *
- * \brief  Test of satellite-traffic-helper module.
+ * \brief TODO
  */
 
-NS_LOG_COMPONENT_DEFINE ("sat-traffic-helper");
+NS_LOG_COMPONENT_DEFINE ("sat-vhts-example");
 
 int
 main (int argc, char *argv[])
 {
+  // TODO system
+  // TODO FWD
+  // TODO RTN
+  // TODO outputs
+
+  // Variables
   std::string beams = "12";
   uint32_t nb_gw = 1;
   uint32_t endUsersPerUt = 1;
   uint32_t utsPerBeam = 10;
-  //uint32_t packetSize = 1000;
-  //std::string interval = "10ms";
-  double simLength = 60.0;
 
   Time appStartTime = Seconds (0.001);
+  double simLength = 60.0;
 
-  /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
-  //Config::SetDefault ("ns3::SatBbFrameConf::AcmEnabled", BooleanValue (true));
-  //Config::SetDefault ("ns3::SatBeamHelper::FadingModel", StringValue ("FadingMarkov"));
+  std::string modcodsUsed = "QPSK_1_TO_3 QPSK_1_TO_2 QPSK_3_TO_5 QPSK_2_TO_3 QPSK_3_TO_4 QPSK_4_TO_5 QPSK_5_TO_6 QPSK_8_TO_9 QPSK_9_TO_10 "
+          "8PSK_3_TO_5 8PSK_2_TO_3 8PSK_3_TO_4 8PSK_5_TO_6 8PSK_8_TO_9 8PSK_9_TO_10 "
+          "16APSK_2_TO_3 16APSK_3_TO_4 16APSK_4_TO_5 16APSK_5_TO_6 16APSK_8_TO_9 16APSK_9_TO_10 "
+          "32APSK_3_TO_4 32APSK_4_TO_5 32APSK_5_TO_6 32APSK_8_TO_9";
 
-  /// Enable packet trace
-  Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
-
+  /*
+   * FWD link
+   */
+  // Set defaults TODO default plan ?
   Config::SetDefault ("ns3::SatConf::FwdUserLinkBandwidth", DoubleValue (2e+09));
   Config::SetDefault ("ns3::SatConf::FwdFeederLinkBandwidth", DoubleValue (8e+09));
   Config::SetDefault ("ns3::SatConf::FwdCarrierAllocatedBandwidth", DoubleValue (500e+06));
   Config::SetDefault ("ns3::SatConf::FwdCarrierRollOff", DoubleValue (0.05));
 
-  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("sat-traffic-helper");
+  // ModCods selection TODO can only choose ModCods with S2X
+  Config::SetDefault ("ns3::SatBeamHelper::DvbVersion", StringValue ("DVB_S2X"));
+  Config::SetDefault ("ns3::SatBbFrameConf::S2XModCodsUsed", StringValue (modcodsUsed));
+
+  // Link results
+
+
+  /*
+   * RTN link
+   */
+  // Set defaults TODO default plan ?
+  Config::SetDefault ("ns3::SatConf::RtnUserLinkBandwidth", DoubleValue (2e+09));
+  Config::SetDefault ("ns3::SatConf::RtnFeederLinkBandwidth", DoubleValue (8e+09));
+  Config::SetDefault ("ns3::SatConf::RtnCarrierAllocatedBandwidth", DoubleValue (125e+06));
+  Config::SetDefault ("ns3::SatConf::RtnCarrierRollOff", DoubleValue (0.05));
+
+  // Porteuse
+
+  // Link results
+
+  // Other
+
+
+  /*
+   * Traffics
+   */
+  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("sat-vhts-example");
   simulationHelper->SetSimulationTime (simLength);
 
   // We set the UT count and UT user count using attributes when configuring a pre-defined scenario
@@ -73,71 +104,32 @@ main (int argc, char *argv[])
   simulationHelper->SetUserCountPerUt (endUsersPerUt);
   simulationHelper->SetBeams (beams);
 
-  //TODO cancel some changes made in TrafficHelper...
-  //Config::SetDefault ("ns3::CbrApplication::Interval", StringValue (interval));
-  //Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
-
   simulationHelper->CreateSatScenario ();
 
-  simulationHelper->InstallTrafficModel (
-    SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
-    appStartTime, Seconds (simLength), Seconds (0.001));
-
-  /*Ptr<SatTrafficHelper> trafficHelper = simulationHelper->GetTrafficHelper ();
+  Ptr<SatTrafficHelper> trafficHelper = simulationHelper->GetTrafficHelper ();
   Ptr<SatHelper> satHelper = simulationHelper->GetSatelliteHelper ();
-  trafficHelper->AddCustomTraffic (SatTrafficHelper::FWD_LINK,
-                                "10ms",
-                                1000,
-                                satHelper->GetGwUsers (),
-                                satHelper->GetUtUsers (),
-                                appStartTime,
-                                Seconds (simLength),
-                                Seconds (0.001));
-
-  trafficHelper->ChangeCustomTraffic (Seconds (4), "20ms", 1000);
-  trafficHelper->ChangeCustomTraffic (Seconds (30), "10ms", 2000);*/
-
-  /*trafficHelper->AddPoissonTraffic (SatTrafficHelper::FWD_LINK,
-                                    Seconds (0.1),
-                                    Seconds (1),
-                                    "10Mbps",
-                                    1000,
-                                    satHelper->GetGwUsers (),
-                                    satHelper->GetUtUsers (),
-                                    appStartTime,
-                                    Seconds (simLength),
-                                    Seconds (0.001));*/
-
-  /*trafficHelper->AddVoipTraffic (SatTrafficHelper::FWD_LINK,
+  trafficHelper->AddVoipTraffic (SatTrafficHelper::FWD_LINK,
                                   SatTrafficHelper::G_711_1,
                                   satHelper->GetGwUsers (),
                                   satHelper->GetUtUsers (),
                                   appStartTime,
                                   Seconds (simLength),
-                                  Seconds (0.001));*/
+                                  Seconds (0.001));
 
-  /*trafficHelper->AddCustomTraffic (SatTrafficHelper::FWD_LINK,
-                                "10ms",
-                                1000,
-                                satHelper->GetGwUsers (),
-                                satHelper->GetUtUsers (),
-                                Seconds (15),
-                                Seconds (simLength),
-                                Seconds (0.001));
+  /*
+   * Outputs
+   */
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+  Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
 
-  trafficHelper->ChangeCustomTraffic (Seconds (25), "20ms", 1000);*/
-
-  //simulationHelper->CreateDefaultFwdLinkStats ();
   simulationHelper->EnableProgressLogs ();
 
-  // To store attributes to file
   Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("contrib/satellite/data/sims/sat-traffic-helper/output-attributes.xml"));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
   ConfigStore outputConfig;
   outputConfig.ConfigureDefaults ();
 
-  // Stats
   Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer ();
 
   s->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
