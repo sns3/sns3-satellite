@@ -72,6 +72,7 @@ main (int argc, char *argv[])
   // ModCods selection TODO can only choose ModCods with S2X
   Config::SetDefault ("ns3::SatBeamHelper::DvbVersion", StringValue ("DVB_S2X"));
   Config::SetDefault ("ns3::SatBbFrameConf::S2XModCodsUsed", StringValue (modcodsUsed));
+  //TODO default MC
 
   // Link results
 
@@ -80,10 +81,8 @@ main (int argc, char *argv[])
    * RTN link
    */
   // Set defaults TODO default plan ?
-  Config::SetDefault ("ns3::SatConf::RtnUserLinkBandwidth", DoubleValue (2e+09));
-  Config::SetDefault ("ns3::SatConf::RtnFeederLinkBandwidth", DoubleValue (8e+09));
-  Config::SetDefault ("ns3::SatConf::RtnCarrierAllocatedBandwidth", DoubleValue (125e+06));
-  Config::SetDefault ("ns3::SatConf::RtnCarrierRollOff", DoubleValue (0.05));
+  Config::SetDefault ("ns3::SatConf::RtnUserLinkBandwidth", DoubleValue (500e+06));
+  Config::SetDefault ("ns3::SatConf::RtnFeederLinkBandwidth", DoubleValue (2e+09));
 
   // Porteuse
 
@@ -124,7 +123,7 @@ main (int argc, char *argv[])
 
   simulationHelper->EnableProgressLogs ();
 
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("contrib/satellite/data/sims/sat-traffic-helper/output-attributes.xml"));
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("contrib/satellite/data/sims/sat-vhts-example/output-attributes.xml"));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
   ConfigStore outputConfig;
