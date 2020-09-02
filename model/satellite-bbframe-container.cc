@@ -58,7 +58,7 @@ SatBbFrameContainer::SatBbFrameContainer (std::vector<SatEnums::SatModcod_t>& mo
 
   m_defaultBbFrameType = SatEnums::NORMAL_FRAME;
 
-  if (m_bbFrameConf->GetBbFrameUsageMode () == SatBbFrameConf::SHORT_FRAMES )
+  if (m_bbFrameConf->GetBbFrameUsageMode () == SatEnums::SHORT_FRAMES )
     {
       m_defaultBbFrameType = SatEnums::SHORT_FRAME;
     }
@@ -183,7 +183,7 @@ SatBbFrameContainer::AddData (uint32_t priorityClass, SatEnums::SatModcod_t modc
         {
           CreateFrameToTail (priorityClass, modcod);
         }
-      else if ( ( m_bbFrameConf->GetBbFrameUsageMode () == SatBbFrameConf::SHORT_AND_NORMAL_FRAMES )
+      else if ( ( m_bbFrameConf->GetBbFrameUsageMode () == SatEnums::SHORT_AND_NORMAL_FRAMES )
                 && ( m_container.at (modcod).back ()->GetFrameType () == SatEnums::SHORT_FRAME ) )
         {
           m_totalDuration += m_container.at (modcod).back ()->Extend (m_bbFrameConf);
@@ -199,7 +199,7 @@ SatBbFrameContainer::AddData (uint32_t priorityClass, SatEnums::SatModcod_t modc
           // create and add frame to tail
           CreateFrameToTail (priorityClass, m_bbFrameConf->GetMostRobustModcod (m_defaultBbFrameType) );
         }
-      else if ( ( m_bbFrameConf->GetBbFrameUsageMode () == SatBbFrameConf::SHORT_AND_NORMAL_FRAMES )
+      else if ( ( m_bbFrameConf->GetBbFrameUsageMode () == SatEnums::SHORT_AND_NORMAL_FRAMES )
                 && ( m_container.at (modcod).back ()->GetFrameType () == SatEnums::SHORT_FRAME ) )
         {
           m_totalDuration += m_ctrlContainer.back ()->Extend (m_bbFrameConf);
@@ -381,7 +381,7 @@ SatBbFrameContainer::MergeBbFrames (double carrierBandwidthInHz)
 
   // if both short and normal frames are used then try to shrink normal frames
   // which are last ones in containers
-  if ( m_bbFrameConf->GetBbFrameUsageMode () == SatBbFrameConf::SHORT_AND_NORMAL_FRAMES )
+  if ( m_bbFrameConf->GetBbFrameUsageMode () == SatEnums::SHORT_AND_NORMAL_FRAMES )
     {
       // go through all MODCOD based BB Frame containers and try to shrink last frame in the container
       for (FrameContainer_t::reverse_iterator it = m_container.rbegin (); it != m_container.rend (); it++ )

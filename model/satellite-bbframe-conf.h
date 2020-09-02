@@ -27,6 +27,7 @@
 #include <ns3/simple-ref-count.h>
 #include <ns3/nstime.h>
 #include <ns3/satellite-enums.h>
+#include <ns3/satellite-link-results.h>
 
 namespace ns3 {
 
@@ -137,15 +138,6 @@ private:
 class SatBbFrameConf : public Object
 {
 public:
-  /**
-   * BBFrame usage modes.
-   */
-  typedef enum
-  {
-    SHORT_FRAMES,          //!< SHORT_FRAMES
-    NORMAL_FRAMES,         //!< NORMAL_FRAMES
-    SHORT_AND_NORMAL_FRAMES //!< SHORT_AND_NORMAL_FRAMES
-  } BbFrameUsageMode_t;
 
   /**
    * Default constructor
@@ -156,7 +148,7 @@ public:
    * SatBbFrameConf constructor
    * \param symbolRate Symbol rate in baud
    */
-  SatBbFrameConf (double symbolRate);
+  SatBbFrameConf (double symbolRate, SatEnums::DvbVersion_t dvbVersion);
 
   /**
    * Destructor for SatBbFrameConf
@@ -215,7 +207,7 @@ public:
    *
    * \return BB frame usage mode
    */
-  inline SatBbFrameConf::BbFrameUsageMode_t GetBbFrameUsageMode () const
+  inline SatEnums::BbFrameUsageMode_t GetBbFrameUsageMode () const
   {
     return m_bbFrameUsageMode;
   }
@@ -223,9 +215,9 @@ public:
   /**
    * \brief Initialize the C/No requirements for a given BLER target.
    *
-   * \param linkResults DVB-S2 link results
+   * \param linkResults DVB-S2 pr DVB-S2X link results
    */
-  void InitializeCNoRequirements ( Ptr<SatLinkResultsDvbS2> linkResults );
+  void InitializeCNoRequirements ( Ptr<SatLinkResultsFwd> linkResults );
 
   /**
    * \brief Get the dummy frame duration in Time.
@@ -265,6 +257,12 @@ public:
   SatEnums::SatModcod_t GetBestModcod (double cNo, SatEnums::SatBbFrameType_t frameType) const;
 
   /**
+   * Get the default MODCOD for short DVB-S2X frames
+   * \return SatModcod_t The default MODCOD for short DVB-S2X frames
+   */
+  SatEnums::SatModcod_t GetDefaultModCodDummyFramesS2X () const;
+
+  /**
    * Get the default MODCOD
    * \return SatModcod_t The default MODCOD
    */
@@ -281,6 +279,20 @@ public:
    * \brief Dump waveform details for debugging purposes
    */
   void DumpWaveforms () const;
+
+  /**
+   * \brief Indicates if using DVB-S2 or DVB-S2X
+   *
+   * \return The DVB version chosen
+   */
+  SatEnums::DvbVersion_t GetDvbVersion ();
+
+  /**
+   * \brief Get the list of ModCods used.
+   *
+   * \return All the ModCods used in this conf.
+   */
+  std::vector<SatEnums::SatModcod_t> GetModCodsUsed ();
 
 private:
   /**
@@ -299,6 +311,11 @@ private:
    * \return The BBFrame duration in Time
    */
   Time CalculateBbFrameDuration (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType) const;
+
+  /**
+   * \brief Get the list of ModCods from their string representation.
+   */
+  void GetModCodsList ();
 
   /**
    * Symbol rate in baud
@@ -358,15 +375,39 @@ private:
   bool m_acmEnabled;
 
   /**
+   * Default MODCOD for DVB-S2X dummy Frames. This must be a short frame.
+   */
+  SatEnums::SatModcod_t m_defaultModCodDummyFramesS2X;
+
+  /**
+   * String representation of default ModCod for DVB-S2X Dummy Frames.
+   * Must be only modulation and coding rate in the string.
+   * This must exist in short Frame format.
+   * Used in the attributes and converted into correct m_defaultModCodDummyFramesS2X.
+   * In DVB-S2, Dummy Frames use m_defaultModCod.
+   */
+  std::string m_defaultModCodDummyFramesS2XStr;
+
+  /**
    * Default MODCOD is used
    * - For broadcast control messages
    * - When ACM is disabled
    * - When there is not valid C/No information
    *
+   * It will be m_defaultModCodS2 or m_defaultModCodS2X depending on the DVB version
+   * chosen: DVB-S2 or DVB-S2X.
+   *
    * TODO: The attribute for m_defaultModCod does not currently accept
    * all MODCODs due to maximum arguments limitation (<=22) of MakeEnumChecker (...)
    */
   SatEnums::SatModcod_t m_defaultModCod;
+
+  /**
+   * The string representation of default ModCod.
+   * Should be only modulation and coding rate.
+   * Used in the attributes and converted into correct m_defaultModCod.
+   */
+  std::string m_defaultModCodStr;
 
   std::map<uint32_t, uint32_t> m_shortFramePayloadInSlots;
   std::map<uint32_t, uint32_t> m_normalFramePayloadInSlots;
@@ -379,7 +420,7 @@ private:
   /**
    * BBFrame usage mode.
    */
-  BbFrameUsageMode_t m_bbFrameUsageMode;
+  SatEnums::BbFrameUsageMode_t m_bbFrameUsageMode;
 
   /**
    * The most robust MODCOD for short frame.
@@ -390,6 +431,26 @@ private:
    * The most robust MODCOD for long frame.
    */
   SatEnums::SatModcod_t m_mostRobustNormalFrameModcod;
+
+  /**
+   * Indicates if using DVB-S2 or DVB-S2X.
+   */
+  SatEnums::DvbVersion_t m_dvbVersion;
+
+  /**
+   * Indicates if using pilots in BBFrames when DVB-S2X is chosen.
+   */
+  bool m_bbFrameS2XPilots;
+
+  /**
+   * List of ModCods used.
+   */
+  std::vector<SatEnums::SatModcod_t> m_modCodsUsed;
+
+  /**
+   * String containing all DVB-S2X ModCods used.
+   */
+  std::string m_s2XModCodsUsedStr;
 };
 
 } // namespace ns3
