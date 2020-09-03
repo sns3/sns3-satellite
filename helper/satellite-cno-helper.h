@@ -19,8 +19,8 @@
  * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#ifndef __SATELLITE_SINR_HELPER_H__
-#define __SATELLITE_SINR_HELPER_H__
+#ifndef __SATELLITE_CNO_HELPER_H__
+#define __SATELLITE_CNO_HELPER_H__
 
 #include <ns3/object.h>
 #include <ns3/type-id.h>
@@ -31,7 +31,7 @@ namespace ns3 {
 /**
  * \brief TODO
  */
-class SatSinrHelper : public Object
+class SatCnoHelper : public Object
 {
 public:
   /**
@@ -47,14 +47,14 @@ public:
   TypeId GetInstanceTypeId (void) const;
 
   /**
-   * \brief Default constructor. Not used.
+   * \brief Default constructor.
    */
-  SatSinrHelper ();
+  SatCnoHelper ();
 
   /**
-   * Destructor for SatSinrHelper
+   * Destructor for SatCnoHelper
    */
-  virtual ~SatSinrHelper ()
+  virtual ~SatCnoHelper ()
   {
   }
 
@@ -64,4 +64,4 @@ private:
 
 } // namespace ns3
 
-#endif /* __SATELLITE_SINR_HELPER_H__ */
+#endif /* __SATELLITE_CNO_HELPER_H__ */

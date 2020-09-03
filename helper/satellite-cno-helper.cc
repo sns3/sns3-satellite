@@ -19,32 +19,32 @@
  * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "satellite-sinr-helper.h"
+#include "satellite-cno-helper.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatelliteSinrHelper");
+NS_LOG_COMPONENT_DEFINE ("SatelliteCnoHelper");
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (SatSinrHelper);
+NS_OBJECT_ENSURE_REGISTERED (SatCnoHelper);
 
 TypeId
-SatSinrHelper::GetTypeId (void)
+SatCnoHelper::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::SatSinrHelper")
+  static TypeId tid = TypeId ("ns3::SatCnoHelper")
     .SetParent<Object> ()
-    .AddConstructor<SatSinrHelper> ();
+    .AddConstructor<SatCnoHelper> ();
   return tid;
 }
 
 TypeId
-SatSinrHelper::GetInstanceTypeId (void) const
+SatCnoHelper::GetInstanceTypeId (void) const
 {
   NS_LOG_FUNCTION (this);
 
   return GetTypeId ();
 }
 
-SatSinrHelper::SatSinrHelper ()
+SatCnoHelper::SatCnoHelper ()
 {
 }
 
