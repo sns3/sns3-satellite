@@ -47,7 +47,7 @@ main (int argc, char *argv[])
   // TODO outputs
 
   // Variables
-  std::string beams = "12";
+  std::string beams = "8";
   uint32_t nb_gw = 1;
   uint32_t endUsersPerUt = 1;
   uint32_t utsPerBeam = 1;
@@ -84,7 +84,7 @@ main (int argc, char *argv[])
 
 
   // Tests
-  Config::SetDefault ("ns3::SatChannel::RxPowerCalculationMode", EnumValue (SatEnums::RX_PWR_INPUT_TRACE));
+  Config::SetDefault ("ns3::SatChannel::RxPowerCalculationMode", EnumValue (SatEnums::RX_CNO_INPUT_TRACE));
 
 
 

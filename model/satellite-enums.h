@@ -1788,6 +1788,7 @@ public:
   {
     RX_PWR_CALCULATION = 0,
     RX_PWR_INPUT_TRACE = 1,
+    RX_CNO_INPUT_TRACE = 2,
   } RxPowerCalculationMode_t;
 
   static inline std::string GetChannelTypeName (ChannelType_t channelType)

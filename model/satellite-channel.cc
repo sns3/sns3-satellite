@@ -110,7 +110,8 @@ SatChannel::GetTypeId (void)
                    EnumValue (SatEnums::RX_PWR_CALCULATION),
                    MakeEnumAccessor (&SatChannel::m_rxPowerCalculationMode),
                    MakeEnumChecker (SatEnums::RX_PWR_CALCULATION, "RxPowerCalculation",
-                                    SatEnums::RX_PWR_INPUT_TRACE, "RxPowerInputTrace"))
+                                    SatEnums::RX_PWR_INPUT_TRACE, "RxPowerInputTrace",
+                                    SatEnums::RX_CNO_INPUT_TRACE, "RxCnoInputTrace"))
     .AddAttribute ("ForwardingMode",
                    "Channel forwarding mode.",
                    EnumValue (SatChannel::ALL_BEAMS),
@@ -352,6 +353,11 @@ SatChannel::StartRx (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
         DoRxPowerInputTrace (rxParams, phyRx);
         break;
       }
+    case SatEnums::RX_CNO_INPUT_TRACE:
+      {
+        DoRxCnoInputTrace (rxParams, phyRx);
+        break;
+      }
     default:
       {
         NS_FATAL_ERROR ("SatChannel::StartRx - Invalid Rx power calculation mode");
@@ -407,6 +413,59 @@ void
 SatChannel::DoRxPowerInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
 {
   NS_LOG_FUNCTION (this << rxParams << phyRx);
+
+  // Get the bandwidth of the currently used carrier
+  double carrierBandwidthHz = m_carrierBandwidthConverter (m_channelType, rxParams->m_carrierId, SatEnums::EFFECTIVE_BANDWIDTH );
+
+  switch (m_channelType)
+    {
+    case SatEnums::RETURN_FEEDER_CH:
+    case SatEnums::FORWARD_USER_CH:
+      {
+        // Calculate the Rx power from Rx power density
+        rxParams->m_rxPower_W = carrierBandwidthHz * Singleton<SatRxPowerInputTraceContainer>::Get ()->GetRxPowerDensity (std::make_pair (phyRx->GetDevice ()->GetAddress (), m_channelType));
+
+        break;
+      }
+    case SatEnums::FORWARD_FEEDER_CH:
+    case SatEnums::RETURN_USER_CH:
+      {
+        // Calculate the Rx power from Rx power density
+        rxParams->m_rxPower_W = carrierBandwidthHz * Singleton<SatRxPowerInputTraceContainer>::Get ()->GetRxPowerDensity (std::make_pair (GetSourceAddress (rxParams), m_channelType));
+        break;
+      }
+    default:
+      {
+        NS_FATAL_ERROR ("SatChannel::DoRxPowerInputTrace - Invalid channel type");
+        break;
+      }
+    }
+
+  NS_LOG_INFO ("Carrier bw: " << carrierBandwidthHz <<
+               ", rxPower: " << SatUtils::LinearToDb (rxParams->m_rxPower_W) <<
+               ", carrierId: " << rxParams->m_carrierId <<
+               ", channelType: " << SatEnums::GetChannelTypeName (m_channelType));
+
+  // get external fading input trace
+  if (m_enableExternalFadingInputTrace)
+    {
+      rxParams->m_rxPower_W /= GetExternalFadingTrace (rxParams, phyRx);
+    }
+}
+
+void
+SatChannel::DoRxCnoInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx)
+{
+  NS_LOG_FUNCTION (this << rxParams << phyRx);
+
+  // TODO change -> need to know noise... => move to sat-phy-rx-carrier-per-slot ?
+  // or get noise from phyRx ?
+
+  /*
+  m_rxBandwidthHz = carrierConf->GetCarrierBandwidthHz (carrierId, SatEnums::EFFECTIVE_BANDWIDTH);  -> OK
+  m_rxTemperatureK = carrierConf->GetRxTemperatureK ();                                             -> NOK
+  m_rxNoisePowerW = SatConstVariables::BOLTZMANN_CONSTANT * m_rxTemperatureK * m_rxBandwidthHz;     -> NOK
+  */
 
   // Get the bandwidth of the currently used carrier
   double carrierBandwidthHz = m_carrierBandwidthConverter (m_channelType, rxParams->m_carrierId, SatEnums::EFFECTIVE_BANDWIDTH );
