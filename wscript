@@ -109,6 +109,7 @@ def build(bld):
         'model/satellite-rtn-link-time.cc',
         'model/satellite-rx-power-input-trace-container.cc',
         'model/satellite-rx-power-output-trace-container.cc',
+        'model/satellite-rx-cno-input-trace-container.cc',
         'model/satellite-scheduling-object.cc',
         'model/satellite-signal-parameters.cc',
         'model/satellite-simple-channel.cc',

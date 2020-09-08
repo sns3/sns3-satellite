@@ -36,6 +36,7 @@
 #include "ns3/boolean.h"
 #include "satellite-rx-power-output-trace-container.h"
 #include "satellite-rx-power-input-trace-container.h"
+#include "satellite-rx-cno-input-trace-container.h"
 #include "satellite-fading-output-trace-container.h"
 #include "satellite-fading-external-input-trace-container.h"
 #include "satellite-id-mapper.h"
@@ -478,7 +479,7 @@ SatChannel::DoRxCnoInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> 
     case SatEnums::FORWARD_USER_CH:
       {
         //Calculate the Rx power from C/N0
-        cno = 2e8; // TODO change it of course
+        cno = Singleton<SatRxCnoInputTraceContainer>::Get ()->GetRxCno (std::make_pair (phyRx->GetDevice ()->GetAddress (), m_channelType));
         rxParams->m_rxPower_W = rxNoisePowerW*cno/carrierBandwidthHz;
         std::cout << "Channel downlink \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxNoisePowerW*cno/carrierBandwidthHz << std::endl;
         break;
@@ -487,7 +488,7 @@ SatChannel::DoRxCnoInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> 
     case SatEnums::RETURN_USER_CH:
       {
         // Calculate the Rx power from C/N0
-        cno = 2e8; // TODO change it of course
+        cno = Singleton<SatRxCnoInputTraceContainer>::Get ()->GetRxCno (std::make_pair (GetSourceAddress (rxParams), m_channelType));
         rxParams->m_rxPower_W = rxNoisePowerW*cno/carrierBandwidthHz;
         std::cout << "Channel uplink \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxNoisePowerW*cno/carrierBandwidthHz << std::endl;
         break;
