@@ -26,6 +26,8 @@
 #include <ns3/type-id.h>
 #include <ns3/log.h>
 
+#include <ns3/satellite-helper.h>
+
 namespace ns3 {
 
 /**
@@ -52,13 +54,41 @@ public:
   SatCnoHelper ();
 
   /**
-   * Destructor for SatCnoHelper
+   * \brief Create a base SatCnoHelper.
+   * \param satHelper The satellite Helper.
+   */
+  SatCnoHelper (Ptr<SatHelper> satHelper);
+
+  /**
+   * Destructor for SatCnoHelper.
    */
   virtual ~SatCnoHelper ()
   {
   }
 
+  /**
+   * Set m_useTraces attribute.
+   */
+  void SetUseTraces (bool useTraces);
+
+  /**
+   * Apply configuration to all the satellite channels.
+   * Needs to be done after node creation.
+   */
+  void ApplyConfiguration ();
+
 private:
+
+  /**
+   * \brief Pointer to the SatHelper objet
+   */
+
+  Ptr<SatHelper> m_satHelper;
+
+  /**
+   * \brief Use C/N0 input traces instead of power calculation from antenna gain
+   */
+  bool m_useTraces;
   
 };
 

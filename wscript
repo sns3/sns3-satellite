@@ -315,6 +315,7 @@ def build(bld):
         'model/satellite-rtn-link-time.h',
         'model/satellite-rx-power-input-trace-container.h',
         'model/satellite-rx-power-output-trace-container.h',
+        'model/satellite-rx-cno-input-trace-container.h',
         'model/satellite-scheduling-object.h',
         'model/satellite-signal-parameters.h',
         'model/satellite-simple-channel.h',

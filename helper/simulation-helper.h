@@ -28,6 +28,7 @@
 #include <ns3/command-line.h>
 #include <ns3/satellite-helper.h>
 #include <ns3/satellite-traffic-helper.h>
+#include <ns3/satellite-cno-helper.h>
 #include <ns3/satellite-stats-helper-container.h>
 #include <ns3/satellite-enums.h>
 
@@ -484,6 +485,12 @@ public:
    */
   Ptr<SatTrafficHelper> GetTrafficHelper ();
 
+  /**
+   * \brief Get the C/N0 helper to customize C/N0 on some nodes. If does not exist, one is created.
+   * \return C/N0 Helper
+   */
+  Ptr<SatCnoHelper> GetCnoHelper ();
+
   typedef enum
   {
     CBR,
@@ -634,6 +641,7 @@ private:
   Ptr<SatHelper> m_satHelper;
   Ptr<SatStatsHelperContainer> m_statContainer;
   Ptr<SatTrafficHelper> m_trafficHelper;
+  Ptr<SatCnoHelper> m_cnoHelper;
   Ptr<SatListPositionAllocator> m_commonUtPositions;
   std::map<uint32_t, Ptr<SatListPositionAllocator> > m_utPositionsByBeam;
 

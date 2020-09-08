@@ -478,16 +478,16 @@ SatChannel::DoRxCnoInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> 
     case SatEnums::RETURN_FEEDER_CH:
     case SatEnums::FORWARD_USER_CH:
       {
-        //Calculate the Rx power from C/N0
+        // Calculate the Rx power from C/N0
         cno = Singleton<SatRxCnoInputTraceContainer>::Get ()->GetRxCno (std::make_pair (phyRx->GetDevice ()->GetAddress (), m_channelType));
         if (cno == 0)
           {
             DoRxPowerCalculation (rxParams, phyRx);
-            std::cout << "Use calculation downlink \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxParams->m_rxPower_W << std::endl;
+            // std::cout << "Use calculation downlink \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxParams->m_rxPower_W << std::endl;
             return;
           }
         rxParams->m_rxPower_W = rxNoisePowerW*cno/carrierBandwidthHz;
-        std::cout << "Channel downlink \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxNoisePowerW*cno/carrierBandwidthHz << std::endl;
+        // std::cout << "Channel downlink \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxNoisePowerW*cno/carrierBandwidthHz << std::endl;
         break;
       }
     case SatEnums::FORWARD_FEEDER_CH:
@@ -498,11 +498,11 @@ SatChannel::DoRxCnoInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> 
         if (cno == 0)
           {
             DoRxPowerCalculation (rxParams, phyRx);
-            std::cout << "Use calculation uplink \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxParams->m_rxPower_W << std::endl;
+            // std::cout << "Use calculation uplink   \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxParams->m_rxPower_W << std::endl;
             return;
           }
         rxParams->m_rxPower_W = rxNoisePowerW*cno/carrierBandwidthHz;
-        std::cout << "Channel uplink \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxNoisePowerW*cno/carrierBandwidthHz << std::endl;
+        // std::cout << "Channel uplink   \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxNoisePowerW*cno/carrierBandwidthHz << std::endl;
         break;
       }
     default:

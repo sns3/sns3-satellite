@@ -1154,6 +1154,19 @@ SimulationHelper::GetTrafficHelper ()
   return m_trafficHelper;
 }
 
+Ptr<SatCnoHelper>
+SimulationHelper::GetCnoHelper ()
+{
+  NS_LOG_FUNCTION (this);
+
+  if (!m_cnoHelper)
+    {
+      m_cnoHelper = CreateObject<SatCnoHelper> (m_satHelper);
+    }
+
+  return m_cnoHelper;
+}
+
 void
 SimulationHelper::SetupOutputPath ()
 {

@@ -21,6 +21,12 @@
 
 #include "satellite-cno-helper.h"
 
+#include "ns3/core-module.h"
+#include "ns3/satellite-rx-cno-input-trace-container.h"
+#include "ns3/satellite-id-mapper.h"
+#include "ns3/singleton.h"
+#include "ns3/enum.h"
+
 NS_LOG_COMPONENT_DEFINE ("SatelliteCnoHelper");
 
 namespace ns3 {
@@ -45,7 +51,53 @@ SatCnoHelper::GetInstanceTypeId (void) const
 }
 
 SatCnoHelper::SatCnoHelper ()
+  : m_satHelper (NULL),
+  m_useTraces (false)
 {
+}
+
+SatCnoHelper::SatCnoHelper (Ptr<SatHelper> satHelper)
+  : m_satHelper (satHelper),
+  m_useTraces (false)
+{
+}
+
+void
+SatCnoHelper::SetUseTraces (bool useTraces)
+{
+  m_useTraces = useTraces;
+}
+
+void
+SatCnoHelper::ApplyConfiguration ()
+{
+  Config::SetDefault ("ns3::SatChannel::RxPowerCalculationMode", EnumValue (SatEnums::RX_CNO_INPUT_TRACE));
+  Singleton<SatRxCnoInputTraceContainer>::Get ()->Reset ();
+
+  if (!m_useTraces)
+    {
+      std::pair<Address, SatEnums::ChannelType_t> key;
+      Ptr<Node> gwNode;
+      for (uint32_t i = 0; i < m_satHelper->GetBeamHelper ()->GetGwNodes ().GetN (); i++)
+        {
+          gwNode = m_satHelper->GetBeamHelper ()->GetGwNodes ().Get (i);
+          key = std::make_pair(Singleton<SatIdMapper>::Get ()->GetGwMacWithNode (gwNode), SatEnums::FORWARD_FEEDER_CH);
+          Singleton<SatRxCnoInputTraceContainer>::Get ()->SetRxCno (key, 0);
+          key = std::make_pair(Singleton<SatIdMapper>::Get ()->GetGwMacWithNode (gwNode), SatEnums::RETURN_FEEDER_CH);
+          Singleton<SatRxCnoInputTraceContainer>::Get ()->SetRxCno (key, 0);
+        }
+      Ptr<Node> utNode;
+      for (uint32_t i = 0; i < m_satHelper->GetBeamHelper ()->GetUtNodes ().GetN (); i++)
+        {
+          utNode = m_satHelper->GetBeamHelper ()->GetUtNodes ().Get (i);
+          key = std::make_pair(Singleton<SatIdMapper>::Get ()->GetUtMacWithNode (utNode), SatEnums::FORWARD_USER_CH);
+          Singleton<SatRxCnoInputTraceContainer>::Get ()->SetRxCno (key, 0);
+          key = std::make_pair(Singleton<SatIdMapper>::Get ()->GetUtMacWithNode (utNode), SatEnums::RETURN_USER_CH);
+          Singleton<SatRxCnoInputTraceContainer>::Get ()->SetRxCno (key, 0);
+        }
+    }
+
+  // TODO add custom values
 }
 
 } // namespace ns3

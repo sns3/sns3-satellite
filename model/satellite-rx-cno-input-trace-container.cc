@@ -77,6 +77,11 @@ SatRxCnoInputTraceContainer::Reset ()
     {
       m_container.clear ();
     }
+
+  if (!m_containerConstantCno.empty ())
+    {
+      m_containerConstantCno.clear ();
+    }
 }
 
 Ptr<SatInputFileStreamTimeDoubleContainer>

@@ -53,7 +53,7 @@ main (int argc, char *argv[])
   uint32_t utsPerBeam = 1;
 
   Time appStartTime = Seconds (0.001);
-  double simLength = 60.0;
+  double simLength = 10.0;
 
   std::string modcodsUsed = "QPSK_1_TO_3 QPSK_1_TO_2 QPSK_3_TO_5 QPSK_2_TO_3 QPSK_3_TO_4 QPSK_4_TO_5 QPSK_5_TO_6 QPSK_8_TO_9 QPSK_9_TO_10 "
           "8PSK_3_TO_5 8PSK_2_TO_3 8PSK_3_TO_4 8PSK_5_TO_6 8PSK_8_TO_9 8PSK_9_TO_10 "
@@ -75,8 +75,6 @@ main (int argc, char *argv[])
   //TODO default MC
 
   // Link results
-
-
 
 
 
@@ -163,8 +161,8 @@ main (int argc, char *argv[])
 
   simulationHelper->CreateSatScenario ();
 
-  Ptr<SatTrafficHelper> trafficHelper = simulationHelper->GetTrafficHelper ();
   Ptr<SatHelper> satHelper = simulationHelper->GetSatelliteHelper ();
+  Ptr<SatTrafficHelper> trafficHelper = simulationHelper->GetTrafficHelper ();
   trafficHelper->AddVoipTraffic (SatTrafficHelper::FWD_LINK,
                                   SatTrafficHelper::G_711_1,
                                   satHelper->GetGwUsers (),
@@ -172,6 +170,11 @@ main (int argc, char *argv[])
                                   appStartTime,
                                   Seconds (simLength),
                                   Seconds (0.001));
+
+
+  Ptr<SatCnoHelper> satCnoHelper = simulationHelper->GetCnoHelper ();
+  satCnoHelper->SetUseTraces (false);
+  satCnoHelper->ApplyConfiguration ();
 
   /*
    * Outputs
