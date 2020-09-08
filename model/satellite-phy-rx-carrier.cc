@@ -558,6 +558,8 @@ SatPhyRxCarrier::CalculateSinr (double rxPowerW,
 {
   NS_LOG_FUNCTION (this << rxPowerW <<  ifPowerW);
 
+  std::cout << "Carrier \t" << m_rxTemperatureK << std::endl;
+
   std::cout << rxPowerW << " " << ifPowerW << " " << rxNoisePowerW << " " << rxAciIfPowerW << " " << rxExtNoisePowerW << std::endl;
 
   std::cout << "C/N   " << rxPowerW / (rxNoisePowerW) << std::endl; // C/N
@@ -574,20 +576,20 @@ SatPhyRxCarrier::CalculateSinr (double rxPowerW,
   if (m_customCno != 0)
     {
       // sinr = P / (P*B/cno + I + extNoise)
-      std::cout << "custom C/N0" << std::endl;
+      // std::cout << "custom C/N0" << std::endl;
       sinr = rxPowerW / (rxPowerW*m_rxBandwidthHz/m_customCno + ifPowerW + rxAciIfPowerW + rxExtNoisePowerW);
     }
   else
     {
       // sinr = P / (N + I + extNoise)
-      std::cout << "default formula" << std::endl;
+      // std::cout << "default formula" << std::endl;
       sinr = rxPowerW / (ifPowerW +  rxNoisePowerW + rxAciIfPowerW + rxExtNoisePowerW);
     }
 
   // Call PHY calculator to composite C over I interference configured to PHY.
   double finalSinr = sinrCalculate (sinr);
 
-  std::cout << "sinr  " << finalSinr << std::endl;
+  // std::cout << "sinr  " << finalSinr << std::endl;
 
   return (finalSinr);
 }

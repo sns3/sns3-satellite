@@ -458,15 +458,6 @@ SatChannel::DoRxCnoInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> 
 {
   NS_LOG_FUNCTION (this << rxParams << phyRx);
 
-  // TODO change -> need to know noise... => move to sat-phy-rx-carrier-per-slot ?
-  // or get noise from phyRx ?
-
-  /*
-  m_rxBandwidthHz = carrierConf->GetCarrierBandwidthHz (carrierId, SatEnums::EFFECTIVE_BANDWIDTH);  -> OK
-  m_rxTemperatureK = carrierConf->GetRxTemperatureK ();                                             -> NOK
-  m_rxNoisePowerW = SatConstVariables::BOLTZMANN_CONSTANT * m_rxTemperatureK * m_rxBandwidthHz;     -> NOK
-  */
-
   // Get the bandwidth of the currently used carrier
   double carrierBandwidthHz = m_carrierBandwidthConverter (m_channelType, rxParams->m_carrierId, SatEnums::EFFECTIVE_BANDWIDTH );
 
@@ -475,9 +466,18 @@ SatChannel::DoRxCnoInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> 
     case SatEnums::RETURN_FEEDER_CH:
     case SatEnums::FORWARD_USER_CH:
       {
-        // Calculate the Rx power from Rx power density
-        rxParams->m_rxPower_W = carrierBandwidthHz * Singleton<SatRxPowerInputTraceContainer>::Get ()->GetRxPowerDensity (std::make_pair (phyRx->GetDevice ()->GetAddress (), m_channelType));
-
+        /* Calculate the Rx power from C/N0
+         * We have C/N0 = B*P/N
+         * Where:
+         * B is the carrier bandwidth
+         * N is the noise
+         * P is the required power to get the selected C/N0
+         */
+        double cno = 2e8; // TODO change it of course
+        double rxTemperatureK = phyRx->GetRxTemperatureK (rxParams);
+        double rxNoisePowerW = SatConstVariables::BOLTZMANN_CONSTANT * rxTemperatureK * carrierBandwidthHz;
+        rxParams->m_rxPower_W = rxNoisePowerW*cno/carrierBandwidthHz;
+        std::cout << "Channel \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxNoisePowerW*cno/carrierBandwidthHz << std::endl;
         break;
       }
     case SatEnums::FORWARD_FEEDER_CH:
@@ -489,7 +489,7 @@ SatChannel::DoRxCnoInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> 
       }
     default:
       {
-        NS_FATAL_ERROR ("SatChannel::DoRxPowerInputTrace - Invalid channel type");
+        NS_FATAL_ERROR ("SatChannel::DoRxCnoInputTrace - Invalid channel type");
         break;
       }
     }
