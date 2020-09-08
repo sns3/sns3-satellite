@@ -159,11 +159,20 @@ SatRxCnoInputTraceContainer::SetRxCno (key_t key, double cno)
 {
   NS_LOG_FUNCTION (this << cno);
 
-  std::pair <containerConstantCno_t::iterator, bool> result = m_containerConstantCno.insert (std::make_pair (key, cno));
-
-  if (result.second == false)
+  containerConstantCno_t::iterator iter = m_containerConstantCno.find (key);
+  if (iter != m_containerConstantCno.end ())
     {
-      NS_FATAL_ERROR ("SatRxCnoInputTraceContainer::SetRxCno failed");
+      // Key already existing, updating value
+      iter->second = cno;
+    }
+  else
+    {
+      // Add a new key and corresponding value to container
+      std::pair <containerConstantCno_t::iterator, bool> result = m_containerConstantCno.insert (std::make_pair (key, cno));
+      if (result.second == false)
+        {
+          NS_FATAL_ERROR ("SatRxCnoInputTraceContainer::SetRxCno failed");
+        }
     }
 }
 

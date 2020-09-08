@@ -480,6 +480,12 @@ SatChannel::DoRxCnoInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> 
       {
         //Calculate the Rx power from C/N0
         cno = Singleton<SatRxCnoInputTraceContainer>::Get ()->GetRxCno (std::make_pair (phyRx->GetDevice ()->GetAddress (), m_channelType));
+        if (cno == -1)
+          {
+            DoRxPowerCalculation (rxParams, phyRx);
+            std::cout << "Use calculation downlink \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxParams->m_rxPower_W << std::endl;
+            return;
+          }
         rxParams->m_rxPower_W = rxNoisePowerW*cno/carrierBandwidthHz;
         std::cout << "Channel downlink \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxNoisePowerW*cno/carrierBandwidthHz << std::endl;
         break;
@@ -489,6 +495,12 @@ SatChannel::DoRxCnoInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> 
       {
         // Calculate the Rx power from C/N0
         cno = Singleton<SatRxCnoInputTraceContainer>::Get ()->GetRxCno (std::make_pair (GetSourceAddress (rxParams), m_channelType));
+        if (cno == -1)
+          {
+            DoRxPowerCalculation (rxParams, phyRx);
+            std::cout << "Use calculation uplink \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxParams->m_rxPower_W << std::endl;
+            return;
+          }
         rxParams->m_rxPower_W = rxNoisePowerW*cno/carrierBandwidthHz;
         std::cout << "Channel uplink \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxNoisePowerW*cno/carrierBandwidthHz << std::endl;
         break;
