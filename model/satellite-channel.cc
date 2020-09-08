@@ -458,33 +458,38 @@ SatChannel::DoRxCnoInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> 
 {
   NS_LOG_FUNCTION (this << rxParams << phyRx);
 
-  // Get the bandwidth of the currently used carrier
+  /* Get the required parameters
+   *
+   * We have C/N0 = B*P/N
+   * So P = N/B * C/N0
+   * Where:
+   * B is the carrier bandwidth
+   * N is the noise
+   * P is the required power to get the selected C/N0
+   */
+  double cno;
   double carrierBandwidthHz = m_carrierBandwidthConverter (m_channelType, rxParams->m_carrierId, SatEnums::EFFECTIVE_BANDWIDTH );
+  double rxTemperatureK = phyRx->GetRxTemperatureK (rxParams);;
+  double rxNoisePowerW = SatConstVariables::BOLTZMANN_CONSTANT * rxTemperatureK * carrierBandwidthHz;
 
   switch (m_channelType)
     {
     case SatEnums::RETURN_FEEDER_CH:
     case SatEnums::FORWARD_USER_CH:
       {
-        /* Calculate the Rx power from C/N0
-         * We have C/N0 = B*P/N
-         * Where:
-         * B is the carrier bandwidth
-         * N is the noise
-         * P is the required power to get the selected C/N0
-         */
-        double cno = 2e8; // TODO change it of course
-        double rxTemperatureK = phyRx->GetRxTemperatureK (rxParams);
-        double rxNoisePowerW = SatConstVariables::BOLTZMANN_CONSTANT * rxTemperatureK * carrierBandwidthHz;
+        //Calculate the Rx power from C/N0
+        cno = 2e8; // TODO change it of course
         rxParams->m_rxPower_W = rxNoisePowerW*cno/carrierBandwidthHz;
-        std::cout << "Channel \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxNoisePowerW*cno/carrierBandwidthHz << std::endl;
+        std::cout << "Channel downlink \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxNoisePowerW*cno/carrierBandwidthHz << std::endl;
         break;
       }
     case SatEnums::FORWARD_FEEDER_CH:
     case SatEnums::RETURN_USER_CH:
       {
-        // Calculate the Rx power from Rx power density
-        rxParams->m_rxPower_W = carrierBandwidthHz * Singleton<SatRxPowerInputTraceContainer>::Get ()->GetRxPowerDensity (std::make_pair (GetSourceAddress (rxParams), m_channelType));
+        // Calculate the Rx power from C/N0
+        cno = 2e8; // TODO change it of course
+        rxParams->m_rxPower_W = rxNoisePowerW*cno/carrierBandwidthHz;
+        std::cout << "Channel uplink \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxNoisePowerW*cno/carrierBandwidthHz << std::endl;
         break;
       }
     default:
@@ -494,7 +499,8 @@ SatChannel::DoRxCnoInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> 
       }
     }
 
-  NS_LOG_INFO ("Carrier bw: " << carrierBandwidthHz <<
+  NS_LOG_INFO ("Target C/N0: " << cno <<
+               ", carrier bw: " << carrierBandwidthHz <<
                ", rxPower: " << SatUtils::LinearToDb (rxParams->m_rxPower_W) <<
                ", carrierId: " << rxParams->m_carrierId <<
                ", channelType: " << SatEnums::GetChannelTypeName (m_channelType));
