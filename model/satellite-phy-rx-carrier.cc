@@ -62,8 +62,7 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
   m_satInterferenceElimination (),
   m_enableCompositeSinrOutputTrace (false),
   m_numOfOngoingRx (0),
-  m_rxPacketCounter (0),
-  m_customCno (0)
+  m_rxPacketCounter (0)
 {
   NS_LOG_FUNCTION (this << carrierId);
 
@@ -572,19 +571,7 @@ SatPhyRxCarrier::CalculateSinr (double rxPowerW,
 
   // Calculate first SINR based on co-channel interference, Adjacent channel interference, noise and external noise
   // NOTE! ACI noise power and Ext noise power are set 0 by default and given as attributes by PHY object when used.
-  double sinr;
-  if (m_customCno != 0)
-    {
-      // sinr = P / (P*B/cno + I + extNoise)
-      // std::cout << "custom C/N0" << std::endl;
-      sinr = rxPowerW / (rxPowerW*m_rxBandwidthHz/m_customCno + ifPowerW + rxAciIfPowerW + rxExtNoisePowerW);
-    }
-  else
-    {
-      // sinr = P / (N + I + extNoise)
-      // std::cout << "default formula" << std::endl;
-      sinr = rxPowerW / (ifPowerW +  rxNoisePowerW + rxAciIfPowerW + rxExtNoisePowerW);
-    }
+  double sinr = rxPowerW / (ifPowerW +  rxNoisePowerW + rxAciIfPowerW + rxExtNoisePowerW);
 
   // Call PHY calculator to composite C over I interference configured to PHY.
   double finalSinr = sinrCalculate (sinr);

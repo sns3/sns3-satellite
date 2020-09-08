@@ -622,12 +622,6 @@ private:
    * \brief Channel estimation error container
    */
   Ptr<SatChannelEstimationErrorContainer> m_channelEstimationError;
-
-  /**
-   * \brief Custom C/N0 to set manually the link results for one carrier.
-   * It is zero by default, and is only used in CalculateSinr if non zero.
-   */
-  double m_customCno;
 };
 
 }
