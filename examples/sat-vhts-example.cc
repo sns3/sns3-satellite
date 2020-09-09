@@ -78,14 +78,8 @@ main (int argc, char *argv[])
 
 
 
-
-
-
-  // Tests
+  // TODO put in helper...
   Config::SetDefault ("ns3::SatChannel::RxPowerCalculationMode", EnumValue (SatEnums::RX_CNO_INPUT_TRACE));
-
-
-
 
 
 
@@ -174,6 +168,9 @@ main (int argc, char *argv[])
 
   Ptr<SatCnoHelper> satCnoHelper = simulationHelper->GetCnoHelper ();
   satCnoHelper->SetUseTraces (false);
+
+  satCnoHelper->SetUtNodeCno (satHelper->GetBeamHelper ()->GetUtNodes ().Get (0), SatEnums::FORWARD_USER_CH, 2e10);
+
   satCnoHelper->ApplyConfiguration ();
 
   /*

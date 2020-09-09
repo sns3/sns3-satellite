@@ -54,12 +54,18 @@ SatCnoHelper::SatCnoHelper ()
   : m_satHelper (NULL),
   m_useTraces (false)
 {
+  Config::SetDefault ("ns3::SatChannel::RxPowerCalculationMode", EnumValue (SatEnums::RX_CNO_INPUT_TRACE));
+  //Config::Set ("/NodeList/*/DeviceList/*/$ns3::SatChannel/RxPowerCalculationMode",
+  //           EnumValue (SatEnums::RX_CNO_INPUT_TRACE));
 }
 
 SatCnoHelper::SatCnoHelper (Ptr<SatHelper> satHelper)
   : m_satHelper (satHelper),
   m_useTraces (false)
 {
+  Config::SetDefault ("ns3::SatChannel::RxPowerCalculationMode", EnumValue (SatEnums::RX_CNO_INPUT_TRACE));
+  //Config::Set ("/NodeList/*/DeviceList/*/$ns3::SatChannel/RxPowerCalculationMode",
+  //          EnumValue (SatEnums::RX_CNO_INPUT_TRACE));
 }
 
 void
@@ -69,14 +75,45 @@ SatCnoHelper::SetUseTraces (bool useTraces)
 }
 
 void
+SatCnoHelper::SetGwNodeCno (Ptr<Node> node, SatEnums::ChannelType_t channel, double cno)
+{
+  if (channel != SatEnums::FORWARD_FEEDER_CH && channel != SatEnums::RETURN_FEEDER_CH)
+    {
+      NS_FATAL_ERROR ("Can only apply custom GWs C/N0 on feeder channels");
+    }
+  cnoCustomParams_s params;
+  params.node = node;
+  params.isGw = true;
+  params.constant = true;
+  params.channelType = channel;
+  params.cno = cno;
+  m_customCno.push_back(params);
+}
+
+void
+SatCnoHelper::SetUtNodeCno (Ptr<Node> node, SatEnums::ChannelType_t channel, double cno)
+{
+  if (channel != SatEnums::FORWARD_USER_CH && channel != SatEnums::RETURN_USER_CH)
+    {
+      NS_FATAL_ERROR ("Can only apply custom UTs C/N0 on user channels");
+    }
+  cnoCustomParams_s params;
+  params.node = node;
+  params.isGw = false;
+  params.constant = true;
+  params.channelType = channel;
+  params.cno = cno;
+  m_customCno.push_back(params);
+}
+
+void
 SatCnoHelper::ApplyConfiguration ()
 {
-  Config::SetDefault ("ns3::SatChannel::RxPowerCalculationMode", EnumValue (SatEnums::RX_CNO_INPUT_TRACE));
   Singleton<SatRxCnoInputTraceContainer>::Get ()->Reset ();
 
+  std::pair<Address, SatEnums::ChannelType_t> key;
   if (!m_useTraces)
     {
-      std::pair<Address, SatEnums::ChannelType_t> key;
       Ptr<Node> gwNode;
       for (uint32_t i = 0; i < m_satHelper->GetBeamHelper ()->GetGwNodes ().GetN (); i++)
         {
@@ -97,7 +134,25 @@ SatCnoHelper::ApplyConfiguration ()
         }
     }
 
-  // TODO add custom values
+  for (cnoCustomParams_s params : m_customCno)
+    {
+      if (params.constant)
+        {
+          if (params.isGw)
+            {
+              key = std::make_pair(Singleton<SatIdMapper>::Get ()->GetGwMacWithNode (params.node), params.channelType);
+            }
+          else
+            {
+              key = std::make_pair(Singleton<SatIdMapper>::Get ()->GetUtMacWithNode (params.node), params.channelType);
+            }
+          Singleton<SatRxCnoInputTraceContainer>::Get ()->SetRxCno (key, params.cno);
+        }
+      else
+        {
+          //TODO
+        }
+    }
 }
 
 } // namespace ns3

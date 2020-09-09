@@ -37,6 +37,20 @@ class SatCnoHelper : public Object
 {
 public:
   /**
+   * \brief Struct for storing the custom C/N0 for some nodes.
+   * //TODO allow to put custom file evolution instead of constant.
+   */
+  typedef struct
+  {
+    Ptr<Node> node;
+    bool isGw;
+    bool constant;
+    SatEnums::ChannelType_t channelType;
+    std::string pathToFile;
+    double cno;
+  } cnoCustomParams_s;
+
+  /**
    * \brief Get the type ID
    * \return the object TypeId
    */
@@ -49,13 +63,13 @@ public:
   TypeId GetInstanceTypeId (void) const;
 
   /**
-   * \brief Default constructor.
+   * \brief Default constructor
    */
   SatCnoHelper ();
 
   /**
-   * \brief Create a base SatCnoHelper.
-   * \param satHelper The satellite Helper.
+   * \brief Create a base SatCnoHelper
+   * \param satHelper The satellite Helper
    */
   SatCnoHelper (Ptr<SatHelper> satHelper);
 
@@ -72,8 +86,27 @@ public:
   void SetUseTraces (bool useTraces);
 
   /**
-   * Apply configuration to all the satellite channels.
-   * Needs to be done after node creation.
+   * Set a constant C/N0 for one GW node and one channel direction
+   * \param node The node to apply the new C/N0
+   * \param channel The channel type
+   * \param cno The constant C/N0 value to set
+   */
+  // TODO use Ptr<Node> or node id ?
+  void SetGwNodeCno (Ptr<Node> node, SatEnums::ChannelType_t channel, double cno);
+
+  /**
+   * Set a constant C/N0 for one UT node and one channel direction
+   * \param node The node to apply the new C/N0
+   * \param channel The channel type
+   * \param cno The constant C/N0 value to set
+   */
+  // TODO use Ptr<Node> or node id ?
+  void SetUtNodeCno (Ptr<Node> node, SatEnums::ChannelType_t channel, double cno);
+
+  /**
+   * Apply configuration to all the satellite channels
+   * Needs to be done after node creation
+   * // TODO put private and call at each update ?
    */
   void ApplyConfiguration ();
 
@@ -89,6 +122,11 @@ private:
    * \brief Use C/N0 input traces instead of power calculation from antenna gain
    */
   bool m_useTraces;
+
+  /**
+   * \brief Array storing manuel C/N0 updates
+   */
+  std::vector<cnoCustomParams_s> m_customCno;
   
 };
 
