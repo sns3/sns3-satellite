@@ -78,9 +78,6 @@ main (int argc, char *argv[])
 
 
 
-  // TODO put in helper...
-  Config::SetDefault ("ns3::SatChannel::RxPowerCalculationMode", EnumValue (SatEnums::RX_CNO_INPUT_TRACE));
-
 
 
 

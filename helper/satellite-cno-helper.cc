@@ -54,18 +54,14 @@ SatCnoHelper::SatCnoHelper ()
   : m_satHelper (NULL),
   m_useTraces (false)
 {
-  Config::SetDefault ("ns3::SatChannel::RxPowerCalculationMode", EnumValue (SatEnums::RX_CNO_INPUT_TRACE));
-  //Config::Set ("/NodeList/*/DeviceList/*/$ns3::SatChannel/RxPowerCalculationMode",
-  //           EnumValue (SatEnums::RX_CNO_INPUT_TRACE));
+  Config::Set ("/ChannelList/*/$ns3::SatChannel/RxPowerCalculationMode", EnumValue (SatEnums::RX_CNO_INPUT_TRACE));
 }
 
 SatCnoHelper::SatCnoHelper (Ptr<SatHelper> satHelper)
   : m_satHelper (satHelper),
   m_useTraces (false)
 {
-  Config::SetDefault ("ns3::SatChannel::RxPowerCalculationMode", EnumValue (SatEnums::RX_CNO_INPUT_TRACE));
-  //Config::Set ("/NodeList/*/DeviceList/*/$ns3::SatChannel/RxPowerCalculationMode",
-  //          EnumValue (SatEnums::RX_CNO_INPUT_TRACE));
+  Config::Set ("/ChannelList/*/$ns3::SatChannel/RxPowerCalculationMode", EnumValue (SatEnums::RX_CNO_INPUT_TRACE));
 }
 
 void
