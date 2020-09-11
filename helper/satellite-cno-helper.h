@@ -31,7 +31,9 @@
 namespace ns3 {
 
 /**
- * \brief TODO
+ * \brief This helper allows to set customs C/N0 values for some GW or UT nodes.
+ * For each node, the C/N0 value can be constant over time, or follow a trace file
+ * giving the temporal evolution of this parameter.
  */
 class SatCnoHelper : public Object
 {
@@ -91,7 +93,6 @@ public:
    * \param channel The channel type
    * \param cno The constant C/N0 value to set
    */
-  // TODO use Ptr<Node> or node id ?
   void SetGwNodeCno (Ptr<Node> node, SatEnums::ChannelType_t channel, double cno);
 
   /**
@@ -100,15 +101,39 @@ public:
    * \param channel The channel type
    * \param cno The constant C/N0 value to set
    */
-  // TODO use Ptr<Node> or node id ?
   void SetUtNodeCno (Ptr<Node> node, SatEnums::ChannelType_t channel, double cno);
 
   /**
-   * Apply configuration to all the satellite channels
-   * Needs to be done after node creation
-   * // TODO put private and call at each update ?
+   * Set a constant C/N0 for one GW node and one channel direction
+   * \param nodeId The ID of the node to apply the new C/N0
+   * \param channel The channel type
+   * \param cno The constant C/N0 value to set
    */
-  void ApplyConfiguration ();
+  void SetGwNodeCno (uint32_t nodeId, SatEnums::ChannelType_t channel, double cno);
+
+  /**
+   * Set a constant C/N0 for one UT node and one channel direction
+   * \param nodeId The ID of the node to apply the new C/N0
+   * \param channel The channel type
+   * \param cno The constant C/N0 value to set
+   */
+  void SetUtNodeCno (uint32_t nodeId, SatEnums::ChannelType_t channel, double cno);
+
+  /**
+   * Set a constant C/N0 for one GW node and one channel direction
+   * \param nodes The nodes to apply the new C/N0
+   * \param channel The channel type
+   * \param cno The constant C/N0 value to set
+   */
+  void SetGwNodeCno (NodeContainer nodes, SatEnums::ChannelType_t channel, double cno);
+
+  /**
+   * Set a constant C/N0 for one UT node and one channel direction
+   * \param nodes The nodes to apply the new C/N0
+   * \param channel The channel type
+   * \param cno The constant C/N0 value to set
+   */
+  void SetUtNodeCno (NodeContainer nodes, SatEnums::ChannelType_t channel, double cno);
 
 private:
 
@@ -127,6 +152,12 @@ private:
    * \brief Array storing manuel C/N0 updates
    */
   std::vector<cnoCustomParams_s> m_customCno;
+
+  /**
+   * Apply configuration to all the satellite channels
+   * Needs to be done after node creation
+   */
+  void ApplyConfiguration ();
   
 };
 

@@ -166,9 +166,7 @@ main (int argc, char *argv[])
   Ptr<SatCnoHelper> satCnoHelper = simulationHelper->GetCnoHelper ();
   satCnoHelper->SetUseTraces (false);
 
-  satCnoHelper->SetUtNodeCno (satHelper->GetBeamHelper ()->GetUtNodes ().Get (0), SatEnums::FORWARD_USER_CH, 2e10);
-
-  satCnoHelper->ApplyConfiguration ();
+  satCnoHelper->SetUtNodeCno (satHelper->GetBeamHelper ()->GetUtNodes (), SatEnums::FORWARD_USER_CH, 2e10);
 
   /*
    * Outputs

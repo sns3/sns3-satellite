@@ -84,6 +84,8 @@ SatCnoHelper::SetGwNodeCno (Ptr<Node> node, SatEnums::ChannelType_t channel, dou
   params.channelType = channel;
   params.cno = cno;
   m_customCno.push_back(params);
+
+  ApplyConfiguration ();
 }
 
 void
@@ -100,6 +102,38 @@ SatCnoHelper::SetUtNodeCno (Ptr<Node> node, SatEnums::ChannelType_t channel, dou
   params.channelType = channel;
   params.cno = cno;
   m_customCno.push_back(params);
+
+  ApplyConfiguration ();
+}
+
+void
+SatCnoHelper::SetGwNodeCno (uint32_t nodeId, SatEnums::ChannelType_t channel, double cno)
+{
+  SetGwNodeCno (m_satHelper->GetBeamHelper ()->GetGwNodes ().Get (nodeId), channel, cno);
+}
+
+void
+SatCnoHelper::SetUtNodeCno (uint32_t nodeId, SatEnums::ChannelType_t channel, double cno)
+{
+  SetUtNodeCno (m_satHelper->GetBeamHelper ()->GetUtNodes ().Get (nodeId), channel, cno);
+}
+
+void
+SatCnoHelper::SetGwNodeCno (NodeContainer nodes, SatEnums::ChannelType_t channel, double cno)
+{
+  for(uint32_t i = 0; i < nodes.GetN (); i++)
+    {
+      SetGwNodeCno (nodes.Get (i), channel, cno);
+    }
+}
+
+void
+SatCnoHelper::SetUtNodeCno (NodeContainer nodes, SatEnums::ChannelType_t channel, double cno)
+{
+  for(uint32_t i = 0; i < nodes.GetN (); i++)
+    {
+      SetUtNodeCno (nodes.Get (i), channel, cno);
+    }
 }
 
 void
