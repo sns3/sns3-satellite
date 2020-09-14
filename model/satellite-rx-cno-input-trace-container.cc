@@ -181,4 +181,34 @@ SatRxCnoInputTraceContainer::SetRxCno (key_t key, double cno)
     }
 }
 
+void
+SatRxCnoInputTraceContainer::SetRxCnoFile (key_t key, std::string path)
+{
+  NS_LOG_FUNCTION (this);
+
+  container_t::iterator iter = m_container.find (key);
+  if (iter != m_container.end ())
+    {
+      // Key already existing, updating value
+      iter->second = CreateObject<SatInputFileStreamTimeDoubleContainer> (path, std::ios::in, SatBaseTraceContainer::RX_CNO_TRACE_DEFAULT_NUMBER_OF_COLUMNS);
+    }
+  else
+    {
+      // Add a new key and corresponding value to container
+      std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair (key, CreateObject<SatInputFileStreamTimeDoubleContainer> (path, std::ios::in, SatBaseTraceContainer::RX_CNO_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
+
+      if (result.second == false)
+        {
+          NS_FATAL_ERROR ("SatRxCnoInputTraceContainer::SetRxCnoFile failed");
+        }
+    }
+
+    //Remove key in m_containerConstantCno
+    if (m_containerConstantCno.find (key) != m_containerConstantCno.end ())
+      {
+        // Key already existing, updating value
+        m_containerConstantCno.erase (key);
+      }
+}
+
 } // namespace ns3

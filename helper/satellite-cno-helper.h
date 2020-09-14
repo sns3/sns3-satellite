@@ -40,7 +40,6 @@ class SatCnoHelper : public Object
 public:
   /**
    * \brief Struct for storing the custom C/N0 for some nodes.
-   * //TODO allow to put custom file evolution instead of constant.
    */
   typedef struct
   {
@@ -85,7 +84,7 @@ public:
   /**
    * Set m_useTraces attribute.
    */
-  void SetUseTraces (bool useTraces);
+  void SetUseTraces (bool useTraces); // TODO set enum
 
   /**
    * Set a constant C/N0 for one GW node and one channel direction
@@ -135,6 +134,38 @@ public:
    */
   void SetUtNodeCno (NodeContainer nodes, SatEnums::ChannelType_t channel, double cno);
 
+  /**
+   * Set a constant C/N0 for one GW node and one channel direction
+   * \param node The node to apply the new C/N0
+   * \param channel The channel type
+   * \param path The path to the file to read
+   */
+  void SetGwNodeCnoFile (Ptr<Node> node, SatEnums::ChannelType_t channel, std::string path);
+
+  /**
+   * Set a constant C/N0 for one UT node and one channel direction
+   * \param node The node to apply the new C/N0
+   * \param channel The channel type
+   * \param path The path to the file to read
+   */
+  void SetUtNodeCnoFile (Ptr<Node> node, SatEnums::ChannelType_t channel, std::string path);
+
+  /**
+   * Set a constant C/N0 for one GW node and one channel direction
+   * \param nodeId The ID of the node to apply the new C/N0
+   * \param channel The channel type
+   * \param path The path to the file to read
+   */
+  void SetGwNodeCnoFile (uint32_t nodeId, SatEnums::ChannelType_t channel, std::string path);
+
+  /**
+   * Set a constant C/N0 for one UT node and one channel direction
+   * \param nodeId The ID of the node to apply the new C/N0
+   * \param channel The channel type
+   * \param path The path to the file to read
+   */
+  void SetUtNodeCnoFile (uint32_t nodeId, SatEnums::ChannelType_t channel, std::string path);
+
 private:
 
   /**
@@ -149,7 +180,7 @@ private:
   bool m_useTraces;
 
   /**
-   * \brief Array storing manuel C/N0 updates
+   * \brief Array storing manual C/N0 updates (constant or custom file)
    */
   std::vector<cnoCustomParams_s> m_customCno;
 
@@ -158,6 +189,13 @@ private:
    * Needs to be done after node creation
    */
   void ApplyConfiguration ();
+
+  /**
+   * Verify if a node has already been set
+   * \param node The node to verify
+   * \return true if the node is aleady stored in m_customCno
+   */
+  bool CheckDuplicate (Ptr<Node> node, SatEnums::ChannelType_t channel);
   
 };
 

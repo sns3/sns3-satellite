@@ -68,6 +68,7 @@ void
 SatCnoHelper::SetUseTraces (bool useTraces)
 {
   m_useTraces = useTraces;
+  ApplyConfiguration ();
 }
 
 void
@@ -76,6 +77,10 @@ SatCnoHelper::SetGwNodeCno (Ptr<Node> node, SatEnums::ChannelType_t channel, dou
   if (channel != SatEnums::FORWARD_FEEDER_CH && channel != SatEnums::RETURN_FEEDER_CH)
     {
       NS_FATAL_ERROR ("Can only apply custom GWs C/N0 on feeder channels");
+    }
+  if (CheckDuplicate(node, channel))
+    {
+      NS_FATAL_ERROR ("Trying to set custom C/N0 several time for same node and channel");
     }
   cnoCustomParams_s params;
   params.node = node;
@@ -94,6 +99,10 @@ SatCnoHelper::SetUtNodeCno (Ptr<Node> node, SatEnums::ChannelType_t channel, dou
   if (channel != SatEnums::FORWARD_USER_CH && channel != SatEnums::RETURN_USER_CH)
     {
       NS_FATAL_ERROR ("Can only apply custom UTs C/N0 on user channels");
+    }
+  if (CheckDuplicate(node, channel))
+    {
+      NS_FATAL_ERROR ("Trying to set custom C/N0 several time for same node and channel");
     }
   cnoCustomParams_s params;
   params.node = node;
@@ -137,13 +146,71 @@ SatCnoHelper::SetUtNodeCno (NodeContainer nodes, SatEnums::ChannelType_t channel
 }
 
 void
+SatCnoHelper::SetGwNodeCnoFile (Ptr<Node> node, SatEnums::ChannelType_t channel, std::string path)
+{
+  if (channel != SatEnums::FORWARD_FEEDER_CH && channel != SatEnums::RETURN_FEEDER_CH)
+    {
+      NS_FATAL_ERROR ("Can only apply custom GWs C/N0 on feeder channels");
+    }
+  if (CheckDuplicate(node, channel))
+    {
+      NS_FATAL_ERROR ("Trying to set custom C/N0 several time for same node and channel");
+    }
+  cnoCustomParams_s params;
+  params.node = node;
+  params.isGw = true;
+  params.constant = false;
+  params.channelType = channel;
+  params.pathToFile = path;
+  m_customCno.push_back(params);
+
+  ApplyConfiguration ();
+}
+
+void
+SatCnoHelper::SetUtNodeCnoFile (Ptr<Node> node, SatEnums::ChannelType_t channel, std::string path)
+{
+  if (channel != SatEnums::FORWARD_USER_CH && channel != SatEnums::RETURN_USER_CH)
+    {
+      NS_FATAL_ERROR ("Can only apply custom UTs C/N0 on user channels");
+    }
+  if (CheckDuplicate(node, channel))
+    {
+      NS_FATAL_ERROR ("Trying to set custom C/N0 several time for same node and channel");
+    }
+  cnoCustomParams_s params;
+  params.node = node;
+  params.isGw = false;
+  params.constant = false;
+  params.channelType = channel;
+  params.pathToFile = path;
+  m_customCno.push_back(params);
+
+  ApplyConfiguration ();
+}
+
+void
+SatCnoHelper::SetGwNodeCnoFile (uint32_t nodeId, SatEnums::ChannelType_t channel, std::string path)
+{
+  SetGwNodeCnoFile (m_satHelper->GetBeamHelper ()->GetGwNodes ().Get (nodeId), channel, path);
+}
+
+void
+SatCnoHelper::SetUtNodeCnoFile (uint32_t nodeId, SatEnums::ChannelType_t channel, std::string path)
+{
+  SetUtNodeCnoFile (m_satHelper->GetBeamHelper ()->GetUtNodes ().Get (nodeId), channel, path);
+}
+
+void
 SatCnoHelper::ApplyConfiguration ()
 {
   Singleton<SatRxCnoInputTraceContainer>::Get ()->Reset ();
 
   std::pair<Address, SatEnums::ChannelType_t> key;
+  // set default value for all nodes
   if (!m_useTraces)
     {
+      // use power calculation from satellite-channel
       Ptr<Node> gwNode;
       for (uint32_t i = 0; i < m_satHelper->GetBeamHelper ()->GetGwNodes ().GetN (); i++)
         {
@@ -163,26 +230,64 @@ SatCnoHelper::ApplyConfiguration ()
           Singleton<SatRxCnoInputTraceContainer>::Get ()->SetRxCno (key, 0);
         }
     }
+  else
+    {
+      // use input files from data/rxcnotraces/input folder
+      Ptr<Node> gwNode;
+      for (uint32_t i = 0; i < m_satHelper->GetBeamHelper ()->GetGwNodes ().GetN (); i++)
+        {
+          gwNode = m_satHelper->GetBeamHelper ()->GetGwNodes ().Get (i);
+          key = std::make_pair(Singleton<SatIdMapper>::Get ()->GetGwMacWithNode (gwNode), SatEnums::FORWARD_FEEDER_CH);
+          Singleton<SatRxCnoInputTraceContainer>::Get ()->AddNode (key);
+          key = std::make_pair(Singleton<SatIdMapper>::Get ()->GetGwMacWithNode (gwNode), SatEnums::RETURN_FEEDER_CH);
+          Singleton<SatRxCnoInputTraceContainer>::Get ()->AddNode (key);
+        }
+      Ptr<Node> utNode;
+      for (uint32_t i = 0; i < m_satHelper->GetBeamHelper ()->GetUtNodes ().GetN (); i++)
+        {
+          utNode = m_satHelper->GetBeamHelper ()->GetUtNodes ().Get (i);
+          key = std::make_pair(Singleton<SatIdMapper>::Get ()->GetUtMacWithNode (utNode), SatEnums::FORWARD_USER_CH);
+          Singleton<SatRxCnoInputTraceContainer>::Get ()->AddNode (key);
+          key = std::make_pair(Singleton<SatIdMapper>::Get ()->GetUtMacWithNode (utNode), SatEnums::RETURN_USER_CH);
+          Singleton<SatRxCnoInputTraceContainer>::Get ()->AddNode (key);
+        }
+    }
 
+  // set custom values. The values will cancel the default values set above
   for (cnoCustomParams_s params : m_customCno)
     {
+      if (params.isGw)
+        {
+          key = std::make_pair(Singleton<SatIdMapper>::Get ()->GetGwMacWithNode (params.node), params.channelType);
+        }
+      else
+        {
+          key = std::make_pair(Singleton<SatIdMapper>::Get ()->GetUtMacWithNode (params.node), params.channelType);
+        }
       if (params.constant)
         {
-          if (params.isGw)
-            {
-              key = std::make_pair(Singleton<SatIdMapper>::Get ()->GetGwMacWithNode (params.node), params.channelType);
-            }
-          else
-            {
-              key = std::make_pair(Singleton<SatIdMapper>::Get ()->GetUtMacWithNode (params.node), params.channelType);
-            }
+          // Set constant value
           Singleton<SatRxCnoInputTraceContainer>::Get ()->SetRxCno (key, params.cno);
         }
       else
         {
-          //TODO
+          // Set custom input file
+          Singleton<SatRxCnoInputTraceContainer>::Get ()->SetRxCnoFile (key, params.pathToFile);
         }
     }
+}
+
+bool
+SatCnoHelper::CheckDuplicate(Ptr<Node> node, SatEnums::ChannelType_t channel)
+{
+  for (cnoCustomParams_s params : m_customCno)
+    {
+      if (params.node == node && params.channelType == channel)
+        {
+          return true;
+        }
+    }
+  return false;
 }
 
 } // namespace ns3

@@ -89,24 +89,32 @@ public:
   double GetRxCno (key_t key);
 
   /**
-   * \brief Function for getting the Rx C/N0
+   * \brief Function for setting the Rx C/N0 with constant value
    * \param key key
    * \param cno C/N0
    */
   void SetRxCno (key_t key, double cno);
 
   /**
+   * \brief Function for setting the Rx C/N0 with input file
+   * \param key key
+   * \param path path to C/N0 file
+   */
+  void SetRxCnoFile (key_t key, std::string path);
+
+  /**
    * \brief Function for resetting the variables
    */
   void Reset ();
 
-private:
   /**
    * \brief Function for adding the node to the map
    * \param key key
    * \return pointer to the added container
    */
   Ptr<SatInputFileStreamTimeDoubleContainer> AddNode (std::pair<Address, SatEnums::ChannelType_t> key);
+
+private:
 
   /**
    * \brief Function for finding the container matching the key
