@@ -24,10 +24,13 @@
 #include <ns3/type-id.h>
 #include <ns3/log.h>
 
+#include <ns3/simulation-helper.h>
 #include <ns3/packet-sink.h>
 #include <ns3/packet-sink-helper.h>
 #include <ns3/cbr-helper.h>
 #include <ns3/satellite-on-off-helper.h>
+#include <ns3/nrtv-helper.h>
+#include <ns3/three-gpp-http-satellite-helper.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatelliteTrafficHelper");
 
@@ -124,6 +127,70 @@ SatTrafficHelper::AddCbrTraffic (TrafficDirection_t direction,
 
   sinkContainer.Start (startTime);
   sinkContainer.Stop (stopTime);
+}
+
+void
+SatTrafficHelper::AddHttpTraffic (TrafficDirection_t direction,
+                                  NodeContainer gws,
+                                  NodeContainer uts,
+                                  Time startTime,
+                                  Time stopTime,
+                                  Time startDelay)
+{
+  ThreeGppHttpHelper httpHelper;
+  if (direction == FWD_LINK)
+    {
+      for (uint32_t j = 0; j < gws.GetN (); j++)
+        {
+          auto app = httpHelper.InstallUsingIpv4 (gws.Get (j), uts).Get (1);
+          app->SetStartTime (startTime + (j + 1) * startDelay);
+          httpHelper.GetServer ().Start (startTime);
+          httpHelper.GetServer ().Stop (stopTime);
+        }
+    }
+  else if (direction == RTN_LINK)
+    {
+      for (uint32_t i = 0; i < uts.GetN (); i++)
+        {
+          auto app = httpHelper.InstallUsingIpv4 (uts.Get (i), gws).Get (1);
+          app->SetStartTime (startTime + (i + 1) * startDelay);
+          httpHelper.GetServer ().Start (startTime);
+          httpHelper.GetServer ().Stop (stopTime);
+        }
+    }
+}
+
+void
+SatTrafficHelper::AddNrtvTraffic (TrafficDirection_t direction,
+                                  NodeContainer gws,
+                                  NodeContainer uts,
+                                  Time startTime,
+                                  Time stopTime,
+                                  Time startDelay)
+{
+  std::string socketFactory = "ns3::TcpSocketFactory";
+
+  NrtvHelper nrtvHelper (TypeId::LookupByName (socketFactory));
+  if (direction == FWD_LINK)
+    {
+      for (uint32_t j = 0; j < gws.GetN (); j++)
+        {
+          auto app = nrtvHelper.InstallUsingIpv4 (gws.Get (j), uts).Get (1);
+          app->SetStartTime (startTime + (j + 1) * startDelay);
+          nrtvHelper.GetServer ().Start (startTime);
+          nrtvHelper.GetServer ().Stop (stopTime);
+        }
+    }
+  else if (direction == RTN_LINK)
+    {
+      for (uint32_t i = 0; i < uts.GetN (); i++)
+        {
+          auto app = nrtvHelper.InstallUsingIpv4 (uts.Get (i), gws).Get (1);
+          app->SetStartTime (startTime + (i + 1) * startDelay);
+          nrtvHelper.GetServer ().Start (startTime);
+          nrtvHelper.GetServer ().Stop (stopTime);
+        }
+    }
 }
 
 void

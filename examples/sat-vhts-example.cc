@@ -50,7 +50,7 @@ main (int argc, char *argv[])
   std::string beams = "8";
   uint32_t nb_gw = 1;
   uint32_t endUsersPerUt = 1;
-  uint32_t utsPerBeam = 1;
+  uint32_t utsPerBeam = 10;
 
   Time appStartTime = Seconds (0.001);
   double simLength = 10.0;

@@ -34,7 +34,7 @@ namespace ns3 {
 
 /**
  * \brief Creates pre-defined trafics.
- *        Utilizes SatUserHelper and SatBeamHelper helper objects. TODO update
+ *        Use SatUserHelper and SatBeamHelper helper objects. TODO update
  */
 class SatTrafficHelper : public Object
 {
@@ -46,10 +46,10 @@ public:
   {
     NONE, //TODO
     CBR, //TODO -> implemented
-    CUSTOM, //TODO -> implemented
-    POISSON, //TODO -> implemented, but verify formula and repartition of offTime
     HTTP, //TODO
     NRTV, //TODO
+    CUSTOM, //TODO -> implemented
+    POISSON, //TODO -> implemented, but verify formula and repartition of offTime
     VISIO, //TODO
     VOIP //TODO -> set codecs
   } TrafficType_t;
@@ -67,7 +67,7 @@ public:
   {
     RTN_LINK,
     FWD_LINK
-  } TrafficDirection_t;
+  } TrafficDirection_t; //TODO merge with enum from SimulationHelper
 
   /**
    * \brief Get the type ID
@@ -99,7 +99,7 @@ public:
   }
 
   /**
-   * Add a new CBR traffic between chosen GWs and UTs
+   * Add a new UDP/CBR traffic between chosen GWs and UTs
    * \param direction Direction of traffic
    * \param interval Wait time between transmission of two packets
    * \param packetSize Packet size in bytes
@@ -112,6 +112,38 @@ public:
   void AddCbrTraffic (TrafficDirection_t direction,
                       std::string interval,
                       uint32_t packetSize,
+                      NodeContainer gws,
+                      NodeContainer uts,
+                      Time startTime,
+                      Time stopTime,
+                      Time startDelay);
+
+  /**
+   * Add a new TCP/HTTP traffic between chosen GWs and UTs
+   * \param direction Direction of traffic
+   * \param gws The Gateways
+   * \param uts The User Terminals
+   * \param startTime Application Start time
+   * \param stopTime Application stop time
+   * \param startDelay application start delay between each user
+   */
+  void AddHttpTraffic (TrafficDirection_t direction,
+                      NodeContainer gws,
+                      NodeContainer uts,
+                      Time startTime,
+                      Time stopTime,
+                      Time startDelay);
+
+  /**
+   * Add a new TCP/NRTV traffic between chosen GWs and UTs
+   * \param direction Direction of traffic
+   * \param gws The Gateways
+   * \param uts The User Terminals
+   * \param startTime Application Start time
+   * \param stopTime Application stop time
+   * \param startDelay application start delay between each user
+   */
+  void AddNrtvTraffic (TrafficDirection_t direction,
                       NodeContainer gws,
                       NodeContainer uts,
                       Time startTime,
