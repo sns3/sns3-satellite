@@ -164,7 +164,7 @@ main (int argc, char *argv[])
 
 
   Ptr<SatCnoHelper> satCnoHelper = simulationHelper->GetCnoHelper ();
-  satCnoHelper->SetUseTraces (false);
+  satCnoHelper->UseTracesForDefault (false);
 
   satCnoHelper->SetUtNodeCnoFile (satHelper->GetBeamHelper ()->GetUtNodes ().Get (0), SatEnums::FORWARD_USER_CH, "/home/btauran/Desktop/toto");
 

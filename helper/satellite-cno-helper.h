@@ -84,7 +84,7 @@ public:
   /**
    * Set m_useTraces attribute.
    */
-  void SetUseTraces (bool useTraces); // TODO set enum
+  void UseTracesForDefault (bool useTraces);
 
   /**
    * Set a constant C/N0 for one GW node and one channel direction

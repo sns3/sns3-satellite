@@ -65,7 +65,7 @@ SatCnoHelper::SatCnoHelper (Ptr<SatHelper> satHelper)
 }
 
 void
-SatCnoHelper::SetUseTraces (bool useTraces)
+SatCnoHelper::UseTracesForDefault (bool useTraces)
 {
   m_useTraces = useTraces;
   ApplyConfiguration ();
