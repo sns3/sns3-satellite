@@ -44,14 +44,13 @@ public:
    */
   typedef enum
   {
-    NONE, //TODO
-    CBR, //TODO -> implemented
-    HTTP, //TODO
-    NRTV, //TODO
-    CUSTOM, //TODO -> implemented
+    CBR, //implemented
+    HTTP, //implemented
+    NRTV, //implemented
+    CUSTOM, //implemented
     POISSON, //TODO -> implemented, but verify formula and repartition of offTime
     VISIO, //TODO
-    VOIP //TODO -> set codecs
+    VOIP //implemented
   } TrafficType_t;
 
   typedef enum
@@ -174,12 +173,6 @@ public:
                           Time stopTime,
                           Time startDelay);
 
-// VoIP (cf Fractal Analysis and Modeling of VoIP Traffic)
-// Pkt size = 210B TODO with header ?
-// Rate = 64kb/s
-// Distribution pareto (ATM it is constant -> TODO change)
-// Burst time = 500ms (G.711.1)
-// Idle time = 50ms (G.711.1)
   /**
    * Add a new Poisson traffic between chosen GWs and UTs
    * \param direction Direction of traffic
@@ -220,7 +213,7 @@ public:
                          Time startDelay);
 
   /**
-   * Change the parameters of the last traffic created
+   * Change the parameters of the last custom traffic created
    * \param time Delay after traffic launch to apply the changes
    * \param interval New wait time between transmission of two packets
    * \param packetSize New packet size in bytes
@@ -251,7 +244,6 @@ private:
   CustomTrafficInfo_s m_last_custom_application; // Last application container of custom traffic
 
   /**
-   * TODO where I put this ?
    * Update the chosen attribute of a custom traffic
    * \param application The CBR application to update
    * \param interval The new interval

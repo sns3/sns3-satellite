@@ -281,8 +281,8 @@ SatTrafficHelper::AddVoipTraffic (TrafficDirection_t direction,
   std::string socketFactory = "ns3::UdpSocketFactory";
   uint16_t port = 9;
 
-  double onTime;
-  double offTime;
+  double onTime; // TODO nedd to chek for all codecs if correct
+  double offTime; // TODO nedd to chek for all codecs if correct
   std::string rate;
   uint32_t packetSize;
 
@@ -292,11 +292,34 @@ SatTrafficHelper::AddVoipTraffic (TrafficDirection_t direction,
         onTime = 0.5;
         offTime = 0.05;
         rate = "64kbps";
-        packetSize = 210;
+        packetSize = 80;
+        break;
+      case G_711_2:
+        onTime = 0.5;
+        offTime = 0.05;
+        rate = "64kbps";
+        packetSize = 160;
+        break;
+      case G_723_1:
+        onTime = 0.5;
+        offTime = 0.05;
+        rate = "6240bps";
+        packetSize = 30;
+        break;
+      case G_729_2:
+        onTime = 0.5;
+        offTime = 0.05;
+        rate = "8kbps";
+        packetSize = 20;
+        break;
+      case G_729_3:
+        onTime = 0.5;
+        offTime = 0.05;
+        rate = "7200bps";
+        packetSize = 30;
         break;
       default:
-        NS_FATAL_ERROR ("Not implemented yet");
-        // TODO do it
+        NS_FATAL_ERROR ("VoIP codec does not exist");
     }
 
   PacketSinkHelper sinkHelper (socketFactory, Address ());
@@ -467,8 +490,6 @@ SatTrafficHelper::UpdateAttribute (Ptr<CbrApplication> application, std::string 
   application->SetInterval (Time (interval));
   application->SetPacketSize (packetSize);
 }
-
-//TODO same with add/remove nodes ?
 
 bool
 SatTrafficHelper::HasSinkInstalled (Ptr<Node> node, uint16_t port)
