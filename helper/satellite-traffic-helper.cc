@@ -319,7 +319,7 @@ SatTrafficHelper::AddVoipTraffic (TrafficDirection_t direction,
         packetSize = 30;
         break;
       default:
-        NS_FATAL_ERROR ("VoIP codec does not exist");
+        NS_FATAL_ERROR ("VoIP codec does not exist or is not implemented");
     }
 
   PacketSinkHelper sinkHelper (socketFactory, Address ());

@@ -562,7 +562,7 @@ SatPhyRxCarrier::CalculateSinr (double rxPowerW,
   // std::cout << rxPowerW << " " << ifPowerW << " " << rxNoisePowerW << " " << rxAciIfPowerW << " " << rxExtNoisePowerW << std::endl;
 
   // std::cout << "C/N   " << rxPowerW / rxNoisePowerW << std::endl; // C/N
-  std::cout << "C/N0  " << m_rxBandwidthHz * rxPowerW / rxNoisePowerW; // C/N0
+  // std::cout << "C/N0  " << m_rxBandwidthHz * rxPowerW / rxNoisePowerW; // C/N0
 
   if (rxNoisePowerW <= 0.0)
     {
@@ -576,7 +576,7 @@ SatPhyRxCarrier::CalculateSinr (double rxPowerW,
   // Call PHY calculator to composite C over I interference configured to PHY.
   double finalSinr = sinrCalculate (sinr);
 
-  std::cout << ", \tsinr  " << finalSinr << std::endl;
+  // std::cout << ", \tsinr  " << finalSinr << std::endl;
 
   return (finalSinr);
 }

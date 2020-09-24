@@ -26,6 +26,8 @@
 #include "ns3/satellite-module.h"
 #include "ns3/applications-module.h"
 #include "ns3/traffic-module.h"
+#include "ns3/flow-monitor.h"
+#include "ns3/flow-monitor-helper.h"
 
 using namespace ns3;
 
@@ -50,10 +52,10 @@ main (int argc, char *argv[])
   std::string beams = "8";
   uint32_t nb_gw = 1;
   uint32_t endUsersPerUt = 1;
-  uint32_t utsPerBeam = 10;
+  uint32_t utsPerBeam = 1;
 
   Time appStartTime = Seconds (0.001);
-  double simLength = 10.0;
+  double simLength = 100.0;
 
   std::string modcodsUsed = "QPSK_1_TO_3 QPSK_1_TO_2 QPSK_3_TO_5 QPSK_2_TO_3 QPSK_3_TO_4 QPSK_4_TO_5 QPSK_5_TO_6 QPSK_8_TO_9 QPSK_9_TO_10 "
           "8PSK_3_TO_5 8PSK_2_TO_3 8PSK_3_TO_4 8PSK_5_TO_6 8PSK_8_TO_9 8PSK_9_TO_10 "
@@ -154,19 +156,33 @@ main (int argc, char *argv[])
 
   Ptr<SatHelper> satHelper = simulationHelper->GetSatelliteHelper ();
   Ptr<SatTrafficHelper> trafficHelper = simulationHelper->GetTrafficHelper ();
-  trafficHelper->AddVoipTraffic (SatTrafficHelper::FWD_LINK,
+  /*trafficHelper->AddVoipTraffic (SatTrafficHelper::FWD_LINK,
                                   SatTrafficHelper::G_711_1,
                                   satHelper->GetGwUsers (),
                                   satHelper->GetUtUsers (),
                                   appStartTime,
                                   Seconds (simLength),
-                                  Seconds (0.001));
+                                  Seconds (0.001));*/
+  /*trafficHelper->AddHttpTraffic (SatTrafficHelper::FWD_LINK,
+                                  satHelper->GetGwUsers (),
+                                  satHelper->GetUtUsers (),
+                                  appStartTime,
+                                  Seconds (simLength),
+                                  Seconds (0.001));*/
+
+  Config::SetDefault ("ns3::CbrApplication::Interval", StringValue ("1ms"));
+  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (1500));
+  Config::SetDefault ("ns3::SatBbFrameConf::AcmEnabled", BooleanValue (true));
+  Config::SetDefault ("ns3::SatBeamHelper::FadingModel", StringValue ("FadingMarkov"));
+  simulationHelper->InstallTrafficModel (
+    SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
+    appStartTime, Seconds (simLength), Seconds (0.001));
 
 
-  Ptr<SatCnoHelper> satCnoHelper = simulationHelper->GetCnoHelper ();
+  /*Ptr<SatCnoHelper> satCnoHelper = simulationHelper->GetCnoHelper ();
   satCnoHelper->UseTracesForDefault (false);
 
-  satCnoHelper->SetUtNodeCnoFile (satHelper->GetBeamHelper ()->GetUtNodes ().Get (0), SatEnums::FORWARD_USER_CH, "/home/btauran/Desktop/toto");
+  satCnoHelper->SetUtNodeCnoFile (satHelper->GetBeamHelper ()->GetUtNodes ().Get (0), SatEnums::FORWARD_USER_CH, "/home/btauran/Desktop/toto");*/
 
   /*
    * Outputs
@@ -224,7 +240,52 @@ main (int argc, char *argv[])
   s->AddPerGwRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerGwRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
+
+
+
+  s->AddGlobalFwdPhyJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddGlobalFwdMacJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddGlobalFwdDevJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+  s->AddGlobalFwdPhyJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddGlobalFwdMacJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddGlobalFwdDevJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddPerUtFwdPhyJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerUtFwdMacJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerUtFwdDevJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+  s->AddPerUtFwdPhyJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdMacJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdDevJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddGlobalRtnPhyJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddGlobalRtnMacJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddGlobalRtnDevJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+  s->AddGlobalRtnPhyJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddGlobalRtnMacJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddGlobalRtnDevJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddPerGwRtnPhyJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerGwRtnMacJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerGwRtnDevJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+  s->AddPerGwRtnPhyJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerGwRtnMacJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerGwRtnDevJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  // GtkConfigStore configstore;
+  // configstore.ConfigureAttributes();
+
+  // Flow monitor
+  /*Ptr<FlowMonitor> flowMonitor;
+  FlowMonitorHelper flowHelper;
+  flowMonitor = flowHelper.InstallAll();*/
+
   simulationHelper->RunSimulation ();
+
+  // flowMonitor->SerializeToXmlFile("flow.xml", true, true);
 
   return 0;
 
