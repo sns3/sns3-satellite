@@ -163,20 +163,20 @@ main (int argc, char *argv[])
                                   appStartTime,
                                   Seconds (simLength),
                                   Seconds (0.001));*/
-  /*trafficHelper->AddHttpTraffic (SatTrafficHelper::FWD_LINK,
+  trafficHelper->AddHttpTraffic (SatTrafficHelper::FWD_LINK,
                                   satHelper->GetGwUsers (),
                                   satHelper->GetUtUsers (),
                                   appStartTime,
                                   Seconds (simLength),
-                                  Seconds (0.001));*/
+                                  Seconds (0.001));
 
-  Config::SetDefault ("ns3::CbrApplication::Interval", StringValue ("1ms"));
+  /*Config::SetDefault ("ns3::CbrApplication::Interval", StringValue ("1ms"));
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (1500));
   Config::SetDefault ("ns3::SatBbFrameConf::AcmEnabled", BooleanValue (true));
   Config::SetDefault ("ns3::SatBeamHelper::FadingModel", StringValue ("FadingMarkov"));
   simulationHelper->InstallTrafficModel (
     SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
-    appStartTime, Seconds (simLength), Seconds (0.001));
+    appStartTime, Seconds (simLength), Seconds (0.001));*/
 
 
   /*Ptr<SatCnoHelper> satCnoHelper = simulationHelper->GetCnoHelper ();
@@ -243,7 +243,7 @@ main (int argc, char *argv[])
 
 
 
-  s->AddGlobalFwdPhyJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  /*s->AddGlobalFwdPhyJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddGlobalFwdMacJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddGlobalFwdDevJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
@@ -273,7 +273,17 @@ main (int argc, char *argv[])
 
   s->AddPerGwRtnPhyJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerGwRtnMacJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerGwRtnDevJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerGwRtnDevJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);*/
+
+  s->AddGlobalFwdAppPlt (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddGlobalFwdAppPlt (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdAppPlt (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerUtFwdAppPlt (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddGlobalRtnAppPlt (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddGlobalRtnAppPlt (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerGwRtnAppPlt (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerGwRtnAppPlt (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   // GtkConfigStore configstore;
   // configstore.ConfigureAttributes();

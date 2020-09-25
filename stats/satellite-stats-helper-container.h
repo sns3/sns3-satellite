@@ -42,6 +42,8 @@ namespace ns3 {
  * - AddAverage [Beam, Ut] [Fwd, Rtn] [Dev, Mac, Phy] Delay
  * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] [Dev, Mac, Phy] Jitter
  * - AddAverage [Beam, Ut] [Fwd, Rtn] [Dev, Mac, Phy] Jitter
+ * - Add [Global, PerGw, PerBeam, PerUt, PerUtUser] [Fwd, Rtn] AppPlt
+ * - AddAverage [Beam, Ut, UtUser] [Fwd, Rtn] AppPlt
  * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] Queue [Bytes, Packets]
  * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] SignallingLoad
  * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] CompositeSinr
@@ -166,6 +168,12 @@ public:
   void AddAverageBeamFwdPhyJitter (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtFwdPhyJitter (SatStatsHelper::OutputType_t outputType);
 
+  // Forward link application-level packet PLT statistics.
+  SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (FwdAppPlt)
+  void AddAverageBeamFwdAppPlt (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtFwdAppPlt (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtUserFwdAppPlt (SatStatsHelper::OutputType_t outputType);
+
   // Forward link queue size (in bytes) statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdQueueBytes)
 
@@ -234,6 +242,12 @@ public:
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnPhyJitter)
   void AddAverageBeamRtnPhyJitter (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtRtnPhyJitter (SatStatsHelper::OutputType_t outputType);
+
+  // Return link application-level packet PLT statistics.
+  SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (RtnAppPlt)
+  void AddAverageBeamRtnAppPlt (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRtnAppPlt (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtUserRtnAppPlt (SatStatsHelper::OutputType_t outputType);
 
   // Return link queue size (in bytes) statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnQueueBytes)

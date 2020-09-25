@@ -31,6 +31,7 @@
 #include <ns3/satellite-stats-composite-sinr-helper.h>
 #include <ns3/satellite-stats-delay-helper.h>
 #include <ns3/satellite-stats-jitter-helper.h>
+#include <ns3/satellite-stats-plt-helper.h>
 #include <ns3/satellite-stats-frame-load-helper.h>
 #include <ns3/satellite-stats-link-rx-power-helper.h>
 #include <ns3/satellite-stats-link-sinr-helper.h>
@@ -80,6 +81,8 @@ SatStatsHelperContainer::DoDispose ()
  * - Average [Beam, Ut] [Fwd, Rtn] [Dev, Mac, Phy] Delay
  * - [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] [Dev, Mac, Phy] Jitter
  * - Average [Beam, Ut] [Fwd, Rtn] [Dev, Mac, Phy] Jitter
+ * - [Global, PerGw, PerBeam, PerUt, PerUtUser] [Fwd, Rtn] AppPlt
+ * - Average [Beam, Ut, UtUser] [Fwd, Rtn] AppPlt
  * - [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] Queue [Bytes, Packets]
  * - [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] SignallingLoad
  * - [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] CompositeSinr
@@ -232,6 +235,18 @@ SatStatsHelperContainer::GetTypeId ()
     ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdPhyJitter,
         "forward link PHY-level jitter statistics")
 
+    // Forward link application-level packet PLT statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdAppPlt,
+        "forward link application-level PLT statistics")
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUtUserFwdAppPlt,
+        "per UT user forward link application-level PLT statistics")
+    ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdAppPlt,
+        "forward link application-level PLT statistics")
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (AverageUtUserFwdAppPlt,
+        "average UT user forward link application-level PLT statistics")
+    ADD_SAT_STATS_AVERAGED_DISTRIBUTION_OUTPUT_CHECKER
+
     // Forward link queue size (in bytes) statistics.
     ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdQueueBytes,
         "forward link queue size (in bytes) statistics")
@@ -325,6 +340,18 @@ SatStatsHelperContainer::GetTypeId ()
         "return link PHY-level jitter statistics")
     ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnPhyJitter,
         "return link PHY-level jitter statistics")
+
+    // Return link application-level packet PLT statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnAppPlt,
+        "return link application-level PLT statistics")
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUtUserRtnAppPlt,
+        "per UT user return link application-level PLT statistics")
+    ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnAppPlt,
+        "return link application-level PLT statistics")
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (AverageUtUserRtnAppPlt,
+        "average UT user return link application-level PLT statistics")
+    ADD_SAT_STATS_AVERAGED_DISTRIBUTION_OUTPUT_CHECKER
 
     // Return link queue size (in bytes) statistics.
     ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnQueueBytes,
@@ -559,6 +586,8 @@ SatStatsHelperContainer::GetName () const
  * - AddAverage [Beam, Ut] [Fwd, Rtn] [Dev, Mac, Phy] Delay
  * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] [Dev, Mac, Phy] Jitter
  * - AddAverage [Beam, Ut] [Fwd, Rtn] [Dev, Mac, Phy] Jitter
+ * - Add [Global, PerGw, PerBeam, PerUt, PerUtUser] [Fwd, Rtn] AppPlt
+ * - AddAverage [Beam, Ut, UtUser] [Fwd, Rtn] AppPlt
  * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] Queue [Bytes, Packets]
  * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] SignallingLoad
  * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] CompositeSinr
@@ -804,6 +833,16 @@ SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdPhyJitter, "fwd-phy-jitter")
 SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdPhyJitter, "fwd-phy-jitter")
 SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdPhyJitter, "fwd-phy-jitter")
 
+// Forward link application-level packet PLT statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdAppPlt, "fwd-app-plt")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdAppPlt, "fwd-app-plt")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdAppPlt, "fwd-app-plt")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdAppPlt, "fwd-app-plt")
+SAT_STATS_PER_UT_USER_METHOD_DEFINITION  (FwdAppPlt, "fwd-app-plt")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdAppPlt, "fwd-app-plt")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdAppPlt, "fwd-app-plt")
+SAT_STATS_AVERAGE_UT_USER_METHOD_DEFINITION (FwdAppPlt, "fwd-app-plt")
+
 // Forward link queue size (in bytes) statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdQueueBytes, "fwd-queue-bytes")
 SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdQueueBytes, "fwd-queue-bytes")
@@ -919,6 +958,16 @@ SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnPhyJitter, "rtn-phy-jitter")
 SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnPhyJitter, "rtn-phy-jitter")
 SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnPhyJitter, "rtn-phy-jitter")
 SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnPhyJitter, "rtn-phy-jitter")
+
+// Return link application-level packet PLT statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnAppPlt, "rtn-app-plt")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnAppPlt, "rtn-app-plt")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnAppPlt, "rtn-app-plt")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnAppPlt, "rtn-app-plt")
+SAT_STATS_PER_UT_USER_METHOD_DEFINITION  (RtnAppPlt, "rtn-app-plt")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnAppPlt, "rtn-app-plt")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnAppPlt, "rtn-app-plt")
+SAT_STATS_AVERAGE_UT_USER_METHOD_DEFINITION (RtnAppPlt, "rtn-app-plt")
 
 // Return link queue size (in bytes) statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnQueueBytes, "rtn-queue-bytes")
