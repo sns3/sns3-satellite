@@ -214,7 +214,7 @@ public:
 
   /**
    * Change the parameters of the last custom traffic created
-   * \param time Delay after traffic launch to apply the changes
+   * \param delay Delay after traffic launch to apply the changes
    * \param interval New wait time between transmission of two packets
    * \param packetSize New packet size in bytes
    */
