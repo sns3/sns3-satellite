@@ -1010,12 +1010,6 @@ SatTrafficHelper::AddCustomTraffic (TrafficDirection_t direction,
     }
 }
 
-  /**
-   * Change the parameters of the last traffic created
-   * \param time Time to apply the changes
-   * \param interval New wait time between transmission of two packets
-   * \param packetSize New packet size in bytes
-   */
 void
 SatTrafficHelper::ChangeCustomTraffic (Time delay,
                                        std::string interval,
