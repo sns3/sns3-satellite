@@ -1148,7 +1148,7 @@ SimulationHelper::GetTrafficHelper ()
 
   if (!m_trafficHelper)
     {
-      m_trafficHelper = CreateObject<SatTrafficHelper> (m_satHelper);
+      m_trafficHelper = CreateObject<SatTrafficHelper> (GetSatelliteHelper (), GetStatisticsContainer ());
     }
 
   return m_trafficHelper;

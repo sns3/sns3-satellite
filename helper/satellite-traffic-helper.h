@@ -27,11 +27,11 @@
 #include <ns3/string.h>
 
 #include <ns3/satellite-helper.h>
+#include <ns3/satellite-stats-helper-container.h>
 #include <ns3/cbr-application.h>
 #include <ns3/application-container.h>
 
 namespace ns3 {
-
 /**
  * \brief Creates pre-defined trafics.
  *        Use SatUserHelper and SatBeamHelper helper objects. TODO update
@@ -88,7 +88,7 @@ public:
   /**
    * \brief Create a base SatTrafficHelper for creating customized traffics.
    */
-  SatTrafficHelper (Ptr<SatHelper> satHelper);
+  SatTrafficHelper (Ptr<SatHelper> satHelper, Ptr<SatStatsHelperContainer> satStatsHelperContainer);
 
   /**
    * Destructor for SatTrafficHelper
@@ -240,6 +240,7 @@ private:
     } CustomTrafficInfo_s;
 
   Ptr<SatHelper> m_satHelper;	// Pointer to the SatHelper objet
+  Ptr<SatStatsHelperContainer> m_satStatsHelperContainer; // Pointer to the SatStatsHelperContainer objet
 
   CustomTrafficInfo_s m_last_custom_application; // Last application container of custom traffic
 

@@ -56,13 +56,15 @@ SatTrafficHelper::GetInstanceTypeId (void) const
 }
 
 SatTrafficHelper::SatTrafficHelper ()
-  : m_satHelper (NULL)
+  : m_satHelper (NULL),
+  m_satStatsHelperContainer (NULL)
 {
-  m_last_custom_application.created = false;
+  NS_FATAL_ERROR ("Default constructor of SatTrafficHelper cannot be used.");
 }
 
-SatTrafficHelper::SatTrafficHelper (Ptr<SatHelper> satHelper)
-  : m_satHelper (satHelper)
+SatTrafficHelper::SatTrafficHelper (Ptr<SatHelper> satHelper, Ptr<SatStatsHelperContainer> satStatsHelperContainer)
+  : m_satHelper (satHelper),
+  m_satStatsHelperContainer (satStatsHelperContainer)
 {
   m_last_custom_application.created = false;
 }
@@ -127,6 +129,84 @@ SatTrafficHelper::AddCbrTraffic (TrafficDirection_t direction,
 
   sinkContainer.Start (startTime);
   sinkContainer.Stop (stopTime);
+
+  // Add throuhgput statistics
+  if (direction == FWD_LINK)
+    {
+      // Global scalar
+      m_satStatsHelperContainer->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Global scatter
+      m_satStatsHelperContainer->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      // Per UT scalar
+      m_satStatsHelperContainer->AddPerUtFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Per UT scatter
+      m_satStatsHelperContainer->AddPerUtFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      // Per GW scalar
+      m_satStatsHelperContainer->AddPerGwFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Per GW scatter
+      m_satStatsHelperContainer->AddPerGwFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+    }
+  else if (direction == RTN_LINK)
+    {
+      // Global scalar
+      m_satStatsHelperContainer->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Global scatter
+      m_satStatsHelperContainer->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      // Per UT scalar
+      m_satStatsHelperContainer->AddPerUtRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Per UT scatter
+      m_satStatsHelperContainer->AddPerUtRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      // Per GW scalar
+      m_satStatsHelperContainer->AddPerGwRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Per GW scatter
+      m_satStatsHelperContainer->AddPerGwRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+    }
 }
 
 void
@@ -157,6 +237,104 @@ SatTrafficHelper::AddHttpTraffic (TrafficDirection_t direction,
           httpHelper.GetServer ().Start (startTime);
           httpHelper.GetServer ().Stop (stopTime);
         }
+    }
+
+  // Add PLT statistics
+  if (direction == FWD_LINK)
+    {
+      m_satStatsHelperContainer->AddGlobalFwdAppPlt (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdAppPlt (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdAppPlt (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdAppPlt (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdAppPlt (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdAppPlt (SatStatsHelper::OUTPUT_SCATTER_FILE);
+    }
+  else if (direction == RTN_LINK)
+    {
+      m_satStatsHelperContainer->AddGlobalRtnAppPlt (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnAppPlt (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnAppPlt (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnAppPlt (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnAppPlt (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnAppPlt (SatStatsHelper::OUTPUT_SCATTER_FILE);
+    }
+
+  // Add throuhgput statistics
+  if (direction == FWD_LINK)
+    {
+      // Global scalar
+      m_satStatsHelperContainer->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Global scatter
+      m_satStatsHelperContainer->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      // Per UT scalar
+      m_satStatsHelperContainer->AddPerUtFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Per UT scatter
+      m_satStatsHelperContainer->AddPerUtFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      // Per GW scalar
+      m_satStatsHelperContainer->AddPerGwFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Per GW scatter
+      m_satStatsHelperContainer->AddPerGwFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+    }
+  else if (direction == RTN_LINK)
+    {
+      // Global scalar
+      m_satStatsHelperContainer->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Global scatter
+      m_satStatsHelperContainer->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      // Per UT scalar
+      m_satStatsHelperContainer->AddPerUtRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Per UT scatter
+      m_satStatsHelperContainer->AddPerUtRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      // Per GW scalar
+      m_satStatsHelperContainer->AddPerGwRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Per GW scatter
+      m_satStatsHelperContainer->AddPerGwRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
     }
 }
 
@@ -190,6 +368,84 @@ SatTrafficHelper::AddNrtvTraffic (TrafficDirection_t direction,
           nrtvHelper.GetServer ().Start (startTime);
           nrtvHelper.GetServer ().Stop (stopTime);
         }
+    }
+
+  // Add throuhgput statistics
+  if (direction == FWD_LINK)
+    {
+      // Global scalar
+      m_satStatsHelperContainer->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Global scatter
+      m_satStatsHelperContainer->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      // Per UT scalar
+      m_satStatsHelperContainer->AddPerUtFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Per UT scatter
+      m_satStatsHelperContainer->AddPerUtFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      // Per GW scalar
+      m_satStatsHelperContainer->AddPerGwFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Per GW scatter
+      m_satStatsHelperContainer->AddPerGwFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+    }
+  else if (direction == RTN_LINK)
+    {
+      // Global scalar
+      m_satStatsHelperContainer->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Global scatter
+      m_satStatsHelperContainer->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      // Per UT scalar
+      m_satStatsHelperContainer->AddPerUtRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Per UT scatter
+      m_satStatsHelperContainer->AddPerUtRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      // Per GW scalar
+      m_satStatsHelperContainer->AddPerGwRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Per GW scatter
+      m_satStatsHelperContainer->AddPerGwRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
     }
 }
 
@@ -265,6 +521,84 @@ SatTrafficHelper::AddPoissonTraffic (TrafficDirection_t direction,
     }
   sinkContainer.Start (startTime);
   sinkContainer.Stop (stopTime);
+
+  // Add throuhgput statistics
+  if (direction == FWD_LINK)
+    {
+      // Global scalar
+      m_satStatsHelperContainer->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Global scatter
+      m_satStatsHelperContainer->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      // Per UT scalar
+      m_satStatsHelperContainer->AddPerUtFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Per UT scatter
+      m_satStatsHelperContainer->AddPerUtFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      // Per GW scalar
+      m_satStatsHelperContainer->AddPerGwFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Per GW scatter
+      m_satStatsHelperContainer->AddPerGwFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+    }
+  else if (direction == RTN_LINK)
+    {
+      // Global scalar
+      m_satStatsHelperContainer->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Global scatter
+      m_satStatsHelperContainer->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      // Per UT scalar
+      m_satStatsHelperContainer->AddPerUtRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Per UT scatter
+      m_satStatsHelperContainer->AddPerUtRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      // Per GW scalar
+      m_satStatsHelperContainer->AddPerGwRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Per GW scatter
+      m_satStatsHelperContainer->AddPerGwRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+    }
 }
 
 void
@@ -376,6 +710,150 @@ SatTrafficHelper::AddVoipTraffic (TrafficDirection_t direction,
     }
   sinkContainer.Start (startTime);
   sinkContainer.Stop (stopTime);
+
+  // Add jitter statistics
+  if (direction == FWD_LINK)
+    {
+      // Global scalar
+      m_satStatsHelperContainer->AddGlobalFwdDevJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdMacJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdPhyJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Global scatter
+      m_satStatsHelperContainer->AddGlobalFwdDevJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdMacJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdPhyJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      // Per UT scalar
+      m_satStatsHelperContainer->AddPerUtFwdDevJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdMacJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdPhyJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Per UT scatter
+      m_satStatsHelperContainer->AddPerUtFwdDevJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdMacJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdPhyJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      // Per GW scalar
+      m_satStatsHelperContainer->AddPerGwFwdDevJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdMacJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdPhyJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Per GW scatter
+      m_satStatsHelperContainer->AddPerGwFwdDevJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdMacJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdPhyJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+    }
+  else if (direction == RTN_LINK)
+    {
+      // Global scalar
+      m_satStatsHelperContainer->AddGlobalRtnDevJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnMacJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnPhyJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Global scatter
+      m_satStatsHelperContainer->AddGlobalRtnDevJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnMacJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnPhyJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      // Per UT scalar
+      m_satStatsHelperContainer->AddPerUtRtnDevJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnMacJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnPhyJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Per UT scatter
+      m_satStatsHelperContainer->AddPerUtRtnDevJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnMacJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnPhyJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      // Per GW scalar
+      m_satStatsHelperContainer->AddPerGwRtnDevJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnMacJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnPhyJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Per GW scatter
+      m_satStatsHelperContainer->AddPerGwRtnDevJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnMacJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnPhyJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+    }
+
+  // Add throuhgput statistics
+  if (direction == FWD_LINK)
+    {
+      // Global scalar
+      m_satStatsHelperContainer->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Global scatter
+      m_satStatsHelperContainer->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      // Per UT scalar
+      m_satStatsHelperContainer->AddPerUtFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Per UT scatter
+      m_satStatsHelperContainer->AddPerUtFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      // Per GW scalar
+      m_satStatsHelperContainer->AddPerGwFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Per GW scatter
+      m_satStatsHelperContainer->AddPerGwFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+    }
+  else if (direction == RTN_LINK)
+    {
+      // Global scalar
+      m_satStatsHelperContainer->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Global scatter
+      m_satStatsHelperContainer->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      // Per UT scalar
+      m_satStatsHelperContainer->AddPerUtRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Per UT scatter
+      m_satStatsHelperContainer->AddPerUtRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      // Per GW scalar
+      m_satStatsHelperContainer->AddPerGwRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Per GW scatter
+      m_satStatsHelperContainer->AddPerGwRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+    }
 }
 
 void
@@ -452,6 +930,84 @@ SatTrafficHelper::AddCustomTraffic (TrafficDirection_t direction,
   m_last_custom_application.start = startTime;
   m_last_custom_application.stop = stopTime;
   m_last_custom_application.created = true;
+
+  // Add throuhgput statistics
+  if (direction == FWD_LINK)
+    {
+      // Global scalar
+      m_satStatsHelperContainer->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Global scatter
+      m_satStatsHelperContainer->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      // Per UT scalar
+      m_satStatsHelperContainer->AddPerUtFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Per UT scatter
+      m_satStatsHelperContainer->AddPerUtFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      // Per GW scalar
+      m_satStatsHelperContainer->AddPerGwFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Per GW scatter
+      m_satStatsHelperContainer->AddPerGwFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+    }
+  else if (direction == RTN_LINK)
+    {
+      // Global scalar
+      m_satStatsHelperContainer->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Global scatter
+      m_satStatsHelperContainer->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddGlobalRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      // Per UT scalar
+      m_satStatsHelperContainer->AddPerUtRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Per UT scatter
+      m_satStatsHelperContainer->AddPerUtRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      // Per GW scalar
+      m_satStatsHelperContainer->AddPerGwRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+      // Per GW scatter
+      m_satStatsHelperContainer->AddPerGwRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      m_satStatsHelperContainer->AddPerGwRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+    }
 }
 
   /**

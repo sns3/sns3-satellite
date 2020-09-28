@@ -51,7 +51,7 @@ main (int argc, char *argv[])
   // Variables
   std::string beams = "8";
   uint32_t nb_gw = 1;
-  uint32_t endUsersPerUt = 1;
+  uint32_t endUsersPerUt = 10;
   uint32_t utsPerBeam = 1;
 
   Time appStartTime = Seconds (0.001);
@@ -61,6 +61,9 @@ main (int argc, char *argv[])
           "8PSK_3_TO_5 8PSK_2_TO_3 8PSK_3_TO_4 8PSK_5_TO_6 8PSK_8_TO_9 8PSK_9_TO_10 "
           "16APSK_2_TO_3 16APSK_3_TO_4 16APSK_4_TO_5 16APSK_5_TO_6 16APSK_8_TO_9 16APSK_9_TO_10 "
           "32APSK_3_TO_4 32APSK_4_TO_5 32APSK_5_TO_6 32APSK_8_TO_9";
+
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+  Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
 
   /*
    * FWD link
@@ -156,25 +159,25 @@ main (int argc, char *argv[])
 
   Ptr<SatHelper> satHelper = simulationHelper->GetSatelliteHelper ();
   Ptr<SatTrafficHelper> trafficHelper = simulationHelper->GetTrafficHelper ();
-  /*trafficHelper->AddVoipTraffic (SatTrafficHelper::FWD_LINK,
+  trafficHelper->AddVoipTraffic (SatTrafficHelper::FWD_LINK,
                                   SatTrafficHelper::G_711_1,
                                   satHelper->GetGwUsers (),
                                   satHelper->GetUtUsers (),
                                   appStartTime,
                                   Seconds (simLength),
-                                  Seconds (0.001));*/
-  trafficHelper->AddHttpTraffic (SatTrafficHelper::FWD_LINK,
+                                  Seconds (0.001));
+  /*trafficHelper->AddHttpTraffic (SatTrafficHelper::FWD_LINK,
                                   satHelper->GetGwUsers (),
                                   satHelper->GetUtUsers (),
                                   appStartTime,
                                   Seconds (simLength),
-                                  Seconds (0.001));
+                                  Seconds (0.001));*/
 
   /*Config::SetDefault ("ns3::CbrApplication::Interval", StringValue ("1ms"));
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (1500));
   Config::SetDefault ("ns3::SatBbFrameConf::AcmEnabled", BooleanValue (true));
-  Config::SetDefault ("ns3::SatBeamHelper::FadingModel", StringValue ("FadingMarkov"));
-  simulationHelper->InstallTrafficModel (
+  Config::SetDefault ("ns3::SatBeamHelper::FadingModel", StringValue ("FadingMarkov"));*/
+  /*simulationHelper->InstallTrafficModel (
     SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
     appStartTime, Seconds (simLength), Seconds (0.001));*/
 
@@ -187,8 +190,6 @@ main (int argc, char *argv[])
   /*
    * Outputs
    */
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
-  Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
 
   simulationHelper->EnableProgressLogs ();
 
@@ -198,105 +199,10 @@ main (int argc, char *argv[])
   ConfigStore outputConfig;
   outputConfig.ConfigureDefaults ();
 
-  Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer ();
-
-  s->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddGlobalFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddGlobalFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-
-  s->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddGlobalFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddGlobalFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  
-  s->AddPerUtFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-
-  s->AddPerUtFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-  s->AddPerUtRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-
-  s->AddPerUtRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-  s->AddPerGwFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerGwFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerGwFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-
-  s->AddPerGwFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerGwFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerGwFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-  s->AddPerGwRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerGwRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerGwRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-
-  s->AddPerGwRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerGwRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerGwRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-
-
-
-  /*s->AddGlobalFwdPhyJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddGlobalFwdMacJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddGlobalFwdDevJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
-
-  s->AddGlobalFwdPhyJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddGlobalFwdMacJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddGlobalFwdDevJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-  s->AddPerUtFwdPhyJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerUtFwdMacJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerUtFwdDevJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
-
-  s->AddPerUtFwdPhyJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtFwdMacJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtFwdDevJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-  s->AddGlobalRtnPhyJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddGlobalRtnMacJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddGlobalRtnDevJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
-
-  s->AddGlobalRtnPhyJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddGlobalRtnMacJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddGlobalRtnDevJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-  s->AddPerGwRtnPhyJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerGwRtnMacJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerGwRtnDevJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
-
-  s->AddPerGwRtnPhyJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerGwRtnMacJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerGwRtnDevJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);*/
-
-  s->AddGlobalFwdAppPlt (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddGlobalFwdAppPlt (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtFwdAppPlt (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerUtFwdAppPlt (SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-  s->AddGlobalRtnAppPlt (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddGlobalRtnAppPlt (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerGwRtnAppPlt (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerGwRtnAppPlt (SatStatsHelper::OUTPUT_SCATTER_FILE);
-
   // GtkConfigStore configstore;
   // configstore.ConfigureAttributes();
 
-  // Flow monitor
-  /*Ptr<FlowMonitor> flowMonitor;
-  FlowMonitorHelper flowHelper;
-  flowMonitor = flowHelper.InstallAll();*/
-
   simulationHelper->RunSimulation ();
-
-  // flowMonitor->SerializeToXmlFile("flow.xml", true, true);
-
   return 0;
 
 } // end of `int main (int argc, char *argv[])`
