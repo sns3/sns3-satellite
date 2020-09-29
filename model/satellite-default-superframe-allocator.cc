@@ -166,14 +166,14 @@ SatDefaultSuperframeAllocator::SelectCarriers (SatFrameAllocator::SatFrameAllocC
     {
       requestedBandwidth += demand.first->GetCarrierBandwidthHz () * demand.second / demand.first->GetVolumeBytes ();
     }
-  double loadCoefficient = std::min(std::max(0.1, requestedBandwidth / m_totalBandwidth), 10.0);
+  double loadCoefficient = std::min(std::max(0.1, m_totalBandwidth / requestedBandwidth), 10.0);
   NS_LOG_INFO ("" << allocReqs.size () << " requested " << requestedBandwidth << "Hz through " <<
                wsrDemand.size () << " subdivision levels; giving a load coefficient of " << loadCoefficient);
 
   std::map<Ptr<SatFrameAllocator>, double, SatFrameAllocator::BandwidthComparator> scaledDemand;
   for (auto& demand : wsrDemand)
     {
-      scaledDemand[demand.first] = loadCoefficient * demand.second / demand.first->GetVolumeBytes ();
+      scaledDemand[demand.first] = loadCoefficient * demand.second / demand.first->GetVolumeBytes () + 1;
     }
 
   NS_LOG_LOGIC ("Zero-out old carrier selection");
@@ -184,7 +184,7 @@ SatDefaultSuperframeAllocator::SelectCarriers (SatFrameAllocator::SatFrameAllocC
     }
 
   NS_LOG_LOGIC ("Allocate carriers in subdivision levels");
-  while (!scaledDemand.empty ())
+  if (!scaledDemand.empty ())
     {
       NS_LOG_LOGIC ("Find bandwidth of the original frame");
       Ptr<SatFrameAllocator> frameAllocator = scaledDemand.begin()->first;
@@ -194,7 +194,6 @@ SatDefaultSuperframeAllocator::SelectCarriers (SatFrameAllocator::SatFrameAllocC
         }
       double remainingBandwidth = frameAllocator->GetCarrierBandwidthHz (true);
       NS_ASSERT_MSG (remainingBandwidth != 0.0, "Could not find bandwidth of original frame");
-      NS_LOG_INFO ("Remaining bandwidth on non-subdivided frame: " << remainingBandwidth);
 
       // Select carriers from the most subdivided version of the frame up to the original
       frameAllocator = scaledDemand.begin()->first;
@@ -208,8 +207,7 @@ SatDefaultSuperframeAllocator::SelectCarriers (SatFrameAllocator::SatFrameAllocC
               demand = frameDemand->second;
               scaledDemand.erase (frameDemand);
             }
-          NS_LOG_LOGIC (demand << " carriers requested on (subdivided) frame " << frameAllocator);
-
+          NS_LOG_LOGIC (demand << " carriers requested on (subdivided) frame " << frameAllocator->GetCarrierBandwidthHz());
           uint16_t carriersCount = 0;
           double carrierBandwidth = frameAllocator->GetCarrierBandwidthHz ();
           if (frameAllocator->GetParent () != nullptr)
@@ -221,6 +219,7 @@ SatDefaultSuperframeAllocator::SelectCarriers (SatFrameAllocator::SatFrameAllocC
 
           frameAllocator->SelectCarriers (carriersCount, offset);
           remainingBandwidth -= carriersCount * carrierBandwidth;
+          NS_LOG_INFO ("Remaining bandwidth on non-subdivided frame: " << remainingBandwidth);
           offset = (carriersCount + offset) / 2;
           frameAllocator = frameAllocator->GetParent ();
         }
