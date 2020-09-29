@@ -29,6 +29,7 @@
 #include <ns3/double.h>
 #include <ns3/boolean.h>
 #include <ns3/uinteger.h>
+#include <ns3/enum.h>
 #include <ns3/satellite-const-variables.h>
 #include <ns3/satellite-utils.h>
 #include <ns3/satellite-link-results.h>
@@ -162,7 +163,8 @@ SatWaveformConf::SatWaveformConf ()
   m_acmEnabled (false),
   m_defaultWfId (3),
   m_minWfId (0),
-  m_maxWfId (23)
+  m_maxWfId (23),
+  m_burstLength (SatEnums::UNKNOWN_BURST)
 {
   // default constructor should not be used
   NS_ASSERT (false);
@@ -175,13 +177,29 @@ SatWaveformConf::SatWaveformConf (std::string filePathName)
   m_acmEnabled (false),
   m_defaultWfId (3),
   m_minWfId (0),
-  m_maxWfId (23)
+  m_maxWfId (23),
+  m_burstLength (SatEnums::UNKNOWN_BURST)
 {
   NS_LOG_FUNCTION (this);
   ReadFromFile (filePathName);
 
-  m_supportedBurstLengthsInSymbols.push_back ((uint32_t) SHORT_BURST_LENGTH);
-  m_supportedBurstLengthsInSymbols.push_back ((uint32_t) LONG_BURST_LENGTH);
+  ObjectBase::ConstructSelf (AttributeConstructionList ());
+
+  switch (m_burstLength)
+    {
+      case SatEnums::SHORT_BURST:
+        m_supportedBurstLengthsInSymbols.push_back ((uint32_t) SHORT_BURST_LENGTH);
+        break;
+      case SatEnums::LONG_BURST:
+        m_supportedBurstLengthsInSymbols.push_back ((uint32_t) LONG_BURST_LENGTH);
+        break;
+      case SatEnums::SHORT_AND_LONG_BURST:
+        m_supportedBurstLengthsInSymbols.push_back ((uint32_t) SHORT_BURST_LENGTH);
+        m_supportedBurstLengthsInSymbols.push_back ((uint32_t) LONG_BURST_LENGTH);
+        break;
+      default:
+        NS_FATAL_ERROR ("Incorrect choice of burst length.");
+    }
 }
 
 TypeId
@@ -204,9 +222,24 @@ SatWaveformConf::GetTypeId (void)
                     UintegerValue (3),
                     MakeUintegerAccessor (&SatWaveformConf::m_defaultWfId),
                     MakeUintegerChecker<uint32_t> (3, 22))
+    .AddAttribute ( "BurstLength",
+                    "Default burst length",
+                    EnumValue (SatEnums::SHORT_AND_LONG_BURST),
+                    MakeEnumAccessor (&SatWaveformConf::m_burstLength),
+                    MakeEnumChecker (SatEnums::SHORT_BURST, "ShortBurst",
+                                     SatEnums::LONG_BURST, "LongBurst",
+                                     SatEnums::SHORT_AND_LONG_BURST, "ShortAndLongBurst"))
     .AddConstructor<SatWaveformConf> ()
   ;
   return tid;
+}
+
+TypeId
+SatWaveformConf::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
 }
 
 SatWaveformConf::~SatWaveformConf ()

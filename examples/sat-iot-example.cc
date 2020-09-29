@@ -93,18 +93,29 @@ main (int argc, char *argv[])
 
   simulationHelper->CreateSatScenario ();
 
-  Ptr<SatTrafficHelper> trafficHelper = simulationHelper->GetTrafficHelper ();
   Ptr<SatHelper> satHelper = simulationHelper->GetSatelliteHelper ();
-  trafficHelper->AddPoissonTraffic (SatTrafficHelper::FWD_LINK,
-                                    Seconds (0.1),
-                                    Seconds (1),
-                                    "10Mbps",
-                                    1000,
-                                    satHelper->GetGwUsers (),
-                                    satHelper->GetUtUsers (),
-                                    appStartTime,
-                                    Seconds (simLength),
-                                    Seconds (0.001));
+  Ptr<SatTrafficHelper> trafficHelper = simulationHelper->GetTrafficHelper ();
+  trafficHelper->AddVoipTraffic (SatTrafficHelper::FWD_LINK,
+                                  SatTrafficHelper::G_711_1,
+                                  satHelper->GetGwUsers (),
+                                  satHelper->GetUtUsers (),
+                                  appStartTime,
+                                  Seconds (simLength),
+                                  Seconds (0.001));
+  /*trafficHelper->AddHttpTraffic (SatTrafficHelper::FWD_LINK,
+                                  satHelper->GetGwUsers (),
+                                  satHelper->GetUtUsers (),
+                                  appStartTime,
+                                  Seconds (simLength),
+                                  Seconds (0.001));*/
+
+  /*Config::SetDefault ("ns3::CbrApplication::Interval", StringValue ("1ms"));
+  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (1500));
+  Config::SetDefault ("ns3::SatBbFrameConf::AcmEnabled", BooleanValue (true));
+  Config::SetDefault ("ns3::SatBeamHelper::FadingModel", StringValue ("FadingMarkov"));*/
+  /*simulationHelper->InstallTrafficModel (
+    SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
+    appStartTime, Seconds (simLength), Seconds (0.001));*/
 
   /*
    * Outputs

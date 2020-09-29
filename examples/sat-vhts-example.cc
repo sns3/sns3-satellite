@@ -26,8 +26,6 @@
 #include "ns3/satellite-module.h"
 #include "ns3/applications-module.h"
 #include "ns3/traffic-module.h"
-#include "ns3/flow-monitor.h"
-#include "ns3/flow-monitor-helper.h"
 
 using namespace ns3;
 
@@ -35,66 +33,27 @@ using namespace ns3;
  * \file vhts-example.cc
  * \ingroup satellite
  *
- * \brief TODO
+ * \brief This file allows to create a VHTS scenario
  */
 
 NS_LOG_COMPONENT_DEFINE ("sat-vhts-example");
 
-int
-main (int argc, char *argv[])
+// TODO confirm that
+void EnableRA (std::string raModel, bool dynamicloadControl)
 {
-  // TODO system
-  // TODO FWD
-  // TODO RTN
-  // TODO outputs
-
-  // Variables
-  std::string beams = "8";
-  uint32_t nb_gw = 1;
-  uint32_t endUsersPerUt = 10;
-  uint32_t utsPerBeam = 1;
-
-  Time appStartTime = Seconds (0.001);
-  double simLength = 100.0;
-
-  std::string modcodsUsed = "QPSK_1_TO_3 QPSK_1_TO_2 QPSK_3_TO_5 QPSK_2_TO_3 QPSK_3_TO_4 QPSK_4_TO_5 QPSK_5_TO_6 QPSK_8_TO_9 QPSK_9_TO_10 "
-          "8PSK_3_TO_5 8PSK_2_TO_3 8PSK_3_TO_4 8PSK_5_TO_6 8PSK_8_TO_9 8PSK_9_TO_10 "
-          "16APSK_2_TO_3 16APSK_3_TO_4 16APSK_4_TO_5 16APSK_5_TO_6 16APSK_8_TO_9 16APSK_9_TO_10 "
-          "32APSK_3_TO_4 32APSK_4_TO_5 32APSK_5_TO_6 32APSK_8_TO_9";
-
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
-  Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
-
-  /*
-   * FWD link
-   */
-  // Set defaults TODO default plan ?
-  Config::SetDefault ("ns3::SatConf::FwdUserLinkBandwidth", DoubleValue (2e+09));
-  Config::SetDefault ("ns3::SatConf::FwdFeederLinkBandwidth", DoubleValue (8e+09));
-  Config::SetDefault ("ns3::SatConf::FwdCarrierAllocatedBandwidth", DoubleValue (500e+06));
-  Config::SetDefault ("ns3::SatConf::FwdCarrierRollOff", DoubleValue (0.05));
-
-  // ModCods selection TODO can only choose ModCods with S2X
-  Config::SetDefault ("ns3::SatBeamHelper::DvbVersion", StringValue ("DVB_S2X"));
-  Config::SetDefault ("ns3::SatBbFrameConf::S2XModCodsUsed", StringValue (modcodsUsed));
-  //TODO default MC
-
-  // Link results
-
-
-
-
-
-
-  /*
-   * RTN link
-   */
-  // Set defaults TODO default plan ?
-  Config::SetDefault ("ns3::SatConf::RtnUserLinkBandwidth", DoubleValue (500e+06));
-  Config::SetDefault ("ns3::SatConf::RtnFeederLinkBandwidth", DoubleValue (2e+09));
-
-  // Enable Random Access with CRDSA
-  Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_CRDSA));
+  // Enable Random Access with CRDSA or MARSALA
+  if (raModel == "CRDSA")
+  {
+    Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_CRDSA));
+  }
+  else if (raModel == "MARSALA")
+  {
+    Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_MARSALA));
+  }
+  else
+  {
+    NS_FATAL_ERROR ("Incorrect RA model, aborting...");
+  }
 
   // Set Random Access interference model
   Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
@@ -106,7 +65,7 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (false));
 
   // Set dynamic load control parameters
-  Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableRandomAccessDynamicLoadControl", BooleanValue (false));
+  Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableRandomAccessDynamicLoadControl", BooleanValue (dynamicloadControl));
   Config::SetDefault ("ns3::SatPhyRxCarrierConf::RandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize", UintegerValue (10));
 
   // Set random access parameters
@@ -135,10 +94,71 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_VolumeAllowed", BooleanValue (false));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_VolumeAllowed", BooleanValue (false));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
+}
+
+static void
+SatCourseChange (std::string context, Ptr<const SatMobilityModel> position)
+{
+  auto tracedPosition = DynamicCast<const SatTracedMobilityModel> (position);
+  NS_ASSERT_MSG (tracedPosition != NULL, "Course changed for a non-mobile UT");
+}
+
+int
+main (int argc, char *argv[])
+{
+  // Variables
+  std::string beams = "8";
+  uint32_t nb_gw = 1;
+  uint32_t endUsersPerUt = 10;
+  uint32_t utsPerBeam = 1;
+
+  Time appStartTime = Seconds (0.001);
+  double simLength = 100.0;
+
+  // std::string raModel = "CRDSA";
+  std::string raModel = "MARSALA";
+  bool dynamicloadControl = true;
+
+  std::string modcodsUsed = "QPSK_1_TO_3 QPSK_1_TO_2 QPSK_3_TO_5 QPSK_2_TO_3 QPSK_3_TO_4 QPSK_4_TO_5 QPSK_5_TO_6 QPSK_8_TO_9 QPSK_9_TO_10 "
+          "8PSK_3_TO_5 8PSK_2_TO_3 8PSK_3_TO_4 8PSK_5_TO_6 8PSK_8_TO_9 8PSK_9_TO_10 "
+          "16APSK_2_TO_3 16APSK_3_TO_4 16APSK_4_TO_5 16APSK_5_TO_6 16APSK_8_TO_9 16APSK_9_TO_10 "
+          "32APSK_3_TO_4 32APSK_4_TO_5 32APSK_5_TO_6 32APSK_8_TO_9";
+
+  bool utMobility = true;
+
+  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("sat-vhts-example");
+
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+  Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
+
+  /*
+   * FWD link
+   */
+  // Set defaults TODO default plan ?
+  Config::SetDefault ("ns3::SatConf::FwdUserLinkBandwidth", DoubleValue (2e+09));
+  Config::SetDefault ("ns3::SatConf::FwdFeederLinkBandwidth", DoubleValue (8e+09));
+  Config::SetDefault ("ns3::SatConf::FwdCarrierAllocatedBandwidth", DoubleValue (500e+06));
+  Config::SetDefault ("ns3::SatConf::FwdCarrierRollOff", DoubleValue (0.05));
+
+  // ModCods selection TODO can only choose ModCods with S2X
+  Config::SetDefault ("ns3::SatBeamHelper::DvbVersion", StringValue ("DVB_S2X"));
+  Config::SetDefault ("ns3::SatBbFrameConf::S2XModCodsUsed", StringValue (modcodsUsed));
+  //TODO default MC
+
+
+
+  /*
+   * RTN link
+   */
+  // Set defaults TODO default plan ?
+  Config::SetDefault ("ns3::SatConf::RtnUserLinkBandwidth", DoubleValue (500e+06));
+  Config::SetDefault ("ns3::SatConf::RtnFeederLinkBandwidth", DoubleValue (2e+09));
+
+  EnableRA (raModel, dynamicloadControl);
+
+  Config::SetDefault ("ns3::SatWaveformConf::BurstLength", EnumValue (SatEnums::SHORT_BURST));
 
   // Porteuse
-
-  // Link results
 
   // Other
 
@@ -146,7 +166,6 @@ main (int argc, char *argv[])
   /*
    * Traffics
    */
-  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("sat-vhts-example");
   simulationHelper->SetSimulationTime (simLength);
 
   // We set the UT count and UT user count using attributes when configuring a pre-defined scenario
@@ -166,26 +185,29 @@ main (int argc, char *argv[])
                                   appStartTime,
                                   Seconds (simLength),
                                   Seconds (0.001));
-  /*trafficHelper->AddHttpTraffic (SatTrafficHelper::FWD_LINK,
+  trafficHelper->AddHttpTraffic (SatTrafficHelper::FWD_LINK,
                                   satHelper->GetGwUsers (),
                                   satHelper->GetUtUsers (),
                                   appStartTime,
                                   Seconds (simLength),
-                                  Seconds (0.001));*/
+                                  Seconds (0.001));
 
-  /*Config::SetDefault ("ns3::CbrApplication::Interval", StringValue ("1ms"));
-  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (1500));
-  Config::SetDefault ("ns3::SatBbFrameConf::AcmEnabled", BooleanValue (true));
-  Config::SetDefault ("ns3::SatBeamHelper::FadingModel", StringValue ("FadingMarkov"));*/
-  /*simulationHelper->InstallTrafficModel (
-    SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
-    appStartTime, Seconds (simLength), Seconds (0.001));*/
-
-
-  /*Ptr<SatCnoHelper> satCnoHelper = simulationHelper->GetCnoHelper ();
+  // Link results
+  Ptr<SatCnoHelper> satCnoHelper = simulationHelper->GetCnoHelper ();
   satCnoHelper->UseTracesForDefault (false);
+  // TODO change path
+  for (uint32_t i = 0; i < satHelper->GetBeamHelper ()->GetUtNodes ().GetN (); i++)
+    {
+      satCnoHelper->SetUtNodeCnoFile (satHelper->GetBeamHelper ()->GetUtNodes ().Get (i), SatEnums::FORWARD_USER_CH, "contrib/satellite/data/rxcnotraces/input/BEAM_8_GW_2_channelType_FORWARD_FEEDER_CH");
+    }
 
-  satCnoHelper->SetUtNodeCnoFile (satHelper->GetBeamHelper ()->GetUtNodes ().Get (0), SatEnums::FORWARD_USER_CH, "/home/btauran/Desktop/toto");*/
+  // Mobility
+  if (utMobility)
+    {
+      Ptr<SatMobilityModel> satMobility = satHelper->GetBeamHelper ()->GetGeoSatNode ()->GetObject<SatMobilityModel> ();
+      Ptr<Node> node = satHelper->LoadMobileUtFromFile ("contrib/satellite/data/utpositions/mobiles/scenario0/trajectory"); // TODO change path -> from command line
+      node->GetObject<SatMobilityModel> ()->TraceConnect ("SatCourseChange", "BeamTracer", MakeCallback (SatCourseChange));
+    }
 
   /*
    * Outputs
@@ -198,9 +220,6 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
   ConfigStore outputConfig;
   outputConfig.ConfigureDefaults ();
-
-  // GtkConfigStore configstore;
-  // configstore.ConfigureAttributes();
 
   simulationHelper->RunSimulation ();
   return 0;

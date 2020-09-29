@@ -1735,6 +1735,17 @@ public:
    */
   typedef enum
   {
+    UNKNOWN_BURST = 0,
+    SHORT_BURST = 1,
+    LONG_BURST = 2,
+    SHORT_AND_LONG_BURST = 3
+  } SatWaveFormBurstLength_t;
+
+  /**
+   * \brief Definition for different types of Capacity Request (CR) messages.
+   */
+  typedef enum
+  {
     DA_UNKNOWN = 0,
     DA_RBDC = 1,
     DA_VBDC = 2,
