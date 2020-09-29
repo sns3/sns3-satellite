@@ -82,7 +82,8 @@ void EnableRA (std::string raModel, bool dynamicloadControl)
   Config::SetDefault ("ns3::SatRandomAccessConf::SlottedAlohaSignalingOverheadInBytes", UintegerValue (3));
 
   // Disable CRA and DA
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (false));
+  // TODO keep ?
+  /*Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (false));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_ConstantAssignmentProvided", BooleanValue (false));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_ConstantAssignmentProvided", BooleanValue (false));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
@@ -93,7 +94,7 @@ void EnableRA (std::string raModel, bool dynamicloadControl)
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_VolumeAllowed", BooleanValue (false));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_VolumeAllowed", BooleanValue (false));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_VolumeAllowed", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));*/
 }
 
 static void
@@ -109,17 +110,19 @@ main (int argc, char *argv[])
   // Variables
   std::string beams = "8";
   uint32_t nb_gw = 1;
-  uint32_t endUsersPerUt = 10;
-  uint32_t utsPerBeam = 1;
+  uint32_t endUsersPerUt = 1;
+  uint32_t utsPerBeam = 10;
 
   Time appStartTime = Seconds (0.001);
   double simLength = 100.0;
 
-  // std::string raModel = "CRDSA";
-  std::string raModel = "MARSALA";
+  std::string raModel = "CRDSA";
+  // std::string raModel = "MARSALA";
   bool dynamicloadControl = true;
 
-  std::string modcodsUsed = "QPSK_1_TO_3 QPSK_1_TO_2 QPSK_3_TO_5 QPSK_2_TO_3 QPSK_3_TO_4 QPSK_4_TO_5 QPSK_5_TO_6 QPSK_8_TO_9 QPSK_9_TO_10 "
+  SatEnums::SatWaveFormBurstLength_t burstLength = SatEnums::SHORT_BURST;
+
+  std::string modcodsUsed = "QPSK_1_TO_2 QPSK_3_TO_5 QPSK_2_TO_3 QPSK_3_TO_4 QPSK_4_TO_5 QPSK_5_TO_6 QPSK_8_TO_9 QPSK_9_TO_10 "
           "8PSK_3_TO_5 8PSK_2_TO_3 8PSK_3_TO_4 8PSK_5_TO_6 8PSK_8_TO_9 8PSK_9_TO_10 "
           "16APSK_2_TO_3 16APSK_3_TO_4 16APSK_4_TO_5 16APSK_5_TO_6 16APSK_8_TO_9 16APSK_9_TO_10 "
           "32APSK_3_TO_4 32APSK_4_TO_5 32APSK_5_TO_6 32APSK_8_TO_9";
@@ -140,10 +143,10 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatConf::FwdCarrierAllocatedBandwidth", DoubleValue (500e+06));
   Config::SetDefault ("ns3::SatConf::FwdCarrierRollOff", DoubleValue (0.05));
 
-  // ModCods selection TODO can only choose ModCods with S2X
-  Config::SetDefault ("ns3::SatBeamHelper::DvbVersion", StringValue ("DVB_S2X"));
-  Config::SetDefault ("ns3::SatBbFrameConf::S2XModCodsUsed", StringValue (modcodsUsed));
-  //TODO default MC
+  // ModCods selection
+  Config::SetDefault ("ns3::SatBeamHelper::DvbVersion", StringValue ("DVB_S2"));
+  Config::SetDefault ("ns3::SatBbFrameConf::ModCodsUsed", StringValue (modcodsUsed));
+  Config::SetDefault ("ns3::SatBbFrameConf::DefaultModCod", StringValue ("QPSK_1_TO_2"));
 
 
 
@@ -156,7 +159,7 @@ main (int argc, char *argv[])
 
   EnableRA (raModel, dynamicloadControl);
 
-  Config::SetDefault ("ns3::SatWaveformConf::BurstLength", EnumValue (SatEnums::SHORT_BURST));
+  Config::SetDefault ("ns3::SatWaveformConf::BurstLength", EnumValue (burstLength));
 
   // Porteuse
 
@@ -220,6 +223,49 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
   ConfigStore outputConfig;
   outputConfig.ConfigureDefaults ();
+
+  Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer ();
+
+  s->AddGlobalCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerGwCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerBeamCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddGlobalResourcesGranted (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerGwResourcesGranted (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerUtResourcesGranted (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+  s->AddGlobalResourcesGranted (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerGwResourcesGranted (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtResourcesGranted (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddGlobalFwdFeederLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddGlobalFwdUserLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddGlobalRtnFeederLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddGlobalRtnUserLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddGlobalFwdFeederLinkSinr (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddGlobalFwdUserLinkSinr (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddGlobalRtnFeederLinkSinr (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddGlobalRtnUserLinkSinr (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+  s->AddPerUtFwdCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddPerUtFwdCompositeSinr (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerUtRtnCompositeSinr (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+  s->AddGlobalFwdFeederLinkRxPower (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddGlobalFwdUserLinkRxPower (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddGlobalRtnFeederLinkRxPower (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddGlobalRtnUserLinkRxPower (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddGlobalFwdFeederLinkRxPower (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddGlobalFwdUserLinkRxPower (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddGlobalRtnFeederLinkRxPower (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddGlobalRtnUserLinkRxPower (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   simulationHelper->RunSimulation ();
   return 0;

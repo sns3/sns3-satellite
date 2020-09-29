@@ -450,7 +450,7 @@ private:
   /**
    * String containing all DVB-S2X ModCods used.
    */
-  std::string m_s2XModCodsUsedStr;
+  std::string m_modCodsUsedStr;
 };
 
 } // namespace ns3
