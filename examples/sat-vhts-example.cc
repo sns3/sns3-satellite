@@ -119,6 +119,7 @@ main (int argc, char *argv[])
   std::string raModel = "CRDSA";
   bool dynamicLoadControl = true;
   bool utMobility = true;
+  std::string mobilityPath = "contrib/satellite/data/utpositions/mobiles/scenario0/trajectory";
   std::string burstLengthStr = "ShortBurst";
   SatEnums::SatWaveFormBurstLength_t burstLength = SatEnums::SHORT_BURST;
 
@@ -139,6 +140,7 @@ main (int argc, char *argv[])
   cmd.AddValue ("RaModel", "Random Access model chosen (CRDSA or MARSALA)", raModel);
   cmd.AddValue ("DynamicLoadControl", "Set true to use dynamic load control", dynamicLoadControl);
   cmd.AddValue ("UtMobility", "Set true to use UT mobility", utMobility);
+  cmd.AddValue ("mobilityPath", "Path to the mobility file", mobilityPath); // TODO works if only one UT ?
   cmd.AddValue ("BurstLength", "Burst length (can be ShortBurst, LongBurst or ShortAndLongBurst)", burstLengthStr);
   simulationHelper->AddDefaultUiArguments (cmd);
   cmd.Parse (argc, argv);
@@ -237,7 +239,7 @@ main (int argc, char *argv[])
   if (utMobility)
     {
       Ptr<SatMobilityModel> satMobility = satHelper->GetBeamHelper ()->GetGeoSatNode ()->GetObject<SatMobilityModel> ();
-      Ptr<Node> node = satHelper->LoadMobileUtFromFile ("contrib/satellite/data/utpositions/mobiles/scenario0/trajectory"); // TODO change path -> from command line
+      Ptr<Node> node = satHelper->LoadMobileUtFromFile (mobilityPath);
       node->GetObject<SatMobilityModel> ()->TraceConnect ("SatCourseChange", "BeamTracer", MakeCallback (SatCourseChange));
     }
 
@@ -255,21 +257,21 @@ main (int argc, char *argv[])
 
   Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer ();
 
+  // Capacity request
   s->AddGlobalCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerGwCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerBeamCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-  s->AddGlobalResourcesGranted (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerGwResourcesGranted (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerUtResourcesGranted (SatStatsHelper::OUTPUT_SCALAR_FILE);
-
+  // Granted resources
   s->AddGlobalResourcesGranted (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerGwResourcesGranted (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddGlobalResourcesGranted (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddGlobalResourcesGranted (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_CDF_PLOT);
   s->AddPerUtResourcesGranted (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
+  // Link SINR
   s->AddGlobalFwdFeederLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddGlobalFwdUserLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddGlobalRtnFeederLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
@@ -280,12 +282,21 @@ main (int argc, char *argv[])
   s->AddGlobalRtnFeederLinkSinr (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddGlobalRtnUserLinkSinr (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
+  // SINR
+  s->AddGlobalFwdCompositeSinr (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddGlobalFwdCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdCompositeSinr (SatStatsHelper::OUTPUT_CDF_FILE);
   s->AddPerUtFwdCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdCompositeSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
+  s->AddGlobalRtnCompositeSinr (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddGlobalRtnCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerBeamRtnCompositeSinr (SatStatsHelper::OUTPUT_CDF_FILE);
+  s->AddPerBeamRtnCompositeSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
+  s->AddPerUtRtnCompositeSinr (SatStatsHelper::OUTPUT_CDF_FILE);
   s->AddPerUtRtnCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnCompositeSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
 
-  s->AddPerUtFwdCompositeSinr (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerUtRtnCompositeSinr (SatStatsHelper::OUTPUT_SCALAR_FILE);
-
+  // Link RX Power
   s->AddGlobalFwdFeederLinkRxPower (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddGlobalFwdUserLinkRxPower (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddGlobalRtnFeederLinkRxPower (SatStatsHelper::OUTPUT_SCATTER_FILE);
@@ -295,6 +306,12 @@ main (int argc, char *argv[])
   s->AddGlobalFwdUserLinkRxPower (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddGlobalRtnFeederLinkRxPower (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddGlobalRtnUserLinkRxPower (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+  if (raModel == "MARSALA")
+    {
+      s->AddPerBeamMarsalaCorrelation (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerBeamMarsalaCorrelation (SatStatsHelper::OUTPUT_SCATTER_FILE);
+    }
 
   simulationHelper->RunSimulation ();
   return 0;
