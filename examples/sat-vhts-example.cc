@@ -39,7 +39,7 @@ using namespace ns3;
 NS_LOG_COMPONENT_DEFINE ("sat-vhts-example");
 
 // TODO confirm that
-void EnableRA (std::string raModel, bool dynamicloadControl)
+void EnableRA (std::string raModel, bool dynamicLoadControl)
 {
   // Enable Random Access with CRDSA or MARSALA
   if (raModel == "CRDSA")
@@ -65,7 +65,7 @@ void EnableRA (std::string raModel, bool dynamicloadControl)
   Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (false));
 
   // Set dynamic load control parameters
-  Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableRandomAccessDynamicLoadControl", BooleanValue (dynamicloadControl));
+  Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableRandomAccessDynamicLoadControl", BooleanValue (dynamicLoadControl));
   Config::SetDefault ("ns3::SatPhyRxCarrierConf::RandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize", UintegerValue (10));
 
   // Set random access parameters
@@ -109,17 +109,17 @@ main (int argc, char *argv[])
 {
   // Variables
   std::string beams = "8";
-  uint32_t nb_gw = 1;
-  uint32_t endUsersPerUt = 1;
-  uint32_t utsPerBeam = 10;
+  uint32_t nbGw = 1;
+  uint32_t nbUtsPerBeam = 10;
+  uint32_t nbEndUsersPerUt = 1;
 
   Time appStartTime = Seconds (0.001);
-  double simLength = 100.0;
+  Time simLength = Seconds (100.0);
 
   std::string raModel = "CRDSA";
-  // std::string raModel = "MARSALA";
-  bool dynamicloadControl = true;
-
+  bool dynamicLoadControl = true;
+  bool utMobility = true;
+  std::string burstLengthStr = "ShortBurst";
   SatEnums::SatWaveFormBurstLength_t burstLength = SatEnums::SHORT_BURST;
 
   std::string modcodsUsed = "QPSK_1_TO_2 QPSK_3_TO_5 QPSK_2_TO_3 QPSK_3_TO_4 QPSK_4_TO_5 QPSK_5_TO_6 QPSK_8_TO_9 QPSK_9_TO_10 "
@@ -127,9 +127,38 @@ main (int argc, char *argv[])
           "16APSK_2_TO_3 16APSK_3_TO_4 16APSK_4_TO_5 16APSK_5_TO_6 16APSK_8_TO_9 16APSK_9_TO_10 "
           "32APSK_3_TO_4 32APSK_4_TO_5 32APSK_5_TO_6 32APSK_8_TO_9";
 
-  bool utMobility = true;
-
   Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("sat-vhts-example");
+
+  // Read command line parameters given by user
+  CommandLine cmd;
+  cmd.AddValue ("NbGw", "Number of GWs per UT", nbGw);
+  cmd.AddValue ("NbUtsPerBeam", "Number of UTs per spot-beam", nbUtsPerBeam);
+  cmd.AddValue ("NbEndUsersPerUt", "Number of end users per UT", nbEndUsersPerUt);
+  cmd.AddValue ("AppStartTime", "Applications start time (in seconds, or add unit)", appStartTime);
+  cmd.AddValue ("SimLength", "Simulation length (in seconds, or add unit)", simLength);
+  cmd.AddValue ("RaModel", "Random Access model chosen (CRDSA or MARSALA)", raModel);
+  cmd.AddValue ("DynamicLoadControl", "Set true to use dynamic load control", dynamicLoadControl);
+  cmd.AddValue ("UtMobility", "Set true to use UT mobility", utMobility);
+  cmd.AddValue ("BurstLength", "Burst length (can be ShortBurst, LongBurst or ShortAndLongBurst)", burstLengthStr);
+  simulationHelper->AddDefaultUiArguments (cmd);
+  cmd.Parse (argc, argv);
+
+  if (burstLengthStr == "ShortBurst")
+    {
+      burstLength = SatEnums::SHORT_BURST;
+    }
+  else if (burstLengthStr == "LongBurst")
+    {
+      burstLength = SatEnums::LONG_BURST;
+    }
+  else if (burstLengthStr == "ShortAndLongBurst")
+    {
+      burstLength = SatEnums::SHORT_AND_LONG_BURST;
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Incorrect burst size");
+    }
 
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
   Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
@@ -157,7 +186,7 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatConf::RtnUserLinkBandwidth", DoubleValue (500e+06));
   Config::SetDefault ("ns3::SatConf::RtnFeederLinkBandwidth", DoubleValue (2e+09));
 
-  EnableRA (raModel, dynamicloadControl);
+  EnableRA (raModel, dynamicLoadControl);
 
   Config::SetDefault ("ns3::SatWaveformConf::BurstLength", EnumValue (burstLength));
 
@@ -172,9 +201,9 @@ main (int argc, char *argv[])
   simulationHelper->SetSimulationTime (simLength);
 
   // We set the UT count and UT user count using attributes when configuring a pre-defined scenario
-  simulationHelper->SetGwUserCount (nb_gw);
-  simulationHelper->SetUtCountPerBeam (utsPerBeam);
-  simulationHelper->SetUserCountPerUt (endUsersPerUt);
+  simulationHelper->SetGwUserCount (nbGw);
+  simulationHelper->SetUtCountPerBeam (nbUtsPerBeam);
+  simulationHelper->SetUserCountPerUt (nbEndUsersPerUt);
   simulationHelper->SetBeams (beams);
 
   simulationHelper->CreateSatScenario ();
@@ -186,13 +215,13 @@ main (int argc, char *argv[])
                                   satHelper->GetGwUsers (),
                                   satHelper->GetUtUsers (),
                                   appStartTime,
-                                  Seconds (simLength),
+                                  simLength,
                                   Seconds (0.001));
   trafficHelper->AddHttpTraffic (SatTrafficHelper::FWD_LINK,
                                   satHelper->GetGwUsers (),
                                   satHelper->GetUtUsers (),
                                   appStartTime,
-                                  Seconds (simLength),
+                                  simLength,
                                   Seconds (0.001));
 
   // Link results
