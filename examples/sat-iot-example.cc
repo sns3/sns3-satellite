@@ -63,7 +63,7 @@ main (int argc, char *argv[])
 
   // Read command line parameters given by user
   CommandLine cmd;
-  cmd.AddValue ("NbGw", "Number of GWs per UT", nbGw);
+  cmd.AddValue ("NbGw", "Number of GWs", nbGw);
   cmd.AddValue ("NbUtsPerBeam", "Number of UTs per spot-beam", nbUtsPerBeam);
   cmd.AddValue ("NbEndUsersPerUt", "Number of end users per UT", nbEndUsersPerUt);
   cmd.AddValue ("QueueSize", "Satellite queue sizes in packets", queueSize);
