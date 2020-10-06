@@ -219,6 +219,20 @@ main (int argc, char *argv[])
   s->AddGlobalRtnFeederLinkRxPower (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddGlobalRtnUserLinkRxPower (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
+  // return link load
+  s->AddGlobalFrameUserLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerGwFrameUserLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamFrameUserLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+  s->AddGlobalFrameUserLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerGwFrameUserLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamFrameUserLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+  // Frame type usage
+  s->AddGlobalFrameTypeUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+
+
   // GtkConfigStore config;
   // config.ConfigureAttributes ();
 

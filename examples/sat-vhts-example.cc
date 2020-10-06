@@ -307,6 +307,9 @@ main (int argc, char *argv[])
   s->AddGlobalRtnFeederLinkRxPower (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddGlobalRtnUserLinkRxPower (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
+  // Frame type usage
+  s->AddGlobalFrameTypeUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
   if (raModel == "MARSALA")
     {
       s->AddPerBeamMarsalaCorrelation (SatStatsHelper::OUTPUT_SCALAR_FILE);
