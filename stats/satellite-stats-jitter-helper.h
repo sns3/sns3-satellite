@@ -143,6 +143,65 @@ private:
 
 }; // end of class SatStatsJitterHelper
 
+// FORWARD LINK APPLICATION-LEVEL /////////////////////////////////////////////
+
+class Probe;
+
+
+class SatStatsFwdAppJitterHelper : public SatStatsJitterHelper
+{
+public:
+  // inherited from SatStatsHelper base class
+  SatStatsFwdAppJitterHelper (Ptr<const SatHelper> satHelper);
+
+
+  /**
+   * Destructor for SatStatsFwdAppJitterHelper.
+   */
+  virtual ~SatStatsFwdAppJitterHelper ();
+
+
+  /**
+   * inherited from ObjectBase base class
+   */
+  static TypeId GetTypeId ();
+
+  /**
+   * \brief Receive inputs from trace sources and determine the right collector
+   *        to forward the inputs to.
+   * \param helper Pointer to the jitter statistics collector helper
+   * \param identifier Identifier used to group statistics.
+   * \param packet the received packet, expected to have been tagged with
+   *               TrafficTimeTag.
+   * \param from the InetSocketAddress of the sender of the packet.
+   */
+  static void RxCallback (Ptr<SatStatsFwdAppJitterHelper> helper,
+                          uint32_t identifier,
+                          Ptr<const Packet> packet,
+                          const Address &from);
+
+  /**
+   * \brief Returns the previous delay mesurment for given identifier,
+   *        and update with new value measured
+   * \param identifier Identifier used to group statistics.
+   * \param newDelay new delay measurement
+   * \return Previous delay measurement or zero if not value is stored
+   */
+  Time GetAndUpdatePreviousDelay (uint32_t identifier, Time newDelay);
+
+protected:
+  // inherited from SatStatsFwdAppJitterHelper base class
+  void DoInstallProbes ();
+
+private:
+  /// Maintains a list of probes created by this helper.
+  std::list<Ptr<Probe> > m_probes;
+
+  /// Stores the last delay to a UT to compute jitter
+  std::map<uint32_t, Time> m_previousDelayMap;
+
+}; // end of class SatStatsFwdAppJitterHelper
+
 
 // FORWARD LINK DEVICE-LEVEL /////////////////////////////////////////////////////
 
@@ -236,6 +295,64 @@ private:
 
 }; // end of class SatStatsFwdPhyJitterHelper
 
+// RETURN LINK APPLICATION-LEVEL //////////////////////////////////////////////
+
+class SatStatsRtnAppJitterHelper : public SatStatsJitterHelper
+{
+public:
+  // inherited from SatStatsHelper base class
+  SatStatsRtnAppJitterHelper (Ptr<const SatHelper> satHelper);
+
+
+  /**
+   * / Destructor.
+   */
+  virtual ~SatStatsRtnAppJitterHelper ();
+
+
+  /**
+   * inherited from ObjectBase base class
+   */
+  static TypeId GetTypeId ();
+
+  /**
+   * \brief Receive inputs from trace sources and determine the right collector
+   *        to forward the inputs to.
+   * \param packet the received packet, expected to have been tagged with
+   *               TrafficTimeTag.
+   * \param from the InetSocketAddress of the sender of the packet.
+   */
+  void RxCallback (Ptr<const Packet> packet, const Address &from);
+
+  /**
+   * \brief Receive inputs from trace sources and determine the right collector
+   *        to forward the inputs to.
+   * \param jitter packet jitter.
+   * \param from the InetSocketAddress of the sender of the packet.
+   */
+  void Ipv4Callback (const Time &jitter, const Address &from);
+
+protected:
+  // inherited from SatStatsRtnAppJitterHelper base class
+  void DoInstallProbes ();
+
+private:
+  /**
+   * \brief Save the IPv4 address and the proper identifier from the given
+   *        UT user node.
+   * \param utUserNode a UT user node.
+   *
+   * Any addresses found in the given node will be saved in the
+   * #m_identifierMap member variable.
+   */
+  void SaveIpv4AddressAndIdentifier (Ptr<Node> utUserNode);
+
+  /// Stores the last delay to a UT to compute jitter
+  std::map<const Address, Time> m_previousDelayMap;
+
+  /// \todo Write SaveIpv6Address() method.
+
+}; // end of class SatStatsRtnAppJitterHelper
 
 // RETURN LINK DEVICE-LEVEL //////////////////////////////////////////////
 

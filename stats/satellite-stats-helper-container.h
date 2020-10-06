@@ -40,7 +40,9 @@ namespace ns3 {
  * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] [Dev, Mac, Phy] Delay
  * - AddAverage [Beam, Ut, UtUser] [Fwd, Rtn] AppDelay
  * - AddAverage [Beam, Ut] [Fwd, Rtn] [Dev, Mac, Phy] Delay
+ * - Add [Global, PerGw, PerBeam, PerUt, PerUtUser] [Fwd, Rtn] AppJitter
  * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] [Dev, Mac, Phy] Jitter
+ * - AddAverage [Beam, Ut, UtUser] [Fwd, Rtn] AppJitter
  * - AddAverage [Beam, Ut] [Fwd, Rtn] [Dev, Mac, Phy] Jitter
  * - Add [Global, PerGw, PerBeam, PerUt, PerUtUser] [Fwd, Rtn] AppPlt
  * - AddAverage [Beam, Ut, UtUser] [Fwd, Rtn] AppPlt
@@ -153,6 +155,12 @@ public:
   void AddAverageBeamFwdPhyDelay (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtFwdPhyDelay (SatStatsHelper::OutputType_t outputType);
 
+  // Forward link application-level packet jitter statistics.
+  SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (FwdAppJitter)
+  void AddAverageBeamFwdAppJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtFwdAppJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtUserFwdAppJitter (SatStatsHelper::OutputType_t outputType);
+
   // Forward link device-level packet Jitter statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdDevJitter)
   void AddAverageBeamFwdDevJitter (SatStatsHelper::OutputType_t outputType);
@@ -227,6 +235,12 @@ public:
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnPhyDelay)
   void AddAverageBeamRtnPhyDelay (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtRtnPhyDelay (SatStatsHelper::OutputType_t outputType);
+
+  // Return link application-level packet jitter statistics.
+  SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (RtnAppJitter)
+  void AddAverageBeamRtnAppJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRtnAppJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtUserRtnAppJitter (SatStatsHelper::OutputType_t outputType);
 
   // Return link device-level packet jitter statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnDevJitter)

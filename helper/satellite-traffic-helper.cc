@@ -715,31 +715,37 @@ SatTrafficHelper::AddVoipTraffic (TrafficDirection_t direction,
   if (direction == FWD_LINK)
     {
       // Global scalar
+      m_satStatsHelperContainer->AddGlobalFwdAppJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
       m_satStatsHelperContainer->AddGlobalFwdDevJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
       m_satStatsHelperContainer->AddGlobalFwdMacJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
       m_satStatsHelperContainer->AddGlobalFwdPhyJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
       // Global scatter
+      m_satStatsHelperContainer->AddGlobalFwdAppJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
       m_satStatsHelperContainer->AddGlobalFwdDevJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
       m_satStatsHelperContainer->AddGlobalFwdMacJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
       m_satStatsHelperContainer->AddGlobalFwdPhyJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
       // Per UT scalar
+      m_satStatsHelperContainer->AddPerUtFwdAppJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
       m_satStatsHelperContainer->AddPerUtFwdDevJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
       m_satStatsHelperContainer->AddPerUtFwdMacJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
       m_satStatsHelperContainer->AddPerUtFwdPhyJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
       // Per UT scatter
+      m_satStatsHelperContainer->AddPerUtFwdAppJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
       m_satStatsHelperContainer->AddPerUtFwdDevJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
       m_satStatsHelperContainer->AddPerUtFwdMacJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
       m_satStatsHelperContainer->AddPerUtFwdPhyJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
       // Per GW scalar
+      m_satStatsHelperContainer->AddPerGwFwdAppJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
       m_satStatsHelperContainer->AddPerGwFwdDevJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
       m_satStatsHelperContainer->AddPerGwFwdMacJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
       m_satStatsHelperContainer->AddPerGwFwdPhyJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
       // Per GW scatter
+      m_satStatsHelperContainer->AddPerGwFwdAppJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
       m_satStatsHelperContainer->AddPerGwFwdDevJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
       m_satStatsHelperContainer->AddPerGwFwdMacJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
       m_satStatsHelperContainer->AddPerGwFwdPhyJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
@@ -747,31 +753,37 @@ SatTrafficHelper::AddVoipTraffic (TrafficDirection_t direction,
   else if (direction == RTN_LINK)
     {
       // Global scalar
+      m_satStatsHelperContainer->AddGlobalRtnAppJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
       m_satStatsHelperContainer->AddGlobalRtnDevJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
       m_satStatsHelperContainer->AddGlobalRtnMacJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
       m_satStatsHelperContainer->AddGlobalRtnPhyJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
       // Global scatter
+      m_satStatsHelperContainer->AddGlobalRtnAppJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
       m_satStatsHelperContainer->AddGlobalRtnDevJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
       m_satStatsHelperContainer->AddGlobalRtnMacJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
       m_satStatsHelperContainer->AddGlobalRtnPhyJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
       // Per UT scalar
+      m_satStatsHelperContainer->AddPerUtRtnAppJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
       m_satStatsHelperContainer->AddPerUtRtnDevJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
       m_satStatsHelperContainer->AddPerUtRtnMacJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
       m_satStatsHelperContainer->AddPerUtRtnPhyJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
       // Per UT scatter
+      m_satStatsHelperContainer->AddPerUtRtnAppJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
       m_satStatsHelperContainer->AddPerUtRtnDevJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
       m_satStatsHelperContainer->AddPerUtRtnMacJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
       m_satStatsHelperContainer->AddPerUtRtnPhyJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
       // Per GW scalar
+      m_satStatsHelperContainer->AddPerGwRtnAppJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
       m_satStatsHelperContainer->AddPerGwRtnDevJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
       m_satStatsHelperContainer->AddPerGwRtnMacJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
       m_satStatsHelperContainer->AddPerGwRtnPhyJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
       // Per GW scatter
+      m_satStatsHelperContainer->AddPerGwRtnAppJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
       m_satStatsHelperContainer->AddPerGwRtnDevJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
       m_satStatsHelperContainer->AddPerGwRtnMacJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
       m_satStatsHelperContainer->AddPerGwRtnPhyJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);

@@ -579,6 +579,176 @@ SatStatsJitterHelper::PassSampleToCollector (const Time &jitter, uint32_t identi
 
 } // end of `void PassSampleToCollector (Time, uint32_t)`
 
+// FORWARD LINK APPLICATION-LEVEL /////////////////////////////////////////////
+
+NS_OBJECT_ENSURE_REGISTERED (SatStatsFwdAppJitterHelper);
+
+SatStatsFwdAppJitterHelper::SatStatsFwdAppJitterHelper (Ptr<const SatHelper> satHelper)
+  : SatStatsJitterHelper (satHelper)
+{
+  NS_LOG_FUNCTION (this << satHelper);
+}
+
+
+SatStatsFwdAppJitterHelper::~SatStatsFwdAppJitterHelper ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsFwdAppJitterHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsFwdAppJitterHelper")
+    .SetParent<SatStatsJitterHelper> ()
+  ;
+  return tid;
+}
+
+
+void
+SatStatsFwdAppJitterHelper::DoInstallProbes ()
+{
+  NS_LOG_FUNCTION (this);
+  NodeContainer utUsers = GetSatHelper ()->GetUtUsers ();
+
+  for (NodeContainer::Iterator it = utUsers.Begin (); it != utUsers.End (); ++it)
+    {
+      const int32_t utUserId = GetUtUserId (*it);
+      NS_ASSERT_MSG (utUserId > 0,
+                     "Node " << (*it)->GetId () << " is not a valid UT user");
+      const uint32_t identifier = GetIdentifierForUtUser (*it);
+
+      for (uint32_t i = 0; i < (*it)->GetNApplications (); i++)
+        {
+          Ptr<Application> app = (*it)->GetApplication (i);
+          bool isConnected = false;
+
+          /*
+           * Some applications support RxJitter trace sources, and some other
+           * applications support Rx trace sources. Below we support both ways.
+           */
+          if (app->GetInstanceTypeId ().LookupTraceSourceByName ("RxJitter") != 0)
+            {
+              NS_LOG_INFO (this << " attempt to connect using RxJitter");
+
+              // Create the probe.
+              std::ostringstream probeName;
+              probeName << utUserId << "-" << i;
+              Ptr<ApplicationDelayProbe> probe = CreateObject<ApplicationDelayProbe> ();
+              probe->SetName (probeName.str ());
+
+              // Connect the object to the probe.
+              if (probe->ConnectByObject ("RxJitter", app))
+                {
+                  isConnected = ConnectProbeToCollector (probe, identifier);
+                  m_probes.push_back (probe->GetObject<Probe> ());
+                }
+            }
+          else if (app->GetInstanceTypeId ().LookupTraceSourceByName ("Rx") != 0)
+            {
+              NS_LOG_INFO (this << " attempt to connect using Rx");
+              Callback<void, Ptr<const Packet>, const Address &> rxCallback
+                = MakeBoundCallback (&SatStatsFwdAppJitterHelper::RxCallback,
+                                     this,
+                                     identifier);
+              isConnected = app->TraceConnectWithoutContext ("Rx",
+                                                             rxCallback);
+            }
+
+          if (isConnected)
+            {
+              NS_LOG_INFO (this << " successfully connected"
+                                << " with node ID " << (*it)->GetId ()
+                                << " application #" << i);
+            }
+          else
+            {
+              /*
+               * We're being tolerant here by only logging a warning, because
+               * not every kind of Application is equipped with the expected
+               * RxJitter or Rx trace source.
+               */
+              NS_LOG_WARN (this << " unable to connect"
+                                << " with node ID " << (*it)->GetId ()
+                                << " application #" << i);
+            }
+
+        } // end of `for (i = 0; i < (*it)->GetNApplications (); i++)`
+
+    } // end of `for (it = utUsers.Begin(); it != utUsers.End (); ++it)`
+
+  /*
+   * Some sender applications might need a special attribute to be enabled
+   * before jitter statistics can be computed. We enable it here.
+   */
+  NodeContainer gwUsers = GetSatHelper ()->GetGwUsers ();
+  for (NodeContainer::Iterator it = gwUsers.Begin (); it != gwUsers.End (); ++it)
+    {
+      for (uint32_t i = 0; i < (*it)->GetNApplications (); i++)
+        {
+          Ptr<Application> app = (*it)->GetApplication (i);
+
+          if (!app->SetAttributeFailSafe ("EnableStatisticsTags",
+                                          BooleanValue (true)))
+            {
+              NS_LOG_WARN (this << " node ID " << (*it)->GetId ()
+                                << " application #" << i
+                                << " might not produce the required tags"
+                                << " in the packets it transmits,"
+                                << " thus preventing jitter statistics"
+                                << " from this application");
+            }
+
+        } // end of `for (i = 0; i < (*it)->GetNApplications (); i++)`
+
+    } // end of `for (it = gwUsers.Begin(); it != gwUsers.End (); ++it)`
+
+} // end of `void DoInstallProbes ();`
+
+Time
+SatStatsFwdAppJitterHelper::GetAndUpdatePreviousDelay (uint32_t identifier, Time newDelay)
+{
+  NS_LOG_FUNCTION (identifier);
+
+  Time delay = Seconds (0);
+  std::map<uint32_t,Time>::iterator it = m_previousDelayMap.find(identifier);
+  if(it != m_previousDelayMap.end())
+    {
+      delay = it->second;
+    }
+  m_previousDelayMap[identifier] = newDelay;
+  return delay;
+}
+
+void // static
+SatStatsFwdAppJitterHelper::RxCallback (Ptr<SatStatsFwdAppJitterHelper> helper,
+                                       uint32_t identifier,
+                                       Ptr<const Packet> packet,
+                                       const Address &from)
+{
+  NS_LOG_FUNCTION (helper << identifier << packet << packet->GetSize () << from);
+
+  TrafficTimeTag timeTag;
+  if (packet->PeekPacketTag (timeTag))
+    {
+      NS_LOG_DEBUG ("Contains a TrafficTimeTag tag");
+      const Time delay = Simulator::Now () - timeTag.GetSenderTimestamp ();
+      Time previousDelay = helper->GetAndUpdatePreviousDelay (identifier, delay);
+      if(previousDelay != 0)
+      {
+         Time jitter = Abs (delay - previousDelay);
+         helper->PassSampleToCollector (jitter, identifier);
+      }
+    }
+  else
+    {
+      NS_LOG_WARN ("Discarding a packet of " << packet->GetSize ()
+                                             << " from statistics collection"
+                                             << " because it does not contain any TrafficTimeTag");
+    }
+}
+
 // FORWARD LINK DEVICE-LEVEL //////////////////////////////////////////////////
 
 NS_OBJECT_ENSURE_REGISTERED (SatStatsFwdDevJitterHelper);
@@ -843,6 +1013,218 @@ SatStatsFwdPhyJitterHelper::DoInstallProbes ()
     }
 
 } // end of `void DoInstallProbes ();`
+
+// RETURN LINK APPLICATION-LEVEL //////////////////////////////////////////////
+
+NS_OBJECT_ENSURE_REGISTERED (SatStatsRtnAppJitterHelper);
+
+SatStatsRtnAppJitterHelper::SatStatsRtnAppJitterHelper (Ptr<const SatHelper> satHelper)
+  : SatStatsJitterHelper (satHelper)
+{
+  NS_LOG_FUNCTION (this << satHelper);
+}
+
+
+SatStatsRtnAppJitterHelper::~SatStatsRtnAppJitterHelper ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsRtnAppJitterHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsRtnAppJitterHelper")
+    .SetParent<SatStatsJitterHelper> ()
+  ;
+  return tid;
+}
+
+
+void
+SatStatsRtnAppJitterHelper::DoInstallProbes ()
+{
+  NS_LOG_FUNCTION (this);
+
+  NodeContainer utUsers = GetSatHelper ()->GetUtUsers ();
+  for (NodeContainer::Iterator it = utUsers.Begin ();
+       it != utUsers.End (); ++it)
+    {
+      // Create a map of UT user addresses and identifiers.
+      SaveIpv4AddressAndIdentifier (*it);
+
+      /*
+       * Some sender applications might need a special attribute to be enabled
+       * before jitter statistics can be computed. We enable it here.
+       */
+      for (uint32_t i = 0; i < (*it)->GetNApplications (); i++)
+        {
+          Ptr<Application> app = (*it)->GetApplication (i);
+
+          if (!app->SetAttributeFailSafe ("EnableStatisticsTags",
+                                          BooleanValue (true)))
+            {
+              NS_LOG_WARN (this << " node ID " << (*it)->GetId ()
+                                << " application #" << i
+                                << " might not produce the required tags"
+                                << " in the transmitted packets,"
+                                << " thus preventing jitter statistics"
+                                << " from this sender application");
+            }
+
+        } // end of `for (i = 0; i < (*it)->GetNApplications (); i++)`
+
+    } // end of `for (NodeContainer::Iterator it: utUsers)`
+
+  // Connect to trace sources at GW user node's applications.
+
+  NodeContainer gwUsers = GetSatHelper ()->GetGwUsers ();
+  Callback<void, const Time &, const Address &> rxJitterCallback
+    = MakeCallback (&SatStatsRtnAppJitterHelper::Ipv4Callback, this);
+  Callback<void, Ptr<const Packet>, const Address &> rxCallback
+    = MakeCallback (&SatStatsRtnAppJitterHelper::RxCallback, this);
+
+  for (NodeContainer::Iterator it = gwUsers.Begin ();
+       it != gwUsers.End (); ++it)
+    {
+      for (uint32_t i = 0; i < (*it)->GetNApplications (); i++)
+        {
+          Ptr<Application> app = (*it)->GetApplication (i);
+          bool isConnected = false;
+
+          /*
+           * Some applications support RxJitter trace sources, and some other
+           * applications support Rx trace sources. Below we support both ways.
+           */
+          if (app->GetInstanceTypeId ().LookupTraceSourceByName ("RxJitter") != 0)
+            {
+              isConnected = app->TraceConnectWithoutContext ("RxJitter",
+                                                             rxJitterCallback);
+            }
+          else if (app->GetInstanceTypeId ().LookupTraceSourceByName ("Rx") != 0)
+            {
+              isConnected = app->TraceConnectWithoutContext ("Rx",
+                                                             rxCallback);
+            }
+
+          if (isConnected)
+            {
+              NS_LOG_INFO (this << " successfully connected"
+                                << " with node ID " << (*it)->GetId ()
+                                << " application #" << i);
+            }
+          else
+            {
+              /*
+               * We're being tolerant here by only logging a warning, because
+               * not every kind of Application is equipped with the expected
+               * RxJitter or Rx trace source.
+               */
+              NS_LOG_WARN (this << " unable to connect"
+                                << " with node ID " << (*it)->GetId ()
+                                << " application #" << i);
+            }
+
+        } // end of `for (i = 0; i < (*it)->GetNApplications (); i++)`
+
+    } // end of `for (NodeContainer::Iterator it: gwUsers)`
+
+} // end of `void DoInstallProbes ();`
+
+void
+SatStatsRtnAppJitterHelper::RxCallback (Ptr<const Packet> packet,
+                                       const Address &from)
+{
+  TrafficTimeTag timeTag;
+  if (packet->PeekPacketTag (timeTag))
+    {
+      NS_LOG_DEBUG (this << " contains a TrafficTimeTag tag");
+      const Time delay = Simulator::Now () - timeTag.GetSenderTimestamp ();
+      const Address identifier = InetSocketAddress::ConvertFrom (from).GetIpv4 ();
+      std::map<const Address,Time>::iterator it = m_previousDelayMap.find(identifier);
+      if(it != m_previousDelayMap.end())
+      {
+         Time previousDelay = it->second;
+         Time jitter = Abs (delay - previousDelay);
+         Ipv4Callback (jitter, from);
+      }
+      m_previousDelayMap[identifier] = delay;
+    }
+  else
+    {
+      NS_LOG_WARN (this << " discarding a packet of " << packet->GetSize ()
+                        << " from statistics collection"
+                        << " because it does not contain any TrafficTimeTag");
+    }
+} // end of `void RxCallback (Ptr<const Packet>, const Address);`
+
+
+void
+SatStatsRtnAppJitterHelper::Ipv4Callback (const Time &jitter, const Address &from)
+{
+  //NS_LOG_FUNCTION (this << Time.GetSeconds () << from);
+
+  if (InetSocketAddress::IsMatchingType (from))
+    {
+      // Determine the identifier associated with the sender address.
+      const Address ipv4Addr = InetSocketAddress::ConvertFrom (from).GetIpv4 ();
+      std::map<const Address, uint32_t>::const_iterator it1 = m_identifierMap.find (ipv4Addr);
+
+      if (it1 == m_identifierMap.end ())
+        {
+          NS_LOG_WARN (this << " discarding a packet jitter of " << jitter.GetSeconds ()
+                            << " from statistics collection because of"
+                            << " unknown sender IPV4 address " << ipv4Addr);
+        }
+      else
+        {
+          PassSampleToCollector (jitter, it1->second);
+        }
+    }
+  else
+    {
+      NS_LOG_WARN (this << " discarding a packet jitter of " << jitter.GetSeconds ()
+                        << " from statistics collection"
+                        << " because it comes from sender " << from
+                        << " without valid InetSocketAddress");
+    }
+}
+
+
+void
+SatStatsRtnAppJitterHelper::SaveIpv4AddressAndIdentifier (Ptr<Node> utUserNode)
+{
+  NS_LOG_FUNCTION (this << utUserNode->GetId ());
+
+  Ptr<Ipv4> ipv4 = utUserNode->GetObject<Ipv4> ();
+
+  if (ipv4 == 0)
+    {
+      NS_LOG_INFO (this << " Node " << utUserNode->GetId ()
+                        << " does not support IPv4 protocol");
+    }
+  else if (ipv4->GetNInterfaces () >= 2)
+    {
+      const uint32_t identifier = GetIdentifierForUtUser (utUserNode);
+
+      /*
+       * Assuming that #0 is for loopback interface and #1 is for subscriber
+       * network interface.
+       */
+      for (uint32_t i = 0; i < ipv4->GetNAddresses (1); i++)
+        {
+          const Address addr = ipv4->GetAddress (1, i).GetLocal ();
+          m_identifierMap[addr] = identifier;
+          NS_LOG_INFO (this << " associated address " << addr
+                            << " with identifier " << identifier);
+        }
+    }
+  else
+    {
+      NS_LOG_WARN (this << " Node " << utUserNode->GetId ()
+                        << " is not a valid UT user");
+    }
+}
 
 // RETURN LINK DEVICE-LEVEL ///////////////////////////////////////////////////
 

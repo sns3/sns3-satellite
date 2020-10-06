@@ -79,7 +79,9 @@ SatStatsHelperContainer::DoDispose ()
  * - [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] [Dev, Mac, Phy] Delay
  * - Average [Beam, Ut, UtUser] [Fwd, Rtn] AppDelay
  * - Average [Beam, Ut] [Fwd, Rtn] [Dev, Mac, Phy] Delay
+ * - [Global, PerGw, PerBeam, PerUt, PerUtUser] [Fwd, Rtn] AppJitter
  * - [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] [Dev, Mac, Phy] Jitter
+ * - Average [Beam, Ut, UtUser] [Fwd, Rtn] AppJitter
  * - Average [Beam, Ut] [Fwd, Rtn] [Dev, Mac, Phy] Jitter
  * - [Global, PerGw, PerBeam, PerUt, PerUtUser] [Fwd, Rtn] AppPlt
  * - Average [Beam, Ut, UtUser] [Fwd, Rtn] AppPlt
@@ -217,6 +219,18 @@ SatStatsHelperContainer::GetTypeId ()
     ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdPhyDelay,
         "forward link PHY-level delay statistics")
 
+    // Forward link application-level packet jitter statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdAppJitter,
+        "forward link application-level jitter statistics")
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUtUserFwdAppJitter,
+        "per UT user forward link application-level jitter statistics")
+    ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdAppJitter,
+        "forward link application-level jitter statistics")
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (AverageUtUserFwdAppJitter,
+        "average UT user forward link application-level jitter statistics")
+    ADD_SAT_STATS_AVERAGED_DISTRIBUTION_OUTPUT_CHECKER
+
     // Forward link device-level packet jitter statistics.
     ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdDevJitter,
         "forward link device-level jitter statistics")
@@ -322,6 +336,18 @@ SatStatsHelperContainer::GetTypeId ()
         "return link PHY-level delay statistics")
     ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnPhyDelay,
         "return link PHY-level delay statistics")
+
+    // Return link application-level packet jitter statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnAppJitter,
+        "return link application-level jitter statistics")
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUtUserRtnAppJitter,
+        "per UT user return link application-level jitter statistics")
+    ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnAppJitter,
+        "return link application-level jitter statistics")
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (AverageUtUserRtnAppJitter,
+        "average UT user return link application-level jitter statistics")
+    ADD_SAT_STATS_AVERAGED_DISTRIBUTION_OUTPUT_CHECKER
 
     // Return link device-level packet jitter statistics.
     ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnDevJitter,
@@ -584,7 +610,9 @@ SatStatsHelperContainer::GetName () const
  * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] [Dev, Mac, Phy] Delay
  * - AddAverage [Beam, Ut, UtUser] [Fwd, Rtn] AppDelay
  * - AddAverage [Beam, Ut] [Fwd, Rtn] [Dev, Mac, Phy] Delay
+ * - Add [Global, PerGw, PerBeam, PerUt, PerUtUser] [Fwd, Rtn] AppJitter
  * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] [Dev, Mac, Phy] Jitter
+ * - AddAverage [Beam, Ut, UtUser] [Fwd, Rtn] AppJitter
  * - AddAverage [Beam, Ut] [Fwd, Rtn] [Dev, Mac, Phy] Jitter
  * - Add [Global, PerGw, PerBeam, PerUt, PerUtUser] [Fwd, Rtn] AppPlt
  * - AddAverage [Beam, Ut, UtUser] [Fwd, Rtn] AppPlt
@@ -809,6 +837,16 @@ SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdPhyDelay, "fwd-phy-delay")
 SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdPhyDelay, "fwd-phy-delay")
 SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdPhyDelay, "fwd-phy-delay")
 
+// Forward link application-level packet jitter statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdAppJitter, "fwd-app-jitter")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdAppJitter, "fwd-app-jitter")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdAppJitter, "fwd-app-jitter")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdAppJitter, "fwd-app-jitter")
+SAT_STATS_PER_UT_USER_METHOD_DEFINITION  (FwdAppJitter, "fwd-app-jitter")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdAppJitter, "fwd-app-jitter")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdAppJitter, "fwd-app-jitter")
+SAT_STATS_AVERAGE_UT_USER_METHOD_DEFINITION (FwdAppJitter, "fwd-app-jitter")
+
 // Forward link device-level packet jitter statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdDevJitter, "fwd-dev-jitter")
 SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdDevJitter, "fwd-dev-jitter")
@@ -934,6 +972,16 @@ SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnPhyDelay, "rtn-phy-delay")
 SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnPhyDelay, "rtn-phy-delay")
 SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnPhyDelay, "rtn-phy-delay")
 SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnPhyDelay, "rtn-phy-delay")
+
+// Return link application-level packet jitter statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnAppJitter, "rtn-app-jitter")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnAppJitter, "rtn-app-jitter")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnAppJitter, "rtn-app-jitter")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnAppJitter, "rtn-app-jitter")
+SAT_STATS_PER_UT_USER_METHOD_DEFINITION  (RtnAppJitter, "rtn-app-jitter")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnAppJitter, "rtn-app-jitter")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnAppJitter, "rtn-app-jitter")
+SAT_STATS_AVERAGE_UT_USER_METHOD_DEFINITION (RtnAppJitter, "rtn-app-jitter")
 
 // Return link device-level packet jitter statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnDevJitter, "rtn-dev-jitter")
