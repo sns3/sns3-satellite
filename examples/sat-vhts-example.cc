@@ -123,6 +123,11 @@ main (int argc, char *argv[])
   std::string burstLengthStr = "ShortBurst";
   SatEnums::SatWaveFormBurstLength_t burstLength = SatEnums::SHORT_BURST;
 
+  uint32_t superFrameConfForSeq0Int = 0;
+  SatSuperframeConf::SuperFrameConfiguration_t superFrameConfForSeq0 = SatSuperframeConf::SUPER_FRAME_CONFIG_0;
+  uint32_t frameConfigTypeInt = 0;
+  SatSuperframeConf::ConfigType_t frameConfigType = SatSuperframeConf::CONFIG_TYPE_0;
+
   std::string modcodsUsed = "QPSK_1_TO_2 QPSK_3_TO_5 QPSK_2_TO_3 QPSK_3_TO_4 QPSK_4_TO_5 QPSK_5_TO_6 QPSK_8_TO_9 QPSK_9_TO_10 "
           "8PSK_3_TO_5 8PSK_2_TO_3 8PSK_3_TO_4 8PSK_5_TO_6 8PSK_8_TO_9 8PSK_9_TO_10 "
           "16APSK_2_TO_3 16APSK_3_TO_4 16APSK_4_TO_5 16APSK_5_TO_6 16APSK_8_TO_9 16APSK_9_TO_10 "
@@ -142,9 +147,12 @@ main (int argc, char *argv[])
   cmd.AddValue ("UtMobility", "Set true to use UT mobility", utMobility);
   cmd.AddValue ("mobilityPath", "Path to the mobility file", mobilityPath); // TODO works if only one UT ?
   cmd.AddValue ("BurstLength", "Burst length (can be ShortBurst, LongBurst or ShortAndLongBurst)", burstLengthStr);
+  cmd.AddValue ("SuperFrameConfForSeq0", "Super frame configuration used for super frame sequence 0", superFrameConfForSeq0Int);
+  cmd.AddValue ("FrameConfigType", "The frame configuration type used for super frame", frameConfigTypeInt);
   simulationHelper->AddDefaultUiArguments (cmd);
   cmd.Parse (argc, argv);
 
+  // Initialize enum values
   if (burstLengthStr == "ShortBurst")
     {
       burstLength = SatEnums::SHORT_BURST;
@@ -162,13 +170,51 @@ main (int argc, char *argv[])
       NS_FATAL_ERROR ("Incorrect burst size");
     }
 
+  switch(superFrameConfForSeq0Int)
+    {
+      case 0:
+        superFrameConfForSeq0 = SatSuperframeConf::SUPER_FRAME_CONFIG_0;
+        break;
+      case 1:
+        superFrameConfForSeq0 = SatSuperframeConf::SUPER_FRAME_CONFIG_1;
+        break;
+      case 2:
+        superFrameConfForSeq0 = SatSuperframeConf::SUPER_FRAME_CONFIG_2;
+        break;
+      case 3:
+        superFrameConfForSeq0 = SatSuperframeConf::SUPER_FRAME_CONFIG_3;
+        break;
+      default:
+        NS_FATAL_ERROR ("Incorrect super frame conf");
+    }
+
+  switch(frameConfigTypeInt)
+    {
+      case 0:
+        frameConfigType = SatSuperframeConf::CONFIG_TYPE_0;
+        break;
+      case 1:
+        frameConfigType = SatSuperframeConf::CONFIG_TYPE_1;
+        break;
+      case 2:
+        frameConfigType = SatSuperframeConf::CONFIG_TYPE_2;
+        break;
+      case 3:
+        frameConfigType = SatSuperframeConf::CONFIG_TYPE_3;
+        break;
+      default:
+        NS_FATAL_ERROR ("Incorrect frame type");
+    }
+
+
+
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
   Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
 
   /*
    * FWD link
    */
-  // Set defaults TODO default plan ?
+  // Set defaults
   Config::SetDefault ("ns3::SatConf::FwdUserLinkBandwidth", DoubleValue (2e+09));
   Config::SetDefault ("ns3::SatConf::FwdFeederLinkBandwidth", DoubleValue (8e+09));
   Config::SetDefault ("ns3::SatConf::FwdCarrierAllocatedBandwidth", DoubleValue (500e+06));
@@ -184,18 +230,31 @@ main (int argc, char *argv[])
   /*
    * RTN link
    */
-  // Set defaults TODO default plan ?
+  // Set defaults
   Config::SetDefault ("ns3::SatConf::RtnUserLinkBandwidth", DoubleValue (500e+06));
   Config::SetDefault ("ns3::SatConf::RtnFeederLinkBandwidth", DoubleValue (2e+09));
+  Config::SetDefault ("ns3::SatWaveformConf::BurstLength", EnumValue (burstLength));
 
   EnableRA (raModel, dynamicLoadControl);
 
-  Config::SetDefault ("ns3::SatWaveformConf::BurstLength", EnumValue (burstLength));
-
-  // Porteuse
-
-  // Other
-
+  Config::SetDefault ("ns3::SatConf::SuperFrameConfForSeq0", EnumValue (superFrameConfForSeq0));
+  switch(superFrameConfForSeq0)
+    {
+      case SatSuperframeConf::SUPER_FRAME_CONFIG_0:
+        Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", EnumValue (frameConfigType));
+        break;
+      case SatSuperframeConf::SUPER_FRAME_CONFIG_1:
+        Config::SetDefault ("ns3::SatSuperframeConf1::FrameConfigType", EnumValue (frameConfigType));
+        break;
+      case SatSuperframeConf::SUPER_FRAME_CONFIG_2:
+        Config::SetDefault ("ns3::SatSuperframeConf2::FrameConfigType", EnumValue (frameConfigType));
+        break;
+      case SatSuperframeConf::SUPER_FRAME_CONFIG_3:
+        Config::SetDefault ("ns3::SatSuperframeConf3::FrameConfigType", EnumValue (frameConfigType));
+        break;
+      default:
+        NS_FATAL_ERROR ("Impossible to reach here");
+    }
 
   /*
    * Traffics
@@ -227,13 +286,17 @@ main (int argc, char *argv[])
                                   Seconds (0.001));
 
   // Link results
+  // Uncomment to use custom C/N0 traces or constants for some links
+  /*
   Ptr<SatCnoHelper> satCnoHelper = simulationHelper->GetCnoHelper ();
   satCnoHelper->UseTracesForDefault (false);
-  // TODO change path
   for (uint32_t i = 0; i < satHelper->GetBeamHelper ()->GetUtNodes ().GetN (); i++)
     {
-      satCnoHelper->SetUtNodeCnoFile (satHelper->GetBeamHelper ()->GetUtNodes ().Get (i), SatEnums::FORWARD_USER_CH, "contrib/satellite/data/rxcnotraces/input/BEAM_8_GW_2_channelType_FORWARD_FEEDER_CH");
+      satCnoHelper->SetUtNodeCnoFile (satHelper->GetBeamHelper ()->GetUtNodes ().Get (i), SatEnums::FORWARD_USER_CH, "path_to_cno_file"); // For input trace file
+      // or
+      satCnoHelper->SetGwNodeCno (satHelper->GetBeamHelper ()->GetUtNodes ().Get (i), SatEnums::FORWARD_USER_CH, 1e10); // For constant value
     }
+  */
 
   // Mobility
   if (utMobility)
