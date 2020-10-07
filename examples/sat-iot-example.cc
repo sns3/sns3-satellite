@@ -141,17 +141,17 @@ main (int argc, char *argv[])
   Ptr<SatTrafficHelper> trafficHelper = simulationHelper->GetTrafficHelper ();
   trafficHelper->AddPoissonTraffic (SatTrafficHelper::FWD_LINK,
                                   Seconds (1),
-                                  Seconds (0.1), // TODO I have no idea of these values
-                                  "100kb/s",
-                                  1500,
+                                  Seconds (0.1),
+                                  "10kb/s",
+                                  300,
                                   satHelper->GetGwUsers (),
                                   satHelper->GetUtUsers (),
                                   appStartTime,
                                   simLength,
                                   Seconds (0.001));
   trafficHelper->AddCbrTraffic (SatTrafficHelper::FWD_LINK,
-                                  "10ms",
-                                  1500, // TODO I have no idea of these values neither
+                                  "100ms",
+                                  300,
                                   satHelper->GetGwUsers (),
                                   satHelper->GetUtUsers (),
                                   appStartTime,
