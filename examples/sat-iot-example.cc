@@ -48,7 +48,7 @@ main (int argc, char *argv[])
   uint32_t nbEndUsersPerUt = 1;
 
   Time appStartTime = Seconds (0.001);
-  Time simLength = Seconds (100.0);
+  Time simLength = Seconds (60.0);
 
   uint32_t queueSize = 10;
   double maxPowerTerminalW = 0.3;
@@ -67,6 +67,7 @@ main (int argc, char *argv[])
 
   // Read command line parameters given by user
   CommandLine cmd;
+  cmd.AddValue ("Beams", "Ids of beams used (each separated by _)", beams);
   cmd.AddValue ("NbGw", "Number of GWs", nbGw);
   cmd.AddValue ("NbUtsPerBeam", "Number of UTs per spot-beam", nbUtsPerBeam);
   cmd.AddValue ("NbEndUsersPerUt", "Number of end users per UT", nbEndUsersPerUt);
@@ -78,6 +79,8 @@ main (int argc, char *argv[])
   cmd.AddValue ("FrameConfigType", "The frame configuration type used for super frame", frameConfigTypeInt);
   simulationHelper->AddDefaultUiArguments (cmd);
   cmd.Parse (argc, argv);
+
+  std::replace (beams.begin (), beams.end (), '_', ' ');
 
   // Initialize enum values
   switch(superFrameConfForSeq0Int)
@@ -223,9 +226,6 @@ main (int argc, char *argv[])
   /*
    * Outputs
    */
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
-  Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
-
   simulationHelper->EnableProgressLogs ();
 
   Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("contrib/satellite/data/sims/sat-iot-example/output-attributes.xml"));
@@ -283,11 +283,6 @@ main (int argc, char *argv[])
 
   // Frame type usage
   s->AddGlobalFrameTypeUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
-
-
-
-  // GtkConfigStore config;
-  // config.ConfigureAttributes ();
 
   simulationHelper->RunSimulation ();
 

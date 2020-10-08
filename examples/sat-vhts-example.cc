@@ -114,7 +114,7 @@ main (int argc, char *argv[])
   uint32_t nbEndUsersPerUt = 1;
 
   Time appStartTime = Seconds (0.001);
-  Time simLength = Seconds (100.0);
+  Time simLength = Seconds (60.0);
 
   std::string raModel = "CRDSA";
   bool dynamicLoadControl = true;
@@ -137,6 +137,7 @@ main (int argc, char *argv[])
 
   // Read command line parameters given by user
   CommandLine cmd;
+  cmd.AddValue ("Beams", "Ids of beams used (each separated by _)", beams);
   cmd.AddValue ("NbGw", "Number of GWs", nbGw);
   cmd.AddValue ("NbUtsPerBeam", "Number of UTs per spot-beam", nbUtsPerBeam);
   cmd.AddValue ("NbEndUsersPerUt", "Number of end users per UT", nbEndUsersPerUt);
@@ -151,6 +152,8 @@ main (int argc, char *argv[])
   cmd.AddValue ("FrameConfigType", "The frame configuration type used for super frame", frameConfigTypeInt);
   simulationHelper->AddDefaultUiArguments (cmd);
   cmd.Parse (argc, argv);
+
+  std::replace (beams.begin (), beams.end (), '_', ' ');
 
   // Initialize enum values
   if (burstLengthStr == "ShortBurst")
@@ -309,7 +312,6 @@ main (int argc, char *argv[])
   /*
    * Outputs
    */
-
   simulationHelper->EnableProgressLogs ();
 
   Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("contrib/satellite/data/sims/sat-vhts-example/output-attributes.xml"));

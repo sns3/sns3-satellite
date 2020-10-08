@@ -519,8 +519,8 @@ SatTrafficHelper::AddVoipTraffic (TrafficDirection_t direction,
   std::string socketFactory = "ns3::UdpSocketFactory";
   uint16_t port = 9;
 
-  double onTime; // TODO nedd to chek for all codecs if correct
-  double offTime; // TODO nedd to chek for all codecs if correct
+  double onTime;
+  double offTime;
   std::string rate;
   uint32_t packetSize;
 
@@ -529,31 +529,31 @@ SatTrafficHelper::AddVoipTraffic (TrafficDirection_t direction,
       case G_711_1:
         onTime = 0.5;
         offTime = 0.05;
-        rate = "64kbps";
+        rate = "70kbps"; // 64kbps globally
         packetSize = 80;
         break;
       case G_711_2:
         onTime = 0.5;
         offTime = 0.05;
-        rate = "64kbps";
+        rate = "70kbps"; // 64kbps globally
         packetSize = 160;
         break;
       case G_723_1:
         onTime = 0.5;
         offTime = 0.05;
-        rate = "6240bps";
+        rate = "6864bps"; // 6240bps globally
         packetSize = 30;
         break;
       case G_729_2:
         onTime = 0.5;
         offTime = 0.05;
-        rate = "8kbps";
+        rate = "8800bps"; // 8kbps globally
         packetSize = 20;
         break;
       case G_729_3:
         onTime = 0.5;
         offTime = 0.05;
-        rate = "7200bps";
+        rate = "7920bps"; // 7200bps globally
         packetSize = 30;
         break;
       default:
