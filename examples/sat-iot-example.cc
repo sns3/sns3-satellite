@@ -30,10 +30,10 @@
 using namespace ns3;
 
 /**
- * \file iot-example.cc
+ * \file sat-iot-example.cc
  * \ingroup satellite
  *
- * \brief This file allows to create an IOT scenario
+ * \brief This file allows to create an IoT scenario
  */
 
 NS_LOG_COMPONENT_DEFINE ("sat-iot-example");
@@ -42,21 +42,24 @@ int
 main (int argc, char *argv[])
 {
   // Variables
-  std::string beams = "8";
+  std::string beam = "8";
   uint32_t nbGw = 1;
-  uint32_t nbUtsPerBeam = 10;
+  uint32_t nbUtsPerBeam = 1;
   uint32_t nbEndUsersPerUt = 1;
 
   Time appStartTime = Seconds (0.001);
   Time simLength = Seconds (60.0);
 
-  uint32_t queueSize = 10;
+  uint32_t queueSize = 50;
   double maxPowerTerminalW = 0.3;
 
-  uint32_t superFrameConfForSeq0Int = 0;
-  SatSuperframeConf::SuperFrameConfiguration_t superFrameConfForSeq0 = SatSuperframeConf::SUPER_FRAME_CONFIG_0;
-  uint32_t frameConfigTypeInt = 0;
-  SatSuperframeConf::ConfigType_t frameConfigType = SatSuperframeConf::CONFIG_TYPE_0;
+  double rtnFeederLinkBaseFrequency = 1.77e+10;
+  double rtnUserLinkBaseFrequency = 2.95e+10;
+  double rtnFeederLinkBandwidth = 4.6848e+6;
+  double frame0_AllocatedBandwidthHz = 2.928e+05;
+  double frame0_CarrierAllocatedBandwidthHz = 2.928e+05;
+  double frame0_CarrierRollOff = 0.22;
+  double frame0_CarrierSpacing = 0;
 
   std::string modcodsUsed = "QPSK_1_TO_2 QPSK_3_TO_5 QPSK_2_TO_3 QPSK_3_TO_4 QPSK_4_TO_5 QPSK_5_TO_6 QPSK_8_TO_9 QPSK_9_TO_10 "
           "8PSK_3_TO_5 8PSK_2_TO_3 8PSK_3_TO_4 8PSK_5_TO_6 8PSK_8_TO_9 8PSK_9_TO_10 "
@@ -67,7 +70,7 @@ main (int argc, char *argv[])
 
   // Read command line parameters given by user
   CommandLine cmd;
-  cmd.AddValue ("Beams", "Ids of beams used (each separated by _)", beams);
+  cmd.AddValue ("Beam", "Id of beam used (cannot use multiple beams)", beam);
   cmd.AddValue ("NbGw", "Number of GWs", nbGw);
   cmd.AddValue ("NbUtsPerBeam", "Number of UTs per spot-beam", nbUtsPerBeam);
   cmd.AddValue ("NbEndUsersPerUt", "Number of end users per UT", nbEndUsersPerUt);
@@ -75,50 +78,15 @@ main (int argc, char *argv[])
   cmd.AddValue ("AppStartTime", "Applications start time (in seconds, or add unit)", appStartTime);
   cmd.AddValue ("SimLength", "Simulation length (in seconds, or add unit)", simLength);
   cmd.AddValue ("MaxPowerTerminalW", "Maximum power of terminals in W", maxPowerTerminalW);
-  cmd.AddValue ("SuperFrameConfForSeq0", "Super frame configuration used for super frame sequence 0", superFrameConfForSeq0Int);
-  cmd.AddValue ("FrameConfigType", "The frame configuration type used for super frame", frameConfigTypeInt);
+  cmd.AddValue ("RtnFeederLinkBaseFrequency", "Base frequency of the return feeder link band", rtnFeederLinkBaseFrequency);
+  cmd.AddValue ("RtnUserLinkBaseFrequency", "Base frequency of the return user link band", rtnUserLinkBaseFrequency);
+  cmd.AddValue ("RtnFeederLinkBandwidth", "Bandwidth of the return feeder link band", rtnFeederLinkBandwidth);
+  cmd.AddValue ("Frame0_AllocatedBandwidthHz", "The allocated bandwidth [Hz] for frame", frame0_AllocatedBandwidthHz);
+  cmd.AddValue ("Frame0_CarrierAllocatedBandwidthHz", "The allocated carrier bandwidth [Hz] for frame", frame0_CarrierAllocatedBandwidthHz);
+  cmd.AddValue ("Frame0_CarrierRollOff", "The roll-off factor for frame", frame0_CarrierRollOff);
+  cmd.AddValue ("Frame0_CarrierSpacing", "The carrier spacing factor for frame", frame0_CarrierSpacing);
   simulationHelper->AddDefaultUiArguments (cmd);
   cmd.Parse (argc, argv);
-
-  std::replace (beams.begin (), beams.end (), '_', ' ');
-
-  // Initialize enum values
-  switch(superFrameConfForSeq0Int)
-    {
-      case 0:
-        superFrameConfForSeq0 = SatSuperframeConf::SUPER_FRAME_CONFIG_0;
-        break;
-      case 1:
-        superFrameConfForSeq0 = SatSuperframeConf::SUPER_FRAME_CONFIG_1;
-        break;
-      case 2:
-        superFrameConfForSeq0 = SatSuperframeConf::SUPER_FRAME_CONFIG_2;
-        break;
-      case 3:
-        superFrameConfForSeq0 = SatSuperframeConf::SUPER_FRAME_CONFIG_3;
-        break;
-      default:
-        NS_FATAL_ERROR ("Incorrect super frame conf");
-    }
-
-  switch(frameConfigTypeInt)
-    {
-      case 0:
-        frameConfigType = SatSuperframeConf::CONFIG_TYPE_0;
-        break;
-      case 1:
-        frameConfigType = SatSuperframeConf::CONFIG_TYPE_1;
-        break;
-      case 2:
-        frameConfigType = SatSuperframeConf::CONFIG_TYPE_2;
-        break;
-      case 3:
-        frameConfigType = SatSuperframeConf::CONFIG_TYPE_3;
-        break;
-      default:
-        NS_FATAL_ERROR ("Incorrect frame type");
-    }
-
 
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
   Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
@@ -146,69 +114,53 @@ main (int argc, char *argv[])
   /*
    * RTN link
    */
-  // Band
-  Config::SetDefault ("ns3::SatConf::RtnFeederLinkBandwidth", DoubleValue (2e+09));
-  Config::SetDefault ("ns3::SatConf::RtnFeederLinkBaseFrequency", DoubleValue (1.77e+10));
-  Config::SetDefault ("ns3::SatConf::RtnUserLinkBandwidth", DoubleValue (5e+08));
-  Config::SetDefault ("ns3::SatConf::RtnUserLinkBaseFrequency", DoubleValue (2.95e+10));
-
-  Config::SetDefault ("ns3::SatConf::RtnUserLinkChannels", UintegerValue (4));
-  Config::SetDefault ("ns3::SatConf::RtnFeederLinkChannels", UintegerValue (16));
-
   // Default plan
-  Config::SetDefault ("ns3::SatConf::SuperFrameConfForSeq0", EnumValue (superFrameConfForSeq0));
-  switch(superFrameConfForSeq0)
-    {
-      case SatSuperframeConf::SUPER_FRAME_CONFIG_0:
-        Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", EnumValue (frameConfigType));
-        break;
-      case SatSuperframeConf::SUPER_FRAME_CONFIG_1:
-        Config::SetDefault ("ns3::SatSuperframeConf1::FrameConfigType", EnumValue (frameConfigType));
-        break;
-      case SatSuperframeConf::SUPER_FRAME_CONFIG_2:
-        Config::SetDefault ("ns3::SatSuperframeConf2::FrameConfigType", EnumValue (frameConfigType));
-        break;
-      case SatSuperframeConf::SUPER_FRAME_CONFIG_3:
-        Config::SetDefault ("ns3::SatSuperframeConf3::FrameConfigType", EnumValue (frameConfigType));
-        break;
-      default:
-        NS_FATAL_ERROR ("Impossible to reach here");
-    }
+  Config::SetDefault ("ns3::SatSuperframeConf0::FrameCount", UintegerValue (1));
+  Config::SetDefault ("ns3::SatConf::SuperFrameConfForSeq0", EnumValue (SatSuperframeConf::SUPER_FRAME_CONFIG_0));
+  Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", EnumValue (SatSuperframeConf::CONFIG_TYPE_0));
 
+  Config::SetDefault ("ns3::SatConf::RtnFeederLinkBaseFrequency", DoubleValue (rtnFeederLinkBaseFrequency)); // Default value
+  Config::SetDefault ("ns3::SatConf::RtnUserLinkBaseFrequency", DoubleValue (rtnUserLinkBaseFrequency)); // Default value
+  Config::SetDefault ("ns3::SatConf::RtnFeederLinkBandwidth", DoubleValue (rtnFeederLinkBandwidth));
+  Config::SetDefault ("ns3::SatConf::RtnUserLinkBandwidth", DoubleValue (rtnFeederLinkBandwidth/4));
+
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame0_AllocatedBandwidthHz", DoubleValue (frame0_AllocatedBandwidthHz));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame0_CarrierAllocatedBandwidthHz", DoubleValue (frame0_CarrierAllocatedBandwidthHz));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame0_CarrierRollOff", DoubleValue (frame0_CarrierRollOff));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame0_CarrierSpacing", DoubleValue (frame0_CarrierSpacing));
 
   /*
    * Traffics
    */
   simulationHelper->SetSimulationTime (simLength);
 
-  // We set the UT count and UT user count using attributes when configuring a pre-defined scenario
   simulationHelper->SetGwUserCount (nbGw);
   simulationHelper->SetUtCountPerBeam (nbUtsPerBeam);
   simulationHelper->SetUserCountPerUt (nbEndUsersPerUt);
-  simulationHelper->SetBeams (beams);
+  simulationHelper->SetBeams (beam);
 
   simulationHelper->CreateSatScenario ();
 
   Ptr<SatHelper> satHelper = simulationHelper->GetSatelliteHelper ();
   Ptr<SatTrafficHelper> trafficHelper = simulationHelper->GetTrafficHelper ();
-  trafficHelper->AddPoissonTraffic (SatTrafficHelper::FWD_LINK,
-                                  Seconds (1),
-                                  Seconds (0.1),
-                                  "10kb/s",
-                                  300,
-                                  satHelper->GetGwUsers (),
-                                  satHelper->GetUtUsers (),
-                                  appStartTime,
-                                  simLength,
-                                  Seconds (0.001));
-  trafficHelper->AddCbrTraffic (SatTrafficHelper::FWD_LINK,
-                                  "100ms",
-                                  300,
-                                  satHelper->GetGwUsers (),
-                                  satHelper->GetUtUsers (),
-                                  appStartTime,
-                                  simLength,
-                                  Seconds (0.001));
+  trafficHelper->AddPoissonTraffic (SatTrafficHelper::RTN_LINK,
+                                    Seconds (1),
+                                    Seconds (0.1),
+                                    "200kb/s",
+                                    300,
+                                    satHelper->GetGwUsers (),
+                                    satHelper->GetUtUsers (),
+                                    appStartTime,
+                                    simLength,
+                                    Seconds (0.001)); // 200kb/s == 100kBaud
+  trafficHelper->AddCbrTraffic (SatTrafficHelper::RTN_LINK,
+                                "8.5ms",
+                                300,
+                                satHelper->GetGwUsers (),
+                                satHelper->GetUtUsers (),
+                                appStartTime,
+                                simLength,
+                                Seconds (0.001)); // 280kb/s == 140kBaud
 
   // Link results
   // Uncomment to use custom C/N0 traces or constants for some links
@@ -225,6 +177,7 @@ main (int argc, char *argv[])
 
   /*
    * Outputs
+   * Note: some outputs are automatically generated by traffic helper
    */
   simulationHelper->EnableProgressLogs ();
 
@@ -272,7 +225,7 @@ main (int argc, char *argv[])
   s->AddGlobalRtnFeederLinkRxPower (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddGlobalRtnUserLinkRxPower (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-  // return link load
+  // Return link load
   s->AddGlobalFrameUserLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerGwFrameUserLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamFrameUserLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);

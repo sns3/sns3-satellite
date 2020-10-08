@@ -30,7 +30,7 @@
 using namespace ns3;
 
 /**
- * \file vhts-example.cc
+ * \file sat-vhts-example.cc
  * \ingroup satellite
  *
  * \brief This file allows to create a VHTS scenario
@@ -52,7 +52,7 @@ void EnableRA (std::string raModel, bool dynamicLoadControl)
   }
   else
   {
-    NS_FATAL_ERROR ("Incorrect RA model, aborting...");
+    NS_FATAL_ERROR ("Incorrect RA model");
   }
 
   // Set Random Access interference model
@@ -61,40 +61,9 @@ void EnableRA (std::string raModel, bool dynamicLoadControl)
   // Set Random Access collision model
   Config::SetDefault ("ns3::SatBeamHelper::RaCollisionModel", EnumValue (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
 
-  // Disable periodic control slots
-  Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (false));
-
   // Set dynamic load control parameters
   Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableRandomAccessDynamicLoadControl", BooleanValue (dynamicLoadControl));
   Config::SetDefault ("ns3::SatPhyRxCarrierConf::RandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize", UintegerValue (10));
-
-  // Set random access parameters
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_MaximumUniquePayloadPerBlock", UintegerValue (3));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_MaximumConsecutiveBlockAccessed", UintegerValue (6));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_MinimumIdleBlock", UintegerValue (2));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_BackOffTimeInMilliSeconds", UintegerValue (250));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_BackOffProbability", UintegerValue (10000));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_HighLoadBackOffProbability", UintegerValue (30000));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_NumberOfInstances", UintegerValue (3));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_AverageNormalizedOfferedLoadThreshold", DoubleValue (0.5));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DefaultControlRandomizationInterval", TimeValue (MilliSeconds (100)));
-  Config::SetDefault ("ns3::SatRandomAccessConf::CrdsaSignalingOverheadInBytes", UintegerValue (5));
-  Config::SetDefault ("ns3::SatRandomAccessConf::SlottedAlohaSignalingOverheadInBytes", UintegerValue (3));
-
-  // Disable CRA and DA
-  // TODO keep ?
-  /*Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_ConstantAssignmentProvided", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_ConstantAssignmentProvided", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_RbdcAllowed", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_RbdcAllowed", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_RbdcAllowed", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_VolumeAllowed", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_VolumeAllowed", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_VolumeAllowed", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));*/
 }
 
 static void
@@ -209,8 +178,6 @@ main (int argc, char *argv[])
         NS_FATAL_ERROR ("Incorrect frame type");
     }
 
-
-
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
   Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
 
@@ -227,8 +194,6 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatBeamHelper::DvbVersion", StringValue ("DVB_S2"));
   Config::SetDefault ("ns3::SatBbFrameConf::ModCodsUsed", StringValue (modcodsUsed));
   Config::SetDefault ("ns3::SatBbFrameConf::DefaultModCod", StringValue ("QPSK_1_TO_2"));
-
-
 
   /*
    * RTN link
@@ -264,7 +229,6 @@ main (int argc, char *argv[])
    */
   simulationHelper->SetSimulationTime (simLength);
 
-  // We set the UT count and UT user count using attributes when configuring a pre-defined scenario
   simulationHelper->SetGwUserCount (nbGw);
   simulationHelper->SetUtCountPerBeam (nbUtsPerBeam);
   simulationHelper->SetUserCountPerUt (nbEndUsersPerUt);
@@ -275,18 +239,18 @@ main (int argc, char *argv[])
   Ptr<SatHelper> satHelper = simulationHelper->GetSatelliteHelper ();
   Ptr<SatTrafficHelper> trafficHelper = simulationHelper->GetTrafficHelper ();
   trafficHelper->AddVoipTraffic (SatTrafficHelper::FWD_LINK,
-                                  SatTrafficHelper::G_711_1,
-                                  satHelper->GetGwUsers (),
-                                  satHelper->GetUtUsers (),
-                                  appStartTime,
-                                  simLength,
-                                  Seconds (0.001));
+                                 SatTrafficHelper::G_711_1,
+                                 satHelper->GetGwUsers (),
+                                 satHelper->GetUtUsers (),
+                                 appStartTime,
+                                 simLength,
+                                 Seconds (0.001));
   trafficHelper->AddHttpTraffic (SatTrafficHelper::FWD_LINK,
-                                  satHelper->GetGwUsers (),
-                                  satHelper->GetUtUsers (),
-                                  appStartTime,
-                                  simLength,
-                                  Seconds (0.001));
+                                 satHelper->GetGwUsers (),
+                                 satHelper->GetUtUsers (),
+                                 appStartTime,
+                                 simLength,
+                                 Seconds (0.001));
 
   // Link results
   // Uncomment to use custom C/N0 traces or constants for some links
@@ -311,6 +275,7 @@ main (int argc, char *argv[])
 
   /*
    * Outputs
+   * Note: some outputs are automatically generated by traffic helper
    */
   simulationHelper->EnableProgressLogs ();
 
