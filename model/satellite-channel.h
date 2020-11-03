@@ -176,14 +176,14 @@ public:
   /**
    * \return Number of receivers in the channel
    */
-  virtual uint32_t GetNDevices (void) const;
+  virtual std::size_t GetNDevices (void) const;
 
   /**
    * \brief Get a device for a certain receiver index
    * \param i Index
    * \return A netdevice attached to this channel
    */
-  virtual Ptr<NetDevice> GetDevice (uint32_t i) const;
+  virtual Ptr<NetDevice> GetDevice (std::size_t i) const;
 
 private:
   /**

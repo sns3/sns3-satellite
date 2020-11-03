@@ -38,7 +38,8 @@
 #include <ns3/cbr-helper.h>
 #include <ns3/satellite-on-off-helper.h>
 #include <ns3/nrtv-helper.h>
-#include <ns3/three-gpp-http-helper.h>
+#include <ns3/three-gpp-http-satellite-helper.h>
+
 #include <ns3/random-variable-stream.h>
 
 NS_LOG_COMPONENT_DEFINE ("SimulationHelper");
