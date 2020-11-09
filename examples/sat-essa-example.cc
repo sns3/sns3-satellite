@@ -27,6 +27,8 @@
 #include "ns3/applications-module.h"
 #include "ns3/traffic-module.h"
 
+#include <chrono>
+
 using namespace ns3;
 
 /**
@@ -41,6 +43,8 @@ NS_LOG_COMPONENT_DEFINE ("sat-essa-example");
 int
 main (int argc, char *argv[])
 {
+  std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
   // Variables
   std::string beams = "8";
   uint32_t nbGw = 1;
@@ -59,7 +63,8 @@ main (int argc, char *argv[])
   double frame0_CarrierSpacing = 0; // OK
   uint32_t frame0_SpreadingFactor = 256; // OK
 
-  bool interferenceModePerPacket = true;
+  bool interferenceModePerPacket = false;
+  bool displayTraces = true;
 
   // Defaults
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
@@ -214,71 +219,41 @@ Es/N0
   ConfigStore outputConfig;
   outputConfig.ConfigureDefaults ();
 
+  if(displayTraces)
+    {
+      Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer ();
+
+      s->AddGlobalEssaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddGlobalEssaPacketError (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddPerGwEssaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerGwEssaPacketError (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddPerBeamEssaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerBeamEssaPacketError (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddPerUtEssaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerUtEssaPacketError (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      s->AddGlobalEssaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddGlobalEssaPacketCollision (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddPerGwEssaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerGwEssaPacketCollision (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddPerBeamEssaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerBeamEssaPacketCollision (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddPerUtEssaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerUtEssaPacketCollision (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      s->AddGlobalRtnFeederWindowLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddGlobalRtnFeederWindowLoad (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddPerGwRtnFeederWindowLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerGwRtnFeederWindowLoad (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddPerBeamRtnFeederWindowLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerBeamRtnFeederWindowLoad (SatStatsHelper::OUTPUT_SCATTER_FILE);
+    }
 
   simulationHelper->RunSimulation ();
+
+  std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+  std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() << " s" << std::endl;
+
   return 0;
-
-
-
-  /*Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer ();
-
-  // Capacity request
-  s->AddGlobalCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerGwCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerBeamCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-  // Granted resources
-  s->AddGlobalResourcesGranted (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddGlobalResourcesGranted (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddGlobalResourcesGranted (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_CDF_PLOT);
-  s->AddPerUtResourcesGranted (SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-  // Link SINR
-  s->AddGlobalFwdFeederLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddGlobalFwdUserLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddGlobalRtnFeederLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddGlobalRtnUserLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-  s->AddGlobalFwdFeederLinkSinr (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddGlobalFwdUserLinkSinr (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddGlobalRtnFeederLinkSinr (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddGlobalRtnUserLinkSinr (SatStatsHelper::OUTPUT_SCALAR_FILE);
-
-  // SINR
-  s->AddGlobalFwdCompositeSinr (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddGlobalFwdCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtFwdCompositeSinr (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddPerUtFwdCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtFwdCompositeSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
-  s->AddGlobalRtnCompositeSinr (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddGlobalRtnCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerBeamRtnCompositeSinr (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddPerBeamRtnCompositeSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
-  s->AddPerUtRtnCompositeSinr (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddPerUtRtnCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtRtnCompositeSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
-
-  // Link RX Power
-  s->AddGlobalFwdFeederLinkRxPower (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddGlobalFwdUserLinkRxPower (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddGlobalRtnFeederLinkRxPower (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddGlobalRtnUserLinkRxPower (SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-  s->AddGlobalFwdFeederLinkRxPower (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddGlobalFwdUserLinkRxPower (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddGlobalRtnFeederLinkRxPower (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddGlobalRtnUserLinkRxPower (SatStatsHelper::OUTPUT_SCALAR_FILE);
-
-  // Frame type usage
-  s->AddGlobalFrameTypeUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
-
-  if (raModel == "MARSALA")
-    {
-      s->AddPerBeamMarsalaCorrelation (SatStatsHelper::OUTPUT_SCALAR_FILE);
-      s->AddPerBeamMarsalaCorrelation (SatStatsHelper::OUTPUT_SCATTER_FILE);
-    }*/
 
 } // end of `int main (int argc, char *argv[])`
