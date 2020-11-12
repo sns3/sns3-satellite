@@ -48,8 +48,8 @@ main (int argc, char *argv[])
   // Variables
   std::string beams = "8";
   uint32_t nbGw = 1;
-  uint32_t nbUtsPerBeam = 1;
-  //uint32_t nbUtsPerBeam = 5000;
+  //uint32_t nbUtsPerBeam = 1;
+  uint32_t nbUtsPerBeam = 5000;
   uint32_t nbEndUsersPerUt = 1;
 
   Time appStartTime = Seconds (0.001);
@@ -65,6 +65,15 @@ main (int argc, char *argv[])
 
   bool interferenceModePerPacket = false;
   bool displayTraces = true;
+
+  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("sat-essa-example");
+
+  // read command line parameters given by user
+  CommandLine cmd;
+  cmd.AddValue ("model", "interferenceModePerPacket", interferenceModePerPacket);
+  cmd.AddValue ("traces", "displayTraces", displayTraces);
+  simulationHelper->AddDefaultUiArguments (cmd);
+  cmd.Parse (argc, argv);
 
   // Defaults
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
@@ -98,11 +107,6 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatBbFrameConf::DefaultModCod", StringValue ("QPSK_1_TO_2"));
   //Config::SetDefault ("ns3::SatBbFrameConf::DefaultModCod", StringValue ("BPSK_1_TO_3"));
 
-  Config::SetDefault ("ns3::CbrApplication::Interval", StringValue ("1s"));
-  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
-
-  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("sat-essa-example");
-
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaServiceCount", UintegerValue (4));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (false));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_RbdcAllowed", BooleanValue (false));
@@ -122,15 +126,16 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DefaultControlRandomizationInterval", TimeValue (MilliSeconds (100)));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaServiceCount", UintegerValue (1));
   Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_ESSA));
-  // Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_SLOTTED_ALOHA));
 
   if(interferenceModePerPacket)
     {
       Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+      Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::EnableSIC", BooleanValue (false));
     }
   else
     {
       Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_FRAGMENT));
+      Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::EnableSIC", BooleanValue (true));
     }
 
   Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceEliminationModel", EnumValue (SatPhyRxCarrierConf::SIC_RESIDUAL));
@@ -141,8 +146,8 @@ main (int argc, char *argv[])
   //Config::SetDefault ("ns3::SatBeamHelper::ReturnLinkLinkResults", EnumValue (SatEnums::LR_RCS2)); // TODO raise error if used with E-SSA
   Config::SetDefault ("ns3::SatBeamHelper::ReturnLinkLinkResults", EnumValue (SatEnums::LR_FSIM));
 
-  Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableRandomAccessDynamicLoadControl", BooleanValue (false));
-  Config::SetDefault ("ns3::SatPhyRxCarrierConf::RandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize", UintegerValue (10));
+  Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableRandomAccessDynamicLoadControl", BooleanValue (true));
+  Config::SetDefault ("ns3::SatPhyRxCarrierConf::RandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize", UintegerValue (5));
 
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_MaximumUniquePayloadPerBlock", UintegerValue (3));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_MaximumConsecutiveBlockAccessed", UintegerValue (6));
@@ -164,27 +169,27 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatSuperframeSeq::TargetDuration", StringValue("100ms")); // Def = 100ms
 
   // The duration of the sliding window
-  Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::WindowDuration", StringValue ("60ms"));
+  Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::WindowDuration", StringValue ("60ms")); // def = 60ms
   // The length of the step between two window iterations
-  Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::WindowStep", StringValue ("20ms"));
+  Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::WindowStep", StringValue ("20ms")); // def = 20ms
   // The delay before processing a sliding window, waiting for incomplete packets
   Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::WindowDelay", StringValue ("0s"));
   // The time at which the first window is processed
   Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::FirstWindow", StringValue ("0s"));
   // The number of SIC iterations performed on each window
-  Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::WindowSICIterations", UintegerValue (10));
+  Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::WindowSICIterations", UintegerValue (5));
   // TODO: this shouldn't be here!! find a way to retrieve SF from SuperFrameConf,
   // The spreading factor of the packets
   Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::SpreadingFactor", UintegerValue (1));
   // The SNIR Detection Threshold (in magnitude) for a packet
   Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::DetectionThreshold", DoubleValue (0));
   // Use SIC when decoding a packet
-  Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::EnableSIC", BooleanValue (true));
+  // Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::EnableSIC", BooleanValue (false)); // true
 
-/*
-Es/N0
-13.7 dB
-*/
+  /*
+  Es/N0
+  13.7 dB
+  */
 
   // Traffics
   simulationHelper->SetSimulationTime (simLength);
@@ -196,19 +201,31 @@ Es/N0
 
   simulationHelper->CreateSatScenario ();
 
-  //Ptr<SatHelper> satHelper = simulationHelper->GetSatelliteHelper ();
-  simulationHelper->InstallTrafficModel (
-    SimulationHelper::CBR,
-    SimulationHelper::UDP,
-    SimulationHelper::FWD_LINK,
-    Seconds (appStartTime), Seconds (simLength));
+  Config::SetDefault ("ns3::CbrApplication::Interval", StringValue ("10ms"));
+  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
+
+  Config::SetDefault ("ns3::OnOffApplication::DataRate", StringValue ("3000bps"));
+  Config::SetDefault ("ns3::OnOffApplication::PacketSize", UintegerValue (packetSize));
+  Config::SetDefault ("ns3::OnOffApplication::OnTime", StringValue ("ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]"));
+  Config::SetDefault ("ns3::OnOffApplication::OffTime", StringValue ("ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]"));
 
   simulationHelper->InstallTrafficModel (
     SimulationHelper::CBR,
     SimulationHelper::UDP,
     SimulationHelper::RTN_LINK,
-    Seconds (appStartTime), Seconds (simLength));
+    Seconds (appStartTime), Seconds (simLength), Seconds (0.001));
 
+  /*simulationHelper->InstallTrafficModel (
+    SimulationHelper::ONOFF,
+    SimulationHelper::UDP,
+    SimulationHelper::RTN_LINK,
+    Seconds (appStartTime), Seconds (simLength));*/
+
+  /*simulationHelper->InstallTrafficModel (
+    SimulationHelper::HTTP,
+    SimulationHelper::TCP,
+    SimulationHelper::RTN_LINK,
+    Seconds (appStartTime), Seconds (simLength));*/
 
   // Outputs
   simulationHelper->EnableProgressLogs ();
@@ -247,6 +264,16 @@ Es/N0
       s->AddPerGwRtnFeederWindowLoad (SatStatsHelper::OUTPUT_SCATTER_FILE);
       s->AddPerBeamRtnFeederWindowLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
       s->AddPerBeamRtnFeederWindowLoad (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      s->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      s->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
     }
 
   simulationHelper->RunSimulation ();
