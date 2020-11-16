@@ -89,7 +89,7 @@ SatPerFragmentInterference::DoCalculate (Ptr<SatInterference::InterferenceChange
   std::vector< std::pair<double, double> > ifPowerPerFragment;
   ifPowerPerFragment.reserve (fragmentsCount);
 
-  std::map<double, double>::const_iterator iter = m_ifPowerAtEventChangeW.begin ();
+  std::vector<std::pair<double, double>>::const_iterator iter = m_ifPowerAtEventChangeW.begin ();
   std::pair<double, double> eventChangeInPower = *iter;
   for (++iter; iter != m_ifPowerAtEventChangeW.end (); ++iter)
     {
@@ -112,7 +112,7 @@ SatPerFragmentInterference::onOwnStartReached (double ifPowerW)
 {
   // Hook into per packet interference computation to store
   // interference level at the beginning of the packet
-  m_ifPowerAtEventChangeW[0.0] = ifPowerW;
+  m_ifPowerAtEventChangeW.push_back(std::make_pair(0.0, ifPowerW));
 }
 
 
@@ -122,7 +122,7 @@ SatPerFragmentInterference::onInterferentEvent (long double timeRatio, double in
   // Hook into per packet interference computation to store
   // interference level at each event change
   ifPowerW += interferenceValue;
-  m_ifPowerAtEventChangeW[1.0 - timeRatio] = ifPowerW;
+  m_ifPowerAtEventChangeW.push_back(std::make_pair(1.0 - timeRatio, ifPowerW));
 }
 
 }
