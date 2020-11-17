@@ -49,7 +49,8 @@ SatPerFragmentInterference::GetInstanceTypeId (void) const
 
 SatPerFragmentInterference::SatPerFragmentInterference ()
   : SatPerPacketInterference (),
-  m_ifPowerAtEventChangeW ()
+  m_ifPowerAtEventChangeW (),
+  m_maxFragmentsCount (1)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -57,7 +58,8 @@ SatPerFragmentInterference::SatPerFragmentInterference ()
 
 SatPerFragmentInterference::SatPerFragmentInterference (SatEnums::ChannelType_t channelType, double rxBandwidthHz)
   : SatPerPacketInterference (channelType, rxBandwidthHz),
-  m_ifPowerAtEventChangeW ()
+  m_ifPowerAtEventChangeW (),
+  m_maxFragmentsCount (1)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -75,6 +77,8 @@ SatPerFragmentInterference::DoCalculate (Ptr<SatInterference::InterferenceChange
   NS_LOG_FUNCTION (this);
 
   m_ifPowerAtEventChangeW.clear ();
+  m_ifPowerAtEventChangeW.reserve (m_maxFragmentsCount);
+
   // Use the per packet interference computation hooks to store
   // interferences at each event associated to the current packet
   SatPerPacketInterference::DoCalculate (event);
@@ -83,6 +87,11 @@ SatPerFragmentInterference::DoCalculate (Ptr<SatInterference::InterferenceChange
   if (!fragmentsCount)
     {
       NS_FATAL_ERROR ("Interference computation did not find a single fragment");
+    }
+
+  if (fragmentsCount > m_maxFragmentsCount)
+    {
+      m_maxFragmentsCount = fragmentsCount;
     }
 
   // Convert time ratio into durations
@@ -112,7 +121,7 @@ SatPerFragmentInterference::onOwnStartReached (double ifPowerW)
 {
   // Hook into per packet interference computation to store
   // interference level at the beginning of the packet
-  m_ifPowerAtEventChangeW.push_back(std::make_pair(0.0, ifPowerW));
+  m_ifPowerAtEventChangeW.emplace_back(0.0, ifPowerW);
 }
 
 
@@ -122,7 +131,7 @@ SatPerFragmentInterference::onInterferentEvent (long double timeRatio, double in
   // Hook into per packet interference computation to store
   // interference level at each event change
   ifPowerW += interferenceValue;
-  m_ifPowerAtEventChangeW.push_back(std::make_pair(1.0 - timeRatio, ifPowerW));
+  m_ifPowerAtEventChangeW.emplace_back(1.0 - timeRatio, ifPowerW);
 }
 
 }

@@ -98,6 +98,8 @@ protected:
 
 private:
   std::vector<std::pair<double, double>> m_ifPowerAtEventChangeW;
+
+  uint32_t m_maxFragmentsCount;
 };
 
 }  // namespace ns3
