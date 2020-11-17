@@ -1399,7 +1399,7 @@ SimulationHelper::InstallTrafficModel (TrafficModel_t trafficModel,
                   }
 
                 onOffHelper.SetAttribute ("Remote", AddressValue (Address (utUserAddr)));
-                auto app = onOffHelper.Install (gwUsers.Get (i)).Get (0);
+                auto app = onOffHelper.Install (gwUsers.Get (m_gwUserId)).Get (0);
                 app->SetStartTime (startTime + (i + 1) * startDelay);
                 onOffContainer.Add (app);
               }
