@@ -20,6 +20,7 @@ cpp_examples = [
 	("sat-dama-sim-tn9", "True", "True"),
 	("sat-dama-verification-sim", "True", "True"),
 	("sat-environmental-variables-example", "True", "True"),
+	("sat-essa-example", "True", "True"),
 	("sat-fwd-system-test-example", "True", "True"),
 	("sat-http-example", "True", "True"),
 	("sat-link-budget-example", "True", "True"),

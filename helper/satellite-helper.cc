@@ -155,11 +155,6 @@ SatHelper::GetTypeId (void)
                    StringValue ("CreationTraceUt"),
                    MakeStringAccessor (&SatHelper::m_utCreationFileName),
                    MakeStringChecker ())
-    .AddAttribute ("WaveformConfigFileName",
-                   "File name that contains return channel waveform configurations",
-                   StringValue ("dvbRcs2Waveforms.txt"),
-                   MakeStringAccessor (&SatHelper::m_wfConfigFileName),
-                   MakeStringChecker ())
     .AddTraceSource ("Creation", "Creation traces",
                      MakeTraceSourceAccessor (&SatHelper::m_creationDetailsTrace),
                      "ns3::SatTypedefs::CreationCallback")
