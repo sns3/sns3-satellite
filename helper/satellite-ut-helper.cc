@@ -177,15 +177,15 @@ SatUtHelper::SatUtHelper (SatTypedefs::CarrierBandwidthConverter_t carrierBandwi
 }
 
 void
-SatUtHelper::Initialize (Ptr<SatLinkResultsDvbS2> lrS2)
+SatUtHelper::Initialize (Ptr<SatLinkResultsFwd> lrFwd)
 {
   NS_LOG_FUNCTION (this);
   /*
-   * Forward channel link results (DVB-S2) are created for UTs.
+   * Forward channel link results (DVB-S2 or DVB-S2X) are created for UTs.
    */
-  if (lrS2 && m_errorModel == SatPhyRxCarrierConf::EM_AVI)
+  if (lrFwd && m_errorModel == SatPhyRxCarrierConf::EM_AVI)
     {
-      m_linkResults = lrS2;
+      m_linkResults = lrFwd;
     }
 }
 

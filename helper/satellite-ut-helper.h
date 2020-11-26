@@ -97,9 +97,9 @@ public:
 
   /*
    * Initializes the UT helper based on attributes
-   * \param lrS2 DVB-S2 link results
+   * \param lrFwd DVB-S2 or DVB-S2X link results
    */
-  void Initialize (Ptr<SatLinkResultsDvbS2> lrS2);
+  void Initialize (Ptr<SatLinkResultsFwd> lrFwd);
 
   /**
    * Set an attribute value to be propagated to each NetDevice created by the

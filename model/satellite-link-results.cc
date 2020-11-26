@@ -126,11 +126,12 @@ SatLinkResultsDvbRcs2::GetEbNoDb (uint32_t waveformId, double blerTarget) const
 }
 
 /*
- * SATLINKRESULTSDVBS2 CHILD CLASS
+ * SATLINKRESULTSFWD ABSTRACT CLASS
  */
-NS_OBJECT_ENSURE_REGISTERED (SatLinkResultsDvbS2);
 
-SatLinkResultsDvbS2::SatLinkResultsDvbS2 ()
+NS_OBJECT_ENSURE_REGISTERED (SatLinkResultsFwd);
+
+SatLinkResultsFwd::SatLinkResultsFwd ()
   : SatLinkResults (),
   m_table (),
   m_shortFrameOffsetInDb (0.0)
@@ -139,16 +140,85 @@ SatLinkResultsDvbS2::SatLinkResultsDvbS2 ()
 }
 
 TypeId
-SatLinkResultsDvbS2::GetTypeId ()
+SatLinkResultsFwd::GetTypeId ()
 {
-  static TypeId tid = TypeId ("ns3::SatLinkResultsDvbS2")
+  static TypeId tid = TypeId ("ns3::SatLinkResultsFwd")
     .SetParent<SatLinkResults> ()
     .AddAttribute ( "EsNoOffsetForShortFrame",
                     "EsNo increase offset for short BB frame with a given BLER",
                     DoubleValue (0.4),
-                    MakeDoubleAccessor (&SatLinkResultsDvbS2::m_shortFrameOffsetInDb),
+                    MakeDoubleAccessor (&SatLinkResultsFwd::m_shortFrameOffsetInDb),
                     MakeDoubleChecker <double_t> ())
   ;
+  return tid;
+}
+
+double
+SatLinkResultsFwd::GetBler (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType, double esNoDb) const
+{
+  NS_LOG_FUNCTION (this << modcod << esNoDb);
+
+  if (!m_isInitialized)
+    {
+      NS_FATAL_ERROR ("Error retrieving link results, call Initialize first");
+    }
+
+  /**
+   * Short BB frame is assumed to be requiring m_shortFrameOffsetInDb dB
+   * higher Es/No if compared to normal BB frame.
+   * TODO: Proper link results need to be added for short BB frame in FWD link.
+   */
+  if (frameType == SatEnums::SHORT_FRAME)
+    {
+      esNoDb -= m_shortFrameOffsetInDb;
+    }
+
+  return m_table.at (modcod)->GetBler (esNoDb);
+}
+
+double
+SatLinkResultsFwd::GetEsNoDb (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType, double blerTarget) const
+{
+  NS_LOG_FUNCTION (this << modcod << blerTarget);
+
+  if (!m_isInitialized)
+    {
+      NS_FATAL_ERROR ("Error retrieving link results, call Initialize first");
+    }
+
+  // Get Es/No requirement for normal BB frame
+  double esno = m_table.at (modcod)->GetEsNoDb (blerTarget);
+
+  /**
+   * Short BB frame is assumed to be requiring "m_shortFrameOffsetInDb" dB
+   * higher Es/No if compared to normal BB frame.
+   * TODO: Proper link results need to be added for short BB frame in FWD link.
+   */
+  if (frameType == SatEnums::SHORT_FRAME)
+    {
+      esno += m_shortFrameOffsetInDb;
+    }
+
+  return esno;
+}
+
+
+/*
+ * SATLINKRESULTSDVBS2 CHILD CLASS
+ */
+NS_OBJECT_ENSURE_REGISTERED (SatLinkResultsDvbS2);
+
+SatLinkResultsDvbS2::SatLinkResultsDvbS2 ()
+  : SatLinkResultsFwd ()
+{
+
+}
+
+TypeId
+SatLinkResultsDvbS2::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatLinkResultsDvbS2")
+    .SetParent<SatLinkResultsFwd> ();
   return tid;
 }
 
@@ -191,53 +261,261 @@ SatLinkResultsDvbS2::DoInitialize ()
 
 } // end of void SatLinkResultsDvbS2::DoInitialize
 
-double
-SatLinkResultsDvbS2::GetBler (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType, double esNoDb) const
+
+/*
+ * SATLINKRESULTSDVBS2X CHILD CLASS
+ */
+NS_OBJECT_ENSURE_REGISTERED (SatLinkResultsDvbS2X);
+
+SatLinkResultsDvbS2X::SatLinkResultsDvbS2X ()
+  : SatLinkResultsFwd ()
 {
-  NS_LOG_FUNCTION (this << modcod << esNoDb);
 
-  if (!m_isInitialized)
-    {
-      NS_FATAL_ERROR ("Error retrieving link results, call Initialize first");
-    }
-
-  /**
-   * Short BB frame is assumed to be requiring m_shortFrameOffsetInDb dB
-   * higher Es/No if compared to normal BB frame.
-   * TODO: Proper link results need to be added for short BB frame in FWD link.
-   */
-  if (frameType == SatEnums::SHORT_FRAME)
-    {
-      esNoDb -= m_shortFrameOffsetInDb;
-    }
-
-  return m_table.at (modcod)->GetBler (esNoDb);
 }
 
-double
-SatLinkResultsDvbS2::GetEsNoDb (SatEnums::SatModcod_t modcod, SatEnums::SatBbFrameType_t frameType, double blerTarget) const
+TypeId
+SatLinkResultsDvbS2X::GetTypeId ()
 {
-  NS_LOG_FUNCTION (this << modcod << blerTarget);
-
-  if (!m_isInitialized)
-    {
-      NS_FATAL_ERROR ("Error retrieving link results, call Initialize first");
-    }
-
-  // Get Es/No requirement for normal BB frame
-  double esno = m_table.at (modcod)->GetEsNoDb (blerTarget);
-
-  /**
-   * Short BB frame is assumed to be requiring "m_shortFrameOffsetInDb" dB
-   * higher Es/No if compared to normal BB frame.
-   * TODO: Proper link results need to be added for short BB frame in FWD link.
-   */
-  if (frameType == SatEnums::SHORT_FRAME)
-    {
-      esno += m_shortFrameOffsetInDb;
-    }
-
-  return esno;
+  static TypeId tid = TypeId ("ns3::SatLinkResultsDvbS2X")
+    .SetParent<SatLinkResultsFwd> ();
+  return tid;
 }
+
+void
+SatLinkResultsDvbS2X::DoInitialize ()
+{
+  NS_LOG_FUNCTION (this);
+
+  // QPSK
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_3_TO_5_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_3_to_5_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_1_TO_2_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_1_to_2_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_14_TO_45_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_14_to_45_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_1_TO_3_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_1_to_3_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_3_TO_4_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_3_to_4_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_9_TO_20_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_9_to_20_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_4_TO_15_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_4_to_15_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_1_TO_4_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_1_to_4_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_4_TO_5_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_4_to_5_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_2_TO_5_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_2_to_5_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_2_TO_5_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_2_to_5_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_1_TO_2_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_1_to_2_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_2_TO_3_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_2_to_3_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_11_TO_20_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_11_to_20_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_2_TO_5_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_2_to_5_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_2_TO_3_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_2_to_3_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_5_TO_6_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_5_to_6_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_32_TO_45_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_32_to_45_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_9_TO_10_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_9_to_10_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_8_TO_9_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_8_to_9_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_2_TO_3_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_2_to_3_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_5_TO_6_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_5_to_6_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_8_TO_15_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_8_to_15_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_13_TO_45_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_13_to_45_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_3_TO_5_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_3_to_5_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_4_TO_5_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_4_to_5_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_1_TO_4_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_1_to_4_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_1_TO_3_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_1_to_3_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_4_TO_15_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_4_to_15_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_14_TO_45_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_14_to_45_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_1_TO_4_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_1_to_4_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_3_TO_5_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_3_to_5_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_1_TO_2_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_1_to_2_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_4_TO_5_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_4_to_5_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_7_TO_15_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_7_to_15_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_3_TO_5_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_3_to_5_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_1_TO_3_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_1_to_3_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_11_TO_45_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_11_to_45_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_1_TO_2_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_1_to_2_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_8_TO_9_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_8_to_9_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_13_TO_45_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_13_to_45_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_5_TO_6_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_5_to_6_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_1_TO_4_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_1_to_4_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_11_TO_45_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_11_to_45_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_2_TO_5_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_2_to_5_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_3_TO_4_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_3_to_4_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_3_TO_4_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_3_to_4_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_1_TO_3_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_1_to_3_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_8_TO_9_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_8_to_9_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_7_TO_15_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_7_to_15_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_9_TO_10_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_9_to_10_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_11_TO_20_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_11_to_20_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_4_TO_5_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_4_to_5_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_32_TO_45_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_32_to_45_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_8_TO_15_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_8_to_15_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_9_TO_20_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_9_to_20_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_2_TO_3_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_2_to_3_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_8_TO_9_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_8_to_9_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_5_TO_6_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_5_to_6_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_QPSK_3_TO_4_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_qpsk_3_to_4_normal_pilots.txt");
+
+  // 8PSK
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_8_TO_9_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_8_to_9_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_2_TO_3_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_2_to_3_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_3_TO_4_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_3_to_4_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_3_TO_4_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_3_to_4_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_13_TO_18_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_13_to_18_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_13_TO_18_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_13_to_18_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_7_TO_15_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_7_to_15_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_2_TO_3_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_2_to_3_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_8_TO_15_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_8_to_15_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_8_TO_15_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_8_to_15_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_2_TO_3_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_2_to_3_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_32_TO_45_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_32_to_45_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_3_TO_5_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_3_to_5_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_9_TO_10_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_9_to_10_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_5_TO_6_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_5_to_6_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_25_TO_36_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_25_to_36_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_3_TO_4_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_3_to_4_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_26_TO_45_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_26_to_45_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_23_TO_36_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_23_to_36_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_23_TO_36_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_23_to_36_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_25_TO_36_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_25_to_36_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_3_TO_5_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_3_to_5_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_2_TO_3_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_2_to_3_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_5_TO_6_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_5_to_6_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_7_TO_15_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_7_to_15_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_26_TO_45_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_26_to_45_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_8_TO_9_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_8_to_9_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_3_TO_5_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_3_to_5_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_8_TO_9_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_8_to_9_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_5_TO_6_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_5_to_6_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_5_TO_6_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_5_to_6_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_32_TO_45_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_32_to_45_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_9_TO_10_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_9_to_10_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_8_TO_9_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_8_to_9_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_3_TO_4_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_3_to_4_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8PSK_3_TO_5_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8psk_3_to_5_normal_pilots.txt");
+
+  // 8APSK
+  m_table[SatEnums::SAT_MODCOD_S2X_8APSK_26_TO_45_L_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8apsk_26_to_45_l_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8APSK_26_TO_45_L_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8apsk_26_to_45_l_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8APSK_5_TO_9_L_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8apsk_5_to_9_l_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_8APSK_5_TO_9_L_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_8apsk_5_to_9_l_normal_nopilots.txt");
+
+  // 16APSK
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_7_TO_9_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_7_to_9_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_5_TO_6_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_5_to_6_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_3_TO_5_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_3_to_5_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_3_TO_5_L_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_3_to_5_l_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_8_TO_9_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_8_to_9_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_25_TO_36_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_25_to_36_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_1_TO_2_L_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_1_to_2_l_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_3_TO_5_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_3_to_5_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_2_TO_3_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_2_to_3_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_13_TO_18_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_13_to_18_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_4_TO_5_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_4_to_5_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_8_TO_9_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_8_to_9_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_28_TO_45_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_28_to_45_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_5_TO_6_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_5_to_6_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_2_TO_3_L_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_2_to_3_l_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_4_TO_5_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_4_to_5_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_23_TO_36_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_23_to_36_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_5_TO_9_L_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_5_to_9_l_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_3_TO_4_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_3_to_4_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_8_TO_9_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_8_to_9_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_8_TO_15_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_8_to_15_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_26_TO_45_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_26_to_45_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_8_TO_15_L_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_8_to_15_l_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_5_TO_6_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_5_to_6_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_3_TO_5_L_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_3_to_5_l_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_23_TO_36_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_23_to_36_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_5_TO_6_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_5_to_6_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_28_TO_45_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_28_to_45_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_7_TO_9_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_7_to_9_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_7_TO_15_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_7_to_15_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_25_TO_36_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_25_to_36_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_5_TO_9_L_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_5_to_9_l_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_32_TO_45_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_32_to_45_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_26_TO_45_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_26_to_45_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_1_TO_2_L_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_1_to_2_l_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_13_TO_18_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_13_to_18_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_2_TO_3_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_2_to_3_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_9_TO_10_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_9_to_10_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_32_TO_45_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_32_to_45_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_2_TO_3_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_2_to_3_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_26_TO_45_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_26_to_45_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_3_TO_4_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_3_to_4_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_8_TO_15_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_8_to_15_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_4_TO_5_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_4_to_5_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_2_TO_3_L_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_2_to_3_l_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_8_TO_15_L_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_8_to_15_l_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_3_TO_4_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_3_to_4_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_77_TO_90_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_77_to_90_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_26_TO_45_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_26_to_45_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_3_TO_5_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_3_to_5_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_77_TO_90_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_77_to_90_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_7_TO_15_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_7_to_15_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_8_TO_9_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_8_to_9_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_2_TO_3_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_2_to_3_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_4_TO_5_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_4_to_5_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_3_TO_5_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_3_to_5_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_3_TO_4_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_3_to_4_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_16APSK_9_TO_10_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_16apsk_9_to_10_normal_pilots.txt");
+
+  // 32APSK
+  m_table[SatEnums::SAT_MODCOD_S2X_32APSK_7_TO_9_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_32apsk_7_to_9_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_32APSK_5_TO_6_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_32apsk_5_to_6_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_32APSK_8_TO_9_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_32apsk_8_to_9_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_32APSK_11_TO_15_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_32apsk_11_to_15_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_32APSK_32_TO_45_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_32apsk_32_to_45_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_32APSK_2_TO_3_L_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_32apsk_2_to_3_l_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_32APSK_2_TO_3_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_32apsk_2_to_3_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_32APSK_8_TO_9_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_32apsk_8_to_9_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_32APSK_2_TO_3_L_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_32apsk_2_to_3_l_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_32APSK_5_TO_6_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_32apsk_5_to_6_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_32APSK_32_TO_45_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_32apsk_32_to_45_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_32APSK_3_TO_4_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_32apsk_3_to_4_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_32APSK_32_TO_45_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_32apsk_32_to_45_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_32APSK_4_TO_5_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_32apsk_4_to_5_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_32APSK_5_TO_6_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_32apsk_5_to_6_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_32APSK_8_TO_9_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_32apsk_8_to_9_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_32APSK_11_TO_15_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_32apsk_11_to_15_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_32APSK_4_TO_5_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_32apsk_4_to_5_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_32APSK_3_TO_4_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_32apsk_3_to_4_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_32APSK_7_TO_9_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_32apsk_7_to_9_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_32APSK_5_TO_6_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_32apsk_5_to_6_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_32APSK_2_TO_3_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_32apsk_2_to_3_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_32APSK_3_TO_4_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_32apsk_3_to_4_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_32APSK_9_TO_10_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_32apsk_9_to_10_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_32APSK_3_TO_4_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_32apsk_3_to_4_short_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_32APSK_32_TO_45_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_32apsk_32_to_45_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_32APSK_9_TO_10_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_32apsk_9_to_10_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_32APSK_8_TO_9_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_32apsk_8_to_9_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_32APSK_4_TO_5_SHORT_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_32apsk_4_to_5_short_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_32APSK_4_TO_5_SHORT_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_32apsk_4_to_5_short_pilots.txt");
+
+  // 64APSK
+  m_table[SatEnums::SAT_MODCOD_S2X_64APSK_4_TO_5_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_64apsk_4_to_5_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_64APSK_32_TO_45_L_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_64apsk_32_to_45_l_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_64APSK_5_TO_6_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_64apsk_5_to_6_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_64APSK_4_TO_5_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_64apsk_4_to_5_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_64APSK_7_TO_9_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_64apsk_7_to_9_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_64APSK_5_TO_6_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_64apsk_5_to_6_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_64APSK_11_TO_15_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_64apsk_11_to_15_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_64APSK_7_TO_9_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_64apsk_7_to_9_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_64APSK_11_TO_15_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_64apsk_11_to_15_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_64APSK_32_TO_45_L_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_64apsk_32_to_45_l_normal_nopilots.txt");
+
+  // 128APSK
+  m_table[SatEnums::SAT_MODCOD_S2X_128APSK_7_TO_9_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_128apsk_7_to_9_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_128APSK_7_TO_9_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_128apsk_7_to_9_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_128APSK_3_TO_4_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_128apsk_3_to_4_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_128APSK_3_TO_4_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_128apsk_3_to_4_normal_nopilots.txt");
+
+  // 256APSK
+  m_table[SatEnums::SAT_MODCOD_S2X_256APSK_29_TO_45_L_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_256apsk_29_to_45_l_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_256APSK_31_TO_45_L_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_256apsk_31_to_45_l_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_256APSK_3_TO_4_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_256apsk_3_to_4_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_256APSK_11_TO_15_L_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_256apsk_11_to_15_l_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_256APSK_29_TO_45_L_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_256apsk_29_to_45_l_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_256APSK_31_TO_45_L_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_256apsk_31_to_45_l_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_256APSK_2_TO_3_L_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_256apsk_2_to_3_l_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_256APSK_11_TO_15_L_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_256apsk_11_to_15_l_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_256APSK_32_TO_45_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_256apsk_32_to_45_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_256APSK_32_TO_45_NORMAL_PILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_256apsk_32_to_45_normal_pilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_256APSK_2_TO_3_L_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_256apsk_2_to_3_l_normal_nopilots.txt");
+  m_table[SatEnums::SAT_MODCOD_S2X_256APSK_3_TO_4_NORMAL_NOPILOTS] = CreateObject<SatLookUpTable> (m_inputPath + "s2x_256apsk_3_to_4_normal_nopilots.txt");
+
+} // end of void SatLinkResultsDvbS2X::DoInitialize
 
 } // end of namespace ns3

@@ -159,7 +159,7 @@ SatDvbS2BbFrameConfTestCase::DoRun (void)
   lr->Initialize ();
 
   // Create BBFrame conf
-  Ptr<SatBbFrameConf> bbFrameConf = CreateObject<SatBbFrameConf> (symbolRate);
+  Ptr<SatBbFrameConf> bbFrameConf = CreateObject<SatBbFrameConf> (symbolRate, SatEnums::DVB_S2);
   bbFrameConf->InitializeCNoRequirements (lr);
 
   std::vector<SatEnums::SatModcod_t> modcods;
