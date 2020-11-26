@@ -169,6 +169,15 @@ public:
   virtual void ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint8_t rcIndex);
 
   /**
+   * Receive a queue event:
+   * - FIRST_BUFFER_RCVD
+   * - BUFFER_EMPTY
+   * /param event Queue event from SatQueue
+   * /param rcIndex Identifier of the queue
+   */
+  virtual void ReceiveQueueEventEssa (SatQueue::QueueEvent_t event, uint8_t rcIndex);
+
+  /**
    * Set address of the GW (or its MAC) serving this UT.
    *
    * \param gwAddress Address of the GW.
@@ -302,6 +311,12 @@ private:
   void ScheduleSlottedAlohaTransmission (uint32_t allocationChannel);
 
   /**
+   * \brief Function for scheduling the ESSA transmissions
+   * \param allocationChannel RA allocation channel
+   */
+  void ScheduleEssaTransmission (uint32_t allocationChannel);
+
+  /**
    * \brief Function for scheduling the CRDSA transmissions
    * \param allocationChannel RA allocation channel
    * \param txOpportunities Tx opportunities
@@ -413,6 +428,17 @@ private:
   void DoSlottedAlohaTransmit (Time duration, Ptr<SatWaveform> waveform, uint32_t carrierId, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy = SatUtScheduler::LOOSE);
 
   /**
+   * Notify the upper layer about the ESSA Tx opportunity. If upper layer
+   * returns a PDU, send it to lower layer.
+   *
+   * \param duration duration of the burst
+   * \param waveform waveform
+   * \param carrierId Carrier id used for the transmission
+   * \param rcIndex RC index
+   */
+  void DoEssaTransmit (Time duration, Ptr<SatWaveform> waveform, uint32_t carrierId, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy = SatUtScheduler::LOOSE);
+
+  /**
    *
    * \param payloadBytes Tx opportunity payload
    * \param type Time slot type
@@ -521,7 +547,7 @@ private:
   /**
    * CRDSA packet ID (per frame)
    */
-  uint8_t m_crdsaUniquePacketId;
+  uint32_t m_crdsaUniquePacketId;
 
   /**
    * Planned CRDSA usage:
@@ -530,16 +556,27 @@ private:
    */
   bool m_crdsaOnlyForControl;
 
+  /**
+   * Next time when a next ESSA packet can be safely sent.
+   */
+  Time m_nextPacketTime;
+
+  /**
+   * Flag that indicates if a method DoRandomAccess is scheduled for
+   * asynchronous access.
+   */
+  bool m_isRandomAccessScheduled;
+
   class SatTimuInfo : public SimpleRefCount<SatTimuInfo>
   {
-public:
+  public:
     SatTimuInfo (uint32_t beamId, Address address);
 
     uint32_t GetBeamId () const;
 
     Address GetGwAddress () const;
 
-private:
+  private:
     uint32_t m_beamId;
     Address m_gwAddress;
   };

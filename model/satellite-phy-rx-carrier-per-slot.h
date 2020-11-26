@@ -67,6 +67,11 @@ public:
   static TypeId GetTypeId (void);
 
   /**
+   * \brief Function for initializing the frame/window end scheduling
+   */
+  virtual void BeginEndScheduling ();
+
+  /**
    * \brief Function for setting the random access allocation channel ID
    * \param randomAccessAllocationChannelId
    */

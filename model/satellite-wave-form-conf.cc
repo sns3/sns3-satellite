@@ -47,19 +47,21 @@ SatWaveform::SatWaveform ()
   m_modCod (SatEnums::SAT_NONVALID_MODCOD),
   m_payloadBytes (0),
   m_lengthInSymbols (0),
+  m_preambleLengthInSymbols (0),
   m_ebnoRequirement (0.0)
 {
   NS_ASSERT (false);
 }
 
 
-SatWaveform::SatWaveform (uint32_t wfId, uint32_t modulatedBits, double codingRate, SatEnums::SatModcod_t modcod, uint32_t payloadBytes, uint32_t lengthInSymbols)
+SatWaveform::SatWaveform (uint32_t wfId, uint32_t modulatedBits, double codingRate, SatEnums::SatModcod_t modcod, uint32_t payloadBytes, uint32_t lengthInSymbols, uint32_t preambleLengthInSymbols)
   : m_waveformId (wfId),
   m_modulatedBits (modulatedBits),
   m_codingRate (codingRate),
   m_modCod (modcod),
   m_payloadBytes (payloadBytes),
   m_lengthInSymbols (lengthInSymbols),
+  m_preambleLengthInSymbols (preambleLengthInSymbols),
   m_ebnoRequirement (0.0)
 {
 
@@ -93,11 +95,25 @@ SatWaveform::GetBurstLengthInSymbols () const
   return m_lengthInSymbols;
 }
 
+uint32_t
+SatWaveform::GetPreambleLengthInSymbols () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_preambleLengthInSymbols;
+}
+
 Time
 SatWaveform::GetBurstDuration (double symbolRateInBaud) const
 {
   NS_LOG_FUNCTION (this << symbolRateInBaud);
   return Seconds (m_lengthInSymbols / symbolRateInBaud);
+}
+
+Time
+SatWaveform::GetPreambleDuration (double symbolRateInBaud) const
+{
+  NS_LOG_FUNCTION (this << symbolRateInBaud);
+  return Seconds (m_preambleLengthInSymbols / symbolRateInBaud);
 }
 
 double
@@ -203,7 +219,7 @@ SatWaveformConf::GetTypeId (void)
                     "Default waveform id",
                     UintegerValue (3),
                     MakeUintegerAccessor (&SatWaveformConf::m_defaultWfId),
-                    MakeUintegerChecker<uint32_t> (3, 22))
+                    MakeUintegerChecker<uint32_t> (1, 22))
     .AddConstructor<SatWaveformConf> ()
   ;
   return tid;
@@ -241,14 +257,27 @@ SatWaveformConf::ReadFromFile (std::string filePathName)
   std::vector<double> rowVector;
 
   // Start conditions
-  int32_t wfIndex, modulatedBits, payloadBytes, durationInSymbols;
+  int32_t wfIndex, modulatedBits, payloadBytes, durationInSymbols, preambleDurationInSymbols;
   std::string sCodingRate;
 
-  // Read a row
-  *ifs >> wfIndex >> modulatedBits >> sCodingRate >> payloadBytes >> durationInSymbols;
+  // Read line by line
+  std::string line;
 
-  while (ifs->good ())
+  while (std::getline (*ifs, line))
     {
+      std::istringstream line_ss (line);
+
+      // Unpack values
+      if (!(line_ss >> wfIndex >> modulatedBits >> sCodingRate >> payloadBytes >> durationInSymbols))
+        {
+          NS_FATAL_ERROR ("SatWaveformConf::ReadFromFile - Waveform conf vector has unexpected amount of elements!");
+        }
+      // Try to unpack preambule duration
+      if (!(line_ss >> preambleDurationInSymbols))
+        {
+          preambleDurationInSymbols = 0;
+        }
+
       // Store temporarily all wfIds
       wfIds.push_back (wfIndex);
 
@@ -277,11 +306,9 @@ SatWaveformConf::ReadFromFile (std::string filePathName)
       SatEnums::SatModcod_t modcod = ConvertToModCod (modulatedBits, output[0], output[1]);
 
       // Create new waveform and insert it to the waveform map
-      Ptr<SatWaveform> wf = Create<SatWaveform> (wfIndex, modulatedBits, dCodingRate, modcod, payloadBytes, durationInSymbols);
+      Ptr<SatWaveform> wf = Create<SatWaveform> (wfIndex, modulatedBits, dCodingRate, modcod, payloadBytes, durationInSymbols, preambleDurationInSymbols);
       m_waveforms.insert (std::make_pair (wfIndex, wf));
 
-      // get next row
-      *ifs >> wfIndex >> modulatedBits >> sCodingRate >> payloadBytes >> durationInSymbols;
     }
 
   ifs->close ();
@@ -450,6 +477,19 @@ SatWaveformConf::ConvertToModCod (uint32_t modulatedBits, uint32_t codingRateNum
 
   switch (modulatedBits)
     {
+    // BPSK
+    case 1:
+      {
+        if (codingRateNumerator == 1 && codingRateDenominator == 3)
+          {
+            return SatEnums::SAT_MODCOD_BPSK_1_TO_3;
+          }
+        else
+          {
+            NS_FATAL_ERROR ("Unsupported coding rate numerator: " << codingRateNumerator << ", denominator: " << codingRateDenominator);
+          }
+        break;
+      }
     // QPSK
     case 2:
       {

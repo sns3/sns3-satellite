@@ -29,6 +29,7 @@
 #include <ns3/satellite-per-packet-interference.h>
 #include <ns3/satellite-traced-interference.h>
 #include <ns3/satellite-perfect-interference-elimination.h>
+#include <ns3/satellite-residual-interference-elimination.h>
 #include <ns3/satellite-mac-tag.h>
 #include <ns3/singleton.h>
 #include <ns3/satellite-composite-sinr-output-trace-container.h>
@@ -62,7 +63,8 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
   m_satInterferenceElimination (),
   m_enableCompositeSinrOutputTrace (false),
   m_numOfOngoingRx (0),
-  m_rxPacketCounter (0)
+  m_rxPacketCounter (0),
+  m_waveformConf (waveformConf)
 {
   NS_LOG_FUNCTION (this << carrierId);
 
@@ -180,6 +182,12 @@ SatPhyRxCarrier::DoCreateInterferenceEliminationModel (
         m_satInterferenceElimination = CreateObject<SatPerfectInterferenceElimination> ();
         break;
       }
+    case SatPhyRxCarrierConf::SIC_RESIDUAL:
+      {
+        NS_LOG_INFO (this << " Residual interference elimination model created for carrier: " << carrierId);
+        m_satInterferenceElimination = CreateObject<SatResidualInterferenceElimination> (waveformConf);
+        break;
+      }
     default:
       {
         NS_LOG_ERROR (this << " Not a valid interference elimination model!");
@@ -194,6 +202,10 @@ SatPhyRxCarrier::~SatPhyRxCarrier ()
   NS_LOG_FUNCTION (this);
 }
 
+void
+SatPhyRxCarrier::BeginEndScheduling (void)
+{
+}
 
 TypeId
 SatPhyRxCarrier::GetTypeId (void)

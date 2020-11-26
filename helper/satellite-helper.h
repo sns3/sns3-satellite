@@ -85,6 +85,12 @@ public:
   SatHelper ();
 
   /**
+   * \brief Create a base SatHelper for creating customized Satellite topologies.
+   */
+  SatHelper (std::string scenarioName);
+
+
+  /**
    * Destructor for SatHelper
    */
   virtual ~SatHelper ()
@@ -324,6 +330,11 @@ private:
    * File name for UT creation trace output
    */
   std::string m_utCreationFileName;
+
+  /**
+   * File name for Waveform configurations file
+   */
+  std::string m_wfConfigFileName;
 
   /**
    * Antenna gain patterns for all spot-beams. Used for beam selection.

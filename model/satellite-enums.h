@@ -147,6 +147,7 @@ public:
     SAT_MODCOD_32APSK_4_TO_5,  // 0.80
     SAT_MODCOD_32APSK_5_TO_6,  // 0.83
     SAT_MODCOD_32APSK_8_TO_9,  // 0.89
+    SAT_MODCOD_BPSK_1_TO_3,    // 0.33
 
     SAT_MODCOD_S2X_QPSK_11_TO_45_SHORT_NOPILOTS,       //0.24
     SAT_MODCOD_S2X_QPSK_11_TO_45_SHORT_PILOTS,         //0.24
@@ -747,6 +748,8 @@ public:
         return "32APSK_5_TO_6";
       case SAT_MODCOD_32APSK_8_TO_9:
         return "32APSK_8_TO_9";
+      case SAT_MODCOD_BPSK_1_TO_3:
+        return "BPSK_1_TO_3";
       case SAT_MODCOD_S2X_QPSK_11_TO_45_SHORT_NOPILOTS:
         return "QPSK_11_TO_45_SHORT_NOPILOTS";
       case SAT_MODCOD_S2X_QPSK_11_TO_45_SHORT_PILOTS:
@@ -2014,7 +2017,8 @@ public:
   typedef enum
   {
     RA_TRIGGER_TYPE_SLOTTED_ALOHA = 0,
-    RA_TRIGGER_TYPE_CRDSA = 1
+    RA_TRIGGER_TYPE_CRDSA = 1,
+    RA_TRIGGER_TYPE_ESSA = 2
   } RandomAccessTriggerType_t;
 
   static inline std::string GetRandomAccessTriggerTypeName (RandomAccessTriggerType_t triggerType)
@@ -2028,6 +2032,10 @@ public:
       case RA_TRIGGER_TYPE_CRDSA:
         {
           return "RA_TRIGGER_TYPE_CRDSA";
+        }
+      case RA_TRIGGER_TYPE_ESSA:
+        {
+          return "RA_TRIGGER_TYPE_ESSA";
         }
       default:
         {
@@ -2050,6 +2058,7 @@ public:
     RA_MODEL_CRDSA = 2,
     RA_MODEL_RCS2_SPECIFICATION = 3,
     RA_MODEL_MARSALA = 4,
+    RA_MODEL_ESSA = 5
   } RandomAccessModel_t;
 
   static inline std::string GetRandomAccessModelName (RandomAccessModel_t model)
@@ -2072,6 +2081,10 @@ public:
         {
           return "RA_MODEL_RCS2_SPECIFICATION";
         }
+      case RA_MODEL_ESSA:
+        {
+          return "RA_MODEL_ESSA";
+        }
       default:
         {
           NS_FATAL_ERROR ("SatEnums::GetRandomAccessModelName - Invalid model");
@@ -2092,6 +2105,7 @@ public:
     RA_TX_OPPORTUNITY_DO_NOTHING = 0,
     RA_TX_OPPORTUNITY_SLOTTED_ALOHA = 1,
     RA_TX_OPPORTUNITY_CRDSA = 2,
+    RA_TX_OPPORTUNITY_ESSA = 3,
   } RandomAccessTxOpportunityType_t;
 
   static inline std::string GetRandomAccessOpportunityTypeName (RandomAccessTxOpportunityType_t opportunityType)
@@ -2109,6 +2123,10 @@ public:
       case RA_TX_OPPORTUNITY_CRDSA:
         {
           return "RA_TX_OPPORTUNITY_CRDSA";
+        }
+      case RA_TX_OPPORTUNITY_ESSA:
+        {
+          return "RA_TX_OPPORTUNITY_ESSA";
         }
       default:
         {
@@ -2129,6 +2147,7 @@ public:
     PACKET_TYPE_DEDICATED_ACCESS = 0,
     PACKET_TYPE_SLOTTED_ALOHA = 1,
     PACKET_TYPE_CRDSA = 2,
+    PACKET_TYPE_ESSA = 3,
   } PacketType_t;
 
   static inline std::string GetPacketTypeName (PacketType_t packetType)
@@ -2144,6 +2163,10 @@ public:
           return "PACKET_TYPE_SLOTTED_ALOHA";
         }
       case PACKET_TYPE_CRDSA:
+        {
+          return "PACKET_TYPE_CRDSA";
+        }
+      case PACKET_TYPE_ESSA:
         {
           return "PACKET_TYPE_CRDSA";
         }
@@ -2222,6 +2245,17 @@ public:
   {
     DEFAULT_SUPERFRAME_ALLOCATOR = 0,
   } SuperframeAllocatorType_t;
+
+  /**
+   * \enum LinkResults_t
+   * \brief Return link Link result types. These are used to define which type of
+   * waveforms are used to check link results on the return link.
+   */
+  typedef enum
+  {
+    LR_RCS2 = 0,
+    LR_FSIM = 1
+  } LinkResults_t;
 
 private:
   /**

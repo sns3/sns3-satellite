@@ -621,4 +621,34 @@ SatStatsCrdsaPacketErrorHelper::GetTypeId ()
 }
 
 
+// E-SSA //////////////////////////////////////////////////////////////////////
+
+NS_OBJECT_ENSURE_REGISTERED (SatStatsEssaPacketErrorHelper);
+
+SatStatsEssaPacketErrorHelper::SatStatsEssaPacketErrorHelper (Ptr<const SatHelper> satHelper)
+  : SatStatsPacketErrorHelper (satHelper)
+{
+  NS_LOG_FUNCTION (this << satHelper);
+  SetTraceSourceName ("EssaRxError");
+  SetLinkDirection (SatEnums::LD_RETURN);
+  SetValidCarrierType (SatPhyRxCarrier::RA_ESSA);
+}
+
+
+SatStatsEssaPacketErrorHelper::~SatStatsEssaPacketErrorHelper ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsEssaPacketErrorHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsEssaPacketErrorHelper")
+    .SetParent<SatStatsPacketErrorHelper> ()
+  ;
+  return tid;
+}
+
+
 } // end of namespace ns3

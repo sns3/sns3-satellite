@@ -373,7 +373,7 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
 
   // Begin frame end scheduling for processes utilizing frame length as interval
   // Node info needs to be set before the start in order to get the scheduling context correctly set
-  phy->BeginFrameEndScheduling ();
+  phy->BeginEndScheduling ();
 
   // TODO: When multiple carriers are supported. Multiple scheduler are needed too.
   double carrierBandwidth = m_carrierBandwidthConverter (SatEnums::FORWARD_FEEDER_CH, 0, SatEnums::EFFECTIVE_BANDWIDTH);

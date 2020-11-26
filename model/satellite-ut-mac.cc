@@ -94,6 +94,8 @@ SatUtMac::SatUtMac ()
   m_raChannel (0),
   m_crdsaUniquePacketId (1),
   m_crdsaOnlyForControl (false),
+  m_nextPacketTime (Now ()),
+  m_isRandomAccessScheduled (false),
   m_timuInfo (0),
   m_handoverState (NO_HANDOVER),
   m_firstTransmittableSuperframeId (0),
@@ -118,6 +120,8 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, bool crdsaOnlyFo
   m_raChannel (0),
   m_crdsaUniquePacketId (1),
   m_crdsaOnlyForControl (crdsaOnlyForControl),
+  m_nextPacketTime (Now ()),
+  m_isRandomAccessScheduled (false),
   m_timuInfo (0),
   m_handoverState (NO_HANDOVER),
   m_firstTransmittableSuperframeId (0),
@@ -330,6 +334,13 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
    * at correct time.
    */
 
+  /// If using asynchronous access (no timeslots), return
+  /// TODO find better way of doing this
+  if (m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE)->GetConfigType () == SatSuperframeConf::CONFIG_TYPE_4)
+    {
+      return;
+    }
+
   Time timingAdvance = m_timingAdvanceCb ();
   Time txTime = Singleton<SatRtnLinkTime>::Get ()->GetSuperFrameTxTime (tbtp->GetSuperframeSeqId (), tbtp->GetSuperframeCounter (), timingAdvance);
 
@@ -491,6 +502,63 @@ SatUtMac::DoSlottedAlohaTransmit (Time duration, Ptr<SatWaveform> waveform, uint
       TransmitPackets (packets, duration, carrierId, txInfo);
     }
 }
+
+void
+SatUtMac::DoEssaTransmit (Time duration, Ptr<SatWaveform> waveform, uint32_t carrierId, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy)
+{
+  NS_LOG_FUNCTION (this << duration.GetSeconds () << waveform->GetPayloadInBytes () << carrierId << (uint32_t)(rcIndex));
+  NS_LOG_INFO ("SatUtMac::DoEssaTransmit - Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () << " at time: " << Simulator::Now ().GetSeconds () << " duration: " << duration.GetSeconds () << ", payload: " << waveform->GetPayloadInBytes () << ", carrier: " << carrierId << ", RC index: " << (uint32_t)(rcIndex));
+
+  /// get the slot payload
+  uint32_t payloadBytes = waveform->GetPayloadInBytes ();
+
+  /// get the next packets
+  SatPhy::PacketContainer_t packets;
+  m_utScheduler->DoScheduling (packets, payloadBytes, SatTimeSlotConf::SLOT_TYPE_TRC, rcIndex, policy);
+
+  if ( !packets.empty () )
+    {
+      NS_LOG_INFO ("Number of packets sent in a ESSA frame: " << packets.size ());
+
+      for (SatPhy::PacketContainer_t::const_iterator it = packets.begin ();
+           it != packets.end ();
+           ++it)
+        {
+          // Add packet trace entry:
+          m_packetTrace (Simulator::Now (),
+                         SatEnums::PACKET_SENT,
+                         m_nodeInfo->GetNodeType (),
+                         m_nodeInfo->GetNodeId (),
+                         m_nodeInfo->GetMacAddress (),
+                         SatEnums::LL_MAC,
+                         SatEnums::LD_RETURN,
+                         SatUtils::GetPacketInfo (*it));
+        }
+
+      /// create ESSA Tx params
+      SatSignalParameters::txInfo_s txInfo;
+      txInfo.packetType = SatEnums::PACKET_TYPE_ESSA;
+      txInfo.modCod = waveform->GetModCod ();
+      txInfo.fecBlockSizeInBytes = waveform->GetPayloadInBytes ();
+      txInfo.frameType = SatEnums::UNDEFINED_FRAME;
+      txInfo.waveformId = waveform->GetWaveformId ();
+      txInfo.crdsaUniquePacketId = m_crdsaUniquePacketId; // reuse the crdsaUniquePacketId to identify ESSA frames
+
+      TransmitPackets (packets, duration, carrierId, txInfo);
+      m_crdsaUniquePacketId++;
+      /// update m_nextPacketTime
+      m_nextPacketTime = Now () + duration; // TODO: this doesn't take into account the guard bands !!
+      /// schedule a DoRandomAccess then in case there still are packets to transmit
+      /// ( schedule DoRandomAccess in case there is a back-off to compute )
+      Simulator::Schedule (duration, &SatUtMac::DoRandomAccess, this, SatEnums::RA_TRIGGER_TYPE_ESSA);
+      m_isRandomAccessScheduled = true;
+    }
+  else
+    {
+      m_isRandomAccessScheduled = false;
+    }
+}
+
 SatPhy::PacketContainer_t
 SatUtMac::FetchPackets (uint32_t payloadBytes, SatTimeSlotConf::SatTimeSlotType_t type, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy)
 {
@@ -577,6 +645,31 @@ SatUtMac::ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint8_t rcIndex)
               NS_LOG_INFO ("Doing Slotted ALOHA");
 
               DoRandomAccess (SatEnums::RA_TRIGGER_TYPE_SLOTTED_ALOHA);
+            }
+        }
+    }
+}
+
+void
+SatUtMac::ReceiveQueueEventEssa (SatQueue::QueueEvent_t event, uint8_t rcIndex)
+{
+  NS_LOG_FUNCTION (this << event << (uint32_t) rcIndex);
+
+  NS_LOG_INFO ("SatUtMac::ReceiveQueueEventEssa - UT: " << m_nodeInfo->GetMacAddress () << " time: " << Now ().GetSeconds () << " Queue: " << (uint32_t)rcIndex);
+
+  // DoRandomAccess only if it is not scheduled yet
+  // NOTE: could use m_nextPacketTime to do the check
+  if (!m_isRandomAccessScheduled)
+    {
+      if (event == SatQueue::FIRST_BUFFERED_PKT || event == SatQueue::BUFFERED_PKT)
+        {
+          NS_LOG_INFO ("SatUtMac::ReceiveQueueEventEssa - Buffered packet event received");
+
+          if (m_randomAccess != NULL)
+            {
+              NS_LOG_INFO ("SatUtMac::ReceiveQueueEventEssa - Doing ESSA");
+
+              DoRandomAccess (SatEnums::RA_TRIGGER_TYPE_ESSA);
             }
         }
     }
@@ -718,8 +811,8 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
                          "  Updating RA backoff probability for AC: " << allocationChannelId <<
                          " to: " << backoffProbability);
 
-            m_randomAccess->SetCrdsaBackoffProbability (allocationChannelId, backoffProbability);
-            m_randomAccess->SetCrdsaBackoffTimeInMilliSeconds (allocationChannelId, backoffTime);
+            m_randomAccess->SetBackoffProbability (allocationChannelId, backoffProbability);
+            m_randomAccess->SetBackoffTime (allocationChannelId, backoffTime);
 
             packet->RemovePacketTag (macTag);
             packet->RemovePacketTag (ctrlTag);
@@ -796,6 +889,9 @@ SatUtMac::DoRandomAccess (SatEnums::RandomAccessTriggerType_t randomAccessTrigge
 
   NS_LOG_INFO ("UT: " << m_nodeInfo->GetMacAddress ());
 
+  /// reset the isRaandomAccessScheduled flag. TODO: should be done only if randomAccessTriggerType is ESSA
+  m_isRandomAccessScheduled = false;
+
   SatRandomAccess::RandomAccessTxOpportunities_s txOpportunities;
 
   /// select the RA allocation channel
@@ -821,6 +917,18 @@ SatUtMac::DoRandomAccess (SatEnums::RandomAccessTriggerType_t randomAccessTrigge
 
       /// schedule CRDSA transmission
       ScheduleCrdsaTransmission (allocationChannel, txOpportunities);
+    }
+  /// process ESSA opportunities
+  else if (txOpportunities.txOpportunityType == SatEnums::RA_TX_OPPORTUNITY_ESSA)
+    {
+      NS_LOG_INFO ("SatUtMac::DoRandomAccess - Processing ESSA results");
+      /// set the is RA scheduled
+      /// TODO: if there are no Tx opportunities there'll be no scheduling until a new event arrives
+      m_isRandomAccessScheduled = true;
+      Time txOpportunity = Time::FromInteger (txOpportunities.slottedAlohaTxOpportunity, Time::MS);
+
+      /// schedule the transmission
+      Simulator::Schedule (txOpportunity, &SatUtMac::ScheduleEssaTransmission, this, allocationChannel);
     }
 }
 
@@ -982,6 +1090,44 @@ SatUtMac::FindNextAvailableRandomAccessSlot (Time opportunityOffset,
                " slot: " << slotId << "/" << timeSlotCount);
 
   return std::make_pair (availableSlotFound, slotId);
+}
+
+void
+SatUtMac::ScheduleEssaTransmission (uint32_t allocationChannel)
+{
+  // TODO: do we really need the allocationChannel ???
+  NS_LOG_FUNCTION (this << allocationChannel);
+
+  NS_LOG_INFO ("SatUtMac::ScheduleEssaTransmission - UT: " << m_nodeInfo->GetMacAddress () << " time: " << Now ().GetSeconds () << " AC: " << allocationChannel);
+
+  /// start time
+  Time offset = m_nextPacketTime - Now ();
+
+  if (offset.IsStrictlyNegative ())
+    {
+      /// not transmiting at the moment, transmit now
+      offset = Seconds (0);
+    }
+
+  /// duration
+  Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE);
+  uint8_t frameId = superframeConf->GetRaChannelFrameId (allocationChannel);
+  Ptr<SatFrameConf> frameConf = superframeConf->GetFrameConf (frameId);
+  Ptr<SatTimeSlotConf> timeSlotConf = frameConf->GetTimeSlotConf ( 0 ); // only one timeslot on ESSA
+
+  Ptr<SatWaveform> wf = m_superframeSeq->GetWaveformConf ()->GetWaveform (timeSlotConf->GetWaveFormId ());
+  Time duration = wf->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
+
+  NS_LOG_INFO ("SatUtMac::ScheduleEssaTransmission - Starting to schedule @ " << Now ().GetSeconds () <<
+               " Tx start: " << (Now () + offset).GetSeconds () <<
+               " duration: " << duration.GetSeconds () <<
+               " payload in bytes: " << wf->GetPayloadInBytes ());
+
+  /// carrier
+  uint32_t carrierId = 0; // TODO: for now we use 0 as we have a single carrier
+
+  /// schedule transmission
+  Simulator::Schedule (offset, &SatUtMac::DoEssaTransmit, this, duration, wf, carrierId, uint8_t (SatEnums::CONTROL_FID), SatUtScheduler::LOOSE);
 }
 
 void

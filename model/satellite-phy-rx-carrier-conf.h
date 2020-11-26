@@ -81,7 +81,7 @@ public:
    */
   enum InterferenceEliminationModel
   {
-    SIC_NONE, SIC_PERFECT,
+    SIC_NONE, SIC_PERFECT, SIC_RESIDUAL
   };
 
   /**

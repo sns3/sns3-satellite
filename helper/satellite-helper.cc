@@ -155,6 +155,11 @@ SatHelper::GetTypeId (void)
                    StringValue ("CreationTraceUt"),
                    MakeStringAccessor (&SatHelper::m_utCreationFileName),
                    MakeStringChecker ())
+    .AddAttribute ("WaveformConfigFileName",
+                   "File name that contains return channel waveform configurations",
+                   StringValue ("dvbRcs2Waveforms.txt"),
+                   MakeStringAccessor (&SatHelper::m_wfConfigFileName),
+                   MakeStringChecker ())
     .AddTraceSource ("Creation", "Creation traces",
                      MakeTraceSourceAccessor (&SatHelper::m_creationDetailsTrace),
                      "ns3::SatTypedefs::CreationCallback")
@@ -193,6 +198,7 @@ SatHelper::SatHelper ()
 {
   NS_LOG_FUNCTION (this);
 
+  // uncomment next line, if attributes are needed already in construction phase
   ObjectBase::ConstructSelf(AttributeConstructionList ());
 
   Singleton<SatEnvVariables>::Get ()->Initialize ();

@@ -133,7 +133,7 @@ SatFrameAllocatorTestCase::~SatFrameAllocatorTestCase ()
 void SatFrameAllocatorTestCase::InitFrame (SatSuperframeConf::ConfigType_t configType)
 {
   // create first frame with two carriers and each carrier having three slots
-  Ptr<SatBtuConf> btu = Create<SatBtuConf> (10e4, 0.4, 0.1);
+  Ptr<SatBtuConf> btu = Create<SatBtuConf> (10e4, 0.4, 0.1, 1);
 
   bool defaultWaveformInUse = false;
   bool checkSlotLimit = true;

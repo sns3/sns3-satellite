@@ -139,6 +139,38 @@ public:
                                                     uint32_t minIdleBlocks);
 
   /**
+   * \brief Function for setting the backoff time in frames
+   * \param allocationChannel allocation channel
+   * \param backoffTimeInFrames backoff time
+   */
+  void SetFSimBackoffTimeInFrames (uint32_t allocationChannel,
+                                   uint32_t backoffTimeInFrames);
+
+  /**
+   * \brief Function for setting the backoff probability
+   * \param allocationChannel allocation channel
+   * \param backoffPersistence backoff persistence
+   */
+  void SetFSimBackoffProbability (uint32_t allocationChannel,
+                                  uint16_t backoffPersistence);
+
+  /**
+   * \brief Function for setting the backoff time
+   * \param allocationChannel allocation channel
+   * \param backoffTime backoff time
+   */
+  void SetBackoffTime (uint32_t allocationChannel,
+                       uint32_t backoffTime);
+
+  /**
+   * \brief Function for setting the backoff probability
+   * \param allocationChannel allocation channel
+   * \param backoffProbability backoff probability
+   */
+  void SetBackoffProbability (uint32_t allocationChannel,
+                              uint16_t backoffProbability);
+
+  /**
    * \brief Function for setting the Slotted ALOHA control randomization interval
    * \param controlRandomizationIntervalInMilliSeconds Control randomization interval in milliseconds
    */
@@ -202,6 +234,13 @@ private:
    * \return The carrier allocation channel configuration ID
    */
   uint32_t GetConfigurationIdForAllocationChannel (uint32_t allocationChannelId);
+
+  /**
+   * \brief Main function for ESSA
+   * \param allocationChannel allocation channel
+   * \return ESSA algorithm results (Tx opportunity)
+   */
+  SatRandomAccess::RandomAccessTxOpportunities_s DoEssa (uint32_t allocationChannel);
 
   /**
    * \brief Main function for Slotted ALOHA
@@ -313,6 +352,13 @@ private:
    * \return Is Slotted ALOHA allocation channel
    */
   bool IsSlottedAlohaAllocationChannel (uint32_t allocationChannel);
+
+  /**
+   * \brief Function for checking if the allocation channel is ESSA allocation channel
+   * \param allocationChannel allocation channel
+   * \return Is ESSA allocation channel
+   */
+  bool IsEssaAllocationChannel (uint32_t allocationChannel);
 
   /**
    * \brief Uniform random variable object

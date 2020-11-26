@@ -242,6 +242,11 @@ public:
     switch (modcod)
       {
       //DVB-S2
+      case SatEnums::SAT_MODCOD_BPSK_1_TO_3:
+        {
+          return 1;
+          break;
+        }
       case SatEnums::SAT_MODCOD_QPSK_1_TO_3:
       case SatEnums::SAT_MODCOD_QPSK_1_TO_2:
       case SatEnums::SAT_MODCOD_QPSK_3_TO_5:
@@ -548,6 +553,7 @@ public:
     switch (modcod)
       {
       // DVB-S2
+      case SatEnums::SAT_MODCOD_BPSK_1_TO_3:
       case SatEnums::SAT_MODCOD_QPSK_1_TO_3:
         {
           return 1.0 / 3.0;
@@ -1213,6 +1219,21 @@ public:
     double relX = x - x0;
     double relY = (dY / dX) * relX;
     return y0 + relY;
+  }
+
+  /**
+   * \brief Scalar product
+   * \param vector Array of pairs of doubles
+   * \return Sum of the product of each pair elements
+   */
+  static inline double ScalarProduct (const std::vector<std::pair<double, double> >& vector)
+  {
+    double scalarProduct = 0.0;
+    for (const std::pair<double, double>& element: vector)
+      {
+        scalarProduct += element.first * element.second;
+      }
+    return scalarProduct;
   }
 
 private:

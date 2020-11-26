@@ -30,6 +30,7 @@
 #include "satellite-phy-rx.h"
 #include "satellite-phy-rx-carrier.h"
 #include "satellite-phy-rx-carrier-marsala.h"
+#include "satellite-phy-rx-carrier-per-window.h"
 #include "satellite-phy-rx-carrier-per-frame.h"
 #include "satellite-phy-rx-carrier-per-slot.h"
 #include "satellite-phy-rx-carrier-uplink.h"
@@ -201,7 +202,7 @@ SatPhyRx::SetNodeInfo (const Ptr<SatNodeInfo> nodeInfo)
 }
 
 void
-SatPhyRx::BeginFrameEndScheduling ()
+SatPhyRx::BeginEndScheduling ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -209,11 +210,7 @@ SatPhyRx::BeginFrameEndScheduling ()
        it != m_rxCarriers.end ();
        ++it)
     {
-      Ptr<SatPhyRxCarrierPerFrame> crdsaPrxc = (*it)->GetObject<SatPhyRxCarrierPerFrame> ();
-      if (crdsaPrxc != 0)
-        {
-          crdsaPrxc->BeginFrameEndScheduling ();
-        }
+      (*it)->BeginEndScheduling ();
     }
 }
 
@@ -351,6 +348,12 @@ SatPhyRx::ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatS
             else if (raModel == SatEnums::RA_MODEL_MARSALA)
               {
                 rxc = CreateObject<SatPhyRxCarrierMarsala> (i, carrierConf, waveformConf, true);
+                DynamicCast<SatPhyRxCarrierPerSlot> (rxc)->
+                SetRandomAccessAllocationChannelId (superFrameConf->GetRaChannel (i));
+              }
+            else if (raModel == SatEnums::RA_MODEL_ESSA)
+              {
+                rxc = CreateObject<SatPhyRxCarrierPerWindow> (i, carrierConf, waveformConf, true);
                 DynamicCast<SatPhyRxCarrierPerSlot> (rxc)->
                 SetRandomAccessAllocationChannelId (superFrameConf->GetRaChannel (i));
               }

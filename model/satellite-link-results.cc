@@ -126,6 +126,42 @@ SatLinkResultsDvbRcs2::GetEbNoDb (uint32_t waveformId, double blerTarget) const
 }
 
 /*
+ * SATLINKRESULTSFSIM CHILD CLASS
+ */
+NS_OBJECT_ENSURE_REGISTERED (SatLinkResultsFSim);
+
+SatLinkResultsFSim::SatLinkResultsFSim ()
+  : SatLinkResultsDvbRcs2 ()
+{
+}
+
+TypeId
+SatLinkResultsFSim::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatLinkResultsFSim")
+    .SetParent<SatLinkResultsDvbRcs2> ();
+  return tid;
+}
+
+void
+SatLinkResultsFSim::DoInitialize ()
+{
+  NS_LOG_FUNCTION (this);
+
+  // Waveform ids 1-2 currently supported
+  for (uint32_t i = 1; i <= 2; ++i)
+    {
+      std::ostringstream ss;
+      ss << i;
+      std::string filePathName = m_inputPath + "fsim_waveformat" + ss.str () + ".txt";
+      m_table.insert (std::make_pair (i, CreateObject<SatLookUpTable> (filePathName)));
+    }
+
+  // Initialize Mutual Information table
+  m_mutualInformationTable = CreateObject<SatMutualInformationTable> (m_inputPath + "mutualInformationTable.txt");
+} // end of void SatLinkResultsFSim::DoInitialize
+
+/*
  * SATLINKRESULTSFWD ABSTRACT CLASS
  */
 

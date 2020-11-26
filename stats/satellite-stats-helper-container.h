@@ -47,8 +47,8 @@ namespace ns3 {
  * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] [Dev, Mac, Phy] Throughput
  * - AddAverage [Beam, Ut, UtUser] [Fwd, Rtn] AppThroughput
  * - AddAverage [Beam, Ut] [Fwd, Rtn] [Dev, Mac, Phy] Throughput
- * - Add [Global, PerGw, PerBeam, PerUt] [FwdDa, RtnDa, SlottedAloha, Crdsa] PacketError
- * - Add [Global, PerGw, PerBeam, PerUt] [SlottedAloha, Crdsa] PacketCollision
+ * - Add [Global, PerGw, PerBeam, PerUt] [FwdDa, RtnDa, SlottedAloha, Crdsa, Essa] PacketError
+ * - Add [Global, PerGw, PerBeam, PerUt] [SlottedAloha, Crdsa, Essa] PacketCollision
  * - Add [Global, PerGw, PerBeam, PerUt] CapacityRequest
  * - Add [Global, PerGw, PerBeam, PerUt] ResourcesGranted
  * - Add [Global, PerGw, PerBeam] BackloggedRequest
@@ -58,6 +58,7 @@ namespace ns3 {
  * - AddGlobal [Fwd, Rtn] [Feeder, User] LinkSinr
  * - AddGlobal [Fwd, Rtn] [Feeder, User] LinkRxPower
  * - Add [Global, PerGw, PerBeam] FrameTypeUsage
+ * - Add [Global, PerGw, PerBeam] RtnFeederWindowLoad
  *
  * Also check the Doxygen documentation of this class for more information.
  */
@@ -257,6 +258,12 @@ public:
   // Random Access Marsala packet collision rate statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (MarsalaCorrelation)
 
+  // Random Access E-SSA packet error rate statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (EssaPacketError)
+
+  // Random Access E-SSA packet collision rate statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (EssaPacketCollision)
+
   // Capacity request statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (CapacityRequest)
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RbdcRequest)
@@ -302,6 +309,11 @@ public:
   // Fwd Link Scheduler SymbolRate statistics.
   void AddPerSliceFwdLinkSchedulerSymbolRate (SatStatsHelper::OutputType_t outputType);
   void AddGlobalFwdLinkSchedulerSymbolRate (SatStatsHelper::OutputType_t outputType);
+
+  // Window load statistics
+  void AddGlobalRtnFeederWindowLoad (SatStatsHelper::OutputType_t outputType);
+  void AddPerGwRtnFeederWindowLoad (SatStatsHelper::OutputType_t outputType);
+  void AddPerBeamRtnFeederWindowLoad (SatStatsHelper::OutputType_t outputType);
 
   /**
    * \param outputType an arbitrary output type.

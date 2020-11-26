@@ -450,9 +450,9 @@ public:
   void SetNodeInfo (const Ptr<SatNodeInfo> nodeInfo);
 
   /**
-   * \brief Begin frame end scheduling for processes utilizing frame length as interval
+   * \brief Begin frame/window end scheduling for processes utilizing frame length as interval
    */
-  void BeginFrameEndScheduling ();
+  void BeginEndScheduling ();
 
   /**
    * \brief Callback for retrieving a pair of SatChannel associated to a beam

@@ -39,6 +39,7 @@ class SatPhyRxCarrierConf;
 class SatPhyRxCarrier;
 class SatPhyRxCarrierPerSlot;
 class SatPhyRxCarrierPerFrame;
+class SatPhyRxCarrierPerWindow;
 class SatPhyRxCarrierUplink;
 
 /**
@@ -210,9 +211,9 @@ public:
   void SetNodeInfo (const Ptr<SatNodeInfo> nodeInfo);
 
   /**
-   * \brief Begin frame end scheduling for processes utilizing frame length as interval
+   * \brief Begin frame/window end scheduling for processes utilizing frame length as interval
    */
-  void BeginFrameEndScheduling ();
+  void BeginEndScheduling ();
 
 private:
   Ptr<MobilityModel> m_mobility;

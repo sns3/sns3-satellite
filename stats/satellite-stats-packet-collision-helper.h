@@ -210,6 +210,46 @@ public:
 };
 
 
+// E-SSA //////////////////////////////////////////////////////////////
+
+/**
+ * \ingroup satstats
+ * \brief Produce packet collision statistics of Random Access E-SSA
+ *        from a satellite module simulation.
+ *
+ * For a more convenient usage in simulation script, it is recommended to use
+ * the corresponding methods in SatStatsHelperContainer class.
+ *
+ * Otherwise, the following example can be used:
+ * \code
+ * Ptr<SatStatsEssaPacketCollisionHelper> s = Create<SatStatsEssaPacketCollisionHelper> (satHelper);
+ * s->SetName ("name");
+ * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+ * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
+ * s->Install ();
+ * \endcode
+ */
+class SatStatsEssaPacketCollisionHelper : public SatStatsPacketCollisionHelper
+{
+public:
+  // inherited from SatStatsPacketCollisionHelper base class
+  SatStatsEssaPacketCollisionHelper (Ptr<const SatHelper> satHelper);
+
+
+  /**
+   * / Destructor.
+   */
+  virtual ~SatStatsEssaPacketCollisionHelper ();
+
+
+  /**
+   * inherited from ObjectBase base class
+   */
+  static TypeId GetTypeId ();
+
+};
+
+
 } // end of namespace ns3
 
 
