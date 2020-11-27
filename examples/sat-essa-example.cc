@@ -64,7 +64,7 @@ main (int argc, char *argv[])
   bool interferenceModePerPacket = true;
   bool displayTraces = true;
 
-  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("sat-essa-example");
+  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("example-essa");
 
   // read command line parameters given by user
   CommandLine cmd;
@@ -174,7 +174,8 @@ main (int argc, char *argv[])
   // Outputs
   simulationHelper->EnableProgressLogs ();
 
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("contrib/satellite/data/sims/sat-essa-example/output-attributes.xml"));
+  std::string outputPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory ("contrib/satellite/data/sims/example-essa");
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (outputPath + "/output-attributes.xml"));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
   ConfigStore outputConfig;
