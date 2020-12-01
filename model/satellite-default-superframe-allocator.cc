@@ -184,7 +184,7 @@ SatDefaultSuperframeAllocator::SelectCarriers (SatFrameAllocator::SatFrameAllocC
     }
 
   NS_LOG_LOGIC ("Allocate carriers in subdivision levels");
-  if (!scaledDemand.empty ())
+  while (!scaledDemand.empty ())
     {
       NS_LOG_LOGIC ("Find bandwidth of the original frame");
       Ptr<SatFrameAllocator> frameAllocator = scaledDemand.begin()->first;
