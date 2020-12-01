@@ -170,8 +170,8 @@ SatFrameAllocator::BandwidthComparator::operator () (
   double bandwidthA = a->m_frameConf->GetBandwidthHz ();
   double bandwidthB = b->m_frameConf->GetBandwidthHz ();
 
-  if (bandwidthA == bandwidthB) return a < b;
-  return bandwidthA < bandwidthB;
+  if (bandwidthA == bandwidthB) return a > b;
+  return bandwidthA > bandwidthB;
 }
 
 // SatFrameAllocator
