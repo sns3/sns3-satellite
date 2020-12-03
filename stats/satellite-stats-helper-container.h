@@ -254,7 +254,7 @@ public:
 
   // Random Access CRDSA packet collision rate statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (CrdsaPacketCollision)
-  //
+
   // Random Access Marsala packet collision rate statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (MarsalaCorrelation)
 
@@ -263,6 +263,9 @@ public:
 
   // Random Access E-SSA packet collision rate statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (EssaPacketCollision)
+
+  // Dedicated Access carrier ID statistics
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (CarrierId)
 
   // Capacity request statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (CapacityRequest)

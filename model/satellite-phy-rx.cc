@@ -365,6 +365,7 @@ SatPhyRx::ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatS
             NS_FATAL_ERROR ("SatPhyRx::ConfigurePhyRxCarriers - Invalid channel type!");
           }
         }
+      NS_LOG_INFO (this << " added carrier " << rxc << " on channel " << carrierConf->GetChannelType () << " being random access " << superFrameConf->IsRandomAccessCarrier(i));
       m_rxCarriers.push_back (rxc);
     }
 }

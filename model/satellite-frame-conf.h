@@ -246,211 +246,232 @@ private:
 
 class SatFrameConf : public SimpleRefCount<SatFrameConf>
 {
-public:
-  /**
-   * Define type SatTimeSlotConfContainer_t
-   */
-  typedef std::vector<Ptr<SatTimeSlotConf> > SatTimeSlotConfContainer_t;
+  public:
+    /**
+     * Define type SatTimeSlotConfContainer_t
+     */
+    typedef std::vector<Ptr<SatTimeSlotConf> > SatTimeSlotConfContainer_t;
 
-  static const uint16_t m_maxTimeSlotCount = SatConstVariables::MAXIMUM_TIME_SLOT_ID + 1;
+    static const uint16_t m_maxTimeSlotCount = SatConstVariables::MAXIMUM_TIME_SLOT_ID + 1;
 
-  /**
-   * \brief Helper struct to reduce the number of parameters
-   * fed into the SatFrameConf constructor
-   *
-   * \param bandwidthHz           Bandwidth of the frame in hertz
-   * \param targetDuration        Target duration of the frame
-   * \param btuConf               BTU configuration of the frame
-   * \param waveformConf          Waveform configuration
-   * \param allocationChannel     Lower layer service configuration ID
-   * \param isRandomAccess        Flag telling if random access frame
-   * \param defaultWaveformInUse  Flag telling if default waveform should be used with frame
-   * \param checkSlotLimit        Flag telling if slot limit should be checked already in frame creation phase
-   */
-  typedef struct
-  {
-    double m_bandwidthHz;
-    Time m_targetDuration;
-    Ptr<SatBtuConf> m_btuConf;
-    Ptr<SatWaveformConf> m_waveformConf;
-    uint8_t m_allocationChannel;
-    bool m_isRandomAccess;
-    bool m_defaultWaveformInUse;
-    bool m_checkSlotLimit;
-  } SatFrameConfParams_t;
+    /**
+     * \brief Helper struct to reduce the number of parameters
+     * fed into the SatFrameConf constructor
+     *
+     * \param bandwidthHz           Bandwidth of the frame in hertz
+     * \param targetDuration        Target duration of the frame
+     * \param btuConf               BTU configuration of the frame
+     * \param waveformConf          Waveform configuration
+     * \param allocationChannel     Lower layer service configuration ID
+     * \param isRandomAccess        Flag telling if random access frame
+     * \param defaultWaveformInUse  Flag telling if default waveform should be used with frame
+     * \param checkSlotLimit        Flag telling if slot limit should be checked already in frame creation phase
+     */
+    typedef struct
+    {
+      double m_bandwidthHz;
+      Time m_targetDuration;
+      Ptr<SatFrameConf> m_parent;
+      Ptr<SatBtuConf> m_btuConf;
+      Ptr<SatWaveformConf> m_waveformConf;
+      uint8_t m_allocationChannel;
+      bool m_isRandomAccess;
+      bool m_defaultWaveformInUse;
+      bool m_checkSlotLimit;
+    } SatFrameConfParams_t;
 
-  /**
-   * Default constructor for SatFrameConf
-   */
-  SatFrameConf ();
+    /**
+     * Default constructor for SatFrameConf
+     */
+    SatFrameConf ();
 
-  /**
-   * Constructor for SatFrameConf.
-   *
-   * \param parameters  Parameters to construct the frame configuration with
-   */
-  SatFrameConf (SatFrameConfParams_t parameters);
+    /**
+     * Constructor for SatFrameConf.
+     *
+     * \param parameters  Parameters to construct the frame configuration with
+     */
+    SatFrameConf (SatFrameConfParams_t parameters);
 
-  /**
-   * Destructor for SatFrameConf
-   */
-  ~SatFrameConf ();
+    /**
+     * Destructor for SatFrameConf
+     */
+    ~SatFrameConf ();
 
-  /**
-   * Get time slot configuration of the frame. Possible values for id are from 0 to 2047.
-   *
-   * \param index Id of the time slot requested in frame.
-   * \return      The requested time slot configuration of frame.
-   */
-  Ptr<SatTimeSlotConf> GetTimeSlotConf (uint16_t index) const;
+    /**
+     * Get time slot configuration of the frame. Possible values for id are from 0 to 2047.
+     *
+     * \param index Id of the time slot requested in frame.
+     * \return      The requested time slot configuration of frame.
+     */
+    Ptr<SatTimeSlotConf> GetTimeSlotConf (uint16_t index) const;
 
-  /**
-   * Get time slot conf of the frame. Possible values for id are from 0 to Carrier count - 1.
-   *
-   * \param carrierId Id of carrier which time slot is requested.
-   * \param index Id of the time slot requested in the carrier of the frame.
-   * \return The requested time slot configuration of frame.
-  */
-  Ptr<SatTimeSlotConf> GetTimeSlotConf (uint16_t carrierId, uint16_t index) const;
+    /**
+     * Get time slot conf of the frame. Possible values for id are from 0 to Carrier count - 1.
+     *
+     * \param carrierId Id of carrier which time slot is requested.
+     * \param index Id of the time slot requested in the carrier of the frame.
+     * \return The requested time slot configuration of frame.
+     */
+    Ptr<SatTimeSlotConf> GetTimeSlotConf (uint16_t carrierId, uint16_t index) const;
 
-  /**
-   * Get bandwidth of the frame.
-   *
-   * \return The bandwidth of frame in Hertz.
-   */
-  inline double GetBandwidthHz () const
-  {
-    return m_bandwidthHz;
-  }
+    /**
+     * Get bandwidth of the frame.
+     *
+     * \return The bandwidth of frame in Hertz.
+     */
+    inline double GetBandwidthHz () const
+    {
+      return m_bandwidthHz;
+    }
 
-  /**
-   * Get duration of frame.
-   *
-   * \return The duration of frame.
-   */
-  inline Time GetDuration () const
-  {
-    return m_duration;
-  }
+    /**
+     * Get duration of frame.
+     *
+     * \return The duration of frame.
+     */
+    inline Time GetDuration () const
+    {
+      return m_duration;
+    }
 
-  /**
-   * Get maximum symbols in carrier
-   *
-   * \return maximum symbols in carrier
-   */
-  inline uint32_t GetCarrierMaxSymbols () const
-  {
-    return m_maxSymbolsPerCarrier;
-  }
+    /**
+     * Get maximum symbols in carrier
+     *
+     * \return maximum symbols in carrier
+     */
+    inline uint32_t GetCarrierMaxSymbols () const
+    {
+      return m_maxSymbolsPerCarrier;
+    }
 
-  /**
-   * Get minimum payload of a carrier in bytes
-   *
-   * \return minimum payload of a carrier in bytes
-   */
-  inline uint32_t GetCarrierMinPayloadInBytes () const
-  {
-    return m_minPayloadPerCarrierInBytes;
-  }
+    /**
+     * Get minimum payload of a carrier in bytes
+     *
+     * \return minimum payload of a carrier in bytes
+     */
+    inline uint32_t GetCarrierMinPayloadInBytes () const
+    {
+      return m_minPayloadPerCarrierInBytes;
+    }
 
-  /**
-   * Get carrier center frequency in frame.
-   *
-   * \return The carrier bandwidth in frame in hertz.
-   */
-  double GetCarrierFrequencyHz ( uint16_t carrierId ) const;
+    /**
+     * Get carrier center frequency in frame.
+     *
+     * \return The carrier bandwidth in frame in hertz.
+     */
+    double GetCarrierFrequencyHz ( uint16_t carrierId ) const;
 
-  /**
-   * Get carrier bandwidth in frame.
-   *
-   * \param bandwidthType Type of bandwidth requested.
-   * \return The carrier bandwidth in frame in hertz.
-   */
-  double GetCarrierBandwidthHz (SatEnums::CarrierBandwidthType_t bandwidthType) const;
+    /**
+     * Get carrier bandwidth in frame.
+     *
+     * \param bandwidthType Type of bandwidth requested.
+     * \return The carrier bandwidth in frame in hertz.
+     */
+    double GetCarrierBandwidthHz (SatEnums::CarrierBandwidthType_t bandwidthType) const;
 
-  /**
-   * Get BTU conf of the frame.
-   *
-   * \return The BTU conf of frame.
-   */
-  inline Ptr<SatBtuConf> GetBtuConf () const
-  {
-    return m_btuConf;
-  }
+    /**
+     * Get wether this frame is subdivided or not.
+     *
+     * \return true if this frame is subdivided, false otherwise.
+     */
+    inline bool IsSubdivided () const
+    {
+      return m_parent != nullptr;;
+    }
 
-  /**
-   * Get carrier count of the frame.
-   *
-   * \return The carrier count of the frame.
-   */
-  inline uint16_t GetCarrierCount ()
-  {
-    return m_carrierCount;
-  }
+    /**
+     * Get the subdivision level of this frame.
+     *
+     * \return the amount of time this frame add its carriers split in two.
+     */
+    uint8_t GetSubdivisionLevel () const;
 
-  /**
-   * Get time slot count of the frame.
-   *
-   * \return      The requested time slot count of frame.
-   */
-  uint16_t GetTimeSlotCount () const;
+    inline Ptr<SatFrameConf> GetParent () const { return m_parent; }
 
-  /**
-   * Get time slot of the specific carrier.
-   *
-   * \param carrierId Id of the carrier which time slots are requested.
-   * \return  Container containing time slots.
-   */
-  SatTimeSlotConfContainer_t GetTimeSlotConfs (uint16_t carrierId) const;
+    /**
+     * Get BTU conf of the frame.
+     *
+     * \return The BTU conf of frame.
+     */
+    inline Ptr<SatBtuConf> GetBtuConf () const
+    {
+      return m_btuConf;
+    }
 
-  /**
-   * Get state if frame is random access frame.
-   *
-   * \return Is frame random access frame [true or false]
-   */
-  inline bool IsRandomAccess () const
-  {
-    return m_isRandomAccess;
-  }
+    /**
+     * Get carrier count of the frame.
+     *
+     * \return The carrier count of the frame.
+     */
+    inline uint16_t GetCarrierCount () const
+    {
+      return m_carrierCount;
+    }
 
-  /**
-   * Get allocation channel ID of this frame
-   */
-  inline uint8_t GetAllocationChannelId () const
-  {
-    return m_allocationChannel;
-  }
+    /**
+     * Get time slot count of the frame.
+     *
+     * \return      The requested time slot count of frame.
+     */
+    uint16_t GetTimeSlotCount () const;
 
-  /**
-   * Get waveform configuration of this frame
-   */
-  inline Ptr<SatWaveformConf> GetWaveformConf () const
-  {
-    return m_waveformConf;
-  }
+    /**
+     * Get time slot of the specific carrier.
+     *
+     * \param carrierId Id of the carrier which time slots are requested.
+     * \return  Container containing time slots.
+     */
+    SatTimeSlotConfContainer_t GetTimeSlotConfs (uint16_t carrierId) const;
 
-private:
-  typedef std::map<uint16_t, SatTimeSlotConfContainer_t > SatTimeSlotConfMap_t; // key = carrier ID
+    /**
+     * Get state if frame is random access frame.
+     *
+     * \return Is frame random access frame [true or false]
+     */
+    inline bool IsRandomAccess () const
+    {
+      return m_isRandomAccess;
+    }
 
-  double    m_bandwidthHz;
-  Time      m_duration;
-  bool      m_isRandomAccess;
+    /**
+     * Get allocation channel ID of this frame
+     */
+    inline uint8_t GetAllocationChannelId () const
+    {
+      return m_allocationChannel;
+    }
 
-  Ptr<SatBtuConf>       m_btuConf;
-  Ptr<SatWaveformConf>  m_waveformConf;
-  uint8_t               m_allocationChannel;
-  uint16_t              m_carrierCount;
-  uint32_t              m_maxSymbolsPerCarrier;
-  uint32_t              m_minPayloadPerCarrierInBytes;
-  SatTimeSlotConfMap_t  m_timeSlotConfMap;
+    /**
+     * Get waveform configuration of this frame
+     */
+    inline Ptr<SatWaveformConf> GetWaveformConf () const
+    {
+      return m_waveformConf;
+    }
 
-  /**
-   * Add time slot.
-   *
-   * \param conf  Time slot configuration added.
-   * \return ID of the added time slot.
-   */
-  uint16_t AddTimeSlotConf ( Ptr<SatTimeSlotConf> conf);
+  private:
+    typedef std::map<uint16_t, SatTimeSlotConfContainer_t > SatTimeSlotConfMap_t; // key = carrier ID
+
+    double    m_bandwidthHz;
+    Time      m_duration;
+    bool      m_isRandomAccess;
+
+    Ptr<SatFrameConf>     m_parent;
+    Ptr<SatBtuConf>       m_btuConf;
+    Ptr<SatWaveformConf>  m_waveformConf;
+    uint8_t               m_allocationChannel;
+    uint16_t              m_carrierCount;
+    uint32_t              m_maxSymbolsPerCarrier;
+    uint32_t              m_minPayloadPerCarrierInBytes;
+    SatTimeSlotConfMap_t  m_timeSlotConfMap;
+
+    /**
+     * Add time slot.
+     *
+     * \param conf  Time slot configuration added.
+     * \return ID of the added time slot.
+     */
+    uint16_t AddTimeSlotConf ( Ptr<SatTimeSlotConf> conf);
 };
 
 
@@ -734,6 +755,16 @@ public:
     return m_configType;
   }
 
+  inline void SetMaxSubdivision (uint8_t maximumCarrierSubdivision)
+  {
+    m_maxCarrierSubdivision = maximumCarrierSubdivision;
+  }
+
+  inline uint8_t GetMaxSubdivision () const
+  {
+    return m_maxCarrierSubdivision;
+  }
+
   // Frame specific getter and setter method for attributes (called by methods of objects derived from this object)
   void SetFrameAllocatedBandwidthHz (uint8_t frameIndex, double bandwidthHz);
   void SetFrameCarrierAllocatedBandwidthHz (uint8_t frameIndex, double bandwidthHz);
@@ -760,6 +791,7 @@ private:
 
   uint8_t       m_frameCount;
   ConfigType_t  m_configType;
+  uint8_t       m_maxCarrierSubdivision;
 
   double    m_frameAllocatedBandwidth[m_maxFrameCount];
   double    m_frameCarrierAllocatedBandwidth[m_maxFrameCount];
@@ -786,7 +818,12 @@ private:
    *
    * \param conf  Frame configuration to add super frame configuration
    */
-  void AddFrameConf (Ptr<SatFrameConf> conf);
+  void AddFrameConf (SatFrameConf::SatFrameConfParams_t frameConfParameters,
+                     double bandwidthInHz,
+                     double rollOff,
+                     double spacing,
+                     uint32_t spreadingFactor,
+                     uint8_t subdivisionLevel);
 
 public:
   // macro to ease definition of access methods for frame specific attributes
