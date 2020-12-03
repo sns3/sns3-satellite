@@ -215,6 +215,12 @@ public:
    */
   void BeginEndScheduling ();
 
+  /**
+   * \brief Method for querying the temperature of the chosen carrier
+   * \param rxParams The needed parameters for the received signal
+   */
+  double GetRxTemperatureK (Ptr<SatSignalParameters> rxParams);
+
 private:
   Ptr<MobilityModel> m_mobility;
   Ptr<NetDevice> m_device;

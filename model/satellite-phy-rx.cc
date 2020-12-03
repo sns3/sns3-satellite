@@ -393,6 +393,21 @@ SatPhyRx::GetBeamId () const
   return m_beamId;
 }
 
+double
+SatPhyRx::GetRxTemperatureK (Ptr<SatSignalParameters> rxParams)
+{
+  NS_LOG_FUNCTION (this << rxParams);
+
+  uint32_t cId = rxParams->m_carrierId;
+
+  if (cId >= m_rxCarriers.size ())
+    {
+      NS_FATAL_ERROR ("SatPhyRx::GetRxTemperatureK - unvalid carrier id: " << cId);
+    }
+
+  return m_rxCarriers[cId]->GetRxTemperatureK ();
+}
+
 void
 SatPhyRx::StartRx (Ptr<SatSignalParameters> rxParams)
 {

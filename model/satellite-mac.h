@@ -279,6 +279,12 @@ protected:
   TracedCallback<const Time &, const Address &> m_rxDelayTrace;
 
   /**
+   * Traced callback for all received packets, including jitter information and
+   * the address of the senders.
+   */
+  TracedCallback<const Time &, const Address &> m_rxJitterTrace;
+
+  /**
    * Traced callback for beam being disabled and including service time.
    */
   TracedCallback<Time> m_beamServiceTrace;
@@ -305,6 +311,11 @@ protected:
    * Time of the last beam enable event.
    */
   Time m_beamEnabledTime;
+
+  /**
+   * Last delay measurement. Used to compute jitter.
+   */
+  Time m_lastDelay;
 };
 
 } // namespace ns3

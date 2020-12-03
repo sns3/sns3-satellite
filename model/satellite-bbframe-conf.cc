@@ -157,7 +157,7 @@ SatBbFrameConf::SatBbFrameConf ()
   m_mostRobustNormalFrameModcod (SatEnums::SAT_NONVALID_MODCOD),
   m_dvbVersion (SatEnums::DVB_S2),
   m_bbFrameS2XPilots (true),
-  m_s2XModCodsUsedStr ("")
+  m_modCodsUsedStr ("")
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("Default constructor not supported!!!");
@@ -187,7 +187,7 @@ SatBbFrameConf::SatBbFrameConf (double symbolRate, SatEnums::DvbVersion_t dvbVer
   m_mostRobustNormalFrameModcod (SatEnums::SAT_NONVALID_MODCOD),
   m_dvbVersion (dvbVersion),
   m_bbFrameS2XPilots (true),
-  m_s2XModCodsUsedStr ("")
+  m_modCodsUsedStr ("")
 {
   ObjectBase::ConstructSelf (AttributeConstructionList ());
 
@@ -198,31 +198,32 @@ SatBbFrameConf::SatBbFrameConf (double symbolRate, SatEnums::DvbVersion_t dvbVer
       m_shortFramePayloadInSlots.insert (std::make_pair (payloadConf[i][0], payloadConf[i][2]));
     }
 
+  // Load custom MC list if specified or all MC if nothing in m_modCodsUsedStr is empty
   m_modCodsUsed.clear ();
+  GetModCodsList ();
 
   switch(m_dvbVersion)
-  {
-    case SatEnums::DVB_S2:
-      m_defaultModCod = SatEnums::GetModcodFromName ("SAT_MODCOD_" + m_defaultModCodStr);
-      SatEnums::GetAvailableModcodsFwdLink (m_modCodsUsed);
-      break;
-    case SatEnums::DVB_S2X:
-      if (m_bbFrameUsageMode == SatEnums::SHORT_AND_NORMAL_FRAMES)
-        {
-          NS_FATAL_ERROR ("Cannot use NORMAL_AND_SHORT_FRAMES with DVB-S2X ModCods");
-        }
-      // Load custom MC list if specified or all MC if nothing in m_s2XModCodsUsedStr is empty
-      GetModCodsList ();
+    {
+      case SatEnums::DVB_S2:
+        m_defaultModCod = SatEnums::GetModcodFromName ("SAT_MODCOD_" + m_defaultModCodStr);
+        break;
+      case SatEnums::DVB_S2X:
+        if (m_bbFrameUsageMode == SatEnums::SHORT_AND_NORMAL_FRAMES)
+          {
+            NS_FATAL_ERROR ("Cannot use NORMAL_AND_SHORT_FRAMES with DVB-S2X ModCods");
+          }
 
-      m_defaultModCod = SatEnums::GetModcodFromName ("SAT_MODCOD_S2X_" + m_defaultModCodStr +
-          "_" + (m_bbFrameUsageMode == SatEnums::NORMAL_FRAMES ? "NORMAL" : "SHORT") +
-          "_" + (m_bbFrameS2XPilots ? "PILOTS" : "NOPILOTS"));
+        m_defaultModCod = SatEnums::GetModcodFromName ("SAT_MODCOD_S2X_" + m_defaultModCodStr +
+            "_" + (m_bbFrameUsageMode == SatEnums::NORMAL_FRAMES ? "NORMAL" : "SHORT") +
+            "_" + (m_bbFrameS2XPilots ? "PILOTS" : "NOPILOTS"));
 
-      m_defaultModCodDummyFramesS2X = SatEnums::GetModcodFromName ("SAT_MODCOD_S2X_" + m_defaultModCodDummyFramesS2XStr +
-          "_SHORT_" + (m_bbFrameS2XPilots ? "PILOTS" : "NOPILOTS"));
+        m_defaultModCodDummyFramesS2X = SatEnums::GetModcodFromName ("SAT_MODCOD_S2X_" + m_defaultModCodDummyFramesS2XStr +
+            "_SHORT_" + (m_bbFrameS2XPilots ? "PILOTS" : "NOPILOTS"));
 
-      break;
-  }
+        break;
+      default:
+        NS_FATAL_ERROR ("Unknown DVB version used");
+    }
 
   if (std::find(m_modCodsUsed.begin(), m_modCodsUsed.end(), m_defaultModCod) == m_modCodsUsed.end())
     {
@@ -411,10 +412,10 @@ SatBbFrameConf::GetTypeId (void)
                     BooleanValue (true),
                     MakeBooleanAccessor (&SatBbFrameConf::m_bbFrameS2XPilots),
                     MakeBooleanChecker ())
-    .AddAttribute ("S2XModCodsUsed",
+    .AddAttribute ("ModCodsUsed",
                    "List of DVB-S2X ModCods used. If nothing specified, all available ModCods are used",
                    StringValue (""),
-                   MakeStringAccessor (&SatBbFrameConf::m_s2XModCodsUsedStr),
+                   MakeStringAccessor (&SatBbFrameConf::m_modCodsUsedStr),
                    MakeStringChecker ())
     .AddConstructor<SatBbFrameConf> ()
   ;
@@ -558,20 +559,45 @@ SatBbFrameConf::GetModCodsList ()
 {
   NS_LOG_FUNCTION (this);
   m_modCodsUsed.clear ();
-  if (m_s2XModCodsUsedStr.size () == 0)
-  {
-    SatEnums::GetAvailableModcodsFwdLinkS2X (m_modCodsUsed, m_bbFrameUsageMode, m_bbFrameS2XPilots);
-    return;
-  }
 
-  std::stringstream strm (m_s2XModCodsUsedStr);
+  if (m_modCodsUsedStr.size () == 0)
+    {
+      switch (m_dvbVersion)
+        {
+          case SatEnums::DVB_S2:
+            SatEnums::GetAvailableModcodsFwdLink (m_modCodsUsed);
+            return;
+          case SatEnums::DVB_S2X:
+            SatEnums::GetAvailableModcodsFwdLinkS2X (m_modCodsUsed, m_bbFrameUsageMode, m_bbFrameS2XPilots);
+            return;
+          default:
+            NS_FATAL_ERROR ("Incorrect DVB version");
+        }
+    }
+
+  std::stringstream strm (m_modCodsUsedStr);
   std::string name;
+  std::string prefix;
+  std::string suffix;
+
+  switch (m_dvbVersion)
+    {
+      case SatEnums::DVB_S2:
+        prefix = "SAT_MODCOD_";
+        suffix = "";
+        break;
+      case SatEnums::DVB_S2X:
+        prefix = "SAT_MODCOD_S2X_";
+        suffix = std::string("_") + (m_bbFrameUsageMode == SatEnums::NORMAL_FRAMES ? "NORMAL" : "SHORT") +
+                 "_" + (m_bbFrameS2XPilots ? "PILOTS" : "NOPILOTS");
+        break;
+      default:
+        NS_FATAL_ERROR ("Incorrect DVB version");
+    }
 
   while (getline(strm, name, ' '))
     {
-      SatEnums::SatModcod_t mc = SatEnums::GetModcodFromName ("SAT_MODCOD_S2X_" + name +
-        "_" + (m_bbFrameUsageMode == SatEnums::NORMAL_FRAMES ? "NORMAL" : "SHORT") +
-        "_" + (m_bbFrameS2XPilots ? "PILOTS" : "NOPILOTS"));
+      SatEnums::SatModcod_t mc = SatEnums::GetModcodFromName (prefix + name + suffix);
       m_modCodsUsed.push_back (mc);
     }
   std::sort (m_modCodsUsed.begin (), m_modCodsUsed.end ());

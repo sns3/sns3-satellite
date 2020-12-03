@@ -191,6 +191,11 @@ private:
 
   Ptr<SatNodeInfo> m_nodeInfo;
 
+  /**
+   * Last delay measurement. Used to compute jitter.
+   */
+  Time m_lastDelay;
+
   TracedCallback<Time,
                  SatEnums::SatPacketEvent_t,
                  SatEnums::SatNodeType_t,
@@ -223,6 +228,12 @@ private:
    * the address of the senders.
    */
   TracedCallback<const Time &, const Address &> m_rxDelayTrace;
+
+  /**
+   * Traced callback for all received packets, including jitter information and
+   * the address of the senders.
+   */
+  TracedCallback<const Time &, const Address &> m_rxJitterTrace;
 
 };
 

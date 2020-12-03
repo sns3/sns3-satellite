@@ -227,6 +227,12 @@ public:
   static TypeId GetTypeId (void);
 
   /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
+  virtual TypeId GetInstanceTypeId (void) const;
+
+  /**
    * Check if ACM is enabled.
    */
   inline bool IsAcmEnabled () const
@@ -378,6 +384,11 @@ private:
    */
   uint32_t m_minWfId;
   uint32_t m_maxWfId;
+
+  /**
+   * Burst length used.
+   */
+  SatEnums::SatWaveFormBurstLength_t m_burstLength;
 
   /**
    * Container to store supported burst lengths.

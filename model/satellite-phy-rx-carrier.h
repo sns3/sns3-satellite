@@ -219,6 +219,14 @@ public:
    */
   void SetAverageNormalizedOfferedLoadCallback (SatPhyRx::AverageNormalizedOfferedLoadCallback callback);
 
+  /**
+   * \brief Method for querying the temperature of the carrier
+   */
+  double GetRxTemperatureK ()
+    {
+      return m_rxTemperatureK;
+    }
+
 protected:
   /**
    * Get the default receive mode for the carrier. In satellite nodes, this will
