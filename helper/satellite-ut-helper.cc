@@ -85,16 +85,6 @@ SatUtHelper::GetTypeId (void)
                                     SatPhyRxCarrierConf::IF_TRACE, "Trace",
                                     SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket",
                                     SatPhyRxCarrierConf::IF_PER_FRAGMENT, "PerFragment"))
-    .AddAttribute ("EnableLogon",
-                   "Start simulations with UT logged off",
-                   BooleanValue (false),
-                   MakeBooleanAccessor (&SatUtHelper::m_enableLogon),
-                   MakeBooleanChecker ())
-    .AddAttribute ("LogonChannelId",
-                   "Channel Id of the logon carrier",
-                   UintegerValue (0),
-                   MakeUintegerAccessor (&SatUtHelper::m_logonChannelId),
-                   MakeUintegerChecker<uint32_t> ())
     .AddAttribute ("FwdLinkErrorModel",
                    "Forward link error model",
                    EnumValue (SatPhyRxCarrierConf::EM_AVI),
@@ -432,10 +422,14 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId,
   // Attach the device receive callback to SatMac
   llc->SetReceiveCallback (MakeCallback (&SatNetDevice::Receive, dev));
 
+  Ptr<SatSuperframeConf> superFrameConf = m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE);
+  bool enableLogon = superFrameConf->IsLogonEnabled ();
+  uint32_t logonChannelId = superFrameConf->GetLogonChannelIndex ();
+
   // Add UT to NCC
-  if (m_enableLogon)
+  if (enableLogon)
     {
-      ncc->ReserveLogonChannel (m_logonChannelId);
+      ncc->ReserveLogonChannel (logonChannelId);
     }
   else
     {
@@ -478,13 +472,13 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId,
 
       /// attach the RA module
       mac->SetRandomAccess (randomAccess);
-      if (m_enableLogon)
+      if (enableLogon)
         {
-          mac->SetLogonChannel (m_logonChannelId);
+          mac->SetLogonChannel (logonChannelId);
           mac->LogOff ();
         }
     }
-  else if (m_enableLogon)
+  else if (enableLogon)
     {
       NS_FATAL_ERROR ("Cannot simulate logon without a RA frame");
     }

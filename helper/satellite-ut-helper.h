@@ -239,16 +239,6 @@ private:
    */
   bool m_crdsaOnlyForControl;
 
-  /**
-   * Logon simulation
-   */
-  bool m_enableLogon;
-
-  /**
-   * Logon carrier
-   */
-  bool m_logonChannelId;
-
   /*
    * Asynchronous access on the return channel:
    * - true -> asynchronous

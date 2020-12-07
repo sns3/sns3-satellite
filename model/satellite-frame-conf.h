@@ -264,6 +264,7 @@ class SatFrameConf : public SimpleRefCount<SatFrameConf>
      * \param waveformConf          Waveform configuration
      * \param allocationChannel     Lower layer service configuration ID
      * \param isRandomAccess        Flag telling if random access frame
+     * \param m_isLogon             Flag telling if logon frame
      * \param defaultWaveformInUse  Flag telling if default waveform should be used with frame
      * \param checkSlotLimit        Flag telling if slot limit should be checked already in frame creation phase
      */
@@ -276,6 +277,7 @@ class SatFrameConf : public SimpleRefCount<SatFrameConf>
       Ptr<SatWaveformConf> m_waveformConf;
       uint8_t m_allocationChannel;
       bool m_isRandomAccess;
+      bool m_isLogon;
       bool m_defaultWaveformInUse;
       bool m_checkSlotLimit;
     } SatFrameConfParams_t;
@@ -433,6 +435,16 @@ class SatFrameConf : public SimpleRefCount<SatFrameConf>
       return m_isRandomAccess;
     }
 
+/**
+     * Get state if frame is logon frame.
+     *
+     * \return Is frame logon frame [true or false]
+     */
+    inline bool IsLogon () const
+    {
+      return m_isLogon;
+    }
+
     /**
      * Get allocation channel ID of this frame
      */
@@ -455,6 +467,7 @@ class SatFrameConf : public SimpleRefCount<SatFrameConf>
     double    m_bandwidthHz;
     Time      m_duration;
     bool      m_isRandomAccess;
+    bool      m_isLogon;
 
     Ptr<SatFrameConf>     m_parent;
     Ptr<SatBtuConf>       m_btuConf;
@@ -772,15 +785,19 @@ public:
   void SetFrameCarrierRollOff (uint8_t frameIndex, double rollOff);
   void SetFrameCarrierSpreadingFactor (uint8_t frameIndex, uint32_t spreadingFactor);
   void SetFrameRandomAccess (uint8_t frameIndex, bool randomAccess);
+  void SetFrameLogon (uint8_t frameIndex, bool logon);
   void SetFrameAllocationChannelId (uint8_t frameIndex, uint8_t allocationChannel);
 
-  double GetFrameAllocatedBandwidthHz (uint8_t frameIndex) const;
-  double GetFrameCarrierAllocatedBandwidthHz (uint8_t frameIndex) const;
-  double GetFrameCarrierSpacing (uint8_t frameIndex) const;
-  double GetFrameCarrierRollOff (uint8_t frameIndex) const;
-  uint32_t GetFrameCarrierSpreadingFactor (uint8_t frameIndex) const;
-  bool IsFrameRandomAccess (uint8_t frameIndex) const;
-  uint8_t GetFrameAllocationChannelId (uint8_t frameIndex) const;
+  double    GetFrameAllocatedBandwidthHz (uint8_t frameIndex) const;
+  double    GetFrameCarrierAllocatedBandwidthHz (uint8_t frameIndex) const;
+  double    GetFrameCarrierSpacing (uint8_t frameIndex) const;
+  double    GetFrameCarrierRollOff (uint8_t frameIndex) const;
+  uint32_t  GetFrameCarrierSpreadingFactor (uint8_t frameIndex) const;
+  bool      IsFrameRandomAccess (uint8_t frameIndex) const;
+  bool      IsFrameLogon (uint8_t frameIndex) const;
+  uint8_t   GetFrameAllocationChannelId (uint8_t frameIndex) const;
+  bool      IsLogonEnabled () const;
+  uint32_t  GetLogonChannelIndex () const;
 
 private:
   // first = frame ID, second = RA channel id (index), third = allocation channel id
@@ -799,11 +816,14 @@ private:
   double    m_frameCarrierRollOff[m_maxFrameCount];
   uint32_t  m_frameCarrierSpreadingFactor[m_maxFrameCount];
   bool      m_frameIsRandomAccess[m_maxFrameCount];
+  bool      m_frameIsLogon[m_maxFrameCount];
   uint8_t   m_frameAllocationChannel[m_maxFrameCount];
 
   SatFrameConfList_t            m_frames;
   std::vector<RaChannelInfo_t>  m_raChannels;
   uint32_t                      m_carrierCount;
+  bool                          m_logonEnabled;
+  uint32_t                      m_logonChannelIndex;
 
   /**
    * Get frame id where given global carrier ID belongs to.
@@ -856,7 +876,11 @@ public:
   inline void SetFrame ## index ## AllocationChannelId (uint8_t value) \
   { return SetFrameAllocationChannelId (index, value); } \
   inline uint8_t GetFrame ## index ## AllocationChannelId () const \
-  { return GetFrameAllocationChannelId (index); }
+  { return GetFrameAllocationChannelId (index); } \
+  inline void SetFrame ## index ## Logon (bool value)  \
+  { return SetFrameLogon (index, value); } \
+  inline double IsFrame ## index ## Logon () const      \
+  { return IsFrameLogon (index); }
 
   // Access method definition for frame specific attributes
   // there should be as many macro calls as m_maxFrameCount defines
