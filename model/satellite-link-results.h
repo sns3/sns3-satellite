@@ -27,6 +27,7 @@
 #include <ns3/object.h>
 #include <ns3/ptr.h>
 #include <ns3/satellite-look-up-table.h>
+#include <ns3/satellite-mutual-information-table.h>
 #include <ns3/satellite-enums.h>
 
 namespace ns3 {
@@ -151,9 +152,8 @@ protected:
   /**
    * \brief Initialize by loading DVB-RCS2 look up tables.
    */
-  void DoInitialize ();
+  virtual void DoInitialize ();
 
-private:
   /**
    * \brief Map of satellite link result look up tables.
    * - key = uint32_t, i.e. waveform id
@@ -162,25 +162,97 @@ private:
   std::map<uint32_t, Ptr<SatLookUpTable> > m_table;
 };
 
+/**
+ * \ingroup satellite
+ *
+ * \brief Link results for F-SIM.
+ *
+ * Loads and maintains multiple SatLookUpTable. Provides query service based on
+ * waveform id. Loads and maintains a Mutual Information table.
+ *
+ * See usage examples in the parent class documentation (SatLinkResults).
+ */
+// TODO: this is only a temporary solution. SatLinkResultsFSim could inherit from
+// a class such as SatLinkResultsReturn, as well as SatLinkResultsDvbRcs2
+class SatLinkResultsFSim : public SatLinkResultsDvbRcs2
+{
+public:
+  /**
+   * Default constructor.
+   */
+  SatLinkResultsFSim ();
+  ~SatLinkResultsFSim ()
+  {
+  }
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
+  static TypeId GetTypeId ();
+
+  /**
+   * \brief Get the Normalized Symbol Information corresponding to a given SNIR
+   * \param snirDb SNIR in logarithmic scale
+   * \return Normalized  Symbol Information
+   */
+  inline double GetNormalizedSymbolInformation (double snirDb) const
+  {
+    return m_mutualInformationTable->GetNormalizedSymbolInformation (snirDb);
+  }
+
+  /**
+   * \brief Get the SNIR in dB for a given Normalized Symbol Information target
+   * \param Normalizd Symbol Information target (0-1)
+   * \return Snir target in dB
+   */
+  inline double GetSnirDb (double symbolInformationTarget) const
+  {
+    return m_mutualInformationTable->GetSnirDb (symbolInformationTarget);
+  }
+
+  /**
+   * \brief Get the Mutual Information Table
+   */
+  inline Ptr<SatMutualInformationTable> GetMutualInformationTable () const
+  {
+    return m_mutualInformationTable;
+  }
+
+protected:
+  /**
+   * \brief Initialize by loading F-SIM look up tables.
+   */
+  void DoInitialize ();
+
+private:
+  /**
+   * \brief Mutual information table.
+   */
+  Ptr<SatMutualInformationTable> m_mutualInformationTable;
+};
+
 
 /**
  * \ingroup satellite
  *
- * \brief Link results for DVB-S2.
+ * \brief Link results for forward link.
+ *
+ * The instance will be SatLinkResultsDvbS2 or SatLinkResultsDvbS2X.
  *
  * Loads and maintains multiple SatLookUpTable. Provides query service based on
  * modulation and coding scheme.
  *
  * See usage examples in the parent class documentation (SatLinkResults).
  */
-class SatLinkResultsDvbS2 : public SatLinkResults
+class SatLinkResultsFwd : public SatLinkResults
 {
 public:
   /**
    * Default constructor.
    */
-  SatLinkResultsDvbS2 ();
-  ~SatLinkResultsDvbS2 ()
+  SatLinkResultsFwd ();
+  ~SatLinkResultsFwd ()
   {
   }
 
@@ -218,11 +290,15 @@ public:
 
 protected:
   /**
-   * \brief Initialize by loading DVB-S2 look up tables.
+   * \brief Initialize look up tables.
+   *
+   * Child classes must implement this function to initialize
+   * m_table member variable. This is typically done by loading
+   * pre-defined input files from the file system. In case of failure, the
+   * function should throw an error by calling `NS_FATAL_ERROR`.
    */
-  void DoInitialize ();
+  virtual void DoInitialize () = 0;
 
-private:
   /**
    * \brief Map of satellite link result look up tables.
    * - key = SatModcod_e, i.e. modulation and coding scheme
@@ -231,6 +307,76 @@ private:
   std::map<SatEnums::SatModcod_t, Ptr<SatLookUpTable> > m_table;
 
   double m_shortFrameOffsetInDb;
+};
+
+
+/**
+ * \ingroup satellite
+ *
+ * \brief Link results for DVB-S2.
+ *
+ * Loads and maintains multiple SatLookUpTable. Provides query service based on
+ * modulation and coding scheme.
+ *
+ * See usage examples in the parent class documentation (SatLinkResults).
+ */
+class SatLinkResultsDvbS2 : public SatLinkResultsFwd
+{
+public:
+  /**
+   * Default constructor.
+   */
+  SatLinkResultsDvbS2 ();
+  ~SatLinkResultsDvbS2 ()
+  {
+  }
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
+  static TypeId GetTypeId ();
+
+private:
+  /**
+   * \brief Initialize by loading DVB-S2 look up tables.
+   */
+  void DoInitialize ();
+};
+
+
+/**
+ * \ingroup satellite
+ *
+ * \brief Link results for DVB-S2X.
+ *
+ * Loads and maintains multiple SatLookUpTable. Provides query service based on
+ * modulation and coding scheme.
+ *
+ * See usage examples in the parent class documentation (SatLinkResults).
+ */
+class SatLinkResultsDvbS2X : public SatLinkResultsFwd
+{
+public:
+  /**
+   * Default constructor.
+   */
+  SatLinkResultsDvbS2X ();
+  ~SatLinkResultsDvbS2X ()
+  {
+  }
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
+  static TypeId GetTypeId ();
+
+private:
+  /**
+   * \brief Initialize by loading DVB-S2 look up tables.
+   */
+  void DoInitialize ();
 };
 
 

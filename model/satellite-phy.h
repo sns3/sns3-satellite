@@ -450,9 +450,9 @@ public:
   void SetNodeInfo (const Ptr<SatNodeInfo> nodeInfo);
 
   /**
-   * \brief Begin frame end scheduling for processes utilizing frame length as interval
+   * \brief Begin frame/window end scheduling for processes utilizing frame length as interval
    */
-  void BeginFrameEndScheduling ();
+  void BeginEndScheduling ();
 
   /**
    * \brief Callback for retrieving a pair of SatChannel associated to a beam
@@ -502,6 +502,12 @@ protected:
    * the address of the senders.
    */
   TracedCallback<const Time &, const Address &> m_rxDelayTrace;
+
+  /**
+   * Traced callback for all received packets, including jitter information and
+   * the address of the senders.
+   */
+  TracedCallback<const Time &, const Address &> m_rxJitterTrace;
 
   /**
    * Node info containing node related information, such as
@@ -593,6 +599,11 @@ private:
    * \brief Default fading value
    */
   double m_defaultFadingValue;
+
+  /**
+   * Last delay measurement. Used to compute jitter.
+   */
+  Time m_lastDelay;
 };
 
 

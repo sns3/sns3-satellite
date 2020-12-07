@@ -80,7 +80,8 @@ SatBeamHelper::GetTypeId (void)
                                     SatEnums::RA_MODEL_SLOTTED_ALOHA, "RaSlottedAloha",
                                     SatEnums::RA_MODEL_CRDSA, "RaCrdsa",
                                     SatEnums::RA_MODEL_RCS2_SPECIFICATION, "RaRcs2Specification",
-                                    SatEnums::RA_MODEL_MARSALA, "RaMarsala"))
+                                    SatEnums::RA_MODEL_MARSALA, "RaMarsala",
+                                    SatEnums::RA_MODEL_ESSA, "RaEssa"))
     .AddAttribute ("RaInterferenceModel",
                    "Interference model for random access",
                    EnumValue (SatPhyRxCarrierConf::IF_CONSTANT),
@@ -93,7 +94,8 @@ SatBeamHelper::GetTypeId (void)
                    "Interference elimination model for random access",
                    EnumValue (SatPhyRxCarrierConf::SIC_PERFECT),
                    MakeEnumAccessor (&SatBeamHelper::m_raInterferenceEliminationModel),
-                   MakeEnumChecker (SatPhyRxCarrierConf::SIC_PERFECT, "Perfect"))
+                   MakeEnumChecker (SatPhyRxCarrierConf::SIC_PERFECT, "Perfect",
+                                    SatPhyRxCarrierConf::SIC_RESIDUAL, "Residual"))
     .AddAttribute ("RaCollisionModel",
                    "Collision model for random access",
                    EnumValue (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR),
@@ -141,6 +143,17 @@ SatBeamHelper::GetTypeId (void)
                    BooleanValue (false),
                    MakeBooleanAccessor (&SatBeamHelper::m_enableTracesOnReturnLink),
                    MakeBooleanChecker ())
+    .AddAttribute ("DvbVersion",
+                   "Indicates if using DVB-S2 or DVB-S2X",
+                   EnumValue (SatEnums::DVB_S2),
+                   MakeEnumAccessor (&SatBeamHelper::m_dvbVersion),
+                   MakeEnumChecker (SatEnums::DVB_S2, "DVB_S2",
+                                    SatEnums::DVB_S2X, "DVB_S2X"))
+    .AddAttribute ("ReturnLinkLinkResults", "Protocol used for the return link link results.",
+                   EnumValue (SatEnums::LR_RCS2),
+                   MakeEnumAccessor (&SatBeamHelper::m_rlLinkResultsType),
+                   MakeEnumChecker (SatEnums::LR_RCS2, "RCS2",
+                                    SatEnums::LR_FSIM, "FSIM"))
     .AddTraceSource ("Creation", "Creation traces",
                      MakeTraceSourceAccessor (&SatBeamHelper::m_creationTrace),
                      "ns3::SatTypedefs::CreationCallback")
@@ -257,25 +270,56 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
   // packet reception for packet decoding, but on the other hand they are utilized in
   // transmission side in ACM for deciding the best MODCOD.
   //
-  // DVB-RCS2 link results:
+  // Return link results:
   // - Packet reception at the GW
   // - RTN link packet scheduling at the NCC
   // DVB-S2 link results:
   // - Packet reception at the UT
   // - FWD link packet scheduling at the GW
   //
-  Ptr<SatLinkResultsDvbS2> linkResultsS2 = CreateObject<SatLinkResultsDvbS2> ();
-  Ptr<SatLinkResultsDvbRcs2> linkResultsRcs2 = CreateObject<SatLinkResultsDvbRcs2> ();
-  linkResultsS2->Initialize ();
-  linkResultsRcs2->Initialize ();
+  Ptr<SatLinkResultsFwd> linkResultsFwd;
+  switch (m_dvbVersion)
+  {
+    case SatEnums::DVB_S2:
+      linkResultsFwd = CreateObject<SatLinkResultsDvbS2> ();
+      break;
+    case SatEnums::DVB_S2X:
+      linkResultsFwd = CreateObject<SatLinkResultsDvbS2X> ();
+      break;
+    default:
+      NS_FATAL_ERROR ("The DVB version does not exist");
+  }
+
+  Ptr<SatLinkResultsDvbRcs2> linkResultsReturnLink;
+  switch (m_rlLinkResultsType)
+    {
+    case SatEnums::LR_RCS2:
+      {
+        linkResultsReturnLink = CreateObject<SatLinkResultsDvbRcs2> ();
+        break;
+      }
+    case SatEnums::LR_FSIM:
+      {
+        linkResultsReturnLink = CreateObject<SatLinkResultsFSim> ();
+        break;
+      }
+    default:
+      {
+        NS_FATAL_ERROR ("Invalid address for multicast group");
+        break;
+      }
+    }
+
+  linkResultsFwd->Initialize ();
+  linkResultsReturnLink->Initialize ();
 
   // DVB-S2 link results for packet decoding at the UT
-  m_utHelper->Initialize (linkResultsS2);
+  m_utHelper->Initialize (linkResultsFwd);
   // DVB-RCS2 link results for packet decoding at the GW +
   // DVB-S2 link results for FWD link RRM
-  m_gwHelper->Initialize (linkResultsRcs2, linkResultsS2);
+  m_gwHelper->Initialize (linkResultsReturnLink, linkResultsFwd, m_dvbVersion);
   // DVB-RCS2 link results for RTN link waveform configurations
-  m_superframeSeq->GetWaveformConf ()->InitializeEbNoRequirements (linkResultsRcs2);
+  m_superframeSeq->GetWaveformConf ()->InitializeEbNoRequirements (linkResultsReturnLink);
 
   m_geoNode = geoNode;
   m_geoHelper->Install (m_geoNode);
@@ -483,7 +527,7 @@ SatBeamHelper::Install (NodeContainer ut,
 
   SatEnums::SatBbFrameType_t frameType = SatEnums::NORMAL_FRAME;
 
-  if (bbFrameConf->GetBbFrameUsageMode () == SatBbFrameConf::SHORT_FRAMES)
+  if (bbFrameConf->GetBbFrameUsageMode () == SatEnums::SHORT_FRAMES)
     {
       frameType = SatEnums::SHORT_FRAME;
     }

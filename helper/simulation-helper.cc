@@ -41,6 +41,7 @@
 #include <ns3/satellite-on-off-helper.h>
 #include <ns3/nrtv-helper.h>
 #include <ns3/three-gpp-http-satellite-helper.h>
+
 #include <ns3/random-variable-stream.h>
 
 NS_LOG_COMPONENT_DEFINE ("SimulationHelper");
@@ -632,7 +633,7 @@ SimulationHelper::EnableRandomAccess ()
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaServiceCount", UintegerValue (1));
   Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_RCS2_SPECIFICATION));
   Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
-  Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceEliminationModel", EnumValue (SatPhyRxCarrierConf::SIC_PERFECT));
+  Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceEliminationModel", EnumValue (SatPhyRxCarrierConf::SIC_RESIDUAL));
   Config::SetDefault ("ns3::SatBeamHelper::RaCollisionModel", EnumValue (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
   Config::SetDefault ("ns3::SatBeamHelper::RaConstantErrorRate", DoubleValue (0.0));
 
@@ -1141,6 +1142,32 @@ SimulationHelper::GetStatisticsContainer ()
   return m_statContainer;
 }
 
+Ptr<SatTrafficHelper>
+SimulationHelper::GetTrafficHelper ()
+{
+  NS_LOG_FUNCTION (this);
+
+  if (!m_trafficHelper)
+    {
+      m_trafficHelper = CreateObject<SatTrafficHelper> (GetSatelliteHelper (), GetStatisticsContainer ());
+    }
+
+  return m_trafficHelper;
+}
+
+Ptr<SatCnoHelper>
+SimulationHelper::GetCnoHelper ()
+{
+  NS_LOG_FUNCTION (this);
+
+  if (!m_cnoHelper)
+    {
+      m_cnoHelper = CreateObject<SatCnoHelper> (m_satHelper);
+    }
+
+  return m_cnoHelper;
+}
+
 void
 SimulationHelper::SetupOutputPath ()
 {
@@ -1399,7 +1426,7 @@ SimulationHelper::InstallTrafficModel (TrafficModel_t trafficModel,
                   }
 
                 onOffHelper.SetAttribute ("Remote", AddressValue (Address (utUserAddr)));
-                auto app = onOffHelper.Install (gwUsers.Get (i)).Get (0);
+                auto app = onOffHelper.Install (gwUsers.Get (m_gwUserId)).Get (0);
                 app->SetStartTime (startTime + (i + 1) * startDelay);
                 onOffContainer.Add (app);
               }

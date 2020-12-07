@@ -352,6 +352,11 @@ private:
   Time m_ctrlMsgStoreTimeRtnLink;
 
   /**
+   * Type of Return channel link results.
+   */
+  SatEnums::LinkResults_t m_rlLinkResultsType;
+
+  /**
    * Configured fading model. Set as an attribute.
    */
   SatEnums::FadingModel_t m_fadingModel;
@@ -470,6 +475,10 @@ private:
    */
   void AddMulticastRouteToUt (Ptr<Node> utNode, Ipv4Address sourceAddress, Ipv4Address groupAddress, bool routeToSatellite);
 
+  /**
+   * Indicates if using DVB-S2 or DVB-S2X
+   */
+  SatEnums::DvbVersion_t m_dvbVersion;
 };
 
 } // namespace ns3

@@ -137,6 +137,14 @@ SatRandomAccess::IsSlottedAlohaAllocationChannel (uint32_t allocationChannel)
   return m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetSlottedAlohaAllowed ();
 }
 
+bool
+SatRandomAccess::IsEssaAllocationChannel (uint32_t allocationChannel)
+{
+  NS_LOG_FUNCTION (this << allocationChannel);
+
+  return m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetEssaAllowed ();
+}
+
 SatRandomAccess::RandomAccessTxOpportunities_s
 SatRandomAccess::DoRandomAccess (uint32_t allocationChannelId, SatEnums::RandomAccessTriggerType_t triggerType)
 {
@@ -177,6 +185,22 @@ SatRandomAccess::DoRandomAccess (uint32_t allocationChannelId, SatEnums::RandomA
       else
         {
           NS_FATAL_ERROR ("SatRandomAccess::DoRandomAccess - Invalid allocation channel for CRDSA");
+        }
+    }
+  /// Do ESSA
+  else if (m_randomAccessModel == SatEnums::RA_MODEL_ESSA && triggerType == SatEnums::RA_TRIGGER_TYPE_ESSA)
+    {
+      NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Only ESSA enabled, checking allocation channel");
+
+      if (IsEssaAllocationChannel (allocationChannel))
+        {
+          NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - Valid allocation channel, evaluating ESSA");
+
+          txOpportunities = DoEssa (allocationChannel);
+        }
+      else
+        {
+          NS_FATAL_ERROR ("SatRandomAccess::DoRandomAccess - Invalid allocation channel for ESSA");
         }
     }
   /// Do Slotted ALOHA
@@ -281,6 +305,10 @@ SatRandomAccess::DoRandomAccess (uint32_t allocationChannelId, SatEnums::RandomA
     {
       NS_LOG_INFO ("SA minimum time to wait: " << txOpportunities.slottedAlohaTxOpportunity << " milliseconds");
     }
+  else if (txOpportunities.txOpportunityType == SatEnums::RA_TX_OPPORTUNITY_ESSA)
+    {
+      NS_LOG_INFO ("SatRandomAccess::DoRandomAccess - ESSA minimum time to wait: " << txOpportunities.slottedAlohaTxOpportunity << " milliseconds");
+    }
   else if (txOpportunities.txOpportunityType == SatEnums::RA_TX_OPPORTUNITY_DO_NOTHING)
     {
       NS_LOG_INFO ("No Tx opportunity");
@@ -329,6 +357,60 @@ uint32_t
 SatRandomAccess::GetConfigurationIdForAllocationChannel (uint32_t allocationChannelId)
 {
   return m_randomAccessConf->GetAllocationChannelConfigurationId (allocationChannelId);
+}
+
+void
+SatRandomAccess::SetBackoffTime (uint32_t allocationChannel,
+                                 uint32_t backoffTime)
+{
+  NS_LOG_FUNCTION (this);
+
+  switch (m_randomAccessModel)
+    {
+    case SatEnums::RA_MODEL_ESSA:
+      {
+        SetFSimBackoffTimeInFrames (allocationChannel, backoffTime);
+        break;
+      }
+    case SatEnums::RA_MODEL_CRDSA:
+    case SatEnums::RA_MODEL_RCS2_SPECIFICATION:
+      {
+        SetCrdsaBackoffTimeInMilliSeconds (allocationChannel, backoffTime);
+        break;
+      }
+    default:
+      {
+        NS_FATAL_ERROR ("SatRandomAccess::SetBackoffTime - Wrong random access model in use");
+        break;
+      }
+    }
+}
+
+void
+SatRandomAccess::SetBackoffProbability (uint32_t allocationChannel,
+                                        uint16_t backoffProbability)
+{
+  NS_LOG_FUNCTION (this);
+
+  switch (m_randomAccessModel)
+    {
+    case SatEnums::RA_MODEL_ESSA:
+      {
+        SetFSimBackoffProbability (allocationChannel, backoffProbability);
+        break;
+      }
+    case SatEnums::RA_MODEL_CRDSA:
+    case SatEnums::RA_MODEL_RCS2_SPECIFICATION:
+      {
+        SetCrdsaBackoffProbability (allocationChannel, backoffProbability);
+        break;
+      }
+    default:
+      {
+        NS_FATAL_ERROR ("SatRandomAccess::SetBackoffProbability - Wrong random access model in use");
+        break;
+      }
+    }
 }
 
 ///-------------------------------
@@ -406,6 +488,82 @@ SatRandomAccess::SlottedAlohaRandomizeReleaseTime ()
 
   return releaseTime;
 }
+
+///-------------------------------
+/// ESSA related methods
+///-------------------------------
+void
+SatRandomAccess::SetFSimBackoffTimeInFrames (uint32_t allocationChannel,
+                                             uint32_t backoffTimeInFrames)
+{
+  /// NOTE: this could be done with the same functions for Crdsa (SetCrdsaBackOffTime)
+  /// but changing the name of the function. The NCC should then send the backofftime
+  /// in ms, and not in frames.
+  NS_LOG_FUNCTION (this);
+
+  if (m_randomAccessModel == SatEnums::RA_MODEL_ESSA)
+    {
+      m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetFSimBackoffTimeInFrames (backoffTimeInFrames);
+    }
+  else
+    {
+      NS_FATAL_ERROR ("SatRandomAccess::SetFSimBackoffTimeInFrames - Wrong random access model in use");
+    }
+}
+
+void
+SatRandomAccess::SetFSimBackoffProbability (uint32_t allocationChannel,
+                                            uint16_t backoffPersistence)
+{
+  /// NOTE: this could be done with the same functions for Crdsa (SetCrdsaBackOffProbabaility)
+  /// but changing the name of the function. The NCC should then send the backoff probability
+  /// and not the persistence.
+  NS_LOG_FUNCTION (this);
+
+  if (m_randomAccessModel == SatEnums::RA_MODEL_ESSA)
+    {
+      m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->SetFSimBackoffProbability (backoffPersistence);
+    }
+  else
+    {
+      NS_FATAL_ERROR ("SatRandomAccess::SetFSimBackoffProbability - Wrong random access model in use");
+    }
+}
+
+
+SatRandomAccess::RandomAccessTxOpportunities_s
+SatRandomAccess::DoEssa (uint32_t allocationChannel)
+{
+  NS_LOG_FUNCTION (this);
+
+  RandomAccessTxOpportunities_s txOpportunity;
+
+  NS_LOG_INFO ("------------------------------------");
+  NS_LOG_INFO ("------ Running ESSA algorithm ------");
+  NS_LOG_INFO ("------------------------------------");
+
+  /// TODO: take into account inter-packet time ?
+
+  /// Calculate how many backoff slots must wait
+  /// TODO: this should be done in a semi-periodic way:
+  /// each time a backoff time has passed, check if we
+  /// can send or not (the back-off time and probability
+  /// may have changed in between).
+  uint32_t numberOfBackoff = 0;
+  while (m_uniformRandomVariable->GetValue (0.0,1.0) > m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetFSimBackoffProbability ())
+    {
+      numberOfBackoff++;
+    }
+  txOpportunity.txOpportunityType = SatEnums::RA_TX_OPPORTUNITY_ESSA;
+  txOpportunity.slottedAlohaTxOpportunity = numberOfBackoff * m_randomAccessConf->GetAllocationChannelConfiguration (allocationChannel)->GetFSimBackoffTimeInMilliSeconds (); // NOTE: could rename variable
+
+  NS_LOG_INFO ("-------------------------------------");
+  NS_LOG_INFO ("------ ESSA algorithm FINISHED ------");
+  NS_LOG_INFO ("-------------------------------------");
+
+  return txOpportunity;
+}
+
 
 ///-----------------------
 /// CRDSA related methods

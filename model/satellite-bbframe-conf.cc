@@ -23,12 +23,13 @@
 #include <limits>
 #include <utility>
 #include <vector>
+#include <algorithm>
 #include <ns3/log.h>
+#include <ns3/string.h>
 #include <ns3/double.h>
 #include <ns3/uinteger.h>
 #include <ns3/boolean.h>
 #include <ns3/enum.h>
-#include <ns3/satellite-link-results.h>
 #include <ns3/satellite-utils.h>
 #include "satellite-bbframe-conf.h"
 
@@ -41,10 +42,13 @@ namespace ns3 {
  * 2nd col = payload slots per normal frame
  * 3rnd col = payload slots per short frame
  */
-const uint32_t payloadConf[4][3] = { { 2, 360, 90 },
+const uint32_t payloadConf[7][3] = { { 2, 360, 90 },
                                      { 3, 240, 60 },
                                      { 4, 180, 45 },
-                                     { 5, 144, 36 }, };
+                                     { 5, 144, 36 },
+                                     { 6, 120, 30 },
+                                     { 7, 102, 25 },
+                                     { 8,  90, 22 }, };
 
 
 SatDvbS2Waveform::SatDvbS2Waveform ()
@@ -141,19 +145,25 @@ SatBbFrameConf::SatBbFrameConf ()
   m_bbFrameLowOccupancyThreshold (0.5),
   m_targetBler (0.00001),
   m_acmEnabled (false),
-  m_defaultModCod (SatEnums::SAT_MODCOD_QPSK_1_TO_2),
+  m_defaultModCodDummyFramesS2X (SatEnums::SAT_NONVALID_MODCOD),
+  m_defaultModCodDummyFramesS2XStr ("QPSK_1_TO_4"),
+  m_defaultModCod (SatEnums::SAT_NONVALID_MODCOD),
+  m_defaultModCodStr ("QPSK_1_TO_2"),
   m_shortFramePayloadInSlots (),
   m_normalFramePayloadInSlots (),
   m_waveforms (),
-  m_bbFrameUsageMode (NORMAL_FRAMES),
+  m_bbFrameUsageMode (SatEnums::NORMAL_FRAMES),
   m_mostRobustShortFrameModcod (SatEnums::SAT_NONVALID_MODCOD),
-  m_mostRobustNormalFrameModcod (SatEnums::SAT_NONVALID_MODCOD)
+  m_mostRobustNormalFrameModcod (SatEnums::SAT_NONVALID_MODCOD),
+  m_dvbVersion (SatEnums::DVB_S2),
+  m_bbFrameS2XPilots (true),
+  m_modCodsUsedStr ("")
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("Default constructor not supported!!!");
 }
 
-SatBbFrameConf::SatBbFrameConf (double symbolRate)
+SatBbFrameConf::SatBbFrameConf (double symbolRate, SatEnums::DvbVersion_t dvbVersion)
   : m_symbolRate (symbolRate),
   m_symbolsPerSlot (90),
   m_pilotBlockInSymbols (0),
@@ -165,50 +175,117 @@ SatBbFrameConf::SatBbFrameConf (double symbolRate)
   m_bbFrameLowOccupancyThreshold (0.5),
   m_targetBler (0.00001),
   m_acmEnabled (false),
-  m_defaultModCod (SatEnums::SAT_MODCOD_QPSK_1_TO_2),
+  m_defaultModCodDummyFramesS2X (SatEnums::SAT_NONVALID_MODCOD),
+  m_defaultModCodDummyFramesS2XStr ("QPSK_1_TO_4"),
+  m_defaultModCod (SatEnums::SAT_NONVALID_MODCOD),
+  m_defaultModCodStr ("QPSK_1_TO_2"),
   m_shortFramePayloadInSlots (),
   m_normalFramePayloadInSlots (),
   m_waveforms (),
-  m_bbFrameUsageMode (NORMAL_FRAMES),
+  m_bbFrameUsageMode (SatEnums::NORMAL_FRAMES),
   m_mostRobustShortFrameModcod (SatEnums::SAT_NONVALID_MODCOD),
-  m_mostRobustNormalFrameModcod (SatEnums::SAT_NONVALID_MODCOD)
+  m_mostRobustNormalFrameModcod (SatEnums::SAT_NONVALID_MODCOD),
+  m_dvbVersion (dvbVersion),
+  m_bbFrameS2XPilots (true),
+  m_modCodsUsedStr ("")
 {
   ObjectBase::ConstructSelf (AttributeConstructionList ());
 
   // Initialize the payloads
-  for (uint32_t i = 0; i < 4; ++i)
+  for (uint32_t i = 0; i < 7; ++i)
     {
       m_normalFramePayloadInSlots.insert (std::make_pair (payloadConf[i][0], payloadConf[i][1]));
       m_shortFramePayloadInSlots.insert (std::make_pair (payloadConf[i][0], payloadConf[i][2]));
     }
 
-  // Available MODCODs
-  std::vector<SatEnums::SatModcod_t> modcods;
-  SatEnums::GetAvailableModcodsFwdLink (modcods);
+  // Load custom MC list if specified or all MC if nothing in m_modCodsUsedStr is empty
+  m_modCodsUsed.clear ();
+  GetModCodsList ();
+
+  switch(m_dvbVersion)
+    {
+      case SatEnums::DVB_S2:
+        m_defaultModCod = SatEnums::GetModcodFromName ("SAT_MODCOD_" + m_defaultModCodStr);
+        break;
+      case SatEnums::DVB_S2X:
+        if (m_bbFrameUsageMode == SatEnums::SHORT_AND_NORMAL_FRAMES)
+          {
+            NS_FATAL_ERROR ("Cannot use NORMAL_AND_SHORT_FRAMES with DVB-S2X ModCods");
+          }
+
+        m_defaultModCod = SatEnums::GetModcodFromName ("SAT_MODCOD_S2X_" + m_defaultModCodStr +
+            "_" + (m_bbFrameUsageMode == SatEnums::NORMAL_FRAMES ? "NORMAL" : "SHORT") +
+            "_" + (m_bbFrameS2XPilots ? "PILOTS" : "NOPILOTS"));
+
+        m_defaultModCodDummyFramesS2X = SatEnums::GetModcodFromName ("SAT_MODCOD_S2X_" + m_defaultModCodDummyFramesS2XStr +
+            "_SHORT_" + (m_bbFrameS2XPilots ? "PILOTS" : "NOPILOTS"));
+
+        break;
+      default:
+        NS_FATAL_ERROR ("Unknown DVB version used");
+    }
+
+  if (std::find(m_modCodsUsed.begin(), m_modCodsUsed.end(), m_defaultModCod) == m_modCodsUsed.end())
+    {
+      NS_FATAL_ERROR ("Default ModCod (" + SatEnums::GetModcodTypeName (m_defaultModCod) + ") is not in the list of used ModCods.");
+    }
 
   // Available frame types
   std::vector<SatEnums::SatBbFrameType_t> frameTypes;
   SatEnums::GetAvailableBbFrameTypes (frameTypes);
 
   uint32_t wfCount (1);
-  for (std::vector<SatEnums::SatModcod_t>::const_iterator mit = modcods.begin ();
-       mit != modcods.end ();
+  for (std::vector<SatEnums::SatModcod_t>::const_iterator mit = m_modCodsUsed.begin ();
+       mit != m_modCodsUsed.end ();
        ++mit)
     {
-      for (std::vector<SatEnums::SatBbFrameType_t>::const_iterator fit = frameTypes.begin ();
-           fit != frameTypes.end ();
-           ++fit)
+      switch(m_dvbVersion)
         {
-          // Calculate the payload
-          uint32_t pl = CalculateBbFramePayloadBits (*mit, *fit);
+          case SatEnums::DVB_S2:
+            for (std::vector<SatEnums::SatBbFrameType_t>::const_iterator fit = frameTypes.begin ();
+                   fit != frameTypes.end ();
+                   ++fit)
+                {
+                  // Calculate the payload
+                  uint32_t pl = CalculateBbFramePayloadBits (*mit, *fit);
 
-          // Calculate the frame length
-          Time len = CalculateBbFrameDuration (*mit, *fit);
+                  // Calculate the frame length
+                  Time len = CalculateBbFrameDuration (*mit, *fit);
 
-          Ptr<SatDvbS2Waveform> wf = Create<SatDvbS2Waveform> (*mit, *fit, len, pl);
-          m_waveforms.insert (std::make_pair (std::make_pair (*mit, *fit), wf));
-          wfCount++;
+                  Ptr<SatDvbS2Waveform> wf = Create<SatDvbS2Waveform> (*mit, *fit, len, pl);
+                  m_waveforms.insert (std::make_pair (std::make_pair (*mit, *fit), wf));
+                  wfCount++;
+                }
+            break;
+          case SatEnums::DVB_S2X:
+            SatEnums::SatBbFrameType_t fit = SatUtils::GetFrameTypeS2X (*mit);
+            uint32_t pl = CalculateBbFramePayloadBits (*mit, fit);
+
+            // Calculate the frame length
+            Time len = CalculateBbFrameDuration (*mit, fit);
+
+            Ptr<SatDvbS2Waveform> wf = Create<SatDvbS2Waveform> (*mit, fit, len, pl);
+            m_waveforms.insert (std::make_pair (std::make_pair (*mit, fit), wf));
+            wfCount++;
+            break;
         }
+    }
+
+  /* Add waveform with Default Dummy Frames ModCod when using DVB-S2X.
+   * Added if not already in ModCods list.
+   */
+  if (m_dvbVersion == SatEnums::DVB_S2X && std::find(m_modCodsUsed.begin(), m_modCodsUsed.end(), m_defaultModCodDummyFramesS2X) == m_modCodsUsed.end())
+    {
+      SatEnums::SatBbFrameType_t fit = SatEnums::SHORT_FRAME;
+      SatEnums::SatModcod_t mit = m_defaultModCodDummyFramesS2X;
+      uint32_t pl = CalculateBbFramePayloadBits (mit, fit);
+
+      // Calculate the frame length
+      Time len = CalculateBbFrameDuration (mit, fit);
+
+      Ptr<SatDvbS2Waveform> wf = Create<SatDvbS2Waveform> (mit, fit, len, pl);
+      m_waveforms.insert (std::make_pair (std::make_pair (mit, fit), wf));
+      wfCount++;
     }
 
   uint32_t payloadBitsForShortFrame = std::numeric_limits<uint32_t>::max ();
@@ -240,11 +317,18 @@ SatBbFrameConf::SatBbFrameConf (double symbolRate)
         }
     }
 
-  if ( ( m_mostRobustNormalFrameModcod == SatEnums::SAT_NONVALID_MODCOD ) || (m_mostRobustShortFrameModcod == SatEnums::SAT_NONVALID_MODCOD ) )
+  if (     ( (m_bbFrameUsageMode == SatEnums::SHORT_FRAMES) || (m_bbFrameUsageMode == SatEnums::SHORT_AND_NORMAL_FRAMES) )
+        && (m_mostRobustShortFrameModcod == SatEnums::SAT_NONVALID_MODCOD ) )
     {
-      NS_FATAL_ERROR ("The most robust MODCOD not found, BB frame configuration error???");
+      NS_FATAL_ERROR ("The most robust MODCOD not found for short frames, BB frame configuration error???");
     }
-  else if ( m_mostRobustNormalFrameModcod != m_mostRobustShortFrameModcod)
+  if (     ( (m_bbFrameUsageMode == SatEnums::NORMAL_FRAMES) || (m_bbFrameUsageMode == SatEnums::SHORT_AND_NORMAL_FRAMES) )
+        && (m_mostRobustNormalFrameModcod == SatEnums::SAT_NONVALID_MODCOD ) )
+    {
+      NS_FATAL_ERROR ("The most robust MODCOD not found for normal frames, BB frame configuration error???");
+    }
+
+  if ( (m_bbFrameUsageMode == SatEnums::SHORT_AND_NORMAL_FRAMES) && (m_mostRobustNormalFrameModcod != m_mostRobustShortFrameModcod) )
     {
       // currently is assumed that the most robust MODCODs are same for both short and normal frames
       NS_FATAL_ERROR ("The most robust MODCODs are different for short and normal frames!!!");
@@ -293,31 +377,14 @@ SatBbFrameConf::GetTypeId (void)
                     MakeBooleanChecker ())
     .AddAttribute ( "DefaultModCod",
                     "Default MODCOD",
-                    EnumValue (SatEnums::SAT_MODCOD_QPSK_1_TO_2),
-                    MakeEnumAccessor (&SatBbFrameConf::m_defaultModCod),
-                    // only the top 22 valid MODCODs are included below
-                    MakeEnumChecker (SatEnums::SAT_MODCOD_QPSK_1_TO_2,    "QPSK_1_TO_2",
-                                     SatEnums::SAT_MODCOD_QPSK_3_TO_5,    "QPSK_3_TO_5",
-                                     SatEnums::SAT_MODCOD_QPSK_2_TO_3,    "QPSK_2_TO_3",
-                                     SatEnums::SAT_MODCOD_QPSK_3_TO_4,    "QPSK_3_TO_4",
-                                     SatEnums::SAT_MODCOD_QPSK_4_TO_5,    "QPSK_4_TO_5",
-                                     SatEnums::SAT_MODCOD_QPSK_5_TO_6,    "QPSK_5_TO_6",
-                                     SatEnums::SAT_MODCOD_QPSK_8_TO_9,    "QPSK_8_TO_9",
-                                     SatEnums::SAT_MODCOD_QPSK_9_TO_10,   "QPSK_9_TO_10",
-                                     SatEnums::SAT_MODCOD_8PSK_3_TO_5,    "8PSK_3_TO_5",
-                                     SatEnums::SAT_MODCOD_8PSK_2_TO_3,    "8PSK_2_TO_3",
-                                     SatEnums::SAT_MODCOD_8PSK_3_TO_4,    "8PSK_3_TO_4",
-                                     SatEnums::SAT_MODCOD_8PSK_5_TO_6,    "8PSK_5_TO_6",
-                                     SatEnums::SAT_MODCOD_8PSK_8_TO_9,    "8PSK_8_TO_9",
-                                     SatEnums::SAT_MODCOD_8PSK_9_TO_10,   "8PSK_9_TO_10",
-                                     SatEnums::SAT_MODCOD_16APSK_2_TO_3,  "16APSK_2_TO_3",
-                                     SatEnums::SAT_MODCOD_16APSK_3_TO_4,  "16APSK_3_TO_4",
-                                     SatEnums::SAT_MODCOD_16APSK_4_TO_5,  "16APSK_4_TO_5",
-                                     SatEnums::SAT_MODCOD_16APSK_5_TO_6,  "16APSK_5_TO_6",
-                                     SatEnums::SAT_MODCOD_16APSK_8_TO_9,  "16APSK_8_TO_9",
-                                     SatEnums::SAT_MODCOD_16APSK_9_TO_10, "16APSK_9_TO_10",
-                                     SatEnums::SAT_MODCOD_32APSK_3_TO_4,  "32APSK_3_TO_4",
-                                     SatEnums::SAT_MODCOD_32APSK_4_TO_5,  "32APSK_4_TO_5"))
+                    StringValue ("QPSK_1_TO_2"),
+                    MakeStringAccessor (&SatBbFrameConf::m_defaultModCodStr),
+                    MakeStringChecker ())
+    .AddAttribute ( "DefaultModCodDummyFramesS2X",
+                    "Default MODCOD for DVB-S2X Dummy Frames. In DVB-S2, Dummy Frames use m_defaultModCod.",
+                    StringValue ("QPSK_1_TO_4"),
+                    MakeStringAccessor (&SatBbFrameConf::m_defaultModCodDummyFramesS2XStr),
+                    MakeStringChecker ())
     .AddAttribute ( "BbFrameHeaderInBytes",
                     "BB Frame header size in bytes",
                     UintegerValue (10), // ETSI EN 302 307 V1.3.1 specified 80 bits
@@ -335,11 +402,21 @@ SatBbFrameConf::GetTypeId (void)
                     MakeDoubleChecker<double> (0.0, 1.0))
     .AddAttribute ("BBFrameUsageMode",
                    "Mode for selecting used BB Frames.",
-                   EnumValue (SatBbFrameConf::NORMAL_FRAMES),
+                   EnumValue (SatEnums::NORMAL_FRAMES),
                    MakeEnumAccessor (&SatBbFrameConf::m_bbFrameUsageMode),
-                   MakeEnumChecker (SatBbFrameConf::SHORT_FRAMES, "ShortFrames",
-                                    SatBbFrameConf::NORMAL_FRAMES, "NormalFrames",
-                                    SatBbFrameConf::SHORT_AND_NORMAL_FRAMES, "ShortAndNormalFrames"))
+                   MakeEnumChecker (SatEnums::SHORT_FRAMES, "ShortFrames",
+                                    SatEnums::NORMAL_FRAMES, "NormalFrames",
+                                    SatEnums::SHORT_AND_NORMAL_FRAMES, "ShortAndNormalFrames"))
+    .AddAttribute ("BBFramePilotsS2X",
+                   "Use Pilots in DVB-S2X BB Frames.",
+                    BooleanValue (true),
+                    MakeBooleanAccessor (&SatBbFrameConf::m_bbFrameS2XPilots),
+                    MakeBooleanChecker ())
+    .AddAttribute ("ModCodsUsed",
+                   "List of DVB-S2X ModCods used. If nothing specified, all available ModCods are used",
+                   StringValue (""),
+                   MakeStringAccessor (&SatBbFrameConf::m_modCodsUsedStr),
+                   MakeStringChecker ())
     .AddConstructor<SatBbFrameConf> ()
   ;
   return tid;
@@ -357,7 +434,7 @@ SatBbFrameConf::~SatBbFrameConf ()
 }
 
 void
-SatBbFrameConf::InitializeCNoRequirements ( Ptr<SatLinkResultsDvbS2> linkResults )
+SatBbFrameConf::InitializeCNoRequirements ( Ptr<SatLinkResultsFwd> linkResults )
 {
   NS_LOG_FUNCTION (this);
 
@@ -392,6 +469,20 @@ SatBbFrameConf::DumpWaveforms () const
     {
       it->second->Dump ();
     }
+}
+
+SatEnums::DvbVersion_t
+SatBbFrameConf::GetDvbVersion ()
+{
+  NS_LOG_FUNCTION (this);
+  return m_dvbVersion;
+}
+
+std::vector<SatEnums::SatModcod_t>
+SatBbFrameConf::GetModCodsUsed ()
+{
+  NS_LOG_FUNCTION (this);
+  return m_modCodsUsed;
 }
 
 uint32_t
@@ -461,6 +552,55 @@ SatBbFrameConf::CalculateBbFrameDuration (SatEnums::SatModcod_t modcod, SatEnums
   double frameLength = totalSymbols / m_symbolRate;
 
   return Seconds (frameLength);
+}
+
+void
+SatBbFrameConf::GetModCodsList ()
+{
+  NS_LOG_FUNCTION (this);
+  m_modCodsUsed.clear ();
+
+  if (m_modCodsUsedStr.size () == 0)
+    {
+      switch (m_dvbVersion)
+        {
+          case SatEnums::DVB_S2:
+            SatEnums::GetAvailableModcodsFwdLink (m_modCodsUsed);
+            return;
+          case SatEnums::DVB_S2X:
+            SatEnums::GetAvailableModcodsFwdLinkS2X (m_modCodsUsed, m_bbFrameUsageMode, m_bbFrameS2XPilots);
+            return;
+          default:
+            NS_FATAL_ERROR ("Incorrect DVB version");
+        }
+    }
+
+  std::stringstream strm (m_modCodsUsedStr);
+  std::string name;
+  std::string prefix;
+  std::string suffix;
+
+  switch (m_dvbVersion)
+    {
+      case SatEnums::DVB_S2:
+        prefix = "SAT_MODCOD_";
+        suffix = "";
+        break;
+      case SatEnums::DVB_S2X:
+        prefix = "SAT_MODCOD_S2X_";
+        suffix = std::string("_") + (m_bbFrameUsageMode == SatEnums::NORMAL_FRAMES ? "NORMAL" : "SHORT") +
+                 "_" + (m_bbFrameS2XPilots ? "PILOTS" : "NOPILOTS");
+        break;
+      default:
+        NS_FATAL_ERROR ("Incorrect DVB version");
+    }
+
+  while (getline(strm, name, ' '))
+    {
+      SatEnums::SatModcod_t mc = SatEnums::GetModcodFromName (prefix + name + suffix);
+      m_modCodsUsed.push_back (mc);
+    }
+  std::sort (m_modCodsUsed.begin (), m_modCodsUsed.end ());
 }
 
 uint32_t
@@ -550,5 +690,11 @@ SatBbFrameConf::GetDefaultModCod () const
   return m_defaultModCod;
 }
 
+SatEnums::SatModcod_t
+SatBbFrameConf::GetDefaultModCodDummyFramesS2X () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_defaultModCodDummyFramesS2X;
+}
 
 }  // namespace ns3

@@ -97,7 +97,9 @@ protected:
   void onInterferentEvent (long double timeRatio, double interferenceValue, double& ifPowerW);
 
 private:
-  std::map<double, double> m_ifPowerAtEventChangeW;
+  std::vector<std::pair<double, double>> m_ifPowerAtEventChangeW;
+
+  uint32_t m_maxFragmentsCount;
 };
 
 }  // namespace ns3

@@ -289,6 +289,13 @@ private:
   void DoRxPowerInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx);
 
   /**
+   * \brief Function for Rx power input trace from C/N0 values
+   * \param rxParams Rx parameters
+   * \param phyRx The receiver SatPhyRx entity
+   */
+  void DoRxCnoInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx);
+
+  /**
    * \brief Function for fading output trace
    * \param rxParams Rx parameters
    * \param phyRx The receiver SatPhyRx entity

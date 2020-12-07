@@ -40,14 +40,23 @@ class SatBaseTraceContainer : public Object
 {
 public:
   /**
-   * \brief Default Rx power density index for Rx power traces
+   * \brief Default Rx C/N0 index for C/N0 traces
    */
   static const uint32_t RX_POWER_TRACE_DEFAULT_RX_POWER_DENSITY_INDEX = 1;
 
   /**
-   * \brief Default Rx power density index for Rx power traces
+   * \brief Default Rx C/N0 index for C/N0 traces
    */
   static const uint32_t RX_POWER_TRACE_DEFAULT_NUMBER_OF_COLUMNS = 2;
+  /**
+   * \brief Default Rx power density index for Rx power traces
+   */
+  static const uint32_t RX_CNO_TRACE_DEFAULT_RX_POWER_DENSITY_INDEX = 1;
+
+  /**
+   * \brief Default Rx power density index for Rx power traces
+   */
+  static const uint32_t RX_CNO_TRACE_DEFAULT_NUMBER_OF_COLUMNS = 2;
 
   /**
    * \brief Default interference density index for interference traces

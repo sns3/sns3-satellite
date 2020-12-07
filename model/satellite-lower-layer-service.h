@@ -241,6 +241,7 @@ private:
   double m_averageNormalizedOfferedLoadThreshold;
   bool m_isCrdsaAllowed;
   bool m_isSlottedAlohaAllowed;
+  bool m_isEssaAllowed;
 
   /**
    * Get maximum unique payload per block.
@@ -460,6 +461,26 @@ private:
   inline void SetIsCrdsaAllowed (bool isCrdsaAllowed)
   {
     m_isCrdsaAllowed = isCrdsaAllowed;
+  }
+
+  /**
+   * Get ESSA allowance
+   *
+   * \return Is ESSA allowed
+   */
+  inline bool GetIsEssaAllowed () const
+  {
+    return m_isEssaAllowed;
+  }
+
+  /**
+   * Set ESSA allowance
+   *
+   * \param isEssaAllowed Is ESSA allowed
+   */
+  inline void SetIsEssaAllowed (bool isEssaAllowed)
+  {
+    m_isEssaAllowed = isEssaAllowed;
   }
 };
 
@@ -713,6 +734,14 @@ public:
    */
   bool GetRaIsCrdsaAllowed (uint8_t index) const;
 
+  /**
+   * Get E-SSA allowance
+   *
+   * \param index Index of the service
+   * \return Is E-SSA allowed
+   */
+  bool GetRaIsEssaAllowed (uint8_t index) const;
+
 private:
   uint8_t                                  m_dynamicRatePersistence;
   uint8_t                                  m_volumeBacklogPersistence;
@@ -897,6 +926,14 @@ private:
    */
   void SetRaIsCrdsaAllowed (uint8_t index, bool isCrdsaAllowed);
 
+  /**
+   * Set ESSA allowance
+   *
+   * \param index Index of the service
+   * \param isEssaAllowed Is ESSA allowed
+   */
+  void SetRaIsEssaAllowed (uint8_t index, bool isEssaAllowed);
+
 /**
  * SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE macro helps to define DA service entry
  * attribute access method.
@@ -979,6 +1016,8 @@ private:
  *  - GetRaServ0IsSlottedAlohaAllowed, see @SatLowerLayerServiceRaEntry::GetIsSlottedAlohaAllowed
  *  - SetRaServ0IsCrdsaAllowed, see @SatLowerLayerServiceRaEntry::SetIsCrdsaAllowed
  *  - GetRaServ0IsCrdsaAllowed, see @SatLowerLayerServiceRaEntry::GetIsCrdsaAllowed
+ *  - SetRaServ0IsEssaAllowed, see @SatLowerLayerServiceRaEntry::SetIsEssaAllowed
+ *  - GetRaServ0IsEssaAllowed, see @SatLowerLayerServiceRaEntry::GetIsEssaAllowed
  *
  * \param index Index of the service which attribute access methods are defined
  */
@@ -1027,6 +1066,10 @@ private:
   { return SetRaIsCrdsaAllowed (index, value); } \
   inline bool GetRaServ ## index ## IsCrdsaAllowed () const  \
   { return GetRaIsCrdsaAllowed (index); } \
+  inline void SetRaServ ## index ## IsEssaAllowed (bool value)  \
+  { return SetRaIsEssaAllowed (index, value); } \
+  inline bool GetRaServ ## index ## IsEssaAllowed () const  \
+  { return GetRaIsEssaAllowed (index); } \
 
   SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE (0);
   SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE (1);

@@ -59,7 +59,8 @@ SatPhy::SatPhy (void)
   m_txPointingLossDb (0),
   m_txOboLossDb (0),
   m_txAntennaLossDb (0),
-  m_defaultFadingValue (1.0)
+  m_defaultFadingValue (1.0),
+  m_lastDelay (0)
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("SatPhy default constructor is not allowed to use");
@@ -78,7 +79,8 @@ SatPhy::SatPhy (CreateParam_t & params)
   m_txPointingLossDb (0),
   m_txOboLossDb (0),
   m_txAntennaLossDb (0),
-  m_defaultFadingValue (1.0)
+  m_defaultFadingValue (1.0),
+  m_lastDelay (0)
 {
   NS_LOG_FUNCTION (this << params.m_beamId);
   ObjectBase::ConstructSelf (AttributeConstructionList ());
@@ -130,6 +132,10 @@ SatPhy::GetTypeId (void)
                      "A packet is received with delay information",
                      MakeTraceSourceAccessor (&SatPhy::m_rxDelayTrace),
                      "ns3::SatTypedefs::PacketDelayAddressCallback")
+    .AddTraceSource ("RxJitter",
+                     "A packet is received with jitter information",
+                     MakeTraceSourceAccessor (&SatPhy::m_rxJitterTrace),
+                     "ns3::SatTypedefs::PacketJitterAddressCallback")
   ;
   return tid;
 }
@@ -245,10 +251,10 @@ SatPhy::SetNodeInfo (const Ptr<SatNodeInfo> nodeInfo)
 }
 
 void
-SatPhy::BeginFrameEndScheduling ()
+SatPhy::BeginEndScheduling ()
 {
   NS_LOG_FUNCTION (this);
-  m_phyRx->BeginFrameEndScheduling ();
+  m_phyRx->BeginEndScheduling ();
 }
 
 Ptr<SatPhyTx>
@@ -418,9 +424,15 @@ SatPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
               SatPhyTimeTag timeTag;
               if ((*it1)->RemovePacketTag (timeTag))
                 {
-                  NS_LOG_DEBUG (this << " contains a SatPhyTimeTag tag");
-                  m_rxDelayTrace (Simulator::Now () - timeTag.GetSenderTimestamp (),
-                                  addr);
+                  NS_LOG_DEBUG (this << " contains a SatMacTimeTag tag");
+                  Time delay = Simulator::Now () - timeTag.GetSenderTimestamp ();
+                  m_rxDelayTrace (delay, addr);
+                  if (m_lastDelay != 0)
+                    {
+                      Time jitter = Abs (delay - m_lastDelay);
+                      m_rxJitterTrace (jitter, addr);
+                    }
+                  m_lastDelay = delay;
                 }
 
             } // end of `for (it1 = rxParams->m_packetsInBurst)`

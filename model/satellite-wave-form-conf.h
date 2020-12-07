@@ -57,8 +57,9 @@ public:
    * \param modcod ModCod
    * \param payloadBytes Payload in bytes
    * \param lengthInSymbols Duration in symbols
+   * \param preambleLengthInSymbols Preamble duration in symbols
    */
-  SatWaveform (uint32_t wfId, uint32_t modulatedBits, double codingRate, SatEnums::SatModcod_t modcod, uint32_t payloadBytes, uint32_t lengthInSymbols);
+  SatWaveform (uint32_t wfId, uint32_t modulatedBits, double codingRate, SatEnums::SatModcod_t modcod, uint32_t payloadBytes, uint32_t lengthInSymbols, uint32_t preambleLengthInSymbols);
 
   /**
    * \brief Get waveform id
@@ -79,10 +80,23 @@ public:
   uint32_t GetPayloadInBytes () const;
 
   /**
+   * \brief Get preamble length of the waveform in symbols
+   * \return Burst length
+   */
+  uint32_t GetPreambleLengthInSymbols () const;
+
+  /**
    * \brief Get burst length of the waveform in symbols
    * \return Burst length
    */
   uint32_t GetBurstLengthInSymbols () const;
+
+  /**
+   * \brief Get/calculate the preamble duration of a waveform based on symbol rate
+   * \param symbolRateInBaud Symbol rate
+   * \return Preamble duration
+   */
+  Time GetPreambleDuration (double symbolRateInBaud) const;
 
   /**
    * \brief Get/calculate the burst duration of a waveform based on symbol rate
@@ -163,6 +177,11 @@ private:
   uint32_t m_lengthInSymbols;
 
   /**
+   * Length of the preamble in symbols
+   */
+  uint32_t m_preambleLengthInSymbols;
+
+  /**
    * Eb/No threshold calculated with a certain BLER target
    * from the link results
    */
@@ -206,6 +225,12 @@ public:
    * Derived from Object
    */
   static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
+  virtual TypeId GetInstanceTypeId (void) const;
 
   /**
    * Check if ACM is enabled.
@@ -265,10 +290,11 @@ public:
    * \param cno UTs estimated C/No
    * \param symbolRateInBaud Frame's symbol rate used for waveform C/No requirement calculation
    * \param wfId Waveform id variable used for passing the best waveform id to the client
+   * \param cnoThreshold variable used for passing the C/No threshold of the selected waveform to the client
    * \param burstLength Requested burst length in symbols
    * \return boolean value presenting whether or not a suitable waveform was found.
    */
-  bool GetBestWaveformId (double cno, double symbolRateInBaud, uint32_t& wfId, uint32_t burstLength = SHORT_BURST_LENGTH) const;
+  bool GetBestWaveformId (double cno, double symbolRateInBaud, uint32_t& wfId, double& cnoThreshold, uint32_t burstLength = SHORT_BURST_LENGTH) const;
 
   /**
    * \brief Get the most robust waveform id based payload of the waveform in bytes
@@ -358,6 +384,11 @@ private:
    */
   uint32_t m_minWfId;
   uint32_t m_maxWfId;
+
+  /**
+   * Burst length used.
+   */
+  SatEnums::SatWaveFormBurstLength_t m_burstLength;
 
   /**
    * Container to store supported burst lengths.

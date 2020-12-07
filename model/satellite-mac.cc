@@ -61,6 +61,10 @@ SatMac::GetTypeId (void)
                      "A packet is received with delay information",
                      MakeTraceSourceAccessor (&SatMac::m_rxDelayTrace),
                      "ns3::SatTypedefs::PacketDelayAddressCallback")
+    .AddTraceSource ("RxJitter",
+                     "A packet is received with jitter information",
+                     MakeTraceSourceAccessor (&SatMac::m_rxJitterTrace),
+                     "ns3::SatTypedefs::PacketJitterAddressCallback")
     .AddTraceSource ("BeamServiceTime",
                      "A beam was disabled. Transmits length of last beam service time.",
                      MakeTraceSourceAccessor (&SatMac::m_beamServiceTrace),
@@ -74,7 +78,8 @@ SatMac::SatMac ()
   m_nodeInfo (),
   m_beamId (0),
   m_txEnabled (true),
-  m_beamEnabledTime (Seconds (0))
+  m_beamEnabledTime (Seconds (0)),
+  m_lastDelay (0)
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT (false); // this version of the constructor should not been used
@@ -85,7 +90,8 @@ SatMac::SatMac (uint32_t beamId)
   m_nodeInfo (),
   m_beamId (beamId),
   m_txEnabled (true),
-  m_beamEnabledTime (Seconds (0))
+  m_beamEnabledTime (Seconds (0)),
+  m_lastDelay (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -278,8 +284,14 @@ SatMac::RxTraces (SatPhy::PacketContainer_t packets)
               if ((*it1)->RemovePacketTag (timeTag))
                 {
                   NS_LOG_DEBUG (this << " contains a SatMacTimeTag tag");
-                  m_rxDelayTrace (Simulator::Now () - timeTag.GetSenderTimestamp (),
-                                  addr);
+                  Time delay = Simulator::Now () - timeTag.GetSenderTimestamp ();
+                  m_rxDelayTrace (delay, addr);
+                  if (m_lastDelay != 0)
+                    {
+                      Time jitter = Abs (delay - m_lastDelay);
+                      m_rxJitterTrace (jitter, addr);
+                    }
+                  m_lastDelay = delay;
                 }
             } // end of `if (destAddress == m_nodeInfo->GetMacAddress () || destAddress.IsBroadcast ())`
         } // end of `for it1 = packets.begin () -> packets.end ()`

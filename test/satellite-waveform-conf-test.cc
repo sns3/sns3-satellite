@@ -106,7 +106,8 @@ SatDvbRcs2WaveformTableTestCase::DoRun (void)
   for (double d = 60.0; d <= 70.0; d += 0.5)
     {
       uint32_t wfid (0);
-      bool success = wf->GetBestWaveformId (SatUtils::DbToLinear (d), symbolRate, wfid);
+      double cnoThreshold = std::numeric_limits<double>::quiet_NaN();
+      bool success = wf->GetBestWaveformId (SatUtils::DbToLinear (d), symbolRate, wfid, cnoThreshold);
 
       NS_TEST_ASSERT_MSG_EQ (success, true, "A suitable waveform not found");
       NS_TEST_ASSERT_MSG_EQ (wfid, refResults[i], "Not expected waveform id");
@@ -159,7 +160,7 @@ SatDvbS2BbFrameConfTestCase::DoRun (void)
   lr->Initialize ();
 
   // Create BBFrame conf
-  Ptr<SatBbFrameConf> bbFrameConf = CreateObject<SatBbFrameConf> (symbolRate);
+  Ptr<SatBbFrameConf> bbFrameConf = CreateObject<SatBbFrameConf> (symbolRate, SatEnums::DVB_S2);
   bbFrameConf->InitializeCNoRequirements (lr);
 
   std::vector<SatEnums::SatModcod_t> modcods;

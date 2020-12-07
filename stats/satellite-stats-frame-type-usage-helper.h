@@ -25,7 +25,7 @@
 #include <ns3/ptr.h>
 #include <ns3/satellite-stats-helper.h>
 #include <ns3/collector-map.h>
-#include <ns3/satellite-enums.h>
+#include <ns3/satellite-bbframe.h>
 #include <map>
 
 
@@ -82,7 +82,7 @@ private:
    * \param context Beam ID, GW ID or global ID (0) as string
    * \param frameType Type of the frame
    */
-  void FrameTypeUsageCallback (std::string context, SatEnums::SatBbFrameType_t frameType);
+  void FrameTypeUsageCallback (std::string context, Ptr<SatBbFrame> bbFrame);
 
   /**
    * \brief Get frame type ID.

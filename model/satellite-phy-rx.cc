@@ -30,6 +30,7 @@
 #include "satellite-phy-rx.h"
 #include "satellite-phy-rx-carrier.h"
 #include "satellite-phy-rx-carrier-marsala.h"
+#include "satellite-phy-rx-carrier-per-window.h"
 #include "satellite-phy-rx-carrier-per-frame.h"
 #include "satellite-phy-rx-carrier-per-slot.h"
 #include "satellite-phy-rx-carrier-uplink.h"
@@ -201,7 +202,7 @@ SatPhyRx::SetNodeInfo (const Ptr<SatNodeInfo> nodeInfo)
 }
 
 void
-SatPhyRx::BeginFrameEndScheduling ()
+SatPhyRx::BeginEndScheduling ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -209,11 +210,7 @@ SatPhyRx::BeginFrameEndScheduling ()
        it != m_rxCarriers.end ();
        ++it)
     {
-      Ptr<SatPhyRxCarrierPerFrame> crdsaPrxc = (*it)->GetObject<SatPhyRxCarrierPerFrame> ();
-      if (crdsaPrxc != 0)
-        {
-          crdsaPrxc->BeginFrameEndScheduling ();
-        }
+      (*it)->BeginEndScheduling ();
     }
 }
 
@@ -354,6 +351,12 @@ SatPhyRx::ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatS
                 DynamicCast<SatPhyRxCarrierPerSlot> (rxc)->
                 SetRandomAccessAllocationChannelId (superFrameConf->GetRaChannel (i));
               }
+            else if (raModel == SatEnums::RA_MODEL_ESSA)
+              {
+                rxc = CreateObject<SatPhyRxCarrierPerWindow> (i, carrierConf, waveformConf, true);
+                DynamicCast<SatPhyRxCarrierPerSlot> (rxc)->
+                SetRandomAccessAllocationChannelId (superFrameConf->GetRaChannel (i));
+              }
             break;
           }
         case SatEnums::UNKNOWN_CH:
@@ -362,6 +365,7 @@ SatPhyRx::ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatS
             NS_FATAL_ERROR ("SatPhyRx::ConfigurePhyRxCarriers - Invalid channel type!");
           }
         }
+      NS_LOG_INFO (this << " added carrier " << rxc << " on channel " << carrierConf->GetChannelType () << " being random access " << superFrameConf->IsRandomAccessCarrier(i));
       m_rxCarriers.push_back (rxc);
     }
 }
@@ -387,6 +391,21 @@ SatPhyRx::GetBeamId () const
   NS_LOG_FUNCTION (this);
 
   return m_beamId;
+}
+
+double
+SatPhyRx::GetRxTemperatureK (Ptr<SatSignalParameters> rxParams)
+{
+  NS_LOG_FUNCTION (this << rxParams);
+
+  uint32_t cId = rxParams->m_carrierId;
+
+  if (cId >= m_rxCarriers.size ())
+    {
+      NS_FATAL_ERROR ("SatPhyRx::GetRxTemperatureK - unvalid carrier id: " << cId);
+    }
+
+  return m_rxCarriers[cId]->GetRxTemperatureK ();
 }
 
 void

@@ -81,12 +81,17 @@ SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf,
 
       allocationChannel->SetSlottedAlohaAllowed (llsConf->GetRaIsSlottedAlohaAllowed (i));
       allocationChannel->SetCrdsaAllowed (llsConf->GetRaIsCrdsaAllowed (i));
+      allocationChannel->SetEssaAllowed (llsConf->GetRaIsEssaAllowed (i));
       allocationChannel->SetCrdsaMaxUniquePayloadPerBlock (llsConf->GetRaMaximumUniquePayloadPerBlock (i));
       allocationChannel->SetCrdsaMaxConsecutiveBlocksAccessed (llsConf->GetRaMaximumConsecutiveBlockAccessed (i));
       allocationChannel->SetCrdsaMinIdleBlocks (llsConf->GetRaMinimumIdleBlock (i));
       allocationChannel->SetCrdsaNumOfInstances (llsConf->GetRaNumberOfInstances (i));
       allocationChannel->SetCrdsaBackoffProbability (llsConf->GetRaBackOffProbability (i));
       allocationChannel->SetCrdsaBackoffTimeInMilliSeconds (llsConf->GetRaBackOffTimeInMilliSeconds (i));
+      allocationChannel->SetFSimBackoffProbability (llsConf->GetRaBackOffProbability (i));
+      allocationChannel->SetFSimBackoffTimeInMilliSeconds (llsConf->GetRaBackOffTimeInMilliSeconds (i));
+      allocationChannel->SetFSimPhysicalLayerFrameInMilliSeconds ((superframeSeq->GetSuperframeConf (0)->GetDuration ()).GetMilliSeconds ());
+
       /// this assumes that the slot IDs for each allocation channel start at 0
       allocationChannel->SetCrdsaMinRandomizationValue (0);
       allocationChannel->SetCrdsaMaxRandomizationValue (std::numeric_limits<uint16_t>::max ());
@@ -117,7 +122,10 @@ SatRandomAccessConf::SatRandomAccessConf (Ptr<SatLowerLayerServiceConf> llsConf,
 
   for (auto& allocationChannelConf : m_allocationChannelConf)
     {
-      allocationChannelConf.second->DoCrdsaVariableSanityCheck ();
+      if (allocationChannelConf.second->GetCrdsaAllowed ())
+        {
+          allocationChannelConf.second->DoCrdsaVariableSanityCheck ();
+        }
     }
 }
 

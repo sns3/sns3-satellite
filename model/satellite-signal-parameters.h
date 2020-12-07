@@ -28,6 +28,7 @@
 #include "ns3/nstime.h"
 #include "ns3/object.h"
 #include "satellite-enums.h"
+#include "satellite-utils.h"
 
 namespace ns3 {
 
@@ -174,7 +175,7 @@ public:
   inline void SetInterferencePower (std::vector< std::pair<double, double> > ifPowerPerFragment)
   {
     m_ifPowerPerFragment_W = ifPowerPerFragment;
-    m_ifPower_W = ComputeIfPowerFromFragments (m_ifPowerPerFragment_W);
+    m_ifPower_W = SatUtils::ScalarProduct (m_ifPowerPerFragment_W);
   }
 
   /**
@@ -200,7 +201,7 @@ public:
   inline void SetInterferencePowerInSatellite (std::vector< std::pair<double, double> > ifPowerPerFragment)
   {
     m_ifPowerInSatellitePerFragment_W = ifPowerPerFragment;
-    m_ifPowerInSatellite_W = ComputeIfPowerFromFragments (m_ifPowerInSatellitePerFragment_W);
+    m_ifPowerInSatellite_W = SatUtils::ScalarProduct (m_ifPowerInSatellitePerFragment_W);
   }
 
   /**
@@ -253,12 +254,6 @@ private:
    * See m_ifPowerPerFragment_W for full description
    */
   std::vector< std::pair<double, double> > m_ifPowerInSatellitePerFragment_W;
-
-  /**
-   * \brief Compute the interference power value for the whole packet
-   * based off of individual values per fragment of packet.
-   */
-  double ComputeIfPowerFromFragments (const std::vector< std::pair<double, double> >& ifPowerPerFragment);
 };
 
 

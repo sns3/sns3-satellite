@@ -29,6 +29,7 @@
 #include <ns3/satellite-per-packet-interference.h>
 #include <ns3/satellite-traced-interference.h>
 #include <ns3/satellite-perfect-interference-elimination.h>
+#include <ns3/satellite-residual-interference-elimination.h>
 #include <ns3/satellite-mac-tag.h>
 #include <ns3/singleton.h>
 #include <ns3/satellite-composite-sinr-output-trace-container.h>
@@ -62,7 +63,8 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
   m_satInterferenceElimination (),
   m_enableCompositeSinrOutputTrace (false),
   m_numOfOngoingRx (0),
-  m_rxPacketCounter (0)
+  m_rxPacketCounter (0),
+  m_waveformConf (waveformConf)
 {
   NS_LOG_FUNCTION (this << carrierId);
 
@@ -180,6 +182,12 @@ SatPhyRxCarrier::DoCreateInterferenceEliminationModel (
         m_satInterferenceElimination = CreateObject<SatPerfectInterferenceElimination> ();
         break;
       }
+    case SatPhyRxCarrierConf::SIC_RESIDUAL:
+      {
+        NS_LOG_INFO (this << " Residual interference elimination model created for carrier: " << carrierId);
+        m_satInterferenceElimination = CreateObject<SatResidualInterferenceElimination> (waveformConf);
+        break;
+      }
     default:
       {
         NS_LOG_ERROR (this << " Not a valid interference elimination model!");
@@ -194,6 +202,10 @@ SatPhyRxCarrier::~SatPhyRxCarrier ()
   NS_LOG_FUNCTION (this);
 }
 
+void
+SatPhyRxCarrier::BeginEndScheduling (void)
+{
+}
 
 TypeId
 SatPhyRxCarrier::GetTypeId (void)
@@ -225,6 +237,10 @@ SatPhyRxCarrier::GetTypeId (void)
                      "Received a packet burst through Dedicated Channel",
                      MakeTraceSourceAccessor (&SatPhyRxCarrier::m_daRxTrace),
                      "ns3::SatPhyRxCarrierPacketProbe::RxStatusCallback")
+    .AddTraceSource ("DaRxCarrierId",
+                     "Received a packet burst though DAMA",
+                     MakeTraceSourceAccessor (&SatPhyRxCarrier::m_daRxCarrierIdTrace),
+                     "ns3::SatTypedefs::DataSenderAddressCallback")
   ;
   return tid;
 }
@@ -468,7 +484,7 @@ SatPhyRxCarrier::CheckAgainstLinkResultsErrorModelAvi (double cSinr, Ptr<SatSign
          * fs = symbol rate in baud
         */
 
-        double ber = (GetLinkResults ()->GetObject <SatLinkResultsDvbS2> ())->GetBler (rxParams->m_txInfo.modCod,
+        double ber = (GetLinkResults ()->GetObject <SatLinkResultsFwd> ())->GetBler (rxParams->m_txInfo.modCod,
                                                                                        rxParams->m_txInfo.frameType,
                                                                                        SatUtils::LinearToDb (cSinr));
         double r = GetUniformRandomValue (0, 1);
@@ -557,6 +573,13 @@ SatPhyRxCarrier::CalculateSinr (double rxPowerW,
 {
   NS_LOG_FUNCTION (this << rxPowerW <<  ifPowerW);
 
+  // std::cout << "Carrier \t" << m_rxTemperatureK << std::endl;
+
+  // std::cout << rxPowerW << " " << ifPowerW << " " << rxNoisePowerW << " " << rxAciIfPowerW << " " << rxExtNoisePowerW << std::endl;
+
+  // std::cout << "C/N   " << rxPowerW / rxNoisePowerW << std::endl; // C/N
+  // std::cout << "C/N0  " << m_rxBandwidthHz * rxPowerW / rxNoisePowerW; // C/N0
+
   if (rxNoisePowerW <= 0.0)
     {
       NS_FATAL_ERROR ("Noise power must be greater than zero!!!");
@@ -568,6 +591,8 @@ SatPhyRxCarrier::CalculateSinr (double rxPowerW,
 
   // Call PHY calculator to composite C over I interference configured to PHY.
   double finalSinr = sinrCalculate (sinr);
+
+  // std::cout << ", \tsinr  " << finalSinr << std::endl;
 
   return (finalSinr);
 }

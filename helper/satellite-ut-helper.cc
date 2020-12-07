@@ -122,6 +122,11 @@ SatUtHelper::GetTypeId (void)
                    BooleanValue (false),
                    MakeBooleanAccessor (&SatUtHelper::m_crdsaOnlyForControl),
                    MakeBooleanChecker ())
+    .AddAttribute ("AsynchronousReturnAccess",
+                   "Use asynchronous access methods on the return channel.",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatUtHelper::m_asyncAccess),
+                   MakeBooleanChecker ())
     .AddTraceSource ("Creation",
                      "Creation traces",
                      MakeTraceSourceAccessor (&SatUtHelper::m_creationTrace),
@@ -149,6 +154,7 @@ SatUtHelper::SatUtHelper ()
   m_llsConf (),
   m_enableChannelEstimationError (false),
   m_crdsaOnlyForControl (false),
+  m_asyncAccess (false),
   m_raSettings ()
 {
   NS_LOG_FUNCTION (this);
@@ -187,15 +193,15 @@ SatUtHelper::SatUtHelper (SatTypedefs::CarrierBandwidthConverter_t carrierBandwi
 }
 
 void
-SatUtHelper::Initialize (Ptr<SatLinkResultsDvbS2> lrS2)
+SatUtHelper::Initialize (Ptr<SatLinkResultsFwd> lrFwd)
 {
   NS_LOG_FUNCTION (this);
   /*
-   * Forward channel link results (DVB-S2) are created for UTs.
+   * Forward channel link results (DVB-S2 or DVB-S2X) are created for UTs.
    */
-  if (lrS2 && m_errorModel == SatPhyRxCarrierConf::EM_AVI)
+  if (lrFwd && m_errorModel == SatPhyRxCarrierConf::EM_AVI)
     {
-      m_linkResults = lrS2;
+      m_linkResults = lrFwd;
     }
 }
 
@@ -312,12 +318,15 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId,
   mac->SetReserveCtrlCallback (m_reserveCtrlCb);
   mac->SetSendCtrlCallback (m_sendCtrlCb);
 
-  // Set timing advance callback to mac.
-  Ptr<SatMobilityObserver> observer = n->GetObject<SatMobilityObserver> ();
-  NS_ASSERT (observer != NULL);
+  // Set timing advance callback to mac (if not asynchronous access)
+  if (m_raSettings.m_randomAccessModel != SatEnums::RA_MODEL_ESSA)
+    {
+      Ptr<SatMobilityObserver> observer = n->GetObject<SatMobilityObserver> ();
+      NS_ASSERT (observer != NULL);
 
-  SatUtMac::TimingAdvanceCallback timingCb = MakeCallback (&SatMobilityObserver::GetTimingAdvance, observer);
-  mac->SetTimingAdvanceCallback (timingCb);
+      SatUtMac::TimingAdvanceCallback timingCb = MakeCallback (&SatMobilityObserver::GetTimingAdvance, observer);
+      mac->SetTimingAdvanceCallback (timingCb);
+    }
 
   // Attach the Mac layer receiver to Phy
   SatPhy::ReceiveCallback recCb = MakeCallback (&SatUtMac::Receive, mac);
@@ -382,7 +391,15 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId,
   Ptr<SatBaseEncapsulator> utEncap = CreateObject<SatBaseEncapsulator> (addr, gwAddr, SatEnums::CONTROL_FID);
 
   // Create queue event callbacks to MAC (for random access) and RM (for on-demand DAMA)
-  SatQueue::QueueEventCallback macCb = MakeCallback (&SatUtMac::ReceiveQueueEvent, mac);
+  SatQueue::QueueEventCallback macCb;
+  if (m_raSettings.m_randomAccessModel == SatEnums::RA_MODEL_ESSA)
+    {
+      macCb = MakeCallback (&SatUtMac::ReceiveQueueEventEssa, mac);
+    }
+  else
+    {
+      macCb = MakeCallback (&SatUtMac::ReceiveQueueEvent, mac);
+    }
   SatQueue::QueueEventCallback rmCb = MakeCallback (&SatRequestManager::ReceiveQueueEvent, rm);
 
   // Create a queue

@@ -74,8 +74,8 @@ SatFwdLinkSchedulerDefault::SatFwdLinkSchedulerDefault (Ptr<SatBbFrameConf> conf
 
   ObjectBase::ConstructSelf (AttributeConstructionList ());
 
-  std::vector<SatEnums::SatModcod_t> modCods;
-  SatEnums::GetAvailableModcodsFwdLink (modCods);
+  std::vector<SatEnums::SatModcod_t> modCods = conf->GetModCodsUsed ();
+
   m_bbFrameContainer = CreateObject<SatBbFrameContainer> (modCods, m_bbFrameConf);
 
   Simulator::Schedule (m_periodicInterval, &SatFwdLinkSchedulerDefault::PeriodicTimerExpired, this);

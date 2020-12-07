@@ -45,12 +45,13 @@ SatPhyRxCarrierPerFrame::SatPhyRxCarrierPerFrame (uint32_t carrierId,
   m_frameEndSchedulingInitialized (false)
 {
   NS_LOG_FUNCTION (this);
+  NS_LOG_INFO ("Constructor called with arguments " << carrierId << ", " << carrierConf << ", and " << randomAccessEnabled);
 
   NS_ASSERT (m_randomAccessEnabled == true);
 }
 
 void
-SatPhyRxCarrierPerFrame::BeginFrameEndScheduling ()
+SatPhyRxCarrierPerFrame::BeginEndScheduling ()
 {
   NS_LOG_FUNCTION (this);
   if (!m_frameEndSchedulingInitialized)

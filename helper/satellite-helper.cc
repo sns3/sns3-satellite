@@ -193,6 +193,7 @@ SatHelper::SatHelper ()
 {
   NS_LOG_FUNCTION (this);
 
+  // uncomment next line, if attributes are needed already in construction phase
   ObjectBase::ConstructSelf(AttributeConstructionList ());
 
   Singleton<SatEnvVariables>::Get ()->Initialize ();

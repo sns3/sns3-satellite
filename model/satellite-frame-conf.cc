@@ -49,8 +49,9 @@ SatBtuConf::SatBtuConf ()
   NS_ASSERT (false);
 }
 
-SatBtuConf::SatBtuConf (double bandwidthInHz, double rollOff, double spacing)
-  : m_allocatedBandwidthInHz (bandwidthInHz)
+SatBtuConf::SatBtuConf (double bandwidthInHz, double rollOff, double spacing, uint32_t spreadingFactor)
+  : m_allocatedBandwidthInHz (bandwidthInHz),
+  m_spreadingFactor (spreadingFactor)
 {
   NS_LOG_FUNCTION (this);
 
@@ -64,8 +65,8 @@ SatBtuConf::SatBtuConf (double bandwidthInHz, double rollOff, double spacing)
       NS_FATAL_ERROR ("Roll-off for BTU is out of range. Check frame configuration parameters (attributes)!!!");
     }
 
-  m_occupiedBandwidthInHz = m_allocatedBandwidthInHz / (rollOff + 1.00);
-  m_effectiveBandwidthInHz = m_allocatedBandwidthInHz / ((spacing + 1.00) * (rollOff + 1.00));
+  m_occupiedBandwidthInHz = spreadingFactor * m_allocatedBandwidthInHz / (rollOff + 1.00);
+  m_effectiveBandwidthInHz = spreadingFactor * m_allocatedBandwidthInHz / ((spacing + 1.00) * (rollOff + 1.00));
 
   m_duration = Seconds (1 / m_effectiveBandwidthInHz);
 }
@@ -111,7 +112,8 @@ SatFrameConf::SatFrameConf ()
   : m_bandwidthHz (0.0),
   m_duration (0.0),
   m_isRandomAccess (false),
-  m_btuConf (0),
+  m_parent (nullptr),
+  m_btuConf (nullptr),
   m_allocationChannel (0),
   m_carrierCount (0),
   m_maxSymbolsPerCarrier (0),
@@ -126,6 +128,7 @@ SatFrameConf::SatFrameConf ()
 SatFrameConf::SatFrameConf (SatFrameConfParams_t parameters)
   : m_bandwidthHz (parameters.m_bandwidthHz),
   m_isRandomAccess (parameters.m_isRandomAccess),
+  m_parent (parameters.m_parent),
   m_btuConf (parameters.m_btuConf),
   m_waveformConf (parameters.m_waveformConf),
   m_allocationChannel (parameters.m_allocationChannel)
@@ -137,6 +140,10 @@ SatFrameConf::SatFrameConf (SatFrameConfParams_t parameters)
   if ( m_carrierCount == 0 )
     {
       NS_FATAL_ERROR ("No carriers can be created for the frame with given BTU and bandwidth. Check frame configuration parameters (attributes)!!! ");
+    }
+  else
+    {
+      NS_LOG_INFO ("Carriers count " << m_carrierCount);
     }
 
   uint32_t defWaveFormId = m_waveformConf->GetDefaultWaveformId ();
@@ -245,6 +252,24 @@ SatFrameConf::GetCarrierBandwidthHz (SatEnums::CarrierBandwidthType_t bandwidthT
   return bandwidth;
 }
 
+uint8_t
+SatFrameConf::GetSubdivisionLevel () const
+{
+  NS_LOG_FUNCTION (this);
+
+  uint8_t subdivisionLevel = 0;
+  Ptr<SatFrameConf> parent = m_parent;
+
+  while (parent != nullptr)
+    {
+      ++subdivisionLevel;
+      parent = parent->m_parent;
+    }
+
+  NS_LOG_INFO ("Subdivision level is " << (uint32_t) subdivisionLevel);
+  return subdivisionLevel;
+}
+
 uint16_t
 SatFrameConf::GetTimeSlotCount () const
 {
@@ -319,8 +344,6 @@ SatFrameConf::GetTimeSlotConfs (uint16_t carrierId) const
 uint16_t
 SatFrameConf::AddTimeSlotConf (Ptr<SatTimeSlotConf> conf)
 {
-  NS_LOG_FUNCTION (this);
-
   NS_LOG_FUNCTION (this << conf);
 
   // find container for the Carrier from map
@@ -383,6 +406,10 @@ SatSuperframeConf::CreateSuperframeConf (SuperFrameConfiguration_t conf)
       superFrameConf = CreateObject<SatSuperframeConf3> ();
       break;
 
+    case SUPER_FRAME_CONFIG_4:
+      superFrameConf = CreateObject<SatSuperframeConf4> ();
+      break;
+
     default:
       NS_FATAL_ERROR ("Not supported super frame configuration!!!");
       break;
@@ -425,17 +452,27 @@ SatSuperframeConf::GetInstanceTypeId (void) const
 }
 
 void
-SatSuperframeConf::AddFrameConf (Ptr<SatFrameConf> conf)
+SatSuperframeConf::AddFrameConf (SatFrameConf::SatFrameConfParams_t frameConfParameters,
+                                 double bandwidthInHz,
+                                 double rollOff,
+                                 double spacing,
+                                 uint32_t spreadingFactor,
+                                 uint8_t subdivisionLevel)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << &frameConfParameters << bandwidthInHz << rollOff << spacing << (uint32_t) subdivisionLevel);
+  uint32_t frameId = m_frames.size ();
 
   // in case of random access frame, store carriers to RA channel container
-  if ( conf->IsRandomAccess () )
+  if ( frameConfParameters.m_isRandomAccess )
     {
-      uint32_t frameId = m_frames.size ();
-      uint16_t raBaseIndex = m_raChannels.size ();
+      // Create BTU conf according to given attributes
+      frameConfParameters.m_btuConf = Create<SatBtuConf> (bandwidthInHz, rollOff, spacing, spreadingFactor);
+      Ptr<SatFrameConf> frameConf = Create<SatFrameConf> (frameConfParameters);
 
-      for ( uint32_t i = 0; i < conf->GetCarrierCount (); i++)
+      uint16_t raBaseIndex = m_raChannels.size ();
+      uint16_t carriersCount = frameConf->GetCarrierCount ();
+
+      for ( uint32_t i = 0; i < carriersCount; i++)
         {
           // Only number of the RA channels definable by uint8_t data type can used
           // This is needed to take into account when configuring frames and defined which of them
@@ -445,18 +482,35 @@ SatSuperframeConf::AddFrameConf (Ptr<SatFrameConf> conf)
               NS_FATAL_ERROR ("RA channels maximum count is exceeded!!!");
             }
 
-          m_raChannels.push_back (std::make_tuple (frameId, i, conf->GetAllocationChannelId ()));
+          m_raChannels.push_back (std::make_tuple (frameId, i, frameConf->GetAllocationChannelId ()));
+        }
+
+      m_frames.push_back (frameConf);
+      m_carrierCount += carriersCount;
+    }
+  else
+    {
+      for (uint8_t i = 0; i <= subdivisionLevel; ++i)
+        {
+          double subdivisionAmount = std::pow (2.0, static_cast<double> (i));
+
+          // Create BTU conf according to given attributes
+          frameConfParameters.m_btuConf = Create<SatBtuConf> (bandwidthInHz / subdivisionAmount, rollOff, spacing, spreadingFactor);
+          Ptr<SatFrameConf> frameConf = Create<SatFrameConf> (frameConfParameters);
+
+          m_frames.push_back (frameConf);
+          m_carrierCount += frameConf->GetCarrierCount ();
+
+          // Update parent for the next subdivided frame conf
+          frameConfParameters.m_parent = frameConf;
         }
     }
-
-  m_frames.push_back (conf);
-  m_carrierCount += conf->GetCarrierCount ();
 }
 
 Ptr<SatFrameConf>
 SatSuperframeConf::GetFrameConf (uint8_t index) const
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << (uint32_t) index);
 
   return m_frames[index];
 }
@@ -474,15 +528,15 @@ SatSuperframeConf::GetCarrierId ( uint8_t frameId, uint16_t frameCarrierId ) con
 {
   NS_LOG_FUNCTION (this);
 
+  if (frameId > m_frames.size())
+    {
+      NS_FATAL_ERROR ("Frame ID out of range.");
+    }
+
   uint32_t carrierId = frameCarrierId;
 
   for (uint8_t i = 0; i < frameId; i++)
     {
-      if ( i >= m_frames.size ())
-        {
-          NS_FATAL_ERROR ("Carrier ID out of range.");
-        }
-
       carrierId += m_frames[i]->GetCarrierCount ();
     }
 
@@ -499,7 +553,7 @@ SatSuperframeConf::GetCarrierFrequencyHz (uint32_t carrierId) const
 
   uint8_t frameId = GetCarrierFrame (carrierId);
 
-  for ( uint8_t i = 0; i < frameId; i++ )
+  for (uint8_t i = 0; i < frameId; ++i)
     {
       carrierIdInFrame -= m_frames[i]->GetCarrierCount ();
       frameStartFrequency += m_frames[i]->GetBandwidthHz ();
@@ -537,13 +591,13 @@ SatSuperframeConf::IsRandomAccessCarrier (uint32_t carrierId) const
 
   uint8_t frameId = GetCarrierFrame (carrierId);
 
-  return m_frameIsRandomAccess[frameId];
+  return m_frames[frameId]->IsRandomAccess ();
 }
 
 void
 SatSuperframeConf::SetFrameAllocatedBandwidthHz (uint8_t frameIndex, double bandwidthHz)
 {
-  NS_LOG_FUNCTION (this << frameIndex << bandwidthHz);
+  NS_LOG_FUNCTION (this << (uint32_t)frameIndex << bandwidthHz);
 
   if ( frameIndex >= m_maxFrameCount )
     {
@@ -556,7 +610,7 @@ SatSuperframeConf::SetFrameAllocatedBandwidthHz (uint8_t frameIndex, double band
 void
 SatSuperframeConf::SetFrameCarrierAllocatedBandwidthHz (uint8_t frameIndex, double bandwidthHz)
 {
-  NS_LOG_FUNCTION (this << frameIndex << bandwidthHz);
+  NS_LOG_FUNCTION (this << (uint32_t)frameIndex << bandwidthHz);
 
   if ( frameIndex >= m_maxFrameCount )
     {
@@ -569,7 +623,7 @@ SatSuperframeConf::SetFrameCarrierAllocatedBandwidthHz (uint8_t frameIndex, doub
 void
 SatSuperframeConf::SetFrameCarrierSpacing (uint8_t frameIndex, double spacing)
 {
-  NS_LOG_FUNCTION (this << frameIndex << spacing);
+  NS_LOG_FUNCTION (this << (uint32_t)frameIndex << spacing);
 
   if ( frameIndex >= m_maxFrameCount )
     {
@@ -582,7 +636,7 @@ SatSuperframeConf::SetFrameCarrierSpacing (uint8_t frameIndex, double spacing)
 void
 SatSuperframeConf::SetFrameCarrierRollOff (uint8_t frameIndex, double rollOff)
 {
-  NS_LOG_FUNCTION (this << frameIndex << rollOff);
+  NS_LOG_FUNCTION (this << (uint32_t)frameIndex << rollOff);
 
   if ( frameIndex >= m_maxFrameCount )
     {
@@ -593,9 +647,22 @@ SatSuperframeConf::SetFrameCarrierRollOff (uint8_t frameIndex, double rollOff)
 }
 
 void
+SatSuperframeConf::SetFrameCarrierSpreadingFactor (uint8_t frameIndex, uint32_t spreadingFactor)
+{
+  NS_LOG_FUNCTION (this << frameIndex << spreadingFactor);
+
+  if ( frameIndex >= m_maxFrameCount )
+    {
+      NS_FATAL_ERROR ("Frame index out of range!!!");
+    }
+
+  m_frameCarrierSpreadingFactor[frameIndex] = spreadingFactor;
+}
+
+void
 SatSuperframeConf::SetFrameRandomAccess (uint8_t frameIndex, bool randomAccess)
 {
-  NS_LOG_FUNCTION (this << frameIndex << randomAccess);
+  NS_LOG_FUNCTION (this << (uint32_t)frameIndex << randomAccess);
 
   if ( frameIndex >= m_maxFrameCount )
     {
@@ -608,7 +675,7 @@ SatSuperframeConf::SetFrameRandomAccess (uint8_t frameIndex, bool randomAccess)
 void
 SatSuperframeConf::SetFrameAllocationChannelId (uint8_t frameIndex, uint8_t allocationChannel)
 {
-  NS_LOG_FUNCTION (this << frameIndex << allocationChannel);
+  NS_LOG_FUNCTION (this << (uint32_t)frameIndex << (uint32_t)allocationChannel);
 
   if ( frameIndex >= m_maxFrameCount )
     {
@@ -621,7 +688,7 @@ SatSuperframeConf::SetFrameAllocationChannelId (uint8_t frameIndex, uint8_t allo
 double
 SatSuperframeConf::GetFrameAllocatedBandwidthHz (uint8_t frameIndex) const
 {
-  NS_LOG_FUNCTION (this << frameIndex);
+  NS_LOG_FUNCTION (this << (uint32_t)frameIndex);
 
   if ( frameIndex >= m_maxFrameCount )
     {
@@ -634,7 +701,7 @@ SatSuperframeConf::GetFrameAllocatedBandwidthHz (uint8_t frameIndex) const
 double
 SatSuperframeConf::GetFrameCarrierAllocatedBandwidthHz (uint8_t frameIndex) const
 {
-  NS_LOG_FUNCTION (this << frameIndex);
+  NS_LOG_FUNCTION (this << (uint32_t)frameIndex);
 
   if ( frameIndex >= m_maxFrameCount )
     {
@@ -647,7 +714,7 @@ SatSuperframeConf::GetFrameCarrierAllocatedBandwidthHz (uint8_t frameIndex) cons
 double
 SatSuperframeConf::GetFrameCarrierSpacing (uint8_t frameIndex) const
 {
-  NS_LOG_FUNCTION (this << frameIndex);
+  NS_LOG_FUNCTION (this << (uint32_t)frameIndex);
 
   if ( frameIndex >= m_maxFrameCount )
     {
@@ -660,7 +727,7 @@ SatSuperframeConf::GetFrameCarrierSpacing (uint8_t frameIndex) const
 double
 SatSuperframeConf::GetFrameCarrierRollOff (uint8_t frameIndex) const
 {
-  NS_LOG_FUNCTION (this << frameIndex);
+  NS_LOG_FUNCTION (this << (uint32_t)frameIndex);
 
   if ( frameIndex >= m_maxFrameCount )
     {
@@ -670,8 +737,8 @@ SatSuperframeConf::GetFrameCarrierRollOff (uint8_t frameIndex) const
   return m_frameCarrierRollOff[frameIndex];
 }
 
-bool
-SatSuperframeConf::IsFrameRandomAccess (uint8_t frameIndex) const
+uint32_t
+SatSuperframeConf::GetFrameCarrierSpreadingFactor (uint8_t frameIndex) const
 {
   NS_LOG_FUNCTION (this << frameIndex);
 
@@ -680,13 +747,26 @@ SatSuperframeConf::IsFrameRandomAccess (uint8_t frameIndex) const
       NS_FATAL_ERROR ("Frame index out of range!!!");
     }
 
-  return m_frameIsRandomAccess[frameIndex];
+  return m_frameCarrierSpreadingFactor[frameIndex];
+}
+
+bool
+SatSuperframeConf::IsFrameRandomAccess (uint8_t frameIndex) const
+{
+  NS_LOG_FUNCTION (this << (uint32_t)frameIndex);
+
+  if ( frameIndex >= m_frames.size() )
+    {
+      NS_FATAL_ERROR ("Frame index out of range!!!");
+    }
+
+  return m_frames[frameIndex]->IsRandomAccess ();
 }
 
 uint8_t
 SatSuperframeConf::GetFrameAllocationChannelId (uint8_t frameIndex) const
 {
-  NS_LOG_FUNCTION (this << frameIndex);
+  NS_LOG_FUNCTION (this << (uint32_t)frameIndex);
 
   if ( frameIndex >= m_maxFrameCount )
     {
@@ -716,6 +796,7 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
 
   bool useDefaultWaveform = false;
   bool checkSlotLimit = true;
+  uint8_t subdivisionLevels = 0;
 
   /**
    * Note, that the superframe duration may be a bit longer than the frame
@@ -729,64 +810,66 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
   switch (m_configType)
     {
     case CONFIG_TYPE_0:
+      useDefaultWaveform = true;
+      break;
     case CONFIG_TYPE_1:
+      break;
     case CONFIG_TYPE_2:
-      {
-        m_raChannels.clear ();
-        m_frames.clear ();
-        m_carrierCount = 0;
-
-        if ( m_configType == CONFIG_TYPE_0)
-          {
-            useDefaultWaveform = true;
-          }
-
-        if ( m_configType == CONFIG_TYPE_2)
-          {
-            checkSlotLimit = false;
-          }
-
-        for (uint8_t frameIndex = 0; frameIndex < m_frameCount; frameIndex++)
-          {
-            // Create BTU conf according to given attributes
-            Ptr<SatBtuConf> btuConf = Create<SatBtuConf> (
-                m_frameCarrierAllocatedBandwidth[frameIndex],
-                m_frameCarrierRollOff[frameIndex],
-                m_frameCarrierSpacing[frameIndex]);
-
-            // Create frame utilizing earlier created BTU
-            SatFrameConf::SatFrameConfParams_t frameConfParameters;
-            frameConfParameters.m_bandwidthHz = m_frameAllocatedBandwidth[frameIndex];
-            frameConfParameters.m_targetDuration = targetDuration;
-            frameConfParameters.m_btuConf = btuConf;
-            frameConfParameters.m_waveformConf = waveformConf;
-            frameConfParameters.m_allocationChannel = m_frameAllocationChannel[frameIndex];
-            frameConfParameters.m_isRandomAccess = m_frameIsRandomAccess[frameIndex];
-            frameConfParameters.m_defaultWaveformInUse = useDefaultWaveform;
-            frameConfParameters.m_checkSlotLimit = checkSlotLimit;
-            Ptr<SatFrameConf> frameConf = Create<SatFrameConf> (frameConfParameters);
-
-            m_usedBandwidthHz += m_frameAllocatedBandwidth[frameIndex];
-
-            // Add created frame to super frame configuration
-            AddFrameConf (frameConf);
-          }
-
-        // check if configured frames exceeds given band
-        if ( m_usedBandwidthHz > allocatedBandwidthHz )
-          {
-            NS_FATAL_ERROR ("Bandwidth of super frame exceeds allocated bandwidth");
-          }
-      }
+      checkSlotLimit = false;
       break;
-
     case CONFIG_TYPE_3:
-      NS_FATAL_ERROR ("Configuration type 3 is not supported!!!");
+      checkSlotLimit = false;
+      subdivisionLevels = m_maxCarrierSubdivision;
       break;
-
+    case CONFIG_TYPE_4:
+      useDefaultWaveform = true;
+      checkSlotLimit = false;
+      break;
     default:
-      NS_FATAL_ERROR ("Not supported configuration type!!!");
+      NS_FATAL_ERROR ("Not supported configuration type " << m_configType << "!!!");
       break;
+    }
+
+  m_raChannels.clear ();
+  m_frames.clear ();
+  m_carrierCount = 0;
+
+  for (uint8_t frameIndex = 0; frameIndex < m_frameCount; frameIndex++)
+    {
+      // Create frame without allocating a BTU yet
+      SatFrameConf::SatFrameConfParams_t frameConfParameters;
+      frameConfParameters.m_bandwidthHz = m_frameAllocatedBandwidth[frameIndex];
+      frameConfParameters.m_targetDuration = targetDuration;
+      frameConfParameters.m_parent = nullptr;
+      frameConfParameters.m_btuConf = nullptr;
+      frameConfParameters.m_waveformConf = waveformConf;
+      frameConfParameters.m_allocationChannel = m_frameAllocationChannel[frameIndex];
+      frameConfParameters.m_isRandomAccess = m_frameIsRandomAccess[frameIndex];
+      frameConfParameters.m_defaultWaveformInUse = useDefaultWaveform;
+      frameConfParameters.m_checkSlotLimit = checkSlotLimit;
+
+      m_usedBandwidthHz += m_frameAllocatedBandwidth[frameIndex];
+
+      // Add created frame to super frame configuration, creating
+      // the BTU and the carrier subdivision in the process if need bee
+      AddFrameConf (frameConfParameters, 
+                    m_frameCarrierAllocatedBandwidth[frameIndex],
+                    m_frameCarrierRollOff[frameIndex],
+                    m_frameCarrierSpacing[frameIndex],
+                    m_frameCarrierSpreadingFactor[frameIndex],
+                    subdivisionLevels);
+    }
+
+  if (m_frames.size () != m_frameCount)
+    {
+      NS_ASSERT_MSG (m_configType == CONFIG_TYPE_3, "SatSuperframeConf::Configure: Error: configured more frames than requested");
+      m_frameCount = m_frames.size ();
+    }
+
+  // check if configured frames exceeds given band
+  if ( m_usedBandwidthHz > allocatedBandwidthHz )
+    {
+      NS_FATAL_ERROR ("Bandwidth of super frame exceeds allocated bandwidth");
     }
 }
 
@@ -799,8 +882,9 @@ SatSuperframeConf::GetRaSlots (uint8_t raChannel)
 
   if ( raChannel < m_raChannels.size ())
     {
-      uint8_t frameId = std::get<0> (m_raChannels[raChannel]);
-      uint32_t carrierId = std::get<1> (m_raChannels[raChannel]);
+      uint8_t frameId;
+      uint32_t carrierId;
+      std::tie (frameId, carrierId, std::ignore) = m_raChannels[raChannel];
 
       timeSlots = m_frames[frameId]->GetTimeSlotConfs (carrierId);
     }
@@ -821,8 +905,9 @@ SatSuperframeConf::GetRaSlotCount (uint8_t raChannel)
 
   if ( raChannel < m_raChannels.size ())
     {
-      uint8_t frameId = std::get<0> (m_raChannels[raChannel]);
-      uint32_t carrierId = std::get<1> (m_raChannels[raChannel]);
+      uint8_t frameId;
+      uint32_t carrierId;
+      std::tie (frameId, carrierId, std::ignore) = m_raChannels[raChannel];
 
       slotCount = m_frames[frameId]->GetTimeSlotConfs (carrierId).size ();
     }
@@ -914,7 +999,7 @@ SatSuperframeConf::GetIndexAsFrameName (uint32_t index)
 #define GetIndexAsFrameName(index) SatSuperframeConf::GetIndexAsFrameName (index)
 
 // macro to ease definition of attributes for several frames
-#define ADD_FRAME_ATTRIBUTES(index, frameBandwidth, carrierBandwidth, carrierSpacing, carrierRollOff, randomAccess, lowerLayerService ) \
+#define ADD_FRAME_ATTRIBUTES(index, frameBandwidth, carrierBandwidth, carrierSpacing, carrierRollOff, spreadingFactor, randomAccess, lowerLayerService ) \
   .AddAttribute ( GetIndexAsFrameName (index) + "_AllocatedBandwidthHz", \
                   std::string ("The allocated bandwidth [Hz] for ") + GetIndexAsFrameName (index), \
                   TypeId::ATTR_CONSTRUCT, \
@@ -943,6 +1028,13 @@ SatSuperframeConf::GetIndexAsFrameName (uint32_t index)
                   MakeDoubleAccessor (&SatSuperframeConf::SetFrame ## index ## CarrierSpacing, \
                                       &SatSuperframeConf::GetFrame ## index ## CarrierSpacing), \
                   MakeDoubleChecker<double> (0.00, 1.00)) \
+  .AddAttribute ( GetIndexAsFrameName (index) + std::string ("_SpreadingFactor"), \
+                  std::string ("The carrier spreading factor for ") + GetIndexAsFrameName (index), \
+                  TypeId::ATTR_CONSTRUCT, \
+                  UintegerValue (spreadingFactor), \
+                  MakeUintegerAccessor (&SatSuperframeConf::SetFrame ## index ## SpreadingFactor, \
+                                        &SatSuperframeConf::GetFrame ## index ## SpreadingFactor), \
+                  MakeUintegerChecker<uint32_t> (1, std::numeric_limits<uint32_t>::max ())) \
   .AddAttribute ( GetIndexAsFrameName (index) + std::string ("_RandomAccessFrame"), \
                   std::string ("Flag to tell if ") + GetIndexAsFrameName (index) + std::string (" is used for random access"), \
                   TypeId::ATTR_CONSTRUCT, \
@@ -959,7 +1051,7 @@ SatSuperframeConf::GetIndexAsFrameName (uint32_t index)
                   MakeUintegerChecker<uint8_t> ())
 
 // macro to ease definition of attributes for several super frames
-#define ADD_SUPER_FRAME_ATTRIBUTES( frameCount, configType ) \
+#define ADD_SUPER_FRAME_ATTRIBUTES( frameCount, configType, maxSubdivision ) \
   .AddAttribute ("FrameCount", "The number of frames in super frame.", \
                  TypeId::ATTR_CONSTRUCT, \
                  UintegerValue (frameCount), \
@@ -973,7 +1065,15 @@ SatSuperframeConf::GetIndexAsFrameName (uint32_t index)
                                     &SatSuperframeConf::GetConfigType), \
                  MakeEnumChecker ( SatSuperframeConf::CONFIG_TYPE_0, "ConfigType_0", \
                                    SatSuperframeConf::CONFIG_TYPE_1, "ConfigType_1", \
-                                   SatSuperframeConf::CONFIG_TYPE_2, "ConfigType_2"))
+                                   SatSuperframeConf::CONFIG_TYPE_2, "ConfigType_2", \
+                                   SatSuperframeConf::CONFIG_TYPE_3, "ConfigType_3", \
+                                   SatSuperframeConf::CONFIG_TYPE_4, "ConfigType_4")) \
+  .AddAttribute ("MaxCarrierSubdivision", "The maximum amount of subdivision for a single carrier (ConfigType_3 only).", \
+                 TypeId::ATTR_CONSTRUCT, \
+                 UintegerValue (maxSubdivision), \
+                 MakeUintegerAccessor (&SatSuperframeConf::SetMaxSubdivision, \
+                                       &SatSuperframeConf::GetMaxSubdivision), \
+                 MakeUintegerChecker<uint8_t> (0))
 
 
 uint8_t
@@ -986,7 +1086,7 @@ SatSuperframeConf::GetCarrierFrame (uint32_t carrierId) const
 
   while (carrierId > lastIdInFrame)
     {
-      currentFrame++;
+      ++currentFrame;
       lastIdInFrame += m_frames[currentFrame]->GetCarrierCount ();
     }
 
@@ -1044,17 +1144,17 @@ SatSuperframeConf0::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatSuperframeConf0")
     .SetParent<ns3::SatSuperframeConf> ()
     .AddConstructor<SatSuperframeConf0> ()
-    ADD_SUPER_FRAME_ATTRIBUTES (10, SatSuperframeConf::CONFIG_TYPE_0 )
-    ADD_FRAME_ATTRIBUTES (0, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (1, 1.25e6, 1.25e6, 0.20, 0.30, true, 0)
-    ADD_FRAME_ATTRIBUTES (2, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (3, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (4, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (5, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (6, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (7, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (8, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (9, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
+    ADD_SUPER_FRAME_ATTRIBUTES (10, SatSuperframeConf::CONFIG_TYPE_0, 5)
+    ADD_FRAME_ATTRIBUTES (0, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (1, 1.25e6, 1.25e6, 0.20, 0.30, 1, true, 0)
+    ADD_FRAME_ATTRIBUTES (2, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (3, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (4, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (5, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (6, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (7, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (8, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (9, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
   ;
 
   return tid;
@@ -1093,17 +1193,17 @@ SatSuperframeConf1::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatSuperframeConf1")
     .SetParent<ns3::SatSuperframeConf> ()
     .AddConstructor<SatSuperframeConf1> ()
-    ADD_SUPER_FRAME_ATTRIBUTES (10, SatSuperframeConf::CONFIG_TYPE_1)
-    ADD_FRAME_ATTRIBUTES (0, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (1, 1.25e6, 1.25e6, 0.20, 0.30, true, 0)
-    ADD_FRAME_ATTRIBUTES (2, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (3, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (4, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (5, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (6, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (7, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (8, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (9, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
+    ADD_SUPER_FRAME_ATTRIBUTES (10, SatSuperframeConf::CONFIG_TYPE_1, 0)
+    ADD_FRAME_ATTRIBUTES (0, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (1, 1.25e6, 1.25e6, 0.20, 0.30, 1, true, 0)
+    ADD_FRAME_ATTRIBUTES (2, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (3, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (4, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (5, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (6, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (7, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (8, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (9, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
   ;
 
   return tid;
@@ -1142,17 +1242,17 @@ SatSuperframeConf2::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatSuperframeConf2")
     .SetParent<ns3::SatSuperframeConf> ()
     .AddConstructor<SatSuperframeConf2> ()
-    ADD_SUPER_FRAME_ATTRIBUTES (10, SatSuperframeConf::CONFIG_TYPE_2)
-    ADD_FRAME_ATTRIBUTES (0, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (1, 1.25e6, 1.25e6, 0.20, 0.30, true, 0)
-    ADD_FRAME_ATTRIBUTES (2, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (3, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (4, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (5, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (6, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (7, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (8, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (9, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
+    ADD_SUPER_FRAME_ATTRIBUTES (10, SatSuperframeConf::CONFIG_TYPE_2, 0)
+    ADD_FRAME_ATTRIBUTES (0, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (1, 1.25e6, 1.25e6, 0.20, 0.30, 1, true, 0)
+    ADD_FRAME_ATTRIBUTES (2, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (3, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (4, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (5, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (6, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (7, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (8, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (9, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
   ;
 
   return tid;
@@ -1191,17 +1291,17 @@ SatSuperframeConf3::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatSuperframeConf3")
     .SetParent<ns3::SatSuperframeConf> ()
     .AddConstructor<SatSuperframeConf3> ()
-    ADD_SUPER_FRAME_ATTRIBUTES (10, SatSuperframeConf::CONFIG_TYPE_2)
-    ADD_FRAME_ATTRIBUTES (0, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (1, 1.25e6, 1.25e6, 0.20, 0.30, true, 0)
-    ADD_FRAME_ATTRIBUTES (2, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (3, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (4, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (5, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (6, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (7, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (8, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
-    ADD_FRAME_ATTRIBUTES (9, 1.25e7, 1.25e6, 0.20, 0.30, false, 0)
+    ADD_SUPER_FRAME_ATTRIBUTES (10, SatSuperframeConf::CONFIG_TYPE_3, 5)
+    ADD_FRAME_ATTRIBUTES (0, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (1, 1.25e6, 1.25e6, 0.20, 0.30, 1, true, 0)
+    ADD_FRAME_ATTRIBUTES (2, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (3, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (4, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (5, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (6, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (7, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (8, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
+    ADD_FRAME_ATTRIBUTES (9, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0)
   ;
 
   return tid;
@@ -1216,6 +1316,45 @@ SatSuperframeConf3::GetInstanceTypeId (void) const
 
 void
 SatSuperframeConf3::DoConfigure ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+NS_OBJECT_ENSURE_REGISTERED (SatSuperframeConf4);
+// Super frame configuration 4.
+
+SatSuperframeConf4::SatSuperframeConf4 ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+SatSuperframeConf4::~SatSuperframeConf4 ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+TypeId
+SatSuperframeConf4::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatSuperframeConf4")
+    .SetParent<ns3::SatSuperframeConf> ()
+    .AddConstructor<SatSuperframeConf4> ()
+    ADD_SUPER_FRAME_ATTRIBUTES (1, SatSuperframeConf::CONFIG_TYPE_4, 0)
+    ADD_FRAME_ATTRIBUTES (0, 3.0e5, 3.0e5, 0.25, 0.0, 16, true, 0) // create frame only to store waveformconf
+  ;
+
+  return tid;
+}
+
+TypeId
+SatSuperframeConf4::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+  return GetTypeId ();
+}
+
+void
+SatSuperframeConf4::DoConfigure ()
 {
   NS_LOG_FUNCTION (this);
 }
