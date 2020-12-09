@@ -384,6 +384,7 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
             msg << " at: " << Now ().GetSeconds () << "s";
             Singleton<SatLog>::Get ()->AddToLog (SatLog::LOG_WARNING, "", msg.str ());
           }
+        break;
       }
     default:
       {

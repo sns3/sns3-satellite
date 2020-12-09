@@ -94,6 +94,12 @@ public:
   typedef Callback<bool> CtrlMsgTxPossibleCallback;
 
   /**
+   * \brief Callback to check whether logon msg transmission is possible
+   * \return boolean indicating whether logon msg transmission is possible
+   */
+  typedef Callback<bool> LogonMsgTxPossibleCallback;
+
+  /**
    * Container for the pending RBDC requests
    */
   typedef std::vector<std::deque<std::pair<Time, uint32_t> > > PendingRbdcRequestsContainer_t;
@@ -124,6 +130,13 @@ public:
    * \param cb callback to check whether ctrl message sending is possible.
    */
   void SetCtrlMsgTxPossibleCallback (SatRequestManager::CtrlMsgTxPossibleCallback cb);
+
+  /**
+   * \brief Set the callback to check the possibility of sending a
+   * control message.
+   * \param cb callback to check whether ctrl message sending is possible.
+   */
+  void SetLogonMsgTxPossibleCallback (SatRequestManager::LogonMsgTxPossibleCallback cb);
 
   /**
    * \brief Set the GW address needed for CR transmission.
@@ -370,6 +383,12 @@ private:
    * transmitted in the near future.
    */
   CtrlMsgTxPossibleCallback m_ctrlMsgTxPossibleCallback;
+
+  /**
+   * Callback to check from MAC if a logon msg may be
+   * transmitted in the near future.
+   */
+  LogonMsgTxPossibleCallback m_logonMsgTxPossibleCallback;
 
   /**
    * GW address

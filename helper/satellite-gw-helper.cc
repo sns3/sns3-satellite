@@ -60,7 +60,7 @@ namespace ns3 {
 void
 logonCallbackHelper (Ptr<SatNcc> ncc, Ptr<SatLowerLayerServiceConf> llsConf, Address utId, uint32_t beamId, Callback<void, uint32_t> setRaChannelCallback)
 {
-  ncc->AddUt (llsConf, utId, beamId, setRaChannelCallback);
+  ncc->AddUt (llsConf, utId, beamId, setRaChannelCallback, true);
 }
 
 
@@ -398,11 +398,12 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
       break;
     case SatEnums::TIME_SLICING:
       fwdLinkScheduler = CreateObject<SatFwdLinkSchedulerTimeSlicing> (m_bbFrameConf, addr, carrierBandwidth);
-      (DynamicCast<SatFwdLinkSchedulerTimeSlicing> (fwdLinkScheduler))->SetSendControlMsgCallback (MakeCallback (&SatNetDevice::SendControlMsg, dev));
       break;
     default:
       NS_FATAL_ERROR ("Forward scheduling algorithm is not implemented");
     }
+
+  fwdLinkScheduler->SetSendControlMsgCallback (MakeCallback (&SatNetDevice::SendControlMsg, dev));
 
   // Attach the LLC Tx opportunity and scheduling context getter callbacks to SatFwdLinkScheduler
   fwdLinkScheduler->SetTxOpportunityCallback (MakeCallback (&SatGwLlc::NotifyTxOpportunity, llc));

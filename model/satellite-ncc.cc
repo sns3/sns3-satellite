@@ -268,7 +268,7 @@ SatNcc::AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq>
 }
 
 void
-SatNcc::AddUt (Ptr<SatLowerLayerServiceConf> llsConf, Address utId, uint32_t beamId, Callback<void, uint32_t> setRaChannelCallback)
+SatNcc::AddUt (Ptr<SatLowerLayerServiceConf> llsConf, Address utId, uint32_t beamId, Callback<void, uint32_t> setRaChannelCallback, bool verifyExisting)
 {
   NS_LOG_FUNCTION (this << utId << beamId);
 
@@ -279,7 +279,10 @@ SatNcc::AddUt (Ptr<SatLowerLayerServiceConf> llsConf, Address utId, uint32_t bea
       NS_FATAL_ERROR ( "Beam where tried to add, not found." );
     }
 
-  setRaChannelCallback (m_beamSchedulers[beamId]->AddUt (utId, llsConf));
+  if (!verifyExisting || !(m_beamSchedulers[beamId]->HasUt (utId)))
+    {
+      setRaChannelCallback (m_beamSchedulers[beamId]->AddUt (utId, llsConf));
+    }
 }
 
 void

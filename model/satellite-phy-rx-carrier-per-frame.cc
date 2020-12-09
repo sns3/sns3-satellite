@@ -127,7 +127,8 @@ SatPhyRxCarrierPerFrame::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams
 
   // If the received random access packet is of type slotted aloha, we
   // receive the packet with the base class ReceiveSlot method.
-  if (packetRxParams.rxParams->m_txInfo.packetType == SatEnums::PACKET_TYPE_SLOTTED_ALOHA)
+  if (packetRxParams.rxParams->m_txInfo.packetType == SatEnums::PACKET_TYPE_SLOTTED_ALOHA
+        || packetRxParams.rxParams->m_txInfo.packetType == SatEnums::PACKET_TYPE_LOGON)
     {
       SatPhyRxCarrierPerSlot::ReceiveSlot (packetRxParams, nPackets);
       return;

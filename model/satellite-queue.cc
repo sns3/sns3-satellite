@@ -27,6 +27,7 @@
 #include "satellite-utils.h"
 #include "satellite-const-variables.h"
 #include "satellite-log.h"
+#include "ns3/satellite-control-message.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatQueue");
 
@@ -154,6 +155,16 @@ SatQueue::Enqueue (Ptr<Packet> p)
       return false;
     }
 
+  SatControlMsgTag tag;
+  if (p->PeekPacketTag (tag))
+    {
+      if (tag.GetMsgType () == SatControlMsgTag::SAT_LOGON_CTRL_MSG)
+        {
+          m_logonCallback (p);
+          return true;
+        }
+    }
+
   bool emptyBeforeEnque = m_packets.empty ();
 
   m_nBytes += p->GetSize ();
@@ -268,6 +279,13 @@ SatQueue::AddQueueEventCallback (SatQueue::QueueEventCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);
   m_queueEventCallbacks.push_back (cb);
+}
+
+void
+SatQueue::AddLogonCallback (SatQueue::LogonCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_logonCallback = cb;
 }
 
 void

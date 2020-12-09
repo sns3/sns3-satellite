@@ -341,6 +341,9 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId,
   // Set the callback to check whether control msg transmissions are possible
   rm->SetCtrlMsgTxPossibleCallback (MakeCallback (&SatUtMac::ControlMsgTransmissionPossible, mac));
 
+  // Set the callback to check whether logon msg transmissions are possible
+  rm->SetLogonMsgTxPossibleCallback (MakeCallback (&SatUtMac::LogonMsgTransmissionPossible, mac));
+
   // Set TBTP callback to UT MAC
   mac->SetAssignedDaResourcesCallback (MakeCallback (&SatRequestManager::AssignedDaResources, rm));
 
@@ -390,10 +393,12 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId,
     {
       macCb = MakeCallback (&SatUtMac::ReceiveQueueEvent, mac);
     }
+  SatQueue::LogonCallback logonCb = MakeCallback (&SatUtMac::SendLogon, mac);
   SatQueue::QueueEventCallback rmCb = MakeCallback (&SatRequestManager::ReceiveQueueEvent, rm);
 
   // Create a queue
   Ptr<SatQueue> queue = CreateObject<SatQueue> (SatEnums::CONTROL_FID);
+  queue->AddLogonCallback (logonCb);
   queue->AddQueueEventCallback (macCb);
   queue->AddQueueEventCallback (rmCb);
   utEncap->SetQueue (queue);

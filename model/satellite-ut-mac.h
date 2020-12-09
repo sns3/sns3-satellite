@@ -189,6 +189,12 @@ public:
   virtual void ReceiveQueueEventEssa (SatQueue::QueueEvent_t event, uint8_t rcIndex);
 
   /**
+   * Receive a logon message to transmit
+   * /param packet The logon packet to send
+   */
+  void SendLogon (Ptr<Packet> packet);
+
+  /**
    * Set address of the GW (or its MAC) serving this UT.
    *
    * \param gwAddress Address of the GW.
@@ -229,6 +235,13 @@ public:
    * \return Boolean to indicate whether a control msg transmission is possible
    */
   bool ControlMsgTransmissionPossible () const;
+
+  /**
+   * \brief Method to check whether a transmission of a logon msg
+   * is somewhat possible.
+   * \return Boolean to indicate whether a logon msg transmission is possible
+   */
+  bool LogonMsgTransmissionPossible () const;
 
   /**
    * \brief Callback signature for `DaResourcesTrace` trace source.

@@ -2160,6 +2160,7 @@ public:
     PACKET_TYPE_SLOTTED_ALOHA = 1,
     PACKET_TYPE_CRDSA = 2,
     PACKET_TYPE_ESSA = 3,
+    PACKET_TYPE_LOGON = 4
   } PacketType_t;
 
   static inline std::string GetPacketTypeName (PacketType_t packetType)

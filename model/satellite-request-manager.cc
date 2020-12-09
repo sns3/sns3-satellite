@@ -187,6 +187,7 @@ void SatRequestManager::DoDispose ()
   m_ctrlCallback.Nullify ();
 
   m_ctrlMsgTxPossibleCallback.Nullify ();
+  m_logonMsgTxPossibleCallback.Nullify ();
 
   m_llsConf = NULL;
 
@@ -386,6 +387,13 @@ SatRequestManager::SetCtrlMsgTxPossibleCallback (SatRequestManager::CtrlMsgTxPos
 {
   NS_LOG_FUNCTION (this << &cb);
   m_ctrlMsgTxPossibleCallback = cb;
+}
+
+void
+SatRequestManager::SetLogonMsgTxPossibleCallback (SatRequestManager::LogonMsgTxPossibleCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_logonMsgTxPossibleCallback = cb;
 }
 
 void
@@ -849,8 +857,9 @@ SatRequestManager::SendLogonMessage ()
 {
   NS_LOG_FUNCTION (this);
 
-  // Check if we have the possiblity to send a ctrl msg
-  if (!m_ctrlCallback.IsNull () && m_ctrlMsgTxPossibleCallback ())
+  // Check if we have the possiblity to send a logon msg
+  // TODO add new callback
+  if (!m_ctrlCallback.IsNull () && m_logonMsgTxPossibleCallback ())
     {
       NS_LOG_INFO ("Send logon message to GW: " << m_gwAddress);
 

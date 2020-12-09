@@ -309,6 +309,13 @@ SatUtMac::ControlMsgTransmissionPossible () const
   return da || ra;
 }
 
+bool
+SatUtMac::LogonMsgTransmissionPossible () const
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_useLogon;
+}
 
 void
 SatUtMac::SetTimingAdvanceCallback (SatUtMac::TimingAdvanceCallback cb)
@@ -721,6 +728,34 @@ SatUtMac::ReceiveQueueEventEssa (SatQueue::QueueEvent_t event, uint8_t rcIndex)
 }
 
 void
+SatUtMac::SendLogon (Ptr<Packet> packet)
+{
+  SatPhy::PacketContainer_t packets;
+  packets.push_back (packet);
+
+  Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE);
+  uint8_t frameId = superframeConf->GetRaChannelFrameId (m_logonChannel);
+  Ptr<SatFrameConf> frameConf = superframeConf->GetFrameConf (frameId);
+
+  Ptr<SatTimeSlotConf> timeSlotConf = frameConf->GetTimeSlotConf (0);
+
+  Ptr<SatWaveform> wf = m_superframeSeq->GetWaveformConf ()->GetWaveform (timeSlotConf->GetWaveFormId ());
+  Time duration = wf->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
+
+  uint32_t carrierId = m_superframeSeq->GetCarrierId (SatConstVariables::SUPERFRAME_SEQUENCE, frameId, timeSlotConf->GetCarrierId () );
+
+  SatSignalParameters::txInfo_s txInfo;
+  txInfo.packetType = SatEnums::PACKET_TYPE_LOGON;
+  txInfo.modCod = wf->GetModCod ();
+  txInfo.sliceId = 0;
+  txInfo.fecBlockSizeInBytes = wf->GetPayloadInBytes ();
+  txInfo.frameType = SatEnums::UNDEFINED_FRAME;
+  txInfo.waveformId = wf->GetWaveformId ();
+
+  TransmitPackets (packets, duration, carrierId, txInfo);
+}
+
+void
 SatUtMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/)
 {
   NS_LOG_FUNCTION (this << packets.size ());
@@ -954,6 +989,7 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
             msg << " at: " << Now ().GetSeconds () << "s";
             Singleton<SatLog>::Get ()->AddToLog (SatLog::LOG_WARNING, "", msg.str ());
           }
+        break;
       }
     default:
       {
