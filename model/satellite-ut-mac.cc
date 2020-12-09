@@ -112,6 +112,7 @@ SatUtMac::SatUtMac ()
   m_gatewayUpdateCallback (0),
   m_routingUpdateCallback (0),
   m_beamCheckerCallback (0),
+  m_askedBeamCallback (0),
   m_txCheckCallback (0),
   m_sliceSubscriptionCallback (0),
   m_sendLogonCallback (0)
@@ -144,6 +145,7 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, bool crdsaOnlyFo
   m_gatewayUpdateCallback (0),
   m_routingUpdateCallback (0),
   m_beamCheckerCallback (0),
+  m_askedBeamCallback (0),
   m_txCheckCallback (0),
   m_sliceSubscriptionCallback (0),
   m_sendLogonCallback (0)
@@ -173,6 +175,7 @@ SatUtMac::DoDispose (void)
   m_gatewayUpdateCallback.Nullify ();
   m_routingUpdateCallback.Nullify ();
   m_beamCheckerCallback.Nullify ();
+  m_askedBeamCallback.Nullify ();
   m_txCheckCallback.Nullify ();
   m_sliceSubscriptionCallback.Nullify ();
   m_sendLogonCallback.Nullify ();
@@ -209,6 +212,13 @@ SatUtMac::SetBeamCheckerCallback (SatUtMac::BeamCheckerCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);
   m_beamCheckerCallback = cb;
+}
+
+void
+SatUtMac::SetAskedBeamCallback (SatUtMac::AskedBeamCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_askedBeamCallback = cb;
 }
 
 void
@@ -1588,6 +1598,11 @@ SatUtMac::DoFrameStart ()
                 {
                   m_handoverMessagesCount = 0;
                   LogOff ();
+
+                  m_beamId = m_askedBeamCallback ();
+                  m_handoverCallback (m_beamId);
+                  m_tbtpContainer->Clear ();
+                  m_handoverState = WAITING_FOR_TBTP;
                 }
             }
         }

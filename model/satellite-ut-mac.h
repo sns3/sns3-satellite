@@ -295,10 +295,22 @@ public:
   typedef Callback<bool, uint32_t> BeamCheckerCallback;
 
   /**
+   * \brief Callback to ask for the best beam ID during handover
+   * \return The best beam ID
+   */
+  typedef Callback<uint32_t> AskedBeamCallback;
+
+  /**
    * \brief Method to set the beam checker callback
    * \param cb callback to invoke to check beams and recommend handover
    */
   void SetBeamCheckerCallback (SatUtMac::BeamCheckerCallback cb);
+
+  /**
+   * \brief Method to get the best beam when performing handover
+   * \param cb callback to invoke to ask best beam ID
+   */
+  void SetAskedBeamCallback (SatUtMac::AskedBeamCallback cb);
 
   void LogOff ();
 
@@ -661,6 +673,11 @@ private:
    * Beam checker and handover recommendation sending callback
    */
   SatUtMac::BeamCheckerCallback m_beamCheckerCallback;
+
+  /**
+   * Beam checker and handover recommendation sending callback
+   */
+  SatUtMac::AskedBeamCallback m_askedBeamCallback;
 
   /**
    * Tx checking callback

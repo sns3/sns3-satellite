@@ -109,6 +109,12 @@ SatUtHandoverModule::SetHandoverRequestCallback (HandoverRequestCallback cb)
   m_handoverCallback = cb;
 }
 
+uint32_t
+SatUtHandoverModule::GetAskedBeamId ()
+{
+  return m_askedBeamId;
+}
+
 
 bool
 SatUtHandoverModule::CheckForHandoverRecommendation (uint32_t beamId)

@@ -484,8 +484,10 @@ SatBeamScheduler::UpdateUtCno (Address utId, double cno)
 {
   NS_LOG_FUNCTION (this << utId << cno);
 
-  NS_ASSERT (HasUt (utId));
-  m_utInfos[utId]->AddCnoSample (cno);
+  if (HasUt (utId))
+    {
+      m_utInfos[utId]->AddCnoSample (cno);
+    }
 }
 
 void
@@ -493,8 +495,10 @@ SatBeamScheduler::UtCrReceived (Address utId, Ptr<SatCrMessage> crMsg)
 {
   NS_LOG_FUNCTION (this << utId << crMsg);
 
-  NS_ASSERT (HasUt (utId));
-  m_utInfos[utId]->AddCrMsg (crMsg);
+  if (HasUt (utId))
+    {
+      m_utInfos[utId]->AddCrMsg (crMsg);
+    }
 }
 
 Ptr<SatCnoEstimator>
