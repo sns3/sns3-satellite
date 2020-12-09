@@ -59,6 +59,9 @@ def build(bld):
     obj = bld.create_ns3_program('sat-log-example', ['satellite'])
     obj.source = 'sat-log-example.cc'
 
+    obj = bld.create_ns3_program('sat-logon-example', ['satellite'])
+    obj.source = 'sat-logon-example.cc'
+
     obj = bld.create_ns3_program('sat-loo-example', ['satellite'])
     obj.source = 'sat-loo-example.cc'
 

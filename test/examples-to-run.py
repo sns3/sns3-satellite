@@ -27,6 +27,7 @@ cpp_examples = [
 	("sat-link-results-plot", "True", "True"),
 	("sat-list-position-ext-fading-example", "True", "True"),
 	("sat-log-example", "True", "True"),
+	("sat-logon-example", "True", "True"),
 	("sat-loo-example", "True", "True"),
 	("sat-markov-fading-trace-example", "True", "True"),
 	("sat-markov-logic-example", "True", "True"),
