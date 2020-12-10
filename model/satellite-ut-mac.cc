@@ -1011,7 +1011,6 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
             m_raChannel = logonMsg->GetRaChannel ();
             m_loggedOn = true;
             m_sendLogonTries = 0;
-            std::cout << "m_loggedOn = true" << std::endl;
           }
         else
           {
