@@ -590,6 +590,31 @@ private:
   bool m_useLogon;
 
   /**
+   * Number of times a logon message has been sent without response
+   */
+  uint32_t m_sendLogonTries;
+
+  /**
+   * The initial max time to wait when sending a logon message
+   */
+  Time m_windowInitLogon;
+
+  /**
+   * Timeout for waiting for a response for a logon message
+   */
+  Time m_maxWaitingTimeLogonResponse;
+  /**
+   * The random generator for waiting transmission time
+   */
+  Ptr<UniformRandomVariable> m_waitingTimeLogonRng;
+
+  /**
+   * Instant when a logon message can be transmitted
+   */
+  Time m_nextLogonTransmissionPossible;
+
+
+  /**
    * UT scheduler
    */
   Ptr<SatUtScheduler> m_utScheduler;

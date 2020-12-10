@@ -73,6 +73,16 @@ SatUtMac::GetTypeId (void)
                    PointerValue (),
                    MakePointerAccessor (&SatUtMac::m_utScheduler),
                    MakePointerChecker<SatUtScheduler> ())
+    .AddAttribute ("WindowInitLogon",
+                   "The initial window for logon waiting time before transmission.",
+                   TimeValue (Seconds (20)),
+                   MakeTimeAccessor (&SatUtMac::m_windowInitLogon),
+                   MakeTimeChecker ())
+    .AddAttribute ("MaxWaitingTimeLogonResponse",
+                   "Timeout for waiting for a response for a logon message.",
+                   TimeValue (Seconds (1)),
+                   MakeTimeAccessor (&SatUtMac::m_maxWaitingTimeLogonResponse),
+                   MakeTimeChecker ())
     .AddTraceSource ("DaResourcesTrace",
                      "Assigned dedicated access resources in return link to this UT.",
                      MakeTraceSourceAccessor (&SatUtMac::m_tbtpResourcesTrace),
@@ -99,6 +109,11 @@ SatUtMac::SatUtMac ()
   m_logonChannel (0),
   m_loggedOn (true),
   m_useLogon (false),
+  m_sendLogonTries (0),
+  m_windowInitLogon (Seconds (20)),
+  m_maxWaitingTimeLogonResponse (Seconds (1)),
+  m_waitingTimeLogonRng (CreateObject<UniformRandomVariable> ()),
+  m_nextLogonTransmissionPossible (Seconds (0)),
   m_crdsaUniquePacketId (1),
   m_crdsaOnlyForControl (false),
   m_nextPacketTime (Now ()),
@@ -132,6 +147,11 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, bool crdsaOnlyFo
   m_logonChannel (0),
   m_loggedOn (true),
   m_useLogon (false),
+  m_sendLogonTries (0),
+  m_windowInitLogon (Seconds (20)),
+  m_maxWaitingTimeLogonResponse (Seconds (1)),
+  m_waitingTimeLogonRng (CreateObject<UniformRandomVariable> ()),
+  m_nextLogonTransmissionPossible (Seconds (0)),
   m_crdsaUniquePacketId (1),
   m_crdsaOnlyForControl (crdsaOnlyForControl),
   m_nextPacketTime (Now ()),
@@ -762,7 +782,11 @@ SatUtMac::SendLogon (Ptr<Packet> packet)
   txInfo.frameType = SatEnums::UNDEFINED_FRAME;
   txInfo.waveformId = wf->GetWaveformId ();
 
-  TransmitPackets (packets, duration, carrierId, txInfo);
+  Time waitingTime = Seconds (m_waitingTimeLogonRng->GetValue (0.0, pow (1 + m_sendLogonTries, 2) * m_windowInitLogon.GetSeconds ()));
+  m_sendLogonTries++;
+  Simulator::Schedule (waitingTime, &SatUtMac::TransmitPackets, this, packets, duration, carrierId, txInfo);
+
+  m_nextLogonTransmissionPossible = Simulator::Now () + m_maxWaitingTimeLogonResponse + waitingTime;
 }
 
 void
@@ -986,6 +1010,8 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
           {
             m_raChannel = logonMsg->GetRaChannel ();
             m_loggedOn = true;
+            m_sendLogonTries = 0;
+            std::cout << "m_loggedOn = true" << std::endl;
           }
         else
           {
@@ -1619,8 +1645,11 @@ SatUtMac::DoFrameStart ()
             }
           else if (m_useLogon)
             {
-              // Do Logon
-              m_sendLogonCallback ();
+              if (Simulator::Now () > m_nextLogonTransmissionPossible)
+                {
+                  // Do Logon
+                  m_sendLogonCallback ();
+                }
             }
         }
     }

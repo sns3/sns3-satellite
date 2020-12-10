@@ -260,10 +260,6 @@ SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams,
                                       );
         }
     }
-  else if (packetRxParams.rxParams->m_txInfo.packetType == SatEnums::PACKET_TYPE_LOGON)
-    {
-      // Do nothing
-    }
   else
     {
       /// check against link results
