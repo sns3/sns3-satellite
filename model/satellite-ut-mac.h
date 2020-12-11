@@ -35,6 +35,7 @@
 #include <ns3/satellite-signal-parameters.h>
 #include <ns3/satellite-random-access-container.h>
 #include <ns3/satellite-enums.h>
+#include <ns3/satellite-beam-scheduler.h>
 #include <utility>
 
 namespace ns3 {
@@ -162,6 +163,28 @@ public:
    * \param cb callback to invoke when sending a logon message
    */
   void SetSendLogonCallback (SatUtMac::SendLogonCallback cb);
+
+  /**
+   * Callback to update GW address to SatRequestManager
+   */
+  typedef Callback<void, Mac48Address> UpdateGwAddressCallback;
+
+  /**
+   * \brief Set the gw update callback
+   * \param cb callback to update GW address to SatRequestManager
+   */
+  void SetUpdateGwAddressCallback (SatUtMac::UpdateGwAddressCallback cb);
+
+  /**
+   * Callback to get the SatBeamScheduler from the beam ID for handover
+   */
+  typedef Callback<Ptr<SatBeamScheduler>, uint32_t> BeamScheculerCallback;
+
+  /**
+   * \brief Set the beam scheduler callback
+   * \param cb Callback to get the SatBeamScheduler
+   */
+  void SetBeamScheculerCallback (SatUtMac::BeamScheculerCallback cb);
 
   /**
    * Get Tx time for the next possible superframe.
@@ -718,6 +741,16 @@ private:
    * Callback for sending a logon message
    */
   SatUtMac::SendLogonCallback m_sendLogonCallback;
+
+  /**
+   * Callback for sending a logon message
+   */
+  SatUtMac::UpdateGwAddressCallback m_updateGwAddressCallback;
+
+  /**
+   * Callback to get the SatBeamScheduler linked to a beam ID
+   */
+  SatUtMac::BeamScheculerCallback m_beamScheculerCallback;
 };
 
 } // namespace ns3

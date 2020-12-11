@@ -97,7 +97,7 @@ SatReturnLinkEncapsulator::DoDispose ()
 }
 
 void
-SatReturnLinkEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address /*dest*/)
+SatReturnLinkEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address dest)
 {
   NS_LOG_FUNCTION (this << p->GetSize ());
 
@@ -111,6 +111,12 @@ SatReturnLinkEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address /*dest*/)
   SatEncapPduStatusTag tag;
   tag.SetStatus (SatEncapPduStatusTag::FULL_PDU);
   p->AddPacketTag (tag);
+
+  // Add MAC tag to identify the packet in lower layers
+  SatMacTag mTag;
+  mTag.SetDestAddress (dest);
+  mTag.SetSourceAddress (m_sourceAddress);
+  p->AddPacketTag (mTag);
 
   /**
    * TODO: This is the place to encapsulate the higher layer packet

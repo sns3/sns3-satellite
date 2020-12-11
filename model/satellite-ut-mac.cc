@@ -130,7 +130,9 @@ SatUtMac::SatUtMac ()
   m_askedBeamCallback (0),
   m_txCheckCallback (0),
   m_sliceSubscriptionCallback (0),
-  m_sendLogonCallback (0)
+  m_sendLogonCallback (0),
+  m_updateGwAddressCallback (0),
+  m_beamScheculerCallback (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -168,7 +170,9 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, bool crdsaOnlyFo
   m_askedBeamCallback (0),
   m_txCheckCallback (0),
   m_sliceSubscriptionCallback (0),
-  m_sendLogonCallback (0)
+  m_sendLogonCallback (0),
+  m_updateGwAddressCallback (0),
+  m_beamScheculerCallback (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -199,6 +203,8 @@ SatUtMac::DoDispose (void)
   m_txCheckCallback.Nullify ();
   m_sliceSubscriptionCallback.Nullify ();
   m_sendLogonCallback.Nullify ();
+  m_updateGwAddressCallback.Nullify ();
+  m_beamScheculerCallback.Nullify ();
   m_tbtpContainer->DoDispose ();
   m_utScheduler->DoDispose ();
   m_utScheduler = NULL;
@@ -263,6 +269,22 @@ SatUtMac::SetSendLogonCallback (SatUtMac::SendLogonCallback cb)
   NS_LOG_FUNCTION (this << &cb);
 
   m_sendLogonCallback = cb;
+}
+
+void
+SatUtMac::SetUpdateGwAddressCallback (SatUtMac::UpdateGwAddressCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+
+  m_updateGwAddressCallback = cb;
+}
+
+void
+SatUtMac::SetBeamScheculerCallback (SatUtMac::BeamScheculerCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+
+  m_beamScheculerCallback = cb;
 }
 
 void
@@ -1625,9 +1647,20 @@ SatUtMac::DoFrameStart ()
                   LogOff ();
 
                   m_beamId = m_askedBeamCallback ();
+
+                  Address gwAddress = m_beamScheculerCallback (m_beamId)->GetGwAddress ();
+                  Mac48Address gwAddress48 = Mac48Address::ConvertFrom (gwAddress);
+                  if (gwAddress48 != m_gwAddress)
+                    {
+                      SetGwAddress (gwAddress48);
+                      m_updateGwAddressCallback (gwAddress48);
+                      m_routingUpdateCallback (m_nodeInfo->GetMacAddress (), gwAddress);
+                    }
                   m_handoverCallback (m_beamId);
+
                   m_tbtpContainer->Clear ();
-                  m_handoverState = WAITING_FOR_TBTP;
+                  m_handoverState = NO_HANDOVER;
+                  m_nextLogonTransmissionPossible = Simulator::Now ();
                 }
             }
         }
