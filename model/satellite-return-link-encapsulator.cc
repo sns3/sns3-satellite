@@ -112,6 +112,12 @@ SatReturnLinkEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address /*dest*/)
   tag.SetStatus (SatEncapPduStatusTag::FULL_PDU);
   p->AddPacketTag (tag);
 
+  // Add MAC tag to identify the packet in lower layers
+  SatMacTag mTag;
+  mTag.SetDestAddress (m_destAddress);
+  mTag.SetSourceAddress (m_sourceAddress);
+  p->AddPacketTag (mTag);
+
   /**
    * TODO: This is the place to encapsulate the higher layer packet
    * with Addressed Link (AL) header, if needed.
@@ -150,11 +156,14 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
 
   if (packet)
     {
-      // Add MAC tag to identify the packet in lower layers
+      // Add MAC tag to identify the packet in lower layers if not already added
       SatMacTag mTag;
-      mTag.SetDestAddress (m_destAddress);
-      mTag.SetSourceAddress (m_sourceAddress);
-      packet->AddPacketTag (mTag);
+      if (!packet->PeekPacketTag (mTag))
+        {
+          mTag.SetDestAddress (m_destAddress);
+          mTag.SetSourceAddress (m_sourceAddress);
+          packet->AddPacketTag (mTag);
+        }
 
       // Add flow id tag
       SatFlowIdTag flowIdTag;
