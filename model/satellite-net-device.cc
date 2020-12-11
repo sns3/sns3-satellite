@@ -473,6 +473,14 @@ SatNetDevice::SendControlMsg (Ptr<SatControlMessage> msg, const Address& dest)
   tag.SetMsgType (msg->GetMsgType ());
   packet->AddPacketTag (tag);
 
+  if (msg->GetMsgType () == SatControlMsgTag::SAT_LOGON_CTRL_MSG)
+    {
+      SatMacTag mTag;
+      mTag.SetDestAddress (Mac48Address::ConvertFrom (dest));
+      mTag.SetSourceAddress (m_address);
+      packet->AddPacketTag (mTag);
+    }
+
   uint8_t flowId = m_classifier->Classify (msg->GetMsgType (), dest);
 
   m_signallingTxTrace (packet, dest);
