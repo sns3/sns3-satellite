@@ -735,7 +735,7 @@ SatStatsFwdAppJitterHelper::RxCallback (Ptr<SatStatsFwdAppJitterHelper> helper,
       NS_LOG_DEBUG ("Contains a TrafficTimeTag tag");
       const Time delay = Simulator::Now () - timeTag.GetSenderTimestamp ();
       Time previousDelay = helper->GetAndUpdatePreviousDelay (identifier, delay);
-      if(previousDelay != 0)
+      if(previousDelay.IsZero() == false)
       {
          Time jitter = Abs (delay - previousDelay);
          helper->PassSampleToCollector (jitter, identifier);

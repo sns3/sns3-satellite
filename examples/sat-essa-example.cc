@@ -169,7 +169,7 @@ main (int argc, char *argv[])
     SimulationHelper::ONOFF,
     SimulationHelper::UDP,
     SimulationHelper::RTN_LINK,
-    Seconds (appStartTime), Seconds (simLength));
+    appStartTime, simLength);
 
   // Outputs
   simulationHelper->EnableProgressLogs ();

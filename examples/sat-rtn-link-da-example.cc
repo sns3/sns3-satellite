@@ -79,7 +79,7 @@ main (int argc, char *argv[])
     SimulationHelper::CBR,
     SimulationHelper::UDP,
     SimulationHelper::RTN_LINK,
-    Seconds (1), Seconds (simLength), Seconds (0.05));
+    Seconds (1), simLength, Seconds (0.05));
 
   // Create RTN link statistics
   simulationHelper->CreateDefaultRtnLinkStats ();

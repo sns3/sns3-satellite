@@ -150,7 +150,7 @@ main (int argc, char *argv[])
     SimulationHelper::CBR,
     SimulationHelper::UDP,
     SimulationHelper::RTN_LINK,
-    appStartTime, Seconds (simLength + 1), Seconds (0.05));
+    appStartTime, simLength + Seconds (1), Seconds (0.05));
 
   NS_LOG_INFO ("--- Cbr-user-defined-example ---");
   NS_LOG_INFO ("  Packet size in bytes: " << packetSize);
