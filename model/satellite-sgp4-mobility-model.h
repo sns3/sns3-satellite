@@ -65,9 +65,9 @@ public:
   void SetStartTime (const JulianDate &t);
 
 private:
-  virtual Vector DoGetVelocity (void) const;
+  virtual Vector DoGetVelocity () const;
 
-  virtual GeoCoordinate DoGetGeoPosition (void) const;
+  virtual GeoCoordinate DoGetGeoPosition () const;
   virtual void DoSetGeoPosition (const GeoCoordinate &position);
 
   mutable GeoCoordinate m_geoPosition;

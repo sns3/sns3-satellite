@@ -23,12 +23,15 @@
 
 #include "satellite-sgp4-position-allocator.h"
 
-NS_LOG_COMPONENT_DEFINE ("sat-sgp4-position-allocator");
-
 namespace ns3 {
 
+NS_LOG_COMPONENT_DEFINE ("sat-sgp4-position-allocator");
+
+const gravconsttype SatSGP4PositionAllocator::WGeoSys = wgs72;   // recommended for SGP4/SDP4
+const uint32_t SatSGP4PositionAllocator::TleSatInfoWidth = 69;
+
 TypeId
-SatSGP4PositionAllocator::GetTypeId (void) {
+SatSGP4PositionAllocator::GetTypeId () {
   static TypeId tid = TypeId ("ns3::SatSGP4PositionAllocator")
     .SetParent<SatPositionAllocator> ()
     .AddConstructor<SatSGP4PositionAllocator> ()
@@ -41,10 +44,47 @@ SatSGP4PositionAllocator::SatSGP4PositionAllocator () { }
 SatSGP4PositionAllocator::~SatSGP4PositionAllocator () { }
 
 GeoCoordinate
-SatSGP4PositionAllocator::GetNextGeoPosition (void) const
+SatSGP4PositionAllocator::GetNextGeoPosition () const
 {
   // TODO
-  return GeoCoordinate();
+  std::cout << "GetNextGeoPosition" << std::endl;
+  return GeoCoordinate (0.0, 0.0, 400.0*0 + 360000000.0);
+}
+
+bool
+SatSGP4PositionAllocator::SetTleInfo (const std::string &tle)
+{
+  uint32_t delimPos = tle.find("\n");
+  const std::string line1 = tle.substr(0, delimPos);
+  const std::string line2 = tle.substr(delimPos + 1, tle.size() - delimPos);
+
+  double start, stop, delta;
+  char l1[TleSatInfoWidth+1], l2[TleSatInfoWidth+1];
+  double r[3], v[3];
+
+  NS_ASSERT_MSG (
+    line1.size () == TleSatInfoWidth && line2.size () == TleSatInfoWidth,
+    "Two-Line Element info lines must be of length" << TleSatInfoWidth << "!"
+  );
+
+  m_tle1 = std::string (line1.c_str ());
+  m_tle2 = std::string (line2.c_str ());
+
+  memcpy (l1, line1.c_str (), sizeof (l1));
+  memcpy (l2, line2.c_str (), sizeof (l2));
+
+  // 'c' => catalog mode run
+  // 'e' => epoch time (relative to TLE lines)
+  // 'i' => improved mode of operation
+  twoline2rv (
+    l1, l2, 'c', 'e', 'i', WGeoSys, start, stop, delta, m_sgp4_record
+  );
+
+  // call propagator to check if it has been properly initialized
+  sgp4 (WGeoSys, m_sgp4_record, 0, r, v);
+
+  // return true if no errors occurred
+  return (m_sgp4_record.error == 0);
 }
 
 } // namespace ns3

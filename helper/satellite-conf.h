@@ -67,12 +67,14 @@ public:
    * \param gwPos GW position file name
    * \param satPos Satellie position file name
    * \param wfConf Waveform configuration file name
+   * \param tle TLE configuration file name
    */
   void Initialize (std::string rtnConf,
                    std::string fwdConf,
                    std::string gwPos,
                    std::string satPos,
-                   std::string wfConf);
+                   std::string wfConf,
+                   std::string tle);
 
   /**
    * Try to open a file from a given path
@@ -146,6 +148,13 @@ public:
    * \return Geo satellite position.
    */
   GeoCoordinate GetGeoSatPosition () const;
+
+  /**
+   * Get the TLE of the Satellite
+   *
+   * \return TLE satellite information
+   */
+  std::string GetSatTle () const;
 
   /**
    * Convert carrier id, sequency id and frequency id to real frequency value.
@@ -225,6 +234,11 @@ private:
    * Geodetic positions of the Geo Satellite
    */
   PositionContainer_t m_geoSatPosition;
+
+  /**
+   * TLE information of the Satellite
+   */
+  std::string m_tleSat;
 
   /**
    * File to use when loading UT specific position (for user defined positions)
@@ -355,6 +369,13 @@ private:
    * \param container Container reference to store found positions
    */
   void LoadPositions (std::string filePathName, PositionContainer_t& container);
+
+  /**
+   * Load TLE information from a file
+   * \param filePathName
+   * \param tleInfo TLE information extracted from file
+   */
+  void LoadTle (std::string filePathName, std::string& tleInfo);
 
 };
 

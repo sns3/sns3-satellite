@@ -27,6 +27,9 @@ NS_LOG_COMPONENT_DEFINE ("sat-sgp4-mobility-model");
 
 namespace ns3 {
 
+NS_OBJECT_ENSURE_REGISTERED (SatSGP4MobilityModel);
+
+
 TypeId
 SatSGP4MobilityModel::GetTypeId (void) {
   static TypeId tid = TypeId ("ns3::SatSGP4MobilityModel")
@@ -64,9 +67,13 @@ SatSGP4MobilityModel::DoGetVelocity () const
 }
 
 GeoCoordinate
-SatSGP4MobilityModel::DoGetGeoPosition (void) const
+SatSGP4MobilityModel::DoGetGeoPosition () const
 {
   NS_LOG_FUNCTION (this);
+
+  std::cout << "DoGetGeoPosition" << std::endl;
+
+  return GeoCoordinate (0.0, 0.0, 400.0*0 + 360000000.0);
 
   return m_geoPosition;
 }
@@ -74,6 +81,8 @@ void
 SatSGP4MobilityModel::DoSetGeoPosition (const GeoCoordinate &position)
 {
   NS_LOG_FUNCTION (this << position);
+
+  std::cout << "DoSetGeoPosition" << std::endl;
 
   m_geoPosition = position;
   NotifyGeoCourseChange ();

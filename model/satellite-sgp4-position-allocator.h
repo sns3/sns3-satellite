@@ -25,6 +25,10 @@
 
 #include "satellite-position-allocator.h"
 
+#include "satellite-sgp4unit.h"
+
+#include "satellite-sgp4io.h"
+
 namespace ns3 {
 
 /**
@@ -32,6 +36,11 @@ namespace ns3 {
  */
 class SatSGP4PositionAllocator : public SatPositionAllocator {
 public:
+  /// World Geodetic System (WGS) constants to be used by SGP4/SDP4 models.
+  static const gravconsttype WGeoSys;
+  /// Satellite's information line size defined by TLE data format.
+  static const uint32_t TleSatInfoWidth;
+
   /**
    * @brief Get the type ID.
    * @return the object TypeId.
@@ -48,8 +57,18 @@ public:
    */
   virtual ~SatSGP4PositionAllocator ();
 
-  virtual GeoCoordinate GetNextGeoPosition (void) const;
+  /**
+   * @brief Set satellite's TLE information required for its initialization.
+   * @param tle The two lines of the TLE data format.
+   * @return a boolean indicating whether the initialization succeeded.
+   */
+  bool SetTleInfo (const std::string &tle);
 
+  virtual GeoCoordinate GetNextGeoPosition () const;
+
+private:
+  std::string m_tle1, m_tle2;                       //!< satellite's TLE data.
+  mutable elsetrec m_sgp4_record;                   //!< SGP4/SDP4 record.
 };
 
 } // namespace ns3

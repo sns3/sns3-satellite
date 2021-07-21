@@ -37,10 +37,12 @@
 
 #include <ns3/satellite-typedefs.h>
 #include <ns3/satellite-position-allocator.h>
+#include <ns3/satellite-sgp4-position-allocator.h>
 #include <ns3/satellite-rtn-link-time.h>
 #include <ns3/satellite-log.h>
 #include <ns3/satellite-env-variables.h>
 #include <ns3/satellite-traced-mobility-model.h>
+#include <ns3/satellite-sgp4-mobility-model.h>
 #include <ns3/satellite-ut-handover-module.h>
 #include "satellite-helper.h"
 
@@ -71,6 +73,16 @@ SatHelper::GetTypeId (void)
                    "Name of the GW positions configuration file.",
                    StringValue ("Scenario72GwPos.txt"),
                    MakeStringAccessor (&SatHelper::m_gwPosFileName),
+                   MakeStringChecker ())
+    .AddAttribute ("SatMobilitySGP4Enabled",
+                   "The satellite moves following a SGP4 model.",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatHelper::m_satMobilitySGP4Enabled),
+                   MakeBooleanChecker ())
+    .AddAttribute ("SatMobilitySGP4TleFileName",
+                   "TLE input filename used for SGP4 mobility.",
+                   StringValue ("tle.txt"),
+                   MakeStringAccessor (&SatHelper::m_satMobilitySGP4TleFileName),
                    MakeStringChecker ())
     .AddAttribute ("GeoSatPosFileName",
                    "Name of the geostationary satellite position configuration file.",
@@ -204,14 +216,23 @@ SatHelper::SatHelper ()
                          m_fwdConfFileName,
                          m_gwPosFileName,
                          m_geoPosFileName,
-                         m_waveformConfFileName);
+                         m_waveformConfFileName,
+                         m_satMobilitySGP4TleFileName);
 
   // Create antenna gain patterns
   m_antennaGainPatterns = CreateObject<SatAntennaGainPatternContainer> ();
 
   // create Geo Satellite node, set mobility to it
   Ptr<Node> geoSatNode = CreateObject<Node> ();
-  SetGeoSatMobility (geoSatNode);
+
+  if (m_satMobilitySGP4Enabled == true)
+    {
+      SetSatMobility (geoSatNode);
+    }
+  else
+    {
+      SetGeoSatMobility (geoSatNode);
+    }
 
   m_beamHelper = CreateObject<SatBeamHelper> (geoSatNode,
                                               MakeCallback (&SatConf::GetCarrierBandwidthHz, m_satConf),
@@ -714,6 +735,21 @@ SatHelper::SetGeoSatMobility (Ptr<Node> node)
 
   mobility.SetPositionAllocator (geoSatPosAllocator);
   mobility.SetMobilityModel ("ns3::SatConstantPositionMobilityModel");
+  mobility.Install (node);
+}
+
+void
+SatHelper::SetSatMobility (Ptr<Node> node)
+{
+  NS_LOG_FUNCTION (this);
+
+  MobilityHelper mobility;
+
+  Ptr<SatSGP4PositionAllocator> satSGP4PosAllocator = CreateObject<SatSGP4PositionAllocator> ();
+  satSGP4PosAllocator->SetTleInfo (m_satConf->GetSatTle ());
+
+  mobility.SetPositionAllocator (satSGP4PosAllocator);
+  mobility.SetMobilityModel ("ns3::SatSGP4MobilityModel");
   mobility.Install (node);
 }
 

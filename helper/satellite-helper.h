@@ -229,6 +229,16 @@ private:
   std::string m_waveformConfFileName;
 
   /**
+   * The satellite moves following a SGP4 model
+   */
+  bool m_satMobilitySGP4Enabled;
+
+  /**
+   * TLE input filename used for SGP4 mobility
+   */
+  std::string m_satMobilitySGP4TleFileName;
+
+  /**
    * User helper
    */
   Ptr<SatUserHelper> m_userHelper;
@@ -429,6 +439,13 @@ private:
    * \param node node pointer of Geo Satellite to set mobility
    */
   void SetGeoSatMobility (Ptr<Node> node);
+
+  /**
+   * Sets SGP4 mobility to created Sat node.
+   *
+   * \param node node pointer of Satellite to set mobility
+   */
+  void SetSatMobility (Ptr<Node> node);
 
   /**
    * Sets mobility to created UT nodes.
