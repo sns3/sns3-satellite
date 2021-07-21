@@ -37,7 +37,6 @@
 
 #include <ns3/satellite-typedefs.h>
 #include <ns3/satellite-position-allocator.h>
-#include <ns3/satellite-sgp4-position-allocator.h>
 #include <ns3/satellite-rtn-link-time.h>
 #include <ns3/satellite-log.h>
 #include <ns3/satellite-env-variables.h>
@@ -743,14 +742,21 @@ SatHelper::SetSatMobility (Ptr<Node> node)
 {
   NS_LOG_FUNCTION (this);
 
-  MobilityHelper mobility;
-
-  Ptr<SatSGP4PositionAllocator> satSGP4PosAllocator = CreateObject<SatSGP4PositionAllocator> ();
-  satSGP4PosAllocator->SetTleInfo (m_satConf->GetSatTle ());
-
-  mobility.SetPositionAllocator (satSGP4PosAllocator);
-  mobility.SetMobilityModel ("ns3::SatSGP4MobilityModel");
-  mobility.Install (node);
+  Ptr<Object> object = node;
+  Ptr<SatSGP4MobilityModel> model = object->GetObject<SatSGP4MobilityModel> ();
+  if (model == 0)
+    {
+      ObjectFactory mobilityFactory;
+      mobilityFactory.SetTypeId ("ns3::SatSGP4MobilityModel");
+      model = mobilityFactory.Create ()->GetObject<SatSGP4MobilityModel> ();
+      if (model == 0)
+        {
+          NS_FATAL_ERROR ("The requested mobility model is not a mobility model: \""<<
+                          mobilityFactory.GetTypeId ().GetName ()<<"\"");
+        }
+      object->AggregateObject (model);
+    }
+  model->SetTleInfo (m_satConf->GetSatTle ());
 }
 
 void
