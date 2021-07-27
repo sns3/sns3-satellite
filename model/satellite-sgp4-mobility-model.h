@@ -48,7 +48,8 @@ public:
    * @brief Get the type ID.
    * @return the object TypeId.
    */
-  static TypeId GetTypeId ();
+  static TypeId GetTypeId (void);
+  TypeId GetInstanceTypeId (void) const;
 
   /**
    * @brief Default constructor.

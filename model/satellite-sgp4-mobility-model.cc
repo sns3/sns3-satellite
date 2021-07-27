@@ -43,11 +43,17 @@ SatSGP4MobilityModel::GetTypeId (void) {
     .AddConstructor<SatSGP4MobilityModel> ()
     .AddAttribute ("StartDateStr",
                    "Absolute start time of simulation (UTC)",
-                   StringValue ("1992-01-01 00:00:01"),
+                   StringValue ("1992-01-01 00:00:00"),
                    MakeStringAccessor (&SatSGP4MobilityModel::m_startStr),
                    MakeStringChecker ())
   ;
   return tid;
+}
+
+TypeId
+SatSGP4MobilityModel::GetInstanceTypeId (void) const
+{
+  return GetTypeId ();
 }
 
 SatSGP4MobilityModel::SatSGP4MobilityModel ()
@@ -56,7 +62,6 @@ SatSGP4MobilityModel::SatSGP4MobilityModel ()
   NS_LOG_FUNCTION (this);
 
   ObjectBase::ConstructSelf (AttributeConstructionList ());
-  std::cout << m_startStr << std::endl;
   SetStartTime (JulianDate (m_startStr));
 }
 
