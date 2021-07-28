@@ -24,6 +24,7 @@
 #include "satellite-sgp4-mobility-model.h"
 
 #include "ns3/simulator.h"
+#include "ns3/boolean.h"
 #include "ns3/string.h"
 #include "vector-extensions.h"
 
@@ -46,6 +47,16 @@ SatSGP4MobilityModel::GetTypeId (void) {
                    StringValue ("1992-01-01 00:00:00"),
                    MakeStringAccessor (&SatSGP4MobilityModel::m_startStr),
                    MakeStringChecker ())
+    .AddAttribute ("UpdatePositionEachRequest",
+                   "Compute position each time a packet is transmitted",
+                   BooleanValue (true),
+                   MakeBooleanAccessor (&SatSGP4MobilityModel::m_updatePositionEachRequest),
+                   MakeBooleanChecker ())
+    .AddAttribute ("UpdatePositionPeriod",
+                   "Period of satellite position refresh, if UpdatePositionEachRequest is false",
+                   TimeValue (Seconds (1)),
+                   MakeTimeAccessor (&SatSGP4MobilityModel::m_updatePositionPeriod),
+                   MakeTimeChecker ())
   ;
   return tid;
 }
@@ -57,7 +68,8 @@ SatSGP4MobilityModel::GetInstanceTypeId (void) const
 }
 
 SatSGP4MobilityModel::SatSGP4MobilityModel ()
-  : m_startStr ("1992-01-01 00:00:00")
+  : m_startStr ("1992-01-01 00:00:00"),
+  m_timeLastUpdate (Time::Min ())
 {
   NS_LOG_FUNCTION (this);
 
@@ -126,7 +138,17 @@ SatSGP4MobilityModel::DoGetGeoPosition () const
 {
   NS_LOG_FUNCTION (this);
 
-  JulianDate cur = m_start + Simulator::Now ();
+  std::cout << "DoGetGeoPosition" << std::endl;
+
+  if ( (m_updatePositionEachRequest == false) && (Simulator::Now () < m_timeLastUpdate + m_updatePositionPeriod) )
+    {
+      return m_lastPosition;
+    }
+
+  std::cout << "Compute position" << std::endl;
+
+  m_timeLastUpdate = Simulator::Now ();
+  JulianDate cur = m_start + m_timeLastUpdate;
 
   double r[3], v[3];
   double delta = (cur - GetTleEpoch ()).GetMinutes();

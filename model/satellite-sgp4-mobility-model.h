@@ -176,6 +176,21 @@ private:
    * Simulation absolute start time in string format
    */
   std::string m_startStr;
+
+  /**
+   * Compute position each time a packet is transmitted
+   */
+  bool m_updatePositionEachRequest;
+
+  /**
+   * Period of satellite position refresh, if UpdatePositionEachRequest is false
+   */
+  Time m_updatePositionPeriod;
+
+  /**
+   * Last position update time
+   */
+  mutable Time m_timeLastUpdate;
 };
 
 } // namespace ns3
