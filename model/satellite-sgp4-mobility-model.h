@@ -16,6 +16,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
+ * Code from https://gitlab.inesctec.pt/pmms/ns3-satellite
+ *
  * Author: Pedro Silva  <pmms@inesctec.pt>
  * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */

@@ -1,6 +1,4 @@
-#ifndef _sgp4ext_
-#define _sgp4ext_
-/*     ----------------------------------------------------------------
+/* ----------------------------------------------------------------
 *
 *                                 sgp4ext.h
 *
@@ -20,78 +18,40 @@
 *    changes :
 *              14 aug 06  david vallado
 *                           original baseline
-*       ----------------------------------------------------------------      */
+*
+*    code from https://gitlab.inesctec.pt/pmms/ns3-satellite
+* ---------------------------------------------------------------- */
+
+#ifndef SAT_SGP4EXT_H
+#define SAT_SGP4EXT_H
 
 #include <string.h>
 #include <math.h>
 
 #include "satellite-sgp4unit.h"
 
+double sgn (double x);
 
-// ------------------------- function declarations -------------------------
+double mag (double x[3]);
 
-double  sgn
-        (
-          double x
-        );
+void cross (double vec1[3], double vec2[3], double outvec[3]);
 
-double  mag
-        (
-          double x[3]
-        );
+double dot (double x[3], double y[3]);
 
-void    cross
-        (
-          double vec1[3], double vec2[3], double outvec[3]
-        );
+double angle (double vec1[3], double vec2[3]);
 
-double  dot
-        (
-          double x[3], double y[3]
-        );
+void newtonnu (double ecc, double nu, double& e0, double& m);
 
-double  angle
-        (
-          double vec1[3],
-          double vec2[3]
-        );
+//double asinh (double xval);
 
-void    newtonnu
-        (
-          double ecc, double nu,
-          double& e0, double& m
-        );
+void rv2coe (double r[3], double v[3], double mu,
+        double& p, double& a, double& ecc, double& incl, double& omega, double& argp,
+        double& nu, double& m, double& arglat, double& truelon, double& lonper);
 
-//double  asinh
-//        (
-//          double xval
-//        );
+void jday (int year, int mon, int day, int hr, int minute, double sec, double& jd);
 
-void    rv2coe
-        (
-          double r[3], double v[3], double mu,
-          double& p, double& a, double& ecc, double& incl, double& omega, double& argp,
-          double& nu, double& m, double& arglat, double& truelon, double& lonper
-        );
+void days2mdhms (int year, double days, int& mon, int& day, int& hr, int& minute, double& sec);
 
-void    jday
-        (
-          int year, int mon, int day, int hr, int minute, double sec,
-          double& jd
-        );
+void invjday (double jd, int& year, int& mon, int& day, int& hr, int& minute, double& sec);
 
-void    days2mdhms
-        (
-          int year, double days,
-          int& mon, int& day, int& hr, int& minute, double& sec
-        );
-
-void    invjday
-        (
-          double jd,
-          int& year, int& mon, int& day,
-          int& hr, int& minute, double& sec
-        );
-
-#endif
-
+#endif //SAT_SGP4EXT_H

@@ -1,6 +1,4 @@
-#ifndef _sgp4io_
-#define _sgp4io_
-/*     ----------------------------------------------------------------
+/*  ----------------------------------------------------------------
 *
 *                                 sgp4io.h;
 *
@@ -23,7 +21,12 @@
 *                           misc updates for manual operation
 *              14 aug 06  david vallado
 *                           original baseline
-*       ----------------------------------------------------------------      */
+*
+*    code from https://gitlab.inesctec.pt/pmms/ns3-satellite
+* ---------------------------------------------------------------- */
+
+#ifndef SAT_SGP4IO_H
+#define SAT_SGP4IO_H
 
 #include <stdio.h>
 #include <math.h>
@@ -33,14 +36,7 @@
 
 // ------------------------- function declarations -------------------------
 
-void twoline2rv
-     (
-      char      longstr1[130], char longstr2[130],
-      char      typerun,  char typeinput, char opsmode,
-      gravconsttype       whichconst,
-      double& startmfe, double& stopmfe, double& deltamin,
-      elsetrec& satrec
-     );
+void twoline2rv (char longstr1[130], char longstr2[130], char typerun, char typeinput, char opsmode,
+        gravconsttype whichconst, double& startmfe, double& stopmfe, double& deltamin, elsetrec& satrec);
 
-#endif
-
+#endif //SAT_SGP4IO_H

@@ -16,10 +16,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
+ * Code from https://gitlab.inesctec.pt/pmms/ns3-satellite
+ *
  * Author: Pedro Silva  <pmms@inesctec.pt>
  * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
-
 
 #include "satellite-sgp4-mobility-model.h"
 
@@ -82,24 +83,32 @@ SatSGP4MobilityModel::~SatSGP4MobilityModel () { }
 bool
 SatSGP4MobilityModel::IsInitialized () const
 {
+  NS_LOG_FUNCTION (this);
+
   return ((m_sgp4_record.jdsatepoch > 0) && (m_tle1 != "") && (m_tle2 != ""));
 }
 
 JulianDate
 SatSGP4MobilityModel::GetStartTime () const
 {
+  NS_LOG_FUNCTION (this);
+
   return m_start;
 }
 
 void
 SatSGP4MobilityModel::SetStartTime (const JulianDate &t)
 {
+  NS_LOG_FUNCTION (this << t);
+
   m_start = t;
 }
 
 Vector3D
 SatSGP4MobilityModel::DoGetVelocity () const
 {
+  NS_LOG_FUNCTION (this);
+
   JulianDate cur = m_start + Simulator::Now ();
 
   double r[3], v[3];
@@ -173,7 +182,10 @@ SatSGP4MobilityModel::DoSetGeoPosition (const GeoCoordinate &position)
 }
 
 JulianDate
-SatSGP4MobilityModel::GetTleEpoch (void) const {
+SatSGP4MobilityModel::GetTleEpoch (void) const
+{
+  NS_LOG_FUNCTION (this);
+
   if (IsInitialized ())
     return JulianDate (m_sgp4_record.jdsatepoch);
 
@@ -183,6 +195,8 @@ SatSGP4MobilityModel::GetTleEpoch (void) const {
 void
 SatSGP4MobilityModel::SetTleInfo (const std::string &tle)
 {
+  NS_LOG_FUNCTION (this << tle);
+
   uint32_t delimPos = tle.find("\n");
   const std::string line1 = tle.substr(0, delimPos);
   const std::string line2 = tle.substr(delimPos + 1, tle.size() - delimPos);
@@ -235,9 +249,7 @@ SatSGP4MobilityModel::rTemeTorItrf (const Vector3D &rteme, const JulianDate &t)
 }
 
 Vector3D
-SatSGP4MobilityModel::rvTemeTovItrf(
-  const Vector3D &rteme, const Vector3D &vteme, const JulianDate &t
-)
+SatSGP4MobilityModel::rvTemeTovItrf (const Vector3D &rteme, const Vector3D &vteme, const JulianDate &t)
 {
   Matrix pmt = PefToItrf (t);                   // PEF->ITRF matrix transposed
   Matrix tmt = TemeToPef (t);                   // TEME->PEF matrix
