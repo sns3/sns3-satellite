@@ -308,6 +308,8 @@ public:
 
   Ptr<PropagationDelayModel> GetPropagationDelayModel (uint32_t beamId, SatEnums::ChannelType_t channelType);
 
+  SatEnums::PropagationDelayModel_t GetPropagationDelayModelEnum ();
+
 private:
   CarrierFreqConverter m_carrierFreqConverter;
   SatTypedefs::CarrierBandwidthConverter_t m_carrierBandwidthConverter;

@@ -80,7 +80,7 @@ SatHelper::GetTypeId (void)
                    MakeBooleanChecker ())
     .AddAttribute ("SatMobilitySGP4TleFileName",
                    "TLE input filename used for SGP4 mobility.",
-                   StringValue ("tle.txt"),
+                   StringValue ("tle_iss_zarya.txt"),
                    MakeStringAccessor (&SatHelper::m_satMobilitySGP4TleFileName),
                    MakeStringChecker ())
     .AddAttribute ("GeoSatPosFileName",
@@ -238,6 +238,11 @@ SatHelper::SatHelper ()
                                               m_satConf->GetRtnLinkCarrierCount (),
                                               m_satConf->GetFwdLinkCarrierCount (),
                                               m_satConf->GetSuperframeSeq ());
+
+  if (m_satMobilitySGP4Enabled == true && m_beamHelper->GetPropagationDelayModelEnum () != SatEnums::PD_CONSTANT_SPEED)
+    {
+      NS_FATAL_ERROR ("Must use constant speed propagation delay model if satellite mobility is enabled");
+    }
 
   Ptr<SatRtnLinkTime> rtnTime = Singleton<SatRtnLinkTime>::Get ();
   rtnTime->Initialize (m_satConf->GetSuperframeSeq ());

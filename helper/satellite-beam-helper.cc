@@ -1287,4 +1287,11 @@ SatBeamHelper::GetPropagationDelayModel (uint32_t beamId, SatEnums::ChannelType_
 }
 
 
+SatEnums::PropagationDelayModel_t
+SatBeamHelper::GetPropagationDelayModelEnum ()
+{
+  return m_propagationDelayModel;
+}
+
+
 } // namespace ns3

@@ -138,14 +138,10 @@ SatSGP4MobilityModel::DoGetGeoPosition () const
 {
   NS_LOG_FUNCTION (this);
 
-  std::cout << "DoGetGeoPosition" << std::endl;
-
   if ( (m_updatePositionEachRequest == false) && (Simulator::Now () < m_timeLastUpdate + m_updatePositionPeriod) )
     {
       return m_lastPosition;
     }
-
-  std::cout << "Compute position" << std::endl;
 
   m_timeLastUpdate = Simulator::Now ();
   JulianDate cur = m_start + m_timeLastUpdate;
@@ -184,7 +180,7 @@ SatSGP4MobilityModel::GetTleEpoch (void) const {
   return JulianDate ();
 }
 
-bool
+void
 SatSGP4MobilityModel::SetTleInfo (const std::string &tle)
 {
   uint32_t delimPos = tle.find("\n");
@@ -216,13 +212,17 @@ SatSGP4MobilityModel::SetTleInfo (const std::string &tle)
   // call propagator to check if it has been properly initialized
   sgp4 (WGeoSys, m_sgp4_record, 0, r, v);
 
-  if (m_sgp4_record.error == 0)
+  if (m_start > GetTleEpoch () + Years (1))
+    {
+      NS_FATAL_ERROR ("Simulation start date " << (m_start - GetTleEpoch ()).GetDays () << " after TLE epoch. TLE are only valid for a few days");
+    }
+
+  if (m_sgp4_record.error != 0)
   {
-    DoGetGeoPosition();
-    return true;
+    NS_FATAL_ERROR ("Error while loading TLE file");
   }
 
-  return false;
+  DoGetGeoPosition();
 }
 
 Vector3D

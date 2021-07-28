@@ -82,9 +82,8 @@ public:
   /**
    * @brief Set satellite's TLE information required for its initialization.
    * @param tle The two lines of the TLE data format.
-   * @return a boolean indicating whether the initialization succeeded.
    */
-  bool SetTleInfo (const std::string &tle);
+  void SetTleInfo (const std::string &tle);
 
 private:
   /// row of a Matrix

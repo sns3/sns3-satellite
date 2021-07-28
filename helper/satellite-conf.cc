@@ -164,6 +164,7 @@ void SatConf::Initialize (std::string rtnConf,
   NS_LOG_FUNCTION (this);
 
   std::string dataPath = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory () + "/";
+  std::string dataPathTle = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory () + "/tle/";
 
   // Load satellite configuration file
   m_rtnConf = LoadSatConf (dataPath + rtnConf);
@@ -182,7 +183,7 @@ void SatConf::Initialize (std::string rtnConf,
   LoadPositions (dataPath + satPos, m_geoSatPosition);
 
   // Load TLE information
-  LoadTle (dataPath + tle, m_tleSat);
+  LoadTle (dataPathTle + tle, m_tleSat);
 
   Configure (dataPath + wfConf);
 }
