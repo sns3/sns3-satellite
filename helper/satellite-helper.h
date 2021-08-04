@@ -38,6 +38,7 @@
 #include <ns3/satellite-fading-input-trace-container.h>
 #include "satellite-user-helper.h"
 #include "satellite-beam-helper.h"
+#include "satellite-group-helper.h"
 #include "satellite-beam-user-info.h"
 #include "satellite-conf.h"
 
@@ -140,6 +141,11 @@ public:
    * \return pointer to beam helper.
    */
   Ptr<SatBeamHelper> GetBeamHelper () const;
+
+  /**
+   * \return pointer to group helper.
+   */
+  Ptr<SatGroupHelper> GetGroupHelper () const;
 
   /**
    * \return pointer to user helper.
@@ -247,6 +253,11 @@ private:
    * Beam helper
    */
   Ptr<SatBeamHelper> m_beamHelper;
+
+  /**
+   * Group helper
+   */
+  Ptr<SatGroupHelper> m_groupHelper;
 
   /**
    * Gateway container

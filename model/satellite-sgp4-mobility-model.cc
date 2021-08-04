@@ -80,14 +80,6 @@ SatSGP4MobilityModel::SatSGP4MobilityModel ()
 
 SatSGP4MobilityModel::~SatSGP4MobilityModel () { }
 
-bool
-SatSGP4MobilityModel::IsInitialized () const
-{
-  NS_LOG_FUNCTION (this);
-
-  return ((m_sgp4_record.jdsatepoch > 0) && (m_tle1 != "") && (m_tle2 != ""));
-}
-
 JulianDate
 SatSGP4MobilityModel::GetStartTime () const
 {
@@ -179,6 +171,14 @@ SatSGP4MobilityModel::DoSetGeoPosition (const GeoCoordinate &position)
 
   m_lastPosition = position;
   NotifyGeoCourseChange ();
+}
+
+bool
+SatSGP4MobilityModel::IsInitialized () const
+{
+  NS_LOG_FUNCTION (this);
+
+  return ((m_sgp4_record.jdsatepoch > 0) && (m_tle1 != "") && (m_tle2 != ""));
 }
 
 JulianDate

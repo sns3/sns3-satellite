@@ -37,7 +37,8 @@
 namespace ns3 {
 
 /**
- * TODO
+ * \ingroup satellite
+ * \brief Keep track of the current position and velocity of satellite using SGP4 model.
  */
 class SatSGP4MobilityModel : public SatMobilityModel {
 public:
@@ -62,12 +63,6 @@ public:
    * @brief Destructor.
    */
   virtual ~SatSGP4MobilityModel ();
-
-  /**
-   * @brief Check if the satellite has already been initialized.
-   * @return a boolean indicating whether the satellite is initialized.
-   */
-  bool IsInitialized (void) const;
 
   /**
    * @brief Get the time instant considered as the simulation start.
@@ -127,6 +122,12 @@ private:
   virtual void DoSetGeoPosition (const GeoCoordinate &position);
   virtual Vector DoGetPosition () const;
   virtual void DoSetPosition (const Vector &position);
+
+  /**
+   * @brief Check if the satellite has already been initialized.
+   * @return a boolean indicating whether the satellite is initialized.
+   */
+  bool IsInitialized (void) const;
 
   /**
    * @brief Retrieve the TLE epoch time.

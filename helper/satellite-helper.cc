@@ -256,6 +256,8 @@ SatHelper::SatHelper ()
 
   // Set the antenna patterns to beam helper
   m_beamHelper->SetAntennaGainPatterns (m_antennaGainPatterns);
+
+  m_groupHelper = CreateObject<SatGroupHelper> ();
 }
 
 void SatHelper::CreatePredefinedScenario (PreDefinedScenario_t scenario)
@@ -352,6 +354,13 @@ SatHelper::GetBeamHelper () const
 {
   NS_LOG_FUNCTION (this);
   return m_beamHelper;
+}
+
+Ptr<SatGroupHelper>
+SatHelper::GetGroupHelper () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_groupHelper;
 }
 
 Ptr<SatUserHelper>

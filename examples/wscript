@@ -172,3 +172,6 @@ def build(bld):
 
     obj = bld.create_ns3_program('sat-mobility-example', ['satellite'])
     obj.source = 'sat-mobility-example.cc'
+
+    obj = bld.create_ns3_program('sat-group-example', ['satellite'])
+    obj.source = 'sat-group-example.cc'

@@ -1,4 +1,4 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2014 Magister Solutions
  *
@@ -30,63 +30,48 @@
 
 using namespace ns3;
 
-
 /**
- * \file sat-mobility-example.cc
+ * \file sat-group-example.cc
  * \ingroup satellite
  *
- * \brief Simulation script to run example simulation with a moving satellite.
+ * \brief Simulation script to run example simulation with a several groups of UTs
  *
- * execute command -> ./waf --run "sat-mobility-example --PrintHelp"
+ * execute command -> ./waf --run "sat-group-example --PrintHelp"
  */
 
-NS_LOG_COMPONENT_DEFINE ("sat-mobility-example");
+NS_LOG_COMPONENT_DEFINE ("sat-group-example");
 
 int
 main (int argc, char *argv[])
 {
   // Enable info logs
-  LogComponentEnable ("sat-mobility-example", LOG_LEVEL_INFO);
+  LogComponentEnable ("sat-group-example", LOG_LEVEL_INFO);
 
   // Variables
   uint32_t beamId = 1;
   uint32_t endUsersPerUt (1);
-  uint32_t utsPerBeam (1);
+  uint32_t utsPerBeam (100);
 
-  uint32_t packetSize (100);
-  Time interval (Seconds (10.0));
-
-  std::string tleFileName ("tle_iss_zarya.txt");
-  std::string startDate ("2014-09-29 12:05:48");
-  bool updatePositionEachRequest (false);
-  Time updatePositionPeriod (Seconds (1));
+  uint32_t packetSize (1500);
+  Time interval (Seconds (1.0));
 
   Time appStartTime = Seconds (0.1);
-  Time simLength (Seconds (7200.0));
+  Time simLength (Seconds (60.0));
 
-  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("sat-mobility-example");
+  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("sat-group-example");
 
   // Parse command-line
   CommandLine cmd;
+  cmd.AddValue ("UtsPerBeam", "Number of UTs per beam", utsPerBeam);
   cmd.AddValue ("PacketSize", "UDP packet size (in bytes)", packetSize);
   cmd.AddValue ("Interval", "CBR interval (in seconds, or add unit)", interval);
   cmd.AddValue ("SimLength", "Simulation length (in seconds, or add unit)", simLength);
-  cmd.AddValue ("TleFileName", "Name of TLE file to load (path from data/tle folder)", tleFileName);
-  cmd.AddValue ("StartDate", "Simulation absolute UTC start time (format: YYYY-MM-DD hh:mm:ss)", startDate);
-  cmd.AddValue ("UpdatePositionEachRequest", "Enable position computation each time a packet is sent", updatePositionEachRequest);
-  cmd.AddValue ("UpdatePositionPeriod", "Period of satellite position refresh, if not update on each request (in seconds, or add unit)", updatePositionPeriod);
   simulationHelper->AddDefaultUiArguments (cmd);
   cmd.Parse (argc, argv);
 
   /// Set default values
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
   Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
-
-  Config::SetDefault ("ns3::SatHelper::SatMobilitySGP4Enabled", BooleanValue (true));
-  Config::SetDefault ("ns3::SatHelper::SatMobilitySGP4TleFileName", StringValue (tleFileName));
-  Config::SetDefault ("ns3::SatSGP4MobilityModel::StartDateStr", StringValue (startDate));
-  Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionEachRequest", BooleanValue (updatePositionEachRequest));
-  Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionPeriod", TimeValue (updatePositionPeriod));
 
   simulationHelper->SetSimulationTime (simLength);
   simulationHelper->SetUserCountPerUt (endUsersPerUt);
@@ -100,6 +85,20 @@ main (int argc, char *argv[])
   // Create reference system
   simulationHelper->CreateSatScenario ();
 
+  // Create groups
+  Ptr<SatGroupHelper> groupHelper = simulationHelper->GetSatelliteHelper ()->GetGroupHelper ();
+  NodeContainer utNodes = simulationHelper->GetSatelliteHelper ()->UtNodes ();
+
+  groupHelper->AddUtNodeToGroup (0, utNodes.Get (0));
+
+  NodeContainer nodes2To10;
+  for (uint32_t i = 2; i < 11; i++)
+    {
+      nodes2To10.Add (utNodes.Get (i));
+    }
+  groupHelper->AddUtNodesToGroup (1, nodes2To10);
+
+
   // setup CBR traffic
   Config::SetDefault ("ns3::CbrApplication::Interval", TimeValue (interval));
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
@@ -112,11 +111,14 @@ main (int argc, char *argv[])
     SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
     appStartTime, simLength, Seconds (0.05));
 
-  NS_LOG_INFO ("--- sat-mobility-example ---");
+  NS_LOG_INFO ("--- sat-group-example ---");
   NS_LOG_INFO ("  Packet size in bytes: " << packetSize);
   NS_LOG_INFO ("  Packet sending interval: " << interval.GetSeconds ());
   NS_LOG_INFO ("  Simulation length: " << simLength.GetSeconds ());
   NS_LOG_INFO ("  Number of UTs: " << utsPerBeam);
+  NS_LOG_INFO ("  Number of groups: " << groupHelper->GetN ());
+  NS_LOG_INFO ("  Nodes in group 0: " << groupHelper->GetUtNodes (0).GetN ());
+  NS_LOG_INFO ("  Nodes in group 1: " << groupHelper->GetUtNodes (1).GetN ());
   NS_LOG_INFO ("  Number of end users per UT: " << endUsersPerUt);
   NS_LOG_INFO ("  ");
 
@@ -124,7 +126,7 @@ main (int argc, char *argv[])
   Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer ();
   simulationHelper->EnableProgressLogs ();
 
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("contrib/satellite/data/sims/sat-mobility-example/output-attributes.xml"));
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("contrib/satellite/data/sims/sat-group-example/output-attributes.xml"));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
   ConfigStore outputConfig;
@@ -149,3 +151,4 @@ main (int argc, char *argv[])
 
   return 0;
 }
+
