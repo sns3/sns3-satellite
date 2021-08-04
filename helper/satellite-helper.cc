@@ -342,6 +342,23 @@ SatHelper::GetUtUsers () const
 }
 
 NodeContainer
+SatHelper::GetUtUsers (Ptr<Node> utNode) const
+{
+  return m_userHelper->GetUtUsers (utNode);
+}
+
+NodeContainer
+SatHelper::GetUtUsers (NodeContainer utNodes) const
+{
+  NodeContainer total;
+  for (NodeContainer::Iterator i = utNodes.Begin ();  i != utNodes.End (); i++ )
+    {
+      total.Add (GetUtUsers (*i));
+    }
+  return total;
+}
+
+NodeContainer
 SatHelper::GetGwUsers () const
 {
   NS_LOG_FUNCTION (this);

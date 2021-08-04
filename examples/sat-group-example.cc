@@ -84,10 +84,11 @@ main (int argc, char *argv[])
 
   // Create reference system
   simulationHelper->CreateSatScenario ();
+  Ptr<SatHelper> satHelper = simulationHelper->GetSatelliteHelper ();
 
   // Create groups
-  Ptr<SatGroupHelper> groupHelper = simulationHelper->GetSatelliteHelper ()->GetGroupHelper ();
-  NodeContainer utNodes = simulationHelper->GetSatelliteHelper ()->UtNodes ();
+  Ptr<SatGroupHelper> groupHelper = satHelper->GetGroupHelper ();
+  NodeContainer utNodes = satHelper->UtNodes ();
 
   groupHelper->AddUtNodeToGroup (1, utNodes.Get (0));
 
@@ -103,13 +104,16 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::CbrApplication::Interval", TimeValue (interval));
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
 
-  simulationHelper->InstallTrafficModel (
-    SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
-    appStartTime, simLength, Seconds (0.05));
-
-  simulationHelper->InstallTrafficModel (
-    SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
-    appStartTime, simLength, Seconds (0.05));
+  // Setup custom traffics
+  Ptr<SatTrafficHelper> trafficHelper = simulationHelper->GetTrafficHelper ();
+  trafficHelper-> AddCbrTraffic (SatTrafficHelper::FWD_LINK,
+                      "100ms",
+                      packetSize,
+                      satHelper->GetGwUsers (),
+                      satHelper->GetUtUsers (groupHelper->GetUtNodes (2)),
+                      appStartTime,
+                      appStartTime + simLength,
+                      Seconds (0.05));
 
   NS_LOG_INFO ("--- sat-group-example ---");
   NS_LOG_INFO ("  Packet size in bytes: " << packetSize);
@@ -172,6 +176,17 @@ main (int argc, char *argv[])
   s->AddPerGroupFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerGroupRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerGroupRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+
+  s->AddPerGroupFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerGroupFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerGroupRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerGroupRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddPerGroupFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerGroupFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerGroupRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerGroupRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   simulationHelper->RunSimulation ();
 

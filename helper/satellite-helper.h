@@ -133,6 +133,18 @@ public:
   NodeContainer GetUtUsers () const;
 
   /**
+   * \param utNode Pointer to UT node, which user nodes are requested.
+   * \return A container having UT specific user nodes in satellite network.
+   */
+  NodeContainer GetUtUsers (Ptr<Node> utNode) const;
+
+  /**
+   * \param utNodes Container to UT nodes, which user nodes are requested.
+   * \return A container having UT specific user nodes in satellite network.
+   */
+  NodeContainer GetUtUsers (NodeContainer utNodes) const;
+
+  /**
    * \return container having GW users.
    */
   NodeContainer GetGwUsers () const;
