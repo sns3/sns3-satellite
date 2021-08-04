@@ -605,6 +605,8 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
     }
 
   m_beamHelper->Init ();
+
+  m_groupHelper->SetUtNodes (UtNodes ());
 }
 
 void

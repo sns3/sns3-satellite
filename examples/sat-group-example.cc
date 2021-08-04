@@ -50,7 +50,7 @@ main (int argc, char *argv[])
   // Variables
   uint32_t beamId = 1;
   uint32_t endUsersPerUt (1);
-  uint32_t utsPerBeam (100);
+  uint32_t utsPerBeam (20);
 
   uint32_t packetSize (1500);
   Time interval (Seconds (1.0));
@@ -89,14 +89,14 @@ main (int argc, char *argv[])
   Ptr<SatGroupHelper> groupHelper = simulationHelper->GetSatelliteHelper ()->GetGroupHelper ();
   NodeContainer utNodes = simulationHelper->GetSatelliteHelper ()->UtNodes ();
 
-  groupHelper->AddUtNodeToGroup (0, utNodes.Get (0));
+  groupHelper->AddUtNodeToGroup (1, utNodes.Get (0));
 
   NodeContainer nodes2To10;
   for (uint32_t i = 2; i < 11; i++)
     {
       nodes2To10.Add (utNodes.Get (i));
     }
-  groupHelper->AddUtNodesToGroup (1, nodes2To10);
+  groupHelper->AddUtNodesToGroup (2, nodes2To10);
 
 
   // setup CBR traffic
@@ -117,8 +117,9 @@ main (int argc, char *argv[])
   NS_LOG_INFO ("  Simulation length: " << simLength.GetSeconds ());
   NS_LOG_INFO ("  Number of UTs: " << utsPerBeam);
   NS_LOG_INFO ("  Number of groups: " << groupHelper->GetN ());
-  NS_LOG_INFO ("  Nodes in group 0: " << groupHelper->GetUtNodes (0).GetN ());
+  NS_LOG_INFO ("  Nodes in default group: " << groupHelper->GetUtNodes (0).GetN ());
   NS_LOG_INFO ("  Nodes in group 1: " << groupHelper->GetUtNodes (1).GetN ());
+  NS_LOG_INFO ("  Nodes in group 2: " << groupHelper->GetUtNodes (2).GetN ());
   NS_LOG_INFO ("  Number of end users per UT: " << endUsersPerUt);
   NS_LOG_INFO ("  ");
 
@@ -131,6 +132,21 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
   ConfigStore outputConfig;
   outputConfig.ConfigureDefaults ();
+
+  s->AddPerUtFwdPhyDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerUtFwdPhyDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnPhyDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerUtRtnPhyDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddPerBeamFwdPhyDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamFwdPhyDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerBeamRtnPhyDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamRtnPhyDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddPerGroupFwdPhyDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerGroupFwdPhyDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerGroupRtnPhyDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerGroupRtnPhyDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   s->AddGlobalFwdPhyDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddGlobalFwdPhyDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
@@ -146,6 +162,16 @@ main (int argc, char *argv[])
   s->AddGlobalFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddGlobalRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddGlobalRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddPerGroupFwdMacDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerGroupFwdMacDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerGroupRtnMacDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerGroupRtnMacDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddPerGroupFwdAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerGroupFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerGroupRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerGroupRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   simulationHelper->RunSimulation ();
 

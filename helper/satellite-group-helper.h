@@ -23,6 +23,7 @@
 #define SATELLITE_GROUP_HELPER_H
 
 #include <set>
+#include <list>
 #include <map>
 
 #include <ns3/node-container.h>
@@ -61,6 +62,12 @@ public:
   }
 
   /**
+   * \brief Add the list of UTs in the database
+   * \param uts The list of all UTs in the simulation
+   */
+  void SetUtNodes (NodeContainer uts);
+
+  /**
    * \brief Add a node to a group
    * \param groupId The group ID where the node is added
    * \param node The node to add
@@ -87,6 +94,12 @@ public:
   uint32_t GetN ();
 
   /**
+   * \brief Get the list of groups created
+   * \return The list of groups created
+   */
+  std::list<uint32_t> GetGroups ();
+
+  /**
    * Dispose of this class instance
    */
   virtual void DoDispose ();
@@ -98,9 +111,19 @@ private:
   bool IsGroupExisting (uint32_t groupId) const;
 
   /**
+   * The list of all the UTs in the simulation
+   */
+  NodeContainer                                     m_uts;
+
+  /**
    * Container to associate nodes to the groups
    */
   std::map<uint32_t, std::set<Ptr<Node> > >         m_groupsMap;
+
+  /**
+   * List of group ID created
+   */
+  std::list<uint32_t>                               m_groupsList;
 };
 
 } // namespace ns3

@@ -19,6 +19,9 @@
  * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
+#include <ns3/singleton.h>
+#include <ns3/satellite-id-mapper.h>
+
 #include "satellite-group-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatGroupHelper");
@@ -59,15 +62,29 @@ SatGroupHelper::DoDispose ()
 }
 
 void
+SatGroupHelper::SetUtNodes (NodeContainer uts)
+{
+  NS_LOG_FUNCTION (this);
+  m_uts = uts;
+}
+
+void
 SatGroupHelper::AddUtNodeToGroup (uint32_t groupId, Ptr<Node> node)
 {
   NS_LOG_FUNCTION (this << groupId << node);
 
+  if (groupId == 0)
+    {
+      NS_FATAL_ERROR ("Group ID 0 is reserved for UTs not manually assigned to a group");
+    }
+
   if (IsGroupExisting (groupId) == false)
   {
+    m_groupsList.push_back (groupId);
     m_groupsMap[groupId] = std::set<Ptr<Node> > ();
   }
   m_groupsMap[groupId].insert (node);
+  Singleton<SatIdMapper>::Get ()->AttachMacToGroupId (Singleton<SatIdMapper>::Get ()->GetUtMacWithNode (node), groupId);
 }
 
 void
@@ -85,6 +102,29 @@ NodeContainer
 SatGroupHelper::GetUtNodes (uint32_t groupId) const
 {
   NS_LOG_FUNCTION (this << groupId);
+
+  if (groupId == 0)
+    {
+      bool found;
+      NodeContainer groupIdZeroUts;
+      for (NodeContainer::Iterator it = m_uts.Begin (); it != m_uts.End (); it++)
+        {
+          found = false;
+          for (std::map<uint32_t, std::set<Ptr<Node> > >::const_iterator it2 = m_groupsMap.begin(); it2 != m_groupsMap.end(); it2++)
+            {
+              if (it2->second.find(*it) != it2->second.end())
+                {
+                  found = true;
+                  break;
+                }
+            }
+          if (found == false)
+            {
+              groupIdZeroUts.Add (*it);
+            }
+        }
+      return groupIdZeroUts;
+    }
 
   if (IsGroupExisting (groupId) == false)
   {
@@ -108,6 +148,12 @@ SatGroupHelper::GetN ()
   NS_LOG_FUNCTION (this);
 
   return m_groupsMap.size ();
+}
+
+std::list<uint32_t>
+SatGroupHelper::GetGroups ()
+{
+  return m_groupsList;
 }
 
 bool
