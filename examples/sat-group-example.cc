@@ -76,7 +76,7 @@ ConfigureAllStats (Ptr<SatStatsHelperContainer> s)
 {
   SatStatsHelper::OutputType_t outputType = SatStatsHelper::OUTPUT_SCATTER_FILE; //Only format compatible with all per group statistics
 
-  /*s->AddPerGroupFwdAppDelay (outputType);
+  s->AddPerGroupFwdAppDelay (outputType);
   s->AddPerGroupRtnAppDelay (outputType);
 
   s->AddPerGroupFwdDevDelay (outputType);
@@ -135,16 +135,16 @@ ConfigureAllStats (Ptr<SatStatsHelperContainer> s)
   s->AddPerGroupRtnCompositeSinr (outputType);
 
   s->AddPerGroupFwdAppThroughput (outputType);
-  s->AddPerGroupRtnAppThroughput (outputType);*/
+  s->AddPerGroupRtnAppThroughput (outputType);
 
-  //s->AddPerGroupFwdDevThroughput (outputType);
-  //s->AddPerGroupRtnDevThroughput (outputType);
+  s->AddPerGroupFwdDevThroughput (outputType);
+  s->AddPerGroupRtnDevThroughput (outputType);
   s->AddPerGroupFwdMacThroughput (outputType);
   s->AddPerGroupRtnMacThroughput (outputType);
-  //s->AddPerGroupFwdPhyThroughput (outputType);
-  //s->AddPerGroupRtnPhyThroughput (outputType);
+  s->AddPerGroupFwdPhyThroughput (outputType);
+  s->AddPerGroupRtnPhyThroughput (outputType);
 
-  /*s->AddAverageGroupFwdAppThroughput (outputType);
+  s->AddAverageGroupFwdAppThroughput (outputType);
   s->AddAverageGroupRtnAppThroughput (outputType);
 
   s->AddAverageGroupFwdDevThroughput (outputType);
@@ -166,7 +166,7 @@ ConfigureAllStats (Ptr<SatStatsHelperContainer> s)
 
   s->AddPerGroupCapacityRequest (outputType);
 
-  s->AddPerGroupResourcesGranted (outputType);*/
+  s->AddPerGroupResourcesGranted (outputType);
 }
 
 int
@@ -218,7 +218,7 @@ main (int argc, char *argv[])
   Ptr<SatGroupHelper> groupHelper = satHelper->GetGroupHelper ();
   NodeContainer utNodes = satHelper->UtNodes ();
 
-  GroupCreationMethod_t creationMethod = GroupCreationMethod_t::POSITION;
+  GroupCreationMethod_t creationMethod = GroupCreationMethod_t::NUMBER;
 
   if (creationMethod == GroupCreationMethod_t::MANUAL)
     {
@@ -230,6 +230,8 @@ main (int argc, char *argv[])
           nodes2To10.Add (utNodes.Get (i));
         }
       groupHelper->AddUtNodesToGroup (2, nodes2To10);
+      std::cout << "Group 1 has " << groupHelper->GetUtNodes (1).GetN () << " nodes" << std::endl;
+      std::cout << "Group 2 has " << groupHelper->GetUtNodes (2).GetN () << " nodes" << std::endl;
     }
   else if (creationMethod == GroupCreationMethod_t::POSITION)
     {
@@ -239,7 +241,11 @@ main (int argc, char *argv[])
     }
   else if (creationMethod == GroupCreationMethod_t::NUMBER)
     {
-      // TODO
+      std::vector<uint32_t> groups = {1, 2, 3};
+      groupHelper->CreateGroupsBySize (groups, utNodes);
+      std::cout << "Group 1 has " << groupHelper->GetUtNodes (1).GetN () << " nodes" << std::endl;
+      std::cout << "Group 2 has " << groupHelper->GetUtNodes (2).GetN () << " nodes" << std::endl;
+      std::cout << "Group 3 has " << groupHelper->GetUtNodes (3).GetN () << " nodes" << std::endl;
     }
   else
     {

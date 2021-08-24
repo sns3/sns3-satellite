@@ -129,6 +129,19 @@ SatGroupHelper::CreateGroupFromPosition (uint32_t groupId, NodeContainer nodes, 
     }
 }
 
+void
+SatGroupHelper::CreateGroupsBySize (std::vector<uint32_t> groupIds, NodeContainer nodes)
+{
+  uint32_t nbNodes = nodes.GetN ();
+  uint32_t counter = 0;
+  for (uint32_t i = 0; i < nbNodes; i++)
+    {
+      AddUtNodeToGroup (groupIds[counter], nodes.Get (i));
+      counter++;
+      counter %= groupIds.size();
+    }
+}
+
 NodeContainer
 SatGroupHelper::GetUtNodes (uint32_t groupId) const
 {

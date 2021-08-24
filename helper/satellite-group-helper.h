@@ -25,6 +25,7 @@
 #include <set>
 #include <list>
 #include <map>
+#include <vector>
 
 #include <ns3/node-container.h>
 #include <ns3/vector.h>
@@ -86,6 +87,13 @@ public:
    * \param radius The radius of the circle in meters
    */
   void CreateGroupFromPosition (uint32_t groupId, NodeContainer nodes, GeoCoordinate center, uint32_t radius);
+
+  /**
+   * \brief Create several groups and distribute nodes among them
+   * \param groupIds The list of group IDs to create. They all must be empty
+   * \param nodes The nodes to distribute in the groups
+   */
+  void CreateGroupsBySize (std::vector<uint32_t> groupIds, NodeContainer nodes);
 
   /**
    * \brief Add several nodes to a group
