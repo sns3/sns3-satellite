@@ -482,6 +482,10 @@ SatStatsHelperContainer::GetTypeId ()
                                   "per beam capacity request statistics")
     MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
                      SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
+    ADD_SAT_STATS_ATTRIBUTE_HEAD (PerGroupCapacityRequest,
+                                  "per group capacity request statistics")
+    MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
+                     SatStatsHelper::OUTPUT_SCATTER_FILE, "SCATTER_FILE"))
     ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUtCapacityRequest,
                                   "per UT capacity request statistics")
     MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,         "NONE",
