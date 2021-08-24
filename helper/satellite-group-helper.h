@@ -27,6 +27,10 @@
 #include <map>
 
 #include <ns3/node-container.h>
+#include <ns3/vector.h>
+
+#include <ns3/geo-coordinate.h>
+#include <ns3/satellite-mobility-model.h>
 
 namespace ns3 {
 
@@ -75,6 +79,15 @@ public:
   void AddUtNodeToGroup (uint32_t groupId, Ptr<Node> node);
 
   /**
+   * \brief Create a new group using a central position and a radius
+   * \param groupId The ID of created group. Cannot be an already existing group
+   * \param nodes The input nodes, used to determine if each one belong to the group or not
+   * \param center The center of the circle
+   * \param radius The radius of the circle in meters
+   */
+  void CreateGroupFromPosition (uint32_t groupId, NodeContainer nodes, GeoCoordinate center, uint32_t radius);
+
+  /**
    * \brief Add several nodes to a group
    * \param groupId The group ID where the nodes are added
    * \param nodes The nodes to add
@@ -107,8 +120,17 @@ public:
 private:
   /**
    * Tells if the groupId is already existing in the database
+   * \param groupId The group to test
+   * \return true if the group already exists
    */
   bool IsGroupExisting (uint32_t groupId) const;
+
+  /**
+   * Get the group to which a node belongs
+   * \param node The node to analyse
+   * \return The groupID where the node is registered. Return 0 if no group is found
+   */
+  uint32_t GetGroupId (Ptr<Node> node) const;
 
   /**
    * The list of all the UTs in the simulation

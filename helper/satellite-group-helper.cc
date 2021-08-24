@@ -78,6 +78,11 @@ SatGroupHelper::AddUtNodeToGroup (uint32_t groupId, Ptr<Node> node)
       NS_FATAL_ERROR ("Group ID 0 is reserved for UTs not manually assigned to a group");
     }
 
+  if (GetGroupId (node) != 0)
+    {
+      NS_FATAL_ERROR ("Node " << node << " is already in group " << GetGroupId (node) << ". It cannot be added to group " << groupId);
+    }
+
   if (IsGroupExisting (groupId) == false)
   {
     m_groupsList.push_back (groupId);
@@ -95,6 +100,32 @@ SatGroupHelper::AddUtNodesToGroup (uint32_t groupId, NodeContainer nodes)
   for (NodeContainer::Iterator it = nodes.Begin (); it != nodes.End (); it++)
     {
       AddUtNodeToGroup (groupId, *it);
+    }
+}
+
+void
+SatGroupHelper::CreateGroupFromPosition (uint32_t groupId, NodeContainer nodes, GeoCoordinate center, uint32_t radius)
+{
+  if (groupId == 0)
+    {
+      NS_FATAL_ERROR ("Cannot create new geographical group with a group ID of zero.");
+    }
+  if (GetUtNodes (groupId).GetN () != 0)
+    {
+      NS_FATAL_ERROR ("Cannot create new geographical group with a group ID already used.");
+    }
+
+  Vector centerPosition = center.ToVector ();
+  GeoCoordinate nodePosition;
+  double distance;
+  for (NodeContainer::Iterator it = nodes.Begin (); it != nodes.End (); it++)
+    {
+      nodePosition = (*it)->GetObject<SatMobilityModel> ()->GetGeoPosition ();
+      distance = CalculateDistance (centerPosition, nodePosition.ToVector ());
+      if (distance <= radius)
+        {
+          AddUtNodeToGroup (groupId, *it);
+        }
     }
 }
 
@@ -160,6 +191,19 @@ bool
 SatGroupHelper::IsGroupExisting (uint32_t groupId) const
 {
   return m_groupsMap.find(groupId) != m_groupsMap.end();
+}
+
+uint32_t
+SatGroupHelper::GetGroupId (Ptr<Node> node) const
+{
+  for (std::map<uint32_t, std::set<Ptr<Node> > >::const_iterator it = m_groupsMap.begin(); it != m_groupsMap.end(); it++)
+    {
+      if (it->second.find(node) != it->second.end())
+        {
+          return it->first;
+        }
+    }
+  return 0;
 }
 
 } // namespace ns3

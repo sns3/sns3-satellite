@@ -64,6 +64,13 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("sat-group-example");
 
+typedef enum
+{
+  MANUAL,
+  POSITION,
+  NUMBER,
+} GroupCreationMethod_t;
+
 void
 ConfigureAllStats (Ptr<SatStatsHelperContainer> s)
 {
@@ -211,14 +218,33 @@ main (int argc, char *argv[])
   Ptr<SatGroupHelper> groupHelper = satHelper->GetGroupHelper ();
   NodeContainer utNodes = satHelper->UtNodes ();
 
-  groupHelper->AddUtNodeToGroup (1, utNodes.Get (0));
+  GroupCreationMethod_t creationMethod = GroupCreationMethod_t::POSITION;
 
-  NodeContainer nodes2To10;
-  for (uint32_t i = 2; i < 11; i++)
+  if (creationMethod == GroupCreationMethod_t::MANUAL)
     {
-      nodes2To10.Add (utNodes.Get (i));
+      groupHelper->AddUtNodeToGroup (1, utNodes.Get (0));
+
+      NodeContainer nodes2To10;
+      for (uint32_t i = 2; i < 11; i++)
+        {
+          nodes2To10.Add (utNodes.Get (i));
+        }
+      groupHelper->AddUtNodesToGroup (2, nodes2To10);
     }
-  groupHelper->AddUtNodesToGroup (2, nodes2To10);
+  else if (creationMethod == GroupCreationMethod_t::POSITION)
+    {
+      // Add all nodes less than 100km from node 0
+      groupHelper->CreateGroupFromPosition (2, utNodes, utNodes.Get (0)->GetObject<SatMobilityModel> ()->GetGeoPosition (), 100000);
+      std::cout << "Group 2 has " << groupHelper->GetUtNodes (2).GetN () << " nodes" << std::endl;
+    }
+  else if (creationMethod == GroupCreationMethod_t::NUMBER)
+    {
+      // TODO
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Unknown value of GroupCreationMethod_t: " << creationMethod);
+    }
 
   // setup CBR traffic
   Config::SetDefault ("ns3::CbrApplication::Interval", TimeValue (interval));
