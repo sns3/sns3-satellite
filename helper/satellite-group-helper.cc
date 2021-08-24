@@ -130,10 +130,19 @@ SatGroupHelper::CreateGroupFromPosition (uint32_t groupId, NodeContainer nodes, 
 }
 
 void
-SatGroupHelper::CreateGroupsBySize (std::vector<uint32_t> groupIds, NodeContainer nodes)
+SatGroupHelper::CreateGroupsUniformly (std::vector<uint32_t> groupIds, NodeContainer nodes)
 {
+  for (uint32_t groupId : groupIds)
+    {
+      if (GetUtNodes (groupId).GetN () != 0)
+        {
+          NS_FATAL_ERROR ("Cannot create new group with a group ID already used: " << groupId);
+        }
+    }
+
   uint32_t nbNodes = nodes.GetN ();
   uint32_t counter = 0;
+
   for (uint32_t i = 0; i < nbNodes; i++)
     {
       AddUtNodeToGroup (groupIds[counter], nodes.Get (i));

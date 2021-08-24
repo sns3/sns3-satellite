@@ -242,7 +242,7 @@ main (int argc, char *argv[])
   else if (creationMethod == GroupCreationMethod_t::NUMBER)
     {
       std::vector<uint32_t> groups = {1, 2, 3};
-      groupHelper->CreateGroupsBySize (groups, utNodes);
+      groupHelper->CreateGroupsUniformly (groups, utNodes);
       std::cout << "Group 1 has " << groupHelper->GetUtNodes (1).GetN () << " nodes" << std::endl;
       std::cout << "Group 2 has " << groupHelper->GetUtNodes (2).GetN () << " nodes" << std::endl;
       std::cout << "Group 3 has " << groupHelper->GetUtNodes (3).GetN () << " nodes" << std::endl;
@@ -276,6 +276,13 @@ main (int argc, char *argv[])
                       appStartTime + simLength,
                       Seconds (0.05));
 
+  trafficHelper-> AddHttpTraffic (SatTrafficHelper::FWD_LINK,
+                      satHelper->GetGwUsers ().Get (0),
+                      satHelper->GetUtUsers (groupHelper->GetUtNodes (1)),
+                      appStartTime,
+                      appStartTime + simLength,
+                      Seconds (0.05));
+
   NS_LOG_INFO ("--- sat-group-example ---");
   NS_LOG_INFO ("  Packet size in bytes: " << packetSize);
   NS_LOG_INFO ("  Packet sending interval: " << interval.GetSeconds ());
@@ -283,8 +290,6 @@ main (int argc, char *argv[])
   NS_LOG_INFO ("  Number of UTs: " << utsPerBeam);
   NS_LOG_INFO ("  Number of groups: " << groupHelper->GetN ());
   NS_LOG_INFO ("  Nodes in default group: " << groupHelper->GetUtNodes (0).GetN ());
-  NS_LOG_INFO ("  Nodes in group 1: " << groupHelper->GetUtNodes (1).GetN ());
-  NS_LOG_INFO ("  Nodes in group 2: " << groupHelper->GetUtNodes (2).GetN ());
   NS_LOG_INFO ("  Number of end users per UT: " << endUsersPerUt);
   NS_LOG_INFO ("  ");
 

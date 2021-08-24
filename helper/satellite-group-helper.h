@@ -80,6 +80,13 @@ public:
   void AddUtNodeToGroup (uint32_t groupId, Ptr<Node> node);
 
   /**
+   * \brief Add several nodes to a group
+   * \param groupId The group ID where the nodes are added
+   * \param nodes The nodes to add
+   */
+  void AddUtNodesToGroup (uint32_t groupId, NodeContainer nodes);
+
+  /**
    * \brief Create a new group using a central position and a radius
    * \param groupId The ID of created group. Cannot be an already existing group
    * \param nodes The input nodes, used to determine if each one belong to the group or not
@@ -93,14 +100,7 @@ public:
    * \param groupIds The list of group IDs to create. They all must be empty
    * \param nodes The nodes to distribute in the groups
    */
-  void CreateGroupsBySize (std::vector<uint32_t> groupIds, NodeContainer nodes);
-
-  /**
-   * \brief Add several nodes to a group
-   * \param groupId The group ID where the nodes are added
-   * \param nodes The nodes to add
-   */
-  void AddUtNodesToGroup (uint32_t groupId, NodeContainer nodes);
+  void CreateGroupsUniformly (std::vector<uint32_t> groupIds, NodeContainer nodes);
 
   /**
    * \param groupId The group ID
