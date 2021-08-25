@@ -62,7 +62,7 @@ SatGroupHelper::DoDispose ()
 }
 
 void
-SatGroupHelper::SetUtNodes (NodeContainer uts)
+SatGroupHelper::Init (NodeContainer uts)
 {
   NS_LOG_FUNCTION (this);
   m_uts = uts;

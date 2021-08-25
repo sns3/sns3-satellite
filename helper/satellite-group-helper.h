@@ -67,10 +67,10 @@ public:
   }
 
   /**
-   * \brief Add the list of UTs in the database
+   * \brief Initialize the helper. Should be call only by SatHelper internally
    * \param uts The list of all UTs in the simulation
    */
-  void SetUtNodes (NodeContainer uts);
+  void Init (NodeContainer uts);
 
   /**
    * \brief Add a node to a group
