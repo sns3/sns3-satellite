@@ -201,6 +201,77 @@ SatRandomBoxPositionAllocator::AssignStreams (int64_t stream)
   return 3;
 }
 
+NS_OBJECT_ENSURE_REGISTERED (SatRandomCirclePositionAllocator);
+
+TypeId
+SatRandomCirclePositionAllocator::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatRandomCirclePositionAllocator")
+    .SetParent<SatPositionAllocator> ()
+    .SetGroupName ("Mobility")
+    .AddConstructor<SatRandomCirclePositionAllocator> ();
+  return tid;
+}
+
+SatRandomCirclePositionAllocator::SatRandomCirclePositionAllocator ()
+{
+  Ptr<RandomVariableStream> m_rand = CreateObject<UniformRandomVariable> ();
+}
+
+SatRandomCirclePositionAllocator::SatRandomCirclePositionAllocator (GeoCoordinate center, uint32_t radius)
+  : m_center (center),
+  m_radius (radius)
+{
+  Ptr<RandomVariableStream> m_rand = CreateObject<UniformRandomVariable> ();
+}
+
+
+SatRandomCirclePositionAllocator::~SatRandomCirclePositionAllocator ()
+{
+}
+
+void
+SatRandomCirclePositionAllocator::SetCenter (GeoCoordinate center)
+{
+  NS_LOG_INFO (this);
+
+  m_center = center;
+}
+void
+SatRandomCirclePositionAllocator::SetRadius (uint32_t radius)
+{
+  NS_LOG_INFO (this);
+
+  m_radius = radius;
+}
+
+GeoCoordinate
+SatRandomCirclePositionAllocator::GetNextGeoPosition () const
+{
+  NS_LOG_INFO (this);
+
+  double radius = m_radius*m_rand->GetValue ();
+  double theta = m_rand->GetValue ()*2*M_PI;
+
+  double latitude = m_center.GetLatitude ();
+  double longitude = m_center.GetLongitude ();
+  double altitude = m_center.GetAltitude ();
+
+  double lat2 = asin(sin(latitude)*cos(radius/GeoCoordinate::polarRadius_sphere) + cos(latitude)*sin(radius/GeoCoordinate::polarRadius_sphere)*cos(theta));
+  double lon2 = longitude + atan2(sin(theta)*sin(radius/GeoCoordinate::polarRadius_sphere)*cos(latitude), cos(radius/GeoCoordinate::polarRadius_sphere) - sin(latitude)*sin(lat2));
+
+  GeoCoordinate position = GeoCoordinate (lat2, lon2, altitude);
+
+  return position;
+}
+
+int64_t
+SatRandomCirclePositionAllocator::AssignStreams (int64_t stream)
+{
+  m_rand->SetStream (stream);
+  return 1;
+}
+
 
 NS_OBJECT_ENSURE_REGISTERED (SatSpotBeamPositionAllocator);
 

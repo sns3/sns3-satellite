@@ -29,9 +29,12 @@
 
 #include <ns3/node-container.h>
 #include <ns3/vector.h>
+#include <ns3/mobility-helper.h>
 
 #include <ns3/geo-coordinate.h>
 #include <ns3/satellite-mobility-model.h>
+#include <ns3/satellite-position-allocator.h>
+#include <ns3/satellite-ut-handover-module.h>
 
 namespace ns3 {
 
@@ -101,6 +104,15 @@ public:
    * \param nodes The nodes to distribute in the groups
    */
   void CreateGroupsUniformly (std::vector<uint32_t> groupIds, NodeContainer nodes);
+
+  /**
+   * \brief Create a new group using a central position and a radius, and create UT nodes inside this area
+   * \param groupId The ID of created group. Cannot be an already existing group
+   * \param nb The number of nodes to create in this circle
+   * \param center The center of the circle
+   * \param radius The radius of the circle in meters
+   */
+  void CreateUtNodesFromPosition (uint32_t groupId, uint32_t nb, GeoCoordinate center, uint32_t radius);
 
   /**
    * \param groupId The group ID

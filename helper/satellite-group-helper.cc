@@ -151,6 +151,33 @@ SatGroupHelper::CreateGroupsUniformly (std::vector<uint32_t> groupIds, NodeConta
     }
 }
 
+void
+SatGroupHelper::CreateUtNodesFromPosition (uint32_t groupId, uint32_t nb, GeoCoordinate center, uint32_t radius)
+{
+  Ptr<Node> n = CreateObject<Node> ();
+
+  Ptr<SatRandomCirclePositionAllocator> circleAllocator = CreateObject<SatRandomCirclePositionAllocator> (center, radius);
+
+  MobilityHelper mobility;
+
+  mobility.SetPositionAllocator (circleAllocator);
+  mobility.SetMobilityModel ("ns3::SatConstantPositionMobilityModel");
+  mobility.Install (n);
+
+  // TODO finish it
+  /*InstallMobilityObserver (uts);
+
+  for (uint32_t i = 0; i < uts.GetN (); ++i)
+    {
+      GeoCoordinate position = uts.Get (i)->GetObject<SatMobilityModel> ()->GetGeoPosition ();
+      NS_LOG_INFO ("Installing mobility observer on Ut Node at " <<
+                   position << " with antenna gain of " <<
+                   m_antennaGainPatterns->GetAntennaGainPattern (beamId)->GetAntennaGain_lin (position));
+    }*/
+
+  Ptr<SatUtHandoverModule> handoverModule = n->GetObject<SatUtHandoverModule> ();
+}
+
 NodeContainer
 SatGroupHelper::GetUtNodes (uint32_t groupId) const
 {
