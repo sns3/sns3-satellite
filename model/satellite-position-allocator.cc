@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
 #include <limits>
@@ -215,14 +216,14 @@ SatRandomCirclePositionAllocator::GetTypeId (void)
 
 SatRandomCirclePositionAllocator::SatRandomCirclePositionAllocator ()
 {
-  Ptr<RandomVariableStream> m_rand = CreateObject<UniformRandomVariable> ();
+  m_rand = CreateObject<UniformRandomVariable> ();
 }
 
 SatRandomCirclePositionAllocator::SatRandomCirclePositionAllocator (GeoCoordinate center, uint32_t radius)
   : m_center (center),
   m_radius (radius)
 {
-  Ptr<RandomVariableStream> m_rand = CreateObject<UniformRandomVariable> ();
+  m_rand = CreateObject<UniformRandomVariable> ();
 }
 
 
@@ -250,15 +251,15 @@ SatRandomCirclePositionAllocator::GetNextGeoPosition () const
 {
   NS_LOG_INFO (this);
 
-  double radius = m_radius*m_rand->GetValue ();
+  double radius = m_radius*sqrt(m_rand->GetValue ());
   double theta = m_rand->GetValue ()*2*M_PI;
 
-  double latitude = m_center.GetLatitude ();
-  double longitude = m_center.GetLongitude ();
+  double latitude = m_center.GetLatitude ()*M_PI/180;
+  double longitude = m_center.GetLongitude ()*M_PI/180;
   double altitude = m_center.GetAltitude ();
 
-  double lat2 = asin(sin(latitude)*cos(radius/GeoCoordinate::polarRadius_sphere) + cos(latitude)*sin(radius/GeoCoordinate::polarRadius_sphere)*cos(theta));
-  double lon2 = longitude + atan2(sin(theta)*sin(radius/GeoCoordinate::polarRadius_sphere)*cos(latitude), cos(radius/GeoCoordinate::polarRadius_sphere) - sin(latitude)*sin(lat2));
+  double lat2 = (180/M_PI)*asin(sin(latitude)*cos(radius/GeoCoordinate::polarRadius_sphere) + cos(latitude)*sin(radius/GeoCoordinate::polarRadius_sphere)*cos(theta));
+  double lon2 = (180/M_PI)*(longitude + atan2(sin(theta)*sin(radius/GeoCoordinate::polarRadius_sphere)*cos(latitude), cos(radius/GeoCoordinate::polarRadius_sphere) - sin(latitude)*sin(lat2)));
 
   GeoCoordinate position = GeoCoordinate (lat2, lon2, altitude);
 

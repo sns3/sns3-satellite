@@ -154,7 +154,8 @@ SatGroupHelper::CreateGroupsUniformly (std::vector<uint32_t> groupIds, NodeConta
 void
 SatGroupHelper::CreateUtNodesFromPosition (uint32_t groupId, uint32_t nb, GeoCoordinate center, uint32_t radius)
 {
-  Ptr<Node> n = CreateObject<Node> ();
+  NodeContainer n;
+  n.Create (nb);
 
   Ptr<SatRandomCirclePositionAllocator> circleAllocator = CreateObject<SatRandomCirclePositionAllocator> (center, radius);
 
@@ -175,7 +176,7 @@ SatGroupHelper::CreateUtNodesFromPosition (uint32_t groupId, uint32_t nb, GeoCoo
                    m_antennaGainPatterns->GetAntennaGainPattern (beamId)->GetAntennaGain_lin (position));
     }*/
 
-  Ptr<SatUtHandoverModule> handoverModule = n->GetObject<SatUtHandoverModule> ();
+  //Ptr<SatUtHandoverModule> handoverModule = n->GetObject<SatUtHandoverModule> ();
 }
 
 NodeContainer

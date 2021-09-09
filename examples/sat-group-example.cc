@@ -252,6 +252,10 @@ main (int argc, char *argv[])
       NS_FATAL_ERROR ("Unknown value of GroupCreationMethod_t: " << creationMethod);
     }
 
+  groupHelper->CreateUtNodesFromPosition (5, 1000, utNodes.Get (0)->GetObject<SatMobilityModel> ()->GetGeoPosition (), 1000);
+
+  return 0;
+
   // setup CBR traffic
   Config::SetDefault ("ns3::CbrApplication::Interval", TimeValue (interval));
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
