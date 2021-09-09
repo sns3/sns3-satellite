@@ -44,6 +44,8 @@
 
 namespace ns3 {
 
+class SatGroupHelper;
+
 /**
  * \brief Build a satellite network set with needed objects and configuration.
  *        Utilizes SatUserHelper and SatBeamHelper helper objects.
@@ -177,6 +179,15 @@ public:
    * \param posAllocator
    */
   void SetUtPositionAllocatorForBeam (uint32_t beamId, Ptr<SatListPositionAllocator> posAllocator);
+
+  /**
+   * \brief Create new UTs using a central position and a radius
+   * \param nb The number of nodes to create in this circle
+   * \param center The center of the circle
+   * \param radius The radius of the circle in meters
+   * \return the UTs created
+   */
+  NodeContainer CreateUtsInArea (uint32_t nb, GeoCoordinate center, uint32_t radius);
 
   /**
    * \brief Load UTs with a SatTracedMobilityModel associated to them from the

@@ -257,7 +257,7 @@ SatHelper::SatHelper ()
   // Set the antenna patterns to beam helper
   m_beamHelper->SetAntennaGainPatterns (m_antennaGainPatterns);
 
-  m_groupHelper = CreateObject<SatGroupHelper> ();
+  m_groupHelper = CreateObject<SatGroupHelper> (this);
 }
 
 void SatHelper::CreatePredefinedScenario (PreDefinedScenario_t scenario)
@@ -477,6 +477,48 @@ SatHelper::SetUtPositionAllocatorForBeam (uint32_t beamId, Ptr<SatListPositionAl
 {
   NS_LOG_FUNCTION (this << beamId);
   m_utPositionsByBeam[beamId] = posAllocator;
+}
+
+NodeContainer
+SatHelper::CreateUtsInArea (uint32_t nb, GeoCoordinate center, uint32_t radius)
+{
+  NS_LOG_FUNCTION (this << nb << center << radius);
+
+  NodeContainer nodes;
+  nodes.Create (nb);
+
+  Ptr<SatRandomCirclePositionAllocator> circleAllocator = CreateObject<SatRandomCirclePositionAllocator> (center, radius);
+
+  MobilityHelper mobility;
+
+  mobility.SetPositionAllocator (circleAllocator);
+  mobility.SetMobilityModel ("ns3::SatConstantPositionMobilityModel");
+  mobility.Install (nodes);
+
+  for ( NodeContainer::Iterator i = nodes.Begin ();  i != nodes.End (); i++ )
+    {
+      Ptr<SatMobilityObserver> observer = (*i)->GetObject<SatMobilityObserver> ();
+      Ptr<SatMobilityModel> ownMobility = (*i)->GetObject<SatMobilityModel> ();
+
+      if (observer == 0)
+        {
+          Ptr<SatMobilityModel> satMobility = m_beamHelper->GetGeoSatNode ()->GetObject<SatMobilityModel> ();
+
+          NS_ASSERT (ownMobility != NULL);
+          NS_ASSERT (satMobility != NULL);
+
+          observer = CreateObject<SatMobilityObserver> (ownMobility, satMobility);
+
+          (*i)->AggregateObject (observer);
+        }
+
+      uint32_t bestBeamId = m_antennaGainPatterns->GetBestBeamId (ownMobility->GetPosition ());
+      std::cout << bestBeamId << std::endl;
+    }
+
+  // TODO install now in the good place
+
+  return nodes;
 }
 
 void

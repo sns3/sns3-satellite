@@ -32,11 +32,14 @@
 #include <ns3/mobility-helper.h>
 
 #include <ns3/geo-coordinate.h>
+#include <ns3/satellite-helper.h>
 #include <ns3/satellite-mobility-model.h>
 #include <ns3/satellite-position-allocator.h>
 #include <ns3/satellite-ut-handover-module.h>
 
 namespace ns3 {
+
+class SatHelper;
 
 /**
  * \brief This helper is used to create groups of UTs.
@@ -58,9 +61,14 @@ public:
   virtual TypeId GetInstanceTypeId (void) const;
 
   /**
-   * Default constructor for SatGroupHelper
+   * Default constructor for SatGroupHelper. Should not be used
    */
   SatGroupHelper ();
+
+  /**
+   * Constructor for SatGroupHelper with the SatHelper that created it in parameter
+   */
+  SatGroupHelper (Ptr<SatHelper> satHelper);
 
   /**
    * Destructor for SatGroupHelper.
@@ -151,6 +159,11 @@ private:
    * \return The groupID where the node is registered. Return 0 if no group is found
    */
   uint32_t GetGroupId (Ptr<Node> node) const;
+
+  /**
+   * A pointer to the SatHelper object
+   */
+  Ptr<SatHelper> m_satHelper;
 
   /**
    * The list of all the UTs in the simulation
