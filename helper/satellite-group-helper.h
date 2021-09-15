@@ -26,6 +26,7 @@
 #include <list>
 #include <map>
 #include <vector>
+#include <algorithm>
 
 #include <ns3/node-container.h>
 #include <ns3/vector.h>
@@ -117,10 +118,18 @@ public:
   void CreateUtNodesFromPosition (uint32_t groupId, uint32_t nb, GeoCoordinate center, uint32_t radius);
 
   /**
+   * \brief Schedule a node to be added to a group when scenario creation is finished.
+   * This should not be used in a user scenario, only in intern calls.
+   * \param groupId The ID of created group. Cannot be an already existing group
+   * \param node The associated node
+   */
+  void AddNodeToGroupAfterScenarioCreation (uint32_t groupId, Ptr<Node> node);
+
+  /**
    * \brief Get the position of nodes to add to the scenario
    * \return The map beamId/positions associated
    */
-  std::map<uint32_t, std::vector<GeoCoordinate>> GetAdditionalNodesPerBeam ();
+  std::map<uint32_t, std::vector<std::pair<GeoCoordinate, uint32_t>>> GetAdditionalNodesPerBeam ();
 
   /**
    * \param groupId The group ID
@@ -166,6 +175,13 @@ private:
   uint32_t GetGroupId (Ptr<Node> node) const;
 
   /**
+   * \brief Get list of nodes not created from position by group helper
+   * \param nodes The list of nodes to filter
+   * \return The list of nodes not created from position by group helper
+   */
+  NodeContainer GetNodesNotAddedFromPosition (NodeContainer nodes);
+
+  /**
    * The list of all the UTs in the simulation
    */
   NodeContainer                                     m_uts;
@@ -186,9 +202,20 @@ private:
   Ptr<SatAntennaGainPatternContainer> m_antennaGainPatterns;
 
   /**
-   * Nodes created by position to add to scenario
+   * Nodes created by position to add to scenario. Map: <beamId, vector: <position, group ID>>
    */
-  std::map<uint32_t, std::vector<GeoCoordinate>> m_additionalNodesPerBeam;
+  std::map<uint32_t, std::vector<std::pair<GeoCoordinate, uint32_t>>> m_additionalNodesPerBeam;
+
+  /*
+   * Map to store node to add to groups after scenario is created
+   */
+  std::map<Ptr<Node>, uint32_t> m_nodesToAdd;
+
+  /*
+   * Tells if the scenario has been created by simulation helper.
+   * Some methods have to be called before, some after.
+   */
+  bool m_scenarioCreated;
 };
 
 } // namespace ns3

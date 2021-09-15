@@ -49,6 +49,7 @@ SatGroupHelper::GetInstanceTypeId (void) const
 }
 
 SatGroupHelper::SatGroupHelper ()
+  : m_scenarioCreated (false)
 {
   NS_LOG_FUNCTION (this);
 
@@ -69,12 +70,24 @@ SatGroupHelper::Init (NodeContainer uts)
 {
   NS_LOG_FUNCTION (this);
   m_uts = uts;
+
+  m_scenarioCreated = true;
+
+  for (std::map<Ptr<Node>, uint32_t>::iterator it = m_nodesToAdd.begin(); it != m_nodesToAdd.end(); it++)
+    {
+      AddUtNodeToGroup (it->second, it->first);
+    }
 }
 
 void
 SatGroupHelper::AddUtNodeToGroup (uint32_t groupId, Ptr<Node> node)
 {
   NS_LOG_FUNCTION (this << groupId << node);
+
+  if (m_scenarioCreated == false)
+  {
+    NS_FATAL_ERROR ("Method SatGroupHelper::AddUtNodeToGroup has to be called after SimulationHelper::CreateSatScenario");
+  }
 
   if (groupId == 0)
     {
@@ -100,6 +113,11 @@ SatGroupHelper::AddUtNodesToGroup (uint32_t groupId, NodeContainer nodes)
 {
   NS_LOG_FUNCTION (this << groupId);
 
+  if (m_scenarioCreated == false)
+  {
+    NS_FATAL_ERROR ("Method SatGroupHelper::AddUtNodesToGroup has to be called after SimulationHelper::CreateSatScenario");
+  }
+
   for (NodeContainer::Iterator it = nodes.Begin (); it != nodes.End (); it++)
     {
       AddUtNodeToGroup (groupId, *it);
@@ -109,6 +127,13 @@ SatGroupHelper::AddUtNodesToGroup (uint32_t groupId, NodeContainer nodes)
 void
 SatGroupHelper::CreateGroupFromPosition (uint32_t groupId, NodeContainer nodes, GeoCoordinate center, uint32_t radius)
 {
+  NS_LOG_FUNCTION (this << groupId << center << radius);
+
+  if (m_scenarioCreated == false)
+  {
+    NS_FATAL_ERROR ("Method SatGroupHelper::CreateGroupFromPosition has to be called after SimulationHelper::CreateSatScenario");
+  }
+
   if (groupId == 0)
     {
       NS_FATAL_ERROR ("Cannot create new geographical group with a group ID of zero.");
@@ -121,7 +146,8 @@ SatGroupHelper::CreateGroupFromPosition (uint32_t groupId, NodeContainer nodes, 
   Vector centerPosition = center.ToVector ();
   GeoCoordinate nodePosition;
   double distance;
-  for (NodeContainer::Iterator it = nodes.Begin (); it != nodes.End (); it++)
+  NodeContainer nodesNotAlreadyAdded = GetNodesNotAddedFromPosition (nodes);
+  for (NodeContainer::Iterator it = nodesNotAlreadyAdded.Begin (); it != nodesNotAlreadyAdded.End (); it++)
     {
       nodePosition = (*it)->GetObject<SatMobilityModel> ()->GetGeoPosition ();
       distance = CalculateDistance (centerPosition, nodePosition.ToVector ());
@@ -135,6 +161,13 @@ SatGroupHelper::CreateGroupFromPosition (uint32_t groupId, NodeContainer nodes, 
 void
 SatGroupHelper::CreateGroupsUniformly (std::vector<uint32_t> groupIds, NodeContainer nodes)
 {
+  NS_LOG_FUNCTION (this << groupIds);
+
+  if (m_scenarioCreated == false)
+  {
+    NS_FATAL_ERROR ("Method SatGroupHelper::CreateGroupsUniformly has to be called after SimulationHelper::CreateSatScenario");
+  }
+
   for (uint32_t groupId : groupIds)
     {
       if (GetUtNodes (groupId).GetN () != 0)
@@ -143,12 +176,14 @@ SatGroupHelper::CreateGroupsUniformly (std::vector<uint32_t> groupIds, NodeConta
         }
     }
 
-  uint32_t nbNodes = nodes.GetN ();
+  NodeContainer nodesNotAlreadyAdded = GetNodesNotAddedFromPosition (nodes);
+
+  uint32_t nbNodes = nodesNotAlreadyAdded.GetN ();
   uint32_t counter = 0;
 
   for (uint32_t i = 0; i < nbNodes; i++)
     {
-      AddUtNodeToGroup (groupIds[counter], nodes.Get (i));
+      AddUtNodeToGroup (groupIds[counter], nodesNotAlreadyAdded.Get (i));
       counter++;
       counter %= groupIds.size();
     }
@@ -159,21 +194,45 @@ SatGroupHelper::CreateUtNodesFromPosition (uint32_t groupId, uint32_t nb, GeoCoo
 {
   NS_LOG_FUNCTION (this << groupId << nb << center << radius);
 
+  if (m_scenarioCreated == true)
+  {
+    NS_FATAL_ERROR ("Method SatGroupHelper::CreateUtNodesFromPosition has to be called before SimulationHelper::CreateSatScenario");
+  }
+
+  if (groupId == 0)
+    {
+      NS_FATAL_ERROR ("Cannot call CreateUtNodesFromPosition with a group ID of zero.");
+    }
+  if (std::find(m_groupsList.begin(), m_groupsList.end(), groupId) != m_groupsList.end())
+    {
+      NS_FATAL_ERROR ("Cannot call CreateUtNodesFromPosition with a group ID already used: " << groupId);
+    }
+
   Ptr<SatRandomCirclePositionAllocator> circleAllocator = CreateObject<SatRandomCirclePositionAllocator> (center, radius);
 
   for (uint32_t i = 0; i < nb; i++)
     {
       GeoCoordinate position = circleAllocator->GetNextGeoPosition ();
       uint32_t bestBeamId = m_antennaGainPatterns->GetBestBeamId (position);
-      m_additionalNodesPerBeam[bestBeamId].push_back (position);
+      m_additionalNodesPerBeam[bestBeamId].push_back (std::make_pair(position, groupId));
     }
 
-  return;
+  m_groupsList.push_back(groupId);
 }
 
-std::map<uint32_t, std::vector<GeoCoordinate>>
+void
+SatGroupHelper::AddNodeToGroupAfterScenarioCreation (uint32_t groupId, Ptr<Node> node)
+{
+  NS_LOG_FUNCTION (this << groupId << node);
+
+  m_nodesToAdd[node] = groupId;
+}
+
+std::map<uint32_t, std::vector<std::pair<GeoCoordinate, uint32_t>>>
 SatGroupHelper::GetAdditionalNodesPerBeam ()
 {
+  NS_LOG_FUNCTION (this);
+
   return m_additionalNodesPerBeam;
 }
 
@@ -258,6 +317,24 @@ SatGroupHelper::GetGroupId (Ptr<Node> node) const
         }
     }
   return 0;
+}
+
+NodeContainer
+SatGroupHelper::GetNodesNotAddedFromPosition (NodeContainer nodes)
+{
+  NS_LOG_FUNCTION (this);
+
+  NodeContainer nodesFiltered;
+  Ptr<Node> node;
+  for (uint32_t i = 0; i < nodes.GetN (); i++)
+    {
+      node = nodes.Get (i);
+      if (m_nodesToAdd.count(node) == 0)
+        {
+          nodesFiltered.Add (node);
+        }
+    }
+  return nodesFiltered;
 }
 
 } // namespace ns3

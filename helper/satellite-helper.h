@@ -497,10 +497,10 @@ private:
    *
    * \param uts node container of UTs to set mobility
    * \param beamId the spot-beam id, where the UTs should be placed
-   * \param positions the list of known positions
+   * \param positionsAndGroupId the list of known positions, associated to a group ID
    *
    */
-  void SetUtMobilityWithPosition (NodeContainer uts, uint32_t beamId, std::vector<GeoCoordinate> positions);
+  void SetUtMobilityFromPosition (NodeContainer uts, uint32_t beamId, std::vector<std::pair<GeoCoordinate, uint32_t>> positionsAndGroupId);
 
   /**
    * Install Satellite Mobility Observer to nodes, if observer doesn't exist already in a node

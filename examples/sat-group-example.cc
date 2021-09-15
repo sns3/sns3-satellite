@@ -213,7 +213,9 @@ main (int argc, char *argv[])
   simulationHelper->SetBeams (beamsEnabled.str ());
 
   Ptr<SatGroupHelper> groupHelper = simulationHelper->GetGroupHelper ();
-  groupHelper->CreateUtNodesFromPosition (5, 100, GeoCoordinate (56.4243, -16.042, 122.427), 100000);
+
+  // Create group 5 and create 100 UTs (in addition to the ones are created by SimulationHelper, using utsPerBeam) to in this group
+  groupHelper->CreateUtNodesFromPosition (5, 10, GeoCoordinate (56.4243, -16.042, 122.427), 100000);
 
   // Create reference system
   simulationHelper->CreateSatScenario ();
@@ -234,29 +236,21 @@ main (int argc, char *argv[])
           nodes2To10.Add (utNodes.Get (i));
         }
       groupHelper->AddUtNodesToGroup (2, nodes2To10);
-      std::cout << "Group 1 has " << groupHelper->GetUtNodes (1).GetN () << " nodes" << std::endl;
-      std::cout << "Group 2 has " << groupHelper->GetUtNodes (2).GetN () << " nodes" << std::endl;
     }
   else if (creationMethod == GroupCreationMethod_t::POSITION)
     {
       // Add all nodes less than 100km from node 0
       groupHelper->CreateGroupFromPosition (2, utNodes, utNodes.Get (0)->GetObject<SatMobilityModel> ()->GetGeoPosition (), 100000);
-      std::cout << "Group 2 has " << groupHelper->GetUtNodes (2).GetN () << " nodes" << std::endl;
     }
   else if (creationMethod == GroupCreationMethod_t::NUMBER)
     {
       std::vector<uint32_t> groups = {1, 2, 3};
       groupHelper->CreateGroupsUniformly (groups, utNodes);
-      std::cout << "Group 1 has " << groupHelper->GetUtNodes (1).GetN () << " nodes" << std::endl;
-      std::cout << "Group 2 has " << groupHelper->GetUtNodes (2).GetN () << " nodes" << std::endl;
-      std::cout << "Group 3 has " << groupHelper->GetUtNodes (3).GetN () << " nodes" << std::endl;
     }
   else
     {
       NS_FATAL_ERROR ("Unknown value of GroupCreationMethod_t: " << creationMethod);
     }
-
-  std::cout << "Group 5 has " << groupHelper->GetUtNodes (5).GetN () << " nodes" << std::endl;
 
   // setup CBR traffic
   Config::SetDefault ("ns3::CbrApplication::Interval", TimeValue (interval));
@@ -264,7 +258,7 @@ main (int argc, char *argv[])
 
   // Setup custom traffics
   Ptr<SatTrafficHelper> trafficHelper = simulationHelper->GetTrafficHelper ();
-  trafficHelper-> AddCbrTraffic (SatTrafficHelper::FWD_LINK,
+  trafficHelper->AddCbrTraffic (SatTrafficHelper::FWD_LINK,
                       "100ms",
                       packetSize,
                       satHelper->GetGwUsers ().Get (0),
@@ -273,7 +267,7 @@ main (int argc, char *argv[])
                       appStartTime + simLength,
                       Seconds (0.05));
 
-  trafficHelper-> AddCbrTraffic (SatTrafficHelper::RTN_LINK,
+  trafficHelper->AddCbrTraffic (SatTrafficHelper::RTN_LINK,
                       "1000ms",
                       packetSize,
                       satHelper->GetGwUsers ().Get (0),
@@ -282,9 +276,17 @@ main (int argc, char *argv[])
                       appStartTime + simLength,
                       Seconds (0.05));
 
-  trafficHelper-> AddHttpTraffic (SatTrafficHelper::FWD_LINK,
+  trafficHelper->AddHttpTraffic (SatTrafficHelper::FWD_LINK,
                       satHelper->GetGwUsers ().Get (0),
                       satHelper->GetUtUsers (groupHelper->GetUtNodes (1)),
+                      appStartTime,
+                      appStartTime + simLength,
+                      Seconds (0.05));
+
+  trafficHelper->AddVoipTraffic (SatTrafficHelper::FWD_LINK,
+                      SatTrafficHelper::G_711_1,
+                      satHelper->GetGwUsers ().Get (0),
+                      satHelper->GetUtUsers (groupHelper->GetUtNodes (5)),
                       appStartTime,
                       appStartTime + simLength,
                       Seconds (0.05));
@@ -294,9 +296,15 @@ main (int argc, char *argv[])
   NS_LOG_INFO ("  Packet sending interval: " << interval.GetSeconds ());
   NS_LOG_INFO ("  Simulation length: " << simLength.GetSeconds ());
   NS_LOG_INFO ("  Number total of UTs: " << satHelper->UtNodes ().GetN ());
+  NS_LOG_INFO ("  Number of end users per UT: " << endUsersPerUt);
   NS_LOG_INFO ("  Number of groups: " << groupHelper->GetN ());
   NS_LOG_INFO ("  Nodes in default group: " << groupHelper->GetUtNodes (0).GetN ());
-  NS_LOG_INFO ("  Number of end users per UT: " << endUsersPerUt);
+  std::list<uint32_t> groupIds = groupHelper->GetGroups ();
+  groupIds.sort ();
+  for (uint32_t groupId : groupIds)
+    {
+      NS_LOG_INFO ("  Nodes in group " << groupId << ": " << groupHelper->GetUtNodes (groupId).GetN ());
+    }
   NS_LOG_INFO ("  ");
 
   // Set statistics

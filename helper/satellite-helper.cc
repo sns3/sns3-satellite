@@ -236,6 +236,9 @@ SatHelper::SatHelper ()
                                               m_satConf->GetFwdLinkCarrierCount (),
                                               m_satConf->GetSuperframeSeq ());
 
+  m_antennaGainPatterns = CreateObject<SatAntennaGainPatternContainer> ();
+  m_beamHelper->SetAntennaGainPatterns (m_antennaGainPatterns);
+
   if (m_satMobilitySGP4Enabled == true && m_beamHelper->GetPropagationDelayModelEnum () != SatEnums::PD_CONSTANT_SPEED)
     {
       NS_FATAL_ERROR ("Must use constant speed propagation delay model if satellite mobility is enabled");
@@ -561,14 +564,14 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
       for (BeamUserInfoMap_t::iterator info = beamInfos.begin (); info != beamInfos.end (); info++)
         {
           // create UTs of the beam, set mobility to them
-          std::vector<GeoCoordinate> positions = info->second.GetPositions ();
+          std::vector<std::pair<GeoCoordinate, uint32_t>> positionsAndGroupId = info->second.GetPositions ();
           NodeContainer uts;
-          uts.Create (info->second.GetUtCount () - positions.size ());
+          uts.Create (info->second.GetUtCount () - positionsAndGroupId.size ());
           SetUtMobility (uts, info->first);
 
           NodeContainer utsFromPosition;
-          utsFromPosition.Create (positions.size ());
-          SetUtMobilityWithPosition (utsFromPosition, info->first, positions);
+          utsFromPosition.Create (positionsAndGroupId.size ());
+          SetUtMobilityFromPosition (utsFromPosition, info->first, positionsAndGroupId);
           uts.Add (utsFromPosition);
 
           // Add mobile UTs starting at this beam
@@ -740,6 +743,7 @@ SatHelper::SetUtMobility (NodeContainer uts, uint32_t beamId)
 
   mobility.SetPositionAllocator (allocator);
   mobility.SetMobilityModel ("ns3::SatConstantPositionMobilityModel");
+  Ptr<MobilityModel> model = uts.Get (0)->GetObject<MobilityModel> ();
   mobility.Install (uts);
 
   InstallMobilityObserver (uts);
@@ -754,7 +758,7 @@ SatHelper::SetUtMobility (NodeContainer uts, uint32_t beamId)
 }
 
 void
-SatHelper::SetUtMobilityWithPosition (NodeContainer uts, uint32_t beamId, std::vector<GeoCoordinate> positions)
+SatHelper::SetUtMobilityFromPosition (NodeContainer uts, uint32_t beamId, std::vector<std::pair<GeoCoordinate, uint32_t>> positionsAndGroupId)
 {
   NS_LOG_FUNCTION (this << beamId);
 
@@ -762,10 +766,13 @@ SatHelper::SetUtMobilityWithPosition (NodeContainer uts, uint32_t beamId, std::v
 
   Ptr<SatListPositionAllocator> allocator = CreateObject<SatListPositionAllocator> ();
 
-  for (GeoCoordinate position : positions)
-  {
-    allocator->Add (position);
-  }
+  NS_ASSERT_MSG (uts.GetN () == positionsAndGroupId.size (), "Inconsistent number of nodes and positions");
+
+  for (uint32_t i = 0; i < positionsAndGroupId.size (); i++)
+    {
+      allocator->Add (positionsAndGroupId[i].first);
+      m_groupHelper->AddNodeToGroupAfterScenarioCreation (positionsAndGroupId[i].second, uts.Get (i));
+    }
 
   mobility.SetPositionAllocator (allocator);
   mobility.SetMobilityModel ("ns3::SatConstantPositionMobilityModel");

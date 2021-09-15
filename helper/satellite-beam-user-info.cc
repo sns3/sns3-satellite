@@ -42,7 +42,6 @@ SatBeamUserInfo::SatBeamUserInfo (uint32_t utCount, uint32_t userCountPerUt)
     {
       m_userCount.push_back (userCountPerUt);
     }
-  m_positions = std::vector<GeoCoordinate> ();
 }
 
 uint32_t
@@ -82,12 +81,12 @@ void SatBeamUserInfo::AppendUt (uint32_t userCount)
 }
 
 void
-SatBeamUserInfo::SetPositions (std::vector<GeoCoordinate> positions)
+SatBeamUserInfo::SetPositions (std::vector<std::pair<GeoCoordinate, uint32_t>> positions)
 {
   m_positions = positions;
 }
 
-std::vector<GeoCoordinate>
+std::vector<std::pair<GeoCoordinate, uint32_t>>
 SatBeamUserInfo::GetPositions ()
 {
   return m_positions;

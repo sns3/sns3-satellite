@@ -90,16 +90,22 @@ public:
    */
   void AppendUt (uint32_t userCount);
 
-  std::vector<GeoCoordinate> GetPositions ();
+  /**
+   * \return Get the list of custom positions to create, and associated group
+   */
+  std::vector<std::pair<GeoCoordinate, uint32_t>> GetPositions ();
 
-  void SetPositions (std::vector<GeoCoordinate> positions);
+  /**
+   * \brief Set the list of custom positions to create, and associated group
+   */
+  void SetPositions (std::vector<std::pair<GeoCoordinate, uint32_t>> positions);
 
 private:
   // vector to store users per UT
   std::vector<uint32_t> m_userCount;
 
   // storing static positions for some UTs
-  std::vector<GeoCoordinate> m_positions;
+  std::vector<std::pair<GeoCoordinate, uint32_t>> m_positions;
 };
 
 } // namespace ns3

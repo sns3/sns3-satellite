@@ -1267,8 +1267,8 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario, c
             }
         }
 
-      std::map<uint32_t, std::vector<GeoCoordinate>> additionalNodes = m_groupHelper->GetAdditionalNodesPerBeam ();
-      for (std::map<uint32_t, std::vector<GeoCoordinate>>::iterator it = additionalNodes.begin(); it != additionalNodes.end(); it++)
+      std::map<uint32_t, std::vector<std::pair<GeoCoordinate, uint32_t>>> additionalNodes = m_groupHelper->GetAdditionalNodesPerBeam ();
+      for (std::map<uint32_t, std::vector<std::pair<GeoCoordinate, uint32_t>>>::iterator it = additionalNodes.begin(); it != additionalNodes.end(); it++)
         {
           if (!IsBeamEnabled (it->first))
             {
@@ -1277,7 +1277,6 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario, c
               continue;
             }
           beamInfo[it->first].SetPositions (it->second);
-          std::cout << "it->second " << it->second.size () << std::endl;
           for (uint32_t i = 0; i < it->second.size (); i++)
             {
               beamInfo[it->first].AppendUt (GetNextUtUserCount ());
