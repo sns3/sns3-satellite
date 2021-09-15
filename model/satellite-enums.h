@@ -84,6 +84,16 @@ public:
   } FadingModel_t;
 
   /**
+   * \enum Standard_t
+   * \brief The global standard used. Can be either DVB or Lora
+   */
+  typedef enum
+  {
+    DVB,
+    LORA
+  } Standard_t;
+
+  /**
    * \enum DvbVersion_t
    * \brief The scheduling algorithm used to fill the BBFrames.
    */

@@ -24,6 +24,7 @@
 #include "ns3/object.h"
 #include "ns3/packet.h"
 #include "ns3/satellite-phy.h"
+#include "ns3/satellite-mac.h"
 #include <array>
 
 namespace ns3 {
@@ -48,7 +49,7 @@ struct LoraTxParameters
  * belongs to an End Device or a Gateway, while holding some functionality that
  * is common to both.
  */
-class LorawanMac : public Object
+class LorawanMac : public SatMac
 {
 public:
   static TypeId GetTypeId (void);

@@ -51,7 +51,6 @@
 #include <ns3/satellite-generic-stream-encapsulator-arq.h>
 #include <ns3/satellite-return-link-encapsulator.h>
 #include <ns3/satellite-return-link-encapsulator-arq.h>
-#include <ns3/satellite-net-device.h>
 #include <ns3/satellite-node-info.h>
 #include <ns3/satellite-enums.h>
 #include <ns3/satellite-request-manager.h>

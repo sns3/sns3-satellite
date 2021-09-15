@@ -143,6 +143,12 @@ SatBeamHelper::GetTypeId (void)
                    BooleanValue (false),
                    MakeBooleanAccessor (&SatBeamHelper::m_enableTracesOnReturnLink),
                    MakeBooleanChecker ())
+    .AddAttribute ("Standard",
+                   "The global standard used. Can be either DVB or Lora",
+                   EnumValue (SatEnums::DVB),
+                   MakeEnumAccessor (&SatBeamHelper::m_standard),
+                   MakeEnumChecker (SatEnums::DVB, "DVB",
+                                    SatEnums::LORA, "LORA"))
     .AddAttribute ("DvbVersion",
                    "Indicates if using DVB-S2 or DVB-S2X",
                    EnumValue (SatEnums::DVB_S2),

@@ -476,6 +476,11 @@ private:
   void AddMulticastRouteToUt (Ptr<Node> utNode, Ipv4Address sourceAddress, Ipv4Address groupAddress, bool routeToSatellite);
 
   /**
+   * The global standard used. Can be either DVB or Lora
+   */
+  SatEnums::Standard_t m_standard;
+
+  /**
    * Indicates if using DVB-S2 or DVB-S2X
    */
   SatEnums::DvbVersion_t m_dvbVersion;
