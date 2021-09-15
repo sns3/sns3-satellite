@@ -1155,6 +1155,19 @@ SimulationHelper::GetTrafficHelper ()
   return m_trafficHelper;
 }
 
+Ptr<SatGroupHelper>
+SimulationHelper::GetGroupHelper ()
+{
+  NS_LOG_FUNCTION (this);
+
+  if (!m_groupHelper)
+    {
+      m_groupHelper = CreateObject<SatGroupHelper> ();
+    }
+
+  return m_groupHelper;
+}
+
 Ptr<SatCnoHelper>
 SimulationHelper::GetCnoHelper ()
 {
@@ -1209,6 +1222,10 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario, c
 
   m_satHelper = CreateObject<SatHelper> ();
 
+  m_satHelper->SetGroupHelper (GetGroupHelper ()); // If not done in user scenario, group helper is created here
+  m_satHelper->SetAntennaGainPatterns (m_groupHelper->GetAntennaGainPatterns ());
+  m_satHelper->GetBeamHelper ()->SetAntennaGainPatterns (m_groupHelper->GetAntennaGainPatterns ());
+
   // Set UT position allocators, if any
   if (!m_enableInputFileUtListPositions)
     {
@@ -1240,13 +1257,30 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario, c
               for (uint32_t j = 1; j < utCount + 1; j++)
                 {
                   uint32_t utUserCount = GetNextUtUserCount ();
-                  info.AppendUt (GetNextUtUserCount ());
+                  info.AppendUt (utUserCount);
                   ss << ", " <<  j << ". UT user count= " << utUserCount;
                 }
 
               beamInfo.insert (std::make_pair (i, info));
 
               ss << std::endl;
+            }
+        }
+
+      std::map<uint32_t, std::vector<GeoCoordinate>> additionalNodes = m_groupHelper->GetAdditionalNodesPerBeam ();
+      for (std::map<uint32_t, std::vector<GeoCoordinate>>::iterator it = additionalNodes.begin(); it != additionalNodes.end(); it++)
+        {
+          if (!IsBeamEnabled (it->first))
+            {
+              NS_LOG_WARN ("Beam ID " << it->first << " is not enabled, cannot add " << it->second.size () << " UTs from SatGroupHelper");
+              std::cout << "Beam ID " << it->first << " is not enabled, cannot add " << it->second.size () << " UTs from SatGroupHelper" << std::endl;
+              continue;
+            }
+          beamInfo[it->first].SetPositions (it->second);
+          std::cout << "it->second " << it->second.size () << std::endl;
+          for (uint32_t i = 0; i < it->second.size (); i++)
+            {
+              beamInfo[it->first].AppendUt (GetNextUtUserCount ());
             }
         }
 
@@ -1272,6 +1306,8 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario, c
     }
 
   NS_LOG_INFO (ss.str ());
+
+  m_groupHelper->Init (m_satHelper->UtNodes ());
 
   return m_satHelper;
 }

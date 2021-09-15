@@ -22,6 +22,7 @@
 #define SAT_BEAM_USER_INFO_H
 
 #include <vector>
+#include <ns3/geo-coordinate.h>
 
 namespace ns3 {
 
@@ -89,9 +90,16 @@ public:
    */
   void AppendUt (uint32_t userCount);
 
+  std::vector<GeoCoordinate> GetPositions ();
+
+  void SetPositions (std::vector<GeoCoordinate> positions);
+
 private:
   // vector to store users per UT
   std::vector<uint32_t> m_userCount;
+
+  // storing static positions for some UTs
+  std::vector<GeoCoordinate> m_positions;
 };
 
 } // namespace ns3

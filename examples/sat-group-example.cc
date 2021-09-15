@@ -76,6 +76,8 @@ ConfigureAllStats (Ptr<SatStatsHelperContainer> s)
 {
   SatStatsHelper::OutputType_t outputType = SatStatsHelper::OUTPUT_SCATTER_FILE; //Only format compatible with all per group statistics
 
+  s->AddPerBeamFwdAppDelay (outputType);
+
   s->AddPerGroupFwdAppDelay (outputType);
   s->AddPerGroupRtnAppDelay (outputType);
 
@@ -210,12 +212,14 @@ main (int argc, char *argv[])
   beamsEnabled << beamId;
   simulationHelper->SetBeams (beamsEnabled.str ());
 
+  Ptr<SatGroupHelper> groupHelper = simulationHelper->GetGroupHelper ();
+  groupHelper->CreateUtNodesFromPosition (5, 100, GeoCoordinate (56.4243, -16.042, 122.427), 100000);
+
   // Create reference system
   simulationHelper->CreateSatScenario ();
   Ptr<SatHelper> satHelper = simulationHelper->GetSatelliteHelper ();
 
   // Create groups
-  Ptr<SatGroupHelper> groupHelper = satHelper->GetGroupHelper ();
   NodeContainer utNodes = satHelper->UtNodes ();
 
   GroupCreationMethod_t creationMethod = GroupCreationMethod_t::NUMBER;
@@ -252,9 +256,7 @@ main (int argc, char *argv[])
       NS_FATAL_ERROR ("Unknown value of GroupCreationMethod_t: " << creationMethod);
     }
 
-  groupHelper->CreateUtNodesFromPosition (5, 1000, utNodes.Get (0)->GetObject<SatMobilityModel> ()->GetGeoPosition (), 1000);
-
-  return 0;
+  std::cout << "Group 5 has " << groupHelper->GetUtNodes (5).GetN () << " nodes" << std::endl;
 
   // setup CBR traffic
   Config::SetDefault ("ns3::CbrApplication::Interval", TimeValue (interval));
@@ -291,7 +293,7 @@ main (int argc, char *argv[])
   NS_LOG_INFO ("  Packet size in bytes: " << packetSize);
   NS_LOG_INFO ("  Packet sending interval: " << interval.GetSeconds ());
   NS_LOG_INFO ("  Simulation length: " << simLength.GetSeconds ());
-  NS_LOG_INFO ("  Number of UTs: " << utsPerBeam);
+  NS_LOG_INFO ("  Number total of UTs: " << satHelper->UtNodes ().GetN ());
   NS_LOG_INFO ("  Number of groups: " << groupHelper->GetN ());
   NS_LOG_INFO ("  Nodes in default group: " << groupHelper->GetUtNodes (0).GetN ());
   NS_LOG_INFO ("  Number of end users per UT: " << endUsersPerUt);

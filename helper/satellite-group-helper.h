@@ -32,7 +32,6 @@
 #include <ns3/mobility-helper.h>
 
 #include <ns3/geo-coordinate.h>
-#include <ns3/satellite-helper.h>
 #include <ns3/satellite-mobility-model.h>
 #include <ns3/satellite-position-allocator.h>
 #include <ns3/satellite-ut-handover-module.h>
@@ -61,14 +60,9 @@ public:
   virtual TypeId GetInstanceTypeId (void) const;
 
   /**
-   * Default constructor for SatGroupHelper. Should not be used
+   * Default constructor for SatGroupHelper
    */
   SatGroupHelper ();
-
-  /**
-   * Constructor for SatGroupHelper with the SatHelper that created it in parameter
-   */
-  SatGroupHelper (Ptr<SatHelper> satHelper);
 
   /**
    * Destructor for SatGroupHelper.
@@ -123,6 +117,12 @@ public:
   void CreateUtNodesFromPosition (uint32_t groupId, uint32_t nb, GeoCoordinate center, uint32_t radius);
 
   /**
+   * \brief Get the position of nodes to add to the scenario
+   * \return The map beamId/positions associated
+   */
+  std::map<uint32_t, std::vector<GeoCoordinate>> GetAdditionalNodesPerBeam ();
+
+  /**
    * \param groupId The group ID
    * \return container having all UT nodes associated to a group
    */
@@ -139,6 +139,11 @@ public:
    * \return The list of groups created
    */
   std::list<uint32_t> GetGroups ();
+
+  /**
+   * \return Get the antenna gain patterns
+   */
+  Ptr<SatAntennaGainPatternContainer> GetAntennaGainPatterns ();
 
   /**
    * Dispose of this class instance
@@ -161,11 +166,6 @@ private:
   uint32_t GetGroupId (Ptr<Node> node) const;
 
   /**
-   * A pointer to the SatHelper object
-   */
-  Ptr<SatHelper> m_satHelper;
-
-  /**
    * The list of all the UTs in the simulation
    */
   NodeContainer                                     m_uts;
@@ -179,6 +179,16 @@ private:
    * List of group ID created
    */
   std::list<uint32_t>                               m_groupsList;
+
+  /**
+   * Antenna gain patterns
+   */
+  Ptr<SatAntennaGainPatternContainer> m_antennaGainPatterns;
+
+  /**
+   * Nodes created by position to add to scenario
+   */
+  std::map<uint32_t, std::vector<GeoCoordinate>> m_additionalNodesPerBeam;
 };
 
 } // namespace ns3

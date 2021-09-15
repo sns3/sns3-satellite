@@ -258,10 +258,12 @@ SatRandomCirclePositionAllocator::GetNextGeoPosition () const
   double longitude = m_center.GetLongitude ()*M_PI/180;
   double altitude = m_center.GetAltitude ();
 
-  double lat2 = (180/M_PI)*asin(sin(latitude)*cos(radius/GeoCoordinate::polarRadius_sphere) + cos(latitude)*sin(radius/GeoCoordinate::polarRadius_sphere)*cos(theta));
-  double lon2 = (180/M_PI)*(longitude + atan2(sin(theta)*sin(radius/GeoCoordinate::polarRadius_sphere)*cos(latitude), cos(radius/GeoCoordinate::polarRadius_sphere) - sin(latitude)*sin(lat2)));
+  double radiusNormalized = radius/GeoCoordinate::polarRadius_sphere;
 
-  GeoCoordinate position = GeoCoordinate (lat2, lon2, altitude);
+  double lat2 = asin(sin(latitude)*cos(radiusNormalized) + cos(latitude)*sin(radiusNormalized)*cos(theta));
+  double lon2 = longitude + atan2(sin(theta)*sin(radiusNormalized)*cos(latitude), cos(radiusNormalized) - sin(latitude)*sin(lat2));
+
+  GeoCoordinate position = GeoCoordinate ((180/M_PI)*lat2, (180/M_PI)*lon2, altitude);
 
   return position;
 }
