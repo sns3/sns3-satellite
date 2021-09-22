@@ -1678,7 +1678,7 @@ SimulationHelper::ConfigureAttributesFromFile (std::string filePath, bool overri
       EnableProgressLogs ();
     }
 
-  for (const std::pair<std::string, SimulationHelperConf::TrafficConfiguration_t>& trafficModel : simulationConf->m_trafficModel)
+  for (auto const& trafficModel : simulationConf->m_trafficModel)
     {
       TrafficModel_t modelName;
       if (trafficModel.first == "Cbr")
