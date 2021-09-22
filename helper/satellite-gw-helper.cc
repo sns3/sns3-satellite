@@ -33,6 +33,7 @@
 #include "../model/satellite-gw-llc.h"
 #include "../model/satellite-gw-mac.h"
 #include "../model/satellite-net-device.h"
+#include "../model/satellite-lorawan-net-device.h"
 #include "../model/satellite-geo-net-device.h"
 #include "../model/satellite-gw-phy.h"
 #include "../model/satellite-phy-tx.h"
@@ -227,14 +228,13 @@ SatGwHelper::SetPhyAttribute (std::string n1, const AttributeValue &v1)
 }
 
 NetDeviceContainer
-SatGwHelper::Install (NodeContainer c,
-                      uint32_t gwId,
-                      uint32_t beamId,
-                      Ptr<SatChannel> fCh,
-                      Ptr<SatChannel> rCh,
-                      Ptr<SatNcc> ncc,
-                      Ptr<SatLowerLayerServiceConf> llsConf,
-                      SatEnums::Standard_t standard)
+SatGwHelper::InstallDvb (NodeContainer c,
+                         uint32_t gwId,
+                         uint32_t beamId,
+                         Ptr<SatChannel> fCh,
+                         Ptr<SatChannel> rCh,
+                         Ptr<SatNcc> ncc,
+                         Ptr<SatLowerLayerServiceConf> llsConf)
 {
   NS_LOG_FUNCTION (this << beamId << fCh << rCh );
 
@@ -242,28 +242,27 @@ SatGwHelper::Install (NodeContainer c,
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
     {
-      devs.Add (Install (*i, gwId, beamId, fCh, rCh, ncc, llsConf, standard));
+      devs.Add (InstallDvb (*i, gwId, beamId, fCh, rCh, ncc, llsConf));
     }
 
   return devs;
 }
 
 Ptr<NetDevice>
-SatGwHelper::Install (Ptr<Node> n,
-                      uint32_t gwId,
-                      uint32_t beamId,
-                      Ptr<SatChannel> fCh,
-                      Ptr<SatChannel> rCh,
-                      Ptr<SatNcc> ncc,
-                      Ptr<SatLowerLayerServiceConf> llsConf,
-                      SatEnums::Standard_t standard)
+SatGwHelper::InstallDvb (Ptr<Node> n,
+                         uint32_t gwId,
+                         uint32_t beamId,
+                         Ptr<SatChannel> fCh,
+                         Ptr<SatChannel> rCh,
+                         Ptr<SatNcc> ncc,
+                         Ptr<SatLowerLayerServiceConf> llsConf)
 {
   NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
 
   NetDeviceContainer container;
 
   // Create SatNetDevice
-  std::cout << "DVB GW" << std::endl;
+  m_deviceFactory.SetTypeId ("ns3::SatNetDevice");
   Ptr<SatNetDevice> dev = m_deviceFactory.Create<SatNetDevice> ();
 
   // Attach the SatNetDevices to nodes
@@ -362,6 +361,7 @@ SatGwHelper::Install (Ptr<Node> n,
   // Attach the device receive callback to SatNetDevice
   llc->SetReceiveCallback (MakeCallback (&SatNetDevice::Receive, dev));
 
+
   // Attach the transmit callback to PHY
   mac->SetTransmitCallback (MakeCallback (&SatPhy::SendPdu, phy));
 
@@ -419,6 +419,210 @@ SatGwHelper::Install (Ptr<Node> n,
     }
 
   fwdLinkScheduler->SetSendControlMsgCallback (MakeCallback (&SatNetDevice::SendControlMsg, dev));
+
+  // Attach the LLC Tx opportunity and scheduling context getter callbacks to SatFwdLinkScheduler
+  fwdLinkScheduler->SetTxOpportunityCallback (MakeCallback (&SatGwLlc::NotifyTxOpportunity, llc));
+  fwdLinkScheduler->SetSchedContextCallback (MakeCallback (&SatLlc::GetSchedulingContexts, llc));
+
+  // set scheduler to Mac
+  mac->SetAttribute ("Scheduler", PointerValue (fwdLinkScheduler));
+
+  mac->StartPeriodicTransmissions ();
+
+  return dev;
+}
+
+NetDeviceContainer
+SatGwHelper::InstallLora (NodeContainer c,
+                          uint32_t gwId,
+                          uint32_t beamId,
+                          Ptr<SatChannel> fCh,
+                          Ptr<SatChannel> rCh,
+                          Ptr<SatNcc> ncc,
+                          Ptr<SatLowerLayerServiceConf> llsConf)
+{
+  NS_LOG_FUNCTION (this << beamId << fCh << rCh );
+
+  NetDeviceContainer devs;
+
+  for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
+    {
+      devs.Add (InstallLora (*i, gwId, beamId, fCh, rCh, ncc, llsConf));
+    }
+
+  return devs;
+}
+
+Ptr<NetDevice>
+SatGwHelper::InstallLora (Ptr<Node> n,
+                          uint32_t gwId,
+                          uint32_t beamId,
+                          Ptr<SatChannel> fCh,
+                          Ptr<SatChannel> rCh,
+                          Ptr<SatNcc> ncc,
+                          Ptr<SatLowerLayerServiceConf> llsConf)
+{
+  NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
+
+  NetDeviceContainer container;
+
+  // Create SatNetDevice
+  m_deviceFactory.SetTypeId ("ns3::SatLorawanNetDevice");
+  Ptr<SatLorawanNetDevice> dev = m_deviceFactory.Create<SatLorawanNetDevice> ();
+
+  // Attach the SatNetDevices to nodes
+  n->AddDevice (dev);
+
+  SatPhy::CreateParam_t params;
+  params.m_beamId = beamId;
+  params.m_device = dev;
+  params.m_txCh = fCh;
+  params.m_rxCh = rCh;
+
+  // Create a packet classifier
+  Ptr<SatPacketClassifier> classifier = Create<SatPacketClassifier> ();
+
+  /**
+   * Channel estimation errors
+   */
+  Ptr<SatChannelEstimationErrorContainer> cec;
+  // Not enabled, create only base class
+  if (!m_enableChannelEstimationError)
+    {
+      cec = Create<SatSimpleChannelEstimationErrorContainer> ();
+    }
+  // Create SatFwdLinkChannelEstimationErrorContainer
+  else
+    {
+      uint32_t minWfId = m_superframeSeq->GetWaveformConf ()->GetMinWfId ();
+      uint32_t maxWfId = m_superframeSeq->GetWaveformConf ()->GetMaxWfId ();
+      cec = Create<SatRtnLinkChannelEstimationErrorContainer> (minWfId, maxWfId);
+    }
+
+  SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters = SatPhyRxCarrierConf::RxCarrierCreateParams_s ();
+  parameters.m_errorModel = m_errorModel;
+  parameters.m_daConstantErrorRate = m_daConstantErrorRate;
+  parameters.m_daIfModel = m_daInterferenceModel;
+  parameters.m_raIfModel = m_raSettings.m_raInterferenceModel;
+  parameters.m_raIfEliminateModel = m_raSettings.m_raInterferenceEliminationModel;
+  parameters.m_bwConverter = m_carrierBandwidthConverter;
+  parameters.m_carrierCount = m_rtnLinkCarrierCount;
+  parameters.m_cec = cec;
+  parameters.m_raCollisionModel = m_raSettings.m_raCollisionModel;
+  parameters.m_raConstantErrorRate = m_raSettings.m_raConstantErrorRate;
+  parameters.m_randomAccessModel = m_raSettings.m_randomAccessModel;
+
+  Ptr<SatGwPhy> phy = CreateObject<SatGwPhy> (params,
+                                              m_linkResults,
+                                              parameters,
+                                              m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE));
+
+  // Set fading
+  phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());
+  phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
+
+  Ptr<SatGwMac> mac = CreateObject<SatGwMac> (beamId);
+
+  // Set the control message container callbacks
+  mac->SetReadCtrlCallback (m_readCtrlCb);
+  mac->SetReserveCtrlCallback (m_reserveCtrlCb);
+  mac->SetSendCtrlCallback (m_sendCtrlCb);
+
+  mac->SetCrReceiveCallback (MakeCallback (&SatNcc::UtCrReceived, ncc));
+
+  mac->SetHandoverCallback (MakeCallback (&SatNcc::MoveUtBetweenBeams, ncc));
+
+  // Attach the Mac layer receiver to Phy
+  SatPhy::ReceiveCallback recCb = MakeCallback (&SatGwMac::Receive, mac);
+
+  // Attach the NCC C/N0 update to Phy
+  SatPhy::CnoCallback cnoCb = MakeCallback (&SatNcc::UtCnoUpdated, ncc);
+
+  // Attach the NCC random access load update to Phy
+  SatPhy::AverageNormalizedOfferedLoadCallback avgNormalizedOfferedLoadCb = MakeCallback (&SatNcc::DoRandomAccessDynamicLoadControl, ncc);
+
+  phy->SetAttribute ("ReceiveCb", CallbackValue (recCb));
+  phy->SetAttribute ("CnoCb", CallbackValue (cnoCb));
+  phy->SetAttribute ("AverageNormalizedOfferedLoadCallback", CallbackValue (avgNormalizedOfferedLoadCb));
+
+  // Attach the PHY layer to SatNetDevice
+  dev->SetPhy (phy);
+
+  // Attach the Mac layer to SatNetDevice
+  dev->SetMac (mac);
+
+  // Create Logical Link Control (LLC) layer
+  Ptr<SatGwLlc> llc = CreateObject<SatGwLlc> ();
+
+  // Set the control msg read callback to LLC due to ARQ ACKs
+  llc->SetReadCtrlCallback (m_readCtrlCb);
+
+  // Attach the LLC layer to SatNetDevice
+  dev->SetLlc (llc);
+
+  // Attach the packet classifier
+  dev->SetPacketClassifier (classifier);
+
+  // Attach the device receive callback to SatNetDevice
+  llc->SetReceiveCallback (MakeCallback (&SatLorawanNetDevice::Receive, DynamicCast<SatLorawanNetDevice> (dev)));
+
+  // Attach the transmit callback to PHY
+  mac->SetTransmitCallback (MakeCallback (&SatPhy::SendPdu, phy));
+
+  // Attach the device receive callback to SatLlc
+  mac->SetReceiveCallback (MakeCallback (&SatLlc::Receive, llc));
+
+  // Attach the logon receive callback to SatNcc
+  mac->SetLogonCallback (MakeBoundCallback (&logonCallbackHelper, ncc, llsConf));
+
+  // Set the device address and pass it to MAC as well
+  Mac48Address addr = Mac48Address::Allocate ();
+  dev->SetAddress (addr);
+
+  Singleton<SatIdMapper>::Get ()->AttachMacToTraceId (dev->GetAddress ());
+  Singleton<SatIdMapper>::Get ()->AttachMacToGwId (dev->GetAddress (), gwId);
+  Singleton<SatIdMapper>::Get ()->AttachMacToBeamId (dev->GetAddress (), beamId);
+
+  // Create an encapsulator for control messages.
+  // Source = GW address
+  // Destination = broadcast address
+  // Flow id = by default 0
+  Ptr<SatQueue> queue = CreateObject<SatQueue> (SatEnums::CONTROL_FID);
+  Ptr<SatBaseEncapsulator> gwEncap = CreateObject<SatBaseEncapsulator> (addr, Mac48Address::GetBroadcast (), SatEnums::CONTROL_FID);
+  gwEncap->SetQueue (queue);
+  llc->AddEncap (addr, Mac48Address::GetBroadcast (), SatEnums::CONTROL_FID, gwEncap);
+  llc->SetCtrlMsgCallback (MakeCallback (&SatLorawanNetDevice::SendControlMsg, DynamicCast<SatLorawanNetDevice> (dev)));
+
+  phy->Initialize ();
+
+  // Create a node info to all the protocol layers
+  Ptr<SatNodeInfo> nodeInfo = Create <SatNodeInfo> (SatEnums::NT_GW, n->GetId (), addr);
+  dev->SetNodeInfo (nodeInfo);
+  llc->SetNodeInfo (nodeInfo);
+  mac->SetNodeInfo (nodeInfo);
+  phy->SetNodeInfo (nodeInfo);
+
+  // Begin frame end scheduling for processes utilizing frame length as interval
+  // Node info needs to be set before the start in order to get the scheduling context correctly set
+  phy->BeginEndScheduling ();
+
+  // TODO: When multiple carriers are supported. Multiple scheduler are needed too.
+  double carrierBandwidth = m_carrierBandwidthConverter (SatEnums::FORWARD_FEEDER_CH, 0, SatEnums::EFFECTIVE_BANDWIDTH);
+
+  Ptr<SatFwdLinkScheduler> fwdLinkScheduler;
+  switch (m_fwdSchedulingAlgorithm)
+    {
+    case SatEnums::NO_TIME_SLICING:
+      fwdLinkScheduler = CreateObject<SatFwdLinkSchedulerDefault> (m_bbFrameConf, addr, carrierBandwidth);
+      break;
+    case SatEnums::TIME_SLICING:
+      fwdLinkScheduler = CreateObject<SatFwdLinkSchedulerTimeSlicing> (m_bbFrameConf, addr, carrierBandwidth);
+      break;
+    default:
+      NS_FATAL_ERROR ("Forward scheduling algorithm is not implemented");
+    }
+
+  fwdLinkScheduler->SetSendControlMsgCallback (MakeCallback (&SatLorawanNetDevice::SendControlMsg, DynamicCast<SatLorawanNetDevice> (dev)));
 
   // Attach the LLC Tx opportunity and scheduling context getter callbacks to SatFwdLinkScheduler
   fwdLinkScheduler->SetTxOpportunityCallback (MakeCallback (&SatGwLlc::NotifyTxOpportunity, llc));

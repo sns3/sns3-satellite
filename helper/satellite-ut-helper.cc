@@ -220,12 +220,11 @@ SatUtHelper::SetPhyAttribute (std::string n1, const AttributeValue &v1)
 }
 
 NetDeviceContainer
-SatUtHelper::Install (NodeContainer c, uint32_t beamId,
-                      Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
-                      Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
-                      SatPhy::ChannelPairGetterCallback cbChannel,
-                      SatUtMac::RoutingUpdateCallback cbRouting,
-                      SatEnums::Standard_t standard)
+SatUtHelper::InstallDvb (NodeContainer c, uint32_t beamId,
+                         Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
+                         Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
+                         SatPhy::ChannelPairGetterCallback cbChannel,
+                         SatUtMac::RoutingUpdateCallback cbRouting)
 {
   NS_LOG_FUNCTION (this << beamId << fCh << rCh );
 
@@ -233,41 +232,26 @@ SatUtHelper::Install (NodeContainer c, uint32_t beamId,
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
     {
-      devs.Add (Install (*i, beamId, fCh, rCh, gwNd, ncc, cbChannel, cbRouting, standard));
+      devs.Add (InstallDvb (*i, beamId, fCh, rCh, gwNd, ncc, cbChannel, cbRouting));
     }
 
   return devs;
 }
 
 Ptr<NetDevice>
-SatUtHelper::Install (Ptr<Node> n, uint32_t beamId,
-                      Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
-                      Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
-                      SatPhy::ChannelPairGetterCallback cbChannel,
-                      SatUtMac::RoutingUpdateCallback cbRouting,
-                      SatEnums::Standard_t standard)
+SatUtHelper::InstallDvb (Ptr<Node> n, uint32_t beamId,
+                         Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
+                         Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
+                         SatPhy::ChannelPairGetterCallback cbChannel,
+                         SatUtMac::RoutingUpdateCallback cbRouting)
 {
   NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
 
   NetDeviceContainer container;
 
   // Create SatNetDevice
-  Ptr<SatNetDevice> dev;
-  switch (standard)
-    {
-      case SatEnums::DVB:
-        std::cout << "DVB UT" << std::endl;
-        m_deviceFactory.SetTypeId ("ns3::SatNetDevice");
-        dev = m_deviceFactory.Create<SatNetDevice> ();
-        break;
-      case SatEnums::LORA:
-        std::cout << "LORA UT" << std::endl;
-        m_deviceFactory.SetTypeId ("ns3::SatLorawanNetDevice");
-        dev = m_deviceFactory.Create<SatLorawanNetDevice> ();
-        break;
-      default:
-        NS_FATAL_ERROR ("Incorrect standard chosen");
-    }
+  m_deviceFactory.SetTypeId ("ns3::SatNetDevice");
+  Ptr<SatNetDevice> dev = m_deviceFactory.Create<SatNetDevice> ();
 
   // Attach the SatNetDevice to node
   n->AddDevice (dev);
@@ -353,6 +337,289 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId,
   // Create a request manager and attach it to LLC, and set control message callback to RM
   Ptr<SatRequestManager> rm = CreateObject<SatRequestManager> ();
   llc->SetRequestManager (rm);
+  rm->SetCtrlMsgCallback (MakeCallback (&SatNetDevice::SendControlMsg, dev));
+
+  // Set the callback to check whether control msg transmissions are possible
+  rm->SetCtrlMsgTxPossibleCallback (MakeCallback (&SatUtMac::ControlMsgTransmissionPossible, mac));
+
+  // Set the callback to check whether logon msg transmissions are possible
+  rm->SetLogonMsgTxPossibleCallback (MakeCallback (&SatUtMac::LogonMsgTransmissionPossible, mac));
+
+  // Set TBTP callback to UT MAC
+  mac->SetAssignedDaResourcesCallback (MakeCallback (&SatRequestManager::AssignedDaResources, rm));
+
+  // Set Send Logon callback to UT MAC
+  mac->SetSendLogonCallback (MakeCallback (&SatRequestManager::SendLogonMessage, rm));
+
+  // Attach the PHY layer to SatNetDevice
+  dev->SetPhy (phy);
+
+  // Attach the Mac layer to SatNetDevice
+  dev->SetMac (mac);
+
+  // Attach the LLC layer to SatNetDevice
+  dev->SetLlc (llc);
+
+  // Attach the packet classifier
+  dev->SetPacketClassifier (classifier);
+
+  // Attach the Mac layer C/N0 updates receiver to Phy
+  SatPhy::CnoCallback cnoCb = MakeCallback (&SatRequestManager::CnoUpdated, rm);
+  phy->SetAttribute ("CnoCb", CallbackValue (cnoCb));
+
+  // Set the device address and pass it to MAC as well
+  Mac48Address addr = Mac48Address::Allocate ();
+  dev->SetAddress (addr);
+
+  Singleton<SatIdMapper>::Get ()->AttachMacToTraceId (dev->GetAddress ());
+  Singleton<SatIdMapper>::Get ()->AttachMacToUtId (dev->GetAddress ());
+  Singleton<SatIdMapper>::Get ()->AttachMacToBeamId (dev->GetAddress (), beamId);
+
+  // Create encapsulator and add it to UT's LLC
+  Mac48Address gwAddr = Mac48Address::ConvertFrom (gwNd->GetAddress ());
+
+  // Create an encapsulator for control messages.
+  // Source = UT MAC address
+  // Destination = GW MAC address
+  // Flow id = by default 0
+  Ptr<SatBaseEncapsulator> utEncap = CreateObject<SatBaseEncapsulator> (addr, gwAddr, SatEnums::CONTROL_FID);
+
+  // Create queue event callbacks to MAC (for random access) and RM (for on-demand DAMA)
+  SatQueue::QueueEventCallback macCb;
+  if (m_raSettings.m_randomAccessModel == SatEnums::RA_MODEL_ESSA)
+    {
+      macCb = MakeCallback (&SatUtMac::ReceiveQueueEventEssa, mac);
+    }
+  else
+    {
+      macCb = MakeCallback (&SatUtMac::ReceiveQueueEvent, mac);
+    }
+  SatQueue::LogonCallback logonCb = MakeCallback (&SatUtMac::SendLogon, mac);
+  SatQueue::QueueEventCallback rmCb = MakeCallback (&SatRequestManager::ReceiveQueueEvent, rm);
+
+  // Create a queue
+  Ptr<SatQueue> queue = CreateObject<SatQueue> (SatEnums::CONTROL_FID);
+  queue->AddLogonCallback (logonCb);
+  queue->AddQueueEventCallback (macCb);
+  queue->AddQueueEventCallback (rmCb);
+  utEncap->SetQueue (queue);
+  llc->AddEncap (addr, gwAddr, SatEnums::CONTROL_FID, utEncap);
+  rm->AddQueueCallback (SatEnums::CONTROL_FID, MakeCallback (&SatQueue::GetQueueStatistics, queue));
+
+  // Add callbacks to LLC for future need. LLC creates encapsulators and
+  // decapsulators dynamically 'on-a-need-basis'.
+  llc->SetCtrlMsgCallback (MakeCallback (&SatNetDevice::SendControlMsg, dev));
+  llc->SetMacQueueEventCallback (macCb);
+
+  // set serving GW MAC address to RM
+  mac->SetRoutingUpdateCallback (cbRouting);
+  mac->SetGatewayUpdateCallback (MakeCallback (&SatUtLlc::SetGwAddress, llc));
+  mac->SetGwAddress (gwAddr);
+
+  // Attach the transmit callback to PHY
+  mac->SetTransmitCallback (MakeCallback (&SatPhy::SendPdu, phy));
+
+  // Attach the PHY handover callback to SatMac
+  mac->SetHandoverCallback (MakeCallback (&SatUtPhy::PerformHandover, phy));
+
+  // Attach the LLC receive callback to SatMac
+  mac->SetReceiveCallback (MakeCallback (&SatLlc::Receive, llc));
+
+  llc->SetReceiveCallback (MakeCallback (&SatNetDevice::Receive, dev));
+
+  Ptr<SatSuperframeConf> superFrameConf = m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE);
+  bool enableLogon = superFrameConf->IsLogonEnabled ();
+  uint32_t logonChannelId = superFrameConf->GetLogonChannelIndex ();
+
+  // Add UT to NCC
+  if (enableLogon)
+    {
+      ncc->ReserveLogonChannel (logonChannelId);
+    }
+  else
+    {
+      ncc->AddUt (m_llsConf, dev->GetAddress (), beamId, MakeCallback (&SatUtMac::SetRaChannel, mac));
+    }
+
+  phy->Initialize ();
+
+  // Create UT scheduler for MAC and connect callbacks to LLC
+  Ptr<SatUtScheduler> utScheduler = CreateObject<SatUtScheduler> (m_llsConf);
+  utScheduler->SetTxOpportunityCallback (MakeCallback (&SatUtLlc::NotifyTxOpportunity, llc));
+  utScheduler->SetSchedContextCallback (MakeCallback (&SatLlc::GetSchedulingContexts, llc));
+  mac->SetAttribute ("Scheduler", PointerValue (utScheduler));
+
+  // Create a node info to all the protocol layers
+  Ptr<SatNodeInfo> nodeInfo = Create <SatNodeInfo> (SatEnums::NT_UT, n->GetId (), addr);
+  dev->SetNodeInfo (nodeInfo);
+  llc->SetNodeInfo (nodeInfo);
+  mac->SetNodeInfo (nodeInfo);
+  phy->SetNodeInfo (nodeInfo);
+
+  rm->Initialize (m_llsConf, m_superframeSeq->GetDuration (0));
+
+  if (m_raSettings.m_randomAccessModel != SatEnums::RA_MODEL_OFF)
+    {
+      Ptr<SatRandomAccessConf> randomAccessConf = CreateObject<SatRandomAccessConf> (m_llsConf, m_superframeSeq);
+
+      /// create RA module with defaults
+      Ptr<SatRandomAccess> randomAccess = CreateObject<SatRandomAccess> (randomAccessConf, m_raSettings.m_randomAccessModel);
+
+      /// attach callbacks
+      if (m_crdsaOnlyForControl)
+        {
+          randomAccess->SetAreBuffersEmptyCallback (MakeCallback (&SatLlc::ControlBuffersEmpty, llc));
+        }
+      else
+        {
+          randomAccess->SetAreBuffersEmptyCallback (MakeCallback (&SatLlc::BuffersEmpty, llc));
+        }
+
+      /// attach the RA module
+      mac->SetRandomAccess (randomAccess);
+      if (enableLogon)
+        {
+          mac->SetLogonChannel (logonChannelId);
+          mac->LogOff ();
+        }
+    }
+  else if (enableLogon)
+    {
+      NS_FATAL_ERROR ("Cannot simulate logon without a RA frame");
+    }
+
+  Ptr<SatUtHandoverModule> utHandoverModule = n->GetObject<SatUtHandoverModule> ();
+  if (utHandoverModule != NULL)
+    {
+      utHandoverModule->SetHandoverRequestCallback (MakeCallback (&SatRequestManager::SendHandoverRecommendation, rm));
+      mac->SetBeamCheckerCallback (MakeCallback (&SatUtHandoverModule::CheckForHandoverRecommendation, utHandoverModule));
+      mac->SetAskedBeamCallback (MakeCallback (&SatUtHandoverModule::GetAskedBeamId, utHandoverModule));
+      mac->SetBeamScheculerCallback (MakeCallback (&SatNcc::GetBeamScheduler, ncc));
+      mac->SetUpdateGwAddressCallback (MakeCallback (&SatRequestManager::SetGwAddress, rm));
+    }
+
+  return dev;
+}
+
+NetDeviceContainer
+SatUtHelper::InstallLora (NodeContainer c, uint32_t beamId,
+                          Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
+                          Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
+                          SatPhy::ChannelPairGetterCallback cbChannel,
+                          SatUtMac::RoutingUpdateCallback cbRouting)
+{
+  NS_LOG_FUNCTION (this << beamId << fCh << rCh );
+
+  NetDeviceContainer devs;
+
+  for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
+    {
+      devs.Add (InstallLora (*i, beamId, fCh, rCh, gwNd, ncc, cbChannel, cbRouting));
+    }
+
+  return devs;
+}
+
+Ptr<NetDevice>
+SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
+                          Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
+                          Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
+                          SatPhy::ChannelPairGetterCallback cbChannel,
+                          SatUtMac::RoutingUpdateCallback cbRouting)
+{
+  NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
+
+  NetDeviceContainer container;
+
+  // Create SatNetDevice
+  m_deviceFactory.SetTypeId ("ns3::SatLorawanNetDevice");
+  Ptr<SatLorawanNetDevice> dev = m_deviceFactory.Create<SatLorawanNetDevice> ();
+
+  // Attach the SatNetDevice to node
+  n->AddDevice (dev);
+
+  SatPhy::CreateParam_t params;
+  params.m_beamId = beamId;
+  params.m_device = dev;
+  params.m_txCh = rCh;
+  params.m_rxCh = fCh;
+
+  // Create a packet classifier
+  Ptr<SatPacketClassifier> classifier = Create<SatPacketClassifier> ();
+
+  /**
+   * Channel estimation errors
+   */
+  Ptr<SatChannelEstimationErrorContainer> cec;
+  // Not enabled, create only base class
+  if (!m_enableChannelEstimationError)
+    {
+      cec = Create<SatSimpleChannelEstimationErrorContainer> ();
+    }
+  // Create SatFwdLinkChannelEstimationErrorContainer
+  else
+    {
+      cec = Create<SatFwdLinkChannelEstimationErrorContainer> ();
+    }
+
+  SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters = SatPhyRxCarrierConf::RxCarrierCreateParams_s ();
+  parameters.m_errorModel = m_errorModel;
+  parameters.m_daConstantErrorRate = m_daConstantErrorRate;
+  parameters.m_daIfModel = m_daInterferenceModel;
+  parameters.m_raIfModel = m_raSettings.m_raInterferenceModel;
+  parameters.m_raIfEliminateModel = m_raSettings.m_raInterferenceEliminationModel;
+  parameters.m_bwConverter = m_carrierBandwidthConverter;
+  parameters.m_carrierCount = m_fwdLinkCarrierCount;
+  parameters.m_cec = cec;
+  parameters.m_raCollisionModel = m_raSettings.m_raCollisionModel;
+  parameters.m_randomAccessModel = m_raSettings.m_randomAccessModel;
+
+  Ptr<SatUtPhy> phy = CreateObject<SatUtPhy> (params,
+                                              m_linkResults,
+                                              parameters,
+                                              m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE));
+  phy->SetChannelPairGetterCallback (cbChannel);
+
+  // Set fading
+  phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());
+  phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
+
+  Ptr<SatUtMac> mac = CreateObject<SatUtMac> (m_superframeSeq, beamId, m_crdsaOnlyForControl);
+
+  // Set the control message container callbacks
+  mac->SetReadCtrlCallback (m_readCtrlCb);
+  mac->SetReserveCtrlCallback (m_reserveCtrlCb);
+  mac->SetSendCtrlCallback (m_sendCtrlCb);
+
+  // Set timing advance callback to mac (if not asynchronous access)
+  if (m_raSettings.m_randomAccessModel != SatEnums::RA_MODEL_ESSA)
+    {
+      Ptr<SatMobilityObserver> observer = n->GetObject<SatMobilityObserver> ();
+      NS_ASSERT (observer != NULL);
+
+      SatUtMac::TimingAdvanceCallback timingCb = MakeCallback (&SatMobilityObserver::GetTimingAdvance, observer);
+      mac->SetTimingAdvanceCallback (timingCb);
+    }
+
+  // Attach the Mac layer receiver to Phy
+  SatPhy::ReceiveCallback recCb = MakeCallback (&SatUtMac::Receive, mac);
+
+  phy->SetAttribute ("ReceiveCb", CallbackValue (recCb));
+  mac->SetTxCheckCallback (MakeCallback (&SatUtPhy::IsTxPossible, phy));
+
+  // Create callback to inform phy layer slices subscription
+  mac->SetSliceSubscriptionCallback (MakeCallback (&SatUtPhy::UpdateSliceSubscription, phy));
+
+  // Create Logical Link Control (LLC) layer
+  Ptr<SatUtLlc> llc = CreateObject<SatUtLlc> ();
+
+  // Set the control msg read callback to LLC due to ARQ ACKs
+  llc->SetReadCtrlCallback (m_readCtrlCb);
+
+  // Create a request manager and attach it to LLC, and set control message callback to RM
+  Ptr<SatRequestManager> rm = CreateObject<SatRequestManager> ();
+  llc->SetRequestManager (rm);
+  rm->SetCtrlMsgCallback (MakeCallback (&SatLorawanNetDevice::SendControlMsg, DynamicCast<SatLorawanNetDevice> (dev)));
 
   // Set the callback to check whether control msg transmissions are possible
   rm->SetCtrlMsgTxPossibleCallback (MakeCallback (&SatUtMac::ControlMsgTransmissionPossible, mac));
@@ -424,6 +691,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId,
   // Add callbacks to LLC for future need. LLC creates encapsulators and
   // decapsulators dynamically 'on-a-need-basis'.
   llc->SetMacQueueEventCallback (macCb);
+  llc->SetCtrlMsgCallback (MakeCallback (&SatLorawanNetDevice::SendControlMsg, DynamicCast<SatLorawanNetDevice> (dev)));
 
   // set serving GW MAC address to RM
   mac->SetRoutingUpdateCallback (cbRouting);
@@ -439,22 +707,7 @@ SatUtHelper::Install (Ptr<Node> n, uint32_t beamId,
   // Attach the LLC receive callback to SatMac
   mac->SetReceiveCallback (MakeCallback (&SatLlc::Receive, llc));
 
-  // Set NetDevice callbacks
-  switch (standard)
-    {
-      case SatEnums::DVB:
-        rm->SetCtrlMsgCallback (MakeCallback (&SatNetDevice::SendControlMsg, dev));
-        llc->SetCtrlMsgCallback (MakeCallback (&SatNetDevice::SendControlMsg, dev));
-        llc->SetReceiveCallback (MakeCallback (&SatNetDevice::Receive, dev));
-        break;
-      case SatEnums::LORA:
-        rm->SetCtrlMsgCallback (MakeCallback (&SatLorawanNetDevice::SendControlMsg, DynamicCast<SatLorawanNetDevice> (dev)));
-        llc->SetCtrlMsgCallback (MakeCallback (&SatLorawanNetDevice::SendControlMsg, DynamicCast<SatLorawanNetDevice> (dev)));
-        llc->SetReceiveCallback (MakeCallback (&SatLorawanNetDevice::Receive, DynamicCast<SatLorawanNetDevice> (dev)));
-        break;
-      default:
-        NS_FATAL_ERROR ("Incorrect standard chosen");
-    }
+  llc->SetReceiveCallback (MakeCallback (&SatLorawanNetDevice::Receive, DynamicCast<SatLorawanNetDevice> (dev)));
 
   Ptr<SatSuperframeConf> superFrameConf = m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE);
   bool enableLogon = superFrameConf->IsLogonEnabled ();

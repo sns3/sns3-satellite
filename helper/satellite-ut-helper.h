@@ -143,7 +143,6 @@ public:
    * \param rCh return channel
    * \param gwNd satellite netdevice of the GW
    * \param ncc NCC (Network Control Center)
-   * \param standard Choose between DVB and LORA
    * \return Container of installed net devices
    *
    * This method creates a ns3::SatChannel with the
@@ -153,12 +152,11 @@ public:
    * a queue for this ns3::NetDevice, and associate the resulting
    * ns3::NetDevice with the ns3::Node and ns3::SatChannel.
    */
-  NetDeviceContainer Install (NodeContainer c, uint32_t beamId,
-                              Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
-                              Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
-                              SatPhy::ChannelPairGetterCallback cbChannel,
-                              SatUtMac::RoutingUpdateCallback cbRouting,
-                              SatEnums::Standard_t standard);
+  NetDeviceContainer InstallDvb (NodeContainer c, uint32_t beamId,
+                                 Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
+                                 Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
+                                 SatPhy::ChannelPairGetterCallback cbChannel,
+                                 SatUtMac::RoutingUpdateCallback cbRouting);
   /**
    * \param n node
    * \param beamId  id of the beam
@@ -166,17 +164,53 @@ public:
    * \param rCh return channel
    * \param gwNd satellite netdevice of the GW
    * \param ncc NCC (Network Control Center)
-   * \param standard Choose between DVB and LORA
    * \return Net device installed to node
    *
    * Saves you from having to construct a temporary NodeContainer.
    */
-  Ptr<NetDevice> Install (Ptr<Node> n, uint32_t beamId,
-                          Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
-                          Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
-                          SatPhy::ChannelPairGetterCallback cbChannel,
-                          SatUtMac::RoutingUpdateCallback cbRouting,
-                          SatEnums::Standard_t standard);
+  Ptr<NetDevice> InstallDvb (Ptr<Node> n, uint32_t beamId,
+                             Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
+                             Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
+                             SatPhy::ChannelPairGetterCallback cbChannel,
+                             SatUtMac::RoutingUpdateCallback cbRouting);
+
+  /**
+   * \param c a set of nodes
+   * \param beamId  id of the beam
+   * \param fCh forward channel
+   * \param rCh return channel
+   * \param gwNd satellite netdevice of the GW
+   * \param ncc NCC (Network Control Center)
+   * \return Container of installed net devices
+   *
+   * This method creates a ns3::SatChannel with the
+   * attributes configured by SatUtHelper::SetChannelAttribute,
+   * then, for each node in the input container, we create a
+   * ns3::SatNetDevice with the requested attributes,
+   * a queue for this ns3::SatNetLorawanDevice, and associate the resulting
+   * ns3::SatNetLorawanDevice with the ns3::Node and ns3::SatChannel.
+   */
+  NetDeviceContainer InstallLora (NodeContainer c, uint32_t beamId,
+                                  Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
+                                  Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
+                                  SatPhy::ChannelPairGetterCallback cbChannel,
+                                  SatUtMac::RoutingUpdateCallback cbRouting);
+  /**
+   * \param n node
+   * \param beamId  id of the beam
+   * \param fCh forward channel
+   * \param rCh return channel
+   * \param gwNd satellite netdevice of the GW
+   * \param ncc NCC (Network Control Center)
+   * \return Net device installed to node
+   *
+   * Saves you from having to construct a temporary NodeContainer.
+   */
+  Ptr<NetDevice> InstallLora (Ptr<Node> n, uint32_t beamId,
+                              Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
+                              Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
+                              SatPhy::ChannelPairGetterCallback cbChannel,
+                              SatUtMac::RoutingUpdateCallback cbRouting);
 
   /**
    * Enables creation traces to be written in given file

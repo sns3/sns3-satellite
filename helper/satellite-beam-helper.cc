@@ -520,14 +520,31 @@ SatBeamHelper::Install (NodeContainer ut,
   //install GW
   PointerValue llsConf;
   m_utHelper->GetAttribute ("LowerLayerServiceConf", llsConf);
-  Ptr<NetDevice> gwNd = m_gwHelper->Install (gwNode,
-                                             gwId,
-                                             beamId,
-                                             feederLink.first,
-                                             feederLink.second,
-                                             m_ncc,
-                                             llsConf.Get<SatLowerLayerServiceConf> (),
-                                             m_standard);
+  Ptr<NetDevice> gwNd;
+  switch(m_standard)
+  {
+    case SatEnums::DVB:
+      gwNd = m_gwHelper->InstallDvb (gwNode,
+                                     gwId,
+                                     beamId,
+                                     feederLink.first,
+                                     feederLink.second,
+                                     m_ncc,
+                                     llsConf.Get<SatLowerLayerServiceConf> ());
+      break;
+    case SatEnums::LORA:
+      gwNd = m_gwHelper->InstallLora (gwNode,
+                                      gwId,
+                                      beamId,
+                                      feederLink.first,
+                                      feederLink.second,
+                                      m_ncc,
+                                      llsConf.Get<SatLowerLayerServiceConf> ());
+      break;
+    default:
+      NS_FATAL_ERROR ("Incorrect standard chosen");
+  }
+
 
   // calculate maximum size of the BB frame with the most robust MODCOD
   Ptr<SatBbFrameConf> bbFrameConf = m_gwHelper->GetBbFrameConf ();
@@ -561,15 +578,32 @@ SatBeamHelper::Install (NodeContainer ut,
     }
 
   // install UTs
-  NetDeviceContainer utNd = m_utHelper->Install (ut,
-                                                 beamId,
-                                                 userLink.first,
-                                                 userLink.second,
-                                                 DynamicCast<SatNetDevice> (gwNd),
-                                                 m_ncc,
-                                                 MakeCallback (&SatChannelPair::GetChannelPair, m_ulChannels),
-                                                 routingCallback,
-                                                 m_standard);
+  NetDeviceContainer utNd;
+  switch(m_standard)
+  {
+    case SatEnums::DVB:
+      utNd = m_utHelper->InstallDvb (ut,
+                                     beamId,
+                                     userLink.first,
+                                     userLink.second,
+                                     DynamicCast<SatNetDevice> (gwNd),
+                                     m_ncc,
+                                     MakeCallback (&SatChannelPair::GetChannelPair, m_ulChannels),
+                                     routingCallback);
+      break;
+    case SatEnums::LORA:
+      utNd = m_utHelper->InstallLora (ut,
+                                      beamId,
+                                      userLink.first,
+                                      userLink.second,
+                                      DynamicCast<SatNetDevice> (gwNd),
+                                      m_ncc,
+                                      MakeCallback (&SatChannelPair::GetChannelPair, m_ulChannels),
+                                      routingCallback);
+      break;
+    default:
+      NS_FATAL_ERROR ("Incorrect standard chosen");
+  }
 
   return std::make_pair (gwNd, utNd);
 }

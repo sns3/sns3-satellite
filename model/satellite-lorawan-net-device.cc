@@ -44,9 +44,7 @@ SatLorawanNetDevice::SatLorawanNetDevice ()
 void
 SatLorawanNetDevice::Receive (Ptr<const Packet> packet)
 {
-  NS_LOG_FUNCTION (this << packet);
-
-  std::cout << "Packet received" << std::endl;
+  // TODO edit
 
   NS_LOG_FUNCTION (this << packet);
   NS_LOG_INFO ("Receiving a packet: " << packet->GetUid ());
@@ -114,9 +112,36 @@ SatLorawanNetDevice::Receive (Ptr<const Packet> packet)
 bool
 SatLorawanNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
 {
+  // TODO edit
+
   NS_LOG_FUNCTION (this << packet << dest << protocolNumber);
 
-  // TODO
+  if (m_isStatisticsTagsEnabled)
+    {
+      // Add a SatAddressTag tag with this device's address as the source address.
+      packet->AddByteTag (SatAddressTag (m_nodeInfo->GetMacAddress ()));
+
+      // Add a SatDevTimeTag tag for packet delay computation at the receiver end.
+      packet->AddPacketTag (SatDevTimeTag (Simulator::Now ()));
+    }
+
+  // Add packet trace entry:
+  SatEnums::SatLinkDir_t ld =
+    (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
+
+  m_packetTrace (Simulator::Now (),
+                 SatEnums::PACKET_SENT,
+                 m_nodeInfo->GetNodeType (),
+                 m_nodeInfo->GetNodeId (),
+                 m_nodeInfo->GetMacAddress (),
+                 SatEnums::LL_ND,
+                 ld,
+                 SatUtils::GetPacketInfo (packet));
+
+  m_txTrace (packet);
+
+  uint8_t flowId = m_classifier->Classify (packet, dest, protocolNumber);
+  m_llc->Enque (packet, dest, flowId);
 
   return true;
 }
@@ -124,9 +149,36 @@ SatLorawanNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t pro
 bool
 SatLorawanNetDevice::SendFrom (Ptr<Packet> packet, const Address& source, const Address& dest, uint16_t protocolNumber)
 {
+  // TODO edit
+
   NS_LOG_FUNCTION (this << packet << source << dest << protocolNumber);
 
-  // TODO
+  if (m_isStatisticsTagsEnabled)
+    {
+      // Add a SatAddressTag tag with this device's address as the source address.
+      packet->AddByteTag (SatAddressTag (m_nodeInfo->GetMacAddress ()));
+
+      // Add a SatDevTimeTag tag for packet delay computation at the receiver end.
+      packet->AddPacketTag (SatDevTimeTag (Simulator::Now ()));
+    }
+
+  // Add packet trace entry:
+  SatEnums::SatLinkDir_t ld =
+    (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
+
+  m_packetTrace (Simulator::Now (),
+                 SatEnums::PACKET_SENT,
+                 m_nodeInfo->GetNodeType (),
+                 m_nodeInfo->GetNodeId (),
+                 m_nodeInfo->GetMacAddress (),
+                 SatEnums::LL_ND,
+                 ld,
+                 SatUtils::GetPacketInfo (packet));
+
+  m_txTrace (packet);
+
+  uint8_t flowId = m_classifier->Classify (packet, dest, protocolNumber);
+  m_llc->Enque (packet, dest, flowId);
 
   return true;
 }
@@ -134,9 +186,46 @@ SatLorawanNetDevice::SendFrom (Ptr<Packet> packet, const Address& source, const 
 bool
 SatLorawanNetDevice::SendControlMsg (Ptr<SatControlMessage> msg, const Address& dest)
 {
+  // TODO edit
+
   NS_LOG_FUNCTION (this << msg << dest);
 
-  // TODO
+  Ptr<Packet> packet = Create<Packet> (msg->GetSizeInBytes ());
+
+  if (m_isStatisticsTagsEnabled)
+    {
+      // Add a SatAddressTag tag with this device's address as the source address.
+      packet->AddByteTag (SatAddressTag (m_nodeInfo->GetMacAddress ()));
+
+      // Add a SatDevTimeTag tag for packet delay computation at the receiver end.
+      packet->AddPacketTag (SatDevTimeTag (Simulator::Now ()));
+    }
+
+  // Add packet trace entry:
+  SatEnums::SatLinkDir_t ld =
+    (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
+
+  m_packetTrace (Simulator::Now (),
+                 SatEnums::PACKET_SENT,
+                 m_nodeInfo->GetNodeType (),
+                 m_nodeInfo->GetNodeId (),
+                 m_nodeInfo->GetMacAddress (),
+                 SatEnums::LL_ND,
+                 ld,
+                 SatUtils::GetPacketInfo (packet));
+
+  // Add control tag to message and write msg to container in MAC
+  SatControlMsgTag tag;
+  uint32_t id = m_mac->ReserveIdAndStoreCtrlMsgToContainer (msg);
+  tag.SetMsgId (id);
+  tag.SetMsgType (msg->GetMsgType ());
+  packet->AddPacketTag (tag);
+
+  uint8_t flowId = m_classifier->Classify (msg->GetMsgType (), dest);
+
+  m_signallingTxTrace (packet, dest);
+
+  m_llc->Enque (packet, dest, flowId);
 
   return true;
 }
