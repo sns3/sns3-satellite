@@ -45,6 +45,7 @@
 #include "../model/satellite-channel-estimation-error-container.h"
 #include "../model/satellite-packet-classifier.h"
 #include "../model/satellite-lower-layer-service.h"
+#include "../model/gateway-lorawan-mac.h"
 #include "ns3/satellite-gw-helper.h"
 #include "ns3/singleton.h"
 #include "ns3/satellite-id-mapper.h"
@@ -521,19 +522,19 @@ SatGwHelper::InstallLora (Ptr<Node> n,
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());
   phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
 
-  Ptr<SatGwMac> mac = CreateObject<SatGwMac> (beamId);
+  Ptr<GatewayLorawanMac> mac = CreateObject<GatewayLorawanMac> (beamId);
 
   // Set the control message container callbacks
   mac->SetReadCtrlCallback (m_readCtrlCb);
   mac->SetReserveCtrlCallback (m_reserveCtrlCb);
   mac->SetSendCtrlCallback (m_sendCtrlCb);
 
-  mac->SetCrReceiveCallback (MakeCallback (&SatNcc::UtCrReceived, ncc));
+  //mac->SetCrReceiveCallback (MakeCallback (&SatNcc::UtCrReceived, ncc));
 
-  mac->SetHandoverCallback (MakeCallback (&SatNcc::MoveUtBetweenBeams, ncc));
+  //mac->SetHandoverCallback (MakeCallback (&SatNcc::MoveUtBetweenBeams, ncc));
 
   // Attach the Mac layer receiver to Phy
-  SatPhy::ReceiveCallback recCb = MakeCallback (&SatGwMac::Receive, mac);
+  SatPhy::ReceiveCallback recCb = MakeCallback (&LorawanMac::Receive, mac);
 
   // Attach the NCC C/N0 update to Phy
   SatPhy::CnoCallback cnoCb = MakeCallback (&SatNcc::UtCnoUpdated, ncc);
@@ -552,28 +553,29 @@ SatGwHelper::InstallLora (Ptr<Node> n,
   dev->SetMac (mac);
 
   // Create Logical Link Control (LLC) layer
-  Ptr<SatGwLlc> llc = CreateObject<SatGwLlc> ();
+  //Ptr<SatGwLlc> llc = CreateObject<SatGwLlc> ();
 
   // Set the control msg read callback to LLC due to ARQ ACKs
-  llc->SetReadCtrlCallback (m_readCtrlCb);
+  //llc->SetReadCtrlCallback (m_readCtrlCb);
 
   // Attach the LLC layer to SatNetDevice
-  dev->SetLlc (llc);
+  //dev->SetLlc (llc);
 
   // Attach the packet classifier
   dev->SetPacketClassifier (classifier);
 
   // Attach the device receive callback to SatNetDevice
-  llc->SetReceiveCallback (MakeCallback (&SatLorawanNetDevice::Receive, DynamicCast<SatLorawanNetDevice> (dev)));
+  //llc->SetReceiveCallback (MakeCallback (&SatLorawanNetDevice::Receive, DynamicCast<SatLorawanNetDevice> (dev)));
+  mac->SetLoraReceiveCallback (MakeCallback (&SatLorawanNetDevice::Receive, dev));
 
   // Attach the transmit callback to PHY
   mac->SetTransmitCallback (MakeCallback (&SatPhy::SendPdu, phy));
 
   // Attach the device receive callback to SatLlc
-  mac->SetReceiveCallback (MakeCallback (&SatLlc::Receive, llc));
+  //mac->SetReceiveCallback (MakeCallback (&SatLlc::Receive, llc));
 
   // Attach the logon receive callback to SatNcc
-  mac->SetLogonCallback (MakeBoundCallback (&logonCallbackHelper, ncc, llsConf));
+  //mac->SetLogonCallback (MakeBoundCallback (&logonCallbackHelper, ncc, llsConf));
 
   // Set the device address and pass it to MAC as well
   Mac48Address addr = Mac48Address::Allocate ();
@@ -590,15 +592,15 @@ SatGwHelper::InstallLora (Ptr<Node> n,
   Ptr<SatQueue> queue = CreateObject<SatQueue> (SatEnums::CONTROL_FID);
   Ptr<SatBaseEncapsulator> gwEncap = CreateObject<SatBaseEncapsulator> (addr, Mac48Address::GetBroadcast (), SatEnums::CONTROL_FID);
   gwEncap->SetQueue (queue);
-  llc->AddEncap (addr, Mac48Address::GetBroadcast (), SatEnums::CONTROL_FID, gwEncap);
-  llc->SetCtrlMsgCallback (MakeCallback (&SatLorawanNetDevice::SendControlMsg, DynamicCast<SatLorawanNetDevice> (dev)));
+  //llc->AddEncap (addr, Mac48Address::GetBroadcast (), SatEnums::CONTROL_FID, gwEncap);
+  //llc->SetCtrlMsgCallback (MakeCallback (&SatLorawanNetDevice::SendControlMsg, DynamicCast<SatLorawanNetDevice> (dev)));
 
   phy->Initialize ();
 
   // Create a node info to all the protocol layers
   Ptr<SatNodeInfo> nodeInfo = Create <SatNodeInfo> (SatEnums::NT_GW, n->GetId (), addr);
   dev->SetNodeInfo (nodeInfo);
-  llc->SetNodeInfo (nodeInfo);
+  //llc->SetNodeInfo (nodeInfo);
   mac->SetNodeInfo (nodeInfo);
   phy->SetNodeInfo (nodeInfo);
 
@@ -625,13 +627,13 @@ SatGwHelper::InstallLora (Ptr<Node> n,
   fwdLinkScheduler->SetSendControlMsgCallback (MakeCallback (&SatLorawanNetDevice::SendControlMsg, DynamicCast<SatLorawanNetDevice> (dev)));
 
   // Attach the LLC Tx opportunity and scheduling context getter callbacks to SatFwdLinkScheduler
-  fwdLinkScheduler->SetTxOpportunityCallback (MakeCallback (&SatGwLlc::NotifyTxOpportunity, llc));
-  fwdLinkScheduler->SetSchedContextCallback (MakeCallback (&SatLlc::GetSchedulingContexts, llc));
+  //fwdLinkScheduler->SetTxOpportunityCallback (MakeCallback (&SatGwLlc::NotifyTxOpportunity, llc));
+  //fwdLinkScheduler->SetSchedContextCallback (MakeCallback (&SatLlc::GetSchedulingContexts, llc));
 
   // set scheduler to Mac
-  mac->SetAttribute ("Scheduler", PointerValue (fwdLinkScheduler));
+  //mac->SetAttribute ("Scheduler", PointerValue (fwdLinkScheduler));
 
-  mac->StartPeriodicTransmissions ();
+  //mac->StartPeriodicTransmissions ();
 
   return dev;
 }

@@ -32,7 +32,6 @@
 #include "ns3/traced-value.h"
 
 namespace ns3 {
-namespace lorawan {
 
 /**
  * Class representing the MAC layer of a LoRaWAN device.
@@ -93,6 +92,7 @@ public:
    * \param packet the received packet.
    */
   virtual void Receive (Ptr<Packet const> packet);
+  virtual void Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/);
 
   virtual void FailedReception (Ptr<Packet const> packet);
 
@@ -503,5 +503,4 @@ private:
 
 } /* namespace ns3 */
 
-}
 #endif /* END_DEVICE_LORAWAN_MAC_H */

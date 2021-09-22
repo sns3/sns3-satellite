@@ -26,7 +26,6 @@
 #include "ns3/buffer.h"
 
 namespace ns3 {
-namespace lorawan {
 
 /**
  * Enum for every possible command type
@@ -609,7 +608,7 @@ public:
 
 private:
 };
-}
 
 }
+
 #endif /* DEVICE_STATUS_H */

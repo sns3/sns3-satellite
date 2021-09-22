@@ -25,14 +25,18 @@
 #include "ns3/lora-tag.h"
 
 namespace ns3 {
-namespace lorawan {
 
 class GatewayLorawanMac : public LorawanMac
 {
 public:
   static TypeId GetTypeId (void);
+  /**
+   * Derived from Object
+   */
+  virtual TypeId GetInstanceTypeId (void) const;
 
   GatewayLorawanMac ();
+  GatewayLorawanMac (uint32_t beamId);
   virtual ~GatewayLorawanMac ();
 
   // Implementation of the LorawanMac interface
@@ -42,7 +46,8 @@ public:
   bool IsTransmitting (void);
 
   // Implementation of the LorawanMac interface
-  virtual void Receive (Ptr<Packet const> packet);
+  //virtual void Receive (Ptr<Packet const> packet);
+  virtual void Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/);
 
   // Implementation of the LorawanMac interface
   virtual void FailedReception (Ptr<Packet const> packet);
@@ -62,5 +67,4 @@ protected:
 
 } /* namespace ns3 */
 
-}
 #endif /* GATEWAY_LORAWAN_MAC_H */

@@ -34,6 +34,7 @@
 #include <ns3/satellite-address-tag.h>
 #include <ns3/satellite-time-tag.h>
 #include <ns3/satellite-node-info.h>
+#include <ns3/lorawan-mac.h>
 
 namespace ns3 {
 

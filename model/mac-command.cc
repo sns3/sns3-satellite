@@ -24,7 +24,6 @@
 #include <cmath>
 
 namespace ns3 {
-namespace lorawan {
 
 NS_LOG_COMPONENT_DEFINE ("MacCommand");
 
@@ -1221,5 +1220,4 @@ TxParamSetupAns::Print (std::ostream &os) const
   os << "TxParamSetupAns" << std::endl;
 }
 
-}
 }

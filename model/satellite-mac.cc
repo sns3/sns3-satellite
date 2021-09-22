@@ -313,6 +313,13 @@ SatMac::SetReceiveCallback (SatMac::ReceiveCallback cb)
 }
 
 void
+SatMac::SetLoraReceiveCallback (SatMac::LoraReceiveCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_rxLoraCallback = cb;
+}
+
+void
 SatMac::SetReadCtrlCallback (SatMac::ReadCtrlMsgCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);

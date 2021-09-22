@@ -29,7 +29,6 @@
 #include <algorithm>
 
 namespace ns3 {
-namespace lorawan {
 
 NS_LOG_COMPONENT_DEFINE ("ClassAEndDeviceLorawanMac");
 
@@ -147,6 +146,12 @@ ClassAEndDeviceLorawanMac::SendToPhy (Ptr<Packet> packetToSend)
 //////////////////////////
 //  Receiving methods   //
 //////////////////////////
+void
+ClassAEndDeviceLorawanMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/)
+{
+
+}
+
 void
 ClassAEndDeviceLorawanMac::Receive (Ptr<Packet const> packet)
 {
@@ -576,5 +581,4 @@ ClassAEndDeviceLorawanMac::OnRxClassParamSetupReq (Ptr<RxParamSetupReq> rxParamS
 
 }
 
-} /* namespace lorawan */
 } /* namespace ns3 */

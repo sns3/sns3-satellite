@@ -25,7 +25,6 @@
 #include "ns3/log.h"
 
 namespace ns3 {
-namespace lorawan {
 
 NS_LOG_COMPONENT_DEFINE ("GatewayLorawanMac");
 
@@ -37,11 +36,25 @@ GatewayLorawanMac::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::GatewayLorawanMac")
     .SetParent<LorawanMac> ()
     .AddConstructor<GatewayLorawanMac> ()
-    .SetGroupName ("lorawan");
+    ;
   return tid;
 }
 
+TypeId
+GatewayLorawanMac::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
+}
+
 GatewayLorawanMac::GatewayLorawanMac ()
+{
+  NS_FATAL_ERROR ("Default constructor not in use");
+}
+
+GatewayLorawanMac::GatewayLorawanMac (uint32_t beamId)
+  : LorawanMac (beamId)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -117,28 +130,33 @@ GatewayLorawanMac::IsTransmitting (void)
 }
 
 void
-GatewayLorawanMac::Receive (Ptr<Packet const> packet)
+GatewayLorawanMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/)
 {
-  NS_LOG_FUNCTION (this << packet);
+  NS_LOG_FUNCTION (this << packets);
 
-  // Make a copy of the packet to work on
-  Ptr<Packet> packetCopy = packet->Copy ();
-
-  // Only forward the packet if it's uplink
-  LorawanMacHeader macHdr;
-  packetCopy->PeekHeader (macHdr);
-
-  if (macHdr.IsUplink ())
+  Ptr<Packet> packet;
+  for (SatPhy::PacketContainer_t::iterator i = packets.begin (); i != packets.end (); i++ )
     {
-      m_device->GetObject<SatLorawanNetDevice> ()->Receive (packetCopy);
+      packet = *i;
+      // Make a copy of the packet to work on
+      Ptr<Packet> packetCopy = packet->Copy ();
 
-      NS_LOG_DEBUG ("Received packet: " << packet);
+      // Only forward the packet if it's uplink
+      LorawanMacHeader macHdr;
+      packetCopy->PeekHeader (macHdr);
 
-      m_receivedPacket (packet);
-    }
-  else
-    {
-      NS_LOG_DEBUG ("Not forwarding downlink message to NetDevice");
+      if (macHdr.IsUplink ())
+        {
+          m_device->GetObject<SatLorawanNetDevice> ()->Receive (packetCopy);
+
+          NS_LOG_DEBUG ("Received packet: " << packet);
+
+          m_receivedPacket (packet);
+        }
+      else
+        {
+          NS_LOG_DEBUG ("Not forwarding downlink message to NetDevice");
+        }
     }
 }
 
@@ -165,6 +183,5 @@ GatewayLorawanMac::GetWaitingTime (double frequency)
                                            (frequency));
                                            */
   return Seconds(0);
-}
 }
 }

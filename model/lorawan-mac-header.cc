@@ -23,7 +23,6 @@
 #include <bitset>
 
 namespace ns3 {
-namespace lorawan {
 
 NS_LOG_COMPONENT_DEFINE ("LorawanMacHeader");
 
@@ -158,6 +157,5 @@ LorawanMacHeader::IsConfirmed (void) const
 
   return (m_mtype == CONFIRMED_DATA_DOWN)
          || (m_mtype == CONFIRMED_DATA_UP);
-}
 }
 }

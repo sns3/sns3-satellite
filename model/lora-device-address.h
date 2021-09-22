@@ -25,7 +25,6 @@
 #include <string>
 
 namespace ns3 {
-namespace lorawan {
 
 /**
  * Class representing the NetworkId component of a LoraDeviceAddress (7 bits).
@@ -215,5 +214,5 @@ private:
 std::ostream& operator<< (std::ostream& os, const LoraDeviceAddress &address);
 
 }
-}
+
 #endif

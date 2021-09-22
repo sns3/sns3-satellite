@@ -23,7 +23,6 @@
 #include <bitset>
 
 namespace ns3 {
-namespace lorawan {
 
 NS_LOG_COMPONENT_DEFINE ("LoraFrameHeader");
 
@@ -596,5 +595,4 @@ LoraFrameHeader::AddCommand (Ptr<MacCommand> macCommand)
   m_fOptsLen += macCommand->GetSerializedSize ();
 }
 
-}
 }

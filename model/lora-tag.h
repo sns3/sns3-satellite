@@ -24,7 +24,6 @@
 #include "ns3/tag.h"
 
 namespace ns3 {
-namespace lorawan {
 
 /**
  * Tag used to save various data about a packet, like its Spreading Factor and
@@ -132,5 +131,5 @@ private:
   double m_frequency; //!< The frequency of this packet
 };
 } // namespace ns3
-}
+
 #endif

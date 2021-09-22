@@ -22,7 +22,6 @@
 #include "ns3/log.h"
 
 namespace ns3 {
-namespace lorawan {
 
 NS_LOG_COMPONENT_DEFINE ("LorawanMac");
 
@@ -33,7 +32,6 @@ LorawanMac::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::LorawanMac")
     .SetParent<Object> ()
-    .SetGroupName ("lorawan")
     .AddTraceSource ("SentNewPacket",
                      "Trace source indicating a new packet "
                      "arrived at the MAC layer",
@@ -48,11 +46,26 @@ LorawanMac::GetTypeId (void)
                      "Trace source indicating a packet "
                      "could not be sent immediately because of duty cycle limitations",
                      MakeTraceSourceAccessor (&LorawanMac::m_cannotSendBecauseDutyCycle),
-                     "ns3::Packet::TracedCallback");
+                     "ns3::Packet::TracedCallback")
+    ;
   return tid;
 }
 
+TypeId
+LorawanMac::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
+}
+
 LorawanMac::LorawanMac ()
+{
+  NS_FATAL_ERROR ("Default constructor not in use");
+}
+
+LorawanMac::LorawanMac (uint32_t beamId)
+  : SatMac (beamId)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -173,6 +186,5 @@ void
 LorawanMac::SetReplyDataRateMatrix (ReplyDataRateMatrix replyDataRateMatrix)
 {
   m_replyDataRateMatrix = replyDataRateMatrix;
-}
 }
 }

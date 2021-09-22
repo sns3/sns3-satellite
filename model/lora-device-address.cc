@@ -23,7 +23,6 @@
 #include <bitset>
 
 namespace ns3 {
-namespace lorawan {
 
 NS_LOG_COMPONENT_DEFINE ("LoraDeviceAddress");
 
@@ -265,6 +264,5 @@ std::ostream& operator<< (std::ostream& os, const LoraDeviceAddress &address)
 {
   os << address.Print ();
   return os;
-}
 }
 }

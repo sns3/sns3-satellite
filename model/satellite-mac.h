@@ -107,11 +107,24 @@ public:
   typedef Callback<void, Ptr<Packet>, Mac48Address, Mac48Address> ReceiveCallback;
 
   /**
+   * \brief Callback to receive packet by upper layer.
+   * \param packet the packet received
+   */
+  typedef Callback<void, Ptr<const Packet>> LoraReceiveCallback;
+
+  /**
    * \brief Method to set receive callback.
    * \param cb callback to invoke whenever a packet has been received and must
    *        be forwarded to the higher layers.
    */
   void SetReceiveCallback (SatMac::ReceiveCallback cb);
+
+  /**
+   * \brief Method to set receive callback.
+   * \param cb callback to invoke whenever a packet has been received and must
+   *        be forwarded to the higher layers.
+   */
+  void SetLoraReceiveCallback (SatMac::LoraReceiveCallback cb);
 
   /**
    * \brief Callback to read control messages from container storing control messages.
@@ -232,6 +245,11 @@ protected:
    * The upper layer package receive callback.
    */
   SatMac::ReceiveCallback m_rxCallback;
+
+  /**
+   * The upper layer package receive callback.
+   */
+  SatMac::LoraReceiveCallback m_rxLoraCallback;
 
   /**
    * The read control message callback.

@@ -24,7 +24,6 @@
 #include "ns3/header.h"
 
 namespace ns3 {
-namespace lorawan {
 
 /**
  * This class represents the Mac header of a LoRaWAN packet.
@@ -134,5 +133,4 @@ private:
 };
 }
 
-}
 #endif

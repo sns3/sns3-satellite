@@ -26,7 +26,6 @@
 #include "ns3/mac-command.h"
 
 namespace ns3 {
-namespace lorawan {
 
 /**
  * This class represents the Frame header (FHDR) used in a LoraWAN network.
@@ -339,5 +338,4 @@ LoraFrameHeader::GetMacCommand ()
 }
 }
 
-}
 #endif

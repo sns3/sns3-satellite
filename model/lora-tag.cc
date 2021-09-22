@@ -23,7 +23,6 @@
 #include "ns3/uinteger.h"
 
 namespace ns3 {
-namespace lorawan {
 
 NS_OBJECT_ENSURE_REGISTERED (LoraTag);
 
@@ -152,5 +151,4 @@ LoraTag::SetDataRate (uint8_t dataRate)
   m_dataRate = dataRate;
 }
 
-}
 } // namespace ns3

@@ -28,7 +28,6 @@
 #include <array>
 
 namespace ns3 {
-namespace lorawan {
 
 // TODO move
 struct LoraTxParameters
@@ -53,8 +52,13 @@ class LorawanMac : public SatMac
 {
 public:
   static TypeId GetTypeId (void);
+  /**
+   * Derived from Object
+   */
+  virtual TypeId GetInstanceTypeId (void) const;
 
   LorawanMac ();
+  LorawanMac (uint32_t beamId);
   virtual ~LorawanMac ();
 
   typedef std::array<std::array<uint8_t, 6>, 8> ReplyDataRateMatrix;
@@ -83,9 +87,9 @@ public:
   /**
    * Receive a packet from the lower layer.
    *
-   * \param packet the received packet
+   * \param packets the received packets
    */
-  virtual void Receive (Ptr<Packet const> packet) = 0;
+  virtual void Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/) = 0;
 
   /**
    * Function called by lower layers to inform this layer that reception of a
@@ -271,5 +275,4 @@ protected:
 
 } /* namespace ns3 */
 
-}
 #endif /* LORAWAN_MAC_H */

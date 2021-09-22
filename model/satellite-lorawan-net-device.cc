@@ -140,8 +140,7 @@ SatLorawanNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t pro
 
   m_txTrace (packet);
 
-  uint8_t flowId = m_classifier->Classify (packet, dest, protocolNumber);
-  m_llc->Enque (packet, dest, flowId);
+  (DynamicCast<LorawanMac> (m_mac))->Send (packet);
 
   return true;
 }
