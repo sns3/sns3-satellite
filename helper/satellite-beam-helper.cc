@@ -526,7 +526,8 @@ SatBeamHelper::Install (NodeContainer ut,
                                              feederLink.first,
                                              feederLink.second,
                                              m_ncc,
-                                             llsConf.Get<SatLowerLayerServiceConf> ());
+                                             llsConf.Get<SatLowerLayerServiceConf> (),
+                                             m_standard);
 
   // calculate maximum size of the BB frame with the most robust MODCOD
   Ptr<SatBbFrameConf> bbFrameConf = m_gwHelper->GetBbFrameConf ();
@@ -567,7 +568,8 @@ SatBeamHelper::Install (NodeContainer ut,
                                                  DynamicCast<SatNetDevice> (gwNd),
                                                  m_ncc,
                                                  MakeCallback (&SatChannelPair::GetChannelPair, m_ulChannels),
-                                                 routingCallback);
+                                                 routingCallback,
+                                                 m_standard);
 
   return std::make_pair (gwNd, utNd);
 }

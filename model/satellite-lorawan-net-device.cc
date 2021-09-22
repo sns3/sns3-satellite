@@ -46,7 +46,69 @@ SatLorawanNetDevice::Receive (Ptr<const Packet> packet)
 {
   NS_LOG_FUNCTION (this << packet);
 
-  // TODO
+  std::cout << "Packet received" << std::endl;
+
+  NS_LOG_FUNCTION (this << packet);
+  NS_LOG_INFO ("Receiving a packet: " << packet->GetUid ());
+
+  // Add packet trace entry:
+  SatEnums::SatLinkDir_t ld =
+    (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_FORWARD : SatEnums::LD_RETURN;
+
+  m_packetTrace (Simulator::Now (),
+                 SatEnums::PACKET_RECV,
+                 m_nodeInfo->GetNodeType (),
+                 m_nodeInfo->GetNodeId (),
+                 m_nodeInfo->GetMacAddress (),
+                 SatEnums::LL_ND,
+                 ld,
+                 SatUtils::GetPacketInfo (packet));
+
+  /*
+   * Invoke the `Rx` and `RxDelay` trace sources. We look at the packet's tags
+   * for information, but cannot remove the tags because the packet is a const.
+   */
+  if (m_isStatisticsTagsEnabled)
+    {
+      Address addr; // invalid address.
+      bool isTaggedWithAddress = false;
+      ByteTagIterator it = packet->GetByteTagIterator ();
+
+      while (!isTaggedWithAddress && it.HasNext ())
+        {
+          ByteTagIterator::Item item = it.Next ();
+
+          if (item.GetTypeId () == SatAddressTag::GetTypeId ())
+            {
+              NS_LOG_DEBUG (this << " contains a SatAddressTag tag:"
+                                 << " start=" << item.GetStart ()
+                                 << " end=" << item.GetEnd ());
+              SatAddressTag addrTag;
+              item.GetTag (addrTag);
+              addr = addrTag.GetSourceAddress ();
+              isTaggedWithAddress = true; // this will exit the while loop.
+            }
+        }
+
+      m_rxTrace (packet, addr);
+
+      SatDevTimeTag timeTag;
+      if (packet->PeekPacketTag (timeTag))
+        {
+          NS_LOG_DEBUG (this << " contains a SatMacTimeTag tag");
+          Time delay = Simulator::Now () - timeTag.GetSenderTimestamp ();
+          m_rxDelayTrace (delay, addr);
+          if (m_lastDelay.IsZero() == false)
+            {
+              Time jitter = Abs (delay - m_lastDelay);
+              m_rxJitterTrace (jitter, addr);
+            }
+          m_lastDelay = delay;
+        }
+    }
+
+  // Pass the packet to the upper layer.
+  m_rxCallback (this, packet, Ipv4L3Protocol::PROT_NUMBER, Address ());
 }
 
 bool
@@ -77,6 +139,14 @@ SatLorawanNetDevice::SendControlMsg (Ptr<SatControlMessage> msg, const Address& 
   // TODO
 
   return true;
+}
+
+void
+SatLorawanNetDevice::DoDispose (void)
+{
+  NS_LOG_FUNCTION (this);
+
+  SatNetDevice::DoDispose ();
 }
 
 } // namespace ns3

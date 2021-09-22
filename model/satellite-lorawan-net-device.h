@@ -25,11 +25,14 @@
 
 #include <ns3/node.h>
 #include <ns3/error-model.h>
+#include <ns3/ipv4-l3-protocol.h>
 
 #include <ns3/satellite-phy.h>
 #include <ns3/satellite-mac.h>
 #include <ns3/satellite-llc.h>
 #include <ns3/satellite-control-message.h>
+#include <ns3/satellite-address-tag.h>
+#include <ns3/satellite-time-tag.h>
 #include <ns3/satellite-node-info.h>
 
 namespace ns3 {
@@ -63,6 +66,10 @@ public:
   bool SendControlMsg (Ptr<SatControlMessage> msg, const Address& dest);
 
 protected:
+  /**
+   * Dispose of this class instance
+   */
+  virtual void DoDispose (void);
 private:
 };
 

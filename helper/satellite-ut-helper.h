@@ -143,6 +143,7 @@ public:
    * \param rCh return channel
    * \param gwNd satellite netdevice of the GW
    * \param ncc NCC (Network Control Center)
+   * \param standard Choose between DVB and LORA
    * \return Container of installed net devices
    *
    * This method creates a ns3::SatChannel with the
@@ -156,7 +157,8 @@ public:
                               Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
                               Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
                               SatPhy::ChannelPairGetterCallback cbChannel,
-                              SatUtMac::RoutingUpdateCallback cbRouting);
+                              SatUtMac::RoutingUpdateCallback cbRouting,
+                              SatEnums::Standard_t standard);
   /**
    * \param n node
    * \param beamId  id of the beam
@@ -164,6 +166,7 @@ public:
    * \param rCh return channel
    * \param gwNd satellite netdevice of the GW
    * \param ncc NCC (Network Control Center)
+   * \param standard Choose between DVB and LORA
    * \return Net device installed to node
    *
    * Saves you from having to construct a temporary NodeContainer.
@@ -172,7 +175,8 @@ public:
                           Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
                           Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
                           SatPhy::ChannelPairGetterCallback cbChannel,
-                          SatUtMac::RoutingUpdateCallback cbRouting);
+                          SatUtMac::RoutingUpdateCallback cbRouting,
+                          SatEnums::Standard_t standard);
 
   /**
    * Enables creation traces to be written in given file

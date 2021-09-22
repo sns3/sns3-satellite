@@ -143,6 +143,7 @@ public:
    * \param fCh forward channel
    * \param rCh return channel
    * \param ncc NCC (Network Control Center)
+   * \param standard Choose between DVB and LORA
    *
    * This method creates a ns3::SatChannel with the
    * attributes configured by SatGwHelper::SetChannelAttribute,
@@ -151,7 +152,14 @@ public:
    * a queue for this ns3::SatNetDevice, and associate the resulting
    * ns3::SatNetDevice with the ns3::Node and ns3::SatChannel.
    */
-  NetDeviceContainer Install (NodeContainer c, uint32_t gwId, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc, Ptr<SatLowerLayerServiceConf> llsConf);
+  NetDeviceContainer Install (NodeContainer c,
+                              uint32_t gwId,
+                              uint32_t beamId,
+                              Ptr<SatChannel> fCh,
+                              Ptr<SatChannel> rCh,
+                              Ptr<SatNcc> ncc,
+                              Ptr<SatLowerLayerServiceConf> llsConf,
+                              SatEnums::Standard_t standard);
 
   /**
    * \param n node
@@ -160,10 +168,18 @@ public:
    * \param fCh forward channel
    * \param rCh return channel
    * \param ncc NCC (Network Control Center)
+   * \param standard Choose between DVB and LORA
    *
    * Saves you from having to construct a temporary NodeContainer.
    */
-  Ptr<NetDevice> Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc, Ptr<SatLowerLayerServiceConf> llsConf);
+  Ptr<NetDevice> Install (Ptr<Node> n,
+                          uint32_t gwId,
+                          uint32_t beamId,
+                          Ptr<SatChannel> fCh,
+                          Ptr<SatChannel> rCh,
+                          Ptr<SatNcc> ncc,
+                          Ptr<SatLowerLayerServiceConf> llsConf,
+                          SatEnums::Standard_t standard);
 
   /**
    * Enables creation traces to be written in given file

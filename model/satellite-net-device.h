@@ -175,7 +175,7 @@ protected:
    */
   virtual void DoDispose (void);
 
-private:
+protected:
   Ptr<SatPhy> m_phy;
   Ptr<SatMac> m_mac;
   Ptr<SatLlc> m_llc;

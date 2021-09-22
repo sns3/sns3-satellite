@@ -30,13 +30,13 @@
 using namespace ns3;
 
 /**
- * \file sat-essa-example.cc
+ * \file sat-lora-example.cc
  * \ingroup satellite
  *
  * \brief This file allows to create a E-SSA scenario
  */
 
-NS_LOG_COMPONENT_DEFINE ("sat-essa-example");
+NS_LOG_COMPONENT_DEFINE ("sat-lora-example");
 
 int
 main (int argc, char *argv[])
@@ -64,7 +64,7 @@ main (int argc, char *argv[])
   bool interferenceModePerPacket = true;
   bool displayTraces = true;
 
-  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("example-essa");
+  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("example-lora");
 
   // read command line parameters given by user
   CommandLine cmd;
@@ -168,16 +168,25 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::OnOffApplication::OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + onTime + "]"));
   Config::SetDefault ("ns3::OnOffApplication::OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + offTime + "]"));
 
+  Config::SetDefault ("ns3::CbrApplication::Interval", StringValue ("100ms"));
+  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (1500));
+
   simulationHelper->InstallTrafficModel (
     SimulationHelper::ONOFF,
     SimulationHelper::UDP,
     SimulationHelper::RTN_LINK,
     appStartTime, simLength);
 
+    simulationHelper->InstallTrafficModel (
+    SimulationHelper::CBR,
+    SimulationHelper::UDP,
+    SimulationHelper::FWD_LINK,
+    appStartTime, simLength);
+
   // Outputs
   simulationHelper->EnableProgressLogs ();
 
-  std::string outputPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory ("contrib/satellite/data/sims/example-essa");
+  std::string outputPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory ("contrib/satellite/data/sims/example-lora");
   Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (outputPath + "/output-attributes.xml"));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
@@ -227,6 +236,12 @@ main (int argc, char *argv[])
       s->AddGlobalRtnFeederLinkRxPower (SatStatsHelper::OUTPUT_SCATTER_FILE);
       s->AddGlobalRtnUserLinkRxPower (SatStatsHelper::OUTPUT_SCALAR_FILE);
       s->AddGlobalRtnUserLinkRxPower (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+
+      s->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
     }
 
   simulationHelper->RunSimulation ();

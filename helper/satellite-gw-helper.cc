@@ -227,7 +227,14 @@ SatGwHelper::SetPhyAttribute (std::string n1, const AttributeValue &v1)
 }
 
 NetDeviceContainer
-SatGwHelper::Install (NodeContainer c, uint32_t gwId, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc, Ptr<SatLowerLayerServiceConf> llsConf)
+SatGwHelper::Install (NodeContainer c,
+                      uint32_t gwId,
+                      uint32_t beamId,
+                      Ptr<SatChannel> fCh,
+                      Ptr<SatChannel> rCh,
+                      Ptr<SatNcc> ncc,
+                      Ptr<SatLowerLayerServiceConf> llsConf,
+                      SatEnums::Standard_t standard)
 {
   NS_LOG_FUNCTION (this << beamId << fCh << rCh );
 
@@ -235,20 +242,28 @@ SatGwHelper::Install (NodeContainer c, uint32_t gwId, uint32_t beamId, Ptr<SatCh
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
     {
-      devs.Add (Install (*i, gwId, beamId, fCh, rCh, ncc, llsConf));
+      devs.Add (Install (*i, gwId, beamId, fCh, rCh, ncc, llsConf, standard));
     }
 
   return devs;
 }
 
 Ptr<NetDevice>
-SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc, Ptr<SatLowerLayerServiceConf> llsConf)
+SatGwHelper::Install (Ptr<Node> n,
+                      uint32_t gwId,
+                      uint32_t beamId,
+                      Ptr<SatChannel> fCh,
+                      Ptr<SatChannel> rCh,
+                      Ptr<SatNcc> ncc,
+                      Ptr<SatLowerLayerServiceConf> llsConf,
+                      SatEnums::Standard_t standard)
 {
   NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
 
   NetDeviceContainer container;
 
   // Create SatNetDevice
+  std::cout << "DVB GW" << std::endl;
   Ptr<SatNetDevice> dev = m_deviceFactory.Create<SatNetDevice> ();
 
   // Attach the SatNetDevices to nodes
