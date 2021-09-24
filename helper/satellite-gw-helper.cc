@@ -525,9 +525,9 @@ SatGwHelper::InstallLora (Ptr<Node> n,
   Ptr<GatewayLorawanMac> mac = CreateObject<GatewayLorawanMac> (beamId);
 
   // Set the control message container callbacks
-  mac->SetReadCtrlCallback (m_readCtrlCb);
-  mac->SetReserveCtrlCallback (m_reserveCtrlCb);
-  mac->SetSendCtrlCallback (m_sendCtrlCb);
+  //mac->SetReadCtrlCallback (m_readCtrlCb);
+  //mac->SetReserveCtrlCallback (m_reserveCtrlCb);
+  //mac->SetSendCtrlCallback (m_sendCtrlCb);
 
   //mac->SetCrReceiveCallback (MakeCallback (&SatNcc::UtCrReceived, ncc));
 
@@ -566,10 +566,10 @@ SatGwHelper::InstallLora (Ptr<Node> n,
 
   // Attach the device receive callback to SatNetDevice
   //llc->SetReceiveCallback (MakeCallback (&SatLorawanNetDevice::Receive, DynamicCast<SatLorawanNetDevice> (dev)));
-  mac->SetLoraReceiveCallback (MakeCallback (&SatLorawanNetDevice::Receive, dev));
+  //mac->SetLoraReceiveCallback (MakeCallback (&SatLorawanNetDevice::Receive, dev));
 
   // Attach the transmit callback to PHY
-  mac->SetTransmitCallback (MakeCallback (&SatPhy::SendPdu, phy));
+  //mac->SetTransmitCallback (MakeCallback (&SatPhy::SendPdu, phy));
 
   // Attach the device receive callback to SatLlc
   //mac->SetReceiveCallback (MakeCallback (&SatLlc::Receive, llc));
@@ -601,7 +601,7 @@ SatGwHelper::InstallLora (Ptr<Node> n,
   Ptr<SatNodeInfo> nodeInfo = Create <SatNodeInfo> (SatEnums::NT_GW, n->GetId (), addr);
   dev->SetNodeInfo (nodeInfo);
   //llc->SetNodeInfo (nodeInfo);
-  mac->SetNodeInfo (nodeInfo);
+  //mac->SetNodeInfo (nodeInfo);
   phy->SetNodeInfo (nodeInfo);
 
   // Begin frame end scheduling for processes utilizing frame length as interval
@@ -609,9 +609,9 @@ SatGwHelper::InstallLora (Ptr<Node> n,
   phy->BeginEndScheduling ();
 
   // TODO: When multiple carriers are supported. Multiple scheduler are needed too.
-  double carrierBandwidth = m_carrierBandwidthConverter (SatEnums::FORWARD_FEEDER_CH, 0, SatEnums::EFFECTIVE_BANDWIDTH);
+  //double carrierBandwidth = m_carrierBandwidthConverter (SatEnums::FORWARD_FEEDER_CH, 0, SatEnums::EFFECTIVE_BANDWIDTH);
 
-  Ptr<SatFwdLinkScheduler> fwdLinkScheduler;
+  /*Ptr<SatFwdLinkScheduler> fwdLinkScheduler;
   switch (m_fwdSchedulingAlgorithm)
     {
     case SatEnums::NO_TIME_SLICING:
@@ -622,13 +622,13 @@ SatGwHelper::InstallLora (Ptr<Node> n,
       break;
     default:
       NS_FATAL_ERROR ("Forward scheduling algorithm is not implemented");
-    }
+    }*/
 
-  fwdLinkScheduler->SetSendControlMsgCallback (MakeCallback (&SatLorawanNetDevice::SendControlMsg, DynamicCast<SatLorawanNetDevice> (dev)));
+  //fwdLinkScheduler->SetSendControlMsgCallback (MakeCallback (&SatLorawanNetDevice::SendControlMsg, DynamicCast<SatLorawanNetDevice> (dev)));
 
   // Attach the LLC Tx opportunity and scheduling context getter callbacks to SatFwdLinkScheduler
-  //fwdLinkScheduler->SetTxOpportunityCallback (MakeCallback (&SatGwLlc::NotifyTxOpportunity, llc));
-  //fwdLinkScheduler->SetSchedContextCallback (MakeCallback (&SatLlc::GetSchedulingContexts, llc));
+  //fwdLinkScheduler->SetTxOpportunityCallback (MakeCallback (&SatGwLlc::NotifyTxOpportunity, dev));
+  //fwdLinkScheduler->SetSchedContextCallback (MakeCallback (&SatLlc::GetSchedulingContexts, dev));
 
   // set scheduler to Mac
   //mac->SetAttribute ("Scheduler", PointerValue (fwdLinkScheduler));

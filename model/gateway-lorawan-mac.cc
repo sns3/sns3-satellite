@@ -40,14 +40,6 @@ GatewayLorawanMac::GetTypeId (void)
   return tid;
 }
 
-TypeId
-GatewayLorawanMac::GetInstanceTypeId (void) const
-{
-  NS_LOG_FUNCTION (this);
-
-  return GetTypeId ();
-}
-
 GatewayLorawanMac::GatewayLorawanMac ()
 {
   NS_FATAL_ERROR ("Default constructor not in use");
@@ -69,7 +61,10 @@ GatewayLorawanMac::Send (Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this << packet);
 
+  std::cout << "GatewayLorawanMac::Send" << std::endl;
+
   // Get DataRate to send this packet with
+  // TODO who add it ????
   LoraTag tag;
   packet->RemovePacketTag (tag);
   uint8_t dataRate = tag.GetDataRate ();
@@ -119,6 +114,8 @@ GatewayLorawanMac::Send (Ptr<Packet> packet)
   // m_phy->Send (packet, params, frequency, sendingPower);
 
   m_sentNewPacket (packet);
+
+  std::cout << "GatewayLorawanMac::Sent" << std::endl;
 }
 
 bool

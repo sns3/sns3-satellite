@@ -52,10 +52,6 @@ class LorawanMac : public SatMac
 {
 public:
   static TypeId GetTypeId (void);
-  /**
-   * Derived from Object
-   */
-  virtual TypeId GetInstanceTypeId (void) const;
 
   LorawanMac ();
   LorawanMac (uint32_t beamId);
@@ -64,18 +60,19 @@ public:
   typedef std::array<std::array<uint8_t, 6>, 8> ReplyDataRateMatrix;
 
   /**
-   * Set the underlying PHY layer
-   *
-   * \param phy the phy layer
-   */
-  void SetPhy (Ptr<SatPhy> phy);
-
-  /**
    * Get the underlying PHY layer
    *
    * \return The PHY layer that this MAC is connected to.
    */
   Ptr<SatPhy> GetPhy (void);
+
+
+  /**
+   * Set the underlying PHY layer
+   *
+   * \param phy the phy layer
+   */
+  void SetPhy (Ptr<SatPhy> phy);
 
   /**
    * Send a packet.

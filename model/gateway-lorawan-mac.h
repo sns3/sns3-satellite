@@ -30,10 +30,6 @@ class GatewayLorawanMac : public LorawanMac
 {
 public:
   static TypeId GetTypeId (void);
-  /**
-   * Derived from Object
-   */
-  virtual TypeId GetInstanceTypeId (void) const;
 
   GatewayLorawanMac ();
   GatewayLorawanMac (uint32_t beamId);

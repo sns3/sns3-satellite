@@ -140,7 +140,7 @@ SatLorawanNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t pro
 
   m_txTrace (packet);
 
-  (DynamicCast<LorawanMac> (m_mac))->Send (packet);
+  DynamicCast<LorawanMac>(m_mac)->Send (packet);
 
   return true;
 }
@@ -189,7 +189,7 @@ SatLorawanNetDevice::SendControlMsg (Ptr<SatControlMessage> msg, const Address& 
 
   NS_LOG_FUNCTION (this << msg << dest);
 
-  Ptr<Packet> packet = Create<Packet> (msg->GetSizeInBytes ());
+  /*Ptr<Packet> packet = Create<Packet> (msg->GetSizeInBytes ());
 
   if (m_isStatisticsTagsEnabled)
     {
@@ -224,7 +224,7 @@ SatLorawanNetDevice::SendControlMsg (Ptr<SatControlMessage> msg, const Address& 
 
   m_signallingTxTrace (packet, dest);
 
-  m_llc->Enque (packet, dest, flowId);
+  m_llc->Enque (packet, dest, flowId);*/
 
   return true;
 }

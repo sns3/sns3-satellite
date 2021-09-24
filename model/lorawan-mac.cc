@@ -31,7 +31,7 @@ TypeId
 LorawanMac::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::LorawanMac")
-    .SetParent<Object> ()
+    .SetParent<SatMac> ()
     .AddTraceSource ("SentNewPacket",
                      "Trace source indicating a new packet "
                      "arrived at the MAC layer",
@@ -51,21 +51,13 @@ LorawanMac::GetTypeId (void)
   return tid;
 }
 
-TypeId
-LorawanMac::GetInstanceTypeId (void) const
-{
-  NS_LOG_FUNCTION (this);
-
-  return GetTypeId ();
-}
-
 LorawanMac::LorawanMac ()
 {
   NS_FATAL_ERROR ("Default constructor not in use");
 }
 
 LorawanMac::LorawanMac (uint32_t beamId)
-  : SatMac (beamId)
+ : SatMac (beamId)
 {
   NS_LOG_FUNCTION (this);
 }

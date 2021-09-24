@@ -469,7 +469,8 @@ SatNetDevice::SendControlMsg (Ptr<SatControlMessage> msg, const Address& dest)
 
   // Add control tag to message and write msg to container in MAC
   SatControlMsgTag tag;
-  uint32_t id = m_mac->ReserveIdAndStoreCtrlMsgToContainer (msg);
+  // TODO remove after removing call of SendControlMsg when not needed
+  /*uint32_t id = m_mac->ReserveIdAndStoreCtrlMsgToContainer (msg);
   tag.SetMsgId (id);
   tag.SetMsgType (msg->GetMsgType ());
   packet->AddPacketTag (tag);
@@ -478,7 +479,7 @@ SatNetDevice::SendControlMsg (Ptr<SatControlMessage> msg, const Address& dest)
 
   m_signallingTxTrace (packet, dest);
 
-  m_llc->Enque (packet, dest, flowId);
+  m_llc->Enque (packet, dest, flowId);*/
 
   return true;
 }

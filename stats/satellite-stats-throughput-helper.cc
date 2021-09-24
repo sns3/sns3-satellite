@@ -1147,9 +1147,6 @@ SatStatsRtnMacThroughputHelper::DoInstallProbes ()
           NS_ASSERT (satMac != 0);
 
           // Connect the object to the probe.
-          TypeId tid = satMac->GetInstanceTypeId ();
-          Ptr<const TraceSourceAccessor> accessor = tid.LookupTraceSourceByName ("Rx");
-          std::cout << "accessor  " << accessor << std::endl;
           if (satMac->TraceConnectWithoutContext ("Rx", callback))
             {
               NS_LOG_INFO (this << " successfully connected with node ID "
@@ -1166,7 +1163,6 @@ SatStatsRtnMacThroughputHelper::DoInstallProbes ()
                               << " at node ID " << (*it)->GetId ()
                               << " device #" << satDev->GetIfIndex ());
             }
-          NS_FATAL_ERROR ("END");
 
         } // end of `for (NetDeviceContainer::Iterator itDev = devs)`
 
