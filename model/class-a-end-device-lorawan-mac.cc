@@ -44,12 +44,18 @@ static TypeId tid = TypeId ("ns3::ClassAEndDeviceLorawanMac")
 return tid;
 }
 
-ClassAEndDeviceLorawanMac::ClassAEndDeviceLorawanMac () :
-  // LoraWAN default
-  m_receiveDelay1 (Seconds (1)),
-  // LoraWAN default
-  m_receiveDelay2 (Seconds (2)),
-  m_rx1DrOffset (0)
+ClassAEndDeviceLorawanMac::ClassAEndDeviceLorawanMac ()
+{
+  NS_FATAL_ERROR ("Default constructor not in use");
+}
+
+ClassAEndDeviceLorawanMac::ClassAEndDeviceLorawanMac (uint32_t beamId)
+  : EndDeviceLorawanMac (beamId),
+    // LoraWAN default
+    m_receiveDelay1 (Seconds (1)),
+    // LoraWAN default
+    m_receiveDelay2 (Seconds (2)),
+    m_rx1DrOffset (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -149,7 +155,10 @@ ClassAEndDeviceLorawanMac::SendToPhy (Ptr<Packet> packetToSend)
 void
 ClassAEndDeviceLorawanMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/)
 {
-
+  for (SatPhy::PacketContainer_t::iterator i = packets.begin (); i != packets.end (); i++ )
+    {
+      Receive  (*i);
+    }
 }
 
 void
@@ -158,7 +167,7 @@ ClassAEndDeviceLorawanMac::Receive (Ptr<Packet const> packet)
   NS_LOG_FUNCTION (this << packet);
 
   // Work on a copy of the packet
-  Ptr<Packet> packetCopy = packet->Copy ();
+  /*Ptr<Packet> packetCopy = packet->Copy ();
 
   // Remove the Mac Header to get some information
   LorawanMacHeader mHdr;
@@ -247,7 +256,7 @@ ClassAEndDeviceLorawanMac::Receive (Ptr<Packet const> packet)
     }
 
   // TODO
-  // m_phy->GetObject<EndDeviceLoraPhy> ()->SwitchToSleep ();
+  // m_phy->GetObject<EndDeviceLoraPhy> ()->SwitchToSleep ();*/
 }
 
 void
@@ -259,7 +268,7 @@ ClassAEndDeviceLorawanMac::FailedReception (Ptr<Packet const> packet)
   // TODO
   // m_phy->GetObject<EndDeviceLoraPhy> ()->SwitchToSleep ();
 
-  if (m_secondReceiveWindow.IsExpired () && m_retxParams.waitingAck)
+  /*if (m_secondReceiveWindow.IsExpired () && m_retxParams.waitingAck)
     {
       if (m_retxParams.retxLeft > 0)
         {
@@ -275,7 +284,7 @@ ClassAEndDeviceLorawanMac::FailedReception (Ptr<Packet const> packet)
           // Reset retransmission parameters
           resetRetransmissionParameters ();
         }
-    }
+    }*/
 }
 
 void
@@ -284,13 +293,13 @@ ClassAEndDeviceLorawanMac::TxFinished (Ptr<const Packet> packet)
   NS_LOG_FUNCTION_NOARGS ();
 
   // Schedule the opening of the first receive window
-  Simulator::Schedule (m_receiveDelay1,
+  /*Simulator::Schedule (m_receiveDelay1,
                        &ClassAEndDeviceLorawanMac::OpenFirstReceiveWindow, this);
 
   // Schedule the opening of the second receive window
   m_secondReceiveWindow = Simulator::Schedule (m_receiveDelay2,
                                                &ClassAEndDeviceLorawanMac::OpenSecondReceiveWindow,
-                                               this);
+                                               this);*/
   // // Schedule the opening of the first receive window
   // Simulator::Schedule (m_receiveDelay1,
   //                      &ClassAEndDeviceLorawanMac::OpenFirstReceiveWindow, this);

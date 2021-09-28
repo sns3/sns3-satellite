@@ -42,6 +42,7 @@ public:
   static TypeId GetTypeId (void);
 
   ClassAEndDeviceLorawanMac ();
+  ClassAEndDeviceLorawanMac (uint32_t beamId);
   virtual ~ClassAEndDeviceLorawanMac ();
 
   /////////////////////

@@ -172,16 +172,16 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (1500));
 
   simulationHelper->InstallTrafficModel (
-    SimulationHelper::ONOFF,
+    SimulationHelper::CBR,
     SimulationHelper::UDP,
     SimulationHelper::RTN_LINK,
     appStartTime, simLength);
 
-    simulationHelper->InstallTrafficModel (
+  /*simulationHelper->InstallTrafficModel (
     SimulationHelper::CBR,
     SimulationHelper::UDP,
     SimulationHelper::FWD_LINK,
-    appStartTime, simLength);
+    appStartTime, simLength);*/
 
   // Outputs
   simulationHelper->EnableProgressLogs ();

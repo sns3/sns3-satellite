@@ -108,7 +108,13 @@ EndDeviceLorawanMac::GetTypeId (void)
 }
 
 EndDeviceLorawanMac::EndDeviceLorawanMac ()
-    : m_enableDRAdapt (false),
+{
+  NS_FATAL_ERROR ("Default constructor not in use");
+}
+
+EndDeviceLorawanMac::EndDeviceLorawanMac (uint32_t beamId)
+    : LorawanMac (beamId),
+      m_enableDRAdapt (false),
       m_maxNumbTx (8),
       m_dataRate (0),
       m_txPower (14),

@@ -520,7 +520,10 @@ SatNetDevice::DoDispose (void)
   m_mac = 0;
   m_node = 0;
   m_receiveErrorModel = 0;
-  m_llc->Dispose ();
+  if (m_llc != 0)
+    {
+      m_llc->Dispose ();
+    }
   m_llc = 0;
   m_classifier = 0;
 
