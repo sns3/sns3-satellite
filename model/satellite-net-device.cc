@@ -395,7 +395,11 @@ SatNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNu
                  ld,
                  SatUtils::GetPacketInfo (packet));
 
+  std::cout << "m_nodeInfo->GetNodeType () " << m_nodeInfo->GetNodeType () << std::endl;
+  std::cout << "node: " << GetNode () << std::endl;
+
   m_txTrace (packet);
+  NS_FATAL_ERROR ("STOP !");
 
   uint8_t flowId = m_classifier->Classify (packet, dest, protocolNumber);
   m_llc->Enque (packet, dest, flowId);

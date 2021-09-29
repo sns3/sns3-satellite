@@ -298,19 +298,6 @@ public:
   void SetGatewayUpdateCallback (SatUtMac::GatewayUpdateCallback cb);
 
   /**
-   * \brief Callback to update routing and ARP tables after handover
-   * \param Address the address of this device
-   * \param Address the address of the new gateway
-   */
-  typedef Callback<void, Address, Address> RoutingUpdateCallback;
-
-  /**
-   * \brief Method to set the routing update callback
-   * \param cb callback to invoke to update routing
-   */
-  void SetRoutingUpdateCallback (SatUtMac::RoutingUpdateCallback cb);
-
-  /**
    * \brief Callback to check whether the current beam is still the best one
    * to use for sending data; and sending handover recommendation if not
    * \param uint32_t the current beam ID
@@ -711,11 +698,6 @@ private:
    * Gateway address update callback
    */
   SatUtMac::GatewayUpdateCallback m_gatewayUpdateCallback;
-
-  /**
-   * Callback to update routing and ARP tables after a beam handover
-   */
-  SatUtMac::RoutingUpdateCallback m_routingUpdateCallback;
 
   /**
    * Beam checker and handover recommendation sending callback

@@ -125,7 +125,6 @@ SatUtMac::SatUtMac ()
   m_firstTransmittableSuperframeId (0),
   m_handoverCallback (0),
   m_gatewayUpdateCallback (0),
-  m_routingUpdateCallback (0),
   m_beamCheckerCallback (0),
   m_askedBeamCallback (0),
   m_txCheckCallback (0),
@@ -165,7 +164,6 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, bool crdsaOnlyFo
   m_firstTransmittableSuperframeId (0),
   m_handoverCallback (0),
   m_gatewayUpdateCallback (0),
-  m_routingUpdateCallback (0),
   m_beamCheckerCallback (0),
   m_askedBeamCallback (0),
   m_txCheckCallback (0),
@@ -197,7 +195,6 @@ SatUtMac::DoDispose (void)
   m_timingAdvanceCb.Nullify ();
   m_handoverCallback.Nullify ();
   m_gatewayUpdateCallback.Nullify ();
-  m_routingUpdateCallback.Nullify ();
   m_beamCheckerCallback.Nullify ();
   m_askedBeamCallback.Nullify ();
   m_txCheckCallback.Nullify ();
@@ -224,13 +221,6 @@ SatUtMac::SetGatewayUpdateCallback (SatUtMac::GatewayUpdateCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);
   m_gatewayUpdateCallback = cb;
-}
-
-void
-SatUtMac::SetRoutingUpdateCallback (SatUtMac::RoutingUpdateCallback cb)
-{
-  NS_LOG_FUNCTION (this << &cb);
-  m_routingUpdateCallback = cb;
 }
 
 void

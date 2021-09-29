@@ -630,6 +630,7 @@ SatUserHelper::PopulateBeamRoutings (NodeContainer ut, NetDeviceContainer utNd,
 void
 SatUserHelper::UpdateUtRoutes (Address utAddress, Address gwAddress)
 {
+  std::cout << "    SatUserHelper::UpdateUtRoutes" << std::endl;
   NS_LOG_FUNCTION (this << utAddress << gwAddress);
 
   std::map<Address, Ptr<NetDevice> >::iterator gwNdIterator = m_gwDevices.find (gwAddress);

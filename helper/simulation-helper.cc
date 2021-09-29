@@ -41,6 +41,7 @@
 #include <ns3/satellite-on-off-helper.h>
 #include <ns3/nrtv-helper.h>
 #include <ns3/three-gpp-http-satellite-helper.h>
+#include <ns3/periodic-sender-helper.h>
 
 #include <ns3/random-variable-stream.h>
 
@@ -1501,6 +1502,41 @@ SimulationHelper::InstallTrafficModel (TrafficModel_t trafficModel,
     default:
       NS_FATAL_ERROR ("Invalid traffic model");
       break;
+    }
+}
+
+void
+SimulationHelper::InstallLoraTrafficModel (LoraTrafficModel_t trafficModel,
+                                           Time interval, // TODO attribute ?
+                                           uint32_t packetSize, // TODO attribute ?
+                                           Time startTime,
+                                           Time stopTime)
+{
+  NS_LOG_FUNCTION (this << trafficModel << interval << packetSize << startTime << stopTime);
+
+  // get users
+  NodeContainer utUsers = m_satHelper->GetUtUsers ();
+  NodeContainer gwUsers = m_satHelper->GetGwUsers ();
+  NS_ASSERT_MSG (m_gwUserId < gwUsers.GetN (), "The number of GW users configured was too low.");
+
+  std::cout << "Installing Lora traffic model on " << utUsers.GetN () << " UT users" << std::endl;
+
+  switch (trafficModel)
+    {
+    case SimulationHelper::PERIODIC:
+      {
+        PeriodicSenderHelper appHelper = PeriodicSenderHelper ();
+        appHelper.SetPeriod (interval);
+        appHelper.SetPacketSize (packetSize);
+        ApplicationContainer appContainer = appHelper.Install (utUsers);
+
+        appContainer.Start (startTime);
+        appContainer.Stop (stopTime);
+        break;
+      }
+      case SimulationHelper::ONE_SHOT:
+      default:
+        NS_FATAL_ERROR("Traffic Model for Lora not implemented yet");
     }
 }
 

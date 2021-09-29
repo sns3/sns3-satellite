@@ -66,12 +66,16 @@ public:
   virtual bool SendFrom (Ptr<Packet> packet, const Address& source, const Address& dest, uint16_t protocolNumber);
   bool SendControlMsg (Ptr<SatControlMessage> msg, const Address& dest);
 
+  Ptr<LorawanMac> GetLorawanMac ();
+  void SetLorawanMac (Ptr<LorawanMac> lorawanMac);
+
 protected:
   /**
    * Dispose of this class instance
    */
   virtual void DoDispose (void);
 private:
+  Ptr<LorawanMac> m_lorawanMac;
 };
 
 } // namespace ns3

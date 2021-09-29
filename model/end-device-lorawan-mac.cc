@@ -39,7 +39,6 @@ EndDeviceLorawanMac::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::EndDeviceLorawanMac")
     .SetParent<LorawanMac> ()
-    .SetGroupName ("lorawan")
     .AddTraceSource ("RequiredTransmissions",
                      "Total number of transmissions required to deliver this packet",
                      MakeTraceSourceAccessor
@@ -125,6 +124,7 @@ EndDeviceLorawanMac::EndDeviceLorawanMac (uint32_t beamId)
       m_address (LoraDeviceAddress (0)),
       // LoraWAN default
       m_receiveWindowDurationInSymbols (8),
+      m_gatewayUpdateCallback (0),
       // LoraWAN default
       m_controlDataRate (false),
       m_lastKnownLinkMargin (0),
@@ -132,6 +132,7 @@ EndDeviceLorawanMac::EndDeviceLorawanMac (uint32_t beamId)
       m_aggregatedDutyCycle (1),
       m_mType (LorawanMacHeader::CONFIRMED_DATA_UP),
       m_currentFCnt (0)
+
 {
   NS_LOG_FUNCTION (this);
 
@@ -958,4 +959,21 @@ EndDeviceLorawanMac::GetTransmissionPower (void)
 {
   return m_txPower;
 }
+
+void
+EndDeviceLorawanMac::SetGatewayUpdateCallback (EndDeviceLorawanMac::GatewayUpdateCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_gatewayUpdateCallback = cb;
+}
+
+void
+EndDeviceLorawanMac::SetGwAddress (Mac48Address gwAddress)
+{
+  NS_LOG_FUNCTION (this << gwAddress);
+
+  //m_gatewayUpdateCallback (gwAddress);
+  m_gwAddress = gwAddress;
+}
+
 }

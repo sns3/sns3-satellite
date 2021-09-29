@@ -24,6 +24,7 @@
 #ifndef END_DEVICE_LORAWAN_MAC_H
 #define END_DEVICE_LORAWAN_MAC_H
 
+#include "ns3/satellite-ut-mac.h"
 #include "ns3/lorawan-mac.h"
 #include "ns3/lorawan-mac-header.h"
 #include "ns3/lora-frame-header.h"
@@ -336,6 +337,25 @@ public:
    */
   void AddMacCommand (Ptr<MacCommand> macCommand);
 
+  /**
+   * \brief Callback to update gateway address after handover
+   * \param Mac48Address the address of the new gateway
+   */
+  typedef Callback<void, Mac48Address> GatewayUpdateCallback;
+
+  /**
+   * \brief Method to set the gateway address update callback
+   * \param cb callback to invoke to update gateway address
+   */
+  void SetGatewayUpdateCallback (EndDeviceLorawanMac::GatewayUpdateCallback cb);
+
+  /**
+   * Set address of the GW (or its MAC) serving this UT.
+   *
+   * \param gwAddress Address of the GW.
+   */
+  void SetGwAddress (Mac48Address gwAddress);
+
 protected:
   /**
    * Structure representing the parameters that will be used in the
@@ -436,6 +456,13 @@ protected:
    * \see class CallBackTraceSource
    */
   TracedCallback<uint8_t, bool, Time, Ptr<Packet> > m_requiredTxCallback;
+
+  /**
+   * Gateway address update callback
+   */
+  EndDeviceLorawanMac::GatewayUpdateCallback m_gatewayUpdateCallback;
+
+  Mac48Address m_gwAddress;
 
 private:
   /**

@@ -46,8 +46,7 @@ LorawanMac::GetTypeId (void)
                      "Trace source indicating a packet "
                      "could not be sent immediately because of duty cycle limitations",
                      MakeTraceSourceAccessor (&LorawanMac::m_cannotSendBecauseDutyCycle),
-                     "ns3::Packet::TracedCallback")
-    ;
+                     "ns3::Packet::TracedCallback");
   return tid;
 }
 
@@ -57,7 +56,7 @@ LorawanMac::LorawanMac ()
 }
 
 LorawanMac::LorawanMac (uint32_t beamId)
- : SatMac (beamId)
+  : SatMac (beamId)
 {
   NS_LOG_FUNCTION (this);
 }

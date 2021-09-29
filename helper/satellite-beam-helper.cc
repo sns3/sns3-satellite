@@ -440,7 +440,7 @@ SatBeamHelper::Install (NodeContainer ut,
                         uint32_t rtnFlFreqId,
                         uint32_t fwdUlFreqId,
                         uint32_t fwdFlFreqId,
-                        SatUtMac::RoutingUpdateCallback routingCallback)
+                        SatMac::RoutingUpdateCallback routingCallback)
 {
   NS_LOG_FUNCTION (this << gwNode << gwId << beamId << rtnUlFreqId << rtnFlFreqId << fwdUlFreqId << fwdFlFreqId);
 

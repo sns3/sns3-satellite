@@ -225,7 +225,7 @@ SatUtHelper::InstallDvb (NodeContainer c, uint32_t beamId,
                          Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
                          Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
                          SatPhy::ChannelPairGetterCallback cbChannel,
-                         SatUtMac::RoutingUpdateCallback cbRouting)
+                         SatMac::RoutingUpdateCallback cbRouting)
 {
   NS_LOG_FUNCTION (this << beamId << fCh << rCh );
 
@@ -244,7 +244,7 @@ SatUtHelper::InstallDvb (Ptr<Node> n, uint32_t beamId,
                          Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
                          Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
                          SatPhy::ChannelPairGetterCallback cbChannel,
-                         SatUtMac::RoutingUpdateCallback cbRouting)
+                         SatMac::RoutingUpdateCallback cbRouting)
 {
   NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
 
@@ -507,7 +507,7 @@ SatUtHelper::InstallLora (NodeContainer c, uint32_t beamId,
                           Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
                           Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
                           SatPhy::ChannelPairGetterCallback cbChannel,
-                          SatUtMac::RoutingUpdateCallback cbRouting)
+                          SatMac::RoutingUpdateCallback cbRouting)
 {
   NS_LOG_FUNCTION (this << beamId << fCh << rCh );
 
@@ -526,7 +526,7 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
                           Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
                           Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
                           SatPhy::ChannelPairGetterCallback cbChannel,
-                          SatUtMac::RoutingUpdateCallback cbRouting)
+                          SatMac::RoutingUpdateCallback cbRouting)
 {
   NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
 
@@ -638,7 +638,9 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
   dev->SetPhy (phy);
 
   // Attach the Mac layer to SatNetDevice
-  dev->SetMac (mac);
+  //dev->SetMac (mac);
+  dev->SetLorawanMac (mac);
+  mac->SetDevice (dev);
 
   // Attach the LLC layer to SatNetDevice
   //dev->SetLlc (llc);
@@ -695,12 +697,13 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
   //llc->SetCtrlMsgCallback (MakeCallback (&SatLorawanNetDevice::SendControlMsg, DynamicCast<SatLorawanNetDevice> (dev)));
 
   // set serving GW MAC address to RM
-  //mac->SetRoutingUpdateCallback (cbRouting);
+  mac->SetRoutingUpdateCallback (cbRouting);
   //mac->SetGatewayUpdateCallback (MakeCallback (&SatUtLlc::SetGwAddress, llc));
-  //mac->SetGwAddress (gwAddr);
+  mac->SetGwAddress (gwAddr);
+  //cbRouting (addr, gwAddr);
 
   // Attach the transmit callback to PHY
-  //mac->SetTransmitCallback (MakeCallback (&SatPhy::SendPdu, phy));
+  mac->SetTransmitCallback (MakeCallback (&SatPhy::SendPdu, phy));
 
   // Attach the PHY handover callback to SatMac
   //mac->SetHandoverCallback (MakeCallback (&SatUtPhy::PerformHandover, phy));
@@ -708,21 +711,21 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
   // Attach the LLC receive callback to SatMac
   //mac->SetReceiveCallback (MakeCallback (&SatLlc::Receive, llc));
 
-  //llc->SetReceiveCallback (MakeCallback (&SatLorawanNetDevice::Receive, DynamicCast<SatLorawanNetDevice> (dev)));
+  //llc->SetReceiveCallback (MakeCallback (&SatLorawanNetDevice::Receive, dev));
 
   Ptr<SatSuperframeConf> superFrameConf = m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE);
-  bool enableLogon = superFrameConf->IsLogonEnabled ();
-  uint32_t logonChannelId = superFrameConf->GetLogonChannelIndex ();
+  //bool enableLogon = superFrameConf->IsLogonEnabled ();
+  //uint32_t logonChannelId = superFrameConf->GetLogonChannelIndex ();
 
   // Add UT to NCC
-  if (enableLogon)
+  /*if (enableLogon)
     {
-      ncc->ReserveLogonChannel (logonChannelId);
+      //ncc->ReserveLogonChannel (logonChannelId);
     }
   else
-    {
+    {*/
       //ncc->AddUt (m_llsConf, dev->GetAddress (), beamId, MakeCallback (&SatUtMac::SetRaChannel, mac));
-    }
+    //}
 
   phy->Initialize ();
 
@@ -760,16 +763,16 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
 
       /// attach the RA module
       //mac->SetRandomAccess (randomAccess);
-      if (enableLogon)
+      /*if (enableLogon)
         {
-          //mac->SetLogonChannel (logonChannelId);
-          //mac->LogOff ();
-        }
+          mac->SetLogonChannel (logonChannelId);
+          mac->LogOff ();
+        }*/
     }
-  else if (enableLogon)
-    {
-      NS_FATAL_ERROR ("Cannot simulate logon without a RA frame");
-    }
+  //else if (enableLogon)
+    //{
+      //NS_FATAL_ERROR ("Cannot simulate logon without a RA frame");
+    //}
 
   /*Ptr<SatUtHandoverModule> utHandoverModule = n->GetObject<SatUtHandoverModule> ();
   if (utHandoverModule != NULL)

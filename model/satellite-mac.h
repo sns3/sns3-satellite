@@ -169,6 +169,19 @@ public:
   void SetSendCtrlCallback (SatMac::SendCtrlMsgCallback cb);
 
   /**
+   * \brief Callback to update routing and ARP tables after handover
+   * \param Address the address of this device
+   * \param Address the address of the new gateway
+   */
+  typedef Callback<void, Address, Address> RoutingUpdateCallback;
+
+  /**
+   * \brief Method to set the routing update callback
+   * \param cb callback to invoke to update routing
+   */
+  void SetRoutingUpdateCallback (SatMac::RoutingUpdateCallback cb);
+
+  /**
    * \brief Set the node info
    * \param nodeInfo containing node specific information
    */
@@ -306,6 +319,11 @@ protected:
    * Traced callback for beam being disabled and including service time.
    */
   TracedCallback<Time> m_beamServiceTrace;
+
+  /**
+   * Callback to update routing and ARP tables after a beam handover
+   */
+  SatMac::RoutingUpdateCallback m_routingUpdateCallback;
 
   /**
    * Node info containing node related information, such as

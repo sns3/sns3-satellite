@@ -39,6 +39,7 @@
 #include "ns3/satellite-random-access-container.h"
 #include "ns3/satellite-random-access-container-conf.h"
 #include "ns3/satellite-typedefs.h"
+#include <ns3/end-device-lorawan-mac.h>
 
 namespace ns3 {
 
@@ -156,7 +157,7 @@ public:
                                  Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
                                  Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
                                  SatPhy::ChannelPairGetterCallback cbChannel,
-                                 SatUtMac::RoutingUpdateCallback cbRouting);
+                                 SatMac::RoutingUpdateCallback cbRouting);
   /**
    * \param n node
    * \param beamId  id of the beam
@@ -172,7 +173,7 @@ public:
                              Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
                              Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
                              SatPhy::ChannelPairGetterCallback cbChannel,
-                             SatUtMac::RoutingUpdateCallback cbRouting);
+                             SatMac::RoutingUpdateCallback cbRouting);
 
   /**
    * \param c a set of nodes
@@ -194,7 +195,7 @@ public:
                                   Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
                                   Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
                                   SatPhy::ChannelPairGetterCallback cbChannel,
-                                  SatUtMac::RoutingUpdateCallback cbRouting);
+                                  SatMac::RoutingUpdateCallback cbRouting);
   /**
    * \param n node
    * \param beamId  id of the beam
@@ -210,7 +211,7 @@ public:
                               Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
                               Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
                               SatPhy::ChannelPairGetterCallback cbChannel,
-                              SatUtMac::RoutingUpdateCallback cbRouting);
+                              SatMac::RoutingUpdateCallback cbRouting);
 
   /**
    * Enables creation traces to be written in given file

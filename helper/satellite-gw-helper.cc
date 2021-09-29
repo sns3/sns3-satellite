@@ -550,7 +550,9 @@ SatGwHelper::InstallLora (Ptr<Node> n,
   dev->SetPhy (phy);
 
   // Attach the Mac layer to SatNetDevice
-  dev->SetMac (mac);
+  //dev->SetMac (mac);
+  dev->SetLorawanMac (mac);
+  mac->SetDevice (dev);
 
   // Create Logical Link Control (LLC) layer
   //Ptr<SatGwLlc> llc = CreateObject<SatGwLlc> ();

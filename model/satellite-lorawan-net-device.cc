@@ -140,7 +140,7 @@ SatLorawanNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t pro
 
   m_txTrace (packet);
 
-  DynamicCast<LorawanMac>(m_mac)->Send (packet);
+  m_lorawanMac->Send (packet);
 
   return true;
 }
@@ -227,6 +227,19 @@ SatLorawanNetDevice::SendControlMsg (Ptr<SatControlMessage> msg, const Address& 
   m_llc->Enque (packet, dest, flowId);*/
 
   return true;
+}
+
+Ptr<LorawanMac>
+SatLorawanNetDevice::GetLorawanMac ()
+{
+  return m_lorawanMac;
+}
+
+void
+SatLorawanNetDevice::SetLorawanMac (Ptr<LorawanMac> lorawanMac)
+{
+  SetMac(lorawanMac);
+  m_lorawanMac = lorawanMac;
 }
 
 void

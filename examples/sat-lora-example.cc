@@ -48,7 +48,7 @@ main (int argc, char *argv[])
   uint32_t nbEndUsersPerUt = 1;
 
   Time appStartTime = Seconds (0.001);
-  Time simLength = Seconds (60.0);
+  Time simLength = Seconds (10.0);
 
   uint32_t packetSize = 64;
   std::string dataRate = "5kbps";
@@ -168,7 +168,7 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::OnOffApplication::OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + onTime + "]"));
   Config::SetDefault ("ns3::OnOffApplication::OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + offTime + "]"));
 
-  Config::SetDefault ("ns3::CbrApplication::Interval", StringValue ("100ms"));
+  Config::SetDefault ("ns3::CbrApplication::Interval", StringValue ("1s"));
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (1500));
 
   simulationHelper->InstallTrafficModel (
@@ -181,6 +181,12 @@ main (int argc, char *argv[])
     SimulationHelper::CBR,
     SimulationHelper::UDP,
     SimulationHelper::FWD_LINK,
+    appStartTime, simLength);*/
+
+  /*simulationHelper->InstallLoraTrafficModel (
+    SimulationHelper::PERIODIC,
+    Seconds (2),
+    24,
     appStartTime, simLength);*/
 
   // Outputs
@@ -242,6 +248,11 @@ main (int argc, char *argv[])
       s->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
       s->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
       s->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+    }
+
+  for (uint32_t i = 0; i < simulationHelper->GetSatelliteHelper ()->GetUtUsers ().GetN(); i++)
+    {
+      std::cout << "UT user " << simulationHelper->GetSatelliteHelper ()->GetUtUsers ().Get (i) << std::endl;
     }
 
   simulationHelper->RunSimulation ();
