@@ -356,6 +356,8 @@ public:
    */
   void SetGwAddress (Mac48Address gwAddress);
 
+  void SetWaveformConf (Ptr<SatWaveformConf> waveformConf);
+
 protected:
   /**
    * Structure representing the parameters that will be used in the
@@ -463,6 +465,8 @@ protected:
   EndDeviceLorawanMac::GatewayUpdateCallback m_gatewayUpdateCallback;
 
   Mac48Address m_gwAddress;
+
+  Ptr<SatWaveformConf> m_waveformConf;
 
 private:
   /**

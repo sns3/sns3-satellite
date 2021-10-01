@@ -608,6 +608,8 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
   phy->SetAttribute ("ReceiveCb", CallbackValue (recCb));
   //mac->SetTxCheckCallback (MakeCallback (&SatUtPhy::IsTxPossible, phy));
 
+  //TODO need to set ESSA here, but TODO: need to understand how it works in details (ReceiveQueueEventEssa) and when routes are set ? If not, because of no ESSA ?
+
   // Create callback to inform phy layer slices subscription
   //mac->SetSliceSubscriptionCallback (MakeCallback (&SatUtPhy::UpdateSliceSubscription, phy));
 
@@ -641,12 +643,13 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
   //dev->SetMac (mac);
   dev->SetLorawanMac (mac);
   mac->SetDevice (dev);
+  mac->SetPhy (phy);
 
   // Attach the LLC layer to SatNetDevice
   //dev->SetLlc (llc);
 
   // Attach the packet classifier
-  dev->SetPacketClassifier (classifier);
+  //dev->SetPacketClassifier (classifier);
 
   // Attach the Mac layer C/N0 updates receiver to Phy
   //SatPhy::CnoCallback cnoCb = MakeCallback (&SatRequestManager::CnoUpdated, rm);
@@ -667,18 +670,12 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
   // Source = UT MAC address
   // Destination = GW MAC address
   // Flow id = by default 0
-  Ptr<SatBaseEncapsulator> utEncap = CreateObject<SatBaseEncapsulator> (addr, gwAddr, SatEnums::CONTROL_FID);
+  //Ptr<SatBaseEncapsulator> utEncap = CreateObject<SatBaseEncapsulator> (addr, gwAddr, SatEnums::CONTROL_FID);
 
   // Create queue event callbacks to MAC (for random access) and RM (for on-demand DAMA)
-  /*SatQueue::QueueEventCallback macCb;
-  if (m_raSettings.m_randomAccessModel == SatEnums::RA_MODEL_ESSA)
-    {
-      macCb = MakeCallback (&SatUtMac::ReceiveQueueEventEssa, mac);
-    }
-  else
-    {
-      macCb = MakeCallback (&SatUtMac::ReceiveQueueEvent, mac);
-    }*/
+  //SatQueue::QueueEventCallback macCb;
+  //macCb = MakeCallback (&SatUtMac::ReceiveQueueEventEssa, mac);
+
   //SatQueue::LogonCallback logonCb = MakeCallback (&SatUtMac::SendLogon, mac);
   //SatQueue::QueueEventCallback rmCb = MakeCallback (&SatRequestManager::ReceiveQueueEvent, rm);
 
@@ -705,6 +702,10 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
   // Attach the transmit callback to PHY
   mac->SetTransmitCallback (MakeCallback (&SatPhy::SendPdu, phy));
 
+  mac->SetSfForDataRate (std::vector<uint8_t>{12, 11, 10, 9, 8, 7, 7});
+  mac->SetBandwidthForDataRate (std::vector<double>{125000, 125000, 125000, 125000, 125000, 125000, 250000});
+  mac->SetMaxAppPayloadForDataRate (std::vector<uint32_t>{59, 59, 59, 123, 230, 230, 230, 230});
+
   // Attach the PHY handover callback to SatMac
   //mac->SetHandoverCallback (MakeCallback (&SatUtPhy::PerformHandover, phy));
 
@@ -713,7 +714,8 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
 
   //llc->SetReceiveCallback (MakeCallback (&SatLorawanNetDevice::Receive, dev));
 
-  Ptr<SatSuperframeConf> superFrameConf = m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE);
+  Ptr<SatWaveformConf> waveformConf = m_superframeSeq->GetWaveformConf ();
+  mac->SetWaveformConf (waveformConf);
   //bool enableLogon = superFrameConf->IsLogonEnabled ();
   //uint32_t logonChannelId = superFrameConf->GetLogonChannelIndex ();
 
@@ -744,12 +746,12 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
 
   //rm->Initialize (m_llsConf, m_superframeSeq->GetDuration (0));
 
-  if (m_raSettings.m_randomAccessModel != SatEnums::RA_MODEL_OFF)
-    {
-      Ptr<SatRandomAccessConf> randomAccessConf = CreateObject<SatRandomAccessConf> (m_llsConf, m_superframeSeq);
+  //if (m_raSettings.m_randomAccessModel != SatEnums::RA_MODEL_OFF)
+    //{
+      //Ptr<SatRandomAccessConf> randomAccessConf = CreateObject<SatRandomAccessConf> (m_llsConf, m_superframeSeq);
 
       /// create RA module with defaults
-      Ptr<SatRandomAccess> randomAccess = CreateObject<SatRandomAccess> (randomAccessConf, m_raSettings.m_randomAccessModel);
+      //Ptr<SatRandomAccess> randomAccess = CreateObject<SatRandomAccess> (randomAccessConf, m_raSettings.m_randomAccessModel);
 
       /// attach callbacks
       /*if (m_crdsaOnlyForControl)
@@ -763,12 +765,7 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
 
       /// attach the RA module
       //mac->SetRandomAccess (randomAccess);
-      /*if (enableLogon)
-        {
-          mac->SetLogonChannel (logonChannelId);
-          mac->LogOff ();
-        }*/
-    }
+    //}
   //else if (enableLogon)
     //{
       //NS_FATAL_ERROR ("Cannot simulate logon without a RA frame");
@@ -783,6 +780,8 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
       mac->SetBeamScheculerCallback (MakeCallback (&SatNcc::GetBeamScheduler, ncc));
       mac->SetUpdateGwAddressCallback (MakeCallback (&SatRequestManager::SetGwAddress, rm));
     }*/
+
+  //dev->Send (Create<Packet> (10));
 
   return dev;
 }

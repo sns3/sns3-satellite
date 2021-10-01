@@ -238,7 +238,6 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
           return;
         }
 
-
       // Add the Lora Mac header to the packet
       LorawanMacHeader macHdr;
       ApplyNecessaryOptions (macHdr);
@@ -974,6 +973,12 @@ EndDeviceLorawanMac::SetGwAddress (Mac48Address gwAddress)
 
   //m_gatewayUpdateCallback (gwAddress);
   m_gwAddress = gwAddress;
+}
+
+void
+EndDeviceLorawanMac::SetWaveformConf (Ptr<SatWaveformConf> waveformConf)
+{
+  m_waveformConf = waveformConf;
 }
 
 }

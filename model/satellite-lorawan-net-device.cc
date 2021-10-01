@@ -110,11 +110,11 @@ SatLorawanNetDevice::Receive (Ptr<const Packet> packet)
 }
 
 bool
-SatLorawanNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
+SatLorawanNetDevice::Send (Ptr<Packet> packet)
 {
   // TODO edit
 
-  NS_LOG_FUNCTION (this << packet << dest << protocolNumber);
+  NS_LOG_FUNCTION (this << packet);
 
   if (m_isStatisticsTagsEnabled)
     {

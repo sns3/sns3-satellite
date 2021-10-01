@@ -199,6 +199,42 @@ main (int argc, char *argv[])
   ConfigStore outputConfig;
   outputConfig.ConfigureDefaults ();
 
+  Ptr<Node> utUsers = simulationHelper->GetSatelliteHelper ()->GetUtUsers ().Get (0);
+  std::cout << "UT users " << utUsers << std::endl;
+  std::cout << "GetNDevices () " << utUsers->GetNDevices () << std::endl;
+  for( uint32_t i = 0; i < utUsers->GetNDevices (); i++)
+  {
+    Ptr<NetDevice> dev = utUsers->GetDevice (i);
+    std::cout << "    " << dev << " " << dev->GetAddress () << " " << dev->IsLinkUp () << " " << dev->GetChannel () << std::endl;
+  }
+
+  Ptr<Node> ut = simulationHelper->GetSatelliteHelper ()->UtNodes ().Get (0);
+  std::cout << "UT " << ut << std::endl;
+  std::cout << "GetNDevices () " << ut->GetNDevices () << std::endl;
+  for( uint32_t i = 0; i < ut->GetNDevices (); i++)
+  {
+    Ptr<NetDevice> dev = ut->GetDevice (i);
+    std::cout << "    " << dev << " " << dev->GetAddress () << " " << dev->IsLinkUp () << " " << dev->GetChannel () << std::endl;
+  }
+
+  Ptr<Node> gw = simulationHelper->GetSatelliteHelper ()->GwNodes ().Get (0);
+  std::cout << "GW " << gw << std::endl;
+  std::cout << "GetNDevices () " << gw->GetNDevices () << std::endl;
+  for( uint32_t i = 0; i < gw->GetNDevices (); i++)
+  {
+    Ptr<NetDevice> dev = gw->GetDevice (i);
+    std::cout << "    " << dev << " " << dev->GetAddress () << " " << dev->IsLinkUp () << " " << dev->GetChannel () << std::endl;
+  }
+
+  Ptr<Node> gwUsers = simulationHelper->GetSatelliteHelper ()->GetGwUsers ().Get (0);
+  std::cout << "GW users " << gwUsers << std::endl;
+  std::cout << "GetNDevices () " << gwUsers->GetNDevices () << std::endl;
+  for( uint32_t i = 0; i < gwUsers->GetNDevices (); i++)
+  {
+    Ptr<NetDevice> dev = gwUsers->GetDevice (i);
+    std::cout << "    " << dev << " " << dev->GetAddress () << " " << dev->IsLinkUp () << " " << dev->GetChannel () << std::endl;
+  }
+
   if(displayTraces)
     {
       Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer ();

@@ -97,6 +97,7 @@ ClassAEndDeviceLorawanMac::SendToPhy (Ptr<Packet> packetToSend)
     }
 
   // Craft LoraTxParameters object
+  // TODO add to packet or merge with txParams
   LoraTxParameters params;
   params.sf = GetSfFromDataRate (m_dataRate);
   params.headerDisabled = m_headerDisabled;
@@ -106,11 +107,36 @@ ClassAEndDeviceLorawanMac::SendToPhy (Ptr<Packet> packetToSend)
   params.crcEnabled = 1;
   params.lowDataRateOptimizationEnabled = 0;
 
+
+  // TODO put correct WF ID here
+  Ptr<SatWaveform> wf = m_waveformConf->GetWaveform (1);
+  SatSignalParameters::txInfo_s txInfo;
+  txInfo.packetType = SatEnums::PACKET_TYPE_ESSA;
+  txInfo.modCod = wf->GetModCod ();
+  //txInfo.fecBlockSizeInBytes = waveform->GetPayloadInBytes ();
+  //txInfo.frameType = SatEnums::UNDEFINED_FRAME;
+  txInfo.waveformId = wf->GetWaveformId ();
+  //txInfo.crdsaUniquePacketId = m_crdsaUniquePacketId; // reuse the crdsaUniquePacketId to identify ESSA frames
+
+  SatMacTag mTag;
+  mTag.SetDestAddress (m_gwAddress);
+  mTag.SetSourceAddress ( Mac48Address::ConvertFrom (m_device->GetAddress ()));
+  packetToSend->AddPacketTag (mTag);
+
+  SatPhy::PacketContainer_t packets;
+  packets.push_back (packetToSend);
+
+  //Time duration = waveform->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
+  uint32_t carrierId = 0;
+
+  // TODO change duration
+  std::cout << "m_phy " << m_phy << std::endl;
+  m_phy->SendPdu (packets, carrierId, /*duration*/ MilliSeconds (100), txInfo);
+
   // Wake up PHY layer and directly send the packet
 
   // TODO
-  /*
-  Ptr<LogicalLoraChannel> txChannel = GetChannelForTx ();
+  /*Ptr<LogicalLoraChannel> txChannel = GetChannelForTx ();
 
   NS_LOG_DEBUG ("PacketToSend: " << packetToSend);
   m_phy->Send (packetToSend, params, txChannel->GetFrequency (), m_txPower);
@@ -123,8 +149,7 @@ ClassAEndDeviceLorawanMac::SendToPhy (Ptr<Packet> packetToSend)
   Time duration = m_phy->GetOnAirTime (packetToSend, params);
 
   // Register the sent packet into the DutyCycleHelper
-  m_channelHelper.AddEvent (duration, txChannel);
-  */
+  m_channelHelper.AddEvent (duration, txChannel);*/
 
   //////////////////////////////
   // Prepare for the downlink //
