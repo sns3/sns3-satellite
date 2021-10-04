@@ -62,7 +62,7 @@ public:
    */
   void Receive (Ptr<const Packet> packet);
 
-  virtual bool Send (Ptr<Packet> packet);
+  virtual bool Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber);
   virtual bool SendFrom (Ptr<Packet> packet, const Address& source, const Address& dest, uint16_t protocolNumber);
   bool SendControlMsg (Ptr<SatControlMessage> msg, const Address& dest);
 

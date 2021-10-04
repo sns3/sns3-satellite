@@ -171,11 +171,11 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::CbrApplication::Interval", StringValue ("1s"));
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (1500));
 
-  simulationHelper->InstallTrafficModel (
+  /*simulationHelper->InstallTrafficModel (
     SimulationHelper::CBR,
     SimulationHelper::UDP,
     SimulationHelper::RTN_LINK,
-    appStartTime, simLength);
+    appStartTime, simLength);*/
 
   /*simulationHelper->InstallTrafficModel (
     SimulationHelper::CBR,

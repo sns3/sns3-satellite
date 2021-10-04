@@ -36,7 +36,7 @@ public:
   virtual ~GatewayLorawanMac ();
 
   // Implementation of the LorawanMac interface
-  virtual void Send (Ptr<Packet> packet);
+  virtual void Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber);
 
   // Implementation of the LorawanMac interface
   bool IsTransmitting (void);

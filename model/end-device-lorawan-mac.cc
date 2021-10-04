@@ -159,7 +159,7 @@ EndDeviceLorawanMac::~EndDeviceLorawanMac ()
 ////////////////////////
 
 void
-EndDeviceLorawanMac::Send (Ptr<Packet> packet)
+EndDeviceLorawanMac::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
 {
   NS_LOG_FUNCTION (this << packet);
 

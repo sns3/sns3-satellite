@@ -130,7 +130,6 @@ ClassAEndDeviceLorawanMac::SendToPhy (Ptr<Packet> packetToSend)
   uint32_t carrierId = 0;
 
   // TODO change duration
-  std::cout << "m_phy " << m_phy << std::endl;
   m_phy->SendPdu (packets, carrierId, /*duration*/ MilliSeconds (100), txInfo);
 
   // Wake up PHY layer and directly send the packet
@@ -190,6 +189,8 @@ void
 ClassAEndDeviceLorawanMac::Receive (Ptr<Packet const> packet)
 {
   NS_LOG_FUNCTION (this << packet);
+
+  m_device->GetObject<SatNetDevice> ()->Receive (packet);
 
   // Work on a copy of the packet
   /*Ptr<Packet> packetCopy = packet->Copy ();

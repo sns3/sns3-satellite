@@ -540,6 +540,7 @@ SatBeamHelper::Install (NodeContainer ut,
                                       feederLink.second,
                                       m_ncc,
                                       llsConf.Get<SatLowerLayerServiceConf> ());
+
       break;
     default:
       NS_FATAL_ERROR ("Incorrect standard chosen");
@@ -604,6 +605,9 @@ SatBeamHelper::Install (NodeContainer ut,
     default:
       NS_FATAL_ERROR ("Incorrect standard chosen");
   }
+
+  // TODO only for testing
+  //gwNd->Send (Create<Packet> (10), utNd.Get (0)->GetAddress (), 0);
 
   return std::make_pair (gwNd, utNd);
 }

@@ -57,20 +57,25 @@ GatewayLorawanMac::~GatewayLorawanMac ()
 }
 
 void
-GatewayLorawanMac::Send (Ptr<Packet> packet)
+GatewayLorawanMac::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
 {
   NS_LOG_FUNCTION (this << packet);
 
   std::cout << "GatewayLorawanMac::Send" << std::endl;
 
   // Get DataRate to send this packet with
-  // TODO who add it ????
+  // TODO who add it ???? -> GetReplyForDevice from "network status" And add it again here
+  // TODO change values in tag
+  // TODO only some values of datarate (and BW) -> say it in phy, or change in MAC
   LoraTag tag;
+  packet->AddPacketTag (tag);
+  tag.SetDataRate (0);
+  tag.SetFrequency (1000000000);
   packet->RemovePacketTag (tag);
   uint8_t dataRate = tag.GetDataRate ();
   double frequency = tag.GetFrequency ();
-  NS_LOG_DEBUG ("DR: " << unsigned (dataRate));
-  NS_LOG_DEBUG ("SF: " << unsigned (GetSfFromDataRate (dataRate)));
+  NS_LOG_DEBUG ("DR: " << (uint32_t) unsigned (dataRate));
+  NS_LOG_DEBUG ("SF: " << (uint32_t) unsigned (GetSfFromDataRate (dataRate)));
   NS_LOG_DEBUG ("BW: " << GetBandwidthFromDataRate (dataRate));
   NS_LOG_DEBUG ("Freq: " << frequency << " MHz");
   packet->AddPacketTag (tag);
@@ -94,6 +99,17 @@ GatewayLorawanMac::Send (Ptr<Packet> packet)
   params.crcEnabled = 1;
   params.lowDataRateOptimizationEnabled = 0;
 
+
+  // TODO put correct stuff here
+  //Ptr<SatWaveform> wf = m_waveformConf->GetWaveform (1);
+  SatSignalParameters::txInfo_s txInfo;
+  txInfo.modCod = SatEnums::SAT_MODCOD_QPSK_1_TO_2;
+  //txInfo.fecBlockSizeInBytes = waveform->GetPayloadInBytes ();
+  //txInfo.frameType = SatEnums::UNDEFINED_FRAME;
+  //txInfo.waveformId = wf->GetWaveformId ();
+  //txInfo.crdsaUniquePacketId = m_crdsaUniquePacketId; // reuse the crdsaUniquePacketId to identify ESSA frames
+  txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
+
   // Get the duration
   // TODO
   // Time duration = m_phy->GetOnAirTime (packet, params);
@@ -110,8 +126,19 @@ GatewayLorawanMac::Send (Ptr<Packet> packet)
                               (frequency));
   */
 
+  SatMacTag mTag;
+  mTag.SetDestAddress (Mac48Address::ConvertFrom (dest));
+  mTag.SetSourceAddress (Mac48Address::ConvertFrom (m_device->GetAddress ()));
+  packet->AddPacketTag (mTag);
+
+  SatPhy::PacketContainer_t packets;
+  packets.push_back (packet);
+  uint32_t carrierId = 0;
+
   // Send the packet to the PHY layer to send it on the channel
-  // m_phy->Send (packet, params, frequency, sendingPower);
+  //m_phy->Send (packet, params, frequency, sendingPower);
+  //TODO change duration
+  m_phy->SendPdu (packets, carrierId, MilliSeconds (100), txInfo);
 
   m_sentNewPacket (packet);
 

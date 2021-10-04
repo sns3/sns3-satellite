@@ -554,6 +554,11 @@ SatGwHelper::InstallLora (Ptr<Node> n,
   dev->SetLorawanMac (mac);
   mac->SetDevice (dev);
 
+  mac->SetSfForDataRate (std::vector<uint8_t>{12, 11, 10, 9, 8, 7, 7});
+  mac->SetBandwidthForDataRate (std::vector<double>{125000, 125000, 125000, 125000, 125000, 125000, 250000});
+  mac->SetMaxAppPayloadForDataRate (std::vector<uint32_t>{59, 59, 59, 123, 230, 230, 230, 230});
+  mac->SetPhy (phy);
+
   // Create Logical Link Control (LLC) layer
   //Ptr<SatGwLlc> llc = CreateObject<SatGwLlc> ();
 

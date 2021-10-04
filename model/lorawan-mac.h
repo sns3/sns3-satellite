@@ -79,7 +79,7 @@ public:
    *
    * \param packet The packet to send.
    */
-  virtual void Send (Ptr<Packet> packet) = 0;
+  virtual void Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber) = 0;
 
   /**
    * Receive a packet from the lower layer.

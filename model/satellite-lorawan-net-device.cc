@@ -110,7 +110,7 @@ SatLorawanNetDevice::Receive (Ptr<const Packet> packet)
 }
 
 bool
-SatLorawanNetDevice::Send (Ptr<Packet> packet)
+SatLorawanNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
 {
   // TODO edit
 
@@ -140,7 +140,7 @@ SatLorawanNetDevice::Send (Ptr<Packet> packet)
 
   m_txTrace (packet);
 
-  m_lorawanMac->Send (packet);
+  m_lorawanMac->Send (packet, dest, 0);
 
   return true;
 }
