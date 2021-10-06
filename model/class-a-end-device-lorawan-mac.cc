@@ -113,7 +113,7 @@ ClassAEndDeviceLorawanMac::SendToPhy (Ptr<Packet> packetToSend)
   SatSignalParameters::txInfo_s txInfo;
   txInfo.packetType = SatEnums::PACKET_TYPE_ESSA;
   txInfo.modCod = wf->GetModCod ();
-  //txInfo.fecBlockSizeInBytes = waveform->GetPayloadInBytes ();
+  //txInfo.fecBlockSizeInBytes = wf->GetPayloadInBytes ();
   //txInfo.frameType = SatEnums::UNDEFINED_FRAME;
   txInfo.waveformId = wf->GetWaveformId ();
   //txInfo.crdsaUniquePacketId = m_crdsaUniquePacketId; // reuse the crdsaUniquePacketId to identify ESSA frames

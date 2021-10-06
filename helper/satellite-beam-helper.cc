@@ -47,6 +47,7 @@
 #include <ns3/satellite-fading-input-trace-container.h>
 #include <ns3/satellite-fading-input-trace.h>
 #include <ns3/satellite-id-mapper.h>
+#include <ns3/satellite-lorawan-net-device.h>
 #include "satellite-beam-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatBeamHelper");
@@ -559,12 +560,25 @@ SatBeamHelper::Install (NodeContainer ut,
 
   uint32_t maxBbFrameDataSizeInBytes = ( bbFrameConf->GetBbFramePayloadBits (bbFrameConf->GetMostRobustModcod (frameType), frameType) / SatConstVariables::BITS_PER_BYTE ) - bbFrameConf->GetBbFrameHeaderSizeInBytes ();
 
-
-  m_ncc->AddBeam (beamId,
+  switch(m_standard)
+  {
+    case SatEnums::DVB:
+      m_ncc->AddBeam (beamId,
                   MakeCallback (&SatNetDevice::SendControlMsg, DynamicCast<SatNetDevice> (gwNd)),
                   m_superframeSeq,
                   maxBbFrameDataSizeInBytes,
                   gwNd->GetAddress ());
+      break;
+    case SatEnums::LORA:
+      m_ncc->AddBeam (beamId,
+                  MakeCallback (&SatLorawanNetDevice::SendControlMsg, DynamicCast<SatLorawanNetDevice> (gwNd)),
+                  m_superframeSeq,
+                  maxBbFrameDataSizeInBytes,
+                  gwNd->GetAddress ());
+      break;
+    default:
+      NS_FATAL_ERROR ("Incorrect standard chosen");
+  }
 
   if (m_bstpController)
     {
@@ -605,9 +619,6 @@ SatBeamHelper::Install (NodeContainer ut,
     default:
       NS_FATAL_ERROR ("Incorrect standard chosen");
   }
-
-  // TODO only for testing
-  //gwNd->Send (Create<Packet> (10), utNd.Get (0)->GetAddress (), 0);
 
   return std::make_pair (gwNd, utNd);
 }

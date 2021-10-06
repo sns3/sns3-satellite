@@ -583,6 +583,7 @@ SatGwHelper::InstallLora (Ptr<Node> n,
 
   // Attach the logon receive callback to SatNcc
   //mac->SetLogonCallback (MakeBoundCallback (&logonCallbackHelper, ncc, llsConf));
+  //ncc->AddUt (llsConf, utId, beamId, setRaChannelCallback, true);
 
   // Set the device address and pass it to MAC as well
   Mac48Address addr = Mac48Address::Allocate ();
@@ -596,9 +597,9 @@ SatGwHelper::InstallLora (Ptr<Node> n,
   // Source = GW address
   // Destination = broadcast address
   // Flow id = by default 0
-  Ptr<SatQueue> queue = CreateObject<SatQueue> (SatEnums::CONTROL_FID);
-  Ptr<SatBaseEncapsulator> gwEncap = CreateObject<SatBaseEncapsulator> (addr, Mac48Address::GetBroadcast (), SatEnums::CONTROL_FID);
-  gwEncap->SetQueue (queue);
+  //Ptr<SatQueue> queue = CreateObject<SatQueue> (SatEnums::CONTROL_FID);
+  //Ptr<SatBaseEncapsulator> gwEncap = CreateObject<SatBaseEncapsulator> (addr, Mac48Address::GetBroadcast (), SatEnums::CONTROL_FID);
+  //gwEncap->SetQueue (queue);
   //llc->AddEncap (addr, Mac48Address::GetBroadcast (), SatEnums::CONTROL_FID, gwEncap);
   //llc->SetCtrlMsgCallback (MakeCallback (&SatLorawanNetDevice::SendControlMsg, DynamicCast<SatLorawanNetDevice> (dev)));
 
@@ -608,7 +609,7 @@ SatGwHelper::InstallLora (Ptr<Node> n,
   Ptr<SatNodeInfo> nodeInfo = Create <SatNodeInfo> (SatEnums::NT_GW, n->GetId (), addr);
   dev->SetNodeInfo (nodeInfo);
   //llc->SetNodeInfo (nodeInfo);
-  //mac->SetNodeInfo (nodeInfo);
+  mac->SetNodeInfo (nodeInfo);
   phy->SetNodeInfo (nodeInfo);
 
   // Begin frame end scheduling for processes utilizing frame length as interval

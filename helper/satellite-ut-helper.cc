@@ -726,7 +726,7 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
     }
   else
     {*/
-      //ncc->AddUt (m_llsConf, dev->GetAddress (), beamId, MakeCallback (&SatUtMac::SetRaChannel, mac));
+      ncc->AddUt (m_llsConf, dev->GetAddress (), beamId, MakeCallback (&EndDeviceLorawanMac::SetRaChannel, mac));
     //}
 
   phy->Initialize ();

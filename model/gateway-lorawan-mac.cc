@@ -61,8 +61,6 @@ GatewayLorawanMac::Send (Ptr<Packet> packet, const Address& dest, uint16_t proto
 {
   NS_LOG_FUNCTION (this << packet);
 
-  std::cout << "GatewayLorawanMac::Send" << std::endl;
-
   // Get DataRate to send this packet with
   // TODO who add it ???? -> GetReplyForDevice from "network status" And add it again here
   // TODO change values in tag
@@ -109,6 +107,7 @@ GatewayLorawanMac::Send (Ptr<Packet> packet, const Address& dest, uint16_t proto
   //txInfo.waveformId = wf->GetWaveformId ();
   //txInfo.crdsaUniquePacketId = m_crdsaUniquePacketId; // reuse the crdsaUniquePacketId to identify ESSA frames
   txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
+  txInfo.sliceId = 0;
 
   // Get the duration
   // TODO
@@ -141,8 +140,6 @@ GatewayLorawanMac::Send (Ptr<Packet> packet, const Address& dest, uint16_t proto
   m_phy->SendPdu (packets, carrierId, MilliSeconds (100), txInfo);
 
   m_sentNewPacket (packet);
-
-  std::cout << "GatewayLorawanMac::Sent" << std::endl;
 }
 
 bool
@@ -164,6 +161,9 @@ GatewayLorawanMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalPara
       packet = *i;
       // Make a copy of the packet to work on
       Ptr<Packet> packetCopy = packet->Copy ();
+
+      SatMacTag mTag;
+      packetCopy->PeekPacketTag (mTag);
 
       // Only forward the packet if it's uplink
       LorawanMacHeader macHdr;

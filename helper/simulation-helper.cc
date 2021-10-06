@@ -1525,13 +1525,14 @@ SimulationHelper::InstallLoraTrafficModel (LoraTrafficModel_t trafficModel,
     {
     case SimulationHelper::PERIODIC:
       {
-        PeriodicSenderHelper appHelper = PeriodicSenderHelper ();
+        //TODO use CBR
+        /*PeriodicSenderHelper appHelper = PeriodicSenderHelper ();
         appHelper.SetPeriod (interval);
         appHelper.SetPacketSize (packetSize);
         ApplicationContainer appContainer = appHelper.Install (utUsers);
 
         appContainer.Start (startTime);
-        appContainer.Stop (stopTime);
+        appContainer.Stop (stopTime);*/
         break;
       }
       case SimulationHelper::ONE_SHOT:

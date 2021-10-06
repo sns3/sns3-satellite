@@ -83,11 +83,11 @@ LoraFrameHeader::Serialize (Buffer::Iterator start) const
 
   // fCtrl field
   uint8_t fCtrl = 0;
-  fCtrl |= uint8_t (m_adr << 6 & 0b1000000);
-  fCtrl |= uint8_t (m_adrAckReq << 5 & 0b100000);
-  fCtrl |= uint8_t (m_ack << 4 & 0b10000);
-  fCtrl |= uint8_t (m_fPending << 3 & 0b1000);
-  fCtrl |= m_fOptsLen & 0b111;
+  fCtrl |= uint8_t (m_adr << 7 & 0b10000000);
+  fCtrl |= uint8_t (m_adrAckReq << 6 & 0b1000000);
+  fCtrl |= uint8_t (m_ack << 5 & 0b100000);
+  fCtrl |= uint8_t (m_fPending << 4 & 0b10000);
+  fCtrl |= m_fOptsLen & 0b1111;
   start.WriteU8 (fCtrl);
 
   // FCnt field
@@ -102,6 +102,15 @@ LoraFrameHeader::Serialize (Buffer::Iterator start) const
 
   // FPort
   start.WriteU8 (m_fPort);
+
+  NS_LOG_DEBUG ("Serializing the following data: ");
+  NS_LOG_DEBUG ("Address: " << m_address.Print ());
+  NS_LOG_DEBUG ("ADR: " << unsigned(m_adr));
+  NS_LOG_DEBUG ("ADRAckReq: " << unsigned (m_adrAckReq));
+  NS_LOG_DEBUG ("Ack: " << unsigned (m_ack));
+  NS_LOG_DEBUG ("fPending: " << unsigned (m_fPending));
+  NS_LOG_DEBUG ("fOptsLen: " << unsigned (m_fOptsLen));
+  NS_LOG_DEBUG ("fCnt: " << unsigned (m_fCnt));
 }
 
 uint32_t
@@ -114,12 +123,12 @@ LoraFrameHeader::Deserialize (Buffer::Iterator start)
 
   // Read from buffer and save into local variables
   m_address.Set (start.ReadU32 ());
-  uint8_t fCtl = start.ReadU8 ();
-  m_adr = (fCtl >> 6) & 0b1;
-  m_adrAckReq = (fCtl >> 5) & 0b1;
-  m_ack = (fCtl >> 4) & 0b1;
-  m_fPending = (fCtl >> 3) & 0b1;
-  m_fOptsLen = fCtl & 0b111;
+  uint8_t fCtrl = start.ReadU8 ();
+  m_adr = (fCtrl >> 7) & 0b1;
+  m_adrAckReq = (fCtrl >> 6) & 0b1;
+  m_ack = (fCtrl >> 5) & 0b1;
+  m_fPending = (fCtrl >> 4) & 0b1;
+  m_fOptsLen = fCtrl & 0b1111;
   m_fCnt = start.ReadU16 ();
 
   NS_LOG_DEBUG ("Deserialized data: ");

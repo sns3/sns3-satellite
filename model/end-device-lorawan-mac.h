@@ -358,6 +358,13 @@ public:
 
   void SetWaveformConf (Ptr<SatWaveformConf> waveformConf);
 
+  /**
+   * Set RA channel assigned for this UT.
+   *
+   * \param raChannel RA channel assigned to this UT.
+   */
+  void SetRaChannel (uint32_t raChannel);
+
 protected:
   /**
    * Structure representing the parameters that will be used in the
@@ -467,6 +474,11 @@ protected:
   Mac48Address m_gwAddress;
 
   Ptr<SatWaveformConf> m_waveformConf;
+
+  /**
+   * RA channel assigned to the UT.
+   */
+  uint32_t m_raChannel;
 
 private:
   /**

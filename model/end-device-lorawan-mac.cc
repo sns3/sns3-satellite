@@ -26,6 +26,7 @@
 #include "ns3/satellite-phy.h"
 #include "ns3/simulator.h"
 #include "ns3/log.h"
+#include "ns3/ipv4-header.h"
 #include <algorithm>
 
 namespace ns3 {
@@ -173,6 +174,9 @@ EndDeviceLorawanMac::Send (Ptr<Packet> packet, const Address& dest, uint16_t pro
       return;
     }
 
+  // TODO remove quickly it is dirty
+  DoSend (packet);
+
   // Pick a channel on which to transmit the packet
   // TODO
   /*Ptr<LogicalLoraChannel> txChannel = GetChannelForTx ();
@@ -224,7 +228,7 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
       // Add the Lora Frame Header to the packet
       LoraFrameHeader frameHdr;
       ApplyNecessaryOptions (frameHdr);
-      packet->AddHeader (frameHdr);
+      //packet->AddHeader (frameHdr); //TODO breaks everything if used. Reason unknown...
 
       NS_LOG_INFO ("Added frame header of size " << frameHdr.GetSerializedSize () <<
                    " bytes.");
@@ -234,14 +238,14 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
         {
           NS_LOG_WARN ("Attempting to send a packet larger than the maximum allowed"
                        << " size at this DataRate (DR" << unsigned(m_dataRate) <<
-                       "). Transmission canceled.");
+                       "). Transmission canceled. ");
           return;
         }
 
       // Add the Lora Mac header to the packet
       LorawanMacHeader macHdr;
       ApplyNecessaryOptions (macHdr);
-      packet->AddHeader (macHdr);
+      //packet->AddHeader (macHdr); //TODO breaks everything too if used. Reason unknown...
 
       // Reset MAC command list
       m_macCommandList.clear ();
@@ -277,13 +281,11 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
           NS_LOG_DEBUG ("Copied packet: " << m_retxParams.packet);
           m_sentNewPacket (m_retxParams.packet);
 
-          // static_cast<ClassAEndDeviceLorawanMac*>(this)->SendToPhy (m_retxParams.packet);
           SendToPhy (m_retxParams.packet);
         }
       else
         {
           m_sentNewPacket (packet);
-          // static_cast<ClassAEndDeviceLorawanMac*>(this)->SendToPhy (packet);
           SendToPhy (packet);
         }
 
@@ -574,7 +576,7 @@ EndDeviceLorawanMac::GetNextTransmissionDelay (void)
   return waitingTime;
   */
 
-  return Seconds (1);
+  return Seconds (0);
 }
 
 
@@ -979,6 +981,12 @@ void
 EndDeviceLorawanMac::SetWaveformConf (Ptr<SatWaveformConf> waveformConf)
 {
   m_waveformConf = waveformConf;
+}
+
+void
+EndDeviceLorawanMac::SetRaChannel (uint32_t raChannel)
+{
+  m_raChannel = raChannel;
 }
 
 }

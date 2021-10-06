@@ -140,7 +140,27 @@ SatLorawanNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t pro
 
   m_txTrace (packet);
 
-  m_lorawanMac->Send (packet, dest, 0);
+  Address addr; // invalid address.
+  bool isTaggedWithAddress = false;
+  ByteTagIterator it = packet->GetByteTagIterator ();
+
+  while (!isTaggedWithAddress && it.HasNext ())
+    {
+      ByteTagIterator::Item item = it.Next ();
+
+      if (item.GetTypeId () == SatAddressTag::GetTypeId ())
+        {
+          NS_LOG_DEBUG (this << " contains a SatAddressTag tag:"
+                             << " start=" << item.GetStart ()
+                             << " end=" << item.GetEnd ());
+          SatAddressTag addrTag;
+          item.GetTag (addrTag);
+          addr = addrTag.GetSourceAddress ();
+          isTaggedWithAddress = true; // this will exit the while loop.
+        }
+    }
+
+  m_lorawanMac->Send (packet, dest, protocolNumber);
 
   return true;
 }

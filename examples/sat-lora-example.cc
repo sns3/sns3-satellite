@@ -50,7 +50,7 @@ main (int argc, char *argv[])
   Time appStartTime = Seconds (0.001);
   Time simLength = Seconds (10.0);
 
-  uint32_t packetSize = 64;
+  uint32_t packetSize = 20;
   std::string dataRate = "5kbps";
   std::string onTime = "0.2";
   std::string offTime = "0.8";
@@ -86,6 +86,7 @@ main (int argc, char *argv[])
 
   // Enable Lora
   Config::SetDefault ("ns3::SatBeamHelper::Standard", EnumValue (SatEnums::LORA));
+  //Config::SetDefault ("ns3::EndDeviceLorawanMac::MType", EnumValue (LorawanMacHeader::CONFIRMED_DATA_UP));
 
   // Defaults
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
@@ -169,13 +170,13 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::OnOffApplication::OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + offTime + "]"));
 
   Config::SetDefault ("ns3::CbrApplication::Interval", StringValue ("1s"));
-  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (1500));
+  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
 
-  /*simulationHelper->InstallTrafficModel (
+  simulationHelper->InstallTrafficModel (
     SimulationHelper::CBR,
     SimulationHelper::UDP,
     SimulationHelper::RTN_LINK,
-    appStartTime, simLength);*/
+    appStartTime, simLength);
 
   /*simulationHelper->InstallTrafficModel (
     SimulationHelper::CBR,
@@ -198,42 +199,6 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
   ConfigStore outputConfig;
   outputConfig.ConfigureDefaults ();
-
-  Ptr<Node> utUsers = simulationHelper->GetSatelliteHelper ()->GetUtUsers ().Get (0);
-  std::cout << "UT users " << utUsers << std::endl;
-  std::cout << "GetNDevices () " << utUsers->GetNDevices () << std::endl;
-  for( uint32_t i = 0; i < utUsers->GetNDevices (); i++)
-  {
-    Ptr<NetDevice> dev = utUsers->GetDevice (i);
-    std::cout << "    " << dev << " " << dev->GetAddress () << " " << dev->IsLinkUp () << " " << dev->GetChannel () << std::endl;
-  }
-
-  Ptr<Node> ut = simulationHelper->GetSatelliteHelper ()->UtNodes ().Get (0);
-  std::cout << "UT " << ut << std::endl;
-  std::cout << "GetNDevices () " << ut->GetNDevices () << std::endl;
-  for( uint32_t i = 0; i < ut->GetNDevices (); i++)
-  {
-    Ptr<NetDevice> dev = ut->GetDevice (i);
-    std::cout << "    " << dev << " " << dev->GetAddress () << " " << dev->IsLinkUp () << " " << dev->GetChannel () << std::endl;
-  }
-
-  Ptr<Node> gw = simulationHelper->GetSatelliteHelper ()->GwNodes ().Get (0);
-  std::cout << "GW " << gw << std::endl;
-  std::cout << "GetNDevices () " << gw->GetNDevices () << std::endl;
-  for( uint32_t i = 0; i < gw->GetNDevices (); i++)
-  {
-    Ptr<NetDevice> dev = gw->GetDevice (i);
-    std::cout << "    " << dev << " " << dev->GetAddress () << " " << dev->IsLinkUp () << " " << dev->GetChannel () << std::endl;
-  }
-
-  Ptr<Node> gwUsers = simulationHelper->GetSatelliteHelper ()->GetGwUsers ().Get (0);
-  std::cout << "GW users " << gwUsers << std::endl;
-  std::cout << "GetNDevices () " << gwUsers->GetNDevices () << std::endl;
-  for( uint32_t i = 0; i < gwUsers->GetNDevices (); i++)
-  {
-    Ptr<NetDevice> dev = gwUsers->GetDevice (i);
-    std::cout << "    " << dev << " " << dev->GetAddress () << " " << dev->IsLinkUp () << " " << dev->GetChannel () << std::endl;
-  }
 
   if(displayTraces)
     {
@@ -284,11 +249,6 @@ main (int argc, char *argv[])
       s->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
       s->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
       s->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-    }
-
-  for (uint32_t i = 0; i < simulationHelper->GetSatelliteHelper ()->GetUtUsers ().GetN(); i++)
-    {
-      std::cout << "UT user " << simulationHelper->GetSatelliteHelper ()->GetUtUsers ().Get (i) << std::endl;
     }
 
   simulationHelper->RunSimulation ();
