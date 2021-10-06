@@ -545,9 +545,6 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
   params.m_txCh = rCh;
   params.m_rxCh = fCh;
 
-  // Create a packet classifier
-  Ptr<SatPacketClassifier> classifier = Create<SatPacketClassifier> ();
-
   /**
    * Channel estimation errors
    */
@@ -587,73 +584,22 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
 
   Ptr<ClassAEndDeviceLorawanMac> mac = CreateObject<ClassAEndDeviceLorawanMac> (beamId);
 
-  // Set the control message container callbacks
-  //mac->SetReadCtrlCallback (m_readCtrlCb);
-  //mac->SetReserveCtrlCallback (m_reserveCtrlCb);
-  //mac->SetSendCtrlCallback (m_sendCtrlCb);
-
-  // Set timing advance callback to mac (if not asynchronous access)
-  /*if (m_raSettings.m_randomAccessModel != SatEnums::RA_MODEL_ESSA)
-    {
-      Ptr<SatMobilityObserver> observer = n->GetObject<SatMobilityObserver> ();
-      NS_ASSERT (observer != NULL);
-
-      SatUtMac::TimingAdvanceCallback timingCb = MakeCallback (&SatMobilityObserver::GetTimingAdvance, observer);
-      mac->SetTimingAdvanceCallback (timingCb);
-    }*/
-
   // Attach the Mac layer receiver to Phy
   SatPhy::ReceiveCallback recCb = MakeCallback (&LorawanMac::Receive, mac);
 
   phy->SetAttribute ("ReceiveCb", CallbackValue (recCb));
-  //mac->SetTxCheckCallback (MakeCallback (&SatUtPhy::IsTxPossible, phy));
-
-  //TODO need to set ESSA here, but TODO: need to understand how it works in details (ReceiveQueueEventEssa) and when routes are set ? If not, because of no ESSA ?
-
-  // Create callback to inform phy layer slices subscription
-  //mac->SetSliceSubscriptionCallback (MakeCallback (&SatUtPhy::UpdateSliceSubscription, phy));
-
-  // Create Logical Link Control (LLC) layer
-  //Ptr<SatUtLlc> llc = CreateObject<SatUtLlc> ();
-
-  // Set the control msg read callback to LLC due to ARQ ACKs
-  //llc->SetReadCtrlCallback (m_readCtrlCb);
-
-  // Create a request manager and attach it to LLC, and set control message callback to RM
-  //Ptr<SatRequestManager> rm = CreateObject<SatRequestManager> ();
-  //llc->SetRequestManager (rm);
-  //rm->SetCtrlMsgCallback (MakeCallback (&SatLorawanNetDevice::SendControlMsg, dev));
-
-  // Set the callback to check whether control msg transmissions are possible
-  //rm->SetCtrlMsgTxPossibleCallback (MakeCallback (&SatUtMac::ControlMsgTransmissionPossible, mac));
-
-  // Set the callback to check whether logon msg transmissions are possible
-  //rm->SetLogonMsgTxPossibleCallback (MakeCallback (&SatUtMac::LogonMsgTransmissionPossible, mac));
-
-  // Set TBTP callback to UT MAC
-  //mac->SetAssignedDaResourcesCallback (MakeCallback (&SatRequestManager::AssignedDaResources, rm));
-
-  // Set Send Logon callback to UT MAC
-  //mac->SetSendLogonCallback (MakeCallback (&SatRequestManager::SendLogonMessage, rm));
 
   // Attach the PHY layer to SatNetDevice
   dev->SetPhy (phy);
 
   // Attach the Mac layer to SatNetDevice
-  //dev->SetMac (mac);
   dev->SetLorawanMac (mac);
   mac->SetDevice (dev);
+
+  mac->SetSfForDataRate (std::vector<uint8_t>{12, 11, 10, 9, 8, 7, 7});
+  mac->SetBandwidthForDataRate (std::vector<double>{125000, 125000, 125000, 125000, 125000, 125000, 250000});
+  mac->SetMaxAppPayloadForDataRate (std::vector<uint32_t>{59, 59, 59, 123, 230, 230, 230, 230});
   mac->SetPhy (phy);
-
-  // Attach the LLC layer to SatNetDevice
-  //dev->SetLlc (llc);
-
-  // Attach the packet classifier
-  //dev->SetPacketClassifier (classifier);
-
-  // Attach the Mac layer C/N0 updates receiver to Phy
-  //SatPhy::CnoCallback cnoCb = MakeCallback (&SatRequestManager::CnoUpdated, rm);
-  //phy->SetAttribute ("CnoCb", CallbackValue (cnoCb));
 
   // Set the device address and pass it to MAC as well
   Mac48Address addr = Mac48Address::Allocate ();
@@ -666,122 +612,23 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
   // Create encapsulator and add it to UT's LLC
   Mac48Address gwAddr = Mac48Address::ConvertFrom (gwNd->GetAddress ());
 
-  // Create an encapsulator for control messages.
-  // Source = UT MAC address
-  // Destination = GW MAC address
-  // Flow id = by default 0
-  //Ptr<SatBaseEncapsulator> utEncap = CreateObject<SatBaseEncapsulator> (addr, gwAddr, SatEnums::CONTROL_FID);
-
-  // Create queue event callbacks to MAC (for random access) and RM (for on-demand DAMA)
-  //SatQueue::QueueEventCallback macCb;
-  //macCb = MakeCallback (&SatUtMac::ReceiveQueueEventEssa, mac);
-
-  //SatQueue::LogonCallback logonCb = MakeCallback (&SatUtMac::SendLogon, mac);
-  //SatQueue::QueueEventCallback rmCb = MakeCallback (&SatRequestManager::ReceiveQueueEvent, rm);
-
-  // Create a queue
-  //Ptr<SatQueue> queue = CreateObject<SatQueue> (SatEnums::CONTROL_FID);
-  //queue->AddLogonCallback (logonCb);
-  //queue->AddQueueEventCallback (macCb);
-  //queue->AddQueueEventCallback (rmCb);
-  //utEncap->SetQueue (queue);
-  //llc->AddEncap (addr, gwAddr, SatEnums::CONTROL_FID, utEncap);
-  //rm->AddQueueCallback (SatEnums::CONTROL_FID, MakeCallback (&SatQueue::GetQueueStatistics, queue));
-
-  // Add callbacks to LLC for future need. LLC creates encapsulators and
-  // decapsulators dynamically 'on-a-need-basis'.
-  //llc->SetMacQueueEventCallback (macCb);
-  //llc->SetCtrlMsgCallback (MakeCallback (&SatLorawanNetDevice::SendControlMsg, DynamicCast<SatLorawanNetDevice> (dev)));
-
   // set serving GW MAC address to RM
   mac->SetRoutingUpdateCallback (cbRouting);
-  //mac->SetGatewayUpdateCallback (MakeCallback (&SatUtLlc::SetGwAddress, llc));
   mac->SetGwAddress (gwAddr);
-  //cbRouting (addr, gwAddr);
-
-  // Attach the transmit callback to PHY
-  mac->SetTransmitCallback (MakeCallback (&SatPhy::SendPdu, phy));
-
-  mac->SetSfForDataRate (std::vector<uint8_t>{12, 11, 10, 9, 8, 7, 7});
-  mac->SetBandwidthForDataRate (std::vector<double>{125000, 125000, 125000, 125000, 125000, 125000, 250000});
-  mac->SetMaxAppPayloadForDataRate (std::vector<uint32_t>{59, 59, 59, 123, 230, 230, 230, 230});
-
-  // Attach the PHY handover callback to SatMac
-  //mac->SetHandoverCallback (MakeCallback (&SatUtPhy::PerformHandover, phy));
-
-  // Attach the LLC receive callback to SatMac
-  //mac->SetReceiveCallback (MakeCallback (&SatLlc::Receive, llc));
-
-  //llc->SetReceiveCallback (MakeCallback (&SatLorawanNetDevice::Receive, dev));
 
   Ptr<SatWaveformConf> waveformConf = m_superframeSeq->GetWaveformConf ();
   mac->SetWaveformConf (waveformConf);
-  //bool enableLogon = superFrameConf->IsLogonEnabled ();
-  //uint32_t logonChannelId = superFrameConf->GetLogonChannelIndex ();
 
   // Add UT to NCC
-  /*if (enableLogon)
-    {
-      //ncc->ReserveLogonChannel (logonChannelId);
-    }
-  else
-    {*/
-      ncc->AddUt (m_llsConf, dev->GetAddress (), beamId, MakeCallback (&EndDeviceLorawanMac::SetRaChannel, mac));
-    //}
+  ncc->AddUt (m_llsConf, dev->GetAddress (), beamId, MakeCallback (&EndDeviceLorawanMac::SetRaChannel, mac));
 
   phy->Initialize ();
-
-  // Create UT scheduler for MAC and connect callbacks to LLC
-  //Ptr<SatUtScheduler> utScheduler = CreateObject<SatUtScheduler> (m_llsConf);
-  //utScheduler->SetTxOpportunityCallback (MakeCallback (&SatUtLlc::NotifyTxOpportunity, llc));
-  //utScheduler->SetSchedContextCallback (MakeCallback (&SatLlc::GetSchedulingContexts, llc));
-  //mac->SetAttribute ("Scheduler", PointerValue (utScheduler));
 
   // Create a node info to all the protocol layers
   Ptr<SatNodeInfo> nodeInfo = Create <SatNodeInfo> (SatEnums::NT_UT, n->GetId (), addr);
   dev->SetNodeInfo (nodeInfo);
-  //llc->SetNodeInfo (nodeInfo);
   mac->SetNodeInfo (nodeInfo);
   phy->SetNodeInfo (nodeInfo);
-
-  //rm->Initialize (m_llsConf, m_superframeSeq->GetDuration (0));
-
-  //if (m_raSettings.m_randomAccessModel != SatEnums::RA_MODEL_OFF)
-    //{
-      //Ptr<SatRandomAccessConf> randomAccessConf = CreateObject<SatRandomAccessConf> (m_llsConf, m_superframeSeq);
-
-      /// create RA module with defaults
-      //Ptr<SatRandomAccess> randomAccess = CreateObject<SatRandomAccess> (randomAccessConf, m_raSettings.m_randomAccessModel);
-
-      /// attach callbacks
-      /*if (m_crdsaOnlyForControl)
-        {
-          randomAccess->SetAreBuffersEmptyCallback (MakeCallback (&SatLlc::ControlBuffersEmpty, llc));
-        }
-      else
-        {
-          randomAccess->SetAreBuffersEmptyCallback (MakeCallback (&SatLlc::BuffersEmpty, llc));
-        }*/
-
-      /// attach the RA module
-      //mac->SetRandomAccess (randomAccess);
-    //}
-  //else if (enableLogon)
-    //{
-      //NS_FATAL_ERROR ("Cannot simulate logon without a RA frame");
-    //}
-
-  /*Ptr<SatUtHandoverModule> utHandoverModule = n->GetObject<SatUtHandoverModule> ();
-  if (utHandoverModule != NULL)
-    {
-      utHandoverModule->SetHandoverRequestCallback (MakeCallback (&SatRequestManager::SendHandoverRecommendation, rm));
-      mac->SetBeamCheckerCallback (MakeCallback (&SatUtHandoverModule::CheckForHandoverRecommendation, utHandoverModule));
-      mac->SetAskedBeamCallback (MakeCallback (&SatUtHandoverModule::GetAskedBeamId, utHandoverModule));
-      mac->SetBeamScheculerCallback (MakeCallback (&SatNcc::GetBeamScheduler, ncc));
-      mac->SetUpdateGwAddressCallback (MakeCallback (&SatRequestManager::SetGwAddress, rm));
-    }*/
-
-  //dev->Send (Create<Packet> (10));
 
   return dev;
 }
