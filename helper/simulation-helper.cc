@@ -1510,7 +1510,8 @@ SimulationHelper::InstallLoraTrafficModel (LoraTrafficModel_t trafficModel,
                                            Time interval, // TODO attribute ?
                                            uint32_t packetSize, // TODO attribute ?
                                            Time startTime,
-                                           Time stopTime)
+                                           Time stopTime,
+                                           Time startDelay)
 {
   NS_LOG_FUNCTION (this << trafficModel << interval << packetSize << startTime << stopTime);
 
@@ -1521,18 +1522,35 @@ SimulationHelper::InstallLoraTrafficModel (LoraTrafficModel_t trafficModel,
 
   std::cout << "Installing Lora traffic model on " << utUsers.GetN () << " UT users" << std::endl;
 
+  std::string socketFactory = "ns3::UdpSocketFactory";
+
   switch (trafficModel)
     {
     case SimulationHelper::PERIODIC:
       {
-        //TODO use CBR
-        /*PeriodicSenderHelper appHelper = PeriodicSenderHelper ();
-        appHelper.SetPeriod (interval);
-        appHelper.SetPacketSize (packetSize);
-        ApplicationContainer appContainer = appHelper.Install (utUsers);
+        uint16_t port = 9;
+        InetSocketAddress gwUserAddr = InetSocketAddress (m_satHelper->GetUserAddress (gwUsers.Get (m_gwUserId)), port);
 
-        appContainer.Start (startTime);
-        appContainer.Stop (stopTime);*/
+        PacketSinkHelper sinkHelper (socketFactory, Address ());
+        CbrHelper cbrHelper (socketFactory, Address ());
+        ApplicationContainer sinkContainer;
+        ApplicationContainer cbrContainer;
+        // create sink application on GW user
+        if (!HasSinkInstalled (gwUsers.Get (m_gwUserId), port))
+          {
+            sinkHelper.SetAttribute ("Local", AddressValue (Address (gwUserAddr)));
+            sinkContainer.Add (sinkHelper.Install (gwUsers.Get (m_gwUserId)));
+          }
+
+        cbrHelper.SetAttribute ("Remote", AddressValue (Address (gwUserAddr)));
+
+        // create CBR applications on UT users
+        for (uint32_t i = 0; i < utUsers.GetN (); i++)
+          {
+            auto app = cbrHelper.Install (utUsers.Get (i)).Get (0);
+            app->SetStartTime (startTime + (i + 1) * startDelay);
+            cbrContainer.Add (app);
+          }
         break;
       }
       case SimulationHelper::ONE_SHOT:

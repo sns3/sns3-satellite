@@ -587,7 +587,8 @@ public:
                                 Time interval,
                                 uint32_t packetSize,
                                 Time startTime,
-                                Time stopTime);
+                                Time stopTime,
+                                Time startDelay);
 
   typedef enum
   {

@@ -110,8 +110,7 @@ GatewayLorawanMac::Send (Ptr<Packet> packet, const Address& dest, uint16_t proto
   txInfo.sliceId = 0;
 
   // Get the duration
-  // TODO
-  // Time duration = m_phy->GetOnAirTime (packet, params);
+  Time duration = GetOnAirTime (packet, params);
 
   // NS_LOG_DEBUG ("Duration: " << duration.GetSeconds ());
 
@@ -136,8 +135,7 @@ GatewayLorawanMac::Send (Ptr<Packet> packet, const Address& dest, uint16_t proto
 
   // Send the packet to the PHY layer to send it on the channel
   //m_phy->Send (packet, params, frequency, sendingPower);
-  //TODO change duration
-  m_phy->SendPdu (packets, carrierId, MilliSeconds (100), txInfo);
+  m_phy->SendPdu (packets, carrierId, duration, txInfo);
 
   m_sentNewPacket (packet);
 }

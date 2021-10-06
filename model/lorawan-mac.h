@@ -148,6 +148,20 @@ public:
   double GetDbmForTxPower (uint8_t txPower);
 
   /**
+   * Compute the time that a packet with certain characteristics will take to be
+   * transmitted.
+   *
+   * Besides from the ones saved in LoraTxParameters, the packet's payload
+   * (obtained through a GetSize () call to accout for the presence of Headers
+   * and Trailers, too) also influences the packet transmit time.
+   *
+   * \param packet The packet that needs to be transmitted.
+   * \param txParams The set of parameters that will be used for transmission.
+   * \return The time necessary to transmit the packet.
+   */
+  Time GetOnAirTime (Ptr<Packet> packet, LoraTxParameters txParams);
+
+  /**
    * Set the vector to use to check up correspondence between SF and DataRate.
    *
    * \param sfForDataRate A vector that contains at position i the SF that

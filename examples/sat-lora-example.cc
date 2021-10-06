@@ -172,11 +172,11 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::CbrApplication::Interval", StringValue ("1s"));
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
 
-  simulationHelper->InstallTrafficModel (
+  /*simulationHelper->InstallTrafficModel (
     SimulationHelper::CBR,
     SimulationHelper::UDP,
     SimulationHelper::RTN_LINK,
-    appStartTime, simLength);
+    appStartTime, simLength, MilliSeconds (10));*/
 
   /*simulationHelper->InstallTrafficModel (
     SimulationHelper::CBR,
@@ -184,11 +184,11 @@ main (int argc, char *argv[])
     SimulationHelper::FWD_LINK,
     appStartTime, simLength);*/
 
-  /*simulationHelper->InstallLoraTrafficModel (
+  simulationHelper->InstallLoraTrafficModel (
     SimulationHelper::PERIODIC,
     Seconds (2),
     24,
-    appStartTime, simLength);*/
+    appStartTime, simLength, MilliSeconds (10));
 
   // Outputs
   simulationHelper->EnableProgressLogs ();
