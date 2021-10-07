@@ -563,7 +563,7 @@ SatPhyRxCarrierPerFrame::ProcessReceivedCrdsaPacket (SatPhyRxCarrierPerFrame::cr
       NS_LOG_INFO ("Replica in slot: " << packet.slotIdsForOtherReplicas[i]);
     }
 
-  NS_LOG_INFO ("SINR CALCULATION, RX sat: " << packet.rxParams->m_rxPowerInSatellite_W <<
+  NS_LOG_INFO ("SINR CALCULATION, RX sat: " << packet.rxParams->GetRxPowerInSatellite () <<
                " IF sat: " << packet.rxParams->GetInterferencePowerInSatellite () <<
                " RX gnd: " << packet.rxParams->m_rxPower_W <<
                " IF gnd: " << packet.rxParams->GetInterferencePower ());
@@ -618,12 +618,12 @@ SatPhyRxCarrierPerFrame::CalculatePacketCompositeSinr (SatPhyRxCarrierPerFrame::
 {
   NS_LOG_FUNCTION (this);
 
-  double sinrSatellite = CalculateSinr ( packet.rxParams->m_rxPowerInSatellite_W,
+  double sinrSatellite = CalculateSinr ( packet.rxParams->GetRxPowerInSatellite (),
                                          packet.rxParams->GetInterferencePowerInSatellite (),
-                                         packet.rxParams->m_rxNoisePowerInSatellite_W,
-                                         packet.rxParams->m_rxAciIfPowerInSatellite_W,
-                                         packet.rxParams->m_rxExtNoisePowerInSatellite_W,
-                                         packet.rxParams->m_sinrCalculate);
+                                         packet.rxParams->GetRxNoisePowerInSatellite (),
+                                         packet.rxParams->GetRxAciIfPowerInSatellite (),
+                                         packet.rxParams->GetRxExtNoisePowerInSatellite (),
+                                         packet.rxParams->GetSinrCalculator ());
 
   double sinr = CalculateSinr ( packet.rxParams->m_rxPower_W,
                                 packet.rxParams->GetInterferencePower (),
@@ -720,7 +720,7 @@ SatPhyRxCarrierPerFrame::EliminateInterference (
           iterList->packetHasBeenProcessed = false;
 
           NS_LOG_INFO ("BEFORE INTERFERENCE ELIMINATION, RX sat: " <<
-                       iterList->rxParams->m_rxPowerInSatellite_W <<
+                       iterList->rxParams->GetRxPowerInSatellite () <<
                        " IF sat: " << iterList->rxParams->GetInterferencePowerInSatellite () <<
                        " RX gnd: " << iterList->rxParams->m_rxPower_W <<
                        " IF gnd: " << iterList->rxParams->GetInterferencePower ());
@@ -741,7 +741,7 @@ SatPhyRxCarrierPerFrame::EliminateInterference (
           GetInterferenceEliminationModel ()->EliminateInterferences (iterList->rxParams, processedPacket.rxParams, processedPacket.cSinr);
 
           NS_LOG_INFO ("AFTER INTERFERENCE ELIMINATION, RX sat: " <<
-                       iterList->rxParams->m_rxPowerInSatellite_W <<
+                       iterList->rxParams->GetRxPowerInSatellite () <<
                        " IF sat: " << iterList->rxParams->GetInterferencePowerInSatellite () <<
                        " RX gnd: " << iterList->rxParams->m_rxPower_W <<
                        " IF gnd: " << iterList->rxParams->GetInterferencePower ());

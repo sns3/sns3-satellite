@@ -62,7 +62,7 @@ static void LinkBudgetTraceCb ( std::string context, Ptr<SatSignalParameters> pa
                    " " << params->m_carrierFreq_hz <<
                    " " << SatUtils::WToDbW (ifPower) <<
                    " " << SatUtils::WToDbW ( params->m_rxPower_W ) <<
-                   " " << SatUtils::LinearToDb (params->m_sinr) <<
+                   " " << SatUtils::LinearToDb (params->GetSinr ()) <<
                    " " << SatUtils::LinearToDb (cSinr) );
     }
 }

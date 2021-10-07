@@ -184,7 +184,7 @@ public:
    * \brief Function for starting packet reception from the SatChannel
    * \param rxParams The needed parameters for the received signal
    */
-  void StartRx (Ptr<SatSignalParameters> rxParams);
+  virtual void StartRx (Ptr<SatSignalParameters> rxParams);
 
   /**
    * \brief Method for querying the type of the carrier

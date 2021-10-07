@@ -330,7 +330,6 @@ SatPhy::SendPdu (PacketContainer_t p, uint32_t carrierId, Time duration, SatSign
   txParams->m_packetsInBurst = p;
   txParams->m_beamId = m_beamId;
   txParams->m_carrierId = carrierId;
-  txParams->m_sinr = 0;
   txParams->m_txPower_W = m_eirpWoGainW;
   txParams->m_txInfo.modCod = txInfo.modCod;
   txParams->m_txInfo.sliceId = txInfo.sliceId;

@@ -34,6 +34,79 @@ namespace ns3 {
 
 class SatPhyTx;
 
+class SatInterferenceParameters : public Object
+{
+public:
+  ~SatInterferenceParameters ();
+
+  /**
+   * The RX power in the satellite in Watts.
+   *
+   */
+  double m_rxPowerInSatellite_W;
+
+  /**
+   * Rx noise power in satellite
+   */
+  double m_rxNoisePowerInSatellite_W;
+
+  /**
+   * ACI interference power in satellite
+   */
+  double m_rxAciIfPowerInSatellite_W;
+
+  /**
+   * RX external noise power in satellite
+   */
+  double m_rxExtNoisePowerInSatellite_W;
+
+  /**
+   * Calculated SINR.
+   */
+  double m_sinr;
+
+  /**
+   * Callback for SINR calculation
+   */
+  Callback<double, double> m_sinrCalculate;
+
+  /**
+   * Interference power (I)
+   */
+  double m_ifPower_W;
+
+  /**
+   * Interference power in the satellite (I)
+   */
+  double m_ifPowerInSatellite_W;
+
+  /**
+   * Interference power (I) per packet fragment.
+   *
+   * A pair p represent:
+   *  - p.first The percentage of time of the packet the interference is applicable
+   *  - p.second The value of the interference for the given amount of time
+   *
+   * As an example, the following values {(0.25, x), (0.5, y), (0.25, z)}
+   * represent the following interferences on the packet:
+   *
+   *  +---+-----+---+
+   *  | x |  y  | z |
+   *  +---+-----+---+
+   *  0   ¼     ¾   1
+   */
+  std::vector< std::pair<double, double> > m_ifPowerPerFragment_W;
+
+  /**
+   * Interference power in the satellite (I) per packet fragment.
+   *
+   * See m_ifPowerPerFragment_W for full description
+   */
+  std::vector< std::pair<double, double> > m_ifPowerInSatellitePerFragment_W;
+
+  bool m_sinrComputed;
+};
+
 /**
 * \ingroup satellite
 * \brief Actual physical layer transmission container. SatSignalParameters is passed
@@ -68,6 +141,7 @@ public:
    * default constructor
    */
   SatSignalParameters ();
+  ~SatSignalParameters ();
 
   /**
    * copy constructor
@@ -128,11 +202,6 @@ public:
   Ptr<SatPhyTx> m_phyTx;
 
   /**
-   * Calculated SINR.
-   */
-  double m_sinr;
-
-  /**
    * The SatChannel instance received the packet.
    */
   SatEnums::ChannelType_t m_channelType;
@@ -143,39 +212,13 @@ public:
   txInfo_s m_txInfo;
 
   /**
-   * The RX power in the satellite in Watts.
-   *
-   */
-  double m_rxPowerInSatellite_W;
-
-  /**
-   * Rx noise power in satellite
-   */
-  double m_rxNoisePowerInSatellite_W;
-
-  /**
-   * ACI interference power in satellite
-   */
-  double m_rxAciIfPowerInSatellite_W;
-
-  /**
-   * RX external noise power in satellite
-   */
-  double m_rxExtNoisePowerInSatellite_W;
-
-  /**
-   * Callback for SINR calculation
-   */
-  Callback<double, double> m_sinrCalculate;
-
-  /**
    * \brief Set interference power based on packet fragment
    * \param ifPowerPerFragment
    */
   inline void SetInterferencePower (std::vector< std::pair<double, double> > ifPowerPerFragment)
   {
-    m_ifPowerPerFragment_W = ifPowerPerFragment;
-    m_ifPower_W = SatUtils::ScalarProduct (m_ifPowerPerFragment_W);
+    m_ifParams->m_ifPowerPerFragment_W = ifPowerPerFragment;
+    m_ifParams->m_ifPower_W = SatUtils::ScalarProduct (ifPowerPerFragment);
   }
 
   /**
@@ -183,7 +226,7 @@ public:
    */
   inline double GetInterferencePower ()
   {
-    return m_ifPower_W;
+    return m_ifParams->m_ifPower_W;
   }
 
   /**
@@ -191,7 +234,7 @@ public:
    */
   inline std::vector< std::pair<double, double> > GetInterferencePowerPerFragment ()
   {
-    return m_ifPowerPerFragment_W;
+    return m_ifParams->m_ifPowerPerFragment_W;
   }
 
   /**
@@ -200,8 +243,8 @@ public:
    */
   inline void SetInterferencePowerInSatellite (std::vector< std::pair<double, double> > ifPowerPerFragment)
   {
-    m_ifPowerInSatellitePerFragment_W = ifPowerPerFragment;
-    m_ifPowerInSatellite_W = SatUtils::ScalarProduct (m_ifPowerInSatellitePerFragment_W);
+    m_ifParams->m_ifPowerInSatellitePerFragment_W = ifPowerPerFragment;
+    m_ifParams->m_ifPowerInSatellite_W = SatUtils::ScalarProduct (ifPowerPerFragment);
   }
 
   /**
@@ -209,7 +252,7 @@ public:
    */
   inline double GetInterferencePowerInSatellite ()
   {
-    return m_ifPowerInSatellite_W;
+    return m_ifParams->m_ifPowerInSatellite_W;
   }
 
   /**
@@ -217,43 +260,56 @@ public:
    */
   inline std::vector< std::pair<double, double> > GetInterferencePowerInSatellitePerFragment ()
   {
-    return m_ifPowerInSatellitePerFragment_W;
+    return m_ifParams->m_ifPowerInSatellitePerFragment_W;
+  }
+
+  /**
+   * \brief Set various power after receiving the packet in the satellite
+   */
+  void SetRxPowersInSatellite (double rxPowerW, double rxNoisePowerW, double rxAciIfPowerW, double rxExtNoisePowerW);
+
+  inline double GetRxPowerInSatellite ()
+  {
+    return m_ifParams->m_rxPowerInSatellite_W;
+  }
+
+  inline double GetRxNoisePowerInSatellite ()
+  {
+    return m_ifParams->m_rxNoisePowerInSatellite_W;
+  }
+
+  inline double GetRxAciIfPowerInSatellite ()
+  {
+    return m_ifParams->m_rxAciIfPowerInSatellite_W;
+  }
+
+  inline double GetRxExtNoisePowerInSatellite ()
+  {
+    return m_ifParams->m_rxExtNoisePowerInSatellite_W;
+  }
+
+  /**
+   * \brief Set computed SINR
+   */
+  void SetSinr (double sinr, Callback<double, double> sinrCalculate);
+
+  inline double GetSinr ()
+  {
+    return m_ifParams->m_sinr;
+  }
+
+  inline Callback<double, double> GetSinrCalculator ()
+  {
+    return m_ifParams->m_sinrCalculate;
+  }
+
+  inline bool HasSinrComputed ()
+  {
+    return m_ifParams->m_sinrComputed;
   }
 
 private:
-  /**
-   * Interference power (I)
-   */
-  double m_ifPower_W;
-
-  /**
-   * Interference power in the satellite (I)
-   */
-  double m_ifPowerInSatellite_W;
-
-  /**
-   * Interference power (I) per packet fragment.
-   *
-   * A pair p represent:
-   *  - p.first The percentage of time of the packet the interference is applicable
-   *  - p.second The value of the interference for the given amount of time
-   *
-   * As an example, the following values {(0.25, x), (0.5, y), (0.25, z)}
-   * represent the following interferences on the packet:
-   *
-   *  +---+-----+---+
-   *  | x |  y  | z |
-   *  +---+-----+---+
-   *  0   ¼     ¾   1
-   */
-  std::vector< std::pair<double, double> > m_ifPowerPerFragment_W;
-
-  /**
-   * Interference power in the satellite (I) per packet fragment.
-   *
-   * See m_ifPowerPerFragment_W for full description
-   */
-  std::vector< std::pair<double, double> > m_ifPowerInSatellitePerFragment_W;
+  Ptr<SatInterferenceParameters> m_ifParams;
 };
 
 

@@ -38,19 +38,10 @@ SatSignalParameters::SatSignalParameters ()
   m_txPower_W (),
   m_rxPower_W (),
   m_phyTx (),
-  m_sinr (),
-  m_channelType (),
-  m_rxPowerInSatellite_W (),
-  m_rxNoisePowerInSatellite_W (),
-  m_rxAciIfPowerInSatellite_W (),
-  m_rxExtNoisePowerInSatellite_W (),
-  m_sinrCalculate (),
-  m_ifPower_W (),
-  m_ifPowerInSatellite_W (),
-  m_ifPowerPerFragment_W (),
-  m_ifPowerInSatellitePerFragment_W ()
+  m_channelType ()
 {
   NS_LOG_FUNCTION (this);
+  m_ifParams = CreateObject<SatInterferenceParameters> ();
 }
 
 SatSignalParameters::SatSignalParameters ( const SatSignalParameters& p )
@@ -66,7 +57,6 @@ SatSignalParameters::SatSignalParameters ( const SatSignalParameters& p )
   m_phyTx = p.m_phyTx;
   m_txPower_W = p.m_txPower_W;
   m_rxPower_W = p.m_rxPower_W;
-  m_sinr = p.m_sinr;
   m_channelType = p.m_channelType;
   m_carrierFreq_hz = p.m_carrierFreq_hz;
   m_txInfo.modCod = p.m_txInfo.modCod;
@@ -76,13 +66,13 @@ SatSignalParameters::SatSignalParameters ( const SatSignalParameters& p )
   m_txInfo.waveformId = p.m_txInfo.waveformId;
   m_txInfo.packetType = p.m_txInfo.packetType;
   m_txInfo.crdsaUniquePacketId = p.m_txInfo.crdsaUniquePacketId;
-  m_rxPowerInSatellite_W = p.m_rxPowerInSatellite_W;
-  m_rxNoisePowerInSatellite_W = p.m_rxNoisePowerInSatellite_W;
-  m_rxAciIfPowerInSatellite_W = p.m_rxAciIfPowerInSatellite_W;
-  m_rxExtNoisePowerInSatellite_W = p.m_rxExtNoisePowerInSatellite_W;
-  m_sinrCalculate = p.m_sinrCalculate;
-  SetInterferencePowerInSatellite (p.m_ifPowerInSatellitePerFragment_W);
-  SetInterferencePower (p.m_ifPowerPerFragment_W);
+  m_ifParams = p.m_ifParams;
+}
+
+SatSignalParameters::~SatSignalParameters ()
+{
+  NS_LOG_FUNCTION (this);
+  m_ifParams = nullptr;
 }
 
 Ptr<SatSignalParameters>
@@ -103,5 +93,27 @@ SatSignalParameters::GetTypeId (void)
   return tid;
 }
 
+void
+SatSignalParameters::SetRxPowersInSatellite (double rxPowerW, double rxNoisePowerW, double rxAciIfPowerW, double rxExtNoisePowerW)
+{
+  m_ifParams->m_rxPowerInSatellite_W = rxPowerW;
+  m_ifParams->m_rxNoisePowerInSatellite_W = rxNoisePowerW;
+  m_ifParams->m_rxAciIfPowerInSatellite_W = rxAciIfPowerW;
+  m_ifParams->m_rxExtNoisePowerInSatellite_W = rxExtNoisePowerW;
+}
+
+void
+SatSignalParameters::SetSinr (double sinr, Callback<double, double> sinrCalculate)
+{
+  m_ifParams->m_sinr = sinr;
+  m_ifParams->m_sinrCalculate = sinrCalculate;
+  m_ifParams->m_sinrComputed = true;
+}
+
+
+SatInterferenceParameters::~SatInterferenceParameters ()
+{
+  m_sinrCalculate.Nullify ();
+}
 
 } // namespace ns3

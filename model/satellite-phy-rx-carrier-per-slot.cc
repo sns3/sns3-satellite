@@ -102,6 +102,8 @@ SatPhyRxCarrierPerSlot::DoDispose ()
 Ptr<SatInterference::InterferenceChangeEvent>
 SatPhyRxCarrierPerSlot::CreateInterference (Ptr<SatSignalParameters> rxParams, Address senderAddress)
 {
+  NS_LOG_FUNCTION (this << rxParams << senderAddress);
+
   SatEnums::ChannelType_t ct = GetChannelType ();
   if (ct == SatEnums::RETURN_FEEDER_CH)
     {
@@ -122,7 +124,12 @@ SatPhyRxCarrierPerSlot::CreateInterference (Ptr<SatSignalParameters> rxParams, A
 
       if (rxParams->m_beamId != GetBeamId ())
         {
-          rxPower = rxParams->m_rxPower_W * (1 + 1 / rxParams->m_sinr);
+          if (!rxParams->HasSinrComputed ())
+            {
+              NS_FATAL_ERROR ("SatPhyRx::StartRx - too long transmission time: packet started to be received in a ground entity while not being fully received on the satellite: interferences could not be properly computed.");
+            }
+
+          rxPower = rxParams->m_rxPower_W * (1 + 1 / rxParams->GetSinr ());
         }
 
       // Add the interference even regardless.
@@ -153,7 +160,7 @@ SatPhyRxCarrierPerSlot::EndRxData (uint32_t key)
 
   DecreaseNumOfRxState (packetRxParams.rxParams->m_txInfo.packetType);
 
-  NS_ASSERT (packetRxParams.rxParams->m_sinr != 0);
+  NS_ASSERT (packetRxParams.rxParams->HasSinrComputed ());
 
   packetRxParams.rxParams->SetInterferencePower (GetInterferenceModel ()->Calculate (packetRxParams.interferenceEvent));
 
@@ -226,7 +233,7 @@ SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams,
   bool phyError (false);
 
   /// calculate composite SINR
-  double cSinr = CalculateCompositeSinr (sinr, packetRxParams.rxParams->m_sinr);
+  double cSinr = CalculateCompositeSinr (sinr, packetRxParams.rxParams->GetSinr ());
 
   // Update composite SINR trace for DAMA and Slotted ALOHA packets
   m_sinrTrace (SatUtils::LinearToDb (cSinr), packetRxParams.sourceAddress);
@@ -278,7 +285,7 @@ SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams,
     }
 
   /// save 2nd link sinr value
-  packetRxParams.rxParams->m_sinr = sinr;
+  packetRxParams.rxParams->SetSinr (sinr, packetRxParams.rxParams->GetSinrCalculator ());
 
   /// uses composite sinr
   m_linkBudgetTrace (packetRxParams.rxParams, GetOwnAddress (),

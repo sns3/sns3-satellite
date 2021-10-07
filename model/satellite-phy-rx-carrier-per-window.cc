@@ -254,12 +254,12 @@ SatPhyRxCarrierPerWindow::CalculatePacketInterferenceVectors (SatPhyRxCarrierPer
   // TODO: should we check the collision model used (check against sinr, collision always drops, etc) ?
 
   /// Calculate the SNR
-  double snrSatellite = CalculateSinr ( packet.rxParams->m_rxPowerInSatellite_W,
+  double snrSatellite = CalculateSinr ( packet.rxParams->GetRxPowerInSatellite (),
                                         0.0,
-                                        packet.rxParams->m_rxNoisePowerInSatellite_W,
-                                        packet.rxParams->m_rxAciIfPowerInSatellite_W,
-                                        packet.rxParams->m_rxExtNoisePowerInSatellite_W,
-                                        packet.rxParams->m_sinrCalculate);
+                                        packet.rxParams->GetRxNoisePowerInSatellite (),
+                                        packet.rxParams->GetRxAciIfPowerInSatellite (),
+                                        packet.rxParams->GetRxExtNoisePowerInSatellite (),
+                                        packet.rxParams->GetSinrCalculator ());
 
   double snr = CalculateSinr ( packet.rxParams->m_rxPower_W,
                                0.0,
@@ -318,7 +318,7 @@ SatPhyRxCarrierPerWindow::CalculatePacketInterferenceVectors (SatPhyRxCarrierPer
       /// gamma[k] = ( SNR^-1 + (C/Interference[k])^-1 )^-1
 
       /// Calculate composite C/I = (C_u/I_u^-1 + C_d/I_d^-1)^-1
-      double cI = (packet.rxParams->m_rxPowerInSatellite_W * packet.rxParams->m_rxPower_W) / (interferencePowerInSatellite->second * packet.rxParams->m_rxPower_W + interferencePower->second * packet.rxParams->m_rxPowerInSatellite_W);
+      double cI = (packet.rxParams->GetRxPowerInSatellite () * packet.rxParams->m_rxPower_W) / (interferencePowerInSatellite->second * packet.rxParams->m_rxPower_W + interferencePower->second * packet.rxParams->GetRxPowerInSatellite ());
 
       /// Calculate gamma[k]
       double gamma = 1 / (1 / cI + 1 / cSnr);
@@ -476,10 +476,6 @@ SatPhyRxCarrierPerWindow::DoSic (packetList_t::iterator processedPacket, std::pa
 
       CalculatePacketInterferenceVectors (*packet_it);
     }
-
-  /// Update packet Rx power and set the SIC flag (what for ??)
-  // processedPacket->rxParams->m_rxPowerInSatellite_W = residualSicPower;
-  // CalculatePacketInterferenceVectors (*processedPacket);
 }
 
 std::pair<double, double>

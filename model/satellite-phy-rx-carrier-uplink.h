@@ -73,6 +73,12 @@ public:
     return CarrierType::DEDICATED_ACCESS;
   }
 
+  /**
+   * \brief Function for starting packet reception from the SatChannel
+   * \param rxParams The needed parameters for the received signal
+   */
+  void StartRx (Ptr<SatSignalParameters> rxParams);
+
 protected:
   /**
    * Get the default receive mode. In satellite node always true.

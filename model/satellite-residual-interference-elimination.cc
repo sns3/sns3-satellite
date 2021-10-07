@@ -100,7 +100,7 @@ SatResidualInterferenceElimination::EliminateInterferences (
                "[" << processedPacket->m_carrierId << "] between " <<
                startTime << " and " << endTime);
   double oldIfPower = packetInterferedWith->GetInterferencePowerInSatellite ();
-  double ifPowerToRemove = processedPacket->m_rxPowerInSatellite_W;
+  double ifPowerToRemove = processedPacket->GetRxPowerInSatellite ();
 
   /// TODO: refactorize this call, so that the residual power is not recalculated
   /// at every iteration of SIC.
@@ -147,7 +147,7 @@ SatResidualInterferenceElimination::GetResidualPower (Ptr<SatSignalParameters> p
 
   NS_LOG_INFO ("SatResidualInterferenceElimination::GetResidualPower");
 
-  double ifPowerToRemove = processedPacket->m_rxPowerInSatellite_W;
+  double ifPowerToRemove = processedPacket->GetRxPowerInSatellite ();
   uint32_t L = GetBurstLengthInSymbols (processedPacket->m_txInfo.waveformId);
   double sigma_lambda_2 = 1.0 / (8.0 * L * EsNo);
   double sigma_phy_2 = 1.0 / (2.0 * L * EsNo);

@@ -275,48 +275,19 @@ SatChannel::ScheduleRx (Ptr<SatSignalParameters> txParams, Ptr<SatPhyRx> receive
 
   if (m_propagationDelay)
     {
-      delay = m_propagationDelay->GetDelay (senderMobility, receiverMobility);
-
       /**
        * In transparent mode (at the satellite), the satellite should start transmitting
        * the packet right away when its reception is started. Thus, there is no delay of
        * the burst duration (between the reception and transmission) at the satellite at all.
-       * However, in there reception we need to receive the whole burst duration so that
-       * we can calculate the experienced interference and SINR. This is compensated at the
-       * channel by reducing the "second-link" propagation delay by burst duration.
-       * Note, that this also means, that the burst duration cannot be longer than the one-link
-       * propagation delay!
-       * TODO: Improve the transparent payload modeling at the satellite such that the
-       * burst duration is taken properly into account!
        */
-      switch (m_channelType)
-        {
-        case SatEnums::RETURN_FEEDER_CH:
-        case SatEnums::FORWARD_USER_CH:
-          {
-            if ( delay > txParams->m_duration)
-              {
-                delay -= txParams->m_duration;
-              }
-            else
-              {
-                NS_FATAL_ERROR ("SatChannel::ScheduleRx - PHY packet burst duration " << (txParams->m_duration).GetSeconds () <<  "s is longer than one-link propagation delay " << delay.GetSeconds () << "s!");
-              }
-            break;
-          }
-
-        default:
-          {
-            break;
-          }
-        }
+      delay = m_propagationDelay->GetDelay (senderMobility, receiverMobility);
     }
-  /**
-   * In satellite model, propagation delay should be always set by using
-   * SetPropagationDelayModel () method!
-   */
   else
     {
+      /**
+       * In satellite model, propagation delay should be always set by using
+       * SetPropagationDelayModel () method!
+       */
       NS_FATAL_ERROR ("SatChannel::ScheduleRx - propagation delay model not set!");
     }
 
