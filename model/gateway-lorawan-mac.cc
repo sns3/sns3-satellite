@@ -160,12 +160,16 @@ GatewayLorawanMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalPara
       // Make a copy of the packet to work on
       Ptr<Packet> packetCopy = packet->Copy ();
 
-      SatMacTag mTag;
-      packetCopy->PeekPacketTag (mTag);
+      // Add the Lora Frame Header to the packet
+      LoraFrameHeader frameHdr;
+      packetCopy->PeekHeader (frameHdr);
 
       // Only forward the packet if it's uplink
       LorawanMacHeader macHdr;
       packetCopy->PeekHeader (macHdr);
+
+      SatMacTag mTag;
+      packetCopy->PeekPacketTag (mTag);
 
       if (macHdr.IsUplink ())
         {

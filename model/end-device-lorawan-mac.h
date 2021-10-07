@@ -30,6 +30,8 @@
 #include "ns3/lora-frame-header.h"
 #include "ns3/random-variable-stream.h"
 #include "ns3/lora-device-address.h"
+#include "ns3/logical-lora-channel.h"
+#include "ns3/logical-lora-channel-helper.h"
 #include "ns3/traced-value.h"
 
 namespace ns3 {
@@ -284,9 +286,8 @@ public:
   /**
    * Perform the actions that need to be taken when receiving a NewChannelReq command.
    */
-  // TODO
-  // void OnNewChannelReq (uint8_t chIndex, double frequency, uint8_t minDataRate,
-  //                      uint8_t maxDataRate);
+  void OnNewChannelReq (uint8_t chIndex, double frequency, uint8_t minDataRate,
+                        uint8_t maxDataRate);
 
   ////////////////////////////////////
   // Logical channel administration //
@@ -297,8 +298,7 @@ public:
    *
    * \param frequency The channel's center frequency.
    */
-  // TODO
-  // void AddLogicalChannel (double frequency);
+  void AddLogicalChannel (double frequency);
 
   /**
    * Set a new logical channel in the helper.
@@ -308,17 +308,15 @@ public:
    * \param minDataRate The minimum data rate allowed on the channel.
    * \param maxDataRate The maximum data rate allowed on the channel.
    */
-  // TODO
-  // void SetLogicalChannel (uint8_t chIndex, double frequency,
-  //                        uint8_t minDataRate, uint8_t maxDataRate);
+  void SetLogicalChannel (uint8_t chIndex, double frequency,
+                          uint8_t minDataRate, uint8_t maxDataRate);
 
   /**
    * Add a logical channel to the helper.
    *
    * \param frequency The channel's center frequency.
    */
-  // TODO
-  // void AddLogicalChannel (Ptr<LogicalLoraChannel> logicalChannel);
+  void AddLogicalChannel (Ptr<LogicalLoraChannel> logicalChannel);
 
   /**
    * Add a subband to the logical channel helper.
@@ -424,8 +422,7 @@ protected:
    * ones that are available in the ED's LogicalLoraChannel, based on their duty
    * cycle limitations.
    */
-  // TODO
-  // Ptr<LogicalLoraChannel> GetChannelForTx (void);
+  Ptr<LogicalLoraChannel> GetChannelForTx (void);
 
   /**
    * The duration of a receive window in number of symbols. This should be
@@ -486,8 +483,7 @@ private:
    *
    * Used to pick a random channel on which to send the packet.
    */
-  // TODO
-  // std::vector<Ptr<LogicalLoraChannel> > Shuffle (std::vector<Ptr<LogicalLoraChannel> > vector);
+  std::vector<Ptr<LogicalLoraChannel> > Shuffle (std::vector<Ptr<LogicalLoraChannel> > vector);
 
   /**
    * Find the minimum waiting time before the next possible transmission.

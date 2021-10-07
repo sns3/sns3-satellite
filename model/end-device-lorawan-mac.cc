@@ -168,23 +168,23 @@ EndDeviceLorawanMac::Send (Ptr<Packet> packet, const Address& dest, uint16_t pro
   // or because we are receiving, schedule a tx/retx later
 
   Time netxTxDelay = GetNextTransmissionDelay ();
-  if (netxTxDelay != Seconds (0))
+  /*if (netxTxDelay != Seconds (0))
     {
       postponeTransmission (netxTxDelay, packet);
       return;
-    }
+    }*/
 
   // TODO remove quickly it is dirty
   DoSend (packet);
 
   // Pick a channel on which to transmit the packet
-  // TODO
   /*Ptr<LogicalLoraChannel> txChannel = GetChannelForTx ();
 
   if (!(txChannel && m_retxParams.retxLeft > 0))
     {
       if (!txChannel)
         {
+          NS_LOG_INFO ("Cannot send because of duty cycle.");
           m_cannotSendBecauseDutyCycle (packet);
         }
       else
@@ -225,14 +225,6 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
       m_currentFCnt++;
       NS_LOG_DEBUG ("APP packet: " << packet << ".");
 
-      // Add the Lora Frame Header to the packet
-      LoraFrameHeader frameHdr;
-      ApplyNecessaryOptions (frameHdr);
-      //packet->AddHeader (frameHdr); //TODO breaks everything if used. Reason unknown...
-
-      NS_LOG_INFO ("Added frame header of size " << frameHdr.GetSerializedSize () <<
-                   " bytes.");
-
       // Check that MACPayload length is below the allowed maximum
       if (packet->GetSize () > m_maxAppPayloadForDataRate.at (m_dataRate))
         {
@@ -245,7 +237,14 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
       // Add the Lora Mac header to the packet
       LorawanMacHeader macHdr;
       ApplyNecessaryOptions (macHdr);
-      //packet->AddHeader (macHdr); //TODO breaks everything too if used. Reason unknown...
+      packet->AddHeader (macHdr);
+
+      // Add the Lora Frame Header to the packet
+      LoraFrameHeader frameHdr;
+      ApplyNecessaryOptions (frameHdr);
+      packet->AddHeader (frameHdr);
+      NS_LOG_INFO ("Added frame header of size " << frameHdr.GetSerializedSize () <<
+                   " bytes.");
 
       // Reset MAC command list
       m_macCommandList.clear ();
@@ -401,10 +400,9 @@ EndDeviceLorawanMac::ParseCommands (LoraFrameHeader frameHeader)
             Ptr<LinkAdrReq> linkAdrReq = (*it)->GetObject<LinkAdrReq> ();
 
             // Call the appropriate function to take action
-            // TODO
-            /*OnLinkAdrReq (linkAdrReq->GetDataRate (), linkAdrReq->GetTxPower (),
+            OnLinkAdrReq (linkAdrReq->GetDataRate (), linkAdrReq->GetTxPower (),
                           linkAdrReq->GetEnabledChannelsList (),
-                          linkAdrReq->GetRepetitions ());*/
+                          linkAdrReq->GetRepetitions ());
 
             break;
           }
@@ -448,15 +446,11 @@ EndDeviceLorawanMac::ParseCommands (LoraFrameHeader frameHeader)
           {
             NS_LOG_DEBUG ("Detected a NewChannelReq command.");
 
-            // TODO
-            /*
             // Cast the command
             Ptr<NewChannelReq> newChannelReq = (*it)->GetObject<NewChannelReq> ();
 
             // Call the appropriate function to take action
             OnNewChannelReq (newChannelReq->GetChannelIndex (), newChannelReq->GetFrequency (), newChannelReq->GetMinDataRate (), newChannelReq->GetMaxDataRate ());
-            */
-
             break;
           }
         case (RX_TIMING_SETUP_REQ):
@@ -548,8 +542,6 @@ EndDeviceLorawanMac::GetNextTransmissionDelay (void)
   //    Check duty cycle    //
 
   // Pick a random channel to transmit on
-  // TODO
-  /*
   std::vector<Ptr<LogicalLoraChannel> > logicalChannels;
   logicalChannels = m_channelHelper.GetEnabledChannelList ();                 // Use a separate list to do the shuffle
   //logicalChannels = Shuffle (logicalChannels);
@@ -574,14 +566,10 @@ EndDeviceLorawanMac::GetNextTransmissionDelay (void)
   waitingTime = GetNextClassTransmissionDelay (waitingTime);
 
   return waitingTime;
-  */
-
-  return Seconds (0);
 }
 
 
-// TODO
-/*Ptr<LogicalLoraChannel>
+Ptr<LogicalLoraChannel>
 EndDeviceLorawanMac::GetChannelForTx (void)
 {
   NS_LOG_FUNCTION_NOARGS ();
@@ -595,6 +583,7 @@ EndDeviceLorawanMac::GetChannelForTx (void)
   std::vector<Ptr<LogicalLoraChannel> >::iterator it;
   for (it = logicalChannels.begin (); it != logicalChannels.end (); ++it)
     {
+      std::cout << "Current channel iteration" << std::endl;
       // Pointer to the current channel
       Ptr<LogicalLoraChannel> logicalChannel = *it;
       double frequency = logicalChannel->GetFrequency ();
@@ -638,7 +627,7 @@ EndDeviceLorawanMac::Shuffle (std::vector<Ptr<LogicalLoraChannel> > vector)
     }
 
   return vector;
-}*/
+}
 
 /////////////////////////
 // Setters and Getters //
@@ -733,8 +722,7 @@ EndDeviceLorawanMac::OnLinkAdrReq (uint8_t dataRate, uint8_t txPower,
                    repetitions);
 
   // Three bools for three requirements before setting things up
-  // TODO
-  /*bool channelMaskOk = true;
+  bool channelMaskOk = true;
   bool dataRateOk = true;
   bool txPowerOk = true;
 
@@ -837,7 +825,6 @@ EndDeviceLorawanMac::OnLinkAdrReq (uint8_t dataRate, uint8_t txPower,
   ///////////////////////////////////////////////
   m_macCommandList.push_back (CreateObject<LinkAdrAns> (txPowerOk, dataRateOk,
                                                         channelMaskOk));
-  */
 }
 
 void
@@ -882,8 +869,6 @@ EndDeviceLorawanMac::OnDevStatusReq (void)
   m_macCommandList.push_back (CreateObject<DevStatusAns> (battery, margin));
 }
 
-// TODO
-/*
 void
 EndDeviceLorawanMac::OnNewChannelReq (uint8_t chIndex, double frequency, uint8_t minDataRate, uint8_t maxDataRate)
 {
@@ -937,7 +922,6 @@ EndDeviceLorawanMac::AddSubBand (double startFrequency, double endFrequency, dou
 
   m_channelHelper.AddSubBand (startFrequency, endFrequency, dutyCycle, maxTxPowerDbm);
 }
-*/
 
 double
 EndDeviceLorawanMac::GetAggregatedDutyCycle (void)

@@ -27,9 +27,7 @@
 #include "ns3/lorawan-mac.h"                // Packet
 #include "ns3/end-device-lorawan-mac.h"     // EndDeviceLorawanMac
 #include "ns3/lora-frame-header.h"          // RxParamSetupReq
-// #include "ns3/random-variable-stream.h"
 #include "ns3/lora-device-address.h"
-// #include "ns3/traced-value.h"
 
 namespace ns3 {
 

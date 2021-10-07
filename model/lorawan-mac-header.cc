@@ -23,7 +23,6 @@
 #include <bitset>
 
 namespace ns3 {
-
 NS_LOG_COMPONENT_DEFINE ("LorawanMacHeader");
 
 LorawanMacHeader::LorawanMacHeader () : m_major (0)

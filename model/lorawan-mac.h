@@ -25,6 +25,7 @@
 #include "ns3/packet.h"
 #include "ns3/satellite-phy.h"
 #include "ns3/satellite-mac.h"
+#include "ns3/logical-lora-channel-helper.h"
 #include <array>
 
 namespace ns3 {
@@ -250,6 +251,11 @@ protected:
    * The device this MAC layer is installed on.
    */
   Ptr<NetDevice> m_device;
+
+  /**
+   * The LogicalLoraChannelHelper instance that is assigned to this MAC.
+   */
+  LogicalLoraChannelHelper m_channelHelper;
 
   /**
    * A vector holding the SF each Data Rate corresponds to.
