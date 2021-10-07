@@ -168,17 +168,14 @@ EndDeviceLorawanMac::Send (Ptr<Packet> packet, const Address& dest, uint16_t pro
   // or because we are receiving, schedule a tx/retx later
 
   Time netxTxDelay = GetNextTransmissionDelay ();
-  /*if (netxTxDelay != Seconds (0))
+  if (netxTxDelay != Seconds (0))
     {
       postponeTransmission (netxTxDelay, packet);
       return;
-    }*/
-
-  // TODO remove quickly it is dirty
-  DoSend (packet);
+    }
 
   // Pick a channel on which to transmit the packet
-  /*Ptr<LogicalLoraChannel> txChannel = GetChannelForTx ();
+  Ptr<LogicalLoraChannel> txChannel = GetChannelForTx ();
 
   if (!(txChannel && m_retxParams.retxLeft > 0))
     {
@@ -199,7 +196,7 @@ EndDeviceLorawanMac::Send (Ptr<Packet> packet, const Address& dest, uint16_t pro
       NS_ASSERT_MSG (m_txPower <= m_channelHelper.GetTxPowerForChannel (txChannel),
                      " The selected power is too hight to be supported by this channel.");
       DoSend (packet);
-    }*/
+    }
 }
 
 void
@@ -234,17 +231,17 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
           return;
         }
 
-      // Add the Lora Mac header to the packet
-      LorawanMacHeader macHdr;
-      ApplyNecessaryOptions (macHdr);
-      packet->AddHeader (macHdr);
-
       // Add the Lora Frame Header to the packet
       LoraFrameHeader frameHdr;
       ApplyNecessaryOptions (frameHdr);
       packet->AddHeader (frameHdr);
       NS_LOG_INFO ("Added frame header of size " << frameHdr.GetSerializedSize () <<
                    " bytes.");
+
+      // Add the Lora Mac header to the packet
+      LorawanMacHeader macHdr;
+      ApplyNecessaryOptions (macHdr);
+      packet->AddHeader (macHdr);
 
       // Reset MAC command list
       m_macCommandList.clear ();
@@ -272,9 +269,6 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
 
           NS_LOG_DEBUG ("Message type is " << m_mType);
           NS_LOG_DEBUG ("It is a confirmed packet. Setting retransmission parameters and decreasing the number of transmissions left.");
-
-          NS_LOG_INFO ("Added MAC header of size " << macHdr.GetSerializedSize () <<
-                       " bytes.");
 
           // Sent a new packet
           NS_LOG_DEBUG ("Copied packet: " << m_retxParams.packet);
@@ -316,7 +310,6 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
           m_retxParams.retxLeft = m_retxParams.retxLeft - 1;           // decreasing the number of retransmissions
           NS_LOG_DEBUG ("Retransmitting an old packet.");
 
-          // static_cast<ClassAEndDeviceLorawanMac*>(this)->SendToPhy (m_retxParams.packet);
           SendToPhy (m_retxParams.packet);
         }
     }

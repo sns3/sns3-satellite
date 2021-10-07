@@ -119,6 +119,20 @@ public:
   Ptr<NetDevice> GetDevice (void);
 
   /**
+   * Get the logical lora channel helper associated with this MAC.
+   *
+   * \return The instance of LogicalLoraChannelHelper that this MAC is using.
+   */
+  LogicalLoraChannelHelper GetLogicalLoraChannelHelper (void);
+
+  /**
+   * Set the LogicalLoraChannelHelper this MAC instance will use.
+   *
+   * \param helper The instance of the helper to use.
+   */
+  void SetLogicalLoraChannelHelper (LogicalLoraChannelHelper helper);
+
+  /**
    * Get the SF corresponding to a data rate, based on this MAC's region.
    *
    * \param dataRate The Data Rate we need to convert to a Spreading Factor

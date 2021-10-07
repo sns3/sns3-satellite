@@ -96,6 +96,18 @@ LorawanMac::SetPhy (Ptr<SatPhy> phy)
   // m_phy->SetTxFinishedCallback (MakeCallback (&LorawanMac::TxFinished, this));
 }
 
+LogicalLoraChannelHelper
+LorawanMac::GetLogicalLoraChannelHelper (void)
+{
+  return m_channelHelper;
+}
+
+void
+LorawanMac::SetLogicalLoraChannelHelper (LogicalLoraChannelHelper helper)
+{
+  m_channelHelper = helper;
+}
+
 uint8_t
 LorawanMac::GetSfFromDataRate (uint8_t dataRate)
 {
