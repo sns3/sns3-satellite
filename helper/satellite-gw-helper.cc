@@ -521,6 +521,32 @@ SatGwHelper::InstallLora (Ptr<Node> n,
 
   Ptr<GatewayLorawanMac> mac = CreateObject<GatewayLorawanMac> (beamId);
 
+  // TODO configuration for EU only
+  LogicalLoraChannelHelper channelHelper;
+  channelHelper.AddSubBand (868, 868.6, 0.01, 14);
+  channelHelper.AddSubBand (868.7, 869.2, 0.001, 14);
+  channelHelper.AddSubBand (869.4, 869.65, 0.1, 27);
+
+  //////////////////////
+  // Default channels //
+  //////////////////////
+  Ptr<LogicalLoraChannel> lc1 = CreateObject<LogicalLoraChannel> (868.1, 0, 5);
+  Ptr<LogicalLoraChannel> lc2 = CreateObject<LogicalLoraChannel> (868.3, 0, 5);
+  Ptr<LogicalLoraChannel> lc3 = CreateObject<LogicalLoraChannel> (868.5, 0, 5);
+  channelHelper.AddChannel (lc1);
+  channelHelper.AddChannel (lc2);
+  channelHelper.AddChannel (lc3);
+
+  mac->SetLogicalLoraChannelHelper (channelHelper);
+
+  ///////////////////////////////////////////////
+  // DataRate -> SF, DataRate -> Bandwidth     //
+  // and DataRate -> MaxAppPayload conversions //
+  ///////////////////////////////////////////////
+  mac->SetSfForDataRate (std::vector<uint8_t>{12, 11, 10, 9, 8, 7, 7});
+  mac->SetBandwidthForDataRate (std::vector<double>{125000, 125000, 125000, 125000, 125000, 125000, 250000});
+  mac->SetMaxAppPayloadForDataRate (std::vector<uint32_t>{59, 59, 59, 123, 230, 230, 230, 230});
+
   // Attach the Mac layer receiver to Phy
   SatPhy::ReceiveCallback recCb = MakeCallback (&LorawanMac::Receive, mac);
 
@@ -541,9 +567,6 @@ SatGwHelper::InstallLora (Ptr<Node> n,
   dev->SetLorawanMac (mac);
   mac->SetDevice (dev);
 
-  mac->SetSfForDataRate (std::vector<uint8_t>{12, 11, 10, 9, 8, 7, 7});
-  mac->SetBandwidthForDataRate (std::vector<double>{125000, 125000, 125000, 125000, 125000, 125000, 250000});
-  mac->SetMaxAppPayloadForDataRate (std::vector<uint32_t>{59, 59, 59, 123, 230, 230, 230, 230});
   mac->SetPhy (phy);
 
   // Set the device address and pass it to MAC as well
