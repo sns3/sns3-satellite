@@ -105,7 +105,7 @@ public:
    *
    * This function handles opening of the first receive window.
    */
-  virtual void TxFinished (Ptr<const Packet> packet);
+  virtual void TxFinished ();
 
   /////////////////////////
   // Getters and Setters //
@@ -363,6 +363,10 @@ public:
    */
   void SetRaChannel (uint32_t raChannel);
 
+  void SetPhyRx (Ptr<SatLoraPhyRx> phyRx);
+
+  Ptr<SatLoraPhyRx> GetPhyRx ();
+
 protected:
   /**
    * Structure representing the parameters that will be used in the
@@ -476,6 +480,11 @@ protected:
    * RA channel assigned to the UT.
    */
   uint32_t m_raChannel;
+
+  /**
+   * Reception phy layer for Lora operations
+   */
+  Ptr<SatLoraPhyRx> m_phyRx;
 
 private:
   /**

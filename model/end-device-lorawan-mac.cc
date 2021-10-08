@@ -517,7 +517,7 @@ EndDeviceLorawanMac::GetMType (void)
 }
 
 void
-EndDeviceLorawanMac::TxFinished (Ptr<const Packet> packet)
+EndDeviceLorawanMac::TxFinished ()
 { }
 
 Time
@@ -576,7 +576,6 @@ EndDeviceLorawanMac::GetChannelForTx (void)
   std::vector<Ptr<LogicalLoraChannel> >::iterator it;
   for (it = logicalChannels.begin (); it != logicalChannels.end (); ++it)
     {
-      std::cout << "Current channel iteration" << std::endl;
       // Pointer to the current channel
       Ptr<LogicalLoraChannel> logicalChannel = *it;
       double frequency = logicalChannel->GetFrequency ();
@@ -964,6 +963,18 @@ void
 EndDeviceLorawanMac::SetRaChannel (uint32_t raChannel)
 {
   m_raChannel = raChannel;
+}
+
+void
+EndDeviceLorawanMac::SetPhyRx (Ptr<SatLoraPhyRx> phyRx)
+{
+  m_phyRx = phyRx;
+}
+
+Ptr<SatLoraPhyRx>
+EndDeviceLorawanMac::GetPhyRx ()
+{
+  return m_phyRx;
 }
 
 }

@@ -136,7 +136,7 @@ public:
   * Start packet transmission to the channel.
   * \param txParams Transmission parameters for a packet
   */
-  void StartTx (Ptr<SatSignalParameters> txParams);
+  virtual void StartTx (Ptr<SatSignalParameters> txParams);
 
   /**
    * Set the beam id for all the transmissions from this SatPhyTx
@@ -149,9 +149,11 @@ public:
    */
   bool CanTransmit (void) const;
 
+protected:
+  virtual void EndTx ();
+
 private:
   void ChangeState (State newState);
-  void EndTx ();
 
   Ptr<MobilityModel> m_mobility;
   Ptr<SatChannel> m_channel;

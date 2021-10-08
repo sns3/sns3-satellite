@@ -88,23 +88,37 @@ SatPhy::SatPhy (CreateParam_t & params)
 
   Ptr<MobilityModel> mobility = params.m_device->GetNode ()->GetObject<MobilityModel> ();
 
-  m_phyTx = CreateObject<SatPhyTx> ();
-  m_phyTx->SetChannel (params.m_txCh);
   switch (params.m_standard)
     {
-      case SatEnums::DVB:
+      case SatEnums::DVB_UT:
       {
+        m_phyTx = CreateObject<SatPhyTx> ();
         m_phyRx = CreateObject<SatPhyRx> ();
         break;
       }
-      case SatEnums::LORA:
+      case SatEnums::LORA_UT:
       {
+        m_phyTx = CreateObject<SatLoraPhyTx> ();
         m_phyRx = CreateObject<SatLoraPhyRx> ();
         break;
       }
+      case SatEnums::DVB_GW:
+      {
+        m_phyTx = CreateObject<SatPhyTx> ();
+        m_phyRx = CreateObject<SatPhyRx> ();
+        break;
+      }
+      case SatEnums::LORA_GW:
+      {
+        m_phyTx = CreateObject<SatLoraPhyTx> ();
+        m_phyRx = CreateObject<SatPhyRx> ();
+        break;
+      }
       default:
-        NS_FATAL_ERROR ("Standard not implemented yet");
+        NS_FATAL_ERROR ("Standard not implemented yet: " << params.m_standard);
     }
+
+  m_phyTx->SetChannel (params.m_txCh);
   m_beamId = params.m_beamId;
 
   params.m_rxCh->AddRx (m_phyRx);

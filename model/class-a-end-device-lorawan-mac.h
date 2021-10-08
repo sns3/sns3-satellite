@@ -76,7 +76,7 @@ public:
    *
    * This function handles opening of the first receive window.
    */
-  virtual void TxFinished (Ptr<const Packet> packet);
+  virtual void TxFinished ();
 
   /**
    * Perform operations needed to open the first receive window.

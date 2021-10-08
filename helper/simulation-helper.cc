@@ -41,7 +41,6 @@
 #include <ns3/satellite-on-off-helper.h>
 #include <ns3/nrtv-helper.h>
 #include <ns3/three-gpp-http-satellite-helper.h>
-#include <ns3/periodic-sender-helper.h>
 
 #include <ns3/random-variable-stream.h>
 

@@ -27,22 +27,9 @@
 
 #include "ns3/satellite-phy-rx.h"
 
-namespace ns3 {
+#include "ns3/satellite-lora-phy-tx.h"
 
-/**
- * Structure to collect all parameters that are used to compute the duration of
- * a packet (excluding payload length).
- */
-struct LoraTxParameters
-{
-  uint8_t sf = 7;     //!< Spreading Factor
-  bool headerDisabled = 0;     //!< Whether to use implicit header mode
-  uint8_t codingRate = 1;     //!< Code rate (obtained as 4/(codingRate+4))
-  double bandwidthHz = 125000;     //!< Bandwidth in Hz
-  uint32_t nPreamble = 8;     //!< Number of preamble symbols
-  bool crcEnabled = 1;     //!< Whether Cyclic Redundancy Check is enabled
-  bool lowDataRateOptimizationEnabled = 0;     //!< Whether Low Data Rate Optimization is enabled
-};
+namespace ns3 {
 
 /**
  * \ingroup lorawan
@@ -92,20 +79,11 @@ public:
   virtual ~SatLoraPhyRx ();
 
   /**
-   * Start receiving a packet.
+   * Start receiving a packet. Set a few actions then call mother class method.
    *
-   * This method is typically called by LoraChannel.
-   *
-   * \param packet The packet that is arriving at this PHY layer.
-   * \param rxPowerDbm The power of the arriving packet (assumed to be constant
-   * for the whole reception).
-   * \param sf The Spreading Factor of the arriving packet.
-   * \param duration The on air time of this packet.
-   * \param frequencyMHz The frequency this packet is being transmitted on.
+   * \param rxParams All the info needed.
    */
-  void StartReceive (Ptr<Packet> packet, double rxPowerDbm,
-                             uint8_t sf, Time duration,
-                             double frequencyMHz);
+  void StartRx (Ptr<SatSignalParameters> rxParams);
 
   /**
    * Finish reception of a packet.
@@ -157,9 +135,6 @@ public:
    */
   void SwitchToSleep (void);
 
-protected:
-
-private:
   /**
    * Switch to the RX state
    */
@@ -170,8 +145,40 @@ private:
    */
   void SwitchToTx ();
 
+  /**
+   * Set the frequency this EndDevice will listen on.
+   *
+   * Should a packet be transmitted on a frequency different than that the
+   * EndDeviceLoraPhy is listening on, the packet will be discarded.
+   *
+   * \param The frequency [MHz] to listen to.
+   */
+  void SetFrequency (double frequencyMHz);
+
+  /**
+   * Set the Spreading Factor this EndDevice will listen for.
+   *
+   * The EndDeviceLoraPhy object will not be able to lock on transmissions that
+   * use a different SF than the one it's listening for.
+   *
+   * \param sf The spreading factor to listen for.
+   */
+  void SetSpreadingFactor (uint8_t sf);
+
+  State GetState ();
+
+protected:
+
+private:
+
   // The state this PHY is currently in.
   State m_state;
+
+  // The frequency this device is listening on
+  double m_frequency;
+
+  // The Spreading Factor this device is listening for
+  uint8_t m_sf;
 
 };
 

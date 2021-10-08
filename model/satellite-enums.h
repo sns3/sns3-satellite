@@ -94,6 +94,18 @@ public:
   } Standard_t;
 
   /**
+   * \enum SatLoraNodeType_t
+   * \brief Specifies standard used and the king of node
+   */
+  typedef enum
+  {
+    DVB_GW,
+    DVB_UT,
+    LORA_GW,
+    LORA_UT
+  } SatLoraNodeType_t;
+
+  /**
    * \enum DvbVersion_t
    * \brief The scheduling algorithm used to fill the BBFrames.
    */

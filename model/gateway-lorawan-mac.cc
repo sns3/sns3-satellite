@@ -115,14 +115,11 @@ GatewayLorawanMac::Send (Ptr<Packet> packet, const Address& dest, uint16_t proto
   // NS_LOG_DEBUG ("Duration: " << duration.GetSeconds ());
 
   // Find the channel with the desired frequency
-  //TODO
-  /*double sendingPower = m_channelHelper.GetTxPowerForChannel
-      (CreateObject<LogicalLoraChannel> (frequency));
+  // double sendingPower = m_channelHelper.GetTxPowerForChannel (CreateObject<LogicalLoraChannel> (frequency));
 
   // Add the event to the channelHelper to keep track of duty cycle
   m_channelHelper.AddEvent (duration, CreateObject<LogicalLoraChannel>
                               (frequency));
-  */
 
   SatMacTag mTag;
   mTag.SetDestAddress (Mac48Address::ConvertFrom (dest));
@@ -196,7 +193,7 @@ GatewayLorawanMac::FailedReception (Ptr<Packet const> packet)
 }
 
 void
-GatewayLorawanMac::TxFinished (Ptr<const Packet> packet)
+GatewayLorawanMac::TxFinished ()
 {
   NS_LOG_FUNCTION_NOARGS ();
 }
@@ -206,11 +203,7 @@ GatewayLorawanMac::GetWaitingTime (double frequency)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
-  // TODO
-  /*
   return m_channelHelper.GetWaitingTime (CreateObject<LogicalLoraChannel>
                                            (frequency));
-                                           */
-  return Seconds(0);
 }
 }

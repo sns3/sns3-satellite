@@ -65,6 +65,21 @@ public:
   void SetPhy (Ptr<SatPhy> phy);
 
   /**
+   * Get the underlying PHY TX layer
+   *
+   * \return The PHY TX layer that this MAC is connected to.
+   */
+  Ptr<SatLoraPhyTx> GetPhyTx (void);
+
+
+  /**
+   * Set the underlying PHY TX layer
+   *
+   * \param phy the phy tx layer
+   */
+  void SetPhyTx (Ptr<SatLoraPhyTx> phyTx);
+
+  /**
    * Send a packet.
    *
    * \param packet The packet to send.
@@ -88,10 +103,8 @@ public:
 
   /**
    * Perform actions after sending a packet.
-   *
-   * \param packet The packet that just finished transmission.
    */
-  virtual void TxFinished (Ptr<const Packet> packet) = 0;
+  virtual void TxFinished () = 0;
 
   /**
    * Set the device this MAC layer is installed on.
@@ -249,6 +262,11 @@ protected:
    * The PHY instance that sits under this MAC layer.
    */
   Ptr<SatPhy> m_phy;
+
+  /**
+   * The PHY TX instance that sits under this MAC layer.
+   */
+  Ptr<SatLoraPhyTx> m_phyTx;
 
   /**
    * The device this MAC layer is installed on.

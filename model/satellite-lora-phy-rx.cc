@@ -46,11 +46,62 @@ SatLoraPhyRx::~SatLoraPhyRx ()
 
 // TODO implement it
 void
-SatLoraPhyRx::StartReceive (Ptr<Packet> packet, double rxPowerDbm,
-                            uint8_t sf, Time duration,
-                            double frequencyMHz)
+SatLoraPhyRx::StartRx (Ptr<SatSignalParameters> rxParams)
 {
+  NS_LOG_FUNCTION (this);
 
+  // Switch on the current PHY state
+  switch (m_state)
+    {
+    // In the SLEEP, TX and RX cases we cannot receive the packet: we only add
+    // it to the list of interferers and do not schedule an EndReceive event for
+    // it.
+    case SLEEP:
+      {
+        NS_LOG_INFO ("Dropping packet because device is in SLEEP state");
+        break;
+      }
+    case TX:
+      {
+        NS_LOG_INFO ("Dropping packet because device is in TX state");
+        break;
+      }
+    case RX:
+      {
+        NS_LOG_INFO ("Dropping packet because device is already in RX state");
+        break;
+      }
+    // If we are in STANDBY mode, we can potentially lock on the currently
+    // incoming transmission
+    case STANDBY:
+      {
+        // There are a series of properties the packet needs to respect in order
+        // for us to be able to lock on it:
+        // - It's on frequency we are listening on
+        // - It uses the SF we are configured to look for
+        // - Its receive power is above the device sensitivity for that SF
+
+        // Flag to signal whether we can receive the packet or not
+        // bool canLockOnPacket = true;
+
+        // Save needed sensitivity
+        // double sensitivity = EndDeviceLoraPhy::sensitivity[unsigned(sf) - 7];
+
+        // Check frequency
+        //////////////////
+
+        // Check Spreading Factor
+        /////////////////////////
+
+        // Check Sensitivity
+        ////////////////////
+
+        // Check if one of the above failed
+        ///////////////////////////////////
+      }
+    }
+
+  SatPhyRx::StartRx (rxParams);
 }
 
 // TODO implement it
@@ -75,11 +126,27 @@ SatLoraPhyRx::IsTransmitting (void)
   return true;
 }
 
-// TODO implement it
 bool
 SatLoraPhyRx::IsOnFrequency (double frequency)
 {
-  return false;
+  return m_frequency == frequency;
+}
+
+void
+SatLoraPhyRx::SetFrequency (double frequencyMHz)
+{
+  m_frequency = frequencyMHz;
+}
+
+void
+SatLoraPhyRx::SetSpreadingFactor (uint8_t sf)
+{
+  m_sf = sf;
+}
+
+SatLoraPhyRx::State
+SatLoraPhyRx::GetState (){
+  return m_state;
 }
 
 void

@@ -262,7 +262,7 @@ SatUtHelper::InstallDvb (Ptr<Node> n, uint32_t beamId,
   params.m_device = dev;
   params.m_txCh = rCh;
   params.m_rxCh = fCh;
-  params.m_standard = SatEnums::DVB;
+  params.m_standard = SatEnums::DVB_UT;
 
   // Create a packet classifier
   Ptr<SatPacketClassifier> classifier = Create<SatPacketClassifier> ();
@@ -545,7 +545,7 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
   params.m_device = dev;
   params.m_txCh = rCh;
   params.m_rxCh = fCh;
-  params.m_standard = SatEnums::LORA;
+  params.m_standard = SatEnums::LORA_UT;
 
   /**
    * Channel estimation errors
@@ -651,6 +651,8 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
   mac->SetDevice (dev);
 
   mac->SetPhy (phy);
+  mac->SetPhyRx (DynamicCast<SatLoraPhyRx> (phy->GetPhyRx ()));
+  mac->SetPhyTx (DynamicCast<SatLoraPhyTx> (phy->GetPhyTx ()));
 
   // Set the device address and pass it to MAC as well
   Mac48Address addr = Mac48Address::Allocate ();

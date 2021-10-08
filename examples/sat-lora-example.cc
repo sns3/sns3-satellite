@@ -87,6 +87,7 @@ main (int argc, char *argv[])
   // Enable Lora
   Config::SetDefault ("ns3::SatBeamHelper::Standard", EnumValue (SatEnums::LORA));
   Config::SetDefault ("ns3::EndDeviceLorawanMac::DataRate", UintegerValue (5));
+  Config::SetDefault ("ns3::EndDeviceLorawanMac::MType", EnumValue (LorawanMacHeader::CONFIRMED_DATA_UP));
 
   // Defaults
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));

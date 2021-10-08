@@ -274,6 +274,7 @@ SatGwHelper::InstallDvb (Ptr<Node> n,
   params.m_device = dev;
   params.m_txCh = fCh;
   params.m_rxCh = rCh;
+  params.m_standard = SatEnums::DVB_GW;
 
   // Create a packet classifier
   Ptr<SatPacketClassifier> classifier = Create<SatPacketClassifier> ();
@@ -479,6 +480,7 @@ SatGwHelper::InstallLora (Ptr<Node> n,
   params.m_device = dev;
   params.m_txCh = fCh;
   params.m_rxCh = rCh;
+  params.m_standard = SatEnums::LORA_GW;
 
   /**
    * Channel estimation errors
@@ -568,6 +570,7 @@ SatGwHelper::InstallLora (Ptr<Node> n,
   mac->SetDevice (dev);
 
   mac->SetPhy (phy);
+  mac->SetPhyTx (DynamicCast<SatLoraPhyTx> (phy->GetPhyTx ()));
 
   // Set the device address and pass it to MAC as well
   Mac48Address addr = Mac48Address::Allocate ();
