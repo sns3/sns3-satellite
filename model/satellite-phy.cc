@@ -30,6 +30,7 @@
 #include <ns3/satellite-utils.h>
 #include <ns3/satellite-phy-rx.h>
 #include <ns3/satellite-phy-tx.h>
+#include <ns3/satellite-lora-phy-rx.h>
 #include <ns3/satellite-channel.h>
 #include <ns3/satellite-mac.h>
 #include <ns3/satellite-signal-parameters.h>
@@ -89,7 +90,21 @@ SatPhy::SatPhy (CreateParam_t & params)
 
   m_phyTx = CreateObject<SatPhyTx> ();
   m_phyTx->SetChannel (params.m_txCh);
-  m_phyRx = CreateObject<SatPhyRx> ();
+  switch (params.m_standard)
+    {
+      case SatEnums::DVB:
+      {
+        m_phyRx = CreateObject<SatPhyRx> ();
+        break;
+      }
+      case SatEnums::LORA:
+      {
+        m_phyRx = CreateObject<SatLoraPhyRx> ();
+        break;
+      }
+      default:
+        NS_FATAL_ERROR ("Standard not implemented yet");
+    }
   m_beamId = params.m_beamId;
 
   params.m_rxCh->AddRx (m_phyRx);

@@ -106,6 +106,7 @@ public:
     Ptr<SatChannel> m_txCh;
     Ptr<SatChannel> m_rxCh;
     uint32_t m_beamId;
+    SatEnums::Standard_t m_standard;
   } CreateParam_t;
 
   /**

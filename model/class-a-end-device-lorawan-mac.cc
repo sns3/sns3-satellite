@@ -129,36 +129,32 @@ ClassAEndDeviceLorawanMac::SendToPhy (Ptr<Packet> packetToSend)
   //Time duration = waveform->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
   uint32_t carrierId = 0;
 
-  // TODO change duration
-  m_phy->SendPdu (packets, carrierId, /*duration*/ MilliSeconds (100), txInfo);
+  // Compute packet duration
+  Time duration = GetOnAirTime (packetToSend, params);
+
+  // TODO no info of freq and tx_power...
+  m_phy->SendPdu (packets, carrierId, duration, txInfo);
+  //m_phy->Send (packetToSend, params, txChannel->GetFrequency (), m_txPower);
 
   // Wake up PHY layer and directly send the packet
 
-  // TODO
-  /*Ptr<LogicalLoraChannel> txChannel = GetChannelForTx ();
+  Ptr<LogicalLoraChannel> txChannel = GetChannelForTx ();
 
   NS_LOG_DEBUG ("PacketToSend: " << packetToSend);
-  m_phy->Send (packetToSend, params, txChannel->GetFrequency (), m_txPower);
 
   //////////////////////////////////////////////
   // Register packet transmission for duty cycle
   //////////////////////////////////////////////
 
-  // Compute packet duration
-  Time duration = m_phy->GetOnAirTime (packetToSend, params);
-
   // Register the sent packet into the DutyCycleHelper
-  m_channelHelper.AddEvent (duration, txChannel);*/
+  m_channelHelper.AddEvent (duration, txChannel);
 
   //////////////////////////////
   // Prepare for the downlink //
   //////////////////////////////
 
-  // TODO
-
-  /*
   // Switch the PHY to the channel so that it will listen here for downlink
-  m_phy->GetObject<EndDeviceLoraPhy> ()->SetFrequency (txChannel->GetFrequency ());
+  /*m_phy->GetObject<EndDeviceLoraPhy> ()->SetFrequency (txChannel->GetFrequency ());
 
   // Instruct the PHY on the right Spreading Factor to listen for during the window
   // create a SetReplyDataRate function?
@@ -167,10 +163,7 @@ ClassAEndDeviceLorawanMac::SendToPhy (Ptr<Packet> packetToSend)
                 ", m_rx1DrOffset: " << unsigned (m_rx1DrOffset) <<
                 ", replyDataRate: " << unsigned (replyDataRate) << ".");
 
-  m_phy->GetObject<EndDeviceLoraPhy> ()->SetSpreadingFactor
-    (GetSfFromDataRate (replyDataRate));
-  */
-
+  m_phy->GetObject<EndDeviceLoraPhy> ()->SetSpreadingFactor (GetSfFromDataRate (replyDataRate));*/
 }
 
 //////////////////////////

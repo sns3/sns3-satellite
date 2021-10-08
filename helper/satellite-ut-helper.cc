@@ -262,6 +262,7 @@ SatUtHelper::InstallDvb (Ptr<Node> n, uint32_t beamId,
   params.m_device = dev;
   params.m_txCh = rCh;
   params.m_rxCh = fCh;
+  params.m_standard = SatEnums::DVB;
 
   // Create a packet classifier
   Ptr<SatPacketClassifier> classifier = Create<SatPacketClassifier> ();
@@ -544,6 +545,7 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
   params.m_device = dev;
   params.m_txCh = rCh;
   params.m_rxCh = fCh;
+  params.m_standard = SatEnums::LORA;
 
   /**
    * Channel estimation errors
