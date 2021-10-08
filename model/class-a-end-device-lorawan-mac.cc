@@ -179,6 +179,9 @@ ClassAEndDeviceLorawanMac::SendToPhy (Ptr<Packet> packetToSend)
 void
 ClassAEndDeviceLorawanMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/)
 {
+  // Invoke the `Rx` and `RxDelay` trace sources.
+  RxTraces (packets);
+
   for (SatPhy::PacketContainer_t::iterator i = packets.begin (); i != packets.end (); i++ )
     {
       Receive  (*i);

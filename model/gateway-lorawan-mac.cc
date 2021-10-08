@@ -153,6 +153,9 @@ GatewayLorawanMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalPara
 {
   NS_LOG_FUNCTION (this << packets);
 
+  // Invoke the `Rx` and `RxDelay` trace sources.
+  RxTraces (packets);
+
   Ptr<Packet> packet;
   for (SatPhy::PacketContainer_t::iterator i = packets.begin (); i != packets.end (); i++ )
     {
