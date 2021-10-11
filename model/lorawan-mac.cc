@@ -16,6 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
 #include "ns3/lorawan-mac.h"
@@ -109,14 +111,14 @@ LorawanMac::SetPhyTx (Ptr<SatLoraPhyTx> phyTx)
   m_phyTx->SetTxFinishedCallback (MakeCallback (&LorawanMac::TxFinished, this));
 }
 
-LogicalLoraChannelHelper
-LorawanMac::GetLogicalLoraChannelHelper (void)
+LoraLogicalChannelHelper
+LorawanMac::GetLoraLogicalChannelHelper (void)
 {
   return m_channelHelper;
 }
 
 void
-LorawanMac::SetLogicalLoraChannelHelper (LogicalLoraChannelHelper helper)
+LorawanMac::SetLoraLogicalChannelHelper (LoraLogicalChannelHelper helper)
 {
   m_channelHelper = helper;
 }

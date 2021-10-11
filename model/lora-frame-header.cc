@@ -421,7 +421,7 @@ LoraFrameHeader::GetFOptsLen (void) const
 {
   // Sum the serialized lenght of all commands in the list
   uint8_t fOptsLen = 0;
-  std::list< Ptr< MacCommand> >::const_iterator it;
+  std::list< Ptr< LorawanMacCommand> >::const_iterator it;
   for (it = m_macCommands.begin (); it != m_macCommands.end (); it++)
     {
       fOptsLen = fOptsLen + (*it)->GetSerializedSize ();
@@ -578,7 +578,7 @@ LoraFrameHeader::AddNewChannelReq (uint8_t chIndex, double frequency,
   m_fOptsLen += command->GetSerializedSize ();
 }
 
-std::list<Ptr<MacCommand> >
+std::list<Ptr<LorawanMacCommand> >
 LoraFrameHeader::GetCommands (void)
 {
   NS_LOG_FUNCTION_NOARGS ();
@@ -587,7 +587,7 @@ LoraFrameHeader::GetCommands (void)
 }
 
 void
-LoraFrameHeader::AddCommand (Ptr<MacCommand> macCommand)
+LoraFrameHeader::AddCommand (Ptr<LorawanMacCommand> macCommand)
 {
   NS_LOG_FUNCTION (this << macCommand);
 

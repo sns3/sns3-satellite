@@ -16,9 +16,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "ns3/gateway-lorawan-mac.h"
+#include "ns3/lorawan-mac-gateway.h"
 #include "ns3/lorawan-mac-header.h"
 #include "ns3/satellite-lorawan-net-device.h"
 #include "ns3/lora-frame-header.h"
@@ -26,38 +28,38 @@
 
 namespace ns3 {
 
-NS_LOG_COMPONENT_DEFINE ("GatewayLorawanMac");
+NS_LOG_COMPONENT_DEFINE ("LorawanMacGateway");
 
-NS_OBJECT_ENSURE_REGISTERED (GatewayLorawanMac);
+NS_OBJECT_ENSURE_REGISTERED (LorawanMacGateway);
 
 TypeId
-GatewayLorawanMac::GetTypeId (void)
+LorawanMacGateway::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::GatewayLorawanMac")
+  static TypeId tid = TypeId ("ns3::LorawanMacGateway")
     .SetParent<LorawanMac> ()
-    .AddConstructor<GatewayLorawanMac> ()
+    .AddConstructor<LorawanMacGateway> ()
     ;
   return tid;
 }
 
-GatewayLorawanMac::GatewayLorawanMac ()
+LorawanMacGateway::LorawanMacGateway ()
 {
   NS_FATAL_ERROR ("Default constructor not in use");
 }
 
-GatewayLorawanMac::GatewayLorawanMac (uint32_t beamId)
+LorawanMacGateway::LorawanMacGateway (uint32_t beamId)
   : LorawanMac (beamId)
 {
   NS_LOG_FUNCTION (this);
 }
 
-GatewayLorawanMac::~GatewayLorawanMac ()
+LorawanMacGateway::~LorawanMacGateway ()
 {
   NS_LOG_FUNCTION (this);
 }
 
 void
-GatewayLorawanMac::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
+LorawanMacGateway::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
 {
   NS_LOG_FUNCTION (this << packet);
 
@@ -80,7 +82,7 @@ GatewayLorawanMac::Send (Ptr<Packet> packet, const Address& dest, uint16_t proto
 
   // Make sure we can transmit this packet
   // TODO
-  /*if (m_channelHelper.GetWaitingTime(CreateObject<LogicalLoraChannel> (frequency)) > Time(0))
+  /*if (m_channelHelper.GetWaitingTime(CreateObject<LoraLogicalChannel> (frequency)) > Time(0))
     {
       // We cannot send now!
       NS_LOG_WARN ("Trying to send a packet but Duty Cycle won't allow it. Aborting.");
@@ -115,10 +117,10 @@ GatewayLorawanMac::Send (Ptr<Packet> packet, const Address& dest, uint16_t proto
   // NS_LOG_DEBUG ("Duration: " << duration.GetSeconds ());
 
   // Find the channel with the desired frequency
-  // double sendingPower = m_channelHelper.GetTxPowerForChannel (CreateObject<LogicalLoraChannel> (frequency));
+  // double sendingPower = m_channelHelper.GetTxPowerForChannel (CreateObject<LoraLogicalChannel> (frequency));
 
   // Add the event to the channelHelper to keep track of duty cycle
-  m_channelHelper.AddEvent (duration, CreateObject<LogicalLoraChannel>
+  m_channelHelper.AddEvent (duration, CreateObject<LoraLogicalChannel>
                               (frequency));
 
   SatMacTag mTag;
@@ -138,7 +140,7 @@ GatewayLorawanMac::Send (Ptr<Packet> packet, const Address& dest, uint16_t proto
 }
 
 bool
-GatewayLorawanMac::IsTransmitting (void)
+LorawanMacGateway::IsTransmitting (void)
 {
   // TODO
   return false;
@@ -146,7 +148,7 @@ GatewayLorawanMac::IsTransmitting (void)
 }
 
 void
-GatewayLorawanMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/)
+LorawanMacGateway::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/)
 {
   NS_LOG_FUNCTION (this << packets);
 
@@ -187,23 +189,23 @@ GatewayLorawanMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalPara
 }
 
 void
-GatewayLorawanMac::FailedReception (Ptr<Packet const> packet)
+LorawanMacGateway::FailedReception (Ptr<Packet const> packet)
 {
   NS_LOG_FUNCTION (this << packet);
 }
 
 void
-GatewayLorawanMac::TxFinished ()
+LorawanMacGateway::TxFinished ()
 {
   NS_LOG_FUNCTION_NOARGS ();
 }
 
 Time
-GatewayLorawanMac::GetWaitingTime (double frequency)
+LorawanMacGateway::GetWaitingTime (double frequency)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
-  return m_channelHelper.GetWaitingTime (CreateObject<LogicalLoraChannel>
+  return m_channelHelper.GetWaitingTime (CreateObject<LoraLogicalChannel>
                                            (frequency));
 }
 }

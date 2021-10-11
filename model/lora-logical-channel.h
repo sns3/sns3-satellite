@@ -16,17 +16,16 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#ifndef LOGICAL_LORA_CHANNEL_H
-#define LOGICAL_LORA_CHANNEL_H
+#ifndef LORA_LOGICAL_CHANNEL_H
+#define LORA_LOGICAL_CHANNEL_H
 
 #include "ns3/object.h"
-//#include "ns3/sub-band.h"
 
 namespace ns3 {
-
-//class SubBand;
 
 /**
  * This class represents a logical LoRaWAN channel.
@@ -34,18 +33,18 @@ namespace ns3 {
  * A logical channel is characterized by a central frequency and a range of data
  * rates that can be sent on it.
  *
- * Furthermore, a LogicalLoraChannel can be marked as enabled or disabled for
+ * Furthermore, a LoraLogicalChannel can be marked as enabled or disabled for
  * uplink transmission.
  */
-class LogicalLoraChannel : public Object
+class LoraLogicalChannel : public Object
 {
 public:
   static TypeId GetTypeId (void);
 
-  LogicalLoraChannel ();
-  virtual ~LogicalLoraChannel ();
+  LoraLogicalChannel ();
+  virtual ~LoraLogicalChannel ();
 
-  LogicalLoraChannel (double frequency);
+  LoraLogicalChannel (double frequency);
 
   /**
   * Constructor providing initialization of frequency and data rate limits.
@@ -54,7 +53,7 @@ public:
   * \param minDataRate This channel's minimum data rate.
   * \param maxDataRate This channel's maximum data rate.
   */
-  LogicalLoraChannel (double frequency, uint8_t minDataRate,
+  LoraLogicalChannel (double frequency, uint8_t minDataRate,
                       uint8_t maxDataRate);
 
   /**
@@ -129,15 +128,15 @@ private:
 };
 
 /**
- * Overload of the == operator to compare different instances of the same LogicalLoraChannel
+ * Overload of the == operator to compare different instances of the same LoraLogicalChannel
  */
-bool operator== (const Ptr<LogicalLoraChannel>& first, const Ptr<LogicalLoraChannel>& second);
+bool operator== (const Ptr<LoraLogicalChannel>& first, const Ptr<LoraLogicalChannel>& second);
 
 /**
- * Overload the != operator to compare different instances of the same LogicalLoraChannel
+ * Overload the != operator to compare different instances of the same LoraLogicalChannel
  */
-bool operator!= (const Ptr<LogicalLoraChannel>& first, const Ptr<LogicalLoraChannel>& second);
+bool operator!= (const Ptr<LoraLogicalChannel>& first, const Ptr<LoraLogicalChannel>& second);
 
 }
 
-#endif /* LOGICAL_LORA_CHANNEL_H */
+#endif /* LORA_LOGICAL_CHANNEL_H */

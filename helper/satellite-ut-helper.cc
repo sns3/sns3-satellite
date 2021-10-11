@@ -42,7 +42,6 @@
 #include <ns3/satellite-lorawan-net-device.h>
 #include <ns3/satellite-ut-llc.h>
 #include <ns3/satellite-ut-mac.h>
-#include <ns3/class-a-end-device-lorawan-mac.h>
 #include <ns3/satellite-ut-handover-module.h>
 #include <ns3/satellite-ut-phy.h>
 #include <ns3/satellite-phy-tx.h>
@@ -62,6 +61,8 @@
 #include <ns3/satellite-packet-classifier.h>
 #include <ns3/satellite-id-mapper.h>
 #include <ns3/satellite-typedefs.h>
+
+#include <ns3/lorawan-mac-end-device-class-a.h>
 
 #include "satellite-ut-helper.h"
 
@@ -584,7 +585,7 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());
   phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
 
-  Ptr<ClassAEndDeviceLorawanMac> mac = CreateObject<ClassAEndDeviceLorawanMac> (beamId);
+  Ptr<LorawanMacEndDeviceClassA> mac = CreateObject<LorawanMacEndDeviceClassA> (beamId);
 
   // TODO configuration for EU only
   mac->SetTxDbmForTxPower (std::vector<double>{16, 14, 12, 10, 8, 6, 4, 2});
@@ -613,22 +614,22 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
   mac->SetSecondReceiveWindowDataRate (0);
   mac->SetSecondReceiveWindowFrequency (869.525);
 
-  LogicalLoraChannelHelper channelHelper;
-  channelHelper.AddSubBand (868, 868.6, 0.01, 14);
-  channelHelper.AddSubBand (868.7, 869.2, 0.001, 14);
-  channelHelper.AddSubBand (869.4, 869.65, 0.1, 27);
+  LoraLogicalChannelHelper channelHelper;
+  channelHelper.AddLoraSubBand (868, 868.6, 0.01, 14);
+  channelHelper.AddLoraSubBand (868.7, 869.2, 0.001, 14);
+  channelHelper.AddLoraSubBand (869.4, 869.65, 0.1, 27);
 
   //////////////////////
   // Default channels //
   //////////////////////
-  Ptr<LogicalLoraChannel> lc1 = CreateObject<LogicalLoraChannel> (868.1, 0, 5);
-  Ptr<LogicalLoraChannel> lc2 = CreateObject<LogicalLoraChannel> (868.3, 0, 5);
-  Ptr<LogicalLoraChannel> lc3 = CreateObject<LogicalLoraChannel> (868.5, 0, 5);
+  Ptr<LoraLogicalChannel> lc1 = CreateObject<LoraLogicalChannel> (868.1, 0, 5);
+  Ptr<LoraLogicalChannel> lc2 = CreateObject<LoraLogicalChannel> (868.3, 0, 5);
+  Ptr<LoraLogicalChannel> lc3 = CreateObject<LoraLogicalChannel> (868.5, 0, 5);
   channelHelper.AddChannel (lc1);
   channelHelper.AddChannel (lc2);
   channelHelper.AddChannel (lc3);
 
-  mac->SetLogicalLoraChannelHelper (channelHelper);
+  mac->SetLoraLogicalChannelHelper (channelHelper);
 
   ///////////////////////////////////////////////
   // DataRate -> SF, DataRate -> Bandwidth     //
@@ -673,7 +674,7 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
   mac->SetWaveformConf (waveformConf);
 
   // Add UT to NCC
-  ncc->AddUt (m_llsConf, dev->GetAddress (), beamId, MakeCallback (&EndDeviceLorawanMac::SetRaChannel, mac));
+  ncc->AddUt (m_llsConf, dev->GetAddress (), beamId, MakeCallback (&LorawanMacEndDevice::SetRaChannel, mac));
 
   phy->Initialize ();
 

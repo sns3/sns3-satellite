@@ -1535,11 +1535,11 @@ SimulationHelper::InstallLoraTrafficModel (LoraTrafficModel_t trafficModel,
         ApplicationContainer sinkContainer;
         ApplicationContainer cbrContainer;
         // create sink application on GW user
-        if (!HasSinkInstalled (gwUsers.Get (m_gwUserId), port))
+        /*if (!HasSinkInstalled (gwUsers.Get (m_gwUserId), port))
           {
             sinkHelper.SetAttribute ("Local", AddressValue (Address (gwUserAddr)));
             sinkContainer.Add (sinkHelper.Install (gwUsers.Get (m_gwUserId)));
-          }
+          }*/
 
         cbrHelper.SetAttribute ("Remote", AddressValue (Address (gwUserAddr)));
 

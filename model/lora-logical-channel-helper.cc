@@ -16,46 +16,49 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "ns3/logical-lora-channel-helper.h"
 #include "ns3/simulator.h"
 #include "ns3/log.h"
 
+#include "ns3/lora-logical-channel-helper.h"
+
 namespace ns3 {
 
-NS_LOG_COMPONENT_DEFINE ("LogicalLoraChannelHelper");
+NS_LOG_COMPONENT_DEFINE ("LoraLogicalChannelHelper");
 
-NS_OBJECT_ENSURE_REGISTERED (LogicalLoraChannelHelper);
+NS_OBJECT_ENSURE_REGISTERED (LoraLogicalChannelHelper);
 
 TypeId
-LogicalLoraChannelHelper::GetTypeId (void)
+LoraLogicalChannelHelper::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::LogicalLoraChannelHelper")
+  static TypeId tid = TypeId ("ns3::LoraLogicalChannelHelper")
     .SetParent<Object> ()
     .SetGroupName ("lorawan");
   return tid;
 }
 
-LogicalLoraChannelHelper::LogicalLoraChannelHelper () :
+LoraLogicalChannelHelper::LoraLogicalChannelHelper () :
   m_nextAggregatedTransmissionTime (Seconds (0)),
   m_aggregatedDutyCycle (1)
 {
   NS_LOG_FUNCTION (this);
 }
 
-LogicalLoraChannelHelper::~LogicalLoraChannelHelper ()
+LoraLogicalChannelHelper::~LoraLogicalChannelHelper ()
 {
   NS_LOG_FUNCTION (this);
 }
 
-std::vector<Ptr <LogicalLoraChannel> >
-LogicalLoraChannelHelper::GetChannelList (void)
+std::vector<Ptr <LoraLogicalChannel> >
+LoraLogicalChannelHelper::GetChannelList (void)
 {
   NS_LOG_FUNCTION (this);
 
   // Make a copy of the channel vector
-  std::vector<Ptr<LogicalLoraChannel> > vector;
+  std::vector<Ptr<LoraLogicalChannel> > vector;
   vector.reserve (m_channelList.size ());
   std::copy (m_channelList.begin (), m_channelList.end (), std::back_inserter
                (vector));
@@ -64,19 +67,19 @@ LogicalLoraChannelHelper::GetChannelList (void)
 }
 
 
-std::vector<Ptr <LogicalLoraChannel> >
-LogicalLoraChannelHelper::GetEnabledChannelList (void)
+std::vector<Ptr <LoraLogicalChannel> >
+LoraLogicalChannelHelper::GetEnabledChannelList (void)
 {
   NS_LOG_FUNCTION (this);
 
   // Make a copy of the channel vector
-  std::vector<Ptr<LogicalLoraChannel> > vector;
+  std::vector<Ptr<LoraLogicalChannel> > vector;
   vector.reserve (m_channelList.size ());
   std::copy (m_channelList.begin (), m_channelList.end (), std::back_inserter
                (vector));     // Working on a copy
 
-  std::vector<Ptr <LogicalLoraChannel> > channels;
-  std::vector<Ptr <LogicalLoraChannel> >::iterator it;
+  std::vector<Ptr <LoraLogicalChannel> > channels;
+  std::vector<Ptr <LoraLogicalChannel> >::iterator it;
   for (it = vector.begin (); it != vector.end (); it++)
     {
       if ((*it)->IsEnabledForUplink ())
@@ -88,39 +91,39 @@ LogicalLoraChannelHelper::GetEnabledChannelList (void)
   return channels;
 }
 
-Ptr<SubBand>
-LogicalLoraChannelHelper::GetSubBandFromChannel (Ptr<LogicalLoraChannel>
+Ptr<LoraSubBand>
+LoraLogicalChannelHelper::GetLoraSubBandFromChannel (Ptr<LoraLogicalChannel>
                                                  channel)
 {
-  return GetSubBandFromFrequency (channel->GetFrequency ());
+  return GetLoraSubBandFromFrequency (channel->GetFrequency ());
 }
 
-Ptr<SubBand>
-LogicalLoraChannelHelper::GetSubBandFromFrequency (double frequency)
+Ptr<LoraSubBand>
+LoraLogicalChannelHelper::GetLoraSubBandFromFrequency (double frequency)
 {
-  // Get the SubBand this frequency belongs to
-  std::list< Ptr< SubBand > >::iterator it;
+  // Get the LoraSubBand this frequency belongs to
+  std::list< Ptr< LoraSubBand > >::iterator it;
   for (it = m_subBandList.begin (); it != m_subBandList.end (); it++)
     {
-      if ((*it)->BelongsToSubBand (frequency))
+      if ((*it)->BelongsToLoraSubBand (frequency))
         {
           return *it;
         }
     }
 
   NS_LOG_ERROR ("Requested frequency: " << frequency);
-  NS_ABORT_MSG ("Warning: frequency is outside any known SubBand.");
+  NS_ABORT_MSG ("Warning: frequency is outside any known LoraSubBand.");
 
-  return 0;     // If no SubBand is found, return 0
+  return 0;     // If no LoraSubBand is found, return 0
 }
 
 void
-LogicalLoraChannelHelper::AddChannel (double frequency)
+LoraLogicalChannelHelper::AddChannel (double frequency)
 {
   NS_LOG_FUNCTION (this << frequency);
 
   // Create the new channel and increment the counter
-  Ptr<LogicalLoraChannel> channel = Create<LogicalLoraChannel> (frequency);
+  Ptr<LoraLogicalChannel> channel = Create<LoraLogicalChannel> (frequency);
 
   // Add it to the list
   m_channelList.push_back (channel);
@@ -130,7 +133,7 @@ LogicalLoraChannelHelper::AddChannel (double frequency)
 }
 
 void
-LogicalLoraChannelHelper::AddChannel (Ptr<LogicalLoraChannel> logicalChannel)
+LoraLogicalChannelHelper::AddChannel (Ptr<LoraLogicalChannel> logicalChannel)
 {
   NS_LOG_FUNCTION (this << logicalChannel);
 
@@ -139,8 +142,8 @@ LogicalLoraChannelHelper::AddChannel (Ptr<LogicalLoraChannel> logicalChannel)
 }
 
 void
-LogicalLoraChannelHelper::SetChannel (uint8_t chIndex,
-                                      Ptr<LogicalLoraChannel> logicalChannel)
+LoraLogicalChannelHelper::SetChannel (uint8_t chIndex,
+                                      Ptr<LoraLogicalChannel> logicalChannel)
 
 {
   NS_LOG_FUNCTION (this << chIndex << logicalChannel);
@@ -149,20 +152,20 @@ LogicalLoraChannelHelper::SetChannel (uint8_t chIndex,
 }
 
 void
-LogicalLoraChannelHelper::AddSubBand (double firstFrequency,
+LoraLogicalChannelHelper::AddLoraSubBand (double firstFrequency,
                                       double lastFrequency, double dutyCycle,
                                       double maxTxPowerDbm)
 {
   NS_LOG_FUNCTION (this << firstFrequency << lastFrequency);
 
-  Ptr<SubBand> subBand = Create<SubBand> (firstFrequency, lastFrequency,
+  Ptr<LoraSubBand> subBand = Create<LoraSubBand> (firstFrequency, lastFrequency,
                                           dutyCycle, maxTxPowerDbm);
 
   m_subBandList.push_back (subBand);
 }
 
 void
-LogicalLoraChannelHelper::AddSubBand (Ptr<SubBand> subBand)
+LoraLogicalChannelHelper::AddLoraSubBand (Ptr<LoraSubBand> subBand)
 {
   NS_LOG_FUNCTION (this << subBand);
 
@@ -170,13 +173,13 @@ LogicalLoraChannelHelper::AddSubBand (Ptr<SubBand> subBand)
 }
 
 void
-LogicalLoraChannelHelper::RemoveChannel (Ptr<LogicalLoraChannel> logicalChannel)
+LoraLogicalChannelHelper::RemoveChannel (Ptr<LoraLogicalChannel> logicalChannel)
 {
   // Search and remove the channel from the list
-  std::vector<Ptr<LogicalLoraChannel> >::iterator it;
+  std::vector<Ptr<LoraLogicalChannel> >::iterator it;
   for (it = m_channelList.begin (); it != m_channelList.end (); it++)
     {
-      Ptr<LogicalLoraChannel> currentChannel = *it;
+      Ptr<LoraLogicalChannel> currentChannel = *it;
       if (currentChannel == logicalChannel)
         {
           m_channelList.erase (it);
@@ -186,7 +189,7 @@ LogicalLoraChannelHelper::RemoveChannel (Ptr<LogicalLoraChannel> logicalChannel)
 }
 
 Time
-LogicalLoraChannelHelper::GetAggregatedWaitingTime (void)
+LoraLogicalChannelHelper::GetAggregatedWaitingTime (void)
 {
   // Aggregate waiting time
   Time aggregatedWaitingTime = m_nextAggregatedTransmissionTime - Simulator::Now ();
@@ -201,12 +204,12 @@ LogicalLoraChannelHelper::GetAggregatedWaitingTime (void)
 }
 
 Time
-LogicalLoraChannelHelper::GetWaitingTime (Ptr<LogicalLoraChannel> channel)
+LoraLogicalChannelHelper::GetWaitingTime (Ptr<LoraLogicalChannel> channel)
 {
   NS_LOG_FUNCTION (this << channel);
 
-  // SubBand waiting time
-  Time subBandWaitingTime = GetSubBandFromChannel (channel)->
+  // LoraSubBand waiting time
+  Time subBandWaitingTime = GetLoraSubBandFromChannel (channel)->
     GetNextTransmissionTime () -
     Simulator::Now ();
 
@@ -220,12 +223,12 @@ LogicalLoraChannelHelper::GetWaitingTime (Ptr<LogicalLoraChannel> channel)
 }
 
 void
-LogicalLoraChannelHelper::AddEvent (Time duration,
-                                    Ptr<LogicalLoraChannel> channel)
+LoraLogicalChannelHelper::AddEvent (Time duration,
+                                    Ptr<LoraLogicalChannel> channel)
 {
   NS_LOG_FUNCTION (this << duration << channel);
 
-  Ptr<SubBand> subBand = GetSubBandFromChannel (channel);
+  Ptr<LoraSubBand> subBand = GetLoraSubBandFromChannel (channel);
 
   double dutyCycle = subBand->GetDutyCycle ();
   double timeOnAir = duration.GetSeconds ();
@@ -248,28 +251,28 @@ LogicalLoraChannelHelper::AddEvent (Time duration,
 }
 
 double
-LogicalLoraChannelHelper::GetTxPowerForChannel (Ptr<LogicalLoraChannel>
+LoraLogicalChannelHelper::GetTxPowerForChannel (Ptr<LoraLogicalChannel>
                                                 logicalChannel)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
-  // Get the maxTxPowerDbm from the SubBand this channel is in
-  std::list< Ptr< SubBand > >::iterator it;
+  // Get the maxTxPowerDbm from the LoraSubBand this channel is in
+  std::list< Ptr< LoraSubBand > >::iterator it;
   for (it = m_subBandList.begin (); it != m_subBandList.end (); it++)
     {
-      // Check whether this channel is in this SubBand
-      if ((*it)->BelongsToSubBand (logicalChannel->GetFrequency ()))
+      // Check whether this channel is in this LoraSubBand
+      if ((*it)->BelongsToLoraSubBand (logicalChannel->GetFrequency ()))
         {
           return (*it)->GetMaxTxPowerDbm ();
         }
     }
-  NS_ABORT_MSG ("Logical channel doesn't belong to a known SubBand");
+  NS_ABORT_MSG ("Logical channel doesn't belong to a known LoraSubBand");
 
   return 0;
 }
 
 void
-LogicalLoraChannelHelper::DisableChannel (int index)
+LoraLogicalChannelHelper::DisableChannel (int index)
 {
   NS_LOG_FUNCTION (this << index);
 

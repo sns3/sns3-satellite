@@ -102,7 +102,8 @@ public:
     DVB_GW,
     DVB_UT,
     LORA_GW,
-    LORA_UT
+    LORA_UT,
+    GEO
   } SatLoraNodeType_t;
 
   /**

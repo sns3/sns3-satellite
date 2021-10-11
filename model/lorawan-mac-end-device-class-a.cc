@@ -20,37 +20,38 @@
  *
  * Modified by: Peggy Anderson <peggy.anderson@usask.ca>
  *              qiuyukang <b612n@qq.com>
+ *              Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "ns3/class-a-end-device-lorawan-mac.h"
-#include "ns3/end-device-lorawan-mac.h"
+#include "ns3/lorawan-mac-end-device-class-a.h"
+#include "ns3/lorawan-mac-end-device.h"
 #include "ns3/satellite-phy.h"
 #include "ns3/log.h"
 #include <algorithm>
 
 namespace ns3 {
 
-NS_LOG_COMPONENT_DEFINE ("ClassAEndDeviceLorawanMac");
+NS_LOG_COMPONENT_DEFINE ("LorawanMacEndDeviceClassA");
 
-NS_OBJECT_ENSURE_REGISTERED (ClassAEndDeviceLorawanMac);
+NS_OBJECT_ENSURE_REGISTERED (LorawanMacEndDeviceClassA);
 
 TypeId
-ClassAEndDeviceLorawanMac::GetTypeId (void)
+LorawanMacEndDeviceClassA::GetTypeId (void)
 {
-static TypeId tid = TypeId ("ns3::ClassAEndDeviceLorawanMac")
-  .SetParent<EndDeviceLorawanMac> ()
+static TypeId tid = TypeId ("ns3::LorawanMacEndDeviceClassA")
+  .SetParent<LorawanMacEndDevice> ()
   .SetGroupName ("lorawan")
-  .AddConstructor<ClassAEndDeviceLorawanMac> ();
+  .AddConstructor<LorawanMacEndDeviceClassA> ();
 return tid;
 }
 
-ClassAEndDeviceLorawanMac::ClassAEndDeviceLorawanMac ()
+LorawanMacEndDeviceClassA::LorawanMacEndDeviceClassA ()
 {
   NS_FATAL_ERROR ("Default constructor not in use");
 }
 
-ClassAEndDeviceLorawanMac::ClassAEndDeviceLorawanMac (uint32_t beamId)
-  : EndDeviceLorawanMac (beamId),
+LorawanMacEndDeviceClassA::LorawanMacEndDeviceClassA (uint32_t beamId)
+  : LorawanMacEndDevice (beamId),
     // LoraWAN default
     m_receiveDelay1 (Seconds (1)),
     // LoraWAN default
@@ -68,7 +69,7 @@ ClassAEndDeviceLorawanMac::ClassAEndDeviceLorawanMac (uint32_t beamId)
   m_secondReceiveWindow.Cancel ();
 }
 
-ClassAEndDeviceLorawanMac::~ClassAEndDeviceLorawanMac ()
+LorawanMacEndDeviceClassA::~LorawanMacEndDeviceClassA ()
 {
   NS_LOG_FUNCTION_NOARGS ();
 }
@@ -78,7 +79,7 @@ ClassAEndDeviceLorawanMac::~ClassAEndDeviceLorawanMac ()
 /////////////////////
 
 void
-ClassAEndDeviceLorawanMac::SendToPhy (Ptr<Packet> packetToSend)
+LorawanMacEndDeviceClassA::SendToPhy (Ptr<Packet> packetToSend)
 {
   /////////////////////////////////////////////////////////
   // Add headers, prepare TX parameters and send the packet
@@ -139,7 +140,7 @@ ClassAEndDeviceLorawanMac::SendToPhy (Ptr<Packet> packetToSend)
 
   // Wake up PHY layer and directly send the packet
 
-  Ptr<LogicalLoraChannel> txChannel = GetChannelForTx ();
+  Ptr<LoraLogicalChannel> txChannel = GetChannelForTx ();
 
   NS_LOG_DEBUG ("PacketToSend: " << packetToSend);
 
@@ -171,7 +172,7 @@ ClassAEndDeviceLorawanMac::SendToPhy (Ptr<Packet> packetToSend)
 //  Receiving methods   //
 //////////////////////////
 void
-ClassAEndDeviceLorawanMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/)
+LorawanMacEndDeviceClassA::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/)
 {
   // Invoke the `Rx` and `RxDelay` trace sources.
   RxTraces (packets);
@@ -183,7 +184,7 @@ ClassAEndDeviceLorawanMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSi
 }
 
 void
-ClassAEndDeviceLorawanMac::Receive (Ptr<Packet const> packet)
+LorawanMacEndDeviceClassA::Receive (Ptr<Packet const> packet)
 {
   NS_LOG_FUNCTION (this << packet);
 
@@ -282,7 +283,7 @@ ClassAEndDeviceLorawanMac::Receive (Ptr<Packet const> packet)
 }
 
 void
-ClassAEndDeviceLorawanMac::FailedReception (Ptr<Packet const> packet)
+LorawanMacEndDeviceClassA::FailedReception (Ptr<Packet const> packet)
 {
   NS_LOG_FUNCTION (this << packet);
 
@@ -309,7 +310,7 @@ ClassAEndDeviceLorawanMac::FailedReception (Ptr<Packet const> packet)
 }
 
 void
-ClassAEndDeviceLorawanMac::TxFinished ()
+LorawanMacEndDeviceClassA::TxFinished ()
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -317,19 +318,19 @@ ClassAEndDeviceLorawanMac::TxFinished ()
 
   // Schedule the opening of the first receive window
   Simulator::Schedule (m_receiveDelay1,
-                       &ClassAEndDeviceLorawanMac::OpenFirstReceiveWindow, this);
+                       &LorawanMacEndDeviceClassA::OpenFirstReceiveWindow, this);
 
   // Schedule the opening of the second receive window
   m_secondReceiveWindow = Simulator::Schedule (m_receiveDelay2,
-                                               &ClassAEndDeviceLorawanMac::OpenSecondReceiveWindow,
+                                               &LorawanMacEndDeviceClassA::OpenSecondReceiveWindow,
                                                this);
   // // Schedule the opening of the first receive window
   // Simulator::Schedule (m_receiveDelay1,
-  //                      &ClassAEndDeviceLorawanMac::OpenFirstReceiveWindow, this);
+  //                      &LorawanMacEndDeviceClassA::OpenFirstReceiveWindow, this);
   //
   // // Schedule the opening of the second receive window
   // m_secondReceiveWindow = Simulator::Schedule (m_receiveDelay2,
-  //                                              &ClassAEndDeviceLorawanMac::OpenSecondReceiveWindow,
+  //                                              &LorawanMacEndDeviceClassA::OpenSecondReceiveWindow,
   //                                              this);
 
   // Switch the PHY to sleep
@@ -337,7 +338,7 @@ ClassAEndDeviceLorawanMac::TxFinished ()
 }
 
 void
-ClassAEndDeviceLorawanMac::OpenFirstReceiveWindow (void)
+LorawanMacEndDeviceClassA::OpenFirstReceiveWindow (void)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -351,12 +352,12 @@ ClassAEndDeviceLorawanMac::OpenFirstReceiveWindow (void)
   // device's radio transceiver to effectively detect a downlink preamble"
   // (LoraWAN specification)
   m_closeFirstWindow = Simulator::Schedule (Seconds (m_receiveWindowDurationInSymbols*tSym),
-                                            &ClassAEndDeviceLorawanMac::CloseFirstReceiveWindow, this); //m_receiveWindowDuration
+                                            &LorawanMacEndDeviceClassA::CloseFirstReceiveWindow, this); //m_receiveWindowDuration
 
 }
 
 void
-ClassAEndDeviceLorawanMac::CloseFirstReceiveWindow (void)
+LorawanMacEndDeviceClassA::CloseFirstReceiveWindow (void)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -385,7 +386,7 @@ ClassAEndDeviceLorawanMac::CloseFirstReceiveWindow (void)
 }
 
 void
-ClassAEndDeviceLorawanMac::OpenSecondReceiveWindow (void)
+LorawanMacEndDeviceClassA::OpenSecondReceiveWindow (void)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -415,11 +416,11 @@ ClassAEndDeviceLorawanMac::OpenSecondReceiveWindow (void)
   // device's radio transceiver to effectively detect a downlink preamble"
   // (LoraWAN specification)
   m_closeSecondWindow = Simulator::Schedule (Seconds (m_receiveWindowDurationInSymbols*tSym),
-                                             &ClassAEndDeviceLorawanMac::CloseSecondReceiveWindow, this);
+                                             &LorawanMacEndDeviceClassA::CloseSecondReceiveWindow, this);
 }
 
 void
-ClassAEndDeviceLorawanMac::CloseSecondReceiveWindow (void)
+LorawanMacEndDeviceClassA::CloseSecondReceiveWindow (void)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -486,7 +487,7 @@ ClassAEndDeviceLorawanMac::CloseSecondReceiveWindow (void)
 /////////////////////////
 
 Time
-ClassAEndDeviceLorawanMac::GetNextClassTransmissionDelay (Time waitingTime)
+LorawanMacEndDeviceClassA::GetNextClassTransmissionDelay (Time waitingTime)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -526,31 +527,31 @@ ClassAEndDeviceLorawanMac::GetNextClassTransmissionDelay (Time waitingTime)
 }
 
 uint8_t
-ClassAEndDeviceLorawanMac::GetFirstReceiveWindowDataRate (void)
+LorawanMacEndDeviceClassA::GetFirstReceiveWindowDataRate (void)
 {
   return m_replyDataRateMatrix.at (m_dataRate).at (m_rx1DrOffset);
 }
 
 void
-ClassAEndDeviceLorawanMac::SetSecondReceiveWindowDataRate (uint8_t dataRate)
+LorawanMacEndDeviceClassA::SetSecondReceiveWindowDataRate (uint8_t dataRate)
 {
   m_secondReceiveWindowDataRate = dataRate;
 }
 
 uint8_t
-ClassAEndDeviceLorawanMac::GetSecondReceiveWindowDataRate (void)
+LorawanMacEndDeviceClassA::GetSecondReceiveWindowDataRate (void)
 {
   return m_secondReceiveWindowDataRate;
 }
 
 void
-ClassAEndDeviceLorawanMac::SetSecondReceiveWindowFrequency (double frequencyMHz)
+LorawanMacEndDeviceClassA::SetSecondReceiveWindowFrequency (double frequencyMHz)
 {
   m_secondReceiveWindowFrequency = frequencyMHz;
 }
 
 double
-ClassAEndDeviceLorawanMac::GetSecondReceiveWindowFrequency (void)
+LorawanMacEndDeviceClassA::GetSecondReceiveWindowFrequency (void)
 {
   return m_secondReceiveWindowFrequency;
 }
@@ -560,7 +561,7 @@ ClassAEndDeviceLorawanMac::GetSecondReceiveWindowFrequency (void)
 /////////////////////////
 
 void
-ClassAEndDeviceLorawanMac::OnRxClassParamSetupReq (Ptr<RxParamSetupReq> rxParamSetupReq)
+LorawanMacEndDeviceClassA::OnRxClassParamSetupReq (Ptr<RxParamSetupReq> rxParamSetupReq)
 {
   NS_LOG_FUNCTION (this << rxParamSetupReq);
 

@@ -19,100 +19,104 @@
  *         Martina Capuzzo <capuzzom@dei.unipd.it>
  *
  * Modified by: Peggy Anderson <peggy.anderson@usask.ca>
+ *              Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "ns3/end-device-lorawan-mac.h"
-#include "ns3/class-a-end-device-lorawan-mac.h"
-#include "ns3/satellite-phy.h"
+#include <algorithm>
+
 #include "ns3/simulator.h"
 #include "ns3/log.h"
 #include "ns3/ipv4-header.h"
-#include <algorithm>
+
+#include "ns3/satellite-phy.h"
+
+#include "ns3/lorawan-mac-end-device.h"
+#include "ns3/lorawan-mac-end-device-class-a.h"
 
 namespace ns3 {
 
-NS_LOG_COMPONENT_DEFINE ("EndDeviceLorawanMac");
+NS_LOG_COMPONENT_DEFINE ("LorawanMacEndDevice");
 
-NS_OBJECT_ENSURE_REGISTERED (EndDeviceLorawanMac);
+NS_OBJECT_ENSURE_REGISTERED (LorawanMacEndDevice);
 
 TypeId
-EndDeviceLorawanMac::GetTypeId (void)
+LorawanMacEndDevice::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::EndDeviceLorawanMac")
+  static TypeId tid = TypeId ("ns3::LorawanMacEndDevice")
     .SetParent<LorawanMac> ()
     .AddTraceSource ("RequiredTransmissions",
                      "Total number of transmissions required to deliver this packet",
                      MakeTraceSourceAccessor
-                       (&EndDeviceLorawanMac::m_requiredTxCallback),
+                       (&LorawanMacEndDevice::m_requiredTxCallback),
                      "ns3::TracedValueCallback::uint8_t")
     .AddAttribute ("DataRate",
                    "Data Rate currently employed by this end device",
                    UintegerValue (0),
-                   MakeUintegerAccessor (&EndDeviceLorawanMac::m_dataRate),
+                   MakeUintegerAccessor (&LorawanMacEndDevice::m_dataRate),
                    MakeUintegerChecker<uint8_t> (0, 5))
     .AddTraceSource ("DataRate",
                      "Data Rate currently employed by this end device",
                      MakeTraceSourceAccessor
-                       (&EndDeviceLorawanMac::m_dataRate),
+                       (&LorawanMacEndDevice::m_dataRate),
                      "ns3::TracedValueCallback::uint8_t")
     .AddAttribute ("DRControl",
                    "Whether to request the NS to control this device's Data Rate",
                    BooleanValue (),
-                   MakeBooleanAccessor (&EndDeviceLorawanMac::m_controlDataRate),
+                   MakeBooleanAccessor (&LorawanMacEndDevice::m_controlDataRate),
                    MakeBooleanChecker ())
     .AddTraceSource ("TxPower",
                      "Transmission power currently employed by this end device",
                      MakeTraceSourceAccessor
-                       (&EndDeviceLorawanMac::m_txPower),
+                       (&LorawanMacEndDevice::m_txPower),
                      "ns3::TracedValueCallback::Double")
     .AddTraceSource ("LastKnownLinkMargin",
                      "Last known demodulation margin in "
                      "communications between this end device "
                      "and a gateway",
                      MakeTraceSourceAccessor
-                       (&EndDeviceLorawanMac::m_lastKnownLinkMargin),
+                       (&LorawanMacEndDevice::m_lastKnownLinkMargin),
                      "ns3::TracedValueCallback::Double")
     .AddTraceSource ("LastKnownGatewayCount",
                      "Last known number of gateways able to "
                      "listen to this end device",
                      MakeTraceSourceAccessor
-                       (&EndDeviceLorawanMac::m_lastKnownGatewayCount),
+                       (&LorawanMacEndDevice::m_lastKnownGatewayCount),
                      "ns3::TracedValueCallback::Int")
     .AddTraceSource ("AggregatedDutyCycle",
                      "Aggregate duty cycle, in fraction form, "
                      "this end device must respect",
                      MakeTraceSourceAccessor
-                       (&EndDeviceLorawanMac::m_aggregatedDutyCycle),
+                       (&LorawanMacEndDevice::m_aggregatedDutyCycle),
                      "ns3::TracedValueCallback::Double")
     .AddAttribute ("MaxTransmissions",
                    "Maximum number of transmissions for a packet",
                    IntegerValue (8),
-                   MakeIntegerAccessor (&EndDeviceLorawanMac::m_maxNumbTx),
+                   MakeIntegerAccessor (&LorawanMacEndDevice::m_maxNumbTx),
                    MakeIntegerChecker<uint8_t> ())
     .AddAttribute ("EnableEDDataRateAdaptation",
                    "Whether the End Device should up its Data Rate "
                    "in case it doesn't get a reply from the NS.",
                    BooleanValue (false),
-                   MakeBooleanAccessor (&EndDeviceLorawanMac::m_enableDRAdapt),
+                   MakeBooleanAccessor (&LorawanMacEndDevice::m_enableDRAdapt),
                    MakeBooleanChecker ())
     .AddAttribute ("MType",
                    "Specify type of message will be sent by this ED.",
                    EnumValue (LorawanMacHeader::UNCONFIRMED_DATA_UP),
-                   MakeEnumAccessor (&EndDeviceLorawanMac::m_mType),
+                   MakeEnumAccessor (&LorawanMacEndDevice::m_mType),
                    MakeEnumChecker (LorawanMacHeader::UNCONFIRMED_DATA_UP,
                                     "Unconfirmed",
                                     LorawanMacHeader::CONFIRMED_DATA_UP,
                                     "Confirmed"))
-    .AddConstructor<EndDeviceLorawanMac> ();
+    .AddConstructor<LorawanMacEndDevice> ();
   return tid;
 }
 
-EndDeviceLorawanMac::EndDeviceLorawanMac ()
+LorawanMacEndDevice::LorawanMacEndDevice ()
 {
   NS_FATAL_ERROR ("Default constructor not in use");
 }
 
-EndDeviceLorawanMac::EndDeviceLorawanMac (uint32_t beamId)
+LorawanMacEndDevice::LorawanMacEndDevice (uint32_t beamId)
     : LorawanMac (beamId),
       m_enableDRAdapt (false),
       m_maxNumbTx (8),
@@ -146,11 +150,11 @@ EndDeviceLorawanMac::EndDeviceLorawanMac (uint32_t beamId)
   m_nextTx.Cancel ();
 
   // Initialize structure for retransmission parameters
-  m_retxParams = EndDeviceLorawanMac::LoraRetxParameters ();
+  m_retxParams = LorawanMacEndDevice::LoraRetxParameters ();
   m_retxParams.retxLeft = m_maxNumbTx;
 }
 
-EndDeviceLorawanMac::~EndDeviceLorawanMac ()
+LorawanMacEndDevice::~LorawanMacEndDevice ()
 {
   NS_LOG_FUNCTION_NOARGS ();
 }
@@ -160,7 +164,7 @@ EndDeviceLorawanMac::~EndDeviceLorawanMac ()
 ////////////////////////
 
 void
-EndDeviceLorawanMac::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
+LorawanMacEndDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
 {
   NS_LOG_FUNCTION (this << packet);
 
@@ -175,7 +179,7 @@ EndDeviceLorawanMac::Send (Ptr<Packet> packet, const Address& dest, uint16_t pro
     }
 
   // Pick a channel on which to transmit the packet
-  Ptr<LogicalLoraChannel> txChannel = GetChannelForTx ();
+  Ptr<LoraLogicalChannel> txChannel = GetChannelForTx ();
 
   if (!(txChannel && m_retxParams.retxLeft > 0))
     {
@@ -200,19 +204,19 @@ EndDeviceLorawanMac::Send (Ptr<Packet> packet, const Address& dest, uint16_t pro
 }
 
 void
-EndDeviceLorawanMac::postponeTransmission (Time netxTxDelay, Ptr<Packet> packet)
+LorawanMacEndDevice::postponeTransmission (Time netxTxDelay, Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this);
   // Delete previously scheduled transmissions if any.
   Simulator::Cancel (m_nextTx);
-  m_nextTx = Simulator::Schedule (netxTxDelay, &EndDeviceLorawanMac::DoSend, this, packet);
+  m_nextTx = Simulator::Schedule (netxTxDelay, &LorawanMacEndDevice::DoSend, this, packet);
   NS_LOG_WARN ("Attempting to send, but the aggregate duty cycle won't allow it. Scheduling a tx at a delay "
                << netxTxDelay.GetSeconds () << ".");
 }
 
 
 void
-EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
+LorawanMacEndDevice::DoSend (Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this);
   // Checking if this is the transmission of a new packet
@@ -317,7 +321,7 @@ EndDeviceLorawanMac::DoSend (Ptr<Packet> packet)
 }
 
 void
-EndDeviceLorawanMac::SendToPhy (Ptr<Packet> packet)
+LorawanMacEndDevice::SendToPhy (Ptr<Packet> packet)
 { }
 
 //////////////////////////
@@ -325,21 +329,21 @@ EndDeviceLorawanMac::SendToPhy (Ptr<Packet> packet)
 //////////////////////////
 
 void
-EndDeviceLorawanMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/)
+LorawanMacEndDevice::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/)
 {
 
 }
 
 void
-EndDeviceLorawanMac::Receive (Ptr<Packet const> packet)
+LorawanMacEndDevice::Receive (Ptr<Packet const> packet)
 { }
 
 void
-EndDeviceLorawanMac::FailedReception (Ptr<Packet const> packet)
+LorawanMacEndDevice::FailedReception (Ptr<Packet const> packet)
 { }
 
 void
-EndDeviceLorawanMac::ParseCommands (LoraFrameHeader frameHeader)
+LorawanMacEndDevice::ParseCommands (LoraFrameHeader frameHeader)
 {
   NS_LOG_FUNCTION (this << frameHeader);
 
@@ -365,8 +369,8 @@ EndDeviceLorawanMac::ParseCommands (LoraFrameHeader frameHeader)
         }
     }
 
-  std::list<Ptr<MacCommand> > commands = frameHeader.GetCommands ();
-  std::list<Ptr<MacCommand> >::iterator it;
+  std::list<Ptr<LorawanMacCommand> > commands = frameHeader.GetCommands ();
+  std::list<Ptr<LorawanMacCommand> >::iterator it;
   for (it = commands.begin (); it != commands.end (); it++)
     {
       NS_LOG_DEBUG ("Iterating over the MAC commands...");
@@ -469,7 +473,7 @@ EndDeviceLorawanMac::ParseCommands (LoraFrameHeader frameHeader)
 }
 
 void
-EndDeviceLorawanMac::ApplyNecessaryOptions (LoraFrameHeader& frameHeader)
+LorawanMacEndDevice::ApplyNecessaryOptions (LoraFrameHeader& frameHeader)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -486,7 +490,7 @@ EndDeviceLorawanMac::ApplyNecessaryOptions (LoraFrameHeader& frameHeader)
   for (const auto &command : m_macCommandList)
     {
       NS_LOG_INFO ("Applying a MAC Command of CID " <<
-                   unsigned(MacCommand::GetCIDFromMacCommand
+                   unsigned(LorawanMacCommand::GetCIDFromLorawanMacCommand
                               (command->GetCommandType ())));
 
       frameHeader.AddCommand (command);
@@ -495,7 +499,7 @@ EndDeviceLorawanMac::ApplyNecessaryOptions (LoraFrameHeader& frameHeader)
 }
 
 void
-EndDeviceLorawanMac::ApplyNecessaryOptions (LorawanMacHeader& macHeader)
+LorawanMacEndDevice::ApplyNecessaryOptions (LorawanMacHeader& macHeader)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -504,38 +508,38 @@ EndDeviceLorawanMac::ApplyNecessaryOptions (LorawanMacHeader& macHeader)
 }
 
 void
-EndDeviceLorawanMac::SetMType (LorawanMacHeader::MType mType)
+LorawanMacEndDevice::SetMType (LorawanMacHeader::MType mType)
 {
   m_mType = mType;
   NS_LOG_DEBUG ("Message type is set to " << mType);
 }
 
 LorawanMacHeader::MType
-EndDeviceLorawanMac::GetMType (void)
+LorawanMacEndDevice::GetMType (void)
 {
   return m_mType;
 }
 
 void
-EndDeviceLorawanMac::TxFinished ()
+LorawanMacEndDevice::TxFinished ()
 { }
 
 Time
-EndDeviceLorawanMac::GetNextClassTransmissionDelay (Time waitingTime)
+LorawanMacEndDevice::GetNextClassTransmissionDelay (Time waitingTime)
 {
   NS_LOG_FUNCTION_NOARGS ();
   return waitingTime;
 }
 
 Time
-EndDeviceLorawanMac::GetNextTransmissionDelay (void)
+LorawanMacEndDevice::GetNextTransmissionDelay (void)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
   //    Check duty cycle    //
 
   // Pick a random channel to transmit on
-  std::vector<Ptr<LogicalLoraChannel> > logicalChannels;
+  std::vector<Ptr<LoraLogicalChannel> > logicalChannels;
   logicalChannels = m_channelHelper.GetEnabledChannelList ();                 // Use a separate list to do the shuffle
   //logicalChannels = Shuffle (logicalChannels);
 
@@ -543,11 +547,11 @@ EndDeviceLorawanMac::GetNextTransmissionDelay (void)
   Time waitingTime = Time::Max ();
 
   // Try every channel
-  std::vector<Ptr<LogicalLoraChannel> >::iterator it;
+  std::vector<Ptr<LoraLogicalChannel> >::iterator it;
   for (it = logicalChannels.begin (); it != logicalChannels.end (); ++it)
     {
       // Pointer to the current channel
-      Ptr<LogicalLoraChannel> logicalChannel = *it;
+      Ptr<LoraLogicalChannel> logicalChannel = *it;
       double frequency = logicalChannel->GetFrequency ();
 
       waitingTime = std::min (waitingTime, m_channelHelper.GetWaitingTime (logicalChannel));
@@ -562,22 +566,22 @@ EndDeviceLorawanMac::GetNextTransmissionDelay (void)
 }
 
 
-Ptr<LogicalLoraChannel>
-EndDeviceLorawanMac::GetChannelForTx (void)
+Ptr<LoraLogicalChannel>
+LorawanMacEndDevice::GetChannelForTx (void)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
   // Pick a random channel to transmit on
-  std::vector<Ptr<LogicalLoraChannel> > logicalChannels;
+  std::vector<Ptr<LoraLogicalChannel> > logicalChannels;
   logicalChannels = m_channelHelper.GetEnabledChannelList ();                 // Use a separate list to do the shuffle
   logicalChannels = Shuffle (logicalChannels);
 
   // Try every channel
-  std::vector<Ptr<LogicalLoraChannel> >::iterator it;
+  std::vector<Ptr<LoraLogicalChannel> >::iterator it;
   for (it = logicalChannels.begin (); it != logicalChannels.end (); ++it)
     {
       // Pointer to the current channel
-      Ptr<LogicalLoraChannel> logicalChannel = *it;
+      Ptr<LoraLogicalChannel> logicalChannel = *it;
       double frequency = logicalChannel->GetFrequency ();
 
       NS_LOG_DEBUG ("Frequency of the current channel: " << frequency);
@@ -603,8 +607,8 @@ EndDeviceLorawanMac::GetChannelForTx (void)
 }
 
 
-std::vector<Ptr<LogicalLoraChannel> >
-EndDeviceLorawanMac::Shuffle (std::vector<Ptr<LogicalLoraChannel> > vector)
+std::vector<Ptr<LoraLogicalChannel> >
+LorawanMacEndDevice::Shuffle (std::vector<Ptr<LoraLogicalChannel> > vector)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -613,7 +617,7 @@ EndDeviceLorawanMac::Shuffle (std::vector<Ptr<LogicalLoraChannel> > vector)
   for (int i = 0; i < size; ++i)
     {
       uint16_t random = std::floor (m_uniformRV->GetValue (0, size));
-      Ptr<LogicalLoraChannel> temp = vector.at (random);
+      Ptr<LoraLogicalChannel> temp = vector.at (random);
       vector.at (random) = vector.at (i);
       vector.at (i) = temp;
     }
@@ -625,7 +629,7 @@ EndDeviceLorawanMac::Shuffle (std::vector<Ptr<LogicalLoraChannel> > vector)
 // Setters and Getters //
 /////////////////////////
 
-void EndDeviceLorawanMac::resetRetransmissionParameters ()
+void LorawanMacEndDevice::resetRetransmissionParameters ()
 {
   m_retxParams.waitingAck = false;
   m_retxParams.retxLeft = m_maxNumbTx;
@@ -637,20 +641,20 @@ void EndDeviceLorawanMac::resetRetransmissionParameters ()
 }
 
 void
-EndDeviceLorawanMac::SetDataRateAdaptation (bool adapt)
+LorawanMacEndDevice::SetDataRateAdaptation (bool adapt)
 {
   NS_LOG_FUNCTION (this << adapt);
   m_enableDRAdapt = adapt;
 }
 
 bool
-EndDeviceLorawanMac::GetDataRateAdaptation (void)
+LorawanMacEndDevice::GetDataRateAdaptation (void)
 {
   return m_enableDRAdapt;
 }
 
 void
-EndDeviceLorawanMac::SetMaxNumberOfTransmissions (uint8_t maxNumbTx)
+LorawanMacEndDevice::SetMaxNumberOfTransmissions (uint8_t maxNumbTx)
 {
   NS_LOG_FUNCTION (this << unsigned(maxNumbTx));
   m_maxNumbTx = maxNumbTx;
@@ -658,7 +662,7 @@ EndDeviceLorawanMac::SetMaxNumberOfTransmissions (uint8_t maxNumbTx)
 }
 
 uint8_t
-EndDeviceLorawanMac::GetMaxNumberOfTransmissions (void)
+LorawanMacEndDevice::GetMaxNumberOfTransmissions (void)
 {
   NS_LOG_FUNCTION (this );
   return m_maxNumbTx;
@@ -666,7 +670,7 @@ EndDeviceLorawanMac::GetMaxNumberOfTransmissions (void)
 
 
 void
-EndDeviceLorawanMac::SetDataRate (uint8_t dataRate)
+LorawanMacEndDevice::SetDataRate (uint8_t dataRate)
 {
   NS_LOG_FUNCTION (this << unsigned (dataRate));
 
@@ -674,7 +678,7 @@ EndDeviceLorawanMac::SetDataRate (uint8_t dataRate)
 }
 
 uint8_t
-EndDeviceLorawanMac::GetDataRate (void)
+LorawanMacEndDevice::GetDataRate (void)
 {
   NS_LOG_FUNCTION (this);
 
@@ -682,7 +686,7 @@ EndDeviceLorawanMac::GetDataRate (void)
 }
 
 void
-EndDeviceLorawanMac::SetDeviceAddress (LoraDeviceAddress address)
+LorawanMacEndDevice::SetDeviceAddress (LoraDeviceAddress address)
 {
   NS_LOG_FUNCTION (this << address);
 
@@ -690,7 +694,7 @@ EndDeviceLorawanMac::SetDeviceAddress (LoraDeviceAddress address)
 }
 
 LoraDeviceAddress
-EndDeviceLorawanMac::GetDeviceAddress (void)
+LorawanMacEndDevice::GetDeviceAddress (void)
 {
   NS_LOG_FUNCTION (this);
 
@@ -698,7 +702,7 @@ EndDeviceLorawanMac::GetDeviceAddress (void)
 }
 
 void
-EndDeviceLorawanMac::OnLinkCheckAns (uint8_t margin, uint8_t gwCnt)
+LorawanMacEndDevice::OnLinkCheckAns (uint8_t margin, uint8_t gwCnt)
 {
   NS_LOG_FUNCTION (this << unsigned(margin) << unsigned(gwCnt));
 
@@ -707,7 +711,7 @@ EndDeviceLorawanMac::OnLinkCheckAns (uint8_t margin, uint8_t gwCnt)
 }
 
 void
-EndDeviceLorawanMac::OnLinkAdrReq (uint8_t dataRate, uint8_t txPower,
+LorawanMacEndDevice::OnLinkAdrReq (uint8_t dataRate, uint8_t txPower,
                                 std::list<int> enabledChannels, int repetitions)
 {
   NS_LOG_FUNCTION (this << unsigned (dataRate) << unsigned (txPower) <<
@@ -820,7 +824,7 @@ EndDeviceLorawanMac::OnLinkAdrReq (uint8_t dataRate, uint8_t txPower,
 }
 
 void
-EndDeviceLorawanMac::OnDutyCycleReq (double dutyCycle)
+LorawanMacEndDevice::OnDutyCycleReq (double dutyCycle)
 {
   NS_LOG_FUNCTION (this << dutyCycle);
 
@@ -836,20 +840,20 @@ EndDeviceLorawanMac::OnDutyCycleReq (double dutyCycle)
 }
 
 void
-EndDeviceLorawanMac::OnRxClassParamSetupReq (Ptr<RxParamSetupReq> rxParamSetupReq)
+LorawanMacEndDevice::OnRxClassParamSetupReq (Ptr<RxParamSetupReq> rxParamSetupReq)
 { }
 
 void
-EndDeviceLorawanMac::OnRxParamSetupReq (Ptr<RxParamSetupReq> rxParamSetupReq)
+LorawanMacEndDevice::OnRxParamSetupReq (Ptr<RxParamSetupReq> rxParamSetupReq)
 {
   NS_LOG_FUNCTION (this << rxParamSetupReq);
 
-  // static_cast<ClassAEndDeviceLorawanMac*>(this)->OnRxClassParamSetupReq (rxParamSetupReq);
+  // static_cast<ClassALorawanMacEndDevice*>(this)->OnRxClassParamSetupReq (rxParamSetupReq);
   OnRxClassParamSetupReq (rxParamSetupReq);
 }
 
 void
-EndDeviceLorawanMac::OnDevStatusReq (void)
+LorawanMacEndDevice::OnDevStatusReq (void)
 {
   NS_LOG_FUNCTION (this);
 
@@ -862,7 +866,7 @@ EndDeviceLorawanMac::OnDevStatusReq (void)
 }
 
 void
-EndDeviceLorawanMac::OnNewChannelReq (uint8_t chIndex, double frequency, uint8_t minDataRate, uint8_t maxDataRate)
+LorawanMacEndDevice::OnNewChannelReq (uint8_t chIndex, double frequency, uint8_t minDataRate, uint8_t maxDataRate)
 {
   NS_LOG_FUNCTION (this);
 
@@ -871,7 +875,7 @@ EndDeviceLorawanMac::OnNewChannelReq (uint8_t chIndex, double frequency, uint8_t
   bool channelFrequencyOk = true;                     // XXX Check whether the frequency is ok
 
   // TODO Return false if one of the checks above failed
-  // TODO Create new channel in the LogicalLoraChannelHelper
+  // TODO Create new channel in the LoraLogicalChannelHelper
 
   SetLogicalChannel (chIndex, frequency, minDataRate, maxDataRate);
 
@@ -881,7 +885,7 @@ EndDeviceLorawanMac::OnNewChannelReq (uint8_t chIndex, double frequency, uint8_t
 }
 
 void
-EndDeviceLorawanMac::AddLogicalChannel (double frequency)
+LorawanMacEndDevice::AddLogicalChannel (double frequency)
 {
   NS_LOG_FUNCTION (this << frequency);
 
@@ -889,7 +893,7 @@ EndDeviceLorawanMac::AddLogicalChannel (double frequency)
 }
 
 void
-EndDeviceLorawanMac::AddLogicalChannel (Ptr<LogicalLoraChannel> logicalChannel)
+LorawanMacEndDevice::AddLogicalChannel (Ptr<LoraLogicalChannel> logicalChannel)
 {
   NS_LOG_FUNCTION (this << logicalChannel);
 
@@ -897,26 +901,26 @@ EndDeviceLorawanMac::AddLogicalChannel (Ptr<LogicalLoraChannel> logicalChannel)
 }
 
 void
-EndDeviceLorawanMac::SetLogicalChannel (uint8_t chIndex, double frequency,
+LorawanMacEndDevice::SetLogicalChannel (uint8_t chIndex, double frequency,
                                      uint8_t minDataRate, uint8_t maxDataRate)
 {
   NS_LOG_FUNCTION (this << unsigned (chIndex) << frequency <<
                    unsigned (minDataRate) << unsigned(maxDataRate));
 
-  m_channelHelper.SetChannel (chIndex, CreateObject<LogicalLoraChannel>
+  m_channelHelper.SetChannel (chIndex, CreateObject<LoraLogicalChannel>
                                 (frequency, minDataRate, maxDataRate));
 }
 
 void
-EndDeviceLorawanMac::AddSubBand (double startFrequency, double endFrequency, double dutyCycle, double maxTxPowerDbm)
+LorawanMacEndDevice::AddLoraSubBand (double startFrequency, double endFrequency, double dutyCycle, double maxTxPowerDbm)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
-  m_channelHelper.AddSubBand (startFrequency, endFrequency, dutyCycle, maxTxPowerDbm);
+  m_channelHelper.AddLoraSubBand (startFrequency, endFrequency, dutyCycle, maxTxPowerDbm);
 }
 
 double
-EndDeviceLorawanMac::GetAggregatedDutyCycle (void)
+LorawanMacEndDevice::GetAggregatedDutyCycle (void)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -924,7 +928,7 @@ EndDeviceLorawanMac::GetAggregatedDutyCycle (void)
 }
 
 void
-EndDeviceLorawanMac::AddMacCommand (Ptr<MacCommand> macCommand)
+LorawanMacEndDevice::AddLorawanMacCommand (Ptr<LorawanMacCommand> macCommand)
 {
   NS_LOG_FUNCTION (this << macCommand);
 
@@ -932,20 +936,20 @@ EndDeviceLorawanMac::AddMacCommand (Ptr<MacCommand> macCommand)
 }
 
 uint8_t
-EndDeviceLorawanMac::GetTransmissionPower (void)
+LorawanMacEndDevice::GetTransmissionPower (void)
 {
   return m_txPower;
 }
 
 void
-EndDeviceLorawanMac::SetGatewayUpdateCallback (EndDeviceLorawanMac::GatewayUpdateCallback cb)
+LorawanMacEndDevice::SetGatewayUpdateCallback (LorawanMacEndDevice::GatewayUpdateCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);
   m_gatewayUpdateCallback = cb;
 }
 
 void
-EndDeviceLorawanMac::SetGwAddress (Mac48Address gwAddress)
+LorawanMacEndDevice::SetGwAddress (Mac48Address gwAddress)
 {
   NS_LOG_FUNCTION (this << gwAddress);
 
@@ -954,25 +958,25 @@ EndDeviceLorawanMac::SetGwAddress (Mac48Address gwAddress)
 }
 
 void
-EndDeviceLorawanMac::SetWaveformConf (Ptr<SatWaveformConf> waveformConf)
+LorawanMacEndDevice::SetWaveformConf (Ptr<SatWaveformConf> waveformConf)
 {
   m_waveformConf = waveformConf;
 }
 
 void
-EndDeviceLorawanMac::SetRaChannel (uint32_t raChannel)
+LorawanMacEndDevice::SetRaChannel (uint32_t raChannel)
 {
   m_raChannel = raChannel;
 }
 
 void
-EndDeviceLorawanMac::SetPhyRx (Ptr<SatLoraPhyRx> phyRx)
+LorawanMacEndDevice::SetPhyRx (Ptr<SatLoraPhyRx> phyRx)
 {
   m_phyRx = phyRx;
 }
 
 Ptr<SatLoraPhyRx>
-EndDeviceLorawanMac::GetPhyRx ()
+LorawanMacEndDevice::GetPhyRx ()
 {
   return m_phyRx;
 }

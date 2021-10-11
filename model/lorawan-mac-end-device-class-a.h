@@ -19,13 +19,14 @@
  *         Martina Capuzzo <capuzzom@dei.unipd.it>
  *
  * Modified by: Peggy Anderson <peggy.anderson@usask.ca>
+ *              Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#ifndef CLASS_A_END_DEVICE_LORAWAN_MAC_H
-#define CLASS_A_END_DEVICE_LORAWAN_MAC_H
+#ifndef LORAWAN_MAC_END_DEVICE_CLASS_A_H
+#define LORAWAN_MAC_END_DEVICE_CLASS_A_H
 
 #include "ns3/lorawan-mac.h"                // Packet
-#include "ns3/end-device-lorawan-mac.h"     // EndDeviceLorawanMac
+#include "ns3/lorawan-mac-end-device.h"     // LorawanMacEndDevice
 #include "ns3/lora-frame-header.h"          // RxParamSetupReq
 #include "ns3/lora-device-address.h"
 
@@ -34,14 +35,14 @@ namespace ns3 {
 /**
  * Class representing the MAC layer of a Class A LoRaWAN device.
  */
-class ClassAEndDeviceLorawanMac : public EndDeviceLorawanMac
+class LorawanMacEndDeviceClassA : public LorawanMacEndDevice
 {
 public:
   static TypeId GetTypeId (void);
 
-  ClassAEndDeviceLorawanMac ();
-  ClassAEndDeviceLorawanMac (uint32_t beamId);
-  virtual ~ClassAEndDeviceLorawanMac ();
+  LorawanMacEndDeviceClassA ();
+  LorawanMacEndDeviceClassA (uint32_t beamId);
+  virtual ~LorawanMacEndDeviceClassA ();
 
   /////////////////////
   // Sending methods //
@@ -212,6 +213,6 @@ private:
    */
   uint8_t m_rx1DrOffset;
 
-}; /* ClassAEndDeviceLorawanMac */
+}; /* LorawanMacEndDeviceClassA */
 } /* namespace ns3 */
-#endif /* CLASS_A_END_DEVICE_LORAWAN_MAC_H */
+#endif /* LORAWAN_MAC_END_DEVICE_CLASS_A_H */

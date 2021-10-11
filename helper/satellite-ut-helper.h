@@ -25,21 +25,23 @@
 
 #include <string>
 
-#include "ns3/object-factory.h"
-#include "ns3/output-stream-wrapper.h"
-#include "ns3/net-device-container.h"
-#include "ns3/node-container.h"
-#include "ns3/traced-callback.h"
-#include "ns3/satellite-channel.h"
-#include "ns3/satellite-link-results.h"
-#include "ns3/satellite-ncc.h"
-#include "ns3/satellite-ut-mac.h"
-#include "ns3/satellite-phy.h"
-#include "ns3/satellite-superframe-sequence.h"
-#include "ns3/satellite-random-access-container.h"
-#include "ns3/satellite-random-access-container-conf.h"
-#include "ns3/satellite-typedefs.h"
-#include <ns3/end-device-lorawan-mac.h>
+#include <ns3/object-factory.h>
+#include <ns3/output-stream-wrapper.h>
+#include <ns3/net-device-container.h>
+#include <ns3/node-container.h>
+#include <ns3/traced-callback.h>
+
+#include <ns3/satellite-channel.h>
+#include <ns3/satellite-link-results.h>
+#include <ns3/satellite-ncc.h>
+#include <ns3/satellite-ut-mac.h>
+#include <ns3/satellite-phy.h>
+#include <ns3/satellite-superframe-sequence.h>
+#include <ns3/satellite-random-access-container.h>
+#include <ns3/satellite-random-access-container-conf.h>
+#include <ns3/satellite-typedefs.h>
+
+#include <ns3/lorawan-mac-end-device.h>
 
 namespace ns3 {
 

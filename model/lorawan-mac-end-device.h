@@ -19,34 +19,37 @@
  *         Martina Capuzzo <capuzzom@dei.unipd.it>
  *
  * Modified by: Peggy Anderson <peggy.anderson@usask.ca>
+ *              Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#ifndef END_DEVICE_LORAWAN_MAC_H
-#define END_DEVICE_LORAWAN_MAC_H
+#ifndef LORAWAN_MAC_END_DEVICE_H
+#define LORAWAN_MAC_END_DEVICE_H
+
+#include "ns3/random-variable-stream.h"
+#include "ns3/traced-value.h"
 
 #include "ns3/satellite-ut-mac.h"
+
 #include "ns3/lorawan-mac.h"
 #include "ns3/lorawan-mac-header.h"
 #include "ns3/lora-frame-header.h"
-#include "ns3/random-variable-stream.h"
 #include "ns3/lora-device-address.h"
-#include "ns3/logical-lora-channel.h"
-#include "ns3/logical-lora-channel-helper.h"
-#include "ns3/traced-value.h"
+#include "ns3/lora-logical-channel.h"
+#include "ns3/lora-logical-channel-helper.h"
 
 namespace ns3 {
 
 /**
  * Class representing the MAC layer of a LoRaWAN device.
  */
-class EndDeviceLorawanMac : public LorawanMac
+class LorawanMacEndDevice : public LorawanMac
 {
 public:
   static TypeId GetTypeId (void);
 
-  EndDeviceLorawanMac ();
-  EndDeviceLorawanMac (uint32_t beamId);
-  virtual ~EndDeviceLorawanMac ();
+  LorawanMacEndDevice ();
+  LorawanMacEndDevice (uint32_t beamId);
+  virtual ~LorawanMacEndDevice ();
 
   /////////////////////
   // Sending methods //
@@ -316,24 +319,24 @@ public:
    *
    * \param frequency The channel's center frequency.
    */
-  void AddLogicalChannel (Ptr<LogicalLoraChannel> logicalChannel);
+  void AddLogicalChannel (Ptr<LoraLogicalChannel> logicalChannel);
 
   /**
    * Add a subband to the logical channel helper.
    *
-   * \param startFrequency The SubBand's lowest frequency.
-   * \param endFrequency The SubBand's highest frequency.
-   * \param dutyCycle The SubBand's duty cycle, in fraction form.
-   * \param maxTxPowerDbm The maximum transmission power allowed on the SubBand.
+   * \param startFrequency The LoraSubBand's lowest frequency.
+   * \param endFrequency The LoraSubBand's highest frequency.
+   * \param dutyCycle The LoraSubBand's duty cycle, in fraction form.
+   * \param maxTxPowerDbm The maximum transmission power allowed on the LoraSubBand.
    */
-  void AddSubBand (double startFrequency, double endFrequency, double dutyCycle,
+  void AddLoraSubBand (double startFrequency, double endFrequency, double dutyCycle,
                    double maxTxPowerDbm);
 
   /**
    * Add a MAC command to the list of those that will be sent out in the next
    * packet.
    */
-  void AddMacCommand (Ptr<MacCommand> macCommand);
+  void AddLorawanMacCommand (Ptr<LorawanMacCommand> macCommand);
 
   /**
    * \brief Callback to update gateway address after handover
@@ -345,7 +348,7 @@ public:
    * \brief Method to set the gateway address update callback
    * \param cb callback to invoke to update gateway address
    */
-  void SetGatewayUpdateCallback (EndDeviceLorawanMac::GatewayUpdateCallback cb);
+  void SetGatewayUpdateCallback (LorawanMacEndDevice::GatewayUpdateCallback cb);
 
   /**
    * Set address of the GW (or its MAC) serving this UT.
@@ -423,10 +426,10 @@ protected:
 
   /**
    * Find a suitable channel for transmission. The channel is chosen among the
-   * ones that are available in the ED's LogicalLoraChannel, based on their duty
+   * ones that are available in the ED's LoraLogicalChannel, based on their duty
    * cycle limitations.
    */
-  Ptr<LogicalLoraChannel> GetChannelForTx (void);
+  Ptr<LoraLogicalChannel> GetChannelForTx (void);
 
   /**
    * The duration of a receive window in number of symbols. This should be
@@ -443,7 +446,7 @@ protected:
   /**
    * List of the MAC commands that need to be applied to the next UL packet.
    */
-  std::list<Ptr<MacCommand> > m_macCommandList;
+  std::list<Ptr<LorawanMacCommand> > m_macCommandList;
 
   /* Structure containing the retransmission parameters
    * for this device.
@@ -470,7 +473,7 @@ protected:
   /**
    * Gateway address update callback
    */
-  EndDeviceLorawanMac::GatewayUpdateCallback m_gatewayUpdateCallback;
+  LorawanMacEndDevice::GatewayUpdateCallback m_gatewayUpdateCallback;
 
   Mac48Address m_gwAddress;
 
@@ -488,11 +491,11 @@ protected:
 
 private:
   /**
-   * Randomly shuffle a Ptr<LogicalLoraChannel> vector.
+   * Randomly shuffle a Ptr<LoraLogicalChannel> vector.
    *
    * Used to pick a random channel on which to send the packet.
    */
-  std::vector<Ptr<LogicalLoraChannel> > Shuffle (std::vector<Ptr<LogicalLoraChannel> > vector);
+  std::vector<Ptr<LoraLogicalChannel> > Shuffle (std::vector<Ptr<LoraLogicalChannel> > vector);
 
   /**
    * Find the minimum waiting time before the next possible transmission.
@@ -552,4 +555,4 @@ private:
 
 } /* namespace ns3 */
 
-#endif /* END_DEVICE_LORAWAN_MAC_H */
+#endif /* LORAWAN_MAC_END_DEVICE_H */

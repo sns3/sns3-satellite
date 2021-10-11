@@ -16,41 +16,43 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "ns3/mac-command.h"
+#include "ns3/lorawan-mac-command.h"
 #include "ns3/log.h"
 #include <bitset>
 #include <cmath>
 
 namespace ns3 {
 
-NS_LOG_COMPONENT_DEFINE ("MacCommand");
+NS_LOG_COMPONENT_DEFINE ("LorawanLorawanMacCommand");
 
-NS_OBJECT_ENSURE_REGISTERED (MacCommand);
+NS_OBJECT_ENSURE_REGISTERED (LorawanMacCommand);
 
 TypeId
-MacCommand::GetTypeId (void)
+LorawanMacCommand::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::MacCommand")
+  static TypeId tid = TypeId ("ns3::LorawanMacCommand")
     .SetParent<Object> ()
     .SetGroupName ("lorawan")
   ;
   return tid;
 }
 
-MacCommand::MacCommand ()
+LorawanMacCommand::LorawanMacCommand ()
 {
   NS_LOG_FUNCTION (this);
 }
 
-MacCommand::~MacCommand ()
+LorawanMacCommand::~LorawanMacCommand ()
 {
   NS_LOG_FUNCTION (this);
 }
 
 enum MacCommandType
-MacCommand::GetCommandType (void) const
+LorawanMacCommand::GetCommandType (void) const
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -58,7 +60,7 @@ MacCommand::GetCommandType (void) const
 }
 
 uint8_t
-MacCommand::GetSerializedSize (void) const
+LorawanMacCommand::GetSerializedSize (void) const
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -66,7 +68,7 @@ MacCommand::GetSerializedSize (void) const
 }
 
 uint8_t
-MacCommand::GetCIDFromMacCommand (enum MacCommandType commandType)
+LorawanMacCommand::GetCIDFromLorawanMacCommand (enum MacCommandType commandType)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -147,7 +149,7 @@ LinkCheckReq::Serialize (Buffer::Iterator &start) const
   NS_LOG_FUNCTION_NOARGS ();
 
   // Write the CID and we're done
-  uint8_t cid = GetCIDFromMacCommand (m_commandType);
+  uint8_t cid = GetCIDFromLorawanMacCommand (m_commandType);
   start.WriteU8 (cid);
   NS_LOG_DEBUG ("Serialized LinkCheckReq: " << unsigned (cid));
 }
@@ -201,7 +203,7 @@ LinkCheckAns::Serialize (Buffer::Iterator &start) const
   NS_LOG_FUNCTION_NOARGS ();
 
   // Write the CID
-  start.WriteU8 (GetCIDFromMacCommand (m_commandType));
+  start.WriteU8 (GetCIDFromLorawanMacCommand (m_commandType));
   // Write the margin
   start.WriteU8 (m_margin);
   // Write the gwCnt
@@ -302,7 +304,7 @@ LinkAdrReq::Serialize (Buffer::Iterator &start) const
   NS_LOG_FUNCTION_NOARGS ();
 
   // Write the CID
-  start.WriteU8 (GetCIDFromMacCommand (m_commandType));
+  start.WriteU8 (GetCIDFromLorawanMacCommand (m_commandType));
   start.WriteU8 (m_dataRate << 4 | (m_txPower & 0b1111));
   start.WriteU16 (m_channelMask);
   start.WriteU8 (m_chMaskCntl << 4 | (m_nbRep & 0b1111));
@@ -409,7 +411,7 @@ LinkAdrAns::Serialize (Buffer::Iterator &start) const
   NS_LOG_FUNCTION_NOARGS ();
 
   // Write the CID
-  start.WriteU8 (GetCIDFromMacCommand (m_commandType));
+  start.WriteU8 (GetCIDFromLorawanMacCommand (m_commandType));
   // We can assume that true will be converted to 1 and that false will be
   // converted to 0 on any C++ compiler
   start.WriteU8 ((uint8_t (m_powerAck) << 2) | (uint8_t (m_dataRateAck) << 1) |
@@ -468,7 +470,7 @@ DutyCycleReq::Serialize (Buffer::Iterator &start) const
   NS_LOG_FUNCTION_NOARGS ();
 
   // Write the CID
-  start.WriteU8 (GetCIDFromMacCommand (m_commandType));
+  start.WriteU8 (GetCIDFromLorawanMacCommand (m_commandType));
   start.WriteU8 (m_maxDCycle);
 }
 
@@ -531,7 +533,7 @@ DutyCycleAns::Serialize (Buffer::Iterator &start) const
   NS_LOG_FUNCTION_NOARGS ();
 
   // Write the CID
-  start.WriteU8 (GetCIDFromMacCommand (m_commandType));
+  start.WriteU8 (GetCIDFromLorawanMacCommand (m_commandType));
 }
 
 uint8_t
@@ -592,7 +594,7 @@ RxParamSetupReq::Serialize (Buffer::Iterator &start) const
   NS_LOG_FUNCTION_NOARGS ();
 
   // Write the CID
-  start.WriteU8 (GetCIDFromMacCommand (m_commandType));
+  start.WriteU8 (GetCIDFromLorawanMacCommand (m_commandType));
   // Data serialization
   start.WriteU8 ((m_rx1DrOffset & 0b111) << 4 | (m_rx2DataRate & 0b1111));
   uint32_t encodedFrequency = uint32_t (m_frequency / 100);
@@ -687,7 +689,7 @@ RxParamSetupAns::Serialize (Buffer::Iterator &start) const
   NS_LOG_FUNCTION_NOARGS ();
 
   // Write the CID
-  start.WriteU8 (GetCIDFromMacCommand (m_commandType));
+  start.WriteU8 (GetCIDFromLorawanMacCommand (m_commandType));
   // Data serialization
   start.WriteU8 (uint8_t (m_rx1DrOffsetAck) << 2 |
                  uint8_t (m_rx2DataRateAck) << 1 |
@@ -741,7 +743,7 @@ DevStatusReq::Serialize (Buffer::Iterator &start) const
   NS_LOG_FUNCTION_NOARGS ();
 
   // Write the CID
-  start.WriteU8 (GetCIDFromMacCommand (m_commandType));
+  start.WriteU8 (GetCIDFromLorawanMacCommand (m_commandType));
 }
 
 uint8_t
@@ -791,7 +793,7 @@ DevStatusAns::Serialize (Buffer::Iterator &start) const
   NS_LOG_FUNCTION_NOARGS ();
 
   // Write the CID
-  start.WriteU8 (GetCIDFromMacCommand (m_commandType));
+  start.WriteU8 (GetCIDFromLorawanMacCommand (m_commandType));
   start.WriteU8 (m_battery);
   start.WriteU8 (m_margin);
 }
@@ -866,7 +868,7 @@ NewChannelReq::Serialize (Buffer::Iterator &start) const
   NS_LOG_FUNCTION_NOARGS ();
 
   // Write the CID
-  start.WriteU8 (GetCIDFromMacCommand (m_commandType));
+  start.WriteU8 (GetCIDFromLorawanMacCommand (m_commandType));
 
   start.WriteU8 (m_chIndex);
   uint32_t encodedFrequency = uint32_t (m_frequency / 100);
@@ -965,7 +967,7 @@ NewChannelAns::Serialize (Buffer::Iterator &start) const
   NS_LOG_FUNCTION_NOARGS ();
 
   // Write the CID
-  start.WriteU8 (GetCIDFromMacCommand (m_commandType));
+  start.WriteU8 (GetCIDFromLorawanMacCommand (m_commandType));
 
   start.WriteU8 ((uint8_t (m_dataRateRangeOk) << 1) |
                  uint8_t (m_channelFrequencyOk));
@@ -1023,7 +1025,7 @@ RxTimingSetupReq::Serialize (Buffer::Iterator &start) const
   NS_LOG_FUNCTION_NOARGS ();
 
   // Write the CID
-  start.WriteU8 (GetCIDFromMacCommand (m_commandType));
+  start.WriteU8 (GetCIDFromLorawanMacCommand (m_commandType));
   // Write the data
   start.WriteU8 (m_delay & 0xf);
 }
@@ -1078,7 +1080,7 @@ RxTimingSetupAns::Serialize (Buffer::Iterator &start) const
   NS_LOG_FUNCTION_NOARGS ();
 
   // Write the CID
-  start.WriteU8 (GetCIDFromMacCommand (m_commandType));
+  start.WriteU8 (GetCIDFromLorawanMacCommand (m_commandType));
 }
 
 uint8_t
@@ -1118,7 +1120,7 @@ DlChannelAns::Serialize (Buffer::Iterator &start) const
   NS_LOG_FUNCTION_NOARGS ();
 
   // Write the CID
-  start.WriteU8 (GetCIDFromMacCommand (m_commandType));
+  start.WriteU8 (GetCIDFromLorawanMacCommand (m_commandType));
 }
 
 uint8_t
@@ -1158,7 +1160,7 @@ TxParamSetupReq::Serialize (Buffer::Iterator &start) const
   NS_LOG_FUNCTION_NOARGS ();
 
   // Write the CID
-  start.WriteU8 (GetCIDFromMacCommand (m_commandType));
+  start.WriteU8 (GetCIDFromLorawanMacCommand (m_commandType));
 }
 
 uint8_t
@@ -1198,7 +1200,7 @@ TxParamSetupAns::Serialize (Buffer::Iterator &start) const
   NS_LOG_FUNCTION_NOARGS ();
 
   // Write the CID
-  start.WriteU8 (GetCIDFromMacCommand (m_commandType));
+  start.WriteU8 (GetCIDFromLorawanMacCommand (m_commandType));
 }
 
 uint8_t

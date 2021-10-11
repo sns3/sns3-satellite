@@ -16,27 +16,30 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "ns3/logical-lora-channel.h"
 #include "ns3/log.h"
+
+#include "ns3/lora-logical-channel.h"
 
 namespace ns3 {
 
-NS_LOG_COMPONENT_DEFINE ("LogicalLoraChannel");
+NS_LOG_COMPONENT_DEFINE ("LoraLogicalChannel");
 
-NS_OBJECT_ENSURE_REGISTERED (LogicalLoraChannel);
+NS_OBJECT_ENSURE_REGISTERED (LoraLogicalChannel);
 
 TypeId
-LogicalLoraChannel::GetTypeId (void)
+LoraLogicalChannel::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::LogicalLoraChannel")
+  static TypeId tid = TypeId ("ns3::LoraLogicalChannel")
     .SetParent<Object> ()
     .SetGroupName ("lorawan");
   return tid;
 }
 
-LogicalLoraChannel::LogicalLoraChannel () :
+LoraLogicalChannel::LoraLogicalChannel () :
   m_frequency (0),
   m_minDataRate (0),
   m_maxDataRate (5),
@@ -45,19 +48,19 @@ LogicalLoraChannel::LogicalLoraChannel () :
   NS_LOG_FUNCTION (this);
 }
 
-LogicalLoraChannel::~LogicalLoraChannel ()
+LoraLogicalChannel::~LoraLogicalChannel ()
 {
   NS_LOG_FUNCTION (this);
 }
 
-LogicalLoraChannel::LogicalLoraChannel (double frequency) :
+LoraLogicalChannel::LoraLogicalChannel (double frequency) :
   m_frequency (frequency),
   m_enabledForUplink (true)
 {
   NS_LOG_FUNCTION (this);
 }
 
-LogicalLoraChannel::LogicalLoraChannel (double frequency, uint8_t minDataRate,
+LoraLogicalChannel::LoraLogicalChannel (double frequency, uint8_t minDataRate,
                                         uint8_t maxDataRate) :
   m_frequency (frequency),
   m_minDataRate (minDataRate),
@@ -68,56 +71,56 @@ LogicalLoraChannel::LogicalLoraChannel (double frequency, uint8_t minDataRate,
 }
 
 double
-LogicalLoraChannel::GetFrequency (void) const
+LoraLogicalChannel::GetFrequency (void) const
 {
   return m_frequency;
 }
 
 void
-LogicalLoraChannel::SetMinimumDataRate (uint8_t minDataRate)
+LoraLogicalChannel::SetMinimumDataRate (uint8_t minDataRate)
 {
   m_minDataRate = minDataRate;
 }
 
 void
-LogicalLoraChannel::SetMaximumDataRate (uint8_t maxDataRate)
+LoraLogicalChannel::SetMaximumDataRate (uint8_t maxDataRate)
 {
   m_maxDataRate = maxDataRate;
 }
 
 uint8_t
-LogicalLoraChannel::GetMinimumDataRate (void)
+LoraLogicalChannel::GetMinimumDataRate (void)
 {
   return m_minDataRate;
 }
 
 uint8_t
-LogicalLoraChannel::GetMaximumDataRate (void)
+LoraLogicalChannel::GetMaximumDataRate (void)
 {
   return m_maxDataRate;
 }
 
 void
-LogicalLoraChannel::SetEnabledForUplink (void)
+LoraLogicalChannel::SetEnabledForUplink (void)
 {
   m_enabledForUplink = true;
 }
 
 void
-LogicalLoraChannel::DisableForUplink (void)
+LoraLogicalChannel::DisableForUplink (void)
 {
   m_enabledForUplink = false;
 }
 
 bool
-LogicalLoraChannel::IsEnabledForUplink (void)
+LoraLogicalChannel::IsEnabledForUplink (void)
 {
   return m_enabledForUplink;
 }
 
 bool
-operator== (const Ptr<LogicalLoraChannel>& first,
-            const Ptr<LogicalLoraChannel>& second)
+operator== (const Ptr<LoraLogicalChannel>& first,
+            const Ptr<LoraLogicalChannel>& second)
 {
   double thisFreq = first->GetFrequency ();
   double otherFreq = second->GetFrequency ();
@@ -130,8 +133,8 @@ operator== (const Ptr<LogicalLoraChannel>& first,
 }
 
 bool
-operator!= (const Ptr<LogicalLoraChannel>& first,
-            const Ptr<LogicalLoraChannel>& second)
+operator!= (const Ptr<LoraLogicalChannel>& first,
+            const Ptr<LoraLogicalChannel>& second)
 {
   return !(first == second);
 }

@@ -16,24 +16,26 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#ifndef GATEWAY_LORAWAN_MAC_H
-#define GATEWAY_LORAWAN_MAC_H
+#ifndef LORAWAN_MAC_GATEWAY_H
+#define LORAWAN_MAC_GATEWAY_H
 
 #include "ns3/lorawan-mac.h"
 #include "ns3/lora-tag.h"
 
 namespace ns3 {
 
-class GatewayLorawanMac : public LorawanMac
+class LorawanMacGateway : public LorawanMac
 {
 public:
   static TypeId GetTypeId (void);
 
-  GatewayLorawanMac ();
-  GatewayLorawanMac (uint32_t beamId);
-  virtual ~GatewayLorawanMac ();
+  LorawanMacGateway ();
+  LorawanMacGateway (uint32_t beamId);
+  virtual ~LorawanMacGateway ();
 
   // Implementation of the LorawanMac interface
   virtual void Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber);
@@ -63,4 +65,4 @@ protected:
 
 } /* namespace ns3 */
 
-#endif /* GATEWAY_LORAWAN_MAC_H */
+#endif /* LORAWAN_MAC_GATEWAY_H */

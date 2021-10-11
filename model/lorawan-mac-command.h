@@ -16,10 +16,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#ifndef MAC_COMMAND_H
-#define MAC_COMMAND_H
+#ifndef LORAWAN_MAC_COMMAND_H
+#define LORAWAN_MAC_COMMAND_H
 
 #include "ns3/object.h"
 #include "ns3/nstime.h"
@@ -60,13 +62,13 @@ enum MacCommandType
  * common features are supposed to be defined in detail by child classes, based
  * on that MAC command's attributes and structure.
  */
-class MacCommand : public Object
+class LorawanMacCommand : public Object
 {
 public:
   static TypeId GetTypeId (void);
 
-  MacCommand ();
-  virtual ~MacCommand ();
+  LorawanMacCommand ();
+  virtual ~LorawanMacCommand ();
 
   /**
    * Serialize the contents of this MAC command into a buffer, according to the
@@ -110,7 +112,7 @@ public:
    *
    * \return The CID as a uint8_t type.
    */
-  static uint8_t GetCIDFromMacCommand (enum MacCommandType commandType);
+  static uint8_t GetCIDFromLorawanMacCommand (enum MacCommandType commandType);
 
 protected:
   /**
@@ -130,7 +132,7 @@ protected:
  *
  * This command holds no variables, and just consists in the CID.
  */
-class LinkCheckReq : public MacCommand
+class LinkCheckReq : public LorawanMacCommand
 {
 public:
   LinkCheckReq ();
@@ -146,7 +148,7 @@ public:
  * This command contains the demodulation margin and the number of receiving
  * gateways of the packet containing the LinkCheckReq command.
  */
-class LinkCheckAns : public MacCommand
+class LinkCheckAns : public LorawanMacCommand
 {
 public:
   LinkCheckAns ();
@@ -185,7 +187,7 @@ public:
   uint8_t GetGwCnt (void) const;
 
   /**
-   * Increment this MacCommand's gwCnt value.
+   * Increment this LorawanMacCommand's gwCnt value.
    */
   void IncrementGwCnt (void);
 
@@ -208,7 +210,7 @@ private:
  * data rate, transmission power and the channel it uses for uplink
  * transmissions.
  */
-class LinkAdrReq : public MacCommand
+class LinkAdrReq : public LorawanMacCommand
 {
 public:
   LinkAdrReq ();
@@ -266,7 +268,7 @@ private:
  *
  * With this command, the end device acknowledges a LinkAdrReq.
  */
-class LinkAdrAns : public MacCommand
+class LinkAdrAns : public LorawanMacCommand
 {
 public:
   LinkAdrAns ();
@@ -290,7 +292,7 @@ private:
  * transmit duty cycle of an end device. The aggregate duty cycle is computed
  * as the duty cycle among all sub bands.
  */
-class DutyCycleReq : public MacCommand
+class DutyCycleReq : public LorawanMacCommand
 {
 public:
   DutyCycleReq ();
@@ -321,7 +323,7 @@ private:
  *
  * This command holds no variables, and just consists in the CID.
  */
-class DutyCycleAns : public MacCommand
+class DutyCycleAns : public LorawanMacCommand
 {
 public:
   DutyCycleAns ();
@@ -334,7 +336,7 @@ public:
 /**
  * Implementation of the RxParamSetupReq LoRaWAN MAC command.
  */
-class RxParamSetupReq : public MacCommand
+class RxParamSetupReq : public LorawanMacCommand
 {
 public:
   RxParamSetupReq ();
@@ -382,7 +384,7 @@ private:
 /**
  * Implementation of the RxParamSetupAns LoRaWAN MAC command.
  */
-class RxParamSetupAns : public MacCommand
+class RxParamSetupAns : public LorawanMacCommand
 {
 public:
   RxParamSetupAns ();
@@ -408,7 +410,7 @@ private:
 /**
  * Implementation of the DevStatusReq LoRaWAN MAC command.
  */
-class DevStatusReq : public MacCommand
+class DevStatusReq : public LorawanMacCommand
 {
 public:
   DevStatusReq ();
@@ -421,7 +423,7 @@ public:
 /**
  * Implementation of the DevStatusAns LoRaWAN MAC command.
  */
-class DevStatusAns : public MacCommand
+class DevStatusAns : public LorawanMacCommand
 {
 public:
   DevStatusAns ();
@@ -459,7 +461,7 @@ private:
 /**
  * Implementation of the NewChannelReq LoRaWAN MAC command.
  */
-class NewChannelReq : public MacCommand
+class NewChannelReq : public LorawanMacCommand
 {
 public:
   NewChannelReq ();
@@ -493,7 +495,7 @@ private:
 /**
  * Implementation of the NewChannelAns LoRaWAN MAC command.
  */
-class NewChannelAns : public MacCommand
+class NewChannelAns : public LorawanMacCommand
 {
 public:
   NewChannelAns ();
@@ -520,7 +522,7 @@ private:
 /**
  * Implementation of the RxTimingSetupReq LoRaWAN MAC command.
  */
-class RxTimingSetupReq : public MacCommand
+class RxTimingSetupReq : public LorawanMacCommand
 {
 public:
   RxTimingSetupReq ();
@@ -552,7 +554,7 @@ private:
  *
  * This MAC command has an empty payload.
  */
-class RxTimingSetupAns : public MacCommand
+class RxTimingSetupAns : public LorawanMacCommand
 {
 public:
   RxTimingSetupAns ();
@@ -567,7 +569,7 @@ private:
 /**
  * Implementation of the TxParamSetupAns LoRaWAN MAC command.
  */
-class TxParamSetupAns : public MacCommand
+class TxParamSetupAns : public LorawanMacCommand
 {
 public:
   TxParamSetupAns ();
@@ -582,7 +584,7 @@ private:
 /**
  * Implementation of the TxParamSetupReq LoRaWAN MAC command.
  */
-class TxParamSetupReq : public MacCommand
+class TxParamSetupReq : public LorawanMacCommand
 {
 public:
   TxParamSetupReq ();
@@ -597,7 +599,7 @@ private:
 /**
  * Implementation of the DlChannelAns LoRaWAN MAC command.
  */
-class DlChannelAns : public MacCommand
+class DlChannelAns : public LorawanMacCommand
 {
 public:
   DlChannelAns ();
@@ -611,4 +613,4 @@ private:
 
 }
 
-#endif /* DEVICE_STATUS_H */
+#endif /* LORAWAN_MAC_COMMAND_H */

@@ -69,6 +69,19 @@ public:
   Ptr<LorawanMac> GetLorawanMac ();
   void SetLorawanMac (Ptr<LorawanMac> lorawanMac);
 
+  /**
+   * Method called to inform the Scheduler of a newly arrived
+   * uplink packet. This function schedules the OnReceiveWindowOpportunity
+   * events 1 and 2 seconds later.
+   */
+  //void OnReceivedPacket (Ptr<const Packet> packet);
+
+  /**
+   * Method that is scheduled after packet arrivals in order to act on
+   * receive windows 1 and 2 seconds later receptions.
+   */
+  //void OnReceiveWindowOpportunity (LoraDeviceAddress deviceAddress, int window);
+
 protected:
   /**
    * Dispose of this class instance

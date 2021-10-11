@@ -16,6 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
 #ifndef LORAWAN_MAC_H
@@ -25,7 +27,7 @@
 #include "ns3/packet.h"
 #include "ns3/satellite-phy.h"
 #include "ns3/satellite-mac.h"
-#include "ns3/logical-lora-channel-helper.h"
+#include "ns3/lora-logical-channel-helper.h"
 #include "ns3/satellite-lora-phy-rx.h"
 #include <array>
 
@@ -123,16 +125,16 @@ public:
   /**
    * Get the logical lora channel helper associated with this MAC.
    *
-   * \return The instance of LogicalLoraChannelHelper that this MAC is using.
+   * \return The instance of LoraLogicalChannelHelper that this MAC is using.
    */
-  LogicalLoraChannelHelper GetLogicalLoraChannelHelper (void);
+  LoraLogicalChannelHelper GetLoraLogicalChannelHelper (void);
 
   /**
-   * Set the LogicalLoraChannelHelper this MAC instance will use.
+   * Set the LoraLogicalChannelHelper this MAC instance will use.
    *
    * \param helper The instance of the helper to use.
    */
-  void SetLogicalLoraChannelHelper (LogicalLoraChannelHelper helper);
+  void SetLoraLogicalChannelHelper (LoraLogicalChannelHelper helper);
 
   /**
    * Get the SF corresponding to a data rate, based on this MAC's region.
@@ -274,9 +276,9 @@ protected:
   Ptr<NetDevice> m_device;
 
   /**
-   * The LogicalLoraChannelHelper instance that is assigned to this MAC.
+   * The LoraLogicalChannelHelper instance that is assigned to this MAC.
    */
-  LogicalLoraChannelHelper m_channelHelper;
+  LoraLogicalChannelHelper m_channelHelper;
 
   /**
    * A vector holding the SF each Data Rate corresponds to.

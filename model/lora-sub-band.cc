@@ -16,32 +16,34 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "ns3/sub-band.h"
+#include "ns3/lora-sub-band.h"
 #include "ns3/log.h"
 
 namespace ns3 {
 
-NS_LOG_COMPONENT_DEFINE ("SubBand");
+NS_LOG_COMPONENT_DEFINE ("LoraSubBand");
 
-NS_OBJECT_ENSURE_REGISTERED (SubBand);
+NS_OBJECT_ENSURE_REGISTERED (LoraSubBand);
 
 TypeId
-SubBand::GetTypeId (void)
+LoraSubBand::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::SubBand")
+  static TypeId tid = TypeId ("ns3::LoraSubBand")
     .SetParent<Object> ()
     .SetGroupName ("lorawan");
   return tid;
 }
 
-SubBand::SubBand ()
+LoraSubBand::LoraSubBand ()
 {
   NS_LOG_FUNCTION (this);
 }
 
-  SubBand::SubBand (double firstFrequency, double lastFrequency, double dutyCycle,
+  LoraSubBand::LoraSubBand (double firstFrequency, double lastFrequency, double dutyCycle,
                     double maxTxPowerDbm) :
     m_firstFrequency (firstFrequency),
     m_lastFrequency (lastFrequency),
@@ -53,56 +55,56 @@ SubBand::SubBand ()
                      maxTxPowerDbm);
   }
 
-  SubBand::~SubBand ()
+  LoraSubBand::~LoraSubBand ()
   {
     NS_LOG_FUNCTION (this);
   }
 
   double
-  SubBand::GetFirstFrequency (void)
+  LoraSubBand::GetFirstFrequency (void)
   {
     return m_firstFrequency;
   }
 
   double
-  SubBand::GetDutyCycle (void)
+  LoraSubBand::GetDutyCycle (void)
   {
     return m_dutyCycle;
   }
 
   bool
-  SubBand::BelongsToSubBand (double frequency)
+  LoraSubBand::BelongsToLoraSubBand (double frequency)
   {
     return (frequency > m_firstFrequency) && (frequency < m_lastFrequency);
   }
 
   bool
-  SubBand::BelongsToSubBand (Ptr<LogicalLoraChannel> logicalChannel)
+  LoraSubBand::BelongsToLoraSubBand (Ptr<LoraLogicalChannel> logicalChannel)
   {
     double frequency = logicalChannel->GetFrequency ();
-    return BelongsToSubBand (frequency);
+    return BelongsToLoraSubBand (frequency);
   }
 
   void
-  SubBand::SetNextTransmissionTime (Time nextTime)
+  LoraSubBand::SetNextTransmissionTime (Time nextTime)
   {
     m_nextTransmissionTime = nextTime;
   }
 
   Time
-  SubBand::GetNextTransmissionTime (void)
+  LoraSubBand::GetNextTransmissionTime (void)
   {
     return m_nextTransmissionTime;
   }
 
   void
-  SubBand::SetMaxTxPowerDbm (double maxTxPowerDbm)
+  LoraSubBand::SetMaxTxPowerDbm (double maxTxPowerDbm)
   {
     m_maxTxPowerDbm = maxTxPowerDbm;
   }
 
   double
-  SubBand::GetMaxTxPowerDbm (void)
+  LoraSubBand::GetMaxTxPowerDbm (void)
   {
     return m_maxTxPowerDbm;
   }

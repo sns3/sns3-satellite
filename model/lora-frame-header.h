@@ -23,7 +23,7 @@
 
 #include "ns3/header.h"
 #include "ns3/lora-device-address.h"
-#include "ns3/mac-command.h"
+#include "ns3/lorawan-mac-command.h"
 
 namespace ns3 {
 
@@ -205,11 +205,11 @@ public:
   uint16_t GetFCnt (void) const;
 
   /**
-   * Return a pointer to a MacCommand, or 0 if the MacCommand does not exist
+   * Return a pointer to a LorawanMacCommand, or 0 if the LorawanMacCommand does not exist
    * in this header.
    */
   template<typename T>
-  inline Ptr<T> GetMacCommand (void);
+  inline Ptr<T> GetLorawanMacCommand (void);
 
   /**
    * Add a LinkCheckReq command.
@@ -287,12 +287,12 @@ public:
   /**
    * Return a list of pointers to all the MAC commands saved in this header.
    */
-  std::list<Ptr<MacCommand> > GetCommands (void);
+  std::list<Ptr<LorawanMacCommand> > GetCommands (void);
 
   /**
    * Add a predefined command to the list.
    */
-  void AddCommand (Ptr<MacCommand> macCommand);
+  void AddCommand (Ptr<LorawanMacCommand> macCommand);
 
 private:
   uint8_t m_fPort;
@@ -310,10 +310,10 @@ private:
   Buffer m_fOpts;
 
   /**
-   * List containing all the MacCommand instances that are contained in this
+   * List containing all the LorawanMacCommand instances that are contained in this
    * LoraFrameHeader.
    */
-  std::list< Ptr< MacCommand> > m_macCommands;
+  std::list< Ptr< LorawanMacCommand> > m_macCommands;
 
   bool m_isUplink;
 };
@@ -321,10 +321,10 @@ private:
 
 template<typename T>
 Ptr<T>
-LoraFrameHeader::GetMacCommand ()
+LoraFrameHeader::GetLorawanMacCommand ()
 {
   // Iterate on MAC commands and try casting
-  std::list< Ptr< MacCommand> >::const_iterator it;
+  std::list< Ptr< LorawanMacCommand> >::const_iterator it;
   for (it = m_macCommands.begin (); it != m_macCommands.end (); ++it)
     {
       if ((*it)->GetObject<T> () != 0)

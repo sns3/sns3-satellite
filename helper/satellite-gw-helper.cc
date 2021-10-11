@@ -20,39 +20,42 @@
  * Author: Mathias Ettinger <mettinger@viveris.toulouse.fr>
  */
 
-#include "ns3/log.h"
-#include "ns3/names.h"
-#include "ns3/enum.h"
-#include "ns3/double.h"
-#include "ns3/pointer.h"
-#include "ns3/uinteger.h"
-#include "ns3/config.h"
-#include "../model/satellite-const-variables.h"
-#include "../model/satellite-utils.h"
-#include "../model/satellite-channel.h"
-#include "../model/satellite-gw-llc.h"
-#include "../model/satellite-gw-mac.h"
-#include "../model/satellite-net-device.h"
-#include "../model/satellite-lorawan-net-device.h"
-#include "../model/satellite-geo-net-device.h"
-#include "../model/satellite-gw-phy.h"
-#include "../model/satellite-phy-tx.h"
-#include "../model/satellite-phy-rx.h"
-#include "../model/satellite-phy-rx-carrier-conf.h"
-#include "../model/satellite-link-results.h"
-#include "../model/satellite-node-info.h"
-#include "../model/satellite-enums.h"
-#include "../model/satellite-channel-estimation-error-container.h"
-#include "../model/satellite-packet-classifier.h"
-#include "../model/satellite-lower-layer-service.h"
-#include "../model/gateway-lorawan-mac.h"
-#include "ns3/satellite-gw-helper.h"
-#include "ns3/singleton.h"
-#include "ns3/satellite-id-mapper.h"
+#include <ns3/log.h>
+#include <ns3/names.h>
+#include <ns3/enum.h>
+#include <ns3/double.h>
+#include <ns3/pointer.h>
+#include <ns3/uinteger.h>
+#include <ns3/config.h>
+#include <ns3/singleton.h>
+
+#include <ns3/satellite-const-variables.h>
+#include <ns3/satellite-utils.h>
+#include <ns3/satellite-channel.h>
+#include <ns3/satellite-gw-llc.h>
+#include <ns3/satellite-gw-mac.h>
+#include <ns3/satellite-net-device.h>
+#include <ns3/satellite-lorawan-net-device.h>
+#include <ns3/satellite-geo-net-device.h>
+#include <ns3/satellite-gw-phy.h>
+#include <ns3/satellite-phy-tx.h>
+#include <ns3/satellite-phy-rx.h>
+#include <ns3/satellite-phy-rx-carrier-conf.h>
+#include <ns3/satellite-link-results.h>
+#include <ns3/satellite-node-info.h>
+#include <ns3/satellite-enums.h>
+#include <ns3/satellite-channel-estimation-error-container.h>
+#include <ns3/satellite-packet-classifier.h>
+#include <ns3/satellite-lower-layer-service.h>
+#include <ns3/satellite-id-mapper.h>
 #include <ns3/satellite-fwd-link-scheduler.h>
 #include <ns3/satellite-fwd-link-scheduler-default.h>
 #include <ns3/satellite-fwd-link-scheduler-time-slicing.h>
 #include <ns3/satellite-typedefs.h>
+
+#include <ns3/lorawan-mac-gateway.h>
+
+#include "ns3/satellite-gw-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatGwHelper");
 
@@ -521,25 +524,25 @@ SatGwHelper::InstallLora (Ptr<Node> n,
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());
   phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
 
-  Ptr<GatewayLorawanMac> mac = CreateObject<GatewayLorawanMac> (beamId);
+  Ptr<LorawanMacGateway> mac = CreateObject<LorawanMacGateway> (beamId);
 
   // TODO configuration for EU only
-  LogicalLoraChannelHelper channelHelper;
-  channelHelper.AddSubBand (868, 868.6, 0.01, 14);
-  channelHelper.AddSubBand (868.7, 869.2, 0.001, 14);
-  channelHelper.AddSubBand (869.4, 869.65, 0.1, 27);
+  LoraLogicalChannelHelper channelHelper;
+  channelHelper.AddLoraSubBand (868, 868.6, 0.01, 14);
+  channelHelper.AddLoraSubBand (868.7, 869.2, 0.001, 14);
+  channelHelper.AddLoraSubBand (869.4, 869.65, 0.1, 27);
 
   //////////////////////
   // Default channels //
   //////////////////////
-  Ptr<LogicalLoraChannel> lc1 = CreateObject<LogicalLoraChannel> (868.1, 0, 5);
-  Ptr<LogicalLoraChannel> lc2 = CreateObject<LogicalLoraChannel> (868.3, 0, 5);
-  Ptr<LogicalLoraChannel> lc3 = CreateObject<LogicalLoraChannel> (868.5, 0, 5);
+  Ptr<LoraLogicalChannel> lc1 = CreateObject<LoraLogicalChannel> (868.1, 0, 5);
+  Ptr<LoraLogicalChannel> lc2 = CreateObject<LoraLogicalChannel> (868.3, 0, 5);
+  Ptr<LoraLogicalChannel> lc3 = CreateObject<LoraLogicalChannel> (868.5, 0, 5);
   channelHelper.AddChannel (lc1);
   channelHelper.AddChannel (lc2);
   channelHelper.AddChannel (lc3);
 
-  mac->SetLogicalLoraChannelHelper (channelHelper);
+  mac->SetLoraLogicalChannelHelper (channelHelper);
 
   ///////////////////////////////////////////////
   // DataRate -> SF, DataRate -> Bandwidth     //
