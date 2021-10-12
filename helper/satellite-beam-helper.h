@@ -123,6 +123,11 @@ public:
   void Init ();
 
   /**
+   * Set the standard to either DVB or Lora
+   */
+  void SetStandard (SatEnums::Standard_t standard);
+
+  /**
    * Set the antenna gain patterns to be used when configuring the beams
    * to the GEO satellite. Note, that currently we have only one set of
    * antenna patterns, which are utilized in both user return (Rx gain)

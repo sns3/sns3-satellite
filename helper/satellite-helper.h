@@ -229,6 +229,11 @@ private:
   std::string m_waveformConfFileName;
 
   /**
+   * The global standard used. Can be either DVB or Lora
+   */
+  SatEnums::Standard_t m_standard;
+
+  /**
    * User helper
    */
   Ptr<SatUserHelper> m_userHelper;

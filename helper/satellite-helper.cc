@@ -57,6 +57,12 @@ SatHelper::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatHelper")
     .SetParent<Object> ()
     .AddConstructor<SatHelper> ()
+    .AddAttribute ("Standard",
+                   "The global standard used. Can be either DVB or Lora",
+                   EnumValue (SatEnums::DVB),
+                   MakeEnumAccessor (&SatHelper::m_standard),
+                   MakeEnumChecker (SatEnums::DVB, "DVB",
+                                    SatEnums::LORA, "LORA"))
     .AddAttribute ("SatRtnConfFileName",
                    "Name of the satellite network RTN link configuration file.",
                    StringValue ("Scenario72RtnConf.txt"),
@@ -218,6 +224,8 @@ SatHelper::SatHelper ()
                                               m_satConf->GetRtnLinkCarrierCount (),
                                               m_satConf->GetFwdLinkCarrierCount (),
                                               m_satConf->GetSuperframeSeq ());
+
+  m_beamHelper->SetStandard (m_standard);
 
   Ptr<SatRtnLinkTime> rtnTime = Singleton<SatRtnLinkTime>::Get ();
   rtnTime->Initialize (m_satConf->GetSuperframeSeq ());
