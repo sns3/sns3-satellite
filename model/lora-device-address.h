@@ -16,6 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
 #ifndef LORA_DEVICE_ADDRESS_H

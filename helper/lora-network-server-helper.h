@@ -41,9 +41,15 @@ namespace ns3 {
 /**
  * This class can install Network Server applications on multiple nodes at once.
  */
-class LoraNetworkServerHelper
+class LoraNetworkServerHelper : public Object
 {
 public:
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
+  static TypeId GetTypeId (void);
+
   LoraNetworkServerHelper ();
 
   ~LoraNetworkServerHelper ();

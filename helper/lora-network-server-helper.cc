@@ -30,16 +30,28 @@
 #include "ns3/lora-network-controller-components.h"
 #include "ns3/lora-adr-component.h"
 
+NS_LOG_COMPONENT_DEFINE ("LoraNetworkServerHelper");
+
 namespace ns3 {
 
-NS_LOG_COMPONENT_DEFINE ("LoraNetworkServerHelper");
+NS_OBJECT_ENSURE_REGISTERED (LoraNetworkServerHelper);
+
+TypeId
+LoraNetworkServerHelper::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::LoraNetworkServerHelper")
+    .SetParent<Object> ()
+    .AddConstructor<LoraNetworkServerHelper> ()
+  ;
+  return tid;
+}
 
 LoraNetworkServerHelper::LoraNetworkServerHelper ()
 {
   m_factory.SetTypeId ("ns3::LoraNetworkServer");
   p2pHelper.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
   p2pHelper.SetChannelAttribute ("Delay", StringValue ("2ms"));
-  SetAdr ("ns3::AdrComponent");
+  SetAdr ("ns3::LoraAdrComponent");
 }
 
 LoraNetworkServerHelper::~LoraNetworkServerHelper ()

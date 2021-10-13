@@ -28,7 +28,6 @@
 #include <ns3/ipv4-l3-protocol.h>
 #include <ns3/channel.h>
 
-#include "satellite-net-device.h"
 #include <ns3/satellite-phy.h>
 #include <ns3/satellite-mac.h>
 #include <ns3/satellite-llc.h>
@@ -38,6 +37,8 @@
 #include <ns3/satellite-address-tag.h>
 #include <ns3/satellite-time-tag.h>
 #include <ns3/satellite-typedefs.h>
+
+#include "satellite-net-device.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatNetDevice");
 

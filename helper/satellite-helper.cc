@@ -42,6 +42,11 @@
 #include <ns3/satellite-env-variables.h>
 #include <ns3/satellite-traced-mobility-model.h>
 #include <ns3/satellite-ut-handover-module.h>
+
+#include <ns3/lora-network-server-helper.h>
+#include <ns3/lora-forwarder-helper.h>
+#include <ns3/lora-device-address-generator.h>
+
 #include "satellite-helper.h"
 
 
@@ -569,6 +574,35 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
       m_mobileUtsByBeam.clear ();  // Release unused resources (mobile UTs starting in non-existent beams)
 
       m_userHelper->InstallGw (m_beamHelper->GetGwNodes (), gwUsers);
+
+      if (m_standard == SatEnums::LORA)
+        {
+          // Create the LoraDeviceAddress of the end devices
+          uint8_t nwkId = 54;
+          uint32_t nwkAddr = 1864;
+          Ptr<LoraDeviceAddressGenerator> addrGen = CreateObject<LoraDeviceAddressGenerator> (nwkId, nwkAddr);
+
+          Ptr<Node> utNode;
+          for(uint32_t indexUt = 0; indexUt < UtNodes ().GetN (); indexUt++)
+            {
+              utNode = UtNodes ().Get (indexUt);
+              Ptr<SatLorawanNetDevice> dev = utNode->GetDevice (2)->GetObject<SatLorawanNetDevice> ();
+              dev->GetMac ()->GetObject<LorawanMacEndDeviceClassA> ()->SetDeviceAddress (addrGen->NextAddress ());;
+            }
+
+          Ptr<LoraNetworkServerHelper> loraNetworkServerHelper = CreateObject<LoraNetworkServerHelper> ();
+          Ptr<LoraForwarderHelper> forHelper = CreateObject<LoraForwarderHelper> ();
+
+          loraNetworkServerHelper->SetGateways (GwNodes ());
+          loraNetworkServerHelper->SetEndDevices (UtNodes ());
+
+          NodeContainer networkServer;
+          networkServer.Create (1);
+
+          loraNetworkServerHelper->Install (networkServer);
+
+          forHelper->Install (GwNodes ());
+        }
 
       if (m_packetTraces)
         {

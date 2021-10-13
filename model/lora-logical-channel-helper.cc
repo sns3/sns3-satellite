@@ -92,8 +92,7 @@ LoraLogicalChannelHelper::GetEnabledChannelList (void)
 }
 
 Ptr<LoraSubBand>
-LoraLogicalChannelHelper::GetLoraSubBandFromChannel (Ptr<LoraLogicalChannel>
-                                                 channel)
+LoraLogicalChannelHelper::GetLoraSubBandFromChannel (Ptr<LoraLogicalChannel> channel)
 {
   return GetLoraSubBandFromFrequency (channel->GetFrequency ());
 }
@@ -101,6 +100,7 @@ LoraLogicalChannelHelper::GetLoraSubBandFromChannel (Ptr<LoraLogicalChannel>
 Ptr<LoraSubBand>
 LoraLogicalChannelHelper::GetLoraSubBandFromFrequency (double frequency)
 {
+  std::cout << "LoraLogicalChannelHelper::GetLoraSubBandFromFrequency " << frequency << std::endl;
   // Get the LoraSubBand this frequency belongs to
   std::list< Ptr< LoraSubBand > >::iterator it;
   for (it = m_subBandList.begin (); it != m_subBandList.end (); it++)
@@ -195,8 +195,7 @@ LoraLogicalChannelHelper::GetAggregatedWaitingTime (void)
   Time aggregatedWaitingTime = m_nextAggregatedTransmissionTime - Simulator::Now ();
 
   // Handle case in which waiting time is negative
-  aggregatedWaitingTime = Seconds (std::max (aggregatedWaitingTime.GetSeconds (),
-                                             double(0)));
+  aggregatedWaitingTime = Seconds (std::max (aggregatedWaitingTime.GetSeconds (), double(0)));
 
   NS_LOG_DEBUG ("Aggregated waiting time: " << aggregatedWaitingTime.GetSeconds ());
 
@@ -209,13 +208,10 @@ LoraLogicalChannelHelper::GetWaitingTime (Ptr<LoraLogicalChannel> channel)
   NS_LOG_FUNCTION (this << channel);
 
   // LoraSubBand waiting time
-  Time subBandWaitingTime = GetLoraSubBandFromChannel (channel)->
-    GetNextTransmissionTime () -
-    Simulator::Now ();
+  Time subBandWaitingTime = GetLoraSubBandFromChannel (channel)->GetNextTransmissionTime () - Simulator::Now ();
 
   // Handle case in which waiting time is negative
-  subBandWaitingTime = Seconds (std::max (subBandWaitingTime.GetSeconds (),
-                                          double(0)));
+  subBandWaitingTime = Seconds (std::max (subBandWaitingTime.GetSeconds (), double(0)));
 
   NS_LOG_DEBUG ("Waiting time: " << subBandWaitingTime.GetSeconds ());
 

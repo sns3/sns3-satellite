@@ -100,7 +100,8 @@ LoraNetworkServer::AddGateway (Ptr<Node> gateway, Ptr<NetDevice> netDevice)
     }
 
   // Get the gateway's LoRa MAC layer (assumes gateway's MAC is configured as first device)
-  Ptr<LorawanMacGateway> gwMac = gateway->GetDevice (0)->GetObject<SatLorawanNetDevice> ()->GetMac ()->GetObject<LorawanMacGateway> ();
+  Ptr<SatLorawanNetDevice> satLoraNetDevice = DynamicCast<SatLorawanNetDevice> (gateway->GetDevice (1));
+  Ptr<LorawanMacGateway> gwMac = DynamicCast<LorawanMacGateway> (satLoraNetDevice->GetMac ());
   NS_ASSERT (gwMac != 0);
 
   // Get the Address
@@ -136,7 +137,7 @@ LoraNetworkServer::AddNode (Ptr<Node> node)
   Ptr<SatLorawanNetDevice> loraNetDevice;
   for (uint32_t i = 0; i < node->GetNDevices (); i++)
     {
-      loraNetDevice = node->GetDevice (i)->GetObject<SatLorawanNetDevice> ();
+      loraNetDevice = DynamicCast<SatLorawanNetDevice> (node->GetDevice (i));
       if (loraNetDevice != 0)
         {
           // We found a SatLorawanNetDevice on the node
@@ -145,8 +146,7 @@ LoraNetworkServer::AddNode (Ptr<Node> node)
     }
 
   // Get the MAC
-  Ptr<LorawanMacEndDeviceClassA> edLorawanMac =
-    loraNetDevice->GetMac ()->GetObject<LorawanMacEndDeviceClassA> ();
+  Ptr<LorawanMacEndDeviceClassA> edLorawanMac = DynamicCast<LorawanMacEndDeviceClassA> (loraNetDevice->GetMac ());
 
   // Update the NetworkStatus about the existence of this node
   m_status->AddNode (edLorawanMac);

@@ -106,7 +106,7 @@ SatLorawanNetDevice::Receive (Ptr<const Packet> packet)
     }
 
   // Pass the packet to the upper layer.
-  // m_rxCallback (this, packet, Ipv4L3Protocol::PROT_NUMBER, Address ());
+  m_rxCallback (this, packet, Ipv4L3Protocol::PROT_NUMBER, Address ());
 }
 
 bool

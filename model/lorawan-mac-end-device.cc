@@ -30,6 +30,7 @@
 
 #include "ns3/satellite-phy.h"
 
+#include "ns3/lora-tag.h"
 #include "ns3/lorawan-mac-end-device.h"
 #include "ns3/lorawan-mac-end-device-class-a.h"
 
@@ -181,6 +182,11 @@ LorawanMacEndDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t pro
   // Pick a channel on which to transmit the packet
   Ptr<LoraLogicalChannel> txChannel = GetChannelForTx ();
 
+  double frequency = txChannel->GetFrequency ();
+  LoraTag tag;
+  tag.SetFrequency (frequency);
+  packet->AddPacketTag (tag);
+
   if (!(txChannel && m_retxParams.retxLeft > 0))
     {
       if (!txChannel)
@@ -239,8 +245,10 @@ LorawanMacEndDevice::DoSend (Ptr<Packet> packet)
       LoraFrameHeader frameHdr;
       ApplyNecessaryOptions (frameHdr);
       packet->AddHeader (frameHdr);
-      NS_LOG_INFO ("Added frame header of size " << frameHdr.GetSerializedSize () <<
-                   " bytes.");
+      NS_LOG_INFO ("Added frame header of size " << frameHdr.GetSerializedSize () << " bytes.");
+
+      // Add the Lora Frame Header to the packet
+      packet->PeekHeader (frameHdr);
 
       // Add the Lora Mac header to the packet
       LorawanMacHeader macHdr;

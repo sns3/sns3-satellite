@@ -64,13 +64,7 @@ LorawanMacGateway::Send (Ptr<Packet> packet, const Address& dest, uint16_t proto
   NS_LOG_FUNCTION (this << packet);
 
   // Get DataRate to send this packet with
-  // TODO who add it ???? -> GetReplyForDevice from "network status" And add it again here
-  // TODO change values in tag
-  // TODO only some values of datarate (and BW) -> say it in phy, or change in MAC
   LoraTag tag;
-  packet->AddPacketTag (tag);
-  tag.SetDataRate (0);
-  tag.SetFrequency (1000000000);
   packet->RemovePacketTag (tag);
   uint8_t dataRate = tag.GetDataRate ();
   double frequency = tag.GetFrequency ();
@@ -120,8 +114,7 @@ LorawanMacGateway::Send (Ptr<Packet> packet, const Address& dest, uint16_t proto
   // double sendingPower = m_channelHelper.GetTxPowerForChannel (CreateObject<LoraLogicalChannel> (frequency));
 
   // Add the event to the channelHelper to keep track of duty cycle
-  m_channelHelper.AddEvent (duration, CreateObject<LoraLogicalChannel>
-                              (frequency));
+  m_channelHelper.AddEvent (duration, CreateObject<LoraLogicalChannel> (frequency));
 
   SatMacTag mTag;
   mTag.SetDestAddress (Mac48Address::ConvertFrom (dest));
@@ -164,11 +157,7 @@ LorawanMacGateway::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalPara
 
       // Only forward the packet if it's uplink
       LorawanMacHeader macHdr;
-      packetCopy->RemoveHeader (macHdr);
-
-      // Add the Lora Frame Header to the packet
-      LoraFrameHeader frameHdr;
-      packetCopy->RemoveHeader (frameHdr);
+      packetCopy->PeekHeader (macHdr);
 
       SatMacTag mTag;
       packetCopy->PeekPacketTag (mTag);
@@ -205,7 +194,6 @@ LorawanMacGateway::GetWaitingTime (double frequency)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
-  return m_channelHelper.GetWaitingTime (CreateObject<LoraLogicalChannel>
-                                           (frequency));
+  return m_channelHelper.GetWaitingTime (CreateObject<LoraLogicalChannel> (frequency));
 }
 }
