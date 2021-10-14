@@ -43,6 +43,8 @@ class LoraNetworkScheduler : public Object
 public:
   static TypeId GetTypeId (void);
 
+  TypeId GetInstanceTypeId (void) const;
+
   LoraNetworkScheduler ();
   LoraNetworkScheduler (Ptr<LoraNetworkStatus> status,
                         Ptr<LoraNetworkController> controller);
@@ -65,6 +67,16 @@ private:
   TracedCallback<Ptr<const Packet> > m_receiveWindowOpened;
   Ptr<LoraNetworkStatus> m_status;
   Ptr<LoraNetworkController> m_controller;
+
+  /**
+   * Delay to wait between end of reception of paquet and sending of anwser, to be in first window opportunity
+   */
+  Time m_firstWindowAnswerDelay;
+
+  /**
+   * Delay to wait between end of reception of paquet and sending of anwser, to be in second window opportunity
+   */
+  Time m_secondWindowAnswerDelay;
 };
 
 } /* namespace ns3 */

@@ -89,6 +89,13 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::LorawanMacEndDevice::DataRate", UintegerValue (5));
   Config::SetDefault ("ns3::LorawanMacEndDevice::MType", EnumValue (LorawanMacHeader::CONFIRMED_DATA_UP));
 
+  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::FirstWindowDelay", TimeValue (MilliSeconds (1500)));
+  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::SecondWindowDelay", TimeValue (Seconds (2)));
+  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::FirstWindowDuration", TimeValue (MilliSeconds (400)));
+  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::SecondWindowDuration", TimeValue (MilliSeconds (400)));
+  Config::SetDefault ("ns3::LoraNetworkScheduler::FirstWindowAnswerDelay", TimeValue (Seconds (1)));
+  Config::SetDefault ("ns3::LoraNetworkScheduler::SecondWindowAnswerDelay", TimeValue (Seconds (2)));
+
   // Defaults
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
   Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));

@@ -22,9 +22,9 @@
 
 #include "lora-network-scheduler.h"
 
-namespace ns3 {
-
 NS_LOG_COMPONENT_DEFINE ("LoraNetworkScheduler");
+
+namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (LoraNetworkScheduler);
 
@@ -33,13 +33,27 @@ LoraNetworkScheduler::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::LoraNetworkScheduler")
     .SetParent<Object> ()
-    .AddConstructor<LoraNetworkScheduler> ()
+    .AddAttribute ("FirstWindowAnswerDelay", "Delay to wait between end of reception of paquet and sending of anwser, to be in first window opportunity",
+                   TimeValue (Seconds (1)),
+                   MakeTimeAccessor (&LoraNetworkScheduler::m_firstWindowAnswerDelay),
+                   MakeTimeChecker ())
+    .AddAttribute ("SecondWindowAnswerDelay", "Delay to wait between end of reception of paquet and sending of anwser, to be in second window opportunity",
+                   TimeValue (Seconds (2)),
+                   MakeTimeAccessor (&LoraNetworkScheduler::m_secondWindowAnswerDelay),
+                   MakeTimeChecker ())
     .AddTraceSource ("ReceiveWindowOpened",
                      "Trace source that is fired when a receive window opportunity happens.",
                      MakeTraceSourceAccessor (&LoraNetworkScheduler::m_receiveWindowOpened),
                      "ns3::Packet::TracedCallback")
-    .SetGroupName ("lorawan");
+    .AddConstructor<LoraNetworkScheduler> ()
+    ;
   return tid;
+}
+
+TypeId
+LoraNetworkScheduler::GetInstanceTypeId (void) const
+{
+  return GetTypeId ();
 }
 
 LoraNetworkScheduler::LoraNetworkScheduler ()
@@ -49,8 +63,11 @@ LoraNetworkScheduler::LoraNetworkScheduler ()
 LoraNetworkScheduler::LoraNetworkScheduler (Ptr<LoraNetworkStatus> status,
                                             Ptr<LoraNetworkController> controller) :
   m_status (status),
-  m_controller (controller)
+  m_controller (controller),
+  m_firstWindowAnswerDelay (Seconds (1)),
+  m_secondWindowAnswerDelay (Seconds (2))
 {
+  ObjectBase::ConstructSelf (AttributeConstructionList ());
 }
 
 LoraNetworkScheduler::~LoraNetworkScheduler ()
@@ -78,11 +95,7 @@ LoraNetworkScheduler::OnReceivedPacket (Ptr<const Packet> packet)
 
     // Schedule OnReceiveWindowOpportunity event
     m_status->GetEndDeviceStatus (packet)->SetReceiveWindowOpportunity (
-      Simulator::Schedule (Seconds (1),
-                           &LoraNetworkScheduler::OnReceiveWindowOpportunity,
-                           this,
-                           deviceAddress,
-                           1)); // This will be the first receive window
+      Simulator::Schedule (m_firstWindowAnswerDelay, &LoraNetworkScheduler::OnReceiveWindowOpportunity, this, deviceAddress, 1));
   }
 }
 
@@ -106,11 +119,7 @@ LoraNetworkScheduler::OnReceiveWindowOpportunity (LoraDeviceAddress deviceAddres
       // second window.
       // Schedule another OnReceiveWindowOpportunity event
       m_status->GetEndDeviceStatus (deviceAddress)->SetReceiveWindowOpportunity (
-      Simulator::Schedule (Seconds (1),
-                           &LoraNetworkScheduler::OnReceiveWindowOpportunity,
-                           this,
-                           deviceAddress,
-                           2));     // This will be the second receive window
+      Simulator::Schedule (m_secondWindowAnswerDelay,&LoraNetworkScheduler::OnReceiveWindowOpportunity, this, deviceAddress, 2));
     }
   else if (gwAddress == Address () && window == 2)
     {

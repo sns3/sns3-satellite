@@ -25,10 +25,10 @@
 #ifndef LORAWAN_MAC_END_DEVICE_CLASS_A_H
 #define LORAWAN_MAC_END_DEVICE_CLASS_A_H
 
-#include "ns3/lorawan-mac.h"                // Packet
-#include "ns3/lorawan-mac-end-device.h"     // LorawanMacEndDevice
-#include "ns3/lora-frame-header.h"          // RxParamSetupReq
-#include "ns3/lora-device-address.h"
+#include <ns3/lorawan-mac.h>                // Packet
+#include <ns3/lorawan-mac-end-device.h>     // LorawanMacEndDevice
+#include <ns3/lora-frame-header.h>          // RxParamSetupReq
+#include <ns3/lora-device-address.h>
 
 namespace ns3 {
 
@@ -165,16 +165,24 @@ public:
 private:
 
   /**
-   * The interval between when a packet is done sending and when the first
-   * receive window is opened.
+   * Time to wait between end of message transmission and opening of first reception window
    */
-  Time m_receiveDelay1;
+  Time m_firstWindowDelay;
 
   /**
-   * The interval between when a packet is done sending and when the second
-   * receive window is opened.
+   * Time to wait between end of message transmission and opening of second reception window
    */
-  Time m_receiveDelay2;
+  Time m_secondWindowDelay;
+
+  /**
+   * Duration of first reception window
+   */
+  Time m_firstWindowDuration;
+
+  /**
+   * Duration of second reception window
+   */
+  Time m_secondWindowDuration;
 
   /**
    * The event of the closing the first receive window.

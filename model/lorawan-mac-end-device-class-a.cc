@@ -23,11 +23,15 @@
  *              Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "ns3/lorawan-mac-end-device-class-a.h"
-#include "ns3/lorawan-mac-end-device.h"
-#include "ns3/satellite-phy.h"
-#include "ns3/log.h"
 #include <algorithm>
+
+#include <ns3/log.h>
+
+#include <ns3/satellite-phy.h>
+#include <ns3/satellite-lorawan-net-device.h>
+
+#include <ns3/lorawan-mac-end-device-class-a.h>
+#include <ns3/lorawan-mac-end-device.h>
 
 namespace ns3 {
 
@@ -40,7 +44,26 @@ LorawanMacEndDeviceClassA::GetTypeId (void)
 {
 static TypeId tid = TypeId ("ns3::LorawanMacEndDeviceClassA")
   .SetParent<LorawanMacEndDevice> ()
-  .SetGroupName ("lorawan")
+    .AddAttribute ("FirstWindowDelay",
+                   "Time to wait between end of message transmission and opening of first reception window",
+                   TimeValue (Seconds (1)),
+                   MakeTimeAccessor (&LorawanMacEndDeviceClassA::m_firstWindowDelay),
+                   MakeTimeChecker ())
+    .AddAttribute ("SecondWindowDelay",
+                   "Time to wait between end of message transmission and opening of second reception window",
+                   TimeValue (Seconds (2)),
+                   MakeTimeAccessor (&LorawanMacEndDeviceClassA::m_secondWindowDelay),
+                   MakeTimeChecker ())
+    .AddAttribute ("FirstWindowDuration",
+                   "Duration of first reception window",
+                   TimeValue (MilliSeconds (100)),
+                   MakeTimeAccessor (&LorawanMacEndDeviceClassA::m_firstWindowDuration),
+                   MakeTimeChecker ())
+    .AddAttribute ("SecondWindowDuration",
+                   "Duration of second reception window",
+                   TimeValue (MilliSeconds (100)),
+                   MakeTimeAccessor (&LorawanMacEndDeviceClassA::m_secondWindowDuration),
+                   MakeTimeChecker ())
   .AddConstructor<LorawanMacEndDeviceClassA> ();
 return tid;
 }
@@ -52,10 +75,10 @@ LorawanMacEndDeviceClassA::LorawanMacEndDeviceClassA ()
 
 LorawanMacEndDeviceClassA::LorawanMacEndDeviceClassA (uint32_t beamId)
   : LorawanMacEndDevice (beamId),
-    // LoraWAN default
-    m_receiveDelay1 (Seconds (1)),
-    // LoraWAN default
-    m_receiveDelay2 (Seconds (2)),
+    m_firstWindowDelay (Seconds (1)),
+    m_secondWindowDelay (Seconds (2)),
+    m_firstWindowDuration (MilliSeconds (100)),
+    m_secondWindowDuration (MilliSeconds (100)),
     m_rx1DrOffset (0)
 {
   NS_LOG_FUNCTION (this);
@@ -188,10 +211,11 @@ LorawanMacEndDeviceClassA::Receive (Ptr<Packet const> packet)
 {
   NS_LOG_FUNCTION (this << packet);
 
-  //m_device->GetObject<SatNetDevice> ()->Receive (packet);
-
   // Work on a copy of the packet
   Ptr<Packet> packetCopy = packet->Copy ();
+
+  SatMacTag mTag;
+  packetCopy->RemovePacketTag (mTag);
 
   // Remove the Mac Header to get some information
   LorawanMacHeader mHdr;
@@ -226,8 +250,7 @@ LorawanMacEndDeviceClassA::Receive (Ptr<Packet const> packet)
           // Parse the MAC commands
           ParseCommands (fHdr);
 
-          // TODO Pass the packet up to the NetDevice
-          m_device->GetObject<SatNetDevice> ()->Receive (packet);
+          m_device->GetObject<SatLorawanNetDevice> ()->Receive (packetCopy);
 
           // Call the trace source
           m_receivedPacket (packet);
@@ -317,21 +340,10 @@ LorawanMacEndDeviceClassA::TxFinished ()
   m_phyRx->SwitchToStandby ();
 
   // Schedule the opening of the first receive window
-  Simulator::Schedule (m_receiveDelay1,
-                       &LorawanMacEndDeviceClassA::OpenFirstReceiveWindow, this);
+  Simulator::Schedule (m_firstWindowDelay, &LorawanMacEndDeviceClassA::OpenFirstReceiveWindow, this);
 
   // Schedule the opening of the second receive window
-  m_secondReceiveWindow = Simulator::Schedule (m_receiveDelay2,
-                                               &LorawanMacEndDeviceClassA::OpenSecondReceiveWindow,
-                                               this);
-  // // Schedule the opening of the first receive window
-  // Simulator::Schedule (m_receiveDelay1,
-  //                      &LorawanMacEndDeviceClassA::OpenFirstReceiveWindow, this);
-  //
-  // // Schedule the opening of the second receive window
-  // m_secondReceiveWindow = Simulator::Schedule (m_receiveDelay2,
-  //                                              &LorawanMacEndDeviceClassA::OpenSecondReceiveWindow,
-  //                                              this);
+  m_secondReceiveWindow = Simulator::Schedule (m_secondWindowDelay, &LorawanMacEndDeviceClassA::OpenSecondReceiveWindow, this);
 
   // Switch the PHY to sleep
   m_phyRx->SwitchToSleep ();
@@ -345,14 +357,10 @@ LorawanMacEndDeviceClassA::OpenFirstReceiveWindow (void)
   // Set Phy in Standby mode
   m_phyRx->SwitchToStandby ();
 
-  //Calculate the duration of a single symbol for the first receive window DR
-  double tSym = pow (2, GetSfFromDataRate (GetFirstReceiveWindowDataRate ())) / GetBandwidthFromDataRate ( GetFirstReceiveWindowDataRate ());
-
   // Schedule return to sleep after "at least the time required by the end
   // device's radio transceiver to effectively detect a downlink preamble"
   // (LoraWAN specification)
-  m_closeFirstWindow = Simulator::Schedule (Seconds (m_receiveWindowDurationInSymbols*tSym),
-                                            &LorawanMacEndDeviceClassA::CloseFirstReceiveWindow, this); //m_receiveWindowDuration
+  m_closeFirstWindow = Simulator::Schedule (m_firstWindowDuration, &LorawanMacEndDeviceClassA::CloseFirstReceiveWindow, this);
 
 }
 
@@ -409,14 +417,10 @@ LorawanMacEndDeviceClassA::OpenSecondReceiveWindow (void)
   m_phyRx->SetFrequency (m_secondReceiveWindowFrequency);
   m_phyRx->SetSpreadingFactor (GetSfFromDataRate (m_secondReceiveWindowDataRate));
 
-  //Calculate the duration of a single symbol for the second receive window DR
-  double tSym = pow (2, GetSfFromDataRate (GetSecondReceiveWindowDataRate ())) / GetBandwidthFromDataRate ( GetSecondReceiveWindowDataRate ());
-
   // Schedule return to sleep after "at least the time required by the end
   // device's radio transceiver to effectively detect a downlink preamble"
   // (LoraWAN specification)
-  m_closeSecondWindow = Simulator::Schedule (Seconds (m_receiveWindowDurationInSymbols*tSym),
-                                             &LorawanMacEndDeviceClassA::CloseSecondReceiveWindow, this);
+  m_closeSecondWindow = Simulator::Schedule (m_secondWindowDuration, &LorawanMacEndDeviceClassA::CloseSecondReceiveWindow, this);
 }
 
 void
