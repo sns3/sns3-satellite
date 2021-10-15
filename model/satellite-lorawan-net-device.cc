@@ -110,18 +110,7 @@ SatLorawanNetDevice::Receive (Ptr<const Packet> packet)
 bool
 SatLorawanNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
 {
-  // TODO edit
-
   NS_LOG_FUNCTION (this << packet);
-
-  if (m_isStatisticsTagsEnabled)
-    {
-      // Add a SatAddressTag tag with this device's address as the source address.
-      packet->AddByteTag (SatAddressTag (m_nodeInfo->GetMacAddress ()));
-
-      // Add a SatDevTimeTag tag for packet delay computation at the receiver end.
-      packet->AddPacketTag (SatDevTimeTag (Simulator::Now ()));
-    }
 
   // Add packet trace entry:
   SatEnums::SatLinkDir_t ld =

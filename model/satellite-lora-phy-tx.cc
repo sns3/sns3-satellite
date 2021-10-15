@@ -35,6 +35,7 @@ SatLoraPhyTx::GetTypeId (void)
 }
 
 SatLoraPhyTx::SatLoraPhyTx ()
+  : m_isTransmitting (false)
 {
 }
 

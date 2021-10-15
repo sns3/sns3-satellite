@@ -121,6 +121,17 @@ LorawanMacEndDeviceClassA::SendToPhy (Ptr<Packet> packetToSend)
       m_dataRate = m_dataRate - 1;
     }
 
+  if (m_isStatisticsTagsEnabled)
+    {
+      // Add a SatAddressTag tag with this device's address as the source address.
+      packetToSend->AddByteTag (SatAddressTag (m_nodeInfo->GetMacAddress ()));
+
+      // Add a SatDevTimeTag tag for packet delay computation at the receiver end.
+      SatDevTimeTag satDevTag;
+      packetToSend->RemovePacketTag (satDevTag);
+      packetToSend->AddPacketTag (SatDevTimeTag (Simulator::Now ()));
+    }
+
   m_phyRx->SwitchToTx ();
 
   // Craft LoraTxParameters object
@@ -156,7 +167,7 @@ LorawanMacEndDeviceClassA::SendToPhy (Ptr<Packet> packetToSend)
   SatMacTag mTag;
   packetToSend->RemovePacketTag (mTag);
   mTag.SetDestAddress (m_gwAddress);
-  mTag.SetSourceAddress ( Mac48Address::ConvertFrom (m_device->GetAddress ()));
+  mTag.SetSourceAddress (Mac48Address::ConvertFrom (m_device->GetAddress ()));
   packetToSend->AddPacketTag (mTag);
 
   SatPhy::PacketContainer_t packets;
@@ -198,22 +209,15 @@ LorawanMacEndDeviceClassA::SendToPhy (Ptr<Packet> packetToSend)
 //////////////////////////
 //  Receiving methods   //
 //////////////////////////
-void
-LorawanMacEndDeviceClassA::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/)
-{
-  // Invoke the `Rx` and `RxDelay` trace sources.
-  RxTraces (packets);
-
-  for (SatPhy::PacketContainer_t::iterator i = packets.begin (); i != packets.end (); i++ )
-    {
-      Receive  (*i);
-    }
-}
 
 void
-LorawanMacEndDeviceClassA::Receive (Ptr<Packet const> packet)
+LorawanMacEndDeviceClassA::Receive (Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this << packet);
+
+  SatPhy::PacketContainer_t packets;
+  packets.push_back (packet);
+  RxTraces (packets);
 
   m_phyRx->SwitchToStandby ();
 

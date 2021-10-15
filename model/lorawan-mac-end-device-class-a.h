@@ -67,8 +67,7 @@ public:
    *
    * \param packet the received packet.
    */
-  virtual void Receive (Ptr<Packet const> packet);
-  virtual void Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/);
+  virtual void Receive (Ptr<Packet> packet);
 
   virtual void FailedReception (Ptr<Packet const> packet);
 

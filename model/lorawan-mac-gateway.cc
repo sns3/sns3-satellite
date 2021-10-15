@@ -74,6 +74,17 @@ LorawanMacGateway::Send (Ptr<Packet> packet)
   NS_LOG_DEBUG ("Freq: " << frequency << " MHz");
   packet->AddPacketTag (tag);
 
+  if (m_isStatisticsTagsEnabled)
+    {
+      // Add a SatAddressTag tag with this device's address as the source address.
+      packet->AddByteTag (SatAddressTag (m_nodeInfo->GetMacAddress ()));
+
+      // Add a SatDevTimeTag tag for packet delay computation at the receiver end.
+      SatDevTimeTag satDevTag;
+      packet->RemovePacketTag (satDevTag);
+      packet->AddPacketTag (SatDevTimeTag (Simulator::Now ()));
+    }
+
   // Make sure we can transmit this packet
   if (m_channelHelper.GetWaitingTime(CreateObject<LoraLogicalChannel> (frequency)) > Time(0))
     {

@@ -172,7 +172,7 @@ main (int argc, char *argv[])
     SimulationHelper::PERIODIC,
     loraInterval,
     packetSize,
-    appStartTime, simLength, MilliSeconds (10));
+    appStartTime, simLength, Seconds (1));
 
   // Outputs
   simulationHelper->EnableProgressLogs ();
