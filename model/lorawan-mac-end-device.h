@@ -62,7 +62,7 @@ public:
    *
    * \param packet the packet to send
    */
-  virtual void Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber);
+  virtual void Send (Ptr<Packet> packet);
 
   /**
    * Checking if we are performing the transmission of a new packet or a retransmission, and call SendToPhy function.

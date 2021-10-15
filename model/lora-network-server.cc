@@ -158,9 +158,6 @@ LoraNetworkServer::Receive (Ptr<NetDevice> device, Ptr<const Packet> packet,
 {
   NS_LOG_FUNCTION (this << packet << protocol << address);
 
-  // Create a copy of the packet
-  Ptr<Packet> myPacket = packet->Copy ();
-
   // Fire the trace source
   m_receivedPacket (packet);
 

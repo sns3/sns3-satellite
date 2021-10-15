@@ -190,49 +190,49 @@ LoraEndDeviceStatus::GetReceivedPacketList ()
 void
 LoraEndDeviceStatus::SetFirstReceiveWindowSpreadingFactor (uint8_t sf)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this << sf);
   m_firstReceiveWindowSpreadingFactor = sf;
 }
 
 void
 LoraEndDeviceStatus::SetFirstReceiveWindowFrequency (double frequency)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this << frequency);
   m_firstReceiveWindowFrequency = frequency;
 }
 
 void
 LoraEndDeviceStatus::SetSecondReceiveWindowOffset (uint8_t offset)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this << offset);
   m_secondReceiveWindowOffset = offset;
 }
 
 void
 LoraEndDeviceStatus::SetSecondReceiveWindowFrequency (double frequency)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this << frequency);
   m_secondReceiveWindowFrequency = frequency;
 }
 
 void
 LoraEndDeviceStatus::SetReplyMacHeader (LorawanMacHeader macHeader)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this << macHeader);
   m_reply.macHeader = macHeader;
 }
 
 void
 LoraEndDeviceStatus::SetReplyFrameHeader (LoraFrameHeader frameHeader)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this << frameHeader);
   m_reply.frameHeader = frameHeader;
 }
 
 void
 LoraEndDeviceStatus::SetReplyPayload (Ptr<Packet> replyPayload)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this << replyPayload);
   m_reply.payload = replyPayload;
 }
 
@@ -243,7 +243,7 @@ LoraEndDeviceStatus::SetReplyPayload (Ptr<Packet> replyPayload)
 void
 LoraEndDeviceStatus::InsertReceivedPacket (Ptr<Packet const> receivedPacket, const Address &gwAddress)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this << receivedPacket << gwAddress);
 
   // Create a copy of the packet
   Ptr<Packet> myPacket = receivedPacket->Copy ();

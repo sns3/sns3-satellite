@@ -611,7 +611,8 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
   //////////////////////////////////////
   // Second receive window parameters //
   //////////////////////////////////////
-  mac->SetSecondReceiveWindowDataRate (0);
+  // TODO should be zero but transmission time is higher than propagation time. This is not possible right now. Revert to zero when possible.
+  mac->SetSecondReceiveWindowDataRate (4);
   mac->SetSecondReceiveWindowFrequency (869.525);
 
   LoraLogicalChannelHelper channelHelper;

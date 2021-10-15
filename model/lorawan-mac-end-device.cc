@@ -165,13 +165,12 @@ LorawanMacEndDevice::~LorawanMacEndDevice ()
 ////////////////////////
 
 void
-LorawanMacEndDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
+LorawanMacEndDevice::Send (Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this << packet);
 
   // If it is not possible to transmit now because of the duty cycle,
   // or because we are receiving, schedule a tx/retx later
-
   Time netxTxDelay = GetNextTransmissionDelay ();
   if (netxTxDelay != Seconds (0))
     {
@@ -181,11 +180,6 @@ LorawanMacEndDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t pro
 
   // Pick a channel on which to transmit the packet
   Ptr<LoraLogicalChannel> txChannel = GetChannelForTx ();
-
-  double frequency = txChannel->GetFrequency ();
-  LoraTag tag;
-  tag.SetFrequency (frequency);
-  packet->AddPacketTag (tag);
 
   if (!(txChannel && m_retxParams.retxLeft > 0))
     {
@@ -246,9 +240,6 @@ LorawanMacEndDevice::DoSend (Ptr<Packet> packet)
       ApplyNecessaryOptions (frameHdr);
       packet->AddHeader (frameHdr);
       NS_LOG_INFO ("Added frame header of size " << frameHdr.GetSerializedSize () << " bytes.");
-
-      // Add the Lora Frame Header to the packet
-      packet->PeekHeader (frameHdr);
 
       // Add the Lora Mac header to the packet
       LorawanMacHeader macHdr;

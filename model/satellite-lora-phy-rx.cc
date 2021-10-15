@@ -98,10 +98,10 @@ SatLoraPhyRx::StartRx (Ptr<SatSignalParameters> rxParams)
 
         // Check if one of the above failed
         ///////////////////////////////////
+        SatPhyRx::StartRx (rxParams);
+        break;
       }
     }
-
-  SatPhyRx::StartRx (rxParams);
 }
 
 // TODO implement it

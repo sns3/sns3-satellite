@@ -81,6 +81,8 @@ public:
 
   void EndTx ();
 
+  bool IsTransmitting ();
+
 protected:
 
 private:
@@ -88,6 +90,8 @@ private:
    * The callback to perform upon the end of a transmission.
    */
   TxFinishedCallback m_txFinishedCallback;
+
+  bool m_isTransmitting;
 
 };
 

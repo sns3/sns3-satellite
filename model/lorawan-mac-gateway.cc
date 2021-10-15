@@ -59,7 +59,7 @@ LorawanMacGateway::~LorawanMacGateway ()
 }
 
 void
-LorawanMacGateway::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
+LorawanMacGateway::Send (Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this << packet);
 
@@ -75,14 +75,19 @@ LorawanMacGateway::Send (Ptr<Packet> packet, const Address& dest, uint16_t proto
   packet->AddPacketTag (tag);
 
   // Make sure we can transmit this packet
-  // TODO
-  /*if (m_channelHelper.GetWaitingTime(CreateObject<LoraLogicalChannel> (frequency)) > Time(0))
+  if (m_channelHelper.GetWaitingTime(CreateObject<LoraLogicalChannel> (frequency)) > Time(0))
     {
       // We cannot send now!
       NS_LOG_WARN ("Trying to send a packet but Duty Cycle won't allow it. Aborting.");
       return;
     }
-    */
+
+  if (IsTransmitting ())
+    {
+      // Gateway already transmitting!
+      NS_LOG_WARN ("Gateway is already transmitting. Aborting.");
+      return;
+    }
 
   LoraTxParameters params;
   params.sf = GetSfFromDataRate (dataRate);
@@ -108,7 +113,7 @@ LorawanMacGateway::Send (Ptr<Packet> packet, const Address& dest, uint16_t proto
   // Get the duration
   Time duration = GetOnAirTime (packet, params);
 
-  // NS_LOG_DEBUG ("Duration: " << duration.GetSeconds ());
+  NS_LOG_DEBUG ("Duration: " << duration.GetSeconds ());
 
   // Find the channel with the desired frequency
   // double sendingPower = m_channelHelper.GetTxPowerForChannel (CreateObject<LoraLogicalChannel> (frequency));
@@ -117,7 +122,7 @@ LorawanMacGateway::Send (Ptr<Packet> packet, const Address& dest, uint16_t proto
   m_channelHelper.AddEvent (duration, CreateObject<LoraLogicalChannel> (frequency));
 
   SatMacTag mTag;
-  mTag.SetDestAddress (Mac48Address::ConvertFrom (dest));
+  mTag.SetDestAddress (Mac48Address::GetBroadcast ());
   mTag.SetSourceAddress (Mac48Address::ConvertFrom (m_device->GetAddress ()));
   packet->AddPacketTag (mTag);
 
@@ -135,9 +140,7 @@ LorawanMacGateway::Send (Ptr<Packet> packet, const Address& dest, uint16_t proto
 bool
 LorawanMacGateway::IsTransmitting (void)
 {
-  // TODO
-  return false;
-  // return m_phy->IsTransmitting ();
+  return m_phyTx->IsTransmitting ();
 }
 
 void
@@ -155,12 +158,12 @@ LorawanMacGateway::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalPara
       // Make a copy of the packet to work on
       Ptr<Packet> packetCopy = packet->Copy ();
 
+      SatMacTag mTag;
+      packetCopy->RemovePacketTag (mTag);
+
       // Only forward the packet if it's uplink
       LorawanMacHeader macHdr;
       packetCopy->PeekHeader (macHdr);
-
-      SatMacTag mTag;
-      packetCopy->PeekPacketTag (mTag);
 
       if (macHdr.IsUplink ())
         {
@@ -192,7 +195,7 @@ LorawanMacGateway::TxFinished ()
 Time
 LorawanMacGateway::GetWaitingTime (double frequency)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this << frequency);
 
   return m_channelHelper.GetWaitingTime (CreateObject<LoraLogicalChannel> (frequency));
 }

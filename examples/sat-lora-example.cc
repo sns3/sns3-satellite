@@ -50,10 +50,8 @@ main (int argc, char *argv[])
   Time appStartTime = Seconds (0.001);
   Time simLength = Seconds (10.0);
 
-  uint32_t packetSize = 20;
-  std::string dataRate = "5kbps";
-  std::string onTime = "0.2";
-  std::string offTime = "0.8";
+  uint32_t packetSize = 24;
+  Time loraInterval = Seconds (10);
 
   double frameAllocatedBandwidthHz = 15000;
   double frameCarrierAllocatedBandwidthHz = 15000;
@@ -73,9 +71,7 @@ main (int argc, char *argv[])
   cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", nbUtsPerBeam);
   cmd.AddValue ("simLength", "Simulation duration in seconds", simLength);
   cmd.AddValue ("packetSize", "Constant packet size in bytes", packetSize);
-  cmd.AddValue ("dataRate", "Data rate (e.g. 500kb/s)", dataRate);
-  cmd.AddValue ("onTime", "Time for packet sending is on in seconds", onTime);
-  cmd.AddValue ("offTime", "Time for packet sending is off in seconds", offTime);
+  cmd.AddValue ("loraInterval", "Interval between two transmissions for each UT in seconds", loraInterval);
   cmd.AddValue ("frameAllocatedBandwidthHz", "Allocated bandwidth in Hz", frameAllocatedBandwidthHz);
   cmd.AddValue ("frameCarrierAllocatedBandwidthHz", "Allocated carrier bandwidth in Hz", frameCarrierAllocatedBandwidthHz);
   cmd.AddValue ("frameCarrierRollOff", "Roll-off factor", frameCarrierRollOff);
@@ -172,30 +168,10 @@ main (int argc, char *argv[])
 
   simulationHelper->CreateSatScenario ();
 
-  Config::SetDefault ("ns3::OnOffApplication::PacketSize", UintegerValue (packetSize));
-  Config::SetDefault ("ns3::OnOffApplication::DataRate", StringValue (dataRate));
-  Config::SetDefault ("ns3::OnOffApplication::OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + onTime + "]"));
-  Config::SetDefault ("ns3::OnOffApplication::OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=" + offTime + "]"));
-
-  Config::SetDefault ("ns3::CbrApplication::Interval", StringValue ("1s"));
-  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
-
-  /*simulationHelper->InstallTrafficModel (
-    SimulationHelper::CBR,
-    SimulationHelper::UDP,
-    SimulationHelper::RTN_LINK,
-    appStartTime, simLength, MilliSeconds (10));*/
-
-  /*simulationHelper->InstallTrafficModel (
-    SimulationHelper::CBR,
-    SimulationHelper::UDP,
-    SimulationHelper::FWD_LINK,
-    appStartTime, simLength);*/
-
   simulationHelper->InstallLoraTrafficModel (
     SimulationHelper::PERIODIC,
-    Seconds (2),
-    24,
+    loraInterval,
+    packetSize,
     appStartTime, simLength, MilliSeconds (10));
 
   // Outputs

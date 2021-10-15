@@ -68,8 +68,8 @@ LoraConfirmedMessagesComponent::~LoraConfirmedMessagesComponent ()
 
 void
 LoraConfirmedMessagesComponent::OnReceivedPacket (Ptr<const Packet> packet,
-                                              Ptr<LoraEndDeviceStatus> status,
-                                              Ptr<LoraNetworkStatus> networkStatus)
+                                                  Ptr<LoraEndDeviceStatus> status,
+                                                  Ptr<LoraNetworkStatus> networkStatus)
 {
   NS_LOG_FUNCTION (this->GetTypeId () << packet << networkStatus);
 

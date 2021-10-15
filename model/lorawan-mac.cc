@@ -69,6 +69,12 @@ LorawanMac::~LorawanMac ()
 }
 
 void
+LorawanMac::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
+{
+  Send (packet);
+}
+
+void
 LorawanMac::SetDevice (Ptr<NetDevice> device)
 {
   m_device = device;

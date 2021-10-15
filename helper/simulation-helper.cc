@@ -42,6 +42,8 @@
 #include <ns3/nrtv-helper.h>
 #include <ns3/three-gpp-http-satellite-helper.h>
 
+#include <ns3/lora-periodic-sender.h>
+
 #include <ns3/random-variable-stream.h>
 
 NS_LOG_COMPONENT_DEFINE ("SimulationHelper");
@@ -1506,51 +1508,39 @@ SimulationHelper::InstallTrafficModel (TrafficModel_t trafficModel,
 
 void
 SimulationHelper::InstallLoraTrafficModel (LoraTrafficModel_t trafficModel,
-                                           Time interval, // TODO attribute ?
-                                           uint32_t packetSize, // TODO attribute ?
+                                           Time interval,
+                                           uint32_t packetSize,
                                            Time startTime,
                                            Time stopTime,
                                            Time startDelay)
 {
   NS_LOG_FUNCTION (this << trafficModel << interval << packetSize << startTime << stopTime);
 
-  // get users
-  NodeContainer utUsers = m_satHelper->GetUtUsers ();
-  NodeContainer gwUsers = m_satHelper->GetGwUsers ();
-  NS_ASSERT_MSG (m_gwUserId < gwUsers.GetN (), "The number of GW users configured was too low.");
+  NodeContainer nodes = GetSatelliteHelper ()->UtNodes ();
+  Ptr<Node> node;
 
-  std::cout << "Installing Lora traffic model on " << utUsers.GetN () << " UT users" << std::endl;
-
-  std::string socketFactory = "ns3::UdpSocketFactory";
+  std::cout << "Installing Lora traffic model on " << nodes.GetN () << " UTs" << std::endl;
 
   switch (trafficModel)
     {
     case SimulationHelper::PERIODIC:
       {
-        uint16_t port = 9;
-        InetSocketAddress gwUserAddr = InetSocketAddress (m_satHelper->GetUserAddress (gwUsers.Get (m_gwUserId)), port);
-
-        PacketSinkHelper sinkHelper (socketFactory, Address ());
-        CbrHelper cbrHelper (socketFactory, Address ());
-        ApplicationContainer sinkContainer;
-        ApplicationContainer cbrContainer;
-        // create sink application on GW user
-        /*if (!HasSinkInstalled (gwUsers.Get (m_gwUserId), port))
+        for (uint32_t i = 0; i < nodes.GetN (); i++)
           {
-            sinkHelper.SetAttribute ("Local", AddressValue (Address (gwUserAddr)));
-            sinkContainer.Add (sinkHelper.Install (gwUsers.Get (m_gwUserId)));
-          }*/
+            node = nodes.Get (i);
+            Ptr<LoraPeriodicSender> app = Create<LoraPeriodicSender> ();
 
-        cbrHelper.SetAttribute ("Remote", AddressValue (Address (gwUserAddr)));
+            app->SetInterval (interval);
+            NS_LOG_DEBUG ("Created an application with interval = " << interval.GetHours () << " hours");
 
-        // create CBR applications on UT users
-        for (uint32_t i = 0; i < utUsers.GetN (); i++)
-          {
-            auto app = cbrHelper.Install (utUsers.Get (i)).Get (0);
             app->SetStartTime (startTime + (i + 1) * startDelay);
-            cbrContainer.Add (app);
+            app->SetStopTime (stopTime);
+            app->SetPacketSize (packetSize);
+
+            app->SetNode (node);
+            node->AddApplication (app);
           }
-        break;
+          break;
       }
       case SimulationHelper::ONE_SHOT:
       default:

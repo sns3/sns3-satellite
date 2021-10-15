@@ -30,6 +30,7 @@
 #include <ns3/satellite-phy.h>
 #include <ns3/satellite-lorawan-net-device.h>
 
+#include "ns3/lora-tag.h"
 #include <ns3/lorawan-mac-end-device-class-a.h>
 #include <ns3/lorawan-mac-end-device.h>
 
@@ -123,7 +124,6 @@ LorawanMacEndDeviceClassA::SendToPhy (Ptr<Packet> packetToSend)
   m_phyRx->SwitchToTx ();
 
   // Craft LoraTxParameters object
-  // TODO add to packet or merge with txParams
   LoraTxParameters params;
   params.sf = GetSfFromDataRate (m_dataRate);
   params.headerDisabled = m_headerDisabled;
@@ -144,7 +144,17 @@ LorawanMacEndDeviceClassA::SendToPhy (Ptr<Packet> packetToSend)
   txInfo.waveformId = wf->GetWaveformId ();
   //txInfo.crdsaUniquePacketId = m_crdsaUniquePacketId; // reuse the crdsaUniquePacketId to identify ESSA frames
 
+  // Pick a channel on which to transmit the packet
+  Ptr<LoraLogicalChannel> txChannel = GetChannelForTx ();
+  double frequency = txChannel->GetFrequency ();
+  LoraTag tag;
+  packetToSend->RemovePacketTag (tag);
+  tag.SetFrequency (frequency);
+  tag.SetDataRate (m_dataRate);
+  packetToSend->AddPacketTag (tag);
+
   SatMacTag mTag;
+  packetToSend->RemovePacketTag (mTag);
   mTag.SetDestAddress (m_gwAddress);
   mTag.SetSourceAddress ( Mac48Address::ConvertFrom (m_device->GetAddress ()));
   packetToSend->AddPacketTag (mTag);
@@ -157,13 +167,7 @@ LorawanMacEndDeviceClassA::SendToPhy (Ptr<Packet> packetToSend)
   // Compute packet duration
   Time duration = GetOnAirTime (packetToSend, params);
 
-  // TODO no info of freq and tx_power...
   m_phy->SendPdu (packets, carrierId, duration, txInfo);
-  //m_phy->Send (packetToSend, params, txChannel->GetFrequency (), m_txPower);
-
-  // Wake up PHY layer and directly send the packet
-
-  Ptr<LoraLogicalChannel> txChannel = GetChannelForTx ();
 
   NS_LOG_DEBUG ("PacketToSend: " << packetToSend);
 
@@ -211,6 +215,8 @@ LorawanMacEndDeviceClassA::Receive (Ptr<Packet const> packet)
 {
   NS_LOG_FUNCTION (this << packet);
 
+  m_phyRx->SwitchToStandby ();
+
   // Work on a copy of the packet
   Ptr<Packet> packetCopy = packet->Copy ();
 
@@ -250,7 +256,7 @@ LorawanMacEndDeviceClassA::Receive (Ptr<Packet const> packet)
           // Parse the MAC commands
           ParseCommands (fHdr);
 
-          m_device->GetObject<SatLorawanNetDevice> ()->Receive (packetCopy);
+          //m_device->GetObject<SatLorawanNetDevice> ()->Receive (packetCopy);
 
           // Call the trace source
           m_receivedPacket (packet);
@@ -277,7 +283,7 @@ LorawanMacEndDeviceClassA::Receive (Ptr<Packet const> packet)
                 }
               else       // Reschedule
                 {
-                  this->Send (m_retxParams.packet, m_gwAddress, 0);
+                  this->Send (m_retxParams.packet);
                   NS_LOG_INFO ("We have " << unsigned(m_retxParams.retxLeft) << " retransmissions left: rescheduling transmission.");
                 }
             }
@@ -288,7 +294,7 @@ LorawanMacEndDeviceClassA::Receive (Ptr<Packet const> packet)
       NS_LOG_INFO ("The packet we are receiving is in uplink.");
       if (m_retxParams.retxLeft > 0)
         {
-          this->Send (m_retxParams.packet, m_gwAddress, 0);
+          this->Send (m_retxParams.packet);
           NS_LOG_INFO ("We have " << unsigned(m_retxParams.retxLeft) << " retransmissions left: rescheduling transmission.");
         }
       else
@@ -317,7 +323,7 @@ LorawanMacEndDeviceClassA::FailedReception (Ptr<Packet const> packet)
     {
       if (m_retxParams.retxLeft > 0)
         {
-          this->Send (m_retxParams.packet, m_gwAddress, 0);
+          this->Send (m_retxParams.packet);
           NS_LOG_INFO ("We have " << unsigned(m_retxParams.retxLeft) << " retransmissions left: rescheduling transmission.");
         }
       else
@@ -403,7 +409,6 @@ LorawanMacEndDeviceClassA::OpenSecondReceiveWindow (void)
   if (m_phyRx->GetState () == SatLoraPhyRx::RX)
     {
       NS_LOG_INFO ("Won't open second receive window since we are in RX mode.");
-
       return;
     }
 
@@ -411,8 +416,7 @@ LorawanMacEndDeviceClassA::OpenSecondReceiveWindow (void)
   m_phyRx->SwitchToStandby ();
 
   // Switch to appropriate channel and data rate
-  NS_LOG_INFO ("Using parameters: " << m_secondReceiveWindowFrequency << "Hz, DR"
-                                    << unsigned(m_secondReceiveWindowDataRate));
+  NS_LOG_INFO ("Using parameters: " << m_secondReceiveWindowFrequency << "Hz, DR" << unsigned(m_secondReceiveWindowDataRate));
 
   m_phyRx->SetFrequency (m_secondReceiveWindowFrequency);
   m_phyRx->SetSpreadingFactor (GetSfFromDataRate (m_secondReceiveWindowDataRate));
@@ -456,7 +460,7 @@ LorawanMacEndDeviceClassA::CloseSecondReceiveWindow (void)
       if (m_retxParams.retxLeft > 0 )
         {
           NS_LOG_INFO ("We have " << unsigned(m_retxParams.retxLeft) << " retransmissions left: rescheduling transmission.");
-          this->Send (m_retxParams.packet, m_gwAddress, 0);
+          this->Send (m_retxParams.packet);
         }
 
       else if (m_retxParams.retxLeft == 0 && m_phyRx->GetState () != SatLoraPhyRx::RX)
@@ -576,8 +580,7 @@ LorawanMacEndDeviceClassA::OnRxClassParamSetupReq (Ptr<RxParamSetupReq> rxParamS
   uint8_t rx2DataRate = rxParamSetupReq->GetRx2DataRate ();
   double frequency = rxParamSetupReq->GetFrequency ();
 
-  NS_LOG_FUNCTION (this << unsigned (rx1DrOffset) << unsigned (rx2DataRate) <<
-                   frequency);
+  NS_LOG_FUNCTION (this << unsigned (rx1DrOffset) << unsigned (rx2DataRate) << frequency);
 
   // Check that the desired offset is valid
   if ( !(0 <= rx1DrOffset && rx1DrOffset <= 5))
@@ -586,8 +589,7 @@ LorawanMacEndDeviceClassA::OnRxClassParamSetupReq (Ptr<RxParamSetupReq> rxParamS
     }
 
   // Check that the desired data rate is valid
-  if (GetSfFromDataRate (rx2DataRate) == 0
-      || GetBandwidthFromDataRate (rx2DataRate) == 0)
+  if (GetSfFromDataRate (rx2DataRate) == 0 || GetBandwidthFromDataRate (rx2DataRate) == 0)
     {
       dataRateOk = false;
     }
@@ -599,8 +601,7 @@ LorawanMacEndDeviceClassA::OnRxClassParamSetupReq (Ptr<RxParamSetupReq> rxParamS
 
   // Craft a RxParamSetupAns as response
   NS_LOG_INFO ("Adding RxParamSetupAns reply");
-  m_macCommandList.push_back (CreateObject<RxParamSetupAns> (offsetOk,
-                                                             dataRateOk, true));
+  m_macCommandList.push_back (CreateObject<RxParamSetupAns> (offsetOk, dataRateOk, true));
 
 }
 

@@ -100,7 +100,6 @@ LoraLogicalChannelHelper::GetLoraSubBandFromChannel (Ptr<LoraLogicalChannel> cha
 Ptr<LoraSubBand>
 LoraLogicalChannelHelper::GetLoraSubBandFromFrequency (double frequency)
 {
-  std::cout << "LoraLogicalChannelHelper::GetLoraSubBandFromFrequency " << frequency << std::endl;
   // Get the LoraSubBand this frequency belongs to
   std::list< Ptr< LoraSubBand > >::iterator it;
   for (it = m_subBandList.begin (); it != m_subBandList.end (); it++)

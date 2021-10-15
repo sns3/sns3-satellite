@@ -83,7 +83,7 @@ public:
    *
    * \param rxParams All the info needed.
    */
-  void StartRx (Ptr<SatSignalParameters> rxParams);
+  virtual void StartRx (Ptr<SatSignalParameters> rxParams);
 
   /**
    * Finish reception of a packet.

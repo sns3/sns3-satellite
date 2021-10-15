@@ -44,8 +44,6 @@ SatLorawanNetDevice::SatLorawanNetDevice ()
 void
 SatLorawanNetDevice::Receive (Ptr<const Packet> packet)
 {
-  // TODO edit
-
   NS_LOG_FUNCTION (this << packet);
   NS_LOG_INFO ("Receiving a packet: " << packet->GetUid ());
 
@@ -166,142 +164,9 @@ SatLorawanNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t pro
 }
 
 bool
-SatLorawanNetDevice::SendFrom (Ptr<Packet> packet, const Address& source, const Address& dest, uint16_t protocolNumber)
-{
-  // TODO edit
-
-  NS_LOG_FUNCTION (this << packet << source << dest << protocolNumber);
-
-  if (m_isStatisticsTagsEnabled)
-    {
-      // Add a SatAddressTag tag with this device's address as the source address.
-      packet->AddByteTag (SatAddressTag (m_nodeInfo->GetMacAddress ()));
-
-      // Add a SatDevTimeTag tag for packet delay computation at the receiver end.
-      packet->AddPacketTag (SatDevTimeTag (Simulator::Now ()));
-    }
-
-  // Add packet trace entry:
-  SatEnums::SatLinkDir_t ld =
-    (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
-
-  m_packetTrace (Simulator::Now (),
-                 SatEnums::PACKET_SENT,
-                 m_nodeInfo->GetNodeType (),
-                 m_nodeInfo->GetNodeId (),
-                 m_nodeInfo->GetMacAddress (),
-                 SatEnums::LL_ND,
-                 ld,
-                 SatUtils::GetPacketInfo (packet));
-
-  m_txTrace (packet);
-
-  uint8_t flowId = m_classifier->Classify (packet, dest, protocolNumber);
-  m_llc->Enque (packet, dest, flowId);
-
-  return true;
-}
-
-/*void
-SatLorawanNetDevice::OnReceivedPacket (Ptr<const Packet> packet)
-{
-  NS_LOG_FUNCTION (packet);
-
-  // Get the current packet's frame counter
-  Ptr<Packet> packetCopy = packet->Copy ();
-  LorawanMacHeader receivedMacHdr;
-  packetCopy->RemoveHeader (receivedMacHdr);
-  LoraFrameHeader receivedFrameHdr;
-  receivedFrameHdr.SetAsUplink ();
-  packetCopy->RemoveHeader (receivedFrameHdr);
-
-  // Need to decide whether to schedule a receive window
-  if (!m_status->GetEndDeviceStatus (packet)->HasReceiveWindowOpportunityScheduled ())
-  {
-    // Extract the address
-    LoraDeviceAddress deviceAddress = receivedFrameHdr.GetAddress ();
-
-    // Schedule OnReceiveWindowOpportunity event
-    m_status->GetEndDeviceStatus (packet)->SetReceiveWindowOpportunity (
-      Simulator::Schedule (Seconds (1),
-                           &SatLorawanNetDevice::OnReceiveWindowOpportunity,
-                           this,
-                           deviceAddress,
-                           1)); // This will be the first receive window
-  }
-}
-
-void
-SatLorawanNetDevice::OnReceiveWindowOpportunity (LoraDeviceAddress deviceAddress, int window)
-{
-  NS_LOG_FUNCTION (deviceAddress);
-
-  NS_LOG_DEBUG ("Opening receive window number " << window << " for device "
-                                                 << deviceAddress);
-
-  // Check whether we can send a reply to the device, again by using
-  // NetworkStatus
-  Address gwAddress = m_status->GetBestGatewayForDevice (deviceAddress, window);
-
-  if (gwAddress == Address () && window == 1)
-    {
-      NS_LOG_DEBUG ("No suitable gateway found for first window.");
-
-      // No suitable GW was found, but there's still hope to find one for the
-      // second window.
-      // Schedule another OnReceiveWindowOpportunity event
-      m_status->GetEndDeviceStatus (deviceAddress)->SetReceiveWindowOpportunity (
-        Simulator::Schedule (Seconds (1),
-                             &NetworkScheduler::OnReceiveWindowOpportunity,
-                             this,
-                             deviceAddress,
-                             2));     // This will be the second receive window
-    }
-  else if (gwAddress == Address () && window == 2)
-    {
-      // No suitable GW was found and this was our last opportunity
-      // Simply give up.
-      NS_LOG_DEBUG ("Giving up on reply: no suitable gateway was found " <<
-                   "on the second receive window");
-
-      // Reset the reply
-      // XXX Should we reset it here or keep it for the next opportunity?
-      m_status->GetEndDeviceStatus (deviceAddress)->RemoveReceiveWindowOpportunity();
-      m_status->GetEndDeviceStatus (deviceAddress)->InitializeReply ();
-    }
-  else
-    {
-      // A gateway was found
-
-      NS_LOG_DEBUG ("Found available gateway with address: " << gwAddress);
-
-      m_controller->BeforeSendingReply (m_status->GetEndDeviceStatus
-                                          (deviceAddress));
-
-      // Check whether this device needs a response by querying m_status
-      bool needsReply = m_status->NeedsReply (deviceAddress);
-
-      if (needsReply)
-        {
-          NS_LOG_INFO ("A reply is needed");
-
-          // Send the reply through that gateway
-          m_status->SendThroughGateway (m_status->GetReplyForDevice
-                                          (deviceAddress, window),
-                                        gwAddress);
-
-          // Reset the reply
-          m_status->GetEndDeviceStatus (deviceAddress)->RemoveReceiveWindowOpportunity();
-          m_status->GetEndDeviceStatus (deviceAddress)->InitializeReply ();
-        }
-    }
-}*/
-
-bool
 SatLorawanNetDevice::SendControlMsg (Ptr<SatControlMessage> msg, const Address& dest)
 {
   // We send nothing in Lora Mode. Control is made via LorawanMacCommand
-
   return true;
 }
 

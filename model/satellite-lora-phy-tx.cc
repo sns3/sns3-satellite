@@ -53,6 +53,8 @@ SatLoraPhyTx::StartTx (Ptr<SatSignalParameters> txParams)
 {
   NS_LOG_FUNCTION (this << txParams);
 
+  m_isTransmitting = true;
+
   SatPhyTx::StartTx (txParams);
 }
 
@@ -61,9 +63,18 @@ SatLoraPhyTx::EndTx ()
 {
   NS_LOG_FUNCTION (this);
 
+  m_isTransmitting = false;
+
   m_txFinishedCallback();
 
   SatPhyTx::EndTx ();
+}
+
+bool SatLoraPhyTx::IsTransmitting ()
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_isTransmitting;
 }
 
 }
