@@ -52,6 +52,7 @@ main (int argc, char *argv[])
 
   uint32_t packetSize = 24;
   Time loraInterval = Seconds (10);
+  std::string interval = "10";
 
   double frameAllocatedBandwidthHz = 15000;
   double frameCarrierAllocatedBandwidthHz = 15000;
@@ -167,6 +168,15 @@ main (int argc, char *argv[])
   simulationHelper->SetBeams (beams);
 
   simulationHelper->CreateSatScenario ();
+
+  Config::SetDefault ("ns3::CbrApplication::Interval", StringValue (interval));
+  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
+
+  /*simulationHelper->InstallTrafficModel (
+    SimulationHelper::CBR,
+    SimulationHelper::UDP,
+    SimulationHelper::RTN_LINK,
+    appStartTime, simLength, Seconds (1));*/
 
   simulationHelper->InstallLoraTrafficModel (
     SimulationHelper::PERIODIC,

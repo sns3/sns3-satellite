@@ -108,7 +108,7 @@ LorawanMacEndDevice::GetTypeId (void)
                                     "Unconfirmed",
                                     LorawanMacHeader::CONFIRMED_DATA_UP,
                                     "Confirmed"))
-    .AddConstructor<LorawanMacEndDevice> ();
+    ;
   return tid;
 }
 
@@ -330,12 +330,12 @@ LorawanMacEndDevice::SendToPhy (Ptr<Packet> packet)
 void
 LorawanMacEndDevice::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/)
 {
-
+  Ptr<Packet> packet;
+  for (SatPhy::PacketContainer_t::iterator i = packets.begin (); i != packets.end (); i++ )
+    {
+      Receive (*i);
+    }
 }
-
-void
-LorawanMacEndDevice::Receive (Ptr<Packet const> packet)
-{ }
 
 void
 LorawanMacEndDevice::FailedReception (Ptr<Packet const> packet)
