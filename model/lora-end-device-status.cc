@@ -136,13 +136,16 @@ LoraEndDeviceStatus::GetCompleteReplyPacket (void)
   lastPacket->RemoveHeader (mHdr);
   lastPacket->RemoveHeader (fHdr);
 
-  Ipv4Header ipv4Header;
-  Ipv4Address src = lastPacketInfo.ipv4Header.GetSource ();
-  Ipv4Address dst = lastPacketInfo.ipv4Header.GetDestination ();
-  ipv4Header.SetSource (dst);
-  ipv4Header.SetDestination (src);
-  ipv4Header.SetTtl (64);
-  replyPacket->AddHeader (ipv4Header);
+  if (lastPacketInfo.hasIpv4Header)
+    {
+      Ipv4Header ipv4Header;
+      Ipv4Address src = lastPacketInfo.ipv4Header.GetSource ();
+      Ipv4Address dst = lastPacketInfo.ipv4Header.GetDestination ();
+      ipv4Header.SetSource (dst);
+      ipv4Header.SetDestination (src);
+      ipv4Header.SetTtl (64);
+      replyPacket->AddHeader (ipv4Header);
+    }
 
   m_reply.frameHeader.SetFCnt (fHdr.GetFCnt ());
   m_reply.macHeader.SetMType (LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
@@ -273,7 +276,7 @@ LoraEndDeviceStatus::InsertReceivedPacket (Ptr<Packet const> receivedPacket, con
   SetFirstReceiveWindowFrequency (tag.GetFrequency ());
 
   Ipv4Header ipv4Header;
-  myPacket->RemoveHeader (ipv4Header);
+  uint32_t ipv4HeaderBytes = myPacket->RemoveHeader (ipv4Header);
 
   // Update Information on the received packet
   ReceivedPacketInfo info;
@@ -281,6 +284,7 @@ LoraEndDeviceStatus::InsertReceivedPacket (Ptr<Packet const> receivedPacket, con
   info.frequency = tag.GetFrequency ();
   info.packet = receivedPacket;
   info.ipv4Header = ipv4Header;
+  info.hasIpv4Header = ipv4HeaderBytes != 0;
 
   double rcvPower = tag.GetReceivePower ();
 
