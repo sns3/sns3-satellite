@@ -88,6 +88,7 @@ protected:
   virtual void DoDispose (void);
 private:
   Ptr<LorawanMac> m_lorawanMac;
+  bool m_forwardToUtUsers;
 };
 
 } // namespace ns3

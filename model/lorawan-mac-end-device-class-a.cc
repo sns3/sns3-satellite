@@ -262,11 +262,10 @@ LorawanMacEndDeviceClassA::Receive (Ptr<Packet> packet)
           // THIS WILL BE GetReceiveWindow()
           Simulator::Cancel (m_secondReceiveWindow);
 
-
           // Parse the MAC commands
           ParseCommands (fHdr);
 
-          //m_device->GetObject<SatLorawanNetDevice> ()->Receive (packetCopy);
+          m_device->GetObject<SatLorawanNetDevice> ()->Receive (packetCopy);
 
           // Call the trace source
           m_receivedPacket (packet);

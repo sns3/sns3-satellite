@@ -31,6 +31,11 @@ SatLorawanNetDevice::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatLorawanNetDevice")
     .SetParent<SatNetDevice> ()
+    .AddAttribute ("ForwardToUtUsers",
+                   "Forward to UT users or stop packet transmission here",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatLorawanNetDevice::m_forwardToUtUsers),
+                   MakeBooleanChecker ())
     .AddConstructor<SatLorawanNetDevice> ()
   ;
   return tid;
@@ -103,8 +108,11 @@ SatLorawanNetDevice::Receive (Ptr<const Packet> packet)
         }
     }
 
-  // Pass the packet to the upper layer.
-  m_rxCallback (this, packet, Ipv4L3Protocol::PROT_NUMBER, Address ());
+  // Pass the packet to the upper layer if IP header in packet or forward to Network Server if on GW.
+  if (m_forwardToUtUsers || (m_nodeInfo->GetNodeType () == SatEnums::NT_GW))
+    {
+      m_rxCallback (this, packet, Ipv4L3Protocol::PROT_NUMBER, Address ());
+    }
 }
 
 bool

@@ -129,11 +129,21 @@ LoraEndDeviceStatus::GetCompleteReplyPacket (void)
   // Add headers
   m_reply.frameHeader.SetAddress (m_endDeviceAddress);
   Ptr<Packet> lastPacket = GetLastPacketReceivedFromDevice ()->Copy ();
+  ReceivedPacketInfo lastPacketInfo = GetLastReceivedPacketInfo ();
   LorawanMacHeader mHdr;
   LoraFrameHeader fHdr;
   fHdr.SetAsUplink ();
   lastPacket->RemoveHeader (mHdr);
   lastPacket->RemoveHeader (fHdr);
+
+  Ipv4Header ipv4Header;
+  Ipv4Address src = lastPacketInfo.ipv4Header.GetSource ();
+  Ipv4Address dst = lastPacketInfo.ipv4Header.GetDestination ();
+  ipv4Header.SetSource (dst);
+  ipv4Header.SetDestination (src);
+  ipv4Header.SetTtl (64);
+  replyPacket->AddHeader (ipv4Header);
+
   m_reply.frameHeader.SetFCnt (fHdr.GetFCnt ());
   m_reply.macHeader.SetMType (LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
   replyPacket->AddHeader (m_reply.frameHeader);
@@ -190,49 +200,49 @@ LoraEndDeviceStatus::GetReceivedPacketList ()
 void
 LoraEndDeviceStatus::SetFirstReceiveWindowSpreadingFactor (uint8_t sf)
 {
-  NS_LOG_FUNCTION (this << sf);
+  NS_LOG_FUNCTION_NOARGS ();
   m_firstReceiveWindowSpreadingFactor = sf;
 }
 
 void
 LoraEndDeviceStatus::SetFirstReceiveWindowFrequency (double frequency)
 {
-  NS_LOG_FUNCTION (this << frequency);
+  NS_LOG_FUNCTION_NOARGS ();
   m_firstReceiveWindowFrequency = frequency;
 }
 
 void
 LoraEndDeviceStatus::SetSecondReceiveWindowOffset (uint8_t offset)
 {
-  NS_LOG_FUNCTION (this << offset);
+  NS_LOG_FUNCTION_NOARGS ();
   m_secondReceiveWindowOffset = offset;
 }
 
 void
 LoraEndDeviceStatus::SetSecondReceiveWindowFrequency (double frequency)
 {
-  NS_LOG_FUNCTION (this << frequency);
+  NS_LOG_FUNCTION_NOARGS ();
   m_secondReceiveWindowFrequency = frequency;
 }
 
 void
 LoraEndDeviceStatus::SetReplyMacHeader (LorawanMacHeader macHeader)
 {
-  NS_LOG_FUNCTION (this << macHeader);
+  NS_LOG_FUNCTION_NOARGS ();
   m_reply.macHeader = macHeader;
 }
 
 void
 LoraEndDeviceStatus::SetReplyFrameHeader (LoraFrameHeader frameHeader)
 {
-  NS_LOG_FUNCTION (this << frameHeader);
+  NS_LOG_FUNCTION_NOARGS ();
   m_reply.frameHeader = frameHeader;
 }
 
 void
 LoraEndDeviceStatus::SetReplyPayload (Ptr<Packet> replyPayload)
 {
-  NS_LOG_FUNCTION (this << replyPayload);
+  NS_LOG_FUNCTION_NOARGS ();
   m_reply.payload = replyPayload;
 }
 
@@ -243,7 +253,7 @@ LoraEndDeviceStatus::SetReplyPayload (Ptr<Packet> replyPayload)
 void
 LoraEndDeviceStatus::InsertReceivedPacket (Ptr<Packet const> receivedPacket, const Address &gwAddress)
 {
-  NS_LOG_FUNCTION (this << receivedPacket << gwAddress);
+  NS_LOG_FUNCTION_NOARGS ();
 
   // Create a copy of the packet
   Ptr<Packet> myPacket = receivedPacket->Copy ();
@@ -262,11 +272,15 @@ LoraEndDeviceStatus::InsertReceivedPacket (Ptr<Packet const> receivedPacket, con
   SetFirstReceiveWindowSpreadingFactor (tag.GetSpreadingFactor ());
   SetFirstReceiveWindowFrequency (tag.GetFrequency ());
 
+  Ipv4Header ipv4Header;
+  myPacket->RemoveHeader (ipv4Header);
+
   // Update Information on the received packet
   ReceivedPacketInfo info;
   info.sf = tag.GetSpreadingFactor ();
   info.frequency = tag.GetFrequency ();
   info.packet = receivedPacket;
+  info.ipv4Header = ipv4Header;
 
   double rcvPower = tag.GetReceivePower ();
 

@@ -28,6 +28,7 @@
 #include "ns3/object.h"
 #include "ns3/pointer.h"
 #include "ns3/net-device.h"
+#include "ns3/ipv4-header.h"
 
 #include "ns3/lora-device-address.h"
 #include "ns3/lorawan-mac-header.h"
@@ -173,6 +174,7 @@ public:
     GatewayList gwList;      //!< List of gateways that received this packet.
     uint8_t sf;
     double frequency;
+    Ipv4Header ipv4Header;
   };
 
   typedef std::list<std::pair<Ptr<Packet const>, ReceivedPacketInfo> >
