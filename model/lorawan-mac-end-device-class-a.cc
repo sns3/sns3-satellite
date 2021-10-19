@@ -215,6 +215,12 @@ LorawanMacEndDeviceClassA::Receive (Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this << packet);
 
+  // We add good address and not broadcast for traces
+  SatMacTag macTag;
+  packet->RemovePacketTag (macTag);
+  macTag.SetDestAddress (m_nodeInfo->GetMacAddress ());
+  packet->AddPacketTag (macTag);
+
   SatPhy::PacketContainer_t packets;
   packets.push_back (packet);
   RxTraces (packets);
