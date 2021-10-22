@@ -143,6 +143,8 @@ LoraNetworkStatus::GetBestGatewayForDevice (LoraDeviceAddress deviceAddress, int
       NS_ABORT_MSG ("Invalid window value");
     }
 
+  std::cout << "replyFrequency " << replyFrequency << std::endl;
+
   // Get the list of gateways that this device can reach
   // NOTE: At this point, we could also take into account the whole network to
   // identify the best gateway according to various metrics. For now, we just

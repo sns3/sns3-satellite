@@ -26,6 +26,8 @@
 #include "ns3/simulator.h"
 #include "ns3/log.h"
 
+#include "ns3/satellite-lorawan-net-device.h"
+
 #include "ns3/lora-network-server-helper.h"
 #include "ns3/lora-network-controller-components.h"
 #include "ns3/lora-adr-component.h"
@@ -105,25 +107,24 @@ LoraNetworkServerHelper::InstallPriv (Ptr<Node> node)
   node->AddApplication (app);
 
   // Cycle on each gateway
-  for (NodeContainer::Iterator i = m_gateways.Begin ();
-       i != m_gateways.End ();
-       i++)
+  for (NodeContainer::Iterator it = m_gateways.Begin (); it != m_gateways.End (); it++)
     {
       // Add the connections with the gateway
       // Create a PointToPoint link between gateway and NS
-      NetDeviceContainer container = p2pHelper.Install (node, *i);
+      NetDeviceContainer container = p2pHelper.Install (node, *it);
 
       // Add the gateway to the NS list
-      app->AddGateway (*i, container.Get (0));
-    }
+      app->AddGateway (*it, container.Get (0));
 
-  // Link the NetworkServer to its NetDevices
-  for (uint32_t i = 0; i < node->GetNDevices (); i++)
-    {
-      Ptr<NetDevice> currentNetDevice = node->GetDevice (i);
-      currentNetDevice->SetReceiveCallback (MakeCallback
-                                              (&LoraNetworkServer::Receive,
-                                              app));
+      // Link the NetworkServer to its NetDevices
+      for (uint32_t i = 0; i < (*it)->GetNDevices (); i++)
+        {
+          Ptr<SatLorawanNetDevice> currentNetDevice = DynamicCast<SatLorawanNetDevice> ((*it)->GetDevice (i));
+          if (currentNetDevice)
+            {
+              currentNetDevice->SetReceiveNetworkServerCallback (MakeCallback (&LoraNetworkServer::Receive, app));
+            }
+        }
     }
 
   // Add the end devices

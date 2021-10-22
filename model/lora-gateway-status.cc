@@ -47,14 +47,14 @@ LoraGatewayStatus::~LoraGatewayStatus ()
   NS_LOG_FUNCTION (this);
 }
 
-LoraGatewayStatus::LoraGatewayStatus (Address address, Ptr<NetDevice> netDevice,
-                              Ptr<LorawanMacGateway> gwMac) :
+LoraGatewayStatus::LoraGatewayStatus (Address address, Ptr<NetDevice> netDevice, Ptr<LorawanMacGateway> gwMac) :
   m_address (address),
   m_netDevice (netDevice),
   m_gatewayMac (gwMac),
   m_nextTransmissionTime (Seconds (0))
 {
   NS_LOG_FUNCTION (this);
+  std::cout << "m_nextTransmissionTime " << m_nextTransmissionTime << std::endl;
 }
 
 Address
@@ -94,7 +94,11 @@ LoraGatewayStatus::GetGatewayMac (void)
 bool
 LoraGatewayStatus::IsAvailableForTransmission (double frequency)
 {
+  NS_LOG_FUNCTION (this << frequency);
+
   // We can't send multiple packets at once, see SX1301 V2.01 page 29
+
+  std::cout << "m_nextTransmissionTime " << m_nextTransmissionTime << std::endl;
 
   // Check that the gateway was not already "booked"
   if (m_nextTransmissionTime > Simulator::Now () - MilliSeconds (1))
@@ -127,6 +131,10 @@ LoraGatewayStatus::IsAvailableForTransmission (double frequency)
 void
 LoraGatewayStatus::SetNextTransmissionTime (Time nextTransmissionTime)
 {
+  NS_LOG_FUNCTION (this << nextTransmissionTime);
+
+  std::cout << "LoraGatewayStatus::SetNextTransmissionTime" << std::endl;
+
   m_nextTransmissionTime = nextTransmissionTime;
 }
 }

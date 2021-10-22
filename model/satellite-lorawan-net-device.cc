@@ -108,11 +108,19 @@ SatLorawanNetDevice::Receive (Ptr<const Packet> packet)
         }
     }
 
-  // Pass the packet to the upper layer if IP header in packet or forward to Network Server if on GW.
-  if (m_forwardToUtUsers || (m_nodeInfo->GetNodeType () == SatEnums::NT_GW))
+  // Forward to Network Server if on GW.
+  if (m_nodeInfo->GetNodeType () == SatEnums::NT_GW)
     {
-      m_rxCallback (this, packet, Ipv4L3Protocol::PROT_NUMBER, Address ());
+      std::cout << "Forxward to NS" << std::endl;
+      m_rxNetworkServerCallback (this, packet, Ipv4L3Protocol::PROT_NUMBER, Address ());
     }
+
+  // Pass the packet to the upper layer if IP header in packet (GW or UT side)
+  /*if (m_forwardToUtUsers)
+    {
+      std::cout << "m_forwardToUtUsers" << std::endl;
+      m_rxCallback (this, packet, Ipv4L3Protocol::PROT_NUMBER, Address ());
+    }*/
 }
 
 bool
@@ -178,6 +186,14 @@ SatLorawanNetDevice::SetLorawanMac (Ptr<LorawanMac> lorawanMac)
 {
   SetMac(lorawanMac);
   m_lorawanMac = lorawanMac;
+}
+
+void
+SatLorawanNetDevice::SetReceiveNetworkServerCallback (SatLorawanNetDevice::ReceiveCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  std::cout << "SatLorawanNetDevice::SetReceiveNetworkServerCallback" << std::endl;
+  m_rxNetworkServerCallback = cb;
 }
 
 void

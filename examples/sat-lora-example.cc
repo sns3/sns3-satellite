@@ -85,7 +85,7 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatHelper::Standard", EnumValue (SatEnums::LORA));
   Config::SetDefault ("ns3::LorawanMacEndDevice::DataRate", UintegerValue (5));
   Config::SetDefault ("ns3::LorawanMacEndDevice::MType", EnumValue (LorawanMacHeader::CONFIRMED_DATA_UP));
-  Config::SetDefault ("ns3::SatLorawanNetDevice::ForwardToUtUsers", BooleanValue (true));
+  Config::SetDefault ("ns3::SatLorawanNetDevice::ForwardToUtUsers", BooleanValue (false));
 
   Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::FirstWindowDelay", TimeValue (MilliSeconds (1500)));
   Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::SecondWindowDelay", TimeValue (Seconds (2)));
@@ -173,17 +173,17 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::CbrApplication::Interval", StringValue (interval));
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
 
-  simulationHelper->InstallTrafficModel (
-    SimulationHelper::CBR,
-    SimulationHelper::UDP,
-    SimulationHelper::RTN_LINK,
-    appStartTime, simLength, Seconds (1));
-
   /*simulationHelper->InstallLoraTrafficModel (
-    SimulationHelper::PERIODIC,
+    SimulationHelper::LORA_CBR,
     loraInterval,
     packetSize,
     appStartTime, simLength, Seconds (1));*/
+
+  simulationHelper->InstallLoraTrafficModel (
+    SimulationHelper::PERIODIC,
+    loraInterval,
+    packetSize,
+    appStartTime, simLength, Seconds (1));
 
   // Outputs
   simulationHelper->EnableProgressLogs ();

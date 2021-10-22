@@ -1517,6 +1517,7 @@ SimulationHelper::InstallLoraTrafficModel (LoraTrafficModel_t trafficModel,
   NS_LOG_FUNCTION (this << trafficModel << interval << packetSize << startTime << stopTime);
 
   NodeContainer nodes = GetSatelliteHelper ()->UtNodes ();
+  NodeContainer utUsers = m_satHelper->GetUtUsers ();
   Ptr<Node> node;
 
   std::cout << "Installing Lora traffic model on " << nodes.GetN () << " UTs" << std::endl;
@@ -1540,7 +1541,40 @@ SimulationHelper::InstallLoraTrafficModel (LoraTrafficModel_t trafficModel,
             app->SetNode (node);
             node->AddApplication (app);
           }
-          break;
+        break;
+      }
+    case SimulationHelper::LORA_CBR:
+      {
+        NodeContainer gwUsers = m_satHelper->GetGwUsers ();
+
+        uint16_t port = 9;
+        InetSocketAddress gwUserAddr = InetSocketAddress (m_satHelper->GetUserAddress (gwUsers.Get (m_gwUserId)), port);
+
+        PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", Address ());
+        CbrHelper cbrHelper ("ns3::UdpSocketFactory", Address ());
+        ApplicationContainer sinkContainer;
+        ApplicationContainer cbrContainer;
+
+        // create sink application on GW user
+        if (!HasSinkInstalled (gwUsers.Get (m_gwUserId), port))
+          {
+            sinkHelper.SetAttribute ("Local", AddressValue (Address (gwUserAddr)));
+            sinkContainer.Add (sinkHelper.Install (gwUsers.Get (m_gwUserId)));
+          }
+
+        cbrHelper.SetAttribute ("Remote", AddressValue (Address (gwUserAddr)));
+
+        // create CBR applications on UT users
+        for (uint32_t i = 0; i < utUsers.GetN (); i++)
+          {
+            auto app = cbrHelper.Install (utUsers.Get (i)).Get (0);
+            app->SetStartTime (startTime + (i + 1) * startDelay);
+            cbrContainer.Add (app);
+          }
+
+        sinkContainer.Start (startTime);
+        sinkContainer.Stop (stopTime);
+        break;
       }
       case SimulationHelper::ONE_SHOT:
       default:

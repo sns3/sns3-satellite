@@ -68,6 +68,10 @@ public:
   Ptr<LorawanMac> GetLorawanMac ();
   void SetLorawanMac (Ptr<LorawanMac> lorawanMac);
 
+  typedef Callback< bool, Ptr<NetDevice>, Ptr<const Packet>, uint16_t, const Address & > ReceiveCallback;
+
+  void SetReceiveNetworkServerCallback (SatLorawanNetDevice::ReceiveCallback cb);
+
   /**
    * Method called to inform the Scheduler of a newly arrived
    * uplink packet. This function schedules the OnReceiveWindowOpportunity
@@ -89,6 +93,7 @@ protected:
 private:
   Ptr<LorawanMac> m_lorawanMac;
   bool m_forwardToUtUsers;
+  ReceiveCallback m_rxNetworkServerCallback;
 };
 
 } // namespace ns3

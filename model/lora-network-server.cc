@@ -153,8 +153,7 @@ LoraNetworkServer::AddNode (Ptr<Node> node)
 }
 
 bool
-LoraNetworkServer::Receive (Ptr<NetDevice> device, Ptr<const Packet> packet,
-                        uint16_t protocol, const Address& address)
+LoraNetworkServer::Receive (Ptr<NetDevice> device, Ptr<const Packet> packet, uint16_t protocol, const Address& address)
 {
   NS_LOG_FUNCTION (this << packet << protocol << address);
 

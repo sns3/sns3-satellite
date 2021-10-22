@@ -581,6 +581,9 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
                                               m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE));
   phy->SetChannelPairGetterCallback (cbChannel);
 
+  // TODO store m_raCollisionModel in MAC Lora for correctly tagging packet
+  // TODO how to config other txParams ?
+
   // Set fading
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());
   phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());

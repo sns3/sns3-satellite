@@ -503,6 +503,7 @@ public:
   {
     ONE_SHOT,
     PERIODIC,
+    LORA_CBR,
   } LoraTrafficModel_t;
 
   typedef enum
