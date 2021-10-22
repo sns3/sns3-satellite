@@ -51,8 +51,7 @@ LoraForwarder::~LoraForwarder ()
 }
 
 void
-LoraForwarder::SetPointToPointNetDevice (Ptr<PointToPointNetDevice>
-                                     pointToPointNetDevice)
+LoraForwarder::SetPointToPointNetDevice (Ptr<PointToPointNetDevice> pointToPointNetDevice)
 {
   NS_LOG_FUNCTION (this << pointToPointNetDevice);
 
@@ -68,24 +67,19 @@ LoraForwarder::SetLoraNetDevice (Ptr<SatLorawanNetDevice> loraNetDevice)
 }
 
 bool
-LoraForwarder::ReceiveFromLora (Ptr<NetDevice> loraNetDevice, Ptr<const Packet>
-                            packet, uint16_t protocol, const Address& sender)
+LoraForwarder::ReceiveFromLora (Ptr<NetDevice> loraNetDevice, Ptr<const Packet> packet, uint16_t protocol, const Address& sender)
 {
   NS_LOG_FUNCTION (this << packet << protocol << sender);
 
   Ptr<Packet> packetCopy = packet->Copy ();
 
-  m_pointToPointNetDevice->Send (packetCopy,
-                                 m_pointToPointNetDevice->GetBroadcast (),
-                                 0x800);
+  m_pointToPointNetDevice->Send (packetCopy, m_pointToPointNetDevice->GetBroadcast (), 0x800);
 
   return true;
 }
 
 bool
-LoraForwarder::ReceiveFromPointToPoint (Ptr<NetDevice> pointToPointNetDevice,
-                                    Ptr<const Packet> packet, uint16_t protocol,
-                                    const Address& sender)
+LoraForwarder::ReceiveFromPointToPoint (Ptr<NetDevice> pointToPointNetDevice, Ptr<const Packet> packet, uint16_t protocol, const Address& sender)
 {
   NS_LOG_FUNCTION (this << packet << protocol << sender);
 

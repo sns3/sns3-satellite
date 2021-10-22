@@ -117,13 +117,10 @@ LoraNetworkServerHelper::InstallPriv (Ptr<Node> node)
       app->AddGateway (*it, container.Get (0));
 
       // Link the NetworkServer to its NetDevices
-      for (uint32_t i = 0; i < (*it)->GetNDevices (); i++)
+      for (uint32_t i = 0; i < node->GetNDevices (); i++)
         {
-          Ptr<SatLorawanNetDevice> currentNetDevice = DynamicCast<SatLorawanNetDevice> ((*it)->GetDevice (i));
-          if (currentNetDevice)
-            {
-              currentNetDevice->SetReceiveNetworkServerCallback (MakeCallback (&LoraNetworkServer::Receive, app));
-            }
+          Ptr<NetDevice> currentNetDevice = node->GetDevice (i);
+          currentNetDevice->SetReceiveCallback (MakeCallback (&LoraNetworkServer::Receive, app));
         }
     }
 

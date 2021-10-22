@@ -23,9 +23,11 @@
 #include "ns3/lora-gateway-status.h"
 #include "ns3/log.h"
 
+NS_LOG_COMPONENT_DEFINE ("LoraGatewayStatus");
+
 namespace ns3 {
 
-NS_LOG_COMPONENT_DEFINE ("LoraGatewayStatus");
+NS_OBJECT_ENSURE_REGISTERED (LoraGatewayStatus);
 
 TypeId
 LoraGatewayStatus::GetTypeId (void)
@@ -54,7 +56,6 @@ LoraGatewayStatus::LoraGatewayStatus (Address address, Ptr<NetDevice> netDevice,
   m_nextTransmissionTime (Seconds (0))
 {
   NS_LOG_FUNCTION (this);
-  std::cout << "m_nextTransmissionTime " << m_nextTransmissionTime << std::endl;
 }
 
 Address
@@ -98,8 +99,6 @@ LoraGatewayStatus::IsAvailableForTransmission (double frequency)
 
   // We can't send multiple packets at once, see SX1301 V2.01 page 29
 
-  std::cout << "m_nextTransmissionTime " << m_nextTransmissionTime << std::endl;
-
   // Check that the gateway was not already "booked"
   if (m_nextTransmissionTime > Simulator::Now () - MilliSeconds (1))
     {
@@ -132,8 +131,6 @@ void
 LoraGatewayStatus::SetNextTransmissionTime (Time nextTransmissionTime)
 {
   NS_LOG_FUNCTION (this << nextTransmissionTime);
-
-  std::cout << "LoraGatewayStatus::SetNextTransmissionTime" << std::endl;
 
   m_nextTransmissionTime = nextTransmissionTime;
 }

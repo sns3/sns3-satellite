@@ -81,7 +81,7 @@ LoraNetworkStatus::AddNode (Ptr<LorawanMacEndDeviceClassA> edMac)
 void
 LoraNetworkStatus::AddGateway (Address& address, Ptr<LoraGatewayStatus> gwStatus)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << address << gwStatus);
 
   // Check whether this device already exists in the list
   if (m_gatewayStatuses.find (address) == m_gatewayStatuses.end ())
@@ -89,8 +89,7 @@ LoraNetworkStatus::AddGateway (Address& address, Ptr<LoraGatewayStatus> gwStatus
       // The device doesn't exist.
 
       // Add it to the map
-      m_gatewayStatuses.insert (std::pair<Address, Ptr<LoraGatewayStatus> >
-                                (address, gwStatus));
+      m_gatewayStatuses.insert (std::pair<Address, Ptr<LoraGatewayStatus> > (address, gwStatus));
       NS_LOG_DEBUG ("Added to the list a gateway with address " << address);
     }
 }
@@ -127,6 +126,8 @@ LoraNetworkStatus::NeedsReply (LoraDeviceAddress deviceAddress)
 Address
 LoraNetworkStatus::GetBestGatewayForDevice (LoraDeviceAddress deviceAddress, int window)
 {
+  NS_LOG_FUNCTION (this << deviceAddress << window);
+
   // Get the endDeviceStatus we are interested in
   Ptr<LoraEndDeviceStatus> edStatus = m_endDeviceStatuses.at (deviceAddress);
   double replyFrequency;
@@ -142,8 +143,6 @@ LoraNetworkStatus::GetBestGatewayForDevice (LoraDeviceAddress deviceAddress, int
     {
       NS_ABORT_MSG ("Invalid window value");
     }
-
-  std::cout << "replyFrequency " << replyFrequency << std::endl;
 
   // Get the list of gateways that this device can reach
   // NOTE: At this point, we could also take into account the whole network to

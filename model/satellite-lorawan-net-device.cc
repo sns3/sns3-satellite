@@ -18,6 +18,9 @@
  * Author: Bastien TAURAN <bastien.tauran@viveris.fr>
  */
 
+#include <ns3/lorawan-mac-header.h>
+#include <ns3/lora-frame-header.h>
+
 #include "satellite-lorawan-net-device.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatLorawanNetDevice");
@@ -111,16 +114,19 @@ SatLorawanNetDevice::Receive (Ptr<const Packet> packet)
   // Forward to Network Server if on GW.
   if (m_nodeInfo->GetNodeType () == SatEnums::NT_GW)
     {
-      std::cout << "Forxward to NS" << std::endl;
-      m_rxNetworkServerCallback (this, packet, Ipv4L3Protocol::PROT_NUMBER, Address ());
+      m_rxNetworkServerCallback (this, packet->Copy (), Ipv4L3Protocol::PROT_NUMBER, Address ());
     }
 
   // Pass the packet to the upper layer if IP header in packet (GW or UT side)
-  /*if (m_forwardToUtUsers)
+  if (m_forwardToUtUsers)
     {
-      std::cout << "m_forwardToUtUsers" << std::endl;
-      m_rxCallback (this, packet, Ipv4L3Protocol::PROT_NUMBER, Address ());
-    }*/
+      Ptr<Packet> pktCopy = packet->Copy();
+      LorawanMacHeader mHdr;
+      pktCopy->RemoveHeader (mHdr);
+      LoraFrameHeader fHdr;
+      pktCopy->RemoveHeader (fHdr);
+      m_rxCallback (this, pktCopy, Ipv4L3Protocol::PROT_NUMBER, Address ());
+    }
 }
 
 bool
@@ -192,7 +198,6 @@ void
 SatLorawanNetDevice::SetReceiveNetworkServerCallback (SatLorawanNetDevice::ReceiveCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);
-  std::cout << "SatLorawanNetDevice::SetReceiveNetworkServerCallback" << std::endl;
   m_rxNetworkServerCallback = cb;
 }
 

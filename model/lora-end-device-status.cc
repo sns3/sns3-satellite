@@ -135,18 +135,6 @@ LoraEndDeviceStatus::GetCompleteReplyPacket (void)
   fHdr.SetAsUplink ();
   lastPacket->RemoveHeader (mHdr);
   lastPacket->RemoveHeader (fHdr);
-
-  if (lastPacketInfo.hasIpv4Header)
-    {
-      Ipv4Header ipv4Header;
-      Ipv4Address src = lastPacketInfo.ipv4Header.GetSource ();
-      Ipv4Address dst = lastPacketInfo.ipv4Header.GetDestination ();
-      ipv4Header.SetSource (dst);
-      ipv4Header.SetDestination (src);
-      ipv4Header.SetTtl (64);
-      replyPacket->AddHeader (ipv4Header);
-    }
-
   m_reply.frameHeader.SetFCnt (fHdr.GetFCnt ());
   m_reply.macHeader.SetMType (LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
   replyPacket->AddHeader (m_reply.frameHeader);
@@ -275,16 +263,11 @@ LoraEndDeviceStatus::InsertReceivedPacket (Ptr<Packet const> receivedPacket, con
   SetFirstReceiveWindowSpreadingFactor (tag.GetSpreadingFactor ());
   SetFirstReceiveWindowFrequency (tag.GetFrequency ());
 
-  Ipv4Header ipv4Header;
-  uint32_t ipv4HeaderBytes = myPacket->RemoveHeader (ipv4Header);
-
   // Update Information on the received packet
   ReceivedPacketInfo info;
   info.sf = tag.GetSpreadingFactor ();
   info.frequency = tag.GetFrequency ();
   info.packet = receivedPacket;
-  info.ipv4Header = ipv4Header;
-  info.hasIpv4Header = ipv4HeaderBytes != 0;
 
   double rcvPower = tag.GetReceivePower ();
 
@@ -335,8 +318,7 @@ LoraEndDeviceStatus::InsertReceivedPacket (Ptr<Packet const> receivedPacket, con
       gwInfo.rxPower = rcvPower;
       gwInfo.gwAddress = gwAddress;
       info.gwList.insert (std::pair<Address, PacketInfoPerGw> (gwAddress, gwInfo));
-      m_receivedPacketList.push_back (
-          std::pair<Ptr<Packet const>, ReceivedPacketInfo> (receivedPacket, info));
+      m_receivedPacketList.push_back (std::pair<Ptr<Packet const>, ReceivedPacketInfo> (receivedPacket, info));
     }
   NS_LOG_DEBUG (*this);
 }

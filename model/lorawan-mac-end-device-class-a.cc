@@ -265,7 +265,7 @@ LorawanMacEndDeviceClassA::Receive (Ptr<Packet> packet)
           // Parse the MAC commands
           ParseCommands (fHdr);
 
-          m_device->GetObject<SatLorawanNetDevice> ()->Receive (packetCopy);
+          //m_device->GetObject<SatLorawanNetDevice> ()->Receive (packetCopy);
 
           // Call the trace source
           m_receivedPacket (packet);

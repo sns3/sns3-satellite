@@ -174,8 +174,6 @@ public:
     GatewayList gwList;      //!< List of gateways that received this packet.
     uint8_t sf;
     double frequency;
-    bool hasIpv4Header;
-    Ipv4Header ipv4Header;
   };
 
   typedef std::list<std::pair<Ptr<Packet const>, ReceivedPacketInfo> >

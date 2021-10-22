@@ -115,8 +115,6 @@ LoraNetworkScheduler::OnReceiveWindowOpportunity (LoraDeviceAddress deviceAddres
     {
       NS_LOG_DEBUG ("No suitable gateway found for first window.");
 
-      std::cout << "gwAddress " << gwAddress << ", Address () " << Address () << std::endl;
-
       // No suitable GW was found, but there's still hope to find one for the
       // second window.
       // Schedule another OnReceiveWindowOpportunity event
@@ -138,8 +136,6 @@ LoraNetworkScheduler::OnReceiveWindowOpportunity (LoraDeviceAddress deviceAddres
   else
     {
       // A gateway was found
-
-      std::cout << "gwAddress " << gwAddress << ", Address () " << Address () << std::endl;
 
       NS_LOG_DEBUG ("Found available gateway with address: " << gwAddress);
 

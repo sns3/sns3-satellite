@@ -98,17 +98,13 @@ LoraForwarderHelper::InstallPriv (Ptr<Node> node) const
         {
           Ptr<SatLorawanNetDevice> loraNetDevice = currentNetDevice->GetObject<SatLorawanNetDevice> ();
           app->SetLoraNetDevice (loraNetDevice);
-          loraNetDevice->SetReceiveCallback (MakeCallback (&LoraForwarder::ReceiveFromLora, app));
+          loraNetDevice->SetReceiveNetworkServerCallback (MakeCallback (&LoraForwarder::ReceiveFromLora, app));
         }
       else if (currentNetDevice->GetObject<PointToPointNetDevice> () != 0)
         {
           Ptr<PointToPointNetDevice> pointToPointNetDevice = currentNetDevice->GetObject<PointToPointNetDevice> ();
           app->SetPointToPointNetDevice (pointToPointNetDevice);
           pointToPointNetDevice->SetReceiveCallback (MakeCallback (&LoraForwarder::ReceiveFromPointToPoint, app));
-        }
-      else
-        {
-          NS_LOG_ERROR ("Potential error: NetDevice is neither Lora nor PointToPoint");
         }
     }
 

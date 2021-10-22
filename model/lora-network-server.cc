@@ -108,9 +108,7 @@ LoraNetworkServer::AddGateway (Ptr<Node> gateway, Ptr<NetDevice> netDevice)
   Address gatewayAddress = p2pNetDevice->GetAddress ();
 
   // Create new gatewayStatus
-  Ptr<LoraGatewayStatus> gwStatus = Create<LoraGatewayStatus> (gatewayAddress,
-                                                       netDevice,
-                                                       gwMac);
+  Ptr<LoraGatewayStatus> gwStatus = Create<LoraGatewayStatus> (gatewayAddress, netDevice, gwMac);
 
   m_status->AddGateway (gatewayAddress, gwStatus);
 }
