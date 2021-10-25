@@ -524,7 +524,7 @@ SatGwHelper::InstallLora (Ptr<Node> n,
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());
   phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
 
-  Ptr<LorawanMacGateway> mac = CreateObject<LorawanMacGateway> (beamId);
+  Ptr<LorawanMacGateway> mac = CreateObject<LorawanMacGateway> (beamId, m_bbFrameConf);
 
   // TODO configuration for EU only
   LoraLogicalChannelHelper channelHelper;

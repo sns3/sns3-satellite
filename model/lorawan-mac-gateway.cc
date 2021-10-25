@@ -20,11 +20,14 @@
  * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "ns3/lorawan-mac-gateway.h"
-#include "ns3/lorawan-mac-header.h"
-#include "ns3/satellite-lorawan-net-device.h"
-#include "ns3/lora-frame-header.h"
-#include "ns3/log.h"
+#include <ns3/log.h>
+
+#include <ns3/satellite-bbframe-conf.h>
+
+#include <ns3/lorawan-mac-gateway.h>
+#include <ns3/lorawan-mac-header.h>
+#include <ns3/satellite-lorawan-net-device.h>
+#include <ns3/lora-frame-header.h>
 
 namespace ns3 {
 
@@ -47,8 +50,9 @@ LorawanMacGateway::LorawanMacGateway ()
   NS_FATAL_ERROR ("Default constructor not in use");
 }
 
-LorawanMacGateway::LorawanMacGateway (uint32_t beamId)
-  : LorawanMac (beamId)
+LorawanMacGateway::LorawanMacGateway (uint32_t beamId, Ptr<SatBbFrameConf> bbFrameConf)
+  : LorawanMac (beamId),
+    m_bbFrameConf (bbFrameConf)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -109,25 +113,17 @@ LorawanMacGateway::Send (Ptr<Packet> packet)
   params.crcEnabled = 1;
   params.lowDataRateOptimizationEnabled = 0;
 
-
-  // TODO put correct stuff here
-  //Ptr<SatWaveform> wf = m_waveformConf->GetWaveform (1);
   SatSignalParameters::txInfo_s txInfo;
-  txInfo.modCod = SatEnums::SAT_MODCOD_QPSK_1_TO_2;
-  //txInfo.fecBlockSizeInBytes = waveform->GetPayloadInBytes ();
-  //txInfo.frameType = SatEnums::UNDEFINED_FRAME;
-  //txInfo.waveformId = wf->GetWaveformId ();
-  //txInfo.crdsaUniquePacketId = m_crdsaUniquePacketId; // reuse the crdsaUniquePacketId to identify ESSA frames
   txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
+  txInfo.frameType = ((m_bbFrameConf->GetBbFrameUsageMode () == SatEnums::SHORT_FRAMES) ? SatEnums::SHORT_FRAME : SatEnums::NORMAL_FRAME);
+  txInfo.modCod = m_bbFrameConf->GetMostRobustModcod (txInfo.frameType);
   txInfo.sliceId = 0;
+  txInfo.waveformId = 0;
 
   // Get the duration
   Time duration = GetOnAirTime (packet, params);
 
   NS_LOG_DEBUG ("Duration: " << duration.GetSeconds ());
-
-  // Find the channel with the desired frequency
-  // double sendingPower = m_channelHelper.GetTxPowerForChannel (CreateObject<LoraLogicalChannel> (frequency));
 
   // Add the event to the channelHelper to keep track of duty cycle
   m_channelHelper.AddEvent (duration, CreateObject<LoraLogicalChannel> (frequency));
@@ -142,7 +138,6 @@ LorawanMacGateway::Send (Ptr<Packet> packet)
   uint32_t carrierId = 0;
 
   // Send the packet to the PHY layer to send it on the channel
-  //m_phy->Send (packet, params, frequency, sendingPower);
   m_phy->SendPdu (packets, carrierId, duration, txInfo);
 
   m_sentNewPacket (packet);

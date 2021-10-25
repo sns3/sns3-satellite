@@ -581,14 +581,11 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
                                               m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE));
   phy->SetChannelPairGetterCallback (cbChannel);
 
-  // TODO store m_raCollisionModel in MAC Lora for correctly tagging packet
-  // TODO how to config other txParams ?
-
   // Set fading
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());
   phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
 
-  Ptr<LorawanMacEndDeviceClassA> mac = CreateObject<LorawanMacEndDeviceClassA> (beamId);
+  Ptr<LorawanMacEndDeviceClassA> mac = CreateObject<LorawanMacEndDeviceClassA> (beamId, m_superframeSeq);
 
   // TODO configuration for EU only
   mac->SetTxDbmForTxPower (std::vector<double>{16, 14, 12, 10, 8, 6, 4, 2});
@@ -659,6 +656,8 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
   mac->SetPhyRx (DynamicCast<SatLoraPhyRx> (phy->GetPhyRx ()));
   mac->SetPhyTx (DynamicCast<SatLoraPhyTx> (phy->GetPhyTx ()));
 
+  mac->SetRaModel (m_raSettings.m_randomAccessModel);
+
   // Set the device address and pass it to MAC as well
   Mac48Address addr = Mac48Address::Allocate ();
   dev->SetAddress (addr);
@@ -673,9 +672,6 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
   // set serving GW MAC address to RM
   mac->SetRoutingUpdateCallback (cbRouting);
   mac->SetGwAddress (gwAddr);
-
-  Ptr<SatWaveformConf> waveformConf = m_superframeSeq->GetWaveformConf ();
-  mac->SetWaveformConf (waveformConf);
 
   // Add UT to NCC
   ncc->AddUt (m_llsConf, dev->GetAddress (), beamId, MakeCallback (&LorawanMacEndDevice::SetRaChannel, mac));

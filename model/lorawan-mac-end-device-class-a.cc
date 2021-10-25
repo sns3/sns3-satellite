@@ -26,6 +26,7 @@
 #include <algorithm>
 
 #include <ns3/log.h>
+#include <ns3/pointer.h>
 
 #include <ns3/satellite-phy.h>
 #include <ns3/satellite-lorawan-net-device.h>
@@ -74,8 +75,9 @@ LorawanMacEndDeviceClassA::LorawanMacEndDeviceClassA ()
   NS_FATAL_ERROR ("Default constructor not in use");
 }
 
-LorawanMacEndDeviceClassA::LorawanMacEndDeviceClassA (uint32_t beamId)
+LorawanMacEndDeviceClassA::LorawanMacEndDeviceClassA (uint32_t beamId, Ptr<SatSuperframeSeq> seq)
   : LorawanMacEndDevice (beamId),
+    m_superframeSeq (seq),
     m_firstWindowDelay (Seconds (1)),
     m_secondWindowDelay (Seconds (2)),
     m_firstWindowDuration (MilliSeconds (100)),
@@ -144,14 +146,18 @@ LorawanMacEndDeviceClassA::SendToPhy (Ptr<Packet> packetToSend)
   params.crcEnabled = 1;
   params.lowDataRateOptimizationEnabled = 0;
 
+  uint32_t allocationChannel = 0; // TODO is really zero here ?
+  Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE);
+  uint8_t frameId = superframeConf->GetRaChannelFrameId (allocationChannel);
+  Ptr<SatFrameConf> frameConf = superframeConf->GetFrameConf (frameId);
+  Ptr<SatTimeSlotConf> timeSlotConf = frameConf->GetTimeSlotConf (0);
+  Ptr<SatWaveform> wf = m_superframeSeq->GetWaveformConf ()->GetWaveform (timeSlotConf->GetWaveFormId ());
 
-  // TODO put correct WF ID here
-  Ptr<SatWaveform> wf = m_waveformConf->GetWaveform (1);
   SatSignalParameters::txInfo_s txInfo;
-  txInfo.packetType = SatEnums::PACKET_TYPE_ESSA;
   txInfo.modCod = wf->GetModCod ();
-  //txInfo.fecBlockSizeInBytes = wf->GetPayloadInBytes ();
-  //txInfo.frameType = SatEnums::UNDEFINED_FRAME;
+  txInfo.fecBlockSizeInBytes = wf->GetPayloadInBytes ();
+  txInfo.packetType = m_packetType;
+  txInfo.frameType = SatEnums::UNDEFINED_FRAME;
   txInfo.waveformId = wf->GetWaveformId ();
   //txInfo.crdsaUniquePacketId = m_crdsaUniquePacketId; // reuse the crdsaUniquePacketId to identify ESSA frames
 
@@ -362,6 +368,36 @@ LorawanMacEndDeviceClassA::TxFinished ()
 
   // Switch the PHY to sleep
   m_phyRx->SwitchToSleep ();
+}
+
+void
+LorawanMacEndDeviceClassA::SetRaModel (SatEnums::RandomAccessModel_t randomAccessModel)
+{
+  switch(randomAccessModel)
+  {
+    case SatEnums::RA_MODEL_OFF:
+    {
+      m_packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
+      break;
+    }
+    case SatEnums::RA_MODEL_SLOTTED_ALOHA:
+    {
+      m_packetType = SatEnums::PACKET_TYPE_SLOTTED_ALOHA;
+      break;
+    }
+    case SatEnums::RA_MODEL_CRDSA:
+    case SatEnums::RA_MODEL_RCS2_SPECIFICATION:
+    case SatEnums::RA_MODEL_MARSALA:
+    {
+      m_packetType = SatEnums::PACKET_TYPE_CRDSA;
+      break;
+    }
+    case SatEnums::RA_MODEL_ESSA:
+    {
+      m_packetType = SatEnums::PACKET_TYPE_ESSA;
+      break;
+    }
+  }
 }
 
 void

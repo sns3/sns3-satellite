@@ -357,8 +357,6 @@ public:
    */
   void SetGwAddress (Mac48Address gwAddress);
 
-  void SetWaveformConf (Ptr<SatWaveformConf> waveformConf);
-
   /**
    * Set RA channel assigned for this UT.
    *
@@ -476,8 +474,6 @@ protected:
   LorawanMacEndDevice::GatewayUpdateCallback m_gatewayUpdateCallback;
 
   Mac48Address m_gwAddress;
-
-  Ptr<SatWaveformConf> m_waveformConf;
 
   /**
    * RA channel assigned to the UT.

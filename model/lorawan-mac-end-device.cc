@@ -957,12 +957,6 @@ LorawanMacEndDevice::SetGwAddress (Mac48Address gwAddress)
 }
 
 void
-LorawanMacEndDevice::SetWaveformConf (Ptr<SatWaveformConf> waveformConf)
-{
-  m_waveformConf = waveformConf;
-}
-
-void
 LorawanMacEndDevice::SetRaChannel (uint32_t raChannel)
 {
   m_raChannel = raChannel;

@@ -23,8 +23,10 @@
 #ifndef LORAWAN_MAC_GATEWAY_H
 #define LORAWAN_MAC_GATEWAY_H
 
-#include "ns3/lorawan-mac.h"
-#include "ns3/lora-tag.h"
+#include <ns3/satellite-bbframe-container.h>
+
+#include <ns3/lorawan-mac.h>
+#include <ns3/lora-tag.h>
 
 namespace ns3 {
 
@@ -34,7 +36,7 @@ public:
   static TypeId GetTypeId (void);
 
   LorawanMacGateway ();
-  LorawanMacGateway (uint32_t beamId);
+  LorawanMacGateway (uint32_t beamId, Ptr<SatBbFrameConf> bbFrameConf);
   virtual ~LorawanMacGateway ();
 
   // Implementation of the LorawanMac interface
@@ -60,6 +62,8 @@ public:
    */
   Time GetWaitingTime (double frequency);
 private:
+  // BB Frame configuration.
+  Ptr<SatBbFrameConf> m_bbFrameConf;
 protected:
 };
 

@@ -41,7 +41,7 @@ public:
   static TypeId GetTypeId (void);
 
   LorawanMacEndDeviceClassA ();
-  LorawanMacEndDeviceClassA (uint32_t beamId);
+  LorawanMacEndDeviceClassA (uint32_t beamId, Ptr<SatSuperframeSeq> seq);
   virtual ~LorawanMacEndDeviceClassA ();
 
   /////////////////////
@@ -77,6 +77,13 @@ public:
    * This function handles opening of the first receive window.
    */
   virtual void TxFinished ();
+
+  /**
+   *  Set the random access model.
+   *
+   * \param randomAccessModel The model to use.
+   */
+  void SetRaModel (SatEnums::RandomAccessModel_t randomAccessModel);
 
   /**
    * Perform operations needed to open the first receive window.
@@ -162,6 +169,16 @@ public:
   virtual void OnRxClassParamSetupReq (Ptr<RxParamSetupReq> rxParamSetupReq);
 
 private:
+
+  /**
+   * Used superframe sequence for the return link
+   */
+  Ptr<SatSuperframeSeq> m_superframeSeq;
+
+  /**
+   * Packet type used on RTN channel
+   */
+  SatEnums::PacketType_t m_packetType;
 
   /**
    * Time to wait between end of message transmission and opening of first reception window
