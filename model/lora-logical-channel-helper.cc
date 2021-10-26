@@ -100,6 +100,7 @@ LoraLogicalChannelHelper::GetLoraSubBandFromChannel (Ptr<LoraLogicalChannel> cha
 Ptr<LoraSubBand>
 LoraLogicalChannelHelper::GetLoraSubBandFromFrequency (double frequency)
 {
+  NS_LOG_FUNCTION (this << frequency);
   // Get the LoraSubBand this frequency belongs to
   std::list< Ptr< LoraSubBand > >::iterator it;
   for (it = m_subBandList.begin (); it != m_subBandList.end (); it++)
@@ -157,8 +158,7 @@ LoraLogicalChannelHelper::AddLoraSubBand (double firstFrequency,
 {
   NS_LOG_FUNCTION (this << firstFrequency << lastFrequency);
 
-  Ptr<LoraSubBand> subBand = Create<LoraSubBand> (firstFrequency, lastFrequency,
-                                          dutyCycle, maxTxPowerDbm);
+  Ptr<LoraSubBand> subBand = Create<LoraSubBand> (firstFrequency, lastFrequency, dutyCycle, maxTxPowerDbm);
 
   m_subBandList.push_back (subBand);
 }

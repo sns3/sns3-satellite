@@ -43,6 +43,7 @@
 #include <ns3/satellite-traced-mobility-model.h>
 #include <ns3/satellite-ut-handover-module.h>
 
+#include <ns3/satellite-lora-conf.h>
 #include <ns3/lora-network-server-helper.h>
 #include <ns3/lora-forwarder-helper.h>
 #include <ns3/lora-device-address-generator.h>
@@ -210,6 +211,12 @@ SatHelper::SatHelper ()
   Singleton<SatEnvVariables>::Get ()->Initialize ();
 
   m_satConf = CreateObject<SatConf> ();
+
+  if (m_standard == SatEnums::LORA)
+    {
+      SatLoraConf satLoraConf;
+      satLoraConf.setSatConfAttributes (m_satConf);
+    }
 
   m_satConf->Initialize (m_rtnConfFileName,
                          m_fwdConfFileName,

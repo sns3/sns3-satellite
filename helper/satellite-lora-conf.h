@@ -21,6 +21,8 @@
 #ifndef SAT_LORA_CONF_H
 #define SAT_LORA_CONF_H
 
+#include <ns3/satellite-conf.h>
+
 #include <ns3/lorawan-mac-end-device-class-a.h>
 #include <ns3/lorawan-mac-gateway.h>
 
@@ -57,6 +59,8 @@ public:
 
   void SetConf (Ptr<LorawanMacGateway> gatewayMac);
   void SetConf (Ptr<LorawanMacEndDeviceClassA> endDeviceMac);
+
+  void setSatConfAttributes (Ptr<SatConf> satConf);
 
 private:
   void SetEu863_870Conf (Ptr<LorawanMacGateway> gatewayMac);

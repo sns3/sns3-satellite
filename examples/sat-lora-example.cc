@@ -42,8 +42,9 @@ int
 main (int argc, char *argv[])
 {
   // Variables
+  //std::string beams = "1 2 3 4 5 6 7 8";
   std::string beams = "8";
-  uint32_t nbGw = 1;
+  uint32_t nbGwUser = 1;
   uint32_t nbUtsPerBeam = 100;
   uint32_t nbEndUsersPerUt = 1;
 
@@ -101,6 +102,7 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::LorawanMacEndDevice::MType", EnumValue (LorawanMacHeader::CONFIRMED_DATA_UP));
   Config::SetDefault ("ns3::SatLorawanNetDevice::ForwardToUtUsers", BooleanValue (true));
 
+  //Config::SetDefault ("ns3::SatLoraConf::Standard", EnumValue (SatLoraConf::EU863_870));
   Config::SetDefault ("ns3::SatLoraConf::Standard", EnumValue (SatLoraConf::SATELLITE));
 
   Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::FirstWindowDelay", TimeValue (firstWindowDelay));
@@ -179,7 +181,7 @@ main (int argc, char *argv[])
   // Traffics
   simulationHelper->SetSimulationTime (simLength);
 
-  simulationHelper->SetGwUserCount (nbGw);
+  simulationHelper->SetGwUserCount (nbGwUser);
   simulationHelper->SetUtCountPerBeam (nbUtsPerBeam);
   simulationHelper->SetUserCountPerUt (nbEndUsersPerUt);
   simulationHelper->SetBeams (beams);

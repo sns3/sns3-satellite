@@ -61,20 +61,22 @@ SatLoraConf::SatLoraConf ()
 {
   NS_LOG_FUNCTION (this);
 
-  // Nothing done here
+  ObjectBase::ConstructSelf (AttributeConstructionList ());
 }
 
 void
 SatLoraConf::SetConf (Ptr<LorawanMacGateway> gatewayMac)
 {
+  NS_LOG_FUNCTION (this << gatewayMac);
+
   switch(m_phyLayerStandard)
   {
-    case SATELLITE:
+    case SatLoraConf::SATELLITE:
     {
       SetSatelliteConf (gatewayMac);
       break;
     }
-    case EU863_870:
+    case SatLoraConf::EU863_870:
     {
       SetEu863_870Conf (gatewayMac);
       break;
@@ -85,14 +87,16 @@ SatLoraConf::SetConf (Ptr<LorawanMacGateway> gatewayMac)
 void
 SatLoraConf::SetConf (Ptr<LorawanMacEndDeviceClassA> endDeviceMac)
 {
+  NS_LOG_FUNCTION (this << endDeviceMac);
+
   switch(m_phyLayerStandard)
   {
-    case SATELLITE:
+    case SatLoraConf::SATELLITE:
     {
       SetSatelliteConf (endDeviceMac);
       break;
     }
-    case EU863_870:
+    case SatLoraConf::EU863_870:
     {
       SetEu863_870Conf (endDeviceMac);
       break;
@@ -101,8 +105,55 @@ SatLoraConf::SetConf (Ptr<LorawanMacEndDeviceClassA> endDeviceMac)
 }
 
 void
+SatLoraConf::setSatConfAttributes (Ptr<SatConf> satConf)
+{
+  NS_LOG_FUNCTION (this << satConf);
+
+  double baseFrequency;
+  double bandwidth;
+  uint32_t channels;
+  double allocatedBandwidth;
+
+  switch(m_phyLayerStandard)
+  {
+    case SatLoraConf::SATELLITE:
+    {
+      baseFrequency = 1.5e9;
+      bandwidth = 125000;
+      channels = 1;
+      allocatedBandwidth = 125000;
+      break;
+    }
+    case SatLoraConf::EU863_870:
+    {
+      baseFrequency = 0.868e9;
+      bandwidth = 375000;
+      channels = 3;
+      allocatedBandwidth = 125000;
+      break;
+    }
+  }
+
+  satConf->SetAttribute ("FwdFeederLinkBandwidth", DoubleValue (bandwidth));
+  satConf->SetAttribute ("FwdFeederLinkBaseFrequency", DoubleValue (baseFrequency));
+  satConf->SetAttribute ("RtnFeederLinkBandwidth", DoubleValue (bandwidth));
+  satConf->SetAttribute ("RtnFeederLinkBaseFrequency", DoubleValue (baseFrequency));
+  satConf->SetAttribute ("FwdUserLinkBandwidth", DoubleValue (bandwidth));
+  satConf->SetAttribute ("FwdUserLinkBaseFrequency", DoubleValue (baseFrequency));
+  satConf->SetAttribute ("RtnUserLinkBandwidth", DoubleValue (bandwidth));
+  satConf->SetAttribute ("RtnUserLinkBaseFrequency", DoubleValue (baseFrequency));
+  satConf->SetAttribute ("FwdUserLinkChannels", UintegerValue (channels));
+  satConf->SetAttribute ("RtnUserLinkChannels", UintegerValue (channels));
+  satConf->SetAttribute ("FwdFeederLinkChannels", UintegerValue (channels));
+  satConf->SetAttribute ("RtnFeederLinkChannels", UintegerValue (channels));
+  satConf->SetAttribute ("FwdCarrierAllocatedBandwidth", DoubleValue (allocatedBandwidth));
+}
+
+void
 SatLoraConf::SetEu863_870Conf (Ptr<LorawanMacGateway> gatewayMac)
 {
+  NS_LOG_FUNCTION (this << gatewayMac);
+
   LoraLogicalChannelHelper channelHelper;
 
   channelHelper.AddLoraSubBand (868, 868.6, 0.01, 14);
@@ -126,6 +177,8 @@ SatLoraConf::SetEu863_870Conf (Ptr<LorawanMacGateway> gatewayMac)
 void
 SatLoraConf::SetEu863_870Conf (Ptr<LorawanMacEndDeviceClassA> endDeviceMac)
 {
+  NS_LOG_FUNCTION (this << endDeviceMac);
+
   LoraLogicalChannelHelper channelHelper;
 
   channelHelper.AddLoraSubBand (868, 868.6, 0.01, 14);
@@ -165,6 +218,8 @@ SatLoraConf::SetEu863_870Conf (Ptr<LorawanMacEndDeviceClassA> endDeviceMac)
 void
 SatLoraConf::SetSatelliteConf (Ptr<LorawanMacGateway> gatewayMac)
 {
+  NS_LOG_FUNCTION (this << gatewayMac);
+
   LoraLogicalChannelHelper channelHelper;
 
   // TODO check values
@@ -190,6 +245,8 @@ SatLoraConf::SetSatelliteConf (Ptr<LorawanMacGateway> gatewayMac)
 void
 SatLoraConf::SetSatelliteConf (Ptr<LorawanMacEndDeviceClassA> endDeviceMac)
 {
+  NS_LOG_FUNCTION (this << endDeviceMac);
+
   LoraLogicalChannelHelper channelHelper;
 
   // TODO check values
