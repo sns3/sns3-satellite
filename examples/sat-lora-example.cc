@@ -101,6 +101,8 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::LorawanMacEndDevice::MType", EnumValue (LorawanMacHeader::CONFIRMED_DATA_UP));
   Config::SetDefault ("ns3::SatLorawanNetDevice::ForwardToUtUsers", BooleanValue (true));
 
+  Config::SetDefault ("ns3::SatLoraConf::Standard", EnumValue (SatLoraConf::SATELLITE));
+
   Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::FirstWindowDelay", TimeValue (firstWindowDelay));
   Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::SecondWindowDelay", TimeValue (secondWindowDelay));
   Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::FirstWindowDuration", TimeValue (firstWindowDuration));

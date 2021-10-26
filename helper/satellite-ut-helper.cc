@@ -62,6 +62,7 @@
 #include <ns3/satellite-id-mapper.h>
 #include <ns3/satellite-typedefs.h>
 
+#include <ns3/satellite-lora-conf.h>
 #include <ns3/lorawan-mac-end-device-class-a.h>
 
 #include "satellite-ut-helper.h"
@@ -590,55 +591,8 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
   // TODO configuration for EU only
   mac->SetTxDbmForTxPower (std::vector<double>{16, 14, 12, 10, 8, 6, 4, 2});
 
-  ////////////////////////////////////////////////////////////
-  // Matrix to know which DataRate the GW will respond with //
-  ////////////////////////////////////////////////////////////
-  LorawanMac::ReplyDataRateMatrix matrix = {{{{0, 0, 0, 0, 0, 0}},
-                                             {{1, 0, 0, 0, 0, 0}},
-                                             {{2, 1, 0, 0, 0, 0}},
-                                             {{3, 2, 1, 0, 0, 0}},
-                                             {{4, 3, 2, 1, 0, 0}},
-                                             {{5, 4, 3, 2, 1, 0}},
-                                             {{6, 5, 4, 3, 2, 1}},
-                                             {{7, 6, 5, 4, 3, 2}}}};
-  mac->SetReplyDataRateMatrix (matrix);
-
-  /////////////////////
-  // Preamble length //
-  /////////////////////
-  mac->SetNPreambleSymbols (8);
-
-  //////////////////////////////////////
-  // Second receive window parameters //
-  //////////////////////////////////////
-  // TODO should be zero but transmission time is higher than propagation time. This is not possible right now. Revert to zero when possible.
-  mac->SetSecondReceiveWindowDataRate (4);
-  mac->SetSecondReceiveWindowFrequency (869.525);
-
-  LoraLogicalChannelHelper channelHelper;
-  channelHelper.AddLoraSubBand (868, 868.6, 0.01, 14);
-  channelHelper.AddLoraSubBand (868.7, 869.2, 0.001, 14);
-  channelHelper.AddLoraSubBand (869.4, 869.65, 0.1, 27);
-
-  //////////////////////
-  // Default channels //
-  //////////////////////
-  Ptr<LoraLogicalChannel> lc1 = CreateObject<LoraLogicalChannel> (868.1, 0, 5);
-  Ptr<LoraLogicalChannel> lc2 = CreateObject<LoraLogicalChannel> (868.3, 0, 5);
-  Ptr<LoraLogicalChannel> lc3 = CreateObject<LoraLogicalChannel> (868.5, 0, 5);
-  channelHelper.AddChannel (lc1);
-  channelHelper.AddChannel (lc2);
-  channelHelper.AddChannel (lc3);
-
-  mac->SetLoraLogicalChannelHelper (channelHelper);
-
-  ///////////////////////////////////////////////
-  // DataRate -> SF, DataRate -> Bandwidth     //
-  // and DataRate -> MaxAppPayload conversions //
-  ///////////////////////////////////////////////
-  mac->SetSfForDataRate (std::vector<uint8_t>{12, 11, 10, 9, 8, 7, 7});
-  mac->SetBandwidthForDataRate (std::vector<double>{125000, 125000, 125000, 125000, 125000, 125000, 250000});
-  mac->SetMaxAppPayloadForDataRate (std::vector<uint32_t>{59, 59, 59, 123, 230, 230, 230, 230});
+  SatLoraConf satLoraConf;
+  satLoraConf.SetConf (mac);
 
   // Attach the Mac layer receiver to Phy
   SatPhy::ReceiveCallback recCb = MakeCallback (&LorawanMac::Receive, mac);
