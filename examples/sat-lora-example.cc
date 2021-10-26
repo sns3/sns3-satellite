@@ -63,6 +63,13 @@ main (int argc, char *argv[])
   bool interferenceModePerPacket = true;
   bool displayTraces = true;
 
+  Time firstWindowDelay = MilliSeconds (1500);
+  Time secondWindowDelay = Seconds (2);
+  Time firstWindowDuration = MilliSeconds (400);
+  Time secondWindowDuration = MilliSeconds (400);
+  Time firstWindowAnswerDelay = Seconds (1);
+  Time secondWindowAnswerDelay = Seconds (2);
+
   Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("example-lora");
 
   // read command line parameters given by user
@@ -78,6 +85,13 @@ main (int argc, char *argv[])
   cmd.AddValue ("frameCarrierRollOff", "Roll-off factor", frameCarrierRollOff);
   cmd.AddValue ("frameCarrierSpacing", "Carrier spacing factor", frameCarrierSpacing);
   cmd.AddValue ("frameSpreadingFactor", "Carrier spreading factor", frameSpreadingFactor);
+
+  cmd.AddValue ("firstWindowDelay", "Delay between end of transmission and opening of first window on End Device", firstWindowDelay);
+  cmd.AddValue ("secondWindowDelay", "Delay between end of transmission and opening of second window on End Device", secondWindowDelay);
+  cmd.AddValue ("firstWindowDuration", "First window duration on End Device", firstWindowDuration);
+  cmd.AddValue ("secondWindowDuration", "Second window duration on End Device", secondWindowDuration);
+  cmd.AddValue ("firstWindowAnswerDelay", "Delay between end of reception and start of ack on first window on Gateway", firstWindowAnswerDelay);
+  cmd.AddValue ("secondWindowAnswerDelay", "Delay between end of reception and start of ack on second window on Gateway", secondWindowAnswerDelay);
   simulationHelper->AddDefaultUiArguments (cmd);
   cmd.Parse (argc, argv);
 
@@ -87,12 +101,12 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::LorawanMacEndDevice::MType", EnumValue (LorawanMacHeader::CONFIRMED_DATA_UP));
   Config::SetDefault ("ns3::SatLorawanNetDevice::ForwardToUtUsers", BooleanValue (true));
 
-  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::FirstWindowDelay", TimeValue (MilliSeconds (1500)));
-  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::SecondWindowDelay", TimeValue (Seconds (2)));
-  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::FirstWindowDuration", TimeValue (MilliSeconds (400)));
-  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::SecondWindowDuration", TimeValue (MilliSeconds (400)));
-  Config::SetDefault ("ns3::LoraNetworkScheduler::FirstWindowAnswerDelay", TimeValue (Seconds (1)));
-  Config::SetDefault ("ns3::LoraNetworkScheduler::SecondWindowAnswerDelay", TimeValue (Seconds (2)));
+  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::FirstWindowDelay", TimeValue (firstWindowDelay));
+  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::SecondWindowDelay", TimeValue (secondWindowDelay));
+  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::FirstWindowDuration", TimeValue (firstWindowDuration));
+  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::SecondWindowDuration", TimeValue (secondWindowDuration));
+  Config::SetDefault ("ns3::LoraNetworkScheduler::FirstWindowAnswerDelay", TimeValue (firstWindowAnswerDelay));
+  Config::SetDefault ("ns3::LoraNetworkScheduler::SecondWindowAnswerDelay", TimeValue (secondWindowAnswerDelay));
 
   // Defaults
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
