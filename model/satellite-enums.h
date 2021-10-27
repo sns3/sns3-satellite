@@ -2290,7 +2290,8 @@ public:
   typedef enum
   {
     LR_RCS2 = 0,
-    LR_FSIM = 1
+    LR_FSIM = 1,
+    LR_LORA = 2
   } LinkResults_t;
 
 private:

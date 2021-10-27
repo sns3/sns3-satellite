@@ -21,7 +21,9 @@
 #ifndef LORA_TAG_H
 #define LORA_TAG_H
 
-#include "ns3/tag.h"
+#include <ns3/tag.h>
+
+#include <ns3/satellite-enums.h>
 
 namespace ns3 {
 
@@ -122,8 +124,23 @@ public:
    */
   void SetDataRate (uint8_t dataRate);
 
+  /**
+   * Get the modcod for this packet.
+   *
+   * \return The data modcod needs to be employed for this packet.
+   */
+  uint8_t GetModcod (void);
+
+  /**
+   * Set the modcod for this packet.
+   *
+   * \param dataRate The modcod.
+   */
+  void SetModcod (uint8_t modcod);
+
 private:
   uint8_t m_sf; //!< The Spreading Factor used by the packet.
+  uint8_t m_modcod; //!< The Modcod ID used by the packet.
   uint8_t m_destroyedBy; //!< The Spreading Factor that destroyed the packet.
   double m_receivePower; //!< The reception power of this packet.
   uint8_t m_dataRate; //!< The Data Rate that needs to be used to send this

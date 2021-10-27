@@ -78,6 +78,13 @@ LoraEndDeviceStatus::~LoraEndDeviceStatus ()
 ///////////////
 
 uint8_t
+LoraEndDeviceStatus::GetModcod ()
+{
+  NS_LOG_FUNCTION_NOARGS ();
+  return m_modcod;
+}
+
+uint8_t
 LoraEndDeviceStatus::GetFirstReceiveWindowSpreadingFactor ()
 {
   NS_LOG_FUNCTION_NOARGS ();
@@ -189,30 +196,37 @@ LoraEndDeviceStatus::GetReceivedPacketList ()
 }
 
 void
+LoraEndDeviceStatus::SetModcod (uint8_t modcod)
+{
+  NS_LOG_FUNCTION (this << modcod);
+  m_modcod = modcod;
+}
+
+void
 LoraEndDeviceStatus::SetFirstReceiveWindowSpreadingFactor (uint8_t sf)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this << sf);
   m_firstReceiveWindowSpreadingFactor = sf;
 }
 
 void
 LoraEndDeviceStatus::SetFirstReceiveWindowFrequency (double frequency)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this << frequency);
   m_firstReceiveWindowFrequency = frequency;
 }
 
 void
 LoraEndDeviceStatus::SetSecondReceiveWindowOffset (uint8_t offset)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this << offset);
   m_secondReceiveWindowOffset = offset;
 }
 
 void
 LoraEndDeviceStatus::SetSecondReceiveWindowFrequency (double frequency)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this << frequency);
   m_secondReceiveWindowFrequency = frequency;
 }
 
@@ -233,7 +247,7 @@ LoraEndDeviceStatus::SetReplyFrameHeader (LoraFrameHeader frameHeader)
 void
 LoraEndDeviceStatus::SetReplyPayload (Ptr<Packet> replyPayload)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this << replyPayload);
   m_reply.payload = replyPayload;
 }
 
@@ -244,7 +258,7 @@ LoraEndDeviceStatus::SetReplyPayload (Ptr<Packet> replyPayload)
 void
 LoraEndDeviceStatus::InsertReceivedPacket (Ptr<Packet const> receivedPacket, const Address &gwAddress)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this << receivedPacket << gwAddress);
 
   // Create a copy of the packet
   Ptr<Packet> myPacket = receivedPacket->Copy ();
@@ -262,6 +276,7 @@ LoraEndDeviceStatus::InsertReceivedPacket (Ptr<Packet const> receivedPacket, con
   myPacket->RemovePacketTag (tag);
   SetFirstReceiveWindowSpreadingFactor (tag.GetSpreadingFactor ());
   SetFirstReceiveWindowFrequency (tag.GetFrequency ());
+  SetModcod (tag.GetModcod ());
 
   // Update Information on the received packet
   ReceivedPacketInfo info;

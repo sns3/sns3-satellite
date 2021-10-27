@@ -165,7 +165,7 @@ SatGwHelper::SatGwHelper (SatTypedefs::CarrierBandwidthConverter_t carrierBandwi
 }
 
 void
-SatGwHelper::Initialize (Ptr<SatLinkResultsDvbRcs2> lrRcs2, Ptr<SatLinkResultsFwd> lrFwd, SatEnums::DvbVersion_t dvbVersion)
+SatGwHelper::Initialize (Ptr<SatLinkResultsRtn> lrRcs2, Ptr<SatLinkResultsFwd> lrFwd, SatEnums::DvbVersion_t dvbVersion)
 {
   NS_LOG_FUNCTION (this);
 
@@ -525,7 +525,7 @@ SatGwHelper::InstallLora (Ptr<Node> n,
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());
   phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
 
-  Ptr<LorawanMacGateway> mac = CreateObject<LorawanMacGateway> (beamId, m_bbFrameConf);
+  Ptr<LorawanMacGateway> mac = CreateObject<LorawanMacGateway> (beamId);
 
   SatLoraConf satLoraConf;
   satLoraConf.SetConf (mac);

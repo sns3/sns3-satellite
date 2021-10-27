@@ -123,7 +123,7 @@ LorawanMacEndDevice::LorawanMacEndDevice (uint32_t beamId)
       m_maxNumbTx (8),
       m_dataRate (0),
       m_txPower (14),
-      m_codingRate (1),
+      m_codingRate (4.0/5),
       // LoraWAN default
       m_headerDisabled (0),
       // LoraWAN default

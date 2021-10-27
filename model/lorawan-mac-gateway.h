@@ -36,7 +36,7 @@ public:
   static TypeId GetTypeId (void);
 
   LorawanMacGateway ();
-  LorawanMacGateway (uint32_t beamId, Ptr<SatBbFrameConf> bbFrameConf);
+  LorawanMacGateway (uint32_t beamId);
   virtual ~LorawanMacGateway ();
 
   // Implementation of the LorawanMac interface
@@ -63,7 +63,6 @@ public:
   Time GetWaitingTime (double frequency);
 private:
   // BB Frame configuration.
-  Ptr<SatBbFrameConf> m_bbFrameConf;
 protected:
 };
 

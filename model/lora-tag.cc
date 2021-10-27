@@ -45,6 +45,7 @@ LoraTag::GetInstanceTypeId (void) const
 
 LoraTag::LoraTag (uint8_t sf, uint8_t destroyedBy) :
   m_sf (sf),
+  m_modcod (0),
   m_destroyedBy (destroyedBy),
   m_receivePower (0),
   m_dataRate (0),
@@ -61,13 +62,14 @@ LoraTag::GetSerializedSize (void) const
 {
   // Each datum about a SF is 1 byte + receivePower (the size of a double) +
   // frequency (the size of a double)
-  return 3 + 2 * sizeof(double);
+  return 4 + 2 * sizeof(double);
 }
 
 void
 LoraTag::Serialize (TagBuffer i) const
 {
   i.WriteU8 (m_sf);
+  i.WriteU8 (m_modcod);
   i.WriteU8 (m_destroyedBy);
   i.WriteDouble (m_receivePower);
   i.WriteU8 (m_dataRate);
@@ -78,6 +80,7 @@ void
 LoraTag::Deserialize (TagBuffer i)
 {
   m_sf = i.ReadU8 ();
+  m_modcod = i.ReadU8 ();
   m_destroyedBy = i.ReadU8 ();
   m_receivePower = i.ReadDouble ();
   m_dataRate = i.ReadU8 ();
@@ -87,7 +90,7 @@ LoraTag::Deserialize (TagBuffer i)
 void
 LoraTag::Print (std::ostream &os) const
 {
-  os << m_sf << " " << m_destroyedBy << " " << m_receivePower << " " <<
+  os << m_sf << " " << m_modcod << " " << m_destroyedBy << " " << m_receivePower << " " <<
     m_dataRate;
 }
 
@@ -149,6 +152,18 @@ void
 LoraTag::SetDataRate (uint8_t dataRate)
 {
   m_dataRate = dataRate;
+}
+
+uint8_t
+LoraTag::GetModcod (void)
+{
+  return (SatEnums::SatModcod_t) m_modcod;
+}
+
+void
+LoraTag::SetModcod (uint8_t modcod)
+{
+  m_modcod = modcod;
 }
 
 } // namespace ns3

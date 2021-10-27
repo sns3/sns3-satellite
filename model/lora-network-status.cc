@@ -172,9 +172,7 @@ LoraNetworkStatus::SendThroughGateway (Ptr<Packet> packet, Address gwAddress)
 {
   NS_LOG_FUNCTION (packet << gwAddress);
 
-  m_gatewayStatuses.find (gwAddress)->second->GetNetDevice ()->Send (packet,
-                                                                      gwAddress,
-                                                                      0x0800);
+  m_gatewayStatuses.find (gwAddress)->second->GetNetDevice ()->Send (packet, gwAddress, 0x0800);
 }
 
 Ptr<Packet>
@@ -186,6 +184,7 @@ LoraNetworkStatus::GetReplyForDevice (LoraDeviceAddress edAddress, int windowNum
 
   // Apply the appropriate tag
   LoraTag tag;
+  tag.SetModcod (edStatus->GetModcod ());
   switch (windowNumber)
     {
     case 1:

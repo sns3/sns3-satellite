@@ -96,7 +96,6 @@ protected:
   bool m_isInitialized;
 };
 
-
 /**
  * \ingroup satellite
  *
@@ -107,14 +106,14 @@ protected:
  *
  * See usage examples in the parent class documentation (SatLinkResults).
  */
-class SatLinkResultsDvbRcs2 : public SatLinkResults
+class SatLinkResultsRtn : public SatLinkResults
 {
 public:
   /**
    * Default constructor.
    */
-  SatLinkResultsDvbRcs2 ();
-  ~SatLinkResultsDvbRcs2 ()
+  SatLinkResultsRtn ();
+  ~SatLinkResultsRtn ()
   {
   }
 
@@ -152,7 +151,7 @@ protected:
   /**
    * \brief Initialize by loading DVB-RCS2 look up tables.
    */
-  virtual void DoInitialize ();
+  virtual void DoInitialize () = 0;
 
   /**
    * \brief Map of satellite link result look up tables.
@@ -160,6 +159,41 @@ protected:
    * - value = Ptr<SatLookUpTable>, i.e. look-up table containing the link results
    */
   std::map<uint32_t, Ptr<SatLookUpTable> > m_table;
+};
+
+
+/**
+ * \ingroup satellite
+ *
+ * \brief Link results for DVB-RCS2.
+ *
+ * Loads and maintains multiple SatLookUpTable. Provides query service based on
+ * waveform id.
+ *
+ * See usage examples in the parent class documentation (SatLinkResults).
+ */
+class SatLinkResultsDvbRcs2 : public SatLinkResultsRtn
+{
+public:
+  /**
+   * Default constructor.
+   */
+  SatLinkResultsDvbRcs2 ();
+  ~SatLinkResultsDvbRcs2 ()
+  {
+  }
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
+  static TypeId GetTypeId ();
+
+protected:
+  /**
+   * \brief Initialize by loading DVB-RCS2 look up tables.
+   */
+  virtual void DoInitialize ();
 };
 
 /**
@@ -172,9 +206,7 @@ protected:
  *
  * See usage examples in the parent class documentation (SatLinkResults).
  */
-// TODO: this is only a temporary solution. SatLinkResultsFSim could inherit from
-// a class such as SatLinkResultsReturn, as well as SatLinkResultsDvbRcs2
-class SatLinkResultsFSim : public SatLinkResultsDvbRcs2
+class SatLinkResultsFSim : public SatLinkResultsRtn
 {
 public:
   /**
@@ -182,6 +214,74 @@ public:
    */
   SatLinkResultsFSim ();
   ~SatLinkResultsFSim ()
+  {
+  }
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
+  static TypeId GetTypeId ();
+
+  /**
+   * \brief Get the Normalized Symbol Information corresponding to a given SNIR
+   * \param snirDb SNIR in logarithmic scale
+   * \return Normalized  Symbol Information
+   */
+  inline double GetNormalizedSymbolInformation (double snirDb) const
+  {
+    return m_mutualInformationTable->GetNormalizedSymbolInformation (snirDb);
+  }
+
+  /**
+   * \brief Get the SNIR in dB for a given Normalized Symbol Information target
+   * \param Normalizd Symbol Information target (0-1)
+   * \return Snir target in dB
+   */
+  inline double GetSnirDb (double symbolInformationTarget) const
+  {
+    return m_mutualInformationTable->GetSnirDb (symbolInformationTarget);
+  }
+
+  /**
+   * \brief Get the Mutual Information Table
+   */
+  inline Ptr<SatMutualInformationTable> GetMutualInformationTable () const
+  {
+    return m_mutualInformationTable;
+  }
+
+protected:
+  /**
+   * \brief Initialize by loading F-SIM look up tables.
+   */
+  void DoInitialize ();
+
+private:
+  /**
+   * \brief Mutual information table.
+   */
+  Ptr<SatMutualInformationTable> m_mutualInformationTable;
+};
+
+/**
+ * \ingroup satellite
+ *
+ * \brief Link results for F-SIM.
+ *
+ * Loads and maintains multiple SatLookUpTable. Provides query service based on
+ * waveform id. Loads and maintains a Mutual Information table.
+ *
+ * See usage examples in the parent class documentation (SatLinkResults).
+ */
+class SatLinkResultsLora : public SatLinkResultsRtn
+{
+public:
+  /**
+   * Default constructor.
+   */
+  SatLinkResultsLora ();
+  ~SatLinkResultsLora ()
   {
   }
 

@@ -152,7 +152,7 @@ main (int argc, char *argv[])
     }
   Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceEliminationModel", EnumValue (SatPhyRxCarrierConf::SIC_RESIDUAL));
   Config::SetDefault ("ns3::SatBeamHelper::RaCollisionModel", EnumValue (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
-  Config::SetDefault ("ns3::SatBeamHelper::ReturnLinkLinkResults", EnumValue (SatEnums::LR_FSIM));
+  Config::SetDefault ("ns3::SatBeamHelper::ReturnLinkLinkResults", EnumValue (SatEnums::LR_LORA));
   Config::SetDefault ("ns3::SatWaveformConf::DefaultWfId", UintegerValue (2));
   Config::SetDefault ("ns3::SatHelper::RtnLinkWaveformConfFileName", StringValue("loraWaveforms.txt"));
 

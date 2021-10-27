@@ -353,7 +353,7 @@ SatWaveformConf::ReadFromFile (std::string filePathName)
 }
 
 
-void SatWaveformConf::InitializeEbNoRequirements ( Ptr<SatLinkResultsDvbRcs2> linkResults )
+void SatWaveformConf::InitializeEbNoRequirements ( Ptr<SatLinkResultsRtn> linkResults )
 {
   NS_LOG_FUNCTION (this);
 

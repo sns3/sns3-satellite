@@ -192,6 +192,13 @@ public:
   virtual ~LoraEndDeviceStatus ();
 
   /**
+   * Get the modcod this device is using.
+   *
+   * \return An unsigned 8-bit integer containing the modcod index.
+   */
+  uint8_t GetModcod (void);
+
+  /**
    * Get the spreading factor this device is using in the first receive window.
    *
    * \return An unsigned 8-bit integer containing the spreading factor.
@@ -223,6 +230,11 @@ public:
    * \return The received packet list.
    */
   ReceivedPacketList GetReceivedPacketList (void);
+
+  /**
+   * Set the modcod this device is using.
+   */
+  void SetModcod (uint8_t modcod);
 
   /**
    * Set the spreading factor this device is using in the first receive window.
@@ -319,6 +331,7 @@ public:
 
 private:
   // Receive window data
+  uint8_t m_modcod;
   uint8_t m_firstReceiveWindowSpreadingFactor = 0;
   double m_firstReceiveWindowFrequency = 0;
   uint8_t m_secondReceiveWindowOffset = 0;

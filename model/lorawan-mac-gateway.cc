@@ -50,9 +50,8 @@ LorawanMacGateway::LorawanMacGateway ()
   NS_FATAL_ERROR ("Default constructor not in use");
 }
 
-LorawanMacGateway::LorawanMacGateway (uint32_t beamId, Ptr<SatBbFrameConf> bbFrameConf)
-  : LorawanMac (beamId),
-    m_bbFrameConf (bbFrameConf)
+LorawanMacGateway::LorawanMacGateway (uint32_t beamId)
+  : LorawanMac (beamId)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -70,6 +69,7 @@ LorawanMacGateway::Send (Ptr<Packet> packet)
   // Get DataRate to send this packet with
   LoraTag tag;
   packet->RemovePacketTag (tag);
+  uint8_t modcod = tag.GetModcod ();
   uint8_t dataRate = tag.GetDataRate ();
   double frequency = tag.GetFrequency ();
   NS_LOG_DEBUG ("DR: " << (uint32_t) unsigned (dataRate));
@@ -107,7 +107,7 @@ LorawanMacGateway::Send (Ptr<Packet> packet)
   LoraTxParameters params;
   params.sf = GetSfFromDataRate (dataRate);
   params.headerDisabled = false;
-  params.codingRate = 1;
+  params.codingRate = SatUtils::GetCodingRate ((SatEnums::SatModcod_t) modcod);
   params.bandwidthHz = GetBandwidthFromDataRate (dataRate);
   params.nPreamble = 8;
   params.crcEnabled = 1;
@@ -115,8 +115,8 @@ LorawanMacGateway::Send (Ptr<Packet> packet)
 
   SatSignalParameters::txInfo_s txInfo;
   txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
-  txInfo.frameType = ((m_bbFrameConf->GetBbFrameUsageMode () == SatEnums::SHORT_FRAMES) ? SatEnums::SHORT_FRAME : SatEnums::NORMAL_FRAME);
-  txInfo.modCod = m_bbFrameConf->GetMostRobustModcod (txInfo.frameType);
+  txInfo.frameType = SatEnums::NORMAL_FRAME;
+  txInfo.modCod = (SatEnums::SatModcod_t) modcod;
   txInfo.sliceId = 0;
   txInfo.waveformId = 0;
 

@@ -199,9 +199,8 @@ LorawanMac::GetOnAirTime (Ptr<Packet> packet, LoraTxParameters txParams)
 
   // num and den refer to numerator and denominator of the time on air formula
   double num = 8 * pl - 4 * txParams.sf + 28 + 16 * crc - 20 * h;
-  double den = 4 * (txParams.sf - 2 * de);
-  double payloadSymbNb = 8 + std::max (std::ceil (num / den) *
-                                       (txParams.codingRate + 4), double(0));
+  double den = (txParams.sf - 2 * de) * txParams.codingRate;
+  double payloadSymbNb = 8 + std::max (std::ceil (num / den), double(0));
 
   // Time to transmit the payload
   double tPayload = payloadSymbNb * tSym;

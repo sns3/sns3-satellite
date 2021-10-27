@@ -136,16 +136,6 @@ LorawanMacEndDeviceClassA::SendToPhy (Ptr<Packet> packetToSend)
 
   m_phyRx->SwitchToTx ();
 
-  // Craft LoraTxParameters object
-  LoraTxParameters params;
-  params.sf = GetSfFromDataRate (m_dataRate);
-  params.headerDisabled = m_headerDisabled;
-  params.codingRate = m_codingRate;
-  params.bandwidthHz = GetBandwidthFromDataRate (m_dataRate);
-  params.nPreamble = m_nPreambleSymbols;
-  params.crcEnabled = 1;
-  params.lowDataRateOptimizationEnabled = 0;
-
   uint32_t allocationChannel = 0; // TODO is really zero here ?
   Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE);
   uint8_t frameId = superframeConf->GetRaChannelFrameId (allocationChannel);
@@ -161,6 +151,16 @@ LorawanMacEndDeviceClassA::SendToPhy (Ptr<Packet> packetToSend)
   txInfo.waveformId = wf->GetWaveformId ();
   //txInfo.crdsaUniquePacketId = m_crdsaUniquePacketId; // reuse the crdsaUniquePacketId to identify ESSA frames
 
+  // Craft LoraTxParameters object
+  LoraTxParameters params;
+  params.sf = GetSfFromDataRate (m_dataRate);
+  params.headerDisabled = m_headerDisabled;
+  params.codingRate = SatUtils::GetCodingRate (wf->GetModCod ());
+  params.bandwidthHz = GetBandwidthFromDataRate (m_dataRate);
+  params.nPreamble = m_nPreambleSymbols;
+  params.crcEnabled = 1;
+  params.lowDataRateOptimizationEnabled = 0;
+
   // Pick a channel on which to transmit the packet
   Ptr<LoraLogicalChannel> txChannel = GetChannelForTx ();
   double frequency = txChannel->GetFrequency ();
@@ -168,6 +168,7 @@ LorawanMacEndDeviceClassA::SendToPhy (Ptr<Packet> packetToSend)
   packetToSend->RemovePacketTag (tag);
   tag.SetFrequency (frequency);
   tag.SetDataRate (m_dataRate);
+  tag.SetModcod (wf->GetModCod ());
   packetToSend->AddPacketTag (tag);
 
   SatMacTag mTag;

@@ -154,7 +154,8 @@ SatBeamHelper::GetTypeId (void)
                    EnumValue (SatEnums::LR_RCS2),
                    MakeEnumAccessor (&SatBeamHelper::m_rlLinkResultsType),
                    MakeEnumChecker (SatEnums::LR_RCS2, "RCS2",
-                                    SatEnums::LR_FSIM, "FSIM"))
+                                    SatEnums::LR_FSIM, "FSIM",
+                                    SatEnums::LR_LORA, "LORA"))
     .AddTraceSource ("Creation", "Creation traces",
                      MakeTraceSourceAccessor (&SatBeamHelper::m_creationTrace),
                      "ns3::SatTypedefs::CreationCallback")
@@ -291,7 +292,7 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
       NS_FATAL_ERROR ("The DVB version does not exist");
   }
 
-  Ptr<SatLinkResultsDvbRcs2> linkResultsReturnLink;
+  Ptr<SatLinkResultsRtn> linkResultsReturnLink;
   switch (m_rlLinkResultsType)
     {
     case SatEnums::LR_RCS2:
@@ -302,6 +303,11 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
     case SatEnums::LR_FSIM:
       {
         linkResultsReturnLink = CreateObject<SatLinkResultsFSim> ();
+        break;
+      }
+    case SatEnums::LR_LORA:
+      {
+        linkResultsReturnLink = CreateObject<SatLinkResultsLora> ();
         break;
       }
     default:
