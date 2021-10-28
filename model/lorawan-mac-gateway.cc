@@ -80,6 +80,8 @@ LorawanMacGateway::Send (Ptr<Packet> packet)
 
   if (m_isStatisticsTagsEnabled)
     {
+      packet->AddPacketTag (SatMacTimeTag (Simulator::Now ()));
+
       // Add a SatAddressTag tag with this device's address as the source address.
       packet->AddByteTag (SatAddressTag (m_nodeInfo->GetMacAddress ()));
 

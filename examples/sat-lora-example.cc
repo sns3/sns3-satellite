@@ -242,6 +242,11 @@ main (int argc, char *argv[])
       s->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
       s->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
+      s->AddPerUtRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerUtRtnMacDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerUtRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddPerUtRtnMacDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
       s->AddGlobalRtnCompositeSinr (SatStatsHelper::OUTPUT_SCALAR_FILE);
       s->AddGlobalRtnCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
       s->AddPerUtRtnCompositeSinr (SatStatsHelper::OUTPUT_SCALAR_FILE);
@@ -267,6 +272,11 @@ main (int argc, char *argv[])
       s->AddGlobalFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
       s->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
       s->AddGlobalFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      s->AddPerUtFwdAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerUtFwdMacDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerUtFwdAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddPerUtFwdMacDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
     }
 
   simulationHelper->RunSimulation ();
