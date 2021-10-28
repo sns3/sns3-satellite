@@ -40,7 +40,6 @@ LoraPeriodicSender::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::LoraPeriodicSender")
     .SetParent<Application> ()
     .AddConstructor<LoraPeriodicSender> ()
-    .SetGroupName ("lorawan")
     .AddAttribute ("Interval", "The interval between packet sends of this app",
                    TimeValue (Seconds (0)),
                    MakeTimeAccessor (&LoraPeriodicSender::GetInterval,

@@ -23,6 +23,8 @@
 #ifndef LORA_FORWARDER_H
 #define LORA_FORWARDER_H
 
+#include <map>
+
 #include <ns3/application.h>
 #include <ns3/nstime.h>
 #include <ns3/point-to-point-net-device.h>
@@ -47,9 +49,10 @@ public:
   /**
    * Sets the device to use to communicate with the EDs.
    *
+   * \param beamId The beam ID of the device.
    * \param loraNetDevice The LoraNetDevice on this node.
    */
-  void SetLoraNetDevice (Ptr<SatLorawanNetDevice> loraNetDevice);
+  void SetLoraNetDevice (uint8_t beamId, Ptr<SatLorawanNetDevice> loraNetDevice);
 
   /**
    * Sets the P2P device to use to communicate with the NS.
@@ -67,15 +70,12 @@ public:
    * \param sender The address of the sender.
    * \returns True if we can handle the packet, false otherwise.
    */
-  bool ReceiveFromLora (Ptr<NetDevice> loraNetDevice, Ptr<const Packet> packet,
-                        uint16_t protocol, const Address& sender);
+  bool ReceiveFromLora (Ptr<SatLorawanNetDevice> loraNetDevice, Ptr<const Packet> packet, uint16_t protocol, const Address& sender);
 
   /**
    * Receive a packet from the PointToPointNetDevice
    */
-  bool ReceiveFromPointToPoint (Ptr<NetDevice> pointToPointNetDevice,
-                                Ptr<const Packet> packet, uint16_t protocol,
-                                const Address& sender);
+  bool ReceiveFromPointToPoint (Ptr<NetDevice> pointToPointNetDevice, Ptr<const Packet> packet, uint16_t protocol, const Address& sender);
 
   /**
    * Start the application
@@ -88,7 +88,7 @@ public:
   void StopApplication (void);
 
 private:
-  Ptr<SatLorawanNetDevice> m_satLorawanNetDevice; //!< Pointer to the node's SatLorawanNetDevice
+  std::map<uint8_t, Ptr<SatLorawanNetDevice> > m_satLorawanNetDevices; //!< Map between beam ID and pointer to the node's SatLorawanNetDevice
 
   Ptr<PointToPointNetDevice> m_pointToPointNetDevice; //!< Pointer to the
   //!P2PNetDevice we use to

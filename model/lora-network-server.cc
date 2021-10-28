@@ -52,8 +52,7 @@ LoraNetworkServer::GetTypeId (void)
     .AddTraceSource ("ReceivedPacket",
                      "Trace source that is fired when a packet arrives at the Network Server",
                      MakeTraceSourceAccessor (&LoraNetworkServer::m_receivedPacket),
-                     "ns3::Packet::TracedCallback")
-    .SetGroupName ("lorawan");
+                     "ns3::Packet::TracedCallback");
   return tid;
 }
 

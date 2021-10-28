@@ -97,11 +97,6 @@ LorawanMac::SetPhy (Ptr<SatPhy> phy)
 {
   // Set the phy
   m_phy = phy;
-
-  // TODO are these useful ?
-  // Connect the receive callbacks
-  // m_phy->SetReceiveOkCallback (MakeCallback (&LorawanMac::Receive, this));
-  // m_phy->SetReceiveFailedCallback (MakeCallback (&LorawanMac::FailedReception, this));
 }
 
 Ptr<SatLoraPhyTx>

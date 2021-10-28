@@ -68,7 +68,7 @@ public:
   Ptr<LorawanMac> GetLorawanMac ();
   void SetLorawanMac (Ptr<LorawanMac> lorawanMac);
 
-  typedef Callback< bool, Ptr<NetDevice>, Ptr<const Packet>, uint16_t, const Address & > ReceiveCallback;
+  typedef Callback< bool, Ptr<SatLorawanNetDevice>, Ptr<const Packet>, uint16_t, const Address & > ReceiveCallback;
 
   void SetReceiveNetworkServerCallback (SatLorawanNetDevice::ReceiveCallback cb);
 

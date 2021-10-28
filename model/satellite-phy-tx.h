@@ -145,6 +145,11 @@ public:
   void SetBeamId (uint32_t beamId);
 
   /**
+   * Tell whether or not this channel is transmitting data
+   */
+  bool IsTransmitting (void) const;
+
+  /**
    * Tell whether or not this channel can transmit data
    */
   bool CanTransmit (void) const;

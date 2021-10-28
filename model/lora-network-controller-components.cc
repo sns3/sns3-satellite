@@ -33,7 +33,6 @@ LoraNetworkControllerComponent::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::LoraNetworkControllerComponent")
     .SetParent<Object> ()
-    .SetGroupName ("lorawan")
   ;
   return tid;
 }
@@ -54,8 +53,7 @@ LoraConfirmedMessagesComponent::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::LoraConfirmedMessagesComponent")
     .SetParent<LoraNetworkControllerComponent> ()
-    .AddConstructor<LoraConfirmedMessagesComponent> ()
-    .SetGroupName ("lorawan");
+    .AddConstructor<LoraConfirmedMessagesComponent> ();
   return tid;
 }
 
@@ -131,8 +129,7 @@ LoraLinkCheckComponent::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::LoraLinkCheckComponent")
     .SetParent<LoraNetworkControllerComponent> ()
-    .AddConstructor<LoraLinkCheckComponent> ()
-    .SetGroupName ("lorawan");
+    .AddConstructor<LoraLinkCheckComponent> ();
   return tid;
 }
 

@@ -16,6 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Davide Magrin <magrinda@dei.unipd.it>
+ *
+ * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
 #include "ns3/lora-tag.h"
@@ -31,7 +33,6 @@ LoraTag::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::LoraTag")
     .SetParent<Tag> ()
-    .SetGroupName ("lorawan")
     .AddConstructor<LoraTag> ()
   ;
   return tid;

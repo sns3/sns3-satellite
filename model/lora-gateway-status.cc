@@ -33,8 +33,7 @@ TypeId
 LoraGatewayStatus::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::LoraGatewayStatus")
-    .AddConstructor<LoraGatewayStatus> ()
-    .SetGroupName ("lorawan");
+    .AddConstructor<LoraGatewayStatus> ();
   return tid;
 }
 

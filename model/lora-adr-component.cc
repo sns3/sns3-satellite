@@ -35,7 +35,6 @@ NS_OBJECT_ENSURE_REGISTERED (LoraAdrComponent);
 TypeId LoraAdrComponent::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::LoraAdrComponent")
-    .SetGroupName ("lorawan")
     .AddConstructor<LoraAdrComponent> ()
     .SetParent<LoraNetworkControllerComponent> ()
     .AddAttribute ("MultipleGwCombiningMethod",

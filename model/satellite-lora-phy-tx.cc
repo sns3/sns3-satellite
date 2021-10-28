@@ -71,11 +71,12 @@ SatLoraPhyTx::EndTx ()
   SatPhyTx::EndTx ();
 }
 
-bool SatLoraPhyTx::IsTransmitting ()
+bool
+SatLoraPhyTx::IsTransmitting ()
 {
   NS_LOG_FUNCTION (this);
 
-  return m_isTransmitting;
+  return m_isTransmitting && SatPhyTx::IsTransmitting ();
 }
 
 }

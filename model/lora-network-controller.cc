@@ -32,8 +32,7 @@ TypeId
 LoraNetworkController::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::LoraNetworkController")
-    .AddConstructor<LoraNetworkController> ()
-    .SetGroupName ("lorawan");
+    .AddConstructor<LoraNetworkController> ();
   return tid;
 }
 

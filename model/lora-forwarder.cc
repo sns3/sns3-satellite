@@ -22,11 +22,13 @@
 
 #include <ns3/log.h>
 
+#include <ns3/lora-beam-tag.h>
+
 #include "ns3/lora-forwarder.h"
 
-namespace ns3 {
-
 NS_LOG_COMPONENT_DEFINE ("LoraForwarder");
+
+namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (LoraForwarder);
 
@@ -35,8 +37,7 @@ LoraForwarder::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::LoraForwarder")
     .SetParent<Application> ()
-    .AddConstructor<LoraForwarder> ()
-    .SetGroupName ("lorawan");
+    .AddConstructor<LoraForwarder> ();
   return tid;
 }
 
@@ -59,21 +60,24 @@ LoraForwarder::SetPointToPointNetDevice (Ptr<PointToPointNetDevice> pointToPoint
 }
 
 void
-LoraForwarder::SetLoraNetDevice (Ptr<SatLorawanNetDevice> loraNetDevice)
+LoraForwarder::SetLoraNetDevice (uint8_t beamId, Ptr<SatLorawanNetDevice> loraNetDevice)
 {
   NS_LOG_FUNCTION (this << loraNetDevice);
 
-  m_satLorawanNetDevice = loraNetDevice;
+  m_satLorawanNetDevices[beamId] = loraNetDevice;
 }
 
 bool
-LoraForwarder::ReceiveFromLora (Ptr<NetDevice> loraNetDevice, Ptr<const Packet> packet, uint16_t protocol, const Address& sender)
+LoraForwarder::ReceiveFromLora (Ptr<SatLorawanNetDevice> loraNetDevice, Ptr<const Packet> packet, uint16_t protocol, const Address& sender)
 {
   NS_LOG_FUNCTION (this << packet << protocol << sender);
 
   Ptr<Packet> packetCopy = packet->Copy ();
 
-  m_pointToPointNetDevice->Send (packetCopy, m_pointToPointNetDevice->GetBroadcast (), 0x800);
+  LoraBeamTag beamTag = LoraBeamTag (loraNetDevice->GetLorawanMac ()->GetBeamId ());
+  packetCopy->AddPacketTag (beamTag);
+
+  m_pointToPointNetDevice->Send (packetCopy, m_pointToPointNetDevice->GetBroadcast (), protocol);
 
   return true;
 }
@@ -85,8 +89,12 @@ LoraForwarder::ReceiveFromPointToPoint (Ptr<NetDevice> pointToPointNetDevice, Pt
 
   Ptr<Packet> packetCopy = packet->Copy ();
 
+  LoraBeamTag tag;
+  packetCopy->RemovePacketTag(tag);
+  uint8_t beamId = tag.GetBeamId ();
+
   // TODO not sure address is correct...
-  m_satLorawanNetDevice->Send (packetCopy, sender, 0x800);
+  m_satLorawanNetDevices[beamId]->Send (packetCopy, sender, protocol);
 
   return true;
 }

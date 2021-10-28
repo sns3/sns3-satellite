@@ -1620,6 +1620,7 @@ SimulationHelper::SetBeams (const std::string& enabledBeams)
   NS_LOG_FUNCTION (this << enabledBeams);
 
   m_enabledBeamsStr = enabledBeams;
+  m_enabledBeams.clear ();
   std::stringstream bss (enabledBeams);
 
   while (!bss.eof ())

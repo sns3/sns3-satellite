@@ -42,8 +42,8 @@ int
 main (int argc, char *argv[])
 {
   // Variables
-  //std::string beams = "1 2 3 4 5 6 7 8";
-  std::string beams = "8";
+  std::string beams = "3 4 5 6";
+  //std::string beams = "8";
   uint32_t nbGwUser = 1;
   uint32_t nbUtsPerBeam = 100;
   uint32_t nbEndUsersPerUt = 1;
@@ -262,6 +262,11 @@ main (int argc, char *argv[])
       s->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
       s->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
       s->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+      s->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddGlobalFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddGlobalFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
     }
 
   simulationHelper->RunSimulation ();

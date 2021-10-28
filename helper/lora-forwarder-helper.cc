@@ -97,7 +97,8 @@ LoraForwarderHelper::InstallPriv (Ptr<Node> node) const
       if (currentNetDevice->GetObject<SatLorawanNetDevice> () != 0)
         {
           Ptr<SatLorawanNetDevice> loraNetDevice = currentNetDevice->GetObject<SatLorawanNetDevice> ();
-          app->SetLoraNetDevice (loraNetDevice);
+          uint8_t beamId = loraNetDevice->GetLorawanMac ()->GetBeamId ();
+          app->SetLoraNetDevice (beamId, loraNetDevice);
           loraNetDevice->SetReceiveNetworkServerCallback (MakeCallback (&LoraForwarder::ReceiveFromLora, app));
         }
       else if (currentNetDevice->GetObject<PointToPointNetDevice> () != 0)

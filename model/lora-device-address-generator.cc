@@ -33,7 +33,6 @@ LoraDeviceAddressGenerator::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::LoraDeviceAddressGenerator")
     .SetParent<Object> ()
-    .SetGroupName ("lorawan")
     .AddConstructor<LoraDeviceAddressGenerator> ();
   return tid;
 }

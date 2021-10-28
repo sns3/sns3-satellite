@@ -86,29 +86,6 @@ public:
   virtual void StartRx (Ptr<SatSignalParameters> rxParams);
 
   /**
-   * Finish reception of a packet.
-   *
-   * This method is scheduled by StartReceive, based on the packet duration. By
-   * passing a LoraInterferenceHelper Event to this method, the class will be
-   * able to identify the packet that is being received among all those that
-   * were registered as interference by StartReceive.
-   *
-   * \param packet The received packet.
-   */
-  void EndReceive (Ptr<Packet> packet);
-
-  /**
-   * Instruct the PHY to send a packet according to some parameters.
-   *
-   * \param packet The packet to send.
-   * \param txParams The desired transmission parameters.
-   * \param frequencyMHz The frequency on which to transmit.
-   * \param txPowerDbm The power in dBm with which to transmit the packet.
-   */
-  void Send (Ptr<Packet> packet, LoraTxParameters txParams,
-                     double frequencyMHz, double txPowerDbm);
-
-  /**
    * Whether this device is transmitting or not.
    *
    * \returns true if the device is currently transmitting a packet, false

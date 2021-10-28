@@ -199,6 +199,13 @@ public:
   uint8_t GetModcod (void);
 
   /**
+   * Get the beam ID this device is using.
+   *
+   * \return An unsigned 8-bit integer containing the beam ID index.
+   */
+  uint8_t GetBeamId (void);
+
+  /**
    * Get the spreading factor this device is using in the first receive window.
    *
    * \return An unsigned 8-bit integer containing the spreading factor.
@@ -235,6 +242,11 @@ public:
    * Set the modcod this device is using.
    */
   void SetModcod (uint8_t modcod);
+
+  /**
+   * Set the beam ID this device is using.
+   */
+  void SetBeamId (uint8_t beamId);
 
   /**
    * Set the spreading factor this device is using in the first receive window.
@@ -332,6 +344,7 @@ public:
 private:
   // Receive window data
   uint8_t m_modcod;
+  uint8_t m_beamId;
   uint8_t m_firstReceiveWindowSpreadingFactor = 0;
   double m_firstReceiveWindowFrequency = 0;
   uint8_t m_secondReceiveWindowOffset = 0;

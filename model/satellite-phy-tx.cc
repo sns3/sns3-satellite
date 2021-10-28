@@ -299,6 +299,14 @@ SatPhyTx::SetBeamId (uint32_t beamId)
 }
 
 bool
+SatPhyTx::IsTransmitting () const
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_state == TX;
+}
+
+bool
 SatPhyTx::CanTransmit (void) const
 {
   NS_LOG_FUNCTION (this);

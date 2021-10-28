@@ -34,6 +34,7 @@
 #include "ns3/lorawan-mac-header.h"
 #include "ns3/lora-frame-header.h"
 #include "ns3/lora-tag.h"
+#include "ns3/lora-beam-tag.h"
 
 namespace ns3 {
 
@@ -44,8 +45,7 @@ LoraEndDeviceStatus::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::LoraEndDeviceStatus")
                           .SetParent<Object> ()
-                          .AddConstructor<LoraEndDeviceStatus> ()
-                          .SetGroupName ("lorawan");
+                          .AddConstructor<LoraEndDeviceStatus> ();
   return tid;
 }
 
@@ -82,6 +82,13 @@ LoraEndDeviceStatus::GetModcod ()
 {
   NS_LOG_FUNCTION_NOARGS ();
   return m_modcod;
+}
+
+uint8_t
+LoraEndDeviceStatus::GetBeamId ()
+{
+  NS_LOG_FUNCTION_NOARGS ();
+  return m_beamId;
 }
 
 uint8_t
@@ -203,6 +210,13 @@ LoraEndDeviceStatus::SetModcod (uint8_t modcod)
 }
 
 void
+LoraEndDeviceStatus::SetBeamId (uint8_t beamId)
+{
+  NS_LOG_FUNCTION (this << beamId);
+  m_beamId = beamId;
+}
+
+void
 LoraEndDeviceStatus::SetFirstReceiveWindowSpreadingFactor (uint8_t sf)
 {
   NS_LOG_FUNCTION (this << sf);
@@ -262,6 +276,11 @@ LoraEndDeviceStatus::InsertReceivedPacket (Ptr<Packet const> receivedPacket, con
 
   // Create a copy of the packet
   Ptr<Packet> myPacket = receivedPacket->Copy ();
+
+  // Update current parameters
+  LoraBeamTag beamTag;
+  myPacket->RemovePacketTag (beamTag);
+  SetBeamId (beamTag.GetBeamId ());
 
   // Extract the headers
   LorawanMacHeader macHdr;

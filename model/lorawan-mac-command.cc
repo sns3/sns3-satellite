@@ -36,7 +36,6 @@ LorawanMacCommand::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::LorawanMacCommand")
     .SetParent<Object> ()
-    .SetGroupName ("lorawan")
   ;
   return tid;
 }

@@ -33,8 +33,7 @@ TypeId
 LoraSubBand::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::LoraSubBand")
-    .SetParent<Object> ()
-    .SetGroupName ("lorawan");
+    .SetParent<Object> ();
   return tid;
 }
 

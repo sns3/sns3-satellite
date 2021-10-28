@@ -27,6 +27,7 @@
 #include "ns3/log.h"
 #include "ns3/pointer.h"
 
+#include "ns3/lora-beam-tag.h"
 #include "ns3/lora-device-address.h"
 #include "ns3/lora-network-status.h"
 #include "ns3/lora-end-device-status.h"
@@ -42,8 +43,7 @@ TypeId
 LoraNetworkStatus::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::LoraNetworkStatus")
-    .AddConstructor<LoraNetworkStatus> ()
-    .SetGroupName ("lorawan");
+    .AddConstructor<LoraNetworkStatus> ();
   return tid;
 }
 
@@ -198,6 +198,11 @@ LoraNetworkStatus::GetReplyForDevice (LoraDeviceAddress edAddress, int windowNum
     }
 
   packet->AddPacketTag (tag);
+
+  // Apply the appropriate tag
+  LoraBeamTag beamTag;
+  beamTag.SetBeamId (edStatus->GetBeamId ());
+  packet->AddPacketTag (beamTag);
   return packet;
 }
 

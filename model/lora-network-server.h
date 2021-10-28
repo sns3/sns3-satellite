@@ -96,8 +96,7 @@ public:
    * Receive a packet from a gateway.
    * \param packet the received packet
    */
-  bool Receive (Ptr<NetDevice> device, Ptr<const Packet> packet, uint16_t protocol,
-                const Address &address);
+  bool Receive (Ptr<NetDevice> device, Ptr<const Packet> packet, uint16_t protocol, const Address &address);
 
   Ptr<LoraNetworkStatus> GetNetworkStatus (void);
 

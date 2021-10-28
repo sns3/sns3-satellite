@@ -114,6 +114,13 @@ LorawanMacEndDeviceClassA::SendToPhy (Ptr<Packet> packetToSend)
 
   NS_LOG_DEBUG ("PacketToSend: " << packetToSend);
 
+  if (m_phyTx->IsTransmitting ())
+    {
+      // Device already transmitting!
+      NS_LOG_WARN ("End Device is already transmitting. Aborting.");
+      return;
+    }
+
   // Data Rate Adaptation as in LoRaWAN specification, V1.0.2 (2016)
   if (m_enableDRAdapt && (m_dataRate > 0)
       && (m_retxParams.retxLeft < m_maxNumbTx)
@@ -133,8 +140,6 @@ LorawanMacEndDeviceClassA::SendToPhy (Ptr<Packet> packetToSend)
       packetToSend->RemovePacketTag (satDevTag);
       packetToSend->AddPacketTag (SatDevTimeTag (Simulator::Now ()));
     }
-
-  m_phyRx->SwitchToTx ();
 
   uint32_t allocationChannel = 0; // TODO is really zero here ?
   Ptr<SatSuperframeConf> superframeConf = m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE);
@@ -185,6 +190,7 @@ LorawanMacEndDeviceClassA::SendToPhy (Ptr<Packet> packetToSend)
   // Compute packet duration
   Time duration = GetOnAirTime (packetToSend, params);
 
+  m_phyRx->SwitchToTx ();
   m_phy->SendPdu (packets, carrierId, duration, txInfo);
 
   NS_LOG_DEBUG ("PacketToSend: " << packetToSend);

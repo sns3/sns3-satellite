@@ -35,8 +35,7 @@ TypeId
 LoraLogicalChannelHelper::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::LoraLogicalChannelHelper")
-    .SetParent<Object> ()
-    .SetGroupName ("lorawan");
+    .SetParent<Object> ();
   return tid;
 }
 

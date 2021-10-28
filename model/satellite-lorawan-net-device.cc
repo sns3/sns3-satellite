@@ -114,7 +114,8 @@ SatLorawanNetDevice::Receive (Ptr<const Packet> packet)
   // Forward to Network Server if on GW.
   if (m_nodeInfo->GetNodeType () == SatEnums::NT_GW)
     {
-      m_rxNetworkServerCallback (this, packet->Copy (), Ipv4L3Protocol::PROT_NUMBER, Address ());
+      Ptr<Packet> pktCopy = packet->Copy ();
+      m_rxNetworkServerCallback (this, pktCopy, Ipv4L3Protocol::PROT_NUMBER, Address ());
     }
 
   // Pass the packet to the upper layer if IP header in packet (GW or UT side)

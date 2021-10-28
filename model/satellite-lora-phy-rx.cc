@@ -44,7 +44,6 @@ SatLoraPhyRx::~SatLoraPhyRx ()
 {
 }
 
-// TODO implement it
 void
 SatLoraPhyRx::StartRx (Ptr<SatSignalParameters> rxParams)
 {
@@ -75,51 +74,12 @@ SatLoraPhyRx::StartRx (Ptr<SatSignalParameters> rxParams)
     // incoming transmission
     case STANDBY:
       {
-        // There are a series of properties the packet needs to respect in order
-        // for us to be able to lock on it:
-        // - It's on frequency we are listening on
-        // - It uses the SF we are configured to look for
-        // - Its receive power is above the device sensitivity for that SF
-
-        // Flag to signal whether we can receive the packet or not
-        // bool canLockOnPacket = true;
-
-        // Save needed sensitivity
-        // double sensitivity = EndDeviceLoraPhy::sensitivity[unsigned(sf) - 7];
-
-        // Check frequency
-        //////////////////
-
-        // Check Spreading Factor
-        /////////////////////////
-
-        // Check Sensitivity
-        ////////////////////
-
-        // Check if one of the above failed
-        ///////////////////////////////////
         SatPhyRx::StartRx (rxParams);
         break;
       }
     }
 }
 
-// TODO implement it
-void
-SatLoraPhyRx::EndReceive (Ptr<Packet> packet)
-{
-
-}
-
-// TODO implement it
-void
-SatLoraPhyRx::Send (Ptr<Packet> packet, LoraTxParameters txParams,
-                     double frequencyMHz, double txPowerDbm)
-{
-
-}
-
-// TODO implement it
 bool
 SatLoraPhyRx::IsTransmitting (void)
 {
