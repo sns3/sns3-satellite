@@ -608,8 +608,6 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
 
   mac->SetPhy (phy);
   mac->SetPhyRx (DynamicCast<SatLoraPhyRx> (phy->GetPhyRx ()));
-  mac->SetPhyTx (DynamicCast<SatLoraPhyTx> (phy->GetPhyTx ()));
-
   mac->SetRaModel (m_raSettings.m_randomAccessModel);
 
   // Set the device address and pass it to MAC as well

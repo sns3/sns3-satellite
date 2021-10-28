@@ -114,7 +114,7 @@ LorawanMacEndDeviceClassA::SendToPhy (Ptr<Packet> packetToSend)
 
   NS_LOG_DEBUG ("PacketToSend: " << packetToSend);
 
-  if (m_phyTx->IsTransmitting ())
+  if (DynamicCast<SatLoraPhyTx> (m_phy->GetPhyTx ())->IsTransmitting ())
     {
       // Device already transmitting!
       NS_LOG_WARN ("End Device is already transmitting. Aborting.");

@@ -97,19 +97,7 @@ LorawanMac::SetPhy (Ptr<SatPhy> phy)
 {
   // Set the phy
   m_phy = phy;
-}
-
-Ptr<SatLoraPhyTx>
-LorawanMac::GetPhyTx (void)
-{
-  return m_phyTx;
-}
-
-void
-LorawanMac::SetPhyTx (Ptr<SatLoraPhyTx> phyTx)
-{
-  m_phyTx = phyTx;
-  m_phyTx->SetTxFinishedCallback (MakeCallback (&LorawanMac::TxFinished, this));
+  DynamicCast<SatLoraPhyTx> (m_phy->GetPhyTx ())->SetTxFinishedCallback (MakeCallback (&LorawanMac::TxFinished, this));
 }
 
 LoraLogicalChannelHelper

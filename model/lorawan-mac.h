@@ -273,11 +273,6 @@ protected:
   Ptr<SatPhy> m_phy;
 
   /**
-   * The PHY TX instance that sits under this MAC layer.
-   */
-  Ptr<SatLoraPhyTx> m_phyTx;
-
-  /**
    * The device this MAC layer is installed on.
    */
   Ptr<NetDevice> m_device;

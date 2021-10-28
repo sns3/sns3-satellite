@@ -146,7 +146,7 @@ LorawanMacGateway::Send (Ptr<Packet> packet)
 bool
 LorawanMacGateway::IsTransmitting (void)
 {
-  return m_phyTx->IsTransmitting ();
+  return DynamicCast<SatLoraPhyTx> (m_phy->GetPhyTx ())->IsTransmitting ();
 }
 
 void

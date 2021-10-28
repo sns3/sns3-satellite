@@ -551,7 +551,6 @@ SatGwHelper::InstallLora (Ptr<Node> n,
   mac->SetDevice (dev);
 
   mac->SetPhy (phy);
-  mac->SetPhyTx (DynamicCast<SatLoraPhyTx> (phy->GetPhyTx ()));
 
   // Set the device address and pass it to MAC as well
   Mac48Address addr = Mac48Address::Allocate ();
