@@ -33,7 +33,7 @@ using namespace ns3;
  * \file sat-lora-example.cc
  * \ingroup satellite
  *
- * \brief This file allows to create a E-SSA scenario
+ * \brief This file allows to create a scenario with Lora configuration
  */
 
 NS_LOG_COMPONENT_DEFINE ("sat-lora-example");

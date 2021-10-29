@@ -132,6 +132,8 @@ LorawanMacEndDeviceClassA::SendToPhy (Ptr<Packet> packetToSend)
 
   if (m_isStatisticsTagsEnabled)
     {
+      SatMacTimeTag satMacTag;
+      packetToSend->RemovePacketTag (satMacTag); // If packet is retransmitted, it already has a tag, updating it
       packetToSend->AddPacketTag (SatMacTimeTag (Simulator::Now ()));
 
       // Add a SatAddressTag tag with this device's address as the source address.

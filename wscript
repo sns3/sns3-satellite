@@ -239,6 +239,7 @@ def build(bld):
         'test/satellite-scenario-creation.cc',
         'test/satellite-simple-unicast.cc',
         'test/satellite-waveform-conf-test.cc',
+        'test/satellite-lora-test.cc',
         ]
 
     headers = bld(features='ns3header')
