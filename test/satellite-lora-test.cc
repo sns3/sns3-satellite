@@ -490,7 +490,139 @@ SatLoraOutOfWindowWindowTestCase::DoRun (void)
 
 /**
  * \ingroup satellite
- * \brief Test case to check if ppacket is received on App layer.
+ * \brief Test case to check that packet is not retransmitted if ack outside of both windows but no retransmission asked.
+ *
+ *  Expected result:
+ *    Ack is not received and packet is not retransmitted.
+ *
+ */
+class SatLoraOutOfWindowWindowNoRetransmissionTestCase : public TestCase
+{
+public:
+  SatLoraOutOfWindowWindowNoRetransmissionTestCase ();
+  virtual ~SatLoraOutOfWindowWindowNoRetransmissionTestCase ();
+
+private:
+  virtual void DoRun (void);
+  void MacTraceCb ( std::string context, Ptr<const Packet> packet, const Address & address);
+  void PhyTraceCb ( std::string context, Ptr<const Packet> packet, const Address & address);
+
+  std::vector<Time> m_gwReceiveDates;
+  Time m_edReceiveDate;
+
+  Address m_gwAddress;
+  Address m_edAddress;
+};
+
+SatLoraOutOfWindowWindowNoRetransmissionTestCase::SatLoraOutOfWindowWindowNoRetransmissionTestCase ()
+  : TestCase ("Test satellite lorawan with acks sent in second window."),
+  m_edReceiveDate (Seconds(0))
+{
+}
+
+SatLoraOutOfWindowWindowNoRetransmissionTestCase::~SatLoraOutOfWindowWindowNoRetransmissionTestCase ()
+{
+}
+
+void
+SatLoraOutOfWindowWindowNoRetransmissionTestCase::MacTraceCb ( std::string context, Ptr<const Packet> packet, const Address & address)
+{
+  if (address == m_edAddress)
+    {
+      m_gwReceiveDates.push_back (Simulator::Now ());
+    }
+
+  if (address == m_gwAddress)
+    {
+      m_edReceiveDate = Simulator::Now ();
+    }
+}
+
+void
+SatLoraOutOfWindowWindowNoRetransmissionTestCase::DoRun (void)
+{
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-lora", "out-of-window", true);
+
+  // Enable Lora
+  Config::SetDefault ("ns3::SatHelper::Standard", EnumValue (SatEnums::LORA));
+  Config::SetDefault ("ns3::LorawanMacEndDevice::DataRate", UintegerValue (5));
+  Config::SetDefault ("ns3::LorawanMacEndDevice::MType", EnumValue (LorawanMacHeader::UNCONFIRMED_DATA_UP));
+  Config::SetDefault ("ns3::SatLorawanNetDevice::ForwardToUtUsers", BooleanValue (false));
+  Config::SetDefault ("ns3::SatLoraConf::Standard", EnumValue (SatLoraConf::SATELLITE));
+
+  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::FirstWindowDelay", TimeValue (MilliSeconds (1500)));
+  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::SecondWindowDelay", TimeValue (Seconds (2)));
+  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::FirstWindowDuration", TimeValue (MilliSeconds (400)));
+  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::SecondWindowDuration", TimeValue (MilliSeconds (400)));
+  // Send answer too early
+  Config::SetDefault ("ns3::LoraNetworkScheduler::FirstWindowAnswerDelay", TimeValue (Seconds (0.1)));
+  Config::SetDefault ("ns3::LoraNetworkScheduler::SecondWindowAnswerDelay", TimeValue (Seconds (2)));
+
+  // Superframe configuration
+  Config::SetDefault ("ns3::SatConf::SuperFrameConfForSeq0", EnumValue (SatSuperframeConf::SUPER_FRAME_CONFIG_4));
+  Config::SetDefault ("ns3::SatSuperframeConf4::FrameConfigType", EnumValue (SatSuperframeConf::CONFIG_TYPE_4));
+  Config::SetDefault ("ns3::SatSuperframeConf4::Frame0_AllocatedBandwidthHz", DoubleValue (15000));
+  Config::SetDefault ("ns3::SatSuperframeConf4::Frame0_CarrierAllocatedBandwidthHz", DoubleValue (15000));
+
+  // CRDSA only
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (false));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue (false));
+
+  // Configure RA
+  Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_ESSA));
+  Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceEliminationModel", EnumValue (SatPhyRxCarrierConf::SIC_RESIDUAL));
+  Config::SetDefault ("ns3::SatBeamHelper::RaCollisionModel", EnumValue (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
+  Config::SetDefault ("ns3::SatBeamHelper::ReturnLinkLinkResults", EnumValue (SatEnums::LR_LORA));
+  Config::SetDefault ("ns3::SatWaveformConf::DefaultWfId", UintegerValue (2));
+  Config::SetDefault ("ns3::SatHelper::RtnLinkWaveformConfFileName", StringValue("loraWaveforms.txt"));
+
+  // Configure E-SSA
+  Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::WindowDuration", StringValue ("600ms"));
+  Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::WindowStep", StringValue ("200ms"));
+  Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::WindowSICIterations", UintegerValue (5));
+  Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::EnableSIC", BooleanValue (false));
+
+  Config::SetDefault ("ns3::SatMac::EnableStatisticsTags", BooleanValue (true));
+  Config::SetDefault ("ns3::SatPhy::EnableStatisticsTags", BooleanValue (true));
+
+  // Creating the reference system.
+  Ptr<SatHelper> helper = CreateObject<SatHelper> ();
+  helper->CreatePredefinedScenario (SatHelper::SIMPLE);
+
+  // >>> Start of actual test using Simple scenario >>>
+  Ptr<Node> utNode = helper->UtNodes ().Get (0);
+  Ptr<LoraPeriodicSender> app = Create<LoraPeriodicSender> ();
+
+  app->SetInterval (Seconds (10));
+
+  app->SetStartTime (Seconds (1.0));
+  app->SetStopTime (Seconds (10.0));
+  app->SetPacketSize (24);
+
+  app->SetNode (utNode);
+  utNode->AddApplication (app);
+
+  m_gwAddress = helper->GwNodes ().Get (0)->GetDevice (1)->GetAddress ();
+  m_edAddress = helper->UtNodes ().Get (0)->GetDevice (2)->GetAddress ();
+
+  Config::Connect ("/NodeList/*/DeviceList/*/SatMac/Rx", MakeCallback (&SatLoraOutOfWindowWindowNoRetransmissionTestCase::MacTraceCb, this));
+
+  Simulator::Stop (Seconds (10));
+  Simulator::Run ();
+
+  Simulator::Destroy ();
+
+  Singleton<SatEnvVariables>::Get ()->DoDispose ();
+
+  NS_TEST_ASSERT_MSG_EQ (m_gwReceiveDates.size (), 1, "GW should receive a packet but no retransmission.");
+  NS_TEST_ASSERT_MSG_EQ (m_edReceiveDate, Seconds (0), "No ack should be received by End Device.");
+}
+
+/**
+ * \ingroup satellite
+ * \brief Test case to check if packet is received on App layer.
  *
  *  Expected result:
  *    Rx and Sink callbacks have data.
@@ -654,6 +786,7 @@ SatLoraTestSuite::SatLoraTestSuite ()
   AddTestCase (new SatLoraFirstWindowTestCase, TestCase::QUICK);
   AddTestCase (new SatLoraSecondWindowTestCase, TestCase::QUICK);
   AddTestCase (new SatLoraOutOfWindowWindowTestCase, TestCase::QUICK);
+  AddTestCase (new SatLoraOutOfWindowWindowNoRetransmissionTestCase, TestCase::QUICK);
   AddTestCase (new SatLoraCbrTestCase, TestCase::QUICK);
 }
 
