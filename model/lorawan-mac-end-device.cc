@@ -29,6 +29,7 @@
 #include "ns3/ipv4-header.h"
 
 #include "ns3/satellite-phy.h"
+#include "ns3/satellite-time-tag.h"
 
 #include "ns3/lora-tag.h"
 #include "ns3/lorawan-mac-end-device.h"
@@ -289,6 +290,9 @@ LorawanMacEndDevice::DoSend (Ptr<Packet> packet)
   // this is a retransmission
   else
     {
+      // Removing SatPhyTimeTag if it exists
+      SatPhyTimeTag satPhyTimeTag;
+      packet->RemovePacketTag (satPhyTimeTag);
       if (m_retxParams.waitingAck)
         {
 

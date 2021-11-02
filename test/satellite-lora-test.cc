@@ -350,17 +350,23 @@ public:
 private:
   virtual void DoRun (void);
   void MacTraceCb ( std::string context, Ptr<const Packet> packet, const Address & address);
+  void PhyTraceCb ( std::string context, Ptr<const Packet> packet, const Address & address);
 
   std::vector<Time> m_gwReceiveDates;
   Time m_edReceiveDate;
 
   Address m_gwAddress;
   Address m_edAddress;
+
+  bool m_phyGwReceive;
+  bool m_phyEdReceive;
 };
 
 SatLoraOutOfWindowWindowTestCase::SatLoraOutOfWindowWindowTestCase ()
   : TestCase ("Test satellite lorawan with acks sent in second window."),
-  m_edReceiveDate (Seconds(0))
+  m_edReceiveDate (Seconds(0)),
+  m_phyGwReceive (false),
+  m_phyEdReceive (false)
 {
 }
 
@@ -379,6 +385,20 @@ SatLoraOutOfWindowWindowTestCase::MacTraceCb ( std::string context, Ptr<const Pa
   if (address == m_gwAddress)
     {
       m_edReceiveDate = Simulator::Now ();
+    }
+}
+
+void
+SatLoraOutOfWindowWindowTestCase::PhyTraceCb ( std::string context, Ptr<const Packet> packet, const Address & address)
+{
+  if (address == m_edAddress)
+    {
+      m_phyGwReceive = true;
+    }
+
+  if (address == m_gwAddress)
+    {
+      m_phyEdReceive = true;
     }
 }
 
@@ -429,6 +449,7 @@ SatLoraOutOfWindowWindowTestCase::DoRun (void)
   Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::EnableSIC", BooleanValue (false));
 
   Config::SetDefault ("ns3::SatMac::EnableStatisticsTags", BooleanValue (true));
+  Config::SetDefault ("ns3::SatPhy::EnableStatisticsTags", BooleanValue (true));
 
   // Creating the reference system.
   Ptr<SatHelper> helper = CreateObject<SatHelper> ();
@@ -451,6 +472,7 @@ SatLoraOutOfWindowWindowTestCase::DoRun (void)
   m_edAddress = helper->UtNodes ().Get (0)->GetDevice (2)->GetAddress ();
 
   Config::Connect ("/NodeList/*/DeviceList/*/SatMac/Rx", MakeCallback (&SatLoraOutOfWindowWindowTestCase::MacTraceCb, this));
+  Config::Connect ("/NodeList/*/DeviceList/*/SatPhy/Rx", MakeCallback (&SatLoraOutOfWindowWindowTestCase::PhyTraceCb, this));
 
   Simulator::Stop (Seconds (10));
   Simulator::Run ();
@@ -461,6 +483,9 @@ SatLoraOutOfWindowWindowTestCase::DoRun (void)
 
   NS_TEST_ASSERT_MSG_EQ (m_gwReceiveDates.size (), 2, "GW should receive a packet and the first retransmission.");
   NS_TEST_ASSERT_MSG_EQ (m_edReceiveDate, Seconds (0), "No ack should be received by End Device.");
+
+  NS_TEST_ASSERT_MSG_EQ (m_phyGwReceive, true, "Phy layer should trace traffic from End Device to Gateway.");
+  NS_TEST_ASSERT_MSG_EQ (m_phyEdReceive, false, "Phy layer should not trace traffic from Gateway to End Device, as phy layer is in SLEEP state.");
 }
 
 /**
