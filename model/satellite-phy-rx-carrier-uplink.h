@@ -76,8 +76,9 @@ public:
   /**
    * \brief Function for starting packet reception from the SatChannel
    * \param rxParams The needed parameters for the received signal
+   * \return true if packet is destinated to this beam
    */
-  void StartRx (Ptr<SatSignalParameters> rxParams);
+  bool StartRx (Ptr<SatSignalParameters> rxParams);
 
 protected:
   /**

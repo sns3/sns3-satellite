@@ -61,19 +61,24 @@ SatPhyRxCarrierUplink::CreateInterference (Ptr<SatSignalParameters> rxParams, Ad
   return GetInterferenceModel ()->Add (rxParams->m_duration, rxParams->m_rxPower_W, senderAddress);
 }
 
-void
+bool
 SatPhyRxCarrierUplink::StartRx (Ptr<SatSignalParameters> rxParams)
 {
   NS_LOG_FUNCTION (this << rxParams);
 
-  this->SatPhyRxCarrier::StartRx (rxParams);
+  if (this->SatPhyRxCarrier::StartRx (rxParams))
+    {
+      /// PHY transmission decoded successfully. Note, that at transparent satellite,
+      /// all the transmissions are not decoded.
+      bool phyError (false);
 
-  /// PHY transmission decoded successfully. Note, that at transparent satellite,
-  /// all the transmissions are not decoded.
-  bool phyError (false);
+      // Forward packet to ground entity without delay in the satellite
+      m_rxCallback (rxParams, phyError);
 
-  // Forward packet to ground entity without delay in the satellite
-  m_rxCallback (rxParams, phyError);
+      return true;
+    }
+
+  return false;
 }
 
 void

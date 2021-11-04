@@ -343,7 +343,7 @@ SatPhyRxCarrier::GetReceiveParams (Ptr<SatSignalParameters> rxParams)
 }
 
 
-void
+bool
 SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
 {
   NS_LOG_FUNCTION (this << rxParams);
@@ -396,6 +396,8 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
             Simulator::Schedule (rxParams->m_duration, &SatPhyRxCarrier::EndRxData, this, key);
 
             IncreaseNumOfRxState (rxParams->m_txInfo.packetType);
+
+            return true;
           }
         break;
       }
@@ -405,6 +407,8 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
         break;
       }
     }
+
+  return false;
 }
 
 
