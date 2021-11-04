@@ -1048,6 +1048,14 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
           }
         break;
       }
+    case SatControlMsgTag::SAT_NCR_CTRL_MSG:
+      {
+        uint32_t ncrCtrlId = ctrlTag.GetMsgId ();
+        Ptr<SatNcrMessage> ncrMsg = DynamicCast<SatNcrMessage> (m_readCtrlCallback (ncrCtrlId));
+
+        std::cout << "Receive NCR control message with NCR = " << ncrMsg->GetNcrDate () << std::endl;
+        break;
+      }
     default:
       {
         NS_FATAL_ERROR ("SatUtMac received a non-supported control packet!");

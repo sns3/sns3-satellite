@@ -968,6 +968,63 @@ SatLogonResponseMessage::GetSizeInBytes () const
 }
 
 
+NS_OBJECT_ENSURE_REGISTERED (SatNcrMessage);
+
+TypeId
+SatNcrMessage::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatNcrMessage")
+    .SetParent<SatControlMessage> ()
+    .AddConstructor<SatNcrMessage> ()
+  ;
+  return tid;
+}
+
+TypeId
+SatNcrMessage::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
+}
+
+SatNcrMessage::SatNcrMessage ()
+{
+  NS_LOG_FUNCTION (this);
+
+  std::cout << "New NCR control message" << std::endl;
+}
+
+SatNcrMessage::~SatNcrMessage ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+void
+SatNcrMessage::SetNcrDate (uint64_t ncr)
+{
+  NS_LOG_FUNCTION (this << ncr);
+  m_ncrDate = ncr;
+}
+
+uint64_t
+SatNcrMessage::GetNcrDate () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_ncrDate;
+}
+
+uint32_t
+SatNcrMessage::GetSizeInBytes () const
+{
+  NS_LOG_FUNCTION (this);
+
+  // 33 bits for base, 9 bits for extension, 6 bits reserved
+  uint32_t size = 6;
+  return size;
+}
+
+
 // Control message container
 
 NS_LOG_COMPONENT_DEFINE ("SatControlMsgContainer");

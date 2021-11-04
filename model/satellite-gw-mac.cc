@@ -60,6 +60,11 @@ SatGwMac::GetTypeId (void)
                    TimeValue (MicroSeconds (1)),
                    MakeTimeAccessor (&SatGwMac::m_guardTime),
                    MakeTimeChecker ())
+    .AddAttribute ("NcrBroadcastPeriod",
+                   "Interval between two broadcast of NCR dates",
+                   TimeValue (MilliSeconds (100)),
+                   MakeTimeAccessor (&SatGwMac::m_ncrInterval),
+                   MakeTimeChecker ())
     .AddTraceSource ("BBFrameTxTrace",
                      "Trace for transmitted BB Frames.",
                      MakeTraceSourceAccessor (&SatGwMac::m_bbFrameTxTrace),
@@ -71,7 +76,8 @@ SatGwMac::GetTypeId (void)
 SatGwMac::SatGwMac ()
   : SatMac (),
   m_fwdScheduler (),
-  m_guardTime (MicroSeconds (1))
+  m_guardTime (MicroSeconds (1)),
+  m_ncrInterval (MilliSeconds (100))
 {
   NS_LOG_FUNCTION (this);
 }
@@ -79,7 +85,8 @@ SatGwMac::SatGwMac ()
 SatGwMac::SatGwMac (uint32_t beamId)
   : SatMac (beamId),
   m_fwdScheduler (),
-  m_guardTime (MicroSeconds (1))
+  m_guardTime (MicroSeconds (1)),
+  m_ncrInterval (MilliSeconds (100))
 {
   NS_LOG_FUNCTION (this);
 }
@@ -120,6 +127,8 @@ SatGwMac::StartPeriodicTransmissions ()
    * carrier.
    */
   Simulator::Schedule (Seconds (0), &SatGwMac::StartTransmission, this, 0);
+
+  Simulator::Schedule (Seconds (0), &SatGwMac::StartNcrTransmission, this);
 }
 
 void
@@ -249,6 +258,16 @@ SatGwMac::StartTransmission (uint32_t carrierId)
    * carrier.
    */
   Simulator::Schedule (txDuration, &SatGwMac::StartTransmission, this, 0);
+}
+
+void
+SatGwMac::StartNcrTransmission ()
+{
+  NS_LOG_FUNCTION (this);
+
+  SendNcrMessage (0);
+
+  Simulator::Schedule (m_ncrInterval, &SatGwMac::StartNcrTransmission, this);
 }
 
 void
@@ -392,6 +411,15 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
         break;
       }
     }
+}
+
+void
+SatGwMac::SendNcrMessage (uint64_t ncr)
+{
+  NS_LOG_FUNCTION (this);
+  Ptr<SatNcrMessage> ncrMessage = CreateObject<SatNcrMessage> ();
+  ncrMessage->SetNcrDate (ncr);
+  m_fwdScheduler->SendControlMsg (ncrMessage, Mac48Address::GetBroadcast ());
 }
 
 void

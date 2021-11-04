@@ -690,6 +690,18 @@ private:
 
   typedef enum
   {
+    HOLD_STANDBY,
+    OFF_STANDBY,
+    READY_FOR_LOGON,
+    READY_FOR_TDMA_SYNC,
+    TDMA_SYNC,
+    NCR_RECOVERY,
+  } ReturnChannelTerminalState_t;
+
+  ReturnChannelTerminalState_t m_rcstState;
+
+  typedef enum
+  {
     NO_HANDOVER,
     HANDOVER_RECOMMENDATION_SENT,
     WAITING_FOR_TBTP,

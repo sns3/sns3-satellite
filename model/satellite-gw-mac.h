@@ -164,11 +164,18 @@ private:
   void StartTransmission (uint32_t carrierId);
 
   /**
+   * Send a NCR packet to the UTs. This method periodically calls itself.
+   */
+  void StartNcrTransmission ();
+
+  /**
    * Signaling packet receiver, which handles all the signaling packet
    * receptions.
    * \param packet Received signaling packet
    */
   void ReceiveSignalingPacket (Ptr<Packet> packet);
+
+  void SendNcrMessage (uint64_t ncr);
 
   void SendLogonResponse (Address utId, uint32_t raChannel);
   static void SendLogonResponseHelper (SatGwMac* self,Address utId, uint32_t raChannel);
@@ -183,6 +190,11 @@ private:
    * the duration of a BB frame by a m_guardTime set by an attribute.
    */
   Time m_guardTime;
+
+  /**
+   * Interval between two broadcast of NCR dates
+   */
+  Time m_ncrInterval;
 
   /**
    * Trace for transmitted BB frames.
