@@ -254,6 +254,13 @@ protected:
   bool m_isStatisticsTagsEnabled;
 
   /**
+   * Use of version 2 of NCR dates.
+   * Version 1 use date of frame N-2.
+   * Version 2 use date of frame N.
+   */
+  bool m_ncrV2;
+
+  /**
    * Trace callback used for packet tracing.
    */
   TracedCallback< Time,

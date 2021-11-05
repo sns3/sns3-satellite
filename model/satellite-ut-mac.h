@@ -700,6 +700,14 @@ private:
 
   ReturnChannelTerminalState_t m_rcstState;
 
+  Time m_lastNcrDateReceived;
+  uint64_t m_ncr;
+
+  /**
+   * Store last 3 packets reception date, to be associated to NCR dates.
+   */
+  std::queue<Time> m_receptionDates;
+
   typedef enum
   {
     NO_HANDOVER,

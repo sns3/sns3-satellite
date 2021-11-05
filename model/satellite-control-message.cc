@@ -991,8 +991,6 @@ SatNcrMessage::GetInstanceTypeId (void) const
 SatNcrMessage::SatNcrMessage ()
 {
   NS_LOG_FUNCTION (this);
-
-  std::cout << "New NCR control message" << std::endl;
 }
 
 SatNcrMessage::~SatNcrMessage ()

@@ -55,6 +55,11 @@ public:
   static TypeId GetTypeId (void);
 
   /**
+   * Derived from Object
+   */
+  TypeId GetInstanceTypeId (void) const;
+
+  /**
    * Default construct of SatGwMac. Should not been used.
    *
    * This is the constructor for the SatGwMac
@@ -145,6 +150,12 @@ public:
    * \param cb callback to invoke whenever a logon is received
    */
   void SetLogonCallback (SatGwMac::LogonCallback cb);
+
+  /**
+   * Method to set forward link scheduler
+   * \param The scheduler to use
+   */
+  void SetFwdScheduler (Ptr<SatFwdLinkScheduler> fwdScheduler);
 
 private:
   SatGwMac& operator = (const SatGwMac &);

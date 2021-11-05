@@ -410,7 +410,7 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   fwdLinkScheduler->SetSchedContextCallback (MakeCallback (&SatLlc::GetSchedulingContexts, llc));
 
   // set scheduler to Mac
-  mac->SetAttribute ("Scheduler", PointerValue (fwdLinkScheduler));
+  mac->SetFwdScheduler (fwdLinkScheduler);
 
   mac->StartPeriodicTransmissions ();
 

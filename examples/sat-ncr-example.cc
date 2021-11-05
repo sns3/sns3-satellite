@@ -91,6 +91,7 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
 
 
+  Config::SetDefault ("ns3::SatMac::NcrVersion2", BooleanValue (false));
   Config::SetDefault ("ns3::SatGwMac::NcrBroadcastPeriod", TimeValue (MilliSeconds (100)));
 
 

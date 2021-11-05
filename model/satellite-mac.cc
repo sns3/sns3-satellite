@@ -49,6 +49,11 @@ SatMac::GetTypeId (void)
                    BooleanValue (false),
                    MakeBooleanAccessor (&SatMac::m_isStatisticsTagsEnabled),
                    MakeBooleanChecker ())
+    .AddAttribute ("NcrVersion2",
+                   "NCR version used (false for 1, true for 2)",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatMac::m_ncrV2),
+                   MakeBooleanChecker ())
     .AddTraceSource ("PacketTrace",
                      "Packet event trace",
                      MakeTraceSourceAccessor (&SatMac::m_packetTrace),
@@ -75,6 +80,7 @@ SatMac::GetTypeId (void)
 
 SatMac::SatMac ()
   : m_isStatisticsTagsEnabled (false),
+  m_ncrV2 (false),
   m_nodeInfo (),
   m_beamId (0),
   m_txEnabled (true),
@@ -87,6 +93,7 @@ SatMac::SatMac ()
 
 SatMac::SatMac (uint32_t beamId)
   : m_isStatisticsTagsEnabled (false),
+  m_ncrV2 (false),
   m_nodeInfo (),
   m_beamId (beamId),
   m_txEnabled (true),
@@ -227,7 +234,8 @@ SatMac::SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time 
             {
               Ptr<SatNcrMessage> ncrMsg = m_ncrMessagesToSend.front ();
               m_ncrMessagesToSend.pop ();
-              ncrMsg->SetNcrDate (m_lastSOF.size () == 3 ? m_lastSOF.front ().GetNanoSeconds ()*0.027 : 0);
+              uint8_t lastSOFSize = m_ncrV2 ? 3 : 1;
+              ncrMsg->SetNcrDate (m_lastSOF.size () == lastSOFSize ? m_lastSOF.front ().GetNanoSeconds ()*0.027 : 0);
             }
 
           if (!success)

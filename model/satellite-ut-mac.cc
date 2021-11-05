@@ -119,6 +119,9 @@ SatUtMac::SatUtMac ()
   m_nextPacketTime (Now ()),
   m_isRandomAccessScheduled (false),
   m_timuInfo (0),
+  m_rcstState (HOLD_STANDBY),
+  m_lastNcrDateReceived (Seconds (0)),
+  m_ncr (0),
   m_handoverState (NO_HANDOVER),
   m_handoverMessagesCount (0),
   m_maxHandoverMessagesSent (20),
@@ -159,6 +162,9 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, bool crdsaOnlyFo
   m_nextPacketTime (Now ()),
   m_isRandomAccessScheduled (false),
   m_timuInfo (0),
+  m_rcstState (HOLD_STANDBY),
+  m_lastNcrDateReceived (Seconds (0)),
+  m_ncr (0),
   m_handoverState (NO_HANDOVER),
   m_handoverMessagesCount (0),
   m_maxHandoverMessagesSent (20),
@@ -829,6 +835,12 @@ SatUtMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
   // Invoke the `Rx` and `RxDelay` trace sources.
   RxTraces (packets);
 
+  m_receptionDates.push (Simulator::Now ());
+  if (m_receptionDates.size () > 3)
+    {
+      m_receptionDates.pop ();
+    }
+
   for (SatPhy::PacketContainer_t::iterator i = packets.begin (); i != packets.end (); i++ )
     {
       // Remove packet tag
@@ -1052,6 +1064,9 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
       {
         uint32_t ncrCtrlId = ctrlTag.GetMsgId ();
         Ptr<SatNcrMessage> ncrMsg = DynamicCast<SatNcrMessage> (m_readCtrlCallback (ncrCtrlId));
+
+        m_lastNcrDateReceived = m_ncrV2 ? m_receptionDates.front () : Simulator::Now ();
+        m_ncr = ncrMsg->GetNcrDate ();
 
         std::cout << "Receive NCR control message with NCR = " << ncrMsg->GetNcrDate () << std::endl;
         break;

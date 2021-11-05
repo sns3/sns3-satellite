@@ -73,6 +73,14 @@ SatGwMac::GetTypeId (void)
   return tid;
 }
 
+TypeId
+SatGwMac::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
+}
+
 SatGwMac::SatGwMac ()
   : SatMac (),
   m_fwdScheduler (),
@@ -205,7 +213,8 @@ SatGwMac::StartTransmission (uint32_t carrierId)
   if (m_nodeInfo->GetNodeType () == SatEnums::NT_GW)
     {
       m_lastSOF.push (Simulator::Now ());
-      if (m_lastSOF.size () > 3)
+      uint8_t lastSOFSize = m_ncrV2 ? 3 : 1;
+      if (m_lastSOF.size () > lastSOFSize)
         {
           m_lastSOF.pop();
         }
@@ -465,6 +474,17 @@ SatGwMac::SetLogonCallback (SatGwMac::LogonCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);
   m_logonCallback = cb;
+}
+
+void
+SatGwMac::SetFwdScheduler (Ptr<SatFwdLinkScheduler> fwdScheduler)
+{
+  m_fwdScheduler = fwdScheduler;
+
+  if (m_ncrV2)
+    {
+      m_fwdScheduler->SetDummyFrameSendingEnabled (true);
+    }
 }
 
 } // namespace ns3
