@@ -1004,14 +1004,15 @@ void
 SatNcrMessage::SetNcrDate (uint64_t ncr)
 {
   NS_LOG_FUNCTION (this << ncr);
-  m_ncrDate = ncr;
+  m_ncrDateBase = (ncr/300) % (1UL<<33);
+  m_ncrDateExtension = ncr%300;
 }
 
 uint64_t
 SatNcrMessage::GetNcrDate () const
 {
   NS_LOG_FUNCTION (this);
-  return m_ncrDate;
+  return 300*m_ncrDateBase + m_ncrDateExtension;
 }
 
 uint32_t

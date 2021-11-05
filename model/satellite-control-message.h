@@ -1165,7 +1165,8 @@ public:
   virtual uint32_t GetSizeInBytes () const;
 
 private:
-  uint64_t m_ncrDate;
+  uint64_t m_ncrDateBase;
+  uint16_t m_ncrDateExtension;
 };
 
 

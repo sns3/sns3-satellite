@@ -223,6 +223,13 @@ SatMac::SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time 
           cTag.SetMsgId (recvId);
           (*it)->AddPacketTag (cTag);
 
+          if (cTag.GetMsgType () == SatControlMsgTag::SAT_NCR_CTRL_MSG)
+            {
+              Ptr<SatNcrMessage> ncrMsg = m_ncrMessagesToSend.front ();
+              m_ncrMessagesToSend.pop ();
+              ncrMsg->SetNcrDate (m_lastSOF.size () == 3 ? m_lastSOF.front ().GetNanoSeconds ()*0.027 : 0);
+            }
+
           if (!success)
             {
               NS_FATAL_ERROR ("Write to control message container was not successful!");

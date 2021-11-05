@@ -316,6 +316,16 @@ protected:
    * Last delay measurement. Used to compute jitter.
    */
   Time m_lastDelay;
+
+  /**
+   * List of NCR control messages created but not sent yet.
+   */
+  std::queue<Ptr<SatNcrMessage>> m_ncrMessagesToSend;
+
+  /**
+   * Store last 3 SOF date for Forward messages, to insert in NCR packets.
+   */
+  std::queue<Time> m_lastSOF;
 };
 
 } // namespace ns3

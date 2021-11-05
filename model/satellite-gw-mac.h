@@ -175,7 +175,7 @@ private:
    */
   void ReceiveSignalingPacket (Ptr<Packet> packet);
 
-  void SendNcrMessage (uint64_t ncr);
+  void SendNcrMessage ();
 
   void SendLogonResponse (Address utId, uint32_t raChannel);
   static void SendLogonResponseHelper (SatGwMac* self,Address utId, uint32_t raChannel);

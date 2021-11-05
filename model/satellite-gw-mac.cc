@@ -128,7 +128,7 @@ SatGwMac::StartPeriodicTransmissions ()
    */
   Simulator::Schedule (Seconds (0), &SatGwMac::StartTransmission, this, 0);
 
-  Simulator::Schedule (Seconds (0), &SatGwMac::StartNcrTransmission, this);
+  Simulator::Schedule (MilliSeconds (50), &SatGwMac::StartNcrTransmission, this);
 }
 
 void
@@ -202,6 +202,15 @@ SatGwMac::StartTransmission (uint32_t carrierId)
 {
   NS_LOG_FUNCTION (this);
 
+  if (m_nodeInfo->GetNodeType () == SatEnums::NT_GW)
+    {
+      m_lastSOF.push (Simulator::Now ());
+      if (m_lastSOF.size () > 3)
+        {
+          m_lastSOF.pop();
+        }
+    }
+
   Time txDuration;
 
   if (m_txEnabled)
@@ -265,7 +274,7 @@ SatGwMac::StartNcrTransmission ()
 {
   NS_LOG_FUNCTION (this);
 
-  SendNcrMessage (0);
+  SendNcrMessage ();
 
   Simulator::Schedule (m_ncrInterval, &SatGwMac::StartNcrTransmission, this);
 }
@@ -414,12 +423,12 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
 }
 
 void
-SatGwMac::SendNcrMessage (uint64_t ncr)
+SatGwMac::SendNcrMessage ()
 {
   NS_LOG_FUNCTION (this);
   Ptr<SatNcrMessage> ncrMessage = CreateObject<SatNcrMessage> ();
-  ncrMessage->SetNcrDate (ncr);
   m_fwdScheduler->SendControlMsg (ncrMessage, Mac48Address::GetBroadcast ());
+  m_ncrMessagesToSend.push (ncrMessage);
 }
 
 void
