@@ -733,7 +733,7 @@ SatUtMac::TransmitPackets (SatPhy::PacketContainer_t packets, Time duration, uin
 {
   NS_LOG_FUNCTION (this << packets.size () << duration.GetSeconds () << carrierId);
 
-  if (m_rcstState.GetState () != SatUtMacState::RcstState_t::TDMA_SYNC)
+  if (m_rcstState.GetState () != SatUtMacState::RcstState_t::TDMA_SYNC and m_useLogon)
     {
       SatPhy::PacketContainer_t pkts;
       for (SatPhy::PacketContainer_t::const_iterator it = packets.begin (); it != packets.end (); ++it)
@@ -1103,8 +1103,6 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
           {
             m_rcstState.SwitchToReadyForTdmaSync ();
           }
-
-        std::cout << "Receive NCR control message with NCR = " << ncrMsg->GetNcrDate () << std::endl;
         break;
       }
     default:

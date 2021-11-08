@@ -57,7 +57,7 @@ SatUtMacState::GetInstanceTypeId (void) const
 }
 
 SatUtMacState::SatUtMacState ()
-  : m_rcstState (HOLD_STANDBY),
+  : m_rcstState (TDMA_SYNC),
   m_lastNcrDateReceived (Seconds (0)),
   m_checkNcrRecoveryScheduled (Seconds (0)),
   m_ncrSyncTimeout (Seconds (1)),
