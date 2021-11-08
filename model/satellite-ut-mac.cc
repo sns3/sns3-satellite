@@ -119,7 +119,7 @@ SatUtMac::SatUtMac ()
   m_nextPacketTime (Now ()),
   m_isRandomAccessScheduled (false),
   m_timuInfo (0),
-  m_rcstState (HOLD_STANDBY),
+  //m_rcstState (SatUtMacState::HOLD_STANDBY),
   m_lastNcrDateReceived (Seconds (0)),
   m_ncr (0),
   m_handoverState (NO_HANDOVER),
@@ -162,7 +162,7 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, bool crdsaOnlyFo
   m_nextPacketTime (Now ()),
   m_isRandomAccessScheduled (false),
   m_timuInfo (0),
-  m_rcstState (HOLD_STANDBY),
+  //m_rcstState (SatUtMacState::HOLD_STANDBY),
   m_lastNcrDateReceived (Seconds (0)),
   m_ncr (0),
   m_handoverState (NO_HANDOVER),
@@ -318,6 +318,7 @@ SatUtMac::LogOff ()
   NS_LOG_FUNCTION (this);
   m_loggedOn = false;
   m_raChannel = m_logonChannel;
+  //m_rcstState = SatUtMacState::OFF_STANDBY;
 }
 
 void
@@ -539,6 +540,7 @@ SatUtMac::DoTransmit (Time duration, uint32_t carrierId, Ptr<SatWaveform> wf, Pt
   if (!m_txCheckCallback ())
     {
       NS_LOG_INFO ("Tx is unavailable");
+      //m_rcstState = SatUtMacState::HOLD_STANDBY;
       return;
     }
 
@@ -1045,6 +1047,7 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
             m_raChannel = logonMsg->GetRaChannel ();
             m_loggedOn = true;
             m_sendLogonTries = 0;
+            //m_rcstState = SatUtMacState::READY_FOR_TDMA_SYNC;
           }
         else
           {
@@ -1700,6 +1703,7 @@ SatUtMac::DoFrameStart ()
             }
           else if (m_useLogon)
             {
+              //m_rcstState = SatUtMacState::READY_FOR_LOGON;
               if (Simulator::Now () > m_nextLogonTransmissionPossible)
                 {
                   // Do Logon
@@ -1711,6 +1715,7 @@ SatUtMac::DoFrameStart ()
   else
     {
       NS_LOG_INFO ("Tx is disabled");
+      //m_rcstState = SatUtMacState::HOLD_STANDBY;
     }
 
   Time nextSuperFrameTxTime = GetNextSuperFrameTxTime (SatConstVariables::SUPERFRAME_SEQUENCE);

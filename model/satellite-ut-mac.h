@@ -36,6 +36,7 @@
 #include <ns3/satellite-random-access-container.h>
 #include <ns3/satellite-enums.h>
 #include <ns3/satellite-beam-scheduler.h>
+#include <ns3/satellite-ut-mac-state.h>
 #include <utility>
 
 namespace ns3 {
@@ -688,17 +689,7 @@ private:
 
   Mac48Address m_gwAddress;
 
-  typedef enum
-  {
-    HOLD_STANDBY,
-    OFF_STANDBY,
-    READY_FOR_LOGON,
-    READY_FOR_TDMA_SYNC,
-    TDMA_SYNC,
-    NCR_RECOVERY,
-  } ReturnChannelTerminalState_t;
-
-  ReturnChannelTerminalState_t m_rcstState;
+  SatUtMacState m_rcstState;
 
   Time m_lastNcrDateReceived;
   uint64_t m_ncr;
