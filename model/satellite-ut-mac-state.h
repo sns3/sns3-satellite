@@ -23,6 +23,8 @@
 #define SATELLITE_UT_MAC_STATE_H
 
 #include <ns3/object.h>
+#include <ns3/nstime.h>
+#include <ns3/simulator.h>
 
 namespace ns3 {
 
@@ -67,11 +69,20 @@ public:
   ~SatUtMacState ();
 
   /**
+   * LogOff callback.
+   */
+  typedef Callback<void> LogOffCallback;
+
+  /**
+   * Set logOff callback.
+   */
+  void SetLogOffCallback (LogOffCallback cb);
+
+  /**
    * Get the current state.
    *
    * \return The current state..
    */
-  // TODO is it useful ?
   RcstState_t GetState ();
 
   /**
@@ -104,9 +115,34 @@ public:
    */
   void SwitchToNcrRecovery ();
 
+  /**
+   * Inform the state diagram that a NCR message has been received. Reset timeouts.
+   */
+  void NcrControlMessageReceived ();
+
 private:
 
-  RcstState_t m_rcstState;
+  RcstState_t m_rcstState;            // Current state
+
+  Time m_lastNcrDateReceived;         // Last time a NCR control message was received
+  Time m_checkNcrRecoveryScheduled;   // Last time state switched to NCR_RECOVERY
+
+  Time m_ncrSyncTimeout;              // Timeout to switch from TDMA_SYNC to NCR_RECOVERY
+  Time m_ncrRecoveryTimeout;          // Timeout to switch from NCR_RECOVERY to OFF_STANDBY
+
+  LogOffCallback m_logOffCallback;    // Callback to call LogOff of SatUtMac
+
+  /**
+   * Check if NCR has been received before sending a timeout.
+   * Switching to NCR_RECOVERY if timeout reached.
+   */
+  void CheckNcrTimeout ();
+
+  /**
+   * Check if timeout reached in NCR_RECOVERY state.
+   * If yes, switching to OFF_STANDBY and logoff UT Mac.
+   */
+  void CheckNcrRecoveryTimeout ();
 };
 
 } // namespace ns3

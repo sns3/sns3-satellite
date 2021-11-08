@@ -93,6 +93,9 @@ main (int argc, char *argv[])
 
   Config::SetDefault ("ns3::SatMac::NcrVersion2", BooleanValue (false));
   Config::SetDefault ("ns3::SatGwMac::NcrBroadcastPeriod", TimeValue (MilliSeconds (100)));
+  Config::SetDefault ("ns3::SatUtMacState::NcrSyncTimeout", TimeValue (Seconds (1)));
+  Config::SetDefault ("ns3::SatUtMacState::NcrRecoveryTimeout", TimeValue (Seconds (10)));
+
 
 
   simulationHelper->CreateSatScenario ();

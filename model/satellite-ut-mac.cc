@@ -119,7 +119,7 @@ SatUtMac::SatUtMac ()
   m_nextPacketTime (Now ()),
   m_isRandomAccessScheduled (false),
   m_timuInfo (0),
-  //m_rcstState (SatUtMacState::HOLD_STANDBY),
+  m_rcstState (SatUtMacState ()),
   m_lastNcrDateReceived (Seconds (0)),
   m_ncr (0),
   m_handoverState (NO_HANDOVER),
@@ -162,7 +162,7 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, bool crdsaOnlyFo
   m_nextPacketTime (Now ()),
   m_isRandomAccessScheduled (false),
   m_timuInfo (0),
-  //m_rcstState (SatUtMacState::HOLD_STANDBY),
+  m_rcstState (SatUtMacState ()),
   m_lastNcrDateReceived (Seconds (0)),
   m_ncr (0),
   m_handoverState (NO_HANDOVER),
@@ -318,7 +318,7 @@ SatUtMac::LogOff ()
   NS_LOG_FUNCTION (this);
   m_loggedOn = false;
   m_raChannel = m_logonChannel;
-  //m_rcstState = SatUtMacState::OFF_STANDBY;
+  m_rcstState.SwitchToOffStandby ();
 }
 
 void
@@ -540,8 +540,20 @@ SatUtMac::DoTransmit (Time duration, uint32_t carrierId, Ptr<SatWaveform> wf, Pt
   if (!m_txCheckCallback ())
     {
       NS_LOG_INFO ("Tx is unavailable");
-      //m_rcstState = SatUtMacState::HOLD_STANDBY;
+      m_rcstState.SwitchToHoldStandby ();
       return;
+    }
+
+  if (m_rcstState.GetState () == SatUtMacState::RcstState_t::HOLD_STANDBY)
+    {
+      m_rcstState.SwitchToOffStandby ();
+    }
+
+  // TODO improve TDMA sync
+  // TODO put somewhere else ?
+  if (m_rcstState.GetState () == SatUtMacState::RcstState_t::READY_FOR_TDMA_SYNC)
+    {
+      m_rcstState.SwitchToTdmaSync ();
     }
 
   NS_LOG_INFO ("DA Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () <<
@@ -1047,7 +1059,8 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
             m_raChannel = logonMsg->GetRaChannel ();
             m_loggedOn = true;
             m_sendLogonTries = 0;
-            //m_rcstState = SatUtMacState::READY_FOR_TDMA_SYNC;
+            m_rcstState.SetLogOffCallback (MakeCallback (&SatUtMac::LogOff, this));
+            m_rcstState.SwitchToReadyForTdmaSync ();
           }
         else
           {
@@ -1070,6 +1083,12 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
 
         m_lastNcrDateReceived = m_ncrV2 ? m_receptionDates.front () : Simulator::Now ();
         m_ncr = ncrMsg->GetNcrDate ();
+        m_rcstState.NcrControlMessageReceived ();
+
+        if (m_rcstState.GetState () == SatUtMacState::RcstState_t::NCR_RECOVERY)
+          {
+            m_rcstState.SwitchToReadyForTdmaSync ();
+          }
 
         std::cout << "Receive NCR control message with NCR = " << ncrMsg->GetNcrDate () << std::endl;
         break;
@@ -1653,6 +1672,11 @@ SatUtMac::DoFrameStart ()
     {
       NS_LOG_INFO ("Tx is permitted");
 
+      if (m_rcstState.GetState () == SatUtMacState::RcstState_t::HOLD_STANDBY)
+        {
+          m_rcstState.SwitchToOffStandby ();
+        }
+
       if (m_loggedOn && !m_beamCheckerCallback.IsNull ())
         {
           NS_LOG_INFO ("UT checking for beam handover recommendation");
@@ -1703,7 +1727,7 @@ SatUtMac::DoFrameStart ()
             }
           else if (m_useLogon)
             {
-              //m_rcstState = SatUtMacState::READY_FOR_LOGON;
+              m_rcstState.SwitchToReadyForLogon ();
               if (Simulator::Now () > m_nextLogonTransmissionPossible)
                 {
                   // Do Logon
@@ -1715,7 +1739,7 @@ SatUtMac::DoFrameStart ()
   else
     {
       NS_LOG_INFO ("Tx is disabled");
-      //m_rcstState = SatUtMacState::HOLD_STANDBY;
+      m_rcstState.SwitchToHoldStandby ();
     }
 
   Time nextSuperFrameTxTime = GetNextSuperFrameTxTime (SatConstVariables::SUPERFRAME_SEQUENCE);

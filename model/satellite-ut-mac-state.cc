@@ -34,6 +34,16 @@ SatUtMacState::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatUtMacState")
     .SetParent<Object> ()
     .AddConstructor<SatUtMacState> ()
+    .AddAttribute ("NcrSyncTimeout",
+                   "Time allowed before switching to NCR_RECOVERY state",
+                   TimeValue (Seconds (1)),
+                   MakeTimeAccessor (&SatUtMacState::m_ncrSyncTimeout),
+                   MakeTimeChecker ())
+    .AddAttribute ("NcrRecoveryTimeout",
+                   "Time allowed before switching from NCR_RECOVERY to OFF_STANDBY",
+                   TimeValue (Seconds (1)),
+                   MakeTimeAccessor (&SatUtMacState::m_ncrRecoveryTimeout),
+                   MakeTimeChecker ())
   ;
   return tid;
 }
@@ -47,7 +57,11 @@ SatUtMacState::GetInstanceTypeId (void) const
 }
 
 SatUtMacState::SatUtMacState ()
-  : m_rcstState (HOLD_STANDBY)
+  : m_rcstState (HOLD_STANDBY),
+  m_lastNcrDateReceived (Seconds (0)),
+  m_checkNcrRecoveryScheduled (Seconds (0)),
+  m_ncrSyncTimeout (Seconds (1)),
+  m_ncrRecoveryTimeout (Seconds (10))
 {
   NS_LOG_FUNCTION (this);
 }
@@ -55,6 +69,14 @@ SatUtMacState::SatUtMacState ()
 SatUtMacState::~SatUtMacState ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+void
+SatUtMacState::SetLogOffCallback (SatUtMacState::LogOffCallback cb)
+{
+  NS_LOG_FUNCTION (this);
+
+  m_logOffCallback = cb;
 }
 
 SatUtMacState::RcstState_t
@@ -128,6 +150,8 @@ SatUtMacState::SwitchToTdmaSync ()
       m_rcstState == SatUtMacState::TDMA_SYNC)
     {
       m_rcstState = SatUtMacState::TDMA_SYNC;
+      Time nextTimeout = Simulator::Now () + m_ncrSyncTimeout;
+      Simulator::Schedule (nextTimeout, &SatUtMacState::CheckNcrTimeout, this);
     }
   else
     {
@@ -148,6 +172,47 @@ SatUtMacState::SwitchToNcrRecovery ()
   else
     {
       NS_FATAL_ERROR ("Cannot transition to NCR_RECOVERY state");
+    }
+}
+
+void
+SatUtMacState::NcrControlMessageReceived ()
+{
+  NS_LOG_FUNCTION (this);
+
+  m_lastNcrDateReceived = Simulator::Now ();
+  Time nextTimeout = m_lastNcrDateReceived + m_ncrSyncTimeout;
+  Simulator::Schedule (nextTimeout, &SatUtMacState::CheckNcrTimeout, this);
+}
+
+void
+SatUtMacState::CheckNcrTimeout ()
+{
+  NS_LOG_FUNCTION (this);
+
+  if (m_lastNcrDateReceived + m_ncrSyncTimeout <= Simulator::Now ())
+    {
+      SwitchToNcrRecovery ();
+      m_checkNcrRecoveryScheduled = Simulator::Now ();
+      Time nextTimeout = m_checkNcrRecoveryScheduled + m_ncrRecoveryTimeout;
+      Simulator::Schedule (nextTimeout, &SatUtMacState::CheckNcrRecoveryTimeout, this);
+    }
+  else
+    {
+      Time nextTimeout = m_lastNcrDateReceived + m_ncrSyncTimeout;
+      Simulator::Schedule (nextTimeout, &SatUtMacState::CheckNcrTimeout, this);
+    }
+}
+
+void
+SatUtMacState::CheckNcrRecoveryTimeout ()
+{
+  NS_LOG_FUNCTION (this);
+
+  if ((m_checkNcrRecoveryScheduled + m_ncrRecoveryTimeout <= Simulator::Now ()) && (GetState () == NCR_RECOVERY))
+    {
+      m_logOffCallback ();
+      SwitchToOffStandby ();
     }
 }
 
