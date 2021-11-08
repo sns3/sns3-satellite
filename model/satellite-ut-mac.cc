@@ -733,6 +733,20 @@ SatUtMac::TransmitPackets (SatPhy::PacketContainer_t packets, Time duration, uin
 {
   NS_LOG_FUNCTION (this << packets.size () << duration.GetSeconds () << carrierId);
 
+  if (m_rcstState.GetState () != SatUtMacState::RcstState_t::TDMA_SYNC)
+    {
+      SatPhy::PacketContainer_t pkts;
+      for (SatPhy::PacketContainer_t::const_iterator it = packets.begin (); it != packets.end (); ++it)
+        {
+          SatControlMsgTag cTag;
+          if ((*it)->PeekPacketTag (cTag))
+            {
+              pkts.push_back (*it);
+            }
+        }
+      packets = pkts;
+    }
+
   // If there are packets to send
   if (!packets.empty ())
     {
