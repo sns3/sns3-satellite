@@ -544,18 +544,6 @@ SatUtMac::DoTransmit (Time duration, uint32_t carrierId, Ptr<SatWaveform> wf, Pt
       return;
     }
 
-  if (m_rcstState.GetState () == SatUtMacState::RcstState_t::HOLD_STANDBY)
-    {
-      m_rcstState.SwitchToOffStandby ();
-    }
-
-  // TODO improve TDMA sync
-  // TODO put somewhere else ?
-  if (m_rcstState.GetState () == SatUtMacState::RcstState_t::READY_FOR_TDMA_SYNC)
-    {
-      m_rcstState.SwitchToTdmaSync ();
-    }
-
   NS_LOG_INFO ("DA Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () <<
                " duration: " << duration.GetSeconds () <<
                ", payload: " << wf->GetPayloadInBytes () <<
@@ -732,6 +720,18 @@ void
 SatUtMac::TransmitPackets (SatPhy::PacketContainer_t packets, Time duration, uint32_t carrierId, SatSignalParameters::txInfo_s txInfo)
 {
   NS_LOG_FUNCTION (this << packets.size () << duration.GetSeconds () << carrierId);
+
+  if (m_rcstState.GetState () == SatUtMacState::RcstState_t::HOLD_STANDBY)
+    {
+      m_rcstState.SwitchToOffStandby ();
+    }
+
+  // TODO improve TDMA sync
+  // TODO put somewhere else ?
+  if (m_rcstState.GetState () == SatUtMacState::RcstState_t::READY_FOR_TDMA_SYNC)
+    {
+      m_rcstState.SwitchToTdmaSync ();
+    }
 
   if (m_rcstState.GetState () != SatUtMacState::RcstState_t::TDMA_SYNC and m_useLogon)
     {

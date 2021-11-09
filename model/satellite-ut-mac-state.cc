@@ -57,7 +57,7 @@ SatUtMacState::GetInstanceTypeId (void) const
 }
 
 SatUtMacState::SatUtMacState ()
-  : m_rcstState (TDMA_SYNC),
+  : m_rcstState (HOLD_STANDBY),
   m_lastNcrDateReceived (Seconds (0)),
   m_checkNcrRecoveryScheduled (Seconds (0)),
   m_ncrSyncTimeout (Seconds (1)),
@@ -102,7 +102,7 @@ SatUtMacState::SwitchToOffStandby ()
   NS_LOG_FUNCTION (this);
 
   // Can transition from all other states including itself
-  m_rcstState = SatUtMacState::HOLD_STANDBY;
+  m_rcstState = SatUtMacState::OFF_STANDBY;
 }
 
 void
@@ -110,9 +110,9 @@ SatUtMacState::SwitchToReadyForLogon ()
 {
   NS_LOG_FUNCTION (this);
 
-  // Can transition from HOLD_STANDBY, READY_FOR_TDMA_SYNC or itself
-  if (m_rcstState == SatUtMacState::HOLD_STANDBY ||
-      m_rcstState == SatUtMacState::READY_FOR_TDMA_SYNC ||
+  // Can transition from OFF_STANDBY, NCR_RECOVERY or itself
+  if (m_rcstState == SatUtMacState::OFF_STANDBY ||
+      m_rcstState == SatUtMacState::NCR_RECOVERY ||
       m_rcstState == SatUtMacState::READY_FOR_LOGON)
     {
       m_rcstState = SatUtMacState::READY_FOR_LOGON;
@@ -150,8 +150,7 @@ SatUtMacState::SwitchToTdmaSync ()
       m_rcstState == SatUtMacState::TDMA_SYNC)
     {
       m_rcstState = SatUtMacState::TDMA_SYNC;
-      Time nextTimeout = Simulator::Now () + m_ncrSyncTimeout;
-      Simulator::Schedule (nextTimeout, &SatUtMacState::CheckNcrTimeout, this);
+      Simulator::Schedule (m_ncrSyncTimeout, &SatUtMacState::CheckNcrTimeout, this);
     }
   else
     {
@@ -181,8 +180,11 @@ SatUtMacState::NcrControlMessageReceived ()
   NS_LOG_FUNCTION (this);
 
   m_lastNcrDateReceived = Simulator::Now ();
-  Time nextTimeout = m_lastNcrDateReceived + m_ncrSyncTimeout;
-  Simulator::Schedule (nextTimeout, &SatUtMacState::CheckNcrTimeout, this);
+
+  if (GetState () == NCR_RECOVERY)
+    {
+      SwitchToReadyForTdmaSync ();
+    }
 }
 
 void
@@ -194,12 +196,11 @@ SatUtMacState::CheckNcrTimeout ()
     {
       SwitchToNcrRecovery ();
       m_checkNcrRecoveryScheduled = Simulator::Now ();
-      Time nextTimeout = m_checkNcrRecoveryScheduled + m_ncrRecoveryTimeout;
-      Simulator::Schedule (nextTimeout, &SatUtMacState::CheckNcrRecoveryTimeout, this);
+      Simulator::Schedule (m_ncrRecoveryTimeout, &SatUtMacState::CheckNcrRecoveryTimeout, this);
     }
-  else
+  else if (GetState () == TDMA_SYNC)
     {
-      Time nextTimeout = m_lastNcrDateReceived + m_ncrSyncTimeout;
+      Time nextTimeout = m_lastNcrDateReceived + m_ncrSyncTimeout - Simulator::Now ();
       Simulator::Schedule (nextTimeout, &SatUtMacState::CheckNcrTimeout, this);
     }
 }
@@ -212,7 +213,6 @@ SatUtMacState::CheckNcrRecoveryTimeout ()
   if ((m_checkNcrRecoveryScheduled + m_ncrRecoveryTimeout <= Simulator::Now ()) && (GetState () == NCR_RECOVERY))
     {
       m_logOffCallback ();
-      SwitchToOffStandby ();
     }
 }
 

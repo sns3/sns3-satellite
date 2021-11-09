@@ -46,7 +46,7 @@ main (int argc, char *argv[])
   uint32_t packetSize = 512;
   std::string interval = "100ms";
 
-  double simLength = 30.0;
+  double simLength = 60.0;
 
   /// Set simulation output details
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
@@ -103,12 +103,12 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::CbrApplication::Interval", StringValue (interval));
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
 
-  /*simulationHelper->InstallTrafficModel (
+  simulationHelper->InstallTrafficModel (
     SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
     Seconds (0.1), Seconds (simLength));
   simulationHelper->InstallTrafficModel (
     SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
-    Seconds (0.1), Seconds (simLength));*/
+    Seconds (0.1), Seconds (simLength));
 
   // To store attributes to file
   Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("output-attributes.xml"));
