@@ -77,7 +77,7 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatUtMac::MaxWaitingTimeLogonResponse", TimeValue (Seconds (1)));
 
   // Disable DA
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (false));
+  /*Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (false));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_ConstantAssignmentProvided", BooleanValue (false));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_ConstantAssignmentProvided", BooleanValue (false));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
@@ -88,13 +88,18 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_VolumeAllowed", BooleanValue (false));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_VolumeAllowed", BooleanValue (false));
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_VolumeAllowed", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
+  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));*/
 
 
   Config::SetDefault ("ns3::SatMac::NcrVersion2", BooleanValue (false));
   Config::SetDefault ("ns3::SatGwMac::NcrBroadcastPeriod", TimeValue (MilliSeconds (100)));
   Config::SetDefault ("ns3::SatUtMacState::NcrSyncTimeout", TimeValue (Seconds (1)));
   Config::SetDefault ("ns3::SatUtMacState::NcrRecoveryTimeout", TimeValue (Seconds (10)));
+
+  Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (true));
+  Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotInterval", TimeValue (MilliSeconds (500)));
+
+
 
 
 

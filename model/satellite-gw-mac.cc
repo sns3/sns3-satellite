@@ -140,7 +140,7 @@ SatGwMac::StartPeriodicTransmissions ()
 }
 
 void
-SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/)
+SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> rxParams)
 {
   NS_LOG_FUNCTION (this);
 
@@ -156,6 +156,12 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
 
   // Invoke the `Rx` and `RxDelay` trace sources.
   RxTraces (packets);
+
+  if (rxParams->m_txInfo.waveformId == 2)
+    {
+      std::cout << "CONTROL MESSAGE RECEIVED" << std::endl;
+      // TODO trigger CMT
+    }
 
   for (SatPhy::PacketContainer_t::iterator i = packets.begin (); i != packets.end (); i++ )
     {

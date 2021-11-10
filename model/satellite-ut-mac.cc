@@ -497,6 +497,14 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
           Ptr<SatWaveform> wf = m_superframeSeq->GetWaveformConf ()->GetWaveform (timeSlotConf->GetWaveFormId ());
           Time duration = wf->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
 
+          if (timeSlotConf->GetSlotType () == SatTimeSlotConf::SLOT_TYPE_C)
+            {
+              std::cout << "ScheduleTimeSlots CONTROL TIMESLOT" << std::endl;
+              // TODO is it good to override here ? Do it in SatFrameConf::SatFrameConf ?
+              wf = m_superframeSeq->GetWaveformConf ()->GetWaveform (2);
+              duration = wf->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
+            }
+
           // Carrier
           uint32_t carrierId = m_superframeSeq->GetCarrierId (0, frameId, timeSlotConf->GetCarrierId () );
 
