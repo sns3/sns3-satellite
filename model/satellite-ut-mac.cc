@@ -499,7 +499,6 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
 
           if (timeSlotConf->GetSlotType () == SatTimeSlotConf::SLOT_TYPE_C)
             {
-              std::cout << "ScheduleTimeSlots CONTROL TIMESLOT" << std::endl;
               // TODO is it good to override here ? Do it in SatFrameConf::SatFrameConf ?
               wf = m_superframeSeq->GetWaveformConf ()->GetWaveform (2);
               duration = wf->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
@@ -1118,6 +1117,12 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
                 m_rcstState.SwitchToReadyForLogon ();
               }
           }
+        break;
+      }
+    case SatControlMsgTag::SAT_CMT_CTRL_MSG:
+      {
+        std::cout << "CMT message received" << std::endl;
+        // TODO do useful stuff here
         break;
       }
     default:

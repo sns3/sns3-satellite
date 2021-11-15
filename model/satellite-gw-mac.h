@@ -188,6 +188,8 @@ private:
 
   void SendNcrMessage ();
 
+  void SendCmtMessage (Address utId); // TODO add arguments
+
   void SendLogonResponse (Address utId, uint32_t raChannel);
   static void SendLogonResponseHelper (SatGwMac* self,Address utId, uint32_t raChannel);
 

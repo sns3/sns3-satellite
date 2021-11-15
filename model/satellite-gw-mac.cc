@@ -157,11 +157,7 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> r
   // Invoke the `Rx` and `RxDelay` trace sources.
   RxTraces (packets);
 
-  if (rxParams->m_txInfo.waveformId == 2)
-    {
-      std::cout << "CONTROL MESSAGE RECEIVED" << std::endl;
-      // TODO trigger CMT
-    }
+  Address utId;
 
   for (SatPhy::PacketContainer_t::iterator i = packets.begin (); i != packets.end (); i++ )
     {
@@ -178,6 +174,7 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> r
 
       // If the packet is intended for this receiver
       Mac48Address destAddress = macTag.GetDestAddress ();
+      utId = macTag.GetSourceAddress ();
 
       if (destAddress == m_nodeInfo->GetMacAddress () || destAddress.IsBroadcast ())
         {
@@ -208,6 +205,11 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> r
         {
           NS_LOG_INFO ("Packet intended for others received by MAC: " << m_nodeInfo->GetMacAddress ());
         }
+    }
+
+  if (rxParams->m_txInfo.waveformId == 2)
+    {
+      SendCmtMessage (utId);
     }
 }
 
@@ -444,6 +446,14 @@ SatGwMac::SendNcrMessage ()
   Ptr<SatNcrMessage> ncrMessage = CreateObject<SatNcrMessage> ();
   m_fwdScheduler->SendControlMsg (ncrMessage, Mac48Address::GetBroadcast ());
   m_ncrMessagesToSend.push (ncrMessage);
+}
+
+void
+SatGwMac::SendCmtMessage (Address utId) // TODO add arguments...
+{
+  NS_LOG_FUNCTION (this << utId);
+  Ptr<SatCmtMessage> cmt = CreateObject<SatCmtMessage> ();
+  m_fwdScheduler->SendControlMsg (cmt, utId);
 }
 
 void
