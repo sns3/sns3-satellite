@@ -1024,6 +1024,129 @@ SatNcrMessage::GetSizeInBytes () const
 }
 
 
+NS_OBJECT_ENSURE_REGISTERED (SatCmtMessage);
+
+TypeId
+SatCmtMessage::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatCmtMessage")
+    .SetParent<SatControlMessage> ()
+    .AddConstructor<SatCmtMessage> ()
+  ;
+  return tid;
+}
+
+TypeId
+SatCmtMessage::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
+}
+
+SatCmtMessage::SatCmtMessage ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+SatCmtMessage::~SatCmtMessage ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+uint8_t
+SatCmtMessage::GetGroupId () const
+{
+  return m_groupId;
+}
+
+void
+SatCmtMessage::SetGroupId (uint8_t groupId)
+{
+  m_groupId = groupId;
+}
+
+uint8_t
+SatCmtMessage::GetLogonId () const
+{
+  return m_logonId;
+}
+
+void
+SatCmtMessage::SetLogonId (uint8_t logonId)
+{
+  m_logonId = logonId;
+}
+
+uint16_t
+SatCmtMessage::GetBurstTimeCorrection () const
+{
+  return m_burstTimeCorrection*(1<<m_burstTimeScaling);
+}
+
+void
+SatCmtMessage::SetBurstTimeCorrection (uint16_t burstTimeCorrection)
+{
+  if (burstTimeCorrection > 32640)
+    {
+      NS_FATAL_ERROR ("Burst Time Correction too high, should be at most 32640, but got " << burstTimeCorrection);
+    }
+  m_burstTimeScaling = 0;
+  for (uint8_t i = 0; i < 7; i++)
+    {
+      if (burstTimeCorrection > 255)
+        {
+          burstTimeCorrection >>= 1;
+          m_burstTimeScaling++;
+        }
+    }
+  m_burstTimeCorrection = burstTimeCorrection;
+}
+
+uint8_t
+SatCmtMessage::GetPowerCorrection () const
+{
+  return m_powerCorrection;
+}
+
+void
+SatCmtMessage::SetPowerCorrection (uint8_t powerCorrection)
+{
+  m_powerCorrection = powerCorrection;
+}
+
+uint16_t
+SatCmtMessage::GetFrequencyCorrection () const
+{
+  return m_frequencyCorrection;
+}
+
+void
+SatCmtMessage::SetFrequencyCorrection (uint16_t frequencyCorrection)
+{
+  m_frequencyCorrection = frequencyCorrection;
+}
+
+uint32_t
+SatCmtMessage::GetSizeInBytes () const
+{
+  NS_LOG_FUNCTION (this);
+
+  // Content of message is
+  // m_groupId: 8 bits
+  // m_logonId: 16 bits
+  // flags (time correction, power correction, frequency correction): 3 bits
+  // slot type (always control here): 2 bits
+  // m_burstTimeScaling: 3 bits
+  // m_burstTimeCorrection: 8 bits
+  // power control flag: 1 bit
+  // m_powerCorrection: 7 bits
+  // m_frequencyCorrection: 16 bits
+  // Total is 64 bits = 8 bytes
+  uint32_t size = 8;
+  return size;
+}
+
 // Control message container
 
 NS_LOG_COMPONENT_DEFINE ("SatControlMsgContainer");
