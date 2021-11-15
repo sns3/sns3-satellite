@@ -1109,7 +1109,14 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
 
         if (m_rcstState.GetState () == SatUtMacState::RcstState_t::NCR_RECOVERY)
           {
-            m_rcstState.SwitchToReadyForTdmaSync ();
+            if (ControlMsgTransmissionPossible ())
+              {
+                m_rcstState.SwitchToReadyForTdmaSync ();
+              }
+            else
+              {
+                m_rcstState.SwitchToReadyForLogon ();
+              }
           }
         break;
       }
@@ -1128,7 +1135,7 @@ SatUtMac::DoRandomAccess (SatEnums::RandomAccessTriggerType_t randomAccessTrigge
 
   NS_LOG_INFO ("UT: " << m_nodeInfo->GetMacAddress ());
 
-  /// reset the isRaandomAccessScheduled flag. TODO: should be done only if randomAccessTriggerType is ESSA
+  /// reset the isRandomAccessScheduled flag. TODO: should be done only if randomAccessTriggerType is ESSA
   m_isRandomAccessScheduled = false;
 
   SatRandomAccess::RandomAccessTxOpportunities_s txOpportunities;
