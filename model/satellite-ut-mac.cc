@@ -83,6 +83,11 @@ SatUtMac::GetTypeId (void)
                    TimeValue (Seconds (1)),
                    MakeTimeAccessor (&SatUtMac::m_maxWaitingTimeLogonResponse),
                    MakeTimeChecker ())
+    .AddAttribute ("ClockDrift",
+                   "Clock drift (number of ticks per second).",
+                   IntegerValue (0),
+                   MakeIntegerAccessor (&SatUtMac::m_clock_drift),
+                   MakeIntegerChecker<int32_t> ())
     .AddTraceSource ("DaResourcesTrace",
                      "Assigned dedicated access resources in return link to this UT.",
                      MakeTraceSourceAccessor (&SatUtMac::m_tbtpResourcesTrace),
@@ -122,6 +127,8 @@ SatUtMac::SatUtMac ()
   m_rcstState (SatUtMacState ()),
   m_lastNcrDateReceived (Seconds (0)),
   m_ncr (0),
+  m_deltaNcr (0),
+  m_clock_drift (0),
   m_handoverState (NO_HANDOVER),
   m_handoverMessagesCount (0),
   m_maxHandoverMessagesSent (20),
@@ -165,6 +172,8 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, bool crdsaOnlyFo
   m_rcstState (SatUtMacState ()),
   m_lastNcrDateReceived (Seconds (0)),
   m_ncr (0),
+  m_deltaNcr (0),
+  m_clock_drift (0),
   m_handoverState (NO_HANDOVER),
   m_handoverMessagesCount (0),
   m_maxHandoverMessagesSent (20),
@@ -727,6 +736,9 @@ void
 SatUtMac::TransmitPackets (SatPhy::PacketContainer_t packets, Time duration, uint32_t carrierId, SatSignalParameters::txInfo_s txInfo)
 {
   NS_LOG_FUNCTION (this << packets.size () << duration.GetSeconds () << carrierId);
+
+  std::cout << Simulator::Now () << " TransmitPackets, drift is " << GetRealSendingTime (Seconds (0)).GetSeconds () << " seconds or ";
+  std::cout << GetRealSendingTime (Seconds (0)).GetSeconds ()*27000000 << " ticks" << std::endl;
 
   if (m_rcstState.GetState () == SatUtMacState::RcstState_t::HOLD_STANDBY)
     {
@@ -1781,6 +1793,13 @@ SatUtMac::DoFrameStart ()
   Simulator::Schedule (schedulingDelay, &SatUtMac::DoFrameStart, this);
 }
 
+Time
+SatUtMac::GetRealSendingTime (Time t)
+{
+  Time deltaTime = t - m_lastNcrDateReceived + Simulator::Now ();
+  int32_t utNcr = deltaTime.GetSeconds ()*m_clock_drift + m_ncr + m_deltaNcr;
+  return Seconds (utNcr/27000000.0) - Simulator::Now ();
+}
 
 SatUtMac::SatTimuInfo::SatTimuInfo (uint32_t beamId, Address address)
   : m_beamId (beamId),

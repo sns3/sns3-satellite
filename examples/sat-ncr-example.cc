@@ -99,7 +99,7 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (true));
   Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotInterval", TimeValue (MilliSeconds (500)));
 
-
+  Config::SetDefault ("ns3::SatUtMac::ClockDrift", IntegerValue (10000));
 
 
 

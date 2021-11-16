@@ -549,6 +549,13 @@ private:
    */
   void DoFrameStart ();
 
+  /**
+   * \brief Compute real sending time of UT based on last NCR reception date and clock drift
+   * \param t Sending time if clock is perfect (relative time from Simulator::Now ())
+   * \return Corrected time (relative time from Simulator::Now ())
+   */
+  Time GetRealSendingTime (Time t);
+
   SatUtMac& operator = (const SatUtMac &);
   SatUtMac (const SatUtMac &);
 
@@ -691,8 +698,25 @@ private:
 
   SatUtMacState m_rcstState;
 
+  /**
+   * Reception date of last NCR control message
+   */
   Time m_lastNcrDateReceived;
+
+  /**
+   * NCR value of last NCR control message
+   */
   uint64_t m_ncr;
+
+  /**
+   * Correction to apply to NCR dates
+   */
+  uint64_t m_deltaNcr;
+
+  /**
+   * Clock drift (number of ticks per second)
+   */
+  int32_t m_clock_drift;
 
   /**
    * Store last 3 packets reception date, to be associated to NCR dates.
