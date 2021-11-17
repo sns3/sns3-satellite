@@ -200,7 +200,22 @@ public:
    */
   void SetUpdateRoutingCallback (SatNcc::UpdateRoutingCallback cb);
 
+  /**
+   * \param msg        the TBTP sent
+   */
+  typedef Callback<void, Ptr<SatTbtpMessage> > SendTbtpCallback;
+
+  /**
+   * Set the callback to inform GW Mac a TBTP has been sent.
+   */
+  void SetSendTbtpCallback (SendTbtpCallback cb);
+
   void ReserveLogonChannel (uint32_t logonChannelId);
+
+  /**
+   * Function called when a TBTP has been sent by the SatBeamScheduler.
+   */
+  void TbtpSent (Ptr<SatTbtpMessage> tbtp);
 
 private:
   SatNcc& operator = (const SatNcc &);
@@ -284,6 +299,11 @@ private:
    * once a handover request has been accepted and treated
    */
   UpdateRoutingCallback m_updateRoutingCallback;
+
+  /**
+   * The TBTP send callback to inform GW Mac.
+   */
+  SatBeamScheduler::SendTbtpCallback m_txTbtpCallback;
 };
 
 } // namespace ns3

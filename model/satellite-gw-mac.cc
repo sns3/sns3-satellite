@@ -28,6 +28,7 @@
 #include <ns3/satellite-mac-tag.h>
 #include <ns3/satellite-utils.h>
 #include <ns3/satellite-log.h>
+#include <ns3/satellite-rtn-link-time.h>
 #include "satellite-gw-mac.h"
 
 #include <ns3/packet.h>
@@ -209,6 +210,7 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> r
 
   if (rxParams->m_txInfo.waveformId == 2)
     {
+      // TODO change check on WF02 to check if correct TS type
       SendCmtMessage (utId);
     }
 }
@@ -284,6 +286,12 @@ SatGwMac::StartTransmission (uint32_t carrierId)
    * carrier.
    */
   Simulator::Schedule (txDuration, &SatGwMac::StartTransmission, this, 0);
+}
+
+void
+SatGwMac::TbtpSent (Ptr<SatTbtpMessage> tbtp)
+{
+  m_tbtps[tbtp->GetSuperframeCounter ()] = tbtp;
 }
 
 void
@@ -452,6 +460,20 @@ void
 SatGwMac::SendCmtMessage (Address utId) // TODO add arguments...
 {
   NS_LOG_FUNCTION (this << utId);
+  uint32_t sfCount = Singleton<SatRtnLinkTime>::Get ()->GetCurrentSuperFrameCount (SatConstVariables::SUPERFRAME_SEQUENCE);
+  Ptr<SatTbtpMessage> tbtp = m_tbtps[sfCount];
+  std::pair<uint8_t, std::vector< Ptr<SatTimeSlotConf> >> timeslots = tbtp->GetDaTimeslots (utId);
+
+  for (auto elt = timeslots.second.begin (); elt < timeslots.second.end (); elt++)
+    {
+      if ((*elt)->GetSlotType () == 0)
+        {
+          Time frameStartTime = Singleton<SatRtnLinkTime>::Get ()->GetSuperFrameTxTime (SatConstVariables::SUPERFRAME_SEQUENCE, sfCount, Seconds (0));
+          //std::cout << timeslots.first << " " << (*elt)->GetStartTime () << std::endl;
+          std::cout << Simulator::Now () << " " << frameStartTime << " " << Simulator::Now () - frameStartTime << std::endl;
+        }
+    }
+
   Ptr<SatCmtMessage> cmt = CreateObject<SatCmtMessage> ();
   m_fwdScheduler->SendControlMsg (cmt, utId);
 }

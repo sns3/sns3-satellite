@@ -313,6 +313,8 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
 
   mac->SetHandoverCallback (MakeCallback (&SatNcc::MoveUtBetweenBeams, ncc));
 
+  ncc->SetSendTbtpCallback (MakeCallback (&SatGwMac::TbtpSent, mac));
+
   // Attach the Mac layer receiver to Phy
   SatPhy::ReceiveCallback recCb = MakeCallback (&SatGwMac::Receive, mac);
 

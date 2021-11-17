@@ -264,6 +264,8 @@ SatNcc::AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq>
   scheduler = CreateObject<SatBeamScheduler> ();
   scheduler->Initialize (beamId, cb, seq, maxFrameSize, gwAddress);
 
+  scheduler->SetSendTbtpCallback (MakeCallback (&SatNcc::TbtpSent, this));
+
   m_beamSchedulers.insert (std::make_pair (beamId, scheduler));
 }
 
@@ -423,6 +425,18 @@ SatNcc::ReserveLogonChannel (uint32_t logonChannelId)
     {
       beamScheduler.second->ReserveLogonChannel (logonChannelId);
     }
+}
+
+void
+SatNcc::SetSendTbtpCallback (SendTbtpCallback cb)
+{
+  m_txTbtpCallback = cb;
+}
+
+void
+SatNcc::TbtpSent (Ptr<SatTbtpMessage> tbtp)
+{
+  m_txTbtpCallback (tbtp);
 }
 
 } // namespace ns3

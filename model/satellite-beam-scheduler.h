@@ -110,6 +110,11 @@ public:
   typedef Callback<bool, Ptr<SatControlMessage>, const Address& > SendCtrlMsgCallback;
 
   /**
+   * \param msg        the TBTP sent
+   */
+  typedef Callback<void, Ptr<SatTbtpMessage> > SendTbtpCallback;
+
+  /**
    * \param id    Id of the TBTP message to add.
    * \param tbtp  Pointer to the TBTP message to add.
    */
@@ -174,6 +179,11 @@ public:
    * \return true if sending is success, false otherwise.
    */
   bool SendTo (Ptr<SatControlMessage> message, Address utId);
+
+  /**
+   * Set the callback to inform NCC a TBTP has been sent.
+   */
+  void SetSendTbtpCallback (SendTbtpCallback cb);
 
   /**
    * Callback signature for `BacklogRequestsTrace` trace source.
@@ -430,6 +440,11 @@ private:
    * The control message send callback.
    */
   SatBeamScheduler::SendCtrlMsgCallback m_txCallback;
+
+  /**
+   * The TBTP send callback to inform GW Mac.
+   */
+  SatBeamScheduler::SendTbtpCallback m_txTbtpCallback;
 
   /**
    * Map to store UT information in beam for updating purposes.

@@ -511,6 +511,7 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
               // TODO is it good to override here ? Do it in SatFrameConf::SatFrameConf ?
               wf = m_superframeSeq->GetWaveformConf ()->GetWaveform (2);
               duration = wf->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
+              //std::cout << "Schedule WF02 in SF number " << tbtp->GetSuperframeCounter () << std::endl;
             }
 
           // Carrier
@@ -737,8 +738,8 @@ SatUtMac::TransmitPackets (SatPhy::PacketContainer_t packets, Time duration, uin
 {
   NS_LOG_FUNCTION (this << packets.size () << duration.GetSeconds () << carrierId);
 
-  std::cout << Simulator::Now () << " TransmitPackets, drift is " << GetRealSendingTime (Seconds (0)).GetSeconds () << " seconds or ";
-  std::cout << GetRealSendingTime (Seconds (0)).GetSeconds ()*27000000 << " ticks" << std::endl;
+  //std::cout << Simulator::Now () << " TransmitPackets, drift is " << GetRealSendingTime (Seconds (0)).GetSeconds () << " seconds or ";
+  //std::cout << GetRealSendingTime (Seconds (0)).GetSeconds ()*27000000 << " ticks" << std::endl;
 
   if (m_rcstState.GetState () == SatUtMacState::RcstState_t::HOLD_STANDBY)
     {
@@ -1133,7 +1134,7 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
       }
     case SatControlMsgTag::SAT_CMT_CTRL_MSG:
       {
-        std::cout << "CMT message received" << std::endl;
+        //std::cout << "CMT message received" << std::endl;
         // TODO do useful stuff here
         break;
       }
@@ -1794,7 +1795,7 @@ SatUtMac::DoFrameStart ()
 }
 
 Time
-SatUtMac::GetRealSendingTime (Time t)
+SatUtMac::GetRealSendingTime (Time t) // TODO need to check if correct...
 {
   Time deltaTime = t - m_lastNcrDateReceived + Simulator::Now ();
   int32_t utNcr = deltaTime.GetSeconds ()*m_clock_drift + m_ncr + m_deltaNcr;

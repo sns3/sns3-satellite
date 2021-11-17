@@ -313,6 +313,12 @@ SatBeamScheduler::SendTo (Ptr<SatControlMessage> msg, Address utId)
 }
 
 void
+SatBeamScheduler::SetSendTbtpCallback (SendTbtpCallback cb)
+{
+  m_txTbtpCallback = cb;
+}
+
+void
 SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCallback cb, Ptr<SatSuperframeSeq> seq, uint32_t maxFrameSizeInBytes, Address gwAddress)
 {
   NS_LOG_FUNCTION (this << beamId << &cb);
@@ -568,6 +574,7 @@ SatBeamScheduler::Schedule ()
             }
           else
             {
+              m_txTbtpCallback (*it);
               Send (*it);
             }
         }

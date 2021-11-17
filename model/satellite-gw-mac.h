@@ -95,6 +95,11 @@ public:
   void Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/);
 
   /**
+   * Function called when a TBTP has been sent by the SatBeamScheduler.
+   */
+  void TbtpSent (Ptr<SatTbtpMessage> tbtp);
+
+  /**
    * Callback to receive capacity request (CR) messages.
    * \param uint32_t The beam ID.
    * \param Address Address of the sender UT.
@@ -192,6 +197,11 @@ private:
 
   void SendLogonResponse (Address utId, uint32_t raChannel);
   static void SendLogonResponseHelper (SatGwMac* self,Address utId, uint32_t raChannel);
+
+  /**
+   * List of TBTPs sent to UTs. Key is superframe counter, value is TBTP.
+   */
+  std::map <uint32_t, Ptr<SatTbtpMessage>> m_tbtps;
 
   /**
    * Scheduler for the forward link.
