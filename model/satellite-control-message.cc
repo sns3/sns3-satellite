@@ -1045,6 +1045,12 @@ SatCmtMessage::GetInstanceTypeId (void) const
 }
 
 SatCmtMessage::SatCmtMessage ()
+ : m_groupId (0),
+  m_logonId (0),
+  m_burstTimeScaling (0),
+  m_burstTimeCorrection (0),
+  m_powerCorrection (0),
+  m_frequencyCorrection (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -1092,7 +1098,7 @@ SatCmtMessage::SetBurstTimeCorrection (uint16_t burstTimeCorrection)
       NS_FATAL_ERROR ("Burst Time Correction too high, should be at most 32640, but got " << burstTimeCorrection);
     }
   m_burstTimeScaling = 0;
-  for (uint8_t i = 0; i < 7; i++)
+  for (uint8_t i = 0; i < 8; i++)
     {
       if (burstTimeCorrection > 255)
         {

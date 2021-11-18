@@ -1204,7 +1204,7 @@ public:
   /**
    * \brief Get type of the message.
    *
-   * \return SatControlMsgTag::SAT_NCR_CTRL_MSG
+   * \return SatControlMsgTag::SAT_CMT_CTRL_MSG
    */
   inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const
   {

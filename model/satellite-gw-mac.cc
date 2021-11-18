@@ -462,20 +462,27 @@ SatGwMac::SendCmtMessage (Address utId) // TODO add arguments...
   NS_LOG_FUNCTION (this << utId);
   uint32_t sfCount = Singleton<SatRtnLinkTime>::Get ()->GetCurrentSuperFrameCount (SatConstVariables::SUPERFRAME_SEQUENCE);
   Ptr<SatTbtpMessage> tbtp = m_tbtps[sfCount];
-  std::pair<uint8_t, std::vector< Ptr<SatTimeSlotConf> >> timeslots = tbtp->GetDaTimeslots (utId);
-
-  for (auto elt = timeslots.second.begin (); elt < timeslots.second.end (); elt++)
+  if (tbtp)
     {
-      if ((*elt)->GetSlotType () == 0)
-        {
-          Time frameStartTime = Singleton<SatRtnLinkTime>::Get ()->GetSuperFrameTxTime (SatConstVariables::SUPERFRAME_SEQUENCE, sfCount, Seconds (0));
-          //std::cout << timeslots.first << " " << (*elt)->GetStartTime () << std::endl;
-          std::cout << Simulator::Now () << " " << frameStartTime << " " << Simulator::Now () - frameStartTime << std::endl;
-        }
-    }
+      std::pair<uint8_t, std::vector< Ptr<SatTimeSlotConf> >> timeslots = tbtp->GetDaTimeslots (utId);
 
-  Ptr<SatCmtMessage> cmt = CreateObject<SatCmtMessage> ();
-  m_fwdScheduler->SendControlMsg (cmt, utId);
+      for (auto elt = timeslots.second.begin (); elt < timeslots.second.end (); elt++)
+        {
+          if ((*elt)->GetSlotType () == 0)
+            {
+              Time frameStartTime = Singleton<SatRtnLinkTime>::Get ()->GetSuperFrameTxTime (SatConstVariables::SUPERFRAME_SEQUENCE, sfCount, Seconds (0));
+              //std::cout << timeslots.first << " " << (*elt)->GetStartTime () << std::endl;
+              std::cout << Simulator::Now () << " " << frameStartTime << " " << Simulator::Now () - frameStartTime << std::endl;
+            }
+        }
+
+      Ptr<SatCmtMessage> cmt = CreateObject<SatCmtMessage> ();
+      m_fwdScheduler->SendControlMsg (cmt, utId);
+    }
+  else
+    {
+      // TODO in sat-training-example, no tbtp found...
+    }
 }
 
 void
