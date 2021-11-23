@@ -66,6 +66,11 @@ SatGwMac::GetTypeId (void)
                    TimeValue (MilliSeconds (100)),
                    MakeTimeAccessor (&SatGwMac::m_ncrInterval),
                    MakeTimeChecker ())
+    .AddAttribute ("UseCmt",
+                   "Use CMT control messages to correct time on the UTs",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatGwMac::m_useCmt),
+                   MakeBooleanChecker ())
     .AddTraceSource ("BBFrameTxTrace",
                      "Trace for transmitted BB Frames.",
                      MakeTraceSourceAccessor (&SatGwMac::m_bbFrameTxTrace),
@@ -86,7 +91,8 @@ SatGwMac::SatGwMac ()
   : SatMac (),
   m_fwdScheduler (),
   m_guardTime (MicroSeconds (1)),
-  m_ncrInterval (MilliSeconds (100))
+  m_ncrInterval (MilliSeconds (100)),
+  m_useCmt (false)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -95,7 +101,8 @@ SatGwMac::SatGwMac (uint32_t beamId)
   : SatMac (beamId),
   m_fwdScheduler (),
   m_guardTime (MicroSeconds (1)),
-  m_ncrInterval (MilliSeconds (100))
+  m_ncrInterval (MilliSeconds (100)),
+  m_useCmt (false)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -211,7 +218,10 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> r
   if (rxParams->m_txInfo.waveformId == 2)
     {
       // TODO change check on WF02 to check if correct TS type
-      SendCmtMessage (utId);
+      if (m_useCmt)
+        {
+          SendCmtMessage (utId);
+        }
     }
 }
 

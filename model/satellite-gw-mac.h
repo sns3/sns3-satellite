@@ -220,6 +220,11 @@ private:
   Time m_ncrInterval;
 
   /**
+   * Use CMT control messages to correct time on the UTs
+   */
+  bool m_useCmt;
+
+  /**
    * Trace for transmitted BB frames.
    */
   TracedCallback<Ptr<SatBbFrame>> m_bbFrameTxTrace;
