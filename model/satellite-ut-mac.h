@@ -711,7 +711,7 @@ private:
   /**
    * Correction to apply to NCR dates
    */
-  uint64_t m_deltaNcr;
+  int64_t m_deltaNcr;
 
   /**
    * Clock drift (number of ticks per second)

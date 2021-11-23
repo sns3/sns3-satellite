@@ -87,7 +87,7 @@ SatUtMac::GetTypeId (void)
                    "Clock drift (number of ticks per second).",
                    IntegerValue (0),
                    MakeIntegerAccessor (&SatUtMac::m_clockDrift),
-                   MakeIntegerChecker<int32_t> ())
+                   MakeIntegerChecker<int32_t> (-100, 100))
     .AddTraceSource ("DaResourcesTrace",
                      "Assigned dedicated access resources in return link to this UT.",
                      MakeTraceSourceAccessor (&SatUtMac::m_tbtpResourcesTrace),
@@ -1134,7 +1134,7 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
         Ptr<SatCmtMessage> cmtMsg = DynamicCast<SatCmtMessage> (m_readCtrlCallback (cmtCtrlId));
         int16_t burstTimeCorrection = cmtMsg->GetBurstTimeCorrection ();
         m_deltaNcr += burstTimeCorrection;
-        std::cout << "CMT message received, correction is " << burstTimeCorrection << std::endl;
+        std::cout << "CMT message received, correction is " << burstTimeCorrection << ", total is " << m_deltaNcr << std::endl;
         break;
       }
     default:
@@ -1800,19 +1800,19 @@ SatUtMac::GetRealSendingTime (Time t) // TODO need to check if correct...
   // TODO handle cases in past
   // TODO initial delta time ????
 
-  std::cout << std::endl;
+  //std::cout << std::endl;
 
   uint32_t driftTicks = (t + Simulator::Now ()).GetMicroSeconds ()/1000000.0*m_clockDrift;
   int32_t deltaTicks = driftTicks - m_deltaNcr;
   Time deltaTime = NanoSeconds (deltaTicks*1000/27.0);
 
-  std::cout << "driftTicks " << driftTicks << std::endl;
-  std::cout << "deltaTicks " << deltaTicks << std::endl;
-  std::cout << "deltaTime " << deltaTime << std::endl;
+  //std::cout << "driftTicks " << driftTicks << std::endl;
+  //std::cout << "deltaTicks " << deltaTicks << std::endl;
+  //std::cout << "deltaTime " << deltaTime << std::endl;
 
   if (t - deltaTime <= Seconds (0))
   {
-    std::cout << "t - deltaTime " << MicroSeconds (10) << std::endl;
+    //std::cout << "t - deltaTime " << MicroSeconds (10) << std::endl;
     return MicroSeconds (10);
   }
 

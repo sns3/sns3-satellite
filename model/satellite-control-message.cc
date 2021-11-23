@@ -1091,7 +1091,7 @@ SatCmtMessage::GetBurstTimeCorrection () const
 }
 
 void
-SatCmtMessage::SetBurstTimeCorrection (int16_t burstTimeCorrection)
+SatCmtMessage::SetBurstTimeCorrection (int32_t burstTimeCorrection)
 {
   if (burstTimeCorrection > 16256 || burstTimeCorrection < -16256)
     {

@@ -460,39 +460,57 @@ SatGwMac::SendNcrMessage ()
 void
 SatGwMac::SendCmtMessage (Address utId) // TODO add arguments...
 {
-  std::cout << "SendCmtMessage" << std::endl;
   NS_LOG_FUNCTION (this << utId);
-  uint32_t sfCount = Singleton<SatRtnLinkTime>::Get ()->GetCurrentSuperFrameCount (SatConstVariables::SUPERFRAME_SEQUENCE);
-  Ptr<SatTbtpMessage> tbtp = m_tbtps[sfCount];
-  if (tbtp)
+
+  uint32_t indexClosest = 0;
+  Time differenceClosest = Seconds (1000000);
+  for (uint32_t i = 0; i < m_tbtps.size (); i++)
     {
-      std::pair<uint8_t, std::vector< Ptr<SatTimeSlotConf> >> timeslots = tbtp->GetDaTimeslots (utId);
-
-      for (auto elt = timeslots.second.begin (); elt < timeslots.second.end (); elt++)
+      Ptr<SatTbtpMessage> tbtp = m_tbtps[i];
+      if (tbtp)
         {
-          if ((*elt)->GetSlotType () == 0)
+          std::pair<uint8_t, std::vector< Ptr<SatTimeSlotConf> >> timeslots = m_tbtps[i]->GetDaTimeslots (utId);
+          for (auto elt = timeslots.second.begin (); elt < timeslots.second.end (); elt++)
             {
-              Time frameStartTime = Singleton<SatRtnLinkTime>::Get ()->GetSuperFrameTxTime (SatConstVariables::SUPERFRAME_SEQUENCE, sfCount, Seconds (0));
-              //std::cout << timeslots.first << " " << (*elt)->GetStartTime () << std::endl;
-              std::cout << "At " << Simulator::Now ().GetSeconds () << "s, received frame that should arrive at " << frameStartTime.GetSeconds () << "s" << std::endl;
-              std::cout << "    Difference is " << (Simulator::Now () - frameStartTime).GetMicroSeconds () << "us, UT is " << utId << std::endl;
-
-              Time difference = frameStartTime - Simulator::Now ();
-              int32_t differenceNcr = difference.GetMicroSeconds ()*27;
-              std::cout << difference << " " << differenceNcr << std::endl;
-
-              Ptr<SatCmtMessage> cmt = CreateObject<SatCmtMessage> ();
-              cmt->SetBurstTimeCorrection (differenceNcr);
-              std::cout << (int32_t) cmt->GetBurstTimeCorrection () << std::endl;
-              m_fwdScheduler->SendControlMsg (cmt, utId);
-              return;
+              if ((*elt)->GetSlotType () == 0)
+                {
+                  Time frameStartTime = Singleton<SatRtnLinkTime>::Get ()->GetSuperFrameTxTime (SatConstVariables::SUPERFRAME_SEQUENCE, i, Seconds (0));
+                  Time difference = Simulator::Now () - frameStartTime;
+                  if (Abs(difference) < differenceClosest)
+                    {
+                      differenceClosest = Abs (difference);
+                      indexClosest = i;
+                    }
+                }
             }
         }
     }
-  else
+
+  if (indexClosest == 0)
     {
       std::cout << "No TBTP" << std::endl;
-      // TODO in sat-training-example, no tbtp found...
+      return;
+    }
+
+  Ptr<SatTbtpMessage> tbtp = m_tbtps[indexClosest];
+  std::pair<uint8_t, std::vector< Ptr<SatTimeSlotConf> >> timeslots = tbtp->GetDaTimeslots (utId);
+
+  for (auto elt = timeslots.second.begin (); elt < timeslots.second.end (); elt++)
+    {
+      if ((*elt)->GetSlotType () == 0)
+        {
+          Time frameStartTime = Singleton<SatRtnLinkTime>::Get ()->GetSuperFrameTxTime (SatConstVariables::SUPERFRAME_SEQUENCE, indexClosest, Seconds (0));
+          std::cout << "At " << Simulator::Now ().GetSeconds () << "s, received frame that should arrive at " << frameStartTime.GetSeconds () << "s" << std::endl;
+          std::cout << "    Difference is " << (Simulator::Now () - frameStartTime).GetMicroSeconds () << "us, UT is " << utId << std::endl;
+
+          Time difference = frameStartTime - Simulator::Now ();
+          int32_t differenceNcr = difference.GetMicroSeconds ()*27;
+
+          Ptr<SatCmtMessage> cmt = CreateObject<SatCmtMessage> ();
+          cmt->SetBurstTimeCorrection (differenceNcr);
+          m_fwdScheduler->SendControlMsg (cmt, utId);
+          return;
+        }
     }
 }
 

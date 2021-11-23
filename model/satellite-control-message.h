@@ -1245,7 +1245,7 @@ public:
    * Set the burst time correction.
    * \param burstTimeCorrection The burst time correction
    */
-  void SetBurstTimeCorrection (int16_t burstTimeCorrection);
+  void SetBurstTimeCorrection (int32_t burstTimeCorrection);
 
   /**
    * \brief Get the powercorrection.
