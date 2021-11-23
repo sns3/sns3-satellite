@@ -716,7 +716,7 @@ private:
   /**
    * Clock drift (number of ticks per second)
    */
-  int32_t m_clock_drift;
+  int32_t m_clockDrift;
 
   /**
    * Store last 3 packets reception date, to be associated to NCR dates.

@@ -86,7 +86,7 @@ SatUtMac::GetTypeId (void)
     .AddAttribute ("ClockDrift",
                    "Clock drift (number of ticks per second).",
                    IntegerValue (0),
-                   MakeIntegerAccessor (&SatUtMac::m_clock_drift),
+                   MakeIntegerAccessor (&SatUtMac::m_clockDrift),
                    MakeIntegerChecker<int32_t> ())
     .AddTraceSource ("DaResourcesTrace",
                      "Assigned dedicated access resources in return link to this UT.",
@@ -128,7 +128,7 @@ SatUtMac::SatUtMac ()
   m_lastNcrDateReceived (Seconds (0)),
   m_ncr (0),
   m_deltaNcr (0),
-  m_clock_drift (0),
+  m_clockDrift (0),
   m_handoverState (NO_HANDOVER),
   m_handoverMessagesCount (0),
   m_maxHandoverMessagesSent (20),
@@ -173,7 +173,7 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, bool crdsaOnlyFo
   m_lastNcrDateReceived (Seconds (0)),
   m_ncr (0),
   m_deltaNcr (0),
-  m_clock_drift (0),
+  m_clockDrift (0),
   m_handoverState (NO_HANDOVER),
   m_handoverMessagesCount (0),
   m_maxHandoverMessagesSent (20),
@@ -402,7 +402,7 @@ SatUtMac::SetTimingAdvanceCallback (SatUtMac::TimingAdvanceCallback cb)
 
   Time schedulingDelay = nextSuperFrameTxTime - Now ();
 
-  Simulator::Schedule (schedulingDelay, &SatUtMac::DoFrameStart, this);
+  Simulator::Schedule (GetRealSendingTime (schedulingDelay), &SatUtMac::DoFrameStart, this);
 }
 
 void
@@ -511,7 +511,6 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
               // TODO is it good to override here ? Do it in SatFrameConf::SatFrameConf ?
               wf = m_superframeSeq->GetWaveformConf ()->GetWaveform (2);
               duration = wf->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
-              //std::cout << "Schedule WF02 in SF number " << tbtp->GetSuperframeCounter () << std::endl;
             }
 
           // Carrier
@@ -545,7 +544,7 @@ SatUtMac::ScheduleDaTxOpportunity (Time transmitDelay, Time duration, Ptr<SatWav
                ", rcIndex: " << (uint32_t)(tsConf->GetRcIndex ()) <<
                ", carrier: " << carrierId);
 
-  Simulator::Schedule (transmitDelay, &SatUtMac::DoTransmit, this, duration, carrierId, wf, tsConf, SatUtScheduler::LOOSE);
+  Simulator::Schedule (GetRealSendingTime (transmitDelay), &SatUtMac::DoTransmit, this, duration, carrierId, wf, tsConf, SatUtScheduler::LOOSE);
 }
 
 
@@ -679,7 +678,7 @@ SatUtMac::DoEssaTransmit (Time duration, Ptr<SatWaveform> waveform, uint32_t car
       m_nextPacketTime = Now () + duration; // TODO: this doesn't take into account the guard bands !!
       /// schedule a DoRandomAccess then in case there still are packets to transmit
       /// ( schedule DoRandomAccess in case there is a back-off to compute )
-      Simulator::Schedule (duration, &SatUtMac::DoRandomAccess, this, SatEnums::RA_TRIGGER_TYPE_ESSA);
+      Simulator::Schedule (GetRealSendingTime (duration), &SatUtMac::DoRandomAccess, this, SatEnums::RA_TRIGGER_TYPE_ESSA);
       m_isRandomAccessScheduled = true;
     }
   else
@@ -737,9 +736,6 @@ void
 SatUtMac::TransmitPackets (SatPhy::PacketContainer_t packets, Time duration, uint32_t carrierId, SatSignalParameters::txInfo_s txInfo)
 {
   NS_LOG_FUNCTION (this << packets.size () << duration.GetSeconds () << carrierId);
-
-  //std::cout << Simulator::Now () << " TransmitPackets, drift is " << GetRealSendingTime (Seconds (0)).GetSeconds () << " seconds or ";
-  //std::cout << GetRealSendingTime (Seconds (0)).GetSeconds ()*27000000 << " ticks" << std::endl;
 
   if (m_rcstState.GetState () == SatUtMacState::RcstState_t::HOLD_STANDBY)
     {
@@ -860,7 +856,7 @@ SatUtMac::SendLogon (Ptr<Packet> packet)
 
   Time waitingTime = Seconds (m_waitingTimeLogonRng->GetValue (0.0, pow (1 + m_sendLogonTries, 2) * m_windowInitLogon.GetSeconds ()));
   m_sendLogonTries++;
-  Simulator::Schedule (waitingTime, &SatUtMac::TransmitPackets, this, packets, duration, carrierId, txInfo);
+  Simulator::Schedule (GetRealSendingTime (waitingTime), &SatUtMac::TransmitPackets, this, packets, duration, carrierId, txInfo);
 
   m_nextLogonTransmissionPossible = Simulator::Now () + m_maxWaitingTimeLogonResponse + waitingTime;
 }
@@ -1134,8 +1130,11 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
       }
     case SatControlMsgTag::SAT_CMT_CTRL_MSG:
       {
-        //std::cout << "CMT message received" << std::endl;
-        // TODO do useful stuff here
+        uint32_t cmtCtrlId = ctrlTag.GetMsgId ();
+        Ptr<SatCmtMessage> cmtMsg = DynamicCast<SatCmtMessage> (m_readCtrlCallback (cmtCtrlId));
+        int16_t burstTimeCorrection = cmtMsg->GetBurstTimeCorrection ();
+        m_deltaNcr += burstTimeCorrection;
+        std::cout << "CMT message received, correction is " << burstTimeCorrection << std::endl;
         break;
       }
     default:
@@ -1178,7 +1177,7 @@ SatUtMac::DoRandomAccess (SatEnums::RandomAccessTriggerType_t randomAccessTrigge
       NS_LOG_INFO ("Processing Slotted ALOHA results, Tx evaluation @: " << (Now () + txOpportunity).GetSeconds () << " seconds");
 
       /// schedule the check for next available RA slot
-      Simulator::Schedule (txOpportunity, &SatUtMac::ScheduleSlottedAlohaTransmission, this, allocationChannel);
+      Simulator::Schedule (GetRealSendingTime (txOpportunity), &SatUtMac::ScheduleSlottedAlohaTransmission, this, allocationChannel);
     }
   /// process CRDSA Tx opportunities
   else if (txOpportunities.txOpportunityType == SatEnums::RA_TX_OPPORTUNITY_CRDSA)
@@ -1198,7 +1197,7 @@ SatUtMac::DoRandomAccess (SatEnums::RandomAccessTriggerType_t randomAccessTrigge
       Time txOpportunity = Time::FromInteger (txOpportunities.slottedAlohaTxOpportunity, Time::MS);
 
       /// schedule the transmission
-      Simulator::Schedule (txOpportunity, &SatUtMac::ScheduleEssaTransmission, this, allocationChannel);
+      Simulator::Schedule (GetRealSendingTime (txOpportunity), &SatUtMac::ScheduleEssaTransmission, this, allocationChannel);
     }
 }
 
@@ -1288,7 +1287,7 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
                    " payload in bytes: " << wf->GetPayloadInBytes ());
 
       /// schedule transmission
-      Simulator::Schedule (offset, &SatUtMac::DoSlottedAlohaTransmit, this, duration, wf, carrierId, uint8_t (SatEnums::CONTROL_FID), SatUtScheduler::STRICT);
+      Simulator::Schedule (GetRealSendingTime (offset), &SatUtMac::DoSlottedAlohaTransmit, this, duration, wf, carrierId, uint8_t (SatEnums::CONTROL_FID), SatUtScheduler::STRICT);
     }
   else
     {
@@ -1397,7 +1396,7 @@ SatUtMac::ScheduleEssaTransmission (uint32_t allocationChannel)
   uint32_t carrierId = 0; // TODO: for now we use 0 as we have a single carrier
 
   /// schedule transmission
-  Simulator::Schedule (offset, &SatUtMac::DoEssaTransmit, this, duration, wf, carrierId, uint8_t (SatEnums::CONTROL_FID), SatUtScheduler::LOOSE);
+  Simulator::Schedule (GetRealSendingTime (offset), &SatUtMac::DoEssaTransmit, this, duration, wf, carrierId, uint8_t (SatEnums::CONTROL_FID), SatUtScheduler::LOOSE);
 }
 
 void
@@ -1588,7 +1587,7 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
           txInfo.crdsaUniquePacketId = m_crdsaUniquePacketId;
 
           /// schedule transmission
-          Simulator::Schedule (offset, &SatUtMac::TransmitPackets, this, replicas[i].second, duration, carrierId, txInfo);
+          Simulator::Schedule (GetRealSendingTime (offset), &SatUtMac::TransmitPackets, this, replicas[i].second, duration, carrierId, txInfo);
           NS_LOG_INFO ("Scheduled a replica in slot " << replicas[i].first << " with offset " << offset.GetSeconds ());
         }
       replicas.clear ();
@@ -1791,15 +1790,33 @@ SatUtMac::DoFrameStart ()
   NS_ASSERT_MSG (Now () < nextSuperFrameTxTime, "Scheduling next superframe start time to the past!");
 
   Time schedulingDelay = nextSuperFrameTxTime - Now ();
-  Simulator::Schedule (schedulingDelay, &SatUtMac::DoFrameStart, this);
+  Simulator::Schedule (GetRealSendingTime (schedulingDelay), &SatUtMac::DoFrameStart, this);
 }
 
 Time
 SatUtMac::GetRealSendingTime (Time t) // TODO need to check if correct...
 {
-  Time deltaTime = t - m_lastNcrDateReceived + Simulator::Now ();
-  int32_t utNcr = deltaTime.GetSeconds ()*m_clock_drift + m_ncr + m_deltaNcr;
-  return Seconds (utNcr/27000000.0) - Simulator::Now ();
+  // TODO handle rollbacks
+  // TODO handle cases in past
+  // TODO initial delta time ????
+
+  std::cout << std::endl;
+
+  uint32_t driftTicks = (t + Simulator::Now ()).GetMicroSeconds ()/1000000.0*m_clockDrift;
+  int32_t deltaTicks = driftTicks - m_deltaNcr;
+  Time deltaTime = NanoSeconds (deltaTicks*1000/27.0);
+
+  std::cout << "driftTicks " << driftTicks << std::endl;
+  std::cout << "deltaTicks " << deltaTicks << std::endl;
+  std::cout << "deltaTime " << deltaTime << std::endl;
+
+  if (t - deltaTime <= Seconds (0))
+  {
+    std::cout << "t - deltaTime " << MicroSeconds (10) << std::endl;
+    return MicroSeconds (10);
+  }
+
+  return t - deltaTime;
 }
 
 SatUtMac::SatTimuInfo::SatTimuInfo (uint32_t beamId, Address address)

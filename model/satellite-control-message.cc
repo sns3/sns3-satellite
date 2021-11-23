@@ -1084,28 +1084,45 @@ SatCmtMessage::SetLogonId (uint8_t logonId)
   m_logonId = logonId;
 }
 
-uint16_t
+int16_t
 SatCmtMessage::GetBurstTimeCorrection () const
 {
   return m_burstTimeCorrection*(1<<m_burstTimeScaling);
 }
 
 void
-SatCmtMessage::SetBurstTimeCorrection (uint16_t burstTimeCorrection)
+SatCmtMessage::SetBurstTimeCorrection (int16_t burstTimeCorrection)
 {
-  if (burstTimeCorrection > 32640)
+  if (burstTimeCorrection > 16256 || burstTimeCorrection < -16256)
     {
-      NS_FATAL_ERROR ("Burst Time Correction too high, should be at most 32640, but got " << burstTimeCorrection);
+      NS_FATAL_ERROR ("Burst Time Correction too high, should be at most 16256 and at least -16256, but got " << burstTimeCorrection);
+      // TODO error or truncate ?
+      // return;
     }
   m_burstTimeScaling = 0;
-  for (uint8_t i = 0; i < 8; i++)
+  if (burstTimeCorrection > 0)
     {
-      if (burstTimeCorrection > 255)
+      for (uint8_t i = 0; i < 8; i++)
         {
-          burstTimeCorrection >>= 1;
-          m_burstTimeScaling++;
+          if (burstTimeCorrection > 127)
+            {
+              burstTimeCorrection >>= 1;
+              m_burstTimeScaling++;
+            }
         }
     }
+  else
+    {
+      for (uint8_t i = 0; i < 8; i++)
+        {
+          if (-1*burstTimeCorrection > 127)
+            {
+              burstTimeCorrection /= 2;
+              m_burstTimeScaling++;
+            }
+        }
+    }
+
   m_burstTimeCorrection = burstTimeCorrection;
 }
 
@@ -1121,14 +1138,14 @@ SatCmtMessage::SetPowerCorrection (uint8_t powerCorrection)
   m_powerCorrection = powerCorrection;
 }
 
-uint16_t
+int16_t
 SatCmtMessage::GetFrequencyCorrection () const
 {
   return m_frequencyCorrection;
 }
 
 void
-SatCmtMessage::SetFrequencyCorrection (uint16_t frequencyCorrection)
+SatCmtMessage::SetFrequencyCorrection (int16_t frequencyCorrection)
 {
   m_frequencyCorrection = frequencyCorrection;
 }

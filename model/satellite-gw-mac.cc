@@ -416,6 +416,7 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
       }
     case SatControlMsgTag::SAT_LOGON_CTRL_MSG:
       {
+        std::cout << "Receive LOGON" << std::endl;
         uint32_t msgId = ctrlTag.GetMsgId ();
         Ptr<SatLogonMessage> logonMessage = DynamicCast<SatLogonMessage> ( m_readCtrlCallback (msgId) );
 
@@ -459,6 +460,7 @@ SatGwMac::SendNcrMessage ()
 void
 SatGwMac::SendCmtMessage (Address utId) // TODO add arguments...
 {
+  std::cout << "SendCmtMessage" << std::endl;
   NS_LOG_FUNCTION (this << utId);
   uint32_t sfCount = Singleton<SatRtnLinkTime>::Get ()->GetCurrentSuperFrameCount (SatConstVariables::SUPERFRAME_SEQUENCE);
   Ptr<SatTbtpMessage> tbtp = m_tbtps[sfCount];
@@ -472,15 +474,24 @@ SatGwMac::SendCmtMessage (Address utId) // TODO add arguments...
             {
               Time frameStartTime = Singleton<SatRtnLinkTime>::Get ()->GetSuperFrameTxTime (SatConstVariables::SUPERFRAME_SEQUENCE, sfCount, Seconds (0));
               //std::cout << timeslots.first << " " << (*elt)->GetStartTime () << std::endl;
-              std::cout << Simulator::Now () << " " << frameStartTime << " " << Simulator::Now () - frameStartTime << std::endl;
+              std::cout << "At " << Simulator::Now ().GetSeconds () << "s, received frame that should arrive at " << frameStartTime.GetSeconds () << "s" << std::endl;
+              std::cout << "    Difference is " << (Simulator::Now () - frameStartTime).GetMicroSeconds () << "us, UT is " << utId << std::endl;
+
+              Time difference = frameStartTime - Simulator::Now ();
+              int32_t differenceNcr = difference.GetMicroSeconds ()*27;
+              std::cout << difference << " " << differenceNcr << std::endl;
+
+              Ptr<SatCmtMessage> cmt = CreateObject<SatCmtMessage> ();
+              cmt->SetBurstTimeCorrection (differenceNcr);
+              std::cout << (int32_t) cmt->GetBurstTimeCorrection () << std::endl;
+              m_fwdScheduler->SendControlMsg (cmt, utId);
+              return;
             }
         }
-
-      Ptr<SatCmtMessage> cmt = CreateObject<SatCmtMessage> ();
-      m_fwdScheduler->SendControlMsg (cmt, utId);
     }
   else
     {
+      std::cout << "No TBTP" << std::endl;
       // TODO in sat-training-example, no tbtp found...
     }
 }

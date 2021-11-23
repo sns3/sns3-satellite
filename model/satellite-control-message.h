@@ -1239,13 +1239,13 @@ public:
    * \brief Get the burst time correction.
    * \return The burst time correction
    */
-  uint16_t GetBurstTimeCorrection () const;
+  int16_t GetBurstTimeCorrection () const;
 
   /**
    * Set the burst time correction.
    * \param burstTimeCorrection The burst time correction
    */
-  void SetBurstTimeCorrection (uint16_t burstTimeCorrection);
+  void SetBurstTimeCorrection (int16_t burstTimeCorrection);
 
   /**
    * \brief Get the powercorrection.
@@ -1266,13 +1266,13 @@ public:
    * \brief Get the frequency correction.
    * \return The frequency correction
    */
-  uint16_t GetFrequencyCorrection () const;
+  int16_t GetFrequencyCorrection () const;
 
   /**
    * Set the frequency correction.
    * \param frequencyCorrection The frequency correction
    */
-  void SetFrequencyCorrection (uint16_t frequencyCorrection);
+  void SetFrequencyCorrection (int16_t frequencyCorrection);
 
   /**
    * \brief Get real size of the message.
@@ -1284,9 +1284,9 @@ private:
   uint8_t m_groupId;
   uint8_t m_logonId;
   uint8_t m_burstTimeScaling;
-  uint8_t m_burstTimeCorrection;
+  int8_t m_burstTimeCorrection;
   uint8_t m_powerCorrection;
-  uint16_t m_frequencyCorrection;
+  int16_t m_frequencyCorrection;
 };
 
 
