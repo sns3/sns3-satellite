@@ -71,6 +71,11 @@ SatGwMac::GetTypeId (void)
                    BooleanValue (false),
                    MakeBooleanAccessor (&SatGwMac::m_useCmt),
                    MakeBooleanChecker ())
+    .AddAttribute ("CmtPeriodMin",
+                   "Minimum interval between two CMT control messages",
+                   TimeValue (MilliSeconds (550)),
+                   MakeTimeAccessor (&SatGwMac::m_cmtPeriodMin),
+                   MakeTimeChecker ())
     .AddTraceSource ("BBFrameTxTrace",
                      "Trace for transmitted BB Frames.",
                      MakeTraceSourceAccessor (&SatGwMac::m_bbFrameTxTrace),
@@ -92,7 +97,9 @@ SatGwMac::SatGwMac ()
   m_fwdScheduler (),
   m_guardTime (MicroSeconds (1)),
   m_ncrInterval (MilliSeconds (100)),
-  m_useCmt (false)
+  m_useCmt (false),
+  m_lastCmtSent (Seconds (0)),
+  m_cmtPeriodMin (MilliSeconds (550))
 {
   NS_LOG_FUNCTION (this);
 }
@@ -102,7 +109,9 @@ SatGwMac::SatGwMac (uint32_t beamId)
   m_fwdScheduler (),
   m_guardTime (MicroSeconds (1)),
   m_ncrInterval (MilliSeconds (100)),
-  m_useCmt (false)
+  m_useCmt (false),
+  m_lastCmtSent (Seconds (0)),
+  m_cmtPeriodMin (MilliSeconds (550))
 {
   NS_LOG_FUNCTION (this);
 }
@@ -472,6 +481,11 @@ SatGwMac::SendCmtMessage (Address utId) // TODO add arguments...
 {
   NS_LOG_FUNCTION (this << utId);
 
+  if (Simulator::Now () < m_lastCmtSent + m_cmtPeriodMin)
+    {
+      return;
+    }
+
   uint32_t indexClosest = 0;
   Time differenceClosest = Seconds (1000000);
   for (uint32_t i = 0; i < m_tbtps.size (); i++)
@@ -519,6 +533,7 @@ SatGwMac::SendCmtMessage (Address utId) // TODO add arguments...
           Ptr<SatCmtMessage> cmt = CreateObject<SatCmtMessage> ();
           cmt->SetBurstTimeCorrection (differenceNcr);
           m_fwdScheduler->SendControlMsg (cmt, utId);
+          m_lastCmtSent = Simulator::Now ();
           return;
         }
     }

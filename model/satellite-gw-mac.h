@@ -225,6 +225,16 @@ private:
   bool m_useCmt;
 
   /**
+   * Time of last CMT sending
+   */
+  Time m_lastCmtSent;
+
+  /**
+   * Minimum interval between two CMT control messages
+   */
+  Time m_cmtPeriodMin;
+
+  /**
    * Trace for transmitted BB frames.
    */
   TracedCallback<Ptr<SatBbFrame>> m_bbFrameTxTrace;

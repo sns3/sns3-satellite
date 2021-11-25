@@ -1800,6 +1800,12 @@ SatUtMac::GetRealSendingTime (Time t) // TODO need to check if correct...
   // TODO handle cases in past
   // TODO initial delta time ????
 
+  if (m_clockDrift == 0 && m_deltaNcr == 0) // For some reason returning t-0 is different than returning t...
+    {
+      //std::cout << "Return t" << std::endl;
+      return t;
+    }
+
   //std::cout << std::endl;
 
   uint32_t driftTicks = (t + Simulator::Now ()).GetMicroSeconds ()/1000000.0*m_clockDrift;
@@ -1813,7 +1819,7 @@ SatUtMac::GetRealSendingTime (Time t) // TODO need to check if correct...
   if (t - deltaTime <= Seconds (0))
   {
     //std::cout << "t - deltaTime " << MicroSeconds (10) << std::endl;
-    return MicroSeconds (10);
+    return NanoSeconds (100);
   }
 
   return t - deltaTime;
