@@ -309,7 +309,7 @@ private:
   Time m_utHandoverDelay;
 
   /**
-   * Timeout to logoff a UT
+   * Timeout to logoff a UT. Set to zero to never logoff
    */
   Time m_utTimeout;
 

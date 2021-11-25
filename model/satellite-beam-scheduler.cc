@@ -866,7 +866,7 @@ SatBeamScheduler::RemoveUt (Address utId)
   UtInfoMap_t::iterator utIterator = m_utInfos.find (utId);
   if (utIterator == m_utInfos.end ())
     {
-      NS_FATAL_ERROR ("Trying to remove a UT not connected to a beam");
+      NS_FATAL_ERROR ("Trying to remove a UT not connected to a beam: " << utId);
     }
 
   // Moving UT infos between beams
