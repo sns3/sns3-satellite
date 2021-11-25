@@ -858,6 +858,22 @@ SatBeamScheduler::TransferUtToBeam (Address utId, Ptr<SatBeamScheduler> destinat
     }
 }
 
+void
+SatBeamScheduler::RemoveUt (Address utId)
+{
+  NS_LOG_FUNCTION (this << utId);
+
+  UtInfoMap_t::iterator utIterator = m_utInfos.find (utId);
+  if (utIterator == m_utInfos.end ())
+    {
+      NS_FATAL_ERROR ("Trying to remove a UT not connected to a beam");
+    }
+
+  // Moving UT infos between beams
+  Ptr<SatUtInfo> utInfo = utIterator->second;
+  RemoveUtInfo (utIterator);
+}
+
 Ptr<SatTimuMessage>
 SatBeamScheduler::CreateTimu () const
 {

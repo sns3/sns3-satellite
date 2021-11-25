@@ -157,6 +157,19 @@ public:
   void SetLogonCallback (SatGwMac::LogonCallback cb);
 
   /**
+   * Callback to inform NCC a control burst has been received.
+   * \param Address identification of the UT that sent the burst
+   * \param uint32_t beam ID where the UT is connected
+   */
+  typedef Callback<void, Address, uint32_t> ControlMessageReceivedCallback;
+
+  /**
+   * Method to set callback for control burst reception
+   * \param cb callback to invoke whenever a control burst is received
+   */
+  void SetControlMessageReceivedCallback (SatGwMac::ControlMessageReceivedCallback cb);
+
+  /**
    * Method to set forward link scheduler
    * \param The scheduler to use
    */
@@ -260,6 +273,11 @@ private:
    * Callback to log a terminal on
    */
   SatGwMac::LogonCallback m_logonCallback;
+
+  /**
+   * Callback to indicate NCC a control burst has been received
+   */
+  SatGwMac::ControlMessageReceivedCallback m_controlMessageReceivedCallback;
 };
 
 } // namespace ns3

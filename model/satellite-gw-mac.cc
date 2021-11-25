@@ -130,6 +130,7 @@ SatGwMac::DoDispose ()
   m_crReceiveCallback.Nullify ();
   m_handoverCallback.Nullify ();
   m_logonCallback.Nullify ();
+  m_controlMessageReceivedCallback.Nullify ();
 
   SatMac::DoDispose ();
 }
@@ -231,6 +232,7 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> r
         {
           SendCmtMessage (utId);
         }
+      m_controlMessageReceivedCallback (utId, m_beamId);
     }
 }
 
@@ -573,6 +575,13 @@ SatGwMac::SetLogonCallback (SatGwMac::LogonCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);
   m_logonCallback = cb;
+}
+
+void
+SatGwMac::SetControlMessageReceivedCallback (SatGwMac::ControlMessageReceivedCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_controlMessageReceivedCallback = cb;
 }
 
 void

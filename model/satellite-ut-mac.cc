@@ -509,6 +509,7 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
           if (timeSlotConf->GetSlotType () == SatTimeSlotConf::SLOT_TYPE_C)
             {
               // TODO is it good to override here ? Do it in SatFrameConf::SatFrameConf ?
+              // TODO add new tag to specify control ?
               wf = m_superframeSeq->GetWaveformConf ()->GetWaveform (2);
               duration = wf->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
             }

@@ -240,6 +240,12 @@ public:
    */
   void TransferUtToBeam (Address utId, Ptr<SatBeamScheduler> destination);
 
+  /**
+   * \brief Remove a UT from its SatBeamScheduler
+   * \param utId the terminal that is leaving this beam
+   */
+  void RemoveUt (Address utId);
+
   void ReserveLogonChannel (uint32_t logonChannelId);
 
   /**

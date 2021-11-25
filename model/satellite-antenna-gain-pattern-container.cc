@@ -51,7 +51,7 @@ SatAntennaGainPatternContainer::SatAntennaGainPatternContainer ()
    * according to the wanted reference system.
    */
   std::string dataPath = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory ();
-  std::string path = dataPath + "/antennapatterns/SatAntennaGain72Beams_";
+  std::string path = dataPath + "/antennapatterns/SatAntennaGain72Beams/SatAntennaGain72Beams_";
 
   // Note, that the beam ids start from 1
   for (uint32_t i = 1; i <= NUMBER_OF_BEAMS; ++i)

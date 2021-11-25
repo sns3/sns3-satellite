@@ -217,6 +217,13 @@ public:
    */
   void TbtpSent (Ptr<SatTbtpMessage> tbtp);
 
+  /**
+   * Function to call when a control burst has been received.
+   * \param utId The address of the sending UT
+   * \param beamId The beam ID
+   */
+  void ReceiveControlBurst (Address utId, uint32_t beamId);
+
 private:
   SatNcc& operator = (const SatNcc &);
   SatNcc (const SatNcc &);
@@ -239,6 +246,13 @@ private:
    * \param destBeamId the beam ID this UT is moving to
    */
   void DoMoveUtBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamId);
+
+  /**
+   * \brief Check if a UT has not been receiving control bursts, and then need to logoff
+   * \param utId The UT to check
+   * \param beamId The beam ID
+   */
+  void CheckTimeout (Address utId, uint32_t beamId);
 
   /**
    * The map containing beams in use (set).
@@ -293,6 +307,16 @@ private:
    * Delay between handover acceptance and effective information transfer
    */
   Time m_utHandoverDelay;
+
+  /**
+   * Timeout to logoff a UT
+   */
+  Time m_utTimeout;
+
+  /**
+   * List of reception time for all UTs. Used to trigger timeouts and logoff UTs.
+   */
+  std::map< std::pair<Address, uint32_t> , Time> m_lastControlBurstReception;
 
   /**
    * Callback to update routing tables and ARP tables on gateways

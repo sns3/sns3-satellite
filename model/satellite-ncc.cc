@@ -56,6 +56,11 @@ SatNcc::GetTypeId (void)
                    TimeValue (Seconds (0.0)),
                    MakeTimeAccessor (&SatNcc::m_utHandoverDelay),
                    MakeTimeChecker ())
+    .AddAttribute ("UtTimeout",
+                   "Timeout to logoff a UT",
+                   TimeValue (Seconds (10)),
+                   MakeTimeAccessor (&SatNcc::m_utTimeout),
+                   MakeTimeChecker ())
   ;
   return tid;
 }
@@ -69,7 +74,8 @@ SatNcc::GetInstanceTypeId (void) const
 }
 
 SatNcc::SatNcc ()
-  : m_utHandoverDelay (Seconds (0.0))
+  : m_utHandoverDelay (Seconds (0.0)),
+  m_utTimeout (Seconds (10))
 {
   NS_LOG_FUNCTION (this);
 }
@@ -430,13 +436,50 @@ SatNcc::ReserveLogonChannel (uint32_t logonChannelId)
 void
 SatNcc::SetSendTbtpCallback (SendTbtpCallback cb)
 {
+  NS_LOG_FUNCTION (this << &cb);
+
   m_txTbtpCallback = cb;
 }
 
 void
 SatNcc::TbtpSent (Ptr<SatTbtpMessage> tbtp)
 {
+  NS_LOG_FUNCTION (this << tbtp);
+
   m_txTbtpCallback (tbtp);
+}
+
+void
+SatNcc::ReceiveControlBurst (Address utId, uint32_t beamId)
+{
+  NS_LOG_FUNCTION (this << utId);
+
+  std::pair <Address, uint32_t> id = std::make_pair (utId, beamId);
+
+  if (m_lastControlBurstReception.find (id) == m_lastControlBurstReception.end ())
+    {
+      Simulator::Schedule (m_utTimeout, &SatNcc::CheckTimeout, this, utId, beamId);
+    }
+  m_lastControlBurstReception[id] = Simulator::Now ();
+}
+
+void
+SatNcc::CheckTimeout (Address utId, uint32_t beamId)
+{
+  NS_LOG_FUNCTION (this << utId);
+  std::pair <Address, uint32_t> id = std::make_pair (utId, beamId);
+  NS_ASSERT_MSG (m_lastControlBurstReception.find (id) != m_lastControlBurstReception.end (), "UT address should be in map");
+
+  Time lastReceptionDate = m_lastControlBurstReception[id];
+  if (Simulator::Now () >= lastReceptionDate + m_utTimeout)
+    {
+      m_lastControlBurstReception.erase (id);
+      m_beamSchedulers[beamId]->RemoveUt (utId);
+    }
+  else
+    {
+      Simulator::Schedule (lastReceptionDate + m_utTimeout - Simulator::Now (), &SatNcc::CheckTimeout, this, utId, beamId);
+    }
 }
 
 } // namespace ns3
