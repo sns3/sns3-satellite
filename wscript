@@ -201,6 +201,7 @@ def build(bld):
         'test/satellite-link-results-test.cc',
         'test/satellite-mobility-test.cc',
         'test/satellite-mobility-observer-test.cc',
+        'test/satellite-ncr-test.cc',
         'test/satellite-per-packet-if-test.cc',
         'test/satellite-performance-memory-test.cc',
         'test/satellite-periodic-control-message-test.cc',

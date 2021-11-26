@@ -34,6 +34,7 @@ cpp_examples = [
 	("sat-multi-application-fwd-example", "True", "True"),
 	("sat-multi-application-rtn-example", "True", "True"),
 	("sat-multicast-example", "True", "True"),
+	("sat-ncr-example", "True", "True"),
 	("sat-nrtv-example", "True", "True"),
 	("sat-onoff-example", "True", "True"),
 	("sat-per-packet-if-sim-tn9", "True", "True"),

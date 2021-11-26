@@ -340,6 +340,8 @@ public:
 
   void SetLogonChannel (uint32_t channelId);
 
+  SatUtMacState::RcstState_t GetRcstState () const;
+
 protected:
   /**
    * Dispose of SatUtMac

@@ -81,9 +81,9 @@ public:
   /**
    * Get the current state.
    *
-   * \return The current state..
+   * \return The current state.
    */
-  RcstState_t GetState ();
+  RcstState_t GetState () const;
 
   /**
    * Change state to HOLD_STANDBY. Raise a FATAL_ERROR if transition not possible from current state.

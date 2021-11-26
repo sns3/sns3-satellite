@@ -561,6 +561,11 @@ SatUtMac::DoTransmit (Time duration, uint32_t carrierId, Ptr<SatWaveform> wf, Pt
       return;
     }
 
+  if ((m_rcstState.GetState () != SatUtMacState::RcstState_t::TDMA_SYNC) && (tsConf->GetSlotType () != SatTimeSlotConf::SLOT_TYPE_C) && m_useLogon)
+    {
+      return;
+    }
+
   NS_LOG_INFO ("DA Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () <<
                " duration: " << duration.GetSeconds () <<
                ", payload: " << wf->GetPayloadInBytes () <<
@@ -748,20 +753,6 @@ SatUtMac::TransmitPackets (SatPhy::PacketContainer_t packets, Time duration, uin
   if (m_rcstState.GetState () == SatUtMacState::RcstState_t::READY_FOR_TDMA_SYNC)
     {
       m_rcstState.SwitchToTdmaSync ();
-    }
-
-  if (m_rcstState.GetState () != SatUtMacState::RcstState_t::TDMA_SYNC and m_useLogon)
-    {
-      SatPhy::PacketContainer_t pkts;
-      for (SatPhy::PacketContainer_t::const_iterator it = packets.begin (); it != packets.end (); ++it)
-        {
-          SatControlMsgTag cTag;
-          if ((*it)->PeekPacketTag (cTag))
-            {
-              pkts.push_back (*it);
-            }
-        }
-      packets = pkts;
     }
 
   // If there are packets to send
@@ -1152,6 +1143,11 @@ SatUtMac::DoRandomAccess (SatEnums::RandomAccessTriggerType_t randomAccessTrigge
   NS_LOG_FUNCTION (this << randomAccessTriggerType);
 
   NS_LOG_INFO ("UT: " << m_nodeInfo->GetMacAddress ());
+
+  if ((m_rcstState.GetState () != SatUtMacState::RcstState_t::TDMA_SYNC) && m_useLogon)
+    {
+      return;
+    }
 
   /// reset the isRandomAccessScheduled flag. TODO: should be done only if randomAccessTriggerType is ESSA
   m_isRandomAccessScheduled = false;
@@ -1847,6 +1843,13 @@ SatUtMac::SatTimuInfo::GetGwAddress () const
 {
   NS_LOG_FUNCTION (this);
   return m_gwAddress;
+}
+
+SatUtMacState::RcstState_t
+SatUtMac::GetRcstState () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_rcstState.GetState ();
 }
 
 

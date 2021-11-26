@@ -80,7 +80,7 @@ SatUtMacState::SetLogOffCallback (SatUtMacState::LogOffCallback cb)
 }
 
 SatUtMacState::RcstState_t
-SatUtMacState::GetState ()
+SatUtMacState::GetState () const
 {
   NS_LOG_FUNCTION (this);
 
