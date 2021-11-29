@@ -517,7 +517,7 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
               // TODO add new tag to specify control ?
               wf = m_superframeSeq->GetWaveformConf ()->GetWaveform (2);
               duration = wf->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
-              if (m_rcstState.GetState () != SatUtMacState::RcstState_t::TDMA_SYNC && m_rcstState.GetState () != SatUtMacState::RcstState_t::READY_FOR_TDMA_SYNC)
+              if (m_useLogon && m_rcstState.GetState () != SatUtMacState::RcstState_t::TDMA_SYNC && m_rcstState.GetState () != SatUtMacState::RcstState_t::READY_FOR_TDMA_SYNC)
                 {
                   drop = true;
                 }
