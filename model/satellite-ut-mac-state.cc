@@ -187,6 +187,14 @@ SatUtMacState::NcrControlMessageReceived ()
     }
 }
 
+bool
+SatUtMacState::IsNcrTimeout () const
+{
+  NS_LOG_FUNCTION (this);
+
+  return Simulator::Now () > m_lastNcrDateReceived + m_ncrSyncTimeout;
+}
+
 void
 SatUtMacState::CheckNcrTimeout ()
 {

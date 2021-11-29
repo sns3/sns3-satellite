@@ -120,6 +120,12 @@ public:
    */
   void NcrControlMessageReceived ();
 
+  /**
+   * Check if NCR m_ncrSyncTimeout has been reached.
+   * \return true if Now () > m_lastNcrDateReceived + m_ncrSyncTimeout
+   */
+  bool IsNcrTimeout () const;
+
 private:
 
   RcstState_t m_rcstState;            // Current state

@@ -475,6 +475,7 @@ SatNcc::CheckTimeout (Address utId, uint32_t beamId)
     {
       m_lastControlBurstReception.erase (id);
       m_beamSchedulers[beamId]->RemoveUt (utId);
+      std::cout << Simulator::Now () << " REMOVE UT" << std::endl;
     }
   else
     {

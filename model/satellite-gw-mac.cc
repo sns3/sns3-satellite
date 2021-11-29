@@ -29,7 +29,6 @@
 #include <ns3/satellite-utils.h>
 #include <ns3/satellite-log.h>
 #include <ns3/satellite-rtn-link-time.h>
-#include "satellite-gw-mac.h"
 
 #include <ns3/packet.h>
 #include <ns3/address.h>
@@ -38,6 +37,8 @@
 #include <ns3/satellite-signal-parameters.h>
 #include <ns3/satellite-control-message.h>
 #include <ns3/satellite-fwd-link-scheduler.h>
+
+#include "satellite-gw-mac.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatGwMac");
 
@@ -437,7 +438,7 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
       }
     case SatControlMsgTag::SAT_LOGON_CTRL_MSG:
       {
-        std::cout << "Receive LOGON" << std::endl;
+        std::cout << Simulator::Now () << "Receive LOGON" << std::endl;
         uint32_t msgId = ctrlTag.GetMsgId ();
         Ptr<SatLogonMessage> logonMessage = DynamicCast<SatLogonMessage> ( m_readCtrlCallback (msgId) );
 

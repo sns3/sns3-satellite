@@ -328,6 +328,7 @@ SatUtMac::LogOff ()
   m_loggedOn = false;
   m_raChannel = m_logonChannel;
   m_rcstState.SwitchToOffStandby ();
+  std::cout << Simulator::Now () << " LOGOFF" << std::endl;
 }
 
 void
@@ -382,7 +383,10 @@ SatUtMac::LogonMsgTransmissionPossible () const
 {
   NS_LOG_FUNCTION (this);
 
-  return m_useLogon;
+  bool stateCorrect = (m_rcstState.GetState () == SatUtMacState::RcstState_t::READY_FOR_LOGON);
+  bool ncrReceived = !m_rcstState.IsNcrTimeout ();
+
+  return m_useLogon && stateCorrect && ncrReceived;
 }
 
 void
@@ -506,22 +510,30 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
           Ptr<SatWaveform> wf = m_superframeSeq->GetWaveformConf ()->GetWaveform (timeSlotConf->GetWaveFormId ());
           Time duration = wf->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
 
+          bool drop = false; // TODO ugly, just to test if it works for now
           if (timeSlotConf->GetSlotType () == SatTimeSlotConf::SLOT_TYPE_C)
             {
               // TODO is it good to override here ? Do it in SatFrameConf::SatFrameConf ?
               // TODO add new tag to specify control ?
               wf = m_superframeSeq->GetWaveformConf ()->GetWaveform (2);
               duration = wf->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
+              if (m_rcstState.GetState () != SatUtMacState::RcstState_t::TDMA_SYNC && m_rcstState.GetState () != SatUtMacState::RcstState_t::READY_FOR_TDMA_SYNC)
+                {
+                  drop = true;
+                }
             }
 
           // Carrier
           uint32_t carrierId = m_superframeSeq->GetCarrierId (0, frameId, timeSlotConf->GetCarrierId () );
 
-          // Schedule individual time slot
-          ScheduleDaTxOpportunity (slotDelay, duration, wf, timeSlotConf, carrierId);
+          if (!drop)
+            {
+              // Schedule individual time slot
+              ScheduleDaTxOpportunity (slotDelay, duration, wf, timeSlotConf, carrierId);
 
-          payloadSumInSuperFrame += wf->GetPayloadInBytes ();
-          payloadSumPerRcIndex [timeSlotConf->GetRcIndex ()] += wf->GetPayloadInBytes ();
+              payloadSumInSuperFrame += wf->GetPayloadInBytes ();
+              payloadSumPerRcIndex [timeSlotConf->GetRcIndex ()] += wf->GetPayloadInBytes ();
+            }
         }
     }
 
