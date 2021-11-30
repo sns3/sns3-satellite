@@ -944,6 +944,20 @@ SatLogonResponseMessage::~SatLogonResponseMessage ()
   NS_LOG_FUNCTION (this);
 }
 
+Time
+SatLogonResponseMessage::GetDelay () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_delay;
+}
+
+void
+SatLogonResponseMessage::SetDelay (Time delay)
+{
+  NS_LOG_FUNCTION (this << delay);
+  m_delay = delay;
+}
+
 void
 SatLogonResponseMessage::SetRaChannel (uint32_t raChannel)
 {
@@ -1093,11 +1107,16 @@ SatCmtMessage::GetBurstTimeCorrection () const
 void
 SatCmtMessage::SetBurstTimeCorrection (int32_t burstTimeCorrection)
 {
-  if (burstTimeCorrection > 16256 || burstTimeCorrection < -16256)
+  // TODO error or truncate ?
+  if (burstTimeCorrection > 16256)
     {
-      NS_FATAL_ERROR ("Burst Time Correction too high, should be at most 16256 and at least -16256, but got " << burstTimeCorrection);
-      // TODO error or truncate ?
-      // return;
+      NS_LOG_INFO ("Burst Time Correction too high, should be at most 16256, but got " << burstTimeCorrection << ". Truncating.");
+      burstTimeCorrection = 16256;
+    }
+  if (burstTimeCorrection < -16256)
+    {
+      NS_LOG_INFO ("Burst Time Correction too low, should be at least -16256, but got " << burstTimeCorrection << ". Truncating.");
+      burstTimeCorrection = -16256;
     }
   m_burstTimeScaling = 0;
   if (burstTimeCorrection > 0)

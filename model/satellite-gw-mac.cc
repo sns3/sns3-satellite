@@ -37,6 +37,7 @@
 #include <ns3/satellite-signal-parameters.h>
 #include <ns3/satellite-control-message.h>
 #include <ns3/satellite-fwd-link-scheduler.h>
+#include <ns3/satellite-time-tag.h>
 
 #include "satellite-gw-mac.h"
 
@@ -73,7 +74,7 @@ SatGwMac::GetTypeId (void)
                    MakeBooleanAccessor (&SatGwMac::m_useCmt),
                    MakeBooleanChecker ())
     .AddAttribute ("CmtPeriodMin",
-                   "Minimum interval between two CMT control messages",
+                   "Minimum interval between two CMT control messages for a same UT",
                    TimeValue (MilliSeconds (550)),
                    MakeTimeAccessor (&SatGwMac::m_cmtPeriodMin),
                    MakeTimeChecker ())
@@ -99,7 +100,7 @@ SatGwMac::SatGwMac ()
   m_guardTime (MicroSeconds (1)),
   m_ncrInterval (MilliSeconds (100)),
   m_useCmt (false),
-  m_lastCmtSent (Seconds (0)),
+  m_lastCmtSent (),
   m_cmtPeriodMin (MilliSeconds (550))
 {
   NS_LOG_FUNCTION (this);
@@ -111,7 +112,7 @@ SatGwMac::SatGwMac (uint32_t beamId)
   m_guardTime (MicroSeconds (1)),
   m_ncrInterval (MilliSeconds (100)),
   m_useCmt (false),
-  m_lastCmtSent (Seconds (0)),
+  m_lastCmtSent (),
   m_cmtPeriodMin (MilliSeconds (550))
 {
   NS_LOG_FUNCTION (this);
@@ -445,7 +446,14 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
         if ( logonMessage != NULL )
           {
             Address utId = macTag.GetSourceAddress ();
-            Callback<void, uint32_t> raChannelCallback = MakeBoundCallback (&SatGwMac::SendLogonResponseHelper, this, utId);
+            SatMacTimeTag timeTag;
+            bool found = packet->PeekPacketTag (timeTag);
+            if (!found)
+              {
+                NS_FATAL_ERROR ("Did not fing SatMacTimeTag in logon message");
+              }
+            Time delay = Simulator::Now () - timeTag.GetSenderTimestamp ();
+            Callback<void, uint32_t> raChannelCallback = MakeBoundCallback (&SatGwMac::SendLogonResponseHelper, this, utId, delay);
             m_logonCallback (utId, m_beamId, raChannelCallback);
           }
         else
@@ -480,16 +488,31 @@ SatGwMac::SendNcrMessage ()
 }
 
 void
-SatGwMac::SendCmtMessage (Address utId) // TODO add arguments...
+SatGwMac::SendCmtMessage (Address utId, int32_t offset) // TODO add arguments...
 {
   NS_LOG_FUNCTION (this << utId);
 
-  if (Simulator::Now () < m_lastCmtSent + m_cmtPeriodMin)
+  if (offset != 0)
+  {
+      Ptr<SatCmtMessage> cmt = CreateObject<SatCmtMessage> ();
+      cmt->SetBurstTimeCorrection (offset);
+      m_fwdScheduler->SendControlMsg (cmt, utId);
+      m_lastCmtSent[utId] = Simulator::Now ();
+  }
+
+  Time lastCmtSent = Seconds (0);
+  if (m_lastCmtSent.find(utId) != m_lastCmtSent.end())
+  {
+    lastCmtSent = m_lastCmtSent[utId];
+  }
+
+  if (Simulator::Now () < lastCmtSent + m_cmtPeriodMin)
     {
       return;
     }
 
   uint32_t indexClosest = 0;
+  uint32_t timeSlotIndexClosest = 0;
   Time differenceClosest = Seconds (1000000);
   for (uint32_t i = 0; i < m_tbtps.size (); i++)
     {
@@ -497,21 +520,27 @@ SatGwMac::SendCmtMessage (Address utId) // TODO add arguments...
       if (tbtp)
         {
           std::pair<uint8_t, std::vector< Ptr<SatTimeSlotConf> >> timeslots = m_tbtps[i]->GetDaTimeslots (utId);
-          for (auto elt = timeslots.second.begin (); elt < timeslots.second.end (); elt++)
+          for (uint32_t j = 0; j < timeslots.second.size (); j++)
             {
-              if ((*elt)->GetSlotType () == 0)
+              Ptr<SatTimeSlotConf> tsConf = timeslots.second[j];
+              if (tsConf->GetSlotType () == SatTimeSlotConf::SLOT_TYPE_C)
                 {
                   Time frameStartTime = Singleton<SatRtnLinkTime>::Get ()->GetSuperFrameTxTime (SatConstVariables::SUPERFRAME_SEQUENCE, i, Seconds (0));
-                  Time difference = Simulator::Now () - frameStartTime;
+                  Time slotStartTime = tsConf->GetStartTime ();
+                  Time difference = Simulator::Now () - frameStartTime - slotStartTime;
                   if (Abs(difference) < differenceClosest)
                     {
                       differenceClosest = Abs (difference);
                       indexClosest = i;
+                      timeSlotIndexClosest = j;
                     }
                 }
             }
         }
     }
+
+  // TODO print closest times
+  std::cout << "Closest: " << indexClosest << " " << timeSlotIndexClosest << std::endl;
 
   if (indexClosest == 0)
     {
@@ -522,39 +551,39 @@ SatGwMac::SendCmtMessage (Address utId) // TODO add arguments...
   Ptr<SatTbtpMessage> tbtp = m_tbtps[indexClosest];
   std::pair<uint8_t, std::vector< Ptr<SatTimeSlotConf> >> timeslots = tbtp->GetDaTimeslots (utId);
 
-  for (auto elt = timeslots.second.begin (); elt < timeslots.second.end (); elt++)
+  if (timeslots.second[timeSlotIndexClosest]->GetSlotType () == 0)
     {
-      if ((*elt)->GetSlotType () == 0)
-        {
-          Time frameStartTime = Singleton<SatRtnLinkTime>::Get ()->GetSuperFrameTxTime (SatConstVariables::SUPERFRAME_SEQUENCE, indexClosest, Seconds (0));
-          std::cout << "At " << Simulator::Now ().GetSeconds () << "s, received frame that should arrive at " << frameStartTime.GetSeconds () << "s" << std::endl;
-          std::cout << "    Difference is " << (Simulator::Now () - frameStartTime).GetMicroSeconds () << "us, UT is " << utId << std::endl;
+      Time frameStartTime = Singleton<SatRtnLinkTime>::Get ()->GetSuperFrameTxTime (SatConstVariables::SUPERFRAME_SEQUENCE, indexClosest, Seconds (0));
+      Time slotStartTime = timeslots.second[timeSlotIndexClosest]->GetStartTime ();
+      std::cout << "At " << Simulator::Now ().GetSeconds () << "s, received frame that should arrive at " << frameStartTime.GetSeconds () + slotStartTime.GetSeconds () << "s" << std::endl;
+      std::cout << "    Difference is " << (Simulator::Now () - frameStartTime - slotStartTime).GetMicroSeconds () << "us, UT is " << utId << std::endl;
 
-          Time difference = frameStartTime - Simulator::Now ();
-          int32_t differenceNcr = difference.GetMicroSeconds ()*27;
+      Time difference = frameStartTime + slotStartTime - Simulator::Now ();
+      int32_t differenceNcr = difference.GetMicroSeconds ()*27;
+      std::cout << "    Difference is " << differenceNcr << " ticks" << std::endl;
 
-          Ptr<SatCmtMessage> cmt = CreateObject<SatCmtMessage> ();
-          cmt->SetBurstTimeCorrection (differenceNcr);
-          m_fwdScheduler->SendControlMsg (cmt, utId);
-          m_lastCmtSent = Simulator::Now ();
-          return;
-        }
+      Ptr<SatCmtMessage> cmt = CreateObject<SatCmtMessage> ();
+      cmt->SetBurstTimeCorrection (differenceNcr);
+      m_fwdScheduler->SendControlMsg (cmt, utId);
+      m_lastCmtSent[utId] = Simulator::Now ();
+      return;
     }
 }
 
 void
-SatGwMac::SendLogonResponse (Address utId, uint32_t raChannel)
+SatGwMac::SendLogonResponse (Address utId, Time delay, uint32_t raChannel)
 {
   NS_LOG_FUNCTION (this << utId << raChannel);
   Ptr<SatLogonResponseMessage> logonResponse = CreateObject<SatLogonResponseMessage> ();
+  logonResponse->SetDelay (delay);
   logonResponse->SetRaChannel (raChannel);
   m_fwdScheduler->SendControlMsg (logonResponse, utId);
 }
 
 void
-SatGwMac::SendLogonResponseHelper (SatGwMac* self, Address utId, uint32_t raChannel)
+SatGwMac::SendLogonResponseHelper (SatGwMac* self, Address utId, Time delay, uint32_t raChannel)
 {
-  self->SendLogonResponse (utId, raChannel);
+  self->SendLogonResponse (utId, delay, raChannel);
 }
 
 void

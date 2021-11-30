@@ -206,10 +206,10 @@ private:
 
   void SendNcrMessage ();
 
-  void SendCmtMessage (Address utId); // TODO add arguments
+  void SendCmtMessage (Address utId, int32_t offset = 0); // TODO add arguments
 
-  void SendLogonResponse (Address utId, uint32_t raChannel);
-  static void SendLogonResponseHelper (SatGwMac* self,Address utId, uint32_t raChannel);
+  void SendLogonResponse (Address utId, Time delay, uint32_t raChannel);
+  static void SendLogonResponseHelper (SatGwMac* self,Address utId, Time delay, uint32_t raChannel);
 
   /**
    * List of TBTPs sent to UTs. Key is superframe counter, value is TBTP.
@@ -238,12 +238,12 @@ private:
   bool m_useCmt;
 
   /**
-   * Time of last CMT sending
+   * Time of last CMT sending for each UT
    */
-  Time m_lastCmtSent;
+  std::map<Address, Time> m_lastCmtSent;
 
   /**
-   * Minimum interval between two CMT control messages
+   * Minimum interval between two CMT control messages for a same UT
    */
   Time m_cmtPeriodMin;
 

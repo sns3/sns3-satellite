@@ -296,7 +296,7 @@ SatMac::RxTraces (SatPhy::PacketContainer_t packets)
               m_rxTrace (*it1, addr);
 
               SatMacTimeTag timeTag;
-              if ((*it1)->RemovePacketTag (timeTag))
+              if ((*it1)->PeekPacketTag (timeTag))
                 {
                   NS_LOG_DEBUG (this << " contains a SatMacTimeTag tag");
                   Time delay = Simulator::Now () - timeTag.GetSenderTimestamp ();

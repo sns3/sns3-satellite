@@ -510,10 +510,9 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
           Ptr<SatWaveform> wf = m_superframeSeq->GetWaveformConf ()->GetWaveform (timeSlotConf->GetWaveFormId ());
           Time duration = wf->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
 
-          bool drop = false; // TODO ugly, just to test if it works for now
+          bool drop = false;
           if (timeSlotConf->GetSlotType () == SatTimeSlotConf::SLOT_TYPE_C)
             {
-              // TODO is it good to override here ? Do it in SatFrameConf::SatFrameConf ?
               // TODO add new tag to specify control ?
               wf = m_superframeSeq->GetWaveformConf ()->GetWaveform (2);
               duration = wf->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
@@ -521,6 +520,7 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
                 {
                   drop = true;
                 }
+              std::cout << "Sending control burst " << timeSlotConf->GetStartTime () << " after SF start" << std::endl;
             }
 
           // Carrier
@@ -590,6 +590,12 @@ SatUtMac::DoTransmit (Time duration, uint32_t carrierId, Ptr<SatWaveform> wf, Pt
   txInfo.fecBlockSizeInBytes = wf->GetPayloadInBytes ();
   txInfo.frameType = SatEnums::UNDEFINED_FRAME;
   txInfo.waveformId = wf->GetWaveformId ();
+
+  if (txInfo.waveformId == 2 && tsConf->GetSlotType () != SatTimeSlotConf::SLOT_TYPE_C)
+    {
+      // TODO remove after use
+      NS_FATAL_ERROR ("NO !");
+    }
 
   TransmitPackets (FetchPackets (wf->GetPayloadInBytes (), tsConf->GetSlotType (), tsConf->GetRcIndex (), policy), duration, carrierId, txInfo);
 }
@@ -1095,6 +1101,17 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
             m_sendLogonTries = 0;
             m_rcstState.SetLogOffCallback (MakeCallback (&SatUtMac::LogOff, this));
             m_rcstState.SwitchToReadyForTdmaSync ();
+            // TODO suppose time correction sent with message + need to compensate processing time ?
+            Time timingAdvance = m_timingAdvanceCb ();
+            Time propagationDelay = logonMsg->GetDelay ();
+            std::cout << "Timing advance: " << timingAdvance << std::endl;
+            std::cout << "Delay: " << propagationDelay << std::endl;
+            std::cout << "Difference: " << (timingAdvance - propagationDelay).GetMicroSeconds () << "us" << std::endl;
+            std::cout << "Difference: " << (timingAdvance - propagationDelay).GetMicroSeconds ()*27 << " ticks" << std::endl;
+            //NS_FATAL_ERROR ("STOP");
+            m_deltaNcr = Simulator::Now ().GetSeconds ()*m_clockDrift - 8784;
+            //m_deltaNcr = Simulator::Now ().GetSeconds ()*m_clockDrift + (timingAdvance - propagationDelay).GetMicroSeconds ()*13.5;
+            std::cout << "UT " << m_nodeInfo->GetMacAddress () << " has been logged in. Correction is " << m_deltaNcr << std::endl;
           }
         else
           {
@@ -1138,7 +1155,7 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
         Ptr<SatCmtMessage> cmtMsg = DynamicCast<SatCmtMessage> (m_readCtrlCallback (cmtCtrlId));
         int16_t burstTimeCorrection = cmtMsg->GetBurstTimeCorrection ();
         m_deltaNcr += burstTimeCorrection;
-        std::cout << "CMT message received, correction is " << burstTimeCorrection << ", total is " << m_deltaNcr << std::endl;
+        std::cout << "CMT message received at " << m_nodeInfo->GetMacAddress () << ", correction is " << burstTimeCorrection << ", total is " << m_deltaNcr << std::endl;
         break;
       }
     default:
@@ -1803,31 +1820,19 @@ SatUtMac::DoFrameStart ()
 }
 
 Time
-SatUtMac::GetRealSendingTime (Time t) // TODO need to check if correct...
+SatUtMac::GetRealSendingTime (Time t)
 {
-  // TODO handle rollbacks
-  // TODO handle cases in past
-  // TODO initial delta time ????
-
   if (m_clockDrift == 0 && m_deltaNcr == 0) // For some reason returning t-0 is different than returning t...
     {
-      //std::cout << "Return t" << std::endl;
       return t;
     }
-
-  //std::cout << std::endl;
 
   uint32_t driftTicks = (t + Simulator::Now ()).GetMicroSeconds ()/1000000.0*m_clockDrift;
   int32_t deltaTicks = driftTicks - m_deltaNcr;
   Time deltaTime = NanoSeconds (deltaTicks*1000/27.0);
 
-  //std::cout << "driftTicks " << driftTicks << std::endl;
-  //std::cout << "deltaTicks " << deltaTicks << std::endl;
-  //std::cout << "deltaTime " << deltaTime << std::endl;
-
   if (t - deltaTime <= Seconds (0))
   {
-    //std::cout << "t - deltaTime " << MicroSeconds (10) << std::endl;
     return NanoSeconds (100);
   }
 
