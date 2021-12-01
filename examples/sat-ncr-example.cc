@@ -41,14 +41,15 @@ main (int argc, char *argv[])
 {
   uint32_t beamId = 1;
   uint32_t endUsersPerUt = 1;
-  // uint32_t utsPerBeam = 1;
+  //uint32_t utsPerBeam = 1;
   uint32_t utsPerBeam = 10;
 
   uint32_t packetSize = 512;
   std::string interval = "100ms";
+  //std::string interval = "1s";
 
   double simLength = 60.0;
-  //double simLength = 20.0;
+  //double simLength = 22.0;
 
   /// Set simulation output details
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
@@ -89,7 +90,7 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (true));
   Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotInterval", TimeValue (MilliSeconds (500)));
 
-  //Config::SetDefault ("ns3::SatUtMac::ClockDrift", IntegerValue (100));
+  Config::SetDefault ("ns3::SatUtMac::ClockDrift", IntegerValue (100));
   Config::SetDefault ("ns3::SatGwMac::CmtPeriodMin", TimeValue (MilliSeconds (550)));
 
 
@@ -125,6 +126,9 @@ main (int argc, char *argv[])
   s->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   s->AddGlobalFwdMacDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddGlobalFwdMacDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);

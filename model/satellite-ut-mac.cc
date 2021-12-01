@@ -520,7 +520,7 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
                 {
                   drop = true;
                 }
-              std::cout << "Sending control burst " << timeSlotConf->GetStartTime () << " after SF start" << std::endl;
+              std::cout << "Sending control burst " << timeSlotConf->GetStartTime () << " after SF start, drop=" << drop << ". slotDelay = " << slotDelay << std::endl;
             }
 
           // Carrier
@@ -578,6 +578,18 @@ SatUtMac::DoTransmit (Time duration, uint32_t carrierId, Ptr<SatWaveform> wf, Pt
       return;
     }
 
+
+  SatPhy::PacketContainer_t packets = FetchPackets (wf->GetPayloadInBytes (), tsConf->GetSlotType (), tsConf->GetRcIndex (), policy);
+
+  if (wf == m_superframeSeq->GetWaveformConf ()->GetWaveform (2))
+    {
+      if (packets.size () == 0) // TODO send dummy packet if constrol slot empty ?
+        {
+          Ptr<Packet> p = Create<Packet> (wf->GetPayloadInBytes ());
+          packets.push_back (p);
+        }
+    }
+
   NS_LOG_INFO ("DA Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () <<
                " duration: " << duration.GetSeconds () <<
                ", payload: " << wf->GetPayloadInBytes () <<
@@ -597,7 +609,7 @@ SatUtMac::DoTransmit (Time duration, uint32_t carrierId, Ptr<SatWaveform> wf, Pt
       NS_FATAL_ERROR ("NO !");
     }
 
-  TransmitPackets (FetchPackets (wf->GetPayloadInBytes (), tsConf->GetSlotType (), tsConf->GetRcIndex (), policy), duration, carrierId, txInfo);
+  TransmitPackets (packets, duration, carrierId, txInfo);
 }
 
 void
@@ -1101,16 +1113,7 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
             m_sendLogonTries = 0;
             m_rcstState.SetLogOffCallback (MakeCallback (&SatUtMac::LogOff, this));
             m_rcstState.SwitchToReadyForTdmaSync ();
-            // TODO suppose time correction sent with message + need to compensate processing time ?
-            Time timingAdvance = m_timingAdvanceCb ();
-            Time propagationDelay = logonMsg->GetDelay ();
-            std::cout << "Timing advance: " << timingAdvance << std::endl;
-            std::cout << "Delay: " << propagationDelay << std::endl;
-            std::cout << "Difference: " << (timingAdvance - propagationDelay).GetMicroSeconds () << "us" << std::endl;
-            std::cout << "Difference: " << (timingAdvance - propagationDelay).GetMicroSeconds ()*27 << " ticks" << std::endl;
-            //NS_FATAL_ERROR ("STOP");
-            m_deltaNcr = Simulator::Now ().GetSeconds ()*m_clockDrift - 8784;
-            //m_deltaNcr = Simulator::Now ().GetSeconds ()*m_clockDrift + (timingAdvance - propagationDelay).GetMicroSeconds ()*13.5;
+            m_deltaNcr = Simulator::Now ().GetMicroSeconds ()*m_clockDrift/1000000;
             std::cout << "UT " << m_nodeInfo->GetMacAddress () << " has been logged in. Correction is " << m_deltaNcr << std::endl;
           }
         else
@@ -1827,12 +1830,19 @@ SatUtMac::GetRealSendingTime (Time t)
       return t;
     }
 
-  uint32_t driftTicks = (t + Simulator::Now ()).GetMicroSeconds ()/1000000.0*m_clockDrift;
+  uint32_t driftTicks = (t + Simulator::Now ()).GetMicroSeconds ()*m_clockDrift/1000000;
   int32_t deltaTicks = driftTicks - m_deltaNcr;
   Time deltaTime = NanoSeconds (deltaTicks*1000/27.0);
 
   if (t - deltaTime <= Seconds (0))
   {
+    /*std::cout << "Truncate " << t-deltaTime << " " << m_nodeInfo->GetMacAddress () << std::endl;
+    std::cout << "m_deltaNcr " << m_deltaNcr << std::endl;
+    std::cout << "driftTicks " << driftTicks << std::endl;
+    std::cout << "deltaTicks " << deltaTicks << std::endl;
+    std::cout << "deltaTime  " << deltaTime << std::endl;
+    std::cout << "t          " << t << std::endl;
+    std::cout << std::endl;*/
     return NanoSeconds (100);
   }
 

@@ -206,10 +206,10 @@ private:
 
   void SendNcrMessage ();
 
-  void SendCmtMessage (Address utId, int32_t offset = 0); // TODO add arguments
+  void SendCmtMessage (Address utId, Time burstDuration);
 
-  void SendLogonResponse (Address utId, Time delay, uint32_t raChannel);
-  static void SendLogonResponseHelper (SatGwMac* self,Address utId, Time delay, uint32_t raChannel);
+  void SendLogonResponse (Address utId, uint32_t raChannel);
+  static void SendLogonResponseHelper (SatGwMac* self,Address utId, uint32_t raChannel);
 
   /**
    * List of TBTPs sent to UTs. Key is superframe counter, value is TBTP.

@@ -1086,18 +1086,6 @@ public:
   }
 
   /**
-   * \brief Get the propagetion delay of corresponding logon
-   * \return The propagation delay
-   */
-  Time GetDelay () const;
-
-  /**
-   * Set the propagetion delay of corresponding logon
-   * \param delay The propagation delay
-   */
-  void SetDelay (Time delay);
-
-  /**
    * \brief Get the RA channel to talk into.
    * \return The RA channel
    */

@@ -944,20 +944,6 @@ SatLogonResponseMessage::~SatLogonResponseMessage ()
   NS_LOG_FUNCTION (this);
 }
 
-Time
-SatLogonResponseMessage::GetDelay () const
-{
-  NS_LOG_FUNCTION (this);
-  return m_delay;
-}
-
-void
-SatLogonResponseMessage::SetDelay (Time delay)
-{
-  NS_LOG_FUNCTION (this << delay);
-  m_delay = delay;
-}
-
 void
 SatLogonResponseMessage::SetRaChannel (uint32_t raChannel)
 {

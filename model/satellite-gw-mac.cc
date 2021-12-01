@@ -230,9 +230,10 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> r
   if (rxParams->m_txInfo.waveformId == 2)
     {
       // TODO change check on WF02 to check if correct TS type
+      std::cout << "Receive control burst" << std::endl;
       if (m_useCmt)
         {
-          SendCmtMessage (utId);
+          SendCmtMessage (utId, rxParams->m_duration);
         }
       m_controlMessageReceivedCallback (utId, m_beamId);
     }
@@ -452,8 +453,7 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
               {
                 NS_FATAL_ERROR ("Did not fing SatMacTimeTag in logon message");
               }
-            Time delay = Simulator::Now () - timeTag.GetSenderTimestamp ();
-            Callback<void, uint32_t> raChannelCallback = MakeBoundCallback (&SatGwMac::SendLogonResponseHelper, this, utId, delay);
+            Callback<void, uint32_t> raChannelCallback = MakeBoundCallback (&SatGwMac::SendLogonResponseHelper, this, utId);
             m_logonCallback (utId, m_beamId, raChannelCallback);
           }
         else
@@ -488,17 +488,9 @@ SatGwMac::SendNcrMessage ()
 }
 
 void
-SatGwMac::SendCmtMessage (Address utId, int32_t offset) // TODO add arguments...
+SatGwMac::SendCmtMessage (Address utId, Time burstDuration) // TODO add arguments...
 {
   NS_LOG_FUNCTION (this << utId);
-
-  if (offset != 0)
-  {
-      Ptr<SatCmtMessage> cmt = CreateObject<SatCmtMessage> ();
-      cmt->SetBurstTimeCorrection (offset);
-      m_fwdScheduler->SendControlMsg (cmt, utId);
-      m_lastCmtSent[utId] = Simulator::Now ();
-  }
 
   Time lastCmtSent = Seconds (0);
   if (m_lastCmtSent.find(utId) != m_lastCmtSent.end())
@@ -527,7 +519,7 @@ SatGwMac::SendCmtMessage (Address utId, int32_t offset) // TODO add arguments...
                 {
                   Time frameStartTime = Singleton<SatRtnLinkTime>::Get ()->GetSuperFrameTxTime (SatConstVariables::SUPERFRAME_SEQUENCE, i, Seconds (0));
                   Time slotStartTime = tsConf->GetStartTime ();
-                  Time difference = Simulator::Now () - frameStartTime - slotStartTime;
+                  Time difference = Simulator::Now () - frameStartTime - slotStartTime - burstDuration;
                   if (Abs(difference) < differenceClosest)
                     {
                       differenceClosest = Abs (difference);
@@ -539,12 +531,9 @@ SatGwMac::SendCmtMessage (Address utId, int32_t offset) // TODO add arguments...
         }
     }
 
-  // TODO print closest times
-  std::cout << "Closest: " << indexClosest << " " << timeSlotIndexClosest << std::endl;
-
   if (indexClosest == 0)
     {
-      std::cout << "No TBTP" << std::endl;
+      std::cout << "No TBTP found" << std::endl;
       return;
     }
 
@@ -556,9 +545,10 @@ SatGwMac::SendCmtMessage (Address utId, int32_t offset) // TODO add arguments...
       Time frameStartTime = Singleton<SatRtnLinkTime>::Get ()->GetSuperFrameTxTime (SatConstVariables::SUPERFRAME_SEQUENCE, indexClosest, Seconds (0));
       Time slotStartTime = timeslots.second[timeSlotIndexClosest]->GetStartTime ();
       std::cout << "At " << Simulator::Now ().GetSeconds () << "s, received frame that should arrive at " << frameStartTime.GetSeconds () + slotStartTime.GetSeconds () << "s" << std::endl;
-      std::cout << "    Difference is " << (Simulator::Now () - frameStartTime - slotStartTime).GetMicroSeconds () << "us, UT is " << utId << std::endl;
+      std::cout << "Burst duration is " << burstDuration << std::endl;
+      std::cout << "    Difference is " << (Simulator::Now () - frameStartTime - slotStartTime - burstDuration).GetMicroSeconds () << "us, UT is " << utId << std::endl;
 
-      Time difference = frameStartTime + slotStartTime - Simulator::Now ();
+      Time difference = frameStartTime + slotStartTime + burstDuration - Simulator::Now ();
       int32_t differenceNcr = difference.GetMicroSeconds ()*27;
       std::cout << "    Difference is " << differenceNcr << " ticks" << std::endl;
 
@@ -571,19 +561,18 @@ SatGwMac::SendCmtMessage (Address utId, int32_t offset) // TODO add arguments...
 }
 
 void
-SatGwMac::SendLogonResponse (Address utId, Time delay, uint32_t raChannel)
+SatGwMac::SendLogonResponse (Address utId, uint32_t raChannel)
 {
   NS_LOG_FUNCTION (this << utId << raChannel);
   Ptr<SatLogonResponseMessage> logonResponse = CreateObject<SatLogonResponseMessage> ();
-  logonResponse->SetDelay (delay);
   logonResponse->SetRaChannel (raChannel);
   m_fwdScheduler->SendControlMsg (logonResponse, utId);
 }
 
 void
-SatGwMac::SendLogonResponseHelper (SatGwMac* self, Address utId, Time delay, uint32_t raChannel)
+SatGwMac::SendLogonResponseHelper (SatGwMac* self, Address utId, uint32_t raChannel)
 {
-  self->SendLogonResponse (utId, delay, raChannel);
+  self->SendLogonResponse (utId, raChannel);
 }
 
 void
