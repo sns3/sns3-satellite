@@ -42,7 +42,7 @@ main (int argc, char *argv[])
   uint32_t beamId = 1;
   uint32_t endUsersPerUt = 1;
   //uint32_t utsPerBeam = 1;
-  uint32_t utsPerBeam = 10;
+  uint32_t utsPerBeam = 100;
 
   uint32_t packetSize = 512;
   std::string interval = "100ms";
@@ -78,6 +78,7 @@ main (int argc, char *argv[])
 
   Config::SetDefault ("ns3::SatUtMac::WindowInitLogon", TimeValue (Seconds (20)));
   Config::SetDefault ("ns3::SatUtMac::MaxWaitingTimeLogonResponse", TimeValue (Seconds (1)));
+  Config::SetDefault ("ns3::SatUtMac::GuardTime", TimeValue (MicroSeconds (1)));
 
 
   Config::SetDefault ("ns3::SatMac::NcrVersion2", BooleanValue (false));

@@ -224,6 +224,12 @@ public:
    */
   void ReceiveControlBurst (Address utId, uint32_t beamId);
 
+  /**
+   * Set if logon is used in this simulation. Logoff is disbled if logon is not used.
+   * \param useLogon boolean indicating if logon is used.
+   */
+  void SetUseLogon (bool useLogon);
+
 private:
   SatNcc& operator = (const SatNcc &);
   SatNcc (const SatNcc &);
@@ -309,9 +315,14 @@ private:
   Time m_utHandoverDelay;
 
   /**
-   * Timeout to logoff a UT. Set to zero to never logoff
+   * Timeout to logoff a UT, if logon procedure is used
    */
   Time m_utTimeout;
+
+  /**
+   * Flag indicating if logon procedure is used
+   */
+  bool m_useLogon;
 
   /**
    * List of reception time for all UTs. Used to trigger timeouts and logoff UTs.

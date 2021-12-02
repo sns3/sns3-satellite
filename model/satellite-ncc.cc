@@ -57,7 +57,7 @@ SatNcc::GetTypeId (void)
                    MakeTimeAccessor (&SatNcc::m_utHandoverDelay),
                    MakeTimeChecker ())
     .AddAttribute ("UtTimeout",
-                   "Timeout to logoff a UT. Set to zero to never logoff",
+                   "Timeout to logoff a UT, if logon procedure is used",
                    TimeValue (Seconds (0)),
                    MakeTimeAccessor (&SatNcc::m_utTimeout),
                    MakeTimeChecker ())
@@ -75,7 +75,8 @@ SatNcc::GetInstanceTypeId (void) const
 
 SatNcc::SatNcc ()
   : m_utHandoverDelay (Seconds (0.0)),
-  m_utTimeout (Seconds (0))
+  m_utTimeout (Seconds (0)),
+  m_useLogon (false)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -456,11 +457,17 @@ SatNcc::ReceiveControlBurst (Address utId, uint32_t beamId)
 
   std::pair <Address, uint32_t> id = std::make_pair (utId, beamId);
 
-  if ((m_lastControlBurstReception.find (id) == m_lastControlBurstReception.end ()) && (m_utTimeout != Seconds (0)))
+  if ((m_lastControlBurstReception.find (id) == m_lastControlBurstReception.end ()) && m_useLogon)
     {
       Simulator::Schedule (m_utTimeout, &SatNcc::CheckTimeout, this, utId, beamId);
     }
   m_lastControlBurstReception[id] = Simulator::Now ();
+}
+
+void
+SatNcc::SetUseLogon (bool useLogon)
+{
+  m_useLogon = useLogon;
 }
 
 void

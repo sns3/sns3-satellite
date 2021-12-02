@@ -40,6 +40,7 @@
 #include <ns3/satellite-node-info.h>
 #include <ns3/satellite-const-variables.h>
 #include <ns3/satellite-log.h>
+#include <ns3/satellite-encap-pdu-status-tag.h>
 #include "satellite-ut-mac.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatUtMac");
@@ -590,7 +591,24 @@ SatUtMac::DoTransmit (Time duration, uint32_t carrierId, Ptr<SatWaveform> wf, Pt
       if (packets.size () == 0) // TODO send dummy packet if constrol slot empty ?
         {
           Ptr<Packet> p = Create<Packet> (wf->GetPayloadInBytes ());
+
+          // Mark the PDU with FULL_PDU tag
+          SatEncapPduStatusTag tag;
+          tag.SetStatus (SatEncapPduStatusTag::FULL_PDU);
+          p->AddPacketTag (tag);
+
+          // Add MAC tag to identify the packet in lower layers
+          SatMacTag mTag;
+          mTag.SetDestAddress (m_gwAddress);
+          mTag.SetSourceAddress (m_nodeInfo->GetMacAddress ());
+          p->AddPacketTag (mTag);
+
+
+
+
           packets.push_back (p);
+          std::cout << "Send dummy control burst for UT " << m_nodeInfo->GetMacAddress () << std::endl;
+          //NS_FATAL_ERROR ("STOP");
         }
     }
 

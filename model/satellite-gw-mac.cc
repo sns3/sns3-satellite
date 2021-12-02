@@ -447,12 +447,6 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
         if ( logonMessage != NULL )
           {
             Address utId = macTag.GetSourceAddress ();
-            SatMacTimeTag timeTag;
-            bool found = packet->PeekPacketTag (timeTag);
-            if (!found)
-              {
-                NS_FATAL_ERROR ("Did not fing SatMacTimeTag in logon message");
-              }
             Callback<void, uint32_t> raChannelCallback = MakeBoundCallback (&SatGwMac::SendLogonResponseHelper, this, utId);
             m_logonCallback (utId, m_beamId, raChannelCallback);
           }
