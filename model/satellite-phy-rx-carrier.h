@@ -640,6 +640,8 @@ private:
    * \brief Channel estimation error container
    */
   Ptr<SatChannelEstimationErrorContainer> m_channelEstimationError;
+
+  Time m_scheduledEnd; // TODO for debug
 };
 
 }
