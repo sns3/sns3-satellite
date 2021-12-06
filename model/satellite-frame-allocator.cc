@@ -870,7 +870,7 @@ SatFrameAllocator::CreateTimeSlot (uint16_t carrierId, int64_t& utSymbolsToUse, 
     {
       if ( rcSymbolsLeft > 0)
         {
-          if (carrierSymbolsToUse <= utSymbolsToUse)
+          if (carrierSymbolsToUse + m_guardTimeSymbols <= utSymbolsToUse)
             {
               carrierSymbolsToUse -= symbolsToUse;
               carrierSymbolsToUse -= m_guardTimeSymbols;
@@ -938,7 +938,7 @@ SatFrameAllocator::CreateCtrlTimeSlot (uint16_t carrierId, int64_t& utSymbolsToU
   Ptr<SatTimeSlotConf> timeSlotConf = NULL;
   int64_t symbolsToUse = std::min<int64_t> (carrierSymbolsToUse, utSymbolsToUse);
 
-  int64_t timeSlotSymbols = m_waveformConf->GetWaveform (2)->GetBurstLengthInSymbols ();
+  int64_t timeSlotSymbols = m_mostRobustWaveform->GetBurstLengthInSymbols ();
 
   if ( timeSlotSymbols + m_guardTimeSymbols <= symbolsToUse )
     {

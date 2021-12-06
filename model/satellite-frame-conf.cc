@@ -192,7 +192,8 @@ SatFrameConf::SatFrameConf (SatFrameConfParams_t parameters)
     {
       for (uint32_t j = 0; j < carrierSlotCount; j++)
         {
-          Ptr<SatTimeSlotConf> timeSlot = Create<SatTimeSlotConf> (Time (j * timeSlotDuration.GetInteger ()), defWaveFormId, i, SatTimeSlotConf::SLOT_TYPE_TRC);
+          Time guardTime = Seconds ( (m_guardTimeSymbols/2) / m_btuConf->GetSymbolRateInBauds ());
+          Ptr<SatTimeSlotConf> timeSlot = Create<SatTimeSlotConf> (Time (j * timeSlotDuration.GetInteger ()) + guardTime, defWaveFormId, i, SatTimeSlotConf::SLOT_TYPE_TRC);
           AddTimeSlotConf (timeSlot);
 
           frameTimeSlotCount++;

@@ -102,6 +102,17 @@ SatNcrTest1::DoRun (void)
   Config::SetDefault ("ns3::SatSuperframeConf0::Frame1_RandomAccessFrame", BooleanValue (true));
   Config::SetDefault ("ns3::SatSuperframeConf0::Frame1_LogonFrame", BooleanValue (true));
 
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame0_GuardTimeSymbols", UintegerValue (4));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame1_GuardTimeSymbols", UintegerValue (4));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame2_GuardTimeSymbols", UintegerValue (4));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame3_GuardTimeSymbols", UintegerValue (4));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame4_GuardTimeSymbols", UintegerValue (4));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame5_GuardTimeSymbols", UintegerValue (4));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame6_GuardTimeSymbols", UintegerValue (4));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame7_GuardTimeSymbols", UintegerValue (4));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame8_GuardTimeSymbols", UintegerValue (4));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame9_GuardTimeSymbols", UintegerValue (4));
+
   Config::SetDefault ("ns3::SatUtMac::WindowInitLogon", TimeValue (Seconds (20)));
   Config::SetDefault ("ns3::SatUtMac::MaxWaitingTimeLogonResponse", TimeValue (Seconds (1)));
 
@@ -253,6 +264,17 @@ SatNcrTest2::DoRun (void)
   Config::SetDefault ("ns3::SatSuperframeConf0::Frame0_RandomAccessFrame", BooleanValue (true));
   Config::SetDefault ("ns3::SatSuperframeConf0::Frame1_RandomAccessFrame", BooleanValue (true));
   Config::SetDefault ("ns3::SatSuperframeConf0::Frame1_LogonFrame", BooleanValue (true));
+
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame0_GuardTimeSymbols", UintegerValue (4));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame1_GuardTimeSymbols", UintegerValue (4));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame2_GuardTimeSymbols", UintegerValue (4));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame3_GuardTimeSymbols", UintegerValue (4));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame4_GuardTimeSymbols", UintegerValue (4));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame5_GuardTimeSymbols", UintegerValue (4));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame6_GuardTimeSymbols", UintegerValue (4));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame7_GuardTimeSymbols", UintegerValue (4));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame8_GuardTimeSymbols", UintegerValue (4));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame9_GuardTimeSymbols", UintegerValue (4));
 
   Config::SetDefault ("ns3::SatUtMac::WindowInitLogon", TimeValue (Seconds (20)));
   Config::SetDefault ("ns3::SatUtMac::MaxWaitingTimeLogonResponse", TimeValue (Seconds (1)));
@@ -440,6 +462,17 @@ SatNcrTest3::DoRun (void)
   Config::SetDefault ("ns3::SatSuperframeConf0::Frame0_RandomAccessFrame", BooleanValue (true));
   Config::SetDefault ("ns3::SatSuperframeConf0::Frame1_RandomAccessFrame", BooleanValue (true));
   Config::SetDefault ("ns3::SatSuperframeConf0::Frame1_LogonFrame", BooleanValue (true));
+
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame0_GuardTimeSymbols", UintegerValue (4));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame1_GuardTimeSymbols", UintegerValue (4));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame2_GuardTimeSymbols", UintegerValue (4));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame3_GuardTimeSymbols", UintegerValue (4));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame4_GuardTimeSymbols", UintegerValue (4));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame5_GuardTimeSymbols", UintegerValue (4));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame6_GuardTimeSymbols", UintegerValue (4));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame7_GuardTimeSymbols", UintegerValue (4));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame8_GuardTimeSymbols", UintegerValue (4));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame9_GuardTimeSymbols", UintegerValue (4));
 
   Config::SetDefault ("ns3::SatUtMac::WindowInitLogon", TimeValue (Seconds (20)));
   Config::SetDefault ("ns3::SatUtMac::MaxWaitingTimeLogonResponse", TimeValue (Seconds (1)));
