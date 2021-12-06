@@ -263,6 +263,7 @@ class SatFrameConf : public SimpleRefCount<SatFrameConf>
      * \param btuConf               BTU configuration of the frame
      * \param waveformConf          Waveform configuration
      * \param allocationChannel     Lower layer service configuration ID
+     * \param guardTimeSymbols      Number of symbols used for guard time
      * \param isRandomAccess        Flag telling if random access frame
      * \param m_isLogon             Flag telling if logon frame
      * \param defaultWaveformInUse  Flag telling if default waveform should be used with frame
@@ -276,6 +277,7 @@ class SatFrameConf : public SimpleRefCount<SatFrameConf>
       Ptr<SatBtuConf> m_btuConf;
       Ptr<SatWaveformConf> m_waveformConf;
       uint8_t m_allocationChannel;
+      uint8_t m_guardTimeSymbols;
       bool m_isRandomAccess;
       bool m_isLogon;
       bool m_defaultWaveformInUse;
@@ -461,6 +463,14 @@ class SatFrameConf : public SimpleRefCount<SatFrameConf>
       return m_waveformConf;
     }
 
+    /**
+     * Get the guard time configuration of this frame
+     */
+    inline uint8_t GetGuardTimeSymbols () const
+    {
+      return m_guardTimeSymbols;
+    }
+
   private:
     typedef std::map<uint16_t, SatTimeSlotConfContainer_t > SatTimeSlotConfMap_t; // key = carrier ID
 
@@ -477,6 +487,7 @@ class SatFrameConf : public SimpleRefCount<SatFrameConf>
     uint32_t              m_maxSymbolsPerCarrier;
     uint32_t              m_minPayloadPerCarrierInBytes;
     SatTimeSlotConfMap_t  m_timeSlotConfMap;
+    uint8_t               m_guardTimeSymbols;
 
     /**
      * Add time slot.
@@ -787,6 +798,7 @@ public:
   void SetFrameRandomAccess (uint8_t frameIndex, bool randomAccess);
   void SetFrameLogon (uint8_t frameIndex, bool logon);
   void SetFrameAllocationChannelId (uint8_t frameIndex, uint8_t allocationChannel);
+  void SetFrameGuardTimeSymbols (uint8_t frameIndex, uint8_t guardTimeSymbols);
 
   double    GetFrameAllocatedBandwidthHz (uint8_t frameIndex) const;
   double    GetFrameCarrierAllocatedBandwidthHz (uint8_t frameIndex) const;
@@ -796,6 +808,7 @@ public:
   bool      IsFrameRandomAccess (uint8_t frameIndex) const;
   bool      IsFrameLogon (uint8_t frameIndex) const;
   uint8_t   GetFrameAllocationChannelId (uint8_t frameIndex) const;
+  uint8_t   GetFrameGuardTimeSymbols (uint8_t frameIndex) const;
   bool      IsLogonEnabled () const;
   uint32_t  GetLogonChannelIndex () const;
 
@@ -818,6 +831,7 @@ private:
   bool      m_frameIsRandomAccess[m_maxFrameCount];
   bool      m_frameIsLogon[m_maxFrameCount];
   uint8_t   m_frameAllocationChannel[m_maxFrameCount];
+  uint8_t   m_frameGuardTimeSymbols[m_maxFrameCount];
 
   SatFrameConfList_t            m_frames;
   std::vector<RaChannelInfo_t>  m_raChannels;
@@ -880,7 +894,11 @@ public:
   inline void SetFrame ## index ## Logon (bool value)  \
   { return SetFrameLogon (index, value); } \
   inline double IsFrame ## index ## Logon () const      \
-  { return IsFrameLogon (index); }
+  { return IsFrameLogon (index); } \
+  inline void SetFrame ## index ## GuardTimeSymbols (uint8_t value) \
+  { return SetFrameGuardTimeSymbols (index, value); } \
+  inline uint8_t GetFrame ## index ## GuardTimeSymbols () const \
+  { return GetFrameGuardTimeSymbols (index); }
 
   // Access method definition for frame specific attributes
   // there should be as many macro calls as m_maxFrameCount defines

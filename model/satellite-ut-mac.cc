@@ -521,7 +521,7 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
                 {
                   drop = true;
                 }
-              std::cout << "Sending control burst " << timeSlotConf->GetStartTime () << " after SF start, drop=" << drop << ". slotDelay = " << slotDelay << std::endl;
+              //std::cout << "Sending control burst " << timeSlotConf->GetStartTime () << " after SF start, drop=" << drop << ". slotDelay = " << slotDelay << std::endl;
             }
 
           // Carrier
@@ -607,7 +607,7 @@ SatUtMac::DoTransmit (Time duration, uint32_t carrierId, Ptr<SatWaveform> wf, Pt
 
 
           packets.push_back (p);
-          std::cout << "Send dummy control burst for UT " << m_nodeInfo->GetMacAddress () << std::endl;
+          //std::cout << "Send dummy control burst for UT " << m_nodeInfo->GetMacAddress () << std::endl;
           //NS_FATAL_ERROR ("STOP");
         }
     }
@@ -824,9 +824,8 @@ SatUtMac::TransmitPackets (SatPhy::PacketContainer_t packets, Time duration, uin
       NS_LOG_INFO ("Duration: " << duration.GetSeconds () << " duration with guard period: " << durationWithoutGuardPeriod.GetSeconds ());
       NS_LOG_INFO ("UT: " << m_nodeInfo->GetMacAddress () << " send packet");
 
-      uint32_t driftTicks = Simulator::Now ().GetMicroSeconds ()*m_clockDrift/1000000;
-      int32_t deltaTicks = driftTicks - m_deltaNcr;
-      std::cout << "Transmit packets with a delta of " << deltaTicks << " ticks, from " << m_nodeInfo->GetMacAddress () << std::endl;
+      //uint32_t driftTicks = Simulator::Now ().GetMicroSeconds ()*m_clockDrift/1000000;
+      //int32_t deltaTicks = driftTicks - m_deltaNcr;
 
       SendPacket (packets, carrierId, durationWithoutGuardPeriod, txInfo);
     }
@@ -1192,7 +1191,7 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
         Ptr<SatCmtMessage> cmtMsg = DynamicCast<SatCmtMessage> (m_readCtrlCallback (cmtCtrlId));
         int16_t burstTimeCorrection = cmtMsg->GetBurstTimeCorrection ();
         m_deltaNcr -= burstTimeCorrection;
-        std::cout << "CMT message received at " << m_nodeInfo->GetMacAddress () << ", correction is " << burstTimeCorrection << ", total is " << m_deltaNcr << std::endl;
+        //std::cout << "CMT message received at " << m_nodeInfo->GetMacAddress () << ", correction is " << burstTimeCorrection << ", total is " << m_deltaNcr << std::endl;
         break;
       }
     default:

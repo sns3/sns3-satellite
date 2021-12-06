@@ -96,6 +96,7 @@ public:
 
   /**
    * Function called when a TBTP has been sent by the SatBeamScheduler.
+   * \param tbtp The TBTP sent by the scheduler.
    */
   void TbtpSent (Ptr<SatTbtpMessage> tbtp);
 
@@ -206,6 +207,12 @@ private:
 
   void SendNcrMessage ();
 
+  /**
+   * Function used to clear old TBTP.
+   * \param superframeCounter The SuperFrame counter to erase.
+   */
+  void RemoveTbtp (uint32_t superframeCounter);
+
   void SendCmtMessage (Address utId, Time burstDuration);
 
   void SendLogonResponse (Address utId, uint32_t raChannel);
@@ -214,7 +221,7 @@ private:
   /**
    * List of TBTPs sent to UTs. Key is superframe counter, value is TBTP.
    */
-  std::map <uint32_t, Ptr<SatTbtpMessage>> m_tbtps;
+  std::map <uint32_t, std::vector<Ptr<SatTbtpMessage>>> m_tbtps;
 
   /**
    * Scheduler for the forward link.

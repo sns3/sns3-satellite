@@ -64,8 +64,7 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
   m_enableCompositeSinrOutputTrace (false),
   m_numOfOngoingRx (0),
   m_rxPacketCounter (0),
-  m_waveformConf (waveformConf),
-  m_scheduledEnd (Seconds (0))
+  m_waveformConf (waveformConf)
 {
   NS_LOG_FUNCTION (this << carrierId);
 
@@ -379,11 +378,7 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
           {
             if (IsReceivingDedicatedAccess () && rxParams->m_txInfo.packetType == SatEnums::PACKET_TYPE_DEDICATED_ACCESS)
               {
-                std::cout << Simulator::Now ().GetNanoSeconds () << std::endl;
-                std::cout << "Starting reception of a packet when receiving DA transmission!" << std::endl;
-                std::cout << "Last scheduled end at " << m_scheduledEnd.GetNanoSeconds () << "ns" << std::endl;
                 NS_FATAL_ERROR ("Starting reception of a packet when receiving DA transmission!");
-                return false;
               }
 
             GetInterferenceModel ()->NotifyRxStart (rxParamsStruct.interferenceEvent);
@@ -398,12 +393,6 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
             // Update link specific received signal power
             m_rxPowerTrace (SatUtils::LinearToDb (rxParams->m_rxPower_W));
 
-            /*if (rxParams->m_txInfo.packetType == SatEnums::PACKET_TYPE_DEDICATED_ACCESS)
-              {
-                std::cout << "SatPhyRxCarrier::StartRx, schedule EndRxData at " << (Simulator::Now () + rxParams->m_duration).GetMicroSeconds () << "us, beam ID " << GetBeamId () << std::endl;
-              }*/
-
-            m_scheduledEnd = Simulator::Now () + rxParams->m_duration;
             Simulator::Schedule (rxParams->m_duration, &SatPhyRxCarrier::EndRxData, this, key);
 
             IncreaseNumOfRxState (rxParams->m_txInfo.packetType);

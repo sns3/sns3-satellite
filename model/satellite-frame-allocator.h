@@ -493,6 +493,9 @@ private:
   // The most robust waveform
   Ptr<SatWaveform>  m_mostRobustWaveform;
 
+  // Guard time in symbols to apply
+  uint8_t m_guardTimeSymbols;
+
   /**
    * Share symbols between all UTs and RCs allocated to the frame.
    *
