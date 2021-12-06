@@ -515,18 +515,18 @@ SatGwMac::SendCmtMessage (Address utId, Time burstDuration) // TODO add argument
       return;
     }
 
-  //TODO clean this ??? And rename stuff
   uint32_t indexClosest = 0;
   uint32_t tbtpIndexClosest = 0;
   uint32_t timeSlotIndexClosest = 0;
   Time differenceClosest = Seconds (1000000);
+  std::vector<Ptr<SatTbtpMessage>> tbtpsForCurrentSF;
+  Ptr<SatTbtpMessage> tbtp;
   for (uint32_t i = 0; i < m_tbtps.size (); i++)
     {
-      std::vector<Ptr<SatTbtpMessage>> tbtps = m_tbtps[i];
-      Ptr<SatTbtpMessage> tbtp;
-      for (uint32_t tbtpIndex = 0; tbtpIndex < tbtps.size (); tbtpIndex++)
+      tbtpsForCurrentSF = m_tbtps[i];
+      for (uint32_t tbtpIndex = 0; tbtpIndex < tbtpsForCurrentSF.size (); tbtpIndex++)
         {
-          tbtp = tbtps[tbtpIndex];
+          tbtp = tbtpsForCurrentSF[tbtpIndex];
           std::pair<uint8_t, std::vector< Ptr<SatTimeSlotConf> >> timeslots = tbtp->GetDaTimeslots (utId);
           for (uint32_t j = 0; j < timeslots.second.size (); j++)
             {
@@ -554,7 +554,7 @@ SatGwMac::SendCmtMessage (Address utId, Time burstDuration) // TODO add argument
       return;
     }
 
-  Ptr<SatTbtpMessage> tbtp = m_tbtps[indexClosest][tbtpIndexClosest];
+  tbtp = m_tbtps[indexClosest][tbtpIndexClosest];
   std::pair<uint8_t, std::vector< Ptr<SatTimeSlotConf> >> timeslots = tbtp->GetDaTimeslots (utId);
 
   if (timeslots.second[timeSlotIndexClosest]->GetSlotType () == 0)

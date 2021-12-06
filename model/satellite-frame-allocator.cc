@@ -943,7 +943,7 @@ SatFrameAllocator::CreateCtrlTimeSlot (uint16_t carrierId, int64_t& utSymbolsToU
   if ( timeSlotSymbols + m_guardTimeSymbols <= symbolsToUse )
     {
       Time startTime = Seconds ( (m_maxSymbolsPerCarrier - carrierSymbolsToUse + m_guardTimeSymbols/2) / m_frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
-      timeSlotConf = Create<SatTimeSlotConf> (startTime, 2, carrierId, SatTimeSlotConf::SLOT_TYPE_C);
+      timeSlotConf = Create<SatTimeSlotConf> (startTime, m_mostRobustWaveform->GetWaveformId (), carrierId, SatTimeSlotConf::SLOT_TYPE_C);
 
       carrierSymbolsToUse -= timeSlotSymbols;
       utSymbolsToUse -= timeSlotSymbols;
