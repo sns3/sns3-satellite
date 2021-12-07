@@ -1194,6 +1194,13 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
         //std::cout << "CMT message received at " << m_nodeInfo->GetMacAddress () << ", correction is " << burstTimeCorrection << ", total is " << m_deltaNcr << std::endl;
         break;
       }
+    case SatControlMsgTag::SAT_LOGOFF_CTRL_MSG:
+      {
+        uint32_t logoffCtrlId = ctrlTag.GetMsgId ();
+        Ptr<SatLogoffMessage> logoffMsg = DynamicCast<SatLogoffMessage> (m_readCtrlCallback (logoffCtrlId));
+        LogOff ();
+        break;
+      }
     default:
       {
         NS_FATAL_ERROR ("SatUtMac received a non-supported control packet!");

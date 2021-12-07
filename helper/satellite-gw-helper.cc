@@ -363,6 +363,9 @@ SatGwHelper::Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChanne
   // Attach the control burst receive callback to SatNcc
   mac->SetControlMessageReceivedCallback (MakeCallback (&SatNcc::ReceiveControlBurst, ncc));
 
+  // Attach the remove UT to SatNcc
+  mac->SetRemoveUtCallback (MakeCallback (&SatNcc::RemoveUt, ncc));
+
   // Set the device address and pass it to MAC as well
   Mac48Address addr = Mac48Address::Allocate ();
   dev->SetAddress (addr);

@@ -171,6 +171,19 @@ public:
   void SetControlMessageReceivedCallback (SatGwMac::ControlMessageReceivedCallback cb);
 
   /**
+   * Callback to indicate NCC a UT needs to be removed
+   * \param Address identification of the UT to remove
+   * \param uint32_t beam ID where the UT is connected
+   */
+  typedef Callback<void, Address, uint32_t> RemoveUtCallback;
+
+  /**
+   * Method to set callback for UT removing
+   * \param cb callback to invoke whenever a UT needs to be removed
+   */
+  void SetRemoveUtCallback (SatGwMac::RemoveUtCallback cb);
+
+  /**
    * Method to set forward link scheduler
    * \param The scheduler to use
    */
@@ -285,6 +298,11 @@ private:
    * Callback to indicate NCC a control burst has been received
    */
   SatGwMac::ControlMessageReceivedCallback m_controlMessageReceivedCallback;
+
+  /**
+   * Callback to indicate NCC a UT needs to be removed
+   */
+  SatGwMac::RemoveUtCallback m_removeUtCallback;
 };
 
 } // namespace ns3

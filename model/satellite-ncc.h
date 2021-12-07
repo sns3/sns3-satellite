@@ -137,6 +137,13 @@ public:
   void AddUt (Ptr<SatLowerLayerServiceConf> llsConf, Address utId, uint32_t beamId, Callback<void, uint32_t> setRaChannelCallback, bool verifyExisting = false);
 
   /**
+   * Remove a UT
+   * \param utId ID (mac address) of the UT to be removed
+   * \param beamId ID of the beam where UT is connected
+   */
+  void RemoveUt (Address utId, uint32_t beamId);
+
+  /**
    * \brief Function for setting the random access allocation channel specific high load backoff probabilities
    * \param allocationChannelId Allocation channel ID
    * \param threshold Average normalized offered load threshold

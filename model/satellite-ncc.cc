@@ -295,6 +295,18 @@ SatNcc::AddUt (Ptr<SatLowerLayerServiceConf> llsConf, Address utId, uint32_t bea
 }
 
 void
+SatNcc::RemoveUt (Address utId, uint32_t beamId)
+{
+  NS_LOG_FUNCTION (this << utId << beamId);
+
+  if (m_beamSchedulers[beamId]->HasUt (utId))
+    {
+      std::cout << Simulator::Now () << " REMOVE UT " << utId << std::endl;
+      m_beamSchedulers[beamId]->RemoveUt (utId);
+    }
+}
+
+void
 SatNcc::SetRandomAccessLowLoadBackoffProbability (uint8_t allocationChannelId, uint16_t lowLoadBackOffProbability)
 {
   NS_LOG_FUNCTION (this << (uint32_t) allocationChannelId << lowLoadBackOffProbability);
@@ -453,7 +465,7 @@ SatNcc::TbtpSent (Ptr<SatTbtpMessage> tbtp)
 void
 SatNcc::ReceiveControlBurst (Address utId, uint32_t beamId)
 {
-  NS_LOG_FUNCTION (this << utId);
+  NS_LOG_FUNCTION (this << utId << beamId);
 
   std::pair <Address, uint32_t> id = std::make_pair (utId, beamId);
 
@@ -467,6 +479,8 @@ SatNcc::ReceiveControlBurst (Address utId, uint32_t beamId)
 void
 SatNcc::SetUseLogon (bool useLogon)
 {
+  NS_LOG_FUNCTION (this << useLogon);
+
   m_useLogon = useLogon;
 }
 
@@ -474,6 +488,7 @@ void
 SatNcc::CheckTimeout (Address utId, uint32_t beamId)
 {
   NS_LOG_FUNCTION (this << utId);
+
   std::pair <Address, uint32_t> id = std::make_pair (utId, beamId);
   NS_ASSERT_MSG (m_lastControlBurstReception.find (id) != m_lastControlBurstReception.end (), "UT address should be in map");
 
@@ -481,8 +496,7 @@ SatNcc::CheckTimeout (Address utId, uint32_t beamId)
   if (Simulator::Now () >= lastReceptionDate + m_utTimeout)
     {
       m_lastControlBurstReception.erase (id);
-      m_beamSchedulers[beamId]->RemoveUt (utId);
-      std::cout << Simulator::Now () << " REMOVE UT" << std::endl;
+      RemoveUt (utId, beamId);
     }
   else
     {

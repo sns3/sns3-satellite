@@ -230,7 +230,6 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> r
   if (rxParams->m_txInfo.waveformId == 2)
     {
       // TODO change check on WF02 to check if correct TS type
-      // std::cout << "Receive control burst" << std::endl;
       if (m_useCmt)
         {
           SendCmtMessage (utId, rxParams->m_duration);
@@ -569,10 +568,21 @@ SatGwMac::SendCmtMessage (Address utId, Time burstDuration) // TODO add argument
       int32_t differenceNcr = difference.GetMicroSeconds ()*27;
       //std::cout << "    Difference is " << differenceNcr << " ticks" << std::endl;
 
-      Ptr<SatCmtMessage> cmt = CreateObject<SatCmtMessage> ();
-      cmt->SetBurstTimeCorrection (differenceNcr);
-      m_fwdScheduler->SendControlMsg (cmt, utId);
-      m_lastCmtSent[utId] = Simulator::Now ();
+      if (differenceNcr > 16256 || differenceNcr < -16256)
+        {
+          NS_LOG_INFO ("Burst Time Correction outside bounds, should be at least -16256 and at most 16256, but got " << differenceNcr << ". Forcing logoff of UT");
+          Ptr<SatLogoffMessage> logoffMsg = CreateObject<SatLogoffMessage> ();
+          m_fwdScheduler->SendControlMsg (logoffMsg, utId);
+          m_removeUtCallback (utId, m_beamId);
+        }
+      else
+        {
+          Ptr<SatCmtMessage> cmt = CreateObject<SatCmtMessage> ();
+          cmt->SetBurstTimeCorrection (differenceNcr);
+          m_fwdScheduler->SendControlMsg (cmt, utId);
+          m_lastCmtSent[utId] = Simulator::Now ();
+        }
+
       return;
     }
 }
@@ -618,6 +628,13 @@ SatGwMac::SetControlMessageReceivedCallback (SatGwMac::ControlMessageReceivedCal
 {
   NS_LOG_FUNCTION (this << &cb);
   m_controlMessageReceivedCallback = cb;
+}
+
+void
+SatGwMac::SetRemoveUtCallback (SatGwMac::RemoveUtCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_removeUtCallback = cb;
 }
 
 void

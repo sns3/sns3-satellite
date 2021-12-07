@@ -62,6 +62,7 @@ public:
     SAT_SLICE_CTRL_MSG,   //!< SAT_SLICE_CTRL_MSG
     SAT_LOGON_CTRL_MSG,   //!< SAT_LOGON_CTRL_MSG
     SAT_LOGON_RESPONSE_CTRL_MSG,   //!< SAT_LOGON_RESPONSE_CTRL_MSG
+    SAT_LOGOFF_CTRL_MSG,  //!< SAT_LOGOFF CTRL_MSG
     SAT_NCR_CTRL_MSG,     //!< SAT_NCR_CTRL_MSG
     SAT_CMT_CTRL_MSG      //!< SAT_CMT_CTRL_MSG
   } SatControlMsgType_t;
@@ -1028,7 +1029,7 @@ public:
   /**
    * \brief Get type of the message.
    *
-   * \return SatControlMsgTag::SAT_SLICE_CTRL_MSG
+   * \return SatControlMsgTag::SAT_LOGON_CTRL_MSG
    */
   inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const
   {
@@ -1106,6 +1107,56 @@ public:
 private:
   Time m_delay;
   uint32_t m_raChannel;
+};
+
+
+/**
+ * \ingroup satellite
+ * \brief This control message is used to inform the UT that it has been deconnected by GW
+ * (Tagged by SatControlMsgTag with type value SAT_LOGOFF_CTRL_MSG)
+ */
+class SatLogoffMessage : public SatControlMessage
+{
+public:
+  /**
+   * Constructor for SatLogoffMessage
+   */
+  SatLogoffMessage ();
+
+  /**
+   * Destructor for SatLogoffMessage
+   */
+  ~SatLogoffMessage ();
+
+
+  /**
+   * methods derived from base classes
+   */
+  static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
+  virtual TypeId GetInstanceTypeId (void) const;
+
+  /**
+   * \brief Get type of the message.
+   *
+   * \return SatControlMsgTag::SAT_LOGOFF_CTRL_MSG
+   */
+  inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const
+  {
+    return SatControlMsgTag::SAT_LOGOFF_CTRL_MSG;
+  }
+
+  /**
+   * \brief Get real size of the message.
+   * \return Real size of the message.
+   */
+  virtual uint32_t GetSizeInBytes () const;
+
+private:
 };
 
 

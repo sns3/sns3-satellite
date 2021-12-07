@@ -968,6 +968,46 @@ SatLogonResponseMessage::GetSizeInBytes () const
 }
 
 
+NS_OBJECT_ENSURE_REGISTERED (SatLogoffMessage);
+
+TypeId
+SatLogoffMessage::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatLogoffMessage")
+    .SetParent<SatControlMessage> ()
+    .AddConstructor<SatLogoffMessage> ()
+  ;
+  return tid;
+}
+
+TypeId
+SatLogoffMessage::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
+}
+
+SatLogoffMessage::SatLogoffMessage ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+SatLogoffMessage::~SatLogoffMessage ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+uint32_t
+SatLogoffMessage::GetSizeInBytes () const
+{
+  NS_LOG_FUNCTION (this);
+
+  uint32_t size = 1 * sizeof (uint8_t);
+  return size;
+}
+
+
 NS_OBJECT_ENSURE_REGISTERED (SatNcrMessage);
 
 TypeId
@@ -1093,16 +1133,13 @@ SatCmtMessage::GetBurstTimeCorrection () const
 void
 SatCmtMessage::SetBurstTimeCorrection (int32_t burstTimeCorrection)
 {
-  // TODO error or truncate ?
   if (burstTimeCorrection > 16256)
     {
-      NS_LOG_INFO ("Burst Time Correction too high, should be at most 16256, but got " << burstTimeCorrection << ". Truncating.");
-      burstTimeCorrection = 16256;
+      NS_FATAL_ERROR ("Burst Time Correction too high, should be at most 16256, but got " << burstTimeCorrection);
     }
   if (burstTimeCorrection < -16256)
     {
-      NS_LOG_INFO ("Burst Time Correction too low, should be at least -16256, but got " << burstTimeCorrection << ". Truncating.");
-      burstTimeCorrection = -16256;
+      NS_FATAL_ERROR ("Burst Time Correction too low, should be at least -16256, but got " << burstTimeCorrection);
     }
   m_burstTimeScaling = 0;
   if (burstTimeCorrection > 0)
