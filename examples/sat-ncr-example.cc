@@ -41,15 +41,15 @@ main (int argc, char *argv[])
 {
   uint32_t beamId = 1;
   uint32_t endUsersPerUt = 1;
-  //uint32_t utsPerBeam = 1;
   uint32_t utsPerBeam = 100;
 
   uint32_t packetSize = 512;
   std::string interval = "100ms";
-  //std::string interval = "1s";
 
   double simLength = 60.0;
-  //double simLength = 22.0;
+
+  uint32_t guardTime = 4;
+  int32_t clockDrift = 50;
 
   /// Set simulation output details
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
@@ -57,14 +57,27 @@ main (int argc, char *argv[])
   /// Enable packet trace
   Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
   Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("example-ncr");
-  simulationHelper->SetSimulationTime (Seconds (simLength));
-  simulationHelper->EnableProgressLogs ();
+
+  // read command line parameters given by user
+  CommandLine cmd;
+  cmd.AddValue ("simLength", "Simulation duration in seconds", simLength);
+  cmd.AddValue ("beamId", "ID of beam used", beamId);
+  cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
+  cmd.AddValue ("endUsersPerUt", "Number end users per UT", endUsersPerUt);
+  cmd.AddValue ("packetSize", "Constant packet size in bytes", packetSize);
+  cmd.AddValue ("interval", "Interval between two UDP packets per UT", interval);
+  cmd.AddValue ("guardTime", "Guard time in time slots in symbols", guardTime);
+  cmd.AddValue ("clockDrift", "Drift value of UT clocks in ticks per second", clockDrift);
+  simulationHelper->AddDefaultUiArguments (cmd);
+  cmd.Parse (argc, argv);
 
   // Set beam ID
   simulationHelper->SetSimulationTime (simLength);
   simulationHelper->SetUserCountPerUt (endUsersPerUt);
   simulationHelper->SetUtCountPerBeam (utsPerBeam);
   simulationHelper->SetBeamSet ({beamId});
+  simulationHelper->SetSimulationTime (Seconds (simLength));
+  simulationHelper->EnableProgressLogs ();
 
 
   // Set 2 RA frames including one for logon
@@ -76,16 +89,16 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatSuperframeConf0::Frame1_RandomAccessFrame", BooleanValue (true));
   Config::SetDefault ("ns3::SatSuperframeConf0::Frame1_LogonFrame", BooleanValue (true));
 
-  Config::SetDefault ("ns3::SatSuperframeConf0::Frame0_GuardTimeSymbols", UintegerValue (4));
-  Config::SetDefault ("ns3::SatSuperframeConf0::Frame1_GuardTimeSymbols", UintegerValue (4));
-  Config::SetDefault ("ns3::SatSuperframeConf0::Frame2_GuardTimeSymbols", UintegerValue (4));
-  Config::SetDefault ("ns3::SatSuperframeConf0::Frame3_GuardTimeSymbols", UintegerValue (4));
-  Config::SetDefault ("ns3::SatSuperframeConf0::Frame4_GuardTimeSymbols", UintegerValue (4));
-  Config::SetDefault ("ns3::SatSuperframeConf0::Frame5_GuardTimeSymbols", UintegerValue (4));
-  Config::SetDefault ("ns3::SatSuperframeConf0::Frame6_GuardTimeSymbols", UintegerValue (4));
-  Config::SetDefault ("ns3::SatSuperframeConf0::Frame7_GuardTimeSymbols", UintegerValue (4));
-  Config::SetDefault ("ns3::SatSuperframeConf0::Frame8_GuardTimeSymbols", UintegerValue (4));
-  Config::SetDefault ("ns3::SatSuperframeConf0::Frame9_GuardTimeSymbols", UintegerValue (4));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame0_GuardTimeSymbols", UintegerValue (guardTime));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame1_GuardTimeSymbols", UintegerValue (guardTime));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame2_GuardTimeSymbols", UintegerValue (guardTime));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame3_GuardTimeSymbols", UintegerValue (guardTime));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame4_GuardTimeSymbols", UintegerValue (guardTime));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame5_GuardTimeSymbols", UintegerValue (guardTime));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame6_GuardTimeSymbols", UintegerValue (guardTime));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame7_GuardTimeSymbols", UintegerValue (guardTime));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame8_GuardTimeSymbols", UintegerValue (guardTime));
+  Config::SetDefault ("ns3::SatSuperframeConf0::Frame9_GuardTimeSymbols", UintegerValue (guardTime));
 
   Config::SetDefault ("ns3::SatUtMac::WindowInitLogon", TimeValue (Seconds (20)));
   Config::SetDefault ("ns3::SatUtMac::MaxWaitingTimeLogonResponse", TimeValue (Seconds (1)));
@@ -101,10 +114,8 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (true));
   Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotInterval", TimeValue (MilliSeconds (500)));
 
-  Config::SetDefault ("ns3::SatUtMac::ClockDrift", IntegerValue (50));
+  Config::SetDefault ("ns3::SatUtMac::ClockDrift", IntegerValue (clockDrift));
   Config::SetDefault ("ns3::SatGwMac::CmtPeriodMin", TimeValue (MilliSeconds (550)));
-
-
 
   simulationHelper->CreateSatScenario ();
 

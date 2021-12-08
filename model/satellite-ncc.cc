@@ -58,7 +58,7 @@ SatNcc::GetTypeId (void)
                    MakeTimeChecker ())
     .AddAttribute ("UtTimeout",
                    "Timeout to logoff a UT, if logon procedure is used",
-                   TimeValue (Seconds (0)),
+                   TimeValue (Seconds (10)),
                    MakeTimeAccessor (&SatNcc::m_utTimeout),
                    MakeTimeChecker ())
   ;
@@ -75,7 +75,7 @@ SatNcc::GetInstanceTypeId (void) const
 
 SatNcc::SatNcc ()
   : m_utHandoverDelay (Seconds (0.0)),
-  m_utTimeout (Seconds (0)),
+  m_utTimeout (Seconds (10)),
   m_useLogon (false)
 {
   NS_LOG_FUNCTION (this);
