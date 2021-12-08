@@ -229,7 +229,6 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> r
 
   if (rxParams->m_txInfo.waveformId == 2)
     {
-      // TODO change check on WF02 to check if correct TS type
       if (m_useCmt)
         {
           SendCmtMessage (utId, rxParams->m_duration);
@@ -317,8 +316,6 @@ SatGwMac::TbtpSent (Ptr<SatTbtpMessage> tbtp)
   NS_LOG_FUNCTION (this << tbtp);
 
   uint32_t superframeCounter = tbtp->GetSuperframeCounter ();
-
-  //std::cout << "Tbtp Sent " << superframeCounter << std::endl;
 
   if(m_tbtps.find(superframeCounter) == m_tbtps.end())
     {
@@ -457,7 +454,6 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
       }
     case SatControlMsgTag::SAT_LOGON_CTRL_MSG:
       {
-        std::cout << Simulator::Now () << " Receive LOGON" << std::endl;
         uint32_t msgId = ctrlTag.GetMsgId ();
         Ptr<SatLogonMessage> logonMessage = DynamicCast<SatLogonMessage> ( m_readCtrlCallback (msgId) );
 
@@ -499,7 +495,7 @@ SatGwMac::SendNcrMessage ()
 }
 
 void
-SatGwMac::SendCmtMessage (Address utId, Time burstDuration) // TODO add arguments...
+SatGwMac::SendCmtMessage (Address utId, Time burstDuration)
 {
   NS_LOG_FUNCTION (this << utId);
 
@@ -549,7 +545,6 @@ SatGwMac::SendCmtMessage (Address utId, Time burstDuration) // TODO add argument
 
   if (indexClosest == 0)
     {
-      std::cout << "No TBTP found" << std::endl;
       return;
     }
 
@@ -560,13 +555,9 @@ SatGwMac::SendCmtMessage (Address utId, Time burstDuration) // TODO add argument
     {
       Time frameStartTime = Singleton<SatRtnLinkTime>::Get ()->GetSuperFrameTxTime (SatConstVariables::SUPERFRAME_SEQUENCE, indexClosest, Seconds (0));
       Time slotStartTime = timeslots.second[timeSlotIndexClosest]->GetStartTime ();
-      //std::cout << "At " << Simulator::Now ().GetSeconds () << "s, received frame that should arrive at " << frameStartTime.GetSeconds () + slotStartTime.GetSeconds () << "s" << std::endl;
-      //std::cout << "Burst duration is " << burstDuration << std::endl;
-      //std::cout << "    Difference is " << (Simulator::Now () - frameStartTime - slotStartTime - burstDuration).GetMicroSeconds () << "us, UT is " << utId << std::endl;
 
       Time difference = frameStartTime + slotStartTime + burstDuration - Simulator::Now ();
       int32_t differenceNcr = difference.GetMicroSeconds ()*27;
-      //std::cout << "    Difference is " << differenceNcr << " ticks" << std::endl;
 
       if (differenceNcr > 16256 || differenceNcr < -16256)
         {

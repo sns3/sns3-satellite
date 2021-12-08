@@ -41,7 +41,7 @@ main (int argc, char *argv[])
 {
   uint32_t beamId = 1;
   uint32_t endUsersPerUt = 1;
-  uint32_t utsPerBeam = 100;
+  uint32_t utsPerBeam = 10;
 
   uint32_t packetSize = 512;
   std::string interval = "100ms";

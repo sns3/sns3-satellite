@@ -329,7 +329,6 @@ SatUtMac::LogOff ()
   m_loggedOn = false;
   m_raChannel = m_logonChannel;
   m_rcstState.SwitchToOffStandby ();
-  std::cout << Simulator::Now () << " LOGOFF" << std::endl;
 }
 
 void
@@ -514,14 +513,12 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
           bool drop = false;
           if (timeSlotConf->GetSlotType () == SatTimeSlotConf::SLOT_TYPE_C)
             {
-              // TODO add new tag to specify control ?
               wf = m_superframeSeq->GetWaveformConf ()->GetWaveform (2);
               duration = wf->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
               if (m_useLogon && m_rcstState.GetState () != SatUtMacState::RcstState_t::TDMA_SYNC && m_rcstState.GetState () != SatUtMacState::RcstState_t::READY_FOR_TDMA_SYNC)
                 {
                   drop = true;
                 }
-              //std::cout << "Sending control burst " << timeSlotConf->GetStartTime () << " after SF start, drop=" << drop << ". slotDelay = " << slotDelay << std::endl;
             }
 
           // Carrier
@@ -588,7 +585,7 @@ SatUtMac::DoTransmit (Time duration, uint32_t carrierId, Ptr<SatWaveform> wf, Pt
 
   if (wf == m_superframeSeq->GetWaveformConf ()->GetWaveform (2))
     {
-      if (packets.size () == 0) // TODO send dummy packet if constrol slot empty ?
+      if (packets.size () == 0)
         {
           Ptr<Packet> p = Create<Packet> (wf->GetPayloadInBytes ());
 
@@ -603,12 +600,7 @@ SatUtMac::DoTransmit (Time duration, uint32_t carrierId, Ptr<SatWaveform> wf, Pt
           mTag.SetSourceAddress (m_nodeInfo->GetMacAddress ());
           p->AddPacketTag (mTag);
 
-
-
-
           packets.push_back (p);
-          //std::cout << "Send dummy control burst for UT " << m_nodeInfo->GetMacAddress () << std::endl;
-          //NS_FATAL_ERROR ("STOP");
         }
     }
 
@@ -627,8 +619,7 @@ SatUtMac::DoTransmit (Time duration, uint32_t carrierId, Ptr<SatWaveform> wf, Pt
 
   if (txInfo.waveformId == 2 && tsConf->GetSlotType () != SatTimeSlotConf::SLOT_TYPE_C)
     {
-      // TODO remove after use
-      NS_FATAL_ERROR ("NO !");
+      NS_FATAL_ERROR ("WF02 should only be used for control bursts");
     }
 
   TransmitPackets (packets, duration, carrierId, txInfo);
@@ -804,8 +795,6 @@ SatUtMac::TransmitPackets (SatPhy::PacketContainer_t packets, Time duration, uin
       m_rcstState.SwitchToOffStandby ();
     }
 
-  // TODO improve TDMA sync
-  // TODO put somewhere else ?
   if (m_rcstState.GetState () == SatUtMacState::RcstState_t::READY_FOR_TDMA_SYNC)
     {
       m_rcstState.SwitchToTdmaSync ();
@@ -823,9 +812,6 @@ SatUtMac::TransmitPackets (SatPhy::PacketContainer_t packets, Time duration, uin
       Time durationWithoutGuardPeriod (duration - m_guardTime);
       NS_LOG_INFO ("Duration: " << duration.GetSeconds () << " duration with guard period: " << durationWithoutGuardPeriod.GetSeconds ());
       NS_LOG_INFO ("UT: " << m_nodeInfo->GetMacAddress () << " send packet");
-
-      //uint32_t driftTicks = Simulator::Now ().GetMicroSeconds ()*m_clockDrift/1000000;
-      //int32_t deltaTicks = driftTicks - m_deltaNcr;
 
       SendPacket (packets, carrierId, durationWithoutGuardPeriod, txInfo);
     }
@@ -1147,7 +1133,6 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
             m_rcstState.SetLogOffCallback (MakeCallback (&SatUtMac::LogOff, this));
             m_rcstState.SwitchToReadyForTdmaSync ();
             m_deltaNcr = Simulator::Now ().GetMicroSeconds ()*m_clockDrift/1000000.0;
-            std::cout << "UT " << m_nodeInfo->GetMacAddress () << " has been logged in. Correction is " << m_deltaNcr << std::endl;
           }
         else
           {
@@ -1191,7 +1176,6 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
         Ptr<SatCmtMessage> cmtMsg = DynamicCast<SatCmtMessage> (m_readCtrlCallback (cmtCtrlId));
         int16_t burstTimeCorrection = cmtMsg->GetBurstTimeCorrection ();
         m_deltaNcr -= burstTimeCorrection;
-        //std::cout << "CMT message received at " << m_nodeInfo->GetMacAddress () << ", correction is " << burstTimeCorrection << ", total is " << m_deltaNcr << std::endl;
         break;
       }
     case SatControlMsgTag::SAT_LOGOFF_CTRL_MSG:

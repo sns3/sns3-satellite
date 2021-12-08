@@ -301,7 +301,6 @@ SatNcc::RemoveUt (Address utId, uint32_t beamId)
 
   if (m_beamSchedulers[beamId]->HasUt (utId))
     {
-      std::cout << Simulator::Now () << " REMOVE UT " << utId << std::endl;
       m_beamSchedulers[beamId]->RemoveUt (utId);
     }
 }
