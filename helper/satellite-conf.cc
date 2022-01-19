@@ -158,11 +158,13 @@ void SatConf::Initialize (std::string rtnConf,
                           std::string fwdConf,
                           std::string gwPos,
                           std::string satPos,
-                          std::string wfConf)
+                          std::string wfConf,
+                          std::string tle)
 {
   NS_LOG_FUNCTION (this);
 
   std::string dataPath = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory () + "/";
+  std::string dataPathTle = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory () + "/tle/";
 
   // Load satellite configuration file
   m_rtnConf = LoadSatConf (dataPath + rtnConf);
@@ -179,6 +181,9 @@ void SatConf::Initialize (std::string rtnConf,
 
   // Load satellite position
   LoadPositions (dataPath + satPos, m_geoSatPosition);
+
+  // Load TLE information
+  LoadTle (dataPathTle + tle, m_tleSat);
 
   Configure (dataPath + wfConf);
 }
@@ -416,6 +421,22 @@ SatConf::LoadPositions (std::string filePathName, PositionContainer_t& container
   delete ifs;
 }
 
+void
+SatConf::LoadTle (std::string filePathName, std::string& tleInfo)
+{
+  NS_LOG_FUNCTION (this << filePathName);
+
+  // READ FROM THE SPECIFIED INPUT FILE
+  std::ifstream *ifs = OpenFile (filePathName);
+
+  std::stringstream buffer;
+  buffer << ifs->rdbuf();
+  tleInfo = buffer.str();
+
+  ifs->close ();
+  delete ifs;
+}
+
 uint32_t
 SatConf::GetBeamCount () const
 {
@@ -526,6 +547,15 @@ SatConf::GetGeoSatPosition () const
   NS_ASSERT (m_geoSatPosition.size () == 1);
 
   return m_geoSatPosition[0];
+}
+
+std::string
+SatConf::GetSatTle () const
+{
+  NS_LOG_FUNCTION (this);
+  NS_ASSERT (m_tleSat.size () != 0);
+
+  return m_tleSat;
 }
 
 } // namespace ns3

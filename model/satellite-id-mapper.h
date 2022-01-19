@@ -33,7 +33,7 @@ class Address;
  * \ingroup satellite
  *
  * \brief Class for ID-mapper. The class enables mapping of a specific
- * MAC-address to UT/GW/user/beam ID. These IDs can be obtained with
+ * MAC-address to UT/GW/user/beam/group ID. These IDs can be obtained with
  * MAC-address by using the provided functions. It is also possible to
  * obtain the MAC-address with node.
  */
@@ -95,6 +95,13 @@ public:
   void AttachMacToBeamId (Address mac, uint32_t beamId);
 
   /**
+   * \brief Attach MAC address to the group ID maps
+   * \param mac MAC address
+   * \param groupId group ID
+   */
+  void AttachMacToGroupId (Address mac, uint32_t groupId);
+
+  /**
    * \brief Attach MAC address to the GW ID maps
    * \param mac MAC address
    * \param gwId GW ID
@@ -138,6 +145,13 @@ public:
    * \return beam ID
    */
   int32_t GetBeamIdWithMac (Address mac) const;
+
+  /**
+   * \brief Function for getting the group ID with MAC. Returns 0 if the MAC is not in the map (default group)
+   * \param mac MAC address
+   * \return group ID
+   */
+  int32_t GetGroupIdWithMac (Address mac) const;
 
   /**
    * \brief Function for getting the GW ID with MAC. Returns -1 if the MAC is not in the map
@@ -243,6 +257,11 @@ private:
    * \brief Map for MAC to beam ID conversion
    */
   std::map <Address, uint32_t> m_macToBeamIdMap;
+
+  /**
+   * \brief Map for MAC to group ID conversion
+   */
+  std::map <Address, uint32_t> m_macToGroupIdMap;
 
   /**
    * \brief Map for MAC to GW ID conversion

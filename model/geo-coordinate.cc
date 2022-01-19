@@ -87,7 +87,7 @@ GeoCoordinate::Construct (double latitude, double longitude, double altitude)
       NS_FATAL_ERROR ("Invalid latitude!!!");
     }
 
-  if (IsValidLongtitude (longitude) == false)
+  if (IsValidLongitude (longitude) == false)
     {
       NS_FATAL_ERROR ("Invalid longitude!!!");
     }
@@ -170,7 +170,7 @@ void GeoCoordinate::SetLongitude (double longitude)
 {
   NS_LOG_FUNCTION (this << longitude);
 
-  if ( IsValidLatitude (longitude) == false)
+  if ( IsValidLongitude (longitude) == false)
     {
       NS_FATAL_ERROR ("Invalid longitude!!!");
     }
@@ -182,7 +182,7 @@ void GeoCoordinate::SetLatitude (double latitude)
 {
   NS_LOG_FUNCTION (this << latitude);
 
-  if ( IsValidLongtitude (latitude) == false)
+  if ( IsValidLatitude (latitude) == false)
     {
       NS_FATAL_ERROR ("Invalid latitude!!!");
     }

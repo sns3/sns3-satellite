@@ -81,6 +81,17 @@ SatTrafficHelper::AddCbrTraffic (TrafficDirection_t direction,
 {
   NS_LOG_FUNCTION (this << interval << packetSize << startTime << stopTime << startDelay);
 
+  if (gws.GetN () == 0)
+    {
+      NS_LOG_WARN ("Gateway container is empty");
+      return;
+    }
+  if (uts.GetN () == 0)
+    {
+      NS_LOG_WARN ("UT container is empty");
+      return;
+    }
+
   std::string socketFactory = "ns3::UdpSocketFactory";
   uint16_t port = 9;
 
@@ -193,6 +204,19 @@ SatTrafficHelper::AddHttpTraffic (TrafficDirection_t direction,
                                   Time stopTime,
                                   Time startDelay)
 {
+  NS_LOG_FUNCTION (this << direction << startTime << stopTime << startDelay);
+
+  if (gws.GetN () == 0)
+    {
+      NS_LOG_WARN ("Gateway container is empty");
+      return;
+    }
+  if (uts.GetN () == 0)
+    {
+      NS_LOG_WARN ("UT container is empty");
+      return;
+    }
+
   ThreeGppHttpHelper httpHelper;
   if (direction == FWD_LINK)
     {
@@ -298,6 +322,19 @@ SatTrafficHelper::AddNrtvTraffic (TrafficDirection_t direction,
                                   Time stopTime,
                                   Time startDelay)
 {
+  NS_LOG_FUNCTION (this << direction << startTime << stopTime << startDelay);
+
+  if (gws.GetN () == 0)
+    {
+      NS_LOG_WARN ("Gateway container is empty");
+      return;
+    }
+  if (uts.GetN () == 0)
+    {
+      NS_LOG_WARN ("UT container is empty");
+      return;
+    }
+
   std::string socketFactory = "ns3::TcpSocketFactory";
 
   NrtvHelper nrtvHelper (TypeId::LookupByName (socketFactory));
@@ -390,6 +427,17 @@ SatTrafficHelper::AddPoissonTraffic (TrafficDirection_t direction,
                                      Time startDelay)
 {
   NS_LOG_FUNCTION (this << direction << onTime << offTimeExpMean << rate << packetSize << startTime << stopTime << startDelay);
+
+  if (gws.GetN () == 0)
+    {
+      NS_LOG_WARN ("Gateway container is empty");
+      return;
+    }
+  if (uts.GetN () == 0)
+    {
+      NS_LOG_WARN ("UT container is empty");
+      return;
+    }
 
   std::string socketFactory = "ns3::UdpSocketFactory";
 
@@ -515,6 +563,17 @@ SatTrafficHelper::AddVoipTraffic (TrafficDirection_t direction,
                                   Time startDelay)
 {
   NS_LOG_FUNCTION (this << direction << codec << startTime << stopTime << startDelay);
+
+  if (gws.GetN () == 0)
+    {
+      NS_LOG_WARN ("Gateway container is empty");
+      return;
+    }
+  if (uts.GetN () == 0)
+    {
+      NS_LOG_WARN ("UT container is empty");
+      return;
+    }
 
   std::string socketFactory = "ns3::UdpSocketFactory";
   uint16_t port = 9;
@@ -711,6 +770,17 @@ SatTrafficHelper::AddCustomTraffic (TrafficDirection_t direction,
                                     Time startDelay)
 {
   NS_LOG_FUNCTION (this << direction << interval << packetSize << startTime << stopTime << startDelay);
+
+  if (gws.GetN () == 0)
+    {
+      NS_LOG_WARN ("Gateway container is empty");
+      return;
+    }
+  if (uts.GetN () == 0)
+    {
+      NS_LOG_WARN ("UT container is empty");
+      return;
+    }
 
   std::string socketFactory = "ns3::UdpSocketFactory";
   uint16_t port = 9;

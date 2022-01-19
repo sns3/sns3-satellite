@@ -80,4 +80,16 @@ void SatBeamUserInfo::AppendUt (uint32_t userCount)
   m_userCount.push_back (userCount);
 }
 
+void
+SatBeamUserInfo::SetPositions (std::vector<std::pair<GeoCoordinate, uint32_t>> positions)
+{
+  m_positions = positions;
+}
+
+std::vector<std::pair<GeoCoordinate, uint32_t>>
+SatBeamUserInfo::GetPositions ()
+{
+  return m_positions;
+}
+
 } // namespace ns3

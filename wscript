@@ -1,9 +1,34 @@
 # -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
 
+import os
+
+def compile_generator(bld):
+    base_path = 'contrib/satellite/model'
+    data_path = '%s/../data/sgp4' % (base_path)
+    cxxflags = ' '.join(str(x) for x in bld.env['CXXFLAGS'])
+    cxx = bld.env['COMPILER_CXX']
+    src = '%s/constants-gen.cc' % data_path
+    dst = '%s/cgen' % data_path
+    header = '%s/iers-data.h' % (base_path)
+    source = '%s/iers-data.cc' % (base_path)
+
+    if not os.path.isfile(dst):
+        #print('%s %s %s -o %s' % (cxx, src, cxxflags, dst))
+        bld.exec_command('%s %s %s -o %s' % (cxx, cxxflags, src, dst))
+
+    bld.exec_command('./%s header %s' % (dst, base_path))
+    bld.exec_command('./%s source %s' % (dst, base_path))
+
 def build(bld):
     module = bld.create_ns3_module('satellite', ['internet', 'propagation', 'antenna', 'csma', 'stats', 'traffic', 'flow-monitor', 'applications'])
     module.source = [
         'model/geo-coordinate.cc',
+        'model/julian-date.cc',
+        'model/iers-data.cc',
+        'model/vector-extensions.cc',
+        'model/satellite-sgp4ext.cc',
+        'model/satellite-sgp4io.cc',
+        'model/satellite-sgp4unit.cc',
         'model/satellite-address-tag.cc',
         'model/satellite-antenna-gain-pattern.cc',
         'model/satellite-antenna-gain-pattern-container.cc',
@@ -77,6 +102,7 @@ def build(bld):
         'model/satellite-markov-model.cc',
         'model/satellite-mobility-model.cc',
         'model/satellite-mobility-observer.cc',
+        'model/satellite-sgp4-mobility-model.cc',
         'model/satellite-mutual-information-table.cc',
         'model/satellite-ncc.cc',
         'model/satellite-net-device.cc',
@@ -138,6 +164,7 @@ def build(bld):
         'utils/satellite-output-fstream-long-double-container.cc',
         'utils/satellite-output-fstream-string-container.cc',
         'utils/satellite-output-fstream-wrapper.cc',
+        'helper/satellite-group-helper.cc',
         'helper/satellite-beam-helper.cc',
         'helper/satellite-beam-user-info.cc',
         'helper/satellite-conf.cc',
@@ -215,6 +242,12 @@ def build(bld):
     headers.module = 'satellite'
     headers.source = [
         'model/geo-coordinate.h',
+        'model/julian-date.h',
+        'model/iers-data.h',
+        'model/vector-extensions.h',
+        'model/satellite-sgp4ext.h',
+        'model/satellite-sgp4io.h',
+        'model/satellite-sgp4unit.h',
         'model/satellite-address-tag.h',
         'model/satellite-antenna-gain-pattern.h',
         'model/satellite-antenna-gain-pattern-container.h',
@@ -290,6 +323,7 @@ def build(bld):
         'model/satellite-markov-model.h',
         'model/satellite-mobility-model.h',
         'model/satellite-mobility-observer.h',
+        'model/satellite-sgp4-mobility-model.h',
         'model/satellite-mutual-information-table.h',
         'model/satellite-ncc.h',
         'model/satellite-net-device.h',
@@ -353,6 +387,7 @@ def build(bld):
         'utils/satellite-output-fstream-long-double-container.h',
         'utils/satellite-output-fstream-string-container.h',
         'utils/satellite-output-fstream-wrapper.h',
+        'helper/satellite-group-helper.h',
         'helper/satellite-beam-helper.h',
         'helper/satellite-beam-user-info.h',
         'helper/satellite-conf.h',
@@ -396,6 +431,8 @@ def build(bld):
         'stats/satellite-stats-helper-container.h',
         'stats/satellite-stats-fwd-link-scheduler-symbol-rate-helper.h',
         ]
+
+    bld.add_pre_fun(compile_generator)
 
     if (bld.env['ENABLE_EXAMPLES']):
         bld.recurse('examples')

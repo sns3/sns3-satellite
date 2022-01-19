@@ -107,6 +107,9 @@ SatStatsCapacityRequestHelper::DoInstall ()
         case SatStatsHelper::IDENTIFIER_BEAM:
           context << GetIdentifierForUt (*it);
           break;
+        case SatStatsHelper::IDENTIFIER_GROUP:
+          context << GetIdentifierForUt (*it);
+          break;
         case SatStatsHelper::IDENTIFIER_UT:
           context << GetIdentifierForUt (*it);
           break;

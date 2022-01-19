@@ -38,10 +38,13 @@
 #include <ns3/satellite-fading-input-trace-container.h>
 #include "satellite-user-helper.h"
 #include "satellite-beam-helper.h"
+#include "satellite-group-helper.h"
 #include "satellite-beam-user-info.h"
 #include "satellite-conf.h"
 
 namespace ns3 {
+
+class SatGroupHelper;
 
 /**
  * \brief Build a satellite network set with needed objects and configuration.
@@ -132,6 +135,18 @@ public:
   NodeContainer GetUtUsers () const;
 
   /**
+   * \param utNode Pointer to UT node, which user nodes are requested.
+   * \return A container having UT specific user nodes in satellite network.
+   */
+  NodeContainer GetUtUsers (Ptr<Node> utNode) const;
+
+  /**
+   * \param utNodes Container to UT nodes, which user nodes are requested.
+   * \return A container having UT specific user nodes in satellite network.
+   */
+  NodeContainer GetUtUsers (NodeContainer utNodes) const;
+
+  /**
    * \return container having GW users.
    */
   NodeContainer GetGwUsers () const;
@@ -140,6 +155,22 @@ public:
    * \return pointer to beam helper.
    */
   Ptr<SatBeamHelper> GetBeamHelper () const;
+
+  /**
+   * \return pointer to group helper.
+   */
+  Ptr<SatGroupHelper> GetGroupHelper () const;
+
+  /**
+   * \brief set the group helper.
+   */
+  void SetGroupHelper (Ptr<SatGroupHelper> groupHelper);
+
+  /**
+   * \brief Set the antenna gain patterns.
+   * \param antennaGainPattern The pattern to set
+   */
+  void SetAntennaGainPatterns (Ptr<SatAntennaGainPatternContainer> antennaGainPattern);
 
   /**
    * \return pointer to user helper.
@@ -229,6 +260,16 @@ private:
   std::string m_waveformConfFileName;
 
   /**
+   * The satellite moves following a SGP4 model
+   */
+  bool m_satMobilitySGP4Enabled;
+
+  /**
+   * TLE input filename used for SGP4 mobility
+   */
+  std::string m_satMobilitySGP4TleFileName;
+
+  /**
    * User helper
    */
   Ptr<SatUserHelper> m_userHelper;
@@ -237,6 +278,11 @@ private:
    * Beam helper
    */
   Ptr<SatBeamHelper> m_beamHelper;
+
+  /**
+   * Group helper
+   */
+  Ptr<SatGroupHelper> m_groupHelper;
 
   /**
    * Gateway container
@@ -431,6 +477,13 @@ private:
   void SetGeoSatMobility (Ptr<Node> node);
 
   /**
+   * Sets SGP4 mobility to created Sat node.
+   *
+   * \param node node pointer of Satellite to set mobility
+   */
+  void SetSatMobility (Ptr<Node> node);
+
+  /**
    * Sets mobility to created UT nodes.
    *
    * \param uts node container of UTs to set mobility
@@ -438,6 +491,16 @@ private:
    *
    */
   void SetUtMobility (NodeContainer uts, uint32_t beamId);
+
+  /**
+   * Sets mobility to created UT nodes when position is known.
+   *
+   * \param uts node container of UTs to set mobility
+   * \param beamId the spot-beam id, where the UTs should be placed
+   * \param positionsAndGroupId the list of known positions, associated to a group ID
+   *
+   */
+  void SetUtMobilityFromPosition (NodeContainer uts, uint32_t beamId, std::vector<std::pair<GeoCoordinate, uint32_t>> positionsAndGroupId);
 
   /**
    * Install Satellite Mobility Observer to nodes, if observer doesn't exist already in a node
