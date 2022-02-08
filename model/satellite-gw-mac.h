@@ -55,6 +55,11 @@ public:
   static TypeId GetTypeId (void);
 
   /**
+   * Derived from Object
+   */
+  TypeId GetInstanceTypeId (void) const;
+
+  /**
    * Default construct of SatGwMac. Should not been used.
    *
    * This is the constructor for the SatGwMac
@@ -88,6 +93,12 @@ public:
    * \param packets Pointers to packets received.
    */
   void Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/);
+
+  /**
+   * Function called when a TBTP has been sent by the SatBeamScheduler.
+   * \param tbtp The TBTP sent by the scheduler.
+   */
+  void TbtpSent (Ptr<SatTbtpMessage> tbtp);
 
   /**
    * Callback to receive capacity request (CR) messages.
@@ -146,6 +157,38 @@ public:
    */
   void SetLogonCallback (SatGwMac::LogonCallback cb);
 
+  /**
+   * Callback to inform NCC a control burst has been received.
+   * \param Address identification of the UT that sent the burst
+   * \param uint32_t beam ID where the UT is connected
+   */
+  typedef Callback<void, Address, uint32_t> ControlMessageReceivedCallback;
+
+  /**
+   * Method to set callback for control burst reception
+   * \param cb callback to invoke whenever a control burst is received
+   */
+  void SetControlMessageReceivedCallback (SatGwMac::ControlMessageReceivedCallback cb);
+
+  /**
+   * Callback to indicate NCC a UT needs to be removed
+   * \param Address identification of the UT to remove
+   * \param uint32_t beam ID where the UT is connected
+   */
+  typedef Callback<void, Address, uint32_t> RemoveUtCallback;
+
+  /**
+   * Method to set callback for UT removing
+   * \param cb callback to invoke whenever a UT needs to be removed
+   */
+  void SetRemoveUtCallback (SatGwMac::RemoveUtCallback cb);
+
+  /**
+   * Method to set forward link scheduler
+   * \param The scheduler to use
+   */
+  void SetFwdScheduler (Ptr<SatFwdLinkScheduler> fwdScheduler);
+
 private:
   SatGwMac& operator = (const SatGwMac &);
   SatGwMac (const SatGwMac &);
@@ -164,14 +207,34 @@ private:
   void StartTransmission (uint32_t carrierId);
 
   /**
+   * Send a NCR packet to the UTs. This method periodically calls itself.
+   */
+  void StartNcrTransmission ();
+
+  /**
    * Signaling packet receiver, which handles all the signaling packet
    * receptions.
    * \param packet Received signaling packet
    */
   void ReceiveSignalingPacket (Ptr<Packet> packet);
 
+  void SendNcrMessage ();
+
+  /**
+   * Function used to clear old TBTP.
+   * \param superframeCounter The SuperFrame counter to erase.
+   */
+  void RemoveTbtp (uint32_t superframeCounter);
+
+  void SendCmtMessage (Address utId, Time burstDuration);
+
   void SendLogonResponse (Address utId, uint32_t raChannel);
   static void SendLogonResponseHelper (SatGwMac* self,Address utId, uint32_t raChannel);
+
+  /**
+   * List of TBTPs sent to UTs. Key is superframe counter, value is TBTP.
+   */
+  std::map <uint32_t, std::vector<Ptr<SatTbtpMessage>>> m_tbtps;
 
   /**
    * Scheduler for the forward link.
@@ -183,6 +246,26 @@ private:
    * the duration of a BB frame by a m_guardTime set by an attribute.
    */
   Time m_guardTime;
+
+  /**
+   * Interval between two broadcast of NCR dates
+   */
+  Time m_ncrInterval;
+
+  /**
+   * Use CMT control messages to correct time on the UTs
+   */
+  bool m_useCmt;
+
+  /**
+   * Time of last CMT sending for each UT
+   */
+  std::map<Address, Time> m_lastCmtSent;
+
+  /**
+   * Minimum interval between two CMT control messages for a same UT
+   */
+  Time m_cmtPeriodMin;
 
   /**
    * Trace for transmitted BB frames.
@@ -210,6 +293,16 @@ private:
    * Callback to log a terminal on
    */
   SatGwMac::LogonCallback m_logonCallback;
+
+  /**
+   * Callback to indicate NCC a control burst has been received
+   */
+  SatGwMac::ControlMessageReceivedCallback m_controlMessageReceivedCallback;
+
+  /**
+   * Callback to indicate NCC a UT needs to be removed
+   */
+  SatGwMac::RemoveUtCallback m_removeUtCallback;
 };
 
 } // namespace ns3

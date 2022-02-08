@@ -110,6 +110,11 @@ public:
   typedef Callback<bool, Ptr<SatControlMessage>, const Address& > SendCtrlMsgCallback;
 
   /**
+   * \param msg        the TBTP sent
+   */
+  typedef Callback<void, Ptr<SatTbtpMessage> > SendTbtpCallback;
+
+  /**
    * \param id    Id of the TBTP message to add.
    * \param tbtp  Pointer to the TBTP message to add.
    */
@@ -176,6 +181,11 @@ public:
   bool SendTo (Ptr<SatControlMessage> message, Address utId);
 
   /**
+   * Set the callback to inform NCC a TBTP has been sent.
+   */
+  void SetSendTbtpCallback (SendTbtpCallback cb);
+
+  /**
    * Callback signature for `BacklogRequestsTrace` trace source.
    *
    * \param trace A string containing the following information:
@@ -229,6 +239,12 @@ public:
    * \param destination the beam that should accept the terminal
    */
   void TransferUtToBeam (Address utId, Ptr<SatBeamScheduler> destination);
+
+  /**
+   * \brief Remove a UT from its SatBeamScheduler
+   * \param utId the terminal that is leaving this beam
+   */
+  void RemoveUt (Address utId);
 
   void ReserveLogonChannel (uint32_t logonChannelId);
 
@@ -430,6 +446,11 @@ private:
    * The control message send callback.
    */
   SatBeamScheduler::SendCtrlMsgCallback m_txCallback;
+
+  /**
+   * The TBTP send callback to inform GW Mac.
+   */
+  SatBeamScheduler::SendTbtpCallback m_txTbtpCallback;
 
   /**
    * Map to store UT information in beam for updating purposes.

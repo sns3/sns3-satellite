@@ -216,6 +216,11 @@ public:
    */
   Time GetDefaultFrameDuration () const;
 
+  /**
+   * \brief Set the value of m_dummyFrameSendingEnabled.
+   */
+  void SetDummyFrameSendingEnabled (bool dummyFrameSendingEnabled);
+
 protected:
 
   typedef std::map<Mac48Address, Ptr<SatCnoEstimator> > CnoEstimatorMap_t;

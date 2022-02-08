@@ -56,6 +56,11 @@ SatNcc::GetTypeId (void)
                    TimeValue (Seconds (0.0)),
                    MakeTimeAccessor (&SatNcc::m_utHandoverDelay),
                    MakeTimeChecker ())
+    .AddAttribute ("UtTimeout",
+                   "Timeout to logoff a UT, if logon procedure is used",
+                   TimeValue (Seconds (10)),
+                   MakeTimeAccessor (&SatNcc::m_utTimeout),
+                   MakeTimeChecker ())
   ;
   return tid;
 }
@@ -69,7 +74,10 @@ SatNcc::GetInstanceTypeId (void) const
 }
 
 SatNcc::SatNcc ()
-  : m_utHandoverDelay (Seconds (0.0))
+  : m_utHandoverDelay (Seconds (0.0)),
+  m_utTimeout (Seconds (10)),
+  m_useLogon (false),
+  m_useLora (false)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -264,6 +272,8 @@ SatNcc::AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq>
   scheduler = CreateObject<SatBeamScheduler> ();
   scheduler->Initialize (beamId, cb, seq, maxFrameSize, gwAddress);
 
+  scheduler->SetSendTbtpCallback (MakeCallback (&SatNcc::TbtpSent, this));
+
   m_beamSchedulers.insert (std::make_pair (beamId, scheduler));
 }
 
@@ -282,6 +292,17 @@ SatNcc::AddUt (Ptr<SatLowerLayerServiceConf> llsConf, Address utId, uint32_t bea
   if (!verifyExisting || !(m_beamSchedulers[beamId]->HasUt (utId)))
     {
       setRaChannelCallback (m_beamSchedulers[beamId]->AddUt (utId, llsConf));
+    }
+}
+
+void
+SatNcc::RemoveUt (Address utId, uint32_t beamId)
+{
+  NS_LOG_FUNCTION (this << utId << beamId);
+
+  if (m_beamSchedulers[beamId]->HasUt (utId))
+    {
+      m_beamSchedulers[beamId]->RemoveUt (utId);
     }
 }
 
@@ -422,6 +443,75 @@ SatNcc::ReserveLogonChannel (uint32_t logonChannelId)
   for (auto& beamScheduler : m_beamSchedulers)
     {
       beamScheduler.second->ReserveLogonChannel (logonChannelId);
+    }
+}
+
+void
+SatNcc::SetSendTbtpCallback (SendTbtpCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+
+  m_txTbtpCallback = cb;
+}
+
+void
+SatNcc::TbtpSent (Ptr<SatTbtpMessage> tbtp)
+{
+  NS_LOG_FUNCTION (this << tbtp);
+
+  if (!m_useLora)
+    {
+      m_txTbtpCallback (tbtp);
+    }
+}
+
+void
+SatNcc::ReceiveControlBurst (Address utId, uint32_t beamId)
+{
+  NS_LOG_FUNCTION (this << utId << beamId);
+
+  std::pair <Address, uint32_t> id = std::make_pair (utId, beamId);
+
+  if ((m_lastControlBurstReception.find (id) == m_lastControlBurstReception.end ()) && m_useLogon)
+    {
+      Simulator::Schedule (m_utTimeout, &SatNcc::CheckTimeout, this, utId, beamId);
+    }
+  m_lastControlBurstReception[id] = Simulator::Now ();
+}
+
+void
+SatNcc::SetUseLogon (bool useLogon)
+{
+  NS_LOG_FUNCTION (this << useLogon);
+
+  m_useLogon = useLogon;
+}
+
+void
+SatNcc::SetUseLora (bool useLora)
+{
+  NS_LOG_FUNCTION (this << useLora);
+
+  m_useLora = useLora;
+}
+
+void
+SatNcc::CheckTimeout (Address utId, uint32_t beamId)
+{
+  NS_LOG_FUNCTION (this << utId);
+
+  std::pair <Address, uint32_t> id = std::make_pair (utId, beamId);
+  NS_ASSERT_MSG (m_lastControlBurstReception.find (id) != m_lastControlBurstReception.end (), "UT address should be in map");
+
+  Time lastReceptionDate = m_lastControlBurstReception[id];
+  if (Simulator::Now () >= lastReceptionDate + m_utTimeout)
+    {
+      m_lastControlBurstReception.erase (id);
+      RemoveUt (utId, beamId);
+    }
+  else
+    {
+      Simulator::Schedule (lastReceptionDate + m_utTimeout - Simulator::Now (), &SatNcc::CheckTimeout, this, utId, beamId);
     }
 }
 

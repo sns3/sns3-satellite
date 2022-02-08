@@ -157,6 +157,7 @@ void SatFrameAllocatorTestCase::InitFrame (SatSuperframeConf::ConfigType_t confi
   frameConfParameters.m_isRandomAccess = false;
   frameConfParameters.m_defaultWaveformInUse = defaultWaveformInUse;
   frameConfParameters.m_checkSlotLimit = checkSlotLimit;
+  frameConfParameters.m_guardTimeSymbols = 0;
   m_frameConf = Create<SatFrameConf> (frameConfParameters);
   m_frameAllocator = Create<SatFrameAllocator> (m_frameConf, 0, configType, nullptr);
 }

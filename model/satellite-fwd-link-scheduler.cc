@@ -263,6 +263,12 @@ SatFwdLinkScheduler::GetDefaultFrameDuration () const
 }
 
 void
+SatFwdLinkScheduler::SetDummyFrameSendingEnabled (bool dummyFrameSendingEnabled)
+{
+  m_dummyFrameSendingEnabled = dummyFrameSendingEnabled;
+}
+
+void
 SatFwdLinkScheduler::PeriodicTimerExpired ()
 {
   NS_FATAL_ERROR ("SatFwdLinkScheduler::ScheduleBbFrames: should not be here");

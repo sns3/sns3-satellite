@@ -61,7 +61,10 @@ public:
     SAT_HR_CTRL_MSG,      //!< SAT_HR_CTRL_MSG
     SAT_SLICE_CTRL_MSG,   //!< SAT_SLICE_CTRL_MSG
     SAT_LOGON_CTRL_MSG,   //!< SAT_LOGON_CTRL_MSG
-    SAT_LOGON_RESPONSE_CTRL_MSG    //!< SAT_LOGON_RESPONSE_CTRL_MSG
+    SAT_LOGON_RESPONSE_CTRL_MSG,   //!< SAT_LOGON_RESPONSE_CTRL_MSG
+    SAT_LOGOFF_CTRL_MSG,  //!< SAT_LOGOFF CTRL_MSG
+    SAT_NCR_CTRL_MSG,     //!< SAT_NCR_CTRL_MSG
+    SAT_CMT_CTRL_MSG      //!< SAT_CMT_CTRL_MSG
   } SatControlMsgType_t;
 
   /**
@@ -1026,7 +1029,7 @@ public:
   /**
    * \brief Get type of the message.
    *
-   * \return SatControlMsgTag::SAT_SLICE_CTRL_MSG
+   * \return SatControlMsgTag::SAT_LOGON_CTRL_MSG
    */
   inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const
   {
@@ -1076,7 +1079,7 @@ public:
   /**
    * \brief Get type of the message.
    *
-   * \return SatControlMsgTag::SAT_SLICE_CTRL_MSG
+   * \return SatControlMsgTag::SAT_LOGON_RESPONSE_CTRL_MSG
    */
   inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const
   {
@@ -1102,7 +1105,240 @@ public:
   virtual uint32_t GetSizeInBytes () const;
 
 private:
+  Time m_delay;
   uint32_t m_raChannel;
+};
+
+
+/**
+ * \ingroup satellite
+ * \brief This control message is used to inform the UT that it has been deconnected by GW
+ * (Tagged by SatControlMsgTag with type value SAT_LOGOFF_CTRL_MSG)
+ */
+class SatLogoffMessage : public SatControlMessage
+{
+public:
+  /**
+   * Constructor for SatLogoffMessage
+   */
+  SatLogoffMessage ();
+
+  /**
+   * Destructor for SatLogoffMessage
+   */
+  ~SatLogoffMessage ();
+
+
+  /**
+   * methods derived from base classes
+   */
+  static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
+  virtual TypeId GetInstanceTypeId (void) const;
+
+  /**
+   * \brief Get type of the message.
+   *
+   * \return SatControlMsgTag::SAT_LOGOFF_CTRL_MSG
+   */
+  inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const
+  {
+    return SatControlMsgTag::SAT_LOGOFF_CTRL_MSG;
+  }
+
+  /**
+   * \brief Get real size of the message.
+   * \return Real size of the message.
+   */
+  virtual uint32_t GetSizeInBytes () const;
+
+private:
+};
+
+
+/**
+ * \ingroup satellite
+ * \brief This control message is used to broadcast NCR date to UTs
+ */
+class SatNcrMessage : public SatControlMessage
+{
+public:
+  /**
+   * Constructor for SatNcrMessage
+   */
+  SatNcrMessage ();
+
+  /**
+   * Destructor for SatNcrMessage
+   */
+  ~SatNcrMessage ();
+
+
+  /**
+   * methods derived from base classes
+   */
+  static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
+  virtual TypeId GetInstanceTypeId (void) const;
+
+  /**
+   * \brief Get type of the message.
+   *
+   * \return SatControlMsgTag::SAT_NCR_CTRL_MSG
+   */
+  inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const
+  {
+    return SatControlMsgTag::SAT_NCR_CTRL_MSG;
+  }
+
+  /**
+   * \brief Get the NCR date (ticks 27MHz).
+   * \return The NCR date
+   */
+  uint64_t GetNcrDate () const;
+
+  /**
+   * Set the NCR date (ticks 27MHz).
+   * \param ncr The new NCR date
+   */
+  void SetNcrDate (uint64_t ncr);
+
+  /**
+   * \brief Get real size of the message.
+   * \return Real size of the message.
+   */
+  virtual uint32_t GetSizeInBytes () const;
+
+private:
+  uint64_t m_ncrDateBase;
+  uint16_t m_ncrDateExtension;
+};
+
+
+/**
+ * \ingroup satellite
+ * This control message is used to give time, power and frequency correction to UTs.
+ * Flags are not used here, if no information is needed for a field, leave it to zero.
+ */
+class SatCmtMessage : public SatControlMessage
+{
+public:
+  /**
+   * Constructor for SatCmtMessage
+   */
+  SatCmtMessage ();
+
+  /**
+   * Destructor for SatCmtMessage
+   */
+  ~SatCmtMessage ();
+
+
+  /**
+   * methods derived from base classes
+   */
+  static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
+  virtual TypeId GetInstanceTypeId (void) const;
+
+  /**
+   * \brief Get type of the message.
+   *
+   * \return SatControlMsgTag::SAT_CMT_CTRL_MSG
+   */
+  inline SatControlMsgTag::SatControlMsgType_t GetMsgType () const
+  {
+    return SatControlMsgTag::SAT_CMT_CTRL_MSG;
+  }
+
+  /**
+   * \brief Get the group ID.
+   * \return The group ID
+   */
+  uint8_t GetGroupId () const;
+
+  /**
+   * Set the group ID.
+   * \param groupId The group ID
+   */
+  void SetGroupId (uint8_t groupId);
+
+  /**
+   * \brief Get the logon ID.
+   * \return The logon ID
+   */
+  uint8_t GetLogonId () const;
+
+  /**
+   * Set the logon ID.
+   * \param logonId The logon ID
+   */
+  void SetLogonId (uint8_t logonId);
+
+  /**
+   * \brief Get the burst time correction.
+   * \return The burst time correction
+   */
+  int16_t GetBurstTimeCorrection () const;
+
+  /**
+   * Set the burst time correction.
+   * \param burstTimeCorrection The burst time correction
+   */
+  void SetBurstTimeCorrection (int32_t burstTimeCorrection);
+
+  /**
+   * \brief Get the powercorrection.
+   * Information of power control flag is the MSB of the result.
+   * The 7 remaining bits are the power correction (if flag is 1) or EsN0 (otherwise).
+   * \return The power correction
+   */
+  uint8_t GetPowerCorrection () const;
+
+  /**
+   * Set the power correction.
+   * \param powerCorrection The power correction. Information of power control flag is the MSB of the parameter.
+   * The 7 remaining bits are the power correction (if flag is 1) or EsN0 (otherwise).
+   */
+  void SetPowerCorrection (uint8_t powerCorrection);
+
+  /**
+   * \brief Get the frequency correction.
+   * \return The frequency correction
+   */
+  int16_t GetFrequencyCorrection () const;
+
+  /**
+   * Set the frequency correction.
+   * \param frequencyCorrection The frequency correction
+   */
+  void SetFrequencyCorrection (int16_t frequencyCorrection);
+
+  /**
+   * \brief Get real size of the message.
+   * \return Real size of the message.
+   */
+  virtual uint32_t GetSizeInBytes () const;
+
+private:
+  uint8_t m_groupId;
+  uint8_t m_logonId;
+  uint8_t m_burstTimeScaling;
+  int8_t m_burstTimeCorrection;
+  uint8_t m_powerCorrection;
+  int16_t m_frequencyCorrection;
 };
 
 

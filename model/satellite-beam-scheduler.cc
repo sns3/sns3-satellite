@@ -313,6 +313,12 @@ SatBeamScheduler::SendTo (Ptr<SatControlMessage> msg, Address utId)
 }
 
 void
+SatBeamScheduler::SetSendTbtpCallback (SendTbtpCallback cb)
+{
+  m_txTbtpCallback = cb;
+}
+
+void
 SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCallback cb, Ptr<SatSuperframeSeq> seq, uint32_t maxFrameSizeInBytes, Address gwAddress)
 {
   NS_LOG_FUNCTION (this << beamId << &cb);
@@ -568,6 +574,7 @@ SatBeamScheduler::Schedule ()
             }
           else
             {
+              m_txTbtpCallback (*it);
               Send (*it);
             }
         }
@@ -849,6 +856,22 @@ SatBeamScheduler::TransferUtToBeam (Address utId, Ptr<SatBeamScheduler> destinat
           NS_FATAL_ERROR ("Unknown handover strategy");
         }
     }
+}
+
+void
+SatBeamScheduler::RemoveUt (Address utId)
+{
+  NS_LOG_FUNCTION (this << utId);
+
+  UtInfoMap_t::iterator utIterator = m_utInfos.find (utId);
+  if (utIterator == m_utInfos.end ())
+    {
+      NS_FATAL_ERROR ("Trying to remove a UT not connected to a beam: " << utId);
+    }
+
+  // Moving UT infos between beams
+  Ptr<SatUtInfo> utInfo = utIterator->second;
+  RemoveUtInfo (utIterator);
 }
 
 Ptr<SatTimuMessage>

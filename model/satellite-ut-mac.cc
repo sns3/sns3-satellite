@@ -40,6 +40,7 @@
 #include <ns3/satellite-node-info.h>
 #include <ns3/satellite-const-variables.h>
 #include <ns3/satellite-log.h>
+#include <ns3/satellite-encap-pdu-status-tag.h>
 #include "satellite-ut-mac.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatUtMac");
@@ -83,6 +84,11 @@ SatUtMac::GetTypeId (void)
                    TimeValue (Seconds (1)),
                    MakeTimeAccessor (&SatUtMac::m_maxWaitingTimeLogonResponse),
                    MakeTimeChecker ())
+    .AddAttribute ("ClockDrift",
+                   "Clock drift (number of ticks per second).",
+                   IntegerValue (0),
+                   MakeIntegerAccessor (&SatUtMac::m_clockDrift),
+                   MakeIntegerChecker<int32_t> ())
     .AddTraceSource ("DaResourcesTrace",
                      "Assigned dedicated access resources in return link to this UT.",
                      MakeTraceSourceAccessor (&SatUtMac::m_tbtpResourcesTrace),
@@ -119,6 +125,11 @@ SatUtMac::SatUtMac ()
   m_nextPacketTime (Now ()),
   m_isRandomAccessScheduled (false),
   m_timuInfo (0),
+  m_rcstState (SatUtMacState ()),
+  m_lastNcrDateReceived (Seconds (0)),
+  m_ncr (0),
+  m_deltaNcr (0),
+  m_clockDrift (0),
   m_handoverState (NO_HANDOVER),
   m_handoverMessagesCount (0),
   m_maxHandoverMessagesSent (20),
@@ -158,6 +169,11 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, bool crdsaOnlyFo
   m_nextPacketTime (Now ()),
   m_isRandomAccessScheduled (false),
   m_timuInfo (0),
+  m_rcstState (SatUtMacState ()),
+  m_lastNcrDateReceived (Seconds (0)),
+  m_ncr (0),
+  m_deltaNcr (0),
+  m_clockDrift (0),
   m_handoverState (NO_HANDOVER),
   m_handoverMessagesCount (0),
   m_maxHandoverMessagesSent (20),
@@ -302,6 +318,7 @@ SatUtMac::LogOff ()
   NS_LOG_FUNCTION (this);
   m_loggedOn = false;
   m_raChannel = m_logonChannel;
+  m_rcstState.SwitchToOffStandby ();
 }
 
 void
@@ -356,7 +373,10 @@ SatUtMac::LogonMsgTransmissionPossible () const
 {
   NS_LOG_FUNCTION (this);
 
-  return m_useLogon;
+  bool stateCorrect = (m_rcstState.GetState () == SatUtMacState::RcstState_t::READY_FOR_LOGON);
+  bool ncrReceived = !m_rcstState.IsNcrTimeout ();
+
+  return m_useLogon && stateCorrect && ncrReceived;
 }
 
 void
@@ -376,7 +396,7 @@ SatUtMac::SetTimingAdvanceCallback (SatUtMac::TimingAdvanceCallback cb)
 
   Time schedulingDelay = nextSuperFrameTxTime - Now ();
 
-  Simulator::Schedule (schedulingDelay, &SatUtMac::DoFrameStart, this);
+  Simulator::Schedule (GetRealSendingTime (schedulingDelay), &SatUtMac::DoFrameStart, this);
 }
 
 void
@@ -480,14 +500,28 @@ SatUtMac::ScheduleTimeSlots (Ptr<SatTbtpMessage> tbtp)
           Ptr<SatWaveform> wf = m_superframeSeq->GetWaveformConf ()->GetWaveform (timeSlotConf->GetWaveFormId ());
           Time duration = wf->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
 
+          bool drop = false;
+          if (timeSlotConf->GetSlotType () == SatTimeSlotConf::SLOT_TYPE_C)
+            {
+              wf = m_superframeSeq->GetWaveformConf ()->GetWaveform (2);
+              duration = wf->GetBurstDuration (frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
+              if (m_useLogon && m_rcstState.GetState () != SatUtMacState::RcstState_t::TDMA_SYNC && m_rcstState.GetState () != SatUtMacState::RcstState_t::READY_FOR_TDMA_SYNC)
+                {
+                  drop = true;
+                }
+            }
+
           // Carrier
           uint32_t carrierId = m_superframeSeq->GetCarrierId (0, frameId, timeSlotConf->GetCarrierId () );
 
-          // Schedule individual time slot
-          ScheduleDaTxOpportunity (slotDelay, duration, wf, timeSlotConf, carrierId);
+          if (!drop)
+            {
+              // Schedule individual time slot
+              ScheduleDaTxOpportunity (slotDelay, duration, wf, timeSlotConf, carrierId);
 
-          payloadSumInSuperFrame += wf->GetPayloadInBytes ();
-          payloadSumPerRcIndex [timeSlotConf->GetRcIndex ()] += wf->GetPayloadInBytes ();
+              payloadSumInSuperFrame += wf->GetPayloadInBytes ();
+              payloadSumPerRcIndex [timeSlotConf->GetRcIndex ()] += wf->GetPayloadInBytes ();
+            }
         }
     }
 
@@ -511,7 +545,11 @@ SatUtMac::ScheduleDaTxOpportunity (Time transmitDelay, Time duration, Ptr<SatWav
                ", rcIndex: " << (uint32_t)(tsConf->GetRcIndex ()) <<
                ", carrier: " << carrierId);
 
-  Simulator::Schedule (transmitDelay, &SatUtMac::DoTransmit, this, duration, carrierId, wf, tsConf, SatUtScheduler::LOOSE);
+  transmitDelay = GetRealSendingTime (transmitDelay);
+  if (transmitDelay >= Seconds (0))
+    {
+      Simulator::Schedule (transmitDelay, &SatUtMac::DoTransmit, this, duration, carrierId, wf, tsConf, SatUtScheduler::LOOSE);
+    }
 }
 
 
@@ -523,7 +561,37 @@ SatUtMac::DoTransmit (Time duration, uint32_t carrierId, Ptr<SatWaveform> wf, Pt
   if (!m_txCheckCallback ())
     {
       NS_LOG_INFO ("Tx is unavailable");
+      m_rcstState.SwitchToHoldStandby ();
       return;
+    }
+
+  if ((m_rcstState.GetState () != SatUtMacState::RcstState_t::TDMA_SYNC) && (tsConf->GetSlotType () != SatTimeSlotConf::SLOT_TYPE_C) && m_useLogon)
+    {
+      return;
+    }
+
+
+  SatPhy::PacketContainer_t packets = FetchPackets (wf->GetPayloadInBytes (), tsConf->GetSlotType (), tsConf->GetRcIndex (), policy);
+
+  if (wf == m_superframeSeq->GetWaveformConf ()->GetWaveform (2))
+    {
+      if (packets.size () == 0)
+        {
+          Ptr<Packet> p = Create<Packet> (wf->GetPayloadInBytes ());
+
+          // Mark the PDU with FULL_PDU tag
+          SatEncapPduStatusTag tag;
+          tag.SetStatus (SatEncapPduStatusTag::FULL_PDU);
+          p->AddPacketTag (tag);
+
+          // Add MAC tag to identify the packet in lower layers
+          SatMacTag mTag;
+          mTag.SetDestAddress (m_gwAddress);
+          mTag.SetSourceAddress (m_nodeInfo->GetMacAddress ());
+          p->AddPacketTag (mTag);
+
+          packets.push_back (p);
+        }
     }
 
   NS_LOG_INFO ("DA Tx opportunity for UT: " << m_nodeInfo->GetMacAddress () <<
@@ -539,7 +607,12 @@ SatUtMac::DoTransmit (Time duration, uint32_t carrierId, Ptr<SatWaveform> wf, Pt
   txInfo.frameType = SatEnums::UNDEFINED_FRAME;
   txInfo.waveformId = wf->GetWaveformId ();
 
-  TransmitPackets (FetchPackets (wf->GetPayloadInBytes (), tsConf->GetSlotType (), tsConf->GetRcIndex (), policy), duration, carrierId, txInfo);
+  if (txInfo.waveformId == 2 && tsConf->GetSlotType () != SatTimeSlotConf::SLOT_TYPE_C)
+    {
+      NS_FATAL_ERROR ("WF02 should only be used for control bursts");
+    }
+
+  TransmitPackets (packets, duration, carrierId, txInfo);
 }
 
 void
@@ -644,7 +717,11 @@ SatUtMac::DoEssaTransmit (Time duration, Ptr<SatWaveform> waveform, uint32_t car
       m_nextPacketTime = Now () + duration; // TODO: this doesn't take into account the guard bands !!
       /// schedule a DoRandomAccess then in case there still are packets to transmit
       /// ( schedule DoRandomAccess in case there is a back-off to compute )
-      Simulator::Schedule (duration, &SatUtMac::DoRandomAccess, this, SatEnums::RA_TRIGGER_TYPE_ESSA);
+      duration = GetRealSendingTime (duration);
+      if (duration >= Seconds (0))
+        {
+          Simulator::Schedule (duration, &SatUtMac::DoRandomAccess, this, SatEnums::RA_TRIGGER_TYPE_ESSA);
+        }
       m_isRandomAccessScheduled = true;
     }
   else
@@ -702,6 +779,16 @@ void
 SatUtMac::TransmitPackets (SatPhy::PacketContainer_t packets, Time duration, uint32_t carrierId, SatSignalParameters::txInfo_s txInfo)
 {
   NS_LOG_FUNCTION (this << packets.size () << duration.GetSeconds () << carrierId);
+
+  if (m_rcstState.GetState () == SatUtMacState::RcstState_t::HOLD_STANDBY)
+    {
+      m_rcstState.SwitchToOffStandby ();
+    }
+
+  if (m_rcstState.GetState () == SatUtMacState::RcstState_t::READY_FOR_TDMA_SYNC)
+    {
+      m_rcstState.SwitchToTdmaSync ();
+    }
 
   // If there are packets to send
   if (!packets.empty ())
@@ -796,7 +883,11 @@ SatUtMac::SendLogon (Ptr<Packet> packet)
 
   Time waitingTime = Seconds (m_waitingTimeLogonRng->GetValue (0.0, pow (1 + m_sendLogonTries, 2) * m_windowInitLogon.GetSeconds ()));
   m_sendLogonTries++;
-  Simulator::Schedule (waitingTime, &SatUtMac::TransmitPackets, this, packets, duration, carrierId, txInfo);
+  waitingTime = GetRealSendingTime (waitingTime);
+  if (waitingTime >= Seconds (0))
+    {
+      Simulator::Schedule (waitingTime, &SatUtMac::TransmitPackets, this, packets, duration, carrierId, txInfo);
+    }
 
   m_nextLogonTransmissionPossible = Simulator::Now () + m_maxWaitingTimeLogonResponse + waitingTime;
 }
@@ -818,6 +909,12 @@ SatUtMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
 
   // Invoke the `Rx` and `RxDelay` trace sources.
   RxTraces (packets);
+
+  m_receptionDates.push (Simulator::Now ());
+  if (m_receptionDates.size () > 3)
+    {
+      m_receptionDates.pop ();
+    }
 
   for (SatPhy::PacketContainer_t::iterator i = packets.begin (); i != packets.end (); i++ )
     {
@@ -1023,6 +1120,9 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
             m_raChannel = logonMsg->GetRaChannel ();
             m_loggedOn = true;
             m_sendLogonTries = 0;
+            m_rcstState.SetLogOffCallback (MakeCallback (&SatUtMac::LogOff, this));
+            m_rcstState.SwitchToReadyForTdmaSync ();
+            m_deltaNcr = Simulator::Now ().GetMicroSeconds ()*m_clockDrift/1000000.0;
           }
         else
           {
@@ -1036,6 +1136,43 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
             msg << " at: " << Now ().GetSeconds () << "s";
             Singleton<SatLog>::Get ()->AddToLog (SatLog::LOG_WARNING, "", msg.str ());
           }
+        break;
+      }
+    case SatControlMsgTag::SAT_NCR_CTRL_MSG:
+      {
+        uint32_t ncrCtrlId = ctrlTag.GetMsgId ();
+        Ptr<SatNcrMessage> ncrMsg = DynamicCast<SatNcrMessage> (m_readCtrlCallback (ncrCtrlId));
+
+        m_lastNcrDateReceived = m_ncrV2 ? m_receptionDates.front () : Simulator::Now ();
+        m_ncr = ncrMsg->GetNcrDate ();
+        m_rcstState.NcrControlMessageReceived ();
+
+        if (m_rcstState.GetState () == SatUtMacState::RcstState_t::NCR_RECOVERY)
+          {
+            if (ControlMsgTransmissionPossible ())
+              {
+                m_rcstState.SwitchToReadyForTdmaSync ();
+              }
+            else
+              {
+                m_rcstState.SwitchToReadyForLogon ();
+              }
+          }
+        break;
+      }
+    case SatControlMsgTag::SAT_CMT_CTRL_MSG:
+      {
+        uint32_t cmtCtrlId = ctrlTag.GetMsgId ();
+        Ptr<SatCmtMessage> cmtMsg = DynamicCast<SatCmtMessage> (m_readCtrlCallback (cmtCtrlId));
+        int16_t burstTimeCorrection = cmtMsg->GetBurstTimeCorrection ();
+        m_deltaNcr -= burstTimeCorrection;
+        break;
+      }
+    case SatControlMsgTag::SAT_LOGOFF_CTRL_MSG:
+      {
+        uint32_t logoffCtrlId = ctrlTag.GetMsgId ();
+        Ptr<SatLogoffMessage> logoffMsg = DynamicCast<SatLogoffMessage> (m_readCtrlCallback (logoffCtrlId));
+        LogOff ();
         break;
       }
     default:
@@ -1053,7 +1190,12 @@ SatUtMac::DoRandomAccess (SatEnums::RandomAccessTriggerType_t randomAccessTrigge
 
   NS_LOG_INFO ("UT: " << m_nodeInfo->GetMacAddress ());
 
-  /// reset the isRaandomAccessScheduled flag. TODO: should be done only if randomAccessTriggerType is ESSA
+  if ((m_rcstState.GetState () != SatUtMacState::RcstState_t::TDMA_SYNC) && m_useLogon)
+    {
+      return;
+    }
+
+  /// reset the isRandomAccessScheduled flag. TODO: should be done only if randomAccessTriggerType is ESSA
   m_isRandomAccessScheduled = false;
 
   SatRandomAccess::RandomAccessTxOpportunities_s txOpportunities;
@@ -1073,12 +1215,15 @@ SatUtMac::DoRandomAccess (SatEnums::RandomAccessTriggerType_t randomAccessTrigge
   /// process Slotted ALOHA Tx opportunities
   if (txOpportunities.txOpportunityType == SatEnums::RA_TX_OPPORTUNITY_SLOTTED_ALOHA)
     {
-      Time txOpportunity = Time::FromInteger (txOpportunities.slottedAlohaTxOpportunity, Time::MS);
+      Time txOpportunity = GetRealSendingTime (Time::FromInteger (txOpportunities.slottedAlohaTxOpportunity, Time::MS));
 
       NS_LOG_INFO ("Processing Slotted ALOHA results, Tx evaluation @: " << (Now () + txOpportunity).GetSeconds () << " seconds");
 
       /// schedule the check for next available RA slot
-      Simulator::Schedule (txOpportunity, &SatUtMac::ScheduleSlottedAlohaTransmission, this, allocationChannel);
+      if (txOpportunity >= Seconds (0))
+        {
+          Simulator::Schedule (txOpportunity, &SatUtMac::ScheduleSlottedAlohaTransmission, this, allocationChannel);
+        }
     }
   /// process CRDSA Tx opportunities
   else if (txOpportunities.txOpportunityType == SatEnums::RA_TX_OPPORTUNITY_CRDSA)
@@ -1095,10 +1240,13 @@ SatUtMac::DoRandomAccess (SatEnums::RandomAccessTriggerType_t randomAccessTrigge
       /// set the is RA scheduled
       /// TODO: if there are no Tx opportunities there'll be no scheduling until a new event arrives
       m_isRandomAccessScheduled = true;
-      Time txOpportunity = Time::FromInteger (txOpportunities.slottedAlohaTxOpportunity, Time::MS);
+      Time txOpportunity = GetRealSendingTime (Time::FromInteger (txOpportunities.slottedAlohaTxOpportunity, Time::MS));
 
       /// schedule the transmission
-      Simulator::Schedule (txOpportunity, &SatUtMac::ScheduleEssaTransmission, this, allocationChannel);
+      if (txOpportunity >= Seconds (0))
+        {
+          Simulator::Schedule (txOpportunity, &SatUtMac::ScheduleEssaTransmission, this, allocationChannel);
+        }
     }
 }
 
@@ -1188,7 +1336,11 @@ SatUtMac::ScheduleSlottedAlohaTransmission (uint32_t allocationChannel)
                    " payload in bytes: " << wf->GetPayloadInBytes ());
 
       /// schedule transmission
-      Simulator::Schedule (offset, &SatUtMac::DoSlottedAlohaTransmit, this, duration, wf, carrierId, uint8_t (SatEnums::CONTROL_FID), SatUtScheduler::STRICT);
+      offset = GetRealSendingTime (offset);
+      if (offset >= Seconds (0))
+        {
+          Simulator::Schedule (offset, &SatUtMac::DoSlottedAlohaTransmit, this, duration, wf, carrierId, uint8_t (SatEnums::CONTROL_FID), SatUtScheduler::STRICT);
+        }
     }
   else
     {
@@ -1297,7 +1449,11 @@ SatUtMac::ScheduleEssaTransmission (uint32_t allocationChannel)
   uint32_t carrierId = 0; // TODO: for now we use 0 as we have a single carrier
 
   /// schedule transmission
-  Simulator::Schedule (offset, &SatUtMac::DoEssaTransmit, this, duration, wf, carrierId, uint8_t (SatEnums::CONTROL_FID), SatUtScheduler::LOOSE);
+  offset = GetRealSendingTime (offset);
+  if (offset >= Seconds (0))
+    {
+      Simulator::Schedule (offset, &SatUtMac::DoEssaTransmit, this, duration, wf, carrierId, uint8_t (SatEnums::CONTROL_FID), SatUtScheduler::LOOSE);
+    }
 }
 
 void
@@ -1488,7 +1644,11 @@ SatUtMac::CreateCrdsaPacketInstances (uint32_t allocationChannel, std::set<uint3
           txInfo.crdsaUniquePacketId = m_crdsaUniquePacketId;
 
           /// schedule transmission
-          Simulator::Schedule (offset, &SatUtMac::TransmitPackets, this, replicas[i].second, duration, carrierId, txInfo);
+          offset = GetRealSendingTime (offset);
+          if (offset >= Seconds (0))
+            {
+              Simulator::Schedule (offset, &SatUtMac::TransmitPackets, this, replicas[i].second, duration, carrierId, txInfo);
+            }
           NS_LOG_INFO ("Scheduled a replica in slot " << replicas[i].first << " with offset " << offset.GetSeconds ());
         }
       replicas.clear ();
@@ -1617,6 +1777,11 @@ SatUtMac::DoFrameStart ()
     {
       NS_LOG_INFO ("Tx is permitted");
 
+      if (m_rcstState.GetState () == SatUtMacState::RcstState_t::HOLD_STANDBY)
+        {
+          m_rcstState.SwitchToOffStandby ();
+        }
+
       if (m_loggedOn && !m_beamCheckerCallback.IsNull ())
         {
           NS_LOG_INFO ("UT checking for beam handover recommendation");
@@ -1667,6 +1832,7 @@ SatUtMac::DoFrameStart ()
             }
           else if (m_useLogon)
             {
+              m_rcstState.SwitchToReadyForLogon ();
               if (Simulator::Now () > m_nextLogonTransmissionPossible)
                 {
                   // Do Logon
@@ -1678,15 +1844,34 @@ SatUtMac::DoFrameStart ()
   else
     {
       NS_LOG_INFO ("Tx is disabled");
+      m_rcstState.SwitchToHoldStandby ();
     }
 
   Time nextSuperFrameTxTime = GetNextSuperFrameTxTime (SatConstVariables::SUPERFRAME_SEQUENCE);
   NS_ASSERT_MSG (Now () < nextSuperFrameTxTime, "Scheduling next superframe start time to the past!");
 
   Time schedulingDelay = nextSuperFrameTxTime - Now ();
-  Simulator::Schedule (schedulingDelay, &SatUtMac::DoFrameStart, this);
+  Time realDelay = GetRealSendingTime (schedulingDelay);
+    if (realDelay == Seconds (0)){
+      schedulingDelay += m_superframeSeq->GetDuration (SatConstVariables::SUPERFRAME_SEQUENCE);
+    }
+  Simulator::Schedule (GetRealSendingTime (schedulingDelay), &SatUtMac::DoFrameStart, this);
 }
 
+Time
+SatUtMac::GetRealSendingTime (Time t)
+{
+  if (m_deltaNcr == 0) // For some reason returning t-0 is different than returning t...
+    {
+      return t;
+    }
+
+  uint32_t driftTicks = (t + Simulator::Now ()).GetMicroSeconds ()*m_clockDrift/1000000;
+  int32_t deltaTicks = m_deltaNcr - driftTicks;
+  Time deltaTime = NanoSeconds (deltaTicks*1000/27.0);
+
+  return t - deltaTime;
+}
 
 SatUtMac::SatTimuInfo::SatTimuInfo (uint32_t beamId, Address address)
   : m_beamId (beamId),
@@ -1709,6 +1894,13 @@ SatUtMac::SatTimuInfo::GetGwAddress () const
 {
   NS_LOG_FUNCTION (this);
   return m_gwAddress;
+}
+
+SatUtMacState::RcstState_t
+SatUtMac::GetRcstState () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_rcstState.GetState ();
 }
 
 

@@ -153,6 +153,7 @@ SatFrameConf::SatFrameConf (SatFrameConfParams_t parameters)
   // calculate slot details based on given parameters and default waveform
   Time timeSlotDuration = defWaveform->GetBurstDuration (m_btuConf->GetSymbolRateInBauds ());
   uint32_t carrierSlotCount = parameters.m_targetDuration.GetSeconds () / timeSlotDuration.GetSeconds ();
+  m_guardTimeSymbols = parameters.m_guardTimeSymbols;
 
   if ( carrierSlotCount == 0)
     {
@@ -191,7 +192,8 @@ SatFrameConf::SatFrameConf (SatFrameConfParams_t parameters)
     {
       for (uint32_t j = 0; j < carrierSlotCount; j++)
         {
-          Ptr<SatTimeSlotConf> timeSlot = Create<SatTimeSlotConf> (Time (j * timeSlotDuration.GetInteger ()), defWaveFormId, i, SatTimeSlotConf::SLOT_TYPE_TRC);
+          Time guardTime = Seconds ( (m_guardTimeSymbols/2) / m_btuConf->GetSymbolRateInBauds ());
+          Ptr<SatTimeSlotConf> timeSlot = Create<SatTimeSlotConf> (Time (j * timeSlotDuration.GetInteger ()) + guardTime, defWaveFormId, i, SatTimeSlotConf::SLOT_TYPE_TRC);
           AddTimeSlotConf (timeSlot);
 
           frameTimeSlotCount++;
@@ -722,6 +724,19 @@ SatSuperframeConf::SetFrameAllocationChannelId (uint8_t frameIndex, uint8_t allo
   m_frameAllocationChannel[frameIndex] = allocationChannel;
 }
 
+void
+SatSuperframeConf::SetFrameGuardTimeSymbols (uint8_t frameIndex, uint8_t guardTimeSymbols)
+{
+  NS_LOG_FUNCTION (this << (uint32_t)frameIndex << guardTimeSymbols);
+
+  if ( frameIndex >= m_maxFrameCount )
+    {
+      NS_FATAL_ERROR ("Frame index out of range!!!");
+    }
+
+  m_frameGuardTimeSymbols[frameIndex] = guardTimeSymbols;
+}
+
 double
 SatSuperframeConf::GetFrameAllocatedBandwidthHz (uint8_t frameIndex) const
 {
@@ -826,6 +841,19 @@ SatSuperframeConf::GetFrameAllocationChannelId (uint8_t frameIndex) const
   return m_frameAllocationChannel[frameIndex];
 }
 
+uint8_t
+SatSuperframeConf::GetFrameGuardTimeSymbols (uint8_t frameIndex) const
+{
+  NS_LOG_FUNCTION (this << (uint32_t)frameIndex);
+
+  if ( frameIndex >= m_maxFrameCount )
+    {
+      NS_FATAL_ERROR ("Frame index out of range!!!");
+    }
+
+  return m_frameGuardTimeSymbols[frameIndex];
+}
+
 bool
 SatSuperframeConf::IsLogonEnabled () const
 {
@@ -915,6 +943,7 @@ SatSuperframeConf::Configure (double allocatedBandwidthHz, Time targetDuration, 
       frameConfParameters.m_isLogon = m_frameIsLogon[frameIndex];
       frameConfParameters.m_defaultWaveformInUse = useDefaultWaveform;
       frameConfParameters.m_checkSlotLimit = checkSlotLimit;
+      frameConfParameters.m_guardTimeSymbols = m_frameGuardTimeSymbols[frameIndex];
 
       m_usedBandwidthHz += m_frameAllocatedBandwidth[frameIndex];
 
@@ -1067,7 +1096,7 @@ SatSuperframeConf::GetIndexAsFrameName (uint32_t index)
 #define GetIndexAsFrameName(index) SatSuperframeConf::GetIndexAsFrameName (index)
 
 // macro to ease definition of attributes for several frames
-#define ADD_FRAME_ATTRIBUTES(index, frameBandwidth, carrierBandwidth, carrierSpacing, carrierRollOff, spreadingFactor, randomAccess, lowerLayerService, logon ) \
+#define ADD_FRAME_ATTRIBUTES(index, frameBandwidth, carrierBandwidth, carrierSpacing, carrierRollOff, spreadingFactor, randomAccess, lowerLayerService, logon, guardTime ) \
   .AddAttribute ( GetIndexAsFrameName (index) + "_AllocatedBandwidthHz", \
                   std::string ("The allocated bandwidth [Hz] for ") + GetIndexAsFrameName (index), \
                   TypeId::ATTR_CONSTRUCT, \
@@ -1123,7 +1152,14 @@ SatSuperframeConf::GetIndexAsFrameName (uint32_t index)
                   BooleanValue (logon), \
                   MakeBooleanAccessor (&SatSuperframeConf::SetFrame ## index ## Logon, \
                                         &SatSuperframeConf::IsFrame ## index ## Logon), \
-                  MakeBooleanChecker ())
+                  MakeBooleanChecker ()) \
+  .AddAttribute ( GetIndexAsFrameName (index) + std::string ("_GuardTimeSymbols"), \
+                  std::string ("Set the guard time of ") + GetIndexAsFrameName (index) + std::string (" in symbols"), \
+                  TypeId::ATTR_CONSTRUCT, \
+                  UintegerValue (guardTime), \
+                  MakeUintegerAccessor (&SatSuperframeConf::SetFrame ## index ## GuardTimeSymbols, \
+                                        &SatSuperframeConf::GetFrame ## index ## GuardTimeSymbols), \
+                  MakeUintegerChecker<uint8_t> ())
 
 // macro to ease definition of attributes for several super frames
 #define ADD_SUPER_FRAME_ATTRIBUTES( frameCount, configType, maxSubdivision ) \
@@ -1220,16 +1256,16 @@ SatSuperframeConf0::GetTypeId (void)
     .SetParent<ns3::SatSuperframeConf> ()
     .AddConstructor<SatSuperframeConf0> ()
     ADD_SUPER_FRAME_ATTRIBUTES (10, SatSuperframeConf::CONFIG_TYPE_0, 5)
-    ADD_FRAME_ATTRIBUTES (0, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (1, 1.25e6, 1.25e6, 0.20, 0.30, 1, true, 0, false)
-    ADD_FRAME_ATTRIBUTES (2, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (3, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (4, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (5, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (6, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (7, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (8, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (9, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
+    ADD_FRAME_ATTRIBUTES (0, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (1, 1.25e6, 1.25e6, 0.20, 0.30, 1, true, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (2, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (3, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (4, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (5, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (6, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (7, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (8, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (9, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
   ;
 
   return tid;
@@ -1269,16 +1305,16 @@ SatSuperframeConf1::GetTypeId (void)
     .SetParent<ns3::SatSuperframeConf> ()
     .AddConstructor<SatSuperframeConf1> ()
     ADD_SUPER_FRAME_ATTRIBUTES (10, SatSuperframeConf::CONFIG_TYPE_1, 0)
-    ADD_FRAME_ATTRIBUTES (0, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (1, 1.25e6, 1.25e6, 0.20, 0.30, 1, true, 0, false)
-    ADD_FRAME_ATTRIBUTES (2, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (3, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (4, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (5, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (6, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (7, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (8, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (9, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
+    ADD_FRAME_ATTRIBUTES (0, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (1, 1.25e6, 1.25e6, 0.20, 0.30, 1, true, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (2, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (3, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (4, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (5, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (6, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (7, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (8, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (9, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
   ;
 
   return tid;
@@ -1318,16 +1354,16 @@ SatSuperframeConf2::GetTypeId (void)
     .SetParent<ns3::SatSuperframeConf> ()
     .AddConstructor<SatSuperframeConf2> ()
     ADD_SUPER_FRAME_ATTRIBUTES (10, SatSuperframeConf::CONFIG_TYPE_2, 0)
-    ADD_FRAME_ATTRIBUTES (0, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (1, 1.25e6, 1.25e6, 0.20, 0.30, 1, true, 0, false)
-    ADD_FRAME_ATTRIBUTES (2, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (3, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (4, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (5, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (6, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (7, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (8, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (9, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
+    ADD_FRAME_ATTRIBUTES (0, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (1, 1.25e6, 1.25e6, 0.20, 0.30, 1, true, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (2, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (3, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (4, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (5, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (6, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (7, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (8, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (9, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
   ;
 
   return tid;
@@ -1367,16 +1403,16 @@ SatSuperframeConf3::GetTypeId (void)
     .SetParent<ns3::SatSuperframeConf> ()
     .AddConstructor<SatSuperframeConf3> ()
     ADD_SUPER_FRAME_ATTRIBUTES (10, SatSuperframeConf::CONFIG_TYPE_3, 5)
-    ADD_FRAME_ATTRIBUTES (0, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (1, 1.25e6, 1.25e6, 0.20, 0.30, 1, true, 0, false)
-    ADD_FRAME_ATTRIBUTES (2, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (3, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (4, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (5, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (6, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (7, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (8, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
-    ADD_FRAME_ATTRIBUTES (9, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false)
+    ADD_FRAME_ATTRIBUTES (0, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (1, 1.25e6, 1.25e6, 0.20, 0.30, 1, true, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (2, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (3, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (4, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (5, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (6, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (7, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (8, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
+    ADD_FRAME_ATTRIBUTES (9, 1.25e7, 1.25e6, 0.20, 0.30, 1, false, 0, false, 0)
   ;
 
   return tid;
@@ -1415,7 +1451,7 @@ SatSuperframeConf4::GetTypeId (void)
     .SetParent<ns3::SatSuperframeConf> ()
     .AddConstructor<SatSuperframeConf4> ()
     ADD_SUPER_FRAME_ATTRIBUTES (1, SatSuperframeConf::CONFIG_TYPE_4, 0)
-    ADD_FRAME_ATTRIBUTES (0, 3.0e5, 3.0e5, 0.25, 0.0, 16, true, 0, false) // create frame only to store waveformconf
+    ADD_FRAME_ATTRIBUTES (0, 3.0e5, 3.0e5, 0.25, 0.0, 16, true, 0, false, 0) // create frame only to store waveformconf
   ;
 
   return tid;

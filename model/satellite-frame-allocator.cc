@@ -215,6 +215,7 @@ SatFrameAllocator::SatFrameAllocator (Ptr<SatFrameConf> frameConf, uint8_t frame
   m_waveformConf = m_frameConf->GetWaveformConf ();
   m_maxSymbolsPerCarrier = frameConf->GetCarrierMaxSymbols ();
   m_totalSymbolsInFrame = m_maxSymbolsPerCarrier * m_maxCarrierCount;
+  m_guardTimeSymbols = m_frameConf->GetGuardTimeSymbols ();
 
   switch ( m_configType )
     {
@@ -856,7 +857,7 @@ SatFrameAllocator::CreateTimeSlot (uint16_t carrierId, int64_t& utSymbolsToUse, 
   uint32_t waveformId = 0;
   int64_t timeSlotSymbols = 0;
 
-  if ( rcBasedAllocationEnabled || (symbolsToUse < utSymbolsLeft))
+  if ( rcBasedAllocationEnabled || (symbolsToUse + m_guardTimeSymbols < utSymbolsLeft))
     {
       timeSlotSymbols = GetOptimalBurtsLengthInSymbols (symbolsToUse, rcSymbolsLeft, cno, waveformId);
     }
@@ -869,12 +870,14 @@ SatFrameAllocator::CreateTimeSlot (uint16_t carrierId, int64_t& utSymbolsToUse, 
     {
       if ( rcSymbolsLeft > 0)
         {
-          if (carrierSymbolsToUse <= utSymbolsToUse)
+          if (carrierSymbolsToUse + m_guardTimeSymbols <= utSymbolsToUse)
             {
               carrierSymbolsToUse -= symbolsToUse;
+              carrierSymbolsToUse -= m_guardTimeSymbols;
             }
 
           utSymbolsToUse -= symbolsToUse;
+          utSymbolsToUse -= m_guardTimeSymbols;
         }
     }
   else if (rcSymbolsLeft > 0)
@@ -892,7 +895,7 @@ SatFrameAllocator::CreateTimeSlot (uint16_t carrierId, int64_t& utSymbolsToUse, 
         case SatSuperframeConf::CONFIG_TYPE_2:
         case SatSuperframeConf::CONFIG_TYPE_3:
           {
-            Time startTime = Seconds ( (m_maxSymbolsPerCarrier - carrierSymbolsToUse) / m_frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
+            Time startTime = Seconds ( (m_maxSymbolsPerCarrier - carrierSymbolsToUse + m_guardTimeSymbols/2) / m_frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
             timeSlotConf = Create<SatTimeSlotConf> (startTime, waveformId, carrierId, SatTimeSlotConf::SLOT_TYPE_TRC);
           }
           break;
@@ -906,6 +909,9 @@ SatFrameAllocator::CreateTimeSlot (uint16_t carrierId, int64_t& utSymbolsToUse, 
         {
           carrierSymbolsToUse -= timeSlotSymbols;
           utSymbolsToUse -= timeSlotSymbols;
+
+          carrierSymbolsToUse -= m_guardTimeSymbols;
+          utSymbolsToUse -= m_guardTimeSymbols;
 
           if ( rcBasedAllocationEnabled )
             {
@@ -934,13 +940,16 @@ SatFrameAllocator::CreateCtrlTimeSlot (uint16_t carrierId, int64_t& utSymbolsToU
 
   int64_t timeSlotSymbols = m_mostRobustWaveform->GetBurstLengthInSymbols ();
 
-  if ( timeSlotSymbols <= symbolsToUse )
+  if ( timeSlotSymbols + m_guardTimeSymbols <= symbolsToUse )
     {
-      Time startTime = Seconds ( (m_maxSymbolsPerCarrier - carrierSymbolsToUse) / m_frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
+      Time startTime = Seconds ( (m_maxSymbolsPerCarrier - carrierSymbolsToUse + m_guardTimeSymbols/2) / m_frameConf->GetBtuConf ()->GetSymbolRateInBauds ());
       timeSlotConf = Create<SatTimeSlotConf> (startTime, m_mostRobustWaveform->GetWaveformId (), carrierId, SatTimeSlotConf::SLOT_TYPE_C);
 
       carrierSymbolsToUse -= timeSlotSymbols;
       utSymbolsToUse -= timeSlotSymbols;
+
+      carrierSymbolsToUse -= m_guardTimeSymbols;
+      utSymbolsToUse -= m_guardTimeSymbols;
 
       if ( rcBasedAllocationEnabled )
         {

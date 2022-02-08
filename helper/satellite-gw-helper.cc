@@ -318,6 +318,8 @@ SatGwHelper::InstallDvb (Ptr<Node> n,
                                               parameters,
                                               m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE));
 
+  ncc->SetUseLogon (m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE)->IsLogonEnabled ());
+
   // Set fading
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());
   phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
@@ -332,6 +334,8 @@ SatGwHelper::InstallDvb (Ptr<Node> n,
   mac->SetCrReceiveCallback (MakeCallback (&SatNcc::UtCrReceived, ncc));
 
   mac->SetHandoverCallback (MakeCallback (&SatNcc::MoveUtBetweenBeams, ncc));
+
+  ncc->SetSendTbtpCallback (MakeCallback (&SatGwMac::TbtpSent, mac));
 
   // Attach the Mac layer receiver to Phy
   SatPhy::ReceiveCallback recCb = MakeCallback (&SatGwMac::Receive, mac);
@@ -376,6 +380,12 @@ SatGwHelper::InstallDvb (Ptr<Node> n,
 
   // Attach the logon receive callback to SatNcc
   mac->SetLogonCallback (MakeBoundCallback (&logonCallbackHelper, ncc, llsConf));
+
+  // Attach the control burst receive callback to SatNcc
+  mac->SetControlMessageReceivedCallback (MakeCallback (&SatNcc::ReceiveControlBurst, ncc));
+
+  // Attach the remove UT to SatNcc
+  mac->SetRemoveUtCallback (MakeCallback (&SatNcc::RemoveUt, ncc));
 
   // Set the device address and pass it to MAC as well
   Mac48Address addr = Mac48Address::Allocate ();
@@ -431,7 +441,7 @@ SatGwHelper::InstallDvb (Ptr<Node> n,
   fwdLinkScheduler->SetSchedContextCallback (MakeCallback (&SatLlc::GetSchedulingContexts, llc));
 
   // set scheduler to Mac
-  mac->SetAttribute ("Scheduler", PointerValue (fwdLinkScheduler));
+  mac->SetFwdScheduler (fwdLinkScheduler);
 
   mac->StartPeriodicTransmissions ();
 
@@ -520,6 +530,8 @@ SatGwHelper::InstallLora (Ptr<Node> n,
                                               m_linkResults,
                                               parameters,
                                               m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE));
+
+  ncc->SetUseLora (true);
 
   // Set fading
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());

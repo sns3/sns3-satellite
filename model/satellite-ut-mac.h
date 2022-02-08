@@ -36,6 +36,7 @@
 #include <ns3/satellite-random-access-container.h>
 #include <ns3/satellite-enums.h>
 #include <ns3/satellite-beam-scheduler.h>
+#include <ns3/satellite-ut-mac-state.h>
 #include <utility>
 
 namespace ns3 {
@@ -326,6 +327,8 @@ public:
 
   void SetLogonChannel (uint32_t channelId);
 
+  SatUtMacState::RcstState_t GetRcstState () const;
+
 protected:
   /**
    * Dispose of SatUtMac
@@ -535,6 +538,13 @@ private:
    */
   void DoFrameStart ();
 
+  /**
+   * \brief Compute real sending time of UT based on last NCR reception date and clock drift
+   * \param t Sending time if clock is perfect (relative time from Simulator::Now ())
+   * \return Corrected time (relative time from Simulator::Now ())
+   */
+  Time GetRealSendingTime (Time t);
+
   SatUtMac& operator = (const SatUtMac &);
   SatUtMac (const SatUtMac &);
 
@@ -674,6 +684,33 @@ private:
   Ptr<SatTimuInfo> m_timuInfo;
 
   Mac48Address m_gwAddress;
+
+  SatUtMacState m_rcstState;
+
+  /**
+   * Reception date of last NCR control message
+   */
+  Time m_lastNcrDateReceived;
+
+  /**
+   * NCR value of last NCR control message
+   */
+  uint64_t m_ncr;
+
+  /**
+   * Correction to apply to NCR dates
+   */
+  int64_t m_deltaNcr;
+
+  /**
+   * Clock drift (number of ticks per second)
+   */
+  int32_t m_clockDrift;
+
+  /**
+   * Store last 3 packets reception date, to be associated to NCR dates.
+   */
+  std::queue<Time> m_receptionDates;
 
   typedef enum
   {
