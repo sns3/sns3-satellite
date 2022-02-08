@@ -132,6 +132,10 @@ SatLoraConf::setSatConfAttributes (Ptr<SatConf> satConf)
       allocatedBandwidth = 125000;
       break;
     }
+    default:
+    {
+      NS_FATAL_ERROR ("Unknown physical layer standard");
+    }
   }
 
   satConf->SetAttribute ("FwdFeederLinkBandwidth", DoubleValue (bandwidth));
