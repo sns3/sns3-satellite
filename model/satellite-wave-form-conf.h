@@ -30,7 +30,7 @@
 
 namespace ns3 {
 
-class SatLinkResultsDvbRcs2;
+class SatLinkResultsRtn;
 
 /**
  * \ingroup satellite
@@ -242,10 +242,10 @@ public:
 
   /**
    * \brief Initialize the Eb/No requirements of the waveforms based on
-   * the used DVB-RCS2 link results.
-   * \param linkResults Pointer to DVB-RCS2 link results
+   * the used return link results.
+   * \param linkResults Pointer to return link results
    */
-  void InitializeEbNoRequirements ( Ptr<SatLinkResultsDvbRcs2> linkResults );
+  void InitializeEbNoRequirements ( Ptr<SatLinkResultsRtn> linkResults );
 
   /**
    * \brief Get the details of a certain waveform

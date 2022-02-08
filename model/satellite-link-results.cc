@@ -66,13 +66,57 @@ SatLinkResults::Initialize ()
 }
 
 /*
+ * SATLINKRESULTSRTN CHILD CLASS
+ */
+NS_OBJECT_ENSURE_REGISTERED (SatLinkResultsRtn);
+
+SatLinkResultsRtn::SatLinkResultsRtn ()
+  : SatLinkResults (),
+  m_table ()
+{
+}
+
+TypeId
+SatLinkResultsRtn::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatLinkResultsRtn")
+    .SetParent<SatLinkResults> ();
+  return tid;
+}
+
+double
+SatLinkResultsRtn::GetBler (uint32_t waveformId, double ebNoDb) const
+{
+  NS_LOG_FUNCTION (this << waveformId << ebNoDb);
+
+  if (!m_isInitialized)
+    {
+      NS_FATAL_ERROR ("Error retrieving link results, call Initialize first");
+    }
+
+  return m_table.at (waveformId)->GetBler (ebNoDb);
+}
+
+double
+SatLinkResultsRtn::GetEbNoDb (uint32_t waveformId, double blerTarget) const
+{
+  NS_LOG_FUNCTION (this << waveformId << blerTarget);
+
+  if (!m_isInitialized)
+    {
+      NS_FATAL_ERROR ("Error retrieving link results, call Initialize first");
+    }
+
+  return m_table.at (waveformId)->GetEsNoDb (blerTarget);
+}
+
+/*
  * SATLINKRESULTSDVBRCS2 CHILD CLASS
  */
 NS_OBJECT_ENSURE_REGISTERED (SatLinkResultsDvbRcs2);
 
 SatLinkResultsDvbRcs2::SatLinkResultsDvbRcs2 ()
-  : SatLinkResults (),
-  m_table ()
+  : SatLinkResultsRtn ()
 {
 }
 
@@ -80,7 +124,7 @@ TypeId
 SatLinkResultsDvbRcs2::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::SatLinkResultsDvbRcs2")
-    .SetParent<SatLinkResults> ();
+    .SetParent<SatLinkResultsRtn> ();
   return tid;
 }
 
@@ -99,39 +143,13 @@ SatLinkResultsDvbRcs2::DoInitialize ()
     }
 } // end of void SatLinkResultsDvbRcs2::DoInitialize
 
-double
-SatLinkResultsDvbRcs2::GetBler (uint32_t waveformId, double ebNoDb) const
-{
-  NS_LOG_FUNCTION (this << waveformId << ebNoDb);
-
-  if (!m_isInitialized)
-    {
-      NS_FATAL_ERROR ("Error retrieving link results, call Initialize first");
-    }
-
-  return m_table.at (waveformId)->GetBler (ebNoDb);
-}
-
-double
-SatLinkResultsDvbRcs2::GetEbNoDb (uint32_t waveformId, double blerTarget) const
-{
-  NS_LOG_FUNCTION (this << waveformId << blerTarget);
-
-  if (!m_isInitialized)
-    {
-      NS_FATAL_ERROR ("Error retrieving link results, call Initialize first");
-    }
-
-  return m_table.at (waveformId)->GetEsNoDb (blerTarget);
-}
-
 /*
  * SATLINKRESULTSFSIM CHILD CLASS
  */
 NS_OBJECT_ENSURE_REGISTERED (SatLinkResultsFSim);
 
 SatLinkResultsFSim::SatLinkResultsFSim ()
-  : SatLinkResultsDvbRcs2 ()
+  : SatLinkResultsRtn ()
 {
 }
 
@@ -139,7 +157,7 @@ TypeId
 SatLinkResultsFSim::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::SatLinkResultsFSim")
-    .SetParent<SatLinkResultsDvbRcs2> ();
+    .SetParent<SatLinkResultsRtn> ();
   return tid;
 }
 
@@ -160,6 +178,42 @@ SatLinkResultsFSim::DoInitialize ()
   // Initialize Mutual Information table
   m_mutualInformationTable = CreateObject<SatMutualInformationTable> (m_inputPath + "mutualInformationTable.txt");
 } // end of void SatLinkResultsFSim::DoInitialize
+
+/*
+ * SATLINKRESULTSLORA CHILD CLASS
+ */
+NS_OBJECT_ENSURE_REGISTERED (SatLinkResultsLora);
+
+SatLinkResultsLora::SatLinkResultsLora ()
+  : SatLinkResultsRtn ()
+{
+}
+
+TypeId
+SatLinkResultsLora::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatLinkResultsLora")
+    .SetParent<SatLinkResultsRtn> ();
+  return tid;
+}
+
+void
+SatLinkResultsLora::DoInitialize ()
+{
+  NS_LOG_FUNCTION (this);
+
+  // Waveform ids 1-2 currently supported
+  for (uint32_t i = 1; i <= 2; ++i)
+    {
+      std::ostringstream ss;
+      ss << i;
+      std::string filePathName = m_inputPath + "lora_waveformat" + ss.str () + ".txt";
+      m_table.insert (std::make_pair (i, CreateObject<SatLookUpTable> (filePathName)));
+    }
+
+  // Initialize Mutual Information table
+  m_mutualInformationTable = CreateObject<SatMutualInformationTable> (m_inputPath + "mutualInformationTable.txt");
+} // end of void SatLinkResultsLora::DoInitialize
 
 /*
  * SATLINKRESULTSFWD ABSTRACT CLASS
@@ -294,6 +348,8 @@ SatLinkResultsDvbS2::DoInitialize ()
   m_table[SatEnums::SAT_MODCOD_32APSK_4_TO_5] = CreateObject<SatLookUpTable> (m_inputPath + "s2_32apsk_4_to_5.txt");
   m_table[SatEnums::SAT_MODCOD_32APSK_5_TO_6] = CreateObject<SatLookUpTable> (m_inputPath + "s2_32apsk_5_to_6.txt");
   m_table[SatEnums::SAT_MODCOD_32APSK_8_TO_9] = CreateObject<SatLookUpTable> (m_inputPath + "s2_32apsk_8_to_9.txt");
+
+  m_table[SatEnums::SAT_MODCOD_BPSK_1_TO_3] = CreateObject<SatLookUpTable> (m_inputPath + "lora_waveformat2.txt");
 
 } // end of void SatLinkResultsDvbS2::DoInitialize
 

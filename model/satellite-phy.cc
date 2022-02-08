@@ -30,6 +30,7 @@
 #include <ns3/satellite-utils.h>
 #include <ns3/satellite-phy-rx.h>
 #include <ns3/satellite-phy-tx.h>
+#include <ns3/satellite-lora-phy-rx.h>
 #include <ns3/satellite-channel.h>
 #include <ns3/satellite-mac.h>
 #include <ns3/satellite-signal-parameters.h>
@@ -87,9 +88,33 @@ SatPhy::SatPhy (CreateParam_t & params)
 
   Ptr<MobilityModel> mobility = params.m_device->GetNode ()->GetObject<MobilityModel> ();
 
-  m_phyTx = CreateObject<SatPhyTx> ();
+  switch (params.m_standard)
+    {
+      case SatEnums::GEO:
+      case SatEnums::DVB_UT:
+      case SatEnums::DVB_GW:
+      {
+        m_phyTx = CreateObject<SatPhyTx> ();
+        m_phyRx = CreateObject<SatPhyRx> ();
+        break;
+      }
+      case SatEnums::LORA_UT:
+      {
+        m_phyTx = CreateObject<SatLoraPhyTx> ();
+        m_phyRx = CreateObject<SatLoraPhyRx> ();
+        break;
+      }
+      case SatEnums::LORA_GW:
+      {
+        m_phyTx = CreateObject<SatLoraPhyTx> ();
+        m_phyRx = CreateObject<SatPhyRx> ();
+        break;
+      }
+      default:
+        NS_FATAL_ERROR ("Standard not implemented yet: " << params.m_standard);
+    }
+
   m_phyTx->SetChannel (params.m_txCh);
-  m_phyRx = CreateObject<SatPhyRx> ();
   m_beamId = params.m_beamId;
 
   params.m_rxCh->AddRx (m_phyRx);
@@ -321,7 +346,6 @@ SatPhy::SendPdu (PacketContainer_t p, uint32_t carrierId, Time duration, SatSign
                  SatEnums::LL_PHY,
                  ld,
                  SatUtils::GetPacketInfo (p));
-
 
   // Create a new SatSignalParameters related to this packet transmission
   Ptr<SatSignalParameters> txParams = Create<SatSignalParameters> ();

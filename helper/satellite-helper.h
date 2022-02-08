@@ -269,6 +269,11 @@ private:
    */
   std::string m_satMobilitySGP4TleFileName;
 
+  /*
+   * The global standard used. Can be either DVB or Lora
+   */
+  SatEnums::Standard_t m_standard;
+
   /**
    * User helper
    */

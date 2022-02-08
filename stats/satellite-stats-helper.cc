@@ -878,17 +878,14 @@ SatStatsHelper::GetGwSatNetDevice (Ptr<Node> gwNode)
   /*
    * Assuming that device #0 is for loopback device, device #(N-1) is for
    * backbone network device, and devices #1 until #(N-2) are for satellite
-   * beam device.
+   * beam device. ==> This is true for DVB, but not for Lora: now we keep all
+   * devices that can be casted to SatNetDevice.
    */
-  for (uint32_t i = 1; i <= gwNode->GetNDevices () - 2; i++)
+  for (uint32_t i = 0; i < gwNode->GetNDevices (); i++)
     {
-      Ptr<NetDevice> dev = gwNode->GetDevice (i);
+      Ptr<SatNetDevice> dev = DynamicCast<SatNetDevice> (gwNode->GetDevice (i));
 
-      if (dev->GetObject<SatNetDevice> () == 0)
-        {
-          NS_FATAL_ERROR ("Node " << gwNode->GetId () << " is not a valid GW");
-        }
-      else
+      if (dev != 0)
         {
           ret.Add (dev);
         }

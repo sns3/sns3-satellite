@@ -527,7 +527,7 @@ SatPhyRxCarrier::CheckAgainstLinkResultsErrorModelAvi (double cSinr, Ptr<SatSign
         double ebNo = cSinr / (SatUtils::GetCodingRate (rxParams->m_txInfo.modCod) *
                                SatUtils::GetModulatedBits (rxParams->m_txInfo.modCod));
 
-        double ber = (GetLinkResults ()->GetObject <SatLinkResultsDvbRcs2> ())->GetBler (rxParams->m_txInfo.waveformId,
+        double ber = (GetLinkResults ()->GetObject <SatLinkResultsRtn> ())->GetBler (rxParams->m_txInfo.waveformId,
                                                                                          SatUtils::LinearToDb (ebNo));
         double r = GetUniformRandomValue (0, 1);
 

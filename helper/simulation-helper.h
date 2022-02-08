@@ -508,6 +508,13 @@ public:
 
   typedef enum
   {
+    ONE_SHOT,
+    PERIODIC,
+    LORA_CBR,
+  } LoraTrafficModel_t;
+
+  typedef enum
+  {
     UDP, TCP
   } TransportLayerProtocol_t;
 
@@ -583,6 +590,13 @@ public:
       m_simTime + Seconds (1),
       Seconds (0));
   }
+
+  void InstallLoraTrafficModel (LoraTrafficModel_t trafficModel,
+                                Time interval,
+                                uint32_t packetSize,
+                                Time startTime,
+                                Time stopTime,
+                                Time startDelay);
 
   typedef enum
   {

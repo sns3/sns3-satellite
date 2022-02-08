@@ -155,7 +155,7 @@ public:
    * Start packet reception from the SatChannel
    * \param rxParams The needed parameters for the received signal
    */
-  void StartRx (Ptr<SatSignalParameters> rxParams);
+  virtual void StartRx (Ptr<SatSignalParameters> rxParams);
 
   /**
    * \param SatSignalParameters containing e.g. the received packet

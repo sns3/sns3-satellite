@@ -523,7 +523,16 @@ SatPhyRxCarrierPerWindow::GetEffectiveSnir (const SatPhyRxCarrierPerWindow::essa
 {
   NS_LOG_FUNCTION (this);
 
-  Ptr<SatMutualInformationTable> mutualInformationTable = (GetLinkResults ()->GetObject <SatLinkResultsFSim> ())->GetMutualInformationTable ();
+  Ptr<SatLinkResultsRtn> satLinkResults = GetLinkResults ()->GetObject <SatLinkResultsFSim> ();
+  Ptr<SatMutualInformationTable> mutualInformationTable;
+  if (satLinkResults != NULL)
+    {
+      mutualInformationTable = (GetLinkResults ()->GetObject <SatLinkResultsFSim> ())->GetMutualInformationTable ();
+    }
+  else
+    {
+      mutualInformationTable = (GetLinkResults ()->GetObject <SatLinkResultsLora> ())->GetMutualInformationTable ();
+    }
   double beta = mutualInformationTable->GetBeta ();
 
   double meanMutualInformation = 0.0;

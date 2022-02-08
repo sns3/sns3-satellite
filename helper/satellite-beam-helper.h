@@ -123,6 +123,11 @@ public:
   void Init ();
 
   /**
+   * Set the standard to either DVB or Lora
+   */
+  void SetStandard (SatEnums::Standard_t standard);
+
+  /**
    * Set the antenna gain patterns to be used when configuring the beams
    * to the GEO satellite. Note, that currently we have only one set of
    * antenna patterns, which are utilized in both user return (Rx gain)
@@ -476,6 +481,11 @@ private:
    * \param routeToSatellite Flag indicating if traffic is going toward satellite network.
    */
   void AddMulticastRouteToUt (Ptr<Node> utNode, Ipv4Address sourceAddress, Ipv4Address groupAddress, bool routeToSatellite);
+
+  /**
+   * The global standard used. Can be either DVB or Lora
+   */
+  SatEnums::Standard_t m_standard;
 
   /**
    * Indicates if using DVB-S2 or DVB-S2X

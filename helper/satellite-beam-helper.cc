@@ -47,6 +47,7 @@
 #include <ns3/satellite-fading-input-trace-container.h>
 #include <ns3/satellite-fading-input-trace.h>
 #include <ns3/satellite-id-mapper.h>
+#include <ns3/satellite-lorawan-net-device.h>
 #include "satellite-beam-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatBeamHelper");
@@ -153,7 +154,8 @@ SatBeamHelper::GetTypeId (void)
                    EnumValue (SatEnums::LR_RCS2),
                    MakeEnumAccessor (&SatBeamHelper::m_rlLinkResultsType),
                    MakeEnumChecker (SatEnums::LR_RCS2, "RCS2",
-                                    SatEnums::LR_FSIM, "FSIM"))
+                                    SatEnums::LR_FSIM, "FSIM",
+                                    SatEnums::LR_LORA, "LORA"))
     .AddTraceSource ("Creation", "Creation traces",
                      MakeTraceSourceAccessor (&SatBeamHelper::m_creationTrace),
                      "ns3::SatTypedefs::CreationCallback")
@@ -290,7 +292,7 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
       NS_FATAL_ERROR ("The DVB version does not exist");
   }
 
-  Ptr<SatLinkResultsDvbRcs2> linkResultsReturnLink;
+  Ptr<SatLinkResultsRtn> linkResultsReturnLink;
   switch (m_rlLinkResultsType)
     {
     case SatEnums::LR_RCS2:
@@ -301,6 +303,11 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
     case SatEnums::LR_FSIM:
       {
         linkResultsReturnLink = CreateObject<SatLinkResultsFSim> ();
+        break;
+      }
+    case SatEnums::LR_LORA:
+      {
+        linkResultsReturnLink = CreateObject<SatLinkResultsLora> ();
         break;
       }
     default:
@@ -396,6 +403,12 @@ SatBeamHelper::Init ()
 }
 
 void
+SatBeamHelper::SetStandard (SatEnums::Standard_t standard)
+{
+  m_standard = standard;
+}
+
+void
 SatBeamHelper::SetAntennaGainPatterns (Ptr<SatAntennaGainPatternContainer> antennaPatterns)
 {
   NS_LOG_FUNCTION (this << antennaPatterns);
@@ -434,7 +447,7 @@ SatBeamHelper::Install (NodeContainer ut,
                         uint32_t rtnFlFreqId,
                         uint32_t fwdUlFreqId,
                         uint32_t fwdFlFreqId,
-                        SatUtMac::RoutingUpdateCallback routingCallback)
+                        SatMac::RoutingUpdateCallback routingCallback)
 {
   NS_LOG_FUNCTION (this << gwNode << gwId << beamId << rtnUlFreqId << rtnFlFreqId << fwdUlFreqId << fwdFlFreqId);
 
@@ -514,13 +527,32 @@ SatBeamHelper::Install (NodeContainer ut,
   //install GW
   PointerValue llsConf;
   m_utHelper->GetAttribute ("LowerLayerServiceConf", llsConf);
-  Ptr<NetDevice> gwNd = m_gwHelper->Install (gwNode,
-                                             gwId,
-                                             beamId,
-                                             feederLink.first,
-                                             feederLink.second,
-                                             m_ncc,
-                                             llsConf.Get<SatLowerLayerServiceConf> ());
+  Ptr<NetDevice> gwNd;
+  switch(m_standard)
+  {
+    case SatEnums::DVB:
+      gwNd = m_gwHelper->InstallDvb (gwNode,
+                                     gwId,
+                                     beamId,
+                                     feederLink.first,
+                                     feederLink.second,
+                                     m_ncc,
+                                     llsConf.Get<SatLowerLayerServiceConf> ());
+      break;
+    case SatEnums::LORA:
+      gwNd = m_gwHelper->InstallLora (gwNode,
+                                      gwId,
+                                      beamId,
+                                      feederLink.first,
+                                      feederLink.second,
+                                      m_ncc,
+                                      llsConf.Get<SatLowerLayerServiceConf> ());
+
+      break;
+    default:
+      NS_FATAL_ERROR ("Incorrect standard chosen");
+  }
+
 
   // calculate maximum size of the BB frame with the most robust MODCOD
   Ptr<SatBbFrameConf> bbFrameConf = m_gwHelper->GetBbFrameConf ();
@@ -534,12 +566,25 @@ SatBeamHelper::Install (NodeContainer ut,
 
   uint32_t maxBbFrameDataSizeInBytes = ( bbFrameConf->GetBbFramePayloadBits (bbFrameConf->GetMostRobustModcod (frameType), frameType) / SatConstVariables::BITS_PER_BYTE ) - bbFrameConf->GetBbFrameHeaderSizeInBytes ();
 
-
-  m_ncc->AddBeam (beamId,
+  switch(m_standard)
+  {
+    case SatEnums::DVB:
+      m_ncc->AddBeam (beamId,
                   MakeCallback (&SatNetDevice::SendControlMsg, DynamicCast<SatNetDevice> (gwNd)),
                   m_superframeSeq,
                   maxBbFrameDataSizeInBytes,
                   gwNd->GetAddress ());
+      break;
+    case SatEnums::LORA:
+      m_ncc->AddBeam (beamId,
+                  MakeCallback (&SatLorawanNetDevice::SendControlMsg, DynamicCast<SatLorawanNetDevice> (gwNd)),
+                  m_superframeSeq,
+                  maxBbFrameDataSizeInBytes,
+                  gwNd->GetAddress ());
+      break;
+    default:
+      NS_FATAL_ERROR ("Incorrect standard chosen");
+  }
 
   if (m_bstpController)
     {
@@ -554,14 +599,32 @@ SatBeamHelper::Install (NodeContainer ut,
     }
 
   // install UTs
-  NetDeviceContainer utNd = m_utHelper->Install (ut,
-                                                 beamId,
-                                                 userLink.first,
-                                                 userLink.second,
-                                                 DynamicCast<SatNetDevice> (gwNd),
-                                                 m_ncc,
-                                                 MakeCallback (&SatChannelPair::GetChannelPair, m_ulChannels),
-                                                 routingCallback);
+  NetDeviceContainer utNd;
+  switch(m_standard)
+  {
+    case SatEnums::DVB:
+      utNd = m_utHelper->InstallDvb (ut,
+                                     beamId,
+                                     userLink.first,
+                                     userLink.second,
+                                     DynamicCast<SatNetDevice> (gwNd),
+                                     m_ncc,
+                                     MakeCallback (&SatChannelPair::GetChannelPair, m_ulChannels),
+                                     routingCallback);
+      break;
+    case SatEnums::LORA:
+      utNd = m_utHelper->InstallLora (ut,
+                                      beamId,
+                                      userLink.first,
+                                      userLink.second,
+                                      DynamicCast<SatNetDevice> (gwNd),
+                                      m_ncc,
+                                      MakeCallback (&SatChannelPair::GetChannelPair, m_ulChannels),
+                                      routingCallback);
+      break;
+    default:
+      NS_FATAL_ERROR ("Incorrect standard chosen");
+  }
 
   return std::make_pair (gwNd, utNd);
 }
@@ -883,7 +946,10 @@ SatBeamHelper::EnablePacketTrace ()
   Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/UserPhy/*/PacketTrace", MakeCallback (&SatPacketTrace::AddTraceEntry, m_packetTrace));
   Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/FeederPhy/*/PacketTrace", MakeCallback (&SatPacketTrace::AddTraceEntry, m_packetTrace));
   Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/SatMac/PacketTrace", MakeCallback (&SatPacketTrace::AddTraceEntry, m_packetTrace));
-  Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/SatLlc/PacketTrace", MakeCallback (&SatPacketTrace::AddTraceEntry, m_packetTrace));
+  if (m_standard == SatEnums::DVB)
+    {
+      Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/SatLlc/PacketTrace", MakeCallback (&SatPacketTrace::AddTraceEntry, m_packetTrace));
+    }
 }
 
 std::string

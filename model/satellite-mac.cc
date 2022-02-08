@@ -75,6 +75,7 @@ SatMac::GetTypeId (void)
 
 SatMac::SatMac ()
   : m_isStatisticsTagsEnabled (false),
+  m_routingUpdateCallback (0),
   m_nodeInfo (),
   m_beamId (0),
   m_txEnabled (true),
@@ -87,6 +88,7 @@ SatMac::SatMac ()
 
 SatMac::SatMac (uint32_t beamId)
   : m_isStatisticsTagsEnabled (false),
+  m_routingUpdateCallback (0),
   m_nodeInfo (),
   m_beamId (beamId),
   m_txEnabled (true),
@@ -112,6 +114,7 @@ SatMac::DoDispose ()
   m_readCtrlCallback.Nullify ();
   m_reserveCtrlCallback.Nullify ();
   m_sendCtrlCallback.Nullify ();
+  m_routingUpdateCallback.Nullify ();
 
   Object::DoDispose ();
 }
@@ -313,6 +316,13 @@ SatMac::SetReceiveCallback (SatMac::ReceiveCallback cb)
 }
 
 void
+SatMac::SetLoraReceiveCallback (SatMac::LoraReceiveCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_rxLoraCallback = cb;
+}
+
+void
 SatMac::SetReadCtrlCallback (SatMac::ReadCtrlMsgCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);
@@ -331,6 +341,13 @@ SatMac::SetSendCtrlCallback (SatMac::SendCtrlMsgCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);
   m_sendCtrlCallback = cb;
+}
+
+void
+SatMac::SetRoutingUpdateCallback (SatMac::RoutingUpdateCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_routingUpdateCallback = cb;
 }
 
 

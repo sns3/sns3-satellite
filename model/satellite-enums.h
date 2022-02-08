@@ -84,6 +84,29 @@ public:
   } FadingModel_t;
 
   /**
+   * \enum Standard_t
+   * \brief The global standard used. Can be either DVB or Lora
+   */
+  typedef enum
+  {
+    DVB,
+    LORA
+  } Standard_t;
+
+  /**
+   * \enum SatLoraNodeType_t
+   * \brief Specifies standard used and the king of node
+   */
+  typedef enum
+  {
+    DVB_GW,
+    DVB_UT,
+    LORA_GW,
+    LORA_UT,
+    GEO
+  } SatLoraNodeType_t;
+
+  /**
    * \enum DvbVersion_t
    * \brief The scheduling algorithm used to fill the BBFrames.
    */
@@ -2267,7 +2290,8 @@ public:
   typedef enum
   {
     LR_RCS2 = 0,
-    LR_FSIM = 1
+    LR_FSIM = 1,
+    LR_LORA = 2
   } LinkResults_t;
 
 private:
