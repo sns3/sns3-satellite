@@ -25,17 +25,18 @@
 
 #include <string>
 
-#include "ns3/object-factory.h"
-#include "ns3/net-device-container.h"
-#include "ns3/node-container.h"
-#include "ns3/traced-callback.h"
-#include "ns3/satellite-channel.h"
-#include "ns3/satellite-ncc.h"
-#include "ns3/satellite-link-results.h"
-#include "ns3/satellite-mac.h"
-#include "ns3/satellite-bbframe-conf.h"
-#include "ns3/satellite-superframe-sequence.h"
-#include "ns3/satellite-typedefs.h"
+#include <ns3/object-factory.h>
+#include <ns3/net-device-container.h>
+#include <ns3/node-container.h>
+#include <ns3/traced-callback.h>
+
+#include <ns3/satellite-channel.h>
+#include <ns3/satellite-ncc.h>
+#include <ns3/satellite-link-results.h>
+#include <ns3/satellite-mac.h>
+#include <ns3/satellite-bbframe-conf.h>
+#include <ns3/satellite-superframe-sequence.h>
+#include <ns3/satellite-typedefs.h>
 
 namespace ns3 {
 
@@ -88,10 +89,11 @@ public:
 
   /*
    * Initializes the GW helper based on attributes
-   * \param lrRcs2 DVB-RCS2 link results
-   * \param lrS2 DVB-S2 link results
+   * \param lrRcs2 return link results
+   * \param lrFwd DVB-S2 or DVB-S2X link results
+   * \param dvbVersion The DVB version chosen
    */
-  void Initialize (Ptr<SatLinkResultsDvbRcs2> lrRcs2, Ptr<SatLinkResultsDvbS2> lrS2);
+  void Initialize (Ptr<SatLinkResultsRtn> lrRcs2, Ptr<SatLinkResultsFwd> lrFwd, SatEnums::DvbVersion_t dvbVersion);
 
   /**
    * Get BB frame configuration.
@@ -150,7 +152,13 @@ public:
    * a queue for this ns3::SatNetDevice, and associate the resulting
    * ns3::SatNetDevice with the ns3::Node and ns3::SatChannel.
    */
-  NetDeviceContainer Install (NodeContainer c, uint32_t gwId, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc );
+  NetDeviceContainer InstallDvb (NodeContainer c,
+                                 uint32_t gwId,
+                                 uint32_t beamId,
+                                 Ptr<SatChannel> fCh,
+                                 Ptr<SatChannel> rCh,
+                                 Ptr<SatNcc> ncc,
+                                 Ptr<SatLowerLayerServiceConf> llsConf);
 
   /**
    * \param n node
@@ -162,7 +170,54 @@ public:
    *
    * Saves you from having to construct a temporary NodeContainer.
    */
-  Ptr<NetDevice> Install (Ptr<Node> n, uint32_t gwId, uint32_t beamId, Ptr<SatChannel> fCh, Ptr<SatChannel> rCh, Ptr<SatNcc> ncc );
+  Ptr<NetDevice> InstallDvb (Ptr<Node> n,
+                             uint32_t gwId,
+                             uint32_t beamId,
+                             Ptr<SatChannel> fCh,
+                             Ptr<SatChannel> rCh,
+                             Ptr<SatNcc> ncc,
+                             Ptr<SatLowerLayerServiceConf> llsConf);
+
+  /**
+   * \param c a set of nodes
+   * \param gwId  id of the gw
+   * \param beamId  id of the beam
+   * \param fCh forward channel
+   * \param rCh return channel
+   * \param ncc NCC (Network Control Center)
+   *
+   * This method creates a ns3::SatChannel with the
+   * attributes configured by SatGwHelper::SetChannelAttribute,
+   * then, for each node in the input container, we create a
+   * ns3::SatLorawanNetDevice with the requested attributes,
+   * a queue for this ns3::SatLorawanNetDevice, and associate the resulting
+   * ns3::SatLorawanNetDevice with the ns3::Node and ns3::SatChannel.
+   */
+  NetDeviceContainer InstallLora (NodeContainer c,
+                                  uint32_t gwId,
+                                  uint32_t beamId,
+                                  Ptr<SatChannel> fCh,
+                                  Ptr<SatChannel> rCh,
+                                  Ptr<SatNcc> ncc,
+                                  Ptr<SatLowerLayerServiceConf> llsConf);
+
+  /**
+   * \param n node
+   * \param gwId  id of the gw
+   * \param beamId  id of the beam
+   * \param fCh forward channel
+   * \param rCh return channel
+   * \param ncc NCC (Network Control Center)
+   *
+   * Saves you from having to construct a temporary NodeContainer.
+   */
+  Ptr<NetDevice> InstallLora (Ptr<Node> n,
+                              uint32_t gwId,
+                              uint32_t beamId,
+                              Ptr<SatChannel> fCh,
+                              Ptr<SatChannel> rCh,
+                              Ptr<SatNcc> ncc,
+                              Ptr<SatLowerLayerServiceConf> llsConf);
 
   /**
    * Enables creation traces to be written in given file

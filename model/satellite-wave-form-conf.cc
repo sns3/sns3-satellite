@@ -29,6 +29,7 @@
 #include <ns3/double.h>
 #include <ns3/boolean.h>
 #include <ns3/uinteger.h>
+#include <ns3/enum.h>
 #include <ns3/satellite-const-variables.h>
 #include <ns3/satellite-utils.h>
 #include <ns3/satellite-link-results.h>
@@ -47,19 +48,21 @@ SatWaveform::SatWaveform ()
   m_modCod (SatEnums::SAT_NONVALID_MODCOD),
   m_payloadBytes (0),
   m_lengthInSymbols (0),
+  m_preambleLengthInSymbols (0),
   m_ebnoRequirement (0.0)
 {
   NS_ASSERT (false);
 }
 
 
-SatWaveform::SatWaveform (uint32_t wfId, uint32_t modulatedBits, double codingRate, SatEnums::SatModcod_t modcod, uint32_t payloadBytes, uint32_t lengthInSymbols)
+SatWaveform::SatWaveform (uint32_t wfId, uint32_t modulatedBits, double codingRate, SatEnums::SatModcod_t modcod, uint32_t payloadBytes, uint32_t lengthInSymbols, uint32_t preambleLengthInSymbols)
   : m_waveformId (wfId),
   m_modulatedBits (modulatedBits),
   m_codingRate (codingRate),
   m_modCod (modcod),
   m_payloadBytes (payloadBytes),
   m_lengthInSymbols (lengthInSymbols),
+  m_preambleLengthInSymbols (preambleLengthInSymbols),
   m_ebnoRequirement (0.0)
 {
 
@@ -93,11 +96,25 @@ SatWaveform::GetBurstLengthInSymbols () const
   return m_lengthInSymbols;
 }
 
+uint32_t
+SatWaveform::GetPreambleLengthInSymbols () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_preambleLengthInSymbols;
+}
+
 Time
 SatWaveform::GetBurstDuration (double symbolRateInBaud) const
 {
   NS_LOG_FUNCTION (this << symbolRateInBaud);
   return Seconds (m_lengthInSymbols / symbolRateInBaud);
+}
+
+Time
+SatWaveform::GetPreambleDuration (double symbolRateInBaud) const
+{
+  NS_LOG_FUNCTION (this << symbolRateInBaud);
+  return Seconds (m_preambleLengthInSymbols / symbolRateInBaud);
 }
 
 double
@@ -162,7 +179,8 @@ SatWaveformConf::SatWaveformConf ()
   m_acmEnabled (false),
   m_defaultWfId (3),
   m_minWfId (0),
-  m_maxWfId (23)
+  m_maxWfId (23),
+  m_burstLength (SatEnums::UNKNOWN_BURST)
 {
   // default constructor should not be used
   NS_ASSERT (false);
@@ -175,13 +193,29 @@ SatWaveformConf::SatWaveformConf (std::string filePathName)
   m_acmEnabled (false),
   m_defaultWfId (3),
   m_minWfId (0),
-  m_maxWfId (23)
+  m_maxWfId (23),
+  m_burstLength (SatEnums::UNKNOWN_BURST)
 {
   NS_LOG_FUNCTION (this);
   ReadFromFile (filePathName);
 
-  m_supportedBurstLengthsInSymbols.push_back ((uint32_t) SHORT_BURST_LENGTH);
-  m_supportedBurstLengthsInSymbols.push_back ((uint32_t) LONG_BURST_LENGTH);
+  ObjectBase::ConstructSelf (AttributeConstructionList ());
+
+  switch (m_burstLength)
+    {
+      case SatEnums::SHORT_BURST:
+        m_supportedBurstLengthsInSymbols.push_back ((uint32_t) SHORT_BURST_LENGTH);
+        break;
+      case SatEnums::LONG_BURST:
+        m_supportedBurstLengthsInSymbols.push_back ((uint32_t) LONG_BURST_LENGTH);
+        break;
+      case SatEnums::SHORT_AND_LONG_BURST:
+        m_supportedBurstLengthsInSymbols.push_back ((uint32_t) SHORT_BURST_LENGTH);
+        m_supportedBurstLengthsInSymbols.push_back ((uint32_t) LONG_BURST_LENGTH);
+        break;
+      default:
+        NS_FATAL_ERROR ("Incorrect choice of burst length.");
+    }
 }
 
 TypeId
@@ -203,10 +237,25 @@ SatWaveformConf::GetTypeId (void)
                     "Default waveform id",
                     UintegerValue (3),
                     MakeUintegerAccessor (&SatWaveformConf::m_defaultWfId),
-                    MakeUintegerChecker<uint32_t> (3, 22))
+                    MakeUintegerChecker<uint32_t> (1, 22))
+    .AddAttribute ( "BurstLength",
+                    "Default burst length",
+                    EnumValue (SatEnums::SHORT_AND_LONG_BURST),
+                    MakeEnumAccessor (&SatWaveformConf::m_burstLength),
+                    MakeEnumChecker (SatEnums::SHORT_BURST, "ShortBurst",
+                                     SatEnums::LONG_BURST, "LongBurst",
+                                     SatEnums::SHORT_AND_LONG_BURST, "ShortAndLongBurst"))
     .AddConstructor<SatWaveformConf> ()
   ;
   return tid;
+}
+
+TypeId
+SatWaveformConf::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
 }
 
 SatWaveformConf::~SatWaveformConf ()
@@ -241,14 +290,27 @@ SatWaveformConf::ReadFromFile (std::string filePathName)
   std::vector<double> rowVector;
 
   // Start conditions
-  int32_t wfIndex, modulatedBits, payloadBytes, durationInSymbols;
+  int32_t wfIndex, modulatedBits, payloadBytes, durationInSymbols, preambleDurationInSymbols;
   std::string sCodingRate;
 
-  // Read a row
-  *ifs >> wfIndex >> modulatedBits >> sCodingRate >> payloadBytes >> durationInSymbols;
+  // Read line by line
+  std::string line;
 
-  while (ifs->good ())
+  while (std::getline (*ifs, line))
     {
+      std::istringstream line_ss (line);
+
+      // Unpack values
+      if (!(line_ss >> wfIndex >> modulatedBits >> sCodingRate >> payloadBytes >> durationInSymbols))
+        {
+          NS_FATAL_ERROR ("SatWaveformConf::ReadFromFile - Waveform conf vector has unexpected amount of elements!");
+        }
+      // Try to unpack preambule duration
+      if (!(line_ss >> preambleDurationInSymbols))
+        {
+          preambleDurationInSymbols = 0;
+        }
+
       // Store temporarily all wfIds
       wfIds.push_back (wfIndex);
 
@@ -277,11 +339,9 @@ SatWaveformConf::ReadFromFile (std::string filePathName)
       SatEnums::SatModcod_t modcod = ConvertToModCod (modulatedBits, output[0], output[1]);
 
       // Create new waveform and insert it to the waveform map
-      Ptr<SatWaveform> wf = Create<SatWaveform> (wfIndex, modulatedBits, dCodingRate, modcod, payloadBytes, durationInSymbols);
+      Ptr<SatWaveform> wf = Create<SatWaveform> (wfIndex, modulatedBits, dCodingRate, modcod, payloadBytes, durationInSymbols, preambleDurationInSymbols);
       m_waveforms.insert (std::make_pair (wfIndex, wf));
 
-      // get next row
-      *ifs >> wfIndex >> modulatedBits >> sCodingRate >> payloadBytes >> durationInSymbols;
     }
 
   ifs->close ();
@@ -293,7 +353,7 @@ SatWaveformConf::ReadFromFile (std::string filePathName)
 }
 
 
-void SatWaveformConf::InitializeEbNoRequirements ( Ptr<SatLinkResultsDvbRcs2> linkResults )
+void SatWaveformConf::InitializeEbNoRequirements ( Ptr<SatLinkResultsRtn> linkResults )
 {
   NS_LOG_FUNCTION (this);
 
@@ -338,11 +398,11 @@ SatWaveformConf::GetDefaultWaveformId () const
 }
 
 bool
-SatWaveformConf::GetBestWaveformId (double cno, double symbolRateInBaud, uint32_t& wfId, uint32_t burstLength) const
+SatWaveformConf::GetBestWaveformId (double cno, double symbolRateInBaud, uint32_t& wfId, double& cnoThreshold, uint32_t burstLength) const
 {
-  NS_LOG_FUNCTION (this << cno << symbolRateInBaud << wfId << burstLength);
+  NS_LOG_FUNCTION (this << cno << symbolRateInBaud << wfId << cnoThreshold << burstLength);
 
-  bool success (false);
+  bool success = false;
 
   // If ACM is disabled, return the default waveform
   if (!m_acmEnabled || std::isnan (cno))
@@ -364,13 +424,14 @@ SatWaveformConf::GetBestWaveformId (double cno, double symbolRateInBaud, uint32_
           if (cnoThr <= cno)
             {
               wfId = rit->first;
+              cnoThreshold = cnoThr;
               success = true;
               break;
             }
         }
     }
 
-  NS_LOG_INFO ("Get best waveform in RTN link (ACM)! CNo: " << SatUtils::LinearToDb (cno) << ", Symbol rate: " << symbolRateInBaud << ", burst length: " << burstLength << ", WF: " << wfId);
+  NS_LOG_INFO ("Get best waveform in RTN link (ACM)! CNo: " << SatUtils::LinearToDb (cno) << ", Symbol rate: " << symbolRateInBaud << ", burst length: " << burstLength << ", WF: " << wfId << ", CNo threshold: " << SatUtils::LinearToDb (cnoThreshold));
 
   return success;
 }
@@ -450,6 +511,19 @@ SatWaveformConf::ConvertToModCod (uint32_t modulatedBits, uint32_t codingRateNum
 
   switch (modulatedBits)
     {
+    // BPSK
+    case 1:
+      {
+        if (codingRateNumerator == 1 && codingRateDenominator == 3)
+          {
+            return SatEnums::SAT_MODCOD_BPSK_1_TO_3;
+          }
+        else
+          {
+            NS_FATAL_ERROR ("Unsupported coding rate numerator: " << codingRateNumerator << ", denominator: " << codingRateDenominator);
+          }
+        break;
+      }
     // QPSK
     case 2:
       {

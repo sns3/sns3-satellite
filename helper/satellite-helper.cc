@@ -41,7 +41,14 @@
 #include <ns3/satellite-log.h>
 #include <ns3/satellite-env-variables.h>
 #include <ns3/satellite-traced-mobility-model.h>
+#include <ns3/satellite-sgp4-mobility-model.h>
 #include <ns3/satellite-ut-handover-module.h>
+
+#include <ns3/satellite-lora-conf.h>
+#include <ns3/lora-network-server-helper.h>
+#include <ns3/lora-forwarder-helper.h>
+#include <ns3/lora-device-address-generator.h>
+
 #include "satellite-helper.h"
 
 
@@ -57,6 +64,12 @@ SatHelper::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatHelper")
     .SetParent<Object> ()
     .AddConstructor<SatHelper> ()
+    .AddAttribute ("Standard",
+                   "The global standard used. Can be either DVB or Lora",
+                   EnumValue (SatEnums::DVB),
+                   MakeEnumAccessor (&SatHelper::m_standard),
+                   MakeEnumChecker (SatEnums::DVB, "DVB",
+                                    SatEnums::LORA, "LORA"))
     .AddAttribute ("SatRtnConfFileName",
                    "Name of the satellite network RTN link configuration file.",
                    StringValue ("Scenario72RtnConf.txt"),
@@ -71,6 +84,16 @@ SatHelper::GetTypeId (void)
                    "Name of the GW positions configuration file.",
                    StringValue ("Scenario72GwPos.txt"),
                    MakeStringAccessor (&SatHelper::m_gwPosFileName),
+                   MakeStringChecker ())
+    .AddAttribute ("SatMobilitySGP4Enabled",
+                   "The satellite moves following a SGP4 model.",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatHelper::m_satMobilitySGP4Enabled),
+                   MakeBooleanChecker ())
+    .AddAttribute ("SatMobilitySGP4TleFileName",
+                   "TLE input filename used for SGP4 mobility.",
+                   StringValue ("tle_iss_zarya.txt"),
+                   MakeStringAccessor (&SatHelper::m_satMobilitySGP4TleFileName),
                    MakeStringChecker ())
     .AddAttribute ("GeoSatPosFileName",
                    "Name of the geostationary satellite position configuration file.",
@@ -193,30 +216,53 @@ SatHelper::SatHelper ()
 {
   NS_LOG_FUNCTION (this);
 
+  // uncomment next line, if attributes are needed already in construction phase
   ObjectBase::ConstructSelf(AttributeConstructionList ());
 
   Singleton<SatEnvVariables>::Get ()->Initialize ();
 
   m_satConf = CreateObject<SatConf> ();
 
+  if (m_standard == SatEnums::LORA)
+    {
+      SatLoraConf satLoraConf;
+      satLoraConf.setSatConfAttributes (m_satConf);
+    }
+
   m_satConf->Initialize (m_rtnConfFileName,
                          m_fwdConfFileName,
                          m_gwPosFileName,
                          m_geoPosFileName,
-                         m_waveformConfFileName);
-
-  // Create antenna gain patterns
-  m_antennaGainPatterns = CreateObject<SatAntennaGainPatternContainer> ();
+                         m_waveformConfFileName,
+                         m_satMobilitySGP4TleFileName);
 
   // create Geo Satellite node, set mobility to it
   Ptr<Node> geoSatNode = CreateObject<Node> ();
-  SetGeoSatMobility (geoSatNode);
+
+  if (m_satMobilitySGP4Enabled == true)
+    {
+      SetSatMobility (geoSatNode);
+    }
+  else
+    {
+      SetGeoSatMobility (geoSatNode);
+    }
 
   m_beamHelper = CreateObject<SatBeamHelper> (geoSatNode,
                                               MakeCallback (&SatConf::GetCarrierBandwidthHz, m_satConf),
                                               m_satConf->GetRtnLinkCarrierCount (),
                                               m_satConf->GetFwdLinkCarrierCount (),
                                               m_satConf->GetSuperframeSeq ());
+
+  m_antennaGainPatterns = CreateObject<SatAntennaGainPatternContainer> ();
+  m_beamHelper->SetAntennaGainPatterns (m_antennaGainPatterns);
+
+  if (m_satMobilitySGP4Enabled == true && m_beamHelper->GetPropagationDelayModelEnum () != SatEnums::PD_CONSTANT_SPEED)
+    {
+      NS_FATAL_ERROR ("Must use constant speed propagation delay model if satellite mobility is enabled");
+    }
+
+  m_beamHelper->SetStandard (m_standard);
 
   Ptr<SatRtnLinkTime> rtnTime = Singleton<SatRtnLinkTime>::Get ();
   rtnTime->Initialize (m_satConf->GetSuperframeSeq ());
@@ -227,9 +273,6 @@ SatHelper::SatHelper ()
   m_userHelper = CreateObject<SatUserHelper> ();
   SatUserHelper::PropagationDelayCallback delayModelCb = MakeCallback (&SatBeamHelper::GetPropagationDelayModel, m_beamHelper);
   m_userHelper->SetAttribute ("PropagationDelayGetter", CallbackValue (delayModelCb));
-
-  // Set the antenna patterns to beam helper
-  m_beamHelper->SetAntennaGainPatterns (m_antennaGainPatterns);
 }
 
 void SatHelper::CreatePredefinedScenario (PreDefinedScenario_t scenario)
@@ -314,6 +357,23 @@ SatHelper::GetUtUsers () const
 }
 
 NodeContainer
+SatHelper::GetUtUsers (Ptr<Node> utNode) const
+{
+  return m_userHelper->GetUtUsers (utNode);
+}
+
+NodeContainer
+SatHelper::GetUtUsers (NodeContainer utNodes) const
+{
+  NodeContainer total;
+  for (NodeContainer::Iterator i = utNodes.Begin ();  i != utNodes.End (); i++ )
+    {
+      total.Add (GetUtUsers (*i));
+    }
+  return total;
+}
+
+NodeContainer
 SatHelper::GetGwUsers () const
 {
   NS_LOG_FUNCTION (this);
@@ -326,6 +386,27 @@ SatHelper::GetBeamHelper () const
 {
   NS_LOG_FUNCTION (this);
   return m_beamHelper;
+}
+
+Ptr<SatGroupHelper>
+SatHelper::GetGroupHelper () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_groupHelper;
+}
+
+void
+SatHelper::SetGroupHelper (Ptr<SatGroupHelper> groupHelper)
+{
+  NS_LOG_FUNCTION (this << groupHelper);
+  m_groupHelper = groupHelper;
+}
+
+void
+SatHelper::SetAntennaGainPatterns (Ptr<SatAntennaGainPatternContainer> antennaGainPatterns)
+{
+  NS_LOG_FUNCTION (this);
+  m_antennaGainPatterns = antennaGainPatterns;
 }
 
 Ptr<SatUserHelper>
@@ -503,9 +584,15 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
       for (BeamUserInfoMap_t::iterator info = beamInfos.begin (); info != beamInfos.end (); info++)
         {
           // create UTs of the beam, set mobility to them
+          std::vector<std::pair<GeoCoordinate, uint32_t>> positionsAndGroupId = info->second.GetPositions ();
           NodeContainer uts;
-          uts.Create (info->second.GetUtCount ());
+          uts.Create (info->second.GetUtCount () - positionsAndGroupId.size ());
           SetUtMobility (uts, info->first);
+
+          NodeContainer utsFromPosition;
+          utsFromPosition.Create (positionsAndGroupId.size ());
+          SetUtMobilityFromPosition (utsFromPosition, info->first, positionsAndGroupId);
+          uts.Add (utsFromPosition);
 
           // Add mobile UTs starting at this beam
           std::map<uint32_t, NodeContainer>::iterator mobileUts = m_mobileUtsByBeam.find (info->first);
@@ -560,6 +647,35 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
       m_mobileUtsByBeam.clear ();  // Release unused resources (mobile UTs starting in non-existent beams)
 
       m_userHelper->InstallGw (m_beamHelper->GetGwNodes (), gwUsers);
+
+      if (m_standard == SatEnums::LORA)
+        {
+          // Create the LoraDeviceAddress of the end devices
+          uint8_t nwkId = 54;
+          uint32_t nwkAddr = 1864;
+          Ptr<LoraDeviceAddressGenerator> addrGen = CreateObject<LoraDeviceAddressGenerator> (nwkId, nwkAddr);
+
+          Ptr<Node> utNode;
+          for(uint32_t indexUt = 0; indexUt < UtNodes ().GetN (); indexUt++)
+            {
+              utNode = UtNodes ().Get (indexUt);
+              Ptr<SatLorawanNetDevice> dev = utNode->GetDevice (2)->GetObject<SatLorawanNetDevice> ();
+              dev->GetMac ()->GetObject<LorawanMacEndDeviceClassA> ()->SetDeviceAddress (addrGen->NextAddress ());;
+            }
+
+          Ptr<LoraNetworkServerHelper> loraNetworkServerHelper = CreateObject<LoraNetworkServerHelper> ();
+          Ptr<LoraForwarderHelper> forHelper = CreateObject<LoraForwarderHelper> ();
+
+          loraNetworkServerHelper->SetGateways (GwNodes ());
+          loraNetworkServerHelper->SetEndDevices (UtNodes ());
+
+          NodeContainer networkServer;
+          networkServer.Create (1);
+
+          loraNetworkServerHelper->Install (networkServer);
+
+          forHelper->Install (GwNodes ());
+        }
 
       if (m_packetTraces)
         {
@@ -676,6 +792,39 @@ SatHelper::SetUtMobility (NodeContainer uts, uint32_t beamId)
 
   mobility.SetPositionAllocator (allocator);
   mobility.SetMobilityModel ("ns3::SatConstantPositionMobilityModel");
+  Ptr<MobilityModel> model = uts.Get (0)->GetObject<MobilityModel> ();
+  mobility.Install (uts);
+
+  InstallMobilityObserver (uts);
+
+  for (uint32_t i = 0; i < uts.GetN (); ++i)
+    {
+      GeoCoordinate position = uts.Get (i)->GetObject<SatMobilityModel> ()->GetGeoPosition ();
+      NS_LOG_INFO ("Installing mobility observer on Ut Node at " <<
+                   position << " with antenna gain of " <<
+                   m_antennaGainPatterns->GetAntennaGainPattern (beamId)->GetAntennaGain_lin (position));
+    }
+}
+
+void
+SatHelper::SetUtMobilityFromPosition (NodeContainer uts, uint32_t beamId, std::vector<std::pair<GeoCoordinate, uint32_t>> positionsAndGroupId)
+{
+  NS_LOG_FUNCTION (this << beamId);
+
+  MobilityHelper mobility;
+
+  Ptr<SatListPositionAllocator> allocator = CreateObject<SatListPositionAllocator> ();
+
+  NS_ASSERT_MSG (uts.GetN () == positionsAndGroupId.size (), "Inconsistent number of nodes and positions");
+
+  for (uint32_t i = 0; i < positionsAndGroupId.size (); i++)
+    {
+      allocator->Add (positionsAndGroupId[i].first);
+      m_groupHelper->AddNodeToGroupAfterScenarioCreation (positionsAndGroupId[i].second, uts.Get (i));
+    }
+
+  mobility.SetPositionAllocator (allocator);
+  mobility.SetMobilityModel ("ns3::SatConstantPositionMobilityModel");
   mobility.Install (uts);
 
   InstallMobilityObserver (uts);
@@ -714,6 +863,28 @@ SatHelper::SetGeoSatMobility (Ptr<Node> node)
   mobility.SetPositionAllocator (geoSatPosAllocator);
   mobility.SetMobilityModel ("ns3::SatConstantPositionMobilityModel");
   mobility.Install (node);
+}
+
+void
+SatHelper::SetSatMobility (Ptr<Node> node)
+{
+  NS_LOG_FUNCTION (this);
+
+  Ptr<Object> object = node;
+  Ptr<SatSGP4MobilityModel> model = object->GetObject<SatSGP4MobilityModel> ();
+  if (model == 0)
+    {
+      ObjectFactory mobilityFactory;
+      mobilityFactory.SetTypeId ("ns3::SatSGP4MobilityModel");
+      model = mobilityFactory.Create ()->GetObject<SatSGP4MobilityModel> ();
+      if (model == 0)
+        {
+          NS_FATAL_ERROR ("The requested mobility model is not a mobility model: \""<<
+                          mobilityFactory.GetTypeId ().GetName ()<<"\"");
+        }
+      object->AggregateObject (model);
+    }
+  model->SetTleInfo (m_satConf->GetSatTle ());
 }
 
 void
@@ -913,7 +1084,7 @@ SatHelper::FindMatchingDevice ( Ptr<NetDevice> devA, Ptr<Node> nodeB )
 
       Ipv4Address netAddressB = addressB.CombineMask (maskB);
 
-      if ( netAddressA.IsEqual (netAddressB))
+      if ( netAddressA == netAddressB)
         {
           matchingDevice = nodeB->GetDevice (j);
         }
@@ -941,8 +1112,8 @@ SatHelper::SetMulticastRouteToSourceNetwork (Ptr<Node> source, Ptr<Node> dest)
 
       for ( uint32_t i = 0; i < staticRouting->GetNRoutes (); i++ )
         {
-          if (staticRouting->GetRoute (i).GetDestNetwork ().IsEqual (defMulticastNetwork)
-              && staticRouting->GetRoute (i).GetDestNetworkMask ().IsEqual (defMulticastNetworkMask) )
+          if (staticRouting->GetRoute (i).GetDestNetwork ()== defMulticastNetwork
+              && staticRouting->GetRoute (i).GetDestNetworkMask () == defMulticastNetworkMask )
             {
               defaultMulticastRouteExists = true;
             }

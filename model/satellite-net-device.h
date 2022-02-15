@@ -66,7 +66,7 @@ public:
    * \brief Receive the packet from mac layer
    * \param packet Pointer to the packet to be received.
    */
-  void Receive (Ptr<const Packet> packet);
+  virtual void Receive (Ptr<const Packet> packet);
 
   /*
    * \brief Attach the SatPhy physical layer to this netdevice.
@@ -175,7 +175,6 @@ protected:
    */
   virtual void DoDispose (void);
 
-private:
   Ptr<SatPhy> m_phy;
   Ptr<SatMac> m_mac;
   Ptr<SatLlc> m_llc;
@@ -190,6 +189,11 @@ private:
   Ptr<ErrorModel> m_receiveErrorModel;
 
   Ptr<SatNodeInfo> m_nodeInfo;
+
+  /**
+   * Last delay measurement. Used to compute jitter.
+   */
+  Time m_lastDelay;
 
   TracedCallback<Time,
                  SatEnums::SatPacketEvent_t,
@@ -223,6 +227,12 @@ private:
    * the address of the senders.
    */
   TracedCallback<const Time &, const Address &> m_rxDelayTrace;
+
+  /**
+   * Traced callback for all received packets, including jitter information and
+   * the address of the senders.
+   */
+  TracedCallback<const Time &, const Address &> m_rxJitterTrace;
 
 };
 

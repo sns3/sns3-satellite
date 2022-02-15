@@ -187,6 +187,7 @@ SatFwdLinkScheduler::DoDispose ()
   NS_LOG_FUNCTION (this);
   m_schedContextCallback.Nullify ();
   m_txOpportunityCallback.Nullify ();
+  m_sendControlMsgCallback.Nullify ();
   m_cnoEstimatorContainer.clear ();
 }
 
@@ -202,6 +203,21 @@ SatFwdLinkScheduler::SetTxOpportunityCallback (SatFwdLinkScheduler::TxOpportunit
 {
   NS_LOG_FUNCTION (this << &cb);
   m_txOpportunityCallback = cb;
+}
+
+void
+SatFwdLinkScheduler::SetSendControlMsgCallback (SatFwdLinkScheduler::SendControlMsgCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_sendControlMsgCallback = cb;
+}
+
+
+bool
+SatFwdLinkScheduler::SendControlMsg (Ptr<SatControlMessage> message, const Address& dest) const
+{
+  NS_LOG_FUNCTION (this << message << dest);
+  return m_sendControlMsgCallback (message, dest);
 }
 
 
@@ -244,6 +260,12 @@ SatFwdLinkScheduler::GetDefaultFrameDuration () const
   NS_LOG_FUNCTION (this);
 
   return m_bbFrameConf->GetBbFrameDuration (m_bbFrameConf->GetDefaultModCod (), SatEnums::NORMAL_FRAME);
+}
+
+void
+SatFwdLinkScheduler::SetDummyFrameSendingEnabled (bool dummyFrameSendingEnabled)
+{
+  m_dummyFrameSendingEnabled = dummyFrameSendingEnabled;
 }
 
 void

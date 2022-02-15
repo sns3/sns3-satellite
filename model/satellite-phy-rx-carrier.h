@@ -140,7 +140,7 @@ public:
    */
   enum CarrierType
   {
-    BASE, DEDICATED_ACCESS, RA_SLOTTED_ALOHA, RA_CRDSA
+    BASE, DEDICATED_ACCESS, RA_SLOTTED_ALOHA, RA_CRDSA, RA_ESSA
   };
 
   /**
@@ -183,8 +183,9 @@ public:
   /**
    * \brief Function for starting packet reception from the SatChannel
    * \param rxParams The needed parameters for the received signal
+   * \return true if packet is destinated to this beam
    */
-  void StartRx (Ptr<SatSignalParameters> rxParams);
+  virtual bool StartRx (Ptr<SatSignalParameters> rxParams);
 
   /**
    * \brief Method for querying the type of the carrier
@@ -193,6 +194,11 @@ public:
   {
     return BASE;
   }
+
+  /**
+   * \brief Function for initializing the frame/window end scheduling
+   */
+  virtual void BeginEndScheduling ();
 
   //////////// Set callbacks ///////////////
 
@@ -213,6 +219,14 @@ public:
    * \param callback callback
    */
   void SetAverageNormalizedOfferedLoadCallback (SatPhyRx::AverageNormalizedOfferedLoadCallback callback);
+
+  /**
+   * \brief Method for querying the temperature of the carrier
+   */
+  double GetRxTemperatureK ()
+    {
+      return m_rxTemperatureK;
+    }
 
 protected:
   /**
@@ -452,6 +466,15 @@ protected:
   }
 
   /**
+   * \brief Get pointer to the waveform configuration.
+   * \return Waveform Configuration
+   */
+  inline Ptr<SatWaveformConf> GetWaveformConf ()
+  {
+    return m_waveformConf;
+  }
+
+  /**
    * \brief Get a pointer to the channel estimation error container of the carrier.
    * \return channel estimation error containe pointer
    */
@@ -554,6 +577,8 @@ protected:
    */
   TracedCallback<uint32_t, const Address &, bool> m_daRxTrace;
 
+  TracedCallback<uint32_t, const Address &> m_daRxCarrierIdTrace;
+
   /**
    * \brief Callback to calculate SINR.
    */
@@ -606,6 +631,7 @@ private:
   Ptr<SatNodeInfo> m_nodeInfo;                                                                  //< NodeInfo of the node where carrier is attached
   SatEnums::ChannelType_t m_channelType;                                //< Channel type
   Ptr<SatLinkResults> m_linkResults;                                            //< Link results from the carrier configuration
+  Ptr<SatWaveformConf> m_waveformConf; // Waveform configuration
   Ptr<UniformRandomVariable> m_uniformVariable; //< Uniform helper random variable
   SatPhyRxCarrierConf::ErrorModel m_errorModel; //< Error model
   double m_constantErrorRate;                                                                           //< Error rate for constant error model

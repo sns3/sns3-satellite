@@ -64,7 +64,7 @@ static void LinkBudgetTraceCb ( std::string context, Ptr<SatSignalParameters> pa
       NS_LOG_INFO ("" << params->m_channelType <<
                    " " << ownAdd << " " << destAdd <<
                    " " << params->m_beamId <<
-                   " " << SatUtils::LinearToDb (params->m_sinr) <<
+                   " " << SatUtils::LinearToDb (params->GetSinr ()) <<
                    " " << SatUtils::LinearToDb (cSinr));
     }
 }

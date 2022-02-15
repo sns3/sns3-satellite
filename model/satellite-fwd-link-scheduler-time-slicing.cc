@@ -65,8 +65,7 @@ SatFwdLinkSchedulerTimeSlicing::SatFwdLinkSchedulerTimeSlicing (Ptr<SatBbFrameCo
 
   ObjectBase::ConstructSelf (AttributeConstructionList ());
 
-  std::vector<SatEnums::SatModcod_t> modCods;
-  SatEnums::GetAvailableModcodsFwdLink (modCods);
+  std::vector<SatEnums::SatModcod_t> modCods = conf->GetModCodsUsed ();
 
   // Create control and broadcast container
   m_bbFrameContainers.insert (std::pair<uint8_t, Ptr<SatBbFrameContainer>> (0, CreateObject<SatBbFrameContainer> (modCods, m_bbFrameConf)));
@@ -90,7 +89,16 @@ SatFwdLinkSchedulerTimeSlicing::SatFwdLinkSchedulerTimeSlicing (Ptr<SatBbFrameCo
   for (std::map<uint8_t, Ptr <SatBbFrameContainer>>::iterator it = m_bbFrameContainers.begin(); it != m_bbFrameContainers.end(); it++ )
     {
       uint32_t maxSymbolPerCycle = it->second->GetMaxSymbolRate ()*m_periodicInterval.GetSeconds ();
-      uint32_t symbolsMostRobustModcod = it->second->GetFrameSymbols(m_bbFrameConf->GetMostRobustModcod (SatEnums::NORMAL_FRAME));
+      uint32_t symbolsMostRobustModcod;
+      if (m_bbFrameConf->GetMostRobustModcod (SatEnums::NORMAL_FRAME) != SatEnums::SAT_NONVALID_MODCOD)
+        {
+          symbolsMostRobustModcod = it->second->GetFrameSymbols(m_bbFrameConf->GetMostRobustModcod (SatEnums::NORMAL_FRAME));
+        }
+      else
+        {
+          //We are using only short Frames, as new ModCod exists for normal Frames.
+          symbolsMostRobustModcod = it->second->GetFrameSymbols(m_bbFrameConf->GetMostRobustModcod (SatEnums::SHORT_FRAME));
+        }
       if (symbolsMostRobustModcod > maxSymbolPerCycle)
         {
           NS_FATAL_ERROR ("Symbol rate of slice " + std::to_string(it->first) + " (" + std::to_string(it->second->GetMaxSymbolRate ())
@@ -197,13 +205,6 @@ SatFwdLinkSchedulerTimeSlicing::GetNextFrame ()
     }
 
   return std::make_pair(frame, frameDuration);
-}
-
-void
-SatFwdLinkSchedulerTimeSlicing::SetSendControlMsgCallback (SatFwdLinkSchedulerTimeSlicing::SendControlMsgCallback cb)
-{
-  NS_LOG_FUNCTION (this << &cb);
-  m_sendControlMsgCallback = cb;
 }
 
 void

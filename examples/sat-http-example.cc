@@ -128,6 +128,17 @@ main (int argc, char *argv[])
   NS_LOG_INFO ("  Scenario used: " << scenario);
   NS_LOG_INFO ("  ");
 
+  simulationHelper->EnableProgressLogs ();
+
+  // Add PLT statistics
+  Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer ();
+  s->AddGlobalFwdAppPlt (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddGlobalFwdAppPlt (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdAppPlt (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerUtFwdAppPlt (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerGwFwdAppPlt (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerGwFwdAppPlt (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
   simulationHelper->RunSimulation ();
 
   plots.clear ();

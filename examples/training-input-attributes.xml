@@ -292,7 +292,7 @@
  <default name="ns3::SatGwPhy::DefaultFadingValue" value="1"/>
  <default name="ns3::SatGwPhy::ImIfCOverIDb" value="22"/>
  <default name="ns3::SatGwPhy::AciIfWrtNoisePercent" value="10"/>
- <default name="ns3::SatLinkResultsDvbS2::EsNoOffsetForShortFrame" value="0.4"/>
+ <default name="ns3::SatLinkResultsFwd::EsNoOffsetForShortFrame" value="0.4"/>
  <default name="ns3::SatLlc::FwdLinkArqEnabled" value="false"/>
  <default name="ns3::SatLlc::RtnLinkArqEnabled" value="false"/>
  <default name="ns3::SatLooConf::ElevationCount" value="1"/>

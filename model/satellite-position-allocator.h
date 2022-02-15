@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
 #ifndef SATELLITE_POSITION_ALLOCATOR_H
@@ -160,6 +161,53 @@ private:
   Ptr<RandomVariableStream> m_latitude;
   Ptr<RandomVariableStream> m_longitude;
   Ptr<RandomVariableStream> m_altitude;
+};
+
+
+/**
+ * \ingroup satellite
+ * \brief Allocate random positions within a circle (center and radius), uniformly distributed
+ */
+class SatRandomCirclePositionAllocator : public SatPositionAllocator
+{
+public:
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
+  static TypeId GetTypeId (void);
+
+  /**
+   * Default constructor.
+   */
+  SatRandomCirclePositionAllocator ();
+
+  /**
+   * Constructor with parameters.
+   * \param center Center of the circle
+   * \param radius Radius in meters
+   */
+  SatRandomCirclePositionAllocator (GeoCoordinate center, uint32_t radius);
+
+  /**
+   * Destructor for SatRandomCirclePositionAllocator
+   */
+  virtual ~SatRandomCirclePositionAllocator ();
+
+  void SetCenter (GeoCoordinate center);
+  void SetRadius (uint32_t radius);
+
+  /**
+   * \brief Get next position
+   * \return The next chosen position.
+   */
+  virtual GeoCoordinate GetNextGeoPosition (void) const;
+  virtual int64_t AssignStreams (int64_t stream);
+
+private:
+  GeoCoordinate m_center;
+  uint32_t m_radius;
+  Ptr<RandomVariableStream> m_rand;
 };
 
 /**

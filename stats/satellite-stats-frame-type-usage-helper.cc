@@ -199,7 +199,7 @@ SatStatsFrameTypeUsageHelper::DoInstall ()
   }
 
   // Create the callback for trace source
-  Callback<void, std::string, SatEnums::SatBbFrameType_t> frameTypeUsageCallback
+  Callback<void, std::string, Ptr<SatBbFrame>> frameTypeUsageCallback
     = MakeCallback (&SatStatsFrameTypeUsageHelper::FrameTypeUsageCallback, this);
 
   // Connect SatGwMac of each beam by identifier (global, gw, beam) to callback
@@ -263,8 +263,9 @@ SatStatsFrameTypeUsageHelper::GetFrameTypeId (SatEnums::SatBbFrameType_t frameTy
 
 void
 SatStatsFrameTypeUsageHelper::FrameTypeUsageCallback (std::string context,
-                                                      SatEnums::SatBbFrameType_t frameType)
+                                                      Ptr<SatBbFrame> bbFrame)
 {
+  SatEnums::SatBbFrameType_t frameType = bbFrame ? bbFrame->GetFrameType () : SatEnums::DUMMY_FRAME;
   NS_LOG_FUNCTION (this << context << SatEnums::GetFrameTypeName (frameType));
 
   // convert context to number

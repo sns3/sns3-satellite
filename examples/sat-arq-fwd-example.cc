@@ -116,7 +116,7 @@ main (int argc, char *argv[])
         SimulationHelper::CBR,
         SimulationHelper::UDP,
         SimulationHelper::FWD_LINK,
-        appStartTime, Seconds (simLength), Seconds (0.001));
+        appStartTime, simLength, Seconds (0.001));
 
     }
   //---- Stop CBR application definitions

@@ -108,6 +108,13 @@ SatIdMapper::Reset ()
       m_macToBeamIdMap.clear ();
     }
 
+  // Group ID maps
+
+  if (!m_macToGroupIdMap.empty ())
+    {
+      m_macToGroupIdMap.clear ();
+    }
+
   // GW ID maps
 
   if (!m_macToGwIdMap.empty ())
@@ -201,6 +208,21 @@ SatIdMapper::AttachMacToBeamId (Address mac, uint32_t beamId)
 }
 
 void
+SatIdMapper::AttachMacToGroupId (Address mac, uint32_t groupId)
+{
+  NS_LOG_FUNCTION (this);
+
+  std::pair < std::map<Address, uint32_t>::iterator, bool> resultMacToGroupId = m_macToGroupIdMap.insert (std::make_pair (mac, groupId));
+
+  if (resultMacToGroupId.second == false)
+    {
+      NS_FATAL_ERROR ("SatIdMapper::AttachMacToGroupId - MAC to group ID failed");
+    }
+
+  NS_LOG_INFO ("Added MAC " << mac << " with group ID " << groupId);
+}
+
+void
 SatIdMapper::AttachMacToGwId (Address mac, uint32_t gwId)
 {
   NS_LOG_FUNCTION (this);
@@ -291,6 +313,21 @@ SatIdMapper::GetBeamIdWithMac (Address mac) const
   if (iter == m_macToBeamIdMap.end ())
     {
       return -1;
+    }
+
+  return iter->second;
+}
+
+int32_t
+SatIdMapper::GetGroupIdWithMac (Address mac) const
+{
+  NS_LOG_FUNCTION (this);
+
+  std::map<Address, uint32_t>::const_iterator iter = m_macToGroupIdMap.find (mac);
+
+  if (iter == m_macToGroupIdMap.end ())
+    {
+      return 0;
     }
 
   return iter->second;
@@ -467,6 +504,14 @@ SatIdMapper::GetMacInfo (Address mac) const
   if (!(iterBeam == m_macToBeamIdMap.end ()))
     {
       out << "beam ID: " << iterBeam->second << " ";
+      isInMap = true;
+    }
+
+  std::map<Address, uint32_t>::const_iterator iterGroup = m_macToGroupIdMap.find (mac);
+
+  if (!(iterGroup == m_macToGroupIdMap.end ()))
+    {
+      out << "beam ID: " << iterGroup->second << " ";
       isInMap = true;
     }
 

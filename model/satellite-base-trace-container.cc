@@ -25,6 +25,21 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (SatBaseTraceContainer);
 
+const uint32_t SatBaseTraceContainer::RX_POWER_TRACE_DEFAULT_RX_POWER_DENSITY_INDEX;
+const uint32_t SatBaseTraceContainer::RX_POWER_TRACE_DEFAULT_NUMBER_OF_COLUMNS;
+const uint32_t SatBaseTraceContainer::RX_CNO_TRACE_DEFAULT_RX_POWER_DENSITY_INDEX;
+const uint32_t SatBaseTraceContainer::RX_CNO_TRACE_DEFAULT_NUMBER_OF_COLUMNS;
+const uint32_t SatBaseTraceContainer::INTF_TRACE_DEFAULT_INTF_DENSITY_INDEX;
+const uint32_t SatBaseTraceContainer::INTF_TRACE_DEFAULT_NUMBER_OF_COLUMNS;
+const uint32_t SatBaseTraceContainer::FADING_TRACE_DEFAULT_FADING_VALUE_INDEX;
+const uint32_t SatBaseTraceContainer::FADING_TRACE_DEFAULT_NUMBER_OF_COLUMNS;
+const uint32_t SatBaseTraceContainer::CSINR_TRACE_DEFAULT_FADING_VALUE_INDEX;
+const uint32_t SatBaseTraceContainer::CSINR_TRACE_DEFAULT_NUMBER_OF_COLUMNS;
+const uint32_t SatBaseTraceContainer::POSITION_TRACE_DEFAULT_LATITUDE_INDEX;
+const uint32_t SatBaseTraceContainer::POSITION_TRACE_DEFAULT_LONGITUDE_INDEX;
+const uint32_t SatBaseTraceContainer::POSITION_TRACE_DEFAULT_ALTITUDE_INDEX;
+const uint32_t SatBaseTraceContainer::POSITION_TRACE_DEFAULT_NUMBER_OF_COLUMNS;
+
 TypeId
 SatBaseTraceContainer::GetTypeId (void)
 {

@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
 #include <limits>
@@ -199,6 +200,79 @@ SatRandomBoxPositionAllocator::AssignStreams (int64_t stream)
   m_latitude->SetStream (stream + 1);
   m_altitude->SetStream (stream + 2);
   return 3;
+}
+
+NS_OBJECT_ENSURE_REGISTERED (SatRandomCirclePositionAllocator);
+
+TypeId
+SatRandomCirclePositionAllocator::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatRandomCirclePositionAllocator")
+    .SetParent<SatPositionAllocator> ()
+    .SetGroupName ("Mobility")
+    .AddConstructor<SatRandomCirclePositionAllocator> ();
+  return tid;
+}
+
+SatRandomCirclePositionAllocator::SatRandomCirclePositionAllocator ()
+{
+  m_rand = CreateObject<UniformRandomVariable> ();
+}
+
+SatRandomCirclePositionAllocator::SatRandomCirclePositionAllocator (GeoCoordinate center, uint32_t radius)
+  : m_center (center),
+  m_radius (radius)
+{
+  m_rand = CreateObject<UniformRandomVariable> ();
+}
+
+
+SatRandomCirclePositionAllocator::~SatRandomCirclePositionAllocator ()
+{
+}
+
+void
+SatRandomCirclePositionAllocator::SetCenter (GeoCoordinate center)
+{
+  NS_LOG_INFO (this);
+
+  m_center = center;
+}
+void
+SatRandomCirclePositionAllocator::SetRadius (uint32_t radius)
+{
+  NS_LOG_INFO (this);
+
+  m_radius = radius;
+}
+
+GeoCoordinate
+SatRandomCirclePositionAllocator::GetNextGeoPosition () const
+{
+  NS_LOG_INFO (this);
+
+  double radius = m_radius*sqrt(m_rand->GetValue ());
+  double theta = m_rand->GetValue ()*2*M_PI;
+
+  double latitude = m_center.GetLatitude ()*M_PI/180;
+  double longitude = m_center.GetLongitude ()*M_PI/180;
+  double altitude = m_center.GetAltitude ();
+
+  double radiusNormalized = radius/GeoCoordinate::polarRadius_sphere;
+
+  double lat2 = asin(sin(latitude)*cos(radiusNormalized) + cos(latitude)*sin(radiusNormalized)*cos(theta));
+  double lon2 = longitude + atan2(sin(theta)*sin(radiusNormalized)*cos(latitude), cos(radiusNormalized) - sin(latitude)*sin(lat2));
+
+  GeoCoordinate position = GeoCoordinate ((180/M_PI)*lat2, (180/M_PI)*lon2, altitude);
+
+  return position;
+}
+
+int64_t
+SatRandomCirclePositionAllocator::AssignStreams (int64_t stream)
+{
+  m_rand->SetStream (stream);
+  return 1;
 }
 
 

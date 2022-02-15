@@ -143,9 +143,9 @@ SatPhyRxCarrierMarsala::PerformMarsala (
           double replicasExtNoisePower = replicasCount * m_rxExtNoisePowerW;
 
           double replicasIfPowerInSatellite = currentPacket->rxParams->GetInterferencePowerInSatellite ();
-          double replicasNoisePowerInSatellite = currentPacket->rxParams->m_rxNoisePowerInSatellite_W;
-          double replicasAciIfPowerInSatellite = currentPacket->rxParams->m_rxAciIfPowerInSatellite_W;
-          double replicasExtNoisePowerInSatellite = currentPacket->rxParams->m_rxExtNoisePowerInSatellite_W;
+          double replicasNoisePowerInSatellite = currentPacket->rxParams->GetRxNoisePowerInSatellite ();
+          double replicasAciIfPowerInSatellite = currentPacket->rxParams->GetRxAciIfPowerInSatellite ();
+          double replicasExtNoisePowerInSatellite = currentPacket->rxParams->GetRxExtNoisePowerInSatellite ();
 
           // add informations from other replicas
           for (uint16_t& replicaSlotId : currentPacket->slotIdsForOtherReplicas)
@@ -163,18 +163,18 @@ SatPhyRxCarrierMarsala::PerformMarsala (
               SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s replica = FindReplicaInSlot (replicaSlot->second, *currentPacket);
               replicasIfPower += replica.rxParams->GetInterferencePower ();
               replicasIfPowerInSatellite += replica.rxParams->GetInterferencePowerInSatellite ();
-              replicasNoisePowerInSatellite += replica.rxParams->m_rxNoisePowerInSatellite_W;
-              replicasAciIfPowerInSatellite += replica.rxParams->m_rxAciIfPowerInSatellite_W;
-              replicasExtNoisePowerInSatellite += replica.rxParams->m_rxExtNoisePowerInSatellite_W;
+              replicasNoisePowerInSatellite += replica.rxParams->GetRxNoisePowerInSatellite ();
+              replicasAciIfPowerInSatellite += replica.rxParams->GetRxAciIfPowerInSatellite ();
+              replicasExtNoisePowerInSatellite += replica.rxParams->GetRxExtNoisePowerInSatellite ();
             }
 
           // Calculate correlated SINR
-          double sinrSatellite = CalculateSinr ( replicasCountSquared * currentPacket->rxParams->m_rxPowerInSatellite_W,
+          double sinrSatellite = CalculateSinr ( replicasCountSquared * currentPacket->rxParams->GetRxPowerInSatellite (),
                                                  replicasIfPowerInSatellite,
                                                  replicasNoisePowerInSatellite,
                                                  replicasAciIfPowerInSatellite,
                                                  replicasExtNoisePowerInSatellite,
-                                                 currentPacket->rxParams->m_sinrCalculate);
+                                                 currentPacket->rxParams->GetSinrCalculator ());
           double sinr = CalculateSinr ( replicasCountSquared * currentPacket->rxParams->m_rxPower_W,
                                         replicasIfPower,
                                         replicasNoisePower,

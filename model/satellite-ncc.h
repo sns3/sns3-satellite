@@ -134,7 +134,14 @@ public:
    * \param setRaChannelCallback  callback to invoke whenever the UT to be
    *        added should change its RA allocation channel
    */
-  void AddUt (Address utId, Ptr<SatLowerLayerServiceConf> llsConf, uint32_t beamId, Callback<void, uint32_t> setRaChannelCallback);
+  void AddUt (Ptr<SatLowerLayerServiceConf> llsConf, Address utId, uint32_t beamId, Callback<void, uint32_t> setRaChannelCallback, bool verifyExisting = false);
+
+  /**
+   * Remove a UT
+   * \param utId ID (mac address) of the UT to be removed
+   * \param beamId ID of the beam where UT is connected
+   */
+  void RemoveUt (Address utId, uint32_t beamId);
 
   /**
    * \brief Function for setting the random access allocation channel specific high load backoff probabilities
@@ -200,6 +207,42 @@ public:
    */
   void SetUpdateRoutingCallback (SatNcc::UpdateRoutingCallback cb);
 
+  /**
+   * \param msg        the TBTP sent
+   */
+  typedef Callback<void, Ptr<SatTbtpMessage> > SendTbtpCallback;
+
+  /**
+   * Set the callback to inform GW Mac a TBTP has been sent.
+   */
+  void SetSendTbtpCallback (SendTbtpCallback cb);
+
+  void ReserveLogonChannel (uint32_t logonChannelId);
+
+  /**
+   * Function called when a TBTP has been sent by the SatBeamScheduler.
+   */
+  void TbtpSent (Ptr<SatTbtpMessage> tbtp);
+
+  /**
+   * Function to call when a control burst has been received.
+   * \param utId The address of the sending UT
+   * \param beamId The beam ID
+   */
+  void ReceiveControlBurst (Address utId, uint32_t beamId);
+
+  /**
+   * Set if logon is used in this simulation. Logoff is disbled if logon is not used.
+   * \param useLogon boolean indicating if logon is used.
+   */
+  void SetUseLogon (bool useLogon);
+
+  /**
+   * Set if SNS-3 is used with Lora standard. TBTPs are not sent in this mode.
+   * \param useLora boolean indicating if lora is used.
+   */
+  void SetUseLora (bool useLora);
+
 private:
   SatNcc& operator = (const SatNcc &);
   SatNcc (const SatNcc &);
@@ -222,6 +265,13 @@ private:
    * \param destBeamId the beam ID this UT is moving to
    */
   void DoMoveUtBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamId);
+
+  /**
+   * \brief Check if a UT has not been receiving control bursts, and then need to logoff
+   * \param utId The UT to check
+   * \param beamId The beam ID
+   */
+  void CheckTimeout (Address utId, uint32_t beamId);
 
   /**
    * The map containing beams in use (set).
@@ -278,10 +328,35 @@ private:
   Time m_utHandoverDelay;
 
   /**
+   * Timeout to logoff a UT, if logon procedure is used
+   */
+  Time m_utTimeout;
+
+  /**
+   * Flag indicating if logon procedure is used
+   */
+  bool m_useLogon;
+
+  /**
+   * Flag indicating if lora standard is used
+   */
+  bool m_useLora;
+
+  /**
+   * List of reception time for all UTs. Used to trigger timeouts and logoff UTs.
+   */
+  std::map< std::pair<Address, uint32_t> , Time> m_lastControlBurstReception;
+
+  /**
    * Callback to update routing tables and ARP tables on gateways
    * once a handover request has been accepted and treated
    */
   UpdateRoutingCallback m_updateRoutingCallback;
+
+  /**
+   * The TBTP send callback to inform GW Mac.
+   */
+  SatBeamScheduler::SendTbtpCallback m_txTbtpCallback;
 };
 
 } // namespace ns3

@@ -39,6 +39,7 @@ class SatPhyRxCarrierConf;
 class SatPhyRxCarrier;
 class SatPhyRxCarrierPerSlot;
 class SatPhyRxCarrierPerFrame;
+class SatPhyRxCarrierPerWindow;
 class SatPhyRxCarrierUplink;
 
 /**
@@ -154,7 +155,7 @@ public:
    * Start packet reception from the SatChannel
    * \param rxParams The needed parameters for the received signal
    */
-  void StartRx (Ptr<SatSignalParameters> rxParams);
+  virtual void StartRx (Ptr<SatSignalParameters> rxParams);
 
   /**
    * \param SatSignalParameters containing e.g. the received packet
@@ -210,9 +211,15 @@ public:
   void SetNodeInfo (const Ptr<SatNodeInfo> nodeInfo);
 
   /**
-   * \brief Begin frame end scheduling for processes utilizing frame length as interval
+   * \brief Begin frame/window end scheduling for processes utilizing frame length as interval
    */
-  void BeginFrameEndScheduling ();
+  void BeginEndScheduling ();
+
+  /**
+   * \brief Method for querying the temperature of the chosen carrier
+   * \param rxParams The needed parameters for the received signal
+   */
+  double GetRxTemperatureK (Ptr<SatSignalParameters> rxParams);
 
 private:
   Ptr<MobilityModel> m_mobility;

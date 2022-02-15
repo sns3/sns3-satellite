@@ -39,6 +39,7 @@ SatRandomAccessAllocationChannel::GetTypeId (void)
 SatRandomAccessAllocationChannel::SatRandomAccessAllocationChannel ()
   : m_slottedAlohaAllowed (false),
   m_crdsaAllowed (false),
+  m_essaAllowed (false),
   m_crdsaMinRandomizationValue (),
   m_crdsaMaxRandomizationValue (),
   m_crdsaNumOfInstances (),
@@ -49,7 +50,10 @@ SatRandomAccessAllocationChannel::SatRandomAccessAllocationChannel ()
   m_crdsaMaxUniquePayloadPerBlock (),
   m_crdsaMaxConsecutiveBlocksAccessed (),
   m_crdsaNumOfConsecutiveBlocksUsed (0),
-  m_crdsaBackoffReleaseTime (0)
+  m_crdsaBackoffReleaseTime (0),
+  m_fSimBackoffTimeInMilliSeconds (),
+  m_fSimBackoffProbability (),
+  m_fSimPhysicalLayerFrameInMilliSeconds ()
 {
   NS_LOG_FUNCTION (this);
 }

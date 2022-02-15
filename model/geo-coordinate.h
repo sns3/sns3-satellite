@@ -155,14 +155,14 @@ private:
    */
   double GetRadiusCurvature (double latitude) const;
   /**
-   * Checks if longtitude is in valid range
+   * Checks if longitude is in valid range
    *
-   * \param longtitude to check
+   * \param longitude to check
    * \return bool true longitude valid, false invalid
    */
-  static inline bool IsValidLongtitude (double longtitude)
+  static inline bool IsValidLongitude (double longitude)
   {
-    return (longtitude >= -180 && longtitude <= 180);
+    return (longitude >= -180 && longitude <= 180);
   }
   /**
    * Checks if latitude is in valid range

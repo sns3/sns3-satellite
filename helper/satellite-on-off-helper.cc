@@ -73,4 +73,5 @@ SatOnOffHelper::SetConstantRate (DataRate dataRate, uint32_t packetSize)
   m_factory.Set ("PacketSize", UintegerValue (packetSize));
 }
 
+
 } // namespace ns3

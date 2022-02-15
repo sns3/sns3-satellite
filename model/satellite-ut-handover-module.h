@@ -82,6 +82,12 @@ public:
   void SetHandoverRequestCallback (SatUtHandoverModule::HandoverRequestCallback cb);
 
   /**
+   * \brief Get the best beam ID
+   * \return The best beam ID
+   */
+  uint32_t GetAskedBeamId ();
+
+  /**
    * \brief Inspect whether or not the given beam is still suitable for
    * the underlying mobility model.
    * \param beamId The current beam ID the underlying mobility model is emitting in

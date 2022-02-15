@@ -62,6 +62,8 @@ SatStatsHelper::GetIdentifierTypeName (SatStatsHelper::IdentifierType_t identifi
       return "IDENTIFIER_UT_USER";
     case SatStatsHelper::IDENTIFIER_SLICE:
       return "IDENTIFIER_SLICE";
+    case SatStatsHelper::IDENTIFIER_GROUP:
+      return "IDENTIFIER_GROUP";
     default:
       NS_FATAL_ERROR ("SatStatsHelper - Invalid identifier type");
       break;
@@ -343,6 +345,23 @@ SatStatsHelper::CreateCollectorPerIdentifier (CollectorMap &collectorMap) const
         break;
       }
 
+    case SatStatsHelper::IDENTIFIER_GROUP:
+      {
+        std::list<uint32_t> groups = m_satHelper->GetGroupHelper ()->GetGroups ();
+        groups.push_back (0);
+        for (std::list<uint32_t>::const_iterator it = groups.begin ();
+             it != groups.end (); ++it)
+          {
+            const uint32_t groupId = (*it);
+            std::ostringstream name;
+            name << groupId;
+            collectorMap.SetAttribute ("Name", StringValue (name.str ()));
+            collectorMap.Create (groupId);
+            n++;
+          }
+        break;
+      }
+
     case SatStatsHelper::IDENTIFIER_UT:
       {
         NodeContainer uts = m_satHelper->GetBeamHelper ()->GetUtNodes ();
@@ -429,6 +448,9 @@ SatStatsHelper::GetIdentifierHeading (std::string dataLabel) const
 
     case SatStatsHelper::IDENTIFIER_BEAM:
       return "% beam_id " + dataLabel;
+
+    case SatStatsHelper::IDENTIFIER_GROUP:
+      return "% group_id " + dataLabel;
 
     case SatStatsHelper::IDENTIFIER_UT:
       return "% ut_id " + dataLabel;
@@ -625,6 +647,30 @@ SatStatsHelper::GetIdentifierForUtUser (Ptr<Node> utUserNode) const
         break;
       }
 
+    case SatStatsHelper::IDENTIFIER_GROUP:
+      {
+        Ptr<Node> utNode = m_satHelper->GetUserHelper ()->GetUtNode (utUserNode);
+
+        if (utNode == 0)
+          {
+            NS_LOG_WARN (this << " UT user node " << utUserNode->GetId ()
+                              << " is not attached to any UT node");
+          }
+        else
+          {
+            const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
+            const Address utMac = satIdMapper->GetUtMacWithNode (utNode);
+
+            if (!utMac.IsInvalid ())
+              {
+                const int32_t groupId = satIdMapper->GetGroupIdWithMac (utMac);
+                ret = groupId;
+              }
+          }
+
+        break;
+      }
+
     case SatStatsHelper::IDENTIFIER_UT:
       {
         Ptr<Node> utNode = m_satHelper->GetUserHelper ()->GetUtNode (utUserNode);
@@ -707,6 +753,20 @@ SatStatsHelper::GetIdentifierForUt (Ptr<Node> utNode) const
         break;
       }
 
+    case SatStatsHelper::IDENTIFIER_GROUP:
+      {
+        const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
+        const Address utMac = satIdMapper->GetUtMacWithNode (utNode);
+
+        if (!utMac.IsInvalid ())
+          {
+            const int32_t groupId = satIdMapper->GetGroupIdWithMac (utMac);
+            ret = groupId;
+          }
+
+        break;
+      }
+
     case SatStatsHelper::IDENTIFIER_UT:
       ret = GetUtId (utNode);
       break;
@@ -760,6 +820,33 @@ SatStatsHelper::GetIdentifierForBeam (uint32_t beamId) const
 
 
 uint32_t
+SatStatsHelper::GetIdentifierForGroup (uint32_t groupId) const
+{
+  uint32_t ret = 0;
+
+  switch (m_identifierType)
+    {
+    case SatStatsHelper::IDENTIFIER_GLOBAL:
+      ret = 0;
+      break;
+
+    case SatStatsHelper::IDENTIFIER_GROUP:
+      ret = groupId;
+      break;
+
+    default:
+      NS_LOG_WARN (this << " Identifier type "
+                        << GetIdentifierTypeName (m_identifierType)
+                        << " is not valid for a group."
+                        << " Assigning identifier 0 to this group.");
+      break;
+    }
+
+  return ret;
+}
+
+
+uint32_t
 SatStatsHelper::GetIdentifierForGw (Ptr<Node> gwNode) const
 {
   if (m_identifierType == IDENTIFIER_GW)
@@ -791,17 +878,14 @@ SatStatsHelper::GetGwSatNetDevice (Ptr<Node> gwNode)
   /*
    * Assuming that device #0 is for loopback device, device #(N-1) is for
    * backbone network device, and devices #1 until #(N-2) are for satellite
-   * beam device.
+   * beam device. ==> This is true for DVB, but not for Lora: now we keep all
+   * devices that can be casted to SatNetDevice.
    */
-  for (uint32_t i = 1; i <= gwNode->GetNDevices () - 2; i++)
+  for (uint32_t i = 0; i < gwNode->GetNDevices (); i++)
     {
-      Ptr<NetDevice> dev = gwNode->GetDevice (i);
+      Ptr<SatNetDevice> dev = DynamicCast<SatNetDevice> (gwNode->GetDevice (i));
 
-      if (dev->GetObject<SatNetDevice> () == 0)
-        {
-          NS_FATAL_ERROR ("Node " << gwNode->GetId () << " is not a valid GW");
-        }
-      else
+      if (dev != 0)
         {
           ret.Add (dev);
         }

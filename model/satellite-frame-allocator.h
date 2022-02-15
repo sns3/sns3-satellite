@@ -146,6 +146,14 @@ public:
   } CcLevel_t;
 
   /**
+   * BandwidthComparator is a custom functor meant as comparison function for std::map
+   */
+  struct BandwidthComparator
+  {
+    bool operator () (const Ptr<SatFrameAllocator>& a, const Ptr<SatFrameAllocator>& b) const;
+  };
+
+  /**
    * Default constructor (not in used)
    */
   SatFrameAllocator ();
@@ -156,8 +164,9 @@ public:
    * \param frameConf Frame configuration for the frame info
    * \param frameId Id of the frame
    * \param m_configType Type of the configuration (0-2 supported)
+   * \param parent Parent allocator in case this one holds configuration for a split frame
    */
-  SatFrameAllocator (Ptr<SatFrameConf> frameConf, uint8_t frameId, SatSuperframeConf::ConfigType_t m_configType);
+  SatFrameAllocator (Ptr<SatFrameConf> frameConf, uint8_t frameId, SatSuperframeConf::ConfigType_t m_configType, Ptr<SatFrameAllocator> parent);
 
   /**
    * Get minimum payload of a carrier in bytes
@@ -180,6 +189,38 @@ public:
   }
 
   /**
+   * Get the amount of carriers used in this frame.
+   *
+   * \return The carrier count of the frame.
+   */
+  inline uint16_t GetCarrierCount () const
+  {
+    return m_maxCarrierCount;
+  }
+
+  /**
+   * Set the amount of carriers used in this frame.
+   * 
+   * \param amount   number of carriers to select in this frame. This parameter may be updated to include padding to round to an even number of selected carriers.
+   * \param offset   number of carriers already selected for subdivided versions of the frame.
+   */
+  void SelectCarriers (uint16_t& amount, uint16_t offset);
+
+  inline double GetCarrierBandwidthHz (bool checkParent = false) const
+  {
+    if (checkParent && m_frameConf->IsSubdivided ())
+      return 0.0;
+    return m_frameConf->GetCarrierBandwidthHz (SatEnums::EFFECTIVE_BANDWIDTH);
+  }
+
+  inline double GetVolumeBytes () const
+  {
+    return m_maxSymbolsPerCarrier;
+  }
+
+  inline Ptr<SatFrameAllocator> GetParent () const { return m_parent; }
+
+  /**
    * Reset frame allocator.
    */
   void Reset ();
@@ -189,9 +230,10 @@ public:
    *
    *  \param cno C/N0 value used to find the best waveform
    *  \param waveFormId variable to store the best waveform id
+   *  \param cnoThreshold variable to store the C/N0 threshold of the selected waveform
    *  \return true if allocator can support given C/N0
    **/
-  bool GetBestWaveform (double cno, uint32_t & waveFormId) const;
+  bool GetBestWaveform (double cno, uint32_t & waveFormId, double & cnoThreshold) const;
 
   /**
    * Get frame load by requested CC
@@ -418,6 +460,12 @@ private:
   // maximum symbols available in frame
   double  m_maxSymbolsPerCarrier;
 
+  // maximum carriers available in frame
+  uint16_t m_maxCarrierCount;
+
+  // skipped carriers at the beginning of the frame
+  uint16_t m_carriersOffset;
+
   // configuration type of the frame
   SatSuperframeConf::ConfigType_t  m_configType;
 
@@ -433,6 +481,9 @@ private:
   // Frame configuration
   Ptr<SatFrameConf>   m_frameConf;
 
+  // Parent allocator in case of carrier subdivision
+  Ptr<SatFrameAllocator> m_parent;
+
   // UT allocation container
   UtAllocContainer_t  m_utAllocs;
 
@@ -441,6 +492,9 @@ private:
 
   // The most robust waveform
   Ptr<SatWaveform>  m_mostRobustWaveform;
+
+  // Guard time in symbols to apply
+  uint8_t m_guardTimeSymbols;
 
   /**
    * Share symbols between all UTs and RCs allocated to the frame.

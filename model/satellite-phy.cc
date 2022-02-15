@@ -30,6 +30,7 @@
 #include <ns3/satellite-utils.h>
 #include <ns3/satellite-phy-rx.h>
 #include <ns3/satellite-phy-tx.h>
+#include <ns3/satellite-lora-phy-rx.h>
 #include <ns3/satellite-channel.h>
 #include <ns3/satellite-mac.h>
 #include <ns3/satellite-signal-parameters.h>
@@ -59,7 +60,8 @@ SatPhy::SatPhy (void)
   m_txPointingLossDb (0),
   m_txOboLossDb (0),
   m_txAntennaLossDb (0),
-  m_defaultFadingValue (1.0)
+  m_defaultFadingValue (1.0),
+  m_lastDelay (0)
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("SatPhy default constructor is not allowed to use");
@@ -78,16 +80,41 @@ SatPhy::SatPhy (CreateParam_t & params)
   m_txPointingLossDb (0),
   m_txOboLossDb (0),
   m_txAntennaLossDb (0),
-  m_defaultFadingValue (1.0)
+  m_defaultFadingValue (1.0),
+  m_lastDelay (0)
 {
   NS_LOG_FUNCTION (this << params.m_beamId);
   ObjectBase::ConstructSelf (AttributeConstructionList ());
 
   Ptr<MobilityModel> mobility = params.m_device->GetNode ()->GetObject<MobilityModel> ();
 
-  m_phyTx = CreateObject<SatPhyTx> ();
+  switch (params.m_standard)
+    {
+      case SatEnums::GEO:
+      case SatEnums::DVB_UT:
+      case SatEnums::DVB_GW:
+      {
+        m_phyTx = CreateObject<SatPhyTx> ();
+        m_phyRx = CreateObject<SatPhyRx> ();
+        break;
+      }
+      case SatEnums::LORA_UT:
+      {
+        m_phyTx = CreateObject<SatLoraPhyTx> ();
+        m_phyRx = CreateObject<SatLoraPhyRx> ();
+        break;
+      }
+      case SatEnums::LORA_GW:
+      {
+        m_phyTx = CreateObject<SatLoraPhyTx> ();
+        m_phyRx = CreateObject<SatPhyRx> ();
+        break;
+      }
+      default:
+        NS_FATAL_ERROR ("Standard not implemented yet: " << params.m_standard);
+    }
+
   m_phyTx->SetChannel (params.m_txCh);
-  m_phyRx = CreateObject<SatPhyRx> ();
   m_beamId = params.m_beamId;
 
   params.m_rxCh->AddRx (m_phyRx);
@@ -130,6 +157,10 @@ SatPhy::GetTypeId (void)
                      "A packet is received with delay information",
                      MakeTraceSourceAccessor (&SatPhy::m_rxDelayTrace),
                      "ns3::SatTypedefs::PacketDelayAddressCallback")
+    .AddTraceSource ("RxJitter",
+                     "A packet is received with jitter information",
+                     MakeTraceSourceAccessor (&SatPhy::m_rxJitterTrace),
+                     "ns3::SatTypedefs::PacketJitterAddressCallback")
   ;
   return tid;
 }
@@ -245,10 +276,10 @@ SatPhy::SetNodeInfo (const Ptr<SatNodeInfo> nodeInfo)
 }
 
 void
-SatPhy::BeginFrameEndScheduling ()
+SatPhy::BeginEndScheduling ()
 {
   NS_LOG_FUNCTION (this);
-  m_phyRx->BeginFrameEndScheduling ();
+  m_phyRx->BeginEndScheduling ();
 }
 
 Ptr<SatPhyTx>
@@ -316,7 +347,6 @@ SatPhy::SendPdu (PacketContainer_t p, uint32_t carrierId, Time duration, SatSign
                  ld,
                  SatUtils::GetPacketInfo (p));
 
-
   // Create a new SatSignalParameters related to this packet transmission
   Ptr<SatSignalParameters> txParams = Create<SatSignalParameters> ();
   txParams->m_duration = duration;
@@ -324,7 +354,6 @@ SatPhy::SendPdu (PacketContainer_t p, uint32_t carrierId, Time duration, SatSign
   txParams->m_packetsInBurst = p;
   txParams->m_beamId = m_beamId;
   txParams->m_carrierId = carrierId;
-  txParams->m_sinr = 0;
   txParams->m_txPower_W = m_eirpWoGainW;
   txParams->m_txInfo.modCod = txInfo.modCod;
   txParams->m_txInfo.sliceId = txInfo.sliceId;
@@ -418,9 +447,15 @@ SatPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
               SatPhyTimeTag timeTag;
               if ((*it1)->RemovePacketTag (timeTag))
                 {
-                  NS_LOG_DEBUG (this << " contains a SatPhyTimeTag tag");
-                  m_rxDelayTrace (Simulator::Now () - timeTag.GetSenderTimestamp (),
-                                  addr);
+                  NS_LOG_DEBUG (this << " contains a SatMacTimeTag tag");
+                  Time delay = Simulator::Now () - timeTag.GetSenderTimestamp ();
+                  m_rxDelayTrace (delay, addr);
+                  if (m_lastDelay.IsZero() == false)
+                    {
+                      Time jitter = Abs (delay - m_lastDelay);
+                      m_rxJitterTrace (jitter, addr);
+                    }
+                  m_lastDelay = delay;
                 }
 
             } // end of `for (it1 = rxParams->m_packetsInBurst)`

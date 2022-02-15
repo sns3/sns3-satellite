@@ -41,6 +41,9 @@
 #include <ns3/satellite-on-off-helper.h>
 #include <ns3/nrtv-helper.h>
 #include <ns3/three-gpp-http-satellite-helper.h>
+
+#include <ns3/lora-periodic-sender.h>
+
 #include <ns3/random-variable-stream.h>
 
 NS_LOG_COMPONENT_DEFINE ("SimulationHelper");
@@ -632,7 +635,7 @@ SimulationHelper::EnableRandomAccess ()
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaServiceCount", UintegerValue (1));
   Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_RCS2_SPECIFICATION));
   Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
-  Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceEliminationModel", EnumValue (SatPhyRxCarrierConf::SIC_PERFECT));
+  Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceEliminationModel", EnumValue (SatPhyRxCarrierConf::SIC_RESIDUAL));
   Config::SetDefault ("ns3::SatBeamHelper::RaCollisionModel", EnumValue (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
   Config::SetDefault ("ns3::SatBeamHelper::RaConstantErrorRate", DoubleValue (0.0));
 
@@ -1141,6 +1144,45 @@ SimulationHelper::GetStatisticsContainer ()
   return m_statContainer;
 }
 
+Ptr<SatTrafficHelper>
+SimulationHelper::GetTrafficHelper ()
+{
+  NS_LOG_FUNCTION (this);
+
+  if (!m_trafficHelper)
+    {
+      m_trafficHelper = CreateObject<SatTrafficHelper> (GetSatelliteHelper (), GetStatisticsContainer ());
+    }
+
+  return m_trafficHelper;
+}
+
+Ptr<SatGroupHelper>
+SimulationHelper::GetGroupHelper ()
+{
+  NS_LOG_FUNCTION (this);
+
+  if (!m_groupHelper)
+    {
+      m_groupHelper = CreateObject<SatGroupHelper> ();
+    }
+
+  return m_groupHelper;
+}
+
+Ptr<SatCnoHelper>
+SimulationHelper::GetCnoHelper ()
+{
+  NS_LOG_FUNCTION (this);
+
+  if (!m_cnoHelper)
+    {
+      m_cnoHelper = CreateObject<SatCnoHelper> (m_satHelper);
+    }
+
+  return m_cnoHelper;
+}
+
 void
 SimulationHelper::SetupOutputPath ()
 {
@@ -1182,6 +1224,10 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario, c
 
   m_satHelper = CreateObject<SatHelper> ();
 
+  m_satHelper->SetGroupHelper (GetGroupHelper ()); // If not done in user scenario, group helper is created here
+  m_satHelper->SetAntennaGainPatterns (m_groupHelper->GetAntennaGainPatterns ());
+  m_satHelper->GetBeamHelper ()->SetAntennaGainPatterns (m_groupHelper->GetAntennaGainPatterns ());
+
   // Set UT position allocators, if any
   if (!m_enableInputFileUtListPositions)
     {
@@ -1213,13 +1259,29 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario, c
               for (uint32_t j = 1; j < utCount + 1; j++)
                 {
                   uint32_t utUserCount = GetNextUtUserCount ();
-                  info.AppendUt (GetNextUtUserCount ());
+                  info.AppendUt (utUserCount);
                   ss << ", " <<  j << ". UT user count= " << utUserCount;
                 }
 
               beamInfo.insert (std::make_pair (i, info));
 
               ss << std::endl;
+            }
+        }
+
+      std::map<uint32_t, std::vector<std::pair<GeoCoordinate, uint32_t>>> additionalNodes = m_groupHelper->GetAdditionalNodesPerBeam ();
+      for (std::map<uint32_t, std::vector<std::pair<GeoCoordinate, uint32_t>>>::iterator it = additionalNodes.begin(); it != additionalNodes.end(); it++)
+        {
+          if (!IsBeamEnabled (it->first))
+            {
+              NS_LOG_WARN ("Beam ID " << it->first << " is not enabled, cannot add " << it->second.size () << " UTs from SatGroupHelper");
+              std::cout << "Beam ID " << it->first << " is not enabled, cannot add " << it->second.size () << " UTs from SatGroupHelper" << std::endl;
+              continue;
+            }
+          beamInfo[it->first].SetPositions (it->second);
+          for (uint32_t i = 0; i < it->second.size (); i++)
+            {
+              beamInfo[it->first].AppendUt (GetNextUtUserCount ());
             }
         }
 
@@ -1245,6 +1307,8 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario, c
     }
 
   NS_LOG_INFO (ss.str ());
+
+  m_groupHelper->Init (m_satHelper->UtNodes ());
 
   return m_satHelper;
 }
@@ -1478,6 +1542,82 @@ SimulationHelper::InstallTrafficModel (TrafficModel_t trafficModel,
 }
 
 void
+SimulationHelper::InstallLoraTrafficModel (LoraTrafficModel_t trafficModel,
+                                           Time interval,
+                                           uint32_t packetSize,
+                                           Time startTime,
+                                           Time stopTime,
+                                           Time startDelay)
+{
+  NS_LOG_FUNCTION (this << trafficModel << interval << packetSize << startTime << stopTime);
+
+  NodeContainer nodes = GetSatelliteHelper ()->UtNodes ();
+  NodeContainer utUsers = m_satHelper->GetUtUsers ();
+  Ptr<Node> node;
+
+  std::cout << "Installing Lora traffic model on " << nodes.GetN () << " UTs" << std::endl;
+
+  switch (trafficModel)
+    {
+    case SimulationHelper::PERIODIC:
+      {
+        for (uint32_t i = 0; i < nodes.GetN (); i++)
+          {
+            node = nodes.Get (i);
+            Ptr<LoraPeriodicSender> app = Create<LoraPeriodicSender> ();
+
+            app->SetInterval (interval);
+            NS_LOG_DEBUG ("Created an application with interval = " << interval.GetHours () << " hours");
+
+            app->SetStartTime (startTime + (i + 1) * startDelay);
+            app->SetStopTime (stopTime);
+            app->SetPacketSize (packetSize);
+
+            app->SetNode (node);
+            node->AddApplication (app);
+          }
+        break;
+      }
+    case SimulationHelper::LORA_CBR:
+      {
+        NodeContainer gwUsers = m_satHelper->GetGwUsers ();
+
+        uint16_t port = 9;
+        InetSocketAddress gwUserAddr = InetSocketAddress (m_satHelper->GetUserAddress (gwUsers.Get (m_gwUserId)), port);
+
+        PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", Address ());
+        CbrHelper cbrHelper ("ns3::UdpSocketFactory", Address ());
+        ApplicationContainer sinkContainer;
+        ApplicationContainer cbrContainer;
+
+        // create sink application on GW user
+        if (!HasSinkInstalled (gwUsers.Get (m_gwUserId), port))
+          {
+            sinkHelper.SetAttribute ("Local", AddressValue (Address (gwUserAddr)));
+            sinkContainer.Add (sinkHelper.Install (gwUsers.Get (m_gwUserId)));
+          }
+
+        cbrHelper.SetAttribute ("Remote", AddressValue (Address (gwUserAddr)));
+
+        // create CBR applications on UT users
+        for (uint32_t i = 0; i < utUsers.GetN (); i++)
+          {
+            auto app = cbrHelper.Install (utUsers.Get (i)).Get (0);
+            app->SetStartTime (startTime + (i + 1) * startDelay);
+            cbrContainer.Add (app);
+          }
+
+        sinkContainer.Start (startTime);
+        sinkContainer.Stop (stopTime);
+        break;
+      }
+      case SimulationHelper::ONE_SHOT:
+      default:
+        NS_FATAL_ERROR("Traffic Model for Lora not implemented yet");
+    }
+}
+
+void
 SimulationHelper::SetCrTxConf (CrTxConf_t crTxConf)
 {
   switch (crTxConf)
@@ -1515,6 +1655,7 @@ SimulationHelper::SetBeams (const std::string& enabledBeams)
   NS_LOG_FUNCTION (this << enabledBeams);
 
   m_enabledBeamsStr = enabledBeams;
+  m_enabledBeams.clear ();
   std::stringstream bss (enabledBeams);
 
   while (!bss.eof ())
@@ -1651,7 +1792,7 @@ SimulationHelper::ConfigureAttributesFromFile (std::string filePath, bool overri
       EnableProgressLogs ();
     }
 
-  for (const std::pair<std::string, SimulationHelperConf::TrafficConfiguration_t>& trafficModel : simulationConf->m_trafficModel)
+  for (auto const& trafficModel : simulationConf->m_trafficModel)
     {
       TrafficModel_t modelName;
       if (trafficModel.first == "Cbr")

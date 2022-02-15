@@ -97,7 +97,7 @@ main (int argc, char *argv[])
   std::string interval = "1s";
   std::string scenario = "larger";
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::LARGER;
-  double duration = 4;
+  double duration = 10;
 
   /// Set simulation output details
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
@@ -166,6 +166,8 @@ main (int argc, char *argv[])
         SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
         Seconds (0.1), Seconds (duration), Seconds (0.001));
     }
+
+  simulationHelper->EnableProgressLogs ();
 
   /*for (NodeContainer::Iterator itGw = gwUsers.Begin ();
        itGw != gwUsers.End (); ++itGw)
@@ -359,6 +361,16 @@ main (int argc, char *argv[])
   s->AddGlobalFrameSymbolLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamFrameUserLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerGwWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+  s->AddGlobalFwdAppJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddGlobalFwdAppJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdAppJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerUtFwdAppJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddGlobalRtnAppJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddGlobalRtnAppJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnAppJitter (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerUtRtnAppJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   NS_LOG_INFO ("--- Cbr-stats-example ---");
   NS_LOG_INFO ("  Scenario used: " << scenario);

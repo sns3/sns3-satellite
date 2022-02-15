@@ -28,7 +28,6 @@
 #include <ns3/ipv4-l3-protocol.h>
 #include <ns3/channel.h>
 
-#include "satellite-net-device.h"
 #include <ns3/satellite-phy.h>
 #include <ns3/satellite-mac.h>
 #include <ns3/satellite-llc.h>
@@ -38,6 +37,8 @@
 #include <ns3/satellite-address-tag.h>
 #include <ns3/satellite-time-tag.h>
 #include <ns3/satellite-typedefs.h>
+
+#include "satellite-net-device.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatNetDevice");
 
@@ -101,6 +102,10 @@ SatNetDevice::GetTypeId (void)
                      "A packet is received with delay information",
                      MakeTraceSourceAccessor (&SatNetDevice::m_rxDelayTrace),
                      "ns3::SatTypedefs::PacketDelayAddressCallback")
+    .AddTraceSource ("RxJitter",
+                     "A packet is received with jitter information",
+                     MakeTraceSourceAccessor (&SatNetDevice::m_rxJitterTrace),
+                     "ns3::SatTypedefs::PacketJitterAddressCallback")
   ;
   return tid;
 }
@@ -112,7 +117,8 @@ SatNetDevice::SatNetDevice ()
   m_isStatisticsTagsEnabled (false),
   m_node (0),
   m_mtu (0xffff),
-  m_ifIndex (0)
+  m_ifIndex (0),
+  m_lastDelay (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -167,9 +173,15 @@ SatNetDevice::Receive (Ptr<const Packet> packet)
       SatDevTimeTag timeTag;
       if (packet->PeekPacketTag (timeTag))
         {
-          NS_LOG_DEBUG (this << " contains a SatDevTimeTag tag");
-          m_rxDelayTrace (Simulator::Now () - timeTag.GetSenderTimestamp (),
-                          addr);
+          NS_LOG_DEBUG (this << " contains a SatMacTimeTag tag");
+          Time delay = Simulator::Now () - timeTag.GetSenderTimestamp ();
+          m_rxDelayTrace (delay, addr);
+          if (m_lastDelay.IsZero() == false)
+            {
+              Time jitter = Abs (delay - m_lastDelay);
+              m_rxJitterTrace (jitter, addr);
+            }
+          m_lastDelay = delay;
         }
     }
 
@@ -391,6 +403,7 @@ SatNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNu
 
   return true;
 }
+
 bool
 SatNetDevice::SendFrom (Ptr<Packet> packet, const Address& source, const Address& dest, uint16_t protocolNumber)
 {
@@ -507,7 +520,10 @@ SatNetDevice::DoDispose (void)
   m_mac = 0;
   m_node = 0;
   m_receiveErrorModel = 0;
-  m_llc->Dispose ();
+  if (m_llc != 0)
+    {
+      m_llc->Dispose ();
+    }
   m_llc = 0;
   m_classifier = 0;
 

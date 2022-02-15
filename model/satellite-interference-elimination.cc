@@ -20,6 +20,7 @@
 
 #include "ns3/simulator.h"
 #include "ns3/log.h"
+#include "satellite-signal-parameters.h"
 #include "satellite-interference-elimination.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatInterferenceElimination");
@@ -52,5 +53,6 @@ SatInterferenceElimination::~SatInterferenceElimination ()
 {
 
 }
+
 
 }  // namespace ns3

@@ -61,6 +61,26 @@ SatPhyRxCarrierUplink::CreateInterference (Ptr<SatSignalParameters> rxParams, Ad
   return GetInterferenceModel ()->Add (rxParams->m_duration, rxParams->m_rxPower_W, senderAddress);
 }
 
+bool
+SatPhyRxCarrierUplink::StartRx (Ptr<SatSignalParameters> rxParams)
+{
+  NS_LOG_FUNCTION (this << rxParams);
+
+  if (this->SatPhyRxCarrier::StartRx (rxParams))
+    {
+      /// PHY transmission decoded successfully. Note, that at transparent satellite,
+      /// all the transmissions are not decoded.
+      bool phyError (false);
+
+      // Forward packet to ground entity without delay in the satellite
+      m_rxCallback (rxParams, phyError);
+
+      return true;
+    }
+
+  return false;
+}
+
 void
 SatPhyRxCarrierUplink::EndRxData (uint32_t key)
 {
@@ -77,11 +97,7 @@ SatPhyRxCarrierUplink::EndRxData (uint32_t key)
 
   /// save values for CRDSA receiver
   packetRxParams.rxParams->SetInterferencePowerInSatellite (packetRxParams.rxParams->GetInterferencePowerPerFragment ());
-  packetRxParams.rxParams->m_rxPowerInSatellite_W = packetRxParams.rxParams->m_rxPower_W;
-  packetRxParams.rxParams->m_rxNoisePowerInSatellite_W = m_rxNoisePowerW;
-  packetRxParams.rxParams->m_rxAciIfPowerInSatellite_W = m_rxAciIfPowerW;
-  packetRxParams.rxParams->m_rxExtNoisePowerInSatellite_W = m_rxExtNoisePowerW;
-  packetRxParams.rxParams->m_sinrCalculate = m_sinrCalculate;
+  packetRxParams.rxParams->SetRxPowersInSatellite (packetRxParams.rxParams->m_rxPower_W, m_rxNoisePowerW, m_rxAciIfPowerW, m_rxExtNoisePowerW);
 
   /// calculates sinr for 1st link
   double sinr = CalculateSinr ( packetRxParams.rxParams->m_rxPower_W,
@@ -94,22 +110,15 @@ SatPhyRxCarrierUplink::EndRxData (uint32_t key)
   // Update link specific SINR trace
   m_linkSinrTrace (SatUtils::LinearToDb (sinr));
 
-  NS_ASSERT (packetRxParams.rxParams->m_sinr == 0);
-
-  /// PHY transmission decoded successfully. Note, that at transparent satellite,
-  /// all the transmissions are not decoded.
-  bool phyError (false);
+  NS_ASSERT (!packetRxParams.rxParams->HasSinrComputed ());
 
   /// save 1st link sinr value for 2nd link composite sinr calculations
-  packetRxParams.rxParams->m_sinr = sinr;
+  packetRxParams.rxParams->SetSinr (sinr, m_sinrCalculate);
 
   /// uses 1st link sinr
   m_linkBudgetTrace (packetRxParams.rxParams, GetOwnAddress (),
                      packetRxParams.destAddress,
                      packetRxParams.rxParams->GetInterferencePower (), sinr);
-
-  /// Send packet upwards
-  m_rxCallback ( packetRxParams.rxParams, phyError );
 
   GetInterferenceModel ()->NotifyRxEnd (packetRxParams.interferenceEvent);
 

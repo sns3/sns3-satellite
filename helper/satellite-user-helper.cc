@@ -599,7 +599,7 @@ SatUserHelper::PopulateBeamRoutings (NodeContainer ut, NetDeviceContainer utNd,
           std::string devName = ipv4Ut->GetNetDevice (j)->GetInstanceTypeId ().GetName ();
 
           // If SatNetDevice interface, add default route to towards GW of the beam on UTs
-          if ( devName == "ns3::SatNetDevice" )
+          if ( devName == "ns3::SatNetDevice" || devName == "ns3::SatLorawanNetDevice" )
             {
               Ptr<Ipv4StaticRouting> srUt = ipv4RoutingHelper.GetStaticRouting (ipv4Ut);
               srUt->SetDefaultRoute (gwAddr, j);
@@ -775,7 +775,7 @@ SatUserHelper::UpdateGwRoutes (Address ut, Address oldGateway, Address newGatewa
       for (uint32_t ifIndex = 1; ifIndex < gwProtocol->GetNInterfaces (); ++ifIndex)
         {
           Ptr<NetDevice> gwNd = gwProtocol->GetNetDevice (ifIndex);
-          if (gwNd->GetInstanceTypeId ().GetName () != "ns3::SatNetDevice")
+          if (gwNd->GetInstanceTypeId ().GetName () != "ns3::SatNetDevice" && gwNd->GetInstanceTypeId ().GetName () != "ns3::SatLorawanNetDevice")
             {
               gwAddress = gwProtocol->GetAddress (ifIndex, 0).GetLocal ();
               break;

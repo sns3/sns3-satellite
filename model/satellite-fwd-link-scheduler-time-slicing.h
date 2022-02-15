@@ -79,20 +79,6 @@ public:
    */
   virtual std::pair<Ptr<SatBbFrame>, const Time> GetNextFrame ();
 
-  /**
-   * Callback to notify upper layer about Tx opportunity.
-   * \param Ptr<SatControlMessage> The control message to send.
-   * \param Address& the destination MAC address.
-   * \return True
-   */
-  typedef Callback<bool, Ptr<SatControlMessage>, const Address& > SendControlMsgCallback;
-
-  /**
-   * Method to set the control message sender callback.
-   * \param cb callback to invoke whenever a control packet has to be sent. Should be about time-slice subscriptions.
-   */
-  void SetSendControlMsgCallback (SatFwdLinkSchedulerTimeSlicing::SendControlMsgCallback cb);
-
 private:
 
   /**
@@ -184,11 +170,6 @@ private:
    * The last slice from which a BBFrame has been sent. used for Round Robin scheduling.
    */
   uint8_t m_lastSliceDequeued;
-
-  /**
-   * The control message sender callback.
-   */
-  SatFwdLinkSchedulerTimeSlicing::SendControlMsgCallback m_sendControlMsgCallback;
 
 };
 

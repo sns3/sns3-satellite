@@ -130,7 +130,7 @@ main (int argc, char *argv[])
 
   simulationHelper->InstallTrafficModel (
     SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
-    appStartTime, Seconds (simLength), Seconds (0.05));
+    appStartTime, simLength, Seconds (0.05));
 
   NS_LOG_INFO ("--- sat-cbr-user-defined-example ---");
   NS_LOG_INFO ("  Packet size in bytes: " << packetSize);

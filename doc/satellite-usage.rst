@@ -756,6 +756,28 @@ each packet overlapping an other is counted as interfering on the whole other pa
 ``PerFragment`` take each overlapping fragment independently to compute interferences on each
 of them; resulting in a vector of interference for each packet.
 
+Interference elimination method can be configured for Random-Access packet decoding. Two method are
+proposed:
+
+ * Perfect cancelation: interferences from a decoded packet/fragment are removed from all other
+   packets/fragment it is interfering with (default behaviour);
+ * Residual interference elimination: interferences from a decoded packet/fragment leave residual
+   power when its influence is removed from the other packets/fragments it is interfering with.
+
+Interference elimination attributes are presented in :ref:`tab-interference-elimination`..
+
+\
+
+.. _tab-interference-elimination:
+
+.. table:: Interference Elimination attributes
+
+	+--------------------------------------------------+
+	|Name of the attribute                             |
+	+==================================================+
+	|ns3::SatBeamHelper::RaInterferenceEliminationModel|
+	+--------------------------------------------------+
+
 BB Frame configuration
 ######################
 

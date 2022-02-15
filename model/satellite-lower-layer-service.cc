@@ -64,7 +64,8 @@ SatLowerLayerServiceRaEntry::SatLowerLayerServiceRaEntry ()
   m_numberOfInstances (0),
   m_averageNormalizedOfferedLoadThreshold (0.0),
   m_isCrdsaAllowed (false),
-  m_isSlottedAlohaAllowed (false)
+  m_isSlottedAlohaAllowed (false),
+  m_isEssaAllowed (false)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -191,10 +192,11 @@ SatLowerLayerServiceConf::GetIndexAsRaServiceName (uint8_t index)
  * \param a9    'Average normalized offered load threshold' attribute value
  * \param a10   'Is Slotted Aloha allowed' attribute value
  * \param a11   'Is CRDSA allowed' attribute value
+ * \param a12   'Is ESSA allowed' attribute value
  *
  * \return TypeId
  */
-#define SAT_ADD_RA_SERVICE_ATTRIBUTES(index, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11) \
+#define SAT_ADD_RA_SERVICE_ATTRIBUTES(index, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12) \
   AddAttribute ( GetIndexAsRaServiceName (index) + "_MaximumUniquePayloadPerBlock", \
                  "Maximum unique payload per block for RA " + GetIndexAsRaServiceName (index), \
                  UintegerValue (a1), \
@@ -260,6 +262,12 @@ SatLowerLayerServiceConf::GetIndexAsRaServiceName (uint8_t index)
                   BooleanValue (a11), \
                   MakeBooleanAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## IsCrdsaAllowed, \
                                        &SatLowerLayerServiceConf::GetRaServ ## index ## IsCrdsaAllowed), \
+                  MakeBooleanChecker ()) \
+  .AddAttribute ( GetIndexAsRaServiceName (index) + "_EssaAllowed", \
+                  "ESSA allowed for RA " + GetIndexAsRaServiceName (index), \
+                  BooleanValue (a12), \
+                  MakeBooleanAccessor (&SatLowerLayerServiceConf::SetRaServ ## index ## IsEssaAllowed, \
+                                       &SatLowerLayerServiceConf::GetRaServ ## index ## IsEssaAllowed), \
                   MakeBooleanChecker ())
 
 TypeId
@@ -309,9 +317,9 @@ SatLowerLayerServiceConf::GetTypeId (void)
     /*
      * Max payload per block, Max consecutive blocks, Min IDLE block, Backoff time, High load Backoff time, Backoff probability, High load Backoff probability, Replicas, Average load threshold
      */
-    .SAT_ADD_RA_SERVICE_ATTRIBUTES (0, 3, 4, 2, 250, 500, 10000, 30000, 3, 0.5, true, true)
-    .SAT_ADD_RA_SERVICE_ATTRIBUTES (1, 3, 4, 2, 250, 500, 10000, 30000, 2, 0.5, true, true)
-    .SAT_ADD_RA_SERVICE_ATTRIBUTES (2, 3, 4, 2, 250, 500, 10000, 30000, 5, 0.5, true, true)
+    .SAT_ADD_RA_SERVICE_ATTRIBUTES (0, 3, 4, 2, 250, 500, 10000, 30000, 3, 0.5, true, true, false)
+    .SAT_ADD_RA_SERVICE_ATTRIBUTES (1, 3, 4, 2, 250, 500, 10000, 30000, 2, 0.5, true, true, false)
+    .SAT_ADD_RA_SERVICE_ATTRIBUTES (2, 3, 4, 2, 250, 500, 10000, 30000, 5, 0.5, true, true, false)
   ;
 
   return tid;
@@ -801,6 +809,32 @@ SatLowerLayerServiceConf::SetRaIsCrdsaAllowed (uint8_t index, bool isCrdsaAllowe
     }
 
   m_raServiceEntries[index].SetIsCrdsaAllowed (isCrdsaAllowed);
+}
+
+bool
+SatLowerLayerServiceConf::GetRaIsEssaAllowed (uint8_t index) const
+{
+  NS_LOG_FUNCTION (this << (uint32_t) index);
+
+  if (index >= m_maxRaServiceEntries)
+    {
+      NS_FATAL_ERROR ("Service index out of range!!!");
+    }
+
+  return m_raServiceEntries[index].GetIsEssaAllowed ();
+}
+
+void
+SatLowerLayerServiceConf::SetRaIsEssaAllowed (uint8_t index, bool isEssaAllowed)
+{
+  NS_LOG_FUNCTION (this << (uint32_t) index << isEssaAllowed);
+
+  if (index >= m_maxRaServiceEntries)
+    {
+      NS_FATAL_ERROR ("Service index out of range!!!");
+    }
+
+  m_raServiceEntries[index].SetIsEssaAllowed (isEssaAllowed);
 }
 
 } // namespace ns3

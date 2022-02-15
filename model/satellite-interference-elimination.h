@@ -60,6 +60,21 @@ public:
    * \param processedPacket Parameters of the packet we want to remove interference from
    */
   virtual void EliminateInterferences (Ptr<SatSignalParameters> packetInterferedWith, Ptr<SatSignalParameters> processedPacket, double EsNo) = 0;
+
+  /**
+   * Calculate residual power of interference for the given packets
+   * \param packetInterferedWith Parameters of the packet whose interference level should be lowered
+   * \param processedPacket Parameters of the packet we want to remove interference from
+   * \param startTime Normalized start time of the interference, with respect to packetInterferedWith
+   * \param startTime Normalized end time of the interference, with respect to packetInterferedWith
+   */
+  virtual void EliminateInterferences (Ptr<SatSignalParameters> packetInterferedWith, Ptr<SatSignalParameters> processedPacket, double EsNo, double startTime, double endTime) = 0;
+
+  /**
+   * \brief Calculate the residual power of interference for a given packet
+   */
+  virtual double GetResidualPower (Ptr<SatSignalParameters> processedPacket, double EsNo) = 0;
+
 };
 
 } // namespace ns3

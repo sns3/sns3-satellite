@@ -104,6 +104,8 @@ public:
 
   typedef void (*ServiceTimeCallback) (Time serviceTime);
 
+  typedef void (*DataSenderAddressCallback)(uint32_t data, const Address& sourceAddress);
+
 private:
   /**
    * Destructor

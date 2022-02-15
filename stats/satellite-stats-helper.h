@@ -100,7 +100,8 @@ public:
     IDENTIFIER_BEAM,
     IDENTIFIER_UT,
     IDENTIFIER_UT_USER,
-    IDENTIFIER_SLICE
+    IDENTIFIER_SLICE,
+    IDENTIFIER_GROUP
   } IdentifierType_t;
 
   /**
@@ -342,6 +343,12 @@ protected:
    * \return
    */
   uint32_t GetIdentifierForBeam (uint32_t beamId) const;
+
+  /**
+   * \param groupId
+   * \return
+   */
+  uint32_t GetIdentifierForGroup (uint32_t groupId) const;
 
   /**
    * \param gwNode

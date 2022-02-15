@@ -98,7 +98,7 @@ public:
   /**
    * \brief Function for initializing the frame end scheduling
    */
-  void BeginFrameEndScheduling ();
+  void BeginEndScheduling ();
 
   /**
    * \brief Method for querying the type of the carrier

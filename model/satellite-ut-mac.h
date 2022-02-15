@@ -35,6 +35,8 @@
 #include <ns3/satellite-signal-parameters.h>
 #include <ns3/satellite-random-access-container.h>
 #include <ns3/satellite-enums.h>
+#include <ns3/satellite-beam-scheduler.h>
+#include <ns3/satellite-ut-mac-state.h>
 #include <utility>
 
 namespace ns3 {
@@ -153,6 +155,39 @@ public:
   void SetSliceSubscriptionCallback (SatUtMac::SliceSubscriptionCallback cb);
 
   /**
+   * Callback to send a logon message to the gateway
+   */
+  typedef Callback<void> SendLogonCallback;
+
+  /**
+   * \brief Set the logon callback
+   * \param cb callback to invoke when sending a logon message
+   */
+  void SetSendLogonCallback (SatUtMac::SendLogonCallback cb);
+
+  /**
+   * Callback to update GW address to SatRequestManager
+   */
+  typedef Callback<void, Mac48Address> UpdateGwAddressCallback;
+
+  /**
+   * \brief Set the gw update callback
+   * \param cb callback to update GW address to SatRequestManager
+   */
+  void SetUpdateGwAddressCallback (SatUtMac::UpdateGwAddressCallback cb);
+
+  /**
+   * Callback to get the SatBeamScheduler from the beam ID for handover
+   */
+  typedef Callback<Ptr<SatBeamScheduler>, uint32_t> BeamScheculerCallback;
+
+  /**
+   * \brief Set the beam scheduler callback
+   * \param cb Callback to get the SatBeamScheduler
+   */
+  void SetBeamScheculerCallback (SatUtMac::BeamScheculerCallback cb);
+
+  /**
    * Get Tx time for the next possible superframe.
    * \param superFrameSeqId Superframe sequence id
    * \return Time Time to transmit
@@ -167,6 +202,21 @@ public:
    * /param rcIndex Identifier of the queue
    */
   virtual void ReceiveQueueEvent (SatQueue::QueueEvent_t event, uint8_t rcIndex);
+
+  /**
+   * Receive a queue event:
+   * - FIRST_BUFFER_RCVD
+   * - BUFFER_EMPTY
+   * /param event Queue event from SatQueue
+   * /param rcIndex Identifier of the queue
+   */
+  virtual void ReceiveQueueEventEssa (SatQueue::QueueEvent_t event, uint8_t rcIndex);
+
+  /**
+   * Receive a logon message to transmit
+   * /param packet The logon packet to send
+   */
+  void SendLogon (Ptr<Packet> packet);
 
   /**
    * Set address of the GW (or its MAC) serving this UT.
@@ -211,6 +261,13 @@ public:
   bool ControlMsgTransmissionPossible () const;
 
   /**
+   * \brief Method to check whether a transmission of a logon msg
+   * is somewhat possible.
+   * \return Boolean to indicate whether a logon msg transmission is possible
+   */
+  bool LogonMsgTransmissionPossible () const;
+
+  /**
    * \brief Callback signature for `DaResourcesTrace` trace source.
    * \param size the amount of assigned TBTP resources (in bytes) in the
    *             superframe for this UT
@@ -242,19 +299,6 @@ public:
   void SetGatewayUpdateCallback (SatUtMac::GatewayUpdateCallback cb);
 
   /**
-   * \brief Callback to update routing and ARP tables after handover
-   * \param Address the address of this device
-   * \param Address the address of the new gateway
-   */
-  typedef Callback<void, Address, Address> RoutingUpdateCallback;
-
-  /**
-   * \brief Method to set the routing update callback
-   * \param cb callback to invoke to update routing
-   */
-  void SetRoutingUpdateCallback (SatUtMac::RoutingUpdateCallback cb);
-
-  /**
    * \brief Callback to check whether the current beam is still the best one
    * to use for sending data; and sending handover recommendation if not
    * \param uint32_t the current beam ID
@@ -262,10 +306,28 @@ public:
   typedef Callback<bool, uint32_t> BeamCheckerCallback;
 
   /**
+   * \brief Callback to ask for the best beam ID during handover
+   * \return The best beam ID
+   */
+  typedef Callback<uint32_t> AskedBeamCallback;
+
+  /**
    * \brief Method to set the beam checker callback
    * \param cb callback to invoke to check beams and recommend handover
    */
   void SetBeamCheckerCallback (SatUtMac::BeamCheckerCallback cb);
+
+  /**
+   * \brief Method to get the best beam when performing handover
+   * \param cb callback to invoke to ask best beam ID
+   */
+  void SetAskedBeamCallback (SatUtMac::AskedBeamCallback cb);
+
+  void LogOff ();
+
+  void SetLogonChannel (uint32_t channelId);
+
+  SatUtMacState::RcstState_t GetRcstState () const;
 
 protected:
   /**
@@ -300,6 +362,12 @@ private:
    * \param allocationChannel allocation channel
    */
   void ScheduleSlottedAlohaTransmission (uint32_t allocationChannel);
+
+  /**
+   * \brief Function for scheduling the ESSA transmissions
+   * \param allocationChannel RA allocation channel
+   */
+  void ScheduleEssaTransmission (uint32_t allocationChannel);
 
   /**
    * \brief Function for scheduling the CRDSA transmissions
@@ -413,6 +481,17 @@ private:
   void DoSlottedAlohaTransmit (Time duration, Ptr<SatWaveform> waveform, uint32_t carrierId, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy = SatUtScheduler::LOOSE);
 
   /**
+   * Notify the upper layer about the ESSA Tx opportunity. If upper layer
+   * returns a PDU, send it to lower layer.
+   *
+   * \param duration duration of the burst
+   * \param waveform waveform
+   * \param carrierId Carrier id used for the transmission
+   * \param rcIndex RC index
+   */
+  void DoEssaTransmit (Time duration, Ptr<SatWaveform> waveform, uint32_t carrierId, uint8_t rcIndex, SatUtScheduler::SatCompliancePolicy_t policy = SatUtScheduler::LOOSE);
+
+  /**
    *
    * \param payloadBytes Tx opportunity payload
    * \param type Time slot type
@@ -458,6 +537,13 @@ private:
    * \brief Function which is executed at every frame start.
    */
   void DoFrameStart ();
+
+  /**
+   * \brief Compute real sending time of UT based on last NCR reception date and clock drift
+   * \param t Sending time if clock is perfect (relative time from Simulator::Now ())
+   * \return Corrected time (relative time from Simulator::Now ())
+   */
+  Time GetRealSendingTime (Time t);
 
   SatUtMac& operator = (const SatUtMac &);
   SatUtMac (const SatUtMac &);
@@ -509,6 +595,46 @@ private:
   uint32_t m_raChannel;
 
   /**
+   * RA channel dedicated to logon messages
+   */
+  uint32_t m_logonChannel;
+
+  /**
+   * UT is logged on
+   */
+  bool m_loggedOn;
+
+  /**
+   * Should logon be simulated?
+   */
+  bool m_useLogon;
+
+  /**
+   * Number of times a logon message has been sent without response
+   */
+  uint32_t m_sendLogonTries;
+
+  /**
+   * The initial max time to wait when sending a logon message
+   */
+  Time m_windowInitLogon;
+
+  /**
+   * Timeout for waiting for a response for a logon message
+   */
+  Time m_maxWaitingTimeLogonResponse;
+  /**
+   * The random generator for waiting transmission time
+   */
+  Ptr<UniformRandomVariable> m_waitingTimeLogonRng;
+
+  /**
+   * Instant when a logon message can be transmitted
+   */
+  Time m_nextLogonTransmissionPossible;
+
+
+  /**
    * UT scheduler
    */
   Ptr<SatUtScheduler> m_utScheduler;
@@ -521,7 +647,7 @@ private:
   /**
    * CRDSA packet ID (per frame)
    */
-  uint8_t m_crdsaUniquePacketId;
+  uint32_t m_crdsaUniquePacketId;
 
   /**
    * Planned CRDSA usage:
@@ -530,16 +656,27 @@ private:
    */
   bool m_crdsaOnlyForControl;
 
+  /**
+   * Next time when a next ESSA packet can be safely sent.
+   */
+  Time m_nextPacketTime;
+
+  /**
+   * Flag that indicates if a method DoRandomAccess is scheduled for
+   * asynchronous access.
+   */
+  bool m_isRandomAccessScheduled;
+
   class SatTimuInfo : public SimpleRefCount<SatTimuInfo>
   {
-public:
+  public:
     SatTimuInfo (uint32_t beamId, Address address);
 
     uint32_t GetBeamId () const;
 
     Address GetGwAddress () const;
 
-private:
+  private:
     uint32_t m_beamId;
     Address m_gwAddress;
   };
@@ -547,6 +684,33 @@ private:
   Ptr<SatTimuInfo> m_timuInfo;
 
   Mac48Address m_gwAddress;
+
+  SatUtMacState m_rcstState;
+
+  /**
+   * Reception date of last NCR control message
+   */
+  Time m_lastNcrDateReceived;
+
+  /**
+   * NCR value of last NCR control message
+   */
+  uint64_t m_ncr;
+
+  /**
+   * Correction to apply to NCR dates
+   */
+  int64_t m_deltaNcr;
+
+  /**
+   * Clock drift (number of ticks per second)
+   */
+  int32_t m_clockDrift;
+
+  /**
+   * Store last 3 packets reception date, to be associated to NCR dates.
+   */
+  std::queue<Time> m_receptionDates;
 
   typedef enum
   {
@@ -556,6 +720,9 @@ private:
   } HandoverState_t;
 
   HandoverState_t m_handoverState;
+
+  uint32_t m_handoverMessagesCount;
+  uint32_t m_maxHandoverMessagesSent;
 
   uint32_t m_firstTransmittableSuperframeId;
 
@@ -570,14 +737,14 @@ private:
   SatUtMac::GatewayUpdateCallback m_gatewayUpdateCallback;
 
   /**
-   * Callback to update routing and ARP tables after a beam handover
+   * Beam checker and handover recommendation sending callback
    */
-  SatUtMac::RoutingUpdateCallback m_routingUpdateCallback;
+  SatUtMac::BeamCheckerCallback m_beamCheckerCallback;
 
   /**
    * Beam checker and handover recommendation sending callback
    */
-  SatUtMac::BeamCheckerCallback m_beamCheckerCallback;
+  SatUtMac::AskedBeamCallback m_askedBeamCallback;
 
   /**
    * Tx checking callback
@@ -588,6 +755,21 @@ private:
    * Tx checking callback
    */
   SatUtMac::SliceSubscriptionCallback m_sliceSubscriptionCallback;
+
+  /**
+   * Callback for sending a logon message
+   */
+  SatUtMac::SendLogonCallback m_sendLogonCallback;
+
+  /**
+   * Callback for sending a logon message
+   */
+  SatUtMac::UpdateGwAddressCallback m_updateGwAddressCallback;
+
+  /**
+   * Callback to get the SatBeamScheduler linked to a beam ID
+   */
+  SatUtMac::BeamScheculerCallback m_beamScheculerCallback;
 };
 
 } // namespace ns3

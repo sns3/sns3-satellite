@@ -123,6 +123,11 @@ public:
   void Init ();
 
   /**
+   * Set the standard to either DVB or Lora
+   */
+  void SetStandard (SatEnums::Standard_t standard);
+
+  /**
    * Set the antenna gain patterns to be used when configuring the beams
    * to the GEO satellite. Note, that currently we have only one set of
    * antenna patterns, which are utilized in both user return (Rx gain)
@@ -308,6 +313,8 @@ public:
 
   Ptr<PropagationDelayModel> GetPropagationDelayModel (uint32_t beamId, SatEnums::ChannelType_t channelType);
 
+  SatEnums::PropagationDelayModel_t GetPropagationDelayModelEnum ();
+
 private:
   CarrierFreqConverter m_carrierFreqConverter;
   SatTypedefs::CarrierBandwidthConverter_t m_carrierBandwidthConverter;
@@ -350,6 +357,11 @@ private:
    * Control message store in container for return link.
    */
   Time m_ctrlMsgStoreTimeRtnLink;
+
+  /**
+   * Type of Return channel link results.
+   */
+  SatEnums::LinkResults_t m_rlLinkResultsType;
 
   /**
    * Configured fading model. Set as an attribute.
@@ -470,6 +482,15 @@ private:
    */
   void AddMulticastRouteToUt (Ptr<Node> utNode, Ipv4Address sourceAddress, Ipv4Address groupAddress, bool routeToSatellite);
 
+  /**
+   * The global standard used. Can be either DVB or Lora
+   */
+  SatEnums::Standard_t m_standard;
+
+  /**
+   * Indicates if using DVB-S2 or DVB-S2X
+   */
+  SatEnums::DvbVersion_t m_dvbVersion;
 };
 
 } // namespace ns3

@@ -99,6 +99,13 @@ public:
   virtual void DoDispose ();
 
   /**
+   * logon msg sending callback
+   * \param pkt
+   * \return bool
+   */
+  typedef Callback<void, Ptr<Packet> > LogonCallback;
+
+  /**
    * \brief Callback to indicate queue related event
    * \param SatQueue::QueueEvent_t Event type
    * \param uint32_t Queue id
@@ -154,6 +161,12 @@ public:
    * \param cb Callback
    */
   void AddQueueEventCallback (SatQueue::QueueEventCallback cb);
+
+  /**
+   * \brief Add queue event callback
+   * \param cb Callback
+   */
+  void AddLogonCallback (SatQueue::LogonCallback cb);
 
   /**
    * \brief Get number of packets currently stored in the queue
@@ -281,6 +294,11 @@ private:
   TracedCallback<Ptr<const Packet> > m_traceEnqueue;
   TracedCallback<Ptr<const Packet> > m_traceDequeue;
   TracedCallback<Ptr<const Packet> > m_traceDrop;
+
+  /**
+   * Callback to send control messages.
+  */
+  LogonCallback m_logonCallback;
 };
 
 

@@ -63,15 +63,39 @@ SatPerfectInterferenceElimination::EliminateInterferences (
 {
   NS_LOG_FUNCTION (this);
 
+  return EliminateInterferences (packetInterferedWith, processedPacket, EsNo, 0.0, 1.0);
+}
+
+void
+SatPerfectInterferenceElimination::EliminateInterferences (
+  Ptr<SatSignalParameters> packetInterferedWith,
+  Ptr<SatSignalParameters> processedPacket,
+  double EsNo, double startTime, double endTime)
+{
+  NS_LOG_FUNCTION (this);
+
   NS_LOG_INFO ("Removing interference power of packet from Beam[Carrier] " <<
                processedPacket->m_beamId <<
-               "[" << processedPacket->m_carrierId << "]");
+               "[" << processedPacket->m_carrierId << "] between " <<
+               startTime << " and " << endTime);
   double oldIfPower = packetInterferedWith->GetInterferencePowerInSatellite ();
+
+  double normalizedTime = 0.0;
 
   auto ifPowerPerFragment = packetInterferedWith->GetInterferencePowerInSatellitePerFragment ();
   for (std::pair<double, double>& ifPower : ifPowerPerFragment)
     {
-      ifPower.second -= processedPacket->m_rxPowerInSatellite_W;
+      normalizedTime += ifPower.first;
+      if (startTime >= normalizedTime)
+        {
+          continue;
+        }
+      else if (endTime < normalizedTime)
+        {
+          break;
+        }
+
+      ifPower.second -= processedPacket->GetRxPowerInSatellite ();
       if (std::abs (ifPower.second) < std::numeric_limits<double>::epsilon ())
         {
           ifPower.second = 0.0;
@@ -79,7 +103,7 @@ SatPerfectInterferenceElimination::EliminateInterferences (
 
       if (ifPower.second < 0)
         {
-          NS_FATAL_ERROR ("Negative interference");
+          NS_FATAL_ERROR ("Negative interference " << ifPower.second);
         }
     }
   packetInterferedWith->SetInterferencePowerInSatellite (ifPowerPerFragment);
@@ -88,5 +112,12 @@ SatPerfectInterferenceElimination::EliminateInterferences (
                oldIfPower << " to " <<
                packetInterferedWith->GetInterferencePowerInSatellite ());
 }
+
+double
+SatPerfectInterferenceElimination::GetResidualPower (Ptr<SatSignalParameters> processedPacket, double EsNo)
+{
+  return 0.0;
+}
+
 
 }  // namespace ns3

@@ -118,7 +118,7 @@ main (int argc, char *argv[])
     SimulationHelper::CBR,
     SimulationHelper::UDP,
     SimulationHelper::RTN_LINK,
-    appStartTime, Seconds (simLength), Seconds (0.05));
+    appStartTime, simLength, Seconds (0.05));
 
 
   NS_LOG_INFO ("--- sat-arq-rtn-example ---");

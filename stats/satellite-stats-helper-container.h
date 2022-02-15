@@ -36,21 +36,27 @@ namespace ns3 {
  * majority of methods in this class. Below is the list of the class methods
  * created using this C++ pre-processing approach.
  *
- * - Add [Global, PerGw, PerBeam, PerUt, PerUtUser] [Fwd, Rtn] AppDelay
- * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] [Dev, Mac, Phy] Delay
- * - AddAverage [Beam, Ut, UtUser] [Fwd, Rtn] AppDelay
- * - AddAverage [Beam, Ut] [Fwd, Rtn] [Dev, Mac, Phy] Delay
- * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] Queue [Bytes, Packets]
- * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] SignallingLoad
- * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] CompositeSinr
- * - Add [Global, PerGw, PerBeam, PerUt, PerUtUser] [Fwd, Rtn] AppThroughput
- * - Add [Global, PerGw, PerBeam, PerUt] [Fwd, Rtn] [Dev, Mac, Phy] Throughput
- * - AddAverage [Beam, Ut, UtUser] [Fwd, Rtn] AppThroughput
- * - AddAverage [Beam, Ut] [Fwd, Rtn] [Dev, Mac, Phy] Throughput
- * - Add [Global, PerGw, PerBeam, PerUt] [FwdDa, RtnDa, SlottedAloha, Crdsa] PacketError
- * - Add [Global, PerGw, PerBeam, PerUt] [SlottedAloha, Crdsa] PacketCollision
- * - Add [Global, PerGw, PerBeam, PerUt] CapacityRequest
- * - Add [Global, PerGw, PerBeam, PerUt] ResourcesGranted
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerUtUser] [Fwd, Rtn] AppDelay
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt] [Fwd, Rtn] [Dev, Mac, Phy] Delay
+ * - AddAverage [Beam, Group, Ut, UtUser] [Fwd, Rtn] AppDelay
+ * - AddAverage [Beam, Group, Ut] [Fwd, Rtn] [Dev, Mac, Phy] Delay
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerUtUser] [Fwd, Rtn] AppJitter
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt] [Fwd, Rtn] [Dev, Mac, Phy] Jitter
+ * - AddAverage [Beam, Group, Ut, UtUser] [Fwd, Rtn] AppJitter
+ * - AddAverage [Beam, Group, Ut] [Fwd, Rtn] [Dev, Mac, Phy] Jitter
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerUtUser] [Fwd, Rtn] AppPlt
+ * - AddAverage [Beam, Group, Ut, UtUser] [Fwd, Rtn] AppPlt
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt] [Fwd, Rtn] Queue [Bytes, Packets]
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt] [Fwd, Rtn] SignallingLoad
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt] [Fwd, Rtn] CompositeSinr
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerUtUser] [Fwd, Rtn] AppThroughput
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt] [Fwd, Rtn] [Dev, Mac, Phy] Throughput
+ * - AddAverage [Beam, Group, Ut, UtUser] [Fwd, Rtn] AppThroughput
+ * - AddAverage [Beam, Group, Ut] [Fwd, Rtn] [Dev, Mac, Phy] Throughput
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt] [FwdDa, RtnDa, SlottedAloha, Crdsa, Essa] PacketError
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt] [SlottedAloha, Crdsa, Essa] PacketCollision
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt] CapacityRequest
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt] ResourcesGranted
  * - Add [Global, PerGw, PerBeam] BackloggedRequest
  * - Add [Global, PerGw, PerBeam] Frame [Symbol, User] Load
  * - Add [Global, PerGw, PerBeam] WaveformUsage
@@ -58,6 +64,7 @@ namespace ns3 {
  * - AddGlobal [Fwd, Rtn] [Feeder, User] LinkSinr
  * - AddGlobal [Fwd, Rtn] [Feeder, User] LinkRxPower
  * - Add [Global, PerGw, PerBeam] FrameTypeUsage
+ * - Add [Global, PerGw, PerBeam] RtnFeederWindowLoad
  *
  * Also check the Doxygen documentation of this class for more information.
  */
@@ -71,12 +78,14 @@ namespace ns3 {
   void AddGlobal ## id (SatStatsHelper::OutputType_t outputType);             \
   void AddPerGw ## id (SatStatsHelper::OutputType_t outputType);              \
   void AddPerBeam ## id (SatStatsHelper::OutputType_t outputType);            \
+  void AddPerGroup ## id (SatStatsHelper::OutputType_t outputType);           \
   void AddPerUt ## id (SatStatsHelper::OutputType_t outputType);
 
 #define SAT_STATS_FULL_SCOPE_METHOD_DECLARATION(id)                           \
   void AddGlobal ## id (SatStatsHelper::OutputType_t outputType);             \
   void AddPerGw ## id (SatStatsHelper::OutputType_t outputType);              \
   void AddPerBeam ## id (SatStatsHelper::OutputType_t outputType);            \
+  void AddPerGroup ## id (SatStatsHelper::OutputType_t outputType);           \
   void AddPerUt ## id (SatStatsHelper::OutputType_t outputType);              \
   void AddPerUtUser ## id (SatStatsHelper::OutputType_t outputType);
 
@@ -131,23 +140,59 @@ public:
   // Forward link application-level packet delay statistics.
   SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (FwdAppDelay)
   void AddAverageBeamFwdAppDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupFwdAppDelay (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtFwdAppDelay (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtUserFwdAppDelay (SatStatsHelper::OutputType_t outputType);
 
   // Forward link device-level packet delay statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdDevDelay)
   void AddAverageBeamFwdDevDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupFwdDevDelay (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtFwdDevDelay (SatStatsHelper::OutputType_t outputType);
 
   // Forward link MAC-level packet delay statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdMacDelay)
   void AddAverageBeamFwdMacDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupFwdMacDelay (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtFwdMacDelay (SatStatsHelper::OutputType_t outputType);
 
   // Forward link PHY-level packet delay statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdPhyDelay)
   void AddAverageBeamFwdPhyDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupFwdPhyDelay (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtFwdPhyDelay (SatStatsHelper::OutputType_t outputType);
+
+  // Forward link application-level packet jitter statistics.
+  SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (FwdAppJitter)
+  void AddAverageBeamFwdAppJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupFwdAppJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtFwdAppJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtUserFwdAppJitter (SatStatsHelper::OutputType_t outputType);
+
+  // Forward link device-level packet Jitter statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdDevJitter)
+  void AddAverageBeamFwdDevJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupFwdDevJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtFwdDevJitter (SatStatsHelper::OutputType_t outputType);
+
+  // Forward link MAC-level packet Jitter statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdMacJitter)
+  void AddAverageBeamFwdMacJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupFwdMacJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtFwdMacJitter (SatStatsHelper::OutputType_t outputType);
+
+  // Forward link PHY-level packet Jitter statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdPhyJitter)
+  void AddAverageBeamFwdPhyJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupFwdPhyJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtFwdPhyJitter (SatStatsHelper::OutputType_t outputType);
+
+  // Forward link application-level packet PLT statistics.
+  SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (FwdAppPlt)
+  void AddAverageBeamFwdAppPlt (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupFwdAppPlt (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtFwdAppPlt (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtUserFwdAppPlt (SatStatsHelper::OutputType_t outputType);
 
   // Forward link queue size (in bytes) statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdQueueBytes)
@@ -164,44 +209,84 @@ public:
   // Forward link application-level throughput statistics.
   SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (FwdAppThroughput)
   void AddAverageBeamFwdAppThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupFwdAppThroughput (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtFwdAppThroughput (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtUserFwdAppThroughput (SatStatsHelper::OutputType_t outputType);
 
   // Forward link device-level throughput statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdDevThroughput)
   void AddAverageBeamFwdDevThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupFwdDevThroughput (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtFwdDevThroughput (SatStatsHelper::OutputType_t outputType);
 
   // Forward link MAC-level throughput statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdMacThroughput)
   void AddAverageBeamFwdMacThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupFwdMacThroughput (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtFwdMacThroughput (SatStatsHelper::OutputType_t outputType);
 
   // Forward link PHY-level throughput statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdPhyThroughput)
   void AddAverageBeamFwdPhyThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupFwdPhyThroughput (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtFwdPhyThroughput (SatStatsHelper::OutputType_t outputType);
 
   // Return link application-level packet delay statistics.
   SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (RtnAppDelay)
   void AddAverageBeamRtnAppDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRtnAppDelay (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtRtnAppDelay (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtUserRtnAppDelay (SatStatsHelper::OutputType_t outputType);
 
   // Return link device-level packet delay statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnDevDelay)
   void AddAverageBeamRtnDevDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRtnDevDelay (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtRtnDevDelay (SatStatsHelper::OutputType_t outputType);
 
   // Return link MAC-level packet delay statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnMacDelay)
   void AddAverageBeamRtnMacDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRtnMacDelay (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtRtnMacDelay (SatStatsHelper::OutputType_t outputType);
 
   // Return link PHY-level packet delay statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnPhyDelay)
   void AddAverageBeamRtnPhyDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRtnPhyDelay (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtRtnPhyDelay (SatStatsHelper::OutputType_t outputType);
+
+  // Return link application-level packet jitter statistics.
+  SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (RtnAppJitter)
+  void AddAverageBeamRtnAppJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRtnAppJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRtnAppJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtUserRtnAppJitter (SatStatsHelper::OutputType_t outputType);
+
+  // Return link device-level packet jitter statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnDevJitter)
+  void AddAverageBeamRtnDevJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRtnDevJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRtnDevJitter (SatStatsHelper::OutputType_t outputType);
+
+  // Return link MAC-level packet jitter statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnMacJitter)
+  void AddAverageBeamRtnMacJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRtnMacJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRtnMacJitter (SatStatsHelper::OutputType_t outputType);
+
+  // Return link PHY-level packet jitter statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnPhyJitter)
+  void AddAverageBeamRtnPhyJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRtnPhyJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRtnPhyJitter (SatStatsHelper::OutputType_t outputType);
+
+  // Return link application-level packet PLT statistics.
+  SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (RtnAppPlt)
+  void AddAverageBeamRtnAppPlt (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRtnAppPlt (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRtnAppPlt (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtUserRtnAppPlt (SatStatsHelper::OutputType_t outputType);
 
   // Return link queue size (in bytes) statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnQueueBytes)
@@ -218,22 +303,26 @@ public:
   // Return link application-level throughput statistics.
   SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (RtnAppThroughput)
   void AddAverageBeamRtnAppThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRtnAppThroughput (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtRtnAppThroughput (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtUserRtnAppThroughput (SatStatsHelper::OutputType_t outputType);
 
   // Return link device-level throughput statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnDevThroughput)
   void AddAverageBeamRtnDevThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRtnDevThroughput (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtRtnDevThroughput (SatStatsHelper::OutputType_t outputType);
 
   // Return link MAC-level throughput statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnMacThroughput)
   void AddAverageBeamRtnMacThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRtnMacThroughput (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtRtnMacThroughput (SatStatsHelper::OutputType_t outputType);
 
   // Return link PHY-level throughput statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnPhyThroughput)
   void AddAverageBeamRtnPhyThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRtnPhyThroughput (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtRtnPhyThroughput (SatStatsHelper::OutputType_t outputType);
 
   // Forward link Dedicated Access packet error rate statistics.
@@ -253,14 +342,24 @@ public:
 
   // Random Access CRDSA packet collision rate statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (CrdsaPacketCollision)
-  //
+
   // Random Access Marsala packet collision rate statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (MarsalaCorrelation)
+
+  // Random Access E-SSA packet error rate statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (EssaPacketError)
+
+  // Random Access E-SSA packet collision rate statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (EssaPacketCollision)
+
+  // Dedicated Access carrier ID statistics
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (CarrierId)
 
   // Capacity request statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (CapacityRequest)
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RbdcRequest)
   void AddAverageBeamRbdcRequest (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRbdcRequest (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtRbdcRequest (SatStatsHelper::OutputType_t outputType);
 
   // Resources granted statistics.
@@ -297,11 +396,17 @@ public:
   // Antenna Gain statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (AntennaGain)
   void AddAverageBeamAntennaGain (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupAntennaGain (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtAntennaGain (SatStatsHelper::OutputType_t outputType);
 
   // Fwd Link Scheduler SymbolRate statistics.
   void AddPerSliceFwdLinkSchedulerSymbolRate (SatStatsHelper::OutputType_t outputType);
   void AddGlobalFwdLinkSchedulerSymbolRate (SatStatsHelper::OutputType_t outputType);
+
+  // Window load statistics
+  void AddGlobalRtnFeederWindowLoad (SatStatsHelper::OutputType_t outputType);
+  void AddPerGwRtnFeederWindowLoad (SatStatsHelper::OutputType_t outputType);
+  void AddPerBeamRtnFeederWindowLoad (SatStatsHelper::OutputType_t outputType);
 
   /**
    * \param outputType an arbitrary output type.

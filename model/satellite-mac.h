@@ -107,11 +107,24 @@ public:
   typedef Callback<void, Ptr<Packet>, Mac48Address, Mac48Address> ReceiveCallback;
 
   /**
+   * \brief Callback to receive packet by upper layer.
+   * \param packet the packet received
+   */
+  typedef Callback<void, Ptr<const Packet>> LoraReceiveCallback;
+
+  /**
    * \brief Method to set receive callback.
    * \param cb callback to invoke whenever a packet has been received and must
    *        be forwarded to the higher layers.
    */
   void SetReceiveCallback (SatMac::ReceiveCallback cb);
+
+  /**
+   * \brief Method to set receive callback.
+   * \param cb callback to invoke whenever a packet has been received and must
+   *        be forwarded to the higher layers.
+   */
+  void SetLoraReceiveCallback (SatMac::LoraReceiveCallback cb);
 
   /**
    * \brief Callback to read control messages from container storing control messages.
@@ -154,6 +167,19 @@ public:
    * \param cb callback to invoke whenever a control message is wanted to sent.
    */
   void SetSendCtrlCallback (SatMac::SendCtrlMsgCallback cb);
+
+  /**
+   * \brief Callback to update routing and ARP tables after handover
+   * \param Address the address of this device
+   * \param Address the address of the new gateway
+   */
+  typedef Callback<void, Address, Address> RoutingUpdateCallback;
+
+  /**
+   * \brief Method to set the routing update callback
+   * \param cb callback to invoke to update routing
+   */
+  void SetRoutingUpdateCallback (SatMac::RoutingUpdateCallback cb);
 
   /**
    * \brief Set the node info
@@ -234,6 +260,11 @@ protected:
   SatMac::ReceiveCallback m_rxCallback;
 
   /**
+   * The upper layer package receive callback.
+   */
+  SatMac::LoraReceiveCallback m_rxLoraCallback;
+
+  /**
    * The read control message callback.
    */
   SatMac::ReadCtrlMsgCallback m_readCtrlCallback;
@@ -252,6 +283,13 @@ protected:
    * `EnableStatisticsTags` attribute.
    */
   bool m_isStatisticsTagsEnabled;
+
+  /**
+   * Use of version 2 of NCR dates.
+   * Version 1 use date of frame N-2.
+   * Version 2 use date of frame N.
+   */
+  bool m_ncrV2;
 
   /**
    * Trace callback used for packet tracing.
@@ -279,9 +317,20 @@ protected:
   TracedCallback<const Time &, const Address &> m_rxDelayTrace;
 
   /**
+   * Traced callback for all received packets, including jitter information and
+   * the address of the senders.
+   */
+  TracedCallback<const Time &, const Address &> m_rxJitterTrace;
+
+  /**
    * Traced callback for beam being disabled and including service time.
    */
   TracedCallback<Time> m_beamServiceTrace;
+
+  /**
+   * Callback to update routing and ARP tables after a beam handover
+   */
+  SatMac::RoutingUpdateCallback m_routingUpdateCallback;
 
   /**
    * Node info containing node related information, such as
@@ -305,6 +354,21 @@ protected:
    * Time of the last beam enable event.
    */
   Time m_beamEnabledTime;
+
+  /**
+   * Last delay measurement. Used to compute jitter.
+   */
+  Time m_lastDelay;
+
+  /**
+   * List of NCR control messages created but not sent yet.
+   */
+  std::queue<Ptr<SatNcrMessage>> m_ncrMessagesToSend;
+
+  /**
+   * Store last 3 SOF date for Forward messages, to insert in NCR packets.
+   */
+  std::queue<Time> m_lastSOF;
 };
 
 } // namespace ns3

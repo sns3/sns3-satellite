@@ -207,6 +207,7 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
   params.m_device = d;
   params.m_txCh = uf;
   params.m_rxCh = ur;
+  params.m_standard = SatEnums::GEO;
 
   /**
    * Simple channel estimation, which does not do actually anything

@@ -388,7 +388,7 @@ void
 SatStatsThroughputHelper::RxCallback (Ptr<const Packet> packet,
                                       const Address &from)
 {
-  //NS_LOG_FUNCTION (this << packet->GetSize () << from);
+  NS_LOG_FUNCTION (this << packet->GetSize () << from);
 
   if (from.IsInvalid ())
     {

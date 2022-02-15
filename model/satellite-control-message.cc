@@ -808,7 +808,6 @@ SatHandoverRecommendationMessage::GetSizeInBytes () const
 }
 
 
-
 NS_OBJECT_ENSURE_REGISTERED (SatSliceSubscriptionMessage);
 
 TypeId
@@ -875,6 +874,343 @@ SatSliceSubscriptionMessage::GetSizeInBytes () const
 }
 
 
+NS_OBJECT_ENSURE_REGISTERED (SatLogonMessage);
+
+TypeId
+SatLogonMessage::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatLogonMessage")
+    .SetParent<SatControlMessage> ()
+    .AddConstructor<SatLogonMessage> ()
+  ;
+  return tid;
+}
+
+TypeId
+SatLogonMessage::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
+}
+
+SatLogonMessage::SatLogonMessage ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+SatLogonMessage::~SatLogonMessage ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+uint32_t
+SatLogonMessage::GetSizeInBytes () const
+{
+  NS_LOG_FUNCTION (this);
+
+  uint32_t size = 1 * sizeof (uint8_t);
+  return size;
+}
+
+
+NS_OBJECT_ENSURE_REGISTERED (SatLogonResponseMessage);
+
+TypeId
+SatLogonResponseMessage::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatLogonResponseMessage")
+    .SetParent<SatControlMessage> ()
+    .AddConstructor<SatLogonResponseMessage> ()
+  ;
+  return tid;
+}
+
+TypeId
+SatLogonResponseMessage::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
+}
+
+SatLogonResponseMessage::SatLogonResponseMessage ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+SatLogonResponseMessage::~SatLogonResponseMessage ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+void
+SatLogonResponseMessage::SetRaChannel (uint32_t raChannel)
+{
+  NS_LOG_FUNCTION (this << raChannel);
+  m_raChannel = raChannel;
+}
+
+uint32_t
+SatLogonResponseMessage::GetRaChannel () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_raChannel;
+}
+
+uint32_t
+SatLogonResponseMessage::GetSizeInBytes () const
+{
+  NS_LOG_FUNCTION (this);
+
+  uint32_t size = 1 * sizeof (uint8_t);
+  return size;
+}
+
+
+NS_OBJECT_ENSURE_REGISTERED (SatLogoffMessage);
+
+TypeId
+SatLogoffMessage::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatLogoffMessage")
+    .SetParent<SatControlMessage> ()
+    .AddConstructor<SatLogoffMessage> ()
+  ;
+  return tid;
+}
+
+TypeId
+SatLogoffMessage::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
+}
+
+SatLogoffMessage::SatLogoffMessage ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+SatLogoffMessage::~SatLogoffMessage ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+uint32_t
+SatLogoffMessage::GetSizeInBytes () const
+{
+  NS_LOG_FUNCTION (this);
+
+  uint32_t size = 1 * sizeof (uint8_t);
+  return size;
+}
+
+
+NS_OBJECT_ENSURE_REGISTERED (SatNcrMessage);
+
+TypeId
+SatNcrMessage::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatNcrMessage")
+    .SetParent<SatControlMessage> ()
+    .AddConstructor<SatNcrMessage> ()
+  ;
+  return tid;
+}
+
+TypeId
+SatNcrMessage::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
+}
+
+SatNcrMessage::SatNcrMessage ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+SatNcrMessage::~SatNcrMessage ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+void
+SatNcrMessage::SetNcrDate (uint64_t ncr)
+{
+  NS_LOG_FUNCTION (this << ncr);
+  m_ncrDateBase = (ncr/300) % (1UL<<33);
+  m_ncrDateExtension = ncr%300;
+}
+
+uint64_t
+SatNcrMessage::GetNcrDate () const
+{
+  NS_LOG_FUNCTION (this);
+  return 300*m_ncrDateBase + m_ncrDateExtension;
+}
+
+uint32_t
+SatNcrMessage::GetSizeInBytes () const
+{
+  NS_LOG_FUNCTION (this);
+
+  // 33 bits for base, 9 bits for extension, 6 bits reserved
+  uint32_t size = 6;
+  return size;
+}
+
+
+NS_OBJECT_ENSURE_REGISTERED (SatCmtMessage);
+
+TypeId
+SatCmtMessage::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatCmtMessage")
+    .SetParent<SatControlMessage> ()
+    .AddConstructor<SatCmtMessage> ()
+  ;
+  return tid;
+}
+
+TypeId
+SatCmtMessage::GetInstanceTypeId (void) const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
+}
+
+SatCmtMessage::SatCmtMessage ()
+ : m_groupId (0),
+  m_logonId (0),
+  m_burstTimeScaling (0),
+  m_burstTimeCorrection (0),
+  m_powerCorrection (0),
+  m_frequencyCorrection (0)
+{
+  NS_LOG_FUNCTION (this);
+}
+
+SatCmtMessage::~SatCmtMessage ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+uint8_t
+SatCmtMessage::GetGroupId () const
+{
+  return m_groupId;
+}
+
+void
+SatCmtMessage::SetGroupId (uint8_t groupId)
+{
+  m_groupId = groupId;
+}
+
+uint8_t
+SatCmtMessage::GetLogonId () const
+{
+  return m_logonId;
+}
+
+void
+SatCmtMessage::SetLogonId (uint8_t logonId)
+{
+  m_logonId = logonId;
+}
+
+int16_t
+SatCmtMessage::GetBurstTimeCorrection () const
+{
+  return m_burstTimeCorrection*(1<<m_burstTimeScaling);
+}
+
+void
+SatCmtMessage::SetBurstTimeCorrection (int32_t burstTimeCorrection)
+{
+  if (burstTimeCorrection > 16256)
+    {
+      NS_FATAL_ERROR ("Burst Time Correction too high, should be at most 16256, but got " << burstTimeCorrection);
+    }
+  if (burstTimeCorrection < -16256)
+    {
+      NS_FATAL_ERROR ("Burst Time Correction too low, should be at least -16256, but got " << burstTimeCorrection);
+    }
+  m_burstTimeScaling = 0;
+  if (burstTimeCorrection > 0)
+    {
+      for (uint8_t i = 0; i < 8; i++)
+        {
+          if (burstTimeCorrection > 127)
+            {
+              burstTimeCorrection >>= 1;
+              m_burstTimeScaling++;
+            }
+        }
+    }
+  else
+    {
+      for (uint8_t i = 0; i < 8; i++)
+        {
+          if (-1*burstTimeCorrection > 127)
+            {
+              burstTimeCorrection /= 2;
+              m_burstTimeScaling++;
+            }
+        }
+    }
+
+  m_burstTimeCorrection = burstTimeCorrection;
+}
+
+uint8_t
+SatCmtMessage::GetPowerCorrection () const
+{
+  return m_powerCorrection;
+}
+
+void
+SatCmtMessage::SetPowerCorrection (uint8_t powerCorrection)
+{
+  m_powerCorrection = powerCorrection;
+}
+
+int16_t
+SatCmtMessage::GetFrequencyCorrection () const
+{
+  return m_frequencyCorrection;
+}
+
+void
+SatCmtMessage::SetFrequencyCorrection (int16_t frequencyCorrection)
+{
+  m_frequencyCorrection = frequencyCorrection;
+}
+
+uint32_t
+SatCmtMessage::GetSizeInBytes () const
+{
+  NS_LOG_FUNCTION (this);
+
+  // Content of message is
+  // m_groupId: 8 bits
+  // m_logonId: 16 bits
+  // flags (time correction, power correction, frequency correction): 3 bits
+  // slot type (always control here): 2 bits
+  // m_burstTimeScaling: 3 bits
+  // m_burstTimeCorrection: 8 bits
+  // power control flag: 1 bit
+  // m_powerCorrection: 7 bits
+  // m_frequencyCorrection: 16 bits
+  // Total is 64 bits = 8 bytes
+  uint32_t size = 8;
+  return size;
+}
 
 // Control message container
 

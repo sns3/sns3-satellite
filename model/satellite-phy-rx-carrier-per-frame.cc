@@ -45,12 +45,13 @@ SatPhyRxCarrierPerFrame::SatPhyRxCarrierPerFrame (uint32_t carrierId,
   m_frameEndSchedulingInitialized (false)
 {
   NS_LOG_FUNCTION (this);
+  NS_LOG_INFO ("Constructor called with arguments " << carrierId << ", " << carrierConf << ", and " << randomAccessEnabled);
 
   NS_ASSERT (m_randomAccessEnabled == true);
 }
 
 void
-SatPhyRxCarrierPerFrame::BeginFrameEndScheduling ()
+SatPhyRxCarrierPerFrame::BeginEndScheduling ()
 {
   NS_LOG_FUNCTION (this);
   if (!m_frameEndSchedulingInitialized)
@@ -126,7 +127,8 @@ SatPhyRxCarrierPerFrame::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams
 
   // If the received random access packet is of type slotted aloha, we
   // receive the packet with the base class ReceiveSlot method.
-  if (packetRxParams.rxParams->m_txInfo.packetType == SatEnums::PACKET_TYPE_SLOTTED_ALOHA)
+  if (packetRxParams.rxParams->m_txInfo.packetType == SatEnums::PACKET_TYPE_SLOTTED_ALOHA
+        || packetRxParams.rxParams->m_txInfo.packetType == SatEnums::PACKET_TYPE_LOGON)
     {
       SatPhyRxCarrierPerSlot::ReceiveSlot (packetRxParams, nPackets);
       return;
@@ -561,7 +563,7 @@ SatPhyRxCarrierPerFrame::ProcessReceivedCrdsaPacket (SatPhyRxCarrierPerFrame::cr
       NS_LOG_INFO ("Replica in slot: " << packet.slotIdsForOtherReplicas[i]);
     }
 
-  NS_LOG_INFO ("SINR CALCULATION, RX sat: " << packet.rxParams->m_rxPowerInSatellite_W <<
+  NS_LOG_INFO ("SINR CALCULATION, RX sat: " << packet.rxParams->GetRxPowerInSatellite () <<
                " IF sat: " << packet.rxParams->GetInterferencePowerInSatellite () <<
                " RX gnd: " << packet.rxParams->m_rxPower_W <<
                " IF gnd: " << packet.rxParams->GetInterferencePower ());
@@ -616,12 +618,12 @@ SatPhyRxCarrierPerFrame::CalculatePacketCompositeSinr (SatPhyRxCarrierPerFrame::
 {
   NS_LOG_FUNCTION (this);
 
-  double sinrSatellite = CalculateSinr ( packet.rxParams->m_rxPowerInSatellite_W,
+  double sinrSatellite = CalculateSinr ( packet.rxParams->GetRxPowerInSatellite (),
                                          packet.rxParams->GetInterferencePowerInSatellite (),
-                                         packet.rxParams->m_rxNoisePowerInSatellite_W,
-                                         packet.rxParams->m_rxAciIfPowerInSatellite_W,
-                                         packet.rxParams->m_rxExtNoisePowerInSatellite_W,
-                                         packet.rxParams->m_sinrCalculate);
+                                         packet.rxParams->GetRxNoisePowerInSatellite (),
+                                         packet.rxParams->GetRxAciIfPowerInSatellite (),
+                                         packet.rxParams->GetRxExtNoisePowerInSatellite (),
+                                         packet.rxParams->GetSinrCalculator ());
 
   double sinr = CalculateSinr ( packet.rxParams->m_rxPower_W,
                                 packet.rxParams->GetInterferencePower (),
@@ -718,7 +720,7 @@ SatPhyRxCarrierPerFrame::EliminateInterference (
           iterList->packetHasBeenProcessed = false;
 
           NS_LOG_INFO ("BEFORE INTERFERENCE ELIMINATION, RX sat: " <<
-                       iterList->rxParams->m_rxPowerInSatellite_W <<
+                       iterList->rxParams->GetRxPowerInSatellite () <<
                        " IF sat: " << iterList->rxParams->GetInterferencePowerInSatellite () <<
                        " RX gnd: " << iterList->rxParams->m_rxPower_W <<
                        " IF gnd: " << iterList->rxParams->GetInterferencePower ());
@@ -739,7 +741,7 @@ SatPhyRxCarrierPerFrame::EliminateInterference (
           GetInterferenceEliminationModel ()->EliminateInterferences (iterList->rxParams, processedPacket.rxParams, processedPacket.cSinr);
 
           NS_LOG_INFO ("AFTER INTERFERENCE ELIMINATION, RX sat: " <<
-                       iterList->rxParams->m_rxPowerInSatellite_W <<
+                       iterList->rxParams->GetRxPowerInSatellite () <<
                        " IF sat: " << iterList->rxParams->GetInterferencePowerInSatellite () <<
                        " RX gnd: " << iterList->rxParams->m_rxPower_W <<
                        " IF gnd: " << iterList->rxParams->GetInterferencePower ());

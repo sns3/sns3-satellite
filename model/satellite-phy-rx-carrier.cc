@@ -29,6 +29,7 @@
 #include <ns3/satellite-per-packet-interference.h>
 #include <ns3/satellite-traced-interference.h>
 #include <ns3/satellite-perfect-interference-elimination.h>
+#include <ns3/satellite-residual-interference-elimination.h>
 #include <ns3/satellite-mac-tag.h>
 #include <ns3/singleton.h>
 #include <ns3/satellite-composite-sinr-output-trace-container.h>
@@ -62,7 +63,8 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
   m_satInterferenceElimination (),
   m_enableCompositeSinrOutputTrace (false),
   m_numOfOngoingRx (0),
-  m_rxPacketCounter (0)
+  m_rxPacketCounter (0),
+  m_waveformConf (waveformConf)
 {
   NS_LOG_FUNCTION (this << carrierId);
 
@@ -180,6 +182,12 @@ SatPhyRxCarrier::DoCreateInterferenceEliminationModel (
         m_satInterferenceElimination = CreateObject<SatPerfectInterferenceElimination> ();
         break;
       }
+    case SatPhyRxCarrierConf::SIC_RESIDUAL:
+      {
+        NS_LOG_INFO (this << " Residual interference elimination model created for carrier: " << carrierId);
+        m_satInterferenceElimination = CreateObject<SatResidualInterferenceElimination> (waveformConf);
+        break;
+      }
     default:
       {
         NS_LOG_ERROR (this << " Not a valid interference elimination model!");
@@ -194,6 +202,10 @@ SatPhyRxCarrier::~SatPhyRxCarrier ()
   NS_LOG_FUNCTION (this);
 }
 
+void
+SatPhyRxCarrier::BeginEndScheduling (void)
+{
+}
 
 TypeId
 SatPhyRxCarrier::GetTypeId (void)
@@ -225,6 +237,10 @@ SatPhyRxCarrier::GetTypeId (void)
                      "Received a packet burst through Dedicated Channel",
                      MakeTraceSourceAccessor (&SatPhyRxCarrier::m_daRxTrace),
                      "ns3::SatPhyRxCarrierPacketProbe::RxStatusCallback")
+    .AddTraceSource ("DaRxCarrierId",
+                     "Received a packet burst though DAMA",
+                     MakeTraceSourceAccessor (&SatPhyRxCarrier::m_daRxCarrierIdTrace),
+                     "ns3::SatTypedefs::DataSenderAddressCallback")
   ;
   return tid;
 }
@@ -327,7 +343,7 @@ SatPhyRxCarrier::GetReceiveParams (Ptr<SatSignalParameters> rxParams)
 }
 
 
-void
+bool
 SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
 {
   NS_LOG_FUNCTION (this << rxParams);
@@ -362,7 +378,7 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
           {
             if (IsReceivingDedicatedAccess () && rxParams->m_txInfo.packetType == SatEnums::PACKET_TYPE_DEDICATED_ACCESS)
               {
-                NS_FATAL_ERROR ("Starting reception of a packet when receiving DA transmission!");
+                NS_FATAL_ERROR ("Starting reception of a packet when receiving DA transmission! This may be due to a clock drift in UTs too important.");
               }
 
             GetInterferenceModel ()->NotifyRxStart (rxParamsStruct.interferenceEvent);
@@ -380,6 +396,8 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
             Simulator::Schedule (rxParams->m_duration, &SatPhyRxCarrier::EndRxData, this, key);
 
             IncreaseNumOfRxState (rxParams->m_txInfo.packetType);
+
+            return true;
           }
         break;
       }
@@ -389,6 +407,8 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
         break;
       }
     }
+
+  return false;
 }
 
 
@@ -468,7 +488,7 @@ SatPhyRxCarrier::CheckAgainstLinkResultsErrorModelAvi (double cSinr, Ptr<SatSign
          * fs = symbol rate in baud
         */
 
-        double ber = (GetLinkResults ()->GetObject <SatLinkResultsDvbS2> ())->GetBler (rxParams->m_txInfo.modCod,
+        double ber = (GetLinkResults ()->GetObject <SatLinkResultsFwd> ())->GetBler (rxParams->m_txInfo.modCod,
                                                                                        rxParams->m_txInfo.frameType,
                                                                                        SatUtils::LinearToDb (cSinr));
         double r = GetUniformRandomValue (0, 1);
@@ -507,7 +527,7 @@ SatPhyRxCarrier::CheckAgainstLinkResultsErrorModelAvi (double cSinr, Ptr<SatSign
         double ebNo = cSinr / (SatUtils::GetCodingRate (rxParams->m_txInfo.modCod) *
                                SatUtils::GetModulatedBits (rxParams->m_txInfo.modCod));
 
-        double ber = (GetLinkResults ()->GetObject <SatLinkResultsDvbRcs2> ())->GetBler (rxParams->m_txInfo.waveformId,
+        double ber = (GetLinkResults ()->GetObject <SatLinkResultsRtn> ())->GetBler (rxParams->m_txInfo.waveformId,
                                                                                          SatUtils::LinearToDb (ebNo));
         double r = GetUniformRandomValue (0, 1);
 
@@ -569,7 +589,7 @@ SatPhyRxCarrier::CalculateSinr (double rxPowerW,
   // Call PHY calculator to composite C over I interference configured to PHY.
   double finalSinr = sinrCalculate (sinr);
 
-  return (finalSinr);
+  return finalSinr;
 }
 
 double
