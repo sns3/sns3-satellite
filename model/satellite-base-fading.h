@@ -20,12 +20,13 @@
 #ifndef SATELLITE_BASE_FADING_H
 #define SATELLITE_BASE_FADING_H
 
-#include "ns3/object.h"
-#include "ns3/uinteger.h"
-#include "ns3/log.h"
-#include "ns3/simulator.h"
+#include <ns3/object.h>
+#include <ns3/uinteger.h>
+#include <ns3/simulator.h>
+#include <ns3/mac48-address.h>
+
 #include "satellite-enums.h"
-#include "ns3/mac48-address.h"
+
 
 namespace ns3 {
 

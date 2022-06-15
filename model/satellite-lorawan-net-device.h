@@ -21,20 +21,20 @@
 #ifndef SATELLITE_LORAWAN_NET_DEVICE_H
 #define SATELLITE_LORAWAN_NET_DEVICE_H
 
-#include <ns3/satellite-net-device.h>
-
 #include <ns3/node.h>
 #include <ns3/error-model.h>
 #include <ns3/ipv4-l3-protocol.h>
 
-#include <ns3/satellite-phy.h>
-#include <ns3/satellite-mac.h>
-#include <ns3/satellite-llc.h>
-#include <ns3/satellite-control-message.h>
-#include <ns3/satellite-address-tag.h>
-#include <ns3/satellite-time-tag.h>
-#include <ns3/satellite-node-info.h>
-#include <ns3/lorawan-mac.h>
+#include "satellite-phy.h"
+#include "satellite-mac.h"
+#include "satellite-llc.h"
+#include "satellite-control-message.h"
+#include "satellite-address-tag.h"
+#include "satellite-time-tag.h"
+#include "satellite-node-info.h"
+#include "satellite-net-device.h"
+#include "lorawan-mac.h"
+
 
 namespace ns3 {
 

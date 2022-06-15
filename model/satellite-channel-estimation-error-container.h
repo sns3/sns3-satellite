@@ -23,8 +23,11 @@
 #define SATELLITE_CHANNEL_ESTIMATION_ERROR_CONTAINER_H_
 
 #include <map>
-#include "ns3/object.h"
+
+#include <ns3/object.h>
+
 #include "satellite-channel-estimation-error.h"
+
 
 namespace ns3 {
 

@@ -24,15 +24,18 @@
 #ifndef SATELLITE_PHY_RX_CARRIER_PER_SLOT_H
 #define SATELLITE_PHY_RX_CARRIER_PER_SLOT_H
 
-#include <ns3/object.h>
-#include <ns3/ptr.h>
-#include <ns3/traced-callback.h>
-#include <ns3/mac48-address.h>
 #include <vector>
 #include <map>
 #include <list>
 #include <deque>
-#include <ns3/satellite-phy-rx-carrier.h>
+
+#include <ns3/object.h>
+#include <ns3/ptr.h>
+#include <ns3/traced-callback.h>
+#include <ns3/mac48-address.h>
+
+#include "satellite-phy-rx-carrier.h"
+
 
 namespace ns3 {
 

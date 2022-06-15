@@ -26,6 +26,7 @@
 #include "satellite-base-trace-container.h"
 #include "geo-coordinate.h"
 
+
 namespace ns3 {
 
 /**

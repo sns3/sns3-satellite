@@ -22,6 +22,7 @@
 
 #include "lora-network-scheduler.h"
 
+
 NS_LOG_COMPONENT_DEFINE ("LoraNetworkScheduler");
 
 namespace ns3 {

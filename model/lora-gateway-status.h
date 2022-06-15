@@ -23,11 +23,12 @@
 #ifndef LORA_GATEWAY_STATUS_H
 #define LORA_GATEWAY_STATUS_H
 
-#include "ns3/object.h"
-#include "ns3/address.h"
-#include "ns3/net-device.h"
+#include <ns3/object.h>
+#include <ns3/address.h>
+#include <ns3/net-device.h>
 
-#include "ns3/lorawan-mac-gateway.h"
+#include "lorawan-mac-gateway.h"
+
 
 namespace ns3 {
 

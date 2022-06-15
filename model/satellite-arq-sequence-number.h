@@ -22,7 +22,9 @@
 #define SATELLITE_ARQ_SEQUENCE_NUMBER_H_
 
 #include <map>
-#include "ns3/simple-ref-count.h"
+
+#include <ns3/simple-ref-count.h>
+
 
 /**
  * \ingroup satellite

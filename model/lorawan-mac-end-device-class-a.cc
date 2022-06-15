@@ -28,12 +28,13 @@
 #include <ns3/log.h>
 #include <ns3/pointer.h>
 
-#include <ns3/satellite-phy.h>
-#include <ns3/satellite-lorawan-net-device.h>
+#include "satellite-phy.h"
+#include "satellite-lorawan-net-device.h"
 
-#include "ns3/lora-tag.h"
-#include <ns3/lorawan-mac-end-device-class-a.h>
-#include <ns3/lorawan-mac-end-device.h>
+#include "lora-tag.h"
+#include "lorawan-mac-end-device-class-a.h"
+#include "lorawan-mac-end-device.h"
+
 
 namespace ns3 {
 

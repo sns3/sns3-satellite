@@ -18,12 +18,13 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include "ns3/log.h"
-#include "ns3/object.h"
-#include "ns3/double.h"
-#include "ns3/string.h"
+#include <ns3/log.h>
+#include <ns3/object.h>
+#include <ns3/double.h>
+#include <ns3/string.h>
 
 #include "satellite-propagation-delay-model.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatConstantPropagationDelayModel");
 

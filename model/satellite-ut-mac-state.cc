@@ -19,8 +19,10 @@
  * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "ns3/log.h"
+#include <ns3/log.h>
+
 #include "satellite-ut-mac-state.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatUtMacState");
 

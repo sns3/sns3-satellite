@@ -23,15 +23,17 @@
 #ifndef SATELLITE_PHY_RX_H
 #define SATELLITE_PHY_RX_H
 
-#include "ns3/mobility-model.h"
-#include "ns3/packet.h"
-#include "ns3/nstime.h"
+#include <ns3/mobility-model.h>
+#include <ns3/packet.h>
+#include <ns3/nstime.h>
+
 #include "satellite-net-device.h"
 #include "satellite-signal-parameters.h"
 #include "satellite-antenna-gain-pattern.h"
 #include "satellite-mobility-model.h"
 #include "satellite-base-fading.h"
-#include "ns3/satellite-frame-conf.h"
+#include "satellite-frame-conf.h"
+
 
 namespace ns3 {
 

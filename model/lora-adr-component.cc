@@ -20,7 +20,10 @@
  * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "ns3/lora-adr-component.h"
+#include <ns3/log.h>
+
+#include "lora-adr-component.h"
+
 
 namespace ns3 {
 

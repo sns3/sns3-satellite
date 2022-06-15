@@ -22,13 +22,14 @@
  * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "satellite-sgp4-mobility-model.h"
+#include <ns3/log.h>
+#include <ns3/simulator.h>
+#include <ns3/boolean.h>
+#include <ns3/string.h>
 
-#include "ns3/log.h"
-#include "ns3/simulator.h"
-#include "ns3/boolean.h"
-#include "ns3/string.h"
+#include "satellite-sgp4-mobility-model.h"
 #include "vector-extensions.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("sat-sgp4-mobility-model");
 

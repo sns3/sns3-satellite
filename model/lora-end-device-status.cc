@@ -23,18 +23,19 @@
 
 #include <algorithm>
 
-#include "ns3/log.h"
-#include "ns3/pointer.h"
-#include "ns3/command-line.h"
-#include "ns3/simulator.h"
-#include "ns3/packet.h"
-#include "ns3/simulator.h"
+#include <ns3/log.h>
+#include <ns3/pointer.h>
+#include <ns3/command-line.h>
+#include <ns3/simulator.h>
+#include <ns3/packet.h>
+#include <ns3/simulator.h>
 
-#include "ns3/lora-end-device-status.h"
-#include "ns3/lorawan-mac-header.h"
-#include "ns3/lora-frame-header.h"
-#include "ns3/lora-tag.h"
-#include "ns3/lora-beam-tag.h"
+#include "lora-end-device-status.h"
+#include "lorawan-mac-header.h"
+#include "lora-frame-header.h"
+#include "lora-tag.h"
+#include "lora-beam-tag.h"
+
 
 namespace ns3 {
 

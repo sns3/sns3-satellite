@@ -22,11 +22,10 @@
  * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "vector-extensions.h"
-
 #include <cmath>
 
-#include "ns3/vector.h"
+#include "vector-extensions.h"
+
 
 namespace ns3 {
 

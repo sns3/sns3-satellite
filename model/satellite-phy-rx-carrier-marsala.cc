@@ -24,6 +24,7 @@
 
 #include "satellite-phy-rx-carrier-marsala.h"
 
+
 NS_LOG_COMPONENT_DEFINE ("SatPhyRxCarrierMarsala");
 
 namespace ns3 {

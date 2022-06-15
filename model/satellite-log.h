@@ -20,8 +20,10 @@
 #ifndef SATELLITE_LOG_H
 #define SATELLITE_LOG_H
 
-#include "ns3/satellite-output-fstream-string-container.h"
 #include <map>
+
+#include <ns3/satellite-output-fstream-string-container.h>
+
 
 namespace ns3 {
 

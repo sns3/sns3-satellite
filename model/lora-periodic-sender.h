@@ -27,7 +27,8 @@
 #include <ns3/nstime.h>
 #include <ns3/attribute.h>
 
-#include <ns3/lorawan-mac.h>
+#include "lorawan-mac.h"
+
 
 namespace ns3 {
 

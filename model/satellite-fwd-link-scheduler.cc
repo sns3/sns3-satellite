@@ -19,16 +19,17 @@
  */
 
 #include <algorithm>
-#include "ns3/log.h"
-#include "ns3/simulator.h"
-#include "ns3/mac48-address.h"
-#include "ns3/trace-source-accessor.h"
-#include "ns3/uinteger.h"
-#include "ns3/nstime.h"
-#include "ns3/pointer.h"
-#include "ns3/enum.h"
-#include "ns3/boolean.h"
-#include "ns3/double.h"
+
+#include <ns3/log.h>
+#include <ns3/simulator.h>
+#include <ns3/mac48-address.h>
+#include <ns3/trace-source-accessor.h>
+#include <ns3/uinteger.h>
+#include <ns3/nstime.h>
+#include <ns3/pointer.h>
+#include <ns3/enum.h>
+#include <ns3/boolean.h>
+#include <ns3/double.h>
 
 #include "satellite-enums.h"
 #include "satellite-mac-tag.h"

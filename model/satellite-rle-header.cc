@@ -18,7 +18,8 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include "ns3/log.h"
+#include <ns3/log.h>
+
 #include "satellite-rle-header.h"
 #include "satellite-encap-pdu-status-tag.h"
 

@@ -28,17 +28,17 @@
 #include <ns3/ipv4-l3-protocol.h>
 #include <ns3/channel.h>
 
-#include <ns3/satellite-phy.h>
-#include <ns3/satellite-mac.h>
-#include <ns3/satellite-llc.h>
-#include <ns3/satellite-control-message.h>
-#include <ns3/satellite-utils.h>
-#include <ns3/satellite-node-info.h>
-#include <ns3/satellite-address-tag.h>
-#include <ns3/satellite-time-tag.h>
-#include <ns3/satellite-typedefs.h>
-
+#include "satellite-phy.h"
+#include "satellite-mac.h"
+#include "satellite-llc.h"
+#include "satellite-control-message.h"
+#include "satellite-utils.h"
+#include "satellite-node-info.h"
+#include "satellite-address-tag.h"
+#include "satellite-time-tag.h"
+#include "satellite-typedefs.h"
 #include "satellite-net-device.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatNetDevice");
 

@@ -19,21 +19,23 @@
  */
 
 #include <algorithm>
-#include "ns3/object.h"
-#include "ns3/simulator.h"
-#include "ns3/log.h"
-#include "ns3/packet.h"
-#include "ns3/net-device.h"
-#include "ns3/node.h"
-#include "ns3/propagation-delay-model.h"
-#include "ns3/mobility-model.h"
-#include "ns3/enum.h"
+
+#include <ns3/object.h>
+#include <ns3/simulator.h>
+#include <ns3/log.h>
+#include <ns3/packet.h>
+#include <ns3/net-device.h>
+#include <ns3/node.h>
+#include <ns3/propagation-delay-model.h>
+#include <ns3/mobility-model.h>
+#include <ns3/enum.h>
+#include <ns3/boolean.h>
+#include <ns3/singleton.h>
+
 #include "satellite-phy-rx.h"
 #include "satellite-phy-tx.h"
 #include "satellite-channel.h"
 #include "satellite-mac-tag.h"
-#include "ns3/singleton.h"
-#include "ns3/boolean.h"
 #include "satellite-rx-power-output-trace-container.h"
 #include "satellite-rx-power-input-trace-container.h"
 #include "satellite-rx-cno-input-trace-container.h"
@@ -41,6 +43,7 @@
 #include "satellite-fading-external-input-trace-container.h"
 #include "satellite-id-mapper.h"
 #include "satellite-utils.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatChannel");
 

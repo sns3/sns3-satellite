@@ -20,7 +20,10 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
+#include <ns3/log.h>
+
 #include "satellite-random-access-container.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatRandomAccess");
 

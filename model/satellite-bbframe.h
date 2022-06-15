@@ -23,12 +23,15 @@
 #define SATELLITE_BBFRAME_H_
 
 #include <vector>
-#include "ns3/simple-ref-count.h"
-#include "ns3/packet.h"
-#include "ns3/nstime.h"
-#include "ns3/traced-callback.h"
-#include "ns3/satellite-bbframe-conf.h"
+
+#include <ns3/simple-ref-count.h>
+#include <ns3/packet.h>
+#include <ns3/nstime.h>
+#include <ns3/traced-callback.h>
+
+#include "satellite-bbframe-conf.h"
 #include "satellite-enums.h"
+
 
 namespace ns3 {
 

@@ -25,10 +25,13 @@
 
 #include <map>
 #include <utility>
+
 #include <ns3/object.h>
 #include <ns3/ptr.h>
 #include <ns3/traced-callback.h>
-#include <ns3/satellite-beam-scheduler.h>
+
+#include "satellite-beam-scheduler.h"
+
 
 namespace ns3 {
 

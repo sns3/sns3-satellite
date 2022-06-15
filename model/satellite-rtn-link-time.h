@@ -21,7 +21,8 @@
 #ifndef SATELLITE_RTN_LINK_TIME_H_
 #define SATELLITE_RTN_LINK_TIME_H_
 
-#include "ns3/satellite-superframe-sequence.h"
+#include "satellite-superframe-sequence.h"
+
 
 namespace ns3 {
 

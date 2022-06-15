@@ -20,8 +20,10 @@
  * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "ns3/lora-gateway-status.h"
-#include "ns3/log.h"
+#include <ns3/log.h>
+
+#include "lora-gateway-status.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("LoraGatewayStatus");
 

@@ -22,8 +22,10 @@
 #define SATELLITE_UT_LLC_H
 
 #include <ns3/ptr.h>
-#include <ns3/satellite-llc.h>
-#include <ns3/satellite-queue.h>
+
+#include "satellite-llc.h"
+#include "satellite-queue.h"
+
 
 namespace ns3 {
 

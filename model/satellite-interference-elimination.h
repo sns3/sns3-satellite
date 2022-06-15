@@ -21,7 +21,8 @@
 #ifndef SATELLITE_INTERFERENCE_ELIMINATION_H
 #define SATELLITE_INTERFERENCE_ELIMINATION_H
 
-#include "ns3/object.h"
+#include <ns3/object.h>
+
 
 namespace ns3 {
 

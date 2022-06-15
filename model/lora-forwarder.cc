@@ -22,9 +22,9 @@
 
 #include <ns3/log.h>
 
-#include <ns3/lora-beam-tag.h>
+#include "lora-beam-tag.h"
+#include "lora-forwarder.h"
 
-#include "ns3/lora-forwarder.h"
 
 NS_LOG_COMPONENT_DEFINE ("LoraForwarder");
 

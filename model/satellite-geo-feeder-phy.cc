@@ -18,12 +18,12 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include "ns3/log.h"
-#include "ns3/simulator.h"
-#include "ns3/double.h"
-#include "ns3/enum.h"
-#include "ns3/uinteger.h"
-#include "ns3/pointer.h"
+#include <ns3/log.h>
+#include <ns3/simulator.h>
+#include <ns3/double.h>
+#include <ns3/enum.h>
+#include <ns3/uinteger.h>
+#include <ns3/pointer.h>
 
 #include "satellite-utils.h"
 #include "satellite-geo-feeder-phy.h"
@@ -33,6 +33,7 @@
 #include "satellite-mac.h"
 #include "satellite-signal-parameters.h"
 #include "satellite-channel-estimation-error-container.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatGeoFeederPhy");
 

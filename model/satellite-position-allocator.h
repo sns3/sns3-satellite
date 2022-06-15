@@ -22,11 +22,13 @@
 #ifndef SATELLITE_POSITION_ALLOCATOR_H
 #define SATELLITE_POSITION_ALLOCATOR_H
 
-#include "ns3/object.h"
-#include "ns3/random-variable-stream.h"
-#include "ns3/position-allocator.h"
+#include <ns3/object.h>
+#include <ns3/random-variable-stream.h>
+#include <ns3/position-allocator.h>
+
 #include "geo-coordinate.h"
 #include "satellite-antenna-gain-pattern-container.h"
+
 
 namespace ns3 {
 

@@ -23,13 +23,16 @@
 #ifndef LORAWAN_MAC_H
 #define LORAWAN_MAC_H
 
-#include "ns3/object.h"
-#include "ns3/packet.h"
-#include "ns3/satellite-phy.h"
-#include "ns3/satellite-mac.h"
-#include "ns3/lora-logical-channel-helper.h"
-#include "ns3/satellite-lora-phy-rx.h"
 #include <array>
+
+#include <ns3/object.h>
+#include <ns3/packet.h>
+
+#include "satellite-phy.h"
+#include "satellite-mac.h"
+#include "satellite-lora-phy-rx.h"
+#include "lora-logical-channel-helper.h"
+
 
 namespace ns3 {
 

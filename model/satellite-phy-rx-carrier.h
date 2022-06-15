@@ -24,22 +24,25 @@
 #ifndef SATELLITE_PHY_RX_CARRIER_H
 #define SATELLITE_PHY_RX_CARRIER_H
 
-#include <ns3/object.h>
-#include <ns3/ptr.h>
-#include <ns3/traced-callback.h>
-#include <ns3/mac48-address.h>
-#include <ns3/satellite-enums.h>
-#include <ns3/satellite-utils.h>
-#include <ns3/satellite-interference.h>
-#include <ns3/satellite-interference-elimination.h>
-#include <ns3/satellite-phy.h>
-#include <ns3/satellite-phy-rx.h>
-#include <ns3/satellite-phy-rx-carrier-conf.h>
-#include <ns3/satellite-wave-form-conf.h>
 #include <vector>
 #include <map>
 #include <list>
 #include <deque>
+
+#include <ns3/object.h>
+#include <ns3/ptr.h>
+#include <ns3/traced-callback.h>
+#include <ns3/mac48-address.h>
+
+#include "satellite-enums.h"
+#include "satellite-utils.h"
+#include "satellite-interference.h"
+#include "satellite-interference-elimination.h"
+#include "satellite-phy.h"
+#include "satellite-phy-rx.h"
+#include "satellite-phy-rx-carrier-conf.h"
+#include "satellite-wave-form-conf.h"
+
 
 namespace ns3 {
 

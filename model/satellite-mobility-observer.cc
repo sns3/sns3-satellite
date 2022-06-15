@@ -18,13 +18,15 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include "ns3/log.h"
-#include "ns3/pointer.h"
-#include "ns3/boolean.h"
-#include "ns3/double.h"
-#include "ns3/trace-source-accessor.h"
+#include <ns3/log.h>
+#include <ns3/pointer.h>
+#include <ns3/boolean.h>
+#include <ns3/double.h>
+#include <ns3/trace-source-accessor.h>
+
 #include "satellite-utils.h"
 #include "satellite-mobility-observer.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatMobilityObserver");
 

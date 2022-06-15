@@ -18,9 +18,11 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include "ns3/log.h"
-#include "ns3/mac48-address.h"
+#include <ns3/log.h>
+#include <ns3/mac48-address.h>
+
 #include "satellite-scheduling-object.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatSchedulingObject");
 

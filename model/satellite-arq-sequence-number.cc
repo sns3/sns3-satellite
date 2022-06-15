@@ -19,8 +19,10 @@
  */
 
 
-#include "ns3/log.h"
+#include <ns3/log.h>
+
 #include "satellite-arq-sequence-number.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatArqSequenceNumber");
 

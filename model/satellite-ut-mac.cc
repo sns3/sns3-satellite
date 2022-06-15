@@ -29,19 +29,20 @@
 #include <ns3/packet.h>
 #include <ns3/singleton.h>
 
-#include <ns3/satellite-utils.h>
-#include <ns3/satellite-tbtp-container.h>
-#include <ns3/satellite-rtn-link-time.h>
-#include <ns3/satellite-wave-form-conf.h>
-#include <ns3/satellite-crdsa-replica-tag.h>
-#include <ns3/satellite-superframe-sequence.h>
-#include <ns3/satellite-control-message.h>
-#include <ns3/satellite-frame-conf.h>
-#include <ns3/satellite-node-info.h>
-#include <ns3/satellite-const-variables.h>
-#include <ns3/satellite-log.h>
-#include <ns3/satellite-encap-pdu-status-tag.h>
+#include "satellite-utils.h"
+#include "satellite-tbtp-container.h"
+#include "satellite-rtn-link-time.h"
+#include "satellite-wave-form-conf.h"
+#include "satellite-crdsa-replica-tag.h"
+#include "satellite-superframe-sequence.h"
+#include "satellite-control-message.h"
+#include "satellite-frame-conf.h"
+#include "satellite-node-info.h"
+#include "satellite-const-variables.h"
+#include "satellite-log.h"
+#include "satellite-encap-pdu-status-tag.h"
 #include "satellite-ut-mac.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatUtMac");
 

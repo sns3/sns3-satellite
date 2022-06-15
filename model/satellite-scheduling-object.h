@@ -22,8 +22,9 @@
 #ifndef SATELLITE_SCHEDULING_OBJECT_H_
 #define SATELLITE_SCHEDULING_OBJECT_H_
 
-#include "ns3/simple-ref-count.h"
-#include "ns3/nstime.h"
+#include <ns3/simple-ref-count.h>
+#include <ns3/nstime.h>
+
 
 namespace ns3 {
 

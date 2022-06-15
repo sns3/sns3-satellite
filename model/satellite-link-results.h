@@ -26,9 +26,11 @@
 
 #include <ns3/object.h>
 #include <ns3/ptr.h>
-#include <ns3/satellite-look-up-table.h>
-#include <ns3/satellite-mutual-information-table.h>
-#include <ns3/satellite-enums.h>
+
+#include "satellite-look-up-table.h"
+#include "satellite-mutual-information-table.h"
+#include "satellite-enums.h"
+
 
 namespace ns3 {
 

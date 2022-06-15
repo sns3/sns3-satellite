@@ -18,6 +18,8 @@
  * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
+#include <ns3/log.h>
+
 #include "satellite-fwd-link-scheduler-default.h"
 
 

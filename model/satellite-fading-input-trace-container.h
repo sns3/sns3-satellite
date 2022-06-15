@@ -20,10 +20,12 @@
 #ifndef SATELLITE_FADING_INPUT_TRACE_CONTAINER_H
 #define SATELLITE_FADING_INPUT_TRACE_CONTAINER_H
 
+#include <ns3/mac48-address.h>
+
+#include <ns3/satellite-input-fstream-time-double-container.h>
 #include "satellite-base-trace-container.h"
-#include "ns3/satellite-input-fstream-time-double-container.h"
 #include "satellite-enums.h"
-#include "ns3/mac48-address.h"
+
 
 namespace ns3 {
 

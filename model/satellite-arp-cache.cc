@@ -18,8 +18,8 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include "ns3/log.h"
-#include "ns3/assert.h"
+#include <ns3/log.h>
+#include <ns3/assert.h>
 
 #include "satellite-arp-cache.h"
 

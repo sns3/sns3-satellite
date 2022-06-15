@@ -20,11 +20,12 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
-#include "ns3/log.h"
-#include "ns3/ptr.h"
+#include <ns3/log.h>
+#include <ns3/ptr.h>
 
 #include "satellite-signal-parameters.h"
 #include "satellite-phy-tx.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatSignalParameters");
 

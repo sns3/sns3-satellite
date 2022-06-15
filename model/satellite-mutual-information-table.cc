@@ -21,11 +21,13 @@
 
 #include <cmath>
 
-#include "ns3/log.h"
-#include "ns3/double.h"
-#include "ns3/fatal-error.h"
+#include <ns3/log.h>
+#include <ns3/double.h>
+#include <ns3/fatal-error.h>
+
 #include "satellite-mutual-information-table.h"
 #include "satellite-utils.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatMutualInformationTable");
 

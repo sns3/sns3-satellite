@@ -24,16 +24,16 @@
 #include <cstring>
 #include <math.h>
 
-#include "ns3/address.h"
-#include "ns3/ptr.h"
-#include "ns3/node.h"
-#include "ns3/callback.h"
-#include "ns3/packet.h"
-#include "ns3/traced-callback.h"
-#include "ns3/nstime.h"
-#include "ns3/mac48-address.h"
-#include "ns3/random-variable-stream.h"
-#include "ns3/timer.h"
+#include <ns3/address.h>
+#include <ns3/ptr.h>
+#include <ns3/node.h>
+#include <ns3/callback.h>
+#include <ns3/packet.h>
+#include <ns3/traced-callback.h>
+#include <ns3/nstime.h>
+#include <ns3/mac48-address.h>
+#include <ns3/random-variable-stream.h>
+#include <ns3/timer.h>
 
 #include "satellite-mac.h"
 #include "satellite-net-device.h"
@@ -43,7 +43,8 @@
 #include "satellite-bbframe.h"
 #include "satellite-bbframe-container.h"
 #include "satellite-cno-estimator.h"
-#include "ns3/satellite-bbframe-conf.h"
+#include "satellite-bbframe-conf.h"
+
 
 namespace ns3 {
 

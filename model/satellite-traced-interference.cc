@@ -20,10 +20,12 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
-#include "ns3/simulator.h"
-#include "ns3/log.h"
+#include <ns3/simulator.h>
+#include <ns3/log.h>
+#include <ns3/singleton.h>
+
 #include "satellite-traced-interference.h"
-#include "ns3/singleton.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatTracedInterference");
 

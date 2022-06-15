@@ -24,16 +24,17 @@
 
 #include <algorithm>
 
-#include "ns3/simulator.h"
-#include "ns3/log.h"
-#include "ns3/ipv4-header.h"
+#include <ns3/simulator.h>
+#include <ns3/log.h>
+#include <ns3/ipv4-header.h>
 
-#include "ns3/satellite-phy.h"
-#include "ns3/satellite-time-tag.h"
+#include "satellite-phy.h"
+#include "satellite-time-tag.h"
 
-#include "ns3/lora-tag.h"
-#include "ns3/lorawan-mac-end-device.h"
-#include "ns3/lorawan-mac-end-device-class-a.h"
+#include "lora-tag.h"
+#include "lorawan-mac-end-device.h"
+#include "lorawan-mac-end-device-class-a.h"
+
 
 namespace ns3 {
 

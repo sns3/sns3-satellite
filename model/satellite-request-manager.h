@@ -24,13 +24,16 @@
 #define SATELLITE_REQUEST_MANAGER_H_
 
 #include <deque>
-#include "ns3/object.h"
-#include "ns3/callback.h"
+
+#include <ns3/object.h>
+#include <ns3/callback.h>
+
 #include "satellite-queue.h"
 #include "satellite-lower-layer-service.h"
 #include "satellite-control-message.h"
 #include "satellite-enums.h"
 #include "satellite-node-info.h"
+
 
 namespace ns3 {
 

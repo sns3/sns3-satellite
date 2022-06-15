@@ -18,10 +18,12 @@
  * Author: Bastien TAURAN <bastien.tauran@viveris.fr>
  */
 
-#include <ns3/lorawan-mac-header.h>
-#include <ns3/lora-frame-header.h>
+#include <ns3/log.h>
 
+#include "lorawan-mac-header.h"
+#include "lora-frame-header.h"
 #include "satellite-lorawan-net-device.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatLorawanNetDevice");
 

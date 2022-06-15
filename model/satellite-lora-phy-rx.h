@@ -21,13 +21,13 @@
 #ifndef SAT_LORA_PHY_RX_H
 #define SAT_LORA_PHY_RX_H
 
-#include "ns3/object.h"
-#include "ns3/packet.h"
-#include "ns3/nstime.h"
+#include <ns3/object.h>
+#include <ns3/packet.h>
+#include <ns3/nstime.h>
 
-#include "ns3/satellite-phy-rx.h"
+#include "satellite-phy-rx.h"
+#include "satellite-lora-phy-tx.h"
 
-#include "ns3/satellite-lora-phy-tx.h"
 
 namespace ns3 {
 

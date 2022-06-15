@@ -22,7 +22,9 @@
 
 #include <ns3/log.h>
 #include <ns3/simulator.h>
+
 #include "satellite-phy-rx-carrier-uplink.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatPhyRxCarrierUplink");
 

@@ -17,10 +17,14 @@
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
-#include "satellite-rx-power-input-trace-container.h"
-#include "ns3/satellite-env-variables.h"
-#include "ns3/singleton.h"
+
+#include <ns3/log.h>
+#include <ns3/singleton.h>
+
+#include "../utils/satellite-env-variables.h"
 #include "satellite-id-mapper.h"
+#include "satellite-rx-power-input-trace-container.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatRxPowerInputTraceContainer");
 

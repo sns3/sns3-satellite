@@ -18,16 +18,18 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include "ns3/simulator.h"
-#include "ns3/log.h"
-#include "ns3/enum.h"
-#include "ns3/singleton.h"
-#include "ns3/uinteger.h"
+#include <ns3/simulator.h>
+#include <ns3/log.h>
+#include <ns3/enum.h>
+#include <ns3/singleton.h>
+#include <ns3/uinteger.h>
+
 #include "satellite-queue.h"
 #include "satellite-utils.h"
 #include "satellite-const-variables.h"
 #include "satellite-log.h"
-#include "ns3/satellite-control-message.h"
+#include "satellite-control-message.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatQueue");
 

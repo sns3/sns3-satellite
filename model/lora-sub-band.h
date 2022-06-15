@@ -23,9 +23,11 @@
 #ifndef LORA_SUB_BAND_H
 #define LORA_SUB_BAND_H
 
-#include "ns3/object.h"
-#include "ns3/lora-logical-channel.h"
-#include "ns3/nstime.h"
+#include <ns3/object.h>
+#include <ns3/nstime.h>
+
+#include "lora-logical-channel.h"
+
 
 namespace ns3 {
 

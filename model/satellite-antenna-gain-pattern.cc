@@ -20,10 +20,13 @@
 
 #include <algorithm>
 #include <stdlib.h>
-#include "ns3/double.h"
-#include "ns3/log.h"
+
+#include <ns3/double.h>
+#include <ns3/log.h>
+
 #include "satellite-utils.h"
 #include "satellite-antenna-gain-pattern.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatAntennaGainPattern");
 

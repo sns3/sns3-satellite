@@ -25,8 +25,10 @@
 #include <ns3/callback.h>
 #include <ns3/traced-callback.h>
 #include <ns3/nstime.h>
-#include <ns3/satellite-mac.h>
-#include <ns3/satellite-phy.h>
+
+#include "satellite-mac.h"
+#include "satellite-phy.h"
+
 
 namespace ns3 {
 

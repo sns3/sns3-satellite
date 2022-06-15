@@ -19,14 +19,17 @@
  */
 
 #include <algorithm>
+
 #include <ns3/log.h>
 #include <ns3/boolean.h>
 #include <ns3/uinteger.h>
 #include <ns3/packet.h>
-#include <ns3/satellite-node-info.h>
-#include <ns3/satellite-lower-layer-service.h>
-#include <ns3/satellite-scheduling-object.h>
+
+#include "satellite-node-info.h"
+#include "satellite-lower-layer-service.h"
+#include "satellite-scheduling-object.h"
 #include "satellite-ut-scheduler.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatUtScheduler");
 

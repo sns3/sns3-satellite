@@ -18,6 +18,12 @@
  * Author: Joaquin Muguerza <jmuguerza@toulouse.viveris.fr>
  */
 
+#include <algorithm>
+#include <ostream>
+#include <limits>
+#include <utility>
+#include <iomanip>
+
 #include <ns3/log.h>
 #include <ns3/simulator.h>
 #include <ns3/double.h>
@@ -29,11 +35,6 @@
 #include "satellite-mutual-information-table.h"
 #include "satellite-phy-rx-carrier-per-window.h"
 
-#include <algorithm>
-#include <ostream>
-#include <limits>
-#include <utility>
-#include <iomanip>
 
 NS_LOG_COMPONENT_DEFINE ("SatPhyRxCarrierPerWindow");
 

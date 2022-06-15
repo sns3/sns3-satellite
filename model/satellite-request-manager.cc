@@ -21,16 +21,19 @@
  */
 
 #include <cmath>
-#include "ns3/log.h"
-#include "ns3/enum.h"
-#include "ns3/double.h"
-#include "ns3/simulator.h"
-#include "ns3/boolean.h"
-#include "ns3/nstime.h"
+
+#include <ns3/log.h>
+#include <ns3/enum.h>
+#include <ns3/double.h>
+#include <ns3/simulator.h>
+#include <ns3/boolean.h>
+#include <ns3/nstime.h>
+
 #include "satellite-const-variables.h"
 #include "satellite-request-manager.h"
 #include "satellite-enums.h"
 #include "satellite-utils.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatRequestManager");
 

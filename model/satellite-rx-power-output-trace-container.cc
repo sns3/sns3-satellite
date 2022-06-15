@@ -17,12 +17,15 @@
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
+
+#include <ns3/singleton.h>
+#include <ns3/boolean.h>
+#include <ns3/string.h>
+
 #include "satellite-rx-power-output-trace-container.h"
-#include "ns3/satellite-env-variables.h"
-#include "ns3/singleton.h"
+#include "../utils/satellite-env-variables.h"
 #include "satellite-id-mapper.h"
-#include "ns3/boolean.h"
-#include "ns3/string.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatRxPowerOutputTraceContainer");
 

@@ -20,32 +20,34 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
-#include <ns3/log.h>
-#include <ns3/simulator.h>
-#include <ns3/boolean.h>
-#include <ns3/satellite-utils.h>
-#include <ns3/satellite-constant-interference.h>
-#include <ns3/satellite-per-fragment-interference.h>
-#include <ns3/satellite-per-packet-interference.h>
-#include <ns3/satellite-traced-interference.h>
-#include <ns3/satellite-perfect-interference-elimination.h>
-#include <ns3/satellite-residual-interference-elimination.h>
-#include <ns3/satellite-mac-tag.h>
-#include <ns3/singleton.h>
-#include <ns3/satellite-composite-sinr-output-trace-container.h>
-#include <ns3/satellite-rtn-link-time.h>
-#include <ns3/satellite-crdsa-replica-tag.h>
-#include <ns3/satellite-const-variables.h>
-#include <ns3/satellite-phy-rx-carrier-packet-probe.h>
-#include <ns3/address.h>
-#include <ns3/satellite-phy.h>
-#include <ns3/satellite-signal-parameters.h>
-#include "satellite-phy-rx-carrier.h"
-
 #include <algorithm>
 #include <ostream>
 #include <limits>
 #include <utility>
+
+#include <ns3/log.h>
+#include <ns3/simulator.h>
+#include <ns3/boolean.h>
+#include <ns3/singleton.h>
+#include <ns3/address.h>
+
+#include "satellite-utils.h"
+#include "satellite-constant-interference.h"
+#include "satellite-per-fragment-interference.h"
+#include "satellite-per-packet-interference.h"
+#include "satellite-traced-interference.h"
+#include "satellite-perfect-interference-elimination.h"
+#include "satellite-residual-interference-elimination.h"
+#include "satellite-mac-tag.h"
+#include "satellite-composite-sinr-output-trace-container.h"
+#include "satellite-rtn-link-time.h"
+#include "satellite-crdsa-replica-tag.h"
+#include "satellite-const-variables.h"
+#include "../stats/satellite-phy-rx-carrier-packet-probe.h"
+#include "satellite-phy.h"
+#include "satellite-signal-parameters.h"
+#include "satellite-phy-rx-carrier.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatPhyRxCarrier");
 

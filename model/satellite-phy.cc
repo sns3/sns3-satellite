@@ -27,18 +27,18 @@
 #include <ns3/node.h>
 
 #include "satellite-phy.h"
-#include <ns3/satellite-utils.h>
-#include <ns3/satellite-phy-rx.h>
-#include <ns3/satellite-phy-tx.h>
-#include <ns3/satellite-lora-phy-rx.h>
-#include <ns3/satellite-channel.h>
-#include <ns3/satellite-mac.h>
-#include <ns3/satellite-signal-parameters.h>
-#include <ns3/satellite-node-info.h>
-#include <ns3/satellite-enums.h>
-#include <ns3/satellite-address-tag.h>
-#include <ns3/satellite-time-tag.h>
-#include <ns3/satellite-typedefs.h>
+#include "satellite-utils.h"
+#include "satellite-phy-rx.h"
+#include "satellite-phy-tx.h"
+#include "satellite-lora-phy-rx.h"
+#include "satellite-channel.h"
+#include "satellite-mac.h"
+#include "satellite-signal-parameters.h"
+#include "satellite-node-info.h"
+#include "satellite-enums.h"
+#include "satellite-address-tag.h"
+#include "satellite-time-tag.h"
+#include "satellite-typedefs.h"
 
 
 NS_LOG_COMPONENT_DEFINE ("SatPhy");

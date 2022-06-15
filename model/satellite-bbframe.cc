@@ -18,10 +18,12 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include "ns3/log.h"
+#include <ns3/log.h>
+
 #include "satellite-utils.h"
 #include "satellite-bbframe.h"
 #include "satellite-const-variables.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatBbFrame");
 

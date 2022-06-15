@@ -26,11 +26,13 @@
 #include <ns3/boolean.h>
 #include <ns3/nstime.h>
 #include <ns3/pointer.h>
-#include <ns3/satellite-mac-tag.h>
-#include <ns3/satellite-address-tag.h>
-#include <ns3/satellite-time-tag.h>
-#include <ns3/satellite-typedefs.h>
+
+#include "satellite-mac-tag.h"
+#include "satellite-address-tag.h"
+#include "satellite-time-tag.h"
+#include "satellite-typedefs.h"
 #include "satellite-mac.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatMac");
 

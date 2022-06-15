@@ -22,12 +22,12 @@
 
 #include <cmath>
 
-#include "ns3/simulator.h"
-#include "ns3/boolean.h"
-#include "ns3/double.h"
-#include "ns3/enum.h"
-#include "ns3/object-factory.h"
-#include "ns3/log.h"
+#include <ns3/simulator.h>
+#include <ns3/boolean.h>
+#include <ns3/double.h>
+#include <ns3/enum.h>
+#include <ns3/object-factory.h>
+#include <ns3/log.h>
 
 #include "satellite-utils.h"
 #include "satellite-phy.h"

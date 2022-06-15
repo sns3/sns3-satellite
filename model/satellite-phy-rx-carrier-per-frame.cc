@@ -20,16 +20,17 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
+#include <algorithm>
+#include <ostream>
+#include <limits>
+#include <utility>
+
 #include <ns3/log.h>
 #include <ns3/simulator.h>
 #include <ns3/boolean.h>
 
 #include "satellite-phy-rx-carrier-per-frame.h"
 
-#include <algorithm>
-#include <ostream>
-#include <limits>
-#include <utility>
 
 NS_LOG_COMPONENT_DEFINE ("SatPhyRxCarrierPerFrame");
 

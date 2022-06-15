@@ -20,16 +20,18 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
-#include <ns3/log.h>
-#include <ns3/simulator.h>
-#include <ns3/boolean.h>
-#include <ns3/address.h>
-#include "satellite-phy-rx-carrier-per-slot.h"
-
 #include <algorithm>
 #include <ostream>
 #include <limits>
 #include <utility>
+
+#include <ns3/log.h>
+#include <ns3/simulator.h>
+#include <ns3/boolean.h>
+#include <ns3/address.h>
+
+#include "satellite-phy-rx-carrier-per-slot.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatPhyRxCarrierPerSlot");
 

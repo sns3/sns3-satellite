@@ -19,8 +19,8 @@
  */
 
 
-#include "ns3/log.h"
-#include "ns3/fatal-error.h"
+#include <ns3/log.h>
+#include <ns3/fatal-error.h>
 
 #include "satellite-enums.h"
 #include "satellite-beam-channel-pair.h"

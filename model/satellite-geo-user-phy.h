@@ -21,14 +21,16 @@
 #ifndef SATELLITE_GEO_USER_PHY_H
 #define SATELLITE_GEO_USER_PHY_H
 
-#include "ns3/ptr.h"
-#include "ns3/nstime.h"
-#include "ns3/object.h"
-#include "ns3/packet.h"
-#include "ns3/address.h"
+#include <ns3/ptr.h>
+#include <ns3/nstime.h>
+#include <ns3/object.h>
+#include <ns3/packet.h>
+#include <ns3/address.h>
+
 #include "satellite-phy.h"
 #include "satellite-signal-parameters.h"
-#include "ns3/satellite-frame-conf.h"
+#include "satellite-frame-conf.h"
+
 
 namespace ns3 {
 

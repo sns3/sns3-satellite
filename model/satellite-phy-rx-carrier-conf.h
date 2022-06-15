@@ -23,12 +23,13 @@
 #ifndef SATELLITE_PHY_RX_CARRIER_CONF_H_
 #define SATELLITE_PHY_RX_CARRIER_CONF_H_
 
-#include "ns3/object.h"
+#include <ns3/object.h>
 
 #include "satellite-channel.h"
 #include "satellite-link-results.h"
 #include "satellite-channel-estimation-error-container.h"
 #include "satellite-typedefs.h"
+
 
 namespace ns3 {
 

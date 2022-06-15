@@ -20,10 +20,11 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
-#include "ns3/log.h"
-#include "ns3/object-vector.h"
-#include "ns3/antenna-model.h"
-#include "ns3/object-factory.h"
+#include <ns3/log.h>
+#include <ns3/object-vector.h>
+#include <ns3/antenna-model.h>
+#include <ns3/object-factory.h>
+
 #include "satellite-utils.h"
 #include "satellite-net-device.h"
 #include "satellite-phy.h"
@@ -37,6 +38,7 @@
 #include "satellite-phy-rx-carrier-conf.h"
 #include "satellite-signal-parameters.h"
 #include "satellite-antenna-gain-pattern.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatPhyRx");
 

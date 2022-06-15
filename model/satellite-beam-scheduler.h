@@ -26,15 +26,18 @@
 #include <vector>
 #include <list>
 #include <map>
+
 #include <ns3/object.h>
 #include <ns3/simple-ref-count.h>
 #include <ns3/ptr.h>
 #include <ns3/callback.h>
 #include <ns3/nstime.h>
 #include <ns3/traced-callback.h>
-#include <ns3/satellite-cno-estimator.h>
-#include <ns3/satellite-enums.h>
-#include <ns3/satellite-frame-allocator.h>
+
+#include "satellite-cno-estimator.h"
+#include "satellite-enums.h"
+#include "satellite-frame-allocator.h"
+
 
 namespace ns3 {
 

@@ -21,10 +21,12 @@
 #ifndef SATELLITE_MOBILITY_OBSERVER_H
 #define SATELLITE_MOBILITY_OBSERVER_H
 
-#include "ns3/object.h"
+#include <ns3/object.h>
+
 #include "satellite-mobility-model.h"
 #include "satellite-propagation-delay-model.h"
 #include "geo-coordinate.h"
+
 
 namespace ns3 {
 

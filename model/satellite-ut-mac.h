@@ -23,21 +23,24 @@
 #ifndef SATELLITE_UT_MAC_H
 #define SATELLITE_UT_MAC_H
 
+#include <utility>
+
 #include <ns3/ptr.h>
 #include <ns3/callback.h>
 #include <ns3/traced-callback.h>
 #include <ns3/traced-value.h>
 #include <ns3/nstime.h>
-#include <ns3/satellite-mac.h>
-#include <ns3/satellite-phy.h>
-#include <ns3/satellite-queue.h>
-#include <ns3/satellite-ut-scheduler.h>
-#include <ns3/satellite-signal-parameters.h>
-#include <ns3/satellite-random-access-container.h>
-#include <ns3/satellite-enums.h>
-#include <ns3/satellite-beam-scheduler.h>
-#include <ns3/satellite-ut-mac-state.h>
-#include <utility>
+
+#include "satellite-mac.h"
+#include "satellite-phy.h"
+#include "satellite-queue.h"
+#include "satellite-ut-scheduler.h"
+#include "satellite-signal-parameters.h"
+#include "satellite-random-access-container.h"
+#include "satellite-enums.h"
+#include "satellite-beam-scheduler.h"
+#include "satellite-ut-mac-state.h"
+
 
 namespace ns3 {
 

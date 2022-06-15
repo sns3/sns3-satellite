@@ -21,7 +21,8 @@
 #ifndef SAT_LORA_PHY_TX_H
 #define SAT_LORA_PHY_TX_H
 
-#include "ns3/satellite-phy-tx.h"
+#include "satellite-phy-tx.h"
+
 
 namespace ns3 {
 
