@@ -20,8 +20,10 @@
 #ifndef SATELLITE_ID_MAPPER_H
 #define SATELLITE_ID_MAPPER_H
 
-#include <ns3/object.h>
 #include <map>
+
+#include <ns3/object.h>
+
 
 namespace ns3 {
 

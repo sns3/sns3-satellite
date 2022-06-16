@@ -26,7 +26,7 @@
 #include <ns3/object.h>
 #include <ns3/callback.h>
 
-#include <ns3/satellite-antenna-gain-pattern-container.h>
+#include "satellite-antenna-gain-pattern-container.h"
 
 
 namespace ns3 {

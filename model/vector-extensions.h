@@ -25,7 +25,8 @@
 #ifndef SATELLITE_VECTOR_EXTENSIONS_H
 #define SATELLITE_VECTOR_EXTENSIONS_H
 
-#include "ns3/vector.h"
+#include <ns3/vector.h>
+
 
 namespace ns3 {
 

@@ -24,20 +24,20 @@
 #ifndef LORA_NETWORK_SERVER_H
 #define LORA_NETWORK_SERVER_H
 
-#include "ns3/object.h"
-#include "ns3/application.h"
-#include "ns3/net-device.h"
-#include "ns3/point-to-point-net-device.h"
-#include "ns3/packet.h"
-#include "ns3/node-container.h"
-#include "ns3/log.h"
+#include <ns3/object.h>
+#include <ns3/application.h>
+#include <ns3/net-device.h>
+#include <ns3/point-to-point-net-device.h>
+#include <ns3/packet.h>
+#include <ns3/node-container.h>
 
-#include "ns3/lora-device-address.h"
-#include "ns3/lora-gateway-status.h"
-#include "ns3/lora-network-status.h"
-#include "ns3/lora-network-scheduler.h"
-#include "ns3/lora-network-controller.h"
-#include "ns3/lorawan-mac-end-device-class-a.h"
+#include "lora-device-address.h"
+#include "lora-gateway-status.h"
+#include "lora-network-status.h"
+#include "lora-network-scheduler.h"
+#include "lora-network-controller.h"
+#include "lorawan-mac-end-device-class-a.h"
+
 
 namespace ns3 {
 

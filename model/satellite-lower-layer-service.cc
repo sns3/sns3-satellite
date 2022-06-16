@@ -20,16 +20,18 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
-#include "ns3/object.h"
-#include "ns3/log.h"
-#include "ns3/boolean.h"
-#include "ns3/double.h"
-#include "ns3/uinteger.h"
-#include "ns3/string.h"
-#include "ns3/pointer.h"
-#include "ns3/random-variable-stream.h"
+#include <ns3/object.h>
+#include <ns3/log.h>
+#include <ns3/boolean.h>
+#include <ns3/double.h>
+#include <ns3/uinteger.h>
+#include <ns3/string.h>
+#include <ns3/pointer.h>
+#include <ns3/random-variable-stream.h>
+
 #include "satellite-lower-layer-service.h"
-#include "../model/satellite-utils.h"
+#include "satellite-utils.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatLowerLayerServiceConf");
 

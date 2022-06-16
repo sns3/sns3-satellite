@@ -19,13 +19,16 @@
  */
 
 #include <fstream>
-#include "ns3/log.h"
-#include "ns3/enum.h"
-#include "ns3/double.h"
-#include "ns3/string.h"
-#include "ns3/singleton.h"
-#include "ns3/satellite-env-variables.h"
+
+#include <ns3/log.h>
+#include <ns3/enum.h>
+#include <ns3/double.h>
+#include <ns3/string.h>
+#include <ns3/singleton.h>
+
+#include "../utils/satellite-env-variables.h"
 #include "satellite-fading-external-input-trace-container.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatFadingExternalInputTraceContainer");
 

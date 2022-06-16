@@ -24,17 +24,19 @@
 #define SATELLITE_PHY_H
 
 #include <string>
-#include "ns3/ptr.h"
-#include "ns3/nstime.h"
-#include "ns3/object.h"
-#include "ns3/packet.h"
-#include "ns3/address.h"
+
+#include <ns3/ptr.h>
+#include <ns3/nstime.h>
+#include <ns3/object.h>
+#include <ns3/packet.h>
+#include <ns3/address.h>
+
 #include "satellite-phy-rx-carrier-conf.h"
 #include "satellite-antenna-gain-pattern.h"
 #include "satellite-signal-parameters.h"
 #include "satellite-node-info.h"
-#include "ns3/satellite-frame-conf.h"
-#include "ns3/satellite-beam-channel-pair.h"
+#include "satellite-frame-conf.h"
+#include "satellite-beam-channel-pair.h"
 
 
 namespace ns3 {

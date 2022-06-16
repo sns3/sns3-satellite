@@ -23,8 +23,10 @@
 
 
 #include <map>
-#include "ns3/event-id.h"
-#include "ns3/mac48-address.h"
+
+#include <ns3/event-id.h>
+#include <ns3/mac48-address.h>
+
 #include "satellite-base-encapsulator.h"
 
 

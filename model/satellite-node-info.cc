@@ -19,7 +19,9 @@
  */
 
 #include <ns3/log.h>
+
 #include "satellite-node-info.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatNodeInfo");
 

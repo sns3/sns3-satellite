@@ -19,7 +19,6 @@
  */
 
 #include "satellite-fwd-link-scheduler-time-slicing.h"
-
 #include "satellite-utils.h"
 
 

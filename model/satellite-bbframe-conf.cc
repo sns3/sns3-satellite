@@ -24,14 +24,17 @@
 #include <utility>
 #include <vector>
 #include <algorithm>
+
 #include <ns3/log.h>
 #include <ns3/string.h>
 #include <ns3/double.h>
 #include <ns3/uinteger.h>
 #include <ns3/boolean.h>
 #include <ns3/enum.h>
-#include <ns3/satellite-utils.h>
+
+#include "satellite-utils.h"
 #include "satellite-bbframe-conf.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatBbFrameConf");
 

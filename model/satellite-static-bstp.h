@@ -22,7 +22,9 @@
 #define SAT_STATIC_BSTP_H
 
 #include <vector>
-#include "ns3/simple-ref-count.h"
+
+#include <ns3/simple-ref-count.h>
+
 
 namespace ns3 {
 

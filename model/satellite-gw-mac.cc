@@ -24,22 +24,21 @@
 #include <ns3/singleton.h>
 #include <ns3/pointer.h>
 #include <ns3/boolean.h>
-
-#include <ns3/satellite-mac-tag.h>
-#include <ns3/satellite-utils.h>
-#include <ns3/satellite-log.h>
-#include <ns3/satellite-rtn-link-time.h>
-
 #include <ns3/packet.h>
 #include <ns3/address.h>
 #include <ns3/mac48-address.h>
-#include <ns3/satellite-bbframe.h>
-#include <ns3/satellite-signal-parameters.h>
-#include <ns3/satellite-control-message.h>
-#include <ns3/satellite-fwd-link-scheduler.h>
-#include <ns3/satellite-time-tag.h>
 
+#include "satellite-mac-tag.h"
+#include "satellite-utils.h"
+#include "satellite-log.h"
+#include "satellite-rtn-link-time.h"
+#include "satellite-bbframe.h"
+#include "satellite-signal-parameters.h"
+#include "satellite-control-message.h"
+#include "satellite-fwd-link-scheduler.h"
+#include "satellite-time-tag.h"
 #include "satellite-gw-mac.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatGwMac");
 

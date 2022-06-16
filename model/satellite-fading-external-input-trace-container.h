@@ -24,11 +24,14 @@
 
 #include <map>
 #include <string>
-#include "ns3/object.h"
-#include "ns3/mobility-model.h"
+
+#include <ns3/object.h>
+#include <ns3/mobility-model.h>
+
 #include "satellite-enums.h"
 #include "geo-coordinate.h"
 #include "satellite-fading-external-input-trace.h"
+
 
 namespace ns3 {
 

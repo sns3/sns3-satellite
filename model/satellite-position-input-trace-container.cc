@@ -18,7 +18,9 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.com>
  */
 
-#include <ns3/satellite-env-variables.h>
+#include <ns3/log.h>
+
+#include "../utils/satellite-env-variables.h"
 #include "satellite-position-input-trace-container.h"
 
 

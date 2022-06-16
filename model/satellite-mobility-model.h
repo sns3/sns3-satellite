@@ -21,7 +21,8 @@
 #ifndef SATELLITE_MOBILITY_MODEL_H
 #define SATELLITE_MOBILITY_MODEL_H
 
-#include "ns3/mobility-model.h"
+#include <ns3/mobility-model.h>
+
 #include "geo-coordinate.h"
 
 namespace ns3 {

@@ -21,8 +21,9 @@
 #ifndef SATELLITE_MAC_TAG_H
 #define SATELLITE_MAC_TAG_H
 
-#include "ns3/mac48-address.h"
-#include "ns3/tag.h"
+#include <ns3/mac48-address.h>
+#include <ns3/tag.h>
+
 
 namespace ns3 {
 

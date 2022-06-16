@@ -23,8 +23,10 @@
 
 #include <map>
 
-#include "ns3/simple-ref-count.h"
+#include <ns3/simple-ref-count.h>
+
 #include "satellite-lower-layer-service.h"
+
 
 namespace ns3 {
 

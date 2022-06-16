@@ -20,11 +20,13 @@
 #ifndef SATELLITE_RAYLEIGH_MODEL_H
 #define SATELLITE_RAYLEIGH_MODEL_H
 
-#include "ns3/vector.h"
+#include <ns3/vector.h>
+#include <ns3/random-variable-stream.h>
+
+#include "satellite-rayleigh-conf.h"
 #include "satellite-fading-oscillator.h"
 #include "satellite-base-fader.h"
-#include "ns3/random-variable-stream.h"
-#include "satellite-rayleigh-conf.h"
+
 
 namespace ns3 {
 

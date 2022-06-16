@@ -18,15 +18,17 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include "ns3/object.h"
-#include "ns3/log.h"
-#include "ns3/output-stream-wrapper.h"
-#include "ns3/trace-helper.h"
-#include "ns3/string.h"
-#include "ns3/mac48-address.h"
-#include "ns3/singleton.h"
+#include <ns3/object.h>
+#include <ns3/log.h>
+#include <ns3/output-stream-wrapper.h>
+#include <ns3/trace-helper.h>
+#include <ns3/string.h>
+#include <ns3/mac48-address.h>
+#include <ns3/singleton.h>
+
 #include "../utils/satellite-env-variables.h"
 #include "satellite-packet-trace.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatPacketTrace");
 

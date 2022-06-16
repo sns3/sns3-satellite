@@ -21,8 +21,10 @@
 #ifndef SATELLITE_GW_LLC_H_
 #define SATELLITE_GW_LLC_H_
 
-#include "ns3/ptr.h"
+#include <ns3/ptr.h>
+
 #include "satellite-llc.h"
+
 
 namespace ns3 {
 

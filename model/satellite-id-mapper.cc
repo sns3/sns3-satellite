@@ -18,12 +18,15 @@
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
 
-#include "satellite-id-mapper.h"
+#include <sstream>
+
 #include <ns3/log.h>
 #include <ns3/node.h>
 #include <ns3/address.h>
-#include <ns3/satellite-net-device.h>
-#include <sstream>
+
+#include "satellite-net-device.h"
+#include "satellite-id-mapper.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatIdMapper");
 

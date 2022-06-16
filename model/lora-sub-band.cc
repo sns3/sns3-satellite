@@ -20,8 +20,10 @@
  * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "ns3/lora-sub-band.h"
-#include "ns3/log.h"
+#include <ns3/log.h>
+
+#include "lora-sub-band.h"
+
 
 namespace ns3 {
 

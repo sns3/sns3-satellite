@@ -21,8 +21,8 @@
 #include <cmath>
 #include <sstream>
 
-#include "ns3/fatal-error.h"
-#include "ns3/log.h"
+#include <ns3/fatal-error.h>
+#include <ns3/log.h>
 
 #include "satellite-utils.h"
 #include "geo-coordinate.h"

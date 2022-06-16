@@ -29,8 +29,10 @@
 #include <ns3/net-device.h>
 #include <ns3/mac48-address.h>
 #include <ns3/traced-callback.h>
-#include <ns3/satellite-enums.h>
-#include <ns3/satellite-packet-classifier.h>
+
+#include "satellite-enums.h"
+#include "satellite-packet-classifier.h"
+
 
 namespace ns3 {
 

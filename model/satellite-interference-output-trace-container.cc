@@ -17,12 +17,16 @@
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
+
+#include <ns3/log.h>
+#include <ns3/boolean.h>
+#include <ns3/string.h>
+#include <ns3/singleton.h>
+
 #include "satellite-interference-output-trace-container.h"
-#include "ns3/satellite-env-variables.h"
-#include "ns3/singleton.h"
 #include "satellite-id-mapper.h"
-#include "ns3/boolean.h"
-#include "ns3/string.h"
+#include "../utils/satellite-env-variables.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatInterferenceOutputTraceContainer");
 

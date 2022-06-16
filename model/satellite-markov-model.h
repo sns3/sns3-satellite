@@ -20,8 +20,8 @@
 #ifndef SATELLITE_MARKOV_MODEL_H
 #define SATELLITE_MARKOV_MODEL_H
 
-#include "ns3/object.h"
-#include "ns3/log.h"
+#include <ns3/object.h>
+
 
 namespace ns3 {
 

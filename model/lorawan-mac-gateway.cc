@@ -22,12 +22,12 @@
 
 #include <ns3/log.h>
 
-#include <ns3/satellite-bbframe-conf.h>
+#include "satellite-bbframe-conf.h"
+#include "satellite-lorawan-net-device.h"
+#include "lorawan-mac-gateway.h"
+#include "lorawan-mac-header.h"
+#include "lora-frame-header.h"
 
-#include <ns3/lorawan-mac-gateway.h>
-#include <ns3/lorawan-mac-header.h>
-#include <ns3/satellite-lorawan-net-device.h>
-#include <ns3/lora-frame-header.h>
 
 namespace ns3 {
 

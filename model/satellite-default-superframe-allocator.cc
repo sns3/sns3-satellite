@@ -22,11 +22,14 @@
 
 #include <algorithm>
 #include <limits>
-#include "ns3/log.h"
-#include "ns3/double.h"
-#include "ns3/boolean.h"
+
+#include <ns3/log.h>
+#include <ns3/double.h>
+#include <ns3/boolean.h>
+
 #include "satellite-utils.h"
 #include "satellite-default-superframe-allocator.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatDefaultSuperframeAllocator");
 

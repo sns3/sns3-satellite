@@ -23,10 +23,10 @@
 #ifndef LORAWAN_MAC_GATEWAY_H
 #define LORAWAN_MAC_GATEWAY_H
 
-#include <ns3/satellite-bbframe-container.h>
+#include "satellite-bbframe-container.h"
+#include "lorawan-mac.h"
+#include "lora-tag.h"
 
-#include <ns3/lorawan-mac.h>
-#include <ns3/lora-tag.h>
 
 namespace ns3 {
 

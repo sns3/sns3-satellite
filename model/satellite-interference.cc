@@ -18,9 +18,11 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include "ns3/simulator.h"
-#include "ns3/log.h"
+#include <ns3/simulator.h>
+#include <ns3/log.h>
+
 #include "satellite-interference.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatInterference");
 

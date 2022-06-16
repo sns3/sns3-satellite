@@ -22,17 +22,19 @@
 #ifndef SATELLITE_CHANNEL_H
 #define SATELLITE_CHANNEL_H
 
-#include "ns3/object.h"
-#include "ns3/nstime.h"
-#include "ns3/channel.h"
-#include "ns3/traced-callback.h"
-#include "ns3/propagation-delay-model.h"
+#include <ns3/object.h>
+#include <ns3/nstime.h>
+#include <ns3/channel.h>
+#include <ns3/traced-callback.h>
+#include <ns3/propagation-delay-model.h>
+
 #include "satellite-signal-parameters.h"
 #include "satellite-free-space-loss.h"
 #include "satellite-phy-rx.h"
 #include "satellite-phy-rx-carrier-conf.h"
 #include "satellite-enums.h"
 #include "satellite-typedefs.h"
+
 
 namespace ns3 {
 

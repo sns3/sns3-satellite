@@ -19,10 +19,13 @@
  */
 
 #include <sstream>
-#include "ns3/log.h"
+
+#include <ns3/log.h>
+#include <ns3/singleton.h>
+
+#include "../utils/satellite-env-variables.h"
 #include "satellite-antenna-gain-pattern-container.h"
-#include "ns3/singleton.h"
-#include "ns3/satellite-env-variables.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatAntennaGainPatternContainer");
 

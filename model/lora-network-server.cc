@@ -21,21 +21,19 @@
  * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "ns3/point-to-point-net-device.h"
-#include "ns3/packet.h"
-#include "ns3/node-container.h"
-#include "ns3/net-device.h"
+#include <ns3/log.h>
 
-#include "ns3/satellite-lorawan-net-device.h"
+#include "satellite-lorawan-net-device.h"
 
-#include "ns3/lora-network-server.h"
-#include "ns3/lora-frame-header.h"
-#include "ns3/lora-device-address.h"
-#include "ns3/lora-network-status.h"
-#include "ns3/lora-frame-header.h"
-#include "ns3/lorawan-mac-command.h"
-#include "ns3/lorawan-mac-end-device-class-a.h"
-#include "ns3/lorawan-mac-header.h"
+#include "lora-network-server.h"
+#include "lora-frame-header.h"
+#include "lora-device-address.h"
+#include "lora-network-status.h"
+#include "lora-frame-header.h"
+#include "lorawan-mac-command.h"
+#include "lorawan-mac-end-device-class-a.h"
+#include "lorawan-mac-header.h"
+
 
 namespace ns3 {
 

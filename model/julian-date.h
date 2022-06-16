@@ -30,7 +30,8 @@
 #include <stdint.h>
 #include <string>
 
-#include "ns3/nstime.h"
+#include <ns3/nstime.h>
+
 
 namespace ns3 {
 

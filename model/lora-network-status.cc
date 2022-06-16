@@ -21,17 +21,18 @@
  * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "ns3/net-device.h"
-#include "ns3/packet.h"
-#include "ns3/node-container.h"
-#include "ns3/log.h"
-#include "ns3/pointer.h"
+#include <ns3/net-device.h>
+#include <ns3/packet.h>
+#include <ns3/node-container.h>
+#include <ns3/log.h>
+#include <ns3/pointer.h>
 
-#include "ns3/lora-beam-tag.h"
-#include "ns3/lora-device-address.h"
-#include "ns3/lora-network-status.h"
-#include "ns3/lora-end-device-status.h"
-#include "ns3/lora-gateway-status.h"
+#include "lora-beam-tag.h"
+#include "lora-device-address.h"
+#include "lora-network-status.h"
+#include "lora-end-device-status.h"
+#include "lora-gateway-status.h"
+
 
 namespace ns3 {
 

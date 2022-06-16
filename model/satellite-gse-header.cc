@@ -18,8 +18,9 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include "ns3/log.h"
-#include "ns3/uinteger.h"
+#include <ns3/log.h>
+#include <ns3/uinteger.h>
+
 #include "satellite-gse-header.h"
 #include "satellite-encap-pdu-status-tag.h"
 

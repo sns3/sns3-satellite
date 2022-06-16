@@ -26,11 +26,12 @@
 
 #include <iterator>
 
-#include "ns3/lora-end-device-status.h"
-#include "ns3/lorawan-mac-end-device-class-a.h"
-#include "ns3/lora-gateway-status.h"
-#include "ns3/lora-device-address.h"
-#include "ns3/lora-network-scheduler.h"
+#include "lora-end-device-status.h"
+#include "lorawan-mac-end-device-class-a.h"
+#include "lora-gateway-status.h"
+#include "lora-device-address.h"
+#include "lora-network-scheduler.h"
+
 
 namespace ns3 {
 

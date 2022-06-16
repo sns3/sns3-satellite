@@ -22,7 +22,9 @@
 #define SATELLITE_FADING_EXTERNAL_INPUT_TRACE_H
 
 #include <vector>
-#include "ns3/simple-ref-count.h"
+
+#include <ns3/simple-ref-count.h>
+
 
 namespace ns3 {
 

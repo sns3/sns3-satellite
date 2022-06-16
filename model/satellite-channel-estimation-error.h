@@ -22,8 +22,9 @@
 #ifndef SATELLITE_CHANNEL_ESTIMATION_ERROR_H_
 #define SATELLITE_CHANNEL_ESTIMATION_ERROR_H_
 
-#include "ns3/object.h"
-#include "ns3/random-variable-stream.h"
+#include <ns3/object.h>
+#include <ns3/random-variable-stream.h>
+
 
 namespace ns3 {
 

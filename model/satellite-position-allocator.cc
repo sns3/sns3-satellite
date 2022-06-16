@@ -20,19 +20,22 @@
  */
 
 #include <limits>
-#include "ns3/double.h"
-#include "ns3/string.h"
-#include "ns3/boolean.h"
-#include "ns3/pointer.h"
-#include "ns3/uinteger.h"
-#include "ns3/enum.h"
-#include "ns3/log.h"
 #include <cmath>
+
+#include <ns3/double.h>
+#include <ns3/string.h>
+#include <ns3/boolean.h>
+#include <ns3/pointer.h>
+#include <ns3/uinteger.h>
+#include <ns3/enum.h>
+#include <ns3/log.h>
+
 #include "satellite-position-allocator.h"
 #include "satellite-antenna-gain-pattern-container.h"
 #include "satellite-utils.h"
 #include "satellite-constant-position-mobility-model.h"
 #include "satellite-mobility-observer.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatPositionAllocator");
 

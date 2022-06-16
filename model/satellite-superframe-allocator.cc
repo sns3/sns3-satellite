@@ -19,8 +19,11 @@
  */
 
 #include <map>
-#include "ns3/log.h"
+
+#include <ns3/log.h>
+
 #include "satellite-superframe-allocator.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatSuperframeAllocator");
 

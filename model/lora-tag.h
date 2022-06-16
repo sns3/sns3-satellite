@@ -25,7 +25,8 @@
 
 #include <ns3/tag.h>
 
-#include <ns3/satellite-enums.h>
+#include "satellite-enums.h"
+
 
 namespace ns3 {
 

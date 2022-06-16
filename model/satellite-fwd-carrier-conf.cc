@@ -18,9 +18,11 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include "ns3/log.h"
-#include "ns3/fatal-error.h"
+#include <ns3/log.h>
+#include <ns3/fatal-error.h>
+
 #include "satellite-fwd-carrier-conf.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatFwdCarrierConf");
 

@@ -19,9 +19,11 @@
  */
 
 #include <math.h>
-#include "ns3/nstime.h"
-#include "ns3/assert.h"
-#include "ns3/log.h"
+
+#include <ns3/nstime.h>
+#include <ns3/assert.h>
+#include <ns3/log.h>
+
 #include "satellite-rtn-link-time.h"
 
 

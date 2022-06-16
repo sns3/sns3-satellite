@@ -21,7 +21,8 @@
 #define SATELLITE_FADING_INPUT_TRACE_H
 
 #include "satellite-base-fading.h"
-#include "ns3/satellite-fading-input-trace-container.h"
+#include "satellite-fading-input-trace-container.h"
+
 
 namespace ns3 {
 

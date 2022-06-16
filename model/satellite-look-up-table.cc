@@ -21,10 +21,12 @@
 
 #include <cmath>
 
-#include "ns3/log.h"
-#include "ns3/fatal-error.h"
+#include <ns3/log.h>
+#include <ns3/fatal-error.h>
+
 #include "satellite-look-up-table.h"
 #include "satellite-utils.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatLookUpTable");
 

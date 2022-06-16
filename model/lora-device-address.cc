@@ -20,9 +20,12 @@
  * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "ns3/lora-device-address.h"
-#include "ns3/log.h"
 #include <bitset>
+
+#include <ns3/log.h>
+
+#include "lora-device-address.h"
+
 
 namespace ns3 {
 

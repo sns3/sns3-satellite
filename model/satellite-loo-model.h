@@ -20,11 +20,13 @@
 #ifndef SATELLITE_LOO_MODEL_H
 #define SATELLITE_LOO_MODEL_H
 
-#include "ns3/vector.h"
+#include <ns3/vector.h>
+#include <ns3/random-variable-stream.h>
+
 #include "satellite-base-fader.h"
 #include "satellite-fading-oscillator.h"
 #include "satellite-loo-conf.h"
-#include "ns3/random-variable-stream.h"
+
 
 namespace ns3 {
 

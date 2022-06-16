@@ -25,15 +25,17 @@
 
 #include <map>
 
-#include "ns3/mobility-model.h"
-#include "ns3/packet.h"
-#include "ns3/nstime.h"
-#include "ns3/satellite-net-device.h"
-#include "ns3/mac48-address.h"
+#include <ns3/mobility-model.h>
+#include <ns3/packet.h>
+#include <ns3/nstime.h>
+#include <ns3/mac48-address.h>
+
+#include "satellite-net-device.h"
 #include "satellite-signal-parameters.h"
 #include "satellite-antenna-gain-pattern.h"
 #include "satellite-mobility-model.h"
 #include "satellite-base-fading.h"
+
 
 namespace ns3 {
 

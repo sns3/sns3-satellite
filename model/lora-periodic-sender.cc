@@ -24,9 +24,10 @@
 #include <ns3/log.h>
 #include <ns3/double.h>
 #include <ns3/string.h>
-#include <ns3/satellite-lorawan-net-device.h>
 
+#include "satellite-lorawan-net-device.h"
 #include "lora-periodic-sender.h"
+
 
 namespace ns3 {
 

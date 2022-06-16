@@ -21,9 +21,12 @@
  */
 
 
+#include <ns3/log.h>
+#include <ns3/uinteger.h>
+#include <ns3/double.h>
+
 #include "satellite-random-access-container-conf.h"
-#include "ns3/uinteger.h"
-#include "ns3/double.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatRandomAccessConf");
 

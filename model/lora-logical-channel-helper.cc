@@ -20,10 +20,11 @@
  * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "ns3/simulator.h"
-#include "ns3/log.h"
+#include <ns3/simulator.h>
+#include <ns3/log.h>
 
-#include "ns3/lora-logical-channel-helper.h"
+#include "lora-logical-channel-helper.h"
+
 
 namespace ns3 {
 

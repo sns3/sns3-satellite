@@ -20,10 +20,13 @@
 
 #include <fstream>
 #include <algorithm>
-#include "ns3/simulator.h"
-#include "ns3/log.h"
+
+#include <ns3/simulator.h>
+#include <ns3/log.h>
+
 #include "satellite-fading-external-input-trace.h"
 #include "satellite-utils.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatFadingExternalInputTrace");
 

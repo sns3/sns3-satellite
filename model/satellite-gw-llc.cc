@@ -18,8 +18,8 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include "ns3/simulator.h"
-#include "ns3/log.h"
+#include <ns3/simulator.h>
+#include <ns3/log.h>
 
 #include "satellite-gw-llc.h"
 #include "satellite-scheduling-object.h"
@@ -30,6 +30,7 @@
 #include "satellite-node-info.h"
 #include "satellite-enums.h"
 #include "satellite-utils.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatGwLlc");
 

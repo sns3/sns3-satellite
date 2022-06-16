@@ -30,7 +30,8 @@
 #include <ns3/point-to-point-net-device.h>
 #include <ns3/attribute.h>
 
-#include <ns3/satellite-lorawan-net-device.h>
+#include "satellite-lorawan-net-device.h"
+
 
 namespace ns3 {
 

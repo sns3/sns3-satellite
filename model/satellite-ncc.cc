@@ -21,12 +21,14 @@
  */
 
 #include <ns3/log.h>
-#include <ns3/satellite-control-message.h>
-#include <ns3/satellite-superframe-sequence.h>
-#include <ns3/satellite-lower-layer-service.h>
 #include <ns3/packet.h>
 #include <ns3/address.h>
+
+#include "satellite-control-message.h"
+#include "satellite-superframe-sequence.h"
+#include "satellite-lower-layer-service.h"
 #include "satellite-ncc.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatNcc");
 

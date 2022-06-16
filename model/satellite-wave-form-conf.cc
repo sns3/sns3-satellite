@@ -25,14 +25,16 @@
 #include <limits>
 #include <utility>
 #include <map>
+
 #include <ns3/log.h>
 #include <ns3/double.h>
 #include <ns3/boolean.h>
 #include <ns3/uinteger.h>
 #include <ns3/enum.h>
-#include <ns3/satellite-const-variables.h>
-#include <ns3/satellite-utils.h>
-#include <ns3/satellite-link-results.h>
+
+#include "satellite-const-variables.h"
+#include "satellite-utils.h"
+#include "satellite-link-results.h"
 #include "satellite-wave-form-conf.h"
 
 

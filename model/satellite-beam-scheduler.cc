@@ -23,25 +23,27 @@
 #include <algorithm>
 #include <utility>
 #include <sstream>
+
 #include <ns3/log.h>
 #include <ns3/double.h>
 #include <ns3/boolean.h>
 #include <ns3/enum.h>
 #include <ns3/singleton.h>
-#include <ns3/satellite-id-mapper.h>
-#include <ns3/satellite-rtn-link-time.h>
-#include <ns3/satellite-const-variables.h>
-#include <ns3/satellite-frame-symbol-load-probe.h>
-#include <ns3/satellite-frame-user-load-probe.h>
 #include <ns3/address.h>
 #include <ns3/mac48-address.h>
 #include <ns3/ipv4-address.h>
-#include <ns3/satellite-superframe-sequence.h>
-#include <ns3/satellite-default-superframe-allocator.h>
-#include <ns3/satellite-superframe-allocator.h>
-#include <ns3/satellite-dama-entry.h>
-#include <ns3/satellite-control-message.h>
-#include <ns3/satellite-lower-layer-service.h>
+
+#include "satellite-id-mapper.h"
+#include "satellite-rtn-link-time.h"
+#include "satellite-const-variables.h"
+#include "../stats/satellite-frame-symbol-load-probe.h"
+#include "../stats/satellite-frame-user-load-probe.h"
+#include "satellite-superframe-sequence.h"
+#include "satellite-default-superframe-allocator.h"
+#include "satellite-superframe-allocator.h"
+#include "satellite-dama-entry.h"
+#include "satellite-control-message.h"
+#include "satellite-lower-layer-service.h"
 #include "satellite-beam-scheduler.h"
 
 

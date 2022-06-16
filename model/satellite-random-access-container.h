@@ -24,14 +24,16 @@
 #ifndef SATELLITE_RANDOM_ACCESS_H
 #define SATELLITE_RANDOM_ACCESS_H
 
-#include "ns3/object.h"
-#include "ns3/uinteger.h"
-#include "ns3/log.h"
-#include "ns3/simulator.h"
-#include "satellite-random-access-container-conf.h"
-#include "ns3/random-variable-stream.h"
 #include <set>
+
+#include <ns3/object.h>
+#include <ns3/uinteger.h>
+#include <ns3/simulator.h>
+#include <ns3/random-variable-stream.h>
+
+#include "satellite-random-access-container-conf.h"
 #include "satellite-enums.h"
+
 
 namespace ns3 {
 

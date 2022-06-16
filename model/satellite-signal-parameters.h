@@ -23,12 +23,14 @@
 #ifndef SATELLITE_SIGNAL_PARAMETERS_H
 #define SATELLITE_SIGNAL_PARAMETERS_H
 
-#include "ns3/ptr.h"
-#include "ns3/packet.h"
-#include "ns3/nstime.h"
-#include "ns3/object.h"
+#include <ns3/ptr.h>
+#include <ns3/packet.h>
+#include <ns3/nstime.h>
+#include <ns3/object.h>
+
 #include "satellite-enums.h"
 #include "satellite-utils.h"
+
 
 namespace ns3 {
 

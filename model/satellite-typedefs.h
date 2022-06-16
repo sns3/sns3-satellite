@@ -23,7 +23,9 @@
 
 #include <ns3/callback.h>
 #include <ns3/ptr.h>
-#include <ns3/satellite-enums.h>
+
+#include "satellite-enums.h"
+
 
 namespace ns3 {
 
