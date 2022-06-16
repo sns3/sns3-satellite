@@ -5,6 +5,8 @@ import os
 def compile_generator(bld):
     base_path = 'contrib/satellite/model'
     data_path = '%s/../data/sgp4' % (base_path)
+    if not os.path.isdir(data_path):
+        return
     cxxflags = ' '.join(str(x) for x in bld.env['CXXFLAGS'])
     cxx = bld.env['COMPILER_CXX']
     src = '%s/constants-gen.cc' % data_path
