@@ -64,8 +64,7 @@ main (int argc, char *argv[])
 
 
   // Find the input xml file in case example is run from other than ns-3 root directory
-  Singleton<SatEnvVariables> satEnvVariables;
-  std::string pathToFile = satEnvVariables.Get ()->LocateFile ("contrib/satellite/examples/tn9-dama-input-attributes.xml");
+  std::string pathToFile = Singleton<SatEnvVariables>::Get ()->LocateFile ("contrib/satellite/examples/tn9-dama-input-attributes.xml");
 
   // read command line parameters given by user
   CommandLine cmd;
