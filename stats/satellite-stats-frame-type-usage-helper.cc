@@ -221,7 +221,6 @@ SatStatsFrameTypeUsageHelper::DoInstall ()
 	                                        context.str (), frameTypeUsageCallback);
 	      NS_ASSERT_MSG (ret,
 	                     "Error connecting to BBFrameTxTrace of beam " << beamId);
-	      NS_UNUSED (ret);
 	      NS_LOG_INFO (this << " successfully connected"
 	                        << " with beam " << beamId);
   	  }

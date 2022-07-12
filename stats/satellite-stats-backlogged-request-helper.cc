@@ -125,7 +125,6 @@ SatStatsBackloggedRequestHelper::DoInstall ()
                                         context.str (), aggregatorSink);
       NS_ASSERT_MSG (ret,
                      "Error connecting to BacklogRequestsTrace of beam " << *it);
-      NS_UNUSED (ret);
       NS_LOG_INFO (this << " successfully connected"
                         << " with beam " << *it);
     }

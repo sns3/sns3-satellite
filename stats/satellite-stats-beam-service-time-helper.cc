@@ -132,7 +132,6 @@ SatStatsBeamServiceTimeHelper::DoInstall ()
 	                                        context.str (), beamServiceCallback);
 	      NS_ASSERT_MSG (ret,
 	                     "Error connecting to BeamServiceTime of beam " << beamId);
-	      NS_UNUSED (ret);
 	      NS_LOG_INFO (this << " successfully connected"
 	                        << " with beam " << beamId);
   	  }

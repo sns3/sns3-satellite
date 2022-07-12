@@ -118,7 +118,6 @@ SatStatsWaveformUsageHelper::DoInstall ()
                                         context.str (), waveformUsageCallback);
       NS_ASSERT_MSG (ret,
                      "Error connecting to WaveformTrace of beam " << *it);
-      NS_UNUSED (ret);
       NS_LOG_INFO (this << " successfully connected"
                         << " with beam " << *it);
     }

@@ -2,3 +2,10 @@ __pycache__
 ext-utils/.uncrustifyignore
 *.xz
 .hgignore
+
+cmake-cache/
+cmake-build-debug/
+cmake-build-relwithdebinfo/
+cmake-build-minsizerel/
+cmake-build-release/
+CMakeFiles/
