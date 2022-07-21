@@ -135,12 +135,21 @@ SatGeoFeederPhy::SatGeoFeederPhy (void)
 
 SatGeoFeederPhy::SatGeoFeederPhy (SatPhy::CreateParam_t& params,
                                   SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
-                                  Ptr<SatSuperframeConf> superFrameConf)
+                                  Ptr<SatSuperframeConf> superFrameConf,
+                                  SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                                  SatEnums::RegenerationMode_t returnLinkRegenerationMode)
   : SatPhy (params)
 {
   NS_LOG_FUNCTION (this);
 
-  SatPhy::GetPhyTx ()->SetAttribute ("TxMode", EnumValue (SatPhyTx::TRANSPARENT));
+  if (returnLinkRegenerationMode == SatEnums::TRANSPARENT)
+    {
+      SatPhy::GetPhyTx ()->SetAttribute ("TxMode", EnumValue (SatPhyTx::TRANSPARENT));
+    }
+  else
+    {
+      SatPhy::GetPhyTx ()->SetAttribute ("TxMode", EnumValue (SatPhyTx::NORMAL));
+    }
 
   ObjectBase::ConstructSelf (AttributeConstructionList ());
 
@@ -153,7 +162,15 @@ SatGeoFeederPhy::SatGeoFeederPhy (SatPhy::CreateParam_t& params,
   parameters.m_extNoiseDensityWhz = SatUtils::DbToLinear ( m_extNoisePowerDensityDbwHz );
   parameters.m_aciIfWrtNoiseFactor = 0.0;
   parameters.m_errorModel = SatPhyRxCarrierConf::EM_NONE;
-  parameters.m_rxMode = SatPhyRxCarrierConf::TRANSPARENT;
+  if (forwardLinkRegenerationMode == SatEnums::TRANSPARENT)
+    {
+      parameters.m_rxMode = SatPhyRxCarrierConf::TRANSPARENT;
+    }
+  else
+    {
+      parameters.m_rxMode = SatPhyRxCarrierConf::NORMAL;
+    }
+  parameters.m_linkRegenerationMode = forwardLinkRegenerationMode;
   parameters.m_chType = SatEnums::FORWARD_FEEDER_CH;
 
   Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf> (parameters);

@@ -165,7 +165,9 @@ public:
                         Ptr<SatChannel> ur,
                         Ptr<SatAntennaGainPattern> userAgp,
                         Ptr<SatAntennaGainPattern> feederAgp,
-                        uint32_t userBeamId);
+                        uint32_t userBeamId,
+                        SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                        SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   /**
    * Enables creation traces to be written in given file

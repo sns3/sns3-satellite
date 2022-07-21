@@ -195,7 +195,16 @@ SatGeoHelper::Install (std::string aName)
 }
 
 void
-SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChannel> fr, Ptr<SatChannel> uf, Ptr<SatChannel> ur, Ptr<SatAntennaGainPattern> userAgp, Ptr<SatAntennaGainPattern> feederAgp, uint32_t userBeamId )
+SatGeoHelper::AttachChannels (Ptr<NetDevice> d,
+                              Ptr<SatChannel> ff,
+                              Ptr<SatChannel> fr,
+                              Ptr<SatChannel> uf,
+                              Ptr<SatChannel> ur,
+                              Ptr<SatAntennaGainPattern> userAgp,
+                              Ptr<SatAntennaGainPattern> feederAgp,
+                              uint32_t userBeamId,
+                              SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                              SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
   NS_LOG_FUNCTION (this << d << ff << fr << uf << ur << userAgp << feederAgp << userBeamId);
 
@@ -236,14 +245,18 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d, Ptr<SatChannel> ff, Ptr<SatChann
 
   Ptr<SatGeoUserPhy> uPhy = CreateObject<SatGeoUserPhy> (params,
                                                          parametersUser,
-                                                         m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE));
+                                                         m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE),
+                                                         forwardLinkRegenerationMode,
+                                                         returnLinkRegenerationMode);
 
   params.m_txCh = fr;
   params.m_rxCh = ff;
 
   Ptr<SatGeoFeederPhy> fPhy = CreateObject<SatGeoFeederPhy> (params,
                                                              parametersFeeder,
-                                                             m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE));
+                                                             m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE),
+                                                             forwardLinkRegenerationMode,
+                                                             returnLinkRegenerationMode);
 
   SatPhy::ReceiveCallback uCb = MakeCallback (&SatGeoNetDevice::ReceiveUser, dev);
   SatPhy::ReceiveCallback fCb = MakeCallback (&SatGeoNetDevice::ReceiveFeeder, dev);

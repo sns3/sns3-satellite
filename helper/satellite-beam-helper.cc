@@ -503,7 +503,9 @@ SatBeamHelper::Install (NodeContainer ut,
                                 userLink.second,
                                 m_antennaGainPatterns->GetAntennaGainPattern (beamId),
                                 m_antennaGainPatterns->GetAntennaGainPattern (feederBeamId),
-                                beamId);
+                                beamId,
+                                m_forwardLinkRegenerationMode,
+                                m_returnLinkRegenerationMode);
 
   // store GW node
   bool storedOk = StoreGwNode (gwId, gwNode);

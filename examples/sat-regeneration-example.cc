@@ -48,6 +48,10 @@ main (int argc, char *argv[])
   std::string scenario = "simple";
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::SIMPLE;
 
+  /// Set regeneration mode
+  Config::SetDefault ("ns3::SatBeamHelper::ForwardLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
+  Config::SetDefault ("ns3::SatBeamHelper::ReturnLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
+
   /// Set simulation output details
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
 
@@ -145,10 +149,10 @@ main (int argc, char *argv[])
 
       simulationHelper->InstallTrafficModel (
         SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
-        Seconds (1.0), Seconds (2.1));
-      simulationHelper->InstallTrafficModel (
+        Seconds (1.0), Seconds (10.0));
+      /*simulationHelper->InstallTrafficModel (
         SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
-        Seconds (7.0), Seconds (9.1));
+        Seconds (1.0), Seconds (10.0));*/
 
     }
 

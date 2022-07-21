@@ -369,6 +369,24 @@ protected:
   }
 
   /**
+   * \brief Get the link regeneration mode
+   * \return Link regeneration mode
+   */
+  inline virtual SatEnums::RegenerationMode_t GetLinkRegenerationMode ()
+  {
+    return m_linkRegenerationMode;
+  }
+
+  /**
+   * \brief Set the link regeneration mode
+   * \param linkRegenerationMode Link regeneration mode
+   */
+  inline void SetLinkRegenerationMode (SatEnums::RegenerationMode_t linkRegenerationMode)
+  {
+    m_linkRegenerationMode = linkRegenerationMode;
+  }
+
+  /**
    * \brief Function for changing the receiver state
    * \param newState New state
    */
@@ -611,9 +629,9 @@ private:
    */
   bool CheckAgainstLinkResultsErrorModelAvi (double cSinr, Ptr<SatSignalParameters> rxParams);
 
-  State m_state;                                                                                                                                //< Current state of the carrier
-  uint32_t m_beamId;                                                                                                            //< Beam ID
-  uint32_t m_carrierId;                                                                                                 //< Carrier ID
+  State m_state;                                                        //< Current state of the carrier
+  uint32_t m_beamId;                                                    //< Beam ID
+  uint32_t m_carrierId;                                                 //< Carrier ID
   bool m_receivingDedicatedAccess;                                      //< Is the carrier receiving a dedicated access packet
   Ptr<SatInterference> m_satInterference;                               //< Interference model
   Ptr<SatInterferenceElimination> m_satInterferenceElimination;         //< Interference model
@@ -629,15 +647,16 @@ private:
    */
   uint32_t m_rxPacketCounter;
 
-  std::map<uint32_t, rxParams_s> m_rxParamsMap; //< Storage for Rx parameters by ID
-  Mac48Address m_ownAddress;                                                                            //< Carrier address
-  Ptr<SatNodeInfo> m_nodeInfo;                                                                  //< NodeInfo of the node where carrier is attached
+  std::map<uint32_t, rxParams_s> m_rxParamsMap;                         //< Storage for Rx parameters by ID
+  Mac48Address m_ownAddress;                                            //< Carrier address
+  Ptr<SatNodeInfo> m_nodeInfo;                                          //< NodeInfo of the node where carrier is attached
   SatEnums::ChannelType_t m_channelType;                                //< Channel type
-  Ptr<SatLinkResults> m_linkResults;                                            //< Link results from the carrier configuration
-  Ptr<SatWaveformConf> m_waveformConf; // Waveform configuration
-  Ptr<UniformRandomVariable> m_uniformVariable; //< Uniform helper random variable
-  SatPhyRxCarrierConf::ErrorModel m_errorModel; //< Error model
-  double m_constantErrorRate;                                                                           //< Error rate for constant error model
+  SatEnums::RegenerationMode_t m_linkRegenerationMode;                  //< Link regeneration mode
+  Ptr<SatLinkResults> m_linkResults;                                    //< Link results from the carrier configuration
+  Ptr<SatWaveformConf> m_waveformConf;                                  //< Waveform configuration
+  Ptr<UniformRandomVariable> m_uniformVariable;                         //< Uniform helper random variable
+  SatPhyRxCarrierConf::ErrorModel m_errorModel;                         //< Error model
+  double m_constantErrorRate;                                           //< Error rate for constant error model
 
   /**
    * \brief Channel estimation error container

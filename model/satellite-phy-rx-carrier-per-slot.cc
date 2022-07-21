@@ -126,7 +126,7 @@ SatPhyRxCarrierPerSlot::CreateInterference (Ptr<SatSignalParameters> rxParams, A
 
       if (rxParams->m_beamId != GetBeamId ())
         {
-          if (!rxParams->HasSinrComputed ())
+          if (!rxParams->HasSinrComputed () && GetLinkRegenerationMode () == SatEnums::TRANSPARENT)
             {
               NS_FATAL_ERROR ("SatPhyRx::StartRx - too long transmission time: packet started to be received in a ground entity while not being fully received on the satellite: interferences could not be properly computed.");
             }
@@ -139,7 +139,15 @@ SatPhyRxCarrierPerSlot::CreateInterference (Ptr<SatSignalParameters> rxParams, A
                                            rxPower,
                                            GetOwnAddress ());
     }
+  else if (ct == SatEnums::RETURN_USER_CH)
+    {
+      return GetInterferenceModel ()->Add (rxParams->m_duration, rxParams->m_rxPower_W, GetOwnAddress ());
+    }
   else if (ct == SatEnums::FORWARD_USER_CH)
+    {
+      return GetInterferenceModel ()->Add (rxParams->m_duration, rxParams->m_rxPower_W, GetOwnAddress ());
+    }
+  else if (ct == SatEnums::FORWARD_FEEDER_CH)
     {
       return GetInterferenceModel ()->Add (rxParams->m_duration, rxParams->m_rxPower_W, GetOwnAddress ());
     }
@@ -162,7 +170,10 @@ SatPhyRxCarrierPerSlot::EndRxData (uint32_t key)
 
   DecreaseNumOfRxState (packetRxParams.rxParams->m_txInfo.packetType);
 
-  NS_ASSERT (packetRxParams.rxParams->HasSinrComputed ());
+  if (GetLinkRegenerationMode () == SatEnums::TRANSPARENT)
+    {
+      NS_ASSERT (packetRxParams.rxParams->HasSinrComputed ());
+    }
 
   packetRxParams.rxParams->SetInterferencePower (GetInterferenceModel ()->Calculate (packetRxParams.interferenceEvent));
 
@@ -234,8 +245,16 @@ SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams,
   /// all the transmissions are not decoded.
   bool phyError (false);
 
-  /// calculate composite SINR
-  double cSinr = CalculateCompositeSinr (sinr, packetRxParams.rxParams->GetSinr ());
+  /// calculate composite SINR if transparent. Otherwise take only current sinr.
+  double cSinr;
+  if (GetLinkRegenerationMode () == SatEnums::TRANSPARENT)
+    {
+      cSinr = CalculateCompositeSinr (sinr, packetRxParams.rxParams->GetSinr ());
+    }
+  else
+    {
+      cSinr = sinr;
+    }
 
   // Update composite SINR trace for DAMA and Slotted ALOHA packets
   m_sinrTrace (SatUtils::LinearToDb (cSinr), packetRxParams.sourceAddress);

@@ -56,7 +56,9 @@ public:
 
   SatGeoUserPhy (SatPhy::CreateParam_t& params,
                  SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
-                 Ptr<SatSuperframeConf> superFrameConf);
+                 Ptr<SatSuperframeConf> superFrameConf,
+                 SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                 SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   /**
    * Destructor for SatGeoUserPhy

@@ -49,6 +49,7 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf ()
   m_carrierCount (),
   m_carrierBandwidthConverter (),
   m_channelType (),
+  m_linkRegenerationMode (),
   m_channelEstimationError (),
   m_sinrCalculate (),
   m_linkResults (),
@@ -75,6 +76,7 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf (RxCarrierCreateParams_s createParams)
   m_carrierCount (createParams.m_carrierCount),
   m_carrierBandwidthConverter (createParams.m_bwConverter),
   m_channelType (createParams.m_chType),
+  m_linkRegenerationMode (createParams.m_linkRegenerationMode),
   m_channelEstimationError (createParams.m_cec),
   m_sinrCalculate (),
   m_linkResults (),
@@ -217,6 +219,12 @@ SatEnums::ChannelType_t
 SatPhyRxCarrierConf::GetChannelType () const
 {
   return m_channelType;
+}
+
+SatEnums::RegenerationMode_t
+SatPhyRxCarrierConf::GetLinkRegenerationMode () const
+{
+  return m_linkRegenerationMode;
 }
 
 bool

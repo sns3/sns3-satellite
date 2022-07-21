@@ -75,6 +75,9 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
   // Set channel type
   SetChannelType (carrierConf->GetChannelType ());
 
+  // Set link regeneration mode
+  SetLinkRegenerationMode (carrierConf->GetLinkRegenerationMode ());
+
   // Create proper interference object for carrier i
   DoCreateInterferenceModel (carrierConf, carrierId, m_rxBandwidthHz);
   DoCreateInterferenceEliminationModel (carrierConf, carrierId, waveformConf);
