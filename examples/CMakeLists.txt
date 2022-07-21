@@ -59,6 +59,7 @@ set(base_examples
     sat-mobility-example
     sat-group-example
     sat-ncr-example
+    sat-regeneration-example
 )
 
 foreach(
