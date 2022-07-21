@@ -491,6 +491,16 @@ private:
    * Indicates if using DVB-S2 or DVB-S2X
    */
   SatEnums::DvbVersion_t m_dvbVersion;
+
+  /**
+   * The regeneration mode used in satellites for forward link
+   */
+  SatEnums::RegenerationMode_t m_forwardLinkRegenerationMode;
+
+  /**
+   * The regeneration mode used in satellites for return link
+   */
+  SatEnums::RegenerationMode_t m_returnLinkRegenerationMode;
 };
 
 } // namespace ns3

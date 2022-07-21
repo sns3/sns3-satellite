@@ -84,6 +84,19 @@ public:
   } FadingModel_t;
 
   /**
+   * \enum RegenerationMode_t
+   * \brief The regeneration mode used in satellites.
+   * It can be set for each link with different values.
+   */
+  typedef enum
+  {
+    TRANSPARENT,
+    REGENERATION_PHY,
+    REGENERATION_MAC,
+    REGENERATION_LLC
+  } RegenerationMode_t;
+
+  /**
    * \enum Standard_t
    * \brief The global standard used. Can be either DVB or Lora
    */

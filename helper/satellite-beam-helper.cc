@@ -156,6 +156,20 @@ SatBeamHelper::GetTypeId (void)
                    MakeEnumChecker (SatEnums::LR_RCS2, "RCS2",
                                     SatEnums::LR_FSIM, "FSIM",
                                     SatEnums::LR_LORA, "LORA"))
+    .AddAttribute ("ForwardLinkRegenerationMode", "The regeneration mode used in satellites for forward link.",
+                   EnumValue (SatEnums::TRANSPARENT),
+                   MakeEnumAccessor (&SatBeamHelper::m_forwardLinkRegenerationMode),
+                   MakeEnumChecker (SatEnums::TRANSPARENT, "TRANSPARENT",
+                                    SatEnums::REGENERATION_PHY, "REGENERATION_PHY",
+                                    SatEnums::REGENERATION_MAC, "REGENERATION_MAC",
+                                    SatEnums::REGENERATION_LLC, "REGENERATION_LLC"))
+    .AddAttribute ("ReturnLinkRegenerationMode", "The regeneration mode used in satellites for return link.",
+                   EnumValue (SatEnums::TRANSPARENT),
+                   MakeEnumAccessor (&SatBeamHelper::m_returnLinkRegenerationMode),
+                   MakeEnumChecker (SatEnums::TRANSPARENT, "TRANSPARENT",
+                                    SatEnums::REGENERATION_PHY, "REGENERATION_PHY",
+                                    SatEnums::REGENERATION_MAC, "REGENERATION_MAC",
+                                    SatEnums::REGENERATION_LLC, "REGENERATION_LLC"))
     .AddTraceSource ("Creation", "Creation traces",
                      MakeTraceSourceAccessor (&SatBeamHelper::m_creationTrace),
                      "ns3::SatTypedefs::CreationCallback")
