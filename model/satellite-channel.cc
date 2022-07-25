@@ -52,7 +52,7 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatChannel);
 
 SatChannel::SatChannel ()
-  : m_fwdMode (SatChannel::ALL_BEAMS),
+  : m_fwdMode (SatChannel::ONLY_DEST_BEAM),
   m_phyRxContainer (),
   m_channelType (SatEnums::UNKNOWN_CH),
   m_carrierFreqConverter (),
@@ -118,7 +118,7 @@ SatChannel::GetTypeId (void)
                                     SatEnums::RX_CNO_INPUT_TRACE, "RxCnoInputTrace"))
     .AddAttribute ("ForwardingMode",
                    "Channel forwarding mode.",
-                   EnumValue (SatChannel::ALL_BEAMS),
+                   EnumValue (SatChannel::ONLY_DEST_BEAM),
                    MakeEnumAccessor (&SatChannel::m_fwdMode),
                    MakeEnumChecker (SatChannel::ONLY_DEST_NODE, "OnlyDestNode",
                                     SatChannel::ONLY_DEST_BEAM, "OnlyDestBeam",
