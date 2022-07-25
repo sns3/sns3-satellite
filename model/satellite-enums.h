@@ -91,9 +91,9 @@ public:
   typedef enum
   {
     TRANSPARENT,
-    REGENERATION_PHY,
-    REGENERATION_MAC,
-    REGENERATION_LLC
+    REGENERATION_PHY,     // regenerate only on physical layer, to compute is the packet is lost or not
+    REGENERATION_LINK,    // regenerate on physical and MAC layers (only on return link). Satellite can perform packet TX scheduling and handle control messages
+    REGENERATION_NETWORK  // regenerate all stack. The GSE/RLE encapsulation is removed at reception and added again when transmitting to next hop
   } RegenerationMode_t;
 
   /**

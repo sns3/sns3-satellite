@@ -161,15 +161,14 @@ SatBeamHelper::GetTypeId (void)
                    MakeEnumAccessor (&SatBeamHelper::m_forwardLinkRegenerationMode),
                    MakeEnumChecker (SatEnums::TRANSPARENT, "TRANSPARENT",
                                     SatEnums::REGENERATION_PHY, "REGENERATION_PHY",
-                                    SatEnums::REGENERATION_MAC, "REGENERATION_MAC",
-                                    SatEnums::REGENERATION_LLC, "REGENERATION_LLC"))
+                                    SatEnums::REGENERATION_LINK, "REGENERATION_LINK",
+                                    SatEnums::REGENERATION_NETWORK, "REGENERATION_NETWORK"))
     .AddAttribute ("ReturnLinkRegenerationMode", "The regeneration mode used in satellites for return link.",
                    EnumValue (SatEnums::TRANSPARENT),
                    MakeEnumAccessor (&SatBeamHelper::m_returnLinkRegenerationMode),
                    MakeEnumChecker (SatEnums::TRANSPARENT, "TRANSPARENT",
                                     SatEnums::REGENERATION_PHY, "REGENERATION_PHY",
-                                    SatEnums::REGENERATION_MAC, "REGENERATION_MAC",
-                                    SatEnums::REGENERATION_LLC, "REGENERATION_LLC"))
+                                    SatEnums::REGENERATION_NETWORK, "REGENERATION_NETWORK"))
     .AddTraceSource ("Creation", "Creation traces",
                      MakeTraceSourceAccessor (&SatBeamHelper::m_creationTrace),
                      "ns3::SatTypedefs::CreationCallback")

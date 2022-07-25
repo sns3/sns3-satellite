@@ -29,18 +29,20 @@
 #include "ns3/pointer.h"
 #include "ns3/uinteger.h"
 #include "ns3/config.h"
-#include "../model/satellite-const-variables.h"
-#include "../model/satellite-utils.h"
-#include "../model/satellite-geo-net-device.h"
-#include "../model/satellite-geo-feeder-phy.h"
-#include "../model/satellite-geo-user-phy.h"
-#include "../model/satellite-phy-tx.h"
-#include "../model/satellite-phy-rx.h"
-#include "../model/satellite-phy-rx-carrier-conf.h"
-#include "../model/satellite-channel-estimation-error-container.h"
-#include "satellite-geo-helper.h"
-#include "satellite-helper.h"
-#include <ns3/satellite-typedefs.h>
+
+#include "ns3/satellite-const-variables.h"
+#include "ns3/satellite-utils.h"
+#include "ns3/satellite-geo-net-device.h"
+#include "ns3/satellite-geo-feeder-phy.h"
+#include "ns3/satellite-geo-user-phy.h"
+#include "ns3/satellite-phy-tx.h"
+#include "ns3/satellite-phy-rx.h"
+#include "ns3/satellite-phy-rx-carrier-conf.h"
+#include "ns3/satellite-channel-estimation-error-container.h"
+#include "ns3/satellite-helper.h"
+#include "ns3/satellite-typedefs.h"
+
+#include "ns3/satellite-geo-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatGeoHelper");
 
