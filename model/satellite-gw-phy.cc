@@ -129,7 +129,8 @@ SatGwPhy::SatGwPhy (void)
 SatGwPhy::SatGwPhy (SatPhy::CreateParam_t& params,
                     Ptr<SatLinkResults> linkResults,
                     SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
-                    Ptr<SatSuperframeConf> superFrameConf)
+                    Ptr<SatSuperframeConf> superFrameConf,
+                    SatEnums::RegenerationMode_t returnLinkRegenerationMode)
   : SatPhy (params),
   m_aciIfWrtNoisePercent (10.0),
   m_imInterferenceCOverIDb (22.0),
@@ -145,6 +146,7 @@ SatGwPhy::SatGwPhy (SatPhy::CreateParam_t& params,
   parameters.m_aciIfWrtNoiseFactor = m_aciIfWrtNoisePercent / 100.0;
   parameters.m_extNoiseDensityWhz = 0.0;
   parameters.m_rxMode = SatPhyRxCarrierConf::NORMAL;
+  parameters.m_linkRegenerationMode = returnLinkRegenerationMode;
   parameters.m_chType = SatEnums::RETURN_FEEDER_CH;
 
   Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf> (parameters);

@@ -16,7 +16,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ *         Bastien Tauran <bastien.tauran@viveris.fr>
  */
+
+#include <limits>
 
 #include <ns3/log.h>
 #include <ns3/simulator.h>
@@ -111,6 +114,11 @@ SatGeoFeederPhy::GetTypeId (void)
                     DoubleValue (82.0),
                     MakeDoubleAccessor (&SatGeoFeederPhy::m_fixedAmplificationGainDb),
                     MakeDoubleChecker<double> ())
+    .AddAttribute ( "QueueSize",
+                    "Maximum size of FIFO m_queue in bursts.",
+                    UintegerValue (100),
+                    MakeUintegerAccessor (&SatGeoFeederPhy::m_queueSizeMax),
+                    MakeUintegerChecker<uint32_t> ())
   ;
   return tid;
 }
@@ -142,7 +150,16 @@ SatGeoFeederPhy::SatGeoFeederPhy (SatPhy::CreateParam_t& params,
 {
   NS_LOG_FUNCTION (this);
 
-  if (returnLinkRegenerationMode == SatEnums::TRANSPARENT)
+  m_forwardLinkRegenerationMode = forwardLinkRegenerationMode;
+  m_returnLinkRegenerationMode = returnLinkRegenerationMode;
+  m_isSending = false;
+
+  if (m_returnLinkRegenerationMode == SatEnums::REGENERATION_PHY)
+    {
+      m_queue = std::queue<Ptr<SatSignalParameters>> ();
+    }
+
+  if (m_returnLinkRegenerationMode == SatEnums::TRANSPARENT)
     {
       SatPhy::GetPhyTx ()->SetAttribute ("TxMode", EnumValue (SatPhyTx::TRANSPARENT));
     }
@@ -237,11 +254,53 @@ SatGeoFeederPhy::SendPduWithParams (Ptr<SatSignalParameters> txParams )
   NS_LOG_INFO ("Amplified Tx power: " << SatUtils::LinearToDb (txParams->m_txPower_W));
   NS_LOG_INFO ("Statically configured tx power: " << SatUtils::LinearToDb (m_eirpWoGainW));
 
+  if (m_returnLinkRegenerationMode == SatEnums::REGENERATION_PHY)
+    {
+      if (m_queue.size () < m_queueSizeMax)
+        {
+          m_queue.push (txParams);
+          if (m_isSending == false)
+            {
+              SendFromQueue ();
+            }
+        }
+      else
+        {
+          NS_LOG_INFO ("Packet dropped because REGENERATION_PHY queue is full");
+        }
+    }
+  else
+    {
+      m_phyTx->StartTx (txParams);
+    }
+}
+
+void
+SatGeoFeederPhy::SendFromQueue ()
+{
+  if (m_queue.empty ())
+    {
+      NS_FATAL_ERROR ("Trying to deque an empty queue");
+    }
+  m_isSending = true;
+  Ptr<SatSignalParameters> txParams = m_queue.front ();
+  m_queue.pop ();
+  Simulator::Schedule (txParams->m_duration + NanoSeconds (1), &SatGeoFeederPhy::EndTx, this);
   m_phyTx->StartTx (txParams);
 }
 
 void
-SatGeoFeederPhy::Receive (Ptr<SatSignalParameters> rxParams, bool /*phyError*/)
+SatGeoFeederPhy::EndTx ()
+{
+  m_isSending = false;
+  if (!m_queue.empty ())
+    {
+      this->SendFromQueue ();
+    }
+}
+
+void
+SatGeoFeederPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
 {
   NS_LOG_FUNCTION (this << rxParams);
 
@@ -255,7 +314,24 @@ SatGeoFeederPhy::Receive (Ptr<SatSignalParameters> rxParams, bool /*phyError*/)
                  SatEnums::LD_FORWARD,
                  SatUtils::GetPacketInfo (rxParams->m_packetsInBurst));
 
-  m_rxCallback ( rxParams->m_packetsInBurst, rxParams);
+  if (phyError)
+    {
+      // If there was a PHY error, the packet is dropped here.
+      NS_LOG_INFO (this << " dropped " << rxParams->m_packetsInBurst.size ()
+                        << " packets because of PHY error.");
+    }
+  else
+    {
+      // In regenerative mode, we do not need to keep SINR of uplink when handling packet in satellite
+      // We put infinite to SINR stored so that it has no impact on composite SINR: composite_sinr(inf,sinr_donwlink)=sinr_downlink
+      if (m_forwardLinkRegenerationMode != SatEnums::TRANSPARENT)
+        {
+          rxParams->m_txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
+          rxParams->SetSinr (std::numeric_limits<double>::infinity(), rxParams->GetSinrCalculator ());
+        }
+
+      m_rxCallback ( rxParams->m_packetsInBurst, rxParams);
+    }
 }
 
 double

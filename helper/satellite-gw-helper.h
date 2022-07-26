@@ -144,6 +144,7 @@ public:
    * \param fCh forward channel
    * \param rCh return channel
    * \param ncc NCC (Network Control Center)
+   * \param returnLinkRegenerationMode The regeneration mode on return link
    *
    * This method creates a ns3::SatChannel with the
    * attributes configured by SatGwHelper::SetChannelAttribute,
@@ -158,7 +159,8 @@ public:
                                  Ptr<SatChannel> fCh,
                                  Ptr<SatChannel> rCh,
                                  Ptr<SatNcc> ncc,
-                                 Ptr<SatLowerLayerServiceConf> llsConf);
+                                 Ptr<SatLowerLayerServiceConf> llsConf,
+                                 SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   /**
    * \param n node
@@ -167,6 +169,7 @@ public:
    * \param fCh forward channel
    * \param rCh return channel
    * \param ncc NCC (Network Control Center)
+   * \param returnLinkRegenerationMode The regeneration mode on return link
    *
    * Saves you from having to construct a temporary NodeContainer.
    */
@@ -176,7 +179,8 @@ public:
                              Ptr<SatChannel> fCh,
                              Ptr<SatChannel> rCh,
                              Ptr<SatNcc> ncc,
-                             Ptr<SatLowerLayerServiceConf> llsConf);
+                             Ptr<SatLowerLayerServiceConf> llsConf,
+                             SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   /**
    * \param c a set of nodes
@@ -185,6 +189,7 @@ public:
    * \param fCh forward channel
    * \param rCh return channel
    * \param ncc NCC (Network Control Center)
+   * \param returnLinkRegenerationMode The regeneration mode on return link
    *
    * This method creates a ns3::SatChannel with the
    * attributes configured by SatGwHelper::SetChannelAttribute,
@@ -199,7 +204,8 @@ public:
                                   Ptr<SatChannel> fCh,
                                   Ptr<SatChannel> rCh,
                                   Ptr<SatNcc> ncc,
-                                  Ptr<SatLowerLayerServiceConf> llsConf);
+                                  Ptr<SatLowerLayerServiceConf> llsConf,
+                                  SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   /**
    * \param n node
@@ -208,6 +214,7 @@ public:
    * \param fCh forward channel
    * \param rCh return channel
    * \param ncc NCC (Network Control Center)
+   * \param returnLinkRegenerationMode The regeneration mode on return link
    *
    * Saves you from having to construct a temporary NodeContainer.
    */
@@ -217,7 +224,8 @@ public:
                               Ptr<SatChannel> fCh,
                               Ptr<SatChannel> rCh,
                               Ptr<SatNcc> ncc,
-                              Ptr<SatLowerLayerServiceConf> llsConf);
+                              Ptr<SatLowerLayerServiceConf> llsConf,
+                              SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   /**
    * Enables creation traces to be written in given file

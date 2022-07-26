@@ -16,7 +16,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ *         Bastien Tauran <bastien.tauran@viveris.fr>
  */
+
+#include <limits>
 
 #include <ns3/log.h>
 #include <ns3/simulator.h>
@@ -137,6 +140,9 @@ SatGeoUserPhy::SatGeoUserPhy (SatPhy::CreateParam_t& params,
 {
   NS_LOG_FUNCTION (this);
 
+  m_forwardLinkRegenerationMode = forwardLinkRegenerationMode;
+  m_returnLinkRegenerationMode = returnLinkRegenerationMode;
+
   if (forwardLinkRegenerationMode == SatEnums::TRANSPARENT)
     {
       SatPhy::GetPhyTx ()->SetAttribute ("TxMode", EnumValue (SatPhyTx::TRANSPARENT));
@@ -218,7 +224,7 @@ SatGeoUserPhy::SendPduWithParams (Ptr<SatSignalParameters> txParams )
 }
 
 void
-SatGeoUserPhy::Receive (Ptr<SatSignalParameters> rxParams, bool /*phyError*/)
+SatGeoUserPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
 {
   NS_LOG_FUNCTION (this << rxParams);
 
@@ -232,7 +238,24 @@ SatGeoUserPhy::Receive (Ptr<SatSignalParameters> rxParams, bool /*phyError*/)
                  SatEnums::LD_RETURN,
                  SatUtils::GetPacketInfo (rxParams->m_packetsInBurst));
 
-  m_rxCallback ( rxParams->m_packetsInBurst, rxParams);
+  if (phyError)
+    {
+      // If there was a PHY error, the packet is dropped here.
+      NS_LOG_INFO (this << " dropped " << rxParams->m_packetsInBurst.size ()
+                        << " packets because of PHY error.");
+    }
+  else
+    {
+      // In regenerative mode, we do not need to keep SINR of uplink when handling packet in satellite
+      // We put infinite to SINR stored so that it has no impact on composite SINR: composite_sinr(inf,sinr_donwlink)=sinr_downlink
+      if (m_returnLinkRegenerationMode != SatEnums::TRANSPARENT)
+        {
+          rxParams->m_txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
+          rxParams->SetSinr (std::numeric_limits<double>::infinity(), rxParams->GetSinrCalculator ());
+        }
+
+      m_rxCallback ( rxParams->m_packetsInBurst, rxParams);
+    }
 }
 
 double

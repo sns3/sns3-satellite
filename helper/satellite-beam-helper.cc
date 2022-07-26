@@ -552,7 +552,8 @@ SatBeamHelper::Install (NodeContainer ut,
                                      feederLink.first,
                                      feederLink.second,
                                      m_ncc,
-                                     llsConf.Get<SatLowerLayerServiceConf> ());
+                                     llsConf.Get<SatLowerLayerServiceConf> (),
+                                     m_returnLinkRegenerationMode);
       break;
     case SatEnums::LORA:
       gwNd = m_gwHelper->InstallLora (gwNode,
@@ -561,7 +562,8 @@ SatBeamHelper::Install (NodeContainer ut,
                                       feederLink.first,
                                       feederLink.second,
                                       m_ncc,
-                                      llsConf.Get<SatLowerLayerServiceConf> ());
+                                      llsConf.Get<SatLowerLayerServiceConf> (),
+                                      m_returnLinkRegenerationMode);
 
       break;
     default:
@@ -625,7 +627,8 @@ SatBeamHelper::Install (NodeContainer ut,
                                      DynamicCast<SatNetDevice> (gwNd),
                                      m_ncc,
                                      MakeCallback (&SatChannelPair::GetChannelPair, m_ulChannels),
-                                     routingCallback);
+                                     routingCallback,
+                                     m_forwardLinkRegenerationMode);
       break;
     case SatEnums::LORA:
       utNd = m_utHelper->InstallLora (ut,
@@ -635,7 +638,8 @@ SatBeamHelper::Install (NodeContainer ut,
                                       DynamicCast<SatNetDevice> (gwNd),
                                       m_ncc,
                                       MakeCallback (&SatChannelPair::GetChannelPair, m_ulChannels),
-                                      routingCallback);
+                                      routingCallback,
+                                      m_forwardLinkRegenerationMode);
       break;
     default:
       NS_FATAL_ERROR ("Incorrect standard chosen");

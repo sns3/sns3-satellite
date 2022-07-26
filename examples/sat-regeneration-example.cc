@@ -173,6 +173,7 @@ main (int argc, char *argv[])
   ConfigStore outputConfig;
   outputConfig.ConfigureDefaults ();
 
+  simulationHelper->EnableProgressLogs ();
   simulationHelper->RunSimulation ();
 
   return 0;

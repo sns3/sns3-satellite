@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ *         Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
 #ifndef SATELLITE_GEO_USER_PHY_H
@@ -123,6 +124,16 @@ private:
    * Other system interference in linear.
    */
   double m_otherSysInterferenceCOverI;
+
+  /**
+   * Regeneration mode on forward link.
+   */
+  SatEnums::RegenerationMode_t m_forwardLinkRegenerationMode;
+
+  /**
+   * Regeneration mode on return link.
+   */
+  SatEnums::RegenerationMode_t m_returnLinkRegenerationMode;
 
 };
 

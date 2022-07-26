@@ -239,7 +239,8 @@ SatGwHelper::InstallDvb (NodeContainer c,
                          Ptr<SatChannel> fCh,
                          Ptr<SatChannel> rCh,
                          Ptr<SatNcc> ncc,
-                         Ptr<SatLowerLayerServiceConf> llsConf)
+                         Ptr<SatLowerLayerServiceConf> llsConf,
+                         SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
   NS_LOG_FUNCTION (this << beamId << fCh << rCh );
 
@@ -247,7 +248,7 @@ SatGwHelper::InstallDvb (NodeContainer c,
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
     {
-      devs.Add (InstallDvb (*i, gwId, beamId, fCh, rCh, ncc, llsConf));
+      devs.Add (InstallDvb (*i, gwId, beamId, fCh, rCh, ncc, llsConf, returnLinkRegenerationMode));
     }
 
   return devs;
@@ -260,7 +261,8 @@ SatGwHelper::InstallDvb (Ptr<Node> n,
                          Ptr<SatChannel> fCh,
                          Ptr<SatChannel> rCh,
                          Ptr<SatNcc> ncc,
-                         Ptr<SatLowerLayerServiceConf> llsConf)
+                         Ptr<SatLowerLayerServiceConf> llsConf,
+                         SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
   NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
 
@@ -316,7 +318,8 @@ SatGwHelper::InstallDvb (Ptr<Node> n,
   Ptr<SatGwPhy> phy = CreateObject<SatGwPhy> (params,
                                               m_linkResults,
                                               parameters,
-                                              m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE));
+                                              m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE),
+                                              returnLinkRegenerationMode);
 
   ncc->SetUseLogon (m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE)->IsLogonEnabled ());
 
@@ -455,7 +458,8 @@ SatGwHelper::InstallLora (NodeContainer c,
                           Ptr<SatChannel> fCh,
                           Ptr<SatChannel> rCh,
                           Ptr<SatNcc> ncc,
-                          Ptr<SatLowerLayerServiceConf> llsConf)
+                          Ptr<SatLowerLayerServiceConf> llsConf,
+                          SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
   NS_LOG_FUNCTION (this << beamId << fCh << rCh );
 
@@ -463,7 +467,7 @@ SatGwHelper::InstallLora (NodeContainer c,
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
     {
-      devs.Add (InstallLora (*i, gwId, beamId, fCh, rCh, ncc, llsConf));
+      devs.Add (InstallLora (*i, gwId, beamId, fCh, rCh, ncc, llsConf, returnLinkRegenerationMode));
     }
 
   return devs;
@@ -476,7 +480,8 @@ SatGwHelper::InstallLora (Ptr<Node> n,
                           Ptr<SatChannel> fCh,
                           Ptr<SatChannel> rCh,
                           Ptr<SatNcc> ncc,
-                          Ptr<SatLowerLayerServiceConf> llsConf)
+                          Ptr<SatLowerLayerServiceConf> llsConf,
+                          SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
   NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
 
@@ -529,7 +534,8 @@ SatGwHelper::InstallLora (Ptr<Node> n,
   Ptr<SatGwPhy> phy = CreateObject<SatGwPhy> (params,
                                               m_linkResults,
                                               parameters,
-                                              m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE));
+                                              m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE),
+                                              returnLinkRegenerationMode);
 
   ncc->SetUseLora (true);
 

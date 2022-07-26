@@ -633,7 +633,15 @@ SatPhyRxCarrierPerFrame::CalculatePacketCompositeSinr (SatPhyRxCarrierPerFrame::
                                 m_rxExtNoisePowerW,
                                 m_sinrCalculate);
 
-  double cSinr = CalculateCompositeSinr (sinr, sinrSatellite);
+  double cSinr;
+  if (GetLinkRegenerationMode () == SatEnums::TRANSPARENT)
+    {
+      cSinr = CalculateCompositeSinr (sinr, sinrSatellite);
+    }
+  else
+    {
+      cSinr = sinr;
+    }
 
   NS_LOG_INFO ("Computed cSINR for packet: " << cSinr);
 

@@ -227,7 +227,8 @@ SatUtHelper::InstallDvb (NodeContainer c, uint32_t beamId,
                          Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
                          Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
                          SatPhy::ChannelPairGetterCallback cbChannel,
-                         SatMac::RoutingUpdateCallback cbRouting)
+                         SatMac::RoutingUpdateCallback cbRouting,
+                         SatEnums::RegenerationMode_t forwardLinkRegenerationMode)
 {
   NS_LOG_FUNCTION (this << beamId << fCh << rCh );
 
@@ -235,7 +236,7 @@ SatUtHelper::InstallDvb (NodeContainer c, uint32_t beamId,
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
     {
-      devs.Add (InstallDvb (*i, beamId, fCh, rCh, gwNd, ncc, cbChannel, cbRouting));
+      devs.Add (InstallDvb (*i, beamId, fCh, rCh, gwNd, ncc, cbChannel, cbRouting, forwardLinkRegenerationMode));
     }
 
   return devs;
@@ -246,7 +247,8 @@ SatUtHelper::InstallDvb (Ptr<Node> n, uint32_t beamId,
                          Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
                          Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
                          SatPhy::ChannelPairGetterCallback cbChannel,
-                         SatMac::RoutingUpdateCallback cbRouting)
+                         SatMac::RoutingUpdateCallback cbRouting,
+                         SatEnums::RegenerationMode_t forwardLinkRegenerationMode)
 {
   NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
 
@@ -299,7 +301,8 @@ SatUtHelper::InstallDvb (Ptr<Node> n, uint32_t beamId,
   Ptr<SatUtPhy> phy = CreateObject<SatUtPhy> (params,
                                               m_linkResults,
                                               parameters,
-                                              m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE));
+                                              m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE),
+                                              forwardLinkRegenerationMode);
   phy->SetChannelPairGetterCallback (cbChannel);
 
   // Set fading
@@ -510,7 +513,8 @@ SatUtHelper::InstallLora (NodeContainer c, uint32_t beamId,
                           Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
                           Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
                           SatPhy::ChannelPairGetterCallback cbChannel,
-                          SatMac::RoutingUpdateCallback cbRouting)
+                          SatMac::RoutingUpdateCallback cbRouting,
+                          SatEnums::RegenerationMode_t forwardLinkRegenerationMode)
 {
   NS_LOG_FUNCTION (this << beamId << fCh << rCh );
 
@@ -518,7 +522,7 @@ SatUtHelper::InstallLora (NodeContainer c, uint32_t beamId,
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
     {
-      devs.Add (InstallLora (*i, beamId, fCh, rCh, gwNd, ncc, cbChannel, cbRouting));
+      devs.Add (InstallLora (*i, beamId, fCh, rCh, gwNd, ncc, cbChannel, cbRouting, forwardLinkRegenerationMode));
     }
 
   return devs;
@@ -529,7 +533,8 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
                           Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
                           Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
                           SatPhy::ChannelPairGetterCallback cbChannel,
-                          SatMac::RoutingUpdateCallback cbRouting)
+                          SatMac::RoutingUpdateCallback cbRouting,
+                          SatEnums::RegenerationMode_t forwardLinkRegenerationMode)
 {
   NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
 
@@ -579,7 +584,8 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
   Ptr<SatUtPhy> phy = CreateObject<SatUtPhy> (params,
                                               m_linkResults,
                                               parameters,
-                                              m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE));
+                                              m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE),
+                                              forwardLinkRegenerationMode);
   phy->SetChannelPairGetterCallback (cbChannel);
 
   // Set fading

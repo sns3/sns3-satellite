@@ -16,10 +16,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ *         Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
 #ifndef SATELLITE_GEO_FEEDER_PHY_H
 #define SATELLITE_GEO_FEEDER_PHY_H
+
+#include <queue>
 
 #include <ns3/ptr.h>
 #include <ns3/nstime.h>
@@ -106,6 +109,17 @@ public:
   virtual double CalculateSinr (double sinr);
 
 private:
+
+  /**
+   * Send a packet from the queue. Used only in REGENERATION_PHY mode.
+   */
+  void SendFromQueue ();
+
+  /**
+   * Notify a packet has finished being sent. Used only in REGENERATION_PHY mode.
+   */
+  void EndTx ();
+
   /**
    * Configured external noise power.
    */
@@ -125,6 +139,31 @@ private:
    * Fixed amplification gain used in RTN link at the satellite.
    */
   double m_fixedAmplificationGainDb;
+
+  /**
+   * Regeneration mode on forward link.
+   */
+  SatEnums::RegenerationMode_t m_forwardLinkRegenerationMode;
+
+  /**
+   * Regeneration mode on return link.
+   */
+  SatEnums::RegenerationMode_t m_returnLinkRegenerationMode;
+
+  /**
+   * Simple FIFO queue to avoid collisions on TX in case of REGENERATION_PHY.
+   */
+  std::queue<Ptr<SatSignalParameters>> m_queue;
+
+  /**
+   * Maximum size of FIFO m_queue in bursts.
+   */
+  uint32_t m_queueSizeMax;
+
+  /**
+   * Indicates if a packet is already being sent.
+   */
+  bool m_isSending;
 };
 
 }

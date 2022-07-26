@@ -269,7 +269,15 @@ SatPhyRxCarrierPerWindow::CalculatePacketInterferenceVectors (SatPhyRxCarrierPer
                                m_rxExtNoisePowerW,
                                m_sinrCalculate);
 
-  double cSnr = CalculateCompositeSinr (snr, snrSatellite);
+  double cSnr;
+  if (GetLinkRegenerationMode () == SatEnums::TRANSPARENT)
+    {
+      cSnr = CalculateCompositeSinr (snr, snrSatellite);
+    }
+  else
+    {
+      cSnr = snr;
+    }
 
   /// Update probes (only the first time we access this method for this packet)
   if (packet.meanSinr < 0.0)

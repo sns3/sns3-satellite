@@ -293,14 +293,14 @@ SatPhyRx::ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatS
   bool isRandomAccessCarrier (false);
 
   SatEnums::RandomAccessModel_t raModel = carrierConf->GetRandomAccessModel ();
-  SatPhyRxCarrierConf::RxMode rxMode = carrierConf->GetRxMode ();
+  SatEnums::RegenerationMode_t regenerationMode = carrierConf->GetLinkRegenerationMode ();
 
   for (uint32_t i = 0; i < carrierConf->GetCarrierCount (); ++i)
     {
       NS_LOG_INFO (this << " Create carrier: " << i);
       Ptr<SatWaveformConf> waveformConf = superFrameConf->GetCarrierFrameConf (i)->GetWaveformConf ();
 
-      if (rxMode == SatPhyRxCarrierConf::TRANSPARENT)
+      if (regenerationMode == SatEnums::TRANSPARENT)
         {
           switch (carrierConf->GetChannelType ())
             {
@@ -371,7 +371,9 @@ SatPhyRx::ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatS
               }
             }
         }
-      else if (rxMode == SatPhyRxCarrierConf::NORMAL)
+      else if (regenerationMode == SatEnums::REGENERATION_PHY
+            || regenerationMode == SatEnums::REGENERATION_LINK
+            || regenerationMode == SatEnums::REGENERATION_NETWORK)
         {
           switch (carrierConf->GetChannelType ())
             {

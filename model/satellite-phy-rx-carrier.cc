@@ -317,31 +317,41 @@ SatPhyRxCarrier::GetReceiveParams (Ptr<SatSignalParameters> rxParams)
   bool receivePacket = GetDefaultReceiveMode ();
   bool ownAddressFound = false;
 
-  for (SatSignalParameters::PacketsInBurst_t::const_iterator i = rxParams->m_packetsInBurst.begin ();
-       ((i != rxParams->m_packetsInBurst.end ()) && (ownAddressFound == false) ); i++)
+  // If satellite and regeneration_phy -> do not check MAC address
+  if ((rxParams->m_channelType == SatEnums::FORWARD_FEEDER_CH
+    || rxParams->m_channelType == SatEnums::RETURN_USER_CH)
+    && m_linkRegenerationMode == SatEnums::REGENERATION_PHY)
     {
-      SatMacTag tag;
-      (*i)->PeekPacketTag (tag);
-
-      params.destAddress = tag.GetDestAddress ();
-      params.sourceAddress = tag.GetSourceAddress ();
-
-      if (( params.destAddress == GetOwnAddress () ))
+      receivePacket = true;
+    }
+  else
+    {
+      for (SatSignalParameters::PacketsInBurst_t::const_iterator i = rxParams->m_packetsInBurst.begin ();
+           ((i != rxParams->m_packetsInBurst.end ()) && (ownAddressFound == false) ); i++)
         {
-          NS_LOG_INFO ("Packet intended for this specific receiver: " << params.destAddress);
+          SatMacTag tag;
+          (*i)->PeekPacketTag (tag);
 
-          receivePacket = true;
-          ownAddressFound = true;
-        }
-      else if ( params.destAddress.IsBroadcast () )
-        {
-          NS_LOG_INFO ("Destination is broadcast address: " << params.destAddress);
-          receivePacket = true;
-        }
-      else if ( params.destAddress.IsGroup () )
-        {
-          NS_LOG_INFO ("Destination is multicast address: " << params.destAddress);
-          receivePacket = true;
+          params.destAddress = tag.GetDestAddress ();
+          params.sourceAddress = tag.GetSourceAddress ();
+
+          if (( params.destAddress == GetOwnAddress () ))
+            {
+              NS_LOG_INFO ("Packet intended for this specific receiver: " << params.destAddress);
+
+              receivePacket = true;
+              ownAddressFound = true;
+            }
+          else if ( params.destAddress.IsBroadcast () )
+            {
+              NS_LOG_INFO ("Destination is broadcast address: " << params.destAddress);
+              receivePacket = true;
+            }
+          else if ( params.destAddress.IsGroup () )
+            {
+              NS_LOG_INFO ("Destination is multicast address: " << params.destAddress);
+              receivePacket = true;
+            }
         }
     }
   return std::make_pair (receivePacket, params);

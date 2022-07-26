@@ -57,7 +57,8 @@ public:
   SatGwPhy (SatPhy::CreateParam_t& params,
             Ptr<SatLinkResults> linkResults,
             SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
-            Ptr<SatSuperframeConf> superFrameConf);
+            Ptr<SatSuperframeConf> superFrameConf,
+            SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   /**
    * Destructor for SatGwPhy

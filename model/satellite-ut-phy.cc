@@ -130,7 +130,8 @@ SatUtPhy::SatUtPhy (void)
 SatUtPhy::SatUtPhy (SatPhy::CreateParam_t &params,
                     Ptr<SatLinkResults> linkResults,
                     SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
-                    Ptr<SatSuperframeConf> superFrameConf)
+                    Ptr<SatSuperframeConf> superFrameConf,
+                    SatEnums::RegenerationMode_t forwardLinkRegenerationMode)
   : SatPhy (params),
   m_antennaReconfigurationDelay (Seconds (0.0))
 {
@@ -144,6 +145,7 @@ SatUtPhy::SatUtPhy (SatPhy::CreateParam_t &params,
   parameters.m_aciIfWrtNoiseFactor = 0.0;
   parameters.m_extNoiseDensityWhz = 0.0;
   parameters.m_rxMode = SatPhyRxCarrierConf::NORMAL;
+  parameters.m_linkRegenerationMode = forwardLinkRegenerationMode;
   parameters.m_chType = SatEnums::FORWARD_USER_CH;
 
   Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf> (parameters);
