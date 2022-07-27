@@ -214,6 +214,11 @@ SatGeoUserPhy::SendPduWithParams (Ptr<SatSignalParameters> txParams )
                  SatEnums::LD_FORWARD,
                  SatUtils::GetPacketInfo (txParams->m_packetsInBurst));
 
+  if (m_forwardLinkRegenerationMode != SatEnums::TRANSPARENT)
+    {
+      SetTimeTag (txParams->m_packetsInBurst);
+    }
+
   // copy as sender own PhyTx object (at satellite) to ensure right distance calculation
   // and antenna gain getting at receiver (UT or GW)
   // copy on tx power too.
@@ -252,6 +257,8 @@ SatGeoUserPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
         {
           rxParams->m_txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
           rxParams->SetSinr (std::numeric_limits<double>::infinity(), rxParams->GetSinrCalculator ());
+
+          RxTraces (rxParams->m_packetsInBurst);
         }
 
       m_rxCallback ( rxParams->m_packetsInBurst, rxParams);

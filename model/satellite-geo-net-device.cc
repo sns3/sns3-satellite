@@ -292,4 +292,24 @@ SatGeoNetDevice::AddFeederPhy (Ptr<SatPhy> phy, uint32_t beamId)
   m_feederPhy.insert (std::pair<uint32_t, Ptr<SatPhy> > (beamId, phy));
 }
 
+Ptr<SatPhy>
+SatGeoNetDevice::GetUserPhy (uint32_t beamId)
+{
+  if (m_userPhy.count(beamId))
+    {
+      return m_userPhy[beamId];
+    }
+  NS_FATAL_ERROR ("User Phy does not exist for beam " << beamId);
+}
+
+Ptr<SatPhy>
+SatGeoNetDevice::GetFeederPhy (uint32_t beamId)
+{
+  if (m_userPhy.count(beamId))
+    {
+      return m_feederPhy[beamId];
+    }
+  NS_FATAL_ERROR ("User Phy does not exist for beam " << beamId);
+}
+
 } // namespace ns3

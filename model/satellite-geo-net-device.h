@@ -89,6 +89,20 @@ public:
   void AddFeederPhy (Ptr<SatPhy> phy, uint32_t beamId);
 
   /**
+   * Get the User Phy object for the beam
+   * \param beamId the id of the beam to use phy for
+   * \return The User Phy
+   */
+  Ptr<SatPhy> GetUserPhy (uint32_t beamId);
+
+  /**
+   * Get the Feeder Phy object for the beam
+   * \param beamId the id of the beam to use phy for
+   * \return The Feeder Phy
+   */
+  Ptr<SatPhy> GetFeederPhy (uint32_t beamId);
+
+  /**
    * Attach a receive ErrorModel to the SatGeoNetDevice.
    * \param em Ptr to the ErrorModel.
    */

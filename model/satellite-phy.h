@@ -472,6 +472,18 @@ public:
 
 protected:
   /**
+   * \brief Invoke the `Rx` trace source for each received packet.
+   * \param packets Container of the pointers to the packets received.
+   */
+  void RxTraces (SatPhy::PacketContainer_t packets);
+
+  /**
+   * \brief Set SatPhyTimeTag of packets
+   * \param packets Container of the pointers to the packets to tag.
+   */
+  void SetTimeTag (SatPhy::PacketContainer_t packets);
+
+  /**
    * The upper layer package receive callback.
    */
   SatPhy::ReceiveCallback m_rxCallback;
