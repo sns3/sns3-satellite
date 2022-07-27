@@ -233,9 +233,11 @@ SatGeoUserPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
 {
   NS_LOG_FUNCTION (this << rxParams);
 
+  SatEnums::SatPacketEvent_t event = (phyError) ? SatEnums::PACKET_DROP : SatEnums::PACKET_RECV;
+
   // Add packet trace entry:
   m_packetTrace (Simulator::Now (),
-                 SatEnums::PACKET_RECV,
+                 event,
                  m_nodeInfo->GetNodeType (),
                  m_nodeInfo->GetNodeId (),
                  m_nodeInfo->GetMacAddress (),

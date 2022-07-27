@@ -53,7 +53,7 @@ using namespace ns3;
  * This case tests that delay of packets takes into account regeneration in satellite
  *
  *  Expected result:
- *    Packet delay = propagation time + 2*transmission time (in SAT and ground station)
+ *    Packet delay = propagation time + transmission time (in SAT and ground entities)
  */
 class SatRegenerationTest1 : public TestCase
 {
@@ -83,6 +83,12 @@ SatRegenerationTest1::SatRegenerationTest1 ()
 {
 }
 
+// This destructor does nothing but we include it as a reminder that
+// the test case should clean up after itself
+SatRegenerationTest1::~SatRegenerationTest1 ()
+{
+}
+
 void
 SatRegenerationTest1::PhyDelayTraceCb (std::string context, const Time & time, const Address & address)
 {
@@ -109,12 +115,6 @@ SatRegenerationTest1::GeoPhyTraceDelayCb (const Time & time, const Address & add
     }
 }
 
-// This destructor does nothing but we include it as a reminder that
-// the test case should clean up after itself
-SatRegenerationTest1::~SatRegenerationTest1 ()
-{
-}
-
 //
 // SatRegenerationTest1 TestCase implementation
 //
@@ -136,31 +136,38 @@ SatRegenerationTest1::DoRun (void)
   /// Set simulation output details
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
 
-  Config::SetDefault ("ns3::CbrApplication::Interval", StringValue ("3s"));
+  Config::SetDefault ("ns3::CbrApplication::Interval", StringValue ("500ms"));
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (512));
 
   // Creating the reference system.
   m_helper = CreateObject<SatHelper> ();
   m_helper->CreatePredefinedScenario (SatHelper::SIMPLE);
 
+  NodeContainer utUsers = m_helper->GetUtUsers ();
   NodeContainer gwUsers = m_helper->GetGwUsers ();
+  uint16_t port = 9;
 
-  // Create the Cbr application to send UDP datagrams of size
-  // 512 bytes at a rate of 500 Kb/s (defaults), one packet send (interval 100ms)
-  uint16_t port = 9; // Discard port (RFC 863)
-  CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (m_helper->GetUserAddress (gwUsers.Get (0)), port)));
-  ApplicationContainer utApps = cbr.Install (m_helper->GetUtUsers ());
-  utApps.Start (Seconds (1.0));
-  utApps.Stop (Seconds (5.0));
+  // Install forward traffic
+  CbrHelper cbrForward ("ns3::UdpSocketFactory", Address (InetSocketAddress (m_helper->GetUserAddress (utUsers.Get (0)), port)));
+  ApplicationContainer gwAppsForward = cbrForward.Install (gwUsers);
+  gwAppsForward.Start (Seconds (1.0));
+  gwAppsForward.Stop (Seconds (5.0));
 
-  // Create a packet sink to receive these packets
-  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (m_helper->GetUserAddress (gwUsers.Get (0)), port)));
-  ApplicationContainer gwApps = sink.Install (gwUsers);
-  gwApps.Start (Seconds (1.0));
-  gwApps.Stop (Seconds (10.0));
+  PacketSinkHelper sinkForward ("ns3::UdpSocketFactory", Address (InetSocketAddress (m_helper->GetUserAddress (utUsers.Get (0)), port)));
+  ApplicationContainer utAppsForward = sinkForward.Install (utUsers);
+  utAppsForward.Start (Seconds (1.0));
+  utAppsForward.Stop (Seconds (10.0));
 
-  Ptr<PacketSink> receiver = DynamicCast<PacketSink> (gwApps.Get (0));
-  Ptr<CbrApplication> sender = DynamicCast<CbrApplication> (utApps.Get (0));
+  // Install return traffic
+  CbrHelper cbrReturn ("ns3::UdpSocketFactory", Address (InetSocketAddress (m_helper->GetUserAddress (gwUsers.Get (0)), port)));
+  ApplicationContainer utAppsReturn = cbrReturn.Install (utUsers);
+  utAppsReturn.Start (Seconds (1.0));
+  utAppsReturn.Stop (Seconds (5.0));
+
+  PacketSinkHelper sinkReturn ("ns3::UdpSocketFactory", Address (InetSocketAddress (m_helper->GetUserAddress (gwUsers.Get (0)), port)));
+  ApplicationContainer gwAppsReturn = sinkReturn.Install (gwUsers);
+  gwAppsReturn.Start (Seconds (1.0));
+  gwAppsReturn.Stop (Seconds (10.0));
 
   m_gwAddress = m_helper->GwNodes ().Get (0)->GetDevice (1)->GetAddress ();
   m_stAddress = m_helper->UtNodes ().Get (0)->GetDevice (2)->GetAddress ();
@@ -222,7 +229,7 @@ SatRegenerationTest1::DoRun (void)
  * \ingroup satellite
  * \brief 'Regeneration, test ' test case implementation.
  *
- * This case tests physical regeneration on satellite. It is based on a LARGER scenario, with losses of uplink.
+ * This case tests physical regeneration on satellite. It is based on a SIMPLE scenario, with losses of uplink, forward and return.
  *
  *  Expected result:
  *    All packets are received on satellite before error model is applied on uplink
@@ -236,13 +243,33 @@ public:
 
 private:
   virtual void DoRun (void);
+  void GeoPhyTraceCb (Time time,
+                      SatEnums::SatPacketEvent_t event,
+                      SatEnums::SatNodeType_t type,
+                      uint32_t nodeId,
+                      Mac48Address address,
+                      SatEnums::SatLogLevel_t level,
+                      SatEnums::SatLinkDir_t dir,
+                      std::string packetInfo);
 
   Ptr<SatHelper> m_helper;
+
+  Address m_gwAddress;
+  Address m_stAddress;
+
+  uint32_t m_packetsReceivedFeeder;
+  uint32_t m_packetsDroppedFeeder;
+  uint32_t m_packetsReceivedUser;
+  uint32_t m_packetsDroppedUser;
 };
 
 // Add some help text to this case to describe what it is intended to test
 SatRegenerationTest2::SatRegenerationTest2 ()
-  : TestCase ("This case tests physical regeneration on satellite. It is based on a LARGER scenario, with losses of uplink.")
+  : TestCase ("This case tests physical regeneration on satellite. It is based on a SIMPLE scenario, with losses of uplink, forward and return."),
+  m_packetsReceivedFeeder (0),
+  m_packetsDroppedFeeder (0),
+  m_packetsReceivedUser (0),
+  m_packetsDroppedUser (0)
 {
 }
 
@@ -252,158 +279,97 @@ SatRegenerationTest2::~SatRegenerationTest2 ()
 {
 }
 
+void
+SatRegenerationTest2::GeoPhyTraceCb (Time time,
+                                     SatEnums::SatPacketEvent_t event,
+                                     SatEnums::SatNodeType_t type,
+                                     uint32_t nodeId,
+                                     Mac48Address address,
+                                     SatEnums::SatLogLevel_t level,
+                                     SatEnums::SatLinkDir_t dir,
+                                     std::string packetInfo)
+{
+  if (event != 1 && event != 3)
+    {
+      return;
+    }
+
+  std::cout << time << " " << SatEnums::GetPacketEventName (event) << " " << address << " ";
+  std::cout << SatEnums::GetNodeTypeName (type) << " " << SatEnums::GetLinkDirName (dir) << std::endl;
+}
+
 //
 // SatRegenerationTest2 TestCase implementation
 //
 void
 SatRegenerationTest2::DoRun (void)
 {
-  // Set simulation output details
-  /*Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+    // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
   Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-regeneration", "", true);
-
-  // Set 2 RA frames including one for logon
-  Config::SetDefault ("ns3::SatConf::SuperFrameConfForSeq0", EnumValue (SatSuperframeConf::SUPER_FRAME_CONFIG_0));
-  Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_SLOTTED_ALOHA));
-  Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
-  Config::SetDefault ("ns3::SatBeamHelper::RaCollisionModel", EnumValue (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
-  Config::SetDefault ("ns3::SatSuperframeConf0::Frame0_RandomAccessFrame", BooleanValue (true));
-  Config::SetDefault ("ns3::SatSuperframeConf0::Frame1_RandomAccessFrame", BooleanValue (true));
-  Config::SetDefault ("ns3::SatSuperframeConf0::Frame1_LogonFrame", BooleanValue (true));
-
-  Config::SetDefault ("ns3::SatSuperframeConf0::Frame0_GuardTimeSymbols", UintegerValue (4));
-  Config::SetDefault ("ns3::SatSuperframeConf0::Frame1_GuardTimeSymbols", UintegerValue (4));
-  Config::SetDefault ("ns3::SatSuperframeConf0::Frame2_GuardTimeSymbols", UintegerValue (4));
-  Config::SetDefault ("ns3::SatSuperframeConf0::Frame3_GuardTimeSymbols", UintegerValue (4));
-  Config::SetDefault ("ns3::SatSuperframeConf0::Frame4_GuardTimeSymbols", UintegerValue (4));
-  Config::SetDefault ("ns3::SatSuperframeConf0::Frame5_GuardTimeSymbols", UintegerValue (4));
-  Config::SetDefault ("ns3::SatSuperframeConf0::Frame6_GuardTimeSymbols", UintegerValue (4));
-  Config::SetDefault ("ns3::SatSuperframeConf0::Frame7_GuardTimeSymbols", UintegerValue (4));
-  Config::SetDefault ("ns3::SatSuperframeConf0::Frame8_GuardTimeSymbols", UintegerValue (4));
-  Config::SetDefault ("ns3::SatSuperframeConf0::Frame9_GuardTimeSymbols", UintegerValue (4));
-
-  Config::SetDefault ("ns3::SatUtMac::WindowInitLogon", TimeValue (Seconds (20)));
-  Config::SetDefault ("ns3::SatUtMac::MaxWaitingTimeLogonResponse", TimeValue (Seconds (1)));
-
-  // Set default values for NCR
-  Config::SetDefault ("ns3::SatMac::NcrVersion2", BooleanValue (false));
-  Config::SetDefault ("ns3::SatGwMac::NcrBroadcastPeriod", TimeValue (MilliSeconds (100)));
-  Config::SetDefault ("ns3::SatGwMac::UseCmt", BooleanValue (true));
-  Config::SetDefault ("ns3::SatUtMacState::NcrSyncTimeout", TimeValue (Seconds (1)));
-  Config::SetDefault ("ns3::SatUtMacState::NcrRecoveryTimeout", TimeValue (Seconds (10)));
-  Config::SetDefault ("ns3::SatNcc::UtTimeout", TimeValue (Seconds (10)));
-
-  Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (true));
-  Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotInterval", TimeValue (MilliSeconds (500)));
-
-  Config::SetDefault ("ns3::SatUtMac::ClockDrift", IntegerValue (100));
-  Config::SetDefault ("ns3::SatGwMac::CmtPeriodMin", TimeValue (MilliSeconds (550)));
-
-  // Creating the reference system.
-  m_helper = CreateObject<SatHelper> ();
-  m_helper->CreatePredefinedScenario (SatHelper::SIMPLE);
-
-  NodeContainer gwUsers = m_helper->GetGwUsers ();
-
-  // Create the Cbr application to send UDP datagrams of size
-  // 512 bytes at a rate of 500 Kb/s (defaults), one packet send (interval 100ms)
-  uint16_t port = 9; // Discard port (RFC 863)
-  CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (m_helper->GetUserAddress (gwUsers.Get (0)), port)));
-  cbr.SetAttribute ("Interval", StringValue ("100ms"));
-  ApplicationContainer utApps = cbr.Install (m_helper->GetUtUsers ());
-  utApps.Start (Seconds (1.0));
-  utApps.Stop (Seconds (59.0));
-
-  // Create a packet sink to receive these packets
-  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (m_helper->GetUserAddress (gwUsers.Get (0)), port)));
-  ApplicationContainer gwApps = sink.Install (gwUsers);
-  gwApps.Start (Seconds (1.0));
-  gwApps.Stop (Seconds (60.0));
-
-  Ptr<PacketSink> receiver = DynamicCast<PacketSink> (gwApps.Get (0));
-  Ptr<CbrApplication> sender = DynamicCast<CbrApplication> (utApps.Get (0));
-
-  Simulator::Stop (Seconds (60));
-  Simulator::Run ();
-
-  Simulator::Destroy ();
-
-  Singleton<SatEnvVariables>::Get ()->DoDispose ();
-
-  uint32_t indexSwitchTdmaSync = 0;
-  for (uint32_t i = 0; i < m_states.size (); i++)
-    {
-      if (m_states[i] == SatUtMacState::TDMA_SYNC)
-        {
-          indexSwitchTdmaSync = i;
-          break;
-        }
-    }
-
-  // Check if switch to TDMA_SYNC state
-  NS_TEST_ASSERT_MSG_NE (indexSwitchTdmaSync, 0, "UT should switch to TDMA_SYNC before the end of simulation");
-
-  // Check that nothing has been received before logon
-  NS_TEST_ASSERT_MSG_NE (m_totalSent[indexSwitchTdmaSync - 1], 0, "Data sent before logon");
-  NS_TEST_ASSERT_MSG_EQ (m_totalReceived[indexSwitchTdmaSync - 1], 0, "Nothing received before logon");
-
-  // Receiver has always received data after logon
-  for (uint32_t i = indexSwitchTdmaSync + 1; i < m_totalReceived.size () - 1; i++)
-    {
-      NS_TEST_ASSERT_MSG_GT (m_totalReceived[i+1], m_totalReceived[i], "Receiver should always receive data after logon");
-    }
-
-  // At the end, receiver got all all data sent
-  NS_TEST_ASSERT_MSG_EQ (receiver->GetTotalRx (), sender->GetSent (), "Packets were lost !");*/
-
-
-
-
-
-
-
 
   /// Set regeneration mode
   Config::SetDefault ("ns3::SatBeamHelper::ForwardLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
   Config::SetDefault ("ns3::SatBeamHelper::ReturnLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
 
+  // Enable SatMac traces
+  Config::SetDefault ("ns3::SatPhy::EnableStatisticsTags", BooleanValue (true));
+  Config::SetDefault ("ns3::SatNetDevice::EnableStatisticsTags", BooleanValue (true));
+
   /// Set simulation output details
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
 
-  Config::SetDefault ("ns3::CbrApplication::Interval", StringValue ("1s"));
+  Config::SetDefault ("ns3::CbrApplication::Interval", StringValue ("500ms"));
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (512));
 
   // Creating the reference system.
   m_helper = CreateObject<SatHelper> ();
-  m_helper->CreatePredefinedScenario (SatHelper::LARGER);
+  m_helper->CreatePredefinedScenario (SatHelper::SIMPLE);
 
+  NodeContainer utUsers = m_helper->GetUtUsers ();
   NodeContainer gwUsers = m_helper->GetGwUsers ();
+  uint16_t port = 9;
 
-  // Create the Cbr application to send UDP datagrams of size
-  // 512 bytes at a rate of 500 Kb/s (defaults), one packet send (interval 100ms)
-  uint16_t port = 9; // Discard port (RFC 863)
-  CbrHelper cbr ("ns3::UdpSocketFactory", Address (InetSocketAddress (m_helper->GetUserAddress (gwUsers.Get (0)), port)));
-  cbr.SetAttribute ("Interval", StringValue ("40s"));
-  ApplicationContainer utApps = cbr.Install (m_helper->GetUtUsers ());
-  utApps.Start (Seconds (1.0));
-  utApps.Stop (Seconds (59.0));
+  // Install forward traffic
+  CbrHelper cbrForward ("ns3::UdpSocketFactory", Address (InetSocketAddress (m_helper->GetUserAddress (utUsers.Get (0)), port)));
+  ApplicationContainer gwAppsForward = cbrForward.Install (gwUsers);
+  gwAppsForward.Start (Seconds (1.0));
+  gwAppsForward.Stop (Seconds (5.0));
 
-  // Create a packet sink to receive these packets
-  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (m_helper->GetUserAddress (gwUsers.Get (0)), port)));
-  ApplicationContainer gwApps = sink.Install (gwUsers);
-  gwApps.Start (Seconds (1.0));
-  gwApps.Stop (Seconds (60.0));
+  PacketSinkHelper sinkForward ("ns3::UdpSocketFactory", Address (InetSocketAddress (m_helper->GetUserAddress (utUsers.Get (0)), port)));
+  ApplicationContainer utAppsForward = sinkForward.Install (utUsers);
+  utAppsForward.Start (Seconds (1.0));
+  utAppsForward.Stop (Seconds (10.0));
 
-  Ptr<PacketSink> receiver = DynamicCast<PacketSink> (gwApps.Get (0));
-  Ptr<CbrApplication> sender = DynamicCast<CbrApplication> (utApps.Get (0));
+  // Install return traffic
+  CbrHelper cbrReturn ("ns3::UdpSocketFactory", Address (InetSocketAddress (m_helper->GetUserAddress (gwUsers.Get (0)), port)));
+  ApplicationContainer utAppsReturn = cbrReturn.Install (utUsers);
+  utAppsReturn.Start (Seconds (1.0));
+  utAppsReturn.Stop (Seconds (5.0));
 
-  Simulator::Stop (Seconds (60));
+  PacketSinkHelper sinkReturn ("ns3::UdpSocketFactory", Address (InetSocketAddress (m_helper->GetUserAddress (gwUsers.Get (0)), port)));
+  ApplicationContainer gwAppsReturn = sinkReturn.Install (gwUsers);
+  gwAppsReturn.Start (Seconds (1.0));
+  gwAppsReturn.Stop (Seconds (10.0));
+
+  m_gwAddress = m_helper->GwNodes ().Get (0)->GetDevice (1)->GetAddress ();
+  m_stAddress = m_helper->UtNodes ().Get (0)->GetDevice (2)->GetAddress ();
+
+  Ptr<SatGeoFeederPhy> satGeoFeederPhy = DynamicCast<SatGeoFeederPhy> (DynamicCast<SatGeoNetDevice> (m_helper->GeoSatNode ()->GetDevice (0))->GetFeederPhy (8));
+  Ptr<SatGeoUserPhy> satGeoUserPhy = DynamicCast<SatGeoUserPhy> (DynamicCast<SatGeoNetDevice> (m_helper->GeoSatNode ()->GetDevice (0))->GetUserPhy (8));
+
+  satGeoFeederPhy->TraceConnectWithoutContext ("PacketTrace", MakeCallback (&SatRegenerationTest2::GeoPhyTraceCb, this));
+  satGeoUserPhy->TraceConnectWithoutContext ("PacketTrace", MakeCallback (&SatRegenerationTest2::GeoPhyTraceCb, this));
+
+  Simulator::Stop (Seconds (10));
   Simulator::Run ();
 
   Simulator::Destroy ();
 
-  Ptr<Node> satelliteNode = m_helper->GeoSatNode ();
-  std::cout << satelliteNode << std::endl;
+  // TODO
+  // Add losses
+  // Count packets lost and received on uplink
+  // (optional) check no losses on downlink ?
 }
 
 // The TestSuite class names the TestSuite as sat-regeneration-test, identifies what type of TestSuite (SYSTEM),
@@ -420,7 +386,7 @@ SatRegenerationTestSuite::SatRegenerationTestSuite ()
   : TestSuite ("sat-regeneration-test", SYSTEM)
 {
   AddTestCase (new SatRegenerationTest1, TestCase::QUICK); // Test delay
-  // AddTestCase (new SatRegenerationTest2, TestCase::QUICK); // Test losses regeneration phy
+  AddTestCase (new SatRegenerationTest2, TestCase::QUICK); // Test losses regeneration phy
   // TODO Test collisions regeneration phy
 }
 
