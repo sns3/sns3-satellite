@@ -462,6 +462,7 @@ set(test_sources
     test/satellite-performance-memory-test.cc
     test/satellite-periodic-control-message-test.cc
     test/satellite-random-access-test.cc
+    test/satellite-regeneration-test.cc
     test/satellite-request-manager-test.cc
     test/satellite-rle-test.cc
     test/satellite-scenario-creation.cc
