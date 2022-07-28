@@ -332,7 +332,3 @@ private:
 }
 
 #endif /* SATELLITE_CHANNEL_H */
-
-
-
-

@@ -178,7 +178,6 @@ SatGeoFeederPhy::SatGeoFeederPhy (SatPhy::CreateParam_t& params,
   parameters.m_rxTemperatureK = SatUtils::DbToLinear ( SatPhy::GetRxNoiseTemperatureDbk ());
   parameters.m_extNoiseDensityWhz = SatUtils::DbToLinear ( m_extNoisePowerDensityDbwHz );
   parameters.m_aciIfWrtNoiseFactor = 0.0;
-  parameters.m_errorModel = SatPhyRxCarrierConf::EM_NONE;
   if (forwardLinkRegenerationMode == SatEnums::TRANSPARENT)
     {
       parameters.m_rxMode = SatPhyRxCarrierConf::TRANSPARENT;

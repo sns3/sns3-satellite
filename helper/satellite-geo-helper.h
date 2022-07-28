@@ -202,6 +202,26 @@ private:
    */
   SatPhy::InterferenceModel m_daRtnLinkInterferenceModel;
 
+  /*
+   * Configured error model for the forward feeder link. Set as an attribute.
+   */
+  SatPhy::ErrorModel m_fwdErrorModel;
+
+  /*
+   * Constant error rate for dedicated access in the FWD feeder link.
+   */
+  double m_fwdDaConstantErrorRate;
+
+  /*
+   * Configured error model for the return user link. Set as an attribute.
+   */
+  SatPhy::ErrorModel m_rtnErrorModel;
+
+  /*
+   * Constant error rate for dedicated access in the RTN user link.
+   */
+  double m_rtnDaConstantErrorRate;
+
   /**
    * \brief Trace callback for creation traces
    */

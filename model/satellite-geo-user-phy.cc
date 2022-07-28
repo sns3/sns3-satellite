@@ -160,7 +160,6 @@ SatGeoUserPhy::SatGeoUserPhy (SatPhy::CreateParam_t& params,
   parameters.m_rxTemperatureK = SatUtils::DbToLinear (SatPhy::GetRxNoiseTemperatureDbk ());
   parameters.m_aciIfWrtNoiseFactor = 0.0;
   parameters.m_extNoiseDensityWhz = 0.0;
-  parameters.m_errorModel = SatPhyRxCarrierConf::EM_NONE;
   if (returnLinkRegenerationMode == SatEnums::TRANSPARENT)
     {
       parameters.m_rxMode = SatPhyRxCarrierConf::TRANSPARENT;

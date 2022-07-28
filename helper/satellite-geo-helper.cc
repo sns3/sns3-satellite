@@ -72,6 +72,28 @@ SatGeoHelper::GetTypeId (void)
                                     SatPhyRxCarrierConf::IF_TRACE, "Trace",
                                     SatPhyRxCarrierConf::IF_PER_PACKET, "PerPacket",
                                     SatPhyRxCarrierConf::IF_PER_FRAGMENT, "PerFragment"))
+    .AddAttribute ("FwdLinkErrorModel",
+                   "Forward feeder link error model",
+                   EnumValue (SatPhyRxCarrierConf::EM_NONE),
+                   MakeEnumAccessor (&SatGeoHelper::m_fwdErrorModel),
+                   MakeEnumChecker (SatPhyRxCarrierConf::EM_NONE, "None",
+                                    SatPhyRxCarrierConf::EM_CONSTANT, "Constant"))
+    .AddAttribute ("FwdLinkConstantErrorRate",
+                   "Constant error rate on forward feeder link",
+                   DoubleValue (0.0),
+                   MakeDoubleAccessor (&SatGeoHelper::m_fwdDaConstantErrorRate),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute ("RtnLinkErrorModel",
+                   "Return user link error model",
+                   EnumValue (SatPhyRxCarrierConf::EM_NONE),
+                   MakeEnumAccessor (&SatGeoHelper::m_rtnErrorModel),
+                   MakeEnumChecker (SatPhyRxCarrierConf::EM_NONE, "None",
+                                    SatPhyRxCarrierConf::EM_CONSTANT, "Constant"))
+    .AddAttribute ("RtnLinkConstantErrorRate",
+                   "Constant error rate on return user link",
+                   DoubleValue (0.0),
+                   MakeDoubleAccessor (&SatGeoHelper::m_rtnDaConstantErrorRate),
+                   MakeDoubleChecker<double> ())
     .AddTraceSource ("Creation", "Creation traces",
                      MakeTraceSourceAccessor (&SatGeoHelper::m_creationTrace),
                      "ns3::SatTypedefs::CreationCallback")
@@ -226,6 +248,8 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d,
   Ptr<SatChannelEstimationErrorContainer> cec = Create<SatSimpleChannelEstimationErrorContainer> ();
 
   SatPhyRxCarrierConf::RxCarrierCreateParams_s parametersUser = SatPhyRxCarrierConf::RxCarrierCreateParams_s ();
+  parametersUser.m_errorModel = m_rtnErrorModel;
+  parametersUser.m_daConstantErrorRate = m_rtnDaConstantErrorRate;
   parametersUser.m_daIfModel = m_daRtnLinkInterferenceModel;
   parametersUser.m_raIfModel = m_raSettings.m_raRtnInterferenceModel;
   parametersUser.m_raIfEliminateModel = m_raSettings.m_raInterferenceEliminationModel;
@@ -236,6 +260,8 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d,
   parametersUser.m_randomAccessModel = m_raSettings.m_randomAccessModel;
 
   SatPhyRxCarrierConf::RxCarrierCreateParams_s parametersFeeder = SatPhyRxCarrierConf::RxCarrierCreateParams_s ();
+  parametersFeeder.m_errorModel = m_fwdErrorModel;
+  parametersFeeder.m_daConstantErrorRate = m_fwdDaConstantErrorRate;
   parametersFeeder.m_daIfModel = m_daFwdLinkInterferenceModel;
   parametersFeeder.m_raIfModel = m_raSettings.m_raFwdInterferenceModel;
   parametersFeeder.m_raIfEliminateModel = m_raSettings.m_raInterferenceEliminationModel;

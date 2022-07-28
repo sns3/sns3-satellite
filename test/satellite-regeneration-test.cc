@@ -123,7 +123,7 @@ SatRegenerationTest1::DoRun (void)
 {
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-regeneration", "", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-regeneration", "test1", true);
 
   /// Set regeneration mode
   Config::SetDefault ("ns3::SatBeamHelper::ForwardLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
@@ -251,6 +251,14 @@ private:
                       SatEnums::SatLogLevel_t level,
                       SatEnums::SatLinkDir_t dir,
                       std::string packetInfo);
+  void PhyTraceCb (Time time,
+                   SatEnums::SatPacketEvent_t event,
+                   SatEnums::SatNodeType_t type,
+                   uint32_t nodeId,
+                   Mac48Address address,
+                   SatEnums::SatLogLevel_t level,
+                   SatEnums::SatLinkDir_t dir,
+                   std::string packetInfo);
 
   Ptr<SatHelper> m_helper;
 
@@ -261,6 +269,11 @@ private:
   uint32_t m_packetsDroppedFeeder;
   uint32_t m_packetsReceivedUser;
   uint32_t m_packetsDroppedUser;
+
+  uint32_t m_packetsReceivedUt;
+  uint32_t m_packetsDroppedUt;
+  uint32_t m_packetsReceivedGw;
+  uint32_t m_packetsDroppedGw;
 };
 
 // Add some help text to this case to describe what it is intended to test
@@ -269,7 +282,11 @@ SatRegenerationTest2::SatRegenerationTest2 ()
   m_packetsReceivedFeeder (0),
   m_packetsDroppedFeeder (0),
   m_packetsReceivedUser (0),
-  m_packetsDroppedUser (0)
+  m_packetsDroppedUser (0),
+  m_packetsReceivedUt (0),
+  m_packetsDroppedUt (0),
+  m_packetsReceivedGw (0),
+  m_packetsDroppedGw (0)
 {
 }
 
@@ -289,13 +306,68 @@ SatRegenerationTest2::GeoPhyTraceCb (Time time,
                                      SatEnums::SatLinkDir_t dir,
                                      std::string packetInfo)
 {
-  if (event != 1 && event != 3)
+  switch (dir)
     {
-      return;
+      case SatEnums::LD_FORWARD:
+        if (event == SatEnums::PACKET_RECV)
+          {
+            m_packetsReceivedFeeder++;
+          }
+        else if (event == SatEnums::PACKET_DROP)
+          {
+            m_packetsDroppedFeeder++;
+          }
+        break;
+      case SatEnums::LD_RETURN:
+        if (event == SatEnums::PACKET_RECV)
+          {
+            m_packetsReceivedUser++;
+          }
+        else if (event == SatEnums::PACKET_DROP)
+          {
+            m_packetsDroppedUser++;
+          }
+        break;
+      default:
+        break;
     }
+}
 
-  std::cout << time << " " << SatEnums::GetPacketEventName (event) << " " << address << " ";
-  std::cout << SatEnums::GetNodeTypeName (type) << " " << SatEnums::GetLinkDirName (dir) << std::endl;
+void
+SatRegenerationTest2::PhyTraceCb (Time time,
+                                  SatEnums::SatPacketEvent_t event,
+                                  SatEnums::SatNodeType_t type,
+                                  uint32_t nodeId,
+                                  Mac48Address address,
+                                  SatEnums::SatLogLevel_t level,
+                                  SatEnums::SatLinkDir_t dir,
+                                  std::string packetInfo)
+{
+  switch (dir)
+    {
+      case SatEnums::LD_FORWARD:
+        if (event == SatEnums::PACKET_RECV)
+          {
+            m_packetsReceivedUt++;
+          }
+        else if (event == SatEnums::PACKET_DROP)
+          {
+            m_packetsDroppedUt++;
+          }
+        break;
+      case SatEnums::LD_RETURN:
+        if (event == SatEnums::PACKET_RECV)
+          {
+            m_packetsReceivedGw++;
+          }
+        else if (event == SatEnums::PACKET_DROP)
+          {
+            m_packetsDroppedGw++;
+          }
+        break;
+      default:
+        break;
+    }
 }
 
 //
@@ -304,13 +376,19 @@ SatRegenerationTest2::GeoPhyTraceCb (Time time,
 void
 SatRegenerationTest2::DoRun (void)
 {
-    // Set simulation output details
+  // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-regeneration", "", true);
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-regeneration", "test2", true);
 
   /// Set regeneration mode
   Config::SetDefault ("ns3::SatBeamHelper::ForwardLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
   Config::SetDefault ("ns3::SatBeamHelper::ReturnLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
+
+  /// Set constant 10% losses on Uplink
+  Config::SetDefault ("ns3::SatGeoHelper::FwdLinkErrorModel", EnumValue (SatPhyRxCarrierConf::EM_CONSTANT));
+  Config::SetDefault ("ns3::SatGeoHelper::FwdLinkConstantErrorRate", DoubleValue (0.1));
+  Config::SetDefault ("ns3::SatGeoHelper::RtnLinkErrorModel", EnumValue (SatPhyRxCarrierConf::EM_CONSTANT));
+  Config::SetDefault ("ns3::SatGeoHelper::RtnLinkConstantErrorRate", DoubleValue (0.1));
 
   // Enable SatMac traces
   Config::SetDefault ("ns3::SatPhy::EnableStatisticsTags", BooleanValue (true));
@@ -319,7 +397,7 @@ SatRegenerationTest2::DoRun (void)
   /// Set simulation output details
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
 
-  Config::SetDefault ("ns3::CbrApplication::Interval", StringValue ("500ms"));
+  Config::SetDefault ("ns3::CbrApplication::Interval", StringValue ("10ms"));
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (512));
 
   // Creating the reference system.
@@ -334,23 +412,23 @@ SatRegenerationTest2::DoRun (void)
   CbrHelper cbrForward ("ns3::UdpSocketFactory", Address (InetSocketAddress (m_helper->GetUserAddress (utUsers.Get (0)), port)));
   ApplicationContainer gwAppsForward = cbrForward.Install (gwUsers);
   gwAppsForward.Start (Seconds (1.0));
-  gwAppsForward.Stop (Seconds (5.0));
+  gwAppsForward.Stop (Seconds (59.0));
 
   PacketSinkHelper sinkForward ("ns3::UdpSocketFactory", Address (InetSocketAddress (m_helper->GetUserAddress (utUsers.Get (0)), port)));
   ApplicationContainer utAppsForward = sinkForward.Install (utUsers);
   utAppsForward.Start (Seconds (1.0));
-  utAppsForward.Stop (Seconds (10.0));
+  utAppsForward.Stop (Seconds (60.0));
 
   // Install return traffic
   CbrHelper cbrReturn ("ns3::UdpSocketFactory", Address (InetSocketAddress (m_helper->GetUserAddress (gwUsers.Get (0)), port)));
   ApplicationContainer utAppsReturn = cbrReturn.Install (utUsers);
   utAppsReturn.Start (Seconds (1.0));
-  utAppsReturn.Stop (Seconds (5.0));
+  utAppsReturn.Stop (Seconds (59.0));
 
   PacketSinkHelper sinkReturn ("ns3::UdpSocketFactory", Address (InetSocketAddress (m_helper->GetUserAddress (gwUsers.Get (0)), port)));
   ApplicationContainer gwAppsReturn = sinkReturn.Install (gwUsers);
   gwAppsReturn.Start (Seconds (1.0));
-  gwAppsReturn.Stop (Seconds (10.0));
+  gwAppsReturn.Stop (Seconds (60.0));
 
   m_gwAddress = m_helper->GwNodes ().Get (0)->GetDevice (1)->GetAddress ();
   m_stAddress = m_helper->UtNodes ().Get (0)->GetDevice (2)->GetAddress ();
@@ -361,15 +439,32 @@ SatRegenerationTest2::DoRun (void)
   satGeoFeederPhy->TraceConnectWithoutContext ("PacketTrace", MakeCallback (&SatRegenerationTest2::GeoPhyTraceCb, this));
   satGeoUserPhy->TraceConnectWithoutContext ("PacketTrace", MakeCallback (&SatRegenerationTest2::GeoPhyTraceCb, this));
 
-  Simulator::Stop (Seconds (10));
+  Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/SatPhy/PacketTrace", MakeCallback (&SatRegenerationTest2::PhyTraceCb, this));
+
+  Simulator::Stop (Seconds (60));
   Simulator::Run ();
 
   Simulator::Destroy ();
 
-  // TODO
-  // Add losses
-  // Count packets lost and received on uplink
-  // (optional) check no losses on downlink ?
+
+  double dropRateForwardFeeder = (m_packetsDroppedFeeder*100.0/(m_packetsReceivedFeeder+m_packetsDroppedFeeder));
+  double dropRateReturnUser = (m_packetsDroppedUser*100.0/(m_packetsReceivedUser+m_packetsDroppedUser));
+
+  double forwardDifference = std::abs((1.0*m_packetsReceivedUt - m_packetsReceivedFeeder)/m_packetsReceivedUt);
+  double returnDifference = std::abs((1.0*m_packetsReceivedGw - m_packetsReceivedUser)/m_packetsReceivedGw);
+
+  NS_TEST_ASSERT_MSG_GT (dropRateForwardFeeder, 8.0, "Not enough losses on FWD feeder");
+  NS_TEST_ASSERT_MSG_LT (dropRateForwardFeeder, 12.0, "Too much losses on FWD feeder");
+  NS_TEST_ASSERT_MSG_GT (dropRateReturnUser, 8.0, "Not enough losses on RTN user");
+  NS_TEST_ASSERT_MSG_LT (dropRateReturnUser, 12.0, "Too much losses on RTN user");
+
+  NS_TEST_ASSERT_MSG_NE (m_packetsReceivedGw, 0, "Packets must be received by GW");
+  NS_TEST_ASSERT_MSG_NE (m_packetsReceivedUt, 0, "Packets must be received by UT");
+  NS_TEST_ASSERT_MSG_EQ (m_packetsDroppedGw, 0, "Packets must not be dropped by GW");
+  NS_TEST_ASSERT_MSG_EQ (m_packetsDroppedUt, 0, "Packets must not be dropped by UT");
+
+  NS_TEST_ASSERT_MSG_LT (forwardDifference, 0.01, "Number of packets received on FWD should be almost the same between SAT and UT");
+  NS_TEST_ASSERT_MSG_LT (returnDifference, 0.01, "Number of packets received on RTN should be almost the same between SAT and GW");
 }
 
 // The TestSuite class names the TestSuite as sat-regeneration-test, identifies what type of TestSuite (SYSTEM),
