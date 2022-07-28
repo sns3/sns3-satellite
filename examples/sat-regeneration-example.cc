@@ -33,7 +33,12 @@ using namespace ns3;
  * \file sat-regeneration-example.cc
  * \ingroup satellite
  *
- * \brief  TODO
+ * \brief This file gives an example of satellite regeneration.
+ *
+ * TODO complete brief
+ * TODO add more cmd options
+ * TODO Clean
+ * TODO add other regeneration modes
  *
  */
 
