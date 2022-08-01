@@ -431,17 +431,37 @@ SatPhy::RxTraces (SatPhy::PacketContainer_t packets)
           m_rxTrace (*it1, addr);
 
           SatPhyTimeTag timeTag;
-          if ((*it1)->RemovePacketTag (timeTag))
+          if (m_nodeInfo->GetNodeType () == SatEnums::NT_SAT)
             {
-              NS_LOG_DEBUG (this << " contains a SatPhyTimeTag tag");
-              Time delay = Simulator::Now () - timeTag.GetSenderTimestamp ();
-              m_rxDelayTrace (delay, addr);
-              if (m_lastDelay.IsZero() == false)
+              // Leave tag if on Satellite
+              if ((*it1)->PeekPacketTag (timeTag))
                 {
-                  Time jitter = Abs (delay - m_lastDelay);
-                  m_rxJitterTrace (jitter, addr);
+                  NS_LOG_DEBUG (this << " contains a SatPhyTimeTag tag");
+                  Time delay = Simulator::Now () - timeTag.GetSenderTimestamp ();
+                  m_rxDelayTrace (delay, addr);
+                  if (m_lastDelay.IsZero() == false)
+                    {
+                      Time jitter = Abs (delay - m_lastDelay);
+                      m_rxJitterTrace (jitter, addr);
+                    }
+                  m_lastDelay = delay;
                 }
-              m_lastDelay = delay;
+            }
+          else
+            {
+              // Remove tag otherwise
+              if ((*it1)->RemovePacketTag (timeTag))
+                {
+                  NS_LOG_DEBUG (this << " contains a SatPhyTimeTag tag");
+                  Time delay = Simulator::Now () - timeTag.GetSenderTimestamp ();
+                  m_rxDelayTrace (delay, addr);
+                  if (m_lastDelay.IsZero() == false)
+                    {
+                      Time jitter = Abs (delay - m_lastDelay);
+                      m_rxJitterTrace (jitter, addr);
+                    }
+                  m_lastDelay = delay;
+                }
             }
 
         } // end of `for (it1 = rxParams->m_packetsInBurst)`
