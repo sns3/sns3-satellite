@@ -118,6 +118,14 @@ public:
    */
   uint32_t AttachMacToGwUserId (Address mac);
 
+  /**
+   * \brief Attach MAC address to the SAT ID maps and give it a running
+   *        SAT ID (starting from 1)
+   * \param mac MAC address
+   * \return the SAT ID assigned to the given MAC address
+   */
+  uint32_t AttachMacToSatId (Address mac);
+
   /* ID GETTERS */
 
   /**
@@ -169,6 +177,13 @@ public:
    */
   int32_t GetGwUserIdWithMac (Address mac) const;
 
+  /**
+   * \brief Function for getting the SAT ID with MAC. Returns -1 if the MAC is not in the map
+   * \param mac MAC address
+   * \return SAT user ID
+   */
+  int32_t GetSatIdWithMac (Address mac) const;
+
   /* NODE GETTERS */
 
   /**
@@ -177,6 +192,13 @@ public:
    *         device, or an invalid address if such device is not found.
    */
   Address GetGwMacWithNode (Ptr<Node> gwNode) const;
+
+  /**
+   * \param satNode pointer to a SAT node
+   * \return the MAC address of the SAT node's first satellite beam network
+   *         device, or an invalid address if such device is not found.
+   */
+  Address GetSatMacWithNode (Ptr<Node> satNode) const;
 
   /**
    * \param utNode pointer to a UT node
@@ -241,6 +263,11 @@ private:
   uint32_t m_gwUserIdIndex;
 
   /**
+   * \brief Running SAT user index number
+   */
+  uint32_t m_satIdIndex;
+
+  /**
    * \brief Map for MAC to trace ID conversion
    */
   std::map <Address, uint32_t> m_macToTraceIdMap;
@@ -274,6 +301,11 @@ private:
    * \brief Map for MAC to GW user ID conversion
    */
   std::map <Address, uint32_t> m_macToGwUserIdMap;
+
+  /**
+   * \brief Map for MAC to SAT ID conversion
+   */
+  std::map <Address, uint32_t> m_macToSatIdMap;
 
   /**
    * \brief Is map printing enabled or not

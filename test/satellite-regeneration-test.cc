@@ -130,7 +130,7 @@ SatRegenerationTest1::DoRun (void)
   Config::SetDefault ("ns3::SatBeamHelper::ForwardLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
   Config::SetDefault ("ns3::SatBeamHelper::ReturnLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
 
-  // Enable SatMac traces
+  // Enable traces
   Config::SetDefault ("ns3::SatPhy::EnableStatisticsTags", BooleanValue (true));
   Config::SetDefault ("ns3::SatNetDevice::EnableStatisticsTags", BooleanValue (true));
 

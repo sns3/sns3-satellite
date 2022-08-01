@@ -25,6 +25,7 @@
 #include <ns3/address.h>
 
 #include "satellite-net-device.h"
+#include "satellite-geo-net-device.h"
 #include "satellite-id-mapper.h"
 
 
@@ -48,6 +49,7 @@ SatIdMapper::SatIdMapper ()
   m_utIdIndex (1),
   m_utUserIdIndex (1),
   m_gwUserIdIndex (1),
+  m_satIdIndex (1),
   m_enableMapPrint (false)
 {
   NS_LOG_FUNCTION (this);
@@ -117,6 +119,14 @@ SatIdMapper::Reset ()
     {
       m_macToGroupIdMap.clear ();
     }
+
+  // SAT ID maps
+
+  if (!m_macToSatIdMap.empty ())
+    {
+      m_macToSatIdMap.clear ();
+    }
+  m_satIdIndex = 1;
 
   // GW ID maps
 
@@ -259,6 +269,25 @@ SatIdMapper::AttachMacToGwUserId (Address mac)
   return ret;
 }
 
+uint32_t
+SatIdMapper::AttachMacToSatId (Address mac)
+{
+  NS_LOG_FUNCTION (this);
+
+  const uint32_t ret = m_satIdIndex;
+  std::pair < std::map<Address, uint32_t>::iterator, bool> resultMacToSatId = m_macToSatIdMap.insert (std::make_pair (mac, m_satIdIndex));
+
+  if (resultMacToSatId.second == false)
+    {
+      NS_FATAL_ERROR ("SatIdMapper::AttachMacToSatId - MAC to SAT ID failed");
+    }
+
+  NS_LOG_INFO ("Added MAC " << mac << " with SAT ID " << m_satIdIndex);
+
+  m_satIdIndex++;
+  return ret;
+}
+
 // ID GETTERS
 
 int32_t
@@ -366,6 +395,21 @@ SatIdMapper::GetGwUserIdWithMac (Address mac) const
   return iter->second;
 }
 
+int32_t
+SatIdMapper::GetSatIdWithMac (Address mac) const
+{
+  NS_LOG_FUNCTION (this);
+
+  std::map<Address, uint32_t>::const_iterator iter = m_macToSatIdMap.find (mac);
+
+  if (iter == m_macToSatIdMap.end ())
+    {
+      return -1;
+    }
+
+  return iter->second;
+}
+
 // NODE GETTERS
 
 Address
@@ -406,6 +450,46 @@ SatIdMapper::GetGwMacWithNode (Ptr<Node> gwNode) const
     {
       NS_LOG_WARN (this << " Node " << gwNode->GetId ()
                         << " is not a valid GW");
+      return Address (); // returns an invalid address
+    }
+}
+
+Address
+SatIdMapper::GetSatMacWithNode (Ptr<Node> satNode) const
+{
+  NS_LOG_FUNCTION (this << satNode->GetId ());
+
+  if (satNode->GetNDevices () >= 1)
+    {
+      /*
+       * Actually there is only one device. This should change with ISLs
+       */
+      Ptr<NetDevice> dev = satNode->GetDevice (0);
+
+      if (dev->GetObject<SatGeoNetDevice> () != 0)
+        {
+          if (Mac48Address::IsMatchingType (dev->GetAddress ()))
+            {
+              return dev->GetAddress ();
+            }
+          else
+            {
+              NS_LOG_WARN (this << " Device 0 of Node " << satNode->GetId ()
+                                << " does not have a valid Mac48Address");
+              return Address (); // returns an invalid address
+            }
+        }
+      else
+        {
+          NS_LOG_WARN (this << " Node " << satNode->GetId ()
+                            << " is not a valid SAT");
+          return Address (); // returns an invalid address
+        }
+    }
+  else
+    {
+      NS_LOG_WARN (this << " Node " << satNode->GetId ()
+                        << " is not a valid SAT");
       return Address (); // returns an invalid address
     }
 }

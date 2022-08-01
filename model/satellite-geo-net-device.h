@@ -103,6 +103,18 @@ public:
   Ptr<SatPhy> GetFeederPhy (uint32_t beamId);
 
   /**
+   * Get all User Phy objects attached to this satellite
+   * \return All the User Phy
+   */
+  std::map<uint32_t, Ptr<SatPhy> > GetUserPhy ();
+
+  /**
+   * Get all Feeder Phy objects attached to this satellite
+   * \return All the Feeder Phy
+   */
+  std::map<uint32_t, Ptr<SatPhy> > GetFeederPhy ();
+
+  /**
    * Attach a receive ErrorModel to the SatGeoNetDevice.
    * \param em Ptr to the ErrorModel.
    */

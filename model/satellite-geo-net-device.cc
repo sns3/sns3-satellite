@@ -312,4 +312,16 @@ SatGeoNetDevice::GetFeederPhy (uint32_t beamId)
   NS_FATAL_ERROR ("User Phy does not exist for beam " << beamId);
 }
 
+std::map<uint32_t, Ptr<SatPhy> >
+SatGeoNetDevice::GetUserPhy ()
+{
+  return m_userPhy;
+}
+
+std::map<uint32_t, Ptr<SatPhy> >
+SatGeoNetDevice::GetFeederPhy ()
+{
+  return m_feederPhy;
+}
+
 } // namespace ns3

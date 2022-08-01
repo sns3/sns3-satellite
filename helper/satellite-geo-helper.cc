@@ -29,6 +29,7 @@
 #include "ns3/pointer.h"
 #include "ns3/uinteger.h"
 #include "ns3/config.h"
+#include "ns3/singleton.h"
 
 #include "ns3/satellite-const-variables.h"
 #include "ns3/satellite-utils.h"
@@ -41,6 +42,7 @@
 #include "ns3/satellite-channel-estimation-error-container.h"
 #include "ns3/satellite-helper.h"
 #include "ns3/satellite-typedefs.h"
+#include "ns3/satellite-id-mapper.h"
 
 #include "ns3/satellite-geo-helper.h"
 
@@ -77,7 +79,8 @@ SatGeoHelper::GetTypeId (void)
                    EnumValue (SatPhyRxCarrierConf::EM_NONE),
                    MakeEnumAccessor (&SatGeoHelper::m_fwdErrorModel),
                    MakeEnumChecker (SatPhyRxCarrierConf::EM_NONE, "None",
-                                    SatPhyRxCarrierConf::EM_CONSTANT, "Constant"))
+                                    SatPhyRxCarrierConf::EM_CONSTANT, "Constant",
+                                    SatPhyRxCarrierConf::EM_AVI, "AVI"))
     .AddAttribute ("FwdLinkConstantErrorRate",
                    "Constant error rate on forward feeder link",
                    DoubleValue (0.0),
@@ -88,7 +91,8 @@ SatGeoHelper::GetTypeId (void)
                    EnumValue (SatPhyRxCarrierConf::EM_NONE),
                    MakeEnumAccessor (&SatGeoHelper::m_rtnErrorModel),
                    MakeEnumChecker (SatPhyRxCarrierConf::EM_NONE, "None",
-                                    SatPhyRxCarrierConf::EM_CONSTANT, "Constant"))
+                                    SatPhyRxCarrierConf::EM_CONSTANT, "Constant",
+                                    SatPhyRxCarrierConf::EM_AVI, "AVI"))
     .AddAttribute ("RtnLinkConstantErrorRate",
                    "Constant error rate on return user link",
                    DoubleValue (0.0),
@@ -204,6 +208,9 @@ SatGeoHelper::Install (Ptr<Node> n)
   n->AddDevice (satDev);
   m_deviceCount++;
   m_nodeId = n->GetId ();
+
+  Singleton<SatIdMapper>::Get ()->AttachMacToTraceId (satDev->GetAddress ());
+  Singleton<SatIdMapper>::Get ()->AttachMacToSatId (satDev->GetAddress ());
 
   return satDev;
 }

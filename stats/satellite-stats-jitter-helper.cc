@@ -33,6 +33,7 @@
 #include <ns3/mac48-address.h>
 #include <ns3/net-device.h>
 #include <ns3/satellite-net-device.h>
+#include <ns3/satellite-geo-net-device.h>
 #include <ns3/satellite-mac.h>
 #include <ns3/satellite-phy.h>
 
@@ -954,6 +955,29 @@ void
 SatStatsFwdPhyJitterHelper::DoInstallProbes ()
 {
   NS_LOG_FUNCTION (this);
+
+  NodeContainer sats = NodeContainer (GetSatHelper ()->GetBeamHelper ()->GetGeoSatNode ());
+
+  for (NodeContainer::Iterator it = sats.Begin (); it != sats.End (); ++it)
+    {
+      Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
+      Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
+      NS_ASSERT (satGeoDev != 0);
+      std::map<uint32_t, Ptr<SatPhy> > satGeoFeederPhys = satGeoDev->GetFeederPhy ();
+      Ptr<SatPhy> satPhy;
+      for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoFeederPhys.begin (); it2 != satGeoFeederPhys.end (); ++it2)
+        {
+          satPhy = it2->second;
+          satPhy->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+        }
+      std::map<uint32_t, Ptr<SatPhy> > satGeoUserPhys = satGeoDev->GetUserPhy ();
+      for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoUserPhys.begin (); it2 != satGeoUserPhys.end (); ++it2)
+        {
+          satPhy = it2->second;
+          satPhy->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+        }
+    } // end of `for (it = sats.Begin(); it != sats.End (); ++it)`
+
   NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
 
   for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
@@ -1430,6 +1454,28 @@ void
 SatStatsRtnPhyJitterHelper::DoInstallProbes ()
 {
   NS_LOG_FUNCTION (this);
+
+  NodeContainer sats = NodeContainer (GetSatHelper ()->GetBeamHelper ()->GetGeoSatNode ());
+
+  for (NodeContainer::Iterator it = sats.Begin (); it != sats.End (); ++it)
+    {
+      Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
+      Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
+      NS_ASSERT (satGeoDev != 0);
+      std::map<uint32_t, Ptr<SatPhy> > satGeoFeederPhys = satGeoDev->GetFeederPhy ();
+      Ptr<SatPhy> satPhy;
+      for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoFeederPhys.begin (); it2 != satGeoFeederPhys.end (); ++it2)
+        {
+          satPhy = it2->second;
+          satPhy->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+        }
+      std::map<uint32_t, Ptr<SatPhy> > satGeoUserPhys = satGeoDev->GetUserPhy ();
+      for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoUserPhys.begin (); it2 != satGeoUserPhys.end (); ++it2)
+        {
+          satPhy = it2->second;
+          satPhy->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+        }
+    } // end of `for (it = sats.Begin(); it != sats.End (); ++it)`
 
   NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
   for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)

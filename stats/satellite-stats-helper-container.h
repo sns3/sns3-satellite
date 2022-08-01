@@ -79,7 +79,8 @@ namespace ns3 {
   void AddPerGw ## id (SatStatsHelper::OutputType_t outputType);              \
   void AddPerBeam ## id (SatStatsHelper::OutputType_t outputType);            \
   void AddPerGroup ## id (SatStatsHelper::OutputType_t outputType);           \
-  void AddPerUt ## id (SatStatsHelper::OutputType_t outputType);
+  void AddPerUt ## id (SatStatsHelper::OutputType_t outputType);              \
+  void AddPerSat ## id (SatStatsHelper::OutputType_t outputType);
 
 #define SAT_STATS_FULL_SCOPE_METHOD_DECLARATION(id)                           \
   void AddGlobal ## id (SatStatsHelper::OutputType_t outputType);             \
@@ -87,7 +88,8 @@ namespace ns3 {
   void AddPerBeam ## id (SatStatsHelper::OutputType_t outputType);            \
   void AddPerGroup ## id (SatStatsHelper::OutputType_t outputType);           \
   void AddPerUt ## id (SatStatsHelper::OutputType_t outputType);              \
-  void AddPerUtUser ## id (SatStatsHelper::OutputType_t outputType);
+  void AddPerUtUser ## id (SatStatsHelper::OutputType_t outputType);          \
+  void AddPerSat ## id (SatStatsHelper::OutputType_t outputType);
 
 class SatHelper;
 
@@ -161,6 +163,7 @@ public:
   void AddAverageBeamFwdPhyDelay (SatStatsHelper::OutputType_t outputType);
   void AddAverageGroupFwdPhyDelay (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtFwdPhyDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatFwdPhyDelay (SatStatsHelper::OutputType_t outputType);
 
   // Forward link application-level packet jitter statistics.
   SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (FwdAppJitter)
@@ -186,6 +189,7 @@ public:
   void AddAverageBeamFwdPhyJitter (SatStatsHelper::OutputType_t outputType);
   void AddAverageGroupFwdPhyJitter (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtFwdPhyJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatFwdPhyJitter (SatStatsHelper::OutputType_t outputType);
 
   // Forward link application-level packet PLT statistics.
   SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (FwdAppPlt)
@@ -230,6 +234,7 @@ public:
   void AddAverageBeamFwdPhyThroughput (SatStatsHelper::OutputType_t outputType);
   void AddAverageGroupFwdPhyThroughput (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtFwdPhyThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatFwdPhyThroughput (SatStatsHelper::OutputType_t outputType);
 
   // Return link application-level packet delay statistics.
   SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (RtnAppDelay)
@@ -255,6 +260,7 @@ public:
   void AddAverageBeamRtnPhyDelay (SatStatsHelper::OutputType_t outputType);
   void AddAverageGroupRtnPhyDelay (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtRtnPhyDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatRtnPhyDelay (SatStatsHelper::OutputType_t outputType);
 
   // Return link application-level packet jitter statistics.
   SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (RtnAppJitter)
@@ -280,6 +286,7 @@ public:
   void AddAverageBeamRtnPhyJitter (SatStatsHelper::OutputType_t outputType);
   void AddAverageGroupRtnPhyJitter (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtRtnPhyJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatRtnPhyJitter (SatStatsHelper::OutputType_t outputType);
 
   // Return link application-level packet PLT statistics.
   SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (RtnAppPlt)
@@ -324,6 +331,7 @@ public:
   void AddAverageBeamRtnPhyThroughput (SatStatsHelper::OutputType_t outputType);
   void AddAverageGroupRtnPhyThroughput (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtRtnPhyThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatRtnPhyThroughput (SatStatsHelper::OutputType_t outputType);
 
   // Forward link Dedicated Access packet error rate statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdDaPacketError)

@@ -110,82 +110,85 @@ SatStatsHelperContainer::DoDispose ()
  * Also check the Doxygen documentation of this class for more information.
  */
 
-#define ADD_SAT_STATS_BASIC_OUTPUT_CHECKER                                    \
-  MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",             \
-      SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",      \
-      SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",     \
+#define ADD_SAT_STATS_BASIC_OUTPUT_CHECKER                            \
+  MakeEnumChecker (                                                   \
+      SatStatsHelper::OUTPUT_NONE,           "NONE",                  \
+      SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",           \
+      SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",          \
       SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT"))
 
-#define ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER                             \
-  MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",             \
-      SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",      \
-      SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",     \
-      SatStatsHelper::OUTPUT_HISTOGRAM_FILE, "HISTOGRAM_FILE",   \
-      SatStatsHelper::OUTPUT_PDF_FILE,       "PDF_FILE",         \
-      SatStatsHelper::OUTPUT_CDF_FILE,       "CDF_FILE",         \
-      SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT",     \
-      SatStatsHelper::OUTPUT_HISTOGRAM_PLOT, "HISTOGRAM_PLOT",   \
-      SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT",         \
+#define ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER                     \
+  MakeEnumChecker (                                                   \
+      SatStatsHelper::OUTPUT_NONE,           "NONE",                  \
+      SatStatsHelper::OUTPUT_SCALAR_FILE,    "SCALAR_FILE",           \
+      SatStatsHelper::OUTPUT_SCATTER_FILE,   "SCATTER_FILE",          \
+      SatStatsHelper::OUTPUT_HISTOGRAM_FILE, "HISTOGRAM_FILE",        \
+      SatStatsHelper::OUTPUT_PDF_FILE,       "PDF_FILE",              \
+      SatStatsHelper::OUTPUT_CDF_FILE,       "CDF_FILE",              \
+      SatStatsHelper::OUTPUT_SCATTER_PLOT,   "SCATTER_PLOT",          \
+      SatStatsHelper::OUTPUT_HISTOGRAM_PLOT, "HISTOGRAM_PLOT",        \
+      SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT",              \
       SatStatsHelper::OUTPUT_CDF_PLOT,       "CDF_PLOT"))
 
-#define ADD_SAT_STATS_AVERAGED_DISTRIBUTION_OUTPUT_CHECKER                    \
-  MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,           "NONE",             \
-      SatStatsHelper::OUTPUT_HISTOGRAM_FILE, "HISTOGRAM_FILE",   \
-      SatStatsHelper::OUTPUT_PDF_FILE,       "PDF_FILE",         \
-      SatStatsHelper::OUTPUT_CDF_FILE,       "CDF_FILE",         \
-      SatStatsHelper::OUTPUT_HISTOGRAM_PLOT, "HISTOGRAM_PLOT",   \
-      SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT",         \
+#define ADD_SAT_STATS_AVERAGED_DISTRIBUTION_OUTPUT_CHECKER            \
+  MakeEnumChecker (                                                   \
+      SatStatsHelper::OUTPUT_NONE,           "NONE",                  \
+      SatStatsHelper::OUTPUT_HISTOGRAM_FILE, "HISTOGRAM_FILE",        \
+      SatStatsHelper::OUTPUT_PDF_FILE,       "PDF_FILE",              \
+      SatStatsHelper::OUTPUT_CDF_FILE,       "CDF_FILE",              \
+      SatStatsHelper::OUTPUT_HISTOGRAM_PLOT, "HISTOGRAM_PLOT",        \
+      SatStatsHelper::OUTPUT_PDF_PLOT,       "PDF_PLOT",              \
       SatStatsHelper::OUTPUT_CDF_PLOT,       "CDF_PLOT"))
 
-#define ADD_SAT_STATS_ATTRIBUTE_HEAD(id, desc)                     \
-  .AddAttribute (# id,                                             \
-      std::string ("Enable the output of ") + desc,                \
-      EnumValue (SatStatsHelper::OUTPUT_NONE),                     \
-      MakeEnumAccessor (&SatStatsHelperContainer::Add ## id),      \
+#define ADD_SAT_STATS_ATTRIBUTE_HEAD(id, desc)                        \
+  .AddAttribute (# id,                                                \
+      std::string ("Enable the output of ") + desc,                   \
+      EnumValue (SatStatsHelper::OUTPUT_NONE),                        \
+      MakeEnumAccessor (&SatStatsHelperContainer::Add ## id),         \
 
-#define ADD_SAT_STATS_ATTRIBUTES_BASIC_SET(id, desc)                          \
-      ADD_SAT_STATS_ATTRIBUTE_HEAD (Global ## id,                                 \
-        std::string ("global ") + desc)               \
-      ADD_SAT_STATS_BASIC_OUTPUT_CHECKER                                          \
-      ADD_SAT_STATS_ATTRIBUTE_HEAD (PerGw ## id,                                  \
-        std::string ("per GW ") + desc)               \
-      ADD_SAT_STATS_BASIC_OUTPUT_CHECKER                                          \
-      ADD_SAT_STATS_ATTRIBUTE_HEAD (PerBeam ## id,                                \
-        std::string ("per beam ") + desc)             \
-      ADD_SAT_STATS_BASIC_OUTPUT_CHECKER                                          \
-      ADD_SAT_STATS_ATTRIBUTE_HEAD (PerGroup ## id,                                  \
-        std::string ("per group ") + desc)               \
-      ADD_SAT_STATS_BASIC_OUTPUT_CHECKER                                          \
-      ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUt ## id,                                  \
-        std::string ("per UT ") + desc)               \
+#define ADD_SAT_STATS_ATTRIBUTES_BASIC_SET(id, desc)                  \
+      ADD_SAT_STATS_ATTRIBUTE_HEAD (Global ## id,                     \
+        std::string ("global ") + desc)                               \
+      ADD_SAT_STATS_BASIC_OUTPUT_CHECKER                              \
+      ADD_SAT_STATS_ATTRIBUTE_HEAD (PerGw ## id,                      \
+        std::string ("per GW ") + desc)                               \
+      ADD_SAT_STATS_BASIC_OUTPUT_CHECKER                              \
+      ADD_SAT_STATS_ATTRIBUTE_HEAD (PerBeam ## id,                    \
+        std::string ("per beam ") + desc)                             \
+      ADD_SAT_STATS_BASIC_OUTPUT_CHECKER                              \
+      ADD_SAT_STATS_ATTRIBUTE_HEAD (PerGroup ## id,                   \
+        std::string ("per group ") + desc)                            \
+      ADD_SAT_STATS_BASIC_OUTPUT_CHECKER                              \
+      ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUt ## id,                      \
+        std::string ("per UT ") + desc)                               \
       ADD_SAT_STATS_BASIC_OUTPUT_CHECKER
 
-#define ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET(id, desc)                   \
-      ADD_SAT_STATS_ATTRIBUTE_HEAD (Global ## id,                                 \
-        std::string ("global ") + desc)               \
-      ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER                                   \
-      ADD_SAT_STATS_ATTRIBUTE_HEAD (PerGw ## id,                                  \
-        std::string ("per GW ") + desc)               \
-      ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER                                   \
-      ADD_SAT_STATS_ATTRIBUTE_HEAD (PerBeam ## id,                                \
-        std::string ("per beam ") + desc)             \
-      ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER                                   \
-      ADD_SAT_STATS_ATTRIBUTE_HEAD (PerGroup ## id,                                  \
-        std::string ("per group ") + desc)               \
-      ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER                                   \
-      ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUt ## id,                                  \
-        std::string ("per UT ") + desc)               \
+#define ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET(id, desc)           \
+      ADD_SAT_STATS_ATTRIBUTE_HEAD (Global ## id,                     \
+        std::string ("global ") + desc)                               \
+      ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER                       \
+      ADD_SAT_STATS_ATTRIBUTE_HEAD (PerGw ## id,                      \
+        std::string ("per GW ") + desc)                               \
+      ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER                       \
+      ADD_SAT_STATS_ATTRIBUTE_HEAD (PerBeam ## id,                    \
+        std::string ("per beam ") + desc)                             \
+      ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER                       \
+      ADD_SAT_STATS_ATTRIBUTE_HEAD (PerGroup ## id,                   \
+        std::string ("per group ") + desc)                            \
+      ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER                       \
+      ADD_SAT_STATS_ATTRIBUTE_HEAD (PerUt ## id,                      \
+        std::string ("per UT ") + desc)                               \
       ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
 
-#define ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET(id, desc)          \
-      ADD_SAT_STATS_ATTRIBUTE_HEAD (AverageBeam ## id,                            \
-        std::string ("average beam ") + desc)         \
-      ADD_SAT_STATS_AVERAGED_DISTRIBUTION_OUTPUT_CHECKER                          \
-      ADD_SAT_STATS_ATTRIBUTE_HEAD (AverageGroup ## id,                              \
-        std::string ("average group ") + desc)           \
-      ADD_SAT_STATS_AVERAGED_DISTRIBUTION_OUTPUT_CHECKER                          \
-      ADD_SAT_STATS_ATTRIBUTE_HEAD (AverageUt ## id,                              \
-        std::string ("average UT ") + desc)           \
+#define ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET(id, desc)  \
+      ADD_SAT_STATS_ATTRIBUTE_HEAD (AverageBeam ## id,                \
+        std::string ("average beam ") + desc)                         \
+      ADD_SAT_STATS_AVERAGED_DISTRIBUTION_OUTPUT_CHECKER              \
+      ADD_SAT_STATS_ATTRIBUTE_HEAD (AverageGroup ## id,               \
+        std::string ("average group ") + desc)                        \
+      ADD_SAT_STATS_AVERAGED_DISTRIBUTION_OUTPUT_CHECKER              \
+      ADD_SAT_STATS_ATTRIBUTE_HEAD (AverageUt ## id,                  \
+        std::string ("average UT ") + desc)                           \
       ADD_SAT_STATS_AVERAGED_DISTRIBUTION_OUTPUT_CHECKER
 
 
@@ -682,9 +685,9 @@ SatStatsHelperContainer::GetName () const
   if (type != SatStatsHelper::OUTPUT_NONE)                                    \
   {                                                                           \
     Ptr<SatStats ## id ## Helper> stat                                        \
-    = CreateObject<SatStats ## id ## Helper> (m_satHelper);                 \
+    = CreateObject<SatStats ## id ## Helper> (m_satHelper);                   \
     stat->SetName (m_name + "-global-" + name                                 \
-        + GetOutputTypeSuffix (type));                             \
+        + GetOutputTypeSuffix (type));                                        \
     stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);              \
     stat->SetOutputType (type);                                               \
     stat->Install ();                                                         \
@@ -700,9 +703,9 @@ SatStatsHelperContainer::GetName () const
   if (type != SatStatsHelper::OUTPUT_NONE)                                    \
   {                                                                           \
     Ptr<SatStats ## id ## Helper> stat                                        \
-    = CreateObject<SatStats ## id ## Helper> (m_satHelper);                 \
+    = CreateObject<SatStats ## id ## Helper> (m_satHelper);                   \
     stat->SetName (m_name + "-per-gw-" + name                                 \
-        + GetOutputTypeSuffix (type));                             \
+        + GetOutputTypeSuffix (type));                                        \
     stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_GW);                  \
     stat->SetOutputType (type);                                               \
     stat->Install ();                                                         \
@@ -718,9 +721,9 @@ SatStatsHelperContainer::GetName () const
   if (type != SatStatsHelper::OUTPUT_NONE)                                    \
   {                                                                           \
     Ptr<SatStats ## id ## Helper> stat                                        \
-    = CreateObject<SatStats ## id ## Helper> (m_satHelper);                 \
+    = CreateObject<SatStats ## id ## Helper> (m_satHelper);                   \
     stat->SetName (m_name + "-per-beam-" + name                               \
-        + GetOutputTypeSuffix (type));                             \
+        + GetOutputTypeSuffix (type));                                        \
     stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_BEAM);                \
     stat->SetOutputType (type);                                               \
     stat->Install ();                                                         \
@@ -754,9 +757,9 @@ SatStatsHelperContainer::GetName () const
   if (type != SatStatsHelper::OUTPUT_NONE)                                    \
   {                                                                           \
     Ptr<SatStats ## id ## Helper> stat                                        \
-    = CreateObject<SatStats ## id ## Helper> (m_satHelper);                 \
+    = CreateObject<SatStats ## id ## Helper> (m_satHelper);                   \
     stat->SetName (m_name + "-per-ut-" + name                                 \
-        + GetOutputTypeSuffix (type));                             \
+        + GetOutputTypeSuffix (type));                                        \
     stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT);                  \
     stat->SetOutputType (type);                                               \
     stat->Install ();                                                         \
@@ -772,9 +775,9 @@ SatStatsHelperContainer::GetName () const
   if (type != SatStatsHelper::OUTPUT_NONE)                                      \
   {                                                                             \
     Ptr<SatStats ## id ## Helper> stat                                          \
-    = CreateObject<SatStats ## id ## Helper> (m_satHelper);                   \
+    = CreateObject<SatStats ## id ## Helper> (m_satHelper);                     \
     stat->SetName (m_name + "-per-ut-user-" + name                              \
-        + GetOutputTypeSuffix (type));                               \
+        + GetOutputTypeSuffix (type));                                          \
     stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT_USER);               \
     stat->SetOutputType (type);                                                 \
     stat->Install ();                                                           \
@@ -790,9 +793,9 @@ SatStatsHelperContainer::GetName () const
   if (type != SatStatsHelper::OUTPUT_NONE)                                        \
   {                                                                               \
     Ptr<SatStats ## id ## Helper> stat                                            \
-    = CreateObject<SatStats ## id ## Helper> (m_satHelper);                     \
+    = CreateObject<SatStats ## id ## Helper> (m_satHelper);                       \
     stat->SetName (m_name + "-average-beam-" + name                               \
-        + GetOutputTypeSuffix (type));                                 \
+        + GetOutputTypeSuffix (type));                                            \
     stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_BEAM);                    \
     stat->SetOutputType (type);                                                   \
     stat->SetAveragingMode (true);                                                \
@@ -808,8 +811,8 @@ SatStatsHelperContainer::GetName () const
   NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));           \
   if (type != SatStatsHelper::OUTPUT_NONE)                                      \
   {                                                                             \
-    Ptr<SatStats ## id ## Helper> stat                                       \
-    = CreateObject<SatStats ## id ## Helper> (m_satHelper);                  \
+    Ptr<SatStats ## id ## Helper> stat                                          \
+    = CreateObject<SatStats ## id ## Helper> (m_satHelper);                     \
     stat->SetName (m_name + "-average-group-" + name                            \
         + GetOutputTypeSuffix (type));                                          \
     stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_GROUP);                 \
@@ -828,9 +831,9 @@ SatStatsHelperContainer::GetName () const
   if (type != SatStatsHelper::OUTPUT_NONE)                                      \
   {                                                                             \
     Ptr<SatStats ## id ## Helper> stat                                          \
-    = CreateObject<SatStats ## id ## Helper> (m_satHelper);                   \
+    = CreateObject<SatStats ## id ## Helper> (m_satHelper);                     \
     stat->SetName (m_name + "-average-ut-" + name                               \
-        + GetOutputTypeSuffix (type));                               \
+        + GetOutputTypeSuffix (type));                                          \
     stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT);                    \
     stat->SetOutputType (type);                                                 \
     stat->SetAveragingMode (true);                                              \
@@ -847,9 +850,9 @@ SatStatsHelperContainer::GetName () const
   if (type != SatStatsHelper::OUTPUT_NONE)                                          \
   {                                                                                 \
     Ptr<SatStats ## id ## Helper> stat                                              \
-    = CreateObject<SatStats ## id ## Helper> (m_satHelper);                       \
+    = CreateObject<SatStats ## id ## Helper> (m_satHelper);                         \
     stat->SetName (m_name + "-average-ut-user-" + name                              \
-        + GetOutputTypeSuffix (type));                                   \
+        + GetOutputTypeSuffix (type));                                              \
     stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT_USER);                   \
     stat->SetOutputType (type);                                                     \
     stat->SetAveragingMode (true);                                                  \
@@ -858,7 +861,26 @@ SatStatsHelperContainer::GetName () const
   }                                                                                 \
 }
 
-  #define SAT_STATS_PER_SLICE_METHOD_DEFINITION(id, name)                               \
+#define SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION(id, name)                           \
+  void                                                                              \
+  SatStatsHelperContainer::AddAverageSat ## id (SatStatsHelper::OutputType_t type)  \
+{                                                                                   \
+  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));               \
+  if (type != SatStatsHelper::OUTPUT_NONE)                                          \
+  {                                                                                 \
+    Ptr<SatStats ## id ## Helper> stat                                              \
+    = CreateObject<SatStats ## id ## Helper> (m_satHelper);                         \
+    stat->SetName (m_name + "-average-sat-" + name                                  \
+        + GetOutputTypeSuffix (type));                                              \
+    stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_SAT);                       \
+    stat->SetOutputType (type);                                                     \
+    stat->SetAveragingMode (true);                                                  \
+    stat->Install ();                                                               \
+    m_stats.push_back (stat);                                                       \
+  }                                                                                 \
+}
+
+#define SAT_STATS_PER_SLICE_METHOD_DEFINITION(id, name)                                 \
   void                                                                                  \
   SatStatsHelperContainer::AddPerSlice ## id (SatStatsHelper::OutputType_t type)        \
   {                                                                                     \
@@ -867,9 +889,27 @@ SatStatsHelperContainer::GetName () const
     {                                                                                   \
       Ptr<SatStats ## id ## Helper> stat                                                \
         = CreateObject<SatStats ## id ## Helper> (m_satHelper);                         \
-      stat->SetName (m_name + "-per-slice-" + name                                       \
+      stat->SetName (m_name + "-per-slice-" + name                                      \
                      + GetOutputTypeSuffix (type));                                     \
       stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_SLICE);                       \
+      stat->SetOutputType (type);                                                       \
+      stat->Install ();                                                                 \
+      m_stats.push_back (stat);                                                         \
+    }                                                                                   \
+  }
+
+#define SAT_STATS_PER_SAT_METHOD_DEFINITION(id, name)                                   \
+  void                                                                                  \
+  SatStatsHelperContainer::AddPerSat ## id (SatStatsHelper::OutputType_t type)          \
+  {                                                                                     \
+    NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));                 \
+    if (type != SatStatsHelper::OUTPUT_NONE)                                            \
+    {                                                                                   \
+      Ptr<SatStats ## id ## Helper> stat                                                \
+        = CreateObject<SatStats ## id ## Helper> (m_satHelper);                         \
+      stat->SetName (m_name + "-per-sat-" + name                                        \
+                     + GetOutputTypeSuffix (type));                                     \
+      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_SAT);                         \
       stat->SetOutputType (type);                                                       \
       stat->Install ();                                                                 \
       m_stats.push_back (stat);                                                         \
@@ -915,9 +955,11 @@ SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdPhyDelay, "fwd-phy-delay")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdPhyDelay, "fwd-phy-delay")
 SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FwdPhyDelay, "fwd-phy-delay")
 SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdPhyDelay, "fwd-phy-delay")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (FwdPhyDelay, "fwd-phy-delay")
 SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdPhyDelay, "fwd-phy-delay")
 SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdPhyDelay, "fwd-phy-delay")
 SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdPhyDelay, "fwd-phy-delay")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdPhyDelay, "fwd-phy-delay")
 
 // Forward link application-level packet jitter statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdAppJitter, "fwd-app-jitter")
@@ -957,9 +999,11 @@ SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdPhyJitter, "fwd-phy-jitter")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdPhyJitter, "fwd-phy-jitter")
 SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FwdPhyJitter, "fwd-phy-jitter")
 SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdPhyJitter, "fwd-phy-jitter")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (FwdPhyJitter, "fwd-phy-jitter")
 SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdPhyJitter, "fwd-phy-jitter")
 SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdPhyJitter, "fwd-phy-jitter")
 SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdPhyJitter, "fwd-phy-jitter")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdPhyJitter, "fwd-phy-jitter")
 
 // Forward link application-level packet PLT statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdAppPlt, "fwd-app-plt")
@@ -1039,9 +1083,11 @@ SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdPhyThroughput, "fwd-phy-throughput"
 SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdPhyThroughput, "fwd-phy-throughput")
 SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FwdPhyThroughput, "fwd-phy-throughput")
 SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdPhyThroughput, "fwd-phy-throughput")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (FwdPhyThroughput, "fwd-phy-throughput")
 SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdPhyThroughput, "fwd-phy-throughput")
 SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdPhyThroughput, "fwd-phy-throughput")
 SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdPhyThroughput, "fwd-phy-throughput")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdPhyThroughput, "fwd-phy-throughput")
 
 // Return link application-level packet delay statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnAppDelay, "rtn-app-delay")
@@ -1081,9 +1127,11 @@ SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnPhyDelay, "rtn-phy-delay")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnPhyDelay, "rtn-phy-delay")
 SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnPhyDelay, "rtn-phy-delay")
 SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnPhyDelay, "rtn-phy-delay")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnPhyDelay, "rtn-phy-delay")
 SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnPhyDelay, "rtn-phy-delay")
 SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnPhyDelay, "rtn-phy-delay")
 SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnPhyDelay, "rtn-phy-delay")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnPhyDelay, "rtn-phy-delay")
 
 // Return link application-level packet jitter statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnAppJitter, "rtn-app-jitter")
@@ -1123,9 +1171,11 @@ SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnPhyJitter, "rtn-phy-jitter")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnPhyJitter, "rtn-phy-jitter")
 SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnPhyJitter, "rtn-phy-jitter")
 SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnPhyJitter, "rtn-phy-jitter")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnPhyJitter, "rtn-phy-jitter")
 SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnPhyJitter, "rtn-phy-jitter")
 SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnPhyJitter, "rtn-phy-jitter")
 SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnPhyJitter, "rtn-phy-jitter")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnPhyJitter, "rtn-phy-jitter")
 
 // Return link application-level packet PLT statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnAppPlt, "rtn-app-plt")
@@ -1205,9 +1255,11 @@ SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnPhyThroughput, "rtn-phy-throughput"
 SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnPhyThroughput, "rtn-phy-throughput")
 SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnPhyThroughput, "rtn-phy-throughput")
 SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnPhyThroughput, "rtn-phy-throughput")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnPhyThroughput, "rtn-phy-throughput")
 SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnPhyThroughput, "rtn-phy-throughput")
 SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnPhyThroughput, "rtn-phy-throughput")
 SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnPhyThroughput, "rtn-phy-throughput")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnPhyThroughput, "rtn-phy-throughput")
 
 // Forward link Dedicated Access packet error rate statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdDaPacketError, "fwd-da-error")

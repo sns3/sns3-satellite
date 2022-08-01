@@ -60,6 +60,10 @@ main (int argc, char *argv[])
   /// Set simulation output details
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
 
+  // Enable traces
+  // Config::SetDefault ("ns3::SatPhy::EnableStatisticsTags", BooleanValue (true));
+  // Config::SetDefault ("ns3::SatNetDevice::EnableStatisticsTags", BooleanValue (true));
+
   /// Enable packet trace
   Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
   Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("example-regeneration");
@@ -155,9 +159,9 @@ main (int argc, char *argv[])
       simulationHelper->InstallTrafficModel (
         SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
         Seconds (1.0), Seconds (10.0));
-      /*simulationHelper->InstallTrafficModel (
+      simulationHelper->InstallTrafficModel (
         SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
-        Seconds (1.0), Seconds (10.0));*/
+        Seconds (1.0), Seconds (10.0));
 
     }
 
@@ -177,6 +181,24 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
   ConfigStore outputConfig;
   outputConfig.ConfigureDefaults ();
+
+  Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer ();
+
+  s->AddPerGwFwdPhyDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdPhyDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatFwdPhyDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddPerGwRtnPhyDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnPhyDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatRtnPhyDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddPerGwFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddPerGwRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   simulationHelper->EnableProgressLogs ();
   simulationHelper->RunSimulation ();

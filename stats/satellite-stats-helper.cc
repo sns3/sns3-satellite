@@ -20,11 +20,7 @@
  */
 
 #include "satellite-stats-helper.h"
-#include <ns3/satellite-helper.h>
-#include <ns3/satellite-beam-helper.h>
-#include <ns3/satellite-user-helper.h>
-#include <ns3/satellite-id-mapper.h>
-#include <ns3/satellite-env-variables.h>
+
 #include <ns3/singleton.h>
 #include <ns3/address.h>
 #include <ns3/mac48-address.h>
@@ -37,6 +33,13 @@
 #include <ns3/string.h>
 #include <ns3/enum.h>
 #include <sstream>
+
+#include <ns3/satellite-helper.h>
+#include <ns3/satellite-beam-helper.h>
+#include <ns3/satellite-user-helper.h>
+#include <ns3/satellite-id-mapper.h>
+#include <ns3/satellite-env-variables.h>
+#include <ns3/satellite-geo-net-device.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatStatsHelper");
 
@@ -64,6 +67,8 @@ SatStatsHelper::GetIdentifierTypeName (SatStatsHelper::IdentifierType_t identifi
       return "IDENTIFIER_SLICE";
     case SatStatsHelper::IDENTIFIER_GROUP:
       return "IDENTIFIER_GROUP";
+    case SatStatsHelper::IDENTIFIER_SAT:
+      return "IDENTIFIER_SAT";
     default:
       NS_FATAL_ERROR ("SatStatsHelper - Invalid identifier type");
       break;
@@ -406,6 +411,21 @@ SatStatsHelper::CreateCollectorPerIdentifier (CollectorMap &collectorMap) const
         break;
       }
 
+    case SatStatsHelper::IDENTIFIER_SAT:
+      {
+        NodeContainer sats = NodeContainer (m_satHelper->GetBeamHelper ()->GetGeoSatNode ());
+        for (NodeContainer::Iterator it = sats.Begin (); it != sats.End (); ++it)
+          {
+            const uint32_t satId = GetSatId (*it);
+            std::ostringstream name;
+            name << satId;
+            collectorMap.SetAttribute ("Name", StringValue (name.str ()));
+            collectorMap.Create (satId);
+            n++;
+          }
+        break;
+      }
+
 
     default:
       NS_FATAL_ERROR ("SatStatsHelper - Invalid identifier type");
@@ -460,6 +480,9 @@ SatStatsHelper::GetIdentifierHeading (std::string dataLabel) const
 
     case SatStatsHelper::IDENTIFIER_SLICE:
       return "% slice_id " + dataLabel;
+
+    case SatStatsHelper::IDENTIFIER_SAT:
+      return "% sat_id " + dataLabel;
 
     default:
       NS_FATAL_ERROR ("SatStatsHelper - Invalid identifier type");
@@ -579,6 +602,37 @@ SatStatsHelper::GetGwId (Ptr<Node> gwNode) const
 
 
 uint32_t
+SatStatsHelper::GetSatId (Ptr<Node> satNode) const
+{
+  uint32_t ret = 0;
+  const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
+  const Address addr = satIdMapper->GetSatMacWithNode (satNode);
+
+  if (addr.IsInvalid ())
+    {
+      NS_LOG_WARN (this << " Node " << satNode->GetId ()
+                        << " does not have any valid Mac48Address");
+    }
+  else
+    {
+      const int32_t satId = satIdMapper->GetSatIdWithMac (addr);
+
+      if (satId < 0)
+        {
+          NS_LOG_WARN (this << " Node " << satNode->GetId ()
+                            << " is not found in the global list of SATs");
+        }
+      else
+        {
+          ret = satId;
+        }
+    }
+
+  return ret;
+}
+
+
+uint32_t
 SatStatsHelper::GetIdentifierForUtUser (Ptr<Node> utUserNode) const
 {
   uint32_t ret = 0;
@@ -616,6 +670,30 @@ SatStatsHelper::GetIdentifierForUtUser (Ptr<Node> utUserNode) const
                 ret = gwId;
               }
           }
+
+        break;
+      }
+
+    case SatStatsHelper::IDENTIFIER_SAT:
+      {
+        /*const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
+        const Address utMac = satIdMapper->GetUtMacWithNode (utNode);
+
+        if (!utMac.IsInvalid ())
+          {
+            const int32_t beamId = satIdMapper->GetBeamIdWithMac (utMac);
+            NS_ASSERT_MSG (beamId != -1,
+                           "UT node " << utNode->GetId ()
+                                      << " is not attached to any beam");
+            const uint32_t gwId = m_satHelper->GetBeamHelper ()->GetGwId (beamId);
+            NS_ASSERT_MSG (gwId != 0,
+                           "UT node " << utNode->GetId ()
+                                      << " is not attached to any GW");
+            ret = gwId;
+          }*/
+
+        // TODO do it when several satellites
+        ret = 1;
 
         break;
       }
@@ -736,6 +814,30 @@ SatStatsHelper::GetIdentifierForUt (Ptr<Node> utNode) const
         break;
       }
 
+    case SatStatsHelper::IDENTIFIER_SAT:
+      {
+        /*const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
+        const Address utMac = satIdMapper->GetUtMacWithNode (utNode);
+
+        if (!utMac.IsInvalid ())
+          {
+            const int32_t beamId = satIdMapper->GetBeamIdWithMac (utMac);
+            NS_ASSERT_MSG (beamId != -1,
+                           "UT node " << utNode->GetId ()
+                                      << " is not attached to any beam");
+            const uint32_t gwId = m_satHelper->GetBeamHelper ()->GetGwId (beamId);
+            NS_ASSERT_MSG (gwId != 0,
+                           "UT node " << utNode->GetId ()
+                                      << " is not attached to any GW");
+            ret = gwId;
+          }*/
+
+        // TODO do it when several satellites
+        ret = 1;
+
+        break;
+      }
+
     case SatStatsHelper::IDENTIFIER_BEAM:
       {
         const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
@@ -803,6 +905,30 @@ SatStatsHelper::GetIdentifierForBeam (uint32_t beamId) const
         break;
       }
 
+    case SatStatsHelper::IDENTIFIER_SAT:
+      {
+        /*const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
+        const Address utMac = satIdMapper->GetUtMacWithNode (utNode);
+
+        if (!utMac.IsInvalid ())
+          {
+            const int32_t beamId = satIdMapper->GetBeamIdWithMac (utMac);
+            NS_ASSERT_MSG (beamId != -1,
+                           "UT node " << utNode->GetId ()
+                                      << " is not attached to any beam");
+            const uint32_t gwId = m_satHelper->GetBeamHelper ()->GetGwId (beamId);
+            NS_ASSERT_MSG (gwId != 0,
+                           "UT node " << utNode->GetId ()
+                                      << " is not attached to any GW");
+            ret = gwId;
+          }*/
+
+        // TODO do it when several satellites
+        ret = 1;
+
+        break;
+      }
+
     case SatStatsHelper::IDENTIFIER_BEAM:
       ret = beamId;
       break;
@@ -857,12 +983,55 @@ SatStatsHelper::GetIdentifierForGw (Ptr<Node> gwNode) const
     {
       return 0;
     }
+  else if (m_identifierType == IDENTIFIER_SAT)
+    {
+      /*const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
+      const Address utMac = satIdMapper->GetUtMacWithNode (utNode);
+
+      if (!utMac.IsInvalid ())
+        {
+          const int32_t beamId = satIdMapper->GetBeamIdWithMac (utMac);
+          NS_ASSERT_MSG (beamId != -1,
+                         "UT node " << utNode->GetId ()
+                                    << " is not attached to any beam");
+          const uint32_t gwId = m_satHelper->GetBeamHelper ()->GetGwId (beamId);
+          NS_ASSERT_MSG (gwId != 0,
+                         "UT node " << utNode->GetId ()
+                                    << " is not attached to any GW");
+          ret = gwId;
+        }*/
+
+      // TODO do it when several satellites
+      return 1;
+    }
   else
     {
       NS_LOG_WARN (this << " Identifier type "
                         << GetIdentifierTypeName (m_identifierType)
                         << " is not valid for a GW."
                         << " Assigning identifier 0 to this GW.");
+      return 0;
+    }
+}
+
+
+uint32_t
+SatStatsHelper::GetIdentifierForSat (Ptr<Node> satNode) const
+{
+  if (m_identifierType == IDENTIFIER_SAT)
+    {
+      return GetSatId (satNode);
+    }
+  else if (m_identifierType == IDENTIFIER_GLOBAL)
+    {
+      return 0;
+    }
+  else
+    {
+      NS_LOG_WARN (this << " Identifier type "
+                        << GetIdentifierTypeName (m_identifierType)
+                        << " is not valid for a SAT."
+                        << " Assigning identifier 0 to this SAT.");
       return 0;
     }
 }
@@ -908,6 +1077,24 @@ SatStatsHelper::GetUtSatNetDevice (Ptr<Node> utNode)
   if (dev->GetObject<SatNetDevice> () == 0)
     {
       NS_FATAL_ERROR ("Node " << utNode->GetId () << " is not a valid UT");
+    }
+
+  return dev;
+}
+
+
+Ptr<NetDevice> // static
+SatStatsHelper::GetSatSatGeoNetDevice (Ptr<Node> satNode)
+{
+  /*
+   * Actually there is only one device. This should change with ISLs
+   */
+  NS_ASSERT (satNode->GetNDevices () == 1);
+  Ptr<NetDevice> dev = satNode->GetDevice (0);
+
+  if (dev->GetObject<SatGeoNetDevice> () == 0)
+    {
+      NS_FATAL_ERROR ("Node " << satNode->GetId () << " is not a valid SAT");
     }
 
   return dev;
