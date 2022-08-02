@@ -198,12 +198,12 @@ private:
 
   /// PRIVATE MEMBER VARIABLES
 
-  uint8_t m_randomAccessAllocationChannelId;                    //< Random access allocation ID
+  uint8_t m_randomAccessAllocationChannelId;                                    //< Random access allocation ID
   SatPhyRxCarrierConf::RandomAccessCollisionModel m_randomAccessCollisionModel; //< Random access collision model
-  double m_randomAccessConstantErrorRate;                       //< Constant error rate if collision model is RA_CONSTANT_COLLISION_PROBABILITY
+  double m_randomAccessConstantErrorRate;                                       //< Constant error rate if collision model is RA_CONSTANT_COLLISION_PROBABILITY
   uint32_t m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize;     //< Random access average normalized offered load measurement window size
-  bool m_enableRandomAccessDynamicLoadControl;  //< Is random access dynamic load control enabled
-  std::deque<double> m_randomAccessDynamicLoadControlNormalizedOfferedLoad; //< Container for calculated normalized offered loads
+  bool m_enableRandomAccessDynamicLoadControl;                                  //< Is random access dynamic load control enabled
+  std::deque<double> m_randomAccessDynamicLoadControlNormalizedOfferedLoad;     //< Container for calculated normalized offered loads
 
 
 };

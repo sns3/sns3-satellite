@@ -317,11 +317,19 @@ SatPhyRxCarrier::GetReceiveParams (Ptr<SatSignalParameters> rxParams)
   bool receivePacket = GetDefaultReceiveMode ();
   bool ownAddressFound = false;
 
-  // If satellite and regeneration_phy -> do not check MAC address
+  // If satellite and regeneration_phy -> do not check MAC address, but store it for stat purposes
   if ((rxParams->m_channelType == SatEnums::FORWARD_FEEDER_CH
     || rxParams->m_channelType == SatEnums::RETURN_USER_CH)
     && m_linkRegenerationMode == SatEnums::REGENERATION_PHY)
     {
+      if (!rxParams->m_packetsInBurst.empty ())
+        {
+          SatMacTag tag;
+          rxParams->m_packetsInBurst[0]->PeekPacketTag (tag);
+
+          params.destAddress = tag.GetDestAddress ();
+          params.sourceAddress = tag.GetSourceAddress ();
+        }
       receivePacket = true;
     }
   else

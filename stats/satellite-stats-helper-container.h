@@ -54,7 +54,7 @@ namespace ns3 {
  * - AddAverage [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppThroughput
  * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Dev, Mac, Phy] Throughput
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [FwdDa, RtnDa, SlottedAloha, Crdsa, Essa] PacketError
- * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [SlottedAloha, Crdsa, Essa] PacketCollision
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Feeder, User] [SlottedAloha, Crdsa, Essa] PacketCollision
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] CapacityRequest
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] ResourcesGranted
  * - Add [Global, PerGw, PerBeam] BackloggedRequest
@@ -363,22 +363,25 @@ public:
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (SlottedAlohaPacketError)
 
   // Random Access Slotted ALOHA packet collision rate statistics.
-  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (SlottedAlohaPacketCollision)
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FeederSlottedAlohaPacketCollision)
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (UserSlottedAlohaPacketCollision)
 
   // Random Access CRDSA packet error rate statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (CrdsaPacketError)
 
   // Random Access CRDSA packet collision rate statistics.
-  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (CrdsaPacketCollision)
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FeederCrdsaPacketCollision)
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (UserCrdsaPacketCollision)
 
-  // Random Access Marsala packet collision rate statistics.
+  // Random Access Marsala packet correlation rate statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (MarsalaCorrelation)
 
   // Random Access E-SSA packet error rate statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (EssaPacketError)
 
   // Random Access E-SSA packet collision rate statistics.
-  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (EssaPacketCollision)
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FeederEssaPacketCollision)
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (UserEssaPacketCollision)
 
   // Dedicated Access carrier ID statistics
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (CarrierId)

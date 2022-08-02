@@ -801,9 +801,9 @@ SimulationHelper::CreateDefaultFwdLinkStats ()
   m_statContainer->AddGlobalFwdDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddPerBeamFwdDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddPerBeamRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamCrdsaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFeederCrdsaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddPerBeamCrdsaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFeederSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddPerBeamSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   // Marsala
@@ -887,9 +887,9 @@ SimulationHelper::CreateDefaultRtnLinkStats ()
   // Packet error
   m_statContainer->AddGlobalRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddPerBeamRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamCrdsaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFeederCrdsaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddPerBeamCrdsaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFeederSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddPerBeamSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   // Waveform
