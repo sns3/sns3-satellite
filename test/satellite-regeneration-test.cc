@@ -44,6 +44,7 @@
 #include "ns3/satellite-geo-net-device.h"
 #include "ns3/satellite-geo-feeder-phy.h"
 #include "ns3/satellite-geo-user-phy.h"
+#include "ns3/satellite-phy-rx-carrier.h"
 
 using namespace ns3;
 
@@ -129,6 +130,8 @@ SatRegenerationTest1::DoRun (void)
   /// Set regeneration mode
   Config::SetDefault ("ns3::SatBeamHelper::ForwardLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
   Config::SetDefault ("ns3::SatBeamHelper::ReturnLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
+
+  Config::SetDefault ("ns3::SatGeoFeederPhy::QueueSize", UintegerValue (100));
 
   // Enable traces
   Config::SetDefault ("ns3::SatPhy::EnableStatisticsTags", BooleanValue (true));
@@ -384,6 +387,8 @@ SatRegenerationTest2::DoRun (void)
   Config::SetDefault ("ns3::SatBeamHelper::ForwardLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
   Config::SetDefault ("ns3::SatBeamHelper::ReturnLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
 
+  Config::SetDefault ("ns3::SatGeoFeederPhy::QueueSize", UintegerValue (100));
+
   /// Set constant 10% losses on Uplink
   Config::SetDefault ("ns3::SatGeoHelper::FwdLinkErrorModel", EnumValue (SatPhyRxCarrierConf::EM_CONSTANT));
   Config::SetDefault ("ns3::SatGeoHelper::FwdLinkConstantErrorRate", DoubleValue (0.1));
@@ -481,6 +486,8 @@ public:
 
 private:
   virtual void DoRun (void);
+  void GeoPhyTraceErrorCb (uint32_t nPackets, const Address & address , bool hasError);
+  void GeoPhyTraceCollisionCb (uint32_t nPackets, const Address & address , bool hasCollision);
   void GeoPhyTraceCb (Time time,
                       SatEnums::SatPacketEvent_t event,
                       SatEnums::SatNodeType_t type,
@@ -492,6 +499,13 @@ private:
 
   Ptr<SatHelper> m_helper;
 
+  Address m_gwAddress;
+
+  uint32_t m_nbErrorpacketsFwd;
+  uint32_t m_nbErrorpacketsRtn;
+  uint32_t m_nbCollisionPacketsFwd;
+  uint32_t m_nbCollisionPacketsRtn;
+
   uint32_t m_packetsReceivedFeeder;
   uint32_t m_packetsDroppedFeeder;
   uint32_t m_packetsReceivedUser;
@@ -501,6 +515,10 @@ private:
 // Add some help text to this case to describe what it is intended to test
 SatRegenerationTest3::SatRegenerationTest3 ()
   : TestCase ("This case tests physical regeneration on satellite. It is based on a LARGER scenario, with collisions on return uplink."),
+  m_nbErrorpacketsFwd (0),
+  m_nbErrorpacketsRtn (0),
+  m_nbCollisionPacketsFwd (0),
+  m_nbCollisionPacketsRtn (0),
   m_packetsReceivedFeeder (0),
   m_packetsDroppedFeeder (0),
   m_packetsReceivedUser (0),
@@ -512,6 +530,40 @@ SatRegenerationTest3::SatRegenerationTest3 ()
 // the test case should clean up after itself
 SatRegenerationTest3::~SatRegenerationTest3 ()
 {
+}
+
+void
+SatRegenerationTest3::GeoPhyTraceErrorCb (uint32_t nPackets, const Address & address , bool hasError)
+{
+  if (!hasError)
+    {
+      return;
+    }
+  if (address == m_gwAddress)
+    {
+      m_nbErrorpacketsFwd += nPackets;
+    }
+  else
+    {
+      m_nbErrorpacketsRtn += nPackets;
+    }
+}
+
+void
+SatRegenerationTest3::GeoPhyTraceCollisionCb (uint32_t nPackets, const Address & address , bool hasCollision)
+{
+  if (!hasCollision)
+    {
+      return;
+    }
+  if (address == m_gwAddress)
+    {
+      m_nbCollisionPacketsFwd += nPackets;
+    }
+  else
+    {
+      m_nbCollisionPacketsRtn += nPackets;
+    }
 }
 
 void
@@ -557,11 +609,6 @@ SatRegenerationTest3::GeoPhyTraceCb (Time time,
 void
 SatRegenerationTest3::DoRun (void)
 {
-  std::cout << "m_packetsReceivedFeeder " << m_packetsReceivedFeeder << std::endl;
-  std::cout << "m_packetsReceivedUser " << m_packetsReceivedUser << std::endl;
-  std::cout << "m_packetsDroppedFeeder " << m_packetsDroppedFeeder << std::endl;
-  std::cout << "m_packetsDroppedUser " << m_packetsDroppedUser << std::endl;
-
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
   Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-regeneration", "test3", true);
@@ -569,6 +616,8 @@ SatRegenerationTest3::DoRun (void)
   /// Set regeneration mode
   Config::SetDefault ("ns3::SatBeamHelper::ForwardLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
   Config::SetDefault ("ns3::SatBeamHelper::ReturnLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
+
+  Config::SetDefault ("ns3::SatGeoFeederPhy::QueueSize", UintegerValue (100));
 
   /// Enable SatMac traces
   Config::SetDefault ("ns3::SatPhy::EnableStatisticsTags", BooleanValue (true));
@@ -582,9 +631,6 @@ SatRegenerationTest3::DoRun (void)
 
   // Set Random Access interference model
   Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
-
-  // Set Random Access collision model
-  Config::SetDefault ("ns3::SatBeamHelper::RaCollisionModel", EnumValue (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
 
   // Disable periodic control slots
   Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (false));
@@ -621,9 +667,8 @@ SatRegenerationTest3::DoRun (void)
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
 
   Config::SetDefault ("ns3::SatGeoHelper::FwdLinkErrorModel", EnumValue (SatPhyRxCarrierConf::EM_NONE));
-  //Config::SetDefault ("ns3::SatGeoHelper::RtnLinkErrorModel", EnumValue (SatPhyRxCarrierConf::EM_AVI)); // TODO add link results
-  Config::SetDefault ("ns3::SatGeoHelper::RtnLinkErrorModel", EnumValue (SatPhyRxCarrierConf::EM_NONE));
-  Config::SetDefault ("ns3::SatBeamHelper::RaCollisionModel", EnumValue (SatPhyRxCarrierConf::RA_COLLISION_ALWAYS_DROP_ALL_COLLIDING_PACKETS));
+  Config::SetDefault ("ns3::SatGeoHelper::RtnLinkErrorModel", EnumValue (SatPhyRxCarrierConf::EM_AVI));
+  Config::SetDefault ("ns3::SatBeamHelper::RaCollisionModel", EnumValue (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
 
   Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("test-sat-regeneration3");
   simulationHelper->SetSimulationTime (Seconds (5));
@@ -645,8 +690,21 @@ SatRegenerationTest3::DoRun (void)
   Ptr<SatGeoFeederPhy> satGeoFeederPhy = DynamicCast<SatGeoFeederPhy> (DynamicCast<SatGeoNetDevice> (m_helper->GeoSatNode ()->GetDevice (0))->GetFeederPhy (1));
   Ptr<SatGeoUserPhy> satGeoUserPhy = DynamicCast<SatGeoUserPhy> (DynamicCast<SatGeoNetDevice> (m_helper->GeoSatNode ()->GetDevice (0))->GetUserPhy (1));
 
+  m_gwAddress = m_helper->GwNodes ().Get (0)->GetDevice (1)->GetAddress ();
+
   satGeoFeederPhy->TraceConnectWithoutContext ("PacketTrace", MakeCallback (&SatRegenerationTest3::GeoPhyTraceCb, this));
   satGeoUserPhy->TraceConnectWithoutContext ("PacketTrace", MakeCallback (&SatRegenerationTest3::GeoPhyTraceCb, this));
+
+  for (Ptr<SatPhyRxCarrier> & carrierFeeder : satGeoFeederPhy->GetPhyRx ()->GetRxCarriers ())
+  {
+    carrierFeeder->TraceConnectWithoutContext ("SlottedAlohaRxError", MakeCallback (&SatRegenerationTest3::GeoPhyTraceErrorCb, this));
+    carrierFeeder->TraceConnectWithoutContext ("SlottedAlohaRxCollision", MakeCallback (&SatRegenerationTest3::GeoPhyTraceCollisionCb, this));
+  }
+  for (Ptr<SatPhyRxCarrier> & carrierUser : satGeoUserPhy->GetPhyRx ()->GetRxCarriers ())
+  {
+    carrierUser->TraceConnectWithoutContext ("SlottedAlohaRxError", MakeCallback (&SatRegenerationTest3::GeoPhyTraceErrorCb, this));
+    carrierUser->TraceConnectWithoutContext ("SlottedAlohaRxCollision", MakeCallback (&SatRegenerationTest3::GeoPhyTraceCollisionCb, this));
+  }
 
   Simulator::Stop (Seconds (5));
   Simulator::Run ();
@@ -657,6 +715,11 @@ SatRegenerationTest3::DoRun (void)
   NS_TEST_ASSERT_MSG_NE (m_packetsReceivedUser, 0, "Packets received on RTN user link due to collisions");
   NS_TEST_ASSERT_MSG_EQ (m_packetsDroppedFeeder, 0, "No packets dropped on FWD feeder link");
   NS_TEST_ASSERT_MSG_NE (m_packetsDroppedUser, 0, "Packets dropped on RTN user link due to collisions");
+
+  NS_TEST_ASSERT_MSG_EQ (m_nbErrorpacketsFwd, 0, "No errors on FWD feeder link");
+  NS_TEST_ASSERT_MSG_EQ (m_nbCollisionPacketsFwd, 0, "No collisions on FWD feeder link");
+  NS_TEST_ASSERT_MSG_NE (m_nbErrorpacketsRtn, 0, "Need errors on RTN feeder link");
+  NS_TEST_ASSERT_MSG_NE (m_nbCollisionPacketsRtn, 0, "Need collisions on RTN feeder link");
 }
 
 // The TestSuite class names the TestSuite as sat-regeneration-test, identifies what type of TestSuite (SYSTEM),
@@ -671,8 +734,8 @@ public:
 SatRegenerationTestSuite::SatRegenerationTestSuite ()
   : TestSuite ("sat-regeneration-test", SYSTEM)
 {
-  AddTestCase (new SatRegenerationTest1, TestCase::QUICK); // Test delay with regeneration phy
-  AddTestCase (new SatRegenerationTest2, TestCase::QUICK); // Test losses with regeneration phy
+  //AddTestCase (new SatRegenerationTest1, TestCase::QUICK); // Test delay with regeneration phy
+  //AddTestCase (new SatRegenerationTest2, TestCase::QUICK); // Test losses with regeneration phy
   AddTestCase (new SatRegenerationTest3, TestCase::QUICK); // Test collisions with regeneration phy
 }
 
