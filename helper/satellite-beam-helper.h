@@ -285,6 +285,12 @@ public:
   uint32_t GetUtBeamId (Ptr<Node> utNode) const;
 
   /**
+   * Get the regeneration mode used in satellites for return link
+   * \return The regeneration mode used in satellites for return link
+   */
+  SatEnums::RegenerationMode_t GetReturnLinkRegenerationMode () const;
+
+  /**
    *
    * \param beamInfo Multicast info for the beams. Receiver UTs in a  beam for the multicast group.
    * \param sourceUtNode Source UT node. (NULL in case that source is behind gateway/backbone network)

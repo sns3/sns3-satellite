@@ -52,7 +52,6 @@ main (int argc, char *argv[])
   std::string interval = "1s";
   std::string scenario = "simple";
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::SIMPLE;
-  bool useSlottedAloha = false;
 
   /// Set regeneration mode
   Config::SetDefault ("ns3::SatBeamHelper::ForwardLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
@@ -69,9 +68,8 @@ main (int argc, char *argv[])
   CommandLine cmd;
   cmd.AddValue ("beamIdInFullScenario", "Id where Sending/Receiving UT is selected in FULL scenario. (used only when scenario is full) ", beamIdInFullScenario);
   cmd.AddValue ("packetSize", "Size of constant packet (bytes)", packetSize);
-  cmd.AddValue ("interval", "Interval to sent packets in seconds, (e.g. (1s)", interval);
+  cmd.AddValue ("interval", "Interval to sent packets in seconds, (e.g. (1s))", interval);
   cmd.AddValue ("scenario", "Test scenario to use. (simple, larger or full", scenario);
-  cmd.AddValue ("slottedAlohaScenario", "Use Slotted Aloha scenario to test collisions.", useSlottedAloha);
   simulationHelper->AddDefaultUiArguments (cmd);
   cmd.Parse (argc, argv);
 
@@ -82,59 +80,6 @@ main (int argc, char *argv[])
   else if ( scenario == "full")
     {
       satScenario = SatHelper::FULL;
-    }
-
-  if (useSlottedAloha)
-    {
-      packetSize = 512;
-      interval = "1ms";
-
-      // Enable Random Access
-      Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_SLOTTED_ALOHA));
-
-      // Set Random Access interference model
-      Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
-
-      // Set Random Access collision model
-      Config::SetDefault ("ns3::SatBeamHelper::RaCollisionModel", EnumValue (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
-
-      // Disable periodic control slots
-      Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (false));
-
-      // Set dynamic load control parameters
-      Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableRandomAccessDynamicLoadControl", BooleanValue (false));
-      Config::SetDefault ("ns3::SatPhyRxCarrierConf::RandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize", UintegerValue (10));
-
-      // Set random access parameters
-      Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_MaximumUniquePayloadPerBlock", UintegerValue (3));
-      Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_MaximumConsecutiveBlockAccessed", UintegerValue (6));
-      Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_MinimumIdleBlock", UintegerValue (2));
-      Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_BackOffTimeInMilliSeconds", UintegerValue (250));
-      Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_BackOffProbability", UintegerValue (10000));
-      Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_HighLoadBackOffProbability", UintegerValue (30000));
-      Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_NumberOfInstances", UintegerValue (3));
-      Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_AverageNormalizedOfferedLoadThreshold", DoubleValue (0.5));
-      Config::SetDefault ("ns3::SatLowerLayerServiceConf::DefaultControlRandomizationInterval", TimeValue (MilliSeconds (100)));
-      Config::SetDefault ("ns3::SatRandomAccessConf::CrdsaSignalingOverheadInBytes", UintegerValue (5));
-      Config::SetDefault ("ns3::SatRandomAccessConf::SlottedAlohaSignalingOverheadInBytes", UintegerValue (3));
-
-      // Disable CRA and DA
-      Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (false));
-      Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_ConstantAssignmentProvided", BooleanValue (false));
-      Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_ConstantAssignmentProvided", BooleanValue (false));
-      Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
-      Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_RbdcAllowed", BooleanValue (false));
-      Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_RbdcAllowed", BooleanValue (false));
-      Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_RbdcAllowed", BooleanValue (false));
-      Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue (false));
-      Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_VolumeAllowed", BooleanValue (false));
-      Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_VolumeAllowed", BooleanValue (false));
-      Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_VolumeAllowed", BooleanValue (false));
-      Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
-
-      Config::SetDefault ("ns3::SatGeoHelper::FwdLinkErrorModel", EnumValue (SatPhyRxCarrierConf::EM_NONE));
-      Config::SetDefault ("ns3::SatGeoHelper::RtnLinkErrorModel", EnumValue (SatPhyRxCarrierConf::EM_NONE));
-      Config::SetDefault ("ns3::SatBeamHelper::RaCollisionModel", EnumValue (SatPhyRxCarrierConf::RA_COLLISION_ALWAYS_DROP_ALL_COLLIDING_PACKETS));
     }
 
   // Set tag, if output path is not explicitly defined
@@ -149,28 +94,14 @@ main (int argc, char *argv[])
 
   LogComponentEnable ("sat-regeneration-example", LOG_LEVEL_INFO);
 
-  Ptr<SatHelper> helper;
-  if (useSlottedAloha)
-    {
-      simulationHelper->SetUserCountPerUt (1);
-      simulationHelper->SetUtCountPerBeam (50);
-      simulationHelper->SetBeamSet ({1});
-      helper = simulationHelper->CreateSatScenario ();
-    }
-  else
-    {
-      helper = simulationHelper->CreateSatScenario (satScenario);
-    }
+  Ptr<SatHelper> helper = simulationHelper->CreateSatScenario (satScenario);
 
   Config::SetDefault ("ns3::CbrApplication::Interval", StringValue (interval));
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize) );
 
-  if (!useSlottedAloha)
-    {
-      simulationHelper->InstallTrafficModel (
-        SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
-        Seconds (1.0), Seconds (10.0));
-    }
+  simulationHelper->InstallTrafficModel (
+    SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
+    Seconds (1.0), Seconds (10.0));
   simulationHelper->InstallTrafficModel (
     SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
     Seconds (1.0), Seconds (10.0));
@@ -209,10 +140,6 @@ main (int argc, char *argv[])
   s->AddPerGwRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerSatRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-  s->AddPerSatFeederSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatUserSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   simulationHelper->EnableProgressLogs ();
   simulationHelper->RunSimulation ();

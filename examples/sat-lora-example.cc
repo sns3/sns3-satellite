@@ -217,15 +217,15 @@ main (int argc, char *argv[])
     {
       Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer ();
 
-      s->AddGlobalEssaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
-      s->AddGlobalEssaPacketError (SatStatsHelper::OUTPUT_SCATTER_FILE);
-      s->AddPerUtEssaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
-      s->AddPerUtEssaPacketError (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddGlobalFeederEssaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddGlobalFeederEssaPacketError (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddPerUtFeederEssaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerUtFeederEssaPacketError (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-      s->AddGlobalEssaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
-      s->AddGlobalEssaPacketCollision (SatStatsHelper::OUTPUT_SCATTER_FILE);
-      s->AddPerUtEssaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
-      s->AddPerUtEssaPacketCollision (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddGlobalFeederEssaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddGlobalFeederEssaPacketCollision (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddPerUtFeederEssaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerUtFeederEssaPacketCollision (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
       s->AddGlobalRtnFeederWindowLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
       s->AddGlobalRtnFeederWindowLoad (SatStatsHelper::OUTPUT_SCATTER_FILE);

@@ -542,58 +542,55 @@ SatStatsUserPacketCollisionHelper::DoInstall ()
 
   for (NodeContainer::Iterator it = sats.Begin (); it != sats.End (); ++it)
     {
-      NetDeviceContainer devs = GetSatSatGeoNetDevice (*it);
+      Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
 
-      for (NetDeviceContainer::Iterator itDev = devs.Begin ();
-           itDev != devs.End (); ++itDev)
+      Ptr<SatPhy> satPhy;
+      Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
+      NS_ASSERT (satGeoDev != 0);
+      std::map<uint32_t, Ptr<SatPhy> > satGeoUserPhys = satGeoDev->GetUserPhy ();
+      for (std::map<uint32_t, Ptr<SatPhy>>::iterator itPhy = satGeoUserPhys.begin (); itPhy != satGeoUserPhys.end (); ++itPhy)
         {
-          Ptr<SatPhy> satPhy;
-          Ptr<SatGeoNetDevice> satGeoDev = (*itDev)->GetObject<SatGeoNetDevice> ();
-          NS_ASSERT (satGeoDev != 0);
-          std::map<uint32_t, Ptr<SatPhy> > satGeoUserPhys = satGeoDev->GetUserPhy ();
-          for (std::map<uint32_t, Ptr<SatPhy>>::iterator itPhy = satGeoUserPhys.begin (); itPhy != satGeoUserPhys.end (); ++itPhy)
+          satPhy = itPhy->second;
+          NS_ASSERT (satPhy != 0);
+          Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx ();
+          NS_ASSERT (satPhyRx != 0);
+
+          ObjectVectorValue carriers;
+          satPhyRx->GetAttribute ("RxCarrierList", carriers);
+          NS_LOG_DEBUG (this << " Node ID " << (*it)->GetId ()
+                             << " device #" << dev->GetIfIndex ()
+                             << " has " << carriers.GetN () << " RX carriers");
+
+          for (ObjectVectorValue::Iterator itCarrier = carriers.Begin ();
+               itCarrier != carriers.End (); ++itCarrier)
             {
-              satPhy = itPhy->second;
-              NS_ASSERT (satPhy != 0);
-              Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx ();
-              NS_ASSERT (satPhyRx != 0);
-
-              ObjectVectorValue carriers;
-              satPhyRx->GetAttribute ("RxCarrierList", carriers);
-              NS_LOG_DEBUG (this << " Node ID " << (*it)->GetId ()
-                                 << " device #" << (*itDev)->GetIfIndex ()
-                                 << " has " << carriers.GetN () << " RX carriers");
-
-              for (ObjectVectorValue::Iterator itCarrier = carriers.Begin ();
-                   itCarrier != carriers.End (); ++itCarrier)
+              SatPhyRxCarrier::CarrierType ct = DynamicCast<SatPhyRxCarrier> (itCarrier->second)->GetCarrierType ();
+              if (ct != GetValidCarrierType ())
                 {
-                  SatPhyRxCarrier::CarrierType ct = DynamicCast<SatPhyRxCarrier> (itCarrier->second)->GetCarrierType ();
-                  if (ct != GetValidCarrierType ())
-                    {
-                      continue;
-                    }
+                  continue;
+                }
 
-                  const bool ret = itCarrier->second->TraceConnectWithoutContext (GetTraceSourceName (), callback);
-                  if (ret)
-                    {
-                      NS_LOG_INFO (this << " successfully connected with node ID "
-                                        << (*it)->GetId ()
-                                        << " device #" << (*itDev)->GetIfIndex ()
-                                        << " RX carrier #" << itCarrier->first);
-                    }
-                  else
-                    {
-                      NS_FATAL_ERROR ("Error connecting to "
-                                      << GetTraceSourceName () << " trace source"
-                                      << " of SatPhyRxCarrier"
-                                      << " at node ID " << (*it)->GetId ()
-                                      << " device #" << (*itDev)->GetIfIndex ()
-                                      << " RX carrier #" << itCarrier->first);
-                    }
+              const bool ret = itCarrier->second->TraceConnectWithoutContext (GetTraceSourceName (), callback);
+              if (ret)
+                {
+                  NS_LOG_INFO (this << " successfully connected with node ID "
+                                    << (*it)->GetId ()
+                                    << " device #" << dev->GetIfIndex ()
+                                    << " RX carrier #" << itCarrier->first);
+                }
+              else
+                {
+                  NS_FATAL_ERROR ("Error connecting to "
+                                  << GetTraceSourceName () << " trace source"
+                                  << " of SatPhyRxCarrier"
+                                  << " at node ID " << (*it)->GetId ()
+                                  << " device #" << dev->GetIfIndex ()
+                                  << " RX carrier #" << itCarrier->first);
+                }
 
-                } // end of `for (ObjectVectorValue::Iterator itCarrier = carriers)`
-            }
-        } // end of `for (NetDeviceContainer::Iterator itDev = devs)`
+            } // end of `for (ObjectVectorValue::Iterator itCarrier = carriers)`
+
+        } // end of `for (std::map<uint32_t, Ptr<SatPhy>>::iterator itPhy = satGeoUserPhys)`
 
     } // end of `for (NodeContainer::Iterator it = sats)`
 

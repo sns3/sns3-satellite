@@ -798,13 +798,13 @@ SimulationHelper::CreateDefaultFwdLinkStats ()
   m_statContainer->AddGlobalFwdAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
 
   // Packet error
-  m_statContainer->AddGlobalFwdDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamFwdDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddGlobalFwdUserDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFwdUserDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamRtnFeederDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddPerBeamFeederCrdsaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamCrdsaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFeederCrdsaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddPerBeamFeederSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFeederSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   // Marsala
   m_statContainer->AddPerBeamMarsalaCorrelation (SatStatsHelper::OUTPUT_SCALAR_FILE);
@@ -885,12 +885,12 @@ SimulationHelper::CreateDefaultRtnLinkStats ()
   m_statContainer->AddPerBeamRtnMacDelay (SatStatsHelper::OUTPUT_CDF_FILE);
 
   // Packet error
-  m_statContainer->AddGlobalRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddGlobalRtnFeederDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamRtnFeederDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddPerBeamFeederCrdsaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamCrdsaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFeederCrdsaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddPerBeamFeederSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFeederSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   // Waveform
   m_statContainer->AddPerBeamWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);

@@ -176,6 +176,7 @@ SatRegenerationTest1::DoRun (void)
   Ptr<SatGeoFeederPhy> satGeoFeederPhy = DynamicCast<SatGeoFeederPhy> (DynamicCast<SatGeoNetDevice> (m_helper->GeoSatNode ()->GetDevice (0))->GetFeederPhy (8));
   Ptr<SatGeoUserPhy> satGeoUserPhy = DynamicCast<SatGeoUserPhy> (DynamicCast<SatGeoNetDevice> (m_helper->GeoSatNode ()->GetDevice (0))->GetUserPhy (8));
 
+  // TODO update with link delay
   satGeoFeederPhy->TraceConnectWithoutContext ("RxDelay", MakeCallback (&SatRegenerationTest1::GeoPhyTraceDelayCb, this));
   satGeoUserPhy->TraceConnectWithoutContext ("RxDelay", MakeCallback (&SatRegenerationTest1::GeoPhyTraceDelayCb, this));
   Config::Connect ("/NodeList/*/DeviceList/*/SatPhy/RxDelay", MakeCallback (&SatRegenerationTest1::PhyDelayTraceCb, this));

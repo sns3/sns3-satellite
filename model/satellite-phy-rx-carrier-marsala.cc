@@ -169,13 +169,6 @@ SatPhyRxCarrierMarsala::PerformMarsala (
               replicasExtNoisePowerInSatellite += replica.rxParams->GetRxExtNoisePowerInSatellite ();
             }
 
-          // Calculate correlated SINR
-          double sinrSatellite = CalculateSinr ( replicasCountSquared * currentPacket->rxParams->GetRxPowerInSatellite (),
-                                                 replicasIfPowerInSatellite,
-                                                 replicasNoisePowerInSatellite,
-                                                 replicasAciIfPowerInSatellite,
-                                                 replicasExtNoisePowerInSatellite,
-                                                 currentPacket->rxParams->GetSinrCalculator ());
           double sinr = CalculateSinr ( replicasCountSquared * currentPacket->rxParams->m_rxPower_W,
                                         replicasIfPower,
                                         replicasNoisePower,
@@ -183,7 +176,22 @@ SatPhyRxCarrierMarsala::PerformMarsala (
                                         replicasExtNoisePower,
                                         m_sinrCalculate);
 
-          double cSinr = CalculateCompositeSinr (sinr, sinrSatellite);
+          /// calculate composite SINR if transparent. Otherwise take only current sinr.
+          double cSinr;
+          if (GetLinkRegenerationMode () == SatEnums::TRANSPARENT)
+            {
+              double sinrSatellite = CalculateSinr ( replicasCountSquared * currentPacket->rxParams->GetRxPowerInSatellite (),
+                                                     replicasIfPowerInSatellite,
+                                                     replicasNoisePowerInSatellite,
+                                                     replicasAciIfPowerInSatellite,
+                                                     replicasExtNoisePowerInSatellite,
+                                                     currentPacket->rxParams->GetSinrCalculator ());
+              cSinr = CalculateCompositeSinr (sinr, sinrSatellite);
+            }
+          else
+            {
+              cSinr = sinr;
+            }
 
           /*
            * Update link specific SINR trace for the RETURN_FEEDER link. The RETURN_USER

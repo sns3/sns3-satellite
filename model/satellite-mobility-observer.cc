@@ -91,13 +91,14 @@ SatMobilityObserver::SatMobilityObserver ()
   NS_ASSERT (false);
 }
 
-SatMobilityObserver::SatMobilityObserver (Ptr<SatMobilityModel> ownMobility, Ptr<SatMobilityModel> geoSatMobility)
+SatMobilityObserver::SatMobilityObserver (Ptr<SatMobilityModel> ownMobility, Ptr<SatMobilityModel> geoSatMobility, bool isRegenerative)
   : m_ownMobility (ownMobility),
   m_anotherMobility (NULL),
   m_geoSatMobility (geoSatMobility),
   m_ownProgDelayModel (NULL),
   m_anotherProgDelayModel (NULL),
-  m_initialized (false)
+  m_initialized (false),
+  m_isRegenerative (isRegenerative)
 {
   NS_LOG_FUNCTION (this << ownMobility << geoSatMobility);
 
@@ -309,9 +310,15 @@ SatMobilityObserver::UpdateTimingAdvance ()
   NS_ASSERT (m_ownProgDelayModel != NULL);
   NS_ASSERT (m_anotherProgDelayModel != NULL);
 
-  m_timingAdvance_s = m_ownProgDelayModel->GetDelay ( m_ownMobility, m_geoSatMobility ) +
-    m_anotherProgDelayModel->GetDelay ( m_anotherMobility, m_geoSatMobility );
-
+  if (m_isRegenerative)
+    {
+      m_timingAdvance_s = m_ownProgDelayModel->GetDelay ( m_ownMobility, m_geoSatMobility );
+    }
+  else
+    {
+      m_timingAdvance_s = m_ownProgDelayModel->GetDelay ( m_ownMobility, m_geoSatMobility ) +
+        m_anotherProgDelayModel->GetDelay ( m_anotherMobility, m_geoSatMobility );
+    }
 }
 
 

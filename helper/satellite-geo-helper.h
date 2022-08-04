@@ -84,6 +84,14 @@ public:
   {
   }
 
+  /*
+   * Initializes the GEO helper based on attributes.
+   * Link results are used only if satellite is regenerative.
+   * \param lrFwd DVB-S2 or DVB-S2X link results
+   * \param lrRcs2 return link results
+   */
+  void Initialize (Ptr<SatLinkResultsFwd> lrFwd, Ptr<SatLinkResultsRtn> lrRcs2);
+
   /**
    * Set an attribute value to be propagated to each NetDevice created by the
    * helper.
@@ -236,6 +244,18 @@ private:
    * \brief The used random access model settings
    */
   RandomAccessSettings_s m_raSettings;
+
+  /*
+   * Forward channel link results (DVB-S2) are created if ErrorModel
+   * is configured to be AVI.
+   */
+  Ptr<SatLinkResults> m_fwdLinkResults;
+
+  /*
+   * Return channel link results (DVB-RCS2) are created if ErrorModel
+   * is configured to be AVI.
+   */
+  Ptr<SatLinkResults> m_rtnLinkResults;
 };
 
 } // namespace ns3

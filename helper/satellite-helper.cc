@@ -904,7 +904,7 @@ SatHelper::InstallMobilityObserver (NodeContainer nodes) const
           NS_ASSERT (ownMobility != NULL);
           NS_ASSERT (satMobility != NULL);
 
-          observer = CreateObject<SatMobilityObserver> (ownMobility, satMobility);
+          observer = CreateObject<SatMobilityObserver> (ownMobility, satMobility, m_beamHelper->GetReturnLinkRegenerationMode () != SatEnums::TRANSPARENT);
 
           (*i)->AggregateObject (observer);
         }

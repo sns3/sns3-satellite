@@ -59,6 +59,7 @@ public:
   SatGeoFeederPhy (void);
 
   SatGeoFeederPhy (SatPhy::CreateParam_t& params,
+                   Ptr<SatLinkResults> linkResults,
                    SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
                    Ptr<SatSuperframeConf> superFrameConf,
                    SatEnums::RegenerationMode_t forwardLinkRegenerationMode,

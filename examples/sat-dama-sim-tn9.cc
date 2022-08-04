@@ -223,7 +223,7 @@ main (int argc, char *argv[])
   s->AddPerBeamRtnCompositeSinr (SatStatsHelper::OUTPUT_CDF_PLOT);
   s->AddPerBeamRtnCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_PLOT);
 
-  s->AddPerBeamRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamRtnFeederDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamFrameSymbolLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);

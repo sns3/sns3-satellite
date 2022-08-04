@@ -493,6 +493,7 @@ SatPhyRxCarrier::CheckAgainstLinkResultsErrorModelAvi (double cSinr, Ptr<SatSign
   bool error = false;
   switch (GetChannelType ())
     {
+    case SatEnums::FORWARD_FEEDER_CH:
     case SatEnums::FORWARD_USER_CH:
       {
         /**
@@ -530,6 +531,7 @@ SatPhyRxCarrier::CheckAgainstLinkResultsErrorModelAvi (double cSinr, Ptr<SatSign
       }
 
     case SatEnums::RETURN_FEEDER_CH:
+    case SatEnums::RETURN_USER_CH:
       {
         /**
          * In return link the link results are in Eb/No format, thus here we need
@@ -567,8 +569,6 @@ SatPhyRxCarrier::CheckAgainstLinkResultsErrorModelAvi (double cSinr, Ptr<SatSign
                                            << " error: " << error);
         break;
       }
-    case SatEnums::RETURN_USER_CH:
-    case SatEnums::FORWARD_FEEDER_CH:
     case SatEnums::UNKNOWN_CH:
     default:
       {
@@ -602,7 +602,7 @@ SatPhyRxCarrier::CalculateSinr (double rxPowerW,
 
   if (rxNoisePowerW <= 0.0)
     {
-      NS_FATAL_ERROR ("Noise power must be greater than zero!!!");
+      NS_FATAL_ERROR ("Noise power must be greater than zero!!! Current value is " << rxNoisePowerW);
     }
 
   // Calculate first SINR based on co-channel interference, Adjacent channel interference, noise and external noise

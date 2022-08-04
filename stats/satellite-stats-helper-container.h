@@ -53,7 +53,7 @@ namespace ns3 {
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Dev, Mac, Phy] Throughput
  * - AddAverage [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppThroughput
  * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Dev, Mac, Phy] Throughput
- * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [FwdDa, RtnDa, SlottedAloha, Crdsa, Essa] PacketError
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Feeder, User] [FwdDa, RtnDa, SlottedAloha, Crdsa, Essa] PacketError
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Feeder, User] [SlottedAloha, Crdsa, Essa] PacketCollision
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] CapacityRequest
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] ResourcesGranted
@@ -354,20 +354,24 @@ public:
   void AddAverageSatRtnPhyThroughput (SatStatsHelper::OutputType_t outputType);
 
   // Forward link Dedicated Access packet error rate statistics.
-  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdDaPacketError)
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdFeederDaPacketError)
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdUserDaPacketError)
 
   // Return link Dedicated Access packet error rate statistics.
-  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnDaPacketError)
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnFeederDaPacketError)
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnUserDaPacketError)
 
   // Random Access Slotted ALOHA packet error rate statistics.
-  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (SlottedAlohaPacketError)
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FeederSlottedAlohaPacketError)
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (UserSlottedAlohaPacketError)
 
   // Random Access Slotted ALOHA packet collision rate statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FeederSlottedAlohaPacketCollision)
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (UserSlottedAlohaPacketCollision)
 
   // Random Access CRDSA packet error rate statistics.
-  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (CrdsaPacketError)
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FeederCrdsaPacketError)
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (UserCrdsaPacketError)
 
   // Random Access CRDSA packet collision rate statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FeederCrdsaPacketCollision)
@@ -377,7 +381,8 @@ public:
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (MarsalaCorrelation)
 
   // Random Access E-SSA packet error rate statistics.
-  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (EssaPacketError)
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FeederEssaPacketError)
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (UserEssaPacketError)
 
   // Random Access E-SSA packet collision rate statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FeederEssaPacketCollision)

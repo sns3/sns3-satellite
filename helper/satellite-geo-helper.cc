@@ -123,7 +123,9 @@ SatGeoHelper::SatGeoHelper ()
   m_deviceFactory (),
   m_daFwdLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
   m_daRtnLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
-  m_raSettings ()
+  m_raSettings (),
+  m_fwdLinkResults (),
+  m_rtnLinkResults ()
 {
   NS_LOG_FUNCTION (this );
 
@@ -145,11 +147,35 @@ SatGeoHelper::SatGeoHelper (SatTypedefs::CarrierBandwidthConverter_t bandwidthCo
   m_daFwdLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
   m_daRtnLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
   m_superframeSeq (seq),
-  m_raSettings (randomAccessSettings)
+  m_raSettings (randomAccessSettings),
+  m_fwdLinkResults (),
+  m_rtnLinkResults ()
 {
   NS_LOG_FUNCTION (this << rtnLinkCarrierCount << fwdLinkCarrierCount );
 
   m_deviceFactory.SetTypeId ("ns3::SatGeoNetDevice");
+}
+
+void
+SatGeoHelper::Initialize (Ptr<SatLinkResultsFwd> lrFwd, Ptr<SatLinkResultsRtn> lrRcs2)
+{
+  NS_LOG_FUNCTION (this);
+
+  /*
+   * Forward channel link results (DVB-S2 or DVB-S2X).
+   */
+  if (lrFwd && m_fwdErrorModel == SatPhyRxCarrierConf::EM_AVI)
+    {
+      m_fwdLinkResults = lrFwd;
+    }
+
+  /*
+   * Return channel link results (DVB-RCS2).
+   */
+  if (lrRcs2 && m_rtnErrorModel == SatPhyRxCarrierConf::EM_AVI)
+    {
+      m_rtnLinkResults = lrRcs2;
+    }
 }
 
 void
@@ -279,6 +305,7 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d,
   parametersFeeder.m_randomAccessModel = m_raSettings.m_randomAccessModel;
 
   Ptr<SatGeoUserPhy> uPhy = CreateObject<SatGeoUserPhy> (params,
+                                                         m_rtnLinkResults,
                                                          parametersUser,
                                                          m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE),
                                                          forwardLinkRegenerationMode,
@@ -288,6 +315,7 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d,
   params.m_rxCh = ff;
 
   Ptr<SatGeoFeederPhy> fPhy = CreateObject<SatGeoFeederPhy> (params,
+                                                             m_fwdLinkResults,
                                                              parametersFeeder,
                                                              m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE),
                                                              forwardLinkRegenerationMode,
@@ -319,6 +347,11 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d,
 
   Ptr<SatNodeInfo> niFeeder = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, Mac48Address::ConvertFrom (d->GetAddress ()));
   fPhy->SetNodeInfo (niFeeder);
+
+  if (returnLinkRegenerationMode != SatEnums::TRANSPARENT)
+    {
+      uPhy->BeginEndScheduling ();
+    }
 }
 
 void

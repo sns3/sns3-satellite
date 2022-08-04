@@ -132,6 +132,7 @@ SatGeoUserPhy::SatGeoUserPhy (void)
 }
 
 SatGeoUserPhy::SatGeoUserPhy (SatPhy::CreateParam_t& params,
+                              Ptr<SatLinkResults> linkResults,
                               SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
                               Ptr<SatSuperframeConf> superFrameConf,
                               SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
@@ -172,6 +173,11 @@ SatGeoUserPhy::SatGeoUserPhy (SatPhy::CreateParam_t& params,
   parameters.m_chType = SatEnums::RETURN_USER_CH;
 
   Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf> (parameters);
+
+  if (linkResults)
+    {
+      carrierConf->SetLinkResults (linkResults);
+    }
 
   carrierConf->SetSinrCalculatorCb (MakeCallback (&SatGeoUserPhy::CalculateSinr, this));
 

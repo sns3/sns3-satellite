@@ -338,6 +338,8 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
   // DVB-RCS2 link results for packet decoding at the GW +
   // DVB-S2 link results for FWD link RRM
   m_gwHelper->Initialize (linkResultsReturnLink, linkResultsFwd, m_dvbVersion);
+  // link results on satellite, to use if regeneration
+  m_geoHelper->Initialize (linkResultsFwd, linkResultsReturnLink);
   // DVB-RCS2 link results for RTN link waveform configurations
   m_superframeSeq->GetWaveformConf ()->InitializeEbNoRequirements (linkResultsReturnLink);
 
@@ -800,6 +802,14 @@ SatBeamHelper::GetUtBeamId (Ptr<Node> utNode) const
     }
 
   return beamId;
+}
+
+SatEnums::RegenerationMode_t
+SatBeamHelper::GetReturnLinkRegenerationMode () const
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_returnLinkRegenerationMode;
 }
 
 NetDeviceContainer

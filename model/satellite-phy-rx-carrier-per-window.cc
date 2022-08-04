@@ -254,14 +254,6 @@ SatPhyRxCarrierPerWindow::CalculatePacketInterferenceVectors (SatPhyRxCarrierPer
   // TODO: should we check the interference model used ?
   // TODO: should we check the collision model used (check against sinr, collision always drops, etc) ?
 
-  /// Calculate the SNR
-  double snrSatellite = CalculateSinr ( packet.rxParams->GetRxPowerInSatellite (),
-                                        0.0,
-                                        packet.rxParams->GetRxNoisePowerInSatellite (),
-                                        packet.rxParams->GetRxAciIfPowerInSatellite (),
-                                        packet.rxParams->GetRxExtNoisePowerInSatellite (),
-                                        packet.rxParams->GetSinrCalculator ());
-
   double snr = CalculateSinr ( packet.rxParams->m_rxPower_W,
                                0.0,
                                m_rxNoisePowerW,
@@ -272,6 +264,14 @@ SatPhyRxCarrierPerWindow::CalculatePacketInterferenceVectors (SatPhyRxCarrierPer
   double cSnr;
   if (GetLinkRegenerationMode () == SatEnums::TRANSPARENT)
     {
+      /// Calculate the SNR
+      double snrSatellite = CalculateSinr ( packet.rxParams->GetRxPowerInSatellite (),
+                                            0.0,
+                                            packet.rxParams->GetRxNoisePowerInSatellite (),
+                                            packet.rxParams->GetRxAciIfPowerInSatellite (),
+                                            packet.rxParams->GetRxExtNoisePowerInSatellite (),
+                                            packet.rxParams->GetSinrCalculator ());
+
       cSnr = CalculateCompositeSinr (snr, snrSatellite);
     }
   else

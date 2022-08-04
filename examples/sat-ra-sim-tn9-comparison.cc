@@ -212,17 +212,17 @@ main (int argc, char *argv[])
   s->AddPerBeamFrameSymbolLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-  s->AddPerBeamRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamRtnFeederDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-  s->AddPerBeamCrdsaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerBeamCrdsaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerBeamSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerBeamSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamFeederCrdsaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamFeederCrdsaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamFeederSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamFeederSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-  //s->AddPerUtCrdsaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  //s->AddPerUtCrdsaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  //s->AddPerUtSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  //s->AddPerUtSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  //s->AddPerUtFeederCrdsaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  //s->AddPerUtFeederCrdsaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  //s->AddPerUtFeederSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  //s->AddPerUtFeederSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   NS_LOG_INFO ("--- sat-ra-sim-tn9-comparison ---");
   NS_LOG_INFO ("  Packet size: " << packetSize);

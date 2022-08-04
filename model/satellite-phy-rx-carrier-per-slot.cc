@@ -295,10 +295,20 @@ SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams,
 
       if (nPackets > 0)
         {
-          m_daRxTrace (nPackets,                      // number of packets
-                       packetRxParams.sourceAddress,  // sender address
-                       phyError                       // error flag
-                       );
+          if (GetChannelType () == SatEnums::FORWARD_FEEDER_CH)
+            {
+              m_daRxTrace (nPackets,                      // number of packets
+                           packetRxParams.destAddress,    // destination address
+                           phyError                       // error flag
+                           );
+            }
+          else
+            {
+              m_daRxTrace (nPackets,                      // number of packets
+                           packetRxParams.sourceAddress,  // sender address
+                           phyError                       // error flag
+                           );
+            }
         }
 
       m_daRxCarrierIdTrace (GetCarrierId (),

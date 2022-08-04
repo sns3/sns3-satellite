@@ -156,15 +156,15 @@ ConfigureAllStats (Ptr<SatStatsHelperContainer> s)
   s->AddAverageGroupFwdPhyThroughput (outputType);
   s->AddAverageGroupRtnPhyThroughput (outputType);
 
-  s->AddPerGroupFwdDaPacketError (outputType);
-  s->AddPerGroupRtnDaPacketError (outputType);
-  s->AddPerGroupSlottedAlohaPacketError (outputType);
-  s->AddPerGroupCrdsaPacketError (outputType);
-  s->AddPerGroupEssaPacketError (outputType);
+  s->AddPerGroupFwdUserDaPacketError (outputType);
+  s->AddPerGroupRtnFeederDaPacketError (outputType);
+  s->AddPerGroupFeederSlottedAlohaPacketError (outputType);
+  s->AddPerGroupFeederCrdsaPacketError (outputType);
+  s->AddPerGroupFeederEssaPacketError (outputType);
 
-  s->AddPerGroupSlottedAlohaPacketCollision (outputType);
-  s->AddPerGroupCrdsaPacketCollision (outputType);
-  s->AddPerGroupEssaPacketCollision (outputType);
+  s->AddPerGroupFeederSlottedAlohaPacketCollision (outputType);
+  s->AddPerGroupFeederCrdsaPacketCollision (outputType);
+  s->AddPerGroupFeederEssaPacketCollision (outputType);
 
   s->AddPerGroupCapacityRequest (outputType);
 

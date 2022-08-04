@@ -619,13 +619,6 @@ SatPhyRxCarrierPerFrame::CalculatePacketCompositeSinr (SatPhyRxCarrierPerFrame::
 {
   NS_LOG_FUNCTION (this);
 
-  double sinrSatellite = CalculateSinr ( packet.rxParams->GetRxPowerInSatellite (),
-                                         packet.rxParams->GetInterferencePowerInSatellite (),
-                                         packet.rxParams->GetRxNoisePowerInSatellite (),
-                                         packet.rxParams->GetRxAciIfPowerInSatellite (),
-                                         packet.rxParams->GetRxExtNoisePowerInSatellite (),
-                                         packet.rxParams->GetSinrCalculator ());
-
   double sinr = CalculateSinr ( packet.rxParams->m_rxPower_W,
                                 packet.rxParams->GetInterferencePower (),
                                 m_rxNoisePowerW,
@@ -636,6 +629,12 @@ SatPhyRxCarrierPerFrame::CalculatePacketCompositeSinr (SatPhyRxCarrierPerFrame::
   double cSinr;
   if (GetLinkRegenerationMode () == SatEnums::TRANSPARENT)
     {
+      double sinrSatellite = CalculateSinr ( packet.rxParams->GetRxPowerInSatellite (),
+                                             packet.rxParams->GetInterferencePowerInSatellite (),
+                                             packet.rxParams->GetRxNoisePowerInSatellite (),
+                                             packet.rxParams->GetRxAciIfPowerInSatellite (),
+                                             packet.rxParams->GetRxExtNoisePowerInSatellite (),
+                                             packet.rxParams->GetSinrCalculator ());
       cSinr = CalculateCompositeSinr (sinr, sinrSatellite);
     }
   else

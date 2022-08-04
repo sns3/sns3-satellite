@@ -94,7 +94,7 @@ SatStatsHelperContainer::DoDispose ()
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Dev, Mac, Phy] Throughput
  * - Average [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppThroughput
  * - Average [Beam, Group, Ut, Sat] [Fwd, Rtn] [Dev, Mac, Phy] Throughput
- * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [FwdDa, RtnDa, SlottedAloha, Crdsa, Essa] PacketError
+ * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Feeder, User] [FwdDa, RtnDa, SlottedAloha, Crdsa, Essa] PacketError
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Feeder, User] [SlottedAloha, Crdsa, Essa] PacketCollision
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] CapacityRequest
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] ResourcesGranted
@@ -441,16 +441,22 @@ SatStatsHelperContainer::GetTypeId ()
         "return link PHY-level throughput statistics")
 
     // Forward link Dedicated Access packet error rate statistics.
-    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdDaPacketError,
-        "Forward link Dedicated Access packet error rate statistics")
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdFeederDaPacketError,
+        "Forward feeder link Dedicated Access packet error rate statistics")
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdUserDaPacketError,
+        "Forward user link Dedicated Access packet error rate statistics")
 
     // Return link Dedicated Access packet error rate statistics.
-    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnDaPacketError,
-        "Return link Dedicated Access packet error rate statistics")
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnFeederDaPacketError,
+        "Return feeder link Dedicated Access packet error rate statistics")
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnUserDaPacketError,
+        "Return user link Dedicated Access packet error rate statistics")
 
     // Random Access Slotted ALOHA packet error rate statistics.
-    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (SlottedAlohaPacketError,
-        "Random Access Slotted ALOHA packet error rate statistics")
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FeederSlottedAlohaPacketError,
+        "Feeder link Random Access Slotted ALOHA packet error rate statistics")
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (UserSlottedAlohaPacketError,
+        "User link Random Access Slotted ALOHA packet error rate statistics")
 
     // Random Access Slotted ALOHA packet collision rate statistics.
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FeederSlottedAlohaPacketCollision,
@@ -459,8 +465,10 @@ SatStatsHelperContainer::GetTypeId ()
         "Random Access User Slotted ALOHA packet collision rate statistics")
 
     // Random Access CRDSA packet error rate statistics.
-    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (CrdsaPacketError,
-        "Random Access CRDSA packet error rate statistics")
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FeederCrdsaPacketError,
+        "Feeder link Random Access CRDSA packet error rate statistics")
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (UserCrdsaPacketError,
+        "User link Random Access CRDSA packet error rate statistics")
 
     // Random Access CRDSA packet collision rate statistics.
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FeederCrdsaPacketCollision,
@@ -469,8 +477,10 @@ SatStatsHelperContainer::GetTypeId ()
         "Random Access User CRDSA packet collision rate statistics")
 
     // Random Access E-SSA packet error rate statistics.
-    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (EssaPacketError,
-                                        "Random Access E-SSA packet error rate statistics")
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FeederEssaPacketError,
+                                        "Feeder link Random Access E-SSA packet error rate statistics")
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (UserEssaPacketError,
+                                        "User link Random Access E-SSA packet error rate statistics")
 
     // Random Access E-SSA packet collision rate statistics.
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FeederEssaPacketCollision,
@@ -667,7 +677,7 @@ SatStatsHelperContainer::GetName () const
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Dev, Mac, Phy] Throughput
  * - AddAverage [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppThroughput
  * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Dev, Mac, Phy] Throughput
- * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [FwdDa, RtnDa, SlottedAloha, Crdsa, Essa] PacketError
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Feeder, User] [FwdDa, RtnDa, SlottedAloha, Crdsa, Essa] PacketError
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Feeder, User] [SlottedAloha, Crdsa, Essa] PacketCollision
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] CapacityRequest
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] ResourcesGranted
@@ -1315,28 +1325,52 @@ SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnPhyThroughput, "rtn-phy-throughput"
 SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnPhyThroughput, "rtn-phy-throughput")
 
 // Forward link Dedicated Access packet error rate statistics.
-SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdDaPacketError, "fwd-da-error")
-SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdDaPacketError, "fwd-da-error")
-SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdDaPacketError, "fwd-da-error")
-SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FwdDaPacketError, "fwd-da-error")
-SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdDaPacketError, "fwd-da-error")
-SAT_STATS_PER_SAT_METHOD_DEFINITION      (FwdDaPacketError, "fwd-da-error")
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdFeederDaPacketError, "fwd-feeder-da-error")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdFeederDaPacketError, "fwd-feeder-da-error")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdFeederDaPacketError, "fwd-feeder-da-error")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FwdFeederDaPacketError, "fwd-feeder-da-error")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdFeederDaPacketError, "fwd-feeder-da-error")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (FwdFeederDaPacketError, "fwd-feeder-da-error")
+
+// Forward link Dedicated Access packet error rate statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdUserDaPacketError, "fwd-user-da-error")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdUserDaPacketError, "fwd-user-da-error")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdUserDaPacketError, "fwd-user-da-error")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FwdUserDaPacketError, "fwd-user-da-error")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdUserDaPacketError, "fwd-user-da-error")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (FwdUserDaPacketError, "fwd-user-da-error")
 
 // Return link Dedicated Access packet error rate statistics.
-SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnDaPacketError, "rtn-da-error")
-SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnDaPacketError, "rtn-da-error")
-SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnDaPacketError, "rtn-da-error")
-SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnDaPacketError, "rtn-da-error")
-SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnDaPacketError, "rtn-da-error")
-SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnDaPacketError, "rtn-da-error")
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnFeederDaPacketError, "rtn-feeder-da-error")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnFeederDaPacketError, "rtn-feeder-da-error")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnFeederDaPacketError, "rtn-feeder-da-error")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnFeederDaPacketError, "rtn-feeder-da-error")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnFeederDaPacketError, "rtn-feeder-da-error")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnFeederDaPacketError, "rtn-feeder-da-error")
+
+// Return link Dedicated Access packet error rate statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnUserDaPacketError, "rtn-user-da-error")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnUserDaPacketError, "rtn-user-da-error")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnUserDaPacketError, "rtn-user-da-error")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnUserDaPacketError, "rtn-user-da-error")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnUserDaPacketError, "rtn-user-da-error")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnUserDaPacketError, "rtn-user-da-error")
 
 // Random Access Slotted ALOHA packet error rate statistics.
-SAT_STATS_GLOBAL_METHOD_DEFINITION       (SlottedAlohaPacketError, "slotted-aloha-error")
-SAT_STATS_PER_GW_METHOD_DEFINITION       (SlottedAlohaPacketError, "slotted-aloha-error")
-SAT_STATS_PER_BEAM_METHOD_DEFINITION     (SlottedAlohaPacketError, "slotted-aloha-error")
-SAT_STATS_PER_GROUP_METHOD_DEFINITION    (SlottedAlohaPacketError, "slotted-aloha-error")
-SAT_STATS_PER_UT_METHOD_DEFINITION       (SlottedAlohaPacketError, "slotted-aloha-error")
-SAT_STATS_PER_SAT_METHOD_DEFINITION      (SlottedAlohaPacketError, "slotted-aloha-error")
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (FeederSlottedAlohaPacketError, "feeder-slotted-aloha-error")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (FeederSlottedAlohaPacketError, "feeder-slotted-aloha-error")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FeederSlottedAlohaPacketError, "feeder-slotted-aloha-error")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FeederSlottedAlohaPacketError, "feeder-slotted-aloha-error")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (FeederSlottedAlohaPacketError, "feeder-slotted-aloha-error")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (FeederSlottedAlohaPacketError, "feeder-slotted-aloha-error")
+
+// Random Access Slotted ALOHA packet error rate statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (UserSlottedAlohaPacketError, "user-slotted-aloha-error")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (UserSlottedAlohaPacketError, "user-slotted-aloha-error")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (UserSlottedAlohaPacketError, "user-slotted-aloha-error")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (UserSlottedAlohaPacketError, "user-slotted-aloha-error")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (UserSlottedAlohaPacketError, "user-slotted-aloha-error")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (UserSlottedAlohaPacketError, "user-slotted-aloha-error")
 
 // Random Access Feeder Slotted ALOHA packet collision rate statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (FeederSlottedAlohaPacketCollision, "feeder-slotted-aloha-collision")
@@ -1355,12 +1389,20 @@ SAT_STATS_PER_UT_METHOD_DEFINITION       (UserSlottedAlohaPacketCollision, "user
 SAT_STATS_PER_SAT_METHOD_DEFINITION      (UserSlottedAlohaPacketCollision, "user-slotted-aloha-collision")
 
 // Random Access CRDSA packet error rate statistics.
-SAT_STATS_GLOBAL_METHOD_DEFINITION       (CrdsaPacketError, "crdsa-error")
-SAT_STATS_PER_GW_METHOD_DEFINITION       (CrdsaPacketError, "crdsa-error")
-SAT_STATS_PER_BEAM_METHOD_DEFINITION     (CrdsaPacketError, "crdsa-error")
-SAT_STATS_PER_GROUP_METHOD_DEFINITION    (CrdsaPacketError, "crdsa-error")
-SAT_STATS_PER_UT_METHOD_DEFINITION       (CrdsaPacketError, "crdsa-error")
-SAT_STATS_PER_SAT_METHOD_DEFINITION      (CrdsaPacketError, "crdsa-error")
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (FeederCrdsaPacketError, "feeder-crdsa-error")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (FeederCrdsaPacketError, "feeder-crdsa-error")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FeederCrdsaPacketError, "feeder-crdsa-error")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FeederCrdsaPacketError, "feeder-crdsa-error")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (FeederCrdsaPacketError, "feeder-crdsa-error")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (FeederCrdsaPacketError, "feeder-crdsa-error")
+
+// Random Access CRDSA packet error rate statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (UserCrdsaPacketError, "user-crdsa-error")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (UserCrdsaPacketError, "user-crdsa-error")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (UserCrdsaPacketError, "user-crdsa-error")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (UserCrdsaPacketError, "user-crdsa-error")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (UserCrdsaPacketError, "user-crdsa-error")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (UserCrdsaPacketError, "user-crdsa-error")
 
 // Random Access Feeder CRDSA packet collision rate statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (FeederCrdsaPacketCollision, "feeder-crdsa-collision")
@@ -1387,12 +1429,20 @@ SAT_STATS_PER_UT_METHOD_DEFINITION       (MarsalaCorrelation, "marsala-correlati
 SAT_STATS_PER_SAT_METHOD_DEFINITION      (MarsalaCorrelation, "marsala-correlation")
 
 // Random Access E-SSA packet collision rate statistics.
-SAT_STATS_GLOBAL_METHOD_DEFINITION      (EssaPacketError, "essa-error")
-SAT_STATS_PER_GW_METHOD_DEFINITION      (EssaPacketError, "essa-error")
-SAT_STATS_PER_BEAM_METHOD_DEFINITION    (EssaPacketError, "essa-error")
-SAT_STATS_PER_GROUP_METHOD_DEFINITION   (EssaPacketError, "essa-error")
-SAT_STATS_PER_UT_METHOD_DEFINITION      (EssaPacketError, "essa-error")
-SAT_STATS_PER_SAT_METHOD_DEFINITION     (EssaPacketError, "essa-error")
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (FeederEssaPacketError, "feeder-essa-error")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (FeederEssaPacketError, "feeder-essa-error")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (FeederEssaPacketError, "feeder-essa-error")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION   (FeederEssaPacketError, "feeder-essa-error")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (FeederEssaPacketError, "feeder-essa-error")
+SAT_STATS_PER_SAT_METHOD_DEFINITION     (FeederEssaPacketError, "feeder-essa-error")
+
+// Random Access E-SSA packet collision rate statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION      (UserEssaPacketError, "user-essa-error")
+SAT_STATS_PER_GW_METHOD_DEFINITION      (UserEssaPacketError, "user-essa-error")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION    (UserEssaPacketError, "user-essa-error")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION   (UserEssaPacketError, "user-essa-error")
+SAT_STATS_PER_UT_METHOD_DEFINITION      (UserEssaPacketError, "user-essa-error")
+SAT_STATS_PER_SAT_METHOD_DEFINITION     (UserEssaPacketError, "user-essa-error")
 
 // Random Access Feeder E-SSA packet collision rate statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION      (FeederEssaPacketCollision, "feeder-essa-collision")

@@ -419,7 +419,10 @@ SatGwHelper::InstallDvb (Ptr<Node> n,
 
   // Begin frame end scheduling for processes utilizing frame length as interval
   // Node info needs to be set before the start in order to get the scheduling context correctly set
-  phy->BeginEndScheduling ();
+  if (returnLinkRegenerationMode == SatEnums::TRANSPARENT)
+    {
+      phy->BeginEndScheduling ();
+    }
 
   // TODO: When multiple carriers are supported. Multiple scheduler are needed too.
   double carrierBandwidth = m_carrierBandwidthConverter (SatEnums::FORWARD_FEEDER_CH, 0, SatEnums::EFFECTIVE_BANDWIDTH);
@@ -588,7 +591,10 @@ SatGwHelper::InstallLora (Ptr<Node> n,
 
   // Begin frame end scheduling for processes utilizing frame length as interval
   // Node info needs to be set before the start in order to get the scheduling context correctly set
-  phy->BeginEndScheduling ();
+  if (returnLinkRegenerationMode == SatEnums::TRANSPARENT)
+    {
+      phy->BeginEndScheduling ();
+    }
 
   return dev;
 }

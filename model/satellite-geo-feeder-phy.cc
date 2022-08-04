@@ -142,6 +142,7 @@ SatGeoFeederPhy::SatGeoFeederPhy (void)
 }
 
 SatGeoFeederPhy::SatGeoFeederPhy (SatPhy::CreateParam_t& params,
+                                  Ptr<SatLinkResults> linkResults,
                                   SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
                                   Ptr<SatSuperframeConf> superFrameConf,
                                   SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
@@ -190,6 +191,11 @@ SatGeoFeederPhy::SatGeoFeederPhy (SatPhy::CreateParam_t& params,
   parameters.m_chType = SatEnums::FORWARD_FEEDER_CH;
 
   Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf> (parameters);
+
+  if (linkResults)
+    {
+      carrierConf->SetLinkResults (linkResults);
+    }
 
   carrierConf->SetSinrCalculatorCb (MakeCallback (&SatGeoFeederPhy::CalculateSinr, this));
 

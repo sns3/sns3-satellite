@@ -49,6 +49,7 @@ cpp_examples = [
 	("sat-ra-sim-tn9-comparison", "True", "True"),
 	("sat-rayleigh-example", "True", "True"),
 	("sat-regeneration-example", "True", "True"),
+	("sat-regeneration-collisions-example", "True", "True"),
 	("sat-rtn-system-test-example", "True", "True"),
 	("sat-trace-input-external-fading-example", "True", "True"),
 	("sat-trace-input-fading-example", "True", "True"),
