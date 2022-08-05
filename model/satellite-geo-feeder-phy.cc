@@ -227,16 +227,6 @@ SatGeoFeederPhy::SendPduWithParams (Ptr<SatSignalParameters> txParams )
   NS_LOG_FUNCTION (this << txParams);
   NS_LOG_INFO (this << " sending a packet with carrierId: " << txParams->m_carrierId << " duration: " << txParams->m_duration);
 
-  // Add packet trace entry:
-  m_packetTrace (Simulator::Now (),
-                 SatEnums::PACKET_SENT,
-                 m_nodeInfo->GetNodeType (),
-                 m_nodeInfo->GetNodeId (),
-                 m_nodeInfo->GetMacAddress (),
-                 SatEnums::LL_PHY,
-                 SatEnums::LD_RETURN,
-                 SatUtils::GetPacketInfo (txParams->m_packetsInBurst));
-
   if (m_returnLinkRegenerationMode != SatEnums::TRANSPARENT)
     {
       SetTimeTag (txParams->m_packetsInBurst);
@@ -264,10 +254,13 @@ SatGeoFeederPhy::SendPduWithParams (Ptr<SatSignalParameters> txParams )
   NS_LOG_INFO ("Amplified Tx power: " << SatUtils::LinearToDb (txParams->m_txPower_W));
   NS_LOG_INFO ("Statically configured tx power: " << SatUtils::LinearToDb (m_eirpWoGainW));
 
+  SatEnums::SatPacketEvent_t event;
+
   if (m_returnLinkRegenerationMode == SatEnums::REGENERATION_PHY)
     {
       if (m_queue.size () < m_queueSizeMax)
         {
+          event = SatEnums::PACKET_ENQUE;
           m_queue.push (txParams);
           if (m_isSending == false)
             {
@@ -276,13 +269,25 @@ SatGeoFeederPhy::SendPduWithParams (Ptr<SatSignalParameters> txParams )
         }
       else
         {
+          event = SatEnums::PACKET_DROP;
           NS_LOG_INFO ("Packet dropped because REGENERATION_PHY queue is full");
         }
     }
   else
     {
+      event = SatEnums::PACKET_SENT;
       m_phyTx->StartTx (txParams);
     }
+
+  // Add packet trace entry:
+  m_packetTrace (Simulator::Now (),
+                 event,
+                 m_nodeInfo->GetNodeType (),
+                 m_nodeInfo->GetNodeId (),
+                 m_nodeInfo->GetMacAddress (),
+                 SatEnums::LL_PHY,
+                 SatEnums::LD_RETURN,
+                 SatUtils::GetPacketInfo (txParams->m_packetsInBurst));
 }
 
 void
@@ -295,6 +300,17 @@ SatGeoFeederPhy::SendFromQueue ()
   m_isSending = true;
   Ptr<SatSignalParameters> txParams = m_queue.front ();
   m_queue.pop ();
+
+  // Add sent packet trace entry:
+  m_packetTrace (Simulator::Now (),
+                 SatEnums::PACKET_SENT,
+                 m_nodeInfo->GetNodeType (),
+                 m_nodeInfo->GetNodeId (),
+                 m_nodeInfo->GetMacAddress (),
+                 SatEnums::LL_PHY,
+                 SatEnums::LD_RETURN,
+                 SatUtils::GetPacketInfo (txParams->m_packetsInBurst));
+
   Simulator::Schedule (txParams->m_duration + NanoSeconds (1), &SatGeoFeederPhy::EndTx, this);
   m_phyTx->StartTx (txParams);
 }
