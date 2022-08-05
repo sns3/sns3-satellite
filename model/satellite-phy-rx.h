@@ -148,12 +148,6 @@ public:
   uint32_t GetBeamId () const;
 
   /**
-   * \brief Get all the RX carriers
-   * \return uint32_t A vector containing the RX carriers
-   */
-  std::vector< Ptr<SatPhyRxCarrier> > GetRxCarriers () const;
-
-  /**
    * \param carrierConf Carrier configuration class
    * \param superFrameConf Superframe configuration
    */

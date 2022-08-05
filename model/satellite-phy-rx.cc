@@ -474,14 +474,6 @@ SatPhyRx::GetBeamId () const
   return m_beamId;
 }
 
-std::vector< Ptr<SatPhyRxCarrier> >
-SatPhyRx::GetRxCarriers () const
-{
-  NS_LOG_FUNCTION (this);
-
-  return m_rxCarriers;
-}
-
 double
 SatPhyRx::GetRxTemperatureK (Ptr<SatSignalParameters> rxParams)
 {

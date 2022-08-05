@@ -486,8 +486,8 @@ public:
 
 private:
   virtual void DoRun (void);
-  void GeoPhyTraceErrorCb (uint32_t nPackets, const Address & address , bool hasError);
-  void GeoPhyTraceCollisionCb (uint32_t nPackets, const Address & address , bool hasCollision);
+  void GeoPhyTraceErrorCb (std::string, uint32_t nPackets, const Address & address , bool hasError);
+  void GeoPhyTraceCollisionCb (std::string, uint32_t nPackets, const Address & address , bool hasCollision);
   void GeoPhyTraceCb (Time time,
                       SatEnums::SatPacketEvent_t event,
                       SatEnums::SatNodeType_t type,
@@ -533,7 +533,7 @@ SatRegenerationTest3::~SatRegenerationTest3 ()
 }
 
 void
-SatRegenerationTest3::GeoPhyTraceErrorCb (uint32_t nPackets, const Address & address , bool hasError)
+SatRegenerationTest3::GeoPhyTraceErrorCb (std::string, uint32_t nPackets, const Address & address , bool hasError)
 {
   if (!hasError)
     {
@@ -550,7 +550,7 @@ SatRegenerationTest3::GeoPhyTraceErrorCb (uint32_t nPackets, const Address & add
 }
 
 void
-SatRegenerationTest3::GeoPhyTraceCollisionCb (uint32_t nPackets, const Address & address , bool hasCollision)
+SatRegenerationTest3::GeoPhyTraceCollisionCb (std::string, uint32_t nPackets, const Address & address , bool hasCollision)
 {
   if (!hasCollision)
     {
@@ -695,16 +695,10 @@ SatRegenerationTest3::DoRun (void)
   satGeoFeederPhy->TraceConnectWithoutContext ("PacketTrace", MakeCallback (&SatRegenerationTest3::GeoPhyTraceCb, this));
   satGeoUserPhy->TraceConnectWithoutContext ("PacketTrace", MakeCallback (&SatRegenerationTest3::GeoPhyTraceCb, this));
 
-  for (Ptr<SatPhyRxCarrier> & carrierFeeder : satGeoFeederPhy->GetPhyRx ()->GetRxCarriers ())
-  {
-    carrierFeeder->TraceConnectWithoutContext ("SlottedAlohaRxError", MakeCallback (&SatRegenerationTest3::GeoPhyTraceErrorCb, this));
-    carrierFeeder->TraceConnectWithoutContext ("SlottedAlohaRxCollision", MakeCallback (&SatRegenerationTest3::GeoPhyTraceCollisionCb, this));
-  }
-  for (Ptr<SatPhyRxCarrier> & carrierUser : satGeoUserPhy->GetPhyRx ()->GetRxCarriers ())
-  {
-    carrierUser->TraceConnectWithoutContext ("SlottedAlohaRxError", MakeCallback (&SatRegenerationTest3::GeoPhyTraceErrorCb, this));
-    carrierUser->TraceConnectWithoutContext ("SlottedAlohaRxCollision", MakeCallback (&SatRegenerationTest3::GeoPhyTraceCollisionCb, this));
-  }
+  Config::Connect ("/NodeList/*/DeviceList/*/FeederPhy/1/PhyRx/RxCarrierList/*/SlottedAlohaRxError", MakeCallback (&SatRegenerationTest3::GeoPhyTraceErrorCb, this));
+  Config::Connect ("/NodeList/*/DeviceList/*/FeederPhy/1/PhyRx/RxCarrierList/*/SlottedAlohaRxCollision", MakeCallback (&SatRegenerationTest3::GeoPhyTraceCollisionCb, this));
+  Config::Connect ("/NodeList/*/DeviceList/*/UserPhy/1/PhyRx/RxCarrierList/*/SlottedAlohaRxError", MakeCallback (&SatRegenerationTest3::GeoPhyTraceErrorCb, this));
+  Config::Connect ("/NodeList/*/DeviceList/*/UserPhy/1/PhyRx/RxCarrierList/*/SlottedAlohaRxCollision", MakeCallback (&SatRegenerationTest3::GeoPhyTraceCollisionCb, this));
 
   Simulator::Stop (Seconds (5));
   Simulator::Run ();
