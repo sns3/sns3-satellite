@@ -122,8 +122,7 @@ SatUtLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
 
   it->second->EnquePdu (packet, Mac48Address::ConvertFrom (dest));
 
-  SatEnums::SatLinkDir_t ld =
-    (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
+  SatEnums::SatLinkDir_t ld = SatEnums::LD_RETURN;
 
   // Add packet trace entry:
   m_packetTrace (Simulator::Now (),
@@ -362,6 +361,18 @@ SatUtLlc::GetSchedulingContexts (std::vector< Ptr<SatSchedulingObject> > & outpu
   /**
    * This is not yet implemented to the UT LLC
    */
+}
+
+SatEnums::SatLinkDir_t
+SatUtLlc::GetSatLinkTxDir ()
+{
+  return SatEnums::LD_RETURN;
+}
+
+SatEnums::SatLinkDir_t
+SatUtLlc::GetSatLinkRxDir ()
+{
+  return SatEnums::LD_FORWARD;
 }
 
 void

@@ -162,6 +162,18 @@ SatGwLlc::CreateDecap (Ptr<EncapKey> key)
     }
 }
 
+SatEnums::SatLinkDir_t
+SatGwLlc::GetSatLinkTxDir ()
+{
+  return SatEnums::LD_FORWARD;
+}
+
+SatEnums::SatLinkDir_t
+SatGwLlc::GetSatLinkRxDir ()
+{
+  return SatEnums::LD_RETURN;
+}
+
 
 void SatGwLlc::GetSchedulingContexts (std::vector< Ptr<SatSchedulingObject> > & output) const
 {

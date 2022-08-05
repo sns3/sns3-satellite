@@ -329,8 +329,7 @@ SatPhy::SendPdu (PacketContainer_t p, uint32_t carrierId, Time duration, SatSign
   SetTimeTag (p);
 
   // Add packet trace entry:
-  SatEnums::SatLinkDir_t ld =
-    (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
+  SatEnums::SatLinkDir_t ld = GetSatLinkTxDir ();
 
   m_packetTrace (Simulator::Now (),
                  SatEnums::PACKET_SENT,
@@ -395,6 +394,18 @@ SatPhy::SetTimeTag (SatPhy::PacketContainer_t packets)
             }
         }
     }
+}
+
+SatEnums::SatLinkDir_t
+SatPhy::GetSatLinkTxDir ()
+{
+  return SatEnums::LD_UNDEFINED;
+}
+
+SatEnums::SatLinkDir_t
+SatPhy::GetSatLinkRxDir ()
+{
+  return SatEnums::LD_UNDEFINED;
 }
 
 void
@@ -475,8 +486,7 @@ SatPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
   NS_LOG_FUNCTION (this << rxParams << phyError);
 
   // Add packet trace entry:
-  SatEnums::SatLinkDir_t ld =
-    (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_FORWARD : SatEnums::LD_RETURN;
+  SatEnums::SatLinkDir_t ld = GetSatLinkRxDir ();
 
   SatEnums::SatPacketEvent_t event = (phyError) ? SatEnums::PACKET_DROP : SatEnums::PACKET_RECV;
 

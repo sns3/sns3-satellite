@@ -230,6 +230,17 @@ SatUtPhy::AssignNewSatChannels ()
   forwardLink->AddRx (m_phyRx);
 }
 
+SatEnums::SatLinkDir_t
+SatUtPhy::GetSatLinkTxDir ()
+{
+  return SatEnums::LD_RETURN;
+}
+
+SatEnums::SatLinkDir_t
+SatUtPhy::GetSatLinkRxDir ()
+{
+  return SatEnums::LD_FORWARD;
+}
 
 bool
 SatUtPhy::IsTxPossible (void) const

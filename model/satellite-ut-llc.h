@@ -183,6 +183,18 @@ protected:
    */
   virtual void GetSchedulingContexts (std::vector< Ptr<SatSchedulingObject> > & output) const;
 
+  /**
+   * \brief Get the link TX direction. Must be implemented by child clases.
+   * \return The link TX direction
+   */
+  virtual SatEnums::SatLinkDir_t GetSatLinkTxDir ();
+
+  /**
+   * \brief Get the link RX direction. Must be implemented by child clases.
+   * \return The link RX direction
+   */
+  virtual SatEnums::SatLinkDir_t GetSatLinkRxDir ();
+
 private:
   /**
    * Request manager handling the capacity requests

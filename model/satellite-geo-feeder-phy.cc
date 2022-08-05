@@ -366,4 +366,16 @@ SatGeoFeederPhy::CalculateSinr (double sinr)
   return (finalSinr);
 }
 
+SatEnums::SatLinkDir_t
+SatGeoFeederPhy::GetSatLinkTxDir ()
+{
+  return SatEnums::LD_RETURN;
+}
+
+SatEnums::SatLinkDir_t
+SatGeoFeederPhy::GetSatLinkRxDir ()
+{
+  return SatEnums::LD_FORWARD;
+}
+
 } // namespace ns3

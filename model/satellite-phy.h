@@ -484,6 +484,18 @@ protected:
   void SetTimeTag (SatPhy::PacketContainer_t packets);
 
   /**
+   * \brief Get the link TX direction. Must be implemented by child clases.
+   * \return The link TX direction
+   */
+  virtual SatEnums::SatLinkDir_t GetSatLinkTxDir ();
+
+  /**
+   * \brief Get the link RX direction. Must be implemented by child clases.
+   * \return The link RX direction
+   */
+  virtual SatEnums::SatLinkDir_t GetSatLinkRxDir ();
+
+  /**
    * The upper layer package receive callback.
    */
   SatPhy::ReceiveCallback m_rxCallback;

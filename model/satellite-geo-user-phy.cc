@@ -290,4 +290,16 @@ SatGeoUserPhy::CalculateSinr (double sinr)
   return (finalSinr);
 }
 
+SatEnums::SatLinkDir_t
+SatGeoUserPhy::GetSatLinkTxDir ()
+{
+  return SatEnums::LD_FORWARD;
+}
+
+SatEnums::SatLinkDir_t
+SatGeoUserPhy::GetSatLinkRxDir ()
+{
+  return SatEnums::LD_RETURN;
+}
+
 } // namespace ns3
