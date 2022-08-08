@@ -475,7 +475,7 @@ protected:
    * \brief Invoke the `Rx` trace source for each received packet.
    * \param packets Container of the pointers to the packets received.
    */
-  void RxTraces (SatPhy::PacketContainer_t packets);
+  virtual void RxTraces (SatPhy::PacketContainer_t packets);
 
   /**
    * \brief Set SatPhyTimeTag of packets
@@ -531,6 +531,12 @@ protected:
   TracedCallback<const Time &, const Address &> m_rxDelayTrace;
 
   /**
+   * Traced callback for all received packets, including link delay information and
+   * the address of the senders.
+   */
+  TracedCallback<const Time &, const Address &> m_rxLinkDelayTrace;
+
+  /**
    * Traced callback for all received packets, including jitter information and
    * the address of the senders.
    */
@@ -562,6 +568,16 @@ protected:
    */
   double m_eirpWoGainW;
 
+  /**
+   * `EnableStatisticsTags` attribute.
+   */
+  bool m_isStatisticsTagsEnabled;
+
+  /**
+   * Last delay measurement. Used to compute jitter.
+   */
+  Time m_lastDelay;
+
 private:
   /**
    * The C/N0 info callback
@@ -572,10 +588,6 @@ private:
    * Average normalized offered load callback
    */
   SatPhy::AverageNormalizedOfferedLoadCallback m_avgNormalizedOfferedLoadCallback;
-  /**
-   * `EnableStatisticsTags` attribute.
-   */
-  bool m_isStatisticsTagsEnabled;
 
   /**
    * Configured receiver noise temperature in dBK.
@@ -626,11 +638,6 @@ private:
    * \brief Default fading value
    */
   double m_defaultFadingValue;
-
-  /**
-   * Last delay measurement. Used to compute jitter.
-   */
-  Time m_lastDelay;
 };
 
 

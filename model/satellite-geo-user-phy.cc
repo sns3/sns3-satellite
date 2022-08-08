@@ -36,6 +36,8 @@
 #include "satellite-mac.h"
 #include "satellite-signal-parameters.h"
 #include "satellite-channel-estimation-error-container.h"
+#include "satellite-address-tag.h"
+#include "satellite-time-tag.h"
 
 
 NS_LOG_COMPONENT_DEFINE ("SatGeoUserPhy");
@@ -231,6 +233,69 @@ SatGeoUserPhy::SendPduWithParams (Ptr<SatSignalParameters> txParams )
   txParams->m_phyTx = m_phyTx;
   txParams->m_txPower_W = m_eirpWoGainW;
   m_phyTx->StartTx (txParams);
+}
+
+void
+SatGeoUserPhy::RxTraces (SatPhy::PacketContainer_t packets)
+{
+  NS_LOG_FUNCTION (this);
+
+  if (m_isStatisticsTagsEnabled)
+    {
+      SatSignalParameters::PacketsInBurst_t::iterator it1;
+      for (it1 = packets.begin ();
+           it1 != packets.end (); ++it1)
+        {
+          Address addr; // invalid address.
+          bool isTaggedWithAddress = false;
+          ByteTagIterator it2 = (*it1)->GetByteTagIterator ();
+
+          while (!isTaggedWithAddress && it2.HasNext ())
+            {
+              ByteTagIterator::Item item = it2.Next ();
+
+              if (item.GetTypeId () == SatAddressTag::GetTypeId ())
+                {
+                  NS_LOG_DEBUG (this << " contains a SatAddressTag tag:"
+                                     << " start=" << item.GetStart ()
+                                     << " end=" << item.GetEnd ());
+                  SatAddressTag addrTag;
+                  item.GetTag (addrTag);
+                  addr = addrTag.GetSourceAddress ();
+                  isTaggedWithAddress = true; // this will exit the while loop.
+                }
+            }
+
+          m_rxTrace (*it1, addr);
+
+          SatPhyLinkTimeTag linkTimeTag;
+          if ((*it1)->RemovePacketTag (linkTimeTag))
+            {
+              NS_LOG_DEBUG (this << " contains a SatPhyLinkTimeTag tag");
+              Time delay = Simulator::Now () - linkTimeTag.GetSenderLinkTimestamp ();
+              m_rxLinkDelayTrace (delay, addr);
+            }
+
+          SatPhyTimeTag timeTag;
+          // Leave tag if on Satellite
+          if ((*it1)->PeekPacketTag (timeTag))
+            {
+              NS_LOG_DEBUG (this << " contains a SatPhyTimeTag tag");
+              Time delay = Simulator::Now () - timeTag.GetSenderTimestamp ();
+              m_rxDelayTrace (delay, addr);
+              if (m_lastDelay.IsZero() == false)
+                {
+                  Time jitter = Abs (delay - m_lastDelay);
+                  m_rxJitterTrace (jitter, addr);
+                }
+              m_lastDelay = delay;
+
+              timeTag.SetSenderTimestamp (Seconds (1));
+            }
+
+        } // end of `for (it1 = rxParams->m_packetsInBurst)`
+
+    } // end of `if (m_isStatisticsTagsEnabled)`
 }
 
 void

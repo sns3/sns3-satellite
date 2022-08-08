@@ -318,8 +318,6 @@ SatStatsPacketErrorHelper::ErrorRxCallback (uint32_t nPackets,
     }
   else if (Mac48Address::ConvertFrom (fromOrTo).IsBroadcast ())
     {
-      //std::map<const Address, uint32_t>::iterator it;
-      //for (it == m_identifierMap.begin (); it != m_identifierMap.end (); it++)
       for (std::pair<const Address, uint32_t> item : m_identifierMap)
         {
           // Find the first-level collector with the right identifier.

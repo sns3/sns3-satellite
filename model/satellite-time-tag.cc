@@ -170,6 +170,77 @@ SatPhyTimeTag::SetSenderTimestamp (Time senderTimestamp)
 }
 
 
+// PHY LINK ////////////////////////////////////////////////////////////////////////
+
+NS_OBJECT_ENSURE_REGISTERED (SatPhyLinkTimeTag);
+
+SatPhyLinkTimeTag::SatPhyLinkTimeTag ()
+  : m_senderLinkTimestamp (Seconds (0))
+{
+  // Nothing to do here
+}
+
+SatPhyLinkTimeTag::SatPhyLinkTimeTag (Time senderLinkTimestamp)
+  : m_senderLinkTimestamp (senderLinkTimestamp)
+{
+  // Nothing to do here
+}
+
+TypeId
+SatPhyLinkTimeTag::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatPhyLinkTimeTag")
+    .SetParent<Tag> ()
+    .AddConstructor<SatPhyLinkTimeTag> ();
+  return tid;
+}
+
+TypeId
+SatPhyLinkTimeTag::GetInstanceTypeId (void) const
+{
+  return GetTypeId ();
+}
+
+uint32_t
+SatPhyLinkTimeTag::GetSerializedSize (void) const
+{
+  return sizeof(Time);
+}
+
+void
+SatPhyLinkTimeTag::Serialize (TagBuffer i) const
+{
+  int64_t senderTimestamp = m_senderLinkTimestamp.GetNanoSeconds ();
+  i.Write ((const uint8_t *)&senderTimestamp, sizeof(int64_t));
+}
+
+void
+SatPhyLinkTimeTag::Deserialize (TagBuffer i)
+{
+  int64_t senderTimestamp;
+  i.Read ((uint8_t *)&senderTimestamp, 8);
+  m_senderLinkTimestamp = NanoSeconds (senderTimestamp);
+}
+
+void
+SatPhyLinkTimeTag::Print (std::ostream &os) const
+{
+  os << m_senderLinkTimestamp;
+}
+
+Time
+SatPhyLinkTimeTag::GetSenderLinkTimestamp (void) const
+{
+  return m_senderLinkTimestamp;
+}
+
+void
+SatPhyLinkTimeTag::SetSenderLinkTimestamp (Time senderLinkTimestamp)
+{
+  this->m_senderLinkTimestamp = senderLinkTimestamp;
+}
+
+
 // MAC ////////////////////////////////////////////////////////////////////////
 
 NS_OBJECT_ENSURE_REGISTERED (SatMacTimeTag);

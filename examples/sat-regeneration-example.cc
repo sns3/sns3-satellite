@@ -49,7 +49,7 @@ main (int argc, char *argv[])
 {
   uint32_t beamIdInFullScenario = 10;
   uint32_t packetSize = 512;
-  std::string interval = "1s";
+  std::string interval = "10ms";
   std::string scenario = "simple";
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::SIMPLE;
 
@@ -134,6 +134,16 @@ main (int argc, char *argv[])
   s->AddPerGwRtnPhyDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtRtnPhyDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerSatRtnPhyDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddPerSatFwdFeederPhyLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatFwdUserPhyLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatRtnFeederPhyLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatRtnUserPhyLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddPerUtFwdFeederPhyLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdUserPhyLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnFeederPhyLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnUserPhyLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   s->AddPerGwFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);

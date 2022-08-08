@@ -197,6 +197,7 @@ set(source_files
     stats/satellite-stats-carrier-id-helper.cc
     stats/satellite-stats-composite-sinr-helper.cc
     stats/satellite-stats-delay-helper.cc
+    stats/satellite-stats-link-delay-helper.cc
     stats/satellite-stats-jitter-helper.cc
     stats/satellite-stats-plt-helper.cc
     stats/satellite-stats-frame-load-helper.cc
@@ -420,6 +421,7 @@ set(header_files
     stats/satellite-stats-carrier-id-helper.h
     stats/satellite-stats-composite-sinr-helper.h
     stats/satellite-stats-delay-helper.h
+    stats/satellite-stats-link-delay-helper.h
     stats/satellite-stats-jitter-helper.h
     stats/satellite-stats-plt-helper.h
     stats/satellite-stats-frame-load-helper.h

@@ -31,6 +31,7 @@
 #include <ns3/satellite-stats-carrier-id-helper.h>
 #include <ns3/satellite-stats-composite-sinr-helper.h>
 #include <ns3/satellite-stats-delay-helper.h>
+#include <ns3/satellite-stats-link-delay-helper.h>
 #include <ns3/satellite-stats-jitter-helper.h>
 #include <ns3/satellite-stats-plt-helper.h>
 #include <ns3/satellite-stats-frame-load-helper.h>
@@ -81,6 +82,8 @@ SatStatsHelperContainer::DoDispose ()
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Dev, Mac, Phy] Delay
  * - Average [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppDelay
  * - Average [Beam, Group, Ut, Sat] [Fwd, Rtn] [Dev, Mac, Phy] Delay
+ * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] [Mac, Phy] LinkDelay
+ * - Average [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] [Mac, Phy] LinkDelay
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerUtUser, PerSat] [Fwd, Rtn] AppJitter
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Dev, Mac, Phy] Jitter
  * - Average [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppJitter
@@ -234,6 +237,30 @@ SatStatsHelperContainer::GetTypeId ()
     ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdPhyDelay,
         "forward link PHY-level delay statistics")
 
+    // Forward feeder link MAC-level packet link delay statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdFeederMacLinkDelay,
+        "forward feeder link MAC-level link delay statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdFeederMacLinkDelay,
+        "forward feeder link MAC-level link delay statistics")
+
+    // Forward user link MAC-level packet link delay statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdUserMacLinkDelay,
+        "forward user link MAC-level link delay statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdUserMacLinkDelay,
+        "forward user link MAC-level link delay statistics")
+
+    // Forward feeder link PHY-level packet link delay statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdFeederPhyLinkDelay,
+        "forward feeder link PHY-level link delay statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdFeederPhyLinkDelay,
+        "forward feeder link PHY-level link delay statistics")
+
+    // Forward user link PHY-level packet link delay statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdUserPhyLinkDelay,
+        "forward user link PHY-level link delay statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdUserPhyLinkDelay,
+        "forward user link PHY-level link delay statistics")
+
     // Forward link application-level packet jitter statistics.
     ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdAppJitter,
         "forward link application-level jitter statistics")
@@ -351,6 +378,30 @@ SatStatsHelperContainer::GetTypeId ()
         "return link PHY-level delay statistics")
     ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnPhyDelay,
         "return link PHY-level delay statistics")
+
+    // Return feeder link MAC-level packet link delay statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnFeederMacLinkDelay,
+        "return feeder link MAC-level link delay statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnFeederMacLinkDelay,
+        "return feeder link MAC-level link delay statistics")
+
+    // Return user link MAC-level packet link delay statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnUserMacLinkDelay,
+        "return user link MAC-level link delay statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnUserMacLinkDelay,
+        "return user link MAC-level link delay statistics")
+
+    // Return feeder link PHY-level packet link delay statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnFeederPhyLinkDelay,
+        "return feeder link PHY-level link delay statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnFeederPhyLinkDelay,
+        "return feeder link PHY-level link delay statistics")
+
+    // Return user link PHY-level packet link delay statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnUserPhyLinkDelay,
+        "return user link PHY-level link delay statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnUserPhyLinkDelay,
+        "return user link PHY-level link delay statistics")
 
     // Return link application-level packet jitter statistics.
     ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnAppJitter,
@@ -664,6 +715,8 @@ SatStatsHelperContainer::GetName () const
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Dev, Mac, Phy] Delay
  * - AddAverage [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppDelay
  * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Dev, Mac, Phy] Delay
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] [Mac, Phy] LinkDelay
+ * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] [Mac, Phy] LinkDelay
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerUtUser, PerSat] [Fwd, Rtn] AppJitter
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Dev, Mac, Phy] Jitter
  * - AddAverage [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppJitter
@@ -983,6 +1036,54 @@ SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdPhyDelay, "fwd-phy-delay")
 SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdPhyDelay, "fwd-phy-delay")
 SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdPhyDelay, "fwd-phy-delay")
 
+// Forward feeder link MAC-level packet link delay statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdFeederMacLinkDelay, "fwd-feeder-mac-link-delay")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdFeederMacLinkDelay, "fwd-feeder-mac-link-delay")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdFeederMacLinkDelay, "fwd-feeder-mac-link-delay")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FwdFeederMacLinkDelay, "fwd-feeder-mac-link-delay")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdFeederMacLinkDelay, "fwd-feeder-mac-link-delay")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (FwdFeederMacLinkDelay, "fwd-feeder-mac-link-delay")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdFeederMacLinkDelay, "fwd-feeder-mac-link-delay")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdFeederMacLinkDelay, "fwd-feeder-mac-link-delay")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdFeederMacLinkDelay, "fwd-feeder-mac-link-delay")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdFeederMacLinkDelay, "fwd-feeder-mac-link-delay")
+
+// Forward user link MAC-level packet link delay statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdUserMacLinkDelay, "fwd-user-mac-link-delay")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdUserMacLinkDelay, "fwd-user-mac-link-delay")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdUserMacLinkDelay, "fwd-user-mac-link-delay")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FwdUserMacLinkDelay, "fwd-user-mac-link-delay")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdUserMacLinkDelay, "fwd-user-mac-link-delay")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (FwdUserMacLinkDelay, "fwd-user-mac-link-delay")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdUserMacLinkDelay, "fwd-user-mac-link-delay")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdUserMacLinkDelay, "fwd-user-mac-link-delay")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdUserMacLinkDelay, "fwd-user-mac-link-delay")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdUserMacLinkDelay, "fwd-user-mac-link-delay")
+
+// Forward feeder link PHY-level packet link delay statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdFeederPhyLinkDelay, "fwd-feeder-phy-link-delay")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdFeederPhyLinkDelay, "fwd-feeder-phy-link-delay")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdFeederPhyLinkDelay, "fwd-feeder-phy-link-delay")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FwdFeederPhyLinkDelay, "fwd-feeder-phy-link-delay")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdFeederPhyLinkDelay, "fwd-feeder-phy-link-delay")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (FwdFeederPhyLinkDelay, "fwd-feeder-phy-link-delay")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdFeederPhyLinkDelay, "fwd-feeder-phy-link-delay")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdFeederPhyLinkDelay, "fwd-feeder-phy-link-delay")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdFeederPhyLinkDelay, "fwd-feeder-phy-link-delay")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdFeederPhyLinkDelay, "fwd-feeder-phy-link-delay")
+
+// Forward user link PHY-level packet link delay statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdUserPhyLinkDelay, "fwd-user-phy-link-delay")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdUserPhyLinkDelay, "fwd-user-phy-link-delay")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdUserPhyLinkDelay, "fwd-user-phy-link-delay")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FwdUserPhyLinkDelay, "fwd-user-phy-link-delay")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdUserPhyLinkDelay, "fwd-user-phy-link-delay")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (FwdUserPhyLinkDelay, "fwd-user-phy-link-delay")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdUserPhyLinkDelay, "fwd-user-phy-link-delay")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdUserPhyLinkDelay, "fwd-user-phy-link-delay")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdUserPhyLinkDelay, "fwd-user-phy-link-delay")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdUserPhyLinkDelay, "fwd-user-phy-link-delay")
+
 // Forward link application-level packet jitter statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdAppJitter, "fwd-app-jitter")
 SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdAppJitter, "fwd-app-jitter")
@@ -1177,6 +1278,54 @@ SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnPhyDelay, "rtn-phy-delay")
 SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnPhyDelay, "rtn-phy-delay")
 SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnPhyDelay, "rtn-phy-delay")
 SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnPhyDelay, "rtn-phy-delay")
+
+// Return feeder link MAC-level packet link delay statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnFeederMacLinkDelay, "rtn-feeder-mac-link-delay")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnFeederMacLinkDelay, "rtn-feeder-mac-link-delay")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnFeederMacLinkDelay, "rtn-feeder-mac-link-delay")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnFeederMacLinkDelay, "rtn-feeder-mac-link-delay")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnFeederMacLinkDelay, "rtn-feeder-mac-link-delay")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnFeederMacLinkDelay, "rtn-feeder-mac-link-delay")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnFeederMacLinkDelay, "rtn-feeder-mac-link-delay")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnFeederMacLinkDelay, "rtn-feeder-mac-link-delay")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnFeederMacLinkDelay, "rtn-feeder-mac-link-delay")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnFeederMacLinkDelay, "rtn-feeder-mac-link-delay")
+
+// Return user link MAC-level packet link delay statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnUserMacLinkDelay, "rtn-user-mac-link-delay")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnUserMacLinkDelay, "rtn-user-mac-link-delay")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnUserMacLinkDelay, "rtn-user-mac-link-delay")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnUserMacLinkDelay, "rtn-user-mac-link-delay")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnUserMacLinkDelay, "rtn-user-mac-link-delay")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnUserMacLinkDelay, "rtn-user-mac-link-delay")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnUserMacLinkDelay, "rtn-user-mac-link-delay")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnUserMacLinkDelay, "rtn-user-mac-link-delay")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnUserMacLinkDelay, "rtn-user-mac-link-delay")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnUserMacLinkDelay, "rtn-user-mac-link-delay")
+
+// Return feeder link PHY-level packet link delay statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnFeederPhyLinkDelay, "rtn-feeder-phy-link-delay")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnFeederPhyLinkDelay, "rtn-feeder-phy-link-delay")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnFeederPhyLinkDelay, "rtn-feeder-phy-link-delay")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnFeederPhyLinkDelay, "rtn-feeder-phy-link-delay")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnFeederPhyLinkDelay, "rtn-feeder-phy-link-delay")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnFeederPhyLinkDelay, "rtn-feeder-phy-link-delay")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnFeederPhyLinkDelay, "rtn-feeder-phy-link-delay")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnFeederPhyLinkDelay, "rtn-feeder-phy-link-delay")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnFeederPhyLinkDelay, "rtn-feeder-phy-link-delay")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnFeederPhyLinkDelay, "rtn-feeder-phy-link-delay")
+
+// Return user link PHY-level packet link delay statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnUserPhyLinkDelay, "rtn-user-phy-link-delay")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnUserPhyLinkDelay, "rtn-user-phy-link-delay")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnUserPhyLinkDelay, "rtn-user-phy-link-delay")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnUserPhyLinkDelay, "rtn-user-phy-link-delay")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnUserPhyLinkDelay, "rtn-user-phy-link-delay")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnUserPhyLinkDelay, "rtn-user-phy-link-delay")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnUserPhyLinkDelay, "rtn-user-phy-link-delay")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnUserPhyLinkDelay, "rtn-user-phy-link-delay")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnUserPhyLinkDelay, "rtn-user-phy-link-delay")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnUserPhyLinkDelay, "rtn-user-phy-link-delay")
 
 // Return link application-level packet jitter statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnAppJitter, "rtn-app-jitter")

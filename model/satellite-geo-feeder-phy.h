@@ -111,6 +111,12 @@ public:
 
 protected:
   /**
+   * \brief Invoke the `Rx` trace source for each received packet.
+   * \param packets Container of the pointers to the packets received.
+   */
+  virtual void RxTraces (SatPhy::PacketContainer_t packets);
+
+  /**
    * \brief Get the link TX direction. Must be implemented by child clases.
    * \return The link TX direction
    */
