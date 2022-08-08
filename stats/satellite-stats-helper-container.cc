@@ -33,6 +33,7 @@
 #include <ns3/satellite-stats-delay-helper.h>
 #include <ns3/satellite-stats-link-delay-helper.h>
 #include <ns3/satellite-stats-jitter-helper.h>
+#include <ns3/satellite-stats-link-jitter-helper.h>
 #include <ns3/satellite-stats-plt-helper.h>
 #include <ns3/satellite-stats-frame-load-helper.h>
 #include <ns3/satellite-stats-link-rx-power-helper.h>
@@ -88,6 +89,8 @@ SatStatsHelperContainer::DoDispose ()
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Dev, Mac, Phy] Jitter
  * - Average [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppJitter
  * - Average [Beam, Group, Ut, Sat] [Fwd, Rtn] [Dev, Mac, Phy] Jitter
+ * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] [Mac, Phy] LinkJitter
+ * - Average [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] [Mac, Phy] LinkJitter
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerUtUser, PerSat] [Fwd, Rtn] AppPlt
  * - Average [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppPlt
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] Queue [Bytes, Packets]
@@ -291,6 +294,30 @@ SatStatsHelperContainer::GetTypeId ()
     ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdPhyJitter,
         "forward link PHY-level jitter statistics")
 
+    // Forward feeder link MAC-level packet link jitter statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdFeederMacLinkJitter,
+        "forward feeder link MAC-level link jitter statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdFeederMacLinkJitter,
+        "forward feeder link MAC-level link jitter statistics")
+
+    // Forward user link MAC-level packet link jitter statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdUserMacLinkJitter,
+        "forward user link MAC-level link jitter statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdUserMacLinkJitter,
+        "forward user link MAC-level link jitter statistics")
+
+    // Forward feeder link PHY-level packet link jitter statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdFeederPhyLinkJitter,
+        "forward feeder link PHY-level link jitter statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdFeederPhyLinkJitter,
+        "forward feeder link PHY-level link jitter statistics")
+
+    // Forward user link PHY-level packet link jitter statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdUserPhyLinkJitter,
+        "forward user link PHY-level link jitter statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdUserPhyLinkJitter,
+        "forward user link PHY-level link jitter statistics")
+
     // Forward link application-level packet PLT statistics.
     ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdAppPlt,
         "forward link application-level PLT statistics")
@@ -402,6 +429,30 @@ SatStatsHelperContainer::GetTypeId ()
         "return user link PHY-level link delay statistics")
     ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnUserPhyLinkDelay,
         "return user link PHY-level link delay statistics")
+
+    // Return feeder link MAC-level packet link jitter statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnFeederMacLinkJitter,
+        "forward feeder link MAC-level link jitter statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnFeederMacLinkJitter,
+        "forward feeder link MAC-level link jitter statistics")
+
+    // Return user link MAC-level packet link jitter statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnUserMacLinkJitter,
+        "forward user link MAC-level link jitter statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnUserMacLinkJitter,
+        "forward user link MAC-level link jitter statistics")
+
+    // Return feeder link PHY-level packet link jitter statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnFeederPhyLinkJitter,
+        "forward feeder link PHY-level link jitter statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnFeederPhyLinkJitter,
+        "forward feeder link PHY-level link jitter statistics")
+
+    // Return user link PHY-level packet link jitter statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnUserPhyLinkJitter,
+        "forward user link PHY-level link jitter statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnUserPhyLinkJitter,
+        "forward user link PHY-level link jitter statistics")
 
     // Return link application-level packet jitter statistics.
     ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnAppJitter,
@@ -721,6 +772,8 @@ SatStatsHelperContainer::GetName () const
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Dev, Mac, Phy] Jitter
  * - AddAverage [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppJitter
  * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Dev, Mac, Phy] Jitter
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] [Mac, Phy] LinkJitter
+ * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] [Mac, Phy] LinkJitter
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerUtUser, PerSat] [Fwd, Rtn] AppPlt
  * - AddAverage [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppPlt
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] Queue [Bytes, Packets]
@@ -1134,6 +1187,54 @@ SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdPhyJitter, "fwd-phy-jitter")
 SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdPhyJitter, "fwd-phy-jitter")
 SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdPhyJitter, "fwd-phy-jitter")
 
+// Forward feeder link MAC-level packet link jitter statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdFeederMacLinkJitter, "fwd-feeder-mac-link-jitter")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdFeederMacLinkJitter, "fwd-feeder-mac-link-jitter")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdFeederMacLinkJitter, "fwd-feeder-mac-link-jitter")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FwdFeederMacLinkJitter, "fwd-feeder-mac-link-jitter")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdFeederMacLinkJitter, "fwd-feeder-mac-link-jitter")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (FwdFeederMacLinkJitter, "fwd-feeder-mac-link-jitter")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdFeederMacLinkJitter, "fwd-feeder-mac-link-jitter")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdFeederMacLinkJitter, "fwd-feeder-mac-link-jitter")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdFeederMacLinkJitter, "fwd-feeder-mac-link-jitter")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdFeederMacLinkJitter, "fwd-feeder-mac-link-jitter")
+
+// Forward user link MAC-level packet link jitter statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdUserMacLinkJitter, "fwd-user-mac-link-jitter")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdUserMacLinkJitter, "fwd-user-mac-link-jitter")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdUserMacLinkJitter, "fwd-user-mac-link-jitter")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FwdUserMacLinkJitter, "fwd-user-mac-link-jitter")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdUserMacLinkJitter, "fwd-user-mac-link-jitter")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (FwdUserMacLinkJitter, "fwd-user-mac-link-jitter")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdUserMacLinkJitter, "fwd-user-mac-link-jitter")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdUserMacLinkJitter, "fwd-user-mac-link-jitter")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdUserMacLinkJitter, "fwd-user-mac-link-jitter")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdUserMacLinkJitter, "fwd-user-mac-link-jitter")
+
+// Forward feeder link PHY-level packet link jitter statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdFeederPhyLinkJitter, "fwd-feeder-phy-link-jitter")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdFeederPhyLinkJitter, "fwd-feeder-phy-link-jitter")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdFeederPhyLinkJitter, "fwd-feeder-phy-link-jitter")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FwdFeederPhyLinkJitter, "fwd-feeder-phy-link-jitter")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdFeederPhyLinkJitter, "fwd-feeder-phy-link-jitter")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (FwdFeederPhyLinkJitter, "fwd-feeder-phy-link-jitter")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdFeederPhyLinkJitter, "fwd-feeder-phy-link-jitter")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdFeederPhyLinkJitter, "fwd-feeder-phy-link-jitter")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdFeederPhyLinkJitter, "fwd-feeder-phy-link-jitter")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdFeederPhyLinkJitter, "fwd-feeder-phy-link-jitter")
+
+// Forward user link PHY-level packet link jitter statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdUserPhyLinkJitter, "fwd-user-phy-link-jitter")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdUserPhyLinkJitter, "fwd-user-phy-link-jitter")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdUserPhyLinkJitter, "fwd-user-phy-link-jitter")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FwdUserPhyLinkJitter, "fwd-user-phy-link-jitter")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdUserPhyLinkJitter, "fwd-user-phy-link-jitter")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (FwdUserPhyLinkJitter, "fwd-user-phy-link-jitter")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdUserPhyLinkJitter, "fwd-user-phy-link-jitter")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdUserPhyLinkJitter, "fwd-user-phy-link-jitter")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdUserPhyLinkJitter, "fwd-user-phy-link-jitter")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdUserPhyLinkJitter, "fwd-user-phy-link-jitter")
+
 // Forward link application-level packet PLT statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdAppPlt, "fwd-app-plt")
 SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdAppPlt, "fwd-app-plt")
@@ -1376,6 +1477,54 @@ SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnPhyJitter, "rtn-phy-jitter")
 SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnPhyJitter, "rtn-phy-jitter")
 SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnPhyJitter, "rtn-phy-jitter")
 SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnPhyJitter, "rtn-phy-jitter")
+
+// Forward feeder link MAC-level packet link jitter statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnFeederMacLinkJitter, "rtn-feeder-mac-link-jitter")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnFeederMacLinkJitter, "rtn-feeder-mac-link-jitter")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnFeederMacLinkJitter, "rtn-feeder-mac-link-jitter")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnFeederMacLinkJitter, "rtn-feeder-mac-link-jitter")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnFeederMacLinkJitter, "rtn-feeder-mac-link-jitter")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnFeederMacLinkJitter, "rtn-feeder-mac-link-jitter")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnFeederMacLinkJitter, "rtn-feeder-mac-link-jitter")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnFeederMacLinkJitter, "rtn-feeder-mac-link-jitter")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnFeederMacLinkJitter, "rtn-feeder-mac-link-jitter")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnFeederMacLinkJitter, "rtn-feeder-mac-link-jitter")
+
+// Forward user link MAC-level packet link jitter statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnUserMacLinkJitter, "rtn-user-mac-link-jitter")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnUserMacLinkJitter, "rtn-user-mac-link-jitter")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnUserMacLinkJitter, "rtn-user-mac-link-jitter")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnUserMacLinkJitter, "rtn-user-mac-link-jitter")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnUserMacLinkJitter, "rtn-user-mac-link-jitter")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnUserMacLinkJitter, "rtn-user-mac-link-jitter")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnUserMacLinkJitter, "rtn-user-mac-link-jitter")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnUserMacLinkJitter, "rtn-user-mac-link-jitter")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnUserMacLinkJitter, "rtn-user-mac-link-jitter")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnUserMacLinkJitter, "rtn-user-mac-link-jitter")
+
+// Forward feeder link PHY-level packet link jitter statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnFeederPhyLinkJitter, "rtn-feeder-phy-link-jitter")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnFeederPhyLinkJitter, "rtn-feeder-phy-link-jitter")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnFeederPhyLinkJitter, "rtn-feeder-phy-link-jitter")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnFeederPhyLinkJitter, "rtn-feeder-phy-link-jitter")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnFeederPhyLinkJitter, "rtn-feeder-phy-link-jitter")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnFeederPhyLinkJitter, "rtn-feeder-phy-link-jitter")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnFeederPhyLinkJitter, "rtn-feeder-phy-link-jitter")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnFeederPhyLinkJitter, "rtn-feeder-phy-link-jitter")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnFeederPhyLinkJitter, "rtn-feeder-phy-link-jitter")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnFeederPhyLinkJitter, "rtn-feeder-phy-link-jitter")
+
+// Forward user link PHY-level packet link jitter statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnUserPhyLinkJitter, "rtn-user-phy-link-jitter")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnUserPhyLinkJitter, "rtn-user-phy-link-jitter")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnUserPhyLinkJitter, "rtn-user-phy-link-jitter")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnUserPhyLinkJitter, "rtn-user-phy-link-jitter")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnUserPhyLinkJitter, "rtn-user-phy-link-jitter")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnUserPhyLinkJitter, "rtn-user-phy-link-jitter")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnUserPhyLinkJitter, "rtn-user-phy-link-jitter")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnUserPhyLinkJitter, "rtn-user-phy-link-jitter")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnUserPhyLinkJitter, "rtn-user-phy-link-jitter")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnUserPhyLinkJitter, "rtn-user-phy-link-jitter")
 
 // Return link application-level packet PLT statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnAppPlt, "rtn-app-plt")

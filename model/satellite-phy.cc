@@ -52,6 +52,7 @@ SatPhy::SatPhy (void)
   m_eirpWoGainW (0),
   m_isStatisticsTagsEnabled (false),
   m_lastDelay (0),
+  m_lastLinkDelay (0),
   m_rxNoiseTemperatureDbk (0),
   m_rxMaxAntennaGainDb (0),
   m_rxAntennaLossDb (0),
@@ -72,6 +73,7 @@ SatPhy::SatPhy (CreateParam_t & params)
   m_eirpWoGainW (0),
   m_isStatisticsTagsEnabled (false),
   m_lastDelay (0),
+  m_lastLinkDelay (0),
   m_rxNoiseTemperatureDbk (0),
   m_rxMaxAntennaGainDb (0),
   m_rxAntennaLossDb (0),
@@ -164,6 +166,10 @@ SatPhy::GetTypeId (void)
     .AddTraceSource ("RxJitter",
                      "A packet is received with jitter information",
                      MakeTraceSourceAccessor (&SatPhy::m_rxJitterTrace),
+                     "ns3::SatTypedefs::PacketJitterAddressCallback")
+    .AddTraceSource ("RxLinkJitter",
+                     "A packet is received with link jitter information",
+                     MakeTraceSourceAccessor (&SatPhy::m_rxLinkJitterTrace),
                      "ns3::SatTypedefs::PacketJitterAddressCallback")
   ;
   return tid;
@@ -453,6 +459,12 @@ SatPhy::RxTraces (SatPhy::PacketContainer_t packets)
               NS_LOG_DEBUG (this << " contains a SatPhyLinkTimeTag tag");
               Time delay = Simulator::Now () - linkTimeTag.GetSenderLinkTimestamp ();
               m_rxLinkDelayTrace (delay, addr);
+              if (m_lastLinkDelay.IsZero() == false)
+                {
+                  Time jitter = Abs (delay - m_lastLinkDelay);
+                  m_rxLinkJitterTrace (jitter, addr);
+                }
+              m_lastLinkDelay = delay;
             }
 
           SatPhyTimeTag timeTag;

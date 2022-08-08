@@ -373,21 +373,12 @@ SatGeoFeederPhy::RxTraces (SatPhy::PacketContainer_t packets)
               NS_LOG_DEBUG (this << " contains a SatPhyLinkTimeTag tag");
               Time delay = Simulator::Now () - linkTimeTag.GetSenderLinkTimestamp ();
               m_rxLinkDelayTrace (delay, addr);
-            }
-
-          SatPhyTimeTag timeTag;
-          // Leave tag if on Satellite
-          if ((*it1)->PeekPacketTag (timeTag))
-            {
-              NS_LOG_DEBUG (this << " contains a SatPhyTimeTag tag");
-              Time delay = Simulator::Now () - timeTag.GetSenderTimestamp ();
-              m_rxDelayTrace (delay, addr);
-              if (m_lastDelay.IsZero() == false)
+              if (m_lastLinkDelay.IsZero() == false)
                 {
-                  Time jitter = Abs (delay - m_lastDelay);
-                  m_rxJitterTrace (jitter, addr);
+                  Time jitter = Abs (delay - m_lastLinkDelay);
+                  m_rxLinkJitterTrace (jitter, addr);
                 }
-              m_lastDelay = delay;
+              m_lastLinkDelay = delay;
             }
 
         } // end of `for (it1 = rxParams->m_packetsInBurst)`

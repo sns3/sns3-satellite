@@ -46,6 +46,8 @@ namespace ns3 {
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Dev, Mac, Phy] Jitter
  * - AddAverage [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppJitter
  * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Dev, Mac, Phy] Jitter
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] [Mac, Phy] LinkJitter
+ * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] [Mac, Phy] LinkJitter
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerUtUser, PerSat] [Fwd, Rtn] AppPlt
  * - AddAverage [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppPlt
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] Queue [Bytes, Packets]
@@ -227,6 +229,34 @@ public:
   void AddAverageUtFwdPhyJitter (SatStatsHelper::OutputType_t outputType);
   void AddAverageSatFwdPhyJitter (SatStatsHelper::OutputType_t outputType);
 
+  // Forward link feeder MAC-level packet link Jitter statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdFeederMacLinkJitter)
+  void AddAverageBeamFwdFeederMacLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupFwdFeederMacLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtFwdFeederMacLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatFwdFeederMacLinkJitter (SatStatsHelper::OutputType_t outputType);
+
+  // Forward link user MAC-level packet link Jitter statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdUserMacLinkJitter)
+  void AddAverageBeamFwdUserMacLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupFwdUserMacLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtFwdUserMacLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatFwdUserMacLinkJitter (SatStatsHelper::OutputType_t outputType);
+
+  // Forward link feeder PHY-level packet link Jitter statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdFeederPhyLinkJitter)
+  void AddAverageBeamFwdFeederPhyLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupFwdFeederPhyLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtFwdFeederPhyLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatFwdFeederPhyLinkJitter (SatStatsHelper::OutputType_t outputType);
+
+  // Forward link user PHY-level packet link Jitter statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdUserPhyLinkJitter)
+  void AddAverageBeamFwdUserPhyLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupFwdUserPhyLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtFwdUserPhyLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatFwdUserPhyLinkJitter (SatStatsHelper::OutputType_t outputType);
+
   // Forward link application-level packet PLT statistics.
   SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (FwdAppPlt)
   void AddAverageBeamFwdAppPlt (SatStatsHelper::OutputType_t outputType);
@@ -361,6 +391,35 @@ public:
   void AddAverageGroupRtnPhyJitter (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtRtnPhyJitter (SatStatsHelper::OutputType_t outputType);
   void AddAverageSatRtnPhyJitter (SatStatsHelper::OutputType_t outputType);
+
+  // Return link feeder MAC-level packet link Jitter statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnFeederMacLinkJitter)
+  void AddAverageBeamRtnFeederMacLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRtnFeederMacLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRtnFeederMacLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatRtnFeederMacLinkJitter (SatStatsHelper::OutputType_t outputType);
+
+  // Return link user MAC-level packet link Jitter statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnUserMacLinkJitter)
+  void AddAverageBeamRtnUserMacLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRtnUserMacLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRtnUserMacLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatRtnUserMacLinkJitter (SatStatsHelper::OutputType_t outputType);
+
+  // Return link feeder PHY-level packet link Jitter statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnFeederPhyLinkJitter)
+  void AddAverageBeamRtnFeederPhyLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRtnFeederPhyLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRtnFeederPhyLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatRtnFeederPhyLinkJitter (SatStatsHelper::OutputType_t outputType);
+
+  // Return link user PHY-level packet link Jitter statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnUserPhyLinkJitter)
+  void AddAverageBeamRtnUserPhyLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRtnUserPhyLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRtnUserPhyLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatRtnUserPhyLinkJitter (SatStatsHelper::OutputType_t outputType);
+
 
   // Return link application-level packet PLT statistics.
   SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (RtnAppPlt)

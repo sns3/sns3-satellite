@@ -199,6 +199,7 @@ set(source_files
     stats/satellite-stats-delay-helper.cc
     stats/satellite-stats-link-delay-helper.cc
     stats/satellite-stats-jitter-helper.cc
+    stats/satellite-stats-link-jitter-helper.cc
     stats/satellite-stats-plt-helper.cc
     stats/satellite-stats-frame-load-helper.cc
     stats/satellite-stats-frame-type-usage-helper.cc
@@ -423,6 +424,7 @@ set(header_files
     stats/satellite-stats-delay-helper.h
     stats/satellite-stats-link-delay-helper.h
     stats/satellite-stats-jitter-helper.h
+    stats/satellite-stats-link-jitter-helper.h
     stats/satellite-stats-plt-helper.h
     stats/satellite-stats-frame-load-helper.h
     stats/satellite-stats-frame-type-usage-helper.h

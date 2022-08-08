@@ -145,6 +145,16 @@ main (int argc, char *argv[])
   s->AddPerUtRtnFeederPhyLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtRtnUserPhyLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
+  s->AddPerSatFwdFeederPhyLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatFwdUserPhyLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatRtnFeederPhyLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatRtnUserPhyLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddPerUtFwdFeederPhyLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdUserPhyLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnFeederPhyLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnUserPhyLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
   s->AddPerGwFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerSatFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);

@@ -543,6 +543,12 @@ protected:
   TracedCallback<const Time &, const Address &> m_rxJitterTrace;
 
   /**
+   * Traced callback for all received packets, including link jitter information and
+   * the address of the senders.
+   */
+  TracedCallback<const Time &, const Address &> m_rxLinkJitterTrace;
+
+  /**
    * Node info containing node related information, such as
    * node type, node id and MAC address (of the SatNetDevice)
    */
@@ -577,6 +583,11 @@ protected:
    * Last delay measurement. Used to compute jitter.
    */
   Time m_lastDelay;
+
+  /**
+   * Last delay measurement for link. Used to compute link jitter.
+   */
+  Time m_lastLinkDelay;
 
 private:
   /**
