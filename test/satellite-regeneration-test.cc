@@ -66,7 +66,8 @@ public:
 private:
   virtual void DoRun (void);
   void PhyDelayTraceCb (std::string context, const Time & time, const Address & address);
-  void GeoPhyTraceDelayCb (const Time & time, const Address & address);
+  void GeoFeederPhyTraceDelayCb (const Time & time, const Address & address);
+  void GeoUserPhyTraceDelayCb (const Time & time, const Address & address);
 
   Ptr<SatHelper> m_helper;
 
@@ -105,16 +106,15 @@ SatRegenerationTest1::PhyDelayTraceCb (std::string context, const Time & time, c
 }
 
 void
-SatRegenerationTest1::GeoPhyTraceDelayCb (const Time & time, const Address & address)
+SatRegenerationTest1::GeoFeederPhyTraceDelayCb (const Time & time, const Address & address)
 {
-  if (address == m_gwAddress)
-    {
-      m_geoForwardDelay.push_back (time);
-    }
-  if (address == m_stAddress)
-    {
-      m_geoReturnDelay.push_back (time);
-    }
+  m_geoForwardDelay.push_back (time);
+}
+
+void
+SatRegenerationTest1::GeoUserPhyTraceDelayCb (const Time & time, const Address & address)
+{
+  m_geoReturnDelay.push_back (time);
 }
 
 //
@@ -180,9 +180,9 @@ SatRegenerationTest1::DoRun (void)
   Ptr<SatGeoUserPhy> satGeoUserPhy = DynamicCast<SatGeoUserPhy> (DynamicCast<SatGeoNetDevice> (m_helper->GeoSatNode ()->GetDevice (0))->GetUserPhy (8));
 
   // TODO update with link delay
-  satGeoFeederPhy->TraceConnectWithoutContext ("RxDelay", MakeCallback (&SatRegenerationTest1::GeoPhyTraceDelayCb, this));
-  satGeoUserPhy->TraceConnectWithoutContext ("RxDelay", MakeCallback (&SatRegenerationTest1::GeoPhyTraceDelayCb, this));
-  Config::Connect ("/NodeList/*/DeviceList/*/SatPhy/RxDelay", MakeCallback (&SatRegenerationTest1::PhyDelayTraceCb, this));
+  satGeoFeederPhy->TraceConnectWithoutContext ("RxLinkDelay", MakeCallback (&SatRegenerationTest1::GeoFeederPhyTraceDelayCb, this));
+  satGeoUserPhy->TraceConnectWithoutContext ("RxLinkDelay", MakeCallback (&SatRegenerationTest1::GeoUserPhyTraceDelayCb, this));
+  Config::Connect ("/NodeList/*/DeviceList/*/SatPhy/RxLinkDelay", MakeCallback (&SatRegenerationTest1::PhyDelayTraceCb, this));
 
   Ptr<SatChannel> feederChannel = satGeoFeederPhy->GetPhyTx ()->GetChannel ();
   Ptr<SatChannel> userChannel = satGeoUserPhy->GetPhyTx ()->GetChannel ();
@@ -728,8 +728,8 @@ public:
 SatRegenerationTestSuite::SatRegenerationTestSuite ()
   : TestSuite ("sat-regeneration-test", SYSTEM)
 {
-  //AddTestCase (new SatRegenerationTest1, TestCase::QUICK); // Test delay with regeneration phy
-  //AddTestCase (new SatRegenerationTest2, TestCase::QUICK); // Test losses with regeneration phy
+  AddTestCase (new SatRegenerationTest1, TestCase::QUICK); // Test delay with regeneration phy
+  AddTestCase (new SatRegenerationTest2, TestCase::QUICK); // Test losses with regeneration phy
   AddTestCase (new SatRegenerationTest3, TestCase::QUICK); // Test collisions with regeneration phy
 }
 
