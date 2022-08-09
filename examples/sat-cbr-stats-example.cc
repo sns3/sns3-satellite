@@ -337,8 +337,8 @@ main (int argc, char *argv[])
   s->AddAverageBeamRtnDevThroughput (SatStatsHelper::OUTPUT_PDF_PLOT);
   s->AddPerGwFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
   s->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddAverageBeamRtnPhyThroughput (SatStatsHelper::OUTPUT_CDF_PLOT);
+  s->AddPerUtFwdUserPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddAverageBeamRtnFeederPhyThroughput (SatStatsHelper::OUTPUT_CDF_PLOT);
 
   s->AddPerGwFwdQueueBytes (SatStatsHelper::OUTPUT_HISTOGRAM_FILE);
   s->AddGlobalRtnQueuePackets (SatStatsHelper::OUTPUT_PDF_FILE);

@@ -213,8 +213,8 @@ main (int argc, char *argv[])
 
   Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer ();
 
-  s->AddGlobalFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddGlobalRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddGlobalFwdUserPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddGlobalRtnFeederPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   s->AddPerSatFeederSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerSatUserSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCATTER_FILE);

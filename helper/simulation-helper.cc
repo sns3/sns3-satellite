@@ -771,23 +771,23 @@ SimulationHelper::CreateDefaultFwdLinkStats ()
 
   // Throughput
   m_statContainer->AddAverageUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
-  m_statContainer->AddAverageUtFwdPhyThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
+  m_statContainer->AddAverageUtFwdUserPhyThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
   m_statContainer->AddAverageBeamFwdAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
 
   m_statContainer->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   m_statContainer->AddGlobalFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddGlobalFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  m_statContainer->AddGlobalFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddGlobalFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddGlobalFwdUserPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddGlobalFwdUserPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   m_statContainer->AddPerBeamFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddPerBeamFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFwdUserPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   Config::SetDefault ("ns3::SatStatsThroughputHelper::AveragingMode", BooleanValue (true));
   m_statContainer->AddPerBeamFwdAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
   m_statContainer->AddPerBeamFwdMacThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
-  m_statContainer->AddPerBeamFwdPhyThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
+  m_statContainer->AddPerBeamFwdUserPhyThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
 
   // SINR
   m_statContainer->AddGlobalFwdCompositeSinr (SatStatsHelper::OUTPUT_CDF_FILE);
@@ -833,7 +833,7 @@ SimulationHelper::CreateDefaultRtnLinkStats ()
 
   // Throughput
   m_statContainer->AddAverageUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
-  m_statContainer->AddAverageUtRtnPhyThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
+  m_statContainer->AddAverageUtRtnFeederPhyThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
   m_statContainer->AddAverageBeamRtnAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
   m_statContainer->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
@@ -841,13 +841,13 @@ SimulationHelper::CreateDefaultRtnLinkStats ()
   m_statContainer->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   m_statContainer->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  m_statContainer->AddGlobalRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddGlobalRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddGlobalRtnFeederPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddGlobalRtnFeederPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   m_statContainer->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddPerBeamRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddPerBeamRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamRtnFeederPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   // Granted resources
   m_statContainer->AddGlobalResourcesGranted (SatStatsHelper::OUTPUT_SCATTER_FILE);

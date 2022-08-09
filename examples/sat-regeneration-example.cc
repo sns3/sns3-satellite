@@ -155,13 +155,15 @@ main (int argc, char *argv[])
   s->AddPerUtRtnFeederPhyLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtRtnUserPhyLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-  s->AddPerGwFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdFeederPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatFwdFeederPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdUserPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatFwdUserPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-  s->AddPerGwRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnFeederPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatRtnFeederPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnUserPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatRtnUserPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   simulationHelper->EnableProgressLogs ();
   simulationHelper->RunSimulation ();

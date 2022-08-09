@@ -54,9 +54,11 @@ namespace ns3 {
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] SignallingLoad
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] CompositeSinr
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerUtUser, PerSat] [Fwd, Rtn] AppThroughput
- * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Dev, Mac, Phy] Throughput
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Dev, Mac] Throughput
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] [Phy] Throughput
  * - AddAverage [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppThroughput
- * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Dev, Mac, Phy] Throughput
+ * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Dev, Mac] Throughput
+ * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Phy] [Feeder, User] Throughput
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Feeder, User] [FwdDa, RtnDa, SlottedAloha, Crdsa, Essa] PacketError
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Feeder, User] [SlottedAloha, Crdsa, Essa] PacketCollision
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] CapacityRequest
@@ -299,12 +301,19 @@ public:
   void AddAverageUtFwdMacThroughput (SatStatsHelper::OutputType_t outputType);
   void AddAverageSatFwdMacThroughput (SatStatsHelper::OutputType_t outputType);
 
-  // Forward link PHY-level throughput statistics.
-  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdPhyThroughput)
-  void AddAverageBeamFwdPhyThroughput (SatStatsHelper::OutputType_t outputType);
-  void AddAverageGroupFwdPhyThroughput (SatStatsHelper::OutputType_t outputType);
-  void AddAverageUtFwdPhyThroughput (SatStatsHelper::OutputType_t outputType);
-  void AddAverageSatFwdPhyThroughput (SatStatsHelper::OutputType_t outputType);
+  // Forward feeder link PHY-level throughput statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdFeederPhyThroughput)
+  void AddAverageBeamFwdFeederPhyThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupFwdFeederPhyThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtFwdFeederPhyThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatFwdFeederPhyThroughput (SatStatsHelper::OutputType_t outputType);
+
+  // Forward user link PHY-level throughput statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdUserPhyThroughput)
+  void AddAverageBeamFwdUserPhyThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupFwdUserPhyThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtFwdUserPhyThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatFwdUserPhyThroughput (SatStatsHelper::OutputType_t outputType);
 
   // Return link application-level packet delay statistics.
   SAT_STATS_FULL_SCOPE_METHOD_DECLARATION (RtnAppDelay)
@@ -463,12 +472,19 @@ public:
   void AddAverageUtRtnMacThroughput (SatStatsHelper::OutputType_t outputType);
   void AddAverageSatRtnMacThroughput (SatStatsHelper::OutputType_t outputType);
 
-  // Return link PHY-level throughput statistics.
-  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnPhyThroughput)
-  void AddAverageBeamRtnPhyThroughput (SatStatsHelper::OutputType_t outputType);
-  void AddAverageGroupRtnPhyThroughput (SatStatsHelper::OutputType_t outputType);
-  void AddAverageUtRtnPhyThroughput (SatStatsHelper::OutputType_t outputType);
-  void AddAverageSatRtnPhyThroughput (SatStatsHelper::OutputType_t outputType);
+  // Return feeder link PHY-level throughput statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnFeederPhyThroughput)
+  void AddAverageBeamRtnFeederPhyThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRtnFeederPhyThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRtnFeederPhyThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatRtnFeederPhyThroughput (SatStatsHelper::OutputType_t outputType);
+
+  // Return user link PHY-level throughput statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnUserPhyThroughput)
+  void AddAverageBeamRtnUserPhyThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRtnUserPhyThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRtnUserPhyThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatRtnUserPhyThroughput (SatStatsHelper::OutputType_t outputType);
 
   // Forward link Dedicated Access packet error rate statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdFeederDaPacketError)

@@ -97,9 +97,11 @@ SatStatsHelperContainer::DoDispose ()
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] SignallingLoad
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] CompositeSinr
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerUtUser, PerSat] [Fwd, Rtn] AppThroughput
- * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Dev, Mac, Phy] Throughput
+ * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Dev, Mac] Throughput
+ * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] [Phy] Throughput
  * - Average [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppThroughput
- * - Average [Beam, Group, Ut, Sat] [Fwd, Rtn] [Dev, Mac, Phy] Throughput
+ * - Average [Beam, Group, Ut, Sat] [Fwd, Rtn] [Dev, Mac] Throughput
+ * - Average [Beam, Group, Ut, Sat] [Fwd, Rtn] [Phy] [Feeder, User] Throughput
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Feeder, User] [FwdDa, RtnDa, SlottedAloha, Crdsa, Essa] PacketError
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Feeder, User] [SlottedAloha, Crdsa, Essa] PacketCollision
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] CapacityRequest
@@ -370,11 +372,17 @@ SatStatsHelperContainer::GetTypeId ()
     ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdMacThroughput,
         "forward link MAC-level throughput statistics")
 
-    // Forward link PHY-level throughput statistics.
-    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdPhyThroughput,
-        "forward link PHY-level throughput statistics")
-    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdPhyThroughput,
-        "forward link PHY-level throughput statistics")
+    // Forward feeder link PHY-level throughput statistics.
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdFeederPhyThroughput,
+        "forward feeder link PHY-level throughput statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdFeederPhyThroughput,
+        "forward feeder link PHY-level throughput statistics")
+
+    // Forward user link PHY-level throughput statistics.
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdUserPhyThroughput,
+        "forward user link PHY-level throughput statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdUserPhyThroughput,
+        "forward user link PHY-level throughput statistics")
 
     // Return link application-level packet delay statistics.
     ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnAppDelay,
@@ -536,11 +544,17 @@ SatStatsHelperContainer::GetTypeId ()
     ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnMacThroughput,
         "return link MAC-level throughput statistics")
 
-    // Return link PHY-level throughput statistics.
-    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnPhyThroughput,
-        "return link PHY-level throughput statistics")
-    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnPhyThroughput,
-        "return link PHY-level throughput statistics")
+    // Return feeder link PHY-level throughput statistics.
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnFeederPhyThroughput,
+        "return feeder link PHY-level throughput statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnFeederPhyThroughput,
+        "return feeder link PHY-level throughput statistics")
+
+    // Return user link PHY-level throughput statistics.
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnUserPhyThroughput,
+        "return user link PHY-level throughput statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnUserPhyThroughput,
+        "return user link PHY-level throughput statistics")
 
     // Forward link Dedicated Access packet error rate statistics.
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdFeederDaPacketError,
@@ -780,9 +794,11 @@ SatStatsHelperContainer::GetName () const
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] SignallingLoad
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] CompositeSinr
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerUtUser, PerSat] [Fwd, Rtn] AppThroughput
- * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Dev, Mac, Phy] Throughput
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Dev, Mac] Throughput
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] [Phy] Throughput
  * - AddAverage [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppThroughput
- * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Dev, Mac, Phy] Throughput
+ * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Dev, Mac] Throughput
+ * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Phy] [Feeder, User] Throughput
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Feeder, User] [FwdDa, RtnDa, SlottedAloha, Crdsa, Essa] PacketError
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Feeder, User] [SlottedAloha, Crdsa, Essa] PacketCollision
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] CapacityRequest
@@ -1318,17 +1334,29 @@ SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdMacThroughput, "fwd-mac-throughput"
 SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdMacThroughput, "fwd-mac-throughput")
 SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdMacThroughput, "fwd-mac-throughput")
 
-// Forward link PHY-level throughput statistics.
-SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdPhyThroughput, "fwd-phy-throughput")
-SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdPhyThroughput, "fwd-phy-throughput")
-SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdPhyThroughput, "fwd-phy-throughput")
-SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FwdPhyThroughput, "fwd-phy-throughput")
-SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdPhyThroughput, "fwd-phy-throughput")
-SAT_STATS_PER_SAT_METHOD_DEFINITION      (FwdPhyThroughput, "fwd-phy-throughput")
-SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdPhyThroughput, "fwd-phy-throughput")
-SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdPhyThroughput, "fwd-phy-throughput")
-SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdPhyThroughput, "fwd-phy-throughput")
-SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdPhyThroughput, "fwd-phy-throughput")
+// Forward feeder link PHY-level throughput statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdFeederPhyThroughput, "fwd-feeder-phy-throughput")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdFeederPhyThroughput, "fwd-feeder-phy-throughput")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdFeederPhyThroughput, "fwd-feeder-phy-throughput")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FwdFeederPhyThroughput, "fwd-feeder-phy-throughput")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdFeederPhyThroughput, "fwd-feeder-phy-throughput")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (FwdFeederPhyThroughput, "fwd-feeder-phy-throughput")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdFeederPhyThroughput, "fwd-feeder-phy-throughput")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdFeederPhyThroughput, "fwd-feeder-phy-throughput")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdFeederPhyThroughput, "fwd-feeder-phy-throughput")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdFeederPhyThroughput, "fwd-feeder-phy-throughput")
+
+// Forward user link PHY-level throughput statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdUserPhyThroughput, "fwd-user-phy-throughput")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdUserPhyThroughput, "fwd-user-phy-throughput")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdUserPhyThroughput, "fwd-user-phy-throughput")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FwdUserPhyThroughput, "fwd-user-phy-throughput")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdUserPhyThroughput, "fwd-user-phy-throughput")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (FwdUserPhyThroughput, "fwd-user-phy-throughput")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdUserPhyThroughput, "fwd-user-phy-throughput")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdUserPhyThroughput, "fwd-user-phy-throughput")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdUserPhyThroughput, "fwd-user-phy-throughput")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdUserPhyThroughput, "fwd-user-phy-throughput")
 
 // Return link application-level packet delay statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnAppDelay, "rtn-app-delay")
@@ -1610,17 +1638,29 @@ SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnMacThroughput, "rtn-mac-throughput"
 SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnMacThroughput, "rtn-mac-throughput")
 SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnMacThroughput, "rtn-mac-throughput")
 
-// Return link PHY-level throughput statistics.
-SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnPhyThroughput, "rtn-phy-throughput")
-SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnPhyThroughput, "rtn-phy-throughput")
-SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnPhyThroughput, "rtn-phy-throughput")
-SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnPhyThroughput, "rtn-phy-throughput")
-SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnPhyThroughput, "rtn-phy-throughput")
-SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnPhyThroughput, "rtn-phy-throughput")
-SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnPhyThroughput, "rtn-phy-throughput")
-SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnPhyThroughput, "rtn-phy-throughput")
-SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnPhyThroughput, "rtn-phy-throughput")
-SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnPhyThroughput, "rtn-phy-throughput")
+// Return feeder link PHY-level throughput statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnFeederPhyThroughput, "rtn-feeder-phy-throughput")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnFeederPhyThroughput, "rtn-feeder-phy-throughput")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnFeederPhyThroughput, "rtn-feeder-phy-throughput")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnFeederPhyThroughput, "rtn-feeder-phy-throughput")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnFeederPhyThroughput, "rtn-feeder-phy-throughput")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnFeederPhyThroughput, "rtn-feeder-phy-throughput")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnFeederPhyThroughput, "rtn-feeder-phy-throughput")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnFeederPhyThroughput, "rtn-feeder-phy-throughput")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnFeederPhyThroughput, "rtn-feeder-phy-throughput")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnFeederPhyThroughput, "rtn-feeder-phy-throughput")
+
+// Return user link PHY-level throughput statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnUserPhyThroughput, "rtn-user-phy-throughput")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnUserPhyThroughput, "rtn-user-phy-throughput")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnUserPhyThroughput, "rtn-user-phy-throughput")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnUserPhyThroughput, "rtn-user-phy-throughput")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnUserPhyThroughput, "rtn-user-phy-throughput")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnUserPhyThroughput, "rtn-user-phy-throughput")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnUserPhyThroughput, "rtn-user-phy-throughput")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnUserPhyThroughput, "rtn-user-phy-throughput")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnUserPhyThroughput, "rtn-user-phy-throughput")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnUserPhyThroughput, "rtn-user-phy-throughput")
 
 // Forward link Dedicated Access packet error rate statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdFeederDaPacketError, "fwd-feeder-da-error")
