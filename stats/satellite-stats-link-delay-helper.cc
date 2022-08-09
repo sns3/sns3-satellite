@@ -587,12 +587,6 @@ SatStatsLinkDelayHelper::PassSampleToCollector (const Time &delay, uint32_t iden
 
 } // end of `void PassSampleToCollector (Time, uint32_t)`
 
-void
-SatStatsLinkDelayHelper::SetChannelLink (SatEnums::ChannelType_t channelLink)
-{
-  m_channelLink = channelLink;
-}
-
 
 // FORWARD FEEDER LINK MAC-LEVEL /////////////////////////////////////////////////////
 
@@ -790,8 +784,6 @@ SatStatsFwdFeederPhyLinkDelayHelper::SatStatsFwdFeederPhyLinkDelayHelper (Ptr<co
   : SatStatsLinkDelayHelper (satHelper)
 {
   NS_LOG_FUNCTION (this << satHelper);
-
-  SetChannelLink (SatEnums::FORWARD_FEEDER_CH);
 }
 
 
@@ -907,8 +899,6 @@ SatStatsFwdUserPhyLinkDelayHelper::SatStatsFwdUserPhyLinkDelayHelper (Ptr<const 
   : SatStatsLinkDelayHelper (satHelper)
 {
   NS_LOG_FUNCTION (this << satHelper);
-
-  SetChannelLink (SatEnums::FORWARD_USER_CH);
 }
 
 
@@ -1212,8 +1202,6 @@ SatStatsRtnFeederPhyLinkDelayHelper::SatStatsRtnFeederPhyLinkDelayHelper (Ptr<co
   : SatStatsLinkDelayHelper (satHelper)
 {
   NS_LOG_FUNCTION (this << satHelper);
-
-  SetChannelLink (SatEnums::RETURN_FEEDER_CH);
 }
 
 
@@ -1329,8 +1317,6 @@ SatStatsRtnUserPhyLinkDelayHelper::SatStatsRtnUserPhyLinkDelayHelper (Ptr<const 
   : SatStatsLinkDelayHelper (satHelper)
 {
   NS_LOG_FUNCTION (this << satHelper);
-
-  SetChannelLink (SatEnums::RETURN_USER_CH);
 }
 
 

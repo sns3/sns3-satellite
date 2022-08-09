@@ -239,7 +239,18 @@ SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams,
                                 m_sinrCalculate);
 
   // Update link specific SINR trace
-  m_linkSinrTrace (SatUtils::LinearToDb (sinr));
+  if (GetChannelType () == SatEnums::RETURN_USER_CH || GetChannelType () == SatEnums::RETURN_FEEDER_CH)
+    {
+      m_linkSinrTrace (SatUtils::LinearToDb (sinr), packetRxParams.sourceAddress);
+    }
+  else if (GetChannelType () == SatEnums::FORWARD_USER_CH || GetChannelType () == SatEnums::FORWARD_FEEDER_CH)
+    {
+      m_linkSinrTrace (SatUtils::LinearToDb (sinr), packetRxParams.destAddress);
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Incorrect channel for satPhyRxCarrierPerSlot: " << SatEnums::GetChannelTypeName (GetChannelType ()));
+    }
 
   /// PHY transmission decoded successfully. Note, that at transparent satellite,
   /// all the transmissions are not decoded.

@@ -67,7 +67,8 @@ namespace ns3 {
  * - Add [Global, PerGw, PerBeam] Frame [Symbol, User] Load
  * - Add [Global, PerGw, PerBeam] WaveformUsage
  * - Add [Global, PerSlice] FwdLinkSchedulerSymbolRate
- * - AddGlobal [Fwd, Rtn] [Feeder, User] LinkSinr
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] LinkSinr
+ * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] LinkSinr
  * - AddGlobal [Fwd, Rtn] [Feeder, User] LinkRxPower
  * - Add [Global, PerGw, PerBeam] FrameTypeUsage
  * - Add [Global, PerGw, PerBeam] RtnFeederWindowLoad
@@ -545,11 +546,33 @@ public:
   // Waveform usage statistics.
   SAT_STATS_REDUCED_SCOPE_METHOD_DECLARATION (WaveformUsage)
 
-  // Link SINR statistics.
-  void AddGlobalFwdFeederLinkSinr (SatStatsHelper::OutputType_t outputType);
-  void AddGlobalFwdUserLinkSinr (SatStatsHelper::OutputType_t outputType);
-  void AddGlobalRtnFeederLinkSinr (SatStatsHelper::OutputType_t outputType);
-  void AddGlobalRtnUserLinkSinr (SatStatsHelper::OutputType_t outputType);
+  // Return link PHY-level packet jitter statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdFeederLinkSinr)
+  void AddAverageBeamFwdFeederLinkSinr (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupFwdFeederLinkSinr (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtFwdFeederLinkSinr (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatFwdFeederLinkSinr (SatStatsHelper::OutputType_t outputType);
+
+  // Return link PHY-level packet jitter statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdUserLinkSinr)
+  void AddAverageBeamFwdUserLinkSinr (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupFwdUserLinkSinr (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtFwdUserLinkSinr (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatFwdUserLinkSinr (SatStatsHelper::OutputType_t outputType);
+
+  // Return link PHY-level packet jitter statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnFeederLinkSinr)
+  void AddAverageBeamRtnFeederLinkSinr (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRtnFeederLinkSinr (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRtnFeederLinkSinr (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatRtnFeederLinkSinr (SatStatsHelper::OutputType_t outputType);
+
+  // Return link PHY-level packet jitter statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnUserLinkSinr)
+  void AddAverageBeamRtnUserLinkSinr (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRtnUserLinkSinr (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRtnUserLinkSinr (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatRtnUserLinkSinr (SatStatsHelper::OutputType_t outputType);
 
   // Link Rx power statistics.
   void AddGlobalFwdFeederLinkRxPower (SatStatsHelper::OutputType_t outputType);

@@ -126,12 +126,6 @@ protected:
    */
   void PassSampleToCollector (const Time &delay, uint32_t identifier);
 
-  /**
-   * \brief Set the channel used by this probe.
-   * \param channelLink The channel used.
-   */
-  void SetChannelLink (SatEnums::ChannelType_t channelLink);
-
   /// Maintains a list of collectors created by this helper.
   CollectorMap m_terminalCollectors;
 
@@ -146,8 +140,6 @@ protected:
 
 private:
   bool m_averagingMode;  ///< `AveragingMode` attribute.
-
-  SatEnums::ChannelType_t m_channelLink; /// < Set channel where packet is received.
 
 }; // end of class SatStatsLinkDelayHelper
 

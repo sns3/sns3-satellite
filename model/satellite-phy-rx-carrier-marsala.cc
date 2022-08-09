@@ -198,7 +198,7 @@ SatPhyRxCarrierMarsala::PerformMarsala (
            * link SINR is already updated at the SatPhyRxCarrier::EndRxDataTransparent ()
            * method!
            */
-          m_linkSinrTrace (SatUtils::LinearToDb (cSinr));
+          m_linkSinrTrace (SatUtils::LinearToDb (cSinr), currentPacket->sourceAddress);
 
           NS_LOG_INFO ("MARSALA correlation computation, Replicas: " << replicasCount <<
                        " Interferents: " << (packetsInSlotsCount - replicasCount) <<

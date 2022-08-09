@@ -283,7 +283,7 @@ SatPhyRxCarrierPerWindow::CalculatePacketInterferenceVectors (SatPhyRxCarrierPer
   if (packet.meanSinr < 0.0)
     {
       // Update link specific SINR trace
-      m_linkSinrTrace (SatUtils::LinearToDb (snr));
+      m_linkSinrTrace (SatUtils::LinearToDb (snr), packet.sourceAddress);
 
       // Update composite SNR trace for DAMA and Slotted ALOHA packets
       // m_sinrTrace (SatUtils::LinearToDb (cSnr), packet.sourceAddress); // Done with effective SINR

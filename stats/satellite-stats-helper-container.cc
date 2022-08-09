@@ -110,7 +110,8 @@ SatStatsHelperContainer::DoDispose ()
  * - [Global, PerGw, PerBeam] Frame [Symbol, User] Load
  * - [Global, PerGw, PerBeam] WaveformUsage
  * - [Global, PerSlice] FwdLinkSchedulerSymbolRate
- * - Global [Fwd, Rtn] [Feeder, User] LinkSinr
+ * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] LinkSinr
+ * - Average [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] LinkSinr
  * - Global [Fwd, Rtn] [Feeder, User] LinkRxPower
  * - [Global, PerGw, PerBeam] FrameTypeUsage
  * - [Global, PerGw, PerBeam] RtnFeederWindowLoad
@@ -161,6 +162,9 @@ SatStatsHelperContainer::DoDispose ()
       ADD_SAT_STATS_ATTRIBUTE_HEAD (PerGw ## id,                      \
         std::string ("per GW ") + desc)                               \
       ADD_SAT_STATS_BASIC_OUTPUT_CHECKER                              \
+      ADD_SAT_STATS_ATTRIBUTE_HEAD (PerSat ## id,                     \
+        std::string ("per SAT ") + desc)                              \
+      ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER                       \
       ADD_SAT_STATS_ATTRIBUTE_HEAD (PerBeam ## id,                    \
         std::string ("per beam ") + desc)                             \
       ADD_SAT_STATS_BASIC_OUTPUT_CHECKER                              \
@@ -177,6 +181,9 @@ SatStatsHelperContainer::DoDispose ()
       ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER                       \
       ADD_SAT_STATS_ATTRIBUTE_HEAD (PerGw ## id,                      \
         std::string ("per GW ") + desc)                               \
+      ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER                       \
+      ADD_SAT_STATS_ATTRIBUTE_HEAD (PerSat ## id,                     \
+        std::string ("per SAT ") + desc)                              \
       ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER                       \
       ADD_SAT_STATS_ATTRIBUTE_HEAD (PerBeam ## id,                    \
         std::string ("per beam ") + desc)                             \
@@ -197,6 +204,9 @@ SatStatsHelperContainer::DoDispose ()
       ADD_SAT_STATS_AVERAGED_DISTRIBUTION_OUTPUT_CHECKER              \
       ADD_SAT_STATS_ATTRIBUTE_HEAD (AverageUt ## id,                  \
         std::string ("average UT ") + desc)                           \
+      ADD_SAT_STATS_AVERAGED_DISTRIBUTION_OUTPUT_CHECKER              \
+      ADD_SAT_STATS_ATTRIBUTE_HEAD (AverageSat ## id,                 \
+        std::string ("average SAT ") + desc)                          \
       ADD_SAT_STATS_AVERAGED_DISTRIBUTION_OUTPUT_CHECKER
 
 
@@ -319,6 +329,30 @@ SatStatsHelperContainer::GetTypeId ()
         "forward user link PHY-level link jitter statistics")
     ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdUserPhyLinkJitter,
         "forward user link PHY-level link jitter statistics")
+
+    // Forward feeder link sinr statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdFeederLinkSinr,
+        "forward feeder link SINR statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdFeederLinkSinr,
+        "forward feeder link SINR statistics")
+
+    // Forward user link sinr statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdUserLinkSinr,
+        "forward user link SINR statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdUserLinkSinr,
+        "forward user link SINR statistics")
+
+    // Return feeder link sinr statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnFeederLinkSinr,
+        "return feeder link SINR statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnFeederLinkSinr,
+        "return feeder link SINR statistics")
+
+    // Return user link sinr statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnUserLinkSinr,
+        "return user link SINR statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnUserLinkSinr,
+        "return user link SINR statistics")
 
     // Forward link application-level packet PLT statistics.
     ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdAppPlt,
@@ -684,20 +718,6 @@ SatStatsHelperContainer::GetTypeId ()
     MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
                      SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
 
-    // Link SINR statistics.
-    ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalFwdFeederLinkSinr,
-                                  "global forward feeder link SINR statistics")
-    ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
-    ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalFwdUserLinkSinr,
-                                  "global forward user link SINR statistics")
-    ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
-    ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalRtnFeederLinkSinr,
-                                  "global return feeder link SINR statistics")
-    ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
-    ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalRtnUserLinkSinr,
-                                  "global return user link SINR statistics")
-    ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
-
     // Link Rx power statistics.
     ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalFwdFeederLinkRxPower,
                                   "global forward feeder link Rx power statistics")
@@ -807,7 +827,8 @@ SatStatsHelperContainer::GetName () const
  * - Add [Global, PerGw, PerBeam] Frame [Symbol, User] Load
  * - Add [Global, PerGw, PerBeam] WaveformUsage
  * - Add [Global, PerSlice] FwdLinkSchedulerSymbolRate
- * - AddGlobal [Fwd, Rtn] [Feeder, User] LinkSinr
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] LinkSinr
+ * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] LinkSinr
  * - AddGlobal [Fwd, Rtn] [Feeder, User] LinkRxPower
  * - Add [Global, PerGw, PerBeam] FrameTypeUsage
  * - Add [Global, PerGw, PerBeam] RtnFeederWindowLoad
@@ -1263,6 +1284,7 @@ SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdAppPlt, "fwd-app-plt")
 SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdAppPlt, "fwd-app-plt")
 SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdAppPlt, "fwd-app-plt")
 SAT_STATS_AVERAGE_UT_USER_METHOD_DEFINITION (FwdAppPlt, "fwd-app-plt")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdAppPlt, "fwd-app-plt")
 
 // Forward link queue size (in bytes) statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdQueueBytes, "fwd-queue-bytes")
@@ -1850,11 +1872,53 @@ SAT_STATS_GLOBAL_METHOD_DEFINITION       (WaveformUsage, "waveform-usage")
 SAT_STATS_PER_GW_METHOD_DEFINITION       (WaveformUsage, "waveform-usage")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION     (WaveformUsage, "waveform-usage")
 
-// Link SINR statistics.
+// Forward Feeder Link SINR statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdFeederLinkSinr, "fwd-feeder-link-sinr")
-SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdUserLinkSinr,   "fwd-user-link-sinr")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdFeederLinkSinr, "fwd-feeder-link-sinr")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdFeederLinkSinr, "fwd-feeder-link-sinr")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FwdFeederLinkSinr, "fwd-feeder-link-sinr")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdFeederLinkSinr, "fwd-feeder-link-sinr")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (FwdFeederLinkSinr, "fwd-feeder-link-sinr")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdFeederLinkSinr, "fwd-feeder-link-sinr")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdFeederLinkSinr, "fwd-feeder-link-sinr")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdFeederLinkSinr, "fwd-feeder-link-sinr")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdFeederLinkSinr, "fwd-feeder-link-sinr")
+
+// Forward User Link SINR statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdUserLinkSinr, "fwd-user-link-sinr")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdUserLinkSinr, "fwd-user-link-sinr")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdUserLinkSinr, "fwd-user-link-sinr")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FwdUserLinkSinr, "fwd-user-link-sinr")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdUserLinkSinr, "fwd-user-link-sinr")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (FwdUserLinkSinr, "fwd-user-link-sinr")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdUserLinkSinr, "fwd-user-link-sinr")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdUserLinkSinr, "fwd-user-link-sinr")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdUserLinkSinr, "fwd-user-link-sinr")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdUserLinkSinr, "fwd-user-link-sinr")
+
+// Return Feeder Link SINR statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnFeederLinkSinr, "rtn-feeder-link-sinr")
-SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnUserLinkSinr,   "rtn-user-link-sinr")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnFeederLinkSinr, "rtn-feeder-link-sinr")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnFeederLinkSinr, "rtn-feeder-link-sinr")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnFeederLinkSinr, "rtn-feeder-link-sinr")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnFeederLinkSinr, "rtn-feeder-link-sinr")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnFeederLinkSinr, "rtn-feeder-link-sinr")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnFeederLinkSinr, "rtn-feeder-link-sinr")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnFeederLinkSinr, "rtn-feeder-link-sinr")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnFeederLinkSinr, "rtn-feeder-link-sinr")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnFeederLinkSinr, "rtn-feeder-link-sinr")
+
+// Return User Link SINR statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnUserLinkSinr, "rtn-user-link-sinr")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnUserLinkSinr, "rtn-user-link-sinr")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnUserLinkSinr, "rtn-user-link-sinr")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnUserLinkSinr, "rtn-user-link-sinr")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnUserLinkSinr, "rtn-user-link-sinr")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnUserLinkSinr, "rtn-user-link-sinr")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnUserLinkSinr, "rtn-user-link-sinr")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnUserLinkSinr, "rtn-user-link-sinr")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnUserLinkSinr, "rtn-user-link-sinr")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnUserLinkSinr, "rtn-user-link-sinr")
 
 // Link Rx power statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdFeederLinkRxPower, "fwd-feeder-link-rx-power")

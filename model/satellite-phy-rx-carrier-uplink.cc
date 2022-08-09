@@ -110,7 +110,18 @@ SatPhyRxCarrierUplink::EndRxData (uint32_t key)
                                 m_sinrCalculate);
 
   // Update link specific SINR trace
-  m_linkSinrTrace (SatUtils::LinearToDb (sinr));
+  if (GetChannelType () == SatEnums::FORWARD_FEEDER_CH)
+    {
+      m_linkSinrTrace (SatUtils::LinearToDb (sinr), packetRxParams.destAddress);
+    }
+  else if (GetChannelType () == SatEnums::RETURN_USER_CH)
+    {
+      m_linkSinrTrace (SatUtils::LinearToDb (sinr), packetRxParams.sourceAddress);
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Incorrect channel for satPhyRxCarrierUplink: " << SatEnums::GetChannelTypeName (GetChannelType ()));
+    }
 
   NS_ASSERT (!packetRxParams.rxParams->HasSinrComputed ());
 

@@ -576,7 +576,7 @@ SatPhyRxCarrierPerFrame::ProcessReceivedCrdsaPacket (SatPhyRxCarrierPerFrame::cr
    * link SINR is already updated at the SatPhyRxCarrierUplink::EndRxData ()
    * method!
    */
-  m_linkSinrTrace (SatUtils::LinearToDb (sinr));
+  m_linkSinrTrace (SatUtils::LinearToDb (sinr), packet.sourceAddress);
 
   if (GetRandomAccessCollisionModel () == SatPhyRxCarrierConf::RA_COLLISION_ALWAYS_DROP_ALL_COLLIDING_PACKETS)
     {

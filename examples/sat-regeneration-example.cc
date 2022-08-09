@@ -165,6 +165,16 @@ main (int argc, char *argv[])
   s->AddPerUtRtnUserPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerSatRtnUserPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
+  s->AddPerUtFwdFeederLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatFwdFeederLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdUserLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatFwdUserLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddPerUtRtnFeederLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatRtnFeederLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnUserLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatRtnUserLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
   simulationHelper->EnableProgressLogs ();
   simulationHelper->RunSimulation ();
 

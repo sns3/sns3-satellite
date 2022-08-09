@@ -582,7 +582,7 @@ protected:
    * \brief A callback for link specific SINR in dB.
    *
    */
-  TracedCallback<double> m_linkSinrTrace;
+  TracedCallback<double, const Address &> m_linkSinrTrace;
 
   ////////////// CALLBACKS /////////////////////
 
