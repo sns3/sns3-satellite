@@ -567,7 +567,7 @@ protected:
    * \brief A callback for received signal power in dBW
    *
    */
-  TracedCallback<double> m_rxPowerTrace;
+  TracedCallback<double, const Address &> m_rxPowerTrace;
 
   /**
    * \brief A callback for transmission composite SINR at UT (BBFrame) or GW

@@ -391,7 +391,7 @@ SatStatsLinkSinrHelper::SinrCallback (double sinrDb, const Address &from)
 
   if (from.IsInvalid ())
     {
-      NS_LOG_WARN (this << " discarding a packet sinr of " << sinrDb << "dB"
+      NS_LOG_WARN (this << " discarding a packet with a sinr of " << sinrDb << "dB"
                         << " from statistics collection because of"
                         << " invalid sender address");
     }
@@ -414,7 +414,7 @@ SatStatsLinkSinrHelper::SinrCallback (double sinrDb, const Address &from)
       else
         {
           NS_FATAL_ERROR ("STOP");
-          NS_LOG_WARN (this << " discarding a packet sinrDb of " << sinrDb << "dB"
+          NS_LOG_WARN (this << " discarding a packet with a sinr of " << sinrDb << "dB"
                             << " from statistics collection because of"
                             << " unknown sender address " << from);
         }

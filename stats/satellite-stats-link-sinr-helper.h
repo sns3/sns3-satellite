@@ -73,8 +73,9 @@ public:
   /**
    * \brief Receive inputs from trace sources and forward them to the collector.
    * \param sinrDb SINR value in dB.
+   * \param addr Address of UT
    */
-  void SinrCallback (double sinrDb, const Address &);
+  void SinrCallback (double sinrDb, const Address & addr);
 
   /**
    * \return

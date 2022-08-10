@@ -414,7 +414,18 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
             NS_LOG_INFO (this << " scheduling EndRx with delay " << rxParams->m_duration.GetSeconds () << "s");
 
             // Update link specific received signal power
-            m_rxPowerTrace (SatUtils::LinearToDb (rxParams->m_rxPower_W));
+            if (GetChannelType () == SatEnums::FORWARD_FEEDER_CH || GetChannelType () == SatEnums::FORWARD_USER_CH)
+              {
+                m_rxPowerTrace (SatUtils::LinearToDb (rxParams->m_rxPower_W), rxParamsStruct.destAddress);
+              }
+            else if (GetChannelType () == SatEnums::RETURN_FEEDER_CH || GetChannelType () == SatEnums::RETURN_USER_CH)
+              {
+                m_rxPowerTrace (SatUtils::LinearToDb (rxParams->m_rxPower_W), rxParamsStruct.sourceAddress);
+              }
+            else
+              {
+                NS_FATAL_ERROR ("Incorrect channel for satPhyRxCarrierUplink: " << SatEnums::GetChannelTypeName (GetChannelType ()));
+              }
 
             Simulator::Schedule (rxParams->m_duration, &SatPhyRxCarrier::EndRxData, this, key);
 

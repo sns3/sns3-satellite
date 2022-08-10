@@ -112,7 +112,8 @@ SatStatsHelperContainer::DoDispose ()
  * - [Global, PerSlice] FwdLinkSchedulerSymbolRate
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] LinkSinr
  * - Average [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] LinkSinr
- * - Global [Fwd, Rtn] [Feeder, User] LinkRxPower
+ * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] LinkRxPower
+ * - Average [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] LinkRxPower
  * - [Global, PerGw, PerBeam] FrameTypeUsage
  * - [Global, PerGw, PerBeam] RtnFeederWindowLoad
  *
@@ -353,6 +354,30 @@ SatStatsHelperContainer::GetTypeId ()
         "return user link SINR statistics")
     ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnUserLinkSinr,
         "return user link SINR statistics")
+
+    // Forward feeder link sinr statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdFeederLinkRxPower,
+        "forward feeder link RX power statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdFeederLinkRxPower,
+        "forward feeder link RX power statistics")
+
+    // Forward user link sinr statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdUserLinkRxPower,
+        "forward user link RX power statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdUserLinkRxPower,
+        "forward user link RX power statistics")
+
+    // Return feeder link sinr statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnFeederLinkRxPower,
+        "return feeder link RX power statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnFeederLinkRxPower,
+        "return feeder link RX power statistics")
+
+    // Return user link sinr statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnUserLinkRxPower,
+        "return user link RX power statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnUserLinkRxPower,
+        "return user link RX power statistics")
 
     // Forward link application-level packet PLT statistics.
     ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdAppPlt,
@@ -718,20 +743,6 @@ SatStatsHelperContainer::GetTypeId ()
     MakeEnumChecker (SatStatsHelper::OUTPUT_NONE,        "NONE",
                      SatStatsHelper::OUTPUT_SCALAR_FILE, "SCALAR_FILE"))
 
-    // Link Rx power statistics.
-    ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalFwdFeederLinkRxPower,
-                                  "global forward feeder link Rx power statistics")
-    ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
-    ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalFwdUserLinkRxPower,
-                                  "global forward user link Rx power statistics")
-    ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
-    ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalRtnFeederLinkRxPower,
-                                  "global return feeder link Rx power statistics")
-    ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
-    ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalRtnUserLinkRxPower,
-                                  "global return user link Rx power statistics")
-    ADD_SAT_STATS_DISTRIBUTION_OUTPUT_CHECKER
-
     // Window load statistics.
     ADD_SAT_STATS_ATTRIBUTE_HEAD (GlobalRtnFeederWindowLoad,
                                   "global return feeder window load statistics")
@@ -829,7 +840,8 @@ SatStatsHelperContainer::GetName () const
  * - Add [Global, PerSlice] FwdLinkSchedulerSymbolRate
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] LinkSinr
  * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] LinkSinr
- * - AddGlobal [Fwd, Rtn] [Feeder, User] LinkRxPower
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] LinkRxPower
+ * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] LinkRxPower
  * - Add [Global, PerGw, PerBeam] FrameTypeUsage
  * - Add [Global, PerGw, PerBeam] RtnFeederWindowLoad
  *
@@ -1920,11 +1932,53 @@ SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnUserLinkSinr, "rtn-user-link-sinr")
 SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnUserLinkSinr, "rtn-user-link-sinr")
 SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnUserLinkSinr, "rtn-user-link-sinr")
 
-// Link Rx power statistics.
+// Forward Feeder Link RX power statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdFeederLinkRxPower, "fwd-feeder-link-rx-power")
-SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdUserLinkRxPower,   "fwd-user-link-rx-power")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdFeederLinkRxPower, "fwd-feeder-link-rx-power")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdFeederLinkRxPower, "fwd-feeder-link-rx-power")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FwdFeederLinkRxPower, "fwd-feeder-link-rx-power")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdFeederLinkRxPower, "fwd-feeder-link-rx-power")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (FwdFeederLinkRxPower, "fwd-feeder-link-rx-power")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdFeederLinkRxPower, "fwd-feeder-link-rx-power")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdFeederLinkRxPower, "fwd-feeder-link-rx-power")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdFeederLinkRxPower, "fwd-feeder-link-rx-power")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdFeederLinkRxPower, "fwd-feeder-link-rx-power")
+
+// Forward User Link RX power statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdUserLinkRxPower, "fwd-user-link-rx-power")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdUserLinkRxPower, "fwd-user-link-rx-power")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdUserLinkRxPower, "fwd-user-link-rx-power")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FwdUserLinkRxPower, "fwd-user-link-rx-power")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdUserLinkRxPower, "fwd-user-link-rx-power")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (FwdUserLinkRxPower, "fwd-user-link-rx-power")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdUserLinkRxPower, "fwd-user-link-rx-power")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdUserLinkRxPower, "fwd-user-link-rx-power")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdUserLinkRxPower, "fwd-user-link-rx-power")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdUserLinkRxPower, "fwd-user-link-rx-power")
+
+// Return Feeder Link RX power statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnFeederLinkRxPower, "rtn-feeder-link-rx-power")
-SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnUserLinkRxPower,   "rtn-user-link-rx-power")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnFeederLinkRxPower, "rtn-feeder-link-rx-power")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnFeederLinkRxPower, "rtn-feeder-link-rx-power")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnFeederLinkRxPower, "rtn-feeder-link-rx-power")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnFeederLinkRxPower, "rtn-feeder-link-rx-power")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnFeederLinkRxPower, "rtn-feeder-link-rx-power")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnFeederLinkRxPower, "rtn-feeder-link-rx-power")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnFeederLinkRxPower, "rtn-feeder-link-rx-power")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnFeederLinkRxPower, "rtn-feeder-link-rx-power")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnFeederLinkRxPower, "rtn-feeder-link-rx-power")
+
+// Return User Link RX power statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnUserLinkRxPower, "rtn-user-link-rx-power")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnUserLinkRxPower, "rtn-user-link-rx-power")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnUserLinkRxPower, "rtn-user-link-rx-power")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnUserLinkRxPower, "rtn-user-link-rx-power")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnUserLinkRxPower, "rtn-user-link-rx-power")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnUserLinkRxPower, "rtn-user-link-rx-power")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnUserLinkRxPower, "rtn-user-link-rx-power")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnUserLinkRxPower, "rtn-user-link-rx-power")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnUserLinkRxPower, "rtn-user-link-rx-power")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnUserLinkRxPower, "rtn-user-link-rx-power")
 
 // Frame type usage statistics
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (FrameTypeUsage, "frame-type-usage")
