@@ -51,6 +51,8 @@ namespace ns3 {
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerUtUser, PerSat] [Fwd, Rtn] AppPlt
  * - AddAverage [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppPlt
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] Queue [Bytes, Packets]
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] RtnFeederQueue [Bytes, Packets]
+ * - AddAverage [Beam, Group, Ut, Sat] RtnFeederQueue [Bytes, Packets]
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] SignallingLoad
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] CompositeSinr
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerUtUser, PerSat] [Fwd, Rtn] AppThroughput
@@ -445,6 +447,20 @@ public:
 
   // Return link queue size (in number of packets) statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnQueuePackets)
+
+  // Return feeder link queue size (in bytes) statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnFeederQueueBytes)
+  void AddAverageBeamRtnFeederQueueBytes (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRtnFeederQueueBytes (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRtnFeederQueueBytes (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatRtnFeederQueueBytes (SatStatsHelper::OutputType_t outputType);
+
+  // Return feeder link queue size (in number of packets) statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnFeederQueuePackets)
+  void AddAverageBeamRtnFeederQueuePackets (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRtnFeederQueuePackets (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRtnFeederQueuePackets (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatRtnFeederQueuePackets (SatStatsHelper::OutputType_t outputType);
 
   // Return link signalling load statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnSignallingLoad)

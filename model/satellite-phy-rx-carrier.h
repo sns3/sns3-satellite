@@ -89,32 +89,34 @@ public:
   /**
    * \brief Callback signature for `RxPowerTrace` trace source.
    * \param rxPower received signal power (in dbW)
+   * \param utAddress the MAC48 address of the corresponding UT.
    */
-  typedef void (*RxPowerTraceCallback)(double rxPower);
+  typedef void (*RxPowerTraceCallback)(double rxPower, const Address &utAddress);
 
   /**
    * \brief Callback signature for `LinkSinrTrace` trace source.
    * \param sinr link-specific SINR (in dB)
+   * \param utAddress the MAC48 address of the corresponding UT.
    */
-  typedef void (*LinkSinrTraceCallback)(double sinr);
+  typedef void (*LinkSinrTraceCallback)(double sinr, const Address &utAddress);
 
   /**
    * \brief Common callback signature for trace sources related to packets
    *        reception by PHY and its error.
    * \param nPackets number of upper layer packets in the received packet burst.
-   * \param from the MAC48 address of the sender of the packets.
+   * \param utAddress the MAC48 address of the corresponding UT.
    * \param isError whether a PHY error has occurred.
    */
-  typedef void (*PhyRxErrorCallback)(uint32_t nPackets, const Address &from, bool isError);
+  typedef void (*PhyRxErrorCallback)(uint32_t nPackets, const Address &utAddress, bool isError);
 
   /**
    * \brief Common callback signature for trace sources related to packets
    *        reception by PHY and its collision.
    * \param nPackets number of packets in the received packet burst.
-   * \param from the MAC48 address of the sender of the packets.
+   * \param utAddress the MAC48 address of the corresponding UT.
    * \param isCollided whether a collision has occurred.
    */
-  typedef void (*PhyRxCollisionCallback)(uint32_t nPackets, const Address &from, bool isCollided);
+  typedef void (*PhyRxCollisionCallback)(uint32_t nPackets, const Address &utAddress, bool isCollided);
 
   /**
    * Constructor

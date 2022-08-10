@@ -171,7 +171,7 @@ SatGeoUserPhy::SatGeoUserPhy (SatPhy::CreateParam_t& params,
     {
       parameters.m_rxMode = SatPhyRxCarrierConf::NORMAL;
     }
-  parameters.m_linkRegenerationMode = forwardLinkRegenerationMode;
+  parameters.m_linkRegenerationMode = returnLinkRegenerationMode;
   parameters.m_chType = SatEnums::RETURN_USER_CH;
 
   Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf> (parameters);

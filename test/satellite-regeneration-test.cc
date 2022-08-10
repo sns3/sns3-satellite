@@ -131,7 +131,7 @@ SatRegenerationTest1::DoRun (void)
   Config::SetDefault ("ns3::SatBeamHelper::ForwardLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
   Config::SetDefault ("ns3::SatBeamHelper::ReturnLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
 
-  Config::SetDefault ("ns3::SatGeoFeederPhy::QueueSize", UintegerValue (100));
+  Config::SetDefault ("ns3::SatGeoFeederPhy::QueueSize", UintegerValue (100000));
 
   // Enable traces
   Config::SetDefault ("ns3::SatPhy::EnableStatisticsTags", BooleanValue (true));

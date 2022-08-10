@@ -117,10 +117,18 @@ SatGeoFeederPhy::GetTypeId (void)
                     MakeDoubleAccessor (&SatGeoFeederPhy::m_fixedAmplificationGainDb),
                     MakeDoubleChecker<double> ())
     .AddAttribute ( "QueueSize",
-                    "Maximum size of FIFO m_queue in bursts.",
-                    UintegerValue (100),
+                    "Maximum size of FIFO m_queue in bytes.",
+                    UintegerValue (100000),
                     MakeUintegerAccessor (&SatGeoFeederPhy::m_queueSizeMax),
                     MakeUintegerChecker<uint32_t> ())
+    .AddTraceSource ("QueueSizeBytes",
+                     "Send number of bytes in FIFO return feeder queue",
+                     MakeTraceSourceAccessor (&SatGeoFeederPhy::m_queueSizeBytesTrace),
+                     "ns3::SatStatsRtnFeederQueueHelper::QueueSizeCallback")
+    .AddTraceSource ("QueueSizePackets",
+                     "Send number of packets in FIFO return feeder queue",
+                     MakeTraceSourceAccessor (&SatGeoFeederPhy::m_queueSizePacketsTrace),
+                     "ns3::SatStatsRtnFeederQueueHelper::QueueSizeCallback")
   ;
   return tid;
 }
@@ -137,7 +145,9 @@ SatGeoFeederPhy::SatGeoFeederPhy (void)
   : m_extNoisePowerDensityDbwHz (-207.0),
   m_imInterferenceCOverIDb (27.0),
   m_imInterferenceCOverI (SatUtils::DbToLinear (m_imInterferenceCOverIDb)),
-  m_fixedAmplificationGainDb (82.0)
+  m_fixedAmplificationGainDb (82.0),
+  m_queueSizeBytes (0),
+  m_queueSizePackets (0)
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("SatGeoFeederPhy default constructor is not allowed to use");
@@ -156,10 +166,12 @@ SatGeoFeederPhy::SatGeoFeederPhy (SatPhy::CreateParam_t& params,
   m_forwardLinkRegenerationMode = forwardLinkRegenerationMode;
   m_returnLinkRegenerationMode = returnLinkRegenerationMode;
   m_isSending = false;
+  m_queueSizeBytes = 0;
+  m_queueSizePackets = 0;
 
   if (m_returnLinkRegenerationMode == SatEnums::REGENERATION_PHY)
     {
-      m_queue = std::queue<Ptr<SatSignalParameters>> ();
+      m_queue = std::queue<std::tuple<Ptr<SatSignalParameters>, uint32_t, uint32_t>> ();
     }
 
   if (m_returnLinkRegenerationMode == SatEnums::TRANSPARENT)
@@ -260,10 +272,22 @@ SatGeoFeederPhy::SendPduWithParams (Ptr<SatSignalParameters> txParams )
 
   if (m_returnLinkRegenerationMode == SatEnums::REGENERATION_PHY)
     {
-      if (m_queue.size () < m_queueSizeMax)
+      uint32_t nbBytes = 0;
+      for (Ptr<Packet> pkt : txParams->m_packetsInBurst)
+        {
+          nbBytes += pkt->GetSize ();
+        }
+      uint32_t nbPackets = txParams->m_packetsInBurst.size ();
+      if (m_queueSizeBytes + nbBytes < m_queueSizeMax)
         {
           event = SatEnums::PACKET_ENQUE;
-          m_queue.push (txParams);
+          m_queue.push (std::make_tuple(txParams, nbBytes, nbPackets));
+          m_queueSizeBytes += nbBytes;
+          m_queueSizePackets += nbPackets;
+
+          m_queueSizeBytesTrace (m_queueSizeBytes, GetSourceAddress (txParams->m_packetsInBurst));
+          m_queueSizePacketsTrace (m_queueSizePackets, GetSourceAddress (txParams->m_packetsInBurst));
+
           if (m_isSending == false)
             {
               SendFromQueue ();
@@ -300,8 +324,15 @@ SatGeoFeederPhy::SendFromQueue ()
       NS_FATAL_ERROR ("Trying to deque an empty queue");
     }
   m_isSending = true;
-  Ptr<SatSignalParameters> txParams = m_queue.front ();
+  std::tuple<Ptr<SatSignalParameters>, uint32_t, uint32_t> element = m_queue.front();
   m_queue.pop ();
+
+  Ptr<SatSignalParameters> txParams = std::get<0> (element);
+  m_queueSizeBytes -= std::get<1> (element);
+  m_queueSizePackets -= std::get<2> (element);
+
+  m_queueSizeBytesTrace (m_queueSizeBytes, GetSourceAddress (txParams->m_packetsInBurst));
+  m_queueSizePacketsTrace (m_queueSizePackets, GetSourceAddress (txParams->m_packetsInBurst));
 
   // Add sent packet trace entry:
   m_packetTrace (Simulator::Now (),
@@ -453,6 +484,31 @@ SatEnums::SatLinkDir_t
 SatGeoFeederPhy::GetSatLinkRxDir ()
 {
   return SatEnums::LD_FORWARD;
+}
+
+Address
+SatGeoFeederPhy::GetSourceAddress (SatPhy::PacketContainer_t packets)
+{
+  SatSignalParameters::PacketsInBurst_t::iterator it1;
+  for (it1 = packets.begin ();
+       it1 != packets.end (); ++it1)
+    {
+      Address addr; // invalid address.
+      ByteTagIterator it2 = (*it1)->GetByteTagIterator ();
+
+      while (it2.HasNext ())
+        {
+          ByteTagIterator::Item item = it2.Next ();
+
+          if (item.GetTypeId () == SatAddressTag::GetTypeId ())
+            {
+              SatAddressTag addrTag;
+              item.GetTag (addrTag);
+              return addrTag.GetSourceAddress ();
+            }
+        }
+    }
+  return Mac48Address ();
 }
 
 } // namespace ns3

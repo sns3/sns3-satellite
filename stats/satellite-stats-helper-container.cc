@@ -42,6 +42,7 @@
 #include <ns3/satellite-stats-packet-collision-helper.h>
 #include <ns3/satellite-stats-packet-error-helper.h>
 #include <ns3/satellite-stats-queue-helper.h>
+#include <ns3/satellite-stats-rtn-feeder-queue-helper.h>
 #include <ns3/satellite-stats-rbdc-request-helper.h>
 #include <ns3/satellite-stats-resources-granted-helper.h>
 #include <ns3/satellite-stats-signalling-load-helper.h>
@@ -94,6 +95,8 @@ SatStatsHelperContainer::DoDispose ()
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerUtUser, PerSat] [Fwd, Rtn] AppPlt
  * - Average [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppPlt
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] Queue [Bytes, Packets]
+ * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] RtnFeederQueue [Bytes, Packets]
+ * - Average [Beam, Group, Ut, Sat] RtnFeederQueue [Bytes, Packets]
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] SignallingLoad
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] CompositeSinr
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerUtUser, PerSat] [Fwd, Rtn] AppThroughput
@@ -571,6 +574,18 @@ SatStatsHelperContainer::GetTypeId ()
     ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnQueuePackets,
         "return link queue size (in number of packets) statistics")
 
+    // Return feederlink queue size (in bytes) statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnFeederQueueBytes,
+        "return feeder link queue size (in bytes) statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnFeederQueueBytes,
+        "return feeder link queue size (in bytes) statistics")
+
+    // Return feeder link queue size (in number of packets) statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnFeederQueuePackets,
+        "return feeder link queue size (in number of packets) statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnFeederQueuePackets,
+        "return feeder link queue size (in number of packets) statistics")
+
     // Return link signalling load statistics.
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnSignallingLoad,
         "return link signalling load statistics")
@@ -822,7 +837,8 @@ SatStatsHelperContainer::GetName () const
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerUtUser, PerSat] [Fwd, Rtn] AppPlt
  * - AddAverage [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppPlt
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] Queue [Bytes, Packets]
- * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] SignallingLoad
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] RtnFeederQueue [Bytes, Packets
+ * - AddAverage [Beam, Group, Ut, Sat] RtnFeederQueue [Bytes, Packets] * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] SignallingLoad
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] CompositeSinr
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerUtUser, PerSat] [Fwd, Rtn] AppThroughput
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Dev, Mac] Throughput
@@ -1616,7 +1632,31 @@ SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnQueuePackets, "rtn-queue-packets")
 SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnQueuePackets, "rtn-queue-packets")
 SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnQueuePackets, "rtn-queue-packets")
 SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnQueuePackets, "rtn-queue-packets")
-SAT_STATS_PER_SAT_METHOD_DEFINITION       (RtnQueuePackets, "rtn-queue-packets")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnQueuePackets, "rtn-queue-packets")
+
+// Return feeder link queue size (in bytes) statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnFeederQueueBytes, "rtn-feeder-queue-bytes")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnFeederQueueBytes, "rtn-feeder-queue-bytes")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnFeederQueueBytes, "rtn-feeder-queue-bytes")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnFeederQueueBytes, "rtn-feeder-queue-bytes")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnFeederQueueBytes, "rtn-feeder-queue-bytes")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnFeederQueueBytes, "rtn-feeder-queue-bytes")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnFeederQueueBytes, "rtn-feeder-queue-bytes")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnFeederQueueBytes, "rtn-feeder-queue-bytes")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnFeederQueueBytes, "rtn-feeder-queue-bytes")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnFeederQueueBytes, "rtn-feeder-queue-bytes")
+
+// Return feeder link queue size (in number of packets) statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnFeederQueuePackets, "rtn-feeder-queue-packets")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnFeederQueuePackets, "rtn-feeder-queue-packets")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnFeederQueuePackets, "rtn-feeder-queue-packets")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnFeederQueuePackets, "rtn-feeder-queue-packets")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnFeederQueuePackets, "rtn-feeder-queue-packets")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnFeederQueuePackets, "rtn-feeder-queue-packets")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnFeederQueuePackets, "rtn-feeder-queue-packets")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnFeederQueuePackets, "rtn-feeder-queue-packets")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnFeederQueuePackets, "rtn-feeder-queue-packets")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnFeederQueuePackets, "rtn-feeder-queue-packets")
 
 // Return link signalling load statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnSignallingLoad, "rtn-signalling-load")
