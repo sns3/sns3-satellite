@@ -294,6 +294,8 @@ LorawanMacEndDevice::DoSend (Ptr<Packet> packet)
       // Removing SatPhyTimeTag if it exists
       SatPhyTimeTag satPhyTimeTag;
       packet->RemovePacketTag (satPhyTimeTag);
+      SatPhyLinkTimeTag satPhyLinkTimeTag;
+      packet->RemovePacketTag (satPhyLinkTimeTag);
       if (m_retxParams.waitingAck)
         {
 
