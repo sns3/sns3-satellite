@@ -49,7 +49,7 @@ main (int argc, char *argv[])
   uint32_t nbEndUsersPerUt = 1;
 
   Time appStartTime = Seconds (0.001);
-  Time simLength = Seconds (10.0);
+  Time simLength = Seconds (15.0);
 
   uint32_t packetSize = 24;
   Time loraInterval = Seconds (10);
@@ -96,6 +96,10 @@ main (int argc, char *argv[])
   simulationHelper->AddDefaultUiArguments (cmd);
   cmd.Parse (argc, argv);
 
+  /// Set regeneration mode
+  Config::SetDefault ("ns3::SatBeamHelper::ForwardLinkRegenerationMode", EnumValue (SatEnums::TRANSPARENT));
+  Config::SetDefault ("ns3::SatBeamHelper::ReturnLinkRegenerationMode", EnumValue (SatEnums::TRANSPARENT));
+
   // Enable Lora
   Config::SetDefault ("ns3::SatHelper::Standard", EnumValue (SatEnums::LORA));
   Config::SetDefault ("ns3::LorawanMacEndDevice::DataRate", UintegerValue (5));
@@ -141,6 +145,8 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
 
   // Configure RA
+  Config::SetDefault ("ns3::SatGeoHelper::FwdLinkErrorModel", EnumValue (SatPhyRxCarrierConf::EM_AVI));
+  Config::SetDefault ("ns3::SatGeoHelper::RtnLinkErrorModel", EnumValue (SatPhyRxCarrierConf::EM_AVI));
   Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_ESSA));
   if(interferenceModePerPacket)
     {
