@@ -10,7 +10,7 @@
 # See test.py for more information.
 cpp_examples = [
 	("sat-arq-fwd-example", "True", "True"),
-	("sat-arq-rtn-example", "True", "True"),
+	#("sat-arq-rtn-example", "True", "True"),
 	("sat-cbr-example", "True", "True"),
 	("sat-cbr-full-example", "True", "True"),
 	("sat-cbr-stats-example", "True", "True"),
@@ -22,6 +22,7 @@ cpp_examples = [
 	("sat-environmental-variables-example", "True", "True"),
 	("sat-essa-example", "True", "True"),
 	("sat-fwd-system-test-example", "True", "True"),
+	("sat-handover-example", "True", "True"),
 	("sat-http-example", "True", "True"),
 	("sat-link-budget-example", "True", "True"),
 	("sat-link-results-plot", "True", "True"),
