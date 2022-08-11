@@ -211,6 +211,7 @@ SatPhy::Initialize ()
 
   if ( m_avgNormalizedOfferedLoadCallback.IsNull () == false )
     {
+      std::cout << "m_phyRx->SetAverageNormalizedOfferedLoadCallback " << std::endl;
       m_phyRx->SetAverageNormalizedOfferedLoadCallback ( MakeCallback (&SatPhy::AverageNormalizedOfferedRandomAccessLoadInfo, this) );
     }
 

@@ -303,36 +303,51 @@ SatPhyRxCarrierPerWindow::CalculatePacketInterferenceVectors (SatPhyRxCarrierPer
 
   /// Calculate the gamma vector
   packet.gamma.clear ();
+
+  std::vector< std::pair<double, double> > interferencePowerPerFragment = packet.rxParams->GetInterferencePowerPerFragment ();
+  std::vector< std::pair<double, double> >::iterator interferencePower = interferencePowerPerFragment.begin ();
+  double normalizedTime = interferencePower->first, normalizedTimeInSatellite = 0.0;
   /// Consider both the interference per fragment in the satellite, and the
   /// interference per fragment in the feeder. Since interference at the
   /// feeder does not consider intrabeam interference, the fragments
   /// will always be a subset of fragments in satellite (TODO: CHECK THIS).
   /// TODO: optimize. Find a way to do this without creating copy.
-  std::vector< std::pair<double, double> > interferencePowerPerFragment = packet.rxParams->GetInterferencePowerPerFragment ();
-  std::vector< std::pair<double, double> > interferencePowerPerFragmentInSatellite = packet.rxParams->GetInterferencePowerInSatellitePerFragment ();
-  std::vector< std::pair<double, double> >::iterator interferencePower = interferencePowerPerFragment.begin ();
-  double normalizedTime = interferencePower->first, normalizedTimeInSatellite = 0.0;
-  for (std::vector< std::pair<double, double> >::iterator interferencePowerInSatellite = interferencePowerPerFragmentInSatellite.begin (); interferencePowerInSatellite != interferencePowerPerFragmentInSatellite.end (); interferencePowerInSatellite++)
+  if (GetLinkRegenerationMode () == SatEnums::TRANSPARENT)
     {
-      normalizedTimeInSatellite += interferencePowerInSatellite->first;
-      /// TODO: verify. Since Interference in feeder is a subset,
-      /// fragments will never be smaller than those in satellite.
-      if (normalizedTimeInSatellite > normalizedTime)
+      std::vector< std::pair<double, double> > interferencePowerPerFragmentInSatellite = packet.rxParams->GetInterferencePowerInSatellitePerFragment ();
+      for (std::vector< std::pair<double, double> >::iterator interferencePowerInSatellite = interferencePowerPerFragmentInSatellite.begin (); interferencePowerInSatellite != interferencePowerPerFragmentInSatellite.end (); interferencePowerInSatellite++)
         {
-          interferencePower++;
-          normalizedTime += interferencePower->first;
-        }
+          normalizedTimeInSatellite += interferencePowerInSatellite->first;
+          /// TODO: verify. Since Interference in feeder is a subset,
+          /// fragments will never be smaller than those in satellite.
+          if (normalizedTimeInSatellite > normalizedTime)
+            {
+              interferencePower++;
+              normalizedTime += interferencePower->first;
+            }
 
+          /// For each iteration:
+          /// gamma[k] = ( SNR^-1 + (C/Interference[k])^-1 )^-1
+
+          /// Calculate composite C/I = (C_u/I_u^-1 + C_d/I_d^-1)^-1
+          double cI = (packet.rxParams->GetRxPowerInSatellite () * packet.rxParams->m_rxPower_W) / (interferencePowerInSatellite->second * packet.rxParams->m_rxPower_W + interferencePower->second * packet.rxParams->GetRxPowerInSatellite ());
+
+          /// Calculate gamma[k]
+          double gamma = 1 / (1 / cI + 1 / cSnr);
+          packet.gamma.emplace_back (interferencePowerInSatellite->first, gamma);
+        }
+    }
+  else
+    {
       /// For each iteration:
       /// gamma[k] = ( SNR^-1 + (C/Interference[k])^-1 )^-1
 
       /// Calculate composite C/I = (C_u/I_u^-1 + C_d/I_d^-1)^-1
-      double cI = (packet.rxParams->GetRxPowerInSatellite () * packet.rxParams->m_rxPower_W) / (interferencePowerInSatellite->second * packet.rxParams->m_rxPower_W + interferencePower->second * packet.rxParams->GetRxPowerInSatellite ());
+      double cI = (packet.rxParams->m_rxPower_W) / (packet.rxParams->m_rxPower_W + interferencePower->second);
 
       /// Calculate gamma[k]
       double gamma = 1 / (1 / cI + 1 / cSnr);
-      packet.gamma.emplace_back (interferencePowerInSatellite->first, gamma);
-
+      packet.gamma.emplace_back (1, gamma);
     }
 
   /// Calculate the gamma vector for the preamble
@@ -701,7 +716,10 @@ SatPhyRxCarrierPerWindow::MeasureRandomAccessLoad ()
   /// upload trace with normalized offered load
   m_windowLoadTrace (normalizedOfferedLoad);
 
-  m_avgNormalizedOfferedLoadCallback (GetBeamId (), GetCarrierId (), GetRandomAccessAllocationChannelId (), averageNormalizedOfferedLoad);
+  if (GetChannelType () == SatEnums::RETURN_FEEDER_CH)
+    {
+      m_avgNormalizedOfferedLoadCallback (GetBeamId (), GetCarrierId (), GetRandomAccessAllocationChannelId (), averageNormalizedOfferedLoad);
+    }
 }
 
 double
