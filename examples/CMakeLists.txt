@@ -61,6 +61,7 @@ set(base_examples
     sat-ncr-example
     sat-regeneration-example
     sat-regeneration-collisions-example
+    sat-handover-example
 )
 
 foreach(
