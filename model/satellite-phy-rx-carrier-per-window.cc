@@ -241,7 +241,12 @@ SatPhyRxCarrierPerWindow::EliminatePreviousInterferences (SatPhyRxCarrierPerWind
 
       NS_LOG_INFO ("SatPhyRxCarrierPerWindow::EliminatePreviousInterferences - eliminate interference with packet " << packet_it->rxParams->m_txInfo.crdsaUniquePacketId << " from " << packet_it->sourceAddress);
       /// Eliminate the interferences
-      GetInterferenceEliminationModel ()->EliminateInterferences (packet.rxParams, packet_it->rxParams, packet_it->meanSinr * m_spreadingFactor, normalizedTimes.first, normalizedTimes.second);
+      GetInterferenceEliminationModel ()->EliminateInterferences (packet.rxParams,
+                                                                  packet_it->rxParams,
+                                                                  packet_it->meanSinr * m_spreadingFactor,
+                                                                  m_linkRegenerationMode != SatEnums::TRANSPARENT,
+                                                                  normalizedTimes.first,
+                                                                  normalizedTimes.second);
     }
 }
 
@@ -496,7 +501,12 @@ SatPhyRxCarrierPerWindow::DoSic (packetList_t::iterator processedPacket, std::pa
       /// Get normalized start and end time
       std::pair<double, double> normalizedTimes = GetNormalizedPacketInterferenceTime (*packet_it, *processedPacket);
       /// Eliminate residual interference and recalculate the packets vectors
-      GetInterferenceEliminationModel ()->EliminateInterferences (packet_it->rxParams, processedPacket->rxParams, processedPacket->meanSinr * m_spreadingFactor, normalizedTimes.first, normalizedTimes.second);
+      GetInterferenceEliminationModel ()->EliminateInterferences (packet_it->rxParams,
+                                                                  processedPacket->rxParams,
+                                                                  processedPacket->meanSinr * m_spreadingFactor,
+                                                                  m_linkRegenerationMode != SatEnums::TRANSPARENT,
+                                                                  normalizedTimes.first,
+                                                                  normalizedTimes.second);
 
       CalculatePacketInterferenceVectors (*packet_it);
     }

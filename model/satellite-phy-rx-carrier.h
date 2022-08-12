@@ -551,6 +551,11 @@ protected:
    */
   double m_rxAciIfPowerW;
 
+  /**
+   * \brief Link regeneration mode
+   */
+  SatEnums::RegenerationMode_t m_linkRegenerationMode;
+
   //////// TRACED CALLBACKS ////////////
   /**
    * \brief The trace source on packet receptiong
@@ -653,7 +658,6 @@ private:
   Mac48Address m_ownAddress;                                            //< Carrier address
   Ptr<SatNodeInfo> m_nodeInfo;                                          //< NodeInfo of the node where carrier is attached
   SatEnums::ChannelType_t m_channelType;                                //< Channel type
-  SatEnums::RegenerationMode_t m_linkRegenerationMode;                  //< Link regeneration mode
   Ptr<SatLinkResults> m_linkResults;                                    //< Link results from the carrier configuration
   Ptr<SatWaveformConf> m_waveformConf;                                  //< Waveform configuration
   Ptr<UniformRandomVariable> m_uniformVariable;                         //< Uniform helper random variable

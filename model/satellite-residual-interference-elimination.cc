@@ -82,18 +82,18 @@ void
 SatResidualInterferenceElimination::EliminateInterferences (
   Ptr<SatSignalParameters> packetInterferedWith,
   Ptr<SatSignalParameters> processedPacket,
-  double EsNo)
+  double EsNo, bool isRegenerative)
 {
   NS_LOG_FUNCTION (this);
 
-  return EliminateInterferences (packetInterferedWith, processedPacket, EsNo, 0.0, 1.0);
+  return EliminateInterferences (packetInterferedWith, processedPacket, EsNo, isRegenerative, 0.0, 1.0);
 }
 
 void
 SatResidualInterferenceElimination::EliminateInterferences (
   Ptr<SatSignalParameters> packetInterferedWith,
   Ptr<SatSignalParameters> processedPacket,
-  double EsNo, double startTime, double endTime)
+  double EsNo, bool isRegenerative, double startTime, double endTime)
 {
   NS_LOG_FUNCTION (this);
 
@@ -101,16 +101,27 @@ SatResidualInterferenceElimination::EliminateInterferences (
                processedPacket->m_beamId <<
                "[" << processedPacket->m_carrierId << "] between " <<
                startTime << " and " << endTime);
-  double oldIfPower = packetInterferedWith->GetInterferencePowerInSatellite ();
-  double ifPowerToRemove = processedPacket->GetRxPowerInSatellite ();
-
+  double oldIfPower;
+  double ifPowerToRemove;
   /// TODO: refactorize this call, so that the residual power is not recalculated
   /// at every iteration of SIC.
   double residualPower = GetResidualPower (processedPacket, EsNo);
-
   double normalizedTime = 0.0;
+  std::vector< std::pair<double, double> > ifPowerPerFragment;
 
-  auto ifPowerPerFragment = packetInterferedWith->GetInterferencePowerInSatellitePerFragment ();
+  if (isRegenerative)
+    {
+      oldIfPower = packetInterferedWith->GetInterferencePower ();
+      ifPowerToRemove = processedPacket->m_rxPower_W;
+      ifPowerPerFragment = packetInterferedWith->GetInterferencePowerPerFragment ();
+    }
+  else
+    {
+      oldIfPower = packetInterferedWith->GetInterferencePowerInSatellite ();
+      ifPowerToRemove = processedPacket->GetRxPowerInSatellite ();
+      ifPowerPerFragment = packetInterferedWith->GetInterferencePowerInSatellitePerFragment ();
+    }
+
   for (std::pair<double, double>& ifPower : ifPowerPerFragment)
     {
       normalizedTime += ifPower.first;
@@ -135,11 +146,17 @@ SatResidualInterferenceElimination::EliminateInterferences (
           NS_FATAL_ERROR ("Negative interference");
         }
     }
-  packetInterferedWith->SetInterferencePowerInSatellite (ifPowerPerFragment);
 
-  NS_LOG_INFO ("Interfered packet ifPower went from " <<
-               oldIfPower << " to " <<
-               packetInterferedWith->GetInterferencePowerInSatellite ());
+  if (isRegenerative)
+    {
+      packetInterferedWith->SetInterferencePower (ifPowerPerFragment);
+    }
+  else
+    {
+      packetInterferedWith->SetInterferencePowerInSatellite (ifPowerPerFragment);
+    }
+
+  NS_LOG_INFO ("Interfered packet ifPower went from " << oldIfPower << " to " << SatUtils::ScalarProduct (ifPowerPerFragment));
 }
 
 double

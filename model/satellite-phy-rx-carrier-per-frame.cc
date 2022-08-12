@@ -746,7 +746,10 @@ SatPhyRxCarrierPerFrame::EliminateInterference (
               NS_FATAL_ERROR ("Negative interference");
             }
 
-          GetInterferenceEliminationModel ()->EliminateInterferences (iterList->rxParams, processedPacket.rxParams, processedPacket.cSinr);
+          GetInterferenceEliminationModel ()->EliminateInterferences (iterList->rxParams,
+                                                                      processedPacket.rxParams,
+                                                                      processedPacket.cSinr,
+                                                                      m_linkRegenerationMode != SatEnums::TRANSPARENT);
 
           NS_LOG_INFO ("AFTER INTERFERENCE ELIMINATION, RX sat: " <<
                        iterList->rxParams->GetRxPowerInSatellite () <<
