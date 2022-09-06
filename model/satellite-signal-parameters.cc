@@ -36,6 +36,7 @@ SatSignalParameters::SatSignalParameters ()
   m_carrierId (),
   m_carrierFreq_hz (),
   m_duration (),
+  m_satelliteReceptionTime (),
   m_txPower_W (),
   m_rxPower_W (),
   m_phyTx (),
@@ -55,6 +56,7 @@ SatSignalParameters::SatSignalParameters ( const SatSignalParameters& p )
   m_beamId = p.m_beamId;
   m_carrierId = p.m_carrierId;
   m_duration = p.m_duration;
+  m_satelliteReceptionTime = p.m_satelliteReceptionTime;
   m_phyTx = p.m_phyTx;
   m_txPower_W = p.m_txPower_W;
   m_rxPower_W = p.m_rxPower_W;

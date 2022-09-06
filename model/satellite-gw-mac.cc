@@ -230,7 +230,7 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> r
     {
       if (m_useCmt)
         {
-          SendCmtMessage (utId, rxParams->m_duration);
+          SendCmtMessage (utId, rxParams->m_duration, rxParams->m_satelliteReceptionTime);
         }
       m_controlMessageReceivedCallback (utId, m_beamId);
     }
@@ -322,7 +322,7 @@ SatGwMac::TbtpSent (Ptr<SatTbtpMessage> tbtp)
     }
   m_tbtps[superframeCounter].push_back (tbtp);
 
-  Simulator::Schedule (Seconds (1), &SatGwMac::RemoveTbtp, this, superframeCounter);
+  Simulator::Schedule (Seconds (10), &SatGwMac::RemoveTbtp, this, superframeCounter);
 }
 
 void
@@ -494,7 +494,7 @@ SatGwMac::SendNcrMessage ()
 }
 
 void
-SatGwMac::SendCmtMessage (Address utId, Time burstDuration)
+SatGwMac::SendCmtMessage (Address utId, Time burstDuration, Time satelliteReceptionTime)
 {
   NS_LOG_FUNCTION (this << utId);
 
@@ -504,7 +504,13 @@ SatGwMac::SendCmtMessage (Address utId, Time burstDuration)
     lastCmtSent = m_lastCmtSent[utId];
   }
 
-  if (Simulator::Now () < lastCmtSent + m_cmtPeriodMin)
+  Time timeReceived = satelliteReceptionTime;
+  if (satelliteReceptionTime == Seconds (0))
+    {
+      timeReceived = Simulator::Now ();
+    }
+
+  if (timeReceived < lastCmtSent + m_cmtPeriodMin)
     {
       return;
     }
@@ -529,7 +535,7 @@ SatGwMac::SendCmtMessage (Address utId, Time burstDuration)
                 {
                   Time frameStartTime = Singleton<SatRtnLinkTime>::Get ()->GetSuperFrameTxTime (SatConstVariables::SUPERFRAME_SEQUENCE, i, Seconds (0));
                   Time slotStartTime = tsConf->GetStartTime ();
-                  Time difference = Simulator::Now () - frameStartTime - slotStartTime - burstDuration;
+                  Time difference = timeReceived - frameStartTime - slotStartTime - burstDuration;
                   if (Abs(difference) < differenceClosest)
                     {
                       differenceClosest = Abs (difference);
@@ -555,12 +561,12 @@ SatGwMac::SendCmtMessage (Address utId, Time burstDuration)
       Time frameStartTime = Singleton<SatRtnLinkTime>::Get ()->GetSuperFrameTxTime (SatConstVariables::SUPERFRAME_SEQUENCE, indexClosest, Seconds (0));
       Time slotStartTime = timeslots.second[timeSlotIndexClosest]->GetStartTime ();
 
-      Time difference = frameStartTime + slotStartTime + burstDuration - Simulator::Now ();
+      Time difference = frameStartTime + slotStartTime + burstDuration - timeReceived;
       int32_t differenceNcr = difference.GetMicroSeconds ()*27;
 
       if (differenceNcr > 16256 || differenceNcr < -16256)
         {
-          NS_LOG_INFO ("Burst Time Correction outside bounds, should be at least -16256 and at most 16256, but got " << differenceNcr << ". Forcing logoff of UT");
+          NS_LOG_INFO ("Burst Time Correction outside bounds, should be at least -16256 and at most 16256, but got " << differenceNcr << ". Forcing logoff of UT " << utId);
           Ptr<SatLogoffMessage> logoffMsg = CreateObject<SatLogoffMessage> ();
           m_fwdScheduler->SendControlMsg (logoffMsg, utId);
           m_removeUtCallback (utId, m_beamId);

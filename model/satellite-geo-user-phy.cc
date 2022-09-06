@@ -318,6 +318,7 @@ SatGeoUserPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
         {
           rxParams->m_txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
           rxParams->SetSinr (std::numeric_limits<double>::infinity(), rxParams->GetSinrCalculator ());
+          rxParams->m_satelliteReceptionTime = Simulator::Now ();
 
           RxTraces (rxParams->m_packetsInBurst);
         }

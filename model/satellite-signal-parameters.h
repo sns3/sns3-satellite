@@ -187,6 +187,13 @@ public:
   Time m_duration;
 
   /**
+   * Time of reception in satellite.
+   * Remains to zero if satellite is not regenerative.
+   *
+   */
+  Time m_satelliteReceptionTime;
+
+  /**
    * The TX power in Watts. Equivalent Isotropically Radiated Power (EIRP).
    *
    */

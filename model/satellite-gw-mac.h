@@ -228,7 +228,7 @@ private:
    */
   void RemoveTbtp (uint32_t superframeCounter);
 
-  void SendCmtMessage (Address utId, Time burstDuration);
+  void SendCmtMessage (Address utId, Time burstDuration, Time satelliteReceptionTime);
 
   void SendLogonResponse (Address utId, uint32_t raChannel);
   static void SendLogonResponseHelper (SatGwMac* self,Address utId, uint32_t raChannel);
