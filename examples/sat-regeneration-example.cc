@@ -55,7 +55,7 @@ main (int argc, char *argv[])
 
   /// Set regeneration mode
   Config::SetDefault ("ns3::SatBeamHelper::ForwardLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
-  Config::SetDefault ("ns3::SatBeamHelper::ReturnLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
+  Config::SetDefault ("ns3::SatBeamHelper::ReturnLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_LINK));
 
   Config::SetDefault ("ns3::SatGeoFeederPhy::QueueSize", UintegerValue (100000));
 
@@ -188,6 +188,8 @@ main (int argc, char *argv[])
   s->AddPerGwRtnFeederQueueBytes (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerSatRtnFeederQueueBytes (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerSatRtnFeederQueuePackets (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   simulationHelper->EnableProgressLogs ();
   simulationHelper->RunSimulation ();

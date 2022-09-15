@@ -84,6 +84,12 @@ public:
   inline uint32_t GetBeamId () const { return m_beamId; }
 
   /**
+   * \brief Get MAC address
+   * \return The MAC address
+   */
+  inline Address GetAddress () const { return m_nodeInfo->GetMacAddress (); }
+
+  /**
    * \brief Callback to send packet to lower layer.
    * \param Container of the pointers to the packets received
    * \param uint32_t carrierId
@@ -223,6 +229,16 @@ public:
    * This is used in beam hopping implementation.
    */
   virtual void Disable ();
+
+  /**
+   * \brief Indicates if the satellite is regenerative on the link this layer is sending packets.
+   */
+  void setRegenerative (bool isRegenerative);
+
+  /**
+   * Set the satellite MAC address on the other side of this link (if regenerative satellite).
+   */
+  void SetSatelliteAddress (Address satelliteAddress);
 
 private:
   SatMac& operator = (const SatMac &);
@@ -369,6 +385,16 @@ protected:
    * Store last 3 SOF date for Forward messages, to insert in NCR packets.
    */
   std::queue<Time> m_lastSOF;
+
+  /**
+   * Indicates if satellite is regenerative on the link where this layer is sending packets.
+   */
+  bool m_isRegenerative;
+
+  /**
+   * MAC address of satellite on other side of the link. Use in regenerative cases.
+   */
+  Address m_satelliteAddress;
 };
 
 } // namespace ns3

@@ -250,6 +250,11 @@ public:
    */
   int GetNPreambleSymbols (void);
 
+  /**
+   * \brief Indicates if the satellite is regenerative on the link this layer is sending packets.
+   */
+  void setRegenerative (bool isRegenerative);
+
 protected:
   /**
   * The trace source that is fired when a packet cannot be sent because of duty
@@ -316,6 +321,11 @@ protected:
    * sending DR and on the value of the RX1DROffset parameter.
    */
   ReplyDataRateMatrix m_replyDataRateMatrix;
+
+  /**
+   * Indicates if satellite is regenerative on the link where this layer is sending packets.
+   */
+  bool m_isRegenerative;
 };
 
 } /* namespace ns3 */

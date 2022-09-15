@@ -228,7 +228,8 @@ SatUtHelper::InstallDvb (NodeContainer c, uint32_t beamId,
                          Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
                          SatPhy::ChannelPairGetterCallback cbChannel,
                          SatMac::RoutingUpdateCallback cbRouting,
-                         SatEnums::RegenerationMode_t forwardLinkRegenerationMode)
+                         SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                          SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
   NS_LOG_FUNCTION (this << beamId << fCh << rCh );
 
@@ -236,7 +237,7 @@ SatUtHelper::InstallDvb (NodeContainer c, uint32_t beamId,
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
     {
-      devs.Add (InstallDvb (*i, beamId, fCh, rCh, gwNd, ncc, cbChannel, cbRouting, forwardLinkRegenerationMode));
+      devs.Add (InstallDvb (*i, beamId, fCh, rCh, gwNd, ncc, cbChannel, cbRouting, forwardLinkRegenerationMode, returnLinkRegenerationMode));
     }
 
   return devs;
@@ -248,7 +249,8 @@ SatUtHelper::InstallDvb (Ptr<Node> n, uint32_t beamId,
                          Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
                          SatPhy::ChannelPairGetterCallback cbChannel,
                          SatMac::RoutingUpdateCallback cbRouting,
-                         SatEnums::RegenerationMode_t forwardLinkRegenerationMode)
+                         SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                          SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
   NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
 
@@ -310,6 +312,11 @@ SatUtHelper::InstallDvb (Ptr<Node> n, uint32_t beamId,
   phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
 
   Ptr<SatUtMac> mac = CreateObject<SatUtMac> (m_superframeSeq, beamId, m_crdsaOnlyForControl);
+
+  if (returnLinkRegenerationMode == SatEnums::REGENERATION_LINK || returnLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
+    {
+      mac->setRegenerative (true);
+    }
 
   // Set the control message container callbacks
   mac->SetReadCtrlCallback (m_readCtrlCb);
@@ -514,7 +521,8 @@ SatUtHelper::InstallLora (NodeContainer c, uint32_t beamId,
                           Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
                           SatPhy::ChannelPairGetterCallback cbChannel,
                           SatMac::RoutingUpdateCallback cbRouting,
-                          SatEnums::RegenerationMode_t forwardLinkRegenerationMode)
+                          SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                          SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
   NS_LOG_FUNCTION (this << beamId << fCh << rCh );
 
@@ -522,7 +530,7 @@ SatUtHelper::InstallLora (NodeContainer c, uint32_t beamId,
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
     {
-      devs.Add (InstallLora (*i, beamId, fCh, rCh, gwNd, ncc, cbChannel, cbRouting, forwardLinkRegenerationMode));
+      devs.Add (InstallLora (*i, beamId, fCh, rCh, gwNd, ncc, cbChannel, cbRouting, forwardLinkRegenerationMode, returnLinkRegenerationMode));
     }
 
   return devs;
@@ -534,7 +542,8 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
                           Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
                           SatPhy::ChannelPairGetterCallback cbChannel,
                           SatMac::RoutingUpdateCallback cbRouting,
-                          SatEnums::RegenerationMode_t forwardLinkRegenerationMode)
+                          SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                          SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
   NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
 
@@ -593,6 +602,11 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
   phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
 
   Ptr<LorawanMacEndDeviceClassA> mac = CreateObject<LorawanMacEndDeviceClassA> (beamId, m_superframeSeq);
+
+  if (returnLinkRegenerationMode == SatEnums::REGENERATION_LINK || returnLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
+    {
+      mac->setRegenerative (true);
+    }
 
   // TODO configuration for EU only
   mac->SetTxDbmForTxPower (std::vector<double>{16, 14, 12, 10, 8, 6, 4, 2});

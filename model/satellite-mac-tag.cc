@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ *         Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
 #include <ns3/log.h>
@@ -125,6 +126,107 @@ SatMacTag::Print (std::ostream &os) const
 {
   NS_LOG_FUNCTION (this << &os);
   os << "DestAddress=" << m_destAddress << "SourceAddress" << m_sourceAddress;
+}
+
+
+NS_OBJECT_ENSURE_REGISTERED (SatAddressE2ETag);
+
+
+SatAddressE2ETag::SatAddressE2ETag ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+SatAddressE2ETag::~SatAddressE2ETag ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+TypeId
+SatAddressE2ETag::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatAddressE2ETag")
+    .SetParent<Tag> ()
+    .AddConstructor<SatAddressE2ETag> ()
+  ;
+  return tid;
+}
+TypeId
+SatAddressE2ETag::GetInstanceTypeId () const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
+}
+
+void
+SatAddressE2ETag::SetFinalDestAddress (Mac48Address finalDest)
+{
+  NS_LOG_FUNCTION (this << finalDest);
+  m_finalDestAddress = finalDest;
+}
+
+Mac48Address
+SatAddressE2ETag::GetFinalDestAddress () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_finalDestAddress;
+}
+
+void
+SatAddressE2ETag::SetFinalSourceAddress (Mac48Address finalSource)
+{
+  NS_LOG_FUNCTION (this << finalSource);
+  m_finalSourceAddress = finalSource;
+}
+
+Mac48Address
+SatAddressE2ETag::GetFinalSourceAddress () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_finalSourceAddress;
+}
+
+uint32_t
+SatAddressE2ETag::GetSerializedSize () const
+{
+  NS_LOG_FUNCTION (this);
+
+  return ( 2 * ADDRESS_LENGHT );
+}
+void
+SatAddressE2ETag::Serialize (TagBuffer i) const
+{
+  NS_LOG_FUNCTION (this << &i);
+
+  uint8_t buff[ADDRESS_LENGHT];
+
+  m_finalDestAddress.CopyTo (buff);
+  i.Write (buff, ADDRESS_LENGHT);
+
+  m_finalSourceAddress.CopyTo (buff);
+  i.Write (buff, ADDRESS_LENGHT);
+}
+
+void
+SatAddressE2ETag::Deserialize (TagBuffer i)
+{
+  NS_LOG_FUNCTION (this << &i);
+
+  uint8_t buff[ADDRESS_LENGHT];
+
+  i.Read (buff, ADDRESS_LENGHT);
+  m_finalDestAddress.CopyFrom (buff);
+
+  i.Read (buff, ADDRESS_LENGHT);
+  m_finalSourceAddress.CopyFrom (buff);
+}
+
+void
+SatAddressE2ETag::Print (std::ostream &os) const
+{
+  NS_LOG_FUNCTION (this << &os);
+  os << "FinalDestAddress=" << m_finalDestAddress << "FinalSourceAddress" << m_finalSourceAddress;
 }
 
 

@@ -270,6 +270,11 @@ SatLlc::ReceiveHigherLayerPdu (Ptr<Packet> packet, Mac48Address source, Mac48Add
   else
     {
       // Call a callback to receive the packet at upper layer
+
+      // Remove SatAddressE2ETag
+      SatAddressE2ETag addressE2ETag;
+      packet->RemovePacketTag (addressE2ETag);
+
       m_rxCallback (packet);
     }
 }

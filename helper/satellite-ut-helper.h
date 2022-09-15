@@ -147,6 +147,7 @@ public:
    * \param gwNd satellite netdevice of the GW
    * \param ncc NCC (Network Control Center)
    * \param forwardLinkRegenerationMode The regeneration mode on forward link
+   * \param returnLinkRegenerationMode The regeneration mode on return link
    * \return Container of installed net devices
    *
    * This method creates a ns3::SatChannel with the
@@ -161,7 +162,8 @@ public:
                                  Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
                                  SatPhy::ChannelPairGetterCallback cbChannel,
                                  SatMac::RoutingUpdateCallback cbRouting,
-                                 SatEnums::RegenerationMode_t forwardLinkRegenerationMode);
+                                 SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                                 SatEnums::RegenerationMode_t returnLinkRegenerationMode);
   /**
    * \param n node
    * \param beamId  id of the beam
@@ -170,6 +172,7 @@ public:
    * \param gwNd satellite netdevice of the GW
    * \param ncc NCC (Network Control Center)
    * \param forwardLinkRegenerationMode The regeneration mode on forward link
+   * \param returnLinkRegenerationMode The regeneration mode on return link
    * \return Net device installed to node
    *
    * Saves you from having to construct a temporary NodeContainer.
@@ -179,7 +182,8 @@ public:
                              Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
                              SatPhy::ChannelPairGetterCallback cbChannel,
                              SatMac::RoutingUpdateCallback cbRouting,
-                             SatEnums::RegenerationMode_t forwardLinkRegenerationMode);
+                             SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                             SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   /**
    * \param c a set of nodes
@@ -189,6 +193,7 @@ public:
    * \param gwNd satellite netdevice of the GW
    * \param ncc NCC (Network Control Center)
    * \param forwardLinkRegenerationMode The regeneration mode on forward link
+   * \param returnLinkRegenerationMode The regeneration mode on return link
    * \return Container of installed net devices
    *
    * This method creates a ns3::SatChannel with the
@@ -203,7 +208,8 @@ public:
                                   Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
                                   SatPhy::ChannelPairGetterCallback cbChannel,
                                   SatMac::RoutingUpdateCallback cbRouting,
-                                  SatEnums::RegenerationMode_t forwardLinkRegenerationMode);
+                                  SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                                  SatEnums::RegenerationMode_t returnLinkRegenerationMode);
   /**
    * \param n node
    * \param beamId  id of the beam
@@ -212,6 +218,7 @@ public:
    * \param gwNd satellite netdevice of the GW
    * \param ncc NCC (Network Control Center)
    * \param forwardLinkRegenerationMode The regeneration mode on forward link
+   * \param returnLinkRegenerationMode The regeneration mode on return link
    * \return Net device installed to node
    *
    * Saves you from having to construct a temporary NodeContainer.
@@ -221,7 +228,8 @@ public:
                               Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
                               SatPhy::ChannelPairGetterCallback cbChannel,
                               SatMac::RoutingUpdateCallback cbRouting,
-                              SatEnums::RegenerationMode_t forwardLinkRegenerationMode);
+                              SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                              SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   /**
    * Enables creation traces to be written in given file

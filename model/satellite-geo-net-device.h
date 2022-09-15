@@ -32,6 +32,7 @@
 #include <ns3/traced-callback.h>
 
 #include "satellite-phy.h"
+#include "satellite-mac.h"
 #include "satellite-channel.h"
 #include "satellite-signal-parameters.h"
 
@@ -115,10 +116,62 @@ public:
   std::map<uint32_t, Ptr<SatPhy> > GetFeederPhy ();
 
   /**
+   * Add the User MAC object for the beam
+   * \param mac user MAC object to add.
+   * \param beamId the id of the beam to use MAC for
+   */
+  void AddUserMac (Ptr<SatMac> mac, uint32_t beamId);
+
+  /**
+   * Add the Feeder MAC object for the beam
+   * \param mac feeder MAC object to add.
+   * \param beamId the id of the beam to use MAC for
+   */
+  void AddFeederMac (Ptr<SatMac> mac, uint32_t beamId);
+
+  /**
+   * Get the User MAC object for the beam
+   * \param beamId the id of the beam to use MAC for
+   * \return The User MAC
+   */
+  Ptr<SatMac> GetUserMac (uint32_t beamId);
+
+  /**
+   * Get the Feeder MAC object for the beam
+   * \param beamId the id of the beam to use MAC for
+   * \return The Feeder MAC
+   */
+  Ptr<SatMac> GetFeederMac (uint32_t beamId);
+
+  /**
+   * Get all User MAC objects attached to this satellite
+   * \return All the User MAC
+   */
+  std::map<uint32_t, Ptr<SatMac> > GetUserMac ();
+
+  /**
+   * Get all Feeder MAC objects attached to this satellite
+   * \return All the Feeder MAC
+   */
+  std::map<uint32_t, Ptr<SatMac> > GetFeederMac ();
+
+  /**
    * Attach a receive ErrorModel to the SatGeoNetDevice.
    * \param em Ptr to the ErrorModel.
    */
   void SetReceiveErrorModel (Ptr<ErrorModel> em);
+
+  /**
+   * Set the forward link regeneration mode.
+   * \param forwardLinkRegenerationMode The regeneration mode.
+   */
+  void SetForwardLinkRegenerationMode (SatEnums::RegenerationMode_t forwardLinkRegenerationMode);
+
+  /**
+   * Set the return link regeneration mode.
+   * \param returnLinkRegenerationMode The regeneration mode.
+   */
+  void SetReturnLinkRegenerationMode (SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   // inherited from NetDevice base class.
   virtual void SetIfIndex (const uint32_t index);
@@ -164,6 +217,11 @@ private:
   Ptr<ErrorModel> m_receiveErrorModel;
   std::map<uint32_t, Ptr<SatPhy> > m_userPhy;
   std::map<uint32_t, Ptr<SatPhy> > m_feederPhy;
+  std::map<uint32_t, Ptr<SatMac> > m_userMac;
+  std::map<uint32_t, Ptr<SatMac> > m_feederMac;
+
+  SatEnums::RegenerationMode_t m_forwardLinkRegenerationMode;
+  SatEnums::RegenerationMode_t m_returnLinkRegenerationMode;
 
 };
 

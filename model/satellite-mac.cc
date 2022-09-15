@@ -88,7 +88,9 @@ SatMac::SatMac ()
   m_beamId (0),
   m_txEnabled (true),
   m_beamEnabledTime (Seconds (0)),
-  m_lastDelay (0)
+  m_lastDelay (0),
+  m_isRegenerative (false),
+  m_satelliteAddress ()
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT (false); // this version of the constructor should not been used
@@ -102,7 +104,9 @@ SatMac::SatMac (uint32_t beamId)
   m_beamId (beamId),
   m_txEnabled (true),
   m_beamEnabledTime (Seconds (0)),
-  m_lastDelay (0)
+  m_lastDelay (0),
+  m_isRegenerative (false),
+  m_satelliteAddress ()
 {
   NS_LOG_FUNCTION (this);
 }
@@ -197,6 +201,19 @@ SatMac::Disable ()
 }
 
 void
+SatMac::setRegenerative (bool isRegenerative)
+{
+  NS_LOG_FUNCTION (this << isRegenerative);
+  m_isRegenerative = isRegenerative;
+}
+
+void
+SatMac::SetSatelliteAddress (Address satelliteAddress)
+{
+  m_satelliteAddress = satelliteAddress;
+}
+
+void
 SatMac::SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time duration, SatSignalParameters::txInfo_s txInfo)
 {
   NS_LOG_FUNCTION (this);
@@ -208,6 +225,24 @@ SatMac::SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time 
            it != packets.end (); ++it)
         {
           (*it)->AddPacketTag (SatMacTimeTag (Simulator::Now ()));
+        }
+    }
+
+  // Update local destination MAC tag with satellite one if satellite is regenerative
+  if (m_isRegenerative)
+    {
+      for (SatPhy::PacketContainer_t::const_iterator it = packets.begin ();
+           it != packets.end (); ++it)
+        {
+          SatMacTag mTag;
+          bool success = (*it)->RemovePacketTag (mTag);
+
+          // MAC tag found
+          if (success)
+            {
+              mTag.SetDestAddress (Mac48Address::ConvertFrom (m_satelliteAddress));
+              (*it)->AddPacketTag (mTag);
+            }
         }
     }
 
@@ -241,11 +276,6 @@ SatMac::SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time 
               m_ncrMessagesToSend.pop ();
               uint8_t lastSOFSize = m_ncrV2 ? 3 : 1;
               ncrMsg->SetNcrDate (m_lastSOF.size () == lastSOFSize ? m_lastSOF.front ().GetNanoSeconds ()*0.027 : 0);
-            }
-
-          if (!success)
-            {
-              NS_FATAL_ERROR ("Write to control message container was not successful!");
             }
         }
     }

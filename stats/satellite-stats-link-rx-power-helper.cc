@@ -413,7 +413,6 @@ SatStatsLinkRxPowerHelper::RxPowerCallback (double rxPowerDb, const Address &fro
         }
       else
         {
-          NS_FATAL_ERROR ("STOP");
           NS_LOG_WARN (this << " discarding a packet RX power of " << rxPowerDb << "dB"
                             << " from statistics collection because of"
                             << " unknown sender address " << from);

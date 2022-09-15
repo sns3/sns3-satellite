@@ -285,8 +285,8 @@ SatGeoFeederPhy::SendPduWithParams (Ptr<SatSignalParameters> txParams )
           m_queueSizeBytes += nbBytes;
           m_queueSizePackets += nbPackets;
 
-          m_queueSizeBytesTrace (m_queueSizeBytes, GetSourceAddress (txParams->m_packetsInBurst));
-          m_queueSizePacketsTrace (m_queueSizePackets, GetSourceAddress (txParams->m_packetsInBurst));
+          m_queueSizeBytesTrace (m_queueSizeBytes, GetFinalSourceAddress (txParams->m_packetsInBurst));
+          m_queueSizePacketsTrace (m_queueSizePackets, GetFinalSourceAddress (txParams->m_packetsInBurst));
 
           if (m_isSending == false)
             {
@@ -331,8 +331,8 @@ SatGeoFeederPhy::SendFromQueue ()
   m_queueSizeBytes -= std::get<1> (element);
   m_queueSizePackets -= std::get<2> (element);
 
-  m_queueSizeBytesTrace (m_queueSizeBytes, GetSourceAddress (txParams->m_packetsInBurst));
-  m_queueSizePacketsTrace (m_queueSizePackets, GetSourceAddress (txParams->m_packetsInBurst));
+  m_queueSizeBytesTrace (m_queueSizeBytes, GetFinalSourceAddress (txParams->m_packetsInBurst));
+  m_queueSizePacketsTrace (m_queueSizePackets, GetFinalSourceAddress (txParams->m_packetsInBurst));
 
   // Add sent packet trace entry:
   m_packetTrace (Simulator::Now (),
@@ -370,30 +370,12 @@ SatGeoFeederPhy::RxTraces (SatPhy::PacketContainer_t packets)
            it1 != packets.end (); ++it1)
         {
           Address addr; // invalid address.
-          bool isTaggedWithAddress = false;
-          ByteTagIterator it2 = (*it1)->GetByteTagIterator ();
 
-          while (!isTaggedWithAddress && it2.HasNext ())
-            {
-              ByteTagIterator::Item item = it2.Next ();
-
-              if (item.GetTypeId () == SatAddressTag::GetTypeId ())
-                {
-                  NS_LOG_DEBUG (this << " contains a SatAddressTag tag:"
-                                     << " start=" << item.GetStart ()
-                                     << " end=" << item.GetEnd ());
-                  SatAddressTag addrTag;
-                  item.GetTag (addrTag);
-                  addr = addrTag.GetSourceAddress ();
-                  isTaggedWithAddress = true; // this will exit the while loop.
-                }
-            }
-
-          SatMacTag macTag;
-          if ((*it1)->PeekPacketTag (macTag))
+          SatAddressE2ETag addressE2ETag;
+          if ((*it1)->PeekPacketTag (addressE2ETag))
             {
               NS_LOG_DEBUG (this << " contains a SatMac tag");
-              addr = macTag.GetDestAddress ();
+              addr = addressE2ETag.GetFinalDestAddress ();
             }
 
           m_rxTrace (*it1, addr);
@@ -487,7 +469,7 @@ SatGeoFeederPhy::GetSatLinkRxDir ()
 }
 
 Address
-SatGeoFeederPhy::GetSourceAddress (SatPhy::PacketContainer_t packets)
+SatGeoFeederPhy::GetFinalSourceAddress (SatPhy::PacketContainer_t packets)
 {
   SatSignalParameters::PacketsInBurst_t::iterator it1;
   for (it1 = packets.begin ();

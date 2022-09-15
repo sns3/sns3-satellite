@@ -457,11 +457,11 @@ SatChannel::DoRxCnoInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> 
         if (cno == 0)
           {
             DoRxPowerCalculation (rxParams, phyRx);
-            // std::cout << "Use calculation downlink \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxParams->m_rxPower_W << std::endl;
+            NS_LOG_INFO ("Use calculation downlink \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxParams->m_rxPower_W);
             return;
           }
         rxParams->m_rxPower_W = rxNoisePowerW*cno/carrierBandwidthHz;
-        // std::cout << "Channel downlink \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxNoisePowerW*cno/carrierBandwidthHz << std::endl;
+        NS_LOG_INFO ("Channel downlink \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxNoisePowerW*cno/carrierBandwidthHz);
         break;
       }
     case SatEnums::FORWARD_FEEDER_CH:
@@ -472,11 +472,11 @@ SatChannel::DoRxCnoInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> 
         if (cno == 0)
           {
             DoRxPowerCalculation (rxParams, phyRx);
-            // std::cout << "Use calculation uplink   \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxParams->m_rxPower_W << std::endl;
+            NS_LOG_INFO ("Use calculation uplink   \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxParams->m_rxPower_W);
             return;
           }
         rxParams->m_rxPower_W = rxNoisePowerW*cno/carrierBandwidthHz;
-        // std::cout << "Channel uplink   \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxNoisePowerW*cno/carrierBandwidthHz << std::endl;
+        NS_LOG_INFO ("Channel uplink   \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxNoisePowerW*cno/carrierBandwidthHz);
         break;
       }
     default:

@@ -32,9 +32,13 @@
 
 #include "satellite-geo-net-device.h"
 #include "satellite-phy.h"
+#include "satellite-geo-feeder-phy.h"
+#include "satellite-geo-user-phy.h"
 #include "satellite-phy-tx.h"
 #include "satellite-phy-rx.h"
 #include "satellite-mac.h"
+#include "satellite-geo-feeder-mac.h"
+#include "satellite-geo-user-mac.h"
 #include "satellite-channel.h"
 
 
@@ -63,6 +67,14 @@ SatGeoNetDevice::GetTypeId (void)
                    ObjectMapValue (),
                    MakeObjectMapAccessor (&SatGeoNetDevice::m_feederPhy),
                    MakeObjectMapChecker<SatPhy> ())
+    .AddAttribute ("UserMac", "The User MAC objects attached to this device.",
+                   ObjectMapValue (),
+                   MakeObjectMapAccessor (&SatGeoNetDevice::m_userMac),
+                   MakeObjectMapChecker<SatMac> ())
+    .AddAttribute ("FeederMac", "The Feeder MAC objects attached to this device.",
+                   ObjectMapValue (),
+                   MakeObjectMapAccessor (&SatGeoNetDevice::m_feederMac),
+                   MakeObjectMapChecker<SatMac> ())
   ;
   return tid;
 }
@@ -82,7 +94,24 @@ SatGeoNetDevice::ReceiveUser (SatPhy::PacketContainer_t packets, Ptr<SatSignalPa
   NS_LOG_FUNCTION (this << packets.size () << rxParams);
   NS_LOG_INFO ("Receiving a packet at the satellite from user link");
   NS_LOG_INFO ("Sending the packet to the feeder link on beam " << rxParams->m_beamId);
-  m_feederPhy[rxParams->m_beamId]->SendPduWithParams (rxParams);
+  switch (m_returnLinkRegenerationMode)
+    {
+      case SatEnums::TRANSPARENT:
+      case SatEnums::REGENERATION_PHY:
+        {
+          DynamicCast<SatGeoFeederPhy> (m_feederPhy[rxParams->m_beamId])->SendPduWithParams (rxParams);
+          break;
+        }
+      case SatEnums::REGENERATION_LINK:
+        {
+          DynamicCast<SatGeoFeederMac> (m_feederMac[rxParams->m_beamId])->SendPackets (packets, rxParams);
+          break;
+        }
+      default:
+        {
+          NS_FATAL_ERROR ("Not implemented yet");
+        }
+    }
 }
 
 void
@@ -91,7 +120,19 @@ SatGeoNetDevice::ReceiveFeeder (SatPhy::PacketContainer_t packets, Ptr<SatSignal
   NS_LOG_FUNCTION (this << packets.size () << rxParams);
   NS_LOG_INFO ("Receiving a packet at the satellite from feeder link");
   NS_LOG_INFO ("Sending the packet to the user link on beam " << rxParams->m_beamId);
-  m_userPhy[rxParams->m_beamId]->SendPduWithParams (rxParams);
+  switch (m_forwardLinkRegenerationMode)
+    {
+      case SatEnums::TRANSPARENT:
+      case SatEnums::REGENERATION_PHY:
+        {
+          DynamicCast<SatGeoUserPhy> (m_userPhy[rxParams->m_beamId])->SendPduWithParams (rxParams);
+          break;
+        }
+      default:
+        {
+          NS_FATAL_ERROR ("Not implemented yet");
+        }
+    }
 }
 
 void
@@ -99,6 +140,18 @@ SatGeoNetDevice::SetReceiveErrorModel (Ptr<ErrorModel> em)
 {
   NS_LOG_FUNCTION (this << em);
   m_receiveErrorModel = em;
+}
+
+void
+SatGeoNetDevice::SetForwardLinkRegenerationMode (SatEnums::RegenerationMode_t forwardLinkRegenerationMode)
+{
+  m_forwardLinkRegenerationMode = forwardLinkRegenerationMode;
+}
+
+void
+SatGeoNetDevice::SetReturnLinkRegenerationMode (SatEnums::RegenerationMode_t returnLinkRegenerationMode)
+{
+  m_returnLinkRegenerationMode = returnLinkRegenerationMode;
 }
 
 void
@@ -254,6 +307,8 @@ SatGeoNetDevice::DoDispose (void)
   m_receiveErrorModel = 0;
   m_userPhy.clear ();
   m_feederPhy.clear ();
+  m_userMac.clear ();
+  m_feederMac.clear ();
   NetDevice::DoDispose ();
 }
 
@@ -322,6 +377,52 @@ std::map<uint32_t, Ptr<SatPhy> >
 SatGeoNetDevice::GetFeederPhy ()
 {
   return m_feederPhy;
+}
+
+void
+SatGeoNetDevice::AddUserMac (Ptr<SatMac> mac, uint32_t beamId)
+{
+  NS_LOG_FUNCTION (this << mac << beamId);
+  m_userMac.insert (std::pair<uint32_t, Ptr<SatMac> > (beamId, mac));
+}
+
+void
+SatGeoNetDevice::AddFeederMac (Ptr<SatMac> mac, uint32_t beamId)
+{
+  NS_LOG_FUNCTION (this << mac << beamId);
+  m_feederMac.insert (std::pair<uint32_t, Ptr<SatMac> > (beamId, mac));
+}
+
+Ptr<SatMac>
+SatGeoNetDevice::GetUserMac (uint32_t beamId)
+{
+  if (m_userMac.count(beamId))
+    {
+      return m_userMac[beamId];
+    }
+  NS_FATAL_ERROR ("User MAC does not exist for beam " << beamId);
+}
+
+Ptr<SatMac>
+SatGeoNetDevice::GetFeederMac (uint32_t beamId)
+{
+  if (m_userMac.count(beamId))
+    {
+      return m_feederMac[beamId];
+    }
+  NS_FATAL_ERROR ("User MAC does not exist for beam " << beamId);
+}
+
+std::map<uint32_t, Ptr<SatMac> >
+SatGeoNetDevice::GetUserMac ()
+{
+  return m_userMac;
+}
+
+std::map<uint32_t, Ptr<SatMac> >
+SatGeoNetDevice::GetFeederMac ()
+{
+  return m_feederMac;
 }
 
 } // namespace ns3

@@ -240,6 +240,7 @@ SatGwHelper::InstallDvb (NodeContainer c,
                          Ptr<SatChannel> rCh,
                          Ptr<SatNcc> ncc,
                          Ptr<SatLowerLayerServiceConf> llsConf,
+                         SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                          SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
   NS_LOG_FUNCTION (this << beamId << fCh << rCh );
@@ -248,7 +249,7 @@ SatGwHelper::InstallDvb (NodeContainer c,
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
     {
-      devs.Add (InstallDvb (*i, gwId, beamId, fCh, rCh, ncc, llsConf, returnLinkRegenerationMode));
+      devs.Add (InstallDvb (*i, gwId, beamId, fCh, rCh, ncc, llsConf, forwardLinkRegenerationMode, returnLinkRegenerationMode));
     }
 
   return devs;
@@ -262,6 +263,7 @@ SatGwHelper::InstallDvb (Ptr<Node> n,
                          Ptr<SatChannel> rCh,
                          Ptr<SatNcc> ncc,
                          Ptr<SatLowerLayerServiceConf> llsConf,
+                         SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                          SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
   NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
@@ -328,6 +330,11 @@ SatGwHelper::InstallDvb (Ptr<Node> n,
   phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
 
   Ptr<SatGwMac> mac = CreateObject<SatGwMac> (beamId);
+
+  if (forwardLinkRegenerationMode == SatEnums::REGENERATION_LINK || forwardLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
+    {
+      mac->setRegenerative (true);
+    }
 
   // Set the control message container callbacks
   mac->SetReadCtrlCallback (m_readCtrlCb);
@@ -462,6 +469,7 @@ SatGwHelper::InstallLora (NodeContainer c,
                           Ptr<SatChannel> rCh,
                           Ptr<SatNcc> ncc,
                           Ptr<SatLowerLayerServiceConf> llsConf,
+                          SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                           SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
   NS_LOG_FUNCTION (this << beamId << fCh << rCh );
@@ -470,7 +478,7 @@ SatGwHelper::InstallLora (NodeContainer c,
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
     {
-      devs.Add (InstallLora (*i, gwId, beamId, fCh, rCh, ncc, llsConf, returnLinkRegenerationMode));
+      devs.Add (InstallLora (*i, gwId, beamId, fCh, rCh, ncc, llsConf, forwardLinkRegenerationMode, returnLinkRegenerationMode));
     }
 
   return devs;
@@ -484,6 +492,7 @@ SatGwHelper::InstallLora (Ptr<Node> n,
                           Ptr<SatChannel> rCh,
                           Ptr<SatNcc> ncc,
                           Ptr<SatLowerLayerServiceConf> llsConf,
+                          SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                           SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
   NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
@@ -547,6 +556,11 @@ SatGwHelper::InstallLora (Ptr<Node> n,
   phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
 
   Ptr<LorawanMacGateway> mac = CreateObject<LorawanMacGateway> (beamId);
+
+  if (forwardLinkRegenerationMode == SatEnums::REGENERATION_LINK || forwardLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
+    {
+      mac->setRegenerative (true);
+    }
 
   SatLoraConf satLoraConf;
   satLoraConf.SetConf (mac);

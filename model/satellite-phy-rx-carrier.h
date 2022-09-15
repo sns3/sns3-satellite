@@ -69,6 +69,8 @@ public:
     Ptr<SatSignalParameters> rxParams;
     Mac48Address destAddress;
     Mac48Address sourceAddress;
+    Mac48Address finalDestAddress;
+    Mac48Address finalSourceAddress;
     Ptr<SatInterference::InterferenceChangeEvent> interferenceEvent;
   } rxParams_s;
 

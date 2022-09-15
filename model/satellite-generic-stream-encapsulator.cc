@@ -149,6 +149,15 @@ SatGenericStreamEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
       mTag.SetSourceAddress (m_sourceAddress);
       packet->AddPacketTag (mTag);
 
+      // Add E2E address tag to identify the packet in lower layers
+      SatAddressE2ETag addressE2ETag;
+      if (!packet->PeekPacketTag (addressE2ETag))
+        {
+          addressE2ETag.SetFinalDestAddress (m_destAddress);
+          addressE2ETag.SetFinalSourceAddress (m_sourceAddress);
+          packet->AddPacketTag (addressE2ETag);
+        }
+
       // Add flow id tag
       SatFlowIdTag flowIdTag;
       flowIdTag.SetFlowId (m_flowId);

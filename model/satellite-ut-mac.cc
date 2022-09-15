@@ -587,9 +587,22 @@ SatUtMac::DoTransmit (Time duration, uint32_t carrierId, Ptr<SatWaveform> wf, Pt
 
           // Add MAC tag to identify the packet in lower layers
           SatMacTag mTag;
-          mTag.SetDestAddress (m_gwAddress);
+          if (m_isRegenerative)
+            {
+              mTag.SetDestAddress (Mac48Address::ConvertFrom (m_satelliteAddress));
+            }
+          else
+            {
+              mTag.SetDestAddress (m_gwAddress);
+            }
           mTag.SetSourceAddress (m_nodeInfo->GetMacAddress ());
           p->AddPacketTag (mTag);
+
+          // Add MAC tag to identify the packet in lower layers
+          SatAddressE2ETag addressE2ETag;
+          addressE2ETag.SetFinalDestAddress (m_gwAddress);
+          addressE2ETag.SetFinalSourceAddress (m_nodeInfo->GetMacAddress ());
+          p->AddPacketTag (addressE2ETag);
 
           packets.push_back (p);
         }
@@ -922,7 +935,13 @@ SatUtMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
       // Remove packet tag
       SatMacTag macTag;
       bool mSuccess = (*i)->PeekPacketTag (macTag);
+      if (!mSuccess)
+        {
+          NS_FATAL_ERROR ("MAC tag was not found from the packet!");
+        }
 
+      SatAddressE2ETag addressE2ETag;
+      mSuccess = (*i)->PeekPacketTag (addressE2ETag);
       if (!mSuccess)
         {
           NS_FATAL_ERROR ("MAC tag was not found from the packet!");
@@ -960,7 +979,7 @@ SatUtMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
           else
             {
               // Pass the receiver address to LLC
-              m_rxCallback (*i, macTag.GetSourceAddress (), destAddress);
+              m_rxCallback (*i, addressE2ETag.GetFinalSourceAddress (), addressE2ETag.GetFinalDestAddress ());
             }
         }
     }
@@ -974,6 +993,9 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
   // Remove the mac tag
   SatMacTag macTag;
   packet->PeekPacketTag (macTag);
+
+  SatAddressE2ETag addressE2ETag;
+  packet->PeekPacketTag (addressE2ETag);
 
   // Peek control msg tag
   SatControlMsgTag ctrlTag;
@@ -1010,6 +1032,7 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
         ScheduleTimeSlots (tbtp);
 
         packet->RemovePacketTag (macTag);
+        packet->RemovePacketTag (addressE2ETag);
         packet->RemovePacketTag (ctrlTag);
 
         break;
@@ -1017,7 +1040,7 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
     case SatControlMsgTag::SAT_ARQ_ACK:
       {
         // ARQ ACK messages are forwarded to LLC, since they may be fragmented
-        m_rxCallback (packet, macTag.GetSourceAddress (), macTag.GetDestAddress ());
+        m_rxCallback (packet, addressE2ETag.GetFinalSourceAddress (), macTag.GetDestAddress ());
         break;
       }
     case SatControlMsgTag::SAT_RA_CTRL_MSG:
@@ -1039,6 +1062,7 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
             m_randomAccess->SetBackoffTime (allocationChannelId, backoffTime);
 
             packet->RemovePacketTag (macTag);
+            packet->RemovePacketTag (addressE2ETag);
             packet->RemovePacketTag (ctrlTag);
           }
         else

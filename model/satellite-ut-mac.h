@@ -715,6 +715,11 @@ private:
    */
   std::queue<Time> m_receptionDates;
 
+  /**
+   * MAC address of satellite on other side of the link. Use in regenerative cases.
+   */
+  Address m_satelliteAddress;
+
   typedef enum
   {
     NO_HANDOVER,

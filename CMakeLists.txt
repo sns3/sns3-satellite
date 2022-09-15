@@ -52,8 +52,10 @@ set(source_files
     model/satellite-generic-stream-encapsulator.cc
     model/satellite-generic-stream-encapsulator-arq.cc
     model/satellite-geo-feeder-phy.cc
+    model/satellite-geo-feeder-mac.cc
     model/satellite-geo-net-device.cc
     model/satellite-geo-user-phy.cc
+    model/satellite-geo-user-mac.cc
     model/satellite-gse-header.cc
     model/satellite-gw-llc.cc
     model/satellite-gw-mac.cc
@@ -276,8 +278,10 @@ set(header_files
     model/satellite-generic-stream-encapsulator.h
     model/satellite-generic-stream-encapsulator-arq.h
     model/satellite-geo-feeder-phy.h
+    model/satellite-geo-feeder-mac.h
     model/satellite-geo-net-device.h
     model/satellite-geo-user-phy.h
+    model/satellite-geo-user-mac.h
     model/satellite-gse-header.h
     model/satellite-gw-llc.h
     model/satellite-gw-mac.h

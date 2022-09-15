@@ -36,6 +36,8 @@
 #include <ns3/satellite-phy.h>
 #include <ns3/satellite-phy-tx.h>
 #include <ns3/satellite-phy-rx.h>
+#include <ns3/satellite-gw-mac.h>
+#include <ns3/satellite-ut-mac.h>
 #include <ns3/satellite-arp-cache.h>
 #include <ns3/satellite-mobility-model.h>
 #include <ns3/satellite-propagation-delay-model.h>
@@ -48,6 +50,7 @@
 #include <ns3/satellite-fading-input-trace.h>
 #include <ns3/satellite-id-mapper.h>
 #include <ns3/satellite-lorawan-net-device.h>
+#include <ns3/satellite-geo-net-device.h>
 #include "satellite-beam-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatBeamHelper");
@@ -161,13 +164,13 @@ SatBeamHelper::GetTypeId (void)
                    MakeEnumAccessor (&SatBeamHelper::m_forwardLinkRegenerationMode),
                    MakeEnumChecker (SatEnums::TRANSPARENT, "TRANSPARENT",
                                     SatEnums::REGENERATION_PHY, "REGENERATION_PHY",
-                                    SatEnums::REGENERATION_LINK, "REGENERATION_LINK",
                                     SatEnums::REGENERATION_NETWORK, "REGENERATION_NETWORK"))
     .AddAttribute ("ReturnLinkRegenerationMode", "The regeneration mode used in satellites for return link.",
                    EnumValue (SatEnums::TRANSPARENT),
                    MakeEnumAccessor (&SatBeamHelper::m_returnLinkRegenerationMode),
                    MakeEnumChecker (SatEnums::TRANSPARENT, "TRANSPARENT",
                                     SatEnums::REGENERATION_PHY, "REGENERATION_PHY",
+                                    SatEnums::REGENERATION_LINK, "REGENERATION_LINK",
                                     SatEnums::REGENERATION_NETWORK, "REGENERATION_NETWORK"))
     .AddTraceSource ("Creation", "Creation traces",
                      MakeTraceSourceAccessor (&SatBeamHelper::m_creationTrace),
@@ -555,6 +558,7 @@ SatBeamHelper::Install (NodeContainer ut,
                                      feederLink.second,
                                      m_ncc,
                                      llsConf.Get<SatLowerLayerServiceConf> (),
+                                     m_forwardLinkRegenerationMode,
                                      m_returnLinkRegenerationMode);
       break;
     case SatEnums::LORA:
@@ -565,6 +569,7 @@ SatBeamHelper::Install (NodeContainer ut,
                                       feederLink.second,
                                       m_ncc,
                                       llsConf.Get<SatLowerLayerServiceConf> (),
+                                      m_forwardLinkRegenerationMode,
                                       m_returnLinkRegenerationMode);
 
       break;
@@ -630,7 +635,8 @@ SatBeamHelper::Install (NodeContainer ut,
                                      m_ncc,
                                      MakeCallback (&SatChannelPair::GetChannelPair, m_ulChannels),
                                      routingCallback,
-                                     m_forwardLinkRegenerationMode);
+                                     m_forwardLinkRegenerationMode,
+                                     m_returnLinkRegenerationMode);
       break;
     case SatEnums::LORA:
       utNd = m_utHelper->InstallLora (ut,
@@ -641,11 +647,29 @@ SatBeamHelper::Install (NodeContainer ut,
                                       m_ncc,
                                       MakeCallback (&SatChannelPair::GetChannelPair, m_ulChannels),
                                       routingCallback,
-                                      m_forwardLinkRegenerationMode);
+                                      m_forwardLinkRegenerationMode,
+                                      m_returnLinkRegenerationMode);
       break;
     default:
       NS_FATAL_ERROR ("Incorrect standard chosen");
   }
+
+  // Add satellite addresses to GW and UT MAC layers.
+  if (m_forwardLinkRegenerationMode == SatEnums::REGENERATION_LINK || m_forwardLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
+    {
+      Ptr<SatGeoNetDevice> geoNetDevice = DynamicCast<SatGeoNetDevice> (m_geoNode->GetDevice (0));
+      Address satFeederAddress = geoNetDevice->GetFeederMac (beamId)->GetAddress ();
+      DynamicCast<SatGwMac> (DynamicCast<SatNetDevice> (gwNd)->GetMac ())->SetSatelliteAddress (satFeederAddress);
+    }
+  if (m_returnLinkRegenerationMode == SatEnums::REGENERATION_LINK || m_returnLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
+    {
+      Ptr<SatGeoNetDevice> geoNetDevice = DynamicCast<SatGeoNetDevice> (m_geoNode->GetDevice (0));
+      Address satUserAddress = geoNetDevice->GetUserMac (beamId)->GetAddress ();
+      for (NetDeviceContainer::Iterator i = utNd.Begin (); i != utNd.End (); i++)
+        {
+          DynamicCast<SatUtMac> (DynamicCast<SatNetDevice> (*i)->GetMac ())->SetSatelliteAddress (satUserAddress);
+        }
+    }
 
   return std::make_pair (gwNd, utNd);
 }

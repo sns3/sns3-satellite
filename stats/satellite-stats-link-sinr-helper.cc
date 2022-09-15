@@ -413,7 +413,6 @@ SatStatsLinkSinrHelper::SinrCallback (double sinrDb, const Address &from)
         }
       else
         {
-          NS_FATAL_ERROR ("STOP");
           NS_LOG_WARN (this << " discarding a packet with a sinr of " << sinrDb << "dB"
                             << " from statistics collection because of"
                             << " unknown sender address " << from);

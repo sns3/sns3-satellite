@@ -324,11 +324,15 @@ SatPhyRxCarrier::GetReceiveParams (Ptr<SatSignalParameters> rxParams)
     {
       if (!rxParams->m_packetsInBurst.empty ())
         {
-          SatMacTag tag;
-          rxParams->m_packetsInBurst[0]->PeekPacketTag (tag);
+          SatMacTag mTag;
+          rxParams->m_packetsInBurst[0]->PeekPacketTag (mTag);
+          SatAddressE2ETag addressE2ETag;
+          rxParams->m_packetsInBurst[0]->PeekPacketTag (addressE2ETag);
 
-          params.destAddress = tag.GetDestAddress ();
-          params.sourceAddress = tag.GetSourceAddress ();
+          params.destAddress = mTag.GetDestAddress ();
+          params.sourceAddress = mTag.GetSourceAddress ();
+          params.finalDestAddress = addressE2ETag.GetFinalDestAddress ();
+          params.finalSourceAddress = addressE2ETag.GetFinalSourceAddress ();
         }
       receivePacket = true;
     }
@@ -337,11 +341,15 @@ SatPhyRxCarrier::GetReceiveParams (Ptr<SatSignalParameters> rxParams)
       for (SatSignalParameters::PacketsInBurst_t::const_iterator i = rxParams->m_packetsInBurst.begin ();
            ((i != rxParams->m_packetsInBurst.end ()) && (ownAddressFound == false) ); i++)
         {
-          SatMacTag tag;
-          (*i)->PeekPacketTag (tag);
+          SatMacTag mTag;
+          (*i)->PeekPacketTag (mTag);
+          SatAddressE2ETag addressE2ETag;
+          (*i)->PeekPacketTag (addressE2ETag);
 
-          params.destAddress = tag.GetDestAddress ();
-          params.sourceAddress = tag.GetSourceAddress ();
+          params.destAddress = mTag.GetDestAddress ();
+          params.sourceAddress = mTag.GetSourceAddress ();
+          params.finalDestAddress = addressE2ETag.GetFinalDestAddress ();
+          params.finalSourceAddress = addressE2ETag.GetFinalSourceAddress ();
 
           if (( params.destAddress == GetOwnAddress () ))
             {
@@ -416,11 +424,11 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
             // Update link specific received signal power
             if (GetChannelType () == SatEnums::FORWARD_FEEDER_CH || GetChannelType () == SatEnums::FORWARD_USER_CH)
               {
-                m_rxPowerTrace (SatUtils::LinearToDb (rxParams->m_rxPower_W), rxParamsStruct.destAddress);
+                m_rxPowerTrace (SatUtils::LinearToDb (rxParams->m_rxPower_W), rxParamsStruct.finalDestAddress);
               }
             else if (GetChannelType () == SatEnums::RETURN_FEEDER_CH || GetChannelType () == SatEnums::RETURN_USER_CH)
               {
-                m_rxPowerTrace (SatUtils::LinearToDb (rxParams->m_rxPower_W), rxParamsStruct.sourceAddress);
+                m_rxPowerTrace (SatUtils::LinearToDb (rxParams->m_rxPower_W), rxParamsStruct.finalSourceAddress);
               }
             else
               {

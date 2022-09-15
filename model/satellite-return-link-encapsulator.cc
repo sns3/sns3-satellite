@@ -119,6 +119,15 @@ SatReturnLinkEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address /*dest*/)
   mTag.SetSourceAddress (m_sourceAddress);
   p->AddPacketTag (mTag);
 
+  // Add E2E address tag to identify the packet in lower layers
+  SatAddressE2ETag addressE2ETag;
+  if (!p->PeekPacketTag (addressE2ETag))
+    {
+      addressE2ETag.SetFinalDestAddress (m_destAddress);
+      addressE2ETag.SetFinalSourceAddress (m_sourceAddress);
+      p->AddPacketTag (addressE2ETag);
+    }
+
   /**
    * TODO: This is the place to encapsulate the higher layer packet
    * with Addressed Link (AL) header, if needed.
@@ -164,6 +173,15 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
           mTag.SetDestAddress (m_destAddress);
           mTag.SetSourceAddress (m_sourceAddress);
           packet->AddPacketTag (mTag);
+        }
+
+      // Add E2E address tag to identify the packet in lower layers
+      SatAddressE2ETag addressE2ETag;
+      if (!packet->PeekPacketTag (addressE2ETag))
+        {
+          addressE2ETag.SetFinalDestAddress (m_destAddress);
+          addressE2ETag.SetFinalSourceAddress (m_sourceAddress);
+          packet->AddPacketTag (addressE2ETag);
         }
 
       // Add flow id tag

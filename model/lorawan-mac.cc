@@ -55,12 +55,14 @@ LorawanMac::GetTypeId (void)
 }
 
 LorawanMac::LorawanMac ()
+  : m_isRegenerative (false)
 {
   NS_FATAL_ERROR ("Default constructor not in use");
 }
 
 LorawanMac::LorawanMac (uint32_t beamId)
-  : SatMac (beamId)
+  : SatMac (beamId),
+  m_isRegenerative (false)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -234,6 +236,13 @@ int
 LorawanMac::GetNPreambleSymbols (void)
 {
   return m_nPreambleSymbols;
+}
+
+void
+LorawanMac::setRegenerative (bool isRegenerative)
+{
+  NS_LOG_FUNCTION (this << isRegenerative);
+  m_isRegenerative = isRegenerative;
 }
 
 void

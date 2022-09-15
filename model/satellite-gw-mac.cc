@@ -187,13 +187,19 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> r
         {
           NS_FATAL_ERROR ("MAC tag was not found from the packet!");
         }
+      SatAddressE2ETag addressE2ETag;
+      mSuccess = (*i)->PeekPacketTag (addressE2ETag);
+      if (!mSuccess)
+        {
+          NS_FATAL_ERROR ("Address E2E tag was not found from the packet!");
+        }
 
       NS_LOG_INFO ("Packet from " << macTag.GetSourceAddress () << " to " << macTag.GetDestAddress ());
       NS_LOG_INFO ("Receiver " << m_nodeInfo->GetMacAddress ());
 
       // If the packet is intended for this receiver
       Mac48Address destAddress = macTag.GetDestAddress ();
-      utId = macTag.GetSourceAddress ();
+      utId = addressE2ETag.GetFinalSourceAddress ();
 
       if (destAddress == m_nodeInfo->GetMacAddress () || destAddress.IsBroadcast ())
         {
@@ -217,7 +223,7 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> r
           else
             {
               // Pass the source address to LLC
-              m_rxCallback (*i, macTag.GetSourceAddress (), macTag.GetDestAddress ());
+              m_rxCallback (*i, addressE2ETag.GetFinalSourceAddress (), addressE2ETag.GetFinalDestAddress ());
             }
         }
       else
@@ -350,6 +356,9 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
   SatMacTag macTag;
   packet->PeekPacketTag (macTag);
 
+  SatAddressE2ETag addressE2ETag;
+  packet->PeekPacketTag (addressE2ETag);
+
   // Peek control msg tag
   SatControlMsgTag ctrlTag;
   bool cSuccess = packet->PeekPacketTag (ctrlTag);
@@ -368,11 +377,11 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
 
         if ( crMsg != NULL )
           {
-            m_fwdScheduler->CnoInfoUpdated (macTag.GetSourceAddress (), crMsg->GetCnoEstimate ());
+            m_fwdScheduler->CnoInfoUpdated (addressE2ETag.GetFinalSourceAddress (), crMsg->GetCnoEstimate ());
 
             if ( m_crReceiveCallback.IsNull () == false )
               {
-                m_crReceiveCallback (m_beamId, macTag.GetSourceAddress (), crMsg);
+                m_crReceiveCallback (m_beamId, addressE2ETag.GetFinalSourceAddress (), crMsg);
               }
           }
         else
@@ -389,6 +398,7 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
           }
 
         packet->RemovePacketTag (macTag);
+        packet->RemovePacketTag (addressE2ETag);
         packet->RemovePacketTag (ctrlTag);
 
         break;
@@ -400,7 +410,7 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
 
         if ( cnoReport != NULL )
           {
-            m_fwdScheduler->CnoInfoUpdated (macTag.GetSourceAddress (), cnoReport->GetCnoEstimate ());
+            m_fwdScheduler->CnoInfoUpdated (addressE2ETag.GetFinalSourceAddress (), cnoReport->GetCnoEstimate ());
           }
         else
           {
@@ -416,6 +426,7 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
           }
 
         packet->RemovePacketTag (macTag);
+        packet->RemovePacketTag (addressE2ETag);
         packet->RemovePacketTag (ctrlTag);
 
         break;
@@ -423,7 +434,7 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
     case SatControlMsgTag::SAT_ARQ_ACK:
       {
         // ARQ ACK messages are forwarded to LLC, since they may be fragmented
-        m_rxCallback (packet, macTag.GetSourceAddress (), macTag.GetDestAddress ());
+        m_rxCallback (packet, addressE2ETag.GetFinalSourceAddress (), macTag.GetDestAddress ());
         break;
       }
     case SatControlMsgTag::SAT_HR_CTRL_MSG:
@@ -434,7 +445,7 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
         if ( handoverRecommendation != NULL )
           {
             uint32_t beamId = handoverRecommendation->GetRecommendedBeamId ();
-            m_handoverCallback (macTag.GetSourceAddress (), m_beamId, beamId);
+            m_handoverCallback (addressE2ETag.GetFinalSourceAddress (), m_beamId, beamId);
           }
         else
           {
@@ -458,7 +469,7 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
 
         if ( logonMessage != NULL )
           {
-            Address utId = macTag.GetSourceAddress ();
+            Address utId = addressE2ETag.GetFinalSourceAddress ();
             Callback<void, uint32_t> raChannelCallback = MakeBoundCallback (&SatGwMac::SendLogonResponseHelper, this, utId);
             m_logonCallback (utId, m_beamId, raChannelCallback);
           }

@@ -164,7 +164,7 @@ private:
    * \return The source MAC address
    */
   Address
-  GetSourceAddress (SatPhy::PacketContainer_t packets);
+  GetFinalSourceAddress (SatPhy::PacketContainer_t packets);
 
   /**
    * Configured external noise power.
