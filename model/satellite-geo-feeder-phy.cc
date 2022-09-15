@@ -285,8 +285,8 @@ SatGeoFeederPhy::SendPduWithParams (Ptr<SatSignalParameters> txParams )
           m_queueSizeBytes += nbBytes;
           m_queueSizePackets += nbPackets;
 
-          m_queueSizeBytesTrace (m_queueSizeBytes, GetFinalSourceAddress (txParams->m_packetsInBurst));
-          m_queueSizePacketsTrace (m_queueSizePackets, GetFinalSourceAddress (txParams->m_packetsInBurst));
+          m_queueSizeBytesTrace (m_queueSizeBytes, GetE2ESourceAddress (txParams->m_packetsInBurst));
+          m_queueSizePacketsTrace (m_queueSizePackets, GetE2ESourceAddress (txParams->m_packetsInBurst));
 
           if (m_isSending == false)
             {
@@ -331,8 +331,8 @@ SatGeoFeederPhy::SendFromQueue ()
   m_queueSizeBytes -= std::get<1> (element);
   m_queueSizePackets -= std::get<2> (element);
 
-  m_queueSizeBytesTrace (m_queueSizeBytes, GetFinalSourceAddress (txParams->m_packetsInBurst));
-  m_queueSizePacketsTrace (m_queueSizePackets, GetFinalSourceAddress (txParams->m_packetsInBurst));
+  m_queueSizeBytesTrace (m_queueSizeBytes, GetE2ESourceAddress (txParams->m_packetsInBurst));
+  m_queueSizePacketsTrace (m_queueSizePackets, GetE2ESourceAddress (txParams->m_packetsInBurst));
 
   // Add sent packet trace entry:
   m_packetTrace (Simulator::Now (),
@@ -375,7 +375,7 @@ SatGeoFeederPhy::RxTraces (SatPhy::PacketContainer_t packets)
           if ((*it1)->PeekPacketTag (addressE2ETag))
             {
               NS_LOG_DEBUG (this << " contains a SatMac tag");
-              addr = addressE2ETag.GetFinalDestAddress ();
+              addr = addressE2ETag.GetE2EDestAddress ();
             }
 
           m_rxTrace (*it1, addr);
@@ -466,7 +466,7 @@ SatGeoFeederPhy::GetSatLinkRxDir ()
 }
 
 Address
-SatGeoFeederPhy::GetFinalSourceAddress (SatPhy::PacketContainer_t packets)
+SatGeoFeederPhy::GetE2ESourceAddress (SatPhy::PacketContainer_t packets)
 {
   SatSignalParameters::PacketsInBurst_t::iterator it1;
   for (it1 = packets.begin ();

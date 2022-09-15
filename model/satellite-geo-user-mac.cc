@@ -109,7 +109,7 @@ SatGeoUserMac::SendPackets (SatPhy::PacketContainer_t packets, Ptr<SatSignalPara
       // MAC tag and E2E address tag found
       if (success)
         {
-          mTag.SetDestAddress (addressE2ETag.GetFinalDestAddress ());
+          mTag.SetDestAddress (addressE2ETag.GetE2EDestAddress ());
           mTag.SetSourceAddress (m_nodeInfo->GetMacAddress ());
           (*it)->AddPacketTag (mTag);
         }

@@ -188,8 +188,8 @@ LorawanMacEndDeviceClassA::SendToPhy (Ptr<Packet> packetToSend)
   packetToSend->AddPacketTag (mTag);
 
   SatAddressE2ETag addressE2ETag;
-  addressE2ETag.SetFinalDestAddress (m_gwAddress);
-  addressE2ETag.SetFinalSourceAddress (Mac48Address::ConvertFrom (m_device->GetAddress ()));
+  addressE2ETag.SetE2EDestAddress (m_gwAddress);
+  addressE2ETag.SetE2ESourceAddress (Mac48Address::ConvertFrom (m_device->GetAddress ()));
   packetToSend->AddPacketTag (addressE2ETag);
 
   SatPhy::PacketContainer_t packets;
@@ -246,7 +246,7 @@ LorawanMacEndDeviceClassA::Receive (Ptr<Packet> packet)
 
   SatAddressE2ETag addressE2ETag;
   packet->RemovePacketTag (addressE2ETag);
-  addressE2ETag.SetFinalDestAddress (m_nodeInfo->GetMacAddress ());
+  addressE2ETag.SetE2EDestAddress (m_nodeInfo->GetMacAddress ());
   packet->AddPacketTag (addressE2ETag);
 
   SatPhy::PacketContainer_t packets;

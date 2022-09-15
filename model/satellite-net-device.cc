@@ -384,8 +384,8 @@ SatNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNu
     }
 
   SatAddressE2ETag addressE2ETag;
-  addressE2ETag.SetFinalSourceAddress (m_nodeInfo->GetMacAddress ());
-  addressE2ETag.SetFinalDestAddress (Mac48Address::ConvertFrom (dest));
+  addressE2ETag.SetE2ESourceAddress (m_nodeInfo->GetMacAddress ());
+  addressE2ETag.SetE2EDestAddress (Mac48Address::ConvertFrom (dest));
   packet->AddPacketTag (addressE2ETag);
 
   // Add packet trace entry:
@@ -424,8 +424,8 @@ SatNetDevice::SendFrom (Ptr<Packet> packet, const Address& source, const Address
     }
 
   SatAddressE2ETag addressE2ETag;
-  addressE2ETag.SetFinalSourceAddress (m_nodeInfo->GetMacAddress ());
-  addressE2ETag.SetFinalDestAddress (Mac48Address::ConvertFrom (dest));
+  addressE2ETag.SetE2ESourceAddress (m_nodeInfo->GetMacAddress ());
+  addressE2ETag.SetE2EDestAddress (Mac48Address::ConvertFrom (dest));
   packet->AddPacketTag (addressE2ETag);
 
   // Add packet trace entry:
@@ -466,8 +466,8 @@ SatNetDevice::SendControlMsg (Ptr<SatControlMessage> msg, const Address& dest)
     }
 
   SatAddressE2ETag addressE2ETag;
-  addressE2ETag.SetFinalSourceAddress (m_nodeInfo->GetMacAddress ());
-  addressE2ETag.SetFinalDestAddress (Mac48Address::ConvertFrom (dest));
+  addressE2ETag.SetE2ESourceAddress (m_nodeInfo->GetMacAddress ());
+  addressE2ETag.SetE2EDestAddress (Mac48Address::ConvertFrom (dest));
   packet->AddPacketTag (addressE2ETag);
 
   // Add packet trace entry:

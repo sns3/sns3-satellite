@@ -194,8 +194,8 @@ SatFwdLinkSchedulerTimeSlicing::GetNextFrame ()
 
       // Add E2E address tag
       SatAddressE2ETag addressE2ETag;
-      addressE2ETag.SetFinalDestAddress (Mac48Address::GetBroadcast ());
-      addressE2ETag.SetFinalSourceAddress (m_macAddress);
+      addressE2ETag.SetE2EDestAddress (Mac48Address::GetBroadcast ());
+      addressE2ETag.SetE2ESourceAddress (m_macAddress);
       dummyPacket->AddPacketTag (addressE2ETag);
 
       // Add dummy packet to dummy frame

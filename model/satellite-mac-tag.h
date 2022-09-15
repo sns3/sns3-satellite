@@ -132,28 +132,28 @@ public:
   ~SatAddressE2ETag ();
 
   /**
-   * \brief Set final destination MAC address
-   * \param dest Final destination MAC address
+   * \brief Set E2E destination MAC address
+   * \param e2eDestAddress E2E destination MAC address
    */
-  void SetFinalDestAddress (Mac48Address finalDest);
+  void SetE2EDestAddress (Mac48Address e2eDestAddress);
 
   /**
-   * \brief Get final destination MAC address
-   * \return Final destination MAC address
+   * \brief Get E2E destination MAC address
+   * \return E2E destination MAC address
    */
-  Mac48Address GetFinalDestAddress (void) const;
+  Mac48Address GetE2EDestAddress (void) const;
 
   /**
-   * \brief Set final source MAC address
-   * \param source Final source MAC address
+   * \brief Set E2E source MAC address
+   * \param e2eSourceAddress E2E source MAC address
    */
-  void SetFinalSourceAddress (Mac48Address finalSource);
+  void SetE2ESourceAddress (Mac48Address e2eSourceAddress);
 
   /**
-   * \brief Get final source MAC address
-   * \return Final source MAC address
+   * \brief Get E2E source MAC address
+   * \return E2E source MAC address
    */
-  Mac48Address GetFinalSourceAddress (void) const;
+  Mac48Address GetE2ESourceAddress (void) const;
 
   /**
    * \brief Get the type ID
@@ -194,8 +194,8 @@ public:
 private:
   static const uint32_t ADDRESS_LENGHT = 6;
 
-  Mac48Address   m_finalDestAddress;
-  Mac48Address   m_finalSourceAddress;
+  Mac48Address   m_e2eDestAddress;
+  Mac48Address   m_e2eSourceAddress;
 };
 
 /**

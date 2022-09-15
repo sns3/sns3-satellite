@@ -600,8 +600,8 @@ SatUtMac::DoTransmit (Time duration, uint32_t carrierId, Ptr<SatWaveform> wf, Pt
 
           // Add MAC tag to identify the packet in lower layers
           SatAddressE2ETag addressE2ETag;
-          addressE2ETag.SetFinalDestAddress (m_gwAddress);
-          addressE2ETag.SetFinalSourceAddress (m_nodeInfo->GetMacAddress ());
+          addressE2ETag.SetE2EDestAddress (m_gwAddress);
+          addressE2ETag.SetE2ESourceAddress (m_nodeInfo->GetMacAddress ());
           p->AddPacketTag (addressE2ETag);
 
           packets.push_back (p);
@@ -979,7 +979,7 @@ SatUtMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
           else
             {
               // Pass the receiver address to LLC
-              m_rxCallback (*i, addressE2ETag.GetFinalSourceAddress (), addressE2ETag.GetFinalDestAddress ());
+              m_rxCallback (*i, addressE2ETag.GetE2ESourceAddress (), addressE2ETag.GetE2EDestAddress ());
             }
         }
     }
@@ -1040,7 +1040,7 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
     case SatControlMsgTag::SAT_ARQ_ACK:
       {
         // ARQ ACK messages are forwarded to LLC, since they may be fragmented
-        m_rxCallback (packet, addressE2ETag.GetFinalSourceAddress (), macTag.GetDestAddress ());
+        m_rxCallback (packet, addressE2ETag.GetE2ESourceAddress (), macTag.GetDestAddress ());
         break;
       }
     case SatControlMsgTag::SAT_RA_CTRL_MSG:

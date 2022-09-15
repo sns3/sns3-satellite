@@ -331,8 +331,8 @@ SatPhyRxCarrier::GetReceiveParams (Ptr<SatSignalParameters> rxParams)
 
           params.destAddress = mTag.GetDestAddress ();
           params.sourceAddress = mTag.GetSourceAddress ();
-          params.finalDestAddress = addressE2ETag.GetFinalDestAddress ();
-          params.finalSourceAddress = addressE2ETag.GetFinalSourceAddress ();
+          params.finalDestAddress = addressE2ETag.GetE2EDestAddress ();
+          params.finalSourceAddress = addressE2ETag.GetE2ESourceAddress ();
         }
       receivePacket = true;
     }
@@ -348,8 +348,8 @@ SatPhyRxCarrier::GetReceiveParams (Ptr<SatSignalParameters> rxParams)
 
           params.destAddress = mTag.GetDestAddress ();
           params.sourceAddress = mTag.GetSourceAddress ();
-          params.finalDestAddress = addressE2ETag.GetFinalDestAddress ();
-          params.finalSourceAddress = addressE2ETag.GetFinalSourceAddress ();
+          params.finalDestAddress = addressE2ETag.GetE2EDestAddress ();
+          params.finalSourceAddress = addressE2ETag.GetE2ESourceAddress ();
 
           if (( params.destAddress == GetOwnAddress () ))
             {

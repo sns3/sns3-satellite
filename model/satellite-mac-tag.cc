@@ -160,31 +160,31 @@ SatAddressE2ETag::GetInstanceTypeId () const
 }
 
 void
-SatAddressE2ETag::SetFinalDestAddress (Mac48Address finalDest)
+SatAddressE2ETag::SetE2EDestAddress (Mac48Address e2eDestAddress)
 {
-  NS_LOG_FUNCTION (this << finalDest);
-  m_finalDestAddress = finalDest;
+  NS_LOG_FUNCTION (this << e2eDestAddress);
+  m_e2eDestAddress = e2eDestAddress;
 }
 
 Mac48Address
-SatAddressE2ETag::GetFinalDestAddress () const
+SatAddressE2ETag::GetE2EDestAddress () const
 {
   NS_LOG_FUNCTION (this);
-  return m_finalDestAddress;
+  return m_e2eDestAddress;
 }
 
 void
-SatAddressE2ETag::SetFinalSourceAddress (Mac48Address finalSource)
+SatAddressE2ETag::SetE2ESourceAddress (Mac48Address e2eSourceAddress)
 {
-  NS_LOG_FUNCTION (this << finalSource);
-  m_finalSourceAddress = finalSource;
+  NS_LOG_FUNCTION (this << e2eSourceAddress);
+  m_e2eSourceAddress = e2eSourceAddress;
 }
 
 Mac48Address
-SatAddressE2ETag::GetFinalSourceAddress () const
+SatAddressE2ETag::GetE2ESourceAddress () const
 {
   NS_LOG_FUNCTION (this);
-  return m_finalSourceAddress;
+  return m_e2eSourceAddress;
 }
 
 uint32_t
@@ -201,10 +201,10 @@ SatAddressE2ETag::Serialize (TagBuffer i) const
 
   uint8_t buff[ADDRESS_LENGHT];
 
-  m_finalDestAddress.CopyTo (buff);
+  m_e2eDestAddress.CopyTo (buff);
   i.Write (buff, ADDRESS_LENGHT);
 
-  m_finalSourceAddress.CopyTo (buff);
+  m_e2eSourceAddress.CopyTo (buff);
   i.Write (buff, ADDRESS_LENGHT);
 }
 
@@ -216,17 +216,17 @@ SatAddressE2ETag::Deserialize (TagBuffer i)
   uint8_t buff[ADDRESS_LENGHT];
 
   i.Read (buff, ADDRESS_LENGHT);
-  m_finalDestAddress.CopyFrom (buff);
+  m_e2eDestAddress.CopyFrom (buff);
 
   i.Read (buff, ADDRESS_LENGHT);
-  m_finalSourceAddress.CopyFrom (buff);
+  m_e2eSourceAddress.CopyFrom (buff);
 }
 
 void
 SatAddressE2ETag::Print (std::ostream &os) const
 {
   NS_LOG_FUNCTION (this << &os);
-  os << "FinalDestAddress=" << m_finalDestAddress << "FinalSourceAddress" << m_finalSourceAddress;
+  os << "E2EDestAddress=" << m_e2eDestAddress << "E2ESourceAddress" << m_e2eSourceAddress;
 }
 
 

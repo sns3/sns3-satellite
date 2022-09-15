@@ -251,8 +251,8 @@ SatGenericStreamEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &
           SatAddressE2ETag addressE2ETag;
           if (!packet->PeekPacketTag (addressE2ETag))
             {
-              addressE2ETag.SetFinalDestAddress (m_destAddress);
-              addressE2ETag.SetFinalSourceAddress (m_sourceAddress);
+              addressE2ETag.SetE2EDestAddress (m_destAddress);
+              addressE2ETag.SetE2ESourceAddress (m_sourceAddress);
               packet->AddPacketTag (addressE2ETag);
             }
 

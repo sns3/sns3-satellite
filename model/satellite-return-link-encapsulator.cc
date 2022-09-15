@@ -123,8 +123,8 @@ SatReturnLinkEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address /*dest*/)
   SatAddressE2ETag addressE2ETag;
   if (!p->PeekPacketTag (addressE2ETag))
     {
-      addressE2ETag.SetFinalDestAddress (m_destAddress);
-      addressE2ETag.SetFinalSourceAddress (m_sourceAddress);
+      addressE2ETag.SetE2EDestAddress (m_destAddress);
+      addressE2ETag.SetE2ESourceAddress (m_sourceAddress);
       p->AddPacketTag (addressE2ETag);
     }
 
@@ -179,8 +179,8 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
       SatAddressE2ETag addressE2ETag;
       if (!packet->PeekPacketTag (addressE2ETag))
         {
-          addressE2ETag.SetFinalDestAddress (m_destAddress);
-          addressE2ETag.SetFinalSourceAddress (m_sourceAddress);
+          addressE2ETag.SetE2EDestAddress (m_destAddress);
+          addressE2ETag.SetE2ESourceAddress (m_sourceAddress);
           packet->AddPacketTag (addressE2ETag);
         }
 

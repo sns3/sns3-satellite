@@ -199,7 +199,7 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> r
 
       // If the packet is intended for this receiver
       Mac48Address destAddress = macTag.GetDestAddress ();
-      utId = addressE2ETag.GetFinalSourceAddress ();
+      utId = addressE2ETag.GetE2ESourceAddress ();
 
       if (destAddress == m_nodeInfo->GetMacAddress () || destAddress.IsBroadcast ())
         {
@@ -223,7 +223,7 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> r
           else
             {
               // Pass the source address to LLC
-              m_rxCallback (*i, addressE2ETag.GetFinalSourceAddress (), addressE2ETag.GetFinalDestAddress ());
+              m_rxCallback (*i, addressE2ETag.GetE2ESourceAddress (), addressE2ETag.GetE2EDestAddress ());
             }
         }
       else
@@ -377,11 +377,11 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
 
         if ( crMsg != NULL )
           {
-            m_fwdScheduler->CnoInfoUpdated (addressE2ETag.GetFinalSourceAddress (), crMsg->GetCnoEstimate ());
+            m_fwdScheduler->CnoInfoUpdated (addressE2ETag.GetE2ESourceAddress (), crMsg->GetCnoEstimate ());
 
             if ( m_crReceiveCallback.IsNull () == false )
               {
-                m_crReceiveCallback (m_beamId, addressE2ETag.GetFinalSourceAddress (), crMsg);
+                m_crReceiveCallback (m_beamId, addressE2ETag.GetE2ESourceAddress (), crMsg);
               }
           }
         else
@@ -410,7 +410,7 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
 
         if ( cnoReport != NULL )
           {
-            m_fwdScheduler->CnoInfoUpdated (addressE2ETag.GetFinalSourceAddress (), cnoReport->GetCnoEstimate ());
+            m_fwdScheduler->CnoInfoUpdated (addressE2ETag.GetE2ESourceAddress (), cnoReport->GetCnoEstimate ());
           }
         else
           {
@@ -434,7 +434,7 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
     case SatControlMsgTag::SAT_ARQ_ACK:
       {
         // ARQ ACK messages are forwarded to LLC, since they may be fragmented
-        m_rxCallback (packet, addressE2ETag.GetFinalSourceAddress (), macTag.GetDestAddress ());
+        m_rxCallback (packet, addressE2ETag.GetE2ESourceAddress (), macTag.GetDestAddress ());
         break;
       }
     case SatControlMsgTag::SAT_HR_CTRL_MSG:
@@ -445,7 +445,7 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
         if ( handoverRecommendation != NULL )
           {
             uint32_t beamId = handoverRecommendation->GetRecommendedBeamId ();
-            m_handoverCallback (addressE2ETag.GetFinalSourceAddress (), m_beamId, beamId);
+            m_handoverCallback (addressE2ETag.GetE2ESourceAddress (), m_beamId, beamId);
           }
         else
           {
@@ -469,7 +469,7 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
 
         if ( logonMessage != NULL )
           {
-            Address utId = addressE2ETag.GetFinalSourceAddress ();
+            Address utId = addressE2ETag.GetE2ESourceAddress ();
             Callback<void, uint32_t> raChannelCallback = MakeBoundCallback (&SatGwMac::SendLogonResponseHelper, this, utId);
             m_logonCallback (utId, m_beamId, raChannelCallback);
           }
