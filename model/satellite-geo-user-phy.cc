@@ -312,12 +312,9 @@ SatGeoUserPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
     }
   else
     {
-      // In regenerative mode, we do not need to keep SINR of uplink when handling packet in satellite
-      // We put infinite to SINR stored so that it has no impact on composite SINR: composite_sinr(inf,sinr_donwlink)=sinr_downlink
       if (m_returnLinkRegenerationMode != SatEnums::TRANSPARENT)
         {
           rxParams->m_txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
-          rxParams->SetSinr (std::numeric_limits<double>::infinity(), rxParams->GetSinrCalculator ());
           rxParams->m_satelliteReceptionTime = Simulator::Now ();
 
           RxTraces (rxParams->m_packetsInBurst);

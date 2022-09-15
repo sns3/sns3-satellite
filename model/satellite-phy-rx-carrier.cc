@@ -652,6 +652,24 @@ SatPhyRxCarrier::CalculateCompositeSinr (double sinr1, double sinr2)
   return 1.0 / ( (1.0 / sinr1) + (1.0 / sinr2) );
 }
 
+double
+SatPhyRxCarrier::GetWorstSinr (double sinr1, double sinr2)
+{
+  NS_LOG_FUNCTION (this << sinr1 << sinr2 );
+
+  if (sinr1 <= 0.0)
+    {
+      NS_FATAL_ERROR ("SINR 1 must be greater than zero!!! Current value is " << sinr1);
+    }
+
+  if (sinr2 <= 0.0)
+    {
+      NS_FATAL_ERROR ("SINR 2 must be greater than zero!!! Current value is " << sinr2);
+    }
+
+  return std::min (sinr1, sinr2);
+}
+
 void
 SatPhyRxCarrier::IncreaseNumOfRxState (SatEnums::PacketType_t packetType)
 {

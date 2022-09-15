@@ -455,6 +455,14 @@ protected:
   double CalculateCompositeSinr (double sinr1, double sinr2);
 
   /**
+   * \brief Function for calculating the worst sinr between uplink and downlink
+   * \param sinr1 SINR 1
+   * \param sinr2 SINR 2
+   * \return Worst SINR
+   */
+  double GetWorstSinr (double sinr1, double sinr2);
+
+  /**
    * \brief Function for increasing the number of ongoing transmissions
    * \param packetType Packet type of the ongoing transmission
    */

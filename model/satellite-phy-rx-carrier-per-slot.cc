@@ -267,6 +267,12 @@ SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams,
       cSinr = sinr;
     }
 
+  double worstSinr;
+  if (!m_cnoCallback.IsNull ())
+    {
+      worstSinr = GetWorstSinr (sinr, packetRxParams.rxParams->GetSinr ());
+    }
+
   // Update composite SINR trace for DAMA and Slotted ALOHA packets
   m_sinrTrace (SatUtils::LinearToDb (cSinr), packetRxParams.sourceAddress);
 
@@ -337,14 +343,14 @@ SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams,
   /// send packet upwards
   m_rxCallback (packetRxParams.rxParams, phyError);
 
-  /// uses composite sinr
+  /// uses worst sinr, callback exists only on downlink receivers
   if (!m_cnoCallback.IsNull ())
     {
       /**
        * Channel estimation error is added to the cno measurement,
        * which is utilized e.g. for ACM.
        */
-      double cno = cSinr;
+      double cno = (GetLinkRegenerationMode () == SatEnums::TRANSPARENT) ? cSinr : worstSinr;
 
       // Forward link
       if (GetNodeInfo ()->GetNodeType () == SatEnums::NT_UT)
@@ -368,7 +374,6 @@ SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams,
       packetRxParams.rxParams->m_packetsInBurst[0]->PeekPacketTag (addressE2ETag);
 
       m_cnoCallback (packetRxParams.rxParams->m_beamId,
-                     //packetRxParams.sourceAddress,
                      addressE2ETag.GetFinalSourceAddress (),
                      GetOwnAddress (),
                      cno);

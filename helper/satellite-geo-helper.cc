@@ -272,8 +272,6 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d,
   SatPhy::CreateParam_t params;
   params.m_beamId = userBeamId;
   params.m_device = d;
-  params.m_txCh = uf;
-  params.m_rxCh = ur;
   params.m_standard = SatEnums::GEO;
 
   /**
@@ -308,13 +306,6 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d,
   dev->SetForwardLinkRegenerationMode (forwardLinkRegenerationMode);
   dev->SetReturnLinkRegenerationMode (returnLinkRegenerationMode);
 
-  Ptr<SatGeoUserPhy> uPhy = CreateObject<SatGeoUserPhy> (params,
-                                                         m_rtnLinkResults,
-                                                         parametersUser,
-                                                         m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE),
-                                                         forwardLinkRegenerationMode,
-                                                         returnLinkRegenerationMode);
-
   params.m_txCh = fr;
   params.m_rxCh = ff;
 
@@ -325,20 +316,78 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d,
                                                              forwardLinkRegenerationMode,
                                                              returnLinkRegenerationMode);
 
+  params.m_txCh = uf;
+  params.m_rxCh = ur;
+
+  Ptr<SatGeoUserPhy> uPhy = CreateObject<SatGeoUserPhy> (params,
+                                                         m_rtnLinkResults,
+                                                         parametersUser,
+                                                         m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE),
+                                                         forwardLinkRegenerationMode,
+                                                         returnLinkRegenerationMode);
+
   // Note, that currently we have only one set of antenna patterns,
   // which are utilized in both in user link and feeder link, and
   // in both uplink and downlink directions.
-  uPhy->SetTxAntennaGainPattern (userAgp);
-  uPhy->SetRxAntennaGainPattern (userAgp);
   fPhy->SetTxAntennaGainPattern (feederAgp);
   fPhy->SetRxAntennaGainPattern (feederAgp);
+  uPhy->SetTxAntennaGainPattern (userAgp);
+  uPhy->SetRxAntennaGainPattern (userAgp);
 
-  dev->AddUserPhy (uPhy, userBeamId);
   dev->AddFeederPhy (fPhy, userBeamId);
+  dev->AddUserPhy (uPhy, userBeamId);
 
-  uPhy->Initialize ();
   fPhy->Initialize ();
+  uPhy->Initialize ();
 
+  Ptr<SatGeoFeederMac> fMac;
+  Ptr<SatGeoUserMac> uMac;
+
+  // Create layers needed depending on max regeneration mode
+  switch (std::max (forwardLinkRegenerationMode, returnLinkRegenerationMode))
+    {
+      case SatEnums::TRANSPARENT:
+      case SatEnums::REGENERATION_PHY:
+        {
+          // Create a node info to PHY layers
+          Ptr<SatNodeInfo> niPhyFeeder = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, Mac48Address::ConvertFrom (d->GetAddress ()));
+          fPhy->SetNodeInfo (niPhyFeeder);
+
+          Ptr<SatNodeInfo> niPhyUser = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, Mac48Address::ConvertFrom (d->GetAddress ()));
+          uPhy->SetNodeInfo (niPhyUser);
+
+          break;
+        }
+      case SatEnums::REGENERATION_LINK:
+        {
+          // Create MAC layer
+          fMac = CreateObject<SatGeoFeederMac> (userBeamId,
+                                                forwardLinkRegenerationMode,
+                                                returnLinkRegenerationMode);
+
+          uMac = CreateObject<SatGeoUserMac> (userBeamId,
+                                              forwardLinkRegenerationMode,
+                                              returnLinkRegenerationMode);
+
+          dev->AddFeederMac (fMac, userBeamId);
+          dev->AddUserMac (uMac, userBeamId);
+
+          // Create a node info to PHY and MAC layers
+          Ptr<SatNodeInfo> niFeeder = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, Mac48Address::Allocate ());
+          fPhy->SetNodeInfo (niFeeder);
+          fMac->SetNodeInfo (niFeeder);
+
+          Ptr<SatNodeInfo> niUser = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, Mac48Address::Allocate ());
+          uPhy->SetNodeInfo (niUser);
+          uMac->SetNodeInfo (niUser);
+
+          break;
+        }
+      default:
+        NS_FATAL_ERROR ("Forward or return link regeneration mode unknown");
+    }
+
+  // Connect callbacks on forward link
   switch (forwardLinkRegenerationMode)
     {
       case SatEnums::TRANSPARENT:
@@ -347,19 +396,13 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d,
           SatPhy::ReceiveCallback fCb = MakeCallback (&SatGeoNetDevice::ReceiveFeeder, dev);
           fPhy->SetAttribute ("ReceiveCb", CallbackValue (fCb));
 
-          // Create a node info to PHY layers
-          Ptr<SatNodeInfo> niPhyUser = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, Mac48Address::ConvertFrom (d->GetAddress ()));
-          uPhy->SetNodeInfo (niPhyUser);
-
-          Ptr<SatNodeInfo> niPhyFeeder = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, Mac48Address::ConvertFrom (d->GetAddress ()));
-          fPhy->SetNodeInfo (niPhyFeeder);
-
           break;
         }
       default:
         NS_FATAL_ERROR ("Forward link regeneration mode unknown");
     }
 
+  // Connect callbacks on return link
   switch (returnLinkRegenerationMode)
     {
       case SatEnums::TRANSPARENT:
@@ -372,34 +415,14 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d,
         }
       case SatEnums::REGENERATION_LINK:
         {
-          Ptr<SatGeoUserMac> uMac = CreateObject<SatGeoUserMac> (userBeamId,
-                                                                 forwardLinkRegenerationMode,
-                                                                 returnLinkRegenerationMode);
-
-          Ptr<SatGeoFeederMac> fMac = CreateObject<SatGeoFeederMac> (userBeamId,
-                                                                     forwardLinkRegenerationMode,
-                                                                     returnLinkRegenerationMode);
-
           SatPhy::ReceiveCallback uCb = MakeCallback (&SatGeoUserMac::Receive, uMac);
           uPhy->SetAttribute ("ReceiveCb", CallbackValue (uCb));
 
-          dev->AddUserMac (uMac, userBeamId);
-          dev->AddFeederMac (fMac, userBeamId);
-
-          uMac->SetTransmitUserCallback (MakeCallback (&SatGeoUserPhy::SendPduWithParams, uPhy));
-          uMac->SetReceiveUserCallback (MakeCallback (&SatGeoNetDevice::ReceiveUser, dev));
-
           fMac->SetTransmitFeederCallback (MakeCallback (&SatGeoFeederPhy::SendPduWithParams, fPhy));
-          fMac->SetReceiveFeederCallback (MakeCallback (&SatGeoNetDevice::ReceiveUser, dev));
+          // fMac->SetReceiveFeederCallback (MakeCallback (&SatGeoNetDevice::ReceiveUser, dev));
 
-          // Create a node info to PHY and MAC layers
-          Ptr<SatNodeInfo> niUser = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, Mac48Address::Allocate ());
-          uPhy->SetNodeInfo (niUser);
-          uMac->SetNodeInfo (niUser);
-
-          Ptr<SatNodeInfo> niFeeder = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, Mac48Address::Allocate ());
-          fPhy->SetNodeInfo (niFeeder);
-          fMac->SetNodeInfo (niFeeder);
+          // uMac->SetTransmitUserCallback (MakeCallback (&SatGeoUserPhy::SendPduWithParams, uPhy));
+          uMac->SetReceiveUserCallback (MakeCallback (&SatGeoNetDevice::ReceiveUser, dev));
 
           break;
         }
