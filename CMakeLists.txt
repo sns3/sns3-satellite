@@ -69,6 +69,7 @@ set(source_files
     model/satellite-residual-interference-elimination.cc
     model/satellite-link-results.cc
     model/satellite-llc.cc
+    model/satellite-geo-llc.cc
     model/satellite-log.cc
     model/satellite-loo-conf.cc
     model/satellite-loo-model.cc
@@ -295,6 +296,7 @@ set(header_files
     model/satellite-residual-interference-elimination.h
     model/satellite-link-results.h
     model/satellite-llc.h
+    model/satellite-geo-llc.h
     model/satellite-log.h
     model/satellite-loo-conf.h
     model/satellite-loo-model.h

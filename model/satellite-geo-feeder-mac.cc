@@ -92,6 +92,99 @@ SatGeoFeederMac::DoInitialize ()
 }
 
 void
+SatGeoFeederMac::StartPeriodicTransmissions ()
+{
+  NS_LOG_FUNCTION (this);
+
+  /*if ( m_fwdScheduler == NULL )
+    {
+      NS_FATAL_ERROR ("Scheduler not set for GEO FEEDER MAC!!!");
+    }*/
+
+  /**
+   * It is currently assumed that there is only one carrier in FWD link. This
+   * carrier has a default index of 0.
+   * TODO: When enabling multi-carrier support for FWD link, we need to
+   * modify the FWD link scheduler to schedule separately each FWD link
+   * carrier.
+   */
+  Simulator::Schedule (Seconds (0), &SatGeoFeederMac::StartTransmission, this, 0);
+}
+
+void
+SatGeoFeederMac::StartTransmission (uint32_t carrierId)
+{
+  NS_LOG_FUNCTION (this);
+
+  /*if (m_nodeInfo->GetNodeType () == SatEnums::NT_GW)
+    {
+      m_lastSOF.push (Simulator::Now ());
+      uint8_t lastSOFSize = m_ncrV2 ? 3 : 1;
+      if (m_lastSOF.size () > lastSOFSize)
+        {
+          m_lastSOF.pop();
+        }
+    }
+
+  Time txDuration;
+
+  if (m_txEnabled)
+    {
+      std::pair<Ptr<SatBbFrame>, const Time> bbFrameInfo = m_fwdScheduler->GetNextFrame ();
+      Ptr<SatBbFrame> bbFrame = bbFrameInfo.first;
+      txDuration = bbFrameInfo.second;
+
+      // trace out BB frames sent.
+      m_bbFrameTxTrace (bbFrame);
+
+      // Handle both dummy frames and normal frames
+      if ( bbFrame != NULL )
+        {
+          // Add packet trace entry:
+          m_packetTrace (Simulator::Now (),
+                         SatEnums::PACKET_SENT,
+                         m_nodeInfo->GetNodeType (),
+                         m_nodeInfo->GetNodeId (),
+                         m_nodeInfo->GetMacAddress (),
+                         SatEnums::LL_MAC,
+                         SatEnums::LD_FORWARD,
+                         SatUtils::GetPacketInfo (bbFrame->GetPayload ()));
+
+          SatSignalParameters::txInfo_s txInfo;
+          txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
+          txInfo.modCod = bbFrame->GetModcod ();
+          txInfo.sliceId = bbFrame->GetSliceId ();
+          txInfo.frameType = bbFrame->GetFrameType ();
+          txInfo.waveformId = 0;*/
+
+          /**
+           * Decrease a guard time from BB frame duration.
+           */
+          /*SendPacket (bbFrame->GetPayload (), carrierId, txDuration - m_guardTime, txInfo);
+        }
+    }
+  else
+    {*/
+      /**
+       * GW MAC is disabled, thus get the duration of the default BB frame
+       * and try again then.
+       */
+
+      /*NS_LOG_INFO ("Beam id: " << m_beamId << " is disabled, thus nothing is transmitted!");
+      txDuration = m_fwdScheduler->GetDefaultFrameDuration ();
+    }*/
+
+  /**
+   * It is currently assumed that there is only one carrier in FWD link. This
+   * carrier has a default index of 0.
+   * TODO: When enabling multi-carrier support for FWD link, we need to
+   * modify the FWD link scheduler to schedule separately each FWD link
+   * carrier.
+   */
+  Simulator::Schedule (/*txDuration*/ MilliSeconds (100), &SatGeoFeederMac::StartTransmission, this, 0);
+}
+
+void
 SatGeoFeederMac::SendPackets (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> txParams)
 {
   NS_LOG_FUNCTION (this);

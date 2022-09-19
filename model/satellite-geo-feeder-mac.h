@@ -71,6 +71,11 @@ public:
   virtual void DoDispose (void);
 
   /**
+   * Starts periodical transmissions. Called when MAC is wanted to take care of periodic sending.
+   */
+  void StartPeriodicTransmissions ();
+
+  /**
    * \brief Send packets to lower layer by using a callback
    * \param packets Packets to be sent.
    * \param rxParams The parameters associated to these packets.
@@ -112,6 +117,17 @@ protected:
   virtual SatEnums::SatLinkDir_t GetSatLinkRxDir ();
 
 private:
+
+  /**
+   * Start sending a Packet Down the Wire.
+   *
+   * The StartTransmission method is used internally in the
+   * SatGwMac to begin the process of sending a packet out on the PHY layer.
+   *
+   * \param carrierId id of the carrier.
+   * \returns true if success, false on failure
+   */
+  void StartTransmission (uint32_t carrierId);
 
   /**
    * Regeneration mode on forward link.
