@@ -139,7 +139,7 @@ SatGenericStreamEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
       return packet;
     }
 
-  packet = GetNewGsePdu (bytes, m_maxGsePduSize);
+  packet = GetNewGsePdu (bytes, m_maxGsePduSize, SatAddressE2ETag::SIZE);
 
   if (packet)
     {

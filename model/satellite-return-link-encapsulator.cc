@@ -128,6 +128,7 @@ SatReturnLinkEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address /*dest*/)
       p->AddPacketTag (addressE2ETag);
     }
 
+
   /**
    * TODO: This is the place to encapsulate the higher layer packet
    * with Addressed Link (AL) header, if needed.
@@ -162,7 +163,7 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
       return packet;
     }
 
-  packet = GetNewRlePdu (bytes, MAX_PPDU_PACKET_SIZE);
+  packet = GetNewRlePdu (bytes, MAX_PPDU_PACKET_SIZE, SatAddressE2ETag::SIZE);
 
   if (packet)
     {

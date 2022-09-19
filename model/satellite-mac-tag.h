@@ -121,6 +121,8 @@ private:
 class SatAddressE2ETag : public Tag
 {
 public:
+  static const uint32_t SIZE = 12;
+
   /**
    * Default constructor.
    */
