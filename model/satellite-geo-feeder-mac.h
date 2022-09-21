@@ -29,7 +29,9 @@
 
 #include "satellite-phy.h"
 #include "satellite-mac.h"
+#include "satellite-geo-feeder-llc.h"
 #include "satellite-signal-parameters.h"
+#include "satellite-fwd-link-scheduler.h"
 
 
 namespace ns3 {
@@ -97,7 +99,27 @@ public:
 
   void SetReceiveFeederCallback (ReceiveFeederCallback cb);
 
+  /**
+   * Method to set SCPC link scheduler
+   * \param The scheduler to use
+   */
+  void SetFwdScheduler (Ptr<SatFwdLinkScheduler> fwdScheduler);
+
+  /**
+   * Set the Geo feeder LLC associated to this Geo feeder MAC layer
+   */
+  void SetLlc (Ptr<SatGeoFeederLlc> llc);
+
 protected:
+  /**
+   * \brief Send packets to lower layer by using a callback
+   * \param packets Packets to be sent.
+   * \param carrierId ID of the carrier used for transmission.
+   * \param duration Duration of the physical layer transmission.
+   * \param txInfo Additional parameterization for burst transmission.
+   */
+  virtual void SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time duration, SatSignalParameters::txInfo_s txInfo);
+
   /**
    * \brief Invoke the `Rx` trace source for each received packet.
    * \param packets Container of the pointers to the packets received.
@@ -139,8 +161,26 @@ private:
    */
   SatEnums::RegenerationMode_t m_returnLinkRegenerationMode;
 
+  /**
+   * Scheduler for the forward link.
+   */
+  Ptr<SatFwdLinkScheduler> m_fwdScheduler;
+
+  /**
+   * Guard time for BB frames. The guard time is modeled by shortening
+   * the duration of a BB frame by a m_guardTime set by an attribute.
+   */
+  Time m_guardTime;
+
   TransmitFeederCallback m_txFeederCallback;
   ReceiveFeederCallback m_rxFeederCallback;
+
+  /**
+   * Trace for transmitted BB frames.
+   */
+  TracedCallback<Ptr<SatBbFrame>> m_bbFrameTxTrace;
+
+  Ptr<SatGeoFeederLlc> m_llc;
 
 };
 

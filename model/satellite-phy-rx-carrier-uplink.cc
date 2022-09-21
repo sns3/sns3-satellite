@@ -23,6 +23,8 @@
 #include <ns3/log.h>
 #include <ns3/simulator.h>
 
+#include "satellite-uplink-info-tag.h"
+
 #include "satellite-phy-rx-carrier-uplink.h"
 
 
@@ -126,7 +128,15 @@ SatPhyRxCarrierUplink::EndRxData (uint32_t key)
   NS_ASSERT (!packetRxParams.rxParams->HasSinrComputed ());
 
   /// save 1st link sinr value for 2nd link composite sinr calculations
-  packetRxParams.rxParams->SetSinr (sinr, m_sinrCalculate);
+  SatSignalParameters::PacketsInBurst_t packets = packetRxParams.rxParams->m_packetsInBurst;
+  SatSignalParameters::PacketsInBurst_t::const_iterator i;
+  for (i = packets.begin (); i != packets.end (); i++)
+    {
+      SatUplinkInfoTag satUplinkInfoTag;
+      (*i)->RemovePacketTag (satUplinkInfoTag);
+      satUplinkInfoTag.SetSinr (sinr, m_sinrCalculate);
+      (*i)->AddPacketTag (satUplinkInfoTag);
+    }
 
   /// uses 1st link sinr
   m_linkBudgetTrace (packetRxParams.rxParams, GetOwnAddress (),

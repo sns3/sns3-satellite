@@ -250,7 +250,7 @@ SatMac::SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time 
    * The transmitted packets are gone through to check whether the PHY transmission
    * contains control packets. If a control packet is found, its control tag is peeked
    * and the control message is added to the control message container with control
-   * message id.
+   * message id. Only made if not on a satellite.
    */
   for (SatPhy::PacketContainer_t::const_iterator it = packets.begin ();
        it != packets.end (); ++it)

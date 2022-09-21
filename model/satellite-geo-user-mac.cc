@@ -114,8 +114,6 @@ SatGeoUserMac::SendPackets (SatPhy::PacketContainer_t packets, Ptr<SatSignalPara
           (*it)->AddPacketTag (mTag);
         }
     }
-
-  // TODO
   m_txUserCallback (txParams);
 }
 
@@ -124,7 +122,6 @@ SatGeoUserMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParamete
 {
   NS_LOG_FUNCTION (this);
 
-  // TODO
   m_rxUserCallback (packets, rxParams);
 }
 

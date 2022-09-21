@@ -257,7 +257,7 @@ protected:
    * \param duration Duration of the physical layer transmission.
    * \param txInfo Additional parameterization for burst transmission.
    */
-  void SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time duration, SatSignalParameters::txInfo_s txInfo);
+  virtual void SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time duration, SatSignalParameters::txInfo_s txInfo);
 
   /**
    * \brief Invoke the `Rx` trace source for each received packet.

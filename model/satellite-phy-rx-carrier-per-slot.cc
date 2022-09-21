@@ -30,6 +30,8 @@
 #include <ns3/boolean.h>
 #include <ns3/address.h>
 
+#include "satellite-uplink-info-tag.h"
+
 #include "satellite-phy-rx-carrier-per-slot.h"
 
 
@@ -106,6 +108,12 @@ SatPhyRxCarrierPerSlot::CreateInterference (Ptr<SatSignalParameters> rxParams, A
 {
   NS_LOG_FUNCTION (this << rxParams << senderAddress);
 
+  // Case satellite regenerative
+  if (GetLinkRegenerationMode () != SatEnums::TRANSPARENT)
+  {
+    return GetInterferenceModel ()->Add (rxParams->m_duration, rxParams->m_rxPower_W, GetOwnAddress ());
+  }
+
   SatEnums::ChannelType_t ct = GetChannelType ();
   if (ct == SatEnums::RETURN_FEEDER_CH)
     {
@@ -124,30 +132,27 @@ SatPhyRxCarrierPerSlot::CreateInterference (Ptr<SatSignalParameters> rxParams, A
 
       double rxPower (0.0);
 
+      // Get first link sinr (stored in any packet of container)
+      SatUplinkInfoTag satUplinkInfoTag;
+      if (!rxParams->m_packetsInBurst[0]->PeekPacketTag (satUplinkInfoTag))
+        {
+          NS_FATAL_ERROR ("SatUplinkInfoTag not found !");
+        }
+
       if (rxParams->m_beamId != GetBeamId ())
         {
-          if (!rxParams->HasSinrComputed () && GetLinkRegenerationMode () == SatEnums::TRANSPARENT)
+          if (!rxParams->HasSinrComputed ())
             {
               NS_FATAL_ERROR ("SatPhyRx::StartRx - too long transmission time: packet started to be received in a ground entity while not being fully received on the satellite: interferences could not be properly computed.");
             }
 
-          rxPower = rxParams->m_rxPower_W * (1 + 1 / rxParams->GetSinr ());
+          rxPower = rxParams->m_rxPower_W * (1 + 1 / satUplinkInfoTag.GetSinr ());
         }
 
       // Add the interference even regardless.
-      return GetInterferenceModel ()->Add (rxParams->m_duration,
-                                           rxPower,
-                                           GetOwnAddress ());
-    }
-  else if (ct == SatEnums::RETURN_USER_CH)
-    {
-      return GetInterferenceModel ()->Add (rxParams->m_duration, rxParams->m_rxPower_W, GetOwnAddress ());
+      return GetInterferenceModel ()->Add (rxParams->m_duration, rxPower, GetOwnAddress ());
     }
   else if (ct == SatEnums::FORWARD_USER_CH)
-    {
-      return GetInterferenceModel ()->Add (rxParams->m_duration, rxParams->m_rxPower_W, GetOwnAddress ());
-    }
-  else if (ct == SatEnums::FORWARD_FEEDER_CH)
     {
       return GetInterferenceModel ()->Add (rxParams->m_duration, rxParams->m_rxPower_W, GetOwnAddress ());
     }
@@ -260,7 +265,13 @@ SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams,
   double cSinr;
   if (GetLinkRegenerationMode () == SatEnums::TRANSPARENT)
     {
-      cSinr = CalculateCompositeSinr (sinr, packetRxParams.rxParams->GetSinr ());
+      // Get first link sinr (stored in any packet of container)
+      SatUplinkInfoTag satUplinkInfoTag;
+      if (!packetRxParams.rxParams->m_packetsInBurst[0]->PeekPacketTag (satUplinkInfoTag))
+        {
+          NS_FATAL_ERROR ("SatUplinkInfoTag not found !");
+        }
+      cSinr = CalculateCompositeSinr (sinr, satUplinkInfoTag.GetSinr ());
     }
   else
     {
@@ -270,7 +281,13 @@ SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams,
   double worstSinr;
   if (!m_cnoCallback.IsNull ())
     {
-      worstSinr = GetWorstSinr (sinr, packetRxParams.rxParams->GetSinr ());
+      // Get first link sinr (stored in any packet of container)
+      SatUplinkInfoTag satUplinkInfoTag;
+      if (!packetRxParams.rxParams->m_packetsInBurst[0]->PeekPacketTag (satUplinkInfoTag))
+        {
+          NS_FATAL_ERROR ("SatUplinkInfoTag not found !");
+        }
+      worstSinr = GetWorstSinr (sinr, satUplinkInfoTag.GetSinr ());
     }
 
   // Update composite SINR trace for DAMA and Slotted ALOHA packets
@@ -333,7 +350,15 @@ SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams,
     }
 
   /// save 2nd link sinr value
-  packetRxParams.rxParams->SetSinr (sinr, packetRxParams.rxParams->GetSinrCalculator ());
+  SatSignalParameters::PacketsInBurst_t packets = packetRxParams.rxParams->m_packetsInBurst;
+  SatSignalParameters::PacketsInBurst_t::const_iterator i;
+  for (i = packets.begin (); i != packets.end (); i++)
+    {
+      SatUplinkInfoTag satUplinkInfoTag;
+      (*i)->RemovePacketTag (satUplinkInfoTag);
+      satUplinkInfoTag.SetSinr (sinr, packetRxParams.rxParams->GetSinrCalculator ());
+      (*i)->AddPacketTag (satUplinkInfoTag);
+    }
 
   /// uses composite sinr
   m_linkBudgetTrace (packetRxParams.rxParams, GetOwnAddress (),
@@ -352,7 +377,7 @@ SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams,
        */
       double cno = (GetLinkRegenerationMode () == SatEnums::TRANSPARENT) ? cSinr : worstSinr;
 
-      // Forward link
+      // Forward link (or return feeder + SCPC)
       if (GetNodeInfo ()->GetNodeType () == SatEnums::NT_UT)
         {
           cno = SatUtils::DbToLinear (GetChannelEstimationErrorContainer ()->AddError (SatUtils::LinearToDb (cno)));
@@ -360,8 +385,16 @@ SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams,
       // Return link
       else if (GetNodeInfo ()->GetNodeType () == SatEnums::NT_GW)
         {
-          cno = SatUtils::DbToLinear (GetChannelEstimationErrorContainer ()->AddError (
-                                        SatUtils::LinearToDb (cno), packetRxParams.rxParams->m_txInfo.waveformId));
+          // If SCPC
+          if (GetLinkRegenerationMode () == SatEnums::REGENERATION_LINK || GetLinkRegenerationMode () == SatEnums::REGENERATION_NETWORK)
+            {
+              cno = SatUtils::DbToLinear (GetChannelEstimationErrorContainer ()->AddError (SatUtils::LinearToDb (cno)));
+            }
+          else
+            {
+              cno = SatUtils::DbToLinear (GetChannelEstimationErrorContainer ()->AddError (
+                                          SatUtils::LinearToDb (cno), packetRxParams.rxParams->m_txInfo.waveformId));
+            }
         }
       else
         {

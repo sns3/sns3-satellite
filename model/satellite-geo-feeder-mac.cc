@@ -28,6 +28,7 @@
 #include "satellite-utils.h"
 #include "satellite-geo-feeder-mac.h"
 #include "satellite-mac.h"
+#include "satellite-time-tag.h"
 #include "satellite-signal-parameters.h"
 
 
@@ -43,6 +44,20 @@ SatGeoFeederMac::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SatGeoFeederMac")
     .SetParent<SatMac> ()
     .AddConstructor<SatGeoFeederMac> ()
+    .AddAttribute ("Scheduler",
+                   "Return link scheduler used by this Sat Geo Feeder MAC (SCPC).",
+                   PointerValue (),
+                   MakePointerAccessor (&SatGeoFeederMac::m_fwdScheduler),
+                   MakePointerChecker<SatFwdLinkScheduler> ())
+    .AddAttribute ("GuardTime",
+                   "Guard time in SCPC link",
+                   TimeValue (MicroSeconds (1)),
+                   MakeTimeAccessor (&SatGeoFeederMac::m_guardTime),
+                   MakeTimeChecker ())
+    .AddTraceSource ("BBFrameTxTrace",
+                     "Trace for transmitted BB Frames.",
+                     MakeTraceSourceAccessor (&SatGeoFeederMac::m_bbFrameTxTrace),
+                     "ns3::SatBbFrame::BbFrameCallback")
   ;
   return tid;
 }
@@ -64,7 +79,9 @@ SatGeoFeederMac::SatGeoFeederMac (void)
 SatGeoFeederMac::SatGeoFeederMac (uint32_t beamId,
                                   SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                                   SatEnums::RegenerationMode_t returnLinkRegenerationMode)
- : SatMac (beamId)
+ : SatMac (beamId),
+  m_fwdScheduler (),
+  m_guardTime (MicroSeconds (1))
 {
   NS_LOG_FUNCTION (this);
 
@@ -96,18 +113,11 @@ SatGeoFeederMac::StartPeriodicTransmissions ()
 {
   NS_LOG_FUNCTION (this);
 
-  /*if ( m_fwdScheduler == NULL )
+  if ( m_fwdScheduler == NULL )
     {
       NS_FATAL_ERROR ("Scheduler not set for GEO FEEDER MAC!!!");
-    }*/
+    }
 
-  /**
-   * It is currently assumed that there is only one carrier in FWD link. This
-   * carrier has a default index of 0.
-   * TODO: When enabling multi-carrier support for FWD link, we need to
-   * modify the FWD link scheduler to schedule separately each FWD link
-   * carrier.
-   */
   Simulator::Schedule (Seconds (0), &SatGeoFeederMac::StartTransmission, this, 0);
 }
 
@@ -115,16 +125,6 @@ void
 SatGeoFeederMac::StartTransmission (uint32_t carrierId)
 {
   NS_LOG_FUNCTION (this);
-
-  /*if (m_nodeInfo->GetNodeType () == SatEnums::NT_GW)
-    {
-      m_lastSOF.push (Simulator::Now ());
-      uint8_t lastSOFSize = m_ncrV2 ? 3 : 1;
-      if (m_lastSOF.size () > lastSOFSize)
-        {
-          m_lastSOF.pop();
-        }
-    }
 
   Time txDuration;
 
@@ -155,24 +155,24 @@ SatGeoFeederMac::StartTransmission (uint32_t carrierId)
           txInfo.modCod = bbFrame->GetModcod ();
           txInfo.sliceId = bbFrame->GetSliceId ();
           txInfo.frameType = bbFrame->GetFrameType ();
-          txInfo.waveformId = 0;*/
+          txInfo.waveformId = 0;
 
           /**
            * Decrease a guard time from BB frame duration.
            */
-          /*SendPacket (bbFrame->GetPayload (), carrierId, txDuration - m_guardTime, txInfo);
+          SendPacket (bbFrame->GetPayload (), carrierId, txDuration - m_guardTime, txInfo);
         }
     }
   else
-    {*/
+    {
       /**
        * GW MAC is disabled, thus get the duration of the default BB frame
        * and try again then.
        */
 
-      /*NS_LOG_INFO ("Beam id: " << m_beamId << " is disabled, thus nothing is transmitted!");
+      NS_LOG_INFO ("Beam id: " << m_beamId << " is disabled, thus nothing is transmitted!");
       txDuration = m_fwdScheduler->GetDefaultFrameDuration ();
-    }*/
+    }
 
   /**
    * It is currently assumed that there is only one carrier in FWD link. This
@@ -181,7 +181,7 @@ SatGeoFeederMac::StartTransmission (uint32_t carrierId)
    * modify the FWD link scheduler to schedule separately each FWD link
    * carrier.
    */
-  Simulator::Schedule (/*txDuration*/ MilliSeconds (100), &SatGeoFeederMac::StartTransmission, this, 0);
+  Simulator::Schedule (txDuration, &SatGeoFeederMac::StartTransmission, this, 0);
 }
 
 void
@@ -206,9 +206,34 @@ SatGeoFeederMac::SendPackets (SatPhy::PacketContainer_t packets, Ptr<SatSignalPa
           mTag.SetSourceAddress (m_nodeInfo->GetMacAddress ());
           (*it)->AddPacketTag (mTag);
         }
+
+      m_llc->Enque (*it, addressE2ETag.GetE2EDestAddress (), 0);
+    }
+}
+
+void
+SatGeoFeederMac::SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time duration, SatSignalParameters::txInfo_s txInfo)
+{
+  NS_LOG_FUNCTION (this);
+
+  // Add a SatMacTimeTag tag for packet delay computation at the receiver end.
+  if (m_isStatisticsTagsEnabled)
+    {
+      for (SatPhy::PacketContainer_t::const_iterator it = packets.begin ();
+           it != packets.end (); ++it)
+        {
+          (*it)->AddPacketTag (SatMacTimeTag (Simulator::Now ()));
+        }
     }
 
-  // TODO
+  Ptr<SatSignalParameters> txParams = Create<SatSignalParameters> ();
+  txParams->m_duration = duration;
+  txParams->m_packetsInBurst = packets;
+  txParams->m_beamId = m_beamId;
+  txParams->m_carrierId = carrierId;
+  txParams->m_txInfo = txInfo;
+
+  // Use call back to send packet to lower layer
   m_txFeederCallback (txParams);
 }
 
@@ -217,7 +242,6 @@ SatGeoFeederMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParame
 {
   NS_LOG_FUNCTION (this);
 
-  // TODO
   m_rxFeederCallback (packets, rxParams);
 }
 
@@ -257,6 +281,18 @@ SatEnums::SatLinkDir_t
 SatGeoFeederMac::GetSatLinkRxDir ()
 {
   return SatEnums::LD_RETURN;
+}
+
+void
+SatGeoFeederMac::SetFwdScheduler (Ptr<SatFwdLinkScheduler> fwdScheduler)
+{
+  m_fwdScheduler = fwdScheduler;
+}
+
+void
+SatGeoFeederMac::SetLlc (Ptr<SatGeoFeederLlc> llc)
+{
+  m_llc = llc;
 }
 
 } // namespace ns3

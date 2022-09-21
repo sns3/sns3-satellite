@@ -37,6 +37,7 @@
 #include "satellite-control-message.h"
 #include "satellite-fwd-link-scheduler.h"
 #include "satellite-time-tag.h"
+#include "satellite-uplink-info-tag.h"
 #include "satellite-gw-mac.h"
 
 
@@ -236,7 +237,17 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> r
     {
       if (m_useCmt)
         {
-          SendCmtMessage (utId, rxParams->m_duration, rxParams->m_satelliteReceptionTime);
+          for (SatPhy::PacketContainer_t::iterator i = packets.begin (); i != packets.end (); i++ )
+            {
+              SatUplinkInfoTag satUplinkInfoTag;
+              if (!(*i)->PeekPacketTag (satUplinkInfoTag))
+                {
+                  NS_FATAL_ERROR ("SatUplinkInfoTag not found !");
+                }
+              Time satelliteReceptionTime = satUplinkInfoTag.GetSatelliteReceptionTime ();
+
+              SendCmtMessage (utId, rxParams->m_duration, satelliteReceptionTime);
+            }
         }
       m_controlMessageReceivedCallback (utId, m_beamId);
     }

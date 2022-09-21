@@ -353,7 +353,6 @@ SatPhy::SendPdu (PacketContainer_t p, uint32_t carrierId, Time duration, SatSign
   // Create a new SatSignalParameters related to this packet transmission
   Ptr<SatSignalParameters> txParams = Create<SatSignalParameters> ();
   txParams->m_duration = duration;
-  txParams->m_satelliteReceptionTime = Seconds (0);
   txParams->m_phyTx = m_phyTx;
   txParams->m_packetsInBurst = p;
   txParams->m_beamId = m_beamId;

@@ -35,6 +35,9 @@
 #include "ns3/satellite-phy.h"
 #include "ns3/satellite-superframe-sequence.h"
 #include "ns3/satellite-typedefs.h"
+#include "ns3/satellite-bbframe-conf.h"
+#include "ns3/satellite-fwd-link-scheduler.h"
+#include "ns3/satellite-fwd-link-scheduler-scpc.h"
 
 namespace ns3 {
 
@@ -229,6 +232,10 @@ private:
    * Constant error rate for dedicated access in the RTN user link.
    */
   double m_rtnDaConstantErrorRate;
+
+  double m_symbolRate;
+
+  Ptr<SatBbFrameConf> m_bbFrameConf;
 
   /**
    * \brief Trace callback for creation traces

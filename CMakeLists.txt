@@ -46,6 +46,7 @@ set(source_files
     model/satellite-fwd-link-scheduler.cc
     model/satellite-fwd-link-scheduler-default.cc
     model/satellite-fwd-link-scheduler-time-slicing.cc
+    model/satellite-fwd-link-scheduler-scpc.cc
     model/satellite-frame-allocator.cc
     model/satellite-frame-conf.cc
     model/satellite-free-space-loss.cc
@@ -70,6 +71,8 @@ set(source_files
     model/satellite-link-results.cc
     model/satellite-llc.cc
     model/satellite-geo-llc.cc
+    model/satellite-geo-feeder-llc.cc
+    model/satellite-geo-user-llc.cc
     model/satellite-log.cc
     model/satellite-loo-conf.cc
     model/satellite-loo-model.cc
@@ -129,6 +132,7 @@ set(source_files
     model/satellite-superframe-sequence.cc
     model/satellite-tbtp-container.cc
     model/satellite-time-tag.cc
+    model/satellite-uplink-info-tag.cc
     model/satellite-traced-interference.cc
     model/satellite-traced-mobility-model.cc
     model/satellite-ut-handover-module.cc
@@ -276,6 +280,7 @@ set(header_files
     model/satellite-fwd-link-scheduler.h
     model/satellite-fwd-link-scheduler-default.h
     model/satellite-fwd-link-scheduler-time-slicing.h
+    model/satellite-fwd-link-scheduler-scpc.h
     model/satellite-generic-stream-encapsulator.h
     model/satellite-generic-stream-encapsulator-arq.h
     model/satellite-geo-feeder-phy.h
@@ -297,6 +302,8 @@ set(header_files
     model/satellite-link-results.h
     model/satellite-llc.h
     model/satellite-geo-llc.h
+    model/satellite-geo-feeder-llc.h
+    model/satellite-geo-user-llc.h
     model/satellite-log.h
     model/satellite-loo-conf.h
     model/satellite-loo-model.h
@@ -356,6 +363,7 @@ set(header_files
     model/satellite-superframe-sequence.h
     model/satellite-tbtp-container.h
     model/satellite-time-tag.h
+    model/satellite-uplink-info-tag.h
     model/satellite-traced-interference.h
     model/satellite-traced-mobility-model.h
     model/satellite-typedefs.h

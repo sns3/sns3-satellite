@@ -205,7 +205,7 @@ SatBbFrameConf::SatBbFrameConf (double symbolRate, SatEnums::DvbVersion_t dvbVer
   m_modCodsUsed.clear ();
   GetModCodsList ();
 
-  switch(m_dvbVersion)
+  switch (m_dvbVersion)
     {
       case SatEnums::DVB_S2:
         m_defaultModCod = SatEnums::GetModcodFromName ("SAT_MODCOD_" + m_defaultModCodStr);

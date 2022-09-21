@@ -92,8 +92,9 @@ public:
    * \param lrRcs2 return link results
    * \param lrFwd DVB-S2 or DVB-S2X link results
    * \param dvbVersion The DVB version chosen
+   * \param useScpc Use SCPC on return feeder (and then lrFwd link results)
    */
-  void Initialize (Ptr<SatLinkResultsRtn> lrRcs2, Ptr<SatLinkResultsFwd> lrFwd, SatEnums::DvbVersion_t dvbVersion);
+  void Initialize (Ptr<SatLinkResultsRtn> lrRcs2, Ptr<SatLinkResultsFwd> lrFwd, SatEnums::DvbVersion_t dvbVersion, bool useScpc);
 
   /**
    * Get BB frame configuration.

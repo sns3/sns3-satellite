@@ -165,7 +165,7 @@ SatGwHelper::SatGwHelper (SatTypedefs::CarrierBandwidthConverter_t carrierBandwi
 }
 
 void
-SatGwHelper::Initialize (Ptr<SatLinkResultsRtn> lrRcs2, Ptr<SatLinkResultsFwd> lrFwd, SatEnums::DvbVersion_t dvbVersion)
+SatGwHelper::Initialize (Ptr<SatLinkResultsRtn> lrRcs2, Ptr<SatLinkResultsFwd> lrFwd, SatEnums::DvbVersion_t dvbVersion, bool useScpc)
 {
   NS_LOG_FUNCTION (this);
 
@@ -191,6 +191,10 @@ SatGwHelper::Initialize (Ptr<SatLinkResultsRtn> lrRcs2, Ptr<SatLinkResultsFwd> l
   if (lrRcs2 && m_errorModel == SatPhyRxCarrierConf::EM_AVI)
     {
       m_linkResults = lrRcs2;
+    }
+  if (useScpc)
+    {
+      m_linkResults = lrFwd;
     }
 
   m_bbFrameConf = CreateObject<SatBbFrameConf> (m_symbolRate, dvbVersion);
@@ -301,7 +305,14 @@ SatGwHelper::InstallDvb (Ptr<Node> n,
     {
       uint32_t minWfId = m_superframeSeq->GetWaveformConf ()->GetMinWfId ();
       uint32_t maxWfId = m_superframeSeq->GetWaveformConf ()->GetMaxWfId ();
-      cec = Create<SatRtnLinkChannelEstimationErrorContainer> (minWfId, maxWfId);
+      if (returnLinkRegenerationMode == SatEnums::TRANSPARENT || returnLinkRegenerationMode == SatEnums::REGENERATION_PHY)
+        {
+          cec = Create<SatRtnLinkChannelEstimationErrorContainer> (minWfId, maxWfId);
+        }
+      else
+        {
+          cec = Create<SatFwdLinkChannelEstimationErrorContainer> ();
+        }
     }
 
   SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters = SatPhyRxCarrierConf::RxCarrierCreateParams_s ();
@@ -527,7 +538,14 @@ SatGwHelper::InstallLora (Ptr<Node> n,
     {
       uint32_t minWfId = m_superframeSeq->GetWaveformConf ()->GetMinWfId ();
       uint32_t maxWfId = m_superframeSeq->GetWaveformConf ()->GetMaxWfId ();
-      cec = Create<SatRtnLinkChannelEstimationErrorContainer> (minWfId, maxWfId);
+      if (returnLinkRegenerationMode == SatEnums::TRANSPARENT || returnLinkRegenerationMode == SatEnums::REGENERATION_PHY)
+        {
+          cec = Create<SatRtnLinkChannelEstimationErrorContainer> (minWfId, maxWfId);
+        }
+      else
+        {
+          cec = Create<SatFwdLinkChannelEstimationErrorContainer> ();
+        }
     }
 
   SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters = SatPhyRxCarrierConf::RxCarrierCreateParams_s ();

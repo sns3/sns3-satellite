@@ -262,8 +262,14 @@ SatGeoFeederPhy::SendPduWithParams (Ptr<SatSignalParameters> txParams )
    * 2) For all CRDSA, SA, and DA.
    */
 
-  txParams->m_txPower_W = txParams->m_rxPower_W * SatUtils::DbToLinear (m_fixedAmplificationGainDb);
-  //txParams->m_txPower_W = m_eirpWoGainW;
+  if (m_returnLinkRegenerationMode == SatEnums::TRANSPARENT)
+    {
+      txParams->m_txPower_W = txParams->m_rxPower_W * SatUtils::DbToLinear (m_fixedAmplificationGainDb);
+    }
+  else
+    {
+      txParams->m_txPower_W = m_eirpWoGainW;
+    }
 
   NS_LOG_INFO ("Amplified Tx power: " << SatUtils::LinearToDb (txParams->m_txPower_W));
   NS_LOG_INFO ("Statically configured tx power: " << SatUtils::LinearToDb (m_eirpWoGainW));

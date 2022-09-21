@@ -571,8 +571,19 @@ SatPhyRxCarrier::CheckAgainstLinkResultsErrorModelAvi (double cSinr, Ptr<SatSign
         double ebNo = cSinr / (SatUtils::GetCodingRate (rxParams->m_txInfo.modCod) *
                                SatUtils::GetModulatedBits (rxParams->m_txInfo.modCod));
 
-        double ber = (GetLinkResults ()->GetObject <SatLinkResultsRtn> ())->GetBler (rxParams->m_txInfo.waveformId,
-                                                                                         SatUtils::LinearToDb (ebNo));
+        double ber;
+        if ((m_linkRegenerationMode == SatEnums::REGENERATION_LINK || m_linkRegenerationMode == SatEnums::REGENERATION_NETWORK)
+             && GetChannelType () == SatEnums::RETURN_FEEDER_CH)
+          {
+            ber = (GetLinkResults ()->GetObject <SatLinkResultsFwd> ())->GetBler (rxParams->m_txInfo.modCod,
+                                                                                  rxParams->m_txInfo.frameType,
+                                                                                  SatUtils::LinearToDb (cSinr));
+          }
+        else
+          {
+            ber = (GetLinkResults ()->GetObject <SatLinkResultsRtn> ())->GetBler (rxParams->m_txInfo.waveformId,
+                                                                                           SatUtils::LinearToDb (ebNo));
+          }
         double r = GetUniformRandomValue (0, 1);
 
         if ( r < ber )

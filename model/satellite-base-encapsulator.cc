@@ -90,14 +90,20 @@ SatBaseEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address dest)
 
   // Add flow id tag
   SatFlowIdTag flowIdTag;
-  flowIdTag.SetFlowId (m_flowId);
-  p->AddPacketTag (flowIdTag);
+  if (!p->PeekPacketTag (flowIdTag))
+    {
+      flowIdTag.SetFlowId (m_flowId);
+      p->AddPacketTag (flowIdTag);
+    }
 
   // Add MAC tag to identify the packet in lower layers
   SatMacTag mTag;
-  mTag.SetDestAddress (dest);
-  mTag.SetSourceAddress (m_sourceAddress);
-  p->AddPacketTag (mTag);
+  if (!p->PeekPacketTag (mTag))
+    {
+      mTag.SetDestAddress (dest);
+      mTag.SetSourceAddress (m_sourceAddress);
+      p->AddPacketTag (mTag);
+    }
 
   NS_LOG_INFO ("Tx Buffer: New packet added of size: " << p->GetSize ());
 

@@ -38,6 +38,8 @@
 #include "ns3/satellite-geo-user-phy.h"
 #include "ns3/satellite-geo-feeder-mac.h"
 #include "ns3/satellite-geo-user-mac.h"
+#include "ns3/satellite-geo-feeder-llc.h"
+#include "ns3/satellite-geo-user-llc.h"
 #include "ns3/satellite-phy-tx.h"
 #include "ns3/satellite-phy-rx.h"
 #include "ns3/satellite-phy-rx-carrier-conf.h"
@@ -178,6 +180,11 @@ SatGeoHelper::Initialize (Ptr<SatLinkResultsFwd> lrFwd, Ptr<SatLinkResultsRtn> l
     {
       m_rtnLinkResults = lrRcs2;
     }
+
+  m_symbolRate = m_carrierBandwidthConverter (SatEnums::RETURN_FEEDER_CH, 0, SatEnums::EFFECTIVE_BANDWIDTH);
+
+  m_bbFrameConf = CreateObject<SatBbFrameConf> (m_symbolRate, SatEnums::DVB_S2); // TODO We should be able to switch to S2X ?
+  m_bbFrameConf->InitializeCNoRequirements (lrFwd);
 }
 
 void
@@ -343,6 +350,12 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d,
   Ptr<SatGeoFeederMac> fMac;
   Ptr<SatGeoUserMac> uMac;
 
+  Ptr<SatGeoFeederLlc> fLlc;
+  Ptr<SatGeoUserLlc> uLlc;
+
+  Mac48Address feederAddress;
+  Mac48Address userAddress;
+
   // Create layers needed depending on max regeneration mode
   switch (std::max (forwardLinkRegenerationMode, returnLinkRegenerationMode))
     {
@@ -369,15 +382,21 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d,
                                               forwardLinkRegenerationMode,
                                               returnLinkRegenerationMode);
 
+          // Create LLC layer
+          fLlc = CreateObject<SatGeoFeederLlc> ();
+
           dev->AddFeederMac (fMac, userBeamId);
           dev->AddUserMac (uMac, userBeamId);
 
           // Create a node info to PHY and MAC layers
-          Ptr<SatNodeInfo> niFeeder = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, Mac48Address::Allocate ());
+          feederAddress = Mac48Address::Allocate ();
+          Ptr<SatNodeInfo> niFeeder = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, feederAddress);
           fPhy->SetNodeInfo (niFeeder);
           fMac->SetNodeInfo (niFeeder);
+          fLlc->SetNodeInfo (niFeeder);
 
-          Ptr<SatNodeInfo> niUser = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, Mac48Address::Allocate ());
+          userAddress = Mac48Address::Allocate ();
+          Ptr<SatNodeInfo> niUser = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, userAddress);
           uPhy->SetNodeInfo (niUser);
           uMac->SetNodeInfo (niUser);
 
@@ -419,10 +438,17 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d,
           uPhy->SetAttribute ("ReceiveCb", CallbackValue (uCb));
 
           fMac->SetTransmitFeederCallback (MakeCallback (&SatGeoFeederPhy::SendPduWithParams, fPhy));
-          // fMac->SetReceiveFeederCallback (MakeCallback (&SatGeoNetDevice::ReceiveUser, dev));
-
-          // uMac->SetTransmitUserCallback (MakeCallback (&SatGeoUserPhy::SendPduWithParams, uPhy));
           uMac->SetReceiveUserCallback (MakeCallback (&SatGeoNetDevice::ReceiveUser, dev));
+
+          double carrierBandwidth = m_carrierBandwidthConverter (SatEnums::RETURN_FEEDER_CH, 0, SatEnums::EFFECTIVE_BANDWIDTH);
+          Ptr<SatFwdLinkSchedulerScpc> fwdLinkSchedulerScpc = CreateObject<SatFwdLinkSchedulerScpc> (m_bbFrameConf, feederAddress, carrierBandwidth);
+          fMac->SetFwdScheduler (fwdLinkSchedulerScpc);
+          fMac->SetLlc (fLlc);
+          fMac->StartPeriodicTransmissions ();
+
+          // Attach the LLC Tx opportunity and scheduling context getter callbacks to SatFwdLinkScheduler
+          fwdLinkSchedulerScpc->SetTxOpportunityCallback (MakeCallback (&SatGeoLlc::NotifyTxOpportunity, fLlc));
+          fwdLinkSchedulerScpc->SetSchedContextCallback (MakeCallback (&SatLlc::GetSchedulingContexts, fLlc));
 
           break;
         }

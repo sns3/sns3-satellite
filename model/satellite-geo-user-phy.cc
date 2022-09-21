@@ -38,6 +38,7 @@
 #include "satellite-channel-estimation-error-container.h"
 #include "satellite-address-tag.h"
 #include "satellite-time-tag.h"
+#include "satellite-uplink-info-tag.h"
 
 
 NS_LOG_COMPONENT_DEFINE ("SatGeoUserPhy");
@@ -315,7 +316,15 @@ SatGeoUserPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
       if (m_returnLinkRegenerationMode != SatEnums::TRANSPARENT)
         {
           rxParams->m_txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
-          rxParams->m_satelliteReceptionTime = Simulator::Now ();
+
+          SatSignalParameters::PacketsInBurst_t::iterator it;
+          for (it = rxParams->m_packetsInBurst.begin (); it != rxParams->m_packetsInBurst.end (); it++)
+            {
+              SatUplinkInfoTag satUplinkInfoTag;
+              (*it)->RemovePacketTag (satUplinkInfoTag);
+              satUplinkInfoTag.SetSatelliteReceptionTime (Simulator::Now ());
+              (*it)->AddPacketTag (satUplinkInfoTag);
+            }
 
           RxTraces (rxParams->m_packetsInBurst);
         }

@@ -23,6 +23,7 @@
 
 #include "satellite-base-encapsulator.h"
 #include "satellite-llc.h"
+#include "satellite-node-info.h"
 
 
 namespace ns3 {
@@ -75,6 +76,36 @@ public:
     */
   virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, Mac48Address utAddr, uint8_t flowId, uint32_t &bytesLeft, uint32_t &nextMinTxO);
 
+  /**
+   * \brief Create and fill the scheduling objects based on LLC layer information.
+   * Scheduling objects may be used at the MAC layer to assist in scheduling.
+   * \param output reference to an output vector that will be filled with
+   *               pointer to scheduling objects
+   */
+  virtual void GetSchedulingContexts (std::vector< Ptr<SatSchedulingObject> > & output) const;
+
+  /**
+   * \brief Get the number of (new) bytes at LLC queue for a certain UT. Method
+   * checks only the SatQueue for packets, thus it does not count possible
+   * packets buffered at the encapsulator (e.g. in case of ARQ). This is a pure
+   * virtual method to be implemented to inherited classes.
+   * \param utAddress the MAC address that identifies a particular UT node.
+   * \return Number of bytes currently queued in the encapsulator(s)
+   *         associated with the UT.
+   */
+  virtual uint32_t GetNBytesInQueue (Mac48Address utAddress) const;
+
+  /**
+    \brief Get the number of (new) packets at LLC queues for a certain UT. Method
+   * checks only the SatQueue for packets, thus it does not count possible
+   * packets buffered at the encapsulator (e.g. in case of ARQ). This is a pure
+   * virtual method to be implemented to inherited classes.
+   * \param utAddress the MAC address that identifies a particular UT node.
+   * \return Number of packets currently queued in the encapsulator(s)
+   *         associated with the UT.
+   */
+  virtual uint32_t GetNPacketsInQueue (Mac48Address utAddress) const;
+
 protected:
   /**
    * Dispose of this class instance
@@ -82,9 +113,20 @@ protected:
   virtual void DoDispose ();
 
   /**
-   * Simple FIFO encapsulator to store packets.
+   * \brief Virtual method to create a new encapsulator 'on-a-need-basis' dynamically.
+   * Method is implemented in the inherited class which knows which type of encapsulator to create.
+   * This is a pure virtual method to be implemented to inherited classes.
+   * \param key Encapsulator key class
    */
-  Ptr<SatBaseEncapsulator> m_encap;
+  virtual void CreateEncap (Ptr<EncapKey> key);
+
+  /**
+   * \brief Virtual method to create a new decapsulator 'on-a-need-basis' dynamically.
+   * Method is implemented in the inherited class which knows which type of decapsulator to create.
+   * This is a pure virtual method to be implemented to inherited classes.
+   * \param key Encapsulator key class
+   */
+  virtual void CreateDecap (Ptr<EncapKey> key);
 
 };
 
