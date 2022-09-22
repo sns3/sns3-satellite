@@ -174,7 +174,7 @@ SatPhyRxCarrierMarsala::PerformMarsala (
                                         replicasNoisePower,
                                         replicasAciIfPower,
                                         replicasExtNoisePower,
-                                        m_sinrCalculate);
+                                        m_additionalInterferenceCallback ());
 
           /// calculate composite SINR if transparent. Otherwise take only current sinr.
           double cSinr;
@@ -185,7 +185,7 @@ SatPhyRxCarrierMarsala::PerformMarsala (
                                                      replicasNoisePowerInSatellite,
                                                      replicasAciIfPowerInSatellite,
                                                      replicasExtNoisePowerInSatellite,
-                                                     currentPacket->rxParams->GetSinrCalculator ());
+                                                     currentPacket->rxParams->GetAdditionalInterference ());
               cSinr = CalculateCompositeSinr (sinr, sinrSatellite);
             }
           else

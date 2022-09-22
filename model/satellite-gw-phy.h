@@ -79,12 +79,11 @@ public:
   virtual void DoDispose (void);
 
   /**
-   * GW specific SINR calculator.
-   * Calculate SINR with GW PHY specific parameters and given SINR.
+   * \brief Get additional interference, used to compute final SINR at RX
    *
-   * \param sinr Calculated (C/NI)
+   * \return Additional interference
    */
-  virtual double CalculateSinr (double sinr);
+  virtual double GetAdditionalInterference ();
 
 protected:
   /**

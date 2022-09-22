@@ -264,7 +264,7 @@ SatPhyRxCarrierPerWindow::CalculatePacketInterferenceVectors (SatPhyRxCarrierPer
                                m_rxNoisePowerW,
                                m_rxAciIfPowerW,
                                m_rxExtNoisePowerW,
-                               m_sinrCalculate);
+                               m_additionalInterferenceCallback ());
 
   double cSnr;
   if (GetLinkRegenerationMode () == SatEnums::TRANSPARENT)
@@ -275,7 +275,7 @@ SatPhyRxCarrierPerWindow::CalculatePacketInterferenceVectors (SatPhyRxCarrierPer
                                             packet.rxParams->GetRxNoisePowerInSatellite (),
                                             packet.rxParams->GetRxAciIfPowerInSatellite (),
                                             packet.rxParams->GetRxExtNoisePowerInSatellite (),
-                                            packet.rxParams->GetSinrCalculator ());
+                                            packet.rxParams->GetAdditionalInterference ());
 
       cSnr = CalculateCompositeSinr (snr, snrSatellite);
     }

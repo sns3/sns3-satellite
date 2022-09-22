@@ -102,13 +102,11 @@ public:
   virtual void Receive (Ptr<SatSignalParameters> rxParams, bool phyError);
 
   /**
-   * \brief Geo Feeder specific SINR calculator.
-   * Calculate SINR with Geo Feeder PHY specific parameters and given SINR.
+   * \brief Get additional interference, used to compute final SINR at RX
    *
-   * \param sinr Calculated link specific SINR
-   * \return SINR with IM interference
+   * \return Additional interference
    */
-  virtual double CalculateSinr (double sinr);
+  virtual double GetAdditionalInterference ();
 
   /**
    * \brief Callback signature for `QueueSizeBytes` and `QueueSizePackets` trace source.

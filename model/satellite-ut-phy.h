@@ -92,13 +92,11 @@ public:
   virtual void DoDispose (void);
 
   /**
-   * UT specific SINR calculator.
-   * Calculate SINR with UT PHY specific parameters and given SINR.
+   * \brief Get additional interference, used to compute final SINR at RX
    *
-   * \param sinr Calculated (C/NI)
-   * \return Final SINR, which takes into account configured additional interferences (C over I)
+   * \return Additional interference
    */
-  virtual double CalculateSinr (double sinr);
+  virtual double GetAdditionalInterference ();
 
   /**
    * \brief Change underlying SatChannel to send and receive data from a new beam

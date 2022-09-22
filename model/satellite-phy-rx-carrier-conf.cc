@@ -51,7 +51,7 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf ()
   m_channelType (),
   m_linkRegenerationMode (),
   m_channelEstimationError (),
-  m_sinrCalculate (),
+  m_additionalInterferenceCallback (),
   m_linkResults (),
   m_rxExtNoiseDensityWhz (0),
   m_enableIntfOutputTrace (false),
@@ -78,7 +78,7 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf (RxCarrierCreateParams_s createParams)
   m_channelType (createParams.m_chType),
   m_linkRegenerationMode (createParams.m_linkRegenerationMode),
   m_channelEstimationError (createParams.m_cec),
-  m_sinrCalculate (),
+  m_additionalInterferenceCallback (),
   m_linkResults (),
   m_rxExtNoiseDensityWhz (createParams.m_extNoiseDensityWhz),
   m_enableIntfOutputTrace (false),
@@ -123,7 +123,7 @@ SatPhyRxCarrierConf::DoDispose ()
 
   m_linkResults = NULL;
   m_carrierBandwidthConverter.Nullify ();
-  m_sinrCalculate.Nullify ();
+  m_additionalInterferenceCallback.Nullify ();
 
   Object::DoDispose ();
 }

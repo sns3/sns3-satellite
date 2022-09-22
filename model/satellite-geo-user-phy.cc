@@ -182,7 +182,7 @@ SatGeoUserPhy::SatGeoUserPhy (SatPhy::CreateParam_t& params,
       carrierConf->SetLinkResults (linkResults);
     }
 
-  carrierConf->SetSinrCalculatorCb (MakeCallback (&SatGeoUserPhy::CalculateSinr, this));
+  carrierConf->SetAdditionalInterferenceCb (MakeCallback (&SatGeoUserPhy::GetAdditionalInterference, this));
 
   SatPhy::ConfigureRxCarriers (carrierConf, superFrameConf);
 }
@@ -334,21 +334,11 @@ SatGeoUserPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
 }
 
 double
-SatGeoUserPhy::CalculateSinr (double sinr)
+SatGeoUserPhy::GetAdditionalInterference ()
 {
-  NS_LOG_FUNCTION (this << sinr);
+  NS_LOG_FUNCTION (this);
 
-  if ( sinr <= 0  )
-    {
-      NS_FATAL_ERROR ( "Calculated own SINR is expected to be greater than zero!!!");
-    }
-
-  // calculate final SINR taken into account configured additional interferences (C over I)
-  // in addition to CCI which is included in given SINR
-
-  double finalSinr = 1 / ( (1 / sinr) + (1 / m_aciInterferenceCOverI) + (1 / m_otherSysInterferenceCOverI) );
-
-  return (finalSinr);
+  return 1 / ( (1 / m_aciInterferenceCOverI) + (1 / m_otherSysInterferenceCOverI) );
 }
 
 SatEnums::SatLinkDir_t

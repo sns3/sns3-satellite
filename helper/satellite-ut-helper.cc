@@ -294,6 +294,7 @@ SatUtHelper::InstallDvb (Ptr<Node> n, uint32_t beamId,
   parameters.m_daIfModel = m_daInterferenceModel;
   parameters.m_raIfModel = m_raSettings.m_raInterferenceModel;
   parameters.m_raIfEliminateModel = m_raSettings.m_raInterferenceEliminationModel;
+  parameters.m_linkRegenerationMode = forwardLinkRegenerationMode;
   parameters.m_bwConverter = m_carrierBandwidthConverter;
   parameters.m_carrierCount = m_fwdLinkCarrierCount;
   parameters.m_cec = cec;
@@ -584,6 +585,7 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
   parameters.m_daIfModel = m_daInterferenceModel;
   parameters.m_raIfModel = m_raSettings.m_raInterferenceModel;
   parameters.m_raIfEliminateModel = m_raSettings.m_raInterferenceEliminationModel;
+  parameters.m_linkRegenerationMode = forwardLinkRegenerationMode;
   parameters.m_bwConverter = m_carrierBandwidthConverter;
   parameters.m_carrierCount = m_fwdLinkCarrierCount;
   parameters.m_cec = cec;

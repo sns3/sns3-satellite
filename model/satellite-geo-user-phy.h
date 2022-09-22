@@ -98,12 +98,11 @@ public:
   virtual void Receive (Ptr<SatSignalParameters> rxParams, bool phyError);
 
   /**
-   * Geo User specific SINR calculator.
-   * Calculate SINR with Geo User PHY specific parameters and given SINR.
+   * \brief Get additional interference, used to compute final SINR at RX
    *
-   * \param sinr Calculated (C/NI)
+   * \return Additional interference
    */
-  virtual double CalculateSinr (double sinr);
+  virtual double GetAdditionalInterference ();
 
 protected:
   /**

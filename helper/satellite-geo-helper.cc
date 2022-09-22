@@ -292,6 +292,7 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d,
   parametersUser.m_daIfModel = m_daRtnLinkInterferenceModel;
   parametersUser.m_raIfModel = m_raSettings.m_raRtnInterferenceModel;
   parametersUser.m_raIfEliminateModel = m_raSettings.m_raInterferenceEliminationModel;
+  parametersUser.m_linkRegenerationMode = returnLinkRegenerationMode;
   parametersUser.m_bwConverter = m_carrierBandwidthConverter;
   parametersUser.m_carrierCount = m_rtnLinkCarrierCount;
   parametersUser.m_cec = cec;
@@ -304,6 +305,7 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d,
   parametersFeeder.m_daIfModel = m_daFwdLinkInterferenceModel;
   parametersFeeder.m_raIfModel = m_raSettings.m_raFwdInterferenceModel;
   parametersFeeder.m_raIfEliminateModel = m_raSettings.m_raInterferenceEliminationModel;
+  parametersFeeder.m_linkRegenerationMode = forwardLinkRegenerationMode;
   parametersFeeder.m_bwConverter = m_carrierBandwidthConverter;
   parametersFeeder.m_carrierCount = m_fwdLinkCarrierCount;
   parametersFeeder.m_cec = cec;

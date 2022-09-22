@@ -155,7 +155,7 @@ SatUtPhy::SatUtPhy (SatPhy::CreateParam_t &params,
       carrierConf->SetLinkResults (linkResults);
     }
 
-  carrierConf->SetSinrCalculatorCb (MakeCallback (&SatUtPhy::CalculateSinr, this));
+  carrierConf->SetAdditionalInterferenceCb (MakeCallback (&SatUtPhy::GetAdditionalInterference, this));
 
   SatPhy::ConfigureRxCarriers (carrierConf, superFrameConf);
 }
@@ -180,21 +180,11 @@ SatUtPhy::DoInitialize ()
 }
 
 double
-SatUtPhy::CalculateSinr (double sinr)
+SatUtPhy::GetAdditionalInterference ()
 {
-  NS_LOG_FUNCTION (this << sinr);
+  NS_LOG_FUNCTION (this);
 
-  if ( sinr <= 0  )
-    {
-      NS_FATAL_ERROR ( "Calculated own SINR is expected to be greater than zero!!!");
-    }
-
-  // calculate final SINR taken into account configured additional interferences (C over I)
-  // in addition to CCI which is included in given SINR
-
-  double finalSinr = 1 / ( (1 / sinr) + (1 / m_otherSysInterferenceCOverI) );
-
-  return (finalSinr);
+  return m_otherSysInterferenceCOverI;
 }
 
 

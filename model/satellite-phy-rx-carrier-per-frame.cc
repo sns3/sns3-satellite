@@ -624,7 +624,7 @@ SatPhyRxCarrierPerFrame::CalculatePacketCompositeSinr (SatPhyRxCarrierPerFrame::
                                 m_rxNoisePowerW,
                                 m_rxAciIfPowerW,
                                 m_rxExtNoisePowerW,
-                                m_sinrCalculate);
+                                m_additionalInterferenceCallback ());
 
   double cSinr;
   if (GetLinkRegenerationMode () == SatEnums::TRANSPARENT)
@@ -634,7 +634,7 @@ SatPhyRxCarrierPerFrame::CalculatePacketCompositeSinr (SatPhyRxCarrierPerFrame::
                                              packet.rxParams->GetRxNoisePowerInSatellite (),
                                              packet.rxParams->GetRxAciIfPowerInSatellite (),
                                              packet.rxParams->GetRxExtNoisePowerInSatellite (),
-                                             packet.rxParams->GetSinrCalculator ());
+                                             packet.rxParams->GetAdditionalInterference ());
       cSinr = CalculateCompositeSinr (sinr, sinrSatellite);
     }
   else

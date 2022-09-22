@@ -27,16 +27,16 @@ NS_OBJECT_ENSURE_REGISTERED (SatUplinkInfoTag);
 SatUplinkInfoTag::SatUplinkInfoTag ()
   : m_satelliteReceptionTime (Seconds (0)),
   m_sinr (0.0),
-  m_sinrCalculate (),
+  m_additionalInterference (0.0),
   m_sinrComputed (false)
 {
   // Nothing to do here
 }
 
-SatUplinkInfoTag::SatUplinkInfoTag (Time satelliteReceptionTime, double sinr, Callback<double, double> sinrCalculate)
+SatUplinkInfoTag::SatUplinkInfoTag (Time satelliteReceptionTime, double sinr, double additionalInterference)
   : m_satelliteReceptionTime (satelliteReceptionTime),
   m_sinr (sinr),
-  m_sinrCalculate (sinrCalculate),
+  m_additionalInterference (additionalInterference),
   m_sinrComputed (true)
 {
   // Nothing to do here
@@ -60,7 +60,7 @@ SatUplinkInfoTag::GetInstanceTypeId (void) const
 uint32_t
 SatUplinkInfoTag::GetSerializedSize (void) const
 {
-  return sizeof(Time) + sizeof(double) + sizeof(Callback<double, double>) + sizeof(bool);
+  return sizeof(Time) + 2*sizeof(double) + sizeof(bool);
 }
 
 void
@@ -70,9 +70,7 @@ SatUplinkInfoTag::Serialize (TagBuffer i) const
   i.Write ((const uint8_t *)&satelliteReceptionTime, sizeof(int64_t));
 
   i.WriteDouble (m_sinr);
-
-  i.Write ((const uint8_t *)&m_sinrCalculate, sizeof(Callback<double, double>));
-
+  i.WriteDouble (m_additionalInterference);
   i.WriteU8 (m_sinrComputed);
 }
 
@@ -84,9 +82,7 @@ SatUplinkInfoTag::Deserialize (TagBuffer i)
   m_satelliteReceptionTime = NanoSeconds (satelliteReceptionTime);
 
   m_sinr = i.ReadDouble ();
-
-  i.Read ((uint8_t *)&m_sinrCalculate, 8);
-
+  m_additionalInterference = i.ReadDouble ();
   m_sinrComputed = i.ReadU8 ();
 }
 
@@ -115,16 +111,16 @@ SatUplinkInfoTag::GetSinr (void) const
 }
 
 void
-SatUplinkInfoTag::SetSinr (double sinr, Callback<double, double> sinrCalculate)
+SatUplinkInfoTag::SetSinr (double sinr, double additionalInterference)
 {
   m_sinr = sinr;
-  m_sinrCalculate = sinrCalculate;
+  m_additionalInterference = additionalInterference;
 }
 
-Callback<double, double>
-SatUplinkInfoTag::GetSinrCalculate (void) const
+double
+SatUplinkInfoTag::GetAdditionalInterference (void) const
 {
-  return m_sinrCalculate;
+  return m_additionalInterference;
 }
 
 bool

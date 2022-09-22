@@ -240,6 +240,26 @@ SatPhy::DoDispose ()
   Object::DoDispose ();
 }
 
+double
+SatPhy::CalculateSinr (double sinr, double otherInterference)
+{
+  NS_LOG_FUNCTION (this << sinr << otherInterference);
+
+  if ( sinr <= 0  )
+    {
+      NS_FATAL_ERROR ( "Calculated own SINR is expected to be greater than zero!!!");
+    }
+
+  if ( otherInterference <= 0  )
+    {
+      NS_FATAL_ERROR ( "Interference is expected to be greater than zero!!!");
+    }
+
+  double finalSinr = 1 / ( (1 / sinr) + (1 / otherInterference) );
+
+  return finalSinr;
+}
+
 void
 SatPhy::SetTxAntennaGainPattern (Ptr<SatAntennaGainPattern> agp)
 {

@@ -100,7 +100,7 @@ SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> c
   // calculate RX ACI power
   m_rxAciIfPowerW = m_rxNoisePowerW * carrierConf->GetRxAciInterferenceWrtNoiseFactor ();
 
-  m_sinrCalculate = carrierConf->GetSinrCalculatorCb ();
+  m_additionalInterferenceCallback = carrierConf->GetAdditionalInterferenceCb ();
 
   // Constant error rate for dedicated access.
   m_constantErrorRate = carrierConf->GetConstantDaErrorRate ();
@@ -258,7 +258,7 @@ SatPhyRxCarrier::DoDispose ()
 
   m_rxCallback.Nullify ();
   m_cnoCallback.Nullify ();
-  m_sinrCalculate.Nullify ();
+  m_additionalInterferenceCallback.Nullify ();
   m_avgNormalizedOfferedLoadCallback.Nullify ();
   m_satInterference = NULL;
   m_satInterferenceElimination = NULL;
@@ -626,7 +626,7 @@ SatPhyRxCarrier::CalculateSinr (double rxPowerW,
                                 double rxNoisePowerW,
                                 double rxAciIfPowerW,
                                 double rxExtNoisePowerW,
-                                SatPhyRxCarrierConf::SinrCalculatorCallback sinrCalculate)
+                                double additionalInterference)
 {
   NS_LOG_FUNCTION (this << rxPowerW <<  ifPowerW);
 
@@ -640,7 +640,27 @@ SatPhyRxCarrier::CalculateSinr (double rxPowerW,
   double sinr = rxPowerW / (ifPowerW +  rxNoisePowerW + rxAciIfPowerW + rxExtNoisePowerW);
 
   // Call PHY calculator to composite C over I interference configured to PHY.
-  double finalSinr = sinrCalculate (sinr);
+  double finalSinr = (1 / ( 1/sinr + 1/additionalInterference ));
+
+  return finalSinr;
+}
+
+double
+SatPhyRxCarrier::CalculateSinr (double sinr, double otherInterference)
+{
+  NS_LOG_FUNCTION (this << sinr << otherInterference);
+
+  if ( sinr <= 0  )
+    {
+      NS_FATAL_ERROR ( "Calculated own SINR is expected to be greater than zero!!!");
+    }
+
+  if ( otherInterference <= 0  )
+    {
+      NS_FATAL_ERROR ( "Interference is expected to be greater than zero!!!");
+    }
+
+  double finalSinr = 1 / ( (1 / sinr) + (1 / otherInterference) );
 
   return finalSinr;
 }

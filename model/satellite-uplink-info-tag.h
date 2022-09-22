@@ -55,9 +55,9 @@ public:
    * Constructor with initialization parameters.
    * \param satelliteReceptionTime
    * \param sinr
-   * \param sinrCalculate
+   * \param additionalInterference additional interference to add to compute final SINR
    */
-  SatUplinkInfoTag (Time satelliteReceptionTime, double sinr, Callback<double, double> sinrCalculate);
+  SatUplinkInfoTag (Time satelliteReceptionTime, double sinr, double additionalInterference);
 
   /**
    * Serializes information to buffer from this instance of SatUplinkInfoTag
@@ -104,18 +104,18 @@ public:
   /**
    * Set uplink SINR
    * \param sinr Uplink SINR
-   * \param sinrCalculate SINR calculator callback
+   * \param additionalInterference additional interference to add to compute final SINR
    */
-  void SetSinr (double sinr, Callback<double, double> sinrCalculate);
+  void SetSinr (double sinr, double additionalInterference);
 
   /**
-   * Get SINR calculator callback
-   * \return SINR calculator callback
+   * Get additional interference to add to compute final SINR
+   * \return The interference to add
    */
-  Callback<double, double> GetSinrCalculate (void) const;
+  double GetAdditionalInterference (void) const;
 
   /**
-   * Tell if  SINR already computed
+   * Tell if SINR already computed
    * \return true if already computed
    */
   bool IsSinrComputed (void) const;
@@ -123,7 +123,7 @@ public:
 private:
   Time m_satelliteReceptionTime;              // Reception time of packet in satellite
   double m_sinr;                              // SINR computed on uplink
-  Callback<double, double> m_sinrCalculate;   // Callback for SINR calculation
+  double m_additionalInterference;            // Other interference to add to compute final SINR
   bool m_sinrComputed;                        // Flag to tell if SINR has been already computed
 
 };

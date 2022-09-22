@@ -109,7 +109,7 @@ SatPhyRxCarrierUplink::EndRxData (uint32_t key)
                                 m_rxNoisePowerW,
                                 m_rxAciIfPowerW,
                                 m_rxExtNoisePowerW,
-                                m_sinrCalculate);
+                                m_additionalInterferenceCallback ());
 
   // Update link specific SINR trace
   if (GetChannelType () == SatEnums::FORWARD_FEEDER_CH)
@@ -128,15 +128,7 @@ SatPhyRxCarrierUplink::EndRxData (uint32_t key)
   NS_ASSERT (!packetRxParams.rxParams->HasSinrComputed ());
 
   /// save 1st link sinr value for 2nd link composite sinr calculations
-  SatSignalParameters::PacketsInBurst_t packets = packetRxParams.rxParams->m_packetsInBurst;
-  SatSignalParameters::PacketsInBurst_t::const_iterator i;
-  for (i = packets.begin (); i != packets.end (); i++)
-    {
-      SatUplinkInfoTag satUplinkInfoTag;
-      (*i)->RemovePacketTag (satUplinkInfoTag);
-      satUplinkInfoTag.SetSinr (sinr, m_sinrCalculate);
-      (*i)->AddPacketTag (satUplinkInfoTag);
-    }
+  packetRxParams.rxParams->SetSinr (sinr, m_additionalInterferenceCallback ());
 
   /// uses 1st link sinr
   m_linkBudgetTrace (packetRxParams.rxParams, GetOwnAddress (),

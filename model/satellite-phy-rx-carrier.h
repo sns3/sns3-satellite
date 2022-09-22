@@ -436,7 +436,7 @@ protected:
    * \param rxNoisePowerW Rx noise power in Watts
    * \param rxAciIfPowerW Rx ACI power in Watts
    * \param rxExtNoisePowerW Rx external noise power in Watts
-   * \param sinrCalculate SINR calculator callback
+   * \param otherInterference Additional interference to compute final SINR
    * \return Calculated SINR
    */
   double CalculateSinr (double rxPowerW,
@@ -444,7 +444,17 @@ protected:
                         double rxNoisePowerW,
                         double rxAciIfPowerW,
                         double rxExtNoisePowerW,
-                        SatPhyRxCarrierConf::SinrCalculatorCallback sinrCalculate);
+                        double otherInterference);
+
+  /**
+   * \brief Calculate final SINR with PHY specific parameters and given calculated SINR.
+   * Additional interference value is added.
+   *
+   * \param sinr Calculated SINR
+   * \param otherInterference Interference to add to the sinr
+   * \return Final SINR
+   */
+  double CalculateSinr (double sinr, double otherInterference);
 
   /**
    * \brief Function for calculating the composite SINR
@@ -618,9 +628,9 @@ protected:
   TracedCallback<uint32_t, const Address &> m_daRxCarrierIdTrace;
 
   /**
-   * \brief Callback to calculate SINR.
+   * \brief Callback to get additional interference.
    */
-  SatPhyRxCarrierConf::SinrCalculatorCallback m_sinrCalculate;
+  SatPhyRxCarrierConf::AdditionalInterferenceCallback m_additionalInterferenceCallback;
 
   /**
    * \brief The upper layer package receive callback.

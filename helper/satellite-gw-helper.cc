@@ -321,6 +321,7 @@ SatGwHelper::InstallDvb (Ptr<Node> n,
   parameters.m_daIfModel = m_daInterferenceModel;
   parameters.m_raIfModel = m_raSettings.m_raInterferenceModel;
   parameters.m_raIfEliminateModel = m_raSettings.m_raInterferenceEliminationModel;
+  parameters.m_linkRegenerationMode = returnLinkRegenerationMode;
   parameters.m_bwConverter = m_carrierBandwidthConverter;
   parameters.m_carrierCount = m_rtnLinkCarrierCount;
   parameters.m_cec = cec;
@@ -554,6 +555,7 @@ SatGwHelper::InstallLora (Ptr<Node> n,
   parameters.m_daIfModel = m_daInterferenceModel;
   parameters.m_raIfModel = m_raSettings.m_raInterferenceModel;
   parameters.m_raIfEliminateModel = m_raSettings.m_raInterferenceEliminationModel;
+  parameters.m_linkRegenerationMode = returnLinkRegenerationMode;
   parameters.m_bwConverter = m_carrierBandwidthConverter;
   parameters.m_carrierCount = m_rtnLinkCarrierCount;
   parameters.m_cec = cec;

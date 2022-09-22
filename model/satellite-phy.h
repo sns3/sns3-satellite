@@ -145,13 +145,21 @@ public:
   virtual void DoDispose (void);
 
   /**
+   * \brief Get additional interference, used to compute final SINR at RX
+   *
+   * \return Additional interference
+   */
+  virtual double GetAdditionalInterference () = 0;
+
+  /**
    * \brief Calculate final SINR with PHY specific parameters and given calculated SINR.
-   * Objects inheriting this PHY object must implement this method.
+   * Additional interference value is added.
    *
    * \param sinr Calculated SINR
+   * \param otherInterference Interference to add to the sinr
    * \return Final SINR
    */
-  virtual double CalculateSinr (double sinr) = 0;
+  double CalculateSinr (double sinr, double otherInterference);
 
   /**
    * \brief Initialize phy.

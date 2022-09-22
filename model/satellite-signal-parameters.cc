@@ -104,17 +104,16 @@ SatSignalParameters::SetRxPowersInSatellite (double rxPowerW, double rxNoisePowe
 }
 
 void
-SatSignalParameters::SetSinr (double sinr, Callback<double, double> sinrCalculate)
+SatSignalParameters::SetSinr (double sinr, double additionalInterference)
 {
   m_ifParams->m_sinr = sinr;
-  m_ifParams->m_sinrCalculate = sinrCalculate;
+  m_ifParams->m_additionalInterference = additionalInterference;
   m_ifParams->m_sinrComputed = true;
 }
 
 
 SatInterferenceParameters::~SatInterferenceParameters ()
 {
-  m_sinrCalculate.Nullify ();
 }
 
 } // namespace ns3

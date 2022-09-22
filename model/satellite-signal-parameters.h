@@ -70,7 +70,7 @@ public:
   /**
    * Callback for SINR calculation
    */
-  Callback<double, double> m_sinrCalculate;
+  double m_additionalInterference;
 
   /**
    * Interference power (I)
@@ -293,16 +293,16 @@ public:
   /**
    * \brief Set computed SINR
    */
-  void SetSinr (double sinr, Callback<double, double> sinrCalculate);
+  void SetSinr (double sinr, double additionalInterference);
 
   inline double GetSinr ()
   {
     return m_ifParams->m_sinr;
   }
 
-  inline Callback<double, double> GetSinrCalculator ()
+  inline double GetAdditionalInterference ()
   {
-    return m_ifParams->m_sinrCalculate;
+    return m_ifParams->m_additionalInterference;
   }
 
   inline bool HasSinrComputed ()
