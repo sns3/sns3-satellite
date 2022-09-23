@@ -160,7 +160,7 @@ SatQueue::Enqueue (Ptr<Packet> p)
   SatControlMsgTag tag;
   if (p->PeekPacketTag (tag))
     {
-      if (tag.GetMsgType () == SatControlMsgTag::SAT_LOGON_CTRL_MSG)
+      if (tag.GetMsgType () == SatControlMsgTag::SAT_LOGON_CTRL_MSG && !m_logonCallback.IsNull ())
         {
           m_logonCallback (p);
           return true;

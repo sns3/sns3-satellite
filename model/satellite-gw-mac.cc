@@ -235,7 +235,7 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> r
 
   if (rxParams->m_txInfo.waveformId == 2)
     {
-      if (m_useCmt)
+      if (m_useCmt && m_isRegenerative)
         {
           for (SatPhy::PacketContainer_t::iterator i = packets.begin (); i != packets.end (); i++ )
             {

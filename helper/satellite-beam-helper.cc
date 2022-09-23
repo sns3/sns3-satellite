@@ -336,11 +336,13 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
   linkResultsFwd->Initialize ();
   linkResultsReturnLink->Initialize ();
 
+  bool useScpc = (m_returnLinkRegenerationMode == SatEnums::REGENERATION_LINK || m_returnLinkRegenerationMode == SatEnums::REGENERATION_NETWORK);
+
   // DVB-S2 link results for packet decoding at the UT
   m_utHelper->Initialize (linkResultsFwd);
   // DVB-RCS2 link results for packet decoding at the GW +
   // DVB-S2 link results for FWD link RRM
-  m_gwHelper->Initialize (linkResultsReturnLink, linkResultsFwd, m_dvbVersion);
+  m_gwHelper->Initialize (linkResultsReturnLink, linkResultsFwd, m_dvbVersion, useScpc);
   // link results on satellite, to use if regeneration
   m_geoHelper->Initialize (linkResultsFwd, linkResultsReturnLink);
   // DVB-RCS2 link results for RTN link waveform configurations
