@@ -68,9 +68,17 @@ SatMac::GetTypeId (void)
                      "A packet is received with delay information",
                      MakeTraceSourceAccessor (&SatMac::m_rxDelayTrace),
                      "ns3::SatTypedefs::PacketDelayAddressCallback")
+    .AddTraceSource ("RxLinkDelay",
+                     "A packet is received with link delay information",
+                     MakeTraceSourceAccessor (&SatMac::m_rxLinkDelayTrace),
+                     "ns3::SatTypedefs::PacketDelayAddressCallback")
     .AddTraceSource ("RxJitter",
                      "A packet is received with jitter information",
                      MakeTraceSourceAccessor (&SatMac::m_rxJitterTrace),
+                     "ns3::SatTypedefs::PacketJitterAddressCallback")
+    .AddTraceSource ("RxLinkJitter",
+                     "A packet is received with link jitter information",
+                     MakeTraceSourceAccessor (&SatMac::m_rxLinkJitterTrace),
                      "ns3::SatTypedefs::PacketJitterAddressCallback")
     .AddTraceSource ("BeamServiceTime",
                      "A beam was disabled. Transmits length of last beam service time.",
@@ -90,7 +98,8 @@ SatMac::SatMac ()
   m_beamEnabledTime (Seconds (0)),
   m_lastDelay (0),
   m_isRegenerative (false),
-  m_satelliteAddress ()
+  m_satelliteAddress (),
+  m_lastLinkDelay (0)
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT (false); // this version of the constructor should not been used
@@ -106,7 +115,8 @@ SatMac::SatMac (uint32_t beamId)
   m_beamEnabledTime (Seconds (0)),
   m_lastDelay (0),
   m_isRegenerative (false),
-  m_satelliteAddress ()
+  m_satelliteAddress (),
+  m_lastLinkDelay (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -214,19 +224,30 @@ SatMac::SetSatelliteAddress (Address satelliteAddress)
 }
 
 void
+SatMac::SetTimeTag (SatPhy::PacketContainer_t packets)
+{
+  if (m_isStatisticsTagsEnabled)
+    {
+      for (SatPhy::PacketContainer_t::const_iterator it = packets.begin (); it != packets.end (); ++it)
+        {
+          SatPhyTimeTag timeTag;
+          if (!(*it)->PeekPacketTag (timeTag))
+            {
+              (*it)->AddPacketTag (SatMacTimeTag (Simulator::Now ()));
+            }
+
+          (*it)->AddPacketTag (SatMacLinkTimeTag (Simulator::Now ()));
+        }
+    }
+}
+
+void
 SatMac::SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time duration, SatSignalParameters::txInfo_s txInfo)
 {
   NS_LOG_FUNCTION (this);
 
   // Add a SatMacTimeTag tag for packet delay computation at the receiver end.
-  if (m_isStatisticsTagsEnabled)
-    {
-      for (SatPhy::PacketContainer_t::const_iterator it = packets.begin ();
-           it != packets.end (); ++it)
-        {
-          (*it)->AddPacketTag (SatMacTimeTag (Simulator::Now ()));
-        }
-    }
+  SetTimeTag (packets);
 
   // Update local destination MAC tag with satellite one if satellite is regenerative
   if (m_isRegenerative)
@@ -342,6 +363,19 @@ SatMac::RxTraces (SatPhy::PacketContainer_t packets)
                       m_rxJitterTrace (jitter, addr);
                     }
                   m_lastDelay = delay;
+                }
+              SatMacLinkTimeTag linkTimeTag;
+              if ((*it1)->RemovePacketTag (linkTimeTag))
+                {
+                  NS_LOG_DEBUG (this << " contains a SatMacLinkTimeTag tag");
+                  Time delay = Simulator::Now () - linkTimeTag.GetSenderLinkTimestamp ();
+                  m_rxLinkDelayTrace (delay, addr);
+                  if (m_lastLinkDelay.IsZero() == false)
+                    {
+                      Time jitter = Abs (delay - m_lastLinkDelay);
+                      m_rxLinkJitterTrace (jitter, addr);
+                    }
+                  m_lastLinkDelay = delay;
                 }
             } // end of `if (destAddress == m_nodeInfo->GetMacAddress () || destAddress.IsBroadcast ())`
         } // end of `for it1 = packets.begin () -> packets.end ()`

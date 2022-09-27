@@ -251,6 +251,12 @@ protected:
   void DoDispose (void);
 
   /**
+   * \brief Set SatMacTimeTag of packets
+   * \param packets Container of the pointers to the packets to tag.
+   */
+  void SetTimeTag (SatPhy::PacketContainer_t packets);
+
+  /**
    * \brief Send packets to lower layer by using a callback
    * \param packets Packets to be sent.
    * \param carrierId ID of the carrier used for transmission.
@@ -333,10 +339,22 @@ protected:
   TracedCallback<const Time &, const Address &> m_rxDelayTrace;
 
   /**
+   * Traced callback for all received packets, including link delay information and
+   * the address of the senders.
+   */
+  TracedCallback<const Time &, const Address &> m_rxLinkDelayTrace;
+
+  /**
    * Traced callback for all received packets, including jitter information and
    * the address of the senders.
    */
   TracedCallback<const Time &, const Address &> m_rxJitterTrace;
+
+  /**
+   * Traced callback for all received packets, including link jitter information and
+   * the address of the senders.
+   */
+  TracedCallback<const Time &, const Address &> m_rxLinkJitterTrace;
 
   /**
    * Traced callback for beam being disabled and including service time.
@@ -395,6 +413,11 @@ protected:
    * MAC address of satellite on other side of the link. Use in regenerative cases.
    */
   Address m_satelliteAddress;
+
+  /**
+   * Last delay measurement for link. Used to compute link jitter.
+   */
+  Time m_lastLinkDelay;
 };
 
 } // namespace ns3

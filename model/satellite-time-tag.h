@@ -327,6 +327,79 @@ private:
 
 /**
  * \ingroup satellite
+ * \brief Time tag used to identify the time when packet is enqueued at MAC on current link
+ *        level.
+ */
+class SatMacLinkTimeTag : public Tag
+{
+public:
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
+  static TypeId  GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
+  virtual TypeId  GetInstanceTypeId (void) const;
+
+  /**
+   * Default constructor.
+   */
+  SatMacLinkTimeTag ();
+
+  /**
+   * Constructor with initialization parameters.
+   * \param senderTimestamp
+   */
+  SatMacLinkTimeTag (Time senderTimestamp);
+
+  /**
+   * Serializes information to buffer from this instance of SatMacLinkTimeTag
+   * \param i Buffer in which the information is serialized
+   */
+  virtual void  Serialize (TagBuffer i) const;
+
+  /**
+   * Deserializes information from buffer to this instance of SatMacLinkTimeTag
+   * \param i Buffer from which the information is deserialized
+   */
+  virtual void  Deserialize (TagBuffer i);
+
+  /**
+   * Get serialized size of SatMacLinkTimeTag
+   * \return Serialized size in bytes
+   */
+  virtual uint32_t  GetSerializedSize () const;
+
+  /**
+   * Print time stamp of this instance of SatMacLinkTimeTag
+   * \param &os Output stream to which tag timestamp is printed.
+   */
+  virtual void Print (std::ostream &os) const;
+
+  /**
+   * Get sender time stamp of this tag.
+   * \return Sender timestamp
+   */
+  Time GetSenderLinkTimestamp (void) const;
+
+  /**
+   * Set sender time stamp of this tag.
+   * \param senderTimestamp Sender time stamp
+   */
+  void SetSenderLinkTimestamp (Time senderLinkTimestamp);
+
+private:
+  Time m_senderLinkTimestamp;
+
+};
+
+
+/**
+ * \ingroup satellite
  * \brief Time tag used to identify the time when packet is enqueued at device
  *        level.
  */

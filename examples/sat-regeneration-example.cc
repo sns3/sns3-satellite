@@ -189,6 +189,10 @@ main (int argc, char *argv[])
   s->AddPerSatRtnFeederQueueBytes (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerSatRtnFeederQueuePackets (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
+  s->AddPerGwRtnMacDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnMacDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatRtnMacDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
   s->AddPerSatFwdFeederMacLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerSatFwdUserMacLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerSatRtnFeederMacLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
