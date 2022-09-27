@@ -230,11 +230,11 @@ private:
 }; // end of class SatStatsFwdDevThroughputHelper
 
 
-// FORWARD LINK MAC-LEVEL /////////////////////////////////////////////////////
+// FORWARD FEEDER LINK MAC-LEVEL /////////////////////////////////////////////////////
 
 /**
  * \ingroup satstats
- * \brief Produce forward link MAC-level throughput statistics from a
+ * \brief Produce forward feeder link MAC-level throughput statistics from a
  *        satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
@@ -242,7 +242,7 @@ private:
  *
  * Otherwise, the following example can be used:
  * \code
- * Ptr<SatStatsFwdMacThroughputHelper> s = Create<SatStatsFwdMacThroughputHelper> (satHelper);
+ * Ptr<SatStatsFwdFeederMacThroughputHelper> s = Create<SatStatsFwdFeederMacThroughputHelper> (satHelper);
  * s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
@@ -251,17 +251,17 @@ private:
  *
  * \todo This statistics include control messages.
  */
-class SatStatsFwdMacThroughputHelper : public SatStatsThroughputHelper
+class SatStatsFwdFeederMacThroughputHelper : public SatStatsThroughputHelper
 {
 public:
   // inherited from SatStatsHelper base class
-  SatStatsFwdMacThroughputHelper (Ptr<const SatHelper> satHelper);
+  SatStatsFwdFeederMacThroughputHelper (Ptr<const SatHelper> satHelper);
 
 
   /**
    * / Destructor.
    */
-  virtual ~SatStatsFwdMacThroughputHelper ();
+  virtual ~SatStatsFwdFeederMacThroughputHelper ();
 
 
   /**
@@ -277,7 +277,57 @@ private:
   /// Maintains a list of probes created by this helper.
   std::list<Ptr<Probe> > m_probes;
 
-}; // end of class SatStatsFwdMacThroughputHelper
+}; // end of class SatStatsFwdFeederMacThroughputHelper
+
+
+// FORWARD USER LINK MAC-LEVEL /////////////////////////////////////////////////////
+
+/**
+ * \ingroup satstats
+ * \brief Produce forward user link MAC-level throughput statistics from a
+ *        satellite module simulation.
+ *
+ * For a more convenient usage in simulation script, it is recommended to use
+ * the corresponding methods in SatStatsHelperContainer class.
+ *
+ * Otherwise, the following example can be used:
+ * \code
+ * Ptr<SatStatsFwdUserMacThroughputHelper> s = Create<SatStatsFwdUserMacThroughputHelper> (satHelper);
+ * s->SetName ("name");
+ * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+ * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
+ * s->Install ();
+ * \endcode
+ *
+ * \todo This statistics include control messages.
+ */
+class SatStatsFwdUserMacThroughputHelper : public SatStatsThroughputHelper
+{
+public:
+  // inherited from SatStatsHelper base class
+  SatStatsFwdUserMacThroughputHelper (Ptr<const SatHelper> satHelper);
+
+
+  /**
+   * / Destructor.
+   */
+  virtual ~SatStatsFwdUserMacThroughputHelper ();
+
+
+  /**
+   * inherited from ObjectBase base class
+   */
+  static TypeId GetTypeId ();
+
+protected:
+  // inherited from SatStatsThroughputHelper base class
+  void DoInstallProbes ();
+
+private:
+  /// Maintains a list of probes created by this helper.
+  std::list<Ptr<Probe> > m_probes;
+
+}; // end of class SatStatsFwdUserMacThroughputHelper
 
 
 // FORWARD FEEDER LINK PHY-LEVEL /////////////////////////////////////////////////////
@@ -489,11 +539,11 @@ protected:
 }; // end of class SatStatsRtnDevThroughputHelper
 
 
-// RETURN LINK MAC-LEVEL //////////////////////////////////////////////////////
+// RETURN FEEDER LINK MAC-LEVEL //////////////////////////////////////////////////////
 
 /**
  * \ingroup satstats
- * \brief Produce return link MAC-level throughput statistics from a
+ * \brief Produce return feeder link MAC-level throughput statistics from a
  *        satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
@@ -501,7 +551,7 @@ protected:
  *
  * Otherwise, the following example can be used:
  * \code
- * Ptr<SatStatsRtnMacThroughputHelper> s = Create<SatStatsRtnMacThroughputHelper> (satHelper);
+ * Ptr<SatStatsRtnFeederMacThroughputHelper> s = Create<SatStatsRtnFeederMacThroughputHelper> (satHelper);
  * s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
@@ -510,17 +560,17 @@ protected:
  *
  * \todo This statistics does not include control messages.
  */
-class SatStatsRtnMacThroughputHelper : public SatStatsThroughputHelper
+class SatStatsRtnFeederMacThroughputHelper : public SatStatsThroughputHelper
 {
 public:
   // inherited from SatStatsHelper base class
-  SatStatsRtnMacThroughputHelper (Ptr<const SatHelper> satHelper);
+  SatStatsRtnFeederMacThroughputHelper (Ptr<const SatHelper> satHelper);
 
 
   /**
    * / Destructor.
    */
-  virtual ~SatStatsRtnMacThroughputHelper ();
+  virtual ~SatStatsRtnFeederMacThroughputHelper ();
 
 
   /**
@@ -532,7 +582,53 @@ protected:
   // inherited from SatStatsThroughputHelper base class
   void DoInstallProbes ();
 
-}; // end of class SatStatsRtnMacThroughputHelper
+}; // end of class SatStatsRtnFeederMacThroughputHelper
+
+
+// RETURN USER LINK MAC-LEVEL //////////////////////////////////////////////////////
+
+/**
+ * \ingroup satstats
+ * \brief Produce return user link MAC-level throughput statistics from a
+ *        satellite module simulation.
+ *
+ * For a more convenient usage in simulation script, it is recommended to use
+ * the corresponding methods in SatStatsHelperContainer class.
+ *
+ * Otherwise, the following example can be used:
+ * \code
+ * Ptr<SatStatsRtnUserMacThroughputHelper> s = Create<SatStatsRtnUserMacThroughputHelper> (satHelper);
+ * s->SetName ("name");
+ * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+ * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
+ * s->Install ();
+ * \endcode
+ *
+ * \todo This statistics does not include control messages.
+ */
+class SatStatsRtnUserMacThroughputHelper : public SatStatsThroughputHelper
+{
+public:
+  // inherited from SatStatsHelper base class
+  SatStatsRtnUserMacThroughputHelper (Ptr<const SatHelper> satHelper);
+
+
+  /**
+   * / Destructor.
+   */
+  virtual ~SatStatsRtnUserMacThroughputHelper ();
+
+
+  /**
+   * inherited from ObjectBase base class
+   */
+  static TypeId GetTypeId ();
+
+protected:
+  // inherited from SatStatsThroughputHelper base class
+  void DoInstallProbes ();
+
+}; // end of class SatStatsRtnUserMacThroughputHelper
 
 
 // RETURN FEEDER LINK PHY-LEVEL //////////////////////////////////////////////////////

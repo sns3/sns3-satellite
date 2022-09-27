@@ -183,7 +183,7 @@ main (int argc, char *argv[])
   s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
   s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerBeamRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamRtnFeederPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   s->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
@@ -196,7 +196,7 @@ main (int argc, char *argv[])
   s->AddPerBeamFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
   s->AddPerBeamFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamFwdDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerBeamFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamFwdUserMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamFwdUserPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   s->AddPerBeamFwdAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);

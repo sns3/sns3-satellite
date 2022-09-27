@@ -141,16 +141,6 @@ SatGeoFeederMac::StartTransmission (uint32_t carrierId)
       // Handle both dummy frames and normal frames
       if ( bbFrame != NULL )
         {
-          // Add packet trace entry:
-          m_packetTrace (Simulator::Now (),
-                         SatEnums::PACKET_SENT,
-                         m_nodeInfo->GetNodeType (),
-                         m_nodeInfo->GetNodeId (),
-                         m_nodeInfo->GetMacAddress (),
-                         SatEnums::LL_MAC,
-                         SatEnums::LD_FORWARD,
-                         SatUtils::GetPacketInfo (bbFrame->GetPayload ()));
-
           SatSignalParameters::txInfo_s txInfo;
           txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
           txInfo.modCod = bbFrame->GetModcod ();
@@ -219,6 +209,16 @@ SatGeoFeederMac::SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrier
 
   // Add a SatMacTimeTag tag for packet delay computation at the receiver end.
   SetTimeTag (packets);
+
+  // Add packet trace entry:
+  m_packetTrace (Simulator::Now (),
+                 SatEnums::PACKET_SENT,
+                 m_nodeInfo->GetNodeType (),
+                 m_nodeInfo->GetNodeId (),
+                 m_nodeInfo->GetMacAddress (),
+                 SatEnums::LL_MAC,
+                 SatEnums::LD_RETURN,
+                 SatUtils::GetPacketInfo (packets));
 
   Ptr<SatSignalParameters> txParams = Create<SatSignalParameters> ();
   txParams->m_duration = duration;

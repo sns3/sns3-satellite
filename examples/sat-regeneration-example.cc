@@ -165,6 +165,16 @@ main (int argc, char *argv[])
   s->AddPerUtRtnUserPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerSatRtnUserPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
+  s->AddPerUtFwdFeederMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatFwdFeederMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdUserMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatFwdUserMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddPerUtRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnUserMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatRtnUserMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
   s->AddPerUtFwdFeederLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerSatFwdFeederLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtFwdUserLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);

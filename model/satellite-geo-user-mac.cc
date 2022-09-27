@@ -98,6 +98,17 @@ SatGeoUserMac::SendPackets (SatPhy::PacketContainer_t packets, Ptr<SatSignalPara
 {
   NS_LOG_FUNCTION (this);
 
+  // TODO move to after scheduling
+  // Add packet trace entry:
+  m_packetTrace (Simulator::Now (),
+                 SatEnums::PACKET_SENT,
+                 m_nodeInfo->GetNodeType (),
+                 m_nodeInfo->GetNodeId (),
+                 m_nodeInfo->GetMacAddress (),
+                 SatEnums::LL_MAC,
+                 SatEnums::LD_FORWARD,
+                 SatUtils::GetPacketInfo (packets));
+
   // Update MAC address source and destination
   for (SatPhy::PacketContainer_t::const_iterator it = packets.begin ();
        it != packets.end (); ++it)

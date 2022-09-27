@@ -1215,16 +1215,6 @@ SatStatsRtnUserMacLinkJitterHelper::DoInstallProbes ()
 
   for (NodeContainer::Iterator it = sats.Begin (); it != sats.End (); ++it)
     {
-      const int32_t satId = GetSatId (*it);
-      NS_ASSERT_MSG (satId > 0,
-                     "Node " << (*it)->GetId () << " is not a valid SAT");
-
-      // Create the probe.
-      std::ostringstream probeName;
-      probeName << satId;
-      Ptr<ApplicationDelayProbe> probe = CreateObject<ApplicationDelayProbe> ();
-      probe->SetName (probeName.str ());
-
       Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
       Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
       NS_ASSERT (satGeoDev != 0);
@@ -1457,16 +1447,6 @@ SatStatsRtnUserPhyLinkJitterHelper::DoInstallProbes ()
 
   for (NodeContainer::Iterator it = sats.Begin (); it != sats.End (); ++it)
     {
-      const int32_t satId = GetSatId (*it);
-      NS_ASSERT_MSG (satId > 0,
-                     "Node " << (*it)->GetId () << " is not a valid SAT");
-
-      // Create the probe.
-      std::ostringstream probeName;
-      probeName << satId;
-      Ptr<ApplicationDelayProbe> probe = CreateObject<ApplicationDelayProbe> ();
-      probe->SetName (probeName.str ());
-
       Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
       Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
       NS_ASSERT (satGeoDev != 0);

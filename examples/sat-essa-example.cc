@@ -201,14 +201,14 @@ main (int argc, char *argv[])
       s->AddPerBeamRtnFeederWindowLoad (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
       s->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-      s->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddGlobalRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
       s->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-      s->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddGlobalRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
       s->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-      s->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerUtRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
       s->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-      s->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddPerUtRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
       s->AddGlobalRtnCompositeSinr (SatStatsHelper::OUTPUT_SCALAR_FILE);
       s->AddGlobalRtnCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);

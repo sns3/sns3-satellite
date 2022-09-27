@@ -141,8 +141,8 @@ ConfigureAllStats (Ptr<SatStatsHelperContainer> s)
 
   s->AddPerGroupFwdDevThroughput (outputType);
   s->AddPerGroupRtnDevThroughput (outputType);
-  s->AddPerGroupFwdMacThroughput (outputType);
-  s->AddPerGroupRtnMacThroughput (outputType);
+  s->AddPerGroupFwdUserMacThroughput (outputType);
+  s->AddPerGroupRtnFeederMacThroughput (outputType);
   s->AddPerGroupFwdUserPhyThroughput (outputType);
   s->AddPerGroupRtnFeederPhyThroughput (outputType);
 
@@ -151,8 +151,8 @@ ConfigureAllStats (Ptr<SatStatsHelperContainer> s)
 
   s->AddAverageGroupFwdDevThroughput (outputType);
   s->AddAverageGroupRtnDevThroughput (outputType);
-  s->AddAverageGroupFwdMacThroughput (outputType);
-  s->AddAverageGroupRtnMacThroughput (outputType);
+  s->AddAverageGroupFwdUserMacThroughput (outputType);
+  s->AddAverageGroupRtnFeederMacThroughput (outputType);
   s->AddAverageGroupFwdUserPhyThroughput (outputType);
   s->AddAverageGroupRtnFeederPhyThroughput (outputType);
 

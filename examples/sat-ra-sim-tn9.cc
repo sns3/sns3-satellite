@@ -229,7 +229,7 @@ main (int argc, char *argv[])
 
   s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerBeamRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddPerBeamRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddPerBeamRtnFeederPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   s->AddAverageUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);

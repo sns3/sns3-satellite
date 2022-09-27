@@ -239,14 +239,14 @@ main (int argc, char *argv[])
       s->AddPerBeamRtnFeederWindowLoad (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
       s->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-      s->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddGlobalRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
       s->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-      s->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddGlobalRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
       s->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-      s->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerUtRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
       s->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-      s->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddPerUtRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
       s->AddPerUtRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
       s->AddPerUtRtnMacDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
@@ -270,14 +270,14 @@ main (int argc, char *argv[])
 
 
       s->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-      s->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerUtFwdUserMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
       s->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-      s->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddPerUtFwdUserMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
       s->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-      s->AddGlobalFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddGlobalFwdUserMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
       s->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-      s->AddGlobalFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddGlobalFwdUserMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
       s->AddPerUtFwdAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
       s->AddPerUtFwdMacDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);

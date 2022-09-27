@@ -776,17 +776,25 @@ SimulationHelper::CreateDefaultFwdLinkStats ()
 
   m_statContainer->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  m_statContainer->AddGlobalFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddGlobalFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddGlobalFwdFeederMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddGlobalFwdUserMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddGlobalFwdFeederMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddGlobalFwdUserMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddGlobalFwdFeederPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddGlobalFwdUserPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddGlobalFwdFeederPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   m_statContainer->AddGlobalFwdUserPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   m_statContainer->AddPerBeamFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFwdFeederMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFwdUserMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFwdFeederPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddPerBeamFwdUserPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   Config::SetDefault ("ns3::SatStatsThroughputHelper::AveragingMode", BooleanValue (true));
   m_statContainer->AddPerBeamFwdAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
-  m_statContainer->AddPerBeamFwdMacThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
+  m_statContainer->AddPerBeamFwdFeederMacThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
+  m_statContainer->AddPerBeamFwdUserMacThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
+  m_statContainer->AddPerBeamFwdFeederPhyThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
   m_statContainer->AddPerBeamFwdUserPhyThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
 
   // SINR
@@ -839,15 +847,21 @@ SimulationHelper::CreateDefaultRtnLinkStats ()
 
   m_statContainer->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  m_statContainer->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddGlobalRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddGlobalRtnUserMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddGlobalRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddGlobalRtnUserMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   m_statContainer->AddGlobalRtnFeederPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddGlobalRtnUserPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddGlobalRtnFeederPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddGlobalRtnUserPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   m_statContainer->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddPerBeamRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamRtnUserMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddPerBeamRtnFeederPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamRtnUserPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   // Granted resources
   m_statContainer->AddGlobalResourcesGranted (SatStatsHelper::OUTPUT_SCATTER_FILE);

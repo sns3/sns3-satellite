@@ -137,7 +137,7 @@ main (int argc, char *argv[])
   Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer ();
 
   s->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddGlobalRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddAverageUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
   s->AddGlobalRtnAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
   s->AddGlobalRtnCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_PLOT);
