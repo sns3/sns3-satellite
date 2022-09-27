@@ -87,7 +87,7 @@ main (int argc, char *argv[])
   // Set tag, if output path is not explicitly defined
   simulationHelper->SetOutputTag (scenario);
 
-  simulationHelper->SetSimulationTime (Seconds (11));
+  simulationHelper->SetSimulationTime (Seconds (30));
 
   // Set beam ID
   std::stringstream beamsEnabled;
@@ -103,10 +103,10 @@ main (int argc, char *argv[])
 
   simulationHelper->InstallTrafficModel (
     SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
-    Seconds (1.0), Seconds (10.0));
+    Seconds (1.0), Seconds (29.0));
   simulationHelper->InstallTrafficModel (
     SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
-    Seconds (1.0), Seconds (10.0));
+    Seconds (1.0), Seconds (29.0));
 
   NS_LOG_INFO ("--- sat-regeneration-example ---");
   NS_LOG_INFO ("  Scenario used: " << scenario);
@@ -189,7 +189,19 @@ main (int argc, char *argv[])
   s->AddPerSatRtnFeederQueueBytes (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerSatRtnFeederQueuePackets (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
+  s->AddPerSatFwdFeederMacLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatFwdUserMacLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatRtnFeederMacLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatRtnUserMacLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddPerUtFwdFeederMacLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdUserMacLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnFeederMacLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnUserMacLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
   s->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnMacJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnAppJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   simulationHelper->EnableProgressLogs ();
   simulationHelper->RunSimulation ();
