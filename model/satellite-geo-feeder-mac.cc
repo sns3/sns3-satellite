@@ -218,10 +218,7 @@ SatGeoFeederMac::SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrier
   NS_LOG_FUNCTION (this);
 
   // Add a SatMacTimeTag tag for packet delay computation at the receiver end.
-  if (m_isRegenerative)
-    {
-      SetTimeTag (packets);
-    }
+  SetTimeTag (packets);
 
   Ptr<SatSignalParameters> txParams = Create<SatSignalParameters> ();
   txParams->m_duration = duration;

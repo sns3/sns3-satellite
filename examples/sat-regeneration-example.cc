@@ -203,6 +203,11 @@ main (int argc, char *argv[])
   s->AddPerUtRtnFeederMacLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtRtnUserMacLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
+  s->AddPerUtFwdFeederMacLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdUserMacLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnFeederMacLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnUserMacLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
   s->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtRtnMacJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtRtnAppJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
