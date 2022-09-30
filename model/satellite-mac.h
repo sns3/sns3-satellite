@@ -66,9 +66,11 @@ public:
 
   /**
    * \brief Construct a SatMac
-   * \param beamId
+   * \param forwardLinkRegenerationMode Forward link regeneration model
+   * \param returnLinkRegenerationMode Return link regeneration model
    */
-  SatMac (uint32_t beamId);
+  SatMac (SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+          SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   /**
    * \brief Destroy a SatMac
@@ -229,11 +231,6 @@ public:
    * This is used in beam hopping implementation.
    */
   virtual void Disable ();
-
-  /**
-   * \brief Indicates if the satellite is regenerative on the link this layer is sending packets.
-   */
-  void setRegenerative (bool isRegenerative);
 
   /**
    * Set the satellite MAC address on the other side of this link (if regenerative satellite).
@@ -405,7 +402,17 @@ protected:
   std::queue<Time> m_lastSOF;
 
   /**
-   * Indicates if satellite is regenerative on the link where this layer is sending packets.
+   * Regeneration mode on forward link.
+   */
+  SatEnums::RegenerationMode_t m_forwardLinkRegenerationMode;
+
+  /**
+   * Regeneration mode on return link.
+   */
+  SatEnums::RegenerationMode_t m_returnLinkRegenerationMode;
+
+  /**
+   * Indicate if satellite is regeneration (at least LINK level) for TX
    */
   bool m_isRegenerative;
 

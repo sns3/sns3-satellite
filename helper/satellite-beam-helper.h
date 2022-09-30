@@ -186,14 +186,14 @@ public:
    * and a NetDeviceContainer of all SatNetDevice for the UTs
    */
   std::pair<Ptr<NetDevice>, NetDeviceContainer> Install (NodeContainer ut,
-                     Ptr<Node> gwNode,
-                     uint32_t gwId,
-                     uint32_t beamId,
-                     uint32_t rtnUlFreqId,
-                     uint32_t rtnFlFreqId,
-                     uint32_t fwdUlFreqId,
-                     uint32_t fwdFlFreqId,
-                     SatUtMac::RoutingUpdateCallback routingCallback);
+                                                         Ptr<Node> gwNode,
+                                                         uint32_t gwId,
+                                                         uint32_t beamId,
+                                                         uint32_t rtnUlFreqId,
+                                                         uint32_t rtnFlFreqId,
+                                                         uint32_t fwdUlFreqId,
+                                                         uint32_t fwdFlFreqId,
+                                                         SatUtMac::RoutingUpdateCallback routingCallback);
 
   /**
    * \param beamId beam ID

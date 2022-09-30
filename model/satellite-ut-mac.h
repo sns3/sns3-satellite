@@ -90,11 +90,17 @@ public:
    *
    * This is the constructor for the SatUtMac
    *
+   * \param beamId ID of beam for UT
    * \param seq Pointer to superframe sequence.
-   * \param beamId Id of the beam.
+   * \param forwardLinkRegenerationMode Forward link regeneration mode
+   * \param returnLinkRegenerationMode Return link regeneration mode
    * \param crdsaOnlyForControl CRDSA buffer operation mode
    */
-  SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, bool crdsaOnlyForControl);
+  SatUtMac (uint32_t beamId,
+            Ptr<SatSuperframeSeq> seq,
+            SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+            SatEnums::RegenerationMode_t returnLinkRegenerationMode,
+            bool crdsaOnlyForControl);
 
   /**
    * Destroy a SatUtMac
@@ -550,6 +556,11 @@ private:
 
   SatUtMac& operator = (const SatUtMac &);
   SatUtMac (const SatUtMac &);
+
+  /**
+   * ID of beam for UT
+   */
+  uint32_t m_beamId;
 
   /**
    * Used superframe sequence for the return link

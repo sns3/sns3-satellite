@@ -62,10 +62,7 @@ public:
   TypeId GetInstanceTypeId (void) const;
 
   /**
-   * Default construct of SatGwMac. Should not been used.
-   *
-   * This is the constructor for the SatGwMac
-   *
+   * Default constructor, which is not used.
    */
   SatGwMac ();
 
@@ -74,8 +71,11 @@ public:
    *
    * This is the constructor for the SatGwMac
    *
+   * \param forwardLinkRegenerationMode Forward link regeneration mode
+   * \param returnLinkRegenerationMode Return link regeneration mode
    */
-  SatGwMac (uint32_t beamId);
+  SatGwMac (SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+            SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   /**
    * Destroy a SatGwMac
@@ -217,8 +217,9 @@ private:
    * Signaling packet receiver, which handles all the signaling packet
    * receptions.
    * \param packet Received signaling packet
+   * \param beamId ID of beam on UT
    */
-  void ReceiveSignalingPacket (Ptr<Packet> packet);
+  void ReceiveSignalingPacket (Ptr<Packet> packet, uint32_t beamId);
 
   void SendNcrMessage ();
 
@@ -228,7 +229,7 @@ private:
    */
   void RemoveTbtp (uint32_t superframeCounter);
 
-  void SendCmtMessage (Address utId, Time burstDuration, Time satelliteReceptionTime);
+  void SendCmtMessage (Address utId, Time burstDuration, Time satelliteReceptionTime, uint32_t beamId);
 
   void SendLogonResponse (Address utId, uint32_t raChannel);
   static void SendLogonResponseHelper (SatGwMac* self,Address utId, uint32_t raChannel);

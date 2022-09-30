@@ -323,6 +323,11 @@ protected:
   ReplyDataRateMatrix m_replyDataRateMatrix;
 
   /**
+   * ID of beam for UT
+   */
+  uint32_t m_beamId;
+
+  /**
    * Indicates if satellite is regenerative on the link where this layer is sending packets.
    */
   bool m_isRegenerative;

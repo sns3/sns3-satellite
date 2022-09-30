@@ -104,10 +104,13 @@ SatGwMac::SatGwMac ()
   m_cmtPeriodMin (MilliSeconds (550))
 {
   NS_LOG_FUNCTION (this);
+
+  NS_FATAL_ERROR ("SatUtMac::SatGwMac - Constructor not in use");
 }
 
-SatGwMac::SatGwMac (uint32_t beamId)
-  : SatMac (beamId),
+SatGwMac::SatGwMac (SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                    SatEnums::RegenerationMode_t returnLinkRegenerationMode)
+  : SatMac (forwardLinkRegenerationMode, returnLinkRegenerationMode),
   m_fwdScheduler (),
   m_guardTime (MicroSeconds (1)),
   m_ncrInterval (MilliSeconds (100)),
@@ -214,7 +217,30 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> r
 
               if ( cType != SatControlMsgTag::SAT_NON_CTRL_MSG )
                 {
-                  ReceiveSignalingPacket (*i);
+                  uint32_t beamId;
+                  switch (m_returnLinkRegenerationMode)
+                    {
+                      case SatEnums::TRANSPARENT:
+                      case SatEnums::REGENERATION_PHY:
+                        {
+                          beamId = rxParams->m_beamId;
+                          break;
+                        }
+                      case SatEnums::REGENERATION_LINK:
+                      case SatEnums::REGENERATION_NETWORK:
+                        {
+                          SatUplinkInfoTag satUplinkInfoTag;
+                          if (!(*i)->PeekPacketTag (satUplinkInfoTag))
+                            {
+                              NS_FATAL_ERROR ("SatUplinkInfoTag not found!");
+                            }
+                          beamId = satUplinkInfoTag.GetBeamId ();
+                          break;
+                        }
+                      default:
+                        NS_FATAL_ERROR ("Unknown regeneration mode");
+                    }
+                  ReceiveSignalingPacket (*i, beamId);
                 }
               else
                 {
@@ -235,7 +261,7 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> r
 
   if (rxParams->m_txInfo.waveformId == 2)
     {
-      if (m_useCmt && m_isRegenerative)
+      if (m_useCmt && (m_forwardLinkRegenerationMode == SatEnums::REGENERATION_LINK || m_forwardLinkRegenerationMode == SatEnums::REGENERATION_NETWORK))
         {
           for (SatPhy::PacketContainer_t::iterator i = packets.begin (); i != packets.end (); i++ )
             {
@@ -245,11 +271,13 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> r
                   NS_FATAL_ERROR ("SatUplinkInfoTag not found !");
                 }
               Time satelliteReceptionTime = satUplinkInfoTag.GetSatelliteReceptionTime ();
+              uint32_t beamId = satUplinkInfoTag.GetBeamId ();
 
-              SendCmtMessage (utId, rxParams->m_duration, satelliteReceptionTime);
+              SendCmtMessage (utId, rxParams->m_duration, satelliteReceptionTime, beamId);
+
+              m_controlMessageReceivedCallback (utId, rxParams->m_beamId);
             }
         }
-      m_controlMessageReceivedCallback (utId, m_beamId);
     }
 }
 
@@ -312,7 +340,7 @@ SatGwMac::StartTransmission (uint32_t carrierId)
        * and try again then.
        */
 
-      NS_LOG_INFO ("Beam id: " << m_beamId << " is disabled, thus nothing is transmitted!");
+      NS_LOG_INFO ("TX is disabled, thus nothing is transmitted!");
       txDuration = m_fwdScheduler->GetDefaultFrameDuration ();
     }
 
@@ -359,7 +387,7 @@ SatGwMac::StartNcrTransmission ()
 }
 
 void
-SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
+SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet, uint32_t beamId)
 {
   NS_LOG_FUNCTION (this);
 
@@ -392,7 +420,7 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
 
             if ( m_crReceiveCallback.IsNull () == false )
               {
-                m_crReceiveCallback (m_beamId, addressE2ETag.GetE2ESourceAddress (), crMsg);
+                m_crReceiveCallback (beamId, addressE2ETag.GetE2ESourceAddress (), crMsg);
               }
           }
         else
@@ -455,8 +483,8 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
 
         if ( handoverRecommendation != NULL )
           {
-            uint32_t beamId = handoverRecommendation->GetRecommendedBeamId ();
-            m_handoverCallback (addressE2ETag.GetE2ESourceAddress (), m_beamId, beamId);
+            uint32_t newBeamId = handoverRecommendation->GetRecommendedBeamId ();
+            m_handoverCallback (addressE2ETag.GetE2ESourceAddress (), beamId, newBeamId);
           }
         else
           {
@@ -482,7 +510,7 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet)
           {
             Address utId = addressE2ETag.GetE2ESourceAddress ();
             Callback<void, uint32_t> raChannelCallback = MakeBoundCallback (&SatGwMac::SendLogonResponseHelper, this, utId);
-            m_logonCallback (utId, m_beamId, raChannelCallback);
+            m_logonCallback (utId, beamId, raChannelCallback);
           }
         else
           {
@@ -516,7 +544,7 @@ SatGwMac::SendNcrMessage ()
 }
 
 void
-SatGwMac::SendCmtMessage (Address utId, Time burstDuration, Time satelliteReceptionTime)
+SatGwMac::SendCmtMessage (Address utId, Time burstDuration, Time satelliteReceptionTime, uint32_t beamId)
 {
   NS_LOG_FUNCTION (this << utId);
 
@@ -591,7 +619,7 @@ SatGwMac::SendCmtMessage (Address utId, Time burstDuration, Time satelliteRecept
           NS_LOG_INFO ("Burst Time Correction outside bounds, should be at least -16256 and at most 16256, but got " << differenceNcr << ". Forcing logoff of UT " << utId);
           Ptr<SatLogoffMessage> logoffMsg = CreateObject<SatLogoffMessage> ();
           m_fwdScheduler->SendControlMsg (logoffMsg, utId);
-          m_removeUtCallback (utId, m_beamId);
+          m_removeUtCallback (utId, beamId);
         }
       else
         {

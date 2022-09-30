@@ -118,7 +118,7 @@ SatChannel::GetTypeId (void)
                                     SatEnums::RX_CNO_INPUT_TRACE, "RxCnoInputTrace"))
     .AddAttribute ("ForwardingMode",
                    "Channel forwarding mode.",
-                   EnumValue (SatChannel::ONLY_DEST_BEAM),
+                   EnumValue (SatChannel::ALL_BEAMS),
                    MakeEnumAccessor (&SatChannel::m_fwdMode),
                    MakeEnumChecker (SatChannel::ONLY_DEST_NODE, "OnlyDestNode",
                                     SatChannel::ONLY_DEST_BEAM, "OnlyDestBeam",

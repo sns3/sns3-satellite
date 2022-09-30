@@ -61,7 +61,8 @@ LorawanMac::LorawanMac ()
 }
 
 LorawanMac::LorawanMac (uint32_t beamId)
-  : SatMac (beamId),
+  : SatMac (),
+  m_beamId (beamId),
   m_isRegenerative (false)
 {
   NS_LOG_FUNCTION (this);

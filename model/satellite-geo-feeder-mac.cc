@@ -26,11 +26,12 @@
 #include <ns3/enum.h>
 
 #include "satellite-utils.h"
-#include "satellite-geo-feeder-mac.h"
 #include "satellite-mac.h"
 #include "satellite-time-tag.h"
 #include "satellite-address-tag.h"
 #include "satellite-signal-parameters.h"
+
+#include "satellite-geo-feeder-mac.h"
 
 
 NS_LOG_COMPONENT_DEFINE ("SatGeoFeederMac");
@@ -77,17 +78,13 @@ SatGeoFeederMac::SatGeoFeederMac (void)
   NS_FATAL_ERROR ("SatGeoFeederMac default constructor is not allowed to use");
 }
 
-SatGeoFeederMac::SatGeoFeederMac (uint32_t beamId,
-                                  SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+SatGeoFeederMac::SatGeoFeederMac (SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                                   SatEnums::RegenerationMode_t returnLinkRegenerationMode)
- : SatMac (beamId),
+ : SatMac (forwardLinkRegenerationMode, returnLinkRegenerationMode),
   m_fwdScheduler (),
   m_guardTime (MicroSeconds (1))
 {
   NS_LOG_FUNCTION (this);
-
-  m_forwardLinkRegenerationMode = forwardLinkRegenerationMode;
-  m_returnLinkRegenerationMode = returnLinkRegenerationMode;
 }
 
 SatGeoFeederMac::~SatGeoFeederMac ()
@@ -161,22 +158,15 @@ SatGeoFeederMac::StartTransmission (uint32_t carrierId)
        * and try again then.
        */
 
-      NS_LOG_INFO ("Beam id: " << m_beamId << " is disabled, thus nothing is transmitted!");
+      NS_LOG_INFO ("TX is disabled, thus nothing is transmitted!");
       txDuration = m_fwdScheduler->GetDefaultFrameDuration ();
     }
 
-  /**
-   * It is currently assumed that there is only one carrier in FWD link. This
-   * carrier has a default index of 0.
-   * TODO: When enabling multi-carrier support for FWD link, we need to
-   * modify the FWD link scheduler to schedule separately each FWD link
-   * carrier.
-   */
   Simulator::Schedule (txDuration, &SatGeoFeederMac::StartTransmission, this, 0);
 }
 
 void
-SatGeoFeederMac::SendPackets (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> txParams)
+SatGeoFeederMac::EnquePackets (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> txParams)
 {
   NS_LOG_FUNCTION (this);
 
@@ -198,7 +188,9 @@ SatGeoFeederMac::SendPackets (SatPhy::PacketContainer_t packets, Ptr<SatSignalPa
           (*it)->AddPacketTag (mTag);
         }
 
-      m_llc->Enque (*it, addressE2ETag.GetE2EDestAddress (), 0);
+      // TODO prioritize if ctrl ?
+
+      m_llc->Enque (*it, addressE2ETag.GetE2EDestAddress (), 1);
     }
 }
 
@@ -223,7 +215,6 @@ SatGeoFeederMac::SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrier
   Ptr<SatSignalParameters> txParams = Create<SatSignalParameters> ();
   txParams->m_duration = duration;
   txParams->m_packetsInBurst = packets;
-  txParams->m_beamId = m_beamId;
   txParams->m_carrierId = carrierId;
   txParams->m_txInfo = txInfo;
 

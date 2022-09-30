@@ -341,12 +341,8 @@ SatGwHelper::InstallDvb (Ptr<Node> n,
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());
   phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
 
-  Ptr<SatGwMac> mac = CreateObject<SatGwMac> (beamId);
-
-  if (forwardLinkRegenerationMode == SatEnums::REGENERATION_LINK || forwardLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
-    {
-      mac->setRegenerative (true);
-    }
+  Ptr<SatGwMac> mac = CreateObject<SatGwMac> (forwardLinkRegenerationMode,
+                                              returnLinkRegenerationMode);
 
   // Set the control message container callbacks
   mac->SetReadCtrlCallback (m_readCtrlCb);
@@ -576,11 +572,6 @@ SatGwHelper::InstallLora (Ptr<Node> n,
   phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
 
   Ptr<LorawanMacGateway> mac = CreateObject<LorawanMacGateway> (beamId);
-
-  if (forwardLinkRegenerationMode == SatEnums::REGENERATION_LINK || forwardLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
-    {
-      mac->setRegenerative (true);
-    }
 
   SatLoraConf satLoraConf;
   satLoraConf.SetConf (mac);

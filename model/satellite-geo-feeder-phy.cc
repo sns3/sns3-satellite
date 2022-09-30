@@ -351,6 +351,7 @@ SatGeoFeederPhy::SendFromQueue ()
                  SatUtils::GetPacketInfo (txParams->m_packetsInBurst));
 
   Simulator::Schedule (txParams->m_duration + NanoSeconds (1), &SatGeoFeederPhy::EndTx, this);
+
   m_phyTx->StartTx (txParams);
 }
 

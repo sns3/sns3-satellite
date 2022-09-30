@@ -276,28 +276,34 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d,
 
   Ptr<SatGeoNetDevice> dev = DynamicCast<SatGeoNetDevice> (d);
 
+  dev->SetForwardLinkRegenerationMode (forwardLinkRegenerationMode);
+  dev->SetReturnLinkRegenerationMode (returnLinkRegenerationMode);
+
+  AttachChannelsFeeder ( dev, ff, fr, feederAgp, userBeamId, forwardLinkRegenerationMode, returnLinkRegenerationMode);
+  AttachChannelsUser ( dev, uf, ur, userAgp, userBeamId, forwardLinkRegenerationMode, returnLinkRegenerationMode);
+}
+
+void
+SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
+                                     Ptr<SatChannel> ff,
+                                     Ptr<SatChannel> fr,
+                                     Ptr<SatAntennaGainPattern> feederAgp,
+                                     uint32_t userBeamId,
+                                     SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                                     SatEnums::RegenerationMode_t returnLinkRegenerationMode)
+{
+
+  NS_LOG_FUNCTION (this << dev << ff << fr << feederAgp << forwardLinkRegenerationMode << returnLinkRegenerationMode);
+
   SatPhy::CreateParam_t params;
   params.m_beamId = userBeamId;
-  params.m_device = d;
+  params.m_device = dev;
   params.m_standard = SatEnums::GEO;
 
   /**
    * Simple channel estimation, which does not do actually anything
    */
   Ptr<SatChannelEstimationErrorContainer> cec = Create<SatSimpleChannelEstimationErrorContainer> ();
-
-  SatPhyRxCarrierConf::RxCarrierCreateParams_s parametersUser = SatPhyRxCarrierConf::RxCarrierCreateParams_s ();
-  parametersUser.m_errorModel = m_rtnErrorModel;
-  parametersUser.m_daConstantErrorRate = m_rtnDaConstantErrorRate;
-  parametersUser.m_daIfModel = m_daRtnLinkInterferenceModel;
-  parametersUser.m_raIfModel = m_raSettings.m_raRtnInterferenceModel;
-  parametersUser.m_raIfEliminateModel = m_raSettings.m_raInterferenceEliminationModel;
-  parametersUser.m_linkRegenerationMode = returnLinkRegenerationMode;
-  parametersUser.m_bwConverter = m_carrierBandwidthConverter;
-  parametersUser.m_carrierCount = m_rtnLinkCarrierCount;
-  parametersUser.m_cec = cec;
-  parametersUser.m_raCollisionModel = m_raSettings.m_raCollisionModel;
-  parametersUser.m_randomAccessModel = m_raSettings.m_randomAccessModel;
 
   SatPhyRxCarrierConf::RxCarrierCreateParams_s parametersFeeder = SatPhyRxCarrierConf::RxCarrierCreateParams_s ();
   parametersFeeder.m_errorModel = m_fwdErrorModel;
@@ -312,9 +318,6 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d,
   parametersFeeder.m_raCollisionModel = m_raSettings.m_raCollisionModel;
   parametersFeeder.m_randomAccessModel = m_raSettings.m_randomAccessModel;
 
-  dev->SetForwardLinkRegenerationMode (forwardLinkRegenerationMode);
-  dev->SetReturnLinkRegenerationMode (returnLinkRegenerationMode);
-
   params.m_txCh = fr;
   params.m_rxCh = ff;
 
@@ -325,38 +328,20 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d,
                                                              forwardLinkRegenerationMode,
                                                              returnLinkRegenerationMode);
 
-  params.m_txCh = uf;
-  params.m_rxCh = ur;
-
-  Ptr<SatGeoUserPhy> uPhy = CreateObject<SatGeoUserPhy> (params,
-                                                         m_rtnLinkResults,
-                                                         parametersUser,
-                                                         m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE),
-                                                         forwardLinkRegenerationMode,
-                                                         returnLinkRegenerationMode);
-
   // Note, that currently we have only one set of antenna patterns,
   // which are utilized in both in user link and feeder link, and
   // in both uplink and downlink directions.
   fPhy->SetTxAntennaGainPattern (feederAgp);
   fPhy->SetRxAntennaGainPattern (feederAgp);
-  uPhy->SetTxAntennaGainPattern (userAgp);
-  uPhy->SetRxAntennaGainPattern (userAgp);
 
   dev->AddFeederPhy (fPhy, userBeamId);
-  dev->AddUserPhy (uPhy, userBeamId);
 
   fPhy->Initialize ();
-  uPhy->Initialize ();
 
   Ptr<SatGeoFeederMac> fMac;
-  Ptr<SatGeoUserMac> uMac;
-
   Ptr<SatGeoFeederLlc> fLlc;
-  Ptr<SatGeoUserLlc> uLlc;
 
   Mac48Address feederAddress;
-  Mac48Address userAddress;
 
   // Create layers needed depending on max regeneration mode
   switch (std::max (forwardLinkRegenerationMode, returnLinkRegenerationMode))
@@ -365,30 +350,21 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d,
       case SatEnums::REGENERATION_PHY:
         {
           // Create a node info to PHY layers
-          Ptr<SatNodeInfo> niPhyFeeder = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, Mac48Address::ConvertFrom (d->GetAddress ()));
+          Ptr<SatNodeInfo> niPhyFeeder = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, Mac48Address::ConvertFrom (dev->GetAddress ()));
           fPhy->SetNodeInfo (niPhyFeeder);
-
-          Ptr<SatNodeInfo> niPhyUser = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, Mac48Address::ConvertFrom (d->GetAddress ()));
-          uPhy->SetNodeInfo (niPhyUser);
 
           break;
         }
       case SatEnums::REGENERATION_LINK:
         {
           // Create MAC layer
-          fMac = CreateObject<SatGeoFeederMac> (userBeamId,
-                                                forwardLinkRegenerationMode,
+          fMac = CreateObject<SatGeoFeederMac> (forwardLinkRegenerationMode,
                                                 returnLinkRegenerationMode);
-
-          uMac = CreateObject<SatGeoUserMac> (userBeamId,
-                                              forwardLinkRegenerationMode,
-                                              returnLinkRegenerationMode);
 
           // Create LLC layer
           fLlc = CreateObject<SatGeoFeederLlc> ();
 
           dev->AddFeederMac (fMac, userBeamId);
-          dev->AddUserMac (uMac, userBeamId);
 
           // Create a node info to PHY and MAC layers
           feederAddress = Mac48Address::Allocate ();
@@ -396,11 +372,6 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d,
           fPhy->SetNodeInfo (niFeeder);
           fMac->SetNodeInfo (niFeeder);
           fLlc->SetNodeInfo (niFeeder);
-
-          userAddress = Mac48Address::Allocate ();
-          Ptr<SatNodeInfo> niUser = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, userAddress);
-          uPhy->SetNodeInfo (niUser);
-          uMac->SetNodeInfo (niUser);
 
           break;
         }
@@ -429,18 +400,12 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d,
       case SatEnums::TRANSPARENT:
       case SatEnums::REGENERATION_PHY:
         {
-          SatPhy::ReceiveCallback uCb = MakeCallback (&SatGeoNetDevice::ReceiveUser, dev);
-          uPhy->SetAttribute ("ReceiveCb", CallbackValue (uCb));
-
+          // Nothing to do on feeder side
           break;
         }
       case SatEnums::REGENERATION_LINK:
         {
-          SatPhy::ReceiveCallback uCb = MakeCallback (&SatGeoUserMac::Receive, uMac);
-          uPhy->SetAttribute ("ReceiveCb", CallbackValue (uCb));
-
           fMac->SetTransmitFeederCallback (MakeCallback (&SatGeoFeederPhy::SendPduWithParams, fPhy));
-          uMac->SetReceiveUserCallback (MakeCallback (&SatGeoNetDevice::ReceiveUser, dev));
 
           double carrierBandwidth = m_carrierBandwidthConverter (SatEnums::RETURN_FEEDER_CH, 0, SatEnums::EFFECTIVE_BANDWIDTH);
           Ptr<SatFwdLinkSchedulerScpc> fwdLinkSchedulerScpc = CreateObject<SatFwdLinkSchedulerScpc> (m_bbFrameConf, feederAddress, carrierBandwidth);
@@ -451,6 +416,137 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d,
           // Attach the LLC Tx opportunity and scheduling context getter callbacks to SatFwdLinkScheduler
           fwdLinkSchedulerScpc->SetTxOpportunityCallback (MakeCallback (&SatGeoLlc::NotifyTxOpportunity, fLlc));
           fwdLinkSchedulerScpc->SetSchedContextCallback (MakeCallback (&SatLlc::GetSchedulingContexts, fLlc));
+
+          break;
+        }
+      default:
+        NS_FATAL_ERROR ("Return link regeneration mode unknown");
+    }
+}
+
+
+void
+SatGeoHelper::AttachChannelsUser ( Ptr<SatGeoNetDevice> dev,
+                                   Ptr<SatChannel> uf,
+                                   Ptr<SatChannel> ur,
+                                   Ptr<SatAntennaGainPattern> userAgp,
+                                   uint32_t userBeamId,
+                                   SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                                   SatEnums::RegenerationMode_t returnLinkRegenerationMode)
+{
+  NS_LOG_FUNCTION (this << dev << uf << ur << userAgp << userBeamId << forwardLinkRegenerationMode << returnLinkRegenerationMode);
+
+  SatPhy::CreateParam_t params;
+  params.m_beamId = userBeamId;
+  params.m_device = dev;
+  params.m_standard = SatEnums::GEO;
+
+  /**
+   * Simple channel estimation, which does not do actually anything
+   */
+  Ptr<SatChannelEstimationErrorContainer> cec = Create<SatSimpleChannelEstimationErrorContainer> ();
+
+  SatPhyRxCarrierConf::RxCarrierCreateParams_s parametersUser = SatPhyRxCarrierConf::RxCarrierCreateParams_s ();
+  parametersUser.m_errorModel = m_rtnErrorModel;
+  parametersUser.m_daConstantErrorRate = m_rtnDaConstantErrorRate;
+  parametersUser.m_daIfModel = m_daRtnLinkInterferenceModel;
+  parametersUser.m_raIfModel = m_raSettings.m_raRtnInterferenceModel;
+  parametersUser.m_raIfEliminateModel = m_raSettings.m_raInterferenceEliminationModel;
+  parametersUser.m_linkRegenerationMode = returnLinkRegenerationMode;
+  parametersUser.m_bwConverter = m_carrierBandwidthConverter;
+  parametersUser.m_carrierCount = m_rtnLinkCarrierCount;
+  parametersUser.m_cec = cec;
+  parametersUser.m_raCollisionModel = m_raSettings.m_raCollisionModel;
+  parametersUser.m_randomAccessModel = m_raSettings.m_randomAccessModel;
+
+  params.m_txCh = uf;
+  params.m_rxCh = ur;
+
+  Ptr<SatGeoUserPhy> uPhy = CreateObject<SatGeoUserPhy> (params,
+                                                         m_rtnLinkResults,
+                                                         parametersUser,
+                                                         m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE),
+                                                         forwardLinkRegenerationMode,
+                                                         returnLinkRegenerationMode);
+
+  // Note, that currently we have only one set of antenna patterns,
+  // which are utilized in both in user link and feeder link, and
+  // in both uplink and downlink directions.
+  uPhy->SetTxAntennaGainPattern (userAgp);
+  uPhy->SetRxAntennaGainPattern (userAgp);
+
+  dev->AddUserPhy (uPhy, userBeamId);
+
+  uPhy->Initialize ();
+
+  Ptr<SatGeoUserMac> uMac;
+  Ptr<SatGeoUserLlc> uLlc;
+
+  Mac48Address userAddress;
+
+  // Create layers needed depending on max regeneration mode
+  switch (std::max (forwardLinkRegenerationMode, returnLinkRegenerationMode))
+    {
+      case SatEnums::TRANSPARENT:
+      case SatEnums::REGENERATION_PHY:
+        {
+          // Create a node info to PHY layers
+          Ptr<SatNodeInfo> niPhyUser = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, Mac48Address::ConvertFrom (dev->GetAddress ()));
+          uPhy->SetNodeInfo (niPhyUser);
+
+          break;
+        }
+      case SatEnums::REGENERATION_LINK:
+        {
+          // Create MAC layer
+          uMac = CreateObject<SatGeoUserMac> (userBeamId,
+                                              forwardLinkRegenerationMode,
+                                              returnLinkRegenerationMode);
+
+          dev->AddUserMac (uMac, userBeamId);
+
+          // Create a node info to PHY and MAC layers
+          userAddress = Mac48Address::Allocate ();
+          Ptr<SatNodeInfo> niUser = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, userAddress);
+          uPhy->SetNodeInfo (niUser);
+          uMac->SetNodeInfo (niUser);
+
+          break;
+        }
+      default:
+        NS_FATAL_ERROR ("Forward or return link regeneration mode unknown");
+    }
+
+  // Connect callbacks on forward link
+  switch (forwardLinkRegenerationMode)
+    {
+      case SatEnums::TRANSPARENT:
+      case SatEnums::REGENERATION_PHY:
+        {
+          // Nothing to do on user side
+          break;
+        }
+      default:
+        NS_FATAL_ERROR ("Forward link regeneration mode unknown");
+    }
+
+  // Connect callbacks on return link
+  switch (returnLinkRegenerationMode)
+    {
+      case SatEnums::TRANSPARENT:
+      case SatEnums::REGENERATION_PHY:
+        {
+          SatPhy::ReceiveCallback uCb = MakeCallback (&SatGeoNetDevice::ReceiveUser, dev);
+          uPhy->SetAttribute ("ReceiveCb", CallbackValue (uCb));
+
+          break;
+        }
+      case SatEnums::REGENERATION_LINK:
+        {
+          SatPhy::ReceiveCallback uCb = MakeCallback (&SatGeoUserMac::Receive, uMac);
+          uPhy->SetAttribute ("ReceiveCb", CallbackValue (uCb));
+
+          uMac->SetReceiveUserCallback (MakeCallback (&SatGeoNetDevice::ReceiveUser, dev));
 
           break;
         }

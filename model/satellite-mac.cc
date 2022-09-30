@@ -93,10 +93,11 @@ SatMac::SatMac ()
   m_ncrV2 (false),
   m_routingUpdateCallback (0),
   m_nodeInfo (),
-  m_beamId (0),
   m_txEnabled (true),
   m_beamEnabledTime (Seconds (0)),
   m_lastDelay (0),
+  m_forwardLinkRegenerationMode (SatEnums::TRANSPARENT),
+  m_returnLinkRegenerationMode (SatEnums::TRANSPARENT),
   m_isRegenerative (false),
   m_satelliteAddress (),
   m_lastLinkDelay (0)
@@ -105,15 +106,17 @@ SatMac::SatMac ()
   NS_ASSERT (false); // this version of the constructor should not been used
 }
 
-SatMac::SatMac (uint32_t beamId)
+SatMac::SatMac (SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                SatEnums::RegenerationMode_t returnLinkRegenerationMode)
   : m_isStatisticsTagsEnabled (false),
   m_ncrV2 (false),
   m_routingUpdateCallback (0),
   m_nodeInfo (),
-  m_beamId (beamId),
   m_txEnabled (true),
   m_beamEnabledTime (Seconds (0)),
   m_lastDelay (0),
+  m_forwardLinkRegenerationMode (forwardLinkRegenerationMode),
+  m_returnLinkRegenerationMode (returnLinkRegenerationMode),
   m_isRegenerative (false),
   m_satelliteAddress (),
   m_lastLinkDelay (0)
@@ -211,16 +214,10 @@ SatMac::Disable ()
 }
 
 void
-SatMac::setRegenerative (bool isRegenerative)
-{
-  NS_LOG_FUNCTION (this << isRegenerative);
-  m_isRegenerative = isRegenerative;
-}
-
-void
 SatMac::SetSatelliteAddress (Address satelliteAddress)
 {
   m_satelliteAddress = satelliteAddress;
+  m_isRegenerative = true;
 }
 
 void

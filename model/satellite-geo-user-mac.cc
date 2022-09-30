@@ -26,11 +26,13 @@
 #include <ns3/enum.h>
 
 #include "satellite-utils.h"
-#include "satellite-geo-user-mac.h"
 #include "satellite-mac.h"
 #include "satellite-time-tag.h"
 #include "satellite-address-tag.h"
+#include "satellite-uplink-info-tag.h"
 #include "satellite-signal-parameters.h"
+
+#include "satellite-geo-user-mac.h"
 
 
 NS_LOG_COMPONENT_DEFINE ("SatGeoUserMac");
@@ -66,12 +68,10 @@ SatGeoUserMac::SatGeoUserMac (void)
 SatGeoUserMac::SatGeoUserMac (uint32_t beamId,
                               SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                               SatEnums::RegenerationMode_t returnLinkRegenerationMode)
- : SatMac (beamId)
+ : SatMac (forwardLinkRegenerationMode, returnLinkRegenerationMode),
+ m_beamId (beamId)
 {
   NS_LOG_FUNCTION (this);
-
-  m_forwardLinkRegenerationMode = forwardLinkRegenerationMode;
-  m_returnLinkRegenerationMode = returnLinkRegenerationMode;
 }
 
 SatGeoUserMac::~SatGeoUserMac ()
@@ -94,20 +94,9 @@ SatGeoUserMac::DoInitialize ()
 }
 
 void
-SatGeoUserMac::SendPackets (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> txParams)
+SatGeoUserMac::EnquePackets (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> txParams)
 {
   NS_LOG_FUNCTION (this);
-
-  // TODO move to after scheduling
-  // Add packet trace entry:
-  m_packetTrace (Simulator::Now (),
-                 SatEnums::PACKET_SENT,
-                 m_nodeInfo->GetNodeType (),
-                 m_nodeInfo->GetNodeId (),
-                 m_nodeInfo->GetMacAddress (),
-                 SatEnums::LL_MAC,
-                 SatEnums::LD_FORWARD,
-                 SatUtils::GetPacketInfo (packets));
 
   // Update MAC address source and destination
   for (SatPhy::PacketContainer_t::const_iterator it = packets.begin ();
@@ -126,7 +115,37 @@ SatGeoUserMac::SendPackets (SatPhy::PacketContainer_t packets, Ptr<SatSignalPara
           mTag.SetSourceAddress (m_nodeInfo->GetMacAddress ());
           (*it)->AddPacketTag (mTag);
         }
+
+      m_llc->Enque (*it, addressE2ETag.GetE2EDestAddress (), 1);
     }
+}
+
+void
+SatGeoUserMac::SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time duration, SatSignalParameters::txInfo_s txInfo)
+{
+  NS_LOG_FUNCTION (this);
+
+  // Add a SatMacTimeTag tag for packet delay computation at the receiver end.
+  SetTimeTag (packets);
+
+  // Add packet trace entry:
+  m_packetTrace (Simulator::Now (),
+                 SatEnums::PACKET_SENT,
+                 m_nodeInfo->GetNodeType (),
+                 m_nodeInfo->GetNodeId (),
+                 m_nodeInfo->GetMacAddress (),
+                 SatEnums::LL_MAC,
+                 SatEnums::LD_RETURN,
+                 SatUtils::GetPacketInfo (packets));
+
+  Ptr<SatSignalParameters> txParams = Create<SatSignalParameters> ();
+  txParams->m_duration = duration;
+  txParams->m_packetsInBurst = packets;
+  txParams->m_beamId = m_beamId;
+  txParams->m_carrierId = carrierId;
+  txParams->m_txInfo = txInfo;
+
+  // Use call back to send packet to lower layer
   m_txUserCallback (txParams);
 }
 
@@ -146,6 +165,15 @@ SatGeoUserMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParamete
                  SatUtils::GetPacketInfo (packets));
 
   RxTraces (packets);
+
+  SatPhy::PacketContainer_t::const_iterator i;
+  for (i = packets.begin (); i != packets.end (); i++)
+    {
+      SatUplinkInfoTag satUplinkInfoTag;
+      (*i)->RemovePacketTag (satUplinkInfoTag);
+      satUplinkInfoTag.SetBeamId (m_beamId);
+      (*i)->AddPacketTag (satUplinkInfoTag);
+    }
 
   m_rxUserCallback (packets, rxParams);
 }

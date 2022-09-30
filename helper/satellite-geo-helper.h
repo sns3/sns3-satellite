@@ -33,6 +33,7 @@
 #include "ns3/traced-callback.h"
 #include "ns3/satellite-channel.h"
 #include "ns3/satellite-phy.h"
+#include "ns3/satellite-geo-net-device.h"
 #include "ns3/satellite-superframe-sequence.h"
 #include "ns3/satellite-typedefs.h"
 #include "ns3/satellite-bbframe-conf.h"
@@ -179,6 +180,42 @@ public:
                         uint32_t userBeamId,
                         SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                         SatEnums::RegenerationMode_t returnLinkRegenerationMode);
+
+  /*
+   * Attach the SatChannels for the beam to NetDevice
+   * \param dev NetDevice to attach channels
+   * \param fr feeder forward channel
+   * \param fr feeder return channel
+   * \param feederAgp feeder beam antenna gain pattern
+   * \param userBeamId Id of the beam
+   * \param forwardLinkRegenerationMode Regeneration mode on forward
+   * \param returnLinkRegenerationMode Regeneration mode on return
+   */
+  void AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
+                              Ptr<SatChannel> ff,
+                              Ptr<SatChannel> fr,
+                              Ptr<SatAntennaGainPattern> feederAgp,
+                            uint32_t userBeamId,
+                              SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                              SatEnums::RegenerationMode_t returnLinkRegenerationMode);
+
+  /*
+   * Attach the SatChannels for the beam to NetDevice
+   * \param dev NetDevice to attach channels
+   * \param uf user forward channel
+   * \param uf user return channel
+   * \param userAgp user beam antenna gain pattern
+   * \param userBeamId Id of the beam
+   * \param forwardLinkRegenerationMode Regeneration mode on forward
+   * \param returnLinkRegenerationMode Regeneration mode on return
+   */
+  void AttachChannelsUser ( Ptr<SatGeoNetDevice> dev,
+                            Ptr<SatChannel> uf,
+                            Ptr<SatChannel> ur,
+                            Ptr<SatAntennaGainPattern> userAgp,
+                            uint32_t userBeamId,
+                            SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                            SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   /**
    * Enables creation traces to be written in given file

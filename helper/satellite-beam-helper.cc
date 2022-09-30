@@ -483,7 +483,7 @@ SatBeamHelper::Install (NodeContainer ut,
   // next it is found user link channels and if not found channels are created and saved to map
   SatChannelPair::ChannelPair_t userLink = GetChannelPair (beamId, fwdUlFreqId, rtnUlFreqId, true);
 
-  // next it is found feeder link channels and if not found channels are created nd saved to map
+  // next it is found feeder link channels and if not found channels are created and saved to map
   SatChannelPair::ChannelPair_t feederLink = GetChannelPair (beamId, fwdFlFreqId, rtnFlFreqId, false);
 
   // Set trace files if options ask for it
@@ -991,6 +991,8 @@ SatBeamHelper::EnablePacketTrace ()
    * - PHY
    */
 
+  SatEnums::RegenerationMode_t maxRegeneration = std::max (m_forwardLinkRegenerationMode, m_returnLinkRegenerationMode);
+
   /**
    * TODO: Currently the packet trace logs all entries updated by the protocol layers. Here
    * we could restrict the protocol layers from where the traced data are collected from.
@@ -1001,8 +1003,11 @@ SatBeamHelper::EnablePacketTrace ()
   Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/UserPhy/*/PacketTrace", MakeCallback (&SatPacketTrace::AddTraceEntry, m_packetTrace));
   Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/FeederPhy/*/PacketTrace", MakeCallback (&SatPacketTrace::AddTraceEntry, m_packetTrace));
   Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/SatMac/PacketTrace", MakeCallback (&SatPacketTrace::AddTraceEntry, m_packetTrace));
-  Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/UserMac/*/PacketTrace", MakeCallback (&SatPacketTrace::AddTraceEntry, m_packetTrace));
-  Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/FeederMac/*/PacketTrace", MakeCallback (&SatPacketTrace::AddTraceEntry, m_packetTrace));
+  if (maxRegeneration == SatEnums::REGENERATION_LINK || maxRegeneration == SatEnums::REGENERATION_NETWORK)
+    {
+      Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/UserMac/*/PacketTrace", MakeCallback (&SatPacketTrace::AddTraceEntry, m_packetTrace));
+      Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/FeederMac/*/PacketTrace", MakeCallback (&SatPacketTrace::AddTraceEntry, m_packetTrace));
+    }
   if (m_standard == SatEnums::DVB)
     {
       Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/SatLlc/PacketTrace", MakeCallback (&SatPacketTrace::AddTraceEntry, m_packetTrace));

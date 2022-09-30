@@ -29,6 +29,7 @@
 
 #include "satellite-phy.h"
 #include "satellite-mac.h"
+#include "satellite-geo-user-llc.h"
 #include "satellite-signal-parameters.h"
 
 
@@ -48,6 +49,15 @@ public:
    */
   SatGeoUserMac (void);
 
+  /**
+   * Construct a SatGeoUserMac
+   *
+   * This is the constructor for the SatGeoUserMac
+   *
+   * \param beamId ID of beam for UT
+   * \param forwardLinkRegenerationMode Forward link regeneration mode
+   * \param returnLinkRegenerationMode Return link regeneration mode
+   */
   SatGeoUserMac (uint32_t beamId,
                  SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                  SatEnums::RegenerationMode_t returnLinkRegenerationMode);
@@ -71,11 +81,11 @@ public:
   virtual void DoDispose (void);
 
   /**
-   * \brief Send packets to lower layer by using a callback
+   * \brief Add new packets to the LLC queue.
    * \param packets Packets to be sent.
    * \param rxParams The parameters associated to these packets.
    */
-  virtual void SendPackets (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> rxParams);
+  virtual void EnquePackets (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> rxParams);
 
   /**
    * Receive packet from lower layer.
@@ -94,6 +104,15 @@ public:
   void SetReceiveUserCallback (ReceiveUserCallback cb);
 
 protected:
+  /**
+   * \brief Send packets to lower layer by using a callback
+   * \param packets Packets to be sent.
+   * \param carrierId ID of the carrier used for transmission.
+   * \param duration Duration of the physical layer transmission.
+   * \param txInfo Additional parameterization for burst transmission.
+   */
+  virtual void SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time duration, SatSignalParameters::txInfo_s txInfo);
+
   /**
    * \brief Invoke the `Rx` trace source for each received packet.
    * \param packets Container of the pointers to the packets received.
@@ -115,17 +134,14 @@ protected:
 private:
 
   /**
-   * Regeneration mode on forward link.
+   * ID of beam for UT
    */
-  SatEnums::RegenerationMode_t m_forwardLinkRegenerationMode;
-
-  /**
-   * Regeneration mode on return link.
-   */
-  SatEnums::RegenerationMode_t m_returnLinkRegenerationMode;
+  uint32_t m_beamId;
 
   TransmitUserCallback m_txUserCallback;
   ReceiveUserCallback m_rxUserCallback;
+
+  Ptr<SatGeoUserLlc> m_llc;
 
 };
 

@@ -108,6 +108,7 @@ SatUtMac::GetInstanceTypeId (void) const
 
 SatUtMac::SatUtMac ()
   : SatMac (),
+  m_beamId (),
   m_superframeSeq (),
   m_timingAdvanceCb (0),
   m_randomAccess (NULL),
@@ -151,8 +152,13 @@ SatUtMac::SatUtMac ()
   NS_FATAL_ERROR ("SatUtMac::SatUtMac - Constructor not in use");
 }
 
-SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, bool crdsaOnlyForControl)
-  : SatMac (beamId),
+SatUtMac::SatUtMac (uint32_t beamId,
+                    Ptr<SatSuperframeSeq> seq,
+                    SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                    SatEnums::RegenerationMode_t returnLinkRegenerationMode,
+                    bool crdsaOnlyForControl)
+  : SatMac (forwardLinkRegenerationMode, returnLinkRegenerationMode),
+  m_beamId (beamId),
   m_superframeSeq (seq),
   m_timingAdvanceCb (0),
   m_guardTime (MicroSeconds (1)),
@@ -587,7 +593,7 @@ SatUtMac::DoTransmit (Time duration, uint32_t carrierId, Ptr<SatWaveform> wf, Pt
 
           // Add MAC tag to identify the packet in lower layers
           SatMacTag mTag;
-          if (m_isRegenerative)
+          if (m_returnLinkRegenerationMode == SatEnums::REGENERATION_LINK || m_returnLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
             {
               mTag.SetDestAddress (Mac48Address::ConvertFrom (m_satelliteAddress));
             }

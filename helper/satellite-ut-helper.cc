@@ -312,12 +312,11 @@ SatUtHelper::InstallDvb (Ptr<Node> n, uint32_t beamId,
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());
   phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
 
-  Ptr<SatUtMac> mac = CreateObject<SatUtMac> (m_superframeSeq, beamId, m_crdsaOnlyForControl);
-
-  if (returnLinkRegenerationMode == SatEnums::REGENERATION_LINK || returnLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
-    {
-      mac->setRegenerative (true);
-    }
+  Ptr<SatUtMac> mac = CreateObject<SatUtMac> (beamId,
+                                              m_superframeSeq,
+                                              forwardLinkRegenerationMode,
+                                              returnLinkRegenerationMode,
+                                              m_crdsaOnlyForControl);
 
   // Set the control message container callbacks
   mac->SetReadCtrlCallback (m_readCtrlCb);
@@ -604,11 +603,6 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
   phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
 
   Ptr<LorawanMacEndDeviceClassA> mac = CreateObject<LorawanMacEndDeviceClassA> (beamId, m_superframeSeq);
-
-  if (returnLinkRegenerationMode == SatEnums::REGENERATION_LINK || returnLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
-    {
-      mac->setRegenerative (true);
-    }
 
   // TODO configuration for EU only
   mac->SetTxDbmForTxPower (std::vector<double>{16, 14, 12, 10, 8, 6, 4, 2});

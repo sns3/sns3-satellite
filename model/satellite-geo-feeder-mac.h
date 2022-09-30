@@ -50,8 +50,15 @@ public:
    */
   SatGeoFeederMac (void);
 
-  SatGeoFeederMac (uint32_t beamId,
-                   SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+  /**
+   * Construct a SatGeoFeederMac
+   *
+   * This is the constructor for the SatGeoFeederMac
+   *
+   * \param forwardLinkRegenerationMode Forward link regeneration mode
+   * \param returnLinkRegenerationMode Return link regeneration mode
+   */
+  SatGeoFeederMac (SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                    SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   /**
@@ -78,11 +85,11 @@ public:
   void StartPeriodicTransmissions ();
 
   /**
-   * \brief Send packets to lower layer by using a callback
+   * \brief Add new packets to the LLC queue.
    * \param packets Packets to be sent.
    * \param rxParams The parameters associated to these packets.
    */
-  virtual void SendPackets (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> txParams);
+  virtual void EnquePackets (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> txParams);
 
   /**
    * Receive packet from lower layer.
@@ -150,16 +157,6 @@ private:
    * \returns true if success, false on failure
    */
   void StartTransmission (uint32_t carrierId);
-
-  /**
-   * Regeneration mode on forward link.
-   */
-  SatEnums::RegenerationMode_t m_forwardLinkRegenerationMode;
-
-  /**
-   * Regeneration mode on return link.
-   */
-  SatEnums::RegenerationMode_t m_returnLinkRegenerationMode;
 
   /**
    * Scheduler for the forward link.

@@ -56,8 +56,9 @@ public:
    * \param satelliteReceptionTime
    * \param sinr
    * \param additionalInterference additional interference to add to compute final SINR
+   * \param beamId Beam ID of the UT
    */
-  SatUplinkInfoTag (Time satelliteReceptionTime, double sinr, double additionalInterference);
+  SatUplinkInfoTag (Time satelliteReceptionTime, double sinr, double additionalInterference, uint32_t beamId);
 
   /**
    * Serializes information to buffer from this instance of SatUplinkInfoTag
@@ -120,11 +121,24 @@ public:
    */
   bool IsSinrComputed (void) const;
 
+  /**
+   * Get the UT beam ID
+   * \return Beam ID
+   */
+  uint32_t GetBeamId (void) const;
+
+  /**
+   * Set the UT beam ID
+   * \param beamId Beam ID
+   */
+  void SetBeamId (uint32_t beamId);
+
 private:
   Time m_satelliteReceptionTime;              // Reception time of packet in satellite
   double m_sinr;                              // SINR computed on uplink
   double m_additionalInterference;            // Other interference to add to compute final SINR
   bool m_sinrComputed;                        // Flag to tell if SINR has been already computed
+  uint32_t m_beamId;                          // Beam ID where the UT is located
 
 };
 
