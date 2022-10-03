@@ -475,23 +475,16 @@ SatBeamHelper::Install (NodeContainer ut,
   std::pair<std::map<uint32_t, uint32_t >::iterator, bool> beam = m_beam.insert (std::make_pair (beamId, gwId));
   NS_ASSERT (beam.second == true);
 
-  // TODO: Update to store 4 frequency ID
+  // TODO: Update channels to store 4 frequency ID
   // save frequency pair to map with beam ID
   // FrequencyPair_t freqPair = FrequencyPair_t (ulFreqId, flFreqId);
   // m_beamFreqs.insert (std::pair<uint32_t, FrequencyPair_t > (beamId, freqPair));
 
-  // next it is found user link channels and if not found channels are created and saved to map
-  SatChannelPair::ChannelPair_t userLink = GetChannelPair (beamId, fwdUlFreqId, rtnUlFreqId, true);
-
   // next it is found feeder link channels and if not found channels are created and saved to map
   SatChannelPair::ChannelPair_t feederLink = GetChannelPair (beamId, fwdFlFreqId, rtnFlFreqId, false);
 
-  // Set trace files if options ask for it
-  if (m_enableTracesOnReturnLink)
-    {
-      userLink.second->SetAttribute ("RxPowerCalculationMode", EnumValue (SatEnums::RX_PWR_INPUT_TRACE));
-      feederLink.second->SetAttribute ("RxPowerCalculationMode", EnumValue (SatEnums::RX_PWR_INPUT_TRACE));
-    }
+  // next it is found user link channels and if not found channels are created and saved to map
+  SatChannelPair::ChannelPair_t userLink = GetChannelPair (beamId, fwdUlFreqId, rtnUlFreqId, true);
 
   NS_ASSERT (m_geoNode != NULL);
 
@@ -512,16 +505,6 @@ SatBeamHelper::Install (NodeContainer ut,
                                 beamId,
                                 m_forwardLinkRegenerationMode,
                                 m_returnLinkRegenerationMode);
-
-  // store GW node
-  bool storedOk = StoreGwNode (gwId, gwNode);
-  NS_ASSERT ( storedOk );
-
-  // install fading container to GW
-  if (m_fadingModel != SatEnums::FADING_OFF)
-    {
-      InstallFadingContainer (gwNode);
-    }
 
   Ptr<SatMobilityModel> gwMobility = gwNode->GetObject<SatMobilityModel> ();
   NS_ASSERT (gwMobility != NULL);
@@ -544,6 +527,51 @@ SatBeamHelper::Install (NodeContainer ut,
 
       //save UT node pointer to multimap container
       m_utNode.insert (std::make_pair (beamId, *i) );
+    }
+
+  Ptr<NetDevice> gwNd = InstallFeeder (gwNode, gwId, beamId, feederLink, rtnFlFreqId, fwdFlFreqId, routingCallback);
+  NetDeviceContainer utNd = InstallUser (ut, gwNd, beamId, userLink, rtnUlFreqId, fwdUlFreqId, routingCallback);
+
+  if (m_bstpController)
+    {
+      SatBstpController::ToggleCallback gwNdCb =
+          MakeCallback (&SatNetDevice::ToggleState, DynamicCast<SatNetDevice> (gwNd));
+
+      m_bstpController->AddNetDeviceCallback (beamId,
+                                              fwdUlFreqId,
+                                              fwdFlFreqId,
+                                              gwId,
+                                              gwNdCb);
+    }
+
+  return std::make_pair (gwNd, utNd);
+}
+
+Ptr<NetDevice>
+SatBeamHelper::InstallFeeder (Ptr<Node> gwNode,
+                              uint32_t gwId,
+                              uint32_t beamId,
+                              SatChannelPair::ChannelPair_t feederLink,
+                              uint32_t rtnFlFreqId,
+                              uint32_t fwdFlFreqId,
+                              SatUtMac::RoutingUpdateCallback routingCallback)
+{
+  NS_LOG_FUNCTION (this << gwNode << gwId << beamId << rtnFlFreqId << fwdFlFreqId);
+
+  // Set trace files if options ask for it
+  if (m_enableTracesOnReturnLink)
+    {
+      feederLink.second->SetAttribute ("RxPowerCalculationMode", EnumValue (SatEnums::RX_PWR_INPUT_TRACE));
+    }
+
+  // store GW node
+  bool storedOk = StoreGwNode (gwId, gwNode);
+  NS_ASSERT ( storedOk );
+
+  // install fading container to GW
+  if (m_fadingModel != SatEnums::FADING_OFF)
+    {
+      InstallFadingContainer (gwNode);
     }
 
   //install GW
@@ -579,7 +607,6 @@ SatBeamHelper::Install (NodeContainer ut,
       NS_FATAL_ERROR ("Incorrect standard chosen");
   }
 
-
   // calculate maximum size of the BB frame with the most robust MODCOD
   Ptr<SatBbFrameConf> bbFrameConf = m_gwHelper->GetBbFrameConf ();
 
@@ -612,16 +639,33 @@ SatBeamHelper::Install (NodeContainer ut,
       NS_FATAL_ERROR ("Incorrect standard chosen");
   }
 
-  if (m_bstpController)
+  // Add satellite addresses to GW MAC layers.
+  if (m_forwardLinkRegenerationMode == SatEnums::REGENERATION_LINK || m_forwardLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
     {
-      SatBstpController::ToggleCallback gwNdCb =
-          MakeCallback (&SatNetDevice::ToggleState, DynamicCast<SatNetDevice> (gwNd));
+      Ptr<SatGeoNetDevice> geoNetDevice = DynamicCast<SatGeoNetDevice> (m_geoNode->GetDevice (0));
+      Address satFeederAddress = geoNetDevice->GetFeederMac (beamId)->GetAddress ();
+      DynamicCast<SatGwMac> (DynamicCast<SatNetDevice> (gwNd)->GetMac ())->SetSatelliteAddress (satFeederAddress);
+    }
 
-      m_bstpController->AddNetDeviceCallback (beamId,
-                                              fwdUlFreqId,
-                                              fwdFlFreqId,
-                                              gwId,
-                                              gwNdCb);
+  return gwNd;
+}
+
+
+NetDeviceContainer
+SatBeamHelper::InstallUser (NodeContainer ut,
+                            Ptr<NetDevice> gwNd,
+                            uint32_t beamId,
+                            SatChannelPair::ChannelPair_t userLink,
+                            uint32_t rtnUlFreqId,
+                            uint32_t fwdUlFreqId,
+                            SatUtMac::RoutingUpdateCallback routingCallback)
+{
+  NS_LOG_FUNCTION (this << beamId << rtnUlFreqId << fwdUlFreqId);
+
+  // Set trace files if options ask for it
+  if (m_enableTracesOnReturnLink)
+    {
+      userLink.second->SetAttribute ("RxPowerCalculationMode", EnumValue (SatEnums::RX_PWR_INPUT_TRACE));
     }
 
   // install UTs
@@ -656,13 +700,7 @@ SatBeamHelper::Install (NodeContainer ut,
       NS_FATAL_ERROR ("Incorrect standard chosen");
   }
 
-  // Add satellite addresses to GW and UT MAC layers.
-  if (m_forwardLinkRegenerationMode == SatEnums::REGENERATION_LINK || m_forwardLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
-    {
-      Ptr<SatGeoNetDevice> geoNetDevice = DynamicCast<SatGeoNetDevice> (m_geoNode->GetDevice (0));
-      Address satFeederAddress = geoNetDevice->GetFeederMac (beamId)->GetAddress ();
-      DynamicCast<SatGwMac> (DynamicCast<SatNetDevice> (gwNd)->GetMac ())->SetSatelliteAddress (satFeederAddress);
-    }
+  // Add satellite addresses UT MAC layers.
   if (m_returnLinkRegenerationMode == SatEnums::REGENERATION_LINK || m_returnLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
     {
       Ptr<SatGeoNetDevice> geoNetDevice = DynamicCast<SatGeoNetDevice> (m_geoNode->GetDevice (0));
@@ -673,7 +711,7 @@ SatBeamHelper::Install (NodeContainer ut,
         }
     }
 
-  return std::make_pair (gwNd, utNd);
+  return utNd;
 }
 
 uint32_t

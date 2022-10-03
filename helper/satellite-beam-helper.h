@@ -196,6 +196,50 @@ public:
                                                          SatUtMac::RoutingUpdateCallback routingCallback);
 
   /**
+   * \param gwNode pointer of GW node
+   * \param gwId id of the GW
+   * \param beamId  id of the beam
+   * \param feederLink Feeder link channel
+   * \param rtnFlFreqId id of the return feeder link frequency
+   * \param fwdFlFreqId id of the forward feeder link frequency
+   * \param routingCallback the callback UT mac layers should
+   * call to update the node routes when receiving handover orders
+   *
+   * This method creates a beam on feeder side with the requested attributes
+   * and associate the resulting ns3::NetDevices with the ns3::Nodes.
+   * \return the new SatNetDevice of the gateway
+   */
+  Ptr<NetDevice> InstallFeeder (Ptr<Node> gwNode,
+                                uint32_t gwId,
+                                uint32_t beamId,
+                                SatChannelPair::ChannelPair_t feederLink,
+                                uint32_t rtnFlFreqId,
+                                uint32_t fwdFlFreqId,
+                                SatUtMac::RoutingUpdateCallback routingCallback);
+
+  /**
+   * \param ut a set of UT nodes
+   * \param gwNd Net Device of GW
+   * \param beamId  id of the beam
+   * \param userLink User link channel
+   * \param rtnUlFreqId id of the return user link frequency
+   * \param fwdUlFreqId id of the forward user link frequency
+   * \param routingCallback the callback UT mac layers should
+   * call to update the node routes when receiving handover orders
+   *
+   * This method creates a beam on user side with the requested attributes
+   * and associate the resulting ns3::NetDevices with the ns3::Nodes.
+   * \return a NetDeviceContainer of all SatNetDevice for the UTs
+   */
+  NetDeviceContainer InstallUser (NodeContainer ut,
+                                  Ptr<NetDevice> gwNd,
+                                  uint32_t beamId,
+                                  SatChannelPair::ChannelPair_t userLink,
+                                  uint32_t rtnUlFreqId,
+                                  uint32_t fwdUlFreqId,
+                                  SatUtMac::RoutingUpdateCallback routingCallback);
+
+  /**
    * \param beamId beam ID
    * \return the ID of the GW serving the specified beam, or zero if the ID is
    *         invalid
