@@ -405,7 +405,14 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
         // In case that RX mode is something else than transparent
         // additionally check that whether the packet was intended for this specific receiver
 
-        if ( receivePacket && ( rxParams->m_beamId == GetBeamId () ) )
+        bool isGoodBeam = (rxParams->m_beamId == GetBeamId ());
+        if ((GetChannelType () == SatEnums::RETURN_FEEDER_CH)
+            && (m_linkRegenerationMode == SatEnums::REGENERATION_LINK || m_linkRegenerationMode == SatEnums::REGENERATION_NETWORK))
+          {
+            isGoodBeam = true;
+          }
+
+        if ( receivePacket && isGoodBeam )
           {
             if (IsReceivingDedicatedAccess () && rxParams->m_txInfo.packetType == SatEnums::PACKET_TYPE_DEDICATED_ACCESS)
               {

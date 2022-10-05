@@ -42,7 +42,7 @@ SatFwdLinkSchedulerScpc::GetTypeId (void)
                    MakeTimeChecker ())
     .AddAttribute ("SchedulingStopThresholdTime",
                    "Threshold time of total transmissions in BB Frame container to stop a scheduling round.",
-                   TimeValue (MilliSeconds (100)),
+                   TimeValue (MilliSeconds (50)),
                    MakeTimeAccessor (&SatFwdLinkSchedulerScpc::m_schedulingStopThresholdTime),
                    MakeTimeChecker ())
     .AddAttribute ( "BBFrameContainer",
@@ -188,6 +188,7 @@ SatFwdLinkSchedulerScpc::ScheduleBbFrames ()
   for ( std::vector< Ptr<SatSchedulingObject> >::const_iterator it = so.begin ();
         ( it != so.end () ) && ( m_bbFrameContainer->GetTotalDuration () < m_schedulingStopThresholdTime ); it++ )
     {
+
       uint32_t currentObBytes = (*it)->GetBufferedBytes ();
       uint32_t currentObMinReqBytes = (*it)->GetMinTxOpportunityInBytes ();
       uint8_t flowId = (*it)->GetFlowId ();
@@ -205,7 +206,7 @@ SatFwdLinkSchedulerScpc::ScheduleBbFrames ()
               // if frame bytes still too small, we must have too long control message, so let's crash
               if ( frameBytes < currentObMinReqBytes )
                 {
-                  NS_FATAL_ERROR ("Control package too probably too long!!!");
+                  NS_FATAL_ERROR ("Control package probably too long!!!");
                 }
             }
 

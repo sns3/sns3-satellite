@@ -93,7 +93,7 @@ SatGeoNetDevice::ReceiveUser (SatPhy::PacketContainer_t packets, Ptr<SatSignalPa
 {
   NS_LOG_FUNCTION (this << packets.size () << rxParams);
   NS_LOG_INFO ("Receiving a packet at the satellite from user link");
-  NS_LOG_INFO ("Sending the packet to the feeder link on beam " << rxParams->m_beamId);
+
   switch (m_returnLinkRegenerationMode)
     {
       case SatEnums::TRANSPARENT:
@@ -104,7 +104,7 @@ SatGeoNetDevice::ReceiveUser (SatPhy::PacketContainer_t packets, Ptr<SatSignalPa
         }
       case SatEnums::REGENERATION_LINK:
         {
-          DynamicCast<SatGeoFeederMac> (m_feederMac[rxParams->m_beamId])->SendPackets (packets, rxParams);
+          DynamicCast<SatGeoFeederMac> (m_feederMac[rxParams->m_beamId])->EnquePackets (packets, rxParams);
           break;
         }
       default:
@@ -119,7 +119,7 @@ SatGeoNetDevice::ReceiveFeeder (SatPhy::PacketContainer_t packets, Ptr<SatSignal
 {
   NS_LOG_FUNCTION (this << packets.size () << rxParams);
   NS_LOG_INFO ("Receiving a packet at the satellite from feeder link");
-  NS_LOG_INFO ("Sending the packet to the user link on beam " << rxParams->m_beamId);
+
   switch (m_forwardLinkRegenerationMode)
     {
       case SatEnums::TRANSPARENT:

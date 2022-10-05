@@ -268,6 +268,7 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d,
                               Ptr<SatChannel> ur,
                               Ptr<SatAntennaGainPattern> userAgp,
                               Ptr<SatAntennaGainPattern> feederAgp,
+                              uint32_t gwId,
                               uint32_t userBeamId,
                               SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                               SatEnums::RegenerationMode_t returnLinkRegenerationMode)
@@ -279,7 +280,7 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d,
   dev->SetForwardLinkRegenerationMode (forwardLinkRegenerationMode);
   dev->SetReturnLinkRegenerationMode (returnLinkRegenerationMode);
 
-  AttachChannelsFeeder ( dev, ff, fr, feederAgp, userBeamId, forwardLinkRegenerationMode, returnLinkRegenerationMode);
+  AttachChannelsFeeder ( dev, ff, fr, feederAgp, gwId, userBeamId, forwardLinkRegenerationMode, returnLinkRegenerationMode);
   AttachChannelsUser ( dev, uf, ur, userAgp, userBeamId, forwardLinkRegenerationMode, returnLinkRegenerationMode);
 }
 
@@ -288,6 +289,7 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
                                      Ptr<SatChannel> ff,
                                      Ptr<SatChannel> fr,
                                      Ptr<SatAntennaGainPattern> feederAgp,
+                                     uint32_t gwId,
                                      uint32_t userBeamId,
                                      SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                                      SatEnums::RegenerationMode_t returnLinkRegenerationMode)
@@ -340,6 +342,7 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
 
   Ptr<SatGeoFeederMac> fMac;
   Ptr<SatGeoFeederLlc> fLlc;
+  bool startScheduler = false;
 
   Mac48Address feederAddress;
 
@@ -364,7 +367,18 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
           // Create LLC layer
           fLlc = CreateObject<SatGeoFeederLlc> ();
 
-          dev->AddFeederMac (fMac, userBeamId);
+          if (m_gwMacMap.count(gwId))
+            {
+              // MAC already exists for this GW ID, reusing it, and disabling the other
+              dev->AddFeederMac (m_gwMacMap[gwId], userBeamId);
+            }
+          else
+            {
+              // First MAC for this GW ID, storing it to the map
+              dev->AddFeederMac (fMac, userBeamId);
+              m_gwMacMap[gwId] = fMac;
+              startScheduler = true;
+            }
 
           // Create a node info to PHY and MAC layers
           feederAddress = Mac48Address::Allocate ();
@@ -411,7 +425,10 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
           Ptr<SatFwdLinkSchedulerScpc> fwdLinkSchedulerScpc = CreateObject<SatFwdLinkSchedulerScpc> (m_bbFrameConf, feederAddress, carrierBandwidth);
           fMac->SetFwdScheduler (fwdLinkSchedulerScpc);
           fMac->SetLlc (fLlc);
-          fMac->StartPeriodicTransmissions ();
+          if (startScheduler)
+            {
+              fMac->StartPeriodicTransmissions ();
+            }
 
           // Attach the LLC Tx opportunity and scheduling context getter callbacks to SatFwdLinkScheduler
           fwdLinkSchedulerScpc->SetTxOpportunityCallback (MakeCallback (&SatGeoLlc::NotifyTxOpportunity, fLlc));

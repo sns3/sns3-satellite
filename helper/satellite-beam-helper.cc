@@ -502,6 +502,7 @@ SatBeamHelper::Install (NodeContainer ut,
                                 userLink.second,
                                 m_antennaGainPatterns->GetAntennaGainPattern (beamId),
                                 m_antennaGainPatterns->GetAntennaGainPattern (feederBeamId),
+                                gwId,
                                 beamId,
                                 m_forwardLinkRegenerationMode,
                                 m_returnLinkRegenerationMode);
@@ -530,7 +531,21 @@ SatBeamHelper::Install (NodeContainer ut,
     }
 
   Ptr<NetDevice> gwNd = InstallFeeder (gwNode, gwId, beamId, feederLink, rtnFlFreqId, fwdFlFreqId, routingCallback);
-  NetDeviceContainer utNd = InstallUser (ut, gwNd, beamId, userLink, rtnUlFreqId, fwdUlFreqId, routingCallback);
+
+  NetDeviceContainer utNd;
+  if (m_returnLinkRegenerationMode == SatEnums::REGENERATION_LINK || m_returnLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
+    {
+      if (m_gwNdMap.count(gwId) == 0)
+        {
+          // If first time we create a Net Device for this GW ID, store it
+          m_gwNdMap[gwId] = gwNd;
+        }
+      utNd = InstallUser (ut, m_gwNdMap[gwId], beamId, userLink, rtnUlFreqId, fwdUlFreqId, routingCallback);
+    }
+  else
+    {
+      utNd = InstallUser (ut, gwNd, beamId, userLink, rtnUlFreqId, fwdUlFreqId, routingCallback);
+    }
 
   if (m_bstpController)
     {

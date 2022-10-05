@@ -79,7 +79,7 @@ SatGeoLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
       it = m_encaps.find (key);
     }
 
-  // Store packet arrival time TODO will it complain here ?
+  // Store packet arrival time
   SatTimeTag timeTag (Simulator::Now ());
   packet->AddPacketTag (timeTag);
 

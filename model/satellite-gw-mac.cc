@@ -389,7 +389,7 @@ SatGwMac::StartNcrTransmission ()
 void
 SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet, uint32_t beamId)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << packet << beamId);
 
   // Remove the mac tag
   SatMacTag macTag;

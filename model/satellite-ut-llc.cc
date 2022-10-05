@@ -95,6 +95,7 @@ SatUtLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
   NS_LOG_INFO ("dest=" << dest );
   NS_LOG_INFO ("UID is " << packet->GetUid ());
 
+  dest = m_gwAddress;
   Mac48Address destMacAddress = Mac48Address::ConvertFrom (dest);
 
   // all multicast traffic is delivered with GW address

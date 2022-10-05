@@ -551,6 +551,11 @@ private:
    * The regeneration mode used in satellites for return link
    */
   SatEnums::RegenerationMode_t m_returnLinkRegenerationMode;
+
+  /**
+   * Map used in regenerative mode to store GW Net device (we need only one per GW)
+   */
+  std::map<uint32_t, Ptr<NetDevice> > m_gwNdMap;
 };
 
 } // namespace ns3

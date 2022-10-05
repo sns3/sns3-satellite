@@ -33,6 +33,7 @@
 #include "ns3/traced-callback.h"
 #include "ns3/satellite-channel.h"
 #include "ns3/satellite-phy.h"
+#include "ns3/satellite-geo-feeder-mac.h"
 #include "ns3/satellite-geo-net-device.h"
 #include "ns3/satellite-superframe-sequence.h"
 #include "ns3/satellite-typedefs.h"
@@ -168,7 +169,10 @@ public:
    * \param uf user return channel
    * \param userAgp user beam antenna gain pattern
    * \param feederAgp feeder beam antenna gain pattern
-   * \param beamId Id of the beam
+   * \param gwId ID of GW associated to this channel
+   * \param userBeamId Id of the beam
+   * \param forwardLinkRegenerationMode Regeneration mode on forward
+   * \param returnLinkRegenerationMode Regeneration mode on return
    */
   void AttachChannels ( Ptr<NetDevice> dev,
                         Ptr<SatChannel> ff,
@@ -177,6 +181,7 @@ public:
                         Ptr<SatChannel> ur,
                         Ptr<SatAntennaGainPattern> userAgp,
                         Ptr<SatAntennaGainPattern> feederAgp,
+                        uint32_t gwId,
                         uint32_t userBeamId,
                         SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                         SatEnums::RegenerationMode_t returnLinkRegenerationMode);
@@ -187,6 +192,7 @@ public:
    * \param fr feeder forward channel
    * \param fr feeder return channel
    * \param feederAgp feeder beam antenna gain pattern
+   * \param gwId ID of GW associated to this channel
    * \param userBeamId Id of the beam
    * \param forwardLinkRegenerationMode Regeneration mode on forward
    * \param returnLinkRegenerationMode Regeneration mode on return
@@ -195,7 +201,8 @@ public:
                               Ptr<SatChannel> ff,
                               Ptr<SatChannel> fr,
                               Ptr<SatAntennaGainPattern> feederAgp,
-                            uint32_t userBeamId,
+                              uint32_t gwId,
+                              uint32_t userBeamId,
                               SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                               SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
@@ -300,6 +307,11 @@ private:
    * is configured to be AVI.
    */
   Ptr<SatLinkResults> m_rtnLinkResults;
+
+  /*
+   * Map used in regenerative mode to store if MAC already created for a given GW ID
+   */
+  std::map<uint32_t, Ptr<SatGeoFeederMac>> m_gwMacMap;
 };
 
 } // namespace ns3
