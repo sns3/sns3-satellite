@@ -117,6 +117,19 @@ SatConf::GetTypeId (void)
                    StringValue ("UtPos.txt"),
                    MakeStringAccessor (&SatConf::m_utPositionInputFileName),
                    MakeStringChecker ())
+    .AddAttribute ("ForwardLinkRegenerationMode", "The regeneration mode used in satellites for forward link.",
+                   EnumValue (SatEnums::TRANSPARENT),
+                   MakeEnumAccessor (&SatConf::m_forwardLinkRegenerationMode),
+                   MakeEnumChecker (SatEnums::TRANSPARENT, "TRANSPARENT",
+                                    SatEnums::REGENERATION_PHY, "REGENERATION_PHY",
+                                    SatEnums::REGENERATION_NETWORK, "REGENERATION_NETWORK"))
+    .AddAttribute ("ReturnLinkRegenerationMode", "The regeneration mode used in satellites for return link.",
+                   EnumValue (SatEnums::TRANSPARENT),
+                   MakeEnumAccessor (&SatConf::m_returnLinkRegenerationMode),
+                   MakeEnumChecker (SatEnums::TRANSPARENT, "TRANSPARENT",
+                                    SatEnums::REGENERATION_PHY, "REGENERATION_PHY",
+                                    SatEnums::REGENERATION_LINK, "REGENERATION_LINK",
+                                    SatEnums::REGENERATION_NETWORK, "REGENERATION_NETWORK"))
 
   ;
   return tid;
@@ -147,7 +160,9 @@ SatConf::SatConf ()
   m_SuperFrameConfForSeq0 (SatSuperframeConf::SUPER_FRAME_CONFIG_0),
   m_fwdCarrierAllocatedBandwidthHz (0.0),
   m_fwdCarrierRollOffFactor (0.0),
-  m_fwdCarrierSpacingFactor (0.0)
+  m_fwdCarrierSpacingFactor (0.0),
+  m_forwardLinkRegenerationMode (SatEnums::TRANSPARENT),
+  m_returnLinkRegenerationMode (SatEnums::TRANSPARENT)
 {
   NS_LOG_FUNCTION (this);
 
@@ -486,6 +501,22 @@ SatConf::GetFwdLinkCarrierCount () const
   NS_LOG_FUNCTION (this);
 
   return m_forwardLinkCarrierConf.size ();
+}
+
+SatEnums::RegenerationMode_t
+SatConf::GetForwardLinkRegenerationMode () const
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_forwardLinkRegenerationMode;
+}
+
+SatEnums::RegenerationMode_t
+SatConf::GetReturnLinkRegenerationMode () const
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_returnLinkRegenerationMode;
 }
 
 double

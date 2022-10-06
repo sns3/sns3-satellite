@@ -159,19 +159,6 @@ SatBeamHelper::GetTypeId (void)
                    MakeEnumChecker (SatEnums::LR_RCS2, "RCS2",
                                     SatEnums::LR_FSIM, "FSIM",
                                     SatEnums::LR_LORA, "LORA"))
-    .AddAttribute ("ForwardLinkRegenerationMode", "The regeneration mode used in satellites for forward link.",
-                   EnumValue (SatEnums::TRANSPARENT),
-                   MakeEnumAccessor (&SatBeamHelper::m_forwardLinkRegenerationMode),
-                   MakeEnumChecker (SatEnums::TRANSPARENT, "TRANSPARENT",
-                                    SatEnums::REGENERATION_PHY, "REGENERATION_PHY",
-                                    SatEnums::REGENERATION_NETWORK, "REGENERATION_NETWORK"))
-    .AddAttribute ("ReturnLinkRegenerationMode", "The regeneration mode used in satellites for return link.",
-                   EnumValue (SatEnums::TRANSPARENT),
-                   MakeEnumAccessor (&SatBeamHelper::m_returnLinkRegenerationMode),
-                   MakeEnumChecker (SatEnums::TRANSPARENT, "TRANSPARENT",
-                                    SatEnums::REGENERATION_PHY, "REGENERATION_PHY",
-                                    SatEnums::REGENERATION_LINK, "REGENERATION_LINK",
-                                    SatEnums::REGENERATION_NETWORK, "REGENERATION_NETWORK"))
     .AddTraceSource ("Creation", "Creation traces",
                      MakeTraceSourceAccessor (&SatBeamHelper::m_creationTrace),
                      "ns3::SatTypedefs::CreationCallback")
@@ -198,7 +185,9 @@ SatBeamHelper::SatBeamHelper ()
   m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED),
   m_raConstantErrorRate (0.0),
   m_enableFwdLinkBeamHopping (false),
-  m_bstpController ()
+  m_bstpController (),
+  m_forwardLinkRegenerationMode (SatEnums::TRANSPARENT),
+  m_returnLinkRegenerationMode (SatEnums::TRANSPARENT)
 {
   NS_LOG_FUNCTION (this);
 
@@ -210,7 +199,9 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
                               SatTypedefs::CarrierBandwidthConverter_t bandwidthConverterCb,
                               uint32_t rtnLinkCarrierCount,
                               uint32_t fwdLinkCarrierCount,
-                              Ptr<SatSuperframeSeq> seq)
+                              Ptr<SatSuperframeSeq> seq,
+                              SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                              SatEnums::RegenerationMode_t returnLinkRegenerationMode)
   : m_carrierBandwidthConverter (bandwidthConverterCb),
   m_superframeSeq (seq),
   m_printDetailedInformationToCreationTraces (false),
@@ -223,7 +214,9 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
   m_raCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR),
   m_raConstantErrorRate (0.0),
   m_enableFwdLinkBeamHopping (false),
-  m_bstpController ()
+  m_bstpController (),
+  m_forwardLinkRegenerationMode (forwardLinkRegenerationMode),
+  m_returnLinkRegenerationMode (returnLinkRegenerationMode)
 {
   NS_LOG_FUNCTION (this << geoNode << rtnLinkCarrierCount << fwdLinkCarrierCount << seq);
 

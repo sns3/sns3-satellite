@@ -53,8 +53,8 @@ main (int argc, char *argv[])
   std::string randomAccess = "SlottedAloha";
 
   /// Set regeneration mode
-  Config::SetDefault ("ns3::SatBeamHelper::ForwardLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
-  Config::SetDefault ("ns3::SatBeamHelper::ReturnLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
+  Config::SetDefault ("ns3::SatConf::ForwardLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
+  Config::SetDefault ("ns3::SatConf::ReturnLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
 
   Config::SetDefault ("ns3::SatGeoFeederPhy::QueueSize", UintegerValue (100000));
 

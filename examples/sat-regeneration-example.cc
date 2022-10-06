@@ -54,8 +54,8 @@ main (int argc, char *argv[])
   SatHelper::PreDefinedScenario_t satScenario = SatHelper::SIMPLE;
 
   /// Set regeneration mode
-  Config::SetDefault ("ns3::SatBeamHelper::ForwardLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
-  Config::SetDefault ("ns3::SatBeamHelper::ReturnLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_LINK));
+  Config::SetDefault ("ns3::SatConf::ForwardLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
+  Config::SetDefault ("ns3::SatConf::ReturnLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_LINK));
 
   Config::SetDefault ("ns3::SatGeoFeederPhy::QueueSize", UintegerValue (100000));
 

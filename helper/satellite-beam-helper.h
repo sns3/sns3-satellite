@@ -97,17 +97,21 @@ public:
   /**
    * Constructor for SatBeamHelper.
    *
-   * \param geoNode               Pointer to Geo Satellite node
-   * \param bandwidthConverterCb  Callback to convert bandwidth
-   * \param fwdLinkCarrierCount   Number of carriers used in forward link
-   * \param rtnLinkCarrierCount   Number of carriers used in return link
-   * \param seq                   Pointer to used superframe sequence configuration (containing superframe configurations).
+   * \param geoNode                     Pointer to Geo Satellite node
+   * \param bandwidthConverterCb        Callback to convert bandwidth
+   * \param fwdLinkCarrierCount         Number of carriers used in forward link
+   * \param rtnLinkCarrierCount         Number of carriers used in return link
+   * \param seq                         Pointer to used superframe sequence configuration (containing superframe configurations).
+   * \param forwardLinkRegenerationMode The regeneration mode used in satellites for forward link
+   * \param returnLinkRegenerationMode  The regeneration mode used in satellites for return link
    */
   SatBeamHelper (Ptr<Node> geoNode,
                  SatTypedefs::CarrierBandwidthConverter_t bandwidthConverterCb,
                  uint32_t fwdLinkCarrierCount,
                  uint32_t rtnLinkCarrierCount,
-                 Ptr<SatSuperframeSeq> seq);
+                 Ptr<SatSuperframeSeq> seq,
+                 SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                 SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   /**
    * Destructor for SatBeamHelper.

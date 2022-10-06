@@ -252,7 +252,9 @@ SatHelper::SatHelper ()
                                               MakeCallback (&SatConf::GetCarrierBandwidthHz, m_satConf),
                                               m_satConf->GetRtnLinkCarrierCount (),
                                               m_satConf->GetFwdLinkCarrierCount (),
-                                              m_satConf->GetSuperframeSeq ());
+                                              m_satConf->GetSuperframeSeq (),
+                                              m_satConf->GetForwardLinkRegenerationMode (),
+                                              m_satConf->GetReturnLinkRegenerationMode ());
 
   m_antennaGainPatterns = CreateObject<SatAntennaGainPatternContainer> ();
   m_beamHelper->SetAntennaGainPatterns (m_antennaGainPatterns);

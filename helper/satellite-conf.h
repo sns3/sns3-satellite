@@ -182,6 +182,18 @@ public:
   uint32_t GetFwdLinkCarrierCount () const;
 
   /**
+   * Get the regeneration mode used in satellites for forward link
+   * \return The regeneration mode used in satellites for forward link
+   */
+  SatEnums::RegenerationMode_t GetForwardLinkRegenerationMode () const;
+
+  /**
+   * Get the regeneration mode used in satellites for return link
+   * \return The regeneration mode used in satellites for return link
+   */
+  SatEnums::RegenerationMode_t GetReturnLinkRegenerationMode () const;
+
+  /**
    * Definition for beam ID index (column) in m_conf
    */
   static const uint32_t BEAM_ID_INDEX = 0;
@@ -330,6 +342,16 @@ private:
    * The configured carrier spacing factor for forward link carriers.
    */
   double m_fwdCarrierSpacingFactor;
+
+  /**
+   * The regeneration mode used in satellites for forward link
+   */
+  SatEnums::RegenerationMode_t m_forwardLinkRegenerationMode;
+
+  /**
+   * The regeneration mode used in satellites for return link
+   */
+  SatEnums::RegenerationMode_t m_returnLinkRegenerationMode;
 
   /**
    * Get bandwidth of the forward link carrier.
