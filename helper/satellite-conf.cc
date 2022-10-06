@@ -112,6 +112,21 @@ SatConf::GetTypeId (void)
                    DoubleValue (0.00),
                    MakeDoubleAccessor (&SatConf::m_fwdCarrierSpacingFactor),
                    MakeDoubleChecker<double> (0.00, 1.00))
+    .AddAttribute ("RtnCarrierAllocatedBandwidth",
+                   "The allocated carrier bandwidth for return link carriers [Hz].",
+                   DoubleValue (0.125e9),
+                   MakeDoubleAccessor (&SatConf::m_rtnCarrierAllocatedBandwidthHz),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute ("RtnCarrierRollOff",
+                   "The roll-off factor for return link carriers.",
+                   DoubleValue (0.20),
+                   MakeDoubleAccessor (&SatConf::m_rtnCarrierRollOffFactor),
+                   MakeDoubleChecker<double> (0.00, 1.00))
+    .AddAttribute ("RtnCarrierSpacing",
+                   "The carrier spacing factor for return link carriers.",
+                   DoubleValue (0.00),
+                   MakeDoubleAccessor (&SatConf::m_rtnCarrierSpacingFactor),
+                   MakeDoubleChecker<double> (0.00, 1.00))
     .AddAttribute ("UtPositionInputFileName",
                    "File defining user defined UT positions for user defined scenarios.",
                    StringValue ("UtPos.txt"),
@@ -161,6 +176,9 @@ SatConf::SatConf ()
   m_fwdCarrierAllocatedBandwidthHz (0.0),
   m_fwdCarrierRollOffFactor (0.0),
   m_fwdCarrierSpacingFactor (0.0),
+  m_rtnCarrierAllocatedBandwidthHz (0.0),
+  m_rtnCarrierRollOffFactor (0.0),
+  m_rtnCarrierSpacingFactor (0.0),
   m_forwardLinkRegenerationMode (SatEnums::TRANSPARENT),
   m_returnLinkRegenerationMode (SatEnums::TRANSPARENT)
 {
@@ -214,8 +232,9 @@ SatConf::Configure (std::string wfConf)
   double fwdFeederLinkChannelBandwidthHz = m_fwdFeederLinkBandwidthHz / m_fwdFeederLinkChannelCount;
   double fwdUserLinkChannelBandwidthHz = m_fwdUserLinkBandwidthHz / m_fwdUserLinkChannelCount;
 
-  // channel bandwidths for the forward feeder and user links is expected to be equal
-  if ( fwdFeederLinkChannelBandwidthHz != fwdUserLinkChannelBandwidthHz )
+  // channel bandwidths for the forward feeder and user links is expected to be equal if forward generation is physical or transparent
+  if ( (fwdFeederLinkChannelBandwidthHz != fwdUserLinkChannelBandwidthHz)
+    && (m_forwardLinkRegenerationMode == SatEnums::TRANSPARENT || m_forwardLinkRegenerationMode == SatEnums::REGENERATION_PHY))
     {
       NS_FATAL_ERROR ("Channel bandwidths for forward feeder and user links are not equal!!!");
     }
@@ -230,13 +249,20 @@ SatConf::Configure (std::string wfConf)
   Ptr<SatFwdCarrierConf> fwdCarrierConf = Create<SatFwdCarrierConf> (m_fwdCarrierAllocatedBandwidthHz, m_fwdCarrierRollOffFactor, m_fwdCarrierSpacingFactor );
   m_forwardLinkCarrierConf.push_back (fwdCarrierConf);
 
+  // create return link carrier configuration and one carrier pushing just one carrier to container
+  // only one carrier supported in return link currently
+  // only used for SCPC
+  Ptr<SatFwdCarrierConf> rtnCarrierConf = Create<SatFwdCarrierConf> (m_rtnCarrierAllocatedBandwidthHz, m_rtnCarrierRollOffFactor, m_rtnCarrierSpacingFactor );
+  m_returnLinkCarrierConf.push_back (rtnCarrierConf);
+
   // *** configure return link ***
 
   double rtnFeederLinkBandwidthHz = m_rtnFeederLinkBandwidthHz / m_rtnFeederLinkChannelCount;
   double rtnUserLinkBandwidthHz = m_rtnUserLinkBandwidthHz / m_rtnUserLinkChannelCount;
 
-  // bandwidths of the return feeder and user links is expected to be equal
-  if ( rtnFeederLinkBandwidthHz != rtnUserLinkBandwidthHz )
+  // bandwidths of the return feeder and user links is expected to be equal if return generation is physical or transparent
+  if ( (rtnFeederLinkBandwidthHz != rtnUserLinkBandwidthHz)
+    && (m_returnLinkRegenerationMode == SatEnums::TRANSPARENT || m_returnLinkRegenerationMode == SatEnums::REGENERATION_PHY) )
     {
       NS_FATAL_ERROR ( "Bandwidths of return feeder and user links are not equal!!!");
     }
@@ -329,6 +355,10 @@ SatConf::GetCarrierBandwidthHz ( SatEnums::ChannelType_t chType, uint32_t carrie
 
     case SatEnums::RETURN_FEEDER_CH:
       carrierBandwidthHz = m_superframeSeq->GetCarrierBandwidthHz (carrierId, bandwidthType);
+      if (m_returnLinkRegenerationMode == SatEnums::REGENERATION_LINK || m_returnLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
+        {
+          carrierBandwidthHz = GetRtnLinkCarrierBandwidthHz (0, bandwidthType);
+        }
       break;
 
     case SatEnums::RETURN_USER_CH:
@@ -543,6 +573,40 @@ SatConf::GetFwdLinkCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierBand
 
     case SatEnums::EFFECTIVE_BANDWIDTH:
       bandwidtHz = m_forwardLinkCarrierConf[carrierId]->GetEffectiveBandwidthInHz ();
+      break;
+
+    default:
+      NS_FATAL_ERROR ("Invalid bandwidth type");
+      break;
+    }
+
+  return bandwidtHz;
+}
+
+double
+SatConf::GetRtnLinkCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType) const
+{
+  NS_LOG_FUNCTION (this);
+
+  double bandwidtHz = 0.0;
+
+  if ( carrierId >= m_returnLinkCarrierConf.size ())
+    {
+      NS_FATAL_ERROR ("Rtn Carrier id out of the range!!");
+    }
+
+  switch (bandwidthType)
+    {
+    case SatEnums::ALLOCATED_BANDWIDTH:
+      bandwidtHz = m_returnLinkCarrierConf[carrierId]->GetAllocatedBandwidthInHz ();
+      break;
+
+    case SatEnums::OCCUPIED_BANDWIDTH:
+      bandwidtHz = m_returnLinkCarrierConf[carrierId]->GetOccupiedBandwidthInHz ();
+      break;
+
+    case SatEnums::EFFECTIVE_BANDWIDTH:
+      bandwidtHz = m_returnLinkCarrierConf[carrierId]->GetEffectiveBandwidthInHz ();
       break;
 
     default:

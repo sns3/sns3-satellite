@@ -274,6 +274,14 @@ private:
   std::vector<Ptr<SatFwdCarrierConf> >  m_forwardLinkCarrierConf;
 
   /**
+   * Return link carrier configuration for SCPC.
+   *
+   * Item index of the list means carrier configuration sequence.
+   * Currently only one sequence used and only one carrier inside carrier conf.
+   */
+  std::vector<Ptr<SatFwdCarrierConf> >  m_returnLinkCarrierConf;
+
+  /**
    *  Base frequency of forward feeder link.
    */
   double m_fwdFeederLinkFreqHz;
@@ -344,6 +352,21 @@ private:
   double m_fwdCarrierSpacingFactor;
 
   /**
+   * The configured allocated bandwidth for return link carriers.
+   */
+  double m_rtnCarrierAllocatedBandwidthHz;
+
+  /**
+   * The configured carrier roll-off factor for return link carriers.
+   */
+  double m_rtnCarrierRollOffFactor;
+
+  /**
+   * The configured carrier spacing factor for return link carriers.
+   */
+  double m_rtnCarrierSpacingFactor;
+
+  /**
    * The regeneration mode used in satellites for forward link
    */
   SatEnums::RegenerationMode_t m_forwardLinkRegenerationMode;
@@ -361,6 +384,15 @@ private:
    * \return Requested carrier bandwidth.
    */
   double GetFwdLinkCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType) const;
+
+  /**
+   * Get bandwidth of the return link carrier.
+   *
+   * \param carrierId Id of the carrier.
+   * \param bandwidthType Type of the bandwidth.
+   * \return Requested carrier bandwidth.
+   */
+  double GetRtnLinkCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType) const;
 
   /**
    * Configures itself with default values. Creates configuration storages as needed.

@@ -38,7 +38,6 @@ using namespace ns3;
  * TODO complete brief
  * TODO add more cmd options
  * TODO Clean
- * TODO add other regeneration modes
  *
  */
 
@@ -51,19 +50,20 @@ main (int argc, char *argv[])
   uint32_t packetSize = 512;
   std::string interval = "10ms";
   std::string scenario = "simple";
-  SatHelper::PreDefinedScenario_t satScenario = SatHelper::SIMPLE;
+  std::string forwardRegeneration = "regeneration_phy";
+  std::string returnRegeneration = "regeneration_link";
 
-  /// Set regeneration mode
-  Config::SetDefault ("ns3::SatConf::ForwardLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
-  Config::SetDefault ("ns3::SatConf::ReturnLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_LINK));
+  std::map<std::string, SatHelper::PreDefinedScenario_t> mapScenario { {"simple", SatHelper::SIMPLE},
+                                                                       {"larger", SatHelper::LARGER},
+                                                                       {"full", SatHelper::FULL}};
+  std::map<std::string, SatEnums::RegenerationMode_t> mapForwardRegeneration { {"transparent", SatEnums::TRANSPARENT},
+                                                                               {"regeneration_phy", SatEnums::REGENERATION_PHY},
+                                                                               {"regeneration_network", SatEnums::REGENERATION_NETWORK}};
+  std::map<std::string, SatEnums::RegenerationMode_t> mapReturnRegeneration { {"transparent", SatEnums::TRANSPARENT},
+                                                                              {"regeneration_phy", SatEnums::REGENERATION_PHY},
+                                                                              {"regeneration_link", SatEnums::REGENERATION_LINK},
+                                                                              {"regeneration_network", SatEnums::REGENERATION_NETWORK}};
 
-  Config::SetDefault ("ns3::SatGeoFeederPhy::QueueSize", UintegerValue (100000));
-
-  /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
-
-  /// Enable packet trace
-  Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
   Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("example-regeneration");
 
   // read command line parameters given by user
@@ -71,18 +71,26 @@ main (int argc, char *argv[])
   cmd.AddValue ("beamIdInFullScenario", "Id where Sending/Receiving UT is selected in FULL scenario. (used only when scenario is full) ", beamIdInFullScenario);
   cmd.AddValue ("packetSize", "Size of constant packet (bytes)", packetSize);
   cmd.AddValue ("interval", "Interval to sent packets in seconds, (e.g. (1s))", interval);
-  cmd.AddValue ("scenario", "Test scenario to use. (simple, larger or full", scenario);
+  cmd.AddValue ("scenario", "Test scenario to use. (simple, larger or full)", scenario);
+  cmd.AddValue ("forwardRegeneration", "Regeneration mode on forward link (transparent, regeneration_phy or regeneration_network)", forwardRegeneration);
+  cmd.AddValue ("returnRegeneration", "Regeneration mode on forward link (transparent, regeneration_phy, regeneration_link or regeneration_network)", returnRegeneration);
   simulationHelper->AddDefaultUiArguments (cmd);
   cmd.Parse (argc, argv);
 
-  if ( scenario == "larger")
-    {
-      satScenario = SatHelper::LARGER;
-    }
-  else if ( scenario == "full")
-    {
-      satScenario = SatHelper::FULL;
-    }
+  SatHelper::PreDefinedScenario_t satScenario = mapScenario[scenario];
+  SatEnums::RegenerationMode_t forwardLinkRegenerationMode = mapForwardRegeneration[forwardRegeneration];
+  SatEnums::RegenerationMode_t returnLinkRegenerationMode = mapReturnRegeneration[returnRegeneration];
+
+  /// Set regeneration mode
+  Config::SetDefault ("ns3::SatConf::ForwardLinkRegenerationMode", EnumValue (forwardLinkRegenerationMode));
+  Config::SetDefault ("ns3::SatConf::ReturnLinkRegenerationMode", EnumValue (returnLinkRegenerationMode));
+  Config::SetDefault ("ns3::SatGeoFeederPhy::QueueSize", UintegerValue (100000));
+
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
+  /// Enable packet trace
+  Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
 
   // Set tag, if output path is not explicitly defined
   simulationHelper->SetOutputTag (scenario);
