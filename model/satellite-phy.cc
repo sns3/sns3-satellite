@@ -544,10 +544,10 @@ SatPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
 }
 
 void
-SatPhy::CnoInfo (uint32_t beamId, Address source, Address dest, double cno)
+SatPhy::CnoInfo (uint32_t beamId, Address source, Address dest, double cno, bool isSatelliteMac)
 {
-  NS_LOG_FUNCTION (this << beamId << source << cno);
-  m_cnoCallback ( beamId, source, dest, cno);
+  NS_LOG_FUNCTION (this << beamId << source << cno << isSatelliteMac);
+  m_cnoCallback ( beamId, source, dest, cno, isSatelliteMac);
 }
 
 void

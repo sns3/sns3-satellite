@@ -102,11 +102,18 @@ SatNcc::DoDispose ()
 
 
 void
-SatNcc::UtCnoUpdated (uint32_t beamId, Address utId, Address /*gwId*/, double cno)
+SatNcc::UtCnoUpdated (uint32_t beamId, Address sourceMac, Address /*gwId*/, double cno, bool isSatelliteMac)
 {
-  NS_LOG_FUNCTION (this << beamId << utId << cno);
+  NS_LOG_FUNCTION (this << beamId << sourceMac << cno);
 
-  m_beamSchedulers[beamId]->UpdateUtCno (utId, cno);
+  if (isSatelliteMac)
+    {
+      m_beamSchedulers[beamId]->UpdateSatelliteCno (sourceMac, cno);
+    }
+  else
+    {
+      m_beamSchedulers[beamId]->UpdateUtCno (sourceMac, cno);
+    }
 }
 
 void

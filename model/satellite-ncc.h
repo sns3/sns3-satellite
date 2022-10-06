@@ -86,11 +86,12 @@ public:
    * to take into account when making schedule decisions.
    *
    * \param beamId  The id of the beam where C/N0 is from.
-   * \param utId  The id of the UT. (sender address)
+   * \param sourceMac  The MAC of the UT or SAT. (sender address)
    * \param gwId  The id (address) of the GW. (receiver address)
    * \param cno Value of the C/N0.
+   * \param isSatelliteMac If true, cno corresponds to link SAT to GW; if false, cno corresponds to link UT to GW
    */
-  void UtCnoUpdated (uint32_t beamId, Address utId, Address gwId, double cno);
+  void UtCnoUpdated (uint32_t beamId, Address sourceMac, Address gwId, double cno, bool isSatelliteMac);
 
   /**
    * \brief Function for adjusting the random access allocation channel specific load

@@ -309,7 +309,8 @@ SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams,
               m_cnoCallback (packetRxParams.rxParams->m_beamId,
                              addressE2ETag.GetE2ESourceAddress (),
                              GetOwnAddress (),
-                             cno);
+                             cno,
+                             false);
               break;
             }
           case SatEnums::REGENERATION_LINK:
@@ -329,28 +330,41 @@ SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams,
                    * Channel estimation error is added to the cno measurement,
                    * which is utilized e.g. for ACM.
                    */
-                  double cno = GetWorstSinr (sinr, satUplinkInfoTag.GetSinr ());
+                  double worstCno = GetWorstSinr (sinr, satUplinkInfoTag.GetSinr ());
+                  double downlinkCno = sinr;
 
                   // Forward link and return link use same algorithms (because of SCPC)
                   switch (GetNodeInfo ()->GetNodeType ())
                     {
                       case SatEnums::NT_UT:
                       case SatEnums::NT_GW:
-                        cno = SatUtils::DbToLinear (GetChannelEstimationErrorContainer ()->AddError (SatUtils::LinearToDb (cno)));
+                        worstCno = SatUtils::DbToLinear (GetChannelEstimationErrorContainer ()->AddError (SatUtils::LinearToDb (worstCno)));
+                        downlinkCno = SatUtils::DbToLinear (GetChannelEstimationErrorContainer ()->AddError (SatUtils::LinearToDb (downlinkCno)));
                         break;
                       default:
                         NS_FATAL_ERROR ("Unsupported node type for a NORMAL Rx model!");
                     }
 
-                  cno *= m_rxBandwidthHz;
+                  worstCno *= m_rxBandwidthHz;
+                  downlinkCno *= m_rxBandwidthHz;
 
                   SatAddressE2ETag addressE2ETag;
                   (*i)->PeekPacketTag (addressE2ETag);
 
+                  SatMacTag satMacTag;
+                  (*i)->PeekPacketTag (satMacTag);
+
                   m_cnoCallback (satUplinkInfoTag.GetBeamId (),
                                  addressE2ETag.GetE2ESourceAddress (),
                                  GetOwnAddress (),
-                                 cno);
+                                 worstCno,
+                                 false);
+
+                  m_cnoCallback (GetBeamId (),
+                                 satMacTag.GetSourceAddress (),
+                                 GetOwnAddress (),
+                                 downlinkCno,
+                                 true);
                 }
               break;
             }

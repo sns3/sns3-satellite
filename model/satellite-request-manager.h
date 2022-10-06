@@ -163,8 +163,9 @@ public:
    * \param utId The id (address) of the UT.
    * \param gwId The id of the GW.
    * \param cno Value of the C/N0.
+   * \param isSatelliteMac If true, cno corresponds to link SAT to UT; if false, cno corresponds to link GW to UT
    */
-  void CnoUpdated (uint32_t beamId, Address utId, Address gwId, double cno);
+  void CnoUpdated (uint32_t beamId, Address utId, Address gwId, double cno, bool isSatelliteMac);
 
   /**
    * \brief Sat UT MAC informs that certain amount of resources have been received

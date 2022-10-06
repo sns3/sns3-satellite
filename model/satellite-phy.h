@@ -89,7 +89,7 @@ public:
    * \param The id (address) of the destination or receiver
    * \param C/N0 value
    */
-  typedef Callback<void, uint32_t, Address, Address, double> CnoCallback;
+  typedef Callback<void, uint32_t, Address, Address, double, bool> CnoCallback;
 
   /**
    * \param beam Id
@@ -442,8 +442,9 @@ public:
    * \param source Id (address) of the source (sender)
    * \param destination Id (address) of the destination
    * \param cno Value of the C/N0
+   * \param isSatelliteMac If true, cno corresponds to link SAT to GW; if false, cno corresponds to link UT to GW
    */
-  void CnoInfo (uint32_t beamId, Address source, Address destination, double cno);
+  void CnoInfo (uint32_t beamId, Address source, Address destination, double cno, bool isSatelliteMac);
 
   /**
    * \brief Function for getting the normalized offered load of the specific random access allocation channel

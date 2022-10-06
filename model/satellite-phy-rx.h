@@ -171,8 +171,9 @@ public:
    * \param Id (address) of the source (sender)
    * \param Id (address) of the destination (receiver)
    * \param C/N0 value
+   * \param If true, cno corresponds to link SAT to GW; if false, cno corresponds to link UT to GW
    */
-  typedef Callback<void, uint32_t, Address, Address, double > CnoCallback;
+  typedef Callback<void, uint32_t, Address, Address, double, bool > CnoCallback;
 
   /**
    * \param beam Id

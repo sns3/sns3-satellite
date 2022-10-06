@@ -606,7 +606,7 @@ private:
  * \brief C/N0 (CNI) estimation report message.
  * (Tagged by SatControlMsgTag with type value SAT_CN0_REPORT)
  *
- * This message is sent periodically by UT to GW.
+ * This message is sent periodically by UT to GW. Or by ground entities to SAT
  */
 
 class SatCnoReportMessage : public SatControlMessage
@@ -666,7 +666,7 @@ private:
   /**
    * C/N0 estimate.
    */
-  double m_forwardLinkCNo;
+  double m_linkCNo;
 };
 
 /**
