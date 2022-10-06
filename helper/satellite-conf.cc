@@ -112,18 +112,18 @@ SatConf::GetTypeId (void)
                    DoubleValue (0.00),
                    MakeDoubleAccessor (&SatConf::m_fwdCarrierSpacingFactor),
                    MakeDoubleChecker<double> (0.00, 1.00))
-    .AddAttribute ("RtnCarrierAllocatedBandwidth",
-                   "The allocated carrier bandwidth for return link carriers [Hz].",
+    .AddAttribute ("RtnScpcCarrierAllocatedBandwidth",
+                   "The allocated carrier bandwidth for SCPC link carriers [Hz].",
                    DoubleValue (0.125e9),
                    MakeDoubleAccessor (&SatConf::m_rtnCarrierAllocatedBandwidthHz),
                    MakeDoubleChecker<double> ())
-    .AddAttribute ("RtnCarrierRollOff",
-                   "The roll-off factor for return link carriers.",
+    .AddAttribute ("RtnScpcCarrierRollOff",
+                   "The roll-off factor for SCPC link carriers.",
                    DoubleValue (0.20),
                    MakeDoubleAccessor (&SatConf::m_rtnCarrierRollOffFactor),
                    MakeDoubleChecker<double> (0.00, 1.00))
-    .AddAttribute ("RtnCarrierSpacing",
-                   "The carrier spacing factor for return link carriers.",
+    .AddAttribute ("RtnScpcCarrierSpacing",
+                   "The carrier spacing factor for SCPC link carriers.",
                    DoubleValue (0.00),
                    MakeDoubleAccessor (&SatConf::m_rtnCarrierSpacingFactor),
                    MakeDoubleChecker<double> (0.00, 1.00))

@@ -188,9 +188,14 @@ SatGeoFeederMac::EnquePackets (SatPhy::PacketContainer_t packets, Ptr<SatSignalP
           (*it)->AddPacketTag (mTag);
         }
 
-      // TODO prioritize if ctrl ?
+      uint8_t flowId = 1;
+      SatControlMsgTag ctrlTag;
+      if ((*it)->PeekPacketTag (ctrlTag))
+        {
+          flowId = 0;
+        }
 
-      m_llc->Enque (*it, addressE2ETag.GetE2EDestAddress (), 1);
+      m_llc->Enque (*it, addressE2ETag.GetE2EDestAddress (), flowId);
     }
 }
 

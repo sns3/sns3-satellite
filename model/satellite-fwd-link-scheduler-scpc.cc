@@ -42,7 +42,7 @@ SatFwdLinkSchedulerScpc::GetTypeId (void)
                    MakeTimeChecker ())
     .AddAttribute ("SchedulingStopThresholdTime",
                    "Threshold time of total transmissions in BB Frame container to stop a scheduling round.",
-                   TimeValue (MilliSeconds (50)),
+                   TimeValue (MilliSeconds (15)),
                    MakeTimeAccessor (&SatFwdLinkSchedulerScpc::m_schedulingStopThresholdTime),
                    MakeTimeChecker ())
     .AddAttribute ( "BBFrameContainer",
