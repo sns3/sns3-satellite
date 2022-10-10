@@ -247,7 +247,7 @@ SatGeoFeederMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParame
       RxTraces (packets);
     }
 
-  //rxParams->m_packetsInBurst.clear ();
+  rxParams->m_packetsInBurst.clear ();
 
   for (SatPhy::PacketContainer_t::iterator i = packets.begin (); i != packets.end (); i++ )
     {
@@ -284,16 +284,16 @@ SatGeoFeederMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParame
             }
           else
             {
-              //rxParams->m_packetsInBurst.push_back (*i);
+              rxParams->m_packetsInBurst.push_back (*i);
             }
         }
       else
         {
-          //rxParams->m_packetsInBurst.push_back (*i);
+          rxParams->m_packetsInBurst.push_back (*i);
         }
     }
 
-  m_rxFeederCallback (packets, rxParams);
+  m_rxFeederCallback (rxParams->m_packetsInBurst, rxParams);
 }
 
 void
@@ -330,8 +330,8 @@ SatGeoFeederMac::ReceiveSignalingPacket (Ptr<Packet> packet)
               NS_LOG_WARN ("Control message " << ctrlTag.GetMsgType () << " is not found from the RTN link control msg container!" << " at: " << Now ().GetSeconds () << "s");
             }
 
-          //packet->RemovePacketTag (macTag);
-          //packet->RemovePacketTag (ctrlTag);
+          packet->RemovePacketTag (macTag);
+          packet->RemovePacketTag (ctrlTag);
 
           break;
         }

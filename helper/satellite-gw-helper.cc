@@ -353,8 +353,6 @@ SatGwHelper::InstallDvb (Ptr<Node> n,
 
   mac->SetHandoverCallback (MakeCallback (&SatNcc::MoveUtBetweenBeams, ncc));
 
-  ncc->SetSendTbtpCallback (MakeCallback (&SatGwMac::TbtpSent, mac));
-
   // Attach the Mac layer receiver to Phy
   SatPhy::ReceiveCallback recCb = MakeCallback (&SatGwMac::Receive, mac);
 

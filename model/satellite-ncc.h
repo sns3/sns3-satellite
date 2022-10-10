@@ -120,15 +120,21 @@ public:
   typedef SatBeamScheduler::SendCtrlMsgCallback SendCallback;
 
   /**
+   * \param msg        the TBTP sent
+   */
+  typedef Callback<void, Ptr<SatTbtpMessage> > SendTbtpCallback;
+
+  /**
    * \brief Function for adding the beam
    * \param beamId ID of the beam which for callback is set
    * \param cb callback to invoke whenever a TBTP is ready for sending and must
    *        be forwarded to the Beam UTs.
+   * \param tbtpCb callback to invoke whenever a TBTP has been sent
    * \param seq Super frame sequence
    * \param maxFrameSizeInBytes Maximum non fragmented BB frame size with most robust ModCod
    * \param gwAddress Mac address of the gateway responsible for this beam
    */
-  void AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq> seq, uint32_t maxFrameSizeInBytes, Address gwAddress);
+  void AddBeam (uint32_t beamId, SatNcc::SendCallback cb, SatNcc::SendTbtpCallback tbtpCb, Ptr<SatSuperframeSeq> seq, uint32_t maxFrameSizeInBytes, Address gwAddress);
 
   /**
    * \brief Function for adding the UT
@@ -211,22 +217,7 @@ public:
    */
   void SetUpdateRoutingCallback (SatNcc::UpdateRoutingCallback cb);
 
-  /**
-   * \param msg        the TBTP sent
-   */
-  typedef Callback<void, Ptr<SatTbtpMessage> > SendTbtpCallback;
-
-  /**
-   * Set the callback to inform GW Mac a TBTP has been sent.
-   */
-  void SetSendTbtpCallback (SendTbtpCallback cb);
-
   void ReserveLogonChannel (uint32_t logonChannelId);
-
-  /**
-   * Function called when a TBTP has been sent by the SatBeamScheduler.
-   */
-  void TbtpSent (Ptr<SatTbtpMessage> tbtp);
 
   /**
    * Function to call when a control burst has been received.
@@ -356,11 +347,6 @@ private:
    * once a handover request has been accepted and treated
    */
   UpdateRoutingCallback m_updateRoutingCallback;
-
-  /**
-   * The TBTP send callback to inform GW Mac.
-   */
-  SatBeamScheduler::SendTbtpCallback m_txTbtpCallback;
 };
 
 } // namespace ns3

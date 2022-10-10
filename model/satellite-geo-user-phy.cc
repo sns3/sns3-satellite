@@ -164,6 +164,7 @@ SatGeoUserPhy::SatGeoUserPhy (SatPhy::CreateParam_t& params,
 
   m_forwardLinkRegenerationMode = forwardLinkRegenerationMode;
   m_returnLinkRegenerationMode = returnLinkRegenerationMode;
+  m_isSending = false;
   m_queueSizeBytes = 0;
   m_queueSizePackets = 0;
 
@@ -304,6 +305,7 @@ SatGeoUserPhy::SendFromQueue ()
     {
       NS_FATAL_ERROR ("Trying to deque an empty queue");
     }
+
   m_isSending = true;
   std::tuple<Ptr<SatSignalParameters>, uint32_t, uint32_t> element = m_queue.front();
   m_queue.pop ();
