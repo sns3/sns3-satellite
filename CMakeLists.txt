@@ -46,7 +46,7 @@ set(source_files
     model/satellite-fwd-link-scheduler.cc
     model/satellite-fwd-link-scheduler-default.cc
     model/satellite-fwd-link-scheduler-time-slicing.cc
-    model/satellite-fwd-link-scheduler-scpc.cc
+    model/satellite-scpc-scheduler.cc
     model/satellite-frame-allocator.cc
     model/satellite-frame-conf.cc
     model/satellite-free-space-loss.cc
@@ -280,7 +280,7 @@ set(header_files
     model/satellite-fwd-link-scheduler.h
     model/satellite-fwd-link-scheduler-default.h
     model/satellite-fwd-link-scheduler-time-slicing.h
-    model/satellite-fwd-link-scheduler-scpc.h
+    model/satellite-scpc-scheduler.h
     model/satellite-generic-stream-encapsulator.h
     model/satellite-generic-stream-encapsulator-arq.h
     model/satellite-geo-feeder-phy.h

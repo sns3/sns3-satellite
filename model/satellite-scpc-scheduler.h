@@ -40,7 +40,7 @@ namespace ns3 {
  *
  */
 
-class SatFwdLinkSchedulerScpc : public SatFwdLinkScheduler
+class SatScpcScheduler : public SatFwdLinkScheduler
 {
 public:
   /**
@@ -61,7 +61,7 @@ public:
    * This the default constructor for the SatFwdLinkScheduler is not supported.
    *
    */
-  SatFwdLinkSchedulerScpc ();
+  SatScpcScheduler ();
 
   /**
    * Actual constructor of a SatFwdLinkScheduler
@@ -70,14 +70,14 @@ public:
    * \param address MAC address
    * \param carrierBandwidthInHz Carrier bandwidth where scheduler is associated to [Hz].
    */
-  SatFwdLinkSchedulerScpc (Ptr<SatBbFrameConf> conf, Mac48Address address, double carrierBandwidthInHz);
+  SatScpcScheduler (Ptr<SatBbFrameConf> conf, Mac48Address address, double carrierBandwidthInHz);
 
   /**
    * Destroy a SatFwdLinkScheduler
    *
    * This is the destructor for the SatFwdLinkScheduler.
    */
-  ~SatFwdLinkSchedulerScpc ();
+  ~SatScpcScheduler ();
 
   /**
    * Get next frame to be transmitted.

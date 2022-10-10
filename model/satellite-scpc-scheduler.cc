@@ -20,55 +20,55 @@
 
 #include <ns3/log.h>
 
-#include "satellite-fwd-link-scheduler-scpc.h"
+#include "satellite-scpc-scheduler.h"
 
 
-NS_LOG_COMPONENT_DEFINE ("SatFwdLinkSchedulerScpc");
+NS_LOG_COMPONENT_DEFINE ("SatScpcScheduler");
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (SatFwdLinkSchedulerScpc);
+NS_OBJECT_ENSURE_REGISTERED (SatScpcScheduler);
 
 TypeId
-SatFwdLinkSchedulerScpc::GetTypeId (void)
+SatScpcScheduler::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::SatFwdLinkSchedulerScpc")
+  static TypeId tid = TypeId ("ns3::SatScpcScheduler")
     .SetParent<SatFwdLinkScheduler> ()
-    .AddConstructor<SatFwdLinkSchedulerScpc> ()
+    .AddConstructor<SatScpcScheduler> ()
     .AddAttribute ("SchedulingStartThresholdTime",
                    "Threshold time of total transmissions in BB Frame container to trigger a scheduling round.",
                    TimeValue (MilliSeconds (5)),
-                   MakeTimeAccessor (&SatFwdLinkSchedulerScpc::m_schedulingStartThresholdTime),
+                   MakeTimeAccessor (&SatScpcScheduler::m_schedulingStartThresholdTime),
                    MakeTimeChecker ())
     .AddAttribute ("SchedulingStopThresholdTime",
                    "Threshold time of total transmissions in BB Frame container to stop a scheduling round.",
                    TimeValue (MilliSeconds (15)),
-                   MakeTimeAccessor (&SatFwdLinkSchedulerScpc::m_schedulingStopThresholdTime),
+                   MakeTimeAccessor (&SatScpcScheduler::m_schedulingStopThresholdTime),
                    MakeTimeChecker ())
     .AddAttribute ( "BBFrameContainer",
                     "BB frame container of this scheduler.",
                     PointerValue (),
-                    MakePointerAccessor (&SatFwdLinkSchedulerScpc::m_bbFrameContainer),
+                    MakePointerAccessor (&SatScpcScheduler::m_bbFrameContainer),
                     MakePointerChecker<SatBbFrameContainer> ())
   ;
   return tid;
 }
 
 TypeId
-SatFwdLinkSchedulerScpc::GetInstanceTypeId (void) const
+SatScpcScheduler::GetInstanceTypeId (void) const
 {
   NS_LOG_FUNCTION (this);
 
   return GetTypeId ();
 }
 
-SatFwdLinkSchedulerScpc::SatFwdLinkSchedulerScpc () : SatFwdLinkScheduler ()
+SatScpcScheduler::SatScpcScheduler () : SatFwdLinkScheduler ()
 {
   NS_LOG_FUNCTION (this);
-  NS_FATAL_ERROR ("Default constructor for SatFwdLinkSchedulerScpc not supported");
+  NS_FATAL_ERROR ("Default constructor for SatScpcScheduler not supported");
 }
 
-SatFwdLinkSchedulerScpc::SatFwdLinkSchedulerScpc (Ptr<SatBbFrameConf> conf, Mac48Address address, double carrierBandwidthInHz) :
+SatScpcScheduler::SatScpcScheduler (Ptr<SatBbFrameConf> conf, Mac48Address address, double carrierBandwidthInHz) :
     SatFwdLinkScheduler (conf, address, carrierBandwidthInHz),
     m_symbolsSent (0)
 {
@@ -80,16 +80,16 @@ SatFwdLinkSchedulerScpc::SatFwdLinkSchedulerScpc (Ptr<SatBbFrameConf> conf, Mac4
 
   m_bbFrameContainer = CreateObject<SatBbFrameContainer> (modCods, m_bbFrameConf);
 
-  Simulator::Schedule (m_periodicInterval, &SatFwdLinkSchedulerScpc::PeriodicTimerExpired, this);
+  Simulator::Schedule (m_periodicInterval, &SatScpcScheduler::PeriodicTimerExpired, this);
 }
 
-SatFwdLinkSchedulerScpc::~SatFwdLinkSchedulerScpc ()
+SatScpcScheduler::~SatScpcScheduler ()
 {
   NS_LOG_FUNCTION (this);
 }
 
 void
-SatFwdLinkSchedulerScpc::DoDispose ()
+SatScpcScheduler::DoDispose ()
 {
   NS_LOG_FUNCTION (this);
   SatFwdLinkScheduler::DoDispose ();
@@ -98,7 +98,7 @@ SatFwdLinkSchedulerScpc::DoDispose ()
 
 
 std::pair<Ptr<SatBbFrame>, const Time>
-SatFwdLinkSchedulerScpc::GetNextFrame ()
+SatScpcScheduler::GetNextFrame ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -156,18 +156,18 @@ SatFwdLinkSchedulerScpc::GetNextFrame ()
 }
 
 void
-SatFwdLinkSchedulerScpc::PeriodicTimerExpired ()
+SatScpcScheduler::PeriodicTimerExpired ()
 {
   NS_LOG_FUNCTION (this);
 
   SendAndClearSymbolsSentStat ();
   ScheduleBbFrames ();
 
-  Simulator::Schedule (m_periodicInterval, &SatFwdLinkSchedulerScpc::PeriodicTimerExpired, this);
+  Simulator::Schedule (m_periodicInterval, &SatScpcScheduler::PeriodicTimerExpired, this);
 }
 
 void
-SatFwdLinkSchedulerScpc::SendAndClearSymbolsSentStat ()
+SatScpcScheduler::SendAndClearSymbolsSentStat ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -177,7 +177,7 @@ SatFwdLinkSchedulerScpc::SendAndClearSymbolsSentStat ()
 }
 
 void
-SatFwdLinkSchedulerScpc::ScheduleBbFrames ()
+SatScpcScheduler::ScheduleBbFrames ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -232,7 +232,7 @@ SatFwdLinkSchedulerScpc::ScheduleBbFrames ()
 }
 
 void
-SatFwdLinkSchedulerScpc::GetSchedulingObjects (std::vector< Ptr<SatSchedulingObject> > & output)
+SatScpcScheduler::GetSchedulingObjects (std::vector< Ptr<SatSchedulingObject> > & output)
 {
   NS_LOG_FUNCTION (this);
 

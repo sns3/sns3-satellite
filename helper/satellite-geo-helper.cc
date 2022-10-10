@@ -437,8 +437,8 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
           fMac->SetTransmitFeederCallback (MakeCallback (&SatGeoFeederPhy::SendPduWithParams, fPhy));
 
           double carrierBandwidth = m_carrierBandwidthConverter (SatEnums::RETURN_FEEDER_CH, 0, SatEnums::EFFECTIVE_BANDWIDTH);
-          Ptr<SatFwdLinkSchedulerScpc> fwdLinkSchedulerScpc = CreateObject<SatFwdLinkSchedulerScpc> (m_bbFrameConf, feederAddress, carrierBandwidth);
-          fMac->SetFwdScheduler (fwdLinkSchedulerScpc);
+          Ptr<SatScpcScheduler> scpcScheduler = CreateObject<SatScpcScheduler> (m_bbFrameConf, feederAddress, carrierBandwidth);
+          fMac->SetFwdScheduler (scpcScheduler);
           fMac->SetLlc (fLlc);
           if (startScheduler)
             {
@@ -446,8 +446,8 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
             }
 
           // Attach the LLC Tx opportunity and scheduling context getter callbacks to SatFwdLinkScheduler
-          fwdLinkSchedulerScpc->SetTxOpportunityCallback (MakeCallback (&SatGeoLlc::NotifyTxOpportunity, fLlc));
-          fwdLinkSchedulerScpc->SetSchedContextCallback (MakeCallback (&SatLlc::GetSchedulingContexts, fLlc));
+          scpcScheduler->SetTxOpportunityCallback (MakeCallback (&SatGeoLlc::NotifyTxOpportunity, fLlc));
+          scpcScheduler->SetSchedContextCallback (MakeCallback (&SatLlc::GetSchedulingContexts, fLlc));
 
           break;
         }

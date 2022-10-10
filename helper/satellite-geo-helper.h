@@ -39,7 +39,7 @@
 #include "ns3/satellite-typedefs.h"
 #include "ns3/satellite-bbframe-conf.h"
 #include "ns3/satellite-fwd-link-scheduler.h"
-#include "ns3/satellite-fwd-link-scheduler-scpc.h"
+#include "ns3/satellite-scpc-scheduler.h"
 
 namespace ns3 {
 
