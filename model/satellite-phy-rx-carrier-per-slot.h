@@ -205,6 +205,8 @@ private:
   bool m_enableRandomAccessDynamicLoadControl;                                  //< Is random access dynamic load control enabled
   std::deque<double> m_randomAccessDynamicLoadControlNormalizedOfferedLoad;     //< Container for calculated normalized offered loads
 
+  bool m_disableErrorHighTransmissionTime;                                      //< Disable fatal error when transmission time is higher than propagation time, but computations are less precise
+
 
 };
 

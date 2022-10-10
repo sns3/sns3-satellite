@@ -51,7 +51,8 @@ SatPhyRxCarrierPerSlot::SatPhyRxCarrierPerSlot (uint32_t carrierId,
   m_randomAccessCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED),
   m_randomAccessConstantErrorRate (0.0),
   m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (0),
-  m_enableRandomAccessDynamicLoadControl (false)
+  m_enableRandomAccessDynamicLoadControl (false),
+  m_disableErrorHighTransmissionTime (false)
 {
   if (randomAccessEnabled)
     {
@@ -82,6 +83,11 @@ SatPhyRxCarrierPerSlot::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatPhyRxCarrierPerSlot")
     .SetParent<SatPhyRxCarrier> ()
+    .AddAttribute ( "DisableErrorHighTransmissionTime",
+                    "Disable fatal error when transmission time is higher than propagation time, but computations are less precise.",
+                    BooleanValue (false),
+                    MakeBooleanAccessor (&SatPhyRxCarrierPerSlot::m_disableErrorHighTransmissionTime),
+                    MakeBooleanChecker ())
     .AddTraceSource ("SlottedAlohaRxCollision",
                      "Received a packet burst through Random Access Slotted ALOHA",
                      MakeTraceSourceAccessor (&SatPhyRxCarrierPerSlot::m_slottedAlohaRxCollisionTrace),
@@ -136,10 +142,20 @@ SatPhyRxCarrierPerSlot::CreateInterference (Ptr<SatSignalParameters> rxParams, A
         {
           if (!rxParams->HasSinrComputed ())
             {
-              NS_FATAL_ERROR ("SatPhyRx::StartRx - too long transmission time: packet started to be received in a ground entity while not being fully received on the satellite: interferences could not be properly computed.");
+              if (m_disableErrorHighTransmissionTime)
+                {
+                  NS_LOG_WARN ("SatPhyRx::StartRx - too long transmission time: packet started to be received in a ground entity while not being fully received on the satellite: interferences could not be properly computed.");
+                  rxPower = rxParams->m_rxPower_W;
+                }
+              else
+                {
+                  NS_FATAL_ERROR ("SatPhyRx::StartRx - too long transmission time: packet started to be received in a ground entity while not being fully received on the satellite: interferences could not be properly computed.");
+                }
             }
-
-          rxPower = rxParams->m_rxPower_W * (1 + 1 / rxParams->GetSinr ());
+          else
+            {
+              rxPower = rxParams->m_rxPower_W * (1 + 1 / rxParams->GetSinr ());
+            }
         }
 
       // Add the interference even regardless.
