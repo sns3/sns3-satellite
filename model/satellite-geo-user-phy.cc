@@ -39,6 +39,7 @@
 #include "satellite-address-tag.h"
 #include "satellite-time-tag.h"
 #include "satellite-uplink-info-tag.h"
+#include "satellite-mac-tag.h"
 
 
 NS_LOG_COMPONENT_DEFINE ("SatGeoUserPhy");
@@ -112,6 +113,19 @@ SatGeoUserPhy::GetTypeId (void)
                     DoubleValue (17.0),
                     MakeDoubleAccessor (&SatGeoUserPhy::m_aciInterferenceCOverIDb),
                     MakeDoubleChecker<double> ())
+    .AddAttribute ( "QueueSize",
+                    "Maximum size of FIFO m_queue in bytes.",
+                    UintegerValue (100000),
+                    MakeUintegerAccessor (&SatGeoUserPhy::m_queueSizeMax),
+                    MakeUintegerChecker<uint32_t> ())
+    .AddTraceSource ("QueueSizeBytes",
+                     "Send number of bytes in FIFO return feeder queue",
+                     MakeTraceSourceAccessor (&SatGeoUserPhy::m_queueSizeBytesTrace),
+                     "ns3::SatStatsRtnFeederQueueHelper::QueueSizeCallback")
+    .AddTraceSource ("QueueSizePackets",
+                     "Send number of packets in FIFO return feeder queue",
+                     MakeTraceSourceAccessor (&SatGeoUserPhy::m_queueSizePacketsTrace),
+                     "ns3::SatStatsRtnFeederQueueHelper::QueueSizeCallback")
   ;
   return tid;
 }
@@ -128,7 +142,9 @@ SatGeoUserPhy::SatGeoUserPhy (void)
   : m_aciInterferenceCOverIDb (17.0),
   m_otherSysInterferenceCOverIDb (27.5),
   m_aciInterferenceCOverI (SatUtils::DbToLinear (m_aciInterferenceCOverIDb)),
-  m_otherSysInterferenceCOverI (SatUtils::DbToLinear (m_otherSysInterferenceCOverIDb))
+  m_otherSysInterferenceCOverI (SatUtils::DbToLinear (m_otherSysInterferenceCOverIDb)),
+  m_queueSizeBytes (0),
+  m_queueSizePackets (0)
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("SatGeoUserPhy default constructor is not allowed to use");
@@ -140,12 +156,21 @@ SatGeoUserPhy::SatGeoUserPhy (SatPhy::CreateParam_t& params,
                               Ptr<SatSuperframeConf> superFrameConf,
                               SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                               SatEnums::RegenerationMode_t returnLinkRegenerationMode)
-  : SatPhy (params)
+  : SatPhy (params),
+  m_queueSizeBytes (0),
+  m_queueSizePackets (0)
 {
   NS_LOG_FUNCTION (this);
 
   m_forwardLinkRegenerationMode = forwardLinkRegenerationMode;
   m_returnLinkRegenerationMode = returnLinkRegenerationMode;
+  m_queueSizeBytes = 0;
+  m_queueSizePackets = 0;
+
+  if (m_returnLinkRegenerationMode == SatEnums::REGENERATION_PHY)
+    {
+      m_queue = std::queue<std::tuple<Ptr<SatSignalParameters>, uint32_t, uint32_t>> ();
+    }
 
   if (forwardLinkRegenerationMode == SatEnums::TRANSPARENT)
     {
@@ -212,16 +237,6 @@ SatGeoUserPhy::SendPduWithParams (Ptr<SatSignalParameters> txParams )
   NS_LOG_FUNCTION (this << txParams);
   NS_LOG_INFO (this << " sending a packet with carrierId: " << txParams->m_carrierId << " duration: " << txParams->m_duration);
 
-  // Add packet trace entry:
-  m_packetTrace (Simulator::Now (),
-                 SatEnums::PACKET_SENT,
-                 m_nodeInfo->GetNodeType (),
-                 m_nodeInfo->GetNodeId (),
-                 m_nodeInfo->GetMacAddress (),
-                 SatEnums::LL_PHY,
-                 SatEnums::LD_FORWARD,
-                 SatUtils::GetPacketInfo (txParams->m_packetsInBurst));
-
   if (m_forwardLinkRegenerationMode != SatEnums::TRANSPARENT)
     {
       SetTimeTag (txParams->m_packetsInBurst);
@@ -233,7 +248,96 @@ SatGeoUserPhy::SendPduWithParams (Ptr<SatSignalParameters> txParams )
 
   txParams->m_phyTx = m_phyTx;
   txParams->m_txPower_W = m_eirpWoGainW;
+
+  SatEnums::SatPacketEvent_t event;
+
+  if (m_forwardLinkRegenerationMode == SatEnums::REGENERATION_PHY)
+    {
+      uint32_t nbBytes = 0;
+      for (Ptr<Packet> pkt : txParams->m_packetsInBurst)
+        {
+          nbBytes += pkt->GetSize ();
+        }
+      uint32_t nbPackets = txParams->m_packetsInBurst.size ();
+      if (m_queueSizeBytes + nbBytes < m_queueSizeMax)
+        {
+          event = SatEnums::PACKET_ENQUE;
+          m_queue.push (std::make_tuple(txParams, nbBytes, nbPackets));
+          m_queueSizeBytes += nbBytes;
+          m_queueSizePackets += nbPackets;
+
+          m_queueSizeBytesTrace (m_queueSizeBytes, GetE2EDestinationAddress (txParams->m_packetsInBurst));
+          m_queueSizePacketsTrace (m_queueSizePackets, GetE2EDestinationAddress (txParams->m_packetsInBurst));
+
+          if (m_isSending == false)
+            {
+              SendFromQueue ();
+            }
+        }
+      else
+        {
+          event = SatEnums::PACKET_DROP;
+          NS_LOG_INFO ("Packet dropped because REGENERATION_PHY queue is full");
+        }
+    }
+  else
+    {
+      event = SatEnums::PACKET_SENT;
+      m_phyTx->StartTx (txParams);
+    }
+
+  // Add packet trace entry:
+  m_packetTrace (Simulator::Now (),
+                 event,
+                 m_nodeInfo->GetNodeType (),
+                 m_nodeInfo->GetNodeId (),
+                 m_nodeInfo->GetMacAddress (),
+                 SatEnums::LL_PHY,
+                 SatEnums::LD_FORWARD,
+                 SatUtils::GetPacketInfo (txParams->m_packetsInBurst));
+}
+
+void
+SatGeoUserPhy::SendFromQueue ()
+{
+  if (m_queue.empty ())
+    {
+      NS_FATAL_ERROR ("Trying to deque an empty queue");
+    }
+  m_isSending = true;
+  std::tuple<Ptr<SatSignalParameters>, uint32_t, uint32_t> element = m_queue.front();
+  m_queue.pop ();
+
+  Ptr<SatSignalParameters> txParams = std::get<0> (element);
+  m_queueSizeBytes -= std::get<1> (element);
+  m_queueSizePackets -= std::get<2> (element);
+
+  m_queueSizeBytesTrace (m_queueSizeBytes, GetE2EDestinationAddress (txParams->m_packetsInBurst));
+  m_queueSizePacketsTrace (m_queueSizePackets, GetE2EDestinationAddress (txParams->m_packetsInBurst));
+
+  // Add sent packet trace entry:
+  m_packetTrace (Simulator::Now (),
+                 SatEnums::PACKET_SENT,
+                 m_nodeInfo->GetNodeType (),
+                 m_nodeInfo->GetNodeId (),
+                 m_nodeInfo->GetMacAddress (),
+                 SatEnums::LL_PHY,
+                 SatEnums::LD_RETURN,
+                 SatUtils::GetPacketInfo (txParams->m_packetsInBurst));
+
+  Simulator::Schedule (txParams->m_duration + NanoSeconds (1), &SatGeoUserPhy::EndTx, this);
+
   m_phyTx->StartTx (txParams);
+}
+
+void
+SatGeoUserPhy::EndTx ()
+{
+  m_isSending = false;
+  if (!m_queue.empty ())
+    {
+      this->SendFromQueue ();
+    }
 }
 
 void
@@ -351,6 +455,23 @@ SatEnums::SatLinkDir_t
 SatGeoUserPhy::GetSatLinkRxDir ()
 {
   return SatEnums::LD_RETURN;
+}
+
+Address
+SatGeoUserPhy::GetE2EDestinationAddress (SatPhy::PacketContainer_t packets)
+{
+  SatSignalParameters::PacketsInBurst_t::iterator it1;
+  for (it1 = packets.begin ();
+       it1 != packets.end (); ++it1)
+    {
+      Address addr; // invalid address.
+      SatAddressE2ETag satAddressE2ETag;
+      if ((*it1)->PeekPacketTag (satAddressE2ETag))
+        {
+          return satAddressE2ETag.GetE2EDestAddress ();
+        }
+    }
+  return Mac48Address ();
 }
 
 } // namespace ns3

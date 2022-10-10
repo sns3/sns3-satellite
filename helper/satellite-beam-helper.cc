@@ -273,7 +273,7 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
     }
 
   // create needed low level satellite helpers
-  m_geoHelper = CreateObject<SatGeoHelper> (bandwidthConverterCb, rtnLinkCarrierCount, fwdLinkCarrierCount, seq, geoRaSettings);
+  m_geoHelper = CreateObject<SatGeoHelper> (bandwidthConverterCb, rtnLinkCarrierCount, fwdLinkCarrierCount, seq, fwdReadCtrlCb, rtnReadCtrlCb, geoRaSettings);
   m_gwHelper = CreateObject<SatGwHelper> (bandwidthConverterCb, rtnLinkCarrierCount, seq, rtnReadCtrlCb, fwdReserveCtrlCb, fwdSendCtrlCb, gwRaSettings);
   m_utHelper = CreateObject<SatUtHelper> (bandwidthConverterCb, fwdLinkCarrierCount, seq, fwdReadCtrlCb, rtnReserveCtrlCb, rtnSendCtrlCb, utRaSettings);
 

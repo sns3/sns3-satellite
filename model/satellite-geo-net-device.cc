@@ -89,9 +89,9 @@ SatGeoNetDevice::SatGeoNetDevice ()
 
 
 void
-SatGeoNetDevice::ReceiveUser (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> rxParams)
+SatGeoNetDevice::ReceiveUser (SatPhy::PacketContainer_t /*packets*/, Ptr<SatSignalParameters> rxParams)
 {
-  NS_LOG_FUNCTION (this << packets.size () << rxParams);
+  NS_LOG_FUNCTION (this << rxParams->m_packetsInBurst.size () << rxParams);
   NS_LOG_INFO ("Receiving a packet at the satellite from user link");
 
   switch (m_returnLinkRegenerationMode)
@@ -104,7 +104,7 @@ SatGeoNetDevice::ReceiveUser (SatPhy::PacketContainer_t packets, Ptr<SatSignalPa
         }
       case SatEnums::REGENERATION_LINK:
         {
-          DynamicCast<SatGeoFeederMac> (m_feederMac[rxParams->m_beamId])->EnquePackets (packets, rxParams);
+          DynamicCast<SatGeoFeederMac> (m_feederMac[rxParams->m_beamId])->EnquePackets (rxParams->m_packetsInBurst, rxParams);
           break;
         }
       default:
@@ -115,9 +115,9 @@ SatGeoNetDevice::ReceiveUser (SatPhy::PacketContainer_t packets, Ptr<SatSignalPa
 }
 
 void
-SatGeoNetDevice::ReceiveFeeder (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> rxParams)
+SatGeoNetDevice::ReceiveFeeder (SatPhy::PacketContainer_t /*packets*/, Ptr<SatSignalParameters> rxParams)
 {
-  NS_LOG_FUNCTION (this << packets.size () << rxParams);
+  NS_LOG_FUNCTION (this << rxParams->m_packetsInBurst.size () << rxParams);
   NS_LOG_INFO ("Receiving a packet at the satellite from feeder link");
 
   switch (m_forwardLinkRegenerationMode)

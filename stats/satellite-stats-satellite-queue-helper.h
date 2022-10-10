@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef SATELLITE_STATS_SAT_FEEDER_QUEUE_HELPER_H
-#define SATELLITE_STATS_SAT_FEEDER_QUEUE_HELPER_H
+#ifndef SATELLITE_STATS_SAT_QUEUE_HELPER_H
+#define SATELLITE_STATS_SAT_QUEUE_HELPER_H
 
 #include <ns3/satellite-stats-helper.h>
 #include <ns3/ptr.h>
@@ -39,9 +39,9 @@ class DataCollectionObject;
 
 /**
  * \ingroup satstats
- * \brief Base class for sat feeder queue statistics helpers.
+ * \brief Base class for sat queue statistics helpers.
  */
-class SatStatsRtnFeederQueueHelper : public SatStatsHelper
+class SatStatsSatelliteQueueHelper : public SatStatsHelper
 {
 public:
   /**
@@ -61,13 +61,13 @@ public:
   static std::string GetUnitTypeName (UnitType_t unitType);
 
   // inherited from SatStatsHelper base class
-  SatStatsRtnFeederQueueHelper (Ptr<const SatHelper> satHelper);
+  SatStatsSatelliteQueueHelper (Ptr<const SatHelper> satHelper);
 
 
   /**
    * / Destructor.
    */
-  virtual ~SatStatsRtnFeederQueueHelper ();
+  virtual ~SatStatsSatelliteQueueHelper ();
 
 
   /**
@@ -159,7 +159,7 @@ private:
 }; // end of class SatStatsLinkSinrHelper
 
 
-// QUEUE IN PACKETS ////////////////////////////////////////////////////////
+// RTN FEEDER QUEUE IN PACKETS ////////////////////////////////////////////////////////
 
 /**
  * \ingroup satstats
@@ -176,7 +176,7 @@ private:
  * s->Install ();
  * \endcode
  */
-class SatStatsRtnFeederQueuePacketsHelper : public SatStatsRtnFeederQueueHelper
+class SatStatsRtnFeederQueuePacketsHelper : public SatStatsSatelliteQueueHelper
 {
 public:
   // inherited from SatStatsHelper base class
@@ -201,7 +201,7 @@ protected:
 }; // end of class SatStatsRtnFeederQueuePacketsHelper
 
 
-// QUEUE IN BYTES ////////////////////////////////////////////////////////
+// RTN FEEDER QUEUE IN BYTES ////////////////////////////////////////////////////////
 
 /**
  * \ingroup satstats
@@ -218,7 +218,7 @@ protected:
  * s->Install ();
  * \endcode
  */
-class SatStatsRtnFeederQueueBytesHelper : public SatStatsRtnFeederQueueHelper
+class SatStatsRtnFeederQueueBytesHelper : public SatStatsSatelliteQueueHelper
 {
 public:
   // inherited from SatStatsHelper base class
@@ -242,7 +242,91 @@ protected:
 
 }; // end of class SatStatsRtnFeederQueueBytesHelper
 
+
+// FWD USER QUEUE IN PACKETS ////////////////////////////////////////////////////////
+
+/**
+ * \ingroup satstats
+ * \brief Produce queue size statistics in packets for return feeder link.
+ *
+ * For a more convenient usage in simulation script, it is recommended to use
+ * the corresponding methods in SatStatsHelperContainer class.
+ *
+ * Otherwise, the following example can be used:
+ * \code
+ * Ptr<SatStatsFwdUserQueuePacketsHelper> s = Create<SatStatsFwdUserQueuePacketsHelper> (satHelper);
+ * s->SetName ("name");
+ * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
+ * s->Install ();
+ * \endcode
+ */
+class SatStatsFwdUserQueuePacketsHelper : public SatStatsSatelliteQueueHelper
+{
+public:
+  // inherited from SatStatsHelper base class
+  SatStatsFwdUserQueuePacketsHelper (Ptr<const SatHelper> satHelper);
+
+
+  /**
+   * / Destructor.
+   */
+  virtual ~SatStatsFwdUserQueuePacketsHelper ();
+
+
+  /**
+   * inherited from ObjectBase base class
+   */
+  static TypeId GetTypeId ();
+
+protected:
+  // inherited from SatStatsLinkSinrHelper base class
+  void DoInstallProbes ();
+
+}; // end of class SatStatsFwdUserQueuePacketsHelper
+
+
+// FWD USER QUEUE IN BYTES ////////////////////////////////////////////////////////
+
+/**
+ * \ingroup satstats
+ * \brief Produce queue size statistics in packets for return feeder link.
+ *
+ * For a more convenient usage in simulation script, it is recommended to use
+ * the corresponding methods in SatStatsHelperContainer class.
+ *
+ * Otherwise, the following example can be used:
+ * \code
+ * Ptr<SatStatsFwdUserQueueBytesHelper> s = Create<SatStatsFwdUserQueueBytesHelper> (satHelper);
+ * s->SetName ("name");
+ * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
+ * s->Install ();
+ * \endcode
+ */
+class SatStatsFwdUserQueueBytesHelper : public SatStatsSatelliteQueueHelper
+{
+public:
+  // inherited from SatStatsHelper base class
+  SatStatsFwdUserQueueBytesHelper (Ptr<const SatHelper> satHelper);
+
+
+  /**
+   * / Destructor.
+   */
+  virtual ~SatStatsFwdUserQueueBytesHelper ();
+
+
+  /**
+   * inherited from ObjectBase base class
+   */
+  static TypeId GetTypeId ();
+
+protected:
+  // inherited from SatStatsLinkSinrHelper base class
+  void DoInstallProbes ();
+
+}; // end of class SatStatsFwdUserQueueBytesHelper
+
 } // end of namespace ns3
 
 
-#endif /* SATELLITE_STATS_SAT_FEEDER_QUEUE_HELPER_H */
+#endif /* SATELLITE_STATS_SAT_QUEUE_HELPER_H */

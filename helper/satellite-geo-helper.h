@@ -83,6 +83,8 @@ public:
                 uint32_t rtnLinkCarrierCount,
                 uint32_t fwdLinkCarrierCount,
                 Ptr<SatSuperframeSeq> seq,
+                SatMac::ReadCtrlMsgCallback fwdReadCb,
+                SatMac::ReadCtrlMsgCallback rtnReadCb,
                 RandomAccessSettings_s randomAccessSettings);
 
   virtual ~SatGeoHelper ()
@@ -312,6 +314,16 @@ private:
    * Map used in regenerative mode to store if MAC already created for a given GW ID
    */
   std::map<uint32_t, Ptr<SatGeoFeederMac>> m_gwMacMap;
+
+  /**
+   * Control forward link messages callback
+   */
+  SatMac::ReadCtrlMsgCallback m_fwdReadCtrlCb;
+
+  /**
+   * Control return link messages callback
+   */
+  SatMac::ReadCtrlMsgCallback m_rtnReadCtrlCb;
 };
 
 } // namespace ns3

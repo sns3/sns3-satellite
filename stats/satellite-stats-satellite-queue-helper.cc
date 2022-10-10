@@ -35,6 +35,7 @@
 #include <ns3/satellite-geo-net-device.h>
 #include <ns3/satellite-phy.h>
 #include <ns3/satellite-geo-feeder-phy.h>
+#include <ns3/satellite-geo-user-phy.h>
 #include <ns3/satellite-helper.h>
 #include <ns3/satellite-id-mapper.h>
 
@@ -46,50 +47,50 @@
 #include <ns3/magister-gnuplot-aggregator.h>
 
 #include <sstream>
-#include "satellite-stats-rtn-feeder-queue-helper.h"
+#include "satellite-stats-satellite-queue-helper.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatStatsRtnFeederQueueHelper");
+NS_LOG_COMPONENT_DEFINE ("SatStatsSatelliteQueueHelper");
 
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (SatStatsRtnFeederQueueHelper);
+NS_OBJECT_ENSURE_REGISTERED (SatStatsSatelliteQueueHelper);
 
 std::string // static
-SatStatsRtnFeederQueueHelper::GetUnitTypeName (SatStatsRtnFeederQueueHelper::UnitType_t unitType)
+SatStatsSatelliteQueueHelper::GetUnitTypeName (SatStatsSatelliteQueueHelper::UnitType_t unitType)
 {
   switch (unitType)
     {
-    case SatStatsRtnFeederQueueHelper::UNIT_BYTES:
+    case SatStatsSatelliteQueueHelper::UNIT_BYTES:
       return "UNIT_BYTES";
-    case SatStatsRtnFeederQueueHelper::UNIT_NUMBER_OF_PACKETS:
+    case SatStatsSatelliteQueueHelper::UNIT_NUMBER_OF_PACKETS:
       return "UNIT_NUMBER_OF_PACKETS";
     default:
-      NS_FATAL_ERROR ("SatStatsRtnFeederQueueHelper - Invalid unit type");
+      NS_FATAL_ERROR ("SatStatsSatelliteQueueHelper - Invalid unit type");
       break;
     }
 
-  NS_FATAL_ERROR ("SatStatsRtnFeederQueueHelper - Invalid unit type");
+  NS_FATAL_ERROR ("SatStatsSatelliteQueueHelper - Invalid unit type");
   return "";
 }
 
-SatStatsRtnFeederQueueHelper::SatStatsRtnFeederQueueHelper (Ptr<const SatHelper> satHelper)
+SatStatsSatelliteQueueHelper::SatStatsSatelliteQueueHelper (Ptr<const SatHelper> satHelper)
   : SatStatsHelper (satHelper)
 {
   NS_LOG_FUNCTION (this << satHelper);
 }
 
 
-SatStatsRtnFeederQueueHelper::~SatStatsRtnFeederQueueHelper ()
+SatStatsSatelliteQueueHelper::~SatStatsSatelliteQueueHelper ()
 {
   NS_LOG_FUNCTION (this);
 }
 
 
 TypeId // static
-SatStatsRtnFeederQueueHelper::GetTypeId ()
+SatStatsSatelliteQueueHelper::GetTypeId ()
 {
-  static TypeId tid = TypeId ("ns3::SatStatsRtnFeederQueueHelper")
+  static TypeId tid = TypeId ("ns3::SatStatsSatelliteQueueHelper")
     .SetParent<SatStatsHelper> ()
   ;
   return tid;
@@ -97,31 +98,31 @@ SatStatsRtnFeederQueueHelper::GetTypeId ()
 
 
 void
-SatStatsRtnFeederQueueHelper::SetUnitType (SatStatsRtnFeederQueueHelper::UnitType_t unitType)
+SatStatsSatelliteQueueHelper::SetUnitType (SatStatsSatelliteQueueHelper::UnitType_t unitType)
 {
   NS_LOG_FUNCTION (this << GetUnitTypeName (unitType));
   m_unitType = unitType;
 
   // Update presentation-based attributes.
-  if (unitType == SatStatsRtnFeederQueueHelper::UNIT_BYTES)
+  if (unitType == SatStatsSatelliteQueueHelper::UNIT_BYTES)
     {
       m_shortLabel = "size_bytes";
       m_longLabel = "Queue size (in bytes)";
     }
-  else if (unitType == SatStatsRtnFeederQueueHelper::UNIT_NUMBER_OF_PACKETS)
+  else if (unitType == SatStatsSatelliteQueueHelper::UNIT_NUMBER_OF_PACKETS)
     {
       m_shortLabel = "num_packets";
       m_longLabel = "Queue size (in number of packets)";
     }
   else
     {
-      NS_FATAL_ERROR ("SatStatsRtnFeederQueueHelper - Invalid unit type");
+      NS_FATAL_ERROR ("SatStatsSatelliteQueueHelper - Invalid unit type");
     }
 }
 
 
 void
-SatStatsRtnFeederQueueHelper::SetAveragingMode (bool averagingMode)
+SatStatsSatelliteQueueHelper::SetAveragingMode (bool averagingMode)
 {
   NS_LOG_FUNCTION (this << averagingMode);
   m_averagingMode = averagingMode;
@@ -129,7 +130,7 @@ SatStatsRtnFeederQueueHelper::SetAveragingMode (bool averagingMode)
 
 
 void
-SatStatsRtnFeederQueueHelper::DoInstall ()
+SatStatsSatelliteQueueHelper::DoInstall ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -417,7 +418,7 @@ SatStatsRtnFeederQueueHelper::DoInstall ()
 
 
 void
-SatStatsRtnFeederQueueHelper::QueueSizeCallback (uint32_t size, const Address &from)
+SatStatsSatelliteQueueHelper::QueueSizeCallback (uint32_t size, const Address &from)
 {
   //NS_LOG_FUNCTION (this << size << from);
 
@@ -445,7 +446,6 @@ SatStatsRtnFeederQueueHelper::QueueSizeCallback (uint32_t size, const Address &f
         }
       else
         {
-          NS_FATAL_ERROR ("STOP");
           NS_LOG_WARN (this << " discarding a packet"
                             << " from statistics collection because of"
                             << " unknown sender address " << from);
@@ -455,7 +455,7 @@ SatStatsRtnFeederQueueHelper::QueueSizeCallback (uint32_t size, const Address &f
 
 
 void
-SatStatsRtnFeederQueueHelper::SaveAddressAndIdentifier (Ptr<Node> utNode)
+SatStatsSatelliteQueueHelper::SaveAddressAndIdentifier (Ptr<Node> utNode)
 {
   NS_LOG_FUNCTION (this << utNode->GetId ());
 
@@ -479,7 +479,7 @@ SatStatsRtnFeederQueueHelper::SaveAddressAndIdentifier (Ptr<Node> utNode)
 
 
 bool
-SatStatsRtnFeederQueueHelper::ConnectProbeToCollector (Ptr<Probe> probe, uint32_t identifier)
+SatStatsSatelliteQueueHelper::ConnectProbeToCollector (Ptr<Probe> probe, uint32_t identifier)
 {
   NS_LOG_FUNCTION (this << probe << probe->GetName () << identifier);
 
@@ -545,7 +545,7 @@ SatStatsRtnFeederQueueHelper::ConnectProbeToCollector (Ptr<Probe> probe, uint32_
 
 
 void
-SatStatsRtnFeederQueueHelper::PassSampleToCollector (uint32_t size, uint32_t identifier)
+SatStatsSatelliteQueueHelper::PassSampleToCollector (uint32_t size, uint32_t identifier)
 {
   //NS_LOG_FUNCTION (this << size << identifier);
 
@@ -603,22 +603,22 @@ SatStatsRtnFeederQueueHelper::PassSampleToCollector (uint32_t size, uint32_t ide
 
 
 void
-SatStatsRtnFeederQueueHelper::InstallProbes ()
+SatStatsSatelliteQueueHelper::InstallProbes ()
 {
   // The method below is supposed to be implemented by the child class.
   DoInstallProbes ();
 }
 
 
-// QUEUE IN BYTES ////////////////////////////////////////////////////////
+// RTN FEEDER QUEUE IN BYTES ////////////////////////////////////////////////////////
 
 NS_OBJECT_ENSURE_REGISTERED (SatStatsRtnFeederQueueBytesHelper);
 
 SatStatsRtnFeederQueueBytesHelper::SatStatsRtnFeederQueueBytesHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsRtnFeederQueueHelper (satHelper)
+  : SatStatsSatelliteQueueHelper (satHelper)
 {
   NS_LOG_FUNCTION (this << satHelper);
-  SetUnitType (SatStatsRtnFeederQueueHelper::UNIT_BYTES);
+  SetUnitType (SatStatsSatelliteQueueHelper::UNIT_BYTES);
 }
 
 
@@ -632,7 +632,7 @@ TypeId // static
 SatStatsRtnFeederQueueBytesHelper::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::SatStatsRtnFeederQueueBytesHelper")
-    .SetParent<SatStatsRtnFeederQueueHelper> ()
+    .SetParent<SatStatsSatelliteQueueHelper> ()
   ;
   return tid;
 }
@@ -687,15 +687,15 @@ SatStatsRtnFeederQueueBytesHelper::DoInstallProbes ()
 } // end of `void DoInstallProbes ();`
 
 
-// QUEUE IN PACKETS ////////////////////////////////////////////////////////
+// RTN FEEDER QUEUE IN PACKETS ////////////////////////////////////////////////////////
 
 NS_OBJECT_ENSURE_REGISTERED (SatStatsRtnFeederQueuePacketsHelper);
 
 SatStatsRtnFeederQueuePacketsHelper::SatStatsRtnFeederQueuePacketsHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsRtnFeederQueueHelper (satHelper)
+  : SatStatsSatelliteQueueHelper (satHelper)
 {
   NS_LOG_FUNCTION (this << satHelper);
-  SetUnitType (SatStatsRtnFeederQueueHelper::UNIT_NUMBER_OF_PACKETS);
+  SetUnitType (SatStatsSatelliteQueueHelper::UNIT_NUMBER_OF_PACKETS);
 }
 
 
@@ -709,7 +709,7 @@ TypeId // static
 SatStatsRtnFeederQueuePacketsHelper::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::SatStatsRtnFeederQueuePacketsHelper")
-    .SetParent<SatStatsRtnFeederQueueHelper> ()
+    .SetParent<SatStatsSatelliteQueueHelper> ()
   ;
   return tid;
 }
@@ -746,6 +746,159 @@ SatStatsRtnFeederQueuePacketsHelper::DoInstallProbes ()
           NS_ASSERT (satGeoFeederPhy != 0);
 
           if (satGeoFeederPhy->TraceConnectWithoutContext ("QueueSizePackets", callback))
+            {
+              NS_LOG_INFO (this << " successfully connected with node ID "
+                                << (*it)->GetId ()
+                                << " device #" << satGeoDev->GetIfIndex ());
+            }
+          else
+            {
+              NS_FATAL_ERROR ("Error connecting to QueueSizePackets trace source"
+                              << " at node ID " << (*it)->GetId ()
+                              << " device #" << satGeoDev->GetIfIndex ());
+            }
+        }
+    } // end of `for (it = sats.Begin(); it != sats.End (); ++it)`
+
+} // end of `void DoInstallProbes ();`
+
+
+// FWD USER QUEUE IN BYTES ////////////////////////////////////////////////////////
+
+NS_OBJECT_ENSURE_REGISTERED (SatStatsFwdUserQueueBytesHelper);
+
+SatStatsFwdUserQueueBytesHelper::SatStatsFwdUserQueueBytesHelper (Ptr<const SatHelper> satHelper)
+  : SatStatsSatelliteQueueHelper (satHelper)
+{
+  NS_LOG_FUNCTION (this << satHelper);
+  SetUnitType (SatStatsSatelliteQueueHelper::UNIT_BYTES);
+}
+
+
+SatStatsFwdUserQueueBytesHelper::~SatStatsFwdUserQueueBytesHelper ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsFwdUserQueueBytesHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsFwdUserQueueBytesHelper")
+    .SetParent<SatStatsSatelliteQueueHelper> ()
+  ;
+  return tid;
+}
+
+
+void
+SatStatsFwdUserQueueBytesHelper::DoInstallProbes ()
+{
+  NS_LOG_FUNCTION (this);
+
+  NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
+  for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
+    {
+      // Create a map of UT addresses and identifiers.
+      SaveAddressAndIdentifier (*it);
+    }
+
+  NodeContainer sats = NodeContainer (GetSatHelper ()->GetBeamHelper ()->GetGeoSatNode ());
+  Callback<void, uint32_t, const Address &> callback
+    = MakeCallback (&SatStatsFwdUserQueueBytesHelper::QueueSizeCallback, this);
+
+  for (NodeContainer::Iterator it = sats.Begin (); it != sats.End (); ++it)
+    {
+      Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
+      Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
+      NS_ASSERT (satGeoDev != 0);
+      Ptr<SatPhy> satPhy;
+      std::map<uint32_t, Ptr<SatPhy> > satGeoUserPhys = satGeoDev->GetUserPhy ();
+      for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoUserPhys.begin (); it2 != satGeoUserPhys.end (); ++it2)
+        {
+          satPhy = it2->second;
+          NS_ASSERT (satPhy != 0);
+          Ptr<SatGeoUserPhy> satGeoUserPhy = satPhy->GetObject<SatGeoUserPhy> ();
+          NS_ASSERT (satGeoUserPhy != 0);
+
+          if (satGeoUserPhy->TraceConnectWithoutContext ("QueueSizeBytes", callback))
+            {
+              NS_LOG_INFO (this << " successfully connected with node ID "
+                                << (*it)->GetId ()
+                                << " device #" << satGeoDev->GetIfIndex ());
+            }
+          else
+            {
+              NS_FATAL_ERROR ("Error connecting to QueueSizeBytes trace source"
+                              << " at node ID " << (*it)->GetId ()
+                              << " device #" << satGeoDev->GetIfIndex ());
+            }
+
+        }
+    } // end of `for (it = sats.Begin(); it != sats.End (); ++it)`
+
+} // end of `void DoInstallProbes ();`
+
+
+// FWD USER QUEUE IN PACKETS ////////////////////////////////////////////////////////
+
+NS_OBJECT_ENSURE_REGISTERED (SatStatsFwdUserQueuePacketsHelper);
+
+SatStatsFwdUserQueuePacketsHelper::SatStatsFwdUserQueuePacketsHelper (Ptr<const SatHelper> satHelper)
+  : SatStatsSatelliteQueueHelper (satHelper)
+{
+  NS_LOG_FUNCTION (this << satHelper);
+  SetUnitType (SatStatsSatelliteQueueHelper::UNIT_NUMBER_OF_PACKETS);
+}
+
+
+SatStatsFwdUserQueuePacketsHelper::~SatStatsFwdUserQueuePacketsHelper ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsFwdUserQueuePacketsHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsFwdUserQueuePacketsHelper")
+    .SetParent<SatStatsSatelliteQueueHelper> ()
+  ;
+  return tid;
+}
+
+
+void
+SatStatsFwdUserQueuePacketsHelper::DoInstallProbes ()
+{
+  NS_LOG_FUNCTION (this);
+
+  NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
+  for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
+    {
+      // Create a map of UT addresses and identifiers.
+      SaveAddressAndIdentifier (*it);
+    }
+
+  NodeContainer sats = NodeContainer (GetSatHelper ()->GetBeamHelper ()->GetGeoSatNode ());
+  Callback<void, uint32_t, const Address &> callback
+    = MakeCallback (&SatStatsFwdUserQueuePacketsHelper::QueueSizeCallback, this);
+
+  for (NodeContainer::Iterator it = sats.Begin (); it != sats.End (); ++it)
+    {
+      Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
+      Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
+      NS_ASSERT (satGeoDev != 0);
+      Ptr<SatPhy> satPhy;
+      std::map<uint32_t, Ptr<SatPhy> > satGeoUserPhys = satGeoDev->GetUserPhy ();
+      for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoUserPhys.begin (); it2 != satGeoUserPhys.end (); ++it2)
+        {
+          satPhy = it2->second;
+          NS_ASSERT (satPhy != 0);
+          Ptr<SatGeoUserPhy> satGeoUserPhy = satPhy->GetObject<SatGeoUserPhy> ();
+          NS_ASSERT (satGeoUserPhy != 0);
+
+          if (satGeoUserPhy->TraceConnectWithoutContext ("QueueSizePackets", callback))
             {
               NS_LOG_INFO (this << " successfully connected with node ID "
                                 << (*it)->GetId ()

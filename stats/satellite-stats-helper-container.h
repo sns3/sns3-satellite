@@ -51,8 +51,8 @@ namespace ns3 {
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerUtUser, PerSat] [Fwd, Rtn] AppPlt
  * - AddAverage [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppPlt
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] Queue [Bytes, Packets]
- * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] RtnFeederQueue [Bytes, Packets]
- * - AddAverage [Beam, Group, Ut, Sat] RtnFeederQueue [Bytes, Packets]
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [RtnFeeder, FwdUser] Queue [Bytes, Packets]
+ * - AddAverage [Beam, Group, Ut, Sat] [RtnFeeder, FwdUser] Queue [Bytes, Packets]
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] SignallingLoad
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] CompositeSinr
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerUtUser, PerSat] [Fwd, Rtn] AppThroughput
@@ -468,6 +468,20 @@ public:
   void AddAverageGroupRtnFeederQueuePackets (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtRtnFeederQueuePackets (SatStatsHelper::OutputType_t outputType);
   void AddAverageSatRtnFeederQueuePackets (SatStatsHelper::OutputType_t outputType);
+
+  // Forward user link queue size (in bytes) statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdUserQueueBytes)
+  void AddAverageBeamFwdUserQueueBytes (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupFwdUserQueueBytes (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtFwdUserQueueBytes (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatFwdUserQueueBytes (SatStatsHelper::OutputType_t outputType);
+
+  // Forward user link queue size (in number of packets) statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdUserQueuePackets)
+  void AddAverageBeamFwdUserQueuePackets (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupFwdUserQueuePackets (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtFwdUserQueuePackets (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatFwdUserQueuePackets (SatStatsHelper::OutputType_t outputType);
 
   // Return link signalling load statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnSignallingLoad)

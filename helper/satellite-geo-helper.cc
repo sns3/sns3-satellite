@@ -129,7 +129,9 @@ SatGeoHelper::SatGeoHelper ()
   m_daRtnLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
   m_raSettings (),
   m_fwdLinkResults (),
-  m_rtnLinkResults ()
+  m_rtnLinkResults (),
+  m_fwdReadCtrlCb (),
+  m_rtnReadCtrlCb ()
 {
   NS_LOG_FUNCTION (this );
 
@@ -141,6 +143,8 @@ SatGeoHelper::SatGeoHelper (SatTypedefs::CarrierBandwidthConverter_t bandwidthCo
                             uint32_t rtnLinkCarrierCount,
                             uint32_t fwdLinkCarrierCount,
                             Ptr<SatSuperframeSeq> seq,
+                            SatMac::ReadCtrlMsgCallback fwdReadCb,
+                            SatMac::ReadCtrlMsgCallback rtnReadCb,
                             RandomAccessSettings_s randomAccessSettings)
   : m_nodeId (0),
   m_carrierBandwidthConverter (bandwidthConverterCb),
@@ -153,7 +157,9 @@ SatGeoHelper::SatGeoHelper (SatTypedefs::CarrierBandwidthConverter_t bandwidthCo
   m_superframeSeq (seq),
   m_raSettings (randomAccessSettings),
   m_fwdLinkResults (),
-  m_rtnLinkResults ()
+  m_rtnLinkResults (),
+  m_fwdReadCtrlCb (fwdReadCb),
+  m_rtnReadCtrlCb (rtnReadCb)
 {
   NS_LOG_FUNCTION (this << rtnLinkCarrierCount << fwdLinkCarrierCount );
 
@@ -344,6 +350,10 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
   Ptr<SatGeoFeederLlc> fLlc;
   bool startScheduler = false;
 
+  // Create MAC layer
+  fMac = CreateObject<SatGeoFeederMac> (forwardLinkRegenerationMode,
+                                        returnLinkRegenerationMode);
+
   Mac48Address feederAddress;
 
   // Create layers needed depending on max regeneration mode
@@ -355,14 +365,12 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
           // Create a node info to PHY layers
           Ptr<SatNodeInfo> niPhyFeeder = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, Mac48Address::ConvertFrom (dev->GetAddress ()));
           fPhy->SetNodeInfo (niPhyFeeder);
+          fMac->SetNodeInfo (niPhyFeeder);
 
           break;
         }
       case SatEnums::REGENERATION_LINK:
         {
-          // Create MAC layer
-          fMac = CreateObject<SatGeoFeederMac> (forwardLinkRegenerationMode,
-                                                returnLinkRegenerationMode);
 
           // Create LLC layer
           fLlc = CreateObject<SatGeoFeederLlc> ();
@@ -379,6 +387,8 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
               m_gwMacMap[gwId] = fMac;
               startScheduler = true;
             }
+
+          fMac->SetReadCtrlCallback (m_fwdReadCtrlCb);
 
           // Create a node info to PHY and MAC layers
           feederAddress = Mac48Address::Allocate ();
@@ -399,8 +409,13 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
       case SatEnums::TRANSPARENT:
       case SatEnums::REGENERATION_PHY:
         {
-          SatPhy::ReceiveCallback fCb = MakeCallback (&SatGeoNetDevice::ReceiveFeeder, dev);
+          //SatPhy::ReceiveCallback fCb = MakeCallback (&SatGeoNetDevice::ReceiveFeeder, dev);
+          //fPhy->SetAttribute ("ReceiveCb", CallbackValue (fCb));
+
+          SatPhy::ReceiveCallback fCb = MakeCallback (&SatGeoFeederMac::Receive, fMac);
           fPhy->SetAttribute ("ReceiveCb", CallbackValue (fCb));
+
+          fMac->SetReceiveFeederCallback (MakeCallback (&SatGeoNetDevice::ReceiveFeeder, dev));
 
           break;
         }

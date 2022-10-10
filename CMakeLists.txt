@@ -216,7 +216,7 @@ set(source_files
     stats/satellite-stats-packet-collision-helper.cc
     stats/satellite-stats-packet-error-helper.cc
     stats/satellite-stats-queue-helper.cc
-    stats/satellite-stats-rtn-feeder-queue-helper.cc
+    stats/satellite-stats-satellite-queue-helper.cc
     stats/satellite-stats-rbdc-request-helper.cc
     stats/satellite-stats-resources-granted-helper.cc
     stats/satellite-stats-signalling-load-helper.cc
@@ -449,7 +449,7 @@ set(header_files
     stats/satellite-stats-packet-collision-helper.h
     stats/satellite-stats-packet-error-helper.h
     stats/satellite-stats-queue-helper.h
-    stats/satellite-stats-rtn-feeder-queue-helper.h
+    stats/satellite-stats-satellite-queue-helper.h
     stats/satellite-stats-rbdc-request-helper.h
     stats/satellite-stats-resources-granted-helper.h
     stats/satellite-stats-signalling-load-helper.h

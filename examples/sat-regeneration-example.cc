@@ -85,6 +85,10 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatConf::ForwardLinkRegenerationMode", EnumValue (forwardLinkRegenerationMode));
   Config::SetDefault ("ns3::SatConf::ReturnLinkRegenerationMode", EnumValue (returnLinkRegenerationMode));
   Config::SetDefault ("ns3::SatGeoFeederPhy::QueueSize", UintegerValue (100000));
+  Config::SetDefault ("ns3::SatGeoUserPhy::QueueSize", UintegerValue (100000));
+
+  /// Enable ACM
+  Config::SetDefault ("ns3::SatBbFrameConf::AcmEnabled", BooleanValue (true));
 
   /// Set simulation output details
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
@@ -211,6 +215,10 @@ main (int argc, char *argv[])
   s->AddPerGwRtnFeederQueueBytes (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerSatRtnFeederQueueBytes (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerSatRtnFeederQueuePackets (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddPerGwFwdUserQueueBytes (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatFwdUserQueueBytes (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatFwdUserQueuePackets (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   s->AddPerGwRtnMacDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtRtnMacDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);

@@ -98,6 +98,8 @@ public:
    */
   void Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> rxParams);
 
+  void ReceiveSignalingPacket (Ptr<Packet> packet);
+
   typedef Callback<void, Ptr<SatSignalParameters>> TransmitFeederCallback;
 
   void SetTransmitFeederCallback (TransmitFeederCallback cb);

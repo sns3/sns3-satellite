@@ -565,6 +565,8 @@ SatBeamScheduler::SendCnoToSatellite ()
 
       Ptr<SatCnoReportMessage> cnoReportMessage = CreateObject<SatCnoReportMessage> ();
       cnoReportMessage->SetCnoEstimate (cno);
+
+      SendToSatellite (cnoReportMessage, m_satelliteMac);
     }
 
   m_receivedSatelliteCnoSample = false;

@@ -22,6 +22,9 @@
 #ifndef SATELLITE_GEO_USER_PHY_H
 #define SATELLITE_GEO_USER_PHY_H
 
+#include <queue>
+#include <tuple>
+
 #include <ns3/ptr.h>
 #include <ns3/nstime.h>
 #include <ns3/object.h>
@@ -104,6 +107,13 @@ public:
    */
   virtual double GetAdditionalInterference ();
 
+  /**
+   * \brief Callback signature for `QueueSizeBytes` and `QueueSizePackets` trace source.
+   * \param size number of bytes or number of packets of queue
+   * \param from The MAC source address of packets
+   */
+  typedef void (*QueueSizeCallback)(uint32_t size, const Address &from);
+
 protected:
   /**
    * \brief Invoke the `Rx` trace source for each received packet.
@@ -123,7 +133,35 @@ protected:
    */
   virtual SatEnums::SatLinkDir_t GetSatLinkRxDir ();
 
+  /**
+   * Traced callback to monitor RTN feeder queue size in bytes.
+   */
+  TracedCallback<uint32_t, const Address &> m_queueSizeBytesTrace;
+
+  /**
+   * Traced callback to monitor RTN feeder queue size in packets.
+   */
+  TracedCallback<uint32_t, const Address &> m_queueSizePacketsTrace;
+
 private:
+  /**
+   * Send a packet from the queue. Used only in REGENERATION_PHY mode.
+   */
+  void SendFromQueue ();
+
+  /**
+   * Notify a packet has finished being sent. Used only in REGENERATION_PHY mode.
+   */
+  void EndTx ();
+
+  /**
+   * Get destination address of packets.
+   * \brief packets The packets from where extract destination
+   * \return The destination MAC address
+   */
+  Address
+  GetE2EDestinationAddress (SatPhy::PacketContainer_t packets);
+
   /**
    * Configured Adjacent Channel Interference (ACI) in dB.
    */
@@ -153,6 +191,32 @@ private:
    * Regeneration mode on return link.
    */
   SatEnums::RegenerationMode_t m_returnLinkRegenerationMode;
+
+  /**
+   * Simple FIFO queue to avoid collisions on TX in case of REGENERATION_PHY.
+   * Second and third elements are respectively size in bytes and in packets.
+   */
+  std::queue<std::tuple<Ptr<SatSignalParameters>, uint32_t, uint32_t>> m_queue;
+
+  /**
+   * Size of FIFO queue in bytes
+   */
+  uint32_t m_queueSizeBytes;
+
+  /**
+   * Size of FIFO queue in packets
+   */
+  uint32_t m_queueSizePackets;
+
+  /**
+   * Maximum size of FIFO m_queue in bytes.
+   */
+  uint32_t m_queueSizeMax;
+
+  /**
+   * Indicates if a packet is already being sent.
+   */
+  bool m_isSending;
 
 };
 

@@ -950,7 +950,7 @@ SatUtMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
       mSuccess = (*i)->PeekPacketTag (addressE2ETag);
       if (!mSuccess)
         {
-          NS_FATAL_ERROR ("MAC tag was not found from the packet!");
+          NS_FATAL_ERROR ("SatAddressE2ETag was not found from the packet!");
         }
 
       NS_LOG_INFO ("Packet from " << macTag.GetSourceAddress () << " to " << macTag.GetDestAddress ());
