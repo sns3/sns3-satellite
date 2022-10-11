@@ -128,8 +128,8 @@ SatRegenerationTest1::DoRun (void)
   Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-regeneration", "test1", true);
 
   /// Set regeneration mode
-  Config::SetDefault ("ns3::SatBeamHelper::ForwardLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
-  Config::SetDefault ("ns3::SatBeamHelper::ReturnLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
+  Config::SetDefault ("ns3::SatConf::ForwardLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
+  Config::SetDefault ("ns3::SatConf::ReturnLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
 
   Config::SetDefault ("ns3::SatGeoFeederPhy::QueueSize", UintegerValue (100000));
 
@@ -384,8 +384,8 @@ SatRegenerationTest2::DoRun (void)
   Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-regeneration", "test2", true);
 
   /// Set regeneration mode
-  Config::SetDefault ("ns3::SatBeamHelper::ForwardLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
-  Config::SetDefault ("ns3::SatBeamHelper::ReturnLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
+  Config::SetDefault ("ns3::SatConf::ForwardLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
+  Config::SetDefault ("ns3::SatConf::ReturnLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
 
   Config::SetDefault ("ns3::SatGeoFeederPhy::QueueSize", UintegerValue (100));
 
@@ -614,8 +614,8 @@ SatRegenerationTest3::DoRun (void)
   Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-regeneration", "test3", true);
 
   /// Set regeneration mode
-  Config::SetDefault ("ns3::SatBeamHelper::ForwardLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
-  Config::SetDefault ("ns3::SatBeamHelper::ReturnLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
+  Config::SetDefault ("ns3::SatConf::ForwardLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
+  Config::SetDefault ("ns3::SatConf::ReturnLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
 
   Config::SetDefault ("ns3::SatGeoFeederPhy::QueueSize", UintegerValue (100));
 

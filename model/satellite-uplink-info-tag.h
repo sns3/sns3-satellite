@@ -57,8 +57,9 @@ public:
    * \param sinr
    * \param additionalInterference additional interference to add to compute final SINR
    * \param beamId Beam ID of the UT
+   * \param isControl This is a control packet
    */
-  SatUplinkInfoTag (Time satelliteReceptionTime, double sinr, double additionalInterference, uint32_t beamId);
+  SatUplinkInfoTag (Time satelliteReceptionTime, double sinr, double additionalInterference, uint32_t beamId, bool isControl);
 
   /**
    * Serializes information to buffer from this instance of SatUplinkInfoTag
@@ -133,12 +134,25 @@ public:
    */
   void SetBeamId (uint32_t beamId);
 
+  /**
+   * Get if packet is a control packet
+   * \return True if this is a control packet
+   */
+  bool IsControl (void) const;
+
+  /**
+   * Set if packet is a control packet
+   * \param isControl True if this is a control packet
+   */
+  void SetIsControl (bool isControl);
+
 private:
   Time m_satelliteReceptionTime;              // Reception time of packet in satellite
   double m_sinr;                              // SINR computed on uplink
   double m_additionalInterference;            // Other interference to add to compute final SINR
   bool m_sinrComputed;                        // Flag to tell if SINR has been already computed
   uint32_t m_beamId;                          // Beam ID where the UT is located
+  bool m_isControl;                           // Uplink burst is control and has been sent using WF02
 
 };
 

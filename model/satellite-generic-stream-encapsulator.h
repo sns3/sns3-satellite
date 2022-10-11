@@ -56,7 +56,7 @@ public:
   /**
    * Constuctor
    */
-  SatGenericStreamEncapsulator (Mac48Address source, Mac48Address dest, uint8_t flowId);
+  SatGenericStreamEncapsulator (Mac48Address source, Mac48Address dest, uint8_t flowId, uint32_t additionalHeaderSize = 0);
 
   /**
    * Destructor for SatGenericStreamEncapsulator

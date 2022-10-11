@@ -29,17 +29,19 @@ SatUplinkInfoTag::SatUplinkInfoTag ()
   m_sinr (0.0),
   m_additionalInterference (0.0),
   m_sinrComputed (false),
-  m_beamId (0)
+  m_beamId (0),
+  m_isControl (false)
 {
   // Nothing to do here
 }
 
-SatUplinkInfoTag::SatUplinkInfoTag (Time satelliteReceptionTime, double sinr, double additionalInterference, uint32_t beamId)
+SatUplinkInfoTag::SatUplinkInfoTag (Time satelliteReceptionTime, double sinr, double additionalInterference, uint32_t beamId, bool isControl)
   : m_satelliteReceptionTime (satelliteReceptionTime),
   m_sinr (sinr),
   m_additionalInterference (additionalInterference),
   m_sinrComputed (true),
-  m_beamId (beamId)
+  m_beamId (beamId),
+  m_isControl (isControl)
 {
   // Nothing to do here
 }
@@ -62,7 +64,7 @@ SatUplinkInfoTag::GetInstanceTypeId (void) const
 uint32_t
 SatUplinkInfoTag::GetSerializedSize (void) const
 {
-  return sizeof(Time) + 2*sizeof(double) + sizeof(bool) + sizeof(uint32_t);
+  return sizeof(Time) + 2*sizeof(double) + 2*sizeof(bool) + sizeof(uint32_t);
 }
 
 void
@@ -75,6 +77,7 @@ SatUplinkInfoTag::Serialize (TagBuffer i) const
   i.WriteDouble (m_additionalInterference);
   i.WriteU8 (m_sinrComputed);
   i.WriteU32 (m_beamId);
+  i.WriteU8 (m_isControl);
 }
 
 void
@@ -88,12 +91,13 @@ SatUplinkInfoTag::Deserialize (TagBuffer i)
   m_additionalInterference = i.ReadDouble ();
   m_sinrComputed = i.ReadU8 ();
   m_beamId = i.ReadU32 ();
+  m_isControl = i.ReadU8 ();
 }
 
 void
 SatUplinkInfoTag::Print (std::ostream &os) const
 {
-  os << m_satelliteReceptionTime << " " << m_sinr << " " << m_beamId;
+  os << m_satelliteReceptionTime << " " << m_sinr << " " << m_beamId << " " << m_isControl;
 }
 
 Time
@@ -143,6 +147,18 @@ void
 SatUplinkInfoTag::SetBeamId (uint32_t beamId)
 {
   m_beamId = beamId;
+}
+
+bool
+SatUplinkInfoTag::IsControl (void) const
+{
+  return m_isControl;
+}
+
+void
+SatUplinkInfoTag::SetIsControl (bool isControl)
+{
+  m_isControl = isControl;
 }
 
 

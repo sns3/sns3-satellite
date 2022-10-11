@@ -259,24 +259,63 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> r
         }
     }
 
-  if (rxParams->m_txInfo.waveformId == 2)
+  if (m_useCmt)
     {
-      if (m_useCmt && (m_forwardLinkRegenerationMode == SatEnums::REGENERATION_LINK || m_forwardLinkRegenerationMode == SatEnums::REGENERATION_NETWORK))
+      switch (m_returnLinkRegenerationMode)
         {
-          for (SatPhy::PacketContainer_t::iterator i = packets.begin (); i != packets.end (); i++ )
+          case SatEnums::TRANSPARENT:
             {
-              SatUplinkInfoTag satUplinkInfoTag;
-              if (!(*i)->PeekPacketTag (satUplinkInfoTag))
+              if (rxParams->m_txInfo.waveformId == 2)
                 {
-                  NS_FATAL_ERROR ("SatUplinkInfoTag not found !");
+                  SendCmtMessage (utId, rxParams->m_duration, Seconds (0), rxParams->m_beamId);
+                  m_controlMessageReceivedCallback (utId, rxParams->m_beamId);
                 }
-              Time satelliteReceptionTime = satUplinkInfoTag.GetSatelliteReceptionTime ();
-              uint32_t beamId = satUplinkInfoTag.GetBeamId ();
-
-              SendCmtMessage (utId, rxParams->m_duration, satelliteReceptionTime, beamId);
-
-              m_controlMessageReceivedCallback (utId, rxParams->m_beamId);
+              break;
             }
+          case SatEnums::REGENERATION_PHY:
+            {
+              if (rxParams->m_txInfo.waveformId == 2)
+                {
+                  for (SatPhy::PacketContainer_t::iterator i = packets.begin (); i != packets.end (); i++ )
+                    {
+                      SatUplinkInfoTag satUplinkInfoTag;
+                      if (!(*i)->PeekPacketTag (satUplinkInfoTag))
+                        {
+                          NS_FATAL_ERROR ("SatUplinkInfoTag not found !");
+                        }
+                      Time satelliteReceptionTime = satUplinkInfoTag.GetSatelliteReceptionTime ();
+                      uint32_t beamId = satUplinkInfoTag.GetBeamId ();
+
+                      SendCmtMessage (utId, rxParams->m_duration, satelliteReceptionTime, beamId);
+                      m_controlMessageReceivedCallback (utId, beamId);
+                    }
+                }
+              break;
+            }
+          case SatEnums::REGENERATION_LINK:
+          case SatEnums::REGENERATION_NETWORK:
+            {
+              for (SatPhy::PacketContainer_t::iterator i = packets.begin (); i != packets.end (); i++ )
+                {
+                  SatUplinkInfoTag satUplinkInfoTag;
+                  if (!(*i)->PeekPacketTag (satUplinkInfoTag))
+                    {
+                      NS_FATAL_ERROR ("SatUplinkInfoTag not found !");
+                    }
+                  Time satelliteReceptionTime = satUplinkInfoTag.GetSatelliteReceptionTime ();
+                  uint32_t beamId = satUplinkInfoTag.GetBeamId ();
+                  bool isControl = satUplinkInfoTag.IsControl ();
+
+                  if (isControl)
+                    {
+                      SendCmtMessage (utId, rxParams->m_duration, satelliteReceptionTime, beamId);
+                      m_controlMessageReceivedCallback (utId, beamId);
+                    }
+                }
+              break;
+            }
+          default:
+            NS_FATAL_ERROR ("Unknown regeneration mode, or received");
         }
     }
 }

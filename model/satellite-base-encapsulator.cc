@@ -48,10 +48,11 @@ SatBaseEncapsulator::SatBaseEncapsulator ()
    */
 }
 
-SatBaseEncapsulator::SatBaseEncapsulator (Mac48Address source, Mac48Address dest, uint8_t flowId)
+SatBaseEncapsulator::SatBaseEncapsulator (Mac48Address source, Mac48Address dest, uint8_t flowId, uint32_t additionalHeaderSize)
   : m_sourceAddress (source),
   m_destAddress (dest),
-  m_flowId (flowId)
+  m_flowId (flowId),
+  m_additionalHeaderSize (additionalHeaderSize)
 {
   NS_LOG_FUNCTION (this);
 }

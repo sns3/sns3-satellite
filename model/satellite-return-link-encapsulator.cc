@@ -57,8 +57,8 @@ SatReturnLinkEncapsulator::SatReturnLinkEncapsulator ()
 }
 
 
-SatReturnLinkEncapsulator::SatReturnLinkEncapsulator (Mac48Address source, Mac48Address dest, uint8_t flowId)
-  : SatBaseEncapsulator (source, dest, flowId),
+SatReturnLinkEncapsulator::SatReturnLinkEncapsulator (Mac48Address source, Mac48Address dest, uint8_t flowId, uint32_t additionalHeaderSize)
+  : SatBaseEncapsulator (source, dest, flowId, additionalHeaderSize),
   m_txFragmentId (0),
   m_currRxFragmentId (0),
   m_currRxPacketSize (0),
@@ -163,7 +163,7 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
       return packet;
     }
 
-  packet = GetNewRlePdu (bytes, MAX_PPDU_PACKET_SIZE, SatAddressE2ETag::SIZE);
+  packet = GetNewRlePdu (bytes, MAX_PPDU_PACKET_SIZE, m_additionalHeaderSize);
 
   if (packet)
     {

@@ -152,7 +152,7 @@ SatPeriodicControlMessageTest1::DoRun (void)
 
   // here we check that results are as expected.
   // * Sender has sent something
-  // * Receiver got all all data sent
+  // * Receiver got all data sent
   NS_TEST_ASSERT_MSG_NE (sender->GetSent (), (uint32_t)0, "Nothing sent !");
   NS_TEST_ASSERT_MSG_EQ (receiver->GetTotalRx (), sender->GetSent (), "Packets were lost !");
 

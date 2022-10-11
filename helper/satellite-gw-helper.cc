@@ -52,6 +52,7 @@
 #include <ns3/satellite-fwd-link-scheduler-default.h>
 #include <ns3/satellite-fwd-link-scheduler-time-slicing.h>
 #include <ns3/satellite-typedefs.h>
+#include <ns3/satellite-mac-tag.h>
 
 #include <ns3/satellite-lora-conf.h>
 #include <ns3/lorawan-mac-gateway.h>
@@ -377,6 +378,11 @@ SatGwHelper::InstallDvb (Ptr<Node> n,
 
   // Set the control msg read callback to LLC due to ARQ ACKs
   llc->SetReadCtrlCallback (m_readCtrlCb);
+
+  if (forwardLinkRegenerationMode != SatEnums::TRANSPARENT && forwardLinkRegenerationMode != SatEnums::REGENERATION_PHY)
+    {
+      llc->SetAdditionalHeaderSize (SatAddressE2ETag::SIZE);
+    }
 
   // Attach the LLC layer to SatNetDevice
   dev->SetLlc (llc);

@@ -57,7 +57,7 @@ public:
   /**
    * Constructor
    */
-  SatReturnLinkEncapsulator (Mac48Address source, Mac48Address dest, uint8_t rcIndex);
+  SatReturnLinkEncapsulator (Mac48Address source, Mac48Address dest, uint8_t rcIndex, uint32_t additionalHeaderSize = 0);
 
   /**
    * Destructor for SatReturnLinkEncapsulator

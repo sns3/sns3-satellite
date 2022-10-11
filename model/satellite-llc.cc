@@ -68,7 +68,8 @@ SatLlc::SatLlc ()
   m_decaps (),
   m_fwdLinkArqEnabled (false),
   m_rtnLinkArqEnabled (false),
-  m_gwAddress ()
+  m_gwAddress (),
+  m_additionalHeaderSize (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -433,6 +434,13 @@ SatLlc::SetGwAddress (Mac48Address address)
 {
   NS_LOG_FUNCTION (this << address);
   m_gwAddress = address;
+}
+
+void
+SatLlc::SetAdditionalHeaderSize (uint32_t additionalHeaderSize)
+{
+  NS_LOG_FUNCTION (this << additionalHeaderSize);
+  m_additionalHeaderSize = additionalHeaderSize;
 }
 
 } // namespace ns3

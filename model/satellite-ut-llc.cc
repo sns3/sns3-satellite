@@ -249,11 +249,11 @@ SatUtLlc::CreateEncap (Ptr<EncapKey> key, Ptr<SatQueue> providedQueue)
 
   if (m_rtnLinkArqEnabled)
     {
-      utEncap = CreateObject<SatReturnLinkEncapsulatorArq> (key->m_source, key->m_destination, key->m_flowId);
+      utEncap = CreateObject<SatReturnLinkEncapsulatorArq> (key->m_source, key->m_destination, key->m_flowId, m_additionalHeaderSize);
     }
   else
     {
-      utEncap = CreateObject<SatReturnLinkEncapsulator> (key->m_source, key->m_destination, key->m_flowId);
+      utEncap = CreateObject<SatReturnLinkEncapsulator> (key->m_source, key->m_destination, key->m_flowId, m_additionalHeaderSize);
     }
 
   Ptr<SatQueue> queue = providedQueue;
@@ -289,11 +289,11 @@ SatUtLlc::CreateDecap (Ptr<EncapKey> key)
 
   if (m_fwdLinkArqEnabled)
     {
-      utDecap = CreateObject<SatGenericStreamEncapsulatorArq> (key->m_source, key->m_destination, key->m_flowId);
+      utDecap = CreateObject<SatGenericStreamEncapsulatorArq> (key->m_source, key->m_destination, key->m_flowId, m_additionalHeaderSize);
     }
   else
     {
-      utDecap = CreateObject<SatGenericStreamEncapsulator> (key->m_source, key->m_destination, key->m_flowId);
+      utDecap = CreateObject<SatGenericStreamEncapsulator> (key->m_source, key->m_destination, key->m_flowId, m_additionalHeaderSize);
     }
 
   utDecap->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu, this));

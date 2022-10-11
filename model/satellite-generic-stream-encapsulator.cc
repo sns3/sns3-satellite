@@ -53,8 +53,8 @@ SatGenericStreamEncapsulator::SatGenericStreamEncapsulator ()
 
 
 
-SatGenericStreamEncapsulator::SatGenericStreamEncapsulator (Mac48Address source, Mac48Address dest, uint8_t flowId)
-  : SatBaseEncapsulator (source, dest, flowId),
+SatGenericStreamEncapsulator::SatGenericStreamEncapsulator (Mac48Address source, Mac48Address dest, uint8_t flowId, uint32_t additionalHeaderSize)
+  : SatBaseEncapsulator (source, dest, flowId, additionalHeaderSize),
   m_maxGsePduSize (4095),
   m_txFragmentId (0),
   m_currRxFragmentId (0),
@@ -139,7 +139,7 @@ SatGenericStreamEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
       return packet;
     }
 
-  packet = GetNewGsePdu (bytes, m_maxGsePduSize, SatAddressE2ETag::SIZE);
+  packet = GetNewGsePdu (bytes, m_maxGsePduSize, m_additionalHeaderSize);
 
   if (packet)
     {

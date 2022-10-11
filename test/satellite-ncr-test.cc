@@ -412,13 +412,15 @@ SatNcrTest2::ChangeTxStatus (bool enable)
 class SatNcrTest3 : public TestCase
 {
 public:
-  SatNcrTest3 ();
+  SatNcrTest3 (SatEnums::RegenerationMode_t regenerationMode);
   virtual ~SatNcrTest3 ();
 
 private:
   virtual void DoRun (void);
   void GetData (Ptr<CbrApplication> sender, Ptr<PacketSink> receiver);
   void ChangeTxStatus (bool enable);
+
+  SatEnums::RegenerationMode_t m_regenerationMode;
 
   Ptr<SatHelper> m_helper;
 
@@ -429,9 +431,10 @@ private:
 };
 
 // Add some help text to this case to describe what it is intended to test
-SatNcrTest3::SatNcrTest3 ()
+SatNcrTest3::SatNcrTest3 (SatEnums::RegenerationMode_t regenerationMode)
   : TestCase ("This case tests ncr recovery timeout mechanism and logoff.")
 {
+  m_regenerationMode = regenerationMode;
 }
 
 // This destructor does nothing but we include it as a reminder that
@@ -453,6 +456,8 @@ SatNcrTest3::DoRun (void)
   // Configure a static error probability
   SatPhyRxCarrierConf::ErrorModel em (SatPhyRxCarrierConf::EM_NONE);
   Config::SetDefault ("ns3::SatUtHelper::FwdLinkErrorModel", EnumValue (em));
+
+  Config::SetDefault ("ns3::SatConf::ReturnLinkRegenerationMode", EnumValue (m_regenerationMode));
 
   // Set 2 RA frames including one for logon
   Config::SetDefault ("ns3::SatConf::SuperFrameConfForSeq0", EnumValue (SatSuperframeConf::SUPER_FRAME_CONFIG_0));
@@ -635,7 +640,9 @@ SatNcrTestSuite::SatNcrTestSuite ()
 {
   AddTestCase (new SatNcrTest1, TestCase::QUICK);
   AddTestCase (new SatNcrTest2, TestCase::QUICK);
-  AddTestCase (new SatNcrTest3, TestCase::QUICK);
+  AddTestCase (new SatNcrTest3 (SatEnums::TRANSPARENT), TestCase::QUICK);
+  AddTestCase (new SatNcrTest3 (SatEnums::REGENERATION_PHY), TestCase::QUICK);
+  AddTestCase (new SatNcrTest3 (SatEnums::REGENERATION_LINK), TestCase::QUICK);
 }
 
 // Allocate an instance of this TestSuite

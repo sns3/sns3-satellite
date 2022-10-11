@@ -63,8 +63,9 @@ public:
    * \param source Source MAC address for the encapsulator (UT address)
    * \param dest Destination MAC address for the encapsulator (GW address)
    * \param flowId Flow id of the encapsulator
+   * \param additionalHeaderSize Additional value in to take into account when pulling packets to represent E2E tags
    */
-  SatGenericStreamEncapsulatorArq (Mac48Address source, Mac48Address dest, uint8_t flowId);
+  SatGenericStreamEncapsulatorArq (Mac48Address source, Mac48Address dest, uint8_t flowId, uint32_t additionalHeaderSize = 0);
 
   /**
    * Destructor for SatGenericStreamEncapsulatorArq

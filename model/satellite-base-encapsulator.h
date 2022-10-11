@@ -61,8 +61,9 @@ public:
    * \param source Configured source MAC addressd
    * \param dest Configured destination MAC address
    * \param flowId Flow identifier
+   * \param additionalHeaderSize Additional value in to take into account when pulling packets to represent E2E tags
    */
-  SatBaseEncapsulator (Mac48Address source, Mac48Address dest, uint8_t flowId);
+  SatBaseEncapsulator (Mac48Address source, Mac48Address dest, uint8_t flowId, uint32_t additionalHeaderSize = 0);
 
   /**
    * Destructor for SatBaseEncapsulator
@@ -189,6 +190,11 @@ protected:
    * Used queue in satellite encapsulator
    */
   Ptr<SatQueue> m_txQueue;
+
+  /**
+   * Additional value in to take into account when pulling packets to represent E2E tags.
+   */
+  uint32_t m_additionalHeaderSize;
 
   /**
    * Receive callback

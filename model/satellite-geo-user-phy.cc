@@ -419,20 +419,46 @@ SatGeoUserPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
     }
   else
     {
-      if (m_returnLinkRegenerationMode != SatEnums::TRANSPARENT)
+      switch (m_returnLinkRegenerationMode)
         {
-          rxParams->m_txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
-
-          SatSignalParameters::PacketsInBurst_t::iterator it;
-          for (it = rxParams->m_packetsInBurst.begin (); it != rxParams->m_packetsInBurst.end (); it++)
+          case SatEnums::TRANSPARENT:
+            break;
+          case SatEnums::REGENERATION_LINK:
+          case SatEnums::REGENERATION_NETWORK:
             {
-              SatUplinkInfoTag satUplinkInfoTag;
-              (*it)->RemovePacketTag (satUplinkInfoTag);
-              satUplinkInfoTag.SetSatelliteReceptionTime (Simulator::Now ());
-              (*it)->AddPacketTag (satUplinkInfoTag);
+              if (rxParams->m_txInfo.waveformId == 2)
+                {
+                  SatSignalParameters::PacketsInBurst_t::iterator it;
+                  for (it = rxParams->m_packetsInBurst.begin (); it != rxParams->m_packetsInBurst.end (); it++ )
+                    {
+                      SatUplinkInfoTag satUplinkInfoTag;
+                      (*it)->RemovePacketTag (satUplinkInfoTag);
+                      satUplinkInfoTag.SetIsControl (true);
+                      (*it)->AddPacketTag (satUplinkInfoTag);
+                    }
+                }
+              // No break here: need to add additional fields SatUplinkInfoTag
             }
+          case SatEnums::REGENERATION_PHY:
+            {
+              rxParams->m_txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
 
-          RxTraces (rxParams->m_packetsInBurst);
+              SatSignalParameters::PacketsInBurst_t::iterator it;
+              for (it = rxParams->m_packetsInBurst.begin (); it != rxParams->m_packetsInBurst.end (); it++)
+                {
+                  SatUplinkInfoTag satUplinkInfoTag;
+                  (*it)->RemovePacketTag (satUplinkInfoTag);
+                  satUplinkInfoTag.SetBeamId (rxParams->m_beamId);
+                  satUplinkInfoTag.SetSatelliteReceptionTime (Simulator::Now ());
+                  (*it)->AddPacketTag (satUplinkInfoTag);
+                }
+
+              RxTraces (rxParams->m_packetsInBurst);
+
+              break;
+            }
+          default:
+            NS_FATAL_ERROR ("Unknown regeneration mode");
         }
 
       m_rxCallback ( rxParams->m_packetsInBurst, rxParams);

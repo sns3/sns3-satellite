@@ -61,8 +61,8 @@ SatGenericStreamEncapsulatorArq::SatGenericStreamEncapsulatorArq ()
 }
 
 
-SatGenericStreamEncapsulatorArq::SatGenericStreamEncapsulatorArq (Mac48Address source, Mac48Address dest, uint8_t flowId)
-  : SatGenericStreamEncapsulator (source, dest, flowId),
+SatGenericStreamEncapsulatorArq::SatGenericStreamEncapsulatorArq (Mac48Address source, Mac48Address dest, uint8_t flowId, uint32_t additionalHeaderSize)
+  : SatGenericStreamEncapsulator (source, dest, flowId, additionalHeaderSize),
   m_seqNo (),
   m_txedBuffer (),
   m_retxBuffer (),

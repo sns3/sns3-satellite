@@ -140,7 +140,7 @@ SatUtScheduler::DoScheduling (std::vector<Ptr<Packet> > &packets, uint32_t paylo
 
   if (type == SatTimeSlotConf::SLOT_TYPE_C && rcIndex != SatEnums::CONTROL_FID)
     {
-      NS_FATAL_ERROR ("Confict in time slot data between RC index and slot type!");
+      NS_FATAL_ERROR ("Conflict in time slot data between RC index and slot type!");
     }
 
   // Schedule

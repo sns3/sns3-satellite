@@ -113,11 +113,11 @@ SatGwLlc::CreateEncap (Ptr<EncapKey> key)
 
   if (m_fwdLinkArqEnabled)
     {
-      gwEncap = CreateObject<SatGenericStreamEncapsulatorArq> (key->m_source, key->m_destination, key->m_flowId);
+      gwEncap = CreateObject<SatGenericStreamEncapsulatorArq> (key->m_source, key->m_destination, key->m_flowId, m_additionalHeaderSize);
     }
   else
     {
-      gwEncap = CreateObject<SatGenericStreamEncapsulator> (key->m_source, key->m_destination, key->m_flowId);
+      gwEncap = CreateObject<SatGenericStreamEncapsulator> (key->m_source, key->m_destination, key->m_flowId, m_additionalHeaderSize);
     }
 
   Ptr<SatQueue> queue = CreateObject<SatQueue> (key->m_flowId);
@@ -142,11 +142,11 @@ SatGwLlc::CreateDecap (Ptr<EncapKey> key)
 
   if (m_rtnLinkArqEnabled)
     {
-      gwDecap = CreateObject<SatReturnLinkEncapsulatorArq> (key->m_source, key->m_destination, key->m_flowId);
+      gwDecap = CreateObject<SatReturnLinkEncapsulatorArq> (key->m_source, key->m_destination, key->m_flowId, m_additionalHeaderSize);
     }
   else
     {
-      gwDecap = CreateObject<SatReturnLinkEncapsulator> (key->m_source, key->m_destination, key->m_flowId);
+      gwDecap = CreateObject<SatReturnLinkEncapsulator> (key->m_source, key->m_destination, key->m_flowId, m_additionalHeaderSize);
     }
 
   gwDecap->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu, this));

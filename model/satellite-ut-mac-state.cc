@@ -203,13 +203,18 @@ SatUtMacState::CheckNcrTimeout ()
 {
   NS_LOG_FUNCTION (this);
 
+  if (GetState () != TDMA_SYNC)
+    {
+      return;
+    }
+
   if (m_lastNcrDateReceived + m_ncrSyncTimeout <= Simulator::Now ())
     {
       SwitchToNcrRecovery ();
       m_checkNcrRecoveryScheduled = Simulator::Now ();
       Simulator::Schedule (m_ncrRecoveryTimeout, &SatUtMacState::CheckNcrRecoveryTimeout, this);
     }
-  else if (GetState () == TDMA_SYNC)
+  else
     {
       Time nextTimeout = m_lastNcrDateReceived + m_ncrSyncTimeout - Simulator::Now ();
       Simulator::Schedule (nextTimeout, &SatUtMacState::CheckNcrTimeout, this);

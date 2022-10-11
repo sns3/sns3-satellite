@@ -61,6 +61,7 @@
 #include <ns3/satellite-packet-classifier.h>
 #include <ns3/satellite-id-mapper.h>
 #include <ns3/satellite-typedefs.h>
+#include <ns3/satellite-mac-tag.h>
 
 #include <ns3/satellite-lora-conf.h>
 #include <ns3/lorawan-mac-end-device-class-a.h>
@@ -347,6 +348,11 @@ SatUtHelper::InstallDvb (Ptr<Node> n, uint32_t beamId,
 
   // Set the control msg read callback to LLC due to ARQ ACKs
   llc->SetReadCtrlCallback (m_readCtrlCb);
+
+  if (returnLinkRegenerationMode != SatEnums::TRANSPARENT && returnLinkRegenerationMode != SatEnums::REGENERATION_PHY)
+    {
+      llc->SetAdditionalHeaderSize (SatAddressE2ETag::SIZE);
+    }
 
   // Create a request manager and attach it to LLC, and set control message callback to RM
   Ptr<SatRequestManager> rm = CreateObject<SatRequestManager> ();

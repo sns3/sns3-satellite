@@ -308,6 +308,12 @@ public:
    */
   virtual void SetGwAddress (Mac48Address address);
 
+  /**
+   * \brief Set the additional header size
+   * \param The additional header size
+   */
+  void SetAdditionalHeaderSize (uint32_t additionalHeaderSize);
+
 protected:
   /**
    * Dispose of this class instance
@@ -393,6 +399,11 @@ protected:
    * GW address
    */
   Mac48Address m_gwAddress;
+
+  /**
+   * Additional header size to add to encapsulation/decapsulation
+   */
+  uint32_t m_additionalHeaderSize;
 
   /**
    * The upper layer package receive callback.
