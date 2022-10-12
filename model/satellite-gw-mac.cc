@@ -292,7 +292,7 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> r
                       Time satelliteReceptionTime = satUplinkInfoTag.GetSatelliteReceptionTime ();
                       uint32_t beamId = satUplinkInfoTag.GetBeamId ();
 
-                      SendCmtMessage (utId, rxParams->m_duration, satelliteReceptionTime, beamId);
+                      SendCmtMessage (utId, Seconds (0), satelliteReceptionTime, beamId);
                       m_controlMessageReceivedCallback (utId, beamId);
                     }
                 }
@@ -314,7 +314,7 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> r
 
                   if (isControl)
                     {
-                      SendCmtMessage (utId, rxParams->m_duration, satelliteReceptionTime, beamId);
+                      SendCmtMessage (utId, Seconds (0), satelliteReceptionTime, beamId);
                       m_controlMessageReceivedCallback (utId, beamId);
                     }
                 }

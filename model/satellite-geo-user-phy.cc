@@ -456,7 +456,7 @@ SatGeoUserPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
                   SatUplinkInfoTag satUplinkInfoTag;
                   (*it)->RemovePacketTag (satUplinkInfoTag);
                   satUplinkInfoTag.SetBeamId (rxParams->m_beamId);
-                  satUplinkInfoTag.SetSatelliteReceptionTime (Simulator::Now ());
+                  satUplinkInfoTag.SetSatelliteReceptionTime (Simulator::Now () - rxParams->m_duration);
                   (*it)->AddPacketTag (satUplinkInfoTag);
                 }
 
