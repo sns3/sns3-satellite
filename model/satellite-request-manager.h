@@ -226,6 +226,12 @@ public:
    */
   void SendLogonMessage ();
 
+  /**
+   * Update the value of header offset
+   * \param headerOffsetVbcd The new value of header offset
+   */
+  void SetHeaderOffsetVbdc (double headerOffsetVbcd);
+
 private:
   typedef std::map<uint8_t, QueueCallback> CallbackContainer_t;
 
@@ -526,6 +532,11 @@ private:
    * The VBDC capacity algorithm to use
    */
 	SatEnums::VbdcCapacityRequestAlgorithm_t m_vbdcCapacityRequestAlgorithm;
+
+  /**
+   * Additional VBDC to add to take into account E2E header in regenerative LINK or NETWORK, and in worst case
+   */
+  double m_headerOffsetVbcd;
 };
 
 } // namespace

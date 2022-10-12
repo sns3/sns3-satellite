@@ -33,6 +33,8 @@
 #include "satellite-wave-form-conf.h"
 #include "satellite-link-results.h"
 #include "satellite-mutual-information-table.h"
+#include "satellite-uplink-info-tag.h"
+
 #include "satellite-phy-rx-carrier-per-window.h"
 
 
@@ -287,6 +289,16 @@ SatPhyRxCarrierPerWindow::CalculatePacketInterferenceVectors (SatPhyRxCarrierPer
   /// Update probes (only the first time we access this method for this packet)
   if (packet.meanSinr < 0.0)
     {
+      SatSignalParameters::PacketsInBurst_t packets = packet.rxParams->m_packetsInBurst;
+      SatSignalParameters::PacketsInBurst_t::const_iterator i;
+      for (i = packets.begin (); i != packets.end (); i++)
+        {
+          SatUplinkInfoTag satUplinkInfoTag;
+          (*i)->RemovePacketTag (satUplinkInfoTag);
+          satUplinkInfoTag.SetSinr (snr, m_additionalInterferenceCallback ());
+          (*i)->AddPacketTag (satUplinkInfoTag);
+        }
+
       // Update link specific SINR trace
       m_linkSinrTrace (SatUtils::LinearToDb (snr), packet.sourceAddress);
 

@@ -22,6 +22,8 @@
 #include <ns3/simulator.h>
 #include <ns3/boolean.h>
 
+#include "satellite-uplink-info-tag.h"
+
 #include "satellite-phy-rx-carrier-marsala.h"
 
 
@@ -191,6 +193,16 @@ SatPhyRxCarrierMarsala::PerformMarsala (
           else
             {
               cSinr = sinr;
+            }
+
+          SatSignalParameters::PacketsInBurst_t packets = currentPacket->rxParams->m_packetsInBurst;
+          SatSignalParameters::PacketsInBurst_t::const_iterator i;
+          for (i = packets.begin (); i != packets.end (); i++)
+            {
+              SatUplinkInfoTag satUplinkInfoTag;
+              (*i)->RemovePacketTag (satUplinkInfoTag);
+              satUplinkInfoTag.SetSinr (sinr, m_additionalInterferenceCallback ());
+              (*i)->AddPacketTag (satUplinkInfoTag);
             }
 
           /*

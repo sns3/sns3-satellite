@@ -62,7 +62,8 @@ SatRequestManager::SatRequestManager ()
   m_forcedAvbdcUpdate (false),
   m_numValues (256),
   m_rbdcCapacityRequestAlgorithm (SatEnums::CR_RBDC_LEGACY),
-  m_vbdcCapacityRequestAlgorithm (SatEnums::CR_VBDC_LEGACY)
+  m_vbdcCapacityRequestAlgorithm (SatEnums::CR_VBDC_LEGACY),
+  m_headerOffsetVbcd (1.0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -299,6 +300,8 @@ SatRequestManager::DoEvaluation ()
                   uint32_t vbdcBytes (0);
 
                   SatEnums::SatCapacityAllocationCategory_t cac = DoVbdc (rc, stats, vbdcBytes);
+
+                  vbdcBytes *= m_headerOffsetVbcd;
 
                   if (vbdcBytes > 0)
                     {
@@ -869,6 +872,12 @@ SatRequestManager::SendLogonMessage ()
       Ptr<SatLogonMessage> logonMessage = CreateObject<SatLogonMessage> ();
       m_ctrlCallback (logonMessage, m_gwAddress);
     }
+}
+
+void
+SatRequestManager::SetHeaderOffsetVbdc (double headerOffsetVbcd)
+{
+  m_headerOffsetVbcd = headerOffsetVbcd;
 }
 
 void
