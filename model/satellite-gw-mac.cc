@@ -278,6 +278,12 @@ SatGwMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> r
                 {
                   for (SatPhy::PacketContainer_t::iterator i = packets.begin (); i != packets.end (); i++ )
                     {
+                      SatControlMsgTag ctrlTag;
+                      if ((*i)->PeekPacketTag (ctrlTag))
+                        {
+                          // This is a NCR CTRL packet, do not use it
+                          continue;
+                        }
                       SatUplinkInfoTag satUplinkInfoTag;
                       if (!(*i)->PeekPacketTag (satUplinkInfoTag))
                         {
@@ -563,6 +569,11 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet, uint32_t beamId)
             msg << " at: " << Now ().GetSeconds () << "s";
             Singleton<SatLog>::Get ()->AddToLog (SatLog::LOG_WARNING, "", msg.str ());
           }
+        break;
+      }
+    case SatControlMsgTag::SAT_NCR_CTRL_MSG:
+      {
+        // We do nothing, from SAT to GW, these messages only add load on link
         break;
       }
     default:

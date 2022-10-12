@@ -227,7 +227,7 @@ SatMac::SetTimeTag (SatPhy::PacketContainer_t packets)
     {
       for (SatPhy::PacketContainer_t::const_iterator it = packets.begin (); it != packets.end (); ++it)
         {
-          SatPhyTimeTag timeTag;
+          SatMacTimeTag timeTag;
           if (!(*it)->PeekPacketTag (timeTag))
             {
               (*it)->AddPacketTag (SatMacTimeTag (Simulator::Now ()));

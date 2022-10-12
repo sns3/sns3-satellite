@@ -441,6 +441,13 @@ SatGeoUserPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
             }
           case SatEnums::REGENERATION_PHY:
             {
+              if (rxParams->m_txInfo.waveformId == 2)
+                {
+                  // Send NCR (empty, just to simulate load) message to GW
+                  Ptr<SatNcrMessage> ncrMessage = CreateObject<SatNcrMessage> ();
+                  m_txCtrlFeederCallback (ncrMessage, GetE2EDestinationAddress (rxParams->m_packetsInBurst), rxParams->Copy ());
+                }
+
               rxParams->m_txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
 
               SatSignalParameters::PacketsInBurst_t::iterator it;
@@ -500,6 +507,12 @@ SatGeoUserPhy::GetE2EDestinationAddress (SatPhy::PacketContainer_t packets)
         }
     }
   return Mac48Address ();
+}
+
+void
+SatGeoUserPhy::SetSendControlMsgToFeederCallback (SendControlMsgToFeederCallback cb)
+{
+  m_txCtrlFeederCallback = cb;
 }
 
 } // namespace ns3

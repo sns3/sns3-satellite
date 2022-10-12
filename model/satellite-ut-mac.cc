@@ -1883,7 +1883,7 @@ SatUtMac::DoFrameStart ()
 
   Time schedulingDelay = nextSuperFrameTxTime - Now ();
   Time realDelay = GetRealSendingTime (schedulingDelay);
-    if (realDelay <= Seconds (0)){
+    if (realDelay == Seconds (0)){
       schedulingDelay += m_superframeSeq->GetDuration (SatConstVariables::SUPERFRAME_SEQUENCE);
     }
   Simulator::Schedule (GetRealSendingTime (schedulingDelay), &SatUtMac::DoFrameStart, this);
@@ -1892,10 +1892,10 @@ SatUtMac::DoFrameStart ()
 Time
 SatUtMac::GetRealSendingTime (Time t)
 {
-  /*if (m_deltaNcr == 0) // For some reason returning t-0 is different than returning t...
+  if (m_deltaNcr == 0) // For some reason returning t-0 is different than returning t...
     {
       return t;
-    }*/
+    }
 
   uint32_t driftTicks = (t + Simulator::Now ()).GetMicroSeconds ()*m_clockDrift/1000000;
   int32_t deltaTicks = m_deltaNcr - driftTicks;

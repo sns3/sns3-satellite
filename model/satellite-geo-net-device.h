@@ -76,6 +76,15 @@ public:
   void ReceiveFeeder (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> rxParams);
 
   /**
+   * \brief Send a control packet on the feeder link
+   * \param msg The control message to send
+   * \param dest The MAC destination
+   * \param rxParams Strucutre storing additional parameters
+   * \return True if success
+   */
+  bool SendControlMsgToFeeder (Ptr<SatControlMessage> msg, const Address& dest, Ptr<SatSignalParameters> rxParams);
+
+  /**
    * Add the User Phy object for the beam
    * \param phy user phy object to add.
    * \param beamId the id of the beam to use phy for
@@ -222,6 +231,8 @@ private:
 
   SatEnums::RegenerationMode_t m_forwardLinkRegenerationMode;
   SatEnums::RegenerationMode_t m_returnLinkRegenerationMode;
+
+  bool m_isStatisticsTagsEnabled;
 
 };
 

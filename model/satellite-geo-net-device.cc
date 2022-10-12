@@ -30,7 +30,6 @@
 #include <ns3/channel.h>
 #include <ns3/uinteger.h>
 
-#include "satellite-geo-net-device.h"
 #include "satellite-phy.h"
 #include "satellite-geo-feeder-phy.h"
 #include "satellite-geo-user-phy.h"
@@ -40,6 +39,11 @@
 #include "satellite-geo-feeder-mac.h"
 #include "satellite-geo-user-mac.h"
 #include "satellite-channel.h"
+#include "satellite-address-tag.h"
+#include "satellite-time-tag.h"
+#include "satellite-uplink-info-tag.h"
+
+#include "satellite-geo-net-device.h"
 
 
 NS_LOG_COMPONENT_DEFINE ("SatGeoNetDevice");
@@ -75,6 +79,11 @@ SatGeoNetDevice::GetTypeId (void)
                    ObjectMapValue (),
                    MakeObjectMapAccessor (&SatGeoNetDevice::m_feederMac),
                    MakeObjectMapChecker<SatMac> ())
+    .AddAttribute ("EnableStatisticsTags",
+                   "If true, some tags will be added to each transmitted packet to assist with statistics computation",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatGeoNetDevice::m_isStatisticsTagsEnabled),
+                   MakeBooleanChecker ())
   ;
   return tid;
 }
@@ -133,6 +142,71 @@ SatGeoNetDevice::ReceiveFeeder (SatPhy::PacketContainer_t /*packets*/, Ptr<SatSi
           NS_FATAL_ERROR ("Not implemented yet");
         }
     }
+}
+
+bool
+SatGeoNetDevice::SendControlMsgToFeeder (Ptr<SatControlMessage> msg, const Address& dest, Ptr<SatSignalParameters> rxParams)
+{
+  NS_LOG_FUNCTION (this << msg << dest);
+
+  Ptr<Packet> packet = Create<Packet> (msg->GetSizeInBytes ());
+
+  if (m_isStatisticsTagsEnabled)
+    {
+      // Add a SatAddressTag tag with this device's address as the source address.
+      packet->AddByteTag (SatAddressTag (m_address));
+
+      // Add a SatDevTimeTag tag for packet delay computation at the receiver end.
+      packet->AddPacketTag (SatDevTimeTag (Simulator::Now ()));
+    }
+
+  SatAddressE2ETag addressE2ETag;
+  addressE2ETag.SetE2ESourceAddress (m_address);
+  addressE2ETag.SetE2EDestAddress (Mac48Address::ConvertFrom (dest));
+  packet->AddPacketTag (addressE2ETag);
+
+  SatMacTag macTag;
+  macTag.SetSourceAddress (m_address);
+  macTag.SetDestAddress (Mac48Address::ConvertFrom (dest));
+  packet->AddPacketTag (macTag);
+
+  // Add control tag to message and write msg to container in MAC
+  SatControlMsgTag tag;
+  tag.SetMsgId (0);
+  tag.SetMsgType (msg->GetMsgType ());
+  packet->AddPacketTag (tag);
+
+  if (m_returnLinkRegenerationMode != SatEnums::TRANSPARENT)
+    {
+      SatUplinkInfoTag satUplinkInfoTag;
+      satUplinkInfoTag.SetSinr (std::numeric_limits<double>::infinity (), rxParams->GetAdditionalInterference ());
+      satUplinkInfoTag.SetBeamId (rxParams->m_beamId);
+      packet->AddPacketTag (satUplinkInfoTag);
+    }
+
+  rxParams->m_packetsInBurst.clear ();
+  rxParams->m_packetsInBurst.push_back (packet);
+
+  switch (m_returnLinkRegenerationMode)
+    {
+      case SatEnums::TRANSPARENT:
+      case SatEnums::REGENERATION_PHY:
+        {
+          DynamicCast<SatGeoFeederPhy> (m_feederPhy[rxParams->m_beamId])->SendPduWithParams (rxParams);
+          break;
+        }
+      case SatEnums::REGENERATION_LINK:
+        {
+          DynamicCast<SatGeoFeederMac> (m_feederMac[rxParams->m_beamId])->EnquePackets (rxParams->m_packetsInBurst, rxParams);
+          break;
+        }
+      default:
+        {
+          NS_FATAL_ERROR ("Not implemented yet");
+        }
+    }
+
+  return true;
 }
 
 void

@@ -114,6 +114,21 @@ public:
    */
   typedef void (*QueueSizeCallback)(uint32_t size, const Address &from);
 
+  /**
+   *
+   */
+  typedef Callback<bool, Ptr<SatControlMessage>, const Address&, Ptr<SatSignalParameters> > SendControlMsgToFeederCallback;
+
+  /**
+   * Callback to send ctrl packet on geo feeder
+   */
+  SatGeoUserPhy::SendControlMsgToFeederCallback m_txCtrlFeederCallback;
+
+  /**
+   * Set SendControlMsgToFeederCallback
+   */
+  void SetSendControlMsgToFeederCallback (SendControlMsgToFeederCallback cb);
+
 protected:
   /**
    * \brief Invoke the `Rx` trace source for each received packet.

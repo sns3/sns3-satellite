@@ -589,6 +589,7 @@ SatGeoHelper::AttachChannelsUser ( Ptr<SatGeoNetDevice> dev,
   if (returnLinkRegenerationMode != SatEnums::TRANSPARENT)
     {
       uPhy->BeginEndScheduling ();
+      uPhy->SetSendControlMsgToFeederCallback (MakeCallback (&SatGeoNetDevice::SendControlMsgToFeeder, dev));
     }
 }
 
