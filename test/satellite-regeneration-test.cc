@@ -853,8 +853,6 @@ SatRegenerationTest4::DoRun (void)
       uts.Get (i)->GetDevice (2)->TraceConnectWithoutContext ("Rx", MakeCallback (&SatRegenerationTest4::GeoDevUtRxTraceCb, this));
     }
 
-
-
   std::string socketFactory = "ns3::UdpSocketFactory";
   uint16_t port = 9;
 
@@ -901,6 +899,203 @@ SatRegenerationTest4::DoRun (void)
   NS_TEST_ASSERT_MSG_EQ (m_totalSentUt, m_totalReceivedGw, "Same number of packets sent and received on RTN link");
 }
 
+/**
+ * \ingroup satellite
+ * \brief 'Regeneration, test 5' test case implementation.
+ *
+ * This case tests ACM on all links.
+ * It is based on a SIMPLE scenario, with PHY regeneration on FWD and LINK regeneration on RTN.
+ *
+ *  Expected result:
+ *    Most robust MODCOD used a start of simulation
+ *    Efficient MODCOD used on all links after a few seconds
+ *    Same MODCOD on FWD feeder and FWD user
+ *    Not same MODCOD on RTN feeder and RTN user
+ */
+class SatRegenerationTest5 : public TestCase
+{
+public:
+  SatRegenerationTest5 ();
+  virtual ~SatRegenerationTest5 ();
+
+private:
+  virtual void DoRun (void);
+  void GeoPhyGwModcodTraceCb (uint32_t modcod, const Address &address);
+  void GeoPhyUtModcodTraceCb (uint32_t modcod, const Address &address);
+  void GeoPhyFeederModcodTraceCb (uint32_t modcod, const Address &address);
+  void GeoPhyUserModcodTraceCb (uint32_t modcod, const Address &address);
+
+  double GetAverage (std::vector<uint32_t> list, uint32_t beg, uint32_t end);
+  double GetMostFrequent (std::vector<uint32_t> list, uint32_t beg, uint32_t end);
+
+  Ptr<SatHelper> m_helper;
+
+  std::vector<uint32_t> m_gwModcods;
+  std::vector<uint32_t> m_utModcods;
+  std::vector<uint32_t> m_feederModcods;
+  std::vector<uint32_t> m_userModcods;
+};
+
+void
+SatRegenerationTest5::GeoPhyGwModcodTraceCb (uint32_t modcod, const Address &address)
+{
+  m_gwModcods.push_back (modcod);
+}
+
+void
+SatRegenerationTest5::GeoPhyUtModcodTraceCb (uint32_t modcod, const Address &address)
+{
+  m_utModcods.push_back (modcod);
+}
+
+void
+SatRegenerationTest5::GeoPhyFeederModcodTraceCb (uint32_t modcod, const Address &address)
+{
+  m_feederModcods.push_back (modcod);
+}
+
+void
+SatRegenerationTest5::GeoPhyUserModcodTraceCb (uint32_t modcod, const Address &address)
+{
+  m_userModcods.push_back (modcod);
+}
+
+double
+SatRegenerationTest5::GetAverage (std::vector<uint32_t> list, uint32_t beg, uint32_t end)
+{
+  uint32_t sum = 0;
+  for (uint32_t i = beg; i < end; i++)
+    {
+      sum += list[i];
+    }
+  return 1.0*sum/(end-beg);
+}
+
+double
+SatRegenerationTest5::GetMostFrequent (std::vector<uint32_t> list, uint32_t beg, uint32_t end)
+{
+  std::map<uint32_t, uint32_t> frequencies;
+  for (uint32_t i = beg; i < end; i++)
+    {
+      frequencies[list[i]]++;
+    }
+
+  uint32_t max_count = 0;
+  uint32_t index = -1;
+  for (std::pair<const uint32_t, uint32_t>& i : frequencies) {
+      if (max_count < i.second) {
+          index = i.first;
+          max_count = i.second;
+      }
+  }
+
+  return index;
+}
+
+// Add some help text to this case to describe what it is intended to test
+SatRegenerationTest5::SatRegenerationTest5 ()
+  : TestCase ("This case tests ACM on all links. It is based on a SIMPLE scenario.")
+{
+}
+
+// This destructor does nothing but we include it as a reminder that
+// the test case should clean up after itself
+SatRegenerationTest5::~SatRegenerationTest5 ()
+{
+}
+
+//
+// SatRegenerationTest5 TestCase implementation
+//
+void
+SatRegenerationTest5::DoRun (void)
+{
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-regeneration", "test5", true);
+
+  /// Set regeneration mode
+  Config::SetDefault ("ns3::SatConf::ForwardLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
+  Config::SetDefault ("ns3::SatConf::ReturnLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_LINK));
+
+  Config::SetDefault ("ns3::SatGeoFeederPhy::QueueSize", UintegerValue (100000));
+
+  /// Enable ACM
+  Config::SetDefault ("ns3::SatBbFrameConf::AcmEnabled", BooleanValue (true));
+
+  // Enable SatMac traces
+  Config::SetDefault ("ns3::SatPhy::EnableStatisticsTags", BooleanValue (true));
+  Config::SetDefault ("ns3::SatNetDevice::EnableStatisticsTags", BooleanValue (true));
+
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
+  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("test-sat-regeneration");
+  simulationHelper->SetSimulationTime (Seconds (20));
+  simulationHelper->CreateSatScenario (SatHelper::SIMPLE);
+
+  m_helper = simulationHelper->GetSatelliteHelper ();
+
+  Ptr<Node> gwNode = m_helper->GwNodes ().Get (0);
+  Ptr<Node> utNode = m_helper->UtNodes ().Get (0);
+  Ptr<Node> geoNode = m_helper->GeoSatNode ();
+  Ptr<SatGeoFeederPhy> satGeoFeederPhy = DynamicCast<SatGeoFeederPhy> (DynamicCast<SatGeoNetDevice> (geoNode->GetDevice (0))->GetFeederPhy (8));
+  Ptr<SatGeoUserPhy> satGeoUserPhy = DynamicCast<SatGeoUserPhy> (DynamicCast<SatGeoNetDevice> (geoNode->GetDevice (0))->GetUserPhy (8));
+  Ptr<SatPhy> satGwPhy = DynamicCast<SatPhy> (DynamicCast<SatNetDevice> (gwNode->GetDevice (1))->GetPhy ());
+  Ptr<SatPhy> satUtPhy = DynamicCast<SatPhy> (DynamicCast<SatNetDevice> (utNode->GetDevice (2))->GetPhy ());
+
+  satGwPhy->TraceConnectWithoutContext ("RxLinkModcod", MakeCallback (&SatRegenerationTest5::GeoPhyGwModcodTraceCb, this));
+  satUtPhy->TraceConnectWithoutContext ("RxLinkModcod", MakeCallback (&SatRegenerationTest5::GeoPhyUtModcodTraceCb, this));
+  satGeoFeederPhy->TraceConnectWithoutContext ("RxLinkModcod", MakeCallback (&SatRegenerationTest5::GeoPhyFeederModcodTraceCb, this));
+  satGeoUserPhy->TraceConnectWithoutContext ("RxLinkModcod", MakeCallback (&SatRegenerationTest5::GeoPhyUserModcodTraceCb, this));
+
+  Config::SetDefault ("ns3::CbrApplication::Interval", TimeValue (MilliSeconds (20)));
+  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (512));
+
+  simulationHelper->InstallTrafficModel (
+    SimulationHelper::CBR,
+    SimulationHelper::UDP,
+    SimulationHelper::RTN_LINK,
+    Seconds (1), Seconds (10), Seconds (0.01));
+
+  simulationHelper->InstallTrafficModel (
+    SimulationHelper::CBR,
+    SimulationHelper::UDP,
+    SimulationHelper::FWD_LINK,
+    Seconds (1), Seconds (10), Seconds (0.01));
+
+  simulationHelper->RunSimulation ();
+
+  Simulator::Destroy ();
+
+  double averageGwModcodsBeg = GetAverage (m_gwModcods, 0, 5);
+  double averageUtModcodsBeg = GetAverage (m_utModcods, 0, 5);
+  double averageFeederModcodsBeg = GetAverage (m_feederModcods, 0, 5);
+  double averageUserModcodsBeg = GetAverage (m_userModcods, 0, 5);
+  double averageGwModcodsEnd = GetMostFrequent (m_gwModcods, m_gwModcods.size()-200, m_gwModcods.size());
+  double averageUtModcodsEnd = GetMostFrequent (m_utModcods, m_utModcods.size()-200, m_utModcods.size());
+  double averageFeederModcodsEnd = GetMostFrequent (m_feederModcods, m_feederModcods.size()-200, m_feederModcods.size());
+  double averageUserModcodsEnd = GetMostFrequent (m_userModcods, m_userModcods.size()-200, m_userModcods.size());
+
+  NS_TEST_ASSERT_MSG_EQ (averageFeederModcodsBeg, 2, "Most robust MODCOD on FWD feeder link at startup");
+  NS_TEST_ASSERT_MSG_EQ (averageUtModcodsBeg, 2, "Most robust MODCOD on FWD user link at startup");
+  NS_TEST_ASSERT_MSG_EQ (averageGwModcodsBeg, 2, "Most robust MODCOD on RTN feeder link at startup");
+  NS_TEST_ASSERT_MSG_EQ (averageUserModcodsBeg, 1, "Most robust MODCOD on RTN user link at startup");
+
+  NS_TEST_ASSERT_MSG_LT (averageFeederModcodsEnd, 28, "Max MODCOD on FWD feeder link is 27");
+  NS_TEST_ASSERT_MSG_LT (averageUtModcodsEnd, 28, "Max MODCOD on FWD user link is 27");
+  NS_TEST_ASSERT_MSG_LT (averageGwModcodsEnd, 28, "Max MODCOD on RTN feeder link is 27");
+  NS_TEST_ASSERT_MSG_LT (averageUserModcodsEnd, 24, "Max MODCOD on RTN user link is 23");
+
+  NS_TEST_ASSERT_MSG_GT (averageFeederModcodsEnd, 2, "Most robust MODCOD on FWD feeder link not used after a few seconds");
+  NS_TEST_ASSERT_MSG_GT (averageUtModcodsEnd, 2, "Most robust MODCOD on FWD user link not used after a few seconds");
+  NS_TEST_ASSERT_MSG_GT (averageGwModcodsEnd, 2, "Most robust MODCOD on RTN feeder link not used after a few seconds");
+  NS_TEST_ASSERT_MSG_GT (averageUserModcodsEnd, 1, "Most robust MODCOD on RTN user link not used after a few seconds");
+
+  NS_TEST_ASSERT_MSG_EQ (averageFeederModcodsEnd, averageUtModcodsEnd, "Same MODCOD on both FWD links");
+  NS_TEST_ASSERT_MSG_NE (averageUserModcodsEnd, averageGwModcodsEnd, "Not same MODCOD on both RTN links");
+}
+
 // The TestSuite class names the TestSuite as sat-regeneration-test, identifies what type of TestSuite (SYSTEM),
 // and enables the TestCases to be run. Typically, only the constructor for this class must be defined
 //
@@ -917,7 +1112,7 @@ SatRegenerationTestSuite::SatRegenerationTestSuite ()
   AddTestCase (new SatRegenerationTest2, TestCase::QUICK); // Test losses with regeneration phy
   AddTestCase (new SatRegenerationTest3, TestCase::QUICK); // Test collisions with regeneration phy
   AddTestCase (new SatRegenerationTest4, TestCase::QUICK); // Test regeneration link
-  //AddTestCase (new SatRegenerationTest5, TestCase::QUICK); // Test ACM loop on regeneration link
+  AddTestCase (new SatRegenerationTest5, TestCase::QUICK); // Test ACM loop on regeneration link
 }
 
 // Allocate an instance of this TestSuite
