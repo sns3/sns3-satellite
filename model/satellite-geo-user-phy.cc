@@ -462,6 +462,8 @@ SatGeoUserPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
 
               RxTraces (rxParams->m_packetsInBurst);
 
+              ModcodTrace (rxParams);
+
               break;
             }
           default:

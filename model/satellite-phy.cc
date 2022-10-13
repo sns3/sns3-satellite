@@ -37,6 +37,7 @@
 #include "satellite-node-info.h"
 #include "satellite-enums.h"
 #include "satellite-address-tag.h"
+#include "satellite-mac-tag.h"
 #include "satellite-time-tag.h"
 #include "satellite-typedefs.h"
 
@@ -171,6 +172,10 @@ SatPhy::GetTypeId (void)
                      "A packet is received with link jitter information",
                      MakeTraceSourceAccessor (&SatPhy::m_rxLinkJitterTrace),
                      "ns3::SatTypedefs::PacketJitterAddressCallback")
+    .AddTraceSource ("RxLinkModcod",
+                     "A packet is received with link MODCOD information",
+                     MakeTraceSourceAccessor (&SatPhy::m_rxLinkModcodTrace),
+                     "ns3::SatTypedefs::PacketModcodAddressCallback")
   ;
   return tid;
 }
@@ -507,6 +512,53 @@ SatPhy::RxTraces (SatPhy::PacketContainer_t packets)
 }
 
 void
+SatPhy::ModcodTrace (Ptr<SatSignalParameters> rxParams)
+{
+  NS_LOG_FUNCTION (this);
+
+  Address addr;
+  SatAddressE2ETag satAddressE2ETag;
+  if (m_isStatisticsTagsEnabled)
+    {
+      switch (GetSatLinkRxDir ())
+        {
+          case SatEnums::LD_RETURN:
+            {
+              SatSignalParameters::PacketsInBurst_t::iterator it1;
+              for (it1 = rxParams->m_packetsInBurst.begin ();
+                   it1 != rxParams->m_packetsInBurst.end (); ++it1)
+                {
+                  if (!(*it1)->PeekPacketTag (satAddressE2ETag))
+                    {
+                      NS_FATAL_ERROR ("SatUplinkInfoTag not found");
+                    }
+                  addr = satAddressE2ETag.GetE2ESourceAddress ();
+                  m_rxLinkModcodTrace (rxParams->m_txInfo.modCod, addr);
+                }
+              break;
+            }
+          case SatEnums::LD_FORWARD:
+            {
+              SatSignalParameters::PacketsInBurst_t::iterator it1;
+              for (it1 = rxParams->m_packetsInBurst.begin ();
+                   it1 != rxParams->m_packetsInBurst.end (); ++it1)
+                {
+                  if (!(*it1)->PeekPacketTag (satAddressE2ETag))
+                    {
+                      NS_FATAL_ERROR ("SatUplinkInfoTag not found");
+                    }
+                  addr = satAddressE2ETag.GetE2EDestAddress ();
+                  m_rxLinkModcodTrace (rxParams->m_txInfo.modCod, addr);
+                }
+              break;
+            }
+          default:
+            NS_FATAL_ERROR ("Incorrect satellite RX link direction");
+        }
+    }
+}
+
+void
 SatPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
 {
   NS_LOG_FUNCTION (this << rxParams << phyError);
@@ -535,6 +587,8 @@ SatPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
     {
       // Invoke the `Rx` and `RxDelay` trace sources.
       RxTraces (rxParams->m_packetsInBurst);
+
+      ModcodTrace (rxParams);
 
       // Pass the packet to the upper layer.
       m_rxCallback (rxParams->m_packetsInBurst, rxParams);

@@ -487,6 +487,12 @@ protected:
   virtual void RxTraces (SatPhy::PacketContainer_t packets);
 
   /**
+   * \brief Invoke the `RxLinkModcod` trace source for each received packet.
+   * \param rxParams Pointer to SatSignalParameters of packets received.
+   */
+  void ModcodTrace (Ptr<SatSignalParameters> rxParams);
+
+  /**
    * \brief Set SatPhyTimeTag of packets
    * \param packets Container of the pointers to the packets to tag.
    */
@@ -556,6 +562,12 @@ protected:
    * the address of the senders.
    */
   TracedCallback<const Time &, const Address &> m_rxLinkJitterTrace;
+
+  /**
+   * Traced callback for all received packets, including link MODCOD information and
+   * the address of the senders.
+   */
+  TracedCallback<uint32_t, const Address &> m_rxLinkModcodTrace;
 
   /**
    * Node info containing node related information, such as

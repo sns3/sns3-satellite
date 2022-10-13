@@ -37,7 +37,7 @@ using namespace ns3;
  *
  * TODO complete brief
  * TODO add more cmd options
- * TODO Clean
+ * TODO Clean and remove useless stats
  *
  */
 
@@ -211,6 +211,11 @@ main (int argc, char *argv[])
   s->AddPerSatRtnFeederLinkRxPower (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtRtnUserLinkRxPower (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerSatRtnUserLinkRxPower (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddPerUtFwdFeederLinkModcod (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdUserLinkModcod (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnFeederLinkModcod (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnUserLinkModcod (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   s->AddPerGwRtnFeederQueueBytes (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerSatRtnFeederQueueBytes (SatStatsHelper::OUTPUT_SCATTER_FILE);

@@ -73,6 +73,8 @@ namespace ns3 {
  * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] LinkSinr
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] LinkRxPower
  * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] LinkRxPower
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] LinkModcod
+ * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] LinkModcod
  * - Add [Global, PerGw, PerBeam] FrameTypeUsage
  * - Add [Global, PerGw, PerBeam] RtnFeederWindowLoad
  *
@@ -646,6 +648,34 @@ public:
   void AddAverageGroupRtnUserLinkRxPower (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtRtnUserLinkRxPower (SatStatsHelper::OutputType_t outputType);
   void AddAverageSatRtnUserLinkRxPower (SatStatsHelper::OutputType_t outputType);
+
+  // Return link PHY-level packet link MODCOD statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdFeederLinkModcod)
+  void AddAverageBeamFwdFeederLinkModcod (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupFwdFeederLinkModcod (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtFwdFeederLinkModcod (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatFwdFeederLinkModcod (SatStatsHelper::OutputType_t outputType);
+
+  // Return link PHY-level packet link MODCOD statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdUserLinkModcod)
+  void AddAverageBeamFwdUserLinkModcod (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupFwdUserLinkModcod (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtFwdUserLinkModcod (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatFwdUserLinkModcod (SatStatsHelper::OutputType_t outputType);
+
+  // Return link PHY-level packet link MODCOD statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnFeederLinkModcod)
+  void AddAverageBeamRtnFeederLinkModcod (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRtnFeederLinkModcod (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRtnFeederLinkModcod (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatRtnFeederLinkModcod (SatStatsHelper::OutputType_t outputType);
+
+  // Return link PHY-level packet link MODCOD statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnUserLinkModcod)
+  void AddAverageBeamRtnUserLinkModcod (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRtnUserLinkModcod (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRtnUserLinkModcod (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatRtnUserLinkModcod (SatStatsHelper::OutputType_t outputType);
 
   // Frame type usage statistics.
   SAT_STATS_REDUCED_SCOPE_METHOD_DECLARATION (FrameTypeUsage)

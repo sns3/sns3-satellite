@@ -211,6 +211,7 @@ set(source_files
     stats/satellite-stats-jitter-helper.cc
     stats/satellite-stats-link-delay-helper.cc
     stats/satellite-stats-link-jitter-helper.cc
+    stats/satellite-stats-link-modcod-helper.cc
     stats/satellite-stats-link-rx-power-helper.cc
     stats/satellite-stats-link-sinr-helper.cc
     stats/satellite-stats-marsala-correlation-helper.cc
@@ -444,6 +445,7 @@ set(header_files
     stats/satellite-stats-jitter-helper.h
     stats/satellite-stats-link-delay-helper.h
     stats/satellite-stats-link-jitter-helper.h
+    stats/satellite-stats-link-modcod-helper.h
     stats/satellite-stats-link-rx-power-helper.h
     stats/satellite-stats-link-sinr-helper.h
     stats/satellite-stats-marsala-correlation-helper.h

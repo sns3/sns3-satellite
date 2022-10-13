@@ -436,6 +436,8 @@ SatGeoFeederPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
           rxParams->m_txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
 
           RxTraces (rxParams->m_packetsInBurst);
+
+          ModcodTrace (rxParams);
         }
 
       m_rxCallback ( rxParams->m_packetsInBurst, rxParams);

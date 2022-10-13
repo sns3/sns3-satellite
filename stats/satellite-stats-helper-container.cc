@@ -38,6 +38,7 @@
 #include <ns3/satellite-stats-frame-load-helper.h>
 #include <ns3/satellite-stats-link-rx-power-helper.h>
 #include <ns3/satellite-stats-link-sinr-helper.h>
+#include <ns3/satellite-stats-link-modcod-helper.h>
 #include <ns3/satellite-stats-marsala-correlation-helper.h>
 #include <ns3/satellite-stats-packet-collision-helper.h>
 #include <ns3/satellite-stats-packet-error-helper.h>
@@ -117,6 +118,8 @@ SatStatsHelperContainer::DoDispose ()
  * - Average [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] LinkSinr
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] LinkRxPower
  * - Average [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] LinkRxPower
+ * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] LinkModcod
+ * - Average [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] LinkModcod
  * - [Global, PerGw, PerBeam] FrameTypeUsage
  * - [Global, PerGw, PerBeam] RtnFeederWindowLoad
  *
@@ -358,29 +361,53 @@ SatStatsHelperContainer::GetTypeId ()
     ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnUserLinkSinr,
         "return user link SINR statistics")
 
-    // Forward feeder link sinr statistics.
+    // Forward feeder link RX power statistics.
     ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdFeederLinkRxPower,
         "forward feeder link RX power statistics")
     ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdFeederLinkRxPower,
         "forward feeder link RX power statistics")
 
-    // Forward user link sinr statistics.
+    // Forward user link RX power statistics.
     ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdUserLinkRxPower,
         "forward user link RX power statistics")
     ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdUserLinkRxPower,
         "forward user link RX power statistics")
 
-    // Return feeder link sinr statistics.
+    // Return feeder link RX power statistics.
     ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnFeederLinkRxPower,
         "return feeder link RX power statistics")
     ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnFeederLinkRxPower,
         "return feeder link RX power statistics")
 
-    // Return user link sinr statistics.
+    // Return user link RX power statistics.
     ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnUserLinkRxPower,
         "return user link RX power statistics")
     ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnUserLinkRxPower,
         "return user link RX power statistics")
+
+    // Forward feeder link MODCOD statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdFeederLinkModcod,
+        "forward feeder link MODCOD statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdFeederLinkModcod,
+        "forward feeder link MODCOD statistics")
+
+    // Forward user link MODCOD statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdUserLinkModcod,
+        "forward user link MODCOD statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdUserLinkModcod,
+        "forward user link MODCOD statistics")
+
+    // Return feeder link MODCOD statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnFeederLinkModcod,
+        "return feeder link MODCOD statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnFeederLinkModcod,
+        "return feeder link MODCOD statistics")
+
+    // Return user link MODCOD statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnUserLinkModcod,
+        "return user link MODCOD statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnUserLinkModcod,
+        "return user link MODCOD statistics")
 
     // Forward link application-level packet PLT statistics.
     ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdAppPlt,
@@ -882,6 +909,8 @@ SatStatsHelperContainer::GetName () const
  * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] LinkSinr
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] LinkRxPower
  * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] LinkRxPower
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] LinkModcod
+ * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] LinkModcod
  * - Add [Global, PerGw, PerBeam] FrameTypeUsage
  * - Add [Global, PerGw, PerBeam] RtnFeederWindowLoad
  *
@@ -2091,6 +2120,54 @@ SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnUserLinkRxPower, "rtn-user-link-rx-
 SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnUserLinkRxPower, "rtn-user-link-rx-power")
 SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnUserLinkRxPower, "rtn-user-link-rx-power")
 SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnUserLinkRxPower, "rtn-user-link-rx-power")
+
+// Forward Feeder Link MODCOD statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdFeederLinkModcod, "fwd-feeder-link-modcod")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdFeederLinkModcod, "fwd-feeder-link-modcod")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdFeederLinkModcod, "fwd-feeder-link-modcod")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FwdFeederLinkModcod, "fwd-feeder-link-modcod")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdFeederLinkModcod, "fwd-feeder-link-modcod")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (FwdFeederLinkModcod, "fwd-feeder-link-modcod")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdFeederLinkModcod, "fwd-feeder-link-modcod")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdFeederLinkModcod, "fwd-feeder-link-modcod")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdFeederLinkModcod, "fwd-feeder-link-modcod")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdFeederLinkModcod, "fwd-feeder-link-modcod")
+
+// Forward User Link MODCOD statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdUserLinkModcod, "fwd-user-link-modcod")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdUserLinkModcod, "fwd-user-link-modcod")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdUserLinkModcod, "fwd-user-link-modcod")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FwdUserLinkModcod, "fwd-user-link-modcod")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdUserLinkModcod, "fwd-user-link-modcod")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (FwdUserLinkModcod, "fwd-user-link-modcod")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdUserLinkModcod, "fwd-user-link-modcod")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdUserLinkModcod, "fwd-user-link-modcod")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdUserLinkModcod, "fwd-user-link-modcod")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdUserLinkModcod, "fwd-user-link-modcod")
+
+// Return Feeder Link MODCOD statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnFeederLinkModcod, "rtn-feeder-link-modcod")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnFeederLinkModcod, "rtn-feeder-link-modcod")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnFeederLinkModcod, "rtn-feeder-link-modcod")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnFeederLinkModcod, "rtn-feeder-link-modcod")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnFeederLinkModcod, "rtn-feeder-link-modcod")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnFeederLinkModcod, "rtn-feeder-link-modcod")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnFeederLinkModcod, "rtn-feeder-link-modcod")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnFeederLinkModcod, "rtn-feeder-link-modcod")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnFeederLinkModcod, "rtn-feeder-link-modcod")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnFeederLinkModcod, "rtn-feeder-link-modcod")
+
+// Return User Link MODCOD statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnUserLinkModcod, "rtn-user-link-modcod")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnUserLinkModcod, "rtn-user-link-modcod")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnUserLinkModcod, "rtn-user-link-modcod")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnUserLinkModcod, "rtn-user-link-modcod")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnUserLinkModcod, "rtn-user-link-modcod")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnUserLinkModcod, "rtn-user-link-modcod")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnUserLinkModcod, "rtn-user-link-modcod")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnUserLinkModcod, "rtn-user-link-modcod")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnUserLinkModcod, "rtn-user-link-modcod")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnUserLinkModcod, "rtn-user-link-modcod")
 
 // Frame type usage statistics
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (FrameTypeUsage, "frame-type-usage")
