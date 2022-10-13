@@ -61,7 +61,7 @@ LorawanMac::LorawanMac ()
 }
 
 LorawanMac::LorawanMac (uint32_t beamId)
-  : SatMac (),
+  : SatMac (SatEnums::TRANSPARENT, SatEnums::TRANSPARENT),
   m_beamId (beamId),
   m_isRegenerative (false)
 {

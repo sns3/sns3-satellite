@@ -131,14 +131,9 @@ LorawanMacGateway::Send (Ptr<Packet> packet)
   m_channelHelper.AddEvent (duration, CreateObject<LoraLogicalChannel> (frequency));
 
   SatMacTag mTag;
-  mTag.SetDestAddress (Mac48Address::ConvertFrom (m_satelliteAddress));
+  mTag.SetDestAddress (Mac48Address::GetBroadcast ());
   mTag.SetSourceAddress (Mac48Address::ConvertFrom (m_device->GetAddress ()));
   packet->AddPacketTag (mTag);
-
-  SatAddressE2ETag addressE2ETag;
-  addressE2ETag.SetE2EDestAddress (Mac48Address::GetBroadcast ());
-  addressE2ETag.SetE2ESourceAddress (Mac48Address::ConvertFrom (m_device->GetAddress ()));
-  packet->AddPacketTag (addressE2ETag);
 
   SatPhy::PacketContainer_t packets;
   packets.push_back (packet);

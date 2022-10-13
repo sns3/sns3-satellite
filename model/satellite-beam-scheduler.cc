@@ -615,7 +615,10 @@ SatBeamScheduler::Schedule ()
             }
           else
             {
-              m_txTbtpCallback (*it);
+              if (!m_txTbtpCallback.IsNull ())
+                {
+                  m_txTbtpCallback (*it);
+                }
               Send (*it);
             }
         }

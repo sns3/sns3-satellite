@@ -627,14 +627,12 @@ SatBeamHelper::InstallFeeder (Ptr<Node> gwNode,
 
   uint32_t maxBbFrameDataSizeInBytes = ( bbFrameConf->GetBbFramePayloadBits (bbFrameConf->GetMostRobustModcod (frameType), frameType) / SatConstVariables::BITS_PER_BYTE ) - bbFrameConf->GetBbFrameHeaderSizeInBytes ();
 
-  Ptr<SatGwMac> gwMac = DynamicCast<SatGwMac> (DynamicCast<SatNetDevice> (gwNd)->GetMac ());
-
   switch(m_standard)
   {
     case SatEnums::DVB:
       m_ncc->AddBeam (beamId,
                   MakeCallback (&SatNetDevice::SendControlMsg, DynamicCast<SatNetDevice> (gwNd)),
-                  MakeCallback (&SatGwMac::TbtpSent, gwMac),
+                  MakeCallback (&SatGwMac::TbtpSent, DynamicCast<SatGwMac> (DynamicCast<SatNetDevice> (gwNd)->GetMac ())),
                   m_superframeSeq,
                   maxBbFrameDataSizeInBytes,
                   gwNd->GetAddress ());
@@ -642,7 +640,7 @@ SatBeamHelper::InstallFeeder (Ptr<Node> gwNode,
     case SatEnums::LORA:
       m_ncc->AddBeam (beamId,
                   MakeCallback (&SatLorawanNetDevice::SendControlMsg, DynamicCast<SatLorawanNetDevice> (gwNd)),
-                  MakeCallback (&SatGwMac::TbtpSent, gwMac),
+                  MakeNullCallback<void, Ptr<SatTbtpMessage>> (),
                   m_superframeSeq,
                   maxBbFrameDataSizeInBytes,
                   gwNd->GetAddress ());
