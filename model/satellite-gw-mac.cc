@@ -571,7 +571,7 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet, uint32_t beamId)
           }
         break;
       }
-    case SatControlMsgTag::SAT_NCR_CTRL_MSG:
+    case SatControlMsgTag::SAT_CMT_CTRL_MSG:
       {
         // We do nothing, from SAT to GW, these messages only add load on link
         break;

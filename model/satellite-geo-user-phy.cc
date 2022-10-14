@@ -443,9 +443,9 @@ SatGeoUserPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
             {
               if (rxParams->m_txInfo.waveformId == 2)
                 {
-                  // Send NCR (empty, just to simulate load) message to GW
-                  Ptr<SatNcrMessage> ncrMessage = CreateObject<SatNcrMessage> ();
-                  m_txCtrlFeederCallback (ncrMessage, GetE2EDestinationAddress (rxParams->m_packetsInBurst), rxParams->Copy ());
+                  // Send CMT (empty, just to simulate load) message to GW
+                  Ptr<SatCmtMessage> cmtMessage = CreateObject<SatCmtMessage> ();
+                  m_txCtrlFeederCallback (cmtMessage, GetE2EDestinationAddress (rxParams->m_packetsInBurst), rxParams->Copy ());
                 }
 
               rxParams->m_txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
