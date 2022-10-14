@@ -135,6 +135,11 @@ LorawanMacGateway::Send (Ptr<Packet> packet)
   mTag.SetSourceAddress (Mac48Address::ConvertFrom (m_device->GetAddress ()));
   packet->AddPacketTag (mTag);
 
+  SatAddressE2ETag addressE2ETag;
+  addressE2ETag.SetE2EDestAddress (Mac48Address::GetBroadcast ());
+  addressE2ETag.SetE2ESourceAddress (Mac48Address::ConvertFrom (m_device->GetAddress ()));
+  packet->AddPacketTag (addressE2ETag);
+
   SatPhy::PacketContainer_t packets;
   packets.push_back (packet);
   uint32_t carrierId = 0;
