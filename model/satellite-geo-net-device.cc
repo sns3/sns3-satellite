@@ -84,6 +84,30 @@ SatGeoNetDevice::GetTypeId (void)
                    BooleanValue (false),
                    MakeBooleanAccessor (&SatGeoNetDevice::m_isStatisticsTagsEnabled),
                    MakeBooleanChecker ())
+    .AddTraceSource ("PacketTrace",
+                     "Packet event trace",
+                     MakeTraceSourceAccessor (&SatGeoNetDevice::m_packetTrace),
+                     "ns3::SatTypedefs::PacketTraceCallback")
+    .AddTraceSource ("Tx",
+                     "A packet to be sent",
+                     MakeTraceSourceAccessor (&SatGeoNetDevice::m_txTrace),
+                     "ns3::Packet::TracedCallback")
+    .AddTraceSource ("SignallingTx",
+                     "A signalling packet to be sent",
+                     MakeTraceSourceAccessor (&SatGeoNetDevice::m_signallingTxTrace),
+                     "ns3::SatTypedefs::PacketDestinationAddressCallback")
+    .AddTraceSource ("Rx",
+                     "A packet received",
+                     MakeTraceSourceAccessor (&SatGeoNetDevice::m_rxTrace),
+                     "ns3::SatTypedefs::PacketSourceAddressCallback")
+    .AddTraceSource ("RxDelay",
+                     "A packet is received with delay information",
+                     MakeTraceSourceAccessor (&SatGeoNetDevice::m_rxDelayTrace),
+                     "ns3::SatTypedefs::PacketDelayAddressCallback")
+    .AddTraceSource ("RxJitter",
+                     "A packet is received with jitter information",
+                     MakeTraceSourceAccessor (&SatGeoNetDevice::m_rxJitterTrace),
+                     "ns3::SatTypedefs::PacketJitterAddressCallback")
   ;
   return tid;
 }
@@ -94,6 +118,77 @@ SatGeoNetDevice::SatGeoNetDevice ()
   m_ifIndex (0)
 {
   NS_LOG_FUNCTION (this);
+}
+
+void
+SatGeoNetDevice::ReceivePacketUser (Ptr<Packet> packet, const Address& userAddress)
+{
+  NS_LOG_FUNCTION (this << packet);
+  NS_LOG_INFO ("Receiving a packet: " << packet->GetUid ());
+
+  Mac48Address macUserAddress = Mac48Address::ConvertFrom (userAddress);
+
+  m_packetTrace (Simulator::Now (),
+                 SatEnums::PACKET_RECV,
+                 SatEnums::NT_SAT,
+                 m_nodeId,
+                 macUserAddress,
+                 SatEnums::LL_ND,
+                 SatEnums::LD_RETURN,
+                 SatUtils::GetPacketInfo (packet));
+
+  /*
+   * Invoke the `Rx` and `RxDelay` trace sources. We look at the packet's tags
+   * for information, but cannot remove the tags because the packet is a const.
+   */
+  if (m_isStatisticsTagsEnabled)
+    {
+      Address addr; // invalid address.
+      bool isTaggedWithAddress = false;
+      ByteTagIterator it = packet->GetByteTagIterator ();
+
+      while (!isTaggedWithAddress && it.HasNext ())
+        {
+          ByteTagIterator::Item item = it.Next ();
+
+          if (item.GetTypeId () == SatAddressTag::GetTypeId ())
+            {
+              NS_LOG_DEBUG (this << " contains a SatAddressTag tag:"
+                                 << " start=" << item.GetStart ()
+                                 << " end=" << item.GetEnd ());
+              SatAddressTag addrTag;
+              item.GetTag (addrTag);
+              addr = addrTag.GetSourceAddress ();
+              isTaggedWithAddress = true; // this will exit the while loop.
+            }
+        }
+
+      m_rxTrace (packet, addr);
+
+      SatDevTimeTag timeTag;
+      if (packet->PeekPacketTag (timeTag))
+        {
+          NS_LOG_DEBUG (this << " contains a SatMacTimeTag tag");
+          Time delay = Simulator::Now () - timeTag.GetSenderTimestamp ();
+          m_rxDelayTrace (delay, addr);
+          if (m_lastDelays[macUserAddress].IsZero() == false)
+            {
+              Time jitter = Abs (delay - m_lastDelays[macUserAddress]);
+              m_rxJitterTrace (jitter, addr);
+            }
+          m_lastDelays[macUserAddress] = delay;
+        }
+    }
+
+  // Pass the packet to the upper layer (when ISLs developped) or send to feeder
+  // m_rxCallback (this, packet, Ipv4L3Protocol::PROT_NUMBER, Address ());
+
+  SatUplinkInfoTag satUplinkInfoTag;
+  if (!packet->PeekPacketTag (satUplinkInfoTag))
+    {
+      NS_FATAL_ERROR ("SatUplinkInfoTag not found");
+    }
+  DynamicCast<SatGeoFeederMac> (m_feederMac[satUplinkInfoTag.GetBeamId ()])->EnquePacket (packet);
 }
 
 
@@ -113,8 +208,17 @@ SatGeoNetDevice::ReceiveUser (SatPhy::PacketContainer_t /*packets*/, Ptr<SatSign
         }
       case SatEnums::REGENERATION_LINK:
         {
-          DynamicCast<SatGeoFeederMac> (m_feederMac[rxParams->m_beamId])->EnquePackets (rxParams->m_packetsInBurst, rxParams);
+          for (SatPhy::PacketContainer_t::const_iterator it = rxParams->m_packetsInBurst.begin ();
+               it != rxParams->m_packetsInBurst.end (); ++it)
+            {
+              DynamicCast<SatGeoFeederMac> (m_feederMac[rxParams->m_beamId])->EnquePacket (*it);
+            }
+
           break;
+        }
+      case SatEnums::REGENERATION_NETWORK:
+        {
+          NS_FATAL_ERROR ("SatGeoNetDevice::ReceiveUser should not be used in case of network regeneration");
         }
       default:
         {
@@ -136,6 +240,10 @@ SatGeoNetDevice::ReceiveFeeder (SatPhy::PacketContainer_t /*packets*/, Ptr<SatSi
         {
           DynamicCast<SatGeoUserPhy> (m_userPhy[rxParams->m_beamId])->SendPduWithParams (rxParams);
           break;
+        }
+      case SatEnums::REGENERATION_NETWORK:
+        {
+          NS_FATAL_ERROR ("SatGeoNetDevice::ReceiveFeeder should not be used in case of network regeneration");
         }
       default:
         {
@@ -197,7 +305,11 @@ SatGeoNetDevice::SendControlMsgToFeeder (Ptr<SatControlMessage> msg, const Addre
         }
       case SatEnums::REGENERATION_LINK:
         {
-          DynamicCast<SatGeoFeederMac> (m_feederMac[rxParams->m_beamId])->EnquePackets (rxParams->m_packetsInBurst, rxParams);
+          for (SatPhy::PacketContainer_t::const_iterator it = rxParams->m_packetsInBurst.begin ();
+               it != rxParams->m_packetsInBurst.end (); ++it)
+            {
+              DynamicCast<SatGeoFeederMac> (m_feederMac[rxParams->m_beamId])->EnquePacket (*it);
+            }
           break;
         }
       default:
@@ -226,6 +338,12 @@ void
 SatGeoNetDevice::SetReturnLinkRegenerationMode (SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
   m_returnLinkRegenerationMode = returnLinkRegenerationMode;
+}
+
+void
+SatGeoNetDevice::SetNodeId (uint32_t nodeId)
+{
+  m_nodeId = nodeId;
 }
 
 void

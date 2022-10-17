@@ -101,7 +101,11 @@ public:
 
   typedef Callback<void, SatPhy::PacketContainer_t, Ptr<SatSignalParameters>> ReceiveUserCallback;
 
-  void SetReceiveUserCallback (ReceiveUserCallback cb);
+  void SetReceiveUserCallback (SatGeoUserMac::ReceiveUserCallback cb);
+
+  typedef Callback<void, Ptr<Packet>, Mac48Address, Mac48Address> ReceiveLlcUserCallback;
+
+  void SetReceiveLlcUserCallback (SatGeoUserMac::ReceiveLlcUserCallback cb);
 
 protected:
   /**
@@ -140,8 +144,9 @@ private:
 
   TransmitUserCallback m_txUserCallback;
   ReceiveUserCallback m_rxUserCallback;
+  ReceiveLlcUserCallback m_rxLlcUserCallback;
 
-  Ptr<SatGeoUserLlc> m_llc;
+  Ptr<SatGeoLlc> m_llc;
 
 };
 

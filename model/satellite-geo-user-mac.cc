@@ -175,7 +175,32 @@ SatGeoUserMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParamete
       (*i)->AddPacketTag (satUplinkInfoTag);
     }
 
-  m_rxUserCallback (packets, rxParams);
+  if (m_returnLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
+    {
+      for (SatPhy::PacketContainer_t::iterator i = packets.begin (); i != packets.end (); i++ )
+        {
+          // Remove packet tag
+          SatMacTag macTag;
+          bool mSuccess = (*i)->PeekPacketTag (macTag);
+          if (!mSuccess)
+            {
+              NS_FATAL_ERROR ("MAC tag was not found from the packet!");
+            }
+
+          NS_LOG_INFO ("Packet from " << macTag.GetSourceAddress () << " to " << macTag.GetDestAddress ());
+          NS_LOG_INFO ("Receiver " << m_nodeInfo->GetMacAddress ());
+
+          Mac48Address destAddress = macTag.GetDestAddress ();
+          if (destAddress == m_nodeInfo->GetMacAddress () || destAddress.IsBroadcast () || destAddress.IsGroup ())
+            {
+              m_rxLlcUserCallback (*i, macTag.GetSourceAddress (), macTag.GetDestAddress ());
+            }
+        }
+    }
+  else
+    {
+      m_rxUserCallback (packets, rxParams);
+    }
 }
 
 void
@@ -187,10 +212,17 @@ SatGeoUserMac::SetTransmitUserCallback (TransmitUserCallback cb)
 }
 
 void
-SatGeoUserMac::SetReceiveUserCallback (ReceiveUserCallback cb)
+SatGeoUserMac::SetReceiveUserCallback (SatGeoUserMac::ReceiveUserCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);
   m_rxUserCallback = cb;
+}
+
+void
+SatGeoUserMac::SetReceiveLlcUserCallback (SatGeoUserMac::ReceiveLlcUserCallback cb)
+{
+  NS_LOG_FUNCTION (this << &cb);
+  m_rxLlcUserCallback = cb;
 }
 
 void

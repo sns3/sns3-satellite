@@ -49,6 +49,12 @@ public:
    */
   virtual ~SatGeoFeederLlc ();
 
+  /**
+   * \brief Method to create a new encapsulator 'on-a-need-basis' dynamically.
+   * \param key Encapsulator key class
+   */
+  virtual void CreateEncap (Ptr<EncapKey> key);
+
 protected:
   /**
    * Dispose of this class instance

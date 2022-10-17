@@ -176,7 +176,7 @@ SatLlc::Receive (Ptr<Packet> packet, Mac48Address source, Mac48Address dest)
       EncapContainer_t::iterator it = m_decaps.find (key);
 
       // Control messages not received by this method
-      if (flowId == SatEnums::CONTROL_FID)
+      if (flowId == SatEnums::CONTROL_FID && m_nodeInfo->GetNodeType () != SatEnums::NT_SAT)
         {
           NS_FATAL_ERROR ("Control messages should not be received by SatLlc::Receive () method!");
         }

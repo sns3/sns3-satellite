@@ -18,6 +18,11 @@
  * Author: Bastien TAURAN <bastien.tauran@viveris.fr>
  */
 
+#include "satellite-return-link-encapsulator.h"
+#include "satellite-return-link-encapsulator-arq.h"
+#include "satellite-generic-stream-encapsulator.h"
+#include "satellite-generic-stream-encapsulator-arq.h"
+
 #include "satellite-geo-feeder-llc.h"
 
 
@@ -51,6 +56,36 @@ void
 SatGeoFeederLlc::DoDispose ()
 {
   Object::DoDispose ();
+}
+
+void
+SatGeoFeederLlc::CreateEncap (Ptr<EncapKey> key)
+{
+  NS_LOG_FUNCTION (this << key->m_source << key->m_destination << (uint32_t)(key->m_flowId));
+
+  Ptr<SatBaseEncapsulator> utEncap;
+
+  if (m_rtnLinkArqEnabled)
+    {
+      utEncap = CreateObject<SatReturnLinkEncapsulatorArq> (key->m_source, key->m_destination, key->m_flowId, m_additionalHeaderSize);
+    }
+  else
+    {
+      utEncap = CreateObject<SatReturnLinkEncapsulator> (key->m_source, key->m_destination, key->m_flowId, m_additionalHeaderSize);
+    }
+
+  Ptr<SatQueue> queue = CreateObject<SatQueue> (key->m_flowId);
+
+  utEncap->SetQueue (queue);
+
+  NS_LOG_INFO ("Create encapsulator with key (" << key->m_source << ", " << key->m_destination << ", " << (uint32_t) key->m_flowId << ")");
+
+  // Store the encapsulator
+  std::pair<EncapContainer_t::iterator, bool> result = m_encaps.insert (std::make_pair (key, utEncap));
+  if (result.second == false)
+    {
+      NS_FATAL_ERROR ("Insert to map with key (" << key->m_source << ", " << key->m_destination << ", " << (uint32_t) key->m_flowId << ") failed!");
+    }
 }
 
 } // namespace ns3

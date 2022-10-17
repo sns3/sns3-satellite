@@ -56,6 +56,12 @@ SatGeoLlc::DoDispose ()
   Object::DoDispose ();
 }
 
+void
+SatGeoLlc::SetReceiveSatelliteCallback (SatGeoLlc::ReceiveSatelliteCallback cb)
+{
+  m_rxSatelliteCallback = cb;
+}
+
 bool
 SatGeoLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
 {
@@ -134,6 +140,45 @@ SatGeoLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address utAddr, uint8_t flo
     }
 
   return packet;
+}
+
+void
+SatGeoLlc::ReceiveHigherLayerPdu (Ptr<Packet> packet, Mac48Address source, Mac48Address dest)
+{
+  NS_LOG_FUNCTION (this << packet << source << dest);
+
+  // Remove time tag
+  SatTimeTag timeTag;
+  packet->RemovePacketTag (timeTag);
+
+  // Remove control msg tag
+  SatControlMsgTag ctrlTag;
+  bool cSuccess = packet->RemovePacketTag (ctrlTag);
+
+  if (cSuccess)
+    {
+      if (ctrlTag.GetMsgType () != SatControlMsgTag::SAT_ARQ_ACK)
+        {
+          NS_FATAL_ERROR ("A control message other than ARQ ACK received at the LLC!");
+        }
+
+      // ARQ ACKs need to be forwarded to LLC/ARQ for processing
+      uint32_t ackId = ctrlTag.GetMsgId ();
+
+      Ptr<SatArqAckMessage> ack = DynamicCast<SatArqAckMessage> (m_readCtrlCallback (ackId));
+
+      if ( ack == NULL )
+        {
+          NS_FATAL_ERROR ("ARQ ACK not found, check that control msg storage time is set long enough!");
+        }
+
+      ReceiveAck (ack, source, dest);
+    }
+  // Higher layer packet
+  else
+    {
+      m_rxSatelliteCallback (packet, m_nodeInfo->GetMacAddress ());
+    }
 }
 
 void

@@ -55,6 +55,18 @@ protected:
    */
   virtual void DoDispose ();
 
+  /**
+   * \brief Virtual method to create a new encapsulator 'on-a-need-basis' dynamically.
+   * \param key Encapsulator key class
+   */
+  virtual void CreateEncap (Ptr<EncapKey> key);
+
+  /**
+   * \brief Virtual method to create a new decapsulator 'on-a-need-basis' dynamically.
+   * \param key Encapsulator key class
+   */
+  virtual void CreateDecap (Ptr<EncapKey> key);
+
 };
 
 } // namespace ns3

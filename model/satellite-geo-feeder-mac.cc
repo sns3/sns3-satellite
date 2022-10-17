@@ -166,37 +166,32 @@ SatGeoFeederMac::StartTransmission (uint32_t carrierId)
 }
 
 void
-SatGeoFeederMac::EnquePackets (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> txParams)
+SatGeoFeederMac::EnquePacket (Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this);
 
-  // Update MAC address source and destination
-  for (SatPhy::PacketContainer_t::const_iterator it = packets.begin ();
-       it != packets.end (); ++it)
+  SatMacTag mTag;
+  bool success = packet->RemovePacketTag (mTag);
+
+  SatAddressE2ETag addressE2ETag;
+  success &= packet->PeekPacketTag (addressE2ETag);
+
+  // MAC tag and E2E address tag found
+  if (success)
     {
-      SatMacTag mTag;
-      bool success = (*it)->RemovePacketTag (mTag);
-
-      SatAddressE2ETag addressE2ETag;
-      success &= (*it)->PeekPacketTag (addressE2ETag);
-
-      // MAC tag and E2E address tag found
-      if (success)
-        {
-          mTag.SetDestAddress (addressE2ETag.GetE2EDestAddress ());
-          mTag.SetSourceAddress (m_nodeInfo->GetMacAddress ());
-          (*it)->AddPacketTag (mTag);
-        }
-
-      uint8_t flowId = 1;
-      SatControlMsgTag ctrlTag;
-      if ((*it)->PeekPacketTag (ctrlTag))
-        {
-          flowId = 0;
-        }
-
-      m_llc->Enque (*it, addressE2ETag.GetE2EDestAddress (), flowId);
+      mTag.SetDestAddress (addressE2ETag.GetE2EDestAddress ());
+      mTag.SetSourceAddress (m_nodeInfo->GetMacAddress ());
+      packet->AddPacketTag (mTag);
     }
+
+  uint8_t flowId = 1;
+  SatControlMsgTag ctrlTag;
+  if (packet->PeekPacketTag (ctrlTag))
+    {
+      flowId = 0;
+    }
+
+  m_llc->Enque (packet, addressE2ETag.GetE2EDestAddress (), flowId);
 }
 
 void
@@ -439,7 +434,7 @@ SatGeoFeederMac::SetFwdScheduler (Ptr<SatFwdLinkScheduler> fwdScheduler)
 }
 
 void
-SatGeoFeederMac::SetLlc (Ptr<SatGeoFeederLlc> llc)
+SatGeoFeederMac::SetLlc (Ptr<SatGeoLlc> llc)
 {
   m_llc = llc;
 }

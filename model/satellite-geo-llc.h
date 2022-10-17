@@ -77,6 +77,15 @@ public:
   virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, Mac48Address utAddr, uint8_t flowId, uint32_t &bytesLeft, uint32_t &nextMinTxO);
 
   /**
+   * \brief Receive HL PDU from encapsulator/decapsulator entity
+   *
+   * \param packet Pointer to packet received.
+   * \param source MAC address of the source
+   * \param dest MAC address of the destination
+   */
+  virtual void ReceiveHigherLayerPdu (Ptr<Packet> packet, Mac48Address source, Mac48Address dest);
+
+  /**
    * \brief Create and fill the scheduling objects based on LLC layer information.
    * Scheduling objects may be used at the MAC layer to assist in scheduling.
    * \param output reference to an output vector that will be filled with
@@ -106,6 +115,19 @@ public:
    */
   virtual uint32_t GetNPacketsInQueue (Mac48Address utAddress) const;
 
+  /**
+   * \brief Receive callback used for sending packet to netdevice layer.
+    * \param packet the packet received
+    */
+  typedef Callback<void, Ptr<Packet>, const Address& > ReceiveSatelliteCallback;
+
+  /**
+   * \brief Set Receive callback to forward packet to upper layer on satellite
+   * \param cb callback to invoke whenever a packet has been received and must
+   *        be forwarded to the higher layers.
+   */
+  void SetReceiveSatelliteCallback (SatGeoLlc::ReceiveSatelliteCallback cb);
+
 protected:
   /**
    * Dispose of this class instance
@@ -127,6 +149,11 @@ protected:
    * \param key Encapsulator key class
    */
   virtual void CreateDecap (Ptr<EncapKey> key);
+
+  /**
+   * The upper layer package receive callback.
+   */
+  ReceiveSatelliteCallback m_rxSatelliteCallback;
 
 };
 

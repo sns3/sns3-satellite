@@ -62,6 +62,13 @@ public:
   SatGeoNetDevice ();
 
   /**
+   * \brief Receive the packet from the lower layers, in network regeneration on return link
+   * \param packet Packet received
+   * \param userAddress MAC address of user that received this packet
+   */
+  void ReceivePacketUser (Ptr<Packet> packet, const Address& userAddress);
+
+  /**
    * \brief Receive the packet from the lower layers
    * \param packets Container of pointers to the packets to be received.
    * \param rxParams Packet transmission parameters
@@ -182,6 +189,8 @@ public:
    */
   void SetReturnLinkRegenerationMode (SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
+  void SetNodeId (uint32_t nodeId);
+
   // inherited from NetDevice base class.
   virtual void SetIfIndex (const uint32_t index);
   virtual uint32_t GetIfIndex (void) const;
@@ -231,8 +240,50 @@ private:
 
   SatEnums::RegenerationMode_t m_forwardLinkRegenerationMode;
   SatEnums::RegenerationMode_t m_returnLinkRegenerationMode;
+  uint32_t m_nodeId;
 
   bool m_isStatisticsTagsEnabled;
+
+  std::map <Mac48Address, Time> m_lastDelays;
+
+  TracedCallback<Time,
+                 SatEnums::SatPacketEvent_t,
+                 SatEnums::SatNodeType_t,
+                 uint32_t,
+                 Mac48Address,
+                 SatEnums::SatLogLevel_t,
+                 SatEnums::SatLinkDir_t,
+                 std::string
+                 > m_packetTrace;
+
+  /**
+   * Traced callback for all packets received to be transmitted
+   */
+  TracedCallback<Ptr<const Packet> > m_txTrace;
+
+  /**
+   * Traced callback for all signalling (control message) packets sent,
+   * including the destination address.
+   */
+  TracedCallback<Ptr<const Packet>, const Address &> m_signallingTxTrace;
+
+  /**
+   * Traced callback for all received packets, including the address of the
+   * senders.
+   */
+  TracedCallback<Ptr<const Packet>, const Address &> m_rxTrace;
+
+  /**
+   * Traced callback for all received packets, including delay information and
+   * the address of the senders.
+   */
+  TracedCallback<const Time &, const Address &> m_rxDelayTrace;
+
+  /**
+   * Traced callback for all received packets, including jitter information and
+   * the address of the senders.
+   */
+  TracedCallback<const Time &, const Address &> m_rxJitterTrace;
 
 };
 

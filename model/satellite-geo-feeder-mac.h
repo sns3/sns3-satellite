@@ -85,11 +85,10 @@ public:
   void StartPeriodicTransmissions ();
 
   /**
-   * \brief Add new packets to the LLC queue.
-   * \param packets Packets to be sent.
-   * \param rxParams The parameters associated to these packets.
+   * \brief Add new packet to the LLC queue.
+   * \param packet Packets to be sent.
    */
-  virtual void EnquePackets (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> txParams);
+  virtual void EnquePacket (Ptr<Packet> packet);
 
   /**
    * Receive packet from lower layer.
@@ -117,7 +116,7 @@ public:
   /**
    * Set the Geo feeder LLC associated to this Geo feeder MAC layer
    */
-  void SetLlc (Ptr<SatGeoFeederLlc> llc);
+  void SetLlc (Ptr<SatGeoLlc> llc);
 
 protected:
   /**
@@ -179,7 +178,7 @@ private:
    */
   TracedCallback<Ptr<SatBbFrame>> m_bbFrameTxTrace;
 
-  Ptr<SatGeoFeederLlc> m_llc;
+  Ptr<SatGeoLlc> m_llc;
 
 };
 
