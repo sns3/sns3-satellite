@@ -235,7 +235,7 @@ public:
   /**
    * Set the satellite MAC address on the other side of this link (if regenerative satellite).
    */
-  void SetSatelliteAddress (Address satelliteAddress);
+  virtual void SetSatelliteAddress (Address satelliteAddress);
 
 private:
   SatMac& operator = (const SatMac &);

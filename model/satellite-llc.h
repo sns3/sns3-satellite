@@ -50,13 +50,21 @@ class SatNodeInfo;
 class EncapKey : public SimpleRefCount <EncapKey>
 {
 public:
-  Mac48Address  m_source;
-  Mac48Address  m_destination;
+  Mac48Address  m_encapAddress;
+  Mac48Address  m_decapAddress;
+  Mac48Address  m_sourceE2EAddress;
+  Mac48Address  m_destE2EAddress;
   int8_t        m_flowId;
 
-  EncapKey (const Mac48Address source, const Mac48Address dest, const uint8_t flowId)
-    : m_source (source),
-    m_destination (dest),
+  EncapKey (const Mac48Address encapAddress,
+            const Mac48Address decapAddress,
+            const uint8_t flowId,
+            const Mac48Address sourceE2EAddress = Mac48Address (),
+            const Mac48Address destE2EAddress = Mac48Address ())
+    : m_encapAddress (encapAddress),
+    m_decapAddress (decapAddress),
+    m_sourceE2EAddress (sourceE2EAddress),
+    m_destE2EAddress (destE2EAddress),
     m_flowId (flowId)
   {
   }
@@ -74,20 +82,20 @@ class EncapKeyCompare
 public:
   bool operator() (Ptr<EncapKey> key1, Ptr<EncapKey> key2) const
   {
-    if ( key1->m_source == key2->m_source )
+    if ( key1->m_encapAddress == key2->m_encapAddress )
       {
-        if ( key1->m_destination == key2->m_destination )
+        if ( key1->m_decapAddress == key2->m_decapAddress )
           {
             return key1->m_flowId < key2->m_flowId;
           }
         else
           {
-            return key1->m_destination < key2->m_destination;
+            return key1->m_decapAddress < key2->m_decapAddress;
           }
       }
     else
       {
-        return key1->m_source < key2->m_source;
+        return key1->m_encapAddress < key2->m_encapAddress;
       }
   }
 };
@@ -125,9 +133,17 @@ public:
   static TypeId GetTypeId (void);
 
   /**
-   * Construct a SatLlc
+   * Construct a SatLlc, should not be used
    */
   SatLlc ();
+
+  /**
+   * \brief Construct a SatLlc
+   * \param forwardLinkRegenerationMode Forward link regeneration model
+   * \param returnLinkRegenerationMode Return link regeneration model
+   */
+  SatLlc (SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+          SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   /**
    * Destroy a SatLlc
@@ -309,6 +325,12 @@ public:
   virtual void SetGwAddress (Mac48Address address);
 
   /**
+   * \brief Set the SAT address
+   * \param address SAT MAC address
+   */
+  virtual void SetSatelliteAddress (Mac48Address address);
+
+  /**
    * \brief Set the additional header size
    * \param The additional header size
    */
@@ -401,6 +423,11 @@ protected:
   Mac48Address m_gwAddress;
 
   /**
+   * SAT address, used in case of network regeneration
+   */
+  Mac48Address m_satelliteAddress;
+
+  /**
    * Additional header size to add to encapsulation/decapsulation
    */
   uint32_t m_additionalHeaderSize;
@@ -421,6 +448,16 @@ protected:
    * stored here.
   */
   SatBaseEncapsulator::SendCtrlCallback m_sendCtrlCallback;
+
+  /**
+   * Regeneration mode on forward link.
+   */
+  SatEnums::RegenerationMode_t m_forwardLinkRegenerationMode;
+
+  /**
+   * Regeneration mode on return link.
+   */
+  SatEnums::RegenerationMode_t m_returnLinkRegenerationMode;
 
 };
 

@@ -38,6 +38,8 @@
 #include <ns3/satellite-phy-rx.h>
 #include <ns3/satellite-gw-mac.h>
 #include <ns3/satellite-ut-mac.h>
+#include <ns3/satellite-gw-llc.h>
+#include <ns3/satellite-ut-llc.h>
 #include <ns3/satellite-arp-cache.h>
 #include <ns3/satellite-mobility-model.h>
 #include <ns3/satellite-propagation-delay-model.h>
@@ -657,6 +659,14 @@ SatBeamHelper::InstallFeeder (Ptr<Node> gwNode,
       DynamicCast<SatGwMac> (DynamicCast<SatNetDevice> (gwNd)->GetMac ())->SetSatelliteAddress (satFeederAddress);
     }
 
+  // Add satellite addresses to GW LLC layers.
+  if (m_forwardLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
+    {
+      Ptr<SatGeoNetDevice> geoNetDevice = DynamicCast<SatGeoNetDevice> (m_geoNode->GetDevice (0));
+      Mac48Address satFeederAddress = Mac48Address::ConvertFrom (geoNetDevice->GetFeederMac (beamId)->GetAddress ());
+      DynamicCast<SatGwLlc> (DynamicCast<SatNetDevice> (gwNd)->GetLlc ())->SetSatelliteAddress (satFeederAddress);
+    }
+
   return gwNd;
 }
 
@@ -718,6 +728,17 @@ SatBeamHelper::InstallUser (NodeContainer ut,
       for (NetDeviceContainer::Iterator i = utNd.Begin (); i != utNd.End (); i++)
         {
           DynamicCast<SatUtMac> (DynamicCast<SatNetDevice> (*i)->GetMac ())->SetSatelliteAddress (satUserAddress);
+        }
+    }
+
+  // Add satellite addresses UT LLC layers.
+  if (m_returnLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
+    {
+      Ptr<SatGeoNetDevice> geoNetDevice = DynamicCast<SatGeoNetDevice> (m_geoNode->GetDevice (0));
+      Mac48Address satUserAddress = Mac48Address::ConvertFrom (geoNetDevice->GetUserMac (beamId)->GetAddress ());
+      for (NetDeviceContainer::Iterator i = utNd.Begin (); i != utNd.End (); i++)
+        {
+          DynamicCast<SatUtLlc> (DynamicCast<SatNetDevice> (*i)->GetLlc ())->SetSatelliteAddress (satUserAddress);
         }
     }
 

@@ -51,9 +51,17 @@ public:
   static TypeId GetTypeId (void);
 
   /**
-   * Construct a SatUtLlc
+   * Construct a SatUtLlc, should not be used
    */
   SatUtLlc ();
+
+  /**
+   * Construct a SatUtLlc
+   * \param forwardLinkRegenerationMode Forward link regeneration model
+   * \param returnLinkRegenerationMode Return link regeneration model
+   */
+  SatUtLlc (SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+            SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   /**
    * Destroy a SatUtLlc

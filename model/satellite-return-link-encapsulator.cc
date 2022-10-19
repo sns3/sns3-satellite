@@ -57,8 +57,13 @@ SatReturnLinkEncapsulator::SatReturnLinkEncapsulator ()
 }
 
 
-SatReturnLinkEncapsulator::SatReturnLinkEncapsulator (Mac48Address source, Mac48Address dest, uint8_t flowId, uint32_t additionalHeaderSize)
-  : SatBaseEncapsulator (source, dest, flowId, additionalHeaderSize),
+SatReturnLinkEncapsulator::SatReturnLinkEncapsulator (Mac48Address encapAddress,
+                                                      Mac48Address decapAddress,
+                                                      Mac48Address sourceE2EAddress,
+                                                      Mac48Address destE2EAddress,
+                                                      uint8_t flowId,
+                                                      uint32_t additionalHeaderSize)
+  : SatBaseEncapsulator (encapAddress, decapAddress, sourceE2EAddress, destE2EAddress, flowId, additionalHeaderSize),
   m_txFragmentId (0),
   m_currRxFragmentId (0),
   m_currRxPacketSize (0),
@@ -115,19 +120,9 @@ SatReturnLinkEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address /*dest*/)
 
   // Add MAC tag to identify the packet in lower layers
   SatMacTag mTag;
-  mTag.SetDestAddress (m_destAddress);
-  mTag.SetSourceAddress (m_sourceAddress);
+  mTag.SetDestAddress (m_decapAddress);
+  mTag.SetSourceAddress (m_encapAddress);
   p->AddPacketTag (mTag);
-
-  // Add E2E address tag to identify the packet in lower layers
-  SatAddressE2ETag addressE2ETag;
-  if (!p->PeekPacketTag (addressE2ETag))
-    {
-      addressE2ETag.SetE2EDestAddress (m_destAddress);
-      addressE2ETag.SetE2ESourceAddress (m_sourceAddress);
-      p->AddPacketTag (addressE2ETag);
-    }
-
 
   /**
    * TODO: This is the place to encapsulate the higher layer packet
@@ -149,7 +144,7 @@ Ptr<Packet>
 SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft, uint32_t &nextMinTxO)
 {
   NS_LOG_FUNCTION (this << bytes);
-  NS_LOG_INFO ("TxOpportunity for UT: " << m_sourceAddress << " flowId: " << (uint32_t) m_flowId << " of " << bytes << " bytes");
+  NS_LOG_INFO ("TxOpportunity for UT: " << m_encapAddress << " flowId: " << (uint32_t) m_flowId << " of " << bytes << " bytes");
 
   // Payload adapted PDU = NULL
   Ptr<Packet> packet;
@@ -171,8 +166,8 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
       SatMacTag mTag;
       if (!packet->PeekPacketTag (mTag))
         {
-          mTag.SetDestAddress (m_destAddress);
-          mTag.SetSourceAddress (m_sourceAddress);
+          mTag.SetDestAddress (m_destE2EAddress);
+          mTag.SetSourceAddress (m_sourceE2EAddress);
           packet->AddPacketTag (mTag);
         }
 
@@ -180,8 +175,8 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
       SatAddressE2ETag addressE2ETag;
       if (!packet->PeekPacketTag (addressE2ETag))
         {
-          addressE2ETag.SetE2EDestAddress (m_destAddress);
-          addressE2ETag.SetE2ESourceAddress (m_sourceAddress);
+          addressE2ETag.SetE2EDestAddress (m_destE2EAddress);
+          addressE2ETag.SetE2ESourceAddress (m_sourceE2EAddress);
           packet->AddPacketTag (addressE2ETag);
         }
 
@@ -394,7 +389,7 @@ SatReturnLinkEncapsulator::ReceivePdu (Ptr<Packet> p)
     {
       NS_FATAL_ERROR ("MAC tag not found in the packet!");
     }
-  else if (mTag.GetDestAddress () != m_destAddress)
+  else if (mTag.GetDestAddress () != m_decapAddress)
     {
       NS_FATAL_ERROR ("Packet was not intended for this receiver!");
     }
@@ -420,7 +415,7 @@ SatReturnLinkEncapsulator::ProcessPdu (Ptr<Packet> p)
 
       Reset ();
 
-      m_rxCallback (p, m_sourceAddress, m_destAddress);
+      m_rxCallback (p, m_encapAddress, m_decapAddress);
     }
 
   // START_PPDU
@@ -473,7 +468,7 @@ SatReturnLinkEncapsulator::ProcessPdu (Ptr<Packet> p)
           else
             {
               m_currRxPacketFragment->AddAtEnd (p);
-              m_rxCallback (m_currRxPacketFragment, m_sourceAddress, m_destAddress);
+              m_rxCallback (m_currRxPacketFragment, m_encapAddress, m_decapAddress);
             }
         }
       else

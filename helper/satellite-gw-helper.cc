@@ -374,7 +374,8 @@ SatGwHelper::InstallDvb (Ptr<Node> n,
   dev->SetMac (mac);
 
   // Create Logical Link Control (LLC) layer
-  Ptr<SatGwLlc> llc = CreateObject<SatGwLlc> ();
+  Ptr<SatGwLlc> llc = CreateObject<SatGwLlc> (forwardLinkRegenerationMode,
+                                              returnLinkRegenerationMode);
 
   // Set the control msg read callback to LLC due to ARQ ACKs
   llc->SetReadCtrlCallback (m_readCtrlCb);
@@ -422,7 +423,7 @@ SatGwHelper::InstallDvb (Ptr<Node> n,
   // Destination = broadcast address
   // Flow id = by default 0
   Ptr<SatQueue> queue = CreateObject<SatQueue> (SatEnums::CONTROL_FID);
-  Ptr<SatBaseEncapsulator> gwEncap = CreateObject<SatBaseEncapsulator> (addr, Mac48Address::GetBroadcast (), SatEnums::CONTROL_FID);
+  Ptr<SatBaseEncapsulator> gwEncap = CreateObject<SatBaseEncapsulator> (addr, Mac48Address::GetBroadcast (), addr, Mac48Address::GetBroadcast (), SatEnums::CONTROL_FID);
   gwEncap->SetQueue (queue);
   llc->AddEncap (addr, Mac48Address::GetBroadcast (), SatEnums::CONTROL_FID, gwEncap);
   llc->SetCtrlMsgCallback (MakeCallback (&SatNetDevice::SendControlMsg, dev));

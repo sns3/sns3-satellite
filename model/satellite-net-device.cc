@@ -455,11 +455,6 @@ SatNetDevice::SendControlMsg (Ptr<SatControlMessage> msg, const Address& dest)
       packet->AddPacketTag (SatDevTimeTag (Simulator::Now ()));
     }
 
-  SatAddressE2ETag addressE2ETag;
-  addressE2ETag.SetE2ESourceAddress (m_nodeInfo->GetMacAddress ());
-  addressE2ETag.SetE2EDestAddress (Mac48Address::ConvertFrom (dest));
-  packet->AddPacketTag (addressE2ETag);
-
   // Add packet trace entry:
   SatEnums::SatLinkDir_t ld =
     (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;

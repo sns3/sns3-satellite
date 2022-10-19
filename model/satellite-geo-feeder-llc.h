@@ -38,9 +38,17 @@ public:
   static TypeId GetTypeId (void);
 
   /**
-   * Construct a SatGeoFeederLlc
+   * Construct a SatGeoFeederLlc, should not be used
    */
   SatGeoFeederLlc ();
+
+  /**
+   * Construct a SatGeoFeederLlc
+   * \param forwardLinkRegenerationMode Forward link regeneration model
+   * \param returnLinkRegenerationMode Return link regeneration model
+   */
+  SatGeoFeederLlc (SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                   SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   /**
    * Destroy a SatGeoFeederLlc
@@ -49,17 +57,23 @@ public:
    */
   virtual ~SatGeoFeederLlc ();
 
+protected:
+  /**
+   * Dispose of this class instance
+   */
+  virtual void DoDispose ();
+
   /**
    * \brief Method to create a new encapsulator 'on-a-need-basis' dynamically.
    * \param key Encapsulator key class
    */
   virtual void CreateEncap (Ptr<EncapKey> key);
 
-protected:
   /**
-   * Dispose of this class instance
+   * \brief Virtual method to create a new decapsulator 'on-a-need-basis' dynamically.
+   * \param key Encapsulator key class
    */
-  virtual void DoDispose ();
+  virtual void CreateDecap (Ptr<EncapKey> key);
 
 };
 

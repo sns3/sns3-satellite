@@ -301,6 +301,13 @@ SatUtMac::SetBeamScheculerCallback (SatUtMac::BeamScheculerCallback cb)
 }
 
 void
+SatUtMac::SetSatelliteAddress (Address satelliteAddress)
+{
+  m_satelliteAddress = satelliteAddress;
+  m_isRegenerative = true;
+}
+
+void
 SatUtMac::SetGwAddress (Mac48Address gwAddress)
 {
   NS_LOG_FUNCTION (this << gwAddress);

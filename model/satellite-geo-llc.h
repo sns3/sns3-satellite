@@ -40,9 +40,17 @@ public:
   static TypeId GetTypeId (void);
 
   /**
-   * Construct a SatGeoLlc
+   * Construct a SatGeoLlc, should not be used
    */
   SatGeoLlc ();
+
+  /**
+   * Construct a SatGeoLlc
+   * \param forwardLinkRegenerationMode Forward link regeneration model
+   * \param returnLinkRegenerationMode Return link regeneration model
+   */
+  SatGeoLlc (SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+             SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   /**
    * Destroy a SatGeoLlc

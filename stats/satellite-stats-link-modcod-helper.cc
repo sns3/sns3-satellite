@@ -928,8 +928,6 @@ SatStatsRtnUserLinkModcodHelper::SatStatsRtnUserLinkModcodHelper (Ptr<const SatH
   : SatStatsLinkModcodHelper (satHelper)
 {
   NS_LOG_FUNCTION (this << satHelper);
-
-  std::cout << "SatStatsRtnUserLinkModcodHelper::SatStatsRtnUserLinkModcodHelper" << std::endl;
 }
 
 

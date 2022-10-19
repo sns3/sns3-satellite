@@ -344,7 +344,8 @@ SatUtHelper::InstallDvb (Ptr<Node> n, uint32_t beamId,
   mac->SetSliceSubscriptionCallback (MakeCallback (&SatUtPhy::UpdateSliceSubscription, phy));
 
   // Create Logical Link Control (LLC) layer
-  Ptr<SatUtLlc> llc = CreateObject<SatUtLlc> ();
+  Ptr<SatUtLlc> llc = CreateObject<SatUtLlc> (forwardLinkRegenerationMode,
+                                              returnLinkRegenerationMode);
 
   // Set the control msg read callback to LLC due to ARQ ACKs
   llc->SetReadCtrlCallback (m_readCtrlCb);
@@ -403,7 +404,7 @@ SatUtHelper::InstallDvb (Ptr<Node> n, uint32_t beamId,
   // Source = UT MAC address
   // Destination = GW MAC address
   // Flow id = by default 0
-  Ptr<SatBaseEncapsulator> utEncap = CreateObject<SatBaseEncapsulator> (addr, gwAddr, SatEnums::CONTROL_FID);
+  Ptr<SatBaseEncapsulator> utEncap = CreateObject<SatBaseEncapsulator> (addr, gwAddr, addr, gwAddr, SatEnums::CONTROL_FID);
 
   // Create queue event callbacks to MAC (for random access) and RM (for on-demand DAMA)
   SatQueue::QueueEventCallback macCb;

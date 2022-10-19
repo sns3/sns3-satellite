@@ -54,9 +54,20 @@ public:
   SatGenericStreamEncapsulator ();
 
   /**
-   * Constuctor
+   * Constructor
+   * \param encapAddress MAC addressd of encapsulator
+   * \param decapAddress MAC addressd of decapsulator
+   * \param sourceE2EAddress E2E source MAC addressd of packets (used to set SatAddressE2ETag)
+   * \param destE2EAddress E2E destination MAC addressd of packets (used to set SatAddressE2ETag)
+   * \param flowId Flow identifier
+   * \param additionalHeaderSize Additional value in to take into account when pulling packets to represent E2E tags
    */
-  SatGenericStreamEncapsulator (Mac48Address source, Mac48Address dest, uint8_t flowId, uint32_t additionalHeaderSize = 0);
+  SatGenericStreamEncapsulator (Mac48Address encapAddress,
+                                Mac48Address decapAddress,
+                                Mac48Address sourceE2EAddress,
+                                Mac48Address destE2EAddress,
+                                uint8_t flowId,
+                                uint32_t additionalHeaderSize = 0);
 
   /**
    * Destructor for SatGenericStreamEncapsulator

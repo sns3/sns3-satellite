@@ -193,7 +193,7 @@ SatGeoUserMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParamete
           Mac48Address destAddress = macTag.GetDestAddress ();
           if (destAddress == m_nodeInfo->GetMacAddress () || destAddress.IsBroadcast () || destAddress.IsGroup ())
             {
-              m_rxLlcUserCallback (*i, macTag.GetSourceAddress (), macTag.GetDestAddress ());
+              m_rxCallback (*i, macTag.GetSourceAddress (), macTag.GetDestAddress ());
             }
         }
     }
@@ -216,13 +216,6 @@ SatGeoUserMac::SetReceiveUserCallback (SatGeoUserMac::ReceiveUserCallback cb)
 {
   NS_LOG_FUNCTION (this << &cb);
   m_rxUserCallback = cb;
-}
-
-void
-SatGeoUserMac::SetReceiveLlcUserCallback (SatGeoUserMac::ReceiveLlcUserCallback cb)
-{
-  NS_LOG_FUNCTION (this << &cb);
-  m_rxLlcUserCallback = cb;
 }
 
 void

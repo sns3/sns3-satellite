@@ -36,8 +36,8 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatBaseEncapsulator);
 
 SatBaseEncapsulator::SatBaseEncapsulator ()
-  : m_sourceAddress (),
-  m_destAddress (),
+  : m_encapAddress (),
+  m_decapAddress (),
   m_flowId (0)
 {
   NS_LOG_FUNCTION (this);
@@ -48,9 +48,16 @@ SatBaseEncapsulator::SatBaseEncapsulator ()
    */
 }
 
-SatBaseEncapsulator::SatBaseEncapsulator (Mac48Address source, Mac48Address dest, uint8_t flowId, uint32_t additionalHeaderSize)
-  : m_sourceAddress (source),
-  m_destAddress (dest),
+SatBaseEncapsulator::SatBaseEncapsulator (Mac48Address encapAddress,
+                                          Mac48Address decapAddress,
+                                          Mac48Address sourceE2EAddress,
+                                          Mac48Address destE2EAddress,
+                                          uint8_t flowId,
+                                          uint32_t additionalHeaderSize)
+  : m_encapAddress (encapAddress),
+  m_decapAddress (decapAddress),
+  m_sourceE2EAddress (sourceE2EAddress),
+  m_destE2EAddress (destE2EAddress),
   m_flowId (flowId),
   m_additionalHeaderSize (additionalHeaderSize)
 {
@@ -102,7 +109,7 @@ SatBaseEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address dest)
   if (!p->PeekPacketTag (mTag))
     {
       mTag.SetDestAddress (dest);
-      mTag.SetSourceAddress (m_sourceAddress);
+      mTag.SetSourceAddress (m_encapAddress);
       p->AddPacketTag (mTag);
     }
 

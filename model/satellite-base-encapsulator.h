@@ -58,12 +58,19 @@ public:
 
   /**
    * Constructor
-   * \param source Configured source MAC addressd
-   * \param dest Configured destination MAC address
+   * \param encapAddress MAC addressd of encapsulator
+   * \param decapAddress MAC addressd of decapsulator
+   * \param sourceE2EAddress E2E source MAC addressd of packets (used to set SatAddressE2ETag)
+   * \param destE2EAddress E2E destination MAC addressd of packets (used to set SatAddressE2ETag)
    * \param flowId Flow identifier
    * \param additionalHeaderSize Additional value in to take into account when pulling packets to represent E2E tags
    */
-  SatBaseEncapsulator (Mac48Address source, Mac48Address dest, uint8_t flowId, uint32_t additionalHeaderSize = 0);
+  SatBaseEncapsulator (Mac48Address encapAddress,
+                       Mac48Address decapAddress,
+                       Mac48Address sourceE2EAddress,
+                       Mac48Address destE2EAddress,
+                       uint8_t flowId,
+                       uint32_t additionalHeaderSize = 0);
 
   /**
    * Destructor for SatBaseEncapsulator
@@ -178,8 +185,10 @@ protected:
    * so that lower layers are capable of passing the packet to the
    * correct destination.
    */
-  Mac48Address m_sourceAddress;
-  Mac48Address m_destAddress;
+  Mac48Address m_encapAddress;
+  Mac48Address m_decapAddress;
+  Mac48Address m_sourceE2EAddress;
+  Mac48Address m_destE2EAddress;
 
   /**
    * Flow identifier

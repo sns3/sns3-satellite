@@ -99,7 +99,7 @@ SatGseTestCase::DoRun (void)
 
   uint8_t flowId (0);
   Ptr<SatQueue> queue = CreateObject<SatQueue> (flowId);
-  Ptr<SatGenericStreamEncapsulator> gse = CreateObject<SatGenericStreamEncapsulator> (source, dest, flowId);
+  Ptr<SatGenericStreamEncapsulator> gse = CreateObject<SatGenericStreamEncapsulator> (source, dest, source, dest, flowId);
   gse->SetQueue (queue);
 
   // Create a receive callback to Receive method of this class.

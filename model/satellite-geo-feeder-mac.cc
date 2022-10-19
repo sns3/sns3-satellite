@@ -170,18 +170,21 @@ SatGeoFeederMac::EnquePacket (Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this);
 
-  SatMacTag mTag;
-  bool success = packet->RemovePacketTag (mTag);
-
   SatAddressE2ETag addressE2ETag;
-  success &= packet->PeekPacketTag (addressE2ETag);
+  bool success = packet->PeekPacketTag (addressE2ETag);
 
-  // MAC tag and E2E address tag found
-  if (success)
+  SatMacTag mTag;
+  success &= packet->RemovePacketTag (mTag);
+
+  if (m_returnLinkRegenerationMode != SatEnums::REGENERATION_NETWORK)
     {
-      mTag.SetDestAddress (addressE2ETag.GetE2EDestAddress ());
-      mTag.SetSourceAddress (m_nodeInfo->GetMacAddress ());
-      packet->AddPacketTag (mTag);
+      // MAC tag and E2E address tag found
+      if (success)
+        {
+          mTag.SetDestAddress (addressE2ETag.GetE2EDestAddress ());
+          mTag.SetSourceAddress (m_nodeInfo->GetMacAddress ());
+          packet->AddPacketTag (mTag);
+        }
     }
 
   uint8_t flowId = 1;

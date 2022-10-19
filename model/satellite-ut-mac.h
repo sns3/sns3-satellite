@@ -228,6 +228,11 @@ public:
   void SendLogon (Ptr<Packet> packet);
 
   /**
+   * Set the satellite MAC address on the other side of this link (if regenerative satellite).
+   */
+  virtual void SetSatelliteAddress (Address satelliteAddress);
+
+  /**
    * Set address of the GW (or its MAC) serving this UT.
    *
    * \param gwAddress Address of the GW.

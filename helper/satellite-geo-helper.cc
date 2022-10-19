@@ -373,7 +373,8 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
       case SatEnums::REGENERATION_LINK:
         {
           // Create LLC layer
-          fLlc = CreateObject<SatGeoLlc> ();
+          fLlc = CreateObject<SatGeoLlc> (forwardLinkRegenerationMode,
+                                          returnLinkRegenerationMode);
 
           if (m_gwMacMap.count(gwId))
             {
@@ -403,7 +404,8 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
         {
 
           // Create LLC layer
-          fLlc = CreateObject<SatGeoFeederLlc> ();
+          fLlc = CreateObject<SatGeoFeederLlc> (forwardLinkRegenerationMode,
+                                                returnLinkRegenerationMode);
 
           if (m_gwMacMap.count(gwId))
             {
@@ -419,6 +421,7 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
             }
 
           fMac->SetReadCtrlCallback (m_fwdReadCtrlCb);
+          fLlc->SetReadCtrlCallback (m_fwdReadCtrlCb);
 
           // Create a node info to PHY and MAC layers
           feederAddress = Mac48Address::Allocate ();
@@ -583,9 +586,12 @@ SatGeoHelper::AttachChannelsUser ( Ptr<SatGeoNetDevice> dev,
                                               forwardLinkRegenerationMode,
                                               returnLinkRegenerationMode);
 
-          uLlc = CreateObject<SatGeoUserLlc> ();
+          uLlc = CreateObject<SatGeoUserLlc> (forwardLinkRegenerationMode,
+                                              returnLinkRegenerationMode);
 
           dev->AddUserMac (uMac, userBeamId);
+
+          uLlc->SetReadCtrlCallback (m_rtnReadCtrlCb);
 
           // Create a node info to PHY and MAC layers
           userAddress = Mac48Address::Allocate ();
@@ -638,7 +644,7 @@ SatGeoHelper::AttachChannelsUser ( Ptr<SatGeoNetDevice> dev,
           SatPhy::ReceiveCallback uCb = MakeCallback (&SatGeoUserMac::Receive, uMac);
           uPhy->SetAttribute ("ReceiveCb", CallbackValue (uCb));
 
-          uMac->SetReceiveLlcUserCallback (MakeCallback (&SatGeoUserLlc::Receive, uLlc));
+          uMac->SetReceiveCallback (MakeCallback (&SatGeoUserLlc::Receive, uLlc));
 
           uLlc->SetReceiveSatelliteCallback (MakeCallback (&SatGeoNetDevice::ReceivePacketUser, dev));
 

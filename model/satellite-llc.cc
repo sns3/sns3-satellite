@@ -69,7 +69,27 @@ SatLlc::SatLlc ()
   m_fwdLinkArqEnabled (false),
   m_rtnLinkArqEnabled (false),
   m_gwAddress (),
-  m_additionalHeaderSize (0)
+  m_satelliteAddress (),
+  m_additionalHeaderSize (0),
+  m_forwardLinkRegenerationMode (SatEnums::TRANSPARENT),
+  m_returnLinkRegenerationMode (SatEnums::TRANSPARENT)
+{
+  NS_LOG_FUNCTION (this);
+  NS_ASSERT (false); // this version of the constructor should not been used
+}
+
+SatLlc::SatLlc (SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                SatEnums::RegenerationMode_t returnLinkRegenerationMode)
+  : m_nodeInfo (),
+  m_encaps (),
+  m_decaps (),
+  m_fwdLinkArqEnabled (false),
+  m_rtnLinkArqEnabled (false),
+  m_gwAddress (),
+  m_satelliteAddress (),
+  m_additionalHeaderSize (0),
+  m_forwardLinkRegenerationMode (forwardLinkRegenerationMode),
+  m_returnLinkRegenerationMode (returnLinkRegenerationMode)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -112,7 +132,7 @@ SatLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
   NS_LOG_INFO ("dest=" << dest );
   NS_LOG_INFO ("UID is " << packet->GetUid ());
 
-  Ptr<EncapKey> key = Create<EncapKey> (m_nodeInfo->GetMacAddress (), Mac48Address::ConvertFrom (dest), flowId);
+  Ptr<EncapKey> key = Create<EncapKey> (m_nodeInfo->GetMacAddress (), Mac48Address::ConvertFrom (dest), flowId, m_nodeInfo->GetMacAddress (), Mac48Address::ConvertFrom (dest));
 
   EncapContainer_t::iterator it = m_encaps.find (key);
 
@@ -130,6 +150,12 @@ SatLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
   // Store packet arrival time
   SatTimeTag timeTag (Simulator::Now ());
   packet->AddPacketTag (timeTag);
+
+  // Add E2E address tag to identify the packet in lower layers
+  SatAddressE2ETag addressE2ETag;
+  addressE2ETag.SetE2EDestAddress (Mac48Address::ConvertFrom (dest));
+  addressE2ETag.SetE2ESourceAddress (m_nodeInfo->GetMacAddress ());
+  packet->AddPacketTag (addressE2ETag);
 
   it->second->EnquePdu (packet, Mac48Address::ConvertFrom (dest));
 
@@ -434,6 +460,13 @@ SatLlc::SetGwAddress (Mac48Address address)
 {
   NS_LOG_FUNCTION (this << address);
   m_gwAddress = address;
+}
+
+void
+SatLlc::SetSatelliteAddress (Mac48Address address)
+{
+  NS_LOG_FUNCTION (this << address);
+  m_satelliteAddress = address;
 }
 
 void
