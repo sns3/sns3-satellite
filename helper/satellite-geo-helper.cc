@@ -390,6 +390,7 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
             }
 
           fMac->SetReadCtrlCallback (m_fwdReadCtrlCb);
+          fLlc->SetReadCtrlCallback (m_fwdReadCtrlCb);
 
           // Create a node info to PHY and MAC layers
           feederAddress = Mac48Address::Allocate ();
@@ -402,7 +403,6 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
         }
       case SatEnums::REGENERATION_NETWORK:
         {
-
           // Create LLC layer
           fLlc = CreateObject<SatGeoFeederLlc> (forwardLinkRegenerationMode,
                                                 returnLinkRegenerationMode);
@@ -442,13 +442,21 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
       case SatEnums::TRANSPARENT:
       case SatEnums::REGENERATION_PHY:
         {
-          //SatPhy::ReceiveCallback fCb = MakeCallback (&SatGeoNetDevice::ReceiveFeeder, dev);
-          //fPhy->SetAttribute ("ReceiveCb", CallbackValue (fCb));
-
           SatPhy::ReceiveCallback fCb = MakeCallback (&SatGeoFeederMac::Receive, fMac);
           fPhy->SetAttribute ("ReceiveCb", CallbackValue (fCb));
 
           fMac->SetReceiveNetDeviceCallback (MakeCallback (&SatGeoNetDevice::ReceiveFeeder, dev));
+
+          break;
+        }
+      case SatEnums::REGENERATION_NETWORK:
+        {
+          SatPhy::ReceiveCallback fCb = MakeCallback (&SatGeoFeederMac::Receive, fMac);
+          fPhy->SetAttribute ("ReceiveCb", CallbackValue (fCb));
+
+          fMac->SetReceiveCallback (MakeCallback (&SatGeoFeederLlc::Receive, fLlc));
+
+          fLlc->SetReceiveSatelliteCallback (MakeCallback (&SatGeoNetDevice::ReceivePacketFeeder, dev));
 
           break;
         }
@@ -548,6 +556,10 @@ SatGeoHelper::AttachChannelsUser ( Ptr<SatGeoNetDevice> dev,
   Ptr<SatGeoUserMac> uMac;
   Ptr<SatGeoLlc> uLlc;
 
+  uMac = CreateObject<SatGeoUserMac> (userBeamId,
+                                      forwardLinkRegenerationMode,
+                                      returnLinkRegenerationMode);
+
   Mac48Address userAddress;
 
   // Create layers needed depending on max regeneration mode
@@ -559,38 +571,40 @@ SatGeoHelper::AttachChannelsUser ( Ptr<SatGeoNetDevice> dev,
           // Create a node info to PHY layers
           Ptr<SatNodeInfo> niPhyUser = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, Mac48Address::ConvertFrom (dev->GetAddress ()));
           uPhy->SetNodeInfo (niPhyUser);
+          uMac->SetNodeInfo (niPhyUser);
+
 
           break;
         }
       case SatEnums::REGENERATION_LINK:
         {
-          // Create MAC layer
-          uMac = CreateObject<SatGeoUserMac> (userBeamId,
-                                              forwardLinkRegenerationMode,
-                                              returnLinkRegenerationMode);
+          // Create LLC layer
+          uLlc = CreateObject<SatGeoLlc> (forwardLinkRegenerationMode,
+                                          returnLinkRegenerationMode);
 
           dev->AddUserMac (uMac, userBeamId);
+
+          uMac->SetReadCtrlCallback (m_rtnReadCtrlCb);
+          uLlc->SetReadCtrlCallback (m_rtnReadCtrlCb);
 
           // Create a node info to PHY and MAC layers
           userAddress = Mac48Address::Allocate ();
           Ptr<SatNodeInfo> niUser = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, userAddress);
           uPhy->SetNodeInfo (niUser);
           uMac->SetNodeInfo (niUser);
+          uLlc->SetNodeInfo (niUser);
 
           break;
         }
       case SatEnums::REGENERATION_NETWORK:
         {
-          // Create MAC layer
-          uMac = CreateObject<SatGeoUserMac> (userBeamId,
-                                              forwardLinkRegenerationMode,
-                                              returnLinkRegenerationMode);
-
+          // Create LLC layer
           uLlc = CreateObject<SatGeoUserLlc> (forwardLinkRegenerationMode,
                                               returnLinkRegenerationMode);
 
           dev->AddUserMac (uMac, userBeamId);
 
+          uMac->SetReadCtrlCallback (m_rtnReadCtrlCb);
           uLlc->SetReadCtrlCallback (m_rtnReadCtrlCb);
 
           // Create a node info to PHY and MAC layers
@@ -615,6 +629,22 @@ SatGeoHelper::AttachChannelsUser ( Ptr<SatGeoNetDevice> dev,
           // Nothing to do on user side
           break;
         }
+      case SatEnums::REGENERATION_NETWORK:
+        {
+          uMac->SetTransmitCallback (MakeCallback (&SatGeoUserPhy::SendPduWithParams, uPhy));
+
+          double carrierBandwidth = m_carrierBandwidthConverter (SatEnums::FORWARD_USER_CH, 0, SatEnums::EFFECTIVE_BANDWIDTH);
+          Ptr<SatFwdLinkScheduler> fwdScheduler = CreateObject<SatScpcScheduler> (m_bbFrameConf, userAddress, carrierBandwidth);
+          uMac->SetFwdScheduler (fwdScheduler);
+          uMac->SetLlc (uLlc);
+          uMac->StartPeriodicTransmissions ();
+
+          // Attach the LLC Tx opportunity and scheduling context getter callbacks to SatFwdLinkScheduler
+          fwdScheduler->SetTxOpportunityCallback (MakeCallback (&SatGeoLlc::NotifyTxOpportunity, uLlc));
+          fwdScheduler->SetSchedContextCallback (MakeCallback (&SatLlc::GetSchedulingContexts, uLlc));
+
+          break;
+        }
       default:
         NS_FATAL_ERROR ("Forward link regeneration mode unknown");
     }
@@ -627,6 +657,8 @@ SatGeoHelper::AttachChannelsUser ( Ptr<SatGeoNetDevice> dev,
         {
           SatPhy::ReceiveCallback uCb = MakeCallback (&SatGeoNetDevice::ReceiveUser, dev);
           uPhy->SetAttribute ("ReceiveCb", CallbackValue (uCb));
+
+          uMac->SetReceiveNetDeviceCallback (MakeCallback (&SatGeoNetDevice::ReceiveUser, dev));
 
           break;
         }

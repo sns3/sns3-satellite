@@ -71,35 +71,44 @@ SatGeoFeederLlc::CreateEncap (Ptr<EncapKey> key)
 {
   NS_LOG_FUNCTION (this << key->m_encapAddress << key->m_decapAddress << (uint32_t)(key->m_flowId));
 
-  Ptr<SatBaseEncapsulator> utEncap;
+  Ptr<SatBaseEncapsulator> feederEncap;
 
-  if (m_rtnLinkArqEnabled)
+  if (key->m_flowId == 0)
     {
-      utEncap = CreateObject<SatReturnLinkEncapsulatorArq> (key->m_encapAddress,
-                                                            key->m_decapAddress,
-                                                            key->m_sourceE2EAddress,
-                                                            key->m_destE2EAddress,
-                                                            key->m_flowId,
-                                                            m_additionalHeaderSize);
+      // Control packet
+      feederEncap = CreateObject<SatBaseEncapsulator> (key->m_encapAddress,
+                                                       key->m_decapAddress,
+                                                       key->m_sourceE2EAddress,
+                                                       key->m_destE2EAddress,
+                                                       key->m_flowId);
+    }
+  else if (m_rtnLinkArqEnabled)
+    {
+      feederEncap = CreateObject<SatReturnLinkEncapsulatorArq> (key->m_encapAddress,
+                                                                key->m_decapAddress,
+                                                                key->m_sourceE2EAddress,
+                                                                key->m_destE2EAddress,
+                                                                key->m_flowId,
+                                                                m_additionalHeaderSize);
     }
   else
     {
-      utEncap = CreateObject<SatReturnLinkEncapsulator> (key->m_encapAddress,
-                                                         key->m_decapAddress,
-                                                         key->m_sourceE2EAddress,
-                                                         key->m_destE2EAddress,
-                                                         key->m_flowId,
-                                                         m_additionalHeaderSize);
+      feederEncap = CreateObject<SatReturnLinkEncapsulator> (key->m_encapAddress,
+                                                             key->m_decapAddress,
+                                                             key->m_sourceE2EAddress,
+                                                             key->m_destE2EAddress,
+                                                             key->m_flowId,
+                                                             m_additionalHeaderSize);
     }
 
   Ptr<SatQueue> queue = CreateObject<SatQueue> (key->m_flowId);
 
-  utEncap->SetQueue (queue);
+  feederEncap->SetQueue (queue);
 
   NS_LOG_INFO ("Create encapsulator with key (" << key->m_encapAddress << ", " << key->m_decapAddress << ", " << (uint32_t) key->m_flowId << ")");
 
   // Store the encapsulator
-  std::pair<EncapContainer_t::iterator, bool> result = m_encaps.insert (std::make_pair (key, utEncap));
+  std::pair<EncapContainer_t::iterator, bool> result = m_encaps.insert (std::make_pair (key, feederEncap));
   if (result.second == false)
     {
       NS_FATAL_ERROR ("Insert to map with key (" << key->m_encapAddress << ", " << key->m_decapAddress << ", " << (uint32_t) key->m_flowId << ") failed!");
@@ -113,7 +122,16 @@ SatGeoFeederLlc::CreateDecap (Ptr<EncapKey> key)
 
   Ptr<SatBaseEncapsulator> userDecap;
 
-  if (m_rtnLinkArqEnabled)
+  if (key->m_flowId == 0)
+    {
+      // Control packet
+      userDecap = CreateObject<SatBaseEncapsulator> (key->m_encapAddress,
+                                                     key->m_decapAddress,
+                                                     key->m_sourceE2EAddress,
+                                                     key->m_destE2EAddress,
+                                                     key->m_flowId);
+    }
+  else if (m_fwdLinkArqEnabled)
     {
       userDecap = CreateObject<SatGenericStreamEncapsulatorArq> (key->m_encapAddress,
                                                                  key->m_decapAddress,

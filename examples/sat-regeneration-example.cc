@@ -250,6 +250,8 @@ main (int argc, char *argv[])
   s->AddPerUtRtnMacJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtRtnAppJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
+  s->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
   simulationHelper->EnableProgressLogs ();
   simulationHelper->RunSimulation ();
 

@@ -38,6 +38,7 @@
 #include "satellite-channel-estimation-error-container.h"
 #include "satellite-address-tag.h"
 #include "satellite-time-tag.h"
+#include "satellite-uplink-info-tag.h"
 
 
 NS_LOG_COMPONENT_DEFINE ("SatGeoFeederPhy");
@@ -431,13 +432,32 @@ SatGeoFeederPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
     }
   else
     {
-      if (m_forwardLinkRegenerationMode != SatEnums::TRANSPARENT)
+      switch (m_forwardLinkRegenerationMode)
         {
-          rxParams->m_txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
+          case SatEnums::TRANSPARENT:
+            break;
+          case SatEnums::REGENERATION_PHY:
+          case SatEnums::REGENERATION_NETWORK:
+            {
+              rxParams->m_txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
 
-          RxTraces (rxParams->m_packetsInBurst);
+              SatSignalParameters::PacketsInBurst_t::iterator it;
+              for (it = rxParams->m_packetsInBurst.begin (); it != rxParams->m_packetsInBurst.end (); it++)
+                {
+                  SatUplinkInfoTag satUplinkInfoTag;
+                  (*it)->RemovePacketTag (satUplinkInfoTag);
+                  satUplinkInfoTag.SetBeamId (rxParams->m_beamId);
+                  (*it)->AddPacketTag (satUplinkInfoTag);
+                }
 
-          ModcodTrace (rxParams);
+              RxTraces (rxParams->m_packetsInBurst);
+
+              ModcodTrace (rxParams);
+
+              break;
+            }
+          default:
+            NS_FATAL_ERROR ("Unknown regeneration mode");
         }
 
       m_rxCallback ( rxParams->m_packetsInBurst, rxParams);

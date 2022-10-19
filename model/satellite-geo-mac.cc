@@ -46,16 +46,6 @@ SatGeoMac::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatGeoMac")
     .SetParent<SatMac> ()
-    .AddAttribute ("Scheduler",
-                   "Return link scheduler used by this Sat Geo MAC (Link or Network regeneration).",
-                   PointerValue (),
-                   MakePointerAccessor (&SatGeoMac::m_fwdScheduler),
-                   MakePointerChecker<SatFwdLinkScheduler> ())
-    .AddAttribute ("GuardTime",
-                   "Guard time in this link scheduler",
-                   TimeValue (MicroSeconds (1)),
-                   MakeTimeAccessor (&SatGeoMac::m_guardTime),
-                   MakeTimeChecker ())
     .AddTraceSource ("BBFrameTxTrace",
                      "Trace for transmitted BB Frames.",
                      MakeTraceSourceAccessor (&SatGeoMac::m_bbFrameTxTrace),
@@ -78,11 +68,13 @@ SatGeoMac::SatGeoMac (void)
   NS_FATAL_ERROR ("SatGeoMac default constructor is not allowed to use");
 }
 
-SatGeoMac::SatGeoMac (SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+SatGeoMac::SatGeoMac (uint32_t beamId,
+                      SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                       SatEnums::RegenerationMode_t returnLinkRegenerationMode)
  : SatMac (forwardLinkRegenerationMode, returnLinkRegenerationMode),
   m_fwdScheduler (),
-  m_guardTime (MicroSeconds (1))
+  m_guardTime (MicroSeconds (1)),
+  m_beamId (beamId)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -249,6 +241,18 @@ void
 SatGeoMac::SetLlc (Ptr<SatGeoLlc> llc)
 {
   m_llc = llc;
+}
+
+Time
+SatGeoMac::GetGuardTime () const
+{
+  return m_guardTime;
+}
+
+void
+SatGeoMac::SetGuardTime (Time guardTime)
+{
+  m_guardTime = guardTime;
 }
 
 void

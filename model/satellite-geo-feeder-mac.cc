@@ -45,7 +45,14 @@ SatGeoFeederMac::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatGeoFeederMac")
     .SetParent<SatGeoMac> ()
-    .AddConstructor<SatGeoFeederMac> ();
+    .AddConstructor<SatGeoFeederMac> ()
+    .AddAttribute ("GuardTime",
+                   "Guard time in this SCPC scheduler",
+                   TimeValue (MicroSeconds (1)),
+                   MakeTimeAccessor (&SatGeoMac::GetGuardTime,
+                                     &SatGeoMac::SetGuardTime),
+                   MakeTimeChecker ())
+    ;
   return tid;
 }
 
@@ -65,7 +72,7 @@ SatGeoFeederMac::SatGeoFeederMac (void)
 
 SatGeoFeederMac::SatGeoFeederMac (SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                                   SatEnums::RegenerationMode_t returnLinkRegenerationMode)
- : SatGeoMac (forwardLinkRegenerationMode, returnLinkRegenerationMode)
+ : SatGeoMac (0, forwardLinkRegenerationMode, returnLinkRegenerationMode)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -142,7 +149,6 @@ SatGeoFeederMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParame
     }
 
   rxParams->m_packetsInBurst.clear ();
-
   for (SatPhy::PacketContainer_t::iterator i = packets.begin (); i != packets.end (); i++ )
     {
       // Remove packet tag
@@ -156,8 +162,14 @@ SatGeoFeederMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParame
       NS_LOG_INFO ("Packet from " << macTag.GetSourceAddress () << " to " << macTag.GetDestAddress ());
       NS_LOG_INFO ("Receiver " << m_nodeInfo->GetMacAddress ());
 
-      Mac48Address destAddress = macTag.GetDestAddress ();
-      if (destAddress == m_nodeInfo->GetMacAddress ())
+      SatAddressE2ETag satAddressE2ETag;
+      mSuccess = (*i)->PeekPacketTag (satAddressE2ETag);
+      if (!mSuccess)
+        {
+          NS_FATAL_ERROR ("SatAddressE2E tag was not found from the packet!");
+        }
+      Mac48Address destE2EAddress = satAddressE2ETag.GetE2EDestAddress ();
+      if (destE2EAddress == m_nodeInfo->GetMacAddress ())
         {
           // Remove control msg tag
           SatControlMsgTag ctrlTag;
@@ -176,10 +188,6 @@ SatGeoFeederMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParame
                   NS_FATAL_ERROR ("A control message received with not valid msg type!");
                 }
             }
-          else
-            {
-              rxParams->m_packetsInBurst.push_back (*i);
-            }
         }
       else
         {
@@ -187,7 +195,32 @@ SatGeoFeederMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParame
         }
     }
 
-  m_rxNetDeviceCallback (rxParams->m_packetsInBurst, rxParams);
+  if (m_forwardLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
+    {
+      for (SatPhy::PacketContainer_t::iterator i = rxParams->m_packetsInBurst.begin (); i != rxParams->m_packetsInBurst.end (); i++ )
+        {
+          // Remove packet tag
+          SatMacTag macTag;
+          bool mSuccess = (*i)->PeekPacketTag (macTag);
+          if (!mSuccess)
+            {
+              NS_FATAL_ERROR ("MAC tag was not found from the packet!");
+            }
+          Mac48Address destAddress = macTag.GetDestAddress ();
+
+          NS_LOG_INFO ("Packet from " << macTag.GetSourceAddress () << " to " << macTag.GetDestAddress ());
+          NS_LOG_INFO ("Receiver " << m_nodeInfo->GetMacAddress ());
+
+          if (destAddress == m_nodeInfo->GetMacAddress () || destAddress.IsBroadcast () || destAddress.IsGroup ())
+            {
+              m_rxCallback (*i, macTag.GetSourceAddress (), macTag.GetDestAddress ());
+            }
+        }
+    }
+  else
+    {
+      m_rxNetDeviceCallback (rxParams->m_packetsInBurst, rxParams);
+    }
 }
 
 void

@@ -54,10 +54,12 @@ public:
    *
    * This is the constructor for the SatGeoMac
    *
+   * \param beamId ID of beam for UT
    * \param forwardLinkRegenerationMode Forward link regeneration mode
    * \param returnLinkRegenerationMode Return link regeneration mode
    */
-  SatGeoMac (SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+  SatGeoMac (uint32_t beamId,
+             SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
              SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   /**
@@ -99,6 +101,9 @@ public:
    * Set the Geo LLC associated to this Geo MAC layer
    */
   void SetLlc (Ptr<SatGeoLlc> llc);
+
+  virtual Time GetGuardTime () const;
+  virtual void SetGuardTime (Time guardTime);
 
   typedef Callback<void, Ptr<SatSignalParameters>> TransmitCallback;
 
@@ -165,6 +170,11 @@ protected:
    * the duration of a BB frame by a m_guardTime set by an attribute.
    */
   Time m_guardTime;
+
+  /**
+   * ID of beam for UT
+   */
+  uint32_t m_beamId;
 
   /**
    * LLC layer linked to this MAC

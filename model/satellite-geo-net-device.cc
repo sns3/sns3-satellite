@@ -191,6 +191,78 @@ SatGeoNetDevice::ReceivePacketUser (Ptr<Packet> packet, const Address& userAddre
   DynamicCast<SatGeoFeederMac> (m_feederMac[satUplinkInfoTag.GetBeamId ()])->EnquePacket (packet);
 }
 
+void
+SatGeoNetDevice::ReceivePacketFeeder (Ptr<Packet> packet, const Address& feederAddress)
+{
+  NS_LOG_FUNCTION (this << packet);
+  NS_LOG_INFO ("Receiving a packet: " << packet->GetUid ());
+
+  Mac48Address macFeederAddress = Mac48Address::ConvertFrom (feederAddress);
+
+  m_packetTrace (Simulator::Now (),
+                 SatEnums::PACKET_RECV,
+                 SatEnums::NT_SAT,
+                 m_nodeId,
+                 macFeederAddress,
+                 SatEnums::LL_ND,
+                 SatEnums::LD_RETURN,
+                 SatUtils::GetPacketInfo (packet));
+
+  /*
+   * Invoke the `Rx` and `RxDelay` trace sources. We look at the packet's tags
+   * for information, but cannot remove the tags because the packet is a const.
+   */
+  if (m_isStatisticsTagsEnabled)
+    {
+      Address addr; // invalid address.
+      bool isTaggedWithAddress = false;
+      ByteTagIterator it = packet->GetByteTagIterator ();
+
+      while (!isTaggedWithAddress && it.HasNext ())
+        {
+          ByteTagIterator::Item item = it.Next ();
+
+          if (item.GetTypeId () == SatAddressTag::GetTypeId ())
+            {
+              NS_LOG_DEBUG (this << " contains a SatAddressTag tag:"
+                                 << " start=" << item.GetStart ()
+                                 << " end=" << item.GetEnd ());
+              SatAddressTag addrTag;
+              item.GetTag (addrTag);
+              addr = addrTag.GetSourceAddress ();
+              isTaggedWithAddress = true; // this will exit the while loop.
+            }
+        }
+
+      m_rxTrace (packet, addr);
+
+      SatDevTimeTag timeTag;
+      if (packet->PeekPacketTag (timeTag))
+        {
+          NS_LOG_DEBUG (this << " contains a SatMacTimeTag tag");
+          Time delay = Simulator::Now () - timeTag.GetSenderTimestamp ();
+          m_rxDelayTrace (delay, addr);
+          if (m_lastDelays[macFeederAddress].IsZero() == false)
+            {
+              Time jitter = Abs (delay - m_lastDelays[macFeederAddress]);
+              m_rxJitterTrace (jitter, addr);
+            }
+          m_lastDelays[macFeederAddress] = delay;
+        }
+    }
+
+  // Pass the packet to the upper layer (when ISLs developped) or send to feeder
+  // m_rxCallback (this, packet, Ipv4L3Protocol::PROT_NUMBER, Address ());
+
+  SatUplinkInfoTag satUplinkInfoTag;
+  if (!packet->PeekPacketTag (satUplinkInfoTag))
+    {
+      NS_FATAL_ERROR ("SatUplinkInfoTag not found");
+    }
+
+  DynamicCast<SatGeoUserMac> (m_userMac[satUplinkInfoTag.GetBeamId ()])->EnquePacket (packet);
+}
+
 
 void
 SatGeoNetDevice::ReceiveUser (SatPhy::PacketContainer_t /*packets*/, Ptr<SatSignalParameters> rxParams)

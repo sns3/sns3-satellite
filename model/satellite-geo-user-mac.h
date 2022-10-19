@@ -121,11 +121,6 @@ protected:
 
 private:
 
-  /**
-   * ID of beam for UT
-   */
-  uint32_t m_beamId;
-
 };
 
 }

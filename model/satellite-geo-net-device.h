@@ -69,6 +69,13 @@ public:
   void ReceivePacketUser (Ptr<Packet> packet, const Address& userAddress);
 
   /**
+   * \brief Receive the packet from the lower layers, in network regeneration on forward link
+   * \param packet Packet received
+   * \param feederAddress MAC address of feeder that received this packet
+   */
+  void ReceivePacketFeeder (Ptr<Packet> packet, const Address& feederAddress);
+
+  /**
    * \brief Receive the packet from the lower layers
    * \param packets Container of pointers to the packets to be received.
    * \param rxParams Packet transmission parameters

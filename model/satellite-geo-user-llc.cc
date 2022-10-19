@@ -73,7 +73,16 @@ SatGeoUserLlc::CreateEncap (Ptr<EncapKey> key)
 
   Ptr<SatBaseEncapsulator> userEncap;
 
-  if (m_rtnLinkArqEnabled)
+  if (key->m_flowId == 0)
+    {
+      // Control packet
+      userEncap = CreateObject<SatBaseEncapsulator> (key->m_encapAddress,
+                                                     key->m_decapAddress,
+                                                     key->m_sourceE2EAddress,
+                                                     key->m_destE2EAddress,
+                                                     key->m_flowId);
+    }
+  else if (m_fwdLinkArqEnabled)
     {
       userEncap = CreateObject<SatGenericStreamEncapsulatorArq> (key->m_encapAddress,
                                                                  key->m_decapAddress,
@@ -113,7 +122,16 @@ SatGeoUserLlc::CreateDecap (Ptr<EncapKey> key)
 
   Ptr<SatBaseEncapsulator> userDecap;
 
-  if (m_rtnLinkArqEnabled)
+  if (key->m_flowId == 0)
+    {
+      // Control packet
+      userDecap = CreateObject<SatBaseEncapsulator> (key->m_encapAddress,
+                                                     key->m_decapAddress,
+                                                     key->m_sourceE2EAddress,
+                                                     key->m_destE2EAddress,
+                                                     key->m_flowId);
+    }
+  else if (m_rtnLinkArqEnabled)
     {
       userDecap = CreateObject<SatReturnLinkEncapsulatorArq> (key->m_encapAddress,
                                                               key->m_decapAddress,
