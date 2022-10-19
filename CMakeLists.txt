@@ -75,6 +75,7 @@ set(source_files
     model/satellite-geo-feeder-mac.cc
     model/satellite-geo-feeder-phy.cc
     model/satellite-geo-llc.cc
+    model/satellite-geo-mac.cc
     model/satellite-geo-net-device.cc
     model/satellite-geo-user-llc.cc
     model/satellite-geo-user-mac.cc
@@ -307,6 +308,7 @@ set(header_files
     model/satellite-geo-feeder-mac.h
     model/satellite-geo-feeder-phy.h
     model/satellite-geo-llc.h
+    model/satellite-geo-mac.h
     model/satellite-geo-net-device.h
     model/satellite-geo-user-llc.h
     model/satellite-geo-user-mac.h

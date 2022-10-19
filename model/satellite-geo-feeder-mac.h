@@ -29,6 +29,7 @@
 
 #include "satellite-phy.h"
 #include "satellite-mac.h"
+#include "satellite-geo-mac.h"
 #include "satellite-geo-feeder-llc.h"
 #include "satellite-signal-parameters.h"
 #include "satellite-fwd-link-scheduler.h"
@@ -42,7 +43,7 @@ namespace ns3 {
  * The SatGeoFeederMac models the user link MAC layer of the
  * satellite node.
  */
-class SatGeoFeederMac : public SatMac
+class SatGeoFeederMac : public SatGeoMac
 {
 public:
   /**
@@ -80,11 +81,6 @@ public:
   virtual void DoDispose (void);
 
   /**
-   * Starts periodical transmissions. Called when MAC is wanted to take care of periodic sending.
-   */
-  void StartPeriodicTransmissions ();
-
-  /**
    * \brief Add new packet to the LLC queue.
    * \param packet Packets to be sent.
    */
@@ -99,41 +95,7 @@ public:
 
   void ReceiveSignalingPacket (Ptr<Packet> packet);
 
-  typedef Callback<void, Ptr<SatSignalParameters>> TransmitFeederCallback;
-
-  void SetTransmitFeederCallback (TransmitFeederCallback cb);
-
-  typedef Callback<void, SatPhy::PacketContainer_t, Ptr<SatSignalParameters>> ReceiveFeederCallback;
-
-  void SetReceiveFeederCallback (ReceiveFeederCallback cb);
-
-  /**
-   * Method to set SCPC link scheduler
-   * \param The scheduler to use
-   */
-  void SetFwdScheduler (Ptr<SatFwdLinkScheduler> fwdScheduler);
-
-  /**
-   * Set the Geo feeder LLC associated to this Geo feeder MAC layer
-   */
-  void SetLlc (Ptr<SatGeoLlc> llc);
-
 protected:
-  /**
-   * \brief Send packets to lower layer by using a callback
-   * \param packets Packets to be sent.
-   * \param carrierId ID of the carrier used for transmission.
-   * \param duration Duration of the physical layer transmission.
-   * \param txInfo Additional parameterization for burst transmission.
-   */
-  virtual void SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time duration, SatSignalParameters::txInfo_s txInfo);
-
-  /**
-   * \brief Invoke the `Rx` trace source for each received packet.
-   * \param packets Container of the pointers to the packets received.
-   */
-  virtual void RxTraces (SatPhy::PacketContainer_t packets);
-
   /**
    * \brief Get the link TX direction. Must be implemented by child clases.
    * \return The link TX direction
@@ -146,40 +108,13 @@ protected:
    */
   virtual SatEnums::SatLinkDir_t GetSatLinkRxDir ();
 
-private:
-
   /**
-   * Start sending a Packet Down the Wire.
-   *
-   * The StartTransmission method is used internally in the
-   * SatGwMac to begin the process of sending a packet out on the PHY layer.
-   *
-   * \param carrierId id of the carrier.
-   * \returns true if success, false on failure
+   * \brief Get the UT address associated to this RX packet.
+   *        In this class, this is the destination address
+   * \param packet The packet to consider
+   * \return The address of associated UT
    */
-  void StartTransmission (uint32_t carrierId);
-
-  /**
-   * Scheduler for the forward link.
-   */
-  Ptr<SatFwdLinkScheduler> m_fwdScheduler;
-
-  /**
-   * Guard time for BB frames. The guard time is modeled by shortening
-   * the duration of a BB frame by a m_guardTime set by an attribute.
-   */
-  Time m_guardTime;
-
-  TransmitFeederCallback m_txFeederCallback;
-  ReceiveFeederCallback m_rxFeederCallback;
-
-  /**
-   * Trace for transmitted BB frames.
-   */
-  TracedCallback<Ptr<SatBbFrame>> m_bbFrameTxTrace;
-
-  Ptr<SatGeoLlc> m_llc;
-
+  virtual Address GetRxUtAddress (Ptr<Packet> packet);
 };
 
 }

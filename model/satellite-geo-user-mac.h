@@ -29,8 +29,10 @@
 
 #include "satellite-phy.h"
 #include "satellite-mac.h"
+#include "satellite-geo-mac.h"
 #include "satellite-geo-user-llc.h"
 #include "satellite-signal-parameters.h"
+#include "satellite-fwd-link-scheduler.h"
 
 
 namespace ns3 {
@@ -41,7 +43,7 @@ namespace ns3 {
  * The SatGeoUserMac models the user link MAC layer of the
  * satellite node.
  */
-class SatGeoUserMac : public SatMac
+class SatGeoUserMac : public SatGeoMac
 {
 public:
   /**
@@ -81,11 +83,10 @@ public:
   virtual void DoDispose (void);
 
   /**
-   * \brief Add new packets to the LLC queue.
-   * \param packets Packets to be sent.
-   * \param rxParams The parameters associated to these packets.
+   * \brief Add new packet to the LLC queue.
+   * \param packet Packets to be sent.
    */
-  virtual void EnquePackets (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> txParams);
+  virtual void EnquePacket (Ptr<Packet> packet);
 
   /**
    * Receive packet from lower layer.
@@ -95,30 +96,9 @@ public:
    */
   void Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> txParams);
 
-  typedef Callback<void, Ptr<SatSignalParameters>> TransmitUserCallback;
-
-  void SetTransmitUserCallback (TransmitUserCallback cb);
-
-  typedef Callback<void, SatPhy::PacketContainer_t, Ptr<SatSignalParameters>> ReceiveUserCallback;
-
-  void SetReceiveUserCallback (SatGeoUserMac::ReceiveUserCallback cb);
+  void ReceiveSignalingPacket (Ptr<Packet> packet);
 
 protected:
-  /**
-   * \brief Send packets to lower layer by using a callback
-   * \param packets Packets to be sent.
-   * \param carrierId ID of the carrier used for transmission.
-   * \param duration Duration of the physical layer transmission.
-   * \param txInfo Additional parameterization for burst transmission.
-   */
-  virtual void SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time duration, SatSignalParameters::txInfo_s txInfo);
-
-  /**
-   * \brief Invoke the `Rx` trace source for each received packet.
-   * \param packets Container of the pointers to the packets received.
-   */
-  virtual void RxTraces (SatPhy::PacketContainer_t packets);
-
   /**
    * \brief Get the link TX direction. Must be implemented by child clases.
    * \return The link TX direction
@@ -131,17 +111,20 @@ protected:
    */
   virtual SatEnums::SatLinkDir_t GetSatLinkRxDir ();
 
+  /**
+   * \brief Get the UT address associated to this RX packet.
+   *        In this class, this is the source address
+   * \param packet The packet to consider
+   * \return The address of associated UT
+   */
+  virtual Address GetRxUtAddress (Ptr<Packet> packet);
+
 private:
 
   /**
    * ID of beam for UT
    */
   uint32_t m_beamId;
-
-  TransmitUserCallback m_txUserCallback;
-  ReceiveUserCallback m_rxUserCallback;
-
-  Ptr<SatGeoLlc> m_llc;
 
 };
 

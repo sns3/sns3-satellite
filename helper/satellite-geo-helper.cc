@@ -448,7 +448,7 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
           SatPhy::ReceiveCallback fCb = MakeCallback (&SatGeoFeederMac::Receive, fMac);
           fPhy->SetAttribute ("ReceiveCb", CallbackValue (fCb));
 
-          fMac->SetReceiveFeederCallback (MakeCallback (&SatGeoNetDevice::ReceiveFeeder, dev));
+          fMac->SetReceiveNetDeviceCallback (MakeCallback (&SatGeoNetDevice::ReceiveFeeder, dev));
 
           break;
         }
@@ -468,7 +468,7 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
       case SatEnums::REGENERATION_LINK:
       case SatEnums::REGENERATION_NETWORK:
         {
-          fMac->SetTransmitFeederCallback (MakeCallback (&SatGeoFeederPhy::SendPduWithParams, fPhy));
+          fMac->SetTransmitCallback (MakeCallback (&SatGeoFeederPhy::SendPduWithParams, fPhy));
 
           double carrierBandwidth = m_carrierBandwidthConverter (SatEnums::RETURN_FEEDER_CH, 0, SatEnums::EFFECTIVE_BANDWIDTH);
           Ptr<SatScpcScheduler> scpcScheduler = CreateObject<SatScpcScheduler> (m_bbFrameConf, feederAddress, carrierBandwidth);
@@ -635,7 +635,7 @@ SatGeoHelper::AttachChannelsUser ( Ptr<SatGeoNetDevice> dev,
           SatPhy::ReceiveCallback uCb = MakeCallback (&SatGeoUserMac::Receive, uMac);
           uPhy->SetAttribute ("ReceiveCb", CallbackValue (uCb));
 
-          uMac->SetReceiveUserCallback (MakeCallback (&SatGeoNetDevice::ReceiveUser, dev));
+          uMac->SetReceiveNetDeviceCallback (MakeCallback (&SatGeoNetDevice::ReceiveUser, dev));
 
           break;
         }
