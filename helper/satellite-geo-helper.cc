@@ -379,12 +379,12 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
           if (m_gwMacMap.count(gwId))
             {
               // MAC already exists for this GW ID, reusing it, and disabling the other
-              dev->AddFeederMac (m_gwMacMap[gwId], userBeamId);
+              dev->AddFeederMac (fMac, m_gwMacMap[gwId], userBeamId);
             }
           else
             {
               // First MAC for this GW ID, storing it to the map
-              dev->AddFeederMac (fMac, userBeamId);
+              dev->AddFeederMac (fMac, fMac, userBeamId);
               m_gwMacMap[gwId] = fMac;
               startScheduler = true;
             }
@@ -398,6 +398,8 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
           fPhy->SetNodeInfo (niFeeder);
           fMac->SetNodeInfo (niFeeder);
           fLlc->SetNodeInfo (niFeeder);
+
+          dev->AddFeederPair (userBeamId, feederAddress);
 
           break;
         }
@@ -410,12 +412,12 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
           if (m_gwMacMap.count(gwId))
             {
               // MAC already exists for this GW ID, reusing it, and disabling the other
-              dev->AddFeederMac (m_gwMacMap[gwId], userBeamId);
+              dev->AddFeederMac (fMac, m_gwMacMap[gwId], userBeamId);
             }
           else
             {
               // First MAC for this GW ID, storing it to the map
-              dev->AddFeederMac (fMac, userBeamId);
+              dev->AddFeederMac (fMac, fMac, userBeamId);
               m_gwMacMap[gwId] = fMac;
               startScheduler = true;
             }
@@ -429,6 +431,8 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
           fPhy->SetNodeInfo (niFeeder);
           fMac->SetNodeInfo (niFeeder);
           fLlc->SetNodeInfo (niFeeder);
+
+          dev->AddFeederPair (userBeamId, feederAddress);
 
           break;
         }

@@ -147,10 +147,11 @@ public:
 
   /**
    * Add the Feeder MAC object for the beam
-   * \param mac feeder MAC object to add.
+   * \param mac feeder MAC created for this beam
+   * \param macUsed feeder MAC that will be used to send data
    * \param beamId the id of the beam to use MAC for
    */
-  void AddFeederMac (Ptr<SatMac> mac, uint32_t beamId);
+  void AddFeederMac (Ptr<SatMac> mac, Ptr<SatMac> macUsed, uint32_t beamId);
 
   /**
    * Get the User MAC object for the beam
@@ -173,10 +174,30 @@ public:
   std::map<uint32_t, Ptr<SatMac> > GetUserMac ();
 
   /**
-   * Get all Feeder MAC objects attached to this satellite
-   * \return All the Feeder MAC
+   * Get all Feeder MAC objects attached to this satellite that are in use
+   * \return All the Feeder MAC used to send on return feeder link
    */
   std::map<uint32_t, Ptr<SatMac> > GetFeederMac ();
+
+  /**
+   * Get all Feeder MAC objects attached to this satellite
+   * \return All the Feeder MAC. They may or not be used to send on return feeder
+   */
+  std::map<uint32_t, Ptr<SatMac> > GetAllFeederMac ();
+
+  /**
+   * Add an entry in the database to get satellite feeder address from beam ID
+   * \param beamId Beam ID
+   * \param satelliteFeederAddress MAC address on the satellite feeder
+   */
+  void AddFeederPair (uint32_t beamId, Mac48Address satelliteFeederAddress);
+
+  /**
+   * Get satellite feeder entry from associated beam ID
+   * \param beamId Beam ID
+   * \return satellite feeder MAC associated to this beam
+   */
+  Mac48Address GetSatelliteFeederAddress (uint32_t beamId);
 
   /**
    * Attach a receive ErrorModel to the SatGeoNetDevice.
@@ -244,6 +265,10 @@ private:
   std::map<uint32_t, Ptr<SatPhy> > m_feederPhy;
   std::map<uint32_t, Ptr<SatMac> > m_userMac;
   std::map<uint32_t, Ptr<SatMac> > m_feederMac;
+
+  std::map<uint32_t, Ptr<SatMac> > m_allFeederMac;
+
+  std::map<uint32_t, Mac48Address > m_addressMapFeeder;
 
   SatEnums::RegenerationMode_t m_forwardLinkRegenerationMode;
   SatEnums::RegenerationMode_t m_returnLinkRegenerationMode;

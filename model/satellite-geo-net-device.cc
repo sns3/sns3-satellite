@@ -573,6 +573,7 @@ SatGeoNetDevice::DoDispose (void)
   m_feederPhy.clear ();
   m_userMac.clear ();
   m_feederMac.clear ();
+  m_addressMapFeeder.clear ();
   NetDevice::DoDispose ();
 }
 
@@ -651,10 +652,11 @@ SatGeoNetDevice::AddUserMac (Ptr<SatMac> mac, uint32_t beamId)
 }
 
 void
-SatGeoNetDevice::AddFeederMac (Ptr<SatMac> mac, uint32_t beamId)
+SatGeoNetDevice::AddFeederMac (Ptr<SatMac> mac, Ptr<SatMac> macUsed, uint32_t beamId)
 {
   NS_LOG_FUNCTION (this << mac << beamId);
-  m_feederMac.insert (std::pair<uint32_t, Ptr<SatMac> > (beamId, mac));
+  m_feederMac.insert (std::pair<uint32_t, Ptr<SatMac> > (beamId, macUsed));
+  m_allFeederMac.insert (std::pair<uint32_t, Ptr<SatMac> > (beamId, mac));
 }
 
 Ptr<SatMac>
@@ -670,7 +672,7 @@ SatGeoNetDevice::GetUserMac (uint32_t beamId)
 Ptr<SatMac>
 SatGeoNetDevice::GetFeederMac (uint32_t beamId)
 {
-  if (m_userMac.count(beamId))
+  if (m_feederMac.count(beamId))
     {
       return m_feederMac[beamId];
     }
@@ -687,6 +689,28 @@ std::map<uint32_t, Ptr<SatMac> >
 SatGeoNetDevice::GetFeederMac ()
 {
   return m_feederMac;
+}
+
+std::map<uint32_t, Ptr<SatMac> >
+SatGeoNetDevice::GetAllFeederMac ()
+{
+  return m_allFeederMac;
+}
+
+void
+SatGeoNetDevice::AddFeederPair (uint32_t beamId, Mac48Address satelliteFeederAddress)
+{
+  m_addressMapFeeder.insert (std::pair<uint32_t, Mac48Address > (beamId, satelliteFeederAddress));
+}
+
+Mac48Address
+SatGeoNetDevice::GetSatelliteFeederAddress (uint32_t beamId)
+{
+  if (m_addressMapFeeder.count(beamId))
+    {
+      return m_addressMapFeeder[beamId];
+    }
+  NS_FATAL_ERROR ("Satellite MAC does not exist for GW " << beamId);
 }
 
 } // namespace ns3

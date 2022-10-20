@@ -233,7 +233,11 @@ SatMac::SetTimeTag (SatPhy::PacketContainer_t packets)
               (*it)->AddPacketTag (SatMacTimeTag (Simulator::Now ()));
             }
 
-          (*it)->AddPacketTag (SatMacLinkTimeTag (Simulator::Now ()));
+          SatMacLinkTimeTag linkTimeTag;
+          if (!(*it)->PeekPacketTag (linkTimeTag))
+            {
+               (*it)->AddPacketTag (SatMacLinkTimeTag (Simulator::Now ()));
+            }
         }
     }
 }

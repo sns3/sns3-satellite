@@ -674,7 +674,7 @@ SatStatsFwdFeederMacThroughputHelper::DoInstallProbes ()
       Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
       Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
       NS_ASSERT (satGeoDev != 0);
-      std::map<uint32_t, Ptr<SatMac> > satGeoFeederMacs = satGeoDev->GetFeederMac ();
+      std::map<uint32_t, Ptr<SatMac> > satGeoFeederMacs = satGeoDev->GetAllFeederMac ();
       Ptr<SatMac> satMac;
       for (std::map<uint32_t, Ptr<SatMac>>::iterator it2 = satGeoFeederMacs.begin (); it2 != satGeoFeederMacs.end (); ++it2)
         {
@@ -688,9 +688,6 @@ SatStatsFwdFeederMacThroughputHelper::DoInstallProbes ()
               NS_LOG_INFO (this << " successfully connected with node ID "
                                 << (*it)->GetId ()
                                 << " device #" << satGeoDev->GetIfIndex ());
-
-              // Enable statistics-related tags and trace sources on the device.
-              satMac->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
             }
           else
             {
@@ -787,7 +784,7 @@ SatStatsFwdUserMacThroughputHelper::DoInstallProbes ()
       Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
       Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
       NS_ASSERT (satGeoDev != 0);
-      std::map<uint32_t, Ptr<SatMac> > satGeoFeederMacs = satGeoDev->GetFeederMac ();
+      std::map<uint32_t, Ptr<SatMac> > satGeoFeederMacs = satGeoDev->GetAllFeederMac ();
       Ptr<SatMac> satMac;
       for (std::map<uint32_t, Ptr<SatMac>>::iterator it2 = satGeoFeederMacs.begin (); it2 != satGeoFeederMacs.end (); ++it2)
         {
@@ -1392,7 +1389,7 @@ SatStatsRtnFeederMacThroughputHelper::DoInstallProbes ()
       Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
       Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
       NS_ASSERT (satGeoDev != 0);
-      std::map<uint32_t, Ptr<SatMac> > satGeoFeederMacs = satGeoDev->GetFeederMac ();
+      std::map<uint32_t, Ptr<SatMac> > satGeoFeederMacs = satGeoDev->GetAllFeederMac ();
       for (std::map<uint32_t, Ptr<SatMac>>::iterator it2 = satGeoFeederMacs.begin (); it2 != satGeoFeederMacs.end (); ++it2)
         {
           satMac = it2->second;
@@ -1508,7 +1505,7 @@ SatStatsRtnUserMacThroughputHelper::DoInstallProbes ()
       Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
       Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
       NS_ASSERT (satGeoDev != 0);
-      std::map<uint32_t, Ptr<SatMac> > satGeoFeederMacs = satGeoDev->GetFeederMac ();
+      std::map<uint32_t, Ptr<SatMac> > satGeoFeederMacs = satGeoDev->GetAllFeederMac ();
       Ptr<SatMac> satMac;
       for (std::map<uint32_t, Ptr<SatMac>>::iterator it2 = satGeoFeederMacs.begin (); it2 != satGeoFeederMacs.end (); ++it2)
         {

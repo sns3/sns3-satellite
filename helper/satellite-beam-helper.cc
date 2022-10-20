@@ -655,7 +655,7 @@ SatBeamHelper::InstallFeeder (Ptr<Node> gwNode,
   if (m_forwardLinkRegenerationMode == SatEnums::REGENERATION_LINK || m_forwardLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
     {
       Ptr<SatGeoNetDevice> geoNetDevice = DynamicCast<SatGeoNetDevice> (m_geoNode->GetDevice (0));
-      Address satFeederAddress = geoNetDevice->GetFeederMac (beamId)->GetAddress ();
+      Mac48Address satFeederAddress = geoNetDevice->GetSatelliteFeederAddress (beamId);
       DynamicCast<SatGwMac> (DynamicCast<SatNetDevice> (gwNd)->GetMac ())->SetSatelliteAddress (satFeederAddress);
     }
 
@@ -663,7 +663,7 @@ SatBeamHelper::InstallFeeder (Ptr<Node> gwNode,
   if (m_forwardLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
     {
       Ptr<SatGeoNetDevice> geoNetDevice = DynamicCast<SatGeoNetDevice> (m_geoNode->GetDevice (0));
-      Mac48Address satFeederAddress = Mac48Address::ConvertFrom (geoNetDevice->GetFeederMac (beamId)->GetAddress ());
+      Mac48Address satFeederAddress = geoNetDevice->GetSatelliteFeederAddress (beamId);
       DynamicCast<SatGwLlc> (DynamicCast<SatNetDevice> (gwNd)->GetLlc ())->SetSatelliteAddress (satFeederAddress);
     }
 
