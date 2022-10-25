@@ -73,7 +73,7 @@ SatGeoFeederLlc::CreateEncap (Ptr<EncapKey> key)
 
   Ptr<SatBaseEncapsulator> feederEncap;
 
-  if (key->m_flowId == 0)
+  if (key->m_flowId == 0 || m_returnLinkRegenerationMode != SatEnums::REGENERATION_NETWORK)
     {
       // Control packet
       feederEncap = CreateObject<SatBaseEncapsulator> (key->m_encapAddress,
@@ -122,16 +122,7 @@ SatGeoFeederLlc::CreateDecap (Ptr<EncapKey> key)
 
   Ptr<SatBaseEncapsulator> userDecap;
 
-  if (key->m_flowId == 0)
-    {
-      // Control packet
-      userDecap = CreateObject<SatBaseEncapsulator> (key->m_encapAddress,
-                                                     key->m_decapAddress,
-                                                     key->m_sourceE2EAddress,
-                                                     key->m_destE2EAddress,
-                                                     key->m_flowId);
-    }
-  else if (m_fwdLinkArqEnabled)
+  if (m_fwdLinkArqEnabled)
     {
       userDecap = CreateObject<SatGenericStreamEncapsulatorArq> (key->m_encapAddress,
                                                                  key->m_decapAddress,

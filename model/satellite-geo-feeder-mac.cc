@@ -272,13 +272,13 @@ SatGeoFeederMac::ReceiveSignalingPacket (Ptr<Packet> packet)
 SatEnums::SatLinkDir_t
 SatGeoFeederMac::GetSatLinkTxDir ()
 {
-  return SatEnums::LD_FORWARD;
+  return SatEnums::LD_RETURN;
 }
 
 SatEnums::SatLinkDir_t
 SatGeoFeederMac::GetSatLinkRxDir ()
 {
-  return SatEnums::LD_RETURN;
+  return SatEnums::LD_FORWARD;
 }
 
 Address

@@ -461,7 +461,24 @@ SatGwMac::ReceiveSignalingPacket (Ptr<Packet> packet, uint32_t beamId)
 
         if ( crMsg != NULL )
           {
-            m_fwdScheduler->CnoInfoUpdated (addressE2ETag.GetE2ESourceAddress (), crMsg->GetCnoEstimate ());
+            Mac48Address sourceAddress;
+            switch (m_forwardLinkRegenerationMode)
+            {
+              case SatEnums::TRANSPARENT:
+              case SatEnums::REGENERATION_PHY:
+                {
+                  sourceAddress = addressE2ETag.GetE2ESourceAddress ();
+                  break;
+                }
+              case SatEnums::REGENERATION_NETWORK:
+                {
+                  sourceAddress = Mac48Address::ConvertFrom (m_satelliteAddress);
+                  break;
+                }
+              default:
+                NS_FATAL_ERROR ("Unknown regeneration mode");
+            }
+            m_fwdScheduler->CnoInfoUpdated (sourceAddress, crMsg->GetCnoEstimate ());
 
             if ( m_crReceiveCallback.IsNull () == false )
               {

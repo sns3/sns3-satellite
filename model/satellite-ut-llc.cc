@@ -104,8 +104,15 @@ SatUtLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
   NS_LOG_INFO ("dest=" << dest );
   NS_LOG_INFO ("UID is " << packet->GetUid ());
 
-  dest = m_gwAddress;
-  Mac48Address destMacAddress = Mac48Address::ConvertFrom (dest);
+  Mac48Address destMacAddress;
+  if (dest != m_satelliteAddress)
+  {
+    destMacAddress = Mac48Address::ConvertFrom (m_gwAddress);
+  }
+  else
+  {
+    destMacAddress = Mac48Address::ConvertFrom (dest);
+  }
 
   // all multicast traffic is delivered with GW address
   // in order to avoid supporting several encaps in UT
@@ -140,13 +147,11 @@ SatUtLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
 
   // Add E2E address tag to identify the packet in lower layers
   SatAddressE2ETag addressE2ETag;
-  addressE2ETag.SetE2EDestAddress (Mac48Address::ConvertFrom (dest));
+  addressE2ETag.SetE2EDestAddress (destMacAddress);
   addressE2ETag.SetE2ESourceAddress (m_nodeInfo->GetMacAddress ());
   packet->AddPacketTag (addressE2ETag);
 
-  it->second->EnquePdu (packet, Mac48Address::ConvertFrom (dest));
-
-  SatEnums::SatLinkDir_t ld = SatEnums::LD_RETURN;
+  it->second->EnquePdu (packet, destMacAddress);
 
   // Add packet trace entry:
   m_packetTrace (Simulator::Now (),
@@ -155,7 +160,7 @@ SatUtLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
                  m_nodeInfo->GetNodeId (),
                  m_nodeInfo->GetMacAddress (),
                  SatEnums::LL_LLC,
-                 ld,
+                 SatEnums::LD_RETURN,
                  SatUtils::GetPacketInfo (packet));
 
   return true;
@@ -471,6 +476,7 @@ SatUtLlc::SetGwAddress (Mac48Address address)
     }
 
   SatLlc::SetGwAddress (address);
+
   m_requestManager->SetGwAddress (address);
 }
 

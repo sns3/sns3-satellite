@@ -279,9 +279,13 @@ private:
    */
   double m_rtnDaConstantErrorRate;
 
-  double m_symbolRate;
+  double m_symbolRateRtn;
 
-  Ptr<SatBbFrameConf> m_bbFrameConf;
+  Ptr<SatBbFrameConf> m_bbFrameConfRtn;
+
+  double m_symbolRateFwd;
+
+  Ptr<SatBbFrameConf> m_bbFrameConfFwd;
 
   /**
    * \brief Trace callback for creation traces

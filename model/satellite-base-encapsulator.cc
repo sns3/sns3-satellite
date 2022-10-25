@@ -181,17 +181,12 @@ SatBaseEncapsulator::ReceivePdu (Ptr<Packet> p)
 {
   NS_LOG_FUNCTION (this);
 
-  if (m_flowId != 0)
-    {
-      NS_ASSERT (false);
+  NS_ASSERT (false);
 
-      /**
-       * The base encapsulator should not be used at receiving data packets
-       * at all! This functionality is implemented in the inherited classes.
-       */
-    }
-
-  m_rxCallback (p, m_encapAddress, m_decapAddress);
+  /**
+   * The base encapsulator should not be used at receiving data packets
+   * at all! This functionality is implemented in the inherited classes.
+   */
 
 }
 

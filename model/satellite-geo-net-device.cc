@@ -205,7 +205,7 @@ SatGeoNetDevice::ReceivePacketFeeder (Ptr<Packet> packet, const Address& feederA
                  m_nodeId,
                  macFeederAddress,
                  SatEnums::LL_ND,
-                 SatEnums::LD_RETURN,
+                 SatEnums::LD_FORWARD,
                  SatUtils::GetPacketInfo (packet));
 
   /*
@@ -359,7 +359,7 @@ SatGeoNetDevice::SendControlMsgToFeeder (Ptr<SatControlMessage> msg, const Addre
   if (m_returnLinkRegenerationMode != SatEnums::TRANSPARENT)
     {
       SatUplinkInfoTag satUplinkInfoTag;
-      satUplinkInfoTag.SetSinr (std::numeric_limits<double>::infinity (), rxParams->GetAdditionalInterference ());
+      satUplinkInfoTag.SetSinr (std::numeric_limits<double>::infinity (), rxParams->GetAdditionalInterference ()); // TODO set to zero additional ?
       satUplinkInfoTag.SetBeamId (rxParams->m_beamId);
       packet->AddPacketTag (satUplinkInfoTag);
     }
@@ -376,6 +376,7 @@ SatGeoNetDevice::SendControlMsgToFeeder (Ptr<SatControlMessage> msg, const Addre
           break;
         }
       case SatEnums::REGENERATION_LINK:
+      case SatEnums::REGENERATION_NETWORK:
         {
           for (SatPhy::PacketContainer_t::const_iterator it = rxParams->m_packetsInBurst.begin ();
                it != rxParams->m_packetsInBurst.end (); ++it)

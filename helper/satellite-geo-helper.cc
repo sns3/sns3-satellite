@@ -187,10 +187,13 @@ SatGeoHelper::Initialize (Ptr<SatLinkResultsFwd> lrFwd, Ptr<SatLinkResultsRtn> l
       m_rtnLinkResults = lrRcs2;
     }
 
-  m_symbolRate = m_carrierBandwidthConverter (SatEnums::RETURN_FEEDER_CH, 0, SatEnums::EFFECTIVE_BANDWIDTH);
+  m_symbolRateRtn = m_carrierBandwidthConverter (SatEnums::RETURN_FEEDER_CH, 0, SatEnums::EFFECTIVE_BANDWIDTH);
+  m_bbFrameConfRtn = CreateObject<SatBbFrameConf> (m_symbolRateRtn, SatEnums::DVB_S2); // TODO We should be able to switch to S2X ?
+  m_bbFrameConfRtn->InitializeCNoRequirements (lrFwd);
 
-  m_bbFrameConf = CreateObject<SatBbFrameConf> (m_symbolRate, SatEnums::DVB_S2); // TODO We should be able to switch to S2X ?
-  m_bbFrameConf->InitializeCNoRequirements (lrFwd);
+  m_symbolRateFwd = m_carrierBandwidthConverter (SatEnums::FORWARD_USER_CH, 0, SatEnums::EFFECTIVE_BANDWIDTH);
+  m_bbFrameConfFwd = CreateObject<SatBbFrameConf> (m_symbolRateFwd, SatEnums::DVB_S2); // TODO We should be able to switch to S2X ?
+  m_bbFrameConfFwd->InitializeCNoRequirements (lrFwd);
 }
 
 void
@@ -483,7 +486,7 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
           fMac->SetTransmitCallback (MakeCallback (&SatGeoFeederPhy::SendPduWithParams, fPhy));
 
           double carrierBandwidth = m_carrierBandwidthConverter (SatEnums::RETURN_FEEDER_CH, 0, SatEnums::EFFECTIVE_BANDWIDTH);
-          Ptr<SatScpcScheduler> scpcScheduler = CreateObject<SatScpcScheduler> (m_bbFrameConf, feederAddress, carrierBandwidth);
+          Ptr<SatScpcScheduler> scpcScheduler = CreateObject<SatScpcScheduler> (m_bbFrameConfRtn, feederAddress, carrierBandwidth);
           fMac->SetFwdScheduler (scpcScheduler);
           fMac->SetLlc (fLlc);
           if (startScheduler)
@@ -638,7 +641,7 @@ SatGeoHelper::AttachChannelsUser ( Ptr<SatGeoNetDevice> dev,
           uMac->SetTransmitCallback (MakeCallback (&SatGeoUserPhy::SendPduWithParams, uPhy));
 
           double carrierBandwidth = m_carrierBandwidthConverter (SatEnums::FORWARD_USER_CH, 0, SatEnums::EFFECTIVE_BANDWIDTH);
-          Ptr<SatFwdLinkScheduler> fwdScheduler = CreateObject<SatScpcScheduler> (m_bbFrameConf, userAddress, carrierBandwidth);
+          Ptr<SatFwdLinkScheduler> fwdScheduler = CreateObject<SatScpcScheduler> (m_bbFrameConfFwd, userAddress, carrierBandwidth);
           uMac->SetFwdScheduler (fwdScheduler);
           uMac->SetLlc (uLlc);
           uMac->StartPeriodicTransmissions ();

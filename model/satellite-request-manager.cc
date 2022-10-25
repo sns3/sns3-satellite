@@ -46,6 +46,7 @@ const uint32_t SatRequestManager::m_vbdcScalingFactors[4] = {1, 8, 64, 512};
 
 SatRequestManager::SatRequestManager ()
   : m_gwAddress (),
+  m_satAddress (),
   m_lastCno (NAN),
   m_llsConf (),
   m_evaluationInterval (Seconds (0.1)),
@@ -418,13 +419,21 @@ SatRequestManager::SetNodeInfo (Ptr<SatNodeInfo> nodeInfo)
 }
 
 void
-SatRequestManager::CnoUpdated (uint32_t beamId, Address /*utId*/, Address /*gwId*/, double cno, bool /*isSatelliteMac*/)
+SatRequestManager::CnoUpdated (uint32_t beamId, Address sourceMac, Address /*gwId*/, double cno, bool isSatelliteMac)
 {
   NS_LOG_FUNCTION (this << beamId << cno);
 
   NS_LOG_INFO ("C/No updated to request manager: " << cno);
 
-  m_lastCno = cno;
+  if (isSatelliteMac)
+    {
+      m_lastSatelliteCno = cno;
+      m_satAddress = Mac48Address::ConvertFrom (sourceMac);
+    }
+  else
+    {
+      m_lastCno = cno;
+    }
 }
 
 
@@ -835,6 +844,18 @@ SatRequestManager::SendCnoReport ()
           m_ctrlCallback (cnoReport, m_gwAddress);
 
           m_lastCno = NAN;
+        }
+
+      if (ctrlMsgTxPossible && m_lastSatelliteCno != NAN)
+        {
+          NS_LOG_INFO ("Send C/No report to SAT user: " << m_satAddress);
+          Ptr<SatCnoReportMessage> cnoReport = CreateObject<SatCnoReportMessage> ();
+
+          cnoReport->SetCnoEstimate (m_lastSatelliteCno);
+          m_ctrlCallback (cnoReport, m_satAddress);
+          //NS_FATAL_ERROR ("STOP");
+
+          m_lastSatelliteCno = NAN;
         }
     }
 

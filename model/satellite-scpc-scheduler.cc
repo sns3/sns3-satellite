@@ -188,7 +188,6 @@ SatScpcScheduler::ScheduleBbFrames ()
   for ( std::vector< Ptr<SatSchedulingObject> >::const_iterator it = so.begin ();
         ( it != so.end () ) && ( m_bbFrameContainer->GetTotalDuration () < m_schedulingStopThresholdTime ); it++ )
     {
-
       uint32_t currentObBytes = (*it)->GetBufferedBytes ();
       uint32_t currentObMinReqBytes = (*it)->GetMinTxOpportunityInBytes ();
       uint8_t flowId = (*it)->GetFlowId ();
@@ -241,7 +240,7 @@ SatScpcScheduler::GetSchedulingObjects (std::vector< Ptr<SatSchedulingObject> > 
       // Get scheduling objects from LLC
       m_schedContextCallback (output);
 
-      SortSchedulingObjects (output); // TODO how ?
+      SortSchedulingObjects (output);
     }
 }
 
