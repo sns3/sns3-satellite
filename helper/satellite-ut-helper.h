@@ -146,6 +146,7 @@ public:
    * \param rCh return channel
    * \param gwNd satellite netdevice of the GW
    * \param ncc NCC (Network Control Center)
+   * \param satUserAddress MAC address of satellite user link
    * \param forwardLinkRegenerationMode The regeneration mode on forward link
    * \param returnLinkRegenerationMode The regeneration mode on return link
    * \return Container of installed net devices
@@ -160,6 +161,7 @@ public:
   NetDeviceContainer InstallDvb (NodeContainer c, uint32_t beamId,
                                  Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
                                  Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
+                                 Address satUserAddress,
                                  SatPhy::ChannelPairGetterCallback cbChannel,
                                  SatMac::RoutingUpdateCallback cbRouting,
                                  SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
@@ -171,6 +173,7 @@ public:
    * \param rCh return channel
    * \param gwNd satellite netdevice of the GW
    * \param ncc NCC (Network Control Center)
+   * \param satUserAddress MAC address of satellite user link
    * \param forwardLinkRegenerationMode The regeneration mode on forward link
    * \param returnLinkRegenerationMode The regeneration mode on return link
    * \return Net device installed to node
@@ -180,6 +183,7 @@ public:
   Ptr<NetDevice> InstallDvb (Ptr<Node> n, uint32_t beamId,
                              Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
                              Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
+                             Address satUserAddress,
                              SatPhy::ChannelPairGetterCallback cbChannel,
                              SatMac::RoutingUpdateCallback cbRouting,
                              SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
@@ -192,6 +196,7 @@ public:
    * \param rCh return channel
    * \param gwNd satellite netdevice of the GW
    * \param ncc NCC (Network Control Center)
+   * \param satUserAddress MAC address of satellite user link
    * \param forwardLinkRegenerationMode The regeneration mode on forward link
    * \param returnLinkRegenerationMode The regeneration mode on return link
    * \return Container of installed net devices
@@ -206,6 +211,7 @@ public:
   NetDeviceContainer InstallLora (NodeContainer c, uint32_t beamId,
                                   Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
                                   Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
+                                  Address satUserAddress,
                                   SatPhy::ChannelPairGetterCallback cbChannel,
                                   SatMac::RoutingUpdateCallback cbRouting,
                                   SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
@@ -217,6 +223,7 @@ public:
    * \param rCh return channel
    * \param gwNd satellite netdevice of the GW
    * \param ncc NCC (Network Control Center)
+   * \param satUserAddress MAC address of satellite user link
    * \param forwardLinkRegenerationMode The regeneration mode on forward link
    * \param returnLinkRegenerationMode The regeneration mode on return link
    * \return Net device installed to node
@@ -226,6 +233,7 @@ public:
   Ptr<NetDevice> InstallLora (Ptr<Node> n, uint32_t beamId,
                               Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
                               Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
+                              Address satUserAddress,
                               SatPhy::ChannelPairGetterCallback cbChannel,
                               SatMac::RoutingUpdateCallback cbRouting,
                               SatEnums::RegenerationMode_t forwardLinkRegenerationMode,

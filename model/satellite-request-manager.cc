@@ -853,7 +853,6 @@ SatRequestManager::SendCnoReport ()
 
           cnoReport->SetCnoEstimate (m_lastSatelliteCno);
           m_ctrlCallback (cnoReport, m_satAddress);
-          //NS_FATAL_ERROR ("STOP");
 
           m_lastSatelliteCno = NAN;
         }

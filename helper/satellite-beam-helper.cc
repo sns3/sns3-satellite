@@ -688,6 +688,13 @@ SatBeamHelper::InstallUser (NodeContainer ut,
       userLink.second->SetAttribute ("RxPowerCalculationMode", EnumValue (SatEnums::RX_PWR_INPUT_TRACE));
     }
 
+  Address satUserAddress = Address ();
+  if (m_returnLinkRegenerationMode == SatEnums::REGENERATION_LINK || m_returnLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
+    {
+      Ptr<SatGeoNetDevice> geoNetDevice = DynamicCast<SatGeoNetDevice> (m_geoNode->GetDevice (0));
+      satUserAddress = geoNetDevice->GetUserMac (beamId)->GetAddress ();
+    }
+
   // install UTs
   NetDeviceContainer utNd;
   switch(m_standard)
@@ -699,6 +706,7 @@ SatBeamHelper::InstallUser (NodeContainer ut,
                                      userLink.second,
                                      DynamicCast<SatNetDevice> (gwNd),
                                      m_ncc,
+                                     satUserAddress,
                                      MakeCallback (&SatChannelPair::GetChannelPair, m_ulChannels),
                                      routingCallback,
                                      m_forwardLinkRegenerationMode,
@@ -711,6 +719,7 @@ SatBeamHelper::InstallUser (NodeContainer ut,
                                       userLink.second,
                                       DynamicCast<SatNetDevice> (gwNd),
                                       m_ncc,
+                                      satUserAddress,
                                       MakeCallback (&SatChannelPair::GetChannelPair, m_ulChannels),
                                       routingCallback,
                                       m_forwardLinkRegenerationMode,
@@ -723,8 +732,6 @@ SatBeamHelper::InstallUser (NodeContainer ut,
   // Add satellite addresses UT MAC layers.
   if (m_returnLinkRegenerationMode == SatEnums::REGENERATION_LINK || m_returnLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
     {
-      Ptr<SatGeoNetDevice> geoNetDevice = DynamicCast<SatGeoNetDevice> (m_geoNode->GetDevice (0));
-      Address satUserAddress = geoNetDevice->GetUserMac (beamId)->GetAddress ();
       for (NetDeviceContainer::Iterator i = utNd.Begin (); i != utNd.End (); i++)
         {
           DynamicCast<SatUtMac> (DynamicCast<SatNetDevice> (*i)->GetMac ())->SetSatelliteAddress (satUserAddress);
@@ -734,11 +741,9 @@ SatBeamHelper::InstallUser (NodeContainer ut,
   // Add satellite addresses UT LLC layers.
   if (m_returnLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
     {
-      Ptr<SatGeoNetDevice> geoNetDevice = DynamicCast<SatGeoNetDevice> (m_geoNode->GetDevice (0));
-      Mac48Address satUserAddress = Mac48Address::ConvertFrom (geoNetDevice->GetUserMac (beamId)->GetAddress ());
       for (NetDeviceContainer::Iterator i = utNd.Begin (); i != utNd.End (); i++)
         {
-          DynamicCast<SatUtLlc> (DynamicCast<SatNetDevice> (*i)->GetLlc ())->SetSatelliteAddress (satUserAddress);
+          DynamicCast<SatUtLlc> (DynamicCast<SatNetDevice> (*i)->GetLlc ())->SetSatelliteAddress (Mac48Address::ConvertFrom (satUserAddress));
         }
     }
 

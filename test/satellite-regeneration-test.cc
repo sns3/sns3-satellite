@@ -123,6 +123,8 @@ SatRegenerationTest1::GeoUserPhyTraceDelayCb (const Time & time, const Address &
 void
 SatRegenerationTest1::DoRun (void)
 {
+  Config::Reset ();
+
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
   Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-regeneration", "test1", true);
@@ -379,6 +381,8 @@ SatRegenerationTest2::PhyTraceCb (Time time,
 void
 SatRegenerationTest2::DoRun (void)
 {
+  Config::Reset ();
+
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
   Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-regeneration", "test2", true);
@@ -611,6 +615,8 @@ SatRegenerationTest3::GeoPhyTraceCb (Time time,
 void
 SatRegenerationTest3::DoRun (void)
 {
+  Config::Reset ();
+
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
   Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-regeneration", "test3", true);
@@ -815,6 +821,8 @@ SatRegenerationTest4::~SatRegenerationTest4 ()
 void
 SatRegenerationTest4::DoRun (void)
 {
+  Config::Reset ();
+
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
   Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-regeneration", "test4", true);
@@ -1010,6 +1018,8 @@ SatRegenerationTest5::~SatRegenerationTest5 ()
 void
 SatRegenerationTest5::DoRun (void)
 {
+  Config::Reset ();
+
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
   Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-regeneration", "test5", true);
@@ -1193,6 +1203,8 @@ SatRegenerationTest6::~SatRegenerationTest6 ()
 void
 SatRegenerationTest6::DoRun (void)
 {
+  Config::Reset ();
+
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
   Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-regeneration", "test6", true);
@@ -1373,6 +1385,8 @@ SatRegenerationTest7::~SatRegenerationTest7 ()
 void
 SatRegenerationTest7::DoRun (void)
 {
+  Config::Reset ();
+
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
   Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-regeneration", "test7", true);
@@ -1431,10 +1445,10 @@ SatRegenerationTest7::DoRun (void)
 
   Simulator::Destroy ();
 
-  double averageGwModcodsBeg = GetAverage (m_gwModcods, 0, 5);
-  double averageUtModcodsBeg = GetAverage (m_utModcods, 0, 5);
-  double averageFeederModcodsBeg = GetAverage (m_feederModcods, 0, 5);
-  double averageUserModcodsBeg = GetAverage (m_userModcods, 0, 5);
+  double averageGwModcodsBeg = GetAverage (m_gwModcods, 0, 3);
+  double averageUtModcodsBeg = GetAverage (m_utModcods, 0, 3);
+  double averageFeederModcodsBeg = GetAverage (m_feederModcods, 0, 3);
+  double averageUserModcodsBeg = GetAverage (m_userModcods, 0, 3);
   double averageGwModcodsEnd = GetMostFrequent (m_gwModcods, m_gwModcods.size()-200, m_gwModcods.size());
   double averageUtModcodsEnd = GetMostFrequent (m_utModcods, m_utModcods.size()-200, m_utModcods.size());
   double averageFeederModcodsEnd = GetMostFrequent (m_feederModcods, m_feederModcods.size()-200, m_feederModcods.size());
@@ -1471,7 +1485,8 @@ SatRegenerationTest7::DoRun (void)
  *  - For regeneration network: phy, MAC and network
  *
  * 10 packets are sent from/to each UT per second, during 14s.
- * This means at least 700 packets received for each probe (not counting control packets)
+ * This means at least 700 packets received for each probe (not counting control packets).
+ * When including control packets, we should have at least 1800 packets
  */
 class SatRegenerationTest8 : public TestCase
 {
@@ -1588,6 +1603,8 @@ SatRegenerationTest8::~SatRegenerationTest8 ()
 void
 SatRegenerationTest8::DoRun (void)
 {
+  Config::Reset ();
+
   // Set simulation output details
   Singleton<SatEnvVariables>::Get ()->DoInitialize ();
   Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-regeneration", "test8", true);
@@ -1660,23 +1677,23 @@ SatRegenerationTest8::DoRun (void)
       case SatEnums::TRANSPARENT:
       case SatEnums::REGENERATION_PHY:
         {
-          NS_TEST_ASSERT_MSG_GT (m_rxFeederPhy, 700, "Packets should be received on feeder phy");
+          NS_TEST_ASSERT_MSG_GT (m_rxFeederPhy, 1600, "Packets should be received on feeder phy");
           NS_TEST_ASSERT_MSG_EQ (m_rxFeederMac, 0, "Packets should not be received on feeder MAC");
           NS_TEST_ASSERT_MSG_EQ (m_rxFeederNet, 0, "Packets should not be received on feeder network");
           break;
         }
       case SatEnums::REGENERATION_LINK:
         {
-          NS_TEST_ASSERT_MSG_GT (m_rxFeederPhy, 700, "Packets should be received on feeder phy");
-          NS_TEST_ASSERT_MSG_GT (m_rxFeederMac, 700, "Packets should be received on feeder MAC");
+          NS_TEST_ASSERT_MSG_GT (m_rxFeederPhy, 1600, "Packets should be received on feeder phy");
+          NS_TEST_ASSERT_MSG_GT (m_rxFeederMac, 1600, "Packets should be received on feeder MAC");
           NS_TEST_ASSERT_MSG_EQ (m_rxFeederNet, 0, "Packets should not be received on feeder network");
           break;
         }
       case SatEnums::REGENERATION_NETWORK:
         {
-          NS_TEST_ASSERT_MSG_GT (m_rxFeederPhy, 700, "Packets should be received on feeder phy");
-          NS_TEST_ASSERT_MSG_GT (m_rxFeederMac, 700, "Packets should be received on feeder MAC");
-          NS_TEST_ASSERT_MSG_GT (m_rxFeederNet, 700, "Packets should be received on feeder network");
+          NS_TEST_ASSERT_MSG_GT (m_rxFeederPhy, 1600, "Packets should be received on feeder phy");
+          NS_TEST_ASSERT_MSG_GT (m_rxFeederMac, 1600, "Packets should be received on feeder MAC");
+          NS_TEST_ASSERT_MSG_GT (m_rxFeederNet, 1600, "Packets should be received on feeder network");
           break;
         }
     }
@@ -1686,23 +1703,23 @@ SatRegenerationTest8::DoRun (void)
       case SatEnums::TRANSPARENT:
       case SatEnums::REGENERATION_PHY:
         {
-          NS_TEST_ASSERT_MSG_GT (m_rxUserPhy, 700, "Packets should be received on user phy");
+          NS_TEST_ASSERT_MSG_GT (m_rxUserPhy, 1600, "Packets should be received on user phy");
           NS_TEST_ASSERT_MSG_EQ (m_rxUserMac, 0, "Packets should not be received on user MAC");
           NS_TEST_ASSERT_MSG_EQ (m_rxUserNet, 0, "Packets should not be received on user network");
           break;
         }
       case SatEnums::REGENERATION_LINK:
         {
-          NS_TEST_ASSERT_MSG_GT (m_rxUserPhy, 700, "Packets should be received on user phy");
-          NS_TEST_ASSERT_MSG_GT (m_rxUserMac, 700, "Packets should be received on user MAC");
+          NS_TEST_ASSERT_MSG_GT (m_rxUserPhy, 1600, "Packets should be received on user phy");
+          NS_TEST_ASSERT_MSG_GT (m_rxUserMac, 1600, "Packets should be received on user MAC");
           NS_TEST_ASSERT_MSG_EQ (m_rxUserNet, 0, "Packets should not be received on user network");
           break;
         }
       case SatEnums::REGENERATION_NETWORK:
         {
-          NS_TEST_ASSERT_MSG_GT (m_rxUserPhy, 700, "Packets should be received on user phy");
-          NS_TEST_ASSERT_MSG_GT (m_rxUserMac, 700, "Packets should be received on user MAC");
-          NS_TEST_ASSERT_MSG_GT (m_rxUserNet, 700, "Packets should be received on user network");
+          NS_TEST_ASSERT_MSG_GT (m_rxUserPhy, 1600, "Packets should be received on user phy");
+          NS_TEST_ASSERT_MSG_GT (m_rxUserMac, 1600, "Packets should be received on user MAC");
+          NS_TEST_ASSERT_MSG_GT (m_rxUserNet, 1600, "Packets should be received on user network");
           break;
         }
     }

@@ -29,6 +29,7 @@
 #include "satellite-encap-pdu-status-tag.h"
 #include "satellite-rle-header.h"
 #include "satellite-queue.h"
+#include "satellite-uplink-info-tag.h"
 
 
 NS_LOG_COMPONENT_DEFINE ("SatReturnLinkEncapsulator");
@@ -392,6 +393,26 @@ SatReturnLinkEncapsulator::ReceivePdu (Ptr<Packet> p)
   else if (mTag.GetDestAddress () != m_decapAddress)
     {
       NS_FATAL_ERROR ("Packet was not intended for this receiver!");
+    }
+
+  SatUplinkInfoTag satUplinkInfoTag;
+  p->PeekPacketTag (satUplinkInfoTag);
+  if (satUplinkInfoTag.IsControl ())
+    {
+      Reset ();
+      m_rxCallback (p, m_encapAddress, m_decapAddress);
+      return;
+    }
+
+  SatControlMsgTag tag;
+  if (p->PeekPacketTag (tag))
+    {
+      if (tag.GetMsgType () == SatControlMsgTag::SAT_LOGON_CTRL_MSG)
+        {
+          Reset ();
+          m_rxCallback (p, m_encapAddress, m_decapAddress);
+          return;
+        }
     }
 
   // Do decapsulation and defragmentation
