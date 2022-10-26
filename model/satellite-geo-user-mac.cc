@@ -144,7 +144,7 @@ SatGeoUserMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParamete
                      m_nodeInfo->GetNodeId (),
                      m_nodeInfo->GetMacAddress (),
                      SatEnums::LL_MAC,
-                     SatEnums::LD_FORWARD,
+                     SatEnums::LD_RETURN,
                      SatUtils::GetPacketInfo (packets));
 
       RxTraces (packets);

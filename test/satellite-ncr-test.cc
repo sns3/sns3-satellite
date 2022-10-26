@@ -623,8 +623,6 @@ SatNcrTest3::ChangeTxStatus (bool enable)
     }
 }
 
-// TODO test handovers
-
 // The TestSuite class names the TestSuite as sat-ncr-test, identifies what type of TestSuite (SYSTEM),
 // and enables the TestCases to be run.  Typically, only the constructor for
 // this class must be defined
@@ -643,6 +641,7 @@ SatNcrTestSuite::SatNcrTestSuite ()
   AddTestCase (new SatNcrTest3 (SatEnums::TRANSPARENT), TestCase::QUICK);
   AddTestCase (new SatNcrTest3 (SatEnums::REGENERATION_PHY), TestCase::QUICK);
   AddTestCase (new SatNcrTest3 (SatEnums::REGENERATION_LINK), TestCase::QUICK);
+  AddTestCase (new SatNcrTest3 (SatEnums::REGENERATION_NETWORK), TestCase::QUICK);
 }
 
 // Allocate an instance of this TestSuite

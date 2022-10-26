@@ -1096,6 +1096,618 @@ SatRegenerationTest5::DoRun (void)
   NS_TEST_ASSERT_MSG_NE (averageUserModcodsEnd, averageGwModcodsEnd, "Not same MODCOD on both RTN links");
 }
 
+/**
+ * \ingroup satellite
+ * \brief 'Regeneration, test 6' test case implementation.
+ *
+ * This case tests network regeneration on satellite. It is based on a LARGER scenario.
+ *
+ *  Expected result:
+ *    Same number of bytes sent and received on FWD
+ *    Same number of bytes sent and received on RTN
+ */
+class SatRegenerationTest6 : public TestCase
+{
+public:
+  SatRegenerationTest6 ();
+  virtual ~SatRegenerationTest6 ();
+
+private:
+  virtual void DoRun (void);
+  void GeoDevGwTxTraceCb (Ptr<const Packet> packet);
+  void GeoDevUtTxTraceCb (Ptr<const Packet> packet);
+  void GeoDevGwRxTraceCb (Ptr<const Packet> packet, const Address &);
+  void GeoDevUtRxTraceCb (Ptr<const Packet> packet, const Address &);
+  bool HasSinkInstalled (Ptr<Node> node, uint16_t port);
+
+  Ptr<SatHelper> m_helper;
+
+  uint32_t m_totalSentGw;
+  uint32_t m_totalSentUt;
+  uint32_t m_totalReceivedGw;
+  uint32_t m_totalReceivedUt;
+};
+
+void
+SatRegenerationTest6::GeoDevGwTxTraceCb (Ptr<const Packet> packet)
+{
+  m_totalSentGw += packet->GetSize ();
+}
+
+void
+SatRegenerationTest6::GeoDevUtTxTraceCb (Ptr<const Packet> packet)
+{
+  m_totalSentUt += packet->GetSize ();
+}
+
+void
+SatRegenerationTest6::GeoDevGwRxTraceCb (Ptr<const Packet> packet, const Address &)
+{
+  m_totalReceivedGw += packet->GetSize ();
+}
+
+void
+SatRegenerationTest6::GeoDevUtRxTraceCb (Ptr<const Packet> packet, const Address &address)
+{
+  m_totalReceivedUt += packet->GetSize ();
+}
+
+bool
+SatRegenerationTest6::HasSinkInstalled (Ptr<Node> node, uint16_t port)
+{
+  for (uint32_t i = 0; i < node->GetNApplications (); i++)
+    {
+      Ptr<PacketSink> sink = DynamicCast<PacketSink> (node->GetApplication (i));
+      if (sink != NULL)
+        {
+          AddressValue av;
+          sink->GetAttribute ("Local", av);
+          if (InetSocketAddress::ConvertFrom (av.Get ()).GetPort () == port)
+            {
+              return true;
+            }
+        }
+    }
+  return false;
+}
+
+// Add some help text to this case to describe what it is intended to test
+SatRegenerationTest6::SatRegenerationTest6 ()
+  : TestCase ("This case tests network regeneration on satellite. It is based on a LARGER scenario.")
+{
+  m_totalSentGw = 0;
+  m_totalSentUt = 0;
+  m_totalReceivedGw = 0;
+  m_totalReceivedUt = 0;
+}
+
+// This destructor does nothing but we include it as a reminder that
+// the test case should clean up after itself
+SatRegenerationTest6::~SatRegenerationTest6 ()
+{
+}
+
+//
+// SatRegenerationTest6 TestCase implementation
+//
+void
+SatRegenerationTest6::DoRun (void)
+{
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-regeneration", "test6", true);
+
+  /// Set regeneration mode
+  Config::SetDefault ("ns3::SatConf::ForwardLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_NETWORK));
+  Config::SetDefault ("ns3::SatConf::ReturnLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_NETWORK));
+
+  Config::SetDefault ("ns3::SatGeoFeederPhy::QueueSize", UintegerValue (100000));
+
+  // Enable SatMac traces
+  Config::SetDefault ("ns3::SatPhy::EnableStatisticsTags", BooleanValue (true));
+  Config::SetDefault ("ns3::SatNetDevice::EnableStatisticsTags", BooleanValue (true));
+
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
+  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("test-sat-regeneration");
+  simulationHelper->SetSimulationTime (Seconds (20));
+  simulationHelper->CreateSatScenario (SatHelper::LARGER);
+
+  m_helper = simulationHelper->GetSatelliteHelper ();
+
+  NodeContainer gws = m_helper->GwNodes ();
+  NodeContainer uts = m_helper->UtNodes ();
+
+  uint32_t i;
+  for (i = 0; i < gws.GetN (); i++)
+    {
+      gws.Get (i)->GetDevice (1)->TraceConnectWithoutContext ("Tx", MakeCallback (&SatRegenerationTest6::GeoDevGwTxTraceCb, this));
+      gws.Get (i)->GetDevice (1)->TraceConnectWithoutContext ("Rx", MakeCallback (&SatRegenerationTest6::GeoDevGwRxTraceCb, this));
+    }
+  for (i = 0; i < uts.GetN (); i++)
+    {
+      uts.Get (i)->GetDevice (2)->TraceConnectWithoutContext ("Tx", MakeCallback (&SatRegenerationTest6::GeoDevUtTxTraceCb, this));
+      uts.Get (i)->GetDevice (2)->TraceConnectWithoutContext ("Rx", MakeCallback (&SatRegenerationTest6::GeoDevUtRxTraceCb, this));
+    }
+
+  Time startTime = Seconds (1);
+  Time stopTime = Seconds (15);
+  Time startDelay = MilliSeconds (10);
+  Time interval = MilliSeconds (1000);
+  uint32_t packetSize = 512;
+
+  Config::SetDefault ("ns3::CbrApplication::Interval", TimeValue (interval));
+  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
+
+  simulationHelper->InstallTrafficModel (
+    SimulationHelper::CBR,
+    SimulationHelper::UDP,
+    SimulationHelper::RTN_LINK,
+    Seconds (1), Seconds (10), Seconds (0.01));
+
+  simulationHelper->InstallTrafficModel (
+    SimulationHelper::CBR,
+    SimulationHelper::UDP,
+    SimulationHelper::FWD_LINK,
+    Seconds (1), Seconds (10), Seconds (0.01));
+
+  simulationHelper->RunSimulation ();
+
+  Simulator::Destroy ();
+
+  NS_TEST_ASSERT_MSG_NE (m_totalReceivedGw, 0, "Packets are received on GW");
+  NS_TEST_ASSERT_MSG_NE (m_totalReceivedUt, 0, "Packets are received on UT");
+  NS_TEST_ASSERT_MSG_EQ (m_totalSentGw*5, m_totalReceivedUt*4, "Same number of packets sent and received on FWD link (taking into account 2 UTs on beam 3)");
+  NS_TEST_ASSERT_MSG_EQ (m_totalSentUt, m_totalReceivedGw, "Same number of packets sent and received on RTN link");
+}
+
+/**
+ * \ingroup satellite
+ * \brief 'Regeneration, test 7' test case implementation.
+ *
+ * This case tests ACM on all links.
+ * It is based on a SIMPLE scenario, with network regeneration on FWD and RTN.
+ *
+ *  Expected result:
+ *    Most robust MODCOD used a start of simulation
+ *    Efficient MODCOD used on all links after a few seconds
+ *    Same MODCOD on FWD feeder and FWD user
+ *    Not same MODCOD on RTN feeder and RTN user
+ */
+class SatRegenerationTest7 : public TestCase
+{
+public:
+  SatRegenerationTest7 ();
+  virtual ~SatRegenerationTest7 ();
+
+private:
+  virtual void DoRun (void);
+  void GeoPhyGwModcodTraceCb (uint32_t modcod, const Address &address);
+  void GeoPhyUtModcodTraceCb (uint32_t modcod, const Address &address);
+  void GeoPhyFeederModcodTraceCb (uint32_t modcod, const Address &address);
+  void GeoPhyUserModcodTraceCb (uint32_t modcod, const Address &address);
+
+  double GetAverage (std::vector<uint32_t> list, uint32_t beg, uint32_t end);
+  double GetMostFrequent (std::vector<uint32_t> list, uint32_t beg, uint32_t end);
+
+  Ptr<SatHelper> m_helper;
+
+  std::vector<uint32_t> m_gwModcods;
+  std::vector<uint32_t> m_utModcods;
+  std::vector<uint32_t> m_feederModcods;
+  std::vector<uint32_t> m_userModcods;
+};
+
+void
+SatRegenerationTest7::GeoPhyGwModcodTraceCb (uint32_t modcod, const Address &address)
+{
+  m_gwModcods.push_back (modcod);
+}
+
+void
+SatRegenerationTest7::GeoPhyUtModcodTraceCb (uint32_t modcod, const Address &address)
+{
+  m_utModcods.push_back (modcod);
+}
+
+void
+SatRegenerationTest7::GeoPhyFeederModcodTraceCb (uint32_t modcod, const Address &address)
+{
+  m_feederModcods.push_back (modcod);
+}
+
+void
+SatRegenerationTest7::GeoPhyUserModcodTraceCb (uint32_t modcod, const Address &address)
+{
+  m_userModcods.push_back (modcod);
+}
+
+double
+SatRegenerationTest7::GetAverage (std::vector<uint32_t> list, uint32_t beg, uint32_t end)
+{
+  uint32_t sum = 0;
+  for (uint32_t i = beg; i < end; i++)
+    {
+      sum += list[i];
+    }
+  return 1.0*sum/(end-beg);
+}
+
+double
+SatRegenerationTest7::GetMostFrequent (std::vector<uint32_t> list, uint32_t beg, uint32_t end)
+{
+  std::map<uint32_t, uint32_t> frequencies;
+  for (uint32_t i = beg; i < end; i++)
+    {
+      frequencies[list[i]]++;
+    }
+
+  uint32_t max_count = 0;
+  uint32_t index = -1;
+  for (std::pair<const uint32_t, uint32_t>& i : frequencies) {
+      if (max_count < i.second) {
+          index = i.first;
+          max_count = i.second;
+      }
+  }
+
+  return index;
+}
+
+// Add some help text to this case to describe what it is intended to test
+SatRegenerationTest7::SatRegenerationTest7 ()
+  : TestCase ("This case tests ACM on all links. It is based on a SIMPLE scenario.")
+{
+}
+
+// This destructor does nothing but we include it as a reminder that
+// the test case should clean up after itself
+SatRegenerationTest7::~SatRegenerationTest7 ()
+{
+}
+
+//
+// SatRegenerationTest7 TestCase implementation
+//
+void
+SatRegenerationTest7::DoRun (void)
+{
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-regeneration", "test7", true);
+
+  /// Set regeneration mode
+  Config::SetDefault ("ns3::SatConf::ForwardLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_NETWORK));
+  Config::SetDefault ("ns3::SatConf::ReturnLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_NETWORK));
+
+  Config::SetDefault ("ns3::SatGeoFeederPhy::QueueSize", UintegerValue (100000));
+
+  /// Enable ACM
+  Config::SetDefault ("ns3::SatBbFrameConf::AcmEnabled", BooleanValue (true));
+
+  // Enable SatMac traces
+  Config::SetDefault ("ns3::SatPhy::EnableStatisticsTags", BooleanValue (true));
+  Config::SetDefault ("ns3::SatNetDevice::EnableStatisticsTags", BooleanValue (true));
+
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
+  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("test-sat-regeneration");
+  simulationHelper->SetSimulationTime (Seconds (20));
+  simulationHelper->CreateSatScenario (SatHelper::SIMPLE);
+
+  m_helper = simulationHelper->GetSatelliteHelper ();
+
+  Ptr<Node> gwNode = m_helper->GwNodes ().Get (0);
+  Ptr<Node> utNode = m_helper->UtNodes ().Get (0);
+  Ptr<Node> geoNode = m_helper->GeoSatNode ();
+  Ptr<SatGeoFeederPhy> satGeoFeederPhy = DynamicCast<SatGeoFeederPhy> (DynamicCast<SatGeoNetDevice> (geoNode->GetDevice (0))->GetFeederPhy (8));
+  Ptr<SatGeoUserPhy> satGeoUserPhy = DynamicCast<SatGeoUserPhy> (DynamicCast<SatGeoNetDevice> (geoNode->GetDevice (0))->GetUserPhy (8));
+  Ptr<SatPhy> satGwPhy = DynamicCast<SatPhy> (DynamicCast<SatNetDevice> (gwNode->GetDevice (1))->GetPhy ());
+  Ptr<SatPhy> satUtPhy = DynamicCast<SatPhy> (DynamicCast<SatNetDevice> (utNode->GetDevice (2))->GetPhy ());
+
+  satGwPhy->TraceConnectWithoutContext ("RxLinkModcod", MakeCallback (&SatRegenerationTest7::GeoPhyGwModcodTraceCb, this));
+  satUtPhy->TraceConnectWithoutContext ("RxLinkModcod", MakeCallback (&SatRegenerationTest7::GeoPhyUtModcodTraceCb, this));
+  satGeoFeederPhy->TraceConnectWithoutContext ("RxLinkModcod", MakeCallback (&SatRegenerationTest7::GeoPhyFeederModcodTraceCb, this));
+  satGeoUserPhy->TraceConnectWithoutContext ("RxLinkModcod", MakeCallback (&SatRegenerationTest7::GeoPhyUserModcodTraceCb, this));
+
+  Config::SetDefault ("ns3::CbrApplication::Interval", TimeValue (MilliSeconds (20)));
+  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (512));
+
+  simulationHelper->InstallTrafficModel (
+    SimulationHelper::CBR,
+    SimulationHelper::UDP,
+    SimulationHelper::RTN_LINK,
+    Seconds (1), Seconds (10), Seconds (0.01));
+
+  simulationHelper->InstallTrafficModel (
+    SimulationHelper::CBR,
+    SimulationHelper::UDP,
+    SimulationHelper::FWD_LINK,
+    Seconds (1), Seconds (10), Seconds (0.01));
+
+  simulationHelper->RunSimulation ();
+
+  Simulator::Destroy ();
+
+  double averageGwModcodsBeg = GetAverage (m_gwModcods, 0, 5);
+  double averageUtModcodsBeg = GetAverage (m_utModcods, 0, 5);
+  double averageFeederModcodsBeg = GetAverage (m_feederModcods, 0, 5);
+  double averageUserModcodsBeg = GetAverage (m_userModcods, 0, 5);
+  double averageGwModcodsEnd = GetMostFrequent (m_gwModcods, m_gwModcods.size()-200, m_gwModcods.size());
+  double averageUtModcodsEnd = GetMostFrequent (m_utModcods, m_utModcods.size()-200, m_utModcods.size());
+  double averageFeederModcodsEnd = GetMostFrequent (m_feederModcods, m_feederModcods.size()-200, m_feederModcods.size());
+  double averageUserModcodsEnd = GetMostFrequent (m_userModcods, m_userModcods.size()-200, m_userModcods.size());
+
+  NS_TEST_ASSERT_MSG_EQ (averageFeederModcodsBeg, 2, "Most robust MODCOD on FWD feeder link at startup");
+  NS_TEST_ASSERT_MSG_EQ (averageUtModcodsBeg, 2, "Most robust MODCOD on FWD user link at startup");
+  NS_TEST_ASSERT_MSG_EQ (averageGwModcodsBeg, 2, "Most robust MODCOD on RTN feeder link at startup");
+  NS_TEST_ASSERT_MSG_EQ (averageUserModcodsBeg, 1, "Most robust MODCOD on RTN user link at startup");
+
+  NS_TEST_ASSERT_MSG_LT (averageFeederModcodsEnd, 28, "Max MODCOD on FWD feeder link is 27");
+  NS_TEST_ASSERT_MSG_LT (averageUtModcodsEnd, 28, "Max MODCOD on FWD user link is 27");
+  NS_TEST_ASSERT_MSG_LT (averageGwModcodsEnd, 28, "Max MODCOD on RTN feeder link is 27");
+  NS_TEST_ASSERT_MSG_LT (averageUserModcodsEnd, 24, "Max MODCOD on RTN user link is 23");
+
+  NS_TEST_ASSERT_MSG_GT (averageFeederModcodsEnd, 2, "Most robust MODCOD on FWD feeder link not used after a few seconds");
+  NS_TEST_ASSERT_MSG_GT (averageUtModcodsEnd, 2, "Most robust MODCOD on FWD user link not used after a few seconds");
+  NS_TEST_ASSERT_MSG_GT (averageGwModcodsEnd, 2, "Most robust MODCOD on RTN feeder link not used after a few seconds");
+  NS_TEST_ASSERT_MSG_GT (averageUserModcodsEnd, 1, "Most robust MODCOD on RTN user link not used after a few seconds");
+
+  NS_TEST_ASSERT_MSG_EQ (averageFeederModcodsEnd, averageUtModcodsEnd, "Same MODCOD on both FWD links");
+  NS_TEST_ASSERT_MSG_NE (averageUserModcodsEnd, averageGwModcodsEnd, "Not same MODCOD on both RTN links");
+}
+
+/**
+ * \ingroup satellite
+ * \brief 'Regeneration, test 8' test case implementation.
+ *
+ * This test is launched several time to test every regeneration combination.
+ * We measure if packets are seen on sat traces, and should have (for RX):
+ *  - For transparent: only phy traces
+ *  - For regeneration phy: only phy traces
+ *  - For regeneration link: phy and MAC
+ *  - For regeneration network: phy, MAC and network
+ *
+ * 10 packets are sent from/to each UT per second, during 14s.
+ * This means at least 700 packets received for each probe (not counting control packets)
+ */
+class SatRegenerationTest8 : public TestCase
+{
+public:
+  SatRegenerationTest8 (SatEnums::RegenerationMode_t forwardLinkRegenerationMode, SatEnums::RegenerationMode_t returnLinkRegenerationMode);
+  virtual ~SatRegenerationTest8 ();
+
+private:
+  virtual void DoRun (void);
+
+  void AddTraceEntry (Time now,
+                      SatEnums::SatPacketEvent_t packetEvent,
+                      SatEnums::SatNodeType_t nodeType,
+                      uint32_t nodeId,
+                      Mac48Address macAddress,
+                      SatEnums::SatLogLevel_t logLevel,
+                      SatEnums::SatLinkDir_t linkDir,
+                      std::string packetInfo);
+
+  Ptr<SatHelper> m_helper;
+
+  SatEnums::RegenerationMode_t m_forwardLinkRegenerationMode;
+  SatEnums::RegenerationMode_t m_returnLinkRegenerationMode;
+
+  uint32_t m_rxFeederPhy;
+  uint32_t m_rxFeederMac;
+  uint32_t m_rxFeederNet;
+  uint32_t m_rxUserPhy;
+  uint32_t m_rxUserMac;
+  uint32_t m_rxUserNet;
+};
+
+void
+SatRegenerationTest8::AddTraceEntry (Time now,
+                                     SatEnums::SatPacketEvent_t packetEvent,
+                                     SatEnums::SatNodeType_t nodeType,
+                                     uint32_t nodeId,
+                                     Mac48Address macAddress,
+                                     SatEnums::SatLogLevel_t logLevel,
+                                     SatEnums::SatLinkDir_t linkDir,
+                                     std::string packetInfo)
+{
+  if (packetEvent != SatEnums::PACKET_RECV)
+    {
+      return;
+    }
+  switch (logLevel)
+    {
+      case SatEnums::LL_PHY:
+        {
+          if (linkDir == SatEnums::LD_FORWARD)
+            {
+              m_rxFeederPhy++;
+            }
+          else if (linkDir == SatEnums::LD_RETURN)
+            {
+              m_rxUserPhy++;
+            }
+          break;
+        }
+      case SatEnums::LL_MAC:
+        {
+          if (linkDir == SatEnums::LD_FORWARD)
+            {
+              m_rxFeederMac++;
+            }
+          else if (linkDir == SatEnums::LD_RETURN)
+            {
+              m_rxUserMac++;
+            }
+          break;
+        }
+      case SatEnums::LL_ND:
+        {
+          if (linkDir == SatEnums::LD_FORWARD)
+            {
+              m_rxFeederNet++;
+            }
+          else if (linkDir == SatEnums::LD_RETURN)
+            {
+              m_rxUserNet++;
+            }
+          break;
+        }
+      default:
+        NS_FATAL_ERROR ("Wrong log level received");
+    }
+}
+
+// Add some help text to this case to describe what it is intended to test
+SatRegenerationTest8::SatRegenerationTest8 (SatEnums::RegenerationMode_t forwardLinkRegenerationMode, SatEnums::RegenerationMode_t returnLinkRegenerationMode)
+  : TestCase ("This test is launched several time to test every regeneration combination.")
+{
+  m_forwardLinkRegenerationMode = forwardLinkRegenerationMode;
+  m_returnLinkRegenerationMode = returnLinkRegenerationMode;
+
+  m_rxFeederPhy = 0;
+  m_rxFeederMac = 0;
+  m_rxFeederNet = 0;
+  m_rxUserPhy = 0;
+  m_rxUserMac = 0;
+  m_rxUserNet = 0;
+}
+
+// This destructor does nothing but we include it as a reminder that
+// the test case should clean up after itself
+SatRegenerationTest8::~SatRegenerationTest8 ()
+{
+}
+
+//
+// SatRegenerationTest8 TestCase implementation
+//
+void
+SatRegenerationTest8::DoRun (void)
+{
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-regeneration", "test8", true);
+
+  /// Set regeneration mode
+  Config::SetDefault ("ns3::SatConf::ForwardLinkRegenerationMode", EnumValue (m_forwardLinkRegenerationMode));
+  Config::SetDefault ("ns3::SatConf::ReturnLinkRegenerationMode", EnumValue (m_returnLinkRegenerationMode));
+
+  SatEnums::RegenerationMode_t maxRegeneration = std::max (m_forwardLinkRegenerationMode, m_returnLinkRegenerationMode);
+
+  Config::SetDefault ("ns3::SatGeoFeederPhy::QueueSize", UintegerValue (100000));
+
+  // Enable SatMac traces
+  Config::SetDefault ("ns3::SatPhy::EnableStatisticsTags", BooleanValue (true));
+  Config::SetDefault ("ns3::SatNetDevice::EnableStatisticsTags", BooleanValue (true));
+
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
+  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("test-sat-regeneration");
+  simulationHelper->SetSimulationTime (Seconds (20));
+  simulationHelper->CreateSatScenario (SatHelper::LARGER);
+
+  m_helper = simulationHelper->GetSatelliteHelper ();
+
+  std::map<uint32_t, Ptr<SatPhy> > satGeoFeederPhy = DynamicCast<SatGeoNetDevice> (m_helper->GeoSatNode ()->GetDevice (0))->GetFeederPhy ();
+  std::map<uint32_t, Ptr<SatPhy> > satGeoUserPhy = DynamicCast<SatGeoNetDevice> (m_helper->GeoSatNode ()->GetDevice (0))->GetUserPhy ();
+  std::map<uint32_t, Ptr<SatMac> > satGeoFeederMac = DynamicCast<SatGeoNetDevice> (m_helper->GeoSatNode ()->GetDevice (0))->GetFeederMac ();
+  std::map<uint32_t, Ptr<SatMac> > satGeoUserMac = DynamicCast<SatGeoNetDevice> (m_helper->GeoSatNode ()->GetDevice (0))->GetUserMac ();
+
+  Config::ConnectWithoutContext ("/NodeList/0/DeviceList/0/UserPhy/*/PacketTrace", MakeCallback (&SatRegenerationTest8::AddTraceEntry, this));
+  Config::ConnectWithoutContext ("/NodeList/0/DeviceList/0/FeederPhy/*/PacketTrace", MakeCallback (&SatRegenerationTest8::AddTraceEntry, this));
+  if (maxRegeneration == SatEnums::REGENERATION_LINK || maxRegeneration == SatEnums::REGENERATION_NETWORK)
+    {
+      Config::ConnectWithoutContext ("/NodeList/0/DeviceList/0/UserMac/*/PacketTrace", MakeCallback (&SatRegenerationTest8::AddTraceEntry, this));
+      Config::ConnectWithoutContext ("/NodeList/0/DeviceList/0/FeederMac/*/PacketTrace", MakeCallback (&SatRegenerationTest8::AddTraceEntry, this));
+    }
+  if (maxRegeneration == SatEnums::REGENERATION_NETWORK)
+    {
+      Config::ConnectWithoutContext ("/NodeList/0/DeviceList/0/PacketTrace", MakeCallback (&SatRegenerationTest8::AddTraceEntry, this));
+    }
+
+  Time startTime = Seconds (1);
+  Time stopTime = Seconds (15);
+  Time startDelay = MilliSeconds (10);
+  Time interval = MilliSeconds (100);
+  uint32_t packetSize = 512;
+
+  Config::SetDefault ("ns3::CbrApplication::Interval", TimeValue (interval));
+  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize));
+
+  simulationHelper->InstallTrafficModel (
+    SimulationHelper::CBR,
+    SimulationHelper::UDP,
+    SimulationHelper::RTN_LINK,
+    startTime, stopTime, startDelay);
+
+  simulationHelper->InstallTrafficModel (
+    SimulationHelper::CBR,
+    SimulationHelper::UDP,
+    SimulationHelper::FWD_LINK,
+    startTime, stopTime, startDelay);
+
+  simulationHelper->RunSimulation ();
+
+  Simulator::Destroy ();
+
+  switch (m_forwardLinkRegenerationMode)
+    {
+      case SatEnums::TRANSPARENT:
+      case SatEnums::REGENERATION_PHY:
+        {
+          NS_TEST_ASSERT_MSG_GT (m_rxFeederPhy, 700, "Packets should be received on feeder phy");
+          NS_TEST_ASSERT_MSG_EQ (m_rxFeederMac, 0, "Packets should not be received on feeder MAC");
+          NS_TEST_ASSERT_MSG_EQ (m_rxFeederNet, 0, "Packets should not be received on feeder network");
+          break;
+        }
+      case SatEnums::REGENERATION_LINK:
+        {
+          NS_TEST_ASSERT_MSG_GT (m_rxFeederPhy, 700, "Packets should be received on feeder phy");
+          NS_TEST_ASSERT_MSG_GT (m_rxFeederMac, 700, "Packets should be received on feeder MAC");
+          NS_TEST_ASSERT_MSG_EQ (m_rxFeederNet, 0, "Packets should not be received on feeder network");
+          break;
+        }
+      case SatEnums::REGENERATION_NETWORK:
+        {
+          NS_TEST_ASSERT_MSG_GT (m_rxFeederPhy, 700, "Packets should be received on feeder phy");
+          NS_TEST_ASSERT_MSG_GT (m_rxFeederMac, 700, "Packets should be received on feeder MAC");
+          NS_TEST_ASSERT_MSG_GT (m_rxFeederNet, 700, "Packets should be received on feeder network");
+          break;
+        }
+    }
+
+  switch (m_returnLinkRegenerationMode)
+    {
+      case SatEnums::TRANSPARENT:
+      case SatEnums::REGENERATION_PHY:
+        {
+          NS_TEST_ASSERT_MSG_GT (m_rxUserPhy, 700, "Packets should be received on user phy");
+          NS_TEST_ASSERT_MSG_EQ (m_rxUserMac, 0, "Packets should not be received on user MAC");
+          NS_TEST_ASSERT_MSG_EQ (m_rxUserNet, 0, "Packets should not be received on user network");
+          break;
+        }
+      case SatEnums::REGENERATION_LINK:
+        {
+          NS_TEST_ASSERT_MSG_GT (m_rxUserPhy, 700, "Packets should be received on user phy");
+          NS_TEST_ASSERT_MSG_GT (m_rxUserMac, 700, "Packets should be received on user MAC");
+          NS_TEST_ASSERT_MSG_EQ (m_rxUserNet, 0, "Packets should not be received on user network");
+          break;
+        }
+      case SatEnums::REGENERATION_NETWORK:
+        {
+          NS_TEST_ASSERT_MSG_GT (m_rxUserPhy, 700, "Packets should be received on user phy");
+          NS_TEST_ASSERT_MSG_GT (m_rxUserMac, 700, "Packets should be received on user MAC");
+          NS_TEST_ASSERT_MSG_GT (m_rxUserNet, 700, "Packets should be received on user network");
+          break;
+        }
+    }
+}
+
 // The TestSuite class names the TestSuite as sat-regeneration-test, identifies what type of TestSuite (SYSTEM),
 // and enables the TestCases to be run. Typically, only the constructor for this class must be defined
 //
@@ -1113,6 +1725,22 @@ SatRegenerationTestSuite::SatRegenerationTestSuite ()
   AddTestCase (new SatRegenerationTest3, TestCase::QUICK); // Test collisions with regeneration phy
   AddTestCase (new SatRegenerationTest4, TestCase::QUICK); // Test regeneration link
   AddTestCase (new SatRegenerationTest5, TestCase::QUICK); // Test ACM loop on regeneration link
+  AddTestCase (new SatRegenerationTest6, TestCase::QUICK); // Test regeneration network
+  AddTestCase (new SatRegenerationTest7, TestCase::QUICK); // Test ACM loop on regeneration network
+
+  // Test all regeneration combinations, and check if packets are correctly received or not on each satellite layer
+  AddTestCase (new SatRegenerationTest8 (SatEnums::TRANSPARENT, SatEnums::TRANSPARENT), TestCase::QUICK);
+  AddTestCase (new SatRegenerationTest8 (SatEnums::TRANSPARENT, SatEnums::REGENERATION_PHY), TestCase::QUICK);
+  AddTestCase (new SatRegenerationTest8 (SatEnums::TRANSPARENT, SatEnums::REGENERATION_LINK), TestCase::QUICK);
+  AddTestCase (new SatRegenerationTest8 (SatEnums::TRANSPARENT, SatEnums::REGENERATION_NETWORK), TestCase::QUICK);
+  AddTestCase (new SatRegenerationTest8 (SatEnums::REGENERATION_PHY, SatEnums::TRANSPARENT), TestCase::QUICK);
+  AddTestCase (new SatRegenerationTest8 (SatEnums::REGENERATION_PHY, SatEnums::REGENERATION_PHY), TestCase::QUICK);
+  AddTestCase (new SatRegenerationTest8 (SatEnums::REGENERATION_PHY, SatEnums::REGENERATION_LINK), TestCase::QUICK);
+  AddTestCase (new SatRegenerationTest8 (SatEnums::REGENERATION_PHY, SatEnums::REGENERATION_NETWORK), TestCase::QUICK);
+  AddTestCase (new SatRegenerationTest8 (SatEnums::REGENERATION_NETWORK, SatEnums::TRANSPARENT), TestCase::QUICK);
+  AddTestCase (new SatRegenerationTest8 (SatEnums::REGENERATION_NETWORK, SatEnums::REGENERATION_PHY), TestCase::QUICK);
+  AddTestCase (new SatRegenerationTest8 (SatEnums::REGENERATION_NETWORK, SatEnums::REGENERATION_LINK), TestCase::QUICK);
+  AddTestCase (new SatRegenerationTest8 (SatEnums::REGENERATION_NETWORK, SatEnums::REGENERATION_NETWORK), TestCase::QUICK);
 }
 
 // Allocate an instance of this TestSuite
