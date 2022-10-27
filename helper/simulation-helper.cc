@@ -857,7 +857,8 @@ SimulationHelper::CreateDefaultRtnLinkStats ()
   m_statContainer->AddGlobalRtnUserPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   m_statContainer->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamRtnFeederDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamRtnUserDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddPerBeamRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddPerBeamRtnUserMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddPerBeamRtnFeederPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);

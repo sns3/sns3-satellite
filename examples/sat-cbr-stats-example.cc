@@ -246,8 +246,8 @@ main (int argc, char *argv[])
 //  s->AddAverageUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);
 //  s->AddAverageUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_PDF_PLOT);
 //  s->AddAverageUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_CDF_PLOT);
-//  CALL_SAT_STATS_BASIC_SET (FwdDevThroughput)
-//  CALL_SAT_STATS_AVERAGED_DISTRIBUTION_SET (FwdDevThroughput)
+//  CALL_SAT_STATS_BASIC_SET (FwdUserDevThroughput)
+//  CALL_SAT_STATS_AVERAGED_DISTRIBUTION_SET (FwdUserDevThroughput)
 //  CALL_SAT_STATS_BASIC_SET (FwdUserMacThroughput)
 //  CALL_SAT_STATS_AVERAGED_DISTRIBUTION_SET (FwdUserMacThroughput)
 //  CALL_SAT_STATS_BASIC_SET (FwdPhyThroughput)
@@ -280,8 +280,8 @@ main (int argc, char *argv[])
 //  s->AddAverageUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);
 //  s->AddAverageUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_PDF_PLOT);
 //  s->AddAverageUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_CDF_PLOT);
-//  CALL_SAT_STATS_BASIC_SET (RtnDevThroughput)
-//  CALL_SAT_STATS_AVERAGED_DISTRIBUTION_SET (RtnDevThroughput)
+//  CALL_SAT_STATS_BASIC_SET (RtnFeederDevThroughput)
+//  CALL_SAT_STATS_AVERAGED_DISTRIBUTION_SET (RtnFeederDevThroughput)
 //  CALL_SAT_STATS_BASIC_SET (RtnFeederMacThroughput)
 //  CALL_SAT_STATS_AVERAGED_DISTRIBUTION_SET (RtnFeederMacThroughput)
 //  CALL_SAT_STATS_BASIC_SET (RtnPhyThroughput)
@@ -333,8 +333,8 @@ main (int argc, char *argv[])
 
   s->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddAverageUtFwdDevThroughput (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);
-  s->AddAverageBeamRtnDevThroughput (SatStatsHelper::OUTPUT_PDF_PLOT);
+  s->AddAverageUtFwdUserDevThroughput (SatStatsHelper::OUTPUT_HISTOGRAM_PLOT);
+  s->AddAverageBeamRtnFeederDevThroughput (SatStatsHelper::OUTPUT_PDF_PLOT);
   s->AddPerGwFwdUserMacThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
   s->AddGlobalRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtFwdUserPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);

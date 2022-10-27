@@ -254,6 +254,12 @@ protected:
   virtual void DoDispose (void);
 
 private:
+  /**
+   * Get UT MAC address associated to this packet.
+   * May be source or destination depending on link
+   */
+  Address GetRxUtAddress (Ptr<Packet> packet, SatEnums::SatLinkDir_t ld);
+
   NetDevice::ReceiveCallback m_rxCallback;
   NetDevice::PromiscReceiveCallback m_promiscCallback;
   Ptr<Node> m_node;
@@ -300,22 +306,40 @@ private:
   TracedCallback<Ptr<const Packet>, const Address &> m_signallingTxTrace;
 
   /**
-   * Traced callback for all received packets, including the address of the
+   * Traced callback for all received packets on feeder, including the address of the
    * senders.
    */
-  TracedCallback<Ptr<const Packet>, const Address &> m_rxTrace;
+  TracedCallback<Ptr<const Packet>, const Address &> m_rxFeederTrace;
 
   /**
-   * Traced callback for all received packets, including delay information and
-   * the address of the senders.
+   * Traced callback for all received packets on user, including the address of the
+   * senders.
    */
-  TracedCallback<const Time &, const Address &> m_rxDelayTrace;
+  TracedCallback<Ptr<const Packet>, const Address &> m_rxUserTrace;
 
   /**
-   * Traced callback for all received packets, including jitter information and
+   * Traced callback for all received packets, including feeder link delay information and
    * the address of the senders.
    */
-  TracedCallback<const Time &, const Address &> m_rxJitterTrace;
+  TracedCallback<const Time &, const Address &> m_rxFeederLinkDelayTrace;
+
+  /**
+   * Traced callback for all received packets, including feeder link jitter information and
+   * the address of the senders.
+   */
+  TracedCallback<const Time &, const Address &> m_rxFeederLinkJitterTrace;
+
+  /**
+   * Traced callback for all received packets, including user link delay information and
+   * the address of the senders.
+   */
+  TracedCallback<const Time &, const Address &> m_rxUserLinkDelayTrace;
+
+  /**
+   * Traced callback for all received packets, including user link jitter information and
+   * the address of the senders.
+   */
+  TracedCallback<const Time &, const Address &> m_rxUserLinkJitterTrace;
 
 };
 

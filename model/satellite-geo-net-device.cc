@@ -96,17 +96,29 @@ SatGeoNetDevice::GetTypeId (void)
                      "A signalling packet to be sent",
                      MakeTraceSourceAccessor (&SatGeoNetDevice::m_signallingTxTrace),
                      "ns3::SatTypedefs::PacketDestinationAddressCallback")
-    .AddTraceSource ("Rx",
-                     "A packet received",
-                     MakeTraceSourceAccessor (&SatGeoNetDevice::m_rxTrace),
+    .AddTraceSource ("RxFeeder",
+                     "A packet received on feeder",
+                     MakeTraceSourceAccessor (&SatGeoNetDevice::m_rxFeederTrace),
                      "ns3::SatTypedefs::PacketSourceAddressCallback")
-    .AddTraceSource ("RxDelay",
-                     "A packet is received with delay information",
-                     MakeTraceSourceAccessor (&SatGeoNetDevice::m_rxDelayTrace),
+    .AddTraceSource ("RxUser",
+                     "A packet received on user",
+                     MakeTraceSourceAccessor (&SatGeoNetDevice::m_rxUserTrace),
+                     "ns3::SatTypedefs::PacketSourceAddressCallback")
+    .AddTraceSource ("RxFeederLinkDelay",
+                     "A packet is received with feeder link delay information",
+                     MakeTraceSourceAccessor (&SatGeoNetDevice::m_rxFeederLinkDelayTrace),
                      "ns3::SatTypedefs::PacketDelayAddressCallback")
-    .AddTraceSource ("RxJitter",
-                     "A packet is received with jitter information",
-                     MakeTraceSourceAccessor (&SatGeoNetDevice::m_rxJitterTrace),
+    .AddTraceSource ("RxFeederLinkJitter",
+                     "A packet is received with feeder link jitter information",
+                     MakeTraceSourceAccessor (&SatGeoNetDevice::m_rxFeederLinkJitterTrace),
+                     "ns3::SatTypedefs::PacketJitterAddressCallback")
+    .AddTraceSource ("RxUserLinkDelay",
+                     "A packet is received with feeder link delay information",
+                     MakeTraceSourceAccessor (&SatGeoNetDevice::m_rxUserLinkDelayTrace),
+                     "ns3::SatTypedefs::PacketDelayAddressCallback")
+    .AddTraceSource ("RxUserLinkJitter",
+                     "A packet is received with feeder link jitter information",
+                     MakeTraceSourceAccessor (&SatGeoNetDevice::m_rxUserLinkJitterTrace),
                      "ns3::SatTypedefs::PacketJitterAddressCallback")
   ;
   return tid;
@@ -143,38 +155,20 @@ SatGeoNetDevice::ReceivePacketUser (Ptr<Packet> packet, const Address& userAddre
    */
   if (m_isStatisticsTagsEnabled)
     {
-      Address addr; // invalid address.
-      bool isTaggedWithAddress = false;
-      ByteTagIterator it = packet->GetByteTagIterator ();
+      Address addr = GetRxUtAddress (packet, SatEnums::LD_RETURN);
 
-      while (!isTaggedWithAddress && it.HasNext ())
+      m_rxUserTrace (packet, addr);
+
+      SatDevLinkTimeTag linkTimeTag;
+      if (packet->RemovePacketTag (linkTimeTag))
         {
-          ByteTagIterator::Item item = it.Next ();
-
-          if (item.GetTypeId () == SatAddressTag::GetTypeId ())
-            {
-              NS_LOG_DEBUG (this << " contains a SatAddressTag tag:"
-                                 << " start=" << item.GetStart ()
-                                 << " end=" << item.GetEnd ());
-              SatAddressTag addrTag;
-              item.GetTag (addrTag);
-              addr = addrTag.GetSourceAddress ();
-              isTaggedWithAddress = true; // this will exit the while loop.
-            }
-        }
-
-      m_rxTrace (packet, addr);
-
-      SatDevTimeTag timeTag;
-      if (packet->PeekPacketTag (timeTag))
-        {
-          NS_LOG_DEBUG (this << " contains a SatMacTimeTag tag");
-          Time delay = Simulator::Now () - timeTag.GetSenderTimestamp ();
-          m_rxDelayTrace (delay, addr);
+          NS_LOG_DEBUG (this << " contains a SatDevLinkTimeTag tag");
+          Time delay = Simulator::Now () - linkTimeTag.GetSenderTimestamp ();
+          m_rxUserLinkDelayTrace (delay, addr);
           if (m_lastDelays[macUserAddress].IsZero() == false)
             {
               Time jitter = Abs (delay - m_lastDelays[macUserAddress]);
-              m_rxJitterTrace (jitter, addr);
+              m_rxUserLinkJitterTrace (jitter, addr);
             }
           m_lastDelays[macUserAddress] = delay;
         }
@@ -188,6 +182,13 @@ SatGeoNetDevice::ReceivePacketUser (Ptr<Packet> packet, const Address& userAddre
     {
       NS_FATAL_ERROR ("SatUplinkInfoTag not found");
     }
+
+  if (m_isStatisticsTagsEnabled)
+    {
+      // Add a SatDevLinkTimeTag tag for packet link delay computation at the receiver end.
+      packet->AddPacketTag (SatDevLinkTimeTag (Simulator::Now ()));
+    }
+
   DynamicCast<SatGeoFeederMac> (m_feederMac[satUplinkInfoTag.GetBeamId ()])->EnquePacket (packet);
 }
 
@@ -214,38 +215,20 @@ SatGeoNetDevice::ReceivePacketFeeder (Ptr<Packet> packet, const Address& feederA
    */
   if (m_isStatisticsTagsEnabled)
     {
-      Address addr; // invalid address.
-      bool isTaggedWithAddress = false;
-      ByteTagIterator it = packet->GetByteTagIterator ();
+      Address addr = GetRxUtAddress (packet, SatEnums::LD_FORWARD);
 
-      while (!isTaggedWithAddress && it.HasNext ())
+      m_rxFeederTrace (packet, addr);
+
+      SatDevLinkTimeTag linkTimeTag;
+      if (packet->RemovePacketTag (linkTimeTag))
         {
-          ByteTagIterator::Item item = it.Next ();
-
-          if (item.GetTypeId () == SatAddressTag::GetTypeId ())
-            {
-              NS_LOG_DEBUG (this << " contains a SatAddressTag tag:"
-                                 << " start=" << item.GetStart ()
-                                 << " end=" << item.GetEnd ());
-              SatAddressTag addrTag;
-              item.GetTag (addrTag);
-              addr = addrTag.GetSourceAddress ();
-              isTaggedWithAddress = true; // this will exit the while loop.
-            }
-        }
-
-      m_rxTrace (packet, addr);
-
-      SatDevTimeTag timeTag;
-      if (packet->PeekPacketTag (timeTag))
-        {
-          NS_LOG_DEBUG (this << " contains a SatMacTimeTag tag");
-          Time delay = Simulator::Now () - timeTag.GetSenderTimestamp ();
-          m_rxDelayTrace (delay, addr);
+          NS_LOG_DEBUG (this << " contains a SatDevLinkTimeTag tag");
+          Time delay = Simulator::Now () - linkTimeTag.GetSenderTimestamp ();
+          m_rxFeederLinkDelayTrace (delay, addr);
           if (m_lastDelays[macFeederAddress].IsZero() == false)
             {
               Time jitter = Abs (delay - m_lastDelays[macFeederAddress]);
-              m_rxJitterTrace (jitter, addr);
+              m_rxFeederLinkJitterTrace (jitter, addr);
             }
           m_lastDelays[macFeederAddress] = delay;
         }
@@ -258,6 +241,12 @@ SatGeoNetDevice::ReceivePacketFeeder (Ptr<Packet> packet, const Address& feederA
   if (!packet->PeekPacketTag (satUplinkInfoTag))
     {
       NS_FATAL_ERROR ("SatUplinkInfoTag not found");
+    }
+
+  if (m_isStatisticsTagsEnabled)
+    {
+      // Add a SatDevLinkTimeTag tag for packet link delay computation at the receiver end.
+      packet->AddPacketTag (SatDevLinkTimeTag (Simulator::Now ()));
     }
 
   DynamicCast<SatGeoUserMac> (m_userMac[satUplinkInfoTag.GetBeamId ()])->EnquePacket (packet);
@@ -336,8 +325,8 @@ SatGeoNetDevice::SendControlMsgToFeeder (Ptr<SatControlMessage> msg, const Addre
       // Add a SatAddressTag tag with this device's address as the source address.
       packet->AddByteTag (SatAddressTag (m_address));
 
-      // Add a SatDevTimeTag tag for packet delay computation at the receiver end.
-      packet->AddPacketTag (SatDevTimeTag (Simulator::Now ()));
+      // Add a SatDevLinkTimeTag tag for packet link delay computation at the receiver end.
+      packet->AddPacketTag (SatDevLinkTimeTag (Simulator::Now ()));
     }
 
   SatAddressE2ETag addressE2ETag;
@@ -712,6 +701,30 @@ SatGeoNetDevice::GetSatelliteFeederAddress (uint32_t beamId)
       return m_addressMapFeeder[beamId];
     }
   NS_FATAL_ERROR ("Satellite MAC does not exist for GW " << beamId);
+}
+
+Address
+SatGeoNetDevice::GetRxUtAddress (Ptr<Packet> packet, SatEnums::SatLinkDir_t ld)
+{
+  NS_LOG_FUNCTION (this << packet);
+
+  Address utAddr; // invalid address.
+
+  SatAddressE2ETag addressE2ETag;
+  if (packet->PeekPacketTag (addressE2ETag))
+    {
+      NS_LOG_DEBUG (this << " contains a SatE2E tag");
+      if (ld == SatEnums::LD_FORWARD)
+        {
+          utAddr = addressE2ETag.GetE2EDestAddress ();
+        }
+      else if (ld == SatEnums::LD_RETURN)
+        {
+          utAddr = addressE2ETag.GetE2ESourceAddress ();
+        }
+    }
+
+  return utAddr;
 }
 
 } // namespace ns3

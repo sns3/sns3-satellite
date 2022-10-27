@@ -144,6 +144,102 @@ private:
 }; // end of class SatStatsLinkDelayHelper
 
 
+// FORWARD FEEDER LINK DEV-LEVEL /////////////////////////////////////////////////////
+
+/**
+ * \ingroup satstats
+ * \brief Produce forward feeder link DEV-level delay statistics from a satellite
+ *        module simulation.
+ *
+ * For a more convenient usage in simulation script, it is recommended to use
+ * the corresponding methods in SatStatsHelperContainer class.
+ *
+ * Otherwise, the following example can be used:
+ * \code
+ * Ptr<SatStatsFwdFeederDevLinkDelayHelper> s = Create<SatStatsFwdFeederDevLinkDelayHelper> (satHelper);
+ * s->SetName ("name");
+ * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+ * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
+ * s->Install ();
+ * \endcode
+ */
+class SatStatsFwdFeederDevLinkDelayHelper : public SatStatsLinkDelayHelper
+{
+public:
+  // inherited from SatStatsHelper base class
+  SatStatsFwdFeederDevLinkDelayHelper (Ptr<const SatHelper> satHelper);
+
+
+  /**
+   * / Destructor.
+   */
+  virtual ~SatStatsFwdFeederDevLinkDelayHelper ();
+
+
+  /**
+   * inherited from ObjectBase base class
+   */
+  static TypeId GetTypeId ();
+
+protected:
+  // inherited from SatStatsLinkDelayHelper base class
+  void DoInstallProbes ();
+
+private:
+  /// Maintains a list of probes created by this helper.
+  std::list<Ptr<Probe> > m_probes;
+
+}; // end of class SatStatsFwdFeederDevLinkDelayHelper
+
+
+// FORWARD USER LINK DEV-LEVEL /////////////////////////////////////////////////////
+
+/**
+ * \ingroup satstats
+ * \brief Produce forward user link DEV-level delay statistics from a satellite
+ *        module simulation.
+ *
+ * For a more convenient usage in simulation script, it is recommended to use
+ * the corresponding methods in SatStatsHelperContainer class.
+ *
+ * Otherwise, the following example can be used:
+ * \code
+ * Ptr<SatStatsFwdUserDevLinkDelayHelper> s = Create<SatStatsFwdUserDevLinkDelayHelper> (satHelper);
+ * s->SetName ("name");
+ * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+ * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
+ * s->Install ();
+ * \endcode
+ */
+class SatStatsFwdUserDevLinkDelayHelper : public SatStatsLinkDelayHelper
+{
+public:
+  // inherited from SatStatsHelper base class
+  SatStatsFwdUserDevLinkDelayHelper (Ptr<const SatHelper> satHelper);
+
+
+  /**
+   * / Destructor.
+   */
+  virtual ~SatStatsFwdUserDevLinkDelayHelper ();
+
+
+  /**
+   * inherited from ObjectBase base class
+   */
+  static TypeId GetTypeId ();
+
+protected:
+  // inherited from SatStatsLinkDelayHelper base class
+  void DoInstallProbes ();
+
+private:
+  /// Maintains a list of probes created by this helper.
+  std::list<Ptr<Probe> > m_probes;
+
+}; // end of class SatStatsFwdUserDevLinkDelayHelper
+
+
 // FORWARD FEEDER LINK MAC-LEVEL /////////////////////////////////////////////////////
 
 /**
@@ -334,6 +430,98 @@ private:
   std::list<Ptr<Probe> > m_probes;
 
 }; // end of class SatStatsFwdUserPhyLinkDelayHelper
+
+
+// RETURN FEEDER LINK DEV-LEVEL //////////////////////////////////////////////
+
+/**
+ * \ingroup satstats
+ * \brief Produce return feeder link DEV-level delay statistics from a satellite
+ *        module simulation.
+ *
+ * For a more convenient usage in simulation script, it is recommended to use
+ * the corresponding methods in SatStatsHelperContainer class.
+ *
+ * Otherwise, the following example can be used:
+ * \code
+ * Ptr<SatStatsRtnFeederDevLinkDelayHelper> s = Create<SatStatsRtnFeederDevLinkDelayHelper> (satHelper);
+ * s->SetName ("name");
+ * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+ * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
+ * s->Install ();
+ * \endcode
+ */
+class SatStatsRtnFeederDevLinkDelayHelper : public SatStatsLinkDelayHelper
+{
+public:
+  // inherited from SatStatsHelper base class
+  SatStatsRtnFeederDevLinkDelayHelper (Ptr<const SatHelper> satHelper);
+
+
+  /**
+   * / Destructor.
+   */
+  virtual ~SatStatsRtnFeederDevLinkDelayHelper ();
+
+
+  /**
+   * inherited from ObjectBase base class
+   */
+  static TypeId GetTypeId ();
+
+protected:
+  // inherited from SatStatsLinkDelayHelper base class
+  void DoInstallProbes ();
+
+}; // end of class SatStatsRtnFeederDevLinkDelayHelper
+
+
+// RETURN USER LINK DEV-LEVEL //////////////////////////////////////////////
+
+/**
+ * \ingroup satstats
+ * \brief Produce return user link DEV-level delay statistics from a satellite
+ *        module simulation.
+ *
+ * For a more convenient usage in simulation script, it is recommended to use
+ * the corresponding methods in SatStatsHelperContainer class.
+ *
+ * Otherwise, the following example can be used:
+ * \code
+ * Ptr<SatStatsRtnUserDevLinkDelayHelper> s = Create<SatStatsRtnUserDevLinkDelayHelper> (satHelper);
+ * s->SetName ("name");
+ * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+ * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
+ * s->Install ();
+ * \endcode
+ */
+class SatStatsRtnUserDevLinkDelayHelper : public SatStatsLinkDelayHelper
+{
+public:
+  // inherited from SatStatsHelper base class
+  SatStatsRtnUserDevLinkDelayHelper (Ptr<const SatHelper> satHelper);
+
+
+  /**
+   * / Destructor.
+   */
+  virtual ~SatStatsRtnUserDevLinkDelayHelper ();
+
+
+  /**
+   * inherited from ObjectBase base class
+   */
+  static TypeId GetTypeId ();
+
+protected:
+  // inherited from SatStatsLinkDelayHelper base class
+  void DoInstallProbes ();
+
+private:
+  /// Maintains a list of probes created by this helper.
+  std::list<Ptr<Probe> > m_probes;
+
+}; // end of class SatStatsRtnUserDevLinkDelayHelper
 
 
 // RETURN FEEDER LINK MAC-LEVEL //////////////////////////////////////////////

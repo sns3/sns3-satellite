@@ -594,6 +594,193 @@ SatStatsLinkJitterHelper::SetChannelLink (SatEnums::ChannelType_t channelLink)
 }
 
 
+// FORWARD FEEDER LINK DEV-LEVEL /////////////////////////////////////////////////////
+
+NS_OBJECT_ENSURE_REGISTERED (SatStatsFwdFeederDevLinkJitterHelper);
+
+SatStatsFwdFeederDevLinkJitterHelper::SatStatsFwdFeederDevLinkJitterHelper (Ptr<const SatHelper> satHelper)
+  : SatStatsLinkJitterHelper (satHelper)
+{
+  NS_LOG_FUNCTION (this << satHelper);
+}
+
+
+SatStatsFwdFeederDevLinkJitterHelper::~SatStatsFwdFeederDevLinkJitterHelper ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsFwdFeederDevLinkJitterHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsFwdFeederDevLinkJitterHelper")
+    .SetParent<SatStatsLinkJitterHelper> ()
+  ;
+  return tid;
+}
+
+
+void
+SatStatsFwdFeederDevLinkJitterHelper::DoInstallProbes ()
+{
+  NS_LOG_FUNCTION (this);
+
+  NodeContainer sats = NodeContainer (GetSatHelper ()->GetBeamHelper ()->GetGeoSatNode ());
+  Callback<void, const Time &, const Address &> callback
+    = MakeCallback (&SatStatsFwdFeederDevLinkJitterHelper::RxLinkJitterCallback, this);
+
+  for (NodeContainer::Iterator it = sats.Begin (); it != sats.End (); ++it)
+    {
+      Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
+      Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
+      NS_ASSERT (satGeoDev != 0);
+      satGeoDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+      if (satGeoDev->TraceConnectWithoutContext ("RxFeederLinkJitter", callback))
+        {
+          NS_LOG_INFO (this << " successfully connected with node ID "
+                            << (*it)->GetId ()
+                            << " device #" << satGeoDev->GetIfIndex ());
+        }
+      else
+        {
+          NS_FATAL_ERROR ("Error connecting to RxFeederLinkJitter trace source of SatNetDevice"
+                          << " at node ID " << (*it)->GetId ()
+                          << " device #" << satGeoDev->GetIfIndex ());
+        }
+    } // end of `for (it = sats.Begin(); it != sats.End (); ++it)`
+
+  NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
+
+  for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
+    {
+      // Create a map of UT addresses and identifiers.
+      SaveAddressAndIdentifier (*it);
+
+      Ptr<NetDevice> dev = GetUtSatNetDevice (*it);
+      Ptr<SatNetDevice> satDev = dev->GetObject<SatNetDevice> ();
+      NS_ASSERT (satDev != 0);
+
+      satDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+
+    } // end of `for (it = uts.Begin(); it != uts.End (); ++it)`
+
+  // Enable statistics-related tags on the transmitting device.
+  NodeContainer gws = GetSatHelper ()->GetBeamHelper ()->GetGwNodes ();
+  for (NodeContainer::Iterator it = gws.Begin (); it != gws.End (); ++it)
+    {
+      NetDeviceContainer devs = GetGwSatNetDevice (*it);
+
+      for (NetDeviceContainer::Iterator itDev = devs.Begin ();
+           itDev != devs.End (); ++itDev)
+        {
+          Ptr<SatNetDevice> satDev = (*itDev)->GetObject<SatNetDevice> ();
+          NS_ASSERT (satDev != 0);
+
+          satDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+        }
+    }
+
+} // end of `void DoInstallProbes ();`
+
+
+// FORWARD USER LINK DEV-LEVEL /////////////////////////////////////////////////////
+
+NS_OBJECT_ENSURE_REGISTERED (SatStatsFwdUserDevLinkJitterHelper);
+
+SatStatsFwdUserDevLinkJitterHelper::SatStatsFwdUserDevLinkJitterHelper (Ptr<const SatHelper> satHelper)
+  : SatStatsLinkJitterHelper (satHelper)
+{
+  NS_LOG_FUNCTION (this << satHelper);
+}
+
+
+SatStatsFwdUserDevLinkJitterHelper::~SatStatsFwdUserDevLinkJitterHelper ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsFwdUserDevLinkJitterHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsFwdUserDevLinkJitterHelper")
+    .SetParent<SatStatsLinkJitterHelper> ()
+  ;
+  return tid;
+}
+
+
+void
+SatStatsFwdUserDevLinkJitterHelper::DoInstallProbes ()
+{
+  NS_LOG_FUNCTION (this);
+
+  NodeContainer sats = NodeContainer (GetSatHelper ()->GetBeamHelper ()->GetGeoSatNode ());
+
+  for (NodeContainer::Iterator it = sats.Begin (); it != sats.End (); ++it)
+    {
+      Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
+      Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
+      NS_ASSERT (satGeoDev != 0);
+      satGeoDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+    } // end of `for (it = sats.Begin(); it != sats.End (); ++it)`
+
+  NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
+
+  for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
+    {
+      const int32_t utId = GetUtId (*it);
+      NS_ASSERT_MSG (utId > 0,
+                     "Node " << (*it)->GetId () << " is not a valid UT");
+      const uint32_t identifier = GetIdentifierForUt (*it);
+
+      // Create the probe.
+      std::ostringstream probeName;
+      probeName << utId;
+      Ptr<ApplicationDelayProbe> probe = CreateObject<ApplicationDelayProbe> ();
+      probe->SetName (probeName.str ());
+
+      Ptr<NetDevice> dev = GetUtSatNetDevice (*it);
+      Ptr<SatNetDevice> satDev = dev->GetObject<SatNetDevice> ();
+      NS_ASSERT (satDev != 0);
+
+      // Connect the object to the probe.
+      if (probe->ConnectByObject ("RxLinkJitter", satDev)
+          && ConnectProbeToCollector (probe, identifier))
+        {
+          m_probes.push_back (probe->GetObject<Probe> ());
+
+          // Enable statistics-related tags and trace sources on the device.
+          satDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+        }
+      else
+        {
+          NS_FATAL_ERROR ("Error connecting to RxLinkJitter trace source of SatMac"
+                          << " at node ID " << (*it)->GetId () << " device #2");
+        }
+
+    } // end of `for (it = uts.Begin(); it != uts.End (); ++it)`
+
+  // Enable statistics-related tags on the transmitting device.
+  NodeContainer gws = GetSatHelper ()->GetBeamHelper ()->GetGwNodes ();
+  for (NodeContainer::Iterator it = gws.Begin (); it != gws.End (); ++it)
+    {
+      NetDeviceContainer devs = GetGwSatNetDevice (*it);
+
+      for (NetDeviceContainer::Iterator itDev = devs.Begin ();
+           itDev != devs.End (); ++itDev)
+        {
+          Ptr<SatNetDevice> satDev = (*itDev)->GetObject<SatNetDevice> ();
+          NS_ASSERT (satDev != 0);
+
+          satDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+        }
+    }
+
+} // end of `void DoInstallProbes ();`
+
+
 // FORWARD FEEDER LINK MAC-LEVEL /////////////////////////////////////////////////////
 
 NS_OBJECT_ENSURE_REGISTERED (SatStatsFwdFeederMacLinkJitterHelper);
@@ -635,6 +822,7 @@ SatStatsFwdFeederMacLinkJitterHelper::DoInstallProbes ()
       Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
       Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
       NS_ASSERT (satGeoDev != 0);
+      satGeoDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
       std::map<uint32_t, Ptr<SatMac> > satGeoFeederMacs = satGeoDev->GetFeederMac ();
       Ptr<SatMac> satMac;
       for (std::map<uint32_t, Ptr<SatMac>>::iterator it2 = satGeoFeederMacs.begin (); it2 != satGeoFeederMacs.end (); ++it2)
@@ -748,6 +936,7 @@ SatStatsFwdUserMacLinkJitterHelper::DoInstallProbes ()
       Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
       Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
       NS_ASSERT (satGeoDev != 0);
+      satGeoDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
       std::map<uint32_t, Ptr<SatMac> > satGeoFeederMacs = satGeoDev->GetFeederMac ();
       Ptr<SatMac> satMac;
       for (std::map<uint32_t, Ptr<SatMac>>::iterator it2 = satGeoFeederMacs.begin (); it2 != satGeoFeederMacs.end (); ++it2)
@@ -869,6 +1058,7 @@ SatStatsFwdFeederPhyLinkJitterHelper::DoInstallProbes ()
       Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
       Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
       NS_ASSERT (satGeoDev != 0);
+      satGeoDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
       std::map<uint32_t, Ptr<SatPhy> > satGeoFeederPhys = satGeoDev->GetFeederPhy ();
       Ptr<SatPhy> satPhy;
       for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoFeederPhys.begin (); it2 != satGeoFeederPhys.end (); ++it2)
@@ -984,6 +1174,7 @@ SatStatsFwdUserPhyLinkJitterHelper::DoInstallProbes ()
       Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
       Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
       NS_ASSERT (satGeoDev != 0);
+      satGeoDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
       std::map<uint32_t, Ptr<SatPhy> > satGeoFeederPhys = satGeoDev->GetFeederPhy ();
       Ptr<SatPhy> satPhy;
       for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoFeederPhys.begin (); it2 != satGeoFeederPhys.end (); ++it2)
@@ -1062,6 +1253,195 @@ SatStatsFwdUserPhyLinkJitterHelper::DoInstallProbes ()
 } // end of `void DoInstallProbes ();`
 
 
+// RETURN FEEDER LINK DEV-LEVEL //////////////////////////////////////////////////////
+
+NS_OBJECT_ENSURE_REGISTERED (SatStatsRtnFeederDevLinkJitterHelper);
+
+SatStatsRtnFeederDevLinkJitterHelper::SatStatsRtnFeederDevLinkJitterHelper (Ptr<const SatHelper> satHelper)
+  : SatStatsLinkJitterHelper (satHelper)
+{
+  NS_LOG_FUNCTION (this << satHelper);
+}
+
+
+SatStatsRtnFeederDevLinkJitterHelper::~SatStatsRtnFeederDevLinkJitterHelper ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsRtnFeederDevLinkJitterHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsRtnFeederDevLinkJitterHelper")
+    .SetParent<SatStatsLinkJitterHelper> ()
+  ;
+  return tid;
+}
+
+
+void
+SatStatsRtnFeederDevLinkJitterHelper::DoInstallProbes ()
+{
+  NS_LOG_FUNCTION (this);
+
+  NodeContainer sats = NodeContainer (GetSatHelper ()->GetBeamHelper ()->GetGeoSatNode ());
+
+  for (NodeContainer::Iterator it = sats.Begin (); it != sats.End (); ++it)
+    {
+      Ptr<SatMac> satMac;
+      Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
+      Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
+      NS_ASSERT (satGeoDev != 0);
+      satGeoDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+    } // end of `for (it = sats.Begin(); it != sats.End (); ++it)`
+
+  NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
+  for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
+    {
+      // Create a map of UT addresses and identifiers.
+      SaveAddressAndIdentifier (*it);
+
+      // Enable statistics-related tags and trace sources on the device.
+      Ptr<NetDevice> dev = GetUtSatNetDevice (*it);
+      Ptr<SatNetDevice> satDev = dev->GetObject<SatNetDevice> ();
+      NS_ASSERT (satDev != 0);
+      satDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+    }
+
+  // Connect to trace sources at GW nodes.
+
+  NodeContainer gws = GetSatHelper ()->GetBeamHelper ()->GetGwNodes ();
+  Callback<void, const Time &, const Address &> callback
+    = MakeCallback (&SatStatsRtnFeederDevLinkJitterHelper::RxLinkJitterCallback, this);
+
+  for (NodeContainer::Iterator it = gws.Begin (); it != gws.End (); ++it)
+    {
+      NetDeviceContainer devs = GetGwSatNetDevice (*it);
+
+      for (NetDeviceContainer::Iterator itDev = devs.Begin ();
+           itDev != devs.End (); ++itDev)
+        {
+          Ptr<SatNetDevice> satDev = (*itDev)->GetObject<SatNetDevice> ();
+          NS_ASSERT (satDev != 0);
+
+          // Connect the object to the probe.
+          if (satDev->TraceConnectWithoutContext ("RxLinkJitter", callback))
+            {
+              NS_LOG_INFO (this << " successfully connected with node ID "
+                                << (*it)->GetId ()
+                                << " device #" << satDev->GetIfIndex ());
+
+              // Enable statistics-related tags and trace sources on the device.
+              satDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+            }
+          else
+            {
+              NS_FATAL_ERROR ("Error connecting to RxLinkJitter trace source of SatNetDevice"
+                              << " at node ID " << (*it)->GetId ()
+                              << " device #" << satDev->GetIfIndex ());
+            }
+
+        } // end of `for (NetDeviceContainer::Iterator itDev = devs)`
+
+    } // end of `for (NodeContainer::Iterator it = gws)`
+
+} // end of `void DoInstallProbes ();`
+
+
+// RETURN USER LINK DEV-LEVEL //////////////////////////////////////////////////////
+
+NS_OBJECT_ENSURE_REGISTERED (SatStatsRtnUserDevLinkJitterHelper);
+
+SatStatsRtnUserDevLinkJitterHelper::SatStatsRtnUserDevLinkJitterHelper (Ptr<const SatHelper> satHelper)
+  : SatStatsLinkJitterHelper (satHelper)
+{
+  NS_LOG_FUNCTION (this << satHelper);
+}
+
+
+SatStatsRtnUserDevLinkJitterHelper::~SatStatsRtnUserDevLinkJitterHelper ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+
+TypeId // static
+SatStatsRtnUserDevLinkJitterHelper::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatStatsRtnUserDevLinkJitterHelper")
+    .SetParent<SatStatsLinkJitterHelper> ()
+  ;
+  return tid;
+}
+
+
+void
+SatStatsRtnUserDevLinkJitterHelper::DoInstallProbes ()
+{
+  NS_LOG_FUNCTION (this);
+
+  NodeContainer sats = NodeContainer (GetSatHelper ()->GetBeamHelper ()->GetGeoSatNode ());
+  Callback<void, const Time &, const Address &> callback
+    = MakeCallback (&SatStatsRtnUserDevLinkJitterHelper::RxLinkJitterCallback, this);
+
+  for (NodeContainer::Iterator it = sats.Begin (); it != sats.End (); ++it)
+    {
+      Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
+      Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
+      NS_ASSERT (satGeoDev != 0);
+      satGeoDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+
+      // Connect the object to the probe.
+      if (satGeoDev->TraceConnectWithoutContext ("RxUserLinkJitter", callback))
+        {
+          NS_LOG_INFO (this << " successfully connected with node ID "
+                            << (*it)->GetId ()
+                            << " device #" << satGeoDev->GetIfIndex ());
+        }
+      else
+        {
+          NS_FATAL_ERROR ("Error connecting to RxUserLinkJitter trace source of SatNetDevice"
+                          << " at node ID " << (*it)->GetId ()
+                          << " device #" << satGeoDev->GetIfIndex ());
+        }
+    } // end of `for (it = sats.Begin(); it != sats.End (); ++it)`
+
+  NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
+  for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
+    {
+      // Create a map of UT addresses and identifiers.
+      SaveAddressAndIdentifier (*it);
+
+      // Enable statistics-related tags and trace sources on the device.
+      Ptr<NetDevice> dev = GetUtSatNetDevice (*it);
+      Ptr<SatNetDevice> satDev = dev->GetObject<SatNetDevice> ();
+      NS_ASSERT (satDev != 0);
+      satDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+    }
+
+  // Connect to trace sources at GW nodes.
+
+  NodeContainer gws = GetSatHelper ()->GetBeamHelper ()->GetGwNodes ();
+
+  for (NodeContainer::Iterator it = gws.Begin (); it != gws.End (); ++it)
+    {
+      NetDeviceContainer devs = GetGwSatNetDevice (*it);
+
+      for (NetDeviceContainer::Iterator itDev = devs.Begin ();
+           itDev != devs.End (); ++itDev)
+        {
+          Ptr<SatNetDevice> satDev = (*itDev)->GetObject<SatNetDevice> ();
+          NS_ASSERT (satDev != 0);
+
+          satDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+        } // end of `for (NetDeviceContainer::Iterator itDev = devs)`
+
+    } // end of `for (NodeContainer::Iterator it = gws)`
+
+} // end of `void DoInstallProbes ();`
+
+
 // RETURN FEEDER LINK MAC-LEVEL //////////////////////////////////////////////////////
 
 NS_OBJECT_ENSURE_REGISTERED (SatStatsRtnFeederMacLinkJitterHelper);
@@ -1102,6 +1482,7 @@ SatStatsRtnFeederMacLinkJitterHelper::DoInstallProbes ()
       Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
       Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
       NS_ASSERT (satGeoDev != 0);
+      satGeoDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
       std::map<uint32_t, Ptr<SatMac> > satGeoFeederMacs = satGeoDev->GetFeederMac ();
       for (std::map<uint32_t, Ptr<SatMac>>::iterator it2 = satGeoFeederMacs.begin (); it2 != satGeoFeederMacs.end (); ++it2)
         {
@@ -1218,6 +1599,7 @@ SatStatsRtnUserMacLinkJitterHelper::DoInstallProbes ()
       Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
       Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
       NS_ASSERT (satGeoDev != 0);
+      satGeoDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
       std::map<uint32_t, Ptr<SatMac> > satGeoFeederMacs = satGeoDev->GetFeederMac ();
       Ptr<SatMac> satMac;
       for (std::map<uint32_t, Ptr<SatMac>>::iterator it2 = satGeoFeederMacs.begin (); it2 != satGeoFeederMacs.end (); ++it2)
@@ -1332,6 +1714,7 @@ SatStatsRtnFeederPhyLinkJitterHelper::DoInstallProbes ()
       Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
       Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
       NS_ASSERT (satGeoDev != 0);
+      satGeoDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
       std::map<uint32_t, Ptr<SatPhy> > satGeoFeederPhys = satGeoDev->GetFeederPhy ();
       for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoFeederPhys.begin (); it2 != satGeoFeederPhys.end (); ++it2)
         {
@@ -1450,6 +1833,7 @@ SatStatsRtnUserPhyLinkJitterHelper::DoInstallProbes ()
       Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
       Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
       NS_ASSERT (satGeoDev != 0);
+      satGeoDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
       std::map<uint32_t, Ptr<SatPhy> > satGeoFeederPhys = satGeoDev->GetFeederPhy ();
       Ptr<SatPhy> satPhy;
       for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoFeederPhys.begin (); it2 != satGeoFeederPhys.end (); ++it2)

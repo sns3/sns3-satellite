@@ -40,14 +40,14 @@ namespace ns3 {
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Dev, Mac, Phy] Delay
  * - AddAverage [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppDelay
  * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Dev, Mac, Phy] Delay
- * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] [Mac, Phy] LinkDelay
- * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] [Mac, Phy] LinkDelay
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] [Dev, Mac, Phy] LinkDelay
+ * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] [Dev, Mac, Phy] LinkDelay
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerUtUser, PerSat] [Fwd, Rtn] AppJitter
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Dev, Mac, Phy] Jitter
  * - AddAverage [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppJitter
  * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Dev, Mac, Phy] Jitter
- * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] [Mac, Phy] LinkJitter
- * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] [Mac, Phy] LinkJitter
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] [Dev, Mac, Phy] LinkJitter
+ * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] [Dev, Mac, Phy] LinkJitter
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerUtUser, PerSat] [Fwd, Rtn] AppPlt
  * - AddAverage [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppPlt
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] Queue [Bytes, Packets]
@@ -56,11 +56,9 @@ namespace ns3 {
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] SignallingLoad
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] CompositeSinr
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerUtUser, PerSat] [Fwd, Rtn] AppThroughput
- * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Dev] Throughput
- * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] [Mac, Phy] Throughput
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] [Dev, Mac, Phy] Throughput
  * - AddAverage [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppThroughput
- * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Dev] Throughput
- * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] [Mac, Phy] Throughput
+ * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] [Dev, Mac, Phy] Throughput
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Feeder, User] [FwdDa, RtnDa, SlottedAloha, Crdsa, Essa] PacketError
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Feeder, User] [SlottedAloha, Crdsa, Essa] PacketCollision
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] CapacityRequest
@@ -180,6 +178,20 @@ public:
   void AddAverageUtFwdPhyDelay (SatStatsHelper::OutputType_t outputType);
   void AddAverageSatFwdPhyDelay (SatStatsHelper::OutputType_t outputType);
 
+  // Forward feeder link DEV-level packet link delay statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdFeederDevLinkDelay)
+  void AddAverageBeamFwdFeederDevLinkDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupFwdFeederDevLinkDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtFwdFeederDevLinkDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatFwdFeederDevLinkDelay (SatStatsHelper::OutputType_t outputType);
+
+  // Forward user link DEV-level packet link delay statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdUserDevLinkDelay)
+  void AddAverageBeamFwdUserDevLinkDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupFwdUserDevLinkDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtFwdUserDevLinkDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatFwdUserDevLinkDelay (SatStatsHelper::OutputType_t outputType);
+
   // Forward feeder link MAC-level packet link delay statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdFeederMacLinkDelay)
   void AddAverageBeamFwdFeederMacLinkDelay (SatStatsHelper::OutputType_t outputType);
@@ -237,6 +249,20 @@ public:
   void AddAverageUtFwdPhyJitter (SatStatsHelper::OutputType_t outputType);
   void AddAverageSatFwdPhyJitter (SatStatsHelper::OutputType_t outputType);
 
+  // Forward link feeder DEV-level packet link Jitter statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdFeederDevLinkJitter)
+  void AddAverageBeamFwdFeederDevLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupFwdFeederDevLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtFwdFeederDevLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatFwdFeederDevLinkJitter (SatStatsHelper::OutputType_t outputType);
+
+  // Forward link user DEV-level packet link Jitter statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdUserDevLinkJitter)
+  void AddAverageBeamFwdUserDevLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupFwdUserDevLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtFwdUserDevLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatFwdUserDevLinkJitter (SatStatsHelper::OutputType_t outputType);
+
   // Forward link feeder MAC-level packet link Jitter statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdFeederMacLinkJitter)
   void AddAverageBeamFwdFeederMacLinkJitter (SatStatsHelper::OutputType_t outputType);
@@ -293,12 +319,19 @@ public:
   void AddAverageUtUserFwdAppThroughput (SatStatsHelper::OutputType_t outputType);
   void AddAverageSatFwdAppThroughput (SatStatsHelper::OutputType_t outputType);
 
-  // Forward link device-level throughput statistics.
-  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdDevThroughput)
-  void AddAverageBeamFwdDevThroughput (SatStatsHelper::OutputType_t outputType);
-  void AddAverageGroupFwdDevThroughput (SatStatsHelper::OutputType_t outputType);
-  void AddAverageUtFwdDevThroughput (SatStatsHelper::OutputType_t outputType);
-  void AddAverageSatFwdDevThroughput (SatStatsHelper::OutputType_t outputType);
+  // Forward feeder link device-level throughput statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdFeederDevThroughput)
+  void AddAverageBeamFwdFeederDevThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupFwdFeederDevThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtFwdFeederDevThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatFwdFeederDevThroughput (SatStatsHelper::OutputType_t outputType);
+
+  // Forward user link device-level throughput statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdUserDevThroughput)
+  void AddAverageBeamFwdUserDevThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupFwdUserDevThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtFwdUserDevThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatFwdUserDevThroughput (SatStatsHelper::OutputType_t outputType);
 
   // Forward feeder link MAC-level throughput statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (FwdFeederMacThroughput)
@@ -357,6 +390,20 @@ public:
   void AddAverageUtRtnPhyDelay (SatStatsHelper::OutputType_t outputType);
   void AddAverageSatRtnPhyDelay (SatStatsHelper::OutputType_t outputType);
 
+  // Return feeder link DEV-level packet link delay statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnFeederDevLinkDelay)
+  void AddAverageBeamRtnFeederDevLinkDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRtnFeederDevLinkDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRtnFeederDevLinkDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatRtnFeederDevLinkDelay (SatStatsHelper::OutputType_t outputType);
+
+  // Return user link DEV-level packet link delay statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnUserDevLinkDelay)
+  void AddAverageBeamRtnUserDevLinkDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRtnUserDevLinkDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRtnUserDevLinkDelay (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatRtnUserDevLinkDelay (SatStatsHelper::OutputType_t outputType);
+
   // Return feeder link MAC-level packet link delay statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnFeederMacLinkDelay)
   void AddAverageBeamRtnFeederMacLinkDelay (SatStatsHelper::OutputType_t outputType);
@@ -413,6 +460,20 @@ public:
   void AddAverageGroupRtnPhyJitter (SatStatsHelper::OutputType_t outputType);
   void AddAverageUtRtnPhyJitter (SatStatsHelper::OutputType_t outputType);
   void AddAverageSatRtnPhyJitter (SatStatsHelper::OutputType_t outputType);
+
+  // Return link feeder DEV-level packet link Jitter statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnFeederDevLinkJitter)
+  void AddAverageBeamRtnFeederDevLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRtnFeederDevLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRtnFeederDevLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatRtnFeederDevLinkJitter (SatStatsHelper::OutputType_t outputType);
+
+  // Return link user DEV-level packet link Jitter statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnUserDevLinkJitter)
+  void AddAverageBeamRtnUserDevLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRtnUserDevLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRtnUserDevLinkJitter (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatRtnUserDevLinkJitter (SatStatsHelper::OutputType_t outputType);
 
   // Return link feeder MAC-level packet link Jitter statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnFeederMacLinkJitter)
@@ -499,12 +560,19 @@ public:
   void AddAverageUtUserRtnAppThroughput (SatStatsHelper::OutputType_t outputType);
   void AddAverageSatRtnAppThroughput (SatStatsHelper::OutputType_t outputType);
 
-  // Return link device-level throughput statistics.
-  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnDevThroughput)
-  void AddAverageBeamRtnDevThroughput (SatStatsHelper::OutputType_t outputType);
-  void AddAverageGroupRtnDevThroughput (SatStatsHelper::OutputType_t outputType);
-  void AddAverageUtRtnDevThroughput (SatStatsHelper::OutputType_t outputType);
-  void AddAverageSatRtnDevThroughput (SatStatsHelper::OutputType_t outputType);
+  // Return feeder link device-level throughput statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnFeederDevThroughput)
+  void AddAverageBeamRtnFeederDevThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRtnFeederDevThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRtnFeederDevThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatRtnFeederDevThroughput (SatStatsHelper::OutputType_t outputType);
+
+  // Return user link device-level throughput statistics.
+  SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnUserDevThroughput)
+  void AddAverageBeamRtnUserDevThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageGroupRtnUserDevThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageUtRtnUserDevThroughput (SatStatsHelper::OutputType_t outputType);
+  void AddAverageSatRtnUserDevThroughput (SatStatsHelper::OutputType_t outputType);
 
   // Return feeder link MAC-level throughput statistics.
   SAT_STATS_NORMAL_SCOPE_METHOD_DECLARATION (RtnFeederMacThroughput)

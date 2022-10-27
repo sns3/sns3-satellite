@@ -34,11 +34,8 @@ using namespace ns3;
  * \ingroup satellite
  *
  * \brief This file gives an example of satellite regeneration with collisions.
- *
- * TODO complete brief
- * TODO add MARSALA
- * TODO Clean
- *
+ *        User can specify regeneration level on FWD and RTN link, and Random Access algorithm.
+ *        It generates several statistics to check collisions and errors where there are supposed to occur.
  */
 
 NS_LOG_COMPONENT_DEFINE ("sat-regeneration-collisions-example");
@@ -66,7 +63,7 @@ main (int argc, char *argv[])
   CommandLine cmd;
   cmd.AddValue ("packetSize", "Size of constant packet (bytes)", packetSize);
   cmd.AddValue ("interval", "Interval to sent packets in seconds, (e.g. (1s))", interval);
-  cmd.AddValue ("randomAccess", "Choose RA (SlottedAloha, Crdsa, Essa) or DA.", randomAccess);
+  cmd.AddValue ("randomAccess", "Choose RA (SlottedAloha, Marsala, Crdsa, Essa) or DA.", randomAccess);
   cmd.AddValue ("forwardRegeneration", "Regeneration mode on forward link (transparent, regeneration_phy or regeneration_network)", forwardRegeneration);
   cmd.AddValue ("returnRegeneration", "Regeneration mode on forward link (transparent, regeneration_phy, regeneration_link or regeneration_network)", returnRegeneration);
   simulationHelper->AddDefaultUiArguments (cmd);

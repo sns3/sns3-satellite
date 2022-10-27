@@ -152,6 +152,102 @@ private:
 }; // end of class SatStatsLinkJitterHelper
 
 
+// FORWARD FEEDER LINK DEV-LEVEL /////////////////////////////////////////////////////
+
+/**
+ * \ingroup satstats
+ * \brief Produce forward feeder link DEV-level jitter statistics from a satellite
+ *        module simulation.
+ *
+ * For a more convenient usage in simulation script, it is recommended to use
+ * the corresponding methods in SatStatsHelperContainer class.
+ *
+ * Otherwise, the following example can be used:
+ * \code
+ * Ptr<SatStatsFwdFeederDevLinkJitterHelper> s = Create<SatStatsFwdFeederDevLinkJitterHelper> (satHelper);
+ * s->SetName ("name");
+ * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+ * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
+ * s->Install ();
+ * \endcode
+ */
+class SatStatsFwdFeederDevLinkJitterHelper : public SatStatsLinkJitterHelper
+{
+public:
+  // inherited from SatStatsHelper base class
+  SatStatsFwdFeederDevLinkJitterHelper (Ptr<const SatHelper> satHelper);
+
+
+  /**
+   * / Destructor.
+   */
+  virtual ~SatStatsFwdFeederDevLinkJitterHelper ();
+
+
+  /**
+   * inherited from ObjectBase base class
+   */
+  static TypeId GetTypeId ();
+
+protected:
+  // inherited from SatStatsLinkJitterHelper base class
+  void DoInstallProbes ();
+
+private:
+  /// Maintains a list of probes created by this helper.
+  std::list<Ptr<Probe> > m_probes;
+
+}; // end of class SatStatsFwdFeederDevLinkJitterHelper
+
+
+// FORWARD USER LINK DEV-LEVEL /////////////////////////////////////////////////////
+
+/**
+ * \ingroup satstats
+ * \brief Produce forward user link DEV-level jitter statistics from a satellite
+ *        module simulation.
+ *
+ * For a more convenient usage in simulation script, it is recommended to use
+ * the corresponding methods in SatStatsHelperContainer class.
+ *
+ * Otherwise, the following example can be used:
+ * \code
+ * Ptr<SatStatsFwdUserDevLinkJitterHelper> s = Create<SatStatsFwdUserDevLinkJitterHelper> (satHelper);
+ * s->SetName ("name");
+ * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+ * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
+ * s->Install ();
+ * \endcode
+ */
+class SatStatsFwdUserDevLinkJitterHelper : public SatStatsLinkJitterHelper
+{
+public:
+  // inherited from SatStatsHelper base class
+  SatStatsFwdUserDevLinkJitterHelper (Ptr<const SatHelper> satHelper);
+
+
+  /**
+   * / Destructor.
+   */
+  virtual ~SatStatsFwdUserDevLinkJitterHelper ();
+
+
+  /**
+   * inherited from ObjectBase base class
+   */
+  static TypeId GetTypeId ();
+
+protected:
+  // inherited from SatStatsLinkJitterHelper base class
+  void DoInstallProbes ();
+
+private:
+  /// Maintains a list of probes created by this helper.
+  std::list<Ptr<Probe> > m_probes;
+
+}; // end of class SatStatsFwdUserDevLinkJitterHelper
+
+
 // FORWARD FEEDER LINK MAC-LEVEL /////////////////////////////////////////////////////
 
 /**
@@ -342,6 +438,98 @@ private:
   std::list<Ptr<Probe> > m_probes;
 
 }; // end of class SatStatsFwdUserPhyLinkJitterHelper
+
+
+// RETURN FEEDER LINK DEV-LEVEL //////////////////////////////////////////////
+
+/**
+ * \ingroup satstats
+ * \brief Produce return feeder link DEV-level jitter statistics from a satellite
+ *        module simulation.
+ *
+ * For a more convenient usage in simulation script, it is recommended to use
+ * the corresponding methods in SatStatsHelperContainer class.
+ *
+ * Otherwise, the following example can be used:
+ * \code
+ * Ptr<SatStatsRtnFeederDevLinkJitterHelper> s = Create<SatStatsRtnFeederDevLinkJitterHelper> (satHelper);
+ * s->SetName ("name");
+ * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+ * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
+ * s->Install ();
+ * \endcode
+ */
+class SatStatsRtnFeederDevLinkJitterHelper : public SatStatsLinkJitterHelper
+{
+public:
+  // inherited from SatStatsHelper base class
+  SatStatsRtnFeederDevLinkJitterHelper (Ptr<const SatHelper> satHelper);
+
+
+  /**
+   * / Destructor.
+   */
+  virtual ~SatStatsRtnFeederDevLinkJitterHelper ();
+
+
+  /**
+   * inherited from ObjectBase base class
+   */
+  static TypeId GetTypeId ();
+
+protected:
+  // inherited from SatStatsLinkJitterHelper base class
+  void DoInstallProbes ();
+
+}; // end of class SatStatsRtnFeederDevLinkJitterHelper
+
+
+// RETURN USER LINK DEV-LEVEL //////////////////////////////////////////////
+
+/**
+ * \ingroup satstats
+ * \brief Produce return user link DEV-level jitter statistics from a satellite
+ *        module simulation.
+ *
+ * For a more convenient usage in simulation script, it is recommended to use
+ * the corresponding methods in SatStatsHelperContainer class.
+ *
+ * Otherwise, the following example can be used:
+ * \code
+ * Ptr<SatStatsRtnUserDevLinkJitterHelper> s = Create<SatStatsRtnUserDevLinkJitterHelper> (satHelper);
+ * s->SetName ("name");
+ * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+ * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
+ * s->Install ();
+ * \endcode
+ */
+class SatStatsRtnUserDevLinkJitterHelper : public SatStatsLinkJitterHelper
+{
+public:
+  // inherited from SatStatsHelper base class
+  SatStatsRtnUserDevLinkJitterHelper (Ptr<const SatHelper> satHelper);
+
+
+  /**
+   * / Destructor.
+   */
+  virtual ~SatStatsRtnUserDevLinkJitterHelper ();
+
+
+  /**
+   * inherited from ObjectBase base class
+   */
+  static TypeId GetTypeId ();
+
+protected:
+  // inherited from SatStatsLinkJitterHelper base class
+  void DoInstallProbes ();
+
+private:
+  /// Maintains a list of probes created by this helper.
+  std::list<Ptr<Probe> > m_probes;
+
+}; // end of class SatStatsRtnUserDevLinkJitterHelper
 
 
 // RETURN FEEDER LINK MAC-LEVEL //////////////////////////////////////////////

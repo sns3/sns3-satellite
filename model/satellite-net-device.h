@@ -197,6 +197,11 @@ protected:
    */
   Time m_lastDelay;
 
+  /**
+   * Last link delay measurement. Used to compute link jitter.
+   */
+  Time m_lastLinkDelay;
+
   TracedCallback<Time,
                  SatEnums::SatPacketEvent_t,
                  SatEnums::SatNodeType_t,
@@ -235,6 +240,18 @@ protected:
    * the address of the senders.
    */
   TracedCallback<const Time &, const Address &> m_rxJitterTrace;
+
+  /**
+   * Traced callback for all received packets, including link delay information and
+   * the address of the senders.
+   */
+  TracedCallback<const Time &, const Address &> m_rxLinkDelayTrace;
+
+  /**
+   * Traced callback for all received packets, including link jitter information and
+   * the address of the senders.
+   */
+  TracedCallback<const Time &, const Address &> m_rxLinkJitterTrace;
 
 };
 

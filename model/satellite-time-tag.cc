@@ -454,5 +454,76 @@ SatDevTimeTag::SetSenderTimestamp (Time senderTimestamp)
 }
 
 
+// DEV LINK ////////////////////////////////////////////////////////////////////////
+
+NS_OBJECT_ENSURE_REGISTERED (SatDevLinkTimeTag);
+
+SatDevLinkTimeTag::SatDevLinkTimeTag ()
+  : m_senderTimestamp (Seconds (0))
+{
+  // Nothing to do here
+}
+
+SatDevLinkTimeTag::SatDevLinkTimeTag (Time senderTimestamp)
+  : m_senderTimestamp (senderTimestamp)
+{
+  // Nothing to do here
+}
+
+TypeId
+SatDevLinkTimeTag::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::SatDevLinkTimeTag")
+    .SetParent<Tag> ()
+    .AddConstructor<SatDevLinkTimeTag> ();
+  return tid;
+}
+
+TypeId
+SatDevLinkTimeTag::GetInstanceTypeId (void) const
+{
+  return GetTypeId ();
+}
+
+uint32_t
+SatDevLinkTimeTag::GetSerializedSize (void) const
+{
+  return sizeof(Time);
+}
+
+void
+SatDevLinkTimeTag::Serialize (TagBuffer i) const
+{
+  int64_t senderTimestamp = m_senderTimestamp.GetNanoSeconds ();
+  i.Write ((const uint8_t *)&senderTimestamp, sizeof(int64_t));
+}
+
+void
+SatDevLinkTimeTag::Deserialize (TagBuffer i)
+{
+  int64_t senderTimestamp;
+  i.Read ((uint8_t *)&senderTimestamp, 8);
+  m_senderTimestamp = NanoSeconds (senderTimestamp);
+}
+
+void
+SatDevLinkTimeTag::Print (std::ostream &os) const
+{
+  os << m_senderTimestamp;
+}
+
+Time
+SatDevLinkTimeTag::GetSenderTimestamp (void) const
+{
+  return m_senderTimestamp;
+}
+
+void
+SatDevLinkTimeTag::SetSenderTimestamp (Time senderTimestamp)
+{
+  this->m_senderTimestamp = senderTimestamp;
+}
+
+
 } // namespace ns3
 

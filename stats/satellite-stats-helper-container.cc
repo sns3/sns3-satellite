@@ -85,14 +85,14 @@ SatStatsHelperContainer::DoDispose ()
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Dev, Mac, Phy] Delay
  * - Average [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppDelay
  * - Average [Beam, Group, Ut, Sat] [Fwd, Rtn] [Dev, Mac, Phy] Delay
- * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] [Mac, Phy] LinkDelay
- * - Average [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] [Mac, Phy] LinkDelay
+ * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] [Dev, Mac, Phy] LinkDelay
+ * - Average [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] [Dev, Mac, Phy] LinkDelay
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerUtUser, PerSat] [Fwd, Rtn] AppJitter
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Dev, Mac, Phy] Jitter
  * - Average [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppJitter
  * - Average [Beam, Group, Ut, Sat] [Fwd, Rtn] [Dev, Mac, Phy] Jitter
- * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] [Mac, Phy] LinkJitter
- * - Average [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] [Mac, Phy] LinkJitter
+ * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] [Dev, Mac, Phy] LinkJitter
+ * - Average [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] [Dev, Mac, Phy] LinkJitter
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerUtUser, PerSat] [Fwd, Rtn] AppPlt
  * - Average [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppPlt
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] Queue [Bytes, Packets]
@@ -101,11 +101,9 @@ SatStatsHelperContainer::DoDispose ()
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] SignallingLoad
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] CompositeSinr
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerUtUser, PerSat] [Fwd, Rtn] AppThroughput
- * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Dev] Throughput
- * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] [Mac, Phy] Throughput
+ * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] [Dev, Mac, Phy] Throughput
  * - Average [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppThroughput
- * - Average [Beam, Group, Ut, Sat] [Fwd, Rtn] [Dev] Throughput
- * - Average [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] [Mac, Phy] Throughput
+ * - Average [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] [Dev, Mac, Phy] Throughput
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Feeder, User] [FwdDa, RtnDa, SlottedAloha, Crdsa, Essa] PacketError
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Feeder, User] [SlottedAloha, Crdsa, Essa] PacketCollision
  * - [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] CapacityRequest
@@ -259,6 +257,18 @@ SatStatsHelperContainer::GetTypeId ()
     ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdPhyDelay,
         "forward link PHY-level delay statistics")
 
+    // Forward feeder link DEV-level packet link delay statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdFeederDevLinkDelay,
+        "forward feeder link DEV-level link delay statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdFeederDevLinkDelay,
+        "forward feeder link DEV-level link delay statistics")
+
+    // Forward user link DEV-level packet link delay statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdUserDevLinkDelay,
+        "forward user link DEV-level link delay statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdUserDevLinkDelay,
+        "forward user link DEV-level link delay statistics")
+
     // Forward feeder link MAC-level packet link delay statistics.
     ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdFeederMacLinkDelay,
         "forward feeder link MAC-level link delay statistics")
@@ -312,6 +322,18 @@ SatStatsHelperContainer::GetTypeId ()
         "forward link PHY-level jitter statistics")
     ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdPhyJitter,
         "forward link PHY-level jitter statistics")
+
+    // Forward feeder link DEV-level packet link jitter statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdFeederDevLinkJitter,
+        "forward feeder link DEV-level link jitter statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdFeederDevLinkJitter,
+        "forward feeder link DEV-level link jitter statistics")
+
+    // Forward user link DEV-level packet link jitter statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdUserDevLinkJitter,
+        "forward user link DEV-level link jitter statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdUserDevLinkJitter,
+        "forward user link DEV-level link jitter statistics")
 
     // Forward feeder link MAC-level packet link jitter statistics.
     ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (FwdFeederMacLinkJitter,
@@ -449,11 +471,17 @@ SatStatsHelperContainer::GetTypeId ()
         "average UT user forward link application-level throughput statistics")
     ADD_SAT_STATS_AVERAGED_DISTRIBUTION_OUTPUT_CHECKER
 
-    // Forward link device-level throughput statistics.
-    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdDevThroughput,
-        "forward link device-level throughput statistics")
-    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdDevThroughput,
-        "forward link device-level throughput statistics")
+    // Forward feeder link device-level throughput statistics.
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdFeederDevThroughput,
+        "forward feeder link device-level throughput statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdFeederDevThroughput,
+        "forward feeder link device-level throughput statistics")
+
+    // Forward user link device-level throughput statistics.
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdUserDevThroughput,
+        "forward user link device-level throughput statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (FwdUserDevThroughput,
+        "forward user link device-level throughput statistics")
 
     // Forward feeder link MAC-level throughput statistics.
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (FwdFeederMacThroughput,
@@ -509,6 +537,18 @@ SatStatsHelperContainer::GetTypeId ()
     ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnPhyDelay,
         "return link PHY-level delay statistics")
 
+    // Return feeder link DEV-level packet link delay statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnFeederDevLinkDelay,
+        "return feeder link DEV-level link delay statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnFeederDevLinkDelay,
+        "return feeder link DEV-level link delay statistics")
+
+    // Return user link DEV-level packet link delay statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnUserDevLinkDelay,
+        "return user link DEV-level link delay statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnUserDevLinkDelay,
+        "return user link DEV-level link delay statistics")
+
     // Return feeder link MAC-level packet link delay statistics.
     ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnFeederMacLinkDelay,
         "return feeder link MAC-level link delay statistics")
@@ -532,6 +572,18 @@ SatStatsHelperContainer::GetTypeId ()
         "return user link PHY-level link delay statistics")
     ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnUserPhyLinkDelay,
         "return user link PHY-level link delay statistics")
+
+    // Return feeder link DEV-level packet link jitter statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnFeederDevLinkJitter,
+        "forward feeder link DEV-level link jitter statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnFeederDevLinkJitter,
+        "forward feeder link DEV-level link jitter statistics")
+
+    // Return user link DEV-level packet link jitter statistics.
+    ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnUserDevLinkJitter,
+        "forward user link DEV-level link jitter statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnUserDevLinkJitter,
+        "forward user link DEV-level link jitter statistics")
 
     // Return feeder link MAC-level packet link jitter statistics.
     ADD_SAT_STATS_ATTRIBUTES_DISTRIBUTION_SET (RtnFeederMacLinkJitter,
@@ -651,11 +703,17 @@ SatStatsHelperContainer::GetTypeId ()
         "average UT user return link application-level throughput statistics")
     ADD_SAT_STATS_AVERAGED_DISTRIBUTION_OUTPUT_CHECKER
 
-    // Return link device-level throughput statistics.
-    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnDevThroughput,
-        "return link device-level throughput statistics")
-    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnDevThroughput,
-        "return link device-level throughput statistics")
+    // Return feeder link device-level throughput statistics.
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnFeederDevThroughput,
+        "return feeder link device-level throughput statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnFeederDevThroughput,
+        "return feeder link device-level throughput statistics")
+
+    // Return user link device-level throughput statistics.
+    ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnUserDevThroughput,
+        "return user link device-level throughput statistics")
+    ADD_SAT_STATS_ATTRIBUTES_AVERAGED_DISTRIBUTION_SET (RtnUserDevThroughput,
+        "return user link device-level throughput statistics")
 
     // Return feeder link MAC-level throughput statistics.
     ADD_SAT_STATS_ATTRIBUTES_BASIC_SET (RtnFeederMacThroughput,
@@ -877,14 +935,14 @@ SatStatsHelperContainer::GetName () const
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Dev, Mac, Phy] Delay
  * - AddAverage [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppDelay
  * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Dev, Mac, Phy] Delay
- * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] [Mac, Phy] LinkDelay
- * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] [Mac, Phy] LinkDelay
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] [Dev, Mac, Phy] LinkDelay
+ * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] [Dev, Mac, Phy] LinkDelay
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerUtUser, PerSat] [Fwd, Rtn] AppJitter
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Dev, Mac, Phy] Jitter
  * - AddAverage [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppJitter
  * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Dev, Mac, Phy] Jitter
- * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] [Mac, Phy] LinkJitter
- * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] [Mac, Phy] LinkJitter
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] [Dev, Mac, Phy] LinkJitter
+ * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] [Dev, Mac, Phy] LinkJitter
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerUtUser, PerSat] [Fwd, Rtn] AppPlt
  * - AddAverage [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppPlt
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] Queue [Bytes, Packets]
@@ -892,11 +950,9 @@ SatStatsHelperContainer::GetName () const
  * - AddAverage [Beam, Group, Ut, Sat] [RtnFeeder, FwdUser] Queue [Bytes, Packets] * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] SignallingLoad
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] CompositeSinr
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerUtUser, PerSat] [Fwd, Rtn] AppThroughput
- * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Dev] Throughput
- * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] [Mac, Phy] Throughput
+ * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Fwd, Rtn] [Feeder, User] [Dev, Mac, Phy] Throughput
  * - AddAverage [Beam, Group, Ut, UtUser, Sat] [Fwd, Rtn] AppThroughput
- * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Dev] Throughput
- * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] [Mac, Phy] Throughput
+ * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] [Dev, Mac, Phy] Throughput
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Feeder, User] [FwdDa, RtnDa, SlottedAloha, Crdsa, Essa] PacketError
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] [Feeder, User] [SlottedAloha, Crdsa, Essa] PacketCollision
  * - Add [Global, PerGw, PerBeam, PerGroup, PerUt, PerSat] CapacityRequest
@@ -1207,6 +1263,30 @@ SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdPhyDelay, "fwd-phy-delay")
 SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdPhyDelay, "fwd-phy-delay")
 SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdPhyDelay, "fwd-phy-delay")
 
+// Forward feeder link DEV-level packet link delay statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdFeederDevLinkDelay, "fwd-feeder-dev-link-delay")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdFeederDevLinkDelay, "fwd-feeder-dev-link-delay")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdFeederDevLinkDelay, "fwd-feeder-dev-link-delay")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FwdFeederDevLinkDelay, "fwd-feeder-dev-link-delay")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdFeederDevLinkDelay, "fwd-feeder-dev-link-delay")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (FwdFeederDevLinkDelay, "fwd-feeder-dev-link-delay")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdFeederDevLinkDelay, "fwd-feeder-dev-link-delay")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdFeederDevLinkDelay, "fwd-feeder-dev-link-delay")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdFeederDevLinkDelay, "fwd-feeder-dev-link-delay")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdFeederDevLinkDelay, "fwd-feeder-dev-link-delay")
+
+// Forward user link DEV-level packet link delay statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdUserDevLinkDelay, "fwd-user-dev-link-delay")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdUserDevLinkDelay, "fwd-user-dev-link-delay")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdUserDevLinkDelay, "fwd-user-dev-link-delay")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FwdUserDevLinkDelay, "fwd-user-dev-link-delay")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdUserDevLinkDelay, "fwd-user-dev-link-delay")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (FwdUserDevLinkDelay, "fwd-user-dev-link-delay")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdUserDevLinkDelay, "fwd-user-dev-link-delay")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdUserDevLinkDelay, "fwd-user-dev-link-delay")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdUserDevLinkDelay, "fwd-user-dev-link-delay")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdUserDevLinkDelay, "fwd-user-dev-link-delay")
+
 // Forward feeder link MAC-level packet link delay statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdFeederMacLinkDelay, "fwd-feeder-mac-link-delay")
 SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdFeederMacLinkDelay, "fwd-feeder-mac-link-delay")
@@ -1304,6 +1384,30 @@ SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdPhyJitter, "fwd-phy-jitter")
 SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdPhyJitter, "fwd-phy-jitter")
 SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdPhyJitter, "fwd-phy-jitter")
 SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdPhyJitter, "fwd-phy-jitter")
+
+// Forward feeder link DEV-level packet link jitter statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdFeederDevLinkJitter, "fwd-feeder-dev-link-jitter")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdFeederDevLinkJitter, "fwd-feeder-dev-link-jitter")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdFeederDevLinkJitter, "fwd-feeder-dev-link-jitter")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FwdFeederDevLinkJitter, "fwd-feeder-dev-link-jitter")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdFeederDevLinkJitter, "fwd-feeder-dev-link-jitter")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (FwdFeederDevLinkJitter, "fwd-feeder-dev-link-jitter")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdFeederDevLinkJitter, "fwd-feeder-dev-link-jitter")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdFeederDevLinkJitter, "fwd-feeder-dev-link-jitter")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdFeederDevLinkJitter, "fwd-feeder-dev-link-jitter")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdFeederDevLinkJitter, "fwd-feeder-dev-link-jitter")
+
+// Forward user link DEV-level packet link jitter statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdUserDevLinkJitter, "fwd-user-dev-link-jitter")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdUserDevLinkJitter, "fwd-user-dev-link-jitter")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdUserDevLinkJitter, "fwd-user-dev-link-jitter")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FwdUserDevLinkJitter, "fwd-user-dev-link-jitter")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdUserDevLinkJitter, "fwd-user-dev-link-jitter")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (FwdUserDevLinkJitter, "fwd-user-dev-link-jitter")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdUserDevLinkJitter, "fwd-user-dev-link-jitter")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdUserDevLinkJitter, "fwd-user-dev-link-jitter")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdUserDevLinkJitter, "fwd-user-dev-link-jitter")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdUserDevLinkJitter, "fwd-user-dev-link-jitter")
 
 // Forward feeder link MAC-level packet link jitter statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdFeederMacLinkJitter, "fwd-feeder-mac-link-jitter")
@@ -1413,17 +1517,29 @@ SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdAppThroughput, "fwd-app-throughput"
 SAT_STATS_AVERAGE_UT_USER_METHOD_DEFINITION (FwdAppThroughput, "fwd-app-throughput")
 SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdAppThroughput, "fwd-app-throughput")
 
-// Forward link device-level throughput statistics.
-SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdDevThroughput, "fwd-dev-throughput")
-SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdDevThroughput, "fwd-dev-throughput")
-SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdDevThroughput, "fwd-dev-throughput")
-SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FwdDevThroughput, "fwd-dev-throughput")
-SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdDevThroughput, "fwd-dev-throughput")
-SAT_STATS_PER_SAT_METHOD_DEFINITION      (FwdDevThroughput, "fwd-dev-throughput")
-SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdDevThroughput, "fwd-dev-throughput")
-SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdDevThroughput, "fwd-dev-throughput")
-SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdDevThroughput, "fwd-dev-throughput")
-SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdDevThroughput, "fwd-dev-throughput")
+// Forward feeder link device-level throughput statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdFeederDevThroughput, "fwd-feeder-dev-throughput")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdFeederDevThroughput, "fwd-feeder-dev-throughput")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdFeederDevThroughput, "fwd-feeder-dev-throughput")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FwdFeederDevThroughput, "fwd-feeder-dev-throughput")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdFeederDevThroughput, "fwd-feeder-dev-throughput")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (FwdFeederDevThroughput, "fwd-feeder-dev-throughput")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdFeederDevThroughput, "fwd-feeder-dev-throughput")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdFeederDevThroughput, "fwd-feeder-dev-throughput")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdFeederDevThroughput, "fwd-feeder-dev-throughput")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdFeederDevThroughput, "fwd-feeder-dev-throughput")
+
+// Forward user link device-level throughput statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdUserDevThroughput, "fwd-user-dev-throughput")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (FwdUserDevThroughput, "fwd-user-dev-throughput")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (FwdUserDevThroughput, "fwd-user-dev-throughput")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (FwdUserDevThroughput, "fwd-user-dev-throughput")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (FwdUserDevThroughput, "fwd-user-dev-throughput")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (FwdUserDevThroughput, "fwd-user-dev-throughput")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (FwdUserDevThroughput, "fwd-user-dev-throughput")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(FwdUserDevThroughput, "fwd-user-dev-throughput")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (FwdUserDevThroughput, "fwd-user-dev-throughput")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (FwdUserDevThroughput, "fwd-user-dev-throughput")
 
 // Forward feeder link MAC-level throughput statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (FwdFeederMacThroughput, "fwd-feeder-mac-throughput")
@@ -1523,6 +1639,30 @@ SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnPhyDelay, "rtn-phy-delay")
 SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnPhyDelay, "rtn-phy-delay")
 SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnPhyDelay, "rtn-phy-delay")
 
+// Return feeder link DEV-level packet link delay statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnFeederDevLinkDelay, "rtn-feeder-dev-link-delay")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnFeederDevLinkDelay, "rtn-feeder-dev-link-delay")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnFeederDevLinkDelay, "rtn-feeder-dev-link-delay")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnFeederDevLinkDelay, "rtn-feeder-dev-link-delay")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnFeederDevLinkDelay, "rtn-feeder-dev-link-delay")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnFeederDevLinkDelay, "rtn-feeder-dev-link-delay")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnFeederDevLinkDelay, "rtn-feeder-dev-link-delay")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnFeederDevLinkDelay, "rtn-feeder-dev-link-delay")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnFeederDevLinkDelay, "rtn-feeder-dev-link-delay")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnFeederDevLinkDelay, "rtn-feeder-dev-link-delay")
+
+// Return user link DEV-level packet link delay statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnUserDevLinkDelay, "rtn-user-dev-link-delay")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnUserDevLinkDelay, "rtn-user-dev-link-delay")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnUserDevLinkDelay, "rtn-user-dev-link-delay")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnUserDevLinkDelay, "rtn-user-dev-link-delay")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnUserDevLinkDelay, "rtn-user-dev-link-delay")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnUserDevLinkDelay, "rtn-user-dev-link-delay")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnUserDevLinkDelay, "rtn-user-dev-link-delay")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnUserDevLinkDelay, "rtn-user-dev-link-delay")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnUserDevLinkDelay, "rtn-user-dev-link-delay")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnUserDevLinkDelay, "rtn-user-dev-link-delay")
+
 // Return feeder link MAC-level packet link delay statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnFeederMacLinkDelay, "rtn-feeder-mac-link-delay")
 SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnFeederMacLinkDelay, "rtn-feeder-mac-link-delay")
@@ -1620,6 +1760,30 @@ SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnPhyJitter, "rtn-phy-jitter")
 SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnPhyJitter, "rtn-phy-jitter")
 SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnPhyJitter, "rtn-phy-jitter")
 SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnPhyJitter, "rtn-phy-jitter")
+
+// Forward feeder link DEV-level packet link jitter statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnFeederDevLinkJitter, "rtn-feeder-dev-link-jitter")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnFeederDevLinkJitter, "rtn-feeder-dev-link-jitter")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnFeederDevLinkJitter, "rtn-feeder-dev-link-jitter")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnFeederDevLinkJitter, "rtn-feeder-dev-link-jitter")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnFeederDevLinkJitter, "rtn-feeder-dev-link-jitter")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnFeederDevLinkJitter, "rtn-feeder-dev-link-jitter")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnFeederDevLinkJitter, "rtn-feeder-dev-link-jitter")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnFeederDevLinkJitter, "rtn-feeder-dev-link-jitter")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnFeederDevLinkJitter, "rtn-feeder-dev-link-jitter")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnFeederDevLinkJitter, "rtn-feeder-dev-link-jitter")
+
+// Forward user link DEV-level packet link jitter statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnUserDevLinkJitter, "rtn-user-dev-link-jitter")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnUserDevLinkJitter, "rtn-user-dev-link-jitter")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnUserDevLinkJitter, "rtn-user-dev-link-jitter")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnUserDevLinkJitter, "rtn-user-dev-link-jitter")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnUserDevLinkJitter, "rtn-user-dev-link-jitter")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnUserDevLinkJitter, "rtn-user-dev-link-jitter")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnUserDevLinkJitter, "rtn-user-dev-link-jitter")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnUserDevLinkJitter, "rtn-user-dev-link-jitter")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnUserDevLinkJitter, "rtn-user-dev-link-jitter")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnUserDevLinkJitter, "rtn-user-dev-link-jitter")
 
 // Forward feeder link MAC-level packet link jitter statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnFeederMacLinkJitter, "rtn-feeder-mac-link-jitter")
@@ -1777,17 +1941,29 @@ SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnAppThroughput, "rtn-app-throughput"
 SAT_STATS_AVERAGE_UT_USER_METHOD_DEFINITION (RtnAppThroughput, "rtn-app-throughput")
 SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnAppThroughput, "rtn-app-throughput")
 
-// Return link device-level throughput statistics.
-SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnDevThroughput, "rtn-dev-throughput")
-SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnDevThroughput, "rtn-dev-throughput")
-SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnDevThroughput, "rtn-dev-throughput")
-SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnDevThroughput, "rtn-dev-throughput")
-SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnDevThroughput, "rtn-dev-throughput")
-SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnDevThroughput, "rtn-dev-throughput")
-SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnDevThroughput, "rtn-dev-throughput")
-SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnDevThroughput, "rtn-dev-throughput")
-SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnDevThroughput, "rtn-dev-throughput")
-SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnDevThroughput, "rtn-dev-throughput")
+// Return feeder link device-level throughput statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnFeederDevThroughput, "rtn-feeder-dev-throughput")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnFeederDevThroughput, "rtn-feeder-dev-throughput")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnFeederDevThroughput, "rtn-feeder-dev-throughput")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnFeederDevThroughput, "rtn-feeder-dev-throughput")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnFeederDevThroughput, "rtn-feeder-dev-throughput")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnFeederDevThroughput, "rtn-feeder-dev-throughput")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnFeederDevThroughput, "rtn-feeder-dev-throughput")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnFeederDevThroughput, "rtn-feeder-dev-throughput")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnFeederDevThroughput, "rtn-feeder-dev-throughput")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnFeederDevThroughput, "rtn-feeder-dev-throughput")
+
+// Return user link device-level throughput statistics.
+SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnUserDevThroughput, "rtn-user-dev-throughput")
+SAT_STATS_PER_GW_METHOD_DEFINITION       (RtnUserDevThroughput, "rtn-user-dev-throughput")
+SAT_STATS_PER_BEAM_METHOD_DEFINITION     (RtnUserDevThroughput, "rtn-user-dev-throughput")
+SAT_STATS_PER_GROUP_METHOD_DEFINITION    (RtnUserDevThroughput, "rtn-user-dev-throughput")
+SAT_STATS_PER_UT_METHOD_DEFINITION       (RtnUserDevThroughput, "rtn-user-dev-throughput")
+SAT_STATS_PER_SAT_METHOD_DEFINITION      (RtnUserDevThroughput, "rtn-user-dev-throughput")
+SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION (RtnUserDevThroughput, "rtn-user-dev-throughput")
+SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(RtnUserDevThroughput, "rtn-user-dev-throughput")
+SAT_STATS_AVERAGE_UT_METHOD_DEFINITION   (RtnUserDevThroughput, "rtn-user-dev-throughput")
+SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION  (RtnUserDevThroughput, "rtn-user-dev-throughput")
 
 // Return feeder link MAC-level throughput statistics.
 SAT_STATS_GLOBAL_METHOD_DEFINITION       (RtnFeederMacThroughput, "rtn-feeder-mac-throughput")

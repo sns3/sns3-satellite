@@ -82,7 +82,7 @@ main (int argc, char *argv[])
   Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer ();
 
   s->AddPerBeamFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerBeamFwdDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerBeamFwdUserDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerBeamBeamServiceTime (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   simulationHelper->EnableProgressLogs ();

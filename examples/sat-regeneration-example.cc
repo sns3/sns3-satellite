@@ -34,11 +34,13 @@ using namespace ns3;
  * \ingroup satellite
  *
  * \brief This file gives an example of satellite regeneration.
+ *        It allows to launch a simulation with FWD and RTN CBR traffics,
+ *        and different levels of regeneration.
+ *        On FWD link: transparent, physical and network
+ *        On RTN link: transparent, physical, link and network
+ *        Several statistics are generated.
  *
- * TODO complete brief
- * TODO add more cmd options
  * TODO Clean and remove useless stats
- *
  */
 
 NS_LOG_COMPONENT_DEFINE ("sat-regeneration-example");
@@ -50,8 +52,8 @@ main (int argc, char *argv[])
   uint32_t packetSize = 512;
   std::string interval = "10ms";
   std::string scenario = "simple";
-  std::string forwardRegeneration = "regeneration_phy";
-  std::string returnRegeneration = "regeneration_link";
+  std::string forwardRegeneration = "regeneration_network";
+  std::string returnRegeneration = "regeneration_network";
 
   std::map<std::string, SatHelper::PreDefinedScenario_t> mapScenario { {"simple", SatHelper::SIMPLE},
                                                                        {"larger", SatHelper::LARGER},
@@ -89,6 +91,10 @@ main (int argc, char *argv[])
 
   /// Enable ACM
   Config::SetDefault ("ns3::SatBbFrameConf::AcmEnabled", BooleanValue (true));
+
+  /// Set GSE/RLE ARQ
+  Config::SetDefault ("ns3::SatLlc::FwdLinkArqEnabled", BooleanValue (false));
+  Config::SetDefault ("ns3::SatLlc::RtnLinkArqEnabled", BooleanValue (false));
 
   /// Set simulation output details
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
@@ -139,79 +145,87 @@ main (int argc, char *argv[])
 
   Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer ();
 
-  s->AddPerGwFwdPhyDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  // Throughput statistics
+  s->AddPerUtFwdFeederPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdUserPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnFeederPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnUserPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddPerUtFwdFeederMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdUserMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnUserMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddPerUtFwdFeederDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdUserDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnFeederDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnUserDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  s->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  // Delay statistics
   s->AddPerUtFwdPhyDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatFwdPhyDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-  s->AddPerGwRtnPhyDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdMacDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdDevDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtRtnPhyDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatRtnPhyDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnMacDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnDevDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-  s->AddPerSatFwdFeederPhyLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatFwdUserPhyLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatRtnFeederPhyLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatRtnUserPhyLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-
+  // link delay statistics
   s->AddPerUtFwdFeederPhyLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtFwdUserPhyLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtRtnFeederPhyLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtRtnUserPhyLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-  s->AddPerSatFwdFeederPhyLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatFwdUserPhyLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatRtnFeederPhyLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatRtnUserPhyLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdFeederMacLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdUserMacLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnFeederMacLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnUserMacLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
+  s->AddPerUtFwdFeederDevLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdUserDevLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnFeederDevLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnUserDevLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  // Jitter statistics
+  s->AddPerUtFwdPhyJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdMacJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdDevJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnPhyJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnMacJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnDevJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  // Link jitter statistics
   s->AddPerUtFwdFeederPhyLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtFwdUserPhyLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtRtnFeederPhyLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtRtnUserPhyLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-  s->AddPerUtFwdFeederPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatFwdFeederPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtFwdUserPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatFwdUserPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdFeederMacLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdUserMacLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnFeederMacLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnUserMacLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-  s->AddPerUtRtnFeederPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatRtnFeederPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtRtnUserPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatRtnUserPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdFeederDevLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdUserDevLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnFeederDevLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnUserDevLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-  s->AddPerUtFwdFeederMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatFwdFeederMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtFwdUserMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatFwdUserMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-  s->AddPerUtRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtRtnUserMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatRtnUserMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-  s->AddPerBeamRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerBeamRtnUserMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-  s->AddPerGwRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-
+  // Phy RX statistics
   s->AddPerUtFwdFeederLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatFwdFeederLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtFwdUserLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatFwdUserLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
-
   s->AddPerUtRtnFeederLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatRtnFeederLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtRtnUserLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatRtnUserLinkSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   s->AddPerUtFwdFeederLinkRxPower (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatFwdFeederLinkRxPower (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtFwdUserLinkRxPower (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatFwdUserLinkRxPower (SatStatsHelper::OUTPUT_SCATTER_FILE);
-
   s->AddPerUtRtnFeederLinkRxPower (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatRtnFeederLinkRxPower (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtRtnUserLinkRxPower (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatRtnUserLinkRxPower (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
+  // Other statistics
   s->AddPerUtFwdFeederLinkModcod (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtFwdUserLinkModcod (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerUtRtnFeederLinkModcod (SatStatsHelper::OUTPUT_SCATTER_FILE);
@@ -224,35 +238,6 @@ main (int argc, char *argv[])
   s->AddPerGwFwdUserQueueBytes (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerSatFwdUserQueueBytes (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerSatFwdUserQueuePackets (SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-  s->AddPerGwRtnMacDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtRtnMacDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatRtnMacDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-  s->AddPerSatFwdFeederMacLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatFwdUserMacLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatRtnFeederMacLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatRtnUserMacLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-  s->AddPerUtFwdFeederMacLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtFwdUserMacLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtRtnFeederMacLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtRtnUserMacLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-  s->AddPerUtFwdFeederMacLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtFwdUserMacLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtRtnFeederMacLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtRtnUserMacLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-  s->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerSatRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtRtnMacJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtRtnAppJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-  s->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtFwdFeederMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtFwdUserMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   simulationHelper->EnableProgressLogs ();
   simulationHelper->RunSimulation ();
