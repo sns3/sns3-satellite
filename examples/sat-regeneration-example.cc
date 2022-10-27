@@ -36,11 +36,9 @@ using namespace ns3;
  * \brief This file gives an example of satellite regeneration.
  *        It allows to launch a simulation with FWD and RTN CBR traffics,
  *        and different levels of regeneration.
- *        On FWD link: transparent, physical and network
- *        On RTN link: transparent, physical, link and network
+ *         - On FWD link: transparent, physical and network
+ *         - On RTN link: transparent, physical, link and network
  *        Several statistics are generated.
- *
- * TODO Clean and remove useless stats
  */
 
 NS_LOG_COMPONENT_DEFINE ("sat-regeneration-example");
@@ -91,10 +89,6 @@ main (int argc, char *argv[])
 
   /// Enable ACM
   Config::SetDefault ("ns3::SatBbFrameConf::AcmEnabled", BooleanValue (true));
-
-  /// Set GSE/RLE ARQ
-  Config::SetDefault ("ns3::SatLlc::FwdLinkArqEnabled", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLlc::RtnLinkArqEnabled", BooleanValue (false));
 
   /// Set simulation output details
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));

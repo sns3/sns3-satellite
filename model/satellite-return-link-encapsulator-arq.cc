@@ -305,6 +305,11 @@ SatReturnLinkEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
           NS_LOG_INFO ("Queue size after TxOpportunity: " << m_txQueue->GetNBytes ());
         }
     }
+  else if (!m_seqNo->SeqNoAvailable ())
+  {
+    bytesLeft = 0;
+    return packet;
+  }
 
   // Update bytes lefts
   bytesLeft = GetTxBufferSizeInBytes ();
