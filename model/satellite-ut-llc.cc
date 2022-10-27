@@ -284,7 +284,16 @@ SatUtLlc::CreateEncap (Ptr<EncapKey> key, Ptr<SatQueue> providedQueue)
 
   Ptr<SatBaseEncapsulator> utEncap;
 
-  if (m_rtnLinkArqEnabled)
+  if (key->m_flowId == 0 && m_returnLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
+    {
+      // Control packet
+      utEncap = CreateObject<SatBaseEncapsulator> (key->m_encapAddress,
+                                                   key->m_decapAddress,
+                                                   key->m_sourceE2EAddress,
+                                                   key->m_destE2EAddress,
+                                                   key->m_flowId);
+    }
+  else if (m_rtnLinkArqEnabled)
     {
       utEncap = CreateObject<SatReturnLinkEncapsulatorArq> (key->m_encapAddress,
                                                             key->m_decapAddress,
