@@ -27,7 +27,10 @@
 namespace ns3 {
 
 /**
- * \ingroup satellite TODO
+ * \ingroup satellite
+ * \brief SatGeoUserLlc holds the GEO user implementation of LLC layer. SatGeoUserLlc is inherited from
+ * SatGeoLlc base class and implements the needed changes from the base class related to
+ * SAT user LLC packet transmissions and receptions.
  */
 class SatGeoUserLlc : public SatGeoLlc
 {

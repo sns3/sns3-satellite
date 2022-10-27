@@ -454,7 +454,6 @@ SatUtLlc::SetGwAddress (Mac48Address address)
           Ptr<EncapKey> peek = Create<EncapKey> (m_nodeInfo->GetMacAddress (), m_gwAddress, rcIndex);
           EncapContainer_t::iterator it = m_encaps.find (peek);
 
-          // TODO do we need it ???
           if (it != m_encaps.end ())
             {
               Ptr<EncapKey> key = Create<EncapKey> (m_nodeInfo->GetMacAddress (), address, rcIndex);

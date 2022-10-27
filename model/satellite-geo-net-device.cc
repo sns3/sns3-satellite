@@ -348,7 +348,7 @@ SatGeoNetDevice::SendControlMsgToFeeder (Ptr<SatControlMessage> msg, const Addre
   if (m_returnLinkRegenerationMode != SatEnums::TRANSPARENT)
     {
       SatUplinkInfoTag satUplinkInfoTag;
-      satUplinkInfoTag.SetSinr (std::numeric_limits<double>::infinity (), rxParams->GetAdditionalInterference ()); // TODO set to zero additional ?
+      satUplinkInfoTag.SetSinr (std::numeric_limits<double>::infinity (), 0);
       satUplinkInfoTag.SetBeamId (rxParams->m_beamId);
       packet->AddPacketTag (satUplinkInfoTag);
     }

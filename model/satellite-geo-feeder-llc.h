@@ -27,7 +27,10 @@
 namespace ns3 {
 
 /**
- * \ingroup satellite TODO
+ * \ingroup satellite
+ * \brief SatGeoFeederLlc holds the GEO feeder implementation of LLC layer. SatGeoFeederLlc is inherited from
+ * SatGeoLlc base class and implements the needed changes from the base class related to
+ * SAT feeder LLC packet transmissions and receptions.
  */
 class SatGeoFeederLlc : public SatGeoLlc
 {
