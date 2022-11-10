@@ -253,16 +253,19 @@ SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams,
                                 m_rxExtNoisePowerW,
                                 m_additionalInterferenceCallback ());
 
+  SatAddressE2ETag addressE2ETag;
+  packetRxParams.rxParams->m_packetsInBurst[0]->PeekPacketTag (addressE2ETag);
+
   // Update link specific SINR trace
   switch (GetChannelType ())
     {
       case SatEnums::RETURN_USER_CH:
       case SatEnums::RETURN_FEEDER_CH:
-        m_linkSinrTrace (SatUtils::LinearToDb (sinr), packetRxParams.sourceAddress);
+        m_linkSinrTrace (SatUtils::LinearToDb (sinr), addressE2ETag.GetE2ESourceAddress ());
         break;
       case SatEnums::FORWARD_USER_CH:
       case SatEnums::FORWARD_FEEDER_CH:
-        m_linkSinrTrace (SatUtils::LinearToDb (sinr), packetRxParams.destAddress);
+        m_linkSinrTrace (SatUtils::LinearToDb (sinr), addressE2ETag.GetE2EDestAddress ());
         break;
       default:
         NS_FATAL_ERROR ("Incorrect channel for satPhyRxCarrierPerSlot: " << SatEnums::GetChannelTypeName (GetChannelType ()));
@@ -319,7 +322,6 @@ SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams,
 
               cno *= m_rxBandwidthHz;
 
-              SatAddressE2ETag addressE2ETag;
               packetRxParams.rxParams->m_packetsInBurst[0]->PeekPacketTag (addressE2ETag);
 
               m_cnoCallback (packetRxParams.rxParams->m_beamId,
@@ -364,7 +366,6 @@ SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams,
                   worstCno *= m_rxBandwidthHz;
                   downlinkCno *= m_rxBandwidthHz;
 
-                  SatAddressE2ETag addressE2ETag;
                   (*i)->PeekPacketTag (addressE2ETag);
 
                   SatMacTag satMacTag;
