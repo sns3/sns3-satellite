@@ -194,6 +194,18 @@ public:
   SatEnums::RegenerationMode_t GetReturnLinkRegenerationMode () const;
 
   /**
+   * Set the UT positions file name
+   */
+  void SetUtPositionInputFileName (std::string utPositionInputFileName);
+
+  /**
+   * Load a vector of TLE information from a file
+   * \param filePathName
+   * \return TLE information extracted from file
+   */
+  std::vector <std::string> LoadTles (std::string filePathName);
+
+  /**
    * Definition for beam ID index (column) in m_conf
    */
   static const uint32_t BEAM_ID_INDEX = 0;

@@ -269,6 +269,16 @@ private:
    */
   std::string m_satMobilitySGP4TleFileName;
 
+  /**
+   * Use a constellation of satellites
+   */
+  bool m_satConstellationEnabled;
+
+  /**
+   * Folder where are stored satellite constellation data
+   */
+  std::string m_satConstellationFolder;
+
   /*
    * The global standard used. Can be either DVB or Lora
    */
@@ -427,6 +437,13 @@ private:
    * Enable packet traces
    */
   void EnablePacketTrace ();
+
+  /**
+   * Load a constellation topology.
+   * \param path Folder where configuration files are located
+   * \return A vector for all TLE loaded
+   */
+  std::vector <std::string> LoadConstellationTopology (std::string path);
 
   /**
    * Sink for creation details traces

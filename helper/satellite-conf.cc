@@ -482,6 +482,52 @@ SatConf::LoadTle (std::string filePathName, std::string& tleInfo)
   delete ifs;
 }
 
+std::vector <std::string>
+SatConf::LoadTles (std::string filePathName)
+{
+  NS_LOG_FUNCTION (this << filePathName);
+
+  std::vector <std::string> tles;
+
+  // READ FROM THE SPECIFIED INPUT FILE
+  std::ifstream *ifs = OpenFile (filePathName);
+
+  double size;
+  std::string firstLine;
+  std::getline (*ifs, firstLine);
+  std::istringstream iss(firstLine);
+  iss >> size;
+
+  tles.reserve (size);
+
+  while (ifs->good ())
+    {
+      std::string tle;
+      std::string name;
+      std::string line1;
+      std::string line2;
+
+      std::getline( *ifs, name );
+      std::getline( *ifs, line1 );
+      std::getline( *ifs, line2 );
+
+      // get next rows
+      /**ifs >> name;
+      *ifs >> line1;
+      *ifs >> line2;*/
+
+      tle = line1 + '\n' + line2;
+      tles.push_back (tle);
+
+      std::cout << "TLE " << tle << std::endl;
+    }
+
+  ifs->close ();
+  delete ifs;
+
+  return tles;
+}
+
 uint32_t
 SatConf::GetBeamCount () const
 {
@@ -651,6 +697,12 @@ SatConf::GetSatTle () const
   NS_ASSERT (m_tleSat.size () != 0);
 
   return m_tleSat;
+}
+
+void
+SatConf::SetUtPositionInputFileName (std::string utPositionInputFileName)
+{
+  m_utPositionInputFileName = utPositionInputFileName;
 }
 
 } // namespace ns3

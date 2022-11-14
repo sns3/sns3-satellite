@@ -95,6 +95,16 @@ SatHelper::GetTypeId (void)
                    StringValue ("tle_iss_zarya.txt"),
                    MakeStringAccessor (&SatHelper::m_satMobilitySGP4TleFileName),
                    MakeStringChecker ())
+    .AddAttribute ("SatConstellationEnabled",
+                   "Use a constellation of satellites.",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&SatHelper::m_satConstellationEnabled),
+                   MakeBooleanChecker ())
+    .AddAttribute ("SatConstellationFolder",
+                   "Folder where are stored satellite constellation data.",
+                   StringValue ("eutelsat-geo-2-sats"),
+                   MakeStringAccessor (&SatHelper::m_satConstellationFolder),
+                   MakeStringChecker ())
     .AddAttribute ("GeoSatPosFileName",
                    "Name of the geostationary satellite position configuration file.",
                    StringValue ("Scenario72GeoPos.txt"),
@@ -229,24 +239,54 @@ SatHelper::SatHelper ()
       satLoraConf.setSatConfAttributes (m_satConf);
     }
 
+  NodeContainer geoNodes;
+
+  if (m_satConstellationEnabled)
+    {
+      if (m_satConf->GetForwardLinkRegenerationMode () != SatEnums::REGENERATION_NETWORK)
+        {
+          NS_FATAL_ERROR ("Forward regeneration must be network when using constellations");
+        }
+      if (m_satConf->GetReturnLinkRegenerationMode () != SatEnums::REGENERATION_NETWORK)
+        {
+          NS_FATAL_ERROR ("Return regeneration must be network when using constellations");
+        }
+
+      std::vector <std::string> tles = LoadConstellationTopology (m_satConstellationFolder);
+    }
+  else
+    {
+      m_satConf->Initialize (m_rtnConfFileName,
+                             m_fwdConfFileName,
+                             m_gwPosFileName,
+                             m_geoPosFileName,
+                             m_waveformConfFileName,
+                             m_satMobilitySGP4TleFileName);
+
+      // create Geo Satellite node, set mobility to it
+      Ptr<Node> geoSatNode = CreateObject<Node> ();
+
+      if (m_satMobilitySGP4Enabled == true)
+        {
+          SetSatMobility (geoSatNode);
+        }
+      else
+        {
+          SetGeoSatMobility (geoSatNode);
+        }
+
+      geoNodes.Add (geoSatNode);
+    }
+
+  // TODO temp
   m_satConf->Initialize (m_rtnConfFileName,
                          m_fwdConfFileName,
                          m_gwPosFileName,
                          m_geoPosFileName,
                          m_waveformConfFileName,
                          m_satMobilitySGP4TleFileName);
-
-  // create Geo Satellite node, set mobility to it
   Ptr<Node> geoSatNode = CreateObject<Node> ();
-
-  if (m_satMobilitySGP4Enabled == true)
-    {
-      SetSatMobility (geoSatNode);
-    }
-  else
-    {
-      SetGeoSatMobility (geoSatNode);
-    }
+  SetGeoSatMobility (geoSatNode);
 
   m_beamHelper = CreateObject<SatBeamHelper> (geoSatNode,
                                               MakeCallback (&SatConf::GetCarrierBandwidthHz, m_satConf),
@@ -329,6 +369,30 @@ SatHelper::EnablePacketTrace ()
   m_beamHelper->EnablePacketTrace ();
 }
 
+std::vector <std::string>
+SatHelper::LoadConstellationTopology (std::string path)
+{
+  NS_LOG_FUNCTION (this << path);
+
+  std::string dataPath = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory () + "/constellations/" + path;
+
+  if (!(Singleton<SatEnvVariables>::Get ()->IsValidDirectory (dataPath)))
+    {
+      NS_FATAL_ERROR ("Directory '" << dataPath << "' does not exist, no constellation can be created.");
+    }
+
+  m_satConf->SetUtPositionInputFileName ("constellations/" + path + "/gw_positions.txt");
+
+  m_satConf->Initialize (m_rtnConfFileName,
+                         m_fwdConfFileName,
+                         "constellations/" + path + "/gw_positions.txt",
+                         m_geoPosFileName,
+                         m_waveformConfFileName,
+                         m_satMobilitySGP4TleFileName);
+
+  std::vector <std::string> tles = m_satConf->LoadTles (dataPath + "/tles.txt");
+  return tles;
+}
 
 void SatHelper::EnableDetailedCreationTraces ()
 {
