@@ -254,18 +254,25 @@ SatHelper::SatHelper ()
 
       std::vector <std::string> tles = LoadConstellationTopology (m_satConstellationFolder);
 
-      for (std::vector <std::string>::iterator i = tles.begin (); i != tles.end (); i++)
+      m_antennaGainPatterns = CreateObject<SatAntennaGainPatternContainer> (tles.size ());
+
+      for (uint32_t i = 0; i < tles.size (); i++)
         {
           // create Geo Satellite node, set mobility to it
           Ptr<Node> geoSatNode = CreateObject<Node> ();
 
-          SetSatMobility (geoSatNode, *i);
+          SetSatMobility (geoSatNode, tles[i]);
+
+          Ptr<SatMobilityModel> mobility = geoSatNode->GetObject<SatMobilityModel> ();
+          m_antennaGainPatterns->ConfigureBeamsMobility (mobility, i);
 
           geoNodes.Add (geoSatNode);
         }
     }
   else
     {
+      m_antennaGainPatterns = CreateObject<SatAntennaGainPatternContainer> ();
+
       m_satConf->Initialize (m_rtnConfFileName,
                              m_fwdConfFileName,
                              m_gwPosFileName,
@@ -285,6 +292,9 @@ SatHelper::SatHelper ()
           SetGeoSatMobility (geoSatNode);
         }
 
+      Ptr<SatMobilityModel> mobility = geoSatNode->GetObject<SatMobilityModel> ();
+      m_antennaGainPatterns->ConfigureBeamsMobility (mobility);
+
       geoNodes.Add (geoSatNode);
     }
 
@@ -296,7 +306,6 @@ SatHelper::SatHelper ()
                                               m_satConf->GetForwardLinkRegenerationMode (),
                                               m_satConf->GetReturnLinkRegenerationMode ());
 
-  m_antennaGainPatterns = CreateObject<SatAntennaGainPatternContainer> ();
   m_beamHelper->SetAntennaGainPatterns (m_antennaGainPatterns);
 
   if (m_satMobilitySGP4Enabled == true && m_beamHelper->GetPropagationDelayModelEnum () != SatEnums::PD_CONSTANT_SPEED)
@@ -484,6 +493,12 @@ SatHelper::SetAntennaGainPatterns (Ptr<SatAntennaGainPatternContainer> antennaGa
   m_antennaGainPatterns = antennaGainPatterns;
 }
 
+Ptr<SatAntennaGainPatternContainer>
+SatHelper::GetAntennaGainPatterns ()
+{
+  return m_antennaGainPatterns;
+}
+
 Ptr<SatUserHelper>
 SatHelper::GetUserHelper () const
 {
@@ -632,16 +647,21 @@ SatHelper::CreateConstellationScenario (std::vector<BeamUserInfoMap_t> infoList,
 {
   NS_LOG_FUNCTION (this);
 
+  NS_ASSERT_MSG (infoList.size () > 0, "There must be at least one satellite");
+
   for (uint32_t i = 0; i < m_satConf->GetSatCount (); i++)
+    {
+      m_antennaGainPatterns->SetEnabledBeams (infoList[i], i);
+    }
+
+  for (uint32_t i = 0; i < m_satConf->GetUtCount (); i++)
     {
       GeoCoordinate position = m_satConf->GetUtPosition (i+1);
       uint32_t satId = m_beamHelper->GetClosestSat (position);
 
-      std::cout << "satId " << satId << std::endl;
-
       BeamUserInfoMap_t info = infoList[satId];
-      // TODO who is m_antennaGainPatterns ???
-      uint32_t bestBeamId = m_antennaGainPatterns->GetBestBeamId (position);
+
+      uint32_t bestBeamId = m_antennaGainPatterns->GetBestBeamId (position, satId);
 
       std::vector<std::pair<GeoCoordinate, uint32_t>> positions = info.at (bestBeamId).GetPositions ();
       positions.push_back (std::make_pair (position, 0));
@@ -651,6 +671,10 @@ SatHelper::CreateConstellationScenario (std::vector<BeamUserInfoMap_t> infoList,
 
       infoList[satId] = info; // TODO need this or implicitely updated ?
     }
+
+  m_groupHelper->SetSatConstellationEnabled ();
+
+  DoCreateScenario (infoList[1], m_satConf->GetGwCount ()); // TODO need to set stuff, genre SAT ID ? -> YES !
 }
 
 void
@@ -677,7 +701,6 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
 
       // create all possible GW nodes, set mobility to them and install to Internet
       NodeContainer gwNodes;
-      std::cout << m_satConf->GetGwCount () << std::endl;
       gwNodes.Create (m_satConf->GetGwCount ());
       SetGwMobility (gwNodes);
       internet.Install (gwNodes);
@@ -733,11 +756,9 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
           NS_ASSERT (rtnConf[SatConf::BEAM_ID_INDEX] == fwdConf[SatConf::BEAM_ID_INDEX]);
 
           // TODO lot of stuff here...
-          // TODO use get best beam ID, and get best satellite
-          // TODO for each beam: get all UTs that are closest, and associate a GW
-          // TODO create custom fwdConf/rtnConf or just change GW for each beam
-          std::cout << gwNodes.GetN () << std::endl;
-          std::cout << rtnConf[SatConf::GW_ID_INDEX] - 1 << std::endl;
+          // TODO use get best beam ID, and get best satellite -> DONE normalement
+          // TODO for each beam: get all UTs that are closest, and associate a GW -> DONE normalement too
+          // TODO create custom fwdConf/rtnConf or just change GW for each beam -> YES
 
           // gw index starts from 1 and we have stored them starting from 0
           Ptr<Node> gwNode = gwNodes.Get (rtnConf[SatConf::GW_ID_INDEX] - 1);
@@ -901,7 +922,6 @@ SatHelper::SetUtMobility (NodeContainer uts, uint32_t beamId)
 
   mobility.SetPositionAllocator (allocator);
   mobility.SetMobilityModel ("ns3::SatConstantPositionMobilityModel");
-  Ptr<MobilityModel> model = uts.Get (0)->GetObject<MobilityModel> ();
   mobility.Install (uts);
 
   InstallMobilityObserver (uts);

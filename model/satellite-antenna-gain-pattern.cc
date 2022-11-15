@@ -20,13 +20,10 @@
 
 #include <algorithm>
 #include <stdlib.h>
-
-#include <ns3/double.h>
-#include <ns3/log.h>
-
+#include "ns3/double.h"
+#include "ns3/log.h"
 #include "satellite-utils.h"
 #include "satellite-antenna-gain-pattern.h"
-
 
 NS_LOG_COMPONENT_DEFINE ("SatAntennaGainPattern");
 
@@ -72,13 +69,15 @@ SatAntennaGainPattern::SatAntennaGainPattern ()
   m_maxLon (0.0),
   m_latInterval (0.0),
   m_lonInterval (0.0),
-  m_nanStrings ()
+  m_nanStrings (),
+  m_satelliteMobility (nullptr)
 {
   // Do nothing here
 }
 
 SatAntennaGainPattern::SatAntennaGainPattern (std::string filePathName)
-  : m_nanStrings (m_nanStringArray, m_nanStringArray + (sizeof m_nanStringArray / sizeof m_nanStringArray[0]))
+  : m_nanStrings (m_nanStringArray, m_nanStringArray + (sizeof m_nanStringArray / sizeof m_nanStringArray[0])),
+  m_satelliteMobility (nullptr)
 {
   // Attributes are needed already in construction phase:
   // - ConstructSelf call in constructor
@@ -221,9 +220,28 @@ void SatAntennaGainPattern::ReadAntennaPatternFromFile (std::string filePathName
 }
 
 
+void SatAntennaGainPattern::GetSatelliteOffset (double& latOffset, double& lonOffset) const
+{
+  NS_LOG_FUNCTION (this);
+
+  if (!m_satelliteMobility)
+    {
+      NS_FATAL_ERROR ("SatAntennaGainPattern::GetSatelliteOffset - Called without initializing satellite position first");
+    }
+
+  GeoCoordinate satellite = m_satelliteMobility->GetGeoPosition ();
+  latOffset = satellite.GetLatitude () - m_initialSatellitePosition.GetLatitude ();
+  lonOffset = satellite.GetLongitude () - m_initialSatellitePosition.GetLongitude ();
+  NS_LOG_DEBUG (this << " Satellite offset (moved from the beginning of the simulation): " << latOffset << " / " << lonOffset);
+}
+
+
 GeoCoordinate SatAntennaGainPattern::GetValidRandomPosition () const
 {
   NS_LOG_FUNCTION (this);
+
+  double satLatOffset, satLonOffset;
+  GetSatelliteOffset (satLatOffset, satLonOffset);
 
   uint32_t numPosGridPoints = m_validPositions.size ();
   uint32_t ind (0);
@@ -269,7 +287,7 @@ GeoCoordinate SatAntennaGainPattern::GetValidRandomPosition () const
   // Pick a random position within a grid square
   double latOffset = m_uniformRandomVariable->GetValue (0.0, m_latInterval - 0.001);
   double lonOffset = m_uniformRandomVariable->GetValue (0.0, m_lonInterval - 0.001);
-  GeoCoordinate coord (lowerLeftCoord.first + latOffset, lowerLeftCoord.second + lonOffset, 0.0);
+  GeoCoordinate coord (lowerLeftCoord.first + latOffset + satLatOffset, lowerLeftCoord.second + lonOffset + satLonOffset, 0.0);
 
   return coord;
 }
@@ -289,9 +307,12 @@ double SatAntennaGainPattern::GetAntennaGain_lin (GeoCoordinate coord) const
 {
   NS_LOG_FUNCTION (this << coord.GetLatitude () << coord.GetLongitude ());
 
+  double satLatOffset, satLonOffset;
+  GetSatelliteOffset (satLatOffset, satLonOffset);
+
   // Get the requested position {latitude, longitude}
-  double latitude = coord.GetLatitude ();
-  double longitude = coord.GetLongitude ();
+  double latitude = coord.GetLatitude () - satLatOffset;
+  double longitude = coord.GetLongitude () - satLonOffset;
 
   // Given {latitude, longitude} has to be inside the min/max latitude/longitude values
   if (m_minLat > latitude
@@ -364,6 +385,13 @@ double SatAntennaGainPattern::GetAntennaGain_lin (GeoCoordinate coord) const
   return gain;
 }
 
+
+void SatAntennaGainPattern::SetInitialSatellitePosition (Ptr<SatMobilityModel> mobility, GeoCoordinate coord)
+{
+  NS_LOG_FUNCTION (this << mobility << coord.GetLatitude () << coord.GetLongitude ());
+  m_initialSatellitePosition = coord;
+  m_satelliteMobility = mobility;
+}
 
 
 } // namespace ns3

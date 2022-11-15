@@ -22,9 +22,12 @@
 #define SATELLITE_ANTENNA_GAIN_PATTERN_CONTAINER_H_
 
 #include "satellite-antenna-gain-pattern.h"
+#include "ns3/satellite-beam-user-info.h"
 #include "geo-coordinate.h"
 
 namespace ns3 {
+
+class SatMobilityModel;
 
 /**
  * \ingroup satellite
@@ -45,19 +48,27 @@ public:
    * \return the object TypeId
    */
   static TypeId GetTypeId (void);
+  TypeId GetInstanceTypeId () const;
 
   /**
    * Default constructor.
+   * \param nbSats Number of satellites to consider
    */
-  SatAntennaGainPatternContainer ();
+  SatAntennaGainPatternContainer (uint32_t nbSats = 1);
   ~SatAntennaGainPatternContainer ();
 
   /**
+   * definition for beam map key is beam ID and value is UT/user info.
+   */
+  typedef std::map<uint32_t, SatBeamUserInfo > BeamUserInfoMap_t;
+
+  /**
    * \brief Get the antenna pattern of a specified beam id
+   * \param satelliteId Satellite identifier
    * \param beamId Beam identifier
    * \return The antenna gain pattern instance of the specified beam id
    */
-  Ptr<SatAntennaGainPattern> GetAntennaGainPattern (uint32_t beamId) const;
+  Ptr<SatAntennaGainPattern> GetAntennaGainPattern (uint32_t beamId, uint32_t satelliteId = 0) const;
 
   /**
    * \brief Get the number of stored antenna pattern
@@ -68,23 +79,23 @@ public:
   /**
    * \brief Get the best beam id based on the antenna patterns in a
    * specified geo coordinate
+   * \param satelliteId ID of satellite to search
    * \param coord Geo coordinate
    * \return best beam id in the specified geo coordinate
    */
-  uint32_t GetBestBeamId (GeoCoordinate coord) const;
+  uint32_t GetBestBeamId (GeoCoordinate coord, uint32_t satelliteId = 0) const;
+
+  void ConfigureBeamsMobility (Ptr<SatMobilityModel> mobility, uint32_t satelliteId = 0);
+
+  void SetEnabledBeams (BeamUserInfoMap_t info, uint32_t satelliteId = 0);
 
 private:
-  /**
-   * \brief Definition of number of beams (72-beam reference scenario).
-   * Note: to change the reference system this has to be changed
-   * accordingly.
-   */
-  static const uint32_t NUMBER_OF_BEAMS = 72;
+  std::string m_patternsFolder;
 
   /**
    * Container of antenna patterns
    */
-  std::map< uint32_t, Ptr<SatAntennaGainPattern> > m_antennaPatternMap;
+  std::map< std::pair<uint32_t, uint32_t>, Ptr<SatAntennaGainPattern> > m_antennaPatternMap;
 
 };
 

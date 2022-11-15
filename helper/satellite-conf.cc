@@ -469,10 +469,6 @@ SatConf::LoadPositions (std::string filePathName, PositionContainer_t& container
                     " latitude [deg] = " << lat <<
                     ", longitude [deg] = " << lon <<
                     ", altitude [m] = ");
-      std::cout << this <<
-                    " latitude [deg] = " << lat <<
-                    ", longitude [deg] = " << lon <<
-                    ", altitude [m] = " << std::endl;
 
       // Store the values
       GeoCoordinate coord (lat, lon, alt);
@@ -538,8 +534,6 @@ SatConf::LoadTles (std::string filePathName)
 
       tle = line1 + '\n' + line2;
       tles.push_back (tle);
-
-      std::cout << "TLE " << tle << std::endl;
     }
 
   ifs->close ();

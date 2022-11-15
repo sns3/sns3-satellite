@@ -27,6 +27,7 @@
 #include <ns3/traced-callback.h>
 #include <ns3/random-variable-stream.h>
 #include "geo-coordinate.h"
+#include "satellite-mobility-model.h"
 
 namespace ns3 {
 
@@ -93,6 +94,10 @@ public:
    * \return Whether or not the given position is valid for this spot-beam
    */
   bool IsValidPosition (GeoCoordinate coord, TracedCallback<double> cb) const;
+
+  void SetInitialSatellitePosition (Ptr<SatMobilityModel> mobility, GeoCoordinate coord);
+
+  void GetSatelliteOffset (double& latOffset, double& lonOffset) const;
 
 private:
   /**
@@ -171,10 +176,13 @@ private:
    */
   static const std::string m_nanStringArray[4];
   std::vector<std::string> m_nanStrings;
+
+  /**
+   * Initial satellite position for beam shifting
+   */
+  GeoCoordinate m_initialSatellitePosition;
+  Ptr<SatMobilityModel> m_satelliteMobility;
 };
-
-
-
 
 
 } // namespace ns3

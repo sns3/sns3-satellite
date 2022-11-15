@@ -150,6 +150,12 @@ public:
   std::list<uint32_t> GetGroups ();
 
   /**
+   * \brief Set the antenna gain patterns.
+   * \param antennaGainPattern The pattern to set
+   */
+  void SetAntennaGainPatterns (Ptr<SatAntennaGainPatternContainer> antennaGainPattern);
+
+  /**
    * \return Get the antenna gain patterns
    */
   Ptr<SatAntennaGainPatternContainer> GetAntennaGainPatterns ();
@@ -158,6 +164,8 @@ public:
    * Dispose of this class instance
    */
   virtual void DoDispose ();
+
+  void SetSatConstellationEnabled ();
 
 private:
   /**
@@ -216,6 +224,11 @@ private:
    * Some methods have to be called before, some after.
    */
   bool m_scenarioCreated;
+
+  /**
+   * Use a constellation of satellites
+   */
+  bool m_satConstellationEnabled;
 };
 
 } // namespace ns3

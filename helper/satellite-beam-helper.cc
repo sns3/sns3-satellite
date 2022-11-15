@@ -790,7 +790,7 @@ Ptr<Node> // TODO temp
 SatBeamHelper::GetGeoSatNode () const
 {
   NS_LOG_FUNCTION (this);
-  return m_geoNode;
+  return m_geoNodes.Get (0);
 }
 
 NodeContainer

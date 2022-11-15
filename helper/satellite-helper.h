@@ -194,6 +194,11 @@ public:
   void SetAntennaGainPatterns (Ptr<SatAntennaGainPatternContainer> antennaGainPattern);
 
   /**
+   * \return Get the antenna gain patterns
+   */
+  Ptr<SatAntennaGainPatternContainer> GetAntennaGainPatterns ();
+
+  /**
    * \return pointer to user helper.
    */
   Ptr<SatUserHelper> GetUserHelper () const;

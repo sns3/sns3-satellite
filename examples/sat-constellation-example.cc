@@ -104,6 +104,7 @@ main (int argc, char *argv[])
   std::stringstream beamsEnabled;
   beamsEnabled << beamIdInFullScenario;
   simulationHelper->SetBeams (beamsEnabled.str ());
+  simulationHelper->SetUserCountPerUt (5);
 
   LogComponentEnable ("sat-constellation-example", LOG_LEVEL_INFO);
 

@@ -1179,7 +1179,12 @@ SimulationHelper::GetGroupHelper ()
 
   if (!m_groupHelper)
     {
+      if (m_satHelper == nullptr)
+        {
+          NS_FATAL_ERROR ("SatHelper must be created before GroupHelper");
+        }
       m_groupHelper = CreateObject<SatGroupHelper> ();
+      m_groupHelper->SetAntennaGainPatterns (m_satHelper->GetAntennaGainPatterns ());
     }
 
   return m_groupHelper;
@@ -1240,7 +1245,6 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario, c
   m_satHelper = CreateObject<SatHelper> ();
 
   m_satHelper->SetGroupHelper (GetGroupHelper ()); // If not done in user scenario, group helper is created here
-  m_satHelper->SetAntennaGainPatterns (m_groupHelper->GetAntennaGainPatterns ());
   m_satHelper->GetBeamHelper ()->SetAntennaGainPatterns (m_groupHelper->GetAntennaGainPatterns ());
 
   // Set UT position allocators, if any
@@ -1392,7 +1396,7 @@ SimulationHelper::InstallTrafficModel (TrafficModel_t trafficModel,
   // get users
   NodeContainer utAllUsers = m_satHelper->GetUtUsers ();
   NodeContainer gwUsers = m_satHelper->GetGwUsers ();
-  NS_ASSERT_MSG (m_gwUserId < gwUsers.GetN (), "The number of GW users configured was too low.");
+  NS_ASSERT_MSG (m_gwUserId < gwUsers.GetN (), "The number of GW users configured was too low. " << m_gwUserId << " " << gwUsers.GetN ());
 
   // Filter UT users to keep only a given percentage on which installing the application
   Ptr<UniformRandomVariable> rng = CreateObject<UniformRandomVariable> ();

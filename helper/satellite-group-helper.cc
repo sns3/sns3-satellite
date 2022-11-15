@@ -50,12 +50,10 @@ SatGroupHelper::GetInstanceTypeId (void) const
 }
 
 SatGroupHelper::SatGroupHelper ()
-  : m_scenarioCreated (false)
+  : m_scenarioCreated (false),
+  m_satConstellationEnabled (false)
 {
   NS_LOG_FUNCTION (this);
-
-  // Create antenna gain patterns
-  m_antennaGainPatterns = CreateObject<SatAntennaGainPatternContainer> ();
 }
 
 void
@@ -90,7 +88,7 @@ SatGroupHelper::AddUtNodeToGroup (uint32_t groupId, Ptr<Node> node)
     NS_FATAL_ERROR ("Method SatGroupHelper::AddUtNodeToGroup has to be called after SimulationHelper::CreateSatScenario");
   }
 
-  if (groupId == 0)
+  if (groupId == 0 && !m_satConstellationEnabled)
     {
       NS_FATAL_ERROR ("Group ID 0 is reserved for UTs not manually assigned to a group");
     }
@@ -295,10 +293,23 @@ SatGroupHelper::GetGroups ()
   return m_groupsList;
 }
 
+void
+SatGroupHelper::SetAntennaGainPatterns (Ptr<SatAntennaGainPatternContainer> antennaGainPatterns)
+{
+  NS_LOG_FUNCTION (this);
+  m_antennaGainPatterns = antennaGainPatterns;
+}
+
 Ptr<SatAntennaGainPatternContainer>
 SatGroupHelper::GetAntennaGainPatterns ()
 {
   return m_antennaGainPatterns;
+}
+
+void
+SatGroupHelper::SetSatConstellationEnabled ()
+{
+  m_satConstellationEnabled = true;
 }
 
 bool
