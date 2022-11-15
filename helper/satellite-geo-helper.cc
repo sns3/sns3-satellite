@@ -123,7 +123,7 @@ SatGeoHelper::SatGeoHelper ()
   m_carrierBandwidthConverter (),
   m_fwdLinkCarrierCount (),
   m_rtnLinkCarrierCount (),
-  m_deviceCount (0),
+  m_deviceCount (),
   m_deviceFactory (),
   m_daFwdLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
   m_daRtnLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
@@ -150,7 +150,7 @@ SatGeoHelper::SatGeoHelper (SatTypedefs::CarrierBandwidthConverter_t bandwidthCo
   m_carrierBandwidthConverter (bandwidthConverterCb),
   m_fwdLinkCarrierCount (fwdLinkCarrierCount),
   m_rtnLinkCarrierCount (rtnLinkCarrierCount),
-  m_deviceCount (0),
+  m_deviceCount (),
   m_deviceFactory (),
   m_daFwdLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
   m_daRtnLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
@@ -225,9 +225,6 @@ SatGeoHelper::Install (NodeContainer c)
 {
   NS_LOG_FUNCTION (this );
 
-  // currently only one node supported by helper
-  NS_ASSERT (c.GetN () == 1);
-
   NetDeviceContainer devs;
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
@@ -243,14 +240,14 @@ SatGeoHelper::Install (Ptr<Node> n)
 {
   NS_LOG_FUNCTION (this << n);
 
-  NS_ASSERT (m_deviceCount == 0);
+  NS_ASSERT (m_deviceCount[n->GetId ()] == 0);
 
   // Create SatGeoNetDevice
   Ptr<SatGeoNetDevice> satDev = m_deviceFactory.Create<SatGeoNetDevice> ();
 
   satDev->SetAddress (Mac48Address::Allocate ());
   n->AddDevice (satDev);
-  m_deviceCount++;
+  m_deviceCount[n->GetId ()]++;
   m_nodeId = n->GetId ();
 
   Singleton<SatIdMapper>::Get ()->AttachMacToTraceId (satDev->GetAddress ());

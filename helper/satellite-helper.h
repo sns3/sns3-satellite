@@ -101,6 +101,12 @@ public:
   }
 
   /**
+   * \brief Get number of Users for a UT
+   * \return The number of UT users
+   */
+  typedef Callback<uint32_t> GetNextUtUserCountCallback;
+
+  /**
    * \brief Create a pre-defined SatHelper to make life easier when creating Satellite topologies.
    */
   void CreatePredefinedScenario (PreDefinedScenario_t scenario);
@@ -121,6 +127,21 @@ public:
    * (the beam is the best according to configured antenna patterns).
    */
   void CreateUserDefinedScenarioFromListPositions (BeamUserInfoMap_t& info, bool checkBeam);
+
+  /**
+   * Creates satellite objects according to constellation parameters.
+   *
+   * \param infoList information of the enabled beams. UT information is given in parameters files.
+   * \param getNextUtUserCountCallback Callback to get number of users per UT.
+   */
+  void CreateConstellationScenario (std::vector<BeamUserInfoMap_t> infoList, GetNextUtUserCountCallback getNextUtUserCountCallback);
+
+  /**
+   * Get closest satellite to a ground station
+   * \param position The position of the ground station
+   * \return The ID of the closest satellite
+   */
+  uint32_t GetClosestSat (GeoCoordinate position);
 
   /**
    * \param  node pointer to user node.
@@ -225,9 +246,14 @@ public:
   {
     return m_beamHelper->GetUtNodes ();
   }
+  // TODO temp ?
   inline Ptr<Node> GeoSatNode ()
   {
-    return m_beamHelper->GetGeoSatNode ();
+    return m_beamHelper->GetGeoSatNodes ().Get (0);
+  }
+  inline NodeContainer GeoSatNodes ()
+  {
+    return m_beamHelper->GetGeoSatNodes ();
   }
 
   /**
@@ -242,6 +268,12 @@ public:
    * \param beamId the beam for which the position allocator should be configured
    */
   Ptr<SatSpotBeamPositionAllocator> GetBeamAllocator (uint32_t beamId);
+
+  inline bool IsSatConstellationEnabled ()
+    {
+      return m_satConstellationEnabled;
+    }
+
 
 private:
   static const uint16_t MIN_ADDRESS_PREFIX_LENGTH = 1;
@@ -503,7 +535,7 @@ private:
    *
    * \param node node pointer of Satellite to set mobility
    */
-  void SetSatMobility (Ptr<Node> node);
+  void SetSatMobility (Ptr<Node> node, std::string tle = "");
 
   /**
    * Sets mobility to created UT nodes.

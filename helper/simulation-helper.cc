@@ -1256,12 +1256,38 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario, c
         }
     }
 
+  if (m_satHelper->IsSatConstellationEnabled ())
+    {
+      std::vector<SatHelper::BeamUserInfoMap_t> beamInfoList;
+      for (uint32_t satId = 0; satId < m_satHelper->GeoSatNodes ().GetN (); satId++)
+        {
+          // Create beam scenario for current SAT
+          SatHelper::BeamUserInfoMap_t beamInfo;
+
+          // TODO do not hardcode 72 here
+          // Set beamInfo to indicate enabled beams
+          for (uint32_t i = 1; i <= 72; i++)
+            {
+              if (IsBeamEnabled (i))
+                {
+                  SatBeamUserInfo info;
+                  beamInfo.insert (std::make_pair (i, info));
+                }
+            }
+
+          beamInfoList.push_back (beamInfo);
+        }
+
+      m_satHelper->CreateConstellationScenario (beamInfoList, MakeCallback (&SimulationHelper::GetNextUtUserCount, this));
+    }
+
   // Determine scenario
-  if (scenario == SatHelper::NONE)
+  else if (scenario == SatHelper::NONE)
     {
       // Create beam scenario
       SatHelper::BeamUserInfoMap_t beamInfo;
 
+      // TODO do not hardcode 72 here
       for (uint32_t i = 1; i <= 72; i++)
         {
           if (IsBeamEnabled (i))

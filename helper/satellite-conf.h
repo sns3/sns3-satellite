@@ -68,13 +68,15 @@ public:
    * \param satPos Satellie position file name
    * \param wfConf Waveform configuration file name
    * \param tle TLE configuration file name
+   * \param isConstellation Indicates if SatConf describes a constellation
    */
   void Initialize (std::string rtnConf,
                    std::string fwdConf,
                    std::string gwPos,
                    std::string satPos,
                    std::string wfConf,
-                   std::string tle);
+                   std::string tle,
+                   bool isConstellation = false);
 
   /**
    * Try to open a file from a given path
@@ -122,6 +124,13 @@ public:
    * \return UT count
    */
   uint32_t GetUtCount () const;
+
+  /**
+   * Get count of the SATs (positions).
+   *
+   * \return SAT count
+   */
+  uint32_t GetSatCount () const;
 
 
   /**
@@ -240,6 +249,11 @@ private:
   std::vector <std::vector <uint32_t> > m_fwdConf;
 
   /**
+   * Indicates with this is a constellation of satellites
+   */
+  bool m_isConstellation;
+
+  /**
    * Beam count.
    */
   uint32_t m_beamCount;
@@ -260,9 +274,14 @@ private:
   PositionContainer_t m_geoSatPosition;
 
   /**
-   * TLE information of the Satellite
+   * TLE information of the Satellite // TODO merge with next
    */
   std::string m_tleSat;
+
+  /**
+   * TLE information for a satellite constellation
+   */
+  std::vector <std::string> m_tles;
 
   /**
    * File to use when loading UT specific position (for user defined positions)

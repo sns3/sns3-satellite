@@ -253,6 +253,16 @@ SatHelper::SatHelper ()
         }
 
       std::vector <std::string> tles = LoadConstellationTopology (m_satConstellationFolder);
+
+      for (std::vector <std::string>::iterator i = tles.begin (); i != tles.end (); i++)
+        {
+          // create Geo Satellite node, set mobility to it
+          Ptr<Node> geoSatNode = CreateObject<Node> ();
+
+          SetSatMobility (geoSatNode, *i);
+
+          geoNodes.Add (geoSatNode);
+        }
     }
   else
     {
@@ -278,17 +288,7 @@ SatHelper::SatHelper ()
       geoNodes.Add (geoSatNode);
     }
 
-  // TODO temp
-  m_satConf->Initialize (m_rtnConfFileName,
-                         m_fwdConfFileName,
-                         m_gwPosFileName,
-                         m_geoPosFileName,
-                         m_waveformConfFileName,
-                         m_satMobilitySGP4TleFileName);
-  Ptr<Node> geoSatNode = CreateObject<Node> ();
-  SetGeoSatMobility (geoSatNode);
-
-  m_beamHelper = CreateObject<SatBeamHelper> (geoSatNode,
+  m_beamHelper = CreateObject<SatBeamHelper> (geoNodes,
                                               MakeCallback (&SatConf::GetCarrierBandwidthHz, m_satConf),
                                               m_satConf->GetRtnLinkCarrierCount (),
                                               m_satConf->GetFwdLinkCarrierCount (),
@@ -388,7 +388,8 @@ SatHelper::LoadConstellationTopology (std::string path)
                          "constellations/" + path + "/gw_positions.txt",
                          m_geoPosFileName,
                          m_waveformConfFileName,
-                         m_satMobilitySGP4TleFileName);
+                         m_satMobilitySGP4TleFileName,
+                         true);
 
   std::vector <std::string> tles = m_satConf->LoadTles (dataPath + "/tles.txt");
   return tles;
@@ -403,6 +404,14 @@ void SatHelper::EnableDetailedCreationTraces ()
 
   m_userHelper->EnableCreationTraces (m_creationTraceStream, creationCb);
   m_beamHelper->EnableCreationTraces (m_creationTraceStream, creationCb);
+}
+
+uint32_t
+SatHelper::GetClosestSat (GeoCoordinate position)
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_beamHelper->GetClosestSat (position);
 }
 
 Ipv4Address
@@ -619,6 +628,32 @@ SatHelper::CreateUserDefinedScenarioFromListPositions (BeamUserInfoMap_t& infos,
 }
 
 void
+SatHelper::CreateConstellationScenario (std::vector<BeamUserInfoMap_t> infoList, GetNextUtUserCountCallback getNextUtUserCountCallback )
+{
+  NS_LOG_FUNCTION (this);
+
+  for (uint32_t i = 0; i < m_satConf->GetSatCount (); i++)
+    {
+      GeoCoordinate position = m_satConf->GetUtPosition (i+1);
+      uint32_t satId = m_beamHelper->GetClosestSat (position);
+
+      std::cout << "satId " << satId << std::endl;
+
+      BeamUserInfoMap_t info = infoList[satId];
+      // TODO who is m_antennaGainPatterns ???
+      uint32_t bestBeamId = m_antennaGainPatterns->GetBestBeamId (position);
+
+      std::vector<std::pair<GeoCoordinate, uint32_t>> positions = info.at (bestBeamId).GetPositions ();
+      positions.push_back (std::make_pair (position, 0));
+      info.at (bestBeamId).SetPositions (positions);
+      uint32_t nbUsers = getNextUtUserCountCallback ();
+      info.at (bestBeamId).AppendUt (nbUsers);
+
+      infoList[satId] = info; // TODO need this or implicitely updated ?
+    }
+}
+
+void
 SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
 {
   NS_LOG_FUNCTION (this);
@@ -642,6 +677,7 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
 
       // create all possible GW nodes, set mobility to them and install to Internet
       NodeContainer gwNodes;
+      std::cout << m_satConf->GetGwCount () << std::endl;
       gwNodes.Create (m_satConf->GetGwCount ());
       SetGwMobility (gwNodes);
       internet.Install (gwNodes);
@@ -695,6 +731,13 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
            */
           NS_ASSERT (rtnConf[SatConf::GW_ID_INDEX] == fwdConf[SatConf::GW_ID_INDEX]);
           NS_ASSERT (rtnConf[SatConf::BEAM_ID_INDEX] == fwdConf[SatConf::BEAM_ID_INDEX]);
+
+          // TODO lot of stuff here...
+          // TODO use get best beam ID, and get best satellite
+          // TODO for each beam: get all UTs that are closest, and associate a GW
+          // TODO create custom fwdConf/rtnConf or just change GW for each beam
+          std::cout << gwNodes.GetN () << std::endl;
+          std::cout << rtnConf[SatConf::GW_ID_INDEX] - 1 << std::endl;
 
           // gw index starts from 1 and we have stored them starting from 0
           Ptr<Node> gwNode = gwNodes.Get (rtnConf[SatConf::GW_ID_INDEX] - 1);
@@ -932,7 +975,7 @@ SatHelper::SetGeoSatMobility (Ptr<Node> node)
 }
 
 void
-SatHelper::SetSatMobility (Ptr<Node> node)
+SatHelper::SetSatMobility (Ptr<Node> node, std::string tle)
 {
   NS_LOG_FUNCTION (this);
 
@@ -950,7 +993,15 @@ SatHelper::SetSatMobility (Ptr<Node> node)
         }
       object->AggregateObject (model);
     }
-  model->SetTleInfo (m_satConf->GetSatTle ());
+
+  if (tle.empty ())
+    {
+      model->SetTleInfo (m_satConf->GetSatTle ());
+    }
+  else
+    {
+      model->SetTleInfo (tle);
+    }
 }
 
 void

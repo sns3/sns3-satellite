@@ -192,9 +192,12 @@ void SatConf::Initialize (std::string rtnConf,
                           std::string gwPos,
                           std::string satPos,
                           std::string wfConf,
-                          std::string tle)
+                          std::string tle,
+                          bool isConstellation)
 {
   NS_LOG_FUNCTION (this);
+
+  m_isConstellation = isConstellation;
 
   std::string dataPath = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory () + "/";
   std::string dataPathTle = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory () + "/tle/";
@@ -217,6 +220,19 @@ void SatConf::Initialize (std::string rtnConf,
 
   // Load TLE information
   LoadTle (dataPathTle + tle, m_tleSat);
+
+  // Update fwdConf & rtnConf with correct nb of GWs
+  if (m_isConstellation)
+    {
+      uint32_t nbGws = m_gwPositions.size ();
+      uint32_t gwId;
+      for (uint32_t i = 0; i < m_fwdConf.size (); i++)
+        {
+          gwId = i % nbGws;
+          m_fwdConf[i][GW_ID_INDEX] = gwId;
+          m_rtnConf[i][GW_ID_INDEX] = gwId;
+        }
+    }
 
   Configure (dataPath + wfConf);
 }
@@ -453,6 +469,10 @@ SatConf::LoadPositions (std::string filePathName, PositionContainer_t& container
                     " latitude [deg] = " << lat <<
                     ", longitude [deg] = " << lon <<
                     ", altitude [m] = ");
+      std::cout << this <<
+                    " latitude [deg] = " << lat <<
+                    ", longitude [deg] = " << lon <<
+                    ", altitude [m] = " << std::endl;
 
       // Store the values
       GeoCoordinate coord (lat, lon, alt);
@@ -525,6 +545,8 @@ SatConf::LoadTles (std::string filePathName)
   ifs->close ();
   delete ifs;
 
+  m_tles = tles;
+
   return tles;
 }
 
@@ -550,6 +572,21 @@ SatConf::GetUtCount () const
   NS_LOG_FUNCTION (this);
 
   return m_utPositions.size ();
+}
+
+uint32_t
+SatConf::GetSatCount () const
+{
+  NS_LOG_FUNCTION (this);
+
+  if (m_isConstellation)
+    {
+      return m_tles.size ();
+    }
+  else
+    {
+      return m_geoSatPosition.size ();
+    }
 }
 
 std::vector <uint32_t>

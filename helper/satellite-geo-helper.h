@@ -244,8 +244,8 @@ private:
   uint32_t m_fwdLinkCarrierCount;
   uint32_t m_rtnLinkCarrierCount;
 
-  // count for devices. Currently only one device supported by helper.
-  uint16_t m_deviceCount;
+  // count for devices for each node ID. Currently only one device supported by helper.
+  std::map<uint32_t, uint16_t> m_deviceCount;
 
   ObjectFactory m_deviceFactory;
 

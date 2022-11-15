@@ -26,6 +26,7 @@
 #include <string>
 #include <set>
 #include <map>
+#include <vector>
 #include <stdint.h>
 
 #include <ns3/node-container.h>
@@ -97,7 +98,7 @@ public:
   /**
    * Constructor for SatBeamHelper.
    *
-   * \param geoNode                     Pointer to Geo Satellite node
+   * \param geoNodes                    Container of Geo Satellite node
    * \param bandwidthConverterCb        Callback to convert bandwidth
    * \param fwdLinkCarrierCount         Number of carriers used in forward link
    * \param rtnLinkCarrierCount         Number of carriers used in return link
@@ -105,7 +106,7 @@ public:
    * \param forwardLinkRegenerationMode The regeneration mode used in satellites for forward link
    * \param returnLinkRegenerationMode  The regeneration mode used in satellites for return link
    */
-  SatBeamHelper (Ptr<Node> geoNode,
+  SatBeamHelper (NodeContainer geoNodes,
                  SatTypedefs::CarrierBandwidthConverter_t bandwidthConverterCb,
                  uint32_t fwdLinkCarrierCount,
                  uint32_t rtnLinkCarrierCount,
@@ -279,6 +280,13 @@ public:
   void EnableCreationTraces (Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
 
   /**
+   * Get closest satellite to a ground station
+   * \param position The position of the ground station
+   * \return The ID of the closest satellite
+   */
+  uint32_t GetClosestSat (GeoCoordinate position);
+
+  /**
    * \return info of created beams as std::string with GW info..
    */
   std::string GetBeamInfo () const;
@@ -303,6 +311,13 @@ public:
    * \return pointer to Geo Satellite node.
    */
   Ptr<Node> GetGeoSatNode () const;
+
+  /**
+   * Gets Geo Satellite nodes.
+   *
+   * \return pointer to Geo Satellite nodes.
+   */
+  NodeContainer GetGeoSatNodes () const;
 
   /**
    * \return pointer to UT helper.
@@ -379,7 +394,8 @@ private:
   Ptr<SatGeoHelper>     m_geoHelper;
   Ptr<SatGwHelper>      m_gwHelper;
   Ptr<SatUtHelper>      m_utHelper;
-  Ptr<Node>             m_geoNode;
+  NodeContainer         m_geoNodes;
+  Ptr<Node>             m_geoNode; // TODO temp
   Ptr<SatNcc>           m_ncc;
 
   Ptr<SatAntennaGainPatternContainer>   m_antennaGainPatterns;

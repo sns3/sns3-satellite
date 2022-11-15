@@ -53,6 +53,8 @@
 #include <ns3/satellite-id-mapper.h>
 #include <ns3/satellite-lorawan-net-device.h>
 #include <ns3/satellite-geo-net-device.h>
+#include <ns3/satellite-sgp4-mobility-model.h>
+
 #include "satellite-beam-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatBeamHelper");
@@ -197,7 +199,7 @@ SatBeamHelper::SatBeamHelper ()
   NS_FATAL_ERROR ("SatBeamHelper::SatBeamHelper - Constructor not in use");
 }
 
-SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
+SatBeamHelper::SatBeamHelper (NodeContainer geoNodes,
                               SatTypedefs::CarrierBandwidthConverter_t bandwidthConverterCb,
                               uint32_t rtnLinkCarrierCount,
                               uint32_t fwdLinkCarrierCount,
@@ -220,7 +222,7 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
   m_forwardLinkRegenerationMode (forwardLinkRegenerationMode),
   m_returnLinkRegenerationMode (returnLinkRegenerationMode)
 {
-  NS_LOG_FUNCTION (this << geoNode << rtnLinkCarrierCount << fwdLinkCarrierCount << seq);
+  NS_LOG_FUNCTION (this << rtnLinkCarrierCount << fwdLinkCarrierCount << seq);
 
   // uncomment next code line, if attributes are needed already in construction phase.
   // E.g attributes set by object factory affecting object creation
@@ -343,8 +345,8 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
   // DVB-RCS2 link results for RTN link waveform configurations
   m_superframeSeq->GetWaveformConf ()->InitializeEbNoRequirements (linkResultsReturnLink);
 
-  m_geoNode = geoNode;
-  m_geoHelper->Install (m_geoNode);
+  m_geoNodes = geoNodes;
+  m_geoHelper->Install (m_geoNodes);
 
   m_ncc = CreateObject<SatNcc> ();
 
@@ -480,6 +482,9 @@ SatBeamHelper::Install (NodeContainer ut,
 
   // next it is found user link channels and if not found channels are created and saved to map
   SatChannelPair::ChannelPair_t userLink = GetChannelPair (beamId, fwdUlFreqId, rtnUlFreqId, true);
+
+  // TODO temp
+  m_geoNode = m_geoNodes.Get (0);
 
   NS_ASSERT (m_geoNode != NULL);
 
@@ -781,11 +786,18 @@ SatBeamHelper::GetGwNode (uint32_t gwId) const
   return node;
 }
 
-Ptr<Node>
+Ptr<Node> // TODO temp
 SatBeamHelper::GetGeoSatNode () const
 {
   NS_LOG_FUNCTION (this);
   return m_geoNode;
+}
+
+NodeContainer
+SatBeamHelper::GetGeoSatNodes () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_geoNodes;
 }
 
 Ptr<SatUtHelper>
@@ -1048,6 +1060,27 @@ SatBeamHelper::EnableCreationTraces (Ptr<OutputStreamWrapper> stream, CallbackBa
   m_geoHelper->EnableCreationTraces (stream, cb);
   m_gwHelper->EnableCreationTraces (stream, cb);
   m_utHelper->EnableCreationTraces (stream, cb);
+}
+
+uint32_t
+SatBeamHelper::GetClosestSat (GeoCoordinate position)
+{
+  NS_LOG_FUNCTION (this);
+
+  double distanceMin = std::numeric_limits<double>::max ();
+  uint32_t indexDistanceMin = 0;
+
+  for (uint32_t i = 0; i < m_geoNodes.GetN (); i++)
+    {
+      GeoCoordinate satPos = m_geoNodes.Get (i)->GetObject<SatSGP4MobilityModel> ()->GetGeoPosition ();
+      double distance = CalculateDistance (position.ToVector (), satPos.ToVector ());
+      if (distance < distanceMin)
+        {
+          distanceMin = distance;
+          indexDistanceMin = i;
+        }
+    }
+  return indexDistanceMin;
 }
 
 void
