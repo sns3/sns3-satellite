@@ -274,12 +274,13 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d,
                               Ptr<SatChannel> ur,
                               Ptr<SatAntennaGainPattern> userAgp,
                               Ptr<SatAntennaGainPattern> feederAgp,
+                              uint32_t satId,
                               uint32_t gwId,
                               uint32_t userBeamId,
                               SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                               SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
-  NS_LOG_FUNCTION (this << d << ff << fr << uf << ur << userAgp << feederAgp << userBeamId);
+  NS_LOG_FUNCTION (this << d << ff << fr << uf << ur << userAgp << feederAgp << satId << gwId << userBeamId);
 
   Ptr<SatGeoNetDevice> dev = DynamicCast<SatGeoNetDevice> (d);
 
@@ -287,8 +288,8 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d,
   dev->SetReturnLinkRegenerationMode (returnLinkRegenerationMode);
   dev->SetNodeId (m_nodeId);
 
-  AttachChannelsFeeder ( dev, ff, fr, feederAgp, gwId, userBeamId, forwardLinkRegenerationMode, returnLinkRegenerationMode);
-  AttachChannelsUser ( dev, uf, ur, userAgp, userBeamId, forwardLinkRegenerationMode, returnLinkRegenerationMode);
+  AttachChannelsFeeder ( dev, ff, fr, feederAgp, satId, gwId, userBeamId, forwardLinkRegenerationMode, returnLinkRegenerationMode);
+  AttachChannelsUser ( dev, uf, ur, userAgp, satId, userBeamId, forwardLinkRegenerationMode, returnLinkRegenerationMode);
 }
 
 void
@@ -296,15 +297,17 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
                                      Ptr<SatChannel> ff,
                                      Ptr<SatChannel> fr,
                                      Ptr<SatAntennaGainPattern> feederAgp,
+                                     uint32_t satId,
                                      uint32_t gwId,
                                      uint32_t userBeamId,
                                      SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                                      SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
 
-  NS_LOG_FUNCTION (this << dev << ff << fr << feederAgp << forwardLinkRegenerationMode << returnLinkRegenerationMode);
+  NS_LOG_FUNCTION (this << dev << ff << fr << feederAgp << satId << gwId << userBeamId << forwardLinkRegenerationMode << returnLinkRegenerationMode);
 
   SatPhy::CreateParam_t params;
+  params.m_satId = satId;
   params.m_beamId = userBeamId;
   params.m_device = dev;
   params.m_standard = SatEnums::GEO;
@@ -352,7 +355,8 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
   bool startScheduler = false;
 
   // Create MAC layer
-  fMac = CreateObject<SatGeoFeederMac> (forwardLinkRegenerationMode,
+  fMac = CreateObject<SatGeoFeederMac> (satId,
+                                        forwardLinkRegenerationMode,
                                         returnLinkRegenerationMode);
 
   Mac48Address feederAddress;
@@ -508,13 +512,15 @@ SatGeoHelper::AttachChannelsUser ( Ptr<SatGeoNetDevice> dev,
                                    Ptr<SatChannel> uf,
                                    Ptr<SatChannel> ur,
                                    Ptr<SatAntennaGainPattern> userAgp,
+                                   uint32_t satId,
                                    uint32_t userBeamId,
                                    SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                                    SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
-  NS_LOG_FUNCTION (this << dev << uf << ur << userAgp << userBeamId << forwardLinkRegenerationMode << returnLinkRegenerationMode);
+  NS_LOG_FUNCTION (this << dev << uf << ur << userAgp << satId << userBeamId << forwardLinkRegenerationMode << returnLinkRegenerationMode);
 
   SatPhy::CreateParam_t params;
+  params.m_satId = satId;
   params.m_beamId = userBeamId;
   params.m_device = dev;
   params.m_standard = SatEnums::GEO;
@@ -560,7 +566,7 @@ SatGeoHelper::AttachChannelsUser ( Ptr<SatGeoNetDevice> dev,
   Ptr<SatGeoUserMac> uMac;
   Ptr<SatGeoLlc> uLlc;
 
-  uMac = CreateObject<SatGeoUserMac> (userBeamId,
+  uMac = CreateObject<SatGeoUserMac> (satId, userBeamId,
                                       forwardLinkRegenerationMode,
                                       returnLinkRegenerationMode);
 

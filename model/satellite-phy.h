@@ -84,20 +84,22 @@ public:
   typedef Callback<void, PacketContainer_t, Ptr<SatSignalParameters> > ReceiveCallback;
 
   /**
+   * \param The id of the satellite.
    * \param The id of the beam.
    * \param The id (address) of the source or sender
    * \param The id (address) of the destination or receiver
    * \param C/N0 value
    */
-  typedef Callback<void, uint32_t, Address, Address, double, bool> CnoCallback;
+  typedef Callback<void, uint32_t, uint32_t, Address, Address, double, bool> CnoCallback;
 
   /**
+   * \param satellite Id
    * \param beam Id
    * \param carrier Id
    * \param allocation channel Id
    * \param average normalized offered load
    */
-  typedef Callback<void, uint32_t, uint32_t, uint8_t, double> AverageNormalizedOfferedLoadCallback;
+  typedef Callback<void, uint32_t, uint32_t, uint32_t, uint8_t, double> AverageNormalizedOfferedLoadCallback;
 
   /**
    * \brief Creation parameters for base PHY object
@@ -107,6 +109,7 @@ public:
     Ptr<NetDevice> m_device;
     Ptr<SatChannel> m_txCh;
     Ptr<SatChannel> m_rxCh;
+    uint32_t m_satId;
     uint32_t m_beamId;
     SatEnums::SatLoraNodeType_t m_standard;
   } CreateParam_t;
@@ -423,6 +426,12 @@ public:
   virtual void SendPduWithParams (Ptr<SatSignalParameters> rxParams);
 
   /**
+   * \brief Set the satId this PHY is connected with
+   * \param satId Satellite ID
+   */
+  void SetSatId (uint32_t satId);
+
+  /**
    * \brief Set the beamId this PHY is connected with
    * \param beamId Satellite beam id
    */
@@ -444,16 +453,17 @@ public:
    * \param cno Value of the C/N0
    * \param isSatelliteMac If true, cno corresponds to link SAT to GW; if false, cno corresponds to link UT to GW
    */
-  void CnoInfo (uint32_t beamId, Address source, Address destination, double cno, bool isSatelliteMac);
+  void CnoInfo (uint32_t satId, uint32_t beamId, Address source, Address destination, double cno, bool isSatelliteMac);
 
   /**
    * \brief Function for getting the normalized offered load of the specific random access allocation channel
+   * \param satId Satellite id of average normalized load is received
    * \param beamId Beam id of average normalized load is received
    * \param carrierId Carrier id of average normalized load is received
    * \param allocationChannelId allocation channel ID
    * \param averageNormalizedOfferedLoad Value of average normalized offered load
    */
-  void AverageNormalizedOfferedRandomAccessLoadInfo (uint32_t beamId, uint32_t carrierId, uint8_t allocationChannelId, double averageNormalizedOfferedLoad);
+  void AverageNormalizedOfferedRandomAccessLoadInfo (uint32_t satId, uint32_t beamId, uint32_t carrierId, uint8_t allocationChannelId, double averageNormalizedOfferedLoad);
 
   /**
    * \brief Set the node info class
@@ -471,7 +481,7 @@ public:
    * \param uint32_t  beam ID
    * \return A pair of SatChannel to use as communication channel in this beam
    */
-  typedef Callback<SatChannelPair::ChannelPair_t, uint32_t> ChannelPairGetterCallback;
+  typedef Callback<SatChannelPair::ChannelPair_t, uint32_t, uint32_t> ChannelPairGetterCallback;
 
   /**
    * \brief Set the channel pair getter callback
@@ -584,6 +594,11 @@ protected:
    * Pointer to internal SatPhyRx instance
    */
   Ptr<SatPhyRx> m_phyRx;
+
+  /**
+   * Satellite ID
+   */
+  uint32_t m_satId;
 
   /**
    * Beam ID

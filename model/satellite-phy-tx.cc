@@ -292,6 +292,13 @@ SatPhyTx::EndTx ()
 }
 
 void
+SatPhyTx::SetSatId (uint32_t satId)
+{
+  NS_LOG_FUNCTION (this << satId);
+  m_satId = satId;
+}
+
+void
 SatPhyTx::SetBeamId (uint32_t beamId)
 {
   NS_LOG_FUNCTION (this << beamId);

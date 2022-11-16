@@ -324,7 +324,8 @@ SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams,
 
               packetRxParams.rxParams->m_packetsInBurst[0]->PeekPacketTag (addressE2ETag);
 
-              m_cnoCallback (packetRxParams.rxParams->m_beamId,
+              m_cnoCallback (packetRxParams.rxParams->m_satId,
+                             packetRxParams.rxParams->m_beamId,
                              addressE2ETag.GetE2ESourceAddress (),
                              GetOwnAddress (),
                              cno,
@@ -371,13 +372,15 @@ SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams,
                   SatMacTag satMacTag;
                   (*i)->PeekPacketTag (satMacTag);
 
-                  m_cnoCallback (satUplinkInfoTag.GetBeamId (),
+                  m_cnoCallback (satUplinkInfoTag.GetSatId (),
+                                 satUplinkInfoTag.GetBeamId (),
                                  addressE2ETag.GetE2ESourceAddress (),
                                  GetOwnAddress (),
                                  worstCno,
                                  false);
 
-                  m_cnoCallback (GetBeamId (),
+                  m_cnoCallback (GetSatId (),
+                                 GetBeamId (),
                                  satMacTag.GetSourceAddress (),
                                  GetOwnAddress (),
                                  downlinkCno,

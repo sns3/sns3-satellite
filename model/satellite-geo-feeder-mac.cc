@@ -70,9 +70,10 @@ SatGeoFeederMac::SatGeoFeederMac (void)
   NS_FATAL_ERROR ("SatGeoFeederMac default constructor is not allowed to use");
 }
 
-SatGeoFeederMac::SatGeoFeederMac (SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+SatGeoFeederMac::SatGeoFeederMac (uint32_t satId,
+                                  SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                                   SatEnums::RegenerationMode_t returnLinkRegenerationMode)
- : SatGeoMac (0, forwardLinkRegenerationMode, returnLinkRegenerationMode)
+ : SatGeoMac (satId, 0, forwardLinkRegenerationMode, returnLinkRegenerationMode)
 {
   NS_LOG_FUNCTION (this);
 }

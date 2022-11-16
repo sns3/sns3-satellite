@@ -452,6 +452,29 @@ SatPhyRx::ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatS
 }
 
 void
+SatPhyRx::SetSatId (uint32_t satId)
+{
+  NS_LOG_FUNCTION (this << satId);
+  NS_ASSERT (satId >= 0);
+  NS_ASSERT (!m_rxCarriers.empty ());
+
+  m_satId = satId;
+
+  for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin (); it != m_rxCarriers.end (); ++it)
+    {
+      (*it)->SetSatId (satId);
+    }
+}
+
+uint32_t
+SatPhyRx::GetSatId () const
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_satId;
+}
+
+void
 SatPhyRx::SetBeamId (uint32_t beamId)
 {
   NS_LOG_FUNCTION (this << beamId);

@@ -515,7 +515,7 @@ SatHelper::CreateSimpleScenario ()
   BeamUserInfoMap_t beamUserInfos;
   beamUserInfos[8] = beamInfo;
 
-  DoCreateScenario (beamUserInfos, 1);
+  DoCreateScenario ({beamUserInfos}, 1);
 
   m_creationSummaryTrace ("*** Simple Scenario Creation Summary ***");
 }
@@ -538,7 +538,7 @@ SatHelper::CreateLargerScenario ()
 
   beamUserInfos[3] = beamInfo;
 
-  DoCreateScenario (beamUserInfos, 1);
+  DoCreateScenario ({beamUserInfos}, 1);
 
   m_creationSummaryTrace ("*** Larger Scenario Creation Summary ***");
 }
@@ -568,7 +568,7 @@ SatHelper::CreateFullScenario ()
       beamUserInfos[i] = info;
     }
 
-  DoCreateScenario (beamUserInfos, m_gwUsers);
+  DoCreateScenario ({beamUserInfos}, m_gwUsers);
 
   m_creationSummaryTrace ("*** Full Scenario Creation Summary ***");
 }
@@ -579,7 +579,7 @@ SatHelper::CreateUserDefinedScenario (BeamUserInfoMap_t& infos)
   NS_LOG_FUNCTION (this);
 
   // create as user wants
-  DoCreateScenario (infos, m_gwUsers);
+  DoCreateScenario ({infos}, m_gwUsers);
 
   m_creationSummaryTrace ("*** User Defined Scenario Creation Summary ***");
 }
@@ -637,7 +637,7 @@ SatHelper::CreateUserDefinedScenarioFromListPositions (BeamUserInfoMap_t& infos,
     }
 
   // create as user wants
-  DoCreateScenario (infos, m_gwUsers);
+  DoCreateScenario ({infos}, m_gwUsers);
 
   m_creationSummaryTrace ("*** User Defined Scenario with List Positions Creation Summary ***");
 }
@@ -669,16 +669,16 @@ SatHelper::CreateConstellationScenario (std::vector<BeamUserInfoMap_t> infoList,
       uint32_t nbUsers = getNextUtUserCountCallback ();
       info.at (bestBeamId).AppendUt (nbUsers);
 
-      infoList[satId] = info; // TODO need this or implicitely updated ?
+      infoList[satId] = info;
     }
 
   m_groupHelper->SetSatConstellationEnabled ();
 
-  DoCreateScenario (infoList[1], m_satConf->GetGwCount ()); // TODO need to set stuff, genre SAT ID ? -> YES !
+  DoCreateScenario (infoList, m_satConf->GetGwCount ());
 }
 
 void
-SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
+SatHelper::DoCreateScenario (std::vector<BeamUserInfoMap_t> infoList, uint32_t gwUsers)
 {
   NS_LOG_FUNCTION (this);
 
@@ -688,7 +688,7 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
     }
   else
     {
-      SetNetworkAddresses (beamInfos, gwUsers);
+      SetNetworkAddresses (infoList, gwUsers);
 
       if (m_creationTraces)
         {
@@ -705,73 +705,74 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
       SetGwMobility (gwNodes);
       internet.Install (gwNodes);
 
-      // Create beams explicitly required for this scenario
-      for (BeamUserInfoMap_t::iterator info = beamInfos.begin (); info != beamInfos.end (); info++)
+      for (uint32_t satId = 0; satId < m_satConf->GetSatCount (); satId++)
         {
-          // create UTs of the beam, set mobility to them
-          std::vector<std::pair<GeoCoordinate, uint32_t>> positionsAndGroupId = info->second.GetPositions ();
-          NodeContainer uts;
-          uts.Create (info->second.GetUtCount () - positionsAndGroupId.size ());
-          SetUtMobility (uts, info->first);
+          BeamUserInfoMap_t beamInfos = infoList[satId];
 
-          NodeContainer utsFromPosition;
-          utsFromPosition.Create (positionsAndGroupId.size ());
-          SetUtMobilityFromPosition (utsFromPosition, info->first, positionsAndGroupId);
-          uts.Add (utsFromPosition);
-
-          // Add mobile UTs starting at this beam
-          std::map<uint32_t, NodeContainer>::iterator mobileUts = m_mobileUtsByBeam.find (info->first);
-          if (mobileUts != m_mobileUtsByBeam.end ())
+          // Create beams explicitly required for this scenario
+          for (BeamUserInfoMap_t::iterator info = beamInfos.begin (); info != beamInfos.end (); info++)
             {
-              uts.Add (mobileUts->second);
-              m_mobileUtsByBeam.erase (mobileUts);
+              // create UTs of the beam, set mobility to them
+              std::vector<std::pair<GeoCoordinate, uint32_t>> positionsAndGroupId = info->second.GetPositions ();
+              NodeContainer uts;
+              uts.Create (info->second.GetUtCount () - positionsAndGroupId.size ());
+              SetUtMobility (uts, info->first);
+
+              NodeContainer utsFromPosition;
+              utsFromPosition.Create (positionsAndGroupId.size ());
+              SetUtMobilityFromPosition (utsFromPosition, info->first, positionsAndGroupId);
+              uts.Add (utsFromPosition);
+
+              // Add mobile UTs starting at this beam
+              std::map<uint32_t, NodeContainer>::iterator mobileUts = m_mobileUtsByBeam.find (info->first);
+              if (mobileUts != m_mobileUtsByBeam.end ())
+                {
+                  uts.Add (mobileUts->second);
+                  m_mobileUtsByBeam.erase (mobileUts);
+                }
+
+              // install the whole fleet to Internet
+              internet.Install (uts);
+
+              for (uint32_t i = 0; i < info->second.GetUtCount (); ++i)
+                {
+                  // create and install needed users
+                  m_userHelper->InstallUt (uts.Get (i), info->second.GetUtUserCount (i));
+                }
+
+              std::pair<std::multimap<uint32_t, uint32_t>::iterator, std::multimap<uint32_t, uint32_t>::iterator> mobileUsers;
+              mobileUsers = m_mobileUtsUsersByBeam.equal_range (info->first);
+              std::multimap<uint32_t, uint32_t>::iterator it = mobileUsers.first;
+              for (uint32_t i = info->second.GetUtCount (); i < uts.GetN () && it != mobileUsers.second; ++i, ++it)
+                {
+                  // create and install needed mobile users
+                  m_userHelper->InstallUt (uts.Get (i), it->second);
+                }
+
+              std::vector<uint32_t> rtnConf = m_satConf->GetBeamConfiguration (info->first, SatEnums::LD_RETURN);
+              std::vector<uint32_t> fwdConf = m_satConf->GetBeamConfiguration (info->first, SatEnums::LD_FORWARD);
+
+              /**
+               * GW and beam ids are assumed to be the same for both directions
+               * currently!
+               */
+              NS_ASSERT (rtnConf[SatConf::GW_ID_INDEX] == fwdConf[SatConf::GW_ID_INDEX]);
+              NS_ASSERT (rtnConf[SatConf::BEAM_ID_INDEX] == fwdConf[SatConf::BEAM_ID_INDEX]);
+
+              // gw index starts from 1 and we have stored them starting from 0
+              Ptr<Node> gwNode = gwNodes.Get (rtnConf[SatConf::GW_ID_INDEX] - 1);
+              std::pair<Ptr<NetDevice>, NetDeviceContainer> netDevices = m_beamHelper->Install (
+                  uts, gwNode,
+                  rtnConf[SatConf::GW_ID_INDEX],
+                  satId,
+                  rtnConf[SatConf::BEAM_ID_INDEX],
+                  rtnConf[SatConf::U_FREQ_ID_INDEX],
+                  rtnConf[SatConf::F_FREQ_ID_INDEX],
+                  fwdConf[SatConf::U_FREQ_ID_INDEX],
+                  fwdConf[SatConf::F_FREQ_ID_INDEX],
+                  MakeCallback (&SatUserHelper::UpdateUtRoutes, m_userHelper));
+              m_userHelper->PopulateBeamRoutings (uts, netDevices.second, gwNode, netDevices.first);
             }
-
-          // install the whole fleet to Internet
-          internet.Install (uts);
-
-          for (uint32_t i = 0; i < info->second.GetUtCount (); ++i)
-            {
-              // create and install needed users
-              m_userHelper->InstallUt (uts.Get (i), info->second.GetUtUserCount (i));
-            }
-
-          std::pair<std::multimap<uint32_t, uint32_t>::iterator, std::multimap<uint32_t, uint32_t>::iterator> mobileUsers;
-          mobileUsers = m_mobileUtsUsersByBeam.equal_range (info->first);
-          std::multimap<uint32_t, uint32_t>::iterator it = mobileUsers.first;
-          for (uint32_t i = info->second.GetUtCount (); i < uts.GetN () && it != mobileUsers.second; ++i, ++it)
-            {
-              // create and install needed mobile users
-              m_userHelper->InstallUt (uts.Get (i), it->second);
-            }
-
-          std::vector<uint32_t> rtnConf = m_satConf->GetBeamConfiguration (info->first, SatEnums::LD_RETURN);
-          std::vector<uint32_t> fwdConf = m_satConf->GetBeamConfiguration (info->first, SatEnums::LD_FORWARD);
-
-          /**
-           * GW and beam ids are assumed to be the same for both directions
-           * currently!
-           */
-          NS_ASSERT (rtnConf[SatConf::GW_ID_INDEX] == fwdConf[SatConf::GW_ID_INDEX]);
-          NS_ASSERT (rtnConf[SatConf::BEAM_ID_INDEX] == fwdConf[SatConf::BEAM_ID_INDEX]);
-
-          // TODO lot of stuff here...
-          // TODO use get best beam ID, and get best satellite -> DONE normalement
-          // TODO for each beam: get all UTs that are closest, and associate a GW -> DONE normalement too
-          // TODO create custom fwdConf/rtnConf or just change GW for each beam -> YES
-
-          // gw index starts from 1 and we have stored them starting from 0
-          Ptr<Node> gwNode = gwNodes.Get (rtnConf[SatConf::GW_ID_INDEX] - 1);
-          std::pair<Ptr<NetDevice>, NetDeviceContainer> netDevices = m_beamHelper->Install (
-              uts, gwNode,
-              rtnConf[SatConf::GW_ID_INDEX],
-              rtnConf[SatConf::BEAM_ID_INDEX],
-              rtnConf[SatConf::U_FREQ_ID_INDEX],
-              rtnConf[SatConf::F_FREQ_ID_INDEX],
-              fwdConf[SatConf::U_FREQ_ID_INDEX],
-              fwdConf[SatConf::F_FREQ_ID_INDEX],
-              MakeCallback (&SatUserHelper::UpdateUtRoutes, m_userHelper));
-          m_userHelper->PopulateBeamRoutings (uts, netDevices.second, gwNode, netDevices.first);
         }
 
       m_mobileUtsByBeam.clear ();  // Release unused resources (mobile UTs starting in non-existent beams)
@@ -1351,7 +1352,7 @@ SatHelper::ConstructMulticastInfo (Ptr<Node> sourceUtNode, NodeContainer receive
 }
 
 void
-SatHelper::SetNetworkAddresses (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers) const
+SatHelper::SetNetworkAddresses (std::vector<BeamUserInfoMap_t> infoList, uint32_t gwUsers) const
 {
   NS_LOG_FUNCTION (this);
 
@@ -1382,34 +1383,42 @@ SatHelper::SetNetworkAddresses (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers) 
   uint32_t gwNetworkAddressCount = 1;   // network addresses needed in GW network. Initially one network needed between GW users and Router needed
   std::set<uint32_t> gwIds;             // to find out the additional network addresses needed in GW network
 
-  for (BeamUserInfoMap_t::const_iterator it = beamInfos.begin (); it != beamInfos.end (); it++)
+  uint32_t beamInfoSize = 0;
+
+  for (uint32_t satId = 0; satId < m_satConf->GetSatCount (); satId++)
     {
-      uint32_t beamUtCount = it->second.GetUtCount ();
-      utNetworkAddressCount += beamUtCount;
+      BeamUserInfoMap_t beamInfos = infoList[satId];
+      beamInfoSize += beamInfos.size ();
 
-      if (beamUtCount > beamHostAddressCount)
+      for (BeamUserInfoMap_t::const_iterator it = beamInfos.begin (); it != beamInfos.end (); it++)
         {
-          beamHostAddressCount = beamUtCount;
-        }
+          uint32_t beamUtCount = it->second.GetUtCount ();
+          utNetworkAddressCount += beamUtCount;
 
-      for (uint32_t i = 0; i < beamUtCount; i++)
-        {
-          if (it->second.GetUtUserCount (i) > utHostAddressCount)
+          if (beamUtCount > beamHostAddressCount)
             {
-              utHostAddressCount = it->second.GetUtUserCount (i);
+              beamHostAddressCount = beamUtCount;
             }
-        }
 
-      // try to add GW id to container, if not existing already in the container
-      // increment GW network address count
-      if (gwIds.insert (m_beamHelper->GetGwId (it->first)).second)
-        {
-          gwNetworkAddressCount++; // one network more needed between a GW and Router
+          for (uint32_t i = 0; i < beamUtCount; i++)
+            {
+              if (it->second.GetUtUserCount (i) > utHostAddressCount)
+                {
+                  utHostAddressCount = it->second.GetUtUserCount (i);
+                }
+            }
+
+          // try to add GW id to container, if not existing already in the container
+          // increment GW network address count
+          if (gwIds.insert (m_beamHelper->GetGwId (it->first, satId)).second)
+            {
+              gwNetworkAddressCount++; // one network more needed between a GW and Router
+            }
         }
     }
 
   // do final checking of the configured address spaces
-  CheckNetwork ("Beam", m_beamNetworkAddress, m_beamNetworkMask, networkAddresses, beamInfos.size (), beamHostAddressCount);
+  CheckNetwork ("Beam", m_beamNetworkAddress, m_beamNetworkMask, networkAddresses, beamInfoSize, beamHostAddressCount);
   CheckNetwork ("GW", m_gwNetworkAddress, m_gwNetworkMask, networkAddresses, gwNetworkAddressCount, gwUsers);
   CheckNetwork ("UT", m_utNetworkAddress, m_utNetworkMask, networkAddresses, utNetworkAddressCount, utHostAddressCount);
 

@@ -80,6 +80,12 @@ public:
   ~SatMac ();
 
   /**
+   * \brief Get sat ID of the object
+   * \return sat ID
+   */
+  inline uint32_t GetSatId () const { return m_satId; }
+
+  /**
    * \brief Get beam ID of the object
    * \return beam ID
    */
@@ -368,6 +374,11 @@ protected:
    * node type, node id and MAC address (of the SatNetDevice)
    */
   Ptr<SatNodeInfo> m_nodeInfo;
+
+  /**
+   * The ID of the sat where mac belongs.
+   */
+  uint32_t m_satId;
 
   /**
    * The ID of the beam where mac belongs.

@@ -68,12 +68,13 @@ SatGeoMac::SatGeoMac (void)
   NS_FATAL_ERROR ("SatGeoMac default constructor is not allowed to use");
 }
 
-SatGeoMac::SatGeoMac (uint32_t beamId,
+SatGeoMac::SatGeoMac (uint32_t satId, uint32_t beamId,
                       SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                       SatEnums::RegenerationMode_t returnLinkRegenerationMode)
  : SatMac (forwardLinkRegenerationMode, returnLinkRegenerationMode),
   m_fwdScheduler (),
   m_guardTime (MicroSeconds (1)),
+  m_satId (satId),
   m_beamId (beamId)
 {
   NS_LOG_FUNCTION (this);
@@ -178,6 +179,7 @@ SatGeoMac::SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Ti
   Ptr<SatSignalParameters> txParams = Create<SatSignalParameters> ();
   txParams->m_duration = duration;
   txParams->m_packetsInBurst = packets;
+  txParams->m_satId = m_satId;
   txParams->m_beamId = m_beamId;
   txParams->m_carrierId = carrierId;
   txParams->m_txInfo = txInfo;

@@ -97,9 +97,9 @@ SatStatsBackloggedRequestHelper::DoInstall ()
   NS_ASSERT (beamHelper != 0);
   Ptr<SatNcc> ncc = beamHelper->GetNcc ();
   NS_ASSERT (ncc != 0);
-  std::list<uint32_t> beams = beamHelper->GetBeams ();
+  std::list<std::pair<uint32_t, uint32_t>> beams = beamHelper->GetBeams ();
 
-  for (std::list<uint32_t>::const_iterator it = beams.begin ();
+  for (std::list<std::pair<uint32_t, uint32_t>>::const_iterator it = beams.begin ();
        it != beams.end (); ++it)
     {
       std::ostringstream context;
@@ -109,24 +109,24 @@ SatStatsBackloggedRequestHelper::DoInstall ()
           context << "0";
           break;
         case SatStatsHelper::IDENTIFIER_GW:
-          context << GetIdentifierForBeam (*it);
+          context << GetIdentifierForBeam (it->second);
           break;
         case SatStatsHelper::IDENTIFIER_BEAM:
-          context << GetIdentifierForBeam (*it);
+          context << GetIdentifierForBeam (it->second);
           break;
         default:
           NS_FATAL_ERROR ("SatStatsBackloggedRequestHelper - Invalid identifier type");
           break;
         }
 
-      Ptr<SatBeamScheduler> s = ncc->GetBeamScheduler (*it);
-      NS_ASSERT_MSG (s != 0, "Error finding beam " << *it);
+      Ptr<SatBeamScheduler> s = ncc->GetBeamScheduler (it->first, it->second);
+      NS_ASSERT_MSG (s != 0, "Error finding beam " << it->second);
       const bool ret = s->TraceConnect ("BacklogRequestsTrace",
                                         context.str (), aggregatorSink);
       NS_ASSERT_MSG (ret,
-                     "Error connecting to BacklogRequestsTrace of beam " << *it);
+                     "Error connecting to BacklogRequestsTrace of beam " << it->second);
       NS_LOG_INFO (this << " successfully connected"
-                        << " with beam " << *it);
+                        << " with beam " << it->second);
     }
 
 } // end of `void DoInstall ();`

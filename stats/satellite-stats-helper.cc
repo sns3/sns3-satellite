@@ -336,13 +336,14 @@ SatStatsHelper::CreateCollectorPerIdentifier (CollectorMap &collectorMap) const
 
     case SatStatsHelper::IDENTIFIER_BEAM:
       {
-        std::list<uint32_t> beams = m_satHelper->GetBeamHelper ()->GetBeams ();
-        for (std::list<uint32_t>::const_iterator it = beams.begin ();
+        std::list<std::pair<uint32_t, uint32_t>> beams = m_satHelper->GetBeamHelper ()->GetBeams ();
+        for (std::list<std::pair<uint32_t, uint32_t>>::const_iterator it = beams.begin ();
              it != beams.end (); ++it)
           {
-            const uint32_t beamId = (*it);
+            const uint32_t satId = (it->first);
+            const uint32_t beamId = (it->second);
             std::ostringstream name;
-            name << beamId;
+            name << satId << "-" << beamId;
             collectorMap.SetAttribute ("Name", StringValue (name.str ()));
             collectorMap.Create (beamId);
             n++;

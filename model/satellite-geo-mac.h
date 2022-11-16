@@ -54,11 +54,12 @@ public:
    *
    * This is the constructor for the SatGeoMac
    *
+   * \param satId ID of sat for UT
    * \param beamId ID of beam for UT
    * \param forwardLinkRegenerationMode Forward link regeneration mode
    * \param returnLinkRegenerationMode Return link regeneration mode
    */
-  SatGeoMac (uint32_t beamId,
+  SatGeoMac (uint32_t satId, uint32_t beamId,
              SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
              SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
@@ -170,6 +171,11 @@ protected:
    * the duration of a BB frame by a m_guardTime set by an attribute.
    */
   Time m_guardTime;
+
+  /**
+   * ID of sat for UT
+   */
+  uint32_t m_satId;
 
   /**
    * ID of beam for UT

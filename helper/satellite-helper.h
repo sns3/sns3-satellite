@@ -509,10 +509,10 @@ private:
 
   /**
    * Creates satellite objects according to given beam info.
-   * \param beamInfos information of the beam to create (and beams which are given in map)
+   * \param infoList information of the sats and beam to create (and beams which are given in map)
    * \param gwUsers number of the users in GW(s) side
    */
-  void DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers);
+  void DoCreateScenario (std::vector<BeamUserInfoMap_t> infoList, uint32_t gwUsers);
 
   /**
    * Creates trace summary starting with give title.
@@ -617,7 +617,7 @@ private:
   /**
    * Set configured network addresses to user and beam helpers.
    */
-  void SetNetworkAddresses (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers) const;
+  void SetNetworkAddresses (std::vector<BeamUserInfoMap_t> infoList, uint32_t gwUsers) const;
 
   /**
    * Check validity of the configured network space.

@@ -141,6 +141,12 @@ public:
   virtual void StartTx (Ptr<SatSignalParameters> txParams);
 
   /**
+   * Set the satellite id for all the transmissions from this SatPhyTx
+   * \param satId the satellite Identifier
+   */
+  void SetSatId (uint32_t satId);
+
+  /**
    * Set the beam id for all the transmissions from this SatPhyTx
    * \param beamId the Beam Identifier
    */
@@ -176,6 +182,7 @@ private:
   double m_maxAntennaGain;
 
   State m_state;
+  uint32_t m_satId;
   uint32_t m_beamId;
   SatPhyTxMode_t m_txMode;
 

@@ -166,6 +166,11 @@ public:
   PacketsInBurst_t m_packetsInBurst;
 
   /**
+   * The sat for the packet transmission
+   */
+  uint32_t m_satId;
+
+  /**
    * The beam for the packet transmission
    */
   uint32_t m_beamId;

@@ -108,6 +108,7 @@ SatUtMac::GetInstanceTypeId (void) const
 
 SatUtMac::SatUtMac ()
   : SatMac (),
+  m_satId (0),
   m_beamId (),
   m_superframeSeq (),
   m_timingAdvanceCb (0),
@@ -152,12 +153,14 @@ SatUtMac::SatUtMac ()
   NS_FATAL_ERROR ("SatUtMac::SatUtMac - Constructor not in use");
 }
 
-SatUtMac::SatUtMac (uint32_t beamId,
+SatUtMac::SatUtMac (uint32_t satId,
+                    uint32_t beamId,
                     Ptr<SatSuperframeSeq> seq,
                     SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                     SatEnums::RegenerationMode_t returnLinkRegenerationMode,
                     bool crdsaOnlyForControl)
   : SatMac (forwardLinkRegenerationMode, returnLinkRegenerationMode),
+  m_satId (satId),
   m_beamId (beamId),
   m_superframeSeq (seq),
   m_timingAdvanceCb (0),
@@ -1841,7 +1844,7 @@ SatUtMac::DoFrameStart ()
 
                   m_beamId = m_askedBeamCallback ();
 
-                  Address gwAddress = m_beamScheculerCallback (m_beamId)->GetGwAddress ();
+                  Address gwAddress = m_beamScheculerCallback (m_satId, m_beamId)->GetGwAddress ();
                   Mac48Address gwAddress48 = Mac48Address::ConvertFrom (gwAddress);
                   if (gwAddress48 != m_gwAddress)
                     {

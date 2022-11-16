@@ -59,6 +59,7 @@ NS_OBJECT_ENSURE_REGISTERED (SatPhyRxCarrier);
 SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatWaveformConf> waveformConf, bool isRandomAccessEnabled)
   : m_randomAccessEnabled (isRandomAccessEnabled),
   m_state (IDLE),
+  m_satId (),
   m_beamId (),
   m_carrierId (carrierId),
   m_receivingDedicatedAccess (false),

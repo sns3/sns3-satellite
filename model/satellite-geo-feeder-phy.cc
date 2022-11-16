@@ -446,6 +446,7 @@ SatGeoFeederPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
                 {
                   SatUplinkInfoTag satUplinkInfoTag;
                   (*it)->RemovePacketTag (satUplinkInfoTag);
+                  satUplinkInfoTag.SetSatId (rxParams->m_satId);
                   satUplinkInfoTag.SetBeamId (rxParams->m_beamId);
                   (*it)->AddPacketTag (satUplinkInfoTag);
                 }

@@ -350,6 +350,7 @@ SatGeoNetDevice::SendControlMsgToFeeder (Ptr<SatControlMessage> msg, const Addre
       SatUplinkInfoTag satUplinkInfoTag;
       satUplinkInfoTag.SetSinr (std::numeric_limits<double>::infinity (), 0);
       satUplinkInfoTag.SetBeamId (rxParams->m_beamId);
+      satUplinkInfoTag.SetSatId (rxParams->m_satId);
       packet->AddPacketTag (satUplinkInfoTag);
     }
 

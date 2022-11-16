@@ -49,7 +49,8 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatPhy);
 
 SatPhy::SatPhy (void)
-  : m_beamId (0),
+  : m_satId (0),
+  m_beamId (0),
   m_eirpWoGainW (0),
   m_isStatisticsTagsEnabled (false),
   m_lastDelay (0),
@@ -70,7 +71,8 @@ SatPhy::SatPhy (void)
 }
 
 SatPhy::SatPhy (CreateParam_t & params)
-  : m_beamId (0),
+  : m_satId (0),
+  m_beamId (0),
   m_eirpWoGainW (0),
   m_isStatisticsTagsEnabled (false),
   m_lastDelay (0),
@@ -86,7 +88,7 @@ SatPhy::SatPhy (CreateParam_t & params)
   m_txAntennaLossDb (0),
   m_defaultFadingValue (1.0)
 {
-  NS_LOG_FUNCTION (this << params.m_beamId);
+  NS_LOG_FUNCTION (this << params.m_satId << params.m_beamId);
   ObjectBase::ConstructSelf (AttributeConstructionList ());
 
   Ptr<MobilityModel> mobility = params.m_device->GetNode ()->GetObject<MobilityModel> ();
@@ -118,6 +120,7 @@ SatPhy::SatPhy (CreateParam_t & params)
     }
 
   m_phyTx->SetChannel (params.m_txCh);
+  m_satId = params.m_satId;
   m_beamId = params.m_beamId;
 
   params.m_rxCh->AddRx (m_phyRx);
@@ -203,6 +206,9 @@ SatPhy::Initialize ()
   double eirpWoGainDbw = m_txMaxPowerDbw - m_txOutputLossDb - m_txPointingLossDb - m_txOboLossDb - m_txAntennaLossDb;
 
   m_eirpWoGainW = SatUtils::DbWToW ( eirpWoGainDbw );
+
+  m_phyTx->SetSatId (m_satId);
+  m_phyRx->SetSatId (m_satId);
 
   m_phyTx->SetBeamId (m_beamId);
   m_phyRx->SetBeamId (m_beamId);
@@ -380,6 +386,7 @@ SatPhy::SendPdu (PacketContainer_t p, uint32_t carrierId, Time duration, SatSign
   txParams->m_duration = duration;
   txParams->m_phyTx = m_phyTx;
   txParams->m_packetsInBurst = p;
+  txParams->m_satId = m_satId;
   txParams->m_beamId = m_beamId;
   txParams->m_carrierId = carrierId;
   txParams->m_txPower_W = m_eirpWoGainW;
@@ -404,6 +411,15 @@ SatPhy::SendPduWithParams (Ptr<SatSignalParameters> txParams )
    * This method is not meant to be used in this class. It
    * is overriden in the inherited classes.
    */
+}
+
+void
+SatPhy::SetSatId (uint32_t satId)
+{
+  NS_LOG_FUNCTION (this << satId);
+  m_satId = satId;
+  m_phyTx->SetSatId (satId);
+  m_phyRx->SetSatId (satId);
 }
 
 void
@@ -598,17 +614,17 @@ SatPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
 }
 
 void
-SatPhy::CnoInfo (uint32_t beamId, Address source, Address dest, double cno, bool isSatelliteMac)
+SatPhy::CnoInfo (uint32_t satId, uint32_t beamId, Address source, Address dest, double cno, bool isSatelliteMac)
 {
   NS_LOG_FUNCTION (this << beamId << source << cno << isSatelliteMac);
-  m_cnoCallback ( beamId, source, dest, cno, isSatelliteMac);
+  m_cnoCallback ( satId, beamId, source, dest, cno, isSatelliteMac);
 }
 
 void
-SatPhy::AverageNormalizedOfferedRandomAccessLoadInfo (uint32_t beamId, uint32_t carrierId, uint8_t allocationChannelId, double averageNormalizedOfferedLoad)
+SatPhy::AverageNormalizedOfferedRandomAccessLoadInfo (uint32_t satId, uint32_t beamId, uint32_t carrierId, uint8_t allocationChannelId, double averageNormalizedOfferedLoad)
 {
-  NS_LOG_FUNCTION (this << beamId << carrierId << allocationChannelId << averageNormalizedOfferedLoad);
-  m_avgNormalizedOfferedLoadCallback (beamId, carrierId, allocationChannelId, averageNormalizedOfferedLoad);
+  NS_LOG_FUNCTION (this << satId << beamId << carrierId << allocationChannelId << averageNormalizedOfferedLoad);
+  m_avgNormalizedOfferedLoadCallback (satId, beamId, carrierId, allocationChannelId, averageNormalizedOfferedLoad);
 }
 
 

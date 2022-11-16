@@ -171,6 +171,7 @@ public:
    * \param uf user return channel
    * \param userAgp user beam antenna gain pattern
    * \param feederAgp feeder beam antenna gain pattern
+   * \param satId ID of satellite associated to this channel
    * \param gwId ID of GW associated to this channel
    * \param userBeamId Id of the beam
    * \param forwardLinkRegenerationMode Regeneration mode on forward
@@ -183,6 +184,7 @@ public:
                         Ptr<SatChannel> ur,
                         Ptr<SatAntennaGainPattern> userAgp,
                         Ptr<SatAntennaGainPattern> feederAgp,
+                        uint32_t satId,
                         uint32_t gwId,
                         uint32_t userBeamId,
                         SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
@@ -194,6 +196,7 @@ public:
    * \param fr feeder forward channel
    * \param fr feeder return channel
    * \param feederAgp feeder beam antenna gain pattern
+   * \param satId ID of satellite associated to this channel
    * \param gwId ID of GW associated to this channel
    * \param userBeamId Id of the beam
    * \param forwardLinkRegenerationMode Regeneration mode on forward
@@ -203,6 +206,7 @@ public:
                               Ptr<SatChannel> ff,
                               Ptr<SatChannel> fr,
                               Ptr<SatAntennaGainPattern> feederAgp,
+                              uint32_t satId,
                               uint32_t gwId,
                               uint32_t userBeamId,
                               SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
@@ -214,6 +218,7 @@ public:
    * \param uf user forward channel
    * \param uf user return channel
    * \param userAgp user beam antenna gain pattern
+   * \param satId ID of satellite associated to this channel
    * \param userBeamId Id of the beam
    * \param forwardLinkRegenerationMode Regeneration mode on forward
    * \param returnLinkRegenerationMode Regeneration mode on return
@@ -222,6 +227,7 @@ public:
                             Ptr<SatChannel> uf,
                             Ptr<SatChannel> ur,
                             Ptr<SatAntennaGainPattern> userAgp,
+                            uint32_t satId,
                             uint32_t userBeamId,
                             SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                             SatEnums::RegenerationMode_t returnLinkRegenerationMode);

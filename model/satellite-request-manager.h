@@ -159,13 +159,14 @@ public:
    * The SatUtMac receives C/N0 information of packet receptions from GW
    * to update this information to serving GW periodically.
    *
+   * \param satId The id of the satellite where C/N0 is from.
    * \param beamId The id of the beam where C/N0 is from.
    * \param sourceMac The MAC address of the source from where we measured C/N0.
    * \param gwId The id of the GW.
    * \param cno Value of the C/N0.
    * \param isSatelliteMac If true, cno corresponds to link SAT to UT; if false, cno corresponds to link GW to UT
    */
-  void CnoUpdated (uint32_t beamId, Address sourceMac, Address gwId, double cno, bool isSatelliteMac);
+  void CnoUpdated (uint32_t satId, uint32_t beamId, Address sourceMac, Address gwId, double cno, bool isSatelliteMac);
 
   /**
    * \brief Sat UT MAC informs that certain amount of resources have been received

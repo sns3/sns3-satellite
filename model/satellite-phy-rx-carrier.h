@@ -163,6 +163,24 @@ public:
   void SetPhy (Ptr<SatPhy> phy);
 
   /**
+   * \brief Function for setting the satellite id for all the transmissions from this SatPhyTx
+   * \param beamId the satellite Identifier
+   */
+  inline void SetSatId (uint32_t satId)
+  {
+    m_satId = satId;
+  }
+
+  /**
+   * \brief Get ID the ID of the satellite this carrier is attached to
+   * \return Satellite ID
+   */
+  inline uint32_t GetSatId ()
+  {
+    return m_satId;
+  }
+
+  /**
    * \brief Function for setting the beam id for all the transmissions from this SatPhyTx
    * \param beamId the Beam Identifier
    */
@@ -657,6 +675,7 @@ private:
   bool CheckAgainstLinkResultsErrorModelAvi (double cSinr, Ptr<SatSignalParameters> rxParams);
 
   State m_state;                                                        //< Current state of the carrier
+  uint32_t m_satId;                                                     //< Satellite ID
   uint32_t m_beamId;                                                    //< Beam ID
   uint32_t m_carrierId;                                                 //< Carrier ID
   bool m_receivingDedicatedAccess;                                      //< Is the carrier receiving a dedicated access packet
