@@ -47,6 +47,7 @@ main (int argc, char *argv[])
   std::string scenario = "simple";
   std::string forwardRegeneration = "regeneration_network";
   std::string returnRegeneration = "regeneration_network";
+  std::string startDate = "2022-11-13 12:00:00";
 
   std::map<std::string, SatHelper::PreDefinedScenario_t> mapScenario { {"simple", SatHelper::SIMPLE},
                                                                        {"larger", SatHelper::LARGER},
@@ -85,6 +86,9 @@ main (int argc, char *argv[])
   /// Use constellation
   Config::SetDefault ("ns3::SatHelper::SatConstellationEnabled", BooleanValue (true));
   Config::SetDefault ("ns3::SatHelper::SatConstellationFolder", StringValue ("eutelsat-geo-2-sats"));
+  Config::SetDefault ("ns3::SatSGP4MobilityModel::StartDateStr", StringValue (startDate));
+  Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionEachRequest", BooleanValue (false));
+  Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionPeriod", TimeValue (Seconds (1)));
 
   /// Enable ACM
   Config::SetDefault ("ns3::SatBbFrameConf::AcmEnabled", BooleanValue (true));
