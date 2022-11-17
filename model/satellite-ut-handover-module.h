@@ -90,10 +90,11 @@ public:
   /**
    * \brief Inspect whether or not the given beam is still suitable for
    * the underlying mobility model.
+   * \param satId The current satellite ID the underlying mobility model is emitting in
    * \param beamId The current beam ID the underlying mobility model is emitting in
    * \return whether or not an handover recommendation has been sent
    */
-  bool CheckForHandoverRecommendation (uint32_t beamId);
+  bool CheckForHandoverRecommendation (uint32_t satId, uint32_t beamId);
 
 private:
   HandoverRequestCallback m_handoverCallback;

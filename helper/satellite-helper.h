@@ -122,11 +122,12 @@ public:
    * Creates satellite objects according to user defined scenario.
    * Positions are read from different input files from file set by attribute ns3::SatConf::UtPositionInputFileName.
    *
+   * \param satId The ID of the satellite
    * \param info information of the beams, and beam UTs and users in beams
    * \param checkBeam Check that positions (set through SatConf) match with given beam
    * (the beam is the best according to configured antenna patterns).
    */
-  void CreateUserDefinedScenarioFromListPositions (BeamUserInfoMap_t& info, bool checkBeam);
+  void CreateUserDefinedScenarioFromListPositions (uint32_t satId, BeamUserInfoMap_t& info, bool checkBeam);
 
   /**
    * Creates satellite objects according to constellation parameters.
@@ -221,17 +222,19 @@ public:
    * \brief Load UTs with a SatTracedMobilityModel associated to them from the
    * files found in the given folder. Each UT will be associated to the beam it
    * is at it's starting position.
+   * \param satId ID of satellite
    * \param folderName Name of the folder to search for mobility trace files
    * \param utUsers Stream to generate the number of users associated to each loaded UT
    */
-  void LoadMobileUTsFromFolder (const std::string& folderName, Ptr<RandomVariableStream> utUsers);
+  void LoadMobileUTsFromFolder (uint32_t satId, const std::string& folderName, Ptr<RandomVariableStream> utUsers);
 
   /**
    * \brief Load an UT with a SatTracedMobilityModel associated to
    * them from the given file.
+   * \param satId ID of satellite
    * \param filename Name of the trace file containing UT positions
    */
-  Ptr<Node> LoadMobileUtFromFile (const std::string& filename);
+  Ptr<Node> LoadMobileUtFromFile (uint32_t satId, const std::string& filename);
 
   /**
    * Set multicast group to satellite network and IP router. Add needed routes to net devices.
@@ -546,20 +549,22 @@ private:
    * Sets mobility to created UT nodes.
    *
    * \param uts node container of UTs to set mobility
+   * \param satId the satellite id, where the UTs should be placed
    * \param beamId the spot-beam id, where the UTs should be placed
    *
    */
-  void SetUtMobility (NodeContainer uts, uint32_t beamId);
+  void SetUtMobility (NodeContainer uts, uint32_t satId, uint32_t beamId);
 
   /**
    * Sets mobility to created UT nodes when position is known.
    *
    * \param uts node container of UTs to set mobility
+   * \param satId the satellite id, where the UTs should be placed
    * \param beamId the spot-beam id, where the UTs should be placed
    * \param positionsAndGroupId the list of known positions, associated to a group ID
    *
    */
-  void SetUtMobilityFromPosition (NodeContainer uts, uint32_t beamId, std::vector<std::pair<GeoCoordinate, uint32_t>> positionsAndGroupId);
+  void SetUtMobilityFromPosition (NodeContainer uts, uint32_t satId, uint32_t beamId, std::vector<std::pair<GeoCoordinate, uint32_t>> positionsAndGroupId);
 
   /**
    * Install Satellite Mobility Observer to nodes, if observer doesn't exist already in a node

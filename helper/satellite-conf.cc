@@ -229,8 +229,8 @@ void SatConf::Initialize (std::string rtnConf,
       for (uint32_t i = 0; i < m_fwdConf.size (); i++)
         {
           gwId = i % nbGws;
-          m_fwdConf[i][GW_ID_INDEX] = gwId;
-          m_rtnConf[i][GW_ID_INDEX] = gwId;
+          m_fwdConf[i][GW_ID_INDEX] = gwId + 1;
+          m_rtnConf[i][GW_ID_INDEX] = gwId + 1;
         }
     }
 

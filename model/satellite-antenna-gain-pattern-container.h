@@ -68,7 +68,7 @@ public:
    * \param beamId Beam identifier
    * \return The antenna gain pattern instance of the specified beam id
    */
-  Ptr<SatAntennaGainPattern> GetAntennaGainPattern (uint32_t beamId, uint32_t satelliteId = 0) const; // TODO  = 0 is temp
+  Ptr<SatAntennaGainPattern> GetAntennaGainPattern (uint32_t satelliteId, uint32_t beamId) const;
 
   /**
    * \brief Get the number of stored antenna pattern
@@ -83,11 +83,11 @@ public:
    * \param coord Geo coordinate
    * \return best beam id in the specified geo coordinate
    */
-  uint32_t GetBestBeamId (GeoCoordinate coord, uint32_t satelliteId = 0) const; // TODO  = 0 is temp
+  uint32_t GetBestBeamId (uint32_t satelliteId, GeoCoordinate coord) const;
 
-  void ConfigureBeamsMobility (Ptr<SatMobilityModel> mobility, uint32_t satelliteId = 0); // TODO  = 0 is temp
+  void ConfigureBeamsMobility (uint32_t satelliteId, Ptr<SatMobilityModel> mobility);
 
-  void SetEnabledBeams (BeamUserInfoMap_t info, uint32_t satelliteId = 0); // TODO  = 0 is temp
+  void SetEnabledBeams (uint32_t satelliteId, BeamUserInfoMap_t info);
 
 private:
   std::string m_patternsFolder;

@@ -317,9 +317,10 @@ public:
   /**
    * \brief Callback to check whether the current beam is still the best one
    * to use for sending data; and sending handover recommendation if not
+   * \param uint32_t the current satellite ID
    * \param uint32_t the current beam ID
    */
-  typedef Callback<bool, uint32_t> BeamCheckerCallback;
+  typedef Callback<bool, uint32_t, uint32_t> BeamCheckerCallback;
 
   /**
    * \brief Callback to ask for the best beam ID during handover

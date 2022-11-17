@@ -242,9 +242,9 @@ public:
 
 private:
   /**
-   * GEO satellite node id
+   * GEO satellites node id
    */
-  uint32_t m_nodeId;
+  std::vector<uint32_t> m_nodeIds;
 
   SatTypedefs::CarrierBandwidthConverter_t m_carrierBandwidthConverter;
   uint32_t m_fwdLinkCarrierCount;

@@ -820,6 +820,7 @@ SatUtMac::TransmitPackets (SatPhy::PacketContainer_t packets, Time duration, uin
       m_rcstState.SwitchToTdmaSync ();
     }
 
+
   // If there are packets to send
   if (!packets.empty ())
     {
@@ -1826,7 +1827,7 @@ SatUtMac::DoFrameStart ()
       if (m_loggedOn && !m_beamCheckerCallback.IsNull ())
         {
           NS_LOG_INFO ("UT checking for beam handover recommendation");
-          if (m_beamCheckerCallback (m_beamId))
+          if (m_beamCheckerCallback (m_satId, m_beamId))
             {
               if (m_handoverState == NO_HANDOVER)
                 {

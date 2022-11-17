@@ -1248,7 +1248,7 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario, c
   m_satHelper->GetBeamHelper ()->SetAntennaGainPatterns (m_groupHelper->GetAntennaGainPatterns ());
 
   // Set UT position allocators, if any
-  if (!m_enableInputFileUtListPositions)
+  if (!m_enableInputFileUtListPositions && !m_satHelper->IsSatConstellationEnabled ())
     {
       if (m_commonUtPositions)
         {
@@ -1332,14 +1332,14 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario, c
 
       if (mobileUtsFolder != "")
         {
-          m_satHelper->LoadMobileUTsFromFolder (mobileUtsFolder, m_utMobileUserCount);
+          m_satHelper->LoadMobileUTsFromFolder (0, mobileUtsFolder, m_utMobileUserCount);
         }
 
       // Now, create either a scenario based on list positions in input file
       // or create a generic scenario with UT positions configured by other ways..
       if (m_enableInputFileUtListPositions)
         {
-          m_satHelper->CreateUserDefinedScenarioFromListPositions (beamInfo, m_inputFileUtPositionsCheckBeams);
+          m_satHelper->CreateUserDefinedScenarioFromListPositions (0, beamInfo, m_inputFileUtPositionsCheckBeams);
         }
       else
         {

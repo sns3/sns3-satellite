@@ -467,7 +467,7 @@ SatBeamHelper::Install (NodeContainer ut,
                         uint32_t fwdFlFreqId,
                         SatMac::RoutingUpdateCallback routingCallback)
 {
-  NS_LOG_FUNCTION (this << gwNode << gwId << beamId << rtnUlFreqId << rtnFlFreqId << fwdUlFreqId << fwdFlFreqId);
+  NS_LOG_FUNCTION (this << gwNode << gwId << satId << beamId << rtnUlFreqId << rtnFlFreqId << fwdUlFreqId << fwdFlFreqId);
 
   // add beamId as key and gwId as value pair to beam map. In case it's there already, assertion failure is caused
   std::pair<std::map<std::pair<uint32_t, uint32_t>, uint32_t >::iterator, bool> beam = m_beam.insert (std::make_pair (std::make_pair (satId, beamId), gwId));
@@ -492,7 +492,7 @@ SatBeamHelper::Install (NodeContainer ut,
   // for this position, and set the antenna patterns to the feeder PHY objects via
   // AttachChannels method.
   GeoCoordinate gwPos = gwNode->GetObject<SatMobilityModel> ()->GetGeoPosition ();
-  uint32_t feederBeamId = m_antennaGainPatterns->GetBestBeamId (gwPos);
+  uint32_t feederBeamId = m_antennaGainPatterns->GetBestBeamId (satId, gwPos);
 
   // attach channels to geo satellite device
   m_geoHelper->AttachChannels ( geoNode->GetDevice (0),
@@ -500,8 +500,8 @@ SatBeamHelper::Install (NodeContainer ut,
                                 feederLink.second,
                                 userLink.first,
                                 userLink.second,
-                                m_antennaGainPatterns->GetAntennaGainPattern (beamId),
-                                m_antennaGainPatterns->GetAntennaGainPattern (feederBeamId),
+                                m_antennaGainPatterns->GetAntennaGainPattern (satId, beamId),
+                                m_antennaGainPatterns->GetAntennaGainPattern (satId, feederBeamId),
                                 satId,
                                 gwId,
                                 beamId,
@@ -1302,8 +1302,8 @@ SatBeamHelper::GetChannelPair (uint32_t satId, uint32_t beamId, uint32_t fwdFreq
   NS_LOG_FUNCTION (this << satId << beamId << fwdFrequencyId << rtnFrequencyId << isUserLink);
   Ptr<SatChannelPair> chPairs = isUserLink ? m_ulChannels : m_flChannels;
 
-	bool hasFwdChannel = chPairs->HasFwdChannel (fwdFrequencyId);
-  bool hasRtnChannel = chPairs->HasRtnChannel (rtnFrequencyId);
+	bool hasFwdChannel = chPairs->HasFwdChannel (satId, fwdFrequencyId);
+  bool hasRtnChannel = chPairs->HasRtnChannel (satId, rtnFrequencyId);
 
   if (hasFwdChannel && hasRtnChannel)
     {
@@ -1318,13 +1318,13 @@ SatBeamHelper::GetChannelPair (uint32_t satId, uint32_t beamId, uint32_t fwdFreq
 
       if (hasFwdChannel)
         {
-					forwardCh = chPairs->GetForwardChannel (fwdFrequencyId);
+					forwardCh = chPairs->GetForwardChannel (satId, fwdFrequencyId);
 					pDelay = forwardCh->GetPropagationDelayModel ();
 					pFsl = forwardCh->GetFreeSpaceLoss ();
 				}
 			else if (hasRtnChannel)
         {
-					returnCh = chPairs->GetReturnChannel (rtnFrequencyId);
+					returnCh = chPairs->GetReturnChannel (satId, rtnFrequencyId);
 					pDelay = returnCh->GetPropagationDelayModel ();
 					pFsl = returnCh->GetFreeSpaceLoss ();
 				}

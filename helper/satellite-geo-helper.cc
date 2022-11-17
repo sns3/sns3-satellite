@@ -119,8 +119,7 @@ SatGeoHelper::GetInstanceTypeId (void) const
 
 
 SatGeoHelper::SatGeoHelper ()
-  : m_nodeId (0),
-  m_carrierBandwidthConverter (),
+  : m_carrierBandwidthConverter (),
   m_fwdLinkCarrierCount (),
   m_rtnLinkCarrierCount (),
   m_deviceCount (),
@@ -146,8 +145,7 @@ SatGeoHelper::SatGeoHelper (SatTypedefs::CarrierBandwidthConverter_t bandwidthCo
                             SatMac::ReadCtrlMsgCallback fwdReadCb,
                             SatMac::ReadCtrlMsgCallback rtnReadCb,
                             RandomAccessSettings_s randomAccessSettings)
-  : m_nodeId (0),
-  m_carrierBandwidthConverter (bandwidthConverterCb),
+  : m_carrierBandwidthConverter (bandwidthConverterCb),
   m_fwdLinkCarrierCount (fwdLinkCarrierCount),
   m_rtnLinkCarrierCount (rtnLinkCarrierCount),
   m_deviceCount (),
@@ -248,7 +246,7 @@ SatGeoHelper::Install (Ptr<Node> n)
   satDev->SetAddress (Mac48Address::Allocate ());
   n->AddDevice (satDev);
   m_deviceCount[n->GetId ()]++;
-  m_nodeId = n->GetId ();
+  m_nodeIds.push_back (n->GetId ());
 
   Singleton<SatIdMapper>::Get ()->AttachMacToTraceId (satDev->GetAddress ());
   Singleton<SatIdMapper>::Get ()->AttachMacToSatId (satDev->GetAddress ());
@@ -286,7 +284,7 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d,
 
   dev->SetForwardLinkRegenerationMode (forwardLinkRegenerationMode);
   dev->SetReturnLinkRegenerationMode (returnLinkRegenerationMode);
-  dev->SetNodeId (m_nodeId);
+  dev->SetNodeId (satId);
 
   AttachChannelsFeeder ( dev, ff, fr, feederAgp, satId, gwId, userBeamId, forwardLinkRegenerationMode, returnLinkRegenerationMode);
   AttachChannelsUser ( dev, uf, ur, userAgp, satId, userBeamId, forwardLinkRegenerationMode, returnLinkRegenerationMode);
@@ -368,7 +366,7 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
       case SatEnums::REGENERATION_PHY:
         {
           // Create a node info to PHY layers
-          Ptr<SatNodeInfo> niPhyFeeder = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, Mac48Address::ConvertFrom (dev->GetAddress ()));
+          Ptr<SatNodeInfo> niPhyFeeder = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeIds[satId], Mac48Address::ConvertFrom (dev->GetAddress ()));
           fPhy->SetNodeInfo (niPhyFeeder);
           fMac->SetNodeInfo (niPhyFeeder);
 
@@ -398,7 +396,7 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
 
           // Create a node info to PHY and MAC layers
           feederAddress = Mac48Address::Allocate ();
-          Ptr<SatNodeInfo> niFeeder = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, feederAddress);
+          Ptr<SatNodeInfo> niFeeder = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeIds[satId], feederAddress);
           fPhy->SetNodeInfo (niFeeder);
           fMac->SetNodeInfo (niFeeder);
           fLlc->SetNodeInfo (niFeeder);
@@ -431,7 +429,7 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
 
           // Create a node info to PHY and MAC layers
           feederAddress = Mac48Address::Allocate ();
-          Ptr<SatNodeInfo> niFeeder = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, feederAddress);
+          Ptr<SatNodeInfo> niFeeder = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeIds[satId], feederAddress);
           fPhy->SetNodeInfo (niFeeder);
           fMac->SetNodeInfo (niFeeder);
           fLlc->SetNodeInfo (niFeeder);
@@ -579,7 +577,7 @@ SatGeoHelper::AttachChannelsUser ( Ptr<SatGeoNetDevice> dev,
       case SatEnums::REGENERATION_PHY:
         {
           // Create a node info to PHY layers
-          Ptr<SatNodeInfo> niPhyUser = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, Mac48Address::ConvertFrom (dev->GetAddress ()));
+          Ptr<SatNodeInfo> niPhyUser = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeIds[satId], Mac48Address::ConvertFrom (dev->GetAddress ()));
           uPhy->SetNodeInfo (niPhyUser);
           uMac->SetNodeInfo (niPhyUser);
 
@@ -599,7 +597,7 @@ SatGeoHelper::AttachChannelsUser ( Ptr<SatGeoNetDevice> dev,
 
           // Create a node info to PHY and MAC layers
           userAddress = Mac48Address::Allocate ();
-          Ptr<SatNodeInfo> niUser = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, userAddress);
+          Ptr<SatNodeInfo> niUser = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeIds[satId], userAddress);
           uPhy->SetNodeInfo (niUser);
           uMac->SetNodeInfo (niUser);
           uLlc->SetNodeInfo (niUser);
@@ -619,7 +617,7 @@ SatGeoHelper::AttachChannelsUser ( Ptr<SatGeoNetDevice> dev,
 
           // Create a node info to PHY and MAC layers
           userAddress = Mac48Address::Allocate ();
-          Ptr<SatNodeInfo> niUser = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, userAddress);
+          Ptr<SatNodeInfo> niUser = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeIds[satId], userAddress);
           uPhy->SetNodeInfo (niUser);
           uMac->SetNodeInfo (niUser);
           uLlc->SetNodeInfo (niUser);

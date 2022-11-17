@@ -75,8 +75,9 @@ SatTracedMobilityModel::SatTracedMobilityModel ()
   NS_FATAL_ERROR ("SatTracedMobilityModel default constructor should not be used");
 }
 
-SatTracedMobilityModel::SatTracedMobilityModel (const std::string& filename, Ptr<SatAntennaGainPatternContainer> agp)
-  : m_traceFilename (filename),
+SatTracedMobilityModel::SatTracedMobilityModel (uint32_t satId, const std::string& filename, Ptr<SatAntennaGainPatternContainer> agp)
+  : m_satId (satId),
+  m_traceFilename (filename),
   m_updateInterval (MilliSeconds (1)),
   m_refEllipsoid (GeoCoordinate::SPHERE),
   m_geoPosition (0.0, 0.0, 0.0),
@@ -138,7 +139,7 @@ SatTracedMobilityModel::UpdateGeoPositionFromFile (void)
 uint32_t
 SatTracedMobilityModel::GetBestBeamId (void) const
 {
-  return m_antennaGainPatterns->GetBestBeamId (m_geoPosition);
+  return m_antennaGainPatterns->GetBestBeamId (m_satId, m_geoPosition);
 }
 
 }

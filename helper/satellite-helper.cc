@@ -264,7 +264,7 @@ SatHelper::SatHelper ()
           SetSatMobility (geoSatNode, tles[i]);
 
           Ptr<SatMobilityModel> mobility = geoSatNode->GetObject<SatMobilityModel> ();
-          m_antennaGainPatterns->ConfigureBeamsMobility (mobility, i);
+          m_antennaGainPatterns->ConfigureBeamsMobility (i, mobility);
 
           geoNodes.Add (geoSatNode);
         }
@@ -293,7 +293,7 @@ SatHelper::SatHelper ()
         }
 
       Ptr<SatMobilityModel> mobility = geoSatNode->GetObject<SatMobilityModel> ();
-      m_antennaGainPatterns->ConfigureBeamsMobility (mobility);
+      m_antennaGainPatterns->ConfigureBeamsMobility (0, mobility);
 
       geoNodes.Add (geoSatNode);
     }
@@ -599,7 +599,7 @@ SatHelper::SetUtPositionAllocatorForBeam (uint32_t beamId, Ptr<SatListPositionAl
 }
 
 void
-SatHelper::CreateUserDefinedScenarioFromListPositions (BeamUserInfoMap_t& infos, bool checkBeam)
+SatHelper::CreateUserDefinedScenarioFromListPositions (uint32_t satId, BeamUserInfoMap_t& infos, bool checkBeam)
 {
   NS_LOG_FUNCTION (this);
 
@@ -626,7 +626,7 @@ SatHelper::CreateUserDefinedScenarioFromListPositions (BeamUserInfoMap_t& infos,
           // if requested, check that the given beam is the best in the configured position
           if (checkBeam)
             {
-              uint32_t bestBeamId = m_antennaGainPatterns->GetBestBeamId (position);
+              uint32_t bestBeamId = m_antennaGainPatterns->GetBestBeamId (satId, position);
 
               if ( bestBeamId != it->first )
                 {
@@ -651,7 +651,7 @@ SatHelper::CreateConstellationScenario (std::vector<BeamUserInfoMap_t> infoList,
 
   for (uint32_t i = 0; i < m_satConf->GetSatCount (); i++)
     {
-      m_antennaGainPatterns->SetEnabledBeams (infoList[i], i);
+      m_antennaGainPatterns->SetEnabledBeams (i, infoList[i]);
     }
 
   for (uint32_t i = 0; i < m_satConf->GetUtCount (); i++)
@@ -661,7 +661,7 @@ SatHelper::CreateConstellationScenario (std::vector<BeamUserInfoMap_t> infoList,
 
       BeamUserInfoMap_t info = infoList[satId];
 
-      uint32_t bestBeamId = m_antennaGainPatterns->GetBestBeamId (position, satId);
+      uint32_t bestBeamId = m_antennaGainPatterns->GetBestBeamId (satId, position);
 
       std::vector<std::pair<GeoCoordinate, uint32_t>> positions = info.at (bestBeamId).GetPositions ();
       positions.push_back (std::make_pair (position, 0));
@@ -716,11 +716,11 @@ SatHelper::DoCreateScenario (std::vector<BeamUserInfoMap_t> infoList, uint32_t g
               std::vector<std::pair<GeoCoordinate, uint32_t>> positionsAndGroupId = info->second.GetPositions ();
               NodeContainer uts;
               uts.Create (info->second.GetUtCount () - positionsAndGroupId.size ());
-              SetUtMobility (uts, info->first);
+              SetUtMobility (uts, satId, info->first);
 
               NodeContainer utsFromPosition;
               utsFromPosition.Create (positionsAndGroupId.size ());
-              SetUtMobilityFromPosition (utsFromPosition, info->first, positionsAndGroupId);
+              SetUtMobilityFromPosition (utsFromPosition, satId, info->first, positionsAndGroupId);
               uts.Add (utsFromPosition);
 
               // Add mobile UTs starting at this beam
@@ -820,7 +820,7 @@ SatHelper::DoCreateScenario (std::vector<BeamUserInfoMap_t> infoList, uint32_t g
 }
 
 void
-SatHelper::LoadMobileUTsFromFolder (const std::string& folderName, Ptr<RandomVariableStream> utUsers)
+SatHelper::LoadMobileUTsFromFolder (uint32_t satId, const std::string& folderName, Ptr<RandomVariableStream> utUsers)
 {
   if (!(Singleton<SatEnvVariables>::Get ()->IsValidDirectory (folderName)))
     {
@@ -837,7 +837,7 @@ SatHelper::LoadMobileUTsFromFolder (const std::string& folderName, Ptr<RandomVar
           continue;
         }
 
-      Ptr<Node> utNode = LoadMobileUtFromFile (filepath);
+      Ptr<Node> utNode = LoadMobileUtFromFile (satId, filepath);
       uint32_t bestBeamId = utNode->GetObject<SatTracedMobilityModel> ()->GetBestBeamId ();
 
       // Store Node in the container for the starting beam
@@ -864,10 +864,10 @@ SatHelper::LoadMobileUTsFromFolder (const std::string& folderName, Ptr<RandomVar
 }
 
 Ptr<Node>
-SatHelper::LoadMobileUtFromFile (const std::string& filename)
+SatHelper::LoadMobileUtFromFile (uint32_t satId, const std::string& filename)
 {
   // Create Node, Mobility and aggregate them
-  Ptr<SatTracedMobilityModel> mobility = CreateObject<SatTracedMobilityModel> (filename, m_antennaGainPatterns);
+  Ptr<SatTracedMobilityModel> mobility = CreateObject<SatTracedMobilityModel> (satId, filename, m_antennaGainPatterns);
   Ptr<Node> utNode = CreateObject<Node> ();
   utNode->AggregateObject (mobility);
   utNode->AggregateObject (CreateObject<SatUtHandoverModule> (m_antennaGainPatterns));
@@ -897,7 +897,7 @@ SatHelper::SetGwMobility (NodeContainer gwNodes)
 }
 
 void
-SatHelper::SetUtMobility (NodeContainer uts, uint32_t beamId)
+SatHelper::SetUtMobility (NodeContainer uts, uint32_t satId, uint32_t beamId)
 {
   NS_LOG_FUNCTION (this);
 
@@ -932,12 +932,12 @@ SatHelper::SetUtMobility (NodeContainer uts, uint32_t beamId)
       GeoCoordinate position = uts.Get (i)->GetObject<SatMobilityModel> ()->GetGeoPosition ();
       NS_LOG_INFO ("Installing mobility observer on Ut Node at " <<
                    position << " with antenna gain of " <<
-                   m_antennaGainPatterns->GetAntennaGainPattern (beamId)->GetAntennaGain_lin (position));
+                   m_antennaGainPatterns->GetAntennaGainPattern (satId, beamId)->GetAntennaGain_lin (position));
     }
 }
 
 void
-SatHelper::SetUtMobilityFromPosition (NodeContainer uts, uint32_t beamId, std::vector<std::pair<GeoCoordinate, uint32_t>> positionsAndGroupId)
+SatHelper::SetUtMobilityFromPosition (NodeContainer uts, uint32_t satId, uint32_t beamId, std::vector<std::pair<GeoCoordinate, uint32_t>> positionsAndGroupId)
 {
   NS_LOG_FUNCTION (this << beamId);
 
@@ -964,7 +964,7 @@ SatHelper::SetUtMobilityFromPosition (NodeContainer uts, uint32_t beamId, std::v
       GeoCoordinate position = uts.Get (i)->GetObject<SatMobilityModel> ()->GetGeoPosition ();
       NS_LOG_INFO ("Installing mobility observer on Ut Node at " <<
                    position << " with antenna gain of " <<
-                   m_antennaGainPatterns->GetAntennaGainPattern (beamId)->GetAntennaGain_lin (position));
+                   m_antennaGainPatterns->GetAntennaGainPattern (satId, beamId)->GetAntennaGain_lin (position));
     }
 }
 

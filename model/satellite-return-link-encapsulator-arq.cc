@@ -250,8 +250,8 @@ SatReturnLinkEncapsulatorArq::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
           SatMacTag mTag;
           if (!packet->PeekPacketTag (mTag))
             {
-              mTag.SetDestAddress (m_destE2EAddress);
-              mTag.SetSourceAddress (m_sourceE2EAddress);
+              mTag.SetDestAddress (m_decapAddress);
+              mTag.SetSourceAddress (m_encapAddress);
               packet->AddPacketTag (mTag);
             }
 

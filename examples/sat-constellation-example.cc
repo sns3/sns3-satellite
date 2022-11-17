@@ -41,17 +41,12 @@ NS_LOG_COMPONENT_DEFINE ("sat-constellation-example");
 int
 main (int argc, char *argv[])
 {
-  uint32_t beamIdInFullScenario = 10;
   uint32_t packetSize = 512;
   std::string interval = "10ms";
-  std::string scenario = "simple";
   std::string forwardRegeneration = "regeneration_network";
   std::string returnRegeneration = "regeneration_network";
   std::string startDate = "2022-11-13 12:00:00";
 
-  std::map<std::string, SatHelper::PreDefinedScenario_t> mapScenario { {"simple", SatHelper::SIMPLE},
-                                                                       {"larger", SatHelper::LARGER},
-                                                                       {"full", SatHelper::FULL}};
   std::map<std::string, SatEnums::RegenerationMode_t> mapForwardRegeneration { {"transparent", SatEnums::TRANSPARENT},
                                                                                {"regeneration_phy", SatEnums::REGENERATION_PHY},
                                                                                {"regeneration_network", SatEnums::REGENERATION_NETWORK}};
@@ -64,16 +59,13 @@ main (int argc, char *argv[])
 
   // read command line parameters given by user
   CommandLine cmd;
-  cmd.AddValue ("beamIdInFullScenario", "Id where Sending/Receiving UT is selected in FULL scenario. (used only when scenario is full) ", beamIdInFullScenario);
   cmd.AddValue ("packetSize", "Size of constant packet (bytes)", packetSize);
   cmd.AddValue ("interval", "Interval to sent packets in seconds, (e.g. (1s))", interval);
-  cmd.AddValue ("scenario", "Test scenario to use. (simple, larger or full)", scenario);
   cmd.AddValue ("forwardRegeneration", "Regeneration mode on forward link (transparent, regeneration_phy or regeneration_network)", forwardRegeneration);
   cmd.AddValue ("returnRegeneration", "Regeneration mode on forward link (transparent, regeneration_phy, regeneration_link or regeneration_network)", returnRegeneration);
   simulationHelper->AddDefaultUiArguments (cmd);
   cmd.Parse (argc, argv);
 
-  SatHelper::PreDefinedScenario_t satScenario = mapScenario[scenario];
   SatEnums::RegenerationMode_t forwardLinkRegenerationMode = mapForwardRegeneration[forwardRegeneration];
   SatEnums::RegenerationMode_t returnLinkRegenerationMode = mapReturnRegeneration[returnRegeneration];
 
@@ -100,19 +92,27 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
 
   // Set tag, if output path is not explicitly defined
-  simulationHelper->SetOutputTag (scenario);
 
   simulationHelper->SetSimulationTime (Seconds (30));
 
+  std::set<uint32_t> beamSetAll = {1, 2, 3, 4, 5, 6, 7, 8, 9,
+                                   10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+                                   20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+                                   30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
+                                   40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
+                                   50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
+                                   60, 61, 62, 63, 64, 65, 66, 67, 68, 69,
+                                   70, 71, 72};
+
+  std::set<uint32_t> beamSet = {11, 18};
+
   // Set beam ID
-  std::stringstream beamsEnabled;
-  beamsEnabled << beamIdInFullScenario;
-  simulationHelper->SetBeams (beamsEnabled.str ());
+  simulationHelper->SetBeamSet (beamSet);
   simulationHelper->SetUserCountPerUt (5);
 
   LogComponentEnable ("sat-constellation-example", LOG_LEVEL_INFO);
 
-  Ptr<SatHelper> helper = simulationHelper->CreateSatScenario (satScenario);
+  Ptr<SatHelper> helper = simulationHelper->CreateSatScenario ();
 
   Config::SetDefault ("ns3::CbrApplication::Interval", StringValue (interval));
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize) );
@@ -125,11 +125,6 @@ main (int argc, char *argv[])
     Seconds (1.0), Seconds (29.0));
 
   NS_LOG_INFO ("--- sat-constellation-example ---");
-  NS_LOG_INFO ("  Scenario used: " << scenario);
-  if ( scenario == "full" )
-    {
-      NS_LOG_INFO ("  UT used in full scenario from beam: " << beamIdInFullScenario );
-    }
   NS_LOG_INFO ("  PacketSize: " << packetSize);
   NS_LOG_INFO ("  Interval: " << interval);
   NS_LOG_INFO ("  ");

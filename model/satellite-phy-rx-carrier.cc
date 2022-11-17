@@ -519,6 +519,7 @@ bool
 SatPhyRxCarrier::CheckAgainstLinkResultsErrorModelAvi (double cSinr, Ptr<SatSignalParameters> rxParams)
 {
   bool error = false;
+
   switch (GetChannelType ())
     {
     case SatEnums::FORWARD_FEEDER_CH:

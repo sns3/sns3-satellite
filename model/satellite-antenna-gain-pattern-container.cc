@@ -130,7 +130,7 @@ SatAntennaGainPatternContainer::SatAntennaGainPatternContainer (uint32_t nbSats)
                     Ptr<SatAntennaGainPattern> gainPattern = CreateObject<SatAntennaGainPattern> (filePath);
 
                     std::pair<std::map<std::pair<uint32_t, uint32_t>, Ptr<SatAntennaGainPattern> >::iterator, bool> ret;
-                    ret = m_antennaPatternMap.insert (std::make_pair (std::make_pair (satelliteId, i-1), gainPattern));
+                    ret = m_antennaPatternMap.insert (std::make_pair (std::make_pair (satelliteId, i), gainPattern));
                     if (ret.second == false)
                       {
                         NS_FATAL_ERROR ("SatAntennaGainPatternContainer::SatAntennaGainPatternContainer an antenna pattern for beam " << i << " already exists!");
@@ -155,7 +155,7 @@ SatAntennaGainPatternContainer::~SatAntennaGainPatternContainer ()
 }
 
 Ptr<SatAntennaGainPattern>
-SatAntennaGainPatternContainer::GetAntennaGainPattern (uint32_t beamId, uint32_t satelliteId) const
+SatAntennaGainPatternContainer::GetAntennaGainPattern (uint32_t satelliteId, uint32_t beamId) const
 {
   NS_LOG_FUNCTION (this << beamId);
 
@@ -169,7 +169,7 @@ SatAntennaGainPatternContainer::GetAntennaGainPattern (uint32_t beamId, uint32_t
 }
 
 uint32_t
-SatAntennaGainPatternContainer::GetBestBeamId (GeoCoordinate coord, uint32_t satelliteId) const
+SatAntennaGainPatternContainer::GetBestBeamId (uint32_t satelliteId, GeoCoordinate coord) const
 {
   NS_LOG_FUNCTION (this << coord.GetLatitude () << coord.GetLongitude ());
 
@@ -212,7 +212,7 @@ SatAntennaGainPatternContainer::GetNAntennaGainPatterns () const
 }
 
 void
-SatAntennaGainPatternContainer::ConfigureBeamsMobility (Ptr<SatMobilityModel> mobility, uint32_t satelliteId)
+SatAntennaGainPatternContainer::ConfigureBeamsMobility (uint32_t satelliteId, Ptr<SatMobilityModel> mobility)
 {
   NS_LOG_FUNCTION (this << mobility);
 
@@ -245,7 +245,7 @@ SatAntennaGainPatternContainer::ConfigureBeamsMobility (Ptr<SatMobilityModel> mo
 }
 
 void
-SatAntennaGainPatternContainer::SetEnabledBeams (BeamUserInfoMap_t info, uint32_t satelliteId)
+SatAntennaGainPatternContainer::SetEnabledBeams (uint32_t satelliteId, BeamUserInfoMap_t info)
 {
   std::map< std::pair<uint32_t, uint32_t>, Ptr<SatAntennaGainPattern> >::iterator it = m_antennaPatternMap.begin ();
   while (it != m_antennaPatternMap.end ())
