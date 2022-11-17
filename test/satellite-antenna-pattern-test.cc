@@ -98,9 +98,9 @@ SatAntennaPatternTestCase::DoRun (void)
   uint32_t bestBeamId (0);
   for ( uint32_t i = 0; i < coordinates.size (); ++i)
     {
-      bestBeamId = gpContainer.GetBestBeamId (coordinates[i]);
+      bestBeamId = gpContainer.GetBestBeamId (0, coordinates[i]);
 
-      Ptr<SatAntennaGainPattern> gainPattern = gpContainer.GetAntennaGainPattern (bestBeamId);
+      Ptr<SatAntennaGainPattern> gainPattern = gpContainer.GetAntennaGainPattern (0, bestBeamId);
 
       gain = gainPattern->GetAntennaGain_lin (coordinates[i]);
       double gain_dB = 10.0 * log10 (gain);

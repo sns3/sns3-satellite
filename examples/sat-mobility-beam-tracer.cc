@@ -80,8 +80,8 @@ main (int argc, char *argv[])
   if (mobileUtTraceFile != "")
     {
       Ptr<SatHelper> satHelper = CreateObject<SatHelper> ();
-      satMobility = satHelper->GetBeamHelper ()->GetGeoSatNode ()->GetObject<SatMobilityModel> ();
-      Ptr<Node> node = satHelper->LoadMobileUtFromFile (mobileUtTraceFile);
+      satMobility = satHelper->GetBeamHelper ()->GetGeoSatNodes ().Get (0)->GetObject<SatMobilityModel> ();
+      Ptr<Node> node = satHelper->LoadMobileUtFromFile (0, mobileUtTraceFile);
       node->GetObject<SatMobilityModel> ()->TraceConnect ("SatCourseChange", "BeamTracer", MakeCallback (SatCourseChange));
 
       Ptr<SimulationHelperConf> simulationConf = CreateObject<SimulationHelperConf> ();

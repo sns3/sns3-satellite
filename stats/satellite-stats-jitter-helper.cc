@@ -956,7 +956,7 @@ SatStatsFwdPhyJitterHelper::DoInstallProbes ()
 {
   NS_LOG_FUNCTION (this);
 
-  NodeContainer sats = NodeContainer (GetSatHelper ()->GetBeamHelper ()->GetGeoSatNode ());
+  NodeContainer sats = GetSatHelper ()->GetBeamHelper ()->GetGeoSatNodes ();
 
   for (NodeContainer::Iterator it = sats.Begin (); it != sats.End (); ++it)
     {
@@ -1455,7 +1455,7 @@ SatStatsRtnPhyJitterHelper::DoInstallProbes ()
 {
   NS_LOG_FUNCTION (this);
 
-  NodeContainer sats = NodeContainer (GetSatHelper ()->GetBeamHelper ()->GetGeoSatNode ());
+  NodeContainer sats = GetSatHelper ()->GetBeamHelper ()->GetGeoSatNodes ();
 
   for (NodeContainer::Iterator it = sats.Begin (); it != sats.End (); ++it)
     {

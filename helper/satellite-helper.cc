@@ -702,7 +702,6 @@ SatHelper::DoCreateScenario (std::vector<BeamUserInfoMap_t> infoList, uint32_t g
       // create all possible GW nodes, set mobility to them and install to Internet
       NodeContainer gwNodes;
       gwNodes.Create (m_satConf->GetGwCount ());
-      SetGwMobility (gwNodes);
       internet.Install (gwNodes);
 
       for (uint32_t satId = 0; satId < m_satConf->GetSatCount (); satId++)
@@ -761,6 +760,9 @@ SatHelper::DoCreateScenario (std::vector<BeamUserInfoMap_t> infoList, uint32_t g
 
               // gw index starts from 1 and we have stored them starting from 0
               Ptr<Node> gwNode = gwNodes.Get (rtnConf[SatConf::GW_ID_INDEX] - 1);
+
+              SetGwMobility (satId, NodeContainer (gwNode));
+
               std::pair<Ptr<NetDevice>, NetDeviceContainer> netDevices = m_beamHelper->Install (
                   uts, gwNode,
                   rtnConf[SatConf::GW_ID_INDEX],
@@ -859,7 +861,7 @@ SatHelper::LoadMobileUTsFromFolder (uint32_t satId, const std::string& folderNam
   for (auto& mobileUtsForBeam : m_mobileUtsByBeam)
     {
       NS_LOG_INFO ("Installing Mobility Observers for mobile UTs starting in beam " << mobileUtsForBeam.first);
-      InstallMobilityObserver (mobileUtsForBeam.second);
+      InstallMobilityObserver (satId, mobileUtsForBeam.second);
     }
 }
 
@@ -875,7 +877,7 @@ SatHelper::LoadMobileUtFromFile (uint32_t satId, const std::string& filename)
 }
 
 void
-SatHelper::SetGwMobility (NodeContainer gwNodes)
+SatHelper::SetGwMobility (uint32_t satId, NodeContainer gwNodes)
 {
   NS_LOG_FUNCTION (this);
 
@@ -893,7 +895,7 @@ SatHelper::SetGwMobility (NodeContainer gwNodes)
   mobility.SetMobilityModel ("ns3::SatConstantPositionMobilityModel");
   mobility.Install (gwNodes);
 
-  InstallMobilityObserver (gwNodes);
+  InstallMobilityObserver (satId, gwNodes);
 }
 
 void
@@ -925,7 +927,7 @@ SatHelper::SetUtMobility (NodeContainer uts, uint32_t satId, uint32_t beamId)
   mobility.SetMobilityModel ("ns3::SatConstantPositionMobilityModel");
   mobility.Install (uts);
 
-  InstallMobilityObserver (uts);
+  InstallMobilityObserver (satId, uts);
 
   for (uint32_t i = 0; i < uts.GetN (); ++i)
     {
@@ -957,7 +959,7 @@ SatHelper::SetUtMobilityFromPosition (NodeContainer uts, uint32_t satId, uint32_
   mobility.SetMobilityModel ("ns3::SatConstantPositionMobilityModel");
   mobility.Install (uts);
 
-  InstallMobilityObserver (uts);
+  InstallMobilityObserver (satId, uts);
 
   for (uint32_t i = 0; i < uts.GetN (); ++i)
     {
@@ -1026,7 +1028,7 @@ SatHelper::SetSatMobility (Ptr<Node> node, std::string tle)
 }
 
 void
-SatHelper::InstallMobilityObserver (NodeContainer nodes) const
+SatHelper::InstallMobilityObserver (uint32_t satId, NodeContainer nodes) const
 {
   NS_LOG_FUNCTION (this);
 
@@ -1037,7 +1039,7 @@ SatHelper::InstallMobilityObserver (NodeContainer nodes) const
       if (observer == 0)
         {
           Ptr<SatMobilityModel> ownMobility = (*i)->GetObject<SatMobilityModel> ();
-          Ptr<SatMobilityModel> satMobility = m_beamHelper->GetGeoSatNode ()->GetObject<SatMobilityModel> ();
+          Ptr<SatMobilityModel> satMobility = m_beamHelper->GetGeoSatNodes ().Get (satId)->GetObject<SatMobilityModel> ();
 
           NS_ASSERT (ownMobility != NULL);
           NS_ASSERT (satMobility != NULL);

@@ -527,9 +527,10 @@ private:
   /**
    * Sets mobilities to created GW nodes.
    *
+   * \param satId ID of the satellite link to this GW
    * \param gws node container of UTs to set mobility
    */
-  void SetGwMobility (NodeContainer gws);
+  void SetGwMobility (uint32_t satId, NodeContainer gws);
 
   /**
    * Sets mobility to created Sat Geo node.
@@ -569,9 +570,10 @@ private:
   /**
    * Install Satellite Mobility Observer to nodes, if observer doesn't exist already in a node
    *
+   * \param satId ID of the satellite.
    * \param nodes Nodecontainer of nodes to install mobility observer.
    */
-  void InstallMobilityObserver (NodeContainer nodes) const;
+  void InstallMobilityObserver (uint32_t satId, NodeContainer nodes) const;
 
   /**
    * Find given device's counterpart (device belonging to same network) device from given node.

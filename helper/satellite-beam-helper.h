@@ -318,13 +318,6 @@ public:
   Ptr<Node> GetGwNode (uint32_t gwId) const;
 
   /**
-   * Gets Geo Satellite node.
-   *
-   * \return pointer to Geo Satellite node.
-   */
-  Ptr<Node> GetGeoSatNode () const;
-
-  /**
    * Gets Geo Satellite nodes.
    *
    * \return pointer to Geo Satellite nodes.
@@ -407,7 +400,6 @@ private:
   Ptr<SatGwHelper>      m_gwHelper;
   Ptr<SatUtHelper>      m_utHelper;
   NodeContainer         m_geoNodes;
-  Ptr<Node>             m_geoNode; // TODO temp
   Ptr<SatNcc>           m_ncc;
 
   Ptr<SatAntennaGainPatternContainer>   m_antennaGainPatterns;

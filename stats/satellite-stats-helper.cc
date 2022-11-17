@@ -414,7 +414,8 @@ SatStatsHelper::CreateCollectorPerIdentifier (CollectorMap &collectorMap) const
 
     case SatStatsHelper::IDENTIFIER_SAT:
       {
-        NodeContainer sats = NodeContainer (m_satHelper->GetBeamHelper ()->GetGeoSatNode ());
+        NodeContainer sats = GetSatHelper ()->GetBeamHelper ()->GetGeoSatNodes ();
+
         for (NodeContainer::Iterator it = sats.Begin (); it != sats.End (); ++it)
           {
             const uint32_t satId = GetSatId (*it);

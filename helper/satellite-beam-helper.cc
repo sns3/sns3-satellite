@@ -794,13 +794,6 @@ SatBeamHelper::GetGwNode (uint32_t gwId) const
   return node;
 }
 
-Ptr<Node> // TODO temp
-SatBeamHelper::GetGeoSatNode () const
-{
-  NS_LOG_FUNCTION (this);
-  return m_geoNodes.Get (0);
-}
-
 NodeContainer
 SatBeamHelper::GetGeoSatNodes () const
 {
@@ -1289,7 +1282,7 @@ SatBeamHelper::CreateBeamInfo () const
 
   oss << std::endl << " -- Geo Satellite position --" << std::endl;
 
-  Ptr<SatMobilityModel> model = m_geoNode->GetObject<SatMobilityModel> ();
+  Ptr<SatMobilityModel> model = m_geoNodes.Get (0)->GetObject<SatMobilityModel> ();
   GeoCoordinate pos = model->GetGeoPosition ();
   oss << "latitude=" << pos.GetLatitude () << ", longitude=" << pos.GetLongitude () << ", altitude=" << pos.GetAltitude () << std::endl;
 
