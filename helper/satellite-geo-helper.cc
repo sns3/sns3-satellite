@@ -249,7 +249,7 @@ SatGeoHelper::Install (Ptr<Node> n)
   m_nodeIds.push_back (n->GetId ());
 
   Singleton<SatIdMapper>::Get ()->AttachMacToTraceId (satDev->GetAddress ());
-  Singleton<SatIdMapper>::Get ()->AttachMacToSatId (satDev->GetAddress ());
+  Singleton<SatIdMapper>::Get ()->AttachMacToSatId (satDev->GetAddress (), m_nodeIds.size ());
 
   return satDev;
 }

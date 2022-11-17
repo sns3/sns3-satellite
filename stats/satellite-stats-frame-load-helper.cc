@@ -169,7 +169,7 @@ SatStatsFrameLoadHelper::DoInstall ()
       if (m_unitType == SatStatsFrameLoadHelper::UNIT_SYMBOLS)
         {
           ret = SetupProbe<SatFrameSymbolLoadProbe> (ncc->GetBeamScheduler (it->first, it->second),
-                                                     GetIdentifierForBeam (it->second),
+                                                     GetIdentifierForBeam (it->first, it->second),
                                                      &SatStatsFrameLoadHelper::FrameSymbolLoadCallback);
         }
       else
@@ -177,7 +177,7 @@ SatStatsFrameLoadHelper::DoInstall ()
           NS_ASSERT_MSG (m_unitType == SatStatsFrameLoadHelper::UNIT_USERS,
                          "Invalid unit type");
           ret = SetupProbe<SatFrameUserLoadProbe> (ncc->GetBeamScheduler (it->first, it->second),
-                                                   GetIdentifierForBeam (it->second),
+                                                   GetIdentifierForBeam (it->first, it->second),
                                                    &SatStatsFrameLoadHelper::FrameUserLoadCallback);
         }
 

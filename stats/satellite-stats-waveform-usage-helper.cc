@@ -110,7 +110,7 @@ SatStatsWaveformUsageHelper::DoInstall ()
        it != beams.end (); ++it)
     {
       std::ostringstream context;
-      context << GetIdentifierForBeam (it->second);
+      context << GetIdentifierForBeam (it->first, it->second);
 
       Ptr<SatBeamScheduler> s = ncc->GetBeamScheduler (it->first, it->second);
       NS_ASSERT_MSG (s != 0, "Error finding beam " << it->second);

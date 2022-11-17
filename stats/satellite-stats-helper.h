@@ -351,7 +351,7 @@ protected:
    * \param beamId
    * \return
    */
-  uint32_t GetIdentifierForBeam (uint32_t beamId) const;
+  uint32_t GetIdentifierForBeam (uint32_t satId, uint32_t beamId) const;
 
   /**
    * \param groupId

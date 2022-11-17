@@ -400,6 +400,7 @@ SatUtHelper::InstallDvb (Ptr<Node> n, uint32_t satId, uint32_t beamId,
   Singleton<SatIdMapper>::Get ()->AttachMacToTraceId (dev->GetAddress ());
   Singleton<SatIdMapper>::Get ()->AttachMacToUtId (dev->GetAddress ());
   Singleton<SatIdMapper>::Get ()->AttachMacToBeamId (dev->GetAddress (), beamId);
+  Singleton<SatIdMapper>::Get ()->AttachMacToSatId (dev->GetAddress (), satId+1);
 
   // Create encapsulator and add it to UT's LLC
   Mac48Address gwAddr = Mac48Address::ConvertFrom (gwNd->GetAddress ());
@@ -663,6 +664,7 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t satId, uint32_t beamId,
   Singleton<SatIdMapper>::Get ()->AttachMacToTraceId (dev->GetAddress ());
   Singleton<SatIdMapper>::Get ()->AttachMacToUtId (dev->GetAddress ());
   Singleton<SatIdMapper>::Get ()->AttachMacToBeamId (dev->GetAddress (), beamId);
+  Singleton<SatIdMapper>::Get ()->AttachMacToSatId (dev->GetAddress (), satId+1);
 
   // Create encapsulator and add it to UT's LLC
   Mac48Address gwAddr = Mac48Address::ConvertFrom (gwNd->GetAddress ());

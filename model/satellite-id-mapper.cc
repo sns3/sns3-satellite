@@ -49,7 +49,6 @@ SatIdMapper::SatIdMapper ()
   m_utIdIndex (1),
   m_utUserIdIndex (1),
   m_gwUserIdIndex (1),
-  m_satIdIndex (1),
   m_enableMapPrint (false)
 {
   NS_LOG_FUNCTION (this);
@@ -106,6 +105,13 @@ SatIdMapper::Reset ()
     }
   m_utUserIdIndex = 1;
 
+  // SAT ID maps
+
+  if (!m_macToSatIdMap.empty ())
+    {
+      m_macToSatIdMap.clear ();
+    }
+
   // Beam ID maps
 
   if (!m_macToBeamIdMap.empty ())
@@ -119,14 +125,6 @@ SatIdMapper::Reset ()
     {
       m_macToGroupIdMap.clear ();
     }
-
-  // SAT ID maps
-
-  if (!m_macToSatIdMap.empty ())
-    {
-      m_macToSatIdMap.clear ();
-    }
-  m_satIdIndex = 1;
 
   // GW ID maps
 
@@ -206,6 +204,21 @@ SatIdMapper::AttachMacToUtUserId (Address mac)
 }
 
 void
+SatIdMapper::AttachMacToSatId (Address mac, uint32_t satId)
+{
+  NS_LOG_FUNCTION (this);
+
+  std::pair < std::map<Address, uint32_t>::iterator, bool> resultMacToSatId = m_macToSatIdMap.insert (std::make_pair (mac, satId));
+
+  if (resultMacToSatId.second == false)
+    {
+      NS_FATAL_ERROR ("SatIdMapper::AttachMacToBeamId - MAC to sat ID failed");
+    }
+
+  NS_LOG_INFO ("Added MAC " << mac << " with sat ID " << satId);
+}
+
+void
 SatIdMapper::AttachMacToBeamId (Address mac, uint32_t beamId)
 {
   NS_LOG_FUNCTION (this);
@@ -269,25 +282,6 @@ SatIdMapper::AttachMacToGwUserId (Address mac)
   return ret;
 }
 
-uint32_t
-SatIdMapper::AttachMacToSatId (Address mac)
-{
-  NS_LOG_FUNCTION (this);
-
-  const uint32_t ret = m_satIdIndex;
-  std::pair < std::map<Address, uint32_t>::iterator, bool> resultMacToSatId = m_macToSatIdMap.insert (std::make_pair (mac, m_satIdIndex));
-
-  if (resultMacToSatId.second == false)
-    {
-      NS_FATAL_ERROR ("SatIdMapper::AttachMacToSatId - MAC to SAT ID failed");
-    }
-
-  NS_LOG_INFO ("Added MAC " << mac << " with SAT ID " << m_satIdIndex);
-
-  m_satIdIndex++;
-  return ret;
-}
-
 // ID GETTERS
 
 int32_t
@@ -328,6 +322,21 @@ SatIdMapper::GetUtUserIdWithMac (Address mac) const
   std::map<Address, uint32_t>::const_iterator iter = m_macToUtUserIdMap.find (mac);
 
   if (iter == m_macToUtUserIdMap.end ())
+    {
+      return -1;
+    }
+
+  return iter->second;
+}
+
+int32_t
+SatIdMapper::GetSatIdWithMac (Address mac) const
+{
+  NS_LOG_FUNCTION (this);
+
+  std::map<Address, uint32_t>::const_iterator iter = m_macToSatIdMap.find (mac);
+
+  if (iter == m_macToSatIdMap.end ())
     {
       return -1;
     }
@@ -388,21 +397,6 @@ SatIdMapper::GetGwUserIdWithMac (Address mac) const
   std::map<Address, uint32_t>::const_iterator iter = m_macToGwUserIdMap.find (mac);
 
   if (iter == m_macToGwUserIdMap.end ())
-    {
-      return -1;
-    }
-
-  return iter->second;
-}
-
-int32_t
-SatIdMapper::GetSatIdWithMac (Address mac) const
-{
-  NS_LOG_FUNCTION (this);
-
-  std::map<Address, uint32_t>::const_iterator iter = m_macToSatIdMap.find (mac);
-
-  if (iter == m_macToSatIdMap.end ())
     {
       return -1;
     }
@@ -583,6 +577,14 @@ SatIdMapper::GetMacInfo (Address mac) const
   if (!(iterTrace == m_macToTraceIdMap.end ()))
     {
       out << "trace ID: " << iterTrace->second << " ";
+      isInMap = true;
+    }
+
+  std::map<Address, uint32_t>::const_iterator iterSat = m_macToSatIdMap.find (mac);
+
+  if (!(iterSat == m_macToSatIdMap.end ()))
+    {
+      out << "sat ID: " << iterSat->second << " ";
       isInMap = true;
     }
 

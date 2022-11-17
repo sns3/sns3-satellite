@@ -216,8 +216,9 @@ SatStatsFrameTypeUsageHelper::DoInstall ()
 
 				// Connect the trace source
 				uint32_t beamId = mac->GetBeamId ();
+        uint32_t satId = mac->GetSatId ();
 				std::ostringstream context;
-				context << GetIdentifierForBeam (beamId);
+				context << GetIdentifierForBeam (satId, beamId);
 	      const bool ret = mac->TraceConnect ("BBFrameTxTrace",
 	                                        context.str (), frameTypeUsageCallback);
 	      NS_ASSERT_MSG (ret,

@@ -109,10 +109,10 @@ SatStatsBackloggedRequestHelper::DoInstall ()
           context << "0";
           break;
         case SatStatsHelper::IDENTIFIER_GW:
-          context << GetIdentifierForBeam (it->second);
+          context << GetIdentifierForBeam (it->first, it->second);
           break;
         case SatStatsHelper::IDENTIFIER_BEAM:
-          context << GetIdentifierForBeam (it->second);
+          context << GetIdentifierForBeam (it->first, it->second);
           break;
         default:
           NS_FATAL_ERROR ("SatStatsBackloggedRequestHelper - Invalid identifier type");

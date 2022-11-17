@@ -345,7 +345,7 @@ SatStatsHelper::CreateCollectorPerIdentifier (CollectorMap &collectorMap) const
             std::ostringstream name;
             name << satId << "-" << beamId;
             collectorMap.SetAttribute ("Name", StringValue (name.str ()));
-            collectorMap.Create (beamId);
+            collectorMap.Create (1000*(satId+1) + beamId);
             n++;
           }
         break;
@@ -678,24 +678,19 @@ SatStatsHelper::GetIdentifierForUtUser (Ptr<Node> utUserNode) const
 
     case SatStatsHelper::IDENTIFIER_SAT:
       {
-        /*const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
+        Ptr<Node> utNode = m_satHelper->GetUserHelper ()->GetUtNode (utUserNode);
+
+        const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
         const Address utMac = satIdMapper->GetUtMacWithNode (utNode);
 
         if (!utMac.IsInvalid ())
           {
-            const int32_t beamId = satIdMapper->GetBeamIdWithMac (utMac);
-            NS_ASSERT_MSG (beamId != -1,
+            const int32_t satId = satIdMapper->GetSatIdWithMac (utMac);
+            NS_ASSERT_MSG (satId != -1,
                            "UT node " << utNode->GetId ()
-                                      << " is not attached to any beam");
-            const uint32_t gwId = m_satHelper->GetBeamHelper ()->GetGwId (beamId);
-            NS_ASSERT_MSG (gwId != 0,
-                           "UT node " << utNode->GetId ()
-                                      << " is not attached to any GW");
-            ret = gwId;
-          }*/
-
-        // TODO do it when several satellites
-        ret = 1;
+                                      << " is not attached to any sat");
+            ret = satId;
+          }
 
         break;
       }
@@ -716,11 +711,15 @@ SatStatsHelper::GetIdentifierForUtUser (Ptr<Node> utUserNode) const
 
             if (!utMac.IsInvalid ())
               {
+                const int32_t satId = satIdMapper->GetSatIdWithMac (utMac);
                 const int32_t beamId = satIdMapper->GetBeamIdWithMac (utMac);
+                NS_ASSERT_MSG (satId != -1,
+                               "UT user node " << utUserNode->GetId ()
+                                               << " is not attached to any sat");
                 NS_ASSERT_MSG (beamId != -1,
                                "UT user node " << utUserNode->GetId ()
                                                << " is not attached to any beam");
-                ret = beamId;
+                ret = 1000*satId + beamId;
               }
           }
 
@@ -818,24 +817,17 @@ SatStatsHelper::GetIdentifierForUt (Ptr<Node> utNode) const
 
     case SatStatsHelper::IDENTIFIER_SAT:
       {
-        /*const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
+        const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
         const Address utMac = satIdMapper->GetUtMacWithNode (utNode);
 
         if (!utMac.IsInvalid ())
           {
-            const int32_t beamId = satIdMapper->GetBeamIdWithMac (utMac);
-            NS_ASSERT_MSG (beamId != -1,
+            const int32_t satId = satIdMapper->GetSatIdWithMac (utMac);
+            NS_ASSERT_MSG (satId != -1,
                            "UT node " << utNode->GetId ()
-                                      << " is not attached to any beam");
-            const uint32_t gwId = m_satHelper->GetBeamHelper ()->GetGwId (beamId);
-            NS_ASSERT_MSG (gwId != 0,
-                           "UT node " << utNode->GetId ()
-                                      << " is not attached to any GW");
-            ret = gwId;
-          }*/
-
-        // TODO do it when several satellites
-        ret = 1;
+                                      << " is not attached to any sat");
+            ret = satId;
+          }
 
         break;
       }
@@ -847,11 +839,15 @@ SatStatsHelper::GetIdentifierForUt (Ptr<Node> utNode) const
 
         if (!utMac.IsInvalid ())
           {
+            const int32_t satId = satIdMapper->GetSatIdWithMac (utMac);
             const int32_t beamId = satIdMapper->GetBeamIdWithMac (utMac);
+            NS_ASSERT_MSG (satId != -1,
+                           "UT node " << utNode->GetId ()
+                                      << " is not attached to any sat");
             NS_ASSERT_MSG (beamId != -1,
                            "UT node " << utNode->GetId ()
                                       << " is not attached to any beam");
-            ret = beamId;
+            ret = 1000*satId + beamId;
           }
 
         break;
@@ -888,7 +884,7 @@ SatStatsHelper::GetIdentifierForUt (Ptr<Node> utNode) const
 
 
 uint32_t
-SatStatsHelper::GetIdentifierForBeam (uint32_t beamId) const
+SatStatsHelper::GetIdentifierForBeam (uint32_t satId, uint32_t beamId) const
 {
   uint32_t ret = 0;
 
@@ -909,24 +905,7 @@ SatStatsHelper::GetIdentifierForBeam (uint32_t beamId) const
 
     case SatStatsHelper::IDENTIFIER_SAT:
       {
-        /*const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
-        const Address utMac = satIdMapper->GetUtMacWithNode (utNode);
-
-        if (!utMac.IsInvalid ())
-          {
-            const int32_t beamId = satIdMapper->GetBeamIdWithMac (utMac);
-            NS_ASSERT_MSG (beamId != -1,
-                           "UT node " << utNode->GetId ()
-                                      << " is not attached to any beam");
-            const uint32_t gwId = m_satHelper->GetBeamHelper ()->GetGwId (beamId);
-            NS_ASSERT_MSG (gwId != 0,
-                           "UT node " << utNode->GetId ()
-                                      << " is not attached to any GW");
-            ret = gwId;
-          }*/
-
-        // TODO do it when several satellites
-        ret = 1;
+        ret = satId;
 
         break;
       }
@@ -984,27 +963,6 @@ SatStatsHelper::GetIdentifierForGw (Ptr<Node> gwNode) const
   else if (m_identifierType == IDENTIFIER_GLOBAL)
     {
       return 0;
-    }
-  else if (m_identifierType == IDENTIFIER_SAT)
-    {
-      /*const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
-      const Address utMac = satIdMapper->GetUtMacWithNode (utNode);
-
-      if (!utMac.IsInvalid ())
-        {
-          const int32_t beamId = satIdMapper->GetBeamIdWithMac (utMac);
-          NS_ASSERT_MSG (beamId != -1,
-                         "UT node " << utNode->GetId ()
-                                    << " is not attached to any beam");
-          const uint32_t gwId = m_satHelper->GetBeamHelper ()->GetGwId (beamId);
-          NS_ASSERT_MSG (gwId != 0,
-                         "UT node " << utNode->GetId ()
-                                    << " is not attached to any GW");
-          ret = gwId;
-        }*/
-
-      // TODO do it when several satellites
-      return 1;
     }
   else
     {

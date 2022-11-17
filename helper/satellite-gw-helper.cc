@@ -420,6 +420,7 @@ SatGwHelper::InstallDvb (Ptr<Node> n,
   Singleton<SatIdMapper>::Get ()->AttachMacToTraceId (dev->GetAddress ());
   Singleton<SatIdMapper>::Get ()->AttachMacToGwId (dev->GetAddress (), gwId);
   Singleton<SatIdMapper>::Get ()->AttachMacToBeamId (dev->GetAddress (), beamId);
+  Singleton<SatIdMapper>::Get ()->AttachMacToSatId (dev->GetAddress (), satId+1);
 
   // Create an encapsulator for control messages.
   // Source = GW address
@@ -616,6 +617,7 @@ SatGwHelper::InstallLora (Ptr<Node> n,
   Singleton<SatIdMapper>::Get ()->AttachMacToTraceId (dev->GetAddress ());
   Singleton<SatIdMapper>::Get ()->AttachMacToGwId (dev->GetAddress (), gwId);
   Singleton<SatIdMapper>::Get ()->AttachMacToBeamId (dev->GetAddress (), beamId);
+  Singleton<SatIdMapper>::Get ()->AttachMacToSatId (dev->GetAddress (), satId+1);
 
   phy->Initialize ();
 
