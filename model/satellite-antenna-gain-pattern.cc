@@ -230,8 +230,11 @@ void SatAntennaGainPattern::GetSatelliteOffset (double& latOffset, double& lonOf
     }
 
   GeoCoordinate satellite = m_satelliteMobility->GetGeoPosition ();
-  latOffset = satellite.GetLatitude () - m_initialSatellitePosition.GetLatitude ();
-  lonOffset = satellite.GetLongitude () - m_initialSatellitePosition.GetLongitude ();
+
+  // TODO do not hardcode (0, 33) here (position of satellite in scenario72)
+  latOffset = 0 - satellite.GetLatitude ();
+  lonOffset = 33 - satellite.GetLongitude ();
+
   NS_LOG_DEBUG (this << " Satellite offset (moved from the beginning of the simulation): " << latOffset << " / " << lonOffset);
 }
 
@@ -311,8 +314,8 @@ double SatAntennaGainPattern::GetAntennaGain_lin (GeoCoordinate coord) const
   GetSatelliteOffset (satLatOffset, satLonOffset);
 
   // Get the requested position {latitude, longitude}
-  double latitude = coord.GetLatitude () - satLatOffset;
-  double longitude = coord.GetLongitude () - satLonOffset;
+  double latitude = coord.GetLatitude () + satLatOffset;
+  double longitude = coord.GetLongitude () + satLonOffset;
 
   // Given {latitude, longitude} has to be inside the min/max latitude/longitude values
   if (m_minLat > latitude

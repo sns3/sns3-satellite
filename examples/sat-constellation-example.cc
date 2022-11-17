@@ -91,8 +91,6 @@ main (int argc, char *argv[])
   /// Enable packet trace
   Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
 
-  // Set tag, if output path is not explicitly defined
-
   simulationHelper->SetSimulationTime (Seconds (30));
 
   std::set<uint32_t> beamSetAll = {1, 2, 3, 4, 5, 6, 7, 8, 9,
@@ -104,7 +102,7 @@ main (int argc, char *argv[])
                                    60, 61, 62, 63, 64, 65, 66, 67, 68, 69,
                                    70, 71, 72};
 
-  std::set<uint32_t> beamSet = {11, 18};
+  std::set<uint32_t> beamSet = {43, 30};
 
   // Set beam ID
   simulationHelper->SetBeamSet (beamSet);

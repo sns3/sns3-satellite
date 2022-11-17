@@ -542,8 +542,8 @@ SatPhyRxCarrier::CheckAgainstLinkResultsErrorModelAvi (double cSinr, Ptr<SatSign
         */
 
         double ber = (GetLinkResults ()->GetObject <SatLinkResultsFwd> ())->GetBler (rxParams->m_txInfo.modCod,
-                                                                                       rxParams->m_txInfo.frameType,
-                                                                                       SatUtils::LinearToDb (cSinr));
+                                                                                     rxParams->m_txInfo.frameType,
+                                                                                     SatUtils::LinearToDb (cSinr));
         double r = GetUniformRandomValue (0, 1);
 
         if ( r < ber )
