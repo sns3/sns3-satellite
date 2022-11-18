@@ -470,6 +470,7 @@ set(test_sources
     test/satellite-arq-test.cc
     test/satellite-channel-estimation-error-test.cc
     test/satellite-cno-estimator-test.cc
+    test/satellite-constellation-test.cc
     test/satellite-control-msg-container-test.cc
     test/satellite-cra-test.cc
     test/satellite-fading-external-input-trace-test.cc

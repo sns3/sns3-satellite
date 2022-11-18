@@ -178,8 +178,8 @@ SatRegenerationTest1::DoRun (void)
   m_gwAddress = m_helper->GwNodes ().Get (0)->GetDevice (1)->GetAddress ();
   m_stAddress = m_helper->UtNodes ().Get (0)->GetDevice (2)->GetAddress ();
 
-  Ptr<SatGeoFeederPhy> satGeoFeederPhy = DynamicCast<SatGeoFeederPhy> (DynamicCast<SatGeoNetDevice> (m_helper->GeoSatNode ()->GetDevice (0))->GetFeederPhy (8));
-  Ptr<SatGeoUserPhy> satGeoUserPhy = DynamicCast<SatGeoUserPhy> (DynamicCast<SatGeoNetDevice> (m_helper->GeoSatNode ()->GetDevice (0))->GetUserPhy (8));
+  Ptr<SatGeoFeederPhy> satGeoFeederPhy = DynamicCast<SatGeoFeederPhy> (DynamicCast<SatGeoNetDevice> (m_helper->GeoSatNodes ().Get (0)->GetDevice (0))->GetFeederPhy (8));
+  Ptr<SatGeoUserPhy> satGeoUserPhy = DynamicCast<SatGeoUserPhy> (DynamicCast<SatGeoNetDevice> (m_helper->GeoSatNodes ().Get (0)->GetDevice (0))->GetUserPhy (8));
 
   satGeoFeederPhy->TraceConnectWithoutContext ("RxLinkDelay", MakeCallback (&SatRegenerationTest1::GeoFeederPhyTraceDelayCb, this));
   satGeoUserPhy->TraceConnectWithoutContext ("RxLinkDelay", MakeCallback (&SatRegenerationTest1::GeoUserPhyTraceDelayCb, this));
@@ -438,8 +438,8 @@ SatRegenerationTest2::DoRun (void)
   gwAppsReturn.Start (Seconds (1.0));
   gwAppsReturn.Stop (Seconds (60.0));
 
-  Ptr<SatGeoFeederPhy> satGeoFeederPhy = DynamicCast<SatGeoFeederPhy> (DynamicCast<SatGeoNetDevice> (m_helper->GeoSatNode ()->GetDevice (0))->GetFeederPhy (8));
-  Ptr<SatGeoUserPhy> satGeoUserPhy = DynamicCast<SatGeoUserPhy> (DynamicCast<SatGeoNetDevice> (m_helper->GeoSatNode ()->GetDevice (0))->GetUserPhy (8));
+  Ptr<SatGeoFeederPhy> satGeoFeederPhy = DynamicCast<SatGeoFeederPhy> (DynamicCast<SatGeoNetDevice> (m_helper->GeoSatNodes ().Get (0)->GetDevice (0))->GetFeederPhy (8));
+  Ptr<SatGeoUserPhy> satGeoUserPhy = DynamicCast<SatGeoUserPhy> (DynamicCast<SatGeoNetDevice> (m_helper->GeoSatNodes ().Get (0)->GetDevice (0))->GetUserPhy (8));
 
   satGeoFeederPhy->TraceConnectWithoutContext ("PacketTrace", MakeCallback (&SatRegenerationTest2::GeoPhyTraceCb, this));
   satGeoUserPhy->TraceConnectWithoutContext ("PacketTrace", MakeCallback (&SatRegenerationTest2::GeoPhyTraceCb, this));
@@ -694,8 +694,8 @@ SatRegenerationTest3::DoRun (void)
 
   m_helper = simulationHelper->GetSatelliteHelper ();
 
-  Ptr<SatGeoFeederPhy> satGeoFeederPhy = DynamicCast<SatGeoFeederPhy> (DynamicCast<SatGeoNetDevice> (m_helper->GeoSatNode ()->GetDevice (0))->GetFeederPhy (1));
-  Ptr<SatGeoUserPhy> satGeoUserPhy = DynamicCast<SatGeoUserPhy> (DynamicCast<SatGeoNetDevice> (m_helper->GeoSatNode ()->GetDevice (0))->GetUserPhy (1));
+  Ptr<SatGeoFeederPhy> satGeoFeederPhy = DynamicCast<SatGeoFeederPhy> (DynamicCast<SatGeoNetDevice> (m_helper->GeoSatNodes ().Get (0)->GetDevice (0))->GetFeederPhy (1));
+  Ptr<SatGeoUserPhy> satGeoUserPhy = DynamicCast<SatGeoUserPhy> (DynamicCast<SatGeoNetDevice> (m_helper->GeoSatNodes ().Get (0)->GetDevice (0))->GetUserPhy (1));
 
   m_gwAddress = m_helper->GwNodes ().Get (0)->GetDevice (1)->GetAddress ();
 
@@ -1047,7 +1047,7 @@ SatRegenerationTest5::DoRun (void)
 
   Ptr<Node> gwNode = m_helper->GwNodes ().Get (0);
   Ptr<Node> utNode = m_helper->UtNodes ().Get (0);
-  Ptr<Node> geoNode = m_helper->GeoSatNode ();
+  Ptr<Node> geoNode = m_helper->GeoSatNodes ().Get (0);
   Ptr<SatGeoFeederPhy> satGeoFeederPhy = DynamicCast<SatGeoFeederPhy> (DynamicCast<SatGeoNetDevice> (geoNode->GetDevice (0))->GetFeederPhy (8));
   Ptr<SatGeoUserPhy> satGeoUserPhy = DynamicCast<SatGeoUserPhy> (DynamicCast<SatGeoNetDevice> (geoNode->GetDevice (0))->GetUserPhy (8));
   Ptr<SatPhy> satGwPhy = DynamicCast<SatPhy> (DynamicCast<SatNetDevice> (gwNode->GetDevice (1))->GetPhy ());
@@ -1414,7 +1414,7 @@ SatRegenerationTest7::DoRun (void)
 
   Ptr<Node> gwNode = m_helper->GwNodes ().Get (0);
   Ptr<Node> utNode = m_helper->UtNodes ().Get (0);
-  Ptr<Node> geoNode = m_helper->GeoSatNode ();
+  Ptr<Node> geoNode = m_helper->GeoSatNodes ().Get (0);
   Ptr<SatGeoFeederPhy> satGeoFeederPhy = DynamicCast<SatGeoFeederPhy> (DynamicCast<SatGeoNetDevice> (geoNode->GetDevice (0))->GetFeederPhy (8));
   Ptr<SatGeoUserPhy> satGeoUserPhy = DynamicCast<SatGeoUserPhy> (DynamicCast<SatGeoNetDevice> (geoNode->GetDevice (0))->GetUserPhy (8));
   Ptr<SatPhy> satGwPhy = DynamicCast<SatPhy> (DynamicCast<SatNetDevice> (gwNode->GetDevice (1))->GetPhy ());
@@ -1629,10 +1629,10 @@ SatRegenerationTest8::DoRun (void)
 
   m_helper = simulationHelper->GetSatelliteHelper ();
 
-  std::map<uint32_t, Ptr<SatPhy> > satGeoFeederPhy = DynamicCast<SatGeoNetDevice> (m_helper->GeoSatNode ()->GetDevice (0))->GetFeederPhy ();
-  std::map<uint32_t, Ptr<SatPhy> > satGeoUserPhy = DynamicCast<SatGeoNetDevice> (m_helper->GeoSatNode ()->GetDevice (0))->GetUserPhy ();
-  std::map<uint32_t, Ptr<SatMac> > satGeoFeederMac = DynamicCast<SatGeoNetDevice> (m_helper->GeoSatNode ()->GetDevice (0))->GetFeederMac ();
-  std::map<uint32_t, Ptr<SatMac> > satGeoUserMac = DynamicCast<SatGeoNetDevice> (m_helper->GeoSatNode ()->GetDevice (0))->GetUserMac ();
+  std::map<uint32_t, Ptr<SatPhy> > satGeoFeederPhy = DynamicCast<SatGeoNetDevice> (m_helper->GeoSatNodes ().Get (0)->GetDevice (0))->GetFeederPhy ();
+  std::map<uint32_t, Ptr<SatPhy> > satGeoUserPhy = DynamicCast<SatGeoNetDevice> (m_helper->GeoSatNodes ().Get (0)->GetDevice (0))->GetUserPhy ();
+  std::map<uint32_t, Ptr<SatMac> > satGeoFeederMac = DynamicCast<SatGeoNetDevice> (m_helper->GeoSatNodes ().Get (0)->GetDevice (0))->GetFeederMac ();
+  std::map<uint32_t, Ptr<SatMac> > satGeoUserMac = DynamicCast<SatGeoNetDevice> (m_helper->GeoSatNodes ().Get (0)->GetDevice (0))->GetUserMac ();
 
   Config::ConnectWithoutContext ("/NodeList/0/DeviceList/0/UserPhy/*/PacketTrace", MakeCallback (&SatRegenerationTest8::AddTraceEntry, this));
   Config::ConnectWithoutContext ("/NodeList/0/DeviceList/0/FeederPhy/*/PacketTrace", MakeCallback (&SatRegenerationTest8::AddTraceEntry, this));

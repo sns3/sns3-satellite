@@ -254,11 +254,6 @@ public:
   {
     return m_beamHelper->GetUtNodes ();
   }
-  // TODO temp ?
-  inline Ptr<Node> GeoSatNode ()
-  {
-    return m_beamHelper->GetGeoSatNodes ().Get (0);
-  }
   inline NodeContainer GeoSatNodes ()
   {
     return m_beamHelper->GetGeoSatNodes ();

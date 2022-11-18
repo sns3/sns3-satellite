@@ -147,7 +147,7 @@ main (int argc, char *argv[])
   NodeContainer gw = helper->GwNodes ();
   Ptr<SatMobilityModel> gwMob = gw.Get (0)->GetObject<SatMobilityModel> ();
 
-  Ptr<Node> geo = helper->GeoSatNode ();
+  Ptr<Node> geo = helper->GeoSatNodes ().Get (0);
   Ptr<SatMobilityModel> geoMob = geo->GetObject<SatMobilityModel> ();
 
   // print used parameters using log info
