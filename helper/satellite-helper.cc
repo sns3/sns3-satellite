@@ -390,7 +390,7 @@ SatHelper::LoadConstellationTopology (std::string path)
       NS_FATAL_ERROR ("Directory '" << dataPath << "' does not exist, no constellation can be created.");
     }
 
-  m_satConf->SetUtPositionInputFileName ("constellations/" + path + "/gw_positions.txt");
+  m_satConf->SetUtPositionInputFileName ("constellations/" + path + "/ut_positions.txt");
 
   m_satConf->Initialize (m_rtnConfFileName,
                          m_fwdConfFileName,
