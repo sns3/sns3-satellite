@@ -95,7 +95,7 @@ public:
    */
   bool IsValidPosition (GeoCoordinate coord, TracedCallback<double> cb) const;
 
-  void SetInitialSatellitePosition (Ptr<SatMobilityModel> mobility, GeoCoordinate coord);
+  void SetMobilityModel (Ptr<SatMobilityModel> mobility);
 
   void GetSatelliteOffset (double& latOffset, double& lonOffset) const;
 
@@ -177,10 +177,6 @@ private:
   static const std::string m_nanStringArray[4];
   std::vector<std::string> m_nanStrings;
 
-  /**
-   * Initial satellite position for beam shifting
-   */
-  GeoCoordinate m_initialSatellitePosition;
   Ptr<SatMobilityModel> m_satelliteMobility;
 };
 

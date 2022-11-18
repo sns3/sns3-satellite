@@ -389,10 +389,10 @@ double SatAntennaGainPattern::GetAntennaGain_lin (GeoCoordinate coord) const
 }
 
 
-void SatAntennaGainPattern::SetInitialSatellitePosition (Ptr<SatMobilityModel> mobility, GeoCoordinate coord)
+void SatAntennaGainPattern::SetMobilityModel (Ptr<SatMobilityModel> mobility)
 {
-  NS_LOG_FUNCTION (this << mobility << coord.GetLatitude () << coord.GetLongitude ());
-  m_initialSatellitePosition = coord;
+  NS_LOG_FUNCTION (this << mobility);
+
   m_satelliteMobility = mobility;
 }
 

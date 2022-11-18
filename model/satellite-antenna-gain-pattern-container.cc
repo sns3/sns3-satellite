@@ -216,8 +216,6 @@ SatAntennaGainPatternContainer::ConfigureBeamsMobility (uint32_t satelliteId, Pt
 {
   NS_LOG_FUNCTION (this << mobility);
 
-  GeoCoordinate initial = mobility->GetGeoPosition ();
-
   Ptr<SatSGP4MobilityModel> sgp4Mobility = DynamicCast<SatSGP4MobilityModel> (mobility);
   if (sgp4Mobility != nullptr)
     {
@@ -232,14 +230,13 @@ SatAntennaGainPatternContainer::ConfigureBeamsMobility (uint32_t satelliteId, Pt
 
       Ptr<SatSGP4MobilityModel> model = CopyObject<SatSGP4MobilityModel> (sgp4Mobility);
       model->SetStartTime (JulianDate (originDate));
-      initial = model->GetGeoPosition ();
     }
 
   for (auto const& entry : m_antennaPatternMap)
     {
       if (entry.first.first == satelliteId)
         {
-          entry.second->SetInitialSatellitePosition (mobility, initial);
+          entry.second->SetMobilityModel (mobility);
         }
     }
 }
