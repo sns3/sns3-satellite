@@ -215,6 +215,13 @@ public:
   std::vector <std::string> LoadTles (std::string filePathName);
 
   /**
+   * Load a vector of ISLs from a file
+   * \param filePathName
+   * \return ISLs information extracted from file. This corresponds to satellite pairs linked by ISLs
+   */
+  std::vector <std::pair <uint32_t, uint32_t>> LoadIsls (std::string filePathName);
+
+  /**
    * Definition for beam ID index (column) in m_conf
    */
   static const uint32_t BEAM_ID_INDEX = 0;

@@ -252,7 +252,10 @@ SatHelper::SatHelper ()
           NS_FATAL_ERROR ("Return regeneration must be network when using constellations");
         }
 
-      std::vector <std::string> tles = LoadConstellationTopology (m_satConstellationFolder);
+      std::vector <std::string> tles;
+      std::vector <std::pair <uint32_t, uint32_t>> isls;
+
+      LoadConstellationTopology (m_satConstellationFolder, tles, isls);
 
       m_antennaGainPatterns = CreateObject<SatAntennaGainPatternContainer> (tles.size ());
 
@@ -267,6 +270,12 @@ SatHelper::SatHelper ()
           m_antennaGainPatterns->ConfigureBeamsMobility (i, mobility);
 
           geoNodes.Add (geoSatNode);
+        }
+
+      for (uint32_t i = 0; i < isls.size (); i++)
+        {
+          // TODO create ISLs
+          std::cout << isls[i].first << " " << isls[i].second <<std::endl;
         }
     }
   else
@@ -378,8 +387,8 @@ SatHelper::EnablePacketTrace ()
   m_beamHelper->EnablePacketTrace ();
 }
 
-std::vector <std::string>
-SatHelper::LoadConstellationTopology (std::string path)
+void
+SatHelper::LoadConstellationTopology (std::string path, std::vector <std::string> &tles, std::vector <std::pair <uint32_t, uint32_t>> &isls)
 {
   NS_LOG_FUNCTION (this << path);
 
@@ -400,8 +409,8 @@ SatHelper::LoadConstellationTopology (std::string path)
                          m_satMobilitySGP4TleFileName,
                          true);
 
-  std::vector <std::string> tles = m_satConf->LoadTles (dataPath + "/tles.txt");
-  return tles;
+  tles = m_satConf->LoadTles (dataPath + "/tles.txt");
+  isls = m_satConf->LoadIsls (dataPath + "/isls.txt");
 }
 
 void SatHelper::EnableDetailedCreationTraces ()

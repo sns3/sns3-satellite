@@ -476,9 +476,10 @@ private:
   /**
    * Load a constellation topology.
    * \param path Folder where configuration files are located
-   * \return A vector for all TLE loaded
+   * \param tles vector to store read TLEs
+   * \param isls vector to store read ISLs
    */
-  std::vector <std::string> LoadConstellationTopology (std::string path);
+  void LoadConstellationTopology (std::string path, std::vector <std::string> &tles, std::vector <std::pair <uint32_t, uint32_t>> &isls);
 
   /**
    * Sink for creation details traces

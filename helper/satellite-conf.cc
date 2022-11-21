@@ -542,6 +542,48 @@ SatConf::LoadTles (std::string filePathName)
   return tles;
 }
 
+std::vector <std::pair <uint32_t, uint32_t>>
+SatConf::LoadIsls (std::string filePathName)
+{
+  NS_LOG_FUNCTION (this << filePathName);
+
+  std::vector <std::pair <uint32_t, uint32_t>> isls;
+
+  // READ FROM THE SPECIFIED INPUT FILE
+  std::ifstream *ifs = OpenFile (filePathName);
+
+  double size;
+  uint32_t i = 0;
+  std::string firstLine;
+  std::getline (*ifs, firstLine);
+  std::istringstream iss(firstLine);
+  iss >> size;
+
+  isls.reserve (size);
+
+  while (ifs->good () && i < size)
+    {
+      std::string line;
+      std::string sat1;
+      std::string sat2;
+
+      std::getline( *ifs, line);
+
+      std::stringstream ss(line);
+      ss >> sat1;
+      ss >> sat2;
+
+      isls.push_back (std::make_pair (std::stoi (sat1), std::stoi (sat2)));
+
+      i += 1;
+    }
+
+  ifs->close ();
+  delete ifs;
+
+  return isls;
+}
+
 uint32_t
 SatConf::GetBeamCount () const
 {
