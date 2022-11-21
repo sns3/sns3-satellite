@@ -343,7 +343,7 @@ SatStatsHelper::CreateCollectorPerIdentifier (CollectorMap &collectorMap) const
             const uint32_t satId = (it->first);
             const uint32_t beamId = (it->second);
             std::ostringstream name;
-            name << satId << "-" << beamId;
+            name << (satId+1) << "-" << beamId;
             collectorMap.SetAttribute ("Name", StringValue (name.str ()));
             collectorMap.Create (1000*(satId+1) + beamId);
             n++;
@@ -661,11 +661,15 @@ SatStatsHelper::GetIdentifierForUtUser (Ptr<Node> utUserNode) const
 
             if (!utMac.IsInvalid ())
               {
+                const int32_t satId = satIdMapper->GetSatIdWithMac (utMac);
                 const int32_t beamId = satIdMapper->GetBeamIdWithMac (utMac);
+                NS_ASSERT_MSG (satId != -1,
+                               "UT user node " << utUserNode->GetId ()
+                                               << " is not attached to any sat");
                 NS_ASSERT_MSG (beamId != -1,
                                "UT user node " << utUserNode->GetId ()
                                                << " is not attached to any beam");
-                const uint32_t gwId = m_satHelper->GetBeamHelper ()->GetGwId (beamId);
+                const uint32_t gwId = m_satHelper->GetBeamHelper ()->GetGwId (satId - 1, beamId);
                 NS_ASSERT_MSG (gwId != 0,
                                "UT user node " << utUserNode->GetId ()
                                                << " is not attached to any GW");
@@ -801,11 +805,15 @@ SatStatsHelper::GetIdentifierForUt (Ptr<Node> utNode) const
 
         if (!utMac.IsInvalid ())
           {
+            const int32_t satId = satIdMapper->GetSatIdWithMac (utMac);
             const int32_t beamId = satIdMapper->GetBeamIdWithMac (utMac);
+            NS_ASSERT_MSG (satId != -1,
+                           "UT user node " << utNode->GetId ()
+                                           << " is not attached to any sat");
             NS_ASSERT_MSG (beamId != -1,
                            "UT node " << utNode->GetId ()
                                       << " is not attached to any beam");
-            const uint32_t gwId = m_satHelper->GetBeamHelper ()->GetGwId (beamId);
+            const uint32_t gwId = m_satHelper->GetBeamHelper ()->GetGwId (satId - 1, beamId);
             NS_ASSERT_MSG (gwId != 0,
                            "UT node " << utNode->GetId ()
                                       << " is not attached to any GW");
@@ -896,7 +904,7 @@ SatStatsHelper::GetIdentifierForBeam (uint32_t satId, uint32_t beamId) const
 
     case SatStatsHelper::IDENTIFIER_GW:
       {
-        const uint32_t gwId = m_satHelper->GetBeamHelper ()->GetGwId (beamId);
+        const uint32_t gwId = m_satHelper->GetBeamHelper ()->GetGwId (satId, beamId);
         NS_ASSERT_MSG (gwId != 0,
                        "Beam " << beamId << " is not attached to any GW");
         ret = gwId;

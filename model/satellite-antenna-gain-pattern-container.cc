@@ -242,16 +242,16 @@ SatAntennaGainPatternContainer::ConfigureBeamsMobility (uint32_t satelliteId, Pt
 }
 
 void
-SatAntennaGainPatternContainer::SetEnabledBeams (uint32_t satelliteId, BeamUserInfoMap_t info)
+SatAntennaGainPatternContainer::SetEnabledBeams (uint32_t satId, BeamUserInfoMap_t& info)
 {
   std::map< std::pair<uint32_t, uint32_t>, Ptr<SatAntennaGainPattern> >::iterator it = m_antennaPatternMap.begin ();
   while (it != m_antennaPatternMap.end ())
     {
       uint32_t satelliteIdIterator = it->first.first;
       uint32_t beamIdIterator = it->first.second;
-      if (satelliteIdIterator == satelliteId)
+      if (satelliteIdIterator == satId)
         {
-          if (info.find (beamIdIterator) == info.end())
+          if (info.find (std::make_pair (satId, beamIdIterator)) == info.end())
             {
               it = m_antennaPatternMap.erase (it);
             }

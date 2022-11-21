@@ -260,7 +260,7 @@ public:
    * \return the ID of the GW serving the specified beam, or zero if the ID is
    *         invalid
    */
-  uint32_t GetGwId (uint32_t beamId, uint32_t satId = 0) const; // TODO  = 0 is temp
+  uint32_t GetGwId (uint32_t satId, uint32_t beamId) const;
 
   /**
    * \return container having all GW nodes in satellite network.

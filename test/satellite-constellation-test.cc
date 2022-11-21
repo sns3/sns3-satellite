@@ -26,6 +26,9 @@
  * In this module implements the Constellation Test Cases.
  */
 
+#include <iostream>
+#include <fstream>
+
 #include "ns3/string.h"
 #include "ns3/packet-sink-helper.h"
 #include "ns3/packet-sink.h"
@@ -56,11 +59,11 @@ using namespace ns3;
  * It load the eutelsat-geo-2-sats configuration
  *
  *  Expected result:
- *    Correct number of entities: 2 satellites, 2 GWs, 2 UTs
+ *    Correct number of entities: 2 satellites, 2 GWs, 3 UTs
  *    Correct position of entities:
  *       - satellites: (0, 7.2, 36M) and (0, 47.7, 36M)
  *       - gws: (48.85, 2.34, 0) and (55.75, 37.62, 0)
- *       - uts: (48.85341, 2.3488, 0) and (55.754996, 37.621849, 0)
+ *       - uts: (48.85341, 2.3488, 0), (55.754996, 37.621849, 0) and (55.754, 37.621, 0)
  */
 class SatConstellationTest1 : public TestCase
 {
@@ -126,9 +129,9 @@ SatConstellationTest1::DoRun (void)
 
   NS_TEST_ASSERT_MSG_EQ (sats.GetN (), 2, "Topology must contain 2 satellites");
   NS_TEST_ASSERT_MSG_EQ (gws.GetN (), 2, "Topology must contain 2 GWs");
-  NS_TEST_ASSERT_MSG_EQ (uts.GetN (), 2, "Topology must contain 2 UTs");
+  NS_TEST_ASSERT_MSG_EQ (uts.GetN (), 3, "Topology must contain 3 UTs");
   NS_TEST_ASSERT_MSG_EQ (gwUsers.GetN (), 2, "Topology must contain 2 GW users");
-  NS_TEST_ASSERT_MSG_EQ (utUsers.GetN (), 10, "Topology must contain 2 UT users");
+  NS_TEST_ASSERT_MSG_EQ (utUsers.GetN (), 15, "Topology must contain 15 UT users");
 
   GeoCoordinate sat1 = GeoCoordinate (sats.Get (0)->GetObject<SatMobilityModel> ()->GetPosition ());
   GeoCoordinate sat2 = GeoCoordinate (sats.Get (1)->GetObject<SatMobilityModel> ()->GetPosition ());
@@ -138,6 +141,7 @@ SatConstellationTest1::DoRun (void)
 
   GeoCoordinate ut1 = GeoCoordinate (uts.Get (0)->GetObject<SatMobilityModel> ()->GetPosition ());
   GeoCoordinate ut2 = GeoCoordinate (uts.Get (1)->GetObject<SatMobilityModel> ()->GetPosition ());
+  GeoCoordinate ut3 = GeoCoordinate (uts.Get (2)->GetObject<SatMobilityModel> ()->GetPosition ());
 
   NS_TEST_ASSERT_MSG_EQ_TOL (sat1.GetLatitude (), 0.0130445, 0.001, "Incorrect latitude for satellite 1");
   NS_TEST_ASSERT_MSG_EQ_TOL (sat1.GetLongitude (), 7.20984, 0.001, "Incorrect longitude for satellite 1");
@@ -159,11 +163,205 @@ SatConstellationTest1::DoRun (void)
   NS_TEST_ASSERT_MSG_EQ_TOL (ut1.GetLongitude (), 37.6218, 0.001, "Incorrect longitude for UT 1");
   NS_TEST_ASSERT_MSG_EQ (ut1.GetAltitude (), 0, "Incorrect altitude for UT 1");
 
-  NS_TEST_ASSERT_MSG_EQ_TOL (ut2.GetLatitude (), 48.8534, 0.001, "Incorrect latitude for UT 2");
-  NS_TEST_ASSERT_MSG_EQ_TOL (ut2.GetLongitude (), 2.3488, 0.001, "Incorrect longitude for UT 2");
+  NS_TEST_ASSERT_MSG_EQ_TOL (ut2.GetLatitude (), 55.754, 0.001, "Incorrect latitude for UT 2");
+  NS_TEST_ASSERT_MSG_EQ_TOL (ut2.GetLongitude (), 37.621, 0.001, "Incorrect longitude for UT 2");
   NS_TEST_ASSERT_MSG_EQ (ut2.GetAltitude (), 0, "Incorrect altitude for UT 2");
 
+  NS_TEST_ASSERT_MSG_EQ_TOL (ut3.GetLatitude (), 48.8534, 0.001, "Incorrect latitude for UT 3");
+  NS_TEST_ASSERT_MSG_EQ_TOL (ut3.GetLongitude (), 2.3488, 0.001, "Incorrect longitude for UT 3");
+  NS_TEST_ASSERT_MSG_EQ (ut3.GetAltitude (), 0, "Incorrect altitude for UT 3");
+
   Simulator::Destroy ();
+}
+
+/**
+ * \ingroup satellite
+ * \brief 'Constellation, test 2 test case implementation.
+ *
+ * This case tests that a application throughputs PerEntity are correct.
+ * It generates a conf with 2 satellites, 2 GWs, 3 UTs and 3 UT users per UT.
+ * Each UT user receives 409.6 kb/s.
+ *
+ *  Expected throughputs (after 3s):
+ *     - 6144 kb/s globally
+ *     - 2048 kb/s and 4096 kb/s per satellite
+ *     - 2048 kb/s per UT
+ *     - 2048 kb/s and 4096 kb/s per GW
+ *     - 409.6 kb/s per UT user
+ *     - 2048 kb/s and 4096 kb/s per satellite
+ */
+class SatConstellationTest2 : public TestCase
+{
+public:
+  SatConstellationTest2 ();
+  virtual ~SatConstellationTest2 ();
+
+private:
+  virtual void DoRun (void);
+
+  std::vector<std::string> Split (std::string s, char del);
+  void TestFileValue (std::string path, uint32_t time, uint32_t expectedValue);
+
+  Ptr<SatHelper> m_helper;
+};
+
+// Add some help text to this case to describe what it is intended to test
+SatConstellationTest2::SatConstellationTest2 ()
+  : TestCase ("This case tests that a application throughputs PerEntity are correct.")
+{
+}
+
+// This destructor does nothing but we include it as a reminder that
+// the test case should clean up after itself
+SatConstellationTest2::~SatConstellationTest2 ()
+{
+}
+
+
+std::vector<std::string>
+SatConstellationTest2::Split (std::string s, char del)
+{
+  std::stringstream ss(s);
+  std::string word;
+  std::vector<std::string> tokens;
+  while (!ss.eof())
+    {
+      std::getline(ss, word, del);
+      tokens.push_back (word);
+    }
+  return tokens;
+}
+
+void
+SatConstellationTest2::TestFileValue (std::string path, uint32_t time, uint32_t expectedValue)
+{
+  std::string line;
+  std::ifstream myfile (path);
+  std::string delimiter = " ";
+  std::string token;
+  bool valueFound;
+
+  if (myfile.is_open())
+    {
+      valueFound = false;
+      while ( std::getline (myfile, line) )
+        {
+          std::vector<std::string> tokens = Split (line, ' ');
+          if (tokens.size () == 2)
+            {
+              if ((uint32_t) std::stoi(tokens[0]) == time)
+                {
+                  NS_TEST_ASSERT_MSG_EQ_TOL (std::stof(tokens[1]), expectedValue, expectedValue/10, "Incorrect throughput for statistic " << path);
+                  valueFound = true;
+                  break;
+                }
+            }
+        }
+      myfile.close();
+      if (!valueFound)
+        {
+          NS_TEST_ASSERT_MSG_EQ (0, 1, "Cannot find time " << time << " for trace file " << path);
+        }
+    }
+  else
+    {
+      NS_TEST_ASSERT_MSG_EQ (0, 1, "Cannot read trace file " << path);
+    }
+}
+
+//
+// SatConstellationTest2 TestCase implementation
+//
+void
+SatConstellationTest2::DoRun (void)
+{
+  Config::Reset ();
+
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-constellation", "test2", true);
+
+  /// Set regeneration mode
+  Config::SetDefault ("ns3::SatConf::ForwardLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_NETWORK));
+  Config::SetDefault ("ns3::SatConf::ReturnLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_NETWORK));
+
+  /// Use constellation
+  Config::SetDefault ("ns3::SatHelper::SatConstellationEnabled", BooleanValue (true));
+  Config::SetDefault ("ns3::SatHelper::SatConstellationFolder", StringValue ("eutelsat-geo-2-sats"));
+  Config::SetDefault ("ns3::SatSGP4MobilityModel::StartDateStr", StringValue ("2022-11-13 12:00:00"));
+  Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionEachRequest", BooleanValue (false));
+  Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionPeriod", TimeValue (Seconds (1)));
+
+  Config::SetDefault ("ns3::CbrApplication::Interval", StringValue ("10ms"));
+  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (512) );
+
+  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("test-sat-constellation/test2");
+
+  // Creating the reference system.
+  simulationHelper->SetBeamSet ({43, 30});
+  simulationHelper->SetUserCountPerUt (5);
+
+  simulationHelper->CreateSatScenario ();
+  m_helper = simulationHelper->GetSatelliteHelper ();
+
+  simulationHelper->InstallTrafficModel (
+    SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
+    Seconds (1.0), Seconds (29.0));
+  simulationHelper->InstallTrafficModel (
+    SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
+    Seconds (1.0), Seconds (29.0));
+
+  Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer ();
+
+  s->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerGwFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerGwRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerBeamFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  simulationHelper->SetSimulationTime (Seconds (10));
+  simulationHelper->RunSimulation ();
+
+  Simulator::Destroy ();
+
+  // Global throughput
+  TestFileValue ("contrib/satellite/data/sims/test-sat-constellation/test2/stat-global-fwd-app-throughput-scatter-0.txt", 5, 6144);
+  TestFileValue ("contrib/satellite/data/sims/test-sat-constellation/test2/stat-global-rtn-app-throughput-scatter-0.txt", 5, 6144);
+
+  // Per satellite throughput
+  TestFileValue ("contrib/satellite/data/sims/test-sat-constellation/test2/stat-per-sat-fwd-app-throughput-scatter-1.txt", 5, 2048);
+  TestFileValue ("contrib/satellite/data/sims/test-sat-constellation/test2/stat-per-sat-fwd-app-throughput-scatter-2.txt", 5, 4096);
+  TestFileValue ("contrib/satellite/data/sims/test-sat-constellation/test2/stat-per-sat-rtn-app-throughput-scatter-1.txt", 5, 2048);
+  TestFileValue ("contrib/satellite/data/sims/test-sat-constellation/test2/stat-per-sat-rtn-app-throughput-scatter-2.txt", 5, 4096);
+
+  // Per beam throughput
+  TestFileValue ("contrib/satellite/data/sims/test-sat-constellation/test2/stat-per-beam-fwd-app-throughput-scatter-1-30.txt", 5, 0);
+  TestFileValue ("contrib/satellite/data/sims/test-sat-constellation/test2/stat-per-beam-fwd-app-throughput-scatter-1-43.txt", 5, 2048);
+  TestFileValue ("contrib/satellite/data/sims/test-sat-constellation/test2/stat-per-beam-fwd-app-throughput-scatter-2-30.txt", 5, 4096);
+  TestFileValue ("contrib/satellite/data/sims/test-sat-constellation/test2/stat-per-beam-fwd-app-throughput-scatter-2-43.txt", 5, 0);
+  TestFileValue ("contrib/satellite/data/sims/test-sat-constellation/test2/stat-per-beam-rtn-app-throughput-scatter-1-30.txt", 5, 0);
+  TestFileValue ("contrib/satellite/data/sims/test-sat-constellation/test2/stat-per-beam-rtn-app-throughput-scatter-1-43.txt", 5, 2048);
+  TestFileValue ("contrib/satellite/data/sims/test-sat-constellation/test2/stat-per-beam-rtn-app-throughput-scatter-2-30.txt", 5, 4096);
+  TestFileValue ("contrib/satellite/data/sims/test-sat-constellation/test2/stat-per-beam-rtn-app-throughput-scatter-2-43.txt", 5, 0);
+
+  // Per GW throughput
+  TestFileValue ("contrib/satellite/data/sims/test-sat-constellation/test2/stat-per-gw-fwd-app-throughput-scatter-1.txt", 5, 2048);
+  TestFileValue ("contrib/satellite/data/sims/test-sat-constellation/test2/stat-per-gw-fwd-app-throughput-scatter-2.txt", 5, 4096);
+  TestFileValue ("contrib/satellite/data/sims/test-sat-constellation/test2/stat-per-gw-rtn-app-throughput-scatter-1.txt", 5, 2048);
+  TestFileValue ("contrib/satellite/data/sims/test-sat-constellation/test2/stat-per-gw-rtn-app-throughput-scatter-2.txt", 5, 4096);
+
+  // Per UT throughput
+  TestFileValue ("contrib/satellite/data/sims/test-sat-constellation/test2/stat-per-ut-fwd-app-throughput-scatter-1.txt", 5, 2048);
+  TestFileValue ("contrib/satellite/data/sims/test-sat-constellation/test2/stat-per-ut-fwd-app-throughput-scatter-2.txt", 5, 2048);
+  TestFileValue ("contrib/satellite/data/sims/test-sat-constellation/test2/stat-per-ut-fwd-app-throughput-scatter-3.txt", 5, 2048);
+  TestFileValue ("contrib/satellite/data/sims/test-sat-constellation/test2/stat-per-ut-rtn-app-throughput-scatter-1.txt", 5, 2048);
+  TestFileValue ("contrib/satellite/data/sims/test-sat-constellation/test2/stat-per-ut-rtn-app-throughput-scatter-2.txt", 5, 2048);
+  TestFileValue ("contrib/satellite/data/sims/test-sat-constellation/test2/stat-per-ut-rtn-app-throughput-scatter-3.txt", 5, 2048);
 }
 
 // The TestSuite class names the TestSuite as sat-constellation-test, identifies what type of TestSuite (SYSTEM),
@@ -179,6 +377,7 @@ SatConstellationTestSuite::SatConstellationTestSuite ()
   : TestSuite ("sat-constellation-test", SYSTEM)
 {
   AddTestCase (new SatConstellationTest1, TestCase::QUICK); // Test topology loading
+  AddTestCase (new SatConstellationTest2, TestCase::QUICK); // Test good throughputs without ISLs
 }
 
 // Allocate an instance of this TestSuite

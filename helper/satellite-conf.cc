@@ -509,6 +509,7 @@ SatConf::LoadTles (std::string filePathName)
   std::ifstream *ifs = OpenFile (filePathName);
 
   double size;
+  uint32_t i = 0;
   std::string firstLine;
   std::getline (*ifs, firstLine);
   std::istringstream iss(firstLine);
@@ -516,7 +517,7 @@ SatConf::LoadTles (std::string filePathName)
 
   tles.reserve (size);
 
-  while (ifs->good ())
+  while (ifs->good () && i < size)
     {
       std::string tle;
       std::string name;
@@ -527,13 +528,10 @@ SatConf::LoadTles (std::string filePathName)
       std::getline( *ifs, line1 );
       std::getline( *ifs, line2 );
 
-      // get next rows
-      /**ifs >> name;
-      *ifs >> line1;
-      *ifs >> line2;*/
-
       tle = line1 + '\n' + line2;
       tles.push_back (tle);
+
+      i += 1;
     }
 
   ifs->close ();

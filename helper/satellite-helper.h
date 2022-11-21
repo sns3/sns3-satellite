@@ -54,9 +54,9 @@ class SatHelper : public Object
 {
 public:
   /**
-   * definition for beam map key is beam ID and value is UT/user info.
+   * definition for beam map key is pair sat ID / beam ID and value is UT/user info.
    */
-  typedef std::map<uint32_t, SatBeamUserInfo > BeamUserInfoMap_t;
+  typedef std::map<std::pair<uint32_t, uint32_t>, SatBeamUserInfo > BeamUserInfoMap_t;
 
   /**
    * \brief Values for pre-defined scenarios to be used by helper when building
@@ -135,7 +135,7 @@ public:
    * \param infoList information of the enabled beams. UT information is given in parameters files.
    * \param getNextUtUserCountCallback Callback to get number of users per UT.
    */
-  void CreateConstellationScenario (std::vector<BeamUserInfoMap_t> infoList, GetNextUtUserCountCallback getNextUtUserCountCallback);
+  void CreateConstellationScenario (BeamUserInfoMap_t& info, GetNextUtUserCountCallback getNextUtUserCountCallback);
 
   /**
    * Get closest satellite to a ground station
@@ -510,7 +510,7 @@ private:
    * \param infoList information of the sats and beam to create (and beams which are given in map)
    * \param gwUsers number of the users in GW(s) side
    */
-  void DoCreateScenario (std::vector<BeamUserInfoMap_t> infoList, uint32_t gwUsers);
+  void DoCreateScenario (BeamUserInfoMap_t& info, uint32_t gwUsers);
 
   /**
    * Creates trace summary starting with give title.
@@ -619,7 +619,7 @@ private:
   /**
    * Set configured network addresses to user and beam helpers.
    */
-  void SetNetworkAddresses (std::vector<BeamUserInfoMap_t> infoList, uint32_t gwUsers) const;
+  void SetNetworkAddresses (BeamUserInfoMap_t& info, uint32_t gwUsers) const;
 
   /**
    * Check validity of the configured network space.

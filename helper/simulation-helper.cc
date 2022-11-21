@@ -1262,12 +1262,9 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario, c
 
   if (m_satHelper->IsSatConstellationEnabled ())
     {
-      std::vector<SatHelper::BeamUserInfoMap_t> beamInfoList;
+      SatHelper::BeamUserInfoMap_t beamInfo;
       for (uint32_t satId = 0; satId < m_satHelper->GeoSatNodes ().GetN (); satId++)
         {
-          // Create beam scenario for current SAT
-          SatHelper::BeamUserInfoMap_t beamInfo;
-
           // TODO do not hardcode 72 here
           // Set beamInfo to indicate enabled beams
           for (uint32_t i = 1; i <= 72; i++)
@@ -1275,14 +1272,12 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario, c
               if (IsBeamEnabled (i))
                 {
                   SatBeamUserInfo info;
-                  beamInfo.insert (std::make_pair (i, info));
+                  beamInfo.insert (std::make_pair (std::make_pair (satId, i), info));
                 }
             }
-
-          beamInfoList.push_back (beamInfo);
         }
 
-      m_satHelper->CreateConstellationScenario (beamInfoList, MakeCallback (&SimulationHelper::GetNextUtUserCount, this));
+      m_satHelper->CreateConstellationScenario (beamInfo, MakeCallback (&SimulationHelper::GetNextUtUserCount, this));
     }
 
   // Determine scenario
@@ -1308,7 +1303,7 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario, c
                   ss << ", " <<  j << ". UT user count= " << utUserCount;
                 }
 
-              beamInfo.insert (std::make_pair (i, info));
+              beamInfo.insert (std::make_pair (std::make_pair (0, i), info));
 
               ss << std::endl;
             }
@@ -1323,10 +1318,10 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario, c
               std::cout << "Beam ID " << it->first << " is not enabled, cannot add " << it->second.size () << " UTs from SatGroupHelper" << std::endl;
               continue;
             }
-          beamInfo[it->first].SetPositions (it->second);
+          beamInfo[std::make_pair (0, it->first)].SetPositions (it->second);
           for (uint32_t i = 0; i < it->second.size (); i++)
             {
-              beamInfo[it->first].AppendUt (GetNextUtUserCount ());
+              beamInfo[std::make_pair (0, it->first)].AppendUt (GetNextUtUserCount ());
             }
         }
 

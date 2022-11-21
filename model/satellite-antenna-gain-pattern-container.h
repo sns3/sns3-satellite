@@ -58,9 +58,9 @@ public:
   ~SatAntennaGainPatternContainer ();
 
   /**
-   * definition for beam map key is beam ID and value is UT/user info.
+   * definition for beam map key is pair sat ID / beam ID and value is UT/user info.
    */
-  typedef std::map<uint32_t, SatBeamUserInfo > BeamUserInfoMap_t;
+  typedef std::map<std::pair<uint32_t, uint32_t>, SatBeamUserInfo > BeamUserInfoMap_t;
 
   /**
    * \brief Get the antenna pattern of a specified beam id
@@ -87,7 +87,7 @@ public:
 
   void ConfigureBeamsMobility (uint32_t satelliteId, Ptr<SatMobilityModel> mobility);
 
-  void SetEnabledBeams (uint32_t satelliteId, BeamUserInfoMap_t info);
+  void SetEnabledBeams (uint32_t satId, BeamUserInfoMap_t& info);
 
 private:
   std::string m_patternsFolder;

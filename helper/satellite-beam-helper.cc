@@ -764,7 +764,7 @@ SatBeamHelper::InstallUser (Ptr<SatGeoNetDevice> geoNetDevice,
 }
 
 uint32_t
-SatBeamHelper::GetGwId (uint32_t beamId, uint32_t satId) const
+SatBeamHelper::GetGwId (uint32_t satId, uint32_t beamId) const
 {
   std::map<std::pair<uint32_t, uint32_t>, uint32_t>::const_iterator i = m_beam.find (std::make_pair (satId, beamId));
 
