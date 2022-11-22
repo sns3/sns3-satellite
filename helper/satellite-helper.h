@@ -459,6 +459,11 @@ private:
   std::multimap<uint32_t, uint32_t> m_mobileUtsUsersByBeam;
 
   /**
+   * Map of closest satellite for each GW
+   */
+  std::map <uint32_t, uint32_t> m_gwSats;
+
+  /**
    * Enables creation traces to be written in given file
    */
   void EnableCreationTraces ();

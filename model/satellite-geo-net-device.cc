@@ -177,6 +177,12 @@ SatGeoNetDevice::ReceivePacketUser (Ptr<Packet> packet, const Address& userAddre
   // Pass the packet to the upper layer (when ISLs developped) or send to feeder
   // m_rxCallback (this, packet, Ipv4L3Protocol::PROT_NUMBER, Address ());
 
+  for (auto &&i : m_gwConnected)
+    {
+      std::cout << i << " ";
+    }
+  std::cout << std::endl;
+
   SatUplinkInfoTag satUplinkInfoTag;
   if (!packet->PeekPacketTag (satUplinkInfoTag))
     {
@@ -726,6 +732,22 @@ SatGeoNetDevice::GetRxUtAddress (Ptr<Packet> packet, SatEnums::SatLinkDir_t ld)
     }
 
   return utAddr;
+}
+
+void
+SatGeoNetDevice::ConnectGw (Mac48Address gwAddress)
+{
+  NS_LOG_FUNCTION (this << gwAddress);
+
+  m_gwConnected.insert (gwAddress);
+}
+
+void
+SatGeoNetDevice::DisconnectGw (Mac48Address gwAddress)
+{
+  NS_LOG_FUNCTION (this << gwAddress);
+
+  m_gwConnected.erase (gwAddress);
 }
 
 } // namespace ns3

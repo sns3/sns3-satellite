@@ -473,7 +473,7 @@ SatBeamHelper::Install (NodeContainer ut,
 {
   NS_LOG_FUNCTION (this << gwNode << gwId << satId << beamId << rtnUlFreqId << rtnFlFreqId << fwdUlFreqId << fwdFlFreqId);
 
-  // add beamId as key and gwId as value pair to beam map. In case it's there already, assertion failure is caused
+  // add pair satId / beamId as key and gwId as value to beam map. In case it's there already, assertion failure is caused
   std::pair<std::map<std::pair<uint32_t, uint32_t>, uint32_t >::iterator, bool> beam = m_beam.insert (std::make_pair (std::make_pair (satId, beamId), gwId));
   NS_ASSERT (beam.second == true);
 
@@ -1328,6 +1328,7 @@ SatChannelPair::ChannelPair_t
 SatBeamHelper::GetChannelPair (uint32_t satId, uint32_t beamId, uint32_t fwdFrequencyId, uint32_t rtnFrequencyId, bool isUserLink)
 {
   NS_LOG_FUNCTION (this << satId << beamId << fwdFrequencyId << rtnFrequencyId << isUserLink);
+
   Ptr<SatChannelPair> chPairs = isUserLink ? m_ulChannels : m_flChannels;
 
 	bool hasFwdChannel = chPairs->HasFwdChannel (satId, fwdFrequencyId);

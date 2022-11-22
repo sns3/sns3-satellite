@@ -670,6 +670,14 @@ SatHelper::CreateConstellationScenario (BeamUserInfoMap_t& info, GetNextUtUserCo
       info.at (std::pair (satId, bestBeamId)).AppendUt (nbUsers);
     }
 
+  for (uint32_t i = 0; i < m_satConf->GetGwCount (); i++)
+    {
+      GeoCoordinate position = m_satConf->GetGwPosition (i+1);
+      uint32_t satId = m_beamHelper->GetClosestSat (position);
+
+      m_gwSats[i] = satId;
+    }
+
   m_groupHelper->SetSatConstellationEnabled ();
 
   DoCreateScenario (info, m_satConf->GetGwCount ());
@@ -760,9 +768,6 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
 
           SetGwMobility (satId, NodeContainer (gwNode));
 
-          std::cout << "Install GW " << rtnConf[SatConf::GW_ID_INDEX] - 1 << " to sat " << satId << std::endl;
-          // TODO need satId_GW and satId_UT
-
           std::pair<Ptr<NetDevice>, NetDeviceContainer> netDevices = m_beamHelper->Install (
               uts, gwNode,
               rtnConf[SatConf::GW_ID_INDEX],
@@ -774,6 +779,20 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
               fwdConf[SatConf::F_FREQ_ID_INDEX],
               MakeCallback (&SatUserHelper::UpdateUtRoutes, m_userHelper));
           m_userHelper->PopulateBeamRoutings (uts, netDevices.second, gwNode, netDevices.first);
+
+          if (m_satConstellationEnabled)
+            {
+              uint32_t gwId = rtnConf[SatConf::GW_ID_INDEX] - 1;
+              uint32_t gwSatId = m_gwSats[gwId];
+              if (satId == gwSatId)
+                {
+                  DynamicCast<SatGeoNetDevice> (m_beamHelper->GetGeoSatNodes ().Get (gwSatId)->GetDevice (0))->ConnectGw (Mac48Address::ConvertFrom (netDevices.first->GetAddress ()));
+                }
+            }
+          else
+            {
+              DynamicCast<SatGeoNetDevice> (m_beamHelper->GetGeoSatNodes ().Get (0)->GetDevice (0))->ConnectGw (Mac48Address::ConvertFrom (netDevices.first->GetAddress ()));
+            }
         }
 
       m_mobileUtsByBeam.clear ();  // Release unused resources (mobile UTs starting in non-existent beams)

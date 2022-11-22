@@ -219,6 +219,18 @@ public:
 
   void SetNodeId (uint32_t nodeId);
 
+  /**
+   * Connect a GW to this satellite.
+   * \param gwAddress MAC address of the GW to connect
+   */
+  void ConnectGw (Mac48Address gwAddress);
+
+  /**
+   * Disconnect a GW to this satellite.
+   * \param gwAddress MAC address of the GW to disconnect
+   */
+  void DisconnectGw (Mac48Address gwAddress);
+
   // inherited from NetDevice base class.
   virtual void SetIfIndex (const uint32_t index);
   virtual uint32_t GetIfIndex (void) const;
@@ -283,6 +295,11 @@ private:
   bool m_isStatisticsTagsEnabled;
 
   std::map <Mac48Address, Time> m_lastDelays;
+
+  /**
+   * Set containing all connected GWs
+   */
+  std::set <Mac48Address> m_gwConnected;
 
   TracedCallback<Time,
                  SatEnums::SatPacketEvent_t,
