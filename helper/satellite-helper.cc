@@ -240,6 +240,7 @@ SatHelper::SatHelper ()
     }
 
   NodeContainer geoNodes;
+  std::vector <std::pair <uint32_t, uint32_t>> isls;
 
   if (m_satConstellationEnabled)
     {
@@ -253,7 +254,6 @@ SatHelper::SatHelper ()
         }
 
       std::vector <std::string> tles;
-      std::vector <std::pair <uint32_t, uint32_t>> isls;
 
       LoadConstellationTopology (m_satConstellationFolder, tles, isls);
 
@@ -270,12 +270,6 @@ SatHelper::SatHelper ()
           m_antennaGainPatterns->ConfigureBeamsMobility (i, mobility);
 
           geoNodes.Add (geoSatNode);
-        }
-
-      for (uint32_t i = 0; i < isls.size (); i++)
-        {
-          // TODO create ISLs
-          std::cout << isls[i].first << " " << isls[i].second <<std::endl;
         }
     }
   else
@@ -307,7 +301,7 @@ SatHelper::SatHelper ()
       geoNodes.Add (geoSatNode);
     }
 
-  m_beamHelper = CreateObject<SatBeamHelper> (geoNodes,
+  m_beamHelper = CreateObject<SatBeamHelper> (geoNodes, isls,
                                               MakeCallback (&SatConf::GetCarrierBandwidthHz, m_satConf),
                                               m_satConf->GetRtnLinkCarrierCount (),
                                               m_satConf->GetFwdLinkCarrierCount (),
@@ -766,6 +760,9 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
 
           SetGwMobility (satId, NodeContainer (gwNode));
 
+          std::cout << "Install GW " << rtnConf[SatConf::GW_ID_INDEX] - 1 << " to sat " << satId << std::endl;
+          // TODO need satId_GW and satId_UT
+
           std::pair<Ptr<NetDevice>, NetDeviceContainer> netDevices = m_beamHelper->Install (
               uts, gwNode,
               rtnConf[SatConf::GW_ID_INDEX],
@@ -782,6 +779,8 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
       m_mobileUtsByBeam.clear ();  // Release unused resources (mobile UTs starting in non-existent beams)
 
       m_userHelper->InstallGw (m_beamHelper->GetGwNodes (), gwUsers);
+
+      m_beamHelper->InstallIsls ();
 
       if (m_standard == SatEnums::LORA)
         {

@@ -1054,10 +1054,7 @@ SatStatsHelper::GetUtSatNetDevice (Ptr<Node> utNode)
 Ptr<NetDevice> // static
 SatStatsHelper::GetSatSatGeoNetDevice (Ptr<Node> satNode)
 {
-  /*
-   * Actually there is only one device. This should change with ISLs
-   */
-  NS_ASSERT (satNode->GetNDevices () == 1);
+  NS_ASSERT (satNode->GetNDevices () > 0);
   Ptr<NetDevice> dev = satNode->GetDevice (0);
 
   if (dev->GetObject<SatGeoNetDevice> () == 0)

@@ -127,7 +127,14 @@ SatConstellationTest1::DoRun (void)
   NodeContainer gwUsers = m_helper->GetGwUsers ();
   NodeContainer utUsers = m_helper->GetUtUsers ();
 
+  uint32_t countNetDevices = 0;
+  for (uint32_t i = 0; i < sats.GetN (); i++)
+    {
+      countNetDevices += sats.Get (i)->GetNDevices () - 1;
+    }
+
   NS_TEST_ASSERT_MSG_EQ (sats.GetN (), 2, "Topology must contain 2 satellites");
+  NS_TEST_ASSERT_MSG_EQ (countNetDevices, 2, "Topology must contain 2 ISLs Net Devices");
   NS_TEST_ASSERT_MSG_EQ (gws.GetN (), 2, "Topology must contain 2 GWs");
   NS_TEST_ASSERT_MSG_EQ (uts.GetN (), 3, "Topology must contain 3 UTs");
   NS_TEST_ASSERT_MSG_EQ (gwUsers.GetN (), 2, "Topology must contain 2 GW users");

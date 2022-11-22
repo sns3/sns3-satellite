@@ -99,6 +99,7 @@ public:
    * Constructor for SatBeamHelper.
    *
    * \param geoNodes                    Container of Geo Satellite node
+   * \param isls                        List of all ISLs
    * \param bandwidthConverterCb        Callback to convert bandwidth
    * \param fwdLinkCarrierCount         Number of carriers used in forward link
    * \param rtnLinkCarrierCount         Number of carriers used in return link
@@ -107,6 +108,7 @@ public:
    * \param returnLinkRegenerationMode  The regeneration mode used in satellites for return link
    */
   SatBeamHelper (NodeContainer geoNodes,
+                 std::vector <std::pair <uint32_t, uint32_t>> isls,
                  SatTypedefs::CarrierBandwidthConverter_t bandwidthConverterCb,
                  uint32_t fwdLinkCarrierCount,
                  uint32_t rtnLinkCarrierCount,
@@ -253,6 +255,11 @@ public:
                                   uint32_t rtnUlFreqId,
                                   uint32_t fwdUlFreqId,
                                   SatUtMac::RoutingUpdateCallback routingCallback);
+
+  /**
+   * Create all the ISLs
+   */
+  void InstallIsls ();
 
   /**
    * \param beamId beam ID
@@ -581,6 +588,11 @@ private:
    * Map used in regenerative mode to store GW Net device (we need only one per GW)
    */
   std::map<uint32_t, Ptr<NetDevice> > m_gwNdMap;
+
+  /**
+   * Vector constaining all the ISLs of the topology
+   */
+  std::vector <std::pair <uint32_t, uint32_t>> m_isls;
 };
 
 } // namespace ns3

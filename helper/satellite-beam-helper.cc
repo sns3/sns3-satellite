@@ -23,6 +23,7 @@
 #include <ns3/log.h>
 #include <ns3/string.h>
 #include <ns3/ipv4-static-routing-helper.h>
+#include <ns3/traffic-control-helper.h>
 #include <ns3/internet-stack-helper.h>
 #include <ns3/ipv4-interface.h>
 #include <ns3/mobility-helper.h>
@@ -54,6 +55,7 @@
 #include <ns3/satellite-lorawan-net-device.h>
 #include <ns3/satellite-geo-net-device.h>
 #include <ns3/satellite-sgp4-mobility-model.h>
+#include <ns3/satellite-point-to-point-laser-helper.h>
 
 #include "satellite-beam-helper.h"
 
@@ -200,6 +202,7 @@ SatBeamHelper::SatBeamHelper ()
 }
 
 SatBeamHelper::SatBeamHelper (NodeContainer geoNodes,
+                              std::vector <std::pair <uint32_t, uint32_t>> isls,
                               SatTypedefs::CarrierBandwidthConverter_t bandwidthConverterCb,
                               uint32_t rtnLinkCarrierCount,
                               uint32_t fwdLinkCarrierCount,
@@ -220,7 +223,8 @@ SatBeamHelper::SatBeamHelper (NodeContainer geoNodes,
   m_enableFwdLinkBeamHopping (false),
   m_bstpController (),
   m_forwardLinkRegenerationMode (forwardLinkRegenerationMode),
-  m_returnLinkRegenerationMode (returnLinkRegenerationMode)
+  m_returnLinkRegenerationMode (returnLinkRegenerationMode),
+  m_isls (isls)
 {
   NS_LOG_FUNCTION (this << rtnLinkCarrierCount << fwdLinkCarrierCount << seq);
 
@@ -761,6 +765,40 @@ SatBeamHelper::InstallUser (Ptr<SatGeoNetDevice> geoNetDevice,
     }
 
   return utNd;
+}
+
+void
+SatBeamHelper::InstallIsls ()
+{
+  NS_LOG_FUNCTION (this);
+
+  PointToPointLaserHelper p2pLaserHelper;
+  TrafficControlHelper tchIsl;
+
+  for (std::vector <std::pair <uint32_t, uint32_t>>::iterator it = m_isls.begin(); it != m_isls.end (); it++)
+    {
+      Ptr<Node> sat1 = m_geoNodes.Get (it->first);
+      Ptr<Node> sat2 = m_geoNodes.Get (it->second);
+
+      // Install a p2p laser link between these two satellites
+      NodeContainer c;
+      c.Add(sat1);
+      c.Add(sat2);
+      NetDeviceContainer netDevices = p2pLaserHelper.Install(c);
+
+      // Install traffic control helper // TODO why this ?
+      /*tchIsl.Install(netDevices.Get(0));
+      tchIsl.Install(netDevices.Get(1));
+
+      // Assign some IP address (nothing smart, no aggregation, just some IP address)
+      m_ipv4_helper.Assign(netDevices);
+      m_ipv4_helper.NewNetwork();
+
+      // Remove the traffic control layer (must be done here, else the Ipv4 helper will assign a default one)
+      TrafficControlHelper tchUninstaller;
+      tchUninstaller.Uninstall(netDevices.Get(0));
+      tchUninstaller.Uninstall(netDevices.Get(1));*/
+    }
 }
 
 uint32_t
