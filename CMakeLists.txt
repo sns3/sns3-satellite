@@ -80,6 +80,7 @@ set(source_files
     model/satellite-geo-user-llc.cc
     model/satellite-geo-user-mac.cc
     model/satellite-geo-user-phy.cc
+    model/satellite-ground-station-address-tag.cc
     model/satellite-gse-header.cc
     model/satellite-gw-llc.cc
     model/satellite-gw-mac.cc
@@ -316,6 +317,7 @@ set(header_files
     model/satellite-geo-user-llc.h
     model/satellite-geo-user-mac.h
     model/satellite-geo-user-phy.h
+    model/satellite-ground-station-address-tag.h
     model/satellite-gse-header.h
     model/satellite-gw-llc.h
     model/satellite-gw-mac.h

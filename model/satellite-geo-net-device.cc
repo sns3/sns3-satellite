@@ -177,12 +177,6 @@ SatGeoNetDevice::ReceivePacketUser (Ptr<Packet> packet, const Address& userAddre
   // Pass the packet to the upper layer (when ISLs developped) or send to feeder
   // m_rxCallback (this, packet, Ipv4L3Protocol::PROT_NUMBER, Address ());
 
-  for (auto &&i : m_gwConnected)
-    {
-      std::cout << i << " ";
-    }
-  std::cout << std::endl;
-
   SatUplinkInfoTag satUplinkInfoTag;
   if (!packet->PeekPacketTag (satUplinkInfoTag))
     {
