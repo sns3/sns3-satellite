@@ -780,7 +780,10 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
 
       m_userHelper->InstallGw (m_beamHelper->GetGwNodes (), gwUsers);
 
-      m_beamHelper->InstallIsls ();
+      if (m_satConstellationEnabled)
+        {
+          m_beamHelper->InstallIsls ();
+        }
 
       if (m_standard == SatEnums::LORA)
         {

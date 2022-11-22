@@ -19,41 +19,30 @@
  * (based on point-to-point helper)
  * Author: Andre Aguas         March 2020
  *         Simon               2020
+ * Adapted to SNS-3 by: Bastien Tauran <bastien.tauran@viveris.fr>
  * 
  */
 
 
-#ifndef POINT_TO_POINT_LASER_HELPER_H
-#define POINT_TO_POINT_LASER_HELPER_H
+#ifndef POINT_TO_POINT_ISL_HELPER_H
+#define POINT_TO_POINT_ISL_HELPER_H
 
 #include "ns3/object-factory.h"
 #include "ns3/net-device-container.h"
-#include "ns3/node-container.h"
-#include "ns3/trace-helper.h"
 
 namespace ns3 {
 
 class NetDevice;
 class Node;
 
-class PointToPointLaserHelper
+class PointToPointIslHelper
 {
 public:
 
   // Constructors
-  PointToPointLaserHelper ();
-
-  // Set point-to-point laser device and channel attributes
-  void SetQueue (std::string type,
-                 std::string n1 = "", const AttributeValue &v1 = EmptyAttributeValue (),
-                 std::string n2 = "", const AttributeValue &v2 = EmptyAttributeValue (),
-                 std::string n3 = "", const AttributeValue &v3 = EmptyAttributeValue (),
-                 std::string n4 = "", const AttributeValue &v4 = EmptyAttributeValue ());
-  void SetDeviceAttribute (std::string name, const AttributeValue &value);
-  void SetChannelAttribute (std::string name, const AttributeValue &value);
+  PointToPointIslHelper ();
 
   // Installers
-  NetDeviceContainer Install (NodeContainer c);
   NetDeviceContainer Install (Ptr<Node> a, Ptr<Node> b);
 
 private:
@@ -64,4 +53,4 @@ private:
 
 } // namespace ns3
 
-#endif /* POINT_TO_POINT_LASER_HELPER_H */
+#endif /* POINT_TO_POINT_ISL_HELPER_H */

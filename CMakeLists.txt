@@ -126,8 +126,8 @@ set(source_files
     model/satellite-phy-rx-carrier-uplink.cc
     model/satellite-phy-rx.cc
     model/satellite-phy-tx.cc
-    model/satellite-point-to-point-laser-channel.cc
-    model/satellite-point-to-point-laser-net-device.cc
+    model/satellite-point-to-point-isl-channel.cc
+    model/satellite-point-to-point-isl-net-device.cc
     model/satellite-position-allocator.cc
     model/satellite-position-input-trace-container.cc
     model/satellite-propagation-delay-model.cc
@@ -191,7 +191,7 @@ set(source_files
     helper/satellite-helper.cc
     helper/satellite-lora-conf.cc
     helper/satellite-on-off-helper.cc
-    helper/satellite-point-to-point-laser-helper.cc
+    helper/satellite-point-to-point-isl-helper.cc
     helper/satellite-traffic-helper.cc
     helper/satellite-user-helper.cc
     helper/satellite-ut-helper.cc
@@ -362,8 +362,8 @@ set(header_files
     model/satellite-phy-rx-carrier-uplink.h
     model/satellite-phy-rx.h
     model/satellite-phy-tx.h
-    model/satellite-point-to-point-laser-channel.h
-    model/satellite-point-to-point-laser-net-device.h
+    model/satellite-point-to-point-isl-channel.h
+    model/satellite-point-to-point-isl-net-device.h
     model/satellite-position-allocator.h
     model/satellite-position-input-trace-container.h
     model/satellite-propagation-delay-model.h
@@ -429,7 +429,7 @@ set(header_files
     helper/satellite-helper.h
     helper/satellite-lora-conf.h
     helper/satellite-on-off-helper.h
-    helper/satellite-point-to-point-laser-helper.h
+    helper/satellite-point-to-point-isl-helper.h
     helper/satellite-traffic-helper.h
     helper/satellite-user-helper.h
     helper/satellite-ut-helper.h

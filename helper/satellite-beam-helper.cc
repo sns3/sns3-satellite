@@ -55,7 +55,7 @@
 #include <ns3/satellite-lorawan-net-device.h>
 #include <ns3/satellite-geo-net-device.h>
 #include <ns3/satellite-sgp4-mobility-model.h>
-#include <ns3/satellite-point-to-point-laser-helper.h>
+#include <ns3/satellite-point-to-point-isl-helper.h>
 
 #include "satellite-beam-helper.h"
 
@@ -772,7 +772,7 @@ SatBeamHelper::InstallIsls ()
 {
   NS_LOG_FUNCTION (this);
 
-  PointToPointLaserHelper p2pLaserHelper;
+  PointToPointIslHelper p2pIslHelper;
   TrafficControlHelper tchIsl;
 
   for (std::vector <std::pair <uint32_t, uint32_t>>::iterator it = m_isls.begin(); it != m_isls.end (); it++)
@@ -780,11 +780,8 @@ SatBeamHelper::InstallIsls ()
       Ptr<Node> sat1 = m_geoNodes.Get (it->first);
       Ptr<Node> sat2 = m_geoNodes.Get (it->second);
 
-      // Install a p2p laser link between these two satellites
-      NodeContainer c;
-      c.Add(sat1);
-      c.Add(sat2);
-      NetDeviceContainer netDevices = p2pLaserHelper.Install(c);
+      // Install a p2p ISL link between these two satellites
+      NetDeviceContainer netDevices = p2pIslHelper.Install(sat1, sat2);
 
       // Install traffic control helper // TODO why this ?
       /*tchIsl.Install(netDevices.Get(0));
