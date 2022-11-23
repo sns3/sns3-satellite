@@ -112,6 +112,18 @@ public:
   ~SatUtMac ();
 
   /**
+   * \brief Get sat ID of the object
+   * \return sat ID
+   */
+  inline uint32_t GetSatId () const { return m_satId; }
+
+  /**
+   * \brief Get beam ID of the object
+   * \return beam ID
+   */
+  inline uint32_t GetBeamId () const { return m_beamId; }
+
+  /**
    * Receive packet from lower layer.
    *
    * \param packets Pointers to packets received.
@@ -233,6 +245,13 @@ public:
    * Set the satellite MAC address on the other side of this link (if regenerative satellite).
    */
   virtual void SetSatelliteAddress (Address satelliteAddress);
+
+  /**
+   * Get address of the GW (or its MAC) serving this UT.
+   *
+   * \return Address of the GW.
+   */
+  Mac48Address GetGwAddress ();
 
   /**
    * Set address of the GW (or its MAC) serving this UT.

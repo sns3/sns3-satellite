@@ -36,7 +36,7 @@ public:
   static TypeId GetTypeId (void);
 
   LorawanMacGateway ();
-  LorawanMacGateway (uint32_t beamId);
+  LorawanMacGateway (uint32_t satId, uint32_t beamId);
   virtual ~LorawanMacGateway ();
 
   // Implementation of the LorawanMac interface

@@ -71,9 +71,10 @@ SatGeoFeederMac::SatGeoFeederMac (void)
 }
 
 SatGeoFeederMac::SatGeoFeederMac (uint32_t satId,
+                                  uint32_t beamId,
                                   SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                                   SatEnums::RegenerationMode_t returnLinkRegenerationMode)
- : SatGeoMac (satId, 0, forwardLinkRegenerationMode, returnLinkRegenerationMode)
+ : SatGeoMac (satId, beamId, forwardLinkRegenerationMode, returnLinkRegenerationMode)
 {
   NS_LOG_FUNCTION (this);
 }

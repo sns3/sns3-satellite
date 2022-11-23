@@ -42,6 +42,7 @@
 #include "satellite-address-tag.h"
 #include "satellite-time-tag.h"
 #include "satellite-uplink-info-tag.h"
+#include "satellite-ground-station-address-tag.h"
 
 #include "satellite-geo-net-device.h"
 
@@ -137,6 +138,12 @@ SatGeoNetDevice::ReceivePacketUser (Ptr<Packet> packet, const Address& userAddre
 {
   NS_LOG_FUNCTION (this << packet);
   NS_LOG_INFO ("Receiving a packet: " << packet->GetUid ());
+
+  SatGroundStationAddressTag groundStationAddressTag;
+  if (!packet->PeekPacketTag (groundStationAddressTag))
+    {
+      NS_FATAL_ERROR ("SatGroundStationAddressTag not found");
+    }
 
   Mac48Address macUserAddress = Mac48Address::ConvertFrom (userAddress);
 
@@ -645,7 +652,7 @@ SatGeoNetDevice::AddUserMac (Ptr<SatMac> mac, uint32_t beamId)
 void
 SatGeoNetDevice::AddFeederMac (Ptr<SatMac> mac, Ptr<SatMac> macUsed, uint32_t beamId)
 {
-  NS_LOG_FUNCTION (this << mac << beamId);
+  NS_LOG_FUNCTION (this << mac << macUsed << beamId);
   m_feederMac.insert (std::pair<uint32_t, Ptr<SatMac> > (beamId, macUsed));
   m_allFeederMac.insert (std::pair<uint32_t, Ptr<SatMac> > (beamId, mac));
 }
@@ -742,6 +749,14 @@ SatGeoNetDevice::DisconnectGw (Mac48Address gwAddress)
   NS_LOG_FUNCTION (this << gwAddress);
 
   m_gwConnected.erase (gwAddress);
+}
+
+std::set <Mac48Address>
+SatGeoNetDevice::GetGwConnected ()
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_gwConnected;
 }
 
 } // namespace ns3

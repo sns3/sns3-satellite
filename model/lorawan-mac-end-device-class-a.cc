@@ -76,8 +76,8 @@ LorawanMacEndDeviceClassA::LorawanMacEndDeviceClassA ()
   NS_FATAL_ERROR ("Default constructor not in use");
 }
 
-LorawanMacEndDeviceClassA::LorawanMacEndDeviceClassA (uint32_t beamId, Ptr<SatSuperframeSeq> seq)
-  : LorawanMacEndDevice (beamId),
+LorawanMacEndDeviceClassA::LorawanMacEndDeviceClassA (uint32_t satId, uint32_t beamId, Ptr<SatSuperframeSeq> seq)
+  : LorawanMacEndDevice (satId, beamId),
     m_superframeSeq (seq),
     m_firstWindowDelay (Seconds (1)),
     m_secondWindowDelay (Seconds (2)),

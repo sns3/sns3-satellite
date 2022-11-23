@@ -138,6 +138,12 @@ public:
   void CreateConstellationScenario (BeamUserInfoMap_t& info, GetNextUtUserCountCallback getNextUtUserCountCallback);
 
   /**
+   * Set the value of GW address for each UT.
+   * This method is called when using constellations.
+   */
+  void SetGwAddressInUt ();
+
+  /**
    * Get closest satellite to a ground station
    * \param position The position of the ground station
    * \return The ID of the closest satellite
@@ -470,6 +476,11 @@ private:
   std::map <uint32_t, uint32_t> m_gwSats;
 
   /**
+   * Map indicating the GW node associated to each UT node.
+   */
+  std::map <Ptr<Node>, Ptr<Node>> m_gwDistribution;
+
+  /**
    * Enables creation traces to be written in given file
    */
   void EnableCreationTraces ();
@@ -535,9 +546,10 @@ private:
    * Sets mobilities to created GW nodes.
    *
    * \param satId ID of the satellite link to this GW
-   * \param gws node container of UTs to set mobility
+   * \param gw GW to set mobility
+   * \param gwIndex Index of GW in SatConf
    */
-  void SetGwMobility (uint32_t satId, NodeContainer gws);
+  void SetGwMobility (uint32_t satId, Ptr<Node> gw, uint32_t gwIndex);
 
   /**
    * Sets mobility to created Sat Geo node.

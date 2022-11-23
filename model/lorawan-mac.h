@@ -49,7 +49,7 @@ public:
   static TypeId GetTypeId (void);
 
   LorawanMac ();
-  LorawanMac (uint32_t beamId);
+  LorawanMac (uint32_t satId, uint32_t beamId);
   virtual ~LorawanMac ();
 
   typedef std::array<std::array<uint8_t, 6>, 8> ReplyDataRateMatrix;

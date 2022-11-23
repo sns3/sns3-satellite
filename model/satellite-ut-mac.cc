@@ -159,7 +159,7 @@ SatUtMac::SatUtMac (uint32_t satId,
                     SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                     SatEnums::RegenerationMode_t returnLinkRegenerationMode,
                     bool crdsaOnlyForControl)
-  : SatMac (forwardLinkRegenerationMode, returnLinkRegenerationMode),
+  : SatMac (satId, beamId, forwardLinkRegenerationMode, returnLinkRegenerationMode),
   m_satId (satId),
   m_beamId (beamId),
   m_superframeSeq (seq),
@@ -308,6 +308,14 @@ SatUtMac::SetSatelliteAddress (Address satelliteAddress)
 {
   m_satelliteAddress = satelliteAddress;
   m_isRegenerative = true;
+}
+
+Mac48Address
+SatUtMac::GetGwAddress ()
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_gwAddress;
 }
 
 void

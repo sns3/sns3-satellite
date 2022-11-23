@@ -36,6 +36,7 @@
 #include "satellite-utils.h"
 #include "satellite-request-manager.h"
 #include "satellite-scheduling-object.h"
+#include "satellite-ground-station-address-tag.h"
 
 
 NS_LOG_COMPONENT_DEFINE ("SatUtLlc");
@@ -113,6 +114,13 @@ SatUtLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
   {
     destMacAddress = Mac48Address::ConvertFrom (dest);
   }
+
+  if (m_returnLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
+    {
+      SatGroundStationAddressTag groundStationAddressTag  = SatGroundStationAddressTag (m_gwAddress);
+      packet->AddPacketTag (groundStationAddressTag);
+    }
+
 
   // all multicast traffic is delivered with GW address
   // in order to avoid supporting several encaps in UT

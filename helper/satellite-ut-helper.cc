@@ -633,7 +633,7 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t satId, uint32_t beamId,
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());
   phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
 
-  Ptr<LorawanMacEndDeviceClassA> mac = CreateObject<LorawanMacEndDeviceClassA> (beamId, m_superframeSeq);
+  Ptr<LorawanMacEndDeviceClassA> mac = CreateObject<LorawanMacEndDeviceClassA> (satId, beamId, m_superframeSeq);
 
   // TODO configuration for EU only
   mac->SetTxDbmForTxPower (std::vector<double>{16, 14, 12, 10, 8, 6, 4, 2});

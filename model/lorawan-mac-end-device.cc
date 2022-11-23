@@ -119,8 +119,8 @@ LorawanMacEndDevice::LorawanMacEndDevice ()
   NS_FATAL_ERROR ("Default constructor not in use");
 }
 
-LorawanMacEndDevice::LorawanMacEndDevice (uint32_t beamId)
-    : LorawanMac (beamId),
+LorawanMacEndDevice::LorawanMacEndDevice (uint32_t satId, uint32_t beamId)
+    : LorawanMac (satId, beamId),
       m_enableDRAdapt (false),
       m_maxNumbTx (8),
       m_dataRate (0),

@@ -231,6 +231,13 @@ public:
    */
   void DisconnectGw (Mac48Address gwAddress);
 
+  /**
+   * The the list of MAC connected to this GW.
+   * The SatGeoNetDevice will send to a GW if connected,
+   * otherwise it will send to ISLs.
+   */
+  std::set <Mac48Address> GetGwConnected ();
+
   // inherited from NetDevice base class.
   virtual void SetIfIndex (const uint32_t index);
   virtual uint32_t GetIfIndex (void) const;

@@ -50,8 +50,8 @@ LorawanMacGateway::LorawanMacGateway ()
   NS_FATAL_ERROR ("Default constructor not in use");
 }
 
-LorawanMacGateway::LorawanMacGateway (uint32_t beamId)
-  : LorawanMac (beamId)
+LorawanMacGateway::LorawanMacGateway (uint32_t satId, uint32_t beamId)
+  : LorawanMac (satId, beamId)
 {
   NS_LOG_FUNCTION (this);
 }

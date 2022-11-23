@@ -108,9 +108,11 @@ SatGwMac::SatGwMac ()
   NS_FATAL_ERROR ("SatUtMac::SatGwMac - Constructor not in use");
 }
 
-SatGwMac::SatGwMac (SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+SatGwMac::SatGwMac (uint32_t satId,
+                    uint32_t beamId,
+                    SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                     SatEnums::RegenerationMode_t returnLinkRegenerationMode)
-  : SatMac (forwardLinkRegenerationMode, returnLinkRegenerationMode),
+  : SatMac (satId, beamId, forwardLinkRegenerationMode, returnLinkRegenerationMode),
   m_fwdScheduler (),
   m_guardTime (MicroSeconds (1)),
   m_ncrInterval (MilliSeconds (100)),

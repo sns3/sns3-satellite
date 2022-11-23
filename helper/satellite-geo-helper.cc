@@ -354,6 +354,7 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
 
   // Create MAC layer
   fMac = CreateObject<SatGeoFeederMac> (satId,
+                                        userBeamId,
                                         forwardLinkRegenerationMode,
                                         returnLinkRegenerationMode);
 
