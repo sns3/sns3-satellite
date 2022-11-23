@@ -321,9 +321,9 @@ private:
   Ptr<SatLinkResults> m_rtnLinkResults;
 
   /*
-   * Map used in regenerative mode to store if MAC already created for a given GW ID
+   * Map used in regenerative mode to store if MAC already created for a given pair SAT ID / GW ID
    */
-  std::map<uint32_t, Ptr<SatGeoFeederMac>> m_gwMacMap;
+  std::map<std::pair<uint32_t, uint32_t>, Ptr<SatGeoFeederMac>> m_gwMacMap;
 
   /**
    * Control forward link messages callback

@@ -301,7 +301,6 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
                                      SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                                      SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
-
   NS_LOG_FUNCTION (this << dev << ff << fr << feederAgp << satId << gwId << userBeamId << forwardLinkRegenerationMode << returnLinkRegenerationMode);
 
   SatPhy::CreateParam_t params;
@@ -379,16 +378,16 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
           fLlc = CreateObject<SatGeoLlc> (forwardLinkRegenerationMode,
                                           returnLinkRegenerationMode);
 
-          if (m_gwMacMap.count(gwId))
+          if (m_gwMacMap.count(std::make_pair (satId, gwId)))
             {
               // MAC already exists for this GW ID, reusing it, and disabling the other
-              dev->AddFeederMac (fMac, m_gwMacMap[gwId], userBeamId);
+              dev->AddFeederMac (fMac, m_gwMacMap[std::make_pair (satId, gwId)], userBeamId);
             }
           else
             {
               // First MAC for this GW ID, storing it to the map
               dev->AddFeederMac (fMac, fMac, userBeamId);
-              m_gwMacMap[gwId] = fMac;
+              m_gwMacMap[std::make_pair (satId, gwId)] = fMac;
               startScheduler = true;
             }
 
@@ -412,16 +411,16 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
           fLlc = CreateObject<SatGeoFeederLlc> (forwardLinkRegenerationMode,
                                                 returnLinkRegenerationMode);
 
-          if (m_gwMacMap.count(gwId))
+          if (m_gwMacMap.count(std::make_pair (satId, gwId)))
             {
               // MAC already exists for this GW ID, reusing it, and disabling the other
-              dev->AddFeederMac (fMac, m_gwMacMap[gwId], userBeamId);
+              dev->AddFeederMac (fMac, m_gwMacMap[std::make_pair (satId, gwId)], userBeamId);
             }
           else
             {
               // First MAC for this GW ID, storing it to the map
               dev->AddFeederMac (fMac, fMac, userBeamId);
-              m_gwMacMap[gwId] = fMac;
+              m_gwMacMap[std::make_pair (satId, gwId)] = fMac;
               startScheduler = true;
             }
 
