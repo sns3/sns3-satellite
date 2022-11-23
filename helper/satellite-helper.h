@@ -277,6 +277,12 @@ public:
       return m_satConstellationEnabled;
     }
 
+  /**
+   * Print all the satellite topology
+   * \param os output stream in which the data should be printed
+   */
+  void PrintTopology (std::ostream & os) const;
+
 
 private:
   static const uint16_t MIN_ADDRESS_PREFIX_LENGTH = 1;

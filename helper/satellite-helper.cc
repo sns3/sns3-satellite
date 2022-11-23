@@ -1210,6 +1210,97 @@ SatHelper::DoDispose ()
   m_mobileUtsUsersByBeam.clear ();
 }
 
+void
+SatHelper::PrintTopology (std::ostream & os) const
+{
+  NS_LOG_FUNCTION (this);
+
+  os << "Satellite topology" << std::endl;
+  os << "==================" << std::endl;
+
+  os << "Satellites" << std::endl;
+  NodeContainer satNodes = m_beamHelper->GetGeoSatNodes ();
+  for (uint32_t i = 0; i < satNodes.GetN (); i++)
+    {
+      Ptr<Node> node = satNodes.Get (i);
+      os << "  SAT: ID = " << satNodes.Get (i)->GetId ();
+      os << ", at " << GeoCoordinate (node->GetObject<SatMobilityModel> ()->GetPosition ()) << std::endl;
+      os << "  Devices " << std::endl;
+      for (uint32_t j = 0; j < node->GetNDevices (); j++)
+        {
+          Ptr<SatGeoNetDevice> geoNetDevice = DynamicCast<SatGeoNetDevice> (node->GetDevice (j));
+          if (geoNetDevice)
+            {
+              os << "    " << geoNetDevice->GetAddress () << std::endl;
+              std::map<uint32_t, Ptr<SatMac>> feederMac = geoNetDevice->GetAllFeederMac ();
+              for (std::map<uint32_t, Ptr<SatMac>>::iterator it = feederMac.begin (); it != feederMac.end (); it++)
+                {
+                  os << "      Feeder at " << it->second->GetAddress () << ", beam " << it->first << std::endl;
+                }
+              std::map<uint32_t, Ptr<SatMac>> userMac = geoNetDevice->GetUserMac ();
+              for (std::map<uint32_t, Ptr<SatMac>>::iterator it = userMac.begin (); it != userMac.end (); it++)
+                {
+                  os << "      User at " << it->second->GetAddress () << ", beam " << it->first << std::endl;
+                }
+            }
+        }
+    }
+
+  os << "GWs" << std::endl;
+  NodeContainer gwNodes = m_beamHelper->GetGwNodes ();
+  for (uint32_t i = 0; i < gwNodes.GetN (); i++)
+    {
+      Ptr<Node> node = gwNodes.Get (i);
+      os << "  GW: ID = " << gwNodes.Get (i)->GetId ();
+      os << ", at " << GeoCoordinate (node->GetObject<SatMobilityModel> ()->GetPosition ()) << std::endl;
+      os << "  Devices " << std::endl;
+      for (uint32_t j = 0; j < node->GetNDevices (); j++)
+        {
+          Ptr<SatNetDevice> netDevice = DynamicCast<SatNetDevice> (node->GetDevice (j));
+          if (netDevice)
+            {
+              Ptr<SatMac> mac = netDevice->GetMac ();
+              os << "    " << mac->GetAddress () << ", sat: " << mac->GetSatId () << ", beam: " << mac->GetBeamId () << std::endl;
+            }
+        }
+    }
+
+  os << "UTs" << std::endl;
+  NodeContainer utNodes = m_beamHelper->GetUtNodes ();
+  for (uint32_t i = 0; i < utNodes.GetN (); i++)
+    {
+      Ptr<Node> node = utNodes.Get (i);
+      os << "  UT: ID = " << utNodes.Get (i)->GetId ();
+      os << ", at " << GeoCoordinate (node->GetObject<SatMobilityModel> ()->GetPosition ()) << std::endl;
+      os << "  Devices " << std::endl;
+      for (uint32_t j = 0; j < node->GetNDevices (); j++)
+        {
+          Ptr<SatNetDevice> netDevice = DynamicCast<SatNetDevice> (node->GetDevice (j));
+          if (netDevice)
+            {
+              Ptr<SatMac> mac = netDevice->GetMac ();
+              os << "    " << mac->GetAddress () << ", sat: " << mac->GetSatId () << ", beam: " << mac->GetBeamId () << std::endl;
+            }
+        }
+    }
+
+  os << "GW users" << std::endl;
+  NodeContainer gwUserNodes = m_userHelper->GetGwUsers ();
+  for (uint32_t i = 0; i < gwUserNodes.GetN (); i++)
+    {
+      Ptr<Node> node = gwUserNodes.Get (i);
+      os << "  GW user: ID = " << gwUserNodes.Get (i)->GetId () << std::endl;
+    }
+
+  os << "UT users" << std::endl;
+  NodeContainer utUserNodes = m_userHelper->GetUtUsers ();
+  for (uint32_t i = 0; i < utUserNodes.GetN (); i++)
+    {
+      Ptr<Node> node = utUserNodes.Get (i);
+      os << "  UT user: ID = " << utUserNodes.Get (i)->GetId () << std::endl;
+    }
+}
+
 bool
 SatHelper::FindMatchingDevices ( Ptr<Node> nodeA, Ptr<Node> nodeB, std::pair<Ptr<NetDevice>, Ptr<NetDevice> >& matchingDevices)
 {
