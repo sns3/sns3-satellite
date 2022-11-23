@@ -162,8 +162,8 @@ SatConstellationTest1::DoRun (void)
   NS_TEST_ASSERT_MSG_EQ_TOL (gw1.GetLongitude (), 2.34, 0.001, "Incorrect longitude for GW 1");
   NS_TEST_ASSERT_MSG_EQ (gw1.GetAltitude (), 0, "Incorrect altitude for GW 1");
 
-  NS_TEST_ASSERT_MSG_EQ_TOL (gw2.GetLatitude (), 48.85, 0.001, "Incorrect latitude for GW 2");
-  NS_TEST_ASSERT_MSG_EQ_TOL (gw2.GetLongitude (), 2.34, 0.001, "Incorrect longitude for GW 2");
+  NS_TEST_ASSERT_MSG_EQ_TOL (gw2.GetLatitude (), 55.75, 0.001, "Incorrect latitude for GW 2");
+  NS_TEST_ASSERT_MSG_EQ_TOL (gw2.GetLongitude (), 37.62, 0.001, "Incorrect longitude for GW 2");
   NS_TEST_ASSERT_MSG_EQ (gw2.GetAltitude (), 0, "Incorrect altitude for GW 2");
 
   NS_TEST_ASSERT_MSG_EQ_TOL (ut1.GetLatitude (), 55.755, 0.001, "Incorrect latitude for UT 1");

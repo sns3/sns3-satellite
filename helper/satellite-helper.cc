@@ -277,6 +277,7 @@ SatHelper::SatHelper ()
     {
       m_antennaGainPatterns = CreateObject<SatAntennaGainPatternContainer> ();
 
+      // In case of constellations, all satellites have the same features, read in same configuration file
       m_satConf->Initialize (m_rtnConfFileName,
                              m_fwdConfFileName,
                              m_gwPosFileName,
