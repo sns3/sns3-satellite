@@ -77,7 +77,7 @@ main (int argc, char *argv[])
 
   /// Use constellation
   Config::SetDefault ("ns3::SatHelper::SatConstellationEnabled", BooleanValue (true));
-  Config::SetDefault ("ns3::SatHelper::SatConstellationFolder", StringValue ("eutelsat-geo-2-sats"));
+  Config::SetDefault ("ns3::SatHelper::SatConstellationFolder", StringValue ("eutelsat-geo-2-sats-isls"));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::StartDateStr", StringValue (startDate));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionEachRequest", BooleanValue (false));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionPeriod", TimeValue (Seconds (1)));

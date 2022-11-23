@@ -107,7 +107,7 @@ SatConstellationTest1::DoRun (void)
 
   /// Use constellation
   Config::SetDefault ("ns3::SatHelper::SatConstellationEnabled", BooleanValue (true));
-  Config::SetDefault ("ns3::SatHelper::SatConstellationFolder", StringValue ("eutelsat-geo-2-sats"));
+  Config::SetDefault ("ns3::SatHelper::SatConstellationFolder", StringValue ("eutelsat-geo-2-sats-no-isl"));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::StartDateStr", StringValue ("2022-11-13 12:00:00"));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionEachRequest", BooleanValue (false));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionPeriod", TimeValue (Seconds (1)));
@@ -294,7 +294,7 @@ SatConstellationTest2::DoRun (void)
 
   /// Use constellation
   Config::SetDefault ("ns3::SatHelper::SatConstellationEnabled", BooleanValue (true));
-  Config::SetDefault ("ns3::SatHelper::SatConstellationFolder", StringValue ("eutelsat-geo-2-sats"));
+  Config::SetDefault ("ns3::SatHelper::SatConstellationFolder", StringValue ("eutelsat-geo-2-sats-no-isl"));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::StartDateStr", StringValue ("2022-11-13 12:00:00"));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionEachRequest", BooleanValue (false));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionPeriod", TimeValue (Seconds (1)));
