@@ -117,10 +117,9 @@ SatUtLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
 
   if (m_returnLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
     {
-      SatGroundStationAddressTag groundStationAddressTag  = SatGroundStationAddressTag (m_gwAddress);
+      SatGroundStationAddressTag groundStationAddressTag  = SatGroundStationAddressTag (destMacAddress);
       packet->AddPacketTag (groundStationAddressTag);
     }
-
 
   // all multicast traffic is delivered with GW address
   // in order to avoid supporting several encaps in UT

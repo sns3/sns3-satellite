@@ -43,41 +43,29 @@ main (int argc, char *argv[])
 {
   uint32_t packetSize = 512;
   std::string interval = "10ms";
-  std::string forwardRegeneration = "regeneration_network";
-  std::string returnRegeneration = "regeneration_network";
+  std::string configurationFolder = "eutelsat-geo-2-sats-isls";
   std::string startDate = "2022-11-13 12:00:00";
-
-  std::map<std::string, SatEnums::RegenerationMode_t> mapForwardRegeneration { {"transparent", SatEnums::TRANSPARENT},
-                                                                               {"regeneration_phy", SatEnums::REGENERATION_PHY},
-                                                                               {"regeneration_network", SatEnums::REGENERATION_NETWORK}};
-  std::map<std::string, SatEnums::RegenerationMode_t> mapReturnRegeneration { {"transparent", SatEnums::TRANSPARENT},
-                                                                              {"regeneration_phy", SatEnums::REGENERATION_PHY},
-                                                                              {"regeneration_link", SatEnums::REGENERATION_LINK},
-                                                                              {"regeneration_network", SatEnums::REGENERATION_NETWORK}};
 
   Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("example-constellation");
 
   // read command line parameters given by user
   CommandLine cmd;
   cmd.AddValue ("packetSize", "Size of constant packet (bytes)", packetSize);
-  cmd.AddValue ("interval", "Interval to sent packets in seconds, (e.g. (1s))", interval);
-  cmd.AddValue ("forwardRegeneration", "Regeneration mode on forward link (transparent, regeneration_phy or regeneration_network)", forwardRegeneration);
-  cmd.AddValue ("returnRegeneration", "Regeneration mode on forward link (transparent, regeneration_phy, regeneration_link or regeneration_network)", returnRegeneration);
+  cmd.AddValue ("interval", "Interval to sent packets in seconds (e.g. (1s))", interval);
+  cmd.AddValue ("configurationFolder", "Satellite constellation configuration folder (e.g. eutelsat-geo-2-sats-isls)", configurationFolder);
+  cmd.AddValue ("startDate", "Simulation start date (e.g. 2022-11-13 12:00:00)", startDate);
   simulationHelper->AddDefaultUiArguments (cmd);
   cmd.Parse (argc, argv);
 
-  SatEnums::RegenerationMode_t forwardLinkRegenerationMode = mapForwardRegeneration[forwardRegeneration];
-  SatEnums::RegenerationMode_t returnLinkRegenerationMode = mapReturnRegeneration[returnRegeneration];
-
   /// Set regeneration mode
-  Config::SetDefault ("ns3::SatConf::ForwardLinkRegenerationMode", EnumValue (forwardLinkRegenerationMode));
-  Config::SetDefault ("ns3::SatConf::ReturnLinkRegenerationMode", EnumValue (returnLinkRegenerationMode));
+  Config::SetDefault ("ns3::SatConf::ForwardLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_NETWORK));
+  Config::SetDefault ("ns3::SatConf::ReturnLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_NETWORK));
   Config::SetDefault ("ns3::SatGeoFeederPhy::QueueSize", UintegerValue (100000));
   Config::SetDefault ("ns3::SatGeoUserPhy::QueueSize", UintegerValue (100000));
 
   /// Use constellation
   Config::SetDefault ("ns3::SatHelper::SatConstellationEnabled", BooleanValue (true));
-  Config::SetDefault ("ns3::SatHelper::SatConstellationFolder", StringValue ("eutelsat-geo-2-sats-isls"));
+  Config::SetDefault ("ns3::SatHelper::SatConstellationFolder", StringValue (configurationFolder));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::StartDateStr", StringValue (startDate));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionEachRequest", BooleanValue (false));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionPeriod", TimeValue (Seconds (1)));

@@ -144,6 +144,7 @@ SatGeoNetDevice::ReceivePacketUser (Ptr<Packet> packet, const Address& userAddre
     {
       NS_FATAL_ERROR ("SatGroundStationAddressTag not found");
     }
+  // std::cout << "SAT " << m_nodeId << ", RTN packet to " << groundStationAddressTag.GetGroundStationAddress () << std::endl;
 
   Mac48Address macUserAddress = Mac48Address::ConvertFrom (userAddress);
 
@@ -184,6 +185,15 @@ SatGeoNetDevice::ReceivePacketUser (Ptr<Packet> packet, const Address& userAddre
   // Pass the packet to the upper layer (when ISLs developped) or send to feeder
   // m_rxCallback (this, packet, Ipv4L3Protocol::PROT_NUMBER, Address ());
 
+  if (m_gwConnected.count (groundStationAddressTag.GetGroundStationAddress ()))
+    {
+      std::cout << "GW desserved by this satellite" << std::endl;
+    }
+  else
+    {
+      std::cout << "GW not desserved by this satellite" << std::endl;
+    }
+
   SatUplinkInfoTag satUplinkInfoTag;
   if (!packet->PeekPacketTag (satUplinkInfoTag))
     {
@@ -204,6 +214,13 @@ SatGeoNetDevice::ReceivePacketFeeder (Ptr<Packet> packet, const Address& feederA
 {
   NS_LOG_FUNCTION (this << packet);
   NS_LOG_INFO ("Receiving a packet: " << packet->GetUid ());
+
+  SatGroundStationAddressTag groundStationAddressTag;
+  if (!packet->PeekPacketTag (groundStationAddressTag))
+    {
+      NS_FATAL_ERROR ("SatGroundStationAddressTag not found");
+    }
+  // std::cout << "SAT " << m_nodeId << ", FWD packet to " << groundStationAddressTag.GetGroundStationAddress () << std::endl;
 
   Mac48Address macFeederAddress = Mac48Address::ConvertFrom (feederAddress);
 
@@ -243,6 +260,15 @@ SatGeoNetDevice::ReceivePacketFeeder (Ptr<Packet> packet, const Address& feederA
 
   // Pass the packet to the upper layer (when ISLs developped) or send to feeder
   // m_rxCallback (this, packet, Ipv4L3Protocol::PROT_NUMBER, Address ());
+
+  if (m_utConnected.count (groundStationAddressTag.GetGroundStationAddress ()))
+    {
+      std::cout << "UT desserved by this satellite" << std::endl;
+    }
+  else
+    {
+      std::cout << "UT not desserved by this satellite" << std::endl;
+    }
 
   SatUplinkInfoTag satUplinkInfoTag;
   if (!packet->PeekPacketTag (satUplinkInfoTag))
@@ -757,6 +783,30 @@ SatGeoNetDevice::GetGwConnected ()
   NS_LOG_FUNCTION (this);
 
   return m_gwConnected;
+}
+
+void
+SatGeoNetDevice::ConnectUt (Mac48Address utAddress)
+{
+  NS_LOG_FUNCTION (this << utAddress);
+
+  m_utConnected.insert (utAddress);
+}
+
+void
+SatGeoNetDevice::DisconnectUt (Mac48Address utAddress)
+{
+  NS_LOG_FUNCTION (this << utAddress);
+
+  m_utConnected.erase (utAddress);
+}
+
+std::set <Mac48Address>
+SatGeoNetDevice::GetUtConnected ()
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_utConnected;
 }
 
 } // namespace ns3

@@ -232,11 +232,30 @@ public:
   void DisconnectGw (Mac48Address gwAddress);
 
   /**
-   * The the list of MAC connected to this GW.
+   * The the list of MAC GW connected to this satellite.
    * The SatGeoNetDevice will send to a GW if connected,
    * otherwise it will send to ISLs.
    */
   std::set <Mac48Address> GetGwConnected ();
+
+  /**
+   * Connect a UT to this satellite.
+   * \param utAddress MAC address of the UT to connect
+   */
+  void ConnectUt (Mac48Address utAddress);
+
+  /**
+   * Disconnect a UT to this satellite.
+   * \param utAddress MAC address of the UT to disconnect
+   */
+  void DisconnectUt (Mac48Address utAddress);
+
+  /**
+   * The the list of UT MAC connected to this satellite.
+   * The SatGeoNetDevice will send to a UT if connected,
+   * otherwise it will send to ISLs.
+   */
+  std::set <Mac48Address> GetUtConnected ();
 
   // inherited from NetDevice base class.
   virtual void SetIfIndex (const uint32_t index);
@@ -307,6 +326,11 @@ private:
    * Set containing all connected GWs
    */
   std::set <Mac48Address> m_gwConnected;
+
+  /**
+   * Set containing all connected UTs
+   */
+  std::set <Mac48Address> m_utConnected;
 
   TracedCallback<Time,
                  SatEnums::SatPacketEvent_t,

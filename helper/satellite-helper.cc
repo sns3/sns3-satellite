@@ -800,6 +800,10 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
             {
               DynamicCast<SatGeoNetDevice> (m_beamHelper->GetGeoSatNodes ().Get (0)->GetDevice (0))->ConnectGw (Mac48Address::ConvertFrom (netDevices.first->GetAddress ()));
             }
+          for (uint32_t utIndex = 0; utIndex < uts.GetN (); utIndex++)
+            {
+              DynamicCast<SatGeoNetDevice> (m_beamHelper->GetGeoSatNodes ().Get (satId)->GetDevice (0))->ConnectUt (Mac48Address::ConvertFrom (netDevices.second.Get (utIndex)->GetAddress ()));
+            }
         }
 
       m_mobileUtsByBeam.clear ();  // Release unused resources (mobile UTs starting in non-existent beams)
