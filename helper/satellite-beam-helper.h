@@ -280,10 +280,11 @@ public:
   NodeContainer GetUtNodes () const;
 
   /**
+   * \param satId satellite ID
    * \param beamId beam ID
    * \return container having all UT nodes of a specific beam.
    */
-  NodeContainer GetUtNodes (uint32_t beamId) const;
+  NodeContainer GetUtNodes (uint32_t satId, uint32_t beamId) const;
 
   /**
    * \param satId satellite ID
@@ -413,7 +414,7 @@ private:
 
   std::map<std::pair<uint32_t, uint32_t>, uint32_t >        m_beam;        // first pair sat ID / beam ID, second GW ID
   std::map<uint32_t, Ptr<Node> >                            m_gwNode;      // first GW ID, second node pointer
-  std::multimap<uint32_t, Ptr<Node> >                       m_utNode;      // first Beam ID, second node pointer of the UT
+  std::multimap<std::pair<uint32_t, uint32_t>, Ptr<Node> >  m_utNode;      // first pair sat ID / beam ID, second node pointer of the UT
   Ptr<SatChannelPair>                                       m_ulChannels;  // user link ID, channel pointers pair
   Ptr<SatChannelPair>                                       m_flChannels;  // feeder link ID, channel pointers pair
   std::map<std::pair<uint32_t, uint32_t>, FrequencyPair_t > m_beamFreqs;   // first beam ID, channel frequency IDs pair

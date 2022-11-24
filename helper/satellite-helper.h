@@ -144,6 +144,11 @@ public:
   void SetGwAddressInUt ();
 
   /**
+   * Populate the routes, when using constellations.
+   */
+  void SetBeamRoutingConstellations ();
+
+  /**
    * Get closest satellite to a ground station
    * \param position The position of the ground station
    * \return The ID of the closest satellite

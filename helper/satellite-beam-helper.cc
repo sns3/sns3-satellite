@@ -532,7 +532,7 @@ SatBeamHelper::Install (NodeContainer ut,
         }
 
       //save UT node pointer to multimap container
-      m_utNode.insert (std::make_pair (beamId, *i) );
+      m_utNode.insert (std::make_pair (std::make_pair (satId, beamId), *i) );
     }
 
   Ptr<NetDevice> gwNd = InstallFeeder (DynamicCast<SatGeoNetDevice> (geoNode->GetDevice (0)), gwNode, gwId, satId, beamId, feederLink, rtnFlFreqId, fwdFlFreqId, routingCallback);
@@ -880,7 +880,7 @@ SatBeamHelper::GetUtNodes () const
 
   NodeContainer utNodes;
 
-  for (std::multimap<uint32_t, Ptr<Node> >::const_iterator i = m_utNode.begin ();
+  for (std::multimap<std::pair<uint32_t, uint32_t>, Ptr<Node> >::const_iterator i = m_utNode.begin ();
        i != m_utNode.end (); ++i)
     {
       utNodes.Add (i->second);
@@ -890,18 +890,18 @@ SatBeamHelper::GetUtNodes () const
 }
 
 NodeContainer
-SatBeamHelper::GetUtNodes (uint32_t beamId) const
+SatBeamHelper::GetUtNodes (uint32_t satId, uint32_t beamId) const
 {
   NS_LOG_FUNCTION (this << beamId);
 
   NodeContainer utNodes;
 
   // find all entries with the specified beamId
-  std::pair <std::multimap<uint32_t, Ptr<Node> >::const_iterator,
-             std::multimap<uint32_t, Ptr<Node> >::const_iterator> range;
-  range = m_utNode.equal_range (beamId);
+  std::pair <std::multimap<std::pair<uint32_t, uint32_t>, Ptr<Node> >::const_iterator,
+             std::multimap<std::pair<uint32_t, uint32_t>, Ptr<Node> >::const_iterator> range;
+  range = m_utNode.equal_range (std::make_pair (satId, beamId));
 
-  for (std::map<uint32_t, Ptr<Node> >::const_iterator i = range.first;
+  for (std::map<std::pair<uint32_t, uint32_t>, Ptr<Node> >::const_iterator i = range.first;
        i != range.second; ++i)
     {
       utNodes.Add (i->second);
@@ -941,11 +941,11 @@ SatBeamHelper::GetUtBeamId (Ptr<Node> utNode) const
 
   uint32_t beamId = 0;
 
-  for ( std::multimap<uint32_t, Ptr<Node> >::const_iterator it = m_utNode.begin (); ( (it != m_utNode.end () ) && (beamId == 0) ); it++ )
+  for ( std::multimap<std::pair<uint32_t, uint32_t>, Ptr<Node> >::const_iterator it = m_utNode.begin (); ( (it != m_utNode.end () ) && (beamId == 0) ); it++ )
     {
       if ( it->second == utNode )
         {
-          beamId = it->first;
+          beamId = it->first.second;
         }
     }
 
@@ -1180,7 +1180,7 @@ SatBeamHelper::GetUtInfo () const
 
   std::ostringstream oss;
 
-  for (std::multimap<uint32_t, Ptr<Node> >::const_iterator i = m_utNode.begin ();
+  for (std::multimap<std::pair<uint32_t, uint32_t>, Ptr<Node> >::const_iterator i = m_utNode.begin ();
        i != m_utNode.end (); ++i)
     {
       Ptr<SatMobilityModel> model = i->second->GetObject<SatMobilityModel> ();
@@ -1208,7 +1208,7 @@ SatBeamHelper::GetUtInfo () const
 
       if ( m_printDetailedInformationToCreationTraces )
         {
-          oss << i->first << " " << Singleton <SatIdMapper>::Get ()->GetUtIdWithMac (devAddress) << " "
+          oss << i->first.second << " " << Singleton <SatIdMapper>::Get ()->GetUtIdWithMac (devAddress) << " "
               << pos.GetLatitude () << " " << pos.GetLongitude () << " " << pos.GetAltitude () << " ";
 
           for ( uint32_t j = 0; j < i->second->GetNDevices (); j++)
@@ -1220,7 +1220,7 @@ SatBeamHelper::GetUtInfo () const
         }
       else
         {
-          oss << i->first << " " << Singleton <SatIdMapper>::Get ()->GetUtIdWithMac (devAddress) << " "
+          oss << i->first.second << " " << Singleton <SatIdMapper>::Get ()->GetUtIdWithMac (devAddress) << " "
               << pos.GetLatitude () << " " << pos.GetLongitude () << " " << pos.GetAltitude ()
               << std::endl;
         }

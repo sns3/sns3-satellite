@@ -135,8 +135,6 @@ SatGeoFeederMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParame
 {
   NS_LOG_FUNCTION (this);
 
-  std::cout << "SatGeoFeederMac::Receive " << m_nodeInfo->GetMacAddress () << std::endl;
-
   if (m_forwardLinkRegenerationMode == SatEnums::REGENERATION_LINK || m_forwardLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
     {
       // Add packet trace entry:

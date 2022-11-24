@@ -107,7 +107,7 @@ SatConstellationTest1::DoRun (void)
 
   /// Use constellation
   Config::SetDefault ("ns3::SatHelper::SatConstellationEnabled", BooleanValue (true));
-  Config::SetDefault ("ns3::SatHelper::SatConstellationFolder", StringValue ("eutelsat-geo-2-sats-no-isl"));
+  Config::SetDefault ("ns3::SatHelper::SatConstellationFolder", StringValue ("eutelsat-geo-2-sats-no-isls"));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::StartDateStr", StringValue ("2022-11-13 12:00:00"));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionEachRequest", BooleanValue (false));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionPeriod", TimeValue (Seconds (1)));
@@ -166,16 +166,16 @@ SatConstellationTest1::DoRun (void)
   NS_TEST_ASSERT_MSG_EQ_TOL (gw2.GetLongitude (), 37.62, 0.001, "Incorrect longitude for GW 2");
   NS_TEST_ASSERT_MSG_EQ (gw2.GetAltitude (), 0, "Incorrect altitude for GW 2");
 
-  NS_TEST_ASSERT_MSG_EQ_TOL (ut1.GetLatitude (), 55.755, 0.001, "Incorrect latitude for UT 1");
-  NS_TEST_ASSERT_MSG_EQ_TOL (ut1.GetLongitude (), 37.6218, 0.001, "Incorrect longitude for UT 1");
+  NS_TEST_ASSERT_MSG_EQ_TOL (ut1.GetLatitude (), 48.8534, 0.001, "Incorrect latitude for UT 1");
+  NS_TEST_ASSERT_MSG_EQ_TOL (ut1.GetLongitude (), 2.3488, 0.001, "Incorrect longitude for UT 1");
   NS_TEST_ASSERT_MSG_EQ (ut1.GetAltitude (), 0, "Incorrect altitude for UT 1");
 
-  NS_TEST_ASSERT_MSG_EQ_TOL (ut2.GetLatitude (), 55.754, 0.001, "Incorrect latitude for UT 2");
-  NS_TEST_ASSERT_MSG_EQ_TOL (ut2.GetLongitude (), 37.621, 0.001, "Incorrect longitude for UT 2");
+  NS_TEST_ASSERT_MSG_EQ_TOL (ut2.GetLatitude (), 55.755, 0.001, "Incorrect latitude for UT 2");
+  NS_TEST_ASSERT_MSG_EQ_TOL (ut2.GetLongitude (), 37.6218, 0.001, "Incorrect longitude for UT 2");
   NS_TEST_ASSERT_MSG_EQ (ut2.GetAltitude (), 0, "Incorrect altitude for UT 2");
 
-  NS_TEST_ASSERT_MSG_EQ_TOL (ut3.GetLatitude (), 48.8534, 0.001, "Incorrect latitude for UT 3");
-  NS_TEST_ASSERT_MSG_EQ_TOL (ut3.GetLongitude (), 2.3488, 0.001, "Incorrect longitude for UT 3");
+  NS_TEST_ASSERT_MSG_EQ_TOL (ut3.GetLatitude (), 55.754, 0.001, "Incorrect latitude for UT 3");
+  NS_TEST_ASSERT_MSG_EQ_TOL (ut3.GetLongitude (), 37.621, 0.001, "Incorrect longitude for UT 3");
   NS_TEST_ASSERT_MSG_EQ (ut3.GetAltitude (), 0, "Incorrect altitude for UT 3");
 
   Simulator::Destroy ();
@@ -294,7 +294,7 @@ SatConstellationTest2::DoRun (void)
 
   /// Use constellation
   Config::SetDefault ("ns3::SatHelper::SatConstellationEnabled", BooleanValue (true));
-  Config::SetDefault ("ns3::SatHelper::SatConstellationFolder", StringValue ("eutelsat-geo-2-sats-no-isl"));
+  Config::SetDefault ("ns3::SatHelper::SatConstellationFolder", StringValue ("eutelsat-geo-2-sats-no-isls"));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::StartDateStr", StringValue ("2022-11-13 12:00:00"));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionEachRequest", BooleanValue (false));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionPeriod", TimeValue (Seconds (1)));

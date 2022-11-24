@@ -120,7 +120,7 @@ main (int argc, char *argv[])
       // Manual configuration of applications
 
       // get users
-      NodeContainer uts = helper->GetBeamHelper ()->GetUtNodes (beamIdInFullScenario);
+      NodeContainer uts = helper->GetBeamHelper ()->GetUtNodes (0, beamIdInFullScenario);
       NodeContainer utUsers = helper->GetUserHelper ()->GetUtUsers (uts.Get (0));
 
       NodeContainer gwUsers = helper->GetGwUsers ();

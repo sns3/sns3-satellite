@@ -463,12 +463,13 @@ SatStatsFwdQueueHelper::DoEnlistSource ()
           NS_ASSERT (satPhy != 0);
           Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx ();
           NS_ASSERT (satPhyRx != 0);
+          const uint32_t satId = satPhyRx->GetSatId ();
           const uint32_t beamId = satPhyRx->GetBeamId ();
-          NS_LOG_DEBUG (this << " enlisting UT from beam ID " << beamId);
+          NS_LOG_DEBUG (this << " enlisting UT from sat ID " << satId << " and beam ID " << beamId);
 
           // Go through the UTs of this beam.
           ListOfUt_t listOfUt;
-          NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes (beamId);
+          NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes (satId, beamId);
           for (NodeContainer::Iterator it2 = uts.Begin ();
                it2 != uts.End (); ++it2)
             {

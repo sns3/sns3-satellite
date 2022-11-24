@@ -52,6 +52,9 @@
 
 #include "satellite-helper.h"
 
+#include <ns3/ipv4-interface.h>
+#include <ns3/arp-cache.h>
+
 
 NS_LOG_COMPONENT_DEFINE ("SatHelper");
 
@@ -780,7 +783,6 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
               fwdConf[SatConf::U_FREQ_ID_INDEX],
               fwdConf[SatConf::F_FREQ_ID_INDEX],
               MakeCallback (&SatUserHelper::UpdateUtRoutes, m_userHelper));
-          m_userHelper->PopulateBeamRoutings (uts, netDevices.second, gwNode, netDevices.first);
 
           for (uint32_t utId = 0; utId < uts.GetN (); utId++)
             {
@@ -795,11 +797,14 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
                 {
                   DynamicCast<SatGeoNetDevice> (m_beamHelper->GetGeoSatNodes ().Get (gwSatId)->GetDevice (0))->ConnectGw (Mac48Address::ConvertFrom (netDevices.first->GetAddress ()));
                 }
+              // m_userHelper->PopulateBeamRoutings (uts, netDevices.second, gwNode, netDevices.first);
             }
           else
             {
               DynamicCast<SatGeoNetDevice> (m_beamHelper->GetGeoSatNodes ().Get (0)->GetDevice (0))->ConnectGw (Mac48Address::ConvertFrom (netDevices.first->GetAddress ()));
+              m_userHelper->PopulateBeamRoutings (uts, netDevices.second, gwNode, netDevices.first);
             }
+
           for (uint32_t utIndex = 0; utIndex < uts.GetN (); utIndex++)
             {
               DynamicCast<SatGeoNetDevice> (m_beamHelper->GetGeoSatNodes ().Get (satId)->GetDevice (0))->ConnectUt (Mac48Address::ConvertFrom (netDevices.second.Get (utIndex)->GetAddress ()));
@@ -807,6 +812,11 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
         }
 
       m_mobileUtsByBeam.clear ();  // Release unused resources (mobile UTs starting in non-existent beams)
+
+      if (m_satConstellationEnabled)
+        {
+          SetBeamRoutingConstellations ();
+        }
 
       m_userHelper->InstallGw (m_beamHelper->GetGwNodes (), gwUsers);
 
@@ -915,6 +925,55 @@ SatHelper::SetGwAddressInUt ()
       NS_ASSERT_MSG (gwSatNetDeviceCount == 1, "GW must have exactly on SatNetDevice for beam " << usedBeamId << " and satellite " << gwSatId);
 
       satUtMac->SetGwAddress (gwAddress);
+    }
+}
+
+void
+SatHelper::SetBeamRoutingConstellations ()
+{
+  NS_LOG_FUNCTION (this);
+
+  std::list<std::pair<uint32_t, uint32_t>> beams = m_beamHelper->GetBeams ();
+  for (std::list<std::pair<uint32_t, uint32_t>>::iterator it = beams.begin (); it != beams.end (); it++)
+    {
+      NodeContainer uts = m_beamHelper->GetUtNodes (it->first, it->second);
+      if (uts.GetN () > 0)
+        {
+          NetDeviceContainer utNd;
+          for (uint32_t utIndex = 0; utIndex < uts.GetN (); utIndex++)
+            {
+              for (uint32_t i = 0; i < uts.Get (utIndex)->GetNDevices (); i++)
+                {
+                  Ptr<SatNetDevice> nd = DynamicCast<SatNetDevice> (uts.Get (utIndex)->GetDevice (i));
+                  if (nd)
+                    {
+                      utNd.Add (nd);
+                    }
+                }
+            }
+          NS_ASSERT_MSG (uts.GetN () == utNd.GetN (), "Must have same number of UT and UT SatNetDevice");
+
+          Ptr<Node> gw = m_gwDistribution[uts.Get (0)];
+          NS_ASSERT_MSG (gw, "GW does not exist");
+
+          Ptr<SatNetDevice> gwNd = nullptr;
+          uint32_t gwSatId = GetClosestSat (GeoCoordinate (gw->GetObject<SatMobilityModel> ()->GetPosition ()));
+          for (uint32_t i = 0; i < gw->GetNDevices (); i++)
+            {
+              Ptr<SatNetDevice> nd = DynamicCast<SatNetDevice> (gw->GetDevice (i));
+              if (nd && nd->GetMac ()->GetBeamId () == it->second && nd->GetMac ()->GetSatId () == gwSatId)
+                {
+                  NS_ASSERT_MSG (gwNd == nullptr, "GW must have only one SatGeoNetDevice");
+                  gwNd = nd;
+                  m_userHelper->PopulateBeamRoutings (uts, utNd, gw, gwNd);
+                }
+              if (nd && nd->GetMac ()->GetBeamId () == it->second && nd->GetMac ()->GetSatId () != gwSatId)
+                {
+                  m_userHelper->PopulateBeamRoutings (NodeContainer (), NetDeviceContainer (), gw, nd);
+                }
+            }
+          NS_ASSERT_MSG (gwNd, "GW SatGeoNetDevice does not exist");
+        }
     }
 }
 
