@@ -782,6 +782,17 @@ SatBeamHelper::InstallIsls ()
 
       // Install a p2p ISL link between these two satellites
       NetDeviceContainer netDevices = p2pIslHelper.Install(sat1, sat2);
+      Ptr<PointToPointIslNetDevice> islNdSat1 = DynamicCast<PointToPointIslNetDevice> (netDevices.Get (0));
+      Ptr<PointToPointIslNetDevice> islNdSat2 = DynamicCast<PointToPointIslNetDevice> (netDevices.Get (1));
+
+      Ptr<SatGeoNetDevice> geoNdSat1 = DynamicCast<SatGeoNetDevice> (sat1->GetDevice (0));
+      Ptr<SatGeoNetDevice> geoNdSat2 = DynamicCast<SatGeoNetDevice> (sat2->GetDevice (0));
+
+      geoNdSat1->AddIslsNetDevice (islNdSat1);
+      geoNdSat2->AddIslsNetDevice (islNdSat2);
+
+      islNdSat1->SetGeoNetDevice (geoNdSat1);
+      islNdSat2->SetGeoNetDevice (geoNdSat2);
 
       // Install traffic control helper // TODO why this ?
       /*tchIsl.Install(netDevices.Get(0));

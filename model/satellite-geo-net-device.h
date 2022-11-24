@@ -35,9 +35,12 @@
 #include "satellite-mac.h"
 #include "satellite-channel.h"
 #include "satellite-signal-parameters.h"
+#include "satellite-point-to-point-isl-net-device.h"
 
 
 namespace ns3 {
+
+class PointToPointIslNetDevice;
 
 /**
  * \ingroup satellite
@@ -257,6 +260,26 @@ public:
    */
   std::set <Mac48Address> GetUtConnected ();
 
+  /**
+   * Add a ISL Net Device to this satellite.
+   * \param islNetDevices ISL Net Device to add.
+   */
+  void AddIslsNetDevice (Ptr<PointToPointIslNetDevice> islNetDevices);
+
+  /**
+   * Send a packet to ISL.
+   * \param packet The packet to send
+   * \param destination The MAC address of ground station that will receive the packet
+   */
+  void SendToIsl (Ptr<Packet> packet, Mac48Address destination);
+
+  /**
+   * Receive a packet from ISL.
+   * \param packet The packet to send
+   * \param destination The MAC address of ground station that will receive the packet
+   */
+  void ReceiveFromIsl (Ptr<Packet> packet, Mac48Address destination);
+
   // inherited from NetDevice base class.
   virtual void SetIfIndex (const uint32_t index);
   virtual uint32_t GetIfIndex (void) const;
@@ -326,6 +349,8 @@ private:
    * Set containing all connected GWs
    */
   std::set <Mac48Address> m_gwConnected;
+
+  std::vector<Ptr<PointToPointIslNetDevice>> m_islNetDevices;
 
   /**
    * Set containing all connected UTs

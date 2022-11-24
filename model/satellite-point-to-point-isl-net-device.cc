@@ -33,6 +33,7 @@
 #include "ns3/pointer.h"
 #include "ns3/ppp-header.h"
 #include "ns3/satellite-point-to-point-isl-channel.h"
+#include "ns3/satellite-ground-station-address-tag.h"
 
 #include "ns3/satellite-point-to-point-isl-net-device.h"
 
@@ -61,7 +62,7 @@ PointToPointIslNetDevice::GetTypeId (void)
                    MakeMac48AddressChecker ())
     .AddAttribute ("DataRate", 
                    "The default data rate for point to point links",
-                   DataRateValue (DataRate ("32768b/s")),
+                   DataRateValue (DataRate ("1000000000b/s")),
                    MakeDataRateAccessor (&PointToPointIslNetDevice::m_dataRate),
                    MakeDataRateChecker ())
     .AddAttribute ("ReceiveErrorModel", 
@@ -250,8 +251,23 @@ PointToPointIslNetDevice::Receive (Ptr<Packet> packet)
           m_promiscCallback (this, packet, protocol, GetRemote (), GetAddress (), NetDevice::PACKET_HOST);
         }
 
-      m_rxCallback (this, packet, protocol, GetRemote ());
+      // m_rxCallback (this, packet, protocol, GetRemote ());
+      SatGroundStationAddressTag groundStationAddressTag;
+      if (!packet->PeekPacketTag (groundStationAddressTag))
+        {
+          NS_FATAL_ERROR ("SatGroundStationAddressTag not found");
+        }
+
+      m_geoNetDevice->ReceiveFromIsl (packet, groundStationAddressTag.GetGroundStationAddress ());
     }
+}
+
+void
+PointToPointIslNetDevice::SetGeoNetDevice (Ptr<SatGeoNetDevice> geoNetDevice)
+{
+  NS_LOG_FUNCTION (this);
+
+  m_geoNetDevice = geoNetDevice;
 }
 
 Ptr<Queue<Packet> >

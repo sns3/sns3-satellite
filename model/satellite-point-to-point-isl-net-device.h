@@ -37,11 +37,14 @@
 #include "ns3/ptr.h"
 #include "ns3/mac48-address.h"
 
+#include "ns3/satellite-geo-net-device.h"
+
 namespace ns3 {
 
 template <typename Item> class Queue;
 class PointToPointIslChannel;
 class ErrorModel;
+class SatGeoNetDevice;
 
 /**
  * \ingroup point-to-point
@@ -143,6 +146,12 @@ public:
    * \param p Ptr to the received packet.
    */
   void Receive (Ptr<Packet> p);
+
+  /**
+   * Set the associated GeoNetDevice
+   * \param geoNetDevice The device to attach to this instance
+   */
+  void SetGeoNetDevice (Ptr<SatGeoNetDevice> geoNetDevice);
 
   // The remaining methods are documented in ns3::NetDevice*
 
@@ -299,6 +308,8 @@ private:
   bool m_linkUp;                                        //!< Identify if the link is up or not
   uint32_t m_mtu;                                       //!< The Maximum Transmission Unit
   Ptr<Packet> m_currentPkt;                             //!< Current packet processed
+
+  Ptr<SatGeoNetDevice> m_geoNetDevice;                  //!< Satellite GEO Net Device associated to this instance
 
   /**
    * \brief PPP to Ethernet protocol number mapping
