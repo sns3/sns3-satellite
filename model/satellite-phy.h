@@ -352,14 +352,16 @@ public:
   /**
    * \brief Set the transmit antenna gain pattern.
    * \param agp antenna gain pattern
+   * \param mobility mobility model of satellite
    */
-  virtual void SetTxAntennaGainPattern (Ptr<SatAntennaGainPattern> agp);
+  virtual void SetTxAntennaGainPattern (Ptr<SatAntennaGainPattern> agp, Ptr<SatMobilityModel> satelliteMobility);
 
   /**
    * \brief Set the receive antenna gain pattern.
    * \param agp antenna gain pattern
+   * \param mobility mobility model of satellite
    */
-  virtual void SetRxAntennaGainPattern (Ptr<SatAntennaGainPattern> agp);
+  virtual void SetRxAntennaGainPattern (Ptr<SatAntennaGainPattern> agp, Ptr<SatMobilityModel> satelliteMobility);
 
   /**
    * \brief Configure Rx carriers

@@ -137,7 +137,9 @@ SatUtHandoverModule::CheckForHandoverRecommendation (uint32_t satId, uint32_t be
 
   // If current beam is still valid, do nothing
   GeoCoordinate coords = mobilityModel->GetGeoPosition ();
-  if (m_antennaGainPatterns->GetAntennaGainPattern (satId, beamId)->IsValidPosition (coords, m_antennaGainTrace))
+  Ptr<SatAntennaGainPattern> agp = m_antennaGainPatterns->GetAntennaGainPattern (beamId);
+  Ptr<SatMobilityModel> mobility = m_antennaGainPatterns->GetAntennaMobility (satId);
+  if (agp->IsValidPosition (coords, m_antennaGainTrace, mobility))
     {
       NS_LOG_FUNCTION ("Current beam is good, do nothing");
       m_hasPendingRequest = false;

@@ -120,23 +120,19 @@ SatAntennaGainPatternContainer::SatAntennaGainPatternContainer (uint32_t nbSats)
 
                 std::string filePath = patternsFolder + "/" + filename;
                 std::istringstream ss {num};
-                uint32_t i;
-                ss >> i;
+                uint32_t beamId;
+                ss >> beamId;
                 if (ss.bad ())
                   {
                     NS_FATAL_ERROR ("SatAntennaGainPatternContainer::SatAntennaGainPatternContainer unable to find beam number in " << filePath << " file name");
                   }
 
-                for (uint32_t satelliteId = 0; satelliteId < nbSats; satelliteId++)
+                Ptr<SatAntennaGainPattern> gainPattern = CreateObject<SatAntennaGainPattern> (filePath, geoPos);
+                std::pair <std::map<uint32_t, Ptr<SatAntennaGainPattern> >::iterator, bool> ret;
+                ret = m_antennaPatternMap.insert (std::make_pair (beamId, gainPattern));
+                if (ret.second == false)
                   {
-                    Ptr<SatAntennaGainPattern> gainPattern = CreateObject<SatAntennaGainPattern> (filePath, geoPos);
-
-                    std::pair<std::map<std::pair<uint32_t, uint32_t>, Ptr<SatAntennaGainPattern> >::iterator, bool> ret;
-                    ret = m_antennaPatternMap.insert (std::make_pair (std::make_pair (satelliteId, i), gainPattern));
-                    if (ret.second == false)
-                      {
-                        NS_FATAL_ERROR ("SatAntennaGainPatternContainer::SatAntennaGainPatternContainer an antenna pattern for beam " << i << " already exists!");
-                      }
+                    NS_FATAL_ERROR ("SatAntennaGainPatternContainer::SatAntennaGainPatternContainer an antenna pattern for beam " << beamId << " already exists!");
                   }
               }
           }
@@ -185,46 +181,58 @@ SatAntennaGainPatternContainer::GetDefaultGeoPosition ()
 }
 
 Ptr<SatAntennaGainPattern>
-SatAntennaGainPatternContainer::GetAntennaGainPattern (uint32_t satelliteId, uint32_t beamId) const
+SatAntennaGainPatternContainer::GetAntennaGainPattern (uint32_t beamId) const
 {
   NS_LOG_FUNCTION (this << beamId);
 
-  std::map<std::pair<uint32_t, uint32_t>, Ptr<SatAntennaGainPattern> >::const_iterator agp = m_antennaPatternMap.find (std::make_pair (satelliteId, beamId));
+  std::map<uint32_t, Ptr<SatAntennaGainPattern> >::const_iterator agp = m_antennaPatternMap.find (beamId);
   if (agp == m_antennaPatternMap.end ())
     {
-      NS_FATAL_ERROR ("SatAntennaGainPatternContainer::GetAntennaGainPattern - unvalid pair satellite id / beam id: " <<satelliteId << "/" << beamId);
+      NS_FATAL_ERROR ("SatAntennaGainPatternContainer::GetAntennaGainPattern - unvalid beam id: " << beamId);
     }
 
   return agp->second;
 }
 
+Ptr<SatMobilityModel>
+SatAntennaGainPatternContainer::GetAntennaMobility (uint32_t satelliteId) const
+{
+  NS_LOG_FUNCTION (this << satelliteId);
+
+  std::map<uint32_t, Ptr<SatMobilityModel> >::const_iterator mm = m_mobilityModelMap.find (satelliteId);
+  if (mm == m_mobilityModelMap.end ())
+    {
+      NS_FATAL_ERROR ("SatAntennaGainPatternContainer::GetAntennaGainPattern - unvalid satellite id: " << satelliteId);
+    }
+
+  return mm->second;
+}
+
 uint32_t
-SatAntennaGainPatternContainer::GetBestBeamId (uint32_t satelliteId, GeoCoordinate coord) const
+SatAntennaGainPatternContainer::GetBestBeamId (uint32_t satelliteId, GeoCoordinate coord)
 {
   NS_LOG_FUNCTION (this << coord.GetLatitude () << coord.GetLongitude ());
 
   double bestGain (-100.0);
   uint32_t bestId (0);
 
+  Ptr<SatMobilityModel> mobility = m_mobilityModelMap[satelliteId];
+
   for (auto const& entry : m_antennaPatternMap)
     {
-      std::pair<uint32_t, uint32_t> i = entry.first;
-      if (i.first != satelliteId)
-        {
-          continue;
-        }
-      double gain = entry.second->GetAntennaGain_lin (coord);
+      uint32_t i = entry.first;
+      double gain = entry.second->GetAntennaGain_lin (coord, mobility);
 
       // The antenna pattern has returned a NAN gain. This means
       // that this position is not valid. Return 0, which is not a valid beam id.
       if (std::isnan (gain))
         {
-          NS_FATAL_ERROR ("SatAntennaGainPatternContainer::GetBestBeamId - Beam " << i.second << " returned a NAN antenna gain value!");
+          NS_FATAL_ERROR ("SatAntennaGainPatternContainer::GetBestBeamId - Beam " << i << " returned a NAN antenna gain value!");
         }
       else if (gain > bestGain)
         {
           bestGain = gain;
-          bestId = i.second;
+          bestId = i;
         }
     }
 
@@ -246,6 +254,7 @@ SatAntennaGainPatternContainer::ConfigureBeamsMobility (uint32_t satelliteId, Pt
 {
   NS_LOG_FUNCTION (this << satelliteId << mobility);
 
+  // TODO all of this is useless ?
   Ptr<SatSGP4MobilityModel> sgp4Mobility = DynamicCast<SatSGP4MobilityModel> (mobility);
   if (sgp4Mobility != nullptr)
     {
@@ -262,33 +271,29 @@ SatAntennaGainPatternContainer::ConfigureBeamsMobility (uint32_t satelliteId, Pt
       model->SetStartTime (JulianDate (originDate));
     }
 
-  for (auto const& entry : m_antennaPatternMap)
-    {
-      if (entry.first.first == satelliteId)
-        {
-          entry.second->SetMobilityModel (mobility);
-        }
-    }
+  m_mobilityModelMap[satelliteId] = mobility;
 }
 
 void
-SatAntennaGainPatternContainer::SetEnabledBeams (uint32_t satId, BeamUserInfoMap_t& info)
+SatAntennaGainPatternContainer::SetEnabledBeams (BeamUserInfoMap_t& info)
 {
-  std::map< std::pair<uint32_t, uint32_t>, Ptr<SatAntennaGainPattern> >::iterator it = m_antennaPatternMap.begin ();
+  std::map< uint32_t, Ptr<SatAntennaGainPattern> >::iterator it = m_antennaPatternMap.begin ();
   while (it != m_antennaPatternMap.end ())
     {
-      uint32_t satelliteIdIterator = it->first.first;
-      uint32_t beamIdIterator = it->first.second;
-      if (satelliteIdIterator == satId)
+      uint32_t beamIdIterator = it->first;
+      BeamUserInfoMap_t::iterator infoIterator;
+      bool found = false;
+      for (infoIterator = info.begin (); infoIterator != info.end (); infoIterator++)
         {
-          if (info.find (std::make_pair (satId, beamIdIterator)) == info.end())
-            {
-              it = m_antennaPatternMap.erase (it);
-            }
-          else
-            {
-              it++;
-            }
+          uint32_t beamId = infoIterator->first.second;
+          if (beamId == beamIdIterator)
+          {
+            found = true;
+          }
+        }
+      if (!found)
+        {
+          it = m_antennaPatternMap.erase (it);
         }
       else
         {

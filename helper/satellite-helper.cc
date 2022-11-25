@@ -657,10 +657,7 @@ SatHelper::CreateConstellationScenario (BeamUserInfoMap_t& info, GetNextUtUserCo
 
   NS_ASSERT_MSG (info.size () > 0, "There must be at least one satellite");
 
-  for (uint32_t i = 0; i < m_satConf->GetSatCount (); i++)
-    {
-      m_antennaGainPatterns->SetEnabledBeams (i, info);
-    }
+  m_antennaGainPatterns->SetEnabledBeams (info);
 
   for (uint32_t i = 0; i < m_satConf->GetUtCount (); i++)
     {
@@ -1085,7 +1082,7 @@ SatHelper::SetUtMobility (NodeContainer uts, uint32_t satId, uint32_t beamId)
       GeoCoordinate position = uts.Get (i)->GetObject<SatMobilityModel> ()->GetGeoPosition ();
       NS_LOG_INFO ("Installing mobility observer on Ut Node at " <<
                    position << " with antenna gain of " <<
-                   m_antennaGainPatterns->GetAntennaGainPattern (satId, beamId)->GetAntennaGain_lin (position));
+                   m_antennaGainPatterns->GetAntennaGainPattern (beamId)->GetAntennaGain_lin (position, m_beamHelper->GetGeoSatNodes ().Get (satId)->GetObject <SatMobilityModel> ()));
     }
 }
 
@@ -1117,7 +1114,7 @@ SatHelper::SetUtMobilityFromPosition (NodeContainer uts, uint32_t satId, uint32_
       GeoCoordinate position = uts.Get (i)->GetObject<SatMobilityModel> ()->GetGeoPosition ();
       NS_LOG_INFO ("Installing mobility observer on Ut Node at " <<
                    position << " with antenna gain of " <<
-                   m_antennaGainPatterns->GetAntennaGainPattern (satId, beamId)->GetAntennaGain_lin (position));
+                   m_antennaGainPatterns->GetAntennaGainPattern (beamId)->GetAntennaGain_lin (position, m_beamHelper->GetGeoSatNodes ().Get (satId)->GetObject <SatMobilityModel> ()));
     }
 }
 

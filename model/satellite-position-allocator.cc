@@ -336,7 +336,8 @@ SatSpotBeamPositionAllocator::GetNextGeoPosition (uint32_t satId) const
   NS_LOG_FUNCTION (this);
 
   uint32_t bestBeamId (std::numeric_limits<uint32_t>::max ());
-  Ptr<SatAntennaGainPattern> agp = m_antennaGainPatterns->GetAntennaGainPattern (satId, m_targetBeamId);
+  Ptr<SatAntennaGainPattern> agp = m_antennaGainPatterns->GetAntennaGainPattern (m_targetBeamId);
+  Ptr<SatMobilityModel> mobility = m_antennaGainPatterns->GetAntennaMobility (satId);
   uint32_t tries (0);
   GeoCoordinate pos;
 
@@ -355,7 +356,7 @@ SatSpotBeamPositionAllocator::GetNextGeoPosition (uint32_t satId) const
   // - elevation is not higher than threshold
   while ( ( bestBeamId != m_targetBeamId || std::isnan (elevation) || elevation < m_minElevationAngleInDeg ) && tries < MAX_TRIES)
     {
-      pos = agp->GetValidRandomPosition ();
+      pos = agp->GetValidRandomPosition (mobility);
       bestBeamId = m_antennaGainPatterns->GetBestBeamId (satId, pos);
 
       // Set the new position to the UT mobility

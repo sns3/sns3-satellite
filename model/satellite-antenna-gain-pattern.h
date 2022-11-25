@@ -79,26 +79,27 @@ public:
 
   /**
    * \brief Calculate the antenna gain value for a certain {latitude, longitude} point
+   * \param mobility The mobility model of the associated satellite
    * \return The gain value in linear format
    */
-  double GetAntennaGain_lin (GeoCoordinate coord) const;
+  double GetAntennaGain_lin (GeoCoordinate coord, Ptr<SatMobilityModel> mobility) const;
 
   /**
    * \brief Get a valid random position under this spot-beam coverage.
+   * \param mobility The mobility model of the associated satellite
    * \return A valid random GeoCoordinate
    */
-  GeoCoordinate GetValidRandomPosition () const;
+  GeoCoordinate GetValidRandomPosition (Ptr<SatMobilityModel> mobility) const;
 
   /**
    * \brief Check if a given position is under this spot-beam coverage.
    * \param coord The position to check for validity
+   * \param mobility The mobility model of the associated satellite
    * \return Whether or not the given position is valid for this spot-beam
    */
-  bool IsValidPosition (GeoCoordinate coord, TracedCallback<double> cb) const;
+  bool IsValidPosition (GeoCoordinate coord, TracedCallback<double> cb, Ptr<SatMobilityModel> mobility) const;
 
-  void SetMobilityModel (Ptr<SatMobilityModel> mobility);
-
-  void GetSatelliteOffset (double& latOffset, double& lonOffset) const;
+  void GetSatelliteOffset (double& latOffset, double& lonOffset, Ptr<SatMobilityModel> mobility) const;
 
 private:
   /**
@@ -187,8 +188,6 @@ private:
    */
   static const std::string m_nanStringArray[4];
   std::vector<std::string> m_nanStrings;
-
-  Ptr<SatMobilityModel> m_satelliteMobility;
 };
 
 

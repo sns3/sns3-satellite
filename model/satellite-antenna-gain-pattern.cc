@@ -71,15 +71,13 @@ SatAntennaGainPattern::SatAntennaGainPattern ()
   m_lonInterval (0.0),
   m_latDefaultSatellite (0.0),
   m_lonDefaultSatellite (0.0),
-  m_nanStrings (),
-  m_satelliteMobility (nullptr)
+  m_nanStrings ()
 {
   // Do nothing here
 }
 
 SatAntennaGainPattern::SatAntennaGainPattern (std::string filePathName, GeoCoordinate defaultSatellitePosition)
-  : m_nanStrings (m_nanStringArray, m_nanStringArray + (sizeof m_nanStringArray / sizeof m_nanStringArray[0])),
-  m_satelliteMobility (nullptr)
+  : m_nanStrings (m_nanStringArray, m_nanStringArray + (sizeof m_nanStringArray / sizeof m_nanStringArray[0]))
 {
   // Attributes are needed already in construction phase:
   // - ConstructSelf call in constructor
@@ -225,16 +223,16 @@ void SatAntennaGainPattern::ReadAntennaPatternFromFile (std::string filePathName
 }
 
 
-void SatAntennaGainPattern::GetSatelliteOffset (double& latOffset, double& lonOffset) const
+void SatAntennaGainPattern::GetSatelliteOffset (double& latOffset, double& lonOffset, Ptr<SatMobilityModel> mobility) const
 {
   NS_LOG_FUNCTION (this);
 
-  if (!m_satelliteMobility)
+  if (!mobility)
     {
       NS_FATAL_ERROR ("SatAntennaGainPattern::GetSatelliteOffset - Called without initializing satellite position first");
     }
 
-  GeoCoordinate satellite = m_satelliteMobility->GetGeoPosition ();
+  GeoCoordinate satellite = mobility->GetGeoPosition ();
 
   latOffset = m_latDefaultSatellite - satellite.GetLatitude ();
   lonOffset = m_lonDefaultSatellite - satellite.GetLongitude ();
@@ -243,12 +241,12 @@ void SatAntennaGainPattern::GetSatelliteOffset (double& latOffset, double& lonOf
 }
 
 
-GeoCoordinate SatAntennaGainPattern::GetValidRandomPosition () const
+GeoCoordinate SatAntennaGainPattern::GetValidRandomPosition (Ptr<SatMobilityModel> mobility) const
 {
   NS_LOG_FUNCTION (this);
 
   double satLatOffset, satLonOffset;
-  GetSatelliteOffset (satLatOffset, satLonOffset);
+  GetSatelliteOffset (satLatOffset, satLonOffset, mobility);
 
   uint32_t numPosGridPoints = m_validPositions.size ();
   uint32_t ind (0);
@@ -300,22 +298,22 @@ GeoCoordinate SatAntennaGainPattern::GetValidRandomPosition () const
 }
 
 
-bool SatAntennaGainPattern::IsValidPosition (GeoCoordinate coord, TracedCallback<double> cb) const
+bool SatAntennaGainPattern::IsValidPosition (GeoCoordinate coord, TracedCallback<double> cb, Ptr<SatMobilityModel> mobility) const
 {
   NS_LOG_FUNCTION (this << coord.GetLatitude () << coord.GetLongitude ());
 
-  double antennaGain = SatUtils::LinearToDb (GetAntennaGain_lin (coord));
+  double antennaGain = SatUtils::LinearToDb (GetAntennaGain_lin (coord, mobility));
   cb (antennaGain);
   return antennaGain >= m_minAcceptableAntennaGainInDb;
 }
 
 
-double SatAntennaGainPattern::GetAntennaGain_lin (GeoCoordinate coord) const
+double SatAntennaGainPattern::GetAntennaGain_lin (GeoCoordinate coord, Ptr<SatMobilityModel> mobility) const
 {
   NS_LOG_FUNCTION (this << coord.GetLatitude () << coord.GetLongitude ());
 
   double satLatOffset, satLonOffset;
-  GetSatelliteOffset (satLatOffset, satLonOffset);
+  GetSatelliteOffset (satLatOffset, satLonOffset, mobility);
 
   // Get the requested position {latitude, longitude}
   double latitude = coord.GetLatitude () + satLatOffset;
@@ -390,14 +388,6 @@ double SatAntennaGainPattern::GetAntennaGain_lin (GeoCoordinate coord) const
       ", interpolated gain: " << gain << std::endl;
    */
   return gain;
-}
-
-
-void SatAntennaGainPattern::SetMobilityModel (Ptr<SatMobilityModel> mobility)
-{
-  NS_LOG_FUNCTION (this << mobility);
-
-  m_satelliteMobility = mobility;
 }
 
 

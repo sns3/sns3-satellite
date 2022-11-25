@@ -81,8 +81,9 @@ public:
   /*
    * Set the receive antenna gain pattern.
    * \param agp antenna gain pattern
+   * \param mobility mobility model of satellite
    */
-  void SetAntennaGainPattern (Ptr<SatAntennaGainPattern> agp);
+  void SetAntennaGainPattern (Ptr<SatAntennaGainPattern> agp, Ptr<SatMobilityModel> mobility);
 
   void SetDevice (Ptr<NetDevice> d);
   Ptr<NetDevice> GetDevice ();
@@ -250,6 +251,11 @@ private:
    * Receive antenna gain pattern
    */
   Ptr<SatAntennaGainPattern> m_antennaGainPattern;
+
+  /*
+   * Satellite mobility model
+   */
+  Ptr<SatMobilityModel> m_satMobility;
 
   /**
    * Configured maximum antenna gain in linear

@@ -70,11 +70,17 @@ public:
 
   /**
    * \brief Get the antenna pattern of a specified beam id
-   * \param satelliteId Satellite identifier
    * \param beamId Beam identifier
    * \return The antenna gain pattern instance of the specified beam id
    */
-  Ptr<SatAntennaGainPattern> GetAntennaGainPattern (uint32_t satelliteId, uint32_t beamId) const;
+  Ptr<SatAntennaGainPattern> GetAntennaGainPattern (uint32_t beamId) const;
+
+  /**
+   * \brief Get the mobility model of a specified beam id
+   * \param satelliteId Satellite identifier
+   * \return The mobility model
+   */
+  Ptr<SatMobilityModel> GetAntennaMobility (uint32_t satelliteId) const;
 
   /**
    * \brief Get the number of stored antenna pattern
@@ -89,11 +95,11 @@ public:
    * \param coord Geo coordinate
    * \return best beam id in the specified geo coordinate
    */
-  uint32_t GetBestBeamId (uint32_t satelliteId, GeoCoordinate coord) const;
+  uint32_t GetBestBeamId (uint32_t satelliteId, GeoCoordinate coord);
 
   void ConfigureBeamsMobility (uint32_t satelliteId, Ptr<SatMobilityModel> mobility);
 
-  void SetEnabledBeams (uint32_t satId, BeamUserInfoMap_t& info);
+  void SetEnabledBeams (BeamUserInfoMap_t& info);
 
 private:
   std::string m_patternsFolder;
@@ -101,7 +107,12 @@ private:
   /**
    * Container of antenna patterns
    */
-  std::map< std::pair<uint32_t, uint32_t>, Ptr<SatAntennaGainPattern> > m_antennaPatternMap;
+  std::map< uint32_t, Ptr<SatAntennaGainPattern> > m_antennaPatternMap;
+
+  /**
+   * Container of mobility models
+   */
+  std::map< uint32_t, Ptr<SatMobilityModel> > m_mobilityModelMap;
 
 };
 

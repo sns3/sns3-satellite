@@ -272,17 +272,17 @@ SatPhy::CalculateSinr (double sinr, double otherInterference)
 }
 
 void
-SatPhy::SetTxAntennaGainPattern (Ptr<SatAntennaGainPattern> agp)
+SatPhy::SetTxAntennaGainPattern (Ptr<SatAntennaGainPattern> agp, Ptr<SatMobilityModel> satelliteMobility)
 {
   NS_LOG_FUNCTION (this);
-  m_phyTx->SetAntennaGainPattern (agp);
+  m_phyTx->SetAntennaGainPattern (agp, satelliteMobility);
 }
 
 void
-SatPhy::SetRxAntennaGainPattern (Ptr<SatAntennaGainPattern> agp)
+SatPhy::SetRxAntennaGainPattern (Ptr<SatAntennaGainPattern> agp, Ptr<SatMobilityModel> satelliteMobility)
 {
   NS_LOG_FUNCTION (this);
-  m_phyRx->SetAntennaGainPattern (agp);
+  m_phyRx->SetAntennaGainPattern (agp, satelliteMobility);
 }
 
 void

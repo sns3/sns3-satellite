@@ -340,8 +340,8 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
   // Note, that currently we have only one set of antenna patterns,
   // which are utilized in both in user link and feeder link, and
   // in both uplink and downlink directions.
-  fPhy->SetTxAntennaGainPattern (feederAgp);
-  fPhy->SetRxAntennaGainPattern (feederAgp);
+  fPhy->SetTxAntennaGainPattern (feederAgp, dev->GetNode ()->GetObject<SatMobilityModel> ());
+  fPhy->SetRxAntennaGainPattern (feederAgp, dev->GetNode ()->GetObject<SatMobilityModel> ());
 
   dev->AddFeederPhy (fPhy, userBeamId);
 
@@ -554,8 +554,8 @@ SatGeoHelper::AttachChannelsUser ( Ptr<SatGeoNetDevice> dev,
   // Note, that currently we have only one set of antenna patterns,
   // which are utilized in both in user link and feeder link, and
   // in both uplink and downlink directions.
-  uPhy->SetTxAntennaGainPattern (userAgp);
-  uPhy->SetRxAntennaGainPattern (userAgp);
+  uPhy->SetTxAntennaGainPattern (userAgp, dev->GetNode ()->GetObject<SatMobilityModel> ());
+  uPhy->SetRxAntennaGainPattern (userAgp, dev->GetNode ()->GetObject<SatMobilityModel> ());
 
   dev->AddUserPhy (uPhy, userBeamId);
 

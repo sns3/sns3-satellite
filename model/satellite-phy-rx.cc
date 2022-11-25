@@ -122,7 +122,7 @@ SatPhyRx::GetAntennaGain (Ptr<MobilityModel> mobility)
   if (m_antennaGainPattern)
     {
       Ptr<SatMobilityModel> m = DynamicCast<SatMobilityModel> (mobility);
-      gain_W = m_antennaGainPattern->GetAntennaGain_lin (m->GetGeoPosition ());
+      gain_W = m_antennaGainPattern->GetAntennaGain_lin (m->GetGeoPosition (), m_satMobility);
     }
 
   /**
@@ -275,12 +275,13 @@ SatPhyRx::SetMobility (Ptr<MobilityModel> m)
 }
 
 void
-SatPhyRx::SetAntennaGainPattern (Ptr<SatAntennaGainPattern> agp)
+SatPhyRx::SetAntennaGainPattern (Ptr<SatAntennaGainPattern> agp, Ptr<SatMobilityModel> mobility)
 {
   NS_LOG_FUNCTION (this << agp);
   NS_ASSERT (m_antennaGainPattern == 0);
 
   m_antennaGainPattern = agp;
+  m_satMobility = mobility;
 }
 
 void
