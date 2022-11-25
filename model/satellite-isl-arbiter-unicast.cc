@@ -23,30 +23,33 @@
 
 #include <ns3/satellite-isl-arbiter-unicast.h>
 
-NS_LOG_COMPONENT_DEFINE ("SatelliteIslArbiterUnicast");
+NS_LOG_COMPONENT_DEFINE ("SatIslArbiterUnicast");
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (SatelliteIslArbiterUnicast);
+NS_OBJECT_ENSURE_REGISTERED (SatIslArbiterUnicast);
 
 TypeId
-SatelliteIslArbiterUnicast::GetTypeId (void)
+SatIslArbiterUnicast::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::SatelliteIslArbiterUnicast")
-          .SetParent<SatelliteIslArbiter> ()
+  static TypeId tid = TypeId ("ns3::SatIslArbiterUnicast")
+          .SetParent<SatIslArbiter> ()
   ;
   return tid;
 }
 
-SatelliteIslArbiterUnicast::SatelliteIslArbiterUnicast(Ptr<Node> node, std::map<uint32_t, uint32_t> nextHopMap)
- : SatelliteIslArbiter (node)
+SatIslArbiterUnicast::SatIslArbiterUnicast(Ptr<Node> node, std::map<uint32_t, uint32_t> nextHopMap)
+ : SatIslArbiter (node)
 {
-    m_nextHopMap = nextHopMap;
+  NS_LOG_FUNCTION (this << node);
+  m_nextHopMap = nextHopMap;
 }
 
 int32_t
-SatelliteIslArbiterUnicast::Decide (int32_t sourceSatId, int32_t targetSatId, Ptr<Packet> pkt)
+SatIslArbiterUnicast::Decide (int32_t sourceSatId, int32_t targetSatId, Ptr<Packet> pkt)
 {
+  NS_LOG_FUNCTION (this << sourceSatId << targetSatId << pkt);
+
   if (m_nextHopMap.count (targetSatId) == 0)
     {
       return -1;
@@ -55,8 +58,10 @@ SatelliteIslArbiterUnicast::Decide (int32_t sourceSatId, int32_t targetSatId, Pt
 }
 
 std::string
-SatelliteIslArbiterUnicast::StringReprOfForwardingState ()
+SatIslArbiterUnicast::StringReprOfForwardingState ()
 {
+  NS_LOG_FUNCTION (this);
+
   std::ostringstream res;
   res << "Unicast state of node " << m_nodeId << std::endl;
 

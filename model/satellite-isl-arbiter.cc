@@ -26,22 +26,22 @@
 
 #include "ns3/satellite-isl-arbiter.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatelliteIslArbiter");
+NS_LOG_COMPONENT_DEFINE ("SatIslArbiter");
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (SatelliteIslArbiter);
+NS_OBJECT_ENSURE_REGISTERED (SatIslArbiter);
 
 TypeId
-SatelliteIslArbiter::GetTypeId (void)
+SatIslArbiter::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::SatelliteIslArbiter")
+  static TypeId tid = TypeId ("ns3::SatIslArbiter")
           .SetParent<Object> ()
   ;
   return tid;
 }
 
-SatelliteIslArbiter::SatelliteIslArbiter(Ptr<Node> node)
+SatIslArbiter::SatIslArbiter(Ptr<Node> node)
 {
   NS_LOG_FUNCTION (this << node);
 
@@ -61,8 +61,10 @@ SatelliteIslArbiter::SatelliteIslArbiter(Ptr<Node> node)
 }
 
 int32_t
-SatelliteIslArbiter::BaseDecide(Ptr<Packet> pkt, Mac48Address destination)
+SatIslArbiter::BaseDecide(Ptr<Packet> pkt, Mac48Address destination)
 {
+  NS_LOG_FUNCTION (this << pkt << destination);
+
   int32_t targetId = Singleton<SatIdMapper>::Get ()->GetSatIdWithMacIsl (destination);
 
   if (targetId == -1)

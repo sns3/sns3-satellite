@@ -262,6 +262,11 @@ public:
   void InstallIsls ();
 
   /**
+   * Set ISL routes
+   */
+  void SetIslRoutes ();
+
+  /**
    * \param beamId beam ID
    * \param satId satellite ID
    * \return the ID of the GW serving the specified beam, or zero if the ID is

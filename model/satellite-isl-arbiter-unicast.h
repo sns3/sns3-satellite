@@ -30,7 +30,7 @@
 
 namespace ns3 {
 
-class SatelliteIslArbiterUnicast : public SatelliteIslArbiter
+class SatIslArbiterUnicast : public SatIslArbiter
 {
 public:
   static TypeId GetTypeId (void);
@@ -40,7 +40,7 @@ public:
    * \param node The satellite node this unicast arbiter is attached
    * \param nextHop The next hop (interface ID) for each destination possible (satellite ID)
    */
-  SatelliteIslArbiterUnicast (Ptr<Node> node, std::map<uint32_t, uint32_t> nextHopMap);
+  SatIslArbiterUnicast (Ptr<Node> node, std::map<uint32_t, uint32_t> nextHopMap);
 
   /**
    * Decide how to forward. Implemented in subclasses

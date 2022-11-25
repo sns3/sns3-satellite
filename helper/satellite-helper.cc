@@ -819,6 +819,7 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
       if (m_satConstellationEnabled)
         {
           m_beamHelper->InstallIsls ();
+          m_beamHelper->SetIslRoutes ();
 
           SetGwAddressInUt ();
         }

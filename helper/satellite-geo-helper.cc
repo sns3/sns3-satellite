@@ -47,6 +47,7 @@
 #include "ns3/satellite-helper.h"
 #include "ns3/satellite-typedefs.h"
 #include "ns3/satellite-id-mapper.h"
+#include "ns3/satellite-isl-arbiter-unicast-helper.h"
 
 #include "ns3/satellite-geo-helper.h"
 
@@ -707,6 +708,15 @@ SatGeoHelper::EnableCreationTraces (Ptr<OutputStreamWrapper> stream, CallbackBas
   NS_LOG_FUNCTION (this);
 
   TraceConnect ("Creation", "SatGeoHelper",  cb);
+}
+
+void
+SatGeoHelper::SetIslRoutes (NodeContainer geoNodes, std::vector <std::pair <uint32_t, uint32_t>> isls)
+{
+  NS_LOG_FUNCTION (this);
+
+  Ptr<SatIslArbiterUnicastHelper> satIslArbiterHelper = CreateObject<SatIslArbiterUnicastHelper> (geoNodes, isls);
+  satIslArbiterHelper->InstallArbiters ();
 }
 
 } // namespace ns3

@@ -809,6 +809,14 @@ SatBeamHelper::InstallIsls ()
     }
 }
 
+void
+SatBeamHelper::SetIslRoutes ()
+{
+  NS_LOG_FUNCTION (this);
+
+  m_geoHelper->SetIslRoutes (m_geoNodes, m_isls);
+}
+
 uint32_t
 SatBeamHelper::GetGwId (uint32_t satId, uint32_t beamId) const
 {

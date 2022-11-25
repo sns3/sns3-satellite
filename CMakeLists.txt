@@ -192,6 +192,7 @@ set(source_files
     helper/satellite-group-helper.cc
     helper/satellite-gw-helper.cc
     helper/satellite-helper.cc
+    helper/satellite-isl-arbiter-unicast-helper.cc
     helper/satellite-lora-conf.cc
     helper/satellite-on-off-helper.cc
     helper/satellite-point-to-point-isl-helper.cc
@@ -433,6 +434,7 @@ set(header_files
     helper/satellite-group-helper.h
     helper/satellite-gw-helper.h
     helper/satellite-helper.h
+    helper/satellite-isl-arbiter-unicast-helper.h
     helper/satellite-lora-conf.h
     helper/satellite-on-off-helper.h
     helper/satellite-point-to-point-isl-helper.h

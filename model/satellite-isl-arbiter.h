@@ -34,7 +34,7 @@
 
 namespace ns3 {
 
-class SatelliteIslArbiter : public Object
+class SatIslArbiter : public Object
 {
 
 public:
@@ -44,7 +44,7 @@ public:
    * Constructor.
    * \param node The satellite node this arbiter is attached
    */
-  SatelliteIslArbiter (Ptr<Node> node);
+  SatIslArbiter (Ptr<Node> node);
 
   /**
    * Base decide how to forward
