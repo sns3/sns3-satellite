@@ -69,9 +69,10 @@ public:
 
   /**
    * Constructor with initialization parameters.
-   * \param filePathName
+   * \param filePathName Path of file to read antenna gain patterns
+   * \param defaultSatellitePosition Position of satellite associated to this pattern
    */
-  SatAntennaGainPattern (std::string filePathName);
+  SatAntennaGainPattern (std::string filePathName, GeoCoordinate defaultSatellitePosition);
   ~SatAntennaGainPattern ()
   {
   }
@@ -170,6 +171,16 @@ private:
    * Interval between longitudes, must be constant
    */
   double m_lonInterval;
+
+  /**
+   * Latitude of default satellite for antenna gain pattern
+   */
+  double m_latDefaultSatellite;
+
+  /**
+   * Longitude of default satellite for antenna gain pattern
+   */
+  double m_lonDefaultSatellite;
 
   /**
    * Valid Not-a-Number (NaN) strings

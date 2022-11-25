@@ -69,13 +69,15 @@ SatAntennaGainPattern::SatAntennaGainPattern ()
   m_maxLon (0.0),
   m_latInterval (0.0),
   m_lonInterval (0.0),
+  m_latDefaultSatellite (0.0),
+  m_lonDefaultSatellite (0.0),
   m_nanStrings (),
   m_satelliteMobility (nullptr)
 {
   // Do nothing here
 }
 
-SatAntennaGainPattern::SatAntennaGainPattern (std::string filePathName)
+SatAntennaGainPattern::SatAntennaGainPattern (std::string filePathName, GeoCoordinate defaultSatellitePosition)
   : m_nanStrings (m_nanStringArray, m_nanStringArray + (sizeof m_nanStringArray / sizeof m_nanStringArray[0])),
   m_satelliteMobility (nullptr)
 {
@@ -83,6 +85,9 @@ SatAntennaGainPattern::SatAntennaGainPattern (std::string filePathName)
   // - ConstructSelf call in constructor
   // - GetInstanceTypeId is needed to be implemented
   ObjectBase::ConstructSelf (AttributeConstructionList ());
+
+  m_latDefaultSatellite = defaultSatellitePosition.GetLatitude ();
+  m_lonDefaultSatellite = defaultSatellitePosition.GetLongitude ();
 
   ReadAntennaPatternFromFile (filePathName);
   m_uniformRandomVariable = CreateObject<UniformRandomVariable> ();
@@ -231,9 +236,8 @@ void SatAntennaGainPattern::GetSatelliteOffset (double& latOffset, double& lonOf
 
   GeoCoordinate satellite = m_satelliteMobility->GetGeoPosition ();
 
-  // TODO do not hardcode (0, 33) here (position of satellite in scenario72)
-  latOffset = 0 - satellite.GetLatitude ();
-  lonOffset = 33 - satellite.GetLongitude ();
+  latOffset = m_latDefaultSatellite - satellite.GetLatitude ();
+  lonOffset = m_lonDefaultSatellite - satellite.GetLongitude ();
 
   NS_LOG_DEBUG (this << " Satellite offset (moved from the beginning of the simulation): " << latOffset << " / " << lonOffset);
 }

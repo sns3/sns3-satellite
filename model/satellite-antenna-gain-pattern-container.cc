@@ -72,6 +72,8 @@ SatAntennaGainPatternContainer::SatAntennaGainPatternContainer (uint32_t nbSats)
   std::string dataPath {Singleton<SatEnvVariables>::Get ()->LocateDataDirectory ()};
   std::string patternsFolder = dataPath + "/antennapatterns/" + m_patternsFolder;
 
+  GeoCoordinate geoPos = GetDefaultGeoPosition ();
+
   NS_LOG_INFO (this << " directory for antenna patterns set to " << patternsFolder);
 
   if (!Singleton<SatEnvVariables>::Get ()->IsValidDirectory (patternsFolder))
@@ -127,7 +129,7 @@ SatAntennaGainPatternContainer::SatAntennaGainPatternContainer (uint32_t nbSats)
 
                 for (uint32_t satelliteId = 0; satelliteId < nbSats; satelliteId++)
                   {
-                    Ptr<SatAntennaGainPattern> gainPattern = CreateObject<SatAntennaGainPattern> (filePath);
+                    Ptr<SatAntennaGainPattern> gainPattern = CreateObject<SatAntennaGainPattern> (filePath, geoPos);
 
                     std::pair<std::map<std::pair<uint32_t, uint32_t>, Ptr<SatAntennaGainPattern> >::iterator, bool> ret;
                     ret = m_antennaPatternMap.insert (std::make_pair (std::make_pair (satelliteId, i), gainPattern));
@@ -152,6 +154,34 @@ SatAntennaGainPatternContainer::SatAntennaGainPatternContainer (uint32_t nbSats)
 SatAntennaGainPatternContainer::~SatAntennaGainPatternContainer ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+GeoCoordinate
+SatAntennaGainPatternContainer::GetDefaultGeoPosition ()
+{
+  NS_LOG_FUNCTION (this);
+
+  std::string dataPath {Singleton<SatEnvVariables>::Get ()->LocateDataDirectory ()};
+  std::string geoPosFilename = dataPath + "/antennapatterns/" + m_patternsFolder + "/GeoPos.in";
+
+  // READ FROM THE SPECIFIED INPUT FILE
+  std::ifstream *ifs = new std::ifstream (geoPosFilename, std::ifstream::in);
+
+  if (!ifs->is_open ())
+    {
+      NS_FATAL_ERROR ("The file " << geoPosFilename << " is not found.");
+    }
+
+  double lat, lon, alt;
+  *ifs >> lat >> lon >> alt;
+
+  // Store the values
+  GeoCoordinate coord (lat, lon, alt);
+
+  ifs->close ();
+  delete ifs;
+
+  return coord;
 }
 
 Ptr<SatAntennaGainPattern>
@@ -214,7 +244,7 @@ SatAntennaGainPatternContainer::GetNAntennaGainPatterns () const
 void
 SatAntennaGainPatternContainer::ConfigureBeamsMobility (uint32_t satelliteId, Ptr<SatMobilityModel> mobility)
 {
-  NS_LOG_FUNCTION (this << mobility);
+  NS_LOG_FUNCTION (this << satelliteId << mobility);
 
   Ptr<SatSGP4MobilityModel> sgp4Mobility = DynamicCast<SatSGP4MobilityModel> (mobility);
   if (sgp4Mobility != nullptr)

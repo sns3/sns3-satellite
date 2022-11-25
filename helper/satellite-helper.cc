@@ -797,7 +797,6 @@ SatHelper::DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
                 {
                   DynamicCast<SatGeoNetDevice> (m_beamHelper->GetGeoSatNodes ().Get (gwSatId)->GetDevice (0))->ConnectGw (Mac48Address::ConvertFrom (netDevices.first->GetAddress ()));
                 }
-              // m_userHelper->PopulateBeamRoutings (uts, netDevices.second, gwNode, netDevices.first);
             }
           else
             {

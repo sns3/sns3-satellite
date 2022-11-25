@@ -63,6 +63,12 @@ public:
   typedef std::map<std::pair<uint32_t, uint32_t>, SatBeamUserInfo > BeamUserInfoMap_t;
 
   /**
+   * \brief Load the default satellite position associated to these traces. Must be in GeoPos.in
+   * \return The satellite position
+   */
+  GeoCoordinate GetDefaultGeoPosition ();
+
+  /**
    * \brief Get the antenna pattern of a specified beam id
    * \param satelliteId Satellite identifier
    * \param beamId Beam identifier

@@ -824,8 +824,6 @@ SatGeoNetDevice::ReceiveFromIsl (Ptr<Packet> packet, Mac48Address destination)
 {
   NS_LOG_FUNCTION (this << packet << destination);
 
-  std::cout << "SatGeoNetDevice::ReceiveFromIsl " << packet << " " << destination << std::endl;
-
   if (m_gwConnected.count (destination))
     {
       SatUplinkInfoTag satUplinkInfoTag;
