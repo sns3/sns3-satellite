@@ -90,6 +90,8 @@ set(source_files
     model/satellite-interference-elimination.cc
     model/satellite-interference-input-trace-container.cc
     model/satellite-interference-output-trace-container.cc
+    model/satellite-isl-arbiter.cc
+    model/satellite-isl-arbiter-unicast.cc
     model/satellite-link-results.cc
     model/satellite-llc.cc
     model/satellite-log.cc
@@ -327,6 +329,8 @@ set(header_files
     model/satellite-interference.h
     model/satellite-interference-input-trace-container.h
     model/satellite-interference-output-trace-container.h
+    model/satellite-isl-arbiter.h
+    model/satellite-isl-arbiter-unicast.h
     model/satellite-link-results.h
     model/satellite-llc.h
     model/satellite-log.h

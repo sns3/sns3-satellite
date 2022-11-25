@@ -29,6 +29,7 @@
 #include <ns3/ipv4-l3-protocol.h>
 #include <ns3/channel.h>
 #include <ns3/uinteger.h>
+#include <ns3/singleton.h>
 
 #include "satellite-phy.h"
 #include "satellite-geo-feeder-phy.h"
@@ -43,6 +44,7 @@
 #include "satellite-time-tag.h"
 #include "satellite-uplink-info-tag.h"
 #include "satellite-ground-station-address-tag.h"
+#include "satellite-id-mapper.h"
 
 #include "satellite-geo-net-device.h"
 
@@ -757,6 +759,7 @@ SatGeoNetDevice::ConnectGw (Mac48Address gwAddress)
   NS_LOG_FUNCTION (this << gwAddress);
 
   m_gwConnected.insert (gwAddress);
+  Singleton<SatIdMapper>::Get ()->AttachMacToSatIdIsl (gwAddress, m_nodeId);
 }
 
 void
@@ -765,6 +768,7 @@ SatGeoNetDevice::DisconnectGw (Mac48Address gwAddress)
   NS_LOG_FUNCTION (this << gwAddress);
 
   m_gwConnected.erase (gwAddress);
+  Singleton<SatIdMapper>::Get ()->RemoveMacToSatIdIsl (gwAddress);
 }
 
 std::set <Mac48Address>
@@ -781,6 +785,7 @@ SatGeoNetDevice::ConnectUt (Mac48Address utAddress)
   NS_LOG_FUNCTION (this << utAddress);
 
   m_utConnected.insert (utAddress);
+  Singleton<SatIdMapper>::Get ()->AttachMacToSatIdIsl (utAddress, m_nodeId);
 }
 
 void
@@ -789,6 +794,7 @@ SatGeoNetDevice::DisconnectUt (Mac48Address utAddress)
   NS_LOG_FUNCTION (this << utAddress);
 
   m_utConnected.erase (utAddress);
+  Singleton<SatIdMapper>::Get ()->RemoveMacToSatIdIsl (utAddress);
 }
 
 std::set <Mac48Address>

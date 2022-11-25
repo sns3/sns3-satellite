@@ -26,6 +26,7 @@
 
 #include "satellite-net-device.h"
 #include "satellite-geo-net-device.h"
+
 #include "satellite-id-mapper.h"
 
 
@@ -141,7 +142,26 @@ SatIdMapper::Reset ()
     }
   m_gwUserIdIndex = 1;
 
+  // SAT ID maps
+
+  if (!m_macToSatIdIslMap.empty ())
+    {
+      m_macToSatIdIslMap.clear ();
+    }
+
   m_enableMapPrint = false;
+}
+
+void
+SatIdMapper::ShowIslMap ()
+{
+  std::cout << "SatIdMapper GW/UT MAC to satellite ID map" << std::endl;
+  std::map<Mac48Address, uint32_t>::iterator it;
+  for (it = m_macToSatIdIslMap.begin (); it != m_macToSatIdIslMap.end (); it++)
+    {
+      std::cout << it->first << " " << it->second << std::endl;
+    }
+  std::cout << std::endl;
 }
 
 // ATTACH TO MAPS
@@ -212,7 +232,7 @@ SatIdMapper::AttachMacToSatId (Address mac, uint32_t satId)
 
   if (resultMacToSatId.second == false)
     {
-      NS_FATAL_ERROR ("SatIdMapper::AttachMacToBeamId - MAC to sat ID failed");
+      NS_FATAL_ERROR ("SatIdMapper::AttachMacToSatId - MAC to sat ID failed");
     }
 
   NS_LOG_INFO ("Added MAC " << mac << " with sat ID " << satId);
@@ -280,6 +300,34 @@ SatIdMapper::AttachMacToGwUserId (Address mac)
 
   m_gwUserIdIndex++;
   return ret;
+}
+
+void
+SatIdMapper::AttachMacToSatIdIsl (Mac48Address mac, uint32_t satId)
+{
+  NS_LOG_FUNCTION (this << mac << satId);
+
+  std::pair < std::map<Mac48Address, uint32_t>::iterator, bool> resultMacToSatId = m_macToSatIdIslMap.insert (std::make_pair (mac, satId));
+
+  if (resultMacToSatId.second == false)
+    {
+      NS_FATAL_ERROR ("SatIdMapper::AttachMacToSatIdIsl - MAC to sat ID failed");
+    }
+
+  NS_LOG_INFO ("Added MAC " << mac << " with sat ISL ID " << satId);
+}
+
+void
+SatIdMapper::RemoveMacToSatIdIsl (Mac48Address mac)
+{
+  NS_LOG_FUNCTION (this << mac);
+
+  if (m_macToSatIdIslMap.erase (mac) == 0)
+    {
+      NS_FATAL_ERROR ("SatIdMapper::RemoveMacToSatIdIsl - MAC " << mac << " not in map");
+    }
+
+  NS_LOG_INFO ("Removed MAC " << mac << " from ISL IDs");
 }
 
 // ID GETTERS
@@ -397,6 +445,21 @@ SatIdMapper::GetGwUserIdWithMac (Address mac) const
   std::map<Address, uint32_t>::const_iterator iter = m_macToGwUserIdMap.find (mac);
 
   if (iter == m_macToGwUserIdMap.end ())
+    {
+      return -1;
+    }
+
+  return iter->second;
+}
+
+int32_t
+SatIdMapper::GetSatIdWithMacIsl (Mac48Address mac) const
+{
+  NS_LOG_FUNCTION (this);
+
+  std::map<Mac48Address, uint32_t>::const_iterator iter = m_macToSatIdIslMap.find (mac);
+
+  if (iter == m_macToSatIdIslMap.end ())
     {
       return -1;
     }

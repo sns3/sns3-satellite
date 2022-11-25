@@ -23,6 +23,7 @@
 #include <map>
 
 #include <ns3/object.h>
+#include <ns3/mac48-address.h>
 
 
 namespace ns3 {
@@ -30,6 +31,7 @@ namespace ns3 {
 
 class Node;
 class Address;
+class Mac48Address;
 
 /**
  * \ingroup satellite
@@ -126,6 +128,19 @@ public:
    */
   uint32_t AttachMacToGwUserId (Address mac);
 
+  /**
+   * \brief Attach GW/UT MAC address to the satellite this node is connected
+   * \param mac MAC address
+   * \param satId The satellite ID this MAC is connected to
+   */
+  void AttachMacToSatIdIsl (Mac48Address mac, uint32_t satId);
+
+  /**
+   * \brief Remove GW/UT MAC address to the satellite this node is connected
+   * \param mac MAC address
+   */
+  void RemoveMacToSatIdIsl (Mac48Address mac);
+
   /* ID GETTERS */
 
   /**
@@ -184,6 +199,13 @@ public:
    */
   int32_t GetGwUserIdWithMac (Address mac) const;
 
+  /**
+   * \brief Function for getting the satellite ID connected to a GW/UT MAC address
+   * \param mac MAC address
+   * \return satellite ID
+   */
+  int32_t GetSatIdWithMacIsl (Mac48Address mac) const;
+
   /* NODE GETTERS */
 
   /**
@@ -232,6 +254,11 @@ public:
    * \brief Function for resetting the variables
    */
   void Reset ();
+
+  /**
+   * \brief Print the map GW/UT address to satellite ID
+   */
+  void ShowIslMap ();
 
   /**
    * \brief Function for enabling the map prints
@@ -306,6 +333,11 @@ private:
    * \brief Is map printing enabled or not
    */
   bool m_enableMapPrint;
+
+  /**
+   * \brief Map for GW/UT MAC to associated SAT ID conversion
+   */
+  std::map <Mac48Address, uint32_t> m_macToSatIdIslMap;
 };
 
 } // namespace ns3
