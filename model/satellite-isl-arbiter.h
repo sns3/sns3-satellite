@@ -41,6 +41,11 @@ public:
   static TypeId GetTypeId (void);
 
   /**
+   * Default constructor.
+   */
+  SatIslArbiter ();
+
+  /**
    * Constructor.
    * \param node The satellite node this arbiter is attached
    */
@@ -76,7 +81,6 @@ public:
 
 protected:
   uint32_t m_nodeId;                          // ID of node where this arbiter is installed.
-  Ptr<SatGeoNetDevice> m_satGeoNetDevice;     // SatGeoNetDevice layer of the node this arbiter is intalled.
 };
 
 }

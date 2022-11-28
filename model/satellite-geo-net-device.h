@@ -31,16 +31,18 @@
 #include <ns3/mac48-address.h>
 #include <ns3/traced-callback.h>
 
-#include "satellite-phy.h"
-#include "satellite-mac.h"
-#include "satellite-channel.h"
-#include "satellite-signal-parameters.h"
-#include "satellite-point-to-point-isl-net-device.h"
+#include <ns3/satellite-phy.h>
+#include <ns3/satellite-mac.h>
+#include <ns3/satellite-channel.h>
+#include <ns3/satellite-signal-parameters.h>
+#include <ns3/satellite-point-to-point-isl-net-device.h>
+#include <ns3/satellite-isl-arbiter.h>
 
 
 namespace ns3 {
 
 class PointToPointIslNetDevice;
+class SatIslArbiter;
 
 /**
  * \ingroup satellite
@@ -267,6 +269,18 @@ public:
   void AddIslsNetDevice (Ptr<PointToPointIslNetDevice> islNetDevices);
 
   /**
+   * Get all the ISL Net devices
+   * \return Vector of all ISL Net Devices
+   */
+  std::vector<Ptr<PointToPointIslNetDevice>> GetIslsNetDevices ();
+
+  /**
+   * Set the arbiter for ISL routing
+   * \param arbiter The arbiter to set
+   */
+  void SetArbiter (Ptr<SatIslArbiter> arbiter);
+
+  /**
    * Send a packet to ISL.
    * \param packet The packet to send
    * \param destination The MAC address of ground station that will receive the packet
@@ -350,12 +364,20 @@ private:
    */
   std::set <Mac48Address> m_gwConnected;
 
-  std::vector<Ptr<PointToPointIslNetDevice>> m_islNetDevices;
-
   /**
    * Set containing all connected UTs
    */
   std::set <Mac48Address> m_utConnected;
+
+  /**
+   * List of ISLs starting from this node
+   */
+  std::vector<Ptr<PointToPointIslNetDevice>> m_islNetDevices;
+
+  /**
+   * Arbiter used to route on ISLs
+   */
+  Ptr<SatIslArbiter> m_arbiter;
 
   TracedCallback<Time,
                  SatEnums::SatPacketEvent_t,

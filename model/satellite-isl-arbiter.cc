@@ -41,23 +41,18 @@ SatIslArbiter::GetTypeId (void)
   return tid;
 }
 
+SatIslArbiter::SatIslArbiter()
+{
+  NS_LOG_FUNCTION (this);
+
+  NS_FATAL_ERROR ("Default constructor not in use");
+}
+
 SatIslArbiter::SatIslArbiter(Ptr<Node> node)
 {
   NS_LOG_FUNCTION (this << node);
 
   m_nodeId = node->GetId ();
-  m_satGeoNetDevice = nullptr;
-
-  for (uint32_t i = 0; i < node->GetNDevices (); i++)
-    {
-      Ptr<SatGeoNetDevice> nd = DynamicCast<SatGeoNetDevice> (node->GetDevice (i));
-      if (nd)
-        {
-          NS_ASSERT_MSG (m_satGeoNetDevice != nullptr, "Satellite node must not have more than one SatGeoNetDevice");
-          m_satGeoNetDevice = nd;
-        }
-    }
-  NS_ASSERT_MSG (m_satGeoNetDevice == nullptr, "Satellite node must not have one SatGeoNetDevice");
 }
 
 int32_t
@@ -72,7 +67,7 @@ SatIslArbiter::BaseDecide(Ptr<Packet> pkt, Mac48Address destination)
       NS_FATAL_ERROR ("Cannot resolve target node ID");
     }
 
-  return Decide(m_nodeId, targetId, pkt);
+  return Decide (m_nodeId, targetId, pkt);
 }
 
 } // namespace ns3

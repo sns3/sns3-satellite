@@ -101,6 +101,7 @@ main (int argc, char *argv[])
   Ptr<SatHelper> helper = simulationHelper->CreateSatScenario ();
 
   helper->PrintTopology (std::cout);
+  Singleton<SatIdMapper>::Get ()->ShowIslMap ();
 
   Config::SetDefault ("ns3::CbrApplication::Interval", StringValue (interval));
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize) );

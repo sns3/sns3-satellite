@@ -59,9 +59,42 @@ SatIslArbiterUnicastHelper::InstallArbiters ()
 {
   NS_LOG_FUNCTION (this);
 
-  // std::vector<std::map<uint32_t, uint32_t>> globalState = CalculateGlobalState ();
+  std::vector<std::map<uint32_t, uint32_t>> globalState = CalculateGlobalState ();
 
-  // TODO
+  for (uint32_t satIndex = 0; satIndex < globalState.size (); satIndex++)
+    {
+      Ptr<Node> satelliteNode = m_geoNodes.Get (satIndex);
+      Ptr<SatGeoNetDevice> satelliteGeoNetDevice;
+      for (uint32_t ndIndex = 0; ndIndex < satelliteNode->GetNDevices (); ndIndex++)
+        {
+          Ptr<SatGeoNetDevice> nd = DynamicCast<SatGeoNetDevice> (satelliteNode->GetDevice (ndIndex));
+          if (nd != nullptr)
+            {
+              satelliteGeoNetDevice = nd;
+            }
+        }
+
+      NS_ASSERT_MSG (satelliteGeoNetDevice != nullptr, "SatGeoNetDevice not found on satellite");
+
+      std::vector<Ptr<PointToPointIslNetDevice>> islNetDevices = satelliteGeoNetDevice->GetIslsNetDevices ();
+      Ptr<SatIslArbiterUnicast> arbiter = CreateObject <SatIslArbiterUnicast> (satelliteNode);
+
+      for (uint32_t islInterfaceIndex = 0; islInterfaceIndex < islNetDevices.size (); islInterfaceIndex++)
+        {
+          uint32_t interfaceNextHopNodeId = islNetDevices[islInterfaceIndex]->GetDestinationNode ()->GetId ();
+          for (std::map<uint32_t, uint32_t>::iterator it = globalState[satIndex].begin (); it != globalState[satIndex].end (); it++)
+            {
+              uint32_t destinationNodeId = it->first;
+              uint32_t nextHopNodeId = it->second;
+
+              if (interfaceNextHopNodeId == nextHopNodeId)
+                {
+                  arbiter->AddNextHopEntry (destinationNodeId, islInterfaceIndex);
+                }
+            }
+        }
+      satelliteGeoNetDevice->SetArbiter (arbiter);
+    }
 }
 
 void
@@ -176,11 +209,14 @@ SatIslArbiterUnicastHelper::CalculateGlobalState ()
   std::vector<std::map<uint32_t, uint32_t>> returnList;
   for (uint32_t i = 0; i < globalCandidateList.size (); i++)
     {
-      returnList[i] = std::map<uint32_t, uint32_t> ();
+      returnList.push_back (std::map<uint32_t, uint32_t> ());
       std::vector<std::vector<uint32_t>> v = globalCandidateList[i];
       for (uint32_t j = 0; j < v.size (); j++)
         {
-          returnList[i][j] = v[j][0]; // TODO for ECMP, keep all values in v[j]
+          if (v[j].size () > 0)
+            {
+              returnList[i].insert (std::make_pair (j, v[j][0])); // TODO for ECMP, keep all values in v[j]
+            }
         }
     }
 

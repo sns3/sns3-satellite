@@ -184,7 +184,7 @@ SatGeoNetDevice::ReceivePacketUser (Ptr<Packet> packet, const Address& userAddre
     }
   Mac48Address destination = groundStationAddressTag.GetGroundStationAddress ();
 
-  if (m_gwConnected.count (destination) || destination.IsBroadcast ()) // TODO or broadcast
+  if (m_gwConnected.count (destination) || destination.IsBroadcast ()) // TODO improve this
     {
       SatUplinkInfoTag satUplinkInfoTag;
       if (!packet->PeekPacketTag (satUplinkInfoTag))
@@ -813,15 +813,42 @@ SatGeoNetDevice::AddIslsNetDevice (Ptr<PointToPointIslNetDevice> islNetDevices)
   m_islNetDevices.push_back (islNetDevices);
 }
 
+std::vector<Ptr<PointToPointIslNetDevice>>
+SatGeoNetDevice::GetIslsNetDevices ()
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_islNetDevices;
+}
+
+void
+SatGeoNetDevice::SetArbiter (Ptr<SatIslArbiter> arbiter)
+{
+  NS_LOG_FUNCTION (this << arbiter);
+
+  m_arbiter = arbiter;
+}
+
 void
 SatGeoNetDevice::SendToIsl (Ptr<Packet> packet, Mac48Address destination)
 {
   NS_LOG_FUNCTION (this << packet << destination);
 
-  // TODO temporary right now
-  if (m_islNetDevices.size () > 0)
+  NS_ASSERT_MSG (m_arbiter != nullptr, "Arbiter not set");
+
+  int32_t islInterfaceIndex = m_arbiter->BaseDecide(packet, destination);
+
+  if (islInterfaceIndex < 0)
     {
-      m_islNetDevices[0]->Send (packet, Address (), 0x0800);
+      NS_LOG_INFO ("Cannot route packet form node " << m_nodeId << " to " << destination);
+    }
+  else if (uint32_t (islInterfaceIndex) >= m_islNetDevices.size ())
+    {
+      NS_FATAL_ERROR ("Incorrect interface index from arbiter: " << islInterfaceIndex << ". Max is " << m_islNetDevices.size () - 1);
+    }
+  else
+    {
+      m_islNetDevices[islInterfaceIndex]->Send (packet, Address (), 0x0800);
     }
 }
 
@@ -864,7 +891,7 @@ SatGeoNetDevice::ReceiveFromIsl (Ptr<Packet> packet, Mac48Address destination)
     }
   else
     {
-      // SendToIsl (packet, destination);
+      SendToIsl (packet, destination);
     }
 }
 

@@ -34,8 +34,23 @@ SatIslArbiterUnicast::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatIslArbiterUnicast")
           .SetParent<SatIslArbiter> ()
+          .AddConstructor<SatIslArbiterUnicast> ()
   ;
   return tid;
+}
+
+SatIslArbiterUnicast::SatIslArbiterUnicast()
+ : SatIslArbiter ()
+{
+  NS_LOG_FUNCTION (this);
+
+  NS_FATAL_ERROR ("Default constructor not in use");
+}
+
+SatIslArbiterUnicast::SatIslArbiterUnicast(Ptr<Node> node)
+ : SatIslArbiter (node)
+{
+  NS_LOG_FUNCTION (this << node);
 }
 
 SatIslArbiterUnicast::SatIslArbiterUnicast(Ptr<Node> node, std::map<uint32_t, uint32_t> nextHopMap)
@@ -94,6 +109,14 @@ SatIslArbiterUnicast::StringReprOfForwardingState ()
     }
 
   return res.str();
+}
+
+void
+SatIslArbiterUnicast::AddNextHopEntry (uint32_t destinationId, uint32_t netDeviceIndex)
+{
+  NS_LOG_FUNCTION (this << destinationId << netDeviceIndex);
+
+  m_nextHopMap.insert (std::make_pair (destinationId, netDeviceIndex));
 }
 
 }
