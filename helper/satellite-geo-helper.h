@@ -316,22 +316,27 @@ private:
    */
   RandomAccessSettings_s m_raSettings;
 
-  /*
+  /**
    * Forward channel link results (DVB-S2) are created if ErrorModel
    * is configured to be AVI.
    */
   Ptr<SatLinkResults> m_fwdLinkResults;
 
-  /*
+  /**
    * Return channel link results (DVB-RCS2) are created if ErrorModel
    * is configured to be AVI.
    */
   Ptr<SatLinkResults> m_rtnLinkResults;
 
-  /*
+  /**
    * Map used in regenerative mode to store if MAC already created for a given pair SAT ID / GW ID
    */
   std::map<std::pair<uint32_t, uint32_t>, Ptr<SatGeoFeederMac>> m_gwMacMap;
+
+  /**
+   * Arbiter in use to route packets on ISLs
+   */
+  SatEnums::IslArbiterType_t m_islArbiterType;
 
   /**
    * Control forward link messages callback

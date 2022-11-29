@@ -35,9 +35,15 @@ namespace ns3 {
 class NetDevice;
 class Node;
 
-class PointToPointIslHelper
+class PointToPointIslHelper : public Object
 {
 public:
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
+  static TypeId GetTypeId (void);
 
   // Constructors
   PointToPointIslHelper ();

@@ -103,6 +103,12 @@ SatGeoHelper::GetTypeId (void)
                    DoubleValue (0.0),
                    MakeDoubleAccessor (&SatGeoHelper::m_rtnDaConstantErrorRate),
                    MakeDoubleChecker<double> ())
+    .AddAttribute ("IslArbiterType",
+                   "Arbiter in use to route packets on ISLs",
+                   EnumValue (SatEnums::UNICAST),
+                   MakeEnumAccessor (&SatGeoHelper::m_islArbiterType),
+                   MakeEnumChecker (SatEnums::UNICAST, "Unicast",
+                                    SatEnums::ECMP, "ECMP"))
     .AddTraceSource ("Creation", "Creation traces",
                      MakeTraceSourceAccessor (&SatGeoHelper::m_creationTrace),
                      "ns3::SatTypedefs::CreationCallback")
@@ -130,6 +136,7 @@ SatGeoHelper::SatGeoHelper ()
   m_raSettings (),
   m_fwdLinkResults (),
   m_rtnLinkResults (),
+  m_islArbiterType (SatEnums::UNICAST),
   m_fwdReadCtrlCb (),
   m_rtnReadCtrlCb ()
 {
@@ -715,8 +722,23 @@ SatGeoHelper::SetIslRoutes (NodeContainer geoNodes, std::vector <std::pair <uint
 {
   NS_LOG_FUNCTION (this);
 
-  Ptr<SatIslArbiterUnicastHelper> satIslArbiterHelper = CreateObject<SatIslArbiterUnicastHelper> (geoNodes, isls);
-  satIslArbiterHelper->InstallArbiters ();
+  switch (m_islArbiterType)
+    {
+      case SatEnums::UNICAST:
+        {
+          Ptr<SatIslArbiterUnicastHelper> satIslArbiterHelper = CreateObject<SatIslArbiterUnicastHelper> (geoNodes, isls);
+          satIslArbiterHelper->InstallArbiters ();
+          break;
+        }
+      case SatEnums::ECMP:
+        {
+           NS_FATAL_ERROR ("ISL Arbiter ECMP not implemented yet");
+        }
+      default:
+        {
+          NS_FATAL_ERROR ("Unknown ISL arbiter");
+        }
+    }
 }
 
 } // namespace ns3

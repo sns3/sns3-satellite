@@ -34,9 +34,21 @@
 
 #include "ns3/satellite-point-to-point-isl-helper.h"
 
+NS_LOG_COMPONENT_DEFINE ("PointToPointIslHelper");
+
 namespace ns3 {
 
-NS_LOG_COMPONENT_DEFINE ("PointToPointIslHelper");
+NS_OBJECT_ENSURE_REGISTERED (PointToPointIslHelper);
+
+TypeId
+PointToPointIslHelper::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::PointToPointIslHelper")
+    .SetParent<Object> ()
+    .AddConstructor<PointToPointIslHelper> ()
+  ;
+  return tid;
+}
 
 PointToPointIslHelper::PointToPointIslHelper ()
 {

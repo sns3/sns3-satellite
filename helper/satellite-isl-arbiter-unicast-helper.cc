@@ -102,17 +102,13 @@ SatIslArbiterUnicastHelper::UpdateArbiters ()
 {
   NS_LOG_FUNCTION (this);
 
-  // std::vector<std::map<uint32_t, uint32_t>> globalState = CalculateGlobalState ();
-
-  // TODO
+  this->InstallArbiters ();
 }
 
 std::vector<std::map<uint32_t, uint32_t>>
 SatIslArbiterUnicastHelper::CalculateGlobalState ()
 {
   NS_LOG_FUNCTION (this);
-
-  // TODO
 
   // Final result
   std::vector<std::vector<std::vector<uint32_t>>> globalCandidateList;

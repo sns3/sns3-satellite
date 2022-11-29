@@ -97,6 +97,16 @@ public:
   } RegenerationMode_t;
 
   /**
+   * \enum IslArbiterType_t
+   * \brief Choose the arbiter to use to route packets on ISLs
+   */
+  typedef enum
+  {
+    UNICAST,              // Only one route for a pair source satellite / destination satellite, using shortest path (in hops)
+    ECMP,                 // Get all routes possible with minimum hops. For each incoming packet, the route is randomly selected among all available
+  } IslArbiterType_t;
+
+  /**
    * \enum Standard_t
    * \brief The global standard used. Can be either DVB or Lora
    */
