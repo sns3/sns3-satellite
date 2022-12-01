@@ -212,7 +212,7 @@ SatGroupHelper::CreateUtNodesFromPosition (uint32_t groupId, uint32_t nb, GeoCoo
   for (uint32_t i = 0; i < nb; i++)
     {
       GeoCoordinate position = circleAllocator->GetNextGeoPosition ();
-      uint32_t bestBeamId = m_antennaGainPatterns->GetBestBeamId (0, position);
+      uint32_t bestBeamId = m_antennaGainPatterns->GetBestBeamId (0, position, false);
       m_additionalNodesPerBeam[bestBeamId].push_back (std::make_pair(position, groupId));
     }
 

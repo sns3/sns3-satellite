@@ -78,6 +78,11 @@ SatGwMac::GetTypeId (void)
                    TimeValue (MilliSeconds (550)),
                    MakeTimeAccessor (&SatGwMac::m_cmtPeriodMin),
                    MakeTimeChecker ())
+    .AddAttribute ("SendNcrBroadcast",
+                   "Broadcast NCR messages to all UTs",
+                   BooleanValue (true),
+                   MakeBooleanAccessor (&SatGwMac::m_broadcastNcr),
+                   MakeBooleanChecker ())
     .AddTraceSource ("BBFrameTxTrace",
                      "Trace for transmitted BB Frames.",
                      MakeTraceSourceAccessor (&SatGwMac::m_bbFrameTxTrace),
@@ -101,7 +106,8 @@ SatGwMac::SatGwMac ()
   m_ncrInterval (MilliSeconds (100)),
   m_useCmt (false),
   m_lastCmtSent (),
-  m_cmtPeriodMin (MilliSeconds (550))
+  m_cmtPeriodMin (MilliSeconds (550)),
+  m_broadcastNcr (true)
 {
   NS_LOG_FUNCTION (this);
 
@@ -118,7 +124,8 @@ SatGwMac::SatGwMac (uint32_t satId,
   m_ncrInterval (MilliSeconds (100)),
   m_useCmt (false),
   m_lastCmtSent (),
-  m_cmtPeriodMin (MilliSeconds (550))
+  m_cmtPeriodMin (MilliSeconds (550)),
+  m_broadcastNcr (true)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -161,7 +168,10 @@ SatGwMac::StartPeriodicTransmissions ()
    */
   Simulator::Schedule (Seconds (0), &SatGwMac::StartTransmission, this, 0);
 
-  Simulator::Schedule (MilliSeconds (50), &SatGwMac::StartNcrTransmission, this);
+  if (m_broadcastNcr)
+    {
+      Simulator::Schedule (MilliSeconds (50), &SatGwMac::StartNcrTransmission, this);
+    }
 }
 
 void

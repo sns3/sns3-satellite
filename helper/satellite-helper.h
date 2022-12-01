@@ -486,6 +486,11 @@ private:
   std::map <Ptr<Node>, Ptr<Node>> m_gwDistribution;
 
   /**
+   * Map indicating all UT NetDevices associated to each GW NetDevice
+   */
+  std::map <Ptr<NetDevice>, NetDeviceContainer> m_utsDistribution;
+
+  /**
    * Enables creation traces to be written in given file
    */
   void EnableCreationTraces ();

@@ -38,25 +38,8 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("sat-constellation-example");
 
-int
-main (int argc, char *argv[])
+int mainGeoTwoSats (uint32_t packetSize, std::string interval, std::string configurationFolder, std::string startDate, Ptr<SimulationHelper> simulationHelper)
 {
-  uint32_t packetSize = 512;
-  std::string interval = "10ms";
-  std::string configurationFolder = "eutelsat-geo-2-sats-isls";
-  std::string startDate = "2022-11-13 12:00:00";
-
-  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("example-constellation");
-
-  // read command line parameters given by user
-  CommandLine cmd;
-  cmd.AddValue ("packetSize", "Size of constant packet (bytes)", packetSize);
-  cmd.AddValue ("interval", "Interval to sent packets in seconds (e.g. (1s))", interval);
-  cmd.AddValue ("configurationFolder", "Satellite constellation configuration folder (e.g. eutelsat-geo-2-sats-isls)", configurationFolder);
-  cmd.AddValue ("startDate", "Simulation start date (e.g. 2022-11-13 12:00:00)", startDate);
-  simulationHelper->AddDefaultUiArguments (cmd);
-  cmd.Parse (argc, argv);
-
   /// Set regeneration mode
   Config::SetDefault ("ns3::SatConf::ForwardLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_NETWORK));
   Config::SetDefault ("ns3::SatConf::ReturnLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_NETWORK));
@@ -106,12 +89,16 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::CbrApplication::Interval", StringValue (interval));
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize) );
 
+  Time startTime = Seconds (1.0);
+  Time stopTime = Seconds (29.0);
+  Time startDelay = Seconds (0.0);
+
   simulationHelper->InstallTrafficModel (
     SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
-    Seconds (1.0), Seconds (29.0));
+    startTime, stopTime);
   simulationHelper->InstallTrafficModel (
     SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
-    Seconds (1.0), Seconds (29.0));
+    startTime, stopTime);
 
   NS_LOG_INFO ("--- sat-constellation-example ---");
   NS_LOG_INFO ("  PacketSize: " << packetSize);
@@ -231,4 +218,179 @@ main (int argc, char *argv[])
   simulationHelper->RunSimulation ();
 
   return 0;
+}
+
+int mainLeo (uint32_t packetSize, std::string interval, std::string configurationFolder, std::string startDate, Ptr<SimulationHelper> simulationHelper)
+{
+  /// Set regeneration mode
+  Config::SetDefault ("ns3::SatConf::ForwardLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_NETWORK));
+  Config::SetDefault ("ns3::SatConf::ReturnLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_NETWORK));
+  Config::SetDefault ("ns3::SatGeoFeederPhy::QueueSize", UintegerValue (100000));
+  Config::SetDefault ("ns3::SatGeoUserPhy::QueueSize", UintegerValue (100000));
+
+  /// Use constellation
+  Config::SetDefault ("ns3::SatHelper::SatConstellationEnabled", BooleanValue (true));
+  Config::SetDefault ("ns3::SatHelper::SatConstellationFolder", StringValue (configurationFolder));
+  Config::SetDefault ("ns3::SatSGP4MobilityModel::StartDateStr", StringValue (startDate));
+  Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionEachRequest", BooleanValue (false));
+  Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionPeriod", TimeValue (Seconds (1)));
+
+  /// Use constellation with correctly centered beams (used for testing)
+  Config::SetDefault ("ns3::SatAntennaGainPatternContainer::PatternsFolder", StringValue ("SatAntennaGain72BeamsShifted"));
+
+  /// Optimize simulation time
+  // Config::SetDefault ("ns3::SatGwMac::SendNcrBroadcast", BooleanValue (false));
+  Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionEachRequest", BooleanValue (false));
+  Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionPeriod", TimeValue (Seconds (1)));
+
+  /// When using 72 beams, we need a 72*nbSats network addresses for beams, so we take margin
+  Config::SetDefault ("ns3::SatHelper::BeamNetworkAddress", Ipv4AddressValue ("20.1.0.0"));
+  Config::SetDefault ("ns3::SatHelper::GwNetworkAddress", Ipv4AddressValue ("10.1.0.0"));
+  Config::SetDefault ("ns3::SatHelper::UtNetworkAddress", Ipv4AddressValue ("250.1.0.0"));
+
+  /// Enable ACM
+  Config::SetDefault ("ns3::SatBbFrameConf::AcmEnabled", BooleanValue (true));
+
+  /// Set simulation output details
+  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+
+  /// Enable packet trace
+  Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
+
+  simulationHelper->SetSimulationTime (Seconds (30));
+
+  std::set<uint32_t> beamSetAll = {1, 2, 3, 4, 5, 6, 7, 8, 9,
+                                   10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+                                   20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+                                   30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
+                                   40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
+                                   50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
+                                   60, 61, 62, 63, 64, 65, 66, 67, 68, 69,
+                                   70, 71, 72};
+
+  std::set<uint32_t> beamSetTelesat = {1, 43, 60, 64};
+
+  // Set beam ID
+  if (configurationFolder == "telesat-351-sats")
+    {
+      simulationHelper->SetBeamSet (beamSetTelesat);
+    }
+  else
+    {
+      simulationHelper->SetBeamSet (beamSetAll);
+    }
+  simulationHelper->SetUserCountPerUt (5);
+
+  LogComponentEnable ("sat-constellation-example", LOG_LEVEL_INFO);
+
+  Ptr<SatHelper> helper = simulationHelper->CreateSatScenario ();
+
+  helper->PrintTopology (std::cout);
+  Singleton<SatIdMapper>::Get ()->ShowIslMap ();
+
+  Config::SetDefault ("ns3::CbrApplication::Interval", StringValue (interval));
+  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize) );
+
+  Time startTime = Seconds (1.0);
+  Time stopTime = Seconds (29.0);
+  Time startDelay = Seconds (0.0);
+
+  /*simulationHelper->InstallTrafficModel (
+    SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
+    startTime, stopTime);
+  simulationHelper->InstallTrafficModel (
+    SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
+    startTime, stopTime);*/
+
+  NodeContainer gws = helper->GwNodes ();
+  NodeContainer uts = helper->UtNodes ();
+  NodeContainer gwUsers = helper->GetGwUsers ();
+  NodeContainer utUsers = NodeContainer (helper->GetUtUsers (uts).Get (10));
+
+  Ptr<SatTrafficHelper> trafficHelper = simulationHelper->GetTrafficHelper ();
+
+  trafficHelper->AddCbrTraffic (SatTrafficHelper::FWD_LINK,
+                                interval,
+                                packetSize,
+                                gwUsers,
+                                utUsers,
+                                startTime,
+                                stopTime,
+                                startDelay);
+
+  trafficHelper->AddCbrTraffic (SatTrafficHelper::RTN_LINK,
+                                interval,
+                                packetSize,
+                                gwUsers,
+                                utUsers,
+                                startTime,
+                                stopTime,
+                                startDelay);
+
+  NS_LOG_INFO ("--- sat-constellation-example ---");
+  NS_LOG_INFO ("  PacketSize: " << packetSize);
+  NS_LOG_INFO ("  Interval: " << interval);
+  NS_LOG_INFO ("  ");
+
+  // To store attributes to file
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("output-attributes.xml"));
+  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
+  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
+  ConfigStore outputConfig;
+  outputConfig.ConfigureDefaults ();
+
+  Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer ();
+
+  // Throughput statistics
+  s->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerGwFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerGwRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerSatRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerBeamFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  simulationHelper->EnableProgressLogs ();
+  simulationHelper->RunSimulation ();
+
+  return 0;
+}
+
+int
+main (int argc, char *argv[])
+{
+  uint32_t packetSize = 512;
+  std::string interval = "10ms";
+  std::string configurationFolder = "eutelsat-geo-2-sats-isls";
+  std::string startDate = "2022-11-13 12:00:00";
+
+  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("example-constellation");
+
+  // read command line parameters given by user
+  CommandLine cmd;
+  cmd.AddValue ("packetSize", "Size of constant packet (bytes)", packetSize);
+  cmd.AddValue ("interval", "Interval to sent packets in seconds (e.g. (1s))", interval);
+  cmd.AddValue ("configurationFolder", "Satellite constellation configuration folder (e.g. eutelsat-geo-2-sats-isls)", configurationFolder);
+  cmd.AddValue ("startDate", "Simulation start date (e.g. 2022-11-13 12:00:00)", startDate);
+  simulationHelper->AddDefaultUiArguments (cmd);
+  cmd.Parse (argc, argv);
+
+  // TODO find better way to handle this
+  std::replace( startDate.begin(), startDate.end(), ',', ' ');
+
+  if (configurationFolder == "eutelsat-geo-2-sats-isls" || configurationFolder == "eutelsat-geo-2-sats-no-isls")
+    {
+      mainGeoTwoSats (packetSize, interval, configurationFolder, startDate, simulationHelper);
+    }
+  else if (configurationFolder == "starlink-1584-sats" || configurationFolder == "kuiper-1156-sats" || configurationFolder == "telesat-351-sats" || configurationFolder == "iridium-next-66-sats")
+    {
+      mainLeo (packetSize, interval, configurationFolder, startDate, simulationHelper);
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Unknown constellation: " << configurationFolder);
+    }
 }

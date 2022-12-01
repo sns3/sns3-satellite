@@ -139,7 +139,7 @@ SatTracedMobilityModel::UpdateGeoPositionFromFile (void)
 uint32_t
 SatTracedMobilityModel::GetBestBeamId (void) const
 {
-  return m_antennaGainPatterns->GetBestBeamId (m_satId, m_geoPosition);
+  return m_antennaGainPatterns->GetBestBeamId (m_satId, m_geoPosition, false);
 }
 
 }

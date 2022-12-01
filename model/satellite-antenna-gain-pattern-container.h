@@ -93,9 +93,10 @@ public:
    * specified geo coordinate
    * \param satelliteId ID of satellite to search
    * \param coord Geo coordinate
+   * \param ignoreNan Do not crash if a NaN value is returned
    * \return best beam id in the specified geo coordinate
    */
-  uint32_t GetBestBeamId (uint32_t satelliteId, GeoCoordinate coord);
+  uint32_t GetBestBeamId (uint32_t satelliteId, GeoCoordinate coord, bool ignoreNan);
 
   void ConfigureBeamsMobility (uint32_t satelliteId, Ptr<SatMobilityModel> mobility);
 

@@ -209,9 +209,9 @@ SatAntennaGainPatternContainer::GetAntennaMobility (uint32_t satelliteId) const
 }
 
 uint32_t
-SatAntennaGainPatternContainer::GetBestBeamId (uint32_t satelliteId, GeoCoordinate coord)
+SatAntennaGainPatternContainer::GetBestBeamId (uint32_t satelliteId, GeoCoordinate coord, bool ignoreNan)
 {
-  NS_LOG_FUNCTION (this << coord.GetLatitude () << coord.GetLongitude ());
+  NS_LOG_FUNCTION (this << satelliteId << coord.GetLatitude () << coord.GetLongitude ());
 
   double bestGain (-100.0);
   uint32_t bestId (0);
@@ -227,13 +227,26 @@ SatAntennaGainPatternContainer::GetBestBeamId (uint32_t satelliteId, GeoCoordina
       // that this position is not valid. Return 0, which is not a valid beam id.
       if (std::isnan (gain))
         {
-          NS_FATAL_ERROR ("SatAntennaGainPatternContainer::GetBestBeamId - Beam " << i << " returned a NAN antenna gain value!");
+          if (ignoreNan)
+            {
+              NS_LOG_WARN ("SatAntennaGainPatternContainer::GetBestBeamId - Beam " << i << " returned a NAN antenna gain value!");
+            }
+          else
+            {
+              NS_FATAL_ERROR ("SatAntennaGainPatternContainer::GetBestBeamId - Beam " << i << " returned a NAN antenna gain value!");
+            }
         }
       else if (gain > bestGain)
         {
           bestGain = gain;
           bestId = i;
         }
+    }
+
+  if (bestId == 0 && ignoreNan)
+    {
+      NS_LOG_WARN ("SatAntennaGainPatternContainer::GetBestBeamId - did not find any good beam! The ground station is probably too far from the satellite. Return 1 by default.");
+      bestId = 1;
     }
 
   return bestId;

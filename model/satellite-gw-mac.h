@@ -280,6 +280,11 @@ private:
   Time m_cmtPeriodMin;
 
   /**
+   * Broadcast NCR messages to all UTs
+   */
+  bool m_broadcastNcr;
+
+  /**
    * Trace for transmitted BB frames.
    */
   TracedCallback<Ptr<SatBbFrame>> m_bbFrameTxTrace;

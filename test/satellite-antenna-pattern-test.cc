@@ -104,7 +104,7 @@ SatAntennaPatternTestCase::DoRun (void)
   uint32_t bestBeamId (0);
   for ( uint32_t i = 0; i < coordinates.size (); ++i)
     {
-      bestBeamId = gpContainer.GetBestBeamId (0, coordinates[i]);
+      bestBeamId = gpContainer.GetBestBeamId (0, coordinates[i], false);
 
       Ptr<SatAntennaGainPattern> gainPattern = gpContainer.GetAntennaGainPattern (bestBeamId);
 

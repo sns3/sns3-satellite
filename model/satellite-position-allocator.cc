@@ -357,7 +357,7 @@ SatSpotBeamPositionAllocator::GetNextGeoPosition (uint32_t satId) const
   while ( ( bestBeamId != m_targetBeamId || std::isnan (elevation) || elevation < m_minElevationAngleInDeg ) && tries < MAX_TRIES)
     {
       pos = agp->GetValidRandomPosition (mobility);
-      bestBeamId = m_antennaGainPatterns->GetBestBeamId (satId, pos);
+      bestBeamId = m_antennaGainPatterns->GetBestBeamId (satId, pos, false);
 
       // Set the new position to the UT mobility
       utMob->SetGeoPosition (pos);

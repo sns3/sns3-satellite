@@ -150,7 +150,7 @@ SatUtHandoverModule::CheckForHandoverRecommendation (uint32_t satId, uint32_t be
   uint32_t bestBeamId = m_askedBeamId;
   if (!m_hasPendingRequest)
     {
-      bestBeamId = m_antennaGainPatterns->GetBestBeamId (satId, coords);
+      bestBeamId = m_antennaGainPatterns->GetBestBeamId (satId, coords, false);
     }
 
   Time now = Simulator::Now ();
