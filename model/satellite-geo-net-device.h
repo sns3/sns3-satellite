@@ -281,6 +281,12 @@ public:
   void SetArbiter (Ptr<SatIslArbiter> arbiter);
 
   /**
+   * Get the arbiter for ISL routing
+   * \return The arbiter used on this satellite
+   */
+  Ptr<SatIslArbiter> GetArbiter ();
+
+  /**
    * Send a packet to ISL.
    * \param packet The packet to send
    * \param destination The MAC address of ground station that will receive the packet
@@ -378,6 +384,11 @@ private:
    * Arbiter used to route on ISLs
    */
   Ptr<SatIslArbiter> m_arbiter;
+
+  /**
+   * Keep a count of all incoming broadcast data to avoid handling them several times
+   */
+  std::set<uint32_t> m_broadcastReceived;
 
   TracedCallback<Time,
                  SatEnums::SatPacketEvent_t,

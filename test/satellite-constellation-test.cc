@@ -49,6 +49,8 @@
 #include "ns3/satellite-geo-user-phy.h"
 #include "ns3/satellite-phy-rx-carrier.h"
 #include "ns3/satellite-id-mapper.h"
+#include "ns3/satellite-isl-arbiter.h"
+#include "ns3/satellite-isl-arbiter-unicast.h"
 
 using namespace ns3;
 
@@ -111,7 +113,8 @@ SatConstellationTest1::DoRun (void)
   Config::SetDefault ("ns3::SatHelper::SatConstellationFolder", StringValue ("eutelsat-geo-2-sats-no-isls"));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::StartDateStr", StringValue ("2022-11-13 12:00:00"));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionEachRequest", BooleanValue (false));
-  Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionPeriod", TimeValue (Seconds (1)));
+  Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionPeriod", TimeValue (MilliSeconds (10)));
+  Config::SetDefault ("ns3::SatHelper::GwUsers", UintegerValue (3));
 
   Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("test-sat-constellation");
 
@@ -131,14 +134,20 @@ SatConstellationTest1::DoRun (void)
   uint32_t countNetDevices = 0;
   for (uint32_t i = 0; i < sats.GetN (); i++)
     {
-      countNetDevices += sats.Get (i)->GetNDevices () - 1;
+      for (uint32_t j = 0; j < sats.Get (i)->GetNDevices (); j++)
+        {
+          if (DynamicCast<SatGeoNetDevice> (sats.Get (i)->GetDevice (j)) != nullptr)
+            {
+              countNetDevices += 1;
+            }
+        }
     }
 
   NS_TEST_ASSERT_MSG_EQ (sats.GetN (), 2, "Topology must contain 2 satellites");
-  NS_TEST_ASSERT_MSG_EQ (countNetDevices, 2, "Topology must contain 2 ISLs Net Devices");
+  NS_TEST_ASSERT_MSG_EQ (countNetDevices, 2, "Topology must contain 2 satellite Geo Net Devices");
   NS_TEST_ASSERT_MSG_EQ (gws.GetN (), 2, "Topology must contain 2 GWs");
   NS_TEST_ASSERT_MSG_EQ (uts.GetN (), 3, "Topology must contain 3 UTs");
-  NS_TEST_ASSERT_MSG_EQ (gwUsers.GetN (), 2, "Topology must contain 2 GW users");
+  NS_TEST_ASSERT_MSG_EQ (gwUsers.GetN (), 3, "Topology must contain 3 GW users");
   NS_TEST_ASSERT_MSG_EQ (utUsers.GetN (), 15, "Topology must contain 15 UT users");
 
   GeoCoordinate sat1 = GeoCoordinate (sats.Get (0)->GetObject<SatMobilityModel> ()->GetPosition ());
@@ -299,7 +308,8 @@ SatConstellationTest2::DoRun (void)
   Config::SetDefault ("ns3::SatHelper::SatConstellationFolder", StringValue ("eutelsat-geo-2-sats-no-isls"));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::StartDateStr", StringValue ("2022-11-13 12:00:00"));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionEachRequest", BooleanValue (false));
-  Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionPeriod", TimeValue (Seconds (1)));
+  Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionPeriod", TimeValue (MilliSeconds (10)));
+  Config::SetDefault ("ns3::SatHelper::GwUsers", UintegerValue (3));
 
   Config::SetDefault ("ns3::CbrApplication::Interval", StringValue ("10ms"));
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (512) );
@@ -490,7 +500,8 @@ SatConstellationTest3::DoRun (void)
   Config::SetDefault ("ns3::SatHelper::SatConstellationFolder", StringValue ("eutelsat-geo-2-sats-isls"));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::StartDateStr", StringValue ("2022-11-13 12:00:00"));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionEachRequest", BooleanValue (false));
-  Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionPeriod", TimeValue (Seconds (1)));
+  Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionPeriod", TimeValue (MilliSeconds (10)));
+  Config::SetDefault ("ns3::SatHelper::GwUsers", UintegerValue (3));
 
   Config::SetDefault ("ns3::CbrApplication::Interval", StringValue ("10ms"));
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (512) );
@@ -564,6 +575,129 @@ SatConstellationTest3::DoRun (void)
   TestFileValue ("contrib/satellite/data/sims/test-sat-constellation/test3/stat-per-ut-rtn-app-throughput-scatter-3.txt", 5, 2048);
 }
 
+/**
+ * \ingroup satellite
+ * \brief 'Constellation, test 4' test case implementation.
+ *
+ * This case tests that a topology with hundreds of LEO satellites is correctly loaded.
+ * It load the telesat-351-sats configuration
+ *
+ *  Expected result:
+ *    Correct number of entities: 351 satellites, 3 GWs, 3 UTs, 702 ISLs
+ *    Each satellite has 4 ISL interfaces
+ *    All satellites know on which interface to send a packet depending on a target satellite
+ */
+class SatConstellationTest4 : public TestCase
+{
+public:
+  SatConstellationTest4 ();
+  virtual ~SatConstellationTest4 ();
+
+private:
+  virtual void DoRun (void);
+
+  Ptr<SatHelper> m_helper;
+};
+
+// Add some help text to this case to describe what it is intended to test
+SatConstellationTest4::SatConstellationTest4 ()
+  : TestCase ("This case tests that a topology with hundreds of LEO satellites is correctly loaded.")
+{
+}
+
+// This destructor does nothing but we include it as a reminder that
+// the test case should clean up after itself
+SatConstellationTest4::~SatConstellationTest4 ()
+{
+}
+
+//
+// SatConstellationTest4 TestCase implementation
+//
+void
+SatConstellationTest4::DoRun (void)
+{
+  Config::Reset ();
+
+  // Set simulation output details
+  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
+  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-constellation", "test4", true);
+
+  /// Set regeneration mode
+  Config::SetDefault ("ns3::SatConf::ForwardLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_NETWORK));
+  Config::SetDefault ("ns3::SatConf::ReturnLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_NETWORK));
+
+  /// Use constellation
+  Config::SetDefault ("ns3::SatHelper::SatConstellationEnabled", BooleanValue (true));
+  Config::SetDefault ("ns3::SatHelper::SatConstellationFolder", StringValue ("telesat-351-sats"));
+  Config::SetDefault ("ns3::SatSGP4MobilityModel::StartDateStr", StringValue ("2000-01-01 00:00:00"));
+  Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionEachRequest", BooleanValue (false));
+  Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionPeriod", TimeValue (MilliSeconds (10)));
+  Config::SetDefault ("ns3::SatGeoHelper::IslArbiterType", EnumValue (SatEnums::UNICAST));
+  Config::SetDefault ("ns3::SatHelper::GwUsers", UintegerValue (3));
+
+  /// Use constellation with correctly centered beams (used for testing)
+  Config::SetDefault ("ns3::SatAntennaGainPatternContainer::PatternsFolder", StringValue ("SatAntennaGain72BeamsShifted"));
+
+  /// When using 72 beams, we need a 72*nbSats network addresses for beams, so we take margin
+  Config::SetDefault ("ns3::SatHelper::BeamNetworkAddress", Ipv4AddressValue ("20.1.0.0"));
+  Config::SetDefault ("ns3::SatHelper::GwNetworkAddress", Ipv4AddressValue ("10.1.0.0"));
+  Config::SetDefault ("ns3::SatHelper::UtNetworkAddress", Ipv4AddressValue ("250.1.0.0"));
+
+  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("test-sat-constellation");
+
+  // Creating the reference system.
+  simulationHelper->SetBeamSet ({1, 43, 60, 64});
+  simulationHelper->SetUserCountPerUt (5);
+
+  simulationHelper->CreateSatScenario ();
+  m_helper = simulationHelper->GetSatelliteHelper ();
+
+  NodeContainer sats = m_helper->GeoSatNodes ();
+  NodeContainer gws = m_helper->GwNodes ();
+  NodeContainer uts = m_helper->UtNodes ();
+  NodeContainer gwUsers = m_helper->GetGwUsers ();
+  NodeContainer utUsers = m_helper->GetUtUsers ();
+
+  uint32_t countNetDevices = 0;
+  uint32_t countIslNetDevice = 0;
+  for (uint32_t i = 0; i < sats.GetN (); i++)
+    {
+      for (uint32_t j = 0; j < sats.Get (i)->GetNDevices (); j++)
+        {
+          if (DynamicCast<SatGeoNetDevice> (sats.Get (i)->GetDevice (j)) != nullptr)
+            {
+              countNetDevices += 1;
+              countIslNetDevice += DynamicCast<SatGeoNetDevice> (sats.Get (i)->GetDevice (j))->GetIslsNetDevices ().size ();
+            }
+        }
+    }
+
+  NS_TEST_ASSERT_MSG_EQ (sats.GetN (), 351, "Topology must contain 351 satellites");
+  NS_TEST_ASSERT_MSG_EQ (countNetDevices, 351, "Topology must contain 351 satellite Geo Net Devices");
+  NS_TEST_ASSERT_MSG_EQ (countIslNetDevice, 1404, "Topology must contain 1404 (351*4) satellite ISL Net Devices");
+  NS_TEST_ASSERT_MSG_EQ (gws.GetN (), 2, "Topology must contain 2 GWs");
+  NS_TEST_ASSERT_MSG_EQ (uts.GetN (), 3, "Topology must contain 3 UTs");
+  NS_TEST_ASSERT_MSG_EQ (gwUsers.GetN (), 3, "Topology must contain 3 GW users");
+  NS_TEST_ASSERT_MSG_EQ (utUsers.GetN (), 15, "Topology must contain 15 UT users");
+
+  for (uint32_t i = 0; i < sats.GetN (); i++)
+    {
+      Ptr<SatIslArbiter> arbiter = DynamicCast<SatGeoNetDevice> (sats.Get (i)->GetDevice (0))->GetArbiter ();
+      Ptr<SatIslArbiterUnicast> arbiterUnicast = DynamicCast<SatIslArbiterUnicast> (arbiter);
+      NS_TEST_ASSERT_MSG_NE (arbiterUnicast, 0, "Arbiter of satellite " << i << " is not of type SatIslArbiterUnicast");
+      for (uint32_t j = 0; j < sats.GetN (); j++)
+        {
+          if (i != j)
+            {
+              NS_TEST_ASSERT_MSG_NE (arbiterUnicast->Decide (i, j, nullptr), -1, "No entry in arbiter of satellite " << i << " to satellite " << j);
+            }
+        }
+    }
+
+  Simulator::Destroy ();
+}
+
 // The TestSuite class names the TestSuite as sat-constellation-test, identifies what type of TestSuite (SYSTEM),
 // and enables the TestCases to be run. Typically, only the constructor for this class must be defined
 //
@@ -579,6 +713,7 @@ SatConstellationTestSuite::SatConstellationTestSuite ()
   AddTestCase (new SatConstellationTest1, TestCase::QUICK); // Test topology loading
   AddTestCase (new SatConstellationTest2, TestCase::QUICK); // Test good throughputs without ISLs
   AddTestCase (new SatConstellationTest3, TestCase::QUICK); // Test good throughputs with ISLs
+  AddTestCase (new SatConstellationTest4, TestCase::QUICK); // Test topology loading with huge constellation
 }
 
 // Allocate an instance of this TestSuite

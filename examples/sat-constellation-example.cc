@@ -232,6 +232,7 @@ int mainLeo (uint32_t packetSize, std::string interval, std::string configuratio
   Config::SetDefault ("ns3::SatHelper::SatConstellationEnabled", BooleanValue (true));
   Config::SetDefault ("ns3::SatHelper::SatConstellationFolder", StringValue (configurationFolder));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::StartDateStr", StringValue (startDate));
+  Config::SetDefault ("ns3::SatGwMac::SendNcrBroadcast", BooleanValue (false));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionEachRequest", BooleanValue (false));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionPeriod", TimeValue (MilliSeconds (10)));
 
@@ -274,7 +275,7 @@ int mainLeo (uint32_t packetSize, std::string interval, std::string configuratio
     {
       simulationHelper->SetBeamSet (beamSetAll);
     }
-  simulationHelper->SetUserCountPerUt (5);
+  simulationHelper->SetUserCountPerUt (2);
 
   LogComponentEnable ("sat-constellation-example", LOG_LEVEL_INFO);
 
@@ -293,10 +294,10 @@ int mainLeo (uint32_t packetSize, std::string interval, std::string configuratio
   NodeContainer gws = helper->GwNodes ();
   NodeContainer uts = helper->UtNodes ();
   NodeContainer gwUsers = helper->GetGwUsers ();      // 3 GW users
-  NodeContainer utUsers = helper->GetUtUsers (uts);   // 15 UT users
+  NodeContainer utUsers = helper->GetUtUsers (uts);   // 6 UT users
 
-  // Total is 3*15 = 45 flows
-  // Global App rate is pktSize*ptkPerSecond*nbFlows = 512*8*100*45 = 18.4kb/s on both FWD and RTN
+  // Total is 3*6 = 18 flows
+  // Global App rate is pktSize*ptkPerSecond*nbFlows = 512*8*100*45 = 7373kb/s on both FWD and RTN
   Ptr<SatTrafficHelper> trafficHelper = simulationHelper->GetTrafficHelper ();
 
   trafficHelper->AddCbrTraffic (SatTrafficHelper::FWD_LINK,

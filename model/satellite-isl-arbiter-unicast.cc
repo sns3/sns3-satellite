@@ -96,16 +96,16 @@ SatIslArbiterUnicast::StringReprOfForwardingState ()
 
   for (mapReversedIterator = mapReversed.begin (); mapReversedIterator != mapReversed.end (); mapReversedIterator++)
     {
-      res << mapReversedIterator->first << "  -> : {" << std::endl;
+      res << mapReversedIterator->first << "  -> : {";
       bool first = true;
       for (uint32_t targetId : mapReversedIterator->second) {
           if (!first) {
-              res << "," << std::endl;
+              res << ",";
           }
           res << "  " << targetId;
           first = false;
       }
-      res << std::endl << "}" << std::endl;
+      res<< "}" << std::endl;
     }
 
   return res.str();

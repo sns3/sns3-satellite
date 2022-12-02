@@ -684,7 +684,7 @@ SatHelper::CreateConstellationScenario (BeamUserInfoMap_t& info, GetNextUtUserCo
 
   m_groupHelper->SetSatConstellationEnabled ();
 
-  DoCreateScenario (info, m_satConf->GetGwCount ());
+  DoCreateScenario (info, m_gwUsers);
 }
 
 void

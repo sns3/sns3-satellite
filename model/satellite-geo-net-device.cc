@@ -184,7 +184,7 @@ SatGeoNetDevice::ReceivePacketUser (Ptr<Packet> packet, const Address& userAddre
     }
   Mac48Address destination = groundStationAddressTag.GetGroundStationAddress ();
 
-  if (m_gwConnected.count (destination) || destination.IsBroadcast ()) // TODO improve this
+  if (m_gwConnected.count (destination))
     {
       SatUplinkInfoTag satUplinkInfoTag;
       if (!packet->PeekPacketTag (satUplinkInfoTag))
@@ -202,7 +202,10 @@ SatGeoNetDevice::ReceivePacketUser (Ptr<Packet> packet, const Address& userAddre
     }
   else
     {
-      SendToIsl (packet, destination);
+      if (m_islNetDevices.size () > 0)
+        {
+          SendToIsl (packet, destination);
+        }
     }
 }
 
@@ -255,7 +258,12 @@ SatGeoNetDevice::ReceivePacketFeeder (Ptr<Packet> packet, const Address& feederA
     }
   Mac48Address destination = groundStationAddressTag.GetGroundStationAddress ();
 
-  if (m_utConnected.count (destination) || destination.IsBroadcast ()) // TODO or broadcast
+  if (destination.IsBroadcast ())
+    {
+      m_broadcastReceived.insert (packet->GetUid ());
+    }
+
+  if (m_utConnected.count (destination) > 0 || destination.IsBroadcast ())
     {
       SatUplinkInfoTag satUplinkInfoTag;
       if (!packet->PeekPacketTag (satUplinkInfoTag))
@@ -271,7 +279,7 @@ SatGeoNetDevice::ReceivePacketFeeder (Ptr<Packet> packet, const Address& feederA
 
       DynamicCast<SatGeoUserMac> (m_userMac[satUplinkInfoTag.GetBeamId ()])->EnquePacket (packet);
     }
-  else
+  if ((m_utConnected.count (destination) == 0 || destination.IsBroadcast ()) && m_islNetDevices.size () > 0)
     {
       SendToIsl (packet, destination);
     }
@@ -829,12 +837,31 @@ SatGeoNetDevice::SetArbiter (Ptr<SatIslArbiter> arbiter)
   m_arbiter = arbiter;
 }
 
+Ptr<SatIslArbiter>
+SatGeoNetDevice::GetArbiter ()
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_arbiter;
+}
+
 void
 SatGeoNetDevice::SendToIsl (Ptr<Packet> packet, Mac48Address destination)
 {
   NS_LOG_FUNCTION (this << packet << destination);
 
+  // If ISLs, arbiter must be set
   NS_ASSERT_MSG (m_arbiter != nullptr, "Arbiter not set");
+
+  if (destination.IsBroadcast ())
+    {
+      // Send to all interfaces
+      for (uint32_t i = 0; i < m_islNetDevices.size (); i++)
+        {
+          m_islNetDevices[i]->Send (packet->Copy (), Address (), 0x0800);
+        }
+      return;
+    }
 
   int32_t islInterfaceIndex = m_arbiter->BaseDecide(packet, destination);
 
@@ -848,7 +875,6 @@ SatGeoNetDevice::SendToIsl (Ptr<Packet> packet, Mac48Address destination)
     }
   else
     {
-      std::cout << "SatGeoNetDevice::SendToIsl from SAT " << m_nodeId << " to SAT " << Singleton<SatIdMapper>::Get ()->GetSatIdWithMacIsl (destination) << std::endl;
       m_islNetDevices[islInterfaceIndex]->Send (packet, Address (), 0x0800);
     }
 }
@@ -858,7 +884,21 @@ SatGeoNetDevice::ReceiveFromIsl (Ptr<Packet> packet, Mac48Address destination)
 {
   NS_LOG_FUNCTION (this << packet << destination);
 
-  if (m_gwConnected.count (destination))
+  if (destination.IsBroadcast ())
+    {
+      if (m_broadcastReceived.count (packet->GetUid ()) > 0)
+        {
+          // Packet already received, drop it
+          return;
+        }
+      else
+        {
+          // Insert in list of receuived broadcast
+          m_broadcastReceived.insert (packet->GetUid ());
+        }
+    }
+
+  if (m_gwConnected.count (destination) > 0)
     {
       SatUplinkInfoTag satUplinkInfoTag;
       if (!packet->PeekPacketTag (satUplinkInfoTag))
@@ -874,25 +914,28 @@ SatGeoNetDevice::ReceiveFromIsl (Ptr<Packet> packet, Mac48Address destination)
 
       DynamicCast<SatGeoFeederMac> (m_feederMac[satUplinkInfoTag.GetBeamId ()])->EnquePacket (packet);
     }
-  else if (m_utConnected.count (destination))
-    {
-      SatUplinkInfoTag satUplinkInfoTag;
-      if (!packet->PeekPacketTag (satUplinkInfoTag))
-        {
-          NS_FATAL_ERROR ("SatUplinkInfoTag not found");
-        }
-
-      if (m_isStatisticsTagsEnabled)
-        {
-          // Add a SatDevLinkTimeTag tag for packet link delay computation at the receiver end.
-          packet->AddPacketTag (SatDevLinkTimeTag (Simulator::Now ()));
-        }
-
-      DynamicCast<SatGeoUserMac> (m_userMac[satUplinkInfoTag.GetBeamId ()])->EnquePacket (packet);
-    }
   else
     {
-      SendToIsl (packet, destination);
+      if (m_utConnected.count (destination) > 0 || destination.IsBroadcast ())
+        {
+          SatUplinkInfoTag satUplinkInfoTag;
+          if (!packet->PeekPacketTag (satUplinkInfoTag))
+            {
+              NS_FATAL_ERROR ("SatUplinkInfoTag not found");
+            }
+
+          if (m_isStatisticsTagsEnabled && !destination.IsBroadcast ())
+            {
+              // Add a SatDevLinkTimeTag tag for packet link delay computation at the receiver end.
+              packet->AddPacketTag (SatDevLinkTimeTag (Simulator::Now ()));
+            }
+
+          DynamicCast<SatGeoUserMac> (m_userMac[satUplinkInfoTag.GetBeamId ()])->EnquePacket (packet);
+        }
+      if ((m_utConnected.count (destination) == 0 || destination.IsBroadcast ()) && m_islNetDevices.size () > 0)
+        {
+          SendToIsl (packet, destination);
+        }
     }
 }
 
