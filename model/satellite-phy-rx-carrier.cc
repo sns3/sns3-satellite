@@ -418,7 +418,7 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
           {
             if (IsReceivingDedicatedAccess () && rxParams->m_txInfo.packetType == SatEnums::PACKET_TYPE_DEDICATED_ACCESS)
               {
-                NS_FATAL_ERROR ("Starting reception of a packet when receiving DA transmission! This may be due to a clock drift in UTs too important.");
+                NS_FATAL_ERROR ("Starting reception of a packet when receiving DA transmission! This may be due to a clock drift in UTs too important, or an update period for SGP4 too important.");
               }
 
             GetInterferenceModel ()->NotifyRxStart (rxParamsStruct.interferenceEvent);

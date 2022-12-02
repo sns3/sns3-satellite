@@ -848,6 +848,7 @@ SatGeoNetDevice::SendToIsl (Ptr<Packet> packet, Mac48Address destination)
     }
   else
     {
+      std::cout << "SatGeoNetDevice::SendToIsl from SAT " << m_nodeId << " to SAT " << Singleton<SatIdMapper>::Get ()->GetSatIdWithMacIsl (destination) << std::endl;
       m_islNetDevices[islInterfaceIndex]->Send (packet, Address (), 0x0800);
     }
 }

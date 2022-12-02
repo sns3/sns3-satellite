@@ -233,15 +233,10 @@ int mainLeo (uint32_t packetSize, std::string interval, std::string configuratio
   Config::SetDefault ("ns3::SatHelper::SatConstellationFolder", StringValue (configurationFolder));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::StartDateStr", StringValue (startDate));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionEachRequest", BooleanValue (false));
-  Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionPeriod", TimeValue (Seconds (1)));
+  Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionPeriod", TimeValue (MilliSeconds (10)));
 
   /// Use constellation with correctly centered beams (used for testing)
   Config::SetDefault ("ns3::SatAntennaGainPatternContainer::PatternsFolder", StringValue ("SatAntennaGain72BeamsShifted"));
-
-  /// Optimize simulation time
-  // Config::SetDefault ("ns3::SatGwMac::SendNcrBroadcast", BooleanValue (false));
-  Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionEachRequest", BooleanValue (false));
-  Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionPeriod", TimeValue (Seconds (1)));
 
   /// When using 72 beams, we need a 72*nbSats network addresses for beams, so we take margin
   Config::SetDefault ("ns3::SatHelper::BeamNetworkAddress", Ipv4AddressValue ("20.1.0.0"));
@@ -257,7 +252,7 @@ int mainLeo (uint32_t packetSize, std::string interval, std::string configuratio
   /// Enable packet trace
   Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
 
-  simulationHelper->SetSimulationTime (Seconds (30));
+  simulationHelper->SetSimulationTime (Seconds (10));
 
   std::set<uint32_t> beamSetAll = {1, 2, 3, 4, 5, 6, 7, 8, 9,
                                    10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
@@ -292,21 +287,16 @@ int mainLeo (uint32_t packetSize, std::string interval, std::string configuratio
   Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize) );
 
   Time startTime = Seconds (1.0);
-  Time stopTime = Seconds (29.0);
+  Time stopTime = Seconds (9.0);
   Time startDelay = Seconds (0.0);
-
-  /*simulationHelper->InstallTrafficModel (
-    SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
-    startTime, stopTime);
-  simulationHelper->InstallTrafficModel (
-    SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::RTN_LINK,
-    startTime, stopTime);*/
 
   NodeContainer gws = helper->GwNodes ();
   NodeContainer uts = helper->UtNodes ();
-  NodeContainer gwUsers = helper->GetGwUsers ();
-  NodeContainer utUsers = NodeContainer (helper->GetUtUsers (uts).Get (10));
+  NodeContainer gwUsers = helper->GetGwUsers ();      // 3 GW users
+  NodeContainer utUsers = helper->GetUtUsers (uts);   // 15 UT users
 
+  // Total is 3*15 = 45 flows
+  // Global App rate is pktSize*ptkPerSecond*nbFlows = 512*8*100*45 = 18.4kb/s on both FWD and RTN
   Ptr<SatTrafficHelper> trafficHelper = simulationHelper->GetTrafficHelper ();
 
   trafficHelper->AddCbrTraffic (SatTrafficHelper::FWD_LINK,
@@ -341,17 +331,11 @@ int mainLeo (uint32_t packetSize, std::string interval, std::string configuratio
 
   Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer ();
 
-  // Throughput statistics
-  s->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerGwFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerGwRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  // Throughput statistics not in TrafficHelper
   s->AddPerSatFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerSatRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerBeamFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   simulationHelper->EnableProgressLogs ();
   simulationHelper->RunSimulation ();
