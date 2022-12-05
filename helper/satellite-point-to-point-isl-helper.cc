@@ -46,6 +46,21 @@ PointToPointIslHelper::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::PointToPointIslHelper")
     .SetParent<Object> ()
     .AddConstructor<PointToPointIslHelper> ()
+    .AddAttribute ("IslDataRate",
+                   "Data rate of ISL links",
+                   DataRateValue (DataRate ("1Gb/s")),
+                   MakeDataRateAccessor (&PointToPointIslHelper::m_dataRate),
+                   MakeDataRateChecker ())
+    .AddAttribute ("QueueMaxPackets",
+                   "The maximum number of packets accepted by ISL queues.",
+                   UintegerValue (100),
+                   MakeUintegerAccessor (&PointToPointIslHelper::m_maxPackets),
+                   MakeUintegerChecker<uint32_t> ())
+    .AddAttribute ("QueueMaxBytes",
+                   "The maximum number of bytes accepted by ISL queues.",
+                   UintegerValue (100 * 65535),
+                   MakeUintegerAccessor (&PointToPointIslHelper::m_maxBytes),
+                   MakeUintegerChecker<uint32_t> ())
   ;
   return tid;
 }
@@ -67,14 +82,23 @@ PointToPointIslHelper::Install (Ptr<Node> a, Ptr<Node> b)
   Ptr<PointToPointIslNetDevice> devA = m_deviceFactory.Create<PointToPointIslNetDevice> ();
   devA->SetAddress (Mac48Address::Allocate ());
   devA->SetDestinationNode(b);
+  devA->SetDataRate (m_dataRate);
   a->AddDevice (devA);
   Ptr<Queue<Packet> > queueA = m_queueFactory.Create<Queue<Packet> > ();
+  // queueA->SetAttribute ("MaxPackets", UintegerValue (m_maxPackets)); // For ns 3.37
+  // queueA->SetAttribute ("MaxBytes", UintegerValue (m_maxBytes)); // For ns 3.37
+  queueA->SetAttribute ("MaxSize", QueueSizeValue (QueueSize (QueueSizeUnit::PACKETS, m_maxPackets)));
   devA->SetQueue (queueA);
+
   Ptr<PointToPointIslNetDevice> devB = m_deviceFactory.Create<PointToPointIslNetDevice> ();
   devB->SetAddress (Mac48Address::Allocate ());
   devB->SetDestinationNode(a);
+  devB->SetDataRate (m_dataRate);
   b->AddDevice (devB);
   Ptr<Queue<Packet> > queueB = m_queueFactory.Create<Queue<Packet> > ();
+  // queueB->SetAttribute ("MaxPackets", UintegerValue (m_maxPackets)); // For ns 3.37
+  // queueB->SetAttribute ("MaxBytes", UintegerValue (m_maxBytes)); // For ns 3.37
+  queueB->SetAttribute ("MaxSize", QueueSizeValue (QueueSize (QueueSizeUnit::PACKETS, m_maxPackets)));
   devB->SetQueue (queueB);
 
   // Aggregate NetDeviceQueueInterface objects

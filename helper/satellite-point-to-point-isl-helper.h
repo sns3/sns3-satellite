@@ -29,6 +29,7 @@
 
 #include "ns3/object-factory.h"
 #include "ns3/net-device-container.h"
+#include "ns3/data-rate.h"
 
 namespace ns3 {
 
@@ -55,6 +56,10 @@ private:
   ObjectFactory m_queueFactory;         //!< Queue Factory
   ObjectFactory m_channelFactory;       //!< Channel Factory
   ObjectFactory m_deviceFactory;        //!< Device Factory
+
+  DataRate m_dataRate;                  //!< Data rate of ISL link
+  uint32_t m_maxPackets;                //!< The maximum number of packets accepted by ISL queues
+  uint32_t m_maxBytes;                  //!< The maximum number of bytes accepted by ISL queues
 };
 
 } // namespace ns3

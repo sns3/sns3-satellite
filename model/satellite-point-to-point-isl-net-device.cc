@@ -37,9 +37,9 @@
 
 #include "ns3/satellite-point-to-point-isl-net-device.h"
 
-namespace ns3 {
-
 NS_LOG_COMPONENT_DEFINE ("PointToPointIslNetDevice");
+
+namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (PointToPointIslNetDevice);
 
@@ -48,23 +48,7 @@ PointToPointIslNetDevice::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::PointToPointIslNetDevice")
     .SetParent<NetDevice> ()
-    .SetGroupName ("PointToPoint")
     .AddConstructor<PointToPointIslNetDevice> ()
-    .AddAttribute ("Mtu", "The MAC-level Maximum Transmission Unit",
-                   UintegerValue (DEFAULT_MTU),
-                   MakeUintegerAccessor (&PointToPointIslNetDevice::SetMtu,
-                                         &PointToPointIslNetDevice::GetMtu),
-                   MakeUintegerChecker<uint16_t> ())
-    .AddAttribute ("Address", 
-                   "The MAC address of this device.",
-                   Mac48AddressValue (Mac48Address ("ff:ff:ff:ff:ff:ff")),
-                   MakeMac48AddressAccessor (&PointToPointIslNetDevice::m_address),
-                   MakeMac48AddressChecker ())
-    .AddAttribute ("DataRate", 
-                   "The default data rate for point to point links",
-                   DataRateValue (DataRate ("1000000000b/s")),
-                   MakeDataRateAccessor (&PointToPointIslNetDevice::m_dataRate),
-                   MakeDataRateChecker ())
     .AddAttribute ("ReceiveErrorModel", 
                    "The receiver error model used to simulate packet loss",
                    PointerValue (),
@@ -75,11 +59,6 @@ PointToPointIslNetDevice::GetTypeId (void)
                    TimeValue (Seconds (0.0)),
                    MakeTimeAccessor (&PointToPointIslNetDevice::m_tInterframeGap),
                    MakeTimeChecker ())
-    .AddAttribute ("TxQueue", 
-                   "A queue to use as the transmit queue in the device.",
-                   PointerValue (),
-                   MakePointerAccessor (&PointToPointIslNetDevice::m_queue),
-                   MakePointerChecker<Queue<Packet> > ())
   ;
   return tid;
 }
@@ -416,29 +395,20 @@ PointToPointIslNetDevice::Send (
   NS_LOG_LOGIC ("p=" << packet << ", dest=" << &dest);
   NS_LOG_LOGIC ("UID is " << packet->GetUid ());
 
-  //
   // If IsLinkUp() is false it means there is no channel to send any packet 
   // over so we just return an error.
-  //
   if (IsLinkUp () == false)
     {
       return false;
     }
 
-  //
-  // Stick a point to point protocol header on the packet in preparation for
-  // shoving it out the door.
-  //
   AddHeader (packet, protocolNumber);
 
-  //
-  // We should enqueue and dequeue the packet to hit the tracing hooks.
-  //
+  NS_ASSERT (m_queue != nullptr);
+
   if (m_queue->Enqueue (packet))
     {
-      //
       // If the channel is ready for transition we send the packet right now
-      // 
       if (m_txMachineState == READY)
         {
           packet = m_queue->Dequeue ();
@@ -447,8 +417,6 @@ PointToPointIslNetDevice::Send (
         }
       return true;
     }
-
-  // Enqueue may fail (overflow)
 
   return false;
 }

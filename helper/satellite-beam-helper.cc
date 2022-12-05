@@ -772,7 +772,7 @@ SatBeamHelper::InstallIsls ()
 {
   NS_LOG_FUNCTION (this);
 
-  PointToPointIslHelper p2pIslHelper;
+  Ptr<PointToPointIslHelper> p2pIslHelper = CreateObject<PointToPointIslHelper> ();
   TrafficControlHelper tchIsl;
 
   for (std::vector <std::pair <uint32_t, uint32_t>>::iterator it = m_isls.begin(); it != m_isls.end (); it++)
@@ -781,7 +781,7 @@ SatBeamHelper::InstallIsls ()
       Ptr<Node> sat2 = m_geoNodes.Get (it->second);
 
       // Install a p2p ISL link between these two satellites
-      NetDeviceContainer netDevices = p2pIslHelper.Install(sat1, sat2);
+      NetDeviceContainer netDevices = p2pIslHelper->Install(sat1, sat2);
       Ptr<PointToPointIslNetDevice> islNdSat1 = DynamicCast<PointToPointIslNetDevice> (netDevices.Get (0));
       Ptr<PointToPointIslNetDevice> islNdSat2 = DynamicCast<PointToPointIslNetDevice> (netDevices.Get (1));
 
@@ -793,19 +793,6 @@ SatBeamHelper::InstallIsls ()
 
       islNdSat1->SetGeoNetDevice (geoNdSat1);
       islNdSat2->SetGeoNetDevice (geoNdSat2);
-
-      // Install traffic control helper // TODO why this ?
-      /*tchIsl.Install(netDevices.Get(0));
-      tchIsl.Install(netDevices.Get(1));
-
-      // Assign some IP address (nothing smart, no aggregation, just some IP address)
-      m_ipv4_helper.Assign(netDevices);
-      m_ipv4_helper.NewNetwork();
-
-      // Remove the traffic control layer (must be done here, else the Ipv4 helper will assign a default one)
-      TrafficControlHelper tchUninstaller;
-      tchUninstaller.Uninstall(netDevices.Get(0));
-      tchUninstaller.Uninstall(netDevices.Get(1));*/
     }
 }
 

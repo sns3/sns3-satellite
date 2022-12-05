@@ -26,9 +26,9 @@
 #include "ns3/satellite-const-variables.h"
 #include "ns3/core-module.h"
 
-namespace ns3 {
-
 NS_LOG_COMPONENT_DEFINE ("PointToPointIslChannel");
+
+namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (PointToPointIslChannel);
 
@@ -51,13 +51,14 @@ PointToPointIslChannel::PointToPointIslChannel()
     Channel (),
     m_nDevices (0)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
 }
 
 void
 PointToPointIslChannel::Attach (Ptr<PointToPointIslNetDevice> device)
 {
   NS_LOG_FUNCTION (this << device);
+
   NS_ASSERT_MSG (m_nDevices < N_DEVICES, "Only two devices permitted");
   NS_ASSERT (device != 0);
 
@@ -103,14 +104,16 @@ PointToPointIslChannel::TransmitStart (Ptr<const Packet> p,
 std::size_t
 PointToPointIslChannel::GetNDevices (void) const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
+
   return m_nDevices;
 }
 
 Ptr<PointToPointIslNetDevice>
 PointToPointIslChannel::GetPointToPointIslDevice (std::size_t i) const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
+
   NS_ASSERT (i < 2);
   return m_link[i].m_src;
 }
@@ -118,13 +121,16 @@ PointToPointIslChannel::GetPointToPointIslDevice (std::size_t i) const
 Ptr<NetDevice>
 PointToPointIslChannel::GetDevice (std::size_t i) const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
+
   return GetPointToPointIslDevice (i);
 }
 
 Time
 PointToPointIslChannel::GetDelay (Ptr<MobilityModel> a, Ptr<MobilityModel> b) const
 {
+  NS_LOG_FUNCTION (this << a << b);
+
   double distance = a->GetDistanceFrom (b);
   double seconds = distance / m_propagationSpeed;
   return Seconds (seconds);
@@ -133,18 +139,24 @@ PointToPointIslChannel::GetDelay (Ptr<MobilityModel> a, Ptr<MobilityModel> b) co
 Ptr<PointToPointIslNetDevice>
 PointToPointIslChannel::GetSource (uint32_t i) const
 {
+  NS_LOG_FUNCTION (this << i);
+
   return m_link[i].m_src;
 }
 
 Ptr<PointToPointIslNetDevice>
 PointToPointIslChannel::GetDestination (uint32_t i) const
 {
+  NS_LOG_FUNCTION (this << i);
+
   return m_link[i].m_dst;
 }
 
 bool
 PointToPointIslChannel::IsInitialized (void) const
 {
+  NS_LOG_FUNCTION (this);
+
   NS_ASSERT (m_link[0].m_state != INITIALIZING);
   NS_ASSERT (m_link[1].m_state != INITIALIZING);
   return true;

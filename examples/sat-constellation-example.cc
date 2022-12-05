@@ -52,6 +52,7 @@ int mainGeoTwoSats (uint32_t packetSize, std::string interval, std::string confi
   Config::SetDefault ("ns3::SatSGP4MobilityModel::StartDateStr", StringValue (startDate));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionEachRequest", BooleanValue (false));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionPeriod", TimeValue (Seconds (1)));
+  Config::SetDefault ("ns3::SatHelper::GwUsers", UintegerValue (3));
 
   /// Enable ACM
   Config::SetDefault ("ns3::SatBbFrameConf::AcmEnabled", BooleanValue (true));
@@ -236,6 +237,7 @@ int mainLeo (uint32_t packetSize, std::string interval, std::string configuratio
   Config::SetDefault ("ns3::SatGwMac::SendNcrBroadcast", BooleanValue (false));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionEachRequest", BooleanValue (false));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionPeriod", TimeValue (MilliSeconds (10)));
+  Config::SetDefault ("ns3::SatHelper::GwUsers", UintegerValue (3));
 
   /// Use constellation with correctly centered beams (used for testing)
   Config::SetDefault ("ns3::SatAntennaGainPatternContainer::PatternsFolder", StringValue ("SatAntennaGain72BeamsShifted"));
@@ -293,13 +295,13 @@ int mainLeo (uint32_t packetSize, std::string interval, std::string configuratio
   Time stopTime = Seconds (9.0);
   Time startDelay = Seconds (0.0);
 
-  NodeContainer gws = helper->GwNodes ();
-  NodeContainer uts = helper->UtNodes ();
+  NodeContainer gws = helper->GwNodes ();             // 3 GWs
+  NodeContainer uts = helper->UtNodes ();             // 3 UTs
   NodeContainer gwUsers = helper->GetGwUsers ();      // 3 GW users
   NodeContainer utUsers = helper->GetUtUsers (uts);   // 6 UT users
 
   // Total is 3*6 = 18 flows
-  // Global App rate is pktSize*ptkPerSecond*nbFlows = 512*8*100*45 = 7373kb/s on both FWD and RTN
+  // Global App rate is pktSize*ptkPerSecond*nbFlows = 512*8*100*18 = 7373kb/s on both FWD and RTN
   Ptr<SatTrafficHelper> trafficHelper = simulationHelper->GetTrafficHelper ();
 
   trafficHelper->AddCbrTraffic (SatTrafficHelper::FWD_LINK,
