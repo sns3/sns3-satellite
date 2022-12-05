@@ -514,6 +514,14 @@ SatHelper::GetUserHelper () const
   return m_userHelper;
 }
 
+uint32_t
+SatHelper::GetBeamCount () const
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_satConf->GetBeamCount ();
+}
+
 void
 SatHelper::CreateSimpleScenario ()
 {

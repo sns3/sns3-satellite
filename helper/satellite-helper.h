@@ -216,6 +216,13 @@ public:
   Ptr<SatUserHelper> GetUserHelper () const;
 
   /**
+   * Get count of the beams (configurations).
+   *
+   * \return beam count
+   */
+  uint32_t GetBeamCount () const;
+
+  /**
    * \brief Set custom position allocator
    * \param posAllocator
    */
