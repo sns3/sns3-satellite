@@ -325,7 +325,6 @@ double SatAntennaGainPattern::GetAntennaGain_lin (GeoCoordinate coord, Ptr<SatMo
       || m_minLon > longitude
       || longitude > m_maxLon)
     {
-      // TODO check this. Or attribute to decide if FATAL_ERROR or not
       NS_LOG_WARN ("Given latitude and longitude out of range!");
       return std::numeric_limits<double>::quiet_NaN();
     }
@@ -342,8 +341,6 @@ double SatAntennaGainPattern::GetAntennaGain_lin (GeoCoordinate coord, Ptr<SatMo
       || std::isnan (m_antennaPattern[minLatIndex + 1][minLonIndex])
       || std::isnan (m_antennaPattern[minLatIndex + 1][minLonIndex + 1]))
     {
-      // TODO check this
-      // NS_FATAL_ERROR (this << ", some value(s) of the interpolated grid point(s) is/are NAN!");
       NS_LOG_WARN (this << ", some value(s) of the interpolated grid point(s) is/are NAN!");
       return std::numeric_limits<double>::quiet_NaN();
     }

@@ -218,7 +218,7 @@ void SatConf::Initialize (std::string rtnConf,
   // Load satellite position
   LoadPositions (dataPath + satPos, m_geoSatPosition);
 
-  // Load TLE information
+  // Load TLE information if case of only one satellite
   LoadTle (dataPathTle + tle, m_tleSat);
 
   // Update fwdConf & rtnConf with correct nb of GWs

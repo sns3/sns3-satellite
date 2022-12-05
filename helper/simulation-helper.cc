@@ -1265,9 +1265,8 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario, c
       SatHelper::BeamUserInfoMap_t beamInfo;
       for (uint32_t satId = 0; satId < m_satHelper->GeoSatNodes ().GetN (); satId++)
         {
-          // TODO do not hardcode 72 here
           // Set beamInfo to indicate enabled beams
-          for (uint32_t i = 1; i <= 72; i++)
+          for (uint32_t i = 1; i <= m_satConf->GetBeamCount (); i++)
             {
               if (IsBeamEnabled (i))
                 {
@@ -1286,8 +1285,7 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario, c
       // Create beam scenario
       SatHelper::BeamUserInfoMap_t beamInfo;
 
-      // TODO do not hardcode 72 here
-      for (uint32_t i = 1; i <= 72; i++)
+      for (uint32_t i = 1; i <= m_satConf->GetBeamCount (); i++)
         {
           if (IsBeamEnabled (i))
             {

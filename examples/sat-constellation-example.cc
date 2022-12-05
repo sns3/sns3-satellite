@@ -33,7 +33,9 @@ using namespace ns3;
  * \file sat-constellation-example.cc
  * \ingroup satellite
  *
- * \brief TODO
+ * \brief This file gives an example of satellite constellations.
+ *        User must choose which constellation to simulate from all available in satellite/data/constellations
+ *        Two main methods are implemented depending on the use of GEO or LEO constellations (different parameters)
  */
 
 NS_LOG_COMPONENT_DEFINE ("sat-constellation-example");

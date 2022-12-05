@@ -267,23 +267,6 @@ SatAntennaGainPatternContainer::ConfigureBeamsMobility (uint32_t satelliteId, Pt
 {
   NS_LOG_FUNCTION (this << satelliteId << mobility);
 
-  // TODO all of this is useless ?
-  Ptr<SatSGP4MobilityModel> sgp4Mobility = DynamicCast<SatSGP4MobilityModel> (mobility);
-  if (sgp4Mobility != nullptr)
-    {
-      std::string dataPath {Singleton<SatEnvVariables>::Get ()->LocateDataDirectory ()};
-      std::string originDateFilename = dataPath + "/antennapatterns/" + m_patternsFolder + "/origin.timestamp";
-
-      std::ifstream originDateFile {originDateFilename.c_str ()};
-      NS_ABORT_MSG_UNLESS (originDateFile.is_open (), "SatAntennaGainPatternContainer::ConfigureBeamsMobility - origin.timestamp unreadable; are these beams meant to be mobile?");
-
-      std::string originDate;
-      originDateFile >> originDate;
-
-      Ptr<SatSGP4MobilityModel> model = CopyObject<SatSGP4MobilityModel> (sgp4Mobility);
-      model->SetStartTime (JulianDate (originDate));
-    }
-
   m_mobilityModelMap[satelliteId] = mobility;
 }
 

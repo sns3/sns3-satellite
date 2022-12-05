@@ -281,7 +281,7 @@ private:
   PositionContainer_t m_geoSatPosition;
 
   /**
-   * TLE information of the Satellite // TODO merge with next
+   * TLE information of the Satellite
    */
   std::string m_tleSat;
 
