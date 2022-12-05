@@ -27,6 +27,7 @@
 #include <ns3/ptr.h>
 #include <ns3/satellite-stats-helper.h>
 #include <list>
+#include <set>
 
 
 namespace ns3 {
@@ -789,6 +790,9 @@ private:
 
   /// Maintains the active SatStatsHelper instances which have created.
   std::list<Ptr<const SatStatsHelper> > m_stats;
+
+  /// Set of names of statisticscreated. Used to avoid creating same stat twice.
+  std::set<std::string> m_names;
 
 }; // end of class StatStatsHelperContainer
 

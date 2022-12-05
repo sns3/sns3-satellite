@@ -973,244 +973,244 @@ SatStatsHelperContainer::GetName () const
  * Also check the Doxygen documentation of this class for more information.
  */
 
-#define SAT_STATS_GLOBAL_METHOD_DEFINITION(id, name)                            \
-  void                                                                          \
-  SatStatsHelperContainer::AddGlobal ## id (SatStatsHelper::OutputType_t type)  \
-{                                                                             \
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));         \
-  if (type != SatStatsHelper::OUTPUT_NONE)                                    \
-  {                                                                           \
-    Ptr<SatStats ## id ## Helper> stat                                        \
-    = CreateObject<SatStats ## id ## Helper> (m_satHelper);                   \
-    stat->SetName (m_name + "-global-" + name                                 \
-        + GetOutputTypeSuffix (type));                                        \
-    stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);              \
-    stat->SetOutputType (type);                                               \
-    stat->Install ();                                                         \
-    m_stats.push_back (stat);                                                 \
-  }                                                                           \
-}
+#define SAT_STATS_GLOBAL_METHOD_DEFINITION(id, name)                                                  \
+  void                                                                                                \
+  SatStatsHelperContainer::AddGlobal ## id (SatStatsHelper::OutputType_t type)                        \
+    {                                                                                                 \
+      NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));                             \
+      std::string statName = m_name + "-global-" + name + GetOutputTypeSuffix (type);                 \
+      if (type != SatStatsHelper::OUTPUT_NONE && m_names.count (statName) == 0)                       \
+        {                                                                                             \
+          Ptr<SatStats ## id ## Helper> stat = CreateObject<SatStats ## id ## Helper> (m_satHelper);  \
+          stat->SetName (statName);                                                                   \
+          stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);                                \
+          stat->SetOutputType (type);                                                                 \
+          stat->Install ();                                                                           \
+          m_stats.push_back (stat);                                                                   \
+          m_names.insert (statName);                                                                  \
+        }                                                                                             \
+    }
 
-#define SAT_STATS_PER_GW_METHOD_DEFINITION(id, name)                            \
-  void                                                                          \
-  SatStatsHelperContainer::AddPerGw ## id (SatStatsHelper::OutputType_t type)   \
-{                                                                             \
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));         \
-  if (type != SatStatsHelper::OUTPUT_NONE)                                    \
-  {                                                                           \
-    Ptr<SatStats ## id ## Helper> stat                                        \
-    = CreateObject<SatStats ## id ## Helper> (m_satHelper);                   \
-    stat->SetName (m_name + "-per-gw-" + name                                 \
-        + GetOutputTypeSuffix (type));                                        \
-    stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_GW);                  \
-    stat->SetOutputType (type);                                               \
-    stat->Install ();                                                         \
-    m_stats.push_back (stat);                                                 \
-  }                                                                           \
-}
+#define SAT_STATS_PER_GW_METHOD_DEFINITION(id, name)                                                  \
+  void                                                                                                \
+  SatStatsHelperContainer::AddPerGw ## id (SatStatsHelper::OutputType_t type)                         \
+    {                                                                                                 \
+      NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));                             \
+      std::string statName = m_name + "-per-gw-" + name + GetOutputTypeSuffix (type);                 \
+      if (type != SatStatsHelper::OUTPUT_NONE && m_names.count (statName) == 0)                       \
+        {                                                                                             \
+          Ptr<SatStats ## id ## Helper> stat = CreateObject<SatStats ## id ## Helper> (m_satHelper);  \
+          stat->SetName (statName);                                                                   \
+          stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_GW);                                    \
+          stat->SetOutputType (type);                                                                 \
+          stat->Install ();                                                                           \
+          m_stats.push_back (stat);                                                                   \
+          m_names.insert (statName);                                                                  \
+        }                                                                                             \
+    }
 
-#define SAT_STATS_PER_BEAM_METHOD_DEFINITION(id, name)                          \
-  void                                                                          \
-  SatStatsHelperContainer::AddPerBeam ## id (SatStatsHelper::OutputType_t type) \
-{                                                                             \
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));         \
-  if (type != SatStatsHelper::OUTPUT_NONE)                                    \
-  {                                                                           \
-    Ptr<SatStats ## id ## Helper> stat                                        \
-    = CreateObject<SatStats ## id ## Helper> (m_satHelper);                   \
-    stat->SetName (m_name + "-per-beam-" + name                               \
-        + GetOutputTypeSuffix (type));                                        \
-    stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_BEAM);                \
-    stat->SetOutputType (type);                                               \
-    stat->Install ();                                                         \
-    m_stats.push_back (stat);                                                 \
-  }                                                                           \
-}
+#define SAT_STATS_PER_BEAM_METHOD_DEFINITION(id, name)                                                \
+  void                                                                                                \
+  SatStatsHelperContainer::AddPerBeam ## id (SatStatsHelper::OutputType_t type)                       \
+    {                                                                                                 \
+      NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));                             \
+      std::string statName = m_name + "-per-beam-" + name + GetOutputTypeSuffix (type);               \
+      if (type != SatStatsHelper::OUTPUT_NONE && m_names.count (statName) == 0)                       \
+        {                                                                                             \
+          Ptr<SatStats ## id ## Helper> stat = CreateObject<SatStats ## id ## Helper> (m_satHelper);  \
+          stat->SetName (statName);                                                                   \
+          stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_BEAM);                                  \
+          stat->SetOutputType (type);                                                                 \
+          stat->Install ();                                                                           \
+          m_stats.push_back (stat);                                                                   \
+          m_names.insert (statName);                                                                  \
+        }                                                                                             \
+    }
 
-#define SAT_STATS_PER_GROUP_METHOD_DEFINITION(id, name)                       \
-  void                                                                        \
-  SatStatsHelperContainer::AddPerGroup ## id (SatStatsHelper::OutputType_t type)\
-{                                                                             \
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));         \
-  if (type != SatStatsHelper::OUTPUT_NONE)                                    \
-  {                                                                           \
-    Ptr<SatStats ## id ## Helper> stat                                        \
-    = CreateObject<SatStats ## id ## Helper> (m_satHelper);                   \
-    stat->SetName (m_name + "-per-group-" + name                              \
-        + GetOutputTypeSuffix (type));                                        \
-    stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_GROUP);               \
-    stat->SetOutputType (type);                                               \
-    stat->Install ();                                                         \
-    m_stats.push_back (stat);                                                 \
-  }                                                                           \
-}
+#define SAT_STATS_PER_GROUP_METHOD_DEFINITION(id, name)                                               \
+  void                                                                                                \
+  SatStatsHelperContainer::AddPerGroup ## id (SatStatsHelper::OutputType_t type)                      \
+    {                                                                                                 \
+      NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));                             \
+      std::string statName = m_name + "-per-group-" + name + GetOutputTypeSuffix (type);              \
+      if (type != SatStatsHelper::OUTPUT_NONE && m_names.count (statName) == 0)                       \
+        {                                                                                             \
+          Ptr<SatStats ## id ## Helper> stat = CreateObject<SatStats ## id ## Helper> (m_satHelper);  \
+          stat->SetName (statName);                                                                   \
+          stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_GROUP);                                 \
+          stat->SetOutputType (type);                                                                 \
+          stat->Install ();                                                                           \
+          m_stats.push_back (stat);                                                                   \
+          m_names.insert (statName);                                                                  \
+        }                                                                                             \
+    }
 
-#define SAT_STATS_PER_UT_METHOD_DEFINITION(id, name)                            \
-  void                                                                          \
-  SatStatsHelperContainer::AddPerUt ## id (SatStatsHelper::OutputType_t type)   \
-{                                                                             \
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));         \
-  if (type != SatStatsHelper::OUTPUT_NONE)                                    \
-  {                                                                           \
-    Ptr<SatStats ## id ## Helper> stat                                        \
-    = CreateObject<SatStats ## id ## Helper> (m_satHelper);                   \
-    stat->SetName (m_name + "-per-ut-" + name                                 \
-        + GetOutputTypeSuffix (type));                                        \
-    stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT);                  \
-    stat->SetOutputType (type);                                               \
-    stat->Install ();                                                         \
-    m_stats.push_back (stat);                                                 \
-  }                                                                           \
-}
+#define SAT_STATS_PER_UT_METHOD_DEFINITION(id, name)                                                  \
+  void                                                                                                \
+  SatStatsHelperContainer::AddPerUt ## id (SatStatsHelper::OutputType_t type)                         \
+    {                                                                                                 \
+      NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));                             \
+      std::string statName = m_name + "-per-ut-" + name + GetOutputTypeSuffix (type);                 \
+      if (type != SatStatsHelper::OUTPUT_NONE && m_names.count (statName) == 0)                       \
+        {                                                                                             \
+          Ptr<SatStats ## id ## Helper> stat = CreateObject<SatStats ## id ## Helper> (m_satHelper);  \
+          stat->SetName (statName);                                                                   \
+          stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT);                                    \
+          stat->SetOutputType (type);                                                                 \
+          stat->Install ();                                                                           \
+          m_stats.push_back (stat);                                                                   \
+          m_names.insert (statName);                                                                  \
+        }                                                                                             \
+    }
 
-#define SAT_STATS_PER_UT_USER_METHOD_DEFINITION(id, name)                         \
-  void                                                                            \
-  SatStatsHelperContainer::AddPerUtUser ## id (SatStatsHelper::OutputType_t type) \
-{                                                                               \
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));           \
-  if (type != SatStatsHelper::OUTPUT_NONE)                                      \
-  {                                                                             \
-    Ptr<SatStats ## id ## Helper> stat                                          \
-    = CreateObject<SatStats ## id ## Helper> (m_satHelper);                     \
-    stat->SetName (m_name + "-per-ut-user-" + name                              \
-        + GetOutputTypeSuffix (type));                                          \
-    stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT_USER);               \
-    stat->SetOutputType (type);                                                 \
-    stat->Install ();                                                           \
-    m_stats.push_back (stat);                                                   \
-  }                                                                             \
-}
+#define SAT_STATS_PER_UT_USER_METHOD_DEFINITION(id, name)                                             \
+  void                                                                                                \
+  SatStatsHelperContainer::AddPerUtUser ## id (SatStatsHelper::OutputType_t type)                     \
+    {                                                                                                 \
+      NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));                             \
+      std::string statName = m_name + "-per-ut-user-" + name + GetOutputTypeSuffix (type);            \
+      if (type != SatStatsHelper::OUTPUT_NONE && m_names.count (statName) == 0)                       \
+        {                                                                                             \
+          Ptr<SatStats ## id ## Helper> stat = CreateObject<SatStats ## id ## Helper> (m_satHelper);  \
+          stat->SetName (statName);                                                                   \
+          stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT_USER);                               \
+          stat->SetOutputType (type);                                                                 \
+          stat->Install ();                                                                           \
+          m_stats.push_back (stat);                                                                   \
+          m_names.insert (statName);                                                                  \
+        }                                                                                             \
+    }
 
-#define SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION(id, name)                          \
-  void                                                                              \
-  SatStatsHelperContainer::AddAverageBeam ## id (SatStatsHelper::OutputType_t type) \
-{                                                                                 \
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));             \
-  if (type != SatStatsHelper::OUTPUT_NONE)                                        \
-  {                                                                               \
-    Ptr<SatStats ## id ## Helper> stat                                            \
-    = CreateObject<SatStats ## id ## Helper> (m_satHelper);                       \
-    stat->SetName (m_name + "-average-beam-" + name                               \
-        + GetOutputTypeSuffix (type));                                            \
-    stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_BEAM);                    \
-    stat->SetOutputType (type);                                                   \
-    stat->SetAveragingMode (true);                                                \
-    stat->Install ();                                                             \
-    m_stats.push_back (stat);                                                     \
-  }                                                                               \
-}
+#define SAT_STATS_AVERAGE_BEAM_METHOD_DEFINITION(id, name)                                            \
+  void                                                                                                \
+  SatStatsHelperContainer::AddAverageBeam ## id (SatStatsHelper::OutputType_t type)                   \
+    {                                                                                                 \
+      NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));                             \
+      std::string statName = m_name + "-average-beam-" + name + GetOutputTypeSuffix (type);           \
+      if (type != SatStatsHelper::OUTPUT_NONE && m_names.count (statName) == 0)                       \
+        {                                                                                             \
+          Ptr<SatStats ## id ## Helper> stat = CreateObject<SatStats ## id ## Helper> (m_satHelper);  \
+          stat->SetName (statName);                                                                   \
+          stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_BEAM);                                  \
+          stat->SetOutputType (type);                                                                 \
+          stat->SetAveragingMode (true);                                                              \
+          stat->Install ();                                                                           \
+          m_stats.push_back (stat);                                                                   \
+          m_names.insert (statName);                                                                  \
+        }                                                                                             \
+    }
 
-#define SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(id, name)                     \
-  void                                                                          \
-  SatStatsHelperContainer::AddAverageGroup ## id (SatStatsHelper::OutputType_t type) \
-{                                                                               \
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));           \
-  if (type != SatStatsHelper::OUTPUT_NONE)                                      \
-  {                                                                             \
-    Ptr<SatStats ## id ## Helper> stat                                          \
-    = CreateObject<SatStats ## id ## Helper> (m_satHelper);                     \
-    stat->SetName (m_name + "-average-group-" + name                            \
-        + GetOutputTypeSuffix (type));                                          \
-    stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_GROUP);                 \
-    stat->SetOutputType (type);                                                 \
-    stat->SetAveragingMode (true);                                              \
-    stat->Install ();                                                           \
-    m_stats.push_back (stat);                                                   \
-  }                                                                             \
-}
+#define SAT_STATS_AVERAGE_GROUP_METHOD_DEFINITION(id, name)                                           \
+  void                                                                                                \
+  SatStatsHelperContainer::AddAverageGroup ## id (SatStatsHelper::OutputType_t type)                  \
+    {                                                                                                 \
+      NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));                             \
+      std::string statName = m_name + "-average-group-" + name + GetOutputTypeSuffix (type);          \
+      if (type != SatStatsHelper::OUTPUT_NONE && m_names.count (statName) == 0)                       \
+        {                                                                                             \
+          Ptr<SatStats ## id ## Helper> stat = CreateObject<SatStats ## id ## Helper> (m_satHelper);  \
+          stat->SetName (statName);                                                                   \
+          stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_GROUP);                                 \
+          stat->SetOutputType (type);                                                                 \
+          stat->SetAveragingMode (true);                                                              \
+          stat->Install ();                                                                           \
+          m_stats.push_back (stat);                                                                   \
+          m_names.insert (statName);                                                                  \
+        }                                                                                             \
+    }
 
-#define SAT_STATS_AVERAGE_UT_METHOD_DEFINITION(id, name)                          \
-  void                                                                            \
-  SatStatsHelperContainer::AddAverageUt ## id (SatStatsHelper::OutputType_t type) \
-{                                                                               \
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));           \
-  if (type != SatStatsHelper::OUTPUT_NONE)                                      \
-  {                                                                             \
-    Ptr<SatStats ## id ## Helper> stat                                          \
-    = CreateObject<SatStats ## id ## Helper> (m_satHelper);                     \
-    stat->SetName (m_name + "-average-ut-" + name                               \
-        + GetOutputTypeSuffix (type));                                          \
-    stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT);                    \
-    stat->SetOutputType (type);                                                 \
-    stat->SetAveragingMode (true);                                              \
-    stat->Install ();                                                           \
-    m_stats.push_back (stat);                                                   \
-  }                                                                             \
-}
+#define SAT_STATS_AVERAGE_UT_METHOD_DEFINITION(id, name)                                              \
+  void                                                                                                \
+  SatStatsHelperContainer::AddAverageUt ## id (SatStatsHelper::OutputType_t type)                     \
+    {                                                                                                 \
+      NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));                             \
+      std::string statName = m_name + "-average-ut-" + name + GetOutputTypeSuffix (type);             \
+      if (type != SatStatsHelper::OUTPUT_NONE && m_names.count (statName) == 0)                       \
+        {                                                                                             \
+          Ptr<SatStats ## id ## Helper> stat = CreateObject<SatStats ## id ## Helper> (m_satHelper);  \
+          stat->SetName (statName);                                                                   \
+          stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT);                                    \
+          stat->SetOutputType (type);                                                                 \
+          stat->SetAveragingMode (true);                                                              \
+          stat->Install ();                                                                           \
+          m_stats.push_back (stat);                                                                   \
+          m_names.insert (statName);                                                                  \
+        }                                                                                             \
+    }
 
-#define SAT_STATS_AVERAGE_UT_USER_METHOD_DEFINITION(id, name)                         \
-  void                                                                                \
-  SatStatsHelperContainer::AddAverageUtUser ## id (SatStatsHelper::OutputType_t type) \
-{                                                                                   \
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));               \
-  if (type != SatStatsHelper::OUTPUT_NONE)                                          \
-  {                                                                                 \
-    Ptr<SatStats ## id ## Helper> stat                                              \
-    = CreateObject<SatStats ## id ## Helper> (m_satHelper);                         \
-    stat->SetName (m_name + "-average-ut-user-" + name                              \
-        + GetOutputTypeSuffix (type));                                              \
-    stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT_USER);                   \
-    stat->SetOutputType (type);                                                     \
-    stat->SetAveragingMode (true);                                                  \
-    stat->Install ();                                                               \
-    m_stats.push_back (stat);                                                       \
-  }                                                                                 \
-}
+#define SAT_STATS_AVERAGE_UT_USER_METHOD_DEFINITION(id, name)                                         \
+  void                                                                                                \
+  SatStatsHelperContainer::AddAverageUtUser ## id (SatStatsHelper::OutputType_t type)                 \
+    {                                                                                                 \
+      NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));                             \
+      std::string statName = m_name + "-average-ut-user-" + name + GetOutputTypeSuffix (type);        \
+      if (type != SatStatsHelper::OUTPUT_NONE && m_names.count (statName) == 0)                       \
+        {                                                                                             \
+          Ptr<SatStats ## id ## Helper> stat = CreateObject<SatStats ## id ## Helper> (m_satHelper);  \
+          stat->SetName (statName);                                                                   \
+          stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_UT_USER);                               \
+          stat->SetOutputType (type);                                                                 \
+          stat->SetAveragingMode (true);                                                              \
+          stat->Install ();                                                                           \
+          m_stats.push_back (stat);                                                                   \
+          m_names.insert (statName);                                                                  \
+        }                                                                                             \
+    }
 
-#define SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION(id, name)                           \
-  void                                                                              \
-  SatStatsHelperContainer::AddAverageSat ## id (SatStatsHelper::OutputType_t type)  \
-{                                                                                   \
-  NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));               \
-  if (type != SatStatsHelper::OUTPUT_NONE)                                          \
-  {                                                                                 \
-    Ptr<SatStats ## id ## Helper> stat                                              \
-    = CreateObject<SatStats ## id ## Helper> (m_satHelper);                         \
-    stat->SetName (m_name + "-average-sat-" + name                                  \
-        + GetOutputTypeSuffix (type));                                              \
-    stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_SAT);                       \
-    stat->SetOutputType (type);                                                     \
-    stat->SetAveragingMode (true);                                                  \
-    stat->Install ();                                                               \
-    m_stats.push_back (stat);                                                       \
-  }                                                                                 \
-}
+#define SAT_STATS_AVERAGE_SAT_METHOD_DEFINITION(id, name)                                             \
+  void                                                                                                \
+  SatStatsHelperContainer::AddAverageSat ## id (SatStatsHelper::OutputType_t type)                    \
+    {                                                                                                 \
+      NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));                             \
+      std::string statName = m_name + "-average-sat-" + name + GetOutputTypeSuffix (type);            \
+      if (type != SatStatsHelper::OUTPUT_NONE && m_names.count (statName) == 0)                       \
+        {                                                                                             \
+          Ptr<SatStats ## id ## Helper> stat = CreateObject<SatStats ## id ## Helper> (m_satHelper);  \
+          stat->SetName (statName);                                                                   \
+          stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_SAT);                                   \
+          stat->SetOutputType (type);                                                                 \
+          stat->SetAveragingMode (true);                                                              \
+          stat->Install ();                                                                           \
+          m_stats.push_back (stat);                                                                   \
+          m_names.insert (statName);                                                                  \
+        }                                                                                             \
+    }
 
-#define SAT_STATS_PER_SLICE_METHOD_DEFINITION(id, name)                                 \
-  void                                                                                  \
-  SatStatsHelperContainer::AddPerSlice ## id (SatStatsHelper::OutputType_t type)        \
-  {                                                                                     \
-    NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));                 \
-    if (type != SatStatsHelper::OUTPUT_NONE)                                            \
-    {                                                                                   \
-      Ptr<SatStats ## id ## Helper> stat                                                \
-        = CreateObject<SatStats ## id ## Helper> (m_satHelper);                         \
-      stat->SetName (m_name + "-per-slice-" + name                                      \
-                     + GetOutputTypeSuffix (type));                                     \
-      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_SLICE);                       \
-      stat->SetOutputType (type);                                                       \
-      stat->Install ();                                                                 \
-      m_stats.push_back (stat);                                                         \
-    }                                                                                   \
-  }
+#define SAT_STATS_PER_SLICE_METHOD_DEFINITION(id, name)                                               \
+  void                                                                                                \
+  SatStatsHelperContainer::AddPerSlice ## id (SatStatsHelper::OutputType_t type)                      \
+    {                                                                                                 \
+      NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));                             \
+      std::string statName = m_name + "-per-slice-" + name + GetOutputTypeSuffix (type);              \
+      if (type != SatStatsHelper::OUTPUT_NONE && m_names.count (statName) == 0)                       \
+        {                                                                                             \
+          Ptr<SatStats ## id ## Helper> stat = CreateObject<SatStats ## id ## Helper> (m_satHelper);  \
+          stat->SetName (statName);                                                                   \
+          stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_SLICE);                                 \
+          stat->SetOutputType (type);                                                                 \
+          stat->Install ();                                                                           \
+          m_stats.push_back (stat);                                                                   \
+          m_names.insert (statName);                                                                  \
+        }                                                                                             \
+    }
 
-#define SAT_STATS_PER_SAT_METHOD_DEFINITION(id, name)                                   \
-  void                                                                                  \
-  SatStatsHelperContainer::AddPerSat ## id (SatStatsHelper::OutputType_t type)          \
-  {                                                                                     \
-    NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));                 \
-    if (type != SatStatsHelper::OUTPUT_NONE)                                            \
-    {                                                                                   \
-      Ptr<SatStats ## id ## Helper> stat                                                \
-        = CreateObject<SatStats ## id ## Helper> (m_satHelper);                         \
-      stat->SetName (m_name + "-per-sat-" + name                                        \
-                     + GetOutputTypeSuffix (type));                                     \
-      stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_SAT);                         \
-      stat->SetOutputType (type);                                                       \
-      stat->Install ();                                                                 \
-      m_stats.push_back (stat);                                                         \
-    }                                                                                   \
-  }
+#define SAT_STATS_PER_SAT_METHOD_DEFINITION(id, name)                                                 \
+  void                                                                                                \
+  SatStatsHelperContainer::AddPerSat ## id (SatStatsHelper::OutputType_t type)                        \
+    {                                                                                                 \
+      NS_LOG_FUNCTION (this << SatStatsHelper::GetOutputTypeName (type));                             \
+      std::string statName = m_name + "-per-sat-" + name + GetOutputTypeSuffix (type);                \
+      if (type != SatStatsHelper::OUTPUT_NONE && m_names.count (statName) == 0)                       \
+        {                                                                                             \
+          Ptr<SatStats ## id ## Helper> stat = CreateObject<SatStats ## id ## Helper> (m_satHelper);  \
+          stat->SetName (statName);                                                                   \
+          stat->SetIdentifierType (SatStatsHelper::IDENTIFIER_SAT);                                   \
+          stat->SetOutputType (type);                                                                 \
+          stat->Install ();                                                                           \
+          m_stats.push_back (stat);                                                                   \
+          m_names.insert (statName);                                                                  \
+        }                                                                                             \
+    }
 
 
 // Forward link application-level packet delay statistics.

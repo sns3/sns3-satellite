@@ -63,6 +63,7 @@ int mainGeoTwoSats (uint32_t packetSize, std::string interval, std::string confi
   Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
 
   simulationHelper->SetSimulationTime (Seconds (30));
+  simulationHelper->SetOutputTag ("geo");
 
   std::set<uint32_t> beamSetAll = {1, 2, 3, 4, 5, 6, 7, 8, 9,
                                    10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
@@ -254,6 +255,7 @@ int mainLeo (uint32_t packetSize, std::string interval, std::string configuratio
   Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
 
   simulationHelper->SetSimulationTime (Seconds (10));
+  simulationHelper->SetOutputTag ("leo");
 
   std::set<uint32_t> beamSetAll = {1, 2, 3, 4, 5, 6, 7, 8, 9,
                                    10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
