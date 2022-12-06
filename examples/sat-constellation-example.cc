@@ -309,7 +309,7 @@ int mainLeo (uint32_t packetSize, std::string interval, std::string configuratio
   NodeContainer utUsers = helper->GetUtUsers (uts);   // 6 UT users
 
   // Total is 3*6 = 18 flows
-  // Global App rate is pktSize*ptkPerSecond*nbFlows = 512*8*20*18 = 1475kb/s on both FWD and RTN
+  // Global App rate is pktSize*ptkPerSecond*nbFlows = 512*8*50*18 = 3686kb/s on both FWD and RTN
   Ptr<SatTrafficHelper> trafficHelper = simulationHelper->GetTrafficHelper ();
 
   trafficHelper->AddCbrTraffic (SatTrafficHelper::FWD_LINK,
