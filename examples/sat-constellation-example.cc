@@ -51,7 +51,7 @@ int mainGeoTwoSats (uint32_t packetSize, std::string interval, std::string confi
   /// Use constellation
   Config::SetDefault ("ns3::SatHelper::SatConstellationEnabled", BooleanValue (true));
   Config::SetDefault ("ns3::SatHelper::SatConstellationFolder", StringValue (configurationFolder));
-  Config::SetDefault ("ns3::PointToPointIslHelper::IslDataRate", DataRateValue (DataRate ("2Mb/s")));
+  Config::SetDefault ("ns3::PointToPointIslHelper::IslDataRate", DataRateValue (DataRate ("100Mb/s")));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::StartDateStr", StringValue (startDate));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionEachRequest", BooleanValue (false));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionPeriod", TimeValue (Seconds (1)));
