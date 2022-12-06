@@ -68,6 +68,16 @@ constexpr uint8_t SUPERFRAME_SEQUENCE = 0;
  */
 constexpr uint16_t MAXIMUM_TIME_SLOT_ID = 2047;
 
+/**
+ * \brief Maximum number of beams per satellite
+ */
+constexpr uint32_t MAX_BEAMS_PER_SATELLITE = 1000;
+
+/**
+ * \brief Maximum number of satellites in constellation
+ */
+constexpr uint32_t MAX_SATELLITES = 10000;
+
 } // namespace SatConstVariables
 
 } // namespace ns3

@@ -224,6 +224,7 @@ set(source_files
     stats/satellite-stats-link-sinr-helper.cc
     stats/satellite-stats-marsala-correlation-helper.cc
     stats/satellite-stats-packet-collision-helper.cc
+    stats/satellite-stats-packet-drop-rate-helper.cc
     stats/satellite-stats-packet-error-helper.cc
     stats/satellite-stats-plt-helper.cc
     stats/satellite-stats-queue-helper.cc
@@ -466,6 +467,7 @@ set(header_files
     stats/satellite-stats-link-sinr-helper.h
     stats/satellite-stats-marsala-correlation-helper.h
     stats/satellite-stats-packet-collision-helper.h
+    stats/satellite-stats-packet-drop-rate-helper.h
     stats/satellite-stats-packet-error-helper.h
     stats/satellite-stats-plt-helper.h
     stats/satellite-stats-queue-helper.h

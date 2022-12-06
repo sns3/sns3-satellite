@@ -324,6 +324,11 @@ private:
    * \return The corresponding PPP protocol number
    */
   static uint16_t EtherToPpp (uint16_t protocol);
+
+  /**
+   * Traced callback for drop rate in queue
+   */
+  TracedCallback<uint32_t, Ptr<Node>, Ptr<Node>, bool> m_packetDropRateTrace;
 };
 
 } // namespace ns3

@@ -27,6 +27,7 @@
 #include "satellite-conf.h"
 #include "ns3/singleton.h"
 #include "ns3/satellite-env-variables.h"
+#include "ns3/satellite-const-variables.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatConf");
 
@@ -208,6 +209,8 @@ void SatConf::Initialize (std::string rtnConf,
 
   NS_ASSERT (m_rtnConf.size () == m_fwdConf.size ());
   m_beamCount = m_rtnConf.size ();
+
+  NS_ASSERT (m_beamCount < SatConstVariables::MAX_BEAMS_PER_SATELLITE);
 
   // Load GW positions
   LoadPositions (dataPath + gwPos, m_gwPositions);
@@ -533,6 +536,8 @@ SatConf::LoadTles (std::string filePathName)
 
       i += 1;
     }
+
+  NS_ASSERT (tles.size () < SatConstVariables::MAX_SATELLITES);
 
   ifs->close ();
   delete ifs;

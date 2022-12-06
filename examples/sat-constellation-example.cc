@@ -51,6 +51,7 @@ int mainGeoTwoSats (uint32_t packetSize, std::string interval, std::string confi
   /// Use constellation
   Config::SetDefault ("ns3::SatHelper::SatConstellationEnabled", BooleanValue (true));
   Config::SetDefault ("ns3::SatHelper::SatConstellationFolder", StringValue (configurationFolder));
+  Config::SetDefault ("ns3::PointToPointIslHelper::IslDataRate", DataRateValue (DataRate ("2Mb/s")));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::StartDateStr", StringValue (startDate));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionEachRequest", BooleanValue (false));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionPeriod", TimeValue (Seconds (1)));
@@ -218,6 +219,10 @@ int mainGeoTwoSats (uint32_t packetSize, std::string interval, std::string confi
   s->AddPerSatFwdUserQueueBytes (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerSatFwdUserQueuePackets (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
+  // ISL drop rate statistics
+  s->AddGlobalPacketDropRate (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerIslPacketDropRate (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
   simulationHelper->EnableProgressLogs ();
   simulationHelper->RunSimulation ();
 
@@ -235,6 +240,7 @@ int mainLeo (uint32_t packetSize, std::string interval, std::string configuratio
   /// Use constellation
   Config::SetDefault ("ns3::SatHelper::SatConstellationEnabled", BooleanValue (true));
   Config::SetDefault ("ns3::SatHelper::SatConstellationFolder", StringValue (configurationFolder));
+  Config::SetDefault ("ns3::PointToPointIslHelper::IslDataRate", DataRateValue (DataRate ("100Mb/s")));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::StartDateStr", StringValue (startDate));
   Config::SetDefault ("ns3::SatGwMac::SendNcrBroadcast", BooleanValue (false));
   Config::SetDefault ("ns3::SatSGP4MobilityModel::UpdatePositionEachRequest", BooleanValue (false));
@@ -303,7 +309,7 @@ int mainLeo (uint32_t packetSize, std::string interval, std::string configuratio
   NodeContainer utUsers = helper->GetUtUsers (uts);   // 6 UT users
 
   // Total is 3*6 = 18 flows
-  // Global App rate is pktSize*ptkPerSecond*nbFlows = 512*8*100*18 = 7373kb/s on both FWD and RTN
+  // Global App rate is pktSize*ptkPerSecond*nbFlows = 512*8*20*18 = 1475kb/s on both FWD and RTN
   Ptr<SatTrafficHelper> trafficHelper = simulationHelper->GetTrafficHelper ();
 
   trafficHelper->AddCbrTraffic (SatTrafficHelper::FWD_LINK,
@@ -344,6 +350,31 @@ int mainLeo (uint32_t packetSize, std::string interval, std::string configuratio
   s->AddPerBeamFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
   s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
+  // Delay statistics
+  s->AddPerUtFwdDevDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnDevDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  // Link delay statistics
+  s->AddPerUtFwdFeederDevLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdUserDevLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnFeederDevLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnUserDevLinkDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  // Jitter statistics
+  s->AddPerUtFwdDevJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnDevJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  // Link jitter statistics
+  s->AddPerUtFwdFeederDevLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtFwdUserDevLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnFeederDevLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerUtRtnUserDevLinkJitter (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+  // ISL drop rate statistics
+  s->AddGlobalPacketDropRate (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  s->AddPerIslPacketDropRate (SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+
   simulationHelper->EnableProgressLogs ();
   simulationHelper->RunSimulation ();
 
@@ -354,7 +385,7 @@ int
 main (int argc, char *argv[])
 {
   uint32_t packetSize = 512;
-  std::string interval = "10ms";
+  std::string interval = "20ms";
   std::string configurationFolder = "eutelsat-geo-2-sats-isls";
   std::string startDate = "2022-11-13 12:00:00";
 

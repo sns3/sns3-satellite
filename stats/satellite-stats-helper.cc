@@ -40,6 +40,7 @@
 #include <ns3/satellite-id-mapper.h>
 #include <ns3/satellite-env-variables.h>
 #include <ns3/satellite-geo-net-device.h>
+#include <ns3/satellite-const-variables.h>
 
 NS_LOG_COMPONENT_DEFINE ("SatStatsHelper");
 
@@ -69,6 +70,8 @@ SatStatsHelper::GetIdentifierTypeName (SatStatsHelper::IdentifierType_t identifi
       return "IDENTIFIER_GROUP";
     case SatStatsHelper::IDENTIFIER_SAT:
       return "IDENTIFIER_SAT";
+    case SatStatsHelper::IDENTIFIER_ISL:
+      return "IDENTIFIER_ISL";
     default:
       NS_FATAL_ERROR ("SatStatsHelper - Invalid identifier type");
       break;
@@ -154,7 +157,10 @@ SatStatsHelper::GetTypeId ()
                                     SatStatsHelper::IDENTIFIER_BEAM,    "BEAM",
                                     SatStatsHelper::IDENTIFIER_UT,      "UT",
                                     SatStatsHelper::IDENTIFIER_UT_USER, "UT_USER",
-                                    SatStatsHelper::IDENTIFIER_UT_USER, "SLICE"))
+                                    SatStatsHelper::IDENTIFIER_SLICE,   "SLICE",
+                                    SatStatsHelper::IDENTIFIER_GROUP,   "GROUP",
+                                    SatStatsHelper::IDENTIFIER_SAT,     "SAT",
+                                    SatStatsHelper::IDENTIFIER_ISL,     "ISL"))
     .AddAttribute ("OutputType",
                    "Determines the type and format of the output.",
                    EnumValue (SatStatsHelper::OUTPUT_SCATTER_FILE),
@@ -345,7 +351,7 @@ SatStatsHelper::CreateCollectorPerIdentifier (CollectorMap &collectorMap) const
             std::ostringstream name;
             name << (satId+1) << "-" << beamId;
             collectorMap.SetAttribute ("Name", StringValue (name.str ()));
-            collectorMap.Create (1000*(satId+1) + beamId);
+            collectorMap.Create (SatConstVariables::MAX_BEAMS_PER_SATELLITE*(satId+1) + beamId);
             n++;
           }
         break;
@@ -428,6 +434,28 @@ SatStatsHelper::CreateCollectorPerIdentifier (CollectorMap &collectorMap) const
         break;
       }
 
+    case SatStatsHelper::IDENTIFIER_ISL:
+      {
+        NodeContainer sats = GetSatHelper ()->GetBeamHelper ()->GetGeoSatNodes ();
+
+        for (NodeContainer::Iterator it = sats.Begin (); it != sats.End (); ++it)
+          {
+            Ptr<SatGeoNetDevice> satGeoNetDevice = DynamicCast<SatGeoNetDevice> (GetSatSatGeoNetDevice (*it));
+            const uint32_t satSrcId = GetSatId (*it);
+            std::vector<Ptr<PointToPointIslNetDevice>> islNetDevices = satGeoNetDevice->GetIslsNetDevices ();
+            for (std::vector<Ptr<PointToPointIslNetDevice>>::iterator itIsl = islNetDevices.begin (); itIsl != islNetDevices.end (); itIsl++)
+              {
+                Ptr<PointToPointIslNetDevice> islNetDevice = *itIsl;
+                const uint32_t satDstId = GetSatId (islNetDevice->GetDestinationNode ());
+                std::ostringstream name;
+                name << satSrcId << "-" << satDstId;
+                collectorMap.SetAttribute ("Name", StringValue (name.str ()));
+                collectorMap.Create (SatConstVariables::MAX_SATELLITES*satSrcId + satDstId);
+                n++;
+              }
+          }
+        break;
+      }
 
     default:
       NS_FATAL_ERROR ("SatStatsHelper - Invalid identifier type");
@@ -485,6 +513,9 @@ SatStatsHelper::GetIdentifierHeading (std::string dataLabel) const
 
     case SatStatsHelper::IDENTIFIER_SAT:
       return "% sat_id " + dataLabel;
+
+    case SatStatsHelper::IDENTIFIER_ISL:
+      return "% isl_id " + dataLabel;
 
     default:
       NS_FATAL_ERROR ("SatStatsHelper - Invalid identifier type");
@@ -723,7 +754,7 @@ SatStatsHelper::GetIdentifierForUtUser (Ptr<Node> utUserNode) const
                 NS_ASSERT_MSG (beamId != -1,
                                "UT user node " << utUserNode->GetId ()
                                                << " is not attached to any beam");
-                ret = 1000*satId + beamId;
+                ret = SatConstVariables::MAX_BEAMS_PER_SATELLITE*satId + beamId;
               }
           }
 
@@ -855,7 +886,7 @@ SatStatsHelper::GetIdentifierForUt (Ptr<Node> utNode) const
             NS_ASSERT_MSG (beamId != -1,
                            "UT node " << utNode->GetId ()
                                       << " is not attached to any beam");
-            ret = 1000*satId + beamId;
+            ret = SatConstVariables::MAX_BEAMS_PER_SATELLITE*satId + beamId;
           }
 
         break;
@@ -1000,6 +1031,28 @@ SatStatsHelper::GetIdentifierForSat (Ptr<Node> satNode) const
                         << GetIdentifierTypeName (m_identifierType)
                         << " is not valid for a SAT."
                         << " Assigning identifier 0 to this SAT.");
+      return 0;
+    }
+}
+
+
+uint32_t
+SatStatsHelper::GetIdentifierForIsl (Ptr<Node> satNodeSrc, Ptr<Node> satNodeDst) const
+{
+  if (m_identifierType == IDENTIFIER_ISL)
+    {
+      return SatConstVariables::MAX_SATELLITES*GetSatId (satNodeSrc) + GetSatId (satNodeDst);
+    }
+  else if (m_identifierType == IDENTIFIER_GLOBAL)
+    {
+      return 0;
+    }
+  else
+    {
+      NS_LOG_WARN (this << " Identifier type "
+                        << GetIdentifierTypeName (m_identifierType)
+                        << " is not valid for a ISL."
+                        << " Assigning identifier 0 to this ISL.");
       return 0;
     }
 }

@@ -59,6 +59,10 @@ PointToPointIslNetDevice::GetTypeId (void)
                    TimeValue (Seconds (0.0)),
                    MakeTimeAccessor (&PointToPointIslNetDevice::m_tInterframeGap),
                    MakeTimeChecker ())
+    .AddTraceSource ("PacketDropRateTrace",
+                     "A packet has been dropped or not",
+                     MakeTraceSourceAccessor (&PointToPointIslNetDevice::m_packetDropRateTrace),
+                     "ns3::SatTypedefs::PacketDropRateTrace")
   ;
   return tid;
 }
@@ -406,8 +410,12 @@ PointToPointIslNetDevice::Send (
 
   NS_ASSERT (m_queue != nullptr);
 
+
   if (m_queue->Enqueue (packet))
     {
+      // Packet is enqued
+      m_packetDropRateTrace (1, m_node, m_destinationNode, false);
+
       // If the channel is ready for transition we send the packet right now
       if (m_txMachineState == READY)
         {
@@ -417,6 +425,9 @@ PointToPointIslNetDevice::Send (
         }
       return true;
     }
+
+  // Packet is dropped
+  m_packetDropRateTrace (1, m_node, m_destinationNode, true);
 
   return false;
 }

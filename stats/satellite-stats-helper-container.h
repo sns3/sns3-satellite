@@ -76,6 +76,7 @@ namespace ns3 {
  * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] LinkModcod
  * - Add [Global, PerGw, PerBeam] FrameTypeUsage
  * - Add [Global, PerGw, PerBeam] RtnFeederWindowLoad
+ * - Add [Global, PerIsl] PacketDropRate
  *
  * Also check the Doxygen documentation of this class for more information.
  */
@@ -767,6 +768,10 @@ public:
   void AddGlobalRtnFeederWindowLoad (SatStatsHelper::OutputType_t outputType);
   void AddPerGwRtnFeederWindowLoad (SatStatsHelper::OutputType_t outputType);
   void AddPerBeamRtnFeederWindowLoad (SatStatsHelper::OutputType_t outputType);
+
+  // ISL queue drop statistics
+  void AddGlobalPacketDropRate (SatStatsHelper::OutputType_t outputType);
+  void AddPerIslPacketDropRate (SatStatsHelper::OutputType_t outputType);
 
   /**
    * \param outputType an arbitrary output type.
