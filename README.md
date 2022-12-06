@@ -95,14 +95,14 @@ Now you’re ready to use bake.
 
 ### Installation
 
-Now that everything is in place, you can tell bake that you want to install SNS-3 (i.e.: ''ns-3'' plus the ''sns3-satellite'' module):
+Now that everything is in place, you can tell bake that you want to install SNS-3 (i.e.: `ns-3` plus the `sns3-satellite` module):
 
 ```shell
 $ ./bake.py configure -e ns-3.36 -e sns3-satellite -e sns3-stats -e sns3-traffic
 $ ./bake.py deploy
 ```
 
-This will download the needed dependencies into a ''source'' folder and call the various build tools on each target. 
+This will download the needed dependencies into a `source` folder and call the various build tools on each target. 
 If bake finds that tools are missing on your system to download or build the various dependencies it will warn you 
 and abort the build process if the dependency wasn't optional. You can ask bake for a summary of the required tools before deploying:
 
@@ -122,12 +122,12 @@ You will need to:
 $ git clone https://gitlab.com/nsnam/ns-3-dev.git ns-3.36
 ```
 
-*  get the ''satellite'' module (by [cloning it using git](https://github.com/SNS-3/SNS-3-satellite));
+*  get the `satellite` module (by [cloning it using git](https://github.com/SNS-3/SNS-3-satellite));
 ```shell
 $ cd ns-3.36/contrib
 $ git clone https://github.com/sns3/sns3-satellite.git satellite
 ```
-*  get the ''traffic'' and ''magister-stats'' modules (needed until they are integrated into NS-3) as dependencies of the ''satellite'' module by cloning them :
+*  get the `traffic` and `magister-stats` modules (needed until they are integrated into NS-3) as dependencies of the `satellite` module by cloning them :
 
 ```shell
 $ git clone https://github.com/sns3/traffic.git traffic
@@ -166,7 +166,7 @@ $ ./ns3 --help
 
 Once you compiled SNS-3 successfully, you will need an extra step before being able to run any simulation: download the data defining the reference scenario of the simulation.
 
-These data are available as a separate repository and bundled as a submodule in SNS-3. You can download them afterwards in the ''satellite'' repository using:
+These data are available as a separate repository and bundled as a submodule in SNS-3. You can download them afterwards in the `satellite` repository using:
 
 ```shell
 $ cd source/ns-3.36/contrib/satellite
@@ -175,7 +175,7 @@ $ git submodule update --init --recursive
 
 # Testing SNS-3
 
-You can run the unit tests of the NS-3 distribution by running the ''./test.py'' script:
+You can run the unit tests of the NS-3 distribution by running the `./test.py` script:
 
 ```shell
 $ ./test.py --no-build
@@ -213,15 +213,15 @@ If debug mode is enabled, gdb can be used:
 $ ./ns3 run --gdb <ns3-program>
 ```
 
-SNS-3 is delivered with several examples. Each one allows to demonstrate one or several functionalities of SNS-3. Statistics are generated in the ''data/sims/<ns3-program>'' folder.
+SNS-3 is delivered with several examples. Each one allows to demonstrate one or several functionalities of SNS-3. Statistics are generated in the `data/sims/<ns3-program>` folder.
 
 The main examples are:
 
- * ''sat-cbr-example.cc'': Simple example with CBR traffic
- * ''sat-regeneration-example.cc'': Example to test several regeneration modes on satellite: transparent, physical, link or network. By default, all simulations use one transparent satellite
- * ''sat-constellation-example.cc'': Example with LEO and GEO satellite constellations. ISLs are used to route packets between satellites, with static routing
- * ''sat-vhts-example.cc'': Create a VHTS scenario (high throughputs and high link capacities)
- * ''sat-iot-example.cc'': Create an IoT scenario (low throughputs and low link capacities)
- * ''sat-logon-example.cc'': Use the logon functionality to log the UTs on the NCC. Traffic on return channels is not send before UT is logged
- * ''sat-ncr-example.cc'': Use NCR synchronization between UTs and GWs. UT clock is generally cheap, and need to be resynchronized periodically by the NCC to correctly schedule sending of frames on return channel
- * ''sat-lora-example.cc'': Create a scenario with Lora configuration. Lora is a LPWAN protocol developed for IoT
+ * `sat-cbr-example.cc`: Simple example with CBR traffic
+ * `sat-regeneration-example.cc`: Example to test several regeneration modes on satellite: transparent, physical, link or network. By default, all simulations use one transparent satellite
+ * `sat-constellation-example.cc`: Example with LEO and GEO satellite constellations. ISLs are used to route packets between satellites, with static routing
+ * `sat-vhts-example.cc`: Create a VHTS scenario (high throughputs and high link capacities)
+ * `sat-iot-example.cc`: Create an IoT scenario (low throughputs and low link capacities)
+ * `sat-logon-example.cc`: Use the logon functionality to log the UTs on the NCC. Traffic on return channels is not send before UT is logged
+ * `sat-ncr-example.cc`: Use NCR synchronization between UTs and GWs. UT clock is generally cheap, and need to be resynchronized periodically by the NCC to correctly schedule sending of frames on return channel
+ * `sat-lora-example.cc`: Create a scenario with Lora configuration. Lora is a LPWAN protocol developed for IoT
