@@ -889,7 +889,7 @@ SatHelper::SetGwAddressInUt ()
       Ptr<SatUtMac> satUtMac;
       Ptr<Node> gw = m_gwDistribution[ut];
       uint32_t gwSatId = GetClosestSat (GeoCoordinate (gw->GetObject<SatMobilityModel> ()->GetPosition ()));
-      uint32_t utBeamId;
+      uint32_t utBeamId = 0;
       uint32_t utSatNetDeviceCount = 0;
       for (uint32_t ndId = 0; ndId < m_beamHelper->GetUtNodes ().Get (utId)->GetNDevices (); ndId++)
         {
