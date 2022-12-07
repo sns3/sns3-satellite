@@ -1179,7 +1179,12 @@ SimulationHelper::GetGroupHelper ()
 
   if (!m_groupHelper)
     {
+      if (m_satHelper == nullptr)
+        {
+          NS_FATAL_ERROR ("SatHelper must be created before GroupHelper");
+        }
       m_groupHelper = CreateObject<SatGroupHelper> ();
+      m_groupHelper->SetAntennaGainPatterns (m_satHelper->GetAntennaGainPatterns ());
     }
 
   return m_groupHelper;
@@ -1240,11 +1245,10 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario, c
   m_satHelper = CreateObject<SatHelper> ();
 
   m_satHelper->SetGroupHelper (GetGroupHelper ()); // If not done in user scenario, group helper is created here
-  m_satHelper->SetAntennaGainPatterns (m_groupHelper->GetAntennaGainPatterns ());
   m_satHelper->GetBeamHelper ()->SetAntennaGainPatterns (m_groupHelper->GetAntennaGainPatterns ());
 
   // Set UT position allocators, if any
-  if (!m_enableInputFileUtListPositions)
+  if (!m_enableInputFileUtListPositions && !m_satHelper->IsSatConstellationEnabled ())
     {
       if (m_commonUtPositions)
         {
@@ -1256,13 +1260,32 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario, c
         }
     }
 
+  if (m_satHelper->IsSatConstellationEnabled ())
+    {
+      SatHelper::BeamUserInfoMap_t beamInfo;
+      for (uint32_t satId = 0; satId < m_satHelper->GeoSatNodes ().GetN (); satId++)
+        {
+          // Set beamInfo to indicate enabled beams
+          for (uint32_t i = 1; i <= m_satHelper->GetBeamCount (); i++)
+            {
+              if (IsBeamEnabled (i))
+                {
+                  SatBeamUserInfo info;
+                  beamInfo.insert (std::make_pair (std::make_pair (satId, i), info));
+                }
+            }
+        }
+
+      m_satHelper->CreateConstellationScenario (beamInfo, MakeCallback (&SimulationHelper::GetNextUtUserCount, this));
+    }
+
   // Determine scenario
-  if (scenario == SatHelper::NONE)
+  else if (scenario == SatHelper::NONE)
     {
       // Create beam scenario
       SatHelper::BeamUserInfoMap_t beamInfo;
 
-      for (uint32_t i = 1; i <= 72; i++)
+      for (uint32_t i = 1; i <= m_satHelper->GetBeamCount (); i++)
         {
           if (IsBeamEnabled (i))
             {
@@ -1278,7 +1301,7 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario, c
                   ss << ", " <<  j << ". UT user count= " << utUserCount;
                 }
 
-              beamInfo.insert (std::make_pair (i, info));
+              beamInfo.insert (std::make_pair (std::make_pair (0, i), info));
 
               ss << std::endl;
             }
@@ -1293,23 +1316,23 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario, c
               std::cout << "Beam ID " << it->first << " is not enabled, cannot add " << it->second.size () << " UTs from SatGroupHelper" << std::endl;
               continue;
             }
-          beamInfo[it->first].SetPositions (it->second);
+          beamInfo[std::make_pair (0, it->first)].SetPositions (it->second);
           for (uint32_t i = 0; i < it->second.size (); i++)
             {
-              beamInfo[it->first].AppendUt (GetNextUtUserCount ());
+              beamInfo[std::make_pair (0, it->first)].AppendUt (GetNextUtUserCount ());
             }
         }
 
       if (mobileUtsFolder != "")
         {
-          m_satHelper->LoadMobileUTsFromFolder (mobileUtsFolder, m_utMobileUserCount);
+          m_satHelper->LoadMobileUTsFromFolder (0, mobileUtsFolder, m_utMobileUserCount);
         }
 
       // Now, create either a scenario based on list positions in input file
       // or create a generic scenario with UT positions configured by other ways..
       if (m_enableInputFileUtListPositions)
         {
-          m_satHelper->CreateUserDefinedScenarioFromListPositions (beamInfo, m_inputFileUtPositionsCheckBeams);
+          m_satHelper->CreateUserDefinedScenarioFromListPositions (0, beamInfo, m_inputFileUtPositionsCheckBeams);
         }
       else
         {
@@ -1366,7 +1389,7 @@ SimulationHelper::InstallTrafficModel (TrafficModel_t trafficModel,
   // get users
   NodeContainer utAllUsers = m_satHelper->GetUtUsers ();
   NodeContainer gwUsers = m_satHelper->GetGwUsers ();
-  NS_ASSERT_MSG (m_gwUserId < gwUsers.GetN (), "The number of GW users configured was too low.");
+  NS_ASSERT_MSG (m_gwUserId < gwUsers.GetN (), "The number of GW users configured was too low. " << m_gwUserId << " " << gwUsers.GetN ());
 
   // Filter UT users to keep only a given percentage on which installing the application
   Ptr<UniformRandomVariable> rng = CreateObject<UniformRandomVariable> ();

@@ -90,13 +90,15 @@ public:
    *
    * This is the constructor for the SatUtMac
    *
+   * \param satId ID of sat for UT
    * \param beamId ID of beam for UT
    * \param seq Pointer to superframe sequence.
    * \param forwardLinkRegenerationMode Forward link regeneration mode
    * \param returnLinkRegenerationMode Return link regeneration mode
    * \param crdsaOnlyForControl CRDSA buffer operation mode
    */
-  SatUtMac (uint32_t beamId,
+  SatUtMac (uint32_t satId,
+            uint32_t beamId,
             Ptr<SatSuperframeSeq> seq,
             SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
             SatEnums::RegenerationMode_t returnLinkRegenerationMode,
@@ -108,6 +110,18 @@ public:
    * This is the destructor for the SatUtMac.
    */
   ~SatUtMac ();
+
+  /**
+   * \brief Get sat ID of the object
+   * \return sat ID
+   */
+  inline uint32_t GetSatId () const { return m_satId; }
+
+  /**
+   * \brief Get beam ID of the object
+   * \return beam ID
+   */
+  inline uint32_t GetBeamId () const { return m_beamId; }
 
   /**
    * Receive packet from lower layer.
@@ -188,7 +202,7 @@ public:
   /**
    * Callback to get the SatBeamScheduler from the beam ID for handover
    */
-  typedef Callback<Ptr<SatBeamScheduler>, uint32_t> BeamScheculerCallback;
+  typedef Callback<Ptr<SatBeamScheduler>, uint32_t, uint32_t> BeamScheculerCallback;
 
   /**
    * \brief Set the beam scheduler callback
@@ -231,6 +245,13 @@ public:
    * Set the satellite MAC address on the other side of this link (if regenerative satellite).
    */
   virtual void SetSatelliteAddress (Address satelliteAddress);
+
+  /**
+   * Get address of the GW (or its MAC) serving this UT.
+   *
+   * \return Address of the GW.
+   */
+  Mac48Address GetGwAddress ();
 
   /**
    * Set address of the GW (or its MAC) serving this UT.
@@ -315,9 +336,10 @@ public:
   /**
    * \brief Callback to check whether the current beam is still the best one
    * to use for sending data; and sending handover recommendation if not
+   * \param uint32_t the current satellite ID
    * \param uint32_t the current beam ID
    */
-  typedef Callback<bool, uint32_t> BeamCheckerCallback;
+  typedef Callback<bool, uint32_t, uint32_t> BeamCheckerCallback;
 
   /**
    * \brief Callback to ask for the best beam ID during handover
@@ -561,6 +583,11 @@ private:
 
   SatUtMac& operator = (const SatUtMac &);
   SatUtMac (const SatUtMac &);
+
+  /**
+   * ID of sat for UT
+   */
+  uint32_t m_satId;
 
   /**
    * ID of beam for UT

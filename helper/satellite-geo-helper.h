@@ -171,6 +171,7 @@ public:
    * \param uf user return channel
    * \param userAgp user beam antenna gain pattern
    * \param feederAgp feeder beam antenna gain pattern
+   * \param satId ID of satellite associated to this channel
    * \param gwId ID of GW associated to this channel
    * \param userBeamId Id of the beam
    * \param forwardLinkRegenerationMode Regeneration mode on forward
@@ -183,6 +184,7 @@ public:
                         Ptr<SatChannel> ur,
                         Ptr<SatAntennaGainPattern> userAgp,
                         Ptr<SatAntennaGainPattern> feederAgp,
+                        uint32_t satId,
                         uint32_t gwId,
                         uint32_t userBeamId,
                         SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
@@ -194,6 +196,7 @@ public:
    * \param fr feeder forward channel
    * \param fr feeder return channel
    * \param feederAgp feeder beam antenna gain pattern
+   * \param satId ID of satellite associated to this channel
    * \param gwId ID of GW associated to this channel
    * \param userBeamId Id of the beam
    * \param forwardLinkRegenerationMode Regeneration mode on forward
@@ -203,6 +206,7 @@ public:
                               Ptr<SatChannel> ff,
                               Ptr<SatChannel> fr,
                               Ptr<SatAntennaGainPattern> feederAgp,
+                              uint32_t satId,
                               uint32_t gwId,
                               uint32_t userBeamId,
                               SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
@@ -214,6 +218,7 @@ public:
    * \param uf user forward channel
    * \param uf user return channel
    * \param userAgp user beam antenna gain pattern
+   * \param satId ID of satellite associated to this channel
    * \param userBeamId Id of the beam
    * \param forwardLinkRegenerationMode Regeneration mode on forward
    * \param returnLinkRegenerationMode Regeneration mode on return
@@ -222,6 +227,7 @@ public:
                             Ptr<SatChannel> uf,
                             Ptr<SatChannel> ur,
                             Ptr<SatAntennaGainPattern> userAgp,
+                            uint32_t satId,
                             uint32_t userBeamId,
                             SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                             SatEnums::RegenerationMode_t returnLinkRegenerationMode);
@@ -233,19 +239,27 @@ public:
    */
   void EnableCreationTraces (Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
 
+  /**
+   * Set ISL routes
+   *
+   * \param List of all satellite nodes
+   * \param isls List of all ISLs
+   */
+  void SetIslRoutes (NodeContainer geoNodes, std::vector <std::pair <uint32_t, uint32_t>> isls);
+
 
 private:
   /**
-   * GEO satellite node id
+   * GEO satellites node id
    */
-  uint32_t m_nodeId;
+  std::vector<uint32_t> m_nodeIds;
 
   SatTypedefs::CarrierBandwidthConverter_t m_carrierBandwidthConverter;
   uint32_t m_fwdLinkCarrierCount;
   uint32_t m_rtnLinkCarrierCount;
 
-  // count for devices. Currently only one device supported by helper.
-  uint16_t m_deviceCount;
+  // count for devices for each node ID. Currently only one device supported by helper.
+  std::map<uint32_t, uint16_t> m_deviceCount;
 
   ObjectFactory m_deviceFactory;
 
@@ -302,22 +316,27 @@ private:
    */
   RandomAccessSettings_s m_raSettings;
 
-  /*
+  /**
    * Forward channel link results (DVB-S2) are created if ErrorModel
    * is configured to be AVI.
    */
   Ptr<SatLinkResults> m_fwdLinkResults;
 
-  /*
+  /**
    * Return channel link results (DVB-RCS2) are created if ErrorModel
    * is configured to be AVI.
    */
   Ptr<SatLinkResults> m_rtnLinkResults;
 
-  /*
-   * Map used in regenerative mode to store if MAC already created for a given GW ID
+  /**
+   * Map used in regenerative mode to store if MAC already created for a given pair SAT ID / GW ID
    */
-  std::map<uint32_t, Ptr<SatGeoFeederMac>> m_gwMacMap;
+  std::map<std::pair<uint32_t, uint32_t>, Ptr<SatGeoFeederMac>> m_gwMacMap;
+
+  /**
+   * Arbiter in use to route packets on ISLs
+   */
+  SatEnums::IslArbiterType_t m_islArbiterType;
 
   /**
    * Control forward link messages callback

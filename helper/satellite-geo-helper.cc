@@ -47,6 +47,7 @@
 #include "ns3/satellite-helper.h"
 #include "ns3/satellite-typedefs.h"
 #include "ns3/satellite-id-mapper.h"
+#include "ns3/satellite-isl-arbiter-unicast-helper.h"
 
 #include "ns3/satellite-geo-helper.h"
 
@@ -102,6 +103,12 @@ SatGeoHelper::GetTypeId (void)
                    DoubleValue (0.0),
                    MakeDoubleAccessor (&SatGeoHelper::m_rtnDaConstantErrorRate),
                    MakeDoubleChecker<double> ())
+    .AddAttribute ("IslArbiterType",
+                   "Arbiter in use to route packets on ISLs",
+                   EnumValue (SatEnums::UNICAST),
+                   MakeEnumAccessor (&SatGeoHelper::m_islArbiterType),
+                   MakeEnumChecker (SatEnums::UNICAST, "Unicast",
+                                    SatEnums::ECMP, "ECMP"))
     .AddTraceSource ("Creation", "Creation traces",
                      MakeTraceSourceAccessor (&SatGeoHelper::m_creationTrace),
                      "ns3::SatTypedefs::CreationCallback")
@@ -119,17 +126,17 @@ SatGeoHelper::GetInstanceTypeId (void) const
 
 
 SatGeoHelper::SatGeoHelper ()
-  : m_nodeId (0),
-  m_carrierBandwidthConverter (),
+  : m_carrierBandwidthConverter (),
   m_fwdLinkCarrierCount (),
   m_rtnLinkCarrierCount (),
-  m_deviceCount (0),
+  m_deviceCount (),
   m_deviceFactory (),
   m_daFwdLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
   m_daRtnLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
   m_raSettings (),
   m_fwdLinkResults (),
   m_rtnLinkResults (),
+  m_islArbiterType (SatEnums::UNICAST),
   m_fwdReadCtrlCb (),
   m_rtnReadCtrlCb ()
 {
@@ -146,11 +153,10 @@ SatGeoHelper::SatGeoHelper (SatTypedefs::CarrierBandwidthConverter_t bandwidthCo
                             SatMac::ReadCtrlMsgCallback fwdReadCb,
                             SatMac::ReadCtrlMsgCallback rtnReadCb,
                             RandomAccessSettings_s randomAccessSettings)
-  : m_nodeId (0),
-  m_carrierBandwidthConverter (bandwidthConverterCb),
+  : m_carrierBandwidthConverter (bandwidthConverterCb),
   m_fwdLinkCarrierCount (fwdLinkCarrierCount),
   m_rtnLinkCarrierCount (rtnLinkCarrierCount),
-  m_deviceCount (0),
+  m_deviceCount (),
   m_deviceFactory (),
   m_daFwdLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
   m_daRtnLinkInterferenceModel (SatPhyRxCarrierConf::IF_CONSTANT),
@@ -225,9 +231,6 @@ SatGeoHelper::Install (NodeContainer c)
 {
   NS_LOG_FUNCTION (this );
 
-  // currently only one node supported by helper
-  NS_ASSERT (c.GetN () == 1);
-
   NetDeviceContainer devs;
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
@@ -243,18 +246,18 @@ SatGeoHelper::Install (Ptr<Node> n)
 {
   NS_LOG_FUNCTION (this << n);
 
-  NS_ASSERT (m_deviceCount == 0);
+  NS_ASSERT (m_deviceCount[n->GetId ()] == 0);
 
   // Create SatGeoNetDevice
   Ptr<SatGeoNetDevice> satDev = m_deviceFactory.Create<SatGeoNetDevice> ();
 
   satDev->SetAddress (Mac48Address::Allocate ());
   n->AddDevice (satDev);
-  m_deviceCount++;
-  m_nodeId = n->GetId ();
+  m_deviceCount[n->GetId ()]++;
+  m_nodeIds.push_back (n->GetId ());
 
   Singleton<SatIdMapper>::Get ()->AttachMacToTraceId (satDev->GetAddress ());
-  Singleton<SatIdMapper>::Get ()->AttachMacToSatId (satDev->GetAddress ());
+  Singleton<SatIdMapper>::Get ()->AttachMacToSatId (satDev->GetAddress (), m_nodeIds.size ());
 
   return satDev;
 }
@@ -277,21 +280,22 @@ SatGeoHelper::AttachChannels (Ptr<NetDevice> d,
                               Ptr<SatChannel> ur,
                               Ptr<SatAntennaGainPattern> userAgp,
                               Ptr<SatAntennaGainPattern> feederAgp,
+                              uint32_t satId,
                               uint32_t gwId,
                               uint32_t userBeamId,
                               SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                               SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
-  NS_LOG_FUNCTION (this << d << ff << fr << uf << ur << userAgp << feederAgp << userBeamId);
+  NS_LOG_FUNCTION (this << d << ff << fr << uf << ur << userAgp << feederAgp << satId << gwId << userBeamId);
 
   Ptr<SatGeoNetDevice> dev = DynamicCast<SatGeoNetDevice> (d);
 
   dev->SetForwardLinkRegenerationMode (forwardLinkRegenerationMode);
   dev->SetReturnLinkRegenerationMode (returnLinkRegenerationMode);
-  dev->SetNodeId (m_nodeId);
+  dev->SetNodeId (satId);
 
-  AttachChannelsFeeder ( dev, ff, fr, feederAgp, gwId, userBeamId, forwardLinkRegenerationMode, returnLinkRegenerationMode);
-  AttachChannelsUser ( dev, uf, ur, userAgp, userBeamId, forwardLinkRegenerationMode, returnLinkRegenerationMode);
+  AttachChannelsFeeder ( dev, ff, fr, feederAgp, satId, gwId, userBeamId, forwardLinkRegenerationMode, returnLinkRegenerationMode);
+  AttachChannelsUser ( dev, uf, ur, userAgp, satId, userBeamId, forwardLinkRegenerationMode, returnLinkRegenerationMode);
 }
 
 void
@@ -299,15 +303,16 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
                                      Ptr<SatChannel> ff,
                                      Ptr<SatChannel> fr,
                                      Ptr<SatAntennaGainPattern> feederAgp,
+                                     uint32_t satId,
                                      uint32_t gwId,
                                      uint32_t userBeamId,
                                      SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                                      SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
-
-  NS_LOG_FUNCTION (this << dev << ff << fr << feederAgp << forwardLinkRegenerationMode << returnLinkRegenerationMode);
+  NS_LOG_FUNCTION (this << dev << ff << fr << feederAgp << satId << gwId << userBeamId << forwardLinkRegenerationMode << returnLinkRegenerationMode);
 
   SatPhy::CreateParam_t params;
+  params.m_satId = satId;
   params.m_beamId = userBeamId;
   params.m_device = dev;
   params.m_standard = SatEnums::GEO;
@@ -343,8 +348,8 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
   // Note, that currently we have only one set of antenna patterns,
   // which are utilized in both in user link and feeder link, and
   // in both uplink and downlink directions.
-  fPhy->SetTxAntennaGainPattern (feederAgp);
-  fPhy->SetRxAntennaGainPattern (feederAgp);
+  fPhy->SetTxAntennaGainPattern (feederAgp, dev->GetNode ()->GetObject<SatMobilityModel> ());
+  fPhy->SetRxAntennaGainPattern (feederAgp, dev->GetNode ()->GetObject<SatMobilityModel> ());
 
   dev->AddFeederPhy (fPhy, userBeamId);
 
@@ -355,7 +360,9 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
   bool startScheduler = false;
 
   // Create MAC layer
-  fMac = CreateObject<SatGeoFeederMac> (forwardLinkRegenerationMode,
+  fMac = CreateObject<SatGeoFeederMac> (satId,
+                                        userBeamId,
+                                        forwardLinkRegenerationMode,
                                         returnLinkRegenerationMode);
 
   Mac48Address feederAddress;
@@ -367,7 +374,7 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
       case SatEnums::REGENERATION_PHY:
         {
           // Create a node info to PHY layers
-          Ptr<SatNodeInfo> niPhyFeeder = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, Mac48Address::ConvertFrom (dev->GetAddress ()));
+          Ptr<SatNodeInfo> niPhyFeeder = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeIds[satId], Mac48Address::ConvertFrom (dev->GetAddress ()));
           fPhy->SetNodeInfo (niPhyFeeder);
           fMac->SetNodeInfo (niPhyFeeder);
 
@@ -379,16 +386,16 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
           fLlc = CreateObject<SatGeoLlc> (forwardLinkRegenerationMode,
                                           returnLinkRegenerationMode);
 
-          if (m_gwMacMap.count(gwId))
+          if (m_gwMacMap.count(std::make_pair (satId, gwId)))
             {
               // MAC already exists for this GW ID, reusing it, and disabling the other
-              dev->AddFeederMac (fMac, m_gwMacMap[gwId], userBeamId);
+              dev->AddFeederMac (fMac, m_gwMacMap[std::make_pair (satId, gwId)], userBeamId);
             }
           else
             {
               // First MAC for this GW ID, storing it to the map
               dev->AddFeederMac (fMac, fMac, userBeamId);
-              m_gwMacMap[gwId] = fMac;
+              m_gwMacMap[std::make_pair (satId, gwId)] = fMac;
               startScheduler = true;
             }
 
@@ -397,7 +404,7 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
 
           // Create a node info to PHY and MAC layers
           feederAddress = Mac48Address::Allocate ();
-          Ptr<SatNodeInfo> niFeeder = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, feederAddress);
+          Ptr<SatNodeInfo> niFeeder = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeIds[satId], feederAddress);
           fPhy->SetNodeInfo (niFeeder);
           fMac->SetNodeInfo (niFeeder);
           fLlc->SetNodeInfo (niFeeder);
@@ -412,16 +419,16 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
           fLlc = CreateObject<SatGeoFeederLlc> (forwardLinkRegenerationMode,
                                                 returnLinkRegenerationMode);
 
-          if (m_gwMacMap.count(gwId))
+          if (m_gwMacMap.count(std::make_pair (satId, gwId)))
             {
               // MAC already exists for this GW ID, reusing it, and disabling the other
-              dev->AddFeederMac (fMac, m_gwMacMap[gwId], userBeamId);
+              dev->AddFeederMac (fMac, m_gwMacMap[std::make_pair (satId, gwId)], userBeamId);
             }
           else
             {
               // First MAC for this GW ID, storing it to the map
               dev->AddFeederMac (fMac, fMac, userBeamId);
-              m_gwMacMap[gwId] = fMac;
+              m_gwMacMap[std::make_pair (satId, gwId)] = fMac;
               startScheduler = true;
             }
 
@@ -430,7 +437,7 @@ SatGeoHelper::AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
 
           // Create a node info to PHY and MAC layers
           feederAddress = Mac48Address::Allocate ();
-          Ptr<SatNodeInfo> niFeeder = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, feederAddress);
+          Ptr<SatNodeInfo> niFeeder = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeIds[satId], feederAddress);
           fPhy->SetNodeInfo (niFeeder);
           fMac->SetNodeInfo (niFeeder);
           fLlc->SetNodeInfo (niFeeder);
@@ -511,13 +518,15 @@ SatGeoHelper::AttachChannelsUser ( Ptr<SatGeoNetDevice> dev,
                                    Ptr<SatChannel> uf,
                                    Ptr<SatChannel> ur,
                                    Ptr<SatAntennaGainPattern> userAgp,
+                                   uint32_t satId,
                                    uint32_t userBeamId,
                                    SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                                    SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
-  NS_LOG_FUNCTION (this << dev << uf << ur << userAgp << userBeamId << forwardLinkRegenerationMode << returnLinkRegenerationMode);
+  NS_LOG_FUNCTION (this << dev << uf << ur << userAgp << satId << userBeamId << forwardLinkRegenerationMode << returnLinkRegenerationMode);
 
   SatPhy::CreateParam_t params;
+  params.m_satId = satId;
   params.m_beamId = userBeamId;
   params.m_device = dev;
   params.m_standard = SatEnums::GEO;
@@ -553,8 +562,8 @@ SatGeoHelper::AttachChannelsUser ( Ptr<SatGeoNetDevice> dev,
   // Note, that currently we have only one set of antenna patterns,
   // which are utilized in both in user link and feeder link, and
   // in both uplink and downlink directions.
-  uPhy->SetTxAntennaGainPattern (userAgp);
-  uPhy->SetRxAntennaGainPattern (userAgp);
+  uPhy->SetTxAntennaGainPattern (userAgp, dev->GetNode ()->GetObject<SatMobilityModel> ());
+  uPhy->SetRxAntennaGainPattern (userAgp, dev->GetNode ()->GetObject<SatMobilityModel> ());
 
   dev->AddUserPhy (uPhy, userBeamId);
 
@@ -563,7 +572,7 @@ SatGeoHelper::AttachChannelsUser ( Ptr<SatGeoNetDevice> dev,
   Ptr<SatGeoUserMac> uMac;
   Ptr<SatGeoLlc> uLlc;
 
-  uMac = CreateObject<SatGeoUserMac> (userBeamId,
+  uMac = CreateObject<SatGeoUserMac> (satId, userBeamId,
                                       forwardLinkRegenerationMode,
                                       returnLinkRegenerationMode);
 
@@ -576,7 +585,7 @@ SatGeoHelper::AttachChannelsUser ( Ptr<SatGeoNetDevice> dev,
       case SatEnums::REGENERATION_PHY:
         {
           // Create a node info to PHY layers
-          Ptr<SatNodeInfo> niPhyUser = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, Mac48Address::ConvertFrom (dev->GetAddress ()));
+          Ptr<SatNodeInfo> niPhyUser = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeIds[satId], Mac48Address::ConvertFrom (dev->GetAddress ()));
           uPhy->SetNodeInfo (niPhyUser);
           uMac->SetNodeInfo (niPhyUser);
 
@@ -596,7 +605,7 @@ SatGeoHelper::AttachChannelsUser ( Ptr<SatGeoNetDevice> dev,
 
           // Create a node info to PHY and MAC layers
           userAddress = Mac48Address::Allocate ();
-          Ptr<SatNodeInfo> niUser = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, userAddress);
+          Ptr<SatNodeInfo> niUser = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeIds[satId], userAddress);
           uPhy->SetNodeInfo (niUser);
           uMac->SetNodeInfo (niUser);
           uLlc->SetNodeInfo (niUser);
@@ -616,7 +625,7 @@ SatGeoHelper::AttachChannelsUser ( Ptr<SatGeoNetDevice> dev,
 
           // Create a node info to PHY and MAC layers
           userAddress = Mac48Address::Allocate ();
-          Ptr<SatNodeInfo> niUser = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeId, userAddress);
+          Ptr<SatNodeInfo> niUser = Create <SatNodeInfo> (SatEnums::NT_SAT, m_nodeIds[satId], userAddress);
           uPhy->SetNodeInfo (niUser);
           uMac->SetNodeInfo (niUser);
           uLlc->SetNodeInfo (niUser);
@@ -706,6 +715,30 @@ SatGeoHelper::EnableCreationTraces (Ptr<OutputStreamWrapper> stream, CallbackBas
   NS_LOG_FUNCTION (this);
 
   TraceConnect ("Creation", "SatGeoHelper",  cb);
+}
+
+void
+SatGeoHelper::SetIslRoutes (NodeContainer geoNodes, std::vector <std::pair <uint32_t, uint32_t>> isls)
+{
+  NS_LOG_FUNCTION (this);
+
+  switch (m_islArbiterType)
+    {
+      case SatEnums::UNICAST:
+        {
+          Ptr<SatIslArbiterUnicastHelper> satIslArbiterHelper = CreateObject<SatIslArbiterUnicastHelper> (geoNodes, isls);
+          satIslArbiterHelper->InstallArbiters ();
+          break;
+        }
+      case SatEnums::ECMP:
+        {
+           NS_FATAL_ERROR ("ISL Arbiter ECMP not implemented yet");
+        }
+      default:
+        {
+          NS_FATAL_ERROR ("Unknown ISL arbiter");
+        }
+    }
 }
 
 } // namespace ns3

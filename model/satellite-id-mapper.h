@@ -23,6 +23,7 @@
 #include <map>
 
 #include <ns3/object.h>
+#include <ns3/mac48-address.h>
 
 
 namespace ns3 {
@@ -30,6 +31,7 @@ namespace ns3 {
 
 class Node;
 class Address;
+class Mac48Address;
 
 /**
  * \ingroup satellite
@@ -90,6 +92,14 @@ public:
   uint32_t AttachMacToUtUserId (Address mac);
 
   /**
+   * \brief Attach MAC address to the SAT ID maps and give it a running
+   *        SAT ID (starting from 1)
+   * \param mac MAC address
+   * \param satId satellite ID
+   */
+  void AttachMacToSatId (Address mac, uint32_t satId);
+
+  /**
    * \brief Attach MAC address to the beam ID maps
    * \param mac MAC address
    * \param beamId beam ID
@@ -119,12 +129,17 @@ public:
   uint32_t AttachMacToGwUserId (Address mac);
 
   /**
-   * \brief Attach MAC address to the SAT ID maps and give it a running
-   *        SAT ID (starting from 1)
+   * \brief Attach GW/UT MAC address to the satellite this node is connected
    * \param mac MAC address
-   * \return the SAT ID assigned to the given MAC address
+   * \param satId The satellite ID this MAC is connected to
    */
-  uint32_t AttachMacToSatId (Address mac);
+  void AttachMacToSatIdIsl (Mac48Address mac, uint32_t satId);
+
+  /**
+   * \brief Remove GW/UT MAC address to the satellite this node is connected
+   * \param mac MAC address
+   */
+  void RemoveMacToSatIdIsl (Mac48Address mac);
 
   /* ID GETTERS */
 
@@ -148,6 +163,13 @@ public:
    * \return UT user ID
    */
   int32_t GetUtUserIdWithMac (Address mac) const;
+
+  /**
+   * \brief Function for getting the SAT ID with MAC. Returns -1 if the MAC is not in the map
+   * \param mac MAC address
+   * \return SAT user ID
+   */
+  int32_t GetSatIdWithMac (Address mac) const;
 
   /**
    * \brief Function for getting the beam ID with MAC. Returns -1 if the MAC is not in the map
@@ -178,11 +200,11 @@ public:
   int32_t GetGwUserIdWithMac (Address mac) const;
 
   /**
-   * \brief Function for getting the SAT ID with MAC. Returns -1 if the MAC is not in the map
+   * \brief Function for getting the satellite ID connected to a GW/UT MAC address
    * \param mac MAC address
-   * \return SAT user ID
+   * \return satellite ID
    */
-  int32_t GetSatIdWithMac (Address mac) const;
+  int32_t GetSatIdWithMacIsl (Mac48Address mac) const;
 
   /* NODE GETTERS */
 
@@ -234,6 +256,11 @@ public:
   void Reset ();
 
   /**
+   * \brief Print the map GW/UT address to satellite ID
+   */
+  void ShowIslMap ();
+
+  /**
    * \brief Function for enabling the map prints
    */
   void EnableMapPrint (bool enableMapPrint)
@@ -263,11 +290,6 @@ private:
   uint32_t m_gwUserIdIndex;
 
   /**
-   * \brief Running SAT user index number
-   */
-  uint32_t m_satIdIndex;
-
-  /**
    * \brief Map for MAC to trace ID conversion
    */
   std::map <Address, uint32_t> m_macToTraceIdMap;
@@ -281,6 +303,11 @@ private:
    * \brief Map for MAC to UT user ID conversion
    */
   std::map <Address, uint32_t> m_macToUtUserIdMap;
+
+  /**
+   * \brief Map for MAC to SAT ID conversion
+   */
+  std::map <Address, uint32_t> m_macToSatIdMap;
 
   /**
    * \brief Map for MAC to beam ID conversion
@@ -303,14 +330,14 @@ private:
   std::map <Address, uint32_t> m_macToGwUserIdMap;
 
   /**
-   * \brief Map for MAC to SAT ID conversion
-   */
-  std::map <Address, uint32_t> m_macToSatIdMap;
-
-  /**
    * \brief Is map printing enabled or not
    */
   bool m_enableMapPrint;
+
+  /**
+   * \brief Map for GW/UT MAC to associated SAT ID conversion
+   */
+  std::map <Mac48Address, uint32_t> m_macToSatIdIslMap;
 };
 
 } // namespace ns3

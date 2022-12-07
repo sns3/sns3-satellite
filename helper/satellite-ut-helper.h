@@ -141,6 +141,7 @@ public:
 
   /**
    * \param c a set of nodes
+   * \param satId  id of the satellite
    * \param beamId  id of the beam
    * \param fCh forward channel
    * \param rCh return channel
@@ -158,7 +159,7 @@ public:
    * a queue for this ns3::NetDevice, and associate the resulting
    * ns3::NetDevice with the ns3::Node and ns3::SatChannel.
    */
-  NetDeviceContainer InstallDvb (NodeContainer c, uint32_t beamId,
+  NetDeviceContainer InstallDvb (NodeContainer c, uint32_t satId, uint32_t beamId,
                                  Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
                                  Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
                                  Address satUserAddress,
@@ -168,6 +169,7 @@ public:
                                  SatEnums::RegenerationMode_t returnLinkRegenerationMode);
   /**
    * \param n node
+   * \param satId  id of the satellite
    * \param beamId  id of the beam
    * \param fCh forward channel
    * \param rCh return channel
@@ -180,7 +182,7 @@ public:
    *
    * Saves you from having to construct a temporary NodeContainer.
    */
-  Ptr<NetDevice> InstallDvb (Ptr<Node> n, uint32_t beamId,
+  Ptr<NetDevice> InstallDvb (Ptr<Node> n, uint32_t satId, uint32_t beamId,
                              Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
                              Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
                              Address satUserAddress,
@@ -191,6 +193,7 @@ public:
 
   /**
    * \param c a set of nodes
+   * \param satId  id of the satellite
    * \param beamId  id of the beam
    * \param fCh forward channel
    * \param rCh return channel
@@ -208,7 +211,7 @@ public:
    * a queue for this ns3::SatNetLorawanDevice, and associate the resulting
    * ns3::SatNetLorawanDevice with the ns3::Node and ns3::SatChannel.
    */
-  NetDeviceContainer InstallLora (NodeContainer c, uint32_t beamId,
+  NetDeviceContainer InstallLora (NodeContainer c, uint32_t satId, uint32_t beamId,
                                   Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
                                   Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
                                   Address satUserAddress,
@@ -218,6 +221,7 @@ public:
                                   SatEnums::RegenerationMode_t returnLinkRegenerationMode);
   /**
    * \param n node
+   * \param satId  id of the satellite
    * \param beamId  id of the beam
    * \param fCh forward channel
    * \param rCh return channel
@@ -230,7 +234,7 @@ public:
    *
    * Saves you from having to construct a temporary NodeContainer.
    */
-  Ptr<NetDevice> InstallLora (Ptr<Node> n, uint32_t beamId,
+  Ptr<NetDevice> InstallLora (Ptr<Node> n, uint32_t satId, uint32_t beamId,
                               Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
                               Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
                               Address satUserAddress,

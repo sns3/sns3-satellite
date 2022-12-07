@@ -32,7 +32,8 @@ NS_LOG_COMPONENT_DEFINE ("SatSignalParameters");
 namespace ns3 {
 
 SatSignalParameters::SatSignalParameters ()
-  : m_beamId (),
+  : m_satId (),
+  m_beamId (),
   m_carrierId (),
   m_carrierFreq_hz (),
   m_duration (),
@@ -52,6 +53,7 @@ SatSignalParameters::SatSignalParameters ( const SatSignalParameters& p )
       m_packetsInBurst.push_back ((*i)->Copy ());
     }
 
+  m_satId = p.m_satId;
   m_beamId = p.m_beamId;
   m_carrierId = p.m_carrierId;
   m_duration = p.m_duration;

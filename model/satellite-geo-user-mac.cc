@@ -71,10 +71,10 @@ SatGeoUserMac::SatGeoUserMac (void)
   NS_FATAL_ERROR ("SatGeoUserMac default constructor is not allowed to use");
 }
 
-SatGeoUserMac::SatGeoUserMac (uint32_t beamId,
+SatGeoUserMac::SatGeoUserMac (uint32_t satId, uint32_t beamId,
                               SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                               SatEnums::RegenerationMode_t returnLinkRegenerationMode)
- : SatGeoMac (beamId, forwardLinkRegenerationMode, returnLinkRegenerationMode)
+ : SatGeoMac (satId, beamId, forwardLinkRegenerationMode, returnLinkRegenerationMode)
 {
   NS_LOG_FUNCTION (this);
 }

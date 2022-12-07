@@ -54,9 +54,9 @@ class SatHelper : public Object
 {
 public:
   /**
-   * definition for beam map key is beam ID and value is UT/user info.
+   * definition for beam map key is pair sat ID / beam ID and value is UT/user info.
    */
-  typedef std::map<uint32_t, SatBeamUserInfo > BeamUserInfoMap_t;
+  typedef std::map<std::pair<uint32_t, uint32_t>, SatBeamUserInfo > BeamUserInfoMap_t;
 
   /**
    * \brief Values for pre-defined scenarios to be used by helper when building
@@ -101,6 +101,12 @@ public:
   }
 
   /**
+   * \brief Get number of Users for a UT
+   * \return The number of UT users
+   */
+  typedef Callback<uint32_t> GetNextUtUserCountCallback;
+
+  /**
    * \brief Create a pre-defined SatHelper to make life easier when creating Satellite topologies.
    */
   void CreatePredefinedScenario (PreDefinedScenario_t scenario);
@@ -116,11 +122,38 @@ public:
    * Creates satellite objects according to user defined scenario.
    * Positions are read from different input files from file set by attribute ns3::SatConf::UtPositionInputFileName.
    *
+   * \param satId The ID of the satellite
    * \param info information of the beams, and beam UTs and users in beams
    * \param checkBeam Check that positions (set through SatConf) match with given beam
    * (the beam is the best according to configured antenna patterns).
    */
-  void CreateUserDefinedScenarioFromListPositions (BeamUserInfoMap_t& info, bool checkBeam);
+  void CreateUserDefinedScenarioFromListPositions (uint32_t satId, BeamUserInfoMap_t& info, bool checkBeam);
+
+  /**
+   * Creates satellite objects according to constellation parameters.
+   *
+   * \param infoList information of the enabled beams. UT information is given in parameters files.
+   * \param getNextUtUserCountCallback Callback to get number of users per UT.
+   */
+  void CreateConstellationScenario (BeamUserInfoMap_t& info, GetNextUtUserCountCallback getNextUtUserCountCallback);
+
+  /**
+   * Set the value of GW address for each UT.
+   * This method is called when using constellations.
+   */
+  void SetGwAddressInUt ();
+
+  /**
+   * Populate the routes, when using constellations.
+   */
+  void SetBeamRoutingConstellations ();
+
+  /**
+   * Get closest satellite to a ground station
+   * \param position The position of the ground station
+   * \return The ID of the closest satellite
+   */
+  uint32_t GetClosestSat (GeoCoordinate position);
 
   /**
    * \param  node pointer to user node.
@@ -173,9 +206,21 @@ public:
   void SetAntennaGainPatterns (Ptr<SatAntennaGainPatternContainer> antennaGainPattern);
 
   /**
+   * \return Get the antenna gain patterns
+   */
+  Ptr<SatAntennaGainPatternContainer> GetAntennaGainPatterns ();
+
+  /**
    * \return pointer to user helper.
    */
   Ptr<SatUserHelper> GetUserHelper () const;
+
+  /**
+   * Get count of the beams (configurations).
+   *
+   * \return beam count
+   */
+  uint32_t GetBeamCount () const;
 
   /**
    * \brief Set custom position allocator
@@ -195,17 +240,19 @@ public:
    * \brief Load UTs with a SatTracedMobilityModel associated to them from the
    * files found in the given folder. Each UT will be associated to the beam it
    * is at it's starting position.
+   * \param satId ID of satellite
    * \param folderName Name of the folder to search for mobility trace files
    * \param utUsers Stream to generate the number of users associated to each loaded UT
    */
-  void LoadMobileUTsFromFolder (const std::string& folderName, Ptr<RandomVariableStream> utUsers);
+  void LoadMobileUTsFromFolder (uint32_t satId, const std::string& folderName, Ptr<RandomVariableStream> utUsers);
 
   /**
    * \brief Load an UT with a SatTracedMobilityModel associated to
    * them from the given file.
+   * \param satId ID of satellite
    * \param filename Name of the trace file containing UT positions
    */
-  Ptr<Node> LoadMobileUtFromFile (const std::string& filename);
+  Ptr<Node> LoadMobileUtFromFile (uint32_t satId, const std::string& filename);
 
   /**
    * Set multicast group to satellite network and IP router. Add needed routes to net devices.
@@ -225,9 +272,9 @@ public:
   {
     return m_beamHelper->GetUtNodes ();
   }
-  inline Ptr<Node> GeoSatNode ()
+  inline NodeContainer GeoSatNodes ()
   {
-    return m_beamHelper->GetGeoSatNode ();
+    return m_beamHelper->GetGeoSatNodes ();
   }
 
   /**
@@ -242,6 +289,18 @@ public:
    * \param beamId the beam for which the position allocator should be configured
    */
   Ptr<SatSpotBeamPositionAllocator> GetBeamAllocator (uint32_t beamId);
+
+  inline bool IsSatConstellationEnabled ()
+    {
+      return m_satConstellationEnabled;
+    }
+
+  /**
+   * Print all the satellite topology
+   * \param os output stream in which the data should be printed
+   */
+  void PrintTopology (std::ostream & os) const;
+
 
 private:
   static const uint16_t MIN_ADDRESS_PREFIX_LENGTH = 1;
@@ -268,6 +327,16 @@ private:
    * TLE input filename used for SGP4 mobility
    */
   std::string m_satMobilitySGP4TleFileName;
+
+  /**
+   * Use a constellation of satellites
+   */
+  bool m_satConstellationEnabled;
+
+  /**
+   * Folder where are stored satellite constellation data
+   */
+  std::string m_satConstellationFolder;
 
   /*
    * The global standard used. Can be either DVB or Lora
@@ -414,6 +483,21 @@ private:
   std::multimap<uint32_t, uint32_t> m_mobileUtsUsersByBeam;
 
   /**
+   * Map of closest satellite for each GW
+   */
+  std::map <uint32_t, uint32_t> m_gwSats;
+
+  /**
+   * Map indicating the GW node associated to each UT node.
+   */
+  std::map <Ptr<Node>, Ptr<Node>> m_gwDistribution;
+
+  /**
+   * Map indicating all UT NetDevices associated to each GW NetDevice
+   */
+  std::map <Ptr<NetDevice>, NetDeviceContainer> m_utsDistribution;
+
+  /**
    * Enables creation traces to be written in given file
    */
   void EnableCreationTraces ();
@@ -427,6 +511,14 @@ private:
    * Enable packet traces
    */
   void EnablePacketTrace ();
+
+  /**
+   * Load a constellation topology.
+   * \param path Folder where configuration files are located
+   * \param tles vector to store read TLEs
+   * \param isls vector to store read ISLs
+   */
+  void LoadConstellationTopology (std::string path, std::vector <std::string> &tles, std::vector <std::pair <uint32_t, uint32_t>> &isls);
 
   /**
    * Sink for creation details traces
@@ -455,10 +547,10 @@ private:
 
   /**
    * Creates satellite objects according to given beam info.
-   * \param beamInfos information of the beam to create (and beams which are given in map)
+   * \param infoList information of the sats and beam to create (and beams which are given in map)
    * \param gwUsers number of the users in GW(s) side
    */
-  void DoCreateScenario (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers);
+  void DoCreateScenario (BeamUserInfoMap_t& info, uint32_t gwUsers);
 
   /**
    * Creates trace summary starting with give title.
@@ -470,9 +562,11 @@ private:
   /**
    * Sets mobilities to created GW nodes.
    *
-   * \param gws node container of UTs to set mobility
+   * \param satId ID of the satellite link to this GW
+   * \param gw GW to set mobility
+   * \param gwIndex Index of GW in SatConf
    */
-  void SetGwMobility (NodeContainer gws);
+  void SetGwMobility (uint32_t satId, Ptr<Node> gw, uint32_t gwIndex);
 
   /**
    * Sets mobility to created Sat Geo node.
@@ -486,33 +580,36 @@ private:
    *
    * \param node node pointer of Satellite to set mobility
    */
-  void SetSatMobility (Ptr<Node> node);
+  void SetSatMobility (Ptr<Node> node, std::string tle = "");
 
   /**
    * Sets mobility to created UT nodes.
    *
    * \param uts node container of UTs to set mobility
+   * \param satId the satellite id, where the UTs should be placed
    * \param beamId the spot-beam id, where the UTs should be placed
    *
    */
-  void SetUtMobility (NodeContainer uts, uint32_t beamId);
+  void SetUtMobility (NodeContainer uts, uint32_t satId, uint32_t beamId);
 
   /**
    * Sets mobility to created UT nodes when position is known.
    *
    * \param uts node container of UTs to set mobility
+   * \param satId the satellite id, where the UTs should be placed
    * \param beamId the spot-beam id, where the UTs should be placed
    * \param positionsAndGroupId the list of known positions, associated to a group ID
    *
    */
-  void SetUtMobilityFromPosition (NodeContainer uts, uint32_t beamId, std::vector<std::pair<GeoCoordinate, uint32_t>> positionsAndGroupId);
+  void SetUtMobilityFromPosition (NodeContainer uts, uint32_t satId, uint32_t beamId, std::vector<std::pair<GeoCoordinate, uint32_t>> positionsAndGroupId);
 
   /**
    * Install Satellite Mobility Observer to nodes, if observer doesn't exist already in a node
    *
+   * \param satId ID of the satellite.
    * \param nodes Nodecontainer of nodes to install mobility observer.
    */
-  void InstallMobilityObserver (NodeContainer nodes) const;
+  void InstallMobilityObserver (uint32_t satId, NodeContainer nodes) const;
 
   /**
    * Find given device's counterpart (device belonging to same network) device from given node.
@@ -563,7 +660,7 @@ private:
   /**
    * Set configured network addresses to user and beam helpers.
    */
-  void SetNetworkAddresses (BeamUserInfoMap_t& beamInfos, uint32_t gwUsers) const;
+  void SetNetworkAddresses (BeamUserInfoMap_t& info, uint32_t gwUsers) const;
 
   /**
    * Check validity of the configured network space.

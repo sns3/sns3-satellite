@@ -104,22 +104,22 @@ SatStatsWaveformUsageHelper::DoInstall ()
   NS_ASSERT (beamHelper != 0);
   Ptr<SatNcc> ncc = beamHelper->GetNcc ();
   NS_ASSERT (ncc != 0);
-  std::list<uint32_t> beams = beamHelper->GetBeams ();
+  std::list<std::pair<uint32_t, uint32_t>> beams = beamHelper->GetBeams ();
 
-  for (std::list<uint32_t>::const_iterator it = beams.begin ();
+  for (std::list<std::pair<uint32_t, uint32_t>>::const_iterator it = beams.begin ();
        it != beams.end (); ++it)
     {
       std::ostringstream context;
-      context << GetIdentifierForBeam (*it);
+      context << GetIdentifierForBeam (it->first, it->second);
 
-      Ptr<SatBeamScheduler> s = ncc->GetBeamScheduler (*it);
-      NS_ASSERT_MSG (s != 0, "Error finding beam " << *it);
+      Ptr<SatBeamScheduler> s = ncc->GetBeamScheduler (it->first, it->second);
+      NS_ASSERT_MSG (s != 0, "Error finding beam " << it->second);
       const bool ret = s->TraceConnect ("WaveformTrace",
                                         context.str (), waveformUsageCallback);
       NS_ASSERT_MSG (ret,
-                     "Error connecting to WaveformTrace of beam " << *it);
+                     "Error connecting to WaveformTrace of beam " << it->second);
       NS_LOG_INFO (this << " successfully connected"
-                        << " with beam " << *it);
+                        << " with beam " << it->second);
     }
 
 } // end of `void DoInstall ();`
@@ -209,13 +209,14 @@ SatStatsWaveformUsageHelper::WaveformUsageCallback (std::string context,
 
         case SatStatsHelper::IDENTIFIER_BEAM:
           {
-            std::list<uint32_t> beams = GetSatHelper ()->GetBeamHelper ()->GetBeams ();
-            for (std::list<uint32_t>::const_iterator it = beams.begin ();
+            std::list<std::pair<uint32_t, uint32_t>> beams = GetSatHelper ()->GetBeamHelper ()->GetBeams ();
+            for (std::list<std::pair<uint32_t, uint32_t>>::const_iterator it = beams.begin ();
                  it != beams.end (); ++it)
               {
-                const uint32_t beamId = (*it);
+                const uint32_t satId = (it->first);
+                const uint32_t beamId = (it->second);
                 std::ostringstream name;
-                name << beamId << " " << waveformId;
+                name << satId << "-" << beamId << " " << waveformId;
                 collectorMap.SetAttribute ("Name", StringValue (name.str ()));
                 collectorMap.Create (beamId);
                 n++;

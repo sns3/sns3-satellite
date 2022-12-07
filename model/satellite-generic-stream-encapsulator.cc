@@ -150,8 +150,8 @@ SatGenericStreamEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
     {
       // Add MAC tag to identify the packet in lower layers
       SatMacTag mTag;
-      mTag.SetDestAddress (m_destE2EAddress);
-      mTag.SetSourceAddress (m_sourceE2EAddress);
+      mTag.SetDestAddress (m_decapAddress);
+      mTag.SetSourceAddress (m_encapAddress);
       packet->AddPacketTag (mTag);
 
       // Add E2E address tag to identify the packet in lower layers

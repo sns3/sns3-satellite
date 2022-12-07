@@ -66,10 +66,14 @@ public:
 
   /**
    * \brief Construct a SatMac
+   * \param satId ID of sat for this MAC
+   * \param beamId ID of beam for this MAC
    * \param forwardLinkRegenerationMode Forward link regeneration model
    * \param returnLinkRegenerationMode Return link regeneration model
    */
-  SatMac (SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+  SatMac (uint32_t satId,
+          uint32_t beamId,
+          SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
           SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   /**
@@ -78,6 +82,12 @@ public:
    * This is the destructor for the SatMac.
    */
   ~SatMac ();
+
+  /**
+   * \brief Get sat ID of the object
+   * \return sat ID
+   */
+  inline uint32_t GetSatId () const { return m_satId; }
 
   /**
    * \brief Get beam ID of the object
@@ -368,6 +378,11 @@ protected:
    * node type, node id and MAC address (of the SatNetDevice)
    */
   Ptr<SatNodeInfo> m_nodeInfo;
+
+  /**
+   * The ID of the sat where mac belongs.
+   */
+  uint32_t m_satId;
 
   /**
    * The ID of the beam where mac belongs.

@@ -22,9 +22,12 @@
 #define SATELLITE_ANTENNA_GAIN_PATTERN_CONTAINER_H_
 
 #include "satellite-antenna-gain-pattern.h"
+#include "ns3/satellite-beam-user-info.h"
 #include "geo-coordinate.h"
 
 namespace ns3 {
+
+class SatMobilityModel;
 
 /**
  * \ingroup satellite
@@ -45,12 +48,25 @@ public:
    * \return the object TypeId
    */
   static TypeId GetTypeId (void);
+  TypeId GetInstanceTypeId () const;
 
   /**
    * Default constructor.
+   * \param nbSats Number of satellites to consider
    */
-  SatAntennaGainPatternContainer ();
+  SatAntennaGainPatternContainer (uint32_t nbSats = 1);
   ~SatAntennaGainPatternContainer ();
+
+  /**
+   * definition for beam map key is pair sat ID / beam ID and value is UT/user info.
+   */
+  typedef std::map<std::pair<uint32_t, uint32_t>, SatBeamUserInfo > BeamUserInfoMap_t;
+
+  /**
+   * \brief Load the default satellite position associated to these traces. Must be in GeoPos.in
+   * \return The satellite position
+   */
+  GeoCoordinate GetDefaultGeoPosition ();
 
   /**
    * \brief Get the antenna pattern of a specified beam id
@@ -58,6 +74,13 @@ public:
    * \return The antenna gain pattern instance of the specified beam id
    */
   Ptr<SatAntennaGainPattern> GetAntennaGainPattern (uint32_t beamId) const;
+
+  /**
+   * \brief Get the mobility model of a specified beam id
+   * \param satelliteId Satellite identifier
+   * \return The mobility model
+   */
+  Ptr<SatMobilityModel> GetAntennaMobility (uint32_t satelliteId) const;
 
   /**
    * \brief Get the number of stored antenna pattern
@@ -68,23 +91,29 @@ public:
   /**
    * \brief Get the best beam id based on the antenna patterns in a
    * specified geo coordinate
+   * \param satelliteId ID of satellite to search
    * \param coord Geo coordinate
+   * \param ignoreNan Do not crash if a NaN value is returned
    * \return best beam id in the specified geo coordinate
    */
-  uint32_t GetBestBeamId (GeoCoordinate coord) const;
+  uint32_t GetBestBeamId (uint32_t satelliteId, GeoCoordinate coord, bool ignoreNan);
+
+  void ConfigureBeamsMobility (uint32_t satelliteId, Ptr<SatMobilityModel> mobility);
+
+  void SetEnabledBeams (BeamUserInfoMap_t& info);
 
 private:
-  /**
-   * \brief Definition of number of beams (72-beam reference scenario).
-   * Note: to change the reference system this has to be changed
-   * accordingly.
-   */
-  static const uint32_t NUMBER_OF_BEAMS = 72;
+  std::string m_patternsFolder;
 
   /**
    * Container of antenna patterns
    */
   std::map< uint32_t, Ptr<SatAntennaGainPattern> > m_antennaPatternMap;
+
+  /**
+   * Container of mobility models
+   */
+  std::map< uint32_t, Ptr<SatMobilityModel> > m_mobilityModelMap;
 
 };
 

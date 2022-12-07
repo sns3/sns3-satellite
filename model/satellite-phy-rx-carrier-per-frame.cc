@@ -301,7 +301,7 @@ SatPhyRxCarrierPerFrame::MeasureRandomAccessLoad ()
 
   NS_LOG_INFO ("Average normalized offered load: " << averageNormalizedOfferedLoad);
 
-  m_avgNormalizedOfferedLoadCallback (GetBeamId (), GetCarrierId (), GetRandomAccessAllocationChannelId (), averageNormalizedOfferedLoad);
+  m_avgNormalizedOfferedLoadCallback (GetSatId (), GetBeamId (), GetCarrierId (), GetRandomAccessAllocationChannelId (), averageNormalizedOfferedLoad);
 }
 
 double

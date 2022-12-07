@@ -261,9 +261,9 @@ SatPerPacketFwdLinkUserTestCase::DoRun (void)
 
   // create user defined scenario with beams 1 and 5
   SatBeamUserInfo beamInfo = SatBeamUserInfo (1, 1);
-  std::map<uint32_t, SatBeamUserInfo > beamMap;
-  beamMap[1] = beamInfo;
-  beamMap[5] = beamInfo;
+  std::map<std::pair<uint32_t, uint32_t>, SatBeamUserInfo > beamMap;
+  beamMap[std::make_pair(0, 1)] = beamInfo;
+  beamMap[std::make_pair(0, 5)] = beamInfo;
 
   helper->CreateUserDefinedScenario (beamMap);
 
@@ -567,9 +567,9 @@ SatPerPacketRtnLinkUserTestCase::DoRun (void)
 
   // create user defined scenario with beams 1 and 5
   SatBeamUserInfo beamInfo = SatBeamUserInfo (1, 1);
-  std::map<uint32_t, SatBeamUserInfo > beamMap;
-  beamMap[1] = beamInfo;
-  beamMap[5] = beamInfo;
+  std::map<std::pair<uint32_t, uint32_t>, SatBeamUserInfo > beamMap;
+  beamMap[std::make_pair(0, 1)] = beamInfo;
+  beamMap[std::make_pair(0, 5)] = beamInfo;
 
   helper->CreateUserDefinedScenario (beamMap);
 

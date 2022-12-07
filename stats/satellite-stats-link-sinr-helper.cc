@@ -617,47 +617,51 @@ SatStatsFwdFeederLinkSinrHelper::DoInstallProbes ()
       SaveAddressAndIdentifier (*it);
     }
 
-  Ptr<Node> geoSat = GetSatHelper ()->GetBeamHelper ()->GetGeoSatNode ();
-  NS_ASSERT (geoSat->GetNDevices () == 1);
-  Ptr<NetDevice> dev = geoSat->GetDevice (0);
-  Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
-  NS_ASSERT (satGeoDev != 0);
-  ObjectMapValue phy;
-  satGeoDev->GetAttribute ("FeederPhy", phy);
-  NS_LOG_DEBUG (this << " GeoSat Node ID " << geoSat->GetId ()
-                     << " device #" << dev->GetIfIndex ()
-                     << " has " << phy.GetN () << " PHY instance(s)");
+  NodeContainer sats = GetSatHelper ()->GetBeamHelper ()->GetGeoSatNodes ();
 
-  for (ObjectMapValue::Iterator itPhy = phy.Begin ();
-       itPhy != phy.End (); ++itPhy)
+  for (NodeContainer::Iterator it = sats.Begin (); it != sats.End (); ++it)
     {
-      Ptr<SatPhy> satPhy = itPhy->second->GetObject<SatPhy> ();
-      NS_ASSERT (satPhy != 0);
-      Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx ();
-      NS_ASSERT (satPhyRx != 0);
-      ObjectVectorValue carriers;
-      satPhyRx->GetAttribute ("RxCarrierList", carriers);
-      NS_LOG_DEBUG (this << " PHY #" << itPhy->first
-                         << " has " << carriers.GetN () << " RX carrier(s)");
+      Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
+      Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
+      NS_ASSERT (satGeoDev != 0);
+      std::map<uint32_t, Ptr<SatPhy> > satGeoFeederPhys = satGeoDev->GetFeederPhy ();
+      ObjectMapValue phy;
+      satGeoDev->GetAttribute ("FeederPhy", phy);
+      NS_LOG_DEBUG (this << " GeoSat Node ID " << (*it)->GetId ()
+                         << " device #" << dev->GetIfIndex ()
+                         << " has " << phy.GetN () << " PHY instance(s)");
 
-      for (ObjectVectorValue::Iterator itCarrier = carriers.Begin ();
-           itCarrier != carriers.End (); ++itCarrier)
+      for (ObjectMapValue::Iterator itPhy = phy.Begin ();
+       itPhy != phy.End (); ++itPhy)
         {
-          //NS_ASSERT (itCarrier->second->m_channelType == SatEnums::FORWARD_FEEDER_CH)
-          if (!itCarrier->second->TraceConnectWithoutContext ("LinkSinr",
-                                                              GetTraceSinkCallback ()))
+          Ptr<SatPhy> satPhy = itPhy->second->GetObject<SatPhy> ();
+          NS_ASSERT (satPhy != 0);
+          Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx ();
+          NS_ASSERT (satPhyRx != 0);
+          ObjectVectorValue carriers;
+          satPhyRx->GetAttribute ("RxCarrierList", carriers);
+          NS_LOG_DEBUG (this << " PHY #" << itPhy->first
+                             << " has " << carriers.GetN () << " RX carrier(s)");
+
+          for (ObjectVectorValue::Iterator itCarrier = carriers.Begin ();
+               itCarrier != carriers.End (); ++itCarrier)
             {
-              NS_FATAL_ERROR ("Error connecting to LinkSinr trace source"
-                              << " of SatPhyRxCarrier"
-                              << " at GeoSat node ID " << geoSat->GetId ()
-                              << " device #" << dev->GetIfIndex ()
-                              << " PHY #" << itPhy->first
-                              << " RX carrier #" << itCarrier->first);
-            }
+              //NS_ASSERT (itCarrier->second->m_channelType == SatEnums::FORWARD_FEEDER_CH)
+              if (!itCarrier->second->TraceConnectWithoutContext ("LinkSinr",
+                                                                  GetTraceSinkCallback ()))
+                {
+                  NS_FATAL_ERROR ("Error connecting to LinkSinr trace source"
+                                  << " of SatPhyRxCarrier"
+                                  << " at GeoSat node ID " << (*it)->GetId ()
+                                  << " device #" << dev->GetIfIndex ()
+                                  << " PHY #" << itPhy->first
+                                  << " RX carrier #" << itCarrier->first);
+                }
 
-        } // end of `for (ObjectVectorValue::Iterator itCarrier = carriers)`
+            } // end of `for (ObjectVectorValue::Iterator itCarrier = carriers)`
 
-    } // end of `for (ObjectMapValue::Iterator itPhy = phys)`
+        } // end of `for (ObjectMapValue::Iterator itPhy = phys)`
+    } // end of `for (it = sats.Begin(); it != sats.End (); ++it)`
 
 } // end of `void DoInstallProbes ();`
 
@@ -859,7 +863,7 @@ SatStatsRtnUserLinkSinrHelper::DoInstallProbes ()
       SaveAddressAndIdentifier (*it);
     }
 
-  NodeContainer sats = NodeContainer (GetSatHelper ()->GetBeamHelper ()->GetGeoSatNode ());
+  NodeContainer sats = GetSatHelper ()->GetBeamHelper ()->GetGeoSatNodes ();
 
   for (NodeContainer::Iterator it = sats.Begin (); it != sats.End (); ++it)
     {

@@ -65,9 +65,9 @@ namespace ns3 {
 
 
 void
-logonCallbackHelper (Ptr<SatNcc> ncc, Ptr<SatLowerLayerServiceConf> llsConf, Address utId, uint32_t beamId, Callback<void, uint32_t> setRaChannelCallback)
+logonCallbackHelper (Ptr<SatNcc> ncc, Ptr<SatLowerLayerServiceConf> llsConf, Address utId, uint32_t satId, uint32_t beamId, Callback<void, uint32_t> setRaChannelCallback)
 {
-  ncc->AddUt (llsConf, utId, beamId, setRaChannelCallback, true);
+  ncc->AddUt (llsConf, utId, satId, beamId, setRaChannelCallback, true);
 }
 
 
@@ -240,6 +240,7 @@ SatGwHelper::SetPhyAttribute (std::string n1, const AttributeValue &v1)
 NetDeviceContainer
 SatGwHelper::InstallDvb (NodeContainer c,
                          uint32_t gwId,
+                         uint32_t satId,
                          uint32_t beamId,
                          Ptr<SatChannel> fCh,
                          Ptr<SatChannel> rCh,
@@ -248,13 +249,13 @@ SatGwHelper::InstallDvb (NodeContainer c,
                          SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                          SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
-  NS_LOG_FUNCTION (this << beamId << fCh << rCh );
+  NS_LOG_FUNCTION (this << satId << beamId << fCh << rCh );
 
   NetDeviceContainer devs;
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
     {
-      devs.Add (InstallDvb (*i, gwId, beamId, fCh, rCh, ncc, llsConf, forwardLinkRegenerationMode, returnLinkRegenerationMode));
+      devs.Add (InstallDvb (*i, gwId, satId,beamId, fCh, rCh, ncc, llsConf, forwardLinkRegenerationMode, returnLinkRegenerationMode));
     }
 
   return devs;
@@ -263,6 +264,7 @@ SatGwHelper::InstallDvb (NodeContainer c,
 Ptr<NetDevice>
 SatGwHelper::InstallDvb (Ptr<Node> n,
                          uint32_t gwId,
+                         uint32_t satId,
                          uint32_t beamId,
                          Ptr<SatChannel> fCh,
                          Ptr<SatChannel> rCh,
@@ -271,7 +273,7 @@ SatGwHelper::InstallDvb (Ptr<Node> n,
                          SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                          SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
-  NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
+  NS_LOG_FUNCTION (this << n << satId << beamId << fCh << rCh );
 
   NetDeviceContainer container;
 
@@ -283,6 +285,7 @@ SatGwHelper::InstallDvb (Ptr<Node> n,
   n->AddDevice (dev);
 
   SatPhy::CreateParam_t params;
+  params.m_satId = satId;
   params.m_beamId = beamId;
   params.m_device = dev;
   params.m_txCh = fCh;
@@ -342,7 +345,9 @@ SatGwHelper::InstallDvb (Ptr<Node> n,
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());
   phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
 
-  Ptr<SatGwMac> mac = CreateObject<SatGwMac> (forwardLinkRegenerationMode,
+  Ptr<SatGwMac> mac = CreateObject<SatGwMac> (satId,
+                                              beamId,
+                                              forwardLinkRegenerationMode,
                                               returnLinkRegenerationMode);
 
   // Set the control message container callbacks
@@ -417,6 +422,7 @@ SatGwHelper::InstallDvb (Ptr<Node> n,
   Singleton<SatIdMapper>::Get ()->AttachMacToTraceId (dev->GetAddress ());
   Singleton<SatIdMapper>::Get ()->AttachMacToGwId (dev->GetAddress (), gwId);
   Singleton<SatIdMapper>::Get ()->AttachMacToBeamId (dev->GetAddress (), beamId);
+  Singleton<SatIdMapper>::Get ()->AttachMacToSatId (dev->GetAddress (), satId+1);
 
   // Create an encapsulator for control messages.
   // Source = GW address
@@ -477,6 +483,7 @@ SatGwHelper::InstallDvb (Ptr<Node> n,
 NetDeviceContainer
 SatGwHelper::InstallLora (NodeContainer c,
                           uint32_t gwId,
+                          uint32_t satId,
                           uint32_t beamId,
                           Ptr<SatChannel> fCh,
                           Ptr<SatChannel> rCh,
@@ -485,13 +492,13 @@ SatGwHelper::InstallLora (NodeContainer c,
                           SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                           SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
-  NS_LOG_FUNCTION (this << beamId << fCh << rCh );
+  NS_LOG_FUNCTION (this << satId << beamId << fCh << rCh );
 
   NetDeviceContainer devs;
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
     {
-      devs.Add (InstallLora (*i, gwId, beamId, fCh, rCh, ncc, llsConf, forwardLinkRegenerationMode, returnLinkRegenerationMode));
+      devs.Add (InstallLora (*i, gwId, satId, beamId, fCh, rCh, ncc, llsConf, forwardLinkRegenerationMode, returnLinkRegenerationMode));
     }
 
   return devs;
@@ -500,6 +507,7 @@ SatGwHelper::InstallLora (NodeContainer c,
 Ptr<NetDevice>
 SatGwHelper::InstallLora (Ptr<Node> n,
                           uint32_t gwId,
+                          uint32_t satId,
                           uint32_t beamId,
                           Ptr<SatChannel> fCh,
                           Ptr<SatChannel> rCh,
@@ -508,7 +516,7 @@ SatGwHelper::InstallLora (Ptr<Node> n,
                           SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                           SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
-  NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
+  NS_LOG_FUNCTION (this << n << satId << beamId << fCh << rCh );
 
   NetDeviceContainer container;
 
@@ -520,6 +528,7 @@ SatGwHelper::InstallLora (Ptr<Node> n,
   n->AddDevice (dev);
 
   SatPhy::CreateParam_t params;
+  params.m_satId = satId;
   params.m_beamId = beamId;
   params.m_device = dev;
   params.m_txCh = fCh;
@@ -576,7 +585,7 @@ SatGwHelper::InstallLora (Ptr<Node> n,
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());
   phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
 
-  Ptr<LorawanMacGateway> mac = CreateObject<LorawanMacGateway> (beamId);
+  Ptr<LorawanMacGateway> mac = CreateObject<LorawanMacGateway> (satId, beamId);
 
   SatLoraConf satLoraConf;
   satLoraConf.SetConf (mac);
@@ -610,6 +619,7 @@ SatGwHelper::InstallLora (Ptr<Node> n,
   Singleton<SatIdMapper>::Get ()->AttachMacToTraceId (dev->GetAddress ());
   Singleton<SatIdMapper>::Get ()->AttachMacToGwId (dev->GetAddress (), gwId);
   Singleton<SatIdMapper>::Get ()->AttachMacToBeamId (dev->GetAddress (), beamId);
+  Singleton<SatIdMapper>::Get ()->AttachMacToSatId (dev->GetAddress (), satId+1);
 
   phy->Initialize ();
 

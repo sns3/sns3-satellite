@@ -26,6 +26,7 @@
 #include <string>
 #include <set>
 #include <map>
+#include <vector>
 #include <stdint.h>
 
 #include <ns3/node-container.h>
@@ -97,7 +98,8 @@ public:
   /**
    * Constructor for SatBeamHelper.
    *
-   * \param geoNode                     Pointer to Geo Satellite node
+   * \param geoNodes                    Container of Geo Satellite node
+   * \param isls                        List of all ISLs
    * \param bandwidthConverterCb        Callback to convert bandwidth
    * \param fwdLinkCarrierCount         Number of carriers used in forward link
    * \param rtnLinkCarrierCount         Number of carriers used in return link
@@ -105,7 +107,8 @@ public:
    * \param forwardLinkRegenerationMode The regeneration mode used in satellites for forward link
    * \param returnLinkRegenerationMode  The regeneration mode used in satellites for return link
    */
-  SatBeamHelper (Ptr<Node> geoNode,
+  SatBeamHelper (NodeContainer geoNodes,
+                 std::vector <std::pair <uint32_t, uint32_t>> isls,
                  SatTypedefs::CarrierBandwidthConverter_t bandwidthConverterCb,
                  uint32_t fwdLinkCarrierCount,
                  uint32_t rtnLinkCarrierCount,
@@ -176,6 +179,7 @@ public:
    * \param ut a set of UT nodes
    * \param gwNode pointer of GW node
    * \param gwId id of the GW
+   * \param satId ID of the satellite
    * \param beamId  id of the beam
    * \param rtnUlFreqId id of the return user link frequency
    * \param rtnFlFreqId id of the return feeder link frequency
@@ -192,6 +196,7 @@ public:
   std::pair<Ptr<NetDevice>, NetDeviceContainer> Install (NodeContainer ut,
                                                          Ptr<Node> gwNode,
                                                          uint32_t gwId,
+                                                         uint32_t satId,
                                                          uint32_t beamId,
                                                          uint32_t rtnUlFreqId,
                                                          uint32_t rtnFlFreqId,
@@ -200,8 +205,10 @@ public:
                                                          SatUtMac::RoutingUpdateCallback routingCallback);
 
   /**
+   * \param geoNetDevice Net device of satellite
    * \param gwNode pointer of GW node
    * \param gwId id of the GW
+   * \param satId ID of the satellite
    * \param beamId  id of the beam
    * \param feederLink Feeder link channel
    * \param rtnFlFreqId id of the return feeder link frequency
@@ -213,8 +220,10 @@ public:
    * and associate the resulting ns3::NetDevices with the ns3::Nodes.
    * \return the new SatNetDevice of the gateway
    */
-  Ptr<NetDevice> InstallFeeder (Ptr<Node> gwNode,
+  Ptr<NetDevice> InstallFeeder (Ptr<SatGeoNetDevice> geoNetDevice,
+                                Ptr<Node> gwNode,
                                 uint32_t gwId,
+                                uint32_t satId,
                                 uint32_t beamId,
                                 SatChannelPair::ChannelPair_t feederLink,
                                 uint32_t rtnFlFreqId,
@@ -222,8 +231,10 @@ public:
                                 SatUtMac::RoutingUpdateCallback routingCallback);
 
   /**
+   * \param geoNetDevice Net device of satellite
    * \param ut a set of UT nodes
    * \param gwNd Net Device of GW
+   * \param satId ID of the satellite
    * \param beamId  id of the beam
    * \param userLink User link channel
    * \param rtnUlFreqId id of the return user link frequency
@@ -235,8 +246,10 @@ public:
    * and associate the resulting ns3::NetDevices with the ns3::Nodes.
    * \return a NetDeviceContainer of all SatNetDevice for the UTs
    */
-  NetDeviceContainer InstallUser (NodeContainer ut,
+  NetDeviceContainer InstallUser (Ptr<SatGeoNetDevice> geoNetDevice,
+                                  NodeContainer ut,
                                   Ptr<NetDevice> gwNd,
+                                  uint32_t satId,
                                   uint32_t beamId,
                                   SatChannelPair::ChannelPair_t userLink,
                                   uint32_t rtnUlFreqId,
@@ -244,11 +257,22 @@ public:
                                   SatUtMac::RoutingUpdateCallback routingCallback);
 
   /**
+   * Create all the ISLs
+   */
+  void InstallIsls ();
+
+  /**
+   * Set ISL routes
+   */
+  void SetIslRoutes ();
+
+  /**
    * \param beamId beam ID
+   * \param satId satellite ID
    * \return the ID of the GW serving the specified beam, or zero if the ID is
    *         invalid
    */
-  uint32_t GetGwId (uint32_t beamId) const;
+  uint32_t GetGwId (uint32_t satId, uint32_t beamId) const;
 
   /**
    * \return container having all GW nodes in satellite network.
@@ -261,15 +285,17 @@ public:
   NodeContainer GetUtNodes () const;
 
   /**
+   * \param satId satellite ID
    * \param beamId beam ID
    * \return container having all UT nodes of a specific beam.
    */
-  NodeContainer GetUtNodes (uint32_t beamId) const;
+  NodeContainer GetUtNodes (uint32_t satId, uint32_t beamId) const;
 
   /**
-   * \return a list of beam IDs which are currently activated.
+   * \param satId satellite ID
+   * \return a list of pair satellite ID / beam ID which are currently activated.
    */
-  std::list<uint32_t> GetBeams () const;
+  std::list<std::pair<uint32_t, uint32_t>> GetBeams () const;
 
   /**
    * Enables creation traces to be written in given file
@@ -277,6 +303,13 @@ public:
    * \param cb  callback to connect traces
    */
   void EnableCreationTraces (Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
+
+  /**
+   * Get closest satellite to a ground station
+   * \param position The position of the ground station
+   * \return The ID of the closest satellite
+   */
+  uint32_t GetClosestSat (GeoCoordinate position);
 
   /**
    * \return info of created beams as std::string with GW info..
@@ -298,11 +331,11 @@ public:
   Ptr<Node> GetGwNode (uint32_t gwId) const;
 
   /**
-   * Gets Geo Satellite node.
+   * Gets Geo Satellite nodes.
    *
-   * \return pointer to Geo Satellite node.
+   * \return pointer to Geo Satellite nodes.
    */
-  Ptr<Node> GetGeoSatNode () const;
+  NodeContainer GetGeoSatNodes () const;
 
   /**
    * \return pointer to UT helper.
@@ -365,7 +398,7 @@ public:
    */
   void EnablePacketTrace ();
 
-  Ptr<PropagationDelayModel> GetPropagationDelayModel (uint32_t beamId, SatEnums::ChannelType_t channelType);
+  Ptr<PropagationDelayModel> GetPropagationDelayModel (uint32_t satId, uint32_t beamId, SatEnums::ChannelType_t channelType);
 
   SatEnums::PropagationDelayModel_t GetPropagationDelayModelEnum ();
 
@@ -379,17 +412,17 @@ private:
   Ptr<SatGeoHelper>     m_geoHelper;
   Ptr<SatGwHelper>      m_gwHelper;
   Ptr<SatUtHelper>      m_utHelper;
-  Ptr<Node>             m_geoNode;
+  NodeContainer         m_geoNodes;
   Ptr<SatNcc>           m_ncc;
 
   Ptr<SatAntennaGainPatternContainer>   m_antennaGainPatterns;
 
-  std::map<uint32_t, uint32_t >             m_beam;        // first beam ID, second GW ID
-  std::map<uint32_t, Ptr<Node> >            m_gwNode;      // first GW ID, second node pointer
-  std::multimap<uint32_t, Ptr<Node> >       m_utNode;      // first Beam ID, second node pointer of the UT
-  Ptr<SatChannelPair>                       m_ulChannels;  // user link ID, channel pointers pair
-  Ptr<SatChannelPair>                       m_flChannels;  // feeder link ID, channel pointers pair
-  std::map<uint32_t, FrequencyPair_t >      m_beamFreqs;   // first beam ID, channel frequency IDs pair
+  std::map<std::pair<uint32_t, uint32_t>, uint32_t >        m_beam;        // first pair sat ID / beam ID, second GW ID
+  std::map<uint32_t, Ptr<Node> >                            m_gwNode;      // first GW ID, second node pointer
+  std::multimap<std::pair<uint32_t, uint32_t>, Ptr<Node> >  m_utNode;      // first pair sat ID / beam ID, second node pointer of the UT
+  Ptr<SatChannelPair>                                       m_ulChannels;  // user link ID, channel pointers pair
+  Ptr<SatChannelPair>                                       m_flChannels;  // feeder link ID, channel pointers pair
+  std::map<std::pair<uint32_t, uint32_t>, FrequencyPair_t > m_beamFreqs;   // first beam ID, channel frequency IDs pair
 
   /**
    * Trace callback for creation traces
@@ -503,7 +536,8 @@ private:
    * \param isUserLink flag indicating if link user link is requested (otherwise feeder link).
    * \return satellite channel pair from requested SatChannelPair
    */
-  SatChannelPair::ChannelPair_t GetChannelPair (uint32_t beamId,
+  SatChannelPair::ChannelPair_t GetChannelPair (uint32_t satId,
+                                                uint32_t beamId,
                                                 uint32_t fwdFrequencyId,
                                                 uint32_t rtnFrequencyId,
                                                 bool isUserLink);
@@ -560,6 +594,11 @@ private:
    * Map used in regenerative mode to store GW Net device (we need only one per GW)
    */
   std::map<uint32_t, Ptr<NetDevice> > m_gwNdMap;
+
+  /**
+   * Vector constaining all the ISLs of the topology
+   */
+  std::vector <std::pair <uint32_t, uint32_t>> m_isls;
 };
 
 } // namespace ns3

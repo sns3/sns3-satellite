@@ -122,7 +122,7 @@ SatPhyRx::GetAntennaGain (Ptr<MobilityModel> mobility)
   if (m_antennaGainPattern)
     {
       Ptr<SatMobilityModel> m = DynamicCast<SatMobilityModel> (mobility);
-      gain_W = m_antennaGainPattern->GetAntennaGain_lin (m->GetGeoPosition ());
+      gain_W = m_antennaGainPattern->GetAntennaGain_lin (m->GetGeoPosition (), m_satMobility);
     }
 
   /**
@@ -275,12 +275,13 @@ SatPhyRx::SetMobility (Ptr<MobilityModel> m)
 }
 
 void
-SatPhyRx::SetAntennaGainPattern (Ptr<SatAntennaGainPattern> agp)
+SatPhyRx::SetAntennaGainPattern (Ptr<SatAntennaGainPattern> agp, Ptr<SatMobilityModel> mobility)
 {
   NS_LOG_FUNCTION (this << agp);
   NS_ASSERT (m_antennaGainPattern == 0);
 
   m_antennaGainPattern = agp;
+  m_satMobility = mobility;
 }
 
 void
@@ -449,6 +450,29 @@ SatPhyRx::ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatS
       NS_LOG_INFO (this << " added carrier " << rxc << " on channel " << carrierConf->GetChannelType () << " being random access " << superFrameConf->IsRandomAccessCarrier(i));
       m_rxCarriers.push_back (rxc);
     }
+}
+
+void
+SatPhyRx::SetSatId (uint32_t satId)
+{
+  NS_LOG_FUNCTION (this << satId);
+  NS_ASSERT (satId >= 0);
+  NS_ASSERT (!m_rxCarriers.empty ());
+
+  m_satId = satId;
+
+  for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin (); it != m_rxCarriers.end (); ++it)
+    {
+      (*it)->SetSatId (satId);
+    }
+}
+
+uint32_t
+SatPhyRx::GetSatId () const
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_satId;
 }
 
 void

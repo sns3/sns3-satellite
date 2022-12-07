@@ -141,6 +141,7 @@ public:
   /**
    * \param c a set of nodes
    * \param gwId  id of the gw
+   * \param satId  id of the satellite
    * \param beamId  id of the beam
    * \param fCh forward channel
    * \param rCh return channel
@@ -157,6 +158,7 @@ public:
    */
   NetDeviceContainer InstallDvb (NodeContainer c,
                                  uint32_t gwId,
+                                 uint32_t satId,
                                  uint32_t beamId,
                                  Ptr<SatChannel> fCh,
                                  Ptr<SatChannel> rCh,
@@ -168,6 +170,7 @@ public:
   /**
    * \param n node
    * \param gwId  id of the gw
+   * \param satId  id of the satellite
    * \param beamId  id of the beam
    * \param fCh forward channel
    * \param rCh return channel
@@ -179,6 +182,7 @@ public:
    */
   Ptr<NetDevice> InstallDvb (Ptr<Node> n,
                              uint32_t gwId,
+                             uint32_t satId,
                              uint32_t beamId,
                              Ptr<SatChannel> fCh,
                              Ptr<SatChannel> rCh,
@@ -190,6 +194,7 @@ public:
   /**
    * \param c a set of nodes
    * \param gwId  id of the gw
+   * \param satId  id of the satellite
    * \param beamId  id of the beam
    * \param fCh forward channel
    * \param rCh return channel
@@ -206,6 +211,7 @@ public:
    */
   NetDeviceContainer InstallLora (NodeContainer c,
                                   uint32_t gwId,
+                                  uint32_t satId,
                                   uint32_t beamId,
                                   Ptr<SatChannel> fCh,
                                   Ptr<SatChannel> rCh,
@@ -217,6 +223,7 @@ public:
   /**
    * \param n node
    * \param gwId  id of the gw
+   * \param satId  id of the satellite
    * \param beamId  id of the beam
    * \param fCh forward channel
    * \param rCh return channel
@@ -228,6 +235,7 @@ public:
    */
   Ptr<NetDevice> InstallLora (Ptr<Node> n,
                               uint32_t gwId,
+                              uint32_t satId,
                               uint32_t beamId,
                               Ptr<SatChannel> fCh,
                               Ptr<SatChannel> rCh,

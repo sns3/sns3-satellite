@@ -650,7 +650,7 @@ SatStatsRtnFeederQueueBytesHelper::DoInstallProbes ()
       SaveAddressAndIdentifier (*it);
     }
 
-  NodeContainer sats = NodeContainer (GetSatHelper ()->GetBeamHelper ()->GetGeoSatNode ());
+  NodeContainer sats = GetSatHelper ()->GetBeamHelper ()->GetGeoSatNodes ();
   Callback<void, uint32_t, const Address &> callback
     = MakeCallback (&SatStatsRtnFeederQueueBytesHelper::QueueSizeCallback, this);
 
@@ -727,7 +727,7 @@ SatStatsRtnFeederQueuePacketsHelper::DoInstallProbes ()
       SaveAddressAndIdentifier (*it);
     }
 
-  NodeContainer sats = NodeContainer (GetSatHelper ()->GetBeamHelper ()->GetGeoSatNode ());
+  NodeContainer sats = GetSatHelper ()->GetBeamHelper ()->GetGeoSatNodes ();
   Callback<void, uint32_t, const Address &> callback
     = MakeCallback (&SatStatsRtnFeederQueuePacketsHelper::QueueSizeCallback, this);
 
@@ -803,7 +803,7 @@ SatStatsFwdUserQueueBytesHelper::DoInstallProbes ()
       SaveAddressAndIdentifier (*it);
     }
 
-  NodeContainer sats = NodeContainer (GetSatHelper ()->GetBeamHelper ()->GetGeoSatNode ());
+  NodeContainer sats = GetSatHelper ()->GetBeamHelper ()->GetGeoSatNodes ();
   Callback<void, uint32_t, const Address &> callback
     = MakeCallback (&SatStatsFwdUserQueueBytesHelper::QueueSizeCallback, this);
 
@@ -880,7 +880,7 @@ SatStatsFwdUserQueuePacketsHelper::DoInstallProbes ()
       SaveAddressAndIdentifier (*it);
     }
 
-  NodeContainer sats = NodeContainer (GetSatHelper ()->GetBeamHelper ()->GetGeoSatNode ());
+  NodeContainer sats = GetSatHelper ()->GetBeamHelper ()->GetGeoSatNodes ();
   Callback<void, uint32_t, const Address &> callback
     = MakeCallback (&SatStatsFwdUserQueuePacketsHelper::QueueSizeCallback, this);
 

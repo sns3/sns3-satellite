@@ -570,7 +570,7 @@ SatStatsFwdFeederDevThroughputHelper::DoInstallProbes ()
 
   NS_LOG_FUNCTION (this);
 
-  NodeContainer sats = NodeContainer (GetSatHelper ()->GetBeamHelper ()->GetGeoSatNode ());
+  NodeContainer sats = GetSatHelper ()->GetBeamHelper ()->GetGeoSatNodes ();
   Callback<void, Ptr<const Packet>, const Address &> callback
     = MakeCallback (&SatStatsFwdFeederDevThroughputHelper::RxCallback, this);
 
@@ -760,7 +760,7 @@ SatStatsFwdFeederMacThroughputHelper::DoInstallProbes ()
 {
   NS_LOG_FUNCTION (this);
 
-  NodeContainer sats = NodeContainer (GetSatHelper ()->GetBeamHelper ()->GetGeoSatNode ());
+  NodeContainer sats = GetSatHelper ()->GetBeamHelper ()->GetGeoSatNodes ();
   Callback<void, Ptr<const Packet>, const Address &> callback
     = MakeCallback (&SatStatsFwdFeederMacThroughputHelper::RxCallback, this);
 
@@ -873,7 +873,7 @@ SatStatsFwdUserMacThroughputHelper::DoInstallProbes ()
 {
   NS_LOG_FUNCTION (this);
 
-  NodeContainer sats = NodeContainer (GetSatHelper ()->GetBeamHelper ()->GetGeoSatNode ());
+  NodeContainer sats = GetSatHelper ()->GetBeamHelper ()->GetGeoSatNodes ();
 
   for (NodeContainer::Iterator it = sats.Begin (); it != sats.End (); ++it)
     {
@@ -1001,7 +1001,7 @@ SatStatsFwdFeederPhyThroughputHelper::DoInstallProbes ()
 {
   NS_LOG_FUNCTION (this);
 
-  NodeContainer sats = NodeContainer (GetSatHelper ()->GetBeamHelper ()->GetGeoSatNode ());
+  NodeContainer sats = GetSatHelper ()->GetBeamHelper ()->GetGeoSatNodes ();
   Callback<void, Ptr<const Packet>, const Address &> callback
     = MakeCallback (&SatStatsFwdFeederPhyThroughputHelper::RxCallback, this);
 
@@ -1117,7 +1117,7 @@ SatStatsFwdUserPhyThroughputHelper::DoInstallProbes ()
 {
   NS_LOG_FUNCTION (this);
 
-  NodeContainer sats = NodeContainer (GetSatHelper ()->GetBeamHelper ()->GetGeoSatNode ());
+  NodeContainer sats = GetSatHelper ()->GetBeamHelper ()->GetGeoSatNodes ();
 
   for (NodeContainer::Iterator it = sats.Begin (); it != sats.End (); ++it)
     {
@@ -1480,7 +1480,7 @@ SatStatsRtnUserDevThroughputHelper::DoInstallProbes ()
 {
   NS_LOG_FUNCTION (this);
 
-  NodeContainer sats = NodeContainer (GetSatHelper ()->GetBeamHelper ()->GetGeoSatNode ());
+  NodeContainer sats = GetSatHelper ()->GetBeamHelper ()->GetGeoSatNodes ();
   Callback<void, Ptr<const Packet>, const Address &> callback
     = MakeCallback (&SatStatsRtnUserMacThroughputHelper::RxCallback, this);
 
@@ -1573,7 +1573,7 @@ SatStatsRtnFeederMacThroughputHelper::DoInstallProbes ()
 {
   NS_LOG_FUNCTION (this);
 
-  NodeContainer sats = NodeContainer (GetSatHelper ()->GetBeamHelper ()->GetGeoSatNode ());
+  NodeContainer sats = GetSatHelper ()->GetBeamHelper ()->GetGeoSatNodes ();
 
   for (NodeContainer::Iterator it = sats.Begin (); it != sats.End (); ++it)
     {
@@ -1689,7 +1689,7 @@ SatStatsRtnUserMacThroughputHelper::DoInstallProbes ()
 {
   NS_LOG_FUNCTION (this);
 
-  NodeContainer sats = NodeContainer (GetSatHelper ()->GetBeamHelper ()->GetGeoSatNode ());
+  NodeContainer sats = GetSatHelper ()->GetBeamHelper ()->GetGeoSatNodes ();
   Callback<void, Ptr<const Packet>, const Address &> callback
     = MakeCallback (&SatStatsRtnUserMacThroughputHelper::RxCallback, this);
 
@@ -1803,7 +1803,7 @@ SatStatsRtnFeederPhyThroughputHelper::DoInstallProbes ()
 {
   NS_LOG_FUNCTION (this);
 
-  NodeContainer sats = NodeContainer (GetSatHelper ()->GetBeamHelper ()->GetGeoSatNode ());
+  NodeContainer sats = GetSatHelper ()->GetBeamHelper ()->GetGeoSatNodes ();
 
   for (NodeContainer::Iterator it = sats.Begin (); it != sats.End (); ++it)
     {
@@ -1919,7 +1919,7 @@ SatStatsRtnUserPhyThroughputHelper::DoInstallProbes ()
 {
   NS_LOG_FUNCTION (this);
 
-  NodeContainer sats = NodeContainer (GetSatHelper ()->GetBeamHelper ()->GetGeoSatNode ());
+  NodeContainer sats = GetSatHelper ()->GetBeamHelper ()->GetGeoSatNodes ();
   Callback<void, Ptr<const Packet>, const Address &> callback
     = MakeCallback (&SatStatsRtnUserPhyThroughputHelper::RxCallback, this);
 

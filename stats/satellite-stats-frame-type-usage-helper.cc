@@ -166,13 +166,14 @@ SatStatsFrameTypeUsageHelper::DoInstall ()
 
       case SatStatsHelper::IDENTIFIER_BEAM:
         {
-          std::list<uint32_t> beams = GetSatHelper ()->GetBeamHelper ()->GetBeams ();
-          for (std::list<uint32_t>::const_iterator it = beams.begin ();
+          std::list<std::pair<uint32_t, uint32_t>> beams = GetSatHelper ()->GetBeamHelper ()->GetBeams ();
+          for (std::list<std::pair<uint32_t, uint32_t>>::const_iterator it = beams.begin ();
                it != beams.end (); ++it)
             {
-              const uint32_t beamId = (*it);
+              const uint32_t satId = (it->first);
+              const uint32_t beamId = (it->second);
               std::ostringstream name;
-              name << beamId << " " << frameTypeId;
+              name << satId << "-" << beamId << " " << frameTypeId;
               collectorMap.SetAttribute ("Name", StringValue (name.str ()));
               collectorMap.Create (beamId);
               n++;
@@ -215,8 +216,9 @@ SatStatsFrameTypeUsageHelper::DoInstall ()
 
 				// Connect the trace source
 				uint32_t beamId = mac->GetBeamId ();
+        uint32_t satId = mac->GetSatId ();
 				std::ostringstream context;
-				context << GetIdentifierForBeam (beamId);
+				context << GetIdentifierForBeam (satId, beamId);
 	      const bool ret = mac->TraceConnect ("BBFrameTxTrace",
 	                                        context.str (), frameTypeUsageCallback);
 	      NS_ASSERT_MSG (ret,

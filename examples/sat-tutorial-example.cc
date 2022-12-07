@@ -149,7 +149,7 @@ Create helper and simulation scenario
   // other scenarios get all UT users.
   if ( scenario == "full")
     {
-      NodeContainer uts = helper->GetBeamHelper ()->GetUtNodes (1);
+      NodeContainer uts = helper->GetBeamHelper ()->GetUtNodes (0, 1);
       utUsers = helper->GetUserHelper ()->GetUtUsers (uts.Get (0));
     }
   else

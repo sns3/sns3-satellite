@@ -60,8 +60,8 @@ LorawanMac::LorawanMac ()
   NS_FATAL_ERROR ("Default constructor not in use");
 }
 
-LorawanMac::LorawanMac (uint32_t beamId)
-  : SatMac (SatEnums::TRANSPARENT, SatEnums::TRANSPARENT),
+LorawanMac::LorawanMac (uint32_t satId, uint32_t beamId)
+  : SatMac (satId, beamId, SatEnums::TRANSPARENT, SatEnums::TRANSPARENT),
   m_beamId (beamId),
   m_isRegenerative (false)
 {

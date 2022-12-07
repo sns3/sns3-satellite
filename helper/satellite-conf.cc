@@ -27,6 +27,7 @@
 #include "satellite-conf.h"
 #include "ns3/singleton.h"
 #include "ns3/satellite-env-variables.h"
+#include "ns3/satellite-const-variables.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatConf");
 
@@ -192,9 +193,12 @@ void SatConf::Initialize (std::string rtnConf,
                           std::string gwPos,
                           std::string satPos,
                           std::string wfConf,
-                          std::string tle)
+                          std::string tle,
+                          bool isConstellation)
 {
   NS_LOG_FUNCTION (this);
+
+  m_isConstellation = isConstellation;
 
   std::string dataPath = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory () + "/";
   std::string dataPathTle = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory () + "/tle/";
@@ -206,6 +210,8 @@ void SatConf::Initialize (std::string rtnConf,
   NS_ASSERT (m_rtnConf.size () == m_fwdConf.size ());
   m_beamCount = m_rtnConf.size ();
 
+  NS_ASSERT (m_beamCount < SatConstVariables::MAX_BEAMS_PER_SATELLITE);
+
   // Load GW positions
   LoadPositions (dataPath + gwPos, m_gwPositions);
 
@@ -215,8 +221,21 @@ void SatConf::Initialize (std::string rtnConf,
   // Load satellite position
   LoadPositions (dataPath + satPos, m_geoSatPosition);
 
-  // Load TLE information
+  // Load TLE information if case of only one satellite
   LoadTle (dataPathTle + tle, m_tleSat);
+
+  // Update fwdConf & rtnConf with correct nb of GWs
+  if (m_isConstellation)
+    {
+      uint32_t nbGws = m_gwPositions.size ();
+      uint32_t gwId;
+      for (uint32_t i = 0; i < m_fwdConf.size (); i++)
+        {
+          gwId = i % nbGws;
+          m_fwdConf[i][GW_ID_INDEX] = gwId + 1;
+          m_rtnConf[i][GW_ID_INDEX] = gwId + 1;
+        }
+    }
 
   Configure (dataPath + wfConf);
 }
@@ -482,6 +501,94 @@ SatConf::LoadTle (std::string filePathName, std::string& tleInfo)
   delete ifs;
 }
 
+std::vector <std::string>
+SatConf::LoadTles (std::string filePathName)
+{
+  NS_LOG_FUNCTION (this << filePathName);
+
+  std::vector <std::string> tles;
+
+  // READ FROM THE SPECIFIED INPUT FILE
+  std::ifstream *ifs = OpenFile (filePathName);
+
+  double size;
+  uint32_t i = 0;
+  std::string firstLine;
+  std::getline (*ifs, firstLine);
+  std::istringstream iss(firstLine);
+  iss >> size;
+
+  tles.reserve (size);
+
+  while (ifs->good () && i < size)
+    {
+      std::string tle;
+      std::string name;
+      std::string line1;
+      std::string line2;
+
+      std::getline( *ifs, name );
+      std::getline( *ifs, line1 );
+      std::getline( *ifs, line2 );
+
+      tle = line1 + '\n' + line2;
+      tles.push_back (tle);
+
+      i += 1;
+    }
+
+  NS_ASSERT (tles.size () < SatConstVariables::MAX_SATELLITES);
+
+  ifs->close ();
+  delete ifs;
+
+  m_tles = tles;
+
+  return tles;
+}
+
+std::vector <std::pair <uint32_t, uint32_t>>
+SatConf::LoadIsls (std::string filePathName)
+{
+  NS_LOG_FUNCTION (this << filePathName);
+
+  std::vector <std::pair <uint32_t, uint32_t>> isls;
+
+  // READ FROM THE SPECIFIED INPUT FILE
+  std::ifstream *ifs = OpenFile (filePathName);
+
+  double size;
+  uint32_t i = 0;
+  std::string firstLine;
+  std::getline (*ifs, firstLine);
+  std::istringstream iss(firstLine);
+  iss >> size;
+
+  isls.reserve (size);
+
+  while (ifs->good () && i < size)
+    {
+      std::string line;
+      std::string sat1;
+      std::string sat2;
+
+      std::getline( *ifs, line);
+
+      std::stringstream ss(line);
+      ss >> sat1;
+      ss >> sat2;
+
+      isls.push_back (std::make_pair (std::stoi (sat1), std::stoi (sat2)));
+
+      i += 1;
+    }
+
+  ifs->close ();
+  delete ifs;
+
+  return isls;
+}
+
 uint32_t
 SatConf::GetBeamCount () const
 {
@@ -504,6 +611,21 @@ SatConf::GetUtCount () const
   NS_LOG_FUNCTION (this);
 
   return m_utPositions.size ();
+}
+
+uint32_t
+SatConf::GetSatCount () const
+{
+  NS_LOG_FUNCTION (this);
+
+  if (m_isConstellation)
+    {
+      return m_tles.size ();
+    }
+  else
+    {
+      return m_geoSatPosition.size ();
+    }
 }
 
 std::vector <uint32_t>
@@ -651,6 +773,12 @@ SatConf::GetSatTle () const
   NS_ASSERT (m_tleSat.size () != 0);
 
   return m_tleSat;
+}
+
+void
+SatConf::SetUtPositionInputFileName (std::string utPositionInputFileName)
+{
+  m_utPositionInputFileName = utPositionInputFileName;
 }
 
 } // namespace ns3

@@ -71,10 +71,14 @@ public:
    *
    * This is the constructor for the SatGwMac
    *
+   * \param satId ID of sat for UT
+   * \param beamId ID of beam for UT
    * \param forwardLinkRegenerationMode Forward link regeneration mode
    * \param returnLinkRegenerationMode Return link regeneration mode
    */
-  SatGwMac (SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+  SatGwMac (uint32_t satId,
+            uint32_t beamId,
+            SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
             SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   /**
@@ -104,11 +108,12 @@ public:
 
   /**
    * Callback to receive capacity request (CR) messages.
+   * \param uint32_t The satellite ID.
    * \param uint32_t The beam ID.
    * \param Address Address of the sender UT.
    * \param Ptr<SatControlMessage> Pointer to the received CR message.
    */
-  typedef Callback<void, uint32_t, Address, Ptr<SatCrMessage> > CrReceiveCallback;
+  typedef Callback<void, uint32_t, uint32_t, Address, Ptr<SatCrMessage> > CrReceiveCallback;
 
   /**
    * Method to set read control message callback.
@@ -134,10 +139,11 @@ public:
   /**
    * Callback to query/apply handover on the terrestrial network
    * \param Address identification of the UT originating the request
+   * \param uint32_t satellite ID
    * \param uint32_t source beam ID the UT is still in
    * \param uint32_t destination beam ID the UT would like to go in
    */
-  typedef Callback<void, Address, uint32_t, uint32_t> HandoverCallback;
+  typedef Callback<void, Address, uint32_t, uint32_t, uint32_t> HandoverCallback;
 
   /**
    * Method to set handover callback
@@ -148,10 +154,11 @@ public:
   /**
    * Callback to register UT logon
    * \param Address identification of the UT originating the request
+   * \param uint32_t sat ID the UT is requesting logon on
    * \param uint32_t beam ID the UT is requesting logon on
    * \param Callback setRaChannelCallback the callback to call when RA channel has been selected
    */
-  typedef Callback<void, Address, uint32_t, Callback<void, uint32_t> > LogonCallback;
+  typedef Callback<void, Address, uint32_t, uint32_t, Callback<void, uint32_t> > LogonCallback;
 
   /**
    * Method to set logon callback
@@ -162,9 +169,10 @@ public:
   /**
    * Callback to inform NCC a control burst has been received.
    * \param Address identification of the UT that sent the burst
+   * \param uint32_t satellite ID where the UT is connected
    * \param uint32_t beam ID where the UT is connected
    */
-  typedef Callback<void, Address, uint32_t> ControlMessageReceivedCallback;
+  typedef Callback<void, Address, uint32_t, uint32_t> ControlMessageReceivedCallback;
 
   /**
    * Method to set callback for control burst reception
@@ -175,9 +183,10 @@ public:
   /**
    * Callback to indicate NCC a UT needs to be removed
    * \param Address identification of the UT to remove
+   * \param uint32_t satellite ID where the UT is connected
    * \param uint32_t beam ID where the UT is connected
    */
-  typedef Callback<void, Address, uint32_t> RemoveUtCallback;
+  typedef Callback<void, Address, uint32_t, uint32_t> RemoveUtCallback;
 
   /**
    * Method to set callback for UT removing
@@ -219,7 +228,7 @@ private:
    * \param packet Received signaling packet
    * \param beamId ID of beam on UT
    */
-  void ReceiveSignalingPacket (Ptr<Packet> packet, uint32_t beamId);
+  void ReceiveSignalingPacket (Ptr<Packet> packet, uint32_t satId, uint32_t beamId);
 
   void SendNcrMessage ();
 
@@ -229,7 +238,7 @@ private:
    */
   void RemoveTbtp (uint32_t superframeCounter);
 
-  void SendCmtMessage (Address utId, Time burstDuration, Time satelliteReceptionTime, uint32_t beamId);
+  void SendCmtMessage (Address utId, Time burstDuration, Time satelliteReceptionTime, uint32_t satId,  uint32_t beamId);
 
   void SendLogonResponse (Address utId, uint32_t raChannel);
   static void SendLogonResponseHelper (SatGwMac* self,Address utId, uint32_t raChannel);
@@ -269,6 +278,11 @@ private:
    * Minimum interval between two CMT control messages for a same UT
    */
   Time m_cmtPeriodMin;
+
+  /**
+   * Broadcast NCR messages to all UTs
+   */
+  bool m_broadcastNcr;
 
   /**
    * Trace for transmitted BB frames.

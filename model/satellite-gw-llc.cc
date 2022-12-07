@@ -31,6 +31,7 @@
 #include "satellite-node-info.h"
 #include "satellite-enums.h"
 #include "satellite-utils.h"
+#include "satellite-ground-station-address-tag.h"
 
 
 NS_LOG_COMPONENT_DEFINE ("SatGwLlc");
@@ -82,6 +83,12 @@ SatGwLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
   NS_LOG_INFO ("p=" << packet );
   NS_LOG_INFO ("dest=" << dest );
   NS_LOG_INFO ("UID is " << packet->GetUid ());
+
+  if (m_forwardLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
+    {
+      SatGroundStationAddressTag groundStationAddressTag  = SatGroundStationAddressTag (Mac48Address::ConvertFrom (dest));
+      packet->AddPacketTag (groundStationAddressTag);
+    }
 
   Ptr<EncapKey> key;
   if (m_forwardLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)

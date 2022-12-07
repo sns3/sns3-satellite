@@ -51,6 +51,7 @@ set(base_examples
     sat-rayleigh-example
     sat-regeneration-collisions-example
     sat-regeneration-example
+    sat-constellation-example
     sat-rtn-link-da-example
     sat-rtn-link-ra-example
     sat-rtn-system-test-example

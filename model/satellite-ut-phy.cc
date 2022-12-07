@@ -194,7 +194,7 @@ SatUtPhy::PerformHandover (uint32_t beamId)
   NS_LOG_FUNCTION (this << beamId);
 
   // disconnect current SatChannels
-  SatChannelPair::ChannelPair_t channels = m_retrieveChannelPair (m_beamId);
+  SatChannelPair::ChannelPair_t channels = m_retrieveChannelPair (m_satId, m_beamId);
   m_phyTx->ClearChannel ();
   channels.first->RemoveRx (m_phyRx);
 
@@ -210,7 +210,7 @@ SatUtPhy::AssignNewSatChannels ()
   NS_LOG_FUNCTION (this);
 
   // Fetch channels for current beam
-  SatChannelPair::ChannelPair_t channels = m_retrieveChannelPair (m_beamId);
+  SatChannelPair::ChannelPair_t channels = m_retrieveChannelPair (m_satId, m_beamId);
   Ptr<SatChannel> forwardLink = channels.first;
   Ptr<SatChannel> returnLink = channels.second;
 

@@ -15,6 +15,7 @@ cpp_examples = [
 	("sat-cbr-full-example", "True", "True"),
 	("sat-cbr-stats-example", "True", "True"),
 	("sat-cbr-user-defined-example", "True", "True"),
+	("sat-constellation-example", "True", "True"),
 	("sat-dama-http-sim-tn9", "True", "True"),
 	("sat-dama-onoff-sim-tn9", "True", "True"),
 	("sat-dama-sim-tn9", "True", "True"),

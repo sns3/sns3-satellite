@@ -304,7 +304,7 @@ public:
    */
   void UpdateGwRoutes (Address ut, Address oldGateway, Address newGateway);
 
-  typedef Callback<Ptr<PropagationDelayModel>, uint32_t, SatEnums::ChannelType_t> PropagationDelayCallback;
+  typedef Callback<Ptr<PropagationDelayModel>, uint32_t, uint32_t, SatEnums::ChannelType_t> PropagationDelayCallback;
 
 private:
   /**

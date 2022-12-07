@@ -102,7 +102,8 @@ public:
     IDENTIFIER_UT_USER,
     IDENTIFIER_SLICE,
     IDENTIFIER_GROUP,
-    IDENTIFIER_SAT
+    IDENTIFIER_SAT,
+    IDENTIFIER_ISL
   } IdentifierType_t;
 
   /**
@@ -351,7 +352,7 @@ protected:
    * \param beamId
    * \return
    */
-  uint32_t GetIdentifierForBeam (uint32_t beamId) const;
+  uint32_t GetIdentifierForBeam (uint32_t satId, uint32_t beamId) const;
 
   /**
    * \param groupId
@@ -370,6 +371,12 @@ protected:
    * \return
    */
   uint32_t GetIdentifierForSat (Ptr<Node> satNode) const;
+
+  /**
+   * \param satNode
+   * \return
+   */
+  uint32_t GetIdentifierForIsl (Ptr<Node> satNodeSrc, Ptr<Node> satNodeDst) const;
 
   // DEVICE RETRIEVAL METHODS /////////////////////////////////////////////////
 

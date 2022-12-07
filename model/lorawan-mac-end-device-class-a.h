@@ -41,7 +41,7 @@ public:
   static TypeId GetTypeId (void);
 
   LorawanMacEndDeviceClassA ();
-  LorawanMacEndDeviceClassA (uint32_t beamId, Ptr<SatSuperframeSeq> seq);
+  LorawanMacEndDeviceClassA (uint32_t satId, uint32_t beamId, Ptr<SatSuperframeSeq> seq);
   virtual ~LorawanMacEndDeviceClassA ();
 
   /////////////////////

@@ -59,6 +59,7 @@ NS_OBJECT_ENSURE_REGISTERED (SatPhyRxCarrier);
 SatPhyRxCarrier::SatPhyRxCarrier (uint32_t carrierId, Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatWaveformConf> waveformConf, bool isRandomAccessEnabled)
   : m_randomAccessEnabled (isRandomAccessEnabled),
   m_state (IDLE),
+  m_satId (),
   m_beamId (),
   m_carrierId (carrierId),
   m_receivingDedicatedAccess (false),
@@ -417,7 +418,7 @@ SatPhyRxCarrier::StartRx (Ptr<SatSignalParameters> rxParams)
           {
             if (IsReceivingDedicatedAccess () && rxParams->m_txInfo.packetType == SatEnums::PACKET_TYPE_DEDICATED_ACCESS)
               {
-                NS_FATAL_ERROR ("Starting reception of a packet when receiving DA transmission! This may be due to a clock drift in UTs too important.");
+                NS_FATAL_ERROR ("Starting reception of a packet when receiving DA transmission! This may be due to a clock drift in UTs too important, or an update period for SGP4 too important.");
               }
 
             GetInterferenceModel ()->NotifyRxStart (rxParamsStruct.interferenceEvent);
@@ -518,6 +519,7 @@ bool
 SatPhyRxCarrier::CheckAgainstLinkResultsErrorModelAvi (double cSinr, Ptr<SatSignalParameters> rxParams)
 {
   bool error = false;
+
   switch (GetChannelType ())
     {
     case SatEnums::FORWARD_FEEDER_CH:
@@ -540,8 +542,8 @@ SatPhyRxCarrier::CheckAgainstLinkResultsErrorModelAvi (double cSinr, Ptr<SatSign
         */
 
         double ber = (GetLinkResults ()->GetObject <SatLinkResultsFwd> ())->GetBler (rxParams->m_txInfo.modCod,
-                                                                                       rxParams->m_txInfo.frameType,
-                                                                                       SatUtils::LinearToDb (cSinr));
+                                                                                     rxParams->m_txInfo.frameType,
+                                                                                     SatUtils::LinearToDb (cSinr));
         double r = GetUniformRandomValue (0, 1);
 
         if ( r < ber )

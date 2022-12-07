@@ -80,6 +80,7 @@ set(source_files
     model/satellite-geo-user-llc.cc
     model/satellite-geo-user-mac.cc
     model/satellite-geo-user-phy.cc
+    model/satellite-ground-station-address-tag.cc
     model/satellite-gse-header.cc
     model/satellite-gw-llc.cc
     model/satellite-gw-mac.cc
@@ -89,6 +90,8 @@ set(source_files
     model/satellite-interference-elimination.cc
     model/satellite-interference-input-trace-container.cc
     model/satellite-interference-output-trace-container.cc
+    model/satellite-isl-arbiter.cc
+    model/satellite-isl-arbiter-unicast.cc
     model/satellite-link-results.cc
     model/satellite-llc.cc
     model/satellite-log.cc
@@ -126,6 +129,8 @@ set(source_files
     model/satellite-phy-rx-carrier-uplink.cc
     model/satellite-phy-rx.cc
     model/satellite-phy-tx.cc
+    model/satellite-point-to-point-isl-channel.cc
+    model/satellite-point-to-point-isl-net-device.cc
     model/satellite-position-allocator.cc
     model/satellite-position-input-trace-container.cc
     model/satellite-propagation-delay-model.cc
@@ -187,8 +192,10 @@ set(source_files
     helper/satellite-group-helper.cc
     helper/satellite-gw-helper.cc
     helper/satellite-helper.cc
+    helper/satellite-isl-arbiter-unicast-helper.cc
     helper/satellite-lora-conf.cc
     helper/satellite-on-off-helper.cc
+    helper/satellite-point-to-point-isl-helper.cc
     helper/satellite-traffic-helper.cc
     helper/satellite-user-helper.cc
     helper/satellite-ut-helper.cc
@@ -217,6 +224,7 @@ set(source_files
     stats/satellite-stats-link-sinr-helper.cc
     stats/satellite-stats-marsala-correlation-helper.cc
     stats/satellite-stats-packet-collision-helper.cc
+    stats/satellite-stats-packet-drop-rate-helper.cc
     stats/satellite-stats-packet-error-helper.cc
     stats/satellite-stats-plt-helper.cc
     stats/satellite-stats-queue-helper.cc
@@ -313,6 +321,7 @@ set(header_files
     model/satellite-geo-user-llc.h
     model/satellite-geo-user-mac.h
     model/satellite-geo-user-phy.h
+    model/satellite-ground-station-address-tag.h
     model/satellite-gse-header.h
     model/satellite-gw-llc.h
     model/satellite-gw-mac.h
@@ -322,6 +331,8 @@ set(header_files
     model/satellite-interference.h
     model/satellite-interference-input-trace-container.h
     model/satellite-interference-output-trace-container.h
+    model/satellite-isl-arbiter.h
+    model/satellite-isl-arbiter-unicast.h
     model/satellite-link-results.h
     model/satellite-llc.h
     model/satellite-log.h
@@ -359,6 +370,8 @@ set(header_files
     model/satellite-phy-rx-carrier-uplink.h
     model/satellite-phy-rx.h
     model/satellite-phy-tx.h
+    model/satellite-point-to-point-isl-channel.h
+    model/satellite-point-to-point-isl-net-device.h
     model/satellite-position-allocator.h
     model/satellite-position-input-trace-container.h
     model/satellite-propagation-delay-model.h
@@ -422,8 +435,10 @@ set(header_files
     helper/satellite-group-helper.h
     helper/satellite-gw-helper.h
     helper/satellite-helper.h
+    helper/satellite-isl-arbiter-unicast-helper.h
     helper/satellite-lora-conf.h
     helper/satellite-on-off-helper.h
+    helper/satellite-point-to-point-isl-helper.h
     helper/satellite-traffic-helper.h
     helper/satellite-user-helper.h
     helper/satellite-ut-helper.h
@@ -452,6 +467,7 @@ set(header_files
     stats/satellite-stats-link-sinr-helper.h
     stats/satellite-stats-marsala-correlation-helper.h
     stats/satellite-stats-packet-collision-helper.h
+    stats/satellite-stats-packet-drop-rate-helper.h
     stats/satellite-stats-packet-error-helper.h
     stats/satellite-stats-plt-helper.h
     stats/satellite-stats-queue-helper.h
@@ -470,6 +486,7 @@ set(test_sources
     test/satellite-arq-test.cc
     test/satellite-channel-estimation-error-test.cc
     test/satellite-cno-estimator-test.cc
+    test/satellite-constellation-test.cc
     test/satellite-control-msg-container-test.cc
     test/satellite-cra-test.cc
     test/satellite-fading-external-input-trace-test.cc

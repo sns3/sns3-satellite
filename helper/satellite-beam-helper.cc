@@ -23,6 +23,7 @@
 #include <ns3/log.h>
 #include <ns3/string.h>
 #include <ns3/ipv4-static-routing-helper.h>
+#include <ns3/traffic-control-helper.h>
 #include <ns3/internet-stack-helper.h>
 #include <ns3/ipv4-interface.h>
 #include <ns3/mobility-helper.h>
@@ -53,6 +54,9 @@
 #include <ns3/satellite-id-mapper.h>
 #include <ns3/satellite-lorawan-net-device.h>
 #include <ns3/satellite-geo-net-device.h>
+#include <ns3/satellite-sgp4-mobility-model.h>
+#include <ns3/satellite-point-to-point-isl-helper.h>
+
 #include "satellite-beam-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatBeamHelper");
@@ -197,7 +201,8 @@ SatBeamHelper::SatBeamHelper ()
   NS_FATAL_ERROR ("SatBeamHelper::SatBeamHelper - Constructor not in use");
 }
 
-SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
+SatBeamHelper::SatBeamHelper (NodeContainer geoNodes,
+                              std::vector <std::pair <uint32_t, uint32_t>> isls,
                               SatTypedefs::CarrierBandwidthConverter_t bandwidthConverterCb,
                               uint32_t rtnLinkCarrierCount,
                               uint32_t fwdLinkCarrierCount,
@@ -218,9 +223,10 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
   m_enableFwdLinkBeamHopping (false),
   m_bstpController (),
   m_forwardLinkRegenerationMode (forwardLinkRegenerationMode),
-  m_returnLinkRegenerationMode (returnLinkRegenerationMode)
+  m_returnLinkRegenerationMode (returnLinkRegenerationMode),
+  m_isls (isls)
 {
-  NS_LOG_FUNCTION (this << geoNode << rtnLinkCarrierCount << fwdLinkCarrierCount << seq);
+  NS_LOG_FUNCTION (this << rtnLinkCarrierCount << fwdLinkCarrierCount << seq);
 
   // uncomment next code line, if attributes are needed already in construction phase.
   // E.g attributes set by object factory affecting object creation
@@ -343,8 +349,8 @@ SatBeamHelper::SatBeamHelper (Ptr<Node> geoNode,
   // DVB-RCS2 link results for RTN link waveform configurations
   m_superframeSeq->GetWaveformConf ()->InitializeEbNoRequirements (linkResultsReturnLink);
 
-  m_geoNode = geoNode;
-  m_geoHelper->Install (m_geoNode);
+  m_geoNodes = geoNodes;
+  m_geoHelper->Install (m_geoNodes);
 
   m_ncc = CreateObject<SatNcc> ();
 
@@ -457,6 +463,7 @@ std::pair<Ptr<NetDevice>, NetDeviceContainer>
 SatBeamHelper::Install (NodeContainer ut,
                         Ptr<Node> gwNode,
                         uint32_t gwId,
+                        uint32_t satId,
                         uint32_t beamId,
                         uint32_t rtnUlFreqId,
                         uint32_t rtnFlFreqId,
@@ -464,10 +471,10 @@ SatBeamHelper::Install (NodeContainer ut,
                         uint32_t fwdFlFreqId,
                         SatMac::RoutingUpdateCallback routingCallback)
 {
-  NS_LOG_FUNCTION (this << gwNode << gwId << beamId << rtnUlFreqId << rtnFlFreqId << fwdUlFreqId << fwdFlFreqId);
+  NS_LOG_FUNCTION (this << gwNode << gwId << satId << beamId << rtnUlFreqId << rtnFlFreqId << fwdUlFreqId << fwdFlFreqId);
 
-  // add beamId as key and gwId as value pair to beam map. In case it's there already, assertion failure is caused
-  std::pair<std::map<uint32_t, uint32_t >::iterator, bool> beam = m_beam.insert (std::make_pair (beamId, gwId));
+  // add pair satId / beamId as key and gwId as value to beam map. In case it's there already, assertion failure is caused
+  std::pair<std::map<std::pair<uint32_t, uint32_t>, uint32_t >::iterator, bool> beam = m_beam.insert (std::make_pair (std::make_pair (satId, beamId), gwId));
   NS_ASSERT (beam.second == true);
 
   // TODO: Update channels to store 4 frequency ID
@@ -476,27 +483,30 @@ SatBeamHelper::Install (NodeContainer ut,
   // m_beamFreqs.insert (std::pair<uint32_t, FrequencyPair_t > (beamId, freqPair));
 
   // next it is found feeder link channels and if not found channels are created and saved to map
-  SatChannelPair::ChannelPair_t feederLink = GetChannelPair (beamId, fwdFlFreqId, rtnFlFreqId, false);
+  SatChannelPair::ChannelPair_t feederLink = GetChannelPair (satId, beamId, fwdFlFreqId, rtnFlFreqId, false);
 
   // next it is found user link channels and if not found channels are created and saved to map
-  SatChannelPair::ChannelPair_t userLink = GetChannelPair (beamId, fwdUlFreqId, rtnUlFreqId, true);
+  SatChannelPair::ChannelPair_t userLink = GetChannelPair (satId, beamId, fwdUlFreqId, rtnUlFreqId, true);
 
-  NS_ASSERT (m_geoNode != NULL);
+  Ptr<Node> geoNode = m_geoNodes.Get (satId);
+
+  NS_ASSERT (geoNode != NULL);
 
   // Get the position of the GW serving this beam, get the best beam based on antenna patterns
   // for this position, and set the antenna patterns to the feeder PHY objects via
   // AttachChannels method.
   GeoCoordinate gwPos = gwNode->GetObject<SatMobilityModel> ()->GetGeoPosition ();
-  uint32_t feederBeamId = m_antennaGainPatterns->GetBestBeamId (gwPos);
+  uint32_t feederBeamId = m_antennaGainPatterns->GetBestBeamId (satId, gwPos, true);
 
   // attach channels to geo satellite device
-  m_geoHelper->AttachChannels ( m_geoNode->GetDevice (0),
+  m_geoHelper->AttachChannels ( geoNode->GetDevice (0),
                                 feederLink.first,
                                 feederLink.second,
                                 userLink.first,
                                 userLink.second,
                                 m_antennaGainPatterns->GetAntennaGainPattern (beamId),
                                 m_antennaGainPatterns->GetAntennaGainPattern (feederBeamId),
+                                satId,
                                 gwId,
                                 beamId,
                                 m_forwardLinkRegenerationMode,
@@ -522,10 +532,10 @@ SatBeamHelper::Install (NodeContainer ut,
         }
 
       //save UT node pointer to multimap container
-      m_utNode.insert (std::make_pair (beamId, *i) );
+      m_utNode.insert (std::make_pair (std::make_pair (satId, beamId), *i) );
     }
 
-  Ptr<NetDevice> gwNd = InstallFeeder (gwNode, gwId, beamId, feederLink, rtnFlFreqId, fwdFlFreqId, routingCallback);
+  Ptr<NetDevice> gwNd = InstallFeeder (DynamicCast<SatGeoNetDevice> (geoNode->GetDevice (0)), gwNode, gwId, satId, beamId, feederLink, rtnFlFreqId, fwdFlFreqId, routingCallback);
 
   NetDeviceContainer utNd;
   if (m_returnLinkRegenerationMode == SatEnums::REGENERATION_LINK || m_returnLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
@@ -535,11 +545,11 @@ SatBeamHelper::Install (NodeContainer ut,
           // If first time we create a Net Device for this GW ID, store it
           m_gwNdMap[gwId] = gwNd;
         }
-      utNd = InstallUser (ut, m_gwNdMap[gwId], beamId, userLink, rtnUlFreqId, fwdUlFreqId, routingCallback);
+      utNd = InstallUser (DynamicCast<SatGeoNetDevice> (geoNode->GetDevice (0)), ut, m_gwNdMap[gwId], satId, beamId, userLink, rtnUlFreqId, fwdUlFreqId, routingCallback);
     }
   else
     {
-      utNd = InstallUser (ut, gwNd, beamId, userLink, rtnUlFreqId, fwdUlFreqId, routingCallback);
+      utNd = InstallUser (DynamicCast<SatGeoNetDevice> (geoNode->GetDevice (0)), ut, gwNd, satId, beamId, userLink, rtnUlFreqId, fwdUlFreqId, routingCallback);
     }
 
   if (m_bstpController)
@@ -558,15 +568,17 @@ SatBeamHelper::Install (NodeContainer ut,
 }
 
 Ptr<NetDevice>
-SatBeamHelper::InstallFeeder (Ptr<Node> gwNode,
+SatBeamHelper::InstallFeeder (Ptr<SatGeoNetDevice> geoNetDevice,
+                              Ptr<Node> gwNode,
                               uint32_t gwId,
+                              uint32_t satId,
                               uint32_t beamId,
                               SatChannelPair::ChannelPair_t feederLink,
                               uint32_t rtnFlFreqId,
                               uint32_t fwdFlFreqId,
                               SatUtMac::RoutingUpdateCallback routingCallback)
 {
-  NS_LOG_FUNCTION (this << gwNode << gwId << beamId << rtnFlFreqId << fwdFlFreqId);
+  NS_LOG_FUNCTION (this << gwNode << gwId << satId << beamId << rtnFlFreqId << fwdFlFreqId);
 
   // Set trace files if options ask for it
   if (m_enableTracesOnReturnLink)
@@ -593,6 +605,7 @@ SatBeamHelper::InstallFeeder (Ptr<Node> gwNode,
     case SatEnums::DVB:
       gwNd = m_gwHelper->InstallDvb (gwNode,
                                      gwId,
+                                     satId,
                                      beamId,
                                      feederLink.first,
                                      feederLink.second,
@@ -604,6 +617,7 @@ SatBeamHelper::InstallFeeder (Ptr<Node> gwNode,
     case SatEnums::LORA:
       gwNd = m_gwHelper->InstallLora (gwNode,
                                       gwId,
+                                      satId,
                                       beamId,
                                       feederLink.first,
                                       feederLink.second,
@@ -632,20 +646,22 @@ SatBeamHelper::InstallFeeder (Ptr<Node> gwNode,
   switch(m_standard)
   {
     case SatEnums::DVB:
-      m_ncc->AddBeam (beamId,
-                  MakeCallback (&SatNetDevice::SendControlMsg, DynamicCast<SatNetDevice> (gwNd)),
-                  MakeCallback (&SatGwMac::TbtpSent, DynamicCast<SatGwMac> (DynamicCast<SatNetDevice> (gwNd)->GetMac ())),
-                  m_superframeSeq,
-                  maxBbFrameDataSizeInBytes,
-                  gwNd->GetAddress ());
+      m_ncc->AddBeam (satId,
+                      beamId,
+                      MakeCallback (&SatNetDevice::SendControlMsg, DynamicCast<SatNetDevice> (gwNd)),
+                      MakeCallback (&SatGwMac::TbtpSent, DynamicCast<SatGwMac> (DynamicCast<SatNetDevice> (gwNd)->GetMac ())),
+                      m_superframeSeq,
+                      maxBbFrameDataSizeInBytes,
+                      gwNd->GetAddress ());
       break;
     case SatEnums::LORA:
-      m_ncc->AddBeam (beamId,
-                  MakeCallback (&SatLorawanNetDevice::SendControlMsg, DynamicCast<SatLorawanNetDevice> (gwNd)),
-                  MakeNullCallback<void, Ptr<SatTbtpMessage>> (),
-                  m_superframeSeq,
-                  maxBbFrameDataSizeInBytes,
-                  gwNd->GetAddress ());
+      m_ncc->AddBeam (satId,
+                      beamId,
+                      MakeCallback (&SatLorawanNetDevice::SendControlMsg, DynamicCast<SatLorawanNetDevice> (gwNd)),
+                      MakeNullCallback<void, Ptr<SatTbtpMessage>> (),
+                      m_superframeSeq,
+                      maxBbFrameDataSizeInBytes,
+                      gwNd->GetAddress ());
       break;
     default:
       NS_FATAL_ERROR ("Incorrect standard chosen");
@@ -654,7 +670,6 @@ SatBeamHelper::InstallFeeder (Ptr<Node> gwNode,
   // Add satellite addresses to GW MAC layers.
   if (m_forwardLinkRegenerationMode == SatEnums::REGENERATION_LINK || m_forwardLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
     {
-      Ptr<SatGeoNetDevice> geoNetDevice = DynamicCast<SatGeoNetDevice> (m_geoNode->GetDevice (0));
       Mac48Address satFeederAddress = geoNetDevice->GetSatelliteFeederAddress (beamId);
       DynamicCast<SatGwMac> (DynamicCast<SatNetDevice> (gwNd)->GetMac ())->SetSatelliteAddress (satFeederAddress);
     }
@@ -662,7 +677,6 @@ SatBeamHelper::InstallFeeder (Ptr<Node> gwNode,
   // Add satellite addresses to GW LLC layers.
   if (m_forwardLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
     {
-      Ptr<SatGeoNetDevice> geoNetDevice = DynamicCast<SatGeoNetDevice> (m_geoNode->GetDevice (0));
       Mac48Address satFeederAddress = geoNetDevice->GetSatelliteFeederAddress (beamId);
       DynamicCast<SatGwLlc> (DynamicCast<SatNetDevice> (gwNd)->GetLlc ())->SetSatelliteAddress (satFeederAddress);
     }
@@ -672,8 +686,10 @@ SatBeamHelper::InstallFeeder (Ptr<Node> gwNode,
 
 
 NetDeviceContainer
-SatBeamHelper::InstallUser (NodeContainer ut,
+SatBeamHelper::InstallUser (Ptr<SatGeoNetDevice> geoNetDevice,
+                            NodeContainer ut,
                             Ptr<NetDevice> gwNd,
+                            uint32_t satId,
                             uint32_t beamId,
                             SatChannelPair::ChannelPair_t userLink,
                             uint32_t rtnUlFreqId,
@@ -691,7 +707,6 @@ SatBeamHelper::InstallUser (NodeContainer ut,
   Address satUserAddress = Address ();
   if (m_returnLinkRegenerationMode == SatEnums::REGENERATION_LINK || m_returnLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
     {
-      Ptr<SatGeoNetDevice> geoNetDevice = DynamicCast<SatGeoNetDevice> (m_geoNode->GetDevice (0));
       satUserAddress = geoNetDevice->GetUserMac (beamId)->GetAddress ();
     }
 
@@ -701,6 +716,7 @@ SatBeamHelper::InstallUser (NodeContainer ut,
   {
     case SatEnums::DVB:
       utNd = m_utHelper->InstallDvb (ut,
+                                     satId,
                                      beamId,
                                      userLink.first,
                                      userLink.second,
@@ -714,6 +730,7 @@ SatBeamHelper::InstallUser (NodeContainer ut,
       break;
     case SatEnums::LORA:
       utNd = m_utHelper->InstallLora (ut,
+                                      satId,
                                       beamId,
                                       userLink.first,
                                       userLink.second,
@@ -750,10 +767,47 @@ SatBeamHelper::InstallUser (NodeContainer ut,
   return utNd;
 }
 
-uint32_t
-SatBeamHelper::GetGwId (uint32_t beamId) const
+void
+SatBeamHelper::InstallIsls ()
 {
-  std::map<uint32_t, uint32_t>::const_iterator i = m_beam.find (beamId);
+  NS_LOG_FUNCTION (this);
+
+  Ptr<PointToPointIslHelper> p2pIslHelper = CreateObject<PointToPointIslHelper> ();
+  TrafficControlHelper tchIsl;
+
+  for (std::vector <std::pair <uint32_t, uint32_t>>::iterator it = m_isls.begin(); it != m_isls.end (); it++)
+    {
+      Ptr<Node> sat1 = m_geoNodes.Get (it->first);
+      Ptr<Node> sat2 = m_geoNodes.Get (it->second);
+
+      // Install a p2p ISL link between these two satellites
+      NetDeviceContainer netDevices = p2pIslHelper->Install(sat1, sat2);
+      Ptr<PointToPointIslNetDevice> islNdSat1 = DynamicCast<PointToPointIslNetDevice> (netDevices.Get (0));
+      Ptr<PointToPointIslNetDevice> islNdSat2 = DynamicCast<PointToPointIslNetDevice> (netDevices.Get (1));
+
+      Ptr<SatGeoNetDevice> geoNdSat1 = DynamicCast<SatGeoNetDevice> (sat1->GetDevice (0));
+      Ptr<SatGeoNetDevice> geoNdSat2 = DynamicCast<SatGeoNetDevice> (sat2->GetDevice (0));
+
+      geoNdSat1->AddIslsNetDevice (islNdSat1);
+      geoNdSat2->AddIslsNetDevice (islNdSat2);
+
+      islNdSat1->SetGeoNetDevice (geoNdSat1);
+      islNdSat2->SetGeoNetDevice (geoNdSat2);
+    }
+}
+
+void
+SatBeamHelper::SetIslRoutes ()
+{
+  NS_LOG_FUNCTION (this);
+
+  m_geoHelper->SetIslRoutes (m_geoNodes, m_isls);
+}
+
+uint32_t
+SatBeamHelper::GetGwId (uint32_t satId, uint32_t beamId) const
+{
+  std::map<std::pair<uint32_t, uint32_t>, uint32_t>::const_iterator i = m_beam.find (std::make_pair (satId, beamId));
 
   if (i == m_beam.end ())
     {
@@ -781,11 +835,11 @@ SatBeamHelper::GetGwNode (uint32_t gwId) const
   return node;
 }
 
-Ptr<Node>
-SatBeamHelper::GetGeoSatNode () const
+NodeContainer
+SatBeamHelper::GetGeoSatNodes () const
 {
   NS_LOG_FUNCTION (this);
-  return m_geoNode;
+  return m_geoNodes;
 }
 
 Ptr<SatUtHelper>
@@ -832,7 +886,7 @@ SatBeamHelper::GetUtNodes () const
 
   NodeContainer utNodes;
 
-  for (std::multimap<uint32_t, Ptr<Node> >::const_iterator i = m_utNode.begin ();
+  for (std::multimap<std::pair<uint32_t, uint32_t>, Ptr<Node> >::const_iterator i = m_utNode.begin ();
        i != m_utNode.end (); ++i)
     {
       utNodes.Add (i->second);
@@ -842,18 +896,18 @@ SatBeamHelper::GetUtNodes () const
 }
 
 NodeContainer
-SatBeamHelper::GetUtNodes (uint32_t beamId) const
+SatBeamHelper::GetUtNodes (uint32_t satId, uint32_t beamId) const
 {
   NS_LOG_FUNCTION (this << beamId);
 
   NodeContainer utNodes;
 
   // find all entries with the specified beamId
-  std::pair <std::multimap<uint32_t, Ptr<Node> >::const_iterator,
-             std::multimap<uint32_t, Ptr<Node> >::const_iterator> range;
-  range = m_utNode.equal_range (beamId);
+  std::pair <std::multimap<std::pair<uint32_t, uint32_t>, Ptr<Node> >::const_iterator,
+             std::multimap<std::pair<uint32_t, uint32_t>, Ptr<Node> >::const_iterator> range;
+  range = m_utNode.equal_range (std::make_pair (satId, beamId));
 
-  for (std::map<uint32_t, Ptr<Node> >::const_iterator i = range.first;
+  for (std::map<std::pair<uint32_t, uint32_t>, Ptr<Node> >::const_iterator i = range.first;
        i != range.second; ++i)
     {
       utNodes.Add (i->second);
@@ -862,14 +916,14 @@ SatBeamHelper::GetUtNodes (uint32_t beamId) const
   return utNodes;
 }
 
-std::list<uint32_t>
+std::list<std::pair<uint32_t, uint32_t>>
 SatBeamHelper::GetBeams () const
 {
   NS_LOG_FUNCTION (this);
 
-  std::list<uint32_t> ret;
+  std::list<std::pair<uint32_t, uint32_t>> ret;
 
-  for (std::map<uint32_t, uint32_t>::const_iterator it = m_beam.begin ();
+  for (std::map<std::pair<uint32_t, uint32_t>, uint32_t>::const_iterator it = m_beam.begin ();
        it != m_beam.end (); ++it)
     {
       ret.push_back (it->first);
@@ -893,11 +947,11 @@ SatBeamHelper::GetUtBeamId (Ptr<Node> utNode) const
 
   uint32_t beamId = 0;
 
-  for ( std::multimap<uint32_t, Ptr<Node> >::const_iterator it = m_utNode.begin (); ( (it != m_utNode.end () ) && (beamId == 0) ); it++ )
+  for ( std::multimap<std::pair<uint32_t, uint32_t>, Ptr<Node> >::const_iterator it = m_utNode.begin (); ( (it != m_utNode.end () ) && (beamId == 0) ); it++ )
     {
       if ( it->second == utNode )
         {
-          beamId = it->first;
+          beamId = it->first.second;
         }
     }
 
@@ -1050,6 +1104,27 @@ SatBeamHelper::EnableCreationTraces (Ptr<OutputStreamWrapper> stream, CallbackBa
   m_utHelper->EnableCreationTraces (stream, cb);
 }
 
+uint32_t
+SatBeamHelper::GetClosestSat (GeoCoordinate position)
+{
+  NS_LOG_FUNCTION (this);
+
+  double distanceMin = std::numeric_limits<double>::max ();
+  uint32_t indexDistanceMin = 0;
+
+  for (uint32_t i = 0; i < m_geoNodes.GetN (); i++)
+    {
+      GeoCoordinate satPos = m_geoNodes.Get (i)->GetObject<SatSGP4MobilityModel> ()->GetGeoPosition ();
+      double distance = CalculateDistance (position.ToVector (), satPos.ToVector ());
+      if (distance < distanceMin)
+        {
+          distanceMin = distance;
+          indexDistanceMin = i;
+        }
+    }
+  return indexDistanceMin;
+}
+
 void
 SatBeamHelper::EnablePacketTrace ()
 {
@@ -1111,7 +1186,7 @@ SatBeamHelper::GetUtInfo () const
 
   std::ostringstream oss;
 
-  for (std::multimap<uint32_t, Ptr<Node> >::const_iterator i = m_utNode.begin ();
+  for (std::multimap<std::pair<uint32_t, uint32_t>, Ptr<Node> >::const_iterator i = m_utNode.begin ();
        i != m_utNode.end (); ++i)
     {
       Ptr<SatMobilityModel> model = i->second->GetObject<SatMobilityModel> ();
@@ -1139,7 +1214,7 @@ SatBeamHelper::GetUtInfo () const
 
       if ( m_printDetailedInformationToCreationTraces )
         {
-          oss << i->first << " " << Singleton <SatIdMapper>::Get ()->GetUtIdWithMac (devAddress) << " "
+          oss << i->first.second << " " << Singleton <SatIdMapper>::Get ()->GetUtIdWithMac (devAddress) << " "
               << pos.GetLatitude () << " " << pos.GetLongitude () << " " << pos.GetAltitude () << " ";
 
           for ( uint32_t j = 0; j < i->second->GetNDevices (); j++)
@@ -1151,7 +1226,7 @@ SatBeamHelper::GetUtInfo () const
         }
       else
         {
-          oss << i->first << " " << Singleton <SatIdMapper>::Get ()->GetUtIdWithMac (devAddress) << " "
+          oss << i->first.second << " " << Singleton <SatIdMapper>::Get ()->GetUtIdWithMac (devAddress) << " "
               << pos.GetLatitude () << " " << pos.GetLongitude () << " " << pos.GetAltitude ()
               << std::endl;
         }
@@ -1170,12 +1245,16 @@ SatBeamHelper::CreateBeamInfo () const
 
   oss << std::endl << " -- Beam details --";
 
-  for (std::map<uint32_t, uint32_t>::const_iterator i = m_beam.begin ();
+  for (std::map<std::pair<uint32_t, uint32_t>, uint32_t>::const_iterator i = m_beam.begin ();
        i != m_beam.end (); ++i)
     {
-      oss << std::endl << "Beam ID: " << (*i).first << " ";
+      uint32_t satId = i->first.first;
+      uint32_t beamId = i->first.second;
 
-      std::map<uint32_t, FrequencyPair_t >::const_iterator freqIds = m_beamFreqs.find ((*i).first);
+      oss << std::endl << "Sat ID: " << satId << " ";
+      oss << "Beam ID: " << beamId << " ";
+
+      std::map<std::pair<uint32_t, uint32_t>, FrequencyPair_t >::const_iterator freqIds = m_beamFreqs.find (std::make_pair (satId, beamId));
 
       if ( freqIds != m_beamFreqs.end ())
         {
@@ -1244,7 +1323,7 @@ SatBeamHelper::CreateBeamInfo () const
 
   oss << std::endl << " -- Geo Satellite position --" << std::endl;
 
-  Ptr<SatMobilityModel> model = m_geoNode->GetObject<SatMobilityModel> ();
+  Ptr<SatMobilityModel> model = m_geoNodes.Get (0)->GetObject<SatMobilityModel> ();
   GeoCoordinate pos = model->GetGeoPosition ();
   oss << "latitude=" << pos.GetLatitude () << ", longitude=" << pos.GetLongitude () << ", altitude=" << pos.GetAltitude () << std::endl;
 
@@ -1252,17 +1331,18 @@ SatBeamHelper::CreateBeamInfo () const
 }
 
 SatChannelPair::ChannelPair_t
-SatBeamHelper::GetChannelPair (uint32_t beamId, uint32_t fwdFrequencyId, uint32_t rtnFrequencyId, bool isUserLink)
+SatBeamHelper::GetChannelPair (uint32_t satId, uint32_t beamId, uint32_t fwdFrequencyId, uint32_t rtnFrequencyId, bool isUserLink)
 {
-  NS_LOG_FUNCTION (this << beamId << fwdFrequencyId << rtnFrequencyId << isUserLink);
+  NS_LOG_FUNCTION (this << satId << beamId << fwdFrequencyId << rtnFrequencyId << isUserLink);
+
   Ptr<SatChannelPair> chPairs = isUserLink ? m_ulChannels : m_flChannels;
 
-	bool hasFwdChannel = chPairs->HasFwdChannel (fwdFrequencyId);
-  bool hasRtnChannel = chPairs->HasRtnChannel (rtnFrequencyId);
+	bool hasFwdChannel = chPairs->HasFwdChannel (satId, fwdFrequencyId);
+  bool hasRtnChannel = chPairs->HasRtnChannel (satId, rtnFrequencyId);
 
   if (hasFwdChannel && hasRtnChannel)
     {
-      chPairs->UpdateBeamsForFrequency (beamId, fwdFrequencyId, rtnFrequencyId);
+      chPairs->UpdateBeamsForFrequency (satId, beamId, fwdFrequencyId, rtnFrequencyId);
     }
   else
     {
@@ -1273,13 +1353,13 @@ SatBeamHelper::GetChannelPair (uint32_t beamId, uint32_t fwdFrequencyId, uint32_
 
       if (hasFwdChannel)
         {
-					forwardCh = chPairs->GetForwardChannel (fwdFrequencyId);
+					forwardCh = chPairs->GetForwardChannel (satId, fwdFrequencyId);
 					pDelay = forwardCh->GetPropagationDelayModel ();
 					pFsl = forwardCh->GetFreeSpaceLoss ();
 				}
 			else if (hasRtnChannel)
         {
-					returnCh = chPairs->GetReturnChannel (rtnFrequencyId);
+					returnCh = chPairs->GetReturnChannel (satId, rtnFrequencyId);
 					pDelay = returnCh->GetPropagationDelayModel ();
 					pFsl = returnCh->GetFreeSpaceLoss ();
 				}
@@ -1326,10 +1406,10 @@ SatBeamHelper::GetChannelPair (uint32_t beamId, uint32_t fwdFrequencyId, uint32_
 					returnCh->SetFreeSpaceLoss (pFsl);
 				}
 
-      chPairs->StoreChannelPair (beamId, fwdFrequencyId, forwardCh, rtnFrequencyId, returnCh);
+      chPairs->StoreChannelPair (satId, beamId, fwdFrequencyId, forwardCh, rtnFrequencyId, returnCh);
     }
 
-  return chPairs->GetChannelPair (beamId);
+  return chPairs->GetChannelPair (satId, beamId);
 }
 
 bool
@@ -1454,29 +1534,29 @@ SatBeamHelper::AddMulticastRouteToUt (Ptr<Node> utNode, Ipv4Address sourceAddres
 
 
 Ptr<PropagationDelayModel>
-SatBeamHelper::GetPropagationDelayModel (uint32_t beamId, SatEnums::ChannelType_t channelType)
+SatBeamHelper::GetPropagationDelayModel (uint32_t satId, uint32_t beamId, SatEnums::ChannelType_t channelType)
 {
   Ptr<SatChannel> channel = NULL;
   switch (channelType)
     {
     case SatEnums::FORWARD_FEEDER_CH:
       {
-        channel = m_flChannels->GetChannelPair (beamId).first;
+        channel = m_flChannels->GetChannelPair (satId, beamId).first;
         break;
       }
     case SatEnums::FORWARD_USER_CH:
       {
-        channel = m_ulChannels->GetChannelPair (beamId).first;
+        channel = m_ulChannels->GetChannelPair (satId, beamId).first;
         break;
       }
     case SatEnums::RETURN_USER_CH:
       {
-        channel = m_ulChannels->GetChannelPair (beamId).second;
+        channel = m_ulChannels->GetChannelPair (satId, beamId).second;
         break;
       }
     case SatEnums::RETURN_FEEDER_CH:
       {
-        channel = m_flChannels->GetChannelPair (beamId).second;
+        channel = m_flChannels->GetChannelPair (satId, beamId).second;
         break;
       }
     default:

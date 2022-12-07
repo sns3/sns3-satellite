@@ -419,9 +419,9 @@ SatRequestManager::SetNodeInfo (Ptr<SatNodeInfo> nodeInfo)
 }
 
 void
-SatRequestManager::CnoUpdated (uint32_t beamId, Address sourceMac, Address /*gwId*/, double cno, bool isSatelliteMac)
+SatRequestManager::CnoUpdated (uint32_t satId, uint32_t beamId, Address sourceMac, Address /*gwId*/, double cno, bool isSatelliteMac)
 {
-  NS_LOG_FUNCTION (this << beamId << cno);
+  NS_LOG_FUNCTION (this << satId << beamId << cno);
 
   NS_LOG_INFO ("C/No updated to request manager: " << cno);
 

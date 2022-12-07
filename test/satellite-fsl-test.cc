@@ -86,7 +86,7 @@ SatFreeSpaceLossTestCase::DoRun (void)
 
   NodeContainer gw = helper->GwNodes ();
   NodeContainer ut = helper->UtNodes ();
-  Ptr<Node> geo = helper->GeoSatNode ();
+  Ptr<Node> geo = helper->GeoSatNodes ().Get (0);
 
   // get mobilities
   Ptr<SatMobilityModel> gwMob = gw.Get (0)->GetObject<SatMobilityModel> ();

@@ -740,7 +740,7 @@ SatPhyRxCarrierPerWindow::MeasureRandomAccessLoad ()
 
   if (GetChannelType () == SatEnums::RETURN_FEEDER_CH)
     {
-      m_avgNormalizedOfferedLoadCallback (GetBeamId (), GetCarrierId (), GetRandomAccessAllocationChannelId (), averageNormalizedOfferedLoad);
+      m_avgNormalizedOfferedLoadCallback (GetSatId (), GetBeamId (), GetCarrierId (), GetRandomAccessAllocationChannelId (), averageNormalizedOfferedLoad);
     }
 }
 

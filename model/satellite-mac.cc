@@ -106,12 +106,16 @@ SatMac::SatMac ()
   NS_ASSERT (false); // this version of the constructor should not been used
 }
 
-SatMac::SatMac (SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+SatMac::SatMac (uint32_t satId,
+                uint32_t beamId,
+                SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                 SatEnums::RegenerationMode_t returnLinkRegenerationMode)
   : m_isStatisticsTagsEnabled (false),
   m_ncrV2 (false),
   m_routingUpdateCallback (0),
   m_nodeInfo (),
+  m_satId (satId),
+  m_beamId (beamId),
   m_txEnabled (true),
   m_beamEnabledTime (Seconds (0)),
   m_lastDelay (0),

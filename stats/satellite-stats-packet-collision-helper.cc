@@ -535,7 +535,7 @@ SatStatsUserPacketCollisionHelper::DoInstall ()
 
   // Connect to trace sources at SAT nodes.
 
-  NodeContainer sats = NodeContainer (GetSatHelper ()->GetBeamHelper ()->GetGeoSatNode ());
+  NodeContainer sats = GetSatHelper ()->GetBeamHelper ()->GetGeoSatNodes ();
   Callback<void, uint32_t, const Address &, bool> callback
     = MakeCallback (&SatStatsUserPacketCollisionHelper::CollisionRxCallback,
                     this);

@@ -56,7 +56,7 @@ public:
   /**
    * Constructor.
    */
-  SatTracedMobilityModel (const std::string& filename, Ptr<SatAntennaGainPatternContainer> agp);
+  SatTracedMobilityModel (uint32_t satId, const std::string& filename, Ptr<SatAntennaGainPatternContainer> agp);
 
   /**
    * Destructor for SatMobilityModel
@@ -86,6 +86,7 @@ private:
 
   void UpdateGeoPositionFromFile (void);
 
+  uint32_t m_satId;
   std::string m_traceFilename;
   Time m_updateInterval;
   GeoCoordinate::ReferenceEllipsoid_t m_refEllipsoid;

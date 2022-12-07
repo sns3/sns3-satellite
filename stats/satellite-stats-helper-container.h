@@ -27,6 +27,7 @@
 #include <ns3/ptr.h>
 #include <ns3/satellite-stats-helper.h>
 #include <list>
+#include <set>
 
 
 namespace ns3 {
@@ -75,6 +76,7 @@ namespace ns3 {
  * - AddAverage [Beam, Group, Ut, Sat] [Fwd, Rtn] [Feeder, User] LinkModcod
  * - Add [Global, PerGw, PerBeam] FrameTypeUsage
  * - Add [Global, PerGw, PerBeam] RtnFeederWindowLoad
+ * - Add [Global, PerIsl] PacketDropRate
  *
  * Also check the Doxygen documentation of this class for more information.
  */
@@ -767,6 +769,10 @@ public:
   void AddPerGwRtnFeederWindowLoad (SatStatsHelper::OutputType_t outputType);
   void AddPerBeamRtnFeederWindowLoad (SatStatsHelper::OutputType_t outputType);
 
+  // ISL queue drop statistics
+  void AddGlobalPacketDropRate (SatStatsHelper::OutputType_t outputType);
+  void AddPerIslPacketDropRate (SatStatsHelper::OutputType_t outputType);
+
   /**
    * \param outputType an arbitrary output type.
    * \return a string suffix to be appended at the end of the corresponding
@@ -789,6 +795,9 @@ private:
 
   /// Maintains the active SatStatsHelper instances which have created.
   std::list<Ptr<const SatStatsHelper> > m_stats;
+
+  /// Set of names of statisticscreated. Used to avoid creating same stat twice.
+  std::set<std::string> m_names;
 
 }; // end of class StatStatsHelperContainer
 

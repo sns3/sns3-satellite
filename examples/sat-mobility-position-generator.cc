@@ -68,7 +68,7 @@ main (int argc, char *argv[])
       for (uint32_t posId = 0; posId < posCount; ++posId)
         {
           Ptr<SatSpotBeamPositionAllocator> positions = satHelper->GetBeamAllocator (beamId);
-          GeoCoordinate coords = positions->GetNextGeoPosition ();
+          GeoCoordinate coords = positions->GetNextGeoPosition (0);
           std::cout << "[" << beamId << "] " << coords << std::endl;
         }
     }
