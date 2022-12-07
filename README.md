@@ -61,6 +61,7 @@ and drop the following file **sns3.xml** in this **contrib** folder:
     <module name="sns3-satellite" type="ns-contrib" min_version="ns-3.36">
       <source type="git">
         <attribute name="url" value="https://github.com/sns3/sns3-satellite.git"/>
+        <attribute name="revision" value="72aa513f43b7687336cf6251d50e81420c41691f"/>
         <attribute name="module_directory" value="satellite"/>
       </source>
       <build type="none">
