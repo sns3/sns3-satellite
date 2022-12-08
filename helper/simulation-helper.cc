@@ -745,7 +745,7 @@ SimulationHelper::ProgressCb ()
 void
 SimulationHelper::CreateDefaultStats ()
 {
-  NS_ASSERT_MSG (m_satHelper != 0, "Satellite scenario not created yet!");
+  NS_ASSERT_MSG (m_satHelper != nullptr, "Satellite scenario not created yet!");
 
   if (!m_statContainer)
     {

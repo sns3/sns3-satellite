@@ -172,11 +172,12 @@ SatIdMapper::AttachMacToTraceId (Address mac)
   NS_LOG_FUNCTION (this);
 
   const uint32_t ret = m_traceIdIndex;
+
   std::pair < std::map<Address, uint32_t>::iterator, bool> resultMacToTraceId = m_macToTraceIdMap.insert (std::make_pair (mac, m_traceIdIndex));
 
   if (resultMacToTraceId.second == false)
     {
-      NS_FATAL_ERROR ("SatIdMapper::AttachMacToTraceId - MAC to Trace ID failed");
+      NS_FATAL_ERROR ("SatIdMapper::AttachMacToTraceId - MAC to Trace ID failed. MAC " << mac << ". Trace ID " << m_traceIdIndex);
     }
 
   NS_LOG_INFO ("Added MAC " << mac << " with Trace ID " << m_traceIdIndex);
@@ -483,7 +484,7 @@ SatIdMapper::GetGwMacWithNode (Ptr<Node> gwNode) const
        */
       Ptr<NetDevice> dev = gwNode->GetDevice (1);
 
-      if (dev->GetObject<SatNetDevice> () != 0)
+      if (dev->GetObject<SatNetDevice> () != nullptr)
         {
           if (Mac48Address::IsMatchingType (dev->GetAddress ()))
             {
@@ -518,12 +519,9 @@ SatIdMapper::GetSatMacWithNode (Ptr<Node> satNode) const
 
   if (satNode->GetNDevices () >= 1)
     {
-      /*
-       * Actually there is only one device. This should change with ISLs
-       */
       Ptr<NetDevice> dev = satNode->GetDevice (0);
 
-      if (dev->GetObject<SatGeoNetDevice> () != 0)
+      if (dev->GetObject<SatGeoNetDevice> () != nullptr)
         {
           if (Mac48Address::IsMatchingType (dev->GetAddress ()))
             {
@@ -564,7 +562,7 @@ SatIdMapper::GetUtMacWithNode (Ptr<Node> utNode) const
        */
       Ptr<NetDevice> dev = utNode->GetDevice (2);
 
-      if (dev->GetObject<SatNetDevice> () != 0)
+      if (dev->GetObject<SatNetDevice> () != nullptr)
         {
           if (Mac48Address::IsMatchingType (dev->GetAddress ()))
             {
@@ -604,7 +602,7 @@ SatIdMapper::GetUtUserMacWithNode (Ptr<Node> utUserNode) const
        * network device.
        */
       Ptr<NetDevice> dev = utUserNode->GetDevice (1);
-      NS_ASSERT (dev != 0);
+      NS_ASSERT (dev != nullptr);
 
       if (Mac48Address::IsMatchingType (dev->GetAddress ()))
         {

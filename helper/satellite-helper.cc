@@ -44,6 +44,7 @@
 #include <ns3/satellite-sgp4-mobility-model.h>
 #include <ns3/satellite-ut-handover-module.h>
 #include <ns3/satellite-point-to-point-isl-net-device.h>
+#include <ns3/satellite-id-mapper.h>
 
 #include <ns3/satellite-lora-conf.h>
 #include <ns3/lora-network-server-helper.h>
@@ -234,6 +235,7 @@ SatHelper::SatHelper ()
   ObjectBase::ConstructSelf(AttributeConstructionList ());
 
   Singleton<SatEnvVariables>::Get ()->Initialize ();
+  Singleton<SatIdMapper>::Get ()->Reset ();
 
   m_satConf = CreateObject<SatConf> ();
 
@@ -1142,12 +1144,12 @@ SatHelper::SetSatMobility (Ptr<Node> node, std::string tle)
 
   Ptr<Object> object = node;
   Ptr<SatSGP4MobilityModel> model = object->GetObject<SatSGP4MobilityModel> ();
-  if (model == 0)
+  if (model == nullptr)
     {
       ObjectFactory mobilityFactory;
       mobilityFactory.SetTypeId ("ns3::SatSGP4MobilityModel");
       model = mobilityFactory.Create ()->GetObject<SatSGP4MobilityModel> ();
-      if (model == 0)
+      if (model == nullptr)
         {
           NS_FATAL_ERROR ("The requested mobility model is not a mobility model: \""<<
                           mobilityFactory.GetTypeId ().GetName ()<<"\"");
@@ -1174,7 +1176,7 @@ SatHelper::InstallMobilityObserver (uint32_t satId, NodeContainer nodes) const
     {
       Ptr<SatMobilityObserver> observer = (*i)->GetObject<SatMobilityObserver> ();
 
-      if (observer == 0)
+      if (observer == nullptr)
         {
           Ptr<SatMobilityModel> ownMobility = (*i)->GetObject<SatMobilityModel> ();
           Ptr<SatMobilityModel> satMobility = m_beamHelper->GetGeoSatNodes ().Get (satId)->GetObject<SatMobilityModel> ();

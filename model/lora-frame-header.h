@@ -329,7 +329,7 @@ LoraFrameHeader::GetLorawanMacCommand ()
   std::list< Ptr< LorawanMacCommand> >::const_iterator it;
   for (it = m_macCommands.begin (); it != m_macCommands.end (); ++it)
     {
-      if ((*it)->GetObject<T> () != 0)
+      if ((*it)->GetObject<T> () != nullptr)
         {
           return (*it)->GetObject<T> ();
         }

@@ -680,7 +680,7 @@ SatStatsHelper::GetIdentifierForUtUser (Ptr<Node> utUserNode) const
       {
         Ptr<Node> utNode = m_satHelper->GetUserHelper ()->GetUtNode (utUserNode);
 
-        if (utNode == 0)
+        if (utNode == nullptr)
           {
             NS_LOG_WARN (this << " UT user node " << utUserNode->GetId ()
                               << " is not attached to any UT node");
@@ -734,7 +734,7 @@ SatStatsHelper::GetIdentifierForUtUser (Ptr<Node> utUserNode) const
       {
         Ptr<Node> utNode = m_satHelper->GetUserHelper ()->GetUtNode (utUserNode);
 
-        if (utNode == 0)
+        if (utNode == nullptr)
           {
             NS_LOG_WARN (this << " UT user node " << utUserNode->GetId ()
                               << " is not attached to any UT node");
@@ -765,7 +765,7 @@ SatStatsHelper::GetIdentifierForUtUser (Ptr<Node> utUserNode) const
       {
         Ptr<Node> utNode = m_satHelper->GetUserHelper ()->GetUtNode (utUserNode);
 
-        if (utNode == 0)
+        if (utNode == nullptr)
           {
             NS_LOG_WARN (this << " UT user node " << utUserNode->GetId ()
                               << " is not attached to any UT node");
@@ -789,7 +789,7 @@ SatStatsHelper::GetIdentifierForUtUser (Ptr<Node> utUserNode) const
       {
         Ptr<Node> utNode = m_satHelper->GetUserHelper ()->GetUtNode (utUserNode);
 
-        if (utNode == 0)
+        if (utNode == nullptr)
           {
             NS_LOG_WARN (this << " UT user node " << utUserNode->GetId ()
                               << " is not attached to any UT node");
@@ -1075,7 +1075,7 @@ SatStatsHelper::GetGwSatNetDevice (Ptr<Node> gwNode)
     {
       Ptr<SatNetDevice> dev = DynamicCast<SatNetDevice> (gwNode->GetDevice (i));
 
-      if (dev != 0)
+      if (dev != nullptr)
         {
           ret.Add (dev);
         }
@@ -1095,7 +1095,7 @@ SatStatsHelper::GetUtSatNetDevice (Ptr<Node> utNode)
   NS_ASSERT (utNode->GetNDevices () >= 3);
   Ptr<NetDevice> dev = utNode->GetDevice (2);
 
-  if (dev->GetObject<SatNetDevice> () == 0)
+  if (dev->GetObject<SatNetDevice> () == nullptr)
     {
       NS_FATAL_ERROR ("Node " << utNode->GetId () << " is not a valid UT");
     }
@@ -1110,7 +1110,7 @@ SatStatsHelper::GetSatSatGeoNetDevice (Ptr<Node> satNode)
   NS_ASSERT (satNode->GetNDevices () > 0);
   Ptr<NetDevice> dev = satNode->GetDevice (0);
 
-  if (dev->GetObject<SatGeoNetDevice> () == 0)
+  if (dev->GetObject<SatGeoNetDevice> () == nullptr)
     {
       NS_FATAL_ERROR ("Node " << satNode->GetId () << " is not a valid SAT");
     }

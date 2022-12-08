@@ -24,7 +24,7 @@
 
 
 #include "ns3/log.h"
-#include "ns3/queue.h"
+#include "ns3/drop-tail-queue.h"
 #include "ns3/simulator.h"
 #include "ns3/mac48-address.h"
 #include "ns3/llc-snap-header.h"
@@ -167,12 +167,12 @@ PointToPointIslNetDevice::TransmitComplete (void)
   NS_ASSERT_MSG (m_txMachineState == BUSY, "Must be BUSY if transmitting");
   m_txMachineState = READY;
 
-  NS_ASSERT_MSG (m_currentPkt != 0, "PointToPointIslNetDevice::TransmitComplete(): m_currentPkt zero");
+  NS_ASSERT_MSG (m_currentPkt != nullptr, "PointToPointIslNetDevice::TransmitComplete(): m_currentPkt zero");
 
-  m_currentPkt = 0;
+  m_currentPkt = nullptr;
 
   Ptr<Packet> p = m_queue->Dequeue ();
-  if (p == 0)
+  if (p == nullptr)
     {
       NS_LOG_LOGIC ("No pending packets in device queue after tx complete");
       return;
@@ -200,7 +200,7 @@ PointToPointIslNetDevice::Attach (Ptr<PointToPointIslChannel> ch)
 }
 
 void
-PointToPointIslNetDevice::SetQueue (Ptr<Queue<Packet> > q)
+PointToPointIslNetDevice::SetQueue (Ptr<DropTailQueue<Packet> > q)
 {
   NS_LOG_FUNCTION (this << q);
   m_queue = q;
@@ -253,7 +253,7 @@ PointToPointIslNetDevice::SetGeoNetDevice (Ptr<SatGeoNetDevice> geoNetDevice)
   m_geoNetDevice = geoNetDevice;
 }
 
-Ptr<Queue<Packet> >
+Ptr<DropTailQueue<Packet> >
 PointToPointIslNetDevice::GetQueue (void) const
 { 
   NS_LOG_FUNCTION (this);

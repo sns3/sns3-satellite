@@ -157,9 +157,9 @@ SatStatsFrameLoadHelper::DoInstall ()
 
   // Setup probes.
   Ptr<SatBeamHelper> beamHelper = GetSatHelper ()->GetBeamHelper ();
-  NS_ASSERT (beamHelper != 0);
+  NS_ASSERT (beamHelper != nullptr);
   Ptr<SatNcc> ncc = beamHelper->GetNcc ();
-  NS_ASSERT (ncc != 0);
+  NS_ASSERT (ncc != nullptr);
   std::list<std::pair<uint32_t, uint32_t>> beams = beamHelper->GetBeams ();
   bool ret = false;
 
@@ -228,7 +228,7 @@ SatStatsFrameLoadHelper::FrameSymbolLoadCallback (std::string context,
 
   // Get the right collector for this frame ID and identifier.
   Ptr<ScalarCollector> collector = GetCollector (frameId, context);
-  NS_ASSERT_MSG (collector != 0,
+  NS_ASSERT_MSG (collector != nullptr,
                  "Unable to get/create collector"
                  << " for frame ID "  << frameId
                  << " and beam " << context);
@@ -247,7 +247,7 @@ SatStatsFrameLoadHelper::FrameUserLoadCallback (std::string context,
 
   // Get the right collector for this frame ID and identifier.
   Ptr<ScalarCollector> collector = GetCollector (frameId, context);
-  NS_ASSERT_MSG (collector != 0,
+  NS_ASSERT_MSG (collector != nullptr,
                  "Unable to get/create collector"
                  << " for frame ID "  << frameId
                  << " and identifier " << context);
@@ -367,7 +367,7 @@ SatStatsFrameLoadHelper::GetCollector (uint32_t frameId, std::string identifier)
 
   // Find the collector with the right identifier.
   Ptr<DataCollectionObject> collector = it->second.Get (identifierNum);
-  NS_ASSERT_MSG (collector != 0,
+  NS_ASSERT_MSG (collector != nullptr,
                  "Unable to find collector with identifier " << identifier);
   Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
   return c;

@@ -94,14 +94,14 @@ LoraForwarderHelper::InstallPriv (Ptr<Node> node) const
   for (uint32_t i = 0; i < node->GetNDevices (); i++)
     {
       Ptr<NetDevice> currentNetDevice = node->GetDevice (i);
-      if (currentNetDevice->GetObject<SatLorawanNetDevice> () != 0)
+      if (currentNetDevice->GetObject<SatLorawanNetDevice> () != nullptr)
         {
           Ptr<SatLorawanNetDevice> loraNetDevice = currentNetDevice->GetObject<SatLorawanNetDevice> ();
           uint8_t beamId = loraNetDevice->GetLorawanMac ()->GetBeamId ();
           app->SetLoraNetDevice (beamId, loraNetDevice);
           loraNetDevice->SetReceiveNetworkServerCallback (MakeCallback (&LoraForwarder::ReceiveFromLora, app));
         }
-      else if (currentNetDevice->GetObject<PointToPointNetDevice> () != 0)
+      else if (currentNetDevice->GetObject<PointToPointNetDevice> () != nullptr)
         {
           Ptr<PointToPointNetDevice> pointToPointNetDevice = currentNetDevice->GetObject<PointToPointNetDevice> ();
           app->SetPointToPointNetDevice (pointToPointNetDevice);

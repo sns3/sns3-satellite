@@ -160,7 +160,7 @@ SatStatsLinkSinrHelper::DoInstall ()
                                              "EnableContextPrinting", BooleanValue (false),
                                              "GeneralHeading", StringValue (GetDistributionHeading ("sinr_db")));
             Ptr<MultiFileAggregator> fileAggregator = m_aggregator->GetObject<MultiFileAggregator> ();
-            NS_ASSERT (fileAggregator != 0);
+            NS_ASSERT (fileAggregator != nullptr);
 
             // Setup the final-level collector.
             m_averagingCollector = CreateObject<DistributionCollector> ();
@@ -250,7 +250,7 @@ SatStatsLinkSinrHelper::DoInstall ()
                                          "OutputFileName", StringValue (GetName ()));
         Ptr<MagisterGnuplotAggregator> plotAggregator
           = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-        NS_ASSERT (plotAggregator != 0);
+        NS_ASSERT (plotAggregator != nullptr);
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("SINR (in dB)",
                                    "Frequency");
@@ -285,7 +285,7 @@ SatStatsLinkSinrHelper::DoInstall ()
                                              "OutputFileName", StringValue (GetName ()));
             Ptr<MagisterGnuplotAggregator> plotAggregator
               = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-            NS_ASSERT (plotAggregator != 0);
+            NS_ASSERT (plotAggregator != nullptr);
             //plot->SetTitle ("");
             plotAggregator->SetLegend ("SINR (in dB)",
                                        "Frequency");
@@ -337,7 +337,7 @@ SatStatsLinkSinrHelper::DoInstall ()
                                              "OutputFileName", StringValue (GetName ()));
             Ptr<MagisterGnuplotAggregator> plotAggregator
               = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-            NS_ASSERT (plotAggregator != 0);
+            NS_ASSERT (plotAggregator != nullptr);
             //plot->SetTitle ("");
             plotAggregator->SetLegend ("SINR (in dB)",
                                        "Frequency");
@@ -517,7 +517,7 @@ SatStatsLinkSinrHelper::PassSampleToCollector (double sinrDb, uint32_t identifie
   //NS_LOG_FUNCTION (this << sinrDb << identifier);
 
   Ptr<DataCollectionObject> collector = m_terminalCollectors.Get (identifier);
-  NS_ASSERT_MSG (collector != 0,
+  NS_ASSERT_MSG (collector != nullptr,
                  "Unable to find collector with identifier " << identifier);
 
   switch (GetOutputType ())
@@ -526,7 +526,7 @@ SatStatsLinkSinrHelper::PassSampleToCollector (double sinrDb, uint32_t identifie
     case SatStatsHelper::OUTPUT_SCALAR_PLOT:
       {
         Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
-        NS_ASSERT (c != 0);
+        NS_ASSERT (c != nullptr);
         c->TraceSinkDouble (0.0, sinrDb);
         break;
       }
@@ -535,7 +535,7 @@ SatStatsLinkSinrHelper::PassSampleToCollector (double sinrDb, uint32_t identifie
     case SatStatsHelper::OUTPUT_SCATTER_PLOT:
       {
         Ptr<UnitConversionCollector> c = collector->GetObject<UnitConversionCollector> ();
-        NS_ASSERT (c != 0);
+        NS_ASSERT (c != nullptr);
         c->TraceSinkDouble (0.0, sinrDb);
         break;
       }
@@ -549,13 +549,13 @@ SatStatsLinkSinrHelper::PassSampleToCollector (double sinrDb, uint32_t identifie
       if (m_averagingMode)
         {
           Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
-          NS_ASSERT (c != 0);
+          NS_ASSERT (c != nullptr);
           c->TraceSinkDouble (0.0, sinrDb);
         }
       else
         {
           Ptr<DistributionCollector> c = collector->GetObject<DistributionCollector> ();
-          NS_ASSERT (c != 0);
+          NS_ASSERT (c != nullptr);
           c->TraceSinkDouble (0.0, sinrDb);
         }
       break;
@@ -623,7 +623,7 @@ SatStatsFwdFeederLinkSinrHelper::DoInstallProbes ()
     {
       Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
       Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
-      NS_ASSERT (satGeoDev != 0);
+      NS_ASSERT (satGeoDev != nullptr);
       std::map<uint32_t, Ptr<SatPhy> > satGeoFeederPhys = satGeoDev->GetFeederPhy ();
       ObjectMapValue phy;
       satGeoDev->GetAttribute ("FeederPhy", phy);
@@ -635,9 +635,9 @@ SatStatsFwdFeederLinkSinrHelper::DoInstallProbes ()
        itPhy != phy.End (); ++itPhy)
         {
           Ptr<SatPhy> satPhy = itPhy->second->GetObject<SatPhy> ();
-          NS_ASSERT (satPhy != 0);
+          NS_ASSERT (satPhy != nullptr);
           Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx ();
-          NS_ASSERT (satPhyRx != 0);
+          NS_ASSERT (satPhyRx != nullptr);
           ObjectVectorValue carriers;
           satPhyRx->GetAttribute ("RxCarrierList", carriers);
           NS_LOG_DEBUG (this << " PHY #" << itPhy->first
@@ -710,11 +710,11 @@ SatStatsFwdUserLinkSinrHelper::DoInstallProbes ()
       //const uint32_t identifier = GetIdentifierForUt (*it);
       Ptr<NetDevice> dev = GetUtSatNetDevice (*it);
       Ptr<SatNetDevice> satDev = dev->GetObject<SatNetDevice> ();
-      NS_ASSERT (satDev != 0);
+      NS_ASSERT (satDev != nullptr);
       Ptr<SatPhy> satPhy = satDev->GetPhy ();
-      NS_ASSERT (satPhy != 0);
+      NS_ASSERT (satPhy != nullptr);
       Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx ();
-      NS_ASSERT (satPhyRx != 0);
+      NS_ASSERT (satPhyRx != nullptr);
       ObjectVectorValue carriers;
       satPhyRx->GetAttribute ("RxCarrierList", carriers);
       NS_LOG_DEBUG (this << " Node ID " << (*it)->GetId ()
@@ -790,11 +790,11 @@ SatStatsRtnFeederLinkSinrHelper::DoInstallProbes ()
            itDev != devs.End (); ++itDev)
         {
           Ptr<SatNetDevice> satDev = (*itDev)->GetObject<SatNetDevice> ();
-          NS_ASSERT (satDev != 0);
+          NS_ASSERT (satDev != nullptr);
           Ptr<SatPhy> satPhy = satDev->GetPhy ();
-          NS_ASSERT (satPhy != 0);
+          NS_ASSERT (satPhy != nullptr);
           Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx ();
-          NS_ASSERT (satPhyRx != 0);
+          NS_ASSERT (satPhyRx != nullptr);
           ObjectVectorValue carriers;
           satPhyRx->GetAttribute ("RxCarrierList", carriers);
           NS_LOG_DEBUG (this << " Node ID " << (*it)->GetId ()
@@ -869,15 +869,15 @@ SatStatsRtnUserLinkSinrHelper::DoInstallProbes ()
     {
       Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
       Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
-      NS_ASSERT (satGeoDev != 0);
+      NS_ASSERT (satGeoDev != nullptr);
       Ptr<SatPhy> satPhy;
       std::map<uint32_t, Ptr<SatPhy> > satGeoUserPhys = satGeoDev->GetUserPhy ();
       for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoUserPhys.begin (); it2 != satGeoUserPhys.end (); ++it2)
         {
           satPhy = it2->second;
-          NS_ASSERT (satPhy != 0);
+          NS_ASSERT (satPhy != nullptr);
           Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx ();
-          NS_ASSERT (satPhyRx != 0);
+          NS_ASSERT (satPhyRx != nullptr);
           ObjectVectorValue carriers;
           satPhyRx->GetAttribute ("RxCarrierList", carriers);
           NS_LOG_DEBUG (this << " Node ID " << (*it)->GetId ()

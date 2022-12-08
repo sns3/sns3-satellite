@@ -552,7 +552,7 @@ SatNetDevice::DoDispose (void)
   m_mac = 0;
   m_node = 0;
   m_receiveErrorModel = 0;
-  if (m_llc != 0)
+  if (m_llc != nullptr)
     {
       m_llc->Dispose ();
     }

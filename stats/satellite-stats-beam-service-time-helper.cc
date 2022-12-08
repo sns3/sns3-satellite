@@ -155,7 +155,7 @@ SatStatsBeamServiceTimeHelper::BeamServiceCallback (std::string context,
     }
 
   Ptr<DataCollectionObject> o = m_collectorMap.Get (beamId);
-  if (o == 0)
+  if (o == nullptr)
   {
 		std::ostringstream name;
 		name << beamId;
@@ -170,7 +170,7 @@ SatStatsBeamServiceTimeHelper::BeamServiceCallback (std::string context,
   }
 
   Ptr<ScalarCollector> s = o->GetObject<ScalarCollector> ();
-  NS_ASSERT (s != 0);
+  NS_ASSERT (s != nullptr);
 
 	// Pass the sample to the collector.
 	s->TraceSinkDouble (0, time.GetSeconds ());

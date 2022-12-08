@@ -85,7 +85,7 @@ SatStatsPacketDropRateHelper::PacketDropRateCallback (uint32_t nPackets,
 
   // Find the first-level collector with the right identifier.
   Ptr<DataCollectionObject> collector = m_terminalCollectors.Get (identifier);
-  NS_ASSERT_MSG (collector != 0,
+  NS_ASSERT_MSG (collector != nullptr,
                  "Unable to find collector with identifier " << identifier);
 
   switch (GetOutputType ())
@@ -94,7 +94,7 @@ SatStatsPacketDropRateHelper::PacketDropRateCallback (uint32_t nPackets,
     case SatStatsHelper::OUTPUT_SCALAR_PLOT:
       {
         Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
-        NS_ASSERT (c != 0);
+        NS_ASSERT (c != nullptr);
         c->TraceSinkBoolean (false, isError);
         break;
       }
@@ -103,7 +103,7 @@ SatStatsPacketDropRateHelper::PacketDropRateCallback (uint32_t nPackets,
     case SatStatsHelper::OUTPUT_SCATTER_PLOT:
       {
         Ptr<IntervalRateCollector> c = collector->GetObject<IntervalRateCollector> ();
-        NS_ASSERT (c != 0);
+        NS_ASSERT (c != nullptr);
         c->TraceSinkBoolean (false, isError);
         break;
       }
@@ -191,7 +191,7 @@ SatStatsPacketDropRateHelper::DoInstall ()
                                          "OutputFileName", StringValue (GetName ()));
         Ptr<MagisterGnuplotAggregator> plotAggregator
           = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-        NS_ASSERT (plotAggregator != 0);
+        NS_ASSERT (plotAggregator != nullptr);
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Time (in seconds)",
                                    "Packet drop rate");

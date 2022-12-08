@@ -188,7 +188,7 @@ SatStatsPacketErrorHelper::DoInstall ()
                                          "OutputFileName", StringValue (GetName ()));
         Ptr<MagisterGnuplotAggregator> plotAggregator
           = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-        NS_ASSERT (plotAggregator != 0);
+        NS_ASSERT (plotAggregator != nullptr);
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Time (in seconds)",
                                    "Packet error rate");
@@ -322,7 +322,7 @@ SatStatsPacketErrorHelper::ErrorRxCallback (uint32_t nPackets,
         {
           // Find the first-level collector with the right identifier.
           Ptr<DataCollectionObject> collector = m_terminalCollectors.Get (item.second);
-          NS_ASSERT_MSG (collector != 0,
+          NS_ASSERT_MSG (collector != nullptr,
                          "Unable to find collector with identifier " << item.second);
 
           switch (GetOutputType ())
@@ -331,7 +331,7 @@ SatStatsPacketErrorHelper::ErrorRxCallback (uint32_t nPackets,
             case SatStatsHelper::OUTPUT_SCALAR_PLOT:
               {
                 Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
-                NS_ASSERT (c != 0);
+                NS_ASSERT (c != nullptr);
                 c->TraceSinkBoolean (false, isError);
                 break;
               }
@@ -340,7 +340,7 @@ SatStatsPacketErrorHelper::ErrorRxCallback (uint32_t nPackets,
             case SatStatsHelper::OUTPUT_SCATTER_PLOT:
               {
                 Ptr<IntervalRateCollector> c = collector->GetObject<IntervalRateCollector> ();
-                NS_ASSERT (c != 0);
+                NS_ASSERT (c != nullptr);
                 c->TraceSinkBoolean (false, isError);
                 break;
               }
@@ -367,7 +367,7 @@ SatStatsPacketErrorHelper::ErrorRxCallback (uint32_t nPackets,
         {
           // Find the first-level collector with the right identifier.
           Ptr<DataCollectionObject> collector = m_terminalCollectors.Get (it->second);
-          NS_ASSERT_MSG (collector != 0,
+          NS_ASSERT_MSG (collector != nullptr,
                          "Unable to find collector with identifier " << it->second);
 
           switch (GetOutputType ())
@@ -376,7 +376,7 @@ SatStatsPacketErrorHelper::ErrorRxCallback (uint32_t nPackets,
             case SatStatsHelper::OUTPUT_SCALAR_PLOT:
               {
                 Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
-                NS_ASSERT (c != 0);
+                NS_ASSERT (c != nullptr);
                 c->TraceSinkBoolean (false, isError);
                 break;
               }
@@ -385,7 +385,7 @@ SatStatsPacketErrorHelper::ErrorRxCallback (uint32_t nPackets,
             case SatStatsHelper::OUTPUT_SCATTER_PLOT:
               {
                 Ptr<IntervalRateCollector> c = collector->GetObject<IntervalRateCollector> ();
-                NS_ASSERT (c != 0);
+                NS_ASSERT (c != nullptr);
                 c->TraceSinkBoolean (false, isError);
                 break;
               }
@@ -440,11 +440,11 @@ SatStatsPacketErrorHelper::InstallProbeOnGw (Ptr<Node> gwNode)
        itDev != devs.End (); ++itDev)
     {
       Ptr<SatNetDevice> satDev = (*itDev)->GetObject<SatNetDevice> ();
-      NS_ASSERT (satDev != 0);
+      NS_ASSERT (satDev != nullptr);
       Ptr<SatPhy> satPhy = satDev->GetPhy ();
-      NS_ASSERT (satPhy != 0);
+      NS_ASSERT (satPhy != nullptr);
       Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx ();
-      NS_ASSERT (satPhyRx != 0);
+      NS_ASSERT (satPhyRx != nullptr);
       ObjectVectorValue carriers;
       satPhyRx->GetAttribute ("RxCarrierList", carriers);
       NS_LOG_DEBUG (this << " Node ID " << gwNode->GetId ()
@@ -494,14 +494,14 @@ SatStatsPacketErrorHelper::InstallProbeOnSatFeeder (Ptr<Node> satNode)
 
   Ptr<SatPhy> satPhy;
   Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
-  NS_ASSERT (satGeoDev != 0);
+  NS_ASSERT (satGeoDev != nullptr);
   std::map<uint32_t, Ptr<SatPhy> > satGeoFeederPhys = satGeoDev->GetFeederPhy ();
   for (std::map<uint32_t, Ptr<SatPhy>>::iterator itPhy = satGeoFeederPhys.begin (); itPhy != satGeoFeederPhys.end (); ++itPhy)
     {
       satPhy = itPhy->second;
-      NS_ASSERT (satPhy != 0);
+      NS_ASSERT (satPhy != nullptr);
       Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx ();
-      NS_ASSERT (satPhyRx != 0);
+      NS_ASSERT (satPhyRx != nullptr);
 
       ObjectVectorValue carriers;
       satPhyRx->GetAttribute ("RxCarrierList", carriers);
@@ -552,14 +552,14 @@ SatStatsPacketErrorHelper::InstallProbeOnSatUser (Ptr<Node> satNode)
 
   Ptr<SatPhy> satPhy;
   Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
-  NS_ASSERT (satGeoDev != 0);
+  NS_ASSERT (satGeoDev != nullptr);
   std::map<uint32_t, Ptr<SatPhy> > satGeoUserPhys = satGeoDev->GetUserPhy ();
   for (std::map<uint32_t, Ptr<SatPhy>>::iterator itPhy = satGeoUserPhys.begin (); itPhy != satGeoUserPhys.end (); ++itPhy)
     {
       satPhy = itPhy->second;
-      NS_ASSERT (satPhy != 0);
+      NS_ASSERT (satPhy != nullptr);
       Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx ();
-      NS_ASSERT (satPhyRx != 0);
+      NS_ASSERT (satPhyRx != nullptr);
 
       ObjectVectorValue carriers;
       satPhyRx->GetAttribute ("RxCarrierList", carriers);
@@ -617,11 +617,11 @@ SatStatsPacketErrorHelper::InstallProbeOnUt (Ptr<Node> utNode)
 
   Ptr<NetDevice> dev = GetUtSatNetDevice (utNode);
   Ptr<SatNetDevice> satDev = dev->GetObject<SatNetDevice> ();
-  NS_ASSERT (satDev != 0);
+  NS_ASSERT (satDev != nullptr);
   Ptr<SatPhy> satPhy = satDev->GetPhy ();
-  NS_ASSERT (satPhy != 0);
+  NS_ASSERT (satPhy != nullptr);
   Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx ();
-  NS_ASSERT (satPhyRx != 0);
+  NS_ASSERT (satPhyRx != nullptr);
   ObjectVectorValue carriers;
   satPhyRx->GetAttribute ("RxCarrierList", carriers);
   NS_LOG_DEBUG (this << " Node ID " << utNode->GetId ()

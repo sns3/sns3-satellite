@@ -89,14 +89,14 @@ SatStatsFwdLinkSchedulerSymbolRateHelper::SymbolRateCallback (uint8_t sliceId, d
       case SatStatsHelper::IDENTIFIER_GLOBAL:
         {
           collector = m_collectors.Get (0);
-          NS_ASSERT_MSG (collector != 0,
+          NS_ASSERT_MSG (collector != nullptr,
                          "Unable to find collector with identifier 0");
           break;
         }
       case SatStatsHelper::IDENTIFIER_SLICE:
         {
           collector = m_collectors.Get (static_cast<uint32_t> (sliceId));
-          NS_ASSERT_MSG (collector != 0,
+          NS_ASSERT_MSG (collector != nullptr,
                          "Unable to find collector with identifier " << sliceId);
           break;
         }
@@ -111,7 +111,7 @@ SatStatsFwdLinkSchedulerSymbolRateHelper::SymbolRateCallback (uint8_t sliceId, d
     case SatStatsHelper::OUTPUT_SCALAR_PLOT:
       {
         Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
-        NS_ASSERT (c != 0);
+        NS_ASSERT (c != nullptr);
         c->TraceSinkDouble (0.0, symbolRate);
         break;
       }
@@ -120,7 +120,7 @@ SatStatsFwdLinkSchedulerSymbolRateHelper::SymbolRateCallback (uint8_t sliceId, d
     case SatStatsHelper::OUTPUT_SCATTER_PLOT:
       {
         Ptr<IntervalRateCollector> c = collector->GetObject<IntervalRateCollector> ();
-        NS_ASSERT (c != 0);
+        NS_ASSERT (c != nullptr);
         c->TraceSinkDouble (0.0, symbolRate);
         break;
       }
@@ -133,7 +133,7 @@ SatStatsFwdLinkSchedulerSymbolRateHelper::SymbolRateCallback (uint8_t sliceId, d
     case SatStatsHelper::OUTPUT_CDF_PLOT:
       {
         Ptr<DistributionCollector> c = collector->GetObject<DistributionCollector> ();
-        NS_ASSERT (c != 0);
+        NS_ASSERT (c != nullptr);
         c->TraceSinkDouble (0.0, symbolRate);
         break;
       }
@@ -262,7 +262,7 @@ SatStatsFwdLinkSchedulerSymbolRateHelper::DoInstall ()
                                          "OutputFileName", StringValue (GetName ()));
         Ptr<MagisterGnuplotAggregator> plotAggregator
           = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-        NS_ASSERT (plotAggregator != 0);
+        NS_ASSERT (plotAggregator != nullptr);
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Time (in seconds)",
                                    "Latency (in seconds)");
@@ -296,7 +296,7 @@ SatStatsFwdLinkSchedulerSymbolRateHelper::DoInstall ()
                                          "OutputFileName", StringValue (GetName ()));
         Ptr<MagisterGnuplotAggregator> plotAggregator
           = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-        NS_ASSERT (plotAggregator != 0);
+        NS_ASSERT (plotAggregator != nullptr);
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Latency (in seconds)",
                                    "Frequency");
@@ -356,15 +356,15 @@ SatStatsFwdLinkSchedulerSymbolRateHelper::InstallProbes ()
            itDev != devs.End (); ++itDev)
         {
           Ptr<SatNetDevice> satDev = (*itDev)->GetObject<SatNetDevice> ();
-          NS_ASSERT (satDev != 0);
+          NS_ASSERT (satDev != nullptr);
           Ptr<SatMac> satMac = satDev->GetMac ();
-          NS_ASSERT (satMac != 0);
+          NS_ASSERT (satMac != nullptr);
           Ptr<SatGwMac> satGwMac = satMac->GetObject<SatGwMac> ();
-          NS_ASSERT (satGwMac != 0);
+          NS_ASSERT (satGwMac != nullptr);
           PointerValue scheduler;
           satGwMac->GetAttribute ("Scheduler", scheduler);
           Ptr<SatFwdLinkScheduler> fwdLinkScheduler = scheduler.Get<SatFwdLinkScheduler> ();
-          NS_ASSERT (fwdLinkScheduler != 0);
+          NS_ASSERT (fwdLinkScheduler != nullptr);
 
           if (!fwdLinkScheduler->TraceConnectWithoutContext ("SymbolRate", GetTraceSinkCallback ()))
             {

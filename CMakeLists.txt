@@ -533,5 +533,6 @@ build_lib(
     ${libtraffic}
     ${libflow-monitor}
     ${libapplications}
+    ${libconfig-store}
   TEST_SOURCES ${test_sources}
 )

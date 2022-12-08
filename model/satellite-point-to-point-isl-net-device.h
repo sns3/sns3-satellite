@@ -41,7 +41,7 @@
 
 namespace ns3 {
 
-template <typename Item> class Queue;
+template <typename Item> class DropTailQueue;
 class PointToPointIslChannel;
 class ErrorModel;
 class SatGeoNetDevice;
@@ -116,14 +116,14 @@ public:
    *
    * \param queue Ptr to the new queue.
    */
-  void SetQueue (Ptr<Queue<Packet> > queue);
+  void SetQueue (Ptr<DropTailQueue<Packet> > queue);
 
   /**
    * Get a copy of the attached Queue.
    *
    * \returns Ptr to the queue.
    */
-  Ptr<Queue<Packet> > GetQueue (void) const;
+  Ptr<DropTailQueue<Packet> > GetQueue (void) const;
 
   /**
    * Attach a receive ErrorModel to the PointToPointIslNetDevice.
@@ -294,7 +294,7 @@ private:
   DataRate m_dataRate;                                  //!< The data rate that the Net Device uses to simulate packet transmission timing
   Time m_tInterframeGap;                                //!< The interframe gap that the Net Device uses to throttle packet transmission
   Ptr<PointToPointIslChannel> m_channel;                //!< The PointToPointIslChannel to which this PointToPointIslNetDevice has been attached
-  Ptr<Queue<Packet> > m_queue;                          //!< The Queue which this PointToPointIslNetDevice uses as a packet source.
+  Ptr<DropTailQueue<Packet> > m_queue;                  //!< The Queue which this PointToPointIslNetDevice uses as a packet source.
                                                         //   Management of this Queue has been delegated to the PointToPointIslNetDevice
                                                         //   and it has the responsibility for deletion
   Ptr<ErrorModel> m_receiveErrorModel;                  //!< Error model for receive packet events

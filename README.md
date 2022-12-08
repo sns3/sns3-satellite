@@ -15,7 +15,9 @@ Some external modules have been partially or totally integrated to SNS-3:
 
 # Installation Manual
 
-SNS-3 is built as an extension module to the [NS-3](https://www.nsnam.org/) network simulator; so their [installation instructions](https://www.nsnam.org/docs/release/3.36/tutorial/html/getting-started.html) apply, particularly concerning the dependencies. They are repeated here for convenience and proper integration of SNS-3.
+SNS-3 is built as an extension module to the [NS-3](https://www.nsnam.org/) network simulator; so their [installation instructions](https://www.nsnam.org/docs/release/3.37/tutorial/html/getting-started.html) apply, particularly concerning the dependencies. They are repeated here for convenience and proper integration of SNS-3.
+
+This revision of SNS-3 is compatible with NS-3.37.
 
 There are 2 methods to download and build (S)NS-3:
 
@@ -58,16 +60,15 @@ and drop the following file **sns3.xml** in this **contrib** folder:
 ```xml
 <configuration>
   <modules>
-    <module name="sns3-satellite" type="ns-contrib" min_version="ns-3.36">
+    <module name="sns3-satellite" type="ns-contrib" min_version="ns-3.37">
       <source type="git">
         <attribute name="url" value="https://github.com/sns3/sns3-satellite.git"/>
-        <attribute name="revision" value="72aa513f43b7687336cf6251d50e81420c41691f"/>
         <attribute name="module_directory" value="satellite"/>
       </source>
       <build type="none">
       </build>
     </module>
-    <module name="sns3-stats" type="ns-contrib" min_version="ns-3.36">
+    <module name="sns3-stats" type="ns-contrib" min_version="ns-3.37">
       <source type="git">
         <attribute name="url" value="https://github.com/sns3/stats.git"/>
         <attribute name="module_directory" value="magister-stats"/>
@@ -75,7 +76,7 @@ and drop the following file **sns3.xml** in this **contrib** folder:
       <build type="none">
       </build>
     </module>
-    <module name="sns3-traffic" type="ns-contrib" min_version="ns-3.36">
+    <module name="sns3-traffic" type="ns-contrib" min_version="ns-3.37">
       <source type="git">
         <attribute name="url" value="https://github.com/sns3/traffic.git" />
         <attribute name="module_directory" value="traffic"/>
@@ -85,6 +86,12 @@ and drop the following file **sns3.xml** in this **contrib** folder:
     </module>
   </modules>
 </configuration>
+```
+
+This configuration file is used to get all the NS-3 modules needed to compile SNS-3. By default, for each module, bake takes the most recent commit on master. If you want a specific commit for a module, add the following line (with the wanted revision in value) between the flags `<attribute name="url" ...>` and `<attribute name="module_directory" ...>`:
+
+```xml
+<attribute name="revision" value="72aa513f43b7687336cf6251d50e81420c41691f"/>
 ```
 
 It might be necessary to remove the default bake configuration one in order to install SNS-3:
@@ -99,7 +106,7 @@ Now you’re ready to use bake.
 Now that everything is in place, you can tell bake that you want to install SNS-3 (i.e.: `ns-3` plus the `sns3-satellite` module):
 
 ```shell
-$ ./bake.py configure -e ns-3.36 -e sns3-satellite -e sns3-stats -e sns3-traffic
+$ ./bake.py configure -e ns-3.37 -e sns3-satellite -e sns3-stats -e sns3-traffic
 $ ./bake.py deploy
 ```
 
@@ -120,12 +127,12 @@ You will need to:
 
 *  get NS-3 (either by [downloading](https://www.nsnam.org/release/) it or [cloning it using git](https://gitlab.com/nsnam/ns-3-dev.git));
 ```shell
-$ git clone https://gitlab.com/nsnam/ns-3-dev.git ns-3.36
+$ git clone https://gitlab.com/nsnam/ns-3-dev.git ns-3.37
 ```
 
 *  get the `satellite` module (by [cloning it using git](https://github.com/SNS-3/SNS-3-satellite));
 ```shell
-$ cd ns-3.36/contrib
+$ cd ns-3.37/contrib
 $ git clone https://github.com/sns3/sns3-satellite.git satellite
 ```
 *  get the `traffic` and `magister-stats` modules (needed until they are integrated into NS-3) as dependencies of the `satellite` module by cloning them :
@@ -136,22 +143,22 @@ $ git clone https://github.com/sns3/stats.git magister-stats
 ```
 
 *note : When retrieving the **satellite**, **traffic** and **magister-stats** modules, you should put 
-them under the **ns-3.36/contrib/** folder. You can do so by cloning them directly in this folder, 
+them under the **ns-3.37/contrib/** folder. You can do so by cloning them directly in this folder, 
 extracting them here, copying the files afterwards or using symbolic links.*
 
 Then you need to configure CMake and ask it to build NS-3. It will automatically build all modules found in contrib:
 
 ```shell
-$ cd ns-3.36
+$ cd ns-3.37
 $ ./ns3 clean
 $ ./ns3 configure --build-profile=optimized --enable-examples --enable-tests
 $ ./ns3 build
 ```
 
-If you want to develop in NS-3, use it in [debug mode](https://www.nsnam.org/docs/release/3.36/tutorial/html/getting-started.html#debugging). It enables debug functionnalities but it is way more slower:
+If you want to develop in NS-3, use it in [debug mode](https://www.nsnam.org/docs/release/3.37/tutorial/html/getting-started.html#debugging). It enables debug functionnalities but it is way more slower:
 
 ```shell
-$ cd ns-3.36
+$ cd ns-3.37
 $ ./ns3 clean
 $ ./ns3 configure --build-profile=debug --enable-examples --enable-tests
 $ ./ns3 build
@@ -170,7 +177,7 @@ Once you compiled SNS-3 successfully, you will need an extra step before being a
 These data are available as a separate repository and bundled as a submodule in SNS-3. You can download them afterwards in the `satellite` repository using:
 
 ```shell
-$ cd source/ns-3.36/contrib/satellite
+$ cd source/ns-3.37/contrib/satellite
 $ git submodule update --init --recursive
 ```
 

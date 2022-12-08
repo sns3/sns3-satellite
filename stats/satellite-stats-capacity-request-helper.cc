@@ -87,7 +87,7 @@ SatStatsCapacityRequestHelper::DoInstall ()
                                    "GeneralHeading",
                                    StringValue ("% time_sec, node_id, rc_id, type, kbps / bytes, queue_bytes"));
   Ptr<MultiFileAggregator> multiFileAggregator = m_aggregator->GetObject<MultiFileAggregator> ();
-  NS_ASSERT (multiFileAggregator != 0);
+  NS_ASSERT (multiFileAggregator != nullptr);
   Callback<void, std::string, std::string> aggregatorSink
     = MakeCallback (&MultiFileAggregator::WriteString, multiFileAggregator);
 
@@ -120,11 +120,11 @@ SatStatsCapacityRequestHelper::DoInstall ()
 
       Ptr<NetDevice> dev = GetUtSatNetDevice (*it);
       Ptr<SatNetDevice> satDev = dev->GetObject<SatNetDevice> ();
-      NS_ASSERT (satDev != 0);
+      NS_ASSERT (satDev != nullptr);
       Ptr<SatLlc> satLlc = satDev->GetLlc ();
-      NS_ASSERT (satLlc != 0);
+      NS_ASSERT (satLlc != nullptr);
       Ptr<SatUtLlc> utLlc = satLlc->GetObject<SatUtLlc> ();
-      NS_ASSERT (utLlc != 0);
+      NS_ASSERT (utLlc != nullptr);
       Ptr<SatRequestManager> requestManager = utLlc->GetRequestManager ();
 
       const bool ret = requestManager->TraceConnect ("CrTraceLog",

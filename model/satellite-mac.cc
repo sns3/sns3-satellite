@@ -91,7 +91,7 @@ SatMac::GetTypeId (void)
 SatMac::SatMac ()
   : m_isStatisticsTagsEnabled (false),
   m_ncrV2 (false),
-  m_routingUpdateCallback (0),
+  m_routingUpdateCallback (),
   m_nodeInfo (),
   m_txEnabled (true),
   m_beamEnabledTime (Seconds (0)),
@@ -112,7 +112,7 @@ SatMac::SatMac (uint32_t satId,
                 SatEnums::RegenerationMode_t returnLinkRegenerationMode)
   : m_isStatisticsTagsEnabled (false),
   m_ncrV2 (false),
-  m_routingUpdateCallback (0),
+  m_routingUpdateCallback (),
   m_nodeInfo (),
   m_satId (satId),
   m_beamId (beamId),

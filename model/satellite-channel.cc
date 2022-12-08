@@ -710,7 +710,7 @@ void
 SatChannel::SetPropagationDelayModel (Ptr<PropagationDelayModel> delay)
 {
   NS_LOG_FUNCTION (this << delay);
-  NS_ASSERT (m_propagationDelay == 0);
+  NS_ASSERT (m_propagationDelay == nullptr);
   m_propagationDelay = delay;
 }
 
@@ -718,7 +718,7 @@ Ptr<PropagationDelayModel>
 SatChannel::GetPropagationDelayModel ()
 {
   NS_LOG_FUNCTION (this);
-  NS_ASSERT (m_propagationDelay != 0);
+  NS_ASSERT (m_propagationDelay != nullptr);
 
   return m_propagationDelay;
 }
@@ -727,7 +727,7 @@ void
 SatChannel::SetFreeSpaceLoss (Ptr<SatFreeSpaceLoss> loss)
 {
   NS_LOG_FUNCTION (this << loss);
-  NS_ASSERT (m_freeSpaceLoss == 0);
+  NS_ASSERT (m_freeSpaceLoss == nullptr);
   m_freeSpaceLoss = loss;
 }
 
@@ -735,7 +735,7 @@ Ptr<SatFreeSpaceLoss>
 SatChannel::GetFreeSpaceLoss () const
 {
   NS_LOG_FUNCTION (this);
-  NS_ASSERT (m_freeSpaceLoss != 0);
+  NS_ASSERT (m_freeSpaceLoss != nullptr);
   return m_freeSpaceLoss;
 }
 

@@ -101,9 +101,9 @@ SatStatsWaveformUsageHelper::DoInstall ()
 
   // Setup probes.
   Ptr<SatBeamHelper> beamHelper = GetSatHelper ()->GetBeamHelper ();
-  NS_ASSERT (beamHelper != 0);
+  NS_ASSERT (beamHelper != nullptr);
   Ptr<SatNcc> ncc = beamHelper->GetNcc ();
-  NS_ASSERT (ncc != 0);
+  NS_ASSERT (ncc != nullptr);
   std::list<std::pair<uint32_t, uint32_t>> beams = beamHelper->GetBeams ();
 
   for (std::list<std::pair<uint32_t, uint32_t>>::const_iterator it = beams.begin ();
@@ -113,7 +113,7 @@ SatStatsWaveformUsageHelper::DoInstall ()
       context << GetIdentifierForBeam (it->first, it->second);
 
       Ptr<SatBeamScheduler> s = ncc->GetBeamScheduler (it->first, it->second);
-      NS_ASSERT_MSG (s != 0, "Error finding beam " << it->second);
+      NS_ASSERT_MSG (s != nullptr, "Error finding beam " << it->second);
       const bool ret = s->TraceConnect ("WaveformTrace",
                                         context.str (), waveformUsageCallback);
       NS_ASSERT_MSG (ret,
@@ -247,10 +247,10 @@ SatStatsWaveformUsageHelper::WaveformUsageCallback (std::string context,
 
   // Find the collector with the right identifier.
   Ptr<DataCollectionObject> collector = it->second.Get (identifier);
-  NS_ASSERT_MSG (collector != 0,
+  NS_ASSERT_MSG (collector != nullptr,
                  "Unable to find collector with identifier " << identifier);
   Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
-  NS_ASSERT (c != 0);
+  NS_ASSERT (c != nullptr);
 
   // Pass the sample to the collector.
   c->TraceSinkUinteger32 (0, 1);

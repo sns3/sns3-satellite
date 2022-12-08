@@ -132,7 +132,7 @@ LorawanMacEndDevice::LorawanMacEndDevice (uint32_t satId, uint32_t beamId)
       m_address (LoraDeviceAddress (0)),
       // LoraWAN default
       m_receiveWindowDurationInSymbols (8),
-      m_gatewayUpdateCallback (0),
+      m_gatewayUpdateCallback (),
       // LoraWAN default
       m_controlDataRate (false),
       m_lastKnownLinkMargin (0),

@@ -161,7 +161,7 @@ void
 SatPhyTx::SetFadingContainer (Ptr<SatBaseFading> fadingContainer)
 {
   NS_LOG_FUNCTION (this);
-  NS_ASSERT (m_fadingContainer == 0);
+  NS_ASSERT (m_fadingContainer == nullptr);
 
   m_fadingContainer = fadingContainer;
 }
@@ -170,7 +170,7 @@ Ptr<MobilityModel>
 SatPhyTx::GetMobility ()
 {
   NS_LOG_FUNCTION (this);
-  NS_ASSERT (m_mobility != 0);
+  NS_ASSERT (m_mobility != nullptr);
 
   return m_mobility;
 }
@@ -179,7 +179,7 @@ void
 SatPhyTx::SetMobility (Ptr<MobilityModel> m)
 {
   NS_LOG_FUNCTION (this << m);
-  NS_ASSERT (m_mobility == 0);
+  NS_ASSERT (m_mobility == nullptr);
 
   m_mobility = m;
 }
@@ -188,7 +188,7 @@ void
 SatPhyTx::SetAntennaGainPattern (Ptr<SatAntennaGainPattern> agp, Ptr<SatMobilityModel> mobility)
 {
   NS_LOG_FUNCTION (this);
-  NS_ASSERT (m_antennaGainPattern == 0);
+  NS_ASSERT (m_antennaGainPattern == nullptr);
 
   m_antennaGainPattern = agp;
   m_satMobility = mobility;
@@ -198,7 +198,7 @@ void
 SatPhyTx::SetChannel (Ptr<SatChannel> c)
 {
   NS_LOG_FUNCTION (this << c);
-  NS_ASSERT (m_channel == 0);
+  NS_ASSERT (m_channel == nullptr);
 
   m_channel = c;
   ChangeState (IDLE);
@@ -208,7 +208,7 @@ void
 SatPhyTx::ClearChannel ()
 {
   NS_LOG_FUNCTION (this);
-  NS_ASSERT (m_channel != 0);
+  NS_ASSERT (m_channel != nullptr);
 
   m_channel = NULL;
   ChangeState (RECONFIGURING);
@@ -218,7 +218,7 @@ Ptr<SatChannel>
 SatPhyTx::GetChannel ()
 {
   NS_LOG_FUNCTION (this);
-  NS_ASSERT (m_channel != 0);
+  NS_ASSERT (m_channel != nullptr);
 
   return m_channel;
 }

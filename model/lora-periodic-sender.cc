@@ -135,7 +135,7 @@ LoraPeriodicSender::StartApplication (void)
   NS_LOG_FUNCTION (this);
 
   // Make sure we have a MAC layer
-  if (m_mac == 0)
+  if (m_mac == nullptr)
     {
       Ptr<SatLorawanNetDevice> loraNetDevice;
       for (uint32_t i = 0; i < m_node->GetNDevices (); i++)
@@ -148,7 +148,7 @@ LoraPeriodicSender::StartApplication (void)
         }
 
       m_mac = DynamicCast<LorawanMac> (loraNetDevice->GetMac ());
-      NS_ASSERT (m_mac != 0);
+      NS_ASSERT (m_mac != nullptr);
     }
 
   // Schedule the next SendPacket event

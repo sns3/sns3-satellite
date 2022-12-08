@@ -88,7 +88,7 @@ Ptr<NetDevice>
 SatPhyRx::GetDevice ()
 {
   NS_LOG_FUNCTION (this);
-  NS_ASSERT (m_device != 0);
+  NS_ASSERT (m_device != nullptr);
 
   return m_device;
 }
@@ -97,7 +97,7 @@ void
 SatPhyRx::SetDevice (Ptr<NetDevice> d)
 {
   NS_LOG_FUNCTION (this << d);
-  NS_ASSERT (m_device == 0);
+  NS_ASSERT (m_device == nullptr);
 
   m_device = d;
 }
@@ -159,7 +159,7 @@ void
 SatPhyRx::SetFadingContainer (Ptr<SatBaseFading> fadingContainer)
 {
   NS_LOG_FUNCTION (this);
-  NS_ASSERT (m_fadingContainer == 0);
+  NS_ASSERT (m_fadingContainer == nullptr);
 
   m_fadingContainer = fadingContainer;
 }
@@ -262,7 +262,7 @@ Ptr<MobilityModel>
 SatPhyRx::GetMobility ()
 {
   NS_LOG_FUNCTION (this);
-  NS_ASSERT (m_mobility != 0);
+  NS_ASSERT (m_mobility != nullptr);
 
   return m_mobility;
 }
@@ -278,7 +278,7 @@ void
 SatPhyRx::SetAntennaGainPattern (Ptr<SatAntennaGainPattern> agp, Ptr<SatMobilityModel> mobility)
 {
   NS_LOG_FUNCTION (this << agp);
-  NS_ASSERT (m_antennaGainPattern == 0);
+  NS_ASSERT (m_antennaGainPattern == nullptr);
 
   m_antennaGainPattern = agp;
   m_satMobility = mobility;

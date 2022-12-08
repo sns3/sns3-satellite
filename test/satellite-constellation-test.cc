@@ -685,7 +685,7 @@ SatConstellationTest4::DoRun (void)
     {
       Ptr<SatIslArbiter> arbiter = DynamicCast<SatGeoNetDevice> (sats.Get (i)->GetDevice (0))->GetArbiter ();
       Ptr<SatIslArbiterUnicast> arbiterUnicast = DynamicCast<SatIslArbiterUnicast> (arbiter);
-      NS_TEST_ASSERT_MSG_NE (arbiterUnicast, 0, "Arbiter of satellite " << i << " is not of type SatIslArbiterUnicast");
+      NS_TEST_ASSERT_MSG_NE (arbiterUnicast, nullptr, "Arbiter of satellite " << i << " is not of type SatIslArbiterUnicast");
       for (uint32_t j = 0; j < sats.GetN (); j++)
         {
           if (i != j)

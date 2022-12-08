@@ -268,7 +268,7 @@ SatBeamScheduler::SatBeamScheduler ()
   : m_beamId (0),
   m_superframeSeq (0),
   m_superFrameCounter (0),
-  m_txCallback (0),
+  m_txCallback (),
   m_logonChannelIndex (1),
   m_cnoEstimatorMode (SatCnoEstimator::LAST),
   m_maxBbFrameSize (0),

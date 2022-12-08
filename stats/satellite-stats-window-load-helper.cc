@@ -85,7 +85,7 @@ SatStatsWindowLoadHelper::WindowLoadCallback (double windowLoad)
     case SatStatsHelper::OUTPUT_SCALAR_PLOT:
       {
         Ptr<ScalarCollector> c = m_collector->GetObject<ScalarCollector> ();
-        NS_ASSERT (c != 0);
+        NS_ASSERT (c != nullptr);
         c->TraceSinkDouble (0.0, windowLoad);
         break;
       }
@@ -94,7 +94,7 @@ SatStatsWindowLoadHelper::WindowLoadCallback (double windowLoad)
     case SatStatsHelper::OUTPUT_SCATTER_PLOT:
       {
         Ptr<UnitConversionCollector> c = m_collector->GetObject<UnitConversionCollector> ();
-        NS_ASSERT (c != 0);
+        NS_ASSERT (c != nullptr);
         c->TraceSinkDouble (0.0, windowLoad);
         break;
       }
@@ -107,7 +107,7 @@ SatStatsWindowLoadHelper::WindowLoadCallback (double windowLoad)
     case SatStatsHelper::OUTPUT_CDF_PLOT:
       {
         Ptr<DistributionCollector> c = m_collector->GetObject<DistributionCollector> ();
-        NS_ASSERT (c != 0);
+        NS_ASSERT (c != nullptr);
         c->TraceSinkDouble (0.0, windowLoad);
         break;
       }
@@ -234,7 +234,7 @@ SatStatsWindowLoadHelper::DoInstall ()
                                          "OutputFileName", StringValue (GetName ()));
         Ptr<MagisterGnuplotAggregator> plotAggregator
           = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-        NS_ASSERT (plotAggregator != 0);
+        NS_ASSERT (plotAggregator != nullptr);
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Time (in seconds)",
                                    "Window normalized load (in bps/Hz)");
@@ -263,7 +263,7 @@ SatStatsWindowLoadHelper::DoInstall ()
                                          "OutputFileName", StringValue (GetName ()));
         Ptr<MagisterGnuplotAggregator> plotAggregator
           = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-        NS_ASSERT (plotAggregator != 0);
+        NS_ASSERT (plotAggregator != nullptr);
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Window normalized load (in bps/Hz)",
                                    "Frequency");
@@ -353,11 +353,11 @@ SatStatsRtnFeederWindowLoadHelper::DoInstallProbes ()
            itDev != devs.End (); ++itDev)
         {
           Ptr<SatNetDevice> satDev = (*itDev)->GetObject<SatNetDevice> ();
-          NS_ASSERT (satDev != 0);
+          NS_ASSERT (satDev != nullptr);
           Ptr<SatPhy> satPhy = satDev->GetPhy ();
-          NS_ASSERT (satPhy != 0);
+          NS_ASSERT (satPhy != nullptr);
           Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx ();
-          NS_ASSERT (satPhyRx != 0);
+          NS_ASSERT (satPhyRx != nullptr);
           ObjectVectorValue carriers;
           satPhyRx->GetAttribute ("RxCarrierList", carriers);
           NS_LOG_DEBUG (this << " Node ID " << (*it)->GetId ()

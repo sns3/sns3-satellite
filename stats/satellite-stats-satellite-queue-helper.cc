@@ -193,7 +193,7 @@ SatStatsSatelliteQueueHelper::DoInstall ()
                                              "EnableContextPrinting", BooleanValue (false),
                                              "GeneralHeading", StringValue (GetDistributionHeading (m_shortLabel)));
             Ptr<MultiFileAggregator> fileAggregator = m_aggregator->GetObject<MultiFileAggregator> ();
-            NS_ASSERT (fileAggregator != 0);
+            NS_ASSERT (fileAggregator != nullptr);
 
             // Setup the final-level collector.
             m_averagingCollector = CreateObject<DistributionCollector> ();
@@ -283,7 +283,7 @@ SatStatsSatelliteQueueHelper::DoInstall ()
                                          "OutputFileName", StringValue (GetName ()));
         Ptr<MagisterGnuplotAggregator> plotAggregator
           = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-        NS_ASSERT (plotAggregator != 0);
+        NS_ASSERT (plotAggregator != nullptr);
         //plot->SetTitle ("");
         plotAggregator->SetLegend (m_longLabel,
                                    "Frequency");
@@ -318,7 +318,7 @@ SatStatsSatelliteQueueHelper::DoInstall ()
                                              "OutputFileName", StringValue (GetName ()));
             Ptr<MagisterGnuplotAggregator> plotAggregator
               = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-            NS_ASSERT (plotAggregator != 0);
+            NS_ASSERT (plotAggregator != nullptr);
             //plot->SetTitle ("");
             plotAggregator->SetLegend (m_longLabel,
                                        "Frequency");
@@ -370,7 +370,7 @@ SatStatsSatelliteQueueHelper::DoInstall ()
                                              "OutputFileName", StringValue (GetName ()));
             Ptr<MagisterGnuplotAggregator> plotAggregator
               = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-            NS_ASSERT (plotAggregator != 0);
+            NS_ASSERT (plotAggregator != nullptr);
             //plot->SetTitle ("");
             plotAggregator->SetLegend (m_longLabel,
                                        "Frequency");
@@ -550,7 +550,7 @@ SatStatsSatelliteQueueHelper::PassSampleToCollector (uint32_t size, uint32_t ide
   //NS_LOG_FUNCTION (this << size << identifier);
 
   Ptr<DataCollectionObject> collector = m_terminalCollectors.Get (identifier);
-  NS_ASSERT_MSG (collector != 0,
+  NS_ASSERT_MSG (collector != nullptr,
                  "Unable to find collector with identifier " << identifier);
 
   switch (GetOutputType ())
@@ -559,7 +559,7 @@ SatStatsSatelliteQueueHelper::PassSampleToCollector (uint32_t size, uint32_t ide
     case SatStatsHelper::OUTPUT_SCALAR_PLOT:
       {
         Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
-        NS_ASSERT (c != 0);
+        NS_ASSERT (c != nullptr);
         c->TraceSinkDouble (0.0, size);
         break;
       }
@@ -568,7 +568,7 @@ SatStatsSatelliteQueueHelper::PassSampleToCollector (uint32_t size, uint32_t ide
     case SatStatsHelper::OUTPUT_SCATTER_PLOT:
       {
         Ptr<UnitConversionCollector> c = collector->GetObject<UnitConversionCollector> ();
-        NS_ASSERT (c != 0);
+        NS_ASSERT (c != nullptr);
         c->TraceSinkDouble (0.0, size);
         break;
       }
@@ -582,13 +582,13 @@ SatStatsSatelliteQueueHelper::PassSampleToCollector (uint32_t size, uint32_t ide
       if (m_averagingMode)
         {
           Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
-          NS_ASSERT (c != 0);
+          NS_ASSERT (c != nullptr);
           c->TraceSinkDouble (0.0, size);
         }
       else
         {
           Ptr<DistributionCollector> c = collector->GetObject<DistributionCollector> ();
-          NS_ASSERT (c != 0);
+          NS_ASSERT (c != nullptr);
           c->TraceSinkDouble (0.0, size);
         }
       break;
@@ -658,15 +658,15 @@ SatStatsRtnFeederQueueBytesHelper::DoInstallProbes ()
     {
       Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
       Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
-      NS_ASSERT (satGeoDev != 0);
+      NS_ASSERT (satGeoDev != nullptr);
       Ptr<SatPhy> satPhy;
       std::map<uint32_t, Ptr<SatPhy> > satGeoFeederPhys = satGeoDev->GetFeederPhy ();
       for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoFeederPhys.begin (); it2 != satGeoFeederPhys.end (); ++it2)
         {
           satPhy = it2->second;
-          NS_ASSERT (satPhy != 0);
+          NS_ASSERT (satPhy != nullptr);
           Ptr<SatGeoFeederPhy> satGeoFeederPhy = satPhy->GetObject<SatGeoFeederPhy> ();
-          NS_ASSERT (satGeoFeederPhy != 0);
+          NS_ASSERT (satGeoFeederPhy != nullptr);
 
           if (satGeoFeederPhy->TraceConnectWithoutContext ("QueueSizeBytes", callback))
             {
@@ -735,15 +735,15 @@ SatStatsRtnFeederQueuePacketsHelper::DoInstallProbes ()
     {
       Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
       Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
-      NS_ASSERT (satGeoDev != 0);
+      NS_ASSERT (satGeoDev != nullptr);
       Ptr<SatPhy> satPhy;
       std::map<uint32_t, Ptr<SatPhy> > satGeoFeederPhys = satGeoDev->GetFeederPhy ();
       for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoFeederPhys.begin (); it2 != satGeoFeederPhys.end (); ++it2)
         {
           satPhy = it2->second;
-          NS_ASSERT (satPhy != 0);
+          NS_ASSERT (satPhy != nullptr);
           Ptr<SatGeoFeederPhy> satGeoFeederPhy = satPhy->GetObject<SatGeoFeederPhy> ();
-          NS_ASSERT (satGeoFeederPhy != 0);
+          NS_ASSERT (satGeoFeederPhy != nullptr);
 
           if (satGeoFeederPhy->TraceConnectWithoutContext ("QueueSizePackets", callback))
             {
@@ -811,15 +811,15 @@ SatStatsFwdUserQueueBytesHelper::DoInstallProbes ()
     {
       Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
       Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
-      NS_ASSERT (satGeoDev != 0);
+      NS_ASSERT (satGeoDev != nullptr);
       Ptr<SatPhy> satPhy;
       std::map<uint32_t, Ptr<SatPhy> > satGeoUserPhys = satGeoDev->GetUserPhy ();
       for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoUserPhys.begin (); it2 != satGeoUserPhys.end (); ++it2)
         {
           satPhy = it2->second;
-          NS_ASSERT (satPhy != 0);
+          NS_ASSERT (satPhy != nullptr);
           Ptr<SatGeoUserPhy> satGeoUserPhy = satPhy->GetObject<SatGeoUserPhy> ();
-          NS_ASSERT (satGeoUserPhy != 0);
+          NS_ASSERT (satGeoUserPhy != nullptr);
 
           if (satGeoUserPhy->TraceConnectWithoutContext ("QueueSizeBytes", callback))
             {
@@ -888,15 +888,15 @@ SatStatsFwdUserQueuePacketsHelper::DoInstallProbes ()
     {
       Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
       Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
-      NS_ASSERT (satGeoDev != 0);
+      NS_ASSERT (satGeoDev != nullptr);
       Ptr<SatPhy> satPhy;
       std::map<uint32_t, Ptr<SatPhy> > satGeoUserPhys = satGeoDev->GetUserPhy ();
       for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoUserPhys.begin (); it2 != satGeoUserPhys.end (); ++it2)
         {
           satPhy = it2->second;
-          NS_ASSERT (satPhy != 0);
+          NS_ASSERT (satPhy != nullptr);
           Ptr<SatGeoUserPhy> satGeoUserPhy = satPhy->GetObject<SatGeoUserPhy> ();
-          NS_ASSERT (satGeoUserPhy != 0);
+          NS_ASSERT (satGeoUserPhy != nullptr);
 
           if (satGeoUserPhy->TraceConnectWithoutContext ("QueueSizePackets", callback))
             {

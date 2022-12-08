@@ -394,9 +394,9 @@ SatUtLlc::GetNBytesInQueue (Mac48Address utAddress) const
     {
       if (it->first->m_encapAddress == utAddress)
         {
-          NS_ASSERT (it->second != 0);
+          NS_ASSERT (it->second != nullptr);
           Ptr<SatQueue> queue = it->second->GetQueue ();
-          NS_ASSERT (queue != 0);
+          NS_ASSERT (queue != nullptr);
           sum += queue->GetNBytes ();
         }
     }
@@ -416,9 +416,9 @@ SatUtLlc::GetNPacketsInQueue (Mac48Address utAddress) const
     {
       if (it->first->m_encapAddress == utAddress)
         {
-          NS_ASSERT (it->second != 0);
+          NS_ASSERT (it->second != nullptr);
           Ptr<SatQueue> queue = it->second->GetQueue ();
-          NS_ASSERT (queue != 0);
+          NS_ASSERT (queue != nullptr);
           sum += queue->GetNPackets ();
         }
     }

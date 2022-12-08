@@ -171,7 +171,7 @@ SatStatsMarsalaCorrelationHelper::DoInstall ()
                                          "OutputFileName", StringValue (GetName ()));
         Ptr<MagisterGnuplotAggregator> plotAggregator
           = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-        NS_ASSERT (plotAggregator != 0);
+        NS_ASSERT (plotAggregator != nullptr);
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Time (in seconds)",
                                    "Correlations");
@@ -229,11 +229,11 @@ SatStatsMarsalaCorrelationHelper::DoInstall ()
            itDev != devs.End (); ++itDev)
         {
           Ptr<SatNetDevice> satDev = (*itDev)->GetObject<SatNetDevice> ();
-          NS_ASSERT (satDev != 0);
+          NS_ASSERT (satDev != nullptr);
           Ptr<SatPhy> satPhy = satDev->GetPhy ();
-          NS_ASSERT (satPhy != 0);
+          NS_ASSERT (satPhy != nullptr);
           Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx ();
-          NS_ASSERT (satPhyRx != 0);
+          NS_ASSERT (satPhyRx != nullptr);
           ObjectVectorValue carriers;
           satPhyRx->GetAttribute ("RxCarrierList", carriers);
           NS_LOG_DEBUG (this << " Node ID " << (*it)->GetId ()
@@ -311,7 +311,7 @@ SatStatsMarsalaCorrelationHelper::CorrelationRxCallback (uint32_t nCorrelations,
 
   // Find the first-level collector with the right identifier.
   Ptr<DataCollectionObject> collector = m_terminalCollectors.Get (it->second);
-  NS_ASSERT_MSG (collector != 0,
+  NS_ASSERT_MSG (collector != nullptr,
                  "Unable to find collector with identifier " << it->second);
 
   switch (GetOutputType ())
@@ -320,7 +320,7 @@ SatStatsMarsalaCorrelationHelper::CorrelationRxCallback (uint32_t nCorrelations,
     case SatStatsHelper::OUTPUT_SCALAR_PLOT:
       {
         Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
-        NS_ASSERT (c != 0);
+        NS_ASSERT (c != nullptr);
         c->TraceSinkUinteger32 (0, nCorrelations);
         break;
       }
@@ -329,7 +329,7 @@ SatStatsMarsalaCorrelationHelper::CorrelationRxCallback (uint32_t nCorrelations,
     case SatStatsHelper::OUTPUT_SCATTER_PLOT:
       {
         Ptr<IntervalRateCollector> c = collector->GetObject<IntervalRateCollector> ();
-        NS_ASSERT (c != 0);
+        NS_ASSERT (c != nullptr);
         c->TraceSinkUinteger32 (0, nCorrelations);
         break;
       }

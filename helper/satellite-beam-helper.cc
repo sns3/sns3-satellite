@@ -1444,7 +1444,7 @@ SatBeamHelper::InstallFadingContainer (Ptr<Node> node) const
 
   Ptr<SatBaseFading> fadingContainer = node->GetObject<SatBaseFading> ();
 
-  if (fadingContainer == 0)
+  if (fadingContainer == nullptr)
     {
       switch (m_fadingModel)
         {

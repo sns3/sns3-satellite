@@ -179,7 +179,7 @@ SatStatsCompositeSinrHelper::DoInstall ()
                                          "OutputFileName", StringValue (GetName ()));
         Ptr<MagisterGnuplotAggregator> plotAggregator
           = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-        NS_ASSERT (plotAggregator != 0);
+        NS_ASSERT (plotAggregator != nullptr);
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Time (in seconds)",
                                    "SINR (in dB)");
@@ -212,7 +212,7 @@ SatStatsCompositeSinrHelper::DoInstall ()
                                          "OutputFileName", StringValue (GetName ()));
         Ptr<MagisterGnuplotAggregator> plotAggregator
           = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-        NS_ASSERT (plotAggregator != 0);
+        NS_ASSERT (plotAggregator != nullptr);
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("SINR (in dB)",
                                    "Frequency");
@@ -311,11 +311,11 @@ SatStatsFwdCompositeSinrHelper::DoInstallProbes ()
 
       Ptr<NetDevice> dev = GetUtSatNetDevice (*it);
       Ptr<SatNetDevice> satDev = dev->GetObject<SatNetDevice> ();
-      NS_ASSERT (satDev != 0);
+      NS_ASSERT (satDev != nullptr);
       Ptr<SatPhy> satPhy = satDev->GetPhy ();
-      NS_ASSERT (satPhy != 0);
+      NS_ASSERT (satPhy != nullptr);
       Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx ();
-      NS_ASSERT (satPhyRx != 0);
+      NS_ASSERT (satPhyRx != nullptr);
       ObjectVectorValue carriers;
       satPhyRx->GetAttribute ("RxCarrierList", carriers);
       NS_LOG_DEBUG (this << " Node ID " << (*it)->GetId ()
@@ -448,11 +448,11 @@ SatStatsRtnCompositeSinrHelper::DoInstallProbes ()
            itDev != devs.End (); ++itDev)
         {
           Ptr<SatNetDevice> satDev = (*itDev)->GetObject<SatNetDevice> ();
-          NS_ASSERT (satDev != 0);
+          NS_ASSERT (satDev != nullptr);
           Ptr<SatPhy> satPhy = satDev->GetPhy ();
-          NS_ASSERT (satPhy != 0);
+          NS_ASSERT (satPhy != nullptr);
           Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx ();
-          NS_ASSERT (satPhyRx != 0);
+          NS_ASSERT (satPhyRx != nullptr);
           ObjectVectorValue carriers;
           satPhyRx->GetAttribute ("RxCarrierList", carriers);
           NS_LOG_DEBUG (this << " Node ID " << (*it)->GetId ()
@@ -514,7 +514,7 @@ SatStatsRtnCompositeSinrHelper::SinrCallback (double sinrDb, const Address &from
         {
           // Find the collector with the right identifier.
           Ptr<DataCollectionObject> collector = m_terminalCollectors.Get (it->second);
-          NS_ASSERT_MSG (collector != 0,
+          NS_ASSERT_MSG (collector != nullptr,
                          "Unable to find collector with identifier " << it->second);
 
           switch (GetOutputType ())
@@ -523,7 +523,7 @@ SatStatsRtnCompositeSinrHelper::SinrCallback (double sinrDb, const Address &from
             case SatStatsHelper::OUTPUT_SCALAR_PLOT:
               {
                 Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
-                NS_ASSERT (c != 0);
+                NS_ASSERT (c != nullptr);
                 c->TraceSinkDouble (0.0, sinrDb);
                 break;
               }
@@ -532,7 +532,7 @@ SatStatsRtnCompositeSinrHelper::SinrCallback (double sinrDb, const Address &from
             case SatStatsHelper::OUTPUT_SCATTER_PLOT:
               {
                 Ptr<UnitConversionCollector> c = collector->GetObject<UnitConversionCollector> ();
-                NS_ASSERT (c != 0);
+                NS_ASSERT (c != nullptr);
                 c->TraceSinkDouble (0.0, sinrDb);
                 break;
               }
@@ -545,7 +545,7 @@ SatStatsRtnCompositeSinrHelper::SinrCallback (double sinrDb, const Address &from
             case SatStatsHelper::OUTPUT_CDF_PLOT:
               {
                 Ptr<DistributionCollector> c = collector->GetObject<DistributionCollector> ();
-                NS_ASSERT (c != 0);
+                NS_ASSERT (c != nullptr);
                 c->TraceSinkDouble (0.0, sinrDb);
                 break;
               }

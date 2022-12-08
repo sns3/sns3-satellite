@@ -88,15 +88,15 @@ SatStatsBackloggedRequestHelper::DoInstall ()
                                    "GeneralHeading",
                                    StringValue ("% time_sec, beam_id, ut_id, type, requests"));
   Ptr<MultiFileAggregator> multiFileAggregator = m_aggregator->GetObject<MultiFileAggregator> ();
-  NS_ASSERT (multiFileAggregator != 0);
+  NS_ASSERT (multiFileAggregator != nullptr);
   Callback<void, std::string, std::string> aggregatorSink
     = MakeCallback (&MultiFileAggregator::WriteString, multiFileAggregator);
 
   // Setup probes.
   Ptr<SatBeamHelper> beamHelper = GetSatHelper ()->GetBeamHelper ();
-  NS_ASSERT (beamHelper != 0);
+  NS_ASSERT (beamHelper != nullptr);
   Ptr<SatNcc> ncc = beamHelper->GetNcc ();
-  NS_ASSERT (ncc != 0);
+  NS_ASSERT (ncc != nullptr);
   std::list<std::pair<uint32_t, uint32_t>> beams = beamHelper->GetBeams ();
 
   for (std::list<std::pair<uint32_t, uint32_t>>::const_iterator it = beams.begin ();
@@ -120,7 +120,7 @@ SatStatsBackloggedRequestHelper::DoInstall ()
         }
 
       Ptr<SatBeamScheduler> s = ncc->GetBeamScheduler (it->first, it->second);
-      NS_ASSERT_MSG (s != 0, "Error finding beam " << it->second);
+      NS_ASSERT_MSG (s != nullptr, "Error finding beam " << it->second);
       const bool ret = s->TraceConnect ("BacklogRequestsTrace",
                                         context.str (), aggregatorSink);
       NS_ASSERT_MSG (ret,

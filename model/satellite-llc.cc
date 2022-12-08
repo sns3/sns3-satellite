@@ -412,9 +412,9 @@ SatLlc::GetNBytesInQueue () const
   for (EncapContainer_t::const_iterator it = m_encaps.begin ();
        it != m_encaps.end (); ++it)
     {
-      NS_ASSERT (it->second != 0);
+      NS_ASSERT (it->second != nullptr);
       Ptr<SatQueue> queue = it->second->GetQueue ();
-      NS_ASSERT (queue != 0);
+      NS_ASSERT (queue != nullptr);
       sum += queue->GetNBytes ();
     }
 
@@ -431,9 +431,9 @@ SatLlc::GetNPacketsInQueue () const
   for (EncapContainer_t::const_iterator it = m_encaps.begin ();
        it != m_encaps.end (); ++it)
     {
-      NS_ASSERT (it->second != 0);
+      NS_ASSERT (it->second != nullptr);
       Ptr<SatQueue> queue = it->second->GetQueue ();
-      NS_ASSERT (queue != 0);
+      NS_ASSERT (queue != nullptr);
       sum += queue->GetNPackets ();
     }
 

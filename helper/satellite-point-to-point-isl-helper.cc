@@ -26,7 +26,7 @@
 #include "ns3/log.h"
 #include "ns3/string.h"
 #include "ns3/packet.h"
-#include "ns3/queue.h"
+#include "ns3/drop-tail-queue.h"
 
 #include "ns3/satellite-point-to-point-isl-channel.h"
 #include "ns3/satellite-const-variables.h"
@@ -84,7 +84,7 @@ PointToPointIslHelper::Install (Ptr<Node> a, Ptr<Node> b)
   devA->SetDestinationNode(b);
   devA->SetDataRate (m_dataRate);
   a->AddDevice (devA);
-  Ptr<Queue<Packet> > queueA = m_queueFactory.Create<Queue<Packet> > ();
+  Ptr<DropTailQueue<Packet> > queueA = m_queueFactory.Create<DropTailQueue<Packet> > ();
   // queueA->SetAttribute ("MaxPackets", UintegerValue (m_maxPackets)); // For ns 3.37
   // queueA->SetAttribute ("MaxBytes", UintegerValue (m_maxBytes)); // For ns 3.37
   queueA->SetAttribute ("MaxSize", QueueSizeValue (QueueSize (QueueSizeUnit::PACKETS, m_maxPackets)));
@@ -95,7 +95,7 @@ PointToPointIslHelper::Install (Ptr<Node> a, Ptr<Node> b)
   devB->SetDestinationNode(a);
   devB->SetDataRate (m_dataRate);
   b->AddDevice (devB);
-  Ptr<Queue<Packet> > queueB = m_queueFactory.Create<Queue<Packet> > ();
+  Ptr<DropTailQueue<Packet> > queueB = m_queueFactory.Create<DropTailQueue<Packet> > ();
   // queueB->SetAttribute ("MaxPackets", UintegerValue (m_maxPackets)); // For ns 3.37
   // queueB->SetAttribute ("MaxBytes", UintegerValue (m_maxBytes)); // For ns 3.37
   queueB->SetAttribute ("MaxSize", QueueSizeValue (QueueSize (QueueSizeUnit::PACKETS, m_maxPackets)));

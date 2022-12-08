@@ -107,7 +107,7 @@ SatStatsRbdcRequestHelper::RbdcRateCallback (std::string identifier, uint32_t rb
       NS_FATAL_ERROR ("Cannot convert '" << identifier << "' to number");
     }
   Ptr<DataCollectionObject> collector = m_terminalCollectors.Get (identifierNum);
-  NS_ASSERT_MSG (collector != 0,
+  NS_ASSERT_MSG (collector != nullptr,
                  "Unable to find collector with identifier " << identifierNum);
 
   switch (GetOutputType ())
@@ -116,7 +116,7 @@ SatStatsRbdcRequestHelper::RbdcRateCallback (std::string identifier, uint32_t rb
     case SatStatsHelper::OUTPUT_SCALAR_PLOT:
       {
         Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
-        NS_ASSERT (c != 0);
+        NS_ASSERT (c != nullptr);
         c->TraceSinkUinteger32 (0, rbdcTraceKbps);
         break;
       }
@@ -125,7 +125,7 @@ SatStatsRbdcRequestHelper::RbdcRateCallback (std::string identifier, uint32_t rb
     case SatStatsHelper::OUTPUT_SCATTER_PLOT:
       {
         Ptr<UnitConversionCollector> c = collector->GetObject<UnitConversionCollector> ();
-        NS_ASSERT (c != 0);
+        NS_ASSERT (c != nullptr);
         c->TraceSinkUinteger32 (0, rbdcTraceKbps);
         break;
       }
@@ -139,13 +139,13 @@ SatStatsRbdcRequestHelper::RbdcRateCallback (std::string identifier, uint32_t rb
       if (m_averagingMode)
         {
           Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
-          NS_ASSERT (c != 0);
+          NS_ASSERT (c != nullptr);
           c->TraceSinkUinteger32 (0, rbdcTraceKbps);
         }
       else
         {
           Ptr<DistributionCollector> c = collector->GetObject<DistributionCollector> ();
-          NS_ASSERT (c != 0);
+          NS_ASSERT (c != nullptr);
           c->TraceSinkUinteger32 (0, rbdcTraceKbps);
         }
       break;
@@ -221,7 +221,7 @@ SatStatsRbdcRequestHelper::DoInstall ()
                                              "EnableContextPrinting", BooleanValue (false),
                                              "GeneralHeading", StringValue (GetDistributionHeading ("rbdc_Kbps")));
             Ptr<MultiFileAggregator> fileAggregator = m_aggregator->GetObject<MultiFileAggregator> ();
-            NS_ASSERT (fileAggregator != 0);
+            NS_ASSERT (fileAggregator != nullptr);
 
             // Setup the final-level collector.
             m_averagingCollector = CreateObject<DistributionCollector> ();
@@ -311,7 +311,7 @@ SatStatsRbdcRequestHelper::DoInstall ()
                                          "OutputFileName", StringValue (GetName ()));
         Ptr<MagisterGnuplotAggregator> plotAggregator
           = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-        NS_ASSERT (plotAggregator != 0);
+        NS_ASSERT (plotAggregator != nullptr);
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Time (in seconds)",
                                    "RBDC requested (in kbps)");
@@ -346,7 +346,7 @@ SatStatsRbdcRequestHelper::DoInstall ()
                                              "OutputFileName", StringValue (GetName ()));
             Ptr<MagisterGnuplotAggregator> plotAggregator
               = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-            NS_ASSERT (plotAggregator != 0);
+            NS_ASSERT (plotAggregator != nullptr);
             //plot->SetTitle ("");
             plotAggregator->SetLegend ("RBDC requested (in kbps)",
                                        "Frequency");
@@ -398,7 +398,7 @@ SatStatsRbdcRequestHelper::DoInstall ()
                                              "OutputFileName", StringValue (GetName ()));
             Ptr<MagisterGnuplotAggregator> plotAggregator
               = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-            NS_ASSERT (plotAggregator != 0);
+            NS_ASSERT (plotAggregator != nullptr);
             //plot->SetTitle ("");
             plotAggregator->SetLegend ("RBDC requested (in kbps)",
                                        "Frequency");
@@ -471,11 +471,11 @@ SatStatsRbdcRequestHelper::InstallProbes ()
 
       Ptr<NetDevice> dev = GetUtSatNetDevice (*it);
       Ptr<SatNetDevice> satDev = dev->GetObject<SatNetDevice> ();
-      NS_ASSERT (satDev != 0);
+      NS_ASSERT (satDev != nullptr);
       Ptr<SatLlc> satLlc = satDev->GetLlc ();
-      NS_ASSERT (satLlc != 0);
+      NS_ASSERT (satLlc != nullptr);
       Ptr<SatUtLlc> utLlc = satLlc->GetObject<SatUtLlc> ();
-      NS_ASSERT (utLlc != 0);
+      NS_ASSERT (utLlc != nullptr);
       Ptr<SatRequestManager> requestManager = utLlc->GetRequestManager ();
 
       const bool ret = requestManager->TraceConnect ("RbdcTrace", context.str (), callback);

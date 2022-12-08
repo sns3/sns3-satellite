@@ -89,7 +89,7 @@ LoraNetworkServer::AddGateway (Ptr<Node> gateway, Ptr<NetDevice> netDevice)
   for (uint32_t i = 0; i < gateway->GetNDevices (); i++)
     {
       p2pNetDevice = gateway->GetDevice (i)->GetObject<PointToPointNetDevice> ();
-      if (p2pNetDevice != 0)
+      if (p2pNetDevice != nullptr)
         {
           // We found a p2pNetDevice on the gateway
           break;
@@ -99,7 +99,7 @@ LoraNetworkServer::AddGateway (Ptr<Node> gateway, Ptr<NetDevice> netDevice)
   // Get the gateway's LoRa MAC layer (assumes gateway's MAC is configured as first device)
   Ptr<SatLorawanNetDevice> satLoraNetDevice = DynamicCast<SatLorawanNetDevice> (gateway->GetDevice (1));
   Ptr<LorawanMacGateway> gwMac = DynamicCast<LorawanMacGateway> (satLoraNetDevice->GetMac ());
-  NS_ASSERT (gwMac != 0);
+  NS_ASSERT (gwMac != nullptr);
 
   // Get the Address
   Address gatewayAddress = p2pNetDevice->GetAddress ();
@@ -133,7 +133,7 @@ LoraNetworkServer::AddNode (Ptr<Node> node)
   for (uint32_t i = 0; i < node->GetNDevices (); i++)
     {
       loraNetDevice = DynamicCast<SatLorawanNetDevice> (node->GetDevice (i));
-      if (loraNetDevice != 0)
+      if (loraNetDevice != nullptr)
         {
           // We found a SatLorawanNetDevice on the node
           break;

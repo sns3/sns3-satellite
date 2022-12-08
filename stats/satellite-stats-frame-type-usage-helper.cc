@@ -286,11 +286,11 @@ SatStatsFrameTypeUsageHelper::FrameTypeUsageCallback (std::string context,
 		{
 			// Find the collector with the right identifier.
 			Ptr<DataCollectionObject> collector = it->second.Get (identifier);
-			NS_ASSERT_MSG (collector != 0,
+			NS_ASSERT_MSG (collector != nullptr,
 										 "Unable to find collector with identifier " << identifier);
 
 			Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
-			NS_ASSERT (c != 0);
+			NS_ASSERT (c != nullptr);
 
 			// Pass the sample to the collector.
 			c->TraceSinkUinteger32 (0, 1);
@@ -302,10 +302,10 @@ SatStatsFrameTypeUsageHelper::FrameTypeUsageCallback (std::string context,
   	  for (auto it : m_collectors)
   	  {
   	  	Ptr<DataCollectionObject> collector = it.second.Get (identifier);
-  			NS_ASSERT_MSG (collector != 0,
+  			NS_ASSERT_MSG (collector != nullptr,
   										 "Unable to find collector with identifier " << identifier);
   			Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
-  			NS_ASSERT (c != 0);
+  			NS_ASSERT (c != nullptr);
   	  	if (it.first == frameTypeId) c->TraceSinkUinteger32 (0, 1);
   	  	else c->TraceSinkUinteger32 (0, 0);
   	  }
