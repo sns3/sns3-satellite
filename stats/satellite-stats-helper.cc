@@ -950,7 +950,7 @@ SatStatsHelper::GetIdentifierForBeam (uint32_t satId, uint32_t beamId) const
       }
 
     case SatStatsHelper::IDENTIFIER_BEAM:
-      ret = beamId;
+      ret = SatConstVariables::MAX_BEAMS_PER_SATELLITE*(satId+1) + beamId;
       break;
 
     default:

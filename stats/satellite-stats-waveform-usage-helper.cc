@@ -218,7 +218,7 @@ SatStatsWaveformUsageHelper::WaveformUsageCallback (std::string context,
                 std::ostringstream name;
                 name << satId << "-" << beamId << " " << waveformId;
                 collectorMap.SetAttribute ("Name", StringValue (name.str ()));
-                collectorMap.Create (beamId);
+                collectorMap.Create (SatConstVariables::MAX_BEAMS_PER_SATELLITE*(satId+1) + beamId);
                 n++;
               }
             break;
