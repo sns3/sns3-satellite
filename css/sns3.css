@@ -1,0 +1,336 @@
+/*!
+ * Start Bootstrap - Modern Business (http://startbootstrap.com/)
+ * Copyright 2013-2016 Start Bootstrap
+ * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap/blob/gh-pages/LICENSE)
+ */
+
+/* Global Styles */
+
+@font-face { font-family: OpenSans; src: url('/web/20220804083856im_/http://www.sns3.org/fonts/open-sans/OpenSans-BoldItalic.ttf'); } 
+@font-face { font-family: Roboto; src: url('/web/20220804083856im_/http://www.sns3.org/fonts/roboto/Roboto-Regular.ttf'); } 
+@font-face { font-family: Lato; src: url('/web/20220804083856im_/http://www.sns3.org/fonts/lato/Lato-Regular.ttf'); } 
+@font-face { font-family: Ubuntu; src: url('/web/20220804083856im_/http://www.sns3.org/fonts/ubuntu/Ubuntu-L.ttf'); } 
+@font-face { font-family: Ubuntu-B; src: url('/web/20220804083856im_/http://www.sns3.org/fonts/ubuntu/Ubuntu-B.ttf'); } 
+@font-face { font-family: ProWindows; src: url('/web/20220804083856im_/http://www.sns3.org/fonts/ProFontWindows/ProFontWindows.ttf'); } 
+/*@font-face { font-family: HemiHeadBD; src: url('/web/20220804083856im_/http://www.sns3.org/fonts/hemi_head_bd_it.ttf'); } */
+
+@font-face {
+    font-family: 'HemiHeadBD';
+    src: url('/web/20220804083856im_/http://www.sns3.org/fonts/hemi_head/hemi_head_bd_it-webfont.woff2') format('woff2'),
+         url('/web/20220804083856im_/http://www.sns3.org/fonts/hemi_head/hemi_head_bd_it-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+* {
+	margin: 0;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    padding-top: 50px; /* Required padding for .navbar-fixed-top. Remove if using .navbar-static-top. Change if height of navigation changes. */
+}
+
+.img-portfolio {
+    margin-bottom: 30px;
+}
+
+.form-input {
+	display: block;
+  width: 100%;
+  height: 34px;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #555;
+  background-color: #fff;
+  background-image: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+  -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+       -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+          transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+}
+
+.text-custom {
+	color: #98C7EA;
+	font-size: 110%;
+	font-weight: bold;
+	font-family: HemiHeadBD;
+	
+}
+
+.text-custom:hover {
+	color: #458FCB;
+	font-family: HemiHeadBD;
+
+}
+
+.page-wrap {
+	min-height: 80%;
+	height: auto;
+	/*height: 100%;*/
+	/* equal to footer height */
+	/*margin-bottom: -20%;*/
+}
+
+.page-wrap:after {
+  content: "";
+  display: block;
+}
+
+.text-custom:active {
+	color: #458FCB;
+}
+
+
+.navbar-custom {
+	//background-color:black;
+}
+
+.dropdown-item:hover {
+	background-color:blue;
+}
+
+
+.img-hover:hover {
+    opacity: 0.8;
+}
+
+/* Home Page Carousel */
+
+header.carousel {
+    height: 50%;
+}
+
+header.carousel .item,
+header.carousel .item.active,
+header.carousel .carousel-inner {
+    height: 100%;
+}
+
+header.carousel .fill {
+    width: 100%;
+    height: 100%;
+    background-position: center;
+    background-size: cover;
+}
+
+/* 404 Page Styles */
+
+.error-404 {
+    font-size: 100px;
+}
+
+/* Pricing Page Styles */
+
+.price {
+    display: block;
+    font-size: 50px;
+    line-height: 50px;
+}
+
+.price sup {
+    top: -20px;
+    left: 2px;
+    font-size: 20px;
+}
+
+.period {
+    display: block;
+    font-style: italic;
+}
+
+/* Footer Styles */
+
+/*footer {
+    margin: 50px 0;
+}*/
+
+/* Responsive Styles */
+
+@media(max-width:991px) {
+    .customer-img,
+    .img-related {
+        margin-bottom: 30px;
+    }
+}
+
+@media(max-width:767px) {
+    .img-portfolio {
+        margin-bottom: 15px;
+    }
+
+    header.carousel .carousel {
+        height: 70%;
+    }
+}
+
+
+/************************/
+
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus {
+  color: #262626;
+  text-decoration: none;
+  background-color: #98C7EA;
+  font-family: Ubuntu-B;
+  border-color: #98C7EA;
+}
+
+.dropdown-menu > li > a {
+  font-family: Ubuntu-B;
+  font-size: 130%;
+  border-color: #98C7EA;
+}
+
+
+.logo:hover {
+	cursor:pointer;
+}
+
+.dropdown.open .text-custom {
+    color: #458FCB;
+}
+
+.navbar-nav {
+	font-size: 130%;
+	font-family: Ubuntu-B;
+}
+
+.dropdown-menu {
+	position: absolute;
+}
+
+.page-header {
+	color: #0A5D9D;
+}
+
+h2 {
+	font-family: HemiHeadBD;
+	color: #0A5D9D;
+}
+
+p {
+	font-size: 130%;
+	text-align: justify;
+}
+
+li {
+	font-family: Ubuntu;
+	font-size: 120%;
+	text-align: justify;
+}
+
+.shell-div > li {
+	font-family: Ubuntu;
+	font-size: 100%;
+	text-align: justify;
+}
+
+ /*#0A5D9D*/
+
+.img_hover:hover {
+	cursor:pointer;
+}
+
+section.font-green {
+  background: #18AEAE;
+  color: white;
+}
+
+section.font-blue {
+  background: #98C7EA;
+}
+
+section.font-yellow{
+	background: #FFD69F;
+}
+
+section {
+  padding: 70px 0;
+}
+
+footer{
+	color: white;
+	background-color: #222222;
+	padding-bottom: 0;
+	bottom: 0;
+	position: relative;
+	clear:both;
+	font-size: 100%;
+	
+	/*position : fixed;
+	width: 100%;
+	bottom: 0px;
+	margin-right: 0%;*/
+}
+
+/*footer, .page-wrap:after {
+	height: 180px;
+}*/
+
+.row-height {
+	padding: 100px 0;
+}
+
+#welcome {
+	background: #6F90DC;
+	color: white;
+}
+
+p {
+	font-family: Ubuntu;
+}
+
+.page-header {
+	font-family: HemiHeadBD;
+	border-bottom: 1px solid #A9D0F5;
+}
+
+.shell {
+	background-color: #222222;
+	color: #e8e8e8;
+}
+
+.well {
+	background-color:#CEE3F6;
+	border: 1px solid #A9D0F5;
+}
+
+blockquote {
+	border-left: 5px solid #A9D0F5;
+}
+
+hr {
+	border-top: 1px solid #A9D0F5;
+}
+
+/*
+     FILE ARCHIVED ON 08:38:56 Aug 04, 2022 AND RETRIEVED FROM THE
+     INTERNET ARCHIVE ON 17:12:01 Jul 26, 2023.
+     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+
+     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+     SECTION 108(a)(3)).
+*/
+/*
+playback timings (ms):
+  captures_list: 80.533
+  exclusion.robots: 0.283
+  exclusion.robots.policy: 0.264
+  RedisCDXSource: 1.063
+  esindex: 0.016
+  LoadShardBlock: 48.5 (3)
+  PetaboxLoader3.datanode: 77.738 (5)
+  load_resource: 614.724
+  PetaboxLoader3.resolve: 542.808
+  loaddict: 57.87
+*/
