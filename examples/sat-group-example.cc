@@ -218,8 +218,7 @@ main (int argc, char *argv[])
   groupHelper->CreateUtNodesFromPosition (5, 10, GeoCoordinate (56.4243, -16.042, 122.427), 100000);
 
   // Create reference system
-  simulationHelper->CreateSatScenario ();
-  Ptr<SatHelper> satHelper = simulationHelper->GetSatelliteHelper ();
+  Ptr<SatHelper> satHelper = simulationHelper->CreateSatScenario ();
 
   // Create groups
   NodeContainer utNodes = satHelper->UtNodes ();

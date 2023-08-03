@@ -1179,12 +1179,7 @@ SimulationHelper::GetGroupHelper ()
 
   if (!m_groupHelper)
     {
-      if (m_satHelper == nullptr)
-        {
-          NS_FATAL_ERROR ("SatHelper must be created before GroupHelper");
-        }
       m_groupHelper = CreateObject<SatGroupHelper> ();
-      m_groupHelper->SetAntennaGainPatterns (m_satHelper->GetAntennaGainPatterns ());
     }
 
   return m_groupHelper;
@@ -1245,7 +1240,8 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario, c
   m_satHelper = CreateObject<SatHelper> ();
 
   m_satHelper->SetGroupHelper (GetGroupHelper ()); // If not done in user scenario, group helper is created here
-  m_satHelper->GetBeamHelper ()->SetAntennaGainPatterns (m_groupHelper->GetAntennaGainPatterns ());
+  Ptr<SatAntennaGainPatternContainer> antennaGainPatterns = m_satHelper->GetAntennaGainPatterns ();
+  m_satHelper->GetBeamHelper ()->SetAntennaGainPatterns (antennaGainPatterns);
 
   // Set UT position allocators, if any
   if (!m_enableInputFileUtListPositions && !m_satHelper->IsSatConstellationEnabled ())
@@ -1307,7 +1303,14 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario, c
             }
         }
 
-      std::map<uint32_t, std::vector<std::pair<GeoCoordinate, uint32_t>>> additionalNodes = m_groupHelper->GetAdditionalNodesPerBeam ();
+      std::vector<std::pair<GeoCoordinate, uint32_t>> additionalNodesVector = m_groupHelper->GetAdditionalNodesPerBeam ();
+      std::map<uint32_t, std::vector<std::pair<GeoCoordinate, uint32_t>>> additionalNodes;
+      for(std::vector<std::pair<GeoCoordinate, uint32_t>>::iterator it = additionalNodesVector.begin(); it != additionalNodesVector.end(); it++)
+        {
+          uint32_t bestBeamId = antennaGainPatterns->GetBestBeamId (0, it->first, false);
+          additionalNodes[bestBeamId].push_back (*it);
+        }
+
       for (std::map<uint32_t, std::vector<std::pair<GeoCoordinate, uint32_t>>>::iterator it = additionalNodes.begin(); it != additionalNodes.end(); it++)
         {
           if (!IsBeamEnabled (it->first))

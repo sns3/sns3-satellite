@@ -127,9 +127,9 @@ public:
 
   /**
    * \brief Get the position of nodes to add to the scenario
-   * \return The map beamId/positions associated
+   * \return The vector of points and group IDs
    */
-  std::map<uint32_t, std::vector<std::pair<GeoCoordinate, uint32_t>>> GetAdditionalNodesPerBeam ();
+  std::vector<std::pair<GeoCoordinate, uint32_t>> GetAdditionalNodesPerBeam ();
 
   /**
    * \param groupId The group ID
@@ -148,17 +148,6 @@ public:
    * \return The list of groups created
    */
   std::list<uint32_t> GetGroups ();
-
-  /**
-   * \brief Set the antenna gain patterns.
-   * \param antennaGainPattern The pattern to set
-   */
-  void SetAntennaGainPatterns (Ptr<SatAntennaGainPatternContainer> antennaGainPattern);
-
-  /**
-   * \return Get the antenna gain patterns
-   */
-  Ptr<SatAntennaGainPatternContainer> GetAntennaGainPatterns ();
 
   /**
    * Dispose of this class instance
@@ -205,14 +194,9 @@ private:
   std::list<uint32_t>                               m_groupsList;
 
   /**
-   * Antenna gain patterns
+   * Nodes created by position to add to scenario. vector: <position, group ID>
    */
-  Ptr<SatAntennaGainPatternContainer> m_antennaGainPatterns;
-
-  /**
-   * Nodes created by position to add to scenario. Map: <beamId, vector: <position, group ID>>
-   */
-  std::map<uint32_t, std::vector<std::pair<GeoCoordinate, uint32_t>>> m_additionalNodesPerBeam;
+  std::vector<std::pair<GeoCoordinate, uint32_t>> m_additionalNodesPerBeam;
 
   /*
    * Map to store node to add to groups after scenario is created
