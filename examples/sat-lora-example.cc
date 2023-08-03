@@ -97,8 +97,8 @@ main (int argc, char *argv[])
   cmd.Parse (argc, argv);
 
   /// Set regeneration mode
-  Config::SetDefault ("ns3::SatBeamHelper::ForwardLinkRegenerationMode", EnumValue (SatEnums::TRANSPARENT));
-  Config::SetDefault ("ns3::SatBeamHelper::ReturnLinkRegenerationMode", EnumValue (SatEnums::TRANSPARENT));
+  Config::SetDefault ("ns3::SatConf::ForwardLinkRegenerationMode", EnumValue (SatEnums::TRANSPARENT));
+  Config::SetDefault ("ns3::SatConf::ReturnLinkRegenerationMode", EnumValue (SatEnums::TRANSPARENT));
 
   // Enable Lora
   Config::SetDefault ("ns3::SatHelper::Standard", EnumValue (SatEnums::LORA));
