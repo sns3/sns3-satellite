@@ -6,18 +6,18 @@
 
 /* Global Styles */
 
-@font-face { font-family: OpenSans; src: url('/web/20220804083856im_/http://www.sns3.org/fonts/open-sans/OpenSans-BoldItalic.ttf'); } 
-@font-face { font-family: Roboto; src: url('/web/20220804083856im_/http://www.sns3.org/fonts/roboto/Roboto-Regular.ttf'); } 
-@font-face { font-family: Lato; src: url('/web/20220804083856im_/http://www.sns3.org/fonts/lato/Lato-Regular.ttf'); } 
-@font-face { font-family: Ubuntu; src: url('/web/20220804083856im_/http://www.sns3.org/fonts/ubuntu/Ubuntu-L.ttf'); } 
-@font-face { font-family: Ubuntu-B; src: url('/web/20220804083856im_/http://www.sns3.org/fonts/ubuntu/Ubuntu-B.ttf'); } 
-@font-face { font-family: ProWindows; src: url('/web/20220804083856im_/http://www.sns3.org/fonts/ProFontWindows/ProFontWindows.ttf'); } 
-/*@font-face { font-family: HemiHeadBD; src: url('/web/20220804083856im_/http://www.sns3.org/fonts/hemi_head_bd_it.ttf'); } */
+@font-face { font-family: OpenSans; src: url('/fonts/open-sans/OpenSans-BoldItalic.ttf'); } 
+@font-face { font-family: Roboto; src: url('/fonts/roboto/Roboto-Regular.ttf'); } 
+@font-face { font-family: Lato; src: url('/fonts/lato/Lato-Regular.ttf'); } 
+@font-face { font-family: Ubuntu; src: url('/fonts/ubuntu/Ubuntu-L.ttf'); } 
+@font-face { font-family: Ubuntu-B; src: url('/fonts/ubuntu/Ubuntu-B.ttf'); } 
+@font-face { font-family: ProWindows; src: url('/fonts/ProFontWindows/ProFontWindows.ttf'); } 
+/*@font-face { font-family: HemiHeadBD; src: url('/fonts/hemi_head_bd_it.ttf'); } */
 
 @font-face {
     font-family: 'HemiHeadBD';
-    src: url('/web/20220804083856im_/http://www.sns3.org/fonts/hemi_head/hemi_head_bd_it-webfont.woff2') format('woff2'),
-         url('/web/20220804083856im_/http://www.sns3.org/fonts/hemi_head/hemi_head_bd_it-webfont.woff') format('woff');
+    src: url('/fonts/hemi_head/hemi_head_bd_it-webfont.woff2') format('woff2'),
+         url('/fonts/hemi_head/hemi_head_bd_it-webfont.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 
