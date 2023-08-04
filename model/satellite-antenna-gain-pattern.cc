@@ -92,7 +92,8 @@ SatAntennaGainPattern::SatAntennaGainPattern (std::string filePathName, GeoCoord
 }
 
 
-void SatAntennaGainPattern::ReadAntennaPatternFromFile (std::string filePathName)
+void
+SatAntennaGainPattern::ReadAntennaPatternFromFile (std::string filePathName)
 {
   NS_LOG_FUNCTION (this << filePathName);
 
@@ -223,7 +224,8 @@ void SatAntennaGainPattern::ReadAntennaPatternFromFile (std::string filePathName
 }
 
 
-void SatAntennaGainPattern::GetSatelliteOffset (double& latOffset, double& lonOffset, Ptr<SatMobilityModel> mobility) const
+void
+SatAntennaGainPattern::GetSatelliteOffset (double& latOffset, double& lonOffset, Ptr<SatMobilityModel> mobility) const
 {
   NS_LOG_FUNCTION (this);
 
@@ -241,9 +243,10 @@ void SatAntennaGainPattern::GetSatelliteOffset (double& latOffset, double& lonOf
 }
 
 
-GeoCoordinate SatAntennaGainPattern::GetValidRandomPosition (Ptr<SatMobilityModel> mobility) const
+GeoCoordinate
+SatAntennaGainPattern::GetValidRandomPosition (Ptr<SatMobilityModel> mobility) const
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << mobility);
 
   double satLatOffset, satLonOffset;
   GetSatelliteOffset (satLatOffset, satLonOffset, mobility);
@@ -292,13 +295,18 @@ GeoCoordinate SatAntennaGainPattern::GetValidRandomPosition (Ptr<SatMobilityMode
   // Pick a random position within a grid square
   double latOffset = m_uniformRandomVariable->GetValue (0.0, m_latInterval - 0.001);
   double lonOffset = m_uniformRandomVariable->GetValue (0.0, m_lonInterval - 0.001);
-  GeoCoordinate coord (lowerLeftCoord.first + latOffset + satLatOffset, lowerLeftCoord.second + lonOffset + satLonOffset, 0.0);
+
+  double latitude = lowerLeftCoord.first + latOffset - satLatOffset;
+  double longitude = lowerLeftCoord.second + lonOffset - satLonOffset;
+
+  GeoCoordinate coord (latitude, longitude, 0.0, true);
 
   return coord;
 }
 
 
-bool SatAntennaGainPattern::IsValidPosition (GeoCoordinate coord, TracedCallback<double> cb, Ptr<SatMobilityModel> mobility) const
+bool
+SatAntennaGainPattern::IsValidPosition (GeoCoordinate coord, TracedCallback<double> cb, Ptr<SatMobilityModel> mobility) const
 {
   NS_LOG_FUNCTION (this << coord.GetLatitude () << coord.GetLongitude ());
 
@@ -308,7 +316,8 @@ bool SatAntennaGainPattern::IsValidPosition (GeoCoordinate coord, TracedCallback
 }
 
 
-double SatAntennaGainPattern::GetAntennaGain_lin (GeoCoordinate coord, Ptr<SatMobilityModel> mobility) const
+double
+SatAntennaGainPattern::GetAntennaGain_lin (GeoCoordinate coord, Ptr<SatMobilityModel> mobility) const
 {
   NS_LOG_FUNCTION (this << coord.GetLatitude () << coord.GetLongitude ());
 

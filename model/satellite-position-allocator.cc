@@ -354,10 +354,10 @@ SatSpotBeamPositionAllocator::GetNextGeoPosition (uint32_t satId) const
   // - the MAX_TRIES have been exceeded
   // - elevation is NOT NaN
   // - elevation is not higher than threshold
-  while ( ( bestBeamId != m_targetBeamId || std::isnan (elevation) || elevation < m_minElevationAngleInDeg ) && tries < MAX_TRIES)
+  while ( ( bestBeamId == 0 || bestBeamId != m_targetBeamId || std::isnan (elevation) || elevation < m_minElevationAngleInDeg ) && tries < MAX_TRIES)
     {
       pos = agp->GetValidRandomPosition (mobility);
-      bestBeamId = m_antennaGainPatterns->GetBestBeamId (satId, pos, false);
+      bestBeamId = m_antennaGainPatterns->GetBestBeamId (satId, pos, true);
 
       // Set the new position to the UT mobility
       utMob->SetGeoPosition (pos);

@@ -72,4 +72,9 @@ main (int argc, char *argv[])
           std::cout << "[" << beamId << "] " << coords << std::endl;
         }
     }
+
+  simulationHelper->SetSimulationTime (0.1);
+  simulationHelper->RunSimulation ();
+
+  return 0;
 }

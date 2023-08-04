@@ -34,20 +34,20 @@ namespace ns3 {
 
 ATTRIBUTE_HELPER_CPP (GeoCoordinate);
 
-GeoCoordinate::GeoCoordinate (double latitude, double longitude, double altitude, ReferenceEllipsoid_t refEllipsoid)
+GeoCoordinate::GeoCoordinate (double latitude, double longitude, double altitude, ReferenceEllipsoid_t refEllipsoid, bool correctIfInvalid)
   : m_refEllipsoid (refEllipsoid)
 {
   NS_LOG_FUNCTION (this << latitude << longitude << altitude);
 
-  Construct (latitude, longitude, altitude);
+  Construct (latitude, longitude, altitude, correctIfInvalid);
 }
 
-GeoCoordinate::GeoCoordinate (double latitude, double longitude, double altitude)
+GeoCoordinate::GeoCoordinate (double latitude, double longitude, double altitude, bool correctIfInvalid)
   : m_refEllipsoid (GeoCoordinate::SPHERE)
 {
   NS_LOG_FUNCTION (this << latitude << longitude << altitude);
 
-  Construct (latitude, longitude, altitude);
+  Construct (latitude, longitude, altitude, correctIfInvalid);
 }
 
 GeoCoordinate::GeoCoordinate (Vector vector)
@@ -78,23 +78,46 @@ GeoCoordinate::GeoCoordinate ()
 }
 
 void
-GeoCoordinate::Construct (double latitude, double longitude, double altitude)
+GeoCoordinate::Construct (double latitude, double longitude, double altitude, bool correctIfInvalid)
 {
   NS_LOG_FUNCTION (this << latitude << longitude << altitude);
 
+  if (correctIfInvalid)
+    {
+      if (latitude > 90)
+        {
+          latitude = 180 - latitude;
+          longitude += 180;
+        }
+      if (latitude < -90)
+        {
+          latitude = -180 - latitude;
+          longitude += 180;
+        }
+
+      while (longitude > 180)
+        {
+          longitude -= 360;
+        }
+      while (longitude < -180)
+        {
+          longitude += 360;
+        }
+    }
+
   if ( IsValidLatitude (latitude) == false)
     {
-      NS_FATAL_ERROR ("Invalid latitude!!!");
+      NS_FATAL_ERROR ("Invalid latitude!!! Got " << latitude);
     }
 
   if (IsValidLongitude (longitude) == false)
     {
-      NS_FATAL_ERROR ("Invalid longitude!!!");
+      NS_FATAL_ERROR ("Invalid longitude!!! Got " << longitude);
     }
 
   if (IsValidAltitude (altitude, m_refEllipsoid) == false)
     {
-      NS_FATAL_ERROR ("Invalid altitude!!!");
+      NS_FATAL_ERROR ("Invalid altitude!!! Got " << altitude);
     }
 
   Initialize ();
@@ -148,25 +171,29 @@ GeoCoordinate::Initialize ()
   m_e2Param = ( ( m_equatorRadius * m_equatorRadius ) - ( m_polarRadius * m_polarRadius ) ) / (m_equatorRadius * m_equatorRadius );
 }
 
-double GeoCoordinate::GetLongitude () const
+double
+GeoCoordinate::GetLongitude () const
 {
   NS_LOG_FUNCTION (this);
   return m_longitude;
 }
 
-double GeoCoordinate::GetLatitude () const
+double
+GeoCoordinate::GetLatitude () const
 {
   NS_LOG_FUNCTION (this);
   return m_latitude;
 }
 
-double GeoCoordinate::GetAltitude () const
+double
+GeoCoordinate::GetAltitude () const
 {
   NS_LOG_FUNCTION (this);
   return m_altitude;
 }
 
-void GeoCoordinate::SetLongitude (double longitude)
+void
+GeoCoordinate::SetLongitude (double longitude)
 {
   NS_LOG_FUNCTION (this << longitude);
 
@@ -178,7 +205,8 @@ void GeoCoordinate::SetLongitude (double longitude)
   m_longitude = longitude;
 }
 
-void GeoCoordinate::SetLatitude (double latitude)
+void
+GeoCoordinate::SetLatitude (double latitude)
 {
   NS_LOG_FUNCTION (this << latitude);
 
@@ -190,7 +218,8 @@ void GeoCoordinate::SetLatitude (double latitude)
   m_latitude = latitude;
 }
 
-void GeoCoordinate::SetAltitude (double altitude)
+void
+GeoCoordinate::SetAltitude (double altitude)
 {
   NS_LOG_FUNCTION (this << altitude);
 
@@ -202,7 +231,8 @@ void GeoCoordinate::SetAltitude (double altitude)
   m_altitude = altitude;
 }
 
-void GeoCoordinate::ConstructFromVector (const Vector &v)
+void
+GeoCoordinate::ConstructFromVector (const Vector &v)
 {
   NS_LOG_FUNCTION (this << v);
 

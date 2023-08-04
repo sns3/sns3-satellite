@@ -87,7 +87,7 @@ main (int argc, char *argv[])
 
   std::string raModel = "CRDSA";
   bool dynamicLoadControl = true;
-  bool utMobility = true;
+  bool utMobility = false;
   std::string mobilityPath = "contrib/satellite/data/utpositions/mobiles/scenario0/trajectory";
   std::string burstLengthStr = "ShortBurst";
   SatEnums::SatWaveFormBurstLength_t burstLength = SatEnums::SHORT_BURST;
@@ -279,7 +279,7 @@ main (int argc, char *argv[])
    */
   simulationHelper->EnableProgressLogs ();
 
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("contrib/satellite/data/sims/sat-vhts-example/output-attributes.xml"));
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("output-attributes.xml"));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
   ConfigStore outputConfig;

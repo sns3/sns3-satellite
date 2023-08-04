@@ -1113,7 +1113,12 @@ SatHelper::SetUtMobilityFromPosition (NodeContainer uts, uint32_t satId, uint32_
 Ptr<SatSpotBeamPositionAllocator>
 SatHelper::GetBeamAllocator (uint32_t beamId)
 {
-  Ptr<SatSpotBeamPositionAllocator> beamAllocator = CreateObject<SatSpotBeamPositionAllocator> (beamId, m_antennaGainPatterns, m_satConf->GetGeoSatPosition ());
+  GeoCoordinate satPosition = m_satConf->GetGeoSatPosition ();
+  if (m_satMobilitySGP4Enabled)
+    {
+      satPosition = m_beamHelper->GetGeoSatNodes ().Get (0)->GetObject <SatMobilityModel> ()->GetPosition ();
+    }
+  Ptr<SatSpotBeamPositionAllocator> beamAllocator = CreateObject<SatSpotBeamPositionAllocator> (beamId, m_antennaGainPatterns, satPosition);
 
   Ptr<UniformRandomVariable> altRnd = CreateObject<UniformRandomVariable> ();
   altRnd->SetAttribute ("Min", DoubleValue (0.0));

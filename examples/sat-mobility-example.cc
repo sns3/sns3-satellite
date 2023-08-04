@@ -49,7 +49,7 @@ main (int argc, char *argv[])
   LogComponentEnable ("sat-mobility-example", LOG_LEVEL_INFO);
 
   // Variables
-  uint32_t beamId = 1;
+  uint32_t beamId = 17;
   uint32_t endUsersPerUt (1);
   uint32_t utsPerBeam (1);
 
@@ -81,6 +81,8 @@ main (int argc, char *argv[])
   /// Set default values
   Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
   Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
+
+  Config::SetDefault ("ns3::SatAntennaGainPatternContainer::PatternsFolder", StringValue ("SatAntennaGain72BeamsShifted"));
 
   Config::SetDefault ("ns3::SatHelper::SatMobilitySGP4Enabled", BooleanValue (true));
   Config::SetDefault ("ns3::SatHelper::SatMobilitySGP4TleFileName", StringValue (tleFileName));
@@ -124,7 +126,7 @@ main (int argc, char *argv[])
   Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer ();
   simulationHelper->EnableProgressLogs ();
 
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("contrib/satellite/data/sims/sat-mobility-example/output-attributes.xml"));
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("output-attributes.xml"));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
   ConfigStore outputConfig;
