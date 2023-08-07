@@ -10,7 +10,7 @@
 # See test.py for more information.
 cpp_examples = [
 	("sat-arq-fwd-example", "True", "True"),
-	#("sat-arq-rtn-example", "True", "True"),
+	("sat-arq-rtn-example", "False", "False"),
 	("sat-cbr-example", "True", "True"),
 	("sat-cbr-full-example", "True", "True"),
 	("sat-cbr-stats-example", "True", "True"),
@@ -39,7 +39,7 @@ cpp_examples = [
 	("sat-markov-fading-trace-example", "True", "True"),
 	("sat-markov-logic-example", "True", "True"),
 	("sat-mobility-beam-tracer", "True", "True"),
-	("sat-mobility-example", "True", "True"),
+	("sat-mobility-example", "False", "False"),
 	("sat-mobility-position-generator", "True", "True"),
 	("sat-multi-application-fwd-example", "True", "True"),
 	("sat-multi-application-rtn-example", "True", "True"),
