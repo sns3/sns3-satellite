@@ -1,0 +1,27 @@
+var classns3_1_1_sat_bb_frame_container =
+[
+    [ "FrameContainer_t", "classns3_1_1_sat_bb_frame_container.html#a76054fa38194c149102b4cc29352f5b6", null ],
+    [ "SatBbFrameContainer", "classns3_1_1_sat_bb_frame_container.html#ad5db53c9c127af412097688d62b83c94", null ],
+    [ "SatBbFrameContainer", "classns3_1_1_sat_bb_frame_container.html#a0614c228fb0a6edd1df89770cfff9711", null ],
+    [ "~SatBbFrameContainer", "classns3_1_1_sat_bb_frame_container.html#a0062614059dc0e41a946a9a186f12904", null ],
+    [ "AddData", "classns3_1_1_sat_bb_frame_container.html#ab3b2f20c41b9c1876fa11bbe5188a6b0", null ],
+    [ "CreateFrameToTail", "classns3_1_1_sat_bb_frame_container.html#a9ef236cf44976a0f13bb7fb587123170", null ],
+    [ "GetBytesLeftInTailFrame", "classns3_1_1_sat_bb_frame_container.html#a12ef8e2e933af63dfb2023441ffa6791", null ],
+    [ "GetFrameSymbols", "classns3_1_1_sat_bb_frame_container.html#a48a988da17bbcfa3472181cfd086774b", null ],
+    [ "GetMaxFramePayloadInBytes", "classns3_1_1_sat_bb_frame_container.html#a107789972e856881672996e1ab85be7c", null ],
+    [ "GetMaxSymbolRate", "classns3_1_1_sat_bb_frame_container.html#a23603f9c00e07018ba1ba76d3d705753", null ],
+    [ "GetModcod", "classns3_1_1_sat_bb_frame_container.html#af89c35607fb1aa33d6e840c4930608e9", null ],
+    [ "GetNextFrame", "classns3_1_1_sat_bb_frame_container.html#a395df1bfd42d3cf1c4dd5574d919bfbc", null ],
+    [ "GetTotalDuration", "classns3_1_1_sat_bb_frame_container.html#a2c2750f77c84efb0cc6db5ec045040de", null ],
+    [ "GetTypeId", "classns3_1_1_sat_bb_frame_container.html#a0e89fed7477b281080c8bee57704633d", null ],
+    [ "IsEmpty", "classns3_1_1_sat_bb_frame_container.html#a59a20f80e447e72597c9259bf7a365e0", null ],
+    [ "MergeBbFrames", "classns3_1_1_sat_bb_frame_container.html#a31a5866ee1493871c20eb59bad7636e7", null ],
+    [ "SetMaxSymbolRate", "classns3_1_1_sat_bb_frame_container.html#a17763147cfa0d8249fb93fc22c58205a", null ],
+    [ "m_bbFrameConf", "classns3_1_1_sat_bb_frame_container.html#a00dc1d893963f49489ac7fe5c96eec1f", null ],
+    [ "m_bbFrameMergeTrace", "classns3_1_1_sat_bb_frame_container.html#a3c52ebf41663e6969c12e8f2738e054e", null ],
+    [ "m_container", "classns3_1_1_sat_bb_frame_container.html#a329e604e234a6b4b7e6e1f18602dd971", null ],
+    [ "m_ctrlContainer", "classns3_1_1_sat_bb_frame_container.html#a94284a0b611787a363dd1b80d995e1d5", null ],
+    [ "m_defaultBbFrameType", "classns3_1_1_sat_bb_frame_container.html#ab7901ffb6115bda1b2024f2a768bda3c", null ],
+    [ "m_maxSymbolRate", "classns3_1_1_sat_bb_frame_container.html#ab81a81b93f9ba96d647f19d4a5ef1246", null ],
+    [ "m_totalDuration", "classns3_1_1_sat_bb_frame_container.html#a0f9c542581b68be58cb925af8b1d8550", null ]
+];

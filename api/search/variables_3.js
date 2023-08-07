@@ -1,0 +1,22 @@
+var searchData=
+[
+  ['cc1_10837',['cc1',['../structelsetrec.html#ac1dcc03331afb37bd8a77aeb5cbad349',1,'elsetrec']]],
+  ['cc4_10838',['cc4',['../structelsetrec.html#af5947ca76e7fc6e6732ca8e29ee58398',1,'elsetrec']]],
+  ['cc5_10839',['cc5',['../structelsetrec.html#a539cb093aef38cebc2e6d67b90813122',1,'elsetrec']]],
+  ['channeltype_10840',['channelType',['../structns3_1_1_sat_cno_helper_1_1cno_custom_params__s.html#add4b2717e557f8648b32ab47b4d76148',1,'ns3::SatCnoHelper::cnoCustomParams_s']]],
+  ['cno_10841',['cno',['../structns3_1_1_sat_cno_helper_1_1cno_custom_params__s.html#a7ef0dbfde09ed97d64e803037086b6df',1,'ns3::SatCnoHelper::cnoCustomParams_s']]],
+  ['codingrate_10842',['codingRate',['../structns3_1_1_lora_tx_parameters.html#ab2bc604926c077cae93b6237ee2e8d0d',1,'ns3::LoraTxParameters']]],
+  ['con41_10843',['con41',['../structelsetrec.html#a9e7eae316097bb7655c5e415247f309e',1,'elsetrec']]],
+  ['constant_10844',['constant',['../structns3_1_1_sat_cno_helper_1_1cno_custom_params__s.html#afc1573c78fca17a6ba9f701f4b813a89',1,'ns3::SatCnoHelper::cnoCustomParams_s']]],
+  ['control_5fmsg_5fcommon_5fheader_5fsize_5fin_5fbytes_10845',['CONTROL_MSG_COMMON_HEADER_SIZE_IN_BYTES',['../classns3_1_1_sat_cr_message.html#a553cf65dd8e935e6ee41514ef56adc9f',1,'ns3::SatCrMessage']]],
+  ['control_5fmsg_5ftype_5fvalue_5fsize_5fin_5fbytes_10846',['CONTROL_MSG_TYPE_VALUE_SIZE_IN_BYTES',['../classns3_1_1_sat_cr_message.html#a6efbd9b09c0c7327a1951695f33f30c5',1,'ns3::SatCrMessage']]],
+  ['cpp_5fexamples_10847',['cpp_examples',['../namespaceexamples-to-run.html#a43040c61d99c22802c00d7dad6c9bb4f',1,'examples-to-run']]],
+  ['crcenabled_10848',['crcEnabled',['../structns3_1_1_lora_tx_parameters.html#ad86490cd805578e0b20cac5f0c71a02e',1,'ns3::LoraTxParameters']]],
+  ['crdsatxopportunities_10849',['crdsaTxOpportunities',['../structns3_1_1_sat_random_access_1_1_random_access_tx_opportunities__s.html#ad5692654531214be7bcd529d17919097',1,'ns3::SatRandomAccess::RandomAccessTxOpportunities_s']]],
+  ['crdsauniquepacketid_10850',['crdsaUniquePacketId',['../structns3_1_1_sat_signal_parameters_1_1tx_info__s.html#a370311849bca73666d0011e4b1acaf0e',1,'ns3::SatSignalParameters::txInfo_s']]],
+  ['created_10851',['created',['../structns3_1_1_sat_traffic_helper_1_1_custom_traffic_info__s.html#a262b3ad1f796d251535b9b9bf8a8d588',1,'ns3::SatTrafficHelper::CustomTrafficInfo_s']]],
+  ['csinr_10852',['cSinr',['../structns3_1_1_sat_phy_rx_carrier_per_frame_1_1crdsa_packet_rx_params__s.html#a0bdeee5751b0650e731d2ad22334dfcf',1,'ns3::SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s']]],
+  ['csinr_5ftrace_5fdefault_5ffading_5fvalue_5findex_10853',['CSINR_TRACE_DEFAULT_FADING_VALUE_INDEX',['../classns3_1_1_sat_base_trace_container.html#a76a5335eb12e0c11d731f449eac984db',1,'ns3::SatBaseTraceContainer']]],
+  ['csinr_5ftrace_5fdefault_5fnumber_5fof_5fcolumns_10854',['CSINR_TRACE_DEFAULT_NUMBER_OF_COLUMNS',['../classns3_1_1_sat_base_trace_container.html#a694734f78ffb927d6905c5b99a98f9cb',1,'ns3::SatBaseTraceContainer']]],
+  ['curleapseconds_10855',['CurLeapSeconds',['../classns3_1_1_iers_data.html#a8aa3cc920af87b4bb6b4f2222e806028',1,'ns3::IersData']]]
+];

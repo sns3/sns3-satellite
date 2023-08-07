@@ -1,0 +1,25 @@
+var searchData=
+[
+  ['packet_5fdrop_12958',['PACKET_DROP',['../classns3_1_1_sat_enums.html#a5a71ff9f111089459f5934204a2015cca8b39fd5f8ab5680ce52b427ff5870152',1,'ns3::SatEnums']]],
+  ['packet_5fenque_12959',['PACKET_ENQUE',['../classns3_1_1_sat_enums.html#a5a71ff9f111089459f5934204a2015cca5e9a80693b071077801dcb185304a040',1,'ns3::SatEnums']]],
+  ['packet_5frecv_12960',['PACKET_RECV',['../classns3_1_1_sat_enums.html#a5a71ff9f111089459f5934204a2015ccaf2bd0a36354e32a71d111827d0bc5166',1,'ns3::SatEnums']]],
+  ['packet_5fsent_12961',['PACKET_SENT',['../classns3_1_1_sat_enums.html#a5a71ff9f111089459f5934204a2015cca88d4d4e24dffaca0f503567ee2a4b04d',1,'ns3::SatEnums']]],
+  ['packet_5ftype_5fcrdsa_12962',['PACKET_TYPE_CRDSA',['../classns3_1_1_sat_enums.html#ad2be04e3355d1f2d12d228ea161b9632a8f836d5cd3280a6b446fad268051e045',1,'ns3::SatEnums']]],
+  ['packet_5ftype_5fdedicated_5faccess_12963',['PACKET_TYPE_DEDICATED_ACCESS',['../classns3_1_1_sat_enums.html#ad2be04e3355d1f2d12d228ea161b9632aa5bb8b5bf183964415cfdb4a9f8c33e0',1,'ns3::SatEnums']]],
+  ['packet_5ftype_5fessa_12964',['PACKET_TYPE_ESSA',['../classns3_1_1_sat_enums.html#ad2be04e3355d1f2d12d228ea161b9632a8fadf927d32daa2aa94280b08f7ec9a9',1,'ns3::SatEnums']]],
+  ['packet_5ftype_5flogon_12965',['PACKET_TYPE_LOGON',['../classns3_1_1_sat_enums.html#ad2be04e3355d1f2d12d228ea161b9632aa0fec5dc642eaca39c2a9e1c53e937a3',1,'ns3::SatEnums']]],
+  ['packet_5ftype_5fslotted_5faloha_12966',['PACKET_TYPE_SLOTTED_ALOHA',['../classns3_1_1_sat_enums.html#ad2be04e3355d1f2d12d228ea161b9632aba0b25b03502b9c4a30cb55eb7fd169e',1,'ns3::SatEnums']]],
+  ['pd_5fconstant_12967',['PD_CONSTANT',['../classns3_1_1_sat_enums.html#ab81700b40299043d8cc784830daf111ea48d9b68c03cb126c84cbe92d950c3b2c',1,'ns3::SatEnums']]],
+  ['pd_5fconstant_5fspeed_12968',['PD_CONSTANT_SPEED',['../classns3_1_1_sat_enums.html#ab81700b40299043d8cc784830daf111ea24ad0e7af036c4cc8377ba2c8f94457d',1,'ns3::SatEnums']]],
+  ['periodic_12969',['PERIODIC',['../classns3_1_1_simulation_helper.html#aff377ffe7a331525403527b8d63733b2a59a132fe6d2ccfdbd3ee01bec6bf35a8',1,'ns3::SimulationHelper']]],
+  ['poisson_12970',['POISSON',['../classns3_1_1_sat_traffic_helper.html#a9f1f9fc294f01a81436278c116b79579a4cd9b62a61097f7e850f6f69755a4165',1,'ns3::SatTrafficHelper']]],
+  ['position_12971',['POSITION',['../sat-group-example_8cc.html#a68039eab022734b15b8028fe2e1a625aad34d5395053a1781444508e570283be1',1,'sat-group-example.cc']]],
+  ['position_5fmode_12972',['POSITION_MODE',['../classns3_1_1_sat_fading_external_input_trace_container.html#a6f56efcd219975b0c5d59af46720bec8a8c63441847dc6057ec2f42526c25c29e',1,'ns3::SatFadingExternalInputTraceContainer']]],
+  ['posix_12973',['POSIX',['../structns3_1_1_date_time.html#a64b4d1fa36067e8c4587b88ebf72983aa075abfec9d4135ed528568fba85b68d8',1,'ns3::DateTime']]],
+  ['priority_5fsort_12974',['PRIORITY_SORT',['../classns3_1_1_sat_fwd_link_scheduler.html#ac0e248d838f763f8ad524913d98e6b43aa9613bb1c6da9e28880d7c827864b9dd',1,'ns3::SatFwdLinkScheduler']]],
+  ['propagating_12975',['PROPAGATING',['../classns3_1_1_point_to_point_isl_channel.html#a319e0b704404a06a3eb05888db6bed63ad190f7f7d562b9666d842e80ccfd0b10',1,'ns3::PointToPointIslChannel']]],
+  ['proprietary_12976',['PROPRIETARY',['../classns3_1_1_lorawan_mac_header.html#a352f1cb4e6947cac7457b05495aa3133ad6b55560c73ff12d5a2cd138a19d6702',1,'ns3::LorawanMacHeader']]],
+  ['protocol_5fboth_12977',['PROTOCOL_BOTH',['../classns3_1_1_simulation_helper_conf.html#a8dfd76192a85666bbb753730e97e899bacde584cebab57430a3ff64e8caa8d664',1,'ns3::SimulationHelperConf']]],
+  ['protocol_5ftcp_12978',['PROTOCOL_TCP',['../classns3_1_1_simulation_helper_conf.html#a8dfd76192a85666bbb753730e97e899ba223a0de59b7d930715936461748a140f',1,'ns3::SimulationHelperConf']]],
+  ['protocol_5fudp_12979',['PROTOCOL_UDP',['../classns3_1_1_simulation_helper_conf.html#a8dfd76192a85666bbb753730e97e899ba071dbe007f61ede495e0391d25420324',1,'ns3::SimulationHelperConf']]]
+];

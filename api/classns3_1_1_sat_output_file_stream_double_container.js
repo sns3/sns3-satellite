@@ -1,0 +1,37 @@
+var classns3_1_1_sat_output_file_stream_double_container =
+[
+    [ "FigureUnitConversion_t", "classns3_1_1_sat_output_file_stream_double_container.html#ade287e6410317bfff1a6d9527819c2c7", [
+      [ "RAW", "classns3_1_1_sat_output_file_stream_double_container.html#ade287e6410317bfff1a6d9527819c2c7a84d1bf86e4e584607ae1882aa1236696", null ],
+      [ "DECIBEL", "classns3_1_1_sat_output_file_stream_double_container.html#ade287e6410317bfff1a6d9527819c2c7a2d3910821d5bcaff87c0d4a580815147", null ],
+      [ "DECIBEL_AMPLITUDE", "classns3_1_1_sat_output_file_stream_double_container.html#ade287e6410317bfff1a6d9527819c2c7a7cad4ce740c2309bbe561b25fa3a3792", null ]
+    ] ],
+    [ "SatOutputFileStreamDoubleContainer", "classns3_1_1_sat_output_file_stream_double_container.html#a12caa68d0c020400e9ac2e9d7a5fa755", null ],
+    [ "SatOutputFileStreamDoubleContainer", "classns3_1_1_sat_output_file_stream_double_container.html#aa0091a090ee51fc2581e63d0bd021989", null ],
+    [ "~SatOutputFileStreamDoubleContainer", "classns3_1_1_sat_output_file_stream_double_container.html#aea0748e5964900ededb54d8b03045733", null ],
+    [ "AddToContainer", "classns3_1_1_sat_output_file_stream_double_container.html#ab5c44b34e9969af8523125aa6230307a", null ],
+    [ "ClearContainer", "classns3_1_1_sat_output_file_stream_double_container.html#a9bd564fdb898d79a523cd3cc00f11bcd", null ],
+    [ "ConvertValue", "classns3_1_1_sat_output_file_stream_double_container.html#a1b3538513b4c8c394fee260a0cef5eba", null ],
+    [ "DoDispose", "classns3_1_1_sat_output_file_stream_double_container.html#a7ea601e645d37f17eea2e24793e38828", null ],
+    [ "EnableFigureOutput", "classns3_1_1_sat_output_file_stream_double_container.html#ae130db28a10954de99353126a5572d90", null ],
+    [ "GetGnuplot", "classns3_1_1_sat_output_file_stream_double_container.html#ae7334e83d89529199b445bad6f87612d", null ],
+    [ "GetGnuplotDataset", "classns3_1_1_sat_output_file_stream_double_container.html#a6640550595cd067c41873dae601331c7", null ],
+    [ "GetTypeId", "classns3_1_1_sat_output_file_stream_double_container.html#af8621d2248c424d43acabc9f7896df0a", null ],
+    [ "OpenStream", "classns3_1_1_sat_output_file_stream_double_container.html#a2108ded9a168477560cf0c530f9d3c1d", null ],
+    [ "PrintFigure", "classns3_1_1_sat_output_file_stream_double_container.html#ab64c29cb7bdb37a77899735f7de439b1", null ],
+    [ "Reset", "classns3_1_1_sat_output_file_stream_double_container.html#a2ace87f31716efb0606227019dbf87ee", null ],
+    [ "ResetStream", "classns3_1_1_sat_output_file_stream_double_container.html#ac51efe18a648161b14d60583ce9c20e8", null ],
+    [ "WriteContainerToFile", "classns3_1_1_sat_output_file_stream_double_container.html#aed41d06e217aed6535578d1b7ad02c92", null ],
+    [ "m_container", "classns3_1_1_sat_output_file_stream_double_container.html#a2420e89a26b7250d4be324ec207eea31", null ],
+    [ "m_figureUnitConversionType", "classns3_1_1_sat_output_file_stream_double_container.html#aa8ccde714848a89ba73411e0ca5a7e70", null ],
+    [ "m_fileMode", "classns3_1_1_sat_output_file_stream_double_container.html#aaf28999555ee4b602e91343b7af0507f", null ],
+    [ "m_fileName", "classns3_1_1_sat_output_file_stream_double_container.html#ad0c36b915a27379c4b72da5bc8bb9560", null ],
+    [ "m_keyPosition", "classns3_1_1_sat_output_file_stream_double_container.html#a984e14947560b344ae53b44063096ec8", null ],
+    [ "m_legendX", "classns3_1_1_sat_output_file_stream_double_container.html#ad08f6c1bfc4ab133bd1ce514b4fa0e4e", null ],
+    [ "m_legendY", "classns3_1_1_sat_output_file_stream_double_container.html#acdf363b792d1a708ecfeb8c752b2a3b1", null ],
+    [ "m_outputFileStream", "classns3_1_1_sat_output_file_stream_double_container.html#aca26bca0fd6766d332ec44e1cbe26da1", null ],
+    [ "m_outputFileStreamWrapper", "classns3_1_1_sat_output_file_stream_double_container.html#a3812faf7701e98d73015432568a701f5", null ],
+    [ "m_printFigure", "classns3_1_1_sat_output_file_stream_double_container.html#a59a05e56bb4ffe2a581f229c2d95ad95", null ],
+    [ "m_style", "classns3_1_1_sat_output_file_stream_double_container.html#aa42cf1da2ed3d73da9775acdda8e4c18", null ],
+    [ "m_title", "classns3_1_1_sat_output_file_stream_double_container.html#a04aca62cd40cc90b608588366d08bbd5", null ],
+    [ "m_valuesInRow", "classns3_1_1_sat_output_file_stream_double_container.html#a879a579a034f01f71a4fd0bdadfae113", null ]
+];

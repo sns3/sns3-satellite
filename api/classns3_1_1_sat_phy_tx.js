@@ -1,0 +1,45 @@
+var classns3_1_1_sat_phy_tx =
+[
+    [ "SatPhyTxMode_t", "classns3_1_1_sat_phy_tx.html#a00a5c22ca636e2d092687b2fc187c8a8", [
+      [ "NORMAL", "classns3_1_1_sat_phy_tx.html#a00a5c22ca636e2d092687b2fc187c8a8ab7c913f07f63429204295dee7ead1309", null ],
+      [ "TRANSPARENT", "classns3_1_1_sat_phy_tx.html#a00a5c22ca636e2d092687b2fc187c8a8a96386bc0dc80ac93af9f9c3c048c4171", null ]
+    ] ],
+    [ "State", "classns3_1_1_sat_phy_tx.html#aafcfcaeda4477481bfd2ded49e9b2983", [
+      [ "IDLE", "classns3_1_1_sat_phy_tx.html#aafcfcaeda4477481bfd2ded49e9b2983abf5c1416e347b19a3a8bc58ff858b4d5", null ],
+      [ "TX", "classns3_1_1_sat_phy_tx.html#aafcfcaeda4477481bfd2ded49e9b2983a62ce1feb3c751c6e57432d6bf663709f", null ],
+      [ "RECONFIGURING", "classns3_1_1_sat_phy_tx.html#aafcfcaeda4477481bfd2ded49e9b2983ae870dac60b2566e1ae686559bb92de04", null ]
+    ] ],
+    [ "SatPhyTx", "classns3_1_1_sat_phy_tx.html#ac061399a36afb65051982d3e580030f1", null ],
+    [ "~SatPhyTx", "classns3_1_1_sat_phy_tx.html#adab0fb381bf5b548b0536cf23b4b87f9", null ],
+    [ "CanTransmit", "classns3_1_1_sat_phy_tx.html#a41c91a46c6ba187bd77ad5198bc29e76", null ],
+    [ "ChangeState", "classns3_1_1_sat_phy_tx.html#a91a94b79419d589483cab4b256e0accc", null ],
+    [ "ClearChannel", "classns3_1_1_sat_phy_tx.html#a1e2385ebd7821d39af96fb4b1c8b2be9", null ],
+    [ "DoDispose", "classns3_1_1_sat_phy_tx.html#ae17ad68fdb7ff8544df4e32a97f3525c", null ],
+    [ "EndTx", "classns3_1_1_sat_phy_tx.html#a8af7b7e86ba24a7d2847568542925799", null ],
+    [ "GetAntennaGain", "classns3_1_1_sat_phy_tx.html#ad2571c819fee9f558b5fcfa2098499de", null ],
+    [ "GetChannel", "classns3_1_1_sat_phy_tx.html#ad15858c3168b2e9ea02eb6ffc78229d8", null ],
+    [ "GetFadingValue", "classns3_1_1_sat_phy_tx.html#a55b48a501d093fa81f8453232521911a", null ],
+    [ "GetMobility", "classns3_1_1_sat_phy_tx.html#a5aac0ab4915ecb1b93b3ab18698909ac", null ],
+    [ "GetTypeId", "classns3_1_1_sat_phy_tx.html#af97db0fb7f284f88a9001452e07ddbfa", null ],
+    [ "IsTransmitting", "classns3_1_1_sat_phy_tx.html#a6862e3feacf070f00dac5612e706fe66", null ],
+    [ "SetAntennaGainPattern", "classns3_1_1_sat_phy_tx.html#a603a26b79ce2f5d8d2f2d0010daac3e1", null ],
+    [ "SetBeamId", "classns3_1_1_sat_phy_tx.html#a8c1d6d0b9c68b87463c7375a417ca359", null ],
+    [ "SetChannel", "classns3_1_1_sat_phy_tx.html#a42061e1eccd62b219ce7799099a3fe5a", null ],
+    [ "SetDefaultFadingValue", "classns3_1_1_sat_phy_tx.html#a073bc8dafb5b8cce5e85fc41d861d3c3", null ],
+    [ "SetFadingContainer", "classns3_1_1_sat_phy_tx.html#af248be10276a24d75470c0e276518907", null ],
+    [ "SetMaxAntennaGain_Db", "classns3_1_1_sat_phy_tx.html#ae2e47ac46ce491ace851a331a2f6ea04", null ],
+    [ "SetMobility", "classns3_1_1_sat_phy_tx.html#a9b6d59d8014ea3949eaad98408512ed6", null ],
+    [ "SetSatId", "classns3_1_1_sat_phy_tx.html#a224c9b5d4c33ab537af71673ba873ac0", null ],
+    [ "StartTx", "classns3_1_1_sat_phy_tx.html#a98053cbf1267cf20a474aac64c76c7ed", null ],
+    [ "m_antennaGainPattern", "classns3_1_1_sat_phy_tx.html#a41c9d90284d355a6a05e8d292b66ef73", null ],
+    [ "m_beamId", "classns3_1_1_sat_phy_tx.html#aeb8a797f536ed4db02cb270d714f9320", null ],
+    [ "m_channel", "classns3_1_1_sat_phy_tx.html#ad7bc20af6d9a545ce3295736ce8ab99b", null ],
+    [ "m_defaultFadingValue", "classns3_1_1_sat_phy_tx.html#a8fafc52f44e9ba80e3f5dce918b560da", null ],
+    [ "m_fadingContainer", "classns3_1_1_sat_phy_tx.html#ac80322298a09a4415d8bd4b9100d34f9", null ],
+    [ "m_maxAntennaGain", "classns3_1_1_sat_phy_tx.html#a52598da3d24628e4c2a541ed63c20822", null ],
+    [ "m_mobility", "classns3_1_1_sat_phy_tx.html#a55ec6aac3328423f8a80d91b160d230a", null ],
+    [ "m_satId", "classns3_1_1_sat_phy_tx.html#af628057d419ef9dc0a828ac96e38ea06", null ],
+    [ "m_satMobility", "classns3_1_1_sat_phy_tx.html#abf1f36c1a237a2456194b78676d8475f", null ],
+    [ "m_state", "classns3_1_1_sat_phy_tx.html#ab77617b04a4e31f8779c8f710f1baee5", null ],
+    [ "m_txMode", "classns3_1_1_sat_phy_tx.html#a5f789eef14510b17c7e71d2cbe32d909", null ]
+];

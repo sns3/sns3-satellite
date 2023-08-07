@@ -1,0 +1,24 @@
+var searchData=
+[
+  ['ncr_5frecovery_12920',['NCR_RECOVERY',['../classns3_1_1_sat_ut_mac_state.html#a9df5f2e0f71fa8f65691f022e288aa23a0d872ea2b54eabc0b5026321d7a21502',1,'ns3::SatUtMacState']]],
+  ['network_5ftype_5fcsma_12921',['NETWORK_TYPE_CSMA',['../classns3_1_1_sat_user_helper.html#ab6c6217fb51a15aa5f3cc46a6d3c3cc5a6c0831ca8e5e6eb229b0b514e3381f78',1,'ns3::SatUserHelper']]],
+  ['network_5ftype_5fsat_5fsimple_12922',['NETWORK_TYPE_SAT_SIMPLE',['../classns3_1_1_sat_user_helper.html#ab6c6217fb51a15aa5f3cc46a6d3c3cc5a1a611c0d2afa6f25095fbb3345a0defa',1,'ns3::SatUserHelper']]],
+  ['new_5fchannel_5fans_12923',['NEW_CHANNEL_ANS',['../namespacens3.html#a8556243d7a14ff77a899590e9066c393a86a560e7699551945382da55f53c0bc5',1,'ns3']]],
+  ['new_5fchannel_5freq_12924',['NEW_CHANNEL_REQ',['../namespacens3.html#a8556243d7a14ff77a899590e9066c393a74e4916f32031767cc82a8963d161719',1,'ns3']]],
+  ['no_5fhandover_12925',['NO_HANDOVER',['../classns3_1_1_sat_ut_mac.html#a49507ace7b3e7ea3498914c30614b534a4aa82d93d10acb1f5bc1c110e430759f',1,'ns3::SatUtMac']]],
+  ['no_5fsort_12926',['NO_SORT',['../classns3_1_1_sat_fwd_link_scheduler.html#ac0e248d838f763f8ad524913d98e6b43a6beab7c3c17132cfcad9fa66563dbc13',1,'ns3::SatFwdLinkScheduler']]],
+  ['no_5ftime_5fslicing_12927',['NO_TIME_SLICING',['../classns3_1_1_sat_enums.html#ab6cd4ba53f08f20d92457160ab34842ca14aebe5e7a8b752a476cb43e0f354313',1,'ns3::SatEnums']]],
+  ['none_12928',['NONE',['../classns3_1_1_sat_helper.html#a91bdbc19a43a4491ab85741d68e7c1e8a2c76c7adbd12c42b5f66826386542b71',1,'ns3::SatHelper']]],
+  ['normal_12929',['NORMAL',['../classns3_1_1_sat_phy_rx_carrier_conf.html#a2328e2806991dbfff0a97f46f289488ba3fc3f6a0af19444a10443de048df2415',1,'ns3::SatPhyRxCarrierConf::NORMAL()'],['../classns3_1_1_sat_phy_tx.html#a00a5c22ca636e2d092687b2fc187c8a8ab7c913f07f63429204295dee7ead1309',1,'ns3::SatPhyTx::NORMAL()']]],
+  ['normal_5fframe_12930',['NORMAL_FRAME',['../classns3_1_1_sat_enums.html#a0bce27377a9776d2ea99435b3ad6d37da84d2a552ecd1163c964e7cf9c41dab86',1,'ns3::SatEnums']]],
+  ['normal_5fframes_12931',['NORMAL_FRAMES',['../classns3_1_1_sat_enums.html#aca5964d420f94517b7c51caf73774145aa692be8012e90b31b35544e1452e78aa',1,'ns3::SatEnums']]],
+  ['nrtv_12932',['NRTV',['../classns3_1_1_sat_traffic_helper.html#a9f1f9fc294f01a81436278c116b79579a0bf2392b04ee480f99b092a79fa2844d',1,'ns3::SatTrafficHelper::NRTV()'],['../classns3_1_1_simulation_helper.html#a2e7e7e80ffd116eaf0e5eaf9307ca2eaaafb054e420127ea799879c0df4698bbb',1,'ns3::SimulationHelper::NRTV()']]],
+  ['nt_5fgw_12933',['NT_GW',['../classns3_1_1_sat_enums.html#a39b8df7744905e73b3653086dc3edae2a10d4e5a589557c31774321b7e5acbffc',1,'ns3::SatEnums']]],
+  ['nt_5fncc_12934',['NT_NCC',['../classns3_1_1_sat_enums.html#a39b8df7744905e73b3653086dc3edae2a4f0e12dfb945ac01df8cd53f0a95daa8',1,'ns3::SatEnums']]],
+  ['nt_5fsat_12935',['NT_SAT',['../classns3_1_1_sat_enums.html#a39b8df7744905e73b3653086dc3edae2a2bb746b9833539c84fd67258b010cf14',1,'ns3::SatEnums']]],
+  ['nt_5fter_12936',['NT_TER',['../classns3_1_1_sat_enums.html#a39b8df7744905e73b3653086dc3edae2a58a66181b945ac3cb8e1b34d166d8691',1,'ns3::SatEnums']]],
+  ['nt_5fundefined_12937',['NT_UNDEFINED',['../classns3_1_1_sat_enums.html#a39b8df7744905e73b3653086dc3edae2a9a418a6df0980587ce1ec74f4479517a',1,'ns3::SatEnums']]],
+  ['nt_5fut_12938',['NT_UT',['../classns3_1_1_sat_enums.html#a39b8df7744905e73b3653086dc3edae2a848824ac8053cfe87509503708605f63',1,'ns3::SatEnums']]],
+  ['num_5ffids_12939',['NUM_FIDS',['../classns3_1_1_sat_enums.html#a874725c1636681dfa6541b143337b600ab7e4bc64d261d9bb3bdcecbd3aa84296',1,'ns3::SatEnums']]],
+  ['number_12940',['NUMBER',['../sat-group-example_8cc.html#a68039eab022734b15b8028fe2e1a625aa12a90dfe20486bbe3e075afcd19ef2d0',1,'sat-group-example.cc']]]
+];

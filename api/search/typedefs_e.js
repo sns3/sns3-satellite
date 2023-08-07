@@ -1,0 +1,24 @@
+var searchData=
+[
+  ['rachannelinfo_5ft_12623',['RaChannelInfo_t',['../classns3_1_1_sat_superframe_conf.html#ac18b656e4eb4c66d4575e70eaecc3268',1,'ns3::SatSuperframeConf']]],
+  ['rachannelinfocontainer_5ft_12624',['RaChannelInfoContainer_t',['../classns3_1_1_sat_tbtp_message.html#ae03c4b30b0c88053907cc22c79703296',1,'ns3::SatTbtpMessage']]],
+  ['rachannelmap_5ft_12625',['RaChannelMap_t',['../classns3_1_1_sat_tbtp_message.html#a0b50507a71d01acc9c93fd4158495a5d',1,'ns3::SatTbtpMessage']]],
+  ['rbdctracecallback_12626',['RbdcTraceCallback',['../classns3_1_1_sat_request_manager.html#ad31b13af307a2a1df28588d8f3ddfbfd',1,'ns3::SatRequestManager']]],
+  ['rcalloccontainer_5ft_12627',['RcAllocContainer_t',['../classns3_1_1_sat_frame_allocator.html#a04f3a7a7f674acd14b8cd7abb1440d11',1,'ns3::SatFrameAllocator']]],
+  ['rcallocitem_5ft_12628',['RcAllocItem_t',['../classns3_1_1_sat_frame_allocator.html#acfb5cd5ff01eabbfe897abee374d2d42',1,'ns3::SatFrameAllocator']]],
+  ['readctrlmsgcallback_12629',['ReadCtrlMsgCallback',['../classns3_1_1_sat_llc.html#a1d45e4e931d7ce35810250c2c73e0689',1,'ns3::SatLlc::ReadCtrlMsgCallback()'],['../classns3_1_1_sat_mac.html#acd5bba88131851e925b0c7b77385c46f',1,'ns3::SatMac::ReadCtrlMsgCallback()']]],
+  ['receivecallback_12630',['ReceiveCallback',['../classns3_1_1_sat_phy.html#aa387fc6084b60470341e0796e855ade6',1,'ns3::SatPhy::ReceiveCallback()'],['../classns3_1_1_sat_phy_rx.html#ab1eef0df3d9f2f84092d0653d43d70a6',1,'ns3::SatPhyRx::ReceiveCallback()'],['../classns3_1_1_sat_mac.html#aa836b1ad13b60c22440dfd2b9fcfb6fd',1,'ns3::SatMac::ReceiveCallback()'],['../classns3_1_1_sat_lorawan_net_device.html#ad50781b94ef035ecc43f19696e7a628e',1,'ns3::SatLorawanNetDevice::ReceiveCallback()'],['../classns3_1_1_sat_llc.html#abaf5d1bca6dd020ef82b56e9a0a82595',1,'ns3::SatLlc::ReceiveCallback()'],['../classns3_1_1_sat_base_encapsulator.html#ae34684a26cb9451c156b934ec411fb25',1,'ns3::SatBaseEncapsulator::ReceiveCallback()']]],
+  ['receivedpacketlist_12631',['ReceivedPacketList',['../classns3_1_1_lora_end_device_status.html#a6cf95da51b9c59bdfdefcbc463c0214c',1,'ns3::LoraEndDeviceStatus']]],
+  ['receivenetdevicecallback_12632',['ReceiveNetDeviceCallback',['../classns3_1_1_sat_geo_mac.html#aa52dc97816a6820d083f902c34a58b05',1,'ns3::SatGeoMac']]],
+  ['receivesatellitecallback_12633',['ReceiveSatelliteCallback',['../classns3_1_1_sat_geo_llc.html#aa087f3a1b138595625a782e44dd27e96',1,'ns3::SatGeoLlc']]],
+  ['removeutcallback_12634',['RemoveUtCallback',['../classns3_1_1_sat_gw_mac.html#a25f12c0f874813b3605a0335165fa771',1,'ns3::SatGwMac']]],
+  ['replydataratematrix_12635',['ReplyDataRateMatrix',['../classns3_1_1_lorawan_mac.html#afb309b39715e7976983da35e8092b9b1',1,'ns3::LorawanMac']]],
+  ['reqinfo_5ft_12636',['ReqInfo_t',['../class_sat_frame_allocator_test_case.html#a7af4e9d9fa2b749b6049268bfebc9060',1,'SatFrameAllocatorTestCase']]],
+  ['requestcontainer_5ft_12637',['RequestContainer_t',['../classns3_1_1_sat_cr_message.html#a4155b2c0d9bda6f3aee173c14a69f067',1,'ns3::SatCrMessage']]],
+  ['requestdescriptor_5ft_12638',['RequestDescriptor_t',['../classns3_1_1_sat_cr_message.html#ac8268c510e83562b77a204eac10b2ce2',1,'ns3::SatCrMessage']]],
+  ['reservectrlmsgcallback_12639',['ReserveCtrlMsgCallback',['../classns3_1_1_sat_mac.html#a4b6fd98e82a4cff08e904d97d598c5b7',1,'ns3::SatMac']]],
+  ['reservedctrlmsgmap_5ft_12640',['ReservedCtrlMsgMap_t',['../classns3_1_1_sat_control_msg_container.html#a35e1bc8b59a7fda0cdceeff93833356d',1,'ns3::SatControlMsgContainer']]],
+  ['routingupdatecallback_12641',['RoutingUpdateCallback',['../classns3_1_1_sat_mac.html#a9fc6eaa003c7fc843930bb72fabfaaf6',1,'ns3::SatMac']]],
+  ['rxpowertracecallback_12642',['RxPowerTraceCallback',['../classns3_1_1_sat_phy_rx_carrier.html#a7298654db09011d1d2c4b89f22255ae6',1,'ns3::SatPhyRxCarrier']]],
+  ['rxstatuscallback_12643',['RxStatusCallback',['../classns3_1_1_sat_phy_rx_carrier_packet_probe.html#aaaf844862a9d8742e352de543093dde0',1,'ns3::SatPhyRxCarrierPacketProbe']]]
+];

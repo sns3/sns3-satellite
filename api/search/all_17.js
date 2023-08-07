@@ -1,0 +1,21 @@
+var searchData=
+[
+  ['waiting_5ffor_5ftbtp_5950',['WAITING_FOR_TBTP',['../classns3_1_1_sat_ut_mac.html#a49507ace7b3e7ea3498914c30614b534a88558ed82ab48cc99fdfd960a7bf60ff',1,'ns3::SatUtMac']]],
+  ['waitingack_5951',['waitingAck',['../structns3_1_1_lorawan_mac_end_device_1_1_lora_retx_parameters.html#a188259932933bfe5bde29095763ad928',1,'ns3::LorawanMacEndDevice::LoraRetxParameters']]],
+  ['waveformid_5952',['waveformId',['../structns3_1_1_sat_signal_parameters_1_1tx_info__s.html#af494b415a071e7889d69e1c298421737',1,'ns3::SatSignalParameters::txInfo_s']]],
+  ['waveformmap_5ft_5953',['waveformMap_t',['../classns3_1_1_sat_bb_frame_conf.html#aa31964948778a92c9ffcfd7eea9643e8',1,'ns3::SatBbFrameConf']]],
+  ['waveformtracecallback_5954',['WaveformTraceCallback',['../classns3_1_1_sat_beam_scheduler.html#adb59dcfbee2c2bb6eeef6177ddc5f6e6',1,'ns3::SatBeamScheduler']]],
+  ['waveformusagecallback_5955',['WaveformUsageCallback',['../classns3_1_1_sat_stats_waveform_usage_helper.html#aa73e2611bc14f81d5a91c902a6f3f43c',1,'ns3::SatStatsWaveformUsageHelper']]],
+  ['wgeosys_5956',['WGeoSys',['../classns3_1_1_sat_s_g_p4_mobility_model.html#a22ced08bc528769005d124d944f56953',1,'ns3::SatSGP4MobilityModel']]],
+  ['wgs72_5957',['wgs72',['../satellite-sgp4unit_8h.html#a8b910c09824c4a9d8365e717c31dda5ea5140ee8557e0d26533b36716ceb80aa1',1,'satellite-sgp4unit.h']]],
+  ['wgs72old_5958',['wgs72old',['../satellite-sgp4unit_8h.html#a8b910c09824c4a9d8365e717c31dda5eae8b6ff8a0f50c5ba7f8096476f05568a',1,'satellite-sgp4unit.h']]],
+  ['wgs84_5959',['wgs84',['../satellite-sgp4unit_8h.html#a8b910c09824c4a9d8365e717c31dda5eafa5bcd83f474e0eeb8224057e4e8837d',1,'satellite-sgp4unit.h']]],
+  ['wgs84_5960',['WGS84',['../classns3_1_1_geo_coordinate.html#aec64775277e7535a7842b4b99a4a5fdba881b3cf52a73f42571adfdf9a41ab3ee',1,'ns3::GeoCoordinate']]],
+  ['windowloadcallback_5961',['WindowLoadCallback',['../classns3_1_1_sat_stats_window_load_helper.html#a1d8e1bf880bac61a2015ba673d387685',1,'ns3::SatStatsWindowLoadHelper']]],
+  ['windowloadtracecallback_5962',['WindowLoadTraceCallback',['../classns3_1_1_sat_phy_rx_carrier_per_window.html#aff593d2a2006e952528ad55258c5444b',1,'ns3::SatPhyRxCarrierPerWindow']]],
+  ['wirestate_5963',['WireState',['../classns3_1_1_point_to_point_isl_channel.html#a319e0b704404a06a3eb05888db6bed63',1,'ns3::PointToPointIslChannel']]],
+  ['writecontainertofile_5964',['WriteContainerToFile',['../classns3_1_1_sat_output_file_stream_double_container.html#aed41d06e217aed6535578d1b7ad02c92',1,'ns3::SatOutputFileStreamDoubleContainer::WriteContainerToFile()'],['../classns3_1_1_sat_output_file_stream_long_double_container.html#a521954d575a7406592492ec6593810e8',1,'ns3::SatOutputFileStreamLongDoubleContainer::WriteContainerToFile()'],['../classns3_1_1_sat_output_file_stream_string_container.html#a71e40d6732e346521970ab3cc9e285b8',1,'ns3::SatOutputFileStreamStringContainer::WriteContainerToFile()']]],
+  ['writetofile_5965',['WriteToFile',['../classns3_1_1_sat_composite_sinr_output_trace_container.html#a182cbdab2fdd5b230beeec199e9492f9',1,'ns3::SatCompositeSinrOutputTraceContainer::WriteToFile()'],['../classns3_1_1_sat_fading_output_trace_container.html#ae5734854999cdd57a112e979e501ab0e',1,'ns3::SatFadingOutputTraceContainer::WriteToFile()'],['../classns3_1_1_sat_interference_output_trace_container.html#ae2c8cbd796f99684cf7bcb02cf1657c9',1,'ns3::SatInterferenceOutputTraceContainer::WriteToFile()'],['../classns3_1_1_sat_log.html#a44083386e64c8234b6a959179df94bae',1,'ns3::SatLog::WriteToFile()'],['../classns3_1_1_sat_rx_power_output_trace_container.html#a9f27c8c87d3c65516fe7705f897a96c7',1,'ns3::SatRxPowerOutputTraceContainer::WriteToFile()']]],
+  ['wtodbm_5966',['WToDbm',['../classns3_1_1_sat_utils.html#a23191d8d0e2384fa25876b3323ed2aef',1,'ns3::SatUtils']]],
+  ['wtodbw_5967',['WToDbW',['../classns3_1_1_sat_utils.html#a7df13f1443fbd4d01ec753026666d935',1,'ns3::SatUtils']]]
+];

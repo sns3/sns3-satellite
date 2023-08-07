@@ -1,0 +1,23 @@
+var searchData=
+[
+  ['da_5favbdc_12818',['DA_AVBDC',['../classns3_1_1_sat_enums.html#a54d6ab8cb85e49b206bca10aa3acb5a4af74b8b4388ca0aabd0f6d87324f3d8b6',1,'ns3::SatEnums']]],
+  ['da_5frbdc_12819',['DA_RBDC',['../classns3_1_1_sat_enums.html#a54d6ab8cb85e49b206bca10aa3acb5a4a28c6110c57197c98b6efbe06a3f10251',1,'ns3::SatEnums']]],
+  ['da_5funknown_12820',['DA_UNKNOWN',['../classns3_1_1_sat_enums.html#a54d6ab8cb85e49b206bca10aa3acb5a4aa3478ec89da6de09270e89c7ecff3ce1',1,'ns3::SatEnums']]],
+  ['da_5fvbdc_12821',['DA_VBDC',['../classns3_1_1_sat_enums.html#a54d6ab8cb85e49b206bca10aa3acb5a4aa6d023102148aab4e0a7d608a3850953',1,'ns3::SatEnums']]],
+  ['decibel_12822',['DECIBEL',['../classns3_1_1_sat_output_file_stream_double_container.html#ade287e6410317bfff1a6d9527819c2c7a2d3910821d5bcaff87c0d4a580815147',1,'ns3::SatOutputFileStreamDoubleContainer::DECIBEL()'],['../classns3_1_1_sat_output_file_stream_long_double_container.html#a5c60251e432084846e7223293748c6a5a383152800f07565905dceb5def694790',1,'ns3::SatOutputFileStreamLongDoubleContainer::DECIBEL()']]],
+  ['decibel_5famplitude_12823',['DECIBEL_AMPLITUDE',['../classns3_1_1_sat_output_file_stream_double_container.html#ade287e6410317bfff1a6d9527819c2c7a7cad4ce740c2309bbe561b25fa3a3792',1,'ns3::SatOutputFileStreamDoubleContainer::DECIBEL_AMPLITUDE()'],['../classns3_1_1_sat_output_file_stream_long_double_container.html#a5c60251e432084846e7223293748c6a5a9cf34536ca9c94a2d2b13f5c0855acde',1,'ns3::SatOutputFileStreamLongDoubleContainer::DECIBEL_AMPLITUDE()']]],
+  ['dedicated_5faccess_12824',['DEDICATED_ACCESS',['../classns3_1_1_sat_phy_rx_carrier.html#a46d023e41d9c633727cb023814532196a7ce9a7340567b239ffd7fde947ec552b',1,'ns3::SatPhyRxCarrier']]],
+  ['default_5fsuperframe_5fallocator_12825',['DEFAULT_SUPERFRAME_ALLOCATOR',['../classns3_1_1_sat_enums.html#aa0b4cfa9f48638b54f379dfa70e26081ae590887d5ce2de9074dc0c4c357f7b2c',1,'ns3::SatEnums']]],
+  ['dev_5fstatus_5fans_12826',['DEV_STATUS_ANS',['../namespacens3.html#a8556243d7a14ff77a899590e9066c393a66be15668de1bce15ff3c6d7cdaa7020',1,'ns3']]],
+  ['dev_5fstatus_5freq_12827',['DEV_STATUS_REQ',['../namespacens3.html#a8556243d7a14ff77a899590e9066c393a4d9fd87e5b5d6926a2f31a7861f227ca',1,'ns3']]],
+  ['dl_5fchannel_5fans_12828',['DL_CHANNEL_ANS',['../namespacens3.html#a8556243d7a14ff77a899590e9066c393adeb22f725c41f6521fbe1faa9a84f25e',1,'ns3']]],
+  ['dl_5fchannel_5freq_12829',['DL_CHANNEL_REQ',['../namespacens3.html#a8556243d7a14ff77a899590e9066c393a462ac4bde4a5c862fcba194e5cacf5d2',1,'ns3']]],
+  ['dummy_5fframe_12830',['DUMMY_FRAME',['../classns3_1_1_sat_enums.html#a0bce27377a9776d2ea99435b3ad6d37dac5137caf2d37ecf971afdea17d905ea3',1,'ns3::SatEnums']]],
+  ['duty_5fcycle_5fans_12831',['DUTY_CYCLE_ANS',['../namespacens3.html#a8556243d7a14ff77a899590e9066c393a7c3c938d6575a7e69d1da99fbb0304a0',1,'ns3']]],
+  ['duty_5fcycle_5freq_12832',['DUTY_CYCLE_REQ',['../namespacens3.html#a8556243d7a14ff77a899590e9066c393a5f83cdfab1ec252c953aa87c7644e4fe',1,'ns3']]],
+  ['dvb_12833',['DVB',['../classns3_1_1_sat_enums.html#ace3349bd9dd206288ca13a248462f6eea6389257b07138caeb46feb8cba1d4cbb',1,'ns3::SatEnums']]],
+  ['dvb_5fgw_12834',['DVB_GW',['../classns3_1_1_sat_enums.html#a1fea8513b60960e6a373619dbab712c7aeed88637e51d63cf699473f684c4ad4b',1,'ns3::SatEnums']]],
+  ['dvb_5fs2_12835',['DVB_S2',['../classns3_1_1_sat_enums.html#aeadbe29dbe762629cbffec726cfa2aa7a0bf5792389dcb4ba7629fe88b076e8b8',1,'ns3::SatEnums']]],
+  ['dvb_5fs2x_12836',['DVB_S2X',['../classns3_1_1_sat_enums.html#aeadbe29dbe762629cbffec726cfa2aa7a93ed2ab1a10c5680e4d874e68636ee70',1,'ns3::SatEnums']]],
+  ['dvb_5fut_12837',['DVB_UT',['../classns3_1_1_sat_enums.html#a1fea8513b60960e6a373619dbab712c7a4078fee98d65939fa250964141898858',1,'ns3::SatEnums']]]
+];

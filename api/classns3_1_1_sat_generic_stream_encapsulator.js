@@ -1,0 +1,25 @@
+var classns3_1_1_sat_generic_stream_encapsulator =
+[
+    [ "SatGenericStreamEncapsulator", "classns3_1_1_sat_generic_stream_encapsulator.html#a4824b4a663fbf8b0009eeae923a458d3", null ],
+    [ "SatGenericStreamEncapsulator", "classns3_1_1_sat_generic_stream_encapsulator.html#a52d0208e3f2781d55a3ebf2482046df5", null ],
+    [ "~SatGenericStreamEncapsulator", "classns3_1_1_sat_generic_stream_encapsulator.html#a88a2fd0d8db910b5d5a13e345f4eb505", null ],
+    [ "DoDispose", "classns3_1_1_sat_generic_stream_encapsulator.html#a0cebc29b2b3929c55695740a770524d5", null ],
+    [ "EnquePdu", "classns3_1_1_sat_generic_stream_encapsulator.html#a38fbb1c8862f17d6fc44f668915dd5a5", null ],
+    [ "GetMinTxOpportunityInBytes", "classns3_1_1_sat_generic_stream_encapsulator.html#af435b75bfcfbd0ecb537620f5c460be7", null ],
+    [ "GetNewGsePdu", "classns3_1_1_sat_generic_stream_encapsulator.html#a713fa27fcc7e2874b9db73966146cd28", null ],
+    [ "GetTypeId", "classns3_1_1_sat_generic_stream_encapsulator.html#ab75ff43c4461202b3145955386712232", null ],
+    [ "IncreaseFragmentId", "classns3_1_1_sat_generic_stream_encapsulator.html#ad58198ddf4082f13e5a96486a7dd9840", null ],
+    [ "NotifyTxOpportunity", "classns3_1_1_sat_generic_stream_encapsulator.html#a9c6d8484299e32bcef21e3a01c613af5", null ],
+    [ "ProcessPdu", "classns3_1_1_sat_generic_stream_encapsulator.html#ace514b3ee101ff8fdacc01783a993540", null ],
+    [ "ReceivePdu", "classns3_1_1_sat_generic_stream_encapsulator.html#abab29e5c9b8acd6ddb111a0cdff58ee6", null ],
+    [ "Reset", "classns3_1_1_sat_generic_stream_encapsulator.html#a40b400a00f8bc691981b7b322a052ece", null ],
+    [ "m_currRxFragmentId", "classns3_1_1_sat_generic_stream_encapsulator.html#a70006880ed34ff3cc6069b3d19cb89ff", null ],
+    [ "m_currRxPacketFragment", "classns3_1_1_sat_generic_stream_encapsulator.html#ad3531fc5a644606625d8ec3b9538eeb2", null ],
+    [ "m_currRxPacketFragmentBytes", "classns3_1_1_sat_generic_stream_encapsulator.html#a0cd1f460f8a3211d59d9e80efbdebc69", null ],
+    [ "m_currRxPacketSize", "classns3_1_1_sat_generic_stream_encapsulator.html#a853c7bd440f328a3ded4258c74b78e05", null ],
+    [ "m_maxGsePduSize", "classns3_1_1_sat_generic_stream_encapsulator.html#ac81871ee9d2705111220144a163d4c4b", null ],
+    [ "m_minGseTxOpportunity", "classns3_1_1_sat_generic_stream_encapsulator.html#ad797cfedb43599c1eaf82a733659e9e3", null ],
+    [ "m_txFragmentId", "classns3_1_1_sat_generic_stream_encapsulator.html#a001ee0ccf89f04811d670f37f989d25c", null ],
+    [ "MAX_FRAGMENT_ID", "classns3_1_1_sat_generic_stream_encapsulator.html#a0aa1427bc02dca5a81b5f9ea6d66a80c", null ],
+    [ "MAX_HL_PACKET_SIZE", "classns3_1_1_sat_generic_stream_encapsulator.html#a521748b46e5d18935158473e9bdd9db1", null ]
+];

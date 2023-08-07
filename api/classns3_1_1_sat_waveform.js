@@ -1,0 +1,25 @@
+var classns3_1_1_sat_waveform =
+[
+    [ "SatWaveform", "classns3_1_1_sat_waveform.html#a11e7813a14e8bc9c5164b4c29b868410", null ],
+    [ "SatWaveform", "classns3_1_1_sat_waveform.html#a5b57dedc2d0896c9c7dc75a37ada06cc", null ],
+    [ "Dump", "classns3_1_1_sat_waveform.html#aa15b0aaddc1117bac9fe0b0b30d211bf", null ],
+    [ "GetBurstDuration", "classns3_1_1_sat_waveform.html#a69807f30e7607941f04b4ef02ff7f001", null ],
+    [ "GetBurstLengthInSymbols", "classns3_1_1_sat_waveform.html#a57e8d73f06b5c4010cd47c652626ab08", null ],
+    [ "GetCNoThreshold", "classns3_1_1_sat_waveform.html#a4231aa3c16f54cebc78dd20ba8ffe436", null ],
+    [ "GetModCod", "classns3_1_1_sat_waveform.html#a62cdd5b4c5a8a97d6e5e589f5ae1f681", null ],
+    [ "GetPayloadInBytes", "classns3_1_1_sat_waveform.html#a7f94577869dd10379b490303af13b0fa", null ],
+    [ "GetPreambleDuration", "classns3_1_1_sat_waveform.html#a69b94b09e9c0c947be43b37ac6a94eb0", null ],
+    [ "GetPreambleLengthInSymbols", "classns3_1_1_sat_waveform.html#a70098b4942ff11c7bcacc48d13552256", null ],
+    [ "GetSpectralEfficiency", "classns3_1_1_sat_waveform.html#a69e29bce23cf30b8b86ad998bf5af5ce", null ],
+    [ "GetThroughputInBitsPerSecond", "classns3_1_1_sat_waveform.html#a82148c4b9cceb2998b5733e4c234ea5e", null ],
+    [ "GetWaveformId", "classns3_1_1_sat_waveform.html#a3fbff227ce1fe6075eb82c35b5a4b560", null ],
+    [ "SetEbNoRequirement", "classns3_1_1_sat_waveform.html#a0f4327747c086ef7040a7d363df60518", null ],
+    [ "m_codingRate", "classns3_1_1_sat_waveform.html#a36d811a00e2c6505a222af627088d64e", null ],
+    [ "m_ebnoRequirement", "classns3_1_1_sat_waveform.html#a38f84574f35fac4779f8966098e500a8", null ],
+    [ "m_lengthInSymbols", "classns3_1_1_sat_waveform.html#a28fa1542a2e37b3adbb4cb663b889421", null ],
+    [ "m_modCod", "classns3_1_1_sat_waveform.html#a465a152236fb5394e07ea698fea2cea1", null ],
+    [ "m_modulatedBits", "classns3_1_1_sat_waveform.html#abd9c639a15dba2df89a85364ae02aab6", null ],
+    [ "m_payloadBytes", "classns3_1_1_sat_waveform.html#a120a1683425ccf729804aa2d8b16350d", null ],
+    [ "m_preambleLengthInSymbols", "classns3_1_1_sat_waveform.html#abf0fa3ec62f18aaf4554e73d9a972b82", null ],
+    [ "m_waveformId", "classns3_1_1_sat_waveform.html#ab3b3930b97f9b590bd05394f87eae40b", null ]
+];

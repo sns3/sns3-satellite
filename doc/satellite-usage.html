@@ -1,0 +1,1458 @@
+
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>User Documentation &#8212; NS3 Satellite Module</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/default.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Testing Documentation" href="satellite-testing.html" />
+    <link rel="prev" title="Design Documentation" href="satellite-design.html" />
+    <!-- Bootstrap Core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="/css/sns3.css" rel="stylesheet">
+    <link href="/css/scrolling-nav.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/img/sns3-logo.png" />
+    <link rel="stylesheet" type="text/css" href="_static/ns3_stylesheet.css" />
+
+    <!-- Custom Fonts -->
+    <link href="/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js" defer></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js" defer></script>
+    <![endif]-->
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/js/bootstrap.min.js" defer></script>
+
+    <!-- Scrolling Nav JavaScript -->
+    <script src="/js/jquery.easing.min.js" defer></script>
+    <script src="/js/scrolling-nav.js" defer></script>
+
+  </head><body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top navbar-custom" role="navigation">
+      <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <div id="imgLogo">
+            <img class="logo" src="/img/sns3-logo-white.png" style="max-width:60%" onclick="document.location.href = '/index.html'" alt="Home Page"></img>
+          </div>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav navbar-right">
+          <li class="page-scroll">
+            <a href="https://github.com/sns3/sns3-satellite"><p class="text-custom">Github</p></a>
+          </li>
+          <li class="page-scroll active">
+            <a href="/doc/satellite.html"><p class="text-custom">Documentation</p></a>
+          </li>
+          <li class="page-scroll">
+            <a href="/api/index.html"><p class="text-custom">API</p></a>
+          </li>
+          <li class="page-scroll">
+            <a href="/references.html"><p class="text-custom">References</p></a>
+          </li>
+
+          <li class="page-scroll">
+            <a href="/commitee.html"><p class="text-custom">Steering Commitee</p></a>
+          </li>
+        </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="satellite-testing.html" title="Testing Documentation"
+             accesskey="N">next</a></li>
+        <li class="right" >
+          <a href="satellite-design.html" title="Design Documentation"
+             accesskey="P">previous</a> |</li>
+    <li class="navelem"><a href="/index.html">sns-3</a><span class="navelem">&nbsp;</span></li>
+    
+        <li class="nav-item nav-item-0"><a href="satellite.html">NS3 Satellite Module</a><span class="navelem">&nbsp;</span></li>
+
+        <li class="nav-item nav-item-this"><a href="">User Documentation</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="user-documentation">
+<h1>User Documentation<a class="headerlink" href="#user-documentation" title="Permalink to this headline">¶</a></h1>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<section id="building-satellite-module">
+<h3>Building Satellite Module<a class="headerlink" href="#building-satellite-module" title="Permalink to this headline">¶</a></h3>
+<p>Satellite module uses a distributed ns-3 approach enabled by bake tool.
+Satellite module does not currently support Mac OS X due to SatEnvVariables class using Linux OS specific commands.</p>
+<section id="overview">
+<h4>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h4>
+<p>Setting up a working version of SNS3 requires the following parts:</p>
+<ul class="simple">
+<li><p>Bake</p></li>
+<li><p>The simulator (NS-3, satellite modules, etc.)</p></li>
+<li><p>Data package</p></li>
+</ul>
+<p>The steps below will guide you to quickly set up the parts.</p>
+</section>
+<section id="bake">
+<h4>Bake<a class="headerlink" href="#bake" title="Permalink to this headline">¶</a></h4>
+<p>Bake is a small tool that automates the deployment of NS-3, other related modules, and their dependencies.
+Bake is an open source tool, so we shall start by downloading its source. Open a terminal and tell Mercurial
+to download Bake from its official repository.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ hg clone http://code.nsnam.org/bake
+</pre></div>
+</div>
+<p>You will be shown an output similar to the following</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">destination</span> <span class="n">directory</span><span class="p">:</span> <span class="n">bake</span>
+<span class="n">requesting</span> <span class="nb">all</span> <span class="n">changes</span>
+<span class="n">adding</span> <span class="n">changesets</span>
+<span class="n">adding</span> <span class="n">manifests</span>
+<span class="n">adding</span> <span class="n">file</span> <span class="n">changes</span>
+<span class="n">added</span> <span class="mi">358</span> <span class="n">changesets</span> <span class="k">with</span> <span class="mi">817</span> <span class="n">changes</span> <span class="n">to</span> <span class="mi">63</span> <span class="n">files</span>
+<span class="n">updating</span> <span class="n">to</span> <span class="n">branch</span> <span class="n">default</span>
+<span class="n">resolving</span> <span class="n">manifests</span>
+<span class="n">getting</span> <span class="o">.</span><span class="n">hgignore</span>
+<span class="n">getting</span> <span class="o">.</span><span class="n">project</span>
+<span class="o">...</span>
+<span class="n">getting</span> <span class="n">test</span><span class="o">/</span><span class="n">test</span><span class="o">.</span><span class="n">xml</span>
+<span class="mi">45</span> <span class="n">files</span> <span class="n">updated</span><span class="p">,</span> <span class="mi">0</span> <span class="n">files</span> <span class="n">merged</span><span class="p">,</span> <span class="mi">0</span> <span class="n">files</span> <span class="n">removed</span><span class="p">,</span> <span class="mi">0</span> <span class="n">files</span> <span class="n">unresolved</span>
+</pre></div>
+</div>
+<p>Bake is now downloaded to <code class="docutils literal notranslate"><span class="pre">bake</span></code> directory.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd bake
+</pre></div>
+</div>
+<p>Now go to <a class="reference external" href="https://wiki.net4sat.org/doku.php?id=sns3:index">the SNS3 wiki</a>  and check the <a class="reference external" href="https://wiki.net4sat.org/doku.php?do=export_code&amp;id=sns3:manuals:install:index&amp;codeblock=3">sns3.xml</a> file there, download it, and copy it into
+your <code class="docutils literal notranslate"><span class="pre">bake/contrib/</span></code> directory. This <code class="docutils literal notranslate"><span class="pre">sns3.xml</span></code> contains information of new modules related to SNS3.</p>
+</section>
+<section id="the-simulator">
+<h4>The simulator<a class="headerlink" href="#the-simulator" title="Permalink to this headline">¶</a></h4>
+<p>We can now proceed to download the simulator.</p>
+<p>Then we use Bake to take care of the download. In <code class="docutils literal notranslate"><span class="pre">bake</span></code> directory, run the following commands.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">bake</span><span class="o">.</span><span class="n">py</span> <span class="n">configure</span> <span class="o">--</span><span class="n">enable</span> <span class="n">ns</span><span class="o">-</span><span class="mf">3.28</span> <span class="o">--</span><span class="n">enable</span> <span class="n">sns3</span><span class="o">-</span><span class="n">satellite</span>
+<span class="o">./</span><span class="n">bake</span><span class="o">.</span><span class="n">py</span> <span class="n">download</span>
+</pre></div>
+</div>
+<p>The last command usually takes some time, especially while downloading ns-3.28.</p>
+<p>The simulator is now downloaded to the <code class="docutils literal notranslate"><span class="pre">bake/source/ns-3.28</span></code> directory.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd source/ns-3.28
+</pre></div>
+</div>
+<p>You’re now in the root directory of NS-3. If you wish, we can proceed to configure and build the simulator
+here.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ./waf configure --enable-examples --enable-tests
+$ ./waf build
+</pre></div>
+</div>
+<p>The build should take some time. But keep in mind that SNS3 is not functioning yet without the data package.
+This is explained in the next section.</p>
+<p>You can also combine both steps (download + build) into a single step by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">bake</span><span class="o">.</span><span class="n">py</span> <span class="n">configure</span> <span class="o">--</span><span class="n">enable</span> <span class="n">ns</span><span class="o">-</span><span class="mf">3.28</span> <span class="o">--</span><span class="n">enable</span> <span class="n">sns3</span><span class="o">-</span><span class="n">satellite</span>
+<span class="o">./</span><span class="n">bake</span><span class="o">.</span><span class="n">py</span> <span class="n">deploy</span>
+</pre></div>
+</div>
+<p>Lastly, you can check your system for missing dependencies before downloading the sources using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">bake</span><span class="o">.</span><span class="n">py</span> <span class="n">configure</span> <span class="o">--</span><span class="n">enable</span> <span class="n">ns</span><span class="o">-</span><span class="mf">3.28</span> <span class="o">--</span><span class="n">enable</span> <span class="n">sns3</span><span class="o">-</span><span class="n">satellite</span>
+<span class="o">./</span><span class="n">bake</span><span class="o">.</span><span class="n">py</span> <span class="n">check</span>
+</pre></div>
+</div>
+</section>
+<section id="data-package">
+<h4>Data package<a class="headerlink" href="#data-package" title="Permalink to this headline">¶</a></h4>
+<p>Data package is a collection of static configuration-like input files for the satellite module. The files are
+distributed separately from the satellite module because of its huge size (around 1 GB). The data package contains
+the following information:</p>
+<ul class="simple">
+<li><p>Antenna patterns</p></li>
+<li><p>External fading traces</p></li>
+<li><p>Fading traces</p></li>
+<li><p>Interference traces</p></li>
+<li><p>Link results</p></li>
+<li><p>Rx power traces</p></li>
+<li><p>SINR measurement error files</p></li>
+<li><p>UT positions</p></li>
+</ul>
+<p>The input files are placed inside the data directory of the satellite module
+(i.e., contrib/satellite/data directory).</p>
+<p>Data package is provided as a submodule of the main satellite module. You can ask Git to
+download it using the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd contrib/satellite
+$ git submodule update --init
+</pre></div>
+</div>
+<p>SNS3 is now properly initialized.</p>
+</section>
+</section>
+<section id="helpers">
+<h3>Helpers<a class="headerlink" href="#helpers" title="Permalink to this headline">¶</a></h3>
+<figure class="align-center" id="id4">
+<span id="fig-satellite-helper-structure"></span><a class="reference internal image-reference" href="_images/satellite-helper-structure.png"><img alt="_images/satellite-helper-structure.png" src="_images/satellite-helper-structure.png" style="width: 761.5999999999999px; height: 327.59999999999997px;" /></a>
+<figcaption>
+<p><span class="caption-text">Satellite helper structure</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>The satellite module adopts a set of hierarchical satellite helper classes, which are used to generate the
+satellite simulation scenario: in relation to the used simulation scenario size (number of beams),
+number of UTs, terrestrial network access technology, number of terrestrial end users and their
+applications.</p>
+<section id="simulation-helper">
+<h4>Simulation helper<a class="headerlink" href="#simulation-helper" title="Permalink to this headline">¶</a></h4>
+<p>To simplify the process of configuring a custom simulation script, the Satellite module includes a
+<code class="docutils literal notranslate"><span class="pre">SimulationHelper</span></code> class. Its sole purpose is to help create satellite simulation scripts by defining e.g.
+beams utilized, number of users, weather traces, statistics and certain parameter groups by using simple
+function calls. Simulation helper leaves only installation of applications to nodes to the user.
+Helper structure is presented in <a class="reference internal" href="#fig-satellite-helper-structure"><span class="std std-ref">Satellite helper structure</span></a>.</p>
+<p>Using Simulation helper’s methods most key attribute groups are configurable by simple function calls.
+However, micromanaging of attributes in NS-3 style using <code class="docutils literal notranslate"><span class="pre">Config::SetDefault</span> <span class="pre">(...)</span></code> and
+<code class="docutils literal notranslate"><span class="pre">Object::SetAttribute</span> <span class="pre">(...)</span></code> is also possible at the same time with Simulation helper.</p>
+<p>The key configuration methods are presented in <a class="reference internal" href="#tab-simulation-helper-configuration"><span class="std std-ref">Simulation configuration methods</span></a>:</p>
+<span id="tab-simulation-helper-configuration"></span><table class="docutils align-default" id="id5">
+<caption><span class="caption-text">Simulation configuration methods</span><a class="headerlink" href="#id5" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 67%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Name of method</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>SimulationHelper:: SetDefaultValues</p></td>
+<td><p>Set default values shared by all examples using SimulationHelper.</p></td>
+</tr>
+<tr class="row-odd"><td><p>SimulationHelper:: SetBeams</p></td>
+<td><p>Set enabled beams (1-72) as a string.</p></td>
+</tr>
+<tr class="row-even"><td><p>SimulationHelper:: SetUtCountPerBeam</p></td>
+<td><p>Set UT count per beam.</p></td>
+</tr>
+<tr class="row-odd"><td><p>SimulationHelper:: SetUserCountPerUt</p></td>
+<td><p>Set user count per UT.</p></td>
+</tr>
+<tr class="row-even"><td><p>SimulationHelper:: SetSimulationTime</p></td>
+<td><p>Set simulation time in seconds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>SimulationHelper:: SetIdealPhyParameterization</p></td>
+<td><p>Set ideal channel/physical layer parameterization.</p></td>
+</tr>
+<tr class="row-even"><td><p>SimulationHelper:: EnableAcm</p></td>
+<td><p>Enable ACM for a simulation direction.</p></td>
+</tr>
+<tr class="row-odd"><td><p>SimulationHelper:: DisableAcm</p></td>
+<td><p>Disable ACM for a simulation direction.</p></td>
+</tr>
+<tr class="row-even"><td><p>SimulationHelper:: DisableAllCapacityAssignmentCategories</p></td>
+<td><p>Disable all capacity allocation categories: CRA/VBDC/RBDC.</p></td>
+</tr>
+<tr class="row-odd"><td><p>SimulationHelper:: EnableOnlyConstantRate</p></td>
+<td><p>Enable only CRA for a given RC index.</p></td>
+</tr>
+<tr class="row-even"><td><p>SimulationHelper:: EnableOnlyRbdc</p></td>
+<td><p>Enable only RBDC for a given RC index.</p></td>
+</tr>
+<tr class="row-odd"><td><p>SimulationHelper:: EnableOnlyVbdc</p></td>
+<td><p>Enable only VBDC for a given RC index.</p></td>
+</tr>
+<tr class="row-even"><td><p>SimulationHelper:: EnableFca</p></td>
+<td><p>Enable free capacity allocation.</p></td>
+</tr>
+<tr class="row-odd"><td><p>SimulationHelper:: DisableFca</p></td>
+<td><p>Disable free capacity allocation.</p></td>
+</tr>
+<tr class="row-even"><td><p>SimulationHelper:: EnablePeriodicalControlSlots</p></td>
+<td><p>Enable periodical control slots.</p></td>
+</tr>
+<tr class="row-odd"><td><p>SimulationHelper:: EnableArq</p></td>
+<td><p>Enable ARQ.</p></td>
+</tr>
+<tr class="row-even"><td><p>SimulationHelper:: DisableRandomAccess</p></td>
+<td><p>Disable random access.</p></td>
+</tr>
+<tr class="row-odd"><td><p>SimulationHelper:: EnableSlottedAloha</p></td>
+<td><p>Enable slotted ALOHA random access.</p></td>
+</tr>
+<tr class="row-even"><td><p>SimulationHelper:: EnableCrdsa</p></td>
+<td><p>Enable CRDSA random access.</p></td>
+</tr>
+<tr class="row-odd"><td><p>SimulationHelper:: ConfigureFrame</p></td>
+<td><p>Configure a frame for a certain superframe id (superframe, frame, frame bandwidth, carrier bandwidth, roll-off, carrier spacing, is random access).</p></td>
+</tr>
+<tr class="row-even"><td><p>SimulationHelper:: ConfigureFrequencyBands</p></td>
+<td><p>Configure the default setting for the forward and return link frequencies.</p></td>
+</tr>
+<tr class="row-odd"><td><p>SimulationHelper:: EnableExternalFadingInputTrace</p></td>
+<td><p>Enable external fading input.</p></td>
+</tr>
+<tr class="row-even"><td><p>SimulationHelper:: EnableOutputTraces</p></td>
+<td><p>Enable all output traces.</p></td>
+</tr>
+<tr class="row-odd"><td><p>SimulationHelper:: ConfigureLinkBudget</p></td>
+<td><p>Configure all link budget related attributes.</p></td>
+</tr>
+<tr class="row-even"><td><p>SimulationHelper:: SetErrorModel</p></td>
+<td><p>Set simulation error model and error rate.</p></td>
+</tr>
+<tr class="row-odd"><td><p>SimulationHelper:: SetInterferenceModel</p></td>
+<td><p>Set simulation interference model.</p></td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="#tab-simulation-helper-control"><span class="std std-ref">Simulation control methods</span></a> contains the rest of the
+methods needed to run the simulation.
+Configuration methods listed in <a class="reference internal" href="#tab-simulation-helper-configuration"><span class="std std-ref">Simulation configuration methods</span></a> must be called before these.</p>
+<p></p>
+<span id="tab-simulation-helper-control"></span><table class="docutils align-default" id="id6">
+<caption><span class="caption-text">Simulation control methods</span><a class="headerlink" href="#id6" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 67%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Name of method</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>SimulationHelper:: SetOutputPath</p></td>
+<td><p>Set the output directory for statistics.</p></td>
+</tr>
+<tr class="row-odd"><td><p>SimulationHelper:: SetOutputTag</p></td>
+<td><p>Alternative for <code class="docutils literal notranslate"><span class="pre">SetOutputPath</span></code>. Set simulation output tag, which is the basename of the directory where output files are stored.</p></td>
+</tr>
+<tr class="row-even"><td><p>SimulationHelper:: CreateSatScenario</p></td>
+<td><p>Create the satellite scenario.</p></td>
+</tr>
+<tr class="row-odd"><td><p>SimulationHelper:: CreateDefaultStats</p></td>
+<td><p>Create stats collectors. Adjust this method to your needs.</p></td>
+</tr>
+<tr class="row-even"><td><p>SimulationHelper:: EnableProgressLogging</p></td>
+<td><p>Enables simulation progress logging to standard output.</p></td>
+</tr>
+<tr class="row-odd"><td><p>SimulationHelper:: RunSimulation</p></td>
+<td><p>Run the simulation.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Note, that almost every class of the Satellite module contains some attributes.
+It is encouraged for the user to get to know the attributes in classes he/she focuses on in custom simulations.
+For more information about available attributes, see the following chapters’ helper attributes.
+For advanced usage, see the section <a class="reference internal" href="#advanced-usage-and-attributes">Advanced usage and Attributes</a>.</p>
+</section>
+<section id="satellite-helper">
+<h4>Satellite helper<a class="headerlink" href="#satellite-helper" title="Permalink to this headline">¶</a></h4>
+<p>Satellite helper is a main helper class which abstracts all the complexity inside
+sub-helpers, which are presented below. The satellite helper is by default capable of generating
+three kinds or scenarios: one spot-beam, full reference system and a user-defined subset
+of the full reference system (any user defined amount of spot-beams). However, the
+scenario creation always obeys the parameterized reference system. The Satellite helper attributes are presented in
+<a class="reference internal" href="#tab-sat-helper"><span class="std std-ref">Satellite helper attributes</span></a>.</p>
+<p></p>
+<span id="tab-sat-helper"></span><table class="docutils align-default" id="id7">
+<caption><span class="caption-text">Satellite helper attributes</span><a class="headerlink" href="#id7" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 39%" />
+<col style="width: 61%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Name of attribute</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ns3::SatHelper:: UtCount</p></td>
+<td><p>Number of UTs per beam.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatHelper:: GwUsers</p></td>
+<td><p>Number of gateway users.</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatHelper:: UtUsers</p></td>
+<td><p>Number of users per UT.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatHelper:: BeamNetworkAddress</p></td>
+<td><p>Initial network number to use during allocation of satellite devices.</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatHelper:: BeamNetworkMask</p></td>
+<td><p>Network mask to use during allocation of satellite devices.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatHelper:: GwNetworkAddress</p></td>
+<td><p>Initial network number to use during allocation of GW, router, and GW users.</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatHelper:: GwNetworkMask</p></td>
+<td><p>Network mask to use during allocation of GW, router, and GW users.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatHelper:: UtNetworkAddress</p></td>
+<td><p>Initial network number to use during allocation of UT and UT users</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatHelper:: UtNetworkMask</p></td>
+<td><p>Network mask to use during allocation of UT and UT users.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatHelper:: PacketTraceEnabled</p></td>
+<td><p>Packet tracing enable status.</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatHelper:: ScenarioCreationTraceEnabled</p></td>
+<td><p>Scenario creation trace output enable status.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatHelper:: DetailedScenarioCreationTraceEnabled</p></td>
+<td><p>Detailed scenario creation trace output enable status.</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatHelper:: ScenarioCreationTraceFileName</p></td>
+<td><p>File name for the scenario creation trace output.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatHelper:: UtCreationTraceFileName</p></td>
+<td><p>File name for the UT creation trace output.</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatHelper:: Creation</p></td>
+<td><p>Creation traces.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatHelper:: CreationSummary</p></td>
+<td><p>Creation summary traces.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="beam-helper">
+<h4>Beam helper<a class="headerlink" href="#beam-helper" title="Permalink to this headline">¶</a></h4>
+<p>Beam helper creates needed <code class="docutils literal notranslate"><span class="pre">SatChannel</span></code> and <code class="docutils literal notranslate"><span class="pre">SatNetDevice</span></code> objects, with help of other lower
+level device helpers, and creates needed GW nodes. The helper assigns IP addresses for
+every node connected to satellite network, sets IP routes to nodes for satellite network and
+fills Address Resolution Protocol (ARP) caches for satellite network. The Beam helper attributes
+are presented in <a class="reference internal" href="#tab-beam-helper"><span class="std std-ref">Beam helper attributes</span></a>.</p>
+<p></p>
+<span id="tab-beam-helper"></span><table class="docutils align-default" id="id8">
+<caption><span class="caption-text">Beam helper attributes</span><a class="headerlink" href="#id8" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 44%" />
+<col style="width: 56%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Name of attribute</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ns3::SatBeamHelper:: CarrierFrequencyConverter</p></td>
+<td><p>Callback to convert carrier id to generate frequency.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatBeamHelper:: FadingModel</p></td>
+<td><p>Fading model.</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatBeamHelper:: RandomAccessModel</p></td>
+<td><p>Random access model.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatBeamHelper:: RaInterferenceModel</p></td>
+<td><p>Interference model for random access.</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatBeamHelper:: RaCollisionModel</p></td>
+<td><p>Collision model for random access.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatBeamHelper:: PropagationDelayModel</p></td>
+<td><p>Propagation delay model.</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatBeamHelper:: ConstantPropagationDelay</p></td>
+<td><p>Constant propagation delay.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatBeamHelper:: PrintDetailedInformationToCreationTraces</p></td>
+<td><p>Print detailed information to creation traces.</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatBeamHelper:: CtrlMsgStoreTimeInFwdLink</p></td>
+<td><p>Time to store a control message in container for forward link.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatBeamHelper:: CtrlMsgStoreTimeInRtnLink</p></td>
+<td><p>Time to store a control message in container for return link.</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatBeamHelper:: Creation</p></td>
+<td><p>Creation traces.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="geo-helper">
+<h4>GEO helper<a class="headerlink" href="#geo-helper" title="Permalink to this headline">¶</a></h4>
+<p>GEO helper creates a <code class="docutils literal notranslate"><span class="pre">SatNetDevice</span></code> object for GEO satellite node and configures the
+satellite switch to deliver packets through satellite node. The GEO helper attributes are presented in <a class="reference internal" href="#tab-geo-helper"><span class="std std-ref">GEO helper attributes</span></a>.</p>
+<p></p>
+<span id="tab-geo-helper"></span><table class="docutils align-default" id="id9">
+<caption><span class="caption-text">GEO helper attributes</span><a class="headerlink" href="#id9" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 44%" />
+<col style="width: 56%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Name of attribute</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ns3::SatGeoHelper:: DaFwdLinkInterferenceModel</p></td>
+<td><p>Forward link interference model for dedicated access.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatGeoHelper:: DaRtnLinkInterferenceModel</p></td>
+<td><p>Return link interference model for dedicated access</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatGeoHelper:: Creation</p></td>
+<td><p>Creation traces.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="gw-helper">
+<h4>GW helper<a class="headerlink" href="#gw-helper" title="Permalink to this headline">¶</a></h4>
+<p>GW helper creates <code class="docutils literal notranslate"><span class="pre">SatNetDevice</span></code> objects for GW nodes and attaches them to proper
+<code class="docutils literal notranslate"><span class="pre">SatChannel</span></code> objects. The GW helper attributes are presented in <a class="reference internal" href="#tab-gw-helper"><span class="std std-ref">GW helper attributes</span></a>.</p>
+<p></p>
+<span id="tab-gw-helper"></span><table class="docutils align-default" id="id10">
+<caption><span class="caption-text">GW helper attributes</span><a class="headerlink" href="#id10" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 44%" />
+<col style="width: 56%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Name of attribute</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ns3::SatGwHelper:: RtnLinkErrorModel</p></td>
+<td><p>Return link error model.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatGwHelper:: DaRtnLinkInterferenceModel</p></td>
+<td><p>Return link interference model for dedicated access</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatGwHelper:: EnableChannelEstimationError</p></td>
+<td><p>Enable channel estimation error in return link receiver at GW.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatGwHelper:: Creation</p></td>
+<td><p>Creation traces.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="ut-helper">
+<h4>UT helper<a class="headerlink" href="#ut-helper" title="Permalink to this headline">¶</a></h4>
+<p>UT helper creates <code class="docutils literal notranslate"><span class="pre">SatNetDevice</span></code> objects for UT nodes and attaches them to
+proper <code class="docutils literal notranslate"><span class="pre">SatChannel</span></code> objects. The UT helper attributes are presented in <a class="reference internal" href="#tab-ut-helper"><span class="std std-ref">UT helper attributes</span></a>.</p>
+<p></p>
+<span id="tab-ut-helper"></span><table class="docutils align-default" id="id11">
+<caption><span class="caption-text">UT helper attributes</span><a class="headerlink" href="#id11" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 44%" />
+<col style="width: 56%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Name of attribute</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ns3::SatUtHelper:: FwdLinkErrorModel</p></td>
+<td><p>Forward link error model.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatUtHelper:: DaFwdLinkInterferenceModel</p></td>
+<td><p>Forward link interference model for dedicated access</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatUtHelper:: LowerLayerServiceConf</p></td>
+<td><p>Pointer to lower layer service configuration.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatUtHelper:: EnableChannelEstimationError</p></td>
+<td><p>Enable channel estimation error in forward link receiver at GW.</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatUtHelper:: UseCrdsaOnlyForControlPackets</p></td>
+<td><p>CRDSA utilized only for control packets or also for user data.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatUtHelper:: Creation</p></td>
+<td><p>Creation traces.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="user-helper">
+<h4>User helper<a class="headerlink" href="#user-helper" title="Permalink to this headline">¶</a></h4>
+<p>User helper creates needed amount of end user nodes for end user networks (user
+connected to UTs) and for public network (behind GWs), their access technologies,
+channels and IP routes. The helper is also responsible of creating different application
+scenarios. The user helper attributes are presented in <a class="reference internal" href="#tab-user-helper"><span class="std std-ref">User helper attributes</span></a>.</p>
+<p></p>
+<span id="tab-user-helper"></span><table class="docutils align-default" id="id12">
+<caption><span class="caption-text">User helper attributes</span><a class="headerlink" href="#id12" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 43%" />
+<col style="width: 57%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Name of attribute</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ns3::SatUserHelper:: BackboneNetworkType</p></td>
+<td><p>Network used between GW and Router, and between Router and Users in operator network.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatUserHelper:: SubscriberNetworkType</p></td>
+<td><p>Network used between UTs and Users in subscriber network.</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatUserHelper:: Creation</p></td>
+<td><p>Creation traces.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="output">
+<h3>Output<a class="headerlink" href="#output" title="Permalink to this headline">¶</a></h3>
+<p>Satellite module is able to print class-specific logs by enabling ns-3 <code class="docutils literal notranslate"><span class="pre">LogComponent</span></code>
+objects by different log levels, usually LOG_LEVEL_INFO. For more information about ns-3 log system, please see
+<a class="reference external" href="https://www.nsnam.org/docs/release/3.7/tutorial/tutorial_21.html">the ns-3 logging tutorial</a>.</p>
+<p>Satellite module supports a set of statistics by using the Data Collection Framework (DCF).
+The available statistics are presented in <a class="reference internal" href="#tab-supported-stats"><span class="std std-ref">Supported statistics</span></a>.</p>
+<p></p>
+<span id="tab-supported-stats"></span><table class="docutils align-default" id="id13">
+<caption><span class="caption-text">Supported statistics</span><a class="headerlink" href="#id13" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 42%" />
+<col style="width: 26%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Statistics name</p></th>
+<th class="head"><p>Applicable link directions</p></th>
+<th class="head"><p>Applicable levels</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Throughput</p></td>
+<td><p>Both</p></td>
+<td><p>Application, device, MAC, and PHY</p></td>
+</tr>
+<tr class="row-odd"><td><p>Packet delay</p></td>
+<td><p>Both</p></td>
+<td><p>Application, device, MAC, and PHY</p></td>
+</tr>
+<tr class="row-even"><td><p>Signalling load</p></td>
+<td><p>Both</p></td>
+<td><p>Device</p></td>
+</tr>
+<tr class="row-odd"><td><p>Queue size (in bytes)</p></td>
+<td><p>Both</p></td>
+<td><p>LLC</p></td>
+</tr>
+<tr class="row-even"><td><p>Queue size (in number of packets)</p></td>
+<td><p>Both</p></td>
+<td><p>LLC</p></td>
+</tr>
+<tr class="row-odd"><td><p>Capacity request</p></td>
+<td><p>Return link</p></td>
+<td><p>LLC</p></td>
+</tr>
+<tr class="row-even"><td><p>Resources granted</p></td>
+<td><p>Forward link</p></td>
+<td><p>MAC</p></td>
+</tr>
+<tr class="row-odd"><td><p>SINR</p></td>
+<td><p>Both</p></td>
+<td><p>PHY</p></td>
+</tr>
+<tr class="row-even"><td><p>DA packet error</p></td>
+<td><p>Both</p></td>
+<td><p>PHY</p></td>
+</tr>
+<tr class="row-odd"><td><p>RA CRDSA packet error</p></td>
+<td><p>Return link</p></td>
+<td><p>PHY</p></td>
+</tr>
+<tr class="row-even"><td><p>RA CRDSA packet collision</p></td>
+<td><p>Return link</p></td>
+<td><p>PHY</p></td>
+</tr>
+<tr class="row-odd"><td><p>RA Slotted ALOHA packet error</p></td>
+<td><p>Return link</p></td>
+<td><p>PHY</p></td>
+</tr>
+<tr class="row-even"><td><p>RA Slotted ALOHA packet collision</p></td>
+<td><p>Return link</p></td>
+<td><p>PHY</p></td>
+</tr>
+<tr class="row-odd"><td><p>Backlogged request</p></td>
+<td><p>Forward link</p></td>
+<td><p>NCC</p></td>
+</tr>
+<tr class="row-even"><td><p>Frame load (in ratio of allocated symbols)</p></td>
+<td><p>Return link</p></td>
+<td><p>NCC</p></td>
+</tr>
+<tr class="row-odd"><td><p>Frame load (in number of scheduled users)</p></td>
+<td><p>Return link</p></td>
+<td><p>NCC</p></td>
+</tr>
+<tr class="row-even"><td><p>Waveform usage</p></td>
+<td><p>Return link</p></td>
+<td><p>NCC</p></td>
+</tr>
+</tbody>
+</table>
+<p>Statistics framework is disabled by default. To enable it, thereby allowing it to produce output,
+users may utilize the <code class="docutils literal notranslate"><span class="pre">SatStatsHelperContainer</span></code> class.
+The first step is to instantiate the class into an object instance. This is done by passing the
+<code class="docutils literal notranslate"><span class="pre">SatHelper</span></code> instance used in the simulation as an input argument to the constructor, as follows.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Ptr</span><span class="o">&lt;</span><span class="n">SatHelper</span><span class="o">&gt;</span> <span class="n">h</span> <span class="o">=</span> <span class="n">CreateObject</span><span class="o">&lt;</span><span class="n">SatHelper</span><span class="o">&gt;</span> <span class="p">();</span>
+<span class="n">h</span><span class="o">-&gt;</span><span class="n">CreateScenario</span> <span class="p">(</span><span class="n">SatHelper</span><span class="p">::</span><span class="n">SIMPLE</span><span class="p">);</span>
+
+<span class="o">//</span> <span class="o">...</span> <span class="p">(</span><span class="n">snip</span><span class="p">)</span> <span class="o">...</span>
+
+<span class="n">Ptr</span><span class="o">&lt;</span><span class="n">SatStatsHelperContainer</span><span class="o">&gt;</span> <span class="n">s</span> <span class="o">=</span> <span class="n">CreateObject</span><span class="o">&lt;</span><span class="n">SatStatsHelperContainer</span><span class="o">&gt;</span><span class="p">;</span> <span class="p">(</span><span class="n">h</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Then a statistics type can be enabled by calling a method.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">s</span><span class="o">-&gt;</span><span class="n">AddPerBeamRtnDevDelay</span> <span class="p">(</span><span class="n">SatStatsHelper</span><span class="p">::</span><span class="n">OUTPUT_SCALAR_FILE</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>There are a lot of methods to choose from the SatStatsHelperContainer object. Please refer to the
+Doxygen documentation section of <code class="docutils literal notranslate"><span class="pre">SatStatsHelperContainer</span></code> for the complete list.</p>
+<p>Each statistics type has different range of supported output types.
+The text-based statistics, e.g., the capacity request and backlogged request, only support
+OUTPUT_SCATTER_FILE type. The rest of the statistics support the following:</p>
+<ul class="simple">
+<li><p>OUTPUT_SCALAR_FILE</p></li>
+<li><p>OUTPUT_SCATTER_FILE</p></li>
+<li><p>OUTPUT_SCATTER_PLOT</p></li>
+</ul>
+<p>In addition to the above, the following output types apply to packet delay, queue size, resources
+granted, and SINR statistics.</p>
+<ul class="simple">
+<li><p>OUTPUT_HISTOGRAM_FILE</p></li>
+<li><p>OUTPUT_PDF_FILE</p></li>
+<li><p>OUTPUT_CDF_FILE</p></li>
+<li><p>OUTPUT_HISTOGRAM_PLOT</p></li>
+<li><p>OUTPUT_PDF_PLOT</p></li>
+<li><p>OUTPUT_CDF_PLOT</p></li>
+</ul>
+<p>Note that the output types are divided to either FILE or PLOT group, as indicated by the suffix. The
+group determines the type of aggregator to be used.</p>
+<p>Identifier type determines how the statistics are categorized. The possible options are <code class="docutils literal notranslate"><span class="pre">GLOBAL</span></code>
+(not categorized at all), <code class="docutils literal notranslate"><span class="pre">PER_GW</span></code>, <code class="docutils literal notranslate"><span class="pre">PER_BEAM</span></code>, and <code class="docutils literal notranslate"><span class="pre">PER_UT</span></code>. Application-level statistics may also
+accept <code class="docutils literal notranslate"><span class="pre">PER_UT_USER</span></code> as an additional identifier. These options are indicated in the name of each
+method.</p>
+<p>As the name implies, the <code class="docutils literal notranslate"><span class="pre">SatStatsHelperContainer</span></code> object instance acts as a container of several
+helpers. Therefore, more than one statistics type can be enabled and become concurrently active
+within the same simulation, i.e., allowing users to produce more than one statistics output in one
+simulation run.</p>
+</section>
+<section id="advanced-usage-and-attributes">
+<h3>Advanced Usage and Attributes<a class="headerlink" href="#advanced-usage-and-attributes" title="Permalink to this headline">¶</a></h3>
+<section id="user-and-feeder-links">
+<h4>User and feeder links<a class="headerlink" href="#user-and-feeder-links" title="Permalink to this headline">¶</a></h4>
+<p>User and feeder links are configured by attributes of SatConf. Link bandwidth and frequency can be
+set separately per each link. The <a class="reference internal" href="#tab-bandwidth-conf"><span class="std std-ref">FWD and RTN link bandwidth configuration attributes</span></a> describes all these attributes.</p>
+<p></p>
+<span id="tab-bandwidth-conf"></span><table class="docutils align-default" id="id14">
+<caption><span class="caption-text">FWD and RTN link bandwidth configuration attributes</span><a class="headerlink" href="#id14" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 34%" />
+<col style="width: 66%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Name of the attribute</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ns3::SatConf:: FwdFeederLinkBandwidth</p></td>
+<td><p>Defines bandwidth for the forward feeder link (in Hertz).</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatConf:: FwdFeederLinkBaseFrequency</p></td>
+<td><p>Defines the lower boundary frequency of the forward feeder link band (in Hertz).</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatConf:: RtnFeederLinkBandwidth</p></td>
+<td><p>Defines bandwidth for the return feeder link (in Hertz).</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatConf:: RtnFeederLinkBaseFrequency</p></td>
+<td><p>Defines the lower boundary frequency of the return feeder link band (in Hertz).</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatConf:: FwdUserLinkBandwidth</p></td>
+<td><p>Defines bandwidth for the forward user link (in Hertz).</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatConf:: FwdUserLinkBaseFrequency</p></td>
+<td><p>Defines the lower boundary frequency of the forward user link band (in Hertz).</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatConf:: RtnUserLinkBandwidth</p></td>
+<td><p>Defines bandwidth for the return user link (in Hertz).</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatConf:: RtnUserLinkBaseFrequency</p></td>
+<td><p>Defines the lower boundary frequency of the return user link band (in Hertz).</p></td>
+</tr>
+</tbody>
+</table>
+<p>User link bandwidth is divided to equal channels by attributes <code class="docutils literal notranslate"><span class="pre">ns3::SatConf::FwdUserLinkChannels</span></code> and
+<code class="docutils literal notranslate"><span class="pre">ns3::SatConf::RtnUserLinkChannels</span></code> for forward and return directions. Feeder link is divided to channels
+same way for both direction by attributes <code class="docutils literal notranslate"><span class="pre">ns3::SatConf::FwdFeederLinkChannels</span></code> and <code class="docutils literal notranslate"><span class="pre">ns3::SatConf::RtnFeederLinkChannels</span></code>.
+Satellite module verifies correctness of the configuration by checking that bandwidths of the channels are same
+for both links in one direction (forward or return). In case of error simulation is terminated by causing fatal error.</p>
+</section>
+<section id="return-link-frame-configuration">
+<h4>Return link frame configuration<a class="headerlink" href="#return-link-frame-configuration" title="Permalink to this headline">¶</a></h4>
+<p>Superframe structure for the return link is the same for every channel. Currently the satellite module
+supports only superframe sequence 0 (one sequence). Structure for this sequence can be
+selected among the four superframe configurations. Selection is done by attribute
+<code class="docutils literal notranslate"><span class="pre">ns3::SatConf::SuperFrameConfForSeq0</span></code> in SatConf class. Superframe structure itself for the
+each selectable configuration is defined by attributes of the each superframe configuration
+objects <code class="docutils literal notranslate"><span class="pre">SatSuperframeConf0</span></code>, <code class="docutils literal notranslate"><span class="pre">SatSuperframeConf1</span></code>, <code class="docutils literal notranslate"><span class="pre">SatSuperframeConf2</span></code> and
+<code class="docutils literal notranslate"><span class="pre">SatSuperframeConf3</span></code>.
+Each of these objects is derived from same abstract base class <code class="docutils literal notranslate"><span class="pre">SatSuperframeConf</span></code>.
+Purpose is to provide four pre-defined configurations for the superframes devised
+to facilitate user configuration. In other words these classes are exactly same
+except the default values that are assigned to their attributes. If pre-defined values
+are not enough for a simulation purposes they can be overridden by attributes without
+re-compiling simulator. Configuration of superframe by attributes is described in
+<a class="reference internal" href="#superframe-structure-configuration">Superframe structure configuration</a>.</p>
+</section>
+<section id="forward-link-carrier-configuration">
+<h4>Forward link carrier configuration<a class="headerlink" href="#forward-link-carrier-configuration" title="Permalink to this headline">¶</a></h4>
+<p>Forward link channels are divided to equal-size carriers using carrier bandwidth defined by attribute
+of the <code class="docutils literal notranslate"><span class="pre">SatConf</span></code> object <code class="docutils literal notranslate"><span class="pre">ns3::SatConf::FwdCarrierAllocatedBandwidth</span></code>. Value of this attribute
+cannot exceed the calculated bandwidth value for forward link channel bandwidths. This ensures that
+there is minimum one carrier available in forward link. Currently the satellite module supports
+only using of the one carrier in forward link per beam. Used carrier is logical first i.e. carrier having
+the lowest center frequency (index or id 0). Carrier spacing and roll-off for the every forward link
+carrier is defined by <code class="docutils literal notranslate"><span class="pre">SatConf</span></code> attributes <code class="docutils literal notranslate"><span class="pre">ns3::SatConf::FwdCarrierSpacing</span></code> and
+<code class="docutils literal notranslate"><span class="pre">ns3::SatConf::FwdCarrierRollOff</span></code>.</p>
+</section>
+<section id="superframe-structure-configuration">
+<h4>Superframe structure configuration<a class="headerlink" href="#superframe-structure-configuration" title="Permalink to this headline">¶</a></h4>
+<p>Superframe structure that is supported by the satellite module is such that all frames in the superframe are
+constructed according to target duration defined by attribute TargetDuration of the SatSuperframeSeq.
+Superframe structure can have in maximum 10 configurable frames. The number of the actually used
+frames are selected by attribute of the <code class="docutils literal notranslate"><span class="pre">SatSuperframeConfX</span></code> (e.g. <code class="docutils literal notranslate"><span class="pre">ns3::SatSuperframeConf0::FrameCount</span></code>).
+Type of the frame configuration for each frame in superframe is selected by attribute
+<code class="docutils literal notranslate"><span class="pre">ns3::SatSuperframeConf0::FrameConfigType</span></code> from three supported types. Supported types are 0-2.
+The <code class="docutils literal notranslate"><span class="pre">ns3::SatSuperframeConf0::FrameConfigType</span></code> attribute has influence how frame are constructed by
+class <code class="docutils literal notranslate"><span class="pre">SatFrameConf</span></code> implementing frame configuration and utilized by <code class="docutils literal notranslate"><span class="pre">SatFrameAllocator</span></code> class.
+Each of these 10 configurable frames have same configurable attributes, but can be configured individually.
+Only as many configurations as selected by FrameCount attribute has meaning in superframe configuration.
+Frame selected in use are taking in ascending order. E.g. if frame count is 1 then Frame0 is in use, if
+frame count is 2 then Frame0 and Frame1 are in use and so on. Each frame is configured with the 5 different
+attributes of <code class="docutils literal notranslate"><span class="pre">SatSuperframeConfX</span></code>. The example of these attributes are shown in
+<span class="xref std std-ref">tab-superframe-conf</span> for Frame0 of
+<code class="docutils literal notranslate"><span class="pre">SatSuperframeConf0</span></code>.</p>
+<p></p>
+<p>Sum of allocated bandwidths of used frames cannot exceed the calculated bandwidth
+for the return link channels, see <a class="reference internal" href="#return-link-frame-configuration">Return link frame configuration</a>. <code class="docutils literal notranslate"><span class="pre">Frame0_CarrierAllocatedBandwidthHz</span></code>
+defines bandwidth for each carrier in the frame and also the number of the frames in use in the frame.
+Value of this attribute cannot exceed the value given for attribute <code class="docutils literal notranslate"><span class="pre">Frame0_AllocatedBandwidthHz</span></code> for
+the frame. This ensures that there is at least one carrier always available in the frame. There is no
+limitation for count of RA or DA frames in the superframe; nor for count of carriers in each frame.</p>
+<p>To better understand what are the implications of changing <code class="docutils literal notranslate"><span class="pre">Frame0_LowerLayerService</span></code>, see
+<a class="reference internal" href="#lls-configuration">LLS configuration</a>.</p>
+</section>
+<section id="waveform-configuration">
+<h4>Waveform configuration<a class="headerlink" href="#waveform-configuration" title="Permalink to this headline">¶</a></h4>
+<p>The waveform configuration has influence to time slot configuration of the superframes.
+Frames in supeframe are constructed with timeslots using the waveform defined by the
+attribute ns3:SatWaveformConf::DefaultWfId. The construction means that this timeslot
+specified duration of the frame (as many slot as fit in given target duration).</p>
+<ul class="simple">
+<li><p>When superframe configuration type 0 is in use, the timeslot constructed based
+on attribute <code class="docutils literal notranslate"><span class="pre">ns3:SatWaveformConf::DefaultWfId</span></code> is always used for scheduling
+timeslots for the UTs by <code class="docutils literal notranslate"><span class="pre">SatBeamScheduler</span></code>.</p></li>
+<li><p>When superframe configuration type 1 is in use the timeslot constructed based
+on attribute <code class="docutils literal notranslate"><span class="pre">ns3:SatWaveformConf::DefaultWfId</span></code> specified duration for the scheduled
+timeslots for the UTs. The waveform selection for the timeslot is based on C/N0
+estimation (the possible). Anyway for control timeslots is always used the most
+robust wave form.</p></li>
+<li><p>When superframe configuration type 2 is in use the timeslot constructed based
+on attribute <code class="docutils literal notranslate"><span class="pre">ns3:SatWaveformConf::DefaultWfId</span></code> doesn’t have influence for
+the scheduled timeslots for the UTs. The waveform selection for the timeslot
+is based on C/N0 estimation (the possible) as for configuration 1. But in
+addition to waveform also timeslot duration can change between short and long
+waveforms. Again for control timeslots is always used the most robust wave form.</p></li>
+</ul>
+<p>For configuration types 1 and 2 attribute <code class="docutils literal notranslate"><span class="pre">ns3:SatWaveformConf::AcmEnabled</span></code>
+is set as true (enabled). Otherwise behavior is same as with configuration 0. If C/N0 estimation
+is unknown then most robust waveform is used when configuration types 1 or 2 are used.</p>
+</section>
+<section id="lls-configuration">
+<h4>LLS configuration<a class="headerlink" href="#lls-configuration" title="Permalink to this headline">¶</a></h4>
+<p>Lower Layer Service (LLS) can be configured currently to be used for Dedicated Access (DA)
+and Random Access (RA) services. Configuration is done by attributes of the
+<code class="docutils literal notranslate"><span class="pre">SatLowerLayerServiceConf</span></code> class implementation LLS configuration. Attribute
+<code class="docutils literal notranslate"><span class="pre">ns3::SatLowerLayerServiceConf::DaServiceCount</span></code> select how many of these four
+configurable DA services are in uses starting from service 0. The number of RA services
+to use are selected by attribute <code class="docutils literal notranslate"><span class="pre">ns3::SatLowerLayerServiceConf::RaServiceCount</span></code>
+(0 or 1 currently only selectable).</p>
+<p></p>
+<p><a class="reference internal" href="#tab-llserv"><span class="std std-ref">Lower layer service attributes</span></a> shortly introduces attributes
+affecting all used DA or RA services.</p>
+<span id="tab-llserv"></span><table class="docutils align-default" id="id15">
+<caption><span class="caption-text">Lower layer service attributes</span><a class="headerlink" href="#id15" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 70%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Name of the attribute</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ns3::SatLowerLayerServiceConf:: DynamicRatePersistence</p></td>
+<td><p>Dynamic rate persistence count for the scheduling in case that capacity request is not received from UT.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatLowerLayerServiceConf:: VolumeBacklogPersistence</p></td>
+<td><p>Volume backlog persistence count for the scheduling in case that capacity request is not received from UT.</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatLowerLayerServiceConf:: DefaultControlRandomizationInterval</p></td>
+<td><p>Default value for the randomization interval to be used when selecting a Slotted ALOHA timeslot for the contention control burst, given in milliseconds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatLowerLayerServiceConf:: RbdcQuantizationSmallStepKbps</p></td>
+<td><p>Quantization interval for RBDC values in the smaller value range (below RbdcQuantizationThresholdKbps), given in kbps.</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatLowerLayerServiceConf:: RbdcQuantizationLargeStepKbps</p></td>
+<td><p>Quantization interval for RBDC values in the larger value range (above RbdcQuantizationThresholdKbps), given in kbps.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatLowerLayerServiceConf:: RbdcQuantizationThresholdKbps</p></td>
+<td><p>RBDC quantization threshold in Kbps. If RBDC rate is lower, then RbdcQuantizationSmallStepKbps is used, if higher, then RbdcQuantizationLargeStepKbps is used.</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatLowerLayerServiceConf:: VbdcQuantizationSmallStepKB</p></td>
+<td><p>Quantization interval for VBDC values in the smaller value range (below VbdcQuantizationThresholdKB), given in kbytes.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatLowerLayerServiceConf:: VbdcQuantizationLargeStepKB</p></td>
+<td><p>Quantization interval for VBDC values in the larger value range (above VbdcQuantizationThresholdKB), given in kbytes.</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatLowerLayerServiceConf:: VbdcQuantizationThresholdKB</p></td>
+<td><p>VBDC quantization threshold in kbytes. If VBDC bytes are lower, then VbdcQuantizationSmallStepKB is used, if higher, then VbdcQuantizationLargeStepKB is used.</p></td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="#tab-llserv-da"><span class="std std-ref">Lower layer service attributes for DA services</span></a> introduces all DA service specific attributes.
+In the table DA service 0 is used as example,
+but configuration for other services has identical structure.</p>
+<p></p>
+<span id="tab-llserv-da"></span><table class="docutils align-default" id="id16">
+<caption><span class="caption-text">Lower layer service attributes for DA services</span><a class="headerlink" href="#id16" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 45%" />
+<col style="width: 55%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Name of the attribute</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ns3::SatLowerLayerServiceConf:: DaService0_ConstantAssignmentProvided</p></td>
+<td><p>Used enable or disable constant assignment.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatLowerLayerServiceConf:: DaService0_RbdcAllowed</p></td>
+<td><p>Used enable or disable RBDC.</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatLowerLayerServiceConf:: DaService0_VolumeAllowed</p></td>
+<td><p>Used enable or disable VBDC.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatLowerLayerServiceConf:: DaService0_ConstantServiceRate</p></td>
+<td><p>Constant service rate assigned (kbps), if constant assignment is enabled.</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatLowerLayerServiceConf:: DaService0_MaximumServiceRate</p></td>
+<td><p>Maximum service rate (kbps).</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatLowerLayerServiceConf:: DaService0_MinimumServiceRate</p></td>
+<td><p>Minimum service rate (kbps).</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatLowerLayerServiceConf:: DaService0_MaximumBacklogSize</p></td>
+<td><p>Maximum backlog size (Kbytes).</p></td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="#tab-llserv-ra"><span class="std std-ref">Lower layer service attributes for RA services</span></a> introduces all RA service
+specific attributes. Only one RA service is configurable currently.</p>
+<p></p>
+<span id="tab-llserv-ra"></span><table class="docutils align-default" id="id17">
+<caption><span class="caption-text">Lower layer service attributes for RA services</span><a class="headerlink" href="#id17" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 72%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Name of the attribute</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ns3::SatLowerLayerServiceConf:: RaService0_ MaximumUniquePayloadPerBlock</p></td>
+<td><p>Indicates the maximum number of unique payloads that the RCST is permitted to send in an RA block.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatLowerLayerServiceConf:: RaService0_ MaximumConsecutiveBlockAccessed</p></td>
+<td><p>Indicates the maximum number of consecutive RA blocks that the RCST is permitted to access for sending of unique payloads.</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatLowerLayerServiceConf:: RaService0_ MinimumIdleBlock</p></td>
+<td><p>Indicates the minimum number of RA blocks that the RCST shall ignore for a given RA allocation channel index after having accessed a maximum allowed number of consecutive RA blocks.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatLowerLayerServiceConf:: RaService0_ BackOffTimeInMilliSeconds</p></td>
+<td><p>Indicates the time that a terminal shall wait before transmitting in the RA allocation channel. This parameter is for normal load state.</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatLowerLayerServiceConf:: RaService0_ HighLoadBackOffTimeInMilliSeconds</p></td>
+<td><p>Indicates the time that a terminal shall wait before transmitting in the RA allocation channel. This parameter is for high load state.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatLowerLayerServiceConf:: RaService0_ BackOffProbability</p></td>
+<td><p>Indicates the probability for entering in back off state. When not in back off state, this is also the probability that the terminal shall avoid accessing the RA allocation channel. This parameter is for normal load state.</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatLowerLayerServiceConf:: RaService0_ HighLoadBackOffProbability</p></td>
+<td><p>Indicates the probability for entering in back off state. When not in back off state, this is also the probability that the terminal shall avoid accessing the RA allocation channel. This parameter is for high load state.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatLowerLayerServiceConf:: RaService0_ NumberOfInstances</p></td>
+<td><p>This field indicates the number of bursts to be transmitted for each unique payload. Value “1” indicates Slotted ALOHA operation. Values above “1” indicate CRDSA operation.</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatLowerLayerServiceConf:: RaService0_ AverageNormalizedOfferedLoadThreshold</p></td>
+<td><p>Indicates the average normalized offered load threshold for dynamic load control. Dynamic load control moves to high load state and parameterization if the load exceeds this threshold.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatLowerLayerServiceConf:: RaService0_ SlottedAlohaAllowed</p></td>
+<td><p>Indicates whether this RA service can be used to send Slotted Aloha traffic.</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatLowerLayerServiceConf:: RaService0_ CrdsaAllowed</p></td>
+<td><p>Indicates whether this RA service can be used to send CRDSA traffic.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="link-budget-configuration">
+<h4>Link Budget configuration<a class="headerlink" href="#link-budget-configuration" title="Permalink to this headline">¶</a></h4>
+<p>Configuration of the link budget for the satellite module can be best studied from
+Link budget example found from <code class="docutils literal notranslate"><span class="pre">/contrib/satellite/examples</span></code> directory and implemented
+in file <code class="docutils literal notranslate"><span class="pre">sat-link-budget-example.cc</span></code>. Parameters (attributes) affecting link budget are
+found in PHY objects. Every type of the PHY object has slight differences to other PHY objects
+related to link budget configuration. The example reads <code class="docutils literal notranslate"><span class="pre">sat-link-budget-input-attributes.xml</span></code>
+file as an input. In this file are all needed attributes for link budget with default values
+(same as set in code level), just changing needed values and re-executing is enough to simulate
+effects on link budget. <code class="docutils literal notranslate"><span class="pre">SatGwPhy</span></code> prefixed attributes are for PHY in GW, <code class="docutils literal notranslate"><span class="pre">SatGeoFeederPhy</span></code>
+prefixed attributes are for feeder link PHY in Geo Satellite, <code class="docutils literal notranslate"><span class="pre">SatGeoUserPhy</span></code> prefixed attributes
+are for user link PHY in Geo Satellite and <code class="docutils literal notranslate"><span class="pre">SatUtPhy</span></code> prefixed attributes are for PHY in UT.</p>
+</section>
+<section id="interference-configuration">
+<h4>Interference configuration<a class="headerlink" href="#interference-configuration" title="Permalink to this headline">¶</a></h4>
+<p>Used interference model are configured by attributes in Helpers.
+Interference model for DA can configured per each link with the following by attributes.
+Interference attributes are presented in <a class="reference internal" href="#tab-interference"><span class="std std-ref">Interference attributes</span></a>.</p>
+<p></p>
+<span id="tab-interference"></span><table class="docutils align-default" id="id18">
+<caption><span class="caption-text">Interference attributes</span><a class="headerlink" href="#id18" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 100%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Name of the attribute</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ns3::SatGeoHelper::DaFwdLinkInterferenceModel</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatGeoHelper::DaRtnLinkInterferenceModel</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3::SatGwHelper::DaRtnLinkInterferenceModel</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3::SatUtHelper::DaFwdLinkInterferenceModel</p></td>
+</tr>
+</tbody>
+</table>
+<p>For random access interference can be configured system level (influence in return link only) with
+<code class="docutils literal notranslate"><span class="pre">ns3::SatBeamHelper::RaInterferenceModel</span></code> attribute.
+Possible model to configure are <code class="docutils literal notranslate"><span class="pre">Constant</span></code>, <code class="docutils literal notranslate"><span class="pre">Trace</span></code>, <code class="docutils literal notranslate"><span class="pre">PerPacket</span></code> (packet by packet), or
+<code class="docutils literal notranslate"><span class="pre">PerFragment</span></code>. Difference between <code class="docutils literal notranslate"><span class="pre">PerPacket</span></code> and <code class="docutils literal notranslate"><span class="pre">PerFragment</span></code> is that, using <code class="docutils literal notranslate"><span class="pre">PerPacket</span></code>,
+each packet overlapping an other is counted as interfering on the whole other packet, whereas
+<code class="docutils literal notranslate"><span class="pre">PerFragment</span></code> take each overlapping fragment independently to compute interferences on each
+of them; resulting in a vector of interference for each packet.</p>
+<p>Interference elimination method can be configured for Random-Access packet decoding. Two method are
+proposed:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Perfect cancelation: interferences from a decoded packet/fragment are removed from all other
+packets/fragment it is interfering with (default behaviour);</p></li>
+<li><p>Residual interference elimination: interferences from a decoded packet/fragment leave residual
+power when its influence is removed from the other packets/fragments it is interfering with.</p></li>
+</ul>
+</div></blockquote>
+<p>Interference elimination attributes are presented in <a class="reference internal" href="#tab-interference-elimination"><span class="std std-ref">Interference Elimination attributes</span></a>..</p>
+<p></p>
+<span id="tab-interference-elimination"></span><table class="docutils align-default" id="id19">
+<caption><span class="caption-text">Interference Elimination attributes</span><a class="headerlink" href="#id19" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 100%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Name of the attribute</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ns3::SatBeamHelper::RaInterferenceEliminationModel</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="bb-frame-configuration">
+<h4>BB Frame configuration<a class="headerlink" href="#bb-frame-configuration" title="Permalink to this headline">¶</a></h4>
+<p>Configuration for BB frames and BB frame configuration are done by class <code class="docutils literal notranslate"><span class="pre">SatBbFrameConf</span></code> attributes.
+These attributes can be seen from Doxygen documentation.</p>
+</section>
+<section id="forward-link-scheduler-configuration">
+<h4>Forward link scheduler configuration<a class="headerlink" href="#forward-link-scheduler-configuration" title="Permalink to this headline">¶</a></h4>
+<p>Configuration for forward link scheduler is done by class <code class="docutils literal notranslate"><span class="pre">SatFwdLinkScheduler</span></code> attributes.
+These attributes can be seen from Doxygen documentation. Also BB frame configuration has direct
+influence to forward link scheduler functionality, see <a class="reference internal" href="#bb-frame-configuration">BB Frame configuration</a>.</p>
+</section>
+<section id="return-link-scheduler-configuration">
+<h4>Return link scheduler configuration<a class="headerlink" href="#return-link-scheduler-configuration" title="Permalink to this headline">¶</a></h4>
+<p>Configuration for return link scheduler is done by class <code class="docutils literal notranslate"><span class="pre">SatBeamScheduler</span></code> and
+<code class="docutils literal notranslate"><span class="pre">SatFrameAllocator</span></code> attributes. These attributes can be seen from Doxygen documentation.
+Also superframe, waveform and lower layer service configurations have influence to return
+link scheduling (<code class="docutils literal notranslate"><span class="pre">SatBeamScheduler</span></code>) functionality. See chapters
+<a class="reference internal" href="#superframe-structure-configuration">Superframe structure configuration</a>, <a class="reference internal" href="#waveform-configuration">Waveform configuration</a> and <a class="reference internal" href="#lls-configuration">LLS configuration</a>.</p>
+</section>
+<section id="request-manager-configuration">
+<h4>Request manager configuration<a class="headerlink" href="#request-manager-configuration" title="Permalink to this headline">¶</a></h4>
+<p>The most important class to be configured for UT request manager is the lower layer service configuration,
+which is already presented in section <a class="reference internal" href="#lls-configuration">LLS configuration</a>. It can be used to enable and disable CRA/VBDC/RBDC and change
+parameters for each RC index individually.</p>
+<p>The request manager evaluation interval may be changed by <code class="docutils literal notranslate"><span class="pre">ns3::SatRequestManager::EvaluationInterval</span></code>
+attribute.</p>
+</section>
+<section id="arq-configuration">
+<h4>ARQ configuration<a class="headerlink" href="#arq-configuration" title="Permalink to this headline">¶</a></h4>
+<p>ARQ maybe enabled and disabled through SatUtHelper attributes <code class="docutils literal notranslate"><span class="pre">ns3::SatUtHelper::EnableRtnLinkArq</span></code>
+and <code class="docutils literal notranslate"><span class="pre">ns3::SatUtHelper::EnableFwdLinkArq.</span></code> The ARQ specific attributes are described in
+<a class="reference internal" href="#tab-arq"><span class="std std-ref">ARQ configuration attributes</span></a>.</p>
+<p></p>
+<span id="tab-arq"></span><table class="docutils align-default" id="id20">
+<caption><span class="caption-text">ARQ configuration attributes</span><a class="headerlink" href="#id20" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 72%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Name of the attribute</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ns3:: SatReturnLinkEncapsulator:: MaxRtnArqSegmentSize</p></td>
+<td><p>Maximum size for the RTN link segment with ARQ. This is set by default to 38 bytes, so that the retransmissions would certainly fit into the time slot.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3:: SatReturnLinkEncapsulator:: MaxNoOfRetransmissions</p></td>
+<td><p>Maximum number of allowed retransmissions for the RTN link ARQ.</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3:: SatReturnLinkEncapsulator:: ReransmissionTimer</p></td>
+<td><p>Time to wait for an ACK before sending a retransmission in RTN link ARQ.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3:: SatReturnLinkEncapsulator:: WindowSize</p></td>
+<td><p>Number of simultaneous and consecutive processes allowed for RTN link ARQ.</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3:: SatReturnLinkEncapsulator:: ArqHeaderSize</p></td>
+<td><p>Header size for ARQ in RTN link.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3:: SatReturnLinkEncapsulator:: RxWaitingTime</p></td>
+<td><p>Maximum waiting time at the receiver side before moving the window forward and accepting an error.</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3:: SatGenericStreamEncapsulator:: MaxNoOfRetransmissions</p></td>
+<td><p>Maximum number of allowed retransmissions for the FWD link ARQ.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3:: SatGenericStreamEncapsulator:: ReransmissionTimer</p></td>
+<td><p>Time to wait for an ACK before sending a retransmission in RTN link ARQ.</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3:: SatGenericStreamEncapsulator:: WindowSize</p></td>
+<td><p>Number of simultaneous and consecutive processes allowed for RTN link ARQ.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ns3:: SatGenericStreamEncapsulator:: ArqHeaderSize</p></td>
+<td><p>Header size for ARQ in RTN link.</p></td>
+</tr>
+<tr class="row-even"><td><p>ns3:: SatGenericStreamEncapsulator:: RxWaitingTime</p></td>
+<td><p>Maximum waiting time at the receiver side before moving the window forward and accepting an error.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="mobility-and-handover-configuration">
+<h4>Mobility and Handover Configuration<a class="headerlink" href="#mobility-and-handover-configuration" title="Permalink to this headline">¶</a></h4>
+<p>The Simulation Helper class defines the attribute <code class="docutils literal notranslate"><span class="pre">MobileUtsFolder</span></code>, which defaults to
+<code class="docutils literal notranslate"><span class="pre">data/utpositions/mobiles/</span></code> to automatically provide trace files for mobile UTs.</p>
+<p>Files in the given folder, if any, are parsed and UTs are created for each of them. These
+UTs are bound to a <code class="docutils literal notranslate"><span class="pre">SatTracedMobilityModel</span></code> and a <code class="docutils literal notranslate"><span class="pre">SatUtHandoverModule</span></code>. If the starting
+position of these UTs is in a beam that is not defined for the simulation, they are discarded
+and not simulated at all.</p>
+</section>
+</section>
+<section id="examples">
+<h3>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h3>
+<p>Example scripts are listed in tables <a class="reference internal" href="#tab-ra-examples"><span class="std std-ref">Random access examples</span></a>, <a class="reference internal" href="#tab-systest-examples"><span class="std std-ref">System test examples</span></a>,
+<a class="reference internal" href="#tab-trace-examples"><span class="std std-ref">Trace examples</span></a>, <a class="reference internal" href="#tab-traffic-examples"><span class="std std-ref">Traffic examples</span></a> and <a class="reference internal" href="#tab-training-examples"><span class="std std-ref">Training examples</span></a>.</p>
+<span id="tab-ra-examples"></span><table class="docutils align-default" id="id21">
+<caption><span class="caption-text">Random access examples</span><a class="headerlink" href="#id21" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 100%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Example script</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>sat-random-access-crdsa-collision-example.cc</p></td>
+</tr>
+<tr class="row-odd"><td><p>sat-random-access-crdsa-example.cc</p></td>
+</tr>
+<tr class="row-even"><td><p>sat-random-access-dynamic-load-control-example.cc</p></td>
+</tr>
+<tr class="row-odd"><td><p>sat-random-access-example.cc</p></td>
+</tr>
+<tr class="row-even"><td><p>sat-random-access-slotted-aloha-collision-example.cc</p></td>
+</tr>
+<tr class="row-odd"><td><p>sat-random-access-slotted-aloha-example.cc</p></td>
+</tr>
+<tr class="row-even"><td><p>sat-ra-sim-tn9.cc</p></td>
+</tr>
+<tr class="row-odd"><td><p>sat-ra-sim-tn9-comparison.cc</p></td>
+</tr>
+</tbody>
+</table>
+<p></p>
+<span id="tab-systest-examples"></span><table class="docutils align-default" id="id22">
+<caption><span class="caption-text">System test examples</span><a class="headerlink" href="#id22" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 100%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Example script</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>sat-fwd-system-test-example.cc</p></td>
+</tr>
+<tr class="row-odd"><td><p>sat-rtn-system-test-example.cc</p></td>
+</tr>
+</tbody>
+</table>
+<p></p>
+<span id="tab-trace-examples"></span><table class="docutils align-default" id="id23">
+<caption><span class="caption-text">Trace examples</span><a class="headerlink" href="#id23" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 100%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Example script</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>sat-trace-input-external-fading-example.cc</p></td>
+</tr>
+<tr class="row-odd"><td><p>sat-trace-input-fading-example.cc</p></td>
+</tr>
+<tr class="row-even"><td><p>sat-trace-input-interference-example.cc</p></td>
+</tr>
+<tr class="row-odd"><td><p>sat-trace-input-rx-power-example.cc</p></td>
+</tr>
+<tr class="row-even"><td><p>sat-trace-output-example.cc</p></td>
+</tr>
+</tbody>
+</table>
+<p></p>
+<span id="tab-traffic-examples"></span><table class="docutils align-default" id="id24">
+<caption><span class="caption-text">Traffic examples</span><a class="headerlink" href="#id24" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 100%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Example script</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>sat-cbr-example.cc</p></td>
+</tr>
+<tr class="row-odd"><td><p>sat-cbr-full-example.cc</p></td>
+</tr>
+<tr class="row-even"><td><p>sat-cbr-stats-example.cc</p></td>
+</tr>
+<tr class="row-odd"><td><p>sat-cbr-user-defined-example.cc</p></td>
+</tr>
+<tr class="row-even"><td><p>sat-dama-http-sim-tn9.cc</p></td>
+</tr>
+<tr class="row-odd"><td><p>sat-dama-onoff-sim-tn9.cc</p></td>
+</tr>
+<tr class="row-even"><td><p>sat-cbr-stats-example.cc</p></td>
+</tr>
+<tr class="row-odd"><td><p>sat-http-example.cc</p></td>
+</tr>
+<tr class="row-even"><td><p>sat-nrtv-example.cc</p></td>
+</tr>
+<tr class="row-odd"><td><p>sat-onoff-example.cc</p></td>
+</tr>
+</tbody>
+</table>
+<p></p>
+<span id="tab-training-examples"></span><table class="docutils align-default" id="id25">
+<caption><span class="caption-text">Training examples</span><a class="headerlink" href="#id25" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 100%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Example script</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>sat-training-example.cc</p></td>
+</tr>
+<tr class="row-odd"><td><p>sat-tutorial-example.cc</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="troubleshooting">
+<h3>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Examples run without data package installed will crash to a fatal error.</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="satellite.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">User Documentation</a><ul>
+<li><a class="reference internal" href="#usage">Usage</a><ul>
+<li><a class="reference internal" href="#building-satellite-module">Building Satellite Module</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#bake">Bake</a></li>
+<li><a class="reference internal" href="#the-simulator">The simulator</a></li>
+<li><a class="reference internal" href="#data-package">Data package</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#helpers">Helpers</a><ul>
+<li><a class="reference internal" href="#simulation-helper">Simulation helper</a></li>
+<li><a class="reference internal" href="#satellite-helper">Satellite helper</a></li>
+<li><a class="reference internal" href="#beam-helper">Beam helper</a></li>
+<li><a class="reference internal" href="#geo-helper">GEO helper</a></li>
+<li><a class="reference internal" href="#gw-helper">GW helper</a></li>
+<li><a class="reference internal" href="#ut-helper">UT helper</a></li>
+<li><a class="reference internal" href="#user-helper">User helper</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#output">Output</a></li>
+<li><a class="reference internal" href="#advanced-usage-and-attributes">Advanced Usage and Attributes</a><ul>
+<li><a class="reference internal" href="#user-and-feeder-links">User and feeder links</a></li>
+<li><a class="reference internal" href="#return-link-frame-configuration">Return link frame configuration</a></li>
+<li><a class="reference internal" href="#forward-link-carrier-configuration">Forward link carrier configuration</a></li>
+<li><a class="reference internal" href="#superframe-structure-configuration">Superframe structure configuration</a></li>
+<li><a class="reference internal" href="#waveform-configuration">Waveform configuration</a></li>
+<li><a class="reference internal" href="#lls-configuration">LLS configuration</a></li>
+<li><a class="reference internal" href="#link-budget-configuration">Link Budget configuration</a></li>
+<li><a class="reference internal" href="#interference-configuration">Interference configuration</a></li>
+<li><a class="reference internal" href="#bb-frame-configuration">BB Frame configuration</a></li>
+<li><a class="reference internal" href="#forward-link-scheduler-configuration">Forward link scheduler configuration</a></li>
+<li><a class="reference internal" href="#return-link-scheduler-configuration">Return link scheduler configuration</a></li>
+<li><a class="reference internal" href="#request-manager-configuration">Request manager configuration</a></li>
+<li><a class="reference internal" href="#arq-configuration">ARQ configuration</a></li>
+<li><a class="reference internal" href="#mobility-and-handover-configuration">Mobility and Handover Configuration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+<li><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="satellite-design.html"
+                        title="previous chapter">Design Documentation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="satellite-testing.html"
+                        title="next chapter">Testing Documentation</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/satellite-usage.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="satellite-testing.html" title="Testing Documentation"
+             >next</a></li>
+        <li class="right" >
+          <a href="satellite-design.html" title="Design Documentation"
+             >previous</a> |</li>
+    <li class="navelem"><a href="/index.html">sns-3</a><span class="navelem">&nbsp;</span></li>
+    
+        <li class="nav-item nav-item-0"><a href="satellite.html">NS3 Satellite Module</a><span class="navelem">&nbsp;</span></li>
+
+        <li class="nav-item nav-item-this"><a href="">User Documentation</a></li> 
+      </ul>
+    </div>
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12">
+            <div id="licenses">
+              <br />
+              <p style="font-size:90%">Contact <a href="mailto:admin _AT_ sns3 _DOT_ org" title="SNS3 contact">
+              SNS3 Maintainers <i class="fa fa-envelope" aria-hidden="true"></i></a></p>
+              <p style="font-size:90%">The text content of this website is published under the <a 
+              href="http://creativecommons.org/licenses/by-nc-sa/3.0/" title="See license details"
+              rel="license" hreflang="en">Creative Commons BY-NC-SA license</a> (except where otherwise
+              stated). Some sections icons are derivative work of the GPL2 icons provided by the Gnome
+              project.</p>
+              <p style="font-size:90%">Logos and trademarks are the property of their respective owners. Any representation,
+              reproduction and/or exploitation, whether partial or total, of trademarks and logos
+              is prohibited without prior written permission from the owners.</p>
+              <p style="font-size:90%"><a href="/privacy_policy.html" title="Read the privacy policy">
+              Privacy policy</a>.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  </body>
+</html>

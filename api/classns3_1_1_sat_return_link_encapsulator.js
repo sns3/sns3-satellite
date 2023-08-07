@@ -1,0 +1,26 @@
+var classns3_1_1_sat_return_link_encapsulator =
+[
+    [ "SatReturnLinkEncapsulator", "classns3_1_1_sat_return_link_encapsulator.html#aea6e89235b5dc3a46a61d8a2c2e1e296", null ],
+    [ "SatReturnLinkEncapsulator", "classns3_1_1_sat_return_link_encapsulator.html#a4c4ab177d4395b1710669f94e398cddb", null ],
+    [ "~SatReturnLinkEncapsulator", "classns3_1_1_sat_return_link_encapsulator.html#a8cb01cf5a2155d38c20da9ecc30d4b3b", null ],
+    [ "DoDispose", "classns3_1_1_sat_return_link_encapsulator.html#a2c8591c9998df82f85a2dce512293131", null ],
+    [ "EnquePdu", "classns3_1_1_sat_return_link_encapsulator.html#acdd249144852325f7cc349d9c64af2e9", null ],
+    [ "GetMinTxOpportunityInBytes", "classns3_1_1_sat_return_link_encapsulator.html#a6b5a5e6866b93539b73aadba8af2545d", null ],
+    [ "GetNewRlePdu", "classns3_1_1_sat_return_link_encapsulator.html#a24275718bc60282afe52334c24f78408", null ],
+    [ "GetTypeId", "classns3_1_1_sat_return_link_encapsulator.html#a08be8282082e4eea66b085422cf42326", null ],
+    [ "IncreaseFragmentId", "classns3_1_1_sat_return_link_encapsulator.html#af7df5228be6d2b31698f351698ac30e2", null ],
+    [ "NotifyTxOpportunity", "classns3_1_1_sat_return_link_encapsulator.html#ac8f36cbb2f4dafad928a47dcb179426e", null ],
+    [ "ProcessPdu", "classns3_1_1_sat_return_link_encapsulator.html#aa7ce7a95ee5dfb347e9e5e6d95af6901", null ],
+    [ "ReceiveAck", "classns3_1_1_sat_return_link_encapsulator.html#a6cdd27284798b4c45b4affec89a6495c", null ],
+    [ "ReceivePdu", "classns3_1_1_sat_return_link_encapsulator.html#ac66400b47254e7f9c693f674d911d7a4", null ],
+    [ "Reset", "classns3_1_1_sat_return_link_encapsulator.html#a5c32088eb9d943797d49b480b20715e6", null ],
+    [ "m_currRxFragmentId", "classns3_1_1_sat_return_link_encapsulator.html#abe474c520bdb776a20abaf196a174a24", null ],
+    [ "m_currRxPacketFragment", "classns3_1_1_sat_return_link_encapsulator.html#a1e8d72c1e2a66424d91a3063a5fedbbb", null ],
+    [ "m_currRxPacketFragmentBytes", "classns3_1_1_sat_return_link_encapsulator.html#a3240b5e98d2dbd977c6bf706911be787", null ],
+    [ "m_currRxPacketSize", "classns3_1_1_sat_return_link_encapsulator.html#a358042c2caf43c6c10d4786c3fc62ea2", null ],
+    [ "m_minTxOpportunity", "classns3_1_1_sat_return_link_encapsulator.html#a0fb70f895b663baa3bd867efe3338dc8", null ],
+    [ "m_txFragmentId", "classns3_1_1_sat_return_link_encapsulator.html#a79e028699ecbacf408169336d7c65103", null ],
+    [ "MAX_FRAGMENT_ID", "classns3_1_1_sat_return_link_encapsulator.html#a4b73c4a17bb725c317b01739018a9c27", null ],
+    [ "MAX_HL_PDU_PACKET_SIZE", "classns3_1_1_sat_return_link_encapsulator.html#ad5d66456b96b2e819adb1e1f54e45a0b", null ],
+    [ "MAX_PPDU_PACKET_SIZE", "classns3_1_1_sat_return_link_encapsulator.html#ad0f9daeb18a7ef54c00a9e5b59c01f41", null ]
+];

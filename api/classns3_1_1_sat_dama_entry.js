@@ -1,0 +1,27 @@
+var classns3_1_1_sat_dama_entry =
+[
+    [ "SatDamaEntry", "classns3_1_1_sat_dama_entry.html#a86c1a4d6af106f80b961dbaddac98555", null ],
+    [ "SatDamaEntry", "classns3_1_1_sat_dama_entry.html#abce47dfaa453aec56682879eca6e0d3a", null ],
+    [ "~SatDamaEntry", "classns3_1_1_sat_dama_entry.html#a59ab0ad9adb9ee10a057a19b5f02149a", null ],
+    [ "DecrementDynamicRatePersistence", "classns3_1_1_sat_dama_entry.html#a4521c3dfdea7b5b34522408118e3252d", null ],
+    [ "DecrementVolumeBacklogPersistence", "classns3_1_1_sat_dama_entry.html#a843d0031bc2e577774254e5c831f8e77", null ],
+    [ "GetCraBasedBytes", "classns3_1_1_sat_dama_entry.html#a11a57bec822a4382bd91cfbd7fad6eb6", null ],
+    [ "GetCraInKbps", "classns3_1_1_sat_dama_entry.html#a55bacca1109a51d810e890f50c8ad9c1", null ],
+    [ "GetMinRateBasedBytes", "classns3_1_1_sat_dama_entry.html#a804b514a74e73c4feb0fa111c6e97c61", null ],
+    [ "GetMinRbdcInKbps", "classns3_1_1_sat_dama_entry.html#ae32c4c5a22f6a07f4ce9fcd1c1836a08", null ],
+    [ "GetRbdcBasedBytes", "classns3_1_1_sat_dama_entry.html#acbaab4c6b62f68adcf4b9a342f8d3e19", null ],
+    [ "GetRbdcInKbps", "classns3_1_1_sat_dama_entry.html#aa991b6650963cd8d5187a52d71db4417", null ],
+    [ "GetRcCount", "classns3_1_1_sat_dama_entry.html#ae39daca1972ccc167b5e1a56cd887892", null ],
+    [ "GetVbdcBasedBytes", "classns3_1_1_sat_dama_entry.html#a16274aa2e7b9faf9a048185e81cb7985", null ],
+    [ "GetVbdcInBytes", "classns3_1_1_sat_dama_entry.html#af63f5f9cf46a7640443c34aa6046cb14", null ],
+    [ "ResetDynamicRatePersistence", "classns3_1_1_sat_dama_entry.html#a6d513616e57f618face84383eca566e5", null ],
+    [ "ResetVolumeBacklogPersistence", "classns3_1_1_sat_dama_entry.html#ab1f14a3d473d3829d02c820a37978f3b", null ],
+    [ "SetVbdcInBytes", "classns3_1_1_sat_dama_entry.html#ad612dc646ec2310d75360131ec9d5f9a", null ],
+    [ "UpdateRbdcInKbps", "classns3_1_1_sat_dama_entry.html#a5b683cd7517d5dbe015ad6f43f143b2d", null ],
+    [ "UpdateVbdcInBytes", "classns3_1_1_sat_dama_entry.html#a5b1d7afb01196cf41cc6fe6e829dbd80", null ],
+    [ "m_dynamicRatePersistence", "classns3_1_1_sat_dama_entry.html#ad8828e264afda91c4706ec2f802cc0df", null ],
+    [ "m_dynamicRateRequestedInKbps", "classns3_1_1_sat_dama_entry.html#acfc268b4dcc46a45127df48220b5d3e0", null ],
+    [ "m_llsConf", "classns3_1_1_sat_dama_entry.html#ae4f739022d648f2888b809ed05825d72", null ],
+    [ "m_volumeBacklogPersistence", "classns3_1_1_sat_dama_entry.html#a25913c43d239ae123349cb272c7424a9", null ],
+    [ "m_volumeBacklogRequestedInBytes", "classns3_1_1_sat_dama_entry.html#a5fd78063e24eebe98bd38cc6a6bf119b", null ]
+];

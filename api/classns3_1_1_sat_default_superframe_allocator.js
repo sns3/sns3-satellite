@@ -1,0 +1,26 @@
+var classns3_1_1_sat_default_superframe_allocator =
+[
+    [ "FrameAllocatorContainer_t", "classns3_1_1_sat_default_superframe_allocator.html#a5ce9f860e5da269b5b3532a993e8b1bd", null ],
+    [ "SupportedFramesMap_t", "classns3_1_1_sat_default_superframe_allocator.html#abe2694305c4bf3fb8c73913c1d7c247b", null ],
+    [ "SatDefaultSuperframeAllocator", "classns3_1_1_sat_default_superframe_allocator.html#a74bfd5449c0c0f9c6c501d75cfc434ba", null ],
+    [ "~SatDefaultSuperframeAllocator", "classns3_1_1_sat_default_superframe_allocator.html#ab01386b7e30bc3db32480af4d3f27658", null ],
+    [ "AllocateBasedOnCc", "classns3_1_1_sat_default_superframe_allocator.html#a35acce80421b483af498ead0603b4be5", null ],
+    [ "AllocateToFrame", "classns3_1_1_sat_default_superframe_allocator.html#a4f3f85127898577cc22427693f0ffddc", null ],
+    [ "GenerateTimeSlots", "classns3_1_1_sat_default_superframe_allocator.html#aa192413bf6aac16d2dbcd545eacd83a7", null ],
+    [ "GetInstanceTypeId", "classns3_1_1_sat_default_superframe_allocator.html#a8da38c75563126143a5bf0c9c3552831", null ],
+    [ "GetTypeId", "classns3_1_1_sat_default_superframe_allocator.html#ab9f0bbb61eec97a31273f72e9097091a", null ],
+    [ "PreAllocateSymbols", "classns3_1_1_sat_default_superframe_allocator.html#a582b13233fb5716469c2e137eb700d18", null ],
+    [ "ReleaseMinimumRate", "classns3_1_1_sat_default_superframe_allocator.html#a6361c517ffd08fe8901fadad25e22abe", null ],
+    [ "RemoveAllocations", "classns3_1_1_sat_default_superframe_allocator.html#a8a480e25b18e8a0cad23a067357d84bc", null ],
+    [ "ReserveMinimumRate", "classns3_1_1_sat_default_superframe_allocator.html#ae902b0675b2b414b744034fb3b78f729", null ],
+    [ "SelectBestCarrier", "classns3_1_1_sat_default_superframe_allocator.html#a942337cdba2b626e58233ea789d34ae4", null ],
+    [ "SelectCarriers", "classns3_1_1_sat_default_superframe_allocator.html#aa0099ebc91070f92208a562ce5bb9e51", null ],
+    [ "m_fcaEnabled", "classns3_1_1_sat_default_superframe_allocator.html#ae6be269df77dfd54ca328829781fcc7e", null ],
+    [ "m_frameAllocators", "classns3_1_1_sat_default_superframe_allocator.html#a9935a92797f4eba53db07b2a00c2f266", null ],
+    [ "m_minCarrierPayloadInBytes", "classns3_1_1_sat_default_superframe_allocator.html#a9f872b0e03e79175a72b8246a6be6781", null ],
+    [ "m_minimumRateBasedBytesLeft", "classns3_1_1_sat_default_superframe_allocator.html#a07c1bce087b7622d4f4192a6daa7ffaa", null ],
+    [ "m_mostRobustSlotPayloadInBytes", "classns3_1_1_sat_default_superframe_allocator.html#ad2b0a642ec5a14c8baa69190eb9257c0", null ],
+    [ "m_rcBasedAllocationEnabled", "classns3_1_1_sat_default_superframe_allocator.html#a285ae999d0f7ba8726c954cf9111e3a9", null ],
+    [ "m_targetLoad", "classns3_1_1_sat_default_superframe_allocator.html#a8d487c93890c8c5c573435cc23acb4e8", null ],
+    [ "m_totalBandwidth", "classns3_1_1_sat_default_superframe_allocator.html#a1f4118ddba1ebcdd9cc1f1da151a0411", null ]
+];

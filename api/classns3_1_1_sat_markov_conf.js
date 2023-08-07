@@ -1,0 +1,36 @@
+var classns3_1_1_sat_markov_conf =
+[
+    [ "MarkovFaderType_t", "classns3_1_1_sat_markov_conf.html#a2ff9fc4eed25f06ff64747a6a97575e3", [
+      [ "LOO_FADER", "classns3_1_1_sat_markov_conf.html#a2ff9fc4eed25f06ff64747a6a97575e3a6106ca8ecb511c7beb6947f06d2f3687", null ],
+      [ "RAYLEIGH_FADER", "classns3_1_1_sat_markov_conf.html#a2ff9fc4eed25f06ff64747a6a97575e3a06a9cda503b5b9b5ca493de5ff9ef0a8", null ]
+    ] ],
+    [ "SatMarkovConf", "classns3_1_1_sat_markov_conf.html#acd97599bee42772a94055dd41b77cb76", null ],
+    [ "~SatMarkovConf", "classns3_1_1_sat_markov_conf.html#a7d99aa69b6bcc24ee916bd98ae2a2f46", null ],
+    [ "AreDecibelsUsed", "classns3_1_1_sat_markov_conf.html#af4663b145f840716254b3c8da6067c7e", null ],
+    [ "DoDispose", "classns3_1_1_sat_markov_conf.html#a00960a2d26ed17b73e8c16660810314e", null ],
+    [ "GetCooldownPeriod", "classns3_1_1_sat_markov_conf.html#a750b2810ecd4b9525abf2a2f5bac3b94", null ],
+    [ "GetElevationProbabilities", "classns3_1_1_sat_markov_conf.html#a0654e7ba64f03a8841419489eb989671", null ],
+    [ "GetFaderType", "classns3_1_1_sat_markov_conf.html#a3106607c02855cc06a47584e5d955383", null ],
+    [ "GetInitialState", "classns3_1_1_sat_markov_conf.html#a73d980dd3e62d1b8761a83126cd8e246", null ],
+    [ "GetLooConf", "classns3_1_1_sat_markov_conf.html#a4bc2aaa59a6fd76bb9681dd7bbd7fe2c", null ],
+    [ "GetMinimumPositionChange", "classns3_1_1_sat_markov_conf.html#a81010d3da798889cbbd34d916f43bb11", null ],
+    [ "GetNumOfSets", "classns3_1_1_sat_markov_conf.html#affcb0cab51d291e43ed0d1324ca63ef4", null ],
+    [ "GetProbabilitySetID", "classns3_1_1_sat_markov_conf.html#a2c3f3c1a2c7a2a5aff02845986b7a883", null ],
+    [ "GetRayleighConf", "classns3_1_1_sat_markov_conf.html#ac1cbbf1061c0be1994ea80b38e6f87f9", null ],
+    [ "GetStateCount", "classns3_1_1_sat_markov_conf.html#acee9af518104c848f79e1f312f3d5c23", null ],
+    [ "GetTypeId", "classns3_1_1_sat_markov_conf.html#ae1ac62ab8f314dd6121c396194cdb58e", null ],
+    [ "Reset", "classns3_1_1_sat_markov_conf.html#a5bc433cbabc2725675f26978fc00a9c9", null ],
+    [ "DEFAULT_ELEVATION_COUNT", "classns3_1_1_sat_markov_conf.html#a13f7aef28f06a72419c0f02bc6953abf", null ],
+    [ "DEFAULT_STATE_COUNT", "classns3_1_1_sat_markov_conf.html#ab5860971d15ba074f83ee1b651293e86", null ],
+    [ "m_cooldownPeriodLength", "classns3_1_1_sat_markov_conf.html#a2c87ad740d2065a3f0b4560501806183", null ],
+    [ "m_elevationCount", "classns3_1_1_sat_markov_conf.html#ad28b2fae840c464bca6885a4dd73003d", null ],
+    [ "m_faderType", "classns3_1_1_sat_markov_conf.html#a43db516410ab6c9613cd50c09cb9b60b", null ],
+    [ "m_initialProbabilities", "classns3_1_1_sat_markov_conf.html#a033e956f8e4218a1ac719fb7cc2c4761", null ],
+    [ "m_looConf", "classns3_1_1_sat_markov_conf.html#a4b3d3d735dee9d0345933bd997923d50", null ],
+    [ "m_markovElevations", "classns3_1_1_sat_markov_conf.html#a3b9455de679e769f2bf81d26a4aa1619", null ],
+    [ "m_markovProbabilities", "classns3_1_1_sat_markov_conf.html#a2dbf8ed9e9f84290847a45bbffd63e10", null ],
+    [ "m_minimumPositionChangeInMeters", "classns3_1_1_sat_markov_conf.html#a370869bd3669fff6c1f378a235c1a164", null ],
+    [ "m_rayleighConf", "classns3_1_1_sat_markov_conf.html#a28e00b93ed1594615546e1bd11ae7b0b", null ],
+    [ "m_stateCount", "classns3_1_1_sat_markov_conf.html#ae654610754e28c85685c8901538d54bc", null ],
+    [ "m_useDecibels", "classns3_1_1_sat_markov_conf.html#a118d556fdc0b007b213d9128624b767a", null ]
+];

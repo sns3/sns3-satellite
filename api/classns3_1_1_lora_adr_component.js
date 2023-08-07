@@ -1,0 +1,35 @@
+var classns3_1_1_lora_adr_component =
+[
+    [ "CombiningMethod", "classns3_1_1_lora_adr_component.html#a3ffde347047059fef8c776f0981b84c2", [
+      [ "AVERAGE", "classns3_1_1_lora_adr_component.html#a3ffde347047059fef8c776f0981b84c2ac712c22053d730e644f3efd1f0497f0c", null ],
+      [ "MAXIMUM", "classns3_1_1_lora_adr_component.html#a3ffde347047059fef8c776f0981b84c2a70550cf0f8ab11076ec876b6461d0512", null ],
+      [ "MINIMUM", "classns3_1_1_lora_adr_component.html#a3ffde347047059fef8c776f0981b84c2ab5e63d3ded416c669b5d6184ffb44850", null ]
+    ] ],
+    [ "LoraAdrComponent", "classns3_1_1_lora_adr_component.html#a2b57c3f8b6ba662bdd1a305c63058a76", null ],
+    [ "~LoraAdrComponent", "classns3_1_1_lora_adr_component.html#a5a94c1c5eac6452c007e505f7abfa536", null ],
+    [ "AdrImplementation", "classns3_1_1_lora_adr_component.html#aa57b7732fd8e91429a2f3e3a50786fb3", null ],
+    [ "BeforeSendingReply", "classns3_1_1_lora_adr_component.html#ab55365beaaaf323f2c07a7ca4e8fe1e5", null ],
+    [ "GetAverageSNR", "classns3_1_1_lora_adr_component.html#a1d0660f6a079152949458ec9b2da09e9", null ],
+    [ "GetAverageTxFromGateways", "classns3_1_1_lora_adr_component.html#aaf3ad3f1081bc995dcb78053464bb59f", null ],
+    [ "GetMaxSNR", "classns3_1_1_lora_adr_component.html#abadc6ac636ab07d05e5efedff5c64f71", null ],
+    [ "GetMaxTxFromGateways", "classns3_1_1_lora_adr_component.html#acd9fd56d0e3f60ce9efd86451646fc81", null ],
+    [ "GetMinSNR", "classns3_1_1_lora_adr_component.html#a180dd907d76a226ef19ad6da8bfea8e9", null ],
+    [ "GetMinTxFromGateways", "classns3_1_1_lora_adr_component.html#aa480731c2dd262c1236cbd8b4351d463", null ],
+    [ "GetReceivedPower", "classns3_1_1_lora_adr_component.html#aff9850fde2e47746c71e3127c4f0bcf6", null ],
+    [ "GetTxPowerIndex", "classns3_1_1_lora_adr_component.html#acbe3dae64e495ad6737e74dcc1f9c664", null ],
+    [ "GetTypeId", "classns3_1_1_lora_adr_component.html#a9deaf6eb41849b255ed87509a1d20c10", null ],
+    [ "OnFailedReply", "classns3_1_1_lora_adr_component.html#a7a50d9aff5acefc817fc4fe30b5dfbf4", null ],
+    [ "OnReceivedPacket", "classns3_1_1_lora_adr_component.html#a853aaf99e145324057fd83776d751590", null ],
+    [ "RxPowerToSNR", "classns3_1_1_lora_adr_component.html#a7c24602e9a9a4be33d400fa9ed7b61fa", null ],
+    [ "SfToDr", "classns3_1_1_lora_adr_component.html#a0d92b99e1d12e481ab91a37a77ebdba8", null ],
+    [ "B", "classns3_1_1_lora_adr_component.html#ae5e1df1db17fc59f3f49ef26c3b349ce", null ],
+    [ "historyAveraging", "classns3_1_1_lora_adr_component.html#a483cd98e9f880984394f48f8dc0b5494", null ],
+    [ "historyRange", "classns3_1_1_lora_adr_component.html#a4b2bca02c9b620a44907f4ee729db5eb", null ],
+    [ "m_toggleTxPower", "classns3_1_1_lora_adr_component.html#a8e11699d3ffdc0b24eae8308351efe4e", null ],
+    [ "max_transmissionPower", "classns3_1_1_lora_adr_component.html#a51bf0cb39270609ca2fcbb039a7f9d9d", null ],
+    [ "min_spreadingFactor", "classns3_1_1_lora_adr_component.html#ab2a02845d1fa3da0934721cff0edbe84", null ],
+    [ "min_transmissionPower", "classns3_1_1_lora_adr_component.html#adfcfb940c51d58413ea20f6c6ae80d96", null ],
+    [ "NF", "classns3_1_1_lora_adr_component.html#aef44d975b166334bfb60585e00fed39b", null ],
+    [ "tpAveraging", "classns3_1_1_lora_adr_component.html#a0429cc40ffd752c3f8abce50b0afb984", null ],
+    [ "treshold", "classns3_1_1_lora_adr_component.html#a9166fdc0e0c61c155d95466c910d117b", null ]
+];

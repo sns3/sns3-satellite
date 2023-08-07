@@ -1,0 +1,27 @@
+var searchData=
+[
+  ['g_5fascending_10916',['g_ascending',['../sat-dynamic-frequency-plan-example_8cc.html#a9f379a942377072de7bdfc7ef6ee95e5',1,'sat-dynamic-frequency-plan-example.cc']]],
+  ['g_5fcnointerval_10917',['g_cnoInterval',['../sat-dynamic-frequency-plan-example_8cc.html#ae62dd4196ad2d99c132323365becd503',1,'sat-dynamic-frequency-plan-example.cc']]],
+  ['g_5felevation_10918',['g_elevation',['../sat-markov-logic-example_8cc.html#a924b1cdd5b79334d347beec16bd0745f',1,'sat-markov-logic-example.cc']]],
+  ['g_5ffirstlatvalue_10919',['g_firstLatValue',['../satellite-mobility-observer-test_8cc.html#a2f30c993c69ba5b0e1d198879b036554',1,'satellite-mobility-observer-test.cc']]],
+  ['g_5ffirstlonvalue_10920',['g_firstLonValue',['../satellite-mobility-observer-test_8cc.html#a16df6aae3be62cebf24571bfff0b4ed5',1,'satellite-mobility-observer-test.cc']]],
+  ['g_5flatitudecount_10921',['g_latitudeCount',['../satellite-mobility-observer-test_8cc.html#ac620641e301b64209f5b63d59ec3f2e4',1,'satellite-mobility-observer-test.cc']]],
+  ['g_5flatstep_10922',['g_latStep',['../satellite-mobility-observer-test_8cc.html#afc1f96dfc57c78688ea489dc7ee4d188',1,'satellite-mobility-observer-test.cc']]],
+  ['g_5flinkresulttestsuite_10923',['g_linkResultTestSuite',['../namespacens3.html#a5e5facf99ab8f347a758a940450f5028',1,'ns3']]],
+  ['g_5flongitudecount_10924',['g_longitudeCount',['../satellite-mobility-observer-test_8cc.html#a55623f3617d09d3509b2bdbc2cb61a0e',1,'satellite-mobility-observer-test.cc']]],
+  ['g_5flonstep_10925',['g_lonStep',['../satellite-mobility-observer-test_8cc.html#ae4b146900501679bf0cfde3c1292ad87',1,'satellite-mobility-observer-test.cc']]],
+  ['g_5flooparameters_10926',['g_LooParameters',['../namespacens3.html#a73004f25131d0848a2bc2885dfce1309',1,'ns3']]],
+  ['g_5fmarkovelevationstatechangeprobabilities_10927',['g_MarkovElevationStateChangeProbabilities',['../namespacens3.html#a76c8eb68f9d323e0d57c38a380230b04',1,'ns3']]],
+  ['g_5fmarkovinitialstateprobabilities_10928',['g_MarkovInitialStateProbabilities',['../namespacens3.html#aa8f5db385e0a598b7b4010af8409e58c',1,'ns3']]],
+  ['g_5frayleighparameters_10929',['g_RayleighParameters',['../namespacens3.html#ae7c44a00f43a966a55ea99c3c24757f0',1,'ns3']]],
+  ['g_5frefelangles_10930',['g_refElAngles',['../satellite-mobility-observer-test_8cc.html#af0b6006ed23a431fc7bcc8f81dcdb19e',1,'satellite-mobility-observer-test.cc']]],
+  ['g_5fsimulationtime_10931',['g_simulationTime',['../sat-dynamic-frequency-plan-example_8cc.html#a6e68b3469dc8ea0a76b05813a31ad66d',1,'sat-dynamic-frequency-plan-example.cc']]],
+  ['g_5ftxmaxpower_10932',['g_txMaxPower',['../sat-dynamic-frequency-plan-example_8cc.html#a7e8995927bb371824b966fd51f4da1b8',1,'sat-dynamic-frequency-plan-example.cc']]],
+  ['g_5fvelocity_10933',['g_velocity',['../sat-markov-logic-example_8cc.html#a1f57a9f9210f3d1959d900bc827c5e7a',1,'sat-markov-logic-example.cc']]],
+  ['gamma_10934',['gamma',['../structns3_1_1_sat_phy_rx_carrier_per_window_1_1essa_packet_rx_params__s.html#a3341cf5319fa44d0c4d00f625f9a74c3',1,'ns3::SatPhyRxCarrierPerWindow::essaPacketRxParams_s']]],
+  ['geocoordinatetestsuite_10935',['geoCoordinateTestSuite',['../satellite-geo-coordinate-test_8cc.html#ace240f8ca37ded212ada897215fcdf6f',1,'satellite-geo-coordinate-test.cc']]],
+  ['gsto_10936',['gsto',['../structelsetrec.html#af5cc95da3ffa1e006fc165feb93fbbee',1,'elsetrec']]],
+  ['gw_5fid_5findex_10937',['GW_ID_INDEX',['../classns3_1_1_sat_conf.html#a4ac838fee00214f6a0d9b779288061b4',1,'ns3::SatConf']]],
+  ['gwaddress_10938',['gwAddress',['../structns3_1_1_lora_end_device_status_1_1_packet_info_per_gw.html#a0d5ffb31e5d22ceeeba2a43efcea93de',1,'ns3::LoraEndDeviceStatus::PacketInfoPerGw']]],
+  ['gwlist_10939',['gwList',['../structns3_1_1_lora_end_device_status_1_1_received_packet_info.html#a6653ade349628081633fc4c25ac7fb0d',1,'ns3::LoraEndDeviceStatus::ReceivedPacketInfo']]]
+];
