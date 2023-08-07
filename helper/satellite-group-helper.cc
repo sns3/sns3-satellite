@@ -212,8 +212,7 @@ SatGroupHelper::CreateUtNodesFromPosition (uint32_t groupId, uint32_t nb, GeoCoo
   for (uint32_t i = 0; i < nb; i++)
     {
       GeoCoordinate position = circleAllocator->GetNextGeoPosition ();
-      uint32_t bestBeamId = m_antennaGainPatterns->GetBestBeamId (0, position, false);
-      m_additionalNodesPerBeam[bestBeamId].push_back (std::make_pair(position, groupId));
+      m_additionalNodesPerBeam.push_back (std::make_pair(position, groupId));
     }
 
   m_groupsList.push_back(groupId);
@@ -227,7 +226,7 @@ SatGroupHelper::AddNodeToGroupAfterScenarioCreation (uint32_t groupId, Ptr<Node>
   m_nodesToAdd[node] = groupId;
 }
 
-std::map<uint32_t, std::vector<std::pair<GeoCoordinate, uint32_t>>>
+std::vector<std::pair<GeoCoordinate, uint32_t>>
 SatGroupHelper::GetAdditionalNodesPerBeam ()
 {
   NS_LOG_FUNCTION (this);
@@ -291,19 +290,6 @@ std::list<uint32_t>
 SatGroupHelper::GetGroups ()
 {
   return m_groupsList;
-}
-
-void
-SatGroupHelper::SetAntennaGainPatterns (Ptr<SatAntennaGainPatternContainer> antennaGainPatterns)
-{
-  NS_LOG_FUNCTION (this);
-  m_antennaGainPatterns = antennaGainPatterns;
-}
-
-Ptr<SatAntennaGainPatternContainer>
-SatGroupHelper::GetAntennaGainPatterns ()
-{
-  return m_antennaGainPatterns;
 }
 
 void

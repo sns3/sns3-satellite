@@ -52,8 +52,9 @@ public:
    * \param latitude latitude of position, -90 ... 90 degrees
    * \param longitude longitude of position, -180 ... 180 degrees
    * \param altitude altitude of position, >= -EARTH_RADIUS
+   * \param correctIfInvalid Correct latitude and longitude if outside bounds
    */
-  GeoCoordinate (double latitude, double longitude, double altitude);
+  GeoCoordinate (double latitude, double longitude, double altitude, bool correctIfInvalid=false);
 
   /**
    * Create GeoCoordinate from given latitude, longitude and altitude decimal degree values
@@ -62,8 +63,9 @@ public:
    * \param longitude longitude of position, -180 ... 180 degrees
    * \param altitude altitude of position, >= -EARTH_RADIUS
    * \param refEllipsoid Reference ellipsoid to be used
+   * \param correctIfInvalid Correct latitude and longitude if outside bounds
    */
-  GeoCoordinate (double latitude, double longitude, double altitude, ReferenceEllipsoid_t refEllipsoid);
+  GeoCoordinate (double latitude, double longitude, double altitude, ReferenceEllipsoid_t refEllipsoid, bool correctIfInvalid=false);
 
   /**
    * Create GeoCoordinate from given vector (x, y, z). Reference ellipsoid to be used is sphere.
@@ -194,6 +196,7 @@ private:
    * \param latitude latitude of position
    * \param longitude longitude of position
    * \param altitude altitude of position
+   * \param correctIfInvalid Correct latitude and longitude if outside bounds
    *
    * Helper for constructor to create GeoCoordinate from given latitude, longitude and altitude decimal degree values.
    *
@@ -204,7 +207,7 @@ private:
    * Altitude:      >= -EARTH_RADIUS
    *
    */
-  void Construct (double latitude, double longitude, double altitude);
+  void Construct (double latitude, double longitude, double altitude, bool correctIfInvalid);
 
   /**
    * This method is called to initialize needed parameters according to used reference ellipsoide.
