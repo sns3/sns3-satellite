@@ -23,7 +23,8 @@
 #ifndef LORA_LOGICAL_CHANNEL_H
 #define LORA_LOGICAL_CHANNEL_H
 
-#include "ns3/object.h"
+#include <ns3/object.h>
+
 
 namespace ns3 {
 

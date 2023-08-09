@@ -87,7 +87,7 @@ main (int argc, char *argv[])
 
   std::string raModel = "CRDSA";
   bool dynamicLoadControl = true;
-  bool utMobility = true;
+  bool utMobility = false;
   std::string mobilityPath = "contrib/satellite/data/utpositions/mobiles/scenario0/trajectory";
   std::string burstLengthStr = "ShortBurst";
   SatEnums::SatWaveFormBurstLength_t burstLength = SatEnums::SHORT_BURST;
@@ -268,8 +268,8 @@ main (int argc, char *argv[])
   // Mobility
   if (utMobility)
     {
-      Ptr<SatMobilityModel> satMobility = satHelper->GetBeamHelper ()->GetGeoSatNode ()->GetObject<SatMobilityModel> ();
-      Ptr<Node> node = satHelper->LoadMobileUtFromFile (mobilityPath);
+      Ptr<SatMobilityModel> satMobility = satHelper->GetBeamHelper ()->GetGeoSatNodes ().Get (0)->GetObject<SatMobilityModel> ();
+      Ptr<Node> node = satHelper->LoadMobileUtFromFile (0, mobilityPath);
       node->GetObject<SatMobilityModel> ()->TraceConnect ("SatCourseChange", "BeamTracer", MakeCallback (SatCourseChange));
     }
 
@@ -279,7 +279,7 @@ main (int argc, char *argv[])
    */
   simulationHelper->EnableProgressLogs ();
 
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("contrib/satellite/data/sims/sat-vhts-example/output-attributes.xml"));
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("output-attributes.xml"));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
   ConfigStore outputConfig;

@@ -101,7 +101,9 @@ public:
     IDENTIFIER_UT,
     IDENTIFIER_UT_USER,
     IDENTIFIER_SLICE,
-    IDENTIFIER_GROUP
+    IDENTIFIER_GROUP,
+    IDENTIFIER_SAT,
+    IDENTIFIER_ISL
   } IdentifierType_t;
 
   /**
@@ -327,6 +329,14 @@ protected:
   uint32_t GetGwId (Ptr<Node> gwNode) const;
 
   /**
+   * \brief
+   * \param satNode
+   * \return the ID previously assigned to the SAT, or zero if the SAT is not
+   *         assigned to any ID.
+   */
+  uint32_t GetSatId (Ptr<Node> satNode) const;
+
+  /**
    * \param utUserNode
    * \return
    */
@@ -342,7 +352,7 @@ protected:
    * \param beamId
    * \return
    */
-  uint32_t GetIdentifierForBeam (uint32_t beamId) const;
+  uint32_t GetIdentifierForBeam (uint32_t satId, uint32_t beamId) const;
 
   /**
    * \param groupId
@@ -356,6 +366,18 @@ protected:
    */
   uint32_t GetIdentifierForGw (Ptr<Node> gwNode) const;
 
+  /**
+   * \param satNode
+   * \return
+   */
+  uint32_t GetIdentifierForSat (Ptr<Node> satNode) const;
+
+  /**
+   * \param satNode
+   * \return
+   */
+  uint32_t GetIdentifierForIsl (Ptr<Node> satNodeSrc, Ptr<Node> satNodeDst) const;
+
   // DEVICE RETRIEVAL METHODS /////////////////////////////////////////////////
 
   /**
@@ -367,6 +389,11 @@ protected:
    * \return
    */
   static Ptr<NetDevice> GetUtSatNetDevice (Ptr<Node> utNode);
+
+  /**
+   * \return
+   */
+  static Ptr<NetDevice> GetSatSatGeoNetDevice (Ptr<Node> satNode);
 
 private:
   std::string           m_name;            ///<

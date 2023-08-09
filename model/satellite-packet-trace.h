@@ -21,8 +21,9 @@
 #ifndef SATELLITE_PACKET_TRACE_H_
 #define SATELLITE_PACKET_TRACE_H_
 
-#include "ns3/object.h"
-#include "ns3/output-stream-wrapper.h"
+#include <ns3/object.h>
+#include <ns3/output-stream-wrapper.h>
+
 #include "satellite-enums.h"
 
 

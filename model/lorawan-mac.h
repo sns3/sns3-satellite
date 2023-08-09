@@ -23,13 +23,16 @@
 #ifndef LORAWAN_MAC_H
 #define LORAWAN_MAC_H
 
-#include "ns3/object.h"
-#include "ns3/packet.h"
-#include "ns3/satellite-phy.h"
-#include "ns3/satellite-mac.h"
-#include "ns3/lora-logical-channel-helper.h"
-#include "ns3/satellite-lora-phy-rx.h"
 #include <array>
+
+#include <ns3/object.h>
+#include <ns3/packet.h>
+
+#include "satellite-phy.h"
+#include "satellite-mac.h"
+#include "satellite-lora-phy-rx.h"
+#include "lora-logical-channel-helper.h"
+
 
 namespace ns3 {
 
@@ -46,7 +49,7 @@ public:
   static TypeId GetTypeId (void);
 
   LorawanMac ();
-  LorawanMac (uint32_t beamId);
+  LorawanMac (uint32_t satId, uint32_t beamId);
   virtual ~LorawanMac ();
 
   typedef std::array<std::array<uint8_t, 6>, 8> ReplyDataRateMatrix;
@@ -247,6 +250,11 @@ public:
    */
   int GetNPreambleSymbols (void);
 
+  /**
+   * \brief Indicates if the satellite is regenerative on the link this layer is sending packets.
+   */
+  void setRegenerative (bool isRegenerative);
+
 protected:
   /**
   * The trace source that is fired when a packet cannot be sent because of duty
@@ -313,6 +321,16 @@ protected:
    * sending DR and on the value of the RX1DROffset parameter.
    */
   ReplyDataRateMatrix m_replyDataRateMatrix;
+
+  /**
+   * ID of beam for UT
+   */
+  uint32_t m_beamId;
+
+  /**
+   * Indicates if satellite is regenerative on the link where this layer is sending packets.
+   */
+  bool m_isRegenerative;
 };
 
 } /* namespace ns3 */

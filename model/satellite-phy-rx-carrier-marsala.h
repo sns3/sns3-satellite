@@ -21,7 +21,8 @@
 #ifndef SATELLITE_PHY_RX_CARRIER_MARSALA_H
 #define SATELLITE_PHY_RX_CARRIER_MARSALA_H
 
-#include <ns3/satellite-phy-rx-carrier-per-frame.h>
+#include "satellite-phy-rx-carrier-per-frame.h"
+
 
 namespace ns3 {
 

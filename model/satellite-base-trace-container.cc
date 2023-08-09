@@ -17,7 +17,11 @@
  *
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
+
+#include <ns3/log.h>
+
 #include "satellite-base-trace-container.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatBaseTraceContainer");
 

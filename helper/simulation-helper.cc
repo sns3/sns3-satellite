@@ -745,7 +745,7 @@ SimulationHelper::ProgressCb ()
 void
 SimulationHelper::CreateDefaultStats ()
 {
-  NS_ASSERT_MSG (m_satHelper != 0, "Satellite scenario not created yet!");
+  NS_ASSERT_MSG (m_satHelper != nullptr, "Satellite scenario not created yet!");
 
   if (!m_statContainer)
     {
@@ -771,23 +771,31 @@ SimulationHelper::CreateDefaultFwdLinkStats ()
 
   // Throughput
   m_statContainer->AddAverageUtUserFwdAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
-  m_statContainer->AddAverageUtFwdPhyThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
+  m_statContainer->AddAverageUtFwdUserPhyThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
   m_statContainer->AddAverageBeamFwdAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
 
   m_statContainer->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  m_statContainer->AddGlobalFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddGlobalFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  m_statContainer->AddGlobalFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddGlobalFwdPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddGlobalFwdFeederMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddGlobalFwdUserMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddGlobalFwdFeederMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddGlobalFwdUserMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddGlobalFwdFeederPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddGlobalFwdUserPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddGlobalFwdFeederPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddGlobalFwdUserPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   m_statContainer->AddPerBeamFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamFwdPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFwdFeederMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFwdUserMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFwdFeederPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFwdUserPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   Config::SetDefault ("ns3::SatStatsThroughputHelper::AveragingMode", BooleanValue (true));
   m_statContainer->AddPerBeamFwdAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
-  m_statContainer->AddPerBeamFwdMacThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
-  m_statContainer->AddPerBeamFwdPhyThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
+  m_statContainer->AddPerBeamFwdFeederMacThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
+  m_statContainer->AddPerBeamFwdUserMacThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
+  m_statContainer->AddPerBeamFwdFeederPhyThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
+  m_statContainer->AddPerBeamFwdUserPhyThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
 
   // SINR
   m_statContainer->AddGlobalFwdCompositeSinr (SatStatsHelper::OUTPUT_CDF_FILE);
@@ -798,13 +806,13 @@ SimulationHelper::CreateDefaultFwdLinkStats ()
   m_statContainer->AddGlobalFwdAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
 
   // Packet error
-  m_statContainer->AddGlobalFwdDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamFwdDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamCrdsaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamCrdsaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddGlobalFwdUserDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFwdUserDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamRtnFeederDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFeederCrdsaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFeederCrdsaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFeederSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFeederSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   // Marsala
   m_statContainer->AddPerBeamMarsalaCorrelation (SatStatsHelper::OUTPUT_SCALAR_FILE);
@@ -833,21 +841,28 @@ SimulationHelper::CreateDefaultRtnLinkStats ()
 
   // Throughput
   m_statContainer->AddAverageUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
-  m_statContainer->AddAverageUtRtnPhyThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
+  m_statContainer->AddAverageUtRtnFeederPhyThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
   m_statContainer->AddAverageBeamRtnAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
   m_statContainer->AddPerUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   m_statContainer->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   m_statContainer->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  m_statContainer->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  m_statContainer->AddGlobalRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddGlobalRtnPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddGlobalRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddGlobalRtnUserMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddGlobalRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddGlobalRtnUserMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddGlobalRtnFeederPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddGlobalRtnUserPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddGlobalRtnFeederPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+  m_statContainer->AddGlobalRtnUserPhyThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
   m_statContainer->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamRtnDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamRtnPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamRtnFeederDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamRtnUserDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamRtnUserMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamRtnFeederPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamRtnUserPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   // Granted resources
   m_statContainer->AddGlobalResourcesGranted (SatStatsHelper::OUTPUT_SCATTER_FILE);
@@ -885,12 +900,12 @@ SimulationHelper::CreateDefaultRtnLinkStats ()
   m_statContainer->AddPerBeamRtnMacDelay (SatStatsHelper::OUTPUT_CDF_FILE);
 
   // Packet error
-  m_statContainer->AddGlobalRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamCrdsaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamCrdsaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  m_statContainer->AddPerBeamSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddGlobalRtnFeederDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamRtnFeederDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFeederCrdsaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFeederCrdsaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFeederSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  m_statContainer->AddPerBeamFeederSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
 
   // Waveform
   m_statContainer->AddPerBeamWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
@@ -1225,11 +1240,11 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario, c
   m_satHelper = CreateObject<SatHelper> ();
 
   m_satHelper->SetGroupHelper (GetGroupHelper ()); // If not done in user scenario, group helper is created here
-  m_satHelper->SetAntennaGainPatterns (m_groupHelper->GetAntennaGainPatterns ());
-  m_satHelper->GetBeamHelper ()->SetAntennaGainPatterns (m_groupHelper->GetAntennaGainPatterns ());
+  Ptr<SatAntennaGainPatternContainer> antennaGainPatterns = m_satHelper->GetAntennaGainPatterns ();
+  m_satHelper->GetBeamHelper ()->SetAntennaGainPatterns (antennaGainPatterns);
 
   // Set UT position allocators, if any
-  if (!m_enableInputFileUtListPositions)
+  if (!m_enableInputFileUtListPositions && !m_satHelper->IsSatConstellationEnabled ())
     {
       if (m_commonUtPositions)
         {
@@ -1241,13 +1256,32 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario, c
         }
     }
 
+  if (m_satHelper->IsSatConstellationEnabled ())
+    {
+      SatHelper::BeamUserInfoMap_t beamInfo;
+      for (uint32_t satId = 0; satId < m_satHelper->GeoSatNodes ().GetN (); satId++)
+        {
+          // Set beamInfo to indicate enabled beams
+          for (uint32_t i = 1; i <= m_satHelper->GetBeamCount (); i++)
+            {
+              if (IsBeamEnabled (i))
+                {
+                  SatBeamUserInfo info;
+                  beamInfo.insert (std::make_pair (std::make_pair (satId, i), info));
+                }
+            }
+        }
+
+      m_satHelper->CreateConstellationScenario (beamInfo, MakeCallback (&SimulationHelper::GetNextUtUserCount, this));
+    }
+
   // Determine scenario
-  if (scenario == SatHelper::NONE)
+  else if (scenario == SatHelper::NONE)
     {
       // Create beam scenario
       SatHelper::BeamUserInfoMap_t beamInfo;
 
-      for (uint32_t i = 1; i <= 72; i++)
+      for (uint32_t i = 1; i <= m_satHelper->GetBeamCount (); i++)
         {
           if (IsBeamEnabled (i))
             {
@@ -1263,13 +1297,20 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario, c
                   ss << ", " <<  j << ". UT user count= " << utUserCount;
                 }
 
-              beamInfo.insert (std::make_pair (i, info));
+              beamInfo.insert (std::make_pair (std::make_pair (0, i), info));
 
               ss << std::endl;
             }
         }
 
-      std::map<uint32_t, std::vector<std::pair<GeoCoordinate, uint32_t>>> additionalNodes = m_groupHelper->GetAdditionalNodesPerBeam ();
+      std::vector<std::pair<GeoCoordinate, uint32_t>> additionalNodesVector = m_groupHelper->GetAdditionalNodesPerBeam ();
+      std::map<uint32_t, std::vector<std::pair<GeoCoordinate, uint32_t>>> additionalNodes;
+      for(std::vector<std::pair<GeoCoordinate, uint32_t>>::iterator it = additionalNodesVector.begin(); it != additionalNodesVector.end(); it++)
+        {
+          uint32_t bestBeamId = antennaGainPatterns->GetBestBeamId (0, it->first, false);
+          additionalNodes[bestBeamId].push_back (*it);
+        }
+
       for (std::map<uint32_t, std::vector<std::pair<GeoCoordinate, uint32_t>>>::iterator it = additionalNodes.begin(); it != additionalNodes.end(); it++)
         {
           if (!IsBeamEnabled (it->first))
@@ -1278,23 +1319,23 @@ SimulationHelper::CreateSatScenario (SatHelper::PreDefinedScenario_t scenario, c
               std::cout << "Beam ID " << it->first << " is not enabled, cannot add " << it->second.size () << " UTs from SatGroupHelper" << std::endl;
               continue;
             }
-          beamInfo[it->first].SetPositions (it->second);
+          beamInfo[std::make_pair (0, it->first)].SetPositions (it->second);
           for (uint32_t i = 0; i < it->second.size (); i++)
             {
-              beamInfo[it->first].AppendUt (GetNextUtUserCount ());
+              beamInfo[std::make_pair (0, it->first)].AppendUt (GetNextUtUserCount ());
             }
         }
 
       if (mobileUtsFolder != "")
         {
-          m_satHelper->LoadMobileUTsFromFolder (mobileUtsFolder, m_utMobileUserCount);
+          m_satHelper->LoadMobileUTsFromFolder (0, mobileUtsFolder, m_utMobileUserCount);
         }
 
       // Now, create either a scenario based on list positions in input file
       // or create a generic scenario with UT positions configured by other ways..
       if (m_enableInputFileUtListPositions)
         {
-          m_satHelper->CreateUserDefinedScenarioFromListPositions (beamInfo, m_inputFileUtPositionsCheckBeams);
+          m_satHelper->CreateUserDefinedScenarioFromListPositions (0, beamInfo, m_inputFileUtPositionsCheckBeams);
         }
       else
         {
@@ -1351,7 +1392,7 @@ SimulationHelper::InstallTrafficModel (TrafficModel_t trafficModel,
   // get users
   NodeContainer utAllUsers = m_satHelper->GetUtUsers ();
   NodeContainer gwUsers = m_satHelper->GetGwUsers ();
-  NS_ASSERT_MSG (m_gwUserId < gwUsers.GetN (), "The number of GW users configured was too low.");
+  NS_ASSERT_MSG (m_gwUserId < gwUsers.GetN (), "The number of GW users configured was too low. " << m_gwUserId << " " << gwUsers.GetN ());
 
   // Filter UT users to keep only a given percentage on which installing the application
   Ptr<UniformRandomVariable> rng = CreateObject<UniformRandomVariable> ();

@@ -18,13 +18,15 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include "ns3/log.h"
-#include "ns3/pointer.h"
-#include "ns3/boolean.h"
-#include "ns3/double.h"
-#include "ns3/trace-source-accessor.h"
+#include <ns3/log.h>
+#include <ns3/pointer.h>
+#include <ns3/boolean.h>
+#include <ns3/double.h>
+#include <ns3/trace-source-accessor.h>
+
 #include "satellite-utils.h"
 #include "satellite-mobility-observer.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatMobilityObserver");
 
@@ -89,13 +91,14 @@ SatMobilityObserver::SatMobilityObserver ()
   NS_ASSERT (false);
 }
 
-SatMobilityObserver::SatMobilityObserver (Ptr<SatMobilityModel> ownMobility, Ptr<SatMobilityModel> geoSatMobility)
+SatMobilityObserver::SatMobilityObserver (Ptr<SatMobilityModel> ownMobility, Ptr<SatMobilityModel> geoSatMobility, bool isRegenerative)
   : m_ownMobility (ownMobility),
   m_anotherMobility (NULL),
   m_geoSatMobility (geoSatMobility),
   m_ownProgDelayModel (NULL),
   m_anotherProgDelayModel (NULL),
-  m_initialized (false)
+  m_initialized (false),
+  m_isRegenerative (isRegenerative)
 {
   NS_LOG_FUNCTION (this << ownMobility << geoSatMobility);
 
@@ -307,9 +310,15 @@ SatMobilityObserver::UpdateTimingAdvance ()
   NS_ASSERT (m_ownProgDelayModel != NULL);
   NS_ASSERT (m_anotherProgDelayModel != NULL);
 
-  m_timingAdvance_s = m_ownProgDelayModel->GetDelay ( m_ownMobility, m_geoSatMobility ) +
-    m_anotherProgDelayModel->GetDelay ( m_anotherMobility, m_geoSatMobility );
-
+  if (m_isRegenerative)
+    {
+      m_timingAdvance_s = m_ownProgDelayModel->GetDelay ( m_ownMobility, m_geoSatMobility );
+    }
+  else
+    {
+      m_timingAdvance_s = m_ownProgDelayModel->GetDelay ( m_ownMobility, m_geoSatMobility ) +
+        m_anotherProgDelayModel->GetDelay ( m_anotherMobility, m_geoSatMobility );
+    }
 }
 
 

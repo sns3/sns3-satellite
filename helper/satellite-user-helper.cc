@@ -657,9 +657,10 @@ SatUserHelper::UpdateUtRoutes (Address utAddress, Address gwAddress)
   Ptr<Ipv4StaticRouting> routing = ipv4RoutingHelper.GetStaticRouting (protocol);
   routing->SetDefaultRoute (ip, utIfIndex);
 
+  uint32_t satId = gwNd->GetMac ()->GetSatId ();
   uint32_t beamId = gwNd->GetMac ()->GetBeamId ();
-  Ptr<PropagationDelayModel> flDelayModel = m_propagationDelayCallback (beamId, SatEnums::RETURN_FEEDER_CH);
-  Ptr<PropagationDelayModel> ulDelayModel = m_propagationDelayCallback (beamId, SatEnums::RETURN_USER_CH);
+  Ptr<PropagationDelayModel> flDelayModel = m_propagationDelayCallback (satId, beamId, SatEnums::RETURN_FEEDER_CH);
+  Ptr<PropagationDelayModel> ulDelayModel = m_propagationDelayCallback (satId, beamId, SatEnums::RETURN_USER_CH);
   Ptr<SatMobilityObserver> observer = utNd->GetNode ()->GetObject<SatMobilityObserver> ();
   observer->ObserveTimingAdvance (ulDelayModel, flDelayModel, gwNd->GetNode ()->GetObject<SatMobilityModel> ());
 }

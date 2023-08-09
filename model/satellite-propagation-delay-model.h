@@ -21,8 +21,9 @@
 #ifndef SATELLITE_PROPAGATION_DELAY_MODEL_H
 #define SATELLITE_PROPAGATION_DELAY_MODEL_H
 
-#include "ns3/propagation-delay-model.h"
-#include "ns3/mobility-model.h"
+#include <ns3/mobility-model.h>
+#include <ns3/propagation-delay-model.h>
+
 
 namespace ns3 {
 

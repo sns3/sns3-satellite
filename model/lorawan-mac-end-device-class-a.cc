@@ -28,12 +28,13 @@
 #include <ns3/log.h>
 #include <ns3/pointer.h>
 
-#include <ns3/satellite-phy.h>
-#include <ns3/satellite-lorawan-net-device.h>
+#include "satellite-phy.h"
+#include "satellite-lorawan-net-device.h"
 
-#include "ns3/lora-tag.h"
-#include <ns3/lorawan-mac-end-device-class-a.h>
-#include <ns3/lorawan-mac-end-device.h>
+#include "lora-tag.h"
+#include "lorawan-mac-end-device-class-a.h"
+#include "lorawan-mac-end-device.h"
+
 
 namespace ns3 {
 
@@ -75,8 +76,8 @@ LorawanMacEndDeviceClassA::LorawanMacEndDeviceClassA ()
   NS_FATAL_ERROR ("Default constructor not in use");
 }
 
-LorawanMacEndDeviceClassA::LorawanMacEndDeviceClassA (uint32_t beamId, Ptr<SatSuperframeSeq> seq)
-  : LorawanMacEndDevice (beamId),
+LorawanMacEndDeviceClassA::LorawanMacEndDeviceClassA (uint32_t satId, uint32_t beamId, Ptr<SatSuperframeSeq> seq)
+  : LorawanMacEndDevice (satId, beamId),
     m_superframeSeq (seq),
     m_firstWindowDelay (Seconds (1)),
     m_secondWindowDelay (Seconds (2)),
@@ -186,6 +187,12 @@ LorawanMacEndDeviceClassA::SendToPhy (Ptr<Packet> packetToSend)
   mTag.SetSourceAddress (Mac48Address::ConvertFrom (m_device->GetAddress ()));
   packetToSend->AddPacketTag (mTag);
 
+  SatAddressE2ETag addressE2ETag;
+  packetToSend->RemovePacketTag (addressE2ETag);
+  addressE2ETag.SetE2EDestAddress (Mac48Address::GetBroadcast ());
+  addressE2ETag.SetE2ESourceAddress (Mac48Address::ConvertFrom (m_device->GetAddress ()));
+  packetToSend->AddPacketTag (addressE2ETag);
+
   SatPhy::PacketContainer_t packets;
   packets.push_back (packetToSend);
 
@@ -237,6 +244,11 @@ LorawanMacEndDeviceClassA::Receive (Ptr<Packet> packet)
   packet->RemovePacketTag (macTag);
   macTag.SetDestAddress (m_nodeInfo->GetMacAddress ());
   packet->AddPacketTag (macTag);
+
+  SatAddressE2ETag addressE2ETag;
+  packet->RemovePacketTag (addressE2ETag);
+  addressE2ETag.SetE2EDestAddress (m_nodeInfo->GetMacAddress ());
+  packet->AddPacketTag (addressE2ETag);
 
   SatPhy::PacketContainer_t packets;
   packets.push_back (packet);

@@ -28,7 +28,9 @@
 #include <map>
 #include <list>
 #include <deque>
-#include <ns3/satellite-phy-rx-carrier.h>
+
+#include "satellite-phy-rx-carrier.h"
+
 
 namespace ns3 {
 

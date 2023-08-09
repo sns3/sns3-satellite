@@ -18,8 +18,10 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include "ns3/log.h"
+#include <ns3/log.h>
+
 #include "satellite-constant-position-mobility-model.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatConstMobilityModel");
 

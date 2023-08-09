@@ -24,9 +24,12 @@
 
 #include <vector>
 #include <deque>
-#include "ns3/simple-ref-count.h"
+
+#include <ns3/simple-ref-count.h>
+
 #include "satellite-bbframe.h"
 #include "satellite-enums.h"
+
 
 namespace ns3 {
 

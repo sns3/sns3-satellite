@@ -87,8 +87,14 @@ public:
   }
 
 protected:
-  // inherited from SatStatsHelper base class
-  void DoInstall ();
+  /**
+   * \brief Save the address and the proper identifier from the given UT node.
+   * \param utNode a UT node.
+   *
+   * The address of the given node will be saved in the #m_identifierMap
+   * member variable.
+   */
+  void SaveAddressAndIdentifier (Ptr<Node> utNode);
 
   /**
    * \param traceSourceName
@@ -104,33 +110,91 @@ protected:
     m_carrierType = carrierType;
   }
 
-private:
-  /**
-   * \brief Save the address and the proper identifier from the given UT node.
-   * \param utNode a UT node.
-   *
-   * The address of the given node will be saved in the #m_identifierMap
-   * member variable.
-   */
-  void SaveAddressAndIdentifier (Ptr<Node> utNode);
-
   /// Maintains a list of collectors created by this helper.
   CollectorMap m_terminalCollectors;
-
-  /// The aggregator created by this helper.
-  Ptr<DataCollectionObject> m_aggregator;
 
   /// Map of address and the identifier associated with it (for forward link).
   std::map<const Address, uint32_t> m_identifierMap;
 
-  std::string m_traceSourceName;
-
+private:
   SatPhyRxCarrier::CarrierType m_carrierType;
+
+  std::string m_traceSourceName;
 
 }; // end of class SatStatsPacketCollisionHelper
 
 
-// SLOTTED ALOHA //////////////////////////////////////////////////////////////
+// BASE CLASS FEEDER /////////////////////////////////////////////////////////////////
+
+/**
+ * \ingroup satstats
+ * \brief
+ */
+class SatStatsFeederPacketCollisionHelper : public SatStatsPacketCollisionHelper
+{
+public:
+  // inherited from SatStatsPacketCollisionHelper base class
+  SatStatsFeederPacketCollisionHelper (Ptr<const SatHelper> satHelper);
+
+
+  /**
+   * / Destructor.
+   */
+  virtual ~SatStatsFeederPacketCollisionHelper ();
+
+
+  /**
+   * inherited from ObjectBase base class
+   */
+  static TypeId GetTypeId ();
+
+protected:
+  // inherited from SatStatsHelper base class
+  void DoInstall ();
+
+private:
+  /// The aggregator created by this helper.
+  Ptr<DataCollectionObject> m_aggregator;
+
+}; // end of class SatStatsFeederPacketCollisionHelper
+
+
+// BASE CLASS USER /////////////////////////////////////////////////////////////////
+
+/**
+ * \ingroup satstats
+ * \brief
+ */
+class SatStatsUserPacketCollisionHelper : public SatStatsPacketCollisionHelper
+{
+public:
+  // inherited from SatStatsPacketCollisionHelper base class
+  SatStatsUserPacketCollisionHelper (Ptr<const SatHelper> satHelper);
+
+
+  /**
+   * / Destructor.
+   */
+  virtual ~SatStatsUserPacketCollisionHelper ();
+
+
+  /**
+   * inherited from ObjectBase base class
+   */
+  static TypeId GetTypeId ();
+
+protected:
+  // inherited from SatStatsHelper base class
+  void DoInstall ();
+
+private:
+  /// The aggregator created by this helper.
+  Ptr<DataCollectionObject> m_aggregator;
+
+}; // end of class SatStatsUserPacketCollisionHelper
+
+
+// SLOTTED ALOHA FEEDER //////////////////////////////////////////////////////////////
 
 /**
  * \ingroup satstats
@@ -142,24 +206,24 @@ private:
  *
  * Otherwise, the following example can be used:
  * \code
- * Ptr<SatStatsSlottedAlohaPacketCollisionHelper> s = Create<SatStatsSlottedAlohaPacketCollisionHelper> (satHelper);
+ * Ptr<SatStatsFeederSlottedAlohaPacketCollisionHelper> s = Create<SatStatsFeederSlottedAlohaPacketCollisionHelper> (satHelper);
  * s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
  * \endcode
  */
-class SatStatsSlottedAlohaPacketCollisionHelper : public SatStatsPacketCollisionHelper
+class SatStatsFeederSlottedAlohaPacketCollisionHelper : public SatStatsFeederPacketCollisionHelper
 {
 public:
-  // inherited from SatStatsPacketCollisionHelper base class
-  SatStatsSlottedAlohaPacketCollisionHelper (Ptr<const SatHelper> satHelper);
+  // inherited from SatStatsFeederPacketCollisionHelper base class
+  SatStatsFeederSlottedAlohaPacketCollisionHelper (Ptr<const SatHelper> satHelper);
 
 
   /**
    * / Destructor.
    */
-  virtual ~SatStatsSlottedAlohaPacketCollisionHelper ();
+  virtual ~SatStatsFeederSlottedAlohaPacketCollisionHelper ();
 
 
   /**
@@ -170,7 +234,7 @@ public:
 };
 
 
-// CRDSA //////////////////////////////////////////////////////////////////////
+// CRDSA FEEDER //////////////////////////////////////////////////////////////////////
 
 /**
  * \ingroup satstats
@@ -182,24 +246,24 @@ public:
  *
  * Otherwise, the following example can be used:
  * \code
- * Ptr<SatStatsCrdsaPacketCollisionHelper> s = Create<SatStatsCrdsaPacketCollisionHelper> (satHelper);
+ * Ptr<SatStatsFeederCrdsaPacketCollisionHelper> s = Create<SatStatsFeederCrdsaPacketCollisionHelper> (satHelper);
  * s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
  * \endcode
  */
-class SatStatsCrdsaPacketCollisionHelper : public SatStatsPacketCollisionHelper
+class SatStatsFeederCrdsaPacketCollisionHelper : public SatStatsFeederPacketCollisionHelper
 {
 public:
-  // inherited from SatStatsPacketCollisionHelper base class
-  SatStatsCrdsaPacketCollisionHelper (Ptr<const SatHelper> satHelper);
+  // inherited from SatStatsFeederPacketCollisionHelper base class
+  SatStatsFeederCrdsaPacketCollisionHelper (Ptr<const SatHelper> satHelper);
 
 
   /**
    * / Destructor.
    */
-  virtual ~SatStatsCrdsaPacketCollisionHelper ();
+  virtual ~SatStatsFeederCrdsaPacketCollisionHelper ();
 
 
   /**
@@ -210,7 +274,7 @@ public:
 };
 
 
-// E-SSA //////////////////////////////////////////////////////////////
+// E-SSA FEEDER //////////////////////////////////////////////////////////////
 
 /**
  * \ingroup satstats
@@ -222,24 +286,144 @@ public:
  *
  * Otherwise, the following example can be used:
  * \code
- * Ptr<SatStatsEssaPacketCollisionHelper> s = Create<SatStatsEssaPacketCollisionHelper> (satHelper);
+ * Ptr<SatStatsFeederEssaPacketCollisionHelper> s = Create<SatStatsFeederEssaPacketCollisionHelper> (satHelper);
  * s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
  * \endcode
  */
-class SatStatsEssaPacketCollisionHelper : public SatStatsPacketCollisionHelper
+class SatStatsFeederEssaPacketCollisionHelper : public SatStatsFeederPacketCollisionHelper
 {
 public:
-  // inherited from SatStatsPacketCollisionHelper base class
-  SatStatsEssaPacketCollisionHelper (Ptr<const SatHelper> satHelper);
+  // inherited from SatStatsFeederPacketCollisionHelper base class
+  SatStatsFeederEssaPacketCollisionHelper (Ptr<const SatHelper> satHelper);
 
 
   /**
    * / Destructor.
    */
-  virtual ~SatStatsEssaPacketCollisionHelper ();
+  virtual ~SatStatsFeederEssaPacketCollisionHelper ();
+
+
+  /**
+   * inherited from ObjectBase base class
+   */
+  static TypeId GetTypeId ();
+
+};
+
+
+// SLOTTED ALOHA USER //////////////////////////////////////////////////////////////
+
+/**
+ * \ingroup satstats
+ * \brief Produce packet collision statistics of Random Access Slotted ALOHA
+ *        from a satellite module simulation.
+ *
+ * For a more convenient usage in simulation script, it is recommended to use
+ * the corresponding methods in SatStatsHelperContainer class.
+ *
+ * Otherwise, the following example can be used:
+ * \code
+ * Ptr<SatStatsUserSlottedAlohaPacketCollisionHelper> s = Create<SatStatsUserSlottedAlohaPacketCollisionHelper> (satHelper);
+ * s->SetName ("name");
+ * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+ * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
+ * s->Install ();
+ * \endcode
+ */
+class SatStatsUserSlottedAlohaPacketCollisionHelper : public SatStatsUserPacketCollisionHelper
+{
+public:
+  // inherited from SatStatsUserPacketCollisionHelper base class
+  SatStatsUserSlottedAlohaPacketCollisionHelper (Ptr<const SatHelper> satHelper);
+
+
+  /**
+   * / Destructor.
+   */
+  virtual ~SatStatsUserSlottedAlohaPacketCollisionHelper ();
+
+
+  /**
+   * inherited from ObjectBase base class
+   */
+  static TypeId GetTypeId ();
+
+};
+
+
+// CRDSA USER //////////////////////////////////////////////////////////////////////
+
+/**
+ * \ingroup satstats
+ * \brief Produce packet collision statistics of Random Access CRDSA
+ *        from a satellite module simulation.
+ *
+ * For a more convenient usage in simulation script, it is recommended to use
+ * the corresponding methods in SatStatsHelperContainer class.
+ *
+ * Otherwise, the following example can be used:
+ * \code
+ * Ptr<SatStatsUserCrdsaPacketCollisionHelper> s = Create<SatStatsUserCrdsaPacketCollisionHelper> (satHelper);
+ * s->SetName ("name");
+ * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+ * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
+ * s->Install ();
+ * \endcode
+ */
+class SatStatsUserCrdsaPacketCollisionHelper : public SatStatsUserPacketCollisionHelper
+{
+public:
+  // inherited from SatStatsUserPacketCollisionHelper base class
+  SatStatsUserCrdsaPacketCollisionHelper (Ptr<const SatHelper> satHelper);
+
+
+  /**
+   * / Destructor.
+   */
+  virtual ~SatStatsUserCrdsaPacketCollisionHelper ();
+
+
+  /**
+   * inherited from ObjectBase base class
+   */
+  static TypeId GetTypeId ();
+
+};
+
+
+// E-SSA USER //////////////////////////////////////////////////////////////
+
+/**
+ * \ingroup satstats
+ * \brief Produce packet collision statistics of Random Access E-SSA
+ *        from a satellite module simulation.
+ *
+ * For a more convenient usage in simulation script, it is recommended to use
+ * the corresponding methods in SatStatsHelperContainer class.
+ *
+ * Otherwise, the following example can be used:
+ * \code
+ * Ptr<SatStatsUserEssaPacketCollisionHelper> s = Create<SatStatsUserEssaPacketCollisionHelper> (satHelper);
+ * s->SetName ("name");
+ * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+ * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
+ * s->Install ();
+ * \endcode
+ */
+class SatStatsUserEssaPacketCollisionHelper : public SatStatsUserPacketCollisionHelper
+{
+public:
+  // inherited from SatStatsUserPacketCollisionHelper base class
+  SatStatsUserEssaPacketCollisionHelper (Ptr<const SatHelper> satHelper);
+
+
+  /**
+   * / Destructor.
+   */
+  virtual ~SatStatsUserEssaPacketCollisionHelper ();
 
 
   /**

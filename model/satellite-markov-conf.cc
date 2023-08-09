@@ -18,8 +18,12 @@
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
 
-#include "satellite-markov-conf.h"
 #include <map>
+
+#include <ns3/log.h>
+
+#include "satellite-markov-conf.h"
+
 
 namespace ns3 {
 

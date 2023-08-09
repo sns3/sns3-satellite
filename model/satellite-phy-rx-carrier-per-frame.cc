@@ -20,16 +20,19 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
-#include <ns3/log.h>
-#include <ns3/simulator.h>
-#include <ns3/boolean.h>
-
-#include "satellite-phy-rx-carrier-per-frame.h"
-
 #include <algorithm>
 #include <ostream>
 #include <limits>
 #include <utility>
+
+#include <ns3/log.h>
+#include <ns3/simulator.h>
+#include <ns3/boolean.h>
+
+#include "satellite-uplink-info-tag.h"
+
+#include "satellite-phy-rx-carrier-per-frame.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatPhyRxCarrierPerFrame");
 
@@ -298,7 +301,7 @@ SatPhyRxCarrierPerFrame::MeasureRandomAccessLoad ()
 
   NS_LOG_INFO ("Average normalized offered load: " << averageNormalizedOfferedLoad);
 
-  m_avgNormalizedOfferedLoadCallback (GetBeamId (), GetCarrierId (), GetRandomAccessAllocationChannelId (), averageNormalizedOfferedLoad);
+  m_avgNormalizedOfferedLoadCallback (GetSatId (), GetBeamId (), GetCarrierId (), GetRandomAccessAllocationChannelId (), averageNormalizedOfferedLoad);
 }
 
 double
@@ -570,12 +573,22 @@ SatPhyRxCarrierPerFrame::ProcessReceivedCrdsaPacket (SatPhyRxCarrierPerFrame::cr
 
   double sinr = CalculatePacketCompositeSinr (packet);
 
+  SatSignalParameters::PacketsInBurst_t packets = packet.rxParams->m_packetsInBurst;
+  SatSignalParameters::PacketsInBurst_t::const_iterator i;
+  for (i = packets.begin (); i != packets.end (); i++)
+    {
+      SatUplinkInfoTag satUplinkInfoTag;
+      (*i)->RemovePacketTag (satUplinkInfoTag);
+      satUplinkInfoTag.SetSinr (sinr, m_additionalInterferenceCallback ());
+      (*i)->AddPacketTag (satUplinkInfoTag);
+    }
+
   /*
    * Update link specific SINR trace for the RETURN_FEEDER link. The RETURN_USER
    * link SINR is already updated at the SatPhyRxCarrierUplink::EndRxData ()
    * method!
    */
-  m_linkSinrTrace (SatUtils::LinearToDb (sinr));
+  m_linkSinrTrace (SatUtils::LinearToDb (sinr), packet.sourceAddress);
 
   if (GetRandomAccessCollisionModel () == SatPhyRxCarrierConf::RA_COLLISION_ALWAYS_DROP_ALL_COLLIDING_PACKETS)
     {
@@ -618,21 +631,28 @@ SatPhyRxCarrierPerFrame::CalculatePacketCompositeSinr (SatPhyRxCarrierPerFrame::
 {
   NS_LOG_FUNCTION (this);
 
-  double sinrSatellite = CalculateSinr ( packet.rxParams->GetRxPowerInSatellite (),
-                                         packet.rxParams->GetInterferencePowerInSatellite (),
-                                         packet.rxParams->GetRxNoisePowerInSatellite (),
-                                         packet.rxParams->GetRxAciIfPowerInSatellite (),
-                                         packet.rxParams->GetRxExtNoisePowerInSatellite (),
-                                         packet.rxParams->GetSinrCalculator ());
-
   double sinr = CalculateSinr ( packet.rxParams->m_rxPower_W,
                                 packet.rxParams->GetInterferencePower (),
                                 m_rxNoisePowerW,
                                 m_rxAciIfPowerW,
                                 m_rxExtNoisePowerW,
-                                m_sinrCalculate);
+                                m_additionalInterferenceCallback ());
 
-  double cSinr = CalculateCompositeSinr (sinr, sinrSatellite);
+  double cSinr;
+  if (GetLinkRegenerationMode () == SatEnums::TRANSPARENT)
+    {
+      double sinrSatellite = CalculateSinr ( packet.rxParams->GetRxPowerInSatellite (),
+                                             packet.rxParams->GetInterferencePowerInSatellite (),
+                                             packet.rxParams->GetRxNoisePowerInSatellite (),
+                                             packet.rxParams->GetRxAciIfPowerInSatellite (),
+                                             packet.rxParams->GetRxExtNoisePowerInSatellite (),
+                                             packet.rxParams->GetAdditionalInterference ());
+      cSinr = CalculateCompositeSinr (sinr, sinrSatellite);
+    }
+  else
+    {
+      cSinr = sinr;
+    }
 
   NS_LOG_INFO ("Computed cSINR for packet: " << cSinr);
 
@@ -738,7 +758,10 @@ SatPhyRxCarrierPerFrame::EliminateInterference (
               NS_FATAL_ERROR ("Negative interference");
             }
 
-          GetInterferenceEliminationModel ()->EliminateInterferences (iterList->rxParams, processedPacket.rxParams, processedPacket.cSinr);
+          GetInterferenceEliminationModel ()->EliminateInterferences (iterList->rxParams,
+                                                                      processedPacket.rxParams,
+                                                                      processedPacket.cSinr,
+                                                                      m_linkRegenerationMode != SatEnums::TRANSPARENT);
 
           NS_LOG_INFO ("AFTER INTERFERENCE ELIMINATION, RX sat: " <<
                        iterList->rxParams->GetRxPowerInSatellite () <<

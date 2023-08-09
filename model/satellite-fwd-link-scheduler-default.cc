@@ -18,6 +18,8 @@
  * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
+#include <ns3/log.h>
+
 #include "satellite-fwd-link-scheduler-default.h"
 
 
@@ -122,10 +124,16 @@ SatFwdLinkSchedulerDefault::GetNextFrame ()
       Ptr<Packet> dummyPacket = Create<Packet> (1);
 
       // Add MAC tag
-      SatMacTag tag;
-      tag.SetDestAddress (Mac48Address::GetBroadcast ());
-      tag.SetSourceAddress (m_macAddress);
-      dummyPacket->AddPacketTag (tag);
+      SatMacTag mTag;
+      mTag.SetDestAddress (Mac48Address::GetBroadcast ());
+      mTag.SetSourceAddress (m_macAddress);
+      dummyPacket->AddPacketTag (mTag);
+
+      // Add E2E address tag
+      SatAddressE2ETag addressE2ETag;
+      addressE2ETag.SetE2EDestAddress (Mac48Address::GetBroadcast ());
+      addressE2ETag.SetE2ESourceAddress (m_macAddress);
+      dummyPacket->AddPacketTag (addressE2ETag);
 
       // Add dummy packet to dummy frame
       frame->AddPayload (dummyPacket);

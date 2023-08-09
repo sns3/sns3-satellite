@@ -21,7 +21,8 @@
 #ifndef SATELLITE_FWD_CARRIER_CONF_H
 #define SATELLITE_FWD_CARRIER_CONF_H
 
-#include "ns3/simple-ref-count.h"
+#include <ns3/simple-ref-count.h>
+
 
 namespace ns3 {
 

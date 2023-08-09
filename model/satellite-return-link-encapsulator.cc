@@ -19,9 +19,9 @@
  */
 
 
-#include "ns3/simulator.h"
-#include "ns3/log.h"
-#include "ns3/mac48-address.h"
+#include <ns3/simulator.h>
+#include <ns3/log.h>
+#include <ns3/mac48-address.h>
 
 #include "satellite-return-link-encapsulator.h"
 #include "satellite-llc.h"
@@ -29,6 +29,8 @@
 #include "satellite-encap-pdu-status-tag.h"
 #include "satellite-rle-header.h"
 #include "satellite-queue.h"
+#include "satellite-uplink-info-tag.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatReturnLinkEncapsulator");
 
@@ -56,8 +58,13 @@ SatReturnLinkEncapsulator::SatReturnLinkEncapsulator ()
 }
 
 
-SatReturnLinkEncapsulator::SatReturnLinkEncapsulator (Mac48Address source, Mac48Address dest, uint8_t flowId)
-  : SatBaseEncapsulator (source, dest, flowId),
+SatReturnLinkEncapsulator::SatReturnLinkEncapsulator (Mac48Address encapAddress,
+                                                      Mac48Address decapAddress,
+                                                      Mac48Address sourceE2EAddress,
+                                                      Mac48Address destE2EAddress,
+                                                      uint8_t flowId,
+                                                      uint32_t additionalHeaderSize)
+  : SatBaseEncapsulator (encapAddress, decapAddress, sourceE2EAddress, destE2EAddress, flowId, additionalHeaderSize),
   m_txFragmentId (0),
   m_currRxFragmentId (0),
   m_currRxPacketSize (0),
@@ -114,8 +121,8 @@ SatReturnLinkEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address /*dest*/)
 
   // Add MAC tag to identify the packet in lower layers
   SatMacTag mTag;
-  mTag.SetDestAddress (m_destAddress);
-  mTag.SetSourceAddress (m_sourceAddress);
+  mTag.SetDestAddress (m_decapAddress);
+  mTag.SetSourceAddress (m_encapAddress);
   p->AddPacketTag (mTag);
 
   /**
@@ -138,7 +145,7 @@ Ptr<Packet>
 SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft, uint32_t &nextMinTxO)
 {
   NS_LOG_FUNCTION (this << bytes);
-  NS_LOG_INFO ("TxOpportunity for UT: " << m_sourceAddress << " flowId: " << (uint32_t) m_flowId << " of " << bytes << " bytes");
+  NS_LOG_INFO ("TxOpportunity for UT: " << m_encapAddress << " flowId: " << (uint32_t) m_flowId << " of " << bytes << " bytes");
 
   // Payload adapted PDU = NULL
   Ptr<Packet> packet;
@@ -152,7 +159,7 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
       return packet;
     }
 
-  packet = GetNewRlePdu (bytes, MAX_PPDU_PACKET_SIZE);
+  packet = GetNewRlePdu (bytes, MAX_PPDU_PACKET_SIZE, m_additionalHeaderSize);
 
   if (packet)
     {
@@ -160,9 +167,18 @@ SatReturnLinkEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesL
       SatMacTag mTag;
       if (!packet->PeekPacketTag (mTag))
         {
-          mTag.SetDestAddress (m_destAddress);
-          mTag.SetSourceAddress (m_sourceAddress);
+          mTag.SetDestAddress (m_decapAddress);
+          mTag.SetSourceAddress (m_encapAddress);
           packet->AddPacketTag (mTag);
+        }
+
+      // Add E2E address tag to identify the packet in lower layers
+      SatAddressE2ETag addressE2ETag;
+      if (!packet->PeekPacketTag (addressE2ETag))
+        {
+          addressE2ETag.SetE2EDestAddress (m_destE2EAddress);
+          addressE2ETag.SetE2ESourceAddress (m_sourceE2EAddress);
+          packet->AddPacketTag (addressE2ETag);
         }
 
       // Add flow id tag
@@ -374,7 +390,7 @@ SatReturnLinkEncapsulator::ReceivePdu (Ptr<Packet> p)
     {
       NS_FATAL_ERROR ("MAC tag not found in the packet!");
     }
-  else if (mTag.GetDestAddress () != m_destAddress)
+  else if (mTag.GetDestAddress () != m_decapAddress)
     {
       NS_FATAL_ERROR ("Packet was not intended for this receiver!");
     }
@@ -400,7 +416,7 @@ SatReturnLinkEncapsulator::ProcessPdu (Ptr<Packet> p)
 
       Reset ();
 
-      m_rxCallback (p, m_sourceAddress, m_destAddress);
+      m_rxCallback (p, m_encapAddress, m_decapAddress);
     }
 
   // START_PPDU
@@ -453,7 +469,7 @@ SatReturnLinkEncapsulator::ProcessPdu (Ptr<Packet> p)
           else
             {
               m_currRxPacketFragment->AddAtEnd (p);
-              m_rxCallback (m_currRxPacketFragment, m_sourceAddress, m_destAddress);
+              m_rxCallback (m_currRxPacketFragment, m_encapAddress, m_decapAddress);
             }
         }
       else

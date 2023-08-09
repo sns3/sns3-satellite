@@ -21,8 +21,10 @@
 #ifndef SAT_FWD_LINK_SCHEDULER_TIME_SLICING_H
 #define SAT_FWD_LINK_SCHEDULER_TIME_SLICING_H
 
-#include "ns3/satellite-fwd-link-scheduler.h"
-#include "ns3/pointer.h"
+#include <ns3/pointer.h>
+
+#include "satellite-fwd-link-scheduler.h"
+
 
 namespace ns3 {
 

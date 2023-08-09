@@ -23,8 +23,10 @@
 
 
 #include <map>
-#include "ns3/event-id.h"
-#include "ns3/mac48-address.h"
+
+#include <ns3/event-id.h>
+#include <ns3/mac48-address.h>
+
 #include "satellite-base-encapsulator.h"
 #include "satellite-control-message.h"
 
@@ -54,8 +56,19 @@ public:
 
   /**
    * Constructor
+   * \param encapAddress MAC addressd of encapsulator
+   * \param decapAddress MAC addressd of decapsulator
+   * \param sourceE2EAddress E2E source MAC addressd of packets (used to set SatAddressE2ETag)
+   * \param destE2EAddress E2E destination MAC addressd of packets (used to set SatAddressE2ETag)
+   * \param rcIndex RC index
+   * \param additionalHeaderSize Additional value in to take into account when pulling packets to represent E2E tags
    */
-  SatReturnLinkEncapsulator (Mac48Address source, Mac48Address dest, uint8_t rcIndex);
+  SatReturnLinkEncapsulator (Mac48Address encapAddress,
+                             Mac48Address decapAddress,
+                             Mac48Address sourceE2EAddress,
+                             Mac48Address destE2EAddress,
+                             uint8_t rcIndex,
+                             uint32_t additionalHeaderSize = 0);
 
   /**
    * Destructor for SatReturnLinkEncapsulator

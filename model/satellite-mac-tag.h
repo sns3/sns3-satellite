@@ -16,13 +16,15 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ *         Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
 #ifndef SATELLITE_MAC_TAG_H
 #define SATELLITE_MAC_TAG_H
 
-#include "ns3/mac48-address.h"
-#include "ns3/tag.h"
+#include <ns3/mac48-address.h>
+#include <ns3/tag.h>
+
 
 namespace ns3 {
 
@@ -109,6 +111,93 @@ private:
 
   Mac48Address   m_destAddress;
   Mac48Address   m_sourceAddress;
+};
+
+/**
+ * \ingroup satellite
+ * \brief This class implements a tag that carries the satellite MAC of GW and UT. It is used for regenerative cases
+ * to update MAC address on satellite when packet is forwarded between uplink and downlink.
+ */
+class SatAddressE2ETag : public Tag
+{
+public:
+  static const uint32_t SIZE = 12;
+
+  /**
+   * Default constructor.
+   */
+  SatAddressE2ETag ();
+
+  /**
+   * Destructor for SatMacTag
+   */
+  ~SatAddressE2ETag ();
+
+  /**
+   * \brief Set E2E destination MAC address
+   * \param e2eDestAddress E2E destination MAC address
+   */
+  void SetE2EDestAddress (Mac48Address e2eDestAddress);
+
+  /**
+   * \brief Get E2E destination MAC address
+   * \return E2E destination MAC address
+   */
+  Mac48Address GetE2EDestAddress (void) const;
+
+  /**
+   * \brief Set E2E source MAC address
+   * \param e2eSourceAddress E2E source MAC address
+   */
+  void SetE2ESourceAddress (Mac48Address e2eSourceAddress);
+
+  /**
+   * \brief Get E2E source MAC address
+   * \return E2E source MAC address
+   */
+  Mac48Address GetE2ESourceAddress (void) const;
+
+  /**
+   * \brief Get the type ID
+   * \return the object TypeId
+   */
+  static TypeId GetTypeId (void);
+
+  /**
+   * \brief Get the type ID of instance
+   * \return the object TypeId
+   */
+  virtual TypeId GetInstanceTypeId (void) const;
+
+  /**
+   * Get serialized size of SatMacTag
+   * \return Serialized size in bytes
+   */
+  virtual uint32_t GetSerializedSize (void) const;
+
+  /**
+   * Serializes information to buffer from this instance of SatMacTag
+   * \param i Buffer in which the information is serialized
+   */
+  virtual void Serialize (TagBuffer i) const;
+
+  /**
+   * Deserializes information from buffer to this instance of SatMacTag
+   * \param i Buffer from which the information is deserialized
+   */
+  virtual void Deserialize (TagBuffer i);
+
+  /**
+   * Print time stamp of this instance of SatMacTag
+   * \param &os Output stream to which tag timestamp is printed.
+   */
+  virtual void Print (std::ostream &os) const;
+
+private:
+  static const uint32_t ADDRESS_LENGHT = 6;
+
+  Mac48Address   m_e2eDestAddress;
+  Mac48Address   m_e2eSourceAddress;
 };
 
 /**

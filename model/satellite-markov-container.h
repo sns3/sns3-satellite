@@ -20,14 +20,16 @@
 #ifndef SATELLITE_MARKOV_CONTAINER_H
 #define SATELLITE_MARKOV_CONTAINER_H
 
-#include "satellite-markov-model.h"
-#include "satellite-markov-conf.h"
+#include <ns3/vector.h>
+#include <ns3/traced-callback.h>
+
 #include "geo-coordinate.h"
-#include "ns3/vector.h"
 #include "satellite-base-fading.h"
 #include "satellite-loo-model.h"
 #include "satellite-rayleigh-model.h"
-#include "ns3/traced-callback.h"
+#include "satellite-markov-model.h"
+#include "satellite-markov-conf.h"
+
 
 namespace ns3 {
 

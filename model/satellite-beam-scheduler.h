@@ -26,15 +26,18 @@
 #include <vector>
 #include <list>
 #include <map>
+
 #include <ns3/object.h>
 #include <ns3/simple-ref-count.h>
 #include <ns3/ptr.h>
 #include <ns3/callback.h>
 #include <ns3/nstime.h>
 #include <ns3/traced-callback.h>
-#include <ns3/satellite-cno-estimator.h>
-#include <ns3/satellite-enums.h>
-#include <ns3/satellite-frame-allocator.h>
+
+#include "satellite-cno-estimator.h"
+#include "satellite-enums.h"
+#include "satellite-frame-allocator.h"
+
 
 namespace ns3 {
 
@@ -156,6 +159,14 @@ public:
   void UpdateUtCno (Address utId, double cno);
 
   /**
+   * Update satellite C/N0 info with the latest value.
+   *
+   * \param satelliteMac MAC of the SAT (address).
+   * \param cno C/N0 value
+   */
+  void UpdateSatelliteCno (Address satelliteMac, double cno);
+
+  /**
    * Receive capacity requests from UTs.
    *
    * \param utId Id of the UT (address).
@@ -175,10 +186,19 @@ public:
    * Send control message to an UT into the beam.
    *
    * \param message Pointer of control message to send.
-   * \param utId Address of the UT to the the message to.
+   * \param utId Address of the UT to send the message to.
    * \return true if sending is success, false otherwise.
    */
   bool SendTo (Ptr<SatControlMessage> message, Address utId);
+
+  /**
+   * Send control message to the satellite.
+   *
+   * \param message Pointer of control message to send.
+   * \param satelliteMac Address of the feeder SAT to send the message to.
+   * \return true if sending is success, false otherwise.
+   */
+  bool SendToSatellite (Ptr<SatControlMessage> msg, Address satelliteMac);
 
   /**
    * Set the callback to inform NCC a TBTP has been sent.
@@ -593,6 +613,11 @@ private:
    */
   Ptr<SatCnoEstimator> CreateCnoEstimator ();
 
+  /**
+   * Send an estimation of cno to satellite, if samples have been received
+   */
+  void SendCnoToSatellite ();
+
   Address m_gwAddress;
 
   HandoverInformationForward_t m_handoverStrategy;
@@ -601,6 +626,21 @@ private:
    * Type of SatSuperframeAllocator class to use
    */
   SatEnums::SuperframeAllocatorType_t m_superframeAllocatorType;
+
+  /**
+   * Estimator for the C/N0 from satellite.
+   */
+  Ptr<SatCnoEstimator> m_satelliteCnoEstimator;
+
+  /**
+   * MAC address of the satellite (used when regenerative)
+   */
+  Address m_satelliteMac;
+
+  /**
+   * Indicates if Cno sample have been received since last C/N0 control message sent
+   */
+  bool m_receivedSatelliteCnoSample;
 };
 
 } // namespace ns3

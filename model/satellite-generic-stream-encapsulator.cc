@@ -19,9 +19,9 @@
  */
 
 
-#include "ns3/simulator.h"
-#include "ns3/log.h"
-#include "ns3/mac48-address.h"
+#include <ns3/simulator.h>
+#include <ns3/log.h>
+#include <ns3/mac48-address.h>
 
 #include "satellite-generic-stream-encapsulator.h"
 #include "satellite-llc.h"
@@ -29,6 +29,7 @@
 #include "satellite-encap-pdu-status-tag.h"
 #include "satellite-gse-header.h"
 #include "satellite-time-tag.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatGenericStreamEncapsulator");
 
@@ -52,8 +53,13 @@ SatGenericStreamEncapsulator::SatGenericStreamEncapsulator ()
 
 
 
-SatGenericStreamEncapsulator::SatGenericStreamEncapsulator (Mac48Address source, Mac48Address dest, uint8_t flowId)
-  : SatBaseEncapsulator (source, dest, flowId),
+SatGenericStreamEncapsulator::SatGenericStreamEncapsulator (Mac48Address encapAddress,
+                                                            Mac48Address decapAddress,
+                                                            Mac48Address sourceE2EAddress,
+                                                            Mac48Address destE2EAddress,
+                                                            uint8_t flowId,
+                                                            uint32_t additionalHeaderSize)
+  : SatBaseEncapsulator (encapAddress, decapAddress, sourceE2EAddress, destE2EAddress, flowId, additionalHeaderSize),
   m_maxGsePduSize (4095),
   m_txFragmentId (0),
   m_currRxFragmentId (0),
@@ -126,7 +132,7 @@ Ptr<Packet>
 SatGenericStreamEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft, uint32_t &nextMinTxO)
 {
   NS_LOG_FUNCTION (this << bytesLeft);
-  NS_LOG_INFO ("TxOpportunity for UT: " << m_destAddress << " flowId: " << (uint32_t) m_flowId << " of " << bytes << " bytes");
+  NS_LOG_INFO ("TxOpportunity for UT: " << m_decapAddress << " flowId: " << (uint32_t) m_flowId << " of " << bytes << " bytes");
 
   // GSE PDU
   Ptr<Packet> packet;
@@ -138,15 +144,24 @@ SatGenericStreamEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &byt
       return packet;
     }
 
-  packet = GetNewGsePdu (bytes, m_maxGsePduSize);
+  packet = GetNewGsePdu (bytes, m_maxGsePduSize, m_additionalHeaderSize);
 
   if (packet)
     {
       // Add MAC tag to identify the packet in lower layers
       SatMacTag mTag;
-      mTag.SetDestAddress (m_destAddress);
-      mTag.SetSourceAddress (m_sourceAddress);
+      mTag.SetDestAddress (m_decapAddress);
+      mTag.SetSourceAddress (m_encapAddress);
       packet->AddPacketTag (mTag);
+
+      // Add E2E address tag to identify the packet in lower layers
+      SatAddressE2ETag addressE2ETag;
+      if (!packet->PeekPacketTag (addressE2ETag))
+        {
+          addressE2ETag.SetE2EDestAddress (m_destE2EAddress);
+          addressE2ETag.SetE2ESourceAddress (m_sourceE2EAddress);
+          packet->AddPacketTag (addressE2ETag);
+        }
 
       // Add flow id tag
       SatFlowIdTag flowIdTag;
@@ -354,7 +369,7 @@ SatGenericStreamEncapsulator::ReceivePdu (Ptr<Packet> p)
     {
       NS_FATAL_ERROR ("MAC tag not found in the packet!");
     }
-  else if (mTag.GetDestAddress () != m_destAddress)
+  else if (mTag.GetDestAddress () != m_decapAddress)
     {
       NS_FATAL_ERROR ("Packet was not intended for this receiver!");
     }
@@ -380,7 +395,7 @@ SatGenericStreamEncapsulator::ProcessPdu (Ptr<Packet> packet)
 
       Reset ();
 
-      m_rxCallback (packet, m_sourceAddress, m_destAddress);
+      m_rxCallback (packet, m_encapAddress, m_decapAddress);
     }
 
   // START_PDU
@@ -433,7 +448,7 @@ SatGenericStreamEncapsulator::ProcessPdu (Ptr<Packet> packet)
           else
             {
               m_currRxPacketFragment->AddAtEnd (packet);
-              m_rxCallback (m_currRxPacketFragment, m_sourceAddress, m_destAddress);
+              m_rxCallback (m_currRxPacketFragment, m_encapAddress, m_decapAddress);
             }
         }
       else

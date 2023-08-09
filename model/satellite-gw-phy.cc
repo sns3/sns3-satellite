@@ -18,11 +18,11 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include "ns3/log.h"
-#include "ns3/simulator.h"
-#include "ns3/double.h"
-#include "ns3/uinteger.h"
-#include "ns3/pointer.h"
+#include <ns3/log.h>
+#include <ns3/simulator.h>
+#include <ns3/double.h>
+#include <ns3/uinteger.h>
+#include <ns3/pointer.h>
 
 #include "satellite-utils.h"
 #include "satellite-gw-phy.h"
@@ -129,7 +129,8 @@ SatGwPhy::SatGwPhy (void)
 SatGwPhy::SatGwPhy (SatPhy::CreateParam_t& params,
                     Ptr<SatLinkResults> linkResults,
                     SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
-                    Ptr<SatSuperframeConf> superFrameConf)
+                    Ptr<SatSuperframeConf> superFrameConf,
+                    SatEnums::RegenerationMode_t returnLinkRegenerationMode)
   : SatPhy (params),
   m_aciIfWrtNoisePercent (10.0),
   m_imInterferenceCOverIDb (22.0),
@@ -145,6 +146,7 @@ SatGwPhy::SatGwPhy (SatPhy::CreateParam_t& params,
   parameters.m_aciIfWrtNoiseFactor = m_aciIfWrtNoisePercent / 100.0;
   parameters.m_extNoiseDensityWhz = 0.0;
   parameters.m_rxMode = SatPhyRxCarrierConf::NORMAL;
+  parameters.m_linkRegenerationMode = returnLinkRegenerationMode;
   parameters.m_chType = SatEnums::RETURN_FEEDER_CH;
 
   Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf> (parameters);
@@ -154,7 +156,7 @@ SatGwPhy::SatGwPhy (SatPhy::CreateParam_t& params,
       carrierConf->SetLinkResults (linkResults);
     }
 
-  carrierConf->SetSinrCalculatorCb (MakeCallback (&SatGwPhy::CalculateSinr, this));
+  carrierConf->SetAdditionalInterferenceCb (MakeCallback (&SatGwPhy::GetAdditionalInterference, this));
 
   SatPhy::ConfigureRxCarriers (carrierConf, superFrameConf);
 }
@@ -179,21 +181,23 @@ SatGwPhy::DoInitialize ()
 }
 
 double
-SatGwPhy::CalculateSinr (double sinr)
+SatGwPhy::GetAdditionalInterference ()
 {
-  NS_LOG_FUNCTION (this << sinr);
+  NS_LOG_FUNCTION (this);
 
-  if ( sinr <= 0  )
-    {
-      NS_FATAL_ERROR ( "Calculated own SINR is expected to be greater than zero!!!");
-    }
+  return m_imInterferenceCOverI;
+}
 
-  // calculate final SINR taken into account configured additional interferences (C over I)
-  // in addition to CCI which is included in given SINR
+SatEnums::SatLinkDir_t
+SatGwPhy::GetSatLinkTxDir ()
+{
+  return SatEnums::LD_FORWARD;
+}
 
-  double finalSinr = 1 / ( (1 / sinr) + (1 / m_imInterferenceCOverI) );
-
-  return (finalSinr);
+SatEnums::SatLinkDir_t
+SatGwPhy::GetSatLinkRxDir ()
+{
+  return SatEnums::LD_RETURN;
 }
 
 

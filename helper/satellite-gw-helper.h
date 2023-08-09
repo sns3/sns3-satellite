@@ -92,8 +92,9 @@ public:
    * \param lrRcs2 return link results
    * \param lrFwd DVB-S2 or DVB-S2X link results
    * \param dvbVersion The DVB version chosen
+   * \param useScpc Use SCPC on return feeder (and then lrFwd link results)
    */
-  void Initialize (Ptr<SatLinkResultsRtn> lrRcs2, Ptr<SatLinkResultsFwd> lrFwd, SatEnums::DvbVersion_t dvbVersion);
+  void Initialize (Ptr<SatLinkResultsRtn> lrRcs2, Ptr<SatLinkResultsFwd> lrFwd, SatEnums::DvbVersion_t dvbVersion, bool useScpc);
 
   /**
    * Get BB frame configuration.
@@ -140,10 +141,13 @@ public:
   /**
    * \param c a set of nodes
    * \param gwId  id of the gw
+   * \param satId  id of the satellite
    * \param beamId  id of the beam
    * \param fCh forward channel
    * \param rCh return channel
    * \param ncc NCC (Network Control Center)
+   * \param forwardLinkRegenerationMode The regeneration mode on forward link
+   * \param returnLinkRegenerationMode The regeneration mode on return link
    *
    * This method creates a ns3::SatChannel with the
    * attributes configured by SatGwHelper::SetChannelAttribute,
@@ -154,37 +158,49 @@ public:
    */
   NetDeviceContainer InstallDvb (NodeContainer c,
                                  uint32_t gwId,
+                                 uint32_t satId,
                                  uint32_t beamId,
                                  Ptr<SatChannel> fCh,
                                  Ptr<SatChannel> rCh,
                                  Ptr<SatNcc> ncc,
-                                 Ptr<SatLowerLayerServiceConf> llsConf);
+                                 Ptr<SatLowerLayerServiceConf> llsConf,
+                                 SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                                 SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   /**
    * \param n node
    * \param gwId  id of the gw
+   * \param satId  id of the satellite
    * \param beamId  id of the beam
    * \param fCh forward channel
    * \param rCh return channel
    * \param ncc NCC (Network Control Center)
+   * \param forwardLinkRegenerationMode The regeneration mode on forward link
+   * \param returnLinkRegenerationMode The regeneration mode on return link
    *
    * Saves you from having to construct a temporary NodeContainer.
    */
   Ptr<NetDevice> InstallDvb (Ptr<Node> n,
                              uint32_t gwId,
+                             uint32_t satId,
                              uint32_t beamId,
                              Ptr<SatChannel> fCh,
                              Ptr<SatChannel> rCh,
                              Ptr<SatNcc> ncc,
-                             Ptr<SatLowerLayerServiceConf> llsConf);
+                             Ptr<SatLowerLayerServiceConf> llsConf,
+                             SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                             SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   /**
    * \param c a set of nodes
    * \param gwId  id of the gw
+   * \param satId  id of the satellite
    * \param beamId  id of the beam
    * \param fCh forward channel
    * \param rCh return channel
    * \param ncc NCC (Network Control Center)
+   * \param forwardLinkRegenerationMode The regeneration mode on forward link
+   * \param returnLinkRegenerationMode The regeneration mode on return link
    *
    * This method creates a ns3::SatChannel with the
    * attributes configured by SatGwHelper::SetChannelAttribute,
@@ -195,29 +211,38 @@ public:
    */
   NetDeviceContainer InstallLora (NodeContainer c,
                                   uint32_t gwId,
+                                  uint32_t satId,
                                   uint32_t beamId,
                                   Ptr<SatChannel> fCh,
                                   Ptr<SatChannel> rCh,
                                   Ptr<SatNcc> ncc,
-                                  Ptr<SatLowerLayerServiceConf> llsConf);
+                                  Ptr<SatLowerLayerServiceConf> llsConf,
+                                  SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                                  SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   /**
    * \param n node
    * \param gwId  id of the gw
+   * \param satId  id of the satellite
    * \param beamId  id of the beam
    * \param fCh forward channel
    * \param rCh return channel
    * \param ncc NCC (Network Control Center)
+   * \param forwardLinkRegenerationMode The regeneration mode on forward link
+   * \param returnLinkRegenerationMode The regeneration mode on return link
    *
    * Saves you from having to construct a temporary NodeContainer.
    */
   Ptr<NetDevice> InstallLora (Ptr<Node> n,
                               uint32_t gwId,
+                              uint32_t satId,
                               uint32_t beamId,
                               Ptr<SatChannel> fCh,
                               Ptr<SatChannel> rCh,
                               Ptr<SatNcc> ncc,
-                              Ptr<SatLowerLayerServiceConf> llsConf);
+                              Ptr<SatLowerLayerServiceConf> llsConf,
+                              SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                              SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   /**
    * Enables creation traces to be written in given file

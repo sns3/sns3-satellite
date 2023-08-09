@@ -22,12 +22,12 @@
 
 #include <ns3/log.h>
 
-#include <ns3/satellite-bbframe-conf.h>
+#include "satellite-bbframe-conf.h"
+#include "satellite-lorawan-net-device.h"
+#include "lorawan-mac-gateway.h"
+#include "lorawan-mac-header.h"
+#include "lora-frame-header.h"
 
-#include <ns3/lorawan-mac-gateway.h>
-#include <ns3/lorawan-mac-header.h>
-#include <ns3/satellite-lorawan-net-device.h>
-#include <ns3/lora-frame-header.h>
 
 namespace ns3 {
 
@@ -50,8 +50,8 @@ LorawanMacGateway::LorawanMacGateway ()
   NS_FATAL_ERROR ("Default constructor not in use");
 }
 
-LorawanMacGateway::LorawanMacGateway (uint32_t beamId)
-  : LorawanMac (beamId)
+LorawanMacGateway::LorawanMacGateway (uint32_t satId, uint32_t beamId)
+  : LorawanMac (satId, beamId)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -134,6 +134,11 @@ LorawanMacGateway::Send (Ptr<Packet> packet)
   mTag.SetDestAddress (Mac48Address::GetBroadcast ());
   mTag.SetSourceAddress (Mac48Address::ConvertFrom (m_device->GetAddress ()));
   packet->AddPacketTag (mTag);
+
+  SatAddressE2ETag addressE2ETag;
+  addressE2ETag.SetE2EDestAddress (Mac48Address::GetBroadcast ());
+  addressE2ETag.SetE2ESourceAddress (Mac48Address::ConvertFrom (m_device->GetAddress ()));
+  packet->AddPacketTag (addressE2ETag);
 
   SatPhy::PacketContainer_t packets;
   packets.push_back (packet);

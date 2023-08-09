@@ -21,18 +21,19 @@
 #ifndef SATELLITE_GW_PHY_H
 #define SATELLITE_GW_PHY_H
 
-#include "ns3/ptr.h"
-#include "ns3/nstime.h"
-#include "ns3/object.h"
-#include "ns3/packet.h"
-#include "ns3/address.h"
+#include <ns3/ptr.h>
+#include <ns3/nstime.h>
+#include <ns3/object.h>
+#include <ns3/packet.h>
+#include <ns3/address.h>
+
 #include "satellite-phy.h"
 #include "satellite-signal-parameters.h"
 #include "satellite-channel-estimation-error-container.h"
-#include "ns3/satellite-frame-conf.h"
+#include "satellite-frame-conf.h"
+
 
 namespace ns3 {
-
 
 class SatPhyRxCarrier;
 class SatPhyRxCarrierUplink;
@@ -56,7 +57,8 @@ public:
   SatGwPhy (SatPhy::CreateParam_t& params,
             Ptr<SatLinkResults> linkResults,
             SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
-            Ptr<SatSuperframeConf> superFrameConf);
+            Ptr<SatSuperframeConf> superFrameConf,
+            SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   /**
    * Destructor for SatGwPhy
@@ -77,12 +79,24 @@ public:
   virtual void DoDispose (void);
 
   /**
-   * GW specific SINR calculator.
-   * Calculate SINR with GW PHY specific parameters and given SINR.
+   * \brief Get additional interference, used to compute final SINR at RX
    *
-   * \param sinr Calculated (C/NI)
+   * \return Additional interference
    */
-  virtual double CalculateSinr (double sinr);
+  virtual double GetAdditionalInterference ();
+
+protected:
+  /**
+   * \brief Get the link TX direction. Must be implemented by child clases.
+   * \return The link TX direction
+   */
+  virtual SatEnums::SatLinkDir_t GetSatLinkTxDir ();
+
+  /**
+   * \brief Get the link RX direction. Must be implemented by child clases.
+   * \return The link RX direction
+   */
+  virtual SatEnums::SatLinkDir_t GetSatLinkRxDir ();
 
 private:
   /**

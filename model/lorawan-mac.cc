@@ -20,8 +20,10 @@
  * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "ns3/lorawan-mac.h"
-#include "ns3/log.h"
+#include <ns3/log.h>
+
+#include "lorawan-mac.h"
+
 
 namespace ns3 {
 
@@ -53,12 +55,15 @@ LorawanMac::GetTypeId (void)
 }
 
 LorawanMac::LorawanMac ()
+  : m_isRegenerative (false)
 {
   NS_FATAL_ERROR ("Default constructor not in use");
 }
 
-LorawanMac::LorawanMac (uint32_t beamId)
-  : SatMac (beamId)
+LorawanMac::LorawanMac (uint32_t satId, uint32_t beamId)
+  : SatMac (satId, beamId, SatEnums::TRANSPARENT, SatEnums::TRANSPARENT),
+  m_beamId (beamId),
+  m_isRegenerative (false)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -232,6 +237,13 @@ int
 LorawanMac::GetNPreambleSymbols (void)
 {
   return m_nPreambleSymbols;
+}
+
+void
+LorawanMac::setRegenerative (bool isRegenerative)
+{
+  NS_LOG_FUNCTION (this << isRegenerative);
+  m_isRegenerative = isRegenerative;
 }
 
 void

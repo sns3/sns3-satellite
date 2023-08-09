@@ -22,8 +22,10 @@
 #define SATELLITE_UT_LLC_H
 
 #include <ns3/ptr.h>
-#include <ns3/satellite-llc.h>
-#include <ns3/satellite-queue.h>
+
+#include "satellite-llc.h"
+#include "satellite-queue.h"
+
 
 namespace ns3 {
 
@@ -49,9 +51,17 @@ public:
   static TypeId GetTypeId (void);
 
   /**
-   * Construct a SatUtLlc
+   * Construct a SatUtLlc, should not be used
    */
   SatUtLlc ();
+
+  /**
+   * Construct a SatUtLlc
+   * \param forwardLinkRegenerationMode Forward link regeneration model
+   * \param returnLinkRegenerationMode Return link regeneration model
+   */
+  SatUtLlc (SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+            SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   /**
    * Destroy a SatUtLlc
@@ -180,6 +190,18 @@ protected:
    *               pointer to scheduling objects
    */
   virtual void GetSchedulingContexts (std::vector< Ptr<SatSchedulingObject> > & output) const;
+
+  /**
+   * \brief Get the link TX direction. Must be implemented by child clases.
+   * \return The link TX direction
+   */
+  virtual SatEnums::SatLinkDir_t GetSatLinkTxDir ();
+
+  /**
+   * \brief Get the link RX direction. Must be implemented by child clases.
+   * \return The link RX direction
+   */
+  virtual SatEnums::SatLinkDir_t GetSatLinkRxDir ();
 
 private:
   /**

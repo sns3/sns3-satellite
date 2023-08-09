@@ -24,14 +24,16 @@
 #ifndef SATELLITE_RANDOM_ACCESS_CONF_H
 #define SATELLITE_RANDOM_ACCESS_CONF_H
 
-#include "ns3/object.h"
-#include "ns3/uinteger.h"
-#include "ns3/log.h"
-#include "ns3/simulator.h"
+#include <map>
+
+#include <ns3/object.h>
+#include <ns3/uinteger.h>
+#include <ns3/simulator.h>
+
 #include "satellite-random-access-allocation-channel.h"
 #include "satellite-lower-layer-service.h"
-#include "ns3/satellite-superframe-sequence.h"
-#include <map>
+#include "satellite-superframe-sequence.h"
+
 
 namespace ns3 {
 

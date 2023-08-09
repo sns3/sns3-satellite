@@ -23,12 +23,14 @@
 #ifndef SATELLITE_SIGNAL_PARAMETERS_H
 #define SATELLITE_SIGNAL_PARAMETERS_H
 
-#include "ns3/ptr.h"
-#include "ns3/packet.h"
-#include "ns3/nstime.h"
-#include "ns3/object.h"
+#include <ns3/ptr.h>
+#include <ns3/packet.h>
+#include <ns3/nstime.h>
+#include <ns3/object.h>
+
 #include "satellite-enums.h"
 #include "satellite-utils.h"
+
 
 namespace ns3 {
 
@@ -68,7 +70,7 @@ public:
   /**
    * Callback for SINR calculation
    */
-  Callback<double, double> m_sinrCalculate;
+  double m_additionalInterference;
 
   /**
    * Interference power (I)
@@ -162,6 +164,11 @@ public:
    */
 
   PacketsInBurst_t m_packetsInBurst;
+
+  /**
+   * The sat for the packet transmission
+   */
+  uint32_t m_satId;
 
   /**
    * The beam for the packet transmission
@@ -291,16 +298,16 @@ public:
   /**
    * \brief Set computed SINR
    */
-  void SetSinr (double sinr, Callback<double, double> sinrCalculate);
+  void SetSinr (double sinr, double additionalInterference);
 
   inline double GetSinr ()
   {
     return m_ifParams->m_sinr;
   }
 
-  inline Callback<double, double> GetSinrCalculator ()
+  inline double GetAdditionalInterference ()
   {
-    return m_ifParams->m_sinrCalculate;
+    return m_ifParams->m_additionalInterference;
   }
 
   inline bool HasSinrComputed ()

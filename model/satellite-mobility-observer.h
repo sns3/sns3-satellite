@@ -21,10 +21,12 @@
 #ifndef SATELLITE_MOBILITY_OBSERVER_H
 #define SATELLITE_MOBILITY_OBSERVER_H
 
-#include "ns3/object.h"
+#include <ns3/object.h>
+
 #include "satellite-mobility-model.h"
 #include "satellite-propagation-delay-model.h"
 #include "geo-coordinate.h"
+
 
 namespace ns3 {
 
@@ -34,6 +36,8 @@ namespace ns3 {
  * Properties can be observed currently are; the timing advance and elevation angle.
  *
  * Observing of timing advance is set by method ObserveTimingAdvance
+ * If satellite regenerates packets on return link, delay corresponds to SAT<->UT link.
+ * Otherwise, delay corresponds to GW<->UT link.
  *
  */
 class SatMobilityObserver : public Object
@@ -56,8 +60,9 @@ public:
    *
    * @param ownMobility Own mobility to observe
    * @param geoSatMobility Satellite mobility to observe
+   * @param isRegenerative Indicates if the satellite regenerates packets
    */
-  SatMobilityObserver (Ptr<SatMobilityModel> ownMobility, Ptr<SatMobilityModel> geoSatMobility);
+  SatMobilityObserver (Ptr<SatMobilityModel> ownMobility, Ptr<SatMobilityModel> geoSatMobility, bool isRegenerative=false);
 
   /**
    * \brief Destructor of the mobility observer
@@ -160,6 +165,7 @@ private:
   double m_maxDistanceToSatellite;
   Time m_timingAdvance_s;
   double m_velocity;
+  bool m_isRegenerative;
 };
 
 } // namespace ns3

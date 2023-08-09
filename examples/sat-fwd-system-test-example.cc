@@ -106,13 +106,13 @@ main (int argc, char *argv[])
 
   uint32_t testCase = 0;
   std::string trafficModel = "cbr";
-  double simLength (400.0); // in seconds
+  double simLength (40.0); // in seconds
   Time senderAppStartTime = Seconds (0.1);
-  bool traceFrameInfo = true;
-  bool traceMergeInfo = true;
+  bool traceFrameInfo = false;
+  bool traceMergeInfo = false;
 
   UintegerValue packetSize (128); // in bytes
-  TimeValue interval (MicroSeconds (10));
+  TimeValue interval (MicroSeconds (50));
   DataRateValue dataRate (DataRate (16000));
 
   /// Set simulation output details
@@ -214,6 +214,8 @@ main (int argc, char *argv[])
     model, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
     senderAppStartTime, Seconds (simLength), MicroSeconds (20));
 
+  simulationHelper->EnableProgressLogs ();
+
 
   NS_LOG_INFO ("--- sat-fwd-sys-test ---");
   NS_LOG_INFO ("  Packet size: " << packetSize.Get ());
@@ -236,6 +238,8 @@ main (int argc, char *argv[])
    * Run simulation
    */
   simulationHelper->RunSimulation ();
+
+  Simulator::Destroy();
 
   return 0;
 }

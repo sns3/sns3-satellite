@@ -49,7 +49,7 @@ main (int argc, char *argv[])
   uint32_t nbEndUsersPerUt = 1;
 
   Time appStartTime = Seconds (0.001);
-  Time simLength = Seconds (10.0);
+  Time simLength = Seconds (15.0);
 
   uint32_t packetSize = 24;
   Time loraInterval = Seconds (10);
@@ -96,6 +96,10 @@ main (int argc, char *argv[])
   simulationHelper->AddDefaultUiArguments (cmd);
   cmd.Parse (argc, argv);
 
+  /// Set regeneration mode
+  Config::SetDefault ("ns3::SatConf::ForwardLinkRegenerationMode", EnumValue (SatEnums::TRANSPARENT));
+  Config::SetDefault ("ns3::SatConf::ReturnLinkRegenerationMode", EnumValue (SatEnums::TRANSPARENT));
+
   // Enable Lora
   Config::SetDefault ("ns3::SatHelper::Standard", EnumValue (SatEnums::LORA));
   Config::SetDefault ("ns3::LorawanMacEndDevice::DataRate", UintegerValue (5));
@@ -141,6 +145,8 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
 
   // Configure RA
+  Config::SetDefault ("ns3::SatGeoHelper::FwdLinkErrorModel", EnumValue (SatPhyRxCarrierConf::EM_AVI));
+  Config::SetDefault ("ns3::SatGeoHelper::RtnLinkErrorModel", EnumValue (SatPhyRxCarrierConf::EM_AVI));
   Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_ESSA));
   if(interferenceModePerPacket)
     {
@@ -217,15 +223,15 @@ main (int argc, char *argv[])
     {
       Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer ();
 
-      s->AddGlobalEssaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
-      s->AddGlobalEssaPacketError (SatStatsHelper::OUTPUT_SCATTER_FILE);
-      s->AddPerUtEssaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
-      s->AddPerUtEssaPacketError (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddGlobalFeederEssaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddGlobalFeederEssaPacketError (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddPerUtFeederEssaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerUtFeederEssaPacketError (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-      s->AddGlobalEssaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
-      s->AddGlobalEssaPacketCollision (SatStatsHelper::OUTPUT_SCATTER_FILE);
-      s->AddPerUtEssaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
-      s->AddPerUtEssaPacketCollision (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddGlobalFeederEssaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddGlobalFeederEssaPacketCollision (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddPerUtFeederEssaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerUtFeederEssaPacketCollision (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
       s->AddGlobalRtnFeederWindowLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
       s->AddGlobalRtnFeederWindowLoad (SatStatsHelper::OUTPUT_SCATTER_FILE);
@@ -233,14 +239,14 @@ main (int argc, char *argv[])
       s->AddPerBeamRtnFeederWindowLoad (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
       s->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-      s->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddGlobalRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
       s->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-      s->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddGlobalRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
       s->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-      s->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerUtRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
       s->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-      s->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddPerUtRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
       s->AddPerUtRtnAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
       s->AddPerUtRtnMacDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
@@ -264,14 +270,14 @@ main (int argc, char *argv[])
 
 
       s->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-      s->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerUtFwdUserMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
       s->AddPerUtFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-      s->AddPerUtFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddPerUtFwdUserMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
       s->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-      s->AddGlobalFwdMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddGlobalFwdUserMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
       s->AddGlobalFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-      s->AddGlobalFwdMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddGlobalFwdUserMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
       s->AddPerUtFwdAppDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
       s->AddPerUtFwdMacDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);

@@ -20,9 +20,11 @@
  * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "ns3/lora-tag.h"
-#include "ns3/tag.h"
-#include "ns3/uinteger.h"
+#include <ns3/tag.h>
+#include <ns3/uinteger.h>
+
+#include "lora-tag.h"
+
 
 namespace ns3 {
 

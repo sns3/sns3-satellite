@@ -20,10 +20,10 @@
 #ifndef SATELLITE_BASE_FADER_CONF_H
 #define SATELLITE_BASE_FADER_CONF_H
 
-#include "ns3/object.h"
-#include "ns3/uinteger.h"
-#include "ns3/log.h"
-#include "ns3/simulator.h"
+#include <ns3/object.h>
+#include <ns3/uinteger.h>
+#include <ns3/simulator.h>
+
 
 namespace ns3 {
 

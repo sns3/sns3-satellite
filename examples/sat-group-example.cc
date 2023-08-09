@@ -139,32 +139,32 @@ ConfigureAllStats (Ptr<SatStatsHelperContainer> s)
   s->AddPerGroupFwdAppThroughput (outputType);
   s->AddPerGroupRtnAppThroughput (outputType);
 
-  s->AddPerGroupFwdDevThroughput (outputType);
-  s->AddPerGroupRtnDevThroughput (outputType);
-  s->AddPerGroupFwdMacThroughput (outputType);
-  s->AddPerGroupRtnMacThroughput (outputType);
-  s->AddPerGroupFwdPhyThroughput (outputType);
-  s->AddPerGroupRtnPhyThroughput (outputType);
+  s->AddPerGroupFwdUserDevThroughput (outputType);
+  s->AddPerGroupRtnFeederDevThroughput (outputType);
+  s->AddPerGroupFwdUserMacThroughput (outputType);
+  s->AddPerGroupRtnFeederMacThroughput (outputType);
+  s->AddPerGroupFwdUserPhyThroughput (outputType);
+  s->AddPerGroupRtnFeederPhyThroughput (outputType);
 
   s->AddAverageGroupFwdAppThroughput (outputType);
   s->AddAverageGroupRtnAppThroughput (outputType);
 
-  s->AddAverageGroupFwdDevThroughput (outputType);
-  s->AddAverageGroupRtnDevThroughput (outputType);
-  s->AddAverageGroupFwdMacThroughput (outputType);
-  s->AddAverageGroupRtnMacThroughput (outputType);
-  s->AddAverageGroupFwdPhyThroughput (outputType);
-  s->AddAverageGroupRtnPhyThroughput (outputType);
+  s->AddAverageGroupFwdUserDevThroughput (outputType);
+  s->AddAverageGroupRtnFeederDevThroughput (outputType);
+  s->AddAverageGroupFwdUserMacThroughput (outputType);
+  s->AddAverageGroupRtnFeederMacThroughput (outputType);
+  s->AddAverageGroupFwdUserPhyThroughput (outputType);
+  s->AddAverageGroupRtnFeederPhyThroughput (outputType);
 
-  s->AddPerGroupFwdDaPacketError (outputType);
-  s->AddPerGroupRtnDaPacketError (outputType);
-  s->AddPerGroupSlottedAlohaPacketError (outputType);
-  s->AddPerGroupCrdsaPacketError (outputType);
-  s->AddPerGroupEssaPacketError (outputType);
+  s->AddPerGroupFwdUserDaPacketError (outputType);
+  s->AddPerGroupRtnFeederDaPacketError (outputType);
+  s->AddPerGroupFeederSlottedAlohaPacketError (outputType);
+  s->AddPerGroupFeederCrdsaPacketError (outputType);
+  s->AddPerGroupFeederEssaPacketError (outputType);
 
-  s->AddPerGroupSlottedAlohaPacketCollision (outputType);
-  s->AddPerGroupCrdsaPacketCollision (outputType);
-  s->AddPerGroupEssaPacketCollision (outputType);
+  s->AddPerGroupFeederSlottedAlohaPacketCollision (outputType);
+  s->AddPerGroupFeederCrdsaPacketCollision (outputType);
+  s->AddPerGroupFeederEssaPacketCollision (outputType);
 
   s->AddPerGroupCapacityRequest (outputType);
 
@@ -218,8 +218,7 @@ main (int argc, char *argv[])
   groupHelper->CreateUtNodesFromPosition (5, 10, GeoCoordinate (56.4243, -16.042, 122.427), 100000);
 
   // Create reference system
-  simulationHelper->CreateSatScenario ();
-  Ptr<SatHelper> satHelper = simulationHelper->GetSatelliteHelper ();
+  Ptr<SatHelper> satHelper = simulationHelper->CreateSatScenario ();
 
   // Create groups
   NodeContainer utNodes = satHelper->UtNodes ();
@@ -311,7 +310,7 @@ main (int argc, char *argv[])
   Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer ();
   simulationHelper->EnableProgressLogs ();
 
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("contrib/satellite/data/sims/sat-group-example/output-attributes.xml"));
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("output-attributes.xml"));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
   ConfigStore outputConfig;

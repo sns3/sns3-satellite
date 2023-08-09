@@ -23,11 +23,12 @@
 #ifndef LORA_NETWORK_CONTROLLER_COMPONENTS_H
 #define LORA_NETWORK_CONTROLLER_COMPONENTS_H
 
-#include "ns3/object.h"
-#include "ns3/log.h"
-#include "ns3/packet.h"
+#include <ns3/object.h>
+#include <ns3/log.h>
+#include <ns3/packet.h>
 
-#include "ns3/lora-network-status.h"
+#include "lora-network-status.h"
+
 
 namespace ns3 {
 

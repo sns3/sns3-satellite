@@ -195,7 +195,7 @@ SatStatsResourcesGrantedHelper::DoInstall ()
                                          "OutputFileName", StringValue (GetName ()));
         Ptr<MagisterGnuplotAggregator> plotAggregator
           = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-        NS_ASSERT (plotAggregator != 0);
+        NS_ASSERT (plotAggregator != nullptr);
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Time (in seconds)",
                                    "Resources granted (in bytes)");
@@ -236,7 +236,7 @@ SatStatsResourcesGrantedHelper::DoInstall ()
                                          "OutputFileName", StringValue (GetName ()));
         Ptr<MagisterGnuplotAggregator> plotAggregator
           = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-        NS_ASSERT (plotAggregator != 0);
+        NS_ASSERT (plotAggregator != nullptr);
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Resources granted (in bytes)",
                                    "Frequency");
@@ -304,11 +304,11 @@ SatStatsResourcesGrantedHelper::InstallProbe (Ptr<Node> utNode,
 
   Ptr<NetDevice> dev = GetUtSatNetDevice (utNode);
   Ptr<SatNetDevice> satDev = dev->GetObject<SatNetDevice> ();
-  NS_ASSERT (satDev != 0);
+  NS_ASSERT (satDev != nullptr);
   Ptr<SatMac> satMac = satDev->GetMac ();
-  NS_ASSERT (satMac != 0);
+  NS_ASSERT (satMac != nullptr);
   Ptr<SatUtMac> satUtMac = satMac->GetObject<SatUtMac> ();
-  NS_ASSERT (satUtMac != 0);
+  NS_ASSERT (satUtMac != nullptr);
 
   // Connect the object to the probe.
   if (probe->ConnectByObject ("DaResourcesTrace", satUtMac))

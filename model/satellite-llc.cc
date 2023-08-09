@@ -20,17 +20,17 @@
 
 #include <ns3/simulator.h>
 #include <ns3/log.h>
-#include <ns3/satellite-queue.h>
 #include <ns3/nstime.h>
 
+#include "satellite-queue.h"
 #include "satellite-llc.h"
-#include <ns3/satellite-time-tag.h>
-#include <ns3/satellite-scheduling-object.h>
-#include <ns3/satellite-control-message.h>
-#include <ns3/satellite-node-info.h>
-#include <ns3/satellite-enums.h>
-#include <ns3/satellite-utils.h>
-#include <ns3/satellite-typedefs.h>
+#include "satellite-time-tag.h"
+#include "satellite-scheduling-object.h"
+#include "satellite-control-message.h"
+#include "satellite-node-info.h"
+#include "satellite-enums.h"
+#include "satellite-utils.h"
+#include "satellite-typedefs.h"
 
 
 NS_LOG_COMPONENT_DEFINE ("SatLlc");
@@ -68,7 +68,28 @@ SatLlc::SatLlc ()
   m_decaps (),
   m_fwdLinkArqEnabled (false),
   m_rtnLinkArqEnabled (false),
-  m_gwAddress ()
+  m_gwAddress (),
+  m_satelliteAddress (),
+  m_additionalHeaderSize (0),
+  m_forwardLinkRegenerationMode (SatEnums::TRANSPARENT),
+  m_returnLinkRegenerationMode (SatEnums::TRANSPARENT)
+{
+  NS_LOG_FUNCTION (this);
+  NS_ASSERT (false); // this version of the constructor should not been used
+}
+
+SatLlc::SatLlc (SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                SatEnums::RegenerationMode_t returnLinkRegenerationMode)
+  : m_nodeInfo (),
+  m_encaps (),
+  m_decaps (),
+  m_fwdLinkArqEnabled (false),
+  m_rtnLinkArqEnabled (false),
+  m_gwAddress (),
+  m_satelliteAddress (),
+  m_additionalHeaderSize (0),
+  m_forwardLinkRegenerationMode (forwardLinkRegenerationMode),
+  m_returnLinkRegenerationMode (returnLinkRegenerationMode)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -111,7 +132,7 @@ SatLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
   NS_LOG_INFO ("dest=" << dest );
   NS_LOG_INFO ("UID is " << packet->GetUid ());
 
-  Ptr<EncapKey> key = Create<EncapKey> (m_nodeInfo->GetMacAddress (), Mac48Address::ConvertFrom (dest), flowId);
+  Ptr<EncapKey> key = Create<EncapKey> (m_nodeInfo->GetMacAddress (), Mac48Address::ConvertFrom (dest), flowId, m_nodeInfo->GetMacAddress (), Mac48Address::ConvertFrom (dest));
 
   EncapContainer_t::iterator it = m_encaps.find (key);
 
@@ -130,10 +151,15 @@ SatLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
   SatTimeTag timeTag (Simulator::Now ());
   packet->AddPacketTag (timeTag);
 
+  // Add E2E address tag to identify the packet in lower layers
+  SatAddressE2ETag addressE2ETag;
+  addressE2ETag.SetE2EDestAddress (Mac48Address::ConvertFrom (dest));
+  addressE2ETag.SetE2ESourceAddress (m_nodeInfo->GetMacAddress ());
+  packet->AddPacketTag (addressE2ETag);
+
   it->second->EnquePdu (packet, Mac48Address::ConvertFrom (dest));
 
-  SatEnums::SatLinkDir_t ld =
-    (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
+  SatEnums::SatLinkDir_t ld = GetSatLinkTxDir ();
 
   // Add packet trace entry:
   m_packetTrace (Simulator::Now (),
@@ -153,8 +179,7 @@ SatLlc::Receive (Ptr<Packet> packet, Mac48Address source, Mac48Address dest)
 {
   NS_LOG_FUNCTION (this << source << dest << packet);
 
-  SatEnums::SatLinkDir_t ld =
-    (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_FORWARD : SatEnums::LD_RETURN;
+  SatEnums::SatLinkDir_t ld = GetSatLinkRxDir ();
 
   // Add packet trace entry:
   m_packetTrace (Simulator::Now (),
@@ -177,7 +202,7 @@ SatLlc::Receive (Ptr<Packet> packet, Mac48Address source, Mac48Address dest)
       EncapContainer_t::iterator it = m_decaps.find (key);
 
       // Control messages not received by this method
-      if (flowId == SatEnums::CONTROL_FID)
+      if (flowId == SatEnums::CONTROL_FID && m_nodeInfo->GetNodeType () != SatEnums::NT_SAT)
         {
           NS_FATAL_ERROR ("Control messages should not be received by SatLlc::Receive () method!");
         }
@@ -224,6 +249,17 @@ SatLlc::ReceiveAck (Ptr<SatArqAckMessage> ack, Mac48Address source, Mac48Address
     }
 }
 
+SatEnums::SatLinkDir_t
+SatLlc::GetSatLinkTxDir ()
+{
+  return SatEnums::LD_UNDEFINED;
+}
+
+SatEnums::SatLinkDir_t
+SatLlc::GetSatLinkRxDir ()
+{
+  return SatEnums::LD_UNDEFINED;
+}
 
 void
 SatLlc::ReceiveHigherLayerPdu (Ptr<Packet> packet, Mac48Address source, Mac48Address dest)
@@ -261,6 +297,11 @@ SatLlc::ReceiveHigherLayerPdu (Ptr<Packet> packet, Mac48Address source, Mac48Add
   else
     {
       // Call a callback to receive the packet at upper layer
+
+      // Remove SatAddressE2ETag
+      SatAddressE2ETag addressE2ETag;
+      packet->RemovePacketTag (addressE2ETag);
+
       m_rxCallback (packet);
     }
 }
@@ -371,9 +412,9 @@ SatLlc::GetNBytesInQueue () const
   for (EncapContainer_t::const_iterator it = m_encaps.begin ();
        it != m_encaps.end (); ++it)
     {
-      NS_ASSERT (it->second != 0);
+      NS_ASSERT (it->second != nullptr);
       Ptr<SatQueue> queue = it->second->GetQueue ();
-      NS_ASSERT (queue != 0);
+      NS_ASSERT (queue != nullptr);
       sum += queue->GetNBytes ();
     }
 
@@ -390,9 +431,9 @@ SatLlc::GetNPacketsInQueue () const
   for (EncapContainer_t::const_iterator it = m_encaps.begin ();
        it != m_encaps.end (); ++it)
     {
-      NS_ASSERT (it->second != 0);
+      NS_ASSERT (it->second != nullptr);
       Ptr<SatQueue> queue = it->second->GetQueue ();
-      NS_ASSERT (queue != 0);
+      NS_ASSERT (queue != nullptr);
       sum += queue->GetNPackets ();
     }
 
@@ -419,6 +460,20 @@ SatLlc::SetGwAddress (Mac48Address address)
 {
   NS_LOG_FUNCTION (this << address);
   m_gwAddress = address;
+}
+
+void
+SatLlc::SetSatelliteAddress (Mac48Address address)
+{
+  NS_LOG_FUNCTION (this << address);
+  m_satelliteAddress = address;
+}
+
+void
+SatLlc::SetAdditionalHeaderSize (uint32_t additionalHeaderSize)
+{
+  NS_LOG_FUNCTION (this << additionalHeaderSize);
+  m_additionalHeaderSize = additionalHeaderSize;
 }
 
 } // namespace ns3

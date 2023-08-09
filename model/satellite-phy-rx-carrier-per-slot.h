@@ -24,15 +24,18 @@
 #ifndef SATELLITE_PHY_RX_CARRIER_PER_SLOT_H
 #define SATELLITE_PHY_RX_CARRIER_PER_SLOT_H
 
-#include <ns3/object.h>
-#include <ns3/ptr.h>
-#include <ns3/traced-callback.h>
-#include <ns3/mac48-address.h>
 #include <vector>
 #include <map>
 #include <list>
 #include <deque>
-#include <ns3/satellite-phy-rx-carrier.h>
+
+#include <ns3/object.h>
+#include <ns3/ptr.h>
+#include <ns3/traced-callback.h>
+#include <ns3/mac48-address.h>
+
+#include "satellite-phy-rx-carrier.h"
+
 
 namespace ns3 {
 
@@ -195,12 +198,14 @@ private:
 
   /// PRIVATE MEMBER VARIABLES
 
-  uint8_t m_randomAccessAllocationChannelId;                    //< Random access allocation ID
+  uint8_t m_randomAccessAllocationChannelId;                                    //< Random access allocation ID
   SatPhyRxCarrierConf::RandomAccessCollisionModel m_randomAccessCollisionModel; //< Random access collision model
-  double m_randomAccessConstantErrorRate;                       //< Constant error rate if collision model is RA_CONSTANT_COLLISION_PROBABILITY
+  double m_randomAccessConstantErrorRate;                                       //< Constant error rate if collision model is RA_CONSTANT_COLLISION_PROBABILITY
   uint32_t m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize;     //< Random access average normalized offered load measurement window size
-  bool m_enableRandomAccessDynamicLoadControl;  //< Is random access dynamic load control enabled
-  std::deque<double> m_randomAccessDynamicLoadControlNormalizedOfferedLoad; //< Container for calculated normalized offered loads
+  bool m_enableRandomAccessDynamicLoadControl;                                  //< Is random access dynamic load control enabled
+  std::deque<double> m_randomAccessDynamicLoadControlNormalizedOfferedLoad;     //< Container for calculated normalized offered loads
+
+  bool m_disableErrorHighTransmissionTime;                                      //< Disable fatal error when transmission time is higher than propagation time, but computations are less precise
 
 
 };

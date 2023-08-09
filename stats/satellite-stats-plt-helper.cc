@@ -171,7 +171,7 @@ SatStatsPltHelper::DoInstall ()
                                              "EnableContextPrinting", BooleanValue (false),
                                              "GeneralHeading", StringValue (GetDistributionHeading ("plt_sec")));
             Ptr<MultiFileAggregator> fileAggregator = m_aggregator->GetObject<MultiFileAggregator> ();
-            NS_ASSERT (fileAggregator != 0);
+            NS_ASSERT (fileAggregator != nullptr);
 
             // Setup the final-level collector.
             m_averagingCollector = CreateObject<DistributionCollector> ();
@@ -261,7 +261,7 @@ SatStatsPltHelper::DoInstall ()
                                          "OutputFileName", StringValue (GetName ()));
         Ptr<MagisterGnuplotAggregator> plotAggregator
           = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-        NS_ASSERT (plotAggregator != 0);
+        NS_ASSERT (plotAggregator != nullptr);
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Time (in seconds)",
                                    "Object PLT (in seconds)");
@@ -296,7 +296,7 @@ SatStatsPltHelper::DoInstall ()
                                              "OutputFileName", StringValue (GetName ()));
             Ptr<MagisterGnuplotAggregator> plotAggregator
               = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-            NS_ASSERT (plotAggregator != 0);
+            NS_ASSERT (plotAggregator != nullptr);
             //plot->SetTitle ("");
             plotAggregator->SetLegend ("Object PLT (in seconds)",
                                        "Frequency");
@@ -348,7 +348,7 @@ SatStatsPltHelper::DoInstall ()
                                              "OutputFileName", StringValue (GetName ()));
             Ptr<MagisterGnuplotAggregator> plotAggregator
               = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-            NS_ASSERT (plotAggregator != 0);
+            NS_ASSERT (plotAggregator != nullptr);
             //plot->SetTitle ("");
             plotAggregator->SetLegend ("Object PLT (in seconds)",
                                        "Frequency");
@@ -528,7 +528,7 @@ SatStatsPltHelper::PassSampleToCollector (const Time &plt, uint32_t identifier)
   //NS_LOG_FUNCTION (this << plt.GetSeconds () << identifier);
 
   Ptr<DataCollectionObject> collector = m_terminalCollectors.Get (identifier);
-  NS_ASSERT_MSG (collector != 0,
+  NS_ASSERT_MSG (collector != nullptr,
                  "Unable to find collector with identifier " << identifier);
 
   switch (GetOutputType ())
@@ -537,7 +537,7 @@ SatStatsPltHelper::PassSampleToCollector (const Time &plt, uint32_t identifier)
     case SatStatsHelper::OUTPUT_SCALAR_PLOT:
       {
         Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
-        NS_ASSERT (c != 0);
+        NS_ASSERT (c != nullptr);
         c->TraceSinkDouble (0.0, plt.GetSeconds ());
         break;
       }
@@ -546,7 +546,7 @@ SatStatsPltHelper::PassSampleToCollector (const Time &plt, uint32_t identifier)
     case SatStatsHelper::OUTPUT_SCATTER_PLOT:
       {
         Ptr<UnitConversionCollector> c = collector->GetObject<UnitConversionCollector> ();
-        NS_ASSERT (c != 0);
+        NS_ASSERT (c != nullptr);
         c->TraceSinkDouble (0.0, plt.GetSeconds ());
         break;
       }
@@ -560,13 +560,13 @@ SatStatsPltHelper::PassSampleToCollector (const Time &plt, uint32_t identifier)
       if (m_averagingMode)
         {
           Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
-          NS_ASSERT (c != 0);
+          NS_ASSERT (c != nullptr);
           c->TraceSinkDouble (0.0, plt.GetSeconds ());
         }
       else
         {
           Ptr<DistributionCollector> c = collector->GetObject<DistributionCollector> ();
-          NS_ASSERT (c != 0);
+          NS_ASSERT (c != nullptr);
           c->TraceSinkDouble (0.0, plt.GetSeconds ());
         }
       break;
@@ -625,7 +625,7 @@ SatStatsFwdAppPltHelper::DoInstallProbes ()
           Ptr<Application> app = (*it)->GetApplication (i);
           bool isConnected = false;
 
-          if (app->GetInstanceTypeId ().LookupTraceSourceByName ("RxPlt") != 0)
+          if (app->GetInstanceTypeId ().LookupTraceSourceByName ("RxPlt") != nullptr)
             {
               NS_LOG_INFO (this << " attempt to connect using RxPlt");
 
@@ -712,7 +712,7 @@ SatStatsRtnAppPltHelper::DoInstallProbes ()
           Ptr<Application> app = (*it)->GetApplication (i);
           bool isConnected = false;
 
-          if (app->GetInstanceTypeId ().LookupTraceSourceByName ("RxPlt") != 0)
+          if (app->GetInstanceTypeId ().LookupTraceSourceByName ("RxPlt") != nullptr)
             {
               isConnected = app->TraceConnectWithoutContext ("RxPlt",
                                                              rxPltCallback);
@@ -782,7 +782,7 @@ SatStatsRtnAppPltHelper::SaveIpv4AddressAndIdentifier (Ptr<Node> utUserNode)
 
   Ptr<Ipv4> ipv4 = utUserNode->GetObject<Ipv4> ();
 
-  if (ipv4 == 0)
+  if (ipv4 == nullptr)
     {
       NS_LOG_INFO (this << " Node " << utUserNode->GetId ()
                         << " does not support IPv4 protocol");

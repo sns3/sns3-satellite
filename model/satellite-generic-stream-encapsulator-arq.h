@@ -23,12 +23,15 @@
 
 
 #include <map>
-#include "ns3/event-id.h"
-#include "ns3/mac48-address.h"
+
+#include <ns3/event-id.h>
+#include <ns3/mac48-address.h>
+
 #include "satellite-generic-stream-encapsulator.h"
 #include "satellite-arq-sequence-number.h"
 #include "satellite-arq-buffer-context.h"
 #include "satellite-control-message.h"
+
 
 namespace ns3 {
 
@@ -56,12 +59,20 @@ public:
   SatGenericStreamEncapsulatorArq ();
 
   /**
-   * \brief Constructor
-   * \param source Source MAC address for the encapsulator (UT address)
-   * \param dest Destination MAC address for the encapsulator (GW address)
-   * \param flowId Flow id of the encapsulator
+   * Constructor
+   * \param encapAddress MAC addressd of encapsulator
+   * \param decapAddress MAC addressd of decapsulator
+   * \param sourceE2EAddress E2E source MAC addressd of packets (used to set SatAddressE2ETag)
+   * \param destE2EAddress E2E destination MAC addressd of packets (used to set SatAddressE2ETag)
+   * \param flowId Flow identifier
+   * \param additionalHeaderSize Additional value in to take into account when pulling packets to represent E2E tags
    */
-  SatGenericStreamEncapsulatorArq (Mac48Address source, Mac48Address dest, uint8_t flowId);
+  SatGenericStreamEncapsulatorArq (Mac48Address encapAddress,
+                                   Mac48Address decapAddress,
+                                   Mac48Address sourceE2EAddress,
+                                   Mac48Address destE2EAddress,
+                                   uint8_t flowId,
+                                   uint32_t additionalHeaderSize = 0);
 
   /**
    * Destructor for SatGenericStreamEncapsulatorArq

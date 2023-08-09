@@ -18,11 +18,15 @@
  * Author: Davide Magrin <magrinda@dei.unipd.it>
  */
 
-#include "ns3/lorawan-mac-header.h"
-#include "ns3/log.h"
 #include <bitset>
 
+#include <ns3/log.h>
+
+#include "lorawan-mac-header.h"
+
+
 namespace ns3 {
+
 NS_LOG_COMPONENT_DEFINE ("LorawanMacHeader");
 
 LorawanMacHeader::LorawanMacHeader () : m_major (0)

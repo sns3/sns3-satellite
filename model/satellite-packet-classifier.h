@@ -22,9 +22,11 @@
 #ifndef SATELLITE_PACKET_CLASSIFIER_H_
 #define SATELLITE_PACKET_CLASSIFIER_H_
 
-#include "ns3/simple-ref-count.h"
+#include <ns3/simple-ref-count.h>
+
 #include "satellite-enums.h"
 #include "satellite-control-message.h"
+
 
 namespace ns3 {
 

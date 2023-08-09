@@ -20,11 +20,11 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.com>
  */
 
-#include "ns3/log.h"
-#include "ns3/simulator.h"
-#include "ns3/double.h"
-#include "ns3/uinteger.h"
-#include "ns3/pointer.h"
+#include <ns3/log.h>
+#include <ns3/simulator.h>
+#include <ns3/double.h>
+#include <ns3/uinteger.h>
+#include <ns3/pointer.h>
 
 #include "satellite-utils.h"
 #include "satellite-ut-phy.h"
@@ -34,6 +34,7 @@
 #include "satellite-mac.h"
 #include "satellite-signal-parameters.h"
 #include "satellite-channel-estimation-error-container.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatUtPhy");
 
@@ -129,7 +130,8 @@ SatUtPhy::SatUtPhy (void)
 SatUtPhy::SatUtPhy (SatPhy::CreateParam_t &params,
                     Ptr<SatLinkResults> linkResults,
                     SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
-                    Ptr<SatSuperframeConf> superFrameConf)
+                    Ptr<SatSuperframeConf> superFrameConf,
+                    SatEnums::RegenerationMode_t forwardLinkRegenerationMode)
   : SatPhy (params),
   m_antennaReconfigurationDelay (Seconds (0.0))
 {
@@ -143,6 +145,7 @@ SatUtPhy::SatUtPhy (SatPhy::CreateParam_t &params,
   parameters.m_aciIfWrtNoiseFactor = 0.0;
   parameters.m_extNoiseDensityWhz = 0.0;
   parameters.m_rxMode = SatPhyRxCarrierConf::NORMAL;
+  parameters.m_linkRegenerationMode = forwardLinkRegenerationMode;
   parameters.m_chType = SatEnums::FORWARD_USER_CH;
 
   Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf> (parameters);
@@ -152,7 +155,7 @@ SatUtPhy::SatUtPhy (SatPhy::CreateParam_t &params,
       carrierConf->SetLinkResults (linkResults);
     }
 
-  carrierConf->SetSinrCalculatorCb (MakeCallback (&SatUtPhy::CalculateSinr, this));
+  carrierConf->SetAdditionalInterferenceCb (MakeCallback (&SatUtPhy::GetAdditionalInterference, this));
 
   SatPhy::ConfigureRxCarriers (carrierConf, superFrameConf);
 }
@@ -177,21 +180,11 @@ SatUtPhy::DoInitialize ()
 }
 
 double
-SatUtPhy::CalculateSinr (double sinr)
+SatUtPhy::GetAdditionalInterference ()
 {
-  NS_LOG_FUNCTION (this << sinr);
+  NS_LOG_FUNCTION (this);
 
-  if ( sinr <= 0  )
-    {
-      NS_FATAL_ERROR ( "Calculated own SINR is expected to be greater than zero!!!");
-    }
-
-  // calculate final SINR taken into account configured additional interferences (C over I)
-  // in addition to CCI which is included in given SINR
-
-  double finalSinr = 1 / ( (1 / sinr) + (1 / m_otherSysInterferenceCOverI) );
-
-  return (finalSinr);
+  return m_otherSysInterferenceCOverI;
 }
 
 
@@ -201,7 +194,7 @@ SatUtPhy::PerformHandover (uint32_t beamId)
   NS_LOG_FUNCTION (this << beamId);
 
   // disconnect current SatChannels
-  SatChannelPair::ChannelPair_t channels = m_retrieveChannelPair (m_beamId);
+  SatChannelPair::ChannelPair_t channels = m_retrieveChannelPair (m_satId, m_beamId);
   m_phyTx->ClearChannel ();
   channels.first->RemoveRx (m_phyRx);
 
@@ -217,7 +210,7 @@ SatUtPhy::AssignNewSatChannels ()
   NS_LOG_FUNCTION (this);
 
   // Fetch channels for current beam
-  SatChannelPair::ChannelPair_t channels = m_retrieveChannelPair (m_beamId);
+  SatChannelPair::ChannelPair_t channels = m_retrieveChannelPair (m_satId, m_beamId);
   Ptr<SatChannel> forwardLink = channels.first;
   Ptr<SatChannel> returnLink = channels.second;
 
@@ -227,6 +220,17 @@ SatUtPhy::AssignNewSatChannels ()
   forwardLink->AddRx (m_phyRx);
 }
 
+SatEnums::SatLinkDir_t
+SatUtPhy::GetSatLinkTxDir ()
+{
+  return SatEnums::LD_RETURN;
+}
+
+SatEnums::SatLinkDir_t
+SatUtPhy::GetSatLinkRxDir ()
+{
+  return SatEnums::LD_FORWARD;
+}
 
 bool
 SatUtPhy::IsTxPossible (void) const

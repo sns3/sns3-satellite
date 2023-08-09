@@ -20,18 +20,20 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
-#include "ns3/log.h"
-#include "ns3/ptr.h"
+#include <ns3/log.h>
+#include <ns3/ptr.h>
 
 #include "satellite-signal-parameters.h"
 #include "satellite-phy-tx.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatSignalParameters");
 
 namespace ns3 {
 
 SatSignalParameters::SatSignalParameters ()
-  : m_beamId (),
+  : m_satId (),
+  m_beamId (),
   m_carrierId (),
   m_carrierFreq_hz (),
   m_duration (),
@@ -51,6 +53,7 @@ SatSignalParameters::SatSignalParameters ( const SatSignalParameters& p )
       m_packetsInBurst.push_back ((*i)->Copy ());
     }
 
+  m_satId = p.m_satId;
   m_beamId = p.m_beamId;
   m_carrierId = p.m_carrierId;
   m_duration = p.m_duration;
@@ -103,17 +106,16 @@ SatSignalParameters::SetRxPowersInSatellite (double rxPowerW, double rxNoisePowe
 }
 
 void
-SatSignalParameters::SetSinr (double sinr, Callback<double, double> sinrCalculate)
+SatSignalParameters::SetSinr (double sinr, double additionalInterference)
 {
   m_ifParams->m_sinr = sinr;
-  m_ifParams->m_sinrCalculate = sinrCalculate;
+  m_ifParams->m_additionalInterference = additionalInterference;
   m_ifParams->m_sinrComputed = true;
 }
 
 
 SatInterferenceParameters::~SatInterferenceParameters ()
 {
-  m_sinrCalculate.Nullify ();
 }
 
 } // namespace ns3

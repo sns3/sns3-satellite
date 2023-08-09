@@ -185,15 +185,15 @@ main (int argc, char *argv[])
     {
       Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer ();
 
-      s->AddGlobalEssaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
-      s->AddGlobalEssaPacketError (SatStatsHelper::OUTPUT_SCATTER_FILE);
-      s->AddPerUtEssaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
-      s->AddPerUtEssaPacketError (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddGlobalFeederEssaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddGlobalFeederEssaPacketError (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddPerUtFeederEssaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerUtFeederEssaPacketError (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-      s->AddGlobalEssaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
-      s->AddGlobalEssaPacketCollision (SatStatsHelper::OUTPUT_SCATTER_FILE);
-      s->AddPerUtEssaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
-      s->AddPerUtEssaPacketCollision (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddGlobalFeederEssaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddGlobalFeederEssaPacketCollision (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddPerUtFeederEssaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerUtFeederEssaPacketCollision (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
       s->AddGlobalRtnFeederWindowLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
       s->AddGlobalRtnFeederWindowLoad (SatStatsHelper::OUTPUT_SCATTER_FILE);
@@ -201,14 +201,14 @@ main (int argc, char *argv[])
       s->AddPerBeamRtnFeederWindowLoad (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
       s->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-      s->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddGlobalRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
       s->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-      s->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddGlobalRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
       s->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-      s->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      s->AddPerUtRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
       s->AddPerUtRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-      s->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      s->AddPerUtRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
 
       s->AddGlobalRtnCompositeSinr (SatStatsHelper::OUTPUT_SCALAR_FILE);
       s->AddGlobalRtnCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_FILE);

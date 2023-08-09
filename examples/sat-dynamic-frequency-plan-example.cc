@@ -230,8 +230,8 @@ main (int argc, char *argv[])
       stats->AddPerUtRtnAppDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
       stats->AddPerUtRtnMacDelay (SatStatsHelper::OUTPUT_SCALAR_FILE);
       stats->AddPerUtRtnMacDelay (SatStatsHelper::OUTPUT_SCATTER_FILE);
-      stats->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-      stats->AddPerUtRtnMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
+      stats->AddPerUtRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+      stats->AddPerUtRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
       stats->AddPerUtCarrierId (SatStatsHelper::OUTPUT_SCALAR_FILE);
       stats->AddPerUtCarrierId (SatStatsHelper::OUTPUT_SCATTER_FILE);
       stats->AddPerUtRtnCompositeSinr (SatStatsHelper::OUTPUT_SCALAR_FILE);

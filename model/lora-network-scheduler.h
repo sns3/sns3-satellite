@@ -23,15 +23,16 @@
 #ifndef LORA_NETWORK_SCHEDULER_H
 #define LORA_NETWORK_SCHEDULER_H
 
-#include "ns3/object.h"
-#include "ns3/packet.h"
-#include "ns3/core-module.h"
+#include <ns3/object.h>
+#include <ns3/packet.h>
+#include <ns3/core-module.h>
 
-#include "ns3/lora-device-address.h"
-#include "ns3/lorawan-mac-header.h"
-#include "ns3/lora-frame-header.h"
-#include "ns3/lora-network-controller.h"
-#include "ns3/lora-network-status.h"
+#include "lora-device-address.h"
+#include "lorawan-mac-header.h"
+#include "lora-frame-header.h"
+#include "lora-network-controller.h"
+#include "lora-network-status.h"
+
 
 namespace ns3 {
 

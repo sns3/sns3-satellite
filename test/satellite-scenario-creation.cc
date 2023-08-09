@@ -298,11 +298,11 @@ ScenarioCreationUser::DoRun (void)
   // Creating the reference system.
   Ptr<SatHelper> helper = CreateObject<SatHelper> ();
   SatBeamUserInfo beamInfo = SatBeamUserInfo (1, 1);
-  std::map<uint32_t, SatBeamUserInfo > beamMap;
-  beamMap[8] = beamInfo;
-  beamMap[3] = beamInfo;
+  std::map<std::pair<uint32_t, uint32_t>, SatBeamUserInfo > beamMap;
+  beamMap[std::make_pair(0, 8)] = beamInfo;
+  beamMap[std::make_pair(0, 3)] = beamInfo;
   beamInfo.AppendUt (2);
-  beamMap[2] = beamInfo;
+  beamMap[std::make_pair(0, 2)] = beamInfo;
 
   // Enable creation traces
   Config::SetDefault ("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue (true));

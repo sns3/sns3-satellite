@@ -25,7 +25,7 @@
 #include <fstream>
 #include <vector>
 
-#include "ns3/object.h"
+#include <ns3/object.h>
 
 
 namespace ns3 {

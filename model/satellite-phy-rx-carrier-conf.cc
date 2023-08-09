@@ -20,14 +20,16 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
-#include "ns3/log.h"
-#include "ns3/enum.h"
-#include "ns3/uinteger.h"
-#include "ns3/double.h"
-#include "ns3/boolean.h"
+#include <ns3/log.h>
+#include <ns3/enum.h>
+#include <ns3/uinteger.h>
+#include <ns3/double.h>
+#include <ns3/boolean.h>
+
 #include "satellite-utils.h"
 #include "satellite-phy-rx-carrier-conf.h"
 #include "satellite-channel-estimation-error-container.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatPhyRxCarrierConf");
 
@@ -47,8 +49,9 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf ()
   m_carrierCount (),
   m_carrierBandwidthConverter (),
   m_channelType (),
+  m_linkRegenerationMode (),
   m_channelEstimationError (),
-  m_sinrCalculate (),
+  m_additionalInterferenceCallback (),
   m_linkResults (),
   m_rxExtNoiseDensityWhz (0),
   m_enableIntfOutputTrace (false),
@@ -73,8 +76,9 @@ SatPhyRxCarrierConf::SatPhyRxCarrierConf (RxCarrierCreateParams_s createParams)
   m_carrierCount (createParams.m_carrierCount),
   m_carrierBandwidthConverter (createParams.m_bwConverter),
   m_channelType (createParams.m_chType),
+  m_linkRegenerationMode (createParams.m_linkRegenerationMode),
   m_channelEstimationError (createParams.m_cec),
-  m_sinrCalculate (),
+  m_additionalInterferenceCallback (),
   m_linkResults (),
   m_rxExtNoiseDensityWhz (createParams.m_extNoiseDensityWhz),
   m_enableIntfOutputTrace (false),
@@ -119,7 +123,7 @@ SatPhyRxCarrierConf::DoDispose ()
 
   m_linkResults = NULL;
   m_carrierBandwidthConverter.Nullify ();
-  m_sinrCalculate.Nullify ();
+  m_additionalInterferenceCallback.Nullify ();
 
   Object::DoDispose ();
 }
@@ -215,6 +219,12 @@ SatEnums::ChannelType_t
 SatPhyRxCarrierConf::GetChannelType () const
 {
   return m_channelType;
+}
+
+SatEnums::RegenerationMode_t
+SatPhyRxCarrierConf::GetLinkRegenerationMode () const
+{
+  return m_linkRegenerationMode;
 }
 
 bool

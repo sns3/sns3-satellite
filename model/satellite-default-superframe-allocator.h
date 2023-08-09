@@ -23,14 +23,16 @@
 #ifndef SAT_DEFAULT_SUPERFRAME_ALLOCATOR_H
 #define SAT_DEFAULT_SUPERFRAME_ALLOCATOR_H
 
-#include "ns3/simple-ref-count.h"
-#include "ns3/address.h"
-#include "ns3/traced-callback.h"
-#include "ns3/satellite-frame-conf.h"
+#include <ns3/simple-ref-count.h>
+#include <ns3/address.h>
+#include <ns3/traced-callback.h>
+
+#include "satellite-frame-conf.h"
 #include "satellite-control-message.h"
 #include "satellite-frame-allocator.h"
 #include "satellite-enums.h"
 #include "satellite-superframe-allocator.h"
+
 
 namespace ns3 {
 

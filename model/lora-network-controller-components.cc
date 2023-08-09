@@ -20,7 +20,8 @@
  * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "ns3/lora-network-controller-components.h"
+#include "lora-network-controller-components.h"
+
 
 namespace ns3 {
 

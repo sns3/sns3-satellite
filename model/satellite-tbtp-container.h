@@ -22,11 +22,14 @@
 #define SATELLITE_TBTP_CONTAINER_H_
 
 #include <map>
-#include "ns3/object.h"
-#include "ns3/mac48-address.h"
+
+#include <ns3/object.h>
+#include <ns3/mac48-address.h>
+
 #include "satellite-control-message.h"
 #include "satellite-frame-conf.h"
 #include "satellite-superframe-sequence.h"
+
 
 namespace ns3 {
 

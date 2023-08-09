@@ -168,7 +168,7 @@ SatStatsSignallingLoadHelper::DoInstall ()
                                          "OutputFileName", StringValue (GetName ()));
         Ptr<MagisterGnuplotAggregator> plotAggregator
           = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-        NS_ASSERT (plotAggregator != 0);
+        NS_ASSERT (plotAggregator != nullptr);
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Time (in seconds)",
                                    "Signalling load (in kilobits per second)");
@@ -253,7 +253,7 @@ SatStatsSignallingLoadHelper::SignallingTxCallback (Ptr<const Packet> packet,
                it != m_conversionCollectors.End (); ++it)
             {
               Ptr<UnitConversionCollector> c = it->second->GetObject<UnitConversionCollector> ();
-              NS_ASSERT (c != 0);
+              NS_ASSERT (c != nullptr);
               c->TraceSinkUinteger32 (0, packet->GetSize ());
             }
         }
@@ -273,10 +273,10 @@ SatStatsSignallingLoadHelper::SignallingTxCallback (Ptr<const Packet> packet,
             {
               // Find the first-level collector with the right identifier.
               Ptr<DataCollectionObject> collector = m_conversionCollectors.Get (it->second);
-              NS_ASSERT_MSG (collector != 0,
+              NS_ASSERT_MSG (collector != nullptr,
                              "Unable to find collector with identifier " << it->second);
               Ptr<UnitConversionCollector> c = collector->GetObject<UnitConversionCollector> ();
-              NS_ASSERT (c != 0);
+              NS_ASSERT (c != nullptr);
 
               // Pass the sample to the collector.
               c->TraceSinkUinteger32 (0, packet->GetSize ());
@@ -364,7 +364,7 @@ SatStatsFwdSignallingLoadHelper::DoInstallProbes ()
       for (NetDeviceContainer::Iterator itDev = devs.Begin ();
            itDev != devs.End (); ++itDev)
         {
-          NS_ASSERT ((*itDev)->GetObject<SatNetDevice> () != 0);
+          NS_ASSERT ((*itDev)->GetObject<SatNetDevice> () != nullptr);
 
           if ((*itDev)->TraceConnectWithoutContext ("SignallingTx", callback))
             {

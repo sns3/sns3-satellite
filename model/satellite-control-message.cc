@@ -494,7 +494,7 @@ SatCnoReportMessage::GetInstanceTypeId (void) const
 }
 
 SatCnoReportMessage::SatCnoReportMessage ()
-  : m_forwardLinkCNo (NAN)
+  : m_linkCNo (NAN)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -509,21 +509,21 @@ double
 SatCnoReportMessage::GetCnoEstimate (void) const
 {
   NS_LOG_FUNCTION (this);
-  return m_forwardLinkCNo;
+  return m_linkCNo;
 }
 
 void
 SatCnoReportMessage::SetCnoEstimate (double cno)
 {
   NS_LOG_FUNCTION (this << cno);
-  m_forwardLinkCNo = cno;
+  m_linkCNo = cno;
 }
 
 uint32_t
 SatCnoReportMessage::GetSizeInBytes () const
 {
   NS_LOG_FUNCTION (this);
-  return sizeof (m_forwardLinkCNo);
+  return sizeof (m_linkCNo);
 }
 
 NS_OBJECT_ENSURE_REGISTERED (SatRaMessage);

@@ -25,17 +25,17 @@
 #ifndef LORAWAN_MAC_END_DEVICE_H
 #define LORAWAN_MAC_END_DEVICE_H
 
-#include "ns3/random-variable-stream.h"
-#include "ns3/traced-value.h"
+#include <ns3/random-variable-stream.h>
+#include <ns3/traced-value.h>
 
-#include "ns3/satellite-ut-mac.h"
+#include "satellite-ut-mac.h"
 
-#include "ns3/lorawan-mac.h"
-#include "ns3/lorawan-mac-header.h"
-#include "ns3/lora-frame-header.h"
-#include "ns3/lora-device-address.h"
-#include "ns3/lora-logical-channel.h"
-#include "ns3/lora-logical-channel-helper.h"
+#include "lorawan-mac.h"
+#include "lorawan-mac-header.h"
+#include "lora-frame-header.h"
+#include "lora-device-address.h"
+#include "lora-logical-channel.h"
+#include "lora-logical-channel-helper.h"
 
 namespace ns3 {
 
@@ -48,7 +48,7 @@ public:
   static TypeId GetTypeId (void);
 
   LorawanMacEndDevice ();
-  LorawanMacEndDevice (uint32_t beamId);
+  LorawanMacEndDevice (uint32_t satId, uint32_t beamId);
   virtual ~LorawanMacEndDevice ();
 
   /////////////////////

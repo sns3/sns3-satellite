@@ -18,9 +18,13 @@
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
 
-#include "satellite-markov-model.h"
 #include <cstdlib>
-#include "ns3/simulator.h"
+
+#include <ns3/log.h>
+#include <ns3/simulator.h>
+
+#include "satellite-markov-model.h"
+
 
 namespace ns3 {
 

@@ -18,8 +18,11 @@
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
 
+#include <ns3/log.h>
+
 #include "satellite-markov-container.h"
 #include "satellite-utils.h"
+
 
 namespace ns3 {
 

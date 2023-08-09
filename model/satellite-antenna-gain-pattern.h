@@ -27,6 +27,7 @@
 #include <ns3/traced-callback.h>
 #include <ns3/random-variable-stream.h>
 #include "geo-coordinate.h"
+#include "satellite-mobility-model.h"
 
 namespace ns3 {
 
@@ -68,31 +69,37 @@ public:
 
   /**
    * Constructor with initialization parameters.
-   * \param filePathName
+   * \param filePathName Path of file to read antenna gain patterns
+   * \param defaultSatellitePosition Position of satellite associated to this pattern
    */
-  SatAntennaGainPattern (std::string filePathName);
+  SatAntennaGainPattern (std::string filePathName, GeoCoordinate defaultSatellitePosition);
   ~SatAntennaGainPattern ()
   {
   }
 
   /**
    * \brief Calculate the antenna gain value for a certain {latitude, longitude} point
+   * \param mobility The mobility model of the associated satellite
    * \return The gain value in linear format
    */
-  double GetAntennaGain_lin (GeoCoordinate coord) const;
+  double GetAntennaGain_lin (GeoCoordinate coord, Ptr<SatMobilityModel> mobility) const;
 
   /**
    * \brief Get a valid random position under this spot-beam coverage.
+   * \param mobility The mobility model of the associated satellite
    * \return A valid random GeoCoordinate
    */
-  GeoCoordinate GetValidRandomPosition () const;
+  GeoCoordinate GetValidRandomPosition (Ptr<SatMobilityModel> mobility) const;
 
   /**
    * \brief Check if a given position is under this spot-beam coverage.
    * \param coord The position to check for validity
+   * \param mobility The mobility model of the associated satellite
    * \return Whether or not the given position is valid for this spot-beam
    */
-  bool IsValidPosition (GeoCoordinate coord, TracedCallback<double> cb) const;
+  bool IsValidPosition (GeoCoordinate coord, TracedCallback<double> cb, Ptr<SatMobilityModel> mobility) const;
+
+  void GetSatelliteOffset (double& latOffset, double& lonOffset, Ptr<SatMobilityModel> mobility) const;
 
 private:
   /**
@@ -167,14 +174,21 @@ private:
   double m_lonInterval;
 
   /**
+   * Latitude of default satellite for antenna gain pattern
+   */
+  double m_latDefaultSatellite;
+
+  /**
+   * Longitude of default satellite for antenna gain pattern
+   */
+  double m_lonDefaultSatellite;
+
+  /**
    * Valid Not-a-Number (NaN) strings
    */
   static const std::string m_nanStringArray[4];
   std::vector<std::string> m_nanStrings;
 };
-
-
-
 
 
 } // namespace ns3

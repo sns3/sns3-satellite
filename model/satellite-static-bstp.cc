@@ -22,11 +22,12 @@
 #include <istream>
 #include <sstream>
 
-#include "ns3/log.h"
-#include "ns3/singleton.h"
-#include "ns3/satellite-env-variables.h"
+#include <ns3/log.h>
+#include <ns3/singleton.h>
 
 #include "satellite-static-bstp.h"
+#include "../utils/satellite-env-variables.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatStaticBstp");
 

@@ -19,13 +19,14 @@
  */
 
 
-#include "ns3/double.h"
-#include "ns3/string.h"
-#include "ns3/log.h"
+#include <ns3/double.h>
+#include <ns3/string.h>
+#include <ns3/log.h>
 
 #include "satellite-utils.h"
 #include "satellite-free-space-loss.h"
 #include "satellite-const-variables.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatFreeSpaceLoss");
 

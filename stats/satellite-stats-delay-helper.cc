@@ -33,6 +33,7 @@
 #include <ns3/mac48-address.h>
 #include <ns3/net-device.h>
 #include <ns3/satellite-net-device.h>
+#include <ns3/satellite-geo-net-device.h>
 #include <ns3/satellite-mac.h>
 #include <ns3/satellite-phy.h>
 
@@ -171,7 +172,7 @@ SatStatsDelayHelper::DoInstall ()
                                              "EnableContextPrinting", BooleanValue (false),
                                              "GeneralHeading", StringValue (GetDistributionHeading ("delay_sec")));
             Ptr<MultiFileAggregator> fileAggregator = m_aggregator->GetObject<MultiFileAggregator> ();
-            NS_ASSERT (fileAggregator != 0);
+            NS_ASSERT (fileAggregator != nullptr);
 
             // Setup the final-level collector.
             m_averagingCollector = CreateObject<DistributionCollector> ();
@@ -261,7 +262,7 @@ SatStatsDelayHelper::DoInstall ()
                                          "OutputFileName", StringValue (GetName ()));
         Ptr<MagisterGnuplotAggregator> plotAggregator
           = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-        NS_ASSERT (plotAggregator != 0);
+        NS_ASSERT (plotAggregator != nullptr);
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Time (in seconds)",
                                    "Packet delay (in seconds)");
@@ -296,7 +297,7 @@ SatStatsDelayHelper::DoInstall ()
                                              "OutputFileName", StringValue (GetName ()));
             Ptr<MagisterGnuplotAggregator> plotAggregator
               = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-            NS_ASSERT (plotAggregator != 0);
+            NS_ASSERT (plotAggregator != nullptr);
             //plot->SetTitle ("");
             plotAggregator->SetLegend ("Packet delay (in seconds)",
                                        "Frequency");
@@ -348,7 +349,7 @@ SatStatsDelayHelper::DoInstall ()
                                              "OutputFileName", StringValue (GetName ()));
             Ptr<MagisterGnuplotAggregator> plotAggregator
               = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-            NS_ASSERT (plotAggregator != 0);
+            NS_ASSERT (plotAggregator != nullptr);
             //plot->SetTitle ("");
             plotAggregator->SetLegend ("Packet delay (in seconds)",
                                        "Frequency");
@@ -528,7 +529,7 @@ SatStatsDelayHelper::PassSampleToCollector (const Time &delay, uint32_t identifi
   //NS_LOG_FUNCTION (this << delay.GetSeconds () << identifier);
 
   Ptr<DataCollectionObject> collector = m_terminalCollectors.Get (identifier);
-  NS_ASSERT_MSG (collector != 0,
+  NS_ASSERT_MSG (collector != nullptr,
                  "Unable to find collector with identifier " << identifier);
 
   switch (GetOutputType ())
@@ -537,7 +538,7 @@ SatStatsDelayHelper::PassSampleToCollector (const Time &delay, uint32_t identifi
     case SatStatsHelper::OUTPUT_SCALAR_PLOT:
       {
         Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
-        NS_ASSERT (c != 0);
+        NS_ASSERT (c != nullptr);
         c->TraceSinkDouble (0.0, delay.GetSeconds ());
         break;
       }
@@ -546,7 +547,7 @@ SatStatsDelayHelper::PassSampleToCollector (const Time &delay, uint32_t identifi
     case SatStatsHelper::OUTPUT_SCATTER_PLOT:
       {
         Ptr<UnitConversionCollector> c = collector->GetObject<UnitConversionCollector> ();
-        NS_ASSERT (c != 0);
+        NS_ASSERT (c != nullptr);
         c->TraceSinkDouble (0.0, delay.GetSeconds ());
         break;
       }
@@ -560,13 +561,13 @@ SatStatsDelayHelper::PassSampleToCollector (const Time &delay, uint32_t identifi
       if (m_averagingMode)
         {
           Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
-          NS_ASSERT (c != 0);
+          NS_ASSERT (c != nullptr);
           c->TraceSinkDouble (0.0, delay.GetSeconds ());
         }
       else
         {
           Ptr<DistributionCollector> c = collector->GetObject<DistributionCollector> ();
-          NS_ASSERT (c != 0);
+          NS_ASSERT (c != nullptr);
           c->TraceSinkDouble (0.0, delay.GetSeconds ());
         }
       break;
@@ -629,7 +630,7 @@ SatStatsFwdAppDelayHelper::DoInstallProbes ()
            * Some applications support RxDelay trace sources, and some other
            * applications support Rx trace sources. Below we support both ways.
            */
-          if (app->GetInstanceTypeId ().LookupTraceSourceByName ("RxDelay") != 0)
+          if (app->GetInstanceTypeId ().LookupTraceSourceByName ("RxDelay") != nullptr)
             {
               NS_LOG_INFO (this << " attempt to connect using RxDelay");
 
@@ -646,7 +647,7 @@ SatStatsFwdAppDelayHelper::DoInstallProbes ()
                   m_probes.push_back (probe->GetObject<Probe> ());
                 }
             }
-          else if (app->GetInstanceTypeId ().LookupTraceSourceByName ("Rx") != 0)
+          else if (app->GetInstanceTypeId ().LookupTraceSourceByName ("Rx") != nullptr)
             {
               NS_LOG_INFO (this << " attempt to connect using Rx");
               Callback<void, Ptr<const Packet>, const Address &> rxCallback
@@ -833,7 +834,7 @@ SatStatsFwdDevDelayHelper::DoInstallProbes ()
       for (NetDeviceContainer::Iterator itDev = devs.Begin ();
            itDev != devs.End (); ++itDev)
         {
-          NS_ASSERT ((*itDev)->GetObject<SatNetDevice> () != 0);
+          NS_ASSERT ((*itDev)->GetObject<SatNetDevice> () != nullptr);
           (*itDev)->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
         }
     }
@@ -889,9 +890,9 @@ SatStatsFwdMacDelayHelper::DoInstallProbes ()
 
       Ptr<NetDevice> dev = GetUtSatNetDevice (*it);
       Ptr<SatNetDevice> satDev = dev->GetObject<SatNetDevice> ();
-      NS_ASSERT (satDev != 0);
+      NS_ASSERT (satDev != nullptr);
       Ptr<SatMac> satMac = satDev->GetMac ();
-      NS_ASSERT (satMac != 0);
+      NS_ASSERT (satMac != nullptr);
 
       // Connect the object to the probe.
       if (probe->ConnectByObject ("RxDelay", satMac)
@@ -921,9 +922,9 @@ SatStatsFwdMacDelayHelper::DoInstallProbes ()
            itDev != devs.End (); ++itDev)
         {
           Ptr<SatNetDevice> satDev = (*itDev)->GetObject<SatNetDevice> ();
-          NS_ASSERT (satDev != 0);
+          NS_ASSERT (satDev != nullptr);
           Ptr<SatMac> satMac = satDev->GetMac ();
-          NS_ASSERT (satMac != 0);
+          NS_ASSERT (satMac != nullptr);
 
           satDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
           satMac->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
@@ -964,6 +965,31 @@ void
 SatStatsFwdPhyDelayHelper::DoInstallProbes ()
 {
   NS_LOG_FUNCTION (this);
+
+  NodeContainer sats = GetSatHelper ()->GetBeamHelper ()->GetGeoSatNodes ();
+
+  for (NodeContainer::Iterator it = sats.Begin (); it != sats.End (); ++it)
+    {
+      Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
+      Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
+      NS_ASSERT (satGeoDev != nullptr);
+      std::map<uint32_t, Ptr<SatPhy> > satGeoFeederPhys = satGeoDev->GetFeederPhy ();
+      Ptr<SatPhy> satPhy;
+      for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoFeederPhys.begin (); it2 != satGeoFeederPhys.end (); ++it2)
+        {
+          satPhy = it2->second;
+          NS_ASSERT (satPhy != nullptr);
+          satPhy->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+        }
+      std::map<uint32_t, Ptr<SatPhy> > satGeoUserPhys = satGeoDev->GetUserPhy ();
+      for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoUserPhys.begin (); it2 != satGeoUserPhys.end (); ++it2)
+        {
+          satPhy = it2->second;
+          NS_ASSERT (satPhy != nullptr);
+          satPhy->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+        }
+    } // end of `for (it = sats.Begin(); it != sats.End (); ++it)`
+
   NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
 
   for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
@@ -981,9 +1007,9 @@ SatStatsFwdPhyDelayHelper::DoInstallProbes ()
 
       Ptr<NetDevice> dev = GetUtSatNetDevice (*it);
       Ptr<SatNetDevice> satDev = dev->GetObject<SatNetDevice> ();
-      NS_ASSERT (satDev != 0);
+      NS_ASSERT (satDev != nullptr);
       Ptr<SatPhy> satPhy = satDev->GetPhy ();
-      NS_ASSERT (satPhy != 0);
+      NS_ASSERT (satPhy != nullptr);
 
       // Connect the object to the probe.
       if (probe->ConnectByObject ("RxDelay", satPhy)
@@ -1013,9 +1039,9 @@ SatStatsFwdPhyDelayHelper::DoInstallProbes ()
            itDev != devs.End (); ++itDev)
         {
           Ptr<SatNetDevice> satDev = (*itDev)->GetObject<SatNetDevice> ();
-          NS_ASSERT (satDev != 0);
+          NS_ASSERT (satDev != nullptr);
           Ptr<SatPhy> satPhy = satDev->GetPhy ();
-          NS_ASSERT (satPhy != 0);
+          NS_ASSERT (satPhy != nullptr);
 
           satDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
           satPhy->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
@@ -1107,12 +1133,12 @@ SatStatsRtnAppDelayHelper::DoInstallProbes ()
            * Some applications support RxDelay trace sources, and some other
            * applications support Rx trace sources. Below we support both ways.
            */
-          if (app->GetInstanceTypeId ().LookupTraceSourceByName ("RxDelay") != 0)
+          if (app->GetInstanceTypeId ().LookupTraceSourceByName ("RxDelay") != nullptr)
             {
               isConnected = app->TraceConnectWithoutContext ("RxDelay",
                                                              rxDelayCallback);
             }
-          else if (app->GetInstanceTypeId ().LookupTraceSourceByName ("Rx") != 0)
+          else if (app->GetInstanceTypeId ().LookupTraceSourceByName ("Rx") != nullptr)
             {
               isConnected = app->TraceConnectWithoutContext ("Rx",
                                                              rxCallback);
@@ -1232,7 +1258,7 @@ SatStatsRtnAppDelayHelper::SaveIpv4AddressAndIdentifier (Ptr<Node> utUserNode)
 
   Ptr<Ipv4> ipv4 = utUserNode->GetObject<Ipv4> ();
 
-  if (ipv4 == 0)
+  if (ipv4 == nullptr)
     {
       NS_LOG_INFO (this << " Node " << utUserNode->GetId ()
                         << " does not support IPv4 protocol");
@@ -1317,7 +1343,7 @@ SatStatsRtnDevDelayHelper::DoInstallProbes ()
       for (NetDeviceContainer::Iterator itDev = devs.Begin ();
            itDev != devs.End (); ++itDev)
         {
-          NS_ASSERT ((*itDev)->GetObject<SatNetDevice> () != 0);
+          NS_ASSERT ((*itDev)->GetObject<SatNetDevice> () != nullptr);
 
           if ((*itDev)->TraceConnectWithoutContext ("RxDelay", callback))
             {
@@ -1384,9 +1410,9 @@ SatStatsRtnMacDelayHelper::DoInstallProbes ()
       // Enable statistics-related tags and trace sources on the device.
       Ptr<NetDevice> dev = GetUtSatNetDevice (*it);
       Ptr<SatNetDevice> satDev = dev->GetObject<SatNetDevice> ();
-      NS_ASSERT (satDev != 0);
+      NS_ASSERT (satDev != nullptr);
       Ptr<SatMac> satMac = satDev->GetMac ();
-      NS_ASSERT (satMac != 0);
+      NS_ASSERT (satMac != nullptr);
       satDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
       satMac->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
     }
@@ -1405,9 +1431,9 @@ SatStatsRtnMacDelayHelper::DoInstallProbes ()
            itDev != devs.End (); ++itDev)
         {
           Ptr<SatNetDevice> satDev = (*itDev)->GetObject<SatNetDevice> ();
-          NS_ASSERT (satDev != 0);
+          NS_ASSERT (satDev != nullptr);
           Ptr<SatMac> satMac = satDev->GetMac ();
-          NS_ASSERT (satMac != 0);
+          NS_ASSERT (satMac != nullptr);
 
           // Connect the object to the probe.
           if (satMac->TraceConnectWithoutContext ("RxDelay", callback))
@@ -1466,6 +1492,30 @@ SatStatsRtnPhyDelayHelper::DoInstallProbes ()
 {
   NS_LOG_FUNCTION (this);
 
+  NodeContainer sats = GetSatHelper ()->GetBeamHelper ()->GetGeoSatNodes ();
+
+  for (NodeContainer::Iterator it = sats.Begin (); it != sats.End (); ++it)
+    {
+      Ptr<SatPhy> satPhy;
+      Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
+      Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
+      NS_ASSERT (satGeoDev != nullptr);
+      std::map<uint32_t, Ptr<SatPhy> > satGeoFeederPhys = satGeoDev->GetFeederPhy ();
+      for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoFeederPhys.begin (); it2 != satGeoFeederPhys.end (); ++it2)
+        {
+          satPhy = it2->second;
+          NS_ASSERT (satPhy != nullptr);
+          satPhy->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+        }
+      std::map<uint32_t, Ptr<SatPhy> > satGeoUserPhys = satGeoDev->GetUserPhy ();
+      for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoUserPhys.begin (); it2 != satGeoUserPhys.end (); ++it2)
+        {
+          satPhy = it2->second;
+          NS_ASSERT (satPhy != nullptr);
+          satPhy->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
+        }
+    } // end of `for (it = sats.Begin(); it != sats.End (); ++it)`
+
   NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
   for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
     {
@@ -1475,9 +1525,9 @@ SatStatsRtnPhyDelayHelper::DoInstallProbes ()
       // Enable statistics-related tags and trace sources on the device.
       Ptr<NetDevice> dev = GetUtSatNetDevice (*it);
       Ptr<SatNetDevice> satDev = dev->GetObject<SatNetDevice> ();
-      NS_ASSERT (satDev != 0);
+      NS_ASSERT (satDev != nullptr);
       Ptr<SatPhy> satPhy = satDev->GetPhy ();
-      NS_ASSERT (satPhy != 0);
+      NS_ASSERT (satPhy != nullptr);
       satDev->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
       satPhy->SetAttribute ("EnableStatisticsTags", BooleanValue (true));
     }
@@ -1496,9 +1546,9 @@ SatStatsRtnPhyDelayHelper::DoInstallProbes ()
            itDev != devs.End (); ++itDev)
         {
           Ptr<SatNetDevice> satDev = (*itDev)->GetObject<SatNetDevice> ();
-          NS_ASSERT (satDev != 0);
+          NS_ASSERT (satDev != nullptr);
           Ptr<SatPhy> satPhy = satDev->GetPhy ();
-          NS_ASSERT (satPhy != 0);
+          NS_ASSERT (satPhy != nullptr);
 
           // Connect the object to the probe.
           if (satPhy->TraceConnectWithoutContext ("RxDelay", callback))

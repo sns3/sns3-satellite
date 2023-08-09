@@ -21,21 +21,19 @@
  * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "ns3/point-to-point-net-device.h"
-#include "ns3/packet.h"
-#include "ns3/node-container.h"
-#include "ns3/net-device.h"
+#include <ns3/log.h>
 
-#include "ns3/satellite-lorawan-net-device.h"
+#include "satellite-lorawan-net-device.h"
 
-#include "ns3/lora-network-server.h"
-#include "ns3/lora-frame-header.h"
-#include "ns3/lora-device-address.h"
-#include "ns3/lora-network-status.h"
-#include "ns3/lora-frame-header.h"
-#include "ns3/lorawan-mac-command.h"
-#include "ns3/lorawan-mac-end-device-class-a.h"
-#include "ns3/lorawan-mac-header.h"
+#include "lora-network-server.h"
+#include "lora-frame-header.h"
+#include "lora-device-address.h"
+#include "lora-network-status.h"
+#include "lora-frame-header.h"
+#include "lorawan-mac-command.h"
+#include "lorawan-mac-end-device-class-a.h"
+#include "lorawan-mac-header.h"
+
 
 namespace ns3 {
 
@@ -91,7 +89,7 @@ LoraNetworkServer::AddGateway (Ptr<Node> gateway, Ptr<NetDevice> netDevice)
   for (uint32_t i = 0; i < gateway->GetNDevices (); i++)
     {
       p2pNetDevice = gateway->GetDevice (i)->GetObject<PointToPointNetDevice> ();
-      if (p2pNetDevice != 0)
+      if (p2pNetDevice != nullptr)
         {
           // We found a p2pNetDevice on the gateway
           break;
@@ -101,7 +99,7 @@ LoraNetworkServer::AddGateway (Ptr<Node> gateway, Ptr<NetDevice> netDevice)
   // Get the gateway's LoRa MAC layer (assumes gateway's MAC is configured as first device)
   Ptr<SatLorawanNetDevice> satLoraNetDevice = DynamicCast<SatLorawanNetDevice> (gateway->GetDevice (1));
   Ptr<LorawanMacGateway> gwMac = DynamicCast<LorawanMacGateway> (satLoraNetDevice->GetMac ());
-  NS_ASSERT (gwMac != 0);
+  NS_ASSERT (gwMac != nullptr);
 
   // Get the Address
   Address gatewayAddress = p2pNetDevice->GetAddress ();
@@ -135,7 +133,7 @@ LoraNetworkServer::AddNode (Ptr<Node> node)
   for (uint32_t i = 0; i < node->GetNDevices (); i++)
     {
       loraNetDevice = DynamicCast<SatLorawanNetDevice> (node->GetDevice (i));
-      if (loraNetDevice != 0)
+      if (loraNetDevice != nullptr)
         {
           // We found a SatLorawanNetDevice on the node
           break;

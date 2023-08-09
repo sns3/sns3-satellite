@@ -61,6 +61,7 @@
 #include <ns3/satellite-packet-classifier.h>
 #include <ns3/satellite-id-mapper.h>
 #include <ns3/satellite-typedefs.h>
+#include <ns3/satellite-mac-tag.h>
 
 #include <ns3/satellite-lora-conf.h>
 #include <ns3/lorawan-mac-end-device-class-a.h>
@@ -223,11 +224,14 @@ SatUtHelper::SetPhyAttribute (std::string n1, const AttributeValue &v1)
 }
 
 NetDeviceContainer
-SatUtHelper::InstallDvb (NodeContainer c, uint32_t beamId,
+SatUtHelper::InstallDvb (NodeContainer c, uint32_t satId, uint32_t beamId,
                          Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
                          Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
+                         Address satUserAddress,
                          SatPhy::ChannelPairGetterCallback cbChannel,
-                         SatMac::RoutingUpdateCallback cbRouting)
+                         SatMac::RoutingUpdateCallback cbRouting,
+                         SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                          SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
   NS_LOG_FUNCTION (this << beamId << fCh << rCh );
 
@@ -235,18 +239,21 @@ SatUtHelper::InstallDvb (NodeContainer c, uint32_t beamId,
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
     {
-      devs.Add (InstallDvb (*i, beamId, fCh, rCh, gwNd, ncc, cbChannel, cbRouting));
+      devs.Add (InstallDvb (*i, satId, beamId, fCh, rCh, gwNd, ncc, satUserAddress, cbChannel, cbRouting, forwardLinkRegenerationMode, returnLinkRegenerationMode));
     }
 
   return devs;
 }
 
 Ptr<NetDevice>
-SatUtHelper::InstallDvb (Ptr<Node> n, uint32_t beamId,
+SatUtHelper::InstallDvb (Ptr<Node> n, uint32_t satId, uint32_t beamId,
                          Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
                          Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
+                         Address satUserAddress,
                          SatPhy::ChannelPairGetterCallback cbChannel,
-                         SatMac::RoutingUpdateCallback cbRouting)
+                         SatMac::RoutingUpdateCallback cbRouting,
+                         SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                         SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
   NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
 
@@ -260,6 +267,7 @@ SatUtHelper::InstallDvb (Ptr<Node> n, uint32_t beamId,
   n->AddDevice (dev);
 
   SatPhy::CreateParam_t params;
+  params.m_satId = satId;
   params.m_beamId = beamId;
   params.m_device = dev;
   params.m_txCh = rCh;
@@ -290,6 +298,7 @@ SatUtHelper::InstallDvb (Ptr<Node> n, uint32_t beamId,
   parameters.m_daIfModel = m_daInterferenceModel;
   parameters.m_raIfModel = m_raSettings.m_raInterferenceModel;
   parameters.m_raIfEliminateModel = m_raSettings.m_raInterferenceEliminationModel;
+  parameters.m_linkRegenerationMode = forwardLinkRegenerationMode;
   parameters.m_bwConverter = m_carrierBandwidthConverter;
   parameters.m_carrierCount = m_fwdLinkCarrierCount;
   parameters.m_cec = cec;
@@ -299,14 +308,20 @@ SatUtHelper::InstallDvb (Ptr<Node> n, uint32_t beamId,
   Ptr<SatUtPhy> phy = CreateObject<SatUtPhy> (params,
                                               m_linkResults,
                                               parameters,
-                                              m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE));
+                                              m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE),
+                                              forwardLinkRegenerationMode);
   phy->SetChannelPairGetterCallback (cbChannel);
 
   // Set fading
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());
   phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
 
-  Ptr<SatUtMac> mac = CreateObject<SatUtMac> (m_superframeSeq, beamId, m_crdsaOnlyForControl);
+  Ptr<SatUtMac> mac = CreateObject<SatUtMac> (satId,
+                                              beamId,
+                                              m_superframeSeq,
+                                              forwardLinkRegenerationMode,
+                                              returnLinkRegenerationMode,
+                                              m_crdsaOnlyForControl);
 
   // Set the control message container callbacks
   mac->SetReadCtrlCallback (m_readCtrlCb);
@@ -333,7 +348,8 @@ SatUtHelper::InstallDvb (Ptr<Node> n, uint32_t beamId,
   mac->SetSliceSubscriptionCallback (MakeCallback (&SatUtPhy::UpdateSliceSubscription, phy));
 
   // Create Logical Link Control (LLC) layer
-  Ptr<SatUtLlc> llc = CreateObject<SatUtLlc> ();
+  Ptr<SatUtLlc> llc = CreateObject<SatUtLlc> (forwardLinkRegenerationMode,
+                                              returnLinkRegenerationMode);
 
   // Set the control msg read callback to LLC due to ARQ ACKs
   llc->SetReadCtrlCallback (m_readCtrlCb);
@@ -342,6 +358,12 @@ SatUtHelper::InstallDvb (Ptr<Node> n, uint32_t beamId,
   Ptr<SatRequestManager> rm = CreateObject<SatRequestManager> ();
   llc->SetRequestManager (rm);
   rm->SetCtrlMsgCallback (MakeCallback (&SatNetDevice::SendControlMsg, dev));
+
+  if (returnLinkRegenerationMode != SatEnums::TRANSPARENT && returnLinkRegenerationMode != SatEnums::REGENERATION_PHY)
+    {
+      llc->SetAdditionalHeaderSize (SatAddressE2ETag::SIZE);
+      rm->SetHeaderOffsetVbdc(38.0/(38-2-SatAddressE2ETag::SIZE));
+    }
 
   // Set the callback to check whether control msg transmissions are possible
   rm->SetCtrlMsgTxPossibleCallback (MakeCallback (&SatUtMac::ControlMsgTransmissionPossible, mac));
@@ -378,15 +400,24 @@ SatUtHelper::InstallDvb (Ptr<Node> n, uint32_t beamId,
   Singleton<SatIdMapper>::Get ()->AttachMacToTraceId (dev->GetAddress ());
   Singleton<SatIdMapper>::Get ()->AttachMacToUtId (dev->GetAddress ());
   Singleton<SatIdMapper>::Get ()->AttachMacToBeamId (dev->GetAddress (), beamId);
+  Singleton<SatIdMapper>::Get ()->AttachMacToSatId (dev->GetAddress (), satId+1);
 
   // Create encapsulator and add it to UT's LLC
   Mac48Address gwAddr = Mac48Address::ConvertFrom (gwNd->GetAddress ());
 
   // Create an encapsulator for control messages.
   // Source = UT MAC address
-  // Destination = GW MAC address
+  // Destination = GW MAC address (or SAT user MAC address if regenerative)
   // Flow id = by default 0
-  Ptr<SatBaseEncapsulator> utEncap = CreateObject<SatBaseEncapsulator> (addr, gwAddr, SatEnums::CONTROL_FID);
+  Ptr<SatBaseEncapsulator> utEncap;
+  if (returnLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
+    {
+      utEncap = CreateObject<SatBaseEncapsulator> (addr, Mac48Address::ConvertFrom (satUserAddress), addr, gwAddr, SatEnums::CONTROL_FID);
+    }
+  else
+    {
+      utEncap = CreateObject<SatBaseEncapsulator> (addr, gwAddr, addr, gwAddr, SatEnums::CONTROL_FID);
+    }
 
   // Create queue event callbacks to MAC (for random access) and RM (for on-demand DAMA)
   SatQueue::QueueEventCallback macCb;
@@ -407,7 +438,14 @@ SatUtHelper::InstallDvb (Ptr<Node> n, uint32_t beamId,
   queue->AddQueueEventCallback (macCb);
   queue->AddQueueEventCallback (rmCb);
   utEncap->SetQueue (queue);
-  llc->AddEncap (addr, gwAddr, SatEnums::CONTROL_FID, utEncap);
+  if (returnLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
+    {
+      llc->AddEncap (addr, Mac48Address::ConvertFrom (satUserAddress), SatEnums::CONTROL_FID, utEncap);
+    }
+  else
+    {
+      llc->AddEncap (addr, gwAddr, SatEnums::CONTROL_FID, utEncap);
+    }
   rm->AddQueueCallback (SatEnums::CONTROL_FID, MakeCallback (&SatQueue::GetQueueStatistics, queue));
 
   // Add callbacks to LLC for future need. LLC creates encapsulators and
@@ -442,7 +480,7 @@ SatUtHelper::InstallDvb (Ptr<Node> n, uint32_t beamId,
     }
   else
     {
-      ncc->AddUt (m_llsConf, dev->GetAddress (), beamId, MakeCallback (&SatUtMac::SetRaChannel, mac));
+      ncc->AddUt (m_llsConf, dev->GetAddress (), satId, beamId, MakeCallback (&SatUtMac::SetRaChannel, mac));
     }
 
   phy->Initialize ();
@@ -506,11 +544,14 @@ SatUtHelper::InstallDvb (Ptr<Node> n, uint32_t beamId,
 }
 
 NetDeviceContainer
-SatUtHelper::InstallLora (NodeContainer c, uint32_t beamId,
+SatUtHelper::InstallLora (NodeContainer c, uint32_t satId, uint32_t beamId,
                           Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
                           Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
+                          Address satUserAddress,
                           SatPhy::ChannelPairGetterCallback cbChannel,
-                          SatMac::RoutingUpdateCallback cbRouting)
+                          SatMac::RoutingUpdateCallback cbRouting,
+                          SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                          SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
   NS_LOG_FUNCTION (this << beamId << fCh << rCh );
 
@@ -518,18 +559,21 @@ SatUtHelper::InstallLora (NodeContainer c, uint32_t beamId,
 
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
     {
-      devs.Add (InstallLora (*i, beamId, fCh, rCh, gwNd, ncc, cbChannel, cbRouting));
+      devs.Add (InstallLora (*i, satId, beamId, fCh, rCh, gwNd, ncc, satUserAddress, cbChannel, cbRouting, forwardLinkRegenerationMode, returnLinkRegenerationMode));
     }
 
   return devs;
 }
 
 Ptr<NetDevice>
-SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
+SatUtHelper::InstallLora (Ptr<Node> n, uint32_t satId, uint32_t beamId,
                           Ptr<SatChannel> fCh, Ptr<SatChannel> rCh,
                           Ptr<SatNetDevice> gwNd, Ptr<SatNcc> ncc,
+                          Address satUserAddress,
                           SatPhy::ChannelPairGetterCallback cbChannel,
-                          SatMac::RoutingUpdateCallback cbRouting)
+                          SatMac::RoutingUpdateCallback cbRouting,
+                          SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                          SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
   NS_LOG_FUNCTION (this << n << beamId << fCh << rCh );
 
@@ -543,6 +587,7 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
   n->AddDevice (dev);
 
   SatPhy::CreateParam_t params;
+  params.m_satId = satId;
   params.m_beamId = beamId;
   params.m_device = dev;
   params.m_txCh = rCh;
@@ -570,6 +615,7 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
   parameters.m_daIfModel = m_daInterferenceModel;
   parameters.m_raIfModel = m_raSettings.m_raInterferenceModel;
   parameters.m_raIfEliminateModel = m_raSettings.m_raInterferenceEliminationModel;
+  parameters.m_linkRegenerationMode = forwardLinkRegenerationMode;
   parameters.m_bwConverter = m_carrierBandwidthConverter;
   parameters.m_carrierCount = m_fwdLinkCarrierCount;
   parameters.m_cec = cec;
@@ -579,14 +625,15 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
   Ptr<SatUtPhy> phy = CreateObject<SatUtPhy> (params,
                                               m_linkResults,
                                               parameters,
-                                              m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE));
+                                              m_superframeSeq->GetSuperframeConf (SatConstVariables::SUPERFRAME_SEQUENCE),
+                                              forwardLinkRegenerationMode);
   phy->SetChannelPairGetterCallback (cbChannel);
 
   // Set fading
   phy->SetTxFadingContainer (n->GetObject<SatBaseFading> ());
   phy->SetRxFadingContainer (n->GetObject<SatBaseFading> ());
 
-  Ptr<LorawanMacEndDeviceClassA> mac = CreateObject<LorawanMacEndDeviceClassA> (beamId, m_superframeSeq);
+  Ptr<LorawanMacEndDeviceClassA> mac = CreateObject<LorawanMacEndDeviceClassA> (satId, beamId, m_superframeSeq);
 
   // TODO configuration for EU only
   mac->SetTxDbmForTxPower (std::vector<double>{16, 14, 12, 10, 8, 6, 4, 2});
@@ -617,6 +664,7 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
   Singleton<SatIdMapper>::Get ()->AttachMacToTraceId (dev->GetAddress ());
   Singleton<SatIdMapper>::Get ()->AttachMacToUtId (dev->GetAddress ());
   Singleton<SatIdMapper>::Get ()->AttachMacToBeamId (dev->GetAddress (), beamId);
+  Singleton<SatIdMapper>::Get ()->AttachMacToSatId (dev->GetAddress (), satId+1);
 
   // Create encapsulator and add it to UT's LLC
   Mac48Address gwAddr = Mac48Address::ConvertFrom (gwNd->GetAddress ());
@@ -626,7 +674,7 @@ SatUtHelper::InstallLora (Ptr<Node> n, uint32_t beamId,
   mac->SetGwAddress (gwAddr);
 
   // Add UT to NCC
-  ncc->AddUt (m_llsConf, dev->GetAddress (), beamId, MakeCallback (&LorawanMacEndDevice::SetRaChannel, mac));
+  ncc->AddUt (m_llsConf, dev->GetAddress (), satId, beamId, MakeCallback (&LorawanMacEndDevice::SetRaChannel, mac));
 
   phy->Initialize ();
 

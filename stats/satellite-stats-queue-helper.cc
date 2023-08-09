@@ -259,7 +259,7 @@ SatStatsQueueHelper::DoInstall ()
                                          "OutputFileName", StringValue (GetName ()));
         Ptr<MagisterGnuplotAggregator> plotAggregator
           = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-        NS_ASSERT (plotAggregator != 0);
+        NS_ASSERT (plotAggregator != nullptr);
         //plot->SetTitle ("");
         plotAggregator->SetLegend ("Time (in seconds)",
                                    "Queued packets");
@@ -293,7 +293,7 @@ SatStatsQueueHelper::DoInstall ()
                                          "OutputFileName", StringValue (GetName ()));
         Ptr<MagisterGnuplotAggregator> plotAggregator
           = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-        NS_ASSERT (plotAggregator != 0);
+        NS_ASSERT (plotAggregator != nullptr);
         //plot->SetTitle ("");
         plotAggregator->SetLegend (m_longLabel, "Frequency");
         plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
@@ -368,7 +368,7 @@ SatStatsQueueHelper::PushToCollector (uint32_t identifier, uint32_t value)
 
   // Find the collector with the right identifier.
   Ptr<DataCollectionObject> collector = m_terminalCollectors.Get (identifier);
-  NS_ASSERT_MSG (collector != 0,
+  NS_ASSERT_MSG (collector != nullptr,
                  "Unable to find collector with identifier " << identifier);
 
   switch (GetOutputType ())
@@ -377,7 +377,7 @@ SatStatsQueueHelper::PushToCollector (uint32_t identifier, uint32_t value)
     case SatStatsHelper::OUTPUT_SCALAR_PLOT:
       {
         Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
-        NS_ASSERT (c != 0);
+        NS_ASSERT (c != nullptr);
         c->TraceSinkUinteger32 (0, value);
         break;
       }
@@ -386,7 +386,7 @@ SatStatsQueueHelper::PushToCollector (uint32_t identifier, uint32_t value)
     case SatStatsHelper::OUTPUT_SCATTER_PLOT:
       {
         Ptr<IntervalRateCollector> c = collector->GetObject<IntervalRateCollector> ();
-        NS_ASSERT (c != 0);
+        NS_ASSERT (c != nullptr);
         c->TraceSinkUinteger32 (0, value);
         break;
       }
@@ -399,7 +399,7 @@ SatStatsQueueHelper::PushToCollector (uint32_t identifier, uint32_t value)
     case SatStatsHelper::OUTPUT_CDF_PLOT:
       {
         Ptr<DistributionCollector> c = collector->GetObject<DistributionCollector> ();
-        NS_ASSERT (c != 0);
+        NS_ASSERT (c != nullptr);
         c->TraceSinkUinteger32 (0, value);
         break;
       }
@@ -456,19 +456,20 @@ SatStatsFwdQueueHelper::DoEnlistSource ()
            itDev != devs.End (); ++itDev)
         {
           Ptr<SatNetDevice> satDev = (*itDev)->GetObject<SatNetDevice> ();
-          NS_ASSERT (satDev != 0);
+          NS_ASSERT (satDev != nullptr);
 
           // Get the beam ID of this device.
           Ptr<SatPhy> satPhy = satDev->GetPhy ();
-          NS_ASSERT (satPhy != 0);
+          NS_ASSERT (satPhy != nullptr);
           Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx ();
-          NS_ASSERT (satPhyRx != 0);
+          NS_ASSERT (satPhyRx != nullptr);
+          const uint32_t satId = satPhyRx->GetSatId ();
           const uint32_t beamId = satPhyRx->GetBeamId ();
-          NS_LOG_DEBUG (this << " enlisting UT from beam ID " << beamId);
+          NS_LOG_DEBUG (this << " enlisting UT from sat ID " << satId << " and beam ID " << beamId);
 
           // Go through the UTs of this beam.
           ListOfUt_t listOfUt;
-          NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes (beamId);
+          NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes (satId, beamId);
           for (NodeContainer::Iterator it2 = uts.Begin ();
                it2 != uts.End (); ++it2)
             {
@@ -489,7 +490,7 @@ SatStatsFwdQueueHelper::DoEnlistSource ()
 
           // Add an entry to the LLC list.
           Ptr<SatLlc> satLlc = satDev->GetLlc ();
-          NS_ASSERT (satLlc != 0);
+          NS_ASSERT (satLlc != nullptr);
           m_llc.push_back (std::make_pair (satLlc, listOfUt));
 
         } // end of `for (NetDeviceContainer::Iterator itDev = devs)`
@@ -623,9 +624,9 @@ SatStatsRtnQueueHelper::DoEnlistSource ()
       const uint32_t identifier = GetIdentifierForUt (*it);
       Ptr<NetDevice> dev = GetUtSatNetDevice (*it);
       Ptr<SatNetDevice> satDev = dev->GetObject<SatNetDevice> ();
-      NS_ASSERT (satDev != 0);
+      NS_ASSERT (satDev != nullptr);
       Ptr<SatLlc> satLlc = satDev->GetLlc ();
-      NS_ASSERT (satLlc != 0);
+      NS_ASSERT (satLlc != nullptr);
       m_llc.push_back (std::make_pair (satLlc, identifier));
     }
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Budiarto Herman <budiarto.herman@magister.fi>
+ * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  *
  */
 
@@ -25,6 +25,7 @@
 #include <ns3/satellite-stats-helper.h>
 #include <ns3/ptr.h>
 #include <ns3/callback.h>
+#include <ns3/collector-map.h>
 
 
 namespace ns3 {
@@ -38,8 +39,7 @@ class DataCollectionObject;
 
 /**
  * \ingroup satstats
- * \brief Abstract class inherited by SatStatsFwdFeederLinkRxPowerHelpe, SatStatsFwdUserLinkRxPowerHelper,
- * SatStatsRtnFeederLinkRxPowerHelper and SatStatsRtnFeederLinkRxPowerHelper.
+ * \brief Base class for link RX power statistics helpers.
  */
 class SatStatsLinkRxPowerHelper : public SatStatsHelper
 {
@@ -60,6 +60,11 @@ public:
   static TypeId GetTypeId ();
 
   /**
+   * \param averagingMode average all samples before passing them to aggregator.
+   */
+  void SetAveragingMode (bool averagingMode);
+
+  /**
    * \brief Set up several probes or other means of listeners and connect them
    *        to the collectors.
    */
@@ -67,14 +72,15 @@ public:
 
   /**
    * \brief Receive inputs from trace sources and forward them to the collector.
-   * \param rxPowerDb Rx power value in dB.
+   * \param rxPowerDb RX power value in dB.
+   * \param addr Address of UT
    */
-  void RxPowerCallback (double rxPowerDb);
+  void RxPowerCallback (double rxPowerDb, const Address & addr);
 
   /**
    * \return
    */
-  Callback<void, double> GetTraceSinkCallback () const;
+  Callback<void, double, const Address &> GetTraceSinkCallback () const;
 
 protected:
   // inherited from SatStatsHelper base class
@@ -85,15 +91,53 @@ protected:
    */
   virtual void DoInstallProbes () = 0;
 
+  /**
+   * \brief Save the address and the proper identifier from the given UT node.
+   * \param utNode a UT node.
+   *
+   * The address of the given node will be saved in the #m_identifierMap
+   * member variable.
+   *
+   * Used in return link statistics. DoInstallProbes() is expected to pass the
+   * the UT node of interest into this method.
+   */
+  void SaveAddressAndIdentifier (Ptr<Node> utNode);
+
+  /**
+   * \brief Connect the probe to the right collector.
+   * \param probe
+   * \param identifier
+   */
+  bool ConnectProbeToCollector (Ptr<Probe> probe, uint32_t identifier);
+
+  /**
+   * \brief Find a collector with the right identifier and pass a sample data
+   *        to it.
+   * \param rxPowerDb
+   * \param identifier
+   */
+  void PassSampleToCollector (double rxPowerDb, uint32_t identifier);
+
+  /// Maintains a list of collectors created by this helper.
+  CollectorMap m_terminalCollectors;
+
   /// The collector created by this helper.
   Ptr<DataCollectionObject> m_collector;
 
   /// The aggregator created by this helper.
   Ptr<DataCollectionObject> m_aggregator;
 
+  /// The final collector utilized in averaged output (histogram, PDF, and CDF).
+  Ptr<DistributionCollector> m_averagingCollector;
+
+  /// Map of address and the identifier associated with it (for return link).
+  std::map<const Address, uint32_t> m_identifierMap;
+
 private:
   ///
-  Callback<void, double> m_traceSinkCallback;
+  Callback<void, double, const Address &> m_traceSinkCallback;
+
+  bool m_averagingMode;  ///< `AveragingMode` attribute.
 
 }; // end of class SatStatsLinkRxPowerHelper
 
@@ -102,7 +146,7 @@ private:
 
 /**
  * \ingroup satstats
- * \brief Produce forward feeder link Rx power statistics from a satellite
+ * \brief Produce forward feeder link RX power statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
@@ -145,7 +189,7 @@ protected:
 
 /**
  * \ingroup satstats
- * \brief Produce forward user link Rx power statistics from a satellite
+ * \brief Produce forward user link RX power statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
@@ -188,7 +232,7 @@ protected:
 
 /**
  * \ingroup satstats
- * \brief Produce return feeder link Rx power statistics from a satellite
+ * \brief Produce return feeder link RX power statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
@@ -231,7 +275,7 @@ protected:
 
 /**
  * \ingroup satstats
- * \brief Produce return user link Rx power statistics from a satellite
+ * \brief Produce return user link RX power statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use

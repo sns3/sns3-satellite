@@ -21,12 +21,14 @@
  */
 
 #include <ns3/log.h>
-#include <ns3/satellite-control-message.h>
-#include <ns3/satellite-superframe-sequence.h>
-#include <ns3/satellite-lower-layer-service.h>
 #include <ns3/packet.h>
 #include <ns3/address.h>
+
+#include "satellite-control-message.h"
+#include "satellite-superframe-sequence.h"
+#include "satellite-lower-layer-service.h"
 #include "satellite-ncc.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatNcc");
 
@@ -100,28 +102,35 @@ SatNcc::DoDispose ()
 
 
 void
-SatNcc::UtCnoUpdated (uint32_t beamId, Address utId, Address /*gwId*/, double cno)
+SatNcc::UtCnoUpdated (uint32_t satId, uint32_t beamId, Address sourceMac, Address /*gwId*/, double cno, bool isSatelliteMac)
 {
-  NS_LOG_FUNCTION (this << beamId << utId << cno);
+  NS_LOG_FUNCTION (this << satId << beamId << sourceMac << cno);
 
-  m_beamSchedulers[beamId]->UpdateUtCno (utId, cno);
+  if (isSatelliteMac)
+    {
+      m_beamSchedulers[std::make_pair (satId, beamId)]->UpdateSatelliteCno (sourceMac, cno);
+    }
+  else
+    {
+      m_beamSchedulers[std::make_pair (satId, beamId)]->UpdateUtCno (sourceMac, cno);
+    }
 }
 
 void
-SatNcc::DoRandomAccessDynamicLoadControl (uint32_t beamId, uint32_t carrierId, uint8_t allocationChannelId, double averageNormalizedOfferedLoad)
+SatNcc::DoRandomAccessDynamicLoadControl (uint32_t satId, uint32_t beamId, uint32_t carrierId, uint8_t allocationChannelId, double averageNormalizedOfferedLoad)
 {
-  NS_LOG_FUNCTION (this << beamId << carrierId << (uint32_t) allocationChannelId << averageNormalizedOfferedLoad);
+  NS_LOG_FUNCTION (this << satId << beamId << carrierId << (uint32_t) allocationChannelId << averageNormalizedOfferedLoad);
 
   bool isLowRandomAccessLoad = true;
-  std::map<std::pair<uint32_t, uint8_t>, bool>::iterator findResult;
-  std::pair<std::map<std::pair<uint32_t, uint8_t>, bool>::iterator, bool> insertResult;
+  std::map<std::tuple<uint32_t, uint32_t, uint8_t>, bool>::iterator findResult;
+  std::pair<std::map<std::tuple<uint32_t, uint32_t, uint8_t>, bool>::iterator, bool> insertResult;
 
   /// search for the current status of load control
-  findResult = m_isLowRandomAccessLoad.find (std::make_pair (beamId, allocationChannelId));
+  findResult = m_isLowRandomAccessLoad.find (std::make_tuple (satId, beamId, allocationChannelId));
 
   if (findResult == m_isLowRandomAccessLoad.end ())
     {
-      insertResult = m_isLowRandomAccessLoad.insert (std::make_pair (std::make_pair (beamId, allocationChannelId), isLowRandomAccessLoad));
+      insertResult = m_isLowRandomAccessLoad.insert (std::make_pair (std::make_tuple (satId, beamId, allocationChannelId), isLowRandomAccessLoad));
 
       if (!insertResult.second)
         {
@@ -174,12 +183,12 @@ SatNcc::DoRandomAccessDynamicLoadControl (uint32_t beamId, uint32_t carrierId, u
           uint16_t time = it->second;
 
           /// use high load back off value
-          CreateRandomAccessLoadControlMessage (probability, time, beamId, allocationChannelId);
+          CreateRandomAccessLoadControlMessage (probability, time, satId, beamId, allocationChannelId);
 
           NS_LOG_INFO ("Beam: " << beamId << ", carrier ID: " << carrierId << ", AC: " << (uint32_t)allocationChannelId << " - Switching to HIGH LOAD back off parameterization");
 
           /// flag RA load as high load
-          m_isLowRandomAccessLoad.at (std::make_pair (beamId, allocationChannelId)) = false;
+          m_isLowRandomAccessLoad.at (std::make_tuple (satId, beamId, allocationChannelId)) = false;
         }
     }
   /// high RA load in effect
@@ -211,23 +220,23 @@ SatNcc::DoRandomAccessDynamicLoadControl (uint32_t beamId, uint32_t carrierId, u
           uint16_t time = it->second;
 
           /// use low load back off value
-          CreateRandomAccessLoadControlMessage (probability, time, beamId, allocationChannelId);
+          CreateRandomAccessLoadControlMessage (probability, time, satId, beamId, allocationChannelId);
 
           NS_LOG_INFO ("Beam: " << beamId << ", carrier ID: " << carrierId << ", AC: " << (uint32_t)allocationChannelId << " - Switching to LOW LOAD back off parameterization");
 
           /// flag RA load as low load
-          m_isLowRandomAccessLoad.at (std::make_pair (beamId, allocationChannelId)) = true;
+          m_isLowRandomAccessLoad.at (std::make_tuple (satId, beamId, allocationChannelId)) = true;
         }
     }
 }
 
 void
-SatNcc::CreateRandomAccessLoadControlMessage (uint16_t backoffProbability, uint16_t backoffTime, uint32_t beamId, uint8_t allocationChannelId)
+SatNcc::CreateRandomAccessLoadControlMessage (uint16_t backoffProbability, uint16_t backoffTime, uint32_t satId, uint32_t beamId, uint8_t allocationChannelId)
 {
   NS_LOG_FUNCTION (this);
 
   Ptr<SatRaMessage> raMsg = CreateObject<SatRaMessage> ();
-  std::map<uint32_t, Ptr<SatBeamScheduler> >::iterator iterator = m_beamSchedulers.find (beamId);
+  std::map<std::pair<uint32_t, uint32_t>, Ptr<SatBeamScheduler> >::iterator iterator = m_beamSchedulers.find (std::make_pair (satId, beamId));
 
   if (iterator == m_beamSchedulers.end ())
     {
@@ -249,20 +258,20 @@ SatNcc::CreateRandomAccessLoadControlMessage (uint16_t backoffProbability, uint1
 }
 
 void
-SatNcc::UtCrReceived (uint32_t beamId, Address utId, Ptr<SatCrMessage> crMsg)
+SatNcc::UtCrReceived (uint32_t satId, uint32_t beamId, Address utId, Ptr<SatCrMessage> crMsg)
 {
-  NS_LOG_FUNCTION (this << beamId << utId << crMsg);
+  NS_LOG_FUNCTION (this << satId << beamId << utId << crMsg);
 
-  m_beamSchedulers[beamId]->UtCrReceived (utId, crMsg);
+  m_beamSchedulers[std::make_pair (satId, beamId)]->UtCrReceived (utId, crMsg);
 }
 
 void
-SatNcc::AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq> seq, uint32_t maxFrameSize, Address gwAddress)
+SatNcc::AddBeam (uint32_t satId, uint32_t beamId, SatNcc::SendCallback cb, SatNcc::SendTbtpCallback tbtpCb, Ptr<SatSuperframeSeq> seq, uint32_t maxFrameSize, Address gwAddress)
 {
-  NS_LOG_FUNCTION (this << &cb);
+  NS_LOG_FUNCTION (this << satId << beamId << &cb);
 
   Ptr<SatBeamScheduler> scheduler;
-  std::map<uint32_t, Ptr<SatBeamScheduler> >::iterator iterator = m_beamSchedulers.find (beamId);
+  std::map<std::pair<uint32_t, uint32_t>, Ptr<SatBeamScheduler> >::iterator iterator = m_beamSchedulers.find (std::make_pair (satId, beamId));
 
   if ( iterator != m_beamSchedulers.end () )
     {
@@ -272,37 +281,37 @@ SatNcc::AddBeam (uint32_t beamId, SatNcc::SendCallback cb, Ptr<SatSuperframeSeq>
   scheduler = CreateObject<SatBeamScheduler> ();
   scheduler->Initialize (beamId, cb, seq, maxFrameSize, gwAddress);
 
-  scheduler->SetSendTbtpCallback (MakeCallback (&SatNcc::TbtpSent, this));
+  scheduler->SetSendTbtpCallback (tbtpCb);
 
-  m_beamSchedulers.insert (std::make_pair (beamId, scheduler));
+  m_beamSchedulers.insert (std::make_pair (std::make_pair (satId, beamId), scheduler));
 }
 
 void
-SatNcc::AddUt (Ptr<SatLowerLayerServiceConf> llsConf, Address utId, uint32_t beamId, Callback<void, uint32_t> setRaChannelCallback, bool verifyExisting)
+SatNcc::AddUt (Ptr<SatLowerLayerServiceConf> llsConf, Address utId, uint32_t satId, uint32_t beamId, Callback<void, uint32_t> setRaChannelCallback, bool verifyExisting)
 {
   NS_LOG_FUNCTION (this << utId << beamId);
 
-  std::map<uint32_t, Ptr<SatBeamScheduler> >::iterator iterator = m_beamSchedulers.find (beamId);
+  std::map<std::pair<uint32_t, uint32_t>, Ptr<SatBeamScheduler> >::iterator iterator = m_beamSchedulers.find (std::make_pair (satId, beamId));
 
   if ( iterator == m_beamSchedulers.end () )
     {
       NS_FATAL_ERROR ( "Beam where tried to add, not found." );
     }
 
-  if (!verifyExisting || !(m_beamSchedulers[beamId]->HasUt (utId)))
+  if (!verifyExisting || !(m_beamSchedulers[std::make_pair (satId, beamId)]->HasUt (utId)))
     {
-      setRaChannelCallback (m_beamSchedulers[beamId]->AddUt (utId, llsConf));
+      setRaChannelCallback (m_beamSchedulers[std::make_pair (satId, beamId)]->AddUt (utId, llsConf));
     }
 }
 
 void
-SatNcc::RemoveUt (Address utId, uint32_t beamId)
+SatNcc::RemoveUt (Address utId, uint32_t satId, uint32_t beamId)
 {
   NS_LOG_FUNCTION (this << utId << beamId);
 
-  if (m_beamSchedulers[beamId]->HasUt (utId))
+  if (m_beamSchedulers[std::make_pair (satId, beamId)]->HasUt (utId))
     {
-      m_beamSchedulers[beamId]->RemoveUt (utId);
+      m_beamSchedulers[std::make_pair (satId, beamId)]->RemoveUt (utId);
     }
 }
 
@@ -352,11 +361,11 @@ SatNcc::SetRandomAccessAverageNormalizedOfferedLoadThreshold (uint8_t allocation
 }
 
 Ptr<SatBeamScheduler>
-SatNcc::GetBeamScheduler (uint32_t beamId) const
+SatNcc::GetBeamScheduler (uint32_t satId, uint32_t beamId) const
 {
-  NS_LOG_FUNCTION (this << beamId);
+  NS_LOG_FUNCTION (this << satId << beamId);
 
-  std::map<uint32_t, Ptr<SatBeamScheduler> >::const_iterator it = m_beamSchedulers.find (beamId);
+  std::map<std::pair<uint32_t, uint32_t>, Ptr<SatBeamScheduler> >::const_iterator it = m_beamSchedulers.find (std::make_pair (satId, beamId));
 
   if (it == m_beamSchedulers.end ())
     {
@@ -369,12 +378,12 @@ SatNcc::GetBeamScheduler (uint32_t beamId) const
 }
 
 void
-SatNcc::DoMoveUtBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamId)
+SatNcc::DoMoveUtBetweenBeams (Address utId, uint32_t satId, uint32_t srcBeamId, uint32_t destBeamId)
 {
-  NS_LOG_FUNCTION (this << utId << srcBeamId << destBeamId);
+  NS_LOG_FUNCTION (this << utId << satId << srcBeamId << destBeamId);
 
-  Ptr<SatBeamScheduler> srcScheduler = GetBeamScheduler (srcBeamId);
-  Ptr<SatBeamScheduler> destScheduler = GetBeamScheduler (destBeamId);
+  Ptr<SatBeamScheduler> srcScheduler = GetBeamScheduler (satId, srcBeamId);
+  Ptr<SatBeamScheduler> destScheduler = GetBeamScheduler (satId, destBeamId);
 
   if (!srcScheduler || !destScheduler)
     {
@@ -386,12 +395,12 @@ SatNcc::DoMoveUtBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBea
 }
 
 void
-SatNcc::MoveUtBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamId)
+SatNcc::MoveUtBetweenBeams (Address utId, uint32_t satId, uint32_t srcBeamId, uint32_t destBeamId)
 {
-  NS_LOG_FUNCTION (this << utId << srcBeamId << destBeamId);
+  NS_LOG_FUNCTION (this << utId << satId << srcBeamId << destBeamId);
 
-  Ptr<SatBeamScheduler> scheduler = GetBeamScheduler (srcBeamId);
-  Ptr<SatBeamScheduler> destination = GetBeamScheduler (destBeamId);
+  Ptr<SatBeamScheduler> scheduler = GetBeamScheduler (satId, srcBeamId);
+  Ptr<SatBeamScheduler> destination = GetBeamScheduler (satId, destBeamId);
 
   if (!scheduler)
     {
@@ -412,7 +421,7 @@ SatNcc::MoveUtBetweenBeams (Address utId, uint32_t srcBeamId, uint32_t destBeamI
       Ptr<SatTimuMessage> timuMsg = destination->CreateTimu ();
       scheduler->SendTo (timuMsg, utId);
 
-      Simulator::Schedule (m_utHandoverDelay, &SatNcc::DoMoveUtBetweenBeams, this, utId, srcBeamId, destBeamId);
+      Simulator::Schedule (m_utHandoverDelay, &SatNcc::DoMoveUtBetweenBeams, this, utId, satId, srcBeamId, destBeamId);
     }
   else if (!scheduler->HasUt (utId) && destination->HasUt (utId))
     {
@@ -447,34 +456,15 @@ SatNcc::ReserveLogonChannel (uint32_t logonChannelId)
 }
 
 void
-SatNcc::SetSendTbtpCallback (SendTbtpCallback cb)
-{
-  NS_LOG_FUNCTION (this << &cb);
-
-  m_txTbtpCallback = cb;
-}
-
-void
-SatNcc::TbtpSent (Ptr<SatTbtpMessage> tbtp)
-{
-  NS_LOG_FUNCTION (this << tbtp);
-
-  if (!m_useLora)
-    {
-      m_txTbtpCallback (tbtp);
-    }
-}
-
-void
-SatNcc::ReceiveControlBurst (Address utId, uint32_t beamId)
+SatNcc::ReceiveControlBurst (Address utId, uint32_t satId, uint32_t beamId)
 {
   NS_LOG_FUNCTION (this << utId << beamId);
 
-  std::pair <Address, uint32_t> id = std::make_pair (utId, beamId);
+  std::tuple <Address, uint32_t, uint32_t> id = std::make_tuple (utId, satId, beamId);
 
   if ((m_lastControlBurstReception.find (id) == m_lastControlBurstReception.end ()) && m_useLogon)
     {
-      Simulator::Schedule (m_utTimeout, &SatNcc::CheckTimeout, this, utId, beamId);
+      Simulator::Schedule (m_utTimeout, &SatNcc::CheckTimeout, this, utId, satId, beamId);
     }
   m_lastControlBurstReception[id] = Simulator::Now ();
 }
@@ -496,22 +486,22 @@ SatNcc::SetUseLora (bool useLora)
 }
 
 void
-SatNcc::CheckTimeout (Address utId, uint32_t beamId)
+SatNcc::CheckTimeout (Address utId, uint32_t satId, uint32_t beamId)
 {
   NS_LOG_FUNCTION (this << utId);
 
-  std::pair <Address, uint32_t> id = std::make_pair (utId, beamId);
+  std::tuple <Address, uint32_t, uint32_t> id = std::make_tuple (utId, satId, beamId);
   NS_ASSERT_MSG (m_lastControlBurstReception.find (id) != m_lastControlBurstReception.end (), "UT address should be in map");
 
   Time lastReceptionDate = m_lastControlBurstReception[id];
   if (Simulator::Now () >= lastReceptionDate + m_utTimeout)
     {
       m_lastControlBurstReception.erase (id);
-      RemoveUt (utId, beamId);
+      RemoveUt (utId, satId, beamId);
     }
   else
     {
-      Simulator::Schedule (lastReceptionDate + m_utTimeout - Simulator::Now (), &SatNcc::CheckTimeout, this, utId, beamId);
+      Simulator::Schedule (lastReceptionDate + m_utTimeout - Simulator::Now (), &SatNcc::CheckTimeout, this, utId, satId, beamId);
     }
 }
 

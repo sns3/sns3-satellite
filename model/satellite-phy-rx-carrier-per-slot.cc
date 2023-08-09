@@ -20,16 +20,20 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
-#include <ns3/log.h>
-#include <ns3/simulator.h>
-#include <ns3/boolean.h>
-#include <ns3/address.h>
-#include "satellite-phy-rx-carrier-per-slot.h"
-
 #include <algorithm>
 #include <ostream>
 #include <limits>
 #include <utility>
+
+#include <ns3/log.h>
+#include <ns3/simulator.h>
+#include <ns3/boolean.h>
+#include <ns3/address.h>
+
+#include "satellite-uplink-info-tag.h"
+
+#include "satellite-phy-rx-carrier-per-slot.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatPhyRxCarrierPerSlot");
 
@@ -47,7 +51,8 @@ SatPhyRxCarrierPerSlot::SatPhyRxCarrierPerSlot (uint32_t carrierId,
   m_randomAccessCollisionModel (SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED),
   m_randomAccessConstantErrorRate (0.0),
   m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (0),
-  m_enableRandomAccessDynamicLoadControl (false)
+  m_enableRandomAccessDynamicLoadControl (false),
+  m_disableErrorHighTransmissionTime (false)
 {
   if (randomAccessEnabled)
     {
@@ -78,6 +83,11 @@ SatPhyRxCarrierPerSlot::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::SatPhyRxCarrierPerSlot")
     .SetParent<SatPhyRxCarrier> ()
+    .AddAttribute ( "DisableErrorHighTransmissionTime",
+                    "Disable fatal error when transmission time is higher than propagation time, but computations are less precise.",
+                    BooleanValue (false),
+                    MakeBooleanAccessor (&SatPhyRxCarrierPerSlot::m_disableErrorHighTransmissionTime),
+                    MakeBooleanChecker ())
     .AddTraceSource ("SlottedAlohaRxCollision",
                      "Received a packet burst through Random Access Slotted ALOHA",
                      MakeTraceSourceAccessor (&SatPhyRxCarrierPerSlot::m_slottedAlohaRxCollisionTrace),
@@ -104,6 +114,12 @@ SatPhyRxCarrierPerSlot::CreateInterference (Ptr<SatSignalParameters> rxParams, A
 {
   NS_LOG_FUNCTION (this << rxParams << senderAddress);
 
+  // Case satellite regenerative
+  if (GetLinkRegenerationMode () != SatEnums::TRANSPARENT)
+  {
+    return GetInterferenceModel ()->Add (rxParams->m_duration, rxParams->m_rxPower_W, GetOwnAddress ());
+  }
+
   SatEnums::ChannelType_t ct = GetChannelType ();
   if (ct == SatEnums::RETURN_FEEDER_CH)
     {
@@ -126,16 +142,24 @@ SatPhyRxCarrierPerSlot::CreateInterference (Ptr<SatSignalParameters> rxParams, A
         {
           if (!rxParams->HasSinrComputed ())
             {
-              NS_FATAL_ERROR ("SatPhyRx::StartRx - too long transmission time: packet started to be received in a ground entity while not being fully received on the satellite: interferences could not be properly computed.");
+              if (m_disableErrorHighTransmissionTime)
+                {
+                  NS_LOG_WARN ("SatPhyRx::StartRx - too long transmission time: packet started to be received in a ground entity while not being fully received on the satellite: interferences could not be properly computed.");
+                  rxPower = rxParams->m_rxPower_W;
+                }
+              else
+                {
+                  NS_FATAL_ERROR ("SatPhyRx::StartRx - too long transmission time: packet started to be received in a ground entity while not being fully received on the satellite: interferences could not be properly computed.");
+                }
             }
-
-          rxPower = rxParams->m_rxPower_W * (1 + 1 / rxParams->GetSinr ());
+          else
+            {
+              rxPower = rxParams->m_rxPower_W * (1 + 1 / rxParams->GetSinr ());
+            }
         }
 
       // Add the interference even regardless.
-      return GetInterferenceModel ()->Add (rxParams->m_duration,
-                                           rxPower,
-                                           GetOwnAddress ());
+      return GetInterferenceModel ()->Add (rxParams->m_duration, rxPower, GetOwnAddress ());
     }
   else if (ct == SatEnums::FORWARD_USER_CH)
     {
@@ -160,7 +184,11 @@ SatPhyRxCarrierPerSlot::EndRxData (uint32_t key)
 
   DecreaseNumOfRxState (packetRxParams.rxParams->m_txInfo.packetType);
 
-  NS_ASSERT (packetRxParams.rxParams->HasSinrComputed ());
+  // Test if when receiving a packet on ground from transparent satellite, uplink SINR has been correctly set
+  if (GetLinkRegenerationMode () == SatEnums::TRANSPARENT)
+    {
+      NS_ASSERT (packetRxParams.rxParams->HasSinrComputed ());
+    }
 
   packetRxParams.rxParams->SetInterferencePower (GetInterferenceModel ()->Calculate (packetRxParams.interferenceEvent));
 
@@ -223,17 +251,147 @@ SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams,
                                 m_rxNoisePowerW,
                                 m_rxAciIfPowerW,
                                 m_rxExtNoisePowerW,
-                                m_sinrCalculate);
+                                m_additionalInterferenceCallback ());
+
+  SatAddressE2ETag addressE2ETag;
+  packetRxParams.rxParams->m_packetsInBurst[0]->PeekPacketTag (addressE2ETag);
 
   // Update link specific SINR trace
-  m_linkSinrTrace (SatUtils::LinearToDb (sinr));
+  switch (GetChannelType ())
+    {
+      case SatEnums::RETURN_USER_CH:
+      case SatEnums::RETURN_FEEDER_CH:
+        m_linkSinrTrace (SatUtils::LinearToDb (sinr), addressE2ETag.GetE2ESourceAddress ());
+        break;
+      case SatEnums::FORWARD_USER_CH:
+      case SatEnums::FORWARD_FEEDER_CH:
+        m_linkSinrTrace (SatUtils::LinearToDb (sinr), addressE2ETag.GetE2EDestAddress ());
+        break;
+      default:
+        NS_FATAL_ERROR ("Incorrect channel for satPhyRxCarrierPerSlot: " << SatEnums::GetChannelTypeName (GetChannelType ()));
+    }
 
   /// PHY transmission decoded successfully. Note, that at transparent satellite,
   /// all the transmissions are not decoded.
   bool phyError (false);
 
-  /// calculate composite SINR
-  double cSinr = CalculateCompositeSinr (sinr, packetRxParams.rxParams->GetSinr ());
+  /// calculate composite SINR if transparent. Otherwise take only current sinr.
+  double cSinr;
+  switch (GetLinkRegenerationMode ())
+    {
+      case SatEnums::TRANSPARENT:
+        cSinr = CalculateCompositeSinr (sinr, packetRxParams.rxParams->GetSinr ());
+        break;
+      case SatEnums::REGENERATION_PHY:
+      case SatEnums::REGENERATION_LINK:
+      case SatEnums::REGENERATION_NETWORK:
+        cSinr = sinr;
+        break;
+      default:
+        NS_FATAL_ERROR ("Incorrect regeneration mode for satPhyRxCarrierPerSlot");
+    }
+
+  if (!m_cnoCallback.IsNull ())
+    {
+      switch (GetLinkRegenerationMode ())
+        {
+          case SatEnums::TRANSPARENT:
+          case SatEnums::REGENERATION_PHY:
+            {
+              double worstSinr = GetWorstSinr (sinr, packetRxParams.rxParams->GetSinr ());
+
+              /**
+               * Channel estimation error is added to the cno measurement,
+               * which is utilized e.g. for ACM.
+               */
+              double cno = (GetLinkRegenerationMode () == SatEnums::TRANSPARENT) ? cSinr : worstSinr;
+
+              // Forward link
+              switch (GetNodeInfo ()->GetNodeType ())
+                {
+                  case SatEnums::NT_UT:
+                    cno = SatUtils::DbToLinear (GetChannelEstimationErrorContainer ()->AddError (SatUtils::LinearToDb (cno)));
+                    break;
+                  case SatEnums::NT_GW:
+                    cno = SatUtils::DbToLinear (GetChannelEstimationErrorContainer ()->AddError (
+                                              SatUtils::LinearToDb (cno), packetRxParams.rxParams->m_txInfo.waveformId));
+                    break;
+                  default:
+                    NS_FATAL_ERROR ("Unsupported node type for a NORMAL Rx model!");
+                }
+
+              cno *= m_rxBandwidthHz;
+
+              packetRxParams.rxParams->m_packetsInBurst[0]->PeekPacketTag (addressE2ETag);
+
+              m_cnoCallback (packetRxParams.rxParams->m_satId,
+                             packetRxParams.rxParams->m_beamId,
+                             addressE2ETag.GetE2ESourceAddress (),
+                             GetOwnAddress (),
+                             cno,
+                             false);
+              break;
+            }
+          case SatEnums::REGENERATION_LINK:
+          case SatEnums::REGENERATION_NETWORK:
+            {
+              SatSignalParameters::PacketsInBurst_t packets = packetRxParams.rxParams->m_packetsInBurst;
+              SatSignalParameters::PacketsInBurst_t::const_iterator i;
+              for (i = packets.begin (); i != packets.end (); i++)
+                {
+                  SatUplinkInfoTag satUplinkInfoTag;
+                  if (!(*i)->PeekPacketTag (satUplinkInfoTag))
+                    {
+                      NS_FATAL_ERROR ("SatUplinkInfoTag not found !");
+                    }
+
+                  /**
+                   * Channel estimation error is added to the cno measurement,
+                   * which is utilized e.g. for ACM.
+                   */
+                  double worstCno = GetWorstSinr (sinr, satUplinkInfoTag.GetSinr ());
+                  double downlinkCno = sinr;
+
+                  // Forward link and return link use same algorithms (because of SCPC)
+                  switch (GetNodeInfo ()->GetNodeType ())
+                    {
+                      case SatEnums::NT_UT:
+                      case SatEnums::NT_GW:
+                        worstCno = SatUtils::DbToLinear (GetChannelEstimationErrorContainer ()->AddError (SatUtils::LinearToDb (worstCno)));
+                        downlinkCno = SatUtils::DbToLinear (GetChannelEstimationErrorContainer ()->AddError (SatUtils::LinearToDb (downlinkCno)));
+                        break;
+                      default:
+                        NS_FATAL_ERROR ("Unsupported node type for a NORMAL Rx model!");
+                    }
+
+                  worstCno *= m_rxBandwidthHz;
+                  downlinkCno *= m_rxBandwidthHz;
+
+                  (*i)->PeekPacketTag (addressE2ETag);
+
+                  SatMacTag satMacTag;
+                  (*i)->PeekPacketTag (satMacTag);
+
+                  m_cnoCallback (satUplinkInfoTag.GetSatId (),
+                                 satUplinkInfoTag.GetBeamId (),
+                                 addressE2ETag.GetE2ESourceAddress (),
+                                 GetOwnAddress (),
+                                 worstCno,
+                                 false);
+
+                  m_cnoCallback (GetSatId (),
+                                 GetBeamId (),
+                                 satMacTag.GetSourceAddress (),
+                                 GetOwnAddress (),
+                                 downlinkCno,
+                                 true);
+                }
+              break;
+            }
+          default:
+            NS_FATAL_ERROR ("Incorrect regeneration mode for SatPhyRxCarrierPerSlot");
+        }
+    }
 
   // Update composite SINR trace for DAMA and Slotted ALOHA packets
   m_sinrTrace (SatUtils::LinearToDb (cSinr), packetRxParams.sourceAddress);
@@ -274,18 +432,54 @@ SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams,
 
       if (nPackets > 0)
         {
-          m_daRxTrace (nPackets,                      // number of packets
-                       packetRxParams.sourceAddress,  // sender address
-                       phyError                       // error flag
-                       );
+          switch (GetChannelType ())
+            {
+              case SatEnums::FORWARD_FEEDER_CH:
+              case SatEnums::FORWARD_USER_CH:
+                m_daRxTrace (nPackets,                      // number of packets
+                             packetRxParams.destAddress,    // destination address
+                             phyError                       // error flag
+                             );
+                break;
+              case SatEnums::RETURN_FEEDER_CH:
+              case SatEnums::RETURN_USER_CH:
+                m_daRxTrace (nPackets,                      // number of packets
+                             packetRxParams.sourceAddress,  // destination address
+                             phyError                       // error flag
+                             );
+                break;
+              default:
+                NS_FATAL_ERROR ("Channel unknown !");
+            }
         }
 
       m_daRxCarrierIdTrace (GetCarrierId (),
                             packetRxParams.sourceAddress);
     }
 
-  /// save 2nd link sinr value
-  packetRxParams.rxParams->SetSinr (sinr, packetRxParams.rxParams->GetSinrCalculator ());
+  switch (GetLinkRegenerationMode ())
+  {
+    case SatEnums::TRANSPARENT:
+    case SatEnums::REGENERATION_PHY:
+      packetRxParams.rxParams->SetSinr (sinr, m_additionalInterferenceCallback ());
+      break;
+    case SatEnums::REGENERATION_LINK:
+    case SatEnums::REGENERATION_NETWORK:
+      {
+        SatSignalParameters::PacketsInBurst_t packets = packetRxParams.rxParams->m_packetsInBurst;
+        SatSignalParameters::PacketsInBurst_t::const_iterator i;
+        for (i = packets.begin (); i != packets.end (); i++)
+          {
+            SatUplinkInfoTag satUplinkInfoTag;
+            (*i)->RemovePacketTag (satUplinkInfoTag);
+            satUplinkInfoTag.SetSinr (sinr, m_additionalInterferenceCallback ());
+            (*i)->AddPacketTag (satUplinkInfoTag);
+          }
+        break;
+      }
+    default:
+      NS_FATAL_ERROR ("Incorrect regeneration mode for SatPhyRxCarrierPerSlot");
+  }
 
   /// uses composite sinr
   m_linkBudgetTrace (packetRxParams.rxParams, GetOwnAddress (),
@@ -294,39 +488,6 @@ SatPhyRxCarrierPerSlot::ReceiveSlot (SatPhyRxCarrier::rxParams_s packetRxParams,
 
   /// send packet upwards
   m_rxCallback (packetRxParams.rxParams, phyError);
-
-  /// uses composite sinr
-  if (!m_cnoCallback.IsNull ())
-    {
-      /**
-       * Channel estimation error is added to the cno measurement,
-       * which is utilized e.g. for ACM.
-       */
-      double cno = cSinr;
-
-      // Forward link
-      if (GetNodeInfo ()->GetNodeType () == SatEnums::NT_UT)
-        {
-          cno = SatUtils::DbToLinear (GetChannelEstimationErrorContainer ()->AddError (SatUtils::LinearToDb (cno)));
-        }
-      // Return link
-      else if (GetNodeInfo ()->GetNodeType () == SatEnums::NT_GW)
-        {
-          cno = SatUtils::DbToLinear (GetChannelEstimationErrorContainer ()->AddError (
-                                        SatUtils::LinearToDb (cno), packetRxParams.rxParams->m_txInfo.waveformId));
-        }
-      else
-        {
-          NS_FATAL_ERROR ("Unsupported node type for a NORMAL Rx model!");
-        }
-
-      cno *= m_rxBandwidthHz;
-
-      m_cnoCallback (packetRxParams.rxParams->m_beamId,
-                     packetRxParams.sourceAddress,
-                     GetOwnAddress (),
-                     cno);
-    }
 
   packetRxParams.rxParams = NULL;
 }

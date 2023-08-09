@@ -18,6 +18,12 @@
  * Author: Joaquin Muguerza <jmuguerza@toulouse.viveris.fr>
  */
 
+#include <algorithm>
+#include <ostream>
+#include <limits>
+#include <utility>
+#include <iomanip>
+
 #include <ns3/log.h>
 #include <ns3/simulator.h>
 #include <ns3/double.h>
@@ -27,13 +33,10 @@
 #include "satellite-wave-form-conf.h"
 #include "satellite-link-results.h"
 #include "satellite-mutual-information-table.h"
+#include "satellite-uplink-info-tag.h"
+
 #include "satellite-phy-rx-carrier-per-window.h"
 
-#include <algorithm>
-#include <ostream>
-#include <limits>
-#include <utility>
-#include <iomanip>
 
 NS_LOG_COMPONENT_DEFINE ("SatPhyRxCarrierPerWindow");
 
@@ -240,7 +243,12 @@ SatPhyRxCarrierPerWindow::EliminatePreviousInterferences (SatPhyRxCarrierPerWind
 
       NS_LOG_INFO ("SatPhyRxCarrierPerWindow::EliminatePreviousInterferences - eliminate interference with packet " << packet_it->rxParams->m_txInfo.crdsaUniquePacketId << " from " << packet_it->sourceAddress);
       /// Eliminate the interferences
-      GetInterferenceEliminationModel ()->EliminateInterferences (packet.rxParams, packet_it->rxParams, packet_it->meanSinr * m_spreadingFactor, normalizedTimes.first, normalizedTimes.second);
+      GetInterferenceEliminationModel ()->EliminateInterferences (packet.rxParams,
+                                                                  packet_it->rxParams,
+                                                                  packet_it->meanSinr * m_spreadingFactor,
+                                                                  m_linkRegenerationMode != SatEnums::TRANSPARENT,
+                                                                  normalizedTimes.first,
+                                                                  normalizedTimes.second);
     }
 }
 
@@ -253,28 +261,46 @@ SatPhyRxCarrierPerWindow::CalculatePacketInterferenceVectors (SatPhyRxCarrierPer
   // TODO: should we check the interference model used ?
   // TODO: should we check the collision model used (check against sinr, collision always drops, etc) ?
 
-  /// Calculate the SNR
-  double snrSatellite = CalculateSinr ( packet.rxParams->GetRxPowerInSatellite (),
-                                        0.0,
-                                        packet.rxParams->GetRxNoisePowerInSatellite (),
-                                        packet.rxParams->GetRxAciIfPowerInSatellite (),
-                                        packet.rxParams->GetRxExtNoisePowerInSatellite (),
-                                        packet.rxParams->GetSinrCalculator ());
-
   double snr = CalculateSinr ( packet.rxParams->m_rxPower_W,
                                0.0,
                                m_rxNoisePowerW,
                                m_rxAciIfPowerW,
                                m_rxExtNoisePowerW,
-                               m_sinrCalculate);
+                               m_additionalInterferenceCallback ());
 
-  double cSnr = CalculateCompositeSinr (snr, snrSatellite);
+  double cSnr;
+  if (GetLinkRegenerationMode () == SatEnums::TRANSPARENT)
+    {
+      /// Calculate the SNR
+      double snrSatellite = CalculateSinr ( packet.rxParams->GetRxPowerInSatellite (),
+                                            0.0,
+                                            packet.rxParams->GetRxNoisePowerInSatellite (),
+                                            packet.rxParams->GetRxAciIfPowerInSatellite (),
+                                            packet.rxParams->GetRxExtNoisePowerInSatellite (),
+                                            packet.rxParams->GetAdditionalInterference ());
+
+      cSnr = CalculateCompositeSinr (snr, snrSatellite);
+    }
+  else
+    {
+      cSnr = snr;
+    }
 
   /// Update probes (only the first time we access this method for this packet)
   if (packet.meanSinr < 0.0)
     {
+      SatSignalParameters::PacketsInBurst_t packets = packet.rxParams->m_packetsInBurst;
+      SatSignalParameters::PacketsInBurst_t::const_iterator i;
+      for (i = packets.begin (); i != packets.end (); i++)
+        {
+          SatUplinkInfoTag satUplinkInfoTag;
+          (*i)->RemovePacketTag (satUplinkInfoTag);
+          satUplinkInfoTag.SetSinr (snr, m_additionalInterferenceCallback ());
+          (*i)->AddPacketTag (satUplinkInfoTag);
+        }
+
       // Update link specific SINR trace
-      m_linkSinrTrace (SatUtils::LinearToDb (snr));
+      m_linkSinrTrace (SatUtils::LinearToDb (snr), packet.sourceAddress);
 
       // Update composite SNR trace for DAMA and Slotted ALOHA packets
       // m_sinrTrace (SatUtils::LinearToDb (cSnr), packet.sourceAddress); // Done with effective SINR
@@ -294,36 +320,51 @@ SatPhyRxCarrierPerWindow::CalculatePacketInterferenceVectors (SatPhyRxCarrierPer
 
   /// Calculate the gamma vector
   packet.gamma.clear ();
+
+  std::vector< std::pair<double, double> > interferencePowerPerFragment = packet.rxParams->GetInterferencePowerPerFragment ();
+  std::vector< std::pair<double, double> >::iterator interferencePower = interferencePowerPerFragment.begin ();
+  double normalizedTime = interferencePower->first, normalizedTimeInSatellite = 0.0;
   /// Consider both the interference per fragment in the satellite, and the
   /// interference per fragment in the feeder. Since interference at the
   /// feeder does not consider intrabeam interference, the fragments
   /// will always be a subset of fragments in satellite (TODO: CHECK THIS).
   /// TODO: optimize. Find a way to do this without creating copy.
-  std::vector< std::pair<double, double> > interferencePowerPerFragment = packet.rxParams->GetInterferencePowerPerFragment ();
-  std::vector< std::pair<double, double> > interferencePowerPerFragmentInSatellite = packet.rxParams->GetInterferencePowerInSatellitePerFragment ();
-  std::vector< std::pair<double, double> >::iterator interferencePower = interferencePowerPerFragment.begin ();
-  double normalizedTime = interferencePower->first, normalizedTimeInSatellite = 0.0;
-  for (std::vector< std::pair<double, double> >::iterator interferencePowerInSatellite = interferencePowerPerFragmentInSatellite.begin (); interferencePowerInSatellite != interferencePowerPerFragmentInSatellite.end (); interferencePowerInSatellite++)
+  if (GetLinkRegenerationMode () == SatEnums::TRANSPARENT)
     {
-      normalizedTimeInSatellite += interferencePowerInSatellite->first;
-      /// TODO: verify. Since Interference in feeder is a subset,
-      /// fragments will never be smaller than those in satellite.
-      if (normalizedTimeInSatellite > normalizedTime)
+      std::vector< std::pair<double, double> > interferencePowerPerFragmentInSatellite = packet.rxParams->GetInterferencePowerInSatellitePerFragment ();
+      for (std::vector< std::pair<double, double> >::iterator interferencePowerInSatellite = interferencePowerPerFragmentInSatellite.begin (); interferencePowerInSatellite != interferencePowerPerFragmentInSatellite.end (); interferencePowerInSatellite++)
         {
-          interferencePower++;
-          normalizedTime += interferencePower->first;
-        }
+          normalizedTimeInSatellite += interferencePowerInSatellite->first;
+          /// TODO: verify. Since Interference in feeder is a subset,
+          /// fragments will never be smaller than those in satellite.
+          if (normalizedTimeInSatellite > normalizedTime)
+            {
+              interferencePower++;
+              normalizedTime += interferencePower->first;
+            }
 
+          /// For each iteration:
+          /// gamma[k] = ( SNR^-1 + (C/Interference[k])^-1 )^-1
+
+          /// Calculate composite C/I = (C_u/I_u^-1 + C_d/I_d^-1)^-1
+          double cI = (packet.rxParams->GetRxPowerInSatellite () * packet.rxParams->m_rxPower_W) / (interferencePowerInSatellite->second * packet.rxParams->m_rxPower_W + interferencePower->second * packet.rxParams->GetRxPowerInSatellite ());
+
+          /// Calculate gamma[k]
+          double gamma = 1 / (1 / cI + 1 / cSnr);
+          packet.gamma.emplace_back (interferencePowerInSatellite->first, gamma);
+        }
+    }
+  else
+    {
       /// For each iteration:
       /// gamma[k] = ( SNR^-1 + (C/Interference[k])^-1 )^-1
 
       /// Calculate composite C/I = (C_u/I_u^-1 + C_d/I_d^-1)^-1
-      double cI = (packet.rxParams->GetRxPowerInSatellite () * packet.rxParams->m_rxPower_W) / (interferencePowerInSatellite->second * packet.rxParams->m_rxPower_W + interferencePower->second * packet.rxParams->GetRxPowerInSatellite ());
+      double cI = (packet.rxParams->m_rxPower_W) / (packet.rxParams->m_rxPower_W + interferencePower->second);
 
       /// Calculate gamma[k]
       double gamma = 1 / (1 / cI + 1 / cSnr);
-      packet.gamma.emplace_back (interferencePowerInSatellite->first, gamma);
-
+      packet.gamma.emplace_back (1, gamma);
     }
 
   /// Calculate the gamma vector for the preamble
@@ -472,7 +513,12 @@ SatPhyRxCarrierPerWindow::DoSic (packetList_t::iterator processedPacket, std::pa
       /// Get normalized start and end time
       std::pair<double, double> normalizedTimes = GetNormalizedPacketInterferenceTime (*packet_it, *processedPacket);
       /// Eliminate residual interference and recalculate the packets vectors
-      GetInterferenceEliminationModel ()->EliminateInterferences (packet_it->rxParams, processedPacket->rxParams, processedPacket->meanSinr * m_spreadingFactor, normalizedTimes.first, normalizedTimes.second);
+      GetInterferenceEliminationModel ()->EliminateInterferences (packet_it->rxParams,
+                                                                  processedPacket->rxParams,
+                                                                  processedPacket->meanSinr * m_spreadingFactor,
+                                                                  m_linkRegenerationMode != SatEnums::TRANSPARENT,
+                                                                  normalizedTimes.first,
+                                                                  normalizedTimes.second);
 
       CalculatePacketInterferenceVectors (*packet_it);
     }
@@ -692,7 +738,10 @@ SatPhyRxCarrierPerWindow::MeasureRandomAccessLoad ()
   /// upload trace with normalized offered load
   m_windowLoadTrace (normalizedOfferedLoad);
 
-  m_avgNormalizedOfferedLoadCallback (GetBeamId (), GetCarrierId (), GetRandomAccessAllocationChannelId (), averageNormalizedOfferedLoad);
+  if (GetChannelType () == SatEnums::RETURN_FEEDER_CH)
+    {
+      m_avgNormalizedOfferedLoadCallback (GetSatId (), GetBeamId (), GetCarrierId (), GetRandomAccessAllocationChannelId (), averageNormalizedOfferedLoad);
+    }
 }
 
 double

@@ -19,21 +19,23 @@
  */
 
 #include <algorithm>
-#include "ns3/object.h"
-#include "ns3/simulator.h"
-#include "ns3/log.h"
-#include "ns3/packet.h"
-#include "ns3/net-device.h"
-#include "ns3/node.h"
-#include "ns3/propagation-delay-model.h"
-#include "ns3/mobility-model.h"
-#include "ns3/enum.h"
+
+#include <ns3/object.h>
+#include <ns3/simulator.h>
+#include <ns3/log.h>
+#include <ns3/packet.h>
+#include <ns3/net-device.h>
+#include <ns3/node.h>
+#include <ns3/propagation-delay-model.h>
+#include <ns3/mobility-model.h>
+#include <ns3/enum.h>
+#include <ns3/boolean.h>
+#include <ns3/singleton.h>
+
 #include "satellite-phy-rx.h"
 #include "satellite-phy-tx.h"
 #include "satellite-channel.h"
 #include "satellite-mac-tag.h"
-#include "ns3/singleton.h"
-#include "ns3/boolean.h"
 #include "satellite-rx-power-output-trace-container.h"
 #include "satellite-rx-power-input-trace-container.h"
 #include "satellite-rx-cno-input-trace-container.h"
@@ -42,6 +44,7 @@
 #include "satellite-id-mapper.h"
 #include "satellite-utils.h"
 
+
 NS_LOG_COMPONENT_DEFINE ("SatChannel");
 
 namespace ns3 {
@@ -49,7 +52,7 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatChannel);
 
 SatChannel::SatChannel ()
-  : m_fwdMode (SatChannel::ALL_BEAMS),
+  : m_fwdMode (SatChannel::ONLY_DEST_BEAM),
   m_phyRxContainer (),
   m_channelType (SatEnums::UNKNOWN_CH),
   m_carrierFreqConverter (),
@@ -454,11 +457,11 @@ SatChannel::DoRxCnoInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> 
         if (cno == 0)
           {
             DoRxPowerCalculation (rxParams, phyRx);
-            // std::cout << "Use calculation downlink \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxParams->m_rxPower_W << std::endl;
+            NS_LOG_INFO ("Use calculation downlink \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxParams->m_rxPower_W);
             return;
           }
         rxParams->m_rxPower_W = rxNoisePowerW*cno/carrierBandwidthHz;
-        // std::cout << "Channel downlink \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxNoisePowerW*cno/carrierBandwidthHz << std::endl;
+        NS_LOG_INFO ("Channel downlink \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxNoisePowerW*cno/carrierBandwidthHz);
         break;
       }
     case SatEnums::FORWARD_FEEDER_CH:
@@ -469,11 +472,11 @@ SatChannel::DoRxCnoInputTrace (Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> 
         if (cno == 0)
           {
             DoRxPowerCalculation (rxParams, phyRx);
-            // std::cout << "Use calculation uplink   \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxParams->m_rxPower_W << std::endl;
+            NS_LOG_INFO ("Use calculation uplink   \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxParams->m_rxPower_W);
             return;
           }
         rxParams->m_rxPower_W = rxNoisePowerW*cno/carrierBandwidthHz;
-        // std::cout << "Channel uplink   \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxNoisePowerW*cno/carrierBandwidthHz << std::endl;
+        NS_LOG_INFO ("Channel uplink   \t" << cno << " " << carrierBandwidthHz << " " << rxNoisePowerW << " " << rxNoisePowerW*cno/carrierBandwidthHz);
         break;
       }
     default:
@@ -707,7 +710,7 @@ void
 SatChannel::SetPropagationDelayModel (Ptr<PropagationDelayModel> delay)
 {
   NS_LOG_FUNCTION (this << delay);
-  NS_ASSERT (m_propagationDelay == 0);
+  NS_ASSERT (m_propagationDelay == nullptr);
   m_propagationDelay = delay;
 }
 
@@ -715,7 +718,7 @@ Ptr<PropagationDelayModel>
 SatChannel::GetPropagationDelayModel ()
 {
   NS_LOG_FUNCTION (this);
-  NS_ASSERT (m_propagationDelay != 0);
+  NS_ASSERT (m_propagationDelay != nullptr);
 
   return m_propagationDelay;
 }
@@ -724,7 +727,7 @@ void
 SatChannel::SetFreeSpaceLoss (Ptr<SatFreeSpaceLoss> loss)
 {
   NS_LOG_FUNCTION (this << loss);
-  NS_ASSERT (m_freeSpaceLoss == 0);
+  NS_ASSERT (m_freeSpaceLoss == nullptr);
   m_freeSpaceLoss = loss;
 }
 
@@ -732,7 +735,7 @@ Ptr<SatFreeSpaceLoss>
 SatChannel::GetFreeSpaceLoss () const
 {
   NS_LOG_FUNCTION (this);
-  NS_ASSERT (m_freeSpaceLoss != 0);
+  NS_ASSERT (m_freeSpaceLoss != nullptr);
   return m_freeSpaceLoss;
 }
 

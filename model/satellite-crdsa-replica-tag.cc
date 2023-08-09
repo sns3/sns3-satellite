@@ -18,8 +18,10 @@
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
 
-#include "ns3/log.h"
+#include <ns3/log.h>
+
 #include "satellite-crdsa-replica-tag.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatCrdsaReplicaTag");
 

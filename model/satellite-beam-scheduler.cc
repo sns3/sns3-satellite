@@ -23,25 +23,27 @@
 #include <algorithm>
 #include <utility>
 #include <sstream>
+
 #include <ns3/log.h>
 #include <ns3/double.h>
 #include <ns3/boolean.h>
 #include <ns3/enum.h>
 #include <ns3/singleton.h>
-#include <ns3/satellite-id-mapper.h>
-#include <ns3/satellite-rtn-link-time.h>
-#include <ns3/satellite-const-variables.h>
-#include <ns3/satellite-frame-symbol-load-probe.h>
-#include <ns3/satellite-frame-user-load-probe.h>
 #include <ns3/address.h>
 #include <ns3/mac48-address.h>
 #include <ns3/ipv4-address.h>
-#include <ns3/satellite-superframe-sequence.h>
-#include <ns3/satellite-default-superframe-allocator.h>
-#include <ns3/satellite-superframe-allocator.h>
-#include <ns3/satellite-dama-entry.h>
-#include <ns3/satellite-control-message.h>
-#include <ns3/satellite-lower-layer-service.h>
+
+#include "satellite-id-mapper.h"
+#include "satellite-rtn-link-time.h"
+#include "satellite-const-variables.h"
+#include "../stats/satellite-frame-symbol-load-probe.h"
+#include "../stats/satellite-frame-user-load-probe.h"
+#include "satellite-superframe-sequence.h"
+#include "satellite-default-superframe-allocator.h"
+#include "satellite-superframe-allocator.h"
+#include "satellite-dama-entry.h"
+#include "satellite-control-message.h"
+#include "satellite-lower-layer-service.h"
 #include "satellite-beam-scheduler.h"
 
 
@@ -266,12 +268,13 @@ SatBeamScheduler::SatBeamScheduler ()
   : m_beamId (0),
   m_superframeSeq (0),
   m_superFrameCounter (0),
-  m_txCallback (0),
+  m_txCallback (),
   m_logonChannelIndex (1),
   m_cnoEstimatorMode (SatCnoEstimator::LAST),
   m_maxBbFrameSize (0),
   m_controlSlotsEnabled (false),
-  m_superframeAllocatorType (SatEnums::DEFAULT_SUPERFRAME_ALLOCATOR)
+  m_superframeAllocatorType (SatEnums::DEFAULT_SUPERFRAME_ALLOCATOR),
+  m_receivedSatelliteCnoSample (false)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -312,6 +315,15 @@ SatBeamScheduler::SendTo (Ptr<SatControlMessage> msg, Address utId)
   return true;
 }
 
+bool
+SatBeamScheduler::SendToSatellite (Ptr<SatControlMessage> msg, Address satelliteMac)
+{
+  NS_LOG_FUNCTION (this << msg << satelliteMac);
+
+  m_txCallback (msg, satelliteMac);
+  return true;
+}
+
 void
 SatBeamScheduler::SetSendTbtpCallback (SendTbtpCallback cb)
 {
@@ -322,6 +334,8 @@ void
 SatBeamScheduler::Initialize (uint32_t beamId, SatBeamScheduler::SendCtrlMsgCallback cb, Ptr<SatSuperframeSeq> seq, uint32_t maxFrameSizeInBytes, Address gwAddress)
 {
   NS_LOG_FUNCTION (this << beamId << &cb);
+
+  m_satelliteCnoEstimator = CreateCnoEstimator ();
 
   m_beamId = beamId;
   m_txCallback = cb;
@@ -497,6 +511,17 @@ SatBeamScheduler::UpdateUtCno (Address utId, double cno)
 }
 
 void
+SatBeamScheduler::UpdateSatelliteCno (Address satelliteMac, double cno)
+{
+  NS_LOG_FUNCTION (this << satelliteMac << cno);
+
+  m_satelliteCnoEstimator->AddSample (cno);
+
+  m_satelliteMac = satelliteMac;
+  m_receivedSatelliteCnoSample = true;
+}
+
+void
 SatBeamScheduler::UtCrReceived (Address utId, Ptr<SatCrMessage> crMsg)
 {
   NS_LOG_FUNCTION (this << utId << crMsg);
@@ -529,6 +554,22 @@ SatBeamScheduler::CreateCnoEstimator ()
     }
 
   return estimator;
+}
+
+void
+SatBeamScheduler::SendCnoToSatellite ()
+{
+  if (m_receivedSatelliteCnoSample)
+    {
+      double cno = m_satelliteCnoEstimator->GetCnoEstimation ();
+
+      Ptr<SatCnoReportMessage> cnoReportMessage = CreateObject<SatCnoReportMessage> ();
+      cnoReportMessage->SetCnoEstimate (cno);
+
+      SendToSatellite (cnoReportMessage, m_satelliteMac);
+    }
+
+  m_receivedSatelliteCnoSample = false;
 }
 
 void
@@ -574,7 +615,10 @@ SatBeamScheduler::Schedule ()
             }
           else
             {
-              m_txTbtpCallback (*it);
+              if (!m_txTbtpCallback.IsNull ())
+                {
+                  m_txTbtpCallback (*it);
+                }
               Send (*it);
             }
         }
@@ -591,6 +635,8 @@ SatBeamScheduler::Schedule ()
   m_unmetCapacityTrace (unmetCapacity);
   m_exceedingCapacityTrace (exceedingCapacity);
   ++m_superFrameCounter;
+
+  SendCnoToSatellite ();
 
   // re-schedule next TBTP sending (call of this function)
   Simulator::Schedule ( m_superframeSeq->GetDuration (SatConstVariables::SUPERFRAME_SEQUENCE), &SatBeamScheduler::Schedule, this);

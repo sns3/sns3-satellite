@@ -24,10 +24,12 @@
 #define SATELLITE_PHY_RX_CARRIER_PER_FRAME_H
 
 #include <ns3/singleton.h>
-#include <ns3/satellite-rtn-link-time.h>
-#include <ns3/satellite-crdsa-replica-tag.h>
-#include <ns3/satellite-phy-rx-carrier.h>
-#include <ns3/satellite-phy-rx-carrier-per-slot.h>
+
+#include "satellite-rtn-link-time.h"
+#include "satellite-crdsa-replica-tag.h"
+#include "satellite-phy-rx-carrier.h"
+#include "satellite-phy-rx-carrier-per-slot.h"
+
 
 namespace ns3 {
 

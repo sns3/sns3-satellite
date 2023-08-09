@@ -18,7 +18,9 @@
  * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "ns3/lora-beam-tag.h"
+#include <ns3/log.h>
+
+#include "lora-beam-tag.h"
 
 NS_LOG_COMPONENT_DEFINE ("LoraBeamTag");
 

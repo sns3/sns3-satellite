@@ -16,19 +16,25 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ *         Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
 #ifndef SATELLITE_GEO_USER_PHY_H
 #define SATELLITE_GEO_USER_PHY_H
 
-#include "ns3/ptr.h"
-#include "ns3/nstime.h"
-#include "ns3/object.h"
-#include "ns3/packet.h"
-#include "ns3/address.h"
+#include <queue>
+#include <tuple>
+
+#include <ns3/ptr.h>
+#include <ns3/nstime.h>
+#include <ns3/object.h>
+#include <ns3/packet.h>
+#include <ns3/address.h>
+
 #include "satellite-phy.h"
 #include "satellite-signal-parameters.h"
-#include "ns3/satellite-frame-conf.h"
+#include "satellite-frame-conf.h"
+
 
 namespace ns3 {
 
@@ -53,8 +59,11 @@ public:
   SatGeoUserPhy (void);
 
   SatGeoUserPhy (SatPhy::CreateParam_t& params,
+                 Ptr<SatLinkResults> linkResults,
                  SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
-                 Ptr<SatSuperframeConf> superFrameConf);
+                 Ptr<SatSuperframeConf> superFrameConf,
+                 SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                 SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   /**
    * Destructor for SatGeoUserPhy
@@ -92,14 +101,82 @@ public:
   virtual void Receive (Ptr<SatSignalParameters> rxParams, bool phyError);
 
   /**
-   * Geo User specific SINR calculator.
-   * Calculate SINR with Geo User PHY specific parameters and given SINR.
+   * \brief Get additional interference, used to compute final SINR at RX
    *
-   * \param sinr Calculated (C/NI)
+   * \return Additional interference
    */
-  virtual double CalculateSinr (double sinr);
+  virtual double GetAdditionalInterference ();
+
+  /**
+   * \brief Callback signature for `QueueSizeBytes` and `QueueSizePackets` trace source.
+   * \param size number of bytes or number of packets of queue
+   * \param from The MAC source address of packets
+   */
+  typedef void (*QueueSizeCallback)(uint32_t size, const Address &from);
+
+  /**
+   *
+   */
+  typedef Callback<bool, Ptr<SatControlMessage>, const Address&, Ptr<SatSignalParameters> > SendControlMsgToFeederCallback;
+
+  /**
+   * Callback to send ctrl packet on geo feeder
+   */
+  SatGeoUserPhy::SendControlMsgToFeederCallback m_txCtrlFeederCallback;
+
+  /**
+   * Set SendControlMsgToFeederCallback
+   */
+  void SetSendControlMsgToFeederCallback (SendControlMsgToFeederCallback cb);
+
+protected:
+  /**
+   * \brief Invoke the `Rx` trace source for each received packet.
+   * \param packets Container of the pointers to the packets received.
+   */
+  virtual void RxTraces (SatPhy::PacketContainer_t packets);
+
+  /**
+   * \brief Get the link TX direction. Must be implemented by child clases.
+   * \return The link TX direction
+   */
+  virtual SatEnums::SatLinkDir_t GetSatLinkTxDir ();
+
+  /**
+   * \brief Get the link RX direction. Must be implemented by child clases.
+   * \return The link RX direction
+   */
+  virtual SatEnums::SatLinkDir_t GetSatLinkRxDir ();
+
+  /**
+   * Traced callback to monitor RTN feeder queue size in bytes.
+   */
+  TracedCallback<uint32_t, const Address &> m_queueSizeBytesTrace;
+
+  /**
+   * Traced callback to monitor RTN feeder queue size in packets.
+   */
+  TracedCallback<uint32_t, const Address &> m_queueSizePacketsTrace;
 
 private:
+  /**
+   * Send a packet from the queue. Used only in REGENERATION_PHY mode.
+   */
+  void SendFromQueue ();
+
+  /**
+   * Notify a packet has finished being sent. Used only in REGENERATION_PHY mode.
+   */
+  void EndTx ();
+
+  /**
+   * Get destination address of packets.
+   * \brief packets The packets from where extract destination
+   * \return The destination MAC address
+   */
+  Address
+  GetE2EDestinationAddress (SatPhy::PacketContainer_t packets);
+
   /**
    * Configured Adjacent Channel Interference (ACI) in dB.
    */
@@ -119,6 +196,42 @@ private:
    * Other system interference in linear.
    */
   double m_otherSysInterferenceCOverI;
+
+  /**
+   * Regeneration mode on forward link.
+   */
+  SatEnums::RegenerationMode_t m_forwardLinkRegenerationMode;
+
+  /**
+   * Regeneration mode on return link.
+   */
+  SatEnums::RegenerationMode_t m_returnLinkRegenerationMode;
+
+  /**
+   * Simple FIFO queue to avoid collisions on TX in case of REGENERATION_PHY.
+   * Second and third elements are respectively size in bytes and in packets.
+   */
+  std::queue<std::tuple<Ptr<SatSignalParameters>, uint32_t, uint32_t>> m_queue;
+
+  /**
+   * Size of FIFO queue in bytes
+   */
+  uint32_t m_queueSizeBytes;
+
+  /**
+   * Size of FIFO queue in packets
+   */
+  uint32_t m_queueSizePackets;
+
+  /**
+   * Maximum size of FIFO m_queue in bytes.
+   */
+  uint32_t m_queueSizeMax;
+
+  /**
+   * Indicates if a packet is already being sent.
+   */
+  bool m_isSending;
 
 };
 

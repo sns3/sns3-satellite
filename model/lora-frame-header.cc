@@ -18,9 +18,12 @@
  * Author: Davide Magrin <magrinda@dei.unipd.it>
  */
 
-#include "ns3/lora-frame-header.h"
-#include "ns3/log.h"
 #include <bitset>
+
+#include <ns3/log.h>
+
+#include "lora-frame-header.h"
+
 
 namespace ns3 {
 

@@ -24,7 +24,8 @@
 
 #include <map>
 
-#include "ns3/object.h"
+#include <ns3/object.h>
+
 #include "satellite-channel.h"
 #include "satellite-typedefs.h"
 
@@ -67,48 +68,53 @@ public:
 
   /**
    * \brief Retrieve the channel pair associated to a beam
+   * \param satId the ID of the satellite
    * \param beamId the ID of the beam
    * \return a pair of SatChannel that has been associated to this beam
    */
-  ChannelPair_t GetChannelPair (uint32_t beamId) const;
-  Ptr<SatChannel> GetForwardChannel (uint32_t frequencyId) const;
-  Ptr<SatChannel> GetReturnChannel (uint32_t frequencyId) const;
+  ChannelPair_t GetChannelPair (uint32_t satId, uint32_t beamId) const;
+  Ptr<SatChannel> GetForwardChannel (uint32_t satId, uint32_t frequencyId) const;
+  Ptr<SatChannel> GetReturnChannel (uint32_t satId, uint32_t frequencyId) const;
 
   /**
    * \brief Test if a channel pair has been stored for a given color
+   * \param satId the ID of the satellite
    * \param frequencyId the ID of the color
    * \return whether or not this color already stores a pair of SatChannel
    */
   // bool HasChannelPair (uint32_t frequencyId);
-  bool HasFwdChannel (uint32_t frequencyId) const;
-  bool HasRtnChannel (uint32_t frequencyId) const;
+  bool HasFwdChannel (uint32_t satId, uint32_t frequencyId) const;
+  bool HasRtnChannel (uint32_t satId, uint32_t frequencyId) const;
 
   /**
    * \brief Associate a new beam to a given color
+   * \param satId the ID of the satellite
    * \param beamId the ID of the beam
    * \param frequencyId the ID of the color
    */
   // void UpdateBeamsForFrequency (uint32_t beamdId, uint32_t frequencyId);
-  void UpdateBeamsForFrequency (uint32_t beamdId, uint32_t fwdFrequencyId, uint32_t rtnFrequencyId);
+  void UpdateBeamsForFrequency (uint32_t satId, uint32_t beamdId, uint32_t fwdFrequencyId, uint32_t rtnFrequencyId);
 
   /**
    * \brief Store a pair of SatChannel for the given color
    * and associate the given beam to said color
+   * \param satId the ID of the satellite
    * \param beamId the ID of the beam
    * \param frequencyId the ID of the color
    * \param channels the SatChannel pair to store
    */
   // void StoreChannelPair (uint32_t beamId, uint32_t frequencyId, ChannelPair_t channels);
-  void StoreChannelPair (uint32_t beamId,
+  void StoreChannelPair (uint32_t satId,
+                         uint32_t beamId,
                          uint32_t fwdFrequencyId,
                          Ptr<SatChannel> fwdChannel,
                          uint32_t rtnFrequencyId,
                          Ptr<SatChannel> rtnChannel);
 
 private:
-  std::map<uint32_t, std::pair<uint32_t, uint32_t> > m_frequencies;   // map from beam ID to frequency ID
-  std::map<uint32_t, Ptr<SatChannel> > m_fwdChannels;
-  std::map<uint32_t, Ptr<SatChannel> > m_rtnChannels;
+  std::map<std::pair<uint32_t, uint32_t>, std::pair<uint32_t, uint32_t> > m_frequencies;   // map from beam ID to frequency ID
+  std::map<std::pair<uint32_t, uint32_t>, Ptr<SatChannel> > m_fwdChannels;
+  std::map<std::pair<uint32_t, uint32_t>, Ptr<SatChannel> > m_rtnChannels;
 };
 
 }

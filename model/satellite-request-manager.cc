@@ -21,16 +21,19 @@
  */
 
 #include <cmath>
-#include "ns3/log.h"
-#include "ns3/enum.h"
-#include "ns3/double.h"
-#include "ns3/simulator.h"
-#include "ns3/boolean.h"
-#include "ns3/nstime.h"
+
+#include <ns3/log.h>
+#include <ns3/enum.h>
+#include <ns3/double.h>
+#include <ns3/simulator.h>
+#include <ns3/boolean.h>
+#include <ns3/nstime.h>
+
 #include "satellite-const-variables.h"
 #include "satellite-request-manager.h"
 #include "satellite-enums.h"
 #include "satellite-utils.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatRequestManager");
 
@@ -43,6 +46,7 @@ const uint32_t SatRequestManager::m_vbdcScalingFactors[4] = {1, 8, 64, 512};
 
 SatRequestManager::SatRequestManager ()
   : m_gwAddress (),
+  m_satAddress (),
   m_lastCno (NAN),
   m_llsConf (),
   m_evaluationInterval (Seconds (0.1)),
@@ -59,7 +63,8 @@ SatRequestManager::SatRequestManager ()
   m_forcedAvbdcUpdate (false),
   m_numValues (256),
   m_rbdcCapacityRequestAlgorithm (SatEnums::CR_RBDC_LEGACY),
-  m_vbdcCapacityRequestAlgorithm (SatEnums::CR_VBDC_LEGACY)
+  m_vbdcCapacityRequestAlgorithm (SatEnums::CR_VBDC_LEGACY),
+  m_headerOffsetVbcd (1.0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -297,6 +302,8 @@ SatRequestManager::DoEvaluation ()
 
                   SatEnums::SatCapacityAllocationCategory_t cac = DoVbdc (rc, stats, vbdcBytes);
 
+                  vbdcBytes *= m_headerOffsetVbcd;
+
                   if (vbdcBytes > 0)
                     {
                       // Add control element only if UT needs some bytes
@@ -412,13 +419,21 @@ SatRequestManager::SetNodeInfo (Ptr<SatNodeInfo> nodeInfo)
 }
 
 void
-SatRequestManager::CnoUpdated (uint32_t beamId, Address /*utId*/, Address /*gwId*/, double cno)
+SatRequestManager::CnoUpdated (uint32_t satId, uint32_t beamId, Address sourceMac, Address /*gwId*/, double cno, bool isSatelliteMac)
 {
-  NS_LOG_FUNCTION (this << beamId << cno);
+  NS_LOG_FUNCTION (this << satId << beamId << cno);
 
   NS_LOG_INFO ("C/No updated to request manager: " << cno);
 
-  m_lastCno = cno;
+  if (isSatelliteMac)
+    {
+      m_lastSatelliteCno = cno;
+      m_satAddress = Mac48Address::ConvertFrom (sourceMac);
+    }
+  else
+    {
+      m_lastCno = cno;
+    }
 }
 
 
@@ -830,6 +845,17 @@ SatRequestManager::SendCnoReport ()
 
           m_lastCno = NAN;
         }
+
+      if (ctrlMsgTxPossible && m_lastSatelliteCno != NAN)
+        {
+          NS_LOG_INFO ("Send C/No report to SAT user: " << m_satAddress);
+          Ptr<SatCnoReportMessage> cnoReport = CreateObject<SatCnoReportMessage> ();
+
+          cnoReport->SetCnoEstimate (m_lastSatelliteCno);
+          m_ctrlCallback (cnoReport, m_satAddress);
+
+          m_lastSatelliteCno = NAN;
+        }
     }
 
   m_cnoReportEvent = Simulator::Schedule (m_cnoReportInterval, &SatRequestManager::SendCnoReport, this);
@@ -866,6 +892,12 @@ SatRequestManager::SendLogonMessage ()
       Ptr<SatLogonMessage> logonMessage = CreateObject<SatLogonMessage> ();
       m_ctrlCallback (logonMessage, m_gwAddress);
     }
+}
+
+void
+SatRequestManager::SetHeaderOffsetVbdc (double headerOffsetVbcd)
+{
+  m_headerOffsetVbcd = headerOffsetVbcd;
 }
 
 void

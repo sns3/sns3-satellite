@@ -22,7 +22,11 @@
 
 #include <ns3/log.h>
 #include <ns3/simulator.h>
+
+#include "satellite-uplink-info-tag.h"
+
 #include "satellite-phy-rx-carrier-uplink.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatPhyRxCarrierUplink");
 
@@ -105,15 +109,26 @@ SatPhyRxCarrierUplink::EndRxData (uint32_t key)
                                 m_rxNoisePowerW,
                                 m_rxAciIfPowerW,
                                 m_rxExtNoisePowerW,
-                                m_sinrCalculate);
+                                m_additionalInterferenceCallback ());
 
   // Update link specific SINR trace
-  m_linkSinrTrace (SatUtils::LinearToDb (sinr));
+  if (GetChannelType () == SatEnums::FORWARD_FEEDER_CH)
+    {
+      m_linkSinrTrace (SatUtils::LinearToDb (sinr), packetRxParams.destAddress);
+    }
+  else if (GetChannelType () == SatEnums::RETURN_USER_CH)
+    {
+      m_linkSinrTrace (SatUtils::LinearToDb (sinr), packetRxParams.sourceAddress);
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Incorrect channel for satPhyRxCarrierUplink: " << SatEnums::GetChannelTypeName (GetChannelType ()));
+    }
 
   NS_ASSERT (!packetRxParams.rxParams->HasSinrComputed ());
 
   /// save 1st link sinr value for 2nd link composite sinr calculations
-  packetRxParams.rxParams->SetSinr (sinr, m_sinrCalculate);
+  packetRxParams.rxParams->SetSinr (sinr, m_additionalInterferenceCallback ());
 
   /// uses 1st link sinr
   m_linkBudgetTrace (packetRxParams.rxParams, GetOwnAddress (),

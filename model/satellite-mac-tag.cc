@@ -16,10 +16,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
+ *         Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "ns3/log.h"
+#include <ns3/log.h>
+
 #include "satellite-mac-tag.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatMacTag");
 
@@ -123,6 +126,107 @@ SatMacTag::Print (std::ostream &os) const
 {
   NS_LOG_FUNCTION (this << &os);
   os << "DestAddress=" << m_destAddress << "SourceAddress" << m_sourceAddress;
+}
+
+
+NS_OBJECT_ENSURE_REGISTERED (SatAddressE2ETag);
+
+
+SatAddressE2ETag::SatAddressE2ETag ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+SatAddressE2ETag::~SatAddressE2ETag ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+TypeId
+SatAddressE2ETag::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::SatAddressE2ETag")
+    .SetParent<Tag> ()
+    .AddConstructor<SatAddressE2ETag> ()
+  ;
+  return tid;
+}
+TypeId
+SatAddressE2ETag::GetInstanceTypeId () const
+{
+  NS_LOG_FUNCTION (this);
+
+  return GetTypeId ();
+}
+
+void
+SatAddressE2ETag::SetE2EDestAddress (Mac48Address e2eDestAddress)
+{
+  NS_LOG_FUNCTION (this << e2eDestAddress);
+  m_e2eDestAddress = e2eDestAddress;
+}
+
+Mac48Address
+SatAddressE2ETag::GetE2EDestAddress () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_e2eDestAddress;
+}
+
+void
+SatAddressE2ETag::SetE2ESourceAddress (Mac48Address e2eSourceAddress)
+{
+  NS_LOG_FUNCTION (this << e2eSourceAddress);
+  m_e2eSourceAddress = e2eSourceAddress;
+}
+
+Mac48Address
+SatAddressE2ETag::GetE2ESourceAddress () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_e2eSourceAddress;
+}
+
+uint32_t
+SatAddressE2ETag::GetSerializedSize () const
+{
+  NS_LOG_FUNCTION (this);
+
+  return ( 2 * ADDRESS_LENGHT );
+}
+void
+SatAddressE2ETag::Serialize (TagBuffer i) const
+{
+  NS_LOG_FUNCTION (this << &i);
+
+  uint8_t buff[ADDRESS_LENGHT];
+
+  m_e2eDestAddress.CopyTo (buff);
+  i.Write (buff, ADDRESS_LENGHT);
+
+  m_e2eSourceAddress.CopyTo (buff);
+  i.Write (buff, ADDRESS_LENGHT);
+}
+
+void
+SatAddressE2ETag::Deserialize (TagBuffer i)
+{
+  NS_LOG_FUNCTION (this << &i);
+
+  uint8_t buff[ADDRESS_LENGHT];
+
+  i.Read (buff, ADDRESS_LENGHT);
+  m_e2eDestAddress.CopyFrom (buff);
+
+  i.Read (buff, ADDRESS_LENGHT);
+  m_e2eSourceAddress.CopyFrom (buff);
+}
+
+void
+SatAddressE2ETag::Print (std::ostream &os) const
+{
+  NS_LOG_FUNCTION (this << &os);
+  os << "E2EDestAddress=" << m_e2eDestAddress << "E2ESourceAddress" << m_e2eSourceAddress;
 }
 
 

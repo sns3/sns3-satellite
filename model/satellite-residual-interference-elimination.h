@@ -25,6 +25,7 @@
 #include "satellite-enums.h"
 #include "satellite-wave-form-conf.h"
 
+
 namespace ns3 {
 
 /**
@@ -63,17 +64,19 @@ public:
    * Eliminate the residual power of interference for the given packets
    * \param packetInterferedWith Parameters of the packet whose interference level should be lowered
    * \param processedPacket Parameters of the packet we want to remove interference from
+   * \param isRegenerative Tell if we are in regenerative configuration. Depending on this value, the computations are made on the GW or on the satellite
    */
-  void EliminateInterferences (Ptr<SatSignalParameters> packetInterferedWith, Ptr<SatSignalParameters> processedPacket, double EsNo);
+  void EliminateInterferences (Ptr<SatSignalParameters> packetInterferedWith, Ptr<SatSignalParameters> processedPacket, double EsNo, bool isRegenerative);
 
   /**
    * Calculate residual power of interference for the given packets
    * \param packetInterferedWith Parameters of the packet whose interference level should be lowered
    * \param processedPacket Parameters of the packet we want to remove interference from
+   * \param isRegenerative Tell if we are in regenerative configuration. Depending on this value, the computations are made on the GW or on the satellite
    * \param startTime Normalized start time of the interference, with respect to packetInterferedWith
    * \param endTime Normalized end time of the interference, with respect to packetInterferedWith
    */
-  void EliminateInterferences (Ptr<SatSignalParameters> packetInterferedWith, Ptr<SatSignalParameters> processedPacket, double EsNo, double startTime, double endTime);
+  void EliminateInterferences (Ptr<SatSignalParameters> packetInterferedWith, Ptr<SatSignalParameters> processedPacket, double EsNo, bool isRegenerative, double startTime, double endTime);
 
   inline uint32_t GetBurstLengthInSymbols (uint32_t waveformId) const
   {

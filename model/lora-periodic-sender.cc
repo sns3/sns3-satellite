@@ -24,9 +24,10 @@
 #include <ns3/log.h>
 #include <ns3/double.h>
 #include <ns3/string.h>
-#include <ns3/satellite-lorawan-net-device.h>
 
+#include "satellite-lorawan-net-device.h"
 #include "lora-periodic-sender.h"
+
 
 namespace ns3 {
 
@@ -134,7 +135,7 @@ LoraPeriodicSender::StartApplication (void)
   NS_LOG_FUNCTION (this);
 
   // Make sure we have a MAC layer
-  if (m_mac == 0)
+  if (m_mac == nullptr)
     {
       Ptr<SatLorawanNetDevice> loraNetDevice;
       for (uint32_t i = 0; i < m_node->GetNDevices (); i++)
@@ -147,7 +148,7 @@ LoraPeriodicSender::StartApplication (void)
         }
 
       m_mac = DynamicCast<LorawanMac> (loraNetDevice->GetMac ());
-      NS_ASSERT (m_mac != 0);
+      NS_ASSERT (m_mac != nullptr);
     }
 
   // Schedule the next SendPacket event

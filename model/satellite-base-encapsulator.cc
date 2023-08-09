@@ -19,12 +19,14 @@
  */
 
 
-#include "ns3/log.h"
-#include "ns3/simulator.h"
+#include <ns3/log.h>
+#include <ns3/simulator.h>
+
 #include "satellite-queue.h"
 #include "satellite-time-tag.h"
 #include "satellite-mac-tag.h"
 #include "satellite-base-encapsulator.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatBaseEncapsulator");
 
@@ -34,8 +36,8 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatBaseEncapsulator);
 
 SatBaseEncapsulator::SatBaseEncapsulator ()
-  : m_sourceAddress (),
-  m_destAddress (),
+  : m_encapAddress (),
+  m_decapAddress (),
   m_flowId (0)
 {
   NS_LOG_FUNCTION (this);
@@ -46,10 +48,18 @@ SatBaseEncapsulator::SatBaseEncapsulator ()
    */
 }
 
-SatBaseEncapsulator::SatBaseEncapsulator (Mac48Address source, Mac48Address dest, uint8_t flowId)
-  : m_sourceAddress (source),
-  m_destAddress (dest),
-  m_flowId (flowId)
+SatBaseEncapsulator::SatBaseEncapsulator (Mac48Address encapAddress,
+                                          Mac48Address decapAddress,
+                                          Mac48Address sourceE2EAddress,
+                                          Mac48Address destE2EAddress,
+                                          uint8_t flowId,
+                                          uint32_t additionalHeaderSize)
+  : m_encapAddress (encapAddress),
+  m_decapAddress (decapAddress),
+  m_sourceE2EAddress (sourceE2EAddress),
+  m_destE2EAddress (destE2EAddress),
+  m_flowId (flowId),
+  m_additionalHeaderSize (additionalHeaderSize)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -88,14 +98,20 @@ SatBaseEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address dest)
 
   // Add flow id tag
   SatFlowIdTag flowIdTag;
-  flowIdTag.SetFlowId (m_flowId);
-  p->AddPacketTag (flowIdTag);
+  if (!p->PeekPacketTag (flowIdTag))
+    {
+      flowIdTag.SetFlowId (m_flowId);
+      p->AddPacketTag (flowIdTag);
+    }
 
   // Add MAC tag to identify the packet in lower layers
   SatMacTag mTag;
-  mTag.SetDestAddress (dest);
-  mTag.SetSourceAddress (m_sourceAddress);
-  p->AddPacketTag (mTag);
+  if (!p->PeekPacketTag (mTag))
+    {
+      mTag.SetDestAddress (dest);
+      mTag.SetSourceAddress (m_encapAddress);
+      p->AddPacketTag (mTag);
+    }
 
   NS_LOG_INFO ("Tx Buffer: New packet added of size: " << p->GetSize ());
 
@@ -164,12 +180,19 @@ void
 SatBaseEncapsulator::ReceivePdu (Ptr<Packet> p)
 {
   NS_LOG_FUNCTION (this);
-  NS_ASSERT (false);
 
-  /**
-   * The base encapsulator should not be used at receiving packets
-   * at all! This functionality is implemented in the inherited classes.
-   */
+  if (m_flowId != 0)
+    {
+      NS_ASSERT (false);
+
+      /**
+       * The base encapsulator should not be used at receiving data packets
+       * at all! This functionality is implemented in the inherited classes.
+       */
+    }
+
+  m_rxCallback (p, m_encapAddress, m_decapAddress);
+
 }
 
 void

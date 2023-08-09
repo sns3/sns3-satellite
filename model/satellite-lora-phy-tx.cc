@@ -18,7 +18,8 @@
  * Author: Davide Magrin <magrinda@dei.unipd.it>
  */
 
-#include "ns3/satellite-lora-phy-tx.h"
+#include "satellite-lora-phy-tx.h"
+
 
 namespace ns3 {
 

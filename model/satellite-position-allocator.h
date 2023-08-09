@@ -22,11 +22,13 @@
 #ifndef SATELLITE_POSITION_ALLOCATOR_H
 #define SATELLITE_POSITION_ALLOCATOR_H
 
-#include "ns3/object.h"
-#include "ns3/random-variable-stream.h"
-#include "ns3/position-allocator.h"
+#include <ns3/object.h>
+#include <ns3/random-variable-stream.h>
+#include <ns3/position-allocator.h>
+
 #include "geo-coordinate.h"
 #include "satellite-antenna-gain-pattern-container.h"
+
 
 namespace ns3 {
 
@@ -60,7 +62,7 @@ public:
    * \brief Get next position
    * \return The next chosen position.
    */
-  virtual GeoCoordinate GetNextGeoPosition (void) const = 0;
+  virtual GeoCoordinate GetNextGeoPosition (uint32_t satId = 0) const = 0;
 
   virtual Vector GetNext (void) const;
   virtual int64_t AssignStreams (int64_t stream);
@@ -104,9 +106,10 @@ public:
 
   /**
    * \brief Get next position
+   * \param satId ID of satellite
    * \return The next chosen position.
    */
-  virtual GeoCoordinate GetNextGeoPosition (void) const;
+  virtual GeoCoordinate GetNextGeoPosition (uint32_t satId = 0) const;
 
   inline virtual void SetToBegin ()
   {
@@ -154,7 +157,7 @@ public:
    * \brief Get next position
    * \return The next chosen position.
    */
-  virtual GeoCoordinate GetNextGeoPosition (void) const;
+  virtual GeoCoordinate GetNextGeoPosition (uint32_t satId = 0) const;
   virtual int64_t AssignStreams (int64_t stream);
 
 private:
@@ -201,7 +204,7 @@ public:
    * \brief Get next position
    * \return The next chosen position.
    */
-  virtual GeoCoordinate GetNextGeoPosition (void) const;
+  virtual GeoCoordinate GetNextGeoPosition (uint32_t satId = 0) const;
   virtual int64_t AssignStreams (int64_t stream);
 
 private:
@@ -247,7 +250,7 @@ public:
    * \brief Get next position
    * \return The next chosen position.
    */
-  virtual GeoCoordinate GetNextGeoPosition (void) const;
+  virtual GeoCoordinate GetNextGeoPosition (uint32_t satId) const;
   virtual int64_t AssignStreams (int64_t stream);
 private:
   /**

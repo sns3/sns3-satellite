@@ -27,6 +27,7 @@
 #include "satellite-conf.h"
 #include "ns3/singleton.h"
 #include "ns3/satellite-env-variables.h"
+#include "ns3/satellite-const-variables.h"
 
 NS_LOG_COMPONENT_DEFINE ("SatConf");
 
@@ -112,11 +113,39 @@ SatConf::GetTypeId (void)
                    DoubleValue (0.00),
                    MakeDoubleAccessor (&SatConf::m_fwdCarrierSpacingFactor),
                    MakeDoubleChecker<double> (0.00, 1.00))
+    .AddAttribute ("RtnScpcCarrierAllocatedBandwidth",
+                   "The allocated carrier bandwidth for SCPC link carriers [Hz].",
+                   DoubleValue (0.125e9),
+                   MakeDoubleAccessor (&SatConf::m_rtnCarrierAllocatedBandwidthHz),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute ("RtnScpcCarrierRollOff",
+                   "The roll-off factor for SCPC link carriers.",
+                   DoubleValue (0.20),
+                   MakeDoubleAccessor (&SatConf::m_rtnCarrierRollOffFactor),
+                   MakeDoubleChecker<double> (0.00, 1.00))
+    .AddAttribute ("RtnScpcCarrierSpacing",
+                   "The carrier spacing factor for SCPC link carriers.",
+                   DoubleValue (0.00),
+                   MakeDoubleAccessor (&SatConf::m_rtnCarrierSpacingFactor),
+                   MakeDoubleChecker<double> (0.00, 1.00))
     .AddAttribute ("UtPositionInputFileName",
                    "File defining user defined UT positions for user defined scenarios.",
                    StringValue ("UtPos.txt"),
                    MakeStringAccessor (&SatConf::m_utPositionInputFileName),
                    MakeStringChecker ())
+    .AddAttribute ("ForwardLinkRegenerationMode", "The regeneration mode used in satellites for forward link.",
+                   EnumValue (SatEnums::TRANSPARENT),
+                   MakeEnumAccessor (&SatConf::m_forwardLinkRegenerationMode),
+                   MakeEnumChecker (SatEnums::TRANSPARENT, "TRANSPARENT",
+                                    SatEnums::REGENERATION_PHY, "REGENERATION_PHY",
+                                    SatEnums::REGENERATION_NETWORK, "REGENERATION_NETWORK"))
+    .AddAttribute ("ReturnLinkRegenerationMode", "The regeneration mode used in satellites for return link.",
+                   EnumValue (SatEnums::TRANSPARENT),
+                   MakeEnumAccessor (&SatConf::m_returnLinkRegenerationMode),
+                   MakeEnumChecker (SatEnums::TRANSPARENT, "TRANSPARENT",
+                                    SatEnums::REGENERATION_PHY, "REGENERATION_PHY",
+                                    SatEnums::REGENERATION_LINK, "REGENERATION_LINK",
+                                    SatEnums::REGENERATION_NETWORK, "REGENERATION_NETWORK"))
 
   ;
   return tid;
@@ -147,7 +176,12 @@ SatConf::SatConf ()
   m_SuperFrameConfForSeq0 (SatSuperframeConf::SUPER_FRAME_CONFIG_0),
   m_fwdCarrierAllocatedBandwidthHz (0.0),
   m_fwdCarrierRollOffFactor (0.0),
-  m_fwdCarrierSpacingFactor (0.0)
+  m_fwdCarrierSpacingFactor (0.0),
+  m_rtnCarrierAllocatedBandwidthHz (0.0),
+  m_rtnCarrierRollOffFactor (0.0),
+  m_rtnCarrierSpacingFactor (0.0),
+  m_forwardLinkRegenerationMode (SatEnums::TRANSPARENT),
+  m_returnLinkRegenerationMode (SatEnums::TRANSPARENT)
 {
   NS_LOG_FUNCTION (this);
 
@@ -159,9 +193,12 @@ void SatConf::Initialize (std::string rtnConf,
                           std::string gwPos,
                           std::string satPos,
                           std::string wfConf,
-                          std::string tle)
+                          std::string tle,
+                          bool isConstellation)
 {
   NS_LOG_FUNCTION (this);
+
+  m_isConstellation = isConstellation;
 
   std::string dataPath = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory () + "/";
   std::string dataPathTle = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory () + "/tle/";
@@ -173,6 +210,8 @@ void SatConf::Initialize (std::string rtnConf,
   NS_ASSERT (m_rtnConf.size () == m_fwdConf.size ());
   m_beamCount = m_rtnConf.size ();
 
+  NS_ASSERT (m_beamCount < SatConstVariables::MAX_BEAMS_PER_SATELLITE);
+
   // Load GW positions
   LoadPositions (dataPath + gwPos, m_gwPositions);
 
@@ -182,8 +221,21 @@ void SatConf::Initialize (std::string rtnConf,
   // Load satellite position
   LoadPositions (dataPath + satPos, m_geoSatPosition);
 
-  // Load TLE information
+  // Load TLE information if case of only one satellite
   LoadTle (dataPathTle + tle, m_tleSat);
+
+  // Update fwdConf & rtnConf with correct nb of GWs
+  if (m_isConstellation)
+    {
+      uint32_t nbGws = m_gwPositions.size ();
+      uint32_t gwId;
+      for (uint32_t i = 0; i < m_fwdConf.size (); i++)
+        {
+          gwId = i % nbGws;
+          m_fwdConf[i][GW_ID_INDEX] = gwId + 1;
+          m_rtnConf[i][GW_ID_INDEX] = gwId + 1;
+        }
+    }
 
   Configure (dataPath + wfConf);
 }
@@ -199,8 +251,9 @@ SatConf::Configure (std::string wfConf)
   double fwdFeederLinkChannelBandwidthHz = m_fwdFeederLinkBandwidthHz / m_fwdFeederLinkChannelCount;
   double fwdUserLinkChannelBandwidthHz = m_fwdUserLinkBandwidthHz / m_fwdUserLinkChannelCount;
 
-  // channel bandwidths for the forward feeder and user links is expected to be equal
-  if ( fwdFeederLinkChannelBandwidthHz != fwdUserLinkChannelBandwidthHz )
+  // channel bandwidths for the forward feeder and user links is expected to be equal if forward generation is physical or transparent
+  if ( (fwdFeederLinkChannelBandwidthHz != fwdUserLinkChannelBandwidthHz)
+    && (m_forwardLinkRegenerationMode == SatEnums::TRANSPARENT || m_forwardLinkRegenerationMode == SatEnums::REGENERATION_PHY))
     {
       NS_FATAL_ERROR ("Channel bandwidths for forward feeder and user links are not equal!!!");
     }
@@ -215,13 +268,20 @@ SatConf::Configure (std::string wfConf)
   Ptr<SatFwdCarrierConf> fwdCarrierConf = Create<SatFwdCarrierConf> (m_fwdCarrierAllocatedBandwidthHz, m_fwdCarrierRollOffFactor, m_fwdCarrierSpacingFactor );
   m_forwardLinkCarrierConf.push_back (fwdCarrierConf);
 
+  // create return link carrier configuration and one carrier pushing just one carrier to container
+  // only one carrier supported in return link currently
+  // only used for SCPC
+  Ptr<SatFwdCarrierConf> rtnCarrierConf = Create<SatFwdCarrierConf> (m_rtnCarrierAllocatedBandwidthHz, m_rtnCarrierRollOffFactor, m_rtnCarrierSpacingFactor );
+  m_returnLinkCarrierConf.push_back (rtnCarrierConf);
+
   // *** configure return link ***
 
   double rtnFeederLinkBandwidthHz = m_rtnFeederLinkBandwidthHz / m_rtnFeederLinkChannelCount;
   double rtnUserLinkBandwidthHz = m_rtnUserLinkBandwidthHz / m_rtnUserLinkChannelCount;
 
-  // bandwidths of the return feeder and user links is expected to be equal
-  if ( rtnFeederLinkBandwidthHz != rtnUserLinkBandwidthHz )
+  // bandwidths of the return feeder and user links is expected to be equal if return generation is physical or transparent
+  if ( (rtnFeederLinkBandwidthHz != rtnUserLinkBandwidthHz)
+    && (m_returnLinkRegenerationMode == SatEnums::TRANSPARENT || m_returnLinkRegenerationMode == SatEnums::REGENERATION_PHY) )
     {
       NS_FATAL_ERROR ( "Bandwidths of return feeder and user links are not equal!!!");
     }
@@ -314,6 +374,10 @@ SatConf::GetCarrierBandwidthHz ( SatEnums::ChannelType_t chType, uint32_t carrie
 
     case SatEnums::RETURN_FEEDER_CH:
       carrierBandwidthHz = m_superframeSeq->GetCarrierBandwidthHz (carrierId, bandwidthType);
+      if (m_returnLinkRegenerationMode == SatEnums::REGENERATION_LINK || m_returnLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
+        {
+          carrierBandwidthHz = GetRtnLinkCarrierBandwidthHz (0, bandwidthType);
+        }
       break;
 
     case SatEnums::RETURN_USER_CH:
@@ -437,6 +501,94 @@ SatConf::LoadTle (std::string filePathName, std::string& tleInfo)
   delete ifs;
 }
 
+std::vector <std::string>
+SatConf::LoadTles (std::string filePathName)
+{
+  NS_LOG_FUNCTION (this << filePathName);
+
+  std::vector <std::string> tles;
+
+  // READ FROM THE SPECIFIED INPUT FILE
+  std::ifstream *ifs = OpenFile (filePathName);
+
+  double size;
+  uint32_t i = 0;
+  std::string firstLine;
+  std::getline (*ifs, firstLine);
+  std::istringstream iss(firstLine);
+  iss >> size;
+
+  tles.reserve (size);
+
+  while (ifs->good () && i < size)
+    {
+      std::string tle;
+      std::string name;
+      std::string line1;
+      std::string line2;
+
+      std::getline( *ifs, name );
+      std::getline( *ifs, line1 );
+      std::getline( *ifs, line2 );
+
+      tle = line1 + '\n' + line2;
+      tles.push_back (tle);
+
+      i += 1;
+    }
+
+  NS_ASSERT (tles.size () < SatConstVariables::MAX_SATELLITES);
+
+  ifs->close ();
+  delete ifs;
+
+  m_tles = tles;
+
+  return tles;
+}
+
+std::vector <std::pair <uint32_t, uint32_t>>
+SatConf::LoadIsls (std::string filePathName)
+{
+  NS_LOG_FUNCTION (this << filePathName);
+
+  std::vector <std::pair <uint32_t, uint32_t>> isls;
+
+  // READ FROM THE SPECIFIED INPUT FILE
+  std::ifstream *ifs = OpenFile (filePathName);
+
+  double size;
+  uint32_t i = 0;
+  std::string firstLine;
+  std::getline (*ifs, firstLine);
+  std::istringstream iss(firstLine);
+  iss >> size;
+
+  isls.reserve (size);
+
+  while (ifs->good () && i < size)
+    {
+      std::string line;
+      std::string sat1;
+      std::string sat2;
+
+      std::getline( *ifs, line);
+
+      std::stringstream ss(line);
+      ss >> sat1;
+      ss >> sat2;
+
+      isls.push_back (std::make_pair (std::stoi (sat1), std::stoi (sat2)));
+
+      i += 1;
+    }
+
+  ifs->close ();
+  delete ifs;
+
+  return isls;
+}
+
 uint32_t
 SatConf::GetBeamCount () const
 {
@@ -459,6 +611,21 @@ SatConf::GetUtCount () const
   NS_LOG_FUNCTION (this);
 
   return m_utPositions.size ();
+}
+
+uint32_t
+SatConf::GetSatCount () const
+{
+  NS_LOG_FUNCTION (this);
+
+  if (m_isConstellation)
+    {
+      return m_tles.size ();
+    }
+  else
+    {
+      return m_geoSatPosition.size ();
+    }
 }
 
 std::vector <uint32_t>
@@ -488,6 +655,22 @@ SatConf::GetFwdLinkCarrierCount () const
   return m_forwardLinkCarrierConf.size ();
 }
 
+SatEnums::RegenerationMode_t
+SatConf::GetForwardLinkRegenerationMode () const
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_forwardLinkRegenerationMode;
+}
+
+SatEnums::RegenerationMode_t
+SatConf::GetReturnLinkRegenerationMode () const
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_returnLinkRegenerationMode;
+}
+
 double
 SatConf::GetFwdLinkCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType) const
 {
@@ -512,6 +695,40 @@ SatConf::GetFwdLinkCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierBand
 
     case SatEnums::EFFECTIVE_BANDWIDTH:
       bandwidtHz = m_forwardLinkCarrierConf[carrierId]->GetEffectiveBandwidthInHz ();
+      break;
+
+    default:
+      NS_FATAL_ERROR ("Invalid bandwidth type");
+      break;
+    }
+
+  return bandwidtHz;
+}
+
+double
+SatConf::GetRtnLinkCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType) const
+{
+  NS_LOG_FUNCTION (this);
+
+  double bandwidtHz = 0.0;
+
+  if ( carrierId >= m_returnLinkCarrierConf.size ())
+    {
+      NS_FATAL_ERROR ("Rtn Carrier id out of the range!!");
+    }
+
+  switch (bandwidthType)
+    {
+    case SatEnums::ALLOCATED_BANDWIDTH:
+      bandwidtHz = m_returnLinkCarrierConf[carrierId]->GetAllocatedBandwidthInHz ();
+      break;
+
+    case SatEnums::OCCUPIED_BANDWIDTH:
+      bandwidtHz = m_returnLinkCarrierConf[carrierId]->GetOccupiedBandwidthInHz ();
+      break;
+
+    case SatEnums::EFFECTIVE_BANDWIDTH:
+      bandwidtHz = m_returnLinkCarrierConf[carrierId]->GetEffectiveBandwidthInHz ();
       break;
 
     default:
@@ -556,6 +773,12 @@ SatConf::GetSatTle () const
   NS_ASSERT (m_tleSat.size () != 0);
 
   return m_tleSat;
+}
+
+void
+SatConf::SetUtPositionInputFileName (std::string utPositionInputFileName)
+{
+  m_utPositionInputFileName = utPositionInputFileName;
 }
 
 } // namespace ns3

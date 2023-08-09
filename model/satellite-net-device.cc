@@ -28,17 +28,17 @@
 #include <ns3/ipv4-l3-protocol.h>
 #include <ns3/channel.h>
 
-#include <ns3/satellite-phy.h>
-#include <ns3/satellite-mac.h>
-#include <ns3/satellite-llc.h>
-#include <ns3/satellite-control-message.h>
-#include <ns3/satellite-utils.h>
-#include <ns3/satellite-node-info.h>
-#include <ns3/satellite-address-tag.h>
-#include <ns3/satellite-time-tag.h>
-#include <ns3/satellite-typedefs.h>
-
+#include "satellite-phy.h"
+#include "satellite-mac.h"
+#include "satellite-llc.h"
+#include "satellite-control-message.h"
+#include "satellite-utils.h"
+#include "satellite-node-info.h"
+#include "satellite-address-tag.h"
+#include "satellite-time-tag.h"
+#include "satellite-typedefs.h"
 #include "satellite-net-device.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatNetDevice");
 
@@ -106,6 +106,14 @@ SatNetDevice::GetTypeId (void)
                      "A packet is received with jitter information",
                      MakeTraceSourceAccessor (&SatNetDevice::m_rxJitterTrace),
                      "ns3::SatTypedefs::PacketJitterAddressCallback")
+    .AddTraceSource ("RxLinkDelay",
+                     "A packet is received with link delay information",
+                     MakeTraceSourceAccessor (&SatNetDevice::m_rxLinkDelayTrace),
+                     "ns3::SatTypedefs::PacketDelayAddressCallback")
+    .AddTraceSource ("RxLinkJitter",
+                     "A packet is received with link jitter information",
+                     MakeTraceSourceAccessor (&SatNetDevice::m_rxLinkJitterTrace),
+                     "ns3::SatTypedefs::PacketJitterAddressCallback")
   ;
   return tid;
 }
@@ -118,7 +126,8 @@ SatNetDevice::SatNetDevice ()
   m_node (0),
   m_mtu (0xffff),
   m_ifIndex (0),
-  m_lastDelay (0)
+  m_lastDelay (0),
+  m_lastLinkDelay (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -182,6 +191,20 @@ SatNetDevice::Receive (Ptr<const Packet> packet)
               m_rxJitterTrace (jitter, addr);
             }
           m_lastDelay = delay;
+        }
+
+      SatDevLinkTimeTag linkTimeTag;
+      if (packet->PeekPacketTag (linkTimeTag))
+        {
+          NS_LOG_DEBUG (this << " contains a SatMacTimeTag tag");
+          Time delay = Simulator::Now () - linkTimeTag.GetSenderTimestamp ();
+          m_rxLinkDelayTrace (delay, addr);
+          if (m_lastLinkDelay.IsZero() == false)
+            {
+              Time jitter = Abs (delay - m_lastLinkDelay);
+              m_rxLinkJitterTrace (jitter, addr);
+            }
+          m_lastLinkDelay = delay;
         }
     }
 
@@ -381,6 +404,9 @@ SatNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNu
 
       // Add a SatDevTimeTag tag for packet delay computation at the receiver end.
       packet->AddPacketTag (SatDevTimeTag (Simulator::Now ()));
+
+      // Add a SatDevLinkTimeTag tag for packet link delay computation at the receiver end.
+      packet->AddPacketTag (SatDevLinkTimeTag (Simulator::Now ()));
     }
 
   // Add packet trace entry:
@@ -416,6 +442,9 @@ SatNetDevice::SendFrom (Ptr<Packet> packet, const Address& source, const Address
 
       // Add a SatDevTimeTag tag for packet delay computation at the receiver end.
       packet->AddPacketTag (SatDevTimeTag (Simulator::Now ()));
+
+      // Add a SatDevLinkTimeTag tag for packet link delay computation at the receiver end.
+      packet->AddPacketTag (SatDevLinkTimeTag (Simulator::Now ()));
     }
 
   // Add packet trace entry:
@@ -453,6 +482,9 @@ SatNetDevice::SendControlMsg (Ptr<SatControlMessage> msg, const Address& dest)
 
       // Add a SatDevTimeTag tag for packet delay computation at the receiver end.
       packet->AddPacketTag (SatDevTimeTag (Simulator::Now ()));
+
+      // Add a SatDevLinkTimeTag tag for packet link delay computation at the receiver end.
+      packet->AddPacketTag (SatDevLinkTimeTag (Simulator::Now ()));
     }
 
   // Add packet trace entry:
@@ -520,7 +552,7 @@ SatNetDevice::DoDispose (void)
   m_mac = 0;
   m_node = 0;
   m_receiveErrorModel = 0;
-  if (m_llc != 0)
+  if (m_llc != nullptr)
     {
       m_llc->Dispose ();
     }

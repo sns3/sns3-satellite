@@ -20,9 +20,11 @@
 
 #include <cmath>
 
-#include "ns3/boolean.h"
+#include <ns3/log.h>
+#include <ns3/boolean.h>
+#include <ns3/trace-source-accessor.h>
+
 #include "satellite-mobility-model.h"
-#include "ns3/trace-source-accessor.h"
 
 namespace ns3 {
 

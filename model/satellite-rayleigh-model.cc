@@ -18,7 +18,10 @@
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
 
+#include <ns3/log.h>
+
 #include "satellite-rayleigh-model.h"
+
 
 namespace ns3 {
 

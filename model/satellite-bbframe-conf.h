@@ -22,12 +22,15 @@
 #define SATELLITE_BBFRAME_CONF_H
 
 #include <map>
+
 #include <ns3/ptr.h>
 #include <ns3/object.h>
 #include <ns3/simple-ref-count.h>
 #include <ns3/nstime.h>
-#include <ns3/satellite-enums.h>
-#include <ns3/satellite-link-results.h>
+
+#include "satellite-enums.h"
+#include "satellite-link-results.h"
+
 
 namespace ns3 {
 
@@ -215,7 +218,7 @@ public:
   /**
    * \brief Initialize the C/No requirements for a given BLER target.
    *
-   * \param linkResults DVB-S2 pr DVB-S2X link results
+   * \param linkResults DVB-S2, DVB-S2X or DVB-RCS2 link results
    */
   void InitializeCNoRequirements ( Ptr<SatLinkResultsFwd> linkResults );
 

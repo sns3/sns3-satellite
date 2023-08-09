@@ -20,10 +20,11 @@
 #ifndef SATELLITE_BASE_TRACE_CONTAINER_H
 #define SATELLITE_BASE_TRACE_CONTAINER_H
 
-#include "ns3/object.h"
-#include "ns3/log.h"
-#include "ns3/simulator.h"
+#include <ns3/object.h>
+#include <ns3/simulator.h>
+
 #include "satellite-enums.h"
+
 
 namespace ns3 {
 

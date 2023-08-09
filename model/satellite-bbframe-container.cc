@@ -19,11 +19,14 @@
  */
 
 #include <algorithm>
-#include "ns3/log.h"
-#include "ns3/enum.h"
+
+#include <ns3/log.h>
+#include <ns3/enum.h>
+
 #include "satellite-utils.h"
 #include "satellite-const-variables.h"
 #include "satellite-bbframe-container.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatBbFrameContainer");
 

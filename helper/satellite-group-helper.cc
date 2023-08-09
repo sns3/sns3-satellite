@@ -19,6 +19,7 @@
  * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
+#include <ns3/log.h>
 #include <ns3/singleton.h>
 #include <ns3/satellite-id-mapper.h>
 
@@ -49,12 +50,10 @@ SatGroupHelper::GetInstanceTypeId (void) const
 }
 
 SatGroupHelper::SatGroupHelper ()
-  : m_scenarioCreated (false)
+  : m_scenarioCreated (false),
+  m_satConstellationEnabled (false)
 {
   NS_LOG_FUNCTION (this);
-
-  // Create antenna gain patterns
-  m_antennaGainPatterns = CreateObject<SatAntennaGainPatternContainer> ();
 }
 
 void
@@ -89,7 +88,7 @@ SatGroupHelper::AddUtNodeToGroup (uint32_t groupId, Ptr<Node> node)
     NS_FATAL_ERROR ("Method SatGroupHelper::AddUtNodeToGroup has to be called after SimulationHelper::CreateSatScenario");
   }
 
-  if (groupId == 0)
+  if (groupId == 0 && !m_satConstellationEnabled)
     {
       NS_FATAL_ERROR ("Group ID 0 is reserved for UTs not manually assigned to a group");
     }
@@ -213,8 +212,7 @@ SatGroupHelper::CreateUtNodesFromPosition (uint32_t groupId, uint32_t nb, GeoCoo
   for (uint32_t i = 0; i < nb; i++)
     {
       GeoCoordinate position = circleAllocator->GetNextGeoPosition ();
-      uint32_t bestBeamId = m_antennaGainPatterns->GetBestBeamId (position);
-      m_additionalNodesPerBeam[bestBeamId].push_back (std::make_pair(position, groupId));
+      m_additionalNodesPerBeam.push_back (std::make_pair(position, groupId));
     }
 
   m_groupsList.push_back(groupId);
@@ -228,7 +226,7 @@ SatGroupHelper::AddNodeToGroupAfterScenarioCreation (uint32_t groupId, Ptr<Node>
   m_nodesToAdd[node] = groupId;
 }
 
-std::map<uint32_t, std::vector<std::pair<GeoCoordinate, uint32_t>>>
+std::vector<std::pair<GeoCoordinate, uint32_t>>
 SatGroupHelper::GetAdditionalNodesPerBeam ()
 {
   NS_LOG_FUNCTION (this);
@@ -294,10 +292,10 @@ SatGroupHelper::GetGroups ()
   return m_groupsList;
 }
 
-Ptr<SatAntennaGainPatternContainer>
-SatGroupHelper::GetAntennaGainPatterns ()
+void
+SatGroupHelper::SetSatConstellationEnabled ()
 {
-  return m_antennaGainPatterns;
+  m_satConstellationEnabled = true;
 }
 
 bool

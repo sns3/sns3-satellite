@@ -83,8 +83,7 @@ main (int argc, char *argv[])
   auto simulationHelper = CreateObject<SimulationHelper> (simulationName);
 
   // Find the input xml file in case example is run from other than ns-3 root directory
-  Singleton<SatEnvVariables> satEnvVariables;
-  std::string pathToFile = satEnvVariables.Get ()->LocateFile ("contrib/satellite/examples/training-input-attributes.xml");
+  std::string pathToFile = Singleton<SatEnvVariables>::Get ()->LocateFile ("contrib/satellite/examples/training-input-attributes.xml");
 
 
   /**

@@ -33,8 +33,13 @@
 #include "ns3/traced-callback.h"
 #include "ns3/satellite-channel.h"
 #include "ns3/satellite-phy.h"
+#include "ns3/satellite-geo-feeder-mac.h"
+#include "ns3/satellite-geo-net-device.h"
 #include "ns3/satellite-superframe-sequence.h"
 #include "ns3/satellite-typedefs.h"
+#include "ns3/satellite-bbframe-conf.h"
+#include "ns3/satellite-fwd-link-scheduler.h"
+#include "ns3/satellite-scpc-scheduler.h"
 
 namespace ns3 {
 
@@ -78,11 +83,21 @@ public:
                 uint32_t rtnLinkCarrierCount,
                 uint32_t fwdLinkCarrierCount,
                 Ptr<SatSuperframeSeq> seq,
+                SatMac::ReadCtrlMsgCallback fwdReadCb,
+                SatMac::ReadCtrlMsgCallback rtnReadCb,
                 RandomAccessSettings_s randomAccessSettings);
 
   virtual ~SatGeoHelper ()
   {
   }
+
+  /*
+   * Initializes the GEO helper based on attributes.
+   * Link results are used only if satellite is regenerative.
+   * \param lrFwd DVB-S2 or DVB-S2X link results
+   * \param lrRcs2 return link results
+   */
+  void Initialize (Ptr<SatLinkResultsFwd> lrFwd, Ptr<SatLinkResultsRtn> lrRcs2);
 
   /**
    * Set an attribute value to be propagated to each NetDevice created by the
@@ -156,7 +171,11 @@ public:
    * \param uf user return channel
    * \param userAgp user beam antenna gain pattern
    * \param feederAgp feeder beam antenna gain pattern
-   * \param beamId Id of the beam
+   * \param satId ID of satellite associated to this channel
+   * \param gwId ID of GW associated to this channel
+   * \param userBeamId Id of the beam
+   * \param forwardLinkRegenerationMode Regeneration mode on forward
+   * \param returnLinkRegenerationMode Regeneration mode on return
    */
   void AttachChannels ( Ptr<NetDevice> dev,
                         Ptr<SatChannel> ff,
@@ -165,7 +184,53 @@ public:
                         Ptr<SatChannel> ur,
                         Ptr<SatAntennaGainPattern> userAgp,
                         Ptr<SatAntennaGainPattern> feederAgp,
-                        uint32_t userBeamId);
+                        uint32_t satId,
+                        uint32_t gwId,
+                        uint32_t userBeamId,
+                        SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                        SatEnums::RegenerationMode_t returnLinkRegenerationMode);
+
+  /*
+   * Attach the SatChannels for the beam to NetDevice
+   * \param dev NetDevice to attach channels
+   * \param fr feeder forward channel
+   * \param fr feeder return channel
+   * \param feederAgp feeder beam antenna gain pattern
+   * \param satId ID of satellite associated to this channel
+   * \param gwId ID of GW associated to this channel
+   * \param userBeamId Id of the beam
+   * \param forwardLinkRegenerationMode Regeneration mode on forward
+   * \param returnLinkRegenerationMode Regeneration mode on return
+   */
+  void AttachChannelsFeeder ( Ptr<SatGeoNetDevice> dev,
+                              Ptr<SatChannel> ff,
+                              Ptr<SatChannel> fr,
+                              Ptr<SatAntennaGainPattern> feederAgp,
+                              uint32_t satId,
+                              uint32_t gwId,
+                              uint32_t userBeamId,
+                              SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                              SatEnums::RegenerationMode_t returnLinkRegenerationMode);
+
+  /*
+   * Attach the SatChannels for the beam to NetDevice
+   * \param dev NetDevice to attach channels
+   * \param uf user forward channel
+   * \param uf user return channel
+   * \param userAgp user beam antenna gain pattern
+   * \param satId ID of satellite associated to this channel
+   * \param userBeamId Id of the beam
+   * \param forwardLinkRegenerationMode Regeneration mode on forward
+   * \param returnLinkRegenerationMode Regeneration mode on return
+   */
+  void AttachChannelsUser ( Ptr<SatGeoNetDevice> dev,
+                            Ptr<SatChannel> uf,
+                            Ptr<SatChannel> ur,
+                            Ptr<SatAntennaGainPattern> userAgp,
+                            uint32_t satId,
+                            uint32_t userBeamId,
+                            SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                            SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   /**
    * Enables creation traces to be written in given file
@@ -174,19 +239,27 @@ public:
    */
   void EnableCreationTraces (Ptr<OutputStreamWrapper> stream, CallbackBase &cb);
 
+  /**
+   * Set ISL routes
+   *
+   * \param List of all satellite nodes
+   * \param isls List of all ISLs
+   */
+  void SetIslRoutes (NodeContainer geoNodes, std::vector <std::pair <uint32_t, uint32_t>> isls);
+
 
 private:
   /**
-   * GEO satellite node id
+   * GEO satellites node id
    */
-  uint32_t m_nodeId;
+  std::vector<uint32_t> m_nodeIds;
 
   SatTypedefs::CarrierBandwidthConverter_t m_carrierBandwidthConverter;
   uint32_t m_fwdLinkCarrierCount;
   uint32_t m_rtnLinkCarrierCount;
 
-  // count for devices. Currently only one device supported by helper.
-  uint16_t m_deviceCount;
+  // count for devices for each node ID. Currently only one device supported by helper.
+  std::map<uint32_t, uint16_t> m_deviceCount;
 
   ObjectFactory m_deviceFactory;
 
@@ -199,6 +272,34 @@ private:
    * Configured return link interference model for dedicated access
    */
   SatPhy::InterferenceModel m_daRtnLinkInterferenceModel;
+
+  /*
+   * Configured error model for the forward feeder link. Set as an attribute.
+   */
+  SatPhy::ErrorModel m_fwdErrorModel;
+
+  /*
+   * Constant error rate for dedicated access in the FWD feeder link.
+   */
+  double m_fwdDaConstantErrorRate;
+
+  /*
+   * Configured error model for the return user link. Set as an attribute.
+   */
+  SatPhy::ErrorModel m_rtnErrorModel;
+
+  /*
+   * Constant error rate for dedicated access in the RTN user link.
+   */
+  double m_rtnDaConstantErrorRate;
+
+  double m_symbolRateRtn;
+
+  Ptr<SatBbFrameConf> m_bbFrameConfRtn;
+
+  double m_symbolRateFwd;
+
+  Ptr<SatBbFrameConf> m_bbFrameConfFwd;
 
   /**
    * \brief Trace callback for creation traces
@@ -214,6 +315,38 @@ private:
    * \brief The used random access model settings
    */
   RandomAccessSettings_s m_raSettings;
+
+  /**
+   * Forward channel link results (DVB-S2) are created if ErrorModel
+   * is configured to be AVI.
+   */
+  Ptr<SatLinkResults> m_fwdLinkResults;
+
+  /**
+   * Return channel link results (DVB-RCS2) are created if ErrorModel
+   * is configured to be AVI.
+   */
+  Ptr<SatLinkResults> m_rtnLinkResults;
+
+  /**
+   * Map used in regenerative mode to store if MAC already created for a given pair SAT ID / GW ID
+   */
+  std::map<std::pair<uint32_t, uint32_t>, Ptr<SatGeoFeederMac>> m_gwMacMap;
+
+  /**
+   * Arbiter in use to route packets on ISLs
+   */
+  SatEnums::IslArbiterType_t m_islArbiterType;
+
+  /**
+   * Control forward link messages callback
+   */
+  SatMac::ReadCtrlMsgCallback m_fwdReadCtrlCb;
+
+  /**
+   * Control return link messages callback
+   */
+  SatMac::ReadCtrlMsgCallback m_rtnReadCtrlCb;
 };
 
 } // namespace ns3

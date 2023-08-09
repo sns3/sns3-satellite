@@ -214,7 +214,7 @@ void SatRtnArqTestCase::Initialize ()
   Config::SetDefault ("ns3::SatReturnLinkEncapsulatorArq::RxWaitingTime", TimeValue (Seconds (2.3)));
 
   Ptr<SatQueue> queue = CreateObject<SatQueue> (m_rcIndex);
-  m_rle = CreateObject<SatReturnLinkEncapsulatorArq> (m_source, m_dest, m_rcIndex);
+  m_rle = CreateObject<SatReturnLinkEncapsulatorArq> (m_source, m_dest, m_source, m_dest, m_rcIndex);
   m_rle->SetQueue (queue);
 
   // Create a receive callback to Receive method of this class.
@@ -505,7 +505,7 @@ SatFwdArqTestCase::Initialize ()
   Config::SetDefault ("ns3::SatGenericStreamEncapsulatorArq::RxWaitingTime", TimeValue (Seconds (2.3)));
 
   Ptr<SatQueue> queue = CreateObject<SatQueue> (m_flowIndex);
-  m_gse = CreateObject<SatGenericStreamEncapsulatorArq> (m_source, m_dest, m_flowIndex);
+  m_gse = CreateObject<SatGenericStreamEncapsulatorArq> (m_source, m_dest, m_source, m_dest, m_flowIndex);
   m_gse->SetQueue (queue);
 
   // Create a receive callback to Receive method of this class.

@@ -20,10 +20,13 @@
  * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "ns3/lorawan-mac-command.h"
-#include "ns3/log.h"
 #include <bitset>
 #include <cmath>
+
+#include <ns3/log.h>
+
+#include "lorawan-mac-command.h"
+
 
 namespace ns3 {
 

@@ -29,19 +29,20 @@
 #include <ns3/packet.h>
 #include <ns3/singleton.h>
 
-#include <ns3/satellite-utils.h>
-#include <ns3/satellite-tbtp-container.h>
-#include <ns3/satellite-rtn-link-time.h>
-#include <ns3/satellite-wave-form-conf.h>
-#include <ns3/satellite-crdsa-replica-tag.h>
-#include <ns3/satellite-superframe-sequence.h>
-#include <ns3/satellite-control-message.h>
-#include <ns3/satellite-frame-conf.h>
-#include <ns3/satellite-node-info.h>
-#include <ns3/satellite-const-variables.h>
-#include <ns3/satellite-log.h>
-#include <ns3/satellite-encap-pdu-status-tag.h>
+#include "satellite-utils.h"
+#include "satellite-tbtp-container.h"
+#include "satellite-rtn-link-time.h"
+#include "satellite-wave-form-conf.h"
+#include "satellite-crdsa-replica-tag.h"
+#include "satellite-superframe-sequence.h"
+#include "satellite-control-message.h"
+#include "satellite-frame-conf.h"
+#include "satellite-node-info.h"
+#include "satellite-const-variables.h"
+#include "satellite-log.h"
+#include "satellite-encap-pdu-status-tag.h"
 #include "satellite-ut-mac.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatUtMac");
 
@@ -107,8 +108,10 @@ SatUtMac::GetInstanceTypeId (void) const
 
 SatUtMac::SatUtMac ()
   : SatMac (),
+  m_satId (0),
+  m_beamId (),
   m_superframeSeq (),
-  m_timingAdvanceCb (0),
+  m_timingAdvanceCb (),
   m_randomAccess (NULL),
   m_guardTime (MicroSeconds (1)),
   m_raChannel (0),
@@ -134,15 +137,15 @@ SatUtMac::SatUtMac ()
   m_handoverMessagesCount (0),
   m_maxHandoverMessagesSent (20),
   m_firstTransmittableSuperframeId (0),
-  m_handoverCallback (0),
-  m_gatewayUpdateCallback (0),
-  m_beamCheckerCallback (0),
-  m_askedBeamCallback (0),
-  m_txCheckCallback (0),
-  m_sliceSubscriptionCallback (0),
-  m_sendLogonCallback (0),
-  m_updateGwAddressCallback (0),
-  m_beamScheculerCallback (0)
+  m_handoverCallback (),
+  m_gatewayUpdateCallback (),
+  m_beamCheckerCallback (),
+  m_askedBeamCallback (),
+  m_txCheckCallback (),
+  m_sliceSubscriptionCallback (),
+  m_sendLogonCallback (),
+  m_updateGwAddressCallback (),
+  m_beamScheculerCallback ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -150,10 +153,17 @@ SatUtMac::SatUtMac ()
   NS_FATAL_ERROR ("SatUtMac::SatUtMac - Constructor not in use");
 }
 
-SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, bool crdsaOnlyForControl)
-  : SatMac (beamId),
+SatUtMac::SatUtMac (uint32_t satId,
+                    uint32_t beamId,
+                    Ptr<SatSuperframeSeq> seq,
+                    SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                    SatEnums::RegenerationMode_t returnLinkRegenerationMode,
+                    bool crdsaOnlyForControl)
+  : SatMac (satId, beamId, forwardLinkRegenerationMode, returnLinkRegenerationMode),
+  m_satId (satId),
+  m_beamId (beamId),
   m_superframeSeq (seq),
-  m_timingAdvanceCb (0),
+  m_timingAdvanceCb (),
   m_guardTime (MicroSeconds (1)),
   m_raChannel (0),
   m_logonChannel (0),
@@ -178,15 +188,15 @@ SatUtMac::SatUtMac (Ptr<SatSuperframeSeq> seq, uint32_t beamId, bool crdsaOnlyFo
   m_handoverMessagesCount (0),
   m_maxHandoverMessagesSent (20),
   m_firstTransmittableSuperframeId (0),
-  m_handoverCallback (0),
-  m_gatewayUpdateCallback (0),
-  m_beamCheckerCallback (0),
-  m_askedBeamCallback (0),
-  m_txCheckCallback (0),
-  m_sliceSubscriptionCallback (0),
-  m_sendLogonCallback (0),
-  m_updateGwAddressCallback (0),
-  m_beamScheculerCallback (0)
+  m_handoverCallback (),
+  m_gatewayUpdateCallback (),
+  m_beamCheckerCallback (),
+  m_askedBeamCallback (),
+  m_txCheckCallback (),
+  m_sliceSubscriptionCallback (),
+  m_sendLogonCallback (),
+  m_updateGwAddressCallback (),
+  m_beamScheculerCallback ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -291,6 +301,21 @@ SatUtMac::SetBeamScheculerCallback (SatUtMac::BeamScheculerCallback cb)
   NS_LOG_FUNCTION (this << &cb);
 
   m_beamScheculerCallback = cb;
+}
+
+void
+SatUtMac::SetSatelliteAddress (Address satelliteAddress)
+{
+  m_satelliteAddress = satelliteAddress;
+  m_isRegenerative = true;
+}
+
+Mac48Address
+SatUtMac::GetGwAddress ()
+{
+  NS_LOG_FUNCTION (this);
+
+  return m_gwAddress;
 }
 
 void
@@ -546,6 +571,7 @@ SatUtMac::ScheduleDaTxOpportunity (Time transmitDelay, Time duration, Ptr<SatWav
                ", carrier: " << carrierId);
 
   transmitDelay = GetRealSendingTime (transmitDelay);
+
   if (transmitDelay >= Seconds (0))
     {
       Simulator::Schedule (transmitDelay, &SatUtMac::DoTransmit, this, duration, carrierId, wf, tsConf, SatUtScheduler::LOOSE);
@@ -570,7 +596,6 @@ SatUtMac::DoTransmit (Time duration, uint32_t carrierId, Ptr<SatWaveform> wf, Pt
       return;
     }
 
-
   SatPhy::PacketContainer_t packets = FetchPackets (wf->GetPayloadInBytes (), tsConf->GetSlotType (), tsConf->GetRcIndex (), policy);
 
   if (wf == m_superframeSeq->GetWaveformConf ()->GetWaveform (2))
@@ -586,9 +611,22 @@ SatUtMac::DoTransmit (Time duration, uint32_t carrierId, Ptr<SatWaveform> wf, Pt
 
           // Add MAC tag to identify the packet in lower layers
           SatMacTag mTag;
-          mTag.SetDestAddress (m_gwAddress);
+          if (m_returnLinkRegenerationMode == SatEnums::REGENERATION_LINK || m_returnLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
+            {
+              mTag.SetDestAddress (Mac48Address::ConvertFrom (m_satelliteAddress));
+            }
+          else
+            {
+              mTag.SetDestAddress (m_gwAddress);
+            }
           mTag.SetSourceAddress (m_nodeInfo->GetMacAddress ());
           p->AddPacketTag (mTag);
+
+          // Add MAC tag to identify the packet in lower layers
+          SatAddressE2ETag addressE2ETag;
+          addressE2ETag.SetE2EDestAddress (m_gwAddress);
+          addressE2ETag.SetE2ESourceAddress (m_nodeInfo->GetMacAddress ());
+          p->AddPacketTag (addressE2ETag);
 
           packets.push_back (p);
         }
@@ -790,6 +828,7 @@ SatUtMac::TransmitPackets (SatPhy::PacketContainer_t packets, Time duration, uin
       m_rcstState.SwitchToTdmaSync ();
     }
 
+
   // If there are packets to send
   if (!packets.empty ())
     {
@@ -921,10 +960,16 @@ SatUtMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
       // Remove packet tag
       SatMacTag macTag;
       bool mSuccess = (*i)->PeekPacketTag (macTag);
-
       if (!mSuccess)
         {
           NS_FATAL_ERROR ("MAC tag was not found from the packet!");
+        }
+
+      SatAddressE2ETag addressE2ETag;
+      mSuccess = (*i)->PeekPacketTag (addressE2ETag);
+      if (!mSuccess)
+        {
+          NS_FATAL_ERROR ("SatAddressE2ETag was not found from the packet!");
         }
 
       NS_LOG_INFO ("Packet from " << macTag.GetSourceAddress () << " to " << macTag.GetDestAddress ());
@@ -959,7 +1004,7 @@ SatUtMac::Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /
           else
             {
               // Pass the receiver address to LLC
-              m_rxCallback (*i, macTag.GetSourceAddress (), destAddress);
+              m_rxCallback (*i, addressE2ETag.GetE2ESourceAddress (), addressE2ETag.GetE2EDestAddress ());
             }
         }
     }
@@ -973,6 +1018,9 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
   // Remove the mac tag
   SatMacTag macTag;
   packet->PeekPacketTag (macTag);
+
+  SatAddressE2ETag addressE2ETag;
+  packet->PeekPacketTag (addressE2ETag);
 
   // Peek control msg tag
   SatControlMsgTag ctrlTag;
@@ -1009,6 +1057,7 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
         ScheduleTimeSlots (tbtp);
 
         packet->RemovePacketTag (macTag);
+        packet->RemovePacketTag (addressE2ETag);
         packet->RemovePacketTag (ctrlTag);
 
         break;
@@ -1016,7 +1065,7 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
     case SatControlMsgTag::SAT_ARQ_ACK:
       {
         // ARQ ACK messages are forwarded to LLC, since they may be fragmented
-        m_rxCallback (packet, macTag.GetSourceAddress (), macTag.GetDestAddress ());
+        m_rxCallback (packet, addressE2ETag.GetE2ESourceAddress (), macTag.GetDestAddress ());
         break;
       }
     case SatControlMsgTag::SAT_RA_CTRL_MSG:
@@ -1038,6 +1087,7 @@ SatUtMac::ReceiveSignalingPacket (Ptr<Packet> packet)
             m_randomAccess->SetBackoffTime (allocationChannelId, backoffTime);
 
             packet->RemovePacketTag (macTag);
+            packet->RemovePacketTag (addressE2ETag);
             packet->RemovePacketTag (ctrlTag);
           }
         else
@@ -1785,7 +1835,7 @@ SatUtMac::DoFrameStart ()
       if (m_loggedOn && !m_beamCheckerCallback.IsNull ())
         {
           NS_LOG_INFO ("UT checking for beam handover recommendation");
-          if (m_beamCheckerCallback (m_beamId))
+          if (m_beamCheckerCallback (m_satId, m_beamId))
             {
               if (m_handoverState == NO_HANDOVER)
                 {
@@ -1803,7 +1853,7 @@ SatUtMac::DoFrameStart ()
 
                   m_beamId = m_askedBeamCallback ();
 
-                  Address gwAddress = m_beamScheculerCallback (m_beamId)->GetGwAddress ();
+                  Address gwAddress = m_beamScheculerCallback (m_satId, m_beamId)->GetGwAddress ();
                   Mac48Address gwAddress48 = Mac48Address::ConvertFrom (gwAddress);
                   if (gwAddress48 != m_gwAddress)
                     {

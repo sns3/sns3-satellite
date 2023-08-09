@@ -64,8 +64,7 @@ main (int argc, char *argv[])
 
 
   // Find the input xml file in case example is run from other than ns-3 root directory
-  Singleton<SatEnvVariables> satEnvVariables;
-  std::string pathToFile = satEnvVariables.Get ()->LocateFile ("contrib/satellite/examples/tn9-dama-input-attributes.xml");
+  std::string pathToFile = Singleton<SatEnvVariables>::Get ()->LocateFile ("contrib/satellite/examples/tn9-dama-input-attributes.xml");
 
   // read command line parameters given by user
   CommandLine cmd;
@@ -138,11 +137,11 @@ main (int argc, char *argv[])
   Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer ();
 
   s->AddGlobalRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddGlobalRtnMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddGlobalRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddAverageUtUserRtnAppThroughput (SatStatsHelper::OUTPUT_CDF_FILE);
   s->AddGlobalRtnAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
   s->AddGlobalRtnCompositeSinr (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  s->AddGlobalRtnDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+  s->AddGlobalRtnFeederDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddGlobalFrameSymbolLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
   s->AddGlobalWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
 

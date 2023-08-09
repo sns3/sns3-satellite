@@ -27,18 +27,19 @@
 #include <ns3/node.h>
 
 #include "satellite-phy.h"
-#include <ns3/satellite-utils.h>
-#include <ns3/satellite-phy-rx.h>
-#include <ns3/satellite-phy-tx.h>
-#include <ns3/satellite-lora-phy-rx.h>
-#include <ns3/satellite-channel.h>
-#include <ns3/satellite-mac.h>
-#include <ns3/satellite-signal-parameters.h>
-#include <ns3/satellite-node-info.h>
-#include <ns3/satellite-enums.h>
-#include <ns3/satellite-address-tag.h>
-#include <ns3/satellite-time-tag.h>
-#include <ns3/satellite-typedefs.h>
+#include "satellite-utils.h"
+#include "satellite-phy-rx.h"
+#include "satellite-phy-tx.h"
+#include "satellite-lora-phy-rx.h"
+#include "satellite-channel.h"
+#include "satellite-mac.h"
+#include "satellite-signal-parameters.h"
+#include "satellite-node-info.h"
+#include "satellite-enums.h"
+#include "satellite-address-tag.h"
+#include "satellite-mac-tag.h"
+#include "satellite-time-tag.h"
+#include "satellite-typedefs.h"
 
 
 NS_LOG_COMPONENT_DEFINE ("SatPhy");
@@ -48,9 +49,12 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SatPhy);
 
 SatPhy::SatPhy (void)
-  : m_beamId (0),
+  : m_satId (0),
+  m_beamId (0),
   m_eirpWoGainW (0),
   m_isStatisticsTagsEnabled (false),
+  m_lastDelay (0),
+  m_lastLinkDelay (0),
   m_rxNoiseTemperatureDbk (0),
   m_rxMaxAntennaGainDb (0),
   m_rxAntennaLossDb (0),
@@ -60,17 +64,19 @@ SatPhy::SatPhy (void)
   m_txPointingLossDb (0),
   m_txOboLossDb (0),
   m_txAntennaLossDb (0),
-  m_defaultFadingValue (1.0),
-  m_lastDelay (0)
+  m_defaultFadingValue (1.0)
 {
   NS_LOG_FUNCTION (this);
   NS_FATAL_ERROR ("SatPhy default constructor is not allowed to use");
 }
 
 SatPhy::SatPhy (CreateParam_t & params)
-  : m_beamId (0),
+  : m_satId (0),
+  m_beamId (0),
   m_eirpWoGainW (0),
   m_isStatisticsTagsEnabled (false),
+  m_lastDelay (0),
+  m_lastLinkDelay (0),
   m_rxNoiseTemperatureDbk (0),
   m_rxMaxAntennaGainDb (0),
   m_rxAntennaLossDb (0),
@@ -80,10 +86,9 @@ SatPhy::SatPhy (CreateParam_t & params)
   m_txPointingLossDb (0),
   m_txOboLossDb (0),
   m_txAntennaLossDb (0),
-  m_defaultFadingValue (1.0),
-  m_lastDelay (0)
+  m_defaultFadingValue (1.0)
 {
-  NS_LOG_FUNCTION (this << params.m_beamId);
+  NS_LOG_FUNCTION (this << params.m_satId << params.m_beamId);
   ObjectBase::ConstructSelf (AttributeConstructionList ());
 
   Ptr<MobilityModel> mobility = params.m_device->GetNode ()->GetObject<MobilityModel> ();
@@ -115,6 +120,7 @@ SatPhy::SatPhy (CreateParam_t & params)
     }
 
   m_phyTx->SetChannel (params.m_txCh);
+  m_satId = params.m_satId;
   m_beamId = params.m_beamId;
 
   params.m_rxCh->AddRx (m_phyRx);
@@ -157,10 +163,22 @@ SatPhy::GetTypeId (void)
                      "A packet is received with delay information",
                      MakeTraceSourceAccessor (&SatPhy::m_rxDelayTrace),
                      "ns3::SatTypedefs::PacketDelayAddressCallback")
+    .AddTraceSource ("RxLinkDelay",
+                     "A packet is received with link delay information",
+                     MakeTraceSourceAccessor (&SatPhy::m_rxLinkDelayTrace),
+                     "ns3::SatTypedefs::PacketDelayAddressCallback")
     .AddTraceSource ("RxJitter",
                      "A packet is received with jitter information",
                      MakeTraceSourceAccessor (&SatPhy::m_rxJitterTrace),
                      "ns3::SatTypedefs::PacketJitterAddressCallback")
+    .AddTraceSource ("RxLinkJitter",
+                     "A packet is received with link jitter information",
+                     MakeTraceSourceAccessor (&SatPhy::m_rxLinkJitterTrace),
+                     "ns3::SatTypedefs::PacketJitterAddressCallback")
+    .AddTraceSource ("RxLinkModcod",
+                     "A packet is received with link MODCOD information",
+                     MakeTraceSourceAccessor (&SatPhy::m_rxLinkModcodTrace),
+                     "ns3::SatTypedefs::PacketModcodAddressCallback")
   ;
   return tid;
 }
@@ -188,6 +206,9 @@ SatPhy::Initialize ()
   double eirpWoGainDbw = m_txMaxPowerDbw - m_txOutputLossDb - m_txPointingLossDb - m_txOboLossDb - m_txAntennaLossDb;
 
   m_eirpWoGainW = SatUtils::DbWToW ( eirpWoGainDbw );
+
+  m_phyTx->SetSatId (m_satId);
+  m_phyRx->SetSatId (m_satId);
 
   m_phyTx->SetBeamId (m_beamId);
   m_phyRx->SetBeamId (m_beamId);
@@ -230,18 +251,38 @@ SatPhy::DoDispose ()
   Object::DoDispose ();
 }
 
-void
-SatPhy::SetTxAntennaGainPattern (Ptr<SatAntennaGainPattern> agp)
+double
+SatPhy::CalculateSinr (double sinr, double otherInterference)
 {
-  NS_LOG_FUNCTION (this);
-  m_phyTx->SetAntennaGainPattern (agp);
+  NS_LOG_FUNCTION (this << sinr << otherInterference);
+
+  if ( sinr <= 0  )
+    {
+      NS_FATAL_ERROR ( "Calculated own SINR is expected to be greater than zero!!!");
+    }
+
+  if ( otherInterference <= 0  )
+    {
+      NS_FATAL_ERROR ( "Interference is expected to be greater than zero!!!");
+    }
+
+  double finalSinr = 1 / ( (1 / sinr) + (1 / otherInterference) );
+
+  return finalSinr;
 }
 
 void
-SatPhy::SetRxAntennaGainPattern (Ptr<SatAntennaGainPattern> agp)
+SatPhy::SetTxAntennaGainPattern (Ptr<SatAntennaGainPattern> agp, Ptr<SatMobilityModel> satelliteMobility)
 {
   NS_LOG_FUNCTION (this);
-  m_phyRx->SetAntennaGainPattern (agp);
+  m_phyTx->SetAntennaGainPattern (agp, satelliteMobility);
+}
+
+void
+SatPhy::SetRxAntennaGainPattern (Ptr<SatAntennaGainPattern> agp, Ptr<SatMobilityModel> satelliteMobility)
+{
+  NS_LOG_FUNCTION (this);
+  m_phyRx->SetAntennaGainPattern (agp, satelliteMobility);
 }
 
 void
@@ -326,17 +367,10 @@ SatPhy::SendPdu (PacketContainer_t p, uint32_t carrierId, Time duration, SatSign
   NS_LOG_INFO ("Sending a packet with carrierId: " << carrierId << " duration: " << duration);
 
   // Add a SatPhyTimeTag tag for packet delay computation at the receiver end.
-  if (m_isStatisticsTagsEnabled)
-    {
-      for (PacketContainer_t::const_iterator it = p.begin (); it != p.end (); ++it)
-        {
-          (*it)->AddPacketTag (SatPhyTimeTag (Simulator::Now ()));
-        }
-    }
+  SetTimeTag (p);
 
   // Add packet trace entry:
-  SatEnums::SatLinkDir_t ld =
-    (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_RETURN : SatEnums::LD_FORWARD;
+  SatEnums::SatLinkDir_t ld = GetSatLinkTxDir ();
 
   m_packetTrace (Simulator::Now (),
                  SatEnums::PACKET_SENT,
@@ -352,6 +386,7 @@ SatPhy::SendPdu (PacketContainer_t p, uint32_t carrierId, Time duration, SatSign
   txParams->m_duration = duration;
   txParams->m_phyTx = m_phyTx;
   txParams->m_packetsInBurst = p;
+  txParams->m_satId = m_satId;
   txParams->m_beamId = m_beamId;
   txParams->m_carrierId = carrierId;
   txParams->m_txPower_W = m_eirpWoGainW;
@@ -379,6 +414,15 @@ SatPhy::SendPduWithParams (Ptr<SatSignalParameters> txParams )
 }
 
 void
+SatPhy::SetSatId (uint32_t satId)
+{
+  NS_LOG_FUNCTION (this << satId);
+  m_satId = satId;
+  m_phyTx->SetSatId (satId);
+  m_phyRx->SetSatId (satId);
+}
+
+void
 SatPhy::SetBeamId (uint32_t beamId)
 {
   NS_LOG_FUNCTION (this << beamId);
@@ -388,13 +432,155 @@ SatPhy::SetBeamId (uint32_t beamId)
 }
 
 void
+SatPhy::SetTimeTag (SatPhy::PacketContainer_t packets)
+{
+  if (m_isStatisticsTagsEnabled)
+    {
+      for (PacketContainer_t::const_iterator it = packets.begin (); it != packets.end (); ++it)
+        {
+          SatPhyTimeTag timeTag;
+          if (!(*it)->PeekPacketTag (timeTag))
+            {
+              (*it)->AddPacketTag (SatPhyTimeTag (Simulator::Now ()));
+            }
+
+          (*it)->AddPacketTag (SatPhyLinkTimeTag (Simulator::Now ()));
+        }
+    }
+}
+
+SatEnums::SatLinkDir_t
+SatPhy::GetSatLinkTxDir ()
+{
+  return SatEnums::LD_UNDEFINED;
+}
+
+SatEnums::SatLinkDir_t
+SatPhy::GetSatLinkRxDir ()
+{
+  return SatEnums::LD_UNDEFINED;
+}
+
+void
+SatPhy::RxTraces (SatPhy::PacketContainer_t packets)
+{
+  NS_LOG_FUNCTION (this);
+
+  if (m_isStatisticsTagsEnabled)
+    {
+      SatSignalParameters::PacketsInBurst_t::iterator it1;
+      for (it1 = packets.begin ();
+           it1 != packets.end (); ++it1)
+        {
+          Address addr; // invalid address.
+          bool isTaggedWithAddress = false;
+          ByteTagIterator it2 = (*it1)->GetByteTagIterator ();
+
+          while (!isTaggedWithAddress && it2.HasNext ())
+            {
+              ByteTagIterator::Item item = it2.Next ();
+
+              if (item.GetTypeId () == SatAddressTag::GetTypeId ())
+                {
+                  NS_LOG_DEBUG (this << " contains a SatAddressTag tag:"
+                                     << " start=" << item.GetStart ()
+                                     << " end=" << item.GetEnd ());
+                  SatAddressTag addrTag;
+                  item.GetTag (addrTag);
+                  addr = addrTag.GetSourceAddress ();
+                  isTaggedWithAddress = true; // this will exit the while loop.
+                }
+            }
+
+          m_rxTrace (*it1, addr);
+
+          SatPhyLinkTimeTag linkTimeTag;
+          if ((*it1)->RemovePacketTag (linkTimeTag))
+            {
+              NS_LOG_DEBUG (this << " contains a SatPhyLinkTimeTag tag");
+              Time delay = Simulator::Now () - linkTimeTag.GetSenderLinkTimestamp ();
+              m_rxLinkDelayTrace (delay, addr);
+              if (m_lastLinkDelay.IsZero() == false)
+                {
+                  Time jitter = Abs (delay - m_lastLinkDelay);
+                  m_rxLinkJitterTrace (jitter, addr);
+                }
+              m_lastLinkDelay = delay;
+            }
+
+          SatPhyTimeTag timeTag;
+          if ((*it1)->RemovePacketTag (timeTag))
+            {
+              NS_LOG_DEBUG (this << " contains a SatPhyTimeTag tag");
+              Time delay = Simulator::Now () - timeTag.GetSenderTimestamp ();
+              m_rxDelayTrace (delay, addr);
+              if (m_lastDelay.IsZero() == false)
+                {
+                  Time jitter = Abs (delay - m_lastDelay);
+                  m_rxJitterTrace (jitter, addr);
+                }
+              m_lastDelay = delay;
+            }
+
+        } // end of `for (it1 = rxParams->m_packetsInBurst)`
+
+    } // end of `if (m_isStatisticsTagsEnabled)`
+}
+
+void
+SatPhy::ModcodTrace (Ptr<SatSignalParameters> rxParams)
+{
+  NS_LOG_FUNCTION (this);
+
+  Address addr;
+  SatAddressE2ETag satAddressE2ETag;
+  if (m_isStatisticsTagsEnabled)
+    {
+      switch (GetSatLinkRxDir ())
+        {
+          case SatEnums::LD_RETURN:
+            {
+              SatSignalParameters::PacketsInBurst_t::iterator it1;
+              for (it1 = rxParams->m_packetsInBurst.begin ();
+                   it1 != rxParams->m_packetsInBurst.end (); ++it1)
+                {
+                  if (!(*it1)->PeekPacketTag (satAddressE2ETag))
+                    {
+                      NS_FATAL_ERROR ("SatUplinkInfoTag not found");
+                    }
+                  addr = satAddressE2ETag.GetE2ESourceAddress ();
+                  m_rxLinkModcodTrace (rxParams->m_txInfo.modCod, addr);
+                }
+              break;
+            }
+          case SatEnums::LD_FORWARD:
+            {
+              SatSignalParameters::PacketsInBurst_t::iterator it1;
+              for (it1 = rxParams->m_packetsInBurst.begin ();
+                   it1 != rxParams->m_packetsInBurst.end (); ++it1)
+                {
+                  if (!(*it1)->PeekPacketTag (satAddressE2ETag))
+                    {
+                      NS_FATAL_ERROR ("SatUplinkInfoTag not found");
+                    }
+                  addr = satAddressE2ETag.GetE2EDestAddress ();
+                  m_rxLinkModcodTrace (rxParams->m_txInfo.modCod, addr);
+                }
+              break;
+            }
+          default:
+            NS_FATAL_ERROR ("Incorrect satellite RX link direction");
+        }
+    }
+}
+
+void
 SatPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
 {
   NS_LOG_FUNCTION (this << rxParams << phyError);
 
   // Add packet trace entry:
-  SatEnums::SatLinkDir_t ld =
-    (m_nodeInfo->GetNodeType () == SatEnums::NT_UT) ? SatEnums::LD_FORWARD : SatEnums::LD_RETURN;
+  SatEnums::SatLinkDir_t ld = GetSatLinkRxDir ();
 
   SatEnums::SatPacketEvent_t event = (phyError) ? SatEnums::PACKET_DROP : SatEnums::PACKET_RECV;
 
@@ -416,51 +602,9 @@ SatPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
   else
     {
       // Invoke the `Rx` and `RxDelay` trace sources.
-      if (m_isStatisticsTagsEnabled)
-        {
-          SatSignalParameters::PacketsInBurst_t::iterator it1;
-          for (it1 = rxParams->m_packetsInBurst.begin ();
-               it1 != rxParams->m_packetsInBurst.end (); ++it1)
-            {
-              Address addr; // invalid address.
-              bool isTaggedWithAddress = false;
-              ByteTagIterator it2 = (*it1)->GetByteTagIterator ();
+      RxTraces (rxParams->m_packetsInBurst);
 
-              while (!isTaggedWithAddress && it2.HasNext ())
-                {
-                  ByteTagIterator::Item item = it2.Next ();
-
-                  if (item.GetTypeId () == SatAddressTag::GetTypeId ())
-                    {
-                      NS_LOG_DEBUG (this << " contains a SatAddressTag tag:"
-                                         << " start=" << item.GetStart ()
-                                         << " end=" << item.GetEnd ());
-                      SatAddressTag addrTag;
-                      item.GetTag (addrTag);
-                      addr = addrTag.GetSourceAddress ();
-                      isTaggedWithAddress = true; // this will exit the while loop.
-                    }
-                }
-
-              m_rxTrace (*it1, addr);
-
-              SatPhyTimeTag timeTag;
-              if ((*it1)->RemovePacketTag (timeTag))
-                {
-                  NS_LOG_DEBUG (this << " contains a SatMacTimeTag tag");
-                  Time delay = Simulator::Now () - timeTag.GetSenderTimestamp ();
-                  m_rxDelayTrace (delay, addr);
-                  if (m_lastDelay.IsZero() == false)
-                    {
-                      Time jitter = Abs (delay - m_lastDelay);
-                      m_rxJitterTrace (jitter, addr);
-                    }
-                  m_lastDelay = delay;
-                }
-
-            } // end of `for (it1 = rxParams->m_packetsInBurst)`
-
-        } // end of `if (m_isStatisticsTagsEnabled)`
+      ModcodTrace (rxParams);
 
       // Pass the packet to the upper layer.
       m_rxCallback (rxParams->m_packetsInBurst, rxParams);
@@ -470,17 +614,17 @@ SatPhy::Receive (Ptr<SatSignalParameters> rxParams, bool phyError)
 }
 
 void
-SatPhy::CnoInfo (uint32_t beamId, Address source, Address dest, double cno)
+SatPhy::CnoInfo (uint32_t satId, uint32_t beamId, Address source, Address dest, double cno, bool isSatelliteMac)
 {
-  NS_LOG_FUNCTION (this << beamId << source << cno);
-  m_cnoCallback ( beamId, source, dest, cno);
+  NS_LOG_FUNCTION (this << beamId << source << cno << isSatelliteMac);
+  m_cnoCallback ( satId, beamId, source, dest, cno, isSatelliteMac);
 }
 
 void
-SatPhy::AverageNormalizedOfferedRandomAccessLoadInfo (uint32_t beamId, uint32_t carrierId, uint8_t allocationChannelId, double averageNormalizedOfferedLoad)
+SatPhy::AverageNormalizedOfferedRandomAccessLoadInfo (uint32_t satId, uint32_t beamId, uint32_t carrierId, uint8_t allocationChannelId, double averageNormalizedOfferedLoad)
 {
-  NS_LOG_FUNCTION (this << beamId << carrierId << allocationChannelId << averageNormalizedOfferedLoad);
-  m_avgNormalizedOfferedLoadCallback (beamId, carrierId, allocationChannelId, averageNormalizedOfferedLoad);
+  NS_LOG_FUNCTION (this << satId << beamId << carrierId << allocationChannelId << averageNormalizedOfferedLoad);
+  m_avgNormalizedOfferedLoadCallback (satId, beamId, carrierId, allocationChannelId, averageNormalizedOfferedLoad);
 }
 
 

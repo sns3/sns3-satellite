@@ -127,9 +127,9 @@ public:
 
   /**
    * \brief Get the position of nodes to add to the scenario
-   * \return The map beamId/positions associated
+   * \return The vector of points and group IDs
    */
-  std::map<uint32_t, std::vector<std::pair<GeoCoordinate, uint32_t>>> GetAdditionalNodesPerBeam ();
+  std::vector<std::pair<GeoCoordinate, uint32_t>> GetAdditionalNodesPerBeam ();
 
   /**
    * \param groupId The group ID
@@ -150,14 +150,11 @@ public:
   std::list<uint32_t> GetGroups ();
 
   /**
-   * \return Get the antenna gain patterns
-   */
-  Ptr<SatAntennaGainPatternContainer> GetAntennaGainPatterns ();
-
-  /**
    * Dispose of this class instance
    */
   virtual void DoDispose ();
+
+  void SetSatConstellationEnabled ();
 
 private:
   /**
@@ -197,14 +194,9 @@ private:
   std::list<uint32_t>                               m_groupsList;
 
   /**
-   * Antenna gain patterns
+   * Nodes created by position to add to scenario. vector: <position, group ID>
    */
-  Ptr<SatAntennaGainPatternContainer> m_antennaGainPatterns;
-
-  /**
-   * Nodes created by position to add to scenario. Map: <beamId, vector: <position, group ID>>
-   */
-  std::map<uint32_t, std::vector<std::pair<GeoCoordinate, uint32_t>>> m_additionalNodesPerBeam;
+  std::vector<std::pair<GeoCoordinate, uint32_t>> m_additionalNodesPerBeam;
 
   /*
    * Map to store node to add to groups after scenario is created
@@ -216,6 +208,11 @@ private:
    * Some methods have to be called before, some after.
    */
   bool m_scenarioCreated;
+
+  /**
+   * Use a constellation of satellites
+   */
+  bool m_satConstellationEnabled;
 };
 
 } // namespace ns3

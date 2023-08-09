@@ -23,8 +23,10 @@
 #ifndef LORA_DEVICE_ADDRESS_H
 #define LORA_DEVICE_ADDRESS_H
 
-#include "ns3/address.h"
 #include <string>
+
+#include <ns3/address.h>
+
 
 namespace ns3 {
 

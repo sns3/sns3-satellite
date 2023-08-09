@@ -23,12 +23,13 @@
 #ifndef SATELLITE_PHY_RX_CARRIER_CONF_H_
 #define SATELLITE_PHY_RX_CARRIER_CONF_H_
 
-#include "ns3/object.h"
+#include <ns3/object.h>
 
 #include "satellite-channel.h"
 #include "satellite-link-results.h"
 #include "satellite-channel-estimation-error-container.h"
 #include "satellite-typedefs.h"
+
 
 namespace ns3 {
 
@@ -43,11 +44,10 @@ class SatPhyRxCarrierConf : public Object
 {
 public:
   /**
-   * \brief Callback for SINR calculation
-   * \param Calculated C/NI
-   * \return Calculated Final SINR in linear
+   * \brief Callback to get additional interference from PHY layer
+   * \return Interference to add
    */
-  typedef Callback<double, double> SinrCalculatorCallback;
+  typedef Callback<double> AdditionalInterferenceCallback;
 
   /**
    *  \brief RX mode enum
@@ -118,6 +118,7 @@ public:
     InterferenceEliminationModel             m_raIfEliminateModel;
     RxMode                                   m_rxMode;
     SatEnums::ChannelType_t                  m_chType;
+    SatEnums::RegenerationMode_t             m_linkRegenerationMode;
     SatTypedefs::CarrierBandwidthConverter_t m_bwConverter;
     uint32_t                                 m_carrierCount;
     Ptr<SatChannelEstimationErrorContainer>  m_cec;
@@ -136,6 +137,7 @@ public:
       m_raIfEliminateModel (SatPhyRxCarrierConf::SIC_PERFECT),
       m_rxMode (SatPhyRxCarrierConf::TRANSPARENT),
       m_chType (SatEnums::RETURN_USER_CH),
+      m_linkRegenerationMode (SatEnums::TRANSPARENT),
       m_bwConverter (),
       m_carrierCount (0),
       m_cec (NULL),
@@ -258,27 +260,33 @@ public:
   SatEnums::ChannelType_t GetChannelType () const;
 
   /**
+   * \brief Get link regeneration mode
+   * \return link regeneration mode
+   */
+  SatEnums::RegenerationMode_t GetLinkRegenerationMode () const;
+
+  /**
    * \brief Is interference output trace enabled
    * \return true or false
    */
   bool IsIntfOutputTraceEnabled () const;
 
   /**
-   * \brief Get callback function to calculate final SINR
-   * \return final SINR
+   * \brief Get additional interference callback
+   * \return The additional interference callback
    */
-  inline SinrCalculatorCallback  GetSinrCalculatorCb ()
+  inline AdditionalInterferenceCallback  GetAdditionalInterferenceCb ()
   {
-    return m_sinrCalculate;
+    return m_additionalInterferenceCallback;
   }
 
   /**
-   * \brief Set callback function to calculate final SINR
-   * \param sinrCalculator SINR calculator callback
+   * \brief Set additional interference callback
+   * \param additionalInterferenceCallback The additional interference callback
    */
-  inline void SetSinrCalculatorCb (SinrCalculatorCallback sinrCalculator)
+  inline void SetAdditionalInterferenceCb (AdditionalInterferenceCallback additionalInterferenceCallback)
   {
-    m_sinrCalculate = sinrCalculator;
+    m_additionalInterferenceCallback = additionalInterferenceCallback;
   }
 
   /**
@@ -335,8 +343,9 @@ private:
   uint32_t m_carrierCount;
   SatTypedefs::CarrierBandwidthConverter_t m_carrierBandwidthConverter;
   SatEnums::ChannelType_t m_channelType;
+  SatEnums::RegenerationMode_t m_linkRegenerationMode;
   Ptr<SatChannelEstimationErrorContainer> m_channelEstimationError;
-  SinrCalculatorCallback m_sinrCalculate;
+  AdditionalInterferenceCallback m_additionalInterferenceCallback;
   Ptr<SatLinkResults> m_linkResults;
   double m_rxExtNoiseDensityWhz;
   bool m_enableIntfOutputTrace;

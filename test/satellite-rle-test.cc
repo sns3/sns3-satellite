@@ -100,7 +100,7 @@ SatRleTestCase::DoRun (void)
 
   uint8_t rcIndex (0);
   Ptr<SatQueue> queue = CreateObject<SatQueue> (rcIndex);
-  Ptr<SatReturnLinkEncapsulator> rle = CreateObject<SatReturnLinkEncapsulator> (source, dest, rcIndex);
+  Ptr<SatReturnLinkEncapsulator> rle = CreateObject<SatReturnLinkEncapsulator> (source, dest, source, dest, rcIndex);
   rle->SetQueue (queue);
 
   // Create a receive callback to Receive method of this class.

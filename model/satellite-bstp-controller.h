@@ -21,10 +21,11 @@
 #ifndef SATELLITE_BSTP_CONTROLLER_H_
 #define SATELLITE_BSTP_CONTROLLER_H_
 
-#include "ns3/object.h"
-#include "ns3/callback.h"
+#include <ns3/object.h>
+#include <ns3/callback.h>
 
 #include "satellite-static-bstp.h"
+
 
 namespace ns3 {
 

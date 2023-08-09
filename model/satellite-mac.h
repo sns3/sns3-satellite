@@ -23,11 +23,11 @@
 
 #include <cstring>
 
-#include "ns3/address.h"
-#include "ns3/ptr.h"
-#include "ns3/callback.h"
-#include "ns3/traced-callback.h"
-#include "ns3/mac48-address.h"
+#include <ns3/address.h>
+#include <ns3/ptr.h>
+#include <ns3/callback.h>
+#include <ns3/traced-callback.h>
+#include <ns3/mac48-address.h>
 
 #include "satellite-control-message.h"
 #include "satellite-signal-parameters.h"
@@ -66,9 +66,15 @@ public:
 
   /**
    * \brief Construct a SatMac
-   * \param beamId
+   * \param satId ID of sat for this MAC
+   * \param beamId ID of beam for this MAC
+   * \param forwardLinkRegenerationMode Forward link regeneration model
+   * \param returnLinkRegenerationMode Return link regeneration model
    */
-  SatMac (uint32_t beamId);
+  SatMac (uint32_t satId,
+          uint32_t beamId,
+          SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+          SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   /**
    * \brief Destroy a SatMac
@@ -78,10 +84,22 @@ public:
   ~SatMac ();
 
   /**
+   * \brief Get sat ID of the object
+   * \return sat ID
+   */
+  inline uint32_t GetSatId () const { return m_satId; }
+
+  /**
    * \brief Get beam ID of the object
    * \return beam ID
    */
   inline uint32_t GetBeamId () const { return m_beamId; }
+
+  /**
+   * \brief Get MAC address
+   * \return The MAC address
+   */
+  inline Address GetAddress () const { return m_nodeInfo->GetMacAddress (); }
 
   /**
    * \brief Callback to send packet to lower layer.
@@ -224,6 +242,11 @@ public:
    */
   virtual void Disable ();
 
+  /**
+   * Set the satellite MAC address on the other side of this link (if regenerative satellite).
+   */
+  virtual void SetSatelliteAddress (Address satelliteAddress);
+
 private:
   SatMac& operator = (const SatMac &);
   SatMac (const SatMac &);
@@ -235,13 +258,19 @@ protected:
   void DoDispose (void);
 
   /**
+   * \brief Set SatMacTimeTag of packets
+   * \param packets Container of the pointers to the packets to tag.
+   */
+  void SetTimeTag (SatPhy::PacketContainer_t packets);
+
+  /**
    * \brief Send packets to lower layer by using a callback
    * \param packets Packets to be sent.
    * \param carrierId ID of the carrier used for transmission.
    * \param duration Duration of the physical layer transmission.
    * \param txInfo Additional parameterization for burst transmission.
    */
-  void SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time duration, SatSignalParameters::txInfo_s txInfo);
+  virtual void SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time duration, SatSignalParameters::txInfo_s txInfo);
 
   /**
    * \brief Invoke the `Rx` trace source for each received packet.
@@ -317,10 +346,22 @@ protected:
   TracedCallback<const Time &, const Address &> m_rxDelayTrace;
 
   /**
+   * Traced callback for all received packets, including link delay information and
+   * the address of the senders.
+   */
+  TracedCallback<const Time &, const Address &> m_rxLinkDelayTrace;
+
+  /**
    * Traced callback for all received packets, including jitter information and
    * the address of the senders.
    */
   TracedCallback<const Time &, const Address &> m_rxJitterTrace;
+
+  /**
+   * Traced callback for all received packets, including link jitter information and
+   * the address of the senders.
+   */
+  TracedCallback<const Time &, const Address &> m_rxLinkJitterTrace;
 
   /**
    * Traced callback for beam being disabled and including service time.
@@ -337,6 +378,11 @@ protected:
    * node type, node id and MAC address (of the SatNetDevice)
    */
   Ptr<SatNodeInfo> m_nodeInfo;
+
+  /**
+   * The ID of the sat where mac belongs.
+   */
+  uint32_t m_satId;
 
   /**
    * The ID of the beam where mac belongs.
@@ -369,6 +415,31 @@ protected:
    * Store last 3 SOF date for Forward messages, to insert in NCR packets.
    */
   std::queue<Time> m_lastSOF;
+
+  /**
+   * Regeneration mode on forward link.
+   */
+  SatEnums::RegenerationMode_t m_forwardLinkRegenerationMode;
+
+  /**
+   * Regeneration mode on return link.
+   */
+  SatEnums::RegenerationMode_t m_returnLinkRegenerationMode;
+
+  /**
+   * Indicate if satellite is regeneration (at least LINK level) for TX
+   */
+  bool m_isRegenerative;
+
+  /**
+   * MAC address of satellite on other side of the link. Use in regenerative cases.
+   */
+  Address m_satelliteAddress;
+
+  /**
+   * Last delay measurement for link. Used to compute link jitter.
+   */
+  Time m_lastLinkDelay;
 };
 
 } // namespace ns3

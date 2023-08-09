@@ -25,15 +25,16 @@
 
 #include <iostream>
 
-#include "ns3/object.h"
-#include "ns3/pointer.h"
-#include "ns3/net-device.h"
-#include "ns3/ipv4-header.h"
+#include <ns3/object.h>
+#include <ns3/pointer.h>
+#include <ns3/net-device.h>
+#include <ns3/ipv4-header.h>
 
-#include "ns3/lora-device-address.h"
-#include "ns3/lorawan-mac-header.h"
-#include "ns3/lorawan-mac-end-device-class-a.h"
-#include "ns3/lora-frame-header.h"
+#include "lora-device-address.h"
+#include "lorawan-mac-header.h"
+#include "lorawan-mac-end-device-class-a.h"
+#include "lora-frame-header.h"
+
 
 namespace ns3 {
 

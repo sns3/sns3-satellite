@@ -26,15 +26,17 @@
 #include <vector>
 #include <map>
 #include <set>
-#include "ns3/header.h"
-#include "ns3/object.h"
-#include "ns3/nstime.h"
-#include "ns3/simulator.h"
-#include "ns3/mac48-address.h"
+
+#include <ns3/header.h>
+#include <ns3/object.h>
+#include <ns3/nstime.h>
+#include <ns3/simulator.h>
+#include <ns3/mac48-address.h>
 
 #include "satellite-mac-tag.h"
 #include "satellite-enums.h"
-#include "ns3/satellite-frame-conf.h"
+#include "satellite-frame-conf.h"
+
 
 namespace ns3 {
 
@@ -604,7 +606,7 @@ private:
  * \brief C/N0 (CNI) estimation report message.
  * (Tagged by SatControlMsgTag with type value SAT_CN0_REPORT)
  *
- * This message is sent periodically by UT to GW.
+ * This message is sent periodically by UT to GW. Or by ground entities to SAT
  */
 
 class SatCnoReportMessage : public SatControlMessage
@@ -664,7 +666,7 @@ private:
   /**
    * C/N0 estimate.
    */
-  double m_forwardLinkCNo;
+  double m_linkCNo;
 };
 
 /**

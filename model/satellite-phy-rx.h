@@ -23,15 +23,17 @@
 #ifndef SATELLITE_PHY_RX_H
 #define SATELLITE_PHY_RX_H
 
-#include "ns3/mobility-model.h"
-#include "ns3/packet.h"
-#include "ns3/nstime.h"
+#include <ns3/mobility-model.h>
+#include <ns3/packet.h>
+#include <ns3/nstime.h>
+
 #include "satellite-net-device.h"
 #include "satellite-signal-parameters.h"
 #include "satellite-antenna-gain-pattern.h"
 #include "satellite-mobility-model.h"
 #include "satellite-base-fading.h"
-#include "ns3/satellite-frame-conf.h"
+#include "satellite-frame-conf.h"
+
 
 namespace ns3 {
 
@@ -79,8 +81,9 @@ public:
   /*
    * Set the receive antenna gain pattern.
    * \param agp antenna gain pattern
+   * \param mobility mobility model of satellite
    */
-  void SetAntennaGainPattern (Ptr<SatAntennaGainPattern> agp);
+  void SetAntennaGainPattern (Ptr<SatAntennaGainPattern> agp, Ptr<SatMobilityModel> mobility);
 
   void SetDevice (Ptr<NetDevice> d);
   Ptr<NetDevice> GetDevice ();
@@ -134,6 +137,18 @@ public:
   double GetLosses ();
 
   /**
+   * Set the satellite id for all the transmissions from this SatPhyTx
+   * \param satId the satellite Identifier
+   */
+  void SetSatId (uint32_t satId);
+
+  /**
+   * \brief Get satellite id of this receiver
+   * \return uint32_t satellite id
+   */
+  uint32_t GetSatId () const;
+
+  /**
    * Set the beam id for all the transmissions from this SatPhyTx
    * \param beamId the Beam Identifier
    */
@@ -165,20 +180,23 @@ public:
   typedef Callback<void, Ptr<SatSignalParameters>, bool> ReceiveCallback;
 
   /**
+   * \param satellite Id
    * \param beam Id
    * \param Id (address) of the source (sender)
    * \param Id (address) of the destination (receiver)
    * \param C/N0 value
+   * \param If true, cno corresponds to link SAT to GW; if false, cno corresponds to link UT to GW
    */
-  typedef Callback<void, uint32_t, Address, Address, double > CnoCallback;
+  typedef Callback<void, uint32_t, uint32_t, Address, Address, double, bool > CnoCallback;
 
   /**
+   * \param satellite Id
    * \param beam Id
    * \param carrier Id
    * \param allocation channel Id
    * \param average normalized offered load
    */
-  typedef Callback<void, uint32_t, uint32_t, uint8_t, double > AverageNormalizedOfferedLoadCallback;
+  typedef Callback<void, uint32_t, uint32_t, uint32_t, uint8_t, double > AverageNormalizedOfferedLoadCallback;
 
   /**
    * Set the upper layer receive callback
@@ -225,6 +243,7 @@ private:
   Ptr<MobilityModel> m_mobility;
   Ptr<NetDevice> m_device;
 
+  uint32_t m_satId;
   uint32_t m_beamId;
   Mac48Address m_macAddress;
 
@@ -232,6 +251,11 @@ private:
    * Receive antenna gain pattern
    */
   Ptr<SatAntennaGainPattern> m_antennaGainPattern;
+
+  /*
+   * Satellite mobility model
+   */
+  Ptr<SatMobilityModel> m_satMobility;
 
   /**
    * Configured maximum antenna gain in linear

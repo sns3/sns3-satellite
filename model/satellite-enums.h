@@ -84,6 +84,29 @@ public:
   } FadingModel_t;
 
   /**
+   * \enum RegenerationMode_t
+   * \brief The regeneration mode used in satellites.
+   * It can be set for each link with different values.
+   */
+  typedef enum
+  {
+    TRANSPARENT,
+    REGENERATION_PHY,     // regenerate only on physical layer, to compute is the packet is lost or not
+    REGENERATION_LINK,    // regenerate on physical and MAC layers (only on return link). Satellite can perform packet TX scheduling and handle control messages
+    REGENERATION_NETWORK  // regenerate all stack. The GSE/RLE encapsulation is removed at reception and added again when transmitting to next hop
+  } RegenerationMode_t;
+
+  /**
+   * \enum IslArbiterType_t
+   * \brief Choose the arbiter to use to route packets on ISLs
+   */
+  typedef enum
+  {
+    UNICAST,              // Only one route for a pair source satellite / destination satellite, using shortest path (in hops)
+    ECMP,                 // Get all routes possible with minimum hops. For each incoming packet, the route is randomly selected among all available
+  } IslArbiterType_t;
+
+  /**
    * \enum Standard_t
    * \brief The global standard used. Can be either DVB or Lora
    */

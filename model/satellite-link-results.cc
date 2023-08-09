@@ -20,14 +20,17 @@
  */
 
 #include <sstream>
-#include "ns3/log.h"
-#include "ns3/string.h"
-#include "ns3/double.h"
-#include "ns3/object.h"
+
+#include <ns3/log.h>
+#include <ns3/string.h>
+#include <ns3/double.h>
+#include <ns3/object.h>
+#include <ns3/singleton.h>
+
 #include "satellite-enums.h"
 #include "satellite-link-results.h"
-#include "ns3/singleton.h"
-#include "ns3/satellite-env-variables.h"
+#include "../utils/satellite-env-variables.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("SatLinkResults");
 

@@ -68,13 +68,15 @@ public:
    * \param satPos Satellie position file name
    * \param wfConf Waveform configuration file name
    * \param tle TLE configuration file name
+   * \param isConstellation Indicates if SatConf describes a constellation
    */
   void Initialize (std::string rtnConf,
                    std::string fwdConf,
                    std::string gwPos,
                    std::string satPos,
                    std::string wfConf,
-                   std::string tle);
+                   std::string tle,
+                   bool isConstellation = false);
 
   /**
    * Try to open a file from a given path
@@ -122,6 +124,13 @@ public:
    * \return UT count
    */
   uint32_t GetUtCount () const;
+
+  /**
+   * Get count of the SATs (positions).
+   *
+   * \return SAT count
+   */
+  uint32_t GetSatCount () const;
 
 
   /**
@@ -182,6 +191,37 @@ public:
   uint32_t GetFwdLinkCarrierCount () const;
 
   /**
+   * Get the regeneration mode used in satellites for forward link
+   * \return The regeneration mode used in satellites for forward link
+   */
+  SatEnums::RegenerationMode_t GetForwardLinkRegenerationMode () const;
+
+  /**
+   * Get the regeneration mode used in satellites for return link
+   * \return The regeneration mode used in satellites for return link
+   */
+  SatEnums::RegenerationMode_t GetReturnLinkRegenerationMode () const;
+
+  /**
+   * Set the UT positions file name
+   */
+  void SetUtPositionInputFileName (std::string utPositionInputFileName);
+
+  /**
+   * Load a vector of TLE information from a file
+   * \param filePathName
+   * \return TLE information extracted from file
+   */
+  std::vector <std::string> LoadTles (std::string filePathName);
+
+  /**
+   * Load a vector of ISLs from a file
+   * \param filePathName
+   * \return ISLs information extracted from file. This corresponds to satellite pairs linked by ISLs
+   */
+  std::vector <std::pair <uint32_t, uint32_t>> LoadIsls (std::string filePathName);
+
+  /**
    * Definition for beam ID index (column) in m_conf
    */
   static const uint32_t BEAM_ID_INDEX = 0;
@@ -216,6 +256,11 @@ private:
   std::vector <std::vector <uint32_t> > m_fwdConf;
 
   /**
+   * Indicates with this is a constellation of satellites
+   */
+  bool m_isConstellation;
+
+  /**
    * Beam count.
    */
   uint32_t m_beamCount;
@@ -241,6 +286,11 @@ private:
   std::string m_tleSat;
 
   /**
+   * TLE information for a satellite constellation
+   */
+  std::vector <std::string> m_tles;
+
+  /**
    * File to use when loading UT specific position (for user defined positions)
    */
   std::string  m_utPositionInputFileName;
@@ -260,6 +310,14 @@ private:
    * Currently only one sequence used and only one carrier inside carrier conf.
    */
   std::vector<Ptr<SatFwdCarrierConf> >  m_forwardLinkCarrierConf;
+
+  /**
+   * Return link carrier configuration for SCPC.
+   *
+   * Item index of the list means carrier configuration sequence.
+   * Currently only one sequence used and only one carrier inside carrier conf.
+   */
+  std::vector<Ptr<SatFwdCarrierConf> >  m_returnLinkCarrierConf;
 
   /**
    *  Base frequency of forward feeder link.
@@ -332,6 +390,31 @@ private:
   double m_fwdCarrierSpacingFactor;
 
   /**
+   * The configured allocated bandwidth for return link carriers.
+   */
+  double m_rtnCarrierAllocatedBandwidthHz;
+
+  /**
+   * The configured carrier roll-off factor for return link carriers.
+   */
+  double m_rtnCarrierRollOffFactor;
+
+  /**
+   * The configured carrier spacing factor for return link carriers.
+   */
+  double m_rtnCarrierSpacingFactor;
+
+  /**
+   * The regeneration mode used in satellites for forward link
+   */
+  SatEnums::RegenerationMode_t m_forwardLinkRegenerationMode;
+
+  /**
+   * The regeneration mode used in satellites for return link
+   */
+  SatEnums::RegenerationMode_t m_returnLinkRegenerationMode;
+
+  /**
    * Get bandwidth of the forward link carrier.
    *
    * \param carrierId Id of the carrier.
@@ -339,6 +422,15 @@ private:
    * \return Requested carrier bandwidth.
    */
   double GetFwdLinkCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType) const;
+
+  /**
+   * Get bandwidth of the return link carrier.
+   *
+   * \param carrierId Id of the carrier.
+   * \param bandwidthType Type of the bandwidth.
+   * \return Requested carrier bandwidth.
+   */
+  double GetRtnLinkCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType) const;
 
   /**
    * Configures itself with default values. Creates configuration storages as needed.

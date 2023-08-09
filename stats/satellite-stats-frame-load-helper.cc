@@ -157,38 +157,38 @@ SatStatsFrameLoadHelper::DoInstall ()
 
   // Setup probes.
   Ptr<SatBeamHelper> beamHelper = GetSatHelper ()->GetBeamHelper ();
-  NS_ASSERT (beamHelper != 0);
+  NS_ASSERT (beamHelper != nullptr);
   Ptr<SatNcc> ncc = beamHelper->GetNcc ();
-  NS_ASSERT (ncc != 0);
-  std::list<uint32_t> beams = beamHelper->GetBeams ();
+  NS_ASSERT (ncc != nullptr);
+  std::list<std::pair<uint32_t, uint32_t>> beams = beamHelper->GetBeams ();
   bool ret = false;
 
-  for (std::list<uint32_t>::const_iterator it = beams.begin ();
+  for (std::list<std::pair<uint32_t, uint32_t>>::const_iterator it = beams.begin ();
        it != beams.end (); ++it)
     {
       if (m_unitType == SatStatsFrameLoadHelper::UNIT_SYMBOLS)
         {
-          ret = SetupProbe<SatFrameSymbolLoadProbe> (ncc->GetBeamScheduler (*it),
-                                                     GetIdentifierForBeam (*it),
+          ret = SetupProbe<SatFrameSymbolLoadProbe> (ncc->GetBeamScheduler (it->first, it->second),
+                                                     GetIdentifierForBeam (it->first, it->second),
                                                      &SatStatsFrameLoadHelper::FrameSymbolLoadCallback);
         }
       else
         {
           NS_ASSERT_MSG (m_unitType == SatStatsFrameLoadHelper::UNIT_USERS,
                          "Invalid unit type");
-          ret = SetupProbe<SatFrameUserLoadProbe> (ncc->GetBeamScheduler (*it),
-                                                   GetIdentifierForBeam (*it),
+          ret = SetupProbe<SatFrameUserLoadProbe> (ncc->GetBeamScheduler (it->first, it->second),
+                                                   GetIdentifierForBeam (it->first, it->second),
                                                    &SatStatsFrameLoadHelper::FrameUserLoadCallback);
         }
 
       if (ret)
         {
           NS_LOG_INFO (this << " successfully connected"
-                            << " with beam " << *it);
+                            << " with beam " << it->second);
         }
       else
         {
-          NS_LOG_WARN (this << " unable to connect to beam " << *it);
+          NS_LOG_WARN (this << " unable to connect to beam " << it->second);
         }
 
     } // end of `for (it: beams)`
@@ -228,7 +228,7 @@ SatStatsFrameLoadHelper::FrameSymbolLoadCallback (std::string context,
 
   // Get the right collector for this frame ID and identifier.
   Ptr<ScalarCollector> collector = GetCollector (frameId, context);
-  NS_ASSERT_MSG (collector != 0,
+  NS_ASSERT_MSG (collector != nullptr,
                  "Unable to get/create collector"
                  << " for frame ID "  << frameId
                  << " and beam " << context);
@@ -247,7 +247,7 @@ SatStatsFrameLoadHelper::FrameUserLoadCallback (std::string context,
 
   // Get the right collector for this frame ID and identifier.
   Ptr<ScalarCollector> collector = GetCollector (frameId, context);
-  NS_ASSERT_MSG (collector != 0,
+  NS_ASSERT_MSG (collector != nullptr,
                  "Unable to get/create collector"
                  << " for frame ID "  << frameId
                  << " and identifier " << context);
@@ -329,15 +329,16 @@ SatStatsFrameLoadHelper::GetCollector (uint32_t frameId, std::string identifier)
 
         case SatStatsHelper::IDENTIFIER_BEAM:
           {
-            std::list<uint32_t> beams = GetSatHelper ()->GetBeamHelper ()->GetBeams ();
-            for (std::list<uint32_t>::const_iterator it = beams.begin ();
+            std::list<std::pair<uint32_t, uint32_t>> beams = GetSatHelper ()->GetBeamHelper ()->GetBeams ();
+            for (std::list<std::pair<uint32_t, uint32_t>>::const_iterator it = beams.begin ();
                  it != beams.end (); ++it)
               {
-                const uint32_t beamId = (*it);
+                const uint32_t satId = (it->first);
+                const uint32_t beamId = (it->second);
                 std::ostringstream name;
-                name << beamId << " " << frameId;
+                name << satId << "-" << beamId << " " << frameId;
                 collectorMap.SetAttribute ("Name", StringValue (name.str ()));
-                collectorMap.Create (beamId);
+                collectorMap.Create (SatConstVariables::MAX_BEAMS_PER_SATELLITE*(satId+1) + beamId);
                 n++;
               }
             break;
@@ -366,7 +367,7 @@ SatStatsFrameLoadHelper::GetCollector (uint32_t frameId, std::string identifier)
 
   // Find the collector with the right identifier.
   Ptr<DataCollectionObject> collector = it->second.Get (identifierNum);
-  NS_ASSERT_MSG (collector != 0,
+  NS_ASSERT_MSG (collector != nullptr,
                  "Unable to find collector with identifier " << identifier);
   Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
   return c;

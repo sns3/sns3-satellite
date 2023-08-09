@@ -21,9 +21,11 @@
 #ifndef LORA_FRAME_HEADER_H
 #define LORA_FRAME_HEADER_H
 
-#include "ns3/header.h"
-#include "ns3/lora-device-address.h"
-#include "ns3/lorawan-mac-command.h"
+#include <ns3/header.h>
+
+#include "lora-device-address.h"
+#include "lorawan-mac-command.h"
+
 
 namespace ns3 {
 
@@ -327,7 +329,7 @@ LoraFrameHeader::GetLorawanMacCommand ()
   std::list< Ptr< LorawanMacCommand> >::const_iterator it;
   for (it = m_macCommands.begin (); it != m_macCommands.end (); ++it)
     {
-      if ((*it)->GetObject<T> () != 0)
+      if ((*it)->GetObject<T> () != nullptr)
         {
           return (*it)->GetObject<T> ();
         }

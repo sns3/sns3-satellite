@@ -21,8 +21,10 @@
 #ifndef SATELLITE_GW_LLC_H_
 #define SATELLITE_GW_LLC_H_
 
-#include "ns3/ptr.h"
+#include <ns3/ptr.h>
+
 #include "satellite-llc.h"
+
 
 namespace ns3 {
 
@@ -42,9 +44,17 @@ public:
   static TypeId GetTypeId (void);
 
   /**
-   * Construct a SatGwLlc
+   * Construct a SatGwLlc, should not be used
    */
   SatGwLlc ();
+
+  /**
+   * Construct a SatGwLlc
+   * \param forwardLinkRegenerationMode Forward link regeneration model
+   * \param returnLinkRegenerationMode Return link regeneration model
+   */
+  SatGwLlc (SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+            SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
   /**
    * Destroy a SatGwLlc
@@ -52,6 +62,16 @@ public:
    * This is the destructor for the SatGwLlc.
    */
   virtual ~SatGwLlc ();
+
+  /**
+   * \brief Called from higher layer (SatNetDevice) to enque packet to LLC
+   *
+   * \param packet packet sent from above down to SatMac
+   * \param dest Destination MAC address of the packet
+   * \param flowId Flow identifier
+   * \return Boolean indicating whether the enque operation succeeded
+   */
+  virtual bool Enque (Ptr<Packet> packet, Address dest, uint8_t flowId);
 
   /**
     *  \brief Called from lower layer (MAC) to inform a tx
@@ -111,6 +131,18 @@ protected:
    * \param key Encapsulator key class
    */
   virtual void CreateDecap (Ptr<EncapKey> key);
+
+  /**
+   * \brief Get the link TX direction. Must be implemented by child clases.
+   * \return The link TX direction
+   */
+  virtual SatEnums::SatLinkDir_t GetSatLinkTxDir ();
+
+  /**
+   * \brief Get the link RX direction. Must be implemented by child clases.
+   * \return The link RX direction
+   */
+  virtual SatEnums::SatLinkDir_t GetSatLinkRxDir ();
 
 };
 
