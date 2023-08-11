@@ -19,17 +19,14 @@
  *
  */
 
-
-#include "ns3/core-module.h"
-#include "ns3/traffic-module.h"
-#include "ns3/network-module.h"
-#include "ns3/internet-module.h"
-#include "ns3/satellite-module.h"
 #include "ns3/config-store-module.h"
-
+#include "ns3/core-module.h"
+#include "ns3/internet-module.h"
+#include "ns3/network-module.h"
+#include "ns3/satellite-module.h"
+#include "ns3/traffic-module.h"
 
 using namespace ns3;
-
 
 /**
  * \file sat-generic-launcher.cc
@@ -41,23 +38,24 @@ using namespace ns3;
  * execute command -> ./waf --run "sat-generic-launcher --PrintHelp"
  */
 
-NS_LOG_COMPONENT_DEFINE ("sat-generic-launcher");
-
+NS_LOG_COMPONENT_DEFINE("sat-generic-launcher");
 
 int
-main (int argc, char *argv[])
+main(int argc, char* argv[])
 {
-  std::string inputFileNameWithPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory ("contrib/satellite/examples") + "/generic-input-attributes.xml";
+    std::string inputFileNameWithPath =
+        Singleton<SatEnvVariables>::Get()->LocateDirectory("contrib/satellite/examples") +
+        "/generic-input-attributes.xml";
 
-  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("generic-launcher");
-  simulationHelper->DisableAllCapacityAssignmentCategories ();
-  simulationHelper->EnableCrdsa ();
+    Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper>("generic-launcher");
+    simulationHelper->DisableAllCapacityAssignmentCategories();
+    simulationHelper->EnableCrdsa();
 
-  CommandLine cmd;
-  simulationHelper->AddDefaultUiArguments (cmd, inputFileNameWithPath);
-  cmd.Parse (argc, argv);
+    CommandLine cmd;
+    simulationHelper->AddDefaultUiArguments(cmd, inputFileNameWithPath);
+    cmd.Parse(argc, argv);
 
-  simulationHelper->ConfigureAttributesFromFile (inputFileNameWithPath);
-  simulationHelper->StoreAttributesToFile ("parametersUsed.xml");
-  simulationHelper->RunSimulation ();
+    simulationHelper->ConfigureAttributesFromFile(inputFileNameWithPath);
+    simulationHelper->StoreAttributesToFile("parametersUsed.xml");
+    simulationHelper->RunSimulation();
 }

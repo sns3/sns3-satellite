@@ -22,16 +22,16 @@
 #ifndef SATELLITE_STATS_DELAY_HELPER_H
 #define SATELLITE_STATS_DELAY_HELPER_H
 
-#include <ns3/satellite-stats-helper.h>
-#include <ns3/ptr.h>
 #include <ns3/address.h>
 #include <ns3/collector-map.h>
+#include <ns3/ptr.h>
+#include <ns3/satellite-stats-helper.h>
+
 #include <list>
 #include <map>
 
-
-namespace ns3 {
-
+namespace ns3
+{
 
 // BASE CLASS /////////////////////////////////////////////////////////////////
 
@@ -47,102 +47,99 @@ class DistributionCollector;
  */
 class SatStatsDelayHelper : public SatStatsHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsDelayHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsDelayHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsDelayHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsDelayHelper ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
+    /**
+     * \param averagingMode average all samples before passing them to aggregator.
+     */
+    void SetAveragingMode(bool averagingMode);
 
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
+    /**
+     * \return the currently active averaging mode.
+     */
+    bool GetAveragingMode() const;
 
-  /**
-   * \param averagingMode average all samples before passing them to aggregator.
-   */
-  void SetAveragingMode (bool averagingMode);
+    /**
+     * \brief Set up several probes or other means of listeners and connect them
+     *        to the collectors.
+     */
+    void InstallProbes();
 
-  /**
-   * \return the currently active averaging mode.
-   */
-  bool GetAveragingMode () const;
+    /**
+     * \brief Receive inputs from trace sources and determine the right collector
+     *        to forward the inputs to.
+     * \param delay packet delay.
+     * \param from the address of the sender of the packet.
+     *
+     * Used in return link statistics. DoInstallProbes() is expected to connect
+     * the right trace sources to this method.
+     */
+    void RxDelayCallback(const Time& delay, const Address& from);
 
-  /**
-   * \brief Set up several probes or other means of listeners and connect them
-   *        to the collectors.
-   */
-  void InstallProbes ();
+  protected:
+    // inherited from SatStatsHelper base class
+    void DoInstall();
 
-  /**
-   * \brief Receive inputs from trace sources and determine the right collector
-   *        to forward the inputs to.
-   * \param delay packet delay.
-   * \param from the address of the sender of the packet.
-   *
-   * Used in return link statistics. DoInstallProbes() is expected to connect
-   * the right trace sources to this method.
-   */
-  void RxDelayCallback (const Time &delay, const Address &from);
+    /**
+     * \brief
+     */
+    virtual void DoInstallProbes() = 0;
 
-protected:
-  // inherited from SatStatsHelper base class
-  void DoInstall ();
+    /**
+     * \brief Save the address and the proper identifier from the given UT node.
+     * \param utNode a UT node.
+     *
+     * The address of the given node will be saved in the #m_identifierMap
+     * member variable.
+     *
+     * Used in return link statistics. DoInstallProbes() is expected to pass the
+     * the UT node of interest into this method.
+     */
+    void SaveAddressAndIdentifier(Ptr<Node> utNode);
 
-  /**
-   * \brief
-   */
-  virtual void DoInstallProbes () = 0;
+    /**
+     * \brief Connect the probe to the right collector.
+     * \param probe
+     * \param identifier
+     */
+    bool ConnectProbeToCollector(Ptr<Probe> probe, uint32_t identifier);
 
-  /**
-   * \brief Save the address and the proper identifier from the given UT node.
-   * \param utNode a UT node.
-   *
-   * The address of the given node will be saved in the #m_identifierMap
-   * member variable.
-   *
-   * Used in return link statistics. DoInstallProbes() is expected to pass the
-   * the UT node of interest into this method.
-   */
-  void SaveAddressAndIdentifier (Ptr<Node> utNode);
+    /**
+     * \brief Find a collector with the right identifier and pass a sample data
+     *        to it.
+     * \param delay
+     * \param identifier
+     */
+    void PassSampleToCollector(const Time& delay, uint32_t identifier);
 
-  /**
-   * \brief Connect the probe to the right collector.
-   * \param probe
-   * \param identifier
-   */
-  bool ConnectProbeToCollector (Ptr<Probe> probe, uint32_t identifier);
+    /// Maintains a list of collectors created by this helper.
+    CollectorMap m_terminalCollectors;
 
-  /**
-   * \brief Find a collector with the right identifier and pass a sample data
-   *        to it.
-   * \param delay
-   * \param identifier
-   */
-  void PassSampleToCollector (const Time &delay, uint32_t identifier);
+    /// The final collector utilized in averaged output (histogram, PDF, and CDF).
+    Ptr<DistributionCollector> m_averagingCollector;
 
-  /// Maintains a list of collectors created by this helper.
-  CollectorMap m_terminalCollectors;
+    /// The aggregator created by this helper.
+    Ptr<DataCollectionObject> m_aggregator;
 
-  /// The final collector utilized in averaged output (histogram, PDF, and CDF).
-  Ptr<DistributionCollector> m_averagingCollector;
+    /// Map of address and the identifier associated with it (for return link).
+    std::map<const Address, uint32_t> m_identifierMap;
 
-  /// The aggregator created by this helper.
-  Ptr<DataCollectionObject> m_aggregator;
-
-  /// Map of address and the identifier associated with it (for return link).
-  std::map<const Address, uint32_t> m_identifierMap;
-
-private:
-  bool m_averagingMode;  ///< `AveragingMode` attribute.
+  private:
+    bool m_averagingMode; ///< `AveragingMode` attribute.
 
 }; // end of class SatStatsDelayHelper
-
 
 // FORWARD LINK APPLICATION-LEVEL /////////////////////////////////////////////
 
@@ -167,46 +164,43 @@ class Probe;
  */
 class SatStatsFwdAppDelayHelper : public SatStatsDelayHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsFwdAppDelayHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsFwdAppDelayHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * Destructor for SatStatsFwdAppDelayHelper.
+     */
+    virtual ~SatStatsFwdAppDelayHelper();
 
-  /**
-   * Destructor for SatStatsFwdAppDelayHelper.
-   */
-  virtual ~SatStatsFwdAppDelayHelper ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
+    /**
+     * \brief Receive inputs from trace sources and determine the right collector
+     *        to forward the inputs to.
+     * \param helper Pointer to the delay statistics collector helper
+     * \param identifier Identifier used to group statistics.
+     * \param packet the received packet, expected to have been tagged with
+     *               TrafficTimeTag.
+     * \param from the InetSocketAddress of the sender of the packet.
+     */
+    static void RxCallback(Ptr<SatStatsFwdAppDelayHelper> helper,
+                           uint32_t identifier,
+                           Ptr<const Packet> packet,
+                           const Address& from);
 
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
+  protected:
+    // inherited from SatStatsDelayHelper base class
+    void DoInstallProbes();
 
-  /**
-   * \brief Receive inputs from trace sources and determine the right collector
-   *        to forward the inputs to.
-   * \param helper Pointer to the delay statistics collector helper
-   * \param identifier Identifier used to group statistics.
-   * \param packet the received packet, expected to have been tagged with
-   *               TrafficTimeTag.
-   * \param from the InetSocketAddress of the sender of the packet.
-   */
-  static void RxCallback (Ptr<SatStatsFwdAppDelayHelper> helper,
-                          uint32_t identifier,
-                          Ptr<const Packet> packet,
-                          const Address &from);
-
-protected:
-  // inherited from SatStatsDelayHelper base class
-  void DoInstallProbes ();
-
-private:
-  /// Maintains a list of probes created by this helper.
-  std::list<Ptr<Probe> > m_probes;
+  private:
+    /// Maintains a list of probes created by this helper.
+    std::list<Ptr<Probe>> m_probes;
 
 }; // end of class SatStatsFwdAppDelayHelper
-
 
 // FORWARD LINK DEVICE-LEVEL /////////////////////////////////////////////////////
 
@@ -229,32 +223,29 @@ private:
  */
 class SatStatsFwdDevDelayHelper : public SatStatsDelayHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsFwdDevDelayHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsFwdDevDelayHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsFwdDevDelayHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsFwdDevDelayHelper ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
+  protected:
+    // inherited from SatStatsDelayHelper base class
+    void DoInstallProbes();
 
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
-
-protected:
-  // inherited from SatStatsDelayHelper base class
-  void DoInstallProbes ();
-
-private:
-  /// Maintains a list of probes created by this helper.
-  std::list<Ptr<Probe> > m_probes;
+  private:
+    /// Maintains a list of probes created by this helper.
+    std::list<Ptr<Probe>> m_probes;
 
 }; // end of class SatStatsFwdDevDelayHelper
-
 
 // FORWARD LINK MAC-LEVEL /////////////////////////////////////////////////////
 
@@ -277,32 +268,29 @@ private:
  */
 class SatStatsFwdMacDelayHelper : public SatStatsDelayHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsFwdMacDelayHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsFwdMacDelayHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsFwdMacDelayHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsFwdMacDelayHelper ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
+  protected:
+    // inherited from SatStatsDelayHelper base class
+    void DoInstallProbes();
 
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
-
-protected:
-  // inherited from SatStatsDelayHelper base class
-  void DoInstallProbes ();
-
-private:
-  /// Maintains a list of probes created by this helper.
-  std::list<Ptr<Probe> > m_probes;
+  private:
+    /// Maintains a list of probes created by this helper.
+    std::list<Ptr<Probe>> m_probes;
 
 }; // end of class SatStatsFwdMacDelayHelper
-
 
 // FORWARD LINK PHY-LEVEL /////////////////////////////////////////////////////
 
@@ -325,32 +313,29 @@ private:
  */
 class SatStatsFwdPhyDelayHelper : public SatStatsDelayHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsFwdPhyDelayHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsFwdPhyDelayHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsFwdPhyDelayHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsFwdPhyDelayHelper ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
+  protected:
+    // inherited from SatStatsDelayHelper base class
+    void DoInstallProbes();
 
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
-
-protected:
-  // inherited from SatStatsDelayHelper base class
-  void DoInstallProbes ();
-
-private:
-  /// Maintains a list of probes created by this helper.
-  std::list<Ptr<Probe> > m_probes;
+  private:
+    /// Maintains a list of probes created by this helper.
+    std::list<Ptr<Probe>> m_probes;
 
 }; // end of class SatStatsFwdPhyDelayHelper
-
 
 // RETURN LINK APPLICATION-LEVEL //////////////////////////////////////////////
 
@@ -373,58 +358,55 @@ private:
  */
 class SatStatsRtnAppDelayHelper : public SatStatsDelayHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsRtnAppDelayHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsRtnAppDelayHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsRtnAppDelayHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsRtnAppDelayHelper ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
+    /**
+     * \brief Receive inputs from trace sources and determine the right collector
+     *        to forward the inputs to.
+     * \param packet the received packet, expected to have been tagged with
+     *               TrafficTimeTag.
+     * \param from the InetSocketAddress of the sender of the packet.
+     */
+    void RxCallback(Ptr<const Packet> packet, const Address& from);
 
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
+    /**
+     * \brief Receive inputs from trace sources and determine the right collector
+     *        to forward the inputs to.
+     * \param delay packet delay.
+     * \param from the InetSocketAddress of the sender of the packet.
+     */
+    void Ipv4Callback(const Time& delay, const Address& from);
 
-  /**
-   * \brief Receive inputs from trace sources and determine the right collector
-   *        to forward the inputs to.
-   * \param packet the received packet, expected to have been tagged with
-   *               TrafficTimeTag.
-   * \param from the InetSocketAddress of the sender of the packet.
-   */
-  void RxCallback (Ptr<const Packet> packet, const Address &from);
+  protected:
+    // inherited from SatStatsDelayHelper base class
+    void DoInstallProbes();
 
-  /**
-   * \brief Receive inputs from trace sources and determine the right collector
-   *        to forward the inputs to.
-   * \param delay packet delay.
-   * \param from the InetSocketAddress of the sender of the packet.
-   */
-  void Ipv4Callback (const Time &delay, const Address &from);
+  private:
+    /**
+     * \brief Save the IPv4 address and the proper identifier from the given
+     *        UT user node.
+     * \param utUserNode a UT user node.
+     *
+     * Any addresses found in the given node will be saved in the
+     * #m_identifierMap member variable.
+     */
+    void SaveIpv4AddressAndIdentifier(Ptr<Node> utUserNode);
 
-protected:
-  // inherited from SatStatsDelayHelper base class
-  void DoInstallProbes ();
-
-private:
-  /**
-   * \brief Save the IPv4 address and the proper identifier from the given
-   *        UT user node.
-   * \param utUserNode a UT user node.
-   *
-   * Any addresses found in the given node will be saved in the
-   * #m_identifierMap member variable.
-   */
-  void SaveIpv4AddressAndIdentifier (Ptr<Node> utUserNode);
-
-  /// \todo Write SaveIpv6Address() method.
+    /// \todo Write SaveIpv6Address() method.
 
 }; // end of class SatStatsRtnAppDelayHelper
-
 
 // RETURN LINK DEVICE-LEVEL //////////////////////////////////////////////
 
@@ -447,28 +429,25 @@ private:
  */
 class SatStatsRtnDevDelayHelper : public SatStatsDelayHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsRtnDevDelayHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsRtnDevDelayHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsRtnDevDelayHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsRtnDevDelayHelper ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
-
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
-
-protected:
-  // inherited from SatStatsDelayHelper base class
-  void DoInstallProbes ();
+  protected:
+    // inherited from SatStatsDelayHelper base class
+    void DoInstallProbes();
 
 }; // end of class SatStatsRtnDevDelayHelper
-
 
 // RETURN LINK MAC-LEVEL //////////////////////////////////////////////
 
@@ -491,28 +470,25 @@ protected:
  */
 class SatStatsRtnMacDelayHelper : public SatStatsDelayHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsRtnMacDelayHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsRtnMacDelayHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsRtnMacDelayHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsRtnMacDelayHelper ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
-
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
-
-protected:
-  // inherited from SatStatsDelayHelper base class
-  void DoInstallProbes ();
+  protected:
+    // inherited from SatStatsDelayHelper base class
+    void DoInstallProbes();
 
 }; // end of class SatStatsRtnMacDelayHelper
-
 
 // RETURN LINK PHY-LEVEL //////////////////////////////////////////////
 
@@ -535,30 +511,26 @@ protected:
  */
 class SatStatsRtnPhyDelayHelper : public SatStatsDelayHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsRtnPhyDelayHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsRtnPhyDelayHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsRtnPhyDelayHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsRtnPhyDelayHelper ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
-
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
-
-protected:
-  // inherited from SatStatsDelayHelper base class
-  void DoInstallProbes ();
+  protected:
+    // inherited from SatStatsDelayHelper base class
+    void DoInstallProbes();
 
 }; // end of class SatStatsRtnPhyDelayHelper
 
-
 } // end of namespace ns3
-
 
 #endif /* SATELLITE_STATS_DELAY_HELPER_H */

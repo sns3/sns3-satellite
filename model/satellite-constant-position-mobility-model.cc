@@ -18,58 +18,59 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include <ns3/log.h>
-
 #include "satellite-constant-position-mobility-model.h"
 
+#include <ns3/log.h>
 
-NS_LOG_COMPONENT_DEFINE ("SatConstMobilityModel");
+NS_LOG_COMPONENT_DEFINE("SatConstMobilityModel");
 
-namespace ns3 {
+namespace ns3
+{
 
-NS_OBJECT_ENSURE_REGISTERED (SatConstantPositionMobilityModel);
+NS_OBJECT_ENSURE_REGISTERED(SatConstantPositionMobilityModel);
 
 TypeId
-SatConstantPositionMobilityModel::GetTypeId (void)
+SatConstantPositionMobilityModel::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatConstantPositionMobilityModel")
-    .SetParent<SatMobilityModel> ()
-    .AddConstructor<SatConstantPositionMobilityModel> ()
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::SatConstantPositionMobilityModel")
+                            .SetParent<SatMobilityModel>()
+                            .AddConstructor<SatConstantPositionMobilityModel>();
+    return tid;
 }
 
-SatConstantPositionMobilityModel::SatConstantPositionMobilityModel ()
+SatConstantPositionMobilityModel::SatConstantPositionMobilityModel()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
-SatConstantPositionMobilityModel::~SatConstantPositionMobilityModel ()
+
+SatConstantPositionMobilityModel::~SatConstantPositionMobilityModel()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
 GeoCoordinate
-SatConstantPositionMobilityModel::DoGetGeoPosition (void) const
+SatConstantPositionMobilityModel::DoGetGeoPosition(void) const
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return m_geoPosition;
+    return m_geoPosition;
 }
-void
-SatConstantPositionMobilityModel::DoSetGeoPosition (const GeoCoordinate &position)
-{
-  NS_LOG_FUNCTION (this << position);
 
-  m_geoPosition = position;
-  NotifyGeoCourseChange ();
+void
+SatConstantPositionMobilityModel::DoSetGeoPosition(const GeoCoordinate& position)
+{
+    NS_LOG_FUNCTION(this << position);
+
+    m_geoPosition = position;
+    NotifyGeoCourseChange();
 }
 
 Vector
-SatConstantPositionMobilityModel::DoGetVelocity (void) const
+SatConstantPositionMobilityModel::DoGetVelocity(void) const
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return Vector (0.0, 0.0, 0.0);
+    return Vector(0.0, 0.0, 0.0);
 }
 
 } // namespace ns3

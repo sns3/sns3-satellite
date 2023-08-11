@@ -18,122 +18,119 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.com>
  */
 
-#include <ns3/simulator.h>
-#include <ns3/log.h>
-
 #include "satellite-per-fragment-interference.h"
 
+#include <ns3/log.h>
+#include <ns3/simulator.h>
 
-NS_LOG_COMPONENT_DEFINE ("SatPerFragmentInterference");
+NS_LOG_COMPONENT_DEFINE("SatPerFragmentInterference");
 
-namespace ns3 {
+namespace ns3
+{
 
-NS_OBJECT_ENSURE_REGISTERED (SatPerFragmentInterference);
+NS_OBJECT_ENSURE_REGISTERED(SatPerFragmentInterference);
 
 TypeId
-SatPerFragmentInterference::GetTypeId (void)
+SatPerFragmentInterference::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatPerFragmentInterference")
-    .SetParent<SatPerPacketInterference> ()
-    .AddConstructor<SatPerFragmentInterference> ();
+    static TypeId tid = TypeId("ns3::SatPerFragmentInterference")
+                            .SetParent<SatPerPacketInterference>()
+                            .AddConstructor<SatPerFragmentInterference>();
 
-  return tid;
+    return tid;
 }
-
 
 TypeId
-SatPerFragmentInterference::GetInstanceTypeId (void) const
+SatPerFragmentInterference::GetInstanceTypeId(void) const
 {
-  NS_LOG_FUNCTION (this);
-  return GetTypeId ();
+    NS_LOG_FUNCTION(this);
+    return GetTypeId();
 }
 
-
-SatPerFragmentInterference::SatPerFragmentInterference ()
-  : SatPerPacketInterference (),
-  m_ifPowerAtEventChangeW (),
-  m_maxFragmentsCount (1)
+SatPerFragmentInterference::SatPerFragmentInterference()
+    : SatPerPacketInterference(),
+      m_ifPowerAtEventChangeW(),
+      m_maxFragmentsCount(1)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-
-SatPerFragmentInterference::SatPerFragmentInterference (SatEnums::ChannelType_t channelType, double rxBandwidthHz)
-  : SatPerPacketInterference (channelType, rxBandwidthHz),
-  m_ifPowerAtEventChangeW (),
-  m_maxFragmentsCount (1)
+SatPerFragmentInterference::SatPerFragmentInterference(SatEnums::ChannelType_t channelType,
+                                                       double rxBandwidthHz)
+    : SatPerPacketInterference(channelType, rxBandwidthHz),
+      m_ifPowerAtEventChangeW(),
+      m_maxFragmentsCount(1)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-
-SatPerFragmentInterference::~SatPerFragmentInterference ()
+SatPerFragmentInterference::~SatPerFragmentInterference()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-
-std::vector< std::pair<double, double> >
-SatPerFragmentInterference::DoCalculate (Ptr<SatInterference::InterferenceChangeEvent> event)
+std::vector<std::pair<double, double>>
+SatPerFragmentInterference::DoCalculate(Ptr<SatInterference::InterferenceChangeEvent> event)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  m_ifPowerAtEventChangeW.clear ();
-  m_ifPowerAtEventChangeW.reserve (m_maxFragmentsCount);
+    m_ifPowerAtEventChangeW.clear();
+    m_ifPowerAtEventChangeW.reserve(m_maxFragmentsCount);
 
-  // Use the per packet interference computation hooks to store
-  // interferences at each event associated to the current packet
-  SatPerPacketInterference::DoCalculate (event);
+    // Use the per packet interference computation hooks to store
+    // interferences at each event associated to the current packet
+    SatPerPacketInterference::DoCalculate(event);
 
-  std::size_t fragmentsCount = m_ifPowerAtEventChangeW.size ();
-  if (!fragmentsCount)
+    std::size_t fragmentsCount = m_ifPowerAtEventChangeW.size();
+    if (!fragmentsCount)
     {
-      NS_FATAL_ERROR ("Interference computation did not find a single fragment");
+        NS_FATAL_ERROR("Interference computation did not find a single fragment");
     }
 
-  if (fragmentsCount > m_maxFragmentsCount)
+    if (fragmentsCount > m_maxFragmentsCount)
     {
-      m_maxFragmentsCount = fragmentsCount;
+        m_maxFragmentsCount = fragmentsCount;
     }
 
-  // Convert time ratio into durations
-  std::vector< std::pair<double, double> > ifPowerPerFragment;
-  ifPowerPerFragment.reserve (fragmentsCount);
+    // Convert time ratio into durations
+    std::vector<std::pair<double, double>> ifPowerPerFragment;
+    ifPowerPerFragment.reserve(fragmentsCount);
 
-  std::vector<std::pair<double, double>>::const_iterator iter = m_ifPowerAtEventChangeW.begin ();
-  std::pair<double, double> eventChangeInPower = *iter;
-  for (++iter; iter != m_ifPowerAtEventChangeW.end (); ++iter)
+    std::vector<std::pair<double, double>>::const_iterator iter = m_ifPowerAtEventChangeW.begin();
+    std::pair<double, double> eventChangeInPower = *iter;
+    for (++iter; iter != m_ifPowerAtEventChangeW.end(); ++iter)
     {
-      ifPowerPerFragment.emplace_back (iter->first - eventChangeInPower.first, eventChangeInPower.second);
-      eventChangeInPower = *iter;
+        ifPowerPerFragment.emplace_back(iter->first - eventChangeInPower.first,
+                                        eventChangeInPower.second);
+        eventChangeInPower = *iter;
     }
 
-  // Account for the last fragment duration
-  if (eventChangeInPower.first != 1.0)
+    // Account for the last fragment duration
+    if (eventChangeInPower.first != 1.0)
     {
-      ifPowerPerFragment.emplace_back (1.0 - eventChangeInPower.first, eventChangeInPower.second);
+        ifPowerPerFragment.emplace_back(1.0 - eventChangeInPower.first, eventChangeInPower.second);
     }
 
-  return ifPowerPerFragment;
+    return ifPowerPerFragment;
 }
-
 
 void
-SatPerFragmentInterference::onOwnStartReached (double ifPowerW)
+SatPerFragmentInterference::onOwnStartReached(double ifPowerW)
 {
-  // Hook into per packet interference computation to store
-  // interference level at the beginning of the packet
-  m_ifPowerAtEventChangeW.emplace_back(0.0, ifPowerW);
+    // Hook into per packet interference computation to store
+    // interference level at the beginning of the packet
+    m_ifPowerAtEventChangeW.emplace_back(0.0, ifPowerW);
 }
-
 
 void
-SatPerFragmentInterference::onInterferentEvent (long double timeRatio, double interferenceValue, double& ifPowerW)
+SatPerFragmentInterference::onInterferentEvent(long double timeRatio,
+                                               double interferenceValue,
+                                               double& ifPowerW)
 {
-  // Hook into per packet interference computation to store
-  // interference level at each event change
-  ifPowerW += interferenceValue;
-  m_ifPowerAtEventChangeW.emplace_back(1.0 - timeRatio, ifPowerW);
+    // Hook into per packet interference computation to store
+    // interference level at each event change
+    ifPowerW += interferenceValue;
+    m_ifPowerAtEventChangeW.emplace_back(1.0 - timeRatio, ifPowerW);
 }
 
-}
+} // namespace ns3

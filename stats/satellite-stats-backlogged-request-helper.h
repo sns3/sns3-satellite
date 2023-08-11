@@ -25,9 +25,8 @@
 #include <ns3/ptr.h>
 #include <ns3/satellite-stats-helper.h>
 
-
-namespace ns3 {
-
+namespace ns3
+{
 
 class SatHelper;
 class DataCollectionObject;
@@ -38,34 +37,30 @@ class DataCollectionObject;
  */
 class SatStatsBackloggedRequestHelper : public SatStatsHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsBackloggedRequestHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsBackloggedRequestHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsBackloggedRequestHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsBackloggedRequestHelper ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
+  protected:
+    // inherited from SatStatsHelper base class
+    void DoInstall();
 
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
-
-protected:
-  // inherited from SatStatsHelper base class
-  void DoInstall ();
-
-private:
-  /// The aggregator created by this helper.
-  Ptr<DataCollectionObject> m_aggregator;
+  private:
+    /// The aggregator created by this helper.
+    Ptr<DataCollectionObject> m_aggregator;
 
 }; // end of class SatStatsBackloggedRequestHelper
 
-
 } // end of namespace ns3
-
 
 #endif /* SATELLITE_STATS_BACKLOGGED_REQUEST_HELPER_H */

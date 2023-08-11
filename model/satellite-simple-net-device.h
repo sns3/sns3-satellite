@@ -21,15 +21,15 @@
 #ifndef SATELLITE_SIMPLE_NET_DEVICE_H
 #define SATELLITE_SIMPLE_NET_DEVICE_H
 
-#include <ns3/net-device.h>
-#include <ns3/packet.h>
-#include <ns3/error-model.h>
-#include <ns3/traced-callback.h>
-
 #include "satellite-simple-channel.h"
 
+#include <ns3/error-model.h>
+#include <ns3/net-device.h>
+#include <ns3/packet.h>
+#include <ns3/traced-callback.h>
 
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -47,107 +47,111 @@ namespace ns3 {
  */
 class SatSimpleNetDevice : public NetDevice
 {
-public:
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
+  public:
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * Default constructor.
-   */
-  SatSimpleNetDevice ();
+    /**
+     * Default constructor.
+     */
+    SatSimpleNetDevice();
 
-  /**
-   * Destructor for SatSimpleNetDevice
-   */
-  ~SatSimpleNetDevice ();
+    /**
+     * Destructor for SatSimpleNetDevice
+     */
+    ~SatSimpleNetDevice();
 
-  /**
-   * Receive a packet from a connected SatSimpleChannel. The
-   * SatSimpleNetDevice receives packets from its connected channel
-   * and then forwards them by calling its rx callback method
-   *
-   * \param packet Packet received on the channel
-   * \param protocol protocol number
-   * \param to address packet should be sent to
-   * \param from address packet was sent from
-   */
-  void Receive (Ptr<Packet> packet, uint16_t protocol, Mac48Address to, Mac48Address from);
+    /**
+     * Receive a packet from a connected SatSimpleChannel. The
+     * SatSimpleNetDevice receives packets from its connected channel
+     * and then forwards them by calling its rx callback method
+     *
+     * \param packet Packet received on the channel
+     * \param protocol protocol number
+     * \param to address packet should be sent to
+     * \param from address packet was sent from
+     */
+    void Receive(Ptr<Packet> packet, uint16_t protocol, Mac48Address to, Mac48Address from);
 
-  /**
-   *
-   * Attach a channel to this net device.  This will be the
-   * channel the net device sends on
-   *
-   * \param channel channel to assign to this net device
-   *
-   */
-  void SetChannel (Ptr<SatSimpleChannel> channel);
+    /**
+     *
+     * Attach a channel to this net device.  This will be the
+     * channel the net device sends on
+     *
+     * \param channel channel to assign to this net device
+     *
+     */
+    void SetChannel(Ptr<SatSimpleChannel> channel);
 
-  /**
-   * Attach a receive ErrorModel to the SimpleNetDevice.
-   *
-   * The SimpleNetDevice may optionally include an ErrorModel in
-   * the packet receive chain.
-   *
-   * \see ErrorModel
-   * \param em Ptr to the ErrorModel.
-   */
-  void SetReceiveErrorModel (Ptr<ErrorModel> em);
+    /**
+     * Attach a receive ErrorModel to the SimpleNetDevice.
+     *
+     * The SimpleNetDevice may optionally include an ErrorModel in
+     * the packet receive chain.
+     *
+     * \see ErrorModel
+     * \param em Ptr to the ErrorModel.
+     */
+    void SetReceiveErrorModel(Ptr<ErrorModel> em);
 
-  // inherited from NetDevice base class.
-  virtual void SetIfIndex (const uint32_t index);
-  virtual uint32_t GetIfIndex (void) const;
-  virtual Ptr<Channel> GetChannel (void) const;
-  virtual void SetAddress (Address address);
-  virtual Address GetAddress (void) const;
-  virtual bool SetMtu (const uint16_t mtu);
-  virtual uint16_t GetMtu (void) const;
-  virtual bool IsLinkUp (void) const;
-  virtual void AddLinkChangeCallback (Callback<void> callback);
-  virtual bool IsBroadcast (void) const;
-  virtual Address GetBroadcast (void) const;
-  virtual bool IsMulticast (void) const;
-  virtual Address GetMulticast (Ipv4Address multicastGroup) const;
-  virtual bool IsPointToPoint (void) const;
-  virtual bool IsBridge (void) const;
-  virtual bool Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber);
-  virtual bool SendFrom (Ptr<Packet> packet, const Address& source, const Address& dest, uint16_t protocolNumber);
-  virtual Ptr<Node> GetNode (void) const;
-  virtual void SetNode (Ptr<Node> node);
-  virtual bool NeedsArp (void) const;
-  virtual void SetReceiveCallback (NetDevice::ReceiveCallback cb);
+    // inherited from NetDevice base class.
+    virtual void SetIfIndex(const uint32_t index);
+    virtual uint32_t GetIfIndex(void) const;
+    virtual Ptr<Channel> GetChannel(void) const;
+    virtual void SetAddress(Address address);
+    virtual Address GetAddress(void) const;
+    virtual bool SetMtu(const uint16_t mtu);
+    virtual uint16_t GetMtu(void) const;
+    virtual bool IsLinkUp(void) const;
+    virtual void AddLinkChangeCallback(Callback<void> callback);
+    virtual bool IsBroadcast(void) const;
+    virtual Address GetBroadcast(void) const;
+    virtual bool IsMulticast(void) const;
+    virtual Address GetMulticast(Ipv4Address multicastGroup) const;
+    virtual bool IsPointToPoint(void) const;
+    virtual bool IsBridge(void) const;
+    virtual bool Send(Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber);
+    virtual bool SendFrom(Ptr<Packet> packet,
+                          const Address& source,
+                          const Address& dest,
+                          uint16_t protocolNumber);
+    virtual Ptr<Node> GetNode(void) const;
+    virtual void SetNode(Ptr<Node> node);
+    virtual bool NeedsArp(void) const;
+    virtual void SetReceiveCallback(NetDevice::ReceiveCallback cb);
 
-  virtual Address GetMulticast (Ipv6Address addr) const;
+    virtual Address GetMulticast(Ipv6Address addr) const;
 
-  virtual void SetPromiscReceiveCallback (PromiscReceiveCallback cb);
-  virtual bool SupportsSendFrom (void) const;
+    virtual void SetPromiscReceiveCallback(PromiscReceiveCallback cb);
+    virtual bool SupportsSendFrom(void) const;
 
-protected:
-  /**
-   * Dispose of this class instance
-   */
-  virtual void DoDispose (void);
-private:
-  Ptr<SatSimpleChannel>             m_channel;
-  NetDevice::ReceiveCallback        m_rxCallback;
-  NetDevice::PromiscReceiveCallback m_promiscCallback;
-  Ptr<Node>                         m_node;
-  uint16_t                          m_mtu;
-  uint32_t                          m_ifIndex;
-  Mac48Address                      m_address;
-  Ptr<ErrorModel>                   m_receiveErrorModel;
-  /**
-   * The trace source fired when the phy layer drops a packet it has received
-   * due to the error model being active.  Although SimpleNetDevice doesn't
-   * really have a Phy model, we choose this trace source name for alignment
-   * with other trace sources.
-   *
-   * \see class CallBackTraceSource
-   */
-  TracedCallback<Ptr<const Packet> > m_phyRxDropTrace;
+  protected:
+    /**
+     * Dispose of this class instance
+     */
+    virtual void DoDispose(void);
+
+  private:
+    Ptr<SatSimpleChannel> m_channel;
+    NetDevice::ReceiveCallback m_rxCallback;
+    NetDevice::PromiscReceiveCallback m_promiscCallback;
+    Ptr<Node> m_node;
+    uint16_t m_mtu;
+    uint32_t m_ifIndex;
+    Mac48Address m_address;
+    Ptr<ErrorModel> m_receiveErrorModel;
+    /**
+     * The trace source fired when the phy layer drops a packet it has received
+     * due to the error model being active.  Although SimpleNetDevice doesn't
+     * really have a Phy model, we choose this trace source name for alignment
+     * with other trace sources.
+     *
+     * \see class CallBackTraceSource
+     */
+    TracedCallback<Ptr<const Packet>> m_phyRxDropTrace;
 };
 
 } // namespace ns3

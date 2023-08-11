@@ -20,133 +20,137 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
-#include <ns3/simulator.h>
-#include <ns3/log.h>
-#include <ns3/singleton.h>
-
 #include "satellite-traced-interference.h"
 
+#include <ns3/log.h>
+#include <ns3/simulator.h>
+#include <ns3/singleton.h>
 
-NS_LOG_COMPONENT_DEFINE ("SatTracedInterference");
+NS_LOG_COMPONENT_DEFINE("SatTracedInterference");
 
-namespace ns3 {
+namespace ns3
+{
 
-NS_OBJECT_ENSURE_REGISTERED (SatTracedInterference);
+NS_OBJECT_ENSURE_REGISTERED(SatTracedInterference);
 
 TypeId
-SatTracedInterference::GetTypeId (void)
+SatTracedInterference::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatTracedInterference")
-    .SetParent<SatInterference> ()
-    .AddConstructor<SatTracedInterference> ();
+    static TypeId tid = TypeId("ns3::SatTracedInterference")
+                            .SetParent<SatInterference>()
+                            .AddConstructor<SatTracedInterference>();
 
-  return tid;
+    return tid;
 }
 
 TypeId
-SatTracedInterference::GetInstanceTypeId (void) const
+SatTracedInterference::GetInstanceTypeId(void) const
 {
-  return GetTypeId ();
+    return GetTypeId();
 }
 
-SatTracedInterference::SatTracedInterference (SatEnums::ChannelType_t channeltype, double rxBandwidth)
-  : m_rxing (false),
-  m_power (0),
-  m_channelType (channeltype),
-  m_rxBandwidth_Hz (rxBandwidth)
+SatTracedInterference::SatTracedInterference(SatEnums::ChannelType_t channeltype,
+                                             double rxBandwidth)
+    : m_rxing(false),
+      m_power(0),
+      m_channelType(channeltype),
+      m_rxBandwidth_Hz(rxBandwidth)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  if (m_rxBandwidth_Hz <= std::numeric_limits<double>::epsilon ())
+    if (m_rxBandwidth_Hz <= std::numeric_limits<double>::epsilon())
     {
-      NS_FATAL_ERROR ("SatTracedInterference::SatTracedInterference - Invalid value");
+        NS_FATAL_ERROR("SatTracedInterference::SatTracedInterference - Invalid value");
     }
 }
 
-SatTracedInterference::SatTracedInterference ()
-  : m_rxing (false),
-  m_power (),
-  m_channelType (),
-  m_rxBandwidth_Hz ()
+SatTracedInterference::SatTracedInterference()
+    : m_rxing(false),
+      m_power(),
+      m_channelType(),
+      m_rxBandwidth_Hz()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  NS_FATAL_ERROR ("SatTracedInterference::SatTracedInterference - Constructor not in use");
+    NS_FATAL_ERROR("SatTracedInterference::SatTracedInterference - Constructor not in use");
 }
 
-SatTracedInterference::~SatTracedInterference ()
+SatTracedInterference::~SatTracedInterference()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  Reset ();
+    Reset();
 }
 
 Ptr<SatInterference::InterferenceChangeEvent>
-SatTracedInterference::DoAdd (Time duration, double power, Address rxAddress)
+SatTracedInterference::DoAdd(Time duration, double power, Address rxAddress)
 {
-  NS_LOG_FUNCTION (this << duration.GetSeconds () << power << rxAddress);
+    NS_LOG_FUNCTION(this << duration.GetSeconds() << power << rxAddress);
 
-  Ptr<SatInterference::InterferenceChangeEvent> event;
-  event = Create<SatInterference::InterferenceChangeEvent> (0, duration, power, rxAddress);
+    Ptr<SatInterference::InterferenceChangeEvent> event;
+    event = Create<SatInterference::InterferenceChangeEvent>(0, duration, power, rxAddress);
 
-  return event;
+    return event;
 }
 
-std::vector< std::pair<double, double> >
-SatTracedInterference::DoCalculate (Ptr<SatInterference::InterferenceChangeEvent> event)
+std::vector<std::pair<double, double>>
+SatTracedInterference::DoCalculate(Ptr<SatInterference::InterferenceChangeEvent> event)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  m_power = m_rxBandwidth_Hz * Singleton<SatInterferenceInputTraceContainer>::Get ()->GetInterferenceDensity (std::make_pair (event->GetSatEarthStationAddress (), m_channelType));
+    m_power = m_rxBandwidth_Hz *
+              Singleton<SatInterferenceInputTraceContainer>::Get()->GetInterferenceDensity(
+                  std::make_pair(event->GetSatEarthStationAddress(), m_channelType));
 
-  std::vector< std::pair<double, double> > powerPerFragment;
-  powerPerFragment.emplace_back (1.0, m_power);
+    std::vector<std::pair<double, double>> powerPerFragment;
+    powerPerFragment.emplace_back(1.0, m_power);
 
-  return powerPerFragment;
-}
-
-void
-SatTracedInterference::DoReset ()
-{
-  NS_LOG_FUNCTION (this);
+    return powerPerFragment;
 }
 
 void
-SatTracedInterference::DoNotifyRxStart (Ptr<SatInterference::InterferenceChangeEvent> event)
+SatTracedInterference::DoReset()
 {
-  NS_LOG_FUNCTION (this);
-
-  m_rxing = true;
+    NS_LOG_FUNCTION(this);
 }
 
 void
-SatTracedInterference::DoNotifyRxEnd (Ptr<SatInterference::InterferenceChangeEvent> event)
+SatTracedInterference::DoNotifyRxStart(Ptr<SatInterference::InterferenceChangeEvent> event)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  m_rxing = false;
+    m_rxing = true;
 }
 
 void
-SatTracedInterference::DoDispose ()
+SatTracedInterference::DoNotifyRxEnd(Ptr<SatInterference::InterferenceChangeEvent> event)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  SatInterference::DoDispose ();
+    m_rxing = false;
 }
 
 void
-SatTracedInterference::SetRxBandwidth (double rxBandwidth)
+SatTracedInterference::DoDispose()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  if (rxBandwidth <= std::numeric_limits<double>::epsilon ())
+    SatInterference::DoDispose();
+}
+
+void
+SatTracedInterference::SetRxBandwidth(double rxBandwidth)
+{
+    NS_LOG_FUNCTION(this);
+
+    if (rxBandwidth <= std::numeric_limits<double>::epsilon())
     {
-      NS_FATAL_ERROR ("SatTracedInterference::SetRxBandwidth - Invalid value");
+        NS_FATAL_ERROR("SatTracedInterference::SetRxBandwidth - Invalid value");
     }
 
-  m_rxBandwidth_Hz = rxBandwidth;
+    m_rxBandwidth_Hz = rxBandwidth;
 }
 
-}
+} // namespace ns3
+
 // namespace ns3

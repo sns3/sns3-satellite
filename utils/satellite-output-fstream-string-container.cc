@@ -19,133 +19,137 @@
  */
 
 #include "satellite-output-fstream-string-container.h"
-#include "ns3/log.h"
+
 #include "ns3/abort.h"
+#include "ns3/log.h"
 #include "ns3/simulator.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatOutputFileStreamStringContainer");
+NS_LOG_COMPONENT_DEFINE("SatOutputFileStreamStringContainer");
 
-namespace ns3 {
+namespace ns3
+{
 
 TypeId
-SatOutputFileStreamStringContainer::GetTypeId (void)
+SatOutputFileStreamStringContainer::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatOutputFileStreamStringContainer")
-    .SetParent<Object> ()
-    .AddConstructor<SatOutputFileStreamStringContainer> ();
-  return tid;
+    static TypeId tid = TypeId("ns3::SatOutputFileStreamStringContainer")
+                            .SetParent<Object>()
+                            .AddConstructor<SatOutputFileStreamStringContainer>();
+    return tid;
 }
 
-SatOutputFileStreamStringContainer::SatOutputFileStreamStringContainer (std::string filename, std::ios::openmode filemode)
-  : m_outputFileStreamWrapper (),
-  m_outputFileStream (),
-  m_container (),
-  m_fileName (filename),
-  m_fileMode (filemode)
+SatOutputFileStreamStringContainer::SatOutputFileStreamStringContainer(std::string filename,
+                                                                       std::ios::openmode filemode)
+    : m_outputFileStreamWrapper(),
+      m_outputFileStream(),
+      m_container(),
+      m_fileName(filename),
+      m_fileMode(filemode)
 {
-  NS_LOG_FUNCTION (this << m_fileName << m_fileMode);
+    NS_LOG_FUNCTION(this << m_fileName << m_fileMode);
 }
 
-SatOutputFileStreamStringContainer::SatOutputFileStreamStringContainer ()
-  : m_outputFileStreamWrapper (),
-  m_outputFileStream (),
-  m_container (),
-  m_fileName (),
-  m_fileMode ()
+SatOutputFileStreamStringContainer::SatOutputFileStreamStringContainer()
+    : m_outputFileStreamWrapper(),
+      m_outputFileStream(),
+      m_container(),
+      m_fileName(),
+      m_fileMode()
 {
-  NS_LOG_FUNCTION (this);
-  NS_FATAL_ERROR ("SatOutputFileStreamStringContainer::SatOutputFileStreamStringContainer - Constructor not in use");
+    NS_LOG_FUNCTION(this);
+    NS_FATAL_ERROR("SatOutputFileStreamStringContainer::SatOutputFileStreamStringContainer - "
+                   "Constructor not in use");
 }
 
-SatOutputFileStreamStringContainer::~SatOutputFileStreamStringContainer ()
+SatOutputFileStreamStringContainer::~SatOutputFileStreamStringContainer()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  Reset ();
-}
-
-void
-SatOutputFileStreamStringContainer::DoDispose ()
-{
-  NS_LOG_FUNCTION (this);
-
-  Reset ();
-  Object::DoDispose ();
+    Reset();
 }
 
 void
-SatOutputFileStreamStringContainer::WriteContainerToFile ()
+SatOutputFileStreamStringContainer::DoDispose()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  OpenStream ();
+    Reset();
+    Object::DoDispose();
+}
 
-  if (m_outputFileStream->is_open ())
+void
+SatOutputFileStreamStringContainer::WriteContainerToFile()
+{
+    NS_LOG_FUNCTION(this);
+
+    OpenStream();
+
+    if (m_outputFileStream->is_open())
     {
-      for (uint32_t i = 0; i < m_container.size (); i++)
+        for (uint32_t i = 0; i < m_container.size(); i++)
         {
-          *m_outputFileStream <<  m_container[i] << std::endl;
+            *m_outputFileStream << m_container[i] << std::endl;
         }
-      m_outputFileStream->close ();
+        m_outputFileStream->close();
     }
-  else
+    else
     {
-      NS_ABORT_MSG ("Output stream is not valid for writing.");
+        NS_ABORT_MSG("Output stream is not valid for writing.");
     }
 
-  Reset ();
+    Reset();
 }
 
 void
-SatOutputFileStreamStringContainer::AddToContainer (std::string newLine)
+SatOutputFileStreamStringContainer::AddToContainer(std::string newLine)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  m_container.push_back (newLine);
+    m_container.push_back(newLine);
 }
 
 void
-SatOutputFileStreamStringContainer::OpenStream ()
+SatOutputFileStreamStringContainer::OpenStream()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  m_outputFileStreamWrapper = new SatOutputFileStreamWrapper (m_fileName, m_fileMode);
-  m_outputFileStream = m_outputFileStreamWrapper->GetStream ();
+    m_outputFileStreamWrapper = new SatOutputFileStreamWrapper(m_fileName, m_fileMode);
+    m_outputFileStream = m_outputFileStreamWrapper->GetStream();
 }
 
 void
-SatOutputFileStreamStringContainer::Reset ()
+SatOutputFileStreamStringContainer::Reset()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  ResetStream ();
-  ClearContainer ();
+    ResetStream();
+    ClearContainer();
 }
 
 void
-SatOutputFileStreamStringContainer::ResetStream ()
+SatOutputFileStreamStringContainer::ResetStream()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  if (m_outputFileStreamWrapper != NULL)
+    if (m_outputFileStreamWrapper != NULL)
     {
-      delete m_outputFileStreamWrapper;
-      m_outputFileStreamWrapper = 0;
+        delete m_outputFileStreamWrapper;
+        m_outputFileStreamWrapper = 0;
     }
-  m_outputFileStream = 0;
+    m_outputFileStream = 0;
 
-  m_fileName = "";
-  m_fileMode = std::ofstream::out;
+    m_fileName = "";
+    m_fileMode = std::ofstream::out;
 }
 
 void
-SatOutputFileStreamStringContainer::ClearContainer ()
+SatOutputFileStreamStringContainer::ClearContainer()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  if (!m_container.empty ())
+    if (!m_container.empty())
     {
-      m_container.clear ();
+        m_container.clear();
     }
 }
 

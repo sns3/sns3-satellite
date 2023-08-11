@@ -22,11 +22,11 @@
 % which we form a "max" antenna gain pattern, where each latitude-
 % longitude coordinate has the antenna gain of the antenna beam
 % providing the maximum antenna gain. The same information is used
-% to build dominance map presenting which beam is the best in a 
-% certain latitude-longitude coordinate. The script also reads the 
+% to build dominance map presenting which beam is the best in a
+% certain latitude-longitude coordinate. The script also reads the
 % satellite system configuration file enabling it to plot beam
 % ids, user and feeder link frequency ids, and GW ids.
-% 
+%
 % Requirements
 % - Matlab
 % - Mapping toolbox for Matlab
@@ -53,7 +53,7 @@ for i = 1:BEAMS
     res = [];
     fileName = ['antennapatterns/SatAntennaGain72Beams_' int2str(i), '.txt']
     res = load(fileName);
-    
+
     % Store x, y coordinates
     if ( i == 1 )
         latitude = res(:,1);
@@ -63,7 +63,7 @@ for i = 1:BEAMS
     % Find beam centers
     ind = find(res(:,3)==max(res(:,3)));
     if (i == 1)
-      beamCenters = [res(ind(1,1),1) res(ind(1,1),2)]; 
+      beamCenters = [res(ind(1,1),1) res(ind(1,1),2)];
     else
       beamCenters = [beamCenters; [res(ind(1,1),1) res(ind(1,1),2)]];
     end
@@ -82,7 +82,7 @@ UF = zeros(size(G));
 FF = zeros(size(G));
 GW = zeros(size(G));
 for i = 1:length(I);
-  if (G(i) > minGain)    
+  if (G(i) > minGain)
     UF(i) = conf(I(i),2);
     FF(i) = conf(I(i),4);
     GW(i) = conf(I(i),3);
@@ -114,7 +114,7 @@ for i = 1:length(latitude);
     end
 end
 
-% Reshape the gain pattern 
+% Reshape the gain pattern
 s = length(G);
 
 shapedG = reshape(G, repetition, s/repetition)';

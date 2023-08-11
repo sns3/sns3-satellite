@@ -23,37 +23,37 @@
 #ifndef LORAWAN_MAC_COMMAND_H
 #define LORAWAN_MAC_COMMAND_H
 
-#include <ns3/object.h>
-#include <ns3/nstime.h>
 #include <ns3/buffer.h>
+#include <ns3/nstime.h>
+#include <ns3/object.h>
 
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * Enum for every possible command type
  */
 enum MacCommandType
 {
-  INVALID,
-  LINK_CHECK_REQ,
-  LINK_CHECK_ANS,
-  LINK_ADR_REQ,
-  LINK_ADR_ANS,
-  DUTY_CYCLE_REQ,
-  DUTY_CYCLE_ANS,
-  RX_PARAM_SETUP_REQ,
-  RX_PARAM_SETUP_ANS,
-  DEV_STATUS_REQ,
-  DEV_STATUS_ANS,
-  NEW_CHANNEL_REQ,
-  NEW_CHANNEL_ANS,
-  RX_TIMING_SETUP_REQ,
-  RX_TIMING_SETUP_ANS,
-  TX_PARAM_SETUP_REQ,
-  TX_PARAM_SETUP_ANS,
-  DL_CHANNEL_REQ,
-  DL_CHANNEL_ANS
+    INVALID,
+    LINK_CHECK_REQ,
+    LINK_CHECK_ANS,
+    LINK_ADR_REQ,
+    LINK_ADR_ANS,
+    DUTY_CYCLE_REQ,
+    DUTY_CYCLE_ANS,
+    RX_PARAM_SETUP_REQ,
+    RX_PARAM_SETUP_ANS,
+    DEV_STATUS_REQ,
+    DEV_STATUS_ANS,
+    NEW_CHANNEL_REQ,
+    NEW_CHANNEL_ANS,
+    RX_TIMING_SETUP_REQ,
+    RX_TIMING_SETUP_ANS,
+    TX_PARAM_SETUP_REQ,
+    TX_PARAM_SETUP_ANS,
+    DL_CHANNEL_REQ,
+    DL_CHANNEL_ANS
 };
 
 /**
@@ -65,67 +65,66 @@ enum MacCommandType
  */
 class LorawanMacCommand : public Object
 {
-public:
-  static TypeId GetTypeId (void);
+  public:
+    static TypeId GetTypeId(void);
 
-  LorawanMacCommand ();
-  virtual ~LorawanMacCommand ();
+    LorawanMacCommand();
+    virtual ~LorawanMacCommand();
 
-  /**
-   * Serialize the contents of this MAC command into a buffer, according to the
-   * LoRaWAN standard.
-   *
-   * \param start A pointer to the buffer into which to serialize the command.
-   */
-  virtual void Serialize (Buffer::Iterator &start) const = 0;
+    /**
+     * Serialize the contents of this MAC command into a buffer, according to the
+     * LoRaWAN standard.
+     *
+     * \param start A pointer to the buffer into which to serialize the command.
+     */
+    virtual void Serialize(Buffer::Iterator& start) const = 0;
 
-  /**
-   * Deserialize the buffer into a MAC command.
-   *
-   * \param start A pointer to the buffer that contains the serialized command.
-   * \return the number of bytes that were consumed.
-   */
-  virtual uint8_t Deserialize (Buffer::Iterator &start) = 0;
+    /**
+     * Deserialize the buffer into a MAC command.
+     *
+     * \param start A pointer to the buffer that contains the serialized command.
+     * \return the number of bytes that were consumed.
+     */
+    virtual uint8_t Deserialize(Buffer::Iterator& start) = 0;
 
-  /**
-   * Print the contents of this MAC command in human-readable format.
-   *
-   * \param os The std::ostream instance on which to print the MAC command.
-   */
-  virtual void Print (std::ostream &os) const = 0;
+    /**
+     * Print the contents of this MAC command in human-readable format.
+     *
+     * \param os The std::ostream instance on which to print the MAC command.
+     */
+    virtual void Print(std::ostream& os) const = 0;
 
-  /**
-   * Get serialized length of this MAC command.
-   *
-   * \return The number of bytes the MAC command takes up.
-   */
-  virtual uint8_t GetSerializedSize (void) const;
+    /**
+     * Get serialized length of this MAC command.
+     *
+     * \return The number of bytes the MAC command takes up.
+     */
+    virtual uint8_t GetSerializedSize(void) const;
 
-  /**
-   * Get the commandType of this MAC command.
-   *
-   * \return The type of MAC command this object represents.
-   */
-  virtual enum MacCommandType GetCommandType (void) const;
+    /**
+     * Get the commandType of this MAC command.
+     *
+     * \return The type of MAC command this object represents.
+     */
+    virtual enum MacCommandType GetCommandType(void) const;
 
-  /**
-   * Get the CID that corresponds to this MAC command.
-   *
-   * \return The CID as a uint8_t type.
-   */
-  static uint8_t GetCIDFromLorawanMacCommand (enum MacCommandType commandType);
+    /**
+     * Get the CID that corresponds to this MAC command.
+     *
+     * \return The CID as a uint8_t type.
+     */
+    static uint8_t GetCIDFromLorawanMacCommand(enum MacCommandType commandType);
 
-protected:
-  /**
-   * The type of this command.
-   */
-  enum MacCommandType m_commandType;
+  protected:
+    /**
+     * The type of this command.
+     */
+    enum MacCommandType m_commandType;
 
-  /**
-   * This MAC command's serialized size.
-   */
-  uint8_t m_serializedSize;
-
+    /**
+     * This MAC command's serialized size.
+     */
+    uint8_t m_serializedSize;
 };
 
 /**
@@ -135,12 +134,12 @@ protected:
  */
 class LinkCheckReq : public LorawanMacCommand
 {
-public:
-  LinkCheckReq ();
-  ~LinkCheckReq ();
-  virtual void Serialize (Buffer::Iterator &start) const;
-  virtual uint8_t Deserialize (Buffer::Iterator &start);
-  virtual void Print (std::ostream &os) const;
+  public:
+    LinkCheckReq();
+    ~LinkCheckReq();
+    virtual void Serialize(Buffer::Iterator& start) const;
+    virtual uint8_t Deserialize(Buffer::Iterator& start);
+    virtual void Print(std::ostream& os) const;
 };
 
 /**
@@ -151,57 +150,57 @@ public:
  */
 class LinkCheckAns : public LorawanMacCommand
 {
-public:
-  LinkCheckAns ();
-  LinkCheckAns (uint8_t margin, uint8_t gwCnt);
+  public:
+    LinkCheckAns();
+    LinkCheckAns(uint8_t margin, uint8_t gwCnt);
 
-  virtual void Serialize (Buffer::Iterator &start) const;
-  virtual uint8_t Deserialize (Buffer::Iterator &start);
-  virtual void Print (std::ostream &os) const;
+    virtual void Serialize(Buffer::Iterator& start) const;
+    virtual uint8_t Deserialize(Buffer::Iterator& start);
+    virtual void Print(std::ostream& os) const;
 
-  /**
-   * Set the demodulation margin value.
-   *
-   * \param margin The demodulation margin to set.
-   */
-  void SetMargin (uint8_t margin);
+    /**
+     * Set the demodulation margin value.
+     *
+     * \param margin The demodulation margin to set.
+     */
+    void SetMargin(uint8_t margin);
 
-  /**
-   * Get the demodulation margin value.
-   *
-   * \return The demodulation margin value.
-   */
-  uint8_t GetMargin (void) const;
+    /**
+     * Get the demodulation margin value.
+     *
+     * \return The demodulation margin value.
+     */
+    uint8_t GetMargin(void) const;
 
-  /**
-   * Set the gateway count value.
-   *
-   * \param gwCnt The count value to set.
-   */
-  void SetGwCnt (uint8_t gwCnt);
+    /**
+     * Set the gateway count value.
+     *
+     * \param gwCnt The count value to set.
+     */
+    void SetGwCnt(uint8_t gwCnt);
 
-  /**
-   * Get the gateway count value.
-   *
-   * \return The gateway count value.
-   */
-  uint8_t GetGwCnt (void) const;
+    /**
+     * Get the gateway count value.
+     *
+     * \return The gateway count value.
+     */
+    uint8_t GetGwCnt(void) const;
 
-  /**
-   * Increment this LorawanMacCommand's gwCnt value.
-   */
-  void IncrementGwCnt (void);
+    /**
+     * Increment this LorawanMacCommand's gwCnt value.
+     */
+    void IncrementGwCnt(void);
 
-private:
-  /**
-   * This MAC command's demodulation margin value.
-   */
-  uint8_t m_margin;
+  private:
+    /**
+     * This MAC command's demodulation margin value.
+     */
+    uint8_t m_margin;
 
-  /**
-   * This MAC command's gateway count value.
-   */
-  uint8_t m_gwCnt;
+    /**
+     * This MAC command's gateway count value.
+     */
+    uint8_t m_gwCnt;
 };
 
 /**
@@ -213,55 +212,58 @@ private:
  */
 class LinkAdrReq : public LorawanMacCommand
 {
-public:
-  LinkAdrReq ();
+  public:
+    LinkAdrReq();
 
-  LinkAdrReq (uint8_t dataRate, uint8_t txPower, uint16_t channelMask,
-              uint8_t chMaskCntl, uint8_t nbRep);
+    LinkAdrReq(uint8_t dataRate,
+               uint8_t txPower,
+               uint16_t channelMask,
+               uint8_t chMaskCntl,
+               uint8_t nbRep);
 
-  virtual void Serialize (Buffer::Iterator &start) const;
-  virtual uint8_t Deserialize (Buffer::Iterator &start);
-  virtual void Print (std::ostream &os) const;
+    virtual void Serialize(Buffer::Iterator& start) const;
+    virtual uint8_t Deserialize(Buffer::Iterator& start);
+    virtual void Print(std::ostream& os) const;
 
-  /**
-   * Return the data rate prescribed by this MAC command.
-   *
-   * \return An unsigned 8-bit integer containing the data rate.
-   */
-  uint8_t GetDataRate (void);
+    /**
+     * Return the data rate prescribed by this MAC command.
+     *
+     * \return An unsigned 8-bit integer containing the data rate.
+     */
+    uint8_t GetDataRate(void);
 
-  /**
-   * Get the transmission power prescribed by this MAC command.
-   *
-   * The MAC layer is expected to translate this value to a certain power in
-   * dBm when communicating it to the PHY, and the translation will vary based
-   * on the region of the device.
-   *
-   * \return The TX power, encoded as an unsigned 8-bit integer.
-   */
-  uint8_t GetTxPower (void);
+    /**
+     * Get the transmission power prescribed by this MAC command.
+     *
+     * The MAC layer is expected to translate this value to a certain power in
+     * dBm when communicating it to the PHY, and the translation will vary based
+     * on the region of the device.
+     *
+     * \return The TX power, encoded as an unsigned 8-bit integer.
+     */
+    uint8_t GetTxPower(void);
 
-  /**
-   * Get the list of enabled channels. This method takes the 16-bit channel mask
-   * and translates it to a list of integers that can be more easily parsed.
-   *
-   * \return The list of enabled channels.
-   */
-  std::list<int> GetEnabledChannelsList (void);
+    /**
+     * Get the list of enabled channels. This method takes the 16-bit channel mask
+     * and translates it to a list of integers that can be more easily parsed.
+     *
+     * \return The list of enabled channels.
+     */
+    std::list<int> GetEnabledChannelsList(void);
 
-  /**
-   * Get the number of repetitions prescribed by this MAC command.
-   *
-   * \return The number of repetitions.
-   */
-  int GetRepetitions (void);
+    /**
+     * Get the number of repetitions prescribed by this MAC command.
+     *
+     * \return The number of repetitions.
+     */
+    int GetRepetitions(void);
 
-private:
-  uint8_t m_dataRate;
-  uint8_t m_txPower;
-  uint16_t m_channelMask;
-  uint8_t m_chMaskCntl;
-  uint8_t m_nbRep;
+  private:
+    uint8_t m_dataRate;
+    uint8_t m_txPower;
+    uint16_t m_channelMask;
+    uint8_t m_chMaskCntl;
+    uint8_t m_nbRep;
 };
 
 /**
@@ -271,19 +273,19 @@ private:
  */
 class LinkAdrAns : public LorawanMacCommand
 {
-public:
-  LinkAdrAns ();
+  public:
+    LinkAdrAns();
 
-  LinkAdrAns (bool powerAck, bool dataRateAck, bool channelMaskAck);
+    LinkAdrAns(bool powerAck, bool dataRateAck, bool channelMaskAck);
 
-  virtual void Serialize (Buffer::Iterator &start) const;
-  virtual uint8_t Deserialize (Buffer::Iterator &start);
-  virtual void Print (std::ostream &os) const;
+    virtual void Serialize(Buffer::Iterator& start) const;
+    virtual uint8_t Deserialize(Buffer::Iterator& start);
+    virtual void Print(std::ostream& os) const;
 
-private:
-  bool m_powerAck;
-  bool m_dataRateAck;
-  bool m_channelMaskAck;
+  private:
+    bool m_powerAck;
+    bool m_dataRateAck;
+    bool m_channelMaskAck;
 };
 
 /**
@@ -295,28 +297,28 @@ private:
  */
 class DutyCycleReq : public LorawanMacCommand
 {
-public:
-  DutyCycleReq ();
-  /**
-   * Constructor providing initialization of all parameters.
-   *
-   * \param dutyCycle The duty cycle as a 8-bit unsigned integer.
-   */
-  DutyCycleReq (uint8_t dutyCycle);
+  public:
+    DutyCycleReq();
+    /**
+     * Constructor providing initialization of all parameters.
+     *
+     * \param dutyCycle The duty cycle as a 8-bit unsigned integer.
+     */
+    DutyCycleReq(uint8_t dutyCycle);
 
-  virtual void Serialize (Buffer::Iterator &start) const;
-  virtual uint8_t Deserialize (Buffer::Iterator &start);
-  virtual void Print (std::ostream &os) const;
+    virtual void Serialize(Buffer::Iterator& start) const;
+    virtual uint8_t Deserialize(Buffer::Iterator& start);
+    virtual void Print(std::ostream& os) const;
 
-  /**
-   * Get the maximum duty cycle prescribed by this Mac command, in fraction form.
-   *
-   * \return The maximum duty cycle.
-   */
-  double GetMaximumAllowedDutyCycle (void) const;
+    /**
+     * Get the maximum duty cycle prescribed by this Mac command, in fraction form.
+     *
+     * \return The maximum duty cycle.
+     */
+    double GetMaximumAllowedDutyCycle(void) const;
 
-private:
-  uint8_t m_maxDCycle;
+  private:
+    uint8_t m_maxDCycle;
 };
 
 /**
@@ -326,12 +328,12 @@ private:
  */
 class DutyCycleAns : public LorawanMacCommand
 {
-public:
-  DutyCycleAns ();
+  public:
+    DutyCycleAns();
 
-  virtual void Serialize (Buffer::Iterator &start) const;
-  virtual uint8_t Deserialize (Buffer::Iterator &start);
-  virtual void Print (std::ostream &os) const;
+    virtual void Serialize(Buffer::Iterator& start) const;
+    virtual uint8_t Deserialize(Buffer::Iterator& start);
+    virtual void Print(std::ostream& os) const;
 };
 
 /**
@@ -339,47 +341,47 @@ public:
  */
 class RxParamSetupReq : public LorawanMacCommand
 {
-public:
-  RxParamSetupReq ();
+  public:
+    RxParamSetupReq();
 
-  /**
-   * Constructor providing initialization of all fields.
-   *
-   * \param rx1DrOffset The Data Rate offset to use for the first receive window.
-   * \param rx2DataRate The Data Rate to use for the second receive window.
-   * \param frequency The frequency in Hz to use for the second receive window.
-   */
-  RxParamSetupReq (uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequency);
+    /**
+     * Constructor providing initialization of all fields.
+     *
+     * \param rx1DrOffset The Data Rate offset to use for the first receive window.
+     * \param rx2DataRate The Data Rate to use for the second receive window.
+     * \param frequency The frequency in Hz to use for the second receive window.
+     */
+    RxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequency);
 
-  virtual void Serialize (Buffer::Iterator &start) const;
-  virtual uint8_t Deserialize (Buffer::Iterator &start);
-  virtual void Print (std::ostream &os) const;
+    virtual void Serialize(Buffer::Iterator& start) const;
+    virtual uint8_t Deserialize(Buffer::Iterator& start);
+    virtual void Print(std::ostream& os) const;
 
-  /**
-   * Get this command's Rx1DrOffset parameter.
-   *
-   * \return The Rx1DrOffset parameter.
-   */
-  uint8_t GetRx1DrOffset (void);
+    /**
+     * Get this command's Rx1DrOffset parameter.
+     *
+     * \return The Rx1DrOffset parameter.
+     */
+    uint8_t GetRx1DrOffset(void);
 
-  /**
-   * Get this command's Rx2DataRate parameter.
-   *
-   * \return The Rx2DataRate parameter.
-   */
-  uint8_t GetRx2DataRate (void);
+    /**
+     * Get this command's Rx2DataRate parameter.
+     *
+     * \return The Rx2DataRate parameter.
+     */
+    uint8_t GetRx2DataRate(void);
 
-  /**
-   * Get this command's frequency.
-   *
-   * \return The frequency parameter, in Hz.
-   */
-  double GetFrequency (void);
+    /**
+     * Get this command's frequency.
+     *
+     * \return The frequency parameter, in Hz.
+     */
+    double GetFrequency(void);
 
-private:
-  uint8_t m_rx1DrOffset;
-  uint8_t m_rx2DataRate;
-  double m_frequency;     //!< The frequency _in Hz_
+  private:
+    uint8_t m_rx1DrOffset;
+    uint8_t m_rx2DataRate;
+    double m_frequency; //!< The frequency _in Hz_
 };
 
 /**
@@ -387,25 +389,25 @@ private:
  */
 class RxParamSetupAns : public LorawanMacCommand
 {
-public:
-  RxParamSetupAns ();
-  /**
-   * Constructor with initialization of all parameters.
-   *
-   * \param rx1DrOffsetAck Whether or not the offset was correctly set.
-   * \param rx2DataRateAck Whether or not the second slot data rate was correctly set.
-   * \param channelAck Whether or not the second slot frequency was correctly set.
-   */
-  RxParamSetupAns (bool rx1DrOffsetAck, bool rx2DataRateAck, bool channelAck);
+  public:
+    RxParamSetupAns();
+    /**
+     * Constructor with initialization of all parameters.
+     *
+     * \param rx1DrOffsetAck Whether or not the offset was correctly set.
+     * \param rx2DataRateAck Whether or not the second slot data rate was correctly set.
+     * \param channelAck Whether or not the second slot frequency was correctly set.
+     */
+    RxParamSetupAns(bool rx1DrOffsetAck, bool rx2DataRateAck, bool channelAck);
 
-  virtual void Serialize (Buffer::Iterator &start) const;
-  virtual uint8_t Deserialize (Buffer::Iterator &start);
-  virtual void Print (std::ostream &os) const;
+    virtual void Serialize(Buffer::Iterator& start) const;
+    virtual uint8_t Deserialize(Buffer::Iterator& start);
+    virtual void Print(std::ostream& os) const;
 
-private:
-  bool m_rx1DrOffsetAck;
-  bool m_rx2DataRateAck;
-  bool m_channelAck;
+  private:
+    bool m_rx1DrOffsetAck;
+    bool m_rx2DataRateAck;
+    bool m_channelAck;
 };
 
 /**
@@ -413,12 +415,12 @@ private:
  */
 class DevStatusReq : public LorawanMacCommand
 {
-public:
-  DevStatusReq ();
+  public:
+    DevStatusReq();
 
-  virtual void Serialize (Buffer::Iterator &start) const;
-  virtual uint8_t Deserialize (Buffer::Iterator &start);
-  virtual void Print (std::ostream &os) const;
+    virtual void Serialize(Buffer::Iterator& start) const;
+    virtual uint8_t Deserialize(Buffer::Iterator& start);
+    virtual void Print(std::ostream& os) const;
 };
 
 /**
@@ -426,37 +428,37 @@ public:
  */
 class DevStatusAns : public LorawanMacCommand
 {
-public:
-  DevStatusAns ();
-  /**
-   * Constructor with initialization of all parameters.
-   *
-   * \param battery The battery level in [0, 255].
-   * \param margin The demodulation margin of the last received DevStatusReq packet.
-   */
-  DevStatusAns (uint8_t battery, uint8_t margin);
+  public:
+    DevStatusAns();
+    /**
+     * Constructor with initialization of all parameters.
+     *
+     * \param battery The battery level in [0, 255].
+     * \param margin The demodulation margin of the last received DevStatusReq packet.
+     */
+    DevStatusAns(uint8_t battery, uint8_t margin);
 
-  virtual void Serialize (Buffer::Iterator &start) const;
-  virtual uint8_t Deserialize (Buffer::Iterator &start);
-  virtual void Print (std::ostream &os) const;
+    virtual void Serialize(Buffer::Iterator& start) const;
+    virtual uint8_t Deserialize(Buffer::Iterator& start);
+    virtual void Print(std::ostream& os) const;
 
-  /**
-   * Get the battery information contained in this MAC command.
-   *
-   * \return The battery level.
-   */
-  uint8_t GetBattery (void);
+    /**
+     * Get the battery information contained in this MAC command.
+     *
+     * \return The battery level.
+     */
+    uint8_t GetBattery(void);
 
-  /**
-   * Get the demodulation margin contained in this MAC command.
-   *
-   * \return The margin.
-   */
-  uint8_t GetMargin (void);
+    /**
+     * Get the demodulation margin contained in this MAC command.
+     *
+     * \return The margin.
+     */
+    uint8_t GetMargin(void);
 
-private:
-  uint8_t m_battery;
-  uint8_t m_margin;
+  private:
+    uint8_t m_battery;
+    uint8_t m_margin;
 };
 
 /**
@@ -464,33 +466,33 @@ private:
  */
 class NewChannelReq : public LorawanMacCommand
 {
-public:
-  NewChannelReq ();
+  public:
+    NewChannelReq();
 
-  /**
-   * Constructor providing initialization of all parameters.
-   *
-   * \param chIndex The index of the channel this command wants to operate on.
-   * \param frequency The new frequency for this channel.
-   * \param minDataRate The minimum data rate allowed on this channel.
-   * \param maxDataRate The minimum data rate allowed on this channel.
-   */
-  NewChannelReq (uint8_t chIndex, double frequency, uint8_t minDataRate, uint8_t maxDataRate);
+    /**
+     * Constructor providing initialization of all parameters.
+     *
+     * \param chIndex The index of the channel this command wants to operate on.
+     * \param frequency The new frequency for this channel.
+     * \param minDataRate The minimum data rate allowed on this channel.
+     * \param maxDataRate The minimum data rate allowed on this channel.
+     */
+    NewChannelReq(uint8_t chIndex, double frequency, uint8_t minDataRate, uint8_t maxDataRate);
 
-  virtual void Serialize (Buffer::Iterator &start) const;
-  virtual uint8_t Deserialize (Buffer::Iterator &start);
-  virtual void Print (std::ostream &os) const;
+    virtual void Serialize(Buffer::Iterator& start) const;
+    virtual uint8_t Deserialize(Buffer::Iterator& start);
+    virtual void Print(std::ostream& os) const;
 
-  uint8_t GetChannelIndex (void);
-  double GetFrequency (void);
-  uint8_t GetMinDataRate (void);
-  uint8_t GetMaxDataRate (void);
+    uint8_t GetChannelIndex(void);
+    double GetFrequency(void);
+    uint8_t GetMinDataRate(void);
+    uint8_t GetMaxDataRate(void);
 
-private:
-  uint8_t m_chIndex;
-  double m_frequency;
-  uint8_t m_minDataRate;
-  uint8_t m_maxDataRate;
+  private:
+    uint8_t m_chIndex;
+    double m_frequency;
+    uint8_t m_minDataRate;
+    uint8_t m_maxDataRate;
 };
 
 /**
@@ -498,26 +500,26 @@ private:
  */
 class NewChannelAns : public LorawanMacCommand
 {
-public:
-  NewChannelAns ();
+  public:
+    NewChannelAns();
 
-  /**
-   * Constructor providing initialization of all parameters.
-   *
-   * \param dataRateRangeOk Whether or not the requested data rate range was set
-   * correctly.
-   * \param channelFrequencyOk Whether or not the requested channel frequency
-   * was set correctly.
-   */
-  NewChannelAns (bool dataRateRangeOk, bool channelFrequencyOk);
+    /**
+     * Constructor providing initialization of all parameters.
+     *
+     * \param dataRateRangeOk Whether or not the requested data rate range was set
+     * correctly.
+     * \param channelFrequencyOk Whether or not the requested channel frequency
+     * was set correctly.
+     */
+    NewChannelAns(bool dataRateRangeOk, bool channelFrequencyOk);
 
-  virtual void Serialize (Buffer::Iterator &start) const;
-  virtual uint8_t Deserialize (Buffer::Iterator &start);
-  virtual void Print (std::ostream &os) const;
+    virtual void Serialize(Buffer::Iterator& start) const;
+    virtual uint8_t Deserialize(Buffer::Iterator& start);
+    virtual void Print(std::ostream& os) const;
 
-private:
-  bool m_dataRateRangeOk;
-  bool m_channelFrequencyOk;
+  private:
+    bool m_dataRateRangeOk;
+    bool m_channelFrequencyOk;
 };
 
 /**
@@ -525,29 +527,29 @@ private:
  */
 class RxTimingSetupReq : public LorawanMacCommand
 {
-public:
-  RxTimingSetupReq ();
+  public:
+    RxTimingSetupReq();
 
-  /**
-   * Constructor providing initialization of all parameters.
-   *
-   * \param delay The delay encoded in this MAC command.
-   */
-  RxTimingSetupReq (uint8_t delay);
+    /**
+     * Constructor providing initialization of all parameters.
+     *
+     * \param delay The delay encoded in this MAC command.
+     */
+    RxTimingSetupReq(uint8_t delay);
 
-  virtual void Serialize (Buffer::Iterator &start) const;
-  virtual uint8_t Deserialize (Buffer::Iterator &start);
-  virtual void Print (std::ostream &os) const;
+    virtual void Serialize(Buffer::Iterator& start) const;
+    virtual uint8_t Deserialize(Buffer::Iterator& start);
+    virtual void Print(std::ostream& os) const;
 
-  /**
-   * Get the first window delay as a Time instance.
-   *
-   * \return The delay.
-   */
-  Time GetDelay (void);
+    /**
+     * Get the first window delay as a Time instance.
+     *
+     * \return The delay.
+     */
+    Time GetDelay(void);
 
-private:
-  uint8_t m_delay;
+  private:
+    uint8_t m_delay;
 };
 
 /**
@@ -557,14 +559,14 @@ private:
  */
 class RxTimingSetupAns : public LorawanMacCommand
 {
-public:
-  RxTimingSetupAns ();
+  public:
+    RxTimingSetupAns();
 
-  virtual void Serialize (Buffer::Iterator &start) const;
-  virtual uint8_t Deserialize (Buffer::Iterator &start);
-  virtual void Print (std::ostream &os) const;
+    virtual void Serialize(Buffer::Iterator& start) const;
+    virtual uint8_t Deserialize(Buffer::Iterator& start);
+    virtual void Print(std::ostream& os) const;
 
-private:
+  private:
 };
 
 /**
@@ -572,14 +574,14 @@ private:
  */
 class TxParamSetupAns : public LorawanMacCommand
 {
-public:
-  TxParamSetupAns ();
+  public:
+    TxParamSetupAns();
 
-  virtual void Serialize (Buffer::Iterator &start) const;
-  virtual uint8_t Deserialize (Buffer::Iterator &start);
-  virtual void Print (std::ostream &os) const;
+    virtual void Serialize(Buffer::Iterator& start) const;
+    virtual uint8_t Deserialize(Buffer::Iterator& start);
+    virtual void Print(std::ostream& os) const;
 
-private:
+  private:
 };
 
 /**
@@ -587,14 +589,14 @@ private:
  */
 class TxParamSetupReq : public LorawanMacCommand
 {
-public:
-  TxParamSetupReq ();
+  public:
+    TxParamSetupReq();
 
-  virtual void Serialize (Buffer::Iterator &start) const;
-  virtual uint8_t Deserialize (Buffer::Iterator &start);
-  virtual void Print (std::ostream &os) const;
+    virtual void Serialize(Buffer::Iterator& start) const;
+    virtual uint8_t Deserialize(Buffer::Iterator& start);
+    virtual void Print(std::ostream& os) const;
 
-private:
+  private:
 };
 
 /**
@@ -602,16 +604,16 @@ private:
  */
 class DlChannelAns : public LorawanMacCommand
 {
-public:
-  DlChannelAns ();
+  public:
+    DlChannelAns();
 
-  virtual void Serialize (Buffer::Iterator &start) const;
-  virtual uint8_t Deserialize (Buffer::Iterator &start);
-  virtual void Print (std::ostream &os) const;
+    virtual void Serialize(Buffer::Iterator& start) const;
+    virtual uint8_t Deserialize(Buffer::Iterator& start);
+    virtual void Print(std::ostream& os) const;
 
-private:
+  private:
 };
 
-}
+} // namespace ns3
 
 #endif /* LORAWAN_MAC_COMMAND_H */

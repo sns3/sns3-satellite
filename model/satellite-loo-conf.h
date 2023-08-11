@@ -23,7 +23,8 @@
 
 #include "satellite-base-fader-conf.h"
 
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -34,60 +35,60 @@ namespace ns3 {
  */
 class SatLooConf : public SatBaseFaderConf
 {
-public:
-  /**
-   * \brief Default Loo parameter count
-   */
-  static const uint32_t DEFAULT_LOO_PARAMETER_COUNT = 7;
+  public:
+    /**
+     * \brief Default Loo parameter count
+     */
+    static const uint32_t DEFAULT_LOO_PARAMETER_COUNT = 7;
 
-  /**
-   * \brief NS-3 function for type id
-   * \return
-   */
-  static TypeId GetTypeId (void);
+    /**
+     * \brief NS-3 function for type id
+     * \return
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * \brief Constructor
-   */
-  SatLooConf ();
+    /**
+     * \brief Constructor
+     */
+    SatLooConf();
 
-  /**
-   * \brief Destructor
-   */
-  ~SatLooConf ();
+    /**
+     * \brief Destructor
+     */
+    ~SatLooConf();
 
-  /**
-   * \brief Function for getting the Loo parameters
-   * \param set parameter set
-   * \return Loo parameter values
-   */
-  std::vector<std::vector<double> > GetParameters (uint32_t set);
+    /**
+     * \brief Function for getting the Loo parameters
+     * \param set parameter set
+     * \return Loo parameter values
+     */
+    std::vector<std::vector<double>> GetParameters(uint32_t set);
 
-  /**
-   * \brief Do needed dispose actions
-   */
-  void DoDispose ();
+    /**
+     * \brief Do needed dispose actions
+     */
+    void DoDispose();
 
-private:
-  /**
-   * \brief Number of parameters sets
-   */
-  uint32_t m_elevationCount;
+  private:
+    /**
+     * \brief Number of parameters sets
+     */
+    uint32_t m_elevationCount;
 
-  /**
-   * \brief Number of states
-   */
-  uint32_t m_stateCount;
+    /**
+     * \brief Number of states
+     */
+    uint32_t m_stateCount;
 
-  /**
-   * \brief Loo's model parameters
-   */
-  std::vector<std::vector<std::vector<double> > > m_looParameters;
+    /**
+     * \brief Loo's model parameters
+     */
+    std::vector<std::vector<std::vector<double>>> m_looParameters;
 
-  /**
-   * \brief Clear used variables
-   */
-  void Reset ();
+    /**
+     * \brief Clear used variables
+     */
+    void Reset();
 };
 
 } // namespace ns3

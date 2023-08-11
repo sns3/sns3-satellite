@@ -18,286 +18,306 @@
  * Author: Bastien TAURAN <bastien.tauran@viveris.fr>
  */
 
-#include "satellite-time-tag.h"
-#include "satellite-utils.h"
-#include "satellite-scheduling-object.h"
-
 #include "satellite-geo-llc.h"
 
+#include "satellite-scheduling-object.h"
+#include "satellite-time-tag.h"
+#include "satellite-utils.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatGeoLlc");
+NS_LOG_COMPONENT_DEFINE("SatGeoLlc");
 
-namespace ns3 {
+namespace ns3
+{
 
-NS_OBJECT_ENSURE_REGISTERED (SatGeoLlc);
+NS_OBJECT_ENSURE_REGISTERED(SatGeoLlc);
 
 TypeId
-SatGeoLlc::GetTypeId (void)
+SatGeoLlc::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatGeoLlc")
-    .SetParent<SatLlc> ()
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::SatGeoLlc").SetParent<SatLlc>();
+    return tid;
 }
 
-SatGeoLlc::SatGeoLlc ()
+SatGeoLlc::SatGeoLlc()
 {
-  NS_LOG_FUNCTION (this);
-  NS_ASSERT (false); // this version of the constructor should not been used
+    NS_LOG_FUNCTION(this);
+    NS_ASSERT(false); // this version of the constructor should not been used
 }
 
-SatGeoLlc::SatGeoLlc (SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
-                      SatEnums::RegenerationMode_t returnLinkRegenerationMode)
- : SatLlc (forwardLinkRegenerationMode, returnLinkRegenerationMode)
+SatGeoLlc::SatGeoLlc(SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                     SatEnums::RegenerationMode_t returnLinkRegenerationMode)
+    : SatLlc(forwardLinkRegenerationMode, returnLinkRegenerationMode)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-SatGeoLlc::~SatGeoLlc ()
+SatGeoLlc::~SatGeoLlc()
 {
-  NS_LOG_FUNCTION (this);
-}
-
-void
-SatGeoLlc::DoDispose ()
-{
-  Object::DoDispose ();
+    NS_LOG_FUNCTION(this);
 }
 
 void
-SatGeoLlc::SetReceiveSatelliteCallback (SatGeoLlc::ReceiveSatelliteCallback cb)
+SatGeoLlc::DoDispose()
 {
-  m_rxSatelliteCallback = cb;
+    Object::DoDispose();
+}
+
+void
+SatGeoLlc::SetReceiveSatelliteCallback(SatGeoLlc::ReceiveSatelliteCallback cb)
+{
+    m_rxSatelliteCallback = cb;
 }
 
 bool
-SatGeoLlc::Enque (Ptr<Packet> packet, Address dest, uint8_t flowId)
+SatGeoLlc::Enque(Ptr<Packet> packet, Address dest, uint8_t flowId)
 {
-  NS_LOG_FUNCTION (this << packet << dest << (uint32_t) flowId);
-  NS_LOG_INFO ("p=" << packet );
-  NS_LOG_INFO ("dest=" << dest );
-  NS_LOG_INFO ("UID is " << packet->GetUid ());
+    NS_LOG_FUNCTION(this << packet << dest << (uint32_t)flowId);
+    NS_LOG_INFO("p=" << packet);
+    NS_LOG_INFO("dest=" << dest);
+    NS_LOG_INFO("UID is " << packet->GetUid());
 
-  Ptr<EncapKey> key = Create<EncapKey> (m_nodeInfo->GetMacAddress (), Mac48Address::ConvertFrom (dest), flowId, m_nodeInfo->GetMacAddress (), Mac48Address::ConvertFrom (dest));
+    Ptr<EncapKey> key = Create<EncapKey>(m_nodeInfo->GetMacAddress(),
+                                         Mac48Address::ConvertFrom(dest),
+                                         flowId,
+                                         m_nodeInfo->GetMacAddress(),
+                                         Mac48Address::ConvertFrom(dest));
 
-  EncapContainer_t::iterator it = m_encaps.find (key);
+    EncapContainer_t::iterator it = m_encaps.find(key);
 
-  if (it == m_encaps.end ())
+    if (it == m_encaps.end())
     {
-      /**
-       * Encapsulator not found, thus create a new one. This method is
-       * implemented in the inherited classes, which knows which type
-       * of encapsulator to create.
-       */
-      CreateEncap (key);
-      it = m_encaps.find (key);
+        /**
+         * Encapsulator not found, thus create a new one. This method is
+         * implemented in the inherited classes, which knows which type
+         * of encapsulator to create.
+         */
+        CreateEncap(key);
+        it = m_encaps.find(key);
     }
 
-  it->second->EnquePdu (packet, Mac48Address::ConvertFrom (dest));
+    it->second->EnquePdu(packet, Mac48Address::ConvertFrom(dest));
 
-  SatEnums::SatLinkDir_t ld = GetSatLinkTxDir ();
+    SatEnums::SatLinkDir_t ld = GetSatLinkTxDir();
 
-  // Add packet trace entry:
-  m_packetTrace (Simulator::Now (),
-                 SatEnums::PACKET_ENQUE,
-                 m_nodeInfo->GetNodeType (),
-                 m_nodeInfo->GetNodeId (),
-                 m_nodeInfo->GetMacAddress (),
-                 SatEnums::LL_LLC,
-                 ld,
-                 SatUtils::GetPacketInfo (packet));
+    // Add packet trace entry:
+    m_packetTrace(Simulator::Now(),
+                  SatEnums::PACKET_ENQUE,
+                  m_nodeInfo->GetNodeType(),
+                  m_nodeInfo->GetNodeId(),
+                  m_nodeInfo->GetMacAddress(),
+                  SatEnums::LL_LLC,
+                  ld,
+                  SatUtils::GetPacketInfo(packet));
 
-  return true;
+    return true;
 }
 
 Ptr<Packet>
-SatGeoLlc::NotifyTxOpportunity (uint32_t bytes, Mac48Address utAddr, uint8_t flowId, uint32_t &bytesLeft, uint32_t &nextMinTxO)
+SatGeoLlc::NotifyTxOpportunity(uint32_t bytes,
+                               Mac48Address utAddr,
+                               uint8_t flowId,
+                               uint32_t& bytesLeft,
+                               uint32_t& nextMinTxO)
 {
-  NS_LOG_FUNCTION (this << utAddr << bytes << (uint32_t) flowId);
+    NS_LOG_FUNCTION(this << utAddr << bytes << (uint32_t)flowId);
 
-  Ptr<Packet> packet;
-  Ptr<EncapKey> key = Create<EncapKey> (m_nodeInfo->GetMacAddress (), utAddr, flowId);
-  EncapContainer_t::iterator it = m_encaps.find (key);
+    Ptr<Packet> packet;
+    Ptr<EncapKey> key = Create<EncapKey>(m_nodeInfo->GetMacAddress(), utAddr, flowId);
+    EncapContainer_t::iterator it = m_encaps.find(key);
 
-  if (it != m_encaps.end ())
+    if (it != m_encaps.end())
     {
-      packet = it->second->NotifyTxOpportunity (bytes, bytesLeft, nextMinTxO);
+        packet = it->second->NotifyTxOpportunity(bytes, bytesLeft, nextMinTxO);
 
-      if (packet)
+        if (packet)
         {
-          SatEnums::SatLinkDir_t ld = SatEnums::LD_FORWARD;
+            SatEnums::SatLinkDir_t ld = SatEnums::LD_FORWARD;
 
-          // Add packet trace entry:
-          m_packetTrace (Simulator::Now (),
-                         SatEnums::PACKET_SENT,
-                         m_nodeInfo->GetNodeType (),
-                         m_nodeInfo->GetNodeId (),
-                         m_nodeInfo->GetMacAddress (),
-                         SatEnums::LL_LLC,
-                         ld,
-                         SatUtils::GetPacketInfo (packet));
+            // Add packet trace entry:
+            m_packetTrace(Simulator::Now(),
+                          SatEnums::PACKET_SENT,
+                          m_nodeInfo->GetNodeType(),
+                          m_nodeInfo->GetNodeId(),
+                          m_nodeInfo->GetMacAddress(),
+                          SatEnums::LL_LLC,
+                          ld,
+                          SatUtils::GetPacketInfo(packet));
         }
     }
-  else
+    else
     {
-      NS_FATAL_ERROR ("Encapsulator not found for key (" << m_nodeInfo->GetMacAddress () << ", " << utAddr << ", " << (uint32_t) flowId << ")");
+        NS_FATAL_ERROR("Encapsulator not found for key (" << m_nodeInfo->GetMacAddress() << ", "
+                                                          << utAddr << ", " << (uint32_t)flowId
+                                                          << ")");
     }
 
-  return packet;
+    return packet;
 }
 
 void
-SatGeoLlc::ReceiveHigherLayerPdu (Ptr<Packet> packet, Mac48Address source, Mac48Address dest)
+SatGeoLlc::ReceiveHigherLayerPdu(Ptr<Packet> packet, Mac48Address source, Mac48Address dest)
 {
-  NS_LOG_FUNCTION (this << packet << source << dest);
+    NS_LOG_FUNCTION(this << packet << source << dest);
 
-  // Peek control msg tag
-  SatControlMsgTag ctrlTag;
-  bool cSuccess = packet->PeekPacketTag (ctrlTag);
+    // Peek control msg tag
+    SatControlMsgTag ctrlTag;
+    bool cSuccess = packet->PeekPacketTag(ctrlTag);
 
-  if (cSuccess)
+    if (cSuccess)
     {
-      if (ctrlTag.GetMsgType () != SatControlMsgTag::SAT_ARQ_ACK)
+        if (ctrlTag.GetMsgType() != SatControlMsgTag::SAT_ARQ_ACK)
         {
-          m_rxSatelliteCallback (packet, m_nodeInfo->GetMacAddress ());
-          return;
+            m_rxSatelliteCallback(packet, m_nodeInfo->GetMacAddress());
+            return;
         }
 
-      // ARQ ACKs need to be forwarded to LLC/ARQ for processing
-      uint32_t ackId = ctrlTag.GetMsgId ();
+        // ARQ ACKs need to be forwarded to LLC/ARQ for processing
+        uint32_t ackId = ctrlTag.GetMsgId();
 
-      Ptr<SatArqAckMessage> ack = DynamicCast<SatArqAckMessage> (m_readCtrlCallback (ackId));
+        Ptr<SatArqAckMessage> ack = DynamicCast<SatArqAckMessage>(m_readCtrlCallback(ackId));
 
-      if ( ack == NULL )
+        if (ack == NULL)
         {
-          NS_FATAL_ERROR ("ARQ ACK not found, check that control msg storage time is set long enough!");
+            NS_FATAL_ERROR(
+                "ARQ ACK not found, check that control msg storage time is set long enough!");
         }
 
-      ReceiveAck (ack, source, dest);
+        ReceiveAck(ack, source, dest);
     }
-  // Higher layer packet
-  else
+    // Higher layer packet
+    else
     {
-      m_rxSatelliteCallback (packet, m_nodeInfo->GetMacAddress ());
-    }
-}
-
-void
-SatGeoLlc::CreateEncap (Ptr<EncapKey> key)
-{
-  NS_LOG_FUNCTION (this << key->m_encapAddress << key->m_decapAddress << (uint32_t)(key->m_flowId));
-
-  Ptr<SatBaseEncapsulator> encap = CreateObject<SatBaseEncapsulator> (key->m_encapAddress,
-                                                                      key->m_decapAddress,
-                                                                      key->m_sourceE2EAddress,
-                                                                      key->m_destE2EAddress,
-                                                                      key->m_flowId);
-
-  Ptr<SatQueue> queue = CreateObject<SatQueue> (key->m_flowId);
-  encap->SetQueue (queue);
-
-  NS_LOG_INFO ("Create encapsulator with key (" << key->m_encapAddress << ", " << key->m_decapAddress << ", " << (uint32_t) key->m_flowId << ")");
-
-  // Store the encapsulator
-  std::pair<EncapContainer_t::iterator, bool> result = m_encaps.insert (std::make_pair (key, encap));
-  if (result.second == false)
-    {
-      NS_FATAL_ERROR ("Insert to map with key (" << key->m_encapAddress << ", " << key->m_decapAddress << ", " << (uint32_t) key->m_flowId << ") failed!");
+        m_rxSatelliteCallback(packet, m_nodeInfo->GetMacAddress());
     }
 }
 
 void
-SatGeoLlc::CreateDecap (Ptr<EncapKey> key)
+SatGeoLlc::CreateEncap(Ptr<EncapKey> key)
 {
-  NS_LOG_FUNCTION (this << key->m_encapAddress << key->m_decapAddress << (uint32_t)(key->m_flowId));
+    NS_LOG_FUNCTION(this << key->m_encapAddress << key->m_decapAddress
+                         << (uint32_t)(key->m_flowId));
 
-  Ptr<SatBaseEncapsulator> decap = CreateObject<SatBaseEncapsulator> (key->m_encapAddress,
-                                                                      key->m_decapAddress,
-                                                                      key->m_sourceE2EAddress,
-                                                                      key->m_destE2EAddress,
-                                                                      key->m_flowId);
+    Ptr<SatBaseEncapsulator> encap = CreateObject<SatBaseEncapsulator>(key->m_encapAddress,
+                                                                       key->m_decapAddress,
+                                                                       key->m_sourceE2EAddress,
+                                                                       key->m_destE2EAddress,
+                                                                       key->m_flowId);
 
-  decap->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu, this));
-  decap->SetCtrlMsgCallback (m_sendCtrlCallback);
+    Ptr<SatQueue> queue = CreateObject<SatQueue>(key->m_flowId);
+    encap->SetQueue(queue);
 
-  NS_LOG_INFO ("Create decapsulator with key (" << key->m_encapAddress << ", " << key->m_decapAddress << ", " << (uint32_t) key->m_flowId << ")");
+    NS_LOG_INFO("Create encapsulator with key (" << key->m_encapAddress << ", "
+                                                 << key->m_decapAddress << ", "
+                                                 << (uint32_t)key->m_flowId << ")");
 
-  // Store the decapsulator
-  std::pair<EncapContainer_t::iterator, bool> result = m_decaps.insert (std::make_pair (key, decap));
-  if (result.second == false)
+    // Store the encapsulator
+    std::pair<EncapContainer_t::iterator, bool> result =
+        m_encaps.insert(std::make_pair(key, encap));
+    if (result.second == false)
     {
-      NS_FATAL_ERROR ("Insert to map with key (" << key->m_encapAddress << ", " << key->m_decapAddress << ", " << (uint32_t) key->m_flowId << ") failed!");
+        NS_FATAL_ERROR("Insert to map with key (" << key->m_encapAddress << ", "
+                                                  << key->m_decapAddress << ", "
+                                                  << (uint32_t)key->m_flowId << ") failed!");
     }
 }
 
-void SatGeoLlc::GetSchedulingContexts (std::vector< Ptr<SatSchedulingObject> > & output) const
+void
+SatGeoLlc::CreateDecap(Ptr<EncapKey> key)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this << key->m_encapAddress << key->m_decapAddress
+                         << (uint32_t)(key->m_flowId));
 
-  // Head of link queuing delay
-  Time holDelay;
+    Ptr<SatBaseEncapsulator> decap = CreateObject<SatBaseEncapsulator>(key->m_encapAddress,
+                                                                       key->m_decapAddress,
+                                                                       key->m_sourceE2EAddress,
+                                                                       key->m_destE2EAddress,
+                                                                       key->m_flowId);
 
-  // Then the user data
-  for (EncapContainer_t::const_iterator cit = m_encaps.begin ();
-       cit != m_encaps.end ();
-       ++cit)
+    decap->SetReceiveCallback(MakeCallback(&SatLlc::ReceiveHigherLayerPdu, this));
+    decap->SetCtrlMsgCallback(m_sendCtrlCallback);
+
+    NS_LOG_INFO("Create decapsulator with key (" << key->m_encapAddress << ", "
+                                                 << key->m_decapAddress << ", "
+                                                 << (uint32_t)key->m_flowId << ")");
+
+    // Store the decapsulator
+    std::pair<EncapContainer_t::iterator, bool> result =
+        m_decaps.insert(std::make_pair(key, decap));
+    if (result.second == false)
     {
-      uint32_t buf = cit->second->GetTxBufferSizeInBytes ();
+        NS_FATAL_ERROR("Insert to map with key (" << key->m_encapAddress << ", "
+                                                  << key->m_decapAddress << ", "
+                                                  << (uint32_t)key->m_flowId << ") failed!");
+    }
+}
 
-      if (buf > 0)
+void
+SatGeoLlc::GetSchedulingContexts(std::vector<Ptr<SatSchedulingObject>>& output) const
+{
+    NS_LOG_FUNCTION(this);
+
+    // Head of link queuing delay
+    Time holDelay;
+
+    // Then the user data
+    for (EncapContainer_t::const_iterator cit = m_encaps.begin(); cit != m_encaps.end(); ++cit)
+    {
+        uint32_t buf = cit->second->GetTxBufferSizeInBytes();
+
+        if (buf > 0)
         {
-          holDelay = cit->second->GetHolDelay ();
-          uint32_t minTxOpportunityInBytes = cit->second->GetMinTxOpportunityInBytes ();
-          Ptr<SatSchedulingObject> so = Create<SatSchedulingObject> (cit->first->m_decapAddress, buf, minTxOpportunityInBytes, holDelay, cit->first->m_flowId);
-          output.push_back (so);
+            holDelay = cit->second->GetHolDelay();
+            uint32_t minTxOpportunityInBytes = cit->second->GetMinTxOpportunityInBytes();
+            Ptr<SatSchedulingObject> so = Create<SatSchedulingObject>(cit->first->m_decapAddress,
+                                                                      buf,
+                                                                      minTxOpportunityInBytes,
+                                                                      holDelay,
+                                                                      cit->first->m_flowId);
+            output.push_back(so);
         }
     }
 }
 
 uint32_t
-SatGeoLlc::GetNBytesInQueue (Mac48Address utAddress) const
+SatGeoLlc::GetNBytesInQueue(Mac48Address utAddress) const
 {
-  NS_LOG_FUNCTION (this << utAddress);
+    NS_LOG_FUNCTION(this << utAddress);
 
-  uint32_t sum = 0;
+    uint32_t sum = 0;
 
-  for (EncapContainer_t::const_iterator it = m_encaps.begin ();
-       it != m_encaps.end (); ++it)
+    for (EncapContainer_t::const_iterator it = m_encaps.begin(); it != m_encaps.end(); ++it)
     {
-      if (it->first->m_encapAddress == utAddress)
+        if (it->first->m_encapAddress == utAddress)
         {
-          NS_ASSERT (it->second != nullptr);
-          Ptr<SatQueue> queue = it->second->GetQueue ();
-          NS_ASSERT (queue != nullptr);
-          sum += queue->GetNBytes ();
+            NS_ASSERT(it->second != nullptr);
+            Ptr<SatQueue> queue = it->second->GetQueue();
+            NS_ASSERT(queue != nullptr);
+            sum += queue->GetNBytes();
         }
     }
 
-  return sum;
+    return sum;
 }
 
 uint32_t
-SatGeoLlc::GetNPacketsInQueue (Mac48Address utAddress) const
+SatGeoLlc::GetNPacketsInQueue(Mac48Address utAddress) const
 {
-  NS_LOG_FUNCTION (this << utAddress);
+    NS_LOG_FUNCTION(this << utAddress);
 
-  uint32_t sum = 0;
+    uint32_t sum = 0;
 
-  for (EncapContainer_t::const_iterator it = m_encaps.begin ();
-       it != m_encaps.end (); ++it)
+    for (EncapContainer_t::const_iterator it = m_encaps.begin(); it != m_encaps.end(); ++it)
     {
-      if (it->first->m_encapAddress == utAddress)
+        if (it->first->m_encapAddress == utAddress)
         {
-          NS_ASSERT (it->second != nullptr);
-          Ptr<SatQueue> queue = it->second->GetQueue ();
-          NS_ASSERT (queue != nullptr);
-          sum += queue->GetNPackets ();
+            NS_ASSERT(it->second != nullptr);
+            Ptr<SatQueue> queue = it->second->GetQueue();
+            NS_ASSERT(queue != nullptr);
+            sum += queue->GetNPackets();
         }
     }
 
-  return sum;
+    return sum;
 }
 
 } // namespace ns3
-
-

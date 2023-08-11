@@ -19,479 +19,465 @@
  *
  */
 
-#include <ns3/log.h>
-#include <ns3/simulator.h>
-#include <ns3/fatal-error.h>
-#include <ns3/enum.h>
-#include <ns3/string.h>
-#include <ns3/boolean.h>
-
-#include <ns3/node-container.h>
-#include <ns3/mac48-address.h>
-#include <ns3/net-device.h>
-#include <ns3/satellite-net-device.h>
-#include <ns3/satellite-llc.h>
-#include <ns3/satellite-phy.h>
-#include <ns3/satellite-phy-rx.h>
-
-#include <ns3/satellite-helper.h>
-#include <ns3/satellite-id-mapper.h>
-#include <ns3/singleton.h>
-
-#include <ns3/data-collection-object.h>
-#include <ns3/unit-conversion-collector.h>
-#include <ns3/distribution-collector.h>
-#include <ns3/scalar-collector.h>
-#include <ns3/interval-rate-collector.h>
-#include <ns3/multi-file-aggregator.h>
-#include <ns3/magister-gnuplot-aggregator.h>
-
 #include "satellite-stats-queue-helper.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatStatsQueueHelper");
+#include <ns3/boolean.h>
+#include <ns3/data-collection-object.h>
+#include <ns3/distribution-collector.h>
+#include <ns3/enum.h>
+#include <ns3/fatal-error.h>
+#include <ns3/interval-rate-collector.h>
+#include <ns3/log.h>
+#include <ns3/mac48-address.h>
+#include <ns3/magister-gnuplot-aggregator.h>
+#include <ns3/multi-file-aggregator.h>
+#include <ns3/net-device.h>
+#include <ns3/node-container.h>
+#include <ns3/satellite-helper.h>
+#include <ns3/satellite-id-mapper.h>
+#include <ns3/satellite-llc.h>
+#include <ns3/satellite-net-device.h>
+#include <ns3/satellite-phy-rx.h>
+#include <ns3/satellite-phy.h>
+#include <ns3/scalar-collector.h>
+#include <ns3/simulator.h>
+#include <ns3/singleton.h>
+#include <ns3/string.h>
+#include <ns3/unit-conversion-collector.h>
 
+NS_LOG_COMPONENT_DEFINE("SatStatsQueueHelper");
 
-namespace ns3 {
-
+namespace ns3
+{
 
 // BASE CLASS /////////////////////////////////////////////////////////////////
 
-NS_OBJECT_ENSURE_REGISTERED (SatStatsQueueHelper);
+NS_OBJECT_ENSURE_REGISTERED(SatStatsQueueHelper);
 
 std::string // static
-SatStatsQueueHelper::GetUnitTypeName (SatStatsQueueHelper::UnitType_t unitType)
+SatStatsQueueHelper::GetUnitTypeName(SatStatsQueueHelper::UnitType_t unitType)
 {
-  switch (unitType)
+    switch (unitType)
     {
     case SatStatsQueueHelper::UNIT_BYTES:
-      return "UNIT_BYTES";
+        return "UNIT_BYTES";
     case SatStatsQueueHelper::UNIT_NUMBER_OF_PACKETS:
-      return "UNIT_NUMBER_OF_PACKETS";
+        return "UNIT_NUMBER_OF_PACKETS";
     default:
-      NS_FATAL_ERROR ("SatStatsQueueHelper - Invalid unit type");
-      break;
+        NS_FATAL_ERROR("SatStatsQueueHelper - Invalid unit type");
+        break;
     }
 
-  NS_FATAL_ERROR ("SatStatsQueueHelper - Invalid unit type");
-  return "";
+    NS_FATAL_ERROR("SatStatsQueueHelper - Invalid unit type");
+    return "";
 }
 
-
-SatStatsQueueHelper::SatStatsQueueHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsHelper (satHelper),
-  m_pollInterval (MilliSeconds (10)),
-  m_unitType (SatStatsQueueHelper::UNIT_BYTES),
-  m_shortLabel (""),
-  m_longLabel ("")
+SatStatsQueueHelper::SatStatsQueueHelper(Ptr<const SatHelper> satHelper)
+    : SatStatsHelper(satHelper),
+      m_pollInterval(MilliSeconds(10)),
+      m_unitType(SatStatsQueueHelper::UNIT_BYTES),
+      m_shortLabel(""),
+      m_longLabel("")
 {
-  NS_LOG_FUNCTION (this << satHelper);
+    NS_LOG_FUNCTION(this << satHelper);
 }
 
-
-SatStatsQueueHelper::~SatStatsQueueHelper ()
+SatStatsQueueHelper::~SatStatsQueueHelper()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
-
 
 TypeId // static
-SatStatsQueueHelper::GetTypeId ()
+SatStatsQueueHelper::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::SatStatsQueueHelper")
-    .SetParent<SatStatsHelper> ()
-    .AddAttribute ("PollInterval",
-                   "",
-                   TimeValue (MilliSeconds (10)),
-                   MakeTimeAccessor (&SatStatsQueueHelper::SetPollInterval,
-                                     &SatStatsQueueHelper::GetPollInterval),
-                   MakeTimeChecker ())
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::SatStatsQueueHelper")
+                            .SetParent<SatStatsHelper>()
+                            .AddAttribute("PollInterval",
+                                          "",
+                                          TimeValue(MilliSeconds(10)),
+                                          MakeTimeAccessor(&SatStatsQueueHelper::SetPollInterval,
+                                                           &SatStatsQueueHelper::GetPollInterval),
+                                          MakeTimeChecker());
+    return tid;
 }
-
 
 void
-SatStatsQueueHelper::SetUnitType (SatStatsQueueHelper::UnitType_t unitType)
+SatStatsQueueHelper::SetUnitType(SatStatsQueueHelper::UnitType_t unitType)
 {
-  NS_LOG_FUNCTION (this << GetUnitTypeName (unitType));
-  m_unitType = unitType;
+    NS_LOG_FUNCTION(this << GetUnitTypeName(unitType));
+    m_unitType = unitType;
 
-  // Update presentation-based attributes.
-  if (unitType == SatStatsQueueHelper::UNIT_BYTES)
+    // Update presentation-based attributes.
+    if (unitType == SatStatsQueueHelper::UNIT_BYTES)
     {
-      m_shortLabel = "size_bytes";
-      m_longLabel = "Queue size (in bytes)";
+        m_shortLabel = "size_bytes";
+        m_longLabel = "Queue size (in bytes)";
     }
-  else if (unitType == SatStatsQueueHelper::UNIT_NUMBER_OF_PACKETS)
+    else if (unitType == SatStatsQueueHelper::UNIT_NUMBER_OF_PACKETS)
     {
-      m_shortLabel = "num_packets";
-      m_longLabel = "Queue size (in number of packets)";
+        m_shortLabel = "num_packets";
+        m_longLabel = "Queue size (in number of packets)";
     }
-  else
+    else
     {
-      NS_FATAL_ERROR ("SatStatsQueueHelper - Invalid unit type");
+        NS_FATAL_ERROR("SatStatsQueueHelper - Invalid unit type");
     }
 }
-
 
 SatStatsQueueHelper::UnitType_t
-SatStatsQueueHelper::GetUnitType () const
+SatStatsQueueHelper::GetUnitType() const
 {
-  return m_unitType;
+    return m_unitType;
 }
-
 
 void
-SatStatsQueueHelper::SetPollInterval (Time pollInterval)
+SatStatsQueueHelper::SetPollInterval(Time pollInterval)
 {
-  NS_LOG_FUNCTION (this << pollInterval.GetSeconds ());
-  m_pollInterval = pollInterval;
+    NS_LOG_FUNCTION(this << pollInterval.GetSeconds());
+    m_pollInterval = pollInterval;
 }
-
 
 Time
-SatStatsQueueHelper::GetPollInterval () const
+SatStatsQueueHelper::GetPollInterval() const
 {
-  return m_pollInterval;
+    return m_pollInterval;
 }
 
-
 void
-SatStatsQueueHelper::DoInstall ()
+SatStatsQueueHelper::DoInstall()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  switch (GetOutputType ())
+    switch (GetOutputType())
     {
     case SatStatsHelper::OUTPUT_NONE:
-      NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
-      break;
+        NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
+                       << " is not a valid output type for this statistics.");
+        break;
 
-    case SatStatsHelper::OUTPUT_SCALAR_FILE:
-      {
+    case SatStatsHelper::OUTPUT_SCALAR_FILE: {
         // Setup aggregator.
-        m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetOutputFileName ()),
-                                         "MultiFileMode", BooleanValue (false),
-                                         "EnableContextPrinting", BooleanValue (true),
-                                         "GeneralHeading", StringValue (GetIdentifierHeading (m_shortLabel)));
+        m_aggregator = CreateAggregator("ns3::MultiFileAggregator",
+                                        "OutputFileName",
+                                        StringValue(GetOutputFileName()),
+                                        "MultiFileMode",
+                                        BooleanValue(false),
+                                        "EnableContextPrinting",
+                                        BooleanValue(true),
+                                        "GeneralHeading",
+                                        StringValue(GetIdentifierHeading(m_shortLabel)));
 
         // Setup collectors.
-        m_terminalCollectors.SetType ("ns3::ScalarCollector");
-        m_terminalCollectors.SetAttribute ("InputDataType",
-                                           EnumValue (ScalarCollector::INPUT_DATA_TYPE_UINTEGER));
-        m_terminalCollectors.SetAttribute ("OutputType",
-                                           EnumValue (ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
-        CreateCollectorPerIdentifier (m_terminalCollectors);
-        m_terminalCollectors.ConnectToAggregator ("Output",
-                                                  m_aggregator,
-                                                  &MultiFileAggregator::Write1d);
+        m_terminalCollectors.SetType("ns3::ScalarCollector");
+        m_terminalCollectors.SetAttribute("InputDataType",
+                                          EnumValue(ScalarCollector::INPUT_DATA_TYPE_UINTEGER));
+        m_terminalCollectors.SetAttribute(
+            "OutputType",
+            EnumValue(ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
+        CreateCollectorPerIdentifier(m_terminalCollectors);
+        m_terminalCollectors.ConnectToAggregator("Output",
+                                                 m_aggregator,
+                                                 &MultiFileAggregator::Write1d);
         break;
-      }
+    }
 
-    case SatStatsHelper::OUTPUT_SCATTER_FILE:
-      {
+    case SatStatsHelper::OUTPUT_SCATTER_FILE: {
         // Setup aggregator.
-        m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetOutputFileName ()),
-                                         "GeneralHeading", StringValue (GetTimeHeading (m_shortLabel)));
+        m_aggregator = CreateAggregator("ns3::MultiFileAggregator",
+                                        "OutputFileName",
+                                        StringValue(GetOutputFileName()),
+                                        "GeneralHeading",
+                                        StringValue(GetTimeHeading(m_shortLabel)));
 
         // Setup second-level collectors.
-        m_terminalCollectors.SetType ("ns3::IntervalRateCollector");
-        m_terminalCollectors.SetAttribute ("InputDataType",
-                                           EnumValue (IntervalRateCollector::INPUT_DATA_TYPE_UINTEGER));
-        CreateCollectorPerIdentifier (m_terminalCollectors);
-        m_terminalCollectors.ConnectToAggregator ("OutputWithTime",
-                                                  m_aggregator,
-                                                  &MultiFileAggregator::Write2d);
-        m_terminalCollectors.ConnectToAggregator ("OutputString",
-                                                  m_aggregator,
-                                                  &MultiFileAggregator::AddContextHeading);
+        m_terminalCollectors.SetType("ns3::IntervalRateCollector");
+        m_terminalCollectors.SetAttribute(
+            "InputDataType",
+            EnumValue(IntervalRateCollector::INPUT_DATA_TYPE_UINTEGER));
+        CreateCollectorPerIdentifier(m_terminalCollectors);
+        m_terminalCollectors.ConnectToAggregator("OutputWithTime",
+                                                 m_aggregator,
+                                                 &MultiFileAggregator::Write2d);
+        m_terminalCollectors.ConnectToAggregator("OutputString",
+                                                 m_aggregator,
+                                                 &MultiFileAggregator::AddContextHeading);
 
         break;
-      }
+    }
 
     case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
     case SatStatsHelper::OUTPUT_PDF_FILE:
-    case SatStatsHelper::OUTPUT_CDF_FILE:
-      {
+    case SatStatsHelper::OUTPUT_CDF_FILE: {
         // Setup aggregator.
-        m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetOutputFileName ()),
-                                         "GeneralHeading", StringValue (GetDistributionHeading (m_shortLabel)));
+        m_aggregator = CreateAggregator("ns3::MultiFileAggregator",
+                                        "OutputFileName",
+                                        StringValue(GetOutputFileName()),
+                                        "GeneralHeading",
+                                        StringValue(GetDistributionHeading(m_shortLabel)));
 
         // Setup collectors.
-        m_terminalCollectors.SetType ("ns3::DistributionCollector");
-        DistributionCollector::OutputType_t outputType
-          = DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
-        if (GetOutputType () == SatStatsHelper::OUTPUT_PDF_FILE)
-          {
+        m_terminalCollectors.SetType("ns3::DistributionCollector");
+        DistributionCollector::OutputType_t outputType =
+            DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
+        if (GetOutputType() == SatStatsHelper::OUTPUT_PDF_FILE)
+        {
             outputType = DistributionCollector::OUTPUT_TYPE_PROBABILITY;
-          }
-        else if (GetOutputType () == SatStatsHelper::OUTPUT_CDF_FILE)
-          {
+        }
+        else if (GetOutputType() == SatStatsHelper::OUTPUT_CDF_FILE)
+        {
             outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
-          }
-        m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
-        CreateCollectorPerIdentifier (m_terminalCollectors);
-        m_terminalCollectors.ConnectToAggregator ("Output",
-                                                  m_aggregator,
-                                                  &MultiFileAggregator::Write2d);
-        m_terminalCollectors.ConnectToAggregator ("OutputString",
-                                                  m_aggregator,
-                                                  &MultiFileAggregator::AddContextHeading);
-        m_terminalCollectors.ConnectToAggregator ("Warning",
-                                                  m_aggregator,
-                                                  &MultiFileAggregator::EnableContextWarning);
+        }
+        m_terminalCollectors.SetAttribute("OutputType", EnumValue(outputType));
+        CreateCollectorPerIdentifier(m_terminalCollectors);
+        m_terminalCollectors.ConnectToAggregator("Output",
+                                                 m_aggregator,
+                                                 &MultiFileAggregator::Write2d);
+        m_terminalCollectors.ConnectToAggregator("OutputString",
+                                                 m_aggregator,
+                                                 &MultiFileAggregator::AddContextHeading);
+        m_terminalCollectors.ConnectToAggregator("Warning",
+                                                 m_aggregator,
+                                                 &MultiFileAggregator::EnableContextWarning);
         break;
-      }
+    }
 
     case SatStatsHelper::OUTPUT_SCALAR_PLOT:
-      /// \todo Add support for boxes in Gnuplot.
-      NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
-      break;
+        /// \todo Add support for boxes in Gnuplot.
+        NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
+                       << " is not a valid output type for this statistics.");
+        break;
 
-    case SatStatsHelper::OUTPUT_SCATTER_PLOT:
-      {
+    case SatStatsHelper::OUTPUT_SCATTER_PLOT: {
         // Setup aggregator.
-        m_aggregator = CreateAggregator ("ns3::MagisterGnuplotAggregator",
-                                         "OutputPath", StringValue (GetOutputPath ()),
-                                         "OutputFileName", StringValue (GetName ()));
-        Ptr<MagisterGnuplotAggregator> plotAggregator
-          = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-        NS_ASSERT (plotAggregator != nullptr);
-        //plot->SetTitle ("");
-        plotAggregator->SetLegend ("Time (in seconds)",
-                                   "Queued packets");
-        plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::STEPS);
+        m_aggregator = CreateAggregator("ns3::MagisterGnuplotAggregator",
+                                        "OutputPath",
+                                        StringValue(GetOutputPath()),
+                                        "OutputFileName",
+                                        StringValue(GetName()));
+        Ptr<MagisterGnuplotAggregator> plotAggregator =
+            m_aggregator->GetObject<MagisterGnuplotAggregator>();
+        NS_ASSERT(plotAggregator != nullptr);
+        // plot->SetTitle ("");
+        plotAggregator->SetLegend("Time (in seconds)", "Queued packets");
+        plotAggregator->Set2dDatasetDefaultStyle(Gnuplot2dDataset::STEPS);
 
         // Setup second-level collectors.
-        m_terminalCollectors.SetType ("ns3::IntervalRateCollector");
-        m_terminalCollectors.SetAttribute ("InputDataType",
-                                           EnumValue (IntervalRateCollector::INPUT_DATA_TYPE_UINTEGER));
-        CreateCollectorPerIdentifier (m_terminalCollectors);
-        for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
-             it != m_terminalCollectors.End (); ++it)
-          {
-            const std::string context = it->second->GetName ();
-            plotAggregator->Add2dDataset (context, context);
-          }
-        m_terminalCollectors.ConnectToAggregator ("OutputWithTime",
-                                                  m_aggregator,
-                                                  &MagisterGnuplotAggregator::Write2d);
+        m_terminalCollectors.SetType("ns3::IntervalRateCollector");
+        m_terminalCollectors.SetAttribute(
+            "InputDataType",
+            EnumValue(IntervalRateCollector::INPUT_DATA_TYPE_UINTEGER));
+        CreateCollectorPerIdentifier(m_terminalCollectors);
+        for (CollectorMap::Iterator it = m_terminalCollectors.Begin();
+             it != m_terminalCollectors.End();
+             ++it)
+        {
+            const std::string context = it->second->GetName();
+            plotAggregator->Add2dDataset(context, context);
+        }
+        m_terminalCollectors.ConnectToAggregator("OutputWithTime",
+                                                 m_aggregator,
+                                                 &MagisterGnuplotAggregator::Write2d);
 
         break;
-      }
+    }
 
     case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
     case SatStatsHelper::OUTPUT_PDF_PLOT:
-    case SatStatsHelper::OUTPUT_CDF_PLOT:
-      {
+    case SatStatsHelper::OUTPUT_CDF_PLOT: {
         // Setup aggregator.
-        m_aggregator = CreateAggregator ("ns3::MagisterGnuplotAggregator",
-                                         "OutputPath", StringValue (GetOutputPath ()),
-                                         "OutputFileName", StringValue (GetName ()));
-        Ptr<MagisterGnuplotAggregator> plotAggregator
-          = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-        NS_ASSERT (plotAggregator != nullptr);
-        //plot->SetTitle ("");
-        plotAggregator->SetLegend (m_longLabel, "Frequency");
-        plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
+        m_aggregator = CreateAggregator("ns3::MagisterGnuplotAggregator",
+                                        "OutputPath",
+                                        StringValue(GetOutputPath()),
+                                        "OutputFileName",
+                                        StringValue(GetName()));
+        Ptr<MagisterGnuplotAggregator> plotAggregator =
+            m_aggregator->GetObject<MagisterGnuplotAggregator>();
+        NS_ASSERT(plotAggregator != nullptr);
+        // plot->SetTitle ("");
+        plotAggregator->SetLegend(m_longLabel, "Frequency");
+        plotAggregator->Set2dDatasetDefaultStyle(Gnuplot2dDataset::LINES);
 
         // Setup collectors.
-        m_terminalCollectors.SetType ("ns3::DistributionCollector");
-        DistributionCollector::OutputType_t outputType
-          = DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
-        if (GetOutputType () == SatStatsHelper::OUTPUT_PDF_PLOT)
-          {
+        m_terminalCollectors.SetType("ns3::DistributionCollector");
+        DistributionCollector::OutputType_t outputType =
+            DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
+        if (GetOutputType() == SatStatsHelper::OUTPUT_PDF_PLOT)
+        {
             outputType = DistributionCollector::OUTPUT_TYPE_PROBABILITY;
-          }
-        else if (GetOutputType () == SatStatsHelper::OUTPUT_CDF_PLOT)
-          {
+        }
+        else if (GetOutputType() == SatStatsHelper::OUTPUT_CDF_PLOT)
+        {
             outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
-          }
-        m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
-        CreateCollectorPerIdentifier (m_terminalCollectors);
-        for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
-             it != m_terminalCollectors.End (); ++it)
-          {
-            const std::string context = it->second->GetName ();
-            plotAggregator->Add2dDataset (context, context);
-          }
-        m_terminalCollectors.ConnectToAggregator ("Output",
-                                                  m_aggregator,
-                                                  &MagisterGnuplotAggregator::Write2d);
+        }
+        m_terminalCollectors.SetAttribute("OutputType", EnumValue(outputType));
+        CreateCollectorPerIdentifier(m_terminalCollectors);
+        for (CollectorMap::Iterator it = m_terminalCollectors.Begin();
+             it != m_terminalCollectors.End();
+             ++it)
+        {
+            const std::string context = it->second->GetName();
+            plotAggregator->Add2dDataset(context, context);
+        }
+        m_terminalCollectors.ConnectToAggregator("Output",
+                                                 m_aggregator,
+                                                 &MagisterGnuplotAggregator::Write2d);
         break;
-      }
-
-    default:
-      NS_FATAL_ERROR ("SatStatsQueueHelper - Invalid output type");
-      break;
     }
 
-  // Identify the list of source of queue events.
-  EnlistSource ();
+    default:
+        NS_FATAL_ERROR("SatStatsQueueHelper - Invalid output type");
+        break;
+    }
 
-  // Schedule the first polling session.
-  Simulator::Schedule (m_pollInterval, &SatStatsQueueHelper::Poll, this);
+    // Identify the list of source of queue events.
+    EnlistSource();
+
+    // Schedule the first polling session.
+    Simulator::Schedule(m_pollInterval, &SatStatsQueueHelper::Poll, this);
 
 } // end of `void DoInstall ();`
 
-
 void
-SatStatsQueueHelper::EnlistSource ()
+SatStatsQueueHelper::EnlistSource()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  // The method below is supposed to be implemented by the child class.
-  DoEnlistSource ();
+    // The method below is supposed to be implemented by the child class.
+    DoEnlistSource();
 }
 
-
 void
-SatStatsQueueHelper::Poll ()
+SatStatsQueueHelper::Poll()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  // The method below is supposed to be implemented by the child class.
-  DoPoll ();
+    // The method below is supposed to be implemented by the child class.
+    DoPoll();
 
-  // Schedule the next polling session.
-  Simulator::Schedule (m_pollInterval, &SatStatsQueueHelper::Poll, this);
+    // Schedule the next polling session.
+    Simulator::Schedule(m_pollInterval, &SatStatsQueueHelper::Poll, this);
 }
 
-
 void
-SatStatsQueueHelper::PushToCollector (uint32_t identifier, uint32_t value)
+SatStatsQueueHelper::PushToCollector(uint32_t identifier, uint32_t value)
 {
-  //NS_LOG_FUNCTION (this << identifier << value);
+    // NS_LOG_FUNCTION (this << identifier << value);
 
-  // Find the collector with the right identifier.
-  Ptr<DataCollectionObject> collector = m_terminalCollectors.Get (identifier);
-  NS_ASSERT_MSG (collector != nullptr,
-                 "Unable to find collector with identifier " << identifier);
+    // Find the collector with the right identifier.
+    Ptr<DataCollectionObject> collector = m_terminalCollectors.Get(identifier);
+    NS_ASSERT_MSG(collector != nullptr, "Unable to find collector with identifier " << identifier);
 
-  switch (GetOutputType ())
+    switch (GetOutputType())
     {
     case SatStatsHelper::OUTPUT_SCALAR_FILE:
-    case SatStatsHelper::OUTPUT_SCALAR_PLOT:
-      {
-        Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
-        NS_ASSERT (c != nullptr);
-        c->TraceSinkUinteger32 (0, value);
+    case SatStatsHelper::OUTPUT_SCALAR_PLOT: {
+        Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector>();
+        NS_ASSERT(c != nullptr);
+        c->TraceSinkUinteger32(0, value);
         break;
-      }
+    }
 
     case SatStatsHelper::OUTPUT_SCATTER_FILE:
-    case SatStatsHelper::OUTPUT_SCATTER_PLOT:
-      {
-        Ptr<IntervalRateCollector> c = collector->GetObject<IntervalRateCollector> ();
-        NS_ASSERT (c != nullptr);
-        c->TraceSinkUinteger32 (0, value);
+    case SatStatsHelper::OUTPUT_SCATTER_PLOT: {
+        Ptr<IntervalRateCollector> c = collector->GetObject<IntervalRateCollector>();
+        NS_ASSERT(c != nullptr);
+        c->TraceSinkUinteger32(0, value);
         break;
-      }
+    }
 
     case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
     case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
     case SatStatsHelper::OUTPUT_PDF_FILE:
     case SatStatsHelper::OUTPUT_PDF_PLOT:
     case SatStatsHelper::OUTPUT_CDF_FILE:
-    case SatStatsHelper::OUTPUT_CDF_PLOT:
-      {
-        Ptr<DistributionCollector> c = collector->GetObject<DistributionCollector> ();
-        NS_ASSERT (c != nullptr);
-        c->TraceSinkUinteger32 (0, value);
+    case SatStatsHelper::OUTPUT_CDF_PLOT: {
+        Ptr<DistributionCollector> c = collector->GetObject<DistributionCollector>();
+        NS_ASSERT(c != nullptr);
+        c->TraceSinkUinteger32(0, value);
         break;
-      }
+    }
 
     default:
-      NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
-      break;
+        NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
+                       << " is not a valid output type for this statistics.");
+        break;
 
     } // end of `switch (GetOutputType ())`
 
 } // end of `void PushToCollector (uint32_t, uint32_t)`
 
-
 // FORWARD LINK ///////////////////////////////////////////////////////////////
 
-NS_OBJECT_ENSURE_REGISTERED (SatStatsFwdQueueHelper);
+NS_OBJECT_ENSURE_REGISTERED(SatStatsFwdQueueHelper);
 
-SatStatsFwdQueueHelper::SatStatsFwdQueueHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsQueueHelper (satHelper)
+SatStatsFwdQueueHelper::SatStatsFwdQueueHelper(Ptr<const SatHelper> satHelper)
+    : SatStatsQueueHelper(satHelper)
 {
-  NS_LOG_FUNCTION (this << satHelper);
+    NS_LOG_FUNCTION(this << satHelper);
 }
 
-
-SatStatsFwdQueueHelper::~SatStatsFwdQueueHelper ()
+SatStatsFwdQueueHelper::~SatStatsFwdQueueHelper()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
-
 
 TypeId // static
-SatStatsFwdQueueHelper::GetTypeId ()
+SatStatsFwdQueueHelper::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::SatStatsFwdQueueHelper")
-    .SetParent<SatStatsQueueHelper> ()
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::SatStatsFwdQueueHelper").SetParent<SatStatsQueueHelper>();
+    return tid;
 }
 
-
 void
-SatStatsFwdQueueHelper::DoEnlistSource ()
+SatStatsFwdQueueHelper::DoEnlistSource()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
+    const SatIdMapper* satIdMapper = Singleton<SatIdMapper>::Get();
 
-  NodeContainer gws = GetSatHelper ()->GetBeamHelper ()->GetGwNodes ();
-  for (NodeContainer::Iterator it1 = gws.Begin (); it1 != gws.End (); ++it1)
+    NodeContainer gws = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+    for (NodeContainer::Iterator it1 = gws.Begin(); it1 != gws.End(); ++it1)
     {
-      NetDeviceContainer devs = GetGwSatNetDevice (*it1);
+        NetDeviceContainer devs = GetGwSatNetDevice(*it1);
 
-      for (NetDeviceContainer::Iterator itDev = devs.Begin ();
-           itDev != devs.End (); ++itDev)
+        for (NetDeviceContainer::Iterator itDev = devs.Begin(); itDev != devs.End(); ++itDev)
         {
-          Ptr<SatNetDevice> satDev = (*itDev)->GetObject<SatNetDevice> ();
-          NS_ASSERT (satDev != nullptr);
+            Ptr<SatNetDevice> satDev = (*itDev)->GetObject<SatNetDevice>();
+            NS_ASSERT(satDev != nullptr);
 
-          // Get the beam ID of this device.
-          Ptr<SatPhy> satPhy = satDev->GetPhy ();
-          NS_ASSERT (satPhy != nullptr);
-          Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx ();
-          NS_ASSERT (satPhyRx != nullptr);
-          const uint32_t satId = satPhyRx->GetSatId ();
-          const uint32_t beamId = satPhyRx->GetBeamId ();
-          NS_LOG_DEBUG (this << " enlisting UT from sat ID " << satId << " and beam ID " << beamId);
+            // Get the beam ID of this device.
+            Ptr<SatPhy> satPhy = satDev->GetPhy();
+            NS_ASSERT(satPhy != nullptr);
+            Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx();
+            NS_ASSERT(satPhyRx != nullptr);
+            const uint32_t satId = satPhyRx->GetSatId();
+            const uint32_t beamId = satPhyRx->GetBeamId();
+            NS_LOG_DEBUG(this << " enlisting UT from sat ID " << satId << " and beam ID "
+                              << beamId);
 
-          // Go through the UTs of this beam.
-          ListOfUt_t listOfUt;
-          NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes (satId, beamId);
-          for (NodeContainer::Iterator it2 = uts.Begin ();
-               it2 != uts.End (); ++it2)
+            // Go through the UTs of this beam.
+            ListOfUt_t listOfUt;
+            NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes(satId, beamId);
+            for (NodeContainer::Iterator it2 = uts.Begin(); it2 != uts.End(); ++it2)
             {
-              const Address addr = satIdMapper->GetUtMacWithNode (*it2);
-              const Mac48Address mac48Addr = Mac48Address::ConvertFrom (addr);
+                const Address addr = satIdMapper->GetUtMacWithNode(*it2);
+                const Mac48Address mac48Addr = Mac48Address::ConvertFrom(addr);
 
-              if (addr.IsInvalid ())
+                if (addr.IsInvalid())
                 {
-                  NS_LOG_WARN (this << " Node " << (*it2)->GetId ()
-                                    << " is not a valid UT");
+                    NS_LOG_WARN(this << " Node " << (*it2)->GetId() << " is not a valid UT");
                 }
-              else
+                else
                 {
-                  const uint32_t identifier = GetIdentifierForUt (*it2);
-                  listOfUt.push_back (std::make_pair (mac48Addr, identifier));
+                    const uint32_t identifier = GetIdentifierForUt(*it2);
+                    listOfUt.push_back(std::make_pair(mac48Addr, identifier));
                 }
             }
 
-          // Add an entry to the LLC list.
-          Ptr<SatLlc> satLlc = satDev->GetLlc ();
-          NS_ASSERT (satLlc != nullptr);
-          m_llc.push_back (std::make_pair (satLlc, listOfUt));
+            // Add an entry to the LLC list.
+            Ptr<SatLlc> satLlc = satDev->GetLlc();
+            NS_ASSERT(satLlc != nullptr);
+            m_llc.push_back(std::make_pair(satLlc, listOfUt));
 
         } // end of `for (NetDeviceContainer::Iterator itDev = devs)`
 
@@ -499,216 +485,188 @@ SatStatsFwdQueueHelper::DoEnlistSource ()
 
 } // end of `void DoInstall ();`
 
-
 void
-SatStatsFwdQueueHelper::DoPoll ()
+SatStatsFwdQueueHelper::DoPoll()
 {
-  //NS_LOG_FUNCTION (this);
+    // NS_LOG_FUNCTION (this);
 
-  // Go through the LLC list.
-  std::list<std::pair<Ptr<SatLlc>, ListOfUt_t> >::const_iterator it1;
-  for (it1 = m_llc.begin (); it1 != m_llc.end (); ++it1)
+    // Go through the LLC list.
+    std::list<std::pair<Ptr<SatLlc>, ListOfUt_t>>::const_iterator it1;
+    for (it1 = m_llc.begin(); it1 != m_llc.end(); ++it1)
     {
-      for (ListOfUt_t::const_iterator it2 = it1->second.begin ();
-           it2 != it1->second.end (); ++it2)
+        for (ListOfUt_t::const_iterator it2 = it1->second.begin(); it2 != it1->second.end(); ++it2)
         {
-          const Mac48Address addr = it2->first;
-          const uint32_t identifier = it2->second;
-          if (GetUnitType () == SatStatsQueueHelper::UNIT_BYTES)
+            const Mac48Address addr = it2->first;
+            const uint32_t identifier = it2->second;
+            if (GetUnitType() == SatStatsQueueHelper::UNIT_BYTES)
             {
-              PushToCollector (identifier,
-                               it1->first->GetNBytesInQueue (addr));
+                PushToCollector(identifier, it1->first->GetNBytesInQueue(addr));
             }
-          else
+            else
             {
-              NS_ASSERT (GetUnitType () == SatStatsQueueHelper::UNIT_NUMBER_OF_PACKETS);
-              PushToCollector (identifier,
-                               it1->first->GetNPacketsInQueue (addr));
+                NS_ASSERT(GetUnitType() == SatStatsQueueHelper::UNIT_NUMBER_OF_PACKETS);
+                PushToCollector(identifier, it1->first->GetNPacketsInQueue(addr));
             }
         }
     }
 }
 
-
 // FORWARD LINK IN BYTES //////////////////////////////////////////////////////
 
-NS_OBJECT_ENSURE_REGISTERED (SatStatsFwdQueueBytesHelper);
+NS_OBJECT_ENSURE_REGISTERED(SatStatsFwdQueueBytesHelper);
 
-SatStatsFwdQueueBytesHelper::SatStatsFwdQueueBytesHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsFwdQueueHelper (satHelper)
+SatStatsFwdQueueBytesHelper::SatStatsFwdQueueBytesHelper(Ptr<const SatHelper> satHelper)
+    : SatStatsFwdQueueHelper(satHelper)
 {
-  NS_LOG_FUNCTION (this << satHelper);
-  SetUnitType (SatStatsQueueHelper::UNIT_BYTES);
+    NS_LOG_FUNCTION(this << satHelper);
+    SetUnitType(SatStatsQueueHelper::UNIT_BYTES);
 }
 
-
-SatStatsFwdQueueBytesHelper::~SatStatsFwdQueueBytesHelper ()
+SatStatsFwdQueueBytesHelper::~SatStatsFwdQueueBytesHelper()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
-
 
 TypeId // static
-SatStatsFwdQueueBytesHelper::GetTypeId ()
+SatStatsFwdQueueBytesHelper::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::SatStatsFwdQueueBytesHelper")
-    .SetParent<SatStatsFwdQueueHelper> ()
-  ;
-  return tid;
+    static TypeId tid =
+        TypeId("ns3::SatStatsFwdQueueBytesHelper").SetParent<SatStatsFwdQueueHelper>();
+    return tid;
 }
-
 
 // FORWARD LINK IN PACKETS ////////////////////////////////////////////////////
 
-NS_OBJECT_ENSURE_REGISTERED (SatStatsFwdQueuePacketsHelper);
+NS_OBJECT_ENSURE_REGISTERED(SatStatsFwdQueuePacketsHelper);
 
-SatStatsFwdQueuePacketsHelper::SatStatsFwdQueuePacketsHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsFwdQueueHelper (satHelper)
+SatStatsFwdQueuePacketsHelper::SatStatsFwdQueuePacketsHelper(Ptr<const SatHelper> satHelper)
+    : SatStatsFwdQueueHelper(satHelper)
 {
-  NS_LOG_FUNCTION (this << satHelper);
-  SetUnitType (SatStatsQueueHelper::UNIT_NUMBER_OF_PACKETS);
+    NS_LOG_FUNCTION(this << satHelper);
+    SetUnitType(SatStatsQueueHelper::UNIT_NUMBER_OF_PACKETS);
 }
 
-
-SatStatsFwdQueuePacketsHelper::~SatStatsFwdQueuePacketsHelper ()
+SatStatsFwdQueuePacketsHelper::~SatStatsFwdQueuePacketsHelper()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
-
 
 TypeId // static
-SatStatsFwdQueuePacketsHelper::GetTypeId ()
+SatStatsFwdQueuePacketsHelper::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::SatStatsFwdQueuePacketsHelper")
-    .SetParent<SatStatsFwdQueueHelper> ()
-  ;
-  return tid;
+    static TypeId tid =
+        TypeId("ns3::SatStatsFwdQueuePacketsHelper").SetParent<SatStatsFwdQueueHelper>();
+    return tid;
 }
-
 
 // RETURN LINK ////////////////////////////////////////////////////////////////
 
-NS_OBJECT_ENSURE_REGISTERED (SatStatsRtnQueueHelper);
+NS_OBJECT_ENSURE_REGISTERED(SatStatsRtnQueueHelper);
 
-SatStatsRtnQueueHelper::SatStatsRtnQueueHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsQueueHelper (satHelper)
+SatStatsRtnQueueHelper::SatStatsRtnQueueHelper(Ptr<const SatHelper> satHelper)
+    : SatStatsQueueHelper(satHelper)
 {
-  NS_LOG_FUNCTION (this << satHelper);
+    NS_LOG_FUNCTION(this << satHelper);
 }
 
-
-SatStatsRtnQueueHelper::~SatStatsRtnQueueHelper ()
+SatStatsRtnQueueHelper::~SatStatsRtnQueueHelper()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
-
 
 TypeId // static
-SatStatsRtnQueueHelper::GetTypeId ()
+SatStatsRtnQueueHelper::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::SatStatsRtnQueueHelper")
-    .SetParent<SatStatsQueueHelper> ()
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::SatStatsRtnQueueHelper").SetParent<SatStatsQueueHelper>();
+    return tid;
 }
 
-
 void
-SatStatsRtnQueueHelper::DoEnlistSource ()
+SatStatsRtnQueueHelper::DoEnlistSource()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
-  for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
+    NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+    for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
     {
-      const uint32_t identifier = GetIdentifierForUt (*it);
-      Ptr<NetDevice> dev = GetUtSatNetDevice (*it);
-      Ptr<SatNetDevice> satDev = dev->GetObject<SatNetDevice> ();
-      NS_ASSERT (satDev != nullptr);
-      Ptr<SatLlc> satLlc = satDev->GetLlc ();
-      NS_ASSERT (satLlc != nullptr);
-      m_llc.push_back (std::make_pair (satLlc, identifier));
+        const uint32_t identifier = GetIdentifierForUt(*it);
+        Ptr<NetDevice> dev = GetUtSatNetDevice(*it);
+        Ptr<SatNetDevice> satDev = dev->GetObject<SatNetDevice>();
+        NS_ASSERT(satDev != nullptr);
+        Ptr<SatLlc> satLlc = satDev->GetLlc();
+        NS_ASSERT(satLlc != nullptr);
+        m_llc.push_back(std::make_pair(satLlc, identifier));
     }
 
 } // end of `void DoInstall ();`
 
-
 void
-SatStatsRtnQueueHelper::DoPoll ()
+SatStatsRtnQueueHelper::DoPoll()
 {
-  //NS_LOG_FUNCTION (this);
+    // NS_LOG_FUNCTION (this);
 
-  // Go through the LLC list.
-  std::list<std::pair<Ptr<SatLlc>, uint32_t> >::const_iterator it;
-  for (it = m_llc.begin (); it != m_llc.end (); ++it)
+    // Go through the LLC list.
+    std::list<std::pair<Ptr<SatLlc>, uint32_t>>::const_iterator it;
+    for (it = m_llc.begin(); it != m_llc.end(); ++it)
     {
-      if (GetUnitType () == SatStatsQueueHelper::UNIT_BYTES)
+        if (GetUnitType() == SatStatsQueueHelper::UNIT_BYTES)
         {
-          PushToCollector (it->second, it->first->GetNBytesInQueue ());
+            PushToCollector(it->second, it->first->GetNBytesInQueue());
         }
-      else
+        else
         {
-          NS_ASSERT (GetUnitType () == SatStatsQueueHelper::UNIT_NUMBER_OF_PACKETS);
-          PushToCollector (it->second, it->first->GetNPacketsInQueue ());
+            NS_ASSERT(GetUnitType() == SatStatsQueueHelper::UNIT_NUMBER_OF_PACKETS);
+            PushToCollector(it->second, it->first->GetNPacketsInQueue());
         }
-
     }
 }
 
 // RETURN LINK IN BYTES ///////////////////////////////////////////////////////
 
-NS_OBJECT_ENSURE_REGISTERED (SatStatsRtnQueueBytesHelper);
+NS_OBJECT_ENSURE_REGISTERED(SatStatsRtnQueueBytesHelper);
 
-SatStatsRtnQueueBytesHelper::SatStatsRtnQueueBytesHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsRtnQueueHelper (satHelper)
+SatStatsRtnQueueBytesHelper::SatStatsRtnQueueBytesHelper(Ptr<const SatHelper> satHelper)
+    : SatStatsRtnQueueHelper(satHelper)
 {
-  NS_LOG_FUNCTION (this << satHelper);
-  SetUnitType (SatStatsQueueHelper::UNIT_BYTES);
+    NS_LOG_FUNCTION(this << satHelper);
+    SetUnitType(SatStatsQueueHelper::UNIT_BYTES);
 }
 
-
-SatStatsRtnQueueBytesHelper::~SatStatsRtnQueueBytesHelper ()
+SatStatsRtnQueueBytesHelper::~SatStatsRtnQueueBytesHelper()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
-
 
 TypeId // static
-SatStatsRtnQueueBytesHelper::GetTypeId ()
+SatStatsRtnQueueBytesHelper::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::SatStatsRtnQueueBytesHelper")
-    .SetParent<SatStatsRtnQueueHelper> ()
-  ;
-  return tid;
+    static TypeId tid =
+        TypeId("ns3::SatStatsRtnQueueBytesHelper").SetParent<SatStatsRtnQueueHelper>();
+    return tid;
 }
-
 
 // RETURN LINK IN PACKETS /////////////////////////////////////////////////////
 
-NS_OBJECT_ENSURE_REGISTERED (SatStatsRtnQueuePacketsHelper);
+NS_OBJECT_ENSURE_REGISTERED(SatStatsRtnQueuePacketsHelper);
 
-SatStatsRtnQueuePacketsHelper::SatStatsRtnQueuePacketsHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsRtnQueueHelper (satHelper)
+SatStatsRtnQueuePacketsHelper::SatStatsRtnQueuePacketsHelper(Ptr<const SatHelper> satHelper)
+    : SatStatsRtnQueueHelper(satHelper)
 {
-  NS_LOG_FUNCTION (this << satHelper);
-  SetUnitType (SatStatsQueueHelper::UNIT_NUMBER_OF_PACKETS);
+    NS_LOG_FUNCTION(this << satHelper);
+    SetUnitType(SatStatsQueueHelper::UNIT_NUMBER_OF_PACKETS);
 }
 
-
-SatStatsRtnQueuePacketsHelper::~SatStatsRtnQueuePacketsHelper ()
+SatStatsRtnQueuePacketsHelper::~SatStatsRtnQueuePacketsHelper()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
-
 
 TypeId // static
-SatStatsRtnQueuePacketsHelper::GetTypeId ()
+SatStatsRtnQueuePacketsHelper::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::SatStatsRtnQueuePacketsHelper")
-    .SetParent<SatStatsRtnQueueHelper> ()
-  ;
-  return tid;
+    static TypeId tid =
+        TypeId("ns3::SatStatsRtnQueuePacketsHelper").SetParent<SatStatsRtnQueueHelper>();
+    return tid;
 }
-
 
 } // end of namespace ns3

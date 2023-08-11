@@ -21,13 +21,13 @@
 #ifndef SATELLITE_INTERFERENCE_H
 #define SATELLITE_INTERFERENCE_H
 
+#include <ns3/mac48-address.h>
+#include <ns3/nstime.h>
 #include <ns3/object.h>
 #include <ns3/simple-ref-count.h>
-#include <ns3/nstime.h>
-#include <ns3/mac48-address.h>
 
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -35,191 +35,200 @@ namespace ns3 {
  */
 class SatInterference : public Object
 {
-public:
-  /**
-   * Event for identifying interference change events (receiving)
-   */
-  class InterferenceChangeEvent : public SimpleRefCount<SatInterference::InterferenceChangeEvent>
-  {
-public:
+  public:
     /**
-      * Constructor of Event for satellite interference
-      * \param id identifier of the event
-      * \param duration duration of the interference event
-      * \param rxPower  RX power of interference
-      * \param satEarthStationAddress Address of the related earth station
-      */
-    InterferenceChangeEvent (uint32_t id, Time duration, double rxPower, Address satEarthStationAddress);
-
-    /**
-     * Destructor of Event for satellite interference
+     * Event for identifying interference change events (receiving)
      */
-    ~InterferenceChangeEvent ();
+    class InterferenceChangeEvent : public SimpleRefCount<SatInterference::InterferenceChangeEvent>
+    {
+      public:
+        /**
+         * Constructor of Event for satellite interference
+         * \param id identifier of the event
+         * \param duration duration of the interference event
+         * \param rxPower  RX power of interference
+         * \param satEarthStationAddress Address of the related earth station
+         */
+        InterferenceChangeEvent(uint32_t id,
+                                Time duration,
+                                double rxPower,
+                                Address satEarthStationAddress);
+
+        /**
+         * Destructor of Event for satellite interference
+         */
+        ~InterferenceChangeEvent();
+
+        /**
+         * \return id identifier of the event
+         */
+        uint32_t GetId(void) const;
+
+        /**
+         * \return duration of the interference event
+         */
+        Time GetDuration(void) const;
+
+        /**
+         * \return start time of the interference event
+         */
+        Time GetStartTime(void) const;
+
+        /**
+         * \return end time of the interference event
+         */
+        Time GetEndTime(void) const;
+
+        /**
+         * \return RX power of the interference event
+         */
+        double GetRxPower(void) const;
+
+        /**
+         * \return Terrestrial node MAC address of the interference event
+         */
+        Address GetSatEarthStationAddress(void) const;
+
+      private:
+        Time m_startTime;
+        Time m_endTime;
+        double m_rxPower;
+        uint32_t m_id;
+        Address m_satEarthStationAddress;
+    };
 
     /**
-      * \return id identifier of the event
-      */
-    uint32_t GetId (void) const;
+     * Derived from Object
+     */
+    static TypeId GetTypeId(void);
 
     /**
-      * \return duration of the interference event
-      */
-    Time GetDuration (void) const;
+     * Derived from Object
+     */
+    TypeId GetInstanceTypeId(void) const;
 
     /**
-      * \return start time of the interference event
-      */
-    Time GetStartTime (void) const;
+     * Constructor for Satellite interference base class
+     */
+    SatInterference();
 
     /**
-      * \return end time of the interference event
-      */
-    Time GetEndTime (void) const;
+     * Destructor for Satellite interference base class
+     */
+    ~SatInterference();
 
     /**
-      * \return RX power of the interference event
-      */
-    double GetRxPower (void) const;
+     * Adds interference power to interference object.
+     * Behavior depends on class actually implementing interference.
+     *
+     * \param rxDuration Duration of the receiving.
+     * \param rxPower Receiving power.
+     * \param rxAddress MAC address.
+     *
+     * \return the pointer to interference event as a reference of the addition
+     */
+    Ptr<SatInterference::InterferenceChangeEvent> Add(Time rxDuration,
+                                                      double rxPower,
+                                                      Address rxAddress);
 
     /**
-      * \return Terrestrial node MAC address of the interference event
-      */
-    Address GetSatEarthStationAddress (void) const;
+     * Calculates interference power for the given reference
+     *
+     * \param event Reference event which for interference is calculated.
+     * \return Calculated power value at end of receiving
+     */
+    std::vector<std::pair<double, double>> Calculate(
+        Ptr<SatInterference::InterferenceChangeEvent> event);
 
-private:
-    Time m_startTime;
-    Time m_endTime;
-    double m_rxPower;
-    uint32_t m_id;
-    Address m_satEarthStationAddress;
-  };
+    /**
+     * Resets current interference.
+     */
+    void Reset(void);
 
-  /**
-   * Derived from Object
-   */
-  static TypeId GetTypeId (void);
+    /**
+     * Notifies that RX is started by a receiver.
+     * \param event Interference reference event of receiver
+     */
+    virtual void NotifyRxStart(Ptr<SatInterference::InterferenceChangeEvent> event);
 
-  /**
-   * Derived from Object
-   */
-  TypeId GetInstanceTypeId (void) const;
+    /**
+     * Notifies that RX is ended by a receiver.
+     * \param event Interference reference event of receiver
+     */
+    virtual void NotifyRxEnd(Ptr<SatInterference::InterferenceChangeEvent> event);
 
-  /**
-   * Constructor for Satellite interference base class
-   */
-  SatInterference ();
+    /**
+     * Checks whether the packet has collided. Used by random access
+     * \param event Interference reference event of receiver
+     * \return has the packet collided
+     */
+    virtual bool HasCollision(Ptr<SatInterference::InterferenceChangeEvent> event);
 
-  /**
-   * Destructor for Satellite interference base class
-   */
-  ~SatInterference ();
+  private:
+    /**
+     * Adds interference power to interference object.
+     *
+     * \param rxDuration Duration of the receiving.
+     * \param rxPower Receiving power.
+     * \param rxAddress MAC address.
+     *
+     * \return the pointer to interference event as a reference of the addition
+     *
+     * Concrete subclasses of this base class must implement this method.
+     */
+    virtual Ptr<SatInterference::InterferenceChangeEvent> DoAdd(Time rxDuration,
+                                                                double rxPower,
+                                                                Address rxAddress) = 0;
 
-  /**
-   * Adds interference power to interference object.
-   * Behavior depends on class actually implementing interference.
-   *
-   * \param rxDuration Duration of the receiving.
-   * \param rxPower Receiving power.
-   * \param rxAddress MAC address.
-   *
-   * \return the pointer to interference event as a reference of the addition
-   */
-  Ptr<SatInterference::InterferenceChangeEvent> Add (Time rxDuration, double rxPower, Address rxAddress);
+    /**
+     * Calculates interference power for the given reference
+     * Sets final power at end time to finalPower.
+     *
+     * \param event Reference event which for interference is calculated.
+     * \return Final power value at end of receiving
+     *
+     * Concrete subclasses of this base class must implement this method.
+     */
+    virtual std::vector<std::pair<double, double>> DoCalculate(
+        Ptr<SatInterference::InterferenceChangeEvent> event) = 0;
 
-  /**
-   * Calculates interference power for the given reference
-   *
-   * \param event Reference event which for interference is calculated.
-   * \return Calculated power value at end of receiving
-   */
-  std::vector< std::pair<double, double> > Calculate (Ptr<SatInterference::InterferenceChangeEvent> event );
+    /**
+     * Resets current interference.
+     *
+     * Concrete subclasses of this base class must implement this method.
+     */
+    virtual void DoReset(void) = 0;
 
-  /**
-   * Resets current interference.
-   */
-  void Reset (void);
+    /**
+     * Notifies that RX is started by a receiver.
+     *
+     * Concrete subclasses of this base class must implement this method.
+     *
+     * \param event Interference reference event of receiver
+     */
+    virtual void DoNotifyRxStart(Ptr<SatInterference::InterferenceChangeEvent> event) = 0;
 
-  /**
-   * Notifies that RX is started by a receiver.
-   * \param event Interference reference event of receiver
-   */
-  virtual void NotifyRxStart (Ptr<SatInterference::InterferenceChangeEvent> event);
+    /**
+     * Notifies that RX is ended by a receiver.
+     *
+     * Concrete subclasses of this base class must implement this method.
+     *
+     * \param event Interference reference event of receiver
+     */
+    virtual void DoNotifyRxEnd(Ptr<SatInterference::InterferenceChangeEvent> event) = 0;
 
-  /**
-   * Notifies that RX is ended by a receiver.
-   * \param event Interference reference event of receiver
-   */
-  virtual void NotifyRxEnd (Ptr<SatInterference::InterferenceChangeEvent> event);
+    SatInterference(const SatInterference& o);
+    SatInterference& operator=(const SatInterference& o);
 
-  /**
-   * Checks whether the packet has collided. Used by random access
-   * \param event Interference reference event of receiver
-   * \return has the packet collided
-   */
-  virtual bool HasCollision (Ptr<SatInterference::InterferenceChangeEvent> event);
+    /**
+     *
+     */
+    std::map<Ptr<SatInterference::InterferenceChangeEvent>, bool> m_packetCollisions;
 
-private:
-  /**
-   * Adds interference power to interference object.
-   *
-   * \param rxDuration Duration of the receiving.
-   * \param rxPower Receiving power.
-   * \param rxAddress MAC address.
-   *
-   * \return the pointer to interference event as a reference of the addition
-   *
-   * Concrete subclasses of this base class must implement this method.
-   */
-  virtual Ptr<SatInterference::InterferenceChangeEvent> DoAdd (Time rxDuration, double rxPower, Address rxAddress) = 0;
-
-  /**
-   * Calculates interference power for the given reference
-   * Sets final power at end time to finalPower.
-   *
-   * \param event Reference event which for interference is calculated.
-   * \return Final power value at end of receiving
-   *
-   * Concrete subclasses of this base class must implement this method.
-   */
-  virtual std::vector< std::pair<double, double> > DoCalculate (Ptr<SatInterference::InterferenceChangeEvent> event) = 0;
-
-  /**
-   * Resets current interference.
-   *
-   * Concrete subclasses of this base class must implement this method.
-   */
-  virtual void DoReset (void) = 0;
-
-  /**
-   * Notifies that RX is started by a receiver.
-   *
-   * Concrete subclasses of this base class must implement this method.
-   *
-   * \param event Interference reference event of receiver
-   */
-  virtual void DoNotifyRxStart (Ptr<SatInterference::InterferenceChangeEvent> event) = 0;
-
-  /**
-   * Notifies that RX is ended by a receiver.
-   *
-   * Concrete subclasses of this base class must implement this method.
-   *
-   * \param event Interference reference event of receiver
-   */
-  virtual void DoNotifyRxEnd (Ptr<SatInterference::InterferenceChangeEvent> event) = 0;
-
-  SatInterference (const SatInterference &o);
-  SatInterference &operator = (const SatInterference &o);
-
-  /**
-   *
-   */
-  std::map<Ptr<SatInterference::InterferenceChangeEvent>, bool> m_packetCollisions;
-
-  /**
-   *
-   */
-  uint32_t m_currentlyReceiving;
+    /**
+     *
+     */
+    uint32_t m_currentlyReceiving;
 };
 
 } // namespace ns3

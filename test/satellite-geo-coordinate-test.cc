@@ -24,28 +24,33 @@
  * \brief Test cases to unit test GeoCoordinate class.
  *
  */
-#include "ns3/log.h"
+#include "../utils/satellite-env-variables.h"
+
 #include "ns3/geo-coordinate.h"
-#include "ns3/test.h"
+#include "ns3/log.h"
 #include "ns3/simulator.h"
 #include "ns3/singleton.h"
-#include "../utils/satellite-env-variables.h"
+#include "ns3/test.h"
 
 using namespace ns3;
 
-//#define PRINT_POSITION_INFO // uncomment to see info while executing test
+// #define PRINT_POSITION_INFO // uncomment to see info while executing test
 
 #ifdef PRINT_POSITION_INFO
-static void PrintPositionInfo (GeoCoordinate pos)
+static void
+PrintPositionInfo(GeoCoordinate pos)
 {
-  Vector pos2 = pos.ToVector ();
+    Vector pos2 = pos.ToVector();
 
-  // sets number of decimal places
-  std::cout.setf (std::ios::fixed, std::ios::floatfield);
-  std::cout.precision (15);
-  std::cout << pos.GetRefEllipsoid () << " position="  "x=" << pos2.x << ", y=" << pos2.y
-            << ", z=" << pos2.z << ", longitude=" << pos.GetLongitude ()
-            << ", latitude=" << pos.GetLatitude () << ", altitude=" << pos.GetAltitude ()  << std::endl;
+    // sets number of decimal places
+    std::cout.setf(std::ios::fixed, std::ios::floatfield);
+    std::cout.precision(15);
+    std::cout << pos.GetRefEllipsoid()
+              << " position="
+                 "x="
+              << pos2.x << ", y=" << pos2.y << ", z=" << pos2.z
+              << ", longitude=" << pos.GetLongitude() << ", latitude=" << pos.GetLatitude()
+              << ", altitude=" << pos.GetAltitude() << std::endl;
 }
 #endif
 
@@ -54,87 +59,87 @@ static void PrintPositionInfo (GeoCoordinate pos)
  */
 class GeoCoordinateTestCase : public TestCase
 {
-public:
-  GeoCoordinateTestCase ();
-  virtual ~GeoCoordinateTestCase ();
+  public:
+    GeoCoordinateTestCase();
+    virtual ~GeoCoordinateTestCase();
 
-private:
-  virtual void DoRun (void);
-  void Validate ( GeoCoordinate& coord1, GeoCoordinate& coord2 );
+  private:
+    virtual void DoRun(void);
+    void Validate(GeoCoordinate& coord1, GeoCoordinate& coord2);
 };
 
-GeoCoordinateTestCase::GeoCoordinateTestCase ()
-  : TestCase ("Test Geo Coordinate correctness")
+GeoCoordinateTestCase::GeoCoordinateTestCase()
+    : TestCase("Test Geo Coordinate correctness")
 {
 }
 
-GeoCoordinateTestCase::~GeoCoordinateTestCase ()
+GeoCoordinateTestCase::~GeoCoordinateTestCase()
 {
 }
 
 void
-GeoCoordinateTestCase::DoRun (void)
+GeoCoordinateTestCase::DoRun(void)
 {
-  GeoCoordinate position1;
-  GeoCoordinate position2;
+    GeoCoordinate position1;
+    GeoCoordinate position2;
 
-  // Set simulation output details
-  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-geo-coordinate", "", true);
+    // Set simulation output details
+    Singleton<SatEnvVariables>::Get()->DoInitialize();
+    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-geo-coordinate", "", true);
 
-  for (int i = -180; i <= 180; i += 30)
+    for (int i = -180; i <= 180; i += 30)
     {
-      position1 = GeoCoordinate (i / 2, i, i * 30);
-      position2 = GeoCoordinate (position1.ToVector ());
+        position1 = GeoCoordinate(i / 2, i, i * 30);
+        position2 = GeoCoordinate(position1.ToVector());
 
-      Validate ( position1, position2 );
+        Validate(position1, position2);
 
-      position1 = GeoCoordinate (i / 2, i, i * 30, GeoCoordinate::SPHERE);
-      position2 = GeoCoordinate (position1.ToVector (), GeoCoordinate::SPHERE);
+        position1 = GeoCoordinate(i / 2, i, i * 30, GeoCoordinate::SPHERE);
+        position2 = GeoCoordinate(position1.ToVector(), GeoCoordinate::SPHERE);
 
-      Validate ( position1, position2 );
+        Validate(position1, position2);
 
-      position1 = GeoCoordinate (i / 2, i, i * 30, GeoCoordinate::WGS84);
-      position2 = GeoCoordinate (position1.ToVector (), GeoCoordinate::WGS84);
+        position1 = GeoCoordinate(i / 2, i, i * 30, GeoCoordinate::WGS84);
+        position2 = GeoCoordinate(position1.ToVector(), GeoCoordinate::WGS84);
 
-      Validate ( position1, position2 );
+        Validate(position1, position2);
 
-      position1 = GeoCoordinate (i / 2, i, i * 30, GeoCoordinate::GRS80);
-      position2 = GeoCoordinate (position1.ToVector (), GeoCoordinate::GRS80);
+        position1 = GeoCoordinate(i / 2, i, i * 30, GeoCoordinate::GRS80);
+        position2 = GeoCoordinate(position1.ToVector(), GeoCoordinate::GRS80);
 
-      Validate ( position1, position2 );
+        Validate(position1, position2);
     }
 
-  Singleton<SatEnvVariables>::Get ()->DoDispose ();
+    Singleton<SatEnvVariables>::Get()->DoDispose();
 }
 
 void
-GeoCoordinateTestCase::Validate (GeoCoordinate& position1, GeoCoordinate& position2)
+GeoCoordinateTestCase::Validate(GeoCoordinate& position1, GeoCoordinate& position2)
 {
-  double altDiff, lonDiff, latDiff = 0;
-  bool altSignSame, lonSignSame, latSignSame = false;
+    double altDiff, lonDiff, latDiff = 0;
+    bool altSignSame, lonSignSame, latSignSame = false;
 
 #ifdef PRINT_POSITION_INFO
-  PrintPositionInfo (position1);
-  PrintPositionInfo (position2);
+    PrintPositionInfo(position1);
+    PrintPositionInfo(position2);
 #endif
 
-  altDiff = std::abs (position1.GetAltitude () - position2.GetAltitude ());
-  lonDiff = std::abs (position1.GetLongitude () - position2.GetLongitude ());
-  latDiff = std::abs (position1.GetLatitude () - position2.GetLatitude ());
+    altDiff = std::abs(position1.GetAltitude() - position2.GetAltitude());
+    lonDiff = std::abs(position1.GetLongitude() - position2.GetLongitude());
+    latDiff = std::abs(position1.GetLatitude() - position2.GetLatitude());
 
-  altSignSame = ((position1.GetAltitude () > 0) ==  (position2.GetAltitude () > 0));
-  lonSignSame = ((position1.GetLongitude () > 0) ==  (position2.GetLongitude () > 0));
-  latSignSame = ((position1.GetLatitude () > 0) == (position2.GetLatitude () > 0));
+    altSignSame = ((position1.GetAltitude() > 0) == (position2.GetAltitude() > 0));
+    lonSignSame = ((position1.GetLongitude() > 0) == (position2.GetLongitude() > 0));
+    latSignSame = ((position1.GetLatitude() > 0) == (position2.GetLatitude() > 0));
 
-  // check that is difference is ok
-  NS_TEST_ASSERT_MSG_LT (altDiff, 0.0001, "Altitude difference too big!");
-  NS_TEST_ASSERT_MSG_LT (lonDiff, 0.0001, "Longitude difference too big!");
-  NS_TEST_ASSERT_MSG_LT (latDiff, 0.0001, "Latitude difference too big!");
+    // check that is difference is ok
+    NS_TEST_ASSERT_MSG_LT(altDiff, 0.0001, "Altitude difference too big!");
+    NS_TEST_ASSERT_MSG_LT(lonDiff, 0.0001, "Longitude difference too big!");
+    NS_TEST_ASSERT_MSG_LT(latDiff, 0.0001, "Latitude difference too big!");
 
-  NS_TEST_ASSERT_MSG_EQ ( altSignSame, true, "Altitude signs are different.");
-  NS_TEST_ASSERT_MSG_EQ ( lonSignSame, true, "Longitude signs are different.");
-  NS_TEST_ASSERT_MSG_EQ ( latSignSame, true, "Latitude signs are different.");
+    NS_TEST_ASSERT_MSG_EQ(altSignSame, true, "Altitude signs are different.");
+    NS_TEST_ASSERT_MSG_EQ(lonSignSame, true, "Longitude signs are different.");
+    NS_TEST_ASSERT_MSG_EQ(latSignSame, true, "Latitude signs are different.");
 }
 
 /**
@@ -142,16 +147,15 @@ GeoCoordinateTestCase::Validate (GeoCoordinate& position1, GeoCoordinate& positi
  */
 class GeoCoordinateTestSuite : public TestSuite
 {
-public:
-  GeoCoordinateTestSuite ();
+  public:
+    GeoCoordinateTestSuite();
 };
 
-GeoCoordinateTestSuite::GeoCoordinateTestSuite ()
-  : TestSuite ("geo-coordinate-test", UNIT)
+GeoCoordinateTestSuite::GeoCoordinateTestSuite()
+    : TestSuite("geo-coordinate-test", UNIT)
 {
-  AddTestCase (new GeoCoordinateTestCase, TestCase::QUICK);
+    AddTestCase(new GeoCoordinateTestCase, TestCase::QUICK);
 }
 
 // Do allocate an instance of this TestSuite
 static GeoCoordinateTestSuite geoCoordinateTestSuite;
-

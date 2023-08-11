@@ -20,14 +20,14 @@
 #ifndef SATELLITE_FADING_OSCILLATOR_H
 #define SATELLITE_FADING_OSCILLATOR_H
 
-#include <complex>
-
-#include <ns3/object.h>
 #include <ns3/double.h>
+#include <ns3/object.h>
 #include <ns3/simulator.h>
 
+#include <complex>
 
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -39,79 +39,78 @@ namespace ns3 {
  */
 class SatFadingOscillator : public Object
 {
-public:
-  /**
-   * \brief NS-3 function for type id
-   * @return type id
-   */
-  static TypeId GetTypeId (void);
+  public:
+    /**
+     * \brief NS-3 function for type id
+     * @return type id
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * \brief Constructor
-   */
-  SatFadingOscillator ();
+    /**
+     * \brief Constructor
+     */
+    SatFadingOscillator();
 
-  /**
-   * \brief Constructor
-   * \param amplitude amplitude
-   * \param initialPhase intial phase
-   * \param omega rotation speed
-   */
-  SatFadingOscillator (std::complex<double> amplitude, double initialPhase, double omega);
+    /**
+     * \brief Constructor
+     * \param amplitude amplitude
+     * \param initialPhase intial phase
+     * \param omega rotation speed
+     */
+    SatFadingOscillator(std::complex<double> amplitude, double initialPhase, double omega);
 
-  /**
-   * \brief Constructor
-   * \param amplitude amplitude
-   * \param initialPhase initial phase
-   * \param omega rotation speed
-   */
-  SatFadingOscillator (double amplitude, double initialPhase, double omega);
+    /**
+     * \brief Constructor
+     * \param amplitude amplitude
+     * \param initialPhase initial phase
+     * \param omega rotation speed
+     */
+    SatFadingOscillator(double amplitude, double initialPhase, double omega);
 
-  /**
-   * \brief Destructor
-   */
-  ~SatFadingOscillator ();
+    /**
+     * \brief Destructor
+     */
+    ~SatFadingOscillator();
 
-  /**
-   * \brief Returns complex value at time t
-   * \param timeInSeconds current time in seconds
-   * \return complex value
-   */
-  std::complex<double> GetComplexValueAt (double timeInSeconds) const;
+    /**
+     * \brief Returns complex value at time t
+     * \param timeInSeconds current time in seconds
+     * \return complex value
+     */
+    std::complex<double> GetComplexValueAt(double timeInSeconds) const;
 
-  /**
-   * \brief Returns cosine wave complex value at time t
-   * \param timeInSeconds current time in seconds
-   * \return complex value
-   */
-  std::complex<double> GetCosineWaveValueAt (double timeInSeconds) const;
+    /**
+     * \brief Returns cosine wave complex value at time t
+     * \param timeInSeconds current time in seconds
+     * \return complex value
+     */
+    std::complex<double> GetCosineWaveValueAt(double timeInSeconds) const;
 
-  /**
-   * \brief Do needed dispose actions
-   */
-  void DoDispose ();
+    /**
+     * \brief Do needed dispose actions
+     */
+    void DoDispose();
 
-private:
-  /**
-   * \brief Complex amplitude
-   */
-  std::complex<double> m_complexAmplitude;
+  private:
+    /**
+     * \brief Complex amplitude
+     */
+    std::complex<double> m_complexAmplitude;
 
-  /**
-   * \brief Amplitude
-   */
-  double m_amplitude;
+    /**
+     * \brief Amplitude
+     */
+    double m_amplitude;
 
-  /**
-   * \brief Initial phase
-   */
-  double m_phase;
+    /**
+     * \brief Initial phase
+     */
+    double m_phase;
 
-  /**
-   * \brief Rotation speed
-   */
-  double m_omega;
-
+    /**
+     * \brief Rotation speed
+     */
+    double m_omega;
 };
 
 } // namespace ns3

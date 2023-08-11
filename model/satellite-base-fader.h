@@ -21,11 +21,11 @@
 #define SATELLITE_BASE_FADER_H
 
 #include <ns3/object.h>
-#include <ns3/uinteger.h>
 #include <ns3/simulator.h>
+#include <ns3/uinteger.h>
 
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -38,43 +38,43 @@ namespace ns3 {
  */
 class SatBaseFader : public Object
 {
-public:
-  /**
-   * \brief Constructor
-   */
-  SatBaseFader ();
+  public:
+    /**
+     * \brief Constructor
+     */
+    SatBaseFader();
 
-  /**
-   * \brief Destructor
-   */
-  virtual ~SatBaseFader ();
+    /**
+     * \brief Destructor
+     */
+    virtual ~SatBaseFader();
 
-  /**
-   * \brief NS-3 type id function
-   * \return type id
-   */
-  static TypeId GetTypeId (void);
+    /**
+     * \brief NS-3 type id function
+     * \return type id
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * \brief Returns channel gain in dB
-   * \return channel gain in dB
-   */
-  virtual double GetChannelGainDb (void) = 0;
+    /**
+     * \brief Returns channel gain in dB
+     * \return channel gain in dB
+     */
+    virtual double GetChannelGainDb(void) = 0;
 
-  /**
-   * \brief Returns channel gain
-   * \return channel gain
-   */
-  virtual double GetChannelGain (void) = 0;
+    /**
+     * \brief Returns channel gain
+     * \return channel gain
+     */
+    virtual double GetChannelGain(void) = 0;
 
-  /**
-   * \brief Function for updating the fader angle set and state
-   * \param newSet new angle set
-   * \param newState new state
-   */
-  virtual void UpdateParameters (uint32_t newSet, uint32_t newState) = 0;
+    /**
+     * \brief Function for updating the fader angle set and state
+     * \param newSet new angle set
+     * \param newState new state
+     */
+    virtual void UpdateParameters(uint32_t newSet, uint32_t newState) = 0;
 
-private:
+  private:
 };
 
 } // namespace ns3

@@ -18,108 +18,106 @@
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
 
-#include <ns3/log.h>
-
 #include "satellite-crdsa-replica-tag.h"
 
+#include <ns3/log.h>
 
-NS_LOG_COMPONENT_DEFINE ("SatCrdsaReplicaTag");
+NS_LOG_COMPONENT_DEFINE("SatCrdsaReplicaTag");
 
-namespace ns3 {
-
-NS_OBJECT_ENSURE_REGISTERED (SatCrdsaReplicaTag);
-
-
-SatCrdsaReplicaTag::SatCrdsaReplicaTag ()
-  : m_numOfIds (0)
+namespace ns3
 {
-  NS_LOG_FUNCTION (this);
+
+NS_OBJECT_ENSURE_REGISTERED(SatCrdsaReplicaTag);
+
+SatCrdsaReplicaTag::SatCrdsaReplicaTag()
+    : m_numOfIds(0)
+{
+    NS_LOG_FUNCTION(this);
 }
 
-SatCrdsaReplicaTag::~SatCrdsaReplicaTag ()
+SatCrdsaReplicaTag::~SatCrdsaReplicaTag()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  m_slotIds.clear ();
+    m_slotIds.clear();
 }
 
 TypeId
-SatCrdsaReplicaTag::GetTypeId (void)
+SatCrdsaReplicaTag::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatCrdsaReplicaTag")
-    .SetParent<Tag> ()
-    .AddConstructor<SatCrdsaReplicaTag> ()
-  ;
-  return tid;
+    static TypeId tid =
+        TypeId("ns3::SatCrdsaReplicaTag").SetParent<Tag>().AddConstructor<SatCrdsaReplicaTag>();
+    return tid;
 }
-TypeId
-SatCrdsaReplicaTag::GetInstanceTypeId (void) const
-{
-  NS_LOG_FUNCTION (this);
 
-  return GetTypeId ();
+TypeId
+SatCrdsaReplicaTag::GetInstanceTypeId(void) const
+{
+    NS_LOG_FUNCTION(this);
+
+    return GetTypeId();
 }
 
 void
-SatCrdsaReplicaTag::AddSlotId (uint16_t slotId)
+SatCrdsaReplicaTag::AddSlotId(uint16_t slotId)
 {
-  NS_LOG_FUNCTION (this);
-  m_slotIds.push_back (slotId);
-  m_numOfIds = m_slotIds.size ();
+    NS_LOG_FUNCTION(this);
+    m_slotIds.push_back(slotId);
+    m_numOfIds = m_slotIds.size();
 }
 
 std::vector<uint16_t>
-SatCrdsaReplicaTag::GetSlotIds (void)
+SatCrdsaReplicaTag::GetSlotIds(void)
 {
-  NS_LOG_FUNCTION (this);
-  return m_slotIds;
+    NS_LOG_FUNCTION(this);
+    return m_slotIds;
 }
 
 uint32_t
-SatCrdsaReplicaTag::GetSerializedSize (void) const
+SatCrdsaReplicaTag::GetSerializedSize(void) const
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return ( sizeof (uint8_t) + m_slotIds.size () * sizeof (uint16_t) );
+    return (sizeof(uint8_t) + m_slotIds.size() * sizeof(uint16_t));
 }
+
 void
-SatCrdsaReplicaTag::Serialize (TagBuffer buffer) const
+SatCrdsaReplicaTag::Serialize(TagBuffer buffer) const
 {
-  NS_LOG_FUNCTION (this << &buffer);
+    NS_LOG_FUNCTION(this << &buffer);
 
-  buffer.WriteU8 (m_numOfIds);
+    buffer.WriteU8(m_numOfIds);
 
-  for (uint8_t i = 0; i < m_numOfIds; i++)
+    for (uint8_t i = 0; i < m_numOfIds; i++)
     {
-      buffer.WriteU16 (m_slotIds[i]);
+        buffer.WriteU16(m_slotIds[i]);
     }
 }
 
 void
-SatCrdsaReplicaTag::Deserialize (TagBuffer buffer)
+SatCrdsaReplicaTag::Deserialize(TagBuffer buffer)
 {
-  NS_LOG_FUNCTION (this << &buffer);
+    NS_LOG_FUNCTION(this << &buffer);
 
-  m_numOfIds = buffer.ReadU8 ();
+    m_numOfIds = buffer.ReadU8();
 
-  for (uint8_t i = 0; i < m_numOfIds; i++)
+    for (uint8_t i = 0; i < m_numOfIds; i++)
     {
-      m_slotIds.push_back (buffer.ReadU16 ());
+        m_slotIds.push_back(buffer.ReadU16());
     }
 }
 
 void
-SatCrdsaReplicaTag::Print (std::ostream &os) const
+SatCrdsaReplicaTag::Print(std::ostream& os) const
 {
-  NS_LOG_FUNCTION (this << &os);
+    NS_LOG_FUNCTION(this << &os);
 
-  os << "id=";
+    os << "id=";
 
-  for (uint8_t i = 0; i < m_numOfIds; i++)
+    for (uint8_t i = 0; i < m_numOfIds; i++)
     {
-      os << m_slotIds[i] << " ";
+        os << m_slotIds[i] << " ";
     }
 }
-
 
 } // namespace ns3

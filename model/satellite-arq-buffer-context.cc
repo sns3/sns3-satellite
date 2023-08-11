@@ -18,45 +18,40 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
+#include "satellite-arq-buffer-context.h"
 
 #include <ns3/log.h>
 
-#include "satellite-arq-buffer-context.h"
+NS_LOG_COMPONENT_DEFINE("SatArqBufferContext");
 
-
-NS_LOG_COMPONENT_DEFINE ("SatArqBufferContext");
-
-namespace ns3 {
-
-NS_OBJECT_ENSURE_REGISTERED (SatArqBufferContext);
-
-
-SatArqBufferContext::SatArqBufferContext ()
-  : m_pdu (),
-  m_seqNo (0),
-  m_retransmissionCount (0),
-  m_waitingTimer (),
-  m_rxStatus (false)
+namespace ns3
 {
 
+NS_OBJECT_ENSURE_REGISTERED(SatArqBufferContext);
+
+SatArqBufferContext::SatArqBufferContext()
+    : m_pdu(),
+      m_seqNo(0),
+      m_retransmissionCount(0),
+      m_waitingTimer(),
+      m_rxStatus(false)
+{
 }
 
 TypeId
-SatArqBufferContext::GetTypeId ()
+SatArqBufferContext::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::SatArqBufferContext")
-    .SetParent<Object> ()
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::SatArqBufferContext").SetParent<Object>();
+    return tid;
 }
 
 void
-SatArqBufferContext::DoDispose ()
+SatArqBufferContext::DoDispose()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  m_pdu = 0;
-  m_waitingTimer.Cancel ();
+    m_pdu = 0;
+    m_waitingTimer.Cancel();
 }
 
-}
+} // namespace ns3

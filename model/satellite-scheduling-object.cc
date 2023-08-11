@@ -18,81 +18,82 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
+#include "satellite-scheduling-object.h"
+
 #include <ns3/log.h>
 #include <ns3/mac48-address.h>
 
-#include "satellite-scheduling-object.h"
+NS_LOG_COMPONENT_DEFINE("SatSchedulingObject");
 
-
-NS_LOG_COMPONENT_DEFINE ("SatSchedulingObject");
-
-namespace ns3 {
-
-
-SatSchedulingObject::SatSchedulingObject ()
-  : m_macAddress (),
-  m_bufferedBytes (0),
-  m_minTxOpportunity (0),
-  m_holDelay (Seconds (0.0)),
-  m_flowId ()
+namespace ns3
 {
-  NS_LOG_FUNCTION (this);
-  NS_ASSERT (false);
 
-  /**
-   * Default constructor is not meant to be used!
-   */
+SatSchedulingObject::SatSchedulingObject()
+    : m_macAddress(),
+      m_bufferedBytes(0),
+      m_minTxOpportunity(0),
+      m_holDelay(Seconds(0.0)),
+      m_flowId()
+{
+    NS_LOG_FUNCTION(this);
+    NS_ASSERT(false);
+
+    /**
+     * Default constructor is not meant to be used!
+     */
 }
 
-
-SatSchedulingObject::SatSchedulingObject (Mac48Address addr, uint32_t bytes, uint32_t minTxOpportunity, Time holDelay, uint8_t flowId)
-  : m_macAddress (addr),
-  m_bufferedBytes (bytes),
-  m_minTxOpportunity (minTxOpportunity),
-  m_holDelay (holDelay),
-  m_flowId (flowId)
+SatSchedulingObject::SatSchedulingObject(Mac48Address addr,
+                                         uint32_t bytes,
+                                         uint32_t minTxOpportunity,
+                                         Time holDelay,
+                                         uint8_t flowId)
+    : m_macAddress(addr),
+      m_bufferedBytes(bytes),
+      m_minTxOpportunity(minTxOpportunity),
+      m_holDelay(holDelay),
+      m_flowId(flowId)
 {
-  NS_LOG_FUNCTION (this << addr << bytes << holDelay << (uint32_t) flowId);
+    NS_LOG_FUNCTION(this << addr << bytes << holDelay << (uint32_t)flowId);
 }
 
-SatSchedulingObject::~SatSchedulingObject ()
+SatSchedulingObject::~SatSchedulingObject()
 {
-
 }
 
 Mac48Address
-SatSchedulingObject::GetMacAddress () const
+SatSchedulingObject::GetMacAddress() const
 {
-  NS_LOG_FUNCTION (this);
-  return m_macAddress;
+    NS_LOG_FUNCTION(this);
+    return m_macAddress;
 }
 
 uint32_t
-SatSchedulingObject::GetBufferedBytes () const
+SatSchedulingObject::GetBufferedBytes() const
 {
-  NS_LOG_FUNCTION (this);
-  return m_bufferedBytes;
+    NS_LOG_FUNCTION(this);
+    return m_bufferedBytes;
 }
 
 uint32_t
-SatSchedulingObject::GetMinTxOpportunityInBytes () const
+SatSchedulingObject::GetMinTxOpportunityInBytes() const
 {
-  NS_LOG_FUNCTION (this);
-  return m_minTxOpportunity;
+    NS_LOG_FUNCTION(this);
+    return m_minTxOpportunity;
 }
 
 uint8_t
-SatSchedulingObject::GetFlowId () const
+SatSchedulingObject::GetFlowId() const
 {
-  NS_LOG_FUNCTION (this);
-  return m_flowId;
+    NS_LOG_FUNCTION(this);
+    return m_flowId;
 }
 
 Time
-SatSchedulingObject::GetHolDelay () const
+SatSchedulingObject::GetHolDelay() const
 {
-  NS_LOG_FUNCTION (this);
-  return m_holDelay;
+    NS_LOG_FUNCTION(this);
+    return m_holDelay;
 }
 
 } // namespace ns3

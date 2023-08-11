@@ -19,7 +19,7 @@
 #
 
 ####################################################
-# Example simulation script for pushing simulations 
+# Example simulation script for pushing simulations
 # to grid engine. Run the script in the NS-3 root.
 ####################################################
 
@@ -46,7 +46,7 @@ main()
     do
         for j in $simTime
         do
-	   # uts simTime
+       # uts simTime
            run_sim $i $j
            run_sim $i $j
         done

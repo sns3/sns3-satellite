@@ -22,15 +22,14 @@
 #ifndef SATELLITE_STATS_FWD_LINK_SCHEDULER_SYMBOL_RATE_HELPER_H
 #define SATELLITE_STATS_FWD_LINK_SCHEDULER_SYMBOL_RATE_HELPER_H
 
-#include <ns3/satellite-stats-helper.h>
-#include <ns3/satellite-enums.h>
-#include <ns3/ptr.h>
 #include <ns3/callback.h>
 #include <ns3/collector-map.h>
+#include <ns3/ptr.h>
+#include <ns3/satellite-enums.h>
+#include <ns3/satellite-stats-helper.h>
 
-
-namespace ns3 {
-
+namespace ns3
+{
 
 // BASE CLASS /////////////////////////////////////////////////////////////////
 
@@ -45,58 +44,54 @@ class DataCollectionObject;
  */
 class SatStatsFwdLinkSchedulerSymbolRateHelper : public SatStatsHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsFwdLinkSchedulerSymbolRateHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsFwdLinkSchedulerSymbolRateHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsFwdLinkSchedulerSymbolRateHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsFwdLinkSchedulerSymbolRateHelper ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
+    /**
+     * \brief Set up several probes or other means of listeners and connect them
+     *        to the collectors.
+     */
+    void InstallProbes();
 
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
+    /**
+     * \brief Receive inputs from trace sources and forward them to the collector.
+     * \param sliceId the sliceId ID of the BBFrame.
+     * \param symbolRate the symbol rate during the allocation cycle.
+     */
+    void SymbolRateCallback(uint8_t sliceId, double symbolRate);
 
-  /**
-   * \brief Set up several probes or other means of listeners and connect them
-   *        to the collectors.
-   */
-  void InstallProbes ();
+    /**
+     * \return
+     */
+    Callback<void, uint8_t, double> GetTraceSinkCallback() const;
 
-  /**
-   * \brief Receive inputs from trace sources and forward them to the collector.
-   * \param sliceId the sliceId ID of the BBFrame.
-   * \param symbolRate the symbol rate during the allocation cycle.
-   */
-  void SymbolRateCallback (uint8_t sliceId, double symbolRate);
+  protected:
+    // inherited from SatStatsHelper base class
+    void DoInstall();
 
-  /**
-   * \return
-   */
-  Callback<void, uint8_t, double> GetTraceSinkCallback () const;
+    /// Maintains a list of collectors created by this helper.
+    CollectorMap m_collectors;
 
-protected:
-  // inherited from SatStatsHelper base class
-  void DoInstall ();
+    /// The aggregator created by this helper.
+    Ptr<DataCollectionObject> m_aggregator;
 
-  /// Maintains a list of collectors created by this helper.
-  CollectorMap m_collectors;
-
-  /// The aggregator created by this helper.
-  Ptr<DataCollectionObject> m_aggregator;
-
-private:
-  ///
-  Callback<void, uint8_t, double> m_traceSinkCallback;
+  private:
+    ///
+    Callback<void, uint8_t, double> m_traceSinkCallback;
 
 }; // end of class SatStatsFwdLinkSchedulerSymbolRateHelper
 
-
 } // end of namespace ns3
-
 
 #endif /* SATELLITE_STATS_FWD_LINK_SCHEDULER_SYMBOL_RATE_HELPER_H */

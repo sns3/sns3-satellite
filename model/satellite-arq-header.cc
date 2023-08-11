@@ -18,83 +18,83 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include <ns3/log.h>
-
 #include "satellite-arq-header.h"
 
+#include <ns3/log.h>
 
-NS_LOG_COMPONENT_DEFINE ("SatArqHeader");
+NS_LOG_COMPONENT_DEFINE("SatArqHeader");
 
-namespace ns3 {
+namespace ns3
+{
 
-NS_OBJECT_ENSURE_REGISTERED (SatArqHeader);
+NS_OBJECT_ENSURE_REGISTERED(SatArqHeader);
 
-SatArqHeader::SatArqHeader ()
-  : m_seqNo (0)
+SatArqHeader::SatArqHeader()
+    : m_seqNo(0)
 {
 }
 
-
-SatArqHeader::~SatArqHeader ()
+SatArqHeader::~SatArqHeader()
 {
-
 }
 
 TypeId
-SatArqHeader::GetTypeId (void)
+SatArqHeader::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatArqHeader")
-    .SetParent<Header> ()
-    .AddConstructor<SatArqHeader> ()
-  ;
-  return tid;
+    static TypeId tid =
+        TypeId("ns3::SatArqHeader").SetParent<Header>().AddConstructor<SatArqHeader>();
+    return tid;
 }
 
-uint32_t SatArqHeader::GetSerializedSize (void) const
+uint32_t
+SatArqHeader::GetSerializedSize(void) const
 {
-  NS_LOG_FUNCTION (this);
-  return 1;
+    NS_LOG_FUNCTION(this);
+    return 1;
 }
 
-void SatArqHeader::Serialize (Buffer::Iterator start) const
+void
+SatArqHeader::Serialize(Buffer::Iterator start) const
 {
-  NS_LOG_FUNCTION (this);
-  Buffer::Iterator i = start;
-  i.WriteU8 (m_seqNo);
+    NS_LOG_FUNCTION(this);
+    Buffer::Iterator i = start;
+    i.WriteU8(m_seqNo);
 }
 
-uint32_t SatArqHeader::Deserialize (Buffer::Iterator start)
+uint32_t
+SatArqHeader::Deserialize(Buffer::Iterator start)
 {
-  NS_LOG_FUNCTION (this);
-  Buffer::Iterator i = start;
+    NS_LOG_FUNCTION(this);
+    Buffer::Iterator i = start;
 
-  m_seqNo = i.ReadU8 ();
-  return GetSerializedSize ();
+    m_seqNo = i.ReadU8();
+    return GetSerializedSize();
 }
 
-void SatArqHeader::Print (std::ostream &os) const
+void
+SatArqHeader::Print(std::ostream& os) const
 {
-  os << m_seqNo;
+    os << m_seqNo;
 }
 
 TypeId
-SatArqHeader::GetInstanceTypeId (void) const
+SatArqHeader::GetInstanceTypeId(void) const
 {
-  return GetTypeId ();
+    return GetTypeId();
 }
 
-uint8_t SatArqHeader::GetSeqNo () const
+uint8_t
+SatArqHeader::GetSeqNo() const
 {
-  NS_LOG_FUNCTION (this);
-  return m_seqNo;
+    NS_LOG_FUNCTION(this);
+    return m_seqNo;
 }
 
-void SatArqHeader::SetSeqNo (uint8_t seqNo)
+void
+SatArqHeader::SetSeqNo(uint8_t seqNo)
 {
-  NS_LOG_FUNCTION (this << (uint32_t) seqNo);
-  m_seqNo = seqNo;
+    NS_LOG_FUNCTION(this << (uint32_t)seqNo);
+    m_seqNo = seqNo;
 }
 
-
-
-}  // namespace ns3
+} // namespace ns3

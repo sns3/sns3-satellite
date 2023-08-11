@@ -19,45 +19,50 @@
  */
 
 #include "satellite-input-fstream-wrapper.h"
-#include "ns3/log.h"
+
 #include "ns3/abort.h"
+#include "ns3/log.h"
+
 #include <fstream>
 
-NS_LOG_COMPONENT_DEFINE ("SatInputFileStreamWrapper");
+NS_LOG_COMPONENT_DEFINE("SatInputFileStreamWrapper");
 
-namespace ns3 {
-
-SatInputFileStreamWrapper::SatInputFileStreamWrapper (std::string filename, std::ios::openmode filemode)
-  : m_destroyable (true)
+namespace ns3
 {
-  NS_LOG_FUNCTION (this << filename << filemode);
 
-  std::ifstream* ifs = new std::ifstream (filename.c_str (), filemode);
+SatInputFileStreamWrapper::SatInputFileStreamWrapper(std::string filename,
+                                                     std::ios::openmode filemode)
+    : m_destroyable(true)
+{
+    NS_LOG_FUNCTION(this << filename << filemode);
 
-  NS_ABORT_MSG_UNLESS (ifs->is_open (), "SatInputFileStreamWrapper::SatInputFileStreamWrapper():  " <<
-                       "Unable to Open " << filename << " for mode " << filemode);
+    std::ifstream* ifs = new std::ifstream(filename.c_str(), filemode);
 
-  m_ifstream = ifs;
+    NS_ABORT_MSG_UNLESS(ifs->is_open(),
+                        "SatInputFileStreamWrapper::SatInputFileStreamWrapper():  "
+                            << "Unable to Open " << filename << " for mode " << filemode);
+
+    m_ifstream = ifs;
 }
 
-SatInputFileStreamWrapper::~SatInputFileStreamWrapper ()
+SatInputFileStreamWrapper::~SatInputFileStreamWrapper()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  if (m_destroyable)
+    if (m_destroyable)
     {
-      delete m_ifstream;
-      m_ifstream = 0;
+        delete m_ifstream;
+        m_ifstream = 0;
     }
-  m_destroyable = false;
+    m_destroyable = false;
 }
 
-std::ifstream *
-SatInputFileStreamWrapper::GetStream (void)
+std::ifstream*
+SatInputFileStreamWrapper::GetStream(void)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return m_ifstream;
+    return m_ifstream;
 }
 
 } // namespace ns3

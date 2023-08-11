@@ -21,53 +21,52 @@
  * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include <ns3/singleton.h>
-#include <ns3/satellite-id-mapper.h>
-
 #include "ns3/satellite-isl-arbiter.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatIslArbiter");
+#include <ns3/satellite-id-mapper.h>
+#include <ns3/singleton.h>
 
-namespace ns3 {
+NS_LOG_COMPONENT_DEFINE("SatIslArbiter");
 
-NS_OBJECT_ENSURE_REGISTERED (SatIslArbiter);
+namespace ns3
+{
+
+NS_OBJECT_ENSURE_REGISTERED(SatIslArbiter);
 
 TypeId
-SatIslArbiter::GetTypeId (void)
+SatIslArbiter::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatIslArbiter")
-          .SetParent<Object> ()
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::SatIslArbiter").SetParent<Object>();
+    return tid;
 }
 
 SatIslArbiter::SatIslArbiter()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  NS_FATAL_ERROR ("Default constructor not in use");
+    NS_FATAL_ERROR("Default constructor not in use");
 }
 
 SatIslArbiter::SatIslArbiter(Ptr<Node> node)
 {
-  NS_LOG_FUNCTION (this << node);
+    NS_LOG_FUNCTION(this << node);
 
-  m_nodeId = node->GetId ();
+    m_nodeId = node->GetId();
 }
 
 int32_t
 SatIslArbiter::BaseDecide(Ptr<Packet> pkt, Mac48Address destination)
 {
-  NS_LOG_FUNCTION (this << pkt << destination);
+    NS_LOG_FUNCTION(this << pkt << destination);
 
-  int32_t targetId = Singleton<SatIdMapper>::Get ()->GetSatIdWithMacIsl (destination);
+    int32_t targetId = Singleton<SatIdMapper>::Get()->GetSatIdWithMacIsl(destination);
 
-  if (targetId == -1)
+    if (targetId == -1)
     {
-      NS_FATAL_ERROR ("Cannot resolve target node ID");
+        NS_FATAL_ERROR("Cannot resolve target node ID");
     }
 
-  return Decide (m_nodeId, targetId, pkt);
+    return Decide(m_nodeId, targetId, pkt);
 }
 
 } // namespace ns3

@@ -24,65 +24,64 @@
 #ifndef SATELLITE_ISL_ARBITER_H
 #define SATELLITE_ISL_ARBITER_H
 
-#include <string>
-
+#include <ns3/mac48-address.h>
 #include <ns3/node.h>
 #include <ns3/packet.h>
-#include <ns3/mac48-address.h>
-
 #include <ns3/satellite-geo-net-device.h>
 
-namespace ns3 {
+#include <string>
+
+namespace ns3
+{
 
 class SatIslArbiter : public Object
 {
+  public:
+    static TypeId GetTypeId(void);
 
-public:
-  static TypeId GetTypeId (void);
+    /**
+     * Default constructor.
+     */
+    SatIslArbiter();
 
-  /**
-   * Default constructor.
-   */
-  SatIslArbiter ();
+    /**
+     * Constructor.
+     * \param node The satellite node this arbiter is attached
+     */
+    SatIslArbiter(Ptr<Node> node);
 
-  /**
-   * Constructor.
-   * \param node The satellite node this arbiter is attached
-   */
-  SatIslArbiter (Ptr<Node> node);
+    /**
+     * Base decide how to forward
+     *
+     * \param pkt                               Packet
+     * \param destination                       IP header of the packet
+     *
+     * \return ISL interface index, or -1 if routing failed
+     */
+    int32_t BaseDecide(Ptr<Packet> pkt, Mac48Address destination);
 
-  /**
-   * Base decide how to forward
-   *
-   * \param pkt                               Packet
-   * \param destination                       IP header of the packet
-   *
-   * \return ISL interface index, or -1 if routing failed
-   */
-  int32_t BaseDecide (Ptr<Packet> pkt, Mac48Address destination);
+    /**
+     * Decide how to forward. Implemented in subclasses
+     *
+     * \param sourceSatId                       Satellite ID where the packet originated from
+     * \param targetSatId                       Satellite ID where the packet has to go to
+     * \param pkt                               Packet
+     *
+     * \return ISL interface index, or -1 if routing failed
+     */
+    virtual int32_t Decide(int32_t sourceSatId, int32_t targetSatId, Ptr<Packet> pkt) = 0;
 
-  /**
-   * Decide how to forward. Implemented in subclasses
-   *
-   * \param sourceSatId                       Satellite ID where the packet originated from
-   * \param targetSatId                       Satellite ID where the packet has to go to
-   * \param pkt                               Packet
-   *
-   * \return ISL interface index, or -1 if routing failed
-   */
-  virtual int32_t Decide (int32_t sourceSatId, int32_t targetSatId, Ptr<Packet> pkt) = 0;
+    /**
+     * Convert the forwarding state (i.e., routing table) to a string representation.
+     *
+     * @return String representation
+     */
+    virtual std::string StringReprOfForwardingState() = 0;
 
-  /**
-   * Convert the forwarding state (i.e., routing table) to a string representation.
-   *
-   * @return String representation
-   */
-  virtual std::string StringReprOfForwardingState () = 0;
-
-protected:
-  uint32_t m_nodeId;                          // ID of node where this arbiter is installed.
+  protected:
+    uint32_t m_nodeId; // ID of node where this arbiter is installed.
 };
 
-}
+} // namespace ns3
 
-#endif //SATELLITE_ISL_ARBITER_H
+#endif // SATELLITE_ISL_ARBITER_H

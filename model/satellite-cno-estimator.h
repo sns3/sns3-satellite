@@ -21,16 +21,15 @@
 #ifndef SAT_CNO_ESTIMATOR
 #define SAT_CNO_ESTIMATOR
 
-#include <map>
+#include "satellite-cno-estimator.h"
 
 #include <ns3/nstime.h>
 #include <ns3/simple-ref-count.h>
 
-#include "satellite-cno-estimator.h"
+#include <map>
 
-
-namespace ns3 {
-
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -39,63 +38,63 @@ namespace ns3 {
  */
 class SatCnoEstimator : public SimpleRefCount<SatCnoEstimator>
 {
-public:
-  /**
-   * Definition of modes for estimator
-   */
-  typedef enum
-  {
-    LAST,   //!< Last value in the given window returned
-    MINIMUM, //!< Minimum value in the given window returned
-    AVERAGE //!< Average value in the given window returned
-  } EstimationMode_t;
+  public:
+    /**
+     * Definition of modes for estimator
+     */
+    typedef enum
+    {
+        LAST,    //!< Last value in the given window returned
+        MINIMUM, //!< Minimum value in the given window returned
+        AVERAGE  //!< Average value in the given window returned
+    } EstimationMode_t;
 
-  /**
-   * Default construct a SatCnoEstimator.
-   */
-  SatCnoEstimator ();
+    /**
+     * Default construct a SatCnoEstimator.
+     */
+    SatCnoEstimator();
 
-  /**
-   * Destroy a SatCnoEstimator
-   *
-   * This is the destructor for the SatCnoEstimator.
-   */
-  virtual ~SatCnoEstimator ();
+    /**
+     * Destroy a SatCnoEstimator
+     *
+     * This is the destructor for the SatCnoEstimator.
+     */
+    virtual ~SatCnoEstimator();
 
-  /**
-   * Add a C/N0 sample to estimator.
-   * Calls the method DoAddSample.
-   *
-   * \param cno C/N0 sample value
-   */
-  void AddSample (double cno);
+    /**
+     * Add a C/N0 sample to estimator.
+     * Calls the method DoAddSample.
+     *
+     * \param cno C/N0 sample value
+     */
+    void AddSample(double cno);
 
-  /**
-   * Estimate C/N0 value of the samples.
-   * Calls the method DoAddSample.
-   *
-   * \return Estimated value of the C/N0,
-   * in case that estimation cannot be done (e.g. no samples) NAN is returned.
-   */
-  double GetCnoEstimation ();
+    /**
+     * Estimate C/N0 value of the samples.
+     * Calls the method DoAddSample.
+     *
+     * \return Estimated value of the C/N0,
+     * in case that estimation cannot be done (e.g. no samples) NAN is returned.
+     */
+    double GetCnoEstimation();
 
-private:
-  /**
-   * Add a C/N0 sample to estimator.
-   * Method must be implemented by inheriting classes.
-   *
-   * \param cno C/N0 sample value
-   */
-  virtual void DoAddSample (double cno) = 0;
+  private:
+    /**
+     * Add a C/N0 sample to estimator.
+     * Method must be implemented by inheriting classes.
+     *
+     * \param cno C/N0 sample value
+     */
+    virtual void DoAddSample(double cno) = 0;
 
-  /**
-   * Estimate C/N0 value of the samples.
-   * Method must be implemented by inheriting classes.
-   *
-   * \return Estimated value of the C/N0,
-   * in case that estimation cannot be done (e.g. no samples) NAN is returned.
-   */
-  virtual double DoGetCnoEstimation () = 0;
+    /**
+     * Estimate C/N0 value of the samples.
+     * Method must be implemented by inheriting classes.
+     *
+     * \return Estimated value of the C/N0,
+     * in case that estimation cannot be done (e.g. no samples) NAN is returned.
+     */
+    virtual double DoGetCnoEstimation() = 0;
 };
 
 /**
@@ -113,69 +112,69 @@ private:
  */
 class SatBasicCnoEstimator : public SatCnoEstimator
 {
-public:
-  /**
-   * Method to add a sample value to current sum.
-   *
-   * \param currentSum
-   * \param sample
-   * \return New sum after addition.
-   */
-  static inline double AddToSum (double currentSum, const std::pair<Time, double>& sample)
-  {
-    double newSum = currentSum;
+  public:
+    /**
+     * Method to add a sample value to current sum.
+     *
+     * \param currentSum
+     * \param sample
+     * \return New sum after addition.
+     */
+    static inline double AddToSum(double currentSum, const std::pair<Time, double>& sample)
+    {
+        double newSum = currentSum;
 
-    if ( !std::isnan (sample.second) )
-      {
-        newSum += sample.second;
-      }
+        if (!std::isnan(sample.second))
+        {
+            newSum += sample.second;
+        }
 
-    return newSum;
-  }
+        return newSum;
+    }
 
-  /**
-   * Default construct a SatCnoEstimator.
-   */
-  SatBasicCnoEstimator ();
+    /**
+     * Default construct a SatCnoEstimator.
+     */
+    SatBasicCnoEstimator();
 
-  /**
-   * Construct a SatCnoEstimator with given estimation mode type.
-   */
-  SatBasicCnoEstimator (SatCnoEstimator::EstimationMode_t mode, Time window);
+    /**
+     * Construct a SatCnoEstimator with given estimation mode type.
+     */
+    SatBasicCnoEstimator(SatCnoEstimator::EstimationMode_t mode, Time window);
 
-  /**
-   * Destroy a SatCnoEstimator
-   *
-   * This is the destructor for the SatCnoEstimator.
-   */
-  ~SatBasicCnoEstimator ();
+    /**
+     * Destroy a SatCnoEstimator
+     *
+     * This is the destructor for the SatCnoEstimator.
+     */
+    ~SatBasicCnoEstimator();
 
-private:
-  typedef std::map<Time, double> SampleMap_t;
+  private:
+    typedef std::map<Time, double> SampleMap_t;
 
-  SampleMap_t       m_samples;
-  Time              m_window;
-  EstimationMode_t  m_mode;
+    SampleMap_t m_samples;
+    Time m_window;
+    EstimationMode_t m_mode;
 
-  /**
-   * Add a C/N0 sample to estimator.
-   *
-   * \param cno C/N0 sample value
-   */
-  virtual void DoAddSample (double cno);
+    /**
+     * Add a C/N0 sample to estimator.
+     *
+     * \param cno C/N0 sample value
+     */
+    virtual void DoAddSample(double cno);
 
-  /**
-   * Estimate C/N0 value of the samples in window.
-   *
-   * \return Estimated value of the C/N0,
-   * in case that estimation cannot be done (e.g. no samples) NAN is returned.
-   */
-  virtual double DoGetCnoEstimation ();
+    /**
+     * Estimate C/N0 value of the samples in window.
+     *
+     * \return Estimated value of the C/N0,
+     * in case that estimation cannot be done (e.g. no samples) NAN is returned.
+     */
+    virtual double DoGetCnoEstimation();
 
-  /**
-   * Clear outdated samples from storage.
-   */
-  void ClearOutdatedSamples ();
+    /**
+     * Clear outdated samples from storage.
+     */
+    void ClearOutdatedSamples();
 };
 
 } // namespace ns3

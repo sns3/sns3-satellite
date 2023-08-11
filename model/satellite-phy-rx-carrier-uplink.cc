@@ -20,127 +20,132 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
-#include <ns3/log.h>
-#include <ns3/simulator.h>
+#include "satellite-phy-rx-carrier-uplink.h"
 
 #include "satellite-uplink-info-tag.h"
 
-#include "satellite-phy-rx-carrier-uplink.h"
+#include <ns3/log.h>
+#include <ns3/simulator.h>
 
+NS_LOG_COMPONENT_DEFINE("SatPhyRxCarrierUplink");
 
-NS_LOG_COMPONENT_DEFINE ("SatPhyRxCarrierUplink");
-
-namespace ns3 {
-
-NS_OBJECT_ENSURE_REGISTERED (SatPhyRxCarrierUplink);
-
-SatPhyRxCarrierUplink::SatPhyRxCarrierUplink (uint32_t carrierId,
-                                              Ptr<SatPhyRxCarrierConf> carrierConf,
-                                              Ptr<SatWaveformConf> waveformConf,
-                                              bool randomAccessEnabled)
-  : SatPhyRxCarrier (carrierId, carrierConf, waveformConf, randomAccessEnabled)
+namespace ns3
 {
-  NS_LOG_FUNCTION (this);
+
+NS_OBJECT_ENSURE_REGISTERED(SatPhyRxCarrierUplink);
+
+SatPhyRxCarrierUplink::SatPhyRxCarrierUplink(uint32_t carrierId,
+                                             Ptr<SatPhyRxCarrierConf> carrierConf,
+                                             Ptr<SatWaveformConf> waveformConf,
+                                             bool randomAccessEnabled)
+    : SatPhyRxCarrier(carrierId, carrierConf, waveformConf, randomAccessEnabled)
+{
+    NS_LOG_FUNCTION(this);
 }
 
-SatPhyRxCarrierUplink::~SatPhyRxCarrierUplink ()
+SatPhyRxCarrierUplink::~SatPhyRxCarrierUplink()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
-
 
 TypeId
-SatPhyRxCarrierUplink::GetTypeId (void)
+SatPhyRxCarrierUplink::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatPhyRxCarrierUplink")
-    .SetParent<SatPhyRxCarrier> ()
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::SatPhyRxCarrierUplink").SetParent<SatPhyRxCarrier>();
+    return tid;
 }
 
 Ptr<SatInterference::InterferenceChangeEvent>
-SatPhyRxCarrierUplink::CreateInterference (Ptr<SatSignalParameters> rxParams, Address senderAddress)
+SatPhyRxCarrierUplink::CreateInterference(Ptr<SatSignalParameters> rxParams, Address senderAddress)
 {
-  NS_LOG_FUNCTION (this << rxParams << senderAddress);
-  return GetInterferenceModel ()->Add (rxParams->m_duration, rxParams->m_rxPower_W, senderAddress);
+    NS_LOG_FUNCTION(this << rxParams << senderAddress);
+    return GetInterferenceModel()->Add(rxParams->m_duration, rxParams->m_rxPower_W, senderAddress);
 }
 
 bool
-SatPhyRxCarrierUplink::StartRx (Ptr<SatSignalParameters> rxParams)
+SatPhyRxCarrierUplink::StartRx(Ptr<SatSignalParameters> rxParams)
 {
-  NS_LOG_FUNCTION (this << rxParams);
+    NS_LOG_FUNCTION(this << rxParams);
 
-  if (this->SatPhyRxCarrier::StartRx (rxParams))
+    if (this->SatPhyRxCarrier::StartRx(rxParams))
     {
-      /// PHY transmission decoded successfully. Note, that at transparent satellite,
-      /// all the transmissions are not decoded.
-      bool phyError (false);
+        /// PHY transmission decoded successfully. Note, that at transparent satellite,
+        /// all the transmissions are not decoded.
+        bool phyError(false);
 
-      // Forward packet to ground entity without delay in the satellite
-      m_rxCallback (rxParams, phyError);
+        // Forward packet to ground entity without delay in the satellite
+        m_rxCallback(rxParams, phyError);
 
-      return true;
+        return true;
     }
 
-  return false;
+    return false;
 }
 
 void
-SatPhyRxCarrierUplink::EndRxData (uint32_t key)
+SatPhyRxCarrierUplink::EndRxData(uint32_t key)
 {
-  NS_LOG_FUNCTION (this << key);
-  NS_LOG_INFO ("State: " << GetState ());
+    NS_LOG_FUNCTION(this << key);
+    NS_LOG_INFO("State: " << GetState());
 
-  NS_ASSERT (GetState () == RX);
+    NS_ASSERT(GetState() == RX);
 
-  auto packetRxParams = GetStoredRxParams (key);
+    auto packetRxParams = GetStoredRxParams(key);
 
-  DecreaseNumOfRxState (packetRxParams.rxParams->m_txInfo.packetType);
+    DecreaseNumOfRxState(packetRxParams.rxParams->m_txInfo.packetType);
 
-  packetRxParams.rxParams->SetInterferencePower (GetInterferenceModel ()->Calculate (packetRxParams.interferenceEvent));
+    packetRxParams.rxParams->SetInterferencePower(
+        GetInterferenceModel()->Calculate(packetRxParams.interferenceEvent));
 
-  /// save values for CRDSA receiver
-  packetRxParams.rxParams->SetInterferencePowerInSatellite (packetRxParams.rxParams->GetInterferencePowerPerFragment ());
-  packetRxParams.rxParams->SetRxPowersInSatellite (packetRxParams.rxParams->m_rxPower_W, m_rxNoisePowerW, m_rxAciIfPowerW, m_rxExtNoisePowerW);
+    /// save values for CRDSA receiver
+    packetRxParams.rxParams->SetInterferencePowerInSatellite(
+        packetRxParams.rxParams->GetInterferencePowerPerFragment());
+    packetRxParams.rxParams->SetRxPowersInSatellite(packetRxParams.rxParams->m_rxPower_W,
+                                                    m_rxNoisePowerW,
+                                                    m_rxAciIfPowerW,
+                                                    m_rxExtNoisePowerW);
 
-  /// calculates sinr for 1st link
-  double sinr = CalculateSinr ( packetRxParams.rxParams->m_rxPower_W,
-                                packetRxParams.rxParams->GetInterferencePower (),
+    /// calculates sinr for 1st link
+    double sinr = CalculateSinr(packetRxParams.rxParams->m_rxPower_W,
+                                packetRxParams.rxParams->GetInterferencePower(),
                                 m_rxNoisePowerW,
                                 m_rxAciIfPowerW,
                                 m_rxExtNoisePowerW,
-                                m_additionalInterferenceCallback ());
+                                m_additionalInterferenceCallback());
 
-  // Update link specific SINR trace
-  if (GetChannelType () == SatEnums::FORWARD_FEEDER_CH)
+    // Update link specific SINR trace
+    if (GetChannelType() == SatEnums::FORWARD_FEEDER_CH)
     {
-      m_linkSinrTrace (SatUtils::LinearToDb (sinr), packetRxParams.destAddress);
+        m_linkSinrTrace(SatUtils::LinearToDb(sinr), packetRxParams.destAddress);
     }
-  else if (GetChannelType () == SatEnums::RETURN_USER_CH)
+    else if (GetChannelType() == SatEnums::RETURN_USER_CH)
     {
-      m_linkSinrTrace (SatUtils::LinearToDb (sinr), packetRxParams.sourceAddress);
+        m_linkSinrTrace(SatUtils::LinearToDb(sinr), packetRxParams.sourceAddress);
     }
-  else
+    else
     {
-      NS_FATAL_ERROR ("Incorrect channel for satPhyRxCarrierUplink: " << SatEnums::GetChannelTypeName (GetChannelType ()));
+        NS_FATAL_ERROR("Incorrect channel for satPhyRxCarrierUplink: "
+                       << SatEnums::GetChannelTypeName(GetChannelType()));
     }
 
-  NS_ASSERT (!packetRxParams.rxParams->HasSinrComputed ());
+    NS_ASSERT(!packetRxParams.rxParams->HasSinrComputed());
 
-  /// save 1st link sinr value for 2nd link composite sinr calculations
-  packetRxParams.rxParams->SetSinr (sinr, m_additionalInterferenceCallback ());
+    /// save 1st link sinr value for 2nd link composite sinr calculations
+    packetRxParams.rxParams->SetSinr(sinr, m_additionalInterferenceCallback());
 
-  /// uses 1st link sinr
-  m_linkBudgetTrace (packetRxParams.rxParams, GetOwnAddress (),
-                     packetRxParams.destAddress,
-                     packetRxParams.rxParams->GetInterferencePower (), sinr);
+    /// uses 1st link sinr
+    m_linkBudgetTrace(packetRxParams.rxParams,
+                      GetOwnAddress(),
+                      packetRxParams.destAddress,
+                      packetRxParams.rxParams->GetInterferencePower(),
+                      sinr);
 
-  GetInterferenceModel ()->NotifyRxEnd (packetRxParams.interferenceEvent);
+    GetInterferenceModel()->NotifyRxEnd(packetRxParams.interferenceEvent);
 
-  /// erase the used Rx params
-  packetRxParams.rxParams = NULL;
-  packetRxParams.interferenceEvent = NULL;
-  RemoveStoredRxParams (key);
+    /// erase the used Rx params
+    packetRxParams.rxParams = NULL;
+    packetRxParams.interferenceEvent = NULL;
+    RemoveStoredRxParams(key);
 }
 
-}
+} // namespace ns3

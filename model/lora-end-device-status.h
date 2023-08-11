@@ -23,20 +23,20 @@
 #ifndef LORA_END_DEVICE_STATUS_H
 #define LORA_END_DEVICE_STATUS_H
 
-#include <iostream>
+#include "lora-device-address.h"
+#include "lora-frame-header.h"
+#include "lorawan-mac-end-device-class-a.h"
+#include "lorawan-mac-header.h"
 
+#include <ns3/ipv4-header.h>
+#include <ns3/net-device.h>
 #include <ns3/object.h>
 #include <ns3/pointer.h>
-#include <ns3/net-device.h>
-#include <ns3/ipv4-header.h>
 
-#include "lora-device-address.h"
-#include "lorawan-mac-header.h"
-#include "lorawan-mac-end-device-class-a.h"
-#include "lora-frame-header.h"
+#include <iostream>
 
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * This class represents the Network Server's knowledge about an End Device in
@@ -84,280 +84,276 @@ namespace ns3 {
 
 class LoraEndDeviceStatus : public Object
 {
+  public:
+    /********************/
+    /* Reply management */
+    /********************/
 
-public:
-  /********************/
-  /* Reply management */
-  /********************/
+    /**
+     * Structure representing the reply that the network server will send this
+     * device at the first opportunity.
+     */
+    struct Reply
+    {
+        // The Mac Header to attach to the reply packet.
+        LorawanMacHeader macHeader;
 
-  /**
-   * Structure representing the reply that the network server will send this
-   * device at the first opportunity.
-   */
-  struct Reply
-  {
-    // The Mac Header to attach to the reply packet.
-    LorawanMacHeader macHeader;
+        // The Frame Header to attach to the reply packet.
+        LoraFrameHeader frameHeader;
 
-    // The Frame Header to attach to the reply packet.
-    LoraFrameHeader frameHeader;
+        // The data packet that will be sent as a reply.
+        Ptr<Packet> payload;
 
-    // The data packet that will be sent as a reply.
-    Ptr<Packet> payload;
+        // Whether or not this device needs a reply
+        bool needsReply = false;
+    };
 
-    // Whether or not this device needs a reply
-    bool needsReply = false;
-  };
+    /**
+     * Whether the end device needs a reply.
+     *
+     * This is determined by looking at headers and payload of the Reply
+     * structure: if they are empty, no reply should be needed.
+     *
+     * \return A boolean value signaling if the end device needs a reply.
+     */
+    bool NeedsReply(void);
 
-  /**
-   * Whether the end device needs a reply.
-   *
-   * This is determined by looking at headers and payload of the Reply
-   * structure: if they are empty, no reply should be needed.
-   *
-   * \return A boolean value signaling if the end device needs a reply.
-   */
-  bool NeedsReply (void);
+    /**
+     * Get the reply packet.
+     *
+     * \return A pointer to the packet reply (data + headers).
+     */
+    Ptr<Packet> GetCompleteReplyPacket(void);
 
-  /**
-   * Get the reply packet.
-   *
-   * \return A pointer to the packet reply (data + headers).
-   */
-  Ptr<Packet> GetCompleteReplyPacket (void);
+    /**
+     * Get the reply packet mac header.
+     *
+     * \return The packet reply mac header.
+     */
+    LorawanMacHeader GetReplyMacHeader(void);
 
-  /**
-   * Get the reply packet mac header.
-   *
-   * \return The packet reply mac header.
-   */
-  LorawanMacHeader GetReplyMacHeader (void);
+    /**
+     * Get the reply packet frame header.
+     *
+     * \return The packet reply frame header.
+     */
+    LoraFrameHeader GetReplyFrameHeader(void);
 
-  /**
-   * Get the reply packet frame header.
-   *
-   * \return The packet reply frame header.
-   */
-  LoraFrameHeader GetReplyFrameHeader (void);
+    /**
+     * Get the data of the reply packet.
+     *
+     * \return A pointer to the packet reply.
+     */
+    Ptr<Packet> GetReplyPayload(void);
 
-  /**
-   * Get the data of the reply packet.
-   *
-   * \return A pointer to the packet reply.
-   */
-  Ptr<Packet> GetReplyPayload (void);
+    /***********************************/
+    /* Received packet list management */
+    /***********************************/
 
-  /***********************************/
-  /* Received packet list management */
-  /***********************************/
+    /**
+     * Structure saving information regarding the packet reception in
+     * each gateway.
+     */
+    struct PacketInfoPerGw
+    {
+        Address gwAddress; //!< Address of the gateway that received the packet.
+        Time receivedTime; //!< Time at which the packet was received by this gateway.
+        double rxPower;    //!< Reception power of the packet at this gateway.
+    };
 
-  /**
-   * Structure saving information regarding the packet reception in
-   * each gateway.
-   */
-  struct PacketInfoPerGw
-  {
-    Address gwAddress;     //!< Address of the gateway that received the packet.
-    Time receivedTime;     //!< Time at which the packet was received by this gateway.
-    double rxPower;        //!< Reception power of the packet at this gateway.
-  };
+    // List of gateways, with relative information
+    typedef std::map<Address, PacketInfoPerGw> GatewayList;
 
-  // List of gateways, with relative information
-  typedef std::map<Address, PacketInfoPerGw> GatewayList;
+    /**
+     * Structure saving information regarding all packet receptions.
+     */
+    struct ReceivedPacketInfo
+    {
+        // Members
+        Ptr<const Packet> packet = 0; //!< The received packet
+        GatewayList gwList;           //!< List of gateways that received this packet.
+        uint8_t sf;
+        double frequency;
+    };
 
-  /**
-   * Structure saving information regarding all packet receptions.
-   */
-  struct ReceivedPacketInfo
-  {
-    // Members
-    Ptr<Packet const> packet = 0;   //!< The received packet
-    GatewayList gwList;      //!< List of gateways that received this packet.
-    uint8_t sf;
-    double frequency;
-  };
+    typedef std::list<std::pair<Ptr<const Packet>, ReceivedPacketInfo>> ReceivedPacketList;
 
-  typedef std::list<std::pair<Ptr<Packet const>, ReceivedPacketInfo> >
-    ReceivedPacketList;
+    /*******************************************/
+    /* Proper LoraEndDeviceStatus class definition */
+    /*******************************************/
 
+    static TypeId GetTypeId(void);
 
-  /*******************************************/
-  /* Proper LoraEndDeviceStatus class definition */
-  /*******************************************/
+    LoraEndDeviceStatus();
+    LoraEndDeviceStatus(LoraDeviceAddress endDeviceAddress,
+                        Ptr<LorawanMacEndDeviceClassA> endDeviceMac);
+    virtual ~LoraEndDeviceStatus();
 
-  static TypeId GetTypeId (void);
+    /**
+     * Get the modcod this device is using.
+     *
+     * \return An unsigned 8-bit integer containing the modcod index.
+     */
+    uint8_t GetModcod(void);
 
-  LoraEndDeviceStatus ();
-  LoraEndDeviceStatus (LoraDeviceAddress endDeviceAddress,
-                   Ptr<LorawanMacEndDeviceClassA> endDeviceMac);
-  virtual ~LoraEndDeviceStatus ();
+    /**
+     * Get the beam ID this device is using.
+     *
+     * \return An unsigned 8-bit integer containing the beam ID index.
+     */
+    uint8_t GetBeamId(void);
 
-  /**
-   * Get the modcod this device is using.
-   *
-   * \return An unsigned 8-bit integer containing the modcod index.
-   */
-  uint8_t GetModcod (void);
+    /**
+     * Get the spreading factor this device is using in the first receive window.
+     *
+     * \return An unsigned 8-bit integer containing the spreading factor.
+     */
+    uint8_t GetFirstReceiveWindowSpreadingFactor(void);
 
-  /**
-   * Get the beam ID this device is using.
-   *
-   * \return An unsigned 8-bit integer containing the beam ID index.
-   */
-  uint8_t GetBeamId (void);
+    /**
+     * Get the first window frequency of this device.
+     */
+    double GetFirstReceiveWindowFrequency(void);
 
-  /**
-   * Get the spreading factor this device is using in the first receive window.
-   *
-   * \return An unsigned 8-bit integer containing the spreading factor.
-   */
-  uint8_t GetFirstReceiveWindowSpreadingFactor (void);
+    /**
+     * Get the offset of spreading factor this device is using in the second
+     * receive window with respect to the first receive window.
+     *
+     * \return An unsigned 8-bit integer containing the spreading factor.
+     */
+    uint8_t GetSecondReceiveWindowOffset(void);
 
-  /**
-   * Get the first window frequency of this device.
-   */
-  double GetFirstReceiveWindowFrequency (void);
+    /**
+     * Return the second window frequency of this device.
+     *
+     */
+    double GetSecondReceiveWindowFrequency(void);
 
-  /**
-   * Get the offset of spreading factor this device is using in the second
-   * receive window with respect to the first receive window.
-   *
-   * \return An unsigned 8-bit integer containing the spreading factor.
-   */
-  uint8_t GetSecondReceiveWindowOffset (void);
+    /**
+     * Get the received packet list.
+     *
+     * \return The received packet list.
+     */
+    ReceivedPacketList GetReceivedPacketList(void);
 
-  /**
-   * Return the second window frequency of this device.
-   *
-   */
-  double GetSecondReceiveWindowFrequency (void);
+    /**
+     * Set the modcod this device is using.
+     */
+    void SetModcod(uint8_t modcod);
 
-  /**
-   * Get the received packet list.
-   *
-   * \return The received packet list.
-   */
-  ReceivedPacketList GetReceivedPacketList (void);
+    /**
+     * Set the beam ID this device is using.
+     */
+    void SetBeamId(uint8_t beamId);
 
-  /**
-   * Set the modcod this device is using.
-   */
-  void SetModcod (uint8_t modcod);
+    /**
+     * Set the spreading factor this device is using in the first receive window.
+     */
+    void SetFirstReceiveWindowSpreadingFactor(uint8_t sf);
 
-  /**
-   * Set the beam ID this device is using.
-   */
-  void SetBeamId (uint8_t beamId);
+    /**
+     * Set the first window frequency of this device.
+     */
+    void SetFirstReceiveWindowFrequency(double frequency);
 
-  /**
-   * Set the spreading factor this device is using in the first receive window.
-   */
-  void SetFirstReceiveWindowSpreadingFactor (uint8_t sf);
+    /**
+     * Set the spreading factor this device is using in the first receive window.
+     */
+    void SetSecondReceiveWindowOffset(uint8_t offset);
 
-  /**
-   * Set the first window frequency of this device.
-   */
-  void SetFirstReceiveWindowFrequency (double frequency);
+    /**
+     * Set the second window frequency of this device.
+     */
+    void SetSecondReceiveWindowFrequency(double frequency);
 
-  /**
-   * Set the spreading factor this device is using in the first receive window.
-   */
-  void SetSecondReceiveWindowOffset (uint8_t offset);
+    /**
+     * Set the reply packet mac header.
+     */
+    void SetReplyMacHeader(LorawanMacHeader macHeader);
 
-  /**
-   * Set the second window frequency of this device.
-   */
-  void SetSecondReceiveWindowFrequency  (double frequency);
+    /**
+     * Set the reply packet frame header.
+     */
+    void SetReplyFrameHeader(LoraFrameHeader frameHeader);
 
-  /**
-   * Set the reply packet mac header.
-   */
-  void SetReplyMacHeader (LorawanMacHeader macHeader);
+    /**
+     * Set the packet reply payload.
+     */
+    void SetReplyPayload(Ptr<Packet> replyPayload);
 
-  /**
-   * Set the reply packet frame header.
-   */
-  void SetReplyFrameHeader (LoraFrameHeader frameHeader);
+    Ptr<LorawanMacEndDeviceClassA> GetMac(void);
 
-  /**
-   * Set the packet reply payload.
-   */
-  void SetReplyPayload (Ptr<Packet> replyPayload);
+    //////////////////////
+    //  Other methods  //
+    //////////////////////
 
-  Ptr<LorawanMacEndDeviceClassA> GetMac (void);
+    /**
+     * Insert a received packet in the packet list.
+     */
+    void InsertReceivedPacket(Ptr<const Packet> receivedPacket, const Address& gwAddress);
 
-  //////////////////////
-  //  Other methods  //
-  //////////////////////
+    /**
+     * Return the last packet that was received from this device.
+     */
+    Ptr<const Packet> GetLastPacketReceivedFromDevice(void);
 
-  /**
-   * Insert a received packet in the packet list.
-   */
-  void InsertReceivedPacket (Ptr<Packet const> receivedPacket,
-                             const Address& gwAddress);
+    /**
+     * Return the information about the last packet that was received from the
+     * device.
+     */
+    LoraEndDeviceStatus::ReceivedPacketInfo GetLastReceivedPacketInfo(void);
 
-  /**
-   * Return the last packet that was received from this device.
-   */
-  Ptr<Packet const> GetLastPacketReceivedFromDevice (void);
+    /**
+     * Initialize reply.
+     */
+    void InitializeReply(void);
 
-  /**
-   * Return the information about the last packet that was received from the
-   * device.
-   */
-  LoraEndDeviceStatus::ReceivedPacketInfo GetLastReceivedPacketInfo (void);
+    /**
+     * Add MAC command to the list.
+     */
+    void AddMACCommand(Ptr<LorawanMacCommand> macCommand);
 
-  /**
-   * Initialize reply.
-   */
-  void InitializeReply (void);
+    /**
+     * Update Gateway data when more then one gateway receive the same packet.
+     */
+    void UpdateGatewayData(GatewayList gwList, Address gwAddress, double rcvPower);
 
-  /**
-   * Add MAC command to the list.
-   */
-  void AddMACCommand (Ptr<LorawanMacCommand> macCommand);
+    /**
+     * Returns whether we already decided we will schedule a transmission to this ED
+     */
+    bool HasReceiveWindowOpportunityScheduled();
 
-  /**
-   * Update Gateway data when more then one gateway receive the same packet.
-   */
-  void UpdateGatewayData (GatewayList gwList, Address gwAddress, double rcvPower);
+    void SetReceiveWindowOpportunity(EventId event);
 
-  /**
-   * Returns whether we already decided we will schedule a transmission to this ED
-   */
-  bool HasReceiveWindowOpportunityScheduled ();
+    void RemoveReceiveWindowOpportunity(void);
 
-  void SetReceiveWindowOpportunity (EventId event);
+    /**
+     * Return an ordered list of the best gateways.
+     */
+    std::map<double, Address> GetPowerGatewayMap(void);
 
-  void RemoveReceiveWindowOpportunity (void);
+    struct Reply m_reply; //<! Next reply intended for this device
 
-  /**
-   * Return an ordered list of the best gateways.
-   */
-  std::map<double, Address> GetPowerGatewayMap (void);
+    LoraDeviceAddress m_endDeviceAddress; //<! The address of this device
 
-  struct Reply m_reply; //<! Next reply intended for this device
+    friend std::ostream& operator<<(std::ostream& os, const LoraEndDeviceStatus& status);
 
-  LoraDeviceAddress m_endDeviceAddress;   //<! The address of this device
+  private:
+    // Receive window data
+    uint8_t m_modcod;
+    uint8_t m_beamId;
+    uint8_t m_firstReceiveWindowSpreadingFactor = 0;
+    double m_firstReceiveWindowFrequency = 0;
+    uint8_t m_secondReceiveWindowOffset = 0;
+    double m_secondReceiveWindowFrequency = 869.525;
+    EventId m_receiveWindowEvent;
 
-  friend std::ostream& operator<< (std::ostream& os, const LoraEndDeviceStatus& status);
+    ReceivedPacketList m_receivedPacketList; //<! List of received packets
 
-private:
-  // Receive window data
-  uint8_t m_modcod;
-  uint8_t m_beamId;
-  uint8_t m_firstReceiveWindowSpreadingFactor = 0;
-  double m_firstReceiveWindowFrequency = 0;
-  uint8_t m_secondReceiveWindowOffset = 0;
-  double m_secondReceiveWindowFrequency = 869.525;
-  EventId m_receiveWindowEvent;
-
-  ReceivedPacketList m_receivedPacketList;   //<! List of received packets
-
-  // NOTE Using this attribute is 'cheating', since we are assuming perfect
-  // synchronization between the info at the device and at the network server
-  Ptr<LorawanMacEndDeviceClassA> m_mac;   //!< Pointer to the MAC layer of this device
+    // NOTE Using this attribute is 'cheating', since we are assuming perfect
+    // synchronization between the info at the device and at the network server
+    Ptr<LorawanMacEndDeviceClassA> m_mac; //!< Pointer to the MAC layer of this device
 };
-}
+} // namespace ns3
 
 #endif /* LORA_END_DEVICE_STATUS_H */

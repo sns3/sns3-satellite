@@ -18,67 +18,64 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include <ns3/log.h>
+#include "satellite-packet-classifier.h"
+
+#include "satellite-control-message.h"
+#include "satellite-enums.h"
+
 #include <ns3/ipv4-header.h>
 #include <ns3/ipv4-l3-protocol.h>
+#include <ns3/log.h>
 
-#include "satellite-packet-classifier.h"
-#include "satellite-enums.h"
-#include "satellite-control-message.h"
+NS_LOG_COMPONENT_DEFINE("SatPacketClassifier");
 
-
-NS_LOG_COMPONENT_DEFINE ("SatPacketClassifier");
-
-namespace ns3 {
-
-
-SatPacketClassifier::SatPacketClassifier ()
+namespace ns3
 {
 
+SatPacketClassifier::SatPacketClassifier()
+{
 }
 
-
-SatPacketClassifier::~SatPacketClassifier ()
+SatPacketClassifier::~SatPacketClassifier()
 {
-
 }
 
 uint8_t
-SatPacketClassifier::Classify (SatControlMsgTag::SatControlMsgType_t type, const Address& dest) const
+SatPacketClassifier::Classify(SatControlMsgTag::SatControlMsgType_t type, const Address& dest) const
 {
-  NS_LOG_FUNCTION (this << dest);
+    NS_LOG_FUNCTION(this << dest);
 
-  // ACKs are treated as user data, thus they are classified to be using the best effort
-  // flow id. Note, that in FWD link, the ACK is sent in RTN link back to the GW, thus
-  // the UT needs to have a lower layer service configured for BE RC index to be able to
-  // transmit the ACKs.
-  if (type == SatControlMsgTag::SAT_ARQ_ACK)
+    // ACKs are treated as user data, thus they are classified to be using the best effort
+    // flow id. Note, that in FWD link, the ACK is sent in RTN link back to the GW, thus
+    // the UT needs to have a lower layer service configured for BE RC index to be able to
+    // transmit the ACKs.
+    if (type == SatControlMsgTag::SAT_ARQ_ACK)
     {
-      return SatEnums::BE_FID;
+        return SatEnums::BE_FID;
     }
 
-  // By default the control messages are classified to control fid
-  return SatEnums::CONTROL_FID;
+    // By default the control messages are classified to control fid
+    return SatEnums::CONTROL_FID;
 }
 
-
 uint8_t
-SatPacketClassifier::Classify (const Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber) const
+SatPacketClassifier::Classify(const Ptr<Packet> packet,
+                              const Address& dest,
+                              uint16_t protocolNumber) const
 {
-  NS_LOG_FUNCTION (this << packet->GetUid () << dest << protocolNumber);
+    NS_LOG_FUNCTION(this << packet->GetUid() << dest << protocolNumber);
 
-  Ipv4Header ipv4Header;
-  packet->PeekHeader (ipv4Header);
+    Ipv4Header ipv4Header;
+    packet->PeekHeader(ipv4Header);
 
-  uint8_t dscp = ipv4Header.GetDscp ();
+    uint8_t dscp = ipv4Header.GetDscp();
 
-  switch (dscp)
+    switch (dscp)
     {
-    case Ipv4Header::DscpDefault:
-      {
+    case Ipv4Header::DscpDefault: {
         return SatEnums::BE_FID;
         break;
-      }
+    }
     case Ipv4Header::DSCP_AF11:
     case Ipv4Header::DSCP_AF12:
     case Ipv4Header::DSCP_AF13:
@@ -94,31 +91,24 @@ SatPacketClassifier::Classify (const Ptr<Packet> packet, const Address& dest, ui
     case Ipv4Header::DSCP_CS1:
     case Ipv4Header::DSCP_CS2:
     case Ipv4Header::DSCP_CS3:
-    case Ipv4Header::DSCP_CS4:
-      {
+    case Ipv4Header::DSCP_CS4: {
         return SatEnums::AF_FID;
         break;
-      }
+    }
     case Ipv4Header::DSCP_EF:
     case Ipv4Header::DSCP_CS5:
     case Ipv4Header::DSCP_CS6:
-    case Ipv4Header::DSCP_CS7:
-      {
+    case Ipv4Header::DSCP_CS7: {
         return SatEnums::EF_FID;
         break;
-      }
-    default:
-      {
-        NS_FATAL_ERROR ("Unsupported DSCP field value: " << dscp);
+    }
+    default: {
+        NS_FATAL_ERROR("Unsupported DSCP field value: " << dscp);
         break;
-      }
+    }
     }
 
-  return SatEnums::BE_FID;
+    return SatEnums::BE_FID;
 }
 
-
 } // namespace ns3
-
-
-

@@ -20,12 +20,12 @@
 #ifndef SATELLITE_LOG_H
 #define SATELLITE_LOG_H
 
-#include <map>
-
 #include <ns3/satellite-output-fstream-string-container.h>
 
+#include <map>
 
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -53,102 +53,102 @@ namespace ns3 {
  */
 class SatLog : public Object
 {
-public:
-  /**
-   * \brief Enum for log types
-   */
-  typedef enum
-  {
-    LOG_GENERIC = 0, //!< LOG_GENERIC
-    LOG_INFO = 1,   //!< LOG_INFO
-    LOG_WARNING = 2, //!< LOG_WARNING
-    LOG_ERROR = 3,  //!< LOG_ERROR
-    LOG_CUSTOM = 4  //!< LOG_CUSTOM
-  } LogType_t;
+  public:
+    /**
+     * \brief Enum for log types
+     */
+    typedef enum
+    {
+        LOG_GENERIC = 0, //!< LOG_GENERIC
+        LOG_INFO = 1,    //!< LOG_INFO
+        LOG_WARNING = 2, //!< LOG_WARNING
+        LOG_ERROR = 3,   //!< LOG_ERROR
+        LOG_CUSTOM = 4   //!< LOG_CUSTOM
+    } LogType_t;
 
-  /**
-   * \brief typedef for container key
-   */
-  typedef std::pair <LogType_t, std::string> key_t;
+    /**
+     * \brief typedef for container key
+     */
+    typedef std::pair<LogType_t, std::string> key_t;
 
-  /**
-   * \brief typedef for map of containers
-   */
-  typedef std::map <key_t, Ptr<SatOutputFileStreamStringContainer> > container_t;
+    /**
+     * \brief typedef for map of containers
+     */
+    typedef std::map<key_t, Ptr<SatOutputFileStreamStringContainer>> container_t;
 
-  /**
-   * \brief Constructor
-   */
-  SatLog ();
+    /**
+     * \brief Constructor
+     */
+    SatLog();
 
-  /**
-   * \brief Destructor
-   */
-  ~SatLog ();
+    /**
+     * \brief Destructor
+     */
+    ~SatLog();
 
-  /**
-   * \brief NS-3 type id function
-   * \return type id
-   */
-  static TypeId GetTypeId (void);
+    /**
+     * \brief NS-3 type id function
+     * \return type id
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * \brief NS-3 instance type id function
-   * \return Instance type is
-   */
-  TypeId GetInstanceTypeId (void) const;
+    /**
+     * \brief NS-3 instance type id function
+     * \return Instance type is
+     */
+    TypeId GetInstanceTypeId(void) const;
 
-  /**
-   * \brief Do needed dispose actions.
-   */
-  void DoDispose ();
+    /**
+     * \brief Do needed dispose actions.
+     */
+    void DoDispose();
 
-  /**
-   * \brief Function for adding a line to a specific log
-   * \param logType log type
-   * \param fileTag file tag for the filename
-   * \param message line to be added
-   */
-  void AddToLog (LogType_t logType, std::string fileTag, std::string message);
+    /**
+     * \brief Function for adding a line to a specific log
+     * \param logType log type
+     * \param fileTag file tag for the filename
+     * \param message line to be added
+     */
+    void AddToLog(LogType_t logType, std::string fileTag, std::string message);
 
-  /**
-   * \brief Function for resetting the variables
-   */
-  void Reset ();
+    /**
+     * \brief Function for resetting the variables
+     */
+    void Reset();
 
-private:
-  /**
-   * \brief Function for getting the file tag for predefined log types
-   * \param logType log type
-   * \return file tag
-   */
-  std::string GetFileTag (LogType_t logType);
+  private:
+    /**
+     * \brief Function for getting the file tag for predefined log types
+     * \param logType log type
+     * \return file tag
+     */
+    std::string GetFileTag(LogType_t logType);
 
-  /**
-   * \brief Function for creating a log
-   * \param logType log type
-   * \param fileTag file tag for the filename
-   * \return the created log
-   */
-  Ptr<SatOutputFileStreamStringContainer> CreateLog (LogType_t logType, std::string fileTag);
+    /**
+     * \brief Function for creating a log
+     * \param logType log type
+     * \param fileTag file tag for the filename
+     * \return the created log
+     */
+    Ptr<SatOutputFileStreamStringContainer> CreateLog(LogType_t logType, std::string fileTag);
 
-  /**
-   * \brief Function for finding a log based on the key
-   * \param logType log type
-   * \param fileTag file tag for the filename
-   * \return the log
-   */
-  Ptr<SatOutputFileStreamStringContainer> FindLog (LogType_t logType, std::string fileTag);
+    /**
+     * \brief Function for finding a log based on the key
+     * \param logType log type
+     * \param fileTag file tag for the filename
+     * \return the log
+     */
+    Ptr<SatOutputFileStreamStringContainer> FindLog(LogType_t logType, std::string fileTag);
 
-  /**
-   * \brief Write the contents of a container matching to the key into a file
-   */
-  void WriteToFile ();
+    /**
+     * \brief Write the contents of a container matching to the key into a file
+     */
+    void WriteToFile();
 
-  /**
-   * \brief Map for containers
-   */
-  container_t m_container;
+    /**
+     * \brief Map for containers
+     */
+    container_t m_container;
 };
 
 } // namespace ns3

@@ -22,8 +22,8 @@
 
 #include <ns3/object.h>
 
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -34,83 +34,81 @@ namespace ns3 {
  */
 class SatMarkovModel : public Object
 {
-public:
-  /**
-   * \brief NS-3 function for type id
-   * \return type id
-   */
-  static TypeId GetTypeId (void);
+  public:
+    /**
+     * \brief NS-3 function for type id
+     * \return type id
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * \brief Constructor
-   */
-  SatMarkovModel ();
+    /**
+     * \brief Constructor
+     */
+    SatMarkovModel();
 
-  /**
-   * \brief Constructor
-   * \param numOfStates Number of states.
-   * \param initialState Initial state of the model.
-   */
-  SatMarkovModel (uint32_t numOfStates, uint32_t initialState);
+    /**
+     * \brief Constructor
+     * \param numOfStates Number of states.
+     * \param initialState Initial state of the model.
+     */
+    SatMarkovModel(uint32_t numOfStates, uint32_t initialState);
 
-  /**
-   * \brief Destructor
-   */
-  ~SatMarkovModel ();
+    /**
+     * \brief Destructor
+     */
+    ~SatMarkovModel();
 
-  /**
-   * \brief Function for setting the probability values
-   * \param from start state
-   * \param to end state
-   * \param probability change probability
-   */
-  void SetProbability (uint32_t from,
-                       uint32_t to,
-                       double probability);
+    /**
+     * \brief Function for setting the probability values
+     * \param from start state
+     * \param to end state
+     * \param probability change probability
+     */
+    void SetProbability(uint32_t from, uint32_t to, double probability);
 
-  /**
-   * \brief Function for evaluating the state change
-   * \return new state
-   */
-  uint32_t DoTransition ();
+    /**
+     * \brief Function for evaluating the state change
+     * \return new state
+     */
+    uint32_t DoTransition();
 
-  /**
-   * \brief Function for returning the current state
-   * \return current state
-   */
-  uint32_t GetState () const;
+    /**
+     * \brief Function for returning the current state
+     * \return current state
+     */
+    uint32_t GetState() const;
 
-  /**
-   * \brief Function for setting the state
-   * \param newState new state
-   */
-  void SetState (uint32_t newState);
+    /**
+     * \brief Function for setting the state
+     * \param newState new state
+     */
+    void SetState(uint32_t newState);
 
-  /**
-   *  \brief Do needed dispose actions.
-   */
-  void DoDispose ();
+    /**
+     *  \brief Do needed dispose actions.
+     */
+    void DoDispose();
 
-private:
-  /**
-   * \brief Markov state change probabilities
-   */
-  double* m_probabilities;
+  private:
+    /**
+     * \brief Markov state change probabilities
+     */
+    double* m_probabilities;
 
-  /**
-   * \brief Number of states
-   */
-  uint32_t m_numOfStates;
+    /**
+     * \brief Number of states
+     */
+    uint32_t m_numOfStates;
 
-  /**
-   * \brief Current state
-   */
-  uint32_t m_currentState;
+    /**
+     * \brief Current state
+     */
+    uint32_t m_currentState;
 
-  /**
-   * \brief Clear used variables
-   */
-  void Reset ();
+    /**
+     * \brief Clear used variables
+     */
+    void Reset();
 };
 
 } // namespace ns3

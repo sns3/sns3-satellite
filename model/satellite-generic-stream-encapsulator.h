@@ -21,16 +21,15 @@
 #ifndef SATELLITE_GENERIC_STREAM_ENCAPSULATOR
 #define SATELLITE_GENERIC_STREAM_ENCAPSULATOR
 
-
-#include <map>
+#include "satellite-base-encapsulator.h"
 
 #include <ns3/event-id.h>
 #include <ns3/mac48-address.h>
 
-#include "satellite-base-encapsulator.h"
+#include <map>
 
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -47,150 +46,153 @@ namespace ns3 {
  */
 class SatGenericStreamEncapsulator : public SatBaseEncapsulator
 {
-public:
-  /**
-   * Default constructor, not used
-   */
-  SatGenericStreamEncapsulator ();
+  public:
+    /**
+     * Default constructor, not used
+     */
+    SatGenericStreamEncapsulator();
 
-  /**
-   * Constructor
-   * \param encapAddress MAC addressd of encapsulator
-   * \param decapAddress MAC addressd of decapsulator
-   * \param sourceE2EAddress E2E source MAC addressd of packets (used to set SatAddressE2ETag)
-   * \param destE2EAddress E2E destination MAC addressd of packets (used to set SatAddressE2ETag)
-   * \param flowId Flow identifier
-   * \param additionalHeaderSize Additional value in to take into account when pulling packets to represent E2E tags
-   */
-  SatGenericStreamEncapsulator (Mac48Address encapAddress,
-                                Mac48Address decapAddress,
-                                Mac48Address sourceE2EAddress,
-                                Mac48Address destE2EAddress,
-                                uint8_t flowId,
-                                uint32_t additionalHeaderSize = 0);
+    /**
+     * Constructor
+     * \param encapAddress MAC addressd of encapsulator
+     * \param decapAddress MAC addressd of decapsulator
+     * \param sourceE2EAddress E2E source MAC addressd of packets (used to set SatAddressE2ETag)
+     * \param destE2EAddress E2E destination MAC addressd of packets (used to set SatAddressE2ETag)
+     * \param flowId Flow identifier
+     * \param additionalHeaderSize Additional value in to take into account when pulling packets to
+     * represent E2E tags
+     */
+    SatGenericStreamEncapsulator(Mac48Address encapAddress,
+                                 Mac48Address decapAddress,
+                                 Mac48Address sourceE2EAddress,
+                                 Mac48Address destE2EAddress,
+                                 uint8_t flowId,
+                                 uint32_t additionalHeaderSize = 0);
 
-  /**
-   * Destructor for SatGenericStreamEncapsulator
-   */
-  virtual ~SatGenericStreamEncapsulator ();
+    /**
+     * Destructor for SatGenericStreamEncapsulator
+     */
+    virtual ~SatGenericStreamEncapsulator();
 
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * Dispose of this class instance
-   */
-  virtual void DoDispose ();
+    /**
+     * Dispose of this class instance
+     */
+    virtual void DoDispose();
 
-  /**
-   * Enqueue a Higher Layer packet to txBuffer.
-   * \param p To be buffered packet
-   * \param dest Target MAC address
-   */
-  virtual void EnquePdu (Ptr<Packet> p, Mac48Address dest);
+    /**
+     * Enqueue a Higher Layer packet to txBuffer.
+     * \param p To be buffered packet
+     * \param dest Target MAC address
+     */
+    virtual void EnquePdu(Ptr<Packet> p, Mac48Address dest);
 
-  /**
-   * Notify a Tx opportunity to this encapsulator.
-   * \param bytes Notified tx opportunity bytes from lower layer
-   * \param bytesLeft Bytes left after this TxOpportunity in SatQueue
-   * \param &nextMinTxO Minimum TxO after this TxO
-   * \return A GSE PDU
-   */
-  virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft, uint32_t &nextMinTxO);
+    /**
+     * Notify a Tx opportunity to this encapsulator.
+     * \param bytes Notified tx opportunity bytes from lower layer
+     * \param bytesLeft Bytes left after this TxOpportunity in SatQueue
+     * \param &nextMinTxO Minimum TxO after this TxO
+     * \return A GSE PDU
+     */
+    virtual Ptr<Packet> NotifyTxOpportunity(uint32_t bytes,
+                                            uint32_t& bytesLeft,
+                                            uint32_t& nextMinTxO);
 
-  /**
-   * Receive a packet, thus decapsulate and defragment/deconcatenate
-   * if needed. The decapsulated/defragmented HL PDU is forwarded back
-   * to LLC and to upper layer.
-   * \param p packet pointer received from lower layer
-   */
-  virtual void ReceivePdu (Ptr<Packet> p);
+    /**
+     * Receive a packet, thus decapsulate and defragment/deconcatenate
+     * if needed. The decapsulated/defragmented HL PDU is forwarded back
+     * to LLC and to upper layer.
+     * \param p packet pointer received from lower layer
+     */
+    virtual void ReceivePdu(Ptr<Packet> p);
 
-  /**
-   * Get minimum Tx opportunity in bytes, which takes the
-   * assumed header sizes into account.
-   * \return uint32_t minimum tx opportunity
-   */
-  virtual uint32_t GetMinTxOpportunityInBytes () const;
+    /**
+     * Get minimum Tx opportunity in bytes, which takes the
+     * assumed header sizes into account.
+     * \return uint32_t minimum tx opportunity
+     */
+    virtual uint32_t GetMinTxOpportunityInBytes() const;
 
-protected:
-  /**
-   * Get new packet performs the GSE fragmentation and encapsulation
-   * for a one single packet. Returns NULL packet if a suitable packet
-   * is not created.
-   * \return Ptr<Packet> GSE packet
-   */
-  Ptr<Packet> GetNewGsePdu (uint32_t txOpportunityBytes, uint32_t maxGsePduSize, uint32_t additionalHeaderSize = 0);
+  protected:
+    /**
+     * Get new packet performs the GSE fragmentation and encapsulation
+     * for a one single packet. Returns NULL packet if a suitable packet
+     * is not created.
+     * \return Ptr<Packet> GSE packet
+     */
+    Ptr<Packet> GetNewGsePdu(uint32_t txOpportunityBytes,
+                             uint32_t maxGsePduSize,
+                             uint32_t additionalHeaderSize = 0);
 
-  /**
-   * Method increases the fragment id by one. If the maximum fragment id is
-   * reached, it is reset to zero.
-   */
-  void IncreaseFragmentId ();
+    /**
+     * Method increases the fragment id by one. If the maximum fragment id is
+     * reached, it is reset to zero.
+     */
+    void IncreaseFragmentId();
 
-  /**
-   * Process the reception of individual GSE PDUs
-   * \param p Packet to be received
-   */
-  virtual void ProcessPdu (Ptr<Packet> p);
+    /**
+     * Process the reception of individual GSE PDUs
+     * \param p Packet to be received
+     */
+    virtual void ProcessPdu(Ptr<Packet> p);
 
-  /**
-   * Reset defragmentation variables
-   */
-  void Reset ();
+    /**
+     * Reset defragmentation variables
+     */
+    void Reset();
 
-  /**
-   * Maximum GSE PDU size
-   */
-  uint32_t m_maxGsePduSize;
+    /**
+     * Maximum GSE PDU size
+     */
+    uint32_t m_maxGsePduSize;
 
-  /**
-   * Fragment id used in the packet transmissions
-   */
-  uint32_t m_txFragmentId;
-  /**
-   * Current fragment id in the reassembly process
-   */
-  uint32_t m_currRxFragmentId;
+    /**
+     * Fragment id used in the packet transmissions
+     */
+    uint32_t m_txFragmentId;
+    /**
+     * Current fragment id in the reassembly process
+     */
+    uint32_t m_currRxFragmentId;
 
-  /**
-   * Current packet in the reassembly process
-   */
-  Ptr<Packet> m_currRxPacketFragment;
+    /**
+     * Current packet in the reassembly process
+     */
+    Ptr<Packet> m_currRxPacketFragment;
 
-  /**
-   * The total size of the ALPDU size reassembly process
-   */
-  uint32_t m_currRxPacketSize;
+    /**
+     * The total size of the ALPDU size reassembly process
+     */
+    uint32_t m_currRxPacketSize;
 
-  /**
-   * Currently received bytes of the fragmented packet
-   */
-  uint32_t m_currRxPacketFragmentBytes;
+    /**
+     * Currently received bytes of the fragmented packet
+     */
+    uint32_t m_currRxPacketFragmentBytes;
 
-  /**
-   * If the GSE opportunity is smaller than this, a NULL
-   * packet is returned.
-   */
-  uint32_t m_minGseTxOpportunity;
+    /**
+     * If the GSE opportunity is smaller than this, a NULL
+     * packet is returned.
+     */
+    uint32_t m_minGseTxOpportunity;
 
-  /**
-   * The fragment is described with 8 bits, thus the
-   * maximum fragment id is 256.
-   */
-  static const uint32_t MAX_FRAGMENT_ID = 256;
+    /**
+     * The fragment is described with 8 bits, thus the
+     * maximum fragment id is 256.
+     */
+    static const uint32_t MAX_FRAGMENT_ID = 256;
 
-  /**
-   * The maximum packet size is described with 16 bits,
-   * thus, the maximum HL packet size is 65536 bytes.
-   */
-  static const uint32_t MAX_HL_PACKET_SIZE = 65536;
-
+    /**
+     * The maximum packet size is described with 16 bits,
+     * thus, the maximum HL packet size is 65536 bytes.
+     */
+    static const uint32_t MAX_HL_PACKET_SIZE = 65536;
 };
-
 
 } // namespace ns3
 

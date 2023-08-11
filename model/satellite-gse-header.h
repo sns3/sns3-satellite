@@ -21,13 +21,12 @@
 #ifndef SATELLITE_GSE_HEADERS_H
 #define SATELLITE_GSE_HEADERS_H
 
+#include <ns3/header.h>
 
 #include <vector>
 
-#include <ns3/header.h>
-
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -45,150 +44,150 @@ namespace ns3 {
  */
 class SatGseHeader : public Header
 {
-public:
-  /**
-   * Constructor
-   */
-  SatGseHeader ();
+  public:
+    /**
+     * Constructor
+     */
+    SatGseHeader();
 
-  /**
-   * Destructor for SatGseHeader
-   */
-  ~SatGseHeader ();
+    /**
+     * Destructor for SatGseHeader
+     */
+    ~SatGseHeader();
 
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * \brief Get the type ID of instance
-   * \return the object TypeId
-   */
-  virtual TypeId GetInstanceTypeId (void) const;
+    /**
+     * \brief Get the type ID of instance
+     * \return the object TypeId
+     */
+    virtual TypeId GetInstanceTypeId(void) const;
 
-  /**
-   * Get serialized size of SatGseHeader
-   * \return Serialized size in bytes
-   */
-  virtual uint32_t GetSerializedSize (void) const;
+    /**
+     * Get serialized size of SatGseHeader
+     * \return Serialized size in bytes
+     */
+    virtual uint32_t GetSerializedSize(void) const;
 
-  /**
-   * Serializes information to buffer from this instance of SatGseHeader
-   * \param start Buffer in which the information is serialized
-   */
-  virtual void Serialize (Buffer::Iterator start) const;
+    /**
+     * Serializes information to buffer from this instance of SatGseHeader
+     * \param start Buffer in which the information is serialized
+     */
+    virtual void Serialize(Buffer::Iterator start) const;
 
-  /**
-   * Deserializes information from buffer to this instance of SatGseHeader
-   * \param start Buffer from which the information is deserialized
-   * \return Serialized size of the buffer
-   */
-  virtual uint32_t Deserialize (Buffer::Iterator start);
+    /**
+     * Deserializes information from buffer to this instance of SatGseHeader
+     * \param start Buffer from which the information is deserialized
+     * \return Serialized size of the buffer
+     */
+    virtual uint32_t Deserialize(Buffer::Iterator start);
 
-  /**
-   * Print time stamp of this instance of SatGseHeader
-   * \param &os Output stream to which tag timestamp is printed.
-   */
-  virtual void Print (std::ostream &os) const;
+    /**
+     * Print time stamp of this instance of SatGseHeader
+     * \param &os Output stream to which tag timestamp is printed.
+     */
+    virtual void Print(std::ostream& os) const;
 
-  /**
-   * \brief Get start indicator of GSE header
-   * \return Start indicator
-   */
-  uint8_t GetStartIndicator () const;
+    /**
+     * \brief Get start indicator of GSE header
+     * \return Start indicator
+     */
+    uint8_t GetStartIndicator() const;
 
-  /**
-   * \brief Get end indicator of GSE header
-   * \return End indicator
-   */
-  uint8_t GetEndIndicator () const;
+    /**
+     * \brief Get end indicator of GSE header
+     * \return End indicator
+     */
+    uint8_t GetEndIndicator() const;
 
-  /**
-   * \brief Get GSE fragment length in bytes
-   * \return GSE PDU length
-   */
-  uint32_t GetGsePduLength () const;
+    /**
+     * \brief Get GSE fragment length in bytes
+     * \return GSE PDU length
+     */
+    uint32_t GetGsePduLength() const;
 
-  /**
-   * \brief Get GSE fragment id
-   * \return Fragment id
-   */
-  uint32_t GetFragmentId () const;
+    /**
+     * \brief Get GSE fragment id
+     * \return Fragment id
+     */
+    uint32_t GetFragmentId() const;
 
-  /**
-   * \brief Get total length of higher layer PDU.
-   * \return Total length of HL PDU
-   */
-  uint32_t GetTotalLength () const;
+    /**
+     * \brief Get total length of higher layer PDU.
+     * \return Total length of HL PDU
+     */
+    uint32_t GetTotalLength() const;
 
-  /**
-   * \brief Set start indicator to GSE header
-   */
-  void SetStartIndicator ();
+    /**
+     * \brief Set start indicator to GSE header
+     */
+    void SetStartIndicator();
 
-  /**
-   * \brief Set end indicator to GSE header
-   */
-  void SetEndIndicator ();
+    /**
+     * \brief Set end indicator to GSE header
+     */
+    void SetEndIndicator();
 
-  /**
-   * \brief Set GSE fragment length to PPDU header
-   * \param bytes GSE length in bytes
-   */
-  void SetGsePduLength (uint32_t bytes);
+    /**
+     * \brief Set GSE fragment length to PPDU header
+     * \param bytes GSE length in bytes
+     */
+    void SetGsePduLength(uint32_t bytes);
 
-  /**
-   * \brief Set fragment id to GSE header
-   * \param id Fragment id
-   */
-  void SetFragmentId (uint32_t id);
+    /**
+     * \brief Set fragment id to GSE header
+     * \param id Fragment id
+     */
+    void SetFragmentId(uint32_t id);
 
-  /**
-   * \brief Set total length of higher layer PDU. Set in
-   * START_PPDU status type.
-   * \param bytes Size of the full HL packet
-   */
-  void SetTotalLength (uint32_t bytes);
+    /**
+     * \brief Set total length of higher layer PDU. Set in
+     * START_PPDU status type.
+     * \param bytes Size of the full HL packet
+     */
+    void SetTotalLength(uint32_t bytes);
 
-  /**
-   * Get the maximum GSE header size
-   * \return Header size in bytes
-   */
-  uint32_t GetGseHeaderSizeInBytes (uint8_t type) const;
+    /**
+     * Get the maximum GSE header size
+     * \return Header size in bytes
+     */
+    uint32_t GetGseHeaderSizeInBytes(uint8_t type) const;
 
-  /**
-   * \brief Get the maximum GSE header size
-   * \return uint32_t header size
-   */
-  uint32_t GetMaxGseHeaderSizeInBytes () const;
+    /**
+     * \brief Get the maximum GSE header size
+     * \return uint32_t header size
+     */
+    uint32_t GetMaxGseHeaderSizeInBytes() const;
 
-private:
-  /**
-   * GSE header content
-   */
-  uint8_t m_startIndicator;
-  uint8_t m_endIndicator;
-  uint16_t m_gsePduLengthInBytes;
-  uint8_t m_fragmentId;
-  uint16_t m_totalLengthInBytes;
-  uint16_t m_protocolType;
-  uint8_t m_labelByte;
-  uint32_t m_crc;
+  private:
+    /**
+     * GSE header content
+     */
+    uint8_t m_startIndicator;
+    uint8_t m_endIndicator;
+    uint16_t m_gsePduLengthInBytes;
+    uint8_t m_fragmentId;
+    uint16_t m_totalLengthInBytes;
+    uint16_t m_protocolType;
+    uint8_t m_labelByte;
+    uint32_t m_crc;
 
-  /**
-   * Constant variables for determining the header sizes
-   * of different GSE fragments.
-   */
-  const uint32_t m_fullGseHeaderSize;
-  const uint32_t m_startGseHeaderSize;
-  const uint32_t m_endGseHeaderSize;
-  const uint32_t m_continuationGseHeaderSize;
+    /**
+     * Constant variables for determining the header sizes
+     * of different GSE fragments.
+     */
+    const uint32_t m_fullGseHeaderSize;
+    const uint32_t m_startGseHeaderSize;
+    const uint32_t m_endGseHeaderSize;
+    const uint32_t m_continuationGseHeaderSize;
 
-  static const uint32_t m_labelFieldLengthInBytes = 3;
+    static const uint32_t m_labelFieldLengthInBytes = 3;
 };
 
-}  // namespace ns3
+} // namespace ns3
 
 #endif // SATELLITE_GSE_HEADERS_H

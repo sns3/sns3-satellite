@@ -22,7 +22,6 @@
 #include "ns3/core-module.h"
 #include "ns3/satellite-module.h"
 
-
 using namespace ns3;
 
 /**
@@ -51,27 +50,33 @@ using namespace ns3;
  * "Example message for custom log".
  */
 
-NS_LOG_COMPONENT_DEFINE ("sat-log-example");
+NS_LOG_COMPONENT_DEFINE("sat-log-example");
 
 int
-main (int argc, char *argv[])
+main(int argc, char* argv[])
 {
-  LogComponentEnable ("sat-log-example", LOG_LEVEL_INFO);
-  LogComponentEnable ("SatLog", LOG_LEVEL_INFO);
+    LogComponentEnable("sat-log-example", LOG_LEVEL_INFO);
+    LogComponentEnable("SatLog", LOG_LEVEL_INFO);
 
-  /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-log"));
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+    /// Set simulation output details
+    Config::SetDefault("ns3::SatEnvVariables::SimulationCampaignName", StringValue("example-log"));
+    Config::SetDefault("ns3::SatEnvVariables::SimulationTag", StringValue(""));
+    Config::SetDefault("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue(true));
 
-  Singleton<SatLog>::Get ()->AddToLog (SatLog::LOG_GENERIC, "", "Logging for generic messages started");
-  Singleton<SatLog>::Get ()->AddToLog (SatLog::LOG_INFO, "", "Logging for info messages started");
-  Singleton<SatLog>::Get ()->AddToLog (SatLog::LOG_WARNING, "", "Logging for warning messages started");
-  Singleton<SatLog>::Get ()->AddToLog (SatLog::LOG_ERROR, "", "Logging for error messages started");
-  Singleton<SatLog>::Get ()->AddToLog (SatLog::LOG_CUSTOM, "_customTag", "Logging for custom messages started");
+    Singleton<SatLog>::Get()->AddToLog(SatLog::LOG_GENERIC,
+                                       "",
+                                       "Logging for generic messages started");
+    Singleton<SatLog>::Get()->AddToLog(SatLog::LOG_INFO, "", "Logging for info messages started");
+    Singleton<SatLog>::Get()->AddToLog(SatLog::LOG_WARNING,
+                                       "",
+                                       "Logging for warning messages started");
+    Singleton<SatLog>::Get()->AddToLog(SatLog::LOG_ERROR, "", "Logging for error messages started");
+    Singleton<SatLog>::Get()->AddToLog(SatLog::LOG_CUSTOM,
+                                       "_customTag",
+                                       "Logging for custom messages started");
 
-  Simulator::Run ();
-  Simulator::Destroy ();
+    Simulator::Run();
+    Simulator::Destroy();
 
-  return 0;
+    return 0;
 }

@@ -18,17 +18,16 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-
 #ifndef SATELLITE_NODE_INFO_H_
 #define SATELLITE_NODE_INFO_H_
 
-#include <ns3/simple-ref-count.h>
-#include <ns3/mac48-address.h>
-
 #include "satellite-enums.h"
 
+#include <ns3/mac48-address.h>
+#include <ns3/simple-ref-count.h>
 
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -40,50 +39,49 @@ namespace ns3 {
 
 class SatNodeInfo : public SimpleRefCount<SatNodeInfo>
 {
-public:
-  /**
-   * Default constructor.
-   */
-  SatNodeInfo ();
+  public:
+    /**
+     * Default constructor.
+     */
+    SatNodeInfo();
 
-  /**
-   * Constructor with initialization parameters.
-   * \param nodeType
-   * \param nodeId
-   * \param macAddress
-   */
-  SatNodeInfo (SatEnums::SatNodeType_t nodeType, uint32_t nodeId, Mac48Address macAddress);
+    /**
+     * Constructor with initialization parameters.
+     * \param nodeType
+     * \param nodeId
+     * \param macAddress
+     */
+    SatNodeInfo(SatEnums::SatNodeType_t nodeType, uint32_t nodeId, Mac48Address macAddress);
 
-  /**
-   * Destructor for SatNodeInfo
-   */
-  virtual ~SatNodeInfo ();
+    /**
+     * Destructor for SatNodeInfo
+     */
+    virtual ~SatNodeInfo();
 
-  /**
-   * \brief Get node identifier
-   * \return Node identifier
-   */
-  uint32_t GetNodeId () const;
+    /**
+     * \brief Get node identifier
+     * \return Node identifier
+     */
+    uint32_t GetNodeId() const;
 
-  /**
-   * \brief Get Node type (UT, SAT, GW, NCC, TER)
-   * \return Node type enum
-   */
-  SatEnums::SatNodeType_t GetNodeType () const;
+    /**
+     * \brief Get Node type (UT, SAT, GW, NCC, TER)
+     * \return Node type enum
+     */
+    SatEnums::SatNodeType_t GetNodeType() const;
 
-  /**
-   * \brief Get MAC address
-   * \return Node (SatNetDevice) MAC address
-   */
-  Mac48Address GetMacAddress () const;
+    /**
+     * \brief Get MAC address
+     * \return Node (SatNetDevice) MAC address
+     */
+    Mac48Address GetMacAddress() const;
 
-private:
-  uint32_t m_nodeId;
-  SatEnums::SatNodeType_t m_nodeType;
-  Mac48Address m_macAddress;
-
+  private:
+    uint32_t m_nodeId;
+    SatEnums::SatNodeType_t m_nodeType;
+    Mac48Address m_macAddress;
 };
 
-}
+} // namespace ns3
 
 #endif /* SATELLITE_NODE_INFO_H_ */

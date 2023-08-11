@@ -23,17 +23,17 @@
 #ifndef LORA_FORWARDER_H
 #define LORA_FORWARDER_H
 
-#include <map>
-
-#include <ns3/application.h>
-#include <ns3/nstime.h>
-#include <ns3/point-to-point-net-device.h>
-#include <ns3/attribute.h>
-
 #include "satellite-lorawan-net-device.h"
 
+#include <ns3/application.h>
+#include <ns3/attribute.h>
+#include <ns3/nstime.h>
+#include <ns3/point-to-point-net-device.h>
 
-namespace ns3 {
+#include <map>
+
+namespace ns3
+{
 
 /**
  * This application forwards packets between NetDevices:
@@ -41,61 +41,69 @@ namespace ns3 {
  */
 class LoraForwarder : public Application
 {
-public:
-  LoraForwarder ();
-  ~LoraForwarder ();
+  public:
+    LoraForwarder();
+    ~LoraForwarder();
 
-  static TypeId GetTypeId (void);
+    static TypeId GetTypeId(void);
 
-  /**
-   * Sets the device to use to communicate with the EDs.
-   *
-   * \param beamId The beam ID of the device.
-   * \param loraNetDevice The LoraNetDevice on this node.
-   */
-  void SetLoraNetDevice (uint8_t beamId, Ptr<SatLorawanNetDevice> loraNetDevice);
+    /**
+     * Sets the device to use to communicate with the EDs.
+     *
+     * \param beamId The beam ID of the device.
+     * \param loraNetDevice The LoraNetDevice on this node.
+     */
+    void SetLoraNetDevice(uint8_t beamId, Ptr<SatLorawanNetDevice> loraNetDevice);
 
-  /**
-   * Sets the P2P device to use to communicate with the NS.
-   *
-   * \param pointToPointNetDevice The P2PNetDevice on this node.
-   */
-  void SetPointToPointNetDevice (Ptr<PointToPointNetDevice> pointToPointNetDevice);
+    /**
+     * Sets the P2P device to use to communicate with the NS.
+     *
+     * \param pointToPointNetDevice The P2PNetDevice on this node.
+     */
+    void SetPointToPointNetDevice(Ptr<PointToPointNetDevice> pointToPointNetDevice);
 
-  /**
-   * Receive a packet from the LoraNetDevice.
-   *
-   * \param loraNetDevice The LoraNetDevice we received the packet from.
-   * \param packet The packet we received.
-   * \param protocol The protocol number associated to this packet.
-   * \param sender The address of the sender.
-   * \returns True if we can handle the packet, false otherwise.
-   */
-  bool ReceiveFromLora (Ptr<SatLorawanNetDevice> loraNetDevice, Ptr<const Packet> packet, uint16_t protocol, const Address& sender);
+    /**
+     * Receive a packet from the LoraNetDevice.
+     *
+     * \param loraNetDevice The LoraNetDevice we received the packet from.
+     * \param packet The packet we received.
+     * \param protocol The protocol number associated to this packet.
+     * \param sender The address of the sender.
+     * \returns True if we can handle the packet, false otherwise.
+     */
+    bool ReceiveFromLora(Ptr<SatLorawanNetDevice> loraNetDevice,
+                         Ptr<const Packet> packet,
+                         uint16_t protocol,
+                         const Address& sender);
 
-  /**
-   * Receive a packet from the PointToPointNetDevice
-   */
-  bool ReceiveFromPointToPoint (Ptr<NetDevice> pointToPointNetDevice, Ptr<const Packet> packet, uint16_t protocol, const Address& sender);
+    /**
+     * Receive a packet from the PointToPointNetDevice
+     */
+    bool ReceiveFromPointToPoint(Ptr<NetDevice> pointToPointNetDevice,
+                                 Ptr<const Packet> packet,
+                                 uint16_t protocol,
+                                 const Address& sender);
 
-  /**
-   * Start the application
-   */
-  void StartApplication (void);
+    /**
+     * Start the application
+     */
+    void StartApplication(void);
 
-  /**
-   * Stop the application
-   */
-  void StopApplication (void);
+    /**
+     * Stop the application
+     */
+    void StopApplication(void);
 
-private:
-  std::map<uint8_t, Ptr<SatLorawanNetDevice> > m_satLorawanNetDevices; //!< Map between beam ID and pointer to the node's SatLorawanNetDevice
+  private:
+    std::map<uint8_t, Ptr<SatLorawanNetDevice>>
+        m_satLorawanNetDevices; //!< Map between beam ID and pointer to the node's
+                                //!< SatLorawanNetDevice
 
-  Ptr<PointToPointNetDevice> m_pointToPointNetDevice; //!< Pointer to the
-  //!P2PNetDevice we use to
-  //!communicate with the NS
+    Ptr<PointToPointNetDevice> m_pointToPointNetDevice; //!< Pointer to the
+                                                        //! P2PNetDevice we use to
+    //! communicate with the NS
 };
 
-} //namespace ns3
+} // namespace ns3
 
 #endif /* LORA_FORWARDER_H */

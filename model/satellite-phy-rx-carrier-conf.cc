@@ -20,255 +20,258 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
-#include <ns3/log.h>
-#include <ns3/enum.h>
-#include <ns3/uinteger.h>
-#include <ns3/double.h>
-#include <ns3/boolean.h>
-
-#include "satellite-utils.h"
 #include "satellite-phy-rx-carrier-conf.h"
+
 #include "satellite-channel-estimation-error-container.h"
+#include "satellite-utils.h"
 
+#include <ns3/boolean.h>
+#include <ns3/double.h>
+#include <ns3/enum.h>
+#include <ns3/log.h>
+#include <ns3/uinteger.h>
 
-NS_LOG_COMPONENT_DEFINE ("SatPhyRxCarrierConf");
+NS_LOG_COMPONENT_DEFINE("SatPhyRxCarrierConf");
 
-namespace ns3 {
-
-NS_OBJECT_ENSURE_REGISTERED (SatPhyRxCarrierConf);
-
-SatPhyRxCarrierConf::SatPhyRxCarrierConf ()
-  : m_daIfModel (),
-  m_raIfModel (),
-  m_raIfEliminateModel (),
-  m_errorModel (),
-  m_daConstantErrorRate (0.0),
-  m_rxTemperatureK (),
-  m_rxAciIfWrtNoiseFactor (),
-  m_rxMode (),
-  m_carrierCount (),
-  m_carrierBandwidthConverter (),
-  m_channelType (),
-  m_linkRegenerationMode (),
-  m_channelEstimationError (),
-  m_additionalInterferenceCallback (),
-  m_linkResults (),
-  m_rxExtNoiseDensityWhz (0),
-  m_enableIntfOutputTrace (false),
-  m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (10),
-  m_raCollisionModel (RA_COLLISION_NOT_DEFINED),
-  m_raConstantErrorRate (0.0),
-  m_enableRandomAccessDynamicLoadControl (true),
-  m_randomAccessModel ()
+namespace ns3
 {
-  NS_FATAL_ERROR ("SatPhyRxCarrierConf::SatPhyRxCarrierConf - Constructor not in use");
+
+NS_OBJECT_ENSURE_REGISTERED(SatPhyRxCarrierConf);
+
+SatPhyRxCarrierConf::SatPhyRxCarrierConf()
+    : m_daIfModel(),
+      m_raIfModel(),
+      m_raIfEliminateModel(),
+      m_errorModel(),
+      m_daConstantErrorRate(0.0),
+      m_rxTemperatureK(),
+      m_rxAciIfWrtNoiseFactor(),
+      m_rxMode(),
+      m_carrierCount(),
+      m_carrierBandwidthConverter(),
+      m_channelType(),
+      m_linkRegenerationMode(),
+      m_channelEstimationError(),
+      m_additionalInterferenceCallback(),
+      m_linkResults(),
+      m_rxExtNoiseDensityWhz(0),
+      m_enableIntfOutputTrace(false),
+      m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize(10),
+      m_raCollisionModel(RA_COLLISION_NOT_DEFINED),
+      m_raConstantErrorRate(0.0),
+      m_enableRandomAccessDynamicLoadControl(true),
+      m_randomAccessModel()
+{
+    NS_FATAL_ERROR("SatPhyRxCarrierConf::SatPhyRxCarrierConf - Constructor not in use");
 }
 
-SatPhyRxCarrierConf::SatPhyRxCarrierConf (RxCarrierCreateParams_s createParams)
-  : m_daIfModel (createParams.m_daIfModel),
-  m_raIfModel (createParams.m_raIfModel),
-  m_raIfEliminateModel (createParams.m_raIfEliminateModel),
-  m_errorModel (createParams.m_errorModel),
-  m_daConstantErrorRate (createParams.m_daConstantErrorRate),
-  m_rxTemperatureK (createParams.m_rxTemperatureK),
-  m_rxAciIfWrtNoiseFactor (createParams.m_aciIfWrtNoiseFactor),
-  m_rxMode (createParams.m_rxMode),
-  m_carrierCount (createParams.m_carrierCount),
-  m_carrierBandwidthConverter (createParams.m_bwConverter),
-  m_channelType (createParams.m_chType),
-  m_linkRegenerationMode (createParams.m_linkRegenerationMode),
-  m_channelEstimationError (createParams.m_cec),
-  m_additionalInterferenceCallback (),
-  m_linkResults (),
-  m_rxExtNoiseDensityWhz (createParams.m_extNoiseDensityWhz),
-  m_enableIntfOutputTrace (false),
-  m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize (10),
-  m_raCollisionModel (createParams.m_raCollisionModel),
-  m_raConstantErrorRate (createParams.m_raConstantErrorRate),
-  m_enableRandomAccessDynamicLoadControl (true),
-  m_randomAccessModel (createParams.m_randomAccessModel)
+SatPhyRxCarrierConf::SatPhyRxCarrierConf(RxCarrierCreateParams_s createParams)
+    : m_daIfModel(createParams.m_daIfModel),
+      m_raIfModel(createParams.m_raIfModel),
+      m_raIfEliminateModel(createParams.m_raIfEliminateModel),
+      m_errorModel(createParams.m_errorModel),
+      m_daConstantErrorRate(createParams.m_daConstantErrorRate),
+      m_rxTemperatureK(createParams.m_rxTemperatureK),
+      m_rxAciIfWrtNoiseFactor(createParams.m_aciIfWrtNoiseFactor),
+      m_rxMode(createParams.m_rxMode),
+      m_carrierCount(createParams.m_carrierCount),
+      m_carrierBandwidthConverter(createParams.m_bwConverter),
+      m_channelType(createParams.m_chType),
+      m_linkRegenerationMode(createParams.m_linkRegenerationMode),
+      m_channelEstimationError(createParams.m_cec),
+      m_additionalInterferenceCallback(),
+      m_linkResults(),
+      m_rxExtNoiseDensityWhz(createParams.m_extNoiseDensityWhz),
+      m_enableIntfOutputTrace(false),
+      m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize(10),
+      m_raCollisionModel(createParams.m_raCollisionModel),
+      m_raConstantErrorRate(createParams.m_raConstantErrorRate),
+      m_enableRandomAccessDynamicLoadControl(true),
+      m_randomAccessModel(createParams.m_randomAccessModel)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
 TypeId
-SatPhyRxCarrierConf::GetTypeId (void)
+SatPhyRxCarrierConf::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatPhyRxCarrierConf")
-    .SetParent<Object> ()
-    .AddAttribute ("EnableIntfOutputTrace",
-                   "Enable interference output trace.",
-                   BooleanValue (false),
-                   MakeBooleanAccessor (&SatPhyRxCarrierConf::m_enableIntfOutputTrace),
-                   MakeBooleanChecker ())
-    .AddAttribute ("RandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize",
-                   "Random access average normalized offered load measurement window size",
-                   UintegerValue (10),
-                   MakeUintegerAccessor (&SatPhyRxCarrierConf::m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize),
-                   MakeUintegerChecker<uint32_t> ())
-    .AddAttribute ("EnableRandomAccessDynamicLoadControl",
-                   "Enable random access dynamic load control.",
-                   BooleanValue (true),
-                   MakeBooleanAccessor (&SatPhyRxCarrierConf::m_enableRandomAccessDynamicLoadControl),
-                   MakeBooleanChecker ())
-    .AddConstructor<SatPhyRxCarrierConf> ()
-  ;
-  return tid;
+    static TypeId tid =
+        TypeId("ns3::SatPhyRxCarrierConf")
+            .SetParent<Object>()
+            .AddAttribute("EnableIntfOutputTrace",
+                          "Enable interference output trace.",
+                          BooleanValue(false),
+                          MakeBooleanAccessor(&SatPhyRxCarrierConf::m_enableIntfOutputTrace),
+                          MakeBooleanChecker())
+            .AddAttribute("RandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize",
+                          "Random access average normalized offered load measurement window size",
+                          UintegerValue(10),
+                          MakeUintegerAccessor(
+                              &SatPhyRxCarrierConf::
+                                  m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize),
+                          MakeUintegerChecker<uint32_t>())
+            .AddAttribute(
+                "EnableRandomAccessDynamicLoadControl",
+                "Enable random access dynamic load control.",
+                BooleanValue(true),
+                MakeBooleanAccessor(&SatPhyRxCarrierConf::m_enableRandomAccessDynamicLoadControl),
+                MakeBooleanChecker())
+            .AddConstructor<SatPhyRxCarrierConf>();
+    return tid;
 }
 
 void
-SatPhyRxCarrierConf::DoDispose ()
+SatPhyRxCarrierConf::DoDispose()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  m_linkResults = NULL;
-  m_carrierBandwidthConverter.Nullify ();
-  m_additionalInterferenceCallback.Nullify ();
+    m_linkResults = NULL;
+    m_carrierBandwidthConverter.Nullify();
+    m_additionalInterferenceCallback.Nullify();
 
-  Object::DoDispose ();
+    Object::DoDispose();
 }
 
 void
-SatPhyRxCarrierConf::SetLinkResults (Ptr<SatLinkResults> linkResults)
+SatPhyRxCarrierConf::SetLinkResults(Ptr<SatLinkResults> linkResults)
 {
-  m_linkResults = linkResults;
+    m_linkResults = linkResults;
 }
 
 uint32_t
-SatPhyRxCarrierConf::GetCarrierCount () const
+SatPhyRxCarrierConf::GetCarrierCount() const
 {
-  return m_carrierCount;
+    return m_carrierCount;
 }
 
-
 SatPhyRxCarrierConf::ErrorModel
-SatPhyRxCarrierConf::GetErrorModel () const
+SatPhyRxCarrierConf::GetErrorModel() const
 {
-  return m_errorModel;
+    return m_errorModel;
 }
 
 double
-SatPhyRxCarrierConf::GetConstantDaErrorRate () const
+SatPhyRxCarrierConf::GetConstantDaErrorRate() const
 {
-  return m_daConstantErrorRate;
+    return m_daConstantErrorRate;
 }
 
 SatPhyRxCarrierConf::InterferenceModel
-SatPhyRxCarrierConf::GetInterferenceModel (bool isRandomAccessCarrier) const
+SatPhyRxCarrierConf::GetInterferenceModel(bool isRandomAccessCarrier) const
 {
-  if (isRandomAccessCarrier)
+    if (isRandomAccessCarrier)
     {
-      return m_raIfModel;
+        return m_raIfModel;
     }
-  else
+    else
     {
-      return m_daIfModel;
+        return m_daIfModel;
     }
 }
 
 SatPhyRxCarrierConf::InterferenceEliminationModel
-SatPhyRxCarrierConf::GetInterferenceEliminationModel (bool isRandomAccessCarrier) const
+SatPhyRxCarrierConf::GetInterferenceEliminationModel(bool isRandomAccessCarrier) const
 {
-  if (isRandomAccessCarrier)
+    if (isRandomAccessCarrier)
     {
-      return m_raIfEliminateModel;
+        return m_raIfEliminateModel;
     }
-  else
+    else
     {
-      return SatPhyRxCarrierConf::SIC_NONE;
+        return SatPhyRxCarrierConf::SIC_NONE;
     }
 }
 
 Ptr<SatLinkResults>
-SatPhyRxCarrierConf::GetLinkResults () const
+SatPhyRxCarrierConf::GetLinkResults() const
 {
-  return m_linkResults;
+    return m_linkResults;
 }
 
 double
-SatPhyRxCarrierConf::GetCarrierBandwidthHz ( uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType ) const
+SatPhyRxCarrierConf::GetCarrierBandwidthHz(uint32_t carrierId,
+                                           SatEnums::CarrierBandwidthType_t bandwidthType) const
 {
-  return m_carrierBandwidthConverter ( m_channelType, carrierId, bandwidthType );
+    return m_carrierBandwidthConverter(m_channelType, carrierId, bandwidthType);
 }
 
 double
-SatPhyRxCarrierConf::GetRxTemperatureK () const
+SatPhyRxCarrierConf::GetRxTemperatureK() const
 {
-  return m_rxTemperatureK;
+    return m_rxTemperatureK;
 }
 
 double
-SatPhyRxCarrierConf::GetExtPowerDensityWhz () const
+SatPhyRxCarrierConf::GetExtPowerDensityWhz() const
 {
-  return m_rxExtNoiseDensityWhz;
+    return m_rxExtNoiseDensityWhz;
 }
 
 double
-SatPhyRxCarrierConf::GetRxAciInterferenceWrtNoiseFactor () const
+SatPhyRxCarrierConf::GetRxAciInterferenceWrtNoiseFactor() const
 {
-  return m_rxAciIfWrtNoiseFactor;
+    return m_rxAciIfWrtNoiseFactor;
 }
 
 SatPhyRxCarrierConf::RxMode
-SatPhyRxCarrierConf::GetRxMode () const
+SatPhyRxCarrierConf::GetRxMode() const
 {
-  return m_rxMode;
+    return m_rxMode;
 }
 
 SatEnums::ChannelType_t
-SatPhyRxCarrierConf::GetChannelType () const
+SatPhyRxCarrierConf::GetChannelType() const
 {
-  return m_channelType;
+    return m_channelType;
 }
 
 SatEnums::RegenerationMode_t
-SatPhyRxCarrierConf::GetLinkRegenerationMode () const
+SatPhyRxCarrierConf::GetLinkRegenerationMode() const
 {
-  return m_linkRegenerationMode;
+    return m_linkRegenerationMode;
 }
 
 bool
-SatPhyRxCarrierConf::IsIntfOutputTraceEnabled () const
+SatPhyRxCarrierConf::IsIntfOutputTraceEnabled() const
 {
-  return m_enableIntfOutputTrace;
+    return m_enableIntfOutputTrace;
 }
 
 Ptr<SatChannelEstimationErrorContainer>
-SatPhyRxCarrierConf::GetChannelEstimatorErrorContainer () const
+SatPhyRxCarrierConf::GetChannelEstimatorErrorContainer() const
 {
-  return m_channelEstimationError;
+    return m_channelEstimationError;
 }
 
 SatPhyRxCarrierConf::RandomAccessCollisionModel
-SatPhyRxCarrierConf::GetRandomAccessCollisionModel () const
+SatPhyRxCarrierConf::GetRandomAccessCollisionModel() const
 {
-  if (m_raIfModel == IF_PER_PACKET || m_raIfModel == IF_PER_FRAGMENT)
+    if (m_raIfModel == IF_PER_PACKET || m_raIfModel == IF_PER_FRAGMENT)
     {
-      return m_raCollisionModel;
+        return m_raCollisionModel;
     }
-  else
+    else
     {
-      return RA_COLLISION_ALWAYS_DROP_ALL_COLLIDING_PACKETS;
+        return RA_COLLISION_ALWAYS_DROP_ALL_COLLIDING_PACKETS;
     }
 }
 
 double
-SatPhyRxCarrierConf::GetRandomAccessConstantErrorRate () const
+SatPhyRxCarrierConf::GetRandomAccessConstantErrorRate() const
 {
-  return m_raConstantErrorRate;
+    return m_raConstantErrorRate;
 }
 
-
 uint32_t
-SatPhyRxCarrierConf::GetRandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize () const
+SatPhyRxCarrierConf::GetRandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize() const
 {
-  return m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize;
+    return m_randomAccessAverageNormalizedOfferedLoadMeasurementWindowSize;
 }
 
 bool
-SatPhyRxCarrierConf::IsRandomAccessDynamicLoadControlEnabled () const
+SatPhyRxCarrierConf::IsRandomAccessDynamicLoadControlEnabled() const
 {
-  return m_enableRandomAccessDynamicLoadControl;
+    return m_enableRandomAccessDynamicLoadControl;
 }
 
 } // namespace ns3

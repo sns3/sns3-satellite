@@ -18,16 +18,15 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-
 #ifndef SATELLITE_ARQ_BUFFER_CONTEXT_H_
 #define SATELLITE_ARQ_BUFFER_CONTEXT_H_
 
+#include <ns3/event-id.h>
 #include <ns3/object.h>
 #include <ns3/packet.h>
-#include <ns3/event-id.h>
 
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -38,34 +37,35 @@ namespace ns3 {
  */
 class SatArqBufferContext : public Object
 {
-public:
-  /**
-   * Default constructor.
-   */
-  SatArqBufferContext ();
-  ~SatArqBufferContext ()
-  {
-  }
+  public:
+    /**
+     * Default constructor.
+     */
+    SatArqBufferContext();
 
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId ();
+    ~SatArqBufferContext()
+    {
+    }
 
-  /**
-   * Dispose of this class instance
-   */
-  virtual void DoDispose ();
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId();
 
-public:
-  Ptr<Packet> m_pdu;
-  uint32_t    m_seqNo;
-  uint32_t    m_retransmissionCount;
-  EventId     m_waitingTimer;
-  bool        m_rxStatus;
+    /**
+     * Dispose of this class instance
+     */
+    virtual void DoDispose();
+
+  public:
+    Ptr<Packet> m_pdu;
+    uint32_t m_seqNo;
+    uint32_t m_retransmissionCount;
+    EventId m_waitingTimer;
+    bool m_rxStatus;
 };
 
-} // namespace
+} // namespace ns3
 
 #endif /* SATELLITE_ARQ_BUFFER_CONTEXT_H_ */

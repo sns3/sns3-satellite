@@ -23,8 +23,8 @@
 
 #include "satellite-mobility-model.h"
 
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -34,29 +34,29 @@ namespace ns3 {
  */
 class SatConstantPositionMobilityModel : public SatMobilityModel
 {
-public:
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
-  /**
-   * Create a position located at coordinates (0, 0, 0)
-   */
-  SatConstantPositionMobilityModel ();
+  public:
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
+    /**
+     * Create a position located at coordinates (0, 0, 0)
+     */
+    SatConstantPositionMobilityModel();
 
-  /**
-   * Destructor for SatConstantPositionMobilityModel
-   */
-  virtual ~SatConstantPositionMobilityModel ();
+    /**
+     * Destructor for SatConstantPositionMobilityModel
+     */
+    virtual ~SatConstantPositionMobilityModel();
 
-private:
-  Vector DoGetVelocity (void) const;
+  private:
+    Vector DoGetVelocity(void) const;
 
-  virtual GeoCoordinate DoGetGeoPosition (void) const;
-  virtual void DoSetGeoPosition (const GeoCoordinate &position);
+    virtual GeoCoordinate DoGetGeoPosition(void) const;
+    virtual void DoSetGeoPosition(const GeoCoordinate& position);
 
-  mutable GeoCoordinate m_geoPosition;
+    mutable GeoCoordinate m_geoPosition;
 };
 
 } // namespace ns3

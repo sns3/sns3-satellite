@@ -19,112 +19,121 @@
  */
 
 #include "satellite-loo-conf.h"
+
 #include "satellite-markov-conf.h"
+
 #include <map>
 
-namespace ns3 {
-
-NS_OBJECT_ENSURE_REGISTERED (SatLooConf);
-NS_LOG_COMPONENT_DEFINE ("SatLooConf");
-
-static const double g_LooParameters[SatMarkovConf::DEFAULT_ELEVATION_COUNT][SatMarkovConf::DEFAULT_STATE_COUNT][SatLooConf::DEFAULT_LOO_PARAMETER_COUNT] =
+namespace ns3
 {
-  /**
-   * Parameters
-   * {State 1 {direct signal mean in dB, direct signal std deviation in dB, rms squared multipath power in dB, number of direct signal oscillators, number of multipath oscillators, direct signal Doppler in Hz, multipath Doppler in Hz}
-   *  State 2 {direct signal mean in dB, direct signal std deviation in dB, rms squared multipath power in dB, number of direct signal oscillators, number of multipath oscillators, direct signal Doppler in Hz, multipath Doppler in Hz}
-   *  State 3 {direct signal mean in dB, direct signal std deviation in dB, rms squared multipath power in dB, number of direct signal oscillators, number of multipath oscillators, direct signal Doppler in Hz, multipath Doppler in Hz}}
-   */
 
-  /* Elevation 30 degrees */
-  {{  0.0, 0.5, -25.0, 10, 10, 2, 30},
-   {-10.0, 3.0, -25.0, 10, 10, 2, 30},
-   {-21.0, 4.0, -25.0, 10, 10, 2, 30}}
-};
+NS_OBJECT_ENSURE_REGISTERED(SatLooConf);
+NS_LOG_COMPONENT_DEFINE("SatLooConf");
+
+static const double g_LooParameters
+    [SatMarkovConf::DEFAULT_ELEVATION_COUNT][SatMarkovConf::DEFAULT_STATE_COUNT]
+    [SatLooConf::DEFAULT_LOO_PARAMETER_COUNT] = {
+        /**
+         * Parameters
+         * {State 1 {direct signal mean in dB, direct signal std deviation in dB, rms squared
+         * multipath power in dB, number of direct signal oscillators, number of multipath
+         * oscillators, direct signal Doppler in Hz, multipath Doppler in Hz} State 2 {direct signal
+         * mean in dB, direct signal std deviation in dB, rms squared multipath power in dB, number
+         * of direct signal oscillators, number of multipath oscillators, direct signal Doppler in
+         * Hz, multipath Doppler in Hz} State 3 {direct signal mean in dB, direct signal std
+         * deviation in dB, rms squared multipath power in dB, number of direct signal oscillators,
+         * number of multipath oscillators, direct signal Doppler in Hz, multipath Doppler in Hz}}
+         */
+
+        /* Elevation 30 degrees */
+        {{0.0, 0.5, -25.0, 10, 10, 2, 30},
+         {-10.0, 3.0, -25.0, 10, 10, 2, 30},
+         {-21.0, 4.0, -25.0, 10, 10, 2, 30}}};
 
 TypeId
-SatLooConf::GetTypeId (void)
+SatLooConf::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatLooConf")
-    .SetParent<SatBaseFaderConf> ()
-    .AddConstructor<SatLooConf> ()
-    .AddAttribute ("ElevationCount", "Number of elevation sets in the Markov model.",
-                   UintegerValue (SatMarkovConf::DEFAULT_ELEVATION_COUNT),
-                   MakeUintegerAccessor (&SatLooConf::m_elevationCount),
-                   MakeUintegerChecker<uint32_t> ())
-    .AddAttribute ("StateCount", "Number of states in the Markov model.",
-                   UintegerValue (SatMarkovConf::DEFAULT_STATE_COUNT),
-                   MakeUintegerAccessor (&SatLooConf::m_stateCount),
-                   MakeUintegerChecker<uint32_t> ());
-  return tid;
+    static TypeId tid = TypeId("ns3::SatLooConf")
+                            .SetParent<SatBaseFaderConf>()
+                            .AddConstructor<SatLooConf>()
+                            .AddAttribute("ElevationCount",
+                                          "Number of elevation sets in the Markov model.",
+                                          UintegerValue(SatMarkovConf::DEFAULT_ELEVATION_COUNT),
+                                          MakeUintegerAccessor(&SatLooConf::m_elevationCount),
+                                          MakeUintegerChecker<uint32_t>())
+                            .AddAttribute("StateCount",
+                                          "Number of states in the Markov model.",
+                                          UintegerValue(SatMarkovConf::DEFAULT_STATE_COUNT),
+                                          MakeUintegerAccessor(&SatLooConf::m_stateCount),
+                                          MakeUintegerChecker<uint32_t>());
+    return tid;
 }
 
-SatLooConf::SatLooConf ()
-  : m_elevationCount (SatMarkovConf::DEFAULT_ELEVATION_COUNT),
-  m_stateCount (SatMarkovConf::DEFAULT_STATE_COUNT)
+SatLooConf::SatLooConf()
+    : m_elevationCount(SatMarkovConf::DEFAULT_ELEVATION_COUNT),
+      m_stateCount(SatMarkovConf::DEFAULT_STATE_COUNT)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  for (uint32_t i = 0; i < m_elevationCount; i++)
+    for (uint32_t i = 0; i < m_elevationCount; i++)
     {
-      std::vector<std::vector<double> > states;
+        std::vector<std::vector<double>> states;
 
-      for (uint32_t j = 0; j < m_stateCount; j++)
+        for (uint32_t j = 0; j < m_stateCount; j++)
         {
-          std::vector<double> parameters;
+            std::vector<double> parameters;
 
-          for (uint32_t k = 0; k < SatLooConf::DEFAULT_LOO_PARAMETER_COUNT; k++)
+            for (uint32_t k = 0; k < SatLooConf::DEFAULT_LOO_PARAMETER_COUNT; k++)
             {
-              parameters.push_back (g_LooParameters[i][j][k]);
+                parameters.push_back(g_LooParameters[i][j][k]);
             }
-          states.push_back (parameters);
+            states.push_back(parameters);
         }
-      m_looParameters.push_back (states);
+        m_looParameters.push_back(states);
     }
 }
 
-SatLooConf::~SatLooConf ()
+SatLooConf::~SatLooConf()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  Reset ();
+    Reset();
 }
 
-std::vector<std::vector<double> >
-SatLooConf::GetParameters (uint32_t set)
+std::vector<std::vector<double>>
+SatLooConf::GetParameters(uint32_t set)
 {
-  NS_LOG_FUNCTION (this << set);
+    NS_LOG_FUNCTION(this << set);
 
-  if (set >= m_elevationCount)
+    if (set >= m_elevationCount)
     {
-      NS_FATAL_ERROR ("SatLooConf::GetParameters - Invalid set");
+        NS_FATAL_ERROR("SatLooConf::GetParameters - Invalid set");
     }
 
-  return m_looParameters[set];
+    return m_looParameters[set];
 }
 
 void
-SatLooConf::Reset ()
+SatLooConf::Reset()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  for (uint32_t i = 0; i < m_elevationCount; i++)
+    for (uint32_t i = 0; i < m_elevationCount; i++)
     {
-      for (uint32_t j = 0; j < m_stateCount; j++)
+        for (uint32_t j = 0; j < m_stateCount; j++)
         {
-          m_looParameters[i][j].clear ();
+            m_looParameters[i][j].clear();
         }
     }
 }
 
 void
-SatLooConf::DoDispose ()
+SatLooConf::DoDispose()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  Reset ();
-  SatBaseFaderConf::DoDispose ();
+    Reset();
+    SatBaseFaderConf::DoDispose();
 }
 
 } // namespace ns3
-

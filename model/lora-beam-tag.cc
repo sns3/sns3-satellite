@@ -18,76 +18,73 @@
  * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include <ns3/log.h>
-
 #include "lora-beam-tag.h"
 
-NS_LOG_COMPONENT_DEFINE ("LoraBeamTag");
+#include <ns3/log.h>
 
-namespace ns3 {
+NS_LOG_COMPONENT_DEFINE("LoraBeamTag");
 
-NS_OBJECT_ENSURE_REGISTERED (LoraBeamTag);
+namespace ns3
+{
+
+NS_OBJECT_ENSURE_REGISTERED(LoraBeamTag);
 
 TypeId
-LoraBeamTag::GetTypeId (void)
+LoraBeamTag::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::LoraBeamTag")
-    .SetParent<Tag> ()
-    .AddConstructor<LoraBeamTag> ()
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::LoraBeamTag").SetParent<Tag>().AddConstructor<LoraBeamTag>();
+    return tid;
 }
 
 TypeId
-LoraBeamTag::GetInstanceTypeId (void) const
+LoraBeamTag::GetInstanceTypeId(void) const
 {
-  return GetTypeId ();
+    return GetTypeId();
 }
 
-LoraBeamTag::LoraBeamTag (uint8_t beamId) :
-  m_beamId (beamId)
+LoraBeamTag::LoraBeamTag(uint8_t beamId)
+    : m_beamId(beamId)
 {
 }
 
-LoraBeamTag::~LoraBeamTag ()
+LoraBeamTag::~LoraBeamTag()
 {
 }
 
 uint32_t
-LoraBeamTag::GetSerializedSize (void) const
+LoraBeamTag::GetSerializedSize(void) const
 {
-  return 1;
+    return 1;
 }
 
 void
-LoraBeamTag::Serialize (TagBuffer i) const
+LoraBeamTag::Serialize(TagBuffer i) const
 {
-  i.WriteU8 (m_beamId);
+    i.WriteU8(m_beamId);
 }
 
 void
-LoraBeamTag::Deserialize (TagBuffer i)
+LoraBeamTag::Deserialize(TagBuffer i)
 {
-  m_beamId = i.ReadU8 ();
+    m_beamId = i.ReadU8();
 }
 
 void
-LoraBeamTag::Print (std::ostream &os) const
+LoraBeamTag::Print(std::ostream& os) const
 {
-  os << m_beamId;
+    os << m_beamId;
 }
 
 uint8_t
-LoraBeamTag::GetBeamId () const
+LoraBeamTag::GetBeamId() const
 {
-  return m_beamId;
+    return m_beamId;
 }
 
-
 void
-LoraBeamTag::SetBeamId (uint8_t beamId)
+LoraBeamTag::SetBeamId(uint8_t beamId)
 {
-  m_beamId = beamId;
+    m_beamId = beamId;
 }
 
 } // namespace ns3

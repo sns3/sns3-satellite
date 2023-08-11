@@ -21,12 +21,12 @@
 #ifndef SATELLITE_CRDSA_REPLICA_TAG_H
 #define SATELLITE_CRDSA_REPLICA_TAG_H
 
-#include <vector>
-
 #include <ns3/tag.h>
 
+#include <vector>
 
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -39,59 +39,59 @@ namespace ns3 {
  */
 class SatCrdsaReplicaTag : public Tag
 {
-public:
-  /**
-   * Default constructor.
-   */
-  SatCrdsaReplicaTag ();
+  public:
+    /**
+     * Default constructor.
+     */
+    SatCrdsaReplicaTag();
 
-  /**
-   * Destructor for SatCrdsaReplicaTag
-   */
-  ~SatCrdsaReplicaTag ();
+    /**
+     * Destructor for SatCrdsaReplicaTag
+     */
+    ~SatCrdsaReplicaTag();
 
-  void AddSlotId (uint16_t slotId);
-  std::vector<uint16_t> GetSlotIds (void);
+    void AddSlotId(uint16_t slotId);
+    std::vector<uint16_t> GetSlotIds(void);
 
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * \brief Get the type ID of instance
-   * \return the object TypeId
-   */
-  virtual TypeId GetInstanceTypeId (void) const;
+    /**
+     * \brief Get the type ID of instance
+     * \return the object TypeId
+     */
+    virtual TypeId GetInstanceTypeId(void) const;
 
-  /**
-   * Get serialized size of SatCrdsaReplicaTag
-   * \return Serialized size in bytes
-   */
-  virtual uint32_t GetSerializedSize (void) const;
+    /**
+     * Get serialized size of SatCrdsaReplicaTag
+     * \return Serialized size in bytes
+     */
+    virtual uint32_t GetSerializedSize(void) const;
 
-  /**
-   * Serializes information to buffer from this instance of SatCrdsaReplicaTag
-   * \param buffer Buffer in which the information is serialized
-   */
-  virtual void Serialize (TagBuffer buffer) const;
+    /**
+     * Serializes information to buffer from this instance of SatCrdsaReplicaTag
+     * \param buffer Buffer in which the information is serialized
+     */
+    virtual void Serialize(TagBuffer buffer) const;
 
-  /**
-   * Deserializes information from buffer to this instance of SatCrdsaReplicaTag
-   * \param buffer Buffer from which the information is deserialized
-   */
-  virtual void Deserialize (TagBuffer buffer);
+    /**
+     * Deserializes information from buffer to this instance of SatCrdsaReplicaTag
+     * \param buffer Buffer from which the information is deserialized
+     */
+    virtual void Deserialize(TagBuffer buffer);
 
-  /**
-   * Print time stamp of this instance of SatCrdsaReplicaTag
-   * \param &os Output stream to which tag timestamp is printed.
-   */
-  virtual void Print (std::ostream &os) const;
+    /**
+     * Print time stamp of this instance of SatCrdsaReplicaTag
+     * \param &os Output stream to which tag timestamp is printed.
+     */
+    virtual void Print(std::ostream& os) const;
 
-private:
-  std::vector<uint16_t> m_slotIds;
-  uint8_t m_numOfIds;
+  private:
+    std::vector<uint16_t> m_slotIds;
+    uint8_t m_numOfIds;
 };
 
 } // namespace ns3

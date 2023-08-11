@@ -23,7 +23,8 @@
 
 #include "satellite-base-fader-conf.h"
 
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -34,60 +35,60 @@ namespace ns3 {
  */
 class SatRayleighConf : public SatBaseFaderConf
 {
-public:
-  /**
-   * \brief Default Rayleigh parameter count
-   */
-  static const uint32_t DEFAULT_RAYLEIGH_PARAMETER_COUNT = 2;
+  public:
+    /**
+     * \brief Default Rayleigh parameter count
+     */
+    static const uint32_t DEFAULT_RAYLEIGH_PARAMETER_COUNT = 2;
 
-  /**
-   * \brief NS-3 function for type id
-   * \return
-   */
-  static TypeId GetTypeId (void);
+    /**
+     * \brief NS-3 function for type id
+     * \return
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * \brief Constructor
-   */
-  SatRayleighConf ();
+    /**
+     * \brief Constructor
+     */
+    SatRayleighConf();
 
-  /**
-   * \brief Destructor
-   */
-  ~SatRayleighConf ();
+    /**
+     * \brief Destructor
+     */
+    ~SatRayleighConf();
 
-  /**
-   * \brief Function for getting the Rayleigh parameters
-   * \param set parameter set
-   * \return Rayleigh parameter values
-   */
-  std::vector<std::vector<double> > GetParameters (uint32_t set);
+    /**
+     * \brief Function for getting the Rayleigh parameters
+     * \param set parameter set
+     * \return Rayleigh parameter values
+     */
+    std::vector<std::vector<double>> GetParameters(uint32_t set);
 
-  /**
-   * \brief Do needed dispose actions
-   */
-  void DoDispose ();
+    /**
+     * \brief Do needed dispose actions
+     */
+    void DoDispose();
 
-private:
-  /**
-   * \brief Clear used variables
-   */
-  void Reset ();
+  private:
+    /**
+     * \brief Clear used variables
+     */
+    void Reset();
 
-  /**
-   * \brief Number of parameters sets
-   */
-  uint32_t m_elevationCount;
+    /**
+     * \brief Number of parameters sets
+     */
+    uint32_t m_elevationCount;
 
-  /**
-   * \brief Number of states
-   */
-  uint32_t m_stateCount;
+    /**
+     * \brief Number of states
+     */
+    uint32_t m_stateCount;
 
-  /**
-   * \brief Rayleigh model parameters
-   */
-  std::vector<std::vector<std::vector<double> > > m_rayleighParameters;
+    /**
+     * \brief Rayleigh model parameters
+     */
+    std::vector<std::vector<std::vector<double>>> m_rayleighParameters;
 };
 
 } // namespace ns3

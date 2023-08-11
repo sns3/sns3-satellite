@@ -22,13 +22,13 @@
 #ifndef SATELLITE_MUTUAL_INFORMATION_TABLE_H
 #define SATELLITE_MUTUAL_INFORMATION_TABLE_H
 
+#include <ns3/object.h>
+
 #include <fstream>
 #include <vector>
 
-#include <ns3/object.h>
-
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -37,63 +37,63 @@ namespace ns3 {
  */
 class SatMutualInformationTable : public Object
 {
-public:
-  /**
-   * Constructor with initialization parameters.
-   * \param mutualInformationPath
-   */
-  SatMutualInformationTable (std::string mutualInformationPath);
+  public:
+    /**
+     * Constructor with initialization parameters.
+     * \param mutualInformationPath
+     */
+    SatMutualInformationTable(std::string mutualInformationPath);
 
-  /**
-   * Destructor for SatMutualInformationTable
-   */
-  virtual ~SatMutualInformationTable ();
+    /**
+     * Destructor for SatMutualInformationTable
+     */
+    virtual ~SatMutualInformationTable();
 
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId ();
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId();
 
-  /**
-   * \brief Get the Normalized Symbol Information corresponding to a given SNIR
-   * \param snirDb SNIR in logarithmic scale
-   * \return NormaizedSymbolInformation
-   */
-  double GetNormalizedSymbolInformation (double snirDb) const;
+    /**
+     * \brief Get the Normalized Symbol Information corresponding to a given SNIR
+     * \param snirDb SNIR in logarithmic scale
+     * \return NormaizedSymbolInformation
+     */
+    double GetNormalizedSymbolInformation(double snirDb) const;
 
-  /**
-   * \brief Get the SNIR in dB for a given Normalized Symbol Information target
-   * \param Normalized Symbol Information target (0-1)
-   * \return Es/No target in dB
-   */
-  double GetSnirDb (double symbolInformationTarget) const;
+    /**
+     * \brief Get the SNIR in dB for a given Normalized Symbol Information target
+     * \param Normalized Symbol Information target (0-1)
+     * \return Es/No target in dB
+     */
+    double GetSnirDb(double symbolInformationTarget) const;
 
-  /**
-   * \brief Get the value of beta
-   */
-  inline double GetBeta () const
-  {
-    return m_beta;
-  }
+    /**
+     * \brief Get the value of beta
+     */
+    inline double GetBeta() const
+    {
+        return m_beta;
+    }
 
-private:
-  virtual void DoDispose ();
+  private:
+    virtual void DoDispose();
 
-  /**
-   * \brief Load the mutual information
-   * \param mutualInformationPath Path to a mutual information file.
-   */
-  void Load (std::string mutualInformationPath);
+    /**
+     * \brief Load the mutual information
+     * \param mutualInformationPath Path to a mutual information file.
+     */
+    void Load(std::string mutualInformationPath);
 
-  std::vector<double> m_snirDb;
-  std::vector<double> m_symbolInformation;
-  std::ifstream *m_ifs;
+    std::vector<double> m_snirDb;
+    std::vector<double> m_symbolInformation;
+    std::ifstream* m_ifs;
 
-  /**
-   * \brief The adjusting factor beta.
-   */
-  double m_beta;
+    /**
+     * \brief The adjusting factor beta.
+     */
+    double m_beta;
 };
 
 } // end of namespace ns3

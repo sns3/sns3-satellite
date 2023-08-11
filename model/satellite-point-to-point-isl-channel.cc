@@ -18,148 +18,151 @@
  * (Based on point-to-point channel)
  * Author: Andre Aguas    March 2020
  * Adapted to SNS-3 by: Bastien Tauran <bastien.tauran@viveris.fr>
- * 
+ *
  */
 
-
 #include "ns3/satellite-point-to-point-isl-channel.h"
-#include "ns3/satellite-const-variables.h"
+
 #include "ns3/core-module.h"
+#include "ns3/satellite-const-variables.h"
 
-NS_LOG_COMPONENT_DEFINE ("PointToPointIslChannel");
+NS_LOG_COMPONENT_DEFINE("PointToPointIslChannel");
 
-namespace ns3 {
-
-NS_OBJECT_ENSURE_REGISTERED (PointToPointIslChannel);
-
-TypeId 
-PointToPointIslChannel::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::PointToPointIslChannel")
-    .SetParent<Channel> ()
-    .AddConstructor<PointToPointIslChannel> ()
-    .AddAttribute ("PropagationSpeed", "Propagation speed through the channel",
-                   DoubleValue (SatConstVariables::SPEED_OF_LIGHT),
-                   MakeDoubleAccessor (&PointToPointIslChannel::m_propagationSpeed),
-                   MakeDoubleChecker<double> ())
-  ;
-  return tid;
+
+NS_OBJECT_ENSURE_REGISTERED(PointToPointIslChannel);
+
+TypeId
+PointToPointIslChannel::GetTypeId(void)
+{
+    static TypeId tid =
+        TypeId("ns3::PointToPointIslChannel")
+            .SetParent<Channel>()
+            .AddConstructor<PointToPointIslChannel>()
+            .AddAttribute("PropagationSpeed",
+                          "Propagation speed through the channel",
+                          DoubleValue(SatConstVariables::SPEED_OF_LIGHT),
+                          MakeDoubleAccessor(&PointToPointIslChannel::m_propagationSpeed),
+                          MakeDoubleChecker<double>());
+    return tid;
 }
 
 PointToPointIslChannel::PointToPointIslChannel()
-  :
-    Channel (),
-    m_nDevices (0)
+    : Channel(),
+      m_nDevices(0)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
 void
-PointToPointIslChannel::Attach (Ptr<PointToPointIslNetDevice> device)
+PointToPointIslChannel::Attach(Ptr<PointToPointIslNetDevice> device)
 {
-  NS_LOG_FUNCTION (this << device);
+    NS_LOG_FUNCTION(this << device);
 
-  NS_ASSERT_MSG (m_nDevices < N_DEVICES, "Only two devices permitted");
-  NS_ASSERT (device != nullptr);
+    NS_ASSERT_MSG(m_nDevices < N_DEVICES, "Only two devices permitted");
+    NS_ASSERT(device != nullptr);
 
-  m_link[m_nDevices++].m_src = device;
-//
-// If we have both devices connected to the channel, then finish introducing
-// the two halves and set the links to IDLE.
-//
-  if (m_nDevices == N_DEVICES)
+    m_link[m_nDevices++].m_src = device;
+    //
+    // If we have both devices connected to the channel, then finish introducing
+    // the two halves and set the links to IDLE.
+    //
+    if (m_nDevices == N_DEVICES)
     {
-      m_link[0].m_dst = m_link[1].m_src;
-      m_link[1].m_dst = m_link[0].m_src;
-      m_link[0].m_state = IDLE;
-      m_link[1].m_state = IDLE;
+        m_link[0].m_dst = m_link[1].m_src;
+        m_link[1].m_dst = m_link[0].m_src;
+        m_link[0].m_state = IDLE;
+        m_link[1].m_state = IDLE;
     }
 }
 
 bool
-PointToPointIslChannel::TransmitStart (Ptr<const Packet> p,
-                                       Ptr<PointToPointIslNetDevice> src,
-                                       Ptr<Node> dst,
-                                       Time txTime)
+PointToPointIslChannel::TransmitStart(Ptr<const Packet> p,
+                                      Ptr<PointToPointIslNetDevice> src,
+                                      Ptr<Node> dst,
+                                      Time txTime)
 {
-  NS_LOG_FUNCTION (this << p << src);
-  NS_LOG_LOGIC ("UID is " << p->GetUid () << ")");
+    NS_LOG_FUNCTION(this << p << src);
+    NS_LOG_LOGIC("UID is " << p->GetUid() << ")");
 
-  NS_ASSERT (m_link[0].m_state != INITIALIZING);
-  NS_ASSERT (m_link[1].m_state != INITIALIZING);
+    NS_ASSERT(m_link[0].m_state != INITIALIZING);
+    NS_ASSERT(m_link[1].m_state != INITIALIZING);
 
-  Ptr<MobilityModel> senderMobility = src->GetNode()->GetObject<MobilityModel>();
-  Ptr<MobilityModel> receiverMobility = dst->GetObject<MobilityModel>();
-  Time delay = this->GetDelay(senderMobility, receiverMobility); 
+    Ptr<MobilityModel> senderMobility = src->GetNode()->GetObject<MobilityModel>();
+    Ptr<MobilityModel> receiverMobility = dst->GetObject<MobilityModel>();
+    Time delay = this->GetDelay(senderMobility, receiverMobility);
 
-  uint32_t wire = src == m_link[0].m_src ? 0 : 1;
+    uint32_t wire = src == m_link[0].m_src ? 0 : 1;
 
-  Simulator::ScheduleWithContext (m_link[wire].m_dst->GetNode()->GetId (),
-                                  txTime + delay, &PointToPointIslNetDevice::Receive,
-                                  m_link[wire].m_dst, p->Copy ());
+    Simulator::ScheduleWithContext(m_link[wire].m_dst->GetNode()->GetId(),
+                                   txTime + delay,
+                                   &PointToPointIslNetDevice::Receive,
+                                   m_link[wire].m_dst,
+                                   p->Copy());
 
-  return true;
+    return true;
 }
 
 std::size_t
-PointToPointIslChannel::GetNDevices (void) const
+PointToPointIslChannel::GetNDevices(void) const
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return m_nDevices;
+    return m_nDevices;
 }
 
 Ptr<PointToPointIslNetDevice>
-PointToPointIslChannel::GetPointToPointIslDevice (std::size_t i) const
+PointToPointIslChannel::GetPointToPointIslDevice(std::size_t i) const
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  NS_ASSERT (i < 2);
-  return m_link[i].m_src;
+    NS_ASSERT(i < 2);
+    return m_link[i].m_src;
 }
 
 Ptr<NetDevice>
-PointToPointIslChannel::GetDevice (std::size_t i) const
+PointToPointIslChannel::GetDevice(std::size_t i) const
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return GetPointToPointIslDevice (i);
+    return GetPointToPointIslDevice(i);
 }
 
 Time
-PointToPointIslChannel::GetDelay (Ptr<MobilityModel> a, Ptr<MobilityModel> b) const
+PointToPointIslChannel::GetDelay(Ptr<MobilityModel> a, Ptr<MobilityModel> b) const
 {
-  NS_LOG_FUNCTION (this << a << b);
+    NS_LOG_FUNCTION(this << a << b);
 
-  double distance = a->GetDistanceFrom (b);
-  double seconds = distance / m_propagationSpeed;
-  return Seconds (seconds);
+    double distance = a->GetDistanceFrom(b);
+    double seconds = distance / m_propagationSpeed;
+    return Seconds(seconds);
 }
 
 Ptr<PointToPointIslNetDevice>
-PointToPointIslChannel::GetSource (uint32_t i) const
+PointToPointIslChannel::GetSource(uint32_t i) const
 {
-  NS_LOG_FUNCTION (this << i);
+    NS_LOG_FUNCTION(this << i);
 
-  return m_link[i].m_src;
+    return m_link[i].m_src;
 }
 
 Ptr<PointToPointIslNetDevice>
-PointToPointIslChannel::GetDestination (uint32_t i) const
+PointToPointIslChannel::GetDestination(uint32_t i) const
 {
-  NS_LOG_FUNCTION (this << i);
+    NS_LOG_FUNCTION(this << i);
 
-  return m_link[i].m_dst;
+    return m_link[i].m_dst;
 }
 
 bool
-PointToPointIslChannel::IsInitialized (void) const
+PointToPointIslChannel::IsInitialized(void) const
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  NS_ASSERT (m_link[0].m_state != INITIALIZING);
-  NS_ASSERT (m_link[1].m_state != INITIALIZING);
-  return true;
+    NS_ASSERT(m_link[0].m_state != INITIALIZING);
+    NS_ASSERT(m_link[1].m_state != INITIALIZING);
+    return true;
 }
 
 } // namespace ns3

@@ -18,263 +18,257 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
+#include "satellite-base-encapsulator.h"
+
+#include "satellite-mac-tag.h"
+#include "satellite-queue.h"
+#include "satellite-time-tag.h"
 
 #include <ns3/log.h>
 #include <ns3/simulator.h>
 
-#include "satellite-queue.h"
-#include "satellite-time-tag.h"
-#include "satellite-mac-tag.h"
-#include "satellite-base-encapsulator.h"
+NS_LOG_COMPONENT_DEFINE("SatBaseEncapsulator");
 
-
-NS_LOG_COMPONENT_DEFINE ("SatBaseEncapsulator");
-
-namespace ns3 {
-
-
-NS_OBJECT_ENSURE_REGISTERED (SatBaseEncapsulator);
-
-SatBaseEncapsulator::SatBaseEncapsulator ()
-  : m_encapAddress (),
-  m_decapAddress (),
-  m_flowId (0)
+namespace ns3
 {
-  NS_LOG_FUNCTION (this);
-  NS_ASSERT (false);
 
-  /**
-   * Default constructor is not meant to be used!
-   */
+NS_OBJECT_ENSURE_REGISTERED(SatBaseEncapsulator);
+
+SatBaseEncapsulator::SatBaseEncapsulator()
+    : m_encapAddress(),
+      m_decapAddress(),
+      m_flowId(0)
+{
+    NS_LOG_FUNCTION(this);
+    NS_ASSERT(false);
+
+    /**
+     * Default constructor is not meant to be used!
+     */
 }
 
-SatBaseEncapsulator::SatBaseEncapsulator (Mac48Address encapAddress,
-                                          Mac48Address decapAddress,
-                                          Mac48Address sourceE2EAddress,
-                                          Mac48Address destE2EAddress,
-                                          uint8_t flowId,
-                                          uint32_t additionalHeaderSize)
-  : m_encapAddress (encapAddress),
-  m_decapAddress (decapAddress),
-  m_sourceE2EAddress (sourceE2EAddress),
-  m_destE2EAddress (destE2EAddress),
-  m_flowId (flowId),
-  m_additionalHeaderSize (additionalHeaderSize)
+SatBaseEncapsulator::SatBaseEncapsulator(Mac48Address encapAddress,
+                                         Mac48Address decapAddress,
+                                         Mac48Address sourceE2EAddress,
+                                         Mac48Address destE2EAddress,
+                                         uint8_t flowId,
+                                         uint32_t additionalHeaderSize)
+    : m_encapAddress(encapAddress),
+      m_decapAddress(decapAddress),
+      m_sourceE2EAddress(sourceE2EAddress),
+      m_destE2EAddress(destE2EAddress),
+      m_flowId(flowId),
+      m_additionalHeaderSize(additionalHeaderSize)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-SatBaseEncapsulator::~SatBaseEncapsulator ()
+SatBaseEncapsulator::~SatBaseEncapsulator()
 {
-  NS_LOG_FUNCTION (this);
-  m_txQueue = NULL;
-  m_rxCallback.Nullify ();
+    NS_LOG_FUNCTION(this);
+    m_txQueue = NULL;
+    m_rxCallback.Nullify();
 }
 
-TypeId SatBaseEncapsulator::GetTypeId (void)
+TypeId
+SatBaseEncapsulator::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatBaseEncapsulator")
-    .SetParent<Object> ()
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::SatBaseEncapsulator").SetParent<Object>();
+    return tid;
 }
 
 void
-SatBaseEncapsulator::DoDispose ()
+SatBaseEncapsulator::DoDispose()
 {
-  NS_LOG_FUNCTION (this);
-  if (m_txQueue)
+    NS_LOG_FUNCTION(this);
+    if (m_txQueue)
     {
-      m_txQueue->DoDispose ();
+        m_txQueue->DoDispose();
     }
-  m_rxCallback.Nullify ();
-  m_ctrlCallback.Nullify ();
+    m_rxCallback.Nullify();
+    m_ctrlCallback.Nullify();
 }
 
 void
-SatBaseEncapsulator::EnquePdu (Ptr<Packet> p, Mac48Address dest)
+SatBaseEncapsulator::EnquePdu(Ptr<Packet> p, Mac48Address dest)
 {
-  NS_LOG_FUNCTION (this << p->GetSize () << dest);
+    NS_LOG_FUNCTION(this << p->GetSize() << dest);
 
-  // Add flow id tag
-  SatFlowIdTag flowIdTag;
-  if (!p->PeekPacketTag (flowIdTag))
+    // Add flow id tag
+    SatFlowIdTag flowIdTag;
+    if (!p->PeekPacketTag(flowIdTag))
     {
-      flowIdTag.SetFlowId (m_flowId);
-      p->AddPacketTag (flowIdTag);
+        flowIdTag.SetFlowId(m_flowId);
+        p->AddPacketTag(flowIdTag);
     }
 
-  // Add MAC tag to identify the packet in lower layers
-  SatMacTag mTag;
-  if (!p->PeekPacketTag (mTag))
+    // Add MAC tag to identify the packet in lower layers
+    SatMacTag mTag;
+    if (!p->PeekPacketTag(mTag))
     {
-      mTag.SetDestAddress (dest);
-      mTag.SetSourceAddress (m_encapAddress);
-      p->AddPacketTag (mTag);
+        mTag.SetDestAddress(dest);
+        mTag.SetSourceAddress(m_encapAddress);
+        p->AddPacketTag(mTag);
     }
 
-  NS_LOG_INFO ("Tx Buffer: New packet added of size: " << p->GetSize ());
+    NS_LOG_INFO("Tx Buffer: New packet added of size: " << p->GetSize());
 
-  if (!m_txQueue->Enqueue (p))
+    if (!m_txQueue->Enqueue(p))
     {
-      NS_LOG_INFO ("Packet is dropped!");
+        NS_LOG_INFO("Packet is dropped!");
     }
 
-  NS_LOG_INFO ("NumPackets = " << m_txQueue->GetNPackets () );
-  NS_LOG_INFO ("NumBytes = " << m_txQueue->GetNBytes ());
+    NS_LOG_INFO("NumPackets = " << m_txQueue->GetNPackets());
+    NS_LOG_INFO("NumBytes = " << m_txQueue->GetNBytes());
 }
-
 
 Ptr<Packet>
-SatBaseEncapsulator::NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft, uint32_t &nextMinTxO)
+SatBaseEncapsulator::NotifyTxOpportunity(uint32_t bytes, uint32_t& bytesLeft, uint32_t& nextMinTxO)
 {
-  NS_LOG_FUNCTION (this << bytes);
-  NS_LOG_INFO ("TxOpportunity for flowId: " << (uint32_t) m_flowId << " of " << bytes << " bytes");
+    NS_LOG_FUNCTION(this << bytes);
+    NS_LOG_INFO("TxOpportunity for flowId: " << (uint32_t)m_flowId << " of " << bytes << " bytes");
 
-  Ptr<Packet> packet;
+    Ptr<Packet> packet;
 
-  // No packets in buffer
-  if (m_txQueue->IsEmpty ())
+    // No packets in buffer
+    if (m_txQueue->IsEmpty())
     {
-      NS_LOG_INFO ("No data pending, return NULL packet");
-      return packet;
+        NS_LOG_INFO("No data pending, return NULL packet");
+        return packet;
     }
 
-  // Peek the first PDU from the buffer.
-  Ptr<const Packet> peekPacket = m_txQueue->Peek ();
+    // Peek the first PDU from the buffer.
+    Ptr<const Packet> peekPacket = m_txQueue->Peek();
 
-  // Initialize with current packet size
-  nextMinTxO = peekPacket->GetSize ();
+    // Initialize with current packet size
+    nextMinTxO = peekPacket->GetSize();
 
-  // If control packet fits into TxO
-  if (peekPacket->GetSize () <= bytes)
+    // If control packet fits into TxO
+    if (peekPacket->GetSize() <= bytes)
     {
-      // Peek the first PDU from the buffer.
-      packet = m_txQueue->Dequeue ();
+        // Peek the first PDU from the buffer.
+        packet = m_txQueue->Dequeue();
 
-      if (!packet)
+        if (!packet)
         {
-          NS_FATAL_ERROR ("Packet not dequeued from txQueue even though the peek PDU should have been fit!");
+            NS_FATAL_ERROR(
+                "Packet not dequeued from txQueue even though the peek PDU should have been fit!");
         }
 
-      // Update bytes left
-      bytesLeft = m_txQueue->GetNBytes ();
+        // Update bytes left
+        bytesLeft = m_txQueue->GetNBytes();
 
-      // Update the next min TxO
-      Ptr<const Packet> nextPacket = m_txQueue->Peek ();
-      if (nextPacket)
+        // Update the next min TxO
+        Ptr<const Packet> nextPacket = m_txQueue->Peek();
+        if (nextPacket)
         {
-          nextMinTxO = nextPacket->GetSize ();
+            nextMinTxO = nextPacket->GetSize();
         }
-      else
+        else
         {
-          nextMinTxO = 0;
+            nextMinTxO = 0;
         }
     }
 
-  return packet;
-}
-
-
-void
-SatBaseEncapsulator::ReceivePdu (Ptr<Packet> p)
-{
-  NS_LOG_FUNCTION (this);
-
-  if (m_flowId != 0)
-    {
-      NS_ASSERT (false);
-
-      /**
-       * The base encapsulator should not be used at receiving data packets
-       * at all! This functionality is implemented in the inherited classes.
-       */
-    }
-
-  m_rxCallback (p, m_encapAddress, m_decapAddress);
-
+    return packet;
 }
 
 void
-SatBaseEncapsulator::ReceiveAck (Ptr<SatArqAckMessage> ack)
+SatBaseEncapsulator::ReceivePdu(Ptr<Packet> p)
 {
-  NS_LOG_FUNCTION (this);
-  NS_ASSERT (false);
+    NS_LOG_FUNCTION(this);
 
-  /**
-   * The base encapsulator should not be used at receiving control packets
-   * at all! This functionality is implemented in the inherited classes.
-   */
+    if (m_flowId != 0)
+    {
+        NS_ASSERT(false);
+
+        /**
+         * The base encapsulator should not be used at receiving data packets
+         * at all! This functionality is implemented in the inherited classes.
+         */
+    }
+
+    m_rxCallback(p, m_encapAddress, m_decapAddress);
+}
+
+void
+SatBaseEncapsulator::ReceiveAck(Ptr<SatArqAckMessage> ack)
+{
+    NS_LOG_FUNCTION(this);
+    NS_ASSERT(false);
+
+    /**
+     * The base encapsulator should not be used at receiving control packets
+     * at all! This functionality is implemented in the inherited classes.
+     */
 }
 
 uint32_t
-SatBaseEncapsulator::GetTxBufferSizeInBytes () const
+SatBaseEncapsulator::GetTxBufferSizeInBytes() const
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return m_txQueue->GetNBytes ();
+    return m_txQueue->GetNBytes();
 }
 
 Time
-SatBaseEncapsulator::GetHolDelay () const
+SatBaseEncapsulator::GetHolDelay() const
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  Time delay (Seconds (0.0));
+    Time delay(Seconds(0.0));
 
-  if (m_txQueue->GetNPackets () > 0)
+    if (m_txQueue->GetNPackets() > 0)
     {
-      // Peek the first PDU from the buffer.
-      Ptr<const Packet> peekPacket = m_txQueue->Peek ();
+        // Peek the first PDU from the buffer.
+        Ptr<const Packet> peekPacket = m_txQueue->Peek();
 
-      SatTimeTag timeTag;
-      peekPacket->PeekPacketTag (timeTag);
+        SatTimeTag timeTag;
+        peekPacket->PeekPacketTag(timeTag);
 
-      delay = Simulator::Now () - timeTag.GetSenderTimestamp ();
+        delay = Simulator::Now() - timeTag.GetSenderTimestamp();
     }
-  return delay;
+    return delay;
 }
 
 void
-SatBaseEncapsulator::SetReceiveCallback (ReceiveCallback cb)
+SatBaseEncapsulator::SetReceiveCallback(ReceiveCallback cb)
 {
-  NS_LOG_FUNCTION (this << &cb);
+    NS_LOG_FUNCTION(this << &cb);
 
-  m_rxCallback = cb;
+    m_rxCallback = cb;
 }
 
 void
-SatBaseEncapsulator::SetCtrlMsgCallback (SatBaseEncapsulator::SendCtrlCallback cb)
+SatBaseEncapsulator::SetCtrlMsgCallback(SatBaseEncapsulator::SendCtrlCallback cb)
 {
-  NS_LOG_FUNCTION (this << &cb);
+    NS_LOG_FUNCTION(this << &cb);
 
-  m_ctrlCallback = cb;
+    m_ctrlCallback = cb;
 }
 
 void
-SatBaseEncapsulator::SetQueue (Ptr<SatQueue> queue)
+SatBaseEncapsulator::SetQueue(Ptr<SatQueue> queue)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  m_txQueue = queue;
+    m_txQueue = queue;
 }
 
 Ptr<SatQueue>
-SatBaseEncapsulator::GetQueue ()
+SatBaseEncapsulator::GetQueue()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return m_txQueue;
+    return m_txQueue;
 }
 
 uint32_t
-SatBaseEncapsulator::GetMinTxOpportunityInBytes () const
+SatBaseEncapsulator::GetMinTxOpportunityInBytes() const
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return m_txQueue->Peek ()->GetSize ();
+    return m_txQueue->Peek()->GetSize();
 }
-
-
 
 } // namespace ns3

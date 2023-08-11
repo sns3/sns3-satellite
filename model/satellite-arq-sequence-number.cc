@@ -18,98 +18,95 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
+#include "satellite-arq-sequence-number.h"
 
 #include <ns3/log.h>
 
-#include "satellite-arq-sequence-number.h"
+NS_LOG_COMPONENT_DEFINE("SatArqSequenceNumber");
 
-
-NS_LOG_COMPONENT_DEFINE ("SatArqSequenceNumber");
-
-namespace ns3 {
-
-
-SatArqSequenceNumber::SatArqSequenceNumber ()
-  : m_seqNoMap (),
-  m_currSeqNo (-1),
-  m_windowSize (0),
-  m_maxSn (std::numeric_limits<uint8_t>::max ())
+namespace ns3
 {
-  NS_LOG_FUNCTION (this);
-  NS_ASSERT (false);
 
-  /**
-   * Default constructor is not meant to be used!
-   */
+SatArqSequenceNumber::SatArqSequenceNumber()
+    : m_seqNoMap(),
+      m_currSeqNo(-1),
+      m_windowSize(0),
+      m_maxSn(std::numeric_limits<uint8_t>::max())
+{
+    NS_LOG_FUNCTION(this);
+    NS_ASSERT(false);
+
+    /**
+     * Default constructor is not meant to be used!
+     */
 }
 
-SatArqSequenceNumber::SatArqSequenceNumber (uint8_t windowSize)
-  : m_seqNoMap (),
-  m_currSeqNo (-1),
-  m_windowSize (windowSize),
-  m_maxSn (std::numeric_limits<uint8_t>::max ())
+SatArqSequenceNumber::SatArqSequenceNumber(uint8_t windowSize)
+    : m_seqNoMap(),
+      m_currSeqNo(-1),
+      m_windowSize(windowSize),
+      m_maxSn(std::numeric_limits<uint8_t>::max())
 {
-  NS_LOG_FUNCTION (this << (uint32_t) windowSize );
+    NS_LOG_FUNCTION(this << (uint32_t)windowSize);
 }
 
 bool
-SatArqSequenceNumber::SeqNoAvailable () const
+SatArqSequenceNumber::SeqNoAvailable() const
 {
-  NS_LOG_FUNCTION (this);
-  return (m_seqNoMap.size () < m_windowSize);
+    NS_LOG_FUNCTION(this);
+    return (m_seqNoMap.size() < m_windowSize);
 }
-
 
 uint8_t
-SatArqSequenceNumber::NextSequenceNumber ()
+SatArqSequenceNumber::NextSequenceNumber()
 {
-  NS_LOG_FUNCTION (this);
-  NS_ASSERT (SeqNoAvailable ());
+    NS_LOG_FUNCTION(this);
+    NS_ASSERT(SeqNoAvailable());
 
-  m_currSeqNo++;
-  uint8_t sn = uint8_t (m_currSeqNo % m_maxSn);
-  m_seqNoMap[m_currSeqNo] = false;
+    m_currSeqNo++;
+    uint8_t sn = uint8_t(m_currSeqNo % m_maxSn);
+    m_seqNoMap[m_currSeqNo] = false;
 
-  return sn;
+    return sn;
 }
 
 void
-SatArqSequenceNumber::Release (uint8_t seqNo)
+SatArqSequenceNumber::Release(uint8_t seqNo)
 {
-  NS_LOG_FUNCTION (this << (uint32_t) seqNo);
+    NS_LOG_FUNCTION(this << (uint32_t)seqNo);
 
-  uint32_t factor = uint32_t (m_currSeqNo / m_maxSn);
-  uint32_t mod = uint32_t (m_currSeqNo % m_maxSn);
-  uint32_t sn;
+    uint32_t factor = uint32_t(m_currSeqNo / m_maxSn);
+    uint32_t mod = uint32_t(m_currSeqNo % m_maxSn);
+    uint32_t sn;
 
-  // Same seqNo window
-  if (seqNo <= mod)
+    // Same seqNo window
+    if (seqNo <= mod)
     {
-      sn = factor * m_maxSn + seqNo;
+        sn = factor * m_maxSn + seqNo;
     }
-  // Different seqNo window
-  else
+    // Different seqNo window
+    else
     {
-      sn = (factor - 1) * m_maxSn + seqNo;
+        sn = (factor - 1) * m_maxSn + seqNo;
     }
 
-  m_seqNoMap[sn] = true;
+    m_seqNoMap[sn] = true;
 
-  CleanUp ();
+    CleanUp();
 }
 
 void
-SatArqSequenceNumber::CleanUp ()
+SatArqSequenceNumber::CleanUp()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  std::map<uint32_t, bool>::iterator it = m_seqNoMap.begin ();
+    std::map<uint32_t, bool>::iterator it = m_seqNoMap.begin();
 
-  while (it != m_seqNoMap.end () && it->second == true)
+    while (it != m_seqNoMap.end() && it->second == true)
     {
-      m_seqNoMap.erase (it);
-      it = m_seqNoMap.begin ();
+        m_seqNoMap.erase(it);
+        it = m_seqNoMap.begin();
     }
 }
 
-} // namespace
+} // namespace ns3

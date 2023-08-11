@@ -24,8 +24,8 @@
 #include <ns3/mobility-model.h>
 #include <ns3/propagation-delay-model.h>
 
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -34,48 +34,47 @@ namespace ns3 {
  */
 class SatConstantPropagationDelayModel : public PropagationDelayModel
 {
-public:
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
+  public:
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * Default constructor.
-   */
-  SatConstantPropagationDelayModel ();
+    /**
+     * Default constructor.
+     */
+    SatConstantPropagationDelayModel();
 
-  /**
-   * \brief Get the propagation delay in Time
-   * \param a the source
-   * \param b the destination
-   * \returns Propagation delay.
-   */
-  virtual Time GetDelay (Ptr<MobilityModel> a, Ptr<MobilityModel> b) const;
+    /**
+     * \brief Get the propagation delay in Time
+     * \param a the source
+     * \param b the destination
+     * \returns Propagation delay.
+     */
+    virtual Time GetDelay(Ptr<MobilityModel> a, Ptr<MobilityModel> b) const;
 
-  /**
-   * \brief Get the propagation delay in Time
-   * \returns Propagation delay.
-   */
-  virtual Time GetDelay (void) const;
+    /**
+     * \brief Get the propagation delay in Time
+     * \returns Propagation delay.
+     */
+    virtual Time GetDelay(void) const;
 
-  /**
-   * Set constant propagation delay.
-   * \param delay Delay in Time.
-   */
-  void SetDelay (Time delay);
+    /**
+     * Set constant propagation delay.
+     * \param delay Delay in Time.
+     */
+    void SetDelay(Time delay);
 
-  /**
-   * DoAssignStreams need to be implemented due to inheritance from
-   * PropagationDelayModel
-   */
-  int64_t DoAssignStreams (int64_t s);
+    /**
+     * DoAssignStreams need to be implemented due to inheritance from
+     * PropagationDelayModel
+     */
+    int64_t DoAssignStreams(int64_t s);
 
-private:
-  Time m_delay;
+  private:
+    Time m_delay;
 };
-
 
 } // namespace ns3
 

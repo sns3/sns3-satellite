@@ -23,15 +23,16 @@
 #ifndef SATELLITE_CONST_VARIABLES_H
 #define SATELLITE_CONST_VARIABLES_H
 
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
  *
  * \brief SatConstVariables is used for const variable definitions in satellite module.
  */
-namespace SatConstVariables {
+namespace SatConstVariables
+{
 
 /**
  * \brief Constant definition for the speed of light in m/s

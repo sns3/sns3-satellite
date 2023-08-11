@@ -21,22 +21,22 @@
 #ifndef SATELLITE_LORAWAN_NET_DEVICE_H
 #define SATELLITE_LORAWAN_NET_DEVICE_H
 
-#include <ns3/node.h>
+#include "lorawan-mac.h"
+#include "satellite-address-tag.h"
+#include "satellite-control-message.h"
+#include "satellite-llc.h"
+#include "satellite-mac.h"
+#include "satellite-net-device.h"
+#include "satellite-node-info.h"
+#include "satellite-phy.h"
+#include "satellite-time-tag.h"
+
 #include <ns3/error-model.h>
 #include <ns3/ipv4-l3-protocol.h>
+#include <ns3/node.h>
 
-#include "satellite-phy.h"
-#include "satellite-mac.h"
-#include "satellite-llc.h"
-#include "satellite-control-message.h"
-#include "satellite-address-tag.h"
-#include "satellite-time-tag.h"
-#include "satellite-node-info.h"
-#include "satellite-net-device.h"
-#include "lorawan-mac.h"
-
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -44,56 +44,58 @@ namespace ns3 {
  */
 class SatLorawanNetDevice : public SatNetDevice
 {
-public:
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
+  public:
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * Default constructor.
-   */
-  SatLorawanNetDevice ();
+    /**
+     * Default constructor.
+     */
+    SatLorawanNetDevice();
 
-  /*
-   * \brief Receive the packet from mac layer
-   * \param packet Pointer to the packet to be received.
-   */
-  void Receive (Ptr<const Packet> packet);
+    /*
+     * \brief Receive the packet from mac layer
+     * \param packet Pointer to the packet to be received.
+     */
+    void Receive(Ptr<const Packet> packet);
 
-  virtual bool Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber);
-  bool SendControlMsg (Ptr<SatControlMessage> msg, const Address& dest);
+    virtual bool Send(Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber);
+    bool SendControlMsg(Ptr<SatControlMessage> msg, const Address& dest);
 
-  Ptr<LorawanMac> GetLorawanMac ();
-  void SetLorawanMac (Ptr<LorawanMac> lorawanMac);
+    Ptr<LorawanMac> GetLorawanMac();
+    void SetLorawanMac(Ptr<LorawanMac> lorawanMac);
 
-  typedef Callback< bool, Ptr<SatLorawanNetDevice>, Ptr<const Packet>, uint16_t, const Address & > ReceiveCallback;
+    typedef Callback<bool, Ptr<SatLorawanNetDevice>, Ptr<const Packet>, uint16_t, const Address&>
+        ReceiveCallback;
 
-  void SetReceiveNetworkServerCallback (SatLorawanNetDevice::ReceiveCallback cb);
+    void SetReceiveNetworkServerCallback(SatLorawanNetDevice::ReceiveCallback cb);
 
-  /**
-   * Method called to inform the Scheduler of a newly arrived
-   * uplink packet. This function schedules the OnReceiveWindowOpportunity
-   * events 1 and 2 seconds later.
-   */
-  //void OnReceivedPacket (Ptr<const Packet> packet);
+    /**
+     * Method called to inform the Scheduler of a newly arrived
+     * uplink packet. This function schedules the OnReceiveWindowOpportunity
+     * events 1 and 2 seconds later.
+     */
+    // void OnReceivedPacket (Ptr<const Packet> packet);
 
-  /**
-   * Method that is scheduled after packet arrivals in order to act on
-   * receive windows 1 and 2 seconds later receptions.
-   */
-  //void OnReceiveWindowOpportunity (LoraDeviceAddress deviceAddress, int window);
+    /**
+     * Method that is scheduled after packet arrivals in order to act on
+     * receive windows 1 and 2 seconds later receptions.
+     */
+    // void OnReceiveWindowOpportunity (LoraDeviceAddress deviceAddress, int window);
 
-protected:
-  /**
-   * Dispose of this class instance
-   */
-  virtual void DoDispose (void);
-private:
-  Ptr<LorawanMac> m_lorawanMac;
-  bool m_forwardToUtUsers;
-  ReceiveCallback m_rxNetworkServerCallback;
+  protected:
+    /**
+     * Dispose of this class instance
+     */
+    virtual void DoDispose(void);
+
+  private:
+    Ptr<LorawanMac> m_lorawanMac;
+    bool m_forwardToUtUsers;
+    ReceiveCallback m_rxNetworkServerCallback;
 };
 
 } // namespace ns3

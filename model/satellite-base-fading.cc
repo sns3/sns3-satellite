@@ -18,41 +18,40 @@
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
 
-#include <ns3/log.h>
-
 #include "satellite-base-fading.h"
 
+#include <ns3/log.h>
 
-NS_LOG_COMPONENT_DEFINE ("SatBaseFading");
+NS_LOG_COMPONENT_DEFINE("SatBaseFading");
 
-namespace ns3 {
+namespace ns3
+{
 
-NS_OBJECT_ENSURE_REGISTERED (SatBaseFading);
+NS_OBJECT_ENSURE_REGISTERED(SatBaseFading);
 
 TypeId
-SatBaseFading::GetTypeId (void)
+SatBaseFading::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatBaseFading")
-    .SetParent<Object> ();
-  return tid;
+    static TypeId tid = TypeId("ns3::SatBaseFading").SetParent<Object>();
+    return tid;
 }
 
-SatBaseFading::SatBaseFading ()
+SatBaseFading::SatBaseFading()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-SatBaseFading::~SatBaseFading ()
+SatBaseFading::~SatBaseFading()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
 double
-SatBaseFading::GetFading (Address macAddress, SatEnums::ChannelType_t channelType)
+SatBaseFading::GetFading(Address macAddress, SatEnums::ChannelType_t channelType)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return DoGetFading (macAddress, channelType);
+    return DoGetFading(macAddress, channelType);
 }
 
 } // namespace ns3

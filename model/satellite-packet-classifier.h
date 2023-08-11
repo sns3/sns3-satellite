@@ -18,17 +18,18 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-
 #ifndef SATELLITE_PACKET_CLASSIFIER_H_
 #define SATELLITE_PACKET_CLASSIFIER_H_
 
+#include "satellite-control-message.h"
+#include "satellite-enums.h"
+
 #include <ns3/simple-ref-count.h>
 
-#include "satellite-enums.h"
-#include "satellite-control-message.h"
+namespace ns3
+{
 
-
-namespace ns3 {
+class Packet;
 
 /**
  * \ingroup satellite
@@ -44,38 +45,38 @@ namespace ns3 {
 
 class SatPacketClassifier : public SimpleRefCount<SatPacketClassifier>
 {
-public:
-  /**
-   * Default constructor.
-   */
-  SatPacketClassifier ();
+  public:
+    /**
+     * Default constructor.
+     */
+    SatPacketClassifier();
 
-  /**
-   * Destructor for SatPacketClassifier
-   */
-  virtual ~SatPacketClassifier ();
+    /**
+     * Destructor for SatPacketClassifier
+     */
+    virtual ~SatPacketClassifier();
 
-  /**
-   * \brief Classify control message
-   * \param type Control msg type
-   * \param dest Destination address
-   * \return uint8_t Flow identifier
-   */
-  uint8_t Classify (SatControlMsgTag::SatControlMsgType_t type, const Address& dest) const;
+    /**
+     * \brief Classify control message
+     * \param type Control msg type
+     * \param dest Destination address
+     * \return uint8_t Flow identifier
+     */
+    uint8_t Classify(SatControlMsgTag::SatControlMsgType_t type, const Address& dest) const;
 
-  /**
-   * \brief Classify a packet based on IP header DSCP to a lower layer
-   * flow id.
-   * \param packet Packet to be classified
-   * \param dest Destination address
-   * \param protocolNumber Protocol number
-   * \return uint8_t Flow identifier
-   */
-  uint8_t Classify (const Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber) const;
+    /**
+     * \brief Classify a packet based on IP header DSCP to a lower layer
+     * flow id.
+     * \param packet Packet to be classified
+     * \param dest Destination address
+     * \param protocolNumber Protocol number
+     * \return uint8_t Flow identifier
+     */
+    uint8_t Classify(const Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber) const;
 
-private:
+  private:
 };
 
-}
+} // namespace ns3
 
 #endif /* SATELLITE_PACKET_CLASSIFIER_H_ */

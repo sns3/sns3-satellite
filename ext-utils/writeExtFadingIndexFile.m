@@ -25,7 +25,7 @@ close all;
 % satellite/data/ext-fadingfiles/input folders. Each fading
 % file comes with a position, which can be enforced by the
 % simulator with list position allocator and external fading
-% files in POSITION_MODE. Remember to change the folders to 
+% files in POSITION_MODE. Remember to change the folders to
 % the ones you are interested.
 % ---------------------------------------------------------
 

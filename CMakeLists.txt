@@ -398,8 +398,8 @@ set(header_files
     model/satellite-sgp4unit.h
     model/satellite-signal-parameters.h
     model/satellite-simple-channel.h
-    model/satellite-simple-net-device.h  
-    model/satellite-static-bstp.h      
+    model/satellite-simple-net-device.h
+    model/satellite-static-bstp.h
     model/satellite-superframe-allocator.h
     model/satellite-superframe-sequence.h
     model/satellite-tbtp-container.h

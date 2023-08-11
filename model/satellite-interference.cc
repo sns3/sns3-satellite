@@ -18,200 +18,204 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include <ns3/simulator.h>
-#include <ns3/log.h>
-
 #include "satellite-interference.h"
 
+#include <ns3/log.h>
+#include <ns3/simulator.h>
 
-NS_LOG_COMPONENT_DEFINE ("SatInterference");
+NS_LOG_COMPONENT_DEFINE("SatInterference");
 
-namespace ns3 {
+namespace ns3
+{
 
-SatInterference::InterferenceChangeEvent::InterferenceChangeEvent (uint32_t id, Time rxDuration, double rxPower, Address satEarthStationAddress)
-  : m_startTime (Simulator::Now ()),
-  m_endTime (m_startTime + rxDuration),
-  m_rxPower (rxPower),
-  m_id (id),
-  m_satEarthStationAddress (satEarthStationAddress)
+SatInterference::InterferenceChangeEvent::InterferenceChangeEvent(uint32_t id,
+                                                                  Time rxDuration,
+                                                                  double rxPower,
+                                                                  Address satEarthStationAddress)
+    : m_startTime(Simulator::Now()),
+      m_endTime(m_startTime + rxDuration),
+      m_rxPower(rxPower),
+      m_id(id),
+      m_satEarthStationAddress(satEarthStationAddress)
 {
 }
-SatInterference::InterferenceChangeEvent::~InterferenceChangeEvent ()
+
+SatInterference::InterferenceChangeEvent::~InterferenceChangeEvent()
 {
 }
 
 uint32_t
-SatInterference::InterferenceChangeEvent::GetId () const
+SatInterference::InterferenceChangeEvent::GetId() const
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return m_id;
+    return m_id;
 }
 
 Time
-SatInterference::InterferenceChangeEvent::GetDuration () const
+SatInterference::InterferenceChangeEvent::GetDuration() const
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return m_endTime - m_startTime;
+    return m_endTime - m_startTime;
 }
 
 Time
-SatInterference::InterferenceChangeEvent::GetStartTime () const
+SatInterference::InterferenceChangeEvent::GetStartTime() const
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return m_startTime;
+    return m_startTime;
 }
 
 Time
-SatInterference::InterferenceChangeEvent::GetEndTime () const
+SatInterference::InterferenceChangeEvent::GetEndTime() const
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return m_endTime;
+    return m_endTime;
 }
 
 double
-SatInterference::InterferenceChangeEvent::GetRxPower () const
+SatInterference::InterferenceChangeEvent::GetRxPower() const
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return m_rxPower;
+    return m_rxPower;
 }
 
 Address
-SatInterference::InterferenceChangeEvent::GetSatEarthStationAddress () const
+SatInterference::InterferenceChangeEvent::GetSatEarthStationAddress() const
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return m_satEarthStationAddress;
+    return m_satEarthStationAddress;
 }
+
 /****************************************************************
  *       The actual SatInterference
  ****************************************************************/
 
-NS_OBJECT_ENSURE_REGISTERED (SatInterference);
+NS_OBJECT_ENSURE_REGISTERED(SatInterference);
 
 TypeId
-SatInterference::GetTypeId (void)
+SatInterference::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatInterference")
-    .SetParent<Object> ();
+    static TypeId tid = TypeId("ns3::SatInterference").SetParent<Object>();
 
-  return tid;
+    return tid;
 }
 
 TypeId
-SatInterference::GetInstanceTypeId (void) const
+SatInterference::GetInstanceTypeId(void) const
 {
-  return GetTypeId ();
+    return GetTypeId();
 }
 
-SatInterference::SatInterference ()
-  : m_currentlyReceiving (0)
+SatInterference::SatInterference()
+    : m_currentlyReceiving(0)
 {
-
 }
 
-SatInterference::~SatInterference ()
+SatInterference::~SatInterference()
 {
-
 }
 
 Ptr<SatInterference::InterferenceChangeEvent>
-SatInterference::Add (Time duration, double power, Address rxAddress)
+SatInterference::Add(Time duration, double power, Address rxAddress)
 {
-  NS_LOG_FUNCTION (this << duration.GetSeconds () << power << rxAddress);
+    NS_LOG_FUNCTION(this << duration.GetSeconds() << power << rxAddress);
 
-  return DoAdd (duration, power, rxAddress);
+    return DoAdd(duration, power, rxAddress);
 }
 
-std::vector< std::pair<double, double> >
-SatInterference::Calculate (Ptr<SatInterference::InterferenceChangeEvent> event)
+std::vector<std::pair<double, double>>
+SatInterference::Calculate(Ptr<SatInterference::InterferenceChangeEvent> event)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  if (m_currentlyReceiving > 1)
+    if (m_currentlyReceiving > 1)
     {
-      std::map<Ptr<SatInterference::InterferenceChangeEvent>, bool>::iterator iter;
-      bool wasCollisionReported = true;
+        std::map<Ptr<SatInterference::InterferenceChangeEvent>, bool>::iterator iter;
+        bool wasCollisionReported = true;
 
-      for (iter = m_packetCollisions.begin (); iter != m_packetCollisions.end (); iter++)
+        for (iter = m_packetCollisions.begin(); iter != m_packetCollisions.end(); iter++)
         {
-          if (!iter->second)
+            if (!iter->second)
             {
-              wasCollisionReported = false;
+                wasCollisionReported = false;
             }
-          iter->second = true;
+            iter->second = true;
         }
-      if (!wasCollisionReported)
+        if (!wasCollisionReported)
         {
-          NS_LOG_INFO ("Packet collision!");
+            NS_LOG_INFO("Packet collision!");
         }
     }
 
-  return DoCalculate (event);
+    return DoCalculate(event);
 }
 
 void
-SatInterference::Reset ()
+SatInterference::Reset()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  m_packetCollisions.clear ();
-  m_currentlyReceiving = 0;
+    m_packetCollisions.clear();
+    m_currentlyReceiving = 0;
 
-  DoReset ();
+    DoReset();
 }
 
 void
-SatInterference::NotifyRxStart (Ptr<SatInterference::InterferenceChangeEvent> event)
+SatInterference::NotifyRxStart(Ptr<SatInterference::InterferenceChangeEvent> event)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  m_currentlyReceiving++;
+    m_currentlyReceiving++;
 
-  std::pair<std::map<Ptr<SatInterference::InterferenceChangeEvent>, bool>::iterator, bool> result;
-  result = m_packetCollisions.insert (std::make_pair (event, false));
+    std::pair<std::map<Ptr<SatInterference::InterferenceChangeEvent>, bool>::iterator, bool> result;
+    result = m_packetCollisions.insert(std::make_pair(event, false));
 
-  if (!result.second)
+    if (!result.second)
     {
-      NS_FATAL_ERROR ("SatInterference::NotifyRxStart - Event already exists");
+        NS_FATAL_ERROR("SatInterference::NotifyRxStart - Event already exists");
     }
 
-  DoNotifyRxStart (event);
+    DoNotifyRxStart(event);
 }
 
 void
-SatInterference::NotifyRxEnd (Ptr<SatInterference::InterferenceChangeEvent> event)
+SatInterference::NotifyRxEnd(Ptr<SatInterference::InterferenceChangeEvent> event)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  if (m_currentlyReceiving > 0)
+    if (m_currentlyReceiving > 0)
     {
-      m_currentlyReceiving--;
+        m_currentlyReceiving--;
     }
 
-  m_packetCollisions.erase (event);
+    m_packetCollisions.erase(event);
 
-  DoNotifyRxEnd (event);
+    DoNotifyRxEnd(event);
 }
 
 bool
-SatInterference::HasCollision (Ptr<SatInterference::InterferenceChangeEvent> event)
+SatInterference::HasCollision(Ptr<SatInterference::InterferenceChangeEvent> event)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  std::map<Ptr<SatInterference::InterferenceChangeEvent>, bool>::iterator result = m_packetCollisions.find (event);
+    std::map<Ptr<SatInterference::InterferenceChangeEvent>, bool>::iterator result =
+        m_packetCollisions.find(event);
 
-  if (result == m_packetCollisions.end ())
+    if (result == m_packetCollisions.end())
     {
-      NS_FATAL_ERROR ("SatInterference::HasCollision - Event not found");
+        NS_FATAL_ERROR("SatInterference::HasCollision - Event not found");
     }
 
-  return result->second;
+    return result->second;
 }
 
-}
+} // namespace ns3
+
 // namespace ns3

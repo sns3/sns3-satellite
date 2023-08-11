@@ -19,11 +19,11 @@
  *
  */
 
-#include "ns3/core-module.h"
-#include "ns3/satellite-module.h"
-#include "ns3/network-module.h"
-#include "ns3/internet-module.h"
 #include "ns3/applications-module.h"
+#include "ns3/core-module.h"
+#include "ns3/internet-module.h"
+#include "ns3/network-module.h"
+#include "ns3/satellite-module.h"
 #include "ns3/traffic-module.h"
 
 using namespace ns3;
@@ -54,112 +54,142 @@ using namespace ns3;
  *         execute command -> ./waf --run "sat-random-access-crdsa-collision-example --PrintHelp"
  */
 
-NS_LOG_COMPONENT_DEFINE ("sat-random-access-crdsa-collision-example");
+NS_LOG_COMPONENT_DEFINE("sat-random-access-crdsa-collision-example");
 
 int
-main (int argc, char *argv[])
+main(int argc, char* argv[])
 {
-  uint32_t beamId (1);
-  uint32_t endUsersPerUt (1);
-  uint32_t utsPerBeam (30);
-  uint32_t packetSize (20);
-  Time interval (Seconds (0.01));
-  Time simLength (Seconds (3.00));
-  Time appStartTime = Seconds (0.01);
+    uint32_t beamId(1);
+    uint32_t endUsersPerUt(1);
+    uint32_t utsPerBeam(30);
+    uint32_t packetSize(20);
+    Time interval(Seconds(0.01));
+    Time simLength(Seconds(3.00));
+    Time appStartTime = Seconds(0.01);
 
-  // Enable info logs
-  LogComponentEnable ("sat-random-access-crdsa-collision-example", LOG_LEVEL_INFO);
-  //LogComponentEnable ("SatRandomAccess", LOG_LEVEL_INFO);
-  //LogComponentEnable ("SatUtMac", LOG_LEVEL_INFO);
-  LogComponentEnable ("SatPhyRxCarrier", LOG_LEVEL_INFO);
-  LogComponentEnable ("SatInterference", LOG_LEVEL_INFO);
-  //LogComponentEnable ("SatBeamScheduler", LOG_LEVEL_INFO);
+    // Enable info logs
+    LogComponentEnable("sat-random-access-crdsa-collision-example", LOG_LEVEL_INFO);
+    // LogComponentEnable ("SatRandomAccess", LOG_LEVEL_INFO);
+    // LogComponentEnable ("SatUtMac", LOG_LEVEL_INFO);
+    LogComponentEnable("SatPhyRxCarrier", LOG_LEVEL_INFO);
+    LogComponentEnable("SatInterference", LOG_LEVEL_INFO);
+    // LogComponentEnable ("SatBeamScheduler", LOG_LEVEL_INFO);
 
-  auto sh = CreateObject<SimulationHelper> ("example-random-access-crdsa-collision");
-  Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
+    auto sh = CreateObject<SimulationHelper>("example-random-access-crdsa-collision");
+    Config::SetDefault("ns3::SatHelper::PacketTraceEnabled", BooleanValue(true));
 
-  // Read command line parameters given by user
-  CommandLine cmd;
-  cmd.AddValue ("endUsersPerUt", "Number of end users per UT", endUsersPerUt);
-  cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
-  sh->AddDefaultUiArguments (cmd);
-  cmd.Parse (argc, argv);
+    // Read command line parameters given by user
+    CommandLine cmd;
+    cmd.AddValue("endUsersPerUt", "Number of end users per UT", endUsersPerUt);
+    cmd.AddValue("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
+    sh->AddDefaultUiArguments(cmd);
+    cmd.Parse(argc, argv);
 
-  // Configure error model
-  SatPhyRxCarrierConf::ErrorModel em (SatPhyRxCarrierConf::EM_AVI);
-  Config::SetDefault ("ns3::SatUtHelper::FwdLinkErrorModel", EnumValue (em));
-  Config::SetDefault ("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue (em));
-  //Config::SetDefault ("ns3::SatUtMac::CrUpdatePeriod", TimeValue(Seconds(10.0)));
+    // Configure error model
+    SatPhyRxCarrierConf::ErrorModel em(SatPhyRxCarrierConf::EM_AVI);
+    Config::SetDefault("ns3::SatUtHelper::FwdLinkErrorModel", EnumValue(em));
+    Config::SetDefault("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue(em));
+    // Config::SetDefault ("ns3::SatUtMac::CrUpdatePeriod", TimeValue(Seconds(10.0)));
 
-  // Enable Random Access with CRDSA
-  Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_CRDSA));
+    // Enable Random Access with CRDSA
+    Config::SetDefault("ns3::SatBeamHelper::RandomAccessModel",
+                       EnumValue(SatEnums::RA_MODEL_CRDSA));
 
-  // Set Random Access interference model
-  Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceModel", EnumValue (SatPhyRxCarrierConf::IF_PER_PACKET));
+    // Set Random Access interference model
+    Config::SetDefault("ns3::SatBeamHelper::RaInterferenceModel",
+                       EnumValue(SatPhyRxCarrierConf::IF_PER_PACKET));
 
-  // Set Random Access collision model
-  Config::SetDefault ("ns3::SatBeamHelper::RaCollisionModel", EnumValue (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
+    // Set Random Access collision model
+    Config::SetDefault("ns3::SatBeamHelper::RaCollisionModel",
+                       EnumValue(SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
 
-  // Disable periodic control slots
-  Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (false));
+    // Disable periodic control slots
+    Config::SetDefault("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue(false));
 
-  // Set dynamic load control parameters
-  Config::SetDefault ("ns3::SatPhyRxCarrierConf::EnableRandomAccessDynamicLoadControl", BooleanValue (false));
-  Config::SetDefault ("ns3::SatPhyRxCarrierConf::RandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize", UintegerValue (10));
+    // Set dynamic load control parameters
+    Config::SetDefault("ns3::SatPhyRxCarrierConf::EnableRandomAccessDynamicLoadControl",
+                       BooleanValue(false));
+    Config::SetDefault(
+        "ns3::SatPhyRxCarrierConf::RandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize",
+        UintegerValue(10));
 
-  // Set random access parameters
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_MaximumUniquePayloadPerBlock", UintegerValue (3));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_MaximumConsecutiveBlockAccessed", UintegerValue (6));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_MinimumIdleBlock", UintegerValue (2));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_BackOffTimeInMilliSeconds", UintegerValue (250));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_BackOffProbability", UintegerValue (10000));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_HighLoadBackOffProbability", UintegerValue (30000));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_NumberOfInstances", UintegerValue (3));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::RaService0_AverageNormalizedOfferedLoadThreshold", DoubleValue (0.5));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DefaultControlRandomizationInterval", TimeValue (MilliSeconds (100)));
-  Config::SetDefault ("ns3::SatRandomAccessConf::CrdsaSignalingOverheadInBytes", UintegerValue (5));
-  Config::SetDefault ("ns3::SatRandomAccessConf::SlottedAlohaSignalingOverheadInBytes", UintegerValue (3));
+    // Set random access parameters
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::RaService0_MaximumUniquePayloadPerBlock",
+                       UintegerValue(3));
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::RaService0_MaximumConsecutiveBlockAccessed",
+                       UintegerValue(6));
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::RaService0_MinimumIdleBlock",
+                       UintegerValue(2));
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::RaService0_BackOffTimeInMilliSeconds",
+                       UintegerValue(250));
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::RaService0_BackOffProbability",
+                       UintegerValue(10000));
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::RaService0_HighLoadBackOffProbability",
+                       UintegerValue(30000));
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::RaService0_NumberOfInstances",
+                       UintegerValue(3));
+    Config::SetDefault(
+        "ns3::SatLowerLayerServiceConf::RaService0_AverageNormalizedOfferedLoadThreshold",
+        DoubleValue(0.5));
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::DefaultControlRandomizationInterval",
+                       TimeValue(MilliSeconds(100)));
+    Config::SetDefault("ns3::SatRandomAccessConf::CrdsaSignalingOverheadInBytes", UintegerValue(5));
+    Config::SetDefault("ns3::SatRandomAccessConf::SlottedAlohaSignalingOverheadInBytes",
+                       UintegerValue(3));
 
-  // Disable CRA and DA
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_ConstantAssignmentProvided", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_ConstantAssignmentProvided", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_RbdcAllowed", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_RbdcAllowed", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_RbdcAllowed", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_VolumeAllowed", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService1_VolumeAllowed", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService2_VolumeAllowed", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
+    // Disable CRA and DA
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided",
+                       BooleanValue(false));
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::DaService1_ConstantAssignmentProvided",
+                       BooleanValue(false));
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::DaService2_ConstantAssignmentProvided",
+                       BooleanValue(false));
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided",
+                       BooleanValue(false));
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::DaService0_RbdcAllowed",
+                       BooleanValue(false));
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::DaService1_RbdcAllowed",
+                       BooleanValue(false));
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::DaService2_RbdcAllowed",
+                       BooleanValue(false));
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed",
+                       BooleanValue(false));
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::DaService0_VolumeAllowed",
+                       BooleanValue(false));
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::DaService1_VolumeAllowed",
+                       BooleanValue(false));
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::DaService2_VolumeAllowed",
+                       BooleanValue(false));
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed",
+                       BooleanValue(false));
 
-  // Creating the reference system. Note, currently the satellite module supports
-  // only one reference system, which is named as "Scenario72". The string is utilized
-  // in mapping the scenario to the needed reference system configuration files. Arbitrary
-  // scenario name results in fatal error.
-  sh->SetSimulationTime (simLength);
-  sh->SetUserCountPerUt (endUsersPerUt);
-  sh->SetUtCountPerBeam (utsPerBeam);
-  sh->SetBeamSet ({beamId});
-  sh->CreateSatScenario ();
+    // Creating the reference system. Note, currently the satellite module supports
+    // only one reference system, which is named as "Scenario72". The string is utilized
+    // in mapping the scenario to the needed reference system configuration files. Arbitrary
+    // scenario name results in fatal error.
+    sh->SetSimulationTime(simLength);
+    sh->SetUserCountPerUt(endUsersPerUt);
+    sh->SetUtCountPerBeam(utsPerBeam);
+    sh->SetBeamSet({beamId});
+    sh->CreateSatScenario();
 
-  Config::SetDefault ("ns3::CbrApplication::Interval", TimeValue (interval));
-  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (packetSize) );
-  sh->InstallTrafficModel (
-    SimulationHelper::CBR,
-    SimulationHelper::UDP,
-    SimulationHelper::RTN_LINK,
-    appStartTime, simLength + Seconds (1), Seconds (0.05));
+    Config::SetDefault("ns3::CbrApplication::Interval", TimeValue(interval));
+    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(packetSize));
+    sh->InstallTrafficModel(SimulationHelper::CBR,
+                            SimulationHelper::UDP,
+                            SimulationHelper::RTN_LINK,
+                            appStartTime,
+                            simLength + Seconds(1),
+                            Seconds(0.05));
 
-  NS_LOG_INFO ("--- Cbr-user-defined-example ---");
-  NS_LOG_INFO ("  Packet size in bytes: " << packetSize);
-  NS_LOG_INFO ("  Packet sending interval: " << interval.GetSeconds ());
-  NS_LOG_INFO ("  Simulation length: " << simLength.GetSeconds ());
-  NS_LOG_INFO ("  Number of UTs: " << utsPerBeam);
-  NS_LOG_INFO ("  Number of end users per UT: " << endUsersPerUt);
-  NS_LOG_INFO ("  ");
+    NS_LOG_INFO("--- Cbr-user-defined-example ---");
+    NS_LOG_INFO("  Packet size in bytes: " << packetSize);
+    NS_LOG_INFO("  Packet sending interval: " << interval.GetSeconds());
+    NS_LOG_INFO("  Simulation length: " << simLength.GetSeconds());
+    NS_LOG_INFO("  Number of UTs: " << utsPerBeam);
+    NS_LOG_INFO("  Number of end users per UT: " << endUsersPerUt);
+    NS_LOG_INFO("  ");
 
-  sh->RunSimulation ();
-  return 0;
+    sh->RunSimulation();
+    return 0;
 }

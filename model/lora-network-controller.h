@@ -23,14 +23,14 @@
 #ifndef LORA_NETWORK_CONTROLLER_H
 #define LORA_NETWORK_CONTROLLER_H
 
+#include "lora-network-controller-components.h"
+#include "lora-network-status.h"
+
 #include <ns3/object.h>
 #include <ns3/packet.h>
 
-#include "lora-network-status.h"
-#include "lora-network-controller-components.h"
-
-
-namespace ns3 {
+namespace ns3
+{
 
 class LoraNetworkStatus;
 class LoraNetworkControllerComponent;
@@ -42,34 +42,34 @@ class LoraNetworkControllerComponent;
  */
 class LoraNetworkController : public Object
 {
-public:
-  static TypeId GetTypeId (void);
+  public:
+    static TypeId GetTypeId(void);
 
-  LoraNetworkController ();
-  LoraNetworkController (Ptr<LoraNetworkStatus> networkStatus);
-  virtual ~LoraNetworkController ();
+    LoraNetworkController();
+    LoraNetworkController(Ptr<LoraNetworkStatus> networkStatus);
+    virtual ~LoraNetworkController();
 
-  /**
-   * Add a new LoraNetworkControllerComponent
-   */
-  void Install (Ptr<LoraNetworkControllerComponent> component);
+    /**
+     * Add a new LoraNetworkControllerComponent
+     */
+    void Install(Ptr<LoraNetworkControllerComponent> component);
 
-  /**
-   * Method that is called by the NetworkServer when a new packet is received.
-   *
-   * \param packet The newly received packet.
-   */
-  void OnNewPacket (Ptr<Packet const> packet);
+    /**
+     * Method that is called by the NetworkServer when a new packet is received.
+     *
+     * \param packet The newly received packet.
+     */
+    void OnNewPacket(Ptr<const Packet> packet);
 
-  /**
-   * Method that is called by the NetworkScheduler just before sending a reply
-   * to a certain End Device.
-   */
-  void BeforeSendingReply (Ptr<LoraEndDeviceStatus> endDeviceStatus);
+    /**
+     * Method that is called by the NetworkScheduler just before sending a reply
+     * to a certain End Device.
+     */
+    void BeforeSendingReply(Ptr<LoraEndDeviceStatus> endDeviceStatus);
 
-private:
-  Ptr<LoraNetworkStatus> m_status;
-  std::list<Ptr<LoraNetworkControllerComponent> > m_components;
+  private:
+    Ptr<LoraNetworkStatus> m_status;
+    std::list<Ptr<LoraNetworkControllerComponent>> m_components;
 };
 
 } /* namespace ns3 */

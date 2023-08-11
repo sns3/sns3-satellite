@@ -18,84 +18,90 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include <ns3/log.h>
-#include <ns3/traced-callback.h>
-#include <ns3/boolean.h>
-#include <ns3/simulator.h>
-#include <ns3/packet.h>
-#include <ns3/traffic-time-tag.h>
 #include "satellite-on-off-application.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatOnOffApplication");
+#include <ns3/boolean.h>
+#include <ns3/log.h>
+#include <ns3/packet.h>
+#include <ns3/simulator.h>
+#include <ns3/traced-callback.h>
+#include <ns3/traffic-time-tag.h>
 
-namespace ns3 {
+NS_LOG_COMPONENT_DEFINE("SatOnOffApplication");
 
-NS_OBJECT_ENSURE_REGISTERED (SatOnOffApplication);
+namespace ns3
+{
+
+NS_OBJECT_ENSURE_REGISTERED(SatOnOffApplication);
 
 TypeId
-SatOnOffApplication::GetTypeId (void)
+SatOnOffApplication::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatOnOffApplication")
-    .SetParent<OnOffApplication> ()
-    .AddConstructor<SatOnOffApplication> ()
-    .AddAttribute ("EnableStatisticsTags",
-                   "If true, some tags will be added to each transmitted packet to assist with statistics computation",
-                   BooleanValue (false),
-                   MakeBooleanAccessor (&SatOnOffApplication::EnableStatisticTags,
-                                        &SatOnOffApplication::IsStatisticTagsEnabled),
-                   MakeBooleanChecker ())
-  ;
-  return tid;
+    static TypeId tid =
+        TypeId("ns3::SatOnOffApplication")
+            .SetParent<OnOffApplication>()
+            .AddConstructor<SatOnOffApplication>()
+            .AddAttribute("EnableStatisticsTags",
+                          "If true, some tags will be added to each transmitted packet to assist "
+                          "with statistics computation",
+                          BooleanValue(false),
+                          MakeBooleanAccessor(&SatOnOffApplication::EnableStatisticTags,
+                                              &SatOnOffApplication::IsStatisticTagsEnabled),
+                          MakeBooleanChecker());
+    return tid;
 }
 
-
-SatOnOffApplication::SatOnOffApplication ()
-  : m_isStatisticsTagsEnabled (false),
-  m_isConnectedWithTraceSource (false)
+SatOnOffApplication::SatOnOffApplication()
+    : m_isStatisticsTagsEnabled(false),
+      m_isConnectedWithTraceSource(false)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-SatOnOffApplication::~SatOnOffApplication ()
+SatOnOffApplication::~SatOnOffApplication()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-void SatOnOffApplication::EnableStatisticTags (bool enable)
+void
+SatOnOffApplication::EnableStatisticTags(bool enable)
 {
-  NS_LOG_FUNCTION (this << enable);
-  m_isStatisticsTagsEnabled = enable;
+    NS_LOG_FUNCTION(this << enable);
+    m_isStatisticsTagsEnabled = enable;
 
-  if ( m_isStatisticsTagsEnabled )
+    if (m_isStatisticsTagsEnabled)
     {
-      /*
-       * Ensure that we don't connect to the same trace source two times.
-       * Otherwise, the same tag type will be added twice, resulting in a
-       * runtime error.
-       */
-      if (!m_isConnectedWithTraceSource)
+        /*
+         * Ensure that we don't connect to the same trace source two times.
+         * Otherwise, the same tag type will be added twice, resulting in a
+         * runtime error.
+         */
+        if (!m_isConnectedWithTraceSource)
         {
-          TraceConnectWithoutContext ("Tx", MakeCallback (&SatOnOffApplication::SendPacketTrace, this) );
-          m_isConnectedWithTraceSource = true;
+            TraceConnectWithoutContext("Tx",
+                                       MakeCallback(&SatOnOffApplication::SendPacketTrace, this));
+            m_isConnectedWithTraceSource = true;
         }
     }
-  else
+    else
     {
-      TraceDisconnectWithoutContext ("Tx", MakeCallback (&SatOnOffApplication::SendPacketTrace, this) );
-      m_isConnectedWithTraceSource = false;
+        TraceDisconnectWithoutContext("Tx",
+                                      MakeCallback(&SatOnOffApplication::SendPacketTrace, this));
+        m_isConnectedWithTraceSource = false;
     }
 }
 
-bool SatOnOffApplication::IsStatisticTagsEnabled () const
+bool
+SatOnOffApplication::IsStatisticTagsEnabled() const
 {
-  return m_isStatisticsTagsEnabled;
+    return m_isStatisticsTagsEnabled;
 }
 
-void SatOnOffApplication::SendPacketTrace (Ptr<const Packet> packet)
+void
+SatOnOffApplication::SendPacketTrace(Ptr<const Packet> packet)
 {
-  // Add a TrafficTimeTag tag for packet delay computation at the receiver end.
-  packet->AddPacketTag (TrafficTimeTag (Simulator::Now ()));
+    // Add a TrafficTimeTag tag for packet delay computation at the receiver end.
+    packet->AddPacketTag(TrafficTimeTag(Simulator::Now()));
 }
 
 } // Namespace ns3
-

@@ -18,363 +18,392 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include <algorithm>
-
-#include <ns3/log.h>
-#include <ns3/enum.h>
-
-#include "satellite-utils.h"
-#include "satellite-const-variables.h"
 #include "satellite-bbframe-container.h"
 
+#include "satellite-const-variables.h"
+#include "satellite-utils.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatBbFrameContainer");
+#include <ns3/enum.h>
+#include <ns3/log.h>
 
-namespace ns3 {
+#include <algorithm>
 
-NS_OBJECT_ENSURE_REGISTERED (SatBbFrameContainer);
+NS_LOG_COMPONENT_DEFINE("SatBbFrameContainer");
 
-SatBbFrameContainer::SatBbFrameContainer ()
-  : m_totalDuration (Seconds (0)),
-  m_defaultBbFrameType (SatEnums::NORMAL_FRAME)
+namespace ns3
 {
-  NS_LOG_FUNCTION (this);
-  NS_FATAL_ERROR ("Default constructor of SatBbFrameContainer not supported.");
+
+NS_OBJECT_ENSURE_REGISTERED(SatBbFrameContainer);
+
+SatBbFrameContainer::SatBbFrameContainer()
+    : m_totalDuration(Seconds(0)),
+      m_defaultBbFrameType(SatEnums::NORMAL_FRAME)
+{
+    NS_LOG_FUNCTION(this);
+    NS_FATAL_ERROR("Default constructor of SatBbFrameContainer not supported.");
 }
 
-SatBbFrameContainer::SatBbFrameContainer (std::vector<SatEnums::SatModcod_t>& modcodsInUse, Ptr<SatBbFrameConf> conf)
-  : m_totalDuration (Seconds (0)),
-  m_bbFrameConf (conf),
-  m_maxSymbolRate (conf->GetSymbolRate ())
+SatBbFrameContainer::SatBbFrameContainer(std::vector<SatEnums::SatModcod_t>& modcodsInUse,
+                                         Ptr<SatBbFrameConf> conf)
+    : m_totalDuration(Seconds(0)),
+      m_bbFrameConf(conf),
+      m_maxSymbolRate(conf->GetSymbolRate())
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  for (std::vector<SatEnums::SatModcod_t>::const_iterator it = modcodsInUse.begin (); it != modcodsInUse.end (); it++)
+    for (std::vector<SatEnums::SatModcod_t>::const_iterator it = modcodsInUse.begin();
+         it != modcodsInUse.end();
+         it++)
     {
-      std::pair<FrameContainer_t::iterator, bool> result = m_container.insert (std::make_pair (*it, std::deque<Ptr<SatBbFrame> > ()) );
+        std::pair<FrameContainer_t::iterator, bool> result =
+            m_container.insert(std::make_pair(*it, std::deque<Ptr<SatBbFrame>>()));
 
-      if ( result.second == false )
+        if (result.second == false)
         {
-          NS_FATAL_ERROR ("Queue for MODCOD: " << *it << " already exists!!!");
+            NS_FATAL_ERROR("Queue for MODCOD: " << *it << " already exists!!!");
         }
     }
 
-  m_defaultBbFrameType = SatEnums::NORMAL_FRAME;
+    m_defaultBbFrameType = SatEnums::NORMAL_FRAME;
 
-  if (m_bbFrameConf->GetBbFrameUsageMode () == SatEnums::SHORT_FRAMES )
+    if (m_bbFrameConf->GetBbFrameUsageMode() == SatEnums::SHORT_FRAMES)
     {
-      m_defaultBbFrameType = SatEnums::SHORT_FRAME;
+        m_defaultBbFrameType = SatEnums::SHORT_FRAME;
     }
-
 }
 
-SatBbFrameContainer::~SatBbFrameContainer ()
+SatBbFrameContainer::~SatBbFrameContainer()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  m_container.clear ();
+    m_container.clear();
 }
 
 TypeId
-SatBbFrameContainer::GetTypeId (void)
+SatBbFrameContainer::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatBbFrameContainer")
-    .SetParent<Object> ()
-    .AddConstructor<SatBbFrameContainer> ()
-    .AddTraceSource ("BBFrameMergeTrace",
-                     "Trace for merged BB Frames.",
-                     MakeTraceSourceAccessor (&SatBbFrameContainer::m_bbFrameMergeTrace),
-                     "ns3::SatBbFrame::BbFrameMergeCallback")
-  ;
-  return tid;
+    static TypeId tid =
+        TypeId("ns3::SatBbFrameContainer")
+            .SetParent<Object>()
+            .AddConstructor<SatBbFrameContainer>()
+            .AddTraceSource("BBFrameMergeTrace",
+                            "Trace for merged BB Frames.",
+                            MakeTraceSourceAccessor(&SatBbFrameContainer::m_bbFrameMergeTrace),
+                            "ns3::SatBbFrame::BbFrameMergeCallback");
+    return tid;
 }
 
 SatEnums::SatModcod_t
-SatBbFrameContainer::GetModcod (uint32_t priorityClass, double cno)
+SatBbFrameContainer::GetModcod(uint32_t priorityClass, double cno)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  SatEnums::SatModcod_t modcod = m_bbFrameConf->GetDefaultModCod ();
+    SatEnums::SatModcod_t modcod = m_bbFrameConf->GetDefaultModCod();
 
-  if (priorityClass == 0)
+    if (priorityClass == 0)
     {
-      modcod = m_bbFrameConf->GetMostRobustModcod (m_defaultBbFrameType);
+        modcod = m_bbFrameConf->GetMostRobustModcod(m_defaultBbFrameType);
     }
-  else if ( std::isnan (cno) == false )
+    else if (std::isnan(cno) == false)
     {
-      modcod = m_bbFrameConf->GetBestModcod (cno, m_defaultBbFrameType);
+        modcod = m_bbFrameConf->GetBestModcod(cno, m_defaultBbFrameType);
     }
 
-  return modcod;
+    return modcod;
 }
 
 uint32_t
-SatBbFrameContainer::GetMaxFramePayloadInBytes (uint32_t priorityClass, SatEnums::SatModcod_t modcod)
+SatBbFrameContainer::GetMaxFramePayloadInBytes(uint32_t priorityClass, SatEnums::SatModcod_t modcod)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  uint32_t payloadBytes = 0;
+    uint32_t payloadBytes = 0;
 
-  if ( priorityClass > 0)
+    if (priorityClass > 0)
     {
-      payloadBytes = m_bbFrameConf->GetBbFramePayloadBits (modcod, m_defaultBbFrameType) / SatConstVariables::BITS_PER_BYTE;
+        payloadBytes = m_bbFrameConf->GetBbFramePayloadBits(modcod, m_defaultBbFrameType) /
+                       SatConstVariables::BITS_PER_BYTE;
     }
-  else
+    else
     {
-      payloadBytes = m_bbFrameConf->GetBbFramePayloadBits (m_bbFrameConf->GetMostRobustModcod (m_defaultBbFrameType), m_defaultBbFrameType) / SatConstVariables::BITS_PER_BYTE;
+        payloadBytes = m_bbFrameConf->GetBbFramePayloadBits(
+                           m_bbFrameConf->GetMostRobustModcod(m_defaultBbFrameType),
+                           m_defaultBbFrameType) /
+                       SatConstVariables::BITS_PER_BYTE;
     }
 
-  return payloadBytes;
+    return payloadBytes;
 }
 
 uint32_t
-SatBbFrameContainer::GetBytesLeftInTailFrame (uint32_t priorityClass, SatEnums::SatModcod_t modcod)
+SatBbFrameContainer::GetBytesLeftInTailFrame(uint32_t priorityClass, SatEnums::SatModcod_t modcod)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  uint32_t bytesLeft = GetMaxFramePayloadInBytes (priorityClass, modcod);
+    uint32_t bytesLeft = GetMaxFramePayloadInBytes(priorityClass, modcod);
 
-  if ( priorityClass > 0)
+    if (priorityClass > 0)
     {
-      if ( m_container.at (modcod).empty () != true )
+        if (m_container.at(modcod).empty() != true)
         {
-          bytesLeft -= m_container.at (modcod).back ()->GetSpaceUsedInBytes ();
+            bytesLeft -= m_container.at(modcod).back()->GetSpaceUsedInBytes();
         }
-      else
+        else
         {
-          bytesLeft -= m_bbFrameConf->GetBbFrameHeaderSizeInBytes ();
+            bytesLeft -= m_bbFrameConf->GetBbFrameHeaderSizeInBytes();
         }
     }
-  else
+    else
     {
-      if ( m_ctrlContainer.empty () != true )
+        if (m_ctrlContainer.empty() != true)
         {
-          bytesLeft -= m_ctrlContainer.back ()->GetSpaceUsedInBytes ();
+            bytesLeft -= m_ctrlContainer.back()->GetSpaceUsedInBytes();
         }
-      else
+        else
         {
-          bytesLeft -= m_bbFrameConf->GetBbFrameHeaderSizeInBytes ();
+            bytesLeft -= m_bbFrameConf->GetBbFrameHeaderSizeInBytes();
         }
     }
 
-  return bytesLeft;
+    return bytesLeft;
 }
 
 bool
-SatBbFrameContainer::IsEmpty (uint32_t priorityClass, SatEnums::SatModcod_t modcod)
+SatBbFrameContainer::IsEmpty(uint32_t priorityClass, SatEnums::SatModcod_t modcod)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  if ( priorityClass > 0)
+    if (priorityClass > 0)
     {
-      return m_container.at (modcod).empty ();
+        return m_container.at(modcod).empty();
     }
-  else
+    else
     {
-      return m_ctrlContainer.empty ();
+        return m_ctrlContainer.empty();
     }
 }
 
 void
-SatBbFrameContainer::AddData (uint32_t priorityClass, SatEnums::SatModcod_t modcod, Ptr<Packet> data)
+SatBbFrameContainer::AddData(uint32_t priorityClass, SatEnums::SatModcod_t modcod, Ptr<Packet> data)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  if ( priorityClass > 0)
+    if (priorityClass > 0)
     {
-      if ( (m_container.at (modcod).empty ()) || (GetBytesLeftInTailFrame (priorityClass, modcod) < data->GetSize ()))
+        if ((m_container.at(modcod).empty()) ||
+            (GetBytesLeftInTailFrame(priorityClass, modcod) < data->GetSize()))
         {
-          CreateFrameToTail (priorityClass, modcod);
+            CreateFrameToTail(priorityClass, modcod);
         }
-      else if ( ( m_bbFrameConf->GetBbFrameUsageMode () == SatEnums::SHORT_AND_NORMAL_FRAMES )
-                && ( m_container.at (modcod).back ()->GetFrameType () == SatEnums::SHORT_FRAME ) )
+        else if ((m_bbFrameConf->GetBbFrameUsageMode() == SatEnums::SHORT_AND_NORMAL_FRAMES) &&
+                 (m_container.at(modcod).back()->GetFrameType() == SatEnums::SHORT_FRAME))
         {
-          m_totalDuration += m_container.at (modcod).back ()->Extend (m_bbFrameConf);
+            m_totalDuration += m_container.at(modcod).back()->Extend(m_bbFrameConf);
         }
-      m_container.at (modcod).back ()->AddPayload (data);
-
+        m_container.at(modcod).back()->AddPayload(data);
     }
-  else
+    else
     {
-      if ( m_ctrlContainer.empty ()
-           || GetBytesLeftInTailFrame (priorityClass, modcod) < data->GetSize () )
+        if (m_ctrlContainer.empty() ||
+            GetBytesLeftInTailFrame(priorityClass, modcod) < data->GetSize())
         {
-          // create and add frame to tail
-          CreateFrameToTail (priorityClass, m_bbFrameConf->GetMostRobustModcod (m_defaultBbFrameType) );
+            // create and add frame to tail
+            CreateFrameToTail(priorityClass,
+                              m_bbFrameConf->GetMostRobustModcod(m_defaultBbFrameType));
         }
-      else if ( ( m_bbFrameConf->GetBbFrameUsageMode () == SatEnums::SHORT_AND_NORMAL_FRAMES )
-                && ( m_container.at (modcod).back ()->GetFrameType () == SatEnums::SHORT_FRAME ) )
+        else if ((m_bbFrameConf->GetBbFrameUsageMode() == SatEnums::SHORT_AND_NORMAL_FRAMES) &&
+                 (m_container.at(modcod).back()->GetFrameType() == SatEnums::SHORT_FRAME))
         {
-          m_totalDuration += m_ctrlContainer.back ()->Extend (m_bbFrameConf);
+            m_totalDuration += m_ctrlContainer.back()->Extend(m_bbFrameConf);
         }
-      m_ctrlContainer.back ()->AddPayload (data);
+        m_ctrlContainer.back()->AddPayload(data);
     }
 }
 
 Time
-SatBbFrameContainer::GetTotalDuration () const
+SatBbFrameContainer::GetTotalDuration() const
 {
-  return m_totalDuration;
+    return m_totalDuration;
 }
 
 uint32_t
-SatBbFrameContainer::GetFrameSymbols (SatEnums::SatModcod_t modcod)
+SatBbFrameContainer::GetFrameSymbols(SatEnums::SatModcod_t modcod)
 {
-  return m_bbFrameConf->GetBbFrameDuration (modcod, m_defaultBbFrameType).GetSeconds () * m_bbFrameConf->GetSymbolRate ();
+    return m_bbFrameConf->GetBbFrameDuration(modcod, m_defaultBbFrameType).GetSeconds() *
+           m_bbFrameConf->GetSymbolRate();
 }
 
 void
-SatBbFrameContainer::SetMaxSymbolRate (uint32_t maxSymbolRate)
+SatBbFrameContainer::SetMaxSymbolRate(uint32_t maxSymbolRate)
 {
-  m_maxSymbolRate = maxSymbolRate;
+    m_maxSymbolRate = maxSymbolRate;
 }
 
 uint32_t
-SatBbFrameContainer::GetMaxSymbolRate ()
+SatBbFrameContainer::GetMaxSymbolRate()
 {
-  return m_maxSymbolRate;
+    return m_maxSymbolRate;
 }
 
 Ptr<SatBbFrame>
-SatBbFrameContainer::GetNextFrame ()
+SatBbFrameContainer::GetNextFrame()
 {
-  Ptr<SatBbFrame> nextFrame = NULL;
+    Ptr<SatBbFrame> nextFrame = NULL;
 
-  if ( m_ctrlContainer.empty () == false )
+    if (m_ctrlContainer.empty() == false)
     {
-      nextFrame = m_ctrlContainer.front ();
-      m_ctrlContainer.pop_front ();
-      m_totalDuration -= nextFrame->GetDuration ();
+        nextFrame = m_ctrlContainer.front();
+        m_ctrlContainer.pop_front();
+        m_totalDuration -= nextFrame->GetDuration();
     }
-  else
+    else
     {
-      std::vector< std::deque<Ptr<SatBbFrame> >* > nonEmptyQueues;
+        std::vector<std::deque<Ptr<SatBbFrame>>*> nonEmptyQueues;
 
-      for (FrameContainer_t::iterator it = m_container.begin (); it != m_container.end (); ++it )
+        for (FrameContainer_t::iterator it = m_container.begin(); it != m_container.end(); ++it)
         {
-          if ( (*it).second.empty () == false )
+            if ((*it).second.empty() == false)
             {
-              nonEmptyQueues.push_back (&it->second);
+                nonEmptyQueues.push_back(&it->second);
             }
         }
 
-      if ( nonEmptyQueues.empty () == false )
+        if (nonEmptyQueues.empty() == false)
         {
-          std::random_shuffle ( nonEmptyQueues.begin (), nonEmptyQueues.end ());
+            std::random_shuffle(nonEmptyQueues.begin(), nonEmptyQueues.end());
 
-          nextFrame = (*nonEmptyQueues.begin ())->front ();
-          (*nonEmptyQueues.begin ())->pop_front ();
-          m_totalDuration -= nextFrame->GetDuration ();
+            nextFrame = (*nonEmptyQueues.begin())->front();
+            (*nonEmptyQueues.begin())->pop_front();
+            m_totalDuration -= nextFrame->GetDuration();
         }
     }
 
-  return nextFrame;
+    return nextFrame;
 }
 
 void
-SatBbFrameContainer::CreateFrameToTail (uint32_t priorityClass, SatEnums::SatModcod_t modcod)
+SatBbFrameContainer::CreateFrameToTail(uint32_t priorityClass, SatEnums::SatModcod_t modcod)
 {
-  NS_LOG_FUNCTION (this << modcod );
+    NS_LOG_FUNCTION(this << modcod);
 
-  Ptr<SatBbFrame> frame = Create<SatBbFrame> (modcod, m_defaultBbFrameType, m_bbFrameConf);
+    Ptr<SatBbFrame> frame = Create<SatBbFrame>(modcod, m_defaultBbFrameType, m_bbFrameConf);
 
-  if ( frame != NULL )
+    if (frame != NULL)
     {
-      if ( priorityClass > 0)
+        if (priorityClass > 0)
         {
-          m_container.at (modcod).push_back (frame);
+            m_container.at(modcod).push_back(frame);
         }
-      else
+        else
         {
-          m_ctrlContainer.push_back (frame);
+            m_ctrlContainer.push_back(frame);
         }
 
-      m_totalDuration += frame->GetDuration ();
+        m_totalDuration += frame->GetDuration();
     }
-  else
+    else
     {
-      NS_FATAL_ERROR ("BB Frame creation failed!!!");
+        NS_FATAL_ERROR("BB Frame creation failed!!!");
     }
 }
 
 void
-SatBbFrameContainer::MergeBbFrames (double carrierBandwidthInHz)
+SatBbFrameContainer::MergeBbFrames(double carrierBandwidthInHz)
 {
-  // go through all BB Frame containers from the most efficient to the robust
-  for (FrameContainer_t::reverse_iterator itFromMerge = m_container.rbegin (); itFromMerge != m_container.rend (); itFromMerge++ )
+    // go through all BB Frame containers from the most efficient to the robust
+    for (FrameContainer_t::reverse_iterator itFromMerge = m_container.rbegin();
+         itFromMerge != m_container.rend();
+         itFromMerge++)
     {
-      // BB Frames currently exists in the BB Frame container for this MODCOD.
-      if ( itFromMerge->second.empty () == false )
+        // BB Frames currently exists in the BB Frame container for this MODCOD.
+        if (itFromMerge->second.empty() == false)
         {
-          // Get occupancy i.e. ratio of used space to maximum space in buffer at the back of the list.
-          // Occupancy is not necessarily efficiency.
-          double occupancy = itFromMerge->second.back ()->GetOccupancy ();
+            // Get occupancy i.e. ratio of used space to maximum space in buffer at the back of the
+            // list. Occupancy is not necessarily efficiency.
+            double occupancy = itFromMerge->second.back()->GetOccupancy();
 
-          // GetBbFrameHighOccupancyThreshold () returns a configured parameter. Part of a high-low threshold hysteresis damper.
-          // Current occupancy is no good. Need to off load the contents to some other BB Frame.
-          if (occupancy < m_bbFrameConf->GetBbFrameHighOccupancyThreshold ())
+            // GetBbFrameHighOccupancyThreshold () returns a configured parameter. Part of a
+            // high-low threshold hysteresis damper. Current occupancy is no good. Need to off load
+            // the contents to some other BB Frame.
+            if (occupancy < m_bbFrameConf->GetBbFrameHighOccupancyThreshold())
             {
-              // weighted occupancy takes into account the spectra efficiency of the current frame (MODCOD and frame length).
-              double weightedOccupancy = itFromMerge->second.back ()->GetSpectralEfficiency (carrierBandwidthInHz) * occupancy;
+                // weighted occupancy takes into account the spectra efficiency of the current frame
+                // (MODCOD and frame length).
+                double weightedOccupancy =
+                    itFromMerge->second.back()->GetSpectralEfficiency(carrierBandwidthInHz) *
+                    occupancy;
 
-              double maxNewOccupancyIfMerged = 0.0; // holder variable during a maximum value search
-              Ptr<SatBbFrame> frameToMerge = NULL;  // holder variable for frame to potentially merge
+                double maxNewOccupancyIfMerged =
+                    0.0; // holder variable during a maximum value search
+                Ptr<SatBbFrame> frameToMerge =
+                    NULL; // holder variable for frame to potentially merge
 
-              // check rest of the containers to find frame to merge.
-              for ( FrameContainer_t::reverse_iterator itToMerge = ++FrameContainer_t::reverse_iterator (itFromMerge); itToMerge != m_container.rend (); itToMerge++ )
+                // check rest of the containers to find frame to merge.
+                for (FrameContainer_t::reverse_iterator itToMerge =
+                         ++FrameContainer_t::reverse_iterator(itFromMerge);
+                     itToMerge != m_container.rend();
+                     itToMerge++)
                 {
-                  // BB Frames currently exists in the BB Frame container for this MODCOD.
-                  if (itToMerge->second.empty () == false)
+                    // BB Frames currently exists in the BB Frame container for this MODCOD.
+                    if (itToMerge->second.empty() == false)
                     {
-                      /* check whether there is enough space in the frame */
-                      // GetBbFrameLowOccupancyThreshold() returns a configured parameter. Part of a high-low threshold hysteresis damper.
-                      // Current occupancy is no good. Need to fill in more.
-                      double occupancy2 = itToMerge->second.back ()->GetOccupancy ();
+                        /* check whether there is enough space in the frame */
+                        // GetBbFrameLowOccupancyThreshold() returns a configured parameter. Part of
+                        // a high-low threshold hysteresis damper. Current occupancy is no good.
+                        // Need to fill in more.
+                        double occupancy2 = itToMerge->second.back()->GetOccupancy();
 
-                      if (occupancy2 < m_bbFrameConf->GetBbFrameLowOccupancyThreshold ())
+                        if (occupancy2 < m_bbFrameConf->GetBbFrameLowOccupancyThreshold())
                         {
-                          Ptr<SatBbFrame> frame = itFromMerge->second.back ();
+                            Ptr<SatBbFrame> frame = itFromMerge->second.back();
 
-                          double newOccupancyIfMerged = itToMerge->second.back ()->GetOccupancyIfMerged (frame);
+                            double newOccupancyIfMerged =
+                                itToMerge->second.back()->GetOccupancyIfMerged(frame);
 
-                          if (newOccupancyIfMerged > maxNewOccupancyIfMerged)
+                            if (newOccupancyIfMerged > maxNewOccupancyIfMerged)
                             {
-                              maxNewOccupancyIfMerged = newOccupancyIfMerged;
-                              frameToMerge = itToMerge->second.back ();
+                                maxNewOccupancyIfMerged = newOccupancyIfMerged;
+                                frameToMerge = itToMerge->second.back();
                             }
                         }
                     }
                 }
 
-              // check control message container tail still, if it is not empty and MODCOD match
-              // control messages are used default MODCOD
-              if ( ( m_ctrlContainer.empty () == false ) && ( m_ctrlContainer.back ()->GetModcod () <= itFromMerge->first ) )
+                // check control message container tail still, if it is not empty and MODCOD match
+                // control messages are used default MODCOD
+                if ((m_ctrlContainer.empty() == false) &&
+                    (m_ctrlContainer.back()->GetModcod() <= itFromMerge->first))
                 {
-                  if (m_ctrlContainer.back ()->GetOccupancy () < m_bbFrameConf->GetBbFrameLowOccupancyThreshold ())
+                    if (m_ctrlContainer.back()->GetOccupancy() <
+                        m_bbFrameConf->GetBbFrameLowOccupancyThreshold())
                     {
-                      double newOccupancyIfMerged = m_ctrlContainer.back ()->GetOccupancyIfMerged (itFromMerge->second.back ());
+                        double newOccupancyIfMerged = m_ctrlContainer.back()->GetOccupancyIfMerged(
+                            itFromMerge->second.back());
 
-                      if (newOccupancyIfMerged > maxNewOccupancyIfMerged)
+                        if (newOccupancyIfMerged > maxNewOccupancyIfMerged)
                         {
-                          maxNewOccupancyIfMerged = newOccupancyIfMerged;
-                          frameToMerge = m_ctrlContainer.back ();
+                            maxNewOccupancyIfMerged = newOccupancyIfMerged;
+                            frameToMerge = m_ctrlContainer.back();
                         }
                     }
                 }
 
-              // frame found where merging can be tried
-              if ( frameToMerge )
+                // frame found where merging can be tried
+                if (frameToMerge)
                 {
-                  double newWeightedOccupancyIfMerged = frameToMerge->GetSpectralEfficiency (carrierBandwidthInHz) * maxNewOccupancyIfMerged;
+                    double newWeightedOccupancyIfMerged =
+                        frameToMerge->GetSpectralEfficiency(carrierBandwidthInHz) *
+                        maxNewOccupancyIfMerged;
 
-                  if ( newWeightedOccupancyIfMerged > weightedOccupancy )
+                    if (newWeightedOccupancyIfMerged > weightedOccupancy)
                     {
-                      // Merge two frames
+                        // Merge two frames
 
-                      if ( frameToMerge->MergeWithFrame (itFromMerge->second.back (), m_bbFrameMergeTrace) )
+                        if (frameToMerge->MergeWithFrame(itFromMerge->second.back(),
+                                                         m_bbFrameMergeTrace))
                         {
-                          m_totalDuration -= itFromMerge->second.back ()->GetDuration ();
-                          itFromMerge->second.pop_back ();
+                            m_totalDuration -= itFromMerge->second.back()->GetDuration();
+                            itFromMerge->second.pop_back();
                         }
                     }
                 }
@@ -382,25 +411,26 @@ SatBbFrameContainer::MergeBbFrames (double carrierBandwidthInHz)
         }
     }
 
-  // if both short and normal frames are used then try to shrink normal frames
-  // which are last ones in containers
-  if ( m_bbFrameConf->GetBbFrameUsageMode () == SatEnums::SHORT_AND_NORMAL_FRAMES )
+    // if both short and normal frames are used then try to shrink normal frames
+    // which are last ones in containers
+    if (m_bbFrameConf->GetBbFrameUsageMode() == SatEnums::SHORT_AND_NORMAL_FRAMES)
     {
-      // go through all MODCOD based BB Frame containers and try to shrink last frame in the container
-      for (FrameContainer_t::reverse_iterator it = m_container.rbegin (); it != m_container.rend (); it++ )
+        // go through all MODCOD based BB Frame containers and try to shrink last frame in the
+        // container
+        for (FrameContainer_t::reverse_iterator it = m_container.rbegin(); it != m_container.rend();
+             it++)
         {
-          if ( it->second.empty () == false)
+            if (it->second.empty() == false)
             {
-              m_totalDuration -= it->second.back ()->Shrink (m_bbFrameConf);
+                m_totalDuration -= it->second.back()->Shrink(m_bbFrameConf);
             }
         }
 
-      if ( m_ctrlContainer.empty () == false )
+        if (m_ctrlContainer.empty() == false)
         {
-          m_totalDuration -= m_ctrlContainer.back ()->Shrink (m_bbFrameConf);
+            m_totalDuration -= m_ctrlContainer.back()->Shrink(m_bbFrameConf);
         }
     }
 }
-
 
 } // namespace ns3

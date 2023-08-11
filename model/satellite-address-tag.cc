@@ -19,94 +19,83 @@
  */
 
 #include "satellite-address-tag.h"
+
 #include <ns3/log.h>
 
-NS_LOG_COMPONENT_DEFINE ("SatAddressTag");
+NS_LOG_COMPONENT_DEFINE("SatAddressTag");
 
-namespace ns3 {
-
-NS_OBJECT_ENSURE_REGISTERED (SatAddressTag);
-
-
-SatAddressTag::SatAddressTag ()
-  : Tag ()
+namespace ns3
 {
-  NS_LOG_FUNCTION (this);
+
+NS_OBJECT_ENSURE_REGISTERED(SatAddressTag);
+
+SatAddressTag::SatAddressTag()
+    : Tag()
+{
+    NS_LOG_FUNCTION(this);
 }
 
-
-SatAddressTag::SatAddressTag (Address addr)
-  : Tag (),
-  m_sourceAddress (addr)
+SatAddressTag::SatAddressTag(Address addr)
+    : Tag(),
+      m_sourceAddress(addr)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
-
 
 TypeId
-SatAddressTag::GetTypeId (void)
+SatAddressTag::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatAddressTag")
-    .SetParent<Tag> ()
-    .AddConstructor<SatAddressTag> ()
-  ;
-  return tid;
+    static TypeId tid =
+        TypeId("ns3::SatAddressTag").SetParent<Tag>().AddConstructor<SatAddressTag>();
+    return tid;
 }
-
 
 TypeId
-SatAddressTag::GetInstanceTypeId () const
+SatAddressTag::GetInstanceTypeId() const
 {
-  return GetTypeId ();
+    return GetTypeId();
 }
-
 
 uint32_t
-SatAddressTag::GetSerializedSize () const
+SatAddressTag::GetSerializedSize() const
 {
-  return m_sourceAddress.GetSerializedSize ();
+    return m_sourceAddress.GetSerializedSize();
 }
-
 
 void
-SatAddressTag::Serialize (TagBuffer i) const
+SatAddressTag::Serialize(TagBuffer i) const
 {
-  NS_LOG_FUNCTION (this << &i);
+    NS_LOG_FUNCTION(this << &i);
 
-  m_sourceAddress.Serialize (i);
+    m_sourceAddress.Serialize(i);
 }
-
 
 void
-SatAddressTag::Deserialize (TagBuffer i)
+SatAddressTag::Deserialize(TagBuffer i)
 {
-  NS_LOG_FUNCTION (this << &i);
+    NS_LOG_FUNCTION(this << &i);
 
-  m_sourceAddress.Deserialize (i);
+    m_sourceAddress.Deserialize(i);
 }
-
 
 void
-SatAddressTag::Print (std::ostream &os) const
+SatAddressTag::Print(std::ostream& os) const
 {
-  NS_LOG_FUNCTION (this << &os);
-  os << "(SourceAddress=" << m_sourceAddress << ")";
+    NS_LOG_FUNCTION(this << &os);
+    os << "(SourceAddress=" << m_sourceAddress << ")";
 }
-
 
 void
-SatAddressTag::SetSourceAddress (Address addr)
+SatAddressTag::SetSourceAddress(Address addr)
 {
-  NS_LOG_FUNCTION (this << addr);
-  m_sourceAddress = addr;
+    NS_LOG_FUNCTION(this << addr);
+    m_sourceAddress = addr;
 }
-
 
 Address
-SatAddressTag::GetSourceAddress () const
+SatAddressTag::GetSourceAddress() const
 {
-  return m_sourceAddress;
+    return m_sourceAddress;
 }
-
 
 } // namespace ns3

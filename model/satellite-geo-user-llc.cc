@@ -18,150 +18,158 @@
  * Author: Bastien TAURAN <bastien.tauran@viveris.fr>
  */
 
-#include "satellite-return-link-encapsulator.h"
-#include "satellite-return-link-encapsulator-arq.h"
-#include "satellite-generic-stream-encapsulator.h"
-#include "satellite-generic-stream-encapsulator-arq.h"
-
 #include "satellite-geo-user-llc.h"
 
+#include "satellite-generic-stream-encapsulator-arq.h"
+#include "satellite-generic-stream-encapsulator.h"
+#include "satellite-return-link-encapsulator-arq.h"
+#include "satellite-return-link-encapsulator.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatGeoUserLlc");
+NS_LOG_COMPONENT_DEFINE("SatGeoUserLlc");
 
-namespace ns3 {
+namespace ns3
+{
 
-NS_OBJECT_ENSURE_REGISTERED (SatGeoUserLlc);
+NS_OBJECT_ENSURE_REGISTERED(SatGeoUserLlc);
 
 TypeId
-SatGeoUserLlc::GetTypeId (void)
+SatGeoUserLlc::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatGeoUserLlc")
-    .SetParent<SatGeoLlc> ()
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::SatGeoUserLlc").SetParent<SatGeoLlc>();
+    return tid;
 }
 
-SatGeoUserLlc::SatGeoUserLlc ()
- : SatGeoLlc ()
+SatGeoUserLlc::SatGeoUserLlc()
+    : SatGeoLlc()
 {
-  NS_LOG_FUNCTION (this);
-  NS_ASSERT (false); // this version of the constructor should not been used
+    NS_LOG_FUNCTION(this);
+    NS_ASSERT(false); // this version of the constructor should not been used
 }
 
-SatGeoUserLlc::SatGeoUserLlc (SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
-                              SatEnums::RegenerationMode_t returnLinkRegenerationMode)
- : SatGeoLlc (forwardLinkRegenerationMode, returnLinkRegenerationMode)
+SatGeoUserLlc::SatGeoUserLlc(SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                             SatEnums::RegenerationMode_t returnLinkRegenerationMode)
+    : SatGeoLlc(forwardLinkRegenerationMode, returnLinkRegenerationMode)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-SatGeoUserLlc::~SatGeoUserLlc ()
+SatGeoUserLlc::~SatGeoUserLlc()
 {
-  NS_LOG_FUNCTION (this);
-}
-
-void
-SatGeoUserLlc::DoDispose ()
-{
-  Object::DoDispose ();
+    NS_LOG_FUNCTION(this);
 }
 
 void
-SatGeoUserLlc::CreateEncap (Ptr<EncapKey> key)
+SatGeoUserLlc::DoDispose()
 {
-  NS_LOG_FUNCTION (this << key->m_encapAddress << key->m_decapAddress << (uint32_t)(key->m_flowId));
+    Object::DoDispose();
+}
 
-  Ptr<SatBaseEncapsulator> userEncap;
+void
+SatGeoUserLlc::CreateEncap(Ptr<EncapKey> key)
+{
+    NS_LOG_FUNCTION(this << key->m_encapAddress << key->m_decapAddress
+                         << (uint32_t)(key->m_flowId));
 
-  if (key->m_flowId == 0 || m_forwardLinkRegenerationMode != SatEnums::REGENERATION_NETWORK)
+    Ptr<SatBaseEncapsulator> userEncap;
+
+    if (key->m_flowId == 0 || m_forwardLinkRegenerationMode != SatEnums::REGENERATION_NETWORK)
     {
-      // Control packet
-      userEncap = CreateObject<SatBaseEncapsulator> (key->m_encapAddress,
-                                                     key->m_decapAddress,
-                                                     key->m_sourceE2EAddress,
-                                                     key->m_destE2EAddress,
-                                                     key->m_flowId);
+        // Control packet
+        userEncap = CreateObject<SatBaseEncapsulator>(key->m_encapAddress,
+                                                      key->m_decapAddress,
+                                                      key->m_sourceE2EAddress,
+                                                      key->m_destE2EAddress,
+                                                      key->m_flowId);
     }
-  else if (m_fwdLinkArqEnabled)
+    else if (m_fwdLinkArqEnabled)
     {
-      userEncap = CreateObject<SatGenericStreamEncapsulatorArq> (key->m_encapAddress,
-                                                                 key->m_decapAddress,
-                                                                 key->m_sourceE2EAddress,
-                                                                 key->m_destE2EAddress,
-                                                                 key->m_flowId,
-                                                                 m_additionalHeaderSize);
+        userEncap = CreateObject<SatGenericStreamEncapsulatorArq>(key->m_encapAddress,
+                                                                  key->m_decapAddress,
+                                                                  key->m_sourceE2EAddress,
+                                                                  key->m_destE2EAddress,
+                                                                  key->m_flowId,
+                                                                  m_additionalHeaderSize);
     }
-  else
+    else
     {
-      userEncap = CreateObject<SatGenericStreamEncapsulator> (key->m_encapAddress,
-                                                              key->m_decapAddress,
-                                                              key->m_sourceE2EAddress,
-                                                              key->m_destE2EAddress,
-                                                              key->m_flowId,
-                                                              m_additionalHeaderSize);
+        userEncap = CreateObject<SatGenericStreamEncapsulator>(key->m_encapAddress,
+                                                               key->m_decapAddress,
+                                                               key->m_sourceE2EAddress,
+                                                               key->m_destE2EAddress,
+                                                               key->m_flowId,
+                                                               m_additionalHeaderSize);
     }
 
-  Ptr<SatQueue> queue = CreateObject<SatQueue> (key->m_flowId);
+    Ptr<SatQueue> queue = CreateObject<SatQueue>(key->m_flowId);
 
-  userEncap->SetQueue (queue);
+    userEncap->SetQueue(queue);
 
-  NS_LOG_INFO ("Create encapsulator with key (" << key->m_encapAddress << ", " << key->m_decapAddress << ", " << (uint32_t) key->m_flowId << ")");
+    NS_LOG_INFO("Create encapsulator with key (" << key->m_encapAddress << ", "
+                                                 << key->m_decapAddress << ", "
+                                                 << (uint32_t)key->m_flowId << ")");
 
-  // Store the encapsulator
-  std::pair<EncapContainer_t::iterator, bool> result = m_encaps.insert (std::make_pair (key, userEncap));
-  if (result.second == false)
+    // Store the encapsulator
+    std::pair<EncapContainer_t::iterator, bool> result =
+        m_encaps.insert(std::make_pair(key, userEncap));
+    if (result.second == false)
     {
-      NS_FATAL_ERROR ("Insert to map with key (" << key->m_encapAddress << ", " << key->m_decapAddress << ", " << (uint32_t) key->m_flowId << ") failed!");
+        NS_FATAL_ERROR("Insert to map with key (" << key->m_encapAddress << ", "
+                                                  << key->m_decapAddress << ", "
+                                                  << (uint32_t)key->m_flowId << ") failed!");
     }
 }
 
 void
-SatGeoUserLlc::CreateDecap (Ptr<EncapKey> key)
+SatGeoUserLlc::CreateDecap(Ptr<EncapKey> key)
 {
-  NS_LOG_FUNCTION (this << key->m_encapAddress << key->m_decapAddress << (uint32_t)(key->m_flowId));
+    NS_LOG_FUNCTION(this << key->m_encapAddress << key->m_decapAddress
+                         << (uint32_t)(key->m_flowId));
 
-  Ptr<SatBaseEncapsulator> userDecap;
+    Ptr<SatBaseEncapsulator> userDecap;
 
-  if (key->m_flowId == 0 || m_returnLinkRegenerationMode != SatEnums::REGENERATION_NETWORK)
+    if (key->m_flowId == 0 || m_returnLinkRegenerationMode != SatEnums::REGENERATION_NETWORK)
     {
-      // Control packet
-      userDecap = CreateObject<SatBaseEncapsulator> (key->m_encapAddress,
-                                                     key->m_decapAddress,
-                                                     key->m_sourceE2EAddress,
-                                                     key->m_destE2EAddress,
-                                                     key->m_flowId);
+        // Control packet
+        userDecap = CreateObject<SatBaseEncapsulator>(key->m_encapAddress,
+                                                      key->m_decapAddress,
+                                                      key->m_sourceE2EAddress,
+                                                      key->m_destE2EAddress,
+                                                      key->m_flowId);
     }
-  else if (m_rtnLinkArqEnabled)
+    else if (m_rtnLinkArqEnabled)
     {
-      userDecap = CreateObject<SatReturnLinkEncapsulatorArq> (key->m_encapAddress,
-                                                              key->m_decapAddress,
-                                                              key->m_sourceE2EAddress,
-                                                              key->m_destE2EAddress,
-                                                              key->m_flowId,
-                                                              m_additionalHeaderSize);
+        userDecap = CreateObject<SatReturnLinkEncapsulatorArq>(key->m_encapAddress,
+                                                               key->m_decapAddress,
+                                                               key->m_sourceE2EAddress,
+                                                               key->m_destE2EAddress,
+                                                               key->m_flowId,
+                                                               m_additionalHeaderSize);
     }
-  else
+    else
     {
-      userDecap = CreateObject<SatReturnLinkEncapsulator> (key->m_encapAddress,
-                                                           key->m_decapAddress,
-                                                           key->m_sourceE2EAddress,
-                                                           key->m_destE2EAddress,
-                                                           key->m_flowId,
-                                                           m_additionalHeaderSize);
+        userDecap = CreateObject<SatReturnLinkEncapsulator>(key->m_encapAddress,
+                                                            key->m_decapAddress,
+                                                            key->m_sourceE2EAddress,
+                                                            key->m_destE2EAddress,
+                                                            key->m_flowId,
+                                                            m_additionalHeaderSize);
     }
 
-  userDecap->SetReceiveCallback (MakeCallback (&SatLlc::ReceiveHigherLayerPdu, this));
+    userDecap->SetReceiveCallback(MakeCallback(&SatLlc::ReceiveHigherLayerPdu, this));
 
-  NS_LOG_INFO ("Create decapsulator with key (" << key->m_encapAddress << ", " << key->m_decapAddress << ", " << (uint32_t) key->m_flowId << ")");
+    NS_LOG_INFO("Create decapsulator with key (" << key->m_encapAddress << ", "
+                                                 << key->m_decapAddress << ", "
+                                                 << (uint32_t)key->m_flowId << ")");
 
-  // Store the decapsulator
-  std::pair<EncapContainer_t::iterator, bool> result = m_decaps.insert (std::make_pair (key, userDecap));
-  if (result.second == false)
+    // Store the decapsulator
+    std::pair<EncapContainer_t::iterator, bool> result =
+        m_decaps.insert(std::make_pair(key, userDecap));
+    if (result.second == false)
     {
-      NS_FATAL_ERROR ("Insert to map with key (" << key->m_encapAddress << ", " << key->m_decapAddress << ", " << (uint32_t) key->m_flowId << ") failed!");
+        NS_FATAL_ERROR("Insert to map with key (" << key->m_encapAddress << ", "
+                                                  << key->m_decapAddress << ", "
+                                                  << (uint32_t)key->m_flowId << ") failed!");
     }
 }
 
 } // namespace ns3
-
-

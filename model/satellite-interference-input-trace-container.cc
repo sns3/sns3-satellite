@@ -18,135 +18,144 @@
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
 
-#include <ns3/log.h>
-#include <ns3/singleton.h>
-
 #include "satellite-interference-input-trace-container.h"
+
 #include "../utils/satellite-env-variables.h"
 #include "satellite-id-mapper.h"
 
+#include <ns3/log.h>
+#include <ns3/singleton.h>
 
-NS_LOG_COMPONENT_DEFINE ("SatInterferenceInputTraceContainer");
+NS_LOG_COMPONENT_DEFINE("SatInterferenceInputTraceContainer");
 
-namespace ns3 {
+namespace ns3
+{
 
-NS_OBJECT_ENSURE_REGISTERED (SatInterferenceInputTraceContainer);
+NS_OBJECT_ENSURE_REGISTERED(SatInterferenceInputTraceContainer);
 
 TypeId
-SatInterferenceInputTraceContainer::GetTypeId (void)
+SatInterferenceInputTraceContainer::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatInterferenceInputTraceContainer")
-    .SetParent<SatBaseTraceContainer> ()
-    .AddConstructor<SatInterferenceInputTraceContainer> ();
-  return tid;
+    static TypeId tid = TypeId("ns3::SatInterferenceInputTraceContainer")
+                            .SetParent<SatBaseTraceContainer>()
+                            .AddConstructor<SatInterferenceInputTraceContainer>();
+    return tid;
 }
 
 TypeId
-SatInterferenceInputTraceContainer::GetInstanceTypeId (void) const
+SatInterferenceInputTraceContainer::GetInstanceTypeId(void) const
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return GetTypeId ();
+    return GetTypeId();
 }
 
-SatInterferenceInputTraceContainer::SatInterferenceInputTraceContainer ()
+SatInterferenceInputTraceContainer::SatInterferenceInputTraceContainer()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-SatInterferenceInputTraceContainer::~SatInterferenceInputTraceContainer ()
+SatInterferenceInputTraceContainer::~SatInterferenceInputTraceContainer()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  Reset ();
+    Reset();
 }
 
 void
-SatInterferenceInputTraceContainer::DoDispose ()
+SatInterferenceInputTraceContainer::DoDispose()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  Reset ();
+    Reset();
 
-  SatBaseTraceContainer::DoDispose ();
+    SatBaseTraceContainer::DoDispose();
 }
 
 void
-SatInterferenceInputTraceContainer::Reset ()
+SatInterferenceInputTraceContainer::Reset()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  if (!m_container.empty ())
+    if (!m_container.empty())
     {
-      m_container.clear ();
+        m_container.clear();
     }
 }
 
 Ptr<SatInputFileStreamTimeDoubleContainer>
-SatInterferenceInputTraceContainer::AddNode (key_t key)
+SatInterferenceInputTraceContainer::AddNode(key_t key)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  std::stringstream filename;
-  std::string dataPath = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory ();
+    std::stringstream filename;
+    std::string dataPath = Singleton<SatEnvVariables>::Get()->LocateDataDirectory();
 
-  int32_t gwId = Singleton<SatIdMapper>::Get ()->GetGwIdWithMac (key.first);
-  int32_t utId = Singleton<SatIdMapper>::Get ()->GetUtIdWithMac (key.first);
-  int32_t beamId = Singleton<SatIdMapper>::Get ()->GetBeamIdWithMac (key.first);
+    int32_t gwId = Singleton<SatIdMapper>::Get()->GetGwIdWithMac(key.first);
+    int32_t utId = Singleton<SatIdMapper>::Get()->GetUtIdWithMac(key.first);
+    int32_t beamId = Singleton<SatIdMapper>::Get()->GetBeamIdWithMac(key.first);
 
-  if (beamId < 0 || (utId < 0 && gwId < 0))
+    if (beamId < 0 || (utId < 0 && gwId < 0))
     {
-      return NULL;
+        return NULL;
     }
-  else
+    else
     {
-      if (utId >= 0 && gwId < 0)
+        if (utId >= 0 && gwId < 0)
         {
-          filename << dataPath << "/interferencetraces/input/BEAM_" << beamId << "_UT_" << utId << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
+            filename << dataPath << "/interferencetraces/input/BEAM_" << beamId << "_UT_" << utId
+                     << "_channelType_" << SatEnums::GetChannelTypeName(key.second);
         }
 
-      if (gwId >= 0 && utId < 0)
+        if (gwId >= 0 && utId < 0)
         {
-          filename << dataPath << "/interferencetraces/input/BEAM_" << beamId << "_GW_" << gwId << "_channelType_" << SatEnums::GetChannelTypeName (key.second);
+            filename << dataPath << "/interferencetraces/input/BEAM_" << beamId << "_GW_" << gwId
+                     << "_channelType_" << SatEnums::GetChannelTypeName(key.second);
         }
 
-      std::pair <container_t::iterator, bool> result = m_container.insert (std::make_pair (key, CreateObject<SatInputFileStreamTimeDoubleContainer> (filename.str ().c_str (), std::ios::in, SatBaseTraceContainer::INTF_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
+        std::pair<container_t::iterator, bool> result = m_container.insert(
+            std::make_pair(key,
+                           CreateObject<SatInputFileStreamTimeDoubleContainer>(
+                               filename.str().c_str(),
+                               std::ios::in,
+                               SatBaseTraceContainer::INTF_TRACE_DEFAULT_NUMBER_OF_COLUMNS)));
 
-      if (result.second == false)
+        if (result.second == false)
         {
-          NS_FATAL_ERROR ("SatInterferenceInputTraceContainer::AddNode failed");
+            NS_FATAL_ERROR("SatInterferenceInputTraceContainer::AddNode failed");
         }
 
-      NS_LOG_INFO ("Added node with MAC " << key.first << " channel type " << key.second);
+        NS_LOG_INFO("Added node with MAC " << key.first << " channel type " << key.second);
 
-      return result.first->second;
+        return result.first->second;
     }
 
-  NS_FATAL_ERROR ("SatInterferenceInputTraceContainer::AddNode failed");
-  return NULL;
+    NS_FATAL_ERROR("SatInterferenceInputTraceContainer::AddNode failed");
+    return NULL;
 }
 
 Ptr<SatInputFileStreamTimeDoubleContainer>
-SatInterferenceInputTraceContainer::FindNode (key_t key)
+SatInterferenceInputTraceContainer::FindNode(key_t key)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  container_t::iterator iter = m_container.find (key);
+    container_t::iterator iter = m_container.find(key);
 
-  if (iter == m_container.end ())
+    if (iter == m_container.end())
     {
-      return AddNode (key);
+        return AddNode(key);
     }
 
-  return iter->second;
+    return iter->second;
 }
 
 double
-SatInterferenceInputTraceContainer::GetInterferenceDensity (key_t key)
+SatInterferenceInputTraceContainer::GetInterferenceDensity(key_t key)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return FindNode (key)->ProceedToNextClosestTimeSample ().at (SatBaseTraceContainer::INTF_TRACE_DEFAULT_INTF_DENSITY_INDEX);
+    return FindNode(key)->ProceedToNextClosestTimeSample().at(
+        SatBaseTraceContainer::INTF_TRACE_DEFAULT_INTF_DENSITY_INDEX);
 }
 
 } // namespace ns3

@@ -21,13 +21,14 @@
 #ifndef SATELLITE_POSITION_INPUT_TRACE_CONTAINER_H
 #define SATELLITE_POSITION_INPUT_TRACE_CONTAINER_H
 
-#include <ns3/satellite-input-fstream-time-double-container.h>
+#include "geo-coordinate.h"
 #include "satellite-antenna-gain-pattern-container.h"
 #include "satellite-base-trace-container.h"
-#include "geo-coordinate.h"
 
+#include <ns3/satellite-input-fstream-time-double-container.h>
 
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -37,70 +38,71 @@ namespace ns3 {
  */
 class SatPositionInputTraceContainer : public SatBaseTraceContainer
 {
-public:
-  /**
-   * \brief typedef for map of containers
-   */
-  typedef std::map <std::string, Ptr<SatInputFileStreamTimeDoubleContainer> > container_t;
+  public:
+    /**
+     * \brief typedef for map of containers
+     */
+    typedef std::map<std::string, Ptr<SatInputFileStreamTimeDoubleContainer>> container_t;
 
-  /**
-   * \brief Constructor
-   */
-  SatPositionInputTraceContainer ();
+    /**
+     * \brief Constructor
+     */
+    SatPositionInputTraceContainer();
 
-  /**
-   * \brief Destructor
-   */
-  ~SatPositionInputTraceContainer ();
+    /**
+     * \brief Destructor
+     */
+    ~SatPositionInputTraceContainer();
 
-  /**
-   * \brief NS-3 type id function
-   * \return type id
-   */
-  static TypeId GetTypeId (void);
+    /**
+     * \brief NS-3 type id function
+     * \return type id
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * \brief NS-3 instance type id function
-   * \return Instance type is
-   */
-  TypeId GetInstanceTypeId (void) const;
+    /**
+     * \brief NS-3 instance type id function
+     * \return Instance type is
+     */
+    TypeId GetInstanceTypeId(void) const;
 
-  /**
-   *  \brief Do needed dispose actions.
-   */
-  void DoDispose ();
+    /**
+     *  \brief Do needed dispose actions.
+     */
+    void DoDispose();
 
-  /**
-   * \brief Function for getting the Rx power density
-   * \param key key
-   * \return Rx power density
-   */
-  GeoCoordinate GetPosition (const std::string& key, GeoCoordinate::ReferenceEllipsoid_t refEllipsoid);
+    /**
+     * \brief Function for getting the Rx power density
+     * \param key key
+     * \return Rx power density
+     */
+    GeoCoordinate GetPosition(const std::string& key,
+                              GeoCoordinate::ReferenceEllipsoid_t refEllipsoid);
 
-  /**
-   * \brief Function for resetting the variables
-   */
-  void Reset ();
+    /**
+     * \brief Function for resetting the variables
+     */
+    void Reset();
 
-private:
-  /**
-   * \brief Function for adding the node to the map
-   * \param key filename to read positions from
-   * \return pointer to the added container
-   */
-  Ptr<SatInputFileStreamTimeDoubleContainer> AddNode (const std::string& key);
+  private:
+    /**
+     * \brief Function for adding the node to the map
+     * \param key filename to read positions from
+     * \return pointer to the added container
+     */
+    Ptr<SatInputFileStreamTimeDoubleContainer> AddNode(const std::string& key);
 
-  /**
-   * \brief Function for finding the container matching the key
-   * \param key key
-   * \return matching container
-   */
-  Ptr<SatInputFileStreamTimeDoubleContainer> FindNode (const std::string& key);
+    /**
+     * \brief Function for finding the container matching the key
+     * \param key key
+     * \return matching container
+     */
+    Ptr<SatInputFileStreamTimeDoubleContainer> FindNode(const std::string& key);
 
-  /**
-   * \brief Map for containers
-   */
-  container_t m_container;
+    /**
+     * \brief Map for containers
+     */
+    container_t m_container;
 };
 
 } // namespace ns3

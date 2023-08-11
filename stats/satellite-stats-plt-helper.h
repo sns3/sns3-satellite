@@ -22,16 +22,16 @@
 #ifndef SATELLITE_STATS_PLT_HELPER_H
 #define SATELLITE_STATS_PLT_HELPER_H
 
-#include <ns3/satellite-stats-helper.h>
-#include <ns3/ptr.h>
 #include <ns3/address.h>
 #include <ns3/collector-map.h>
+#include <ns3/ptr.h>
+#include <ns3/satellite-stats-helper.h>
+
 #include <list>
 #include <map>
 
-
-namespace ns3 {
-
+namespace ns3
+{
 
 // BASE CLASS /////////////////////////////////////////////////////////////////
 
@@ -47,102 +47,99 @@ class DistributionCollector;
  */
 class SatStatsPltHelper : public SatStatsHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsPltHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsPltHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsPltHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsPltHelper ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
+    /**
+     * \param averagingMode average all samples before passing them to aggregator.
+     */
+    void SetAveragingMode(bool averagingMode);
 
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
+    /**
+     * \return the currently active averaging mode.
+     */
+    bool GetAveragingMode() const;
 
-  /**
-   * \param averagingMode average all samples before passing them to aggregator.
-   */
-  void SetAveragingMode (bool averagingMode);
+    /**
+     * \brief Set up several probes or other means of listeners and connect them
+     *        to the collectors.
+     */
+    void InstallProbes();
 
-  /**
-   * \return the currently active averaging mode.
-   */
-  bool GetAveragingMode () const;
+    /**
+     * \brief Receive inputs from trace sources and determine the right collector
+     *        to forward the inputs to.
+     * \param plt object PLT.
+     * \param from the address of the sender of the object.
+     *
+     * Used in return link statistics. DoInstallProbes() is expected to connect
+     * the right trace sources to this method.
+     */
+    void RxPltCallback(const Time& plt, const Address& from);
 
-  /**
-   * \brief Set up several probes or other means of listeners and connect them
-   *        to the collectors.
-   */
-  void InstallProbes ();
+  protected:
+    // inherited from SatStatsHelper base class
+    void DoInstall();
 
-  /**
-   * \brief Receive inputs from trace sources and determine the right collector
-   *        to forward the inputs to.
-   * \param plt object PLT.
-   * \param from the address of the sender of the object.
-   *
-   * Used in return link statistics. DoInstallProbes() is expected to connect
-   * the right trace sources to this method.
-   */
-  void RxPltCallback (const Time &plt, const Address &from);
+    /**
+     * \brief
+     */
+    virtual void DoInstallProbes() = 0;
 
-protected:
-  // inherited from SatStatsHelper base class
-  void DoInstall ();
+    /**
+     * \brief Save the address and the proper identifier from the given UT node.
+     * \param utNode a UT node.
+     *
+     * The address of the given node will be saved in the #m_identifierMap
+     * member variable.
+     *
+     * Used in return link statistics. DoInstallProbes() is expected to pass the
+     * the UT node of interest into this method.
+     */
+    void SaveAddressAndIdentifier(Ptr<Node> utNode);
 
-  /**
-   * \brief
-   */
-  virtual void DoInstallProbes () = 0;
+    /**
+     * \brief Connect the probe to the right collector.
+     * \param probe
+     * \param identifier
+     */
+    bool ConnectProbeToCollector(Ptr<Probe> probe, uint32_t identifier);
 
-  /**
-   * \brief Save the address and the proper identifier from the given UT node.
-   * \param utNode a UT node.
-   *
-   * The address of the given node will be saved in the #m_identifierMap
-   * member variable.
-   *
-   * Used in return link statistics. DoInstallProbes() is expected to pass the
-   * the UT node of interest into this method.
-   */
-  void SaveAddressAndIdentifier (Ptr<Node> utNode);
+    /**
+     * \brief Find a collector with the right identifier and pass a sample data
+     *        to it.
+     * \param plt
+     * \param identifier
+     */
+    void PassSampleToCollector(const Time& plt, uint32_t identifier);
 
-  /**
-   * \brief Connect the probe to the right collector.
-   * \param probe
-   * \param identifier
-   */
-  bool ConnectProbeToCollector (Ptr<Probe> probe, uint32_t identifier);
+    /// Maintains a list of collectors created by this helper.
+    CollectorMap m_terminalCollectors;
 
-  /**
-   * \brief Find a collector with the right identifier and pass a sample data
-   *        to it.
-   * \param plt
-   * \param identifier
-   */
-  void PassSampleToCollector (const Time &plt, uint32_t identifier);
+    /// The final collector utilized in averaged output (histogram, PDF, and CDF).
+    Ptr<DistributionCollector> m_averagingCollector;
 
-  /// Maintains a list of collectors created by this helper.
-  CollectorMap m_terminalCollectors;
+    /// The aggregator created by this helper.
+    Ptr<DataCollectionObject> m_aggregator;
 
-  /// The final collector utilized in averaged output (histogram, PDF, and CDF).
-  Ptr<DistributionCollector> m_averagingCollector;
+    /// Map of address and the identifier associated with it (for return link).
+    std::map<const Address, uint32_t> m_identifierMap;
 
-  /// The aggregator created by this helper.
-  Ptr<DataCollectionObject> m_aggregator;
-
-  /// Map of address and the identifier associated with it (for return link).
-  std::map<const Address, uint32_t> m_identifierMap;
-
-private:
-  bool m_averagingMode;  ///< `AveragingMode` attribute.
+  private:
+    bool m_averagingMode; ///< `AveragingMode` attribute.
 
 }; // end of class SatStatsPltHelper
-
 
 // FORWARD LINK APPLICATION-LEVEL /////////////////////////////////////////////
 
@@ -150,81 +147,75 @@ class Probe;
 
 class SatStatsFwdAppPltHelper : public SatStatsPltHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsFwdAppPltHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsFwdAppPltHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * Destructor for SatStatsFwdAppPltHelper.
+     */
+    virtual ~SatStatsFwdAppPltHelper();
 
-  /**
-   * Destructor for SatStatsFwdAppPltHelper.
-   */
-  virtual ~SatStatsFwdAppPltHelper ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
+  protected:
+    // inherited from SatStatsFwdAppPltHelper base class
+    void DoInstallProbes();
 
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
-
-protected:
-  // inherited from SatStatsFwdAppPltHelper base class
-  void DoInstallProbes ();
-
-private:
-  /// Maintains a list of probes created by this helper.
-  std::list<Ptr<Probe> > m_probes;
+  private:
+    /// Maintains a list of probes created by this helper.
+    std::list<Ptr<Probe>> m_probes;
 
 }; // end of class SatStatsFwdAppPltHelper
-
 
 // RETURN LINK APPLICATION-LEVEL //////////////////////////////////////////////
 
 class SatStatsRtnAppPltHelper : public SatStatsPltHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsRtnAppPltHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsRtnAppPltHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsRtnAppPltHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsRtnAppPltHelper ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
+    /**
+     * \brief Receive inputs from trace sources and determine the right collector
+     *        to forward the inputs to.
+     * \param plt object PLT.
+     * \param from the InetSocketAddress of the sender of the object.
+     */
+    void Ipv4Callback(const Time& plt, const Address& from);
 
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
+  protected:
+    // inherited from SatStatsRtnAppPltHelper base class
+    void DoInstallProbes();
 
-  /**
-   * \brief Receive inputs from trace sources and determine the right collector
-   *        to forward the inputs to.
-   * \param plt object PLT.
-   * \param from the InetSocketAddress of the sender of the object.
-   */
-  void Ipv4Callback (const Time &plt, const Address &from);
+  private:
+    /**
+     * \brief Save the IPv4 address and the proper identifier from the given
+     *        UT user node.
+     * \param utUserNode a UT user node.
+     *
+     * Any addresses found in the given node will be saved in the
+     * #m_identifierMap member variable.
+     */
+    void SaveIpv4AddressAndIdentifier(Ptr<Node> utUserNode);
 
-protected:
-  // inherited from SatStatsRtnAppPltHelper base class
-  void DoInstallProbes ();
-
-private:
-  /**
-   * \brief Save the IPv4 address and the proper identifier from the given
-   *        UT user node.
-   * \param utUserNode a UT user node.
-   *
-   * Any addresses found in the given node will be saved in the
-   * #m_identifierMap member variable.
-   */
-  void SaveIpv4AddressAndIdentifier (Ptr<Node> utUserNode);
-
-  /// \todo Write SaveIpv6Address() method.
+    /// \todo Write SaveIpv6Address() method.
 
 }; // end of class SatStatsRtnAppPltHelper
 
 } // end of namespace ns3
-
 
 #endif /* SATELLITE_STATS_PLT_HELPER_H */

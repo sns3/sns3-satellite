@@ -20,154 +20,152 @@
  * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
+#include "ns3/lora-network-server-helper.h"
+
 #include "ns3/double.h"
+#include "ns3/log.h"
+#include "ns3/lora-adr-component.h"
+#include "ns3/lora-network-controller-components.h"
+#include "ns3/satellite-lorawan-net-device.h"
+#include "ns3/simulator.h"
 #include "ns3/string.h"
 #include "ns3/trace-source-accessor.h"
-#include "ns3/simulator.h"
-#include "ns3/log.h"
 
-#include "ns3/satellite-lorawan-net-device.h"
+NS_LOG_COMPONENT_DEFINE("LoraNetworkServerHelper");
 
-#include "ns3/lora-network-server-helper.h"
-#include "ns3/lora-network-controller-components.h"
-#include "ns3/lora-adr-component.h"
+namespace ns3
+{
 
-NS_LOG_COMPONENT_DEFINE ("LoraNetworkServerHelper");
-
-namespace ns3 {
-
-NS_OBJECT_ENSURE_REGISTERED (LoraNetworkServerHelper);
+NS_OBJECT_ENSURE_REGISTERED(LoraNetworkServerHelper);
 
 TypeId
-LoraNetworkServerHelper::GetTypeId (void)
+LoraNetworkServerHelper::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::LoraNetworkServerHelper")
-    .SetParent<Object> ()
-    .AddConstructor<LoraNetworkServerHelper> ()
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::LoraNetworkServerHelper")
+                            .SetParent<Object>()
+                            .AddConstructor<LoraNetworkServerHelper>();
+    return tid;
 }
 
-LoraNetworkServerHelper::LoraNetworkServerHelper ()
+LoraNetworkServerHelper::LoraNetworkServerHelper()
 {
-  m_factory.SetTypeId ("ns3::LoraNetworkServer");
-  p2pHelper.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
-  p2pHelper.SetChannelAttribute ("Delay", StringValue ("2ms"));
-  SetAdr ("ns3::LoraAdrComponent");
+    m_factory.SetTypeId("ns3::LoraNetworkServer");
+    p2pHelper.SetDeviceAttribute("DataRate", StringValue("5Mbps"));
+    p2pHelper.SetChannelAttribute("Delay", StringValue("2ms"));
+    SetAdr("ns3::LoraAdrComponent");
 }
 
-LoraNetworkServerHelper::~LoraNetworkServerHelper ()
+LoraNetworkServerHelper::~LoraNetworkServerHelper()
 {
-}
-
-void
-LoraNetworkServerHelper::SetAttribute (std::string name, const AttributeValue &value)
-{
-  m_factory.Set (name, value);
 }
 
 void
-LoraNetworkServerHelper::SetGateways (NodeContainer gateways)
+LoraNetworkServerHelper::SetAttribute(std::string name, const AttributeValue& value)
 {
-  m_gateways = gateways;
+    m_factory.Set(name, value);
 }
 
 void
-LoraNetworkServerHelper::SetEndDevices (NodeContainer endDevices)
+LoraNetworkServerHelper::SetGateways(NodeContainer gateways)
 {
-  m_endDevices = endDevices;
+    m_gateways = gateways;
+}
+
+void
+LoraNetworkServerHelper::SetEndDevices(NodeContainer endDevices)
+{
+    m_endDevices = endDevices;
 }
 
 ApplicationContainer
-LoraNetworkServerHelper::Install (Ptr<Node> node)
+LoraNetworkServerHelper::Install(Ptr<Node> node)
 {
-  return ApplicationContainer (InstallPriv (node));
+    return ApplicationContainer(InstallPriv(node));
 }
 
 ApplicationContainer
-LoraNetworkServerHelper::Install (NodeContainer c)
+LoraNetworkServerHelper::Install(NodeContainer c)
 {
-  ApplicationContainer apps;
-  for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
+    ApplicationContainer apps;
+    for (NodeContainer::Iterator i = c.Begin(); i != c.End(); ++i)
     {
-      apps.Add (InstallPriv (*i));
+        apps.Add(InstallPriv(*i));
     }
 
-  return apps;
+    return apps;
 }
 
 Ptr<Application>
-LoraNetworkServerHelper::InstallPriv (Ptr<Node> node)
+LoraNetworkServerHelper::InstallPriv(Ptr<Node> node)
 {
-  NS_LOG_FUNCTION (this << node);
+    NS_LOG_FUNCTION(this << node);
 
-  Ptr<LoraNetworkServer> app = m_factory.Create<LoraNetworkServer> ();
+    Ptr<LoraNetworkServer> app = m_factory.Create<LoraNetworkServer>();
 
-  app->SetNode (node);
-  node->AddApplication (app);
+    app->SetNode(node);
+    node->AddApplication(app);
 
-  // Cycle on each gateway
-  for (NodeContainer::Iterator it = m_gateways.Begin (); it != m_gateways.End (); it++)
+    // Cycle on each gateway
+    for (NodeContainer::Iterator it = m_gateways.Begin(); it != m_gateways.End(); it++)
     {
-      // Add the connections with the gateway
-      // Create a PointToPoint link between gateway and NS
-      NetDeviceContainer container = p2pHelper.Install (node, *it);
+        // Add the connections with the gateway
+        // Create a PointToPoint link between gateway and NS
+        NetDeviceContainer container = p2pHelper.Install(node, *it);
 
-      // Add the gateway to the NS list
-      app->AddGateway (*it, container.Get (0));
+        // Add the gateway to the NS list
+        app->AddGateway(*it, container.Get(0));
 
-      // Link the NetworkServer to its NetDevices
-      for (uint32_t i = 0; i < node->GetNDevices (); i++)
+        // Link the NetworkServer to its NetDevices
+        for (uint32_t i = 0; i < node->GetNDevices(); i++)
         {
-          Ptr<NetDevice> currentNetDevice = node->GetDevice (i);
-          currentNetDevice->SetReceiveCallback (MakeCallback (&LoraNetworkServer::Receive, app));
+            Ptr<NetDevice> currentNetDevice = node->GetDevice(i);
+            currentNetDevice->SetReceiveCallback(MakeCallback(&LoraNetworkServer::Receive, app));
         }
     }
 
-  // Add the end devices
-  app->AddNodes (m_endDevices);
+    // Add the end devices
+    app->AddNodes(m_endDevices);
 
-  // Add components to the NetworkServer
-  InstallComponents (app);
+    // Add components to the NetworkServer
+    InstallComponents(app);
 
-  return app;
+    return app;
 }
 
 void
-LoraNetworkServerHelper::EnableAdr (bool enableAdr)
+LoraNetworkServerHelper::EnableAdr(bool enableAdr)
 {
-  NS_LOG_FUNCTION (this << enableAdr);
+    NS_LOG_FUNCTION(this << enableAdr);
 
-  m_adrEnabled = enableAdr;
+    m_adrEnabled = enableAdr;
 }
 
 void
-LoraNetworkServerHelper::SetAdr (std::string type)
+LoraNetworkServerHelper::SetAdr(std::string type)
 {
-  NS_LOG_FUNCTION (this << type);
+    NS_LOG_FUNCTION(this << type);
 
-  m_adrSupportFactory = ObjectFactory ();
-  m_adrSupportFactory.SetTypeId (type);
+    m_adrSupportFactory = ObjectFactory();
+    m_adrSupportFactory.SetTypeId(type);
 }
 
 void
-LoraNetworkServerHelper::InstallComponents (Ptr<LoraNetworkServer> netServer)
+LoraNetworkServerHelper::InstallComponents(Ptr<LoraNetworkServer> netServer)
 {
-  NS_LOG_FUNCTION (this << netServer);
+    NS_LOG_FUNCTION(this << netServer);
 
-  // Add Confirmed Messages support
-  Ptr<LoraConfirmedMessagesComponent> ackSupport =
-    CreateObject<LoraConfirmedMessagesComponent> ();
-  netServer->AddComponent (ackSupport);
+    // Add Confirmed Messages support
+    Ptr<LoraConfirmedMessagesComponent> ackSupport = CreateObject<LoraConfirmedMessagesComponent>();
+    netServer->AddComponent(ackSupport);
 
-  // Add LinkCheck support
-  Ptr<LoraLinkCheckComponent> linkCheckSupport = CreateObject<LoraLinkCheckComponent> ();
-  netServer->AddComponent (linkCheckSupport);
+    // Add LinkCheck support
+    Ptr<LoraLinkCheckComponent> linkCheckSupport = CreateObject<LoraLinkCheckComponent>();
+    netServer->AddComponent(linkCheckSupport);
 
-  // Add Adr support
-  if (m_adrEnabled)
+    // Add Adr support
+    if (m_adrEnabled)
     {
-      netServer->AddComponent (m_adrSupportFactory.Create<LoraNetworkControllerComponent> ());
+        netServer->AddComponent(m_adrSupportFactory.Create<LoraNetworkControllerComponent>());
     }
 }
 } // namespace ns3

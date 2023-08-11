@@ -22,7 +22,6 @@
 #include "ns3/core-module.h"
 #include "ns3/satellite-module.h"
 
-
 using namespace ns3;
 
 /**
@@ -34,71 +33,109 @@ using namespace ns3;
  * fading calculations with different elevation angles.
  */
 
-NS_LOG_COMPONENT_DEFINE ("sat-markov-logic-example");
+NS_LOG_COMPONENT_DEFINE("sat-markov-logic-example");
 
 static double g_elevation = 45;
 static double g_velocity = 0;
 
-static double GetElevation ()
+static double
+GetElevation()
 {
-  return g_elevation;
+    return g_elevation;
 }
 
-static void SetElevation (double elevation)
+static void
+SetElevation(double elevation)
 {
-  g_elevation = elevation;
+    g_elevation = elevation;
 }
 
-static double GetVelocity ()
+static double
+GetVelocity()
 {
-  return g_velocity;
+    return g_velocity;
 }
 
-static void SetVelocity (double velocity)
+static void
+SetVelocity(double velocity)
 {
-  g_velocity = velocity;
+    g_velocity = velocity;
 }
 
 int
-main (int argc, char *argv[])
+main(int argc, char* argv[])
 {
-  /// Enable info logs
-  LogComponentEnable ("sat-markov-logic-example", LOG_LEVEL_INFO);
-  LogComponentEnable ("SatMarkovContainer", LOG_LEVEL_INFO);
-  LogComponentEnable ("SatMarkovModel", LOG_LEVEL_INFO);
-  LogComponentEnable ("SatMarkovConf", LOG_LEVEL_INFO);
+    /// Enable info logs
+    LogComponentEnable("sat-markov-logic-example", LOG_LEVEL_INFO);
+    LogComponentEnable("SatMarkovContainer", LOG_LEVEL_INFO);
+    LogComponentEnable("SatMarkovModel", LOG_LEVEL_INFO);
+    LogComponentEnable("SatMarkovConf", LOG_LEVEL_INFO);
 
-  /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-markov-logic"));
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+    /// Set simulation output details
+    Config::SetDefault("ns3::SatEnvVariables::SimulationCampaignName",
+                       StringValue("example-markov-logic"));
+    Config::SetDefault("ns3::SatEnvVariables::SimulationTag", StringValue(""));
+    Config::SetDefault("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue(true));
 
-  /// Create default Markov & Loo configurations
-  Ptr<SatMarkovConf> markovConf = CreateObject<SatMarkovConf> ();
+    /// Create default Markov & Loo configurations
+    Ptr<SatMarkovConf> markovConf = CreateObject<SatMarkovConf>();
 
-  SatBaseFading::ElevationCallback elevationCb = MakeCallback (&GetElevation);
-  SatBaseFading::VelocityCallback velocityCb = MakeCallback (&GetVelocity);
+    SatBaseFading::ElevationCallback elevationCb = MakeCallback(&GetElevation);
+    SatBaseFading::VelocityCallback velocityCb = MakeCallback(&GetVelocity);
 
-  /// Create fading container based on default configuration
-  Ptr<SatMarkovContainer> markovContainer = CreateObject<SatMarkovContainer> (markovConf, elevationCb, velocityCb);
+    /// Create fading container based on default configuration
+    Ptr<SatMarkovContainer> markovContainer =
+        CreateObject<SatMarkovContainer>(markovConf, elevationCb, velocityCb);
 
-  Address macAddress;
+    Address macAddress;
 
-  /// Run simulation
-  Simulator::Schedule (Time ("5ms"), &SetVelocity, 0);
-  Simulator::Schedule (Time ("10ms"), &SatMarkovContainer::DoGetFading, markovContainer, macAddress, SatEnums::FORWARD_USER_CH);
-  Simulator::Schedule (Time ("30ms"), &SatMarkovContainer::DoGetFading, markovContainer, macAddress, SatEnums::FORWARD_USER_CH);
-  Simulator::Schedule (Time ("45ms"), &SetElevation, 55);
-  Simulator::Schedule (Time ("50ms"), &SatMarkovContainer::DoGetFading, markovContainer, macAddress, SatEnums::FORWARD_USER_CH);
-  Simulator::Schedule (Time ("60ms"), &SatMarkovContainer::DoGetFading, markovContainer, macAddress, SatEnums::FORWARD_USER_CH);
-  Simulator::Schedule (Time ("90ms"), &SatMarkovContainer::DoGetFading, markovContainer, macAddress, SatEnums::FORWARD_USER_CH);
-  Simulator::Schedule (Time ("95ms"), &SetElevation, 75);
-  Simulator::Schedule (Time ("100ms"), &SatMarkovContainer::DoGetFading, markovContainer, macAddress, SatEnums::FORWARD_USER_CH);
-  Simulator::Schedule (Time ("130ms"), &SatMarkovContainer::DoGetFading, markovContainer, macAddress, SatEnums::FORWARD_USER_CH);
-  Simulator::Schedule (Time ("200ms"), &SatMarkovContainer::DoGetFading, markovContainer, macAddress, SatEnums::FORWARD_USER_CH);
+    /// Run simulation
+    Simulator::Schedule(Time("5ms"), &SetVelocity, 0);
+    Simulator::Schedule(Time("10ms"),
+                        &SatMarkovContainer::DoGetFading,
+                        markovContainer,
+                        macAddress,
+                        SatEnums::FORWARD_USER_CH);
+    Simulator::Schedule(Time("30ms"),
+                        &SatMarkovContainer::DoGetFading,
+                        markovContainer,
+                        macAddress,
+                        SatEnums::FORWARD_USER_CH);
+    Simulator::Schedule(Time("45ms"), &SetElevation, 55);
+    Simulator::Schedule(Time("50ms"),
+                        &SatMarkovContainer::DoGetFading,
+                        markovContainer,
+                        macAddress,
+                        SatEnums::FORWARD_USER_CH);
+    Simulator::Schedule(Time("60ms"),
+                        &SatMarkovContainer::DoGetFading,
+                        markovContainer,
+                        macAddress,
+                        SatEnums::FORWARD_USER_CH);
+    Simulator::Schedule(Time("90ms"),
+                        &SatMarkovContainer::DoGetFading,
+                        markovContainer,
+                        macAddress,
+                        SatEnums::FORWARD_USER_CH);
+    Simulator::Schedule(Time("95ms"), &SetElevation, 75);
+    Simulator::Schedule(Time("100ms"),
+                        &SatMarkovContainer::DoGetFading,
+                        markovContainer,
+                        macAddress,
+                        SatEnums::FORWARD_USER_CH);
+    Simulator::Schedule(Time("130ms"),
+                        &SatMarkovContainer::DoGetFading,
+                        markovContainer,
+                        macAddress,
+                        SatEnums::FORWARD_USER_CH);
+    Simulator::Schedule(Time("200ms"),
+                        &SatMarkovContainer::DoGetFading,
+                        markovContainer,
+                        macAddress,
+                        SatEnums::FORWARD_USER_CH);
 
-  Simulator::Run ();
-  Simulator::Destroy ();
+    Simulator::Run();
+    Simulator::Destroy();
 
-  return 0;
+    return 0;
 }

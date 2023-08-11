@@ -22,14 +22,14 @@
 #ifndef SATELLITE_STATS_RESOURCES_GRANTED_HELPER_H
 #define SATELLITE_STATS_RESOURCES_GRANTED_HELPER_H
 
+#include <ns3/collector-map.h>
 #include <ns3/ptr.h>
 #include <ns3/satellite-stats-helper.h>
-#include <ns3/collector-map.h>
+
 #include <list>
 
-
-namespace ns3 {
-
+namespace ns3
+{
 
 class SatHelper;
 class DataCollectionObject;
@@ -40,48 +40,43 @@ class DataCollectionObject;
  */
 class SatStatsResourcesGrantedHelper : public SatStatsHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsResourcesGrantedHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsResourcesGrantedHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsResourcesGrantedHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsResourcesGrantedHelper ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
+  protected:
+    // inherited from SatStatsHelper base class
+    void DoInstall();
 
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
+  private:
+    /**
+     * \param utNode
+     * \param collectorTraceSink
+     */
+    template <typename R, typename C, typename P>
+    void InstallProbe(Ptr<Node> utNode, R (C::*collectorTraceSink)(P, P));
 
-protected:
-  // inherited from SatStatsHelper base class
-  void DoInstall ();
+    /// Maintains a list of probes created by this helper.
+    std::list<Ptr<Probe>> m_probes;
 
-private:
-  /**
-   * \param utNode
-   * \param collectorTraceSink
-   */
-  template<typename R, typename C, typename P>
-  void InstallProbe (Ptr<Node> utNode,
-                     R (C::*collectorTraceSink)(P, P));
+    /// Maintains a list of collectors created by this helper.
+    CollectorMap m_terminalCollectors;
 
-  /// Maintains a list of probes created by this helper.
-  std::list<Ptr<Probe> > m_probes;
-
-  /// Maintains a list of collectors created by this helper.
-  CollectorMap m_terminalCollectors;
-
-  /// The aggregator created by this helper.
-  Ptr<DataCollectionObject> m_aggregator;
+    /// The aggregator created by this helper.
+    Ptr<DataCollectionObject> m_aggregator;
 
 }; // end of class SatStatsResourcesGrantedHelper
 
-
 } // end of namespace ns3
-
 
 #endif /* SATELLITE_STATS_RESOURCES_GRANTED_HELPER_H */

@@ -23,18 +23,18 @@
 #ifndef SAT_DEFAULT_SUPERFRAME_ALLOCATOR_H
 #define SAT_DEFAULT_SUPERFRAME_ALLOCATOR_H
 
-#include <ns3/simple-ref-count.h>
-#include <ns3/address.h>
-#include <ns3/traced-callback.h>
-
-#include "satellite-frame-conf.h"
 #include "satellite-control-message.h"
-#include "satellite-frame-allocator.h"
 #include "satellite-enums.h"
+#include "satellite-frame-allocator.h"
+#include "satellite-frame-conf.h"
 #include "satellite-superframe-allocator.h"
 
+#include <ns3/address.h>
+#include <ns3/simple-ref-count.h>
+#include <ns3/traced-callback.h>
 
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -49,139 +49,145 @@ namespace ns3 {
  */
 class SatDefaultSuperframeAllocator : public SatSuperframeAllocator
 {
-public:
-  /**
-   * \brief Construct SatDefaultSuperframeAllocator
-   * \param superFrameConf Super frame configuration
-   */
-  SatDefaultSuperframeAllocator (Ptr<SatSuperframeConf> superFrameConf);
+  public:
+    /**
+     * \brief Construct SatDefaultSuperframeAllocator
+     * \param superFrameConf Super frame configuration
+     */
+    SatDefaultSuperframeAllocator(Ptr<SatSuperframeConf> superFrameConf);
 
-  /**
-   * Destruct SatDefaultSuperframeAllocator
-   */
-  ~SatDefaultSuperframeAllocator ();
+    /**
+     * Destruct SatDefaultSuperframeAllocator
+     */
+    ~SatDefaultSuperframeAllocator();
 
+    /**
+     * derived from object
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * derived from object
-   */
-  static TypeId GetTypeId (void);
+    /**
+     * \brief Get the type ID of instance
+     * \return the object TypeId
+     */
+    virtual TypeId GetInstanceTypeId(void) const;
 
-  /**
-   * \brief Get the type ID of instance
-   * \return the object TypeId
-   */
-  virtual TypeId GetInstanceTypeId (void) const;
+    /**
+     * \brief Reserve minimum rate from the allocator. This method is called to perform CAC
+     * functionality.
+     *
+     * \param minimumRateBytes Minimum rate based bytes needed to reserve
+     * \param controlSlotsEnabled Flag indicating if control slot generation is enabled
+     */
+    void ReserveMinimumRate(uint32_t minimumRateBytes, bool controlSlotsEnabled);
 
-  /**
-   * \brief Reserve minimum rate from the allocator. This method is called to perform CAC functionality.
-   *
-   * \param minimumRateBytes Minimum rate based bytes needed to reserve
-   * \param controlSlotsEnabled Flag indicating if control slot generation is enabled
-   */
-  void ReserveMinimumRate (uint32_t minimumRateBytes, bool controlSlotsEnabled);
+    /**
+     * \brief Release minimum rate from the allocator. This method is called when a UT leaves the
+     * beam using this allocator.
+     *
+     * \param minimumRateBytes Minimum rate based bytes needed to reserve
+     * \param controlSlotsEnabled Flag indicating if control slot generation is enabled
+     */
+    void ReleaseMinimumRate(uint32_t minimumRateBytes, bool controlSlotsEnabled);
 
-  /**
-   * \brief Release minimum rate from the allocator. This method is called when a UT leaves the beam using this allocator.
-   *
-   * \param minimumRateBytes Minimum rate based bytes needed to reserve
-   * \param controlSlotsEnabled Flag indicating if control slot generation is enabled
-   */
-  void ReleaseMinimumRate (uint32_t minimumRateBytes, bool controlSlotsEnabled);
+    /**
+     * \brief Preallocate symbols for given to UTs in superframe.
+     * Pre-allocation is done in fairly manner between UTs and RCs.
+     */
+    void PreAllocateSymbols(SatFrameAllocator::SatFrameAllocContainer_t& allocReqs);
 
-  /**
-   * \brief Preallocate symbols for given to UTs in superframe.
-   * Pre-allocation is done in fairly manner between UTs and RCs.
-   */
-  void PreAllocateSymbols (SatFrameAllocator::SatFrameAllocContainer_t& allocReqs);
+    /**
+     * \brief Generate time slots in TBTP(s) for the UT/RC.
+     *
+     * \param tbtpContainer TBTP message container to add/fill TBTPs.
+     * \param maxSizeInBytes Maximum size for a TBTP message.
+     * \param utAllocContainer Reference to UT allocation container to fill in info of the
+     * allocation \param waveformTrace Wave form trace callback \param utLoadTrace UT load per the
+     * frame trace callback \param loadTrace Load per the frame trace callback
+     */
+    void GenerateTimeSlots(SatFrameAllocator::TbtpMsgContainer_t& tbtpContainer,
+                           uint32_t maxSizeInBytes,
+                           SatFrameAllocator::UtAllocInfoContainer_t& utAllocContainer,
+                           TracedCallback<uint32_t> waveformTrace,
+                           TracedCallback<uint32_t, uint32_t> utLoadTrace,
+                           TracedCallback<uint32_t, double> loadTrace);
 
-  /**
-   * \brief Generate time slots in TBTP(s) for the UT/RC.
-   *
-   * \param tbtpContainer TBTP message container to add/fill TBTPs.
-   * \param maxSizeInBytes Maximum size for a TBTP message.
-   * \param utAllocContainer Reference to UT allocation container to fill in info of the allocation
-   * \param waveformTrace Wave form trace callback
-   * \param utLoadTrace UT load per the frame trace callback
-   * \param loadTrace Load per the frame trace callback
-   */
-  void GenerateTimeSlots (SatFrameAllocator::TbtpMsgContainer_t& tbtpContainer, uint32_t maxSizeInBytes, SatFrameAllocator::UtAllocInfoContainer_t& utAllocContainer,
-                          TracedCallback<uint32_t> waveformTrace, TracedCallback<uint32_t, uint32_t> utLoadTrace, TracedCallback<uint32_t, double> loadTrace);
+  private:
+    /**
+     * Container for SatFrameInfo items.
+     */
+    typedef std::vector<Ptr<SatFrameAllocator>> FrameAllocatorContainer_t;
 
-private:
-  /**
-   * Container for SatFrameInfo items.
-   */
-  typedef std::vector< Ptr<SatFrameAllocator> > FrameAllocatorContainer_t;
+    /**
+     * Container for the supported SatFrameAllocator (frames).
+     */
+    typedef std::map<Ptr<SatFrameAllocator>, uint32_t> SupportedFramesMap_t;
 
-  /**
-   * Container for the supported SatFrameAllocator (frames).
-   */
-  typedef std::map<Ptr<SatFrameAllocator>, uint32_t> SupportedFramesMap_t;
+    // Frame info container.
+    FrameAllocatorContainer_t m_frameAllocators;
 
-  // Frame info container.
-  FrameAllocatorContainer_t    m_frameAllocators;
+    // target load for the frame
+    double m_targetLoad;
 
-  // target load for the frame
-  double  m_targetLoad;
+    // flag telling if FCA (free capacity allocation) is on
+    bool m_fcaEnabled;
 
-  // flag telling if FCA (free capacity allocation) is on
-  bool  m_fcaEnabled;
+    // minimum carrier payload in bytes
+    uint32_t m_minCarrierPayloadInBytes;
 
-  // minimum carrier payload in bytes
-  uint32_t  m_minCarrierPayloadInBytes;
+    // minimum rate based bytes left can been guaranteed by frame allocator
+    uint32_t m_minimumRateBasedBytesLeft;
 
-  // minimum rate based bytes left can been guaranteed by frame allocator
-  uint32_t  m_minimumRateBasedBytesLeft;
+    // The flag telling if time slot generation is done per RC based symbols
+    // instead of UT based symbols
+    bool m_rcBasedAllocationEnabled;
 
-  // The flag telling if time slot generation is done per RC based symbols
-  // instead of UT based symbols
-  bool m_rcBasedAllocationEnabled;
+    // the most robust
+    uint32_t m_mostRobustSlotPayloadInBytes;
 
-  // the most robust
-  uint32_t m_mostRobustSlotPayloadInBytes;
+    // the total bandwidth for all configured frames
+    double m_totalBandwidth;
 
-  // the total bandwidth for all configured frames
-  double m_totalBandwidth;
+    /**
+     *  Allocate given request according to type.
+     *
+     * \param ccLevel CC level of the request
+     * \param allocReq Requested bytes
+     * \param frames Information of the possibles frames to allocate.
+     * \return
+     */
+    bool AllocateBasedOnCc(SatFrameAllocator::CcLevel_t ccLevel,
+                           SatFrameAllocator::SatFrameAllocReq* allocReq,
+                           const SupportedFramesMap_t& frames);
 
-  /**
-   *  Allocate given request according to type.
-   *
-   * \param ccLevel CC level of the request
-   * \param allocReq Requested bytes
-   * \param frames Information of the possibles frames to allocate.
-   * \return
-   */
-  bool AllocateBasedOnCc (SatFrameAllocator::CcLevel_t ccLevel, SatFrameAllocator::SatFrameAllocReq * allocReq, const SupportedFramesMap_t &frames);
+    /**
+     * Allocate a request to a frame.
+     *
+     * \param allocReq  Allocation request parameters for RC/CCs
+     * \return true when allocation is successful, false otherwise
+     */
+    bool AllocateToFrame(SatFrameAllocator::SatFrameAllocReq* allocReq);
 
-  /**
-   * Allocate a request to a frame.
-   *
-   * \param allocReq  Allocation request parameters for RC/CCs
-   * \return true when allocation is successful, false otherwise
-   */
-  bool AllocateToFrame (SatFrameAllocator::SatFrameAllocReq * allocReq);
+    /**
+     * Remove allocations from all frames maintained by frame allocator.
+     */
+    void RemoveAllocations();
 
-  /**
-   * Remove allocations from all frames maintained by frame allocator.
-   */
-  void RemoveAllocations ();
+    /**
+     * \brief Select which carriers to use from the underlying frames.
+     * This method is called to perform dynamic frequency plan
+     * functionality. It should be called only if the superframe
+     * configuration is of the CONFIG_TYPE_3 type.
+     */
+    void SelectCarriers(SatFrameAllocator::SatFrameAllocContainer_t& allocReqs);
 
-  /**
-   * \brief Select which carriers to use from the underlying frames.
-   * This method is called to perform dynamic frequency plan
-   * functionality. It should be called only if the superframe
-   * configuration is of the CONFIG_TYPE_3 type.
-   */
-  void SelectCarriers (SatFrameAllocator::SatFrameAllocContainer_t& allocReqs);
-
-  /**
-   * \brief Select which carrier is the best suited for handling requests
-   * of a terminal communicating at the given C/N0.
-   * \return The SatFrameAllocator suitable for such carriers or nullptr if
-   * none can be found.
-   */
-  Ptr<SatFrameAllocator> SelectBestCarrier (double cno, uint32_t& bestWaveFormId);
+    /**
+     * \brief Select which carrier is the best suited for handling requests
+     * of a terminal communicating at the given C/N0.
+     * \return The SatFrameAllocator suitable for such carriers or nullptr if
+     * none can be found.
+     */
+    Ptr<SatFrameAllocator> SelectBestCarrier(double cno, uint32_t& bestWaveFormId);
 };
 
 } // namespace ns3

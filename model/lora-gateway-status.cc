@@ -20,119 +20,118 @@
  * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include <ns3/log.h>
-
 #include "lora-gateway-status.h"
 
+#include <ns3/log.h>
 
-NS_LOG_COMPONENT_DEFINE ("LoraGatewayStatus");
+NS_LOG_COMPONENT_DEFINE("LoraGatewayStatus");
 
-namespace ns3 {
+namespace ns3
+{
 
-NS_OBJECT_ENSURE_REGISTERED (LoraGatewayStatus);
+NS_OBJECT_ENSURE_REGISTERED(LoraGatewayStatus);
 
 TypeId
-LoraGatewayStatus::GetTypeId (void)
+LoraGatewayStatus::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::LoraGatewayStatus")
-    .AddConstructor<LoraGatewayStatus> ();
-  return tid;
+    static TypeId tid = TypeId("ns3::LoraGatewayStatus").AddConstructor<LoraGatewayStatus>();
+    return tid;
 }
 
-
-LoraGatewayStatus::LoraGatewayStatus ()
+LoraGatewayStatus::LoraGatewayStatus()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-LoraGatewayStatus::~LoraGatewayStatus ()
+LoraGatewayStatus::~LoraGatewayStatus()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-LoraGatewayStatus::LoraGatewayStatus (Address address, Ptr<NetDevice> netDevice, Ptr<LorawanMacGateway> gwMac) :
-  m_address (address),
-  m_netDevice (netDevice),
-  m_gatewayMac (gwMac),
-  m_nextTransmissionTime (Seconds (0))
+LoraGatewayStatus::LoraGatewayStatus(Address address,
+                                     Ptr<NetDevice> netDevice,
+                                     Ptr<LorawanMacGateway> gwMac)
+    : m_address(address),
+      m_netDevice(netDevice),
+      m_gatewayMac(gwMac),
+      m_nextTransmissionTime(Seconds(0))
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
 Address
-LoraGatewayStatus::GetAddress ()
+LoraGatewayStatus::GetAddress()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return m_address;
+    return m_address;
 }
 
 void
-LoraGatewayStatus::SetAddress (Address address)
+LoraGatewayStatus::SetAddress(Address address)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  m_address = address;
+    m_address = address;
 }
 
 Ptr<NetDevice>
-LoraGatewayStatus::GetNetDevice ()
+LoraGatewayStatus::GetNetDevice()
 {
-  return m_netDevice;
+    return m_netDevice;
 }
 
 void
-LoraGatewayStatus::SetNetDevice (Ptr<NetDevice> netDevice)
+LoraGatewayStatus::SetNetDevice(Ptr<NetDevice> netDevice)
 {
-  m_netDevice = netDevice;
+    m_netDevice = netDevice;
 }
 
 Ptr<LorawanMacGateway>
-LoraGatewayStatus::GetGatewayMac (void)
+LoraGatewayStatus::GetGatewayMac(void)
 {
-  return m_gatewayMac;
+    return m_gatewayMac;
 }
 
 bool
-LoraGatewayStatus::IsAvailableForTransmission (double frequency)
+LoraGatewayStatus::IsAvailableForTransmission(double frequency)
 {
-  NS_LOG_FUNCTION (this << frequency);
+    NS_LOG_FUNCTION(this << frequency);
 
-  // We can't send multiple packets at once, see SX1301 V2.01 page 29
+    // We can't send multiple packets at once, see SX1301 V2.01 page 29
 
-  // Check that the gateway was not already "booked"
-  if (m_nextTransmissionTime > Simulator::Now () - MilliSeconds (1))
+    // Check that the gateway was not already "booked"
+    if (m_nextTransmissionTime > Simulator::Now() - MilliSeconds(1))
     {
-      NS_LOG_INFO ("This gateway is already booked for a transmission");
-      return false;
+        NS_LOG_INFO("This gateway is already booked for a transmission");
+        return false;
     }
 
-  // Check that the gateway is not already in TX mode
-  if (m_gatewayMac->IsTransmitting ())
+    // Check that the gateway is not already in TX mode
+    if (m_gatewayMac->IsTransmitting())
     {
-      NS_LOG_INFO ("This gateway is currently transmitting");
-      return false;
+        NS_LOG_INFO("This gateway is currently transmitting");
+        return false;
     }
 
-  // Check that the gateway is not constrained by the duty cycle
-  Time waitingTime = m_gatewayMac->GetWaitingTime (frequency);
-  if (waitingTime > Seconds (0))
+    // Check that the gateway is not constrained by the duty cycle
+    Time waitingTime = m_gatewayMac->GetWaitingTime(frequency);
+    if (waitingTime > Seconds(0))
     {
-      NS_LOG_INFO ("Gateway cannot be used because of duty cycle");
-      NS_LOG_INFO ("Waiting time at current GW: " << waitingTime.GetSeconds ()
-                                                  << " seconds");
+        NS_LOG_INFO("Gateway cannot be used because of duty cycle");
+        NS_LOG_INFO("Waiting time at current GW: " << waitingTime.GetSeconds() << " seconds");
 
-      return false;
+        return false;
     }
 
-  return true;
+    return true;
 }
 
 void
-LoraGatewayStatus::SetNextTransmissionTime (Time nextTransmissionTime)
+LoraGatewayStatus::SetNextTransmissionTime(Time nextTransmissionTime)
 {
-  NS_LOG_FUNCTION (this << nextTransmissionTime);
+    NS_LOG_FUNCTION(this << nextTransmissionTime);
 
-  m_nextTransmissionTime = nextTransmissionTime;
+    m_nextTransmissionTime = nextTransmissionTime;
 }
-}
+} // namespace ns3

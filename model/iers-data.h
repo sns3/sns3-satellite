@@ -31,30 +31,32 @@
  *            data/sgp4/ folder using the latest files
  *            provided at:
  * http://www.usno.navy.mil/USNO/earth-orientation/eo-info/general/bullc
- * and 
+ * and
  * http://www.usno.navy.mil/USNO/earth-orientation/eo-products/weekly or
  * http://www.iers.org/IERS/EN/DataProducts/EarthOrientationData/eop.html
  */
-namespace ns3 {
+namespace ns3
+{
 
-class IersData {
-public:
-  struct EopParameters {
-    // radians, radians, seconds, milliseconds
-    double xp, yp, dut1, lod;
-  };
+class IersData
+{
+  public:
+    struct EopParameters
+    {
+        // radians, radians, seconds, milliseconds
+        double xp, yp, dut1, lod;
+    };
 
-  static const std::vector<EopParameters> EopValues;
-  static const uint32_t BaseLeapSeconds;
-  static const uint32_t CurLeapSeconds;
-  static const std::vector<uint32_t> LeapSeconds;
+    static const std::vector<EopParameters> EopValues;
+    static const uint32_t BaseLeapSeconds;
+    static const uint32_t CurLeapSeconds;
+    static const std::vector<uint32_t> LeapSeconds;
 
-protected:
-  static const EopParameters __eop_params[];
-  static const uint32_t __leap_secs[];
+  protected:
+    static const EopParameters __eop_params[];
+    static const uint32_t __leap_secs[];
 };
 
-}
+} // namespace ns3
 
 #endif // IERS_DATA_H
-

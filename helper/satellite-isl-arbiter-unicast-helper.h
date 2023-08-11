@@ -24,46 +24,49 @@
 #ifndef SATELLITE_ISL_ARBITER_UNICAST_HELPER_H
 #define SATELLITE_ISL_ARBITER_UNICAST_HELPER_H
 
+#include <ns3/node-container.h>
 #include <ns3/satellite-isl-arbiter-unicast.h>
 
-namespace ns3 {
+namespace ns3
+{
 
 class SatIslArbiterUnicastHelper : public Object
 {
-public:
-  static TypeId GetTypeId (void);
+  public:
+    static TypeId GetTypeId(void);
 
-  /**
-   * Default constructor. Must not be used
-   */
-  SatIslArbiterUnicastHelper ();
+    /**
+     * Default constructor. Must not be used
+     */
+    SatIslArbiterUnicastHelper();
 
-  /**
-   * Constructor
-   * 
-   * \param geoNodes List of all satellite nodes
-   * \param isls List of all ISLs
-   */
-  SatIslArbiterUnicastHelper (NodeContainer geoNodes, std::vector <std::pair <uint32_t, uint32_t>> isls);
+    /**
+     * Constructor
+     *
+     * \param geoNodes List of all satellite nodes
+     * \param isls List of all ISLs
+     */
+    SatIslArbiterUnicastHelper(NodeContainer geoNodes,
+                               std::vector<std::pair<uint32_t, uint32_t>> isls);
 
-  /**
-   * Install arbiter on all satellite nodes
-   */
-  void InstallArbiters ();
+    /**
+     * Install arbiter on all satellite nodes
+     */
+    void InstallArbiters();
 
-  /**
-   * Update arbiter on all satellite nodes
-   */
-  void UpdateArbiters ();
+    /**
+     * Update arbiter on all satellite nodes
+     */
+    void UpdateArbiters();
 
-private:
-  /**
-   * Compute routing tables for all satellite nodes
-   */
-  std::vector<std::map<uint32_t, uint32_t>> CalculateGlobalState ();
+  private:
+    /**
+     * Compute routing tables for all satellite nodes
+     */
+    std::vector<std::map<uint32_t, uint32_t>> CalculateGlobalState();
 
-  NodeContainer                                m_geoNodes;  // List of all satellite nodes
-  std::vector <std::pair <uint32_t, uint32_t>> m_isls;      // List of all ISLs
+    NodeContainer m_geoNodes;                          // List of all satellite nodes
+    std::vector<std::pair<uint32_t, uint32_t>> m_isls; // List of all ISLs
 };
 
 } // namespace ns3

@@ -21,11 +21,13 @@
 #ifndef SAT_INPUT_FSTREAM_WRAPPER_H
 #define SAT_INPUT_FSTREAM_WRAPPER_H
 
-#include <fstream>
 #include "ns3/object.h"
 #include "ns3/simple-ref-count.h"
 
-namespace ns3 {
+#include <fstream>
+
+namespace ns3
+{
 
 /**
  * \brief A class encapsulating an STL input stream.
@@ -38,35 +40,35 @@ namespace ns3 {
  */
 class SatInputFileStreamWrapper : public SimpleRefCount<SatInputFileStreamWrapper>
 {
-public:
-  /**
-   * \brief Constructor
-   * \param filename file name
-   * \param filemode file mode
-   */
-  SatInputFileStreamWrapper (std::string filename, std::ios::openmode filemode);
+  public:
+    /**
+     * \brief Constructor
+     * \param filename file name
+     * \param filemode file mode
+     */
+    SatInputFileStreamWrapper(std::string filename, std::ios::openmode filemode);
 
-  /**
-   * \brief Destructor
-   */
-  ~SatInputFileStreamWrapper ();
+    /**
+     * \brief Destructor
+     */
+    ~SatInputFileStreamWrapper();
 
-  /**
-   * \brief Return a pointer to an ifstream previously set in the wrapper.
-   * \return a pointer to the encapsulated std::ifstream
-   */
-  std::ifstream * GetStream (void);
+    /**
+     * \brief Return a pointer to an ifstream previously set in the wrapper.
+     * \return a pointer to the encapsulated std::ifstream
+     */
+    std::ifstream* GetStream(void);
 
-private:
-  /**
-   * \brief Input file stream
-   */
-  std::ifstream *m_ifstream;
+  private:
+    /**
+     * \brief Input file stream
+     */
+    std::ifstream* m_ifstream;
 
-  /**
-   * \brief Is the stream destroyable
-   */
-  bool m_destroyable;
+    /**
+     * \brief Is the stream destroyable
+     */
+    bool m_destroyable;
 };
 
 } // namespace ns3

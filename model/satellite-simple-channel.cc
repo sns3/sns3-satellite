@@ -18,74 +18,82 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include <ns3/simulator.h>
-#include <ns3/packet.h>
-#include <ns3/node.h>
-#include <ns3/log.h>
-
 #include "satellite-simple-channel.h"
+
 #include "satellite-simple-net-device.h"
 
+#include <ns3/log.h>
+#include <ns3/node.h>
+#include <ns3/packet.h>
+#include <ns3/simulator.h>
 
-NS_LOG_COMPONENT_DEFINE ("SatSimpleChannel");
+NS_LOG_COMPONENT_DEFINE("SatSimpleChannel");
 
-namespace ns3 {
+namespace ns3
+{
 
-NS_OBJECT_ENSURE_REGISTERED (SatSimpleChannel)
-;
+NS_OBJECT_ENSURE_REGISTERED(SatSimpleChannel);
 
 TypeId
-SatSimpleChannel::GetTypeId (void)
+SatSimpleChannel::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatSimpleChannel")
-    .SetParent<Channel> ()
-    .AddConstructor<SatSimpleChannel> ()
-  ;
-  return tid;
+    static TypeId tid =
+        TypeId("ns3::SatSimpleChannel").SetParent<Channel>().AddConstructor<SatSimpleChannel>();
+    return tid;
 }
 
-SatSimpleChannel::SatSimpleChannel ()
+SatSimpleChannel::SatSimpleChannel()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
 void
-SatSimpleChannel::Send (Ptr<Packet> p, uint16_t protocol,
-                        Mac48Address to, Mac48Address from,
-                        Ptr<SatSimpleNetDevice> sender)
+SatSimpleChannel::Send(Ptr<Packet> p,
+                       uint16_t protocol,
+                       Mac48Address to,
+                       Mac48Address from,
+                       Ptr<SatSimpleNetDevice> sender)
 {
-  NS_LOG_FUNCTION (this << p << protocol << to << from << sender)
-  ;
-  for (std::vector<Ptr<SatSimpleNetDevice> >::const_iterator i = m_devices.begin (); i != m_devices.end (); ++i)
+    NS_LOG_FUNCTION(this << p << protocol << to << from << sender);
+    for (std::vector<Ptr<SatSimpleNetDevice>>::const_iterator i = m_devices.begin();
+         i != m_devices.end();
+         ++i)
     {
-      Ptr<SatSimpleNetDevice> device = *i;
+        Ptr<SatSimpleNetDevice> device = *i;
 
-      if (device != sender)
+        if (device != sender)
         {
-          Simulator::ScheduleWithContext (device->GetNode ()->GetId (), Seconds (0),
-                                          &SatSimpleNetDevice::Receive, device, p->Copy (), protocol, to, from);
+            Simulator::ScheduleWithContext(device->GetNode()->GetId(),
+                                           Seconds(0),
+                                           &SatSimpleNetDevice::Receive,
+                                           device,
+                                           p->Copy(),
+                                           protocol,
+                                           to,
+                                           from);
         }
     }
 }
 
 void
-SatSimpleChannel::Add (Ptr<SatSimpleNetDevice> device)
+SatSimpleChannel::Add(Ptr<SatSimpleNetDevice> device)
 {
-  NS_LOG_FUNCTION (this << device);
-  m_devices.push_back (device);
+    NS_LOG_FUNCTION(this << device);
+    m_devices.push_back(device);
 }
 
 std::size_t
-SatSimpleChannel::GetNDevices (void) const
+SatSimpleChannel::GetNDevices(void) const
 {
-  NS_LOG_FUNCTION (this);
-  return m_devices.size ();
+    NS_LOG_FUNCTION(this);
+    return m_devices.size();
 }
+
 Ptr<NetDevice>
-SatSimpleChannel::GetDevice (std::size_t i) const
+SatSimpleChannel::GetDevice(std::size_t i) const
 {
-  NS_LOG_FUNCTION (this << i);
-  return m_devices[i];
+    NS_LOG_FUNCTION(this << i);
+    return m_devices[i];
 }
 
 } // namespace ns3

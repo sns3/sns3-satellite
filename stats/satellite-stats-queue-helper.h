@@ -22,16 +22,16 @@
 #ifndef SATELLITE_STATS_QUEUE_HELPER_H
 #define SATELLITE_STATS_QUEUE_HELPER_H
 
-#include <ns3/ptr.h>
-#include <ns3/nstime.h>
-#include <ns3/satellite-stats-helper.h>
 #include <ns3/collector-map.h>
+#include <ns3/nstime.h>
+#include <ns3/ptr.h>
+#include <ns3/satellite-stats-helper.h>
+
 #include <list>
 #include <utility>
 
-
-namespace ns3 {
-
+namespace ns3
+{
 
 // BASE CLASS /////////////////////////////////////////////////////////////////
 
@@ -45,104 +45,101 @@ class DataCollectionObject;
  */
 class SatStatsQueueHelper : public SatStatsHelper
 {
-public:
-  /**
-   * \enum UnitType_t
-   * \brief
-   */
-  typedef enum
-  {
-    UNIT_BYTES = 0,
-    UNIT_NUMBER_OF_PACKETS,
-  } UnitType_t;
+  public:
+    /**
+     * \enum UnitType_t
+     * \brief
+     */
+    typedef enum
+    {
+        UNIT_BYTES = 0,
+        UNIT_NUMBER_OF_PACKETS,
+    } UnitType_t;
 
-  /**
-   * \param unitType
-   * \return
-   */
-  static std::string GetUnitTypeName (UnitType_t unitType);
+    /**
+     * \param unitType
+     * \return
+     */
+    static std::string GetUnitTypeName(UnitType_t unitType);
 
-  // inherited from SatStatsHelper base class
-  SatStatsQueueHelper (Ptr<const SatHelper> satHelper);
+    // inherited from SatStatsHelper base class
+    SatStatsQueueHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsQueueHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsQueueHelper ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
+    /**
+     * \param pollInterval
+     */
+    void SetPollInterval(Time pollInterval);
 
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
+    /**
+     * \return
+     */
+    Time GetPollInterval() const;
 
-  /**
-   * \param pollInterval
-   */
-  void SetPollInterval (Time pollInterval);
+    /**
+     * \param unitType
+     */
+    void SetUnitType(UnitType_t unitType);
 
-  /**
-   * \return
-   */
-  Time GetPollInterval () const;
+    /**
+     * \return
+     */
+    UnitType_t GetUnitType() const;
 
-  /**
-   * \param unitType
-   */
-  void SetUnitType (UnitType_t unitType);
+    /**
+     * \brief Identify the list of source of queue events.
+     */
+    void EnlistSource();
 
-  /**
-   * \return
-   */
-  UnitType_t GetUnitType () const;
+    /**
+     * \brief Retrieve the queue size of every relevant encapsulator and push the
+     *        values to the right collectors.
+     */
+    void Poll();
 
-  /**
-   * \brief Identify the list of source of queue events.
-   */
-  void EnlistSource ();
+  protected:
+    // inherited from SatStatsHelper base class
+    void DoInstall();
 
-  /**
-   * \brief Retrieve the queue size of every relevant encapsulator and push the
-   *        values to the right collectors.
-   */
-  void Poll ();
+    /**
+     * \brief
+     */
+    virtual void DoEnlistSource() = 0;
 
-protected:
-  // inherited from SatStatsHelper base class
-  void DoInstall ();
+    /**
+     * \brief Retrieve the queue size of every relevant encapsulator and push the
+     *        values to the right collectors.
+     */
+    virtual void DoPoll() = 0;
 
-  /**
-   * \brief
-   */
-  virtual void DoEnlistSource () = 0;
+    /**
+     * \param identifier
+     * \param value
+     */
+    void PushToCollector(uint32_t identifier, uint32_t value);
 
-  /**
-   * \brief Retrieve the queue size of every relevant encapsulator and push the
-   *        values to the right collectors.
-   */
-  virtual void DoPoll () = 0;
+    /// Maintains a list of collectors created by this helper.
+    CollectorMap m_terminalCollectors;
 
-  /**
-   * \param identifier
-   * \param value
-   */
-  void PushToCollector (uint32_t identifier, uint32_t value);
+    /// The aggregator created by this helper.
+    Ptr<DataCollectionObject> m_aggregator;
 
-  /// Maintains a list of collectors created by this helper.
-  CollectorMap m_terminalCollectors;
-
-  /// The aggregator created by this helper.
-  Ptr<DataCollectionObject> m_aggregator;
-
-private:
-  Time         m_pollInterval;  ///< `PollInterval` attribute.
-  UnitType_t   m_unitType;      ///<
-  std::string  m_shortLabel;    ///<
-  std::string  m_longLabel;     ///<
+  private:
+    Time m_pollInterval;      ///< `PollInterval` attribute.
+    UnitType_t m_unitType;    ///<
+    std::string m_shortLabel; ///<
+    std::string m_longLabel;  ///<
 
 }; // end of class SatStatsQueueHelper
-
 
 // FORWARD LINK ///////////////////////////////////////////////////////////////
 
@@ -154,36 +151,33 @@ class SatLlc;
  */
 class SatStatsFwdQueueHelper : public SatStatsQueueHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsFwdQueueHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsFwdQueueHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsFwdQueueHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsFwdQueueHelper ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
+  protected:
+    // inherited from SatStatsQueueHelper base class
+    void DoEnlistSource();
+    void DoPoll();
 
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
+  private:
+    ///
+    typedef std::list<std::pair<Mac48Address, uint32_t>> ListOfUt_t;
 
-protected:
-  // inherited from SatStatsQueueHelper base class
-  void DoEnlistSource ();
-  void DoPoll ();
-
-private:
-  ///
-  typedef std::list<std::pair<Mac48Address, uint32_t> > ListOfUt_t;
-
-  /// Maintains a list of GW LLC, its UT address, and its identifier.
-  std::list<std::pair<Ptr<SatLlc>, ListOfUt_t> > m_llc;
+    /// Maintains a list of GW LLC, its UT address, and its identifier.
+    std::list<std::pair<Ptr<SatLlc>, ListOfUt_t>> m_llc;
 
 }; // end of class SatStatsFwdQueueHelper
-
 
 /**
  * \ingroup satstats
@@ -191,24 +185,21 @@ private:
  */
 class SatStatsFwdQueueBytesHelper : public SatStatsFwdQueueHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsFwdQueueBytesHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsFwdQueueBytesHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsFwdQueueBytesHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsFwdQueueBytesHelper ();
-
-
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
 }; // end of class SatStatsFwdQueueBytesHelper
-
 
 /**
  * \ingroup satstats
@@ -216,24 +207,21 @@ public:
  */
 class SatStatsFwdQueuePacketsHelper : public SatStatsFwdQueueHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsFwdQueuePacketsHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsFwdQueuePacketsHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsFwdQueuePacketsHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsFwdQueuePacketsHelper ();
-
-
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
 }; // end of class SatStatsFwdQueuePacketsHelper
-
 
 // RETURN LINK ////////////////////////////////////////////////////////////////
 
@@ -243,33 +231,30 @@ public:
  */
 class SatStatsRtnQueueHelper : public SatStatsQueueHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsRtnQueueHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsRtnQueueHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsRtnQueueHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsRtnQueueHelper ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
+  protected:
+    // inherited from SatStatsQueueHelper base class
+    void DoEnlistSource();
+    void DoPoll();
 
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
-
-protected:
-  // inherited from SatStatsQueueHelper base class
-  void DoEnlistSource ();
-  void DoPoll ();
-
-private:
-  /// Maintains a list of UT LLC and its identifier.
-  std::list<std::pair<Ptr<SatLlc>, uint32_t> > m_llc;
+  private:
+    /// Maintains a list of UT LLC and its identifier.
+    std::list<std::pair<Ptr<SatLlc>, uint32_t>> m_llc;
 
 }; // end of class SatStatsRtnQueueHelper
-
 
 /**
  * \ingroup satstats
@@ -277,24 +262,21 @@ private:
  */
 class SatStatsRtnQueueBytesHelper : public SatStatsRtnQueueHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsRtnQueueBytesHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsRtnQueueBytesHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsRtnQueueBytesHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsRtnQueueBytesHelper ();
-
-
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
 }; // end of class SatStatsRtnQueueBytesHelper
-
 
 /**
  * \ingroup satstats
@@ -302,26 +284,22 @@ public:
  */
 class SatStatsRtnQueuePacketsHelper : public SatStatsRtnQueueHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsRtnQueuePacketsHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsRtnQueuePacketsHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsRtnQueuePacketsHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsRtnQueuePacketsHelper ();
-
-
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
 }; // end of class SatStatsRtnQueuePacketsHelper
 
-
 } // end of namespace ns3
-
 
 #endif /* SATELLITE_STATS_QUEUE_HELPER_H */

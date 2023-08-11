@@ -30,24 +30,24 @@ function bler = get_bler (sinr_list, bler_list, sinr)
     bler = 0.0;
   else
     bler = interp1 (sinr_list, bler_list, sinr, 'linear');
-  endif  
+  endif
 endfunction
 
 function print_test_case (link_results_path, dvb_type, modcod, burst_length)
   global g_step_db;
-  
+
   link_results = load (strcat ("../../data/linkresults/", link_results_path));
   sinr_list_db = link_results(:, 1);
   bler_list = link_results(:, 2);
   sinr_min = floor (sinr_list_db(1) / g_step_db) * g_step_db;
   sinr_max = ceil (sinr_list_db(end) / g_step_db) * g_step_db;
-  
+
   for sinr_db = [sinr_min : g_step_db : sinr_max]
     printf ("AddTestCase (new SatLinkResults%sTestCase ", dvb_type);
     printf ("(linkResults%s, ", dvb_type);
     printf ("SatLinkResults::SAT_MODCOD_%s, %d, ", modcod, burst_length);
     printf ("%f, %e)", sinr_db, get_bler (sinr_list_db, bler_list, sinr_db));
-    printf (", TestCase::QUICK);\n");    
+    printf (", TestCase::QUICK);\n");
   endfor
 
   printf ("\n");

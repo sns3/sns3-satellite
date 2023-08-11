@@ -19,48 +19,53 @@
  */
 
 #include "satellite-output-fstream-wrapper.h"
-#include "ns3/log.h"
-#include "ns3/fatal-impl.h"
+
 #include "ns3/abort.h"
+#include "ns3/fatal-impl.h"
+#include "ns3/log.h"
+
 #include <fstream>
 
-NS_LOG_COMPONENT_DEFINE ("SatOutputFileStreamWrapper");
+NS_LOG_COMPONENT_DEFINE("SatOutputFileStreamWrapper");
 
-namespace ns3 {
-
-SatOutputFileStreamWrapper::SatOutputFileStreamWrapper (std::string filename, std::ios::openmode filemode)
-  : m_destroyable (true)
+namespace ns3
 {
-  NS_LOG_FUNCTION (this << filename << filemode);
 
-  m_ofstream = new std::ofstream (filename.c_str (), filemode);
+SatOutputFileStreamWrapper::SatOutputFileStreamWrapper(std::string filename,
+                                                       std::ios::openmode filemode)
+    : m_destroyable(true)
+{
+    NS_LOG_FUNCTION(this << filename << filemode);
 
-  NS_ABORT_MSG_UNLESS (m_ofstream->is_open (), "SatOutputFileStreamWrapper::SatOutputFileStreamWrapper():  " <<
-                       "Unable to Open " << filename << " for mode " << filemode);
+    m_ofstream = new std::ofstream(filename.c_str(), filemode);
 
-  FatalImpl::RegisterStream (m_ofstream);
+    NS_ABORT_MSG_UNLESS(m_ofstream->is_open(),
+                        "SatOutputFileStreamWrapper::SatOutputFileStreamWrapper():  "
+                            << "Unable to Open " << filename << " for mode " << filemode);
+
+    FatalImpl::RegisterStream(m_ofstream);
 }
 
-SatOutputFileStreamWrapper::~SatOutputFileStreamWrapper ()
+SatOutputFileStreamWrapper::~SatOutputFileStreamWrapper()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  FatalImpl::UnregisterStream (m_ofstream);
+    FatalImpl::UnregisterStream(m_ofstream);
 
-  if (m_destroyable)
+    if (m_destroyable)
     {
-      delete m_ofstream;
-      m_ofstream = 0;
+        delete m_ofstream;
+        m_ofstream = 0;
     }
-  m_destroyable = false;
+    m_destroyable = false;
 }
 
-std::ofstream *
-SatOutputFileStreamWrapper::GetStream (void)
+std::ofstream*
+SatOutputFileStreamWrapper::GetStream(void)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return m_ofstream;
+    return m_ofstream;
 }
 
 } // namespace ns3

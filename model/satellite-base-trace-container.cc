@@ -18,16 +18,16 @@
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
 
-#include <ns3/log.h>
-
 #include "satellite-base-trace-container.h"
 
+#include <ns3/log.h>
 
-NS_LOG_COMPONENT_DEFINE ("SatBaseTraceContainer");
+NS_LOG_COMPONENT_DEFINE("SatBaseTraceContainer");
 
-namespace ns3 {
+namespace ns3
+{
 
-NS_OBJECT_ENSURE_REGISTERED (SatBaseTraceContainer);
+NS_OBJECT_ENSURE_REGISTERED(SatBaseTraceContainer);
 
 const uint32_t SatBaseTraceContainer::RX_POWER_TRACE_DEFAULT_RX_POWER_DENSITY_INDEX;
 const uint32_t SatBaseTraceContainer::RX_POWER_TRACE_DEFAULT_NUMBER_OF_COLUMNS;
@@ -45,29 +45,28 @@ const uint32_t SatBaseTraceContainer::POSITION_TRACE_DEFAULT_ALTITUDE_INDEX;
 const uint32_t SatBaseTraceContainer::POSITION_TRACE_DEFAULT_NUMBER_OF_COLUMNS;
 
 TypeId
-SatBaseTraceContainer::GetTypeId (void)
+SatBaseTraceContainer::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatBaseTraceContainer")
-    .SetParent<Object> ();
-  return tid;
+    static TypeId tid = TypeId("ns3::SatBaseTraceContainer").SetParent<Object>();
+    return tid;
 }
 
 TypeId
-SatBaseTraceContainer::GetInstanceTypeId (void) const
+SatBaseTraceContainer::GetInstanceTypeId(void) const
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return GetTypeId ();
+    return GetTypeId();
 }
 
-SatBaseTraceContainer::SatBaseTraceContainer ()
+SatBaseTraceContainer::SatBaseTraceContainer()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-SatBaseTraceContainer::~SatBaseTraceContainer ()
+SatBaseTraceContainer::~SatBaseTraceContainer()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
 } // namespace ns3

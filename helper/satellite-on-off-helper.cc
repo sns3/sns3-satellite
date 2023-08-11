@@ -18,60 +18,61 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include "ns3/string.h"
-#include "ns3/uinteger.h"
 #include "satellite-on-off-helper.h"
 
-namespace ns3 {
+#include "ns3/string.h"
+#include "ns3/uinteger.h"
 
-SatOnOffHelper::SatOnOffHelper (std::string protocol, Address address)
+namespace ns3
 {
-  m_factory.SetTypeId ("ns3::SatOnOffApplication");
-  m_factory.Set ("Protocol", StringValue (protocol));
-  m_factory.Set ("Remote", AddressValue (address));
+
+SatOnOffHelper::SatOnOffHelper(std::string protocol, Address address)
+{
+    m_factory.SetTypeId("ns3::SatOnOffApplication");
+    m_factory.Set("Protocol", StringValue(protocol));
+    m_factory.Set("Remote", AddressValue(address));
 }
 
 void
-SatOnOffHelper::SetAttribute (std::string name, const AttributeValue &value)
+SatOnOffHelper::SetAttribute(std::string name, const AttributeValue& value)
 {
-  m_factory.Set (name, value);
+    m_factory.Set(name, value);
 }
 
 ApplicationContainer
-SatOnOffHelper::Install (Ptr<Node> node) const
+SatOnOffHelper::Install(Ptr<Node> node) const
 {
-  return ApplicationContainer (InstallPriv (node));
+    return ApplicationContainer(InstallPriv(node));
 }
 
 ApplicationContainer
-SatOnOffHelper::Install (NodeContainer c) const
+SatOnOffHelper::Install(NodeContainer c) const
 {
-  ApplicationContainer apps;
-  for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
+    ApplicationContainer apps;
+    for (NodeContainer::Iterator i = c.Begin(); i != c.End(); ++i)
     {
-      apps.Add (InstallPriv (*i));
+        apps.Add(InstallPriv(*i));
     }
 
-  return apps;
+    return apps;
 }
 
 Ptr<Application>
-SatOnOffHelper::InstallPriv (Ptr<Node> node) const
+SatOnOffHelper::InstallPriv(Ptr<Node> node) const
 {
-  Ptr<Application> app = m_factory.Create<Application> ();
-  node->AddApplication (app);
+    Ptr<Application> app = m_factory.Create<Application>();
+    node->AddApplication(app);
 
-  return app;
+    return app;
 }
 
 void
-SatOnOffHelper::SetConstantRate (DataRate dataRate, uint32_t packetSize)
+SatOnOffHelper::SetConstantRate(DataRate dataRate, uint32_t packetSize)
 {
-  m_factory.Set ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=1000]"));
-  m_factory.Set ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=0]"));
-  m_factory.Set ("DataRate", DataRateValue (dataRate));
-  m_factory.Set ("PacketSize", UintegerValue (packetSize));
+    m_factory.Set("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=1000]"));
+    m_factory.Set("OffTime", StringValue("ns3::ConstantRandomVariable[Constant=0]"));
+    m_factory.Set("DataRate", DataRateValue(dataRate));
+    m_factory.Set("PacketSize", UintegerValue(packetSize));
 }
-
 
 } // namespace ns3

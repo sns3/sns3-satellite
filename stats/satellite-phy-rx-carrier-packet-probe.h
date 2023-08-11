@@ -29,12 +29,13 @@
 #ifndef SATELLITE_PHY_RX_CARRIER_PACKET_PROBE_H
 #define SATELLITE_PHY_RX_CARRIER_PACKET_PROBE_H
 
-#include <ns3/nstime.h>
-#include <ns3/traced-callback.h>
 #include <ns3/address.h>
+#include <ns3/nstime.h>
 #include <ns3/probe.h>
+#include <ns3/traced-callback.h>
 
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \brief Probe to translate from a TraceSource to two more easily parsed TraceSources.
@@ -49,99 +50,99 @@ namespace ns3 {
  */
 class SatPhyRxCarrierPacketProbe : public Probe
 {
-public:
-  /**
-   * \brief Get the type ID.
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId ();
+  public:
+    /**
+     * \brief Get the type ID.
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId();
 
-  /**
-   * Default constructor.
-   */
-  SatPhyRxCarrierPacketProbe ();
+    /**
+     * Default constructor.
+     */
+    SatPhyRxCarrierPacketProbe();
 
-  /**
-   * Destructor for SatPhyRxCarrierPacketProbe
-   */
-  virtual ~SatPhyRxCarrierPacketProbe ();
+    /**
+     * Destructor for SatPhyRxCarrierPacketProbe
+     */
+    virtual ~SatPhyRxCarrierPacketProbe();
 
-  /**
-   * \brief Set a probe value
-   *
-   * \param nPackets set the traced number of packets in the packet burst equal to this
-   * \param address set the socket address for the traced packet burst equal to this
-   * \param statusFlag set the traced packet burst status flag equal to this
-   */
-  void SetValue (uint32_t nPackets, const Address& address, bool statusFlag);
+    /**
+     * \brief Set a probe value
+     *
+     * \param nPackets set the traced number of packets in the packet burst equal to this
+     * \param address set the socket address for the traced packet burst equal to this
+     * \param statusFlag set the traced packet burst status flag equal to this
+     */
+    void SetValue(uint32_t nPackets, const Address& address, bool statusFlag);
 
-  /**
-   * \brief Set a probe value by its name in the Config system
-   *
-   * \param path config path to access the probe
-   * \param nPackets set the traced number of packets in the packet burst equal to this
-   * \param address set the socket address for the traced packet burst equal to this
-   * \param statusFlag set the traced packet burst status flag equal to this
-   */
-  static void SetValueByPath (std::string path, uint32_t nPackets,
-                              const Address& address, bool statusFlag);
+    /**
+     * \brief Set a probe value by its name in the Config system
+     *
+     * \param path config path to access the probe
+     * \param nPackets set the traced number of packets in the packet burst equal to this
+     * \param address set the socket address for the traced packet burst equal to this
+     * \param statusFlag set the traced packet burst status flag equal to this
+     */
+    static void SetValueByPath(std::string path,
+                               uint32_t nPackets,
+                               const Address& address,
+                               bool statusFlag);
 
-  /**
-   * \brief connect to a trace source attribute provided by a given object
-   *
-   * \param traceSource the name of the attribute TraceSource to connect to
-   * \param obj ns3::Object to connect to
-   * \return true if the trace source was successfully connected
-   */
-  virtual bool ConnectByObject (std::string traceSource, Ptr<Object> obj);
+    /**
+     * \brief connect to a trace source attribute provided by a given object
+     *
+     * \param traceSource the name of the attribute TraceSource to connect to
+     * \param obj ns3::Object to connect to
+     * \return true if the trace source was successfully connected
+     */
+    virtual bool ConnectByObject(std::string traceSource, Ptr<Object> obj);
 
-  /**
-   * \brief connect to a trace source provided by a config path
-   *
-   * \param path Config path to bind to
-   *
-   * Note, if an invalid path is provided, the probe will not be connected
-   * to anything.
-   */
-  virtual void ConnectByPath (std::string path);
+    /**
+     * \brief connect to a trace source provided by a config path
+     *
+     * \param path Config path to bind to
+     *
+     * Note, if an invalid path is provided, the probe will not be connected
+     * to anything.
+     */
+    virtual void ConnectByPath(std::string path);
 
-  /**
-   * \brief Common callback signature for trace sources related to packets
-   *        reception by PHY and its status.
-   * \param nPackets number of upper layer packets in the received packet burst.
-   * \param from the MAC48 address of the sender of the packets.
-   * \param status whether a PHY error or collision has occurred.
-   */
-  typedef void (*RxStatusCallback)(uint32_t nPackets, const Address &from, bool status);
+    /**
+     * \brief Common callback signature for trace sources related to packets
+     *        reception by PHY and its status.
+     * \param nPackets number of upper layer packets in the received packet burst.
+     * \param from the MAC48 address of the sender of the packets.
+     * \param status whether a PHY error or collision has occurred.
+     */
+    typedef void (*RxStatusCallback)(uint32_t nPackets, const Address& from, bool status);
 
-private:
-  /**
-   * \brief Method to connect to an underlying ns3::TraceSource with
-   * arguments of type double and const Address&
-   *
-   * \param nPackets the traced number of packets in the packet burst
-   * \param address the socket address for the traced packet burst
-   * \param statusFlag the traced packet burst status flag
-   *
-   */
-  void TraceSink (uint32_t nPackets, const Address& address, bool statusFlag);
+  private:
+    /**
+     * \brief Method to connect to an underlying ns3::TraceSource with
+     * arguments of type double and const Address&
+     *
+     * \param nPackets the traced number of packets in the packet burst
+     * \param address the socket address for the traced packet burst
+     * \param statusFlag the traced packet burst status flag
+     *
+     */
+    void TraceSink(uint32_t nPackets, const Address& address, bool statusFlag);
 
-  /// Output trace, the number of packets, source address, and status flag
-  TracedCallback<uint32_t, const Address&, bool> m_output;
-  /// Output trace, previous and current number of packets
-  TracedCallback<uint32_t, uint32_t> m_outputUinteger;
-  /// Output trace, previous and current status flag
-  TracedCallback<bool, bool> m_outputBool;
+    /// Output trace, the number of packets, source address, and status flag
+    TracedCallback<uint32_t, const Address&, bool> m_output;
+    /// Output trace, previous and current number of packets
+    TracedCallback<uint32_t, uint32_t> m_outputUinteger;
+    /// Output trace, previous and current status flag
+    TracedCallback<bool, bool> m_outputBool;
 
-  /// The traced number of packets in the packet burst.
-  uint32_t m_nPackets;
-  /// The socket address for the traced packet burst.
-  Address m_address;
-  /// The traced packet burst status flag.
-  bool m_statusFlag;
-
+    /// The traced number of packets in the packet burst.
+    uint32_t m_nPackets;
+    /// The socket address for the traced packet burst.
+    Address m_address;
+    /// The traced packet burst status flag.
+    bool m_statusFlag;
 };
-
 
 } // namespace ns3
 

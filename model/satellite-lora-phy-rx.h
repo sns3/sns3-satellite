@@ -21,15 +21,15 @@
 #ifndef SAT_LORA_PHY_RX_H
 #define SAT_LORA_PHY_RX_H
 
+#include "satellite-lora-phy-tx.h"
+#include "satellite-phy-rx.h"
+
+#include <ns3/nstime.h>
 #include <ns3/object.h>
 #include <ns3/packet.h>
-#include <ns3/nstime.h>
 
-#include "satellite-phy-rx.h"
-#include "satellite-lora-phy-tx.h"
-
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup lorawan
@@ -38,125 +38,122 @@ namespace ns3 {
  */
 class SatLoraPhyRx : public SatPhyRx
 {
-public:
-  enum State
-  {
-    /**
-     * The PHY layer is sleeping.
-     * During sleep, the device is not listening for incoming messages.
-     */
-    SLEEP,
+  public:
+    enum State
+    {
+        /**
+         * The PHY layer is sleeping.
+         * During sleep, the device is not listening for incoming messages.
+         */
+        SLEEP,
+
+        /**
+         * The PHY layer is in STANDBY.
+         * When the PHY is in this state, it's listening to the channel, and
+         * it's also ready to transmit data passed to it by the MAC layer.
+         */
+        STANDBY,
+
+        /**
+         * The PHY layer is sending a packet.
+         * During transmission, the device cannot receive any packet or send
+         * any additional packet.
+         */
+        TX,
+
+        /**
+         * The PHY layer is receiving a packet.
+         * While the device is locked on an incoming packet, transmission is
+         * not possible.
+         */
+        RX
+    };
+
+    // TypeId
+    static TypeId GetTypeId(void);
 
     /**
-     * The PHY layer is in STANDBY.
-     * When the PHY is in this state, it's listening to the channel, and
-     * it's also ready to transmit data passed to it by the MAC layer.
+     * Constructor and destructor
      */
-    STANDBY,
+    SatLoraPhyRx();
+    virtual ~SatLoraPhyRx();
 
     /**
-     * The PHY layer is sending a packet.
-     * During transmission, the device cannot receive any packet or send
-     * any additional packet.
+     * Start receiving a packet. Set a few actions then call mother class method.
+     *
+     * \param rxParams All the info needed.
      */
-    TX,
+    virtual void StartRx(Ptr<SatSignalParameters> rxParams);
 
     /**
-     * The PHY layer is receiving a packet.
-     * While the device is locked on an incoming packet, transmission is
-     * not possible.
+     * Whether this device is transmitting or not.
+     *
+     * \returns true if the device is currently transmitting a packet, false
+     * otherwise.
      */
-    RX
-  };
+    bool IsTransmitting(void);
 
-  // TypeId
-  static TypeId GetTypeId (void);
+    /**
+     * Whether this device is listening on the specified frequency or not.
+     *
+     * \param frequency The frequency to query.
+     * \returns true if the device is listening on that frequency, false
+     * otherwise.
+     */
+    bool IsOnFrequency(double frequency);
 
-  /**
-   * Constructor and destructor
-   */
-  SatLoraPhyRx ();
-  virtual ~SatLoraPhyRx ();
+    /**
+     * Switch to the STANDBY state.
+     */
+    void SwitchToStandby(void);
 
-  /**
-   * Start receiving a packet. Set a few actions then call mother class method.
-   *
-   * \param rxParams All the info needed.
-   */
-  virtual void StartRx (Ptr<SatSignalParameters> rxParams);
+    /**
+     * Switch to the SLEEP state.
+     */
+    void SwitchToSleep(void);
 
-  /**
-   * Whether this device is transmitting or not.
-   *
-   * \returns true if the device is currently transmitting a packet, false
-   * otherwise.
-   */
-  bool IsTransmitting (void);
+    /**
+     * Switch to the RX state
+     */
+    void SwitchToRx();
 
-  /**
-   * Whether this device is listening on the specified frequency or not.
-   *
-   * \param frequency The frequency to query.
-   * \returns true if the device is listening on that frequency, false
-   * otherwise.
-   */
-  bool IsOnFrequency (double frequency);
+    /**
+     * Switch to the TX state
+     */
+    void SwitchToTx();
 
-  /**
-   * Switch to the STANDBY state.
-   */
-  void SwitchToStandby (void);
+    /**
+     * Set the frequency this EndDevice will listen on.
+     *
+     * Should a packet be transmitted on a frequency different than that the
+     * EndDeviceLoraPhy is listening on, the packet will be discarded.
+     *
+     * \param The frequency [MHz] to listen to.
+     */
+    void SetFrequency(double frequencyMHz);
 
-  /**
-   * Switch to the SLEEP state.
-   */
-  void SwitchToSleep (void);
+    /**
+     * Set the Spreading Factor this EndDevice will listen for.
+     *
+     * The EndDeviceLoraPhy object will not be able to lock on transmissions that
+     * use a different SF than the one it's listening for.
+     *
+     * \param sf The spreading factor to listen for.
+     */
+    void SetSpreadingFactor(uint8_t sf);
 
-  /**
-   * Switch to the RX state
-   */
-  void SwitchToRx ();
+    State GetState();
 
-  /**
-   * Switch to the TX state
-   */
-  void SwitchToTx ();
+  protected:
+  private:
+    // The state this PHY is currently in.
+    State m_state;
 
-  /**
-   * Set the frequency this EndDevice will listen on.
-   *
-   * Should a packet be transmitted on a frequency different than that the
-   * EndDeviceLoraPhy is listening on, the packet will be discarded.
-   *
-   * \param The frequency [MHz] to listen to.
-   */
-  void SetFrequency (double frequencyMHz);
+    // The frequency this device is listening on
+    double m_frequency;
 
-  /**
-   * Set the Spreading Factor this EndDevice will listen for.
-   *
-   * The EndDeviceLoraPhy object will not be able to lock on transmissions that
-   * use a different SF than the one it's listening for.
-   *
-   * \param sf The spreading factor to listen for.
-   */
-  void SetSpreadingFactor (uint8_t sf);
-
-  State GetState ();
-
-protected:
-
-private:
-
-  // The state this PHY is currently in.
-  State m_state;
-
-  // The frequency this device is listening on
-  double m_frequency;
-
-  // The Spreading Factor this device is listening for
-  uint8_t m_sf;
-
+    // The Spreading Factor this device is listening for
+    uint8_t m_sf;
 };
 
 } /* namespace ns3 */

@@ -18,154 +18,154 @@
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
 
-#include <cstdlib>
+#include "satellite-markov-model.h"
 
 #include <ns3/log.h>
 #include <ns3/simulator.h>
 
-#include "satellite-markov-model.h"
+#include <cstdlib>
 
-
-namespace ns3 {
-
-NS_OBJECT_ENSURE_REGISTERED (SatMarkovModel);
-NS_LOG_COMPONENT_DEFINE ("SatMarkovModel");
-
-TypeId SatMarkovModel::GetTypeId (void)
+namespace ns3
 {
-  static TypeId tid = TypeId ("ns3::SatMarkovModel")
-    .SetParent<Object> ()
-    .AddConstructor<SatMarkovModel> ();
-  return tid;
+
+NS_OBJECT_ENSURE_REGISTERED(SatMarkovModel);
+NS_LOG_COMPONENT_DEFINE("SatMarkovModel");
+
+TypeId
+SatMarkovModel::GetTypeId(void)
+{
+    static TypeId tid =
+        TypeId("ns3::SatMarkovModel").SetParent<Object>().AddConstructor<SatMarkovModel>();
+    return tid;
 }
 
-SatMarkovModel::SatMarkovModel ()
-  : m_probabilities (new double[3 * 3]),
-  m_numOfStates (3),
-  m_currentState (0)
+SatMarkovModel::SatMarkovModel()
+    : m_probabilities(new double[3 * 3]),
+      m_numOfStates(3),
+      m_currentState(0)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  NS_FATAL_ERROR ("SatMarkovModel::SatMarkovModel - Constructor not in use");
+    NS_FATAL_ERROR("SatMarkovModel::SatMarkovModel - Constructor not in use");
 }
 
-SatMarkovModel::SatMarkovModel (uint32_t numOfStates, uint32_t initialState)
-  : m_probabilities (new double[numOfStates * numOfStates]),
-  m_numOfStates (numOfStates),
-  m_currentState (initialState)
+SatMarkovModel::SatMarkovModel(uint32_t numOfStates, uint32_t initialState)
+    : m_probabilities(new double[numOfStates * numOfStates]),
+      m_numOfStates(numOfStates),
+      m_currentState(initialState)
 {
-  NS_LOG_FUNCTION (this << numOfStates);
+    NS_LOG_FUNCTION(this << numOfStates);
 
-  NS_LOG_INFO ("Creating Markov model for " << numOfStates << " states, initial state: " << m_currentState);
+    NS_LOG_INFO("Creating Markov model for " << numOfStates
+                                             << " states, initial state: " << m_currentState);
 
-  for (uint32_t i = 0; i < m_numOfStates; ++i)
+    for (uint32_t i = 0; i < m_numOfStates; ++i)
     {
-      for (uint32_t j = 0; j < m_numOfStates; ++j)
+        for (uint32_t j = 0; j < m_numOfStates; ++j)
         {
-          m_probabilities[i * m_numOfStates + j] = 1;
+            m_probabilities[i * m_numOfStates + j] = 1;
         }
     }
 }
 
-SatMarkovModel::~SatMarkovModel ()
+SatMarkovModel::~SatMarkovModel()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  Reset ();
+    Reset();
 }
 
 void
-SatMarkovModel::DoDispose ()
+SatMarkovModel::DoDispose()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  Reset ();
-  Object::DoDispose ();
+    Reset();
+    Object::DoDispose();
 }
 
 void
-SatMarkovModel::Reset ()
+SatMarkovModel::Reset()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  if (m_probabilities != NULL)
+    if (m_probabilities != NULL)
     {
-      delete[] m_probabilities;
-      m_probabilities = NULL;
+        delete[] m_probabilities;
+        m_probabilities = NULL;
     }
 }
 
 uint32_t
-SatMarkovModel::GetState () const
+SatMarkovModel::GetState() const
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return m_currentState;
+    return m_currentState;
 }
 
 void
-SatMarkovModel::SetState (uint32_t newState)
+SatMarkovModel::SetState(uint32_t newState)
 {
-  NS_LOG_FUNCTION (this << newState);
+    NS_LOG_FUNCTION(this << newState);
 
-  if (newState >= m_numOfStates )
+    if (newState >= m_numOfStates)
     {
-      NS_FATAL_ERROR ("SatMarkovModel::SetState - Invalid state");
+        NS_FATAL_ERROR("SatMarkovModel::SetState - Invalid state");
     }
 
-  m_currentState = newState;
+    m_currentState = newState;
 }
 
 uint32_t
-SatMarkovModel::DoTransition ()
+SatMarkovModel::DoTransition()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  NS_LOG_INFO ("Doing transition, current state: " << m_currentState);
+    NS_LOG_INFO("Doing transition, current state: " << m_currentState);
 
-  double total = 0;
-  for (uint32_t i = 0; i < m_numOfStates; ++i)
+    double total = 0;
+    for (uint32_t i = 0; i < m_numOfStates; ++i)
     {
-      total += m_probabilities[m_currentState * m_numOfStates + i];
+        total += m_probabilities[m_currentState * m_numOfStates + i];
     }
 
-  if ( ( fabs (total - 1.0) > std::numeric_limits<double>::epsilon ()) )
+    if ((fabs(total - 1.0) > std::numeric_limits<double>::epsilon()))
     {
-      NS_FATAL_ERROR ("SatMarkovModel::DoTransition - Probability sum does not match");
+        NS_FATAL_ERROR("SatMarkovModel::DoTransition - Probability sum does not match");
     }
 
-  double r = total * (std::rand () / double (RAND_MAX));
+    double r = total * (std::rand() / double(RAND_MAX));
 
-  NS_LOG_INFO ("Random value: " << r);
+    NS_LOG_INFO("Random value: " << r);
 
-  double acc = 0.0;
-  for (uint32_t i = 0; i < m_numOfStates; ++i)
+    double acc = 0.0;
+    for (uint32_t i = 0; i < m_numOfStates; ++i)
     {
-      acc += m_probabilities[m_currentState * m_numOfStates + i];
+        acc += m_probabilities[m_currentState * m_numOfStates + i];
 
-      NS_LOG_INFO ("State " << i << " accumulated value: " << acc);
+        NS_LOG_INFO("State " << i << " accumulated value: " << acc);
 
-      if (r <= acc)
+        if (r <= acc)
         {
-          NS_LOG_INFO ("Transition done, new state: " << i);
-          m_currentState = i;
-          return i;
+            NS_LOG_INFO("Transition done, new state: " << i);
+            m_currentState = i;
+            return i;
         }
     }
-  NS_LOG_INFO ("Transition done, new state: " << m_numOfStates - 1);
-  m_currentState = m_numOfStates - 1;
-  return m_numOfStates - 1;
+    NS_LOG_INFO("Transition done, new state: " << m_numOfStates - 1);
+    m_currentState = m_numOfStates - 1;
+    return m_numOfStates - 1;
 }
 
 void
-SatMarkovModel::SetProbability (uint32_t from,
-                                uint32_t to,
-                                double probability)
+SatMarkovModel::SetProbability(uint32_t from, uint32_t to, double probability)
 {
-  NS_LOG_FUNCTION (this << from << " " << to << " " << probability);
+    NS_LOG_FUNCTION(this << from << " " << to << " " << probability);
 
-  NS_LOG_INFO ("Setting probability, from: " << from << " to: " << to << " probability: " << probability);
-  m_probabilities[from * m_numOfStates + to] = probability;
+    NS_LOG_INFO("Setting probability, from: " << from << " to: " << to
+                                              << " probability: " << probability);
+    m_probabilities[from * m_numOfStates + to] = probability;
 }
 
 } // namespace ns3

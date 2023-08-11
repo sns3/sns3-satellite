@@ -20,234 +20,236 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.com>
  */
 
-#include <cmath>
+#include "satellite-phy-tx.h"
 
-#include <ns3/simulator.h>
+#include "satellite-antenna-gain-pattern.h"
+#include "satellite-channel.h"
+#include "satellite-phy.h"
+#include "satellite-signal-parameters.h"
+#include "satellite-utils.h"
+
 #include <ns3/boolean.h>
 #include <ns3/double.h>
 #include <ns3/enum.h>
-#include <ns3/object-factory.h>
 #include <ns3/log.h>
+#include <ns3/object-factory.h>
+#include <ns3/simulator.h>
 
-#include "satellite-utils.h"
-#include "satellite-phy.h"
-#include "satellite-phy-tx.h"
-#include "satellite-signal-parameters.h"
-#include "satellite-channel.h"
-#include "satellite-antenna-gain-pattern.h"
+#include <cmath>
 
-NS_LOG_COMPONENT_DEFINE ("SatPhyTx");
+NS_LOG_COMPONENT_DEFINE("SatPhyTx");
 
-namespace ns3 {
-
-
-NS_OBJECT_ENSURE_REGISTERED (SatPhyTx);
-
-
-SatPhyTx::SatPhyTx ()
-  : m_maxAntennaGain (),
-  m_state (RECONFIGURING),
-  m_beamId (),
-  m_txMode (),
-  m_defaultFadingValue ()
+namespace ns3
 {
-  NS_LOG_FUNCTION (this);
+
+NS_OBJECT_ENSURE_REGISTERED(SatPhyTx);
+
+SatPhyTx::SatPhyTx()
+    : m_maxAntennaGain(),
+      m_state(RECONFIGURING),
+      m_beamId(),
+      m_txMode(),
+      m_defaultFadingValue()
+{
+    NS_LOG_FUNCTION(this);
 }
 
-
-SatPhyTx::~SatPhyTx ()
+SatPhyTx::~SatPhyTx()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-void SatPhyTx::DoDispose ()
+void
+SatPhyTx::DoDispose()
 {
-  NS_LOG_FUNCTION (this);
-  m_channel = 0;
-  m_mobility = 0;
-  m_fadingContainer = 0;
-  Object::DoDispose ();
+    NS_LOG_FUNCTION(this);
+    m_channel = 0;
+    m_mobility = 0;
+    m_fadingContainer = 0;
+    Object::DoDispose();
 }
 
-std::ostream& operator<< (std::ostream& os, SatPhyTx::State s)
+std::ostream&
+operator<<(std::ostream& os, SatPhyTx::State s)
 {
-  switch (s)
+    switch (s)
     {
     case SatPhyTx::IDLE:
-      os << "IDLE";
-      break;
+        os << "IDLE";
+        break;
     case SatPhyTx::TX:
-      os << "TX";
-      break;
+        os << "TX";
+        break;
     case SatPhyTx::RECONFIGURING:
-      os << "RECONFIGURING";
-      break;
+        os << "RECONFIGURING";
+        break;
     default:
-      os << "UNKNOWN";
-      break;
+        os << "UNKNOWN";
+        break;
     }
-  return os;
+    return os;
 }
 
 TypeId
-SatPhyTx::GetTypeId (void)
+SatPhyTx::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatPhyTx")
-    .SetParent<Object> ()
-    .AddAttribute ("TxMode", "Tx mode of this Phy Tx.",
-                   EnumValue (SatPhyTx::NORMAL),
-                   MakeEnumAccessor (&SatPhyTx::m_txMode),
-                   MakeEnumChecker (SatPhyTx::NORMAL, "Normal Tx mode",
-                                    SatPhyTx::TRANSPARENT, "Transparent Tx mode"))
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::SatPhyTx")
+                            .SetParent<Object>()
+                            .AddAttribute("TxMode",
+                                          "Tx mode of this Phy Tx.",
+                                          EnumValue(SatPhyTx::NORMAL),
+                                          MakeEnumAccessor(&SatPhyTx::m_txMode),
+                                          MakeEnumChecker(SatPhyTx::NORMAL,
+                                                          "Normal Tx mode",
+                                                          SatPhyTx::TRANSPARENT,
+                                                          "Transparent Tx mode"));
+    return tid;
 }
 
 void
-SatPhyTx::SetMaxAntennaGain_Db (double gain_db)
+SatPhyTx::SetMaxAntennaGain_Db(double gain_db)
 {
-  NS_LOG_FUNCTION (this << gain_db);
+    NS_LOG_FUNCTION(this << gain_db);
 
-  m_maxAntennaGain = SatUtils::DbToLinear (gain_db);
+    m_maxAntennaGain = SatUtils::DbToLinear(gain_db);
 }
 
 double
-SatPhyTx::GetAntennaGain (Ptr<MobilityModel> mobility)
+SatPhyTx::GetAntennaGain(Ptr<MobilityModel> mobility)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  double gain_W (m_maxAntennaGain);
+    double gain_W(m_maxAntennaGain);
 
-  // Get the transmit antenna gain at the receiver position.
-  // E.g. GEO satellite transmits to the UT receiver.
-  if (m_antennaGainPattern)
+    // Get the transmit antenna gain at the receiver position.
+    // E.g. GEO satellite transmits to the UT receiver.
+    if (m_antennaGainPattern)
     {
-      Ptr<SatMobilityModel> m = DynamicCast<SatMobilityModel> (mobility);
-      gain_W = m_antennaGainPattern->GetAntennaGain_lin (m->GetGeoPosition (), m_satMobility);
+        Ptr<SatMobilityModel> m = DynamicCast<SatMobilityModel>(mobility);
+        gain_W = m_antennaGainPattern->GetAntennaGain_lin(m->GetGeoPosition(), m_satMobility);
     }
 
-  /**
-   * If antenna gain pattern is not set, we use the
-   * set maximum antenna gain.
-   */
+    /**
+     * If antenna gain pattern is not set, we use the
+     * set maximum antenna gain.
+     */
 
-  return gain_W;
+    return gain_W;
 }
 
 void
-SatPhyTx::SetDefaultFadingValue (double fadingValue)
+SatPhyTx::SetDefaultFadingValue(double fadingValue)
 {
-  NS_LOG_FUNCTION (this << fadingValue);
+    NS_LOG_FUNCTION(this << fadingValue);
 
-  m_defaultFadingValue = fadingValue;
+    m_defaultFadingValue = fadingValue;
 }
 
 double
-SatPhyTx::GetFadingValue (Address macAddress, SatEnums::ChannelType_t channelType)
+SatPhyTx::GetFadingValue(Address macAddress, SatEnums::ChannelType_t channelType)
 {
-  NS_LOG_FUNCTION (this << macAddress << channelType);
+    NS_LOG_FUNCTION(this << macAddress << channelType);
 
-  double fadingValue = m_defaultFadingValue;
+    double fadingValue = m_defaultFadingValue;
 
-  if (m_fadingContainer)
+    if (m_fadingContainer)
     {
-      fadingValue = m_fadingContainer->GetFading (macAddress, channelType);
+        fadingValue = m_fadingContainer->GetFading(macAddress, channelType);
     }
-  // Returns value 1 if fading is not set, as fading value is used as multiplier
-  return fadingValue;
+    // Returns value 1 if fading is not set, as fading value is used as multiplier
+    return fadingValue;
 }
 
 void
-SatPhyTx::SetFadingContainer (Ptr<SatBaseFading> fadingContainer)
+SatPhyTx::SetFadingContainer(Ptr<SatBaseFading> fadingContainer)
 {
-  NS_LOG_FUNCTION (this);
-  NS_ASSERT (m_fadingContainer == nullptr);
+    NS_LOG_FUNCTION(this);
+    NS_ASSERT(m_fadingContainer == nullptr);
 
-  m_fadingContainer = fadingContainer;
+    m_fadingContainer = fadingContainer;
 }
 
 Ptr<MobilityModel>
-SatPhyTx::GetMobility ()
+SatPhyTx::GetMobility()
 {
-  NS_LOG_FUNCTION (this);
-  NS_ASSERT (m_mobility != nullptr);
+    NS_LOG_FUNCTION(this);
+    NS_ASSERT(m_mobility != nullptr);
 
-  return m_mobility;
+    return m_mobility;
 }
 
 void
-SatPhyTx::SetMobility (Ptr<MobilityModel> m)
+SatPhyTx::SetMobility(Ptr<MobilityModel> m)
 {
-  NS_LOG_FUNCTION (this << m);
-  NS_ASSERT (m_mobility == nullptr);
+    NS_LOG_FUNCTION(this << m);
+    NS_ASSERT(m_mobility == nullptr);
 
-  m_mobility = m;
+    m_mobility = m;
 }
 
 void
-SatPhyTx::SetAntennaGainPattern (Ptr<SatAntennaGainPattern> agp, Ptr<SatMobilityModel> mobility)
+SatPhyTx::SetAntennaGainPattern(Ptr<SatAntennaGainPattern> agp, Ptr<SatMobilityModel> mobility)
 {
-  NS_LOG_FUNCTION (this);
-  NS_ASSERT (m_antennaGainPattern == nullptr);
+    NS_LOG_FUNCTION(this);
+    NS_ASSERT(m_antennaGainPattern == nullptr);
 
-  m_antennaGainPattern = agp;
-  m_satMobility = mobility;
+    m_antennaGainPattern = agp;
+    m_satMobility = mobility;
 }
 
 void
-SatPhyTx::SetChannel (Ptr<SatChannel> c)
+SatPhyTx::SetChannel(Ptr<SatChannel> c)
 {
-  NS_LOG_FUNCTION (this << c);
-  NS_ASSERT (m_channel == nullptr);
+    NS_LOG_FUNCTION(this << c);
+    NS_ASSERT(m_channel == nullptr);
 
-  m_channel = c;
-  ChangeState (IDLE);
+    m_channel = c;
+    ChangeState(IDLE);
 }
 
 void
-SatPhyTx::ClearChannel ()
+SatPhyTx::ClearChannel()
 {
-  NS_LOG_FUNCTION (this);
-  NS_ASSERT (m_channel != nullptr);
+    NS_LOG_FUNCTION(this);
+    NS_ASSERT(m_channel != nullptr);
 
-  m_channel = NULL;
-  ChangeState (RECONFIGURING);
+    m_channel = NULL;
+    ChangeState(RECONFIGURING);
 }
 
 Ptr<SatChannel>
-SatPhyTx::GetChannel ()
+SatPhyTx::GetChannel()
 {
-  NS_LOG_FUNCTION (this);
-  NS_ASSERT (m_channel != nullptr);
+    NS_LOG_FUNCTION(this);
+    NS_ASSERT(m_channel != nullptr);
 
-  return m_channel;
+    return m_channel;
 }
 
 void
-SatPhyTx::ChangeState (State newState)
+SatPhyTx::ChangeState(State newState)
 {
-  NS_LOG_FUNCTION (this << newState);
-  NS_LOG_INFO (this << " state: " << m_state << " -> " << newState);
-  m_state = newState;
+    NS_LOG_FUNCTION(this << newState);
+    NS_LOG_INFO(this << " state: " << m_state << " -> " << newState);
+    m_state = newState;
 }
 
 void
-SatPhyTx::StartTx (Ptr<SatSignalParameters> txParams)
+SatPhyTx::StartTx(Ptr<SatSignalParameters> txParams)
 {
-  NS_LOG_FUNCTION (this << txParams);
-  NS_LOG_INFO ("State: " << m_state);
+    NS_LOG_FUNCTION(this << txParams);
+    NS_LOG_INFO("State: " << m_state);
 
-  switch (m_state)
+    switch (m_state)
     {
     case TX:
-      NS_FATAL_ERROR ("cannot TX while already TX: the MAC should avoid this");
-      break;
+        NS_FATAL_ERROR("cannot TX while already TX: the MAC should avoid this");
+        break;
 
-    case IDLE:
-      {
-        NS_ASSERT (m_channel);
-        ChangeState (TX);
-        m_channel->StartTx (txParams);
+    case IDLE: {
+        NS_ASSERT(m_channel);
+        ChangeState(TX);
+        m_channel->StartTx(txParams);
 
         /**
          * The SatPhyTx is mapped to a spot-beam, which means that there may be several
@@ -258,67 +260,67 @@ SatPhyTx::StartTx (Ptr<SatSignalParameters> txParams)
          * E.g. different inherited implementations may be done for satellite and terrestrial
          * domain nodes.
          */
-        if ( m_txMode == TRANSPARENT )
-          {
-            EndTx ();
-          }
+        if (m_txMode == TRANSPARENT)
+        {
+            EndTx();
+        }
         else
-          {
-            Simulator::Schedule (txParams->m_duration, &SatPhyTx::EndTx, this);
-          }
-      }
-      break;
+        {
+            Simulator::Schedule(txParams->m_duration, &SatPhyTx::EndTx, this);
+        }
+    }
+    break;
 
     case RECONFIGURING:
-      break;
+        break;
 
     default:
-      NS_FATAL_ERROR ("unknown state");
-      break;
+        NS_FATAL_ERROR("unknown state");
+        break;
     }
 }
 
 void
-SatPhyTx::EndTx ()
+SatPhyTx::EndTx()
 {
-  NS_LOG_FUNCTION (this);
-  NS_LOG_INFO (this << " state: " << m_state);
+    NS_LOG_FUNCTION(this);
+    NS_LOG_INFO(this << " state: " << m_state);
 
-  if (m_state != TX)
+    if (m_state != TX)
     {
-      NS_FATAL_ERROR ("SatPhyTx::EndTx - unexpected state!");
+        NS_FATAL_ERROR("SatPhyTx::EndTx - unexpected state!");
     }
 
-  ChangeState (IDLE);
+    ChangeState(IDLE);
 }
 
 void
-SatPhyTx::SetSatId (uint32_t satId)
+SatPhyTx::SetSatId(uint32_t satId)
 {
-  NS_LOG_FUNCTION (this << satId);
-  m_satId = satId;
+    NS_LOG_FUNCTION(this << satId);
+    m_satId = satId;
 }
 
 void
-SatPhyTx::SetBeamId (uint32_t beamId)
+SatPhyTx::SetBeamId(uint32_t beamId)
 {
-  NS_LOG_FUNCTION (this << beamId);
-  m_beamId = beamId;
+    NS_LOG_FUNCTION(this << beamId);
+    m_beamId = beamId;
 }
 
 bool
-SatPhyTx::IsTransmitting () const
+SatPhyTx::IsTransmitting() const
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return m_state == TX;
+    return m_state == TX;
 }
 
 bool
-SatPhyTx::CanTransmit (void) const
+SatPhyTx::CanTransmit(void) const
 {
-  NS_LOG_FUNCTION (this);
-  return m_state != RECONFIGURING;
+    NS_LOG_FUNCTION(this);
+    return m_state != RECONFIGURING;
 }
 
 } // namespace ns3

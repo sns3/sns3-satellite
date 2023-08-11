@@ -20,609 +20,629 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.com>
  */
 
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+#include "satellite-env-variables.h"
+
+#include "ns3/boolean.h"
 #include "ns3/fatal-error.h"
 #include "ns3/string.h"
-#include "ns3/boolean.h"
-#include "satellite-env-variables.h"
+
+#include <stdio.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #ifdef __APPLE__
 #include <mach-o/dyld.h>
 #endif
 
-NS_LOG_COMPONENT_DEFINE ("SatEnvVariables");
+NS_LOG_COMPONENT_DEFINE("SatEnvVariables");
 
-namespace ns3 {
+namespace ns3
+{
 
-NS_OBJECT_ENSURE_REGISTERED (SatEnvVariables);
+NS_OBJECT_ENSURE_REGISTERED(SatEnvVariables);
 
 TypeId
-SatEnvVariables::GetTypeId (void)
+SatEnvVariables::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatEnvVariables")
-    .SetParent<Object> ()
-    .AddConstructor<SatEnvVariables> ()
-    .AddAttribute ("CurrentWorkingDirectory",
-                   "Current working directory for the simulator.",
-                   StringValue (""),
-                   MakeStringAccessor (&SatEnvVariables::m_currentWorkingDirectoryFromAttribute),
-                   MakeStringChecker ())
-    .AddAttribute ("PathToExecutable",
-                   "Path to the simulator executable.",
-                   StringValue (""),
-                   MakeStringAccessor (&SatEnvVariables::m_pathToExecutableFromAttribute),
-                   MakeStringChecker ())
-    .AddAttribute ("DataPath",
-                   "Path to the data folder.",
-                   StringValue ("contrib/satellite/data"),
-                   MakeStringAccessor (&SatEnvVariables::m_dataPath),
-                   MakeStringChecker ())
-    .AddAttribute ("SimulationCampaignName",
-                   "Simulation campaign name. Affects the simulation folder.",
-                   StringValue (""),
-                   MakeStringAccessor (&SatEnvVariables::m_campaignName),
-                   MakeStringChecker ())
-    .AddAttribute ("SimulationTag",
-                   "Tag related to the current simulation.",
-                   StringValue ("default"),
-                   MakeStringAccessor (&SatEnvVariables::m_simTag),
-                   MakeStringChecker ())
-    .AddAttribute ("EnableSimulationOutputOverwrite",
-                   "Enable simulation output overwrite.",
-                   BooleanValue (true),
-                   MakeBooleanAccessor (&SatEnvVariables::m_enableOutputOverwrite),
-                   MakeBooleanChecker ())
-    .AddAttribute ("EnableSimInfoOutput",
-                   "Enable simulation information output.",
-                   BooleanValue (true),
-                   MakeBooleanAccessor (&SatEnvVariables::m_enableSimInfoOutput),
-                   MakeBooleanChecker ())
-    .AddAttribute ("EnableSimInfoDiffOutput",
-                   "Enable simulation information diff output.",
-                   BooleanValue (true),
-                   MakeBooleanAccessor (&SatEnvVariables::m_enableSimInfoDiffOutput),
-                   MakeBooleanChecker ())
-    .AddAttribute ("ExcludeSatelliteDataFolderFromSimInfoDiff",
-                   "Exclude satellite data folder from the revision diff.",
-                   BooleanValue (true),
-                   MakeBooleanAccessor (&SatEnvVariables::m_excludeDataFolderFromDiff),
-                   MakeBooleanChecker ());
-  return tid;
+    static TypeId tid =
+        TypeId("ns3::SatEnvVariables")
+            .SetParent<Object>()
+            .AddConstructor<SatEnvVariables>()
+            .AddAttribute(
+                "CurrentWorkingDirectory",
+                "Current working directory for the simulator.",
+                StringValue(""),
+                MakeStringAccessor(&SatEnvVariables::m_currentWorkingDirectoryFromAttribute),
+                MakeStringChecker())
+            .AddAttribute("PathToExecutable",
+                          "Path to the simulator executable.",
+                          StringValue(""),
+                          MakeStringAccessor(&SatEnvVariables::m_pathToExecutableFromAttribute),
+                          MakeStringChecker())
+            .AddAttribute("DataPath",
+                          "Path to the data folder.",
+                          StringValue("contrib/satellite/data"),
+                          MakeStringAccessor(&SatEnvVariables::m_dataPath),
+                          MakeStringChecker())
+            .AddAttribute("SimulationCampaignName",
+                          "Simulation campaign name. Affects the simulation folder.",
+                          StringValue(""),
+                          MakeStringAccessor(&SatEnvVariables::m_campaignName),
+                          MakeStringChecker())
+            .AddAttribute("SimulationTag",
+                          "Tag related to the current simulation.",
+                          StringValue("default"),
+                          MakeStringAccessor(&SatEnvVariables::m_simTag),
+                          MakeStringChecker())
+            .AddAttribute("EnableSimulationOutputOverwrite",
+                          "Enable simulation output overwrite.",
+                          BooleanValue(true),
+                          MakeBooleanAccessor(&SatEnvVariables::m_enableOutputOverwrite),
+                          MakeBooleanChecker())
+            .AddAttribute("EnableSimInfoOutput",
+                          "Enable simulation information output.",
+                          BooleanValue(true),
+                          MakeBooleanAccessor(&SatEnvVariables::m_enableSimInfoOutput),
+                          MakeBooleanChecker())
+            .AddAttribute("EnableSimInfoDiffOutput",
+                          "Enable simulation information diff output.",
+                          BooleanValue(true),
+                          MakeBooleanAccessor(&SatEnvVariables::m_enableSimInfoDiffOutput),
+                          MakeBooleanChecker())
+            .AddAttribute("ExcludeSatelliteDataFolderFromSimInfoDiff",
+                          "Exclude satellite data folder from the revision diff.",
+                          BooleanValue(true),
+                          MakeBooleanAccessor(&SatEnvVariables::m_excludeDataFolderFromDiff),
+                          MakeBooleanChecker());
+    return tid;
 }
 
 TypeId
-SatEnvVariables::GetInstanceTypeId (void) const
+SatEnvVariables::GetInstanceTypeId(void) const
 {
-  return GetTypeId ();
+    return GetTypeId();
 }
 
-SatEnvVariables::SatEnvVariables ()
-  : m_currentWorkingDirectory (""),
-  m_pathToExecutable (""),
-  m_currentWorkingDirectoryFromAttribute (""),
-  m_pathToExecutableFromAttribute (""),
-  m_levelsToCheck (10),
-  m_dataPath ("contrib/satellite/data"),
-  m_outputPath (""),
-  m_campaignName (""),
-  m_simRootPath ("contrib/satellite/data/sims"),
-  m_simTag ("default"),
-  m_enableOutputOverwrite (true),
-  m_isOutputPathInitialized (false),
-  m_enableSimInfoOutput (true),
-  m_enableSimInfoDiffOutput (true),
-  m_excludeDataFolderFromDiff (true),
-  m_isInitialized (false)
+SatEnvVariables::SatEnvVariables()
+    : m_currentWorkingDirectory(""),
+      m_pathToExecutable(""),
+      m_currentWorkingDirectoryFromAttribute(""),
+      m_pathToExecutableFromAttribute(""),
+      m_levelsToCheck(10),
+      m_dataPath("contrib/satellite/data"),
+      m_outputPath(""),
+      m_campaignName(""),
+      m_simRootPath("contrib/satellite/data/sims"),
+      m_simTag("default"),
+      m_enableOutputOverwrite(true),
+      m_isOutputPathInitialized(false),
+      m_enableSimInfoOutput(true),
+      m_enableSimInfoDiffOutput(true),
+      m_excludeDataFolderFromDiff(true),
+      m_isInitialized(false)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  // Attributes are needed already in construction phase:
-  // - ConstructSelf call in constructor
-  // - GetInstanceTypeId needs to be implemented
-  ObjectBase::ConstructSelf (AttributeConstructionList ());
+    // Attributes are needed already in construction phase:
+    // - ConstructSelf call in constructor
+    // - GetInstanceTypeId needs to be implemented
+    ObjectBase::ConstructSelf(AttributeConstructionList());
 
-  Initialize ();
+    Initialize();
 }
 
 void
-SatEnvVariables::DoInitialize ()
+SatEnvVariables::DoInitialize()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  if (!m_isInitialized)
+    if (!m_isInitialized)
     {
-      char currentWorkingDirectory[FILENAME_MAX] = "";
+        char currentWorkingDirectory[FILENAME_MAX] = "";
 
-      if (!getcwd (currentWorkingDirectory, sizeof (currentWorkingDirectory)))
+        if (!getcwd(currentWorkingDirectory, sizeof(currentWorkingDirectory)))
         {
-          NS_FATAL_ERROR ("SatEnvVariables::SatEnvVariables - Could not determine current working directory.");
+            NS_FATAL_ERROR("SatEnvVariables::SatEnvVariables - Could not determine current working "
+                           "directory.");
         }
-      currentWorkingDirectory[sizeof (currentWorkingDirectory) - 1] = '\0';
-      m_currentWorkingDirectory = std::string (currentWorkingDirectory);
+        currentWorkingDirectory[sizeof(currentWorkingDirectory) - 1] = '\0';
+        m_currentWorkingDirectory = std::string(currentWorkingDirectory);
 
-      char pathToExecutable[FILENAME_MAX] = "";
+        char pathToExecutable[FILENAME_MAX] = "";
 
-      int res;
+        int res;
 #ifdef __linux__
-      res = readlink ("/proc/self/exe",
-                      pathToExecutable,
-                      sizeof (pathToExecutable));
+        res = readlink("/proc/self/exe", pathToExecutable, sizeof(pathToExecutable));
 #elif __APPLE__
-      uint32_t size = sizeof (pathToExecutable);
-      res = _NSGetExecutablePath (pathToExecutable, &size);
+        uint32_t size = sizeof(pathToExecutable);
+        res = _NSGetExecutablePath(pathToExecutable, &size);
 #else
-      NS_FATAL_ERROR ("SatEnvVariables::SatEnvVariables - Unknown compiler.");
+        NS_FATAL_ERROR("SatEnvVariables::SatEnvVariables - Unknown compiler.");
 #endif
-      if (res < 0)
+        if (res < 0)
         {
-          NS_FATAL_ERROR ("SatEnvVariables::SatEnvVariables - Could not determine the path to executable.");
+            NS_FATAL_ERROR(
+                "SatEnvVariables::SatEnvVariables - Could not determine the path to executable.");
         }
-      pathToExecutable[sizeof (pathToExecutable) - 1] = '\0';
-      m_pathToExecutable = std::string (pathToExecutable);
+        pathToExecutable[sizeof(pathToExecutable) - 1] = '\0';
+        m_pathToExecutable = std::string(pathToExecutable);
 
-      if (m_enableSimInfoOutput)
+        if (m_enableSimInfoOutput)
         {
-          if (!m_isOutputPathInitialized)
+            if (!m_isOutputPathInitialized)
             {
-              InitializeOutputFolders (m_campaignName, m_simTag, m_enableOutputOverwrite);
+                InitializeOutputFolders(m_campaignName, m_simTag, m_enableOutputOverwrite);
             }
 
-          DumpSimulationInformation ();
+            DumpSimulationInformation();
         }
 
-      m_isInitialized = true;
+        m_isInitialized = true;
     }
 }
 
 void
-SatEnvVariables::DoDispose ()
+SatEnvVariables::DoDispose()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  if (m_isInitialized)
+    if (m_isInitialized)
     {
-      m_currentWorkingDirectory = "";
-      m_pathToExecutable = "";
-      m_isOutputPathInitialized = false;
-      m_isInitialized = false;
+        m_currentWorkingDirectory = "";
+        m_pathToExecutable = "";
+        m_isOutputPathInitialized = false;
+        m_isInitialized = false;
     }
 }
 
 void
-SatEnvVariables::SetCurrentWorkingDirectory (std::string currentWorkingDirectory)
+SatEnvVariables::SetCurrentWorkingDirectory(std::string currentWorkingDirectory)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  m_currentWorkingDirectory = currentWorkingDirectory;
+    m_currentWorkingDirectory = currentWorkingDirectory;
 }
 
 void
-SatEnvVariables::SetPathToExecutable (std::string pathToExecutable)
+SatEnvVariables::SetPathToExecutable(std::string pathToExecutable)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  m_pathToExecutable = pathToExecutable;
+    m_pathToExecutable = pathToExecutable;
 }
 
 std::string
-SatEnvVariables::GetOutputPath ()
+SatEnvVariables::GetOutputPath()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  if (!m_isOutputPathInitialized)
+    if (!m_isOutputPathInitialized)
     {
-      InitializeOutputFolders (m_campaignName, m_simTag, m_enableOutputOverwrite);
+        InitializeOutputFolders(m_campaignName, m_simTag, m_enableOutputOverwrite);
     }
 
-  return m_outputPath;
+    return m_outputPath;
 }
 
 void
-SatEnvVariables::SetOutputPath (std::string outputPath)
+SatEnvVariables::SetOutputPath(std::string outputPath)
 {
-  NS_ASSERT_MSG (IsValidDirectory (outputPath), outputPath << " is not a valid directory");
-  m_outputPath = outputPath;
-  m_isOutputPathInitialized = true;
+    NS_ASSERT_MSG(IsValidDirectory(outputPath), outputPath << " is not a valid directory");
+    m_outputPath = outputPath;
+    m_isOutputPathInitialized = true;
 }
 
 void
-SatEnvVariables::SetOutputVariables (std::string campaignName, std::string simTag, bool enableOutputOverwrite)
+SatEnvVariables::SetOutputVariables(std::string campaignName,
+                                    std::string simTag,
+                                    bool enableOutputOverwrite)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  m_campaignName = campaignName;
-  m_simTag = simTag;
-  m_enableOutputOverwrite = enableOutputOverwrite;
+    m_campaignName = campaignName;
+    m_simTag = simTag;
+    m_enableOutputOverwrite = enableOutputOverwrite;
 
-  InitializeOutputFolders (m_campaignName, m_simTag, m_enableOutputOverwrite);
+    InitializeOutputFolders(m_campaignName, m_simTag, m_enableOutputOverwrite);
 }
 
-SatEnvVariables::~SatEnvVariables ()
+SatEnvVariables::~SatEnvVariables()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  Dispose ();
-}
-
-std::string
-SatEnvVariables::GetCurrentWorkingDirectory ()
-{
-  NS_LOG_FUNCTION (this);
-
-  NS_LOG_INFO ("Current working directory: " << m_currentWorkingDirectory);
-  NS_LOG_INFO ("Current working directory (attribute): " << m_currentWorkingDirectoryFromAttribute);
-
-  if (m_currentWorkingDirectoryFromAttribute.empty ())
-    {
-      NS_LOG_INFO ("Attribute string is empty, using detected working directory");
-      return m_currentWorkingDirectory;
-    }
-  else
-    {
-      NS_LOG_INFO ("Using attributed working directory");
-      return m_currentWorkingDirectoryFromAttribute;
-    }
+    Dispose();
 }
 
 std::string
-SatEnvVariables::GetPathToExecutable ()
+SatEnvVariables::GetCurrentWorkingDirectory()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  NS_LOG_INFO ("Path to executable: " << m_pathToExecutable);
-  NS_LOG_INFO ("Path to executable (attribute): " << m_pathToExecutableFromAttribute);
+    NS_LOG_INFO("Current working directory: " << m_currentWorkingDirectory);
+    NS_LOG_INFO(
+        "Current working directory (attribute): " << m_currentWorkingDirectoryFromAttribute);
 
-  if (m_pathToExecutableFromAttribute.empty ())
+    if (m_currentWorkingDirectoryFromAttribute.empty())
     {
-      NS_LOG_INFO ("Attribute string is empty, using detected path to executable");
-      return m_pathToExecutable;
+        NS_LOG_INFO("Attribute string is empty, using detected working directory");
+        return m_currentWorkingDirectory;
     }
-  else
+    else
     {
-      NS_LOG_INFO ("Using attributed path to executable");
-      return m_pathToExecutableFromAttribute;
+        NS_LOG_INFO("Using attributed working directory");
+        return m_currentWorkingDirectoryFromAttribute;
+    }
+}
+
+std::string
+SatEnvVariables::GetPathToExecutable()
+{
+    NS_LOG_FUNCTION(this);
+
+    NS_LOG_INFO("Path to executable: " << m_pathToExecutable);
+    NS_LOG_INFO("Path to executable (attribute): " << m_pathToExecutableFromAttribute);
+
+    if (m_pathToExecutableFromAttribute.empty())
+    {
+        NS_LOG_INFO("Attribute string is empty, using detected path to executable");
+        return m_pathToExecutable;
+    }
+    else
+    {
+        NS_LOG_INFO("Using attributed path to executable");
+        return m_pathToExecutableFromAttribute;
     }
 }
 
 bool
-SatEnvVariables::IsValidDirectory (std::string path)
+SatEnvVariables::IsValidDirectory(std::string path)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  struct stat st;
-  bool validDirectory = false;
+    struct stat st;
+    bool validDirectory = false;
 
-  if (stat (path.c_str (), &st) == 0)
+    if (stat(path.c_str(), &st) == 0)
     {
-      if (S_ISDIR (st.st_mode))
+        if (S_ISDIR(st.st_mode))
         {
-          validDirectory = true;
+            validDirectory = true;
         }
     }
 
-  NS_LOG_INFO ("" << path << " validity: " << validDirectory);
+    NS_LOG_INFO("" << path << " validity: " << validDirectory);
 
-  return validDirectory;
+    return validDirectory;
 }
 
 bool
-SatEnvVariables::IsValidFile (std::string pathToFile)
+SatEnvVariables::IsValidFile(std::string pathToFile)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  struct stat st;
-  bool validFile = (stat (pathToFile.c_str (), &st) == 0);
+    struct stat st;
+    bool validFile = (stat(pathToFile.c_str(), &st) == 0);
 
-  NS_LOG_INFO ("" << pathToFile << " validity: " << validFile);
+    NS_LOG_INFO("" << pathToFile << " validity: " << validFile);
 
-  return validFile;
+    return validFile;
 }
 
 std::string
-SatEnvVariables::LocateDataDirectory ()
+SatEnvVariables::LocateDataDirectory()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return LocateDirectory (GetDataPath ());
+    return LocateDirectory(GetDataPath());
 }
 
 std::string
-SatEnvVariables::LocateDirectory (std::string initialPath)
+SatEnvVariables::LocateDirectory(std::string initialPath)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  std::string path;
-  bool directoryFound = false;
+    std::string path;
+    bool directoryFound = false;
 
-  NS_LOG_INFO ("Initial path " << initialPath);
+    NS_LOG_INFO("Initial path " << initialPath);
 
-  for (uint32_t i = 0; i < m_levelsToCheck; i++)
+    for (uint32_t i = 0; i < m_levelsToCheck; i++)
     {
-      std::stringstream dataPath;
+        std::stringstream dataPath;
 
-      for (uint32_t j = 0; j < i; j++)
+        for (uint32_t j = 0; j < i; j++)
         {
-          dataPath << "../";
+            dataPath << "../";
         }
 
-      dataPath << initialPath;
+        dataPath << initialPath;
 
-      NS_LOG_INFO ("Checking " << dataPath.str ());
+        NS_LOG_INFO("Checking " << dataPath.str());
 
-      if (IsValidDirectory (dataPath.str ()))
+        if (IsValidDirectory(dataPath.str()))
         {
-          NS_LOG_INFO ("Data directory located in " << dataPath.str ());
-          path = dataPath.str ();
-          directoryFound = true;
-          break;
+            NS_LOG_INFO("Data directory located in " << dataPath.str());
+            path = dataPath.str();
+            directoryFound = true;
+            break;
         }
     }
 
-  if (!directoryFound)
+    if (!directoryFound)
     {
-      NS_FATAL_ERROR ("SatEnvVariables::LocateDirectory - Directory not found within " << m_levelsToCheck << " levels: " << initialPath);
+        NS_FATAL_ERROR("SatEnvVariables::LocateDirectory - Directory not found within "
+                       << m_levelsToCheck << " levels: " << initialPath);
     }
 
-  return path;
+    return path;
 }
 
 std::string
-SatEnvVariables::LocateFile (std::string initialPath)
+SatEnvVariables::LocateFile(std::string initialPath)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  std::string path;
-  bool fileFound = false;
+    std::string path;
+    bool fileFound = false;
 
-  NS_LOG_INFO ("Initial path " << initialPath);
+    NS_LOG_INFO("Initial path " << initialPath);
 
-  for (uint32_t i = 0; i < m_levelsToCheck; i++)
+    for (uint32_t i = 0; i < m_levelsToCheck; i++)
     {
-      std::stringstream dataPath;
+        std::stringstream dataPath;
 
-      for (uint32_t j = 0; j < i; j++)
+        for (uint32_t j = 0; j < i; j++)
         {
-          dataPath << "../";
+            dataPath << "../";
         }
 
-      dataPath << initialPath;
+        dataPath << initialPath;
 
-      NS_LOG_INFO ("Checking " << dataPath.str ());
+        NS_LOG_INFO("Checking " << dataPath.str());
 
-      if (IsValidFile (dataPath.str ()))
+        if (IsValidFile(dataPath.str()))
         {
-          NS_LOG_INFO ("Data directory located in " << dataPath.str ());
-          path = dataPath.str ();
-          fileFound = true;
-          break;
+            NS_LOG_INFO("Data directory located in " << dataPath.str());
+            path = dataPath.str();
+            fileFound = true;
+            break;
         }
     }
 
-  if (!fileFound)
+    if (!fileFound)
     {
-      NS_FATAL_ERROR ("SatEnvVariables::LocateFile - File not found within " << m_levelsToCheck << " levels: " << initialPath);
+        NS_FATAL_ERROR("SatEnvVariables::LocateFile - File not found within "
+                       << m_levelsToCheck << " levels: " << initialPath);
     }
 
-  return path;
+    return path;
 }
 
 std::string
-SatEnvVariables::InitializeOutputFolders (std::string campaignName, std::string simTag, bool enableOutputOverwrite)
+SatEnvVariables::InitializeOutputFolders(std::string campaignName,
+                                         std::string simTag,
+                                         bool enableOutputOverwrite)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  NS_LOG_INFO ("Creating output directory");
+    NS_LOG_INFO("Creating output directory");
 
-  uint32_t safety = 0;
-  std::string safetyTag = "";
-  std::string outputPath = "";
-  bool directoryExists = false;
-  std::string simRootPath = LocateDirectory (m_simRootPath);
+    uint32_t safety = 0;
+    std::string safetyTag = "";
+    std::string outputPath = "";
+    bool directoryExists = false;
+    std::string simRootPath = LocateDirectory(m_simRootPath);
 
-  // If we have set a campaign name
-  if (!campaignName.empty ())
+    // If we have set a campaign name
+    if (!campaignName.empty())
     {
-      std::string tempString = AddToPath (simRootPath, campaignName);
+        std::string tempString = AddToPath(simRootPath, campaignName);
 
-      // If the campaign name directory does not exist, create it
-      if (!IsValidDirectory (tempString))
+        // If the campaign name directory does not exist, create it
+        if (!IsValidDirectory(tempString))
         {
-          CreateDirectory (tempString);
+            CreateDirectory(tempString);
         }
     }
 
-  // As long as the full output folder is created.
-  // Start with false.
-  while (!directoryExists)
+    // As long as the full output folder is created.
+    // Start with false.
+    while (!directoryExists)
     {
-      outputPath = FormOutputPath (simRootPath, campaignName, simTag, safetyTag);
+        outputPath = FormOutputPath(simRootPath, campaignName, simTag, safetyTag);
 
-      // Create new simulation folder or overwrite
-      if ( (!IsValidDirectory (outputPath) && !enableOutputOverwrite) || enableOutputOverwrite)
+        // Create new simulation folder or overwrite
+        if ((!IsValidDirectory(outputPath) && !enableOutputOverwrite) || enableOutputOverwrite)
         {
-          CreateDirectory (outputPath);
-          directoryExists = true;
+            CreateDirectory(outputPath);
+            directoryExists = true;
         }
-      // Do not overwrite, but add a new safety string tag to simulation folder
-      else
+        // Do not overwrite, but add a new safety string tag to simulation folder
+        else
         {
-          safety++;
+            safety++;
 
-          NS_LOG_INFO ("Directory " << outputPath << " exists, increasing safety number to " << safety);
+            NS_LOG_INFO("Directory " << outputPath << " exists, increasing safety number to "
+                                     << safety);
 
-          std::stringstream ss;
-          ss << safety;
-          safetyTag = ss.str ();
+            std::stringstream ss;
+            ss << safety;
+            safetyTag = ss.str();
 
-          // Continue loop and try to create a new directory
-          directoryExists = false;
+            // Continue loop and try to create a new directory
+            directoryExists = false;
         }
     }
 
-  m_isOutputPathInitialized = true;
-  m_outputPath = outputPath;
-  return outputPath;
+    m_isOutputPathInitialized = true;
+    m_outputPath = outputPath;
+    return outputPath;
 }
 
 std::string
-SatEnvVariables::FormOutputPath (std::string simRootPath, std::string campaignName, std::string simTag, std::string safetyTag)
+SatEnvVariables::FormOutputPath(std::string simRootPath,
+                                std::string campaignName,
+                                std::string simTag,
+                                std::string safetyTag)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  std::string outputPath = "";
-  std::stringstream tempTag;
+    std::string outputPath = "";
+    std::stringstream tempTag;
 
-  tempTag << simTag;
+    tempTag << simTag;
 
-  if (!safetyTag.empty ())
+    if (!safetyTag.empty())
     {
-      tempTag << safetyTag;
+        tempTag << safetyTag;
     }
 
-  outputPath = AddToPath (outputPath, simRootPath);
-  outputPath = AddToPath (outputPath, campaignName);
-  outputPath = AddToPath (outputPath, tempTag.str ());
+    outputPath = AddToPath(outputPath, simRootPath);
+    outputPath = AddToPath(outputPath, campaignName);
+    outputPath = AddToPath(outputPath, tempTag.str());
 
-  NS_LOG_INFO ("Formed path " + outputPath);
+    NS_LOG_INFO("Formed path " + outputPath);
 
-  return outputPath;
+    return outputPath;
 }
 
 std::string
-SatEnvVariables::AddToPath (std::string path, std::string stringToAdd)
+SatEnvVariables::AddToPath(std::string path, std::string stringToAdd)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  std::stringstream tempPath;
-  tempPath << path;
+    std::stringstream tempPath;
+    tempPath << path;
 
-  if (!stringToAdd.empty ())
+    if (!stringToAdd.empty())
     {
-      if (tempPath.str ().empty ())
+        if (tempPath.str().empty())
         {
-          tempPath << stringToAdd;
+            tempPath << stringToAdd;
         }
-      else
+        else
         {
-          tempPath << "/" << stringToAdd;
+            tempPath << "/" << stringToAdd;
         }
     }
-  return tempPath.str ();
+    return tempPath.str();
 }
 
 void
-SatEnvVariables::CreateDirectory (std::string path)
+SatEnvVariables::CreateDirectory(std::string path)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  NS_LOG_INFO ("Creating directory " + path);
+    NS_LOG_INFO("Creating directory " + path);
 
-  mkdir (path.c_str (), 0777);
+    mkdir(path.c_str(), 0777);
 }
 
 std::string
-SatEnvVariables::GetCurrentDateAndTime ()
+SatEnvVariables::GetCurrentDateAndTime()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  time_t rawtime;
-  struct tm * timeinfo;
-  char buffer[80];
+    time_t rawtime;
+    struct tm* timeinfo;
+    char buffer[80];
 
-  time (&rawtime);
-  timeinfo = localtime (&rawtime);
+    time(&rawtime);
+    timeinfo = localtime(&rawtime);
 
-  strftime (buffer, 80, "%d-%m-%Y %I:%M:%S", timeinfo);
-  std::string str (buffer);
+    strftime(buffer, 80, "%d-%m-%Y %I:%M:%S", timeinfo);
+    std::string str(buffer);
 
-  NS_LOG_INFO ("Date is " << str);
+    NS_LOG_INFO("Date is " << str);
 
-  return str;
+    return str;
 }
 
 void
-SatEnvVariables::ExecuteCommandAndReadOutput (std::string command, Ptr<SatOutputFileStreamStringContainer> outputContainer)
+SatEnvVariables::ExecuteCommandAndReadOutput(
+    std::string command,
+    Ptr<SatOutputFileStreamStringContainer> outputContainer)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  FILE* pipe = popen (command.c_str (), "r");
-  if (pipe)
+    FILE* pipe = popen(command.c_str(), "r");
+    if (pipe)
     {
-      std::string data = "";
-      char buffer[1024];
-      while (!feof (pipe))
+        std::string data = "";
+        char buffer[1024];
+        while (!feof(pipe))
         {
-          if (fgets (buffer, 1024, pipe) != NULL)
+            if (fgets(buffer, 1024, pipe) != NULL)
             {
-              buffer[strlen (buffer) - 1] = '\0';
-              data.append (buffer);
-              outputContainer->AddToContainer (data);
-              data = "";
+                buffer[strlen(buffer) - 1] = '\0';
+                data.append(buffer);
+                outputContainer->AddToContainer(data);
+                data = "";
             }
         }
-      pclose (pipe);
+        pclose(pipe);
     }
 }
 
 void
-SatEnvVariables::DumpSimulationInformation ()
+SatEnvVariables::DumpSimulationInformation()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  std::string dataPath = LocateDirectory (m_outputPath);
+    std::string dataPath = LocateDirectory(m_outputPath);
 
-  std::ostringstream fileName;
-  fileName << dataPath << "/SimInfo.log";
-  Ptr<SatOutputFileStreamStringContainer> outputContainer = CreateObject<SatOutputFileStreamStringContainer> (fileName.str ().c_str (), std::ios::out);
+    std::ostringstream fileName;
+    fileName << dataPath << "/SimInfo.log";
+    Ptr<SatOutputFileStreamStringContainer> outputContainer =
+        CreateObject<SatOutputFileStreamStringContainer>(fileName.str().c_str(), std::ios::out);
 
-  std::ostringstream revisionCommand;
-  revisionCommand << "cd contrib/satellite"
-                  << " && git log -1 2>&1";
-  ExecuteCommandAndReadOutput (revisionCommand.str (), outputContainer);
+    std::ostringstream revisionCommand;
+    revisionCommand << "cd contrib/satellite"
+                    << " && git log -1 2>&1";
+    ExecuteCommandAndReadOutput(revisionCommand.str(), outputContainer);
 
-  std::stringstream line1;
-  line1 << "\nSimulation finished at " << GetCurrentDateAndTime ();
+    std::stringstream line1;
+    line1 << "\nSimulation finished at " << GetCurrentDateAndTime();
 
-  outputContainer->AddToContainer (line1.str ());
+    outputContainer->AddToContainer(line1.str());
 
-  outputContainer->WriteContainerToFile ();
+    outputContainer->WriteContainerToFile();
 
-  if (m_enableSimInfoDiffOutput)
+    if (m_enableSimInfoDiffOutput)
     {
-      DumpRevisionDiff (dataPath);
+        DumpRevisionDiff(dataPath);
     }
 }
 
 void
-SatEnvVariables::DumpRevisionDiff (std::string dataPath)
+SatEnvVariables::DumpRevisionDiff(std::string dataPath)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  std::ostringstream fileName;
-  fileName << dataPath << "/SimDiff.log";
-  Ptr<SatOutputFileStreamStringContainer> outputContainer = CreateObject<SatOutputFileStreamStringContainer> (fileName.str ().c_str (), std::ios::out);
+    std::ostringstream fileName;
+    fileName << dataPath << "/SimDiff.log";
+    Ptr<SatOutputFileStreamStringContainer> outputContainer =
+        CreateObject<SatOutputFileStreamStringContainer>(fileName.str().c_str(), std::ios::out);
 
-  std::ostringstream diffCommand;
-  diffCommand << "cd contrib/satellite"
-              << " && git diff"
-              << " --ignore-all-space"
-              << " --ignore-space-change"
-              << " --ignore-blank-lines";
+    std::ostringstream diffCommand;
+    diffCommand << "cd contrib/satellite"
+                << " && git diff"
+                << " --ignore-all-space"
+                << " --ignore-space-change"
+                << " --ignore-blank-lines";
 
-  if (m_excludeDataFolderFromDiff)
+    if (m_excludeDataFolderFromDiff)
     {
-      // Requires git 1.9 to work
-      diffCommand << " \":(exclude)" << m_dataPath << "\" ";
+        // Requires git 1.9 to work
+        diffCommand << " \":(exclude)" << m_dataPath << "\" ";
     }
 
-  diffCommand << " 2>&1";
+    diffCommand << " 2>&1";
 
-  ExecuteCommandAndReadOutput (diffCommand.str (), outputContainer);
+    ExecuteCommandAndReadOutput(diffCommand.str(), outputContainer);
 
-  outputContainer->WriteContainerToFile ();
+    outputContainer->WriteContainerToFile();
 }
 
 } // namespace ns3

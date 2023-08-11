@@ -18,78 +18,82 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include "ns3/assert.h"
-#include "ns3/log.h"
 #include "satellite-beam-user-info.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatBeamUserInfo");
+#include "ns3/assert.h"
+#include "ns3/log.h"
 
-namespace ns3 {
+NS_LOG_COMPONENT_DEFINE("SatBeamUserInfo");
 
-SatBeamUserInfo::SatBeamUserInfo ()
+namespace ns3
 {
-  NS_LOG_FUNCTION (this);
+
+SatBeamUserInfo::SatBeamUserInfo()
+{
+    NS_LOG_FUNCTION(this);
 }
 
-SatBeamUserInfo::SatBeamUserInfo (uint32_t utCount, uint32_t userCountPerUt)
+SatBeamUserInfo::SatBeamUserInfo(uint32_t utCount, uint32_t userCountPerUt)
 {
-  NS_LOG_FUNCTION (this << utCount << userCountPerUt);
+    NS_LOG_FUNCTION(this << utCount << userCountPerUt);
 
-  NS_ASSERT (utCount > 0);
-  NS_ASSERT (userCountPerUt > 0);
+    NS_ASSERT(utCount > 0);
+    NS_ASSERT(userCountPerUt > 0);
 
-  for (uint32_t i = 0; i < utCount; i++)
+    for (uint32_t i = 0; i < utCount; i++)
     {
-      m_userCount.push_back (userCountPerUt);
+        m_userCount.push_back(userCountPerUt);
     }
 }
 
 uint32_t
-SatBeamUserInfo::GetUtCount () const
+SatBeamUserInfo::GetUtCount() const
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return m_userCount.size ();
+    return m_userCount.size();
 }
 
 uint32_t
-SatBeamUserInfo::GetUtUserCount (uint32_t utIndex) const
+SatBeamUserInfo::GetUtUserCount(uint32_t utIndex) const
 {
-  NS_LOG_FUNCTION (this << utIndex);
+    NS_LOG_FUNCTION(this << utIndex);
 
-  NS_ASSERT (utIndex < m_userCount.size ());
+    NS_ASSERT(utIndex < m_userCount.size());
 
-  return m_userCount[utIndex];
-}
-
-void SatBeamUserInfo::SetUtUserCount (uint32_t utIndex, uint32_t userCount)
-{
-  NS_LOG_FUNCTION (this << utIndex << userCount);
-
-  NS_ASSERT (utIndex < m_userCount.size ());
-
-  m_userCount[utIndex] = userCount;
-}
-
-void SatBeamUserInfo::AppendUt (uint32_t userCount)
-{
-  NS_LOG_FUNCTION (this << userCount);
-
-  NS_ASSERT (userCount > 0);
-
-  m_userCount.push_back (userCount);
+    return m_userCount[utIndex];
 }
 
 void
-SatBeamUserInfo::SetPositions (std::vector<std::pair<GeoCoordinate, uint32_t>> positions)
+SatBeamUserInfo::SetUtUserCount(uint32_t utIndex, uint32_t userCount)
 {
-  m_positions = positions;
+    NS_LOG_FUNCTION(this << utIndex << userCount);
+
+    NS_ASSERT(utIndex < m_userCount.size());
+
+    m_userCount[utIndex] = userCount;
+}
+
+void
+SatBeamUserInfo::AppendUt(uint32_t userCount)
+{
+    NS_LOG_FUNCTION(this << userCount);
+
+    NS_ASSERT(userCount > 0);
+
+    m_userCount.push_back(userCount);
+}
+
+void
+SatBeamUserInfo::SetPositions(std::vector<std::pair<GeoCoordinate, uint32_t>> positions)
+{
+    m_positions = positions;
 }
 
 std::vector<std::pair<GeoCoordinate, uint32_t>>
-SatBeamUserInfo::GetPositions ()
+SatBeamUserInfo::GetPositions()
 {
-  return m_positions;
+    return m_positions;
 }
 
 } // namespace ns3

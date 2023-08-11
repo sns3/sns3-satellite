@@ -21,16 +21,16 @@
 #ifndef SATELLITE_STATS_ANTENNA_GAIN_HELPER_H
 #define SATELLITE_STATS_ANTENNA_GAIN_HELPER_H
 
-#include <ns3/satellite-stats-helper.h>
-#include <ns3/ptr.h>
 #include <ns3/address.h>
 #include <ns3/collector-map.h>
+#include <ns3/ptr.h>
+#include <ns3/satellite-stats-helper.h>
+
 #include <list>
 #include <map>
 
-
-namespace ns3 {
-
+namespace ns3
+{
 
 class SatHelper;
 class Node;
@@ -44,62 +44,61 @@ class DistributionCollector;
  */
 class SatStatsAntennaGainHelper : public SatStatsHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsAntennaGainHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsAntennaGainHelper(Ptr<const SatHelper> satHelper);
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsAntennaGainHelper ();
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsAntennaGainHelper();
 
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
-  /**
-   * \param averagingMode average all samples before passing them to aggregator.
-   */
-  void SetAveragingMode (bool averagingMode);
+    /**
+     * \param averagingMode average all samples before passing them to aggregator.
+     */
+    void SetAveragingMode(bool averagingMode);
 
-  /**
-   * \return the currently active averaging mode.
-   */
-  bool GetAveragingMode () const;
+    /**
+     * \return the currently active averaging mode.
+     */
+    bool GetAveragingMode() const;
 
-  /**
-   * \brief Set up several probes or other means of listeners
-   *        and connect them to the collectors.
-   */
-  void InstallProbes ();
+    /**
+     * \brief Set up several probes or other means of listeners
+     *        and connect them to the collectors.
+     */
+    void InstallProbes();
 
-  /**
-   * \brief Receive inputs from trace sources
-   * \param identifier the source ID as a context string.
-   * \param gain the antenna gain collected.
-   */
-  void AntennaGainCallback (std::string identifier, double gain);
+    /**
+     * \brief Receive inputs from trace sources
+     * \param identifier the source ID as a context string.
+     * \param gain the antenna gain collected.
+     */
+    void AntennaGainCallback(std::string identifier, double gain);
 
-protected:
-  // inherited from SatStatsHelper base class
-  void DoInstall ();
+  protected:
+    // inherited from SatStatsHelper base class
+    void DoInstall();
 
-  /// Maintains a list of collectors created by this helper.
-  CollectorMap m_terminalCollectors;
+    /// Maintains a list of collectors created by this helper.
+    CollectorMap m_terminalCollectors;
 
-  /// The final collector utilized in averaged output (histogram, PDF, and CDF).
-  Ptr<DistributionCollector> m_averagingCollector;
+    /// The final collector utilized in averaged output (histogram, PDF, and CDF).
+    Ptr<DistributionCollector> m_averagingCollector;
 
-  /// The aggregator created by this helper.
-  Ptr<DataCollectionObject> m_aggregator;
+    /// The aggregator created by this helper.
+    Ptr<DataCollectionObject> m_aggregator;
 
-private:
-  bool m_averagingMode;  ///< `AveragingMode` attribute.
+  private:
+    bool m_averagingMode; ///< `AveragingMode` attribute.
 
 }; // end of class SatStatsAntennaGainHelper
 
-}
-
+} // namespace ns3
 
 #endif /* SATELLITE_STATS_ANTENNA_GAIN_HELPER_H */

@@ -18,89 +18,87 @@
  * Author: Bastien TAURAN <bastien.tauran@viveris.fr>
  */
 
-#include <ns3/log.h>
-
 #include "satellite-ground-station-address-tag.h"
 
+#include <ns3/log.h>
 
-NS_LOG_COMPONENT_DEFINE ("SatGroundStationAddressTag");
+NS_LOG_COMPONENT_DEFINE("SatGroundStationAddressTag");
 
-namespace ns3 {
-
-NS_OBJECT_ENSURE_REGISTERED (SatGroundStationAddressTag);
-
-SatGroundStationAddressTag::SatGroundStationAddressTag ()
+namespace ns3
 {
-  // Nothing to do here
+
+NS_OBJECT_ENSURE_REGISTERED(SatGroundStationAddressTag);
+
+SatGroundStationAddressTag::SatGroundStationAddressTag()
+{
+    // Nothing to do here
 }
 
-SatGroundStationAddressTag::SatGroundStationAddressTag (Mac48Address groundStationAddress)
-  : m_groundStationAddress (groundStationAddress)
+SatGroundStationAddressTag::SatGroundStationAddressTag(Mac48Address groundStationAddress)
+    : m_groundStationAddress(groundStationAddress)
 {
-  // Nothing to do here
-}
-
-TypeId
-SatGroundStationAddressTag::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::SatGroundStationAddressTag")
-    .SetParent<Tag> ()
-    .AddConstructor<SatGroundStationAddressTag> ();
-  return tid;
+    // Nothing to do here
 }
 
 TypeId
-SatGroundStationAddressTag::GetInstanceTypeId (void) const
+SatGroundStationAddressTag::GetTypeId(void)
 {
-  return GetTypeId ();
+    static TypeId tid = TypeId("ns3::SatGroundStationAddressTag")
+                            .SetParent<Tag>()
+                            .AddConstructor<SatGroundStationAddressTag>();
+    return tid;
+}
+
+TypeId
+SatGroundStationAddressTag::GetInstanceTypeId(void) const
+{
+    return GetTypeId();
 }
 
 uint32_t
-SatGroundStationAddressTag::GetSerializedSize (void) const
+SatGroundStationAddressTag::GetSerializedSize(void) const
 {
-  return ADDRESS_LENGHT;
+    return ADDRESS_LENGHT;
 }
 
 void
-SatGroundStationAddressTag::Serialize (TagBuffer i) const
+SatGroundStationAddressTag::Serialize(TagBuffer i) const
 {
-  NS_LOG_FUNCTION (this << &i);
+    NS_LOG_FUNCTION(this << &i);
 
-  uint8_t buff[ADDRESS_LENGHT];
+    uint8_t buff[ADDRESS_LENGHT];
 
-  m_groundStationAddress.CopyTo (buff);
-  i.Write (buff, ADDRESS_LENGHT);
+    m_groundStationAddress.CopyTo(buff);
+    i.Write(buff, ADDRESS_LENGHT);
 }
 
 void
-SatGroundStationAddressTag::Deserialize (TagBuffer i)
+SatGroundStationAddressTag::Deserialize(TagBuffer i)
 {
-  NS_LOG_FUNCTION (this << &i);
+    NS_LOG_FUNCTION(this << &i);
 
-  uint8_t buff[ADDRESS_LENGHT];
+    uint8_t buff[ADDRESS_LENGHT];
 
-  i.Read (buff, ADDRESS_LENGHT);
-  m_groundStationAddress.CopyFrom (buff);
+    i.Read(buff, ADDRESS_LENGHT);
+    m_groundStationAddress.CopyFrom(buff);
 }
 
 void
-SatGroundStationAddressTag::Print (std::ostream &os) const
+SatGroundStationAddressTag::Print(std::ostream& os) const
 {
-  os << m_groundStationAddress;
+    os << m_groundStationAddress;
 }
 
 Mac48Address
-SatGroundStationAddressTag::GetGroundStationAddress (void) const
+SatGroundStationAddressTag::GetGroundStationAddress(void) const
 {
-  return m_groundStationAddress;
+    return m_groundStationAddress;
 }
 
 void
-SatGroundStationAddressTag::SetGroundStationAddress (Mac48Address groundStationAddress)
+SatGroundStationAddressTag::SetGroundStationAddress(Mac48Address groundStationAddress)
 {
-  m_groundStationAddress = groundStationAddress;
+    m_groundStationAddress = groundStationAddress;
 }
 
-
 } // namespace ns3
-

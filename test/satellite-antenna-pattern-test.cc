@@ -18,14 +18,15 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include "ns3/log.h"
-#include "ns3/test.h"
-#include "ns3/simulator.h"
-#include "../model/satellite-antenna-gain-pattern.h"
 #include "../model/satellite-antenna-gain-pattern-container.h"
+#include "../model/satellite-antenna-gain-pattern.h"
 #include "../model/satellite-constant-position-mobility-model.h"
-#include "ns3/singleton.h"
 #include "../utils/satellite-env-variables.h"
+
+#include "ns3/log.h"
+#include "ns3/simulator.h"
+#include "ns3/singleton.h"
+#include "ns3/test.h"
 
 using namespace ns3;
 
@@ -40,90 +41,93 @@ using namespace ns3;
  */
 class SatAntennaPatternTestCase : public TestCase
 {
-public:
-  SatAntennaPatternTestCase ();
-  virtual ~SatAntennaPatternTestCase ();
+  public:
+    SatAntennaPatternTestCase();
+    virtual ~SatAntennaPatternTestCase();
 
-private:
-  virtual void DoRun (void);
+  private:
+    virtual void DoRun(void);
 };
 
-SatAntennaPatternTestCase::SatAntennaPatternTestCase ()
-  : TestCase ("Test satellite antenna gain pattern.")
+SatAntennaPatternTestCase::SatAntennaPatternTestCase()
+    : TestCase("Test satellite antenna gain pattern.")
 {
 }
 
-SatAntennaPatternTestCase::~SatAntennaPatternTestCase ()
+SatAntennaPatternTestCase::~SatAntennaPatternTestCase()
 {
 }
 
 void
-SatAntennaPatternTestCase::DoRun (void)
+SatAntennaPatternTestCase::DoRun(void)
 {
-  // Set simulation output details
-  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-antenna-gain-pattern", "", true);
+    // Set simulation output details
+    Singleton<SatEnvVariables>::Get()->DoInitialize();
+    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-antenna-gain-pattern", "", true);
 
-  // Create antenna gain container
-  SatAntennaGainPatternContainer gpContainer;
+    // Create antenna gain container
+    SatAntennaGainPatternContainer gpContainer;
 
-  GeoCoordinate geoPos = GeoCoordinate (0.0, 33.0, 35786000);
-  Ptr<SatMobilityModel> mobility = CreateObject<SatConstantPositionMobilityModel> ();
-  mobility->SetGeoPosition (geoPos);
-  gpContainer.ConfigureBeamsMobility (0, mobility);
+    GeoCoordinate geoPos = GeoCoordinate(0.0, 33.0, 35786000);
+    Ptr<SatMobilityModel> mobility = CreateObject<SatConstantPositionMobilityModel>();
+    mobility->SetGeoPosition(geoPos);
+    gpContainer.ConfigureBeamsMobility(0, mobility);
 
-  // Test positions (= GW positions from 72 spot-beam reference system)
-  std::vector<GeoCoordinate> coordinates;
-  GeoCoordinate g1 = GeoCoordinate (50.25, 3.75, 0.0);
-  coordinates.push_back (g1);
-  GeoCoordinate g2 = GeoCoordinate (64.00, 8.25, 0.0);
-  coordinates.push_back (g2);
-  GeoCoordinate g3 = GeoCoordinate (42.25, -4.50, 0.0);
-  coordinates.push_back (g3);
-  GeoCoordinate g4 = GeoCoordinate (44.50, 13.50, 0.0);
-  coordinates.push_back (g4);
-  GeoCoordinate g5 = GeoCoordinate (37.25, 23.75, 0.0);
-  coordinates.push_back (g5);
+    // Test positions (= GW positions from 72 spot-beam reference system)
+    std::vector<GeoCoordinate> coordinates;
+    GeoCoordinate g1 = GeoCoordinate(50.25, 3.75, 0.0);
+    coordinates.push_back(g1);
+    GeoCoordinate g2 = GeoCoordinate(64.00, 8.25, 0.0);
+    coordinates.push_back(g2);
+    GeoCoordinate g3 = GeoCoordinate(42.25, -4.50, 0.0);
+    coordinates.push_back(g3);
+    GeoCoordinate g4 = GeoCoordinate(44.50, 13.50, 0.0);
+    coordinates.push_back(g4);
+    GeoCoordinate g5 = GeoCoordinate(37.25, 23.75, 0.0);
+    coordinates.push_back(g5);
 
-  /* Reference results
-  GW: 1, Lat: 50.25, Lon: 3.75, bestBeamId: 12, gain: 51.5528
-  GW: 2, Lat: 64, Lon: 8.25, bestBeamId: 6, gain: 51.4735
-  GW: 3, Lat: 42.25, Lon: -4.5, bestBeamId: 22, gain: 51.3403
-  GW: 4, Lat: 44.5, Lon: 13.5, bestBeamId: 39, gain: 51.6553
-  GW: 5, Lat: 37.25, Lon: 23.75, bestBeamId: 58, gain: 51.4738
-  */
+    /* Reference results
+    GW: 1, Lat: 50.25, Lon: 3.75, bestBeamId: 12, gain: 51.5528
+    GW: 2, Lat: 64, Lon: 8.25, bestBeamId: 6, gain: 51.4735
+    GW: 3, Lat: 42.25, Lon: -4.5, bestBeamId: 22, gain: 51.3403
+    GW: 4, Lat: 44.5, Lon: 13.5, bestBeamId: 39, gain: 51.6553
+    GW: 5, Lat: 37.25, Lon: 23.75, bestBeamId: 58, gain: 51.4738
+    */
 
-  // Expected spot-beam gains from beam 3
-  double expectedGains[5] = { 51.5528, 51.4735, 51.3403, 51.6553, 51.4738 };
+    // Expected spot-beam gains from beam 3
+    double expectedGains[5] = {51.5528, 51.4735, 51.3403, 51.6553, 51.4738};
 
-  // Expected best spot-beams
-  uint32_t expectedBeamIds[5] = {12, 6, 22, 39, 58};
+    // Expected best spot-beams
+    uint32_t expectedBeamIds[5] = {12, 6, 22, 39, 58};
 
-  // Check that the gains and best beam IDs are as expected
-  double gain (0.0);
-  uint32_t bestBeamId (0);
-  for ( uint32_t i = 0; i < coordinates.size (); ++i)
+    // Check that the gains and best beam IDs are as expected
+    double gain(0.0);
+    uint32_t bestBeamId(0);
+    for (uint32_t i = 0; i < coordinates.size(); ++i)
     {
-      bestBeamId = gpContainer.GetBestBeamId (0, coordinates[i], false);
+        bestBeamId = gpContainer.GetBestBeamId(0, coordinates[i], false);
 
-      Ptr<SatAntennaGainPattern> gainPattern = gpContainer.GetAntennaGainPattern (bestBeamId);
+        Ptr<SatAntennaGainPattern> gainPattern = gpContainer.GetAntennaGainPattern(bestBeamId);
 
-      gain = gainPattern->GetAntennaGain_lin (coordinates[i], mobility);
-      double gain_dB = 10.0 * log10 (gain);
+        gain = gainPattern->GetAntennaGain_lin(coordinates[i], mobility);
+        double gain_dB = 10.0 * log10(gain);
 
-      /*
-      std::cout << "GW: " << i+1 <<
-          ", Lat: " << coordinates[i].GetLatitude () <<
-          ", Lon: " << coordinates[i].GetLongitude () <<
-          ", bestBeamId: " << bestBeamId <<
-          ", gain: " << gain_dB << std::endl;
-      */
+        /*
+        std::cout << "GW: " << i+1 <<
+            ", Lat: " << coordinates[i].GetLatitude () <<
+            ", Lon: " << coordinates[i].GetLongitude () <<
+            ", bestBeamId: " << bestBeamId <<
+            ", gain: " << gain_dB << std::endl;
+        */
 
-      NS_TEST_ASSERT_MSG_EQ_TOL ( gain_dB, expectedGains[i], 0.001, "Expected gain not within tolerance");
-      NS_TEST_ASSERT_MSG_EQ ( bestBeamId, expectedBeamIds[i], "Not expected best spot-beam id");
+        NS_TEST_ASSERT_MSG_EQ_TOL(gain_dB,
+                                  expectedGains[i],
+                                  0.001,
+                                  "Expected gain not within tolerance");
+        NS_TEST_ASSERT_MSG_EQ(bestBeamId, expectedBeamIds[i], "Not expected best spot-beam id");
     }
 
-  Singleton<SatEnvVariables>::Get ()->DoDispose ();
+    Singleton<SatEnvVariables>::Get()->DoDispose();
 }
 
 /**
@@ -132,16 +136,15 @@ SatAntennaPatternTestCase::DoRun (void)
  */
 class SatAntennaPatternTestSuite : public TestSuite
 {
-public:
-  SatAntennaPatternTestSuite ();
+  public:
+    SatAntennaPatternTestSuite();
 };
 
-SatAntennaPatternTestSuite::SatAntennaPatternTestSuite ()
-  : TestSuite ("sat-antenna-gain-pattern-test", UNIT)
+SatAntennaPatternTestSuite::SatAntennaPatternTestSuite()
+    : TestSuite("sat-antenna-gain-pattern-test", UNIT)
 {
-  AddTestCase (new SatAntennaPatternTestCase, TestCase::QUICK);
+    AddTestCase(new SatAntennaPatternTestCase, TestCase::QUICK);
 }
 
 // Do allocate an instance of this TestSuite
 static SatAntennaPatternTestSuite satSatInterferenceTestSuite;
-

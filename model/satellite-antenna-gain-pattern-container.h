@@ -21,11 +21,13 @@
 #ifndef SATELLITE_ANTENNA_GAIN_PATTERN_CONTAINER_H_
 #define SATELLITE_ANTENNA_GAIN_PATTERN_CONTAINER_H_
 
-#include "satellite-antenna-gain-pattern.h"
-#include "ns3/satellite-beam-user-info.h"
 #include "geo-coordinate.h"
+#include "satellite-antenna-gain-pattern.h"
 
-namespace ns3 {
+#include "ns3/satellite-beam-user-info.h"
+
+namespace ns3
+{
 
 class SatMobilityModel;
 
@@ -42,79 +44,78 @@ class SatMobilityModel;
  */
 class SatAntennaGainPatternContainer : public Object
 {
-public:
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
-  TypeId GetInstanceTypeId () const;
+  public:
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
+    TypeId GetInstanceTypeId() const;
 
-  /**
-   * Default constructor.
-   * \param nbSats Number of satellites to consider
-   */
-  SatAntennaGainPatternContainer (uint32_t nbSats = 1);
-  ~SatAntennaGainPatternContainer ();
+    /**
+     * Default constructor.
+     * \param nbSats Number of satellites to consider
+     */
+    SatAntennaGainPatternContainer(uint32_t nbSats = 1);
+    ~SatAntennaGainPatternContainer();
 
-  /**
-   * definition for beam map key is pair sat ID / beam ID and value is UT/user info.
-   */
-  typedef std::map<std::pair<uint32_t, uint32_t>, SatBeamUserInfo > BeamUserInfoMap_t;
+    /**
+     * definition for beam map key is pair sat ID / beam ID and value is UT/user info.
+     */
+    typedef std::map<std::pair<uint32_t, uint32_t>, SatBeamUserInfo> BeamUserInfoMap_t;
 
-  /**
-   * \brief Load the default satellite position associated to these traces. Must be in GeoPos.in
-   * \return The satellite position
-   */
-  GeoCoordinate GetDefaultGeoPosition ();
+    /**
+     * \brief Load the default satellite position associated to these traces. Must be in GeoPos.in
+     * \return The satellite position
+     */
+    GeoCoordinate GetDefaultGeoPosition();
 
-  /**
-   * \brief Get the antenna pattern of a specified beam id
-   * \param beamId Beam identifier
-   * \return The antenna gain pattern instance of the specified beam id
-   */
-  Ptr<SatAntennaGainPattern> GetAntennaGainPattern (uint32_t beamId) const;
+    /**
+     * \brief Get the antenna pattern of a specified beam id
+     * \param beamId Beam identifier
+     * \return The antenna gain pattern instance of the specified beam id
+     */
+    Ptr<SatAntennaGainPattern> GetAntennaGainPattern(uint32_t beamId) const;
 
-  /**
-   * \brief Get the mobility model of a specified beam id
-   * \param satelliteId Satellite identifier
-   * \return The mobility model
-   */
-  Ptr<SatMobilityModel> GetAntennaMobility (uint32_t satelliteId) const;
+    /**
+     * \brief Get the mobility model of a specified beam id
+     * \param satelliteId Satellite identifier
+     * \return The mobility model
+     */
+    Ptr<SatMobilityModel> GetAntennaMobility(uint32_t satelliteId) const;
 
-  /**
-   * \brief Get the number of stored antenna pattern
-   * \return The total number of antenna gain pattern instance
-   */
-  uint32_t GetNAntennaGainPatterns () const;
+    /**
+     * \brief Get the number of stored antenna pattern
+     * \return The total number of antenna gain pattern instance
+     */
+    uint32_t GetNAntennaGainPatterns() const;
 
-  /**
-   * \brief Get the best beam id based on the antenna patterns in a
-   * specified geo coordinate
-   * \param satelliteId ID of satellite to search
-   * \param coord Geo coordinate
-   * \param ignoreNan Do not crash if a NaN value is returned
-   * \return best beam id in the specified geo coordinate
-   */
-  uint32_t GetBestBeamId (uint32_t satelliteId, GeoCoordinate coord, bool ignoreNan);
+    /**
+     * \brief Get the best beam id based on the antenna patterns in a
+     * specified geo coordinate
+     * \param satelliteId ID of satellite to search
+     * \param coord Geo coordinate
+     * \param ignoreNan Do not crash if a NaN value is returned
+     * \return best beam id in the specified geo coordinate
+     */
+    uint32_t GetBestBeamId(uint32_t satelliteId, GeoCoordinate coord, bool ignoreNan);
 
-  void ConfigureBeamsMobility (uint32_t satelliteId, Ptr<SatMobilityModel> mobility);
+    void ConfigureBeamsMobility(uint32_t satelliteId, Ptr<SatMobilityModel> mobility);
 
-  void SetEnabledBeams (BeamUserInfoMap_t& info);
+    void SetEnabledBeams(BeamUserInfoMap_t& info);
 
-private:
-  std::string m_patternsFolder;
+  private:
+    std::string m_patternsFolder;
 
-  /**
-   * Container of antenna patterns
-   */
-  std::map< uint32_t, Ptr<SatAntennaGainPattern> > m_antennaPatternMap;
+    /**
+     * Container of antenna patterns
+     */
+    std::map<uint32_t, Ptr<SatAntennaGainPattern>> m_antennaPatternMap;
 
-  /**
-   * Container of mobility models
-   */
-  std::map< uint32_t, Ptr<SatMobilityModel> > m_mobilityModelMap;
-
+    /**
+     * Container of mobility models
+     */
+    std::map<uint32_t, Ptr<SatMobilityModel>> m_mobilityModelMap;
 };
 
 } // namespace ns3

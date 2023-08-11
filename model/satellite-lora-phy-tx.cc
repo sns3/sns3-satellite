@@ -20,64 +20,63 @@
 
 #include "satellite-lora-phy-tx.h"
 
+namespace ns3
+{
 
-namespace ns3 {
+NS_LOG_COMPONENT_DEFINE("SatLoraPhyTx");
 
-NS_LOG_COMPONENT_DEFINE ("SatLoraPhyTx");
-
-NS_OBJECT_ENSURE_REGISTERED (SatLoraPhyTx);
+NS_OBJECT_ENSURE_REGISTERED(SatLoraPhyTx);
 
 TypeId
-SatLoraPhyTx::GetTypeId (void)
+SatLoraPhyTx::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatLoraPhyTx")
-    .SetParent<SatPhyTx> ();
-  return tid;
+    static TypeId tid = TypeId("ns3::SatLoraPhyTx").SetParent<SatPhyTx>();
+    return tid;
 }
 
-SatLoraPhyTx::SatLoraPhyTx ()
-  : m_isTransmitting (false)
-{
-}
-
-SatLoraPhyTx::~SatLoraPhyTx ()
+SatLoraPhyTx::SatLoraPhyTx()
+    : m_isTransmitting(false)
 {
 }
 
-void
-SatLoraPhyTx::SetTxFinishedCallback (TxFinishedCallback callback)
+SatLoraPhyTx::~SatLoraPhyTx()
 {
-  m_txFinishedCallback = callback;
 }
 
 void
-SatLoraPhyTx::StartTx (Ptr<SatSignalParameters> txParams)
+SatLoraPhyTx::SetTxFinishedCallback(TxFinishedCallback callback)
 {
-  NS_LOG_FUNCTION (this << txParams);
-
-  m_isTransmitting = true;
-
-  SatPhyTx::StartTx (txParams);
+    m_txFinishedCallback = callback;
 }
 
 void
-SatLoraPhyTx::EndTx ()
+SatLoraPhyTx::StartTx(Ptr<SatSignalParameters> txParams)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this << txParams);
 
-  m_isTransmitting = false;
+    m_isTransmitting = true;
 
-  m_txFinishedCallback();
+    SatPhyTx::StartTx(txParams);
+}
 
-  SatPhyTx::EndTx ();
+void
+SatLoraPhyTx::EndTx()
+{
+    NS_LOG_FUNCTION(this);
+
+    m_isTransmitting = false;
+
+    m_txFinishedCallback();
+
+    SatPhyTx::EndTx();
 }
 
 bool
-SatLoraPhyTx::IsTransmitting ()
+SatLoraPhyTx::IsTransmitting()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return m_isTransmitting && SatPhyTx::IsTransmitting ();
+    return m_isTransmitting && SatPhyTx::IsTransmitting();
 }
 
-}
+} // namespace ns3

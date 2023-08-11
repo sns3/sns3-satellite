@@ -24,14 +24,15 @@
  * \brief Channel estimation error test suite
  */
 
-#include "ns3/log.h"
-#include "ns3/test.h"
-#include "ns3/ptr.h"
+#include "../model/satellite-channel-estimation-error-container.h"
+#include "../utils/satellite-env-variables.h"
+
 #include "ns3/boolean.h"
 #include "ns3/config.h"
-#include "../model/satellite-channel-estimation-error-container.h"
+#include "ns3/log.h"
+#include "ns3/ptr.h"
 #include "ns3/singleton.h"
-#include "../utils/satellite-env-variables.h"
+#include "ns3/test.h"
 
 using namespace ns3;
 
@@ -42,42 +43,43 @@ using namespace ns3;
 
 class SatFwdChannelEstimationErrorTestCase : public TestCase
 {
-public:
-  SatFwdChannelEstimationErrorTestCase ();
-  virtual ~SatFwdChannelEstimationErrorTestCase ();
+  public:
+    SatFwdChannelEstimationErrorTestCase();
+    virtual ~SatFwdChannelEstimationErrorTestCase();
 
-private:
-  virtual void DoRun (void);
-
+  private:
+    virtual void DoRun(void);
 };
 
-SatFwdChannelEstimationErrorTestCase::SatFwdChannelEstimationErrorTestCase ()
-  : TestCase ("Test FWD link SINR channel estimation error.")
+SatFwdChannelEstimationErrorTestCase::SatFwdChannelEstimationErrorTestCase()
+    : TestCase("Test FWD link SINR channel estimation error.")
 {
 }
 
-SatFwdChannelEstimationErrorTestCase::~SatFwdChannelEstimationErrorTestCase ()
+SatFwdChannelEstimationErrorTestCase::~SatFwdChannelEstimationErrorTestCase()
 {
 }
-
 
 void
-SatFwdChannelEstimationErrorTestCase::DoRun (void)
+SatFwdChannelEstimationErrorTestCase::DoRun(void)
 {
-  // Set simulation output details
-  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-channel-estimation-error", "fwd", true);
+    // Set simulation output details
+    Singleton<SatEnvVariables>::Get()->DoInitialize();
+    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-channel-estimation-error",
+                                                          "fwd",
+                                                          true);
 
-  Ptr<SatChannelEstimationErrorContainer> ceError = Create<SatFwdLinkChannelEstimationErrorContainer> ();
+    Ptr<SatChannelEstimationErrorContainer> ceError =
+        Create<SatFwdLinkChannelEstimationErrorContainer>();
 
-  for (double in = -20.0; in < 20.0; in += 0.1)
+    for (double in = -20.0; in < 20.0; in += 0.1)
     {
-      double out = ceError->AddError (in);
+        double out = ceError->AddError(in);
 
-      std::cout << "SINR in: " << in << ", SINR out: " << out << std::endl;
+        std::cout << "SINR in: " << in << ", SINR out: " << out << std::endl;
     }
 
-  Singleton<SatEnvVariables>::Get ()->DoDispose ();
+    Singleton<SatEnvVariables>::Get()->DoDispose();
 }
 
 /**
@@ -86,44 +88,46 @@ SatFwdChannelEstimationErrorTestCase::DoRun (void)
  */
 class SatRtnChannelEstimationErrorTestCase : public TestCase
 {
-public:
-  SatRtnChannelEstimationErrorTestCase ();
-  virtual ~SatRtnChannelEstimationErrorTestCase ();
+  public:
+    SatRtnChannelEstimationErrorTestCase();
+    virtual ~SatRtnChannelEstimationErrorTestCase();
 
-private:
-  virtual void DoRun (void);
-
+  private:
+    virtual void DoRun(void);
 };
 
-SatRtnChannelEstimationErrorTestCase::SatRtnChannelEstimationErrorTestCase ()
-  : TestCase ("Test RTN link SINR channel estimation error.")
+SatRtnChannelEstimationErrorTestCase::SatRtnChannelEstimationErrorTestCase()
+    : TestCase("Test RTN link SINR channel estimation error.")
 {
 }
 
-SatRtnChannelEstimationErrorTestCase::~SatRtnChannelEstimationErrorTestCase ()
+SatRtnChannelEstimationErrorTestCase::~SatRtnChannelEstimationErrorTestCase()
 {
 }
 
 void
-SatRtnChannelEstimationErrorTestCase::DoRun (void)
+SatRtnChannelEstimationErrorTestCase::DoRun(void)
 {
-  // Set simulation output details
-  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-channel-estimation-error", "rtn", true);
+    // Set simulation output details
+    Singleton<SatEnvVariables>::Get()->DoInitialize();
+    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-channel-estimation-error",
+                                                          "rtn",
+                                                          true);
 
-  Ptr<SatChannelEstimationErrorContainer> ceError = Create<SatFwdLinkChannelEstimationErrorContainer> ();
+    Ptr<SatChannelEstimationErrorContainer> ceError =
+        Create<SatFwdLinkChannelEstimationErrorContainer>();
 
-  for (uint32_t wf = 3; wf <= 23; ++wf)
+    for (uint32_t wf = 3; wf <= 23; ++wf)
     {
-      std::cout << "--- WF:  " << wf << std::endl;
-      for (double in = -20.0; in < 20.0; in += 0.1)
+        std::cout << "--- WF:  " << wf << std::endl;
+        for (double in = -20.0; in < 20.0; in += 0.1)
         {
-          double out = ceError->AddError (in);
+            double out = ceError->AddError(in);
 
-          std::cout << "SINR in: " << in << ", SINR out: " << out << std::endl;
+            std::cout << "SINR in: " << in << ", SINR out: " << out << std::endl;
         }
     }
-  Singleton<SatEnvVariables>::Get ()->DoDispose ();
+    Singleton<SatEnvVariables>::Get()->DoDispose();
 }
 
 /**
@@ -132,17 +136,16 @@ SatRtnChannelEstimationErrorTestCase::DoRun (void)
  */
 class SatChannelEstimationErrorTestSuite : public TestSuite
 {
-public:
-  SatChannelEstimationErrorTestSuite ();
+  public:
+    SatChannelEstimationErrorTestSuite();
 };
 
-SatChannelEstimationErrorTestSuite::SatChannelEstimationErrorTestSuite ()
-  : TestSuite ("sat-channel-estimation-error-test", UNIT)
+SatChannelEstimationErrorTestSuite::SatChannelEstimationErrorTestSuite()
+    : TestSuite("sat-channel-estimation-error-test", UNIT)
 {
-  AddTestCase (new SatFwdChannelEstimationErrorTestCase, TestCase::QUICK);
-  AddTestCase (new SatRtnChannelEstimationErrorTestCase, TestCase::QUICK);
+    AddTestCase(new SatFwdChannelEstimationErrorTestCase, TestCase::QUICK);
+    AddTestCase(new SatRtnChannelEstimationErrorTestCase, TestCase::QUICK);
 }
 
 // Do allocate an instance of this TestSuite
 static SatChannelEstimationErrorTestSuite satChannelEstimationErrorTestSuite;
-

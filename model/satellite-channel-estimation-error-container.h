@@ -18,18 +18,17 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-
 #ifndef SATELLITE_CHANNEL_ESTIMATION_ERROR_CONTAINER_H_
 #define SATELLITE_CHANNEL_ESTIMATION_ERROR_CONTAINER_H_
 
-#include <map>
+#include "satellite-channel-estimation-error.h"
 
 #include <ns3/object.h>
 
-#include "satellite-channel-estimation-error.h"
+#include <map>
 
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -45,129 +44,125 @@ namespace ns3 {
 
 class SatChannelEstimationErrorContainer : public SimpleRefCount<SatChannelEstimationErrorContainer>
 {
-public:
-  /**
-   * Default constructor.
-   */
-  SatChannelEstimationErrorContainer ();
+  public:
+    /**
+     * Default constructor.
+     */
+    SatChannelEstimationErrorContainer();
 
-  /**
-   * Destructor for SatChannelEstimationErrorContainer
-   */
-  virtual ~SatChannelEstimationErrorContainer ();
+    /**
+     * Destructor for SatChannelEstimationErrorContainer
+     */
+    virtual ~SatChannelEstimationErrorContainer();
 
-  /**
-   * \brief Add channel estimation error to SINR. Base class does not actually
-   * do anything, but returns only the sinrInDb as sinrOutDb.
-   * \param sinrInDb Measured SINR in dB
-   * \param wfId Waveform id
-   * \return SINR including channel estimation error in dB
-   */
-  double AddError (double sinrInDb, uint32_t wfId = 0) const;
+    /**
+     * \brief Add channel estimation error to SINR. Base class does not actually
+     * do anything, but returns only the sinrInDb as sinrOutDb.
+     * \param sinrInDb Measured SINR in dB
+     * \param wfId Waveform id
+     * \return SINR including channel estimation error in dB
+     */
+    double AddError(double sinrInDb, uint32_t wfId = 0) const;
 
-protected:
-  /**
-   * \brief Pure virtual method for the implementation in derived classes.
-   * \param sinrInDb Measured SINR in dB
-   * \param wfId Waveform id
-   * \return SINR including channel estimation error in dB
-   */
-  virtual double DoAddError (double sinrInDb, uint32_t wfId) const = 0;
+  protected:
+    /**
+     * \brief Pure virtual method for the implementation in derived classes.
+     * \param sinrInDb Measured SINR in dB
+     * \param wfId Waveform id
+     * \return SINR including channel estimation error in dB
+     */
+    virtual double DoAddError(double sinrInDb, uint32_t wfId) const = 0;
 
-private:
+  private:
 };
-
 
 class SatSimpleChannelEstimationErrorContainer : public SatChannelEstimationErrorContainer
 {
-public:
-  /**
-   * Default constructor.
-   */
-  SatSimpleChannelEstimationErrorContainer ();
+  public:
+    /**
+     * Default constructor.
+     */
+    SatSimpleChannelEstimationErrorContainer();
 
-  /**
-   * Destructor for SatSimpleChannelEstimationErrorContainer
-   */
-  virtual ~SatSimpleChannelEstimationErrorContainer ();
+    /**
+     * Destructor for SatSimpleChannelEstimationErrorContainer
+     */
+    virtual ~SatSimpleChannelEstimationErrorContainer();
 
-protected:
-  /**
-   * \brief Simple channel estimation error does nothing to the SINR
-   * \param sinrInDb Measured SINR in dB
-   * \param wfId Waveform id
-   * \return SINR including channel estimation error in dB
-   */
-  virtual double DoAddError (double sinrInDb, uint32_t wfId) const;
+  protected:
+    /**
+     * \brief Simple channel estimation error does nothing to the SINR
+     * \param sinrInDb Measured SINR in dB
+     * \param wfId Waveform id
+     * \return SINR including channel estimation error in dB
+     */
+    virtual double DoAddError(double sinrInDb, uint32_t wfId) const;
 
-private:
+  private:
 };
 
 class SatFwdLinkChannelEstimationErrorContainer : public SatChannelEstimationErrorContainer
 {
-public:
-  /**
-   * Default constructor.
-   */
-  SatFwdLinkChannelEstimationErrorContainer ();
+  public:
+    /**
+     * Default constructor.
+     */
+    SatFwdLinkChannelEstimationErrorContainer();
 
-  /**
-   * Destructor for SatFwdLinkChannelEstimationErrorContainer
-   */
-  virtual ~SatFwdLinkChannelEstimationErrorContainer ();
+    /**
+     * Destructor for SatFwdLinkChannelEstimationErrorContainer
+     */
+    virtual ~SatFwdLinkChannelEstimationErrorContainer();
 
-protected:
-  /**
-   * \brief Add channel estimation error to SINR in FWD link
-   * Waveform id does not have any significance here.
-   * \param sinrInDb Measured SINR in dB
-   * \param wfId Waveform id
-   * \return SINR including channel estimation error in dB
-   */
-  virtual double DoAddError (double sinrInDb, uint32_t wfId) const;
+  protected:
+    /**
+     * \brief Add channel estimation error to SINR in FWD link
+     * Waveform id does not have any significance here.
+     * \param sinrInDb Measured SINR in dB
+     * \param wfId Waveform id
+     * \return SINR including channel estimation error in dB
+     */
+    virtual double DoAddError(double sinrInDb, uint32_t wfId) const;
 
-private:
-  /**
-   * Only one channel estimator error configuration for
-   * forward link.
-   */
-  Ptr<SatChannelEstimationError> m_channelEstimationError;
-
+  private:
+    /**
+     * Only one channel estimator error configuration for
+     * forward link.
+     */
+    Ptr<SatChannelEstimationError> m_channelEstimationError;
 };
 
 class SatRtnLinkChannelEstimationErrorContainer : public SatChannelEstimationErrorContainer
 {
-public:
-  /**
-   * Constructor with initialization parameters.
-   * \param minWfId
-   * \param maxWfId
-   */
-  SatRtnLinkChannelEstimationErrorContainer (uint32_t minWfId, uint32_t maxWfId);
+  public:
+    /**
+     * Constructor with initialization parameters.
+     * \param minWfId
+     * \param maxWfId
+     */
+    SatRtnLinkChannelEstimationErrorContainer(uint32_t minWfId, uint32_t maxWfId);
 
-  /**
-   * Destructor for SatRtnLinkChannelEstimationErrorContainer
-   */
-  virtual ~SatRtnLinkChannelEstimationErrorContainer ();
+    /**
+     * Destructor for SatRtnLinkChannelEstimationErrorContainer
+     */
+    virtual ~SatRtnLinkChannelEstimationErrorContainer();
 
-protected:
-  /**
-   * \brief Add channel estimation error to SINR in RTN link.
-   * \param sinrInDb Measured SINR in dB
-   * \param wfId Waveform id
-   * \return SINR including channel estimation error in dB
-   */
-  virtual double DoAddError (double sinrInDb, uint32_t wfId) const;
+  protected:
+    /**
+     * \brief Add channel estimation error to SINR in RTN link.
+     * \param sinrInDb Measured SINR in dB
+     * \param wfId Waveform id
+     * \return SINR including channel estimation error in dB
+     */
+    virtual double DoAddError(double sinrInDb, uint32_t wfId) const;
 
-private:
-  /**
-   * Map of channel estimation errors for each waveform id
-   */
-  std::map<uint32_t, Ptr<SatChannelEstimationError> > m_channelEstimationErrors;
+  private:
+    /**
+     * Map of channel estimation errors for each waveform id
+     */
+    std::map<uint32_t, Ptr<SatChannelEstimationError>> m_channelEstimationErrors;
 };
 
-}
-
-
+} // namespace ns3
 
 #endif /* SATELLITE_CHANNEL_ESTIMATION_ERROR_CONTAINER_H_ */

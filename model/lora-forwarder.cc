@@ -20,99 +20,105 @@
  * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include <ns3/log.h>
-
-#include "lora-beam-tag.h"
 #include "lora-forwarder.h"
 
+#include "lora-beam-tag.h"
 
-NS_LOG_COMPONENT_DEFINE ("LoraForwarder");
+#include <ns3/log.h>
 
-namespace ns3 {
+NS_LOG_COMPONENT_DEFINE("LoraForwarder");
 
-NS_OBJECT_ENSURE_REGISTERED (LoraForwarder);
+namespace ns3
+{
+
+NS_OBJECT_ENSURE_REGISTERED(LoraForwarder);
 
 TypeId
-LoraForwarder::GetTypeId (void)
+LoraForwarder::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::LoraForwarder")
-    .SetParent<Application> ()
-    .AddConstructor<LoraForwarder> ();
-  return tid;
+    static TypeId tid =
+        TypeId("ns3::LoraForwarder").SetParent<Application>().AddConstructor<LoraForwarder>();
+    return tid;
 }
 
-LoraForwarder::LoraForwarder ()
+LoraForwarder::LoraForwarder()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 }
 
-LoraForwarder::~LoraForwarder ()
+LoraForwarder::~LoraForwarder()
 {
-  NS_LOG_FUNCTION_NOARGS ();
-}
-
-void
-LoraForwarder::SetPointToPointNetDevice (Ptr<PointToPointNetDevice> pointToPointNetDevice)
-{
-  NS_LOG_FUNCTION (this << pointToPointNetDevice);
-
-  m_pointToPointNetDevice = pointToPointNetDevice;
+    NS_LOG_FUNCTION_NOARGS();
 }
 
 void
-LoraForwarder::SetLoraNetDevice (uint8_t beamId, Ptr<SatLorawanNetDevice> loraNetDevice)
+LoraForwarder::SetPointToPointNetDevice(Ptr<PointToPointNetDevice> pointToPointNetDevice)
 {
-  NS_LOG_FUNCTION (this << loraNetDevice);
+    NS_LOG_FUNCTION(this << pointToPointNetDevice);
 
-  m_satLorawanNetDevices[beamId] = loraNetDevice;
+    m_pointToPointNetDevice = pointToPointNetDevice;
+}
+
+void
+LoraForwarder::SetLoraNetDevice(uint8_t beamId, Ptr<SatLorawanNetDevice> loraNetDevice)
+{
+    NS_LOG_FUNCTION(this << loraNetDevice);
+
+    m_satLorawanNetDevices[beamId] = loraNetDevice;
 }
 
 bool
-LoraForwarder::ReceiveFromLora (Ptr<SatLorawanNetDevice> loraNetDevice, Ptr<const Packet> packet, uint16_t protocol, const Address& sender)
+LoraForwarder::ReceiveFromLora(Ptr<SatLorawanNetDevice> loraNetDevice,
+                               Ptr<const Packet> packet,
+                               uint16_t protocol,
+                               const Address& sender)
 {
-  NS_LOG_FUNCTION (this << packet << protocol << sender);
+    NS_LOG_FUNCTION(this << packet << protocol << sender);
 
-  Ptr<Packet> packetCopy = packet->Copy ();
+    Ptr<Packet> packetCopy = packet->Copy();
 
-  LoraBeamTag beamTag = LoraBeamTag (loraNetDevice->GetLorawanMac ()->GetBeamId ());
-  packetCopy->AddPacketTag (beamTag);
+    LoraBeamTag beamTag = LoraBeamTag(loraNetDevice->GetLorawanMac()->GetBeamId());
+    packetCopy->AddPacketTag(beamTag);
 
-  m_pointToPointNetDevice->Send (packetCopy, m_pointToPointNetDevice->GetBroadcast (), protocol);
+    m_pointToPointNetDevice->Send(packetCopy, m_pointToPointNetDevice->GetBroadcast(), protocol);
 
-  return true;
+    return true;
 }
 
 bool
-LoraForwarder::ReceiveFromPointToPoint (Ptr<NetDevice> pointToPointNetDevice, Ptr<const Packet> packet, uint16_t protocol, const Address& sender)
+LoraForwarder::ReceiveFromPointToPoint(Ptr<NetDevice> pointToPointNetDevice,
+                                       Ptr<const Packet> packet,
+                                       uint16_t protocol,
+                                       const Address& sender)
 {
-  NS_LOG_FUNCTION (this << packet << protocol << sender);
+    NS_LOG_FUNCTION(this << packet << protocol << sender);
 
-  Ptr<Packet> packetCopy = packet->Copy ();
+    Ptr<Packet> packetCopy = packet->Copy();
 
-  LoraBeamTag tag;
-  packetCopy->RemovePacketTag(tag);
-  uint8_t beamId = tag.GetBeamId ();
+    LoraBeamTag tag;
+    packetCopy->RemovePacketTag(tag);
+    uint8_t beamId = tag.GetBeamId();
 
-  // TODO not sure address is correct...
-  m_satLorawanNetDevices[beamId]->Send (packetCopy, sender, protocol);
+    // TODO not sure address is correct...
+    m_satLorawanNetDevices[beamId]->Send(packetCopy, sender, protocol);
 
-  return true;
+    return true;
 }
 
 void
-LoraForwarder::StartApplication (void)
+LoraForwarder::StartApplication(void)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  // TODO Make sure we are connected to both needed devices
+    // TODO Make sure we are connected to both needed devices
 }
 
 void
-LoraForwarder::StopApplication (void)
+LoraForwarder::StopApplication(void)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 
-  // TODO Get rid of callbacks
+    // TODO Get rid of callbacks
 }
 
-}
+} // namespace ns3

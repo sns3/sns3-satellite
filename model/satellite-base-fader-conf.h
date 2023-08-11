@@ -21,11 +21,11 @@
 #define SATELLITE_BASE_FADER_CONF_H
 
 #include <ns3/object.h>
-#include <ns3/uinteger.h>
 #include <ns3/simulator.h>
+#include <ns3/uinteger.h>
 
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -38,31 +38,31 @@ namespace ns3 {
  */
 class SatBaseFaderConf : public Object
 {
-public:
-  /**
-   * \brief Constructor
-   */
-  SatBaseFaderConf ();
+  public:
+    /**
+     * \brief Constructor
+     */
+    SatBaseFaderConf();
 
-  /**
-   * \brief Destructor
-   */
-  virtual ~SatBaseFaderConf ();
+    /**
+     * \brief Destructor
+     */
+    virtual ~SatBaseFaderConf();
 
-  /**
-   * \brief NS-3 type id function
-   * \return type id
-   */
-  static TypeId GetTypeId (void);
+    /**
+     * \brief NS-3 type id function
+     * \return type id
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * \brief Function for getting the fading value
-   * \param set parameter set
-   * \return fading value
-   */
-  virtual std::vector<std::vector<double> > GetParameters (uint32_t set) = 0;
+    /**
+     * \brief Function for getting the fading value
+     * \param set parameter set
+     * \return fading value
+     */
+    virtual std::vector<std::vector<double>> GetParameters(uint32_t set) = 0;
 
-private:
+  private:
 };
 
 } // namespace ns3

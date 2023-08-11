@@ -20,95 +20,98 @@
  * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include <ns3/random-variable-stream.h>
-#include <ns3/double.h>
-#include <ns3/string.h>
-#include <ns3/trace-source-accessor.h>
-#include <ns3/simulator.h>
-#include <ns3/log.h>
-
-#include <ns3/lora-forwarder.h>
-
 #include "lora-forwarder-helper.h"
 
-NS_LOG_COMPONENT_DEFINE ("LoraForwarderHelper");
+#include <ns3/double.h>
+#include <ns3/log.h>
+#include <ns3/lora-forwarder.h>
+#include <ns3/random-variable-stream.h>
+#include <ns3/simulator.h>
+#include <ns3/string.h>
+#include <ns3/trace-source-accessor.h>
 
-namespace ns3 {
+NS_LOG_COMPONENT_DEFINE("LoraForwarderHelper");
 
-NS_OBJECT_ENSURE_REGISTERED (LoraForwarderHelper);
+namespace ns3
+{
+
+NS_OBJECT_ENSURE_REGISTERED(LoraForwarderHelper);
 
 TypeId
-LoraForwarderHelper::GetTypeId (void)
+LoraForwarderHelper::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::LoraForwarderHelper")
-    .SetParent<Object> ()
-    .AddConstructor<LoraForwarderHelper> ()
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::LoraForwarderHelper")
+                            .SetParent<Object>()
+                            .AddConstructor<LoraForwarderHelper>();
+    return tid;
 }
 
-LoraForwarderHelper::LoraForwarderHelper ()
+LoraForwarderHelper::LoraForwarderHelper()
 {
-  m_factory.SetTypeId ("ns3::LoraForwarder");
+    m_factory.SetTypeId("ns3::LoraForwarder");
 }
 
-LoraForwarderHelper::~LoraForwarderHelper ()
+LoraForwarderHelper::~LoraForwarderHelper()
 {
 }
 
 void
-LoraForwarderHelper::SetAttribute (std::string name, const AttributeValue &value)
+LoraForwarderHelper::SetAttribute(std::string name, const AttributeValue& value)
 {
-  m_factory.Set (name, value);
+    m_factory.Set(name, value);
 }
 
 ApplicationContainer
-LoraForwarderHelper::Install (Ptr<Node> node) const
+LoraForwarderHelper::Install(Ptr<Node> node) const
 {
-  return ApplicationContainer (InstallPriv (node));
+    return ApplicationContainer(InstallPriv(node));
 }
 
 ApplicationContainer
-LoraForwarderHelper::Install (NodeContainer c) const
+LoraForwarderHelper::Install(NodeContainer c) const
 {
-  ApplicationContainer apps;
-  for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
+    ApplicationContainer apps;
+    for (NodeContainer::Iterator i = c.Begin(); i != c.End(); ++i)
     {
-      apps.Add (InstallPriv (*i));
+        apps.Add(InstallPriv(*i));
     }
 
-  return apps;
+    return apps;
 }
 
 Ptr<Application>
-LoraForwarderHelper::InstallPriv (Ptr<Node> node) const
+LoraForwarderHelper::InstallPriv(Ptr<Node> node) const
 {
-  NS_LOG_FUNCTION (this << node);
+    NS_LOG_FUNCTION(this << node);
 
-  Ptr<LoraForwarder> app = m_factory.Create<LoraForwarder> ();
+    Ptr<LoraForwarder> app = m_factory.Create<LoraForwarder>();
 
-  app->SetNode (node);
-  node->AddApplication (app);
+    app->SetNode(node);
+    node->AddApplication(app);
 
-  // Link the LoraForwarder to the SatLorawanNetDevices
-  for (uint32_t i = 0; i < node->GetNDevices (); i++)
+    // Link the LoraForwarder to the SatLorawanNetDevices
+    for (uint32_t i = 0; i < node->GetNDevices(); i++)
     {
-      Ptr<NetDevice> currentNetDevice = node->GetDevice (i);
-      if (currentNetDevice->GetObject<SatLorawanNetDevice> () != nullptr)
+        Ptr<NetDevice> currentNetDevice = node->GetDevice(i);
+        if (currentNetDevice->GetObject<SatLorawanNetDevice>() != nullptr)
         {
-          Ptr<SatLorawanNetDevice> loraNetDevice = currentNetDevice->GetObject<SatLorawanNetDevice> ();
-          uint8_t beamId = loraNetDevice->GetLorawanMac ()->GetBeamId ();
-          app->SetLoraNetDevice (beamId, loraNetDevice);
-          loraNetDevice->SetReceiveNetworkServerCallback (MakeCallback (&LoraForwarder::ReceiveFromLora, app));
+            Ptr<SatLorawanNetDevice> loraNetDevice =
+                currentNetDevice->GetObject<SatLorawanNetDevice>();
+            uint8_t beamId = loraNetDevice->GetLorawanMac()->GetBeamId();
+            app->SetLoraNetDevice(beamId, loraNetDevice);
+            loraNetDevice->SetReceiveNetworkServerCallback(
+                MakeCallback(&LoraForwarder::ReceiveFromLora, app));
         }
-      else if (currentNetDevice->GetObject<PointToPointNetDevice> () != nullptr)
+        else if (currentNetDevice->GetObject<PointToPointNetDevice>() != nullptr)
         {
-          Ptr<PointToPointNetDevice> pointToPointNetDevice = currentNetDevice->GetObject<PointToPointNetDevice> ();
-          app->SetPointToPointNetDevice (pointToPointNetDevice);
-          pointToPointNetDevice->SetReceiveCallback (MakeCallback (&LoraForwarder::ReceiveFromPointToPoint, app));
+            Ptr<PointToPointNetDevice> pointToPointNetDevice =
+                currentNetDevice->GetObject<PointToPointNetDevice>();
+            app->SetPointToPointNetDevice(pointToPointNetDevice);
+            pointToPointNetDevice->SetReceiveCallback(
+                MakeCallback(&LoraForwarder::ReceiveFromPointToPoint, app));
         }
     }
 
-  return app;
+    return app;
 }
 } // namespace ns3
