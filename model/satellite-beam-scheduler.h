@@ -154,6 +154,13 @@ class SatBeamScheduler : public Object
     bool HasUt(Address utId);
 
     /**
+     * Check whether an UT is handled by this scheduler
+     *
+     * \return Whether or not at least one UT is handled by this beam
+     */
+    bool HasUt();
+
+    /**
      * Update UT C/N0 info with the latest value.
      *
      * \param utId Id of the UT (address).

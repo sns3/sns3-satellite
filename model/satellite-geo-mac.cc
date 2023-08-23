@@ -44,12 +44,20 @@ NS_OBJECT_ENSURE_REGISTERED(SatGeoMac);
 TypeId
 SatGeoMac::GetTypeId(void)
 {
-    static TypeId tid = TypeId("ns3::SatGeoMac")
-                            .SetParent<SatMac>()
-                            .AddTraceSource("BBFrameTxTrace",
-                                            "Trace for transmitted BB Frames.",
-                                            MakeTraceSourceAccessor(&SatGeoMac::m_bbFrameTxTrace),
-                                            "ns3::SatBbFrame::BbFrameCallback");
+    static TypeId tid =
+        TypeId("ns3::SatGeoMac")
+            .SetParent<SatMac>()
+            .AddTraceSource("BBFrameTxTrace",
+                            "Trace for transmitted BB Frames.",
+                            MakeTraceSourceAccessor(&SatGeoMac::m_bbFrameTxTrace),
+                            "ns3::SatBbFrame::BbFrameCallback")
+            .AddAttribute("DisableSchedulingIfNoDeviceConnected",
+                          "If true, the periodic calls of StartTransmission are not called when no "
+                          "devices are connected to this MAC",
+                          BooleanValue(true),
+                          MakeBooleanAccessor(&SatGeoMac::m_disableSchedulingIfNoDeviceConnected),
+                          MakeBooleanChecker());
+
     return tid;
 }
 
@@ -72,10 +80,12 @@ SatGeoMac::SatGeoMac(uint32_t satId,
                      SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                      SatEnums::RegenerationMode_t returnLinkRegenerationMode)
     : SatMac(satId, beamId, forwardLinkRegenerationMode, returnLinkRegenerationMode),
+      m_disableSchedulingIfNoDeviceConnected(true),
       m_fwdScheduler(),
       m_guardTime(MicroSeconds(1)),
       m_satId(satId),
-      m_beamId(beamId)
+      m_beamId(beamId),
+      m_beamScheculerCallback()
 {
     NS_LOG_FUNCTION(this);
 }
@@ -119,7 +129,7 @@ SatGeoMac::StartTransmission(uint32_t carrierId)
 
     Time txDuration;
 
-    if (m_txEnabled)
+    if (m_txEnabled && HasDeviceConnected())
     {
         std::pair<Ptr<SatBbFrame>, const Time> bbFrameInfo = m_fwdScheduler->GetNextFrame();
         Ptr<SatBbFrame> bbFrame = bbFrameInfo.first;
@@ -273,6 +283,14 @@ SatGeoMac::SetReceiveNetDeviceCallback(ReceiveNetDeviceCallback cb)
 {
     NS_LOG_FUNCTION(this << &cb);
     m_rxNetDeviceCallback = cb;
+}
+
+void
+SatGeoMac::SetBeamScheculerCallback(SatGeoMac::BeamScheculerCallback cb)
+{
+    NS_LOG_FUNCTION(this << &cb);
+
+    m_beamScheculerCallback = cb;
 }
 
 } // namespace ns3

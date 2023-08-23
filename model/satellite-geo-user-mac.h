@@ -120,6 +120,12 @@ class SatGeoUserMac : public SatGeoMac
      */
     virtual Address GetRxUtAddress(Ptr<Packet> packet);
 
+    /**
+     * \brief Indicates if a UT is connected to this MAC device
+     * \return True if there is at least one device connected
+     */
+    virtual bool HasDeviceConnected();
+
   private:
 };
 

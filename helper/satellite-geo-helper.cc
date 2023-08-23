@@ -298,6 +298,7 @@ SatGeoHelper::AttachChannels(Ptr<NetDevice> d,
                              Ptr<SatChannel> ur,
                              Ptr<SatAntennaGainPattern> userAgp,
                              Ptr<SatAntennaGainPattern> feederAgp,
+                             Ptr<SatNcc> ncc,
                              uint32_t satId,
                              uint32_t gwId,
                              uint32_t userBeamId,
@@ -317,6 +318,7 @@ SatGeoHelper::AttachChannels(Ptr<NetDevice> d,
                          ff,
                          fr,
                          feederAgp,
+                         ncc,
                          satId,
                          gwId,
                          userBeamId,
@@ -326,6 +328,7 @@ SatGeoHelper::AttachChannels(Ptr<NetDevice> d,
                        uf,
                        ur,
                        userAgp,
+                       ncc,
                        satId,
                        userBeamId,
                        forwardLinkRegenerationMode,
@@ -337,6 +340,7 @@ SatGeoHelper::AttachChannelsFeeder(Ptr<SatGeoNetDevice> dev,
                                    Ptr<SatChannel> ff,
                                    Ptr<SatChannel> fr,
                                    Ptr<SatAntennaGainPattern> feederAgp,
+                                   Ptr<SatNcc> ncc,
                                    uint32_t satId,
                                    uint32_t gwId,
                                    uint32_t userBeamId,
@@ -538,6 +542,7 @@ SatGeoHelper::AttachChannelsFeeder(Ptr<SatGeoNetDevice> dev,
         {
             fMac->StartPeriodicTransmissions();
         }
+        fMac->SetBeamScheculerCallback(MakeCallback(&SatNcc::GetBeamScheduler, ncc));
 
         // Attach the LLC Tx opportunity and scheduling context getter callbacks to
         // SatFwdLinkScheduler
@@ -557,6 +562,7 @@ SatGeoHelper::AttachChannelsUser(Ptr<SatGeoNetDevice> dev,
                                  Ptr<SatChannel> uf,
                                  Ptr<SatChannel> ur,
                                  Ptr<SatAntennaGainPattern> userAgp,
+                                 Ptr<SatNcc> ncc,
                                  uint32_t satId,
                                  uint32_t userBeamId,
                                  SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
@@ -698,6 +704,7 @@ SatGeoHelper::AttachChannelsUser(Ptr<SatGeoNetDevice> dev,
         uMac->SetFwdScheduler(fwdScheduler);
         uMac->SetLlc(uLlc);
         uMac->StartPeriodicTransmissions();
+        uMac->SetBeamScheculerCallback(MakeCallback(&SatNcc::GetBeamScheduler, ncc));
 
         // Attach the LLC Tx opportunity and scheduling context getter callbacks to
         // SatFwdLinkScheduler

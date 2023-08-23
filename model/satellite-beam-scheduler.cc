@@ -527,6 +527,14 @@ SatBeamScheduler::HasUt(Address utId)
     return result != m_utInfos.end();
 }
 
+bool
+SatBeamScheduler::HasUt()
+{
+    NS_LOG_FUNCTION(this);
+
+    return !m_utInfos.empty();
+}
+
 void
 SatBeamScheduler::UpdateUtCno(Address utId, double cno)
 {

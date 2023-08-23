@@ -21,6 +21,7 @@
 #ifndef SATELLITE_GEO_MAC_H
 #define SATELLITE_GEO_MAC_H
 
+#include "satellite-beam-scheduler.h"
 #include "satellite-fwd-link-scheduler.h"
 #include "satellite-geo-user-llc.h"
 #include "satellite-mac.h"
@@ -115,6 +116,17 @@ class SatGeoMac : public SatMac
 
     void SetReceiveNetDeviceCallback(SatGeoMac::ReceiveNetDeviceCallback cb);
 
+    /**
+     * Callback to get the SatBeamScheduler from the beam ID for handover
+     */
+    typedef Callback<Ptr<SatBeamScheduler>, uint32_t, uint32_t> BeamScheculerCallback;
+
+    /**
+     * \brief Set the beam scheduler callback
+     * \param cb Callback to get the SatBeamScheduler
+     */
+    void SetBeamScheculerCallback(SatGeoMac::BeamScheculerCallback cb);
+
   protected:
     /**
      * Start sending a Packet Down the Wire.
@@ -166,6 +178,18 @@ class SatGeoMac : public SatMac
     virtual Address GetRxUtAddress(Ptr<Packet> packet) = 0;
 
     /**
+     * \brief Indicates if a GW or UT is connected to this MAC device
+     * \return True if there is at least one device connected
+     */
+    virtual bool HasDeviceConnected() = 0;
+
+    /**
+     * If true, the periodic calls of StartTransmission are not called when no
+     * devices are connected to this MAC
+     */
+    bool m_disableSchedulingIfNoDeviceConnected;
+
+    /**
      * Scheduler for the forward link.
      */
     Ptr<SatFwdLinkScheduler> m_fwdScheduler;
@@ -198,6 +222,11 @@ class SatGeoMac : public SatMac
 
     TransmitCallback m_txCallback;
     ReceiveNetDeviceCallback m_rxNetDeviceCallback;
+
+    /**
+     * Callback to get the SatBeamScheduler linked to a beam ID
+     */
+    SatGeoMac::BeamScheculerCallback m_beamScheculerCallback;
 };
 
 } // namespace ns3
