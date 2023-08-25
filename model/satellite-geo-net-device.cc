@@ -189,14 +189,14 @@ SatGeoNetDevice::ReceivePacketUser(Ptr<Packet> packet, const Address& userAddres
     }
     Mac48Address destination = groundStationAddressTag.GetGroundStationAddress();
 
+    SatUplinkInfoTag satUplinkInfoTag;
+    if (!packet->PeekPacketTag(satUplinkInfoTag))
+    {
+        NS_FATAL_ERROR("SatUplinkInfoTag not found");
+    }
+
     if (m_gwConnected.count(destination))
     {
-        SatUplinkInfoTag satUplinkInfoTag;
-        if (!packet->PeekPacketTag(satUplinkInfoTag))
-        {
-            NS_FATAL_ERROR("SatUplinkInfoTag not found");
-        }
-
         if (m_isStatisticsTagsEnabled)
         {
             // Add a SatDevLinkTimeTag tag for packet link delay computation at the receiver end.
@@ -208,6 +208,8 @@ SatGeoNetDevice::ReceivePacketUser(Ptr<Packet> packet, const Address& userAddres
     }
     else
     {
+        DynamicCast<SatGeoFeederMac>(m_feederMac[satUplinkInfoTag.GetBeamId()])
+            ->StopPeriodicTransmission();
         if (m_islNetDevices.size() > 0)
         {
             SendToIsl(packet, destination);
@@ -269,14 +271,14 @@ SatGeoNetDevice::ReceivePacketFeeder(Ptr<Packet> packet, const Address& feederAd
         m_broadcastReceived.insert(packet->GetUid());
     }
 
+    SatUplinkInfoTag satUplinkInfoTag;
+    if (!packet->PeekPacketTag(satUplinkInfoTag))
+    {
+        NS_FATAL_ERROR("SatUplinkInfoTag not found");
+    }
+
     if (m_utConnected.count(destination) > 0 || destination.IsBroadcast())
     {
-        SatUplinkInfoTag satUplinkInfoTag;
-        if (!packet->PeekPacketTag(satUplinkInfoTag))
-        {
-            NS_FATAL_ERROR("SatUplinkInfoTag not found");
-        }
-
         if (m_isStatisticsTagsEnabled)
         {
             // Add a SatDevLinkTimeTag tag for packet link delay computation at the receiver end.
@@ -289,6 +291,11 @@ SatGeoNetDevice::ReceivePacketFeeder(Ptr<Packet> packet, const Address& feederAd
         m_islNetDevices.size() > 0)
     {
         SendToIsl(packet, destination);
+    }
+    if(m_utConnected.count(destination) == 0)
+    {
+        DynamicCast<SatGeoUserMac>(m_userMac[satUplinkInfoTag.GetBeamId()])
+            ->StopPeriodicTransmission();
     }
 }
 

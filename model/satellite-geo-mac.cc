@@ -85,7 +85,7 @@ SatGeoMac::SatGeoMac(uint32_t satId,
       m_guardTime(MicroSeconds(1)),
       m_satId(satId),
       m_beamId(beamId),
-      m_beamScheculerCallback()
+      m_periodicTransmissionEnabled(false)
 {
     NS_LOG_FUNCTION(this);
 }
@@ -129,13 +129,13 @@ SatGeoMac::StartTransmission(uint32_t carrierId)
 
     Time txDuration;
 
-    if (m_txEnabled && HasDeviceConnected())
+    if(m_txEnabled && (!m_disableSchedulingIfNoDeviceConnected || m_periodicTransmissionEnabled))
     {
         std::pair<Ptr<SatBbFrame>, const Time> bbFrameInfo = m_fwdScheduler->GetNextFrame();
         Ptr<SatBbFrame> bbFrame = bbFrameInfo.first;
         txDuration = bbFrameInfo.second;
 
-        // trace out BB frames sent.
+        // trace out BB frames sent
         m_bbFrameTxTrace(bbFrame);
 
         // Handle both dummy frames and normal frames
@@ -286,11 +286,11 @@ SatGeoMac::SetReceiveNetDeviceCallback(ReceiveNetDeviceCallback cb)
 }
 
 void
-SatGeoMac::SetBeamScheculerCallback(SatGeoMac::BeamScheculerCallback cb)
+SatGeoMac::StopPeriodicTransmission()
 {
-    NS_LOG_FUNCTION(this << &cb);
+    NS_LOG_FUNCTION(this);
 
-    m_beamScheculerCallback = cb;
+    m_periodicTransmissionEnabled = false;
 }
 
 } // namespace ns3

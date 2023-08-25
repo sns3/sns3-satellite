@@ -128,6 +128,8 @@ SatGeoUserMac::EnquePacket(Ptr<Packet> packet)
     }
 
     m_llc->Enque(packet, addressE2ETag.GetE2EDestAddress(), flowId);
+
+    m_periodicTransmissionEnabled = true;
 }
 
 void
@@ -306,14 +308,6 @@ SatGeoUserMac::GetRxUtAddress(Ptr<Packet> packet)
     }
 
     return utAddr;
-}
-
-bool
-SatGeoUserMac::HasDeviceConnected()
-{
-    NS_LOG_FUNCTION(this);
-
-    return m_beamScheculerCallback(m_satId, m_beamId)->HasUt();
 }
 
 } // namespace ns3

@@ -542,7 +542,6 @@ SatGeoHelper::AttachChannelsFeeder(Ptr<SatGeoNetDevice> dev,
         {
             fMac->StartPeriodicTransmissions();
         }
-        fMac->SetBeamScheculerCallback(MakeCallback(&SatNcc::GetBeamScheduler, ncc));
 
         // Attach the LLC Tx opportunity and scheduling context getter callbacks to
         // SatFwdLinkScheduler
@@ -704,7 +703,6 @@ SatGeoHelper::AttachChannelsUser(Ptr<SatGeoNetDevice> dev,
         uMac->SetFwdScheduler(fwdScheduler);
         uMac->SetLlc(uLlc);
         uMac->StartPeriodicTransmissions();
-        uMac->SetBeamScheculerCallback(MakeCallback(&SatNcc::GetBeamScheduler, ncc));
 
         // Attach the LLC Tx opportunity and scheduling context getter callbacks to
         // SatFwdLinkScheduler

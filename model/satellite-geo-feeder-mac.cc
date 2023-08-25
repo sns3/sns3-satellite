@@ -127,6 +127,8 @@ SatGeoFeederMac::EnquePacket(Ptr<Packet> packet)
     }
 
     m_llc->Enque(packet, addressE2ETag.GetE2EDestAddress(), flowId);
+
+    m_periodicTransmissionEnabled = true;
 }
 
 void
@@ -305,14 +307,6 @@ SatGeoFeederMac::GetRxUtAddress(Ptr<Packet> packet)
     }
 
     return utAddr;
-}
-
-bool
-SatGeoFeederMac::HasDeviceConnected()
-{
-    NS_LOG_FUNCTION(this);
-
-    return true;
 }
 
 } // namespace ns3

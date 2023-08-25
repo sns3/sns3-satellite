@@ -127,6 +127,11 @@ class SatGeoMac : public SatMac
      */
     void SetBeamScheculerCallback(SatGeoMac::BeamScheculerCallback cb);
 
+    /**
+     * Stop periodic transmission, until a pacquet in enqued.
+     */
+    virtual void StopPeriodicTransmission();
+
   protected:
     /**
      * Start sending a Packet Down the Wire.
@@ -178,12 +183,6 @@ class SatGeoMac : public SatMac
     virtual Address GetRxUtAddress(Ptr<Packet> packet) = 0;
 
     /**
-     * \brief Indicates if a GW or UT is connected to this MAC device
-     * \return True if there is at least one device connected
-     */
-    virtual bool HasDeviceConnected() = 0;
-
-    /**
      * If true, the periodic calls of StartTransmission are not called when no
      * devices are connected to this MAC
      */
@@ -224,9 +223,9 @@ class SatGeoMac : public SatMac
     ReceiveNetDeviceCallback m_rxNetDeviceCallback;
 
     /**
-     * Callback to get the SatBeamScheduler linked to a beam ID
+     * Indicated if periodic transmission is enabled.
      */
-    SatGeoMac::BeamScheculerCallback m_beamScheculerCallback;
+    bool m_periodicTransmissionEnabled;
 };
 
 } // namespace ns3
