@@ -1,0 +1,17 @@
+{#
+    ns-3/layout.html
+    ~~~~~~~~~~~~~~~~~~~
+
+    Sphinx layout template for ns-3.
+
+    :copyright: Copyright 2012 by ns-3, see AUTHORS.
+    :license: GPL, see LICENSE for details.
+#}
+{% extends "basic/layout.html" %}
+
+{% set reldelim1 = '<span class="navelem">&nbsp;</span>' %}
+{# set reldelim1 = ' @' #}
+
+{% if theme_collapsiblesidebar|tobool %}
+  {% set script_files = script_files + ['_static/sidebar.js'] %}
+{% endif %}

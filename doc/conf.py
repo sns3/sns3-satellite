@@ -126,7 +126,7 @@ html_theme = 'sns3-theme'
 # html_theme_options = {}
 
 # Add any paths that contain custom themes here, relative to this directory.
-html_theme_path = ['../../ext-utils/']
+html_theme_path = ['..']
 
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
