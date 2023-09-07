@@ -1,0 +1,92 @@
+/* ns-3 changes to the default CSS from Doxygen and Sphinx */
+
+div.related {
+  background-image: linear-gradient(to bottom, white 0%, #d5d5d5 80%);
+}
+
+/* Dark mode is not supported in Doxygen versions earlier than 1.9.6 */
+@media (prefers-color-scheme: dark) {
+  body,
+  table,
+  div,
+  p,
+  dl,
+  div.body,
+  div.sphinxsidebar h3,
+  div.sphinxsidebar h4 ,
+  div.sphinxsidebar h3 a{
+    color: ivory;
+    background:black;
+  }
+  div.sphinxsidebar input{
+    background: #2c2d24;
+  }
+  div.related{
+    background-image: linear-gradient(to bottom, #66696a 0%, #d5d5d5 80%);
+  }
+}
+
+a {
+  font-weight: bold;
+}
+
+/* Sphinx figure captions */
+p.caption {
+  font-weight: bold;
+}
+
+/* Doxygen side bar */
+#nav-tree {
+  font-size: 12px;
+}
+
+#nav-tree a {
+  font-weight: normal;
+}
+
+div.related h3 {
+  display: none;
+}
+
+div.related a {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+div.related li {
+  background-image: url('bc_s.png');
+  background-position: 100% 40%;
+  background-repeat: no-repeat;
+  padding-left: 10px;
+  padding-right: 15px;
+}
+
+div.related li.right {
+  background-image: none;
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+/* Sphinx side bar */
+div.sphinxsidebar {
+  font-size: 12px;
+}
+
+div.sphinxsidebar a {
+  font-weight: normal;
+}
+
+
+/* Title bar elements */
+
+div.related:first-of-type {
+  margin-top: 56px;
+}
+
+li {
+  font-size: 100%;
+}
+
+.arrow {
+  padding: 0 16px;
+}
