@@ -18,43 +18,40 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.com>
  */
 
-#include <ns3/simulator.h>
-#include <ns3/log.h>
-
-#include "satellite-signal-parameters.h"
 #include "satellite-interference-elimination.h"
 
+#include "satellite-signal-parameters.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatInterferenceElimination");
+#include <ns3/log.h>
+#include <ns3/simulator.h>
 
-namespace ns3 {
+NS_LOG_COMPONENT_DEFINE("SatInterferenceElimination");
 
-NS_OBJECT_ENSURE_REGISTERED (SatInterferenceElimination);
+namespace ns3
+{
+
+NS_OBJECT_ENSURE_REGISTERED(SatInterferenceElimination);
 
 TypeId
-SatInterferenceElimination::GetTypeId (void)
+SatInterferenceElimination::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatInterferenceElimination")
-    .SetParent<Object> ();
+    static TypeId tid = TypeId("ns3::SatInterferenceElimination").SetParent<Object>();
 
-  return tid;
+    return tid;
 }
 
 TypeId
-SatInterferenceElimination::GetInstanceTypeId (void) const
+SatInterferenceElimination::GetInstanceTypeId(void) const
 {
-  return GetTypeId ();
+    return GetTypeId();
 }
 
-SatInterferenceElimination::SatInterferenceElimination ()
+SatInterferenceElimination::SatInterferenceElimination()
 {
-
 }
 
-SatInterferenceElimination::~SatInterferenceElimination ()
+SatInterferenceElimination::~SatInterferenceElimination()
 {
-
 }
 
-
-}  // namespace ns3
+} // namespace ns3

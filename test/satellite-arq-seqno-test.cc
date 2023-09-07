@@ -24,14 +24,16 @@
  * \brief Return Link Encapsulator test suite
  */
 
-#include <vector>
-#include <deque>
-#include "ns3/log.h"
-#include "ns3/test.h"
-#include "ns3/ptr.h"
 #include "../model/satellite-arq-sequence-number.h"
-#include "ns3/singleton.h"
 #include "../utils/satellite-env-variables.h"
+
+#include "ns3/log.h"
+#include "ns3/ptr.h"
+#include "ns3/singleton.h"
+#include "ns3/test.h"
+
+#include <deque>
+#include <vector>
 
 using namespace ns3;
 
@@ -42,60 +44,58 @@ using namespace ns3;
  */
 class SatSeqNoTestCase : public TestCase
 {
-public:
-  SatSeqNoTestCase ();
-  virtual ~SatSeqNoTestCase ();
+  public:
+    SatSeqNoTestCase();
+    virtual ~SatSeqNoTestCase();
 
-private:
-  virtual void DoRun (void);
-
+  private:
+    virtual void DoRun(void);
 };
 
-SatSeqNoTestCase::SatSeqNoTestCase ()
-  : TestCase ("Test ARQ sequence numbers.")
+SatSeqNoTestCase::SatSeqNoTestCase()
+    : TestCase("Test ARQ sequence numbers.")
 {
 }
 
-SatSeqNoTestCase::~SatSeqNoTestCase ()
+SatSeqNoTestCase::~SatSeqNoTestCase()
 {
 }
-
 
 void
-SatSeqNoTestCase::DoRun (void)
+SatSeqNoTestCase::DoRun(void)
 {
-  // Set simulation output details
-  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-arq-seqno", "", true);
+    // Set simulation output details
+    Singleton<SatEnvVariables>::Get()->DoInitialize();
+    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-arq-seqno", "", true);
 
-  uint32_t windowSize (10);
-  Ptr<SatArqSequenceNumber> seqNo = Create<SatArqSequenceNumber> (windowSize);
+    uint32_t windowSize(10);
+    Ptr<SatArqSequenceNumber> seqNo = Create<SatArqSequenceNumber>(windowSize);
 
-  std::deque<uint32_t> seqNoWindow;
-  std::vector<uint32_t> allSeqNos;
+    std::deque<uint32_t> seqNoWindow;
+    std::vector<uint32_t> allSeqNos;
 
-  for (uint32_t i = 0; i < 550; ++i)
+    for (uint32_t i = 0; i < 550; ++i)
     {
-      if (seqNo->SeqNoAvailable ())
+        if (seqNo->SeqNoAvailable())
         {
-          uint32_t sn = uint32_t (seqNo->NextSequenceNumber ());
-          allSeqNos.push_back (sn);
-          seqNoWindow.push_back (sn);
+            uint32_t sn = uint32_t(seqNo->NextSequenceNumber());
+            allSeqNos.push_back(sn);
+            seqNoWindow.push_back(sn);
         }
-      else
+        else
         {
-          uint32_t oldest = seqNoWindow.front ();
-          seqNo->Release (oldest);
-          seqNoWindow.pop_front ();
+            uint32_t oldest = seqNoWindow.front();
+            seqNo->Release(oldest);
+            seqNoWindow.pop_front();
         }
     }
 
-  for (uint32_t i = 0; i < allSeqNos.size (); ++i)
+    for (uint32_t i = 0; i < allSeqNos.size(); ++i)
     {
-      std::cout << "SN: " << allSeqNos[i] << std::endl;
+        std::cout << "SN: " << allSeqNos[i] << std::endl;
     }
 
-  Singleton<SatEnvVariables>::Get ()->DoDispose ();
+    Singleton<SatEnvVariables>::Get()->DoDispose();
 }
 
 /**
@@ -104,16 +104,15 @@ SatSeqNoTestCase::DoRun (void)
  */
 class SatArqSeqNoTraceSuite : public TestSuite
 {
-public:
-  SatArqSeqNoTraceSuite ();
+  public:
+    SatArqSeqNoTraceSuite();
 };
 
-SatArqSeqNoTraceSuite::SatArqSeqNoTraceSuite ()
-  : TestSuite ("sat-arq-seqno-test", UNIT)
+SatArqSeqNoTraceSuite::SatArqSeqNoTraceSuite()
+    : TestSuite("sat-arq-seqno-test", UNIT)
 {
-  AddTestCase (new SatSeqNoTestCase, TestCase::QUICK);
+    AddTestCase(new SatSeqNoTestCase, TestCase::QUICK);
 }
 
 // Do allocate an instance of this TestSuite
 static SatArqSeqNoTraceSuite SatSeqNoTestSuite;
-

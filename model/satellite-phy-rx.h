@@ -23,19 +23,19 @@
 #ifndef SATELLITE_PHY_RX_H
 #define SATELLITE_PHY_RX_H
 
-#include <ns3/mobility-model.h>
-#include <ns3/packet.h>
-#include <ns3/nstime.h>
-
-#include "satellite-net-device.h"
-#include "satellite-signal-parameters.h"
 #include "satellite-antenna-gain-pattern.h"
-#include "satellite-mobility-model.h"
 #include "satellite-base-fading.h"
 #include "satellite-frame-conf.h"
+#include "satellite-mobility-model.h"
+#include "satellite-net-device.h"
+#include "satellite-signal-parameters.h"
 
+#include <ns3/mobility-model.h>
+#include <ns3/nstime.h>
+#include <ns3/packet.h>
 
-namespace ns3 {
+namespace ns3
+{
 
 class SatPhyRxCarrierConf;
 class SatPhyRxCarrier;
@@ -52,236 +52,235 @@ class SatPhyRxCarrierUplink;
  */
 class SatPhyRx : public Object
 {
+  public:
+    /**
+     * Default constructor.
+     */
+    SatPhyRx();
 
-public:
-  /**
-   * Default constructor.
-   */
-  SatPhyRx ();
+    /**
+     * Destructor for SatPhyRx
+     */
+    virtual ~SatPhyRx();
 
-  /**
-   * Destructor for SatPhyRx
-   */
-  virtual ~SatPhyRx ();
+    /**
+     * inherited from Object
+     */
+    static TypeId GetTypeId(void);
 
+    /**
+     * Dispose of this class instance
+     */
+    virtual void DoDispose();
 
-  /**
-   * inherited from Object
-   */
-  static TypeId GetTypeId (void);
+    void SetMobility(Ptr<MobilityModel> m);
+    Ptr<MobilityModel> GetMobility();
 
-  /**
-   * Dispose of this class instance
-   */
-  virtual void DoDispose ();
+    /*
+     * Set the receive antenna gain pattern.
+     * \param agp antenna gain pattern
+     * \param mobility mobility model of satellite
+     */
+    void SetAntennaGainPattern(Ptr<SatAntennaGainPattern> agp, Ptr<SatMobilityModel> mobility);
 
-  void SetMobility (Ptr<MobilityModel> m);
-  Ptr<MobilityModel> GetMobility ();
+    void SetDevice(Ptr<NetDevice> d);
+    Ptr<NetDevice> GetDevice();
 
-  /*
-   * Set the receive antenna gain pattern.
-   * \param agp antenna gain pattern
-   * \param mobility mobility model of satellite
-   */
-  void SetAntennaGainPattern (Ptr<SatAntennaGainPattern> agp, Ptr<SatMobilityModel> mobility);
+    /**
+     * Set the maximum Antenna gain in Db
+     * \param gain_Db maximum antenna gain in Dbs
+     */
+    void SetMaxAntennaGain_Db(double gain_Db);
 
-  void SetDevice (Ptr<NetDevice> d);
-  Ptr<NetDevice> GetDevice ();
+    /**
+     * Get antenna gain based on position
+     * or in case that antenna pattern is not configured, maximum configured gain is return
+     *
+     * \param mobility  Mobility used to get gain from antenna pattern
+     * \return antenna gain
+     */
+    double GetAntennaGain(Ptr<MobilityModel> mobility);
 
-  /**
-   * Set the maximum Antenna gain in Db
-   * \param gain_Db maximum antenna gain in Dbs
-   */
-  void SetMaxAntennaGain_Db (double gain_Db);
+    /**
+     * \brief Function for setting the default fading value
+     * \param fadingValue default fading value
+     */
+    void SetDefaultFadingValue(double fadingValue);
 
-  /**
-   * Get antenna gain based on position
-   * or in case that antenna pattern is not configured, maximum configured gain is return
-   *
-   * \param mobility  Mobility used to get gain from antenna pattern
-   * \return antenna gain
-   */
-  double GetAntennaGain (Ptr<MobilityModel> mobility);
+    /**
+     * \brief Get fading value
+     * \param macAddress MAC address
+     * \param channelType channel type
+     * \return
+     */
+    double GetFadingValue(Address macAddress, SatEnums::ChannelType_t channelType);
 
-  /**
-   * \brief Function for setting the default fading value
-   * \param fadingValue default fading value
-   */
-  void SetDefaultFadingValue (double fadingValue);
+    /**
+     * \brief Set fading container
+     * \param fadingContainer fading container
+     */
+    void SetFadingContainer(Ptr<SatBaseFading> fadingContainer);
 
-  /**
-   * \brief Get fading value
-   * \param macAddress MAC address
-   * \param channelType channel type
-   * \return
-   */
-  double GetFadingValue (Address macAddress, SatEnums::ChannelType_t channelType);
+    /**
+     * Set the Antenna loss in Db
+     * \param loss_Db antenna loss in Dbs
+     */
+    void SetAntennaLoss_Db(double loss_Db);
 
-  /**
-   * \brief Set fading container
-   * \param fadingContainer fading container
-   */
-  void SetFadingContainer (Ptr<SatBaseFading> fadingContainer);
+    /**
+     * Get configures RX losses, currently only antenna loss used.
+     *
+     * \return  Antenna loss in linear
+     */
+    double GetLosses();
 
-  /**
-   * Set the Antenna loss in Db
-   * \param loss_Db antenna loss in Dbs
-   */
-  void SetAntennaLoss_Db (double loss_Db);
+    /**
+     * Set the satellite id for all the transmissions from this SatPhyTx
+     * \param satId the satellite Identifier
+     */
+    void SetSatId(uint32_t satId);
 
-  /**
-   * Get configures RX losses, currently only antenna loss used.
-   *
-   * \return  Antenna loss in linear
-   */
-  double GetLosses ();
+    /**
+     * \brief Get satellite id of this receiver
+     * \return uint32_t satellite id
+     */
+    uint32_t GetSatId() const;
 
-  /**
-   * Set the satellite id for all the transmissions from this SatPhyTx
-   * \param satId the satellite Identifier
-   */
-  void SetSatId (uint32_t satId);
+    /**
+     * Set the beam id for all the transmissions from this SatPhyTx
+     * \param beamId the Beam Identifier
+     */
+    void SetBeamId(uint32_t beamId);
 
-  /**
-   * \brief Get satellite id of this receiver
-   * \return uint32_t satellite id
-   */
-  uint32_t GetSatId () const;
+    /**
+     * \brief Get beam id of this receiver
+     * \return uint32_t beam id
+     */
+    uint32_t GetBeamId() const;
 
-  /**
-   * Set the beam id for all the transmissions from this SatPhyTx
-   * \param beamId the Beam Identifier
-   */
-  void SetBeamId (uint32_t beamId);
+    /**
+     * \param carrierConf Carrier configuration class
+     * \param superFrameConf Superframe configuration
+     */
+    void ConfigurePhyRxCarriers(Ptr<SatPhyRxCarrierConf> carrierConf,
+                                Ptr<SatSuperframeConf> superFrameConf);
 
-  /**
-   * \brief Get beam id of this receiver
-   * \return uint32_t beam id
-   */
-  uint32_t GetBeamId () const;
+    /**
+     * Start packet reception from the SatChannel
+     * \param rxParams The needed parameters for the received signal
+     */
+    virtual void StartRx(Ptr<SatSignalParameters> rxParams);
 
-  /**
-   * \param carrierConf Carrier configuration class
-   * \param superFrameConf Superframe configuration
-   */
-  void ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatSuperframeConf> superFrameConf);
+    /**
+     * \param SatSignalParameters containing e.g. the received packet
+     * \param boolean indicating whether there was a PHY error
+     *
+     */
+    typedef Callback<void, Ptr<SatSignalParameters>, bool> ReceiveCallback;
 
-  /**
-   * Start packet reception from the SatChannel
-   * \param rxParams The needed parameters for the received signal
-   */
-  virtual void StartRx (Ptr<SatSignalParameters> rxParams);
+    /**
+     * \param satellite Id
+     * \param beam Id
+     * \param Id (address) of the source (sender)
+     * \param Id (address) of the destination (receiver)
+     * \param C/N0 value
+     * \param If true, cno corresponds to link SAT to GW; if false, cno corresponds to link UT to GW
+     */
+    typedef Callback<void, uint32_t, uint32_t, Address, Address, double, bool> CnoCallback;
 
-  /**
-   * \param SatSignalParameters containing e.g. the received packet
-   * \param boolean indicating whether there was a PHY error
-   *
-   */
-  typedef Callback<void, Ptr<SatSignalParameters>, bool> ReceiveCallback;
+    /**
+     * \param satellite Id
+     * \param beam Id
+     * \param carrier Id
+     * \param allocation channel Id
+     * \param average normalized offered load
+     */
+    typedef Callback<void, uint32_t, uint32_t, uint32_t, uint8_t, double>
+        AverageNormalizedOfferedLoadCallback;
 
-  /**
-   * \param satellite Id
-   * \param beam Id
-   * \param Id (address) of the source (sender)
-   * \param Id (address) of the destination (receiver)
-   * \param C/N0 value
-   * \param If true, cno corresponds to link SAT to GW; if false, cno corresponds to link UT to GW
-   */
-  typedef Callback<void, uint32_t, uint32_t, Address, Address, double, bool > CnoCallback;
+    /**
+     * Set the upper layer receive callback
+     * \param cb receive callback funtion pointer
+     */
+    void SetReceiveCallback(SatPhyRx::ReceiveCallback cb);
 
-  /**
-   * \param satellite Id
-   * \param beam Id
-   * \param carrier Id
-   * \param allocation channel Id
-   * \param average normalized offered load
-   */
-  typedef Callback<void, uint32_t, uint32_t, uint32_t, uint8_t, double > AverageNormalizedOfferedLoadCallback;
+    /**
+     * Set C/N0 receiver
+     * \param cb receive callback funtion pointer
+     */
+    void SetCnoCallback(SatPhyRx::CnoCallback cb);
 
-  /**
-   * Set the upper layer receive callback
-   * \param cb receive callback funtion pointer
-   */
-  void SetReceiveCallback (SatPhyRx::ReceiveCallback cb);
+    /**
+     * Set average normalized offered load callback
+     * \param cb
+     */
+    void SetAverageNormalizedOfferedLoadCallback(SatPhyRx::AverageNormalizedOfferedLoadCallback cb);
 
-  /**
-   * Set C/N0 receiver
-   * \param cb receive callback funtion pointer
-   */
-  void SetCnoCallback (SatPhyRx::CnoCallback cb);
+    /**
+     * \brief Get MAC address of this PHY/MAC
+     * \return Mac48Address MAC address of this PHY
+     */
+    Mac48Address GetAddress() const;
 
-  /**
-   * Set average normalized offered load callback
-   * \param cb
-   */
-  void SetAverageNormalizedOfferedLoadCallback (SatPhyRx::AverageNormalizedOfferedLoadCallback cb);
+    /**
+     * \brief Set the node info class
+     * \param nodeInfo Node information related to this SatPhyRx
+     */
+    void SetNodeInfo(const Ptr<SatNodeInfo> nodeInfo);
 
-  /**
-   * \brief Get MAC address of this PHY/MAC
-   * \return Mac48Address MAC address of this PHY
-   */
-  Mac48Address GetAddress () const;
+    /**
+     * \brief Begin frame/window end scheduling for processes utilizing frame length as interval
+     */
+    void BeginEndScheduling();
 
-  /**
-   * \brief Set the node info class
-   * \param nodeInfo Node information related to this SatPhyRx
-   */
-  void SetNodeInfo (const Ptr<SatNodeInfo> nodeInfo);
+    /**
+     * \brief Method for querying the temperature of the chosen carrier
+     * \param rxParams The needed parameters for the received signal
+     */
+    double GetRxTemperatureK(Ptr<SatSignalParameters> rxParams);
 
-  /**
-   * \brief Begin frame/window end scheduling for processes utilizing frame length as interval
-   */
-  void BeginEndScheduling ();
+  private:
+    Ptr<MobilityModel> m_mobility;
+    Ptr<NetDevice> m_device;
 
-  /**
-   * \brief Method for querying the temperature of the chosen carrier
-   * \param rxParams The needed parameters for the received signal
-   */
-  double GetRxTemperatureK (Ptr<SatSignalParameters> rxParams);
+    uint32_t m_satId;
+    uint32_t m_beamId;
+    Mac48Address m_macAddress;
 
-private:
-  Ptr<MobilityModel> m_mobility;
-  Ptr<NetDevice> m_device;
+    /*
+     * Receive antenna gain pattern
+     */
+    Ptr<SatAntennaGainPattern> m_antennaGainPattern;
 
-  uint32_t m_satId;
-  uint32_t m_beamId;
-  Mac48Address m_macAddress;
+    /*
+     * Satellite mobility model
+     */
+    Ptr<SatMobilityModel> m_satMobility;
 
-  /*
-   * Receive antenna gain pattern
-   */
-  Ptr<SatAntennaGainPattern> m_antennaGainPattern;
+    /**
+     * Configured maximum antenna gain in linear
+     */
+    double m_maxAntennaGain;
 
-  /*
-   * Satellite mobility model
-   */
-  Ptr<SatMobilityModel> m_satMobility;
+    /**
+     * Configured antenna loss in linear
+     */
+    double m_antennaLoss;
 
-  /**
-   * Configured maximum antenna gain in linear
-   */
-  double m_maxAntennaGain;
+    // A SatPhyRxCarrier object for receiving packets from each carrier
+    std::vector<Ptr<SatPhyRxCarrier>> m_rxCarriers;
 
-  /**
-   * Configured antenna loss in linear
-   */
-  double m_antennaLoss;
+    /**
+     * \brief Fading container for fading model
+     */
+    Ptr<SatBaseFading> m_fadingContainer;
 
-  // A SatPhyRxCarrier object for receiving packets from each carrier
-  std::vector< Ptr<SatPhyRxCarrier> > m_rxCarriers;
-
-  /**
-   * \brief Fading container for fading model
-   */
-  Ptr<SatBaseFading> m_fadingContainer;
-
-  /**
-   * \brief Default fading value
-   */
-  double m_defaultFadingValue;
+    /**
+     * \brief Default fading value
+     */
+    double m_defaultFadingValue;
 };
 
-
-}
+} // namespace ns3
 
 #endif /* SATELLITE_PHY_RX_H */

@@ -21,21 +21,21 @@
 #ifndef SATELLITE_GEO_FEEDER_MAC_H
 #define SATELLITE_GEO_FEEDER_MAC_H
 
-#include <ns3/ptr.h>
+#include "satellite-fwd-link-scheduler.h"
+#include "satellite-geo-feeder-llc.h"
+#include "satellite-geo-mac.h"
+#include "satellite-mac.h"
+#include "satellite-phy.h"
+#include "satellite-signal-parameters.h"
+
+#include <ns3/address.h>
 #include <ns3/nstime.h>
 #include <ns3/object.h>
 #include <ns3/packet.h>
-#include <ns3/address.h>
+#include <ns3/ptr.h>
 
-#include "satellite-phy.h"
-#include "satellite-mac.h"
-#include "satellite-geo-mac.h"
-#include "satellite-geo-feeder-llc.h"
-#include "satellite-signal-parameters.h"
-#include "satellite-fwd-link-scheduler.h"
-
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -45,82 +45,81 @@ namespace ns3 {
  */
 class SatGeoFeederMac : public SatGeoMac
 {
-public:
-  /**
-   * Default constructor
-   */
-  SatGeoFeederMac (void);
+  public:
+    /**
+     * Default constructor
+     */
+    SatGeoFeederMac(void);
 
-  /**
-   * Construct a SatGeoFeederMac
-   *
-   * This is the constructor for the SatGeoFeederMac
-   *
-   * \param satId ID of sat for UT
-   * \param beamid ID of beam for UT
-   * \param forwardLinkRegenerationMode Forward link regeneration mode
-   * \param returnLinkRegenerationMode Return link regeneration mode
-   */
-  SatGeoFeederMac (uint32_t satId,
-                   uint32_t beamId,
-                   SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
-                   SatEnums::RegenerationMode_t returnLinkRegenerationMode);
+    /**
+     * Construct a SatGeoFeederMac
+     *
+     * This is the constructor for the SatGeoFeederMac
+     *
+     * \param satId ID of sat for UT
+     * \param beamid ID of beam for UT
+     * \param forwardLinkRegenerationMode Forward link regeneration mode
+     * \param returnLinkRegenerationMode Return link regeneration mode
+     */
+    SatGeoFeederMac(uint32_t satId,
+                    uint32_t beamId,
+                    SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                    SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
-  /**
-   * Destructor for SatGeoFeederMac
-   */
-  virtual ~SatGeoFeederMac ();
+    /**
+     * Destructor for SatGeoFeederMac
+     */
+    virtual ~SatGeoFeederMac();
 
+    /**
+     * inherited from Object
+     */
+    static TypeId GetTypeId(void);
+    TypeId GetInstanceTypeId(void) const;
+    virtual void DoInitialize(void);
 
-  /**
-   * inherited from Object
-   */
-  static TypeId GetTypeId (void);
-  TypeId GetInstanceTypeId (void) const;
-  virtual void DoInitialize (void);
+    /**
+     * Dispose of this class instance
+     */
+    virtual void DoDispose(void);
 
-  /**
-   * Dispose of this class instance
-   */
-  virtual void DoDispose (void);
+    /**
+     * \brief Add new packet to the LLC queue.
+     * \param packet Packets to be sent.
+     */
+    virtual void EnquePacket(Ptr<Packet> packet);
 
-  /**
-   * \brief Add new packet to the LLC queue.
-   * \param packet Packets to be sent.
-   */
-  virtual void EnquePacket (Ptr<Packet> packet);
+    /**
+     * Receive packet from lower layer.
+     *
+     * \param packets Pointers to packets received.
+     */
+    void Receive(SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> rxParams);
 
-  /**
-   * Receive packet from lower layer.
-   *
-   * \param packets Pointers to packets received.
-   */
-  void Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> rxParams);
+    void ReceiveSignalingPacket(Ptr<Packet> packet);
 
-  void ReceiveSignalingPacket (Ptr<Packet> packet);
+  protected:
+    /**
+     * \brief Get the link TX direction. Must be implemented by child clases.
+     * \return The link TX direction
+     */
+    virtual SatEnums::SatLinkDir_t GetSatLinkTxDir();
 
-protected:
-  /**
-   * \brief Get the link TX direction. Must be implemented by child clases.
-   * \return The link TX direction
-   */
-  virtual SatEnums::SatLinkDir_t GetSatLinkTxDir ();
+    /**
+     * \brief Get the link RX direction. Must be implemented by child clases.
+     * \return The link RX direction
+     */
+    virtual SatEnums::SatLinkDir_t GetSatLinkRxDir();
 
-  /**
-   * \brief Get the link RX direction. Must be implemented by child clases.
-   * \return The link RX direction
-   */
-  virtual SatEnums::SatLinkDir_t GetSatLinkRxDir ();
-
-  /**
-   * \brief Get the UT address associated to this RX packet.
-   *        In this class, this is the destination address
-   * \param packet The packet to consider
-   * \return The address of associated UT
-   */
-  virtual Address GetRxUtAddress (Ptr<Packet> packet);
+    /**
+     * \brief Get the UT address associated to this RX packet.
+     *        In this class, this is the destination address
+     * \param packet The packet to consider
+     * \return The address of associated UT
+     */
+    virtual Address GetRxUtAddress(Ptr<Packet> packet);
 };
 
-}
+} // namespace ns3
 
 #endif /* SATELLITE_GEO_FEEDER_MAC_H */

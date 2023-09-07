@@ -21,13 +21,12 @@
 #ifndef SATELLITE_RLE_HEADER_H
 #define SATELLITE_RLE_HEADER_H
 
+#include <ns3/header.h>
 
 #include <vector>
 
-#include <ns3/header.h>
-
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -45,146 +44,144 @@ namespace ns3 {
  */
 class SatPPduHeader : public Header
 {
-public:
-  /**
-   * Constructor
-   */
-  SatPPduHeader ();
+  public:
+    /**
+     * Constructor
+     */
+    SatPPduHeader();
 
-  /**
-   * Destructor for SatPPduHeader
-   */
-  ~SatPPduHeader ();
+    /**
+     * Destructor for SatPPduHeader
+     */
+    ~SatPPduHeader();
 
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * \brief Get the type ID of instance
-   * \return the object TypeId
-   */
-  virtual TypeId GetInstanceTypeId (void) const;
+    /**
+     * \brief Get the type ID of instance
+     * \return the object TypeId
+     */
+    virtual TypeId GetInstanceTypeId(void) const;
 
-  /**
-   * Get serialized size of SatPPduHeader
-   * \return Serialized size in bytes
-   */
-  virtual uint32_t GetSerializedSize (void) const;
+    /**
+     * Get serialized size of SatPPduHeader
+     * \return Serialized size in bytes
+     */
+    virtual uint32_t GetSerializedSize(void) const;
 
-  /**
-   * Serializes information to buffer from this instance of SatPPduHeader
-   * \param start Buffer in which the information is serialized
-   */
-  virtual void Serialize (Buffer::Iterator start) const;
+    /**
+     * Serializes information to buffer from this instance of SatPPduHeader
+     * \param start Buffer in which the information is serialized
+     */
+    virtual void Serialize(Buffer::Iterator start) const;
 
-  /**
-   * Deserializes information from buffer to this instance of SatPPduHeader
-   * \param start Buffer from which the information is deserialized
-   * \return Serialized size of the buffer
-   */
-  virtual uint32_t Deserialize (Buffer::Iterator start);
+    /**
+     * Deserializes information from buffer to this instance of SatPPduHeader
+     * \param start Buffer from which the information is deserialized
+     * \return Serialized size of the buffer
+     */
+    virtual uint32_t Deserialize(Buffer::Iterator start);
 
-  /**
-   * Print time stamp of this instance of SatPPduHeader
-   * \param &os Output stream to which tag timestamp is printed.
-   */
-  virtual void Print (std::ostream &os) const;
+    /**
+     * Print time stamp of this instance of SatPPduHeader
+     * \param &os Output stream to which tag timestamp is printed.
+     */
+    virtual void Print(std::ostream& os) const;
 
-  /**
-   * \brief Get start indicator of PPDU header
-   * \return Start indicator
-   */
-  uint8_t GetStartIndicator () const;
+    /**
+     * \brief Get start indicator of PPDU header
+     * \return Start indicator
+     */
+    uint8_t GetStartIndicator() const;
 
-  /**
-   * \brief Get end indicator of PPDU header
-   * \return End indicator
-   */
-  uint8_t GetEndIndicator () const;
+    /**
+     * \brief Get end indicator of PPDU header
+     * \return End indicator
+     */
+    uint8_t GetEndIndicator() const;
 
-  /**
-   * \brief Get PPDU fragment length in bytes
-   * \return PPDU length in bytes
-   */
-  uint16_t GetPPduLength () const;
+    /**
+     * \brief Get PPDU fragment length in bytes
+     * \return PPDU length in bytes
+     */
+    uint16_t GetPPduLength() const;
 
-  /**
-   * \brief Get PPDU fragment id
-   * \return Fragment id
-   */
-  uint8_t GetFragmentId () const;
+    /**
+     * \brief Get PPDU fragment id
+     * \return Fragment id
+     */
+    uint8_t GetFragmentId() const;
 
-  /**
-   * \brief Get total length of higher layer PDU. Set in
-   * START_PPDU status type.
-   * \return Total length of HL PDU
-   */
-  uint16_t GetTotalLength () const;
+    /**
+     * \brief Get total length of higher layer PDU. Set in
+     * START_PPDU status type.
+     * \return Total length of HL PDU
+     */
+    uint16_t GetTotalLength() const;
 
-  /**
-   * \brief Set start indicator to PPDU header
-   */
-  void SetStartIndicator ();
+    /**
+     * \brief Set start indicator to PPDU header
+     */
+    void SetStartIndicator();
 
-  /**
-   * \brief Set end indicator to PPDU header
-   */
-  void SetEndIndicator ();
+    /**
+     * \brief Set end indicator to PPDU header
+     */
+    void SetEndIndicator();
 
-  /**
-   * \brief Set PPDU fragment length to PPDU header
-   * \param bytes PPDU length in bytes
-   */
-  void SetPPduLength (uint16_t bytes);
+    /**
+     * \brief Set PPDU fragment length to PPDU header
+     * \param bytes PPDU length in bytes
+     */
+    void SetPPduLength(uint16_t bytes);
 
-  /**
-   * \brief Set fragment id to PPDU header
-   * \param id Fragment id
-   */
-  void SetFragmentId (uint8_t id);
+    /**
+     * \brief Set fragment id to PPDU header
+     * \param id Fragment id
+     */
+    void SetFragmentId(uint8_t id);
 
-  /**
-   * Set total length of higher layer PDU. Set in
-   * START_PPDU status type.
-   * \param bytes Total HL packet size
-   */
-  void SetTotalLength (uint16_t bytes);
+    /**
+     * Set total length of higher layer PDU. Set in
+     * START_PPDU status type.
+     * \param bytes Total HL packet size
+     */
+    void SetTotalLength(uint16_t bytes);
 
-  /**
-   * \brief Get the maximum RLE header size
-   * \param type Header type
-   * \return Header size
-   */
-  uint32_t GetHeaderSizeInBytes (uint8_t type) const;
+    /**
+     * \brief Get the maximum RLE header size
+     * \param type Header type
+     * \return Header size
+     */
+    uint32_t GetHeaderSizeInBytes(uint8_t type) const;
 
-  /**
-   * \brief Get maximum RLE header size
-   * \return Maximum header size
-   */
-  uint32_t GetMaxHeaderSizeInBytes () const;
+    /**
+     * \brief Get maximum RLE header size
+     * \return Maximum header size
+     */
+    uint32_t GetMaxHeaderSizeInBytes() const;
 
-private:
-  uint8_t m_startIndicator;
-  uint8_t m_endIndicator;
-  uint16_t m_ppduLengthInBytes;
-  uint8_t m_fragmentId;
-  uint16_t m_totalLengthInBytes;
+  private:
+    uint8_t m_startIndicator;
+    uint8_t m_endIndicator;
+    uint16_t m_ppduLengthInBytes;
+    uint8_t m_fragmentId;
+    uint16_t m_totalLengthInBytes;
 
-  /**
-   * Constant variables for determining the header sizes
-   * of different RLE PPDU fragments.
-   */
-  const uint32_t m_fullPpduHeaderSize;
-  const uint32_t m_startPpduHeaderSize;
-  const uint32_t m_endPpduHeaderSize;
-  const uint32_t m_continuationPpduHeaderSize;
-
+    /**
+     * Constant variables for determining the header sizes
+     * of different RLE PPDU fragments.
+     */
+    const uint32_t m_fullPpduHeaderSize;
+    const uint32_t m_startPpduHeaderSize;
+    const uint32_t m_endPpduHeaderSize;
+    const uint32_t m_continuationPpduHeaderSize;
 };
 
-
-}  // namespace ns3
+} // namespace ns3
 
 #endif // SATELLITE_RLE_HEADER_H

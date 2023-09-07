@@ -18,257 +18,261 @@
  * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include <ns3/log.h>
-#include <ns3/simulator.h>
-#include <ns3/double.h>
-#include <ns3/uinteger.h>
-#include <ns3/pointer.h>
-#include <ns3/enum.h>
-
-#include "satellite-utils.h"
-#include "satellite-mac.h"
-#include "satellite-time-tag.h"
-#include "satellite-address-tag.h"
-#include "satellite-uplink-info-tag.h"
-#include "satellite-signal-parameters.h"
-
 #include "satellite-geo-mac.h"
 
+#include "satellite-address-tag.h"
+#include "satellite-mac.h"
+#include "satellite-signal-parameters.h"
+#include "satellite-time-tag.h"
+#include "satellite-uplink-info-tag.h"
+#include "satellite-utils.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatGeoMac");
+#include <ns3/double.h>
+#include <ns3/enum.h>
+#include <ns3/log.h>
+#include <ns3/pointer.h>
+#include <ns3/simulator.h>
+#include <ns3/uinteger.h>
 
-namespace ns3 {
+NS_LOG_COMPONENT_DEFINE("SatGeoMac");
 
-NS_OBJECT_ENSURE_REGISTERED (SatGeoMac);
+namespace ns3
+{
+
+NS_OBJECT_ENSURE_REGISTERED(SatGeoMac);
 
 TypeId
-SatGeoMac::GetTypeId (void)
+SatGeoMac::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatGeoMac")
-    .SetParent<SatMac> ()
-    .AddTraceSource ("BBFrameTxTrace",
-                     "Trace for transmitted BB Frames.",
-                     MakeTraceSourceAccessor (&SatGeoMac::m_bbFrameTxTrace),
-                     "ns3::SatBbFrame::BbFrameCallback")
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::SatGeoMac")
+                            .SetParent<SatMac>()
+                            .AddTraceSource("BBFrameTxTrace",
+                                            "Trace for transmitted BB Frames.",
+                                            MakeTraceSourceAccessor(&SatGeoMac::m_bbFrameTxTrace),
+                                            "ns3::SatBbFrame::BbFrameCallback");
+    return tid;
 }
 
 TypeId
-SatGeoMac::GetInstanceTypeId (void) const
+SatGeoMac::GetInstanceTypeId(void) const
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return GetTypeId ();
+    return GetTypeId();
 }
 
-SatGeoMac::SatGeoMac (void)
+SatGeoMac::SatGeoMac(void)
 {
-  NS_LOG_FUNCTION (this);
-  NS_FATAL_ERROR ("SatGeoMac default constructor is not allowed to use");
+    NS_LOG_FUNCTION(this);
+    NS_FATAL_ERROR("SatGeoMac default constructor is not allowed to use");
 }
 
-SatGeoMac::SatGeoMac (uint32_t satId, uint32_t beamId,
-                      SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
-                      SatEnums::RegenerationMode_t returnLinkRegenerationMode)
- : SatMac (satId, beamId, forwardLinkRegenerationMode, returnLinkRegenerationMode),
-  m_fwdScheduler (),
-  m_guardTime (MicroSeconds (1)),
-  m_satId (satId),
-  m_beamId (beamId)
+SatGeoMac::SatGeoMac(uint32_t satId,
+                     uint32_t beamId,
+                     SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                     SatEnums::RegenerationMode_t returnLinkRegenerationMode)
+    : SatMac(satId, beamId, forwardLinkRegenerationMode, returnLinkRegenerationMode),
+      m_fwdScheduler(),
+      m_guardTime(MicroSeconds(1)),
+      m_satId(satId),
+      m_beamId(beamId)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-SatGeoMac::~SatGeoMac ()
+SatGeoMac::~SatGeoMac()
 {
-  NS_LOG_FUNCTION (this);
-}
-
-void
-SatGeoMac::DoDispose ()
-{
-  NS_LOG_FUNCTION (this);
-  Object::DoDispose ();
+    NS_LOG_FUNCTION(this);
 }
 
 void
-SatGeoMac::DoInitialize ()
+SatGeoMac::DoDispose()
 {
-  NS_LOG_FUNCTION (this);
-  Object::DoInitialize ();
+    NS_LOG_FUNCTION(this);
+    Object::DoDispose();
 }
 
 void
-SatGeoMac::StartPeriodicTransmissions ()
+SatGeoMac::DoInitialize()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
+    Object::DoInitialize();
+}
 
-  if ( m_fwdScheduler == NULL )
+void
+SatGeoMac::StartPeriodicTransmissions()
+{
+    NS_LOG_FUNCTION(this);
+
+    if (m_fwdScheduler == NULL)
     {
-      NS_FATAL_ERROR ("Scheduler not set for GEO FEEDER MAC!!!");
+        NS_FATAL_ERROR("Scheduler not set for GEO FEEDER MAC!!!");
     }
 
-  Simulator::Schedule (Seconds (0), &SatGeoMac::StartTransmission, this, 0);
+    Simulator::Schedule(Seconds(0), &SatGeoMac::StartTransmission, this, 0);
 }
 
 void
-SatGeoMac::StartTransmission (uint32_t carrierId)
+SatGeoMac::StartTransmission(uint32_t carrierId)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  Time txDuration;
+    Time txDuration;
 
-  if (m_txEnabled)
+    if (m_txEnabled)
     {
-      std::pair<Ptr<SatBbFrame>, const Time> bbFrameInfo = m_fwdScheduler->GetNextFrame ();
-      Ptr<SatBbFrame> bbFrame = bbFrameInfo.first;
-      txDuration = bbFrameInfo.second;
+        std::pair<Ptr<SatBbFrame>, const Time> bbFrameInfo = m_fwdScheduler->GetNextFrame();
+        Ptr<SatBbFrame> bbFrame = bbFrameInfo.first;
+        txDuration = bbFrameInfo.second;
 
-      // trace out BB frames sent.
-      m_bbFrameTxTrace (bbFrame);
+        // trace out BB frames sent.
+        m_bbFrameTxTrace(bbFrame);
 
-      // Handle both dummy frames and normal frames
-      if ( bbFrame != NULL )
+        // Handle both dummy frames and normal frames
+        if (bbFrame != NULL)
         {
-          SatSignalParameters::txInfo_s txInfo;
-          txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
-          txInfo.modCod = bbFrame->GetModcod ();
-          txInfo.sliceId = bbFrame->GetSliceId ();
-          txInfo.frameType = bbFrame->GetFrameType ();
-          txInfo.waveformId = 0;
+            SatSignalParameters::txInfo_s txInfo;
+            txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;
+            txInfo.modCod = bbFrame->GetModcod();
+            txInfo.sliceId = bbFrame->GetSliceId();
+            txInfo.frameType = bbFrame->GetFrameType();
+            txInfo.waveformId = 0;
 
-          /**
-           * Decrease a guard time from BB frame duration.
-           */
-          SendPacket (bbFrame->GetPayload (), carrierId, txDuration - m_guardTime, txInfo);
+            /**
+             * Decrease a guard time from BB frame duration.
+             */
+            SendPacket(bbFrame->GetPayload(), carrierId, txDuration - m_guardTime, txInfo);
         }
     }
-  else
+    else
     {
-      /**
-       * GEO MAC is disabled, thus get the duration of the default BB frame
-       * and try again then.
-       */
+        /**
+         * GEO MAC is disabled, thus get the duration of the default BB frame
+         * and try again then.
+         */
 
-      NS_LOG_INFO ("TX is disabled, thus nothing is transmitted!");
-      txDuration = m_fwdScheduler->GetDefaultFrameDuration ();
+        NS_LOG_INFO("TX is disabled, thus nothing is transmitted!");
+        txDuration = m_fwdScheduler->GetDefaultFrameDuration();
     }
 
-  Simulator::Schedule (txDuration, &SatGeoMac::StartTransmission, this, 0);
+    Simulator::Schedule(txDuration, &SatGeoMac::StartTransmission, this, 0);
 }
 
 void
-SatGeoMac::SendPacket (SatPhy::PacketContainer_t packets, uint32_t carrierId, Time duration, SatSignalParameters::txInfo_s txInfo)
+SatGeoMac::SendPacket(SatPhy::PacketContainer_t packets,
+                      uint32_t carrierId,
+                      Time duration,
+                      SatSignalParameters::txInfo_s txInfo)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  // Add a SatMacTimeTag tag for packet delay computation at the receiver end.
-  SetTimeTag (packets);
+    // Add a SatMacTimeTag tag for packet delay computation at the receiver end.
+    SetTimeTag(packets);
 
-  // Add packet trace entry:
-  m_packetTrace (Simulator::Now (),
-                 SatEnums::PACKET_SENT,
-                 m_nodeInfo->GetNodeType (),
-                 m_nodeInfo->GetNodeId (),
-                 m_nodeInfo->GetMacAddress (),
-                 SatEnums::LL_MAC,
-                 GetSatLinkTxDir (),
-                 SatUtils::GetPacketInfo (packets));
+    // Add packet trace entry:
+    m_packetTrace(Simulator::Now(),
+                  SatEnums::PACKET_SENT,
+                  m_nodeInfo->GetNodeType(),
+                  m_nodeInfo->GetNodeId(),
+                  m_nodeInfo->GetMacAddress(),
+                  SatEnums::LL_MAC,
+                  GetSatLinkTxDir(),
+                  SatUtils::GetPacketInfo(packets));
 
-  Ptr<SatSignalParameters> txParams = Create<SatSignalParameters> ();
-  txParams->m_duration = duration;
-  txParams->m_packetsInBurst = packets;
-  txParams->m_satId = m_satId;
-  txParams->m_beamId = m_beamId;
-  txParams->m_carrierId = carrierId;
-  txParams->m_txInfo = txInfo;
+    Ptr<SatSignalParameters> txParams = Create<SatSignalParameters>();
+    txParams->m_duration = duration;
+    txParams->m_packetsInBurst = packets;
+    txParams->m_satId = m_satId;
+    txParams->m_beamId = m_beamId;
+    txParams->m_carrierId = carrierId;
+    txParams->m_txInfo = txInfo;
 
-  // Use call back to send packet to lower layer
-  m_txCallback (txParams);
+    // Use call back to send packet to lower layer
+    m_txCallback(txParams);
 }
 
 void
-SatGeoMac::RxTraces (SatPhy::PacketContainer_t packets)
+SatGeoMac::RxTraces(SatPhy::PacketContainer_t packets)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  if (m_isStatisticsTagsEnabled)
+    if (m_isStatisticsTagsEnabled)
     {
-      for (SatPhy::PacketContainer_t::const_iterator it1 = packets.begin ();
-           it1 != packets.end (); ++it1)
+        for (SatPhy::PacketContainer_t::const_iterator it1 = packets.begin(); it1 != packets.end();
+             ++it1)
         {
-          // Remove packet tag
-          SatMacTag macTag;
-          bool mSuccess = (*it1)->PeekPacketTag (macTag);
-          if (!mSuccess)
+            // Remove packet tag
+            SatMacTag macTag;
+            bool mSuccess = (*it1)->PeekPacketTag(macTag);
+            if (!mSuccess)
             {
-              NS_FATAL_ERROR ("MAC tag was not found from the packet!");
+                NS_FATAL_ERROR("MAC tag was not found from the packet!");
             }
 
-          // If the packet is intended for this receiver
-          Mac48Address destAddress = macTag.GetDestAddress ();
+            // If the packet is intended for this receiver
+            Mac48Address destAddress = macTag.GetDestAddress();
 
-          if (destAddress == m_nodeInfo->GetMacAddress ())
+            if (destAddress == m_nodeInfo->GetMacAddress())
             {
-              Address addr = GetRxUtAddress (*it1);
+                Address addr = GetRxUtAddress(*it1);
 
-              m_rxTrace (*it1, addr);
+                m_rxTrace(*it1, addr);
 
-              SatMacLinkTimeTag linkTimeTag;
-              if ((*it1)->RemovePacketTag (linkTimeTag))
+                SatMacLinkTimeTag linkTimeTag;
+                if ((*it1)->RemovePacketTag(linkTimeTag))
                 {
-                  NS_LOG_DEBUG (this << " contains a SatMacLinkTimeTag tag");
-                  Time delay = Simulator::Now () - linkTimeTag.GetSenderLinkTimestamp ();
-                  m_rxLinkDelayTrace (delay, addr);
-                  if (m_lastLinkDelay.IsZero() == false)
+                    NS_LOG_DEBUG(this << " contains a SatMacLinkTimeTag tag");
+                    Time delay = Simulator::Now() - linkTimeTag.GetSenderLinkTimestamp();
+                    m_rxLinkDelayTrace(delay, addr);
+                    if (m_lastLinkDelay.IsZero() == false)
                     {
-                      Time jitter = Abs (delay - m_lastLinkDelay);
-                      m_rxLinkJitterTrace (jitter, addr);
+                        Time jitter = Abs(delay - m_lastLinkDelay);
+                        m_rxLinkJitterTrace(jitter, addr);
                     }
-                  m_lastLinkDelay = delay;
+                    m_lastLinkDelay = delay;
                 }
-            } // end of `if (destAddress == m_nodeInfo->GetMacAddress () || destAddress.IsBroadcast ())`
-        } // end of `for it1 = packets.begin () -> packets.end ()`
-    } // end of `if (m_isStatisticsTagsEnabled)`
+            } // end of `if (destAddress == m_nodeInfo->GetMacAddress () || destAddress.IsBroadcast
+              // ())`
+        }     // end of `for it1 = packets.begin () -> packets.end ()`
+    }         // end of `if (m_isStatisticsTagsEnabled)`
 }
 
 void
-SatGeoMac::SetFwdScheduler (Ptr<SatFwdLinkScheduler> fwdScheduler)
+SatGeoMac::SetFwdScheduler(Ptr<SatFwdLinkScheduler> fwdScheduler)
 {
-  m_fwdScheduler = fwdScheduler;
+    m_fwdScheduler = fwdScheduler;
 }
 
 void
-SatGeoMac::SetLlc (Ptr<SatGeoLlc> llc)
+SatGeoMac::SetLlc(Ptr<SatGeoLlc> llc)
 {
-  m_llc = llc;
+    m_llc = llc;
 }
 
 Time
-SatGeoMac::GetGuardTime () const
+SatGeoMac::GetGuardTime() const
 {
-  return m_guardTime;
+    return m_guardTime;
 }
 
 void
-SatGeoMac::SetGuardTime (Time guardTime)
+SatGeoMac::SetGuardTime(Time guardTime)
 {
-  m_guardTime = guardTime;
+    m_guardTime = guardTime;
 }
 
 void
-SatGeoMac::SetTransmitCallback (TransmitCallback cb)
+SatGeoMac::SetTransmitCallback(TransmitCallback cb)
 {
-  NS_LOG_FUNCTION (this << &cb);
-  m_txCallback = cb;
+    NS_LOG_FUNCTION(this << &cb);
+    m_txCallback = cb;
 }
 
 void
-SatGeoMac::SetReceiveNetDeviceCallback (ReceiveNetDeviceCallback cb)
+SatGeoMac::SetReceiveNetDeviceCallback(ReceiveNetDeviceCallback cb)
 {
-  NS_LOG_FUNCTION (this << &cb);
-  m_rxNetDeviceCallback = cb;
+    NS_LOG_FUNCTION(this << &cb);
+    m_rxNetDeviceCallback = cb;
 }
 
 } // namespace ns3

@@ -21,11 +21,12 @@
 #ifndef SATELLITE_MOBILITY_MODEL_H
 #define SATELLITE_MOBILITY_MODEL_H
 
-#include <ns3/mobility-model.h>
-
 #include "geo-coordinate.h"
 
-namespace ns3 {
+#include <ns3/mobility-model.h>
+
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -39,102 +40,102 @@ namespace ns3 {
  */
 class SatMobilityModel : public MobilityModel
 {
-public:
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
-  TypeId GetInstanceTypeId (void) const;
+  public:
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
+    TypeId GetInstanceTypeId(void) const;
 
-  /**
-   * Default constructor.
-   */
-  SatMobilityModel ();
+    /**
+     * Default constructor.
+     */
+    SatMobilityModel();
 
-  /**
-   * Destructor for SatMobilityModel
-   */
-  virtual ~SatMobilityModel () = 0;
+    /**
+     * Destructor for SatMobilityModel
+     */
+    virtual ~SatMobilityModel() = 0;
 
-  /**
-   * \return the current satellite position
-   */
-  GeoCoordinate GetGeoPosition (void) const;
-  /**
-   * \param position the satellite position to set.
-   */
-  void SetGeoPosition (const GeoCoordinate &position);
+    /**
+     * \return the current satellite position
+     */
+    GeoCoordinate GetGeoPosition(void) const;
+    /**
+     * \param position the satellite position to set.
+     */
+    void SetGeoPosition(const GeoCoordinate& position);
 
-  void NotifyGeoCourseChange (void) const;
+    void NotifyGeoCourseChange(void) const;
 
-  /**
-   * Callback signature for `SatCourseChange` trace source.
-   *
-   * \param model the SatMobilityModel which is changing course
-   */
-  typedef void (*CourseChangeCallback)(const Ptr<const SatMobilityModel> model);
+    /**
+     * Callback signature for `SatCourseChange` trace source.
+     *
+     * \param model the SatMobilityModel which is changing course
+     */
+    typedef void (*CourseChangeCallback)(const Ptr<const SatMobilityModel> model);
 
-private:
-  /**
-   * \return the current position.
-   *
-   * Concrete subclasses of this base class must
-   * implement this method.
-   */
-  virtual GeoCoordinate DoGetGeoPosition (void) const = 0;
-  /**
-   * \param position the position to set.
-   *
-   * Concrete subclasses of this base class must
-   * implement this method.
-   */
-  virtual void DoSetGeoPosition (const GeoCoordinate &position) = 0;
-  /**
-   * This method is used to force update of cartesian position.
-   * Cartesian position is updated when position is set by method DoSetPosition.
-   * In case that position is updated by method DoSetGeoPosition cartesian position is
-   * updated only if it is requested by method DoGetPosition.
-   *
-   * \param position position in cartesian format to set
-   *
-   */
-  void DoSetCartesianPosition (const Vector &position) const;
+  private:
+    /**
+     * \return the current position.
+     *
+     * Concrete subclasses of this base class must
+     * implement this method.
+     */
+    virtual GeoCoordinate DoGetGeoPosition(void) const = 0;
+    /**
+     * \param position the position to set.
+     *
+     * Concrete subclasses of this base class must
+     * implement this method.
+     */
+    virtual void DoSetGeoPosition(const GeoCoordinate& position) = 0;
+    /**
+     * This method is used to force update of cartesian position.
+     * Cartesian position is updated when position is set by method DoSetPosition.
+     * In case that position is updated by method DoSetGeoPosition cartesian position is
+     * updated only if it is requested by method DoGetPosition.
+     *
+     * \param position position in cartesian format to set
+     *
+     */
+    void DoSetCartesianPosition(const Vector& position) const;
 
-  /**
-   * \return cartesian format position as vector
-   *
-   * Implementation for method defined by MobilityModel
-   */
-  virtual Vector DoGetPosition (void) const;
+    /**
+     * \return cartesian format position as vector
+     *
+     * Implementation for method defined by MobilityModel
+     */
+    virtual Vector DoGetPosition(void) const;
 
-  /**
-   * \param position position in Cartesian format to set
-   *
-   * Implementation for method defined by MobilityModel
-   */
-  virtual void DoSetPosition (const Vector &position);
+    /**
+     * \param position position in Cartesian format to set
+     *
+     * Implementation for method defined by MobilityModel
+     */
+    virtual void DoSetPosition(const Vector& position);
 
-  /**
-   * Used to alert subscribers that a change in direction, velocity,
-   * or position has occurred.
-   */
-  ns3::TracedCallback<Ptr<const SatMobilityModel> > m_satCourseChangeTrace;
+    /**
+     * Used to alert subscribers that a change in direction, velocity,
+     * or position has occurred.
+     */
+    ns3::TracedCallback<Ptr<const SatMobilityModel>> m_satCourseChangeTrace;
 
-  // These are defined as mutable in order to support 'lazy' update.
+    // These are defined as mutable in order to support 'lazy' update.
 
-  // position info in Cartesian format
-  mutable Vector m_cartesianPosition;
+    // position info in Cartesian format
+    mutable Vector m_cartesianPosition;
 
-  // flag to indicated if position in Cartesian format is out of date.
-  mutable bool m_cartesianPositionOutdated;
+    // flag to indicated if position in Cartesian format is out of date.
+    mutable bool m_cartesianPositionOutdated;
 
-  // this is the flag for indicating that when calling method DoSetPosition (defined by class Mobility Model)
-  // is taking Vector filled by longitude (in x), latitude (in y) and altitude (in z)
-  // this enables using ns-3 mobility helper without to convert geo coordinates first to Cartesian
-  // but if for some reason used model needs Cartesian coordinates then this flag can be turned off
-  // through attribute 'AsGeoCoordinates'.
-  bool m_GetAsGeoCoordinates;
+    // this is the flag for indicating that when calling method DoSetPosition (defined by class
+    // Mobility Model) is taking Vector filled by longitude (in x), latitude (in y) and altitude (in
+    // z) this enables using ns-3 mobility helper without to convert geo coordinates first to
+    // Cartesian but if for some reason used model needs Cartesian coordinates then this flag can be
+    // turned off through attribute 'AsGeoCoordinates'.
+    bool m_GetAsGeoCoordinates;
 };
 
 } // namespace ns3

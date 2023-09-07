@@ -22,13 +22,12 @@
 #ifndef SATELLITE_STATS_WINDOW_LOAD_HELPER_H
 #define SATELLITE_STATS_WINDOW_LOAD_HELPER_H
 
-#include <ns3/satellite-stats-helper.h>
-#include <ns3/ptr.h>
 #include <ns3/callback.h>
+#include <ns3/ptr.h>
+#include <ns3/satellite-stats-helper.h>
 
-
-namespace ns3 {
-
+namespace ns3
+{
 
 // BASE CLASS /////////////////////////////////////////////////////////////////
 
@@ -42,60 +41,57 @@ class DataCollectionObject;
  */
 class SatStatsWindowLoadHelper : public SatStatsHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsWindowLoadHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsWindowLoadHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsWindowLoadHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsWindowLoadHelper ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
+    /**
+     * \brief Set up several probes or other means of listeners and connect them
+     *        to the collectors.
+     */
+    void InstallProbes();
 
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
+    /**
+     * \brief Receive inputs from trace sources and forward them to the collector.
+     * \param windowLoad the normalized window load in bps/Hz.
+     */
+    void WindowLoadCallback(double windowLoad);
 
-  /**
-   * \brief Set up several probes or other means of listeners and connect them
-   *        to the collectors.
-   */
-  void InstallProbes ();
+    /**
+     * \return
+     */
+    Callback<void, double> GetTraceSinkCallback() const;
 
-  /**
-   * \brief Receive inputs from trace sources and forward them to the collector.
-   * \param windowLoad the normalized window load in bps/Hz.
-   */
-  void WindowLoadCallback (double windowLoad);
+  protected:
+    // inherited from SatStatsHelper base class
+    void DoInstall();
 
-  /**
-   * \return
-   */
-  Callback<void, double> GetTraceSinkCallback () const;
+    /**
+     * \brief
+     */
+    virtual void DoInstallProbes() = 0;
 
-protected:
-  // inherited from SatStatsHelper base class
-  void DoInstall ();
+    /// The collector created by this helper.
+    Ptr<DataCollectionObject> m_collector;
 
-  /**
-   * \brief
-   */
-  virtual void DoInstallProbes () = 0;
+    /// The aggregator created by this helper.
+    Ptr<DataCollectionObject> m_aggregator;
 
-  /// The collector created by this helper.
-  Ptr<DataCollectionObject> m_collector;
-
-  /// The aggregator created by this helper.
-  Ptr<DataCollectionObject> m_aggregator;
-
-private:
-  ///
-  Callback<void, double> m_traceSinkCallback;
+  private:
+    ///
+    Callback<void, double> m_traceSinkCallback;
 
 }; // end of class SatStatsWindowLoadHelper
-
 
 // RETURN FEEDER LINK /////////////////////////////////////////////////////////
 
@@ -117,30 +113,26 @@ private:
  */
 class SatStatsRtnFeederWindowLoadHelper : public SatStatsWindowLoadHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsRtnFeederWindowLoadHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsRtnFeederWindowLoadHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsRtnFeederWindowLoadHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsRtnFeederWindowLoadHelper ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
-
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
-
-protected:
-  // inherited from SatStatsWindowLoadHelper base class
-  void DoInstallProbes ();
+  protected:
+    // inherited from SatStatsWindowLoadHelper base class
+    void DoInstallProbes();
 
 }; // end of class SatStatsRtnFeederWindowLoadHelper
 
-
 } // end of namespace ns3
-
 
 #endif /* SATELLITE_STATS_WINDOW_LOAD_HELPER_H */

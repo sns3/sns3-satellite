@@ -18,51 +18,52 @@
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
 
-#include <ns3/log.h>
-
 #include "satellite-fading-input-trace.h"
 
+#include <ns3/log.h>
 
-NS_LOG_COMPONENT_DEFINE ("SatFadingInputTrace");
+NS_LOG_COMPONENT_DEFINE("SatFadingInputTrace");
 
-namespace ns3 {
+namespace ns3
+{
 
-NS_OBJECT_ENSURE_REGISTERED (SatFadingInputTrace);
+NS_OBJECT_ENSURE_REGISTERED(SatFadingInputTrace);
 
 TypeId
-SatFadingInputTrace::GetTypeId (void)
+SatFadingInputTrace::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatFadingInputTrace")
-    .SetParent<SatBaseFading> ()
-    .AddConstructor<SatFadingInputTrace> ();
-  return tid;
+    static TypeId tid = TypeId("ns3::SatFadingInputTrace")
+                            .SetParent<SatBaseFading>()
+                            .AddConstructor<SatFadingInputTrace>();
+    return tid;
 }
 
-SatFadingInputTrace::SatFadingInputTrace (Ptr<SatFadingInputTraceContainer> satFadingInputTraceContainer)
-  : m_satFadingInputTraceContainer (satFadingInputTraceContainer)
+SatFadingInputTrace::SatFadingInputTrace(
+    Ptr<SatFadingInputTraceContainer> satFadingInputTraceContainer)
+    : m_satFadingInputTraceContainer(satFadingInputTraceContainer)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-SatFadingInputTrace::SatFadingInputTrace ()
-  : m_satFadingInputTraceContainer ()
+SatFadingInputTrace::SatFadingInputTrace()
+    : m_satFadingInputTraceContainer()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  NS_FATAL_ERROR ("SatFadingInputTrace::SatFadingInputTrace - Constructor not in use.");
+    NS_FATAL_ERROR("SatFadingInputTrace::SatFadingInputTrace - Constructor not in use.");
 }
 
-SatFadingInputTrace::~SatFadingInputTrace ()
+SatFadingInputTrace::~SatFadingInputTrace()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
 double
-SatFadingInputTrace::DoGetFading (Address macAddress, SatEnums::ChannelType_t channelType)
+SatFadingInputTrace::DoGetFading(Address macAddress, SatEnums::ChannelType_t channelType)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return m_satFadingInputTraceContainer->GetFadingValue (std::make_pair (macAddress, channelType));
+    return m_satFadingInputTraceContainer->GetFadingValue(std::make_pair(macAddress, channelType));
 }
 
 } // namespace ns3

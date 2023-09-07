@@ -20,19 +20,18 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
-
 #ifndef SATELLITE_PHY_RX_CARRIER_UPLINK_H
 #define SATELLITE_PHY_RX_CARRIER_UPLINK__H
 
-#include <vector>
-#include <map>
-#include <list>
-#include <deque>
-
 #include "satellite-phy-rx-carrier.h"
 
+#include <deque>
+#include <list>
+#include <map>
+#include <vector>
 
-namespace ns3 {
+namespace ns3
+{
 
 class SatPhyRxCarrierConf;
 class SatPhyRxCarrier;
@@ -43,68 +42,70 @@ class SatPhyRxCarrier;
  */
 class SatPhyRxCarrierUplink : public SatPhyRxCarrier
 {
-public:
-  /**
-   * Constructor.
-   * \param carrierId ID of the carrier
-   * \param carrierConf Carrier configuration
-   * \param waveformConf Waveform configuration
-   * \param randomAccessEnabled Is this a RA carrier
-   */
-  SatPhyRxCarrierUplink (uint32_t carrierId,
-                         Ptr<SatPhyRxCarrierConf> carrierConf,
-                         Ptr<SatWaveformConf> waveformConf,
-                         bool randomAccessEnabled);
+  public:
+    /**
+     * Constructor.
+     * \param carrierId ID of the carrier
+     * \param carrierConf Carrier configuration
+     * \param waveformConf Waveform configuration
+     * \param randomAccessEnabled Is this a RA carrier
+     */
+    SatPhyRxCarrierUplink(uint32_t carrierId,
+                          Ptr<SatPhyRxCarrierConf> carrierConf,
+                          Ptr<SatWaveformConf> waveformConf,
+                          bool randomAccessEnabled);
 
-  /**
-   * \brief Destructor
-   */
-  virtual ~SatPhyRxCarrierUplink ();
+    /**
+     * \brief Destructor
+     */
+    virtual ~SatPhyRxCarrierUplink();
 
-  /**
-   * Get the TypeId of the class.
-   * \return TypeId
-   */
-  static TypeId GetTypeId (void);
+    /**
+     * Get the TypeId of the class.
+     * \return TypeId
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * \brief Method for querying the type of the carrier
-   */
-  inline virtual CarrierType GetCarrierType ()
-  {
-    return CarrierType::DEDICATED_ACCESS;
-  }
+    /**
+     * \brief Method for querying the type of the carrier
+     */
+    inline virtual CarrierType GetCarrierType()
+    {
+        return CarrierType::DEDICATED_ACCESS;
+    }
 
-  /**
-   * \brief Function for starting packet reception from the SatChannel
-   * \param rxParams The needed parameters for the received signal
-   * \return true if packet is destinated to this beam
-   */
-  bool StartRx (Ptr<SatSignalParameters> rxParams);
+    /**
+     * \brief Function for starting packet reception from the SatChannel
+     * \param rxParams The needed parameters for the received signal
+     * \return true if packet is destinated to this beam
+     */
+    bool StartRx(Ptr<SatSignalParameters> rxParams);
 
-protected:
-  /**
-   * Get the default receive mode. In satellite node always true.
-   */
-  inline virtual const bool GetDefaultReceiveMode ()
-  {
-    return true;
-  }
+  protected:
+    /**
+     * Get the default receive mode. In satellite node always true.
+     */
+    inline virtual const bool GetDefaultReceiveMode()
+    {
+        return true;
+    }
 
-  /**
-   * \brief Function for ending the packet reception from the SatChannel
-   * \param key Key for Rx params map
-   */
-  virtual void EndRxData (uint32_t key);
+    /**
+     * \brief Function for ending the packet reception from the SatChannel
+     * \param key Key for Rx params map
+     */
+    virtual void EndRxData(uint32_t key);
 
-  /**
-   * \brief Create an interference event based on Rx parameters and address.
-   *
-   * \return Pointer to the interference event.
-   */
-  virtual Ptr<SatInterference::InterferenceChangeEvent> CreateInterference (Ptr<SatSignalParameters> rxParams, Address rxAddress);
+    /**
+     * \brief Create an interference event based on Rx parameters and address.
+     *
+     * \return Pointer to the interference event.
+     */
+    virtual Ptr<SatInterference::InterferenceChangeEvent> CreateInterference(
+        Ptr<SatSignalParameters> rxParams,
+        Address rxAddress);
 };
 
-}
+} // namespace ns3
 
 #endif /* SATELLITE_PHY_RX_CARRIER_UPLINK_H */

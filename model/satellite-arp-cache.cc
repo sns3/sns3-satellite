@@ -18,55 +18,49 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include <ns3/log.h>
-#include <ns3/assert.h>
-
 #include "satellite-arp-cache.h"
 
+#include <ns3/assert.h>
+#include <ns3/log.h>
 
-NS_LOG_COMPONENT_DEFINE ("SatArpCache");
+NS_LOG_COMPONENT_DEFINE("SatArpCache");
 
-namespace ns3 {
+namespace ns3
+{
 
-NS_OBJECT_ENSURE_REGISTERED (SatArpCache);
+NS_OBJECT_ENSURE_REGISTERED(SatArpCache);
 
 TypeId
-SatArpCache::GetTypeId (void)
+SatArpCache::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatArpCache")
-    .SetParent<ArpCache> ()
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::SatArpCache").SetParent<ArpCache>();
+    return tid;
 }
 
-SatArpCache::SatArpCache ()
-  : ArpCache ()
+SatArpCache::SatArpCache()
+    : ArpCache()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-SatArpCache::~SatArpCache ()
+SatArpCache::~SatArpCache()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-
-ArpCache::Entry *
-SatArpCache::Add (Ipv4Address to, Address macAddress)
+ArpCache::Entry*
+SatArpCache::Add(Ipv4Address to, Address macAddress)
 {
-  NS_LOG_FUNCTION (this << to << macAddress);
+    NS_LOG_FUNCTION(this << to << macAddress);
 
-  // Add a new entry
-  ArpCache::Entry *entry = ArpCache::Add (to);
-  entry->SetMacAddress (macAddress);
-  entry->MarkPermanent ();
+    // Add a new entry
+    ArpCache::Entry* entry = ArpCache::Add(to);
+    entry->SetMacAddress(macAddress);
+    entry->MarkPermanent();
 
-  NS_LOG_INFO ( "IP: " << to << ", MAC: " << macAddress );
+    NS_LOG_INFO("IP: " << to << ", MAC: " << macAddress);
 
-  return entry;
+    return entry;
 }
-
-
 
 } // namespace ns3
-

@@ -23,14 +23,14 @@
 #ifndef LORA_NETWORK_CONTROLLER_COMPONENTS_H
 #define LORA_NETWORK_CONTROLLER_COMPONENTS_H
 
-#include <ns3/object.h>
-#include <ns3/log.h>
-#include <ns3/packet.h>
-
 #include "lora-network-status.h"
 
+#include <ns3/log.h>
+#include <ns3/object.h>
+#include <ns3/packet.h>
 
-namespace ns3 {
+namespace ns3
+{
 
 class LoraNetworkStatus;
 
@@ -47,36 +47,36 @@ class LoraNetworkStatus;
  */
 class LoraNetworkControllerComponent : public Object
 {
-public:
-  static TypeId GetTypeId (void);
+  public:
+    static TypeId GetTypeId(void);
 
-  // Constructor and destructor
-  LoraNetworkControllerComponent ();
-  virtual ~LoraNetworkControllerComponent ();
+    // Constructor and destructor
+    LoraNetworkControllerComponent();
+    virtual ~LoraNetworkControllerComponent();
 
-  // Virtual methods whose implementation is left to child classes
-  /**
-   * Method that is called when a new packet is received by the NetworkServer.
-   *
-   * \param packet The newly received packet
-   * \param networkStatus A pointer to the NetworkStatus object
-   */
-  virtual void OnReceivedPacket (Ptr<const Packet> packet,
-                                 Ptr<LoraEndDeviceStatus> status,
-                                 Ptr<LoraNetworkStatus> networkStatus) = 0;
+    // Virtual methods whose implementation is left to child classes
+    /**
+     * Method that is called when a new packet is received by the NetworkServer.
+     *
+     * \param packet The newly received packet
+     * \param networkStatus A pointer to the NetworkStatus object
+     */
+    virtual void OnReceivedPacket(Ptr<const Packet> packet,
+                                  Ptr<LoraEndDeviceStatus> status,
+                                  Ptr<LoraNetworkStatus> networkStatus) = 0;
 
-  virtual void BeforeSendingReply (Ptr<LoraEndDeviceStatus> status,
-                                   Ptr<LoraNetworkStatus> networkStatus) = 0;
+    virtual void BeforeSendingReply(Ptr<LoraEndDeviceStatus> status,
+                                    Ptr<LoraNetworkStatus> networkStatus) = 0;
 
-  /**
-   * Method that is called when a packet cannot be sent in the downlink.
-   *
-   * \param status The EndDeviceStatus of the device to which it was
-   *               impossible to send a reply.
-   * \param networkStatus A pointer to the NetworkStatus object
-   */
-  virtual void OnFailedReply (Ptr<LoraEndDeviceStatus> status,
-                              Ptr<LoraNetworkStatus> networkStatus) = 0;
+    /**
+     * Method that is called when a packet cannot be sent in the downlink.
+     *
+     * \param status The EndDeviceStatus of the device to which it was
+     *               impossible to send a reply.
+     * \param networkStatus A pointer to the NetworkStatus object
+     */
+    virtual void OnFailedReply(Ptr<LoraEndDeviceStatus> status,
+                               Ptr<LoraNetworkStatus> networkStatus) = 0;
 };
 
 ///////////////////////////////
@@ -85,29 +85,27 @@ public:
 
 class LoraConfirmedMessagesComponent : public LoraNetworkControllerComponent
 {
-public:
-  static TypeId GetTypeId (void);
+  public:
+    static TypeId GetTypeId(void);
 
-  // Constructor and destructor
-  LoraConfirmedMessagesComponent ();
-  virtual ~LoraConfirmedMessagesComponent ();
+    // Constructor and destructor
+    LoraConfirmedMessagesComponent();
+    virtual ~LoraConfirmedMessagesComponent();
 
-  /**
-   * This method checks whether the received packet requires an acknowledgment
-   * and sets up the appropriate reply in case it does.
-   *
-   * \param packet The newly received packet
-   * \param networkStatus A pointer to the NetworkStatus object
-   */
-  void OnReceivedPacket (Ptr<const Packet> packet,
-                         Ptr<LoraEndDeviceStatus> status,
-                         Ptr<LoraNetworkStatus> networkStatus);
+    /**
+     * This method checks whether the received packet requires an acknowledgment
+     * and sets up the appropriate reply in case it does.
+     *
+     * \param packet The newly received packet
+     * \param networkStatus A pointer to the NetworkStatus object
+     */
+    void OnReceivedPacket(Ptr<const Packet> packet,
+                          Ptr<LoraEndDeviceStatus> status,
+                          Ptr<LoraNetworkStatus> networkStatus);
 
-  void BeforeSendingReply (Ptr<LoraEndDeviceStatus> status,
-                           Ptr<LoraNetworkStatus> networkStatus);
+    void BeforeSendingReply(Ptr<LoraEndDeviceStatus> status, Ptr<LoraNetworkStatus> networkStatus);
 
-  void OnFailedReply (Ptr<LoraEndDeviceStatus> status,
-                      Ptr<LoraNetworkStatus> networkStatus);
+    void OnFailedReply(Ptr<LoraEndDeviceStatus> status, Ptr<LoraNetworkStatus> networkStatus);
 };
 
 ///////////////////////////////////
@@ -116,34 +114,31 @@ public:
 
 class LoraLinkCheckComponent : public LoraNetworkControllerComponent
 {
-public:
-  static TypeId GetTypeId (void);
+  public:
+    static TypeId GetTypeId(void);
 
-  // Constructor and destructor
-  LoraLinkCheckComponent ();
-  virtual ~LoraLinkCheckComponent ();
+    // Constructor and destructor
+    LoraLinkCheckComponent();
+    virtual ~LoraLinkCheckComponent();
 
-  /**
-   * This method checks whether the received packet requires an acknowledgment
-   * and sets up the appropriate reply in case it does.
-   *
-   * \param packet The newly received packet
-   * \param networkStatus A pointer to the NetworkStatus object
-   */
-  void OnReceivedPacket (Ptr<const Packet> packet,
-                         Ptr<LoraEndDeviceStatus> status,
-                         Ptr<LoraNetworkStatus> networkStatus);
+    /**
+     * This method checks whether the received packet requires an acknowledgment
+     * and sets up the appropriate reply in case it does.
+     *
+     * \param packet The newly received packet
+     * \param networkStatus A pointer to the NetworkStatus object
+     */
+    void OnReceivedPacket(Ptr<const Packet> packet,
+                          Ptr<LoraEndDeviceStatus> status,
+                          Ptr<LoraNetworkStatus> networkStatus);
 
-  void BeforeSendingReply (Ptr<LoraEndDeviceStatus> status,
-                           Ptr<LoraNetworkStatus> networkStatus);
+    void BeforeSendingReply(Ptr<LoraEndDeviceStatus> status, Ptr<LoraNetworkStatus> networkStatus);
 
-  void OnFailedReply (Ptr<LoraEndDeviceStatus> status,
-                      Ptr<LoraNetworkStatus> networkStatus);
+    void OnFailedReply(Ptr<LoraEndDeviceStatus> status, Ptr<LoraNetworkStatus> networkStatus);
 
-private:
-  void UpdateLinkCheckAns (Ptr<Packet const> packet,
-                           Ptr<LoraEndDeviceStatus> status);
+  private:
+    void UpdateLinkCheckAns(Ptr<const Packet> packet, Ptr<LoraEndDeviceStatus> status);
 };
 
-}
+} // namespace ns3
 #endif

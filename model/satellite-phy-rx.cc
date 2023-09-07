@@ -20,512 +20,518 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
-#include <ns3/log.h>
-#include <ns3/object-vector.h>
-#include <ns3/antenna-model.h>
-#include <ns3/object-factory.h>
-
-#include "satellite-utils.h"
-#include "satellite-net-device.h"
-#include "satellite-phy.h"
 #include "satellite-phy-rx.h"
-#include "satellite-phy-rx-carrier.h"
+
+#include "satellite-antenna-gain-pattern.h"
+#include "satellite-net-device.h"
+#include "satellite-phy-rx-carrier-conf.h"
 #include "satellite-phy-rx-carrier-marsala.h"
-#include "satellite-phy-rx-carrier-per-window.h"
 #include "satellite-phy-rx-carrier-per-frame.h"
 #include "satellite-phy-rx-carrier-per-slot.h"
+#include "satellite-phy-rx-carrier-per-window.h"
 #include "satellite-phy-rx-carrier-uplink.h"
-#include "satellite-phy-rx-carrier-conf.h"
+#include "satellite-phy-rx-carrier.h"
+#include "satellite-phy.h"
 #include "satellite-signal-parameters.h"
-#include "satellite-antenna-gain-pattern.h"
+#include "satellite-utils.h"
 
+#include <ns3/antenna-model.h>
+#include <ns3/log.h>
+#include <ns3/object-factory.h>
+#include <ns3/object-vector.h>
 
-NS_LOG_COMPONENT_DEFINE ("SatPhyRx");
+NS_LOG_COMPONENT_DEFINE("SatPhyRx");
 
-namespace ns3 {
-
-
-NS_OBJECT_ENSURE_REGISTERED (SatPhyRx);
-
-SatPhyRx::SatPhyRx ()
-  : m_beamId (),
-  m_maxAntennaGain (),
-  m_antennaLoss (),
-  m_defaultFadingValue ()
+namespace ns3
 {
-  NS_LOG_FUNCTION (this);
+
+NS_OBJECT_ENSURE_REGISTERED(SatPhyRx);
+
+SatPhyRx::SatPhyRx()
+    : m_beamId(),
+      m_maxAntennaGain(),
+      m_antennaLoss(),
+      m_defaultFadingValue()
+{
+    NS_LOG_FUNCTION(this);
 }
 
-SatPhyRx::~SatPhyRx ()
+SatPhyRx::~SatPhyRx()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-void SatPhyRx::DoDispose ()
+void
+SatPhyRx::DoDispose()
 {
-  NS_LOG_FUNCTION (this);
-  m_mobility = 0;
-  m_device = 0;
-  m_fadingContainer = 0;
-  m_rxCarriers.clear ();
-  Object::DoDispose ();
+    NS_LOG_FUNCTION(this);
+    m_mobility = 0;
+    m_device = 0;
+    m_fadingContainer = 0;
+    m_rxCarriers.clear();
+    Object::DoDispose();
 }
 
 TypeId
-SatPhyRx::GetTypeId (void)
+SatPhyRx::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatPhyRx")
-    .SetParent<Object> ()
-    .AddAttribute ("RxCarrierList", "The list of RX carriers associated to this Phy RX.",
-                   ObjectVectorValue (),
-                   MakeObjectVectorAccessor (&SatPhyRx::m_rxCarriers),
-                   MakeObjectVectorChecker<SatPhyRxCarrier> ())
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::SatPhyRx")
+                            .SetParent<Object>()
+                            .AddAttribute("RxCarrierList",
+                                          "The list of RX carriers associated to this Phy RX.",
+                                          ObjectVectorValue(),
+                                          MakeObjectVectorAccessor(&SatPhyRx::m_rxCarriers),
+                                          MakeObjectVectorChecker<SatPhyRxCarrier>());
+    return tid;
 }
 
 Ptr<NetDevice>
-SatPhyRx::GetDevice ()
+SatPhyRx::GetDevice()
 {
-  NS_LOG_FUNCTION (this);
-  NS_ASSERT (m_device != nullptr);
+    NS_LOG_FUNCTION(this);
+    NS_ASSERT(m_device != nullptr);
 
-  return m_device;
+    return m_device;
 }
 
 void
-SatPhyRx::SetDevice (Ptr<NetDevice> d)
+SatPhyRx::SetDevice(Ptr<NetDevice> d)
 {
-  NS_LOG_FUNCTION (this << d);
-  NS_ASSERT (m_device == nullptr);
+    NS_LOG_FUNCTION(this << d);
+    NS_ASSERT(m_device == nullptr);
 
-  m_device = d;
+    m_device = d;
 }
 
 void
-SatPhyRx::SetMaxAntennaGain_Db (double gain_Db)
+SatPhyRx::SetMaxAntennaGain_Db(double gain_Db)
 {
-  NS_LOG_FUNCTION (this << gain_Db);
+    NS_LOG_FUNCTION(this << gain_Db);
 
-  m_maxAntennaGain = SatUtils::DbWToW (gain_Db);
+    m_maxAntennaGain = SatUtils::DbWToW(gain_Db);
 }
 
 double
-SatPhyRx::GetAntennaGain (Ptr<MobilityModel> mobility)
+SatPhyRx::GetAntennaGain(Ptr<MobilityModel> mobility)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  double gain_W (m_maxAntennaGain);
+    double gain_W(m_maxAntennaGain);
 
-  // Get the receive antenna gain at the transmitter position.
-  // E.g. UT transmits to the satellite receiver.
-  if (m_antennaGainPattern)
+    // Get the receive antenna gain at the transmitter position.
+    // E.g. UT transmits to the satellite receiver.
+    if (m_antennaGainPattern)
     {
-      Ptr<SatMobilityModel> m = DynamicCast<SatMobilityModel> (mobility);
-      gain_W = m_antennaGainPattern->GetAntennaGain_lin (m->GetGeoPosition (), m_satMobility);
+        Ptr<SatMobilityModel> m = DynamicCast<SatMobilityModel>(mobility);
+        gain_W = m_antennaGainPattern->GetAntennaGain_lin(m->GetGeoPosition(), m_satMobility);
     }
 
-  /**
-   * If antenna gain pattern is not set, we use the
-   * set maximum antenna gain.
-   */
+    /**
+     * If antenna gain pattern is not set, we use the
+     * set maximum antenna gain.
+     */
 
-  return gain_W;
+    return gain_W;
 }
 
 void
-SatPhyRx::SetDefaultFadingValue (double fadingValue)
+SatPhyRx::SetDefaultFadingValue(double fadingValue)
 {
-  NS_LOG_FUNCTION (this << fadingValue);
-  m_defaultFadingValue = fadingValue;
+    NS_LOG_FUNCTION(this << fadingValue);
+    m_defaultFadingValue = fadingValue;
 }
 
 double
-SatPhyRx::GetFadingValue (Address macAddress, SatEnums::ChannelType_t channelType)
+SatPhyRx::GetFadingValue(Address macAddress, SatEnums::ChannelType_t channelType)
 {
-  NS_LOG_FUNCTION (this << macAddress << channelType);
+    NS_LOG_FUNCTION(this << macAddress << channelType);
 
-  double fadingValue = m_defaultFadingValue;
+    double fadingValue = m_defaultFadingValue;
 
-  if (m_fadingContainer)
+    if (m_fadingContainer)
     {
-      fadingValue = m_fadingContainer->GetFading (macAddress, channelType);
+        fadingValue = m_fadingContainer->GetFading(macAddress, channelType);
     }
-  // Returns value 1 if fading is not set, as fading value is used as multiplier
-  return fadingValue;
+    // Returns value 1 if fading is not set, as fading value is used as multiplier
+    return fadingValue;
 }
 
 void
-SatPhyRx::SetFadingContainer (Ptr<SatBaseFading> fadingContainer)
+SatPhyRx::SetFadingContainer(Ptr<SatBaseFading> fadingContainer)
 {
-  NS_LOG_FUNCTION (this);
-  NS_ASSERT (m_fadingContainer == nullptr);
+    NS_LOG_FUNCTION(this);
+    NS_ASSERT(m_fadingContainer == nullptr);
 
-  m_fadingContainer = fadingContainer;
+    m_fadingContainer = fadingContainer;
 }
 
 void
-SatPhyRx::SetAntennaLoss_Db (double gain_Db)
+SatPhyRx::SetAntennaLoss_Db(double gain_Db)
 {
-  NS_LOG_FUNCTION (this << gain_Db);
+    NS_LOG_FUNCTION(this << gain_Db);
 
-  m_antennaLoss = SatUtils::DbToLinear (gain_Db);
+    m_antennaLoss = SatUtils::DbToLinear(gain_Db);
 }
 
 double
-SatPhyRx::GetLosses ()
+SatPhyRx::GetLosses()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return m_antennaLoss;
+    return m_antennaLoss;
 }
 
 Mac48Address
-SatPhyRx::GetAddress () const
+SatPhyRx::GetAddress() const
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return m_macAddress;
+    return m_macAddress;
 }
 
 void
-SatPhyRx::SetNodeInfo (const Ptr<SatNodeInfo> nodeInfo)
+SatPhyRx::SetNodeInfo(const Ptr<SatNodeInfo> nodeInfo)
 {
-  NS_LOG_FUNCTION (this << nodeInfo->GetNodeId ());
+    NS_LOG_FUNCTION(this << nodeInfo->GetNodeId());
 
-  m_macAddress = nodeInfo->GetMacAddress ();
+    m_macAddress = nodeInfo->GetMacAddress();
 
-  for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin ();
-       it != m_rxCarriers.end ();
-       ++it)
+    for (std::vector<Ptr<SatPhyRxCarrier>>::iterator it = m_rxCarriers.begin();
+         it != m_rxCarriers.end();
+         ++it)
     {
-      (*it)->SetNodeInfo (nodeInfo);
+        (*it)->SetNodeInfo(nodeInfo);
     }
 }
 
 void
-SatPhyRx::BeginEndScheduling ()
+SatPhyRx::BeginEndScheduling()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin ();
-       it != m_rxCarriers.end ();
-       ++it)
+    for (std::vector<Ptr<SatPhyRxCarrier>>::iterator it = m_rxCarriers.begin();
+         it != m_rxCarriers.end();
+         ++it)
     {
-      (*it)->BeginEndScheduling ();
+        (*it)->BeginEndScheduling();
     }
 }
 
 void
-SatPhyRx::SetReceiveCallback (SatPhyRx::ReceiveCallback cb)
+SatPhyRx::SetReceiveCallback(SatPhyRx::ReceiveCallback cb)
 {
-  NS_LOG_FUNCTION (this);
-  NS_ASSERT (!m_rxCarriers.empty ());
+    NS_LOG_FUNCTION(this);
+    NS_ASSERT(!m_rxCarriers.empty());
 
-  for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin ();
-       it != m_rxCarriers.end ();
-       ++it)
+    for (std::vector<Ptr<SatPhyRxCarrier>>::iterator it = m_rxCarriers.begin();
+         it != m_rxCarriers.end();
+         ++it)
     {
-      (*it)->SetReceiveCb (cb);
+        (*it)->SetReceiveCb(cb);
     }
 }
 
 void
-SatPhyRx::SetCnoCallback (SatPhyRx::CnoCallback cb)
+SatPhyRx::SetCnoCallback(SatPhyRx::CnoCallback cb)
 {
-  NS_LOG_FUNCTION (this << &cb);
-  NS_ASSERT (!m_rxCarriers.empty ());
+    NS_LOG_FUNCTION(this << &cb);
+    NS_ASSERT(!m_rxCarriers.empty());
 
-  for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin ();
-       it != m_rxCarriers.end ();
-       ++it)
+    for (std::vector<Ptr<SatPhyRxCarrier>>::iterator it = m_rxCarriers.begin();
+         it != m_rxCarriers.end();
+         ++it)
     {
-      (*it)->SetCnoCb (cb);
+        (*it)->SetCnoCb(cb);
     }
 }
 
 void
-SatPhyRx::SetAverageNormalizedOfferedLoadCallback (SatPhyRx::AverageNormalizedOfferedLoadCallback cb)
+SatPhyRx::SetAverageNormalizedOfferedLoadCallback(SatPhyRx::AverageNormalizedOfferedLoadCallback cb)
 {
-  NS_LOG_FUNCTION (this << &cb);
-  NS_ASSERT (!m_rxCarriers.empty ());
+    NS_LOG_FUNCTION(this << &cb);
+    NS_ASSERT(!m_rxCarriers.empty());
 
-  for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin ();
-       it != m_rxCarriers.end ();
-       ++it)
+    for (std::vector<Ptr<SatPhyRxCarrier>>::iterator it = m_rxCarriers.begin();
+         it != m_rxCarriers.end();
+         ++it)
     {
-      (*it)->SetAverageNormalizedOfferedLoadCallback (cb);
+        (*it)->SetAverageNormalizedOfferedLoadCallback(cb);
     }
 }
 
 Ptr<MobilityModel>
-SatPhyRx::GetMobility ()
+SatPhyRx::GetMobility()
 {
-  NS_LOG_FUNCTION (this);
-  NS_ASSERT (m_mobility != nullptr);
+    NS_LOG_FUNCTION(this);
+    NS_ASSERT(m_mobility != nullptr);
 
-  return m_mobility;
+    return m_mobility;
 }
 
 void
-SatPhyRx::SetMobility (Ptr<MobilityModel> m)
+SatPhyRx::SetMobility(Ptr<MobilityModel> m)
 {
-  NS_LOG_FUNCTION (this << m);
-  m_mobility = m;
+    NS_LOG_FUNCTION(this << m);
+    m_mobility = m;
 }
 
 void
-SatPhyRx::SetAntennaGainPattern (Ptr<SatAntennaGainPattern> agp, Ptr<SatMobilityModel> mobility)
+SatPhyRx::SetAntennaGainPattern(Ptr<SatAntennaGainPattern> agp, Ptr<SatMobilityModel> mobility)
 {
-  NS_LOG_FUNCTION (this << agp);
-  NS_ASSERT (m_antennaGainPattern == nullptr);
+    NS_LOG_FUNCTION(this << agp);
+    NS_ASSERT(m_antennaGainPattern == nullptr);
 
-  m_antennaGainPattern = agp;
-  m_satMobility = mobility;
+    m_antennaGainPattern = agp;
+    m_satMobility = mobility;
 }
 
 void
-SatPhyRx::ConfigurePhyRxCarriers (Ptr<SatPhyRxCarrierConf> carrierConf, Ptr<SatSuperframeConf> superFrameConf)
+SatPhyRx::ConfigurePhyRxCarriers(Ptr<SatPhyRxCarrierConf> carrierConf,
+                                 Ptr<SatSuperframeConf> superFrameConf)
 {
-  NS_LOG_FUNCTION (this);
-  NS_ASSERT (m_rxCarriers.empty ());
+    NS_LOG_FUNCTION(this);
+    NS_ASSERT(m_rxCarriers.empty());
 
-  Ptr<SatPhyRxCarrier> rxc (nullptr);
-  bool isRandomAccessCarrier (false);
+    Ptr<SatPhyRxCarrier> rxc(nullptr);
+    bool isRandomAccessCarrier(false);
 
-  SatEnums::RandomAccessModel_t raModel = carrierConf->GetRandomAccessModel ();
-  SatEnums::RegenerationMode_t regenerationMode = carrierConf->GetLinkRegenerationMode ();
+    SatEnums::RandomAccessModel_t raModel = carrierConf->GetRandomAccessModel();
+    SatEnums::RegenerationMode_t regenerationMode = carrierConf->GetLinkRegenerationMode();
 
-  for (uint32_t i = 0; i < carrierConf->GetCarrierCount (); ++i)
+    for (uint32_t i = 0; i < carrierConf->GetCarrierCount(); ++i)
     {
-      NS_LOG_INFO (this << " Create carrier: " << i);
-      Ptr<SatWaveformConf> waveformConf = superFrameConf->GetCarrierFrameConf (i)->GetWaveformConf ();
+        NS_LOG_INFO(this << " Create carrier: " << i);
+        Ptr<SatWaveformConf> waveformConf =
+            superFrameConf->GetCarrierFrameConf(i)->GetWaveformConf();
 
-      if (regenerationMode == SatEnums::TRANSPARENT)
+        if (regenerationMode == SatEnums::TRANSPARENT)
         {
-          switch (carrierConf->GetChannelType ())
+            switch (carrierConf->GetChannelType())
             {
-            case SatEnums::FORWARD_FEEDER_CH:
-              {
+            case SatEnums::FORWARD_FEEDER_CH: {
                 // Satellite is the receiver in feeder uplink
-                rxc = CreateObject<SatPhyRxCarrierUplink> (i, carrierConf, waveformConf, false);
+                rxc = CreateObject<SatPhyRxCarrierUplink>(i, carrierConf, waveformConf, false);
                 break;
-              }
-            case SatEnums::FORWARD_USER_CH:
-              {
+            }
+            case SatEnums::FORWARD_USER_CH: {
                 // UT has only per slot non-random access carriers
-                rxc = CreateObject<SatPhyRxCarrierPerSlot> (i, carrierConf, waveformConf, false);
+                rxc = CreateObject<SatPhyRxCarrierPerSlot>(i, carrierConf, waveformConf, false);
                 break;
-              }
-            case SatEnums::RETURN_USER_CH:
-              {
-                isRandomAccessCarrier = superFrameConf->IsRandomAccessCarrier (i);
+            }
+            case SatEnums::RETURN_USER_CH: {
+                isRandomAccessCarrier = superFrameConf->IsRandomAccessCarrier(i);
 
                 // Satellite is the receiver in either user or feeder uplink
-                rxc = CreateObject<SatPhyRxCarrierUplink> (i, carrierConf, waveformConf, isRandomAccessCarrier);
+                rxc = CreateObject<SatPhyRxCarrierUplink>(i,
+                                                          carrierConf,
+                                                          waveformConf,
+                                                          isRandomAccessCarrier);
                 break;
-              }
-            case SatEnums::RETURN_FEEDER_CH:
-              {
-                isRandomAccessCarrier = superFrameConf->IsRandomAccessCarrier (i);
+            }
+            case SatEnums::RETURN_FEEDER_CH: {
+                isRandomAccessCarrier = superFrameConf->IsRandomAccessCarrier(i);
 
                 // DA carrier
                 if (!isRandomAccessCarrier)
-                  {
-                    rxc = CreateObject<SatPhyRxCarrierPerSlot> (i, carrierConf, waveformConf, false);
-                  }
+                {
+                    rxc = CreateObject<SatPhyRxCarrierPerSlot>(i, carrierConf, waveformConf, false);
+                }
                 // RA slotted aloha
                 else if (raModel == SatEnums::RA_MODEL_SLOTTED_ALOHA)
-                  {
-                    rxc = CreateObject<SatPhyRxCarrierPerSlot> (i, carrierConf, waveformConf, true);
-                    DynamicCast<SatPhyRxCarrierPerSlot> (rxc)->
-                    SetRandomAccessAllocationChannelId (superFrameConf->GetRaChannel (i));
-                  }
+                {
+                    rxc = CreateObject<SatPhyRxCarrierPerSlot>(i, carrierConf, waveformConf, true);
+                    DynamicCast<SatPhyRxCarrierPerSlot>(rxc)->SetRandomAccessAllocationChannelId(
+                        superFrameConf->GetRaChannel(i));
+                }
                 // Note, that random access model of DVB-RCS2 specification may be configured
                 // to be either slotted ALOHA and CRDSA (wit no of unique payloads attribute).
                 // Here we make a short-cut such that the RCS2_SPECIFICATION random access
                 // always uses the CRDSA frame type receiver.
-                else if (raModel == SatEnums::RA_MODEL_CRDSA || raModel == SatEnums::RA_MODEL_RCS2_SPECIFICATION)
-                  {
-                    rxc = CreateObject<SatPhyRxCarrierPerFrame> (i, carrierConf, waveformConf, true);
-                    DynamicCast<SatPhyRxCarrierPerSlot> (rxc)->
-                    SetRandomAccessAllocationChannelId (superFrameConf->GetRaChannel (i));
-                  }
+                else if (raModel == SatEnums::RA_MODEL_CRDSA ||
+                         raModel == SatEnums::RA_MODEL_RCS2_SPECIFICATION)
+                {
+                    rxc = CreateObject<SatPhyRxCarrierPerFrame>(i, carrierConf, waveformConf, true);
+                    DynamicCast<SatPhyRxCarrierPerSlot>(rxc)->SetRandomAccessAllocationChannelId(
+                        superFrameConf->GetRaChannel(i));
+                }
                 else if (raModel == SatEnums::RA_MODEL_MARSALA)
-                  {
-                    rxc = CreateObject<SatPhyRxCarrierMarsala> (i, carrierConf, waveformConf, true);
-                    DynamicCast<SatPhyRxCarrierPerSlot> (rxc)->
-                    SetRandomAccessAllocationChannelId (superFrameConf->GetRaChannel (i));
-                  }
+                {
+                    rxc = CreateObject<SatPhyRxCarrierMarsala>(i, carrierConf, waveformConf, true);
+                    DynamicCast<SatPhyRxCarrierPerSlot>(rxc)->SetRandomAccessAllocationChannelId(
+                        superFrameConf->GetRaChannel(i));
+                }
                 else if (raModel == SatEnums::RA_MODEL_ESSA)
-                  {
-                    rxc = CreateObject<SatPhyRxCarrierPerWindow> (i, carrierConf, waveformConf, true);
-                    DynamicCast<SatPhyRxCarrierPerSlot> (rxc)->
-                    SetRandomAccessAllocationChannelId (superFrameConf->GetRaChannel (i));
-                  }
+                {
+                    rxc =
+                        CreateObject<SatPhyRxCarrierPerWindow>(i, carrierConf, waveformConf, true);
+                    DynamicCast<SatPhyRxCarrierPerSlot>(rxc)->SetRandomAccessAllocationChannelId(
+                        superFrameConf->GetRaChannel(i));
+                }
                 break;
-              }
+            }
             case SatEnums::UNKNOWN_CH:
-            default:
-              {
-                NS_FATAL_ERROR ("SatPhyRx::ConfigurePhyRxCarriers - Invalid channel type!");
-              }
+            default: {
+                NS_FATAL_ERROR("SatPhyRx::ConfigurePhyRxCarriers - Invalid channel type!");
+            }
             }
         }
-      else if (regenerationMode == SatEnums::REGENERATION_PHY
-            || regenerationMode == SatEnums::REGENERATION_LINK
-            || regenerationMode == SatEnums::REGENERATION_NETWORK)
+        else if (regenerationMode == SatEnums::REGENERATION_PHY ||
+                 regenerationMode == SatEnums::REGENERATION_LINK ||
+                 regenerationMode == SatEnums::REGENERATION_NETWORK)
         {
-          switch (carrierConf->GetChannelType ())
+            switch (carrierConf->GetChannelType())
             {
-            case SatEnums::FORWARD_FEEDER_CH:
-              {
+            case SatEnums::FORWARD_FEEDER_CH: {
                 // Satellite is the receiver in feeder uplink
-                rxc = CreateObject<SatPhyRxCarrierPerSlot> (i, carrierConf, waveformConf, false);
+                rxc = CreateObject<SatPhyRxCarrierPerSlot>(i, carrierConf, waveformConf, false);
                 break;
-              }
-            case SatEnums::FORWARD_USER_CH:
-              {
+            }
+            case SatEnums::FORWARD_USER_CH: {
                 // UT has only per slot non-random access carriers
-                rxc = CreateObject<SatPhyRxCarrierPerSlot> (i, carrierConf, waveformConf, false);
+                rxc = CreateObject<SatPhyRxCarrierPerSlot>(i, carrierConf, waveformConf, false);
                 break;
-              }
-            case SatEnums::RETURN_USER_CH:
-              {
-                isRandomAccessCarrier = superFrameConf->IsRandomAccessCarrier (i);
+            }
+            case SatEnums::RETURN_USER_CH: {
+                isRandomAccessCarrier = superFrameConf->IsRandomAccessCarrier(i);
 
                 // DA carrier
                 if (!isRandomAccessCarrier)
-                  {
-                    rxc = CreateObject<SatPhyRxCarrierPerSlot> (i, carrierConf, waveformConf, false);
-                  }
+                {
+                    rxc = CreateObject<SatPhyRxCarrierPerSlot>(i, carrierConf, waveformConf, false);
+                }
                 // RA slotted aloha
                 else if (raModel == SatEnums::RA_MODEL_SLOTTED_ALOHA)
-                  {
-                    rxc = CreateObject<SatPhyRxCarrierPerSlot> (i, carrierConf, waveformConf, true);
-                    DynamicCast<SatPhyRxCarrierPerSlot> (rxc)->
-                    SetRandomAccessAllocationChannelId (superFrameConf->GetRaChannel (i));
-                  }
+                {
+                    rxc = CreateObject<SatPhyRxCarrierPerSlot>(i, carrierConf, waveformConf, true);
+                    DynamicCast<SatPhyRxCarrierPerSlot>(rxc)->SetRandomAccessAllocationChannelId(
+                        superFrameConf->GetRaChannel(i));
+                }
                 // Note, that random access model of DVB-RCS2 specification may be configured
                 // to be either slotted ALOHA and CRDSA (wit no of unique payloads attribute).
                 // Here we make a short-cut such that the RCS2_SPECIFICATION random access
                 // always uses the CRDSA frame type receiver.
-                else if (raModel == SatEnums::RA_MODEL_CRDSA || raModel == SatEnums::RA_MODEL_RCS2_SPECIFICATION)
-                  {
-                    rxc = CreateObject<SatPhyRxCarrierPerFrame> (i, carrierConf, waveformConf, true);
-                    DynamicCast<SatPhyRxCarrierPerSlot> (rxc)->
-                    SetRandomAccessAllocationChannelId (superFrameConf->GetRaChannel (i));
-                  }
+                else if (raModel == SatEnums::RA_MODEL_CRDSA ||
+                         raModel == SatEnums::RA_MODEL_RCS2_SPECIFICATION)
+                {
+                    rxc = CreateObject<SatPhyRxCarrierPerFrame>(i, carrierConf, waveformConf, true);
+                    DynamicCast<SatPhyRxCarrierPerSlot>(rxc)->SetRandomAccessAllocationChannelId(
+                        superFrameConf->GetRaChannel(i));
+                }
                 else if (raModel == SatEnums::RA_MODEL_MARSALA)
-                  {
-                    rxc = CreateObject<SatPhyRxCarrierMarsala> (i, carrierConf, waveformConf, true);
-                    DynamicCast<SatPhyRxCarrierPerSlot> (rxc)->
-                    SetRandomAccessAllocationChannelId (superFrameConf->GetRaChannel (i));
-                  }
+                {
+                    rxc = CreateObject<SatPhyRxCarrierMarsala>(i, carrierConf, waveformConf, true);
+                    DynamicCast<SatPhyRxCarrierPerSlot>(rxc)->SetRandomAccessAllocationChannelId(
+                        superFrameConf->GetRaChannel(i));
+                }
                 else if (raModel == SatEnums::RA_MODEL_ESSA)
-                  {
-                    rxc = CreateObject<SatPhyRxCarrierPerWindow> (i, carrierConf, waveformConf, true);
-                    DynamicCast<SatPhyRxCarrierPerSlot> (rxc)->
-                    SetRandomAccessAllocationChannelId (superFrameConf->GetRaChannel (i));
-                  }
+                {
+                    rxc =
+                        CreateObject<SatPhyRxCarrierPerWindow>(i, carrierConf, waveformConf, true);
+                    DynamicCast<SatPhyRxCarrierPerSlot>(rxc)->SetRandomAccessAllocationChannelId(
+                        superFrameConf->GetRaChannel(i));
+                }
                 break;
-              }
-            case SatEnums::RETURN_FEEDER_CH:
-              {
-                rxc = CreateObject<SatPhyRxCarrierPerSlot> (i, carrierConf, waveformConf, false);
+            }
+            case SatEnums::RETURN_FEEDER_CH: {
+                rxc = CreateObject<SatPhyRxCarrierPerSlot>(i, carrierConf, waveformConf, false);
                 break;
-              }
+            }
             case SatEnums::UNKNOWN_CH:
-            default:
-              {
-                NS_FATAL_ERROR ("SatPhyRx::ConfigurePhyRxCarriers - Invalid channel type!");
-              }
+            default: {
+                NS_FATAL_ERROR("SatPhyRx::ConfigurePhyRxCarriers - Invalid channel type!");
+            }
             }
         }
-      else
+        else
         {
-          NS_FATAL_ERROR ("SatPhyRx::ConfigurePhyRxCarriers - Unknown RX mode!");
+            NS_FATAL_ERROR("SatPhyRx::ConfigurePhyRxCarriers - Unknown RX mode!");
         }
 
-      NS_LOG_INFO (this << " added carrier " << rxc << " on channel " << carrierConf->GetChannelType () << " being random access " << superFrameConf->IsRandomAccessCarrier(i));
-      m_rxCarriers.push_back (rxc);
+        NS_LOG_INFO(this << " added carrier " << rxc << " on channel "
+                         << carrierConf->GetChannelType() << " being random access "
+                         << superFrameConf->IsRandomAccessCarrier(i));
+        m_rxCarriers.push_back(rxc);
     }
 }
 
 void
-SatPhyRx::SetSatId (uint32_t satId)
+SatPhyRx::SetSatId(uint32_t satId)
 {
-  NS_LOG_FUNCTION (this << satId);
-  NS_ASSERT (satId >= 0);
-  NS_ASSERT (!m_rxCarriers.empty ());
+    NS_LOG_FUNCTION(this << satId);
+    NS_ASSERT(satId >= 0);
+    NS_ASSERT(!m_rxCarriers.empty());
 
-  m_satId = satId;
+    m_satId = satId;
 
-  for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin (); it != m_rxCarriers.end (); ++it)
+    for (std::vector<Ptr<SatPhyRxCarrier>>::iterator it = m_rxCarriers.begin();
+         it != m_rxCarriers.end();
+         ++it)
     {
-      (*it)->SetSatId (satId);
+        (*it)->SetSatId(satId);
     }
 }
 
 uint32_t
-SatPhyRx::GetSatId () const
+SatPhyRx::GetSatId() const
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return m_satId;
+    return m_satId;
 }
 
 void
-SatPhyRx::SetBeamId (uint32_t beamId)
+SatPhyRx::SetBeamId(uint32_t beamId)
 {
-  NS_LOG_FUNCTION (this << beamId);
-  NS_ASSERT (beamId >= 0);
-  NS_ASSERT (!m_rxCarriers.empty ());
+    NS_LOG_FUNCTION(this << beamId);
+    NS_ASSERT(beamId >= 0);
+    NS_ASSERT(!m_rxCarriers.empty());
 
-  m_beamId = beamId;
+    m_beamId = beamId;
 
-  for (std::vector< Ptr<SatPhyRxCarrier> >::iterator it = m_rxCarriers.begin (); it != m_rxCarriers.end (); ++it)
+    for (std::vector<Ptr<SatPhyRxCarrier>>::iterator it = m_rxCarriers.begin();
+         it != m_rxCarriers.end();
+         ++it)
     {
-      (*it)->SetBeamId (beamId);
+        (*it)->SetBeamId(beamId);
     }
 }
 
 uint32_t
-SatPhyRx::GetBeamId () const
+SatPhyRx::GetBeamId() const
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return m_beamId;
+    return m_beamId;
 }
 
 double
-SatPhyRx::GetRxTemperatureK (Ptr<SatSignalParameters> rxParams)
+SatPhyRx::GetRxTemperatureK(Ptr<SatSignalParameters> rxParams)
 {
-  NS_LOG_FUNCTION (this << rxParams);
+    NS_LOG_FUNCTION(this << rxParams);
 
-  uint32_t cId = rxParams->m_carrierId;
+    uint32_t cId = rxParams->m_carrierId;
 
-  if (cId >= m_rxCarriers.size ())
+    if (cId >= m_rxCarriers.size())
     {
-      NS_FATAL_ERROR ("SatPhyRx::GetRxTemperatureK - unvalid carrier id: " << cId);
+        NS_FATAL_ERROR("SatPhyRx::GetRxTemperatureK - unvalid carrier id: " << cId);
     }
 
-  return m_rxCarriers[cId]->GetRxTemperatureK ();
+    return m_rxCarriers[cId]->GetRxTemperatureK();
 }
 
 void
-SatPhyRx::StartRx (Ptr<SatSignalParameters> rxParams)
+SatPhyRx::StartRx(Ptr<SatSignalParameters> rxParams)
 {
-  NS_LOG_FUNCTION (this << rxParams);
+    NS_LOG_FUNCTION(this << rxParams);
 
-  uint32_t cId = rxParams->m_carrierId;
+    uint32_t cId = rxParams->m_carrierId;
 
-  if (cId >= m_rxCarriers.size ())
+    if (cId >= m_rxCarriers.size())
     {
-      NS_FATAL_ERROR ("SatPhyRx::StartRx - unvalid carrier id: " << cId);
+        NS_FATAL_ERROR("SatPhyRx::StartRx - unvalid carrier id: " << cId);
     }
 
-  m_rxCarriers[cId]->StartRx (rxParams);
+    m_rxCarriers[cId]->StartRx(rxParams);
 }
 
 } // namespace ns3

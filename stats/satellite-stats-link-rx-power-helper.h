@@ -22,20 +22,20 @@
 #ifndef SATELLITE_STATS_LINK_RX_POWER_HELPER_H
 #define SATELLITE_STATS_LINK_RX_POWER_HELPER_H
 
-#include <ns3/satellite-stats-helper.h>
-#include <ns3/ptr.h>
 #include <ns3/callback.h>
 #include <ns3/collector-map.h>
+#include <ns3/ptr.h>
+#include <ns3/satellite-stats-helper.h>
 
-
-namespace ns3 {
-
+namespace ns3
+{
 
 // BASE CLASS /////////////////////////////////////////////////////////////////
 
 class SatHelper;
 class Node;
 class DataCollectionObject;
+class DistributionCollector;
 
 /**
  * \ingroup satstats
@@ -43,104 +43,101 @@ class DataCollectionObject;
  */
 class SatStatsLinkRxPowerHelper : public SatStatsHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsLinkRxPowerHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsLinkRxPowerHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsLinkRxPowerHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsLinkRxPowerHelper ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
+    /**
+     * \param averagingMode average all samples before passing them to aggregator.
+     */
+    void SetAveragingMode(bool averagingMode);
 
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
+    /**
+     * \brief Set up several probes or other means of listeners and connect them
+     *        to the collectors.
+     */
+    void InstallProbes();
 
-  /**
-   * \param averagingMode average all samples before passing them to aggregator.
-   */
-  void SetAveragingMode (bool averagingMode);
+    /**
+     * \brief Receive inputs from trace sources and forward them to the collector.
+     * \param rxPowerDb RX power value in dB.
+     * \param addr Address of UT
+     */
+    void RxPowerCallback(double rxPowerDb, const Address& addr);
 
-  /**
-   * \brief Set up several probes or other means of listeners and connect them
-   *        to the collectors.
-   */
-  void InstallProbes ();
+    /**
+     * \return
+     */
+    Callback<void, double, const Address&> GetTraceSinkCallback() const;
 
-  /**
-   * \brief Receive inputs from trace sources and forward them to the collector.
-   * \param rxPowerDb RX power value in dB.
-   * \param addr Address of UT
-   */
-  void RxPowerCallback (double rxPowerDb, const Address & addr);
+  protected:
+    // inherited from SatStatsHelper base class
+    void DoInstall();
 
-  /**
-   * \return
-   */
-  Callback<void, double, const Address &> GetTraceSinkCallback () const;
+    /**
+     * \brief
+     */
+    virtual void DoInstallProbes() = 0;
 
-protected:
-  // inherited from SatStatsHelper base class
-  void DoInstall ();
+    /**
+     * \brief Save the address and the proper identifier from the given UT node.
+     * \param utNode a UT node.
+     *
+     * The address of the given node will be saved in the #m_identifierMap
+     * member variable.
+     *
+     * Used in return link statistics. DoInstallProbes() is expected to pass the
+     * the UT node of interest into this method.
+     */
+    void SaveAddressAndIdentifier(Ptr<Node> utNode);
 
-  /**
-   * \brief
-   */
-  virtual void DoInstallProbes () = 0;
+    /**
+     * \brief Connect the probe to the right collector.
+     * \param probe
+     * \param identifier
+     */
+    bool ConnectProbeToCollector(Ptr<Probe> probe, uint32_t identifier);
 
-  /**
-   * \brief Save the address and the proper identifier from the given UT node.
-   * \param utNode a UT node.
-   *
-   * The address of the given node will be saved in the #m_identifierMap
-   * member variable.
-   *
-   * Used in return link statistics. DoInstallProbes() is expected to pass the
-   * the UT node of interest into this method.
-   */
-  void SaveAddressAndIdentifier (Ptr<Node> utNode);
+    /**
+     * \brief Find a collector with the right identifier and pass a sample data
+     *        to it.
+     * \param rxPowerDb
+     * \param identifier
+     */
+    void PassSampleToCollector(double rxPowerDb, uint32_t identifier);
 
-  /**
-   * \brief Connect the probe to the right collector.
-   * \param probe
-   * \param identifier
-   */
-  bool ConnectProbeToCollector (Ptr<Probe> probe, uint32_t identifier);
+    /// Maintains a list of collectors created by this helper.
+    CollectorMap m_terminalCollectors;
 
-  /**
-   * \brief Find a collector with the right identifier and pass a sample data
-   *        to it.
-   * \param rxPowerDb
-   * \param identifier
-   */
-  void PassSampleToCollector (double rxPowerDb, uint32_t identifier);
+    /// The collector created by this helper.
+    Ptr<DataCollectionObject> m_collector;
 
-  /// Maintains a list of collectors created by this helper.
-  CollectorMap m_terminalCollectors;
+    /// The aggregator created by this helper.
+    Ptr<DataCollectionObject> m_aggregator;
 
-  /// The collector created by this helper.
-  Ptr<DataCollectionObject> m_collector;
+    /// The final collector utilized in averaged output (histogram, PDF, and CDF).
+    Ptr<DistributionCollector> m_averagingCollector;
 
-  /// The aggregator created by this helper.
-  Ptr<DataCollectionObject> m_aggregator;
+    /// Map of address and the identifier associated with it (for return link).
+    std::map<const Address, uint32_t> m_identifierMap;
 
-  /// The final collector utilized in averaged output (histogram, PDF, and CDF).
-  Ptr<DistributionCollector> m_averagingCollector;
+  private:
+    ///
+    Callback<void, double, const Address&> m_traceSinkCallback;
 
-  /// Map of address and the identifier associated with it (for return link).
-  std::map<const Address, uint32_t> m_identifierMap;
-
-private:
-  ///
-  Callback<void, double, const Address &> m_traceSinkCallback;
-
-  bool m_averagingMode;  ///< `AveragingMode` attribute.
+    bool m_averagingMode; ///< `AveragingMode` attribute.
 
 }; // end of class SatStatsLinkRxPowerHelper
-
 
 // FORWARD FEEDER LINK ////////////////////////////////////////////////////////
 
@@ -154,36 +151,32 @@ private:
  *
  * Otherwise, the following example can be used:
  * \code
- * Ptr<SatStatsFwdFeederLinkRxPowerHelper> s = Create<SatStatsFwdFeederLinkRxPowerHelper> (satHelper);
- * s->SetName ("name");
- * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
+ * Ptr<SatStatsFwdFeederLinkRxPowerHelper> s = Create<SatStatsFwdFeederLinkRxPowerHelper>
+ * (satHelper); s->SetName ("name"); s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
  * \endcode
  */
 class SatStatsFwdFeederLinkRxPowerHelper : public SatStatsLinkRxPowerHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsFwdFeederLinkRxPowerHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsFwdFeederLinkRxPowerHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsFwdFeederLinkRxPowerHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsFwdFeederLinkRxPowerHelper ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
-
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
-
-protected:
-  // inherited from SatStatsLinkRxPowerHelper base class
-  void DoInstallProbes ();
+  protected:
+    // inherited from SatStatsLinkRxPowerHelper base class
+    void DoInstallProbes();
 
 }; // end of class SatStatsFwdFeederLinkRxPowerHelper
-
 
 // FORWARD USER LINK //////////////////////////////////////////////////////////
 
@@ -205,28 +198,25 @@ protected:
  */
 class SatStatsFwdUserLinkRxPowerHelper : public SatStatsLinkRxPowerHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsFwdUserLinkRxPowerHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsFwdUserLinkRxPowerHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsFwdUserLinkRxPowerHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsFwdUserLinkRxPowerHelper ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
-
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
-
-protected:
-  // inherited from SatStatsLinkRxPowerHelper base class
-  void DoInstallProbes ();
+  protected:
+    // inherited from SatStatsLinkRxPowerHelper base class
+    void DoInstallProbes();
 
 }; // end of class SatStatsFwdUserLinkRxPowerHelper
-
 
 // RETURN FEEDER LINK /////////////////////////////////////////////////////////
 
@@ -240,36 +230,32 @@ protected:
  *
  * Otherwise, the following example can be used:
  * \code
- * Ptr<SatStatsRtnFeederLinkRxPowerHelper> s = Create<SatStatsRtnFeederLinkRxPowerHelper> (satHelper);
- * s->SetName ("name");
- * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
+ * Ptr<SatStatsRtnFeederLinkRxPowerHelper> s = Create<SatStatsRtnFeederLinkRxPowerHelper>
+ * (satHelper); s->SetName ("name"); s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
  * \endcode
  */
 class SatStatsRtnFeederLinkRxPowerHelper : public SatStatsLinkRxPowerHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsRtnFeederLinkRxPowerHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsRtnFeederLinkRxPowerHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsRtnFeederLinkRxPowerHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsRtnFeederLinkRxPowerHelper ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
-
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
-
-protected:
-  // inherited from SatStatsLinkRxPowerHelper base class
-  void DoInstallProbes ();
+  protected:
+    // inherited from SatStatsLinkRxPowerHelper base class
+    void DoInstallProbes();
 
 }; // end of class SatStatsRtnFeederLinkRxPowerHelper
-
 
 // RETURN USER LINK ///////////////////////////////////////////////////////////
 
@@ -291,30 +277,26 @@ protected:
  */
 class SatStatsRtnUserLinkRxPowerHelper : public SatStatsLinkRxPowerHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsRtnUserLinkRxPowerHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsRtnUserLinkRxPowerHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsRtnUserLinkRxPowerHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsRtnUserLinkRxPowerHelper ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
-
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
-
-protected:
-  // inherited from SatStatsLinkRxPowerHelper base class
-  void DoInstallProbes ();
+  protected:
+    // inherited from SatStatsLinkRxPowerHelper base class
+    void DoInstallProbes();
 
 }; // end of class SatStatsRtnUserLinkRxPowerHelper
 
-
 } // end of namespace ns3
-
 
 #endif /* SATELLITE_STATS_LINK_RX_POWER_HELPER_H */

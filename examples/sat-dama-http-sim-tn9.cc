@@ -19,13 +19,12 @@
  *
  */
 
-#include "ns3/core-module.h"
-#include "ns3/traffic-module.h"
-#include "ns3/network-module.h"
-#include "ns3/internet-module.h"
-#include "ns3/satellite-module.h"
 #include "ns3/config-store-module.h"
-
+#include "ns3/core-module.h"
+#include "ns3/internet-module.h"
+#include "ns3/network-module.h"
+#include "ns3/satellite-module.h"
+#include "ns3/traffic-module.h"
 
 using namespace ns3;
 
@@ -40,207 +39,212 @@ using namespace ns3;
  * execute command -> ./waf --run "sat-dama-http-sim-tn9 --PrintHelp"
  */
 
-NS_LOG_COMPONENT_DEFINE ("sat-dama-http-sim-tn9");
+NS_LOG_COMPONENT_DEFINE("sat-dama-http-sim-tn9");
 
 int
-main (int argc, char *argv[])
+main(int argc, char* argv[])
 {
-  // Spot-beam over Finland
-  uint32_t beamId = 18;
-  uint32_t endUsersPerUt (1);
-  uint32_t utsPerBeam (1);
-  uint32_t crTxConf (0);
+    // Spot-beam over Finland
+    uint32_t beamId = 18;
+    uint32_t endUsersPerUt(1);
+    uint32_t utsPerBeam(1);
+    uint32_t crTxConf(0);
 
-  double simLength (300.0); // in seconds
+    double simLength(300.0); // in seconds
 
-  /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+    /// Set simulation output details
+    Config::SetDefault("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue(true));
 
-  /// Enable packet trace
-  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("example-dama-http-sim-tn9");
+    /// Enable packet trace
+    Ptr<SimulationHelper> simulationHelper =
+        CreateObject<SimulationHelper>("example-dama-http-sim-tn9");
 
-  // To read attributes from file
-  std::string inputFileNameWithPath = Singleton<SatEnvVariables>::Get ()->LocateDirectory ("contrib/satellite/examples") + "/tn9-dama-input-attributes.xml";
+    // To read attributes from file
+    std::string inputFileNameWithPath =
+        Singleton<SatEnvVariables>::Get()->LocateDirectory("contrib/satellite/examples") +
+        "/tn9-dama-input-attributes.xml";
 
-  /**
-   * Attributes:
-   * -----------
-   *
-   * Scenario:
-   *   - 1 beam (beam id = 18)
-   *   - 1 UT
-   *
-   * Frame configuration (configured in tn9-dama-input-attributes.xml):
-   *   - 4 frames (13.75 MHz user bandwidth)
-   *     - 8 x 0.3125 MHz -> 2.5 MHz
-   *     - 8 x 0.625 MHz  -> 5 MHz
-   *     - 4 x 1.25 MHz   -> 5 MHz
-   *     - 1 x 1.25 MHz   -> 1.25 MHz
-   *
-   * NCC configuration mode:
-   *   - Conf-2 scheduling mode (dynamic time slots)
-   *   - FCA disabled
-   *
-   * CR transmission modes (selected from command line argument):
-   *   - RBDC + periodical control slots
-   *   - RBDC + slotted ALOHA
-   *   - RBDC + CDRSA (loose RC 0)
-   *
-   * RTN link
-   *   - Constant interference
-   *   - AVI error model
-   *   - ARQ disabled
-   * FWD link
-   *   - ACM disabled
-   *   - Constant interference
-   *   - No error model
-   *   - ARQ disabled
-   *
-   */
+    /**
+     * Attributes:
+     * -----------
+     *
+     * Scenario:
+     *   - 1 beam (beam id = 18)
+     *   - 1 UT
+     *
+     * Frame configuration (configured in tn9-dama-input-attributes.xml):
+     *   - 4 frames (13.75 MHz user bandwidth)
+     *     - 8 x 0.3125 MHz -> 2.5 MHz
+     *     - 8 x 0.625 MHz  -> 5 MHz
+     *     - 4 x 1.25 MHz   -> 5 MHz
+     *     - 1 x 1.25 MHz   -> 1.25 MHz
+     *
+     * NCC configuration mode:
+     *   - Conf-2 scheduling mode (dynamic time slots)
+     *   - FCA disabled
+     *
+     * CR transmission modes (selected from command line argument):
+     *   - RBDC + periodical control slots
+     *   - RBDC + slotted ALOHA
+     *   - RBDC + CDRSA (loose RC 0)
+     *
+     * RTN link
+     *   - Constant interference
+     *   - AVI error model
+     *   - ARQ disabled
+     * FWD link
+     *   - ACM disabled
+     *   - Constant interference
+     *   - No error model
+     *   - ARQ disabled
+     *
+     */
 
-  // read command line parameters given by user
-  CommandLine cmd;
-  cmd.AddValue ("simLength", "Simulation duration in seconds", simLength);
-  cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
-  cmd.AddValue ("crTxConf", "CR transmission configuration", crTxConf);
-  simulationHelper->AddDefaultUiArguments (cmd, inputFileNameWithPath);
-  cmd.Parse (argc, argv);
+    // read command line parameters given by user
+    CommandLine cmd;
+    cmd.AddValue("simLength", "Simulation duration in seconds", simLength);
+    cmd.AddValue("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
+    cmd.AddValue("crTxConf", "CR transmission configuration", crTxConf);
+    simulationHelper->AddDefaultUiArguments(cmd, inputFileNameWithPath);
+    cmd.Parse(argc, argv);
 
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (inputFileNameWithPath));
-  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Load"));
-  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
-  ConfigStore inputConfig;
-  inputConfig.ConfigureDefaults ();
+    Config::SetDefault("ns3::ConfigStore::Filename", StringValue(inputFileNameWithPath));
+    Config::SetDefault("ns3::ConfigStore::Mode", StringValue("Load"));
+    Config::SetDefault("ns3::ConfigStore::FileFormat", StringValue("Xml"));
+    ConfigStore inputConfig;
+    inputConfig.ConfigureDefaults();
 
-  simulationHelper->SetSimulationTime (simLength);
-  simulationHelper->SetUserCountPerUt (endUsersPerUt);
-  simulationHelper->SetUtCountPerBeam (utsPerBeam);
+    simulationHelper->SetSimulationTime(simLength);
+    simulationHelper->SetUserCountPerUt(endUsersPerUt);
+    simulationHelper->SetUtCountPerBeam(utsPerBeam);
 
-  // Set beam ID
-  std::stringstream beamsEnabled;
-  beamsEnabled << beamId;
-  simulationHelper->SetBeams (beamsEnabled.str ());
+    // Set beam ID
+    std::stringstream beamsEnabled;
+    beamsEnabled << beamId;
+    simulationHelper->SetBeams(beamsEnabled.str());
 
-  // NCC configuration
-  Config::SetDefault ("ns3::SatSuperframeConf0::FrameConfigType", StringValue ("ConfigType_2"));
-  Config::SetDefault ("ns3::SatWaveformConf::AcmEnabled", BooleanValue (true));
+    // NCC configuration
+    Config::SetDefault("ns3::SatSuperframeConf0::FrameConfigType", StringValue("ConfigType_2"));
+    Config::SetDefault("ns3::SatWaveformConf::AcmEnabled", BooleanValue(true));
 
-  // RBDC
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue (true));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_MinimumServiceRate", UintegerValue (16));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed", BooleanValue (false));
+    // RBDC
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::DaService3_ConstantAssignmentProvided",
+                       BooleanValue(false));
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue(true));
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::DaService3_MinimumServiceRate",
+                       UintegerValue(16));
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed",
+                       BooleanValue(false));
 
-  switch (crTxConf)
+    switch (crTxConf)
     {
     // Periodical control slots
-    case 0:
-      {
-        Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_OFF));
-        Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (true));
+    case 0: {
+        Config::SetDefault("ns3::SatBeamHelper::RandomAccessModel",
+                           EnumValue(SatEnums::RA_MODEL_OFF));
+        Config::SetDefault("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue(true));
         break;
-      }
+    }
     // Slotted ALOHA
-    case 1:
-      {
-        Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_SLOTTED_ALOHA));
-        Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (false));
+    case 1: {
+        Config::SetDefault("ns3::SatBeamHelper::RandomAccessModel",
+                           EnumValue(SatEnums::RA_MODEL_SLOTTED_ALOHA));
+        Config::SetDefault("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue(false));
         break;
-      }
+    }
     // CRDSA (loose RC 0)
-    case 2:
-      {
-        Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_CRDSA));
-        Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (false));
-        Config::SetDefault ("ns3::SatUtHelper::UseCrdsaOnlyForControlPackets", BooleanValue (false));
+    case 2: {
+        Config::SetDefault("ns3::SatBeamHelper::RandomAccessModel",
+                           EnumValue(SatEnums::RA_MODEL_CRDSA));
+        Config::SetDefault("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue(false));
+        Config::SetDefault("ns3::SatUtHelper::UseCrdsaOnlyForControlPackets", BooleanValue(false));
         break;
-      }
-    default:
-      {
-        NS_FATAL_ERROR ("Unsupported crTxConf: " << crTxConf);
+    }
+    default: {
+        NS_FATAL_ERROR("Unsupported crTxConf: " << crTxConf);
         break;
-      }
+    }
     }
 
-  // Creating the reference system. Note, currently the satellite module supports
-  // only one reference system, which is named as "Scenario72". The string is utilized
-  // in mapping the scenario to the needed reference system configuration files. Arbitrary
-  // scenario name results in fatal error.
-  simulationHelper->CreateSatScenario ();
+    // Creating the reference system. Note, currently the satellite module supports
+    // only one reference system, which is named as "Scenario72". The string is utilized
+    // in mapping the scenario to the needed reference system configuration files. Arbitrary
+    // scenario name results in fatal error.
+    simulationHelper->CreateSatScenario();
 
-  /**
-   * Set-up HTTP traffic
-   */
-  simulationHelper->InstallTrafficModel (
-    SimulationHelper::HTTP, SimulationHelper::TCP, SimulationHelper::FWD_LINK,
-    MilliSeconds (3));
+    /**
+     * Set-up HTTP traffic
+     */
+    simulationHelper->InstallTrafficModel(SimulationHelper::HTTP,
+                                          SimulationHelper::TCP,
+                                          SimulationHelper::FWD_LINK,
+                                          MilliSeconds(3));
 
-  /**
-   * Set-up statistics
-   */
-  Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer ();
+    /**
+     * Set-up statistics
+     */
+    Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer();
 
-  s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  s->AddPerBeamRtnAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerBeamRtnFeederDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerBeamRtnFeederMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerBeamRtnFeederPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+    s->AddPerBeamRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_PLOT);
+    s->AddPerBeamRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+    s->AddPerBeamRtnFeederDevThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+    s->AddPerBeamRtnFeederMacThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+    s->AddPerBeamRtnFeederPhyThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-  s->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddPerBeamRtnAppDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
-  s->AddPerBeamRtnDevDelay (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddPerBeamRtnDevDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
-  s->AddPerBeamRtnPhyDelay (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddPerBeamRtnPhyDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
+    s->AddPerBeamRtnAppDelay(SatStatsHelper::OUTPUT_CDF_FILE);
+    s->AddPerBeamRtnAppDelay(SatStatsHelper::OUTPUT_CDF_PLOT);
+    s->AddPerBeamRtnDevDelay(SatStatsHelper::OUTPUT_CDF_FILE);
+    s->AddPerBeamRtnDevDelay(SatStatsHelper::OUTPUT_CDF_PLOT);
+    s->AddPerBeamRtnPhyDelay(SatStatsHelper::OUTPUT_CDF_FILE);
+    s->AddPerBeamRtnPhyDelay(SatStatsHelper::OUTPUT_CDF_PLOT);
 
-  s->AddPerBeamFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_PLOT);
-  s->AddPerBeamFwdAppThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerBeamFwdUserDevThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerBeamFwdUserMacThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerBeamFwdUserPhyThroughput (SatStatsHelper::OUTPUT_SCALAR_FILE);
+    s->AddPerBeamFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_PLOT);
+    s->AddPerBeamFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+    s->AddPerBeamFwdUserDevThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+    s->AddPerBeamFwdUserMacThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+    s->AddPerBeamFwdUserPhyThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-  s->AddPerBeamFwdAppDelay (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddPerBeamFwdAppDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
-  s->AddPerBeamFwdDevDelay (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddPerBeamFwdDevDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
-  s->AddPerBeamFwdPhyDelay (SatStatsHelper::OUTPUT_CDF_FILE);
-  s->AddPerBeamFwdPhyDelay (SatStatsHelper::OUTPUT_CDF_PLOT);
+    s->AddPerBeamFwdAppDelay(SatStatsHelper::OUTPUT_CDF_FILE);
+    s->AddPerBeamFwdAppDelay(SatStatsHelper::OUTPUT_CDF_PLOT);
+    s->AddPerBeamFwdDevDelay(SatStatsHelper::OUTPUT_CDF_FILE);
+    s->AddPerBeamFwdDevDelay(SatStatsHelper::OUTPUT_CDF_PLOT);
+    s->AddPerBeamFwdPhyDelay(SatStatsHelper::OUTPUT_CDF_FILE);
+    s->AddPerBeamFwdPhyDelay(SatStatsHelper::OUTPUT_CDF_PLOT);
 
-  s->AddPerBeamRtnFeederDaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerBeamFrameSymbolLoad (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerBeamWaveformUsage (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerBeamCapacityRequest (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerBeamResourcesGranted (SatStatsHelper::OUTPUT_SCATTER_PLOT);
+    s->AddPerBeamRtnFeederDaPacketError(SatStatsHelper::OUTPUT_SCALAR_FILE);
+    s->AddPerBeamFrameSymbolLoad(SatStatsHelper::OUTPUT_SCALAR_FILE);
+    s->AddPerBeamWaveformUsage(SatStatsHelper::OUTPUT_SCALAR_FILE);
+    s->AddPerBeamCapacityRequest(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    s->AddPerBeamResourcesGranted(SatStatsHelper::OUTPUT_SCATTER_PLOT);
 
-  s->AddPerBeamFeederCrdsaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerBeamFeederCrdsaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerBeamFeederSlottedAlohaPacketCollision (SatStatsHelper::OUTPUT_SCALAR_FILE);
-  s->AddPerBeamFeederSlottedAlohaPacketError (SatStatsHelper::OUTPUT_SCALAR_FILE);
+    s->AddPerBeamFeederCrdsaPacketCollision(SatStatsHelper::OUTPUT_SCALAR_FILE);
+    s->AddPerBeamFeederCrdsaPacketError(SatStatsHelper::OUTPUT_SCALAR_FILE);
+    s->AddPerBeamFeederSlottedAlohaPacketCollision(SatStatsHelper::OUTPUT_SCALAR_FILE);
+    s->AddPerBeamFeederSlottedAlohaPacketError(SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-  NS_LOG_INFO ("--- sat-dama-http-sim-tn9 ---");
-  NS_LOG_INFO ("  Simulation length: " << simLength);
-  NS_LOG_INFO ("  Number of UTs: " << utsPerBeam);
-  NS_LOG_INFO ("  Number of end users per UT: " << endUsersPerUt);
-  NS_LOG_INFO ("  ");
+    NS_LOG_INFO("--- sat-dama-http-sim-tn9 ---");
+    NS_LOG_INFO("  Simulation length: " << simLength);
+    NS_LOG_INFO("  Number of UTs: " << utsPerBeam);
+    NS_LOG_INFO("  Number of end users per UT: " << endUsersPerUt);
+    NS_LOG_INFO("  ");
 
-  /**
-   * Store attributes into XML output
-   */
-  // std::stringstream filename;
-  // filename << "tn9-dama-onoff-output-attributes-ut" << utsPerBeam
-  //         << "-conf" << crTxConf << ".xml";
-  //
-  // Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (filename.str ()));
-  // Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
-  // Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
-  // ConfigStore outputConfig;
-  // outputConfig.ConfigureDefaults ();
+    /**
+     * Store attributes into XML output
+     */
+    // std::stringstream filename;
+    // filename << "tn9-dama-onoff-output-attributes-ut" << utsPerBeam
+    //         << "-conf" << crTxConf << ".xml";
+    //
+    // Config::SetDefault ("ns3::ConfigStore::Filename", StringValue (filename.str ()));
+    // Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
+    // Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
+    // ConfigStore outputConfig;
+    // outputConfig.ConfigureDefaults ();
 
-  /**
-   * Run simulation
-   */
-  simulationHelper->RunSimulation ();
+    /**
+     * Run simulation
+     */
+    simulationHelper->RunSimulation();
 
-  return 0;
+    return 0;
 }
-

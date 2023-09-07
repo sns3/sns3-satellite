@@ -23,21 +23,21 @@
 #ifndef SATELLITE_PHY_TX_H
 #define SATELLITE_PHY_TX_H
 
-#include <map>
-
-#include <ns3/mobility-model.h>
-#include <ns3/packet.h>
-#include <ns3/nstime.h>
-#include <ns3/mac48-address.h>
-
+#include "satellite-antenna-gain-pattern.h"
+#include "satellite-base-fading.h"
+#include "satellite-mobility-model.h"
 #include "satellite-net-device.h"
 #include "satellite-signal-parameters.h"
-#include "satellite-antenna-gain-pattern.h"
-#include "satellite-mobility-model.h"
-#include "satellite-base-fading.h"
 
+#include <ns3/mac48-address.h>
+#include <ns3/mobility-model.h>
+#include <ns3/nstime.h>
+#include <ns3/packet.h>
 
-namespace ns3 {
+#include <map>
+
+namespace ns3
+{
 
 class SatChannel;
 
@@ -49,161 +49,160 @@ class SatChannel;
  */
 class SatPhyTx : public Object
 {
+  public:
+    typedef enum
+    {
+        NORMAL,
+        TRANSPARENT
+    } SatPhyTxMode_t;
 
-public:
-  typedef enum
-  {
-    NORMAL,
-    TRANSPARENT
-  } SatPhyTxMode_t;
+    /**
+     * Default constructor.
+     */
+    SatPhyTx();
 
-  /**
-   * Default constructor.
-   */
-  SatPhyTx ();
+    /**
+     * Destructor for SatPhyTx
+     */
+    virtual ~SatPhyTx();
 
-  /**
-   * Destructor for SatPhyTx
-   */
-  virtual ~SatPhyTx ();
+    /**
+     *  PHY states
+     */
+    enum State
+    {
+        IDLE,
+        TX,
+        RECONFIGURING
+    };
 
-  /**
-   *  PHY states
-   */
-  enum State
-  {
-    IDLE, TX, RECONFIGURING
-  };
+    /**
+     * inherited from Object
+     */
+    static TypeId GetTypeId(void);
 
+    /**
+     * Dispose of this class instance
+     */
+    virtual void DoDispose();
 
-  /**
-   * inherited from Object
-   */
-  static TypeId GetTypeId (void);
+    void SetChannel(Ptr<SatChannel> c);
+    void ClearChannel();
+    Ptr<SatChannel> GetChannel();
 
-  /**
-   * Dispose of this class instance
-   */
-  virtual void DoDispose ();
+    void SetMobility(Ptr<MobilityModel> m);
+    Ptr<MobilityModel> GetMobility();
 
-  void SetChannel (Ptr<SatChannel> c);
-  void ClearChannel ();
-  Ptr<SatChannel> GetChannel ();
+    /*
+     * Set the transmit antenna gain pattern.
+     * \param agp antenna gain pattern
+     * \param mobility mobility model of satellite
+     */
+    void SetAntennaGainPattern(Ptr<SatAntennaGainPattern> agp, Ptr<SatMobilityModel> mobility);
 
-  void SetMobility (Ptr<MobilityModel> m);
-  Ptr<MobilityModel> GetMobility ();
+    /**
+     * Set the maximum Antenna gain in Db
+     * \param gain_db maximum antenna gain in Dbs
+     */
+    void SetMaxAntennaGain_Db(double gain_db);
 
-  /*
-   * Set the transmit antenna gain pattern.
-   * \param agp antenna gain pattern
-   * \param mobility mobility model of satellite
-   */
-  void SetAntennaGainPattern (Ptr<SatAntennaGainPattern> agp, Ptr<SatMobilityModel> mobility);
+    /**
+     * Get antenna gain based on position
+     * or in case that antenna pattern is not configured, maximum configured gain is return
+     *
+     * \param mobility  Mobility used to get gain from antenna pattern
+     * \return antenna gain
+     */
+    double GetAntennaGain(Ptr<MobilityModel> mobility);
 
-  /**
-   * Set the maximum Antenna gain in Db
-   * \param gain_db maximum antenna gain in Dbs
-   */
-  void SetMaxAntennaGain_Db (double gain_db);
+    /**
+     * \brief Function for setting the default fading value
+     * \param fadingValue default fading value
+     */
+    void SetDefaultFadingValue(double fadingValue);
 
-  /**
-   * Get antenna gain based on position
-   * or in case that antenna pattern is not configured, maximum configured gain is return
-   *
-   * \param mobility  Mobility used to get gain from antenna pattern
-   * \return antenna gain
-   */
-  double GetAntennaGain (Ptr<MobilityModel> mobility);
+    /**
+     * \brief Get fading value
+     * \param macAddress MAC address
+     * \param channelType channel type
+     * \return
+     */
+    double GetFadingValue(Address macAddress, SatEnums::ChannelType_t channelType);
 
-  /**
-   * \brief Function for setting the default fading value
-   * \param fadingValue default fading value
-   */
-  void SetDefaultFadingValue (double fadingValue);
+    /**
+     * \brief Set fading container
+     * \param fadingContainer fading container
+     */
+    void SetFadingContainer(Ptr<SatBaseFading> fadingContainer);
 
-  /**
-   * \brief Get fading value
-   * \param macAddress MAC address
-   * \param channelType channel type
-   * \return
-   */
-  double GetFadingValue (Address macAddress, SatEnums::ChannelType_t channelType);
+    /**
+     * Start packet transmission to the channel.
+     * \param txParams Transmission parameters for a packet
+     */
+    virtual void StartTx(Ptr<SatSignalParameters> txParams);
 
-  /**
-   * \brief Set fading container
-   * \param fadingContainer fading container
-   */
-  void SetFadingContainer (Ptr<SatBaseFading> fadingContainer);
+    /**
+     * Set the satellite id for all the transmissions from this SatPhyTx
+     * \param satId the satellite Identifier
+     */
+    void SetSatId(uint32_t satId);
 
-  /**
-  * Start packet transmission to the channel.
-  * \param txParams Transmission parameters for a packet
-  */
-  virtual void StartTx (Ptr<SatSignalParameters> txParams);
+    /**
+     * Set the beam id for all the transmissions from this SatPhyTx
+     * \param beamId the Beam Identifier
+     */
+    void SetBeamId(uint32_t beamId);
 
-  /**
-   * Set the satellite id for all the transmissions from this SatPhyTx
-   * \param satId the satellite Identifier
-   */
-  void SetSatId (uint32_t satId);
+    /**
+     * Tell whether or not this channel is transmitting data
+     */
+    bool IsTransmitting(void) const;
 
-  /**
-   * Set the beam id for all the transmissions from this SatPhyTx
-   * \param beamId the Beam Identifier
-   */
-  void SetBeamId (uint32_t beamId);
+    /**
+     * Tell whether or not this channel can transmit data
+     */
+    bool CanTransmit(void) const;
 
-  /**
-   * Tell whether or not this channel is transmitting data
-   */
-  bool IsTransmitting (void) const;
+  protected:
+    virtual void EndTx();
 
-  /**
-   * Tell whether or not this channel can transmit data
-   */
-  bool CanTransmit (void) const;
+  private:
+    void ChangeState(State newState);
 
-protected:
-  virtual void EndTx ();
+    Ptr<MobilityModel> m_mobility;
+    Ptr<SatChannel> m_channel;
 
-private:
-  void ChangeState (State newState);
+    /*
+     * Transmit antenna gain pattern
+     */
+    Ptr<SatAntennaGainPattern> m_antennaGainPattern;
 
-  Ptr<MobilityModel> m_mobility;
-  Ptr<SatChannel> m_channel;
+    /*
+     * Satellite mobility model
+     */
+    Ptr<SatMobilityModel> m_satMobility;
 
-  /*
-   * Transmit antenna gain pattern
-   */
-  Ptr<SatAntennaGainPattern> m_antennaGainPattern;
+    /**
+     * Configured maximum antenna gain in linear
+     */
+    double m_maxAntennaGain;
 
-  /*
-   * Satellite mobility model
-   */
-  Ptr<SatMobilityModel> m_satMobility;
+    State m_state;
+    uint32_t m_satId;
+    uint32_t m_beamId;
+    SatPhyTxMode_t m_txMode;
 
-  /**
-   * Configured maximum antenna gain in linear
-   */
-  double m_maxAntennaGain;
+    /**
+     * \brief Fading container for fading model
+     */
+    Ptr<SatBaseFading> m_fadingContainer;
 
-  State m_state;
-  uint32_t m_satId;
-  uint32_t m_beamId;
-  SatPhyTxMode_t m_txMode;
-
-  /**
-   * \brief Fading container for fading model
-   */
-  Ptr<SatBaseFading> m_fadingContainer;
-
-  /**
-   * \brief Default fading value
-   */
-  double m_defaultFadingValue;
+    /**
+     * \brief Default fading value
+     */
+    double m_defaultFadingValue;
 };
 
-
-}
+} // namespace ns3
 
 #endif /* SATELLITE_PHY_TX_H */

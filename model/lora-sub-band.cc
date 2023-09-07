@@ -20,93 +20,93 @@
  * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include <ns3/log.h>
-
 #include "lora-sub-band.h"
 
+#include <ns3/log.h>
 
-namespace ns3 {
+namespace ns3
+{
 
-NS_LOG_COMPONENT_DEFINE ("LoraSubBand");
+NS_LOG_COMPONENT_DEFINE("LoraSubBand");
 
-NS_OBJECT_ENSURE_REGISTERED (LoraSubBand);
+NS_OBJECT_ENSURE_REGISTERED(LoraSubBand);
 
 TypeId
-LoraSubBand::GetTypeId (void)
+LoraSubBand::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::LoraSubBand")
-    .SetParent<Object> ();
-  return tid;
+    static TypeId tid = TypeId("ns3::LoraSubBand").SetParent<Object>();
+    return tid;
 }
 
-LoraSubBand::LoraSubBand ()
+LoraSubBand::LoraSubBand()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-  LoraSubBand::LoraSubBand (double firstFrequency, double lastFrequency, double dutyCycle,
-                    double maxTxPowerDbm) :
-    m_firstFrequency (firstFrequency),
-    m_lastFrequency (lastFrequency),
-    m_dutyCycle (dutyCycle),
-    m_nextTransmissionTime (Seconds (0)),
-    m_maxTxPowerDbm (maxTxPowerDbm)
-  {
-    NS_LOG_FUNCTION (this << firstFrequency << lastFrequency << dutyCycle <<
-                     maxTxPowerDbm);
-  }
+LoraSubBand::LoraSubBand(double firstFrequency,
+                         double lastFrequency,
+                         double dutyCycle,
+                         double maxTxPowerDbm)
+    : m_firstFrequency(firstFrequency),
+      m_lastFrequency(lastFrequency),
+      m_dutyCycle(dutyCycle),
+      m_nextTransmissionTime(Seconds(0)),
+      m_maxTxPowerDbm(maxTxPowerDbm)
+{
+    NS_LOG_FUNCTION(this << firstFrequency << lastFrequency << dutyCycle << maxTxPowerDbm);
+}
 
-  LoraSubBand::~LoraSubBand ()
-  {
-    NS_LOG_FUNCTION (this);
-  }
+LoraSubBand::~LoraSubBand()
+{
+    NS_LOG_FUNCTION(this);
+}
 
-  double
-  LoraSubBand::GetFirstFrequency (void)
-  {
+double
+LoraSubBand::GetFirstFrequency(void)
+{
     return m_firstFrequency;
-  }
-
-  double
-  LoraSubBand::GetDutyCycle (void)
-  {
-    return m_dutyCycle;
-  }
-
-  bool
-  LoraSubBand::BelongsToLoraSubBand (double frequency)
-  {
-    return (frequency > m_firstFrequency) && (frequency < m_lastFrequency);
-  }
-
-  bool
-  LoraSubBand::BelongsToLoraSubBand (Ptr<LoraLogicalChannel> logicalChannel)
-  {
-    double frequency = logicalChannel->GetFrequency ();
-    return BelongsToLoraSubBand (frequency);
-  }
-
-  void
-  LoraSubBand::SetNextTransmissionTime (Time nextTime)
-  {
-    m_nextTransmissionTime = nextTime;
-  }
-
-  Time
-  LoraSubBand::GetNextTransmissionTime (void)
-  {
-    return m_nextTransmissionTime;
-  }
-
-  void
-  LoraSubBand::SetMaxTxPowerDbm (double maxTxPowerDbm)
-  {
-    m_maxTxPowerDbm = maxTxPowerDbm;
-  }
-
-  double
-  LoraSubBand::GetMaxTxPowerDbm (void)
-  {
-    return m_maxTxPowerDbm;
-  }
 }
+
+double
+LoraSubBand::GetDutyCycle(void)
+{
+    return m_dutyCycle;
+}
+
+bool
+LoraSubBand::BelongsToLoraSubBand(double frequency)
+{
+    return (frequency > m_firstFrequency) && (frequency < m_lastFrequency);
+}
+
+bool
+LoraSubBand::BelongsToLoraSubBand(Ptr<LoraLogicalChannel> logicalChannel)
+{
+    double frequency = logicalChannel->GetFrequency();
+    return BelongsToLoraSubBand(frequency);
+}
+
+void
+LoraSubBand::SetNextTransmissionTime(Time nextTime)
+{
+    m_nextTransmissionTime = nextTime;
+}
+
+Time
+LoraSubBand::GetNextTransmissionTime(void)
+{
+    return m_nextTransmissionTime;
+}
+
+void
+LoraSubBand::SetMaxTxPowerDbm(double maxTxPowerDbm)
+{
+    m_maxTxPowerDbm = maxTxPowerDbm;
+}
+
+double
+LoraSubBand::GetMaxTxPowerDbm(void)
+{
+    return m_maxTxPowerDbm;
+}
+} // namespace ns3

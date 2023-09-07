@@ -18,135 +18,131 @@
  * Author: Davide Magrin <magrinda@dei.unipd.it>
  */
 
-#include <ns3/log.h>
-
 #include "satellite-lora-phy-rx.h"
 
+#include <ns3/log.h>
 
-namespace ns3 {
+namespace ns3
+{
 
-NS_LOG_COMPONENT_DEFINE ("SatLoraPhyRx");
+NS_LOG_COMPONENT_DEFINE("SatLoraPhyRx");
 
-NS_OBJECT_ENSURE_REGISTERED (SatLoraPhyRx);
+NS_OBJECT_ENSURE_REGISTERED(SatLoraPhyRx);
 
 TypeId
-SatLoraPhyRx::GetTypeId (void)
+SatLoraPhyRx::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatLoraPhyRx")
-    .SetParent<SatPhyRx> ();
-  return tid;
+    static TypeId tid = TypeId("ns3::SatLoraPhyRx").SetParent<SatPhyRx>();
+    return tid;
 }
 
-SatLoraPhyRx::SatLoraPhyRx ()
-  : m_state (SLEEP)
+SatLoraPhyRx::SatLoraPhyRx()
+    : m_state(SLEEP)
 {
 }
 
-SatLoraPhyRx::~SatLoraPhyRx ()
+SatLoraPhyRx::~SatLoraPhyRx()
 {
 }
 
 void
-SatLoraPhyRx::StartRx (Ptr<SatSignalParameters> rxParams)
+SatLoraPhyRx::StartRx(Ptr<SatSignalParameters> rxParams)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  // Switch on the current PHY state
-  switch (m_state)
+    // Switch on the current PHY state
+    switch (m_state)
     {
     // In the SLEEP, TX and RX cases we cannot receive the packet: we only add
     // it to the list of interferers and do not schedule an EndReceive event for
     // it.
-    case SLEEP:
-      {
-        NS_LOG_INFO ("Dropping packet because device is in SLEEP state");
+    case SLEEP: {
+        NS_LOG_INFO("Dropping packet because device is in SLEEP state");
         break;
-      }
-    case TX:
-      {
-        NS_LOG_INFO ("Dropping packet because device is in TX state");
+    }
+    case TX: {
+        NS_LOG_INFO("Dropping packet because device is in TX state");
         break;
-      }
-    case RX:
-      {
-        NS_LOG_INFO ("Dropping packet because device is already in RX state");
+    }
+    case RX: {
+        NS_LOG_INFO("Dropping packet because device is already in RX state");
         break;
-      }
+    }
     // If we are in STANDBY mode, we can potentially lock on the currently
     // incoming transmission
-    case STANDBY:
-      {
-        SatPhyRx::StartRx (rxParams);
+    case STANDBY: {
+        SatPhyRx::StartRx(rxParams);
         break;
-      }
+    }
     }
 }
 
 bool
-SatLoraPhyRx::IsTransmitting (void)
+SatLoraPhyRx::IsTransmitting(void)
 {
-  return true;
+    return true;
 }
 
 bool
-SatLoraPhyRx::IsOnFrequency (double frequency)
+SatLoraPhyRx::IsOnFrequency(double frequency)
 {
-  return m_frequency == frequency;
+    return m_frequency == frequency;
 }
 
 void
-SatLoraPhyRx::SetFrequency (double frequencyMHz)
+SatLoraPhyRx::SetFrequency(double frequencyMHz)
 {
-  m_frequency = frequencyMHz;
+    m_frequency = frequencyMHz;
 }
 
 void
-SatLoraPhyRx::SetSpreadingFactor (uint8_t sf)
+SatLoraPhyRx::SetSpreadingFactor(uint8_t sf)
 {
-  m_sf = sf;
+    m_sf = sf;
 }
 
 SatLoraPhyRx::State
-SatLoraPhyRx::GetState (){
-  return m_state;
+SatLoraPhyRx::GetState()
+{
+    return m_state;
 }
 
 void
-SatLoraPhyRx::SwitchToStandby (void)
+SatLoraPhyRx::SwitchToStandby(void)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 
-  m_state = STANDBY;
+    m_state = STANDBY;
 }
 
 void
-SatLoraPhyRx::SwitchToRx (void)
+SatLoraPhyRx::SwitchToRx(void)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 
-  NS_ASSERT (m_state == STANDBY);
+    NS_ASSERT(m_state == STANDBY);
 
-  m_state = RX;
+    m_state = RX;
 }
 
 void
-SatLoraPhyRx::SwitchToTx ()
+SatLoraPhyRx::SwitchToTx()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 
-  NS_ASSERT (m_state != RX);
+    NS_ASSERT(m_state != RX);
 
-  m_state = TX;
+    m_state = TX;
 }
 
 void
-SatLoraPhyRx::SwitchToSleep (void)
+SatLoraPhyRx::SwitchToSleep(void)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 
-  NS_ASSERT (m_state == STANDBY);
+    NS_ASSERT(m_state == STANDBY);
 
-  m_state = SLEEP;
+    m_state = SLEEP;
 }
 
-}
+} // namespace ns3

@@ -21,12 +21,12 @@
 #ifndef SAT_LORA_CONF_H
 #define SAT_LORA_CONF_H
 
-#include <ns3/satellite-conf.h>
-
 #include <ns3/lorawan-mac-end-device-class-a.h>
 #include <ns3/lorawan-mac-gateway.h>
+#include <ns3/satellite-conf.h>
 
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \brief A configuration class for the GEO satellite reference system
@@ -34,46 +34,44 @@ namespace ns3 {
  */
 class SatLoraConf : public Object
 {
-public:
+  public:
+    typedef enum
+    {
+        SATELLITE, //!< For Satellite
+        EU863_870, //!< EU863-870
+    } PhyLayerStandard_t;
 
-  typedef enum
-  {
-    SATELLITE, //!< For Satellite
-    EU863_870, //!< EU863-870
-  } PhyLayerStandard_t;
+    /**
+     * Default constructor.
+     */
+    SatLoraConf();
 
-  /**
-   * Default constructor.
-   */
-  SatLoraConf ();
-  virtual ~SatLoraConf ()
-  {
-  }
+    virtual ~SatLoraConf()
+    {
+    }
 
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
-  TypeId GetInstanceTypeId (void) const;
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
+    TypeId GetInstanceTypeId(void) const;
 
-  void SetConf (Ptr<LorawanMacGateway> gatewayMac);
-  void SetConf (Ptr<LorawanMacEndDeviceClassA> endDeviceMac);
+    void SetConf(Ptr<LorawanMacGateway> gatewayMac);
+    void SetConf(Ptr<LorawanMacEndDeviceClassA> endDeviceMac);
 
-  void setSatConfAttributes (Ptr<SatConf> satConf);
+    void setSatConfAttributes(Ptr<SatConf> satConf);
 
-private:
-  void SetEu863_870Conf (Ptr<LorawanMacGateway> gatewayMac);
-  void SetEu863_870Conf (Ptr<LorawanMacEndDeviceClassA> endDeviceMac);
+  private:
+    void SetEu863_870Conf(Ptr<LorawanMacGateway> gatewayMac);
+    void SetEu863_870Conf(Ptr<LorawanMacEndDeviceClassA> endDeviceMac);
 
-  void SetSatelliteConf (Ptr<LorawanMacGateway> gatewayMac);
-  void SetSatelliteConf (Ptr<LorawanMacEndDeviceClassA> endDeviceMac);
+    void SetSatelliteConf(Ptr<LorawanMacGateway> gatewayMac);
+    void SetSatelliteConf(Ptr<LorawanMacEndDeviceClassA> endDeviceMac);
 
-  PhyLayerStandard_t m_phyLayerStandard;
+    PhyLayerStandard_t m_phyLayerStandard;
 };
 
-
 } // namespace ns3
-
 
 #endif /* SAT_LORA_CONF_H */

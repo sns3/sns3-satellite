@@ -20,101 +20,104 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
+#include "satellite-signal-parameters.h"
+
+#include "satellite-phy-tx.h"
+
 #include <ns3/log.h>
 #include <ns3/ptr.h>
 
-#include "satellite-signal-parameters.h"
-#include "satellite-phy-tx.h"
+NS_LOG_COMPONENT_DEFINE("SatSignalParameters");
 
-
-NS_LOG_COMPONENT_DEFINE ("SatSignalParameters");
-
-namespace ns3 {
-
-SatSignalParameters::SatSignalParameters ()
-  : m_satId (),
-  m_beamId (),
-  m_carrierId (),
-  m_carrierFreq_hz (),
-  m_duration (),
-  m_txPower_W (),
-  m_rxPower_W (),
-  m_phyTx (),
-  m_channelType ()
+namespace ns3
 {
-  NS_LOG_FUNCTION (this);
-  m_ifParams = CreateObject<SatInterferenceParameters> ();
+
+SatSignalParameters::SatSignalParameters()
+    : m_satId(),
+      m_beamId(),
+      m_carrierId(),
+      m_carrierFreq_hz(),
+      m_duration(),
+      m_txPower_W(),
+      m_rxPower_W(),
+      m_phyTx(),
+      m_channelType()
+{
+    NS_LOG_FUNCTION(this);
+    m_ifParams = CreateObject<SatInterferenceParameters>();
 }
 
-SatSignalParameters::SatSignalParameters ( const SatSignalParameters& p )
+SatSignalParameters::SatSignalParameters(const SatSignalParameters& p)
 {
-  for ( PacketsInBurst_t::const_iterator i = p.m_packetsInBurst.begin (); i != p.m_packetsInBurst.end (); i++  )
+    for (PacketsInBurst_t::const_iterator i = p.m_packetsInBurst.begin();
+         i != p.m_packetsInBurst.end();
+         i++)
     {
-      m_packetsInBurst.push_back ((*i)->Copy ());
+        m_packetsInBurst.push_back((*i)->Copy());
     }
 
-  m_satId = p.m_satId;
-  m_beamId = p.m_beamId;
-  m_carrierId = p.m_carrierId;
-  m_duration = p.m_duration;
-  m_phyTx = p.m_phyTx;
-  m_txPower_W = p.m_txPower_W;
-  m_rxPower_W = p.m_rxPower_W;
-  m_channelType = p.m_channelType;
-  m_carrierFreq_hz = p.m_carrierFreq_hz;
-  m_txInfo.modCod = p.m_txInfo.modCod;
-  m_txInfo.sliceId = p.m_txInfo.sliceId;
-  m_txInfo.fecBlockSizeInBytes = p.m_txInfo.fecBlockSizeInBytes;
-  m_txInfo.frameType = p.m_txInfo.frameType;
-  m_txInfo.waveformId = p.m_txInfo.waveformId;
-  m_txInfo.packetType = p.m_txInfo.packetType;
-  m_txInfo.crdsaUniquePacketId = p.m_txInfo.crdsaUniquePacketId;
-  m_ifParams = p.m_ifParams;
+    m_satId = p.m_satId;
+    m_beamId = p.m_beamId;
+    m_carrierId = p.m_carrierId;
+    m_duration = p.m_duration;
+    m_phyTx = p.m_phyTx;
+    m_txPower_W = p.m_txPower_W;
+    m_rxPower_W = p.m_rxPower_W;
+    m_channelType = p.m_channelType;
+    m_carrierFreq_hz = p.m_carrierFreq_hz;
+    m_txInfo.modCod = p.m_txInfo.modCod;
+    m_txInfo.sliceId = p.m_txInfo.sliceId;
+    m_txInfo.fecBlockSizeInBytes = p.m_txInfo.fecBlockSizeInBytes;
+    m_txInfo.frameType = p.m_txInfo.frameType;
+    m_txInfo.waveformId = p.m_txInfo.waveformId;
+    m_txInfo.packetType = p.m_txInfo.packetType;
+    m_txInfo.crdsaUniquePacketId = p.m_txInfo.crdsaUniquePacketId;
+    m_ifParams = p.m_ifParams;
 }
 
-SatSignalParameters::~SatSignalParameters ()
+SatSignalParameters::~SatSignalParameters()
 {
-  NS_LOG_FUNCTION (this);
-  m_ifParams = nullptr;
+    NS_LOG_FUNCTION(this);
+    m_ifParams = nullptr;
 }
 
 Ptr<SatSignalParameters>
-SatSignalParameters::Copy ()
+SatSignalParameters::Copy()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  Ptr<SatSignalParameters> p (new SatSignalParameters (*this), false);
-  return p;
+    Ptr<SatSignalParameters> p(new SatSignalParameters(*this), false);
+    return p;
 }
 
 TypeId
-SatSignalParameters::GetTypeId (void)
+SatSignalParameters::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatSignalParameters")
-    .SetParent<Object> ()
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::SatSignalParameters").SetParent<Object>();
+    return tid;
 }
 
 void
-SatSignalParameters::SetRxPowersInSatellite (double rxPowerW, double rxNoisePowerW, double rxAciIfPowerW, double rxExtNoisePowerW)
+SatSignalParameters::SetRxPowersInSatellite(double rxPowerW,
+                                            double rxNoisePowerW,
+                                            double rxAciIfPowerW,
+                                            double rxExtNoisePowerW)
 {
-  m_ifParams->m_rxPowerInSatellite_W = rxPowerW;
-  m_ifParams->m_rxNoisePowerInSatellite_W = rxNoisePowerW;
-  m_ifParams->m_rxAciIfPowerInSatellite_W = rxAciIfPowerW;
-  m_ifParams->m_rxExtNoisePowerInSatellite_W = rxExtNoisePowerW;
+    m_ifParams->m_rxPowerInSatellite_W = rxPowerW;
+    m_ifParams->m_rxNoisePowerInSatellite_W = rxNoisePowerW;
+    m_ifParams->m_rxAciIfPowerInSatellite_W = rxAciIfPowerW;
+    m_ifParams->m_rxExtNoisePowerInSatellite_W = rxExtNoisePowerW;
 }
 
 void
-SatSignalParameters::SetSinr (double sinr, double additionalInterference)
+SatSignalParameters::SetSinr(double sinr, double additionalInterference)
 {
-  m_ifParams->m_sinr = sinr;
-  m_ifParams->m_additionalInterference = additionalInterference;
-  m_ifParams->m_sinrComputed = true;
+    m_ifParams->m_sinr = sinr;
+    m_ifParams->m_additionalInterference = additionalInterference;
+    m_ifParams->m_sinrComputed = true;
 }
 
-
-SatInterferenceParameters::~SatInterferenceParameters ()
+SatInterferenceParameters::~SatInterferenceParameters()
 {
 }
 

@@ -19,136 +19,125 @@
  *
  */
 
-#include <ns3/log.h>
-#include <ns3/enum.h>
-#include <ns3/string.h>
-#include <ns3/boolean.h>
-#include <ns3/object-vector.h>
-#include <ns3/callback.h>
-
-#include <ns3/node-container.h>
-#include <ns3/mac48-address.h>
-#include <ns3/satellite-net-device.h>
-#include <ns3/satellite-geo-net-device.h>
-#include <ns3/satellite-phy.h>
-#include <ns3/satellite-phy-rx.h>
-#include <ns3/satellite-phy-rx-carrier.h>
-
-#include <ns3/satellite-helper.h>
-#include <ns3/satellite-id-mapper.h>
-#include <ns3/singleton.h>
-
-#include <ns3/data-collection-object.h>
-#include <ns3/scalar-collector.h>
-#include <ns3/interval-rate-collector.h>
-#include <ns3/multi-file-aggregator.h>
-#include <ns3/magister-gnuplot-aggregator.h>
-
-#include <sstream>
 #include "satellite-stats-packet-collision-helper.h"
 
+#include <ns3/boolean.h>
+#include <ns3/callback.h>
+#include <ns3/data-collection-object.h>
+#include <ns3/enum.h>
+#include <ns3/interval-rate-collector.h>
+#include <ns3/log.h>
+#include <ns3/mac48-address.h>
+#include <ns3/magister-gnuplot-aggregator.h>
+#include <ns3/multi-file-aggregator.h>
+#include <ns3/node-container.h>
+#include <ns3/object-vector.h>
+#include <ns3/satellite-geo-net-device.h>
+#include <ns3/satellite-helper.h>
+#include <ns3/satellite-id-mapper.h>
+#include <ns3/satellite-net-device.h>
+#include <ns3/satellite-phy-rx-carrier.h>
+#include <ns3/satellite-phy-rx.h>
+#include <ns3/satellite-phy.h>
+#include <ns3/scalar-collector.h>
+#include <ns3/singleton.h>
+#include <ns3/string.h>
 
-NS_LOG_COMPONENT_DEFINE ("SatStatsPacketCollisionHelper");
+#include <sstream>
 
+NS_LOG_COMPONENT_DEFINE("SatStatsPacketCollisionHelper");
 
-namespace ns3 {
+namespace ns3
+{
 
 // BASE CLASS /////////////////////////////////////////////////////////////////
 
-NS_OBJECT_ENSURE_REGISTERED (SatStatsPacketCollisionHelper);
+NS_OBJECT_ENSURE_REGISTERED(SatStatsPacketCollisionHelper);
 
-SatStatsPacketCollisionHelper::SatStatsPacketCollisionHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsHelper (satHelper)
+SatStatsPacketCollisionHelper::SatStatsPacketCollisionHelper(Ptr<const SatHelper> satHelper)
+    : SatStatsHelper(satHelper)
 {
-  NS_LOG_FUNCTION (this << satHelper);
+    NS_LOG_FUNCTION(this << satHelper);
 }
 
-
-SatStatsPacketCollisionHelper::~SatStatsPacketCollisionHelper ()
+SatStatsPacketCollisionHelper::~SatStatsPacketCollisionHelper()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
-
 
 TypeId // static
-SatStatsPacketCollisionHelper::GetTypeId ()
+SatStatsPacketCollisionHelper::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::SatStatsPacketCollisionHelper")
-    .SetParent<SatStatsHelper> ()
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::SatStatsPacketCollisionHelper").SetParent<SatStatsHelper>();
+    return tid;
 }
-
 
 void
-SatStatsPacketCollisionHelper::SetTraceSourceName (std::string traceSourceName)
+SatStatsPacketCollisionHelper::SetTraceSourceName(std::string traceSourceName)
 {
-  NS_LOG_FUNCTION (this << traceSourceName);
-  m_traceSourceName = traceSourceName;
+    NS_LOG_FUNCTION(this << traceSourceName);
+    m_traceSourceName = traceSourceName;
 }
-
 
 std::string
-SatStatsPacketCollisionHelper::GetTraceSourceName () const
+SatStatsPacketCollisionHelper::GetTraceSourceName() const
 {
-  return m_traceSourceName;
+    return m_traceSourceName;
 }
 
-
 void
-SatStatsPacketCollisionHelper::CollisionRxCallback (uint32_t nPackets,
-                                                    const Address & from,
-                                                    bool isCollided)
+SatStatsPacketCollisionHelper::CollisionRxCallback(uint32_t nPackets,
+                                                   const Address& from,
+                                                   bool isCollided)
 {
-  NS_LOG_FUNCTION (this << nPackets << from << isCollided);
+    NS_LOG_FUNCTION(this << nPackets << from << isCollided);
 
-  if (from.IsInvalid ())
+    if (from.IsInvalid())
     {
-      NS_LOG_WARN (this << " discarding " << nPackets << " packets"
-                        << " from statistics collection because of"
-                        << " invalid sender address");
+        NS_LOG_WARN(this << " discarding " << nPackets << " packets"
+                         << " from statistics collection because of"
+                         << " invalid sender address");
     }
-  else
+    else
     {
-      // Determine the identifier associated with the sender address.
-      std::map<const Address, uint32_t>::const_iterator it = m_identifierMap.find (from);
+        // Determine the identifier associated with the sender address.
+        std::map<const Address, uint32_t>::const_iterator it = m_identifierMap.find(from);
 
-      if (it == m_identifierMap.end ())
+        if (it == m_identifierMap.end())
         {
-          NS_LOG_WARN (this << " discarding " << nPackets << " packets"
-                            << " from statistics collection because of"
-                            << " unknown sender address " << from);
+            NS_LOG_WARN(this << " discarding " << nPackets << " packets"
+                             << " from statistics collection because of"
+                             << " unknown sender address " << from);
         }
-      else
+        else
         {
-          // Find the first-level collector with the right identifier.
-          Ptr<DataCollectionObject> collector = m_terminalCollectors.Get (it->second);
-          NS_ASSERT_MSG (collector != nullptr,
-                         "Unable to find collector with identifier " << it->second);
+            // Find the first-level collector with the right identifier.
+            Ptr<DataCollectionObject> collector = m_terminalCollectors.Get(it->second);
+            NS_ASSERT_MSG(collector != nullptr,
+                          "Unable to find collector with identifier " << it->second);
 
-          switch (GetOutputType ())
+            switch (GetOutputType())
             {
             case SatStatsHelper::OUTPUT_SCALAR_FILE:
-            case SatStatsHelper::OUTPUT_SCALAR_PLOT:
-              {
-                Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
-                NS_ASSERT (c != nullptr);
-                c->TraceSinkBoolean (false, isCollided);
+            case SatStatsHelper::OUTPUT_SCALAR_PLOT: {
+                Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector>();
+                NS_ASSERT(c != nullptr);
+                c->TraceSinkBoolean(false, isCollided);
                 break;
-              }
+            }
 
             case SatStatsHelper::OUTPUT_SCATTER_FILE:
-            case SatStatsHelper::OUTPUT_SCATTER_PLOT:
-              {
-                Ptr<IntervalRateCollector> c = collector->GetObject<IntervalRateCollector> ();
-                NS_ASSERT (c != nullptr);
-                c->TraceSinkBoolean (false, isCollided);
+            case SatStatsHelper::OUTPUT_SCATTER_PLOT: {
+                Ptr<IntervalRateCollector> c = collector->GetObject<IntervalRateCollector>();
+                NS_ASSERT(c != nullptr);
+                c->TraceSinkBoolean(false, isCollided);
                 break;
-              }
+            }
 
             default:
-              NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
-              break;
+                NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
+                               << " is not a valid output type for this statistics.");
+                break;
 
             } // end of `switch (GetOutputType ())`
 
@@ -158,226 +147,232 @@ SatStatsPacketCollisionHelper::CollisionRxCallback (uint32_t nPackets,
 
 } // end of `void CollisionRxCallback (uint32_t, const Address &, bool);`
 
-
 void
-SatStatsPacketCollisionHelper::SaveAddressAndIdentifier (Ptr<Node> utNode)
+SatStatsPacketCollisionHelper::SaveAddressAndIdentifier(Ptr<Node> utNode)
 {
-  NS_LOG_FUNCTION (this << utNode->GetId ());
+    NS_LOG_FUNCTION(this << utNode->GetId());
 
-  const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
-  const Address addr = satIdMapper->GetUtMacWithNode (utNode);
+    const SatIdMapper* satIdMapper = Singleton<SatIdMapper>::Get();
+    const Address addr = satIdMapper->GetUtMacWithNode(utNode);
 
-  if (addr.IsInvalid ())
+    if (addr.IsInvalid())
     {
-      NS_LOG_WARN (this << " Node " << utNode->GetId ()
-                        << " is not a valid UT");
+        NS_LOG_WARN(this << " Node " << utNode->GetId() << " is not a valid UT");
     }
-  else
+    else
     {
-      const uint32_t identifier = GetIdentifierForUt (utNode);
-      m_identifierMap[addr] = identifier;
-      NS_LOG_INFO (this << " associated address " << addr
-                        << " with identifier " << identifier);
-
+        const uint32_t identifier = GetIdentifierForUt(utNode);
+        m_identifierMap[addr] = identifier;
+        NS_LOG_INFO(this << " associated address " << addr << " with identifier " << identifier);
     }
 }
 
 // BASE CLASS FEEDER /////////////////////////////////////////////////////////////////
 
-NS_OBJECT_ENSURE_REGISTERED (SatStatsFeederPacketCollisionHelper);
+NS_OBJECT_ENSURE_REGISTERED(SatStatsFeederPacketCollisionHelper);
 
-SatStatsFeederPacketCollisionHelper::SatStatsFeederPacketCollisionHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsPacketCollisionHelper (satHelper)
+SatStatsFeederPacketCollisionHelper::SatStatsFeederPacketCollisionHelper(
+    Ptr<const SatHelper> satHelper)
+    : SatStatsPacketCollisionHelper(satHelper)
 {
-  NS_LOG_FUNCTION (this << satHelper);
+    NS_LOG_FUNCTION(this << satHelper);
 }
 
-
-SatStatsFeederPacketCollisionHelper::~SatStatsFeederPacketCollisionHelper ()
+SatStatsFeederPacketCollisionHelper::~SatStatsFeederPacketCollisionHelper()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
-
 
 TypeId // static
-SatStatsFeederPacketCollisionHelper::GetTypeId ()
+SatStatsFeederPacketCollisionHelper::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::SatStatsFeederPacketCollisionHelper")
-    .SetParent<SatStatsPacketCollisionHelper> ()
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::SatStatsFeederPacketCollisionHelper")
+                            .SetParent<SatStatsPacketCollisionHelper>();
+    return tid;
 }
 
-
 void
-SatStatsFeederPacketCollisionHelper::DoInstall ()
+SatStatsFeederPacketCollisionHelper::DoInstall()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  switch (GetOutputType ())
+    switch (GetOutputType())
     {
     case SatStatsHelper::OUTPUT_NONE:
-      NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
-      break;
+        NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
+                       << " is not a valid output type for this statistics.");
+        break;
 
-    case SatStatsHelper::OUTPUT_SCALAR_FILE:
-      {
+    case SatStatsHelper::OUTPUT_SCALAR_FILE: {
         // Setup aggregator.
-        m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetOutputFileName ()),
-                                         "MultiFileMode", BooleanValue (false),
-                                         "EnableContextPrinting", BooleanValue (true),
-                                         "GeneralHeading", StringValue (GetIdentifierHeading ("collision_rate")));
+        m_aggregator = CreateAggregator("ns3::MultiFileAggregator",
+                                        "OutputFileName",
+                                        StringValue(GetOutputFileName()),
+                                        "MultiFileMode",
+                                        BooleanValue(false),
+                                        "EnableContextPrinting",
+                                        BooleanValue(true),
+                                        "GeneralHeading",
+                                        StringValue(GetIdentifierHeading("collision_rate")));
 
         // Setup collectors.
-        m_terminalCollectors.SetType ("ns3::ScalarCollector");
-        m_terminalCollectors.SetAttribute ("InputDataType",
-                                           EnumValue (ScalarCollector::INPUT_DATA_TYPE_BOOLEAN));
-        m_terminalCollectors.SetAttribute ("OutputType",
-                                           EnumValue (ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
-        CreateCollectorPerIdentifier (m_terminalCollectors);
-        m_terminalCollectors.ConnectToAggregator ("Output",
-                                                  m_aggregator,
-                                                  &MultiFileAggregator::Write1d);
+        m_terminalCollectors.SetType("ns3::ScalarCollector");
+        m_terminalCollectors.SetAttribute("InputDataType",
+                                          EnumValue(ScalarCollector::INPUT_DATA_TYPE_BOOLEAN));
+        m_terminalCollectors.SetAttribute(
+            "OutputType",
+            EnumValue(ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
+        CreateCollectorPerIdentifier(m_terminalCollectors);
+        m_terminalCollectors.ConnectToAggregator("Output",
+                                                 m_aggregator,
+                                                 &MultiFileAggregator::Write1d);
         break;
-      }
+    }
 
-    case SatStatsHelper::OUTPUT_SCATTER_FILE:
-      {
+    case SatStatsHelper::OUTPUT_SCATTER_FILE: {
         // Setup aggregator.
-        m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetOutputFileName ()),
-                                         "GeneralHeading", StringValue (GetTimeHeading ("collision_rate")));
+        m_aggregator = CreateAggregator("ns3::MultiFileAggregator",
+                                        "OutputFileName",
+                                        StringValue(GetOutputFileName()),
+                                        "GeneralHeading",
+                                        StringValue(GetTimeHeading("collision_rate")));
 
         // Setup collectors.
-        m_terminalCollectors.SetType ("ns3::IntervalRateCollector");
-        m_terminalCollectors.SetAttribute ("InputDataType",
-                                           EnumValue (IntervalRateCollector::INPUT_DATA_TYPE_BOOLEAN));
-        m_terminalCollectors.SetAttribute ("OutputType",
-                                           EnumValue (IntervalRateCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
-        CreateCollectorPerIdentifier (m_terminalCollectors);
-        m_terminalCollectors.ConnectToAggregator ("OutputWithTime",
-                                                  m_aggregator,
-                                                  &MultiFileAggregator::Write2d);
-        m_terminalCollectors.ConnectToAggregator ("OutputString",
-                                                  m_aggregator,
-                                                  &MultiFileAggregator::AddContextHeading);
+        m_terminalCollectors.SetType("ns3::IntervalRateCollector");
+        m_terminalCollectors.SetAttribute(
+            "InputDataType",
+            EnumValue(IntervalRateCollector::INPUT_DATA_TYPE_BOOLEAN));
+        m_terminalCollectors.SetAttribute(
+            "OutputType",
+            EnumValue(IntervalRateCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
+        CreateCollectorPerIdentifier(m_terminalCollectors);
+        m_terminalCollectors.ConnectToAggregator("OutputWithTime",
+                                                 m_aggregator,
+                                                 &MultiFileAggregator::Write2d);
+        m_terminalCollectors.ConnectToAggregator("OutputString",
+                                                 m_aggregator,
+                                                 &MultiFileAggregator::AddContextHeading);
         break;
-      }
+    }
 
     case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
     case SatStatsHelper::OUTPUT_PDF_FILE:
     case SatStatsHelper::OUTPUT_CDF_FILE:
-      NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
-      break;
+        NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
+                       << " is not a valid output type for this statistics.");
+        break;
 
     case SatStatsHelper::OUTPUT_SCALAR_PLOT:
-      /// \todo Add support for boxes in Gnuplot.
-      NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
-      break;
+        /// \todo Add support for boxes in Gnuplot.
+        NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
+                       << " is not a valid output type for this statistics.");
+        break;
 
-    case SatStatsHelper::OUTPUT_SCATTER_PLOT:
-      {
+    case SatStatsHelper::OUTPUT_SCATTER_PLOT: {
         // Setup aggregator.
-        m_aggregator = CreateAggregator ("ns3::MagisterGnuplotAggregator",
-                                         "OutputPath", StringValue (GetOutputPath ()),
-                                         "OutputFileName", StringValue (GetName ()));
-        Ptr<MagisterGnuplotAggregator> plotAggregator
-          = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-        NS_ASSERT (plotAggregator != nullptr);
-        //plot->SetTitle ("");
-        plotAggregator->SetLegend ("Time (in seconds)",
-                                   "Packet collision rate");
-        plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
+        m_aggregator = CreateAggregator("ns3::MagisterGnuplotAggregator",
+                                        "OutputPath",
+                                        StringValue(GetOutputPath()),
+                                        "OutputFileName",
+                                        StringValue(GetName()));
+        Ptr<MagisterGnuplotAggregator> plotAggregator =
+            m_aggregator->GetObject<MagisterGnuplotAggregator>();
+        NS_ASSERT(plotAggregator != nullptr);
+        // plot->SetTitle ("");
+        plotAggregator->SetLegend("Time (in seconds)", "Packet collision rate");
+        plotAggregator->Set2dDatasetDefaultStyle(Gnuplot2dDataset::LINES);
 
         // Setup collectors.
-        m_terminalCollectors.SetType ("ns3::IntervalRateCollector");
-        m_terminalCollectors.SetAttribute ("InputDataType",
-                                           EnumValue (IntervalRateCollector::INPUT_DATA_TYPE_BOOLEAN));
-        m_terminalCollectors.SetAttribute ("OutputType",
-                                           EnumValue (IntervalRateCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
-        CreateCollectorPerIdentifier (m_terminalCollectors);
-        for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
-             it != m_terminalCollectors.End (); ++it)
-          {
-            const std::string context = it->second->GetName ();
-            plotAggregator->Add2dDataset (context, context);
-          }
-        m_terminalCollectors.ConnectToAggregator ("OutputWithTime",
-                                                  m_aggregator,
-                                                  &MagisterGnuplotAggregator::Write2d);
+        m_terminalCollectors.SetType("ns3::IntervalRateCollector");
+        m_terminalCollectors.SetAttribute(
+            "InputDataType",
+            EnumValue(IntervalRateCollector::INPUT_DATA_TYPE_BOOLEAN));
+        m_terminalCollectors.SetAttribute(
+            "OutputType",
+            EnumValue(IntervalRateCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
+        CreateCollectorPerIdentifier(m_terminalCollectors);
+        for (CollectorMap::Iterator it = m_terminalCollectors.Begin();
+             it != m_terminalCollectors.End();
+             ++it)
+        {
+            const std::string context = it->second->GetName();
+            plotAggregator->Add2dDataset(context, context);
+        }
+        m_terminalCollectors.ConnectToAggregator("OutputWithTime",
+                                                 m_aggregator,
+                                                 &MagisterGnuplotAggregator::Write2d);
         break;
-      }
+    }
 
     case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
     case SatStatsHelper::OUTPUT_PDF_PLOT:
     case SatStatsHelper::OUTPUT_CDF_PLOT:
-      NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
-      break;
+        NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
+                       << " is not a valid output type for this statistics.");
+        break;
 
     default:
-      NS_FATAL_ERROR ("SatStatsUserPacketCollisionHelper - Invalid output type");
-      break;
+        NS_FATAL_ERROR("SatStatsUserPacketCollisionHelper - Invalid output type");
+        break;
     }
 
-  // Create a map of UT addresses and identifiers.
-  NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
-  for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
+    // Create a map of UT addresses and identifiers.
+    NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+    for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
     {
-      SaveAddressAndIdentifier (*it);
+        SaveAddressAndIdentifier(*it);
     }
 
-  // Connect to trace sources at GW nodes.
+    // Connect to trace sources at GW nodes.
 
-  NodeContainer gws = GetSatHelper ()->GetBeamHelper ()->GetGwNodes ();
-  Callback<void, uint32_t, const Address &, bool> callback
-    = MakeCallback (&SatStatsFeederPacketCollisionHelper::CollisionRxCallback,
-                    this);
+    NodeContainer gws = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+    Callback<void, uint32_t, const Address&, bool> callback =
+        MakeCallback(&SatStatsFeederPacketCollisionHelper::CollisionRxCallback, this);
 
-  for (NodeContainer::Iterator it = gws.Begin (); it != gws.End (); ++it)
+    for (NodeContainer::Iterator it = gws.Begin(); it != gws.End(); ++it)
     {
-      NetDeviceContainer devs = GetGwSatNetDevice (*it);
+        NetDeviceContainer devs = GetGwSatNetDevice(*it);
 
-      for (NetDeviceContainer::Iterator itDev = devs.Begin ();
-           itDev != devs.End (); ++itDev)
+        for (NetDeviceContainer::Iterator itDev = devs.Begin(); itDev != devs.End(); ++itDev)
         {
-          Ptr<SatNetDevice> satDev = (*itDev)->GetObject<SatNetDevice> ();
-          NS_ASSERT (satDev != nullptr);
-          Ptr<SatPhy> satPhy = satDev->GetPhy ();
-          NS_ASSERT (satPhy != nullptr);
-          Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx ();
-          NS_ASSERT (satPhyRx != nullptr);
-          ObjectVectorValue carriers;
-          satPhyRx->GetAttribute ("RxCarrierList", carriers);
-          NS_LOG_DEBUG (this << " Node ID " << (*it)->GetId ()
-                             << " device #" << (*itDev)->GetIfIndex ()
-                             << " has " << carriers.GetN () << " RX carriers");
+            Ptr<SatNetDevice> satDev = (*itDev)->GetObject<SatNetDevice>();
+            NS_ASSERT(satDev != nullptr);
+            Ptr<SatPhy> satPhy = satDev->GetPhy();
+            NS_ASSERT(satPhy != nullptr);
+            Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx();
+            NS_ASSERT(satPhyRx != nullptr);
+            ObjectVectorValue carriers;
+            satPhyRx->GetAttribute("RxCarrierList", carriers);
+            NS_LOG_DEBUG(this << " Node ID " << (*it)->GetId() << " device #"
+                              << (*itDev)->GetIfIndex() << " has " << carriers.GetN()
+                              << " RX carriers");
 
-          for (ObjectVectorValue::Iterator itCarrier = carriers.Begin ();
-               itCarrier != carriers.End (); ++itCarrier)
+            for (ObjectVectorValue::Iterator itCarrier = carriers.Begin();
+                 itCarrier != carriers.End();
+                 ++itCarrier)
             {
-              SatPhyRxCarrier::CarrierType ct = DynamicCast<SatPhyRxCarrier> (itCarrier->second)->GetCarrierType ();
-              if (ct != GetValidCarrierType ())
+                SatPhyRxCarrier::CarrierType ct =
+                    DynamicCast<SatPhyRxCarrier>(itCarrier->second)->GetCarrierType();
+                if (ct != GetValidCarrierType())
                 {
-                  continue;
+                    continue;
                 }
 
-              const bool ret = itCarrier->second->TraceConnectWithoutContext (GetTraceSourceName (), callback);
-              if (ret)
+                const bool ret =
+                    itCarrier->second->TraceConnectWithoutContext(GetTraceSourceName(), callback);
+                if (ret)
                 {
-                  NS_LOG_INFO (this << " successfully connected with node ID "
-                                    << (*it)->GetId ()
-                                    << " device #" << (*itDev)->GetIfIndex ()
-                                    << " RX carrier #" << itCarrier->first);
+                    NS_LOG_INFO(this << " successfully connected with node ID " << (*it)->GetId()
+                                     << " device #" << (*itDev)->GetIfIndex() << " RX carrier #"
+                                     << itCarrier->first);
                 }
-              else
+                else
                 {
-                  NS_FATAL_ERROR ("Error connecting to "
-                                  << GetTraceSourceName () << " trace source"
-                                  << " of SatPhyRxCarrier"
-                                  << " at node ID " << (*it)->GetId ()
-                                  << " device #" << (*itDev)->GetIfIndex ()
-                                  << " RX carrier #" << itCarrier->first);
+                    NS_FATAL_ERROR("Error connecting to " << GetTraceSourceName() << " trace source"
+                                                          << " of SatPhyRxCarrier"
+                                                          << " at node ID " << (*it)->GetId()
+                                                          << " device #" << (*itDev)->GetIfIndex()
+                                                          << " RX carrier #" << itCarrier->first);
                 }
 
             } // end of `for (ObjectVectorValue::Iterator itCarrier = carriers)`
@@ -390,202 +385,213 @@ SatStatsFeederPacketCollisionHelper::DoInstall ()
 
 // BASE CLASS USER /////////////////////////////////////////////////////////////////
 
-NS_OBJECT_ENSURE_REGISTERED (SatStatsUserPacketCollisionHelper);
+NS_OBJECT_ENSURE_REGISTERED(SatStatsUserPacketCollisionHelper);
 
-SatStatsUserPacketCollisionHelper::SatStatsUserPacketCollisionHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsPacketCollisionHelper (satHelper)
+SatStatsUserPacketCollisionHelper::SatStatsUserPacketCollisionHelper(Ptr<const SatHelper> satHelper)
+    : SatStatsPacketCollisionHelper(satHelper)
 {
-  NS_LOG_FUNCTION (this << satHelper);
+    NS_LOG_FUNCTION(this << satHelper);
 }
 
-
-SatStatsUserPacketCollisionHelper::~SatStatsUserPacketCollisionHelper ()
+SatStatsUserPacketCollisionHelper::~SatStatsUserPacketCollisionHelper()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
-
 
 TypeId // static
-SatStatsUserPacketCollisionHelper::GetTypeId ()
+SatStatsUserPacketCollisionHelper::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::SatStatsUserPacketCollisionHelper")
-    .SetParent<SatStatsPacketCollisionHelper> ()
-  ;
-  return tid;
+    static TypeId tid =
+        TypeId("ns3::SatStatsUserPacketCollisionHelper").SetParent<SatStatsPacketCollisionHelper>();
+    return tid;
 }
 
-
 void
-SatStatsUserPacketCollisionHelper::DoInstall ()
+SatStatsUserPacketCollisionHelper::DoInstall()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  switch (GetOutputType ())
+    switch (GetOutputType())
     {
     case SatStatsHelper::OUTPUT_NONE:
-      NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
-      break;
+        NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
+                       << " is not a valid output type for this statistics.");
+        break;
 
-    case SatStatsHelper::OUTPUT_SCALAR_FILE:
-      {
+    case SatStatsHelper::OUTPUT_SCALAR_FILE: {
         // Setup aggregator.
-        m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetOutputFileName ()),
-                                         "MultiFileMode", BooleanValue (false),
-                                         "EnableContextPrinting", BooleanValue (true),
-                                         "GeneralHeading", StringValue (GetIdentifierHeading ("collision_rate")));
+        m_aggregator = CreateAggregator("ns3::MultiFileAggregator",
+                                        "OutputFileName",
+                                        StringValue(GetOutputFileName()),
+                                        "MultiFileMode",
+                                        BooleanValue(false),
+                                        "EnableContextPrinting",
+                                        BooleanValue(true),
+                                        "GeneralHeading",
+                                        StringValue(GetIdentifierHeading("collision_rate")));
 
         // Setup collectors.
-        m_terminalCollectors.SetType ("ns3::ScalarCollector");
-        m_terminalCollectors.SetAttribute ("InputDataType",
-                                           EnumValue (ScalarCollector::INPUT_DATA_TYPE_BOOLEAN));
-        m_terminalCollectors.SetAttribute ("OutputType",
-                                           EnumValue (ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
-        CreateCollectorPerIdentifier (m_terminalCollectors);
-        m_terminalCollectors.ConnectToAggregator ("Output",
-                                                  m_aggregator,
-                                                  &MultiFileAggregator::Write1d);
+        m_terminalCollectors.SetType("ns3::ScalarCollector");
+        m_terminalCollectors.SetAttribute("InputDataType",
+                                          EnumValue(ScalarCollector::INPUT_DATA_TYPE_BOOLEAN));
+        m_terminalCollectors.SetAttribute(
+            "OutputType",
+            EnumValue(ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
+        CreateCollectorPerIdentifier(m_terminalCollectors);
+        m_terminalCollectors.ConnectToAggregator("Output",
+                                                 m_aggregator,
+                                                 &MultiFileAggregator::Write1d);
         break;
-      }
+    }
 
-    case SatStatsHelper::OUTPUT_SCATTER_FILE:
-      {
+    case SatStatsHelper::OUTPUT_SCATTER_FILE: {
         // Setup aggregator.
-        m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetOutputFileName ()),
-                                         "GeneralHeading", StringValue (GetTimeHeading ("collision_rate")));
+        m_aggregator = CreateAggregator("ns3::MultiFileAggregator",
+                                        "OutputFileName",
+                                        StringValue(GetOutputFileName()),
+                                        "GeneralHeading",
+                                        StringValue(GetTimeHeading("collision_rate")));
 
         // Setup collectors.
-        m_terminalCollectors.SetType ("ns3::IntervalRateCollector");
-        m_terminalCollectors.SetAttribute ("InputDataType",
-                                           EnumValue (IntervalRateCollector::INPUT_DATA_TYPE_BOOLEAN));
-        m_terminalCollectors.SetAttribute ("OutputType",
-                                           EnumValue (IntervalRateCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
-        CreateCollectorPerIdentifier (m_terminalCollectors);
-        m_terminalCollectors.ConnectToAggregator ("OutputWithTime",
-                                                  m_aggregator,
-                                                  &MultiFileAggregator::Write2d);
-        m_terminalCollectors.ConnectToAggregator ("OutputString",
-                                                  m_aggregator,
-                                                  &MultiFileAggregator::AddContextHeading);
+        m_terminalCollectors.SetType("ns3::IntervalRateCollector");
+        m_terminalCollectors.SetAttribute(
+            "InputDataType",
+            EnumValue(IntervalRateCollector::INPUT_DATA_TYPE_BOOLEAN));
+        m_terminalCollectors.SetAttribute(
+            "OutputType",
+            EnumValue(IntervalRateCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
+        CreateCollectorPerIdentifier(m_terminalCollectors);
+        m_terminalCollectors.ConnectToAggregator("OutputWithTime",
+                                                 m_aggregator,
+                                                 &MultiFileAggregator::Write2d);
+        m_terminalCollectors.ConnectToAggregator("OutputString",
+                                                 m_aggregator,
+                                                 &MultiFileAggregator::AddContextHeading);
         break;
-      }
+    }
 
     case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
     case SatStatsHelper::OUTPUT_PDF_FILE:
     case SatStatsHelper::OUTPUT_CDF_FILE:
-      NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
-      break;
+        NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
+                       << " is not a valid output type for this statistics.");
+        break;
 
     case SatStatsHelper::OUTPUT_SCALAR_PLOT:
-      /// \todo Add support for boxes in Gnuplot.
-      NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
-      break;
+        /// \todo Add support for boxes in Gnuplot.
+        NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
+                       << " is not a valid output type for this statistics.");
+        break;
 
-    case SatStatsHelper::OUTPUT_SCATTER_PLOT:
-      {
+    case SatStatsHelper::OUTPUT_SCATTER_PLOT: {
         // Setup aggregator.
-        m_aggregator = CreateAggregator ("ns3::MagisterGnuplotAggregator",
-                                         "OutputPath", StringValue (GetOutputPath ()),
-                                         "OutputFileName", StringValue (GetName ()));
-        Ptr<MagisterGnuplotAggregator> plotAggregator
-          = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-        NS_ASSERT (plotAggregator != nullptr);
-        //plot->SetTitle ("");
-        plotAggregator->SetLegend ("Time (in seconds)",
-                                   "Packet collision rate");
-        plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
+        m_aggregator = CreateAggregator("ns3::MagisterGnuplotAggregator",
+                                        "OutputPath",
+                                        StringValue(GetOutputPath()),
+                                        "OutputFileName",
+                                        StringValue(GetName()));
+        Ptr<MagisterGnuplotAggregator> plotAggregator =
+            m_aggregator->GetObject<MagisterGnuplotAggregator>();
+        NS_ASSERT(plotAggregator != nullptr);
+        // plot->SetTitle ("");
+        plotAggregator->SetLegend("Time (in seconds)", "Packet collision rate");
+        plotAggregator->Set2dDatasetDefaultStyle(Gnuplot2dDataset::LINES);
 
         // Setup collectors.
-        m_terminalCollectors.SetType ("ns3::IntervalRateCollector");
-        m_terminalCollectors.SetAttribute ("InputDataType",
-                                           EnumValue (IntervalRateCollector::INPUT_DATA_TYPE_BOOLEAN));
-        m_terminalCollectors.SetAttribute ("OutputType",
-                                           EnumValue (IntervalRateCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
-        CreateCollectorPerIdentifier (m_terminalCollectors);
-        for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
-             it != m_terminalCollectors.End (); ++it)
-          {
-            const std::string context = it->second->GetName ();
-            plotAggregator->Add2dDataset (context, context);
-          }
-        m_terminalCollectors.ConnectToAggregator ("OutputWithTime",
-                                                  m_aggregator,
-                                                  &MagisterGnuplotAggregator::Write2d);
+        m_terminalCollectors.SetType("ns3::IntervalRateCollector");
+        m_terminalCollectors.SetAttribute(
+            "InputDataType",
+            EnumValue(IntervalRateCollector::INPUT_DATA_TYPE_BOOLEAN));
+        m_terminalCollectors.SetAttribute(
+            "OutputType",
+            EnumValue(IntervalRateCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
+        CreateCollectorPerIdentifier(m_terminalCollectors);
+        for (CollectorMap::Iterator it = m_terminalCollectors.Begin();
+             it != m_terminalCollectors.End();
+             ++it)
+        {
+            const std::string context = it->second->GetName();
+            plotAggregator->Add2dDataset(context, context);
+        }
+        m_terminalCollectors.ConnectToAggregator("OutputWithTime",
+                                                 m_aggregator,
+                                                 &MagisterGnuplotAggregator::Write2d);
         break;
-      }
+    }
 
     case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
     case SatStatsHelper::OUTPUT_PDF_PLOT:
     case SatStatsHelper::OUTPUT_CDF_PLOT:
-      NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
-      break;
+        NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
+                       << " is not a valid output type for this statistics.");
+        break;
 
     default:
-      NS_FATAL_ERROR ("SatStatsFeederPacketCollisionHelper - Invalid output type");
-      break;
+        NS_FATAL_ERROR("SatStatsFeederPacketCollisionHelper - Invalid output type");
+        break;
     }
 
-  // Create a map of UT addresses and identifiers.
-  NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
-  for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
+    // Create a map of UT addresses and identifiers.
+    NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+    for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
     {
-      SaveAddressAndIdentifier (*it);
+        SaveAddressAndIdentifier(*it);
     }
 
-  // Connect to trace sources at SAT nodes.
+    // Connect to trace sources at SAT nodes.
 
-  NodeContainer sats = GetSatHelper ()->GetBeamHelper ()->GetGeoSatNodes ();
-  Callback<void, uint32_t, const Address &, bool> callback
-    = MakeCallback (&SatStatsUserPacketCollisionHelper::CollisionRxCallback,
-                    this);
+    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetGeoSatNodes();
+    Callback<void, uint32_t, const Address&, bool> callback =
+        MakeCallback(&SatStatsUserPacketCollisionHelper::CollisionRxCallback, this);
 
-  for (NodeContainer::Iterator it = sats.Begin (); it != sats.End (); ++it)
+    for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
-      Ptr<NetDevice> dev = GetSatSatGeoNetDevice (*it);
+        Ptr<NetDevice> dev = GetSatSatGeoNetDevice(*it);
 
-      Ptr<SatPhy> satPhy;
-      Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice> ();
-      NS_ASSERT (satGeoDev != nullptr);
-      std::map<uint32_t, Ptr<SatPhy> > satGeoUserPhys = satGeoDev->GetUserPhy ();
-      for (std::map<uint32_t, Ptr<SatPhy>>::iterator itPhy = satGeoUserPhys.begin (); itPhy != satGeoUserPhys.end (); ++itPhy)
+        Ptr<SatPhy> satPhy;
+        Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice>();
+        NS_ASSERT(satGeoDev != nullptr);
+        std::map<uint32_t, Ptr<SatPhy>> satGeoUserPhys = satGeoDev->GetUserPhy();
+        for (std::map<uint32_t, Ptr<SatPhy>>::iterator itPhy = satGeoUserPhys.begin();
+             itPhy != satGeoUserPhys.end();
+             ++itPhy)
         {
-          satPhy = itPhy->second;
-          NS_ASSERT (satPhy != nullptr);
-          Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx ();
-          NS_ASSERT (satPhyRx != nullptr);
+            satPhy = itPhy->second;
+            NS_ASSERT(satPhy != nullptr);
+            Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx();
+            NS_ASSERT(satPhyRx != nullptr);
 
-          ObjectVectorValue carriers;
-          satPhyRx->GetAttribute ("RxCarrierList", carriers);
-          NS_LOG_DEBUG (this << " Node ID " << (*it)->GetId ()
-                             << " device #" << dev->GetIfIndex ()
-                             << " has " << carriers.GetN () << " RX carriers");
+            ObjectVectorValue carriers;
+            satPhyRx->GetAttribute("RxCarrierList", carriers);
+            NS_LOG_DEBUG(this << " Node ID " << (*it)->GetId() << " device #" << dev->GetIfIndex()
+                              << " has " << carriers.GetN() << " RX carriers");
 
-          for (ObjectVectorValue::Iterator itCarrier = carriers.Begin ();
-               itCarrier != carriers.End (); ++itCarrier)
+            for (ObjectVectorValue::Iterator itCarrier = carriers.Begin();
+                 itCarrier != carriers.End();
+                 ++itCarrier)
             {
-              SatPhyRxCarrier::CarrierType ct = DynamicCast<SatPhyRxCarrier> (itCarrier->second)->GetCarrierType ();
-              if (ct != GetValidCarrierType ())
+                SatPhyRxCarrier::CarrierType ct =
+                    DynamicCast<SatPhyRxCarrier>(itCarrier->second)->GetCarrierType();
+                if (ct != GetValidCarrierType())
                 {
-                  continue;
+                    continue;
                 }
 
-              const bool ret = itCarrier->second->TraceConnectWithoutContext (GetTraceSourceName (), callback);
-              if (ret)
+                const bool ret =
+                    itCarrier->second->TraceConnectWithoutContext(GetTraceSourceName(), callback);
+                if (ret)
                 {
-                  NS_LOG_INFO (this << " successfully connected with node ID "
-                                    << (*it)->GetId ()
-                                    << " device #" << dev->GetIfIndex ()
-                                    << " RX carrier #" << itCarrier->first);
+                    NS_LOG_INFO(this << " successfully connected with node ID " << (*it)->GetId()
+                                     << " device #" << dev->GetIfIndex() << " RX carrier #"
+                                     << itCarrier->first);
                 }
-              else
+                else
                 {
-                  NS_FATAL_ERROR ("Error connecting to "
-                                  << GetTraceSourceName () << " trace source"
-                                  << " of SatPhyRxCarrier"
-                                  << " at node ID " << (*it)->GetId ()
-                                  << " device #" << dev->GetIfIndex ()
-                                  << " RX carrier #" << itCarrier->first);
+                    NS_FATAL_ERROR("Error connecting to " << GetTraceSourceName() << " trace source"
+                                                          << " of SatPhyRxCarrier"
+                                                          << " at node ID " << (*it)->GetId()
+                                                          << " device #" << dev->GetIfIndex()
+                                                          << " RX carrier #" << itCarrier->first);
                 }
 
             } // end of `for (ObjectVectorValue::Iterator itCarrier = carriers)`
@@ -596,179 +602,160 @@ SatStatsUserPacketCollisionHelper::DoInstall ()
 
 } // end of `void DoInstall ();`
 
-
 // SLOTTED ALOHA FEEDER //////////////////////////////////////////////////////////////
 
-NS_OBJECT_ENSURE_REGISTERED (SatStatsFeederSlottedAlohaPacketCollisionHelper);
+NS_OBJECT_ENSURE_REGISTERED(SatStatsFeederSlottedAlohaPacketCollisionHelper);
 
-SatStatsFeederSlottedAlohaPacketCollisionHelper::SatStatsFeederSlottedAlohaPacketCollisionHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsFeederPacketCollisionHelper (satHelper)
+SatStatsFeederSlottedAlohaPacketCollisionHelper::SatStatsFeederSlottedAlohaPacketCollisionHelper(
+    Ptr<const SatHelper> satHelper)
+    : SatStatsFeederPacketCollisionHelper(satHelper)
 {
-  NS_LOG_FUNCTION (this << satHelper);
-  SetTraceSourceName ("SlottedAlohaRxCollision");
-  SetValidCarrierType (SatPhyRxCarrier::RA_SLOTTED_ALOHA);
+    NS_LOG_FUNCTION(this << satHelper);
+    SetTraceSourceName("SlottedAlohaRxCollision");
+    SetValidCarrierType(SatPhyRxCarrier::RA_SLOTTED_ALOHA);
 }
 
-
-SatStatsFeederSlottedAlohaPacketCollisionHelper::~SatStatsFeederSlottedAlohaPacketCollisionHelper ()
+SatStatsFeederSlottedAlohaPacketCollisionHelper::~SatStatsFeederSlottedAlohaPacketCollisionHelper()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
-
 
 TypeId // static
-SatStatsFeederSlottedAlohaPacketCollisionHelper::GetTypeId ()
+SatStatsFeederSlottedAlohaPacketCollisionHelper::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::SatStatsFeederSlottedAlohaPacketCollisionHelper")
-    .SetParent<SatStatsFeederPacketCollisionHelper> ()
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::SatStatsFeederSlottedAlohaPacketCollisionHelper")
+                            .SetParent<SatStatsFeederPacketCollisionHelper>();
+    return tid;
 }
-
 
 // CRDSA FEEDER //////////////////////////////////////////////////////////////////////
 
-NS_OBJECT_ENSURE_REGISTERED (SatStatsFeederCrdsaPacketCollisionHelper);
+NS_OBJECT_ENSURE_REGISTERED(SatStatsFeederCrdsaPacketCollisionHelper);
 
-SatStatsFeederCrdsaPacketCollisionHelper::SatStatsFeederCrdsaPacketCollisionHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsFeederPacketCollisionHelper (satHelper)
+SatStatsFeederCrdsaPacketCollisionHelper::SatStatsFeederCrdsaPacketCollisionHelper(
+    Ptr<const SatHelper> satHelper)
+    : SatStatsFeederPacketCollisionHelper(satHelper)
 {
-  NS_LOG_FUNCTION (this << satHelper);
-  SetTraceSourceName ("CrdsaReplicaRx");
-  SetValidCarrierType (SatPhyRxCarrier::RA_CRDSA);
+    NS_LOG_FUNCTION(this << satHelper);
+    SetTraceSourceName("CrdsaReplicaRx");
+    SetValidCarrierType(SatPhyRxCarrier::RA_CRDSA);
 }
 
-
-SatStatsFeederCrdsaPacketCollisionHelper::~SatStatsFeederCrdsaPacketCollisionHelper ()
+SatStatsFeederCrdsaPacketCollisionHelper::~SatStatsFeederCrdsaPacketCollisionHelper()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
-
 
 TypeId // static
-SatStatsFeederCrdsaPacketCollisionHelper::GetTypeId ()
+SatStatsFeederCrdsaPacketCollisionHelper::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::SatStatsFeederCrdsaPacketCollisionHelper")
-    .SetParent<SatStatsFeederPacketCollisionHelper> ()
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::SatStatsFeederCrdsaPacketCollisionHelper")
+                            .SetParent<SatStatsFeederPacketCollisionHelper>();
+    return tid;
 }
-
 
 // E-SSA FEEDER //////////////////////////////////////////////////////////////
 
-NS_OBJECT_ENSURE_REGISTERED (SatStatsFeederEssaPacketCollisionHelper);
+NS_OBJECT_ENSURE_REGISTERED(SatStatsFeederEssaPacketCollisionHelper);
 
-SatStatsFeederEssaPacketCollisionHelper::SatStatsFeederEssaPacketCollisionHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsFeederPacketCollisionHelper (satHelper)
+SatStatsFeederEssaPacketCollisionHelper::SatStatsFeederEssaPacketCollisionHelper(
+    Ptr<const SatHelper> satHelper)
+    : SatStatsFeederPacketCollisionHelper(satHelper)
 {
-  NS_LOG_FUNCTION (this << satHelper);
-  SetTraceSourceName ("EssaRxCollision");
-  SetValidCarrierType (SatPhyRxCarrier::RA_ESSA);
+    NS_LOG_FUNCTION(this << satHelper);
+    SetTraceSourceName("EssaRxCollision");
+    SetValidCarrierType(SatPhyRxCarrier::RA_ESSA);
 }
 
-
-SatStatsFeederEssaPacketCollisionHelper::~SatStatsFeederEssaPacketCollisionHelper ()
+SatStatsFeederEssaPacketCollisionHelper::~SatStatsFeederEssaPacketCollisionHelper()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
-
 
 TypeId // static
-SatStatsFeederEssaPacketCollisionHelper::GetTypeId ()
+SatStatsFeederEssaPacketCollisionHelper::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::SatStatsFeederEssaPacketCollisionHelper")
-    .SetParent<SatStatsFeederPacketCollisionHelper> ()
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::SatStatsFeederEssaPacketCollisionHelper")
+                            .SetParent<SatStatsFeederPacketCollisionHelper>();
+    return tid;
 }
-
 
 // SLOTTED ALOHA USER //////////////////////////////////////////////////////////////
 
-NS_OBJECT_ENSURE_REGISTERED (SatStatsUserSlottedAlohaPacketCollisionHelper);
+NS_OBJECT_ENSURE_REGISTERED(SatStatsUserSlottedAlohaPacketCollisionHelper);
 
-SatStatsUserSlottedAlohaPacketCollisionHelper::SatStatsUserSlottedAlohaPacketCollisionHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsUserPacketCollisionHelper (satHelper)
+SatStatsUserSlottedAlohaPacketCollisionHelper::SatStatsUserSlottedAlohaPacketCollisionHelper(
+    Ptr<const SatHelper> satHelper)
+    : SatStatsUserPacketCollisionHelper(satHelper)
 {
-  NS_LOG_FUNCTION (this << satHelper);
-  SetTraceSourceName ("SlottedAlohaRxCollision");
-  SetValidCarrierType (SatPhyRxCarrier::RA_SLOTTED_ALOHA);
+    NS_LOG_FUNCTION(this << satHelper);
+    SetTraceSourceName("SlottedAlohaRxCollision");
+    SetValidCarrierType(SatPhyRxCarrier::RA_SLOTTED_ALOHA);
 }
 
-
-SatStatsUserSlottedAlohaPacketCollisionHelper::~SatStatsUserSlottedAlohaPacketCollisionHelper ()
+SatStatsUserSlottedAlohaPacketCollisionHelper::~SatStatsUserSlottedAlohaPacketCollisionHelper()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
-
 
 TypeId // static
-SatStatsUserSlottedAlohaPacketCollisionHelper::GetTypeId ()
+SatStatsUserSlottedAlohaPacketCollisionHelper::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::SatStatsUserSlottedAlohaPacketCollisionHelper")
-    .SetParent<SatStatsUserPacketCollisionHelper> ()
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::SatStatsUserSlottedAlohaPacketCollisionHelper")
+                            .SetParent<SatStatsUserPacketCollisionHelper>();
+    return tid;
 }
-
 
 // CRDSA USER //////////////////////////////////////////////////////////////////////
 
-NS_OBJECT_ENSURE_REGISTERED (SatStatsUserCrdsaPacketCollisionHelper);
+NS_OBJECT_ENSURE_REGISTERED(SatStatsUserCrdsaPacketCollisionHelper);
 
-SatStatsUserCrdsaPacketCollisionHelper::SatStatsUserCrdsaPacketCollisionHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsUserPacketCollisionHelper (satHelper)
+SatStatsUserCrdsaPacketCollisionHelper::SatStatsUserCrdsaPacketCollisionHelper(
+    Ptr<const SatHelper> satHelper)
+    : SatStatsUserPacketCollisionHelper(satHelper)
 {
-  NS_LOG_FUNCTION (this << satHelper);
-  SetTraceSourceName ("CrdsaReplicaRx");
-  SetValidCarrierType (SatPhyRxCarrier::RA_CRDSA);
+    NS_LOG_FUNCTION(this << satHelper);
+    SetTraceSourceName("CrdsaReplicaRx");
+    SetValidCarrierType(SatPhyRxCarrier::RA_CRDSA);
 }
 
-
-SatStatsUserCrdsaPacketCollisionHelper::~SatStatsUserCrdsaPacketCollisionHelper ()
+SatStatsUserCrdsaPacketCollisionHelper::~SatStatsUserCrdsaPacketCollisionHelper()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
-
 
 TypeId // static
-SatStatsUserCrdsaPacketCollisionHelper::GetTypeId ()
+SatStatsUserCrdsaPacketCollisionHelper::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::SatStatsUserCrdsaPacketCollisionHelper")
-    .SetParent<SatStatsUserPacketCollisionHelper> ()
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::SatStatsUserCrdsaPacketCollisionHelper")
+                            .SetParent<SatStatsUserPacketCollisionHelper>();
+    return tid;
 }
-
 
 // E-SSA USER //////////////////////////////////////////////////////////////
 
-NS_OBJECT_ENSURE_REGISTERED (SatStatsUserEssaPacketCollisionHelper);
+NS_OBJECT_ENSURE_REGISTERED(SatStatsUserEssaPacketCollisionHelper);
 
-SatStatsUserEssaPacketCollisionHelper::SatStatsUserEssaPacketCollisionHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsUserPacketCollisionHelper (satHelper)
+SatStatsUserEssaPacketCollisionHelper::SatStatsUserEssaPacketCollisionHelper(
+    Ptr<const SatHelper> satHelper)
+    : SatStatsUserPacketCollisionHelper(satHelper)
 {
-  NS_LOG_FUNCTION (this << satHelper);
-  SetTraceSourceName ("EssaRxCollision");
-  SetValidCarrierType (SatPhyRxCarrier::RA_ESSA);
+    NS_LOG_FUNCTION(this << satHelper);
+    SetTraceSourceName("EssaRxCollision");
+    SetValidCarrierType(SatPhyRxCarrier::RA_ESSA);
 }
 
-
-SatStatsUserEssaPacketCollisionHelper::~SatStatsUserEssaPacketCollisionHelper ()
+SatStatsUserEssaPacketCollisionHelper::~SatStatsUserEssaPacketCollisionHelper()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
-
 
 TypeId // static
-SatStatsUserEssaPacketCollisionHelper::GetTypeId ()
+SatStatsUserEssaPacketCollisionHelper::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::SatStatsUserEssaPacketCollisionHelper")
-    .SetParent<SatStatsUserPacketCollisionHelper> ()
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::SatStatsUserEssaPacketCollisionHelper")
+                            .SetParent<SatStatsUserPacketCollisionHelper>();
+    return tid;
 }
-
 
 } // end of namespace ns3

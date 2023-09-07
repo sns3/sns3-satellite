@@ -23,7 +23,8 @@
 
 #include <ns3/tag.h>
 
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * Tag used to save various data about a packet, like its Spreading Factor and
@@ -31,41 +32,41 @@ namespace ns3 {
  */
 class LoraBeamTag : public Tag
 {
-public:
-  static TypeId GetTypeId (void);
-  virtual TypeId GetInstanceTypeId (void) const;
+  public:
+    static TypeId GetTypeId(void);
+    virtual TypeId GetInstanceTypeId(void) const;
 
-  /**
-   * Create a LoraBeamTag with a given beam ID.
-   *
-   * \param beamId The beam ID associated to this packet
-   */
-  LoraBeamTag (uint8_t beamId = 0);
+    /**
+     * Create a LoraBeamTag with a given beam ID.
+     *
+     * \param beamId The beam ID associated to this packet
+     */
+    LoraBeamTag(uint8_t beamId = 0);
 
-  virtual ~LoraBeamTag ();
+    virtual ~LoraBeamTag();
 
-  virtual void Serialize (TagBuffer i) const;
-  virtual void Deserialize (TagBuffer i);
-  virtual uint32_t GetSerializedSize () const;
-  virtual void Print (std::ostream &os) const;
+    virtual void Serialize(TagBuffer i) const;
+    virtual void Deserialize(TagBuffer i);
+    virtual uint32_t GetSerializedSize() const;
+    virtual void Print(std::ostream& os) const;
 
-  /**
-   * Read which beam ID this packet was transmitted with.
-   *
-   * \return This tag's packet's beam ID.
-   */
-  uint8_t GetBeamId () const;
+    /**
+     * Read which beam ID this packet was transmitted with.
+     *
+     * \return This tag's packet's beam ID.
+     */
+    uint8_t GetBeamId() const;
 
-  /**
-   * Set which beamId this packet was transmitted with.
-   *
-   * \param beamId The beam ID.
-   */
-  void SetBeamId (uint8_t beamId);
+    /**
+     * Set which beamId this packet was transmitted with.
+     *
+     * \param beamId The beam ID.
+     */
+    void SetBeamId(uint8_t beamId);
 
-private:
-  uint8_t m_beamId; //!< The beam ID used by the packet.
+  private:
+    uint8_t m_beamId; //!< The beam ID used by the packet.
 };
 } // namespace ns3
 
-#endif //LORA_BEAM_TAG_H
+#endif // LORA_BEAM_TAG_H

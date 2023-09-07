@@ -23,12 +23,12 @@
 #ifndef SATELLITE_TRACED_INTERFERENCE_H
 #define SATELLITE_TRACED_INTERFERENCE_H
 
-#include "satellite-interference.h"
-#include "satellite-interference-input-trace-container.h"
 #include "satellite-enums.h"
+#include "satellite-interference-input-trace-container.h"
+#include "satellite-interference.h"
 
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -36,123 +36,126 @@ namespace ns3 {
  */
 class SatTracedInterference : public SatInterference
 {
-public:
-  /**
-   * Derived from Object
-   * \return TypeId of class
-   */
-  static TypeId GetTypeId (void);
+  public:
+    /**
+     * Derived from Object
+     * \return TypeId of class
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * Derived from Object
-   * \return TypeId of instance
-   */
-  TypeId GetInstanceTypeId (void) const;
+    /**
+     * Derived from Object
+     * \return TypeId of instance
+     */
+    TypeId GetInstanceTypeId(void) const;
 
-  /**
-   * Constructor
-   * \param channeltype
-   * \param rxBandwidth
-   */
-  SatTracedInterference (SatEnums::ChannelType_t channeltype, double rxBandwidth);
+    /**
+     * Constructor
+     * \param channeltype
+     * \param rxBandwidth
+     */
+    SatTracedInterference(SatEnums::ChannelType_t channeltype, double rxBandwidth);
 
-  /**
-   * Default constructor, not used
-   */
-  SatTracedInterference ();
+    /**
+     * Default constructor, not used
+     */
+    SatTracedInterference();
 
-  /**
-   * Destructor
-   */
-  ~SatTracedInterference ();
+    /**
+     * Destructor
+     */
+    ~SatTracedInterference();
 
-  /**
-   * Dispose of SatTracedInterference
-   */
-  void DoDispose ();
+    /**
+     * Dispose of SatTracedInterference
+     */
+    void DoDispose();
 
-  /**
-   * Set Rx bandwidth
-   * \param rxBandwidth
-   */
-  void SetRxBandwidth (double rxBandwidth);
+    /**
+     * Set Rx bandwidth
+     * \param rxBandwidth
+     */
+    void SetRxBandwidth(double rxBandwidth);
 
-private:
-  /**
-   * Adds interference power to interference object.
-   * No effect in this implementation.
-   *
-   * \param rxDuration Duration of the receiving.
-   * \param rxPower Receiving power.
-   * \param rxAddress
-   *
-   * \return the pointer to interference event as a reference of the addition
-   */
-  virtual Ptr<SatInterference::InterferenceChangeEvent> DoAdd (Time rxDuration, double rxPower, Address rxAddress);
-  /**
-   * Calculates interference power for the given reference
-   * Sets final power at end time to finalPower.
-   *
-   * Just return next value from trace input.
-   * finalPower is set to returned value.
-   *
-   * \param event Reference event which for interference is calculated.
-   *
-   * \return Final power value at end of receiving
-   */
-  virtual std::vector< std::pair<double, double> > DoCalculate (Ptr<SatInterference::InterferenceChangeEvent> event);
+  private:
+    /**
+     * Adds interference power to interference object.
+     * No effect in this implementation.
+     *
+     * \param rxDuration Duration of the receiving.
+     * \param rxPower Receiving power.
+     * \param rxAddress
+     *
+     * \return the pointer to interference event as a reference of the addition
+     */
+    virtual Ptr<SatInterference::InterferenceChangeEvent> DoAdd(Time rxDuration,
+                                                                double rxPower,
+                                                                Address rxAddress);
+    /**
+     * Calculates interference power for the given reference
+     * Sets final power at end time to finalPower.
+     *
+     * Just return next value from trace input.
+     * finalPower is set to returned value.
+     *
+     * \param event Reference event which for interference is calculated.
+     *
+     * \return Final power value at end of receiving
+     */
+    virtual std::vector<std::pair<double, double>> DoCalculate(
+        Ptr<SatInterference::InterferenceChangeEvent> event);
 
-  /**
-   * Resets current interference.
-   */
-  virtual void DoReset (void);
+    /**
+     * Resets current interference.
+     */
+    virtual void DoReset(void);
 
-  /**
-   * Notifies that RX is started by a receiver.
-   *
-   * \param event Interference reference event of receiver (ignored in this implementation)
-   */
-  virtual void DoNotifyRxStart (Ptr<SatInterference::InterferenceChangeEvent> event);
+    /**
+     * Notifies that RX is started by a receiver.
+     *
+     * \param event Interference reference event of receiver (ignored in this implementation)
+     */
+    virtual void DoNotifyRxStart(Ptr<SatInterference::InterferenceChangeEvent> event);
 
-  /**
-   * Notifies that RX is ended by a receiver.
-   *
-   * \param event Interference reference event of receiver (ignored in this implementation)
-   */
-  virtual void DoNotifyRxEnd (Ptr<SatInterference::InterferenceChangeEvent> event);
+    /**
+     * Notifies that RX is ended by a receiver.
+     *
+     * \param event Interference reference event of receiver (ignored in this implementation)
+     */
+    virtual void DoNotifyRxEnd(Ptr<SatInterference::InterferenceChangeEvent> event);
 
-  /**
-   *
-   * \param o
-   */
-  SatTracedInterference (const SatTracedInterference &o);
+    /**
+     *
+     * \param o
+     */
+    SatTracedInterference(const SatTracedInterference& o);
 
-  /**
-   *
-   * \param o
-   * \return
-   */
-  SatTracedInterference &operator = (const SatTracedInterference &o);
+    /**
+     *
+     * \param o
+     * \return
+     */
+    SatTracedInterference& operator=(const SatTracedInterference& o);
 
-  /**
-   *
-   */
-  bool m_rxing;
+    /**
+     *
+     */
+    bool m_rxing;
 
-  /**
-   *
-   */
-  double m_power;
+    /**
+     *
+     */
+    double m_power;
 
-  /**
-   *
-   */
-  SatEnums::ChannelType_t m_channelType;
+    /**
+     *
+     */
+    SatEnums::ChannelType_t m_channelType;
 
-  /**
-   * \brief RX Bandwidth in Hz
-   */
-  double m_rxBandwidth_Hz;
+    /**
+     * \brief RX Bandwidth in Hz
+     */
+    double m_rxBandwidth_Hz;
 };
 
 } // namespace ns3

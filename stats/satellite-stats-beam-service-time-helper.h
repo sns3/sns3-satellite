@@ -22,15 +22,15 @@
 #ifndef SATELLITE_STATS_BEAM_SERVICE_TIME_HELPER_H
 #define SATELLITE_STATS_BEAM_SERVICE_TIME_HELPER_H
 
-#include <ns3/ptr.h>
-#include <ns3/satellite-stats-helper.h>
 #include <ns3/collector-map.h>
+#include <ns3/ptr.h>
 #include <ns3/satellite-enums.h>
+#include <ns3/satellite-stats-helper.h>
+
 #include <map>
 
-
-namespace ns3 {
-
+namespace ns3
+{
 
 class SatHelper;
 class DataCollectionObject;
@@ -41,49 +41,46 @@ class DataCollectionObject;
  */
 class SatStatsBeamServiceTimeHelper : public SatStatsHelper
 {
-public:
-  /**
-   * Constructor.
-   * \param satHelper Satellite helper instance
-   */
-  SatStatsBeamServiceTimeHelper (Ptr<const SatHelper> satHelper);
+  public:
+    /**
+     * Constructor.
+     * \param satHelper Satellite helper instance
+     */
+    SatStatsBeamServiceTimeHelper(Ptr<const SatHelper> satHelper);
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsBeamServiceTimeHelper ();
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsBeamServiceTimeHelper();
 
-  /**
-   * inherited from ObjectBase base class
-   * \return Type ID of the helper
-   */
-  static TypeId GetTypeId ();
+    /**
+     * inherited from ObjectBase base class
+     * \return Type ID of the helper
+     */
+    static TypeId GetTypeId();
 
-protected:
-  // inherited from SatStatsHelper base class
-  void DoInstall ();
+  protected:
+    // inherited from SatStatsHelper base class
+    void DoInstall();
 
-private:
-  /**
-   * \param context Beam ID, GW ID or global ID (0) as string
-   * \param time The time beam was enabled
-   */
-  void BeamServiceCallback (std::string context, Time time);
+  private:
+    /**
+     * \param context Beam ID, GW ID or global ID (0) as string
+     * \param time The time beam was enabled
+     */
+    void BeamServiceCallback(std::string context, Time time);
 
-  /**
-   * \brief Two-dimensional map of collectors, indexed first by the
-   * the frame type identifier and second by the global/gw/beam identifier.
-   */
-  CollectorMap m_collectorMap;
+    /**
+     * \brief Two-dimensional map of collectors, indexed first by the
+     * the frame type identifier and second by the global/gw/beam identifier.
+     */
+    CollectorMap m_collectorMap;
 
-  /// The aggregator created by this helper.
-  Ptr<DataCollectionObject> m_aggregator;
-
+    /// The aggregator created by this helper.
+    Ptr<DataCollectionObject> m_aggregator;
 
 }; // end of class SatStatsBeamServiceTimeHelper
 
-
 } // end of namespace ns3
-
 
 #endif /* SATELLITE_STATS_BEAM_SERVICE_TIME_HELPER_H */

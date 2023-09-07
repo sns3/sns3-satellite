@@ -23,47 +23,48 @@
 #ifndef LORAWAN_MAC_GATEWAY_H
 #define LORAWAN_MAC_GATEWAY_H
 
-#include "satellite-bbframe-container.h"
-#include "lorawan-mac.h"
 #include "lora-tag.h"
+#include "lorawan-mac.h"
+#include "satellite-bbframe-container.h"
 
-
-namespace ns3 {
+namespace ns3
+{
 
 class LorawanMacGateway : public LorawanMac
 {
-public:
-  static TypeId GetTypeId (void);
+  public:
+    static TypeId GetTypeId(void);
 
-  LorawanMacGateway ();
-  LorawanMacGateway (uint32_t satId, uint32_t beamId);
-  virtual ~LorawanMacGateway ();
+    LorawanMacGateway();
+    LorawanMacGateway(uint32_t satId, uint32_t beamId);
+    virtual ~LorawanMacGateway();
 
-  // Implementation of the LorawanMac interface
-  virtual void Send (Ptr<Packet> packet);
+    // Implementation of the LorawanMac interface
+    virtual void Send(Ptr<Packet> packet);
 
-  // Implementation of the LorawanMac interface
-  bool IsTransmitting (void);
+    // Implementation of the LorawanMac interface
+    bool IsTransmitting(void);
 
-  // Implementation of the LorawanMac interface
-  //virtual void Receive (Ptr<Packet const> packet);
-  virtual void Receive (SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/);
+    // Implementation of the LorawanMac interface
+    // virtual void Receive (Ptr<Packet const> packet);
+    virtual void Receive(SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/);
 
-  // Implementation of the LorawanMac interface
-  virtual void FailedReception (Ptr<Packet const> packet);
+    // Implementation of the LorawanMac interface
+    virtual void FailedReception(Ptr<const Packet> packet);
 
-  // Implementation of the LorawanMac interface
-  virtual void TxFinished ();
+    // Implementation of the LorawanMac interface
+    virtual void TxFinished();
 
-  /**
-   * Return the next time at which we will be able to transmit.
-   *
-   * \return The next transmission time.
-   */
-  Time GetWaitingTime (double frequency);
-private:
-  // BB Frame configuration.
-protected:
+    /**
+     * Return the next time at which we will be able to transmit.
+     *
+     * \return The next transmission time.
+     */
+    Time GetWaitingTime(double frequency);
+
+  private:
+    // BB Frame configuration.
+  protected:
 };
 
 } /* namespace ns3 */

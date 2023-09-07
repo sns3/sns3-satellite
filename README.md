@@ -31,7 +31,7 @@ There are 2 methods to download and build (S)NS-3:
 
 [Bake](http://planete.inria.fr/software/bake/index.html) is a tool developed to simplify the download and install process of NS-3. It can be extended to make it aware of external modules to NS-3 such as SNS-3. You will first need to get bake.
 
-First you need to download Bake using Git, go to where you want Bake to be installed and call 
+First you need to download Bake using Git, go to where you want Bake to be installed and call
 
 ```shell
 $ git clone https://gitlab.com/nsnam/bake
@@ -40,7 +40,7 @@ $ git clone https://gitlab.com/nsnam/bake
 It is advisable to add bake to your path
 
 ```shell
-$ export BAKE_HOME=`pwd`/bake 
+$ export BAKE_HOME=`pwd`/bake
 $ export PATH=$PATH:$BAKE_HOME
 $ export PYTHONPATH=$PYTHONPATH:$BAKE_HOME
 ```
@@ -110,8 +110,8 @@ $ ./bake.py configure -e ns-3.37 -e sns3-satellite -e sns3-stats -e sns3-traffic
 $ ./bake.py deploy
 ```
 
-This will download the needed dependencies into a `source` folder and call the various build tools on each target. 
-If bake finds that tools are missing on your system to download or build the various dependencies it will warn you 
+This will download the needed dependencies into a `source` folder and call the various build tools on each target.
+If bake finds that tools are missing on your system to download or build the various dependencies it will warn you
 and abort the build process if the dependency wasn't optional. You can ask bake for a summary of the required tools before deploying:
 
 ```shell
@@ -142,8 +142,8 @@ $ git clone https://github.com/sns3/traffic.git traffic
 $ git clone https://github.com/sns3/stats.git magister-stats
 ```
 
-*note : When retrieving the **satellite**, **traffic** and **magister-stats** modules, you should put 
-them under the **ns-3.37/contrib/** folder. You can do so by cloning them directly in this folder, 
+*note : When retrieving the **satellite**, **traffic** and **magister-stats** modules, you should put
+them under the **ns-3.37/contrib/** folder. You can do so by cloning them directly in this folder,
 extracting them here, copying the files afterwards or using symbolic links.*
 
 Then you need to configure CMake and ask it to build NS-3. It will automatically build all modules found in contrib:

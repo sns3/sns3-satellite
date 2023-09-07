@@ -23,19 +23,19 @@
 #ifndef LORA_FORWARDER_HELPER_H
 #define LORA_FORWARDER_HELPER_H
 
+#include <ns3/address.h>
+#include <ns3/application-container.h>
+#include <ns3/attribute.h>
+#include <ns3/lora-forwarder.h>
+#include <ns3/net-device.h>
+#include <ns3/node-container.h>
+#include <ns3/object-factory.h>
+
 #include <stdint.h>
 #include <string>
 
-#include <ns3/object-factory.h>
-#include <ns3/address.h>
-#include <ns3/attribute.h>
-#include <ns3/net-device.h>
-#include <ns3/node-container.h>
-#include <ns3/application-container.h>
-
-#include <ns3/lora-forwarder.h>
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * This class can be used to install LoraForwarder applications on a set of
@@ -43,27 +43,27 @@ namespace ns3 {
  */
 class LoraForwarderHelper : public Object
 {
-public:
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
+  public:
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
 
-  LoraForwarderHelper ();
+    LoraForwarderHelper();
 
-  ~LoraForwarderHelper ();
+    ~LoraForwarderHelper();
 
-  void SetAttribute (std::string name, const AttributeValue &value);
+    void SetAttribute(std::string name, const AttributeValue& value);
 
-  ApplicationContainer Install (NodeContainer c) const;
+    ApplicationContainer Install(NodeContainer c) const;
 
-  ApplicationContainer Install (Ptr<Node> node) const;
+    ApplicationContainer Install(Ptr<Node> node) const;
 
-private:
-  Ptr<Application> InstallPriv (Ptr<Node> node) const;
+  private:
+    Ptr<Application> InstallPriv(Ptr<Node> node) const;
 
-  ObjectFactory m_factory;
+    ObjectFactory m_factory;
 };
 
 } // namespace ns3

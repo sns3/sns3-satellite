@@ -30,10 +30,11 @@
 #define SATELLITE_FRAME_USER_LOAD_PROBE_H
 
 #include "ns3/nstime.h"
-#include "ns3/traced-callback.h"
 #include "ns3/probe.h"
+#include "ns3/traced-callback.h"
 
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \brief Probe to translate from a FrameUtLoadTrace trace source.
@@ -46,82 +47,80 @@ namespace ns3 {
  */
 class SatFrameUserLoadProbe : public Probe
 {
-public:
-  /**
-   * \brief Get the type ID.
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId ();
+  public:
+    /**
+     * \brief Get the type ID.
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId();
 
-  /**
-   * Default constructor.
-   */
-  SatFrameUserLoadProbe ();
+    /**
+     * Default constructor.
+     */
+    SatFrameUserLoadProbe();
 
-  /**
-   * Destructor for SatFrameUserLoadProbe
-   */
-  virtual ~SatFrameUserLoadProbe ();
+    /**
+     * Destructor for SatFrameUserLoadProbe
+     */
+    virtual ~SatFrameUserLoadProbe();
 
-  /**
-   * \brief Set a probe value
-   *
-   * \param frameId set the frame number equal to this
-   * \param utCount set the traced number of scheduled users equal to this
-   */
-  void SetValue (uint32_t frameId, uint32_t utCount);
+    /**
+     * \brief Set a probe value
+     *
+     * \param frameId set the frame number equal to this
+     * \param utCount set the traced number of scheduled users equal to this
+     */
+    void SetValue(uint32_t frameId, uint32_t utCount);
 
-  /**
-   * \brief Set a probe value by its name in the Config system
-   *
-   * \param path config path to access the probe
-   * \param frameId set the frame number equal to this
-   * \param utCount set the traced number of scheduled users equal to this
-   */
-  static void SetValueByPath (std::string path, uint32_t frameId, uint32_t utCount);
+    /**
+     * \brief Set a probe value by its name in the Config system
+     *
+     * \param path config path to access the probe
+     * \param frameId set the frame number equal to this
+     * \param utCount set the traced number of scheduled users equal to this
+     */
+    static void SetValueByPath(std::string path, uint32_t frameId, uint32_t utCount);
 
-  /**
-   * \brief connect to a trace source attribute provided by a given object
-   *
-   * \param traceSource the name of the attribute TraceSource to connect to
-   * \param obj ns3::Object to connect to
-   * \return true if the trace source was successfully connected
-   */
-  virtual bool ConnectByObject (std::string traceSource, Ptr<Object> obj);
+    /**
+     * \brief connect to a trace source attribute provided by a given object
+     *
+     * \param traceSource the name of the attribute TraceSource to connect to
+     * \param obj ns3::Object to connect to
+     * \return true if the trace source was successfully connected
+     */
+    virtual bool ConnectByObject(std::string traceSource, Ptr<Object> obj);
 
-  /**
-   * \brief connect to a trace source provided by a config path
-   *
-   * \param path Config path to bind to
-   *
-   * Note, if an invalid path is provided, the probe will not be connected
-   * to anything.
-   */
-  virtual void ConnectByPath (std::string path);
+    /**
+     * \brief connect to a trace source provided by a config path
+     *
+     * \param path Config path to bind to
+     *
+     * Note, if an invalid path is provided, the probe will not be connected
+     * to anything.
+     */
+    virtual void ConnectByPath(std::string path);
 
-  /**
-   * \brief Callback signature for frame load in unit of users.
-   *
-   * \param frameId The current frame number.
-   * \param utCount The number of scheduled users.
-   */
-  typedef void (*FrameUserLoadCallback)(uint32_t frameId, uint32_t utCount);
+    /**
+     * \brief Callback signature for frame load in unit of users.
+     *
+     * \param frameId The current frame number.
+     * \param utCount The number of scheduled users.
+     */
+    typedef void (*FrameUserLoadCallback)(uint32_t frameId, uint32_t utCount);
 
-private:
-  /**
-   * \brief Method to connect to an underlying ns3::TraceSource with
-   * arguments of type uint32_t and uint32_t
-   *
-   * \param frameId frame number
-   * \param utCount the traced number of scheduled users
-   */
-  void TraceSink (uint32_t frameId, uint32_t utCount);
+  private:
+    /**
+     * \brief Method to connect to an underlying ns3::TraceSource with
+     * arguments of type uint32_t and uint32_t
+     *
+     * \param frameId frame number
+     * \param utCount the traced number of scheduled users
+     */
+    void TraceSink(uint32_t frameId, uint32_t utCount);
 
-  /// Output trace, the frame ID and number of scheduled users
-  TracedCallback<uint32_t, uint32_t> m_output;
-
+    /// Output trace, the frame ID and number of scheduled users
+    TracedCallback<uint32_t, uint32_t> m_output;
 };
-
 
 } // namespace ns3
 

@@ -22,70 +22,70 @@
 
 #include "lora-network-controller.h"
 
+namespace ns3
+{
 
-namespace ns3 {
+NS_LOG_COMPONENT_DEFINE("LoraNetworkController");
 
-NS_LOG_COMPONENT_DEFINE ("LoraNetworkController");
-
-NS_OBJECT_ENSURE_REGISTERED (LoraNetworkController);
+NS_OBJECT_ENSURE_REGISTERED(LoraNetworkController);
 
 TypeId
-LoraNetworkController::GetTypeId (void)
+LoraNetworkController::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::LoraNetworkController")
-    .AddConstructor<LoraNetworkController> ();
-  return tid;
+    static TypeId tid =
+        TypeId("ns3::LoraNetworkController").AddConstructor<LoraNetworkController>();
+    return tid;
 }
 
-LoraNetworkController::LoraNetworkController ()
+LoraNetworkController::LoraNetworkController()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 }
 
-LoraNetworkController::LoraNetworkController (Ptr<LoraNetworkStatus> networkStatus) :
-  m_status (networkStatus)
+LoraNetworkController::LoraNetworkController(Ptr<LoraNetworkStatus> networkStatus)
+    : m_status(networkStatus)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 }
 
-LoraNetworkController::~LoraNetworkController ()
+LoraNetworkController::~LoraNetworkController()
 {
-  NS_LOG_FUNCTION_NOARGS ();
-}
-
-void
-LoraNetworkController::Install (Ptr<LoraNetworkControllerComponent> component)
-{
-  NS_LOG_FUNCTION (this);
-  m_components.push_back (component);
+    NS_LOG_FUNCTION_NOARGS();
 }
 
 void
-LoraNetworkController::OnNewPacket (Ptr<Packet const> packet)
+LoraNetworkController::Install(Ptr<LoraNetworkControllerComponent> component)
 {
-  NS_LOG_FUNCTION (this << packet);
+    NS_LOG_FUNCTION(this);
+    m_components.push_back(component);
+}
 
-  // NOTE As a future optimization, we can allow components to register their
-  // callbacks and only be called in case a certain MAC command is contained.
-  // For now, we call all components.
+void
+LoraNetworkController::OnNewPacket(Ptr<const Packet> packet)
+{
+    NS_LOG_FUNCTION(this << packet);
 
-  // Inform each component about the new packet
-  for (auto it = m_components.begin (); it != m_components.end (); ++it)
+    // NOTE As a future optimization, we can allow components to register their
+    // callbacks and only be called in case a certain MAC command is contained.
+    // For now, we call all components.
+
+    // Inform each component about the new packet
+    for (auto it = m_components.begin(); it != m_components.end(); ++it)
     {
-      (*it)->OnReceivedPacket (packet, m_status->GetEndDeviceStatus (packet), m_status);
+        (*it)->OnReceivedPacket(packet, m_status->GetEndDeviceStatus(packet), m_status);
     }
 }
 
 void
-LoraNetworkController::BeforeSendingReply (Ptr<LoraEndDeviceStatus> endDeviceStatus)
+LoraNetworkController::BeforeSendingReply(Ptr<LoraEndDeviceStatus> endDeviceStatus)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  // Inform each component about the imminent reply
-  for (auto it = m_components.begin (); it != m_components.end (); ++it)
+    // Inform each component about the imminent reply
+    for (auto it = m_components.begin(); it != m_components.end(); ++it)
     {
-      (*it)->BeforeSendingReply (endDeviceStatus, m_status);
+        (*it)->BeforeSendingReply(endDeviceStatus, m_status);
     }
 }
 
-}
+} // namespace ns3

@@ -21,16 +21,16 @@
 #ifndef SATELLITE_STATS_CARRIER_ID_HELPER_H
 #define SATELLITE_STATS_CARRIER_ID_HELPER_H
 
-#include <ns3/satellite-stats-helper.h>
-#include <ns3/satellite-phy-rx-carrier.h>
-#include <ns3/ptr.h>
 #include <ns3/address.h>
 #include <ns3/collector-map.h>
+#include <ns3/ptr.h>
+#include <ns3/satellite-phy-rx-carrier.h>
+#include <ns3/satellite-stats-helper.h>
+
 #include <map>
 
-
-namespace ns3 {
-
+namespace ns3
+{
 
 // BASE CLASS /////////////////////////////////////////////////////////////////
 
@@ -44,89 +44,85 @@ class DataCollectionObject;
  */
 class SatStatsCarrierIdHelper : public SatStatsHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsCarrierIdHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsCarrierIdHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsCarrierIdHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsCarrierIdHelper ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
+    /**
+     * \brief Receive inputs from trace sources and determine the right collector
+     *        to forward the inputs to.
+     * \param carrierId carrier used by the received packet burst.
+     * \param from the source address of the packet.
+     */
+    void CarrierIdRxCallback(uint32_t carrierId, const Address& from);
 
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
+    /**
+     * \return
+     */
+    std::string GetTraceSourceName() const;
 
-  /**
-   * \brief Receive inputs from trace sources and determine the right collector
-   *        to forward the inputs to.
-   * \param carrierId carrier used by the received packet burst.
-   * \param from the source address of the packet.
-   */
-  void CarrierIdRxCallback (uint32_t carrierId, const Address & from);
+    /**
+     * \brief Get the valid carrier type
+     * \return the valid carrier type
+     */
+    inline SatPhyRxCarrier::CarrierType GetValidCarrierType() const
+    {
+        return m_carrierType;
+    }
 
-  /**
-   * \return
-   */
-  std::string GetTraceSourceName () const;
+  protected:
+    // inherited from SatStatsHelper base class
+    void DoInstall();
 
-  /**
-   * \brief Get the valid carrier type
-   * \return the valid carrier type
-   */
-  inline SatPhyRxCarrier::CarrierType GetValidCarrierType () const
-  {
-    return m_carrierType;
-  }
+    /**
+     * \param traceSourceName
+     */
+    void SetTraceSourceName(std::string traceSourceName);
 
-protected:
-  // inherited from SatStatsHelper base class
-  void DoInstall ();
+    /**
+     * \brief Set valid carrier type for this statistics helper type.
+     * \param carrierType
+     */
+    inline void SetValidCarrierType(SatPhyRxCarrier::CarrierType carrierType)
+    {
+        m_carrierType = carrierType;
+    }
 
-  /**
-   * \param traceSourceName
-   */
-  void SetTraceSourceName (std::string traceSourceName);
+  private:
+    /**
+     * \brief Save the address and the proper identifier from the given UT node.
+     * \param utNode a UT node.
+     *
+     * The address of the given node will be saved in the #m_identifierMap
+     * member variable.
+     */
+    void SaveAddressAndIdentifier(Ptr<Node> utNode);
 
-  /**
-   * \brief Set valid carrier type for this statistics helper type.
-   * \param carrierType
-   */
-  inline void SetValidCarrierType (SatPhyRxCarrier::CarrierType carrierType)
-  {
-    m_carrierType = carrierType;
-  }
+    /// Maintains a list of collectors created by this helper.
+    CollectorMap m_terminalCollectors;
 
-private:
-  /**
-   * \brief Save the address and the proper identifier from the given UT node.
-   * \param utNode a UT node.
-   *
-   * The address of the given node will be saved in the #m_identifierMap
-   * member variable.
-   */
-  void SaveAddressAndIdentifier (Ptr<Node> utNode);
+    /// The aggregator created by this helper.
+    Ptr<DataCollectionObject> m_aggregator;
 
-  /// Maintains a list of collectors created by this helper.
-  CollectorMap m_terminalCollectors;
+    /// Map of address and the identifier associated with it (for forward link).
+    std::map<const Address, uint32_t> m_identifierMap;
 
-  /// The aggregator created by this helper.
-  Ptr<DataCollectionObject> m_aggregator;
+    std::string m_traceSourceName;
 
-  /// Map of address and the identifier associated with it (for forward link).
-  std::map<const Address, uint32_t> m_identifierMap;
-
-  std::string m_traceSourceName;
-
-  SatPhyRxCarrier::CarrierType m_carrierType;
+    SatPhyRxCarrier::CarrierType m_carrierType;
 
 }; // end of class SatStatsCarrierIdHelper
 
-
 } // end of namespace ns3
-
 
 #endif /* SATELLITE_STATS_CARRIER_ID_HELPER_H */

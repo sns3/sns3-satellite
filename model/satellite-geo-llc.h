@@ -25,8 +25,8 @@
 #include "satellite-llc.h"
 #include "satellite-node-info.h"
 
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -36,139 +36,141 @@ namespace ns3 {
  */
 class SatGeoLlc : public SatLlc
 {
-public:
-  /**
-   * Derived from Object
-   */
-  static TypeId GetTypeId (void);
+  public:
+    /**
+     * Derived from Object
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * Construct a SatGeoLlc, should not be used
-   */
-  SatGeoLlc ();
+    /**
+     * Construct a SatGeoLlc, should not be used
+     */
+    SatGeoLlc();
 
-  /**
-   * Construct a SatGeoLlc
-   * \param forwardLinkRegenerationMode Forward link regeneration model
-   * \param returnLinkRegenerationMode Return link regeneration model
-   */
-  SatGeoLlc (SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
-             SatEnums::RegenerationMode_t returnLinkRegenerationMode);
+    /**
+     * Construct a SatGeoLlc
+     * \param forwardLinkRegenerationMode Forward link regeneration model
+     * \param returnLinkRegenerationMode Return link regeneration model
+     */
+    SatGeoLlc(SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+              SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
-  /**
-   * Destroy a SatGeoLlc
-   *
-   * This is the destructor for the SatGeoLlc.
-   */
-  virtual ~SatGeoLlc ();
+    /**
+     * Destroy a SatGeoLlc
+     *
+     * This is the destructor for the SatGeoLlc.
+     */
+    virtual ~SatGeoLlc();
 
-  /**
-    * \brief Called from higher layer (SatNetDevice) to enque packet to LLC
-    *
-    * \param packet packet sent from above down to SatMac
-    * \param dest Destination MAC address of the packet
-    * \param flowId Flow identifier
-    * \return Boolean indicating whether the enque operation succeeded
-    */
-  virtual bool Enque (Ptr<Packet> packet, Address dest, uint8_t flowId);
+    /**
+     * \brief Called from higher layer (SatNetDevice) to enque packet to LLC
+     *
+     * \param packet packet sent from above down to SatMac
+     * \param dest Destination MAC address of the packet
+     * \param flowId Flow identifier
+     * \return Boolean indicating whether the enque operation succeeded
+     */
+    virtual bool Enque(Ptr<Packet> packet, Address dest, uint8_t flowId);
 
-  /**
-    * \brief Called from lower layer (MAC) to inform a Tx
-    * opportunity of certain amount of bytes. Note, that this
-    * method is not to be used in this class, but the real
-    * implementation is located in inherited classes.
-    *
-    * \param bytes Size of the Tx opportunity
-    * \param utAddr MAC address of the UT with the Tx opportunity
-    * \param flowId Flow identifier
-    * \param &bytesLeft Bytes left after TxOpportunity
-    * \param &nextMinTxO Minimum TxO after this TxO
-    * \return Pointer to packet to be transmitted
-    */
-  virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, Mac48Address utAddr, uint8_t flowId, uint32_t &bytesLeft, uint32_t &nextMinTxO);
+    /**
+     * \brief Called from lower layer (MAC) to inform a Tx
+     * opportunity of certain amount of bytes. Note, that this
+     * method is not to be used in this class, but the real
+     * implementation is located in inherited classes.
+     *
+     * \param bytes Size of the Tx opportunity
+     * \param utAddr MAC address of the UT with the Tx opportunity
+     * \param flowId Flow identifier
+     * \param &bytesLeft Bytes left after TxOpportunity
+     * \param &nextMinTxO Minimum TxO after this TxO
+     * \return Pointer to packet to be transmitted
+     */
+    virtual Ptr<Packet> NotifyTxOpportunity(uint32_t bytes,
+                                            Mac48Address utAddr,
+                                            uint8_t flowId,
+                                            uint32_t& bytesLeft,
+                                            uint32_t& nextMinTxO);
 
-  /**
-   * \brief Receive HL PDU from encapsulator/decapsulator entity
-   *
-   * \param packet Pointer to packet received.
-   * \param source MAC address of the source
-   * \param dest MAC address of the destination
-   */
-  virtual void ReceiveHigherLayerPdu (Ptr<Packet> packet, Mac48Address source, Mac48Address dest);
+    /**
+     * \brief Receive HL PDU from encapsulator/decapsulator entity
+     *
+     * \param packet Pointer to packet received.
+     * \param source MAC address of the source
+     * \param dest MAC address of the destination
+     */
+    virtual void ReceiveHigherLayerPdu(Ptr<Packet> packet, Mac48Address source, Mac48Address dest);
 
-  /**
-   * \brief Create and fill the scheduling objects based on LLC layer information.
-   * Scheduling objects may be used at the MAC layer to assist in scheduling.
-   * \param output reference to an output vector that will be filled with
-   *               pointer to scheduling objects
-   */
-  virtual void GetSchedulingContexts (std::vector< Ptr<SatSchedulingObject> > & output) const;
+    /**
+     * \brief Create and fill the scheduling objects based on LLC layer information.
+     * Scheduling objects may be used at the MAC layer to assist in scheduling.
+     * \param output reference to an output vector that will be filled with
+     *               pointer to scheduling objects
+     */
+    virtual void GetSchedulingContexts(std::vector<Ptr<SatSchedulingObject>>& output) const;
 
-  /**
-   * \brief Get the number of (new) bytes at LLC queue for a certain UT. Method
-   * checks only the SatQueue for packets, thus it does not count possible
-   * packets buffered at the encapsulator (e.g. in case of ARQ). This is a pure
-   * virtual method to be implemented to inherited classes.
-   * \param utAddress the MAC address that identifies a particular UT node.
-   * \return Number of bytes currently queued in the encapsulator(s)
-   *         associated with the UT.
-   */
-  virtual uint32_t GetNBytesInQueue (Mac48Address utAddress) const;
+    /**
+     * \brief Get the number of (new) bytes at LLC queue for a certain UT. Method
+     * checks only the SatQueue for packets, thus it does not count possible
+     * packets buffered at the encapsulator (e.g. in case of ARQ). This is a pure
+     * virtual method to be implemented to inherited classes.
+     * \param utAddress the MAC address that identifies a particular UT node.
+     * \return Number of bytes currently queued in the encapsulator(s)
+     *         associated with the UT.
+     */
+    virtual uint32_t GetNBytesInQueue(Mac48Address utAddress) const;
 
-  /**
-    \brief Get the number of (new) packets at LLC queues for a certain UT. Method
-   * checks only the SatQueue for packets, thus it does not count possible
-   * packets buffered at the encapsulator (e.g. in case of ARQ). This is a pure
-   * virtual method to be implemented to inherited classes.
-   * \param utAddress the MAC address that identifies a particular UT node.
-   * \return Number of packets currently queued in the encapsulator(s)
-   *         associated with the UT.
-   */
-  virtual uint32_t GetNPacketsInQueue (Mac48Address utAddress) const;
+    /**
+      \brief Get the number of (new) packets at LLC queues for a certain UT. Method
+     * checks only the SatQueue for packets, thus it does not count possible
+     * packets buffered at the encapsulator (e.g. in case of ARQ). This is a pure
+     * virtual method to be implemented to inherited classes.
+     * \param utAddress the MAC address that identifies a particular UT node.
+     * \return Number of packets currently queued in the encapsulator(s)
+     *         associated with the UT.
+     */
+    virtual uint32_t GetNPacketsInQueue(Mac48Address utAddress) const;
 
-  /**
-   * \brief Receive callback used for sending packet to netdevice layer.
-    * \param packet the packet received
-    */
-  typedef Callback<void, Ptr<Packet>, const Address& > ReceiveSatelliteCallback;
+    /**
+     * \brief Receive callback used for sending packet to netdevice layer.
+     * \param packet the packet received
+     */
+    typedef Callback<void, Ptr<Packet>, const Address&> ReceiveSatelliteCallback;
 
-  /**
-   * \brief Set Receive callback to forward packet to upper layer on satellite
-   * \param cb callback to invoke whenever a packet has been received and must
-   *        be forwarded to the higher layers.
-   */
-  void SetReceiveSatelliteCallback (SatGeoLlc::ReceiveSatelliteCallback cb);
+    /**
+     * \brief Set Receive callback to forward packet to upper layer on satellite
+     * \param cb callback to invoke whenever a packet has been received and must
+     *        be forwarded to the higher layers.
+     */
+    void SetReceiveSatelliteCallback(SatGeoLlc::ReceiveSatelliteCallback cb);
 
-protected:
-  /**
-   * Dispose of this class instance
-   */
-  virtual void DoDispose ();
+  protected:
+    /**
+     * Dispose of this class instance
+     */
+    virtual void DoDispose();
 
-  /**
-   * \brief Virtual method to create a new encapsulator 'on-a-need-basis' dynamically.
-   * Method is implemented in the inherited class which knows which type of encapsulator to create.
-   * This is a pure virtual method to be implemented to inherited classes.
-   * \param key Encapsulator key class
-   */
-  virtual void CreateEncap (Ptr<EncapKey> key);
+    /**
+     * \brief Virtual method to create a new encapsulator 'on-a-need-basis' dynamically.
+     * Method is implemented in the inherited class which knows which type of encapsulator to
+     * create. This is a pure virtual method to be implemented to inherited classes. \param key
+     * Encapsulator key class
+     */
+    virtual void CreateEncap(Ptr<EncapKey> key);
 
-  /**
-   * \brief Virtual method to create a new decapsulator 'on-a-need-basis' dynamically.
-   * Method is implemented in the inherited class which knows which type of decapsulator to create.
-   * This is a pure virtual method to be implemented to inherited classes.
-   * \param key Encapsulator key class
-   */
-  virtual void CreateDecap (Ptr<EncapKey> key);
+    /**
+     * \brief Virtual method to create a new decapsulator 'on-a-need-basis' dynamically.
+     * Method is implemented in the inherited class which knows which type of decapsulator to
+     * create. This is a pure virtual method to be implemented to inherited classes. \param key
+     * Encapsulator key class
+     */
+    virtual void CreateDecap(Ptr<EncapKey> key);
 
-  /**
-   * The upper layer package receive callback.
-   */
-  ReceiveSatelliteCallback m_rxSatelliteCallback;
-
+    /**
+     * The upper layer package receive callback.
+     */
+    ReceiveSatelliteCallback m_rxSatelliteCallback;
 };
 
 } // namespace ns3
-
 
 #endif /* SATELLITE_GEO_LLC_H_ */

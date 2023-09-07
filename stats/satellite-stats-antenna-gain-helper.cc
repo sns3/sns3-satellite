@@ -18,116 +18,107 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.com>
  */
 
-#include <ns3/log.h>
-#include <ns3/nstime.h>
-#include <ns3/enum.h>
-#include <ns3/string.h>
-#include <ns3/boolean.h>
-#include <ns3/callback.h>
-
-#include <ns3/singleton.h>
-#include <ns3/node-container.h>
-#include <ns3/satellite-ut-handover-module.h>
-#include <ns3/satellite-helper.h>
-
-#include <ns3/data-collection-object.h>
-#include <ns3/probe.h>
-#include <ns3/unit-conversion-collector.h>
-#include <ns3/distribution-collector.h>
-#include <ns3/scalar-collector.h>
-#include <ns3/multi-file-aggregator.h>
-#include <ns3/magister-gnuplot-aggregator.h>
-
-#include <sstream>
 #include "satellite-stats-antenna-gain-helper.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatStatsAntennaGainHelper");
+#include <ns3/boolean.h>
+#include <ns3/callback.h>
+#include <ns3/data-collection-object.h>
+#include <ns3/distribution-collector.h>
+#include <ns3/enum.h>
+#include <ns3/log.h>
+#include <ns3/magister-gnuplot-aggregator.h>
+#include <ns3/multi-file-aggregator.h>
+#include <ns3/node-container.h>
+#include <ns3/nstime.h>
+#include <ns3/probe.h>
+#include <ns3/satellite-helper.h>
+#include <ns3/satellite-ut-handover-module.h>
+#include <ns3/scalar-collector.h>
+#include <ns3/singleton.h>
+#include <ns3/string.h>
+#include <ns3/unit-conversion-collector.h>
 
+#include <sstream>
 
-namespace ns3 {
+NS_LOG_COMPONENT_DEFINE("SatStatsAntennaGainHelper");
 
-NS_OBJECT_ENSURE_REGISTERED (SatStatsAntennaGainHelper);
-
-
-SatStatsAntennaGainHelper::SatStatsAntennaGainHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsHelper (satHelper),
-  m_averagingMode (false)
+namespace ns3
 {
-  NS_LOG_FUNCTION (this << satHelper);
+
+NS_OBJECT_ENSURE_REGISTERED(SatStatsAntennaGainHelper);
+
+SatStatsAntennaGainHelper::SatStatsAntennaGainHelper(Ptr<const SatHelper> satHelper)
+    : SatStatsHelper(satHelper),
+      m_averagingMode(false)
+{
+    NS_LOG_FUNCTION(this << satHelper);
 }
 
-
-SatStatsAntennaGainHelper::~SatStatsAntennaGainHelper ()
+SatStatsAntennaGainHelper::~SatStatsAntennaGainHelper()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
-
 
 TypeId
-SatStatsAntennaGainHelper::GetTypeId ()
+SatStatsAntennaGainHelper::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::SatStatsAntennaGainHelper")
-    .SetParent<SatStatsHelper> ()
-    .AddAttribute ("AveragingMode",
-                   "If true, all samples will be averaged before passed to aggregator. "
-                   "Only affects histogram, PDF, and CDF output types.",
-                   BooleanValue (false),
-                   MakeBooleanAccessor (&SatStatsAntennaGainHelper::SetAveragingMode,
-                                        &SatStatsAntennaGainHelper::GetAveragingMode),
-                   MakeBooleanChecker ())
-  ;
-  return tid;
+    static TypeId tid =
+        TypeId("ns3::SatStatsAntennaGainHelper")
+            .SetParent<SatStatsHelper>()
+            .AddAttribute("AveragingMode",
+                          "If true, all samples will be averaged before passed to aggregator. "
+                          "Only affects histogram, PDF, and CDF output types.",
+                          BooleanValue(false),
+                          MakeBooleanAccessor(&SatStatsAntennaGainHelper::SetAveragingMode,
+                                              &SatStatsAntennaGainHelper::GetAveragingMode),
+                          MakeBooleanChecker());
+    return tid;
 }
-
 
 void
-SatStatsAntennaGainHelper::SetAveragingMode (bool averagingMode)
+SatStatsAntennaGainHelper::SetAveragingMode(bool averagingMode)
 {
-  NS_LOG_FUNCTION (this << averagingMode);
-  m_averagingMode = averagingMode;
+    NS_LOG_FUNCTION(this << averagingMode);
+    m_averagingMode = averagingMode;
 }
-
 
 bool
-SatStatsAntennaGainHelper::GetAveragingMode () const
+SatStatsAntennaGainHelper::GetAveragingMode() const
 {
-  NS_LOG_FUNCTION (this);
-  return m_averagingMode;
+    NS_LOG_FUNCTION(this);
+    return m_averagingMode;
 }
 
-
 void
-SatStatsAntennaGainHelper::AntennaGainCallback (std::string identifier, double gain)
+SatStatsAntennaGainHelper::AntennaGainCallback(std::string identifier, double gain)
 {
-  std::stringstream ss (identifier);
-  uint32_t identifierNum;
-  if (!(ss >> identifierNum))
+    std::stringstream ss(identifier);
+    uint32_t identifierNum;
+    if (!(ss >> identifierNum))
     {
-      NS_FATAL_ERROR ("Cannot convert '" << identifier << "' to number");
+        NS_FATAL_ERROR("Cannot convert '" << identifier << "' to number");
     }
-  Ptr<DataCollectionObject> collector = m_terminalCollectors.Get (identifierNum);
-  NS_ASSERT_MSG (collector != nullptr,
-                 "Unable to find collector with identifier " << identifierNum);
+    Ptr<DataCollectionObject> collector = m_terminalCollectors.Get(identifierNum);
+    NS_ASSERT_MSG(collector != nullptr,
+                  "Unable to find collector with identifier " << identifierNum);
 
-  switch (GetOutputType ())
+    switch (GetOutputType())
     {
     case SatStatsHelper::OUTPUT_SCALAR_FILE:
-    case SatStatsHelper::OUTPUT_SCALAR_PLOT:
-      {
-        Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
-        NS_ASSERT (c != nullptr);
-        c->TraceSinkDouble (0.0, gain);
+    case SatStatsHelper::OUTPUT_SCALAR_PLOT: {
+        Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector>();
+        NS_ASSERT(c != nullptr);
+        c->TraceSinkDouble(0.0, gain);
         break;
-      }
+    }
 
     case SatStatsHelper::OUTPUT_SCATTER_FILE:
-    case SatStatsHelper::OUTPUT_SCATTER_PLOT:
-      {
-        Ptr<UnitConversionCollector> c = collector->GetObject<UnitConversionCollector> ();
-        NS_ASSERT (c != nullptr);
-        c->TraceSinkDouble (0.0, gain);
+    case SatStatsHelper::OUTPUT_SCATTER_PLOT: {
+        Ptr<UnitConversionCollector> c = collector->GetObject<UnitConversionCollector>();
+        NS_ASSERT(c != nullptr);
+        c->TraceSinkDouble(0.0, gain);
         break;
-      }
+    }
 
     case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
     case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
@@ -135,343 +126,363 @@ SatStatsAntennaGainHelper::AntennaGainCallback (std::string identifier, double g
     case SatStatsHelper::OUTPUT_PDF_PLOT:
     case SatStatsHelper::OUTPUT_CDF_FILE:
     case SatStatsHelper::OUTPUT_CDF_PLOT:
-      if (m_averagingMode)
+        if (m_averagingMode)
         {
-          Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
-          NS_ASSERT (c != nullptr);
-          c->TraceSinkDouble (0.0, gain);
+            Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector>();
+            NS_ASSERT(c != nullptr);
+            c->TraceSinkDouble(0.0, gain);
         }
-      else
+        else
         {
-          Ptr<DistributionCollector> c = collector->GetObject<DistributionCollector> ();
-          NS_ASSERT (c != nullptr);
-          c->TraceSinkDouble (0.0, gain);
+            Ptr<DistributionCollector> c = collector->GetObject<DistributionCollector>();
+            NS_ASSERT(c != nullptr);
+            c->TraceSinkDouble(0.0, gain);
         }
-      break;
+        break;
 
     default:
-      NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
-      break;
+        NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
+                       << " is not a valid output type for this statistics.");
+        break;
     }
 }
 
-
 void
-SatStatsAntennaGainHelper::DoInstall ()
+SatStatsAntennaGainHelper::DoInstall()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  switch (GetOutputType ())
+    switch (GetOutputType())
     {
     case SatStatsHelper::OUTPUT_NONE:
-      NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
-      break;
+        NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
+                       << " is not a valid output type for this statistics.");
+        break;
 
-    case SatStatsHelper::OUTPUT_SCALAR_FILE:
-      {
+    case SatStatsHelper::OUTPUT_SCALAR_FILE: {
         // Setup aggregator.
-        m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetOutputFileName ()),
-                                         "MultiFileMode", BooleanValue (false),
-                                         "EnableContextPrinting", BooleanValue (true),
-                                         "GeneralHeading", StringValue (GetIdentifierHeading ("gain_db")));
+        m_aggregator = CreateAggregator("ns3::MultiFileAggregator",
+                                        "OutputFileName",
+                                        StringValue(GetOutputFileName()),
+                                        "MultiFileMode",
+                                        BooleanValue(false),
+                                        "EnableContextPrinting",
+                                        BooleanValue(true),
+                                        "GeneralHeading",
+                                        StringValue(GetIdentifierHeading("gain_db")));
 
         // Setup collectors.
-        m_terminalCollectors.SetType ("ns3::ScalarCollector");
-        m_terminalCollectors.SetAttribute ("InputDataType",
-                                           EnumValue (ScalarCollector::INPUT_DATA_TYPE_DOUBLE));
-        m_terminalCollectors.SetAttribute ("OutputType",
-                                           EnumValue (ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
-        CreateCollectorPerIdentifier (m_terminalCollectors);
-        m_terminalCollectors.ConnectToAggregator ("Output",
-                                                  m_aggregator,
-                                                  &MultiFileAggregator::Write1d);
+        m_terminalCollectors.SetType("ns3::ScalarCollector");
+        m_terminalCollectors.SetAttribute("InputDataType",
+                                          EnumValue(ScalarCollector::INPUT_DATA_TYPE_DOUBLE));
+        m_terminalCollectors.SetAttribute(
+            "OutputType",
+            EnumValue(ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
+        CreateCollectorPerIdentifier(m_terminalCollectors);
+        m_terminalCollectors.ConnectToAggregator("Output",
+                                                 m_aggregator,
+                                                 &MultiFileAggregator::Write1d);
         break;
-      }
+    }
 
-    case SatStatsHelper::OUTPUT_SCATTER_FILE:
-      {
+    case SatStatsHelper::OUTPUT_SCATTER_FILE: {
         // Setup aggregator.
-        m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetOutputFileName ()),
-                                         "GeneralHeading", StringValue (GetTimeHeading ("gain_db")));
+        m_aggregator = CreateAggregator("ns3::MultiFileAggregator",
+                                        "OutputFileName",
+                                        StringValue(GetOutputFileName()),
+                                        "GeneralHeading",
+                                        StringValue(GetTimeHeading("gain_db")));
 
         // Setup collectors.
-        m_terminalCollectors.SetType ("ns3::UnitConversionCollector");
-        m_terminalCollectors.SetAttribute ("ConversionType",
-                                           EnumValue (UnitConversionCollector::TRANSPARENT));
-        CreateCollectorPerIdentifier (m_terminalCollectors);
-        m_terminalCollectors.ConnectToAggregator ("OutputTimeValue",
-                                                  m_aggregator,
-                                                  &MultiFileAggregator::Write2d);
+        m_terminalCollectors.SetType("ns3::UnitConversionCollector");
+        m_terminalCollectors.SetAttribute("ConversionType",
+                                          EnumValue(UnitConversionCollector::TRANSPARENT));
+        CreateCollectorPerIdentifier(m_terminalCollectors);
+        m_terminalCollectors.ConnectToAggregator("OutputTimeValue",
+                                                 m_aggregator,
+                                                 &MultiFileAggregator::Write2d);
         break;
-      }
+    }
 
     case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
     case SatStatsHelper::OUTPUT_PDF_FILE:
-    case SatStatsHelper::OUTPUT_CDF_FILE:
-      {
+    case SatStatsHelper::OUTPUT_CDF_FILE: {
         if (m_averagingMode)
-          {
+        {
             // Setup aggregator.
-            m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                             "OutputFileName", StringValue (GetOutputFileName ()),
-                                             "MultiFileMode", BooleanValue (false),
-                                             "EnableContextPrinting", BooleanValue (false),
-                                             "GeneralHeading", StringValue (GetDistributionHeading ("gain_db")));
-            Ptr<MultiFileAggregator> fileAggregator = m_aggregator->GetObject<MultiFileAggregator> ();
-            NS_ASSERT (fileAggregator != nullptr);
+            m_aggregator = CreateAggregator("ns3::MultiFileAggregator",
+                                            "OutputFileName",
+                                            StringValue(GetOutputFileName()),
+                                            "MultiFileMode",
+                                            BooleanValue(false),
+                                            "EnableContextPrinting",
+                                            BooleanValue(false),
+                                            "GeneralHeading",
+                                            StringValue(GetDistributionHeading("gain_db")));
+            Ptr<MultiFileAggregator> fileAggregator =
+                m_aggregator->GetObject<MultiFileAggregator>();
+            NS_ASSERT(fileAggregator != nullptr);
 
             // Setup the final-level collector.
-            m_averagingCollector = CreateObject<DistributionCollector> ();
-            DistributionCollector::OutputType_t outputType
-              = DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
-            if (GetOutputType () == SatStatsHelper::OUTPUT_PDF_FILE)
-              {
+            m_averagingCollector = CreateObject<DistributionCollector>();
+            DistributionCollector::OutputType_t outputType =
+                DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
+            if (GetOutputType() == SatStatsHelper::OUTPUT_PDF_FILE)
+            {
                 outputType = DistributionCollector::OUTPUT_TYPE_PROBABILITY;
-              }
-            else if (GetOutputType () == SatStatsHelper::OUTPUT_CDF_FILE)
-              {
+            }
+            else if (GetOutputType() == SatStatsHelper::OUTPUT_CDF_FILE)
+            {
                 outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
-              }
-            m_averagingCollector->SetOutputType (outputType);
-            m_averagingCollector->SetName ("0");
-            m_averagingCollector->TraceConnect ("Output", "0",
-                                                MakeCallback (&MultiFileAggregator::Write2d,
-                                                              fileAggregator));
-            m_averagingCollector->TraceConnect ("OutputString", "0",
-                                                MakeCallback (&MultiFileAggregator::AddContextHeading,
-                                                              fileAggregator));
-            m_averagingCollector->TraceConnect ("Warning", "0",
-                                                MakeCallback (&MultiFileAggregator::EnableContextWarning,
-                                                              fileAggregator));
+            }
+            m_averagingCollector->SetOutputType(outputType);
+            m_averagingCollector->SetName("0");
+            m_averagingCollector->TraceConnect(
+                "Output",
+                "0",
+                MakeCallback(&MultiFileAggregator::Write2d, fileAggregator));
+            m_averagingCollector->TraceConnect(
+                "OutputString",
+                "0",
+                MakeCallback(&MultiFileAggregator::AddContextHeading, fileAggregator));
+            m_averagingCollector->TraceConnect(
+                "Warning",
+                "0",
+                MakeCallback(&MultiFileAggregator::EnableContextWarning, fileAggregator));
 
             // Setup collectors.
-            m_terminalCollectors.SetType ("ns3::ScalarCollector");
-            m_terminalCollectors.SetAttribute ("InputDataType",
-                                               EnumValue (ScalarCollector::INPUT_DATA_TYPE_DOUBLE));
-            m_terminalCollectors.SetAttribute ("OutputType",
-                                               EnumValue (ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
-            CreateCollectorPerIdentifier (m_terminalCollectors);
-            Callback<void, double> callback
-              = MakeCallback (&DistributionCollector::TraceSinkDouble1,
-                              m_averagingCollector);
-            for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
-                 it != m_terminalCollectors.End (); ++it)
-              {
-                it->second->TraceConnectWithoutContext ("Output", callback);
-              }
-          }
+            m_terminalCollectors.SetType("ns3::ScalarCollector");
+            m_terminalCollectors.SetAttribute("InputDataType",
+                                              EnumValue(ScalarCollector::INPUT_DATA_TYPE_DOUBLE));
+            m_terminalCollectors.SetAttribute(
+                "OutputType",
+                EnumValue(ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
+            CreateCollectorPerIdentifier(m_terminalCollectors);
+            Callback<void, double> callback =
+                MakeCallback(&DistributionCollector::TraceSinkDouble1, m_averagingCollector);
+            for (CollectorMap::Iterator it = m_terminalCollectors.Begin();
+                 it != m_terminalCollectors.End();
+                 ++it)
+            {
+                it->second->TraceConnectWithoutContext("Output", callback);
+            }
+        }
         else
-          {
+        {
             // Setup aggregator.
-            m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                             "OutputFileName", StringValue (GetOutputFileName ()),
-                                             "GeneralHeading", StringValue (GetDistributionHeading ("gain_db")));
+            m_aggregator = CreateAggregator("ns3::MultiFileAggregator",
+                                            "OutputFileName",
+                                            StringValue(GetOutputFileName()),
+                                            "GeneralHeading",
+                                            StringValue(GetDistributionHeading("gain_db")));
 
             // Setup collectors.
-            m_terminalCollectors.SetType ("ns3::DistributionCollector");
-            DistributionCollector::OutputType_t outputType
-              = DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
-            if (GetOutputType () == SatStatsHelper::OUTPUT_PDF_FILE)
-              {
+            m_terminalCollectors.SetType("ns3::DistributionCollector");
+            DistributionCollector::OutputType_t outputType =
+                DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
+            if (GetOutputType() == SatStatsHelper::OUTPUT_PDF_FILE)
+            {
                 outputType = DistributionCollector::OUTPUT_TYPE_PROBABILITY;
-              }
-            else if (GetOutputType () == SatStatsHelper::OUTPUT_CDF_FILE)
-              {
+            }
+            else if (GetOutputType() == SatStatsHelper::OUTPUT_CDF_FILE)
+            {
                 outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
-              }
-            m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
-            CreateCollectorPerIdentifier (m_terminalCollectors);
-            m_terminalCollectors.ConnectToAggregator ("Output",
-                                                      m_aggregator,
-                                                      &MultiFileAggregator::Write2d);
-            m_terminalCollectors.ConnectToAggregator ("OutputString",
-                                                      m_aggregator,
-                                                      &MultiFileAggregator::AddContextHeading);
-            m_terminalCollectors.ConnectToAggregator ("Warning",
-                                                      m_aggregator,
-                                                      &MultiFileAggregator::EnableContextWarning);
-          }
+            }
+            m_terminalCollectors.SetAttribute("OutputType", EnumValue(outputType));
+            CreateCollectorPerIdentifier(m_terminalCollectors);
+            m_terminalCollectors.ConnectToAggregator("Output",
+                                                     m_aggregator,
+                                                     &MultiFileAggregator::Write2d);
+            m_terminalCollectors.ConnectToAggregator("OutputString",
+                                                     m_aggregator,
+                                                     &MultiFileAggregator::AddContextHeading);
+            m_terminalCollectors.ConnectToAggregator("Warning",
+                                                     m_aggregator,
+                                                     &MultiFileAggregator::EnableContextWarning);
+        }
 
         break;
-      }
+    }
 
     case SatStatsHelper::OUTPUT_SCALAR_PLOT:
-      /// \todo Add support for boxes in Gnuplot.
-      NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
-      break;
+        /// \todo Add support for boxes in Gnuplot.
+        NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
+                       << " is not a valid output type for this statistics.");
+        break;
 
-    case SatStatsHelper::OUTPUT_SCATTER_PLOT:
-      {
+    case SatStatsHelper::OUTPUT_SCATTER_PLOT: {
         // Setup aggregator.
-        m_aggregator = CreateAggregator ("ns3::MagisterGnuplotAggregator",
-                                         "OutputPath", StringValue (GetOutputPath ()),
-                                         "OutputFileName", StringValue (GetName ()));
-        Ptr<MagisterGnuplotAggregator> plotAggregator
-          = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-        NS_ASSERT (plotAggregator != nullptr);
-        //plot->SetTitle ("");
-        plotAggregator->SetLegend ("Time (in seconds)",
-                                   "Antenna Gain (in dB)");
-        plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
+        m_aggregator = CreateAggregator("ns3::MagisterGnuplotAggregator",
+                                        "OutputPath",
+                                        StringValue(GetOutputPath()),
+                                        "OutputFileName",
+                                        StringValue(GetName()));
+        Ptr<MagisterGnuplotAggregator> plotAggregator =
+            m_aggregator->GetObject<MagisterGnuplotAggregator>();
+        NS_ASSERT(plotAggregator != nullptr);
+        // plot->SetTitle ("");
+        plotAggregator->SetLegend("Time (in seconds)", "Antenna Gain (in dB)");
+        plotAggregator->Set2dDatasetDefaultStyle(Gnuplot2dDataset::LINES);
 
         // Setup collectors.
-        m_terminalCollectors.SetType ("ns3::UnitConversionCollector");
-        m_terminalCollectors.SetAttribute ("ConversionType",
-                                           EnumValue (UnitConversionCollector::TRANSPARENT));
-        CreateCollectorPerIdentifier (m_terminalCollectors);
-        for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
-             it != m_terminalCollectors.End (); ++it)
-          {
-            const std::string context = it->second->GetName ();
-            plotAggregator->Add2dDataset (context, context);
-          }
-        m_terminalCollectors.ConnectToAggregator ("OutputTimeValue",
-                                                  m_aggregator,
-                                                  &MagisterGnuplotAggregator::Write2d);
+        m_terminalCollectors.SetType("ns3::UnitConversionCollector");
+        m_terminalCollectors.SetAttribute("ConversionType",
+                                          EnumValue(UnitConversionCollector::TRANSPARENT));
+        CreateCollectorPerIdentifier(m_terminalCollectors);
+        for (CollectorMap::Iterator it = m_terminalCollectors.Begin();
+             it != m_terminalCollectors.End();
+             ++it)
+        {
+            const std::string context = it->second->GetName();
+            plotAggregator->Add2dDataset(context, context);
+        }
+        m_terminalCollectors.ConnectToAggregator("OutputTimeValue",
+                                                 m_aggregator,
+                                                 &MagisterGnuplotAggregator::Write2d);
         break;
-      }
+    }
 
     case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
     case SatStatsHelper::OUTPUT_PDF_PLOT:
-    case SatStatsHelper::OUTPUT_CDF_PLOT:
-      {
+    case SatStatsHelper::OUTPUT_CDF_PLOT: {
         if (m_averagingMode)
-          {
+        {
             // Setup aggregator.
-            m_aggregator = CreateAggregator ("ns3::MagisterGnuplotAggregator",
-                                             "OutputPath", StringValue (GetOutputPath ()),
-                                             "OutputFileName", StringValue (GetName ()));
-            Ptr<MagisterGnuplotAggregator> plotAggregator
-              = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-            NS_ASSERT (plotAggregator != nullptr);
-            //plot->SetTitle ("");
-            plotAggregator->SetLegend ("Antenna gain (in dB)",
-                                       "Frequency");
-            plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
-            plotAggregator->Add2dDataset (GetName (), GetName ());
+            m_aggregator = CreateAggregator("ns3::MagisterGnuplotAggregator",
+                                            "OutputPath",
+                                            StringValue(GetOutputPath()),
+                                            "OutputFileName",
+                                            StringValue(GetName()));
+            Ptr<MagisterGnuplotAggregator> plotAggregator =
+                m_aggregator->GetObject<MagisterGnuplotAggregator>();
+            NS_ASSERT(plotAggregator != nullptr);
+            // plot->SetTitle ("");
+            plotAggregator->SetLegend("Antenna gain (in dB)", "Frequency");
+            plotAggregator->Set2dDatasetDefaultStyle(Gnuplot2dDataset::LINES);
+            plotAggregator->Add2dDataset(GetName(), GetName());
             /// \todo Find a better dataset name.
 
             // Setup the final-level collector.
-            m_averagingCollector = CreateObject<DistributionCollector> ();
-            DistributionCollector::OutputType_t outputType
-              = DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
-            if (GetOutputType () == SatStatsHelper::OUTPUT_PDF_PLOT)
-              {
+            m_averagingCollector = CreateObject<DistributionCollector>();
+            DistributionCollector::OutputType_t outputType =
+                DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
+            if (GetOutputType() == SatStatsHelper::OUTPUT_PDF_PLOT)
+            {
                 outputType = DistributionCollector::OUTPUT_TYPE_PROBABILITY;
-              }
-            else if (GetOutputType () == SatStatsHelper::OUTPUT_CDF_PLOT)
-              {
+            }
+            else if (GetOutputType() == SatStatsHelper::OUTPUT_CDF_PLOT)
+            {
                 outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
-              }
-            m_averagingCollector->SetOutputType (outputType);
-            m_averagingCollector->SetName ("0");
-            m_averagingCollector->TraceConnect ("Output",
-                                                GetName (),
-                                                MakeCallback (&MagisterGnuplotAggregator::Write2d,
-                                                              plotAggregator));
+            }
+            m_averagingCollector->SetOutputType(outputType);
+            m_averagingCollector->SetName("0");
+            m_averagingCollector->TraceConnect(
+                "Output",
+                GetName(),
+                MakeCallback(&MagisterGnuplotAggregator::Write2d, plotAggregator));
             /// \todo Find a better dataset name.
 
             // Setup collectors.
-            m_terminalCollectors.SetType ("ns3::ScalarCollector");
-            m_terminalCollectors.SetAttribute ("InputDataType",
-                                               EnumValue (ScalarCollector::INPUT_DATA_TYPE_DOUBLE));
-            m_terminalCollectors.SetAttribute ("OutputType",
-                                               EnumValue (ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
-            CreateCollectorPerIdentifier (m_terminalCollectors);
-            Callback<void, double> callback
-              = MakeCallback (&DistributionCollector::TraceSinkDouble1,
-                              m_averagingCollector);
-            for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
-                 it != m_terminalCollectors.End (); ++it)
-              {
-                it->second->TraceConnectWithoutContext ("Output", callback);
-              }
-          }
+            m_terminalCollectors.SetType("ns3::ScalarCollector");
+            m_terminalCollectors.SetAttribute("InputDataType",
+                                              EnumValue(ScalarCollector::INPUT_DATA_TYPE_DOUBLE));
+            m_terminalCollectors.SetAttribute(
+                "OutputType",
+                EnumValue(ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
+            CreateCollectorPerIdentifier(m_terminalCollectors);
+            Callback<void, double> callback =
+                MakeCallback(&DistributionCollector::TraceSinkDouble1, m_averagingCollector);
+            for (CollectorMap::Iterator it = m_terminalCollectors.Begin();
+                 it != m_terminalCollectors.End();
+                 ++it)
+            {
+                it->second->TraceConnectWithoutContext("Output", callback);
+            }
+        }
         else
-          {
+        {
             // Setup aggregator.
-            m_aggregator = CreateAggregator ("ns3::MagisterGnuplotAggregator",
-                                             "OutputPath", StringValue (GetOutputPath ()),
-                                             "OutputFileName", StringValue (GetName ()));
-            Ptr<MagisterGnuplotAggregator> plotAggregator
-              = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-            NS_ASSERT (plotAggregator != nullptr);
-            //plot->SetTitle ("");
-            plotAggregator->SetLegend ("Antenna gain (in dB)",
-                                       "Frequency");
-            plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
+            m_aggregator = CreateAggregator("ns3::MagisterGnuplotAggregator",
+                                            "OutputPath",
+                                            StringValue(GetOutputPath()),
+                                            "OutputFileName",
+                                            StringValue(GetName()));
+            Ptr<MagisterGnuplotAggregator> plotAggregator =
+                m_aggregator->GetObject<MagisterGnuplotAggregator>();
+            NS_ASSERT(plotAggregator != nullptr);
+            // plot->SetTitle ("");
+            plotAggregator->SetLegend("Antenna gain (in dB)", "Frequency");
+            plotAggregator->Set2dDatasetDefaultStyle(Gnuplot2dDataset::LINES);
 
             // Setup collectors.
-            m_terminalCollectors.SetType ("ns3::DistributionCollector");
-            DistributionCollector::OutputType_t outputType
-              = DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
-            if (GetOutputType () == SatStatsHelper::OUTPUT_PDF_PLOT)
-              {
+            m_terminalCollectors.SetType("ns3::DistributionCollector");
+            DistributionCollector::OutputType_t outputType =
+                DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
+            if (GetOutputType() == SatStatsHelper::OUTPUT_PDF_PLOT)
+            {
                 outputType = DistributionCollector::OUTPUT_TYPE_PROBABILITY;
-              }
-            else if (GetOutputType () == SatStatsHelper::OUTPUT_CDF_PLOT)
-              {
+            }
+            else if (GetOutputType() == SatStatsHelper::OUTPUT_CDF_PLOT)
+            {
                 outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
-              }
-            m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
-            CreateCollectorPerIdentifier (m_terminalCollectors);
-            for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
-                 it != m_terminalCollectors.End (); ++it)
-              {
-                const std::string context = it->second->GetName ();
-                plotAggregator->Add2dDataset (context, context);
-              }
-            m_terminalCollectors.ConnectToAggregator ("Output",
-                                                      m_aggregator,
-                                                      &MagisterGnuplotAggregator::Write2d);
-          }
+            }
+            m_terminalCollectors.SetAttribute("OutputType", EnumValue(outputType));
+            CreateCollectorPerIdentifier(m_terminalCollectors);
+            for (CollectorMap::Iterator it = m_terminalCollectors.Begin();
+                 it != m_terminalCollectors.End();
+                 ++it)
+            {
+                const std::string context = it->second->GetName();
+                plotAggregator->Add2dDataset(context, context);
+            }
+            m_terminalCollectors.ConnectToAggregator("Output",
+                                                     m_aggregator,
+                                                     &MagisterGnuplotAggregator::Write2d);
+        }
 
         break;
-      }
+    }
 
     default:
-      NS_FATAL_ERROR ("SatStatsDelayHelper - Invalid output type");
-      break;
+        NS_FATAL_ERROR("SatStatsDelayHelper - Invalid output type");
+        break;
     }
 
-  // Setup probes and connect them to the collectors.
-  InstallProbes ();
+    // Setup probes and connect them to the collectors.
+    InstallProbes();
 }
-
 
 void
-SatStatsAntennaGainHelper::InstallProbes ()
+SatStatsAntennaGainHelper::InstallProbes()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  Callback<void, std::string, double> callback
-    = MakeCallback (&SatStatsAntennaGainHelper::AntennaGainCallback, this);
+    Callback<void, std::string, double> callback =
+        MakeCallback(&SatStatsAntennaGainHelper::AntennaGainCallback, this);
 
-  NodeContainer utUsers = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
-  for (NodeContainer::Iterator it = utUsers.Begin (); it != utUsers.End (); ++it)
+    NodeContainer utUsers = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+    for (NodeContainer::Iterator it = utUsers.Begin(); it != utUsers.End(); ++it)
     {
-      Ptr<SatUtHandoverModule> hoModule = (*it)->GetObject<SatUtHandoverModule> ();
-      if (!hoModule)
+        Ptr<SatUtHandoverModule> hoModule = (*it)->GetObject<SatUtHandoverModule>();
+        if (!hoModule)
         {
-          NS_LOG_INFO ("UT " << *it << " does not check for antenna gain, bailing out.");
+            NS_LOG_INFO("UT " << *it << " does not check for antenna gain, bailing out.");
         }
-      else
+        else
         {
-          std::ostringstream oss;
-          oss << GetIdentifierForUt (*it);
+            std::ostringstream oss;
+            oss << GetIdentifierForUt(*it);
 
-          if (hoModule->TraceConnect ("AntennaGainTrace", oss.str (), callback))
+            if (hoModule->TraceConnect("AntennaGainTrace", oss.str(), callback))
             {
-              NS_LOG_INFO (this << " successfully connected with UT " << *it);
+                NS_LOG_INFO(this << " successfully connected with UT " << *it);
             }
-          else
+            else
             {
-              NS_LOG_WARN (this << " unable to connect to UT " << *it);
+                NS_LOG_WARN(this << " unable to connect to UT " << *it);
             }
         }
     }
 }
 
-}  // namespace ns-3
+} // namespace ns3

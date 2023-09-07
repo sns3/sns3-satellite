@@ -19,113 +19,116 @@
  */
 
 #include "satellite-rayleigh-conf.h"
+
 #include "satellite-markov-conf.h"
+
 #include <map>
 
-namespace ns3 {
-
-NS_OBJECT_ENSURE_REGISTERED (SatRayleighConf);
-NS_LOG_COMPONENT_DEFINE ("SatRayleighConf");
-
-static const double g_RayleighParameters[SatMarkovConf::DEFAULT_ELEVATION_COUNT][SatMarkovConf::DEFAULT_STATE_COUNT][SatRayleighConf::DEFAULT_RAYLEIGH_PARAMETER_COUNT] =
+namespace ns3
 {
-  /**
-   * Parameters
-   * State 1 {{number of oscillators, Doppler in Hz}
-   * State 2  {number of oscillators, Doppler in Hz}
-   * State 3  {number of oscillators, Doppler in Hz}}
-   */
-  /// TODO: The elevation values should eventually be formed from attributes for each state!
 
-  /* Elevation 30 degrees */
-  {{10, 10},
-   {10, 10},
-   {10, 10}}
-};
+NS_OBJECT_ENSURE_REGISTERED(SatRayleighConf);
+NS_LOG_COMPONENT_DEFINE("SatRayleighConf");
+
+static const double g_RayleighParameters[SatMarkovConf::DEFAULT_ELEVATION_COUNT]
+                                        [SatMarkovConf::DEFAULT_STATE_COUNT]
+                                        [SatRayleighConf::DEFAULT_RAYLEIGH_PARAMETER_COUNT] = {
+                                            /**
+                                             * Parameters
+                                             * State 1 {{number of oscillators, Doppler in Hz}
+                                             * State 2  {number of oscillators, Doppler in Hz}
+                                             * State 3  {number of oscillators, Doppler in Hz}}
+                                             */
+                                            /// TODO: The elevation values should eventually be
+                                            /// formed from attributes for each state!
+
+                                            /* Elevation 30 degrees */
+                                            {{10, 10}, {10, 10}, {10, 10}}};
 
 TypeId
-SatRayleighConf::GetTypeId (void)
+SatRayleighConf::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatRayleighConf")
-    .SetParent<SatBaseFaderConf> ()
-    .AddConstructor<SatRayleighConf> ()
-    .AddAttribute ("ElevationCount", "Number of elevation sets in the Markov model.",
-                   UintegerValue (SatMarkovConf::DEFAULT_ELEVATION_COUNT),
-                   MakeUintegerAccessor (&SatRayleighConf::m_elevationCount),
-                   MakeUintegerChecker<uint32_t> ())
-    .AddAttribute ("StateCount", "Number of states in the Markov model.",
-                   UintegerValue (SatMarkovConf::DEFAULT_STATE_COUNT),
-                   MakeUintegerAccessor (&SatRayleighConf::m_stateCount),
-                   MakeUintegerChecker<uint32_t> ());
-  return tid;
+    static TypeId tid = TypeId("ns3::SatRayleighConf")
+                            .SetParent<SatBaseFaderConf>()
+                            .AddConstructor<SatRayleighConf>()
+                            .AddAttribute("ElevationCount",
+                                          "Number of elevation sets in the Markov model.",
+                                          UintegerValue(SatMarkovConf::DEFAULT_ELEVATION_COUNT),
+                                          MakeUintegerAccessor(&SatRayleighConf::m_elevationCount),
+                                          MakeUintegerChecker<uint32_t>())
+                            .AddAttribute("StateCount",
+                                          "Number of states in the Markov model.",
+                                          UintegerValue(SatMarkovConf::DEFAULT_STATE_COUNT),
+                                          MakeUintegerAccessor(&SatRayleighConf::m_stateCount),
+                                          MakeUintegerChecker<uint32_t>());
+    return tid;
 }
 
-SatRayleighConf::SatRayleighConf ()
-  : m_elevationCount (SatMarkovConf::DEFAULT_ELEVATION_COUNT),
-  m_stateCount (SatMarkovConf::DEFAULT_STATE_COUNT)
+SatRayleighConf::SatRayleighConf()
+    : m_elevationCount(SatMarkovConf::DEFAULT_ELEVATION_COUNT),
+      m_stateCount(SatMarkovConf::DEFAULT_STATE_COUNT)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  for (uint32_t i = 0; i < m_elevationCount; i++)
+    for (uint32_t i = 0; i < m_elevationCount; i++)
     {
-      std::vector<std::vector<double> > states;
+        std::vector<std::vector<double>> states;
 
-      for (uint32_t j = 0; j < m_stateCount; j++)
+        for (uint32_t j = 0; j < m_stateCount; j++)
         {
-          std::vector<double> parameters;
+            std::vector<double> parameters;
 
-          for (uint32_t k = 0; k < SatRayleighConf::DEFAULT_RAYLEIGH_PARAMETER_COUNT; k++)
+            for (uint32_t k = 0; k < SatRayleighConf::DEFAULT_RAYLEIGH_PARAMETER_COUNT; k++)
             {
-              parameters.push_back (g_RayleighParameters[i][j][k]);
+                parameters.push_back(g_RayleighParameters[i][j][k]);
             }
-          states.push_back (parameters);
+            states.push_back(parameters);
         }
-      m_rayleighParameters.push_back (states);
+        m_rayleighParameters.push_back(states);
     }
 }
 
-SatRayleighConf::~SatRayleighConf ()
+SatRayleighConf::~SatRayleighConf()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  Reset ();
+    Reset();
 }
 
-std::vector<std::vector<double> >
-SatRayleighConf::GetParameters (uint32_t set)
+std::vector<std::vector<double>>
+SatRayleighConf::GetParameters(uint32_t set)
 {
-  NS_LOG_FUNCTION (this << set);
+    NS_LOG_FUNCTION(this << set);
 
-  if (set >= m_elevationCount)
+    if (set >= m_elevationCount)
     {
-      NS_FATAL_ERROR ("SatRayleighConf::GetParameters - Invalid set");
+        NS_FATAL_ERROR("SatRayleighConf::GetParameters - Invalid set");
     }
 
-  return m_rayleighParameters[set];
+    return m_rayleighParameters[set];
 }
-
 
 void
-SatRayleighConf::Reset ()
+SatRayleighConf::Reset()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  for (uint32_t i = 0; i < m_elevationCount; i++)
+    for (uint32_t i = 0; i < m_elevationCount; i++)
     {
-      for (uint32_t j = 0; j < m_stateCount; j++)
+        for (uint32_t j = 0; j < m_stateCount; j++)
         {
-          m_rayleighParameters[i][j].clear ();
+            m_rayleighParameters[i][j].clear();
         }
     }
 }
 
 void
-SatRayleighConf::DoDispose ()
+SatRayleighConf::DoDispose()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  Reset ();
-  SatBaseFaderConf::DoDispose ();
+    Reset();
+    SatBaseFaderConf::DoDispose();
 }
 
 } // namespace ns3

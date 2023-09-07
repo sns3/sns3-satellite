@@ -18,141 +18,139 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include <string>
-#include <sstream>
+#include "satellite-channel-estimation-error-container.h"
+
+#include "../utils/satellite-env-variables.h"
 
 #include <ns3/log.h>
 #include <ns3/singleton.h>
 
-#include "../utils/satellite-env-variables.h"
-#include "satellite-channel-estimation-error-container.h"
+#include <sstream>
+#include <string>
 
+NS_LOG_COMPONENT_DEFINE("SatFwdLinkChannelEstimationErrorContainer");
 
-NS_LOG_COMPONENT_DEFINE ("SatFwdLinkChannelEstimationErrorContainer");
-
-namespace ns3 {
-
+namespace ns3
+{
 
 /**
  * SatChannelEstimationErrorContainer
  */
 
-SatChannelEstimationErrorContainer::SatChannelEstimationErrorContainer ()
+SatChannelEstimationErrorContainer::SatChannelEstimationErrorContainer()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-SatChannelEstimationErrorContainer::~SatChannelEstimationErrorContainer ()
+SatChannelEstimationErrorContainer::~SatChannelEstimationErrorContainer()
 {
-
 }
 
 double
-SatChannelEstimationErrorContainer::AddError (double sinrIn, uint32_t wfId) const
+SatChannelEstimationErrorContainer::AddError(double sinrIn, uint32_t wfId) const
 {
-  NS_LOG_FUNCTION (this << sinrIn << wfId);
+    NS_LOG_FUNCTION(this << sinrIn << wfId);
 
-  return DoAddError (sinrIn, wfId);
+    return DoAddError(sinrIn, wfId);
 }
-
 
 /**
  * SatSimpleChannelEstimationErrorContainer
  */
 
-SatSimpleChannelEstimationErrorContainer::SatSimpleChannelEstimationErrorContainer ()
+SatSimpleChannelEstimationErrorContainer::SatSimpleChannelEstimationErrorContainer()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-SatSimpleChannelEstimationErrorContainer::~SatSimpleChannelEstimationErrorContainer ()
+SatSimpleChannelEstimationErrorContainer::~SatSimpleChannelEstimationErrorContainer()
 {
-
 }
 
 double
-SatSimpleChannelEstimationErrorContainer::DoAddError (double sinrIn, uint32_t /*wfId*/) const
+SatSimpleChannelEstimationErrorContainer::DoAddError(double sinrIn, uint32_t /*wfId*/) const
 {
-  NS_LOG_FUNCTION (this << sinrIn);
+    NS_LOG_FUNCTION(this << sinrIn);
 
-  return sinrIn;
+    return sinrIn;
 }
 
 /**
  * SatFwdLinkChannelEstimationErrorContainer
  */
 
-SatFwdLinkChannelEstimationErrorContainer::SatFwdLinkChannelEstimationErrorContainer ()
+SatFwdLinkChannelEstimationErrorContainer::SatFwdLinkChannelEstimationErrorContainer()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  /**
-   * Currently only one set of channel estimation error parameters
-   * for forward link are created.
-   */
-  std::string dataPath = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory ();
-  std::string filePathName = dataPath + "/sinrmeaserror/ChannelEstimationErrorFwdLink.txt";
-  m_channelEstimationError = CreateObject<SatChannelEstimationError> (filePathName);
+    /**
+     * Currently only one set of channel estimation error parameters
+     * for forward link are created.
+     */
+    std::string dataPath = Singleton<SatEnvVariables>::Get()->LocateDataDirectory();
+    std::string filePathName = dataPath + "/sinrmeaserror/ChannelEstimationErrorFwdLink.txt";
+    m_channelEstimationError = CreateObject<SatChannelEstimationError>(filePathName);
 }
 
-SatFwdLinkChannelEstimationErrorContainer::~SatFwdLinkChannelEstimationErrorContainer ()
+SatFwdLinkChannelEstimationErrorContainer::~SatFwdLinkChannelEstimationErrorContainer()
 {
-
 }
 
 double
-SatFwdLinkChannelEstimationErrorContainer::DoAddError (double sinrIn, uint32_t /*wfId*/) const
+SatFwdLinkChannelEstimationErrorContainer::DoAddError(double sinrIn, uint32_t /*wfId*/) const
 {
-  NS_LOG_FUNCTION (this << sinrIn);
+    NS_LOG_FUNCTION(this << sinrIn);
 
-  return m_channelEstimationError->AddError (sinrIn);
+    return m_channelEstimationError->AddError(sinrIn);
 }
 
 /**
  * SatFwdLinkChannelEstimationErrorContainer
  */
 
-SatRtnLinkChannelEstimationErrorContainer::SatRtnLinkChannelEstimationErrorContainer (uint32_t minWfId, uint32_t maxWfId)
+SatRtnLinkChannelEstimationErrorContainer::SatRtnLinkChannelEstimationErrorContainer(
+    uint32_t minWfId,
+    uint32_t maxWfId)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  /**
-   * Short burst waveforms 3-12 are using different set of channel estimation error
-   * parameters than longer burst waveforms 13-22.
-   */
-  std::string filePathName;
-  std::string dataPath = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory ();
-  Ptr<SatChannelEstimationError> ce;
+    /**
+     * Short burst waveforms 3-12 are using different set of channel estimation error
+     * parameters than longer burst waveforms 13-22.
+     */
+    std::string filePathName;
+    std::string dataPath = Singleton<SatEnvVariables>::Get()->LocateDataDirectory();
+    Ptr<SatChannelEstimationError> ce;
 
-  for (uint32_t i = minWfId; i <= maxWfId; ++i)
+    for (uint32_t i = minWfId; i <= maxWfId; ++i)
     {
-      std::ostringstream ss;
-      ss << i;
-      filePathName = dataPath + "/sinrmeaserror/ChannelEstimationErrorRtnLinkWf_" + ss.str () + ".txt";
-      ce = CreateObject<SatChannelEstimationError> (filePathName);
-      m_channelEstimationErrors.insert (std::make_pair (i, ce));
+        std::ostringstream ss;
+        ss << i;
+        filePathName =
+            dataPath + "/sinrmeaserror/ChannelEstimationErrorRtnLinkWf_" + ss.str() + ".txt";
+        ce = CreateObject<SatChannelEstimationError>(filePathName);
+        m_channelEstimationErrors.insert(std::make_pair(i, ce));
     }
 }
 
-SatRtnLinkChannelEstimationErrorContainer::~SatRtnLinkChannelEstimationErrorContainer ()
+SatRtnLinkChannelEstimationErrorContainer::~SatRtnLinkChannelEstimationErrorContainer()
 {
-
 }
 
 double
-SatRtnLinkChannelEstimationErrorContainer::DoAddError (double sinrIn, uint32_t wf) const
+SatRtnLinkChannelEstimationErrorContainer::DoAddError(double sinrIn, uint32_t wf) const
 {
-  NS_LOG_FUNCTION (this << wf << sinrIn);
+    NS_LOG_FUNCTION(this << wf << sinrIn);
 
-  if (m_channelEstimationErrors.find (wf) != m_channelEstimationErrors.end ())
+    if (m_channelEstimationErrors.find(wf) != m_channelEstimationErrors.end())
     {
-      return m_channelEstimationErrors.at (wf)->AddError (sinrIn);
+        return m_channelEstimationErrors.at(wf)->AddError(sinrIn);
     }
-  else
+    else
     {
-      NS_FATAL_ERROR ("Non-supported waveform id: " << wf);
+        NS_FATAL_ERROR("Non-supported waveform id: " << wf);
     }
-  return 0.0;
+    return 0.0;
 }
 
-}
+} // namespace ns3

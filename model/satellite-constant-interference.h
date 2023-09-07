@@ -25,8 +25,8 @@
 
 #include "satellite-interference.h"
 
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -35,80 +35,83 @@ namespace ns3 {
  */
 class SatConstantInterference : public SatInterference
 {
-public:
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
-  TypeId GetInstanceTypeId (void) const;
+  public:
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
+    TypeId GetInstanceTypeId(void) const;
 
-  /**
-   * Default constructor.
-   */
-  SatConstantInterference ();
+    /**
+     * Default constructor.
+     */
+    SatConstantInterference();
 
-  /**
-   * Destructor for SatConstantInterference
-   */
-  ~SatConstantInterference ();
+    /**
+     * Destructor for SatConstantInterference
+     */
+    ~SatConstantInterference();
 
-private:
-  /**
-   * Adds interference power to interference object.
-   * No effect in this implementation.
-   *
-   * \param rxDuration Duration of the receiving.
-   * \param rxPower Receiving power.
-   * \param rxAddress
-   *
-   * \return the pointer to interference event as a reference of the addition
-   */
-  virtual Ptr<SatInterference::InterferenceChangeEvent> DoAdd (Time rxDuration, double rxPower, Address rxAddress);
-  /**
-   * Calculates interference power for the given reference
-   * Sets final power at end time to finalPower.
-   *
-   * Just return constant value set by Set method in this implementation.
-   * finalPower is set to returned value.
-   *
-   * \param event Reference event which for interference is calculated.
-   *
-   * \return Final power value at end of receiving
-   */
-  virtual std::vector< std::pair<double, double> > DoCalculate (Ptr<SatInterference::InterferenceChangeEvent> event);
+  private:
+    /**
+     * Adds interference power to interference object.
+     * No effect in this implementation.
+     *
+     * \param rxDuration Duration of the receiving.
+     * \param rxPower Receiving power.
+     * \param rxAddress
+     *
+     * \return the pointer to interference event as a reference of the addition
+     */
+    virtual Ptr<SatInterference::InterferenceChangeEvent> DoAdd(Time rxDuration,
+                                                                double rxPower,
+                                                                Address rxAddress);
+    /**
+     * Calculates interference power for the given reference
+     * Sets final power at end time to finalPower.
+     *
+     * Just return constant value set by Set method in this implementation.
+     * finalPower is set to returned value.
+     *
+     * \param event Reference event which for interference is calculated.
+     *
+     * \return Final power value at end of receiving
+     */
+    virtual std::vector<std::pair<double, double>> DoCalculate(
+        Ptr<SatInterference::InterferenceChangeEvent> event);
 
-  /**
-   * Resets current interference.
-   */
-  virtual void DoReset (void);
+    /**
+     * Resets current interference.
+     */
+    virtual void DoReset(void);
 
-  /**
-   * Notifies that RX is started by a receiver.
-   *
-   * \param event Interference reference event of receiver (ignored in this implementation)
-   */
-  virtual void DoNotifyRxStart (Ptr<SatInterference::InterferenceChangeEvent> event);
+    /**
+     * Notifies that RX is started by a receiver.
+     *
+     * \param event Interference reference event of receiver (ignored in this implementation)
+     */
+    virtual void DoNotifyRxStart(Ptr<SatInterference::InterferenceChangeEvent> event);
 
-  /**
-   * Notifies that RX is ended by a receiver.
-   *
-   * \param event Interference reference event of receiver (ignored in this implementation)
-   */
-  virtual void DoNotifyRxEnd (Ptr<SatInterference::InterferenceChangeEvent> event);
+    /**
+     * Notifies that RX is ended by a receiver.
+     *
+     * \param event Interference reference event of receiver (ignored in this implementation)
+     */
+    virtual void DoNotifyRxEnd(Ptr<SatInterference::InterferenceChangeEvent> event);
 
-  SatConstantInterference (const SatConstantInterference &o);
-  SatConstantInterference &operator = (const SatConstantInterference &o);
+    SatConstantInterference(const SatConstantInterference& o);
+    SatConstantInterference& operator=(const SatConstantInterference& o);
 
-  /**
-   *
-   */
-  double m_power;
+    /**
+     *
+     */
+    double m_power;
 
-  /**
-   *
-   */
-  bool m_rxing;
+    /**
+     *
+     */
+    bool m_rxing;
 };
 
 } // namespace ns3

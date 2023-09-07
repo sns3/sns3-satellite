@@ -23,8 +23,8 @@
 #include "satellite-base-fading.h"
 #include "satellite-fading-input-trace-container.h"
 
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -34,41 +34,41 @@ namespace ns3 {
  */
 class SatFadingInputTrace : public SatBaseFading
 {
-public:
-  /**
-   * \brief Constructor
-   */
-  SatFadingInputTrace ();
+  public:
+    /**
+     * \brief Constructor
+     */
+    SatFadingInputTrace();
 
-  /**
-   * \brief Constructor
-   */
-  SatFadingInputTrace (Ptr<SatFadingInputTraceContainer> satFadingInputTraceContainer);
+    /**
+     * \brief Constructor
+     */
+    SatFadingInputTrace(Ptr<SatFadingInputTraceContainer> satFadingInputTraceContainer);
 
-  /**
-   * \brief Destructor
-   */
-  ~SatFadingInputTrace ();
+    /**
+     * \brief Destructor
+     */
+    ~SatFadingInputTrace();
 
-  /**
-   * \brief NS-3 type id function
-   * \return type id
-   */
-  static TypeId GetTypeId (void);
+    /**
+     * \brief NS-3 type id function
+     * \return type id
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * \brief Function for getting the fading value
-   * \param macAddress MAC address
-   * \param channelType channel type
-   * \return fading value
-   */
-  double DoGetFading (Address macAddress, SatEnums::ChannelType_t channelType);
+    /**
+     * \brief Function for getting the fading value
+     * \param macAddress MAC address
+     * \param channelType channel type
+     * \return fading value
+     */
+    double DoGetFading(Address macAddress, SatEnums::ChannelType_t channelType);
 
-private:
-  /**
-   * \brief Pointer to input trace container
-   */
-  Ptr<SatFadingInputTraceContainer> m_satFadingInputTraceContainer;
+  private:
+    /**
+     * \brief Pointer to input trace container
+     */
+    Ptr<SatFadingInputTraceContainer> m_satFadingInputTraceContainer;
 };
 
 } // namespace ns3

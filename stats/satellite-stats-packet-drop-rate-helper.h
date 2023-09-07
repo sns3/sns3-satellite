@@ -21,16 +21,16 @@
 #ifndef SATELLITE_STATS_PACKET_DROP_RATE_HELPER_H
 #define SATELLITE_STATS_PACKET_DROP_RATE_HELPER_H
 
-#include <ns3/satellite-stats-helper.h>
-#include <ns3/ptr.h>
 #include <ns3/address.h>
 #include <ns3/collector-map.h>
+#include <ns3/ptr.h>
+#include <ns3/satellite-stats-helper.h>
+
 #include <list>
 #include <map>
 
-
-namespace ns3 {
-
+namespace ns3
+{
 
 class SatHelper;
 class Node;
@@ -44,54 +44,53 @@ class DistributionCollector;
  */
 class SatStatsPacketDropRateHelper : public SatStatsHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsPacketDropRateHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsPacketDropRateHelper(Ptr<const SatHelper> satHelper);
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsPacketDropRateHelper ();
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsPacketDropRateHelper();
 
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
-  /**
-   * \brief Set up several probes or other means of listeners
-   *        and connect them to the collectors.
-   */
-  void InstallProbes ();
+    /**
+     * \brief Set up several probes or other means of listeners
+     *        and connect them to the collectors.
+     */
+    void InstallProbes();
 
-  /**
-   * \brief Receive inputs from trace sources and determine the right collector
-   *        to forward the inputs to.
-   * \param nPackets number of packets in the received packet burst.
-   * \param satSrc Satellite src
-   * \param satDst Satellite dst
-   * \param isError whether a PHY error has occurred.
-   *
-   * Used only in return link.
-   */
-  void PacketDropRateCallback (uint32_t nPackets,
-                               Ptr<Node> satSrc,
-                               Ptr<Node> satDst,
-                               bool isError);
+    /**
+     * \brief Receive inputs from trace sources and determine the right collector
+     *        to forward the inputs to.
+     * \param nPackets number of packets in the received packet burst.
+     * \param satSrc Satellite src
+     * \param satDst Satellite dst
+     * \param isError whether a PHY error has occurred.
+     *
+     * Used only in return link.
+     */
+    void PacketDropRateCallback(uint32_t nPackets,
+                                Ptr<Node> satSrc,
+                                Ptr<Node> satDst,
+                                bool isError);
 
-protected:
-  // inherited from SatStatsHelper base class
-  void DoInstall ();
+  protected:
+    // inherited from SatStatsHelper base class
+    void DoInstall();
 
-  /// Maintains a list of collectors created by this helper.
-  CollectorMap m_terminalCollectors;
+    /// Maintains a list of collectors created by this helper.
+    CollectorMap m_terminalCollectors;
 
-  /// The aggregator created by this helper.
-  Ptr<DataCollectionObject> m_aggregator;
+    /// The aggregator created by this helper.
+    Ptr<DataCollectionObject> m_aggregator;
 
 }; // end of class SatStatsPacketDropRateHelper
 
-}
-
+} // namespace ns3
 
 #endif /* SATELLITE_STATS_PACKET_DROP_RATE_HELPER_H */

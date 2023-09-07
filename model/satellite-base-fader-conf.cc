@@ -18,33 +18,32 @@
  * Author: Frans Laakso <frans.laakso@magister.fi>
  */
 
-#include <ns3/log.h>
-
 #include "satellite-base-fader-conf.h"
 
+#include <ns3/log.h>
 
-NS_LOG_COMPONENT_DEFINE ("SatBaseFaderConf");
+NS_LOG_COMPONENT_DEFINE("SatBaseFaderConf");
 
-namespace ns3 {
+namespace ns3
+{
 
-NS_OBJECT_ENSURE_REGISTERED (SatBaseFaderConf);
+NS_OBJECT_ENSURE_REGISTERED(SatBaseFaderConf);
 
 TypeId
-SatBaseFaderConf::GetTypeId (void)
+SatBaseFaderConf::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatBaseFaderConf")
-    .SetParent<Object> ();
-  return tid;
+    static TypeId tid = TypeId("ns3::SatBaseFaderConf").SetParent<Object>();
+    return tid;
 }
 
-SatBaseFaderConf::SatBaseFaderConf ()
+SatBaseFaderConf::SatBaseFaderConf()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-SatBaseFaderConf::~SatBaseFaderConf ()
+SatBaseFaderConf::~SatBaseFaderConf()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
 } // namespace ns3

@@ -21,20 +21,18 @@
 #ifndef SATELLITE_RETURN_LINK_ENCAPSULATOR_ARQ
 #define SATELLITE_RETURN_LINK_ENCAPSULATOR_ARQ
 
-
-#include <map>
+#include "satellite-arq-buffer-context.h"
+#include "satellite-arq-sequence-number.h"
+#include "satellite-control-message.h"
+#include "satellite-return-link-encapsulator.h"
 
 #include <ns3/event-id.h>
 #include <ns3/mac48-address.h>
 
-#include "satellite-return-link-encapsulator.h"
-#include "satellite-arq-sequence-number.h"
-#include "satellite-arq-buffer-context.h"
-#include "satellite-control-message.h"
+#include <map>
 
-
-namespace ns3 {
-
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -53,170 +51,172 @@ namespace ns3 {
  */
 class SatReturnLinkEncapsulatorArq : public SatReturnLinkEncapsulator
 {
-public:
-  /**
-   * Default constructor, not used
-   */
-  SatReturnLinkEncapsulatorArq ();
+  public:
+    /**
+     * Default constructor, not used
+     */
+    SatReturnLinkEncapsulatorArq();
 
-  /**
-   * Constructor
-   * \param encapAddress MAC addressd of encapsulator
-   * \param decapAddress MAC addressd of decapsulator
-   * \param sourceE2EAddress E2E source MAC addressd of packets (used to set SatAddressE2ETag)
-   * \param destE2EAddress E2E destination MAC addressd of packets (used to set SatAddressE2ETag)
-   * \param rcIndex RC index
-   * \param additionalHeaderSize Additional value in to take into account when pulling packets to represent E2E tags
-   */
-  SatReturnLinkEncapsulatorArq (Mac48Address encapAddress,
-                                Mac48Address decapAddress,
-                                Mac48Address sourceE2EAddress,
-                                Mac48Address destE2EAddress,
-                                uint8_t rcIndex,
-                                uint32_t additionalHeaderSize = 0);
+    /**
+     * Constructor
+     * \param encapAddress MAC addressd of encapsulator
+     * \param decapAddress MAC addressd of decapsulator
+     * \param sourceE2EAddress E2E source MAC addressd of packets (used to set SatAddressE2ETag)
+     * \param destE2EAddress E2E destination MAC addressd of packets (used to set SatAddressE2ETag)
+     * \param rcIndex RC index
+     * \param additionalHeaderSize Additional value in to take into account when pulling packets to
+     * represent E2E tags
+     */
+    SatReturnLinkEncapsulatorArq(Mac48Address encapAddress,
+                                 Mac48Address decapAddress,
+                                 Mac48Address sourceE2EAddress,
+                                 Mac48Address destE2EAddress,
+                                 uint8_t rcIndex,
+                                 uint32_t additionalHeaderSize = 0);
 
-  /**
-   * Destructor for SatReturnLinkEncapsulatorArq
-   */
-  virtual ~SatReturnLinkEncapsulatorArq ();
+    /**
+     * Destructor for SatReturnLinkEncapsulatorArq
+     */
+    virtual ~SatReturnLinkEncapsulatorArq();
 
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
-  TypeId GetInstanceTypeId (void) const;
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
+    TypeId GetInstanceTypeId(void) const;
 
-  /**
-   * Dispose of this class instance
-   */
-  virtual void DoDispose ();
+    /**
+     * Dispose of this class instance
+     */
+    virtual void DoDispose();
 
-  /**
-   * \brief Notify a Tx opportunity to this encapsulator.
-   * \param bytes Notified tx opportunity bytes from lower layer
-   * \param &bytesLeft Bytes left after this TxOpportunity in txBuffer
-   * \param &nextMinTxO Minimum TxO after this TxO
-   * \return A RLE PDU pointer
-   */
-  virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft, uint32_t &nextMinTxO);
+    /**
+     * \brief Notify a Tx opportunity to this encapsulator.
+     * \param bytes Notified tx opportunity bytes from lower layer
+     * \param &bytesLeft Bytes left after this TxOpportunity in txBuffer
+     * \param &nextMinTxO Minimum TxO after this TxO
+     * \return A RLE PDU pointer
+     */
+    virtual Ptr<Packet> NotifyTxOpportunity(uint32_t bytes,
+                                            uint32_t& bytesLeft,
+                                            uint32_t& nextMinTxO);
 
-  /**
-   * \brief Receive a packet, thus decapsulate and defragment/deconcatenate
-   * if needed. The decapsuled/defragmented HL PDU is forwarded back to
-   * LLC and to upper layer.
-   * \param p packet pointer received from lower layer
-   */
-  virtual void ReceivePdu (Ptr<Packet> p);
+    /**
+     * \brief Receive a packet, thus decapsulate and defragment/deconcatenate
+     * if needed. The decapsuled/defragmented HL PDU is forwarded back to
+     * LLC and to upper layer.
+     * \param p packet pointer received from lower layer
+     */
+    virtual void ReceivePdu(Ptr<Packet> p);
 
-  /**
-   * \brief Receive a control message (ARQ ACK)
-   * \param ack ACK control message pointer received from lower layer
-   */
-  virtual void ReceiveAck (Ptr<SatArqAckMessage> ack);
+    /**
+     * \brief Receive a control message (ARQ ACK)
+     * \param ack ACK control message pointer received from lower layer
+     */
+    virtual void ReceiveAck(Ptr<SatArqAckMessage> ack);
 
-  /**
-   * \brief Get the buffered packets for this encapsulator
-   * \return uint32_t buffered bytes
-   */
-  virtual uint32_t GetTxBufferSizeInBytes () const;
+    /**
+     * \brief Get the buffered packets for this encapsulator
+     * \return uint32_t buffered bytes
+     */
+    virtual uint32_t GetTxBufferSizeInBytes() const;
 
-private:
-  /**
-   * \brief ARQ Tx timer has expired. The PDU will be flushed, if the maximum
-   * retransmissions has been reached. Otherwise the packet will be resent.
-   * \param seqNo Sequence number
-   */
-  void ArqReTxTimerExpired (uint8_t seqNo);
+  private:
+    /**
+     * \brief ARQ Tx timer has expired. The PDU will be flushed, if the maximum
+     * retransmissions has been reached. Otherwise the packet will be resent.
+     * \param seqNo Sequence number
+     */
+    void ArqReTxTimerExpired(uint8_t seqNo);
 
-  /**
-   * \brief Clean-up a certain sequence number
-   * \param sequenceNumber Sequence number
-   */
-  void CleanUp (uint8_t sequenceNumber);
+    /**
+     * \brief Clean-up a certain sequence number
+     * \param sequenceNumber Sequence number
+     */
+    void CleanUp(uint8_t sequenceNumber);
 
-  /**
-   * \brief Convert the 8-bit sequence number value from ARQ header into
-   * 32-bit continuous sequence number stream at the receiver.
-   * \param seqNo 8-bit sequence number
-   * \return 32-bit sequence number
-   */
-  uint32_t ConvertSeqNo (uint8_t seqNo) const;
+    /**
+     * \brief Convert the 8-bit sequence number value from ARQ header into
+     * 32-bit continuous sequence number stream at the receiver.
+     * \param seqNo 8-bit sequence number
+     * \return 32-bit sequence number
+     */
+    uint32_t ConvertSeqNo(uint8_t seqNo) const;
 
-  /**
-   * \brief Reassemble and receive the received PDUs if possible
-   */
-  void ReassembleAndReceive ();
+    /**
+     * \brief Reassemble and receive the received PDUs if possible
+     */
+    void ReassembleAndReceive();
 
-  /**
-   * \brief Rx waiting timer for a PDU has expired
-   * \param sn Sequence number
-   */
-  void RxWaitingTimerExpired (uint32_t sn);
+    /**
+     * \brief Rx waiting timer for a PDU has expired
+     * \param sn Sequence number
+     */
+    void RxWaitingTimerExpired(uint32_t sn);
 
-  /**
-   * \brief Send ACK for a given sequence number
-   * \param seqNo Sequence number
-   */
-  void SendAck (uint8_t seqNo) const;
+    /**
+     * \brief Send ACK for a given sequence number
+     * \param seqNo Sequence number
+     */
+    void SendAck(uint8_t seqNo) const;
 
-  /**
-   * Sequence number handler
-   */
-  Ptr<SatArqSequenceNumber> m_seqNo;
+    /**
+     * Sequence number handler
+     */
+    Ptr<SatArqSequenceNumber> m_seqNo;
 
-  /**
-   * Transmitted and retransmission context buffer
-   */
-  std::map < uint8_t, Ptr<SatArqBufferContext> > m_txedBuffer;       // Transmitted packets buffer
-  std::map < uint8_t, Ptr<SatArqBufferContext> > m_retxBuffer;       // Retransmission buffer
-  uint32_t m_retxBufferSize;
-  uint32_t m_txedBufferSize;
+    /**
+     * Transmitted and retransmission context buffer
+     */
+    std::map<uint8_t, Ptr<SatArqBufferContext>> m_txedBuffer; // Transmitted packets buffer
+    std::map<uint8_t, Ptr<SatArqBufferContext>> m_retxBuffer; // Retransmission buffer
+    uint32_t m_retxBufferSize;
+    uint32_t m_txedBufferSize;
 
-  /**
-   * Max RTN link ARQ segment size
-   */
-  uint32_t m_maxRtnArqSegmentSize;
+    /**
+     * Max RTN link ARQ segment size
+     */
+    uint32_t m_maxRtnArqSegmentSize;
 
-  /**
-   * Maximum number of retransmissions
-   */
-  uint32_t m_maxNoOfRetransmissions;
+    /**
+     * Maximum number of retransmissions
+     */
+    uint32_t m_maxNoOfRetransmissions;
 
-  /**
-   * Retransmission timer, i.e. when to retransmit a packet if
-   * a ACK has not been received.
-   */
-  Time m_retransmissionTimer;
+    /**
+     * Retransmission timer, i.e. when to retransmit a packet if
+     * a ACK has not been received.
+     */
+    Time m_retransmissionTimer;
 
-  /**
-   * ARQ window size, i.e. how many sequential sequence numbers may be in
-   * use simultaneously.
-   */
-  uint32_t m_arqWindowSize;
+    /**
+     * ARQ window size, i.e. how many sequential sequence numbers may be in
+     * use simultaneously.
+     */
+    uint32_t m_arqWindowSize;
 
-  /**
-   * ARQ header size in Bytes
-   */
-  uint32_t m_arqHeaderSize;
+    /**
+     * ARQ header size in Bytes
+     */
+    uint32_t m_arqHeaderSize;
 
-  /**
-   * Next expected sequence number at the packet reception
-   */
-  uint32_t m_nextExpectedSeqNo;
+    /**
+     * Next expected sequence number at the packet reception
+     */
+    uint32_t m_nextExpectedSeqNo;
 
-  /**
-   * Waiting time for waiting a certain SN to be received.
-   */
-  Time m_rxWaitingTimer;
+    /**
+     * Waiting time for waiting a certain SN to be received.
+     */
+    Time m_rxWaitingTimer;
 
-  /**
-   * key = sequence number
-   * value = RLE packet
-   */
-  std::map<uint32_t, Ptr<SatArqBufferContext> > m_reorderingBuffer;
+    /**
+     * key = sequence number
+     * value = RLE packet
+     */
+    std::map<uint32_t, Ptr<SatArqBufferContext>> m_reorderingBuffer;
 };
-
 
 } // namespace ns3
 

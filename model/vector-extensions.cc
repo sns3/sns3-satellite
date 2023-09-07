@@ -22,58 +22,61 @@
  * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include <cmath>
-
 #include "vector-extensions.h"
 
+#include <cmath>
 
-namespace ns3 {
+namespace ns3
+{
 
 Vector3D
-operator+ (const Vector3D &v1, const Vector3D &v2)
+operator+(const Vector3D& v1, const Vector3D& v2)
 {
-  return Vector3D (v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
+    return Vector3D(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
 }
 
 Vector3D
-operator- (const Vector3D &v1, const Vector3D &v2)
+operator-(const Vector3D& v1, const Vector3D& v2)
 {
-  return Vector3D (v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+    return Vector3D(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
 }
 
 Vector3D
-operator* (const Vector3D &vector, double scalar)
+operator*(const Vector3D& vector, double scalar)
 {
-  return Vector3D (vector.x * scalar, vector.y * scalar, vector.z * scalar);
+    return Vector3D(vector.x * scalar, vector.y * scalar, vector.z * scalar);
 }
 
 Vector3D
-operator* (double scalar, const Vector3D &vector)
+operator*(double scalar, const Vector3D& vector)
 {
-  return vector * scalar;
+    return vector * scalar;
 }
 
 Vector3D
-CrossProduct (const Vector3D &v1, const Vector3D &v2)
+CrossProduct(const Vector3D& v1, const Vector3D& v2)
 {
-  return Vector3D (
-    v1.y*v2.z - v1.z*v2.y, v1.z*v2.x - v1.x*v2.z, v1.x*v2.y - v1.y*v2.x
-  );
+    return Vector3D(v1.y * v2.z - v1.z * v2.y,
+                    v1.z * v2.x - v1.x * v2.z,
+                    v1.x * v2.y - v1.y * v2.x);
 }
 
 double
-DotProduct (const Vector3D &v1, const Vector3D &v2)
+DotProduct(const Vector3D& v1, const Vector3D& v2)
 {
-  return (v1.x*v2.x + v1.y*v2.y + v1.z*v2.z);
+    return (v1.x * v2.x + v1.y * v2.y + v1.z * v2.z);
 }
 
-double Magnitude (const Vector3D &vector)
+double
+Magnitude(const Vector3D& vector)
 {
-  return std::sqrt (DotProduct (vector, vector));
+    return std::sqrt(DotProduct(vector, vector));
 }
 
-double MagnitudeSquared (const Vector3D &vector) {
-  return DotProduct (vector, vector);
+double
+MagnitudeSquared(const Vector3D& vector)
+{
+    return DotProduct(vector, vector);
 }
 
-}
+} // namespace ns3

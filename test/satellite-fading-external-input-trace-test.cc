@@ -24,15 +24,17 @@
  * \brief Test cases to unit test external fading traces
  */
 
-#include <vector>
+#include "../model/satellite-channel.h"
+#include "../model/satellite-fading-external-input-trace-container.h"
+#include "../utils/satellite-env-variables.h"
+
 #include "ns3/log.h"
+#include "ns3/simulator.h"
+#include "ns3/singleton.h"
 #include "ns3/test.h"
 #include "ns3/timer.h"
-#include "ns3/simulator.h"
-#include "../model/satellite-fading-external-input-trace-container.h"
-#include "../model/satellite-channel.h"
-#include "ns3/singleton.h"
-#include "../utils/satellite-env-variables.h"
+
+#include <vector>
 
 using namespace ns3;
 
@@ -44,68 +46,95 @@ using namespace ns3;
  */
 class SatFadingExternalInputTraceTestCase : public TestCase
 {
-public:
-  SatFadingExternalInputTraceTestCase ();
-  virtual ~SatFadingExternalInputTraceTestCase ();
+  public:
+    SatFadingExternalInputTraceTestCase();
+    virtual ~SatFadingExternalInputTraceTestCase();
 
-  void TestGetFading (uint32_t nodeId, SatEnums::ChannelType_t channelType);
+    void TestGetFading(uint32_t nodeId, SatEnums::ChannelType_t channelType);
 
-private:
-  virtual void DoRun (void);
+  private:
+    virtual void DoRun(void);
 
-  std::vector<double> m_results;
+    std::vector<double> m_results;
 };
 
-SatFadingExternalInputTraceTestCase::SatFadingExternalInputTraceTestCase ()
-  : TestCase ("Test satellite fading external input trace and container.")
+SatFadingExternalInputTraceTestCase::SatFadingExternalInputTraceTestCase()
+    : TestCase("Test satellite fading external input trace and container.")
 {
 }
 
-SatFadingExternalInputTraceTestCase::~SatFadingExternalInputTraceTestCase ()
+SatFadingExternalInputTraceTestCase::~SatFadingExternalInputTraceTestCase()
 {
-}
-
-void SatFadingExternalInputTraceTestCase::TestGetFading (uint32_t nodeId, SatEnums::ChannelType_t channelType)
-{
-  Ptr<SatMobilityModel> mobility;
-
-  Ptr<SatFadingExternalInputTrace> trace = Singleton<SatFadingExternalInputTraceContainer>::Get ()->GetFadingTrace (nodeId, channelType, mobility);
-  double fading = trace->GetFading ();
-  m_results.push_back (fading);
 }
 
 void
-SatFadingExternalInputTraceTestCase::DoRun (void)
+SatFadingExternalInputTraceTestCase::TestGetFading(uint32_t nodeId,
+                                                   SatEnums::ChannelType_t channelType)
 {
-  uint32_t numUts (2);
-  uint32_t numGws (5);
+    Ptr<SatMobilityModel> mobility;
 
-  // Set simulation output details
-  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-fading-external-input-trace", "", true);
+    Ptr<SatFadingExternalInputTrace> trace =
+        Singleton<SatFadingExternalInputTraceContainer>::Get()->GetFadingTrace(nodeId,
+                                                                               channelType,
+                                                                               mobility);
+    double fading = trace->GetFading();
+    m_results.push_back(fading);
+}
 
-  // Test the fading traces
-  bool success = Singleton<SatFadingExternalInputTraceContainer>::Get ()->TestFadingTraces (numUts, numGws);
-  NS_TEST_ASSERT_MSG_EQ (success, true, "SatChannelFadingTrace test failed");
+void
+SatFadingExternalInputTraceTestCase::DoRun(void)
+{
+    uint32_t numUts(2);
+    uint32_t numGws(5);
 
-  double time [4] = {1.434, 40.923, 80.503, 140.3};
-  double preCalcRes [4] = {1.020, 1.008, 1.006, 1.012};
+    // Set simulation output details
+    Singleton<SatEnvVariables>::Get()->DoInitialize();
+    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-fading-external-input-trace",
+                                                          "",
+                                                          true);
 
-  Simulator::Schedule (Seconds (time[0]), &SatFadingExternalInputTraceTestCase::TestGetFading, this, 1, SatEnums::RETURN_USER_CH);
-  Simulator::Schedule (Seconds (time[1]), &SatFadingExternalInputTraceTestCase::TestGetFading, this, 2, SatEnums::RETURN_FEEDER_CH);
-  Simulator::Schedule (Seconds (time[2]), &SatFadingExternalInputTraceTestCase::TestGetFading, this, 1, SatEnums::FORWARD_USER_CH);
-  Simulator::Schedule (Seconds (time[3]), &SatFadingExternalInputTraceTestCase::TestGetFading, this, 2, SatEnums::FORWARD_FEEDER_CH);
+    // Test the fading traces
+    bool success =
+        Singleton<SatFadingExternalInputTraceContainer>::Get()->TestFadingTraces(numUts, numGws);
+    NS_TEST_ASSERT_MSG_EQ(success, true, "SatChannelFadingTrace test failed");
 
-  Simulator::Run ();
+    double time[4] = {1.434, 40.923, 80.503, 140.3};
+    double preCalcRes[4] = {1.020, 1.008, 1.006, 1.012};
 
-  for (uint32_t i = 0; i < 4; ++i)
+    Simulator::Schedule(Seconds(time[0]),
+                        &SatFadingExternalInputTraceTestCase::TestGetFading,
+                        this,
+                        1,
+                        SatEnums::RETURN_USER_CH);
+    Simulator::Schedule(Seconds(time[1]),
+                        &SatFadingExternalInputTraceTestCase::TestGetFading,
+                        this,
+                        2,
+                        SatEnums::RETURN_FEEDER_CH);
+    Simulator::Schedule(Seconds(time[2]),
+                        &SatFadingExternalInputTraceTestCase::TestGetFading,
+                        this,
+                        1,
+                        SatEnums::FORWARD_USER_CH);
+    Simulator::Schedule(Seconds(time[3]),
+                        &SatFadingExternalInputTraceTestCase::TestGetFading,
+                        this,
+                        2,
+                        SatEnums::FORWARD_FEEDER_CH);
+
+    Simulator::Run();
+
+    for (uint32_t i = 0; i < 4; ++i)
     {
-      NS_TEST_ASSERT_MSG_EQ_TOL (m_results[i], preCalcRes[i], 0.001, "Fading not within expected tolerance");
+        NS_TEST_ASSERT_MSG_EQ_TOL(m_results[i],
+                                  preCalcRes[i],
+                                  0.001,
+                                  "Fading not within expected tolerance");
     }
 
-  Simulator::Destroy ();
+    Simulator::Destroy();
 
-  Singleton<SatEnvVariables>::Get ()->DoDispose ();
+    Singleton<SatEnvVariables>::Get()->DoDispose();
 }
 
 /**
@@ -114,16 +143,15 @@ SatFadingExternalInputTraceTestCase::DoRun (void)
  */
 class SatFadingExternalInputTraceTestSuite : public TestSuite
 {
-public:
-  SatFadingExternalInputTraceTestSuite ();
+  public:
+    SatFadingExternalInputTraceTestSuite();
 };
 
-SatFadingExternalInputTraceTestSuite::SatFadingExternalInputTraceTestSuite ()
-  : TestSuite ("sat-fading-external-input-trace-test", UNIT)
+SatFadingExternalInputTraceTestSuite::SatFadingExternalInputTraceTestSuite()
+    : TestSuite("sat-fading-external-input-trace-test", UNIT)
 {
-  AddTestCase (new SatFadingExternalInputTraceTestCase, TestCase::QUICK);
+    AddTestCase(new SatFadingExternalInputTraceTestCase, TestCase::QUICK);
 }
 
 // Do allocate an instance of this TestSuite
 static SatFadingExternalInputTraceTestSuite satSatInterferenceTestSuite;
-

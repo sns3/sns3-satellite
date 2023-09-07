@@ -19,300 +19,304 @@
  */
 
 #include "satellite-output-fstream-double-container.h"
-#include "ns3/log.h"
+
 #include "ns3/abort.h"
+#include "ns3/log.h"
 #include "ns3/simulator.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatOutputFileStreamDoubleContainer");
+NS_LOG_COMPONENT_DEFINE("SatOutputFileStreamDoubleContainer");
 
-namespace ns3 {
+namespace ns3
+{
 
 TypeId
-SatOutputFileStreamDoubleContainer::GetTypeId (void)
+SatOutputFileStreamDoubleContainer::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatOutputFileStreamDoubleContainer")
-    .SetParent<Object> ()
-    .AddConstructor<SatOutputFileStreamDoubleContainer> ();
-  return tid;
+    static TypeId tid = TypeId("ns3::SatOutputFileStreamDoubleContainer")
+                            .SetParent<Object>()
+                            .AddConstructor<SatOutputFileStreamDoubleContainer>();
+    return tid;
 }
 
-SatOutputFileStreamDoubleContainer::SatOutputFileStreamDoubleContainer (std::string filename, std::ios::openmode filemode, uint32_t valuesInRow)
-  : m_outputFileStreamWrapper (),
-  m_outputFileStream (),
-  m_container (),
-  m_fileName (filename),
-  m_fileMode (filemode),
-  m_valuesInRow (valuesInRow),
-  m_printFigure (false),
-  m_figureUnitConversionType (RAW),
-  m_style (Gnuplot2dDataset::LINES)
+SatOutputFileStreamDoubleContainer::SatOutputFileStreamDoubleContainer(std::string filename,
+                                                                       std::ios::openmode filemode,
+                                                                       uint32_t valuesInRow)
+    : m_outputFileStreamWrapper(),
+      m_outputFileStream(),
+      m_container(),
+      m_fileName(filename),
+      m_fileMode(filemode),
+      m_valuesInRow(valuesInRow),
+      m_printFigure(false),
+      m_figureUnitConversionType(RAW),
+      m_style(Gnuplot2dDataset::LINES)
 {
-  NS_LOG_FUNCTION (this << m_fileName << m_fileMode);
+    NS_LOG_FUNCTION(this << m_fileName << m_fileMode);
 
-  if (!(m_valuesInRow > 0))
+    if (!(m_valuesInRow > 0))
     {
-      NS_FATAL_ERROR ("SatOutputFileStreamDoubleContainer::SatOutputFileStreamDoubleContainer - No values in the row");
+        NS_FATAL_ERROR("SatOutputFileStreamDoubleContainer::SatOutputFileStreamDoubleContainer - "
+                       "No values in the row");
     }
 }
 
-SatOutputFileStreamDoubleContainer::SatOutputFileStreamDoubleContainer ()
-  : m_outputFileStreamWrapper (),
-  m_outputFileStream (),
-  m_container (),
-  m_fileName (),
-  m_fileMode (),
-  m_valuesInRow (),
-  m_printFigure (),
-  m_figureUnitConversionType (),
-  m_style ()
+SatOutputFileStreamDoubleContainer::SatOutputFileStreamDoubleContainer()
+    : m_outputFileStreamWrapper(),
+      m_outputFileStream(),
+      m_container(),
+      m_fileName(),
+      m_fileMode(),
+      m_valuesInRow(),
+      m_printFigure(),
+      m_figureUnitConversionType(),
+      m_style()
 {
-  NS_LOG_FUNCTION (this);
-  NS_FATAL_ERROR ("SatOutputFileStreamDoubleContainer::SatOutputFileStreamDoubleContainer - Constructor not in use");
+    NS_LOG_FUNCTION(this);
+    NS_FATAL_ERROR("SatOutputFileStreamDoubleContainer::SatOutputFileStreamDoubleContainer - "
+                   "Constructor not in use");
 }
 
-SatOutputFileStreamDoubleContainer::~SatOutputFileStreamDoubleContainer ()
+SatOutputFileStreamDoubleContainer::~SatOutputFileStreamDoubleContainer()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  Reset ();
-}
-
-void
-SatOutputFileStreamDoubleContainer::DoDispose ()
-{
-  NS_LOG_FUNCTION (this);
-
-  Reset ();
-  Object::DoDispose ();
+    Reset();
 }
 
 void
-SatOutputFileStreamDoubleContainer::WriteContainerToFile ()
+SatOutputFileStreamDoubleContainer::DoDispose()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  OpenStream ();
+    Reset();
+    Object::DoDispose();
+}
 
-  if (m_outputFileStream->is_open ())
+void
+SatOutputFileStreamDoubleContainer::WriteContainerToFile()
+{
+    NS_LOG_FUNCTION(this);
+
+    OpenStream();
+
+    if (m_outputFileStream->is_open())
     {
-      for (uint32_t i = 0; i < m_container.size (); i++)
+        for (uint32_t i = 0; i < m_container.size(); i++)
         {
-          for (uint32_t j = 0; j < m_valuesInRow; j++ )
+            for (uint32_t j = 0; j < m_valuesInRow; j++)
             {
-              if (j + 1 == m_valuesInRow)
+                if (j + 1 == m_valuesInRow)
                 {
-                  *m_outputFileStream << m_container[i].at (j);
+                    *m_outputFileStream << m_container[i].at(j);
                 }
-              else
+                else
                 {
-                  *m_outputFileStream << m_container[i].at (j) << "\t";
+                    *m_outputFileStream << m_container[i].at(j) << "\t";
                 }
             }
-          *m_outputFileStream << std::endl;
+            *m_outputFileStream << std::endl;
         }
-      m_outputFileStream->close ();
+        m_outputFileStream->close();
     }
-  else
+    else
     {
-      NS_ABORT_MSG ("Output stream is not valid for writing.");
+        NS_ABORT_MSG("Output stream is not valid for writing.");
     }
 
-  if (m_printFigure)
+    if (m_printFigure)
     {
-      PrintFigure ();
+        PrintFigure();
     }
 
-  Reset ();
+    Reset();
 }
 
 void
-SatOutputFileStreamDoubleContainer::PrintFigure ()
+SatOutputFileStreamDoubleContainer::PrintFigure()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  Gnuplot2dDataset dataset = GetGnuplotDataset ();
-  Gnuplot plot = GetGnuplot ();
-  plot.AddDataset (dataset);
+    Gnuplot2dDataset dataset = GetGnuplotDataset();
+    Gnuplot plot = GetGnuplot();
+    plot.AddDataset(dataset);
 
-  std::string plotFileName = m_fileName + ".plt";
-  std::ofstream plotFile (plotFileName.c_str ());
-  plot.GenerateOutput (plotFile);
-  plotFile.close ();
+    std::string plotFileName = m_fileName + ".plt";
+    std::ofstream plotFile(plotFileName.c_str());
+    plot.GenerateOutput(plotFile);
+    plotFile.close();
 
-  std::string conversionCommand = "gnuplot " + m_fileName + ".plt";
+    std::string conversionCommand = "gnuplot " + m_fileName + ".plt";
 
-  int result = system (conversionCommand.c_str ());
+    int result = system(conversionCommand.c_str());
 
-  if (result < 0)
+    if (result < 0)
     {
-      std::cout << "Unable to open shell process for Gnuplot file conversion for " << m_fileName << ", conversion not done!" << std::endl;
+        std::cout << "Unable to open shell process for Gnuplot file conversion for " << m_fileName
+                  << ", conversion not done!" << std::endl;
     }
 }
 
 void
-SatOutputFileStreamDoubleContainer::AddToContainer (std::vector<double> newItem)
+SatOutputFileStreamDoubleContainer::AddToContainer(std::vector<double> newItem)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  if (newItem.size () != m_valuesInRow)
+    if (newItem.size() != m_valuesInRow)
     {
-      NS_FATAL_ERROR ("SatOutputFileStreamDoubleContainer::AddToContainer - Invalid vector size");
+        NS_FATAL_ERROR("SatOutputFileStreamDoubleContainer::AddToContainer - Invalid vector size");
     }
 
-  m_container.push_back (newItem);
+    m_container.push_back(newItem);
 }
 
 void
-SatOutputFileStreamDoubleContainer::OpenStream ()
+SatOutputFileStreamDoubleContainer::OpenStream()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  m_outputFileStreamWrapper = new SatOutputFileStreamWrapper (m_fileName, m_fileMode);
-  m_outputFileStream = m_outputFileStreamWrapper->GetStream ();
+    m_outputFileStreamWrapper = new SatOutputFileStreamWrapper(m_fileName, m_fileMode);
+    m_outputFileStream = m_outputFileStreamWrapper->GetStream();
 }
 
 void
-SatOutputFileStreamDoubleContainer::Reset ()
+SatOutputFileStreamDoubleContainer::Reset()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  ResetStream ();
-  ClearContainer ();
+    ResetStream();
+    ClearContainer();
 }
 
 void
-SatOutputFileStreamDoubleContainer::ResetStream ()
+SatOutputFileStreamDoubleContainer::ResetStream()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  if (m_outputFileStreamWrapper != NULL)
+    if (m_outputFileStreamWrapper != NULL)
     {
-      delete m_outputFileStreamWrapper;
-      m_outputFileStreamWrapper = 0;
+        delete m_outputFileStreamWrapper;
+        m_outputFileStreamWrapper = 0;
     }
-  m_outputFileStream = 0;
+    m_outputFileStream = 0;
 
-  m_fileName = "";
-  m_fileMode = std::ofstream::out;
+    m_fileName = "";
+    m_fileMode = std::ofstream::out;
 }
 
 void
-SatOutputFileStreamDoubleContainer::ClearContainer ()
+SatOutputFileStreamDoubleContainer::ClearContainer()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  if (!m_container.empty ())
+    if (!m_container.empty())
     {
-      for (uint32_t i = 0; i < m_container.size (); i++)
+        for (uint32_t i = 0; i < m_container.size(); i++)
         {
-          if (!m_container[i].empty ())
+            if (!m_container[i].empty())
             {
-              m_container[i].clear ();
+                m_container[i].clear();
             }
         }
-      m_container.clear ();
+        m_container.clear();
     }
 
-  m_valuesInRow = 0;
+    m_valuesInRow = 0;
 }
 
 Gnuplot2dDataset
-SatOutputFileStreamDoubleContainer::GetGnuplotDataset ()
+SatOutputFileStreamDoubleContainer::GetGnuplotDataset()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  Gnuplot2dDataset ret;
-  ret.SetTitle (m_title);
-  ret.SetStyle (m_style);
+    Gnuplot2dDataset ret;
+    ret.SetTitle(m_title);
+    ret.SetStyle(m_style);
 
-  if (!m_container.empty ())
+    if (!m_container.empty())
     {
-      switch (m_valuesInRow)
+        switch (m_valuesInRow)
         {
-        case 2:
-          {
-            for (uint32_t i = 0; i < m_container.size (); i++)
-              {
-                ret.Add (m_container[i].at (0), ConvertValue (m_container[i].at (1)));
-              }
+        case 2: {
+            for (uint32_t i = 0; i < m_container.size(); i++)
+            {
+                ret.Add(m_container[i].at(0), ConvertValue(m_container[i].at(1)));
+            }
             break;
-          }
-        default:
-          {
-            NS_ABORT_MSG ("SatOutputFileStreamDoubleContainer::GetGnuplotDataset - Figure output not implemented for " << m_valuesInRow << " columns.");
-          }
+        }
+        default: {
+            NS_ABORT_MSG("SatOutputFileStreamDoubleContainer::GetGnuplotDataset - Figure output "
+                         "not implemented for "
+                         << m_valuesInRow << " columns.");
+        }
         }
     }
-  return ret;
+    return ret;
 }
 
 double
-SatOutputFileStreamDoubleContainer::ConvertValue (double value)
+SatOutputFileStreamDoubleContainer::ConvertValue(double value)
 {
-  NS_LOG_FUNCTION (this << value);
+    NS_LOG_FUNCTION(this << value);
 
-  switch (m_figureUnitConversionType)
+    switch (m_figureUnitConversionType)
     {
-    case RAW:
-      {
+    case RAW: {
         return value;
-      }
-    case DECIBEL:
-      {
-        if (value > 0)
-          {
-            return 10.0 * std::log10 (value);
-          }
-        return 10.0 * std::log10 (std::numeric_limits<double>::min ());
-      }
-    case DECIBEL_AMPLITUDE:
-      {
-        if (value > 0)
-          {
-            return 20.0 * std::log10 (value);
-          }
-        return 20.0 * std::log10 (std::numeric_limits<double>::min ());
-      }
-    default:
-      {
-        NS_ABORT_MSG ("SatOutputFileStreamDoubleContainer::ConvertValue - Invalid conversion type.");
-        break;
-      }
     }
-  return -1;
+    case DECIBEL: {
+        if (value > 0)
+        {
+            return 10.0 * std::log10(value);
+        }
+        return 10.0 * std::log10(std::numeric_limits<double>::min());
+    }
+    case DECIBEL_AMPLITUDE: {
+        if (value > 0)
+        {
+            return 20.0 * std::log10(value);
+        }
+        return 20.0 * std::log10(std::numeric_limits<double>::min());
+    }
+    default: {
+        NS_ABORT_MSG("SatOutputFileStreamDoubleContainer::ConvertValue - Invalid conversion type.");
+        break;
+    }
+    }
+    return -1;
 }
 
 Gnuplot
-SatOutputFileStreamDoubleContainer::GetGnuplot ()
+SatOutputFileStreamDoubleContainer::GetGnuplot()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  Gnuplot ret (m_fileName + ".png");
-  ret.SetTitle (m_title);
-  ret.SetTerminal ("png");
-  ret.SetLegend (m_legendY, m_legendX);
-  ret.AppendExtra (m_keyPosition);
-  ret.AppendExtra ("set grid xtics mxtics ytics");
-  return ret;
+    Gnuplot ret(m_fileName + ".png");
+    ret.SetTitle(m_title);
+    ret.SetTerminal("png");
+    ret.SetLegend(m_legendY, m_legendX);
+    ret.AppendExtra(m_keyPosition);
+    ret.AppendExtra("set grid xtics mxtics ytics");
+    return ret;
 }
 
 void
-SatOutputFileStreamDoubleContainer::EnableFigureOutput (std::string title,
-                                                        std::string legendY,
-                                                        std::string legendX,
-                                                        std::string keyPosition,
-                                                        FigureUnitConversion_t figureUnitConversionType,
-                                                        Gnuplot2dDataset::Style style)
+SatOutputFileStreamDoubleContainer::EnableFigureOutput(
+    std::string title,
+    std::string legendY,
+    std::string legendX,
+    std::string keyPosition,
+    FigureUnitConversion_t figureUnitConversionType,
+    Gnuplot2dDataset::Style style)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  m_printFigure = true;
-  m_title = title;
-  m_legendY = legendY;
-  m_legendX = legendX;
-  m_keyPosition = keyPosition;
-  m_figureUnitConversionType = figureUnitConversionType;
-  m_style = style;
+    m_printFigure = true;
+    m_title = title;
+    m_legendY = legendY;
+    m_legendX = legendX;
+    m_keyPosition = keyPosition;
+    m_figureUnitConversionType = figureUnitConversionType;
+    m_style = style;
 }
 
 } // namespace ns3

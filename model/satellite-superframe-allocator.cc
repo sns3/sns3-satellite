@@ -18,44 +18,43 @@
  * Author: Joaquin Muguerza <jmuguerza@viveris.fr>
  */
 
-#include <map>
+#include "satellite-superframe-allocator.h"
 
 #include <ns3/log.h>
 
-#include "satellite-superframe-allocator.h"
+#include <map>
 
+NS_LOG_COMPONENT_DEFINE("SatSuperframeAllocator");
 
-NS_LOG_COMPONENT_DEFINE ("SatSuperframeAllocator");
+namespace ns3
+{
 
-namespace ns3 {
-
-NS_OBJECT_ENSURE_REGISTERED (SatSuperframeAllocator);
+NS_OBJECT_ENSURE_REGISTERED(SatSuperframeAllocator);
 
 TypeId
-SatSuperframeAllocator::GetTypeId (void)
+SatSuperframeAllocator::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatSuperframeAllocator")
-    .SetParent<Object> ();
-  return tid;
+    static TypeId tid = TypeId("ns3::SatSuperframeAllocator").SetParent<Object>();
+    return tid;
 }
 
 TypeId
-SatSuperframeAllocator::GetInstanceTypeId (void) const
+SatSuperframeAllocator::GetInstanceTypeId(void) const
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return GetTypeId ();
+    return GetTypeId();
 }
 
-SatSuperframeAllocator::SatSuperframeAllocator (Ptr<SatSuperframeConf> superFrameConf):
-  m_superframeConf(superFrameConf)
+SatSuperframeAllocator::SatSuperframeAllocator(Ptr<SatSuperframeConf> superFrameConf)
+    : m_superframeConf(superFrameConf)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-SatSuperframeAllocator::~SatSuperframeAllocator ()
+SatSuperframeAllocator::~SatSuperframeAllocator()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
 } // namespace ns3

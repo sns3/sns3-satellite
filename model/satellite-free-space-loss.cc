@@ -18,59 +18,58 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
+#include "satellite-free-space-loss.h"
+
+#include "satellite-const-variables.h"
+#include "satellite-utils.h"
 
 #include <ns3/double.h>
-#include <ns3/string.h>
 #include <ns3/log.h>
+#include <ns3/string.h>
 
-#include "satellite-utils.h"
-#include "satellite-free-space-loss.h"
-#include "satellite-const-variables.h"
+NS_LOG_COMPONENT_DEFINE("SatFreeSpaceLoss");
 
+namespace ns3
+{
 
-NS_LOG_COMPONENT_DEFINE ("SatFreeSpaceLoss");
-
-namespace ns3 {
-
-NS_OBJECT_ENSURE_REGISTERED (SatFreeSpaceLoss);
+NS_OBJECT_ENSURE_REGISTERED(SatFreeSpaceLoss);
 
 TypeId
-SatFreeSpaceLoss::GetTypeId (void)
+SatFreeSpaceLoss::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatFreeSpaceLoss")
-    .SetParent<Object> ()
-    .AddConstructor<SatFreeSpaceLoss> ();
-  return tid;
+    static TypeId tid =
+        TypeId("ns3::SatFreeSpaceLoss").SetParent<Object>().AddConstructor<SatFreeSpaceLoss>();
+    return tid;
 }
 
-SatFreeSpaceLoss::SatFreeSpaceLoss ()
+SatFreeSpaceLoss::SatFreeSpaceLoss()
 {
-}
-
-double
-SatFreeSpaceLoss::GetFsldB (Ptr<MobilityModel> a, Ptr<MobilityModel> b, double frequencyHz) const
-{
-  NS_LOG_FUNCTION (this << frequencyHz);
-
-  double fsl_dB;
-
-  fsl_dB = SatUtils::LinearToDb ( GetFsl (a, b, frequencyHz) );
-
-  return fsl_dB;
 }
 
 double
-SatFreeSpaceLoss::GetFsl (Ptr<MobilityModel> a, Ptr<MobilityModel> b, double frequencyHz) const
+SatFreeSpaceLoss::GetFsldB(Ptr<MobilityModel> a, Ptr<MobilityModel> b, double frequencyHz) const
 {
-  NS_LOG_FUNCTION (this << frequencyHz);
+    NS_LOG_FUNCTION(this << frequencyHz);
 
-  double fsl;
-  double distance = a->GetDistanceFrom (b);
+    double fsl_dB;
 
-  fsl = std::pow ( ( (4.0 * M_PI * distance * frequencyHz ) / SatConstVariables::SPEED_OF_LIGHT ), 2.0 );
+    fsl_dB = SatUtils::LinearToDb(GetFsl(a, b, frequencyHz));
 
-  return fsl;
+    return fsl_dB;
 }
 
+double
+SatFreeSpaceLoss::GetFsl(Ptr<MobilityModel> a, Ptr<MobilityModel> b, double frequencyHz) const
+{
+    NS_LOG_FUNCTION(this << frequencyHz);
+
+    double fsl;
+    double distance = a->GetDistanceFrom(b);
+
+    fsl =
+        std::pow(((4.0 * M_PI * distance * frequencyHz) / SatConstVariables::SPEED_OF_LIGHT), 2.0);
+
+    return fsl;
+}
 
 } // namespace ns3

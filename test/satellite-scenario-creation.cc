@@ -28,14 +28,15 @@
  *
  */
 
+#include "../helper/satellite-helper.h"
+#include "../utils/satellite-env-variables.h"
+
+#include "ns3/core-module.h"
+#include "ns3/satellite-id-mapper.h"
+#include "ns3/simulator.h"
+#include "ns3/singleton.h"
 #include "ns3/string.h"
 #include "ns3/test.h"
-#include "ns3/simulator.h"
-#include "ns3/core-module.h"
-#include "../helper/satellite-helper.h"
-#include "ns3/singleton.h"
-#include "ns3/satellite-id-mapper.h"
-#include "../utils/satellite-env-variables.h"
 
 using namespace ns3;
 
@@ -54,23 +55,23 @@ using namespace ns3;
  */
 class ScenarioCreationSimple : public TestCase
 {
-public:
-  ScenarioCreationSimple ();
-  virtual ~ScenarioCreationSimple ();
+  public:
+    ScenarioCreationSimple();
+    virtual ~ScenarioCreationSimple();
 
-private:
-  virtual void DoRun (void);
+  private:
+    virtual void DoRun(void);
 };
 
 // Add some help text to this case to describe what it is intended to test
-ScenarioCreationSimple::ScenarioCreationSimple ()
-  : TestCase ("'Scenario Creation, Simple' case tests successful creation of Simple test scenario")
+ScenarioCreationSimple::ScenarioCreationSimple()
+    : TestCase("'Scenario Creation, Simple' case tests successful creation of Simple test scenario")
 {
 }
 
 // This destructor does nothing but we include it as a reminder that
 // the test case should clean up after itself
-ScenarioCreationSimple::~ScenarioCreationSimple ()
+ScenarioCreationSimple::~ScenarioCreationSimple()
 {
 }
 
@@ -78,32 +79,34 @@ ScenarioCreationSimple::~ScenarioCreationSimple ()
 // ScenarioCreationSimple TestCase implementation
 //
 void
-ScenarioCreationSimple::DoRun (void)
+ScenarioCreationSimple::DoRun(void)
 {
-  // Reset singletons
-  Singleton<SatIdMapper>::Get ()->Reset ();
+    // Reset singletons
+    Singleton<SatIdMapper>::Get()->Reset();
 
-  // Set simulation output details
-  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-scenario-creation", "simple-scenario", true);
+    // Set simulation output details
+    Singleton<SatEnvVariables>::Get()->DoInitialize();
+    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-scenario-creation",
+                                                          "simple-scenario",
+                                                          true);
 
-  // Create simple scenario
+    // Create simple scenario
 
-  // Creating the reference system.
-  Ptr<SatHelper> helper = CreateObject<SatHelper> ();
+    // Creating the reference system.
+    Ptr<SatHelper> helper = CreateObject<SatHelper>();
 
-  // Enable creation traces
-  Config::SetDefault ("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue (true));
+    // Enable creation traces
+    Config::SetDefault("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue(true));
 
-  helper->CreatePredefinedScenario (SatHelper::SIMPLE);
+    helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
-  // check results what can be done at this level. More checking done in module level with traces
-  NS_TEST_ASSERT_MSG_EQ (helper->GetGwUsers ().GetN (), 1, "GW User count is not what expected!");
-  NS_TEST_ASSERT_MSG_EQ (helper->GetUtUsers ().GetN (), 1, "UT User count is not what expected!");
+    // check results what can be done at this level. More checking done in module level with traces
+    NS_TEST_ASSERT_MSG_EQ(helper->GetGwUsers().GetN(), 1, "GW User count is not what expected!");
+    NS_TEST_ASSERT_MSG_EQ(helper->GetUtUsers().GetN(), 1, "UT User count is not what expected!");
 
-  Singleton<SatEnvVariables>::Get ()->DoDispose ();
+    Singleton<SatEnvVariables>::Get()->DoDispose();
 
-  Simulator::Destroy ();
+    Simulator::Destroy();
 }
 
 /**
@@ -121,23 +124,23 @@ ScenarioCreationSimple::DoRun (void)
  */
 class ScenarioCreationLarger : public TestCase
 {
-public:
-  ScenarioCreationLarger ();
-  virtual ~ScenarioCreationLarger ();
+  public:
+    ScenarioCreationLarger();
+    virtual ~ScenarioCreationLarger();
 
-private:
-  virtual void DoRun (void);
+  private:
+    virtual void DoRun(void);
 };
 
 // Add some help text to this case to describe what it is intended to test
-ScenarioCreationLarger::ScenarioCreationLarger ()
-  : TestCase ("'Scenario Creation, Larger' case tests successful creation of Larger test scenario")
+ScenarioCreationLarger::ScenarioCreationLarger()
+    : TestCase("'Scenario Creation, Larger' case tests successful creation of Larger test scenario")
 {
 }
 
 // This destructor does nothing but we include it as a reminder that
 // the test case should clean up after itself
-ScenarioCreationLarger::~ScenarioCreationLarger ()
+ScenarioCreationLarger::~ScenarioCreationLarger()
 {
 }
 
@@ -145,32 +148,34 @@ ScenarioCreationLarger::~ScenarioCreationLarger ()
 // ScenarioCreationLarger TestCase implementation
 //
 void
-ScenarioCreationLarger::DoRun (void)
+ScenarioCreationLarger::DoRun(void)
 {
-  // Reset singletons
-  Singleton<SatIdMapper>::Get ()->Reset ();
+    // Reset singletons
+    Singleton<SatIdMapper>::Get()->Reset();
 
-  // Set simulation output details
-  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-scenario-creation", "larger-scenario", true);
+    // Set simulation output details
+    Singleton<SatEnvVariables>::Get()->DoInitialize();
+    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-scenario-creation",
+                                                          "larger-scenario",
+                                                          true);
 
-  // Create larger scenario
+    // Create larger scenario
 
-  // Creating the reference system.
-  Ptr<SatHelper> helper = CreateObject<SatHelper> ();
+    // Creating the reference system.
+    Ptr<SatHelper> helper = CreateObject<SatHelper>();
 
-  // Enable creation traces
-  Config::SetDefault ("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue (true));
+    // Enable creation traces
+    Config::SetDefault("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue(true));
 
-  helper->CreatePredefinedScenario (SatHelper::LARGER);
+    helper->CreatePredefinedScenario(SatHelper::LARGER);
 
-  // check results what can be done at this level. More checking done in module level with traces
-  NS_TEST_ASSERT_MSG_EQ (helper->GetGwUsers ().GetN (), 1, "GW User count is not what expected!");
-  NS_TEST_ASSERT_MSG_EQ (helper->GetUtUsers ().GetN (), 5, "UT User count is not what expected!");
+    // check results what can be done at this level. More checking done in module level with traces
+    NS_TEST_ASSERT_MSG_EQ(helper->GetGwUsers().GetN(), 1, "GW User count is not what expected!");
+    NS_TEST_ASSERT_MSG_EQ(helper->GetUtUsers().GetN(), 5, "UT User count is not what expected!");
 
-  Singleton<SatEnvVariables>::Get ()->DoDispose ();
+    Singleton<SatEnvVariables>::Get()->DoDispose();
 
-  Simulator::Destroy ();
+    Simulator::Destroy();
 }
 
 /**
@@ -180,31 +185,31 @@ ScenarioCreationLarger::DoRun (void)
  *  1.  Full test scenario created with helper
  *
  *  Expected result:
- *    • Satellite, seven GWs, defined number (3*98) UTs and defined number of the user nodes created.
- *    • User return/forward and feeder return/forward channels created according to configuration.
- *    • Satellite connected to GWs with feeder channels and to UTs with user channels.
+ *    • Satellite, seven GWs, defined number (3*98) UTs and defined number of the user nodes
+ * created. • User return/forward and feeder return/forward channels created according to
+ * configuration. • Satellite connected to GWs with feeder channels and to UTs with user channels.
  *    • User nodes attached to GW and UT .
  *
  */
 class ScenarioCreationFull : public TestCase
 {
-public:
-  ScenarioCreationFull ();
-  virtual ~ScenarioCreationFull ();
+  public:
+    ScenarioCreationFull();
+    virtual ~ScenarioCreationFull();
 
-private:
-  virtual void DoRun (void);
+  private:
+    virtual void DoRun(void);
 };
 
 // Add some help text to this case to describe what it is intended to test
-ScenarioCreationFull::ScenarioCreationFull ()
-  : TestCase ("'Scenario Creation, Full' case tests successful creation of Full test scenario")
+ScenarioCreationFull::ScenarioCreationFull()
+    : TestCase("'Scenario Creation, Full' case tests successful creation of Full test scenario")
 {
 }
 
 // This destructor does nothing but we include it as a reminder that
 // the test case should clean up after itself
-ScenarioCreationFull::~ScenarioCreationFull ()
+ScenarioCreationFull::~ScenarioCreationFull()
 {
 }
 
@@ -212,42 +217,48 @@ ScenarioCreationFull::~ScenarioCreationFull ()
 // ScenarioCreationFull TestCase implementation
 //
 void
-ScenarioCreationFull::DoRun (void)
+ScenarioCreationFull::DoRun(void)
 {
-  // Reset singletons
-  Singleton<SatIdMapper>::Get ()->Reset ();
+    // Reset singletons
+    Singleton<SatIdMapper>::Get()->Reset();
 
-  // Set simulation output details
-  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-scenario-creation", "full-scenario", true);
+    // Set simulation output details
+    Singleton<SatEnvVariables>::Get()->DoInitialize();
+    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-scenario-creation",
+                                                          "full-scenario",
+                                                          true);
 
-  // Create full scenario
+    // Create full scenario
 
-  // Creating the reference system.
-  Ptr<SatHelper> helper = CreateObject<SatHelper> ();
+    // Creating the reference system.
+    Ptr<SatHelper> helper = CreateObject<SatHelper>();
 
-  // Enable creation traces
-  Config::SetDefault ("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue (true));
+    // Enable creation traces
+    Config::SetDefault("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue(true));
 
-  helper->CreatePredefinedScenario (SatHelper::FULL);
+    helper->CreatePredefinedScenario(SatHelper::FULL);
 
-  // check results what can be done at this level. More checking done in module level with traces
-  // reference system includes 98 beams and we create three UTs with three users per UT in full scenario
-  // and five GW users
+    // check results what can be done at this level. More checking done in module level with traces
+    // reference system includes 98 beams and we create three UTs with three users per UT in full
+    // scenario and five GW users
 
-  NS_TEST_ASSERT_MSG_EQ (helper->GetGwUsers ().GetN (), 5, "GW User count is not what expected!");
-  //NS_TEST_ASSERT_MSG_EQ (helper->GetUtUsers().GetN(), 98*3*3, "UT User count is not what expected!");
-  NS_TEST_ASSERT_MSG_EQ (helper->GetUtUsers ().GetN (), 72 * 3 * 3, "UT User count is not what expected!");
+    NS_TEST_ASSERT_MSG_EQ(helper->GetGwUsers().GetN(), 5, "GW User count is not what expected!");
+    // NS_TEST_ASSERT_MSG_EQ (helper->GetUtUsers().GetN(), 98*3*3, "UT User count is not what
+    // expected!");
+    NS_TEST_ASSERT_MSG_EQ(helper->GetUtUsers().GetN(),
+                          72 * 3 * 3,
+                          "UT User count is not what expected!");
 
-  Singleton<SatEnvVariables>::Get ()->DoDispose ();
+    Singleton<SatEnvVariables>::Get()->DoDispose();
 
-  Simulator::Destroy ();
+    Simulator::Destroy();
 }
 
 /**
  * \brief 'Scenario Creation, User Defined' test case implementation, id: tbd / TN4.
  *
- * This case tests successful creation of the user defined scenario creation of the reference system.
+ * This case tests successful creation of the user defined scenario creation of the reference
+ * system.
  *  1. Set beam info attibute(s) to satellite helper
  *  2. User defined scenario created with helper
  *
@@ -260,23 +271,24 @@ ScenarioCreationFull::DoRun (void)
  */
 class ScenarioCreationUser : public TestCase
 {
-public:
-  ScenarioCreationUser ();
-  virtual ~ScenarioCreationUser ();
+  public:
+    ScenarioCreationUser();
+    virtual ~ScenarioCreationUser();
 
-private:
-  virtual void DoRun (void);
+  private:
+    virtual void DoRun(void);
 };
 
 // Add some help text to this case to describe what it is intended to test
-ScenarioCreationUser::ScenarioCreationUser ()
-  : TestCase ("'Scenario Creation, User defined' case tests successful creation of User defined test scenario")
+ScenarioCreationUser::ScenarioCreationUser()
+    : TestCase("'Scenario Creation, User defined' case tests successful creation of User defined "
+               "test scenario")
 {
 }
 
 // This destructor does nothing but we include it as a reminder that
 // the test case should clean up after itself
-ScenarioCreationUser::~ScenarioCreationUser ()
+ScenarioCreationUser::~ScenarioCreationUser()
 {
 }
 
@@ -284,67 +296,67 @@ ScenarioCreationUser::~ScenarioCreationUser ()
 // ScenarioCreationUser TestCase implementation
 //
 void
-ScenarioCreationUser::DoRun (void)
+ScenarioCreationUser::DoRun(void)
 {
-  // Reset singletons
-  Singleton<SatIdMapper>::Get ()->Reset ();
+    // Reset singletons
+    Singleton<SatIdMapper>::Get()->Reset();
 
-  // Set simulation output details
-  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-scenario-creation", "user-scenario", true);
+    // Set simulation output details
+    Singleton<SatEnvVariables>::Get()->DoInitialize();
+    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-scenario-creation",
+                                                          "user-scenario",
+                                                          true);
 
-  // Create user scenario
+    // Create user scenario
 
-  // Creating the reference system.
-  Ptr<SatHelper> helper = CreateObject<SatHelper> ();
-  SatBeamUserInfo beamInfo = SatBeamUserInfo (1, 1);
-  std::map<std::pair<uint32_t, uint32_t>, SatBeamUserInfo > beamMap;
-  beamMap[std::make_pair(0, 8)] = beamInfo;
-  beamMap[std::make_pair(0, 3)] = beamInfo;
-  beamInfo.AppendUt (2);
-  beamMap[std::make_pair(0, 2)] = beamInfo;
+    // Creating the reference system.
+    Ptr<SatHelper> helper = CreateObject<SatHelper>();
+    SatBeamUserInfo beamInfo = SatBeamUserInfo(1, 1);
+    std::map<std::pair<uint32_t, uint32_t>, SatBeamUserInfo> beamMap;
+    beamMap[std::make_pair(0, 8)] = beamInfo;
+    beamMap[std::make_pair(0, 3)] = beamInfo;
+    beamInfo.AppendUt(2);
+    beamMap[std::make_pair(0, 2)] = beamInfo;
 
-  // Enable creation traces
-  Config::SetDefault ("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue (true));
+    // Enable creation traces
+    Config::SetDefault("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue(true));
 
-  helper->CreateUserDefinedScenario (beamMap);
+    helper->CreateUserDefinedScenario(beamMap);
 
-  // check results what can be done at this level. More checking done in module level with traces
-  NS_TEST_ASSERT_MSG_EQ (helper->GetGwUsers ().GetN (), 5, "GW User count is not what expected!");
-  NS_TEST_ASSERT_MSG_EQ (helper->GetUtUsers ().GetN (), 5, "UT User count is not what expected!");
+    // check results what can be done at this level. More checking done in module level with traces
+    NS_TEST_ASSERT_MSG_EQ(helper->GetGwUsers().GetN(), 5, "GW User count is not what expected!");
+    NS_TEST_ASSERT_MSG_EQ(helper->GetUtUsers().GetN(), 5, "UT User count is not what expected!");
 
-  Singleton<SatEnvVariables>::Get ()->DoDispose ();
+    Singleton<SatEnvVariables>::Get()->DoDispose();
 
-  Simulator::Destroy ();
+    Simulator::Destroy();
 }
 
-// The TestSuite class names the TestSuite as sat-scenario-creation, identifies what type of TestSuite (SYSTEM),
-// and enables the TestCases to be run. Typically, only the constructor for
-// this class must be defined
+// The TestSuite class names the TestSuite as sat-scenario-creation, identifies what type of
+// TestSuite (SYSTEM), and enables the TestCases to be run. Typically, only the constructor for this
+// class must be defined
 //
 class ScenarioCreationTestSuite : public TestSuite
 {
-public:
-  ScenarioCreationTestSuite ();
+  public:
+    ScenarioCreationTestSuite();
 };
 
-ScenarioCreationTestSuite::ScenarioCreationTestSuite ()
-  : TestSuite ("sat-scenario-creation", SYSTEM)
+ScenarioCreationTestSuite::ScenarioCreationTestSuite()
+    : TestSuite("sat-scenario-creation", SYSTEM)
 {
-  // add ScenarioCreationSimple case to suite sat-scenario-creation
-  AddTestCase (new ScenarioCreationSimple, TestCase::QUICK);
+    // add ScenarioCreationSimple case to suite sat-scenario-creation
+    AddTestCase(new ScenarioCreationSimple, TestCase::QUICK);
 
-  // add ScenarioCreationLarger case to suite sat-scenario-creation
-  AddTestCase (new ScenarioCreationLarger, TestCase::QUICK);
+    // add ScenarioCreationLarger case to suite sat-scenario-creation
+    AddTestCase(new ScenarioCreationLarger, TestCase::QUICK);
 
-  // add ScenarioCreationFull case to suite sat-scenario-creation
-  AddTestCase (new ScenarioCreationFull, TestCase::QUICK);
+    // add ScenarioCreationFull case to suite sat-scenario-creation
+    AddTestCase(new ScenarioCreationFull, TestCase::QUICK);
 
-  // add ScenarioCreationUser case to suite sat-scenario-creation
-  AddTestCase (new ScenarioCreationUser, TestCase::QUICK);
-
+    // add ScenarioCreationUser case to suite sat-scenario-creation
+    AddTestCase(new ScenarioCreationUser, TestCase::QUICK);
 }
 
 // Allocate an instance of this TestSuite
 static ScenarioCreationTestSuite scenarioCreationTestSuite;
-

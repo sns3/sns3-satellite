@@ -19,13 +19,12 @@
  *
  */
 
-#include "ns3/core-module.h"
-#include "ns3/network-module.h"
-#include "ns3/internet-module.h"
-#include "ns3/satellite-module.h"
 #include "ns3/applications-module.h"
+#include "ns3/core-module.h"
+#include "ns3/internet-module.h"
+#include "ns3/network-module.h"
+#include "ns3/satellite-module.h"
 #include "ns3/traffic-module.h"
-
 
 using namespace ns3;
 
@@ -36,60 +35,61 @@ using namespace ns3;
  *         execute command -> ./waf --run "sat-rtn-link-ra-example --PrintHelp"
  */
 
-NS_LOG_COMPONENT_DEFINE ("sat-rtn-link-ra-example");
+NS_LOG_COMPONENT_DEFINE("sat-rtn-link-ra-example");
 
 int
-main (int argc, char *argv[])
+main(int argc, char* argv[])
 {
-  uint32_t endUsersPerUt (3);
-  uint32_t utsPerBeam (3);
-  Time simLength (Seconds (50.0));
+    uint32_t endUsersPerUt(3);
+    uint32_t utsPerBeam(3);
+    Time simLength(Seconds(50.0));
 
-  std::string simulationName ("sat-rtn-link-ra-example");
-  auto simulationHelper = CreateObject<SimulationHelper> (simulationName);
+    std::string simulationName("sat-rtn-link-ra-example");
+    auto simulationHelper = CreateObject<SimulationHelper>(simulationName);
 
-  // read command line parameters given by user
-  CommandLine cmd;
-  cmd.AddValue ("endUsersPerUt", "Number of end users per UT", endUsersPerUt);
-  cmd.AddValue ("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
-  simulationHelper->AddDefaultUiArguments (cmd);
-  cmd.Parse (argc, argv);
+    // read command line parameters given by user
+    CommandLine cmd;
+    cmd.AddValue("endUsersPerUt", "Number of end users per UT", endUsersPerUt);
+    cmd.AddValue("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
+    simulationHelper->AddDefaultUiArguments(cmd);
+    cmd.Parse(argc, argv);
 
-  simulationHelper->SetDefaultValues ();
-  simulationHelper->SetUtCountPerBeam (utsPerBeam);
-  simulationHelper->SetUserCountPerUt (endUsersPerUt);
-  simulationHelper->SetSimulationTime (simLength.GetSeconds ());
-  simulationHelper->DisableAllCapacityAssignmentCategories ();
-  simulationHelper->EnableCrdsa ();
+    simulationHelper->SetDefaultValues();
+    simulationHelper->SetUtCountPerBeam(utsPerBeam);
+    simulationHelper->SetUserCountPerUt(endUsersPerUt);
+    simulationHelper->SetSimulationTime(simLength.GetSeconds());
+    simulationHelper->DisableAllCapacityAssignmentCategories();
+    simulationHelper->EnableCrdsa();
 
-  simulationHelper->SetBeams ("1 3 5 7 9 22 24 26 28 30 44 46 48 50 59 61 70 72");
+    simulationHelper->SetBeams("1 3 5 7 9 22 24 26 28 30 44 46 48 50 59 61 70 72");
 
-  /* Simulation tags *****************************************************************/
+    /* Simulation tags *****************************************************************/
 
-  std::stringstream sstag;
-  sstag << simulationName  << "UTs=" << utsPerBeam;
-  simulationHelper->SetOutputTag (sstag.str ());
+    std::stringstream sstag;
+    sstag << simulationName << "UTs=" << utsPerBeam;
+    simulationHelper->SetOutputTag(sstag.str());
 
-  // Create satellite scenario
-  simulationHelper->CreateSatScenario ();
+    // Create satellite scenario
+    simulationHelper->CreateSatScenario();
 
-  // >>> Start of actual test using Full scenario >>>
-  Config::SetDefault ("ns3::CbrApplication::Interval", TimeValue (MilliSeconds (33)));
-  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (20) );
-  simulationHelper->InstallTrafficModel (
-    SimulationHelper::CBR,
-    SimulationHelper::UDP,
-    SimulationHelper::RTN_LINK,
-    Seconds (1), simLength, Seconds (0.05));
+    // >>> Start of actual test using Full scenario >>>
+    Config::SetDefault("ns3::CbrApplication::Interval", TimeValue(MilliSeconds(33)));
+    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(20));
+    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
+                                          SimulationHelper::UDP,
+                                          SimulationHelper::RTN_LINK,
+                                          Seconds(1),
+                                          simLength,
+                                          Seconds(0.05));
 
-  // Create RTN link statistics
-  simulationHelper->CreateDefaultRtnLinkStats ();
+    // Create RTN link statistics
+    simulationHelper->CreateDefaultRtnLinkStats();
 
-  // Enable logs
-  simulationHelper->EnableProgressLogs ();
+    // Enable logs
+    simulationHelper->EnableProgressLogs();
 
-  // Run
-  simulationHelper->RunSimulation ();
+    // Run
+    simulationHelper->RunSimulation();
 
-  return 0;
+    return 0;
 }

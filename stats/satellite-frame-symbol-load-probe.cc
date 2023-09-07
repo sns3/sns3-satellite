@@ -27,83 +27,88 @@
  */
 
 #include "ns3/satellite-frame-symbol-load-probe.h"
+
+#include "ns3/callback.h"
+#include "ns3/config.h"
 #include "ns3/log.h"
 #include "ns3/names.h"
-#include "ns3/config.h"
 #include "ns3/simulator.h"
-#include "ns3/callback.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatFrameSymbolLoadProbe");
+NS_LOG_COMPONENT_DEFINE("SatFrameSymbolLoadProbe");
 
-namespace ns3 {
+namespace ns3
+{
 
-NS_OBJECT_ENSURE_REGISTERED (SatFrameSymbolLoadProbe)
-;
+NS_OBJECT_ENSURE_REGISTERED(SatFrameSymbolLoadProbe);
 
 TypeId
-SatFrameSymbolLoadProbe::GetTypeId ()
+SatFrameSymbolLoadProbe::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::SatFrameSymbolLoadProbe")
-    .SetParent<Probe> ()
-    .AddConstructor<SatFrameSymbolLoadProbe> ()
-    .AddTraceSource ( "Output",
-                      "The frame ID and the ratio of allocated symbols that serve as the output for this probe",
-                      MakeTraceSourceAccessor (&SatFrameSymbolLoadProbe::m_output),
-                      "ns3::SatFrameSymbolLoadProbe::FrameSymbolLoadCallback")
-  ;
-  return tid;
+    static TypeId tid =
+        TypeId("ns3::SatFrameSymbolLoadProbe")
+            .SetParent<Probe>()
+            .AddConstructor<SatFrameSymbolLoadProbe>()
+            .AddTraceSource("Output",
+                            "The frame ID and the ratio of allocated symbols that serve as the "
+                            "output for this probe",
+                            MakeTraceSourceAccessor(&SatFrameSymbolLoadProbe::m_output),
+                            "ns3::SatFrameSymbolLoadProbe::FrameSymbolLoadCallback");
+    return tid;
 }
 
-SatFrameSymbolLoadProbe::SatFrameSymbolLoadProbe ()
+SatFrameSymbolLoadProbe::SatFrameSymbolLoadProbe()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-SatFrameSymbolLoadProbe::~SatFrameSymbolLoadProbe ()
+SatFrameSymbolLoadProbe::~SatFrameSymbolLoadProbe()
 {
-  NS_LOG_FUNCTION (this);
-}
-
-void
-SatFrameSymbolLoadProbe::SetValue (uint32_t frameId, double loadRatio)
-{
-  NS_LOG_FUNCTION (this << frameId << loadRatio);
-  m_output (frameId, loadRatio);
+    NS_LOG_FUNCTION(this);
 }
 
 void
-SatFrameSymbolLoadProbe::SetValueByPath (std::string path, uint32_t frameId, double loadRatio)
+SatFrameSymbolLoadProbe::SetValue(uint32_t frameId, double loadRatio)
 {
-  NS_LOG_FUNCTION (path << frameId << loadRatio);
-  Ptr<SatFrameSymbolLoadProbe> probe = Names::Find<SatFrameSymbolLoadProbe> (path);
-  NS_ASSERT_MSG (probe, "Error:  Can't find probe for path " << path);
-  probe->SetValue (frameId, loadRatio);
+    NS_LOG_FUNCTION(this << frameId << loadRatio);
+    m_output(frameId, loadRatio);
+}
+
+void
+SatFrameSymbolLoadProbe::SetValueByPath(std::string path, uint32_t frameId, double loadRatio)
+{
+    NS_LOG_FUNCTION(path << frameId << loadRatio);
+    Ptr<SatFrameSymbolLoadProbe> probe = Names::Find<SatFrameSymbolLoadProbe>(path);
+    NS_ASSERT_MSG(probe, "Error:  Can't find probe for path " << path);
+    probe->SetValue(frameId, loadRatio);
 }
 
 bool
-SatFrameSymbolLoadProbe::ConnectByObject (std::string traceSource, Ptr<Object> obj)
+SatFrameSymbolLoadProbe::ConnectByObject(std::string traceSource, Ptr<Object> obj)
 {
-  NS_LOG_FUNCTION (this << traceSource << obj);
-  NS_LOG_DEBUG ("Name of probe (if any) in names database: " << Names::FindPath (obj));
-  bool connected = obj->TraceConnectWithoutContext (traceSource, MakeCallback (&ns3::SatFrameSymbolLoadProbe::TraceSink, this));
-  return connected;
+    NS_LOG_FUNCTION(this << traceSource << obj);
+    NS_LOG_DEBUG("Name of probe (if any) in names database: " << Names::FindPath(obj));
+    bool connected = obj->TraceConnectWithoutContext(
+        traceSource,
+        MakeCallback(&ns3::SatFrameSymbolLoadProbe::TraceSink, this));
+    return connected;
 }
 
 void
-SatFrameSymbolLoadProbe::ConnectByPath (std::string path)
+SatFrameSymbolLoadProbe::ConnectByPath(std::string path)
 {
-  NS_LOG_FUNCTION (this << path);
-  NS_LOG_DEBUG ("Name of probe to search for in config database: " << path);
-  Config::ConnectWithoutContext (path, MakeCallback (&ns3::SatFrameSymbolLoadProbe::TraceSink, this));
+    NS_LOG_FUNCTION(this << path);
+    NS_LOG_DEBUG("Name of probe to search for in config database: " << path);
+    Config::ConnectWithoutContext(path,
+                                  MakeCallback(&ns3::SatFrameSymbolLoadProbe::TraceSink, this));
 }
 
 void
-SatFrameSymbolLoadProbe::TraceSink (uint32_t frameId, double loadRatio)
+SatFrameSymbolLoadProbe::TraceSink(uint32_t frameId, double loadRatio)
 {
-  NS_LOG_FUNCTION (this << frameId << loadRatio);
-  if (IsEnabled ())
+    NS_LOG_FUNCTION(this << frameId << loadRatio);
+    if (IsEnabled())
     {
-      m_output (frameId, loadRatio);
+        m_output(frameId, loadRatio);
     }
 }
 

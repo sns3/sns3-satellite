@@ -19,243 +19,232 @@
  *
  */
 
-#include <ns3/log.h>
-#include <ns3/fatal-error.h>
-#include <ns3/boolean.h>
-#include <ns3/string.h>
-#include <ns3/enum.h>
-#include <ns3/callback.h>
-
-#include <ns3/node-container.h>
-#include <ns3/satellite-beam-scheduler.h>
-#include <ns3/satellite-ncc.h>
-#include <ns3/satellite-beam-helper.h>
-#include <ns3/satellite-helper.h>
-
-#include <ns3/data-collection-object.h>
-#include <ns3/scalar-collector.h>
-#include <ns3/multi-file-aggregator.h>
-#include <sstream>
-#include <utility>
-#include <list>
-
 #include "satellite-stats-waveform-usage-helper.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatStatsWaveformUsageHelper");
+#include <ns3/boolean.h>
+#include <ns3/callback.h>
+#include <ns3/data-collection-object.h>
+#include <ns3/enum.h>
+#include <ns3/fatal-error.h>
+#include <ns3/log.h>
+#include <ns3/multi-file-aggregator.h>
+#include <ns3/node-container.h>
+#include <ns3/satellite-beam-helper.h>
+#include <ns3/satellite-beam-scheduler.h>
+#include <ns3/satellite-helper.h>
+#include <ns3/satellite-ncc.h>
+#include <ns3/scalar-collector.h>
+#include <ns3/string.h>
 
+#include <list>
+#include <sstream>
+#include <utility>
 
-namespace ns3 {
+NS_LOG_COMPONENT_DEFINE("SatStatsWaveformUsageHelper");
 
-NS_OBJECT_ENSURE_REGISTERED (SatStatsWaveformUsageHelper);
-
-SatStatsWaveformUsageHelper::SatStatsWaveformUsageHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsHelper (satHelper)
+namespace ns3
 {
-  NS_LOG_FUNCTION (this << satHelper);
+
+NS_OBJECT_ENSURE_REGISTERED(SatStatsWaveformUsageHelper);
+
+SatStatsWaveformUsageHelper::SatStatsWaveformUsageHelper(Ptr<const SatHelper> satHelper)
+    : SatStatsHelper(satHelper)
+{
+    NS_LOG_FUNCTION(this << satHelper);
 }
 
-
-SatStatsWaveformUsageHelper::~SatStatsWaveformUsageHelper ()
+SatStatsWaveformUsageHelper::~SatStatsWaveformUsageHelper()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
-
 
 TypeId // static
-SatStatsWaveformUsageHelper::GetTypeId ()
+SatStatsWaveformUsageHelper::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::SatStatsWaveformUsageHelper")
-    .SetParent<SatStatsHelper> ()
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::SatStatsWaveformUsageHelper").SetParent<SatStatsHelper>();
+    return tid;
 }
 
-
 void
-SatStatsWaveformUsageHelper::DoInstall ()
+SatStatsWaveformUsageHelper::DoInstall()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  if (GetOutputType () != SatStatsHelper::OUTPUT_SCALAR_FILE)
+    if (GetOutputType() != SatStatsHelper::OUTPUT_SCALAR_FILE)
     {
-      NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ())
-                      << " is not a valid output type for this statistics.");
+        NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
+                       << " is not a valid output type for this statistics.");
     }
 
-  if (GetIdentifierType () == SatStatsHelper::IDENTIFIER_UT
-      || GetIdentifierType () == SatStatsHelper::IDENTIFIER_UT_USER)
+    if (GetIdentifierType() == SatStatsHelper::IDENTIFIER_UT ||
+        GetIdentifierType() == SatStatsHelper::IDENTIFIER_UT_USER)
     {
-      NS_FATAL_ERROR (GetIdentifierTypeName (GetIdentifierType ())
-                      << " is not a valid identifier type for this statistics.");
+        NS_FATAL_ERROR(GetIdentifierTypeName(GetIdentifierType())
+                       << " is not a valid identifier type for this statistics.");
     }
 
-  // Setup aggregator.
-  m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                   "OutputFileName", StringValue (GetOutputFileName ()),
-                                   "MultiFileMode", BooleanValue (false),
-                                   "EnableContextPrinting", BooleanValue (true),
-                                   "GeneralHeading", StringValue (GetIdentifierHeading ("usage_count")));
+    // Setup aggregator.
+    m_aggregator = CreateAggregator("ns3::MultiFileAggregator",
+                                    "OutputFileName",
+                                    StringValue(GetOutputFileName()),
+                                    "MultiFileMode",
+                                    BooleanValue(false),
+                                    "EnableContextPrinting",
+                                    BooleanValue(true),
+                                    "GeneralHeading",
+                                    StringValue(GetIdentifierHeading("usage_count")));
 
-  Callback<void, std::string, uint32_t> waveformUsageCallback
-    = MakeCallback (&SatStatsWaveformUsageHelper::WaveformUsageCallback, this);
+    Callback<void, std::string, uint32_t> waveformUsageCallback =
+        MakeCallback(&SatStatsWaveformUsageHelper::WaveformUsageCallback, this);
 
-  // Setup probes.
-  Ptr<SatBeamHelper> beamHelper = GetSatHelper ()->GetBeamHelper ();
-  NS_ASSERT (beamHelper != nullptr);
-  Ptr<SatNcc> ncc = beamHelper->GetNcc ();
-  NS_ASSERT (ncc != nullptr);
-  std::list<std::pair<uint32_t, uint32_t>> beams = beamHelper->GetBeams ();
+    // Setup probes.
+    Ptr<SatBeamHelper> beamHelper = GetSatHelper()->GetBeamHelper();
+    NS_ASSERT(beamHelper != nullptr);
+    Ptr<SatNcc> ncc = beamHelper->GetNcc();
+    NS_ASSERT(ncc != nullptr);
+    std::list<std::pair<uint32_t, uint32_t>> beams = beamHelper->GetBeams();
 
-  for (std::list<std::pair<uint32_t, uint32_t>>::const_iterator it = beams.begin ();
-       it != beams.end (); ++it)
+    for (std::list<std::pair<uint32_t, uint32_t>>::const_iterator it = beams.begin();
+         it != beams.end();
+         ++it)
     {
-      std::ostringstream context;
-      context << GetIdentifierForBeam (it->first, it->second);
+        std::ostringstream context;
+        context << GetIdentifierForBeam(it->first, it->second);
 
-      Ptr<SatBeamScheduler> s = ncc->GetBeamScheduler (it->first, it->second);
-      NS_ASSERT_MSG (s != nullptr, "Error finding beam " << it->second);
-      const bool ret = s->TraceConnect ("WaveformTrace",
-                                        context.str (), waveformUsageCallback);
-      NS_ASSERT_MSG (ret,
-                     "Error connecting to WaveformTrace of beam " << it->second);
-      NS_LOG_INFO (this << " successfully connected"
-                        << " with beam " << it->second);
+        Ptr<SatBeamScheduler> s = ncc->GetBeamScheduler(it->first, it->second);
+        NS_ASSERT_MSG(s != nullptr, "Error finding beam " << it->second);
+        const bool ret = s->TraceConnect("WaveformTrace", context.str(), waveformUsageCallback);
+        NS_ASSERT_MSG(ret, "Error connecting to WaveformTrace of beam " << it->second);
+        NS_LOG_INFO(this << " successfully connected"
+                         << " with beam " << it->second);
     }
 
 } // end of `void DoInstall ();`
 
-
 std::string
-SatStatsWaveformUsageHelper::GetIdentifierHeading (std::string dataLabel) const
+SatStatsWaveformUsageHelper::GetIdentifierHeading(std::string dataLabel) const
 {
-  switch (GetIdentifierType ())
+    switch (GetIdentifierType())
     {
     case SatStatsHelper::IDENTIFIER_GLOBAL:
-      return "% global waveform_id " + dataLabel;
+        return "% global waveform_id " + dataLabel;
 
     case SatStatsHelper::IDENTIFIER_GW:
-      return "% gw_id waveform_id " + dataLabel;
+        return "% gw_id waveform_id " + dataLabel;
 
     case SatStatsHelper::IDENTIFIER_BEAM:
-      return "% beam_id waveform_id " + dataLabel;
+        return "% beam_id waveform_id " + dataLabel;
 
     default:
-      NS_FATAL_ERROR ("SatStatsWaveformUsageHelper - Invalid identifier type");
-      break;
+        NS_FATAL_ERROR("SatStatsWaveformUsageHelper - Invalid identifier type");
+        break;
     }
-  return "";
+    return "";
 }
 
-
 void
-SatStatsWaveformUsageHelper::WaveformUsageCallback (std::string context,
-                                                    uint32_t waveformId)
+SatStatsWaveformUsageHelper::WaveformUsageCallback(std::string context, uint32_t waveformId)
 {
-  NS_LOG_FUNCTION (this << context << waveformId);
+    NS_LOG_FUNCTION(this << context << waveformId);
 
-  // convert context to number
-  std::stringstream ss (context);
-  uint32_t identifier;
-  if (!(ss >> identifier))
+    // convert context to number
+    std::stringstream ss(context);
+    uint32_t identifier;
+    if (!(ss >> identifier))
     {
-      NS_FATAL_ERROR ("Cannot convert '" << context << "' to number");
+        NS_FATAL_ERROR("Cannot convert '" << context << "' to number");
     }
 
-  std::map<uint32_t, CollectorMap>::iterator it = m_collectors.find (waveformId);
-  if (it == m_collectors.end ())
+    std::map<uint32_t, CollectorMap>::iterator it = m_collectors.find(waveformId);
+    if (it == m_collectors.end())
     {
-      // Newly discovered waveform ID
-      NS_LOG_INFO (this << " Creating new collectors for waveform ID " << waveformId);
-      CollectorMap collectorMap;
-      collectorMap.SetType ("ns3::ScalarCollector");
-      collectorMap.SetAttribute ("InputDataType",
-                                 EnumValue (ScalarCollector::INPUT_DATA_TYPE_UINTEGER));
-      collectorMap.SetAttribute ("OutputType",
-                                 EnumValue (ScalarCollector::OUTPUT_TYPE_SUM));
-      uint32_t n = 0;
+        // Newly discovered waveform ID
+        NS_LOG_INFO(this << " Creating new collectors for waveform ID " << waveformId);
+        CollectorMap collectorMap;
+        collectorMap.SetType("ns3::ScalarCollector");
+        collectorMap.SetAttribute("InputDataType",
+                                  EnumValue(ScalarCollector::INPUT_DATA_TYPE_UINTEGER));
+        collectorMap.SetAttribute("OutputType", EnumValue(ScalarCollector::OUTPUT_TYPE_SUM));
+        uint32_t n = 0;
 
-      /*
-       * Create a new set of collectors. Its name consists of two integers:
-       *   - the first is the identifier ID (beam ID, GW ID, or simply zero for
-       *     global);
-       *   - the second is the frame ID.
-       */
-      switch (GetIdentifierType ())
+        /*
+         * Create a new set of collectors. Its name consists of two integers:
+         *   - the first is the identifier ID (beam ID, GW ID, or simply zero for
+         *     global);
+         *   - the second is the frame ID.
+         */
+        switch (GetIdentifierType())
         {
-        case SatStatsHelper::IDENTIFIER_GLOBAL:
-          {
+        case SatStatsHelper::IDENTIFIER_GLOBAL: {
             std::ostringstream name;
             name << "0 " << waveformId;
-            collectorMap.SetAttribute ("Name", StringValue (name.str ()));
-            collectorMap.Create (0);
+            collectorMap.SetAttribute("Name", StringValue(name.str()));
+            collectorMap.Create(0);
             n++;
             break;
-          }
+        }
 
-        case SatStatsHelper::IDENTIFIER_GW:
-          {
-            NodeContainer gws = GetSatHelper ()->GetBeamHelper ()->GetGwNodes ();
-            for (NodeContainer::Iterator it = gws.Begin (); it != gws.End (); ++it)
-              {
-                const uint32_t gwId = GetGwId (*it);
+        case SatStatsHelper::IDENTIFIER_GW: {
+            NodeContainer gws = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+            for (NodeContainer::Iterator it = gws.Begin(); it != gws.End(); ++it)
+            {
+                const uint32_t gwId = GetGwId(*it);
                 std::ostringstream name;
                 name << gwId << " " << waveformId;
-                collectorMap.SetAttribute ("Name", StringValue (name.str ()));
-                collectorMap.Create (gwId);
+                collectorMap.SetAttribute("Name", StringValue(name.str()));
+                collectorMap.Create(gwId);
                 n++;
-              }
+            }
             break;
-          }
+        }
 
-        case SatStatsHelper::IDENTIFIER_BEAM:
-          {
-            std::list<std::pair<uint32_t, uint32_t>> beams = GetSatHelper ()->GetBeamHelper ()->GetBeams ();
-            for (std::list<std::pair<uint32_t, uint32_t>>::const_iterator it = beams.begin ();
-                 it != beams.end (); ++it)
-              {
+        case SatStatsHelper::IDENTIFIER_BEAM: {
+            std::list<std::pair<uint32_t, uint32_t>> beams =
+                GetSatHelper()->GetBeamHelper()->GetBeams();
+            for (std::list<std::pair<uint32_t, uint32_t>>::const_iterator it = beams.begin();
+                 it != beams.end();
+                 ++it)
+            {
                 const uint32_t satId = (it->first);
                 const uint32_t beamId = (it->second);
                 std::ostringstream name;
                 name << satId << "-" << beamId << " " << waveformId;
-                collectorMap.SetAttribute ("Name", StringValue (name.str ()));
-                collectorMap.Create (SatConstVariables::MAX_BEAMS_PER_SATELLITE*(satId+1) + beamId);
+                collectorMap.SetAttribute("Name", StringValue(name.str()));
+                collectorMap.Create(SatConstVariables::MAX_BEAMS_PER_SATELLITE * (satId + 1) +
+                                    beamId);
                 n++;
-              }
+            }
             break;
-          }
-
-        default:
-          NS_FATAL_ERROR ("SatStatsWaveformUsageHelper - Invalid identifier type");
-          break;
         }
 
-      collectorMap.ConnectToAggregator ("Output",
-                                        m_aggregator,
-                                        &MultiFileAggregator::Write1d);
-      NS_LOG_INFO (this << " created " << n << " instance(s)"
-                        << " of " << collectorMap.GetType ().GetName ()
-                        << " for " << GetIdentifierTypeName (GetIdentifierType ()));
+        default:
+            NS_FATAL_ERROR("SatStatsWaveformUsageHelper - Invalid identifier type");
+            break;
+        }
 
-      std::pair<std::map<uint32_t, CollectorMap>::iterator, bool> ret;
-      ret = m_collectors.insert (std::make_pair (waveformId, collectorMap));
-      NS_ASSERT (ret.second);
-      it = ret.first;
+        collectorMap.ConnectToAggregator("Output", m_aggregator, &MultiFileAggregator::Write1d);
+        NS_LOG_INFO(this << " created " << n << " instance(s)"
+                         << " of " << collectorMap.GetType().GetName() << " for "
+                         << GetIdentifierTypeName(GetIdentifierType()));
+
+        std::pair<std::map<uint32_t, CollectorMap>::iterator, bool> ret;
+        ret = m_collectors.insert(std::make_pair(waveformId, collectorMap));
+        NS_ASSERT(ret.second);
+        it = ret.first;
 
     } // end of `if (it == m_collectors.end ())`
 
-  NS_ASSERT (it != m_collectors.end ());
+    NS_ASSERT(it != m_collectors.end());
 
-  // Find the collector with the right identifier.
-  Ptr<DataCollectionObject> collector = it->second.Get (identifier);
-  NS_ASSERT_MSG (collector != nullptr,
-                 "Unable to find collector with identifier " << identifier);
-  Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
-  NS_ASSERT (c != nullptr);
+    // Find the collector with the right identifier.
+    Ptr<DataCollectionObject> collector = it->second.Get(identifier);
+    NS_ASSERT_MSG(collector != nullptr, "Unable to find collector with identifier " << identifier);
+    Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector>();
+    NS_ASSERT(c != nullptr);
 
-  // Pass the sample to the collector.
-  c->TraceSinkUinteger32 (0, 1);
+    // Pass the sample to the collector.
+    c->TraceSinkUinteger32(0, 1);
 
 } // end of `void WaveformUsageCallback (std::string, uint32_t)`
-
 
 } // end of namespace ns3

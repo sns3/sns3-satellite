@@ -33,32 +33,35 @@ using namespace ns3;
  * a single Rayleigh fader and outputs the fading values in time.
  */
 
-NS_LOG_COMPONENT_DEFINE ("sat-rayleigh-example");
+NS_LOG_COMPONENT_DEFINE("sat-rayleigh-example");
 
 int
-main (int argc, char *argv[])
+main(int argc, char* argv[])
 {
-  /// Enable info logs
-  LogComponentEnable ("sat-rayleigh-example", LOG_LEVEL_INFO);
-  LogComponentEnable ("SatRayleighModel", LOG_LEVEL_INFO);
+    /// Enable info logs
+    LogComponentEnable("sat-rayleigh-example", LOG_LEVEL_INFO);
+    LogComponentEnable("SatRayleighModel", LOG_LEVEL_INFO);
 
-  /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationCampaignName", StringValue ("example-rayleigh"));
-  Config::SetDefault ("ns3::SatEnvVariables::SimulationTag", StringValue (""));
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+    /// Set simulation output details
+    Config::SetDefault("ns3::SatEnvVariables::SimulationCampaignName",
+                       StringValue("example-rayleigh"));
+    Config::SetDefault("ns3::SatEnvVariables::SimulationTag", StringValue(""));
+    Config::SetDefault("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue(true));
 
-  /// Create fader
-  Ptr<SatRayleighConf> rayleighConf = CreateObject<SatRayleighConf> ();
-  Ptr<SatRayleighModel> rayleighFader = CreateObject<SatRayleighModel> (rayleighConf, 0, 0);
+    /// Create fader
+    Ptr<SatRayleighConf> rayleighConf = CreateObject<SatRayleighConf>();
+    Ptr<SatRayleighModel> rayleighFader = CreateObject<SatRayleighModel>(rayleighConf, 0, 0);
 
-  /// Run simulation
-  for (uint32_t i = 0; i < 1000; i++)
+    /// Run simulation
+    for (uint32_t i = 0; i < 1000; i++)
     {
-      Simulator::Schedule (Time (500000 + i * 500000), &SatRayleighModel::GetChannelGainDb, rayleighFader);
+        Simulator::Schedule(Time(500000 + i * 500000),
+                            &SatRayleighModel::GetChannelGainDb,
+                            rayleighFader);
     }
 
-  Simulator::Run ();
-  Simulator::Destroy ();
+    Simulator::Run();
+    Simulator::Destroy();
 
-  return 0;
+    return 0;
 }

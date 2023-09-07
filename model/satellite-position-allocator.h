@@ -22,15 +22,15 @@
 #ifndef SATELLITE_POSITION_ALLOCATOR_H
 #define SATELLITE_POSITION_ALLOCATOR_H
 
-#include <ns3/object.h>
-#include <ns3/random-variable-stream.h>
-#include <ns3/position-allocator.h>
-
 #include "geo-coordinate.h"
 #include "satellite-antenna-gain-pattern-container.h"
 
+#include <ns3/object.h>
+#include <ns3/position-allocator.h>
+#include <ns3/random-variable-stream.h>
 
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -41,41 +41,41 @@ namespace ns3 {
  */
 class SatPositionAllocator : public PositionAllocator
 {
-public:
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
+  public:
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * Default constructor.
-   */
-  SatPositionAllocator ();
+    /**
+     * Default constructor.
+     */
+    SatPositionAllocator();
 
-  /**
-   * Destructor for SatPositionAllocator
-   */
-  virtual ~SatPositionAllocator ();
+    /**
+     * Destructor for SatPositionAllocator
+     */
+    virtual ~SatPositionAllocator();
 
-  /**
-   * \brief Get next position
-   * \return The next chosen position.
-   */
-  virtual GeoCoordinate GetNextGeoPosition (uint32_t satId = 0) const = 0;
+    /**
+     * \brief Get next position
+     * \return The next chosen position.
+     */
+    virtual GeoCoordinate GetNextGeoPosition(uint32_t satId = 0) const = 0;
 
-  virtual Vector GetNext (void) const;
-  virtual int64_t AssignStreams (int64_t stream);
+    virtual Vector GetNext(void) const;
+    virtual int64_t AssignStreams(int64_t stream);
 
-private:
-  /*
-   * This is the flag for indicating that when calling method GetNext (defined by class PositionAlocator)
-   * is returned Vector filled by longitude (in x), latitude (in y) and altitude (in z)
-   * this enables using ns-3 mobility helper without to convert geo coordinates first to Cartesian
-   * but if for some reason used model needs Cartesian coordinates then this flag can be turned off
-   * through attribute 'AsGeoCoordinates'.
-   */
-  bool m_GetAsGeoCoordinates;
+  private:
+    /*
+     * This is the flag for indicating that when calling method GetNext (defined by class
+     * PositionAlocator) is returned Vector filled by longitude (in x), latitude (in y) and altitude
+     * (in z) this enables using ns-3 mobility helper without to convert geo coordinates first to
+     * Cartesian but if for some reason used model needs Cartesian coordinates then this flag can be
+     * turned off through attribute 'AsGeoCoordinates'.
+     */
+    bool m_GetAsGeoCoordinates;
 };
 
 /**
@@ -87,85 +87,86 @@ private:
  */
 class SatListPositionAllocator : public SatPositionAllocator
 {
-public:
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
+  public:
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * Default constructor.
-   */
-  SatListPositionAllocator ();
+    /**
+     * Default constructor.
+     */
+    SatListPositionAllocator();
 
-  /**
-   * \param coordinate the position to append at the end of the list of positions to return from GetNext.
-   */
-  void Add (GeoCoordinate coordinate);
+    /**
+     * \param coordinate the position to append at the end of the list of positions to return from
+     * GetNext.
+     */
+    void Add(GeoCoordinate coordinate);
 
-  /**
-   * \brief Get next position
-   * \param satId ID of satellite
-   * \return The next chosen position.
-   */
-  virtual GeoCoordinate GetNextGeoPosition (uint32_t satId = 0) const;
+    /**
+     * \brief Get next position
+     * \param satId ID of satellite
+     * \return The next chosen position.
+     */
+    virtual GeoCoordinate GetNextGeoPosition(uint32_t satId = 0) const;
 
-  inline virtual void SetToBegin ()
-  {
-    m_current = m_positions.begin ();
-  }
-  inline virtual uint32_t GetCount ()
-  {
-    return m_positions.size ();
-  }
+    inline virtual void SetToBegin()
+    {
+        m_current = m_positions.begin();
+    }
 
-private:
-  std::vector<GeoCoordinate> m_positions;
-  mutable std::vector<GeoCoordinate>::const_iterator m_current;
+    inline virtual uint32_t GetCount()
+    {
+        return m_positions.size();
+    }
+
+  private:
+    std::vector<GeoCoordinate> m_positions;
+    mutable std::vector<GeoCoordinate>::const_iterator m_current;
 };
-
 
 /**
  * \ingroup satellite
- * \brief Allocate random positions within a 3D box according to a set of three random variables (longitude, latitude, altitude).
+ * \brief Allocate random positions within a 3D box according to a set of three random variables
+ * (longitude, latitude, altitude).
  */
 class SatRandomBoxPositionAllocator : public SatPositionAllocator
 {
-public:
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
+  public:
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * Default constructor.
-   */
-  SatRandomBoxPositionAllocator ();
+    /**
+     * Default constructor.
+     */
+    SatRandomBoxPositionAllocator();
 
-  /**
-   * Destructor for SatRandomBoxPositionAllocator
-   */
-  virtual ~SatRandomBoxPositionAllocator ();
+    /**
+     * Destructor for SatRandomBoxPositionAllocator
+     */
+    virtual ~SatRandomBoxPositionAllocator();
 
-  void SetLatitude (Ptr<RandomVariableStream> latitude);
-  void SetLongitude (Ptr<RandomVariableStream> longitude);
-  void SetAltitude (Ptr<RandomVariableStream> altitude);
+    void SetLatitude(Ptr<RandomVariableStream> latitude);
+    void SetLongitude(Ptr<RandomVariableStream> longitude);
+    void SetAltitude(Ptr<RandomVariableStream> altitude);
 
-  /**
-   * \brief Get next position
-   * \return The next chosen position.
-   */
-  virtual GeoCoordinate GetNextGeoPosition (uint32_t satId = 0) const;
-  virtual int64_t AssignStreams (int64_t stream);
+    /**
+     * \brief Get next position
+     * \return The next chosen position.
+     */
+    virtual GeoCoordinate GetNextGeoPosition(uint32_t satId = 0) const;
+    virtual int64_t AssignStreams(int64_t stream);
 
-private:
-  Ptr<RandomVariableStream> m_latitude;
-  Ptr<RandomVariableStream> m_longitude;
-  Ptr<RandomVariableStream> m_altitude;
+  private:
+    Ptr<RandomVariableStream> m_latitude;
+    Ptr<RandomVariableStream> m_longitude;
+    Ptr<RandomVariableStream> m_altitude;
 };
-
 
 /**
  * \ingroup satellite
@@ -173,44 +174,44 @@ private:
  */
 class SatRandomCirclePositionAllocator : public SatPositionAllocator
 {
-public:
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
+  public:
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * Default constructor.
-   */
-  SatRandomCirclePositionAllocator ();
+    /**
+     * Default constructor.
+     */
+    SatRandomCirclePositionAllocator();
 
-  /**
-   * Constructor with parameters.
-   * \param center Center of the circle
-   * \param radius Radius in meters
-   */
-  SatRandomCirclePositionAllocator (GeoCoordinate center, uint32_t radius);
+    /**
+     * Constructor with parameters.
+     * \param center Center of the circle
+     * \param radius Radius in meters
+     */
+    SatRandomCirclePositionAllocator(GeoCoordinate center, uint32_t radius);
 
-  /**
-   * Destructor for SatRandomCirclePositionAllocator
-   */
-  virtual ~SatRandomCirclePositionAllocator ();
+    /**
+     * Destructor for SatRandomCirclePositionAllocator
+     */
+    virtual ~SatRandomCirclePositionAllocator();
 
-  void SetCenter (GeoCoordinate center);
-  void SetRadius (uint32_t radius);
+    void SetCenter(GeoCoordinate center);
+    void SetRadius(uint32_t radius);
 
-  /**
-   * \brief Get next position
-   * \return The next chosen position.
-   */
-  virtual GeoCoordinate GetNextGeoPosition (uint32_t satId = 0) const;
-  virtual int64_t AssignStreams (int64_t stream);
+    /**
+     * \brief Get next position
+     * \return The next chosen position.
+     */
+    virtual GeoCoordinate GetNextGeoPosition(uint32_t satId = 0) const;
+    virtual int64_t AssignStreams(int64_t stream);
 
-private:
-  GeoCoordinate m_center;
-  uint32_t m_radius;
-  Ptr<RandomVariableStream> m_rand;
+  private:
+    GeoCoordinate m_center;
+    uint32_t m_radius;
+    Ptr<RandomVariableStream> m_rand;
 };
 
 /**
@@ -219,82 +220,83 @@ private:
  */
 class SatSpotBeamPositionAllocator : public SatPositionAllocator
 {
-public:
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
+  public:
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * Default constructor.
-   */
-  SatSpotBeamPositionAllocator ();
+    /**
+     * Default constructor.
+     */
+    SatSpotBeamPositionAllocator();
 
-  /**
-   * SatSpotBeamPositionAllocator constructor
-   * \param beamId Beam id to which we are placing an UT
-   * \param patternContainer Container holding the antenna patterns
-   * \param geoPos GEO coordinate of the satellite for elevation angle calculations
-   */
-  SatSpotBeamPositionAllocator (uint32_t beamId, Ptr<SatAntennaGainPatternContainer> patternContainer, GeoCoordinate geoPos);
+    /**
+     * SatSpotBeamPositionAllocator constructor
+     * \param beamId Beam id to which we are placing an UT
+     * \param patternContainer Container holding the antenna patterns
+     * \param geoPos GEO coordinate of the satellite for elevation angle calculations
+     */
+    SatSpotBeamPositionAllocator(uint32_t beamId,
+                                 Ptr<SatAntennaGainPatternContainer> patternContainer,
+                                 GeoCoordinate geoPos);
 
-  /**
-   * Destructor for SatSpotBeamPositionAllocator
-   */
-  virtual ~SatSpotBeamPositionAllocator ();
+    /**
+     * Destructor for SatSpotBeamPositionAllocator
+     */
+    virtual ~SatSpotBeamPositionAllocator();
 
-  void SetAltitude (Ptr<RandomVariableStream> altitude);
+    void SetAltitude(Ptr<RandomVariableStream> altitude);
 
-  /**
-   * \brief Get next position
-   * \return The next chosen position.
-   */
-  virtual GeoCoordinate GetNextGeoPosition (uint32_t satId) const;
-  virtual int64_t AssignStreams (int64_t stream);
-private:
-  /**
-   * Max number of tries to pick a random position for a UT.
-   */
-  static constexpr uint32_t MAX_TRIES = 100;
+    /**
+     * \brief Get next position
+     * \return The next chosen position.
+     */
+    virtual GeoCoordinate GetNextGeoPosition(uint32_t satId) const;
+    virtual int64_t AssignStreams(int64_t stream);
 
-  /**
-   * Minimum accepted antenna gain for a UT.
-   */
-  static constexpr double MIN_ANTENNA_GAIN = 40.0;
+  private:
+    /**
+     * Max number of tries to pick a random position for a UT.
+     */
+    static constexpr uint32_t MAX_TRIES = 100;
 
-  /**
-   * Target beam id to which the UT is tried to be placed.
-   */
-  uint32_t m_targetBeamId;
+    /**
+     * Minimum accepted antenna gain for a UT.
+     */
+    static constexpr double MIN_ANTENNA_GAIN = 40.0;
 
-  /**
-   * Minimum accepted elevation angle in degrees for UTs. This
-   * is placed to guarantee that UTs are not positioned into too
-   * low elevation angles (high latitudes, longitudes far from
-   * GEO satellite latitude).
-   */
-  double m_minElevationAngleInDeg;
+    /**
+     * Target beam id to which the UT is tried to be placed.
+     */
+    uint32_t m_targetBeamId;
 
-  /**
-   * Antenna pattern used to check that the give position is valid based on
-   * antenna gains. I.e. UT should be placed into a position where the m_targetBeamId
-   * has the best antenna gain.
-   */
-  Ptr<SatAntennaGainPatternContainer> m_antennaGainPatterns;
+    /**
+     * Minimum accepted elevation angle in degrees for UTs. This
+     * is placed to guarantee that UTs are not positioned into too
+     * low elevation angles (high latitudes, longitudes far from
+     * GEO satellite latitude).
+     */
+    double m_minElevationAngleInDeg;
 
-  /**
-   * Position of the GEO satellite
-   */
-  GeoCoordinate m_geoPos;
+    /**
+     * Antenna pattern used to check that the give position is valid based on
+     * antenna gains. I.e. UT should be placed into a position where the m_targetBeamId
+     * has the best antenna gain.
+     */
+    Ptr<SatAntennaGainPatternContainer> m_antennaGainPatterns;
 
-  /**
-   * A random variable stream for altitude.
-   */
-  Ptr<RandomVariableStream> m_altitude;
+    /**
+     * Position of the GEO satellite
+     */
+    GeoCoordinate m_geoPos;
+
+    /**
+     * A random variable stream for altitude.
+     */
+    Ptr<RandomVariableStream> m_altitude;
 };
-
-
 
 } // namespace ns3
 

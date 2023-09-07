@@ -20,163 +20,167 @@
 
 #include "satellite-uplink-info-tag.h"
 
-namespace ns3 {
-
-NS_OBJECT_ENSURE_REGISTERED (SatUplinkInfoTag);
-
-SatUplinkInfoTag::SatUplinkInfoTag ()
-  : m_satelliteReceptionTime (Seconds (0)),
-  m_sinr (0.0),
-  m_additionalInterference (0.0),
-  m_sinrComputed (false),
-  m_satId (0),
-  m_beamId (0),
-  m_isControl (false)
+namespace ns3
 {
-  // Nothing to do here
+
+NS_OBJECT_ENSURE_REGISTERED(SatUplinkInfoTag);
+
+SatUplinkInfoTag::SatUplinkInfoTag()
+    : m_satelliteReceptionTime(Seconds(0)),
+      m_sinr(0.0),
+      m_additionalInterference(0.0),
+      m_sinrComputed(false),
+      m_satId(0),
+      m_beamId(0),
+      m_isControl(false)
+{
+    // Nothing to do here
 }
 
-SatUplinkInfoTag::SatUplinkInfoTag (Time satelliteReceptionTime, double sinr, double additionalInterference, uint32_t satId, uint32_t beamId, bool isControl)
-  : m_satelliteReceptionTime (satelliteReceptionTime),
-  m_sinr (sinr),
-  m_additionalInterference (additionalInterference),
-  m_sinrComputed (true),
-  m_satId (satId),
-  m_beamId (beamId),
-  m_isControl (isControl)
+SatUplinkInfoTag::SatUplinkInfoTag(Time satelliteReceptionTime,
+                                   double sinr,
+                                   double additionalInterference,
+                                   uint32_t satId,
+                                   uint32_t beamId,
+                                   bool isControl)
+    : m_satelliteReceptionTime(satelliteReceptionTime),
+      m_sinr(sinr),
+      m_additionalInterference(additionalInterference),
+      m_sinrComputed(true),
+      m_satId(satId),
+      m_beamId(beamId),
+      m_isControl(isControl)
 {
-  // Nothing to do here
-}
-
-TypeId
-SatUplinkInfoTag::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::SatUplinkInfoTag")
-    .SetParent<Tag> ()
-    .AddConstructor<SatUplinkInfoTag> ();
-  return tid;
+    // Nothing to do here
 }
 
 TypeId
-SatUplinkInfoTag::GetInstanceTypeId (void) const
+SatUplinkInfoTag::GetTypeId(void)
 {
-  return GetTypeId ();
+    static TypeId tid =
+        TypeId("ns3::SatUplinkInfoTag").SetParent<Tag>().AddConstructor<SatUplinkInfoTag>();
+    return tid;
+}
+
+TypeId
+SatUplinkInfoTag::GetInstanceTypeId(void) const
+{
+    return GetTypeId();
 }
 
 uint32_t
-SatUplinkInfoTag::GetSerializedSize (void) const
+SatUplinkInfoTag::GetSerializedSize(void) const
 {
-  return sizeof(Time) + 2*sizeof(double) + 2*sizeof(bool) + 2*sizeof(uint32_t);
+    return sizeof(Time) + 2 * sizeof(double) + 2 * sizeof(bool) + 2 * sizeof(uint32_t);
 }
 
 void
-SatUplinkInfoTag::Serialize (TagBuffer i) const
+SatUplinkInfoTag::Serialize(TagBuffer i) const
 {
-  int64_t satelliteReceptionTime = m_satelliteReceptionTime.GetNanoSeconds ();
-  i.Write ((const uint8_t *)&satelliteReceptionTime, sizeof(int64_t));
+    int64_t satelliteReceptionTime = m_satelliteReceptionTime.GetNanoSeconds();
+    i.Write((const uint8_t*)&satelliteReceptionTime, sizeof(int64_t));
 
-  i.WriteDouble (m_sinr);
-  i.WriteDouble (m_additionalInterference);
-  i.WriteU8 (m_sinrComputed);
-  i.WriteU32 (m_satId);
-  i.WriteU32 (m_beamId);
-  i.WriteU8 (m_isControl);
+    i.WriteDouble(m_sinr);
+    i.WriteDouble(m_additionalInterference);
+    i.WriteU8(m_sinrComputed);
+    i.WriteU32(m_satId);
+    i.WriteU32(m_beamId);
+    i.WriteU8(m_isControl);
 }
 
 void
-SatUplinkInfoTag::Deserialize (TagBuffer i)
+SatUplinkInfoTag::Deserialize(TagBuffer i)
 {
-  int64_t satelliteReceptionTime;
-  i.Read ((uint8_t *)&satelliteReceptionTime, 8);
-  m_satelliteReceptionTime = NanoSeconds (satelliteReceptionTime);
+    int64_t satelliteReceptionTime;
+    i.Read((uint8_t*)&satelliteReceptionTime, 8);
+    m_satelliteReceptionTime = NanoSeconds(satelliteReceptionTime);
 
-  m_sinr = i.ReadDouble ();
-  m_additionalInterference = i.ReadDouble ();
-  m_sinrComputed = i.ReadU8 ();
-  m_satId = i.ReadU32 ();
-  m_beamId = i.ReadU32 ();
-  m_isControl = i.ReadU8 ();
+    m_sinr = i.ReadDouble();
+    m_additionalInterference = i.ReadDouble();
+    m_sinrComputed = i.ReadU8();
+    m_satId = i.ReadU32();
+    m_beamId = i.ReadU32();
+    m_isControl = i.ReadU8();
 }
 
 void
-SatUplinkInfoTag::Print (std::ostream &os) const
+SatUplinkInfoTag::Print(std::ostream& os) const
 {
-  os << m_satelliteReceptionTime << " " << m_sinr << " " << m_satId << " " << m_beamId << " " << m_isControl;
+    os << m_satelliteReceptionTime << " " << m_sinr << " " << m_satId << " " << m_beamId << " "
+       << m_isControl;
 }
 
 Time
-SatUplinkInfoTag::GetSatelliteReceptionTime (void) const
+SatUplinkInfoTag::GetSatelliteReceptionTime(void) const
 {
-  return m_satelliteReceptionTime;
+    return m_satelliteReceptionTime;
 }
 
 void
-SatUplinkInfoTag::SetSatelliteReceptionTime (Time satelliteReceptionTime)
+SatUplinkInfoTag::SetSatelliteReceptionTime(Time satelliteReceptionTime)
 {
-  m_satelliteReceptionTime = satelliteReceptionTime;
+    m_satelliteReceptionTime = satelliteReceptionTime;
 }
 
 double
-SatUplinkInfoTag::GetSinr (void) const
+SatUplinkInfoTag::GetSinr(void) const
 {
-  return m_sinr;
+    return m_sinr;
 }
 
 void
-SatUplinkInfoTag::SetSinr (double sinr, double additionalInterference)
+SatUplinkInfoTag::SetSinr(double sinr, double additionalInterference)
 {
-  m_sinr = sinr;
-  m_additionalInterference = additionalInterference;
+    m_sinr = sinr;
+    m_additionalInterference = additionalInterference;
 }
 
 double
-SatUplinkInfoTag::GetAdditionalInterference (void) const
+SatUplinkInfoTag::GetAdditionalInterference(void) const
 {
-  return m_additionalInterference;
+    return m_additionalInterference;
 }
 
 bool
-SatUplinkInfoTag::IsSinrComputed (void) const
+SatUplinkInfoTag::IsSinrComputed(void) const
 {
-  return m_sinrComputed;
+    return m_sinrComputed;
 }
 
 uint32_t
-SatUplinkInfoTag::GetSatId (void) const
+SatUplinkInfoTag::GetSatId(void) const
 {
-  return m_satId;
+    return m_satId;
 }
 
 void
-SatUplinkInfoTag::SetSatId (uint32_t satId)
+SatUplinkInfoTag::SetSatId(uint32_t satId)
 {
-  m_satId = satId;
+    m_satId = satId;
 }
 
 uint32_t
-SatUplinkInfoTag::GetBeamId (void) const
+SatUplinkInfoTag::GetBeamId(void) const
 {
-  return m_beamId;
+    return m_beamId;
 }
 
 void
-SatUplinkInfoTag::SetBeamId (uint32_t beamId)
+SatUplinkInfoTag::SetBeamId(uint32_t beamId)
 {
-  m_beamId = beamId;
+    m_beamId = beamId;
 }
 
 bool
-SatUplinkInfoTag::IsControl (void) const
+SatUplinkInfoTag::IsControl(void) const
 {
-  return m_isControl;
+    return m_isControl;
 }
 
 void
-SatUplinkInfoTag::SetIsControl (bool isControl)
+SatUplinkInfoTag::SetIsControl(bool isControl)
 {
-  m_isControl = isControl;
+    m_isControl = isControl;
 }
-
 
 } // namespace ns3
-

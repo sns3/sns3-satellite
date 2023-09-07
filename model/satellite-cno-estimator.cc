@@ -18,148 +18,153 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include <numeric>
-#include <math.h>
+#include "satellite-cno-estimator.h"
 
 #include <ns3/log.h>
 #include <ns3/simulator.h>
 
-#include "satellite-cno-estimator.h"
+#include <math.h>
+#include <numeric>
 
+NS_LOG_COMPONENT_DEFINE("SatCnoEstimator");
 
-NS_LOG_COMPONENT_DEFINE ("SatCnoEstimator");
-
-namespace ns3 {
+namespace ns3
+{
 
 // interface class for C/N0 estimators
 
-//static uint32_t pair_add (uint32_t i, const std::pair<Time, uint32_t>& x)
+// static uint32_t pair_add (uint32_t i, const std::pair<Time, uint32_t>& x)
 //{
-//  return i + x.second;
-//}
+//   return i + x.second;
+// }
 
-SatCnoEstimator::SatCnoEstimator ()
+SatCnoEstimator::SatCnoEstimator()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-SatCnoEstimator::~SatCnoEstimator ()
+SatCnoEstimator::~SatCnoEstimator()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
 void
-SatCnoEstimator::AddSample (double sample)
+SatCnoEstimator::AddSample(double sample)
 {
-  NS_LOG_FUNCTION (this << sample);
+    NS_LOG_FUNCTION(this << sample);
 
-  DoAddSample (sample);
+    DoAddSample(sample);
 }
 
 double
-SatCnoEstimator::GetCnoEstimation ()
+SatCnoEstimator::GetCnoEstimation()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return DoGetCnoEstimation ();
+    return DoGetCnoEstimation();
 }
 
 // class for Basic C/N0 estimator
 
-SatBasicCnoEstimator::SatBasicCnoEstimator ()
-  : m_mode (LAST)
+SatBasicCnoEstimator::SatBasicCnoEstimator()
+    : m_mode(LAST)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-SatBasicCnoEstimator::SatBasicCnoEstimator (SatCnoEstimator::EstimationMode_t mode, Time window)
-  : m_window (window),
-  m_mode (mode)
+SatBasicCnoEstimator::SatBasicCnoEstimator(SatCnoEstimator::EstimationMode_t mode, Time window)
+    : m_window(window),
+      m_mode(mode)
 
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-SatBasicCnoEstimator::~SatBasicCnoEstimator ()
+SatBasicCnoEstimator::~SatBasicCnoEstimator()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
 void
-SatBasicCnoEstimator::DoAddSample (double sample)
+SatBasicCnoEstimator::DoAddSample(double sample)
 {
-  NS_LOG_FUNCTION (this << sample);
+    NS_LOG_FUNCTION(this << sample);
 
-  switch (m_mode)
+    switch (m_mode)
     {
     case LAST:
-      m_samples.clear ();
-      m_samples.insert (std::make_pair (Simulator::Now (), sample) );
-      break;
+        m_samples.clear();
+        m_samples.insert(std::make_pair(Simulator::Now(), sample));
+        break;
 
     case MINIMUM:
-      ClearOutdatedSamples ();
-      m_samples.insert (std::make_pair (Simulator::Now (), sample) );
-      break;
+        ClearOutdatedSamples();
+        m_samples.insert(std::make_pair(Simulator::Now(), sample));
+        break;
 
     case AVERAGE:
-      ClearOutdatedSamples ();
-      m_samples.insert (std::make_pair (Simulator::Now (), sample) );
-      break;
+        ClearOutdatedSamples();
+        m_samples.insert(std::make_pair(Simulator::Now(), sample));
+        break;
 
     default:
-      NS_FATAL_ERROR ("Not supported estimation mode!!!");
-      break;
+        NS_FATAL_ERROR("Not supported estimation mode!!!");
+        break;
     }
 }
 
 double
-SatBasicCnoEstimator::DoGetCnoEstimation ()
+SatBasicCnoEstimator::DoGetCnoEstimation()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  double estimatedCno = NAN;
+    double estimatedCno = NAN;
 
-  ClearOutdatedSamples ();
+    ClearOutdatedSamples();
 
-  if (  m_samples.empty () == false )
+    if (m_samples.empty() == false)
     {
-      switch (m_mode)
+        switch (m_mode)
         {
         case LAST:
-          estimatedCno = m_samples.begin ()->second;
-          break;
+            estimatedCno = m_samples.begin()->second;
+            break;
 
         case MINIMUM:
-          for ( SampleMap_t::const_iterator it = m_samples.begin (); it != m_samples.end (); it++ )
+            for (SampleMap_t::const_iterator it = m_samples.begin(); it != m_samples.end(); it++)
             {
-              if ( std::isnan (estimatedCno) || (( !std::isnan (it->second)) && (it->second < estimatedCno)) )
+                if (std::isnan(estimatedCno) ||
+                    ((!std::isnan(it->second)) && (it->second < estimatedCno)))
                 {
-                  estimatedCno = it->second;
+                    estimatedCno = it->second;
                 }
             }
-          break;
+            break;
 
         case AVERAGE:
-          estimatedCno = std::accumulate (m_samples.begin (), m_samples.end (), 0.0, SatBasicCnoEstimator::AddToSum ) / m_samples.size ();
-          break;
+            estimatedCno = std::accumulate(m_samples.begin(),
+                                           m_samples.end(),
+                                           0.0,
+                                           SatBasicCnoEstimator::AddToSum) /
+                           m_samples.size();
+            break;
 
         default:
-          NS_FATAL_ERROR ("Not supported estimation mode!!!");
-          break;
+            NS_FATAL_ERROR("Not supported estimation mode!!!");
+            break;
         }
     }
 
-  return estimatedCno;
+    return estimatedCno;
 }
 
 void
-SatBasicCnoEstimator::ClearOutdatedSamples ()
+SatBasicCnoEstimator::ClearOutdatedSamples()
 {
-  NS_LOG_FUNCTION (this);
-  SampleMap_t::iterator itLastValid = m_samples.lower_bound (Simulator::Now () - m_window );
+    NS_LOG_FUNCTION(this);
+    SampleMap_t::iterator itLastValid = m_samples.lower_bound(Simulator::Now() - m_window);
 
-  m_samples.erase (m_samples.begin (), itLastValid );
+    m_samples.erase(m_samples.begin(), itLastValid);
 }
 
 } // namespace ns3

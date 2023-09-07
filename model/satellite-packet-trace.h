@@ -21,13 +21,15 @@
 #ifndef SATELLITE_PACKET_TRACE_H_
 #define SATELLITE_PACKET_TRACE_H_
 
+#include "satellite-enums.h"
+
+#include <ns3/mac48-address.h>
+#include <ns3/nstime.h>
 #include <ns3/object.h>
 #include <ns3/output-stream-wrapper.h>
 
-#include "satellite-enums.h"
-
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -38,70 +40,68 @@ namespace ns3 {
 
 class SatPacketTrace : public Object
 {
-public:
-  /**
-   * \brief Constructor
-   */
-  SatPacketTrace ();
+  public:
+    /**
+     * \brief Constructor
+     */
+    SatPacketTrace();
 
-  /**
-   * \brief Destructor
-   */
-  virtual ~SatPacketTrace ();
+    /**
+     * \brief Destructor
+     */
+    virtual ~SatPacketTrace();
 
+    TypeId GetInstanceTypeId() const;
 
-  TypeId GetInstanceTypeId () const;
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
+    /**
+     * Dispose of this class instance
+     */
+    virtual void DoDispose();
 
-  /**
-   * Dispose of this class instance
-   */
-  virtual void DoDispose ();
+    /**
+     * \brief Add a packet trace entry to the log
+     * \param now Time time of a trace event
+     * \param packetEvent Packet event(SND, RCV, DRP, ENQ)
+     * \param nodeType Node type (UT, SAT, GW, NCC, TER)
+     * \param nodeId Node id
+     * \param macAddress MAC address
+     * \param logLevel Log level (ND, LLC, MAC, PHY, CH)
+     * \param linkDir Link direction (FWD, RTN)
+     * \param packetInfo Packet info (List of: Packet id, source MAC address, destination MAC
+     * address)
+     */
+    void AddTraceEntry(Time now,
+                       SatEnums::SatPacketEvent_t packetEvent,
+                       SatEnums::SatNodeType_t nodeType,
+                       uint32_t nodeId,
+                       Mac48Address macAddress,
+                       SatEnums::SatLogLevel_t logLevel,
+                       SatEnums::SatLinkDir_t linkDir,
+                       std::string packetInfo);
 
-  /**
-   * \brief Add a packet trace entry to the log
-   * \param now Time time of a trace event
-   * \param packetEvent Packet event(SND, RCV, DRP, ENQ)
-   * \param nodeType Node type (UT, SAT, GW, NCC, TER)
-   * \param nodeId Node id
-   * \param macAddress MAC address
-   * \param logLevel Log level (ND, LLC, MAC, PHY, CH)
-   * \param linkDir Link direction (FWD, RTN)
-   * \param packetInfo Packet info (List of: Packet id, source MAC address, destination MAC address)
-   */
-  void AddTraceEntry (Time now,
-                      SatEnums::SatPacketEvent_t packetEvent,
-                      SatEnums::SatNodeType_t nodeType,
-                      uint32_t nodeId,
-                      Mac48Address macAddress,
-                      SatEnums::SatLogLevel_t logLevel,
-                      SatEnums::SatLinkDir_t linkDir,
-                      std::string packetInfo);
+  private:
+    /**
+     * \brief Print header to the packet trace log
+     */
+    void PrintHeader();
 
-private:
-  /**
-   * \brief Print header to the packet trace log
-   */
-  void PrintHeader ();
+    /**
+     * File name of the packet trace log
+     */
+    std::string m_fileName;
 
-  /**
-   * File name of the packet trace log
-   */
-  std::string m_fileName;
-
-  /**
-   * Stream wrapper used for packet traces
-   */
-  Ptr<OutputStreamWrapper> m_packetTraceStream;
-
+    /**
+     * Stream wrapper used for packet traces
+     */
+    Ptr<OutputStreamWrapper> m_packetTraceStream;
 };
 
-}
-
+} // namespace ns3
 
 #endif /* SATELLITE_PACKET_TRACE_H_ */

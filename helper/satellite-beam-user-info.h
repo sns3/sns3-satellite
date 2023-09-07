@@ -21,13 +21,16 @@
 #ifndef SAT_BEAM_USER_INFO_H
 #define SAT_BEAM_USER_INFO_H
 
-#include <vector>
 #include <ns3/geo-coordinate.h>
 
-namespace ns3 {
+#include <vector>
+
+namespace ns3
+{
 
 /**
- * \brief Class that holds information for each beam regarding UTs and their users camped in each beam.
+ * \brief Class that holds information for each beam regarding UTs and their users camped in each
+ * beam.
  *
  * Default constructor enables creating an empty information structure.
  * The developer needs to Append individual UTs with individual number of users in each UT by
@@ -39,73 +42,74 @@ namespace ns3 {
  */
 class SatBeamUserInfo
 {
-public:
-  /**
-   * Default constructor for SatBeamUserInfo enables creating an empty information structure.
-   */
-  SatBeamUserInfo ();
+  public:
+    /**
+     * Default constructor for SatBeamUserInfo enables creating an empty information structure.
+     */
+    SatBeamUserInfo();
 
-  /**
-   * Constructor for SatBeamUserInfo which allows creating a group of UT information
-   * structures with each UT having the same number of users.
-   *
-   * \param utCount UT count of the beam (can be added later by method AddUt)
-   * \param userCountPerUt User count of the UTs (can be changed for the specific UT by method SetUtUserCount)
-   */
-  SatBeamUserInfo (uint32_t utCount, uint32_t userCountPerUt);
+    /**
+     * Constructor for SatBeamUserInfo which allows creating a group of UT information
+     * structures with each UT having the same number of users.
+     *
+     * \param utCount UT count of the beam (can be added later by method AddUt)
+     * \param userCountPerUt User count of the UTs (can be changed for the specific UT by method
+     * SetUtUserCount)
+     */
+    SatBeamUserInfo(uint32_t utCount, uint32_t userCountPerUt);
 
-  /**
-   * Destructor for SatBeamUserInfo.
-   */
-  virtual ~SatBeamUserInfo ()
-  {
-  }
+    /**
+     * Destructor for SatBeamUserInfo.
+     */
+    virtual ~SatBeamUserInfo()
+    {
+    }
 
-  /**
-   * \return number of UTs in beam.
-   */
-  uint32_t GetUtCount () const;
+    /**
+     * \return number of UTs in beam.
+     */
+    uint32_t GetUtCount() const;
 
-  /**
-   * \param utIndex index of the UT. Possible indexes are 0  to value -1 returned by GetUtCount
-   *
-   * \return number of users in a UT.
-   */
-  uint32_t GetUtUserCount (uint32_t utIndex) const;
+    /**
+     * \param utIndex index of the UT. Possible indexes are 0  to value -1 returned by GetUtCount
+     *
+     * \return number of users in a UT.
+     */
+    uint32_t GetUtUserCount(uint32_t utIndex) const;
 
-  /**
-   * Sets user count for the UT with given uIndex.
-   *
-   * \param utIndex index of the UT. Possible indexes are 0 to value -1 returned by GetUtCount.
-   * \param userCount Number of users under the UT of with given utIndex. Minimum value is 1.
-   *                  If this is not called for the UT then default value (1) is used for the UT.
-   *
-   */
-  void SetUtUserCount (uint32_t utIndex, uint32_t userCount);
+    /**
+     * Sets user count for the UT with given uIndex.
+     *
+     * \param utIndex index of the UT. Possible indexes are 0 to value -1 returned by GetUtCount.
+     * \param userCount Number of users under the UT of with given utIndex. Minimum value is 1.
+     *                  If this is not called for the UT then default value (1) is used for the UT.
+     *
+     */
+    void SetUtUserCount(uint32_t utIndex, uint32_t userCount);
 
-  /**
-   * Appends new UT to end of the list with given user count for the appended UT.
-   *
-   * \param userCount Number of users under the appended UT. Minimum value is 1.
-   */
-  void AppendUt (uint32_t userCount);
+    /**
+     * Appends new UT to end of the list with given user count for the appended UT.
+     *
+     * \param userCount Number of users under the appended UT. Minimum value is 1.
+     */
+    void AppendUt(uint32_t userCount);
 
-  /**
-   * \return Get the list of custom positions to create, and associated group
-   */
-  std::vector<std::pair<GeoCoordinate, uint32_t>> GetPositions ();
+    /**
+     * \return Get the list of custom positions to create, and associated group
+     */
+    std::vector<std::pair<GeoCoordinate, uint32_t>> GetPositions();
 
-  /**
-   * \brief Set the list of custom positions to create, and associated group
-   */
-  void SetPositions (std::vector<std::pair<GeoCoordinate, uint32_t>> positions);
+    /**
+     * \brief Set the list of custom positions to create, and associated group
+     */
+    void SetPositions(std::vector<std::pair<GeoCoordinate, uint32_t>> positions);
 
-private:
-  // vector to store users per UT
-  std::vector<uint32_t> m_userCount;
+  private:
+    // vector to store users per UT
+    std::vector<uint32_t> m_userCount;
 
-  // storing static positions for some UTs
-  std::vector<std::pair<GeoCoordinate, uint32_t>> m_positions;
+    // storing static positions for some UTs
+    std::vector<std::pair<GeoCoordinate, uint32_t>> m_positions;
 };
 
 } // namespace ns3

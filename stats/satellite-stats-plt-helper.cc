@@ -19,466 +19,472 @@
  *
  */
 
-#include <ns3/log.h>
-#include <ns3/nstime.h>
-#include <ns3/enum.h>
-#include <ns3/string.h>
-#include <ns3/boolean.h>
-#include <ns3/callback.h>
-
-#include <ns3/node-container.h>
-#include <ns3/application.h>
-#include <ns3/inet-socket-address.h>
-#include <ns3/ipv4.h>
-#include <ns3/mac48-address.h>
-#include <ns3/net-device.h>
-#include <ns3/satellite-net-device.h>
-#include <ns3/satellite-mac.h>
-#include <ns3/satellite-phy.h>
-
-#include <ns3/satellite-time-tag.h>
-#include <ns3/satellite-helper.h>
-#include <ns3/satellite-id-mapper.h>
-#include <ns3/singleton.h>
-
-#include <ns3/data-collection-object.h>
-#include <ns3/probe.h>
-#include <ns3/application-delay-probe.h>
-#include <ns3/unit-conversion-collector.h>
-#include <ns3/distribution-collector.h>
-#include <ns3/scalar-collector.h>
-#include <ns3/multi-file-aggregator.h>
-#include <ns3/magister-gnuplot-aggregator.h>
-#include <ns3/traffic-time-tag.h>
-
-#include <sstream>
 #include "satellite-stats-plt-helper.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatStatsPltHelper");
+#include <ns3/application-delay-probe.h>
+#include <ns3/application.h>
+#include <ns3/boolean.h>
+#include <ns3/callback.h>
+#include <ns3/data-collection-object.h>
+#include <ns3/distribution-collector.h>
+#include <ns3/enum.h>
+#include <ns3/inet-socket-address.h>
+#include <ns3/ipv4.h>
+#include <ns3/log.h>
+#include <ns3/mac48-address.h>
+#include <ns3/magister-gnuplot-aggregator.h>
+#include <ns3/multi-file-aggregator.h>
+#include <ns3/net-device.h>
+#include <ns3/node-container.h>
+#include <ns3/nstime.h>
+#include <ns3/probe.h>
+#include <ns3/satellite-helper.h>
+#include <ns3/satellite-id-mapper.h>
+#include <ns3/satellite-mac.h>
+#include <ns3/satellite-net-device.h>
+#include <ns3/satellite-phy.h>
+#include <ns3/satellite-time-tag.h>
+#include <ns3/scalar-collector.h>
+#include <ns3/singleton.h>
+#include <ns3/string.h>
+#include <ns3/traffic-time-tag.h>
+#include <ns3/unit-conversion-collector.h>
 
+#include <sstream>
 
-namespace ns3 {
+NS_LOG_COMPONENT_DEFINE("SatStatsPltHelper");
 
-NS_OBJECT_ENSURE_REGISTERED (SatStatsPltHelper);
-
-SatStatsPltHelper::SatStatsPltHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsHelper (satHelper),
-  m_averagingMode (false)
+namespace ns3
 {
-  NS_LOG_FUNCTION (this << satHelper);
+
+NS_OBJECT_ENSURE_REGISTERED(SatStatsPltHelper);
+
+SatStatsPltHelper::SatStatsPltHelper(Ptr<const SatHelper> satHelper)
+    : SatStatsHelper(satHelper),
+      m_averagingMode(false)
+{
+    NS_LOG_FUNCTION(this << satHelper);
 }
 
-
-SatStatsPltHelper::~SatStatsPltHelper ()
+SatStatsPltHelper::~SatStatsPltHelper()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
-
 
 TypeId // static
-SatStatsPltHelper::GetTypeId ()
+SatStatsPltHelper::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::SatStatsPltHelper")
-    .SetParent<SatStatsHelper> ()
-    .AddAttribute ("AveragingMode",
-                   "If true, all samples will be averaged before passed to aggregator. "
-                   "Only affects histogram, PDF, and CDF output types.",
-                   BooleanValue (false),
-                   MakeBooleanAccessor (&SatStatsPltHelper::SetAveragingMode,
-                                        &SatStatsPltHelper::GetAveragingMode),
-                   MakeBooleanChecker ())
-  ;
-  return tid;
+    static TypeId tid =
+        TypeId("ns3::SatStatsPltHelper")
+            .SetParent<SatStatsHelper>()
+            .AddAttribute("AveragingMode",
+                          "If true, all samples will be averaged before passed to aggregator. "
+                          "Only affects histogram, PDF, and CDF output types.",
+                          BooleanValue(false),
+                          MakeBooleanAccessor(&SatStatsPltHelper::SetAveragingMode,
+                                              &SatStatsPltHelper::GetAveragingMode),
+                          MakeBooleanChecker());
+    return tid;
 }
-
 
 void
-SatStatsPltHelper::SetAveragingMode (bool averagingMode)
+SatStatsPltHelper::SetAveragingMode(bool averagingMode)
 {
-  NS_LOG_FUNCTION (this << averagingMode);
-  m_averagingMode = averagingMode;
+    NS_LOG_FUNCTION(this << averagingMode);
+    m_averagingMode = averagingMode;
 }
-
 
 bool
-SatStatsPltHelper::GetAveragingMode () const
+SatStatsPltHelper::GetAveragingMode() const
 {
-  return m_averagingMode;
+    return m_averagingMode;
 }
 
-
 void
-SatStatsPltHelper::DoInstall ()
+SatStatsPltHelper::DoInstall()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  switch (GetOutputType ())
+    switch (GetOutputType())
     {
     case SatStatsHelper::OUTPUT_NONE:
-      NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
-      break;
+        NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
+                       << " is not a valid output type for this statistics.");
+        break;
 
-    case SatStatsHelper::OUTPUT_SCALAR_FILE:
-      {
+    case SatStatsHelper::OUTPUT_SCALAR_FILE: {
         // Setup aggregator.
-        m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetOutputFileName ()),
-                                         "MultiFileMode", BooleanValue (false),
-                                         "EnableContextPrinting", BooleanValue (true),
-                                         "GeneralHeading", StringValue (GetIdentifierHeading ("plt_sec")));
+        m_aggregator = CreateAggregator("ns3::MultiFileAggregator",
+                                        "OutputFileName",
+                                        StringValue(GetOutputFileName()),
+                                        "MultiFileMode",
+                                        BooleanValue(false),
+                                        "EnableContextPrinting",
+                                        BooleanValue(true),
+                                        "GeneralHeading",
+                                        StringValue(GetIdentifierHeading("plt_sec")));
 
         // Setup collectors.
-        m_terminalCollectors.SetType ("ns3::ScalarCollector");
-        m_terminalCollectors.SetAttribute ("InputDataType",
-                                           EnumValue (ScalarCollector::INPUT_DATA_TYPE_DOUBLE));
-        m_terminalCollectors.SetAttribute ("OutputType",
-                                           EnumValue (ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
-        CreateCollectorPerIdentifier (m_terminalCollectors);
-        m_terminalCollectors.ConnectToAggregator ("Output",
-                                                  m_aggregator,
-                                                  &MultiFileAggregator::Write1d);
+        m_terminalCollectors.SetType("ns3::ScalarCollector");
+        m_terminalCollectors.SetAttribute("InputDataType",
+                                          EnumValue(ScalarCollector::INPUT_DATA_TYPE_DOUBLE));
+        m_terminalCollectors.SetAttribute(
+            "OutputType",
+            EnumValue(ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
+        CreateCollectorPerIdentifier(m_terminalCollectors);
+        m_terminalCollectors.ConnectToAggregator("Output",
+                                                 m_aggregator,
+                                                 &MultiFileAggregator::Write1d);
         break;
-      }
+    }
 
-    case SatStatsHelper::OUTPUT_SCATTER_FILE:
-      {
+    case SatStatsHelper::OUTPUT_SCATTER_FILE: {
         // Setup aggregator.
-        m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetOutputFileName ()),
-                                         "GeneralHeading", StringValue (GetTimeHeading ("plt_sec")));
+        m_aggregator = CreateAggregator("ns3::MultiFileAggregator",
+                                        "OutputFileName",
+                                        StringValue(GetOutputFileName()),
+                                        "GeneralHeading",
+                                        StringValue(GetTimeHeading("plt_sec")));
 
         // Setup collectors.
-        m_terminalCollectors.SetType ("ns3::UnitConversionCollector");
-        m_terminalCollectors.SetAttribute ("ConversionType",
-                                           EnumValue (UnitConversionCollector::TRANSPARENT));
-        CreateCollectorPerIdentifier (m_terminalCollectors);
-        m_terminalCollectors.ConnectToAggregator ("OutputTimeValue",
-                                                  m_aggregator,
-                                                  &MultiFileAggregator::Write2d);
+        m_terminalCollectors.SetType("ns3::UnitConversionCollector");
+        m_terminalCollectors.SetAttribute("ConversionType",
+                                          EnumValue(UnitConversionCollector::TRANSPARENT));
+        CreateCollectorPerIdentifier(m_terminalCollectors);
+        m_terminalCollectors.ConnectToAggregator("OutputTimeValue",
+                                                 m_aggregator,
+                                                 &MultiFileAggregator::Write2d);
         break;
-      }
+    }
 
     case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
     case SatStatsHelper::OUTPUT_PDF_FILE:
-    case SatStatsHelper::OUTPUT_CDF_FILE:
-      {
+    case SatStatsHelper::OUTPUT_CDF_FILE: {
         if (m_averagingMode)
-          {
+        {
             // Setup aggregator.
-            m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                             "OutputFileName", StringValue (GetOutputFileName ()),
-                                             "MultiFileMode", BooleanValue (false),
-                                             "EnableContextPrinting", BooleanValue (false),
-                                             "GeneralHeading", StringValue (GetDistributionHeading ("plt_sec")));
-            Ptr<MultiFileAggregator> fileAggregator = m_aggregator->GetObject<MultiFileAggregator> ();
-            NS_ASSERT (fileAggregator != nullptr);
+            m_aggregator = CreateAggregator("ns3::MultiFileAggregator",
+                                            "OutputFileName",
+                                            StringValue(GetOutputFileName()),
+                                            "MultiFileMode",
+                                            BooleanValue(false),
+                                            "EnableContextPrinting",
+                                            BooleanValue(false),
+                                            "GeneralHeading",
+                                            StringValue(GetDistributionHeading("plt_sec")));
+            Ptr<MultiFileAggregator> fileAggregator =
+                m_aggregator->GetObject<MultiFileAggregator>();
+            NS_ASSERT(fileAggregator != nullptr);
 
             // Setup the final-level collector.
-            m_averagingCollector = CreateObject<DistributionCollector> ();
-            DistributionCollector::OutputType_t outputType
-              = DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
-            if (GetOutputType () == SatStatsHelper::OUTPUT_PDF_FILE)
-              {
+            m_averagingCollector = CreateObject<DistributionCollector>();
+            DistributionCollector::OutputType_t outputType =
+                DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
+            if (GetOutputType() == SatStatsHelper::OUTPUT_PDF_FILE)
+            {
                 outputType = DistributionCollector::OUTPUT_TYPE_PROBABILITY;
-              }
-            else if (GetOutputType () == SatStatsHelper::OUTPUT_CDF_FILE)
-              {
+            }
+            else if (GetOutputType() == SatStatsHelper::OUTPUT_CDF_FILE)
+            {
                 outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
-              }
-            m_averagingCollector->SetOutputType (outputType);
-            m_averagingCollector->SetName ("0");
-            m_averagingCollector->TraceConnect ("Output", "0",
-                                                MakeCallback (&MultiFileAggregator::Write2d,
-                                                              fileAggregator));
-            m_averagingCollector->TraceConnect ("OutputString", "0",
-                                                MakeCallback (&MultiFileAggregator::AddContextHeading,
-                                                              fileAggregator));
-            m_averagingCollector->TraceConnect ("Warning", "0",
-                                                MakeCallback (&MultiFileAggregator::EnableContextWarning,
-                                                              fileAggregator));
+            }
+            m_averagingCollector->SetOutputType(outputType);
+            m_averagingCollector->SetName("0");
+            m_averagingCollector->TraceConnect(
+                "Output",
+                "0",
+                MakeCallback(&MultiFileAggregator::Write2d, fileAggregator));
+            m_averagingCollector->TraceConnect(
+                "OutputString",
+                "0",
+                MakeCallback(&MultiFileAggregator::AddContextHeading, fileAggregator));
+            m_averagingCollector->TraceConnect(
+                "Warning",
+                "0",
+                MakeCallback(&MultiFileAggregator::EnableContextWarning, fileAggregator));
 
             // Setup collectors.
-            m_terminalCollectors.SetType ("ns3::ScalarCollector");
-            m_terminalCollectors.SetAttribute ("InputDataType",
-                                               EnumValue (ScalarCollector::INPUT_DATA_TYPE_DOUBLE));
-            m_terminalCollectors.SetAttribute ("OutputType",
-                                               EnumValue (ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
-            CreateCollectorPerIdentifier (m_terminalCollectors);
-            Callback<void, double> callback
-              = MakeCallback (&DistributionCollector::TraceSinkDouble1,
-                              m_averagingCollector);
-            for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
-                 it != m_terminalCollectors.End (); ++it)
-              {
-                it->second->TraceConnectWithoutContext ("Output", callback);
-              }
-          }
+            m_terminalCollectors.SetType("ns3::ScalarCollector");
+            m_terminalCollectors.SetAttribute("InputDataType",
+                                              EnumValue(ScalarCollector::INPUT_DATA_TYPE_DOUBLE));
+            m_terminalCollectors.SetAttribute(
+                "OutputType",
+                EnumValue(ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
+            CreateCollectorPerIdentifier(m_terminalCollectors);
+            Callback<void, double> callback =
+                MakeCallback(&DistributionCollector::TraceSinkDouble1, m_averagingCollector);
+            for (CollectorMap::Iterator it = m_terminalCollectors.Begin();
+                 it != m_terminalCollectors.End();
+                 ++it)
+            {
+                it->second->TraceConnectWithoutContext("Output", callback);
+            }
+        }
         else
-          {
+        {
             // Setup aggregator.
-            m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                             "OutputFileName", StringValue (GetOutputFileName ()),
-                                             "GeneralHeading", StringValue (GetDistributionHeading ("plt_sec")));
+            m_aggregator = CreateAggregator("ns3::MultiFileAggregator",
+                                            "OutputFileName",
+                                            StringValue(GetOutputFileName()),
+                                            "GeneralHeading",
+                                            StringValue(GetDistributionHeading("plt_sec")));
 
             // Setup collectors.
-            m_terminalCollectors.SetType ("ns3::DistributionCollector");
-            DistributionCollector::OutputType_t outputType
-              = DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
-            if (GetOutputType () == SatStatsHelper::OUTPUT_PDF_FILE)
-              {
+            m_terminalCollectors.SetType("ns3::DistributionCollector");
+            DistributionCollector::OutputType_t outputType =
+                DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
+            if (GetOutputType() == SatStatsHelper::OUTPUT_PDF_FILE)
+            {
                 outputType = DistributionCollector::OUTPUT_TYPE_PROBABILITY;
-              }
-            else if (GetOutputType () == SatStatsHelper::OUTPUT_CDF_FILE)
-              {
+            }
+            else if (GetOutputType() == SatStatsHelper::OUTPUT_CDF_FILE)
+            {
                 outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
-              }
-            m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
-            CreateCollectorPerIdentifier (m_terminalCollectors);
-            m_terminalCollectors.ConnectToAggregator ("Output",
-                                                      m_aggregator,
-                                                      &MultiFileAggregator::Write2d);
-            m_terminalCollectors.ConnectToAggregator ("OutputString",
-                                                      m_aggregator,
-                                                      &MultiFileAggregator::AddContextHeading);
-            m_terminalCollectors.ConnectToAggregator ("Warning",
-                                                      m_aggregator,
-                                                      &MultiFileAggregator::EnableContextWarning);
-          }
+            }
+            m_terminalCollectors.SetAttribute("OutputType", EnumValue(outputType));
+            CreateCollectorPerIdentifier(m_terminalCollectors);
+            m_terminalCollectors.ConnectToAggregator("Output",
+                                                     m_aggregator,
+                                                     &MultiFileAggregator::Write2d);
+            m_terminalCollectors.ConnectToAggregator("OutputString",
+                                                     m_aggregator,
+                                                     &MultiFileAggregator::AddContextHeading);
+            m_terminalCollectors.ConnectToAggregator("Warning",
+                                                     m_aggregator,
+                                                     &MultiFileAggregator::EnableContextWarning);
+        }
 
         break;
-      }
+    }
 
     case SatStatsHelper::OUTPUT_SCALAR_PLOT:
-      /// \todo Add support for boxes in Gnuplot.
-      NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
-      break;
+        /// \todo Add support for boxes in Gnuplot.
+        NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
+                       << " is not a valid output type for this statistics.");
+        break;
 
-    case SatStatsHelper::OUTPUT_SCATTER_PLOT:
-      {
+    case SatStatsHelper::OUTPUT_SCATTER_PLOT: {
         // Setup aggregator.
-        m_aggregator = CreateAggregator ("ns3::MagisterGnuplotAggregator",
-                                         "OutputPath", StringValue (GetOutputPath ()),
-                                         "OutputFileName", StringValue (GetName ()));
-        Ptr<MagisterGnuplotAggregator> plotAggregator
-          = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-        NS_ASSERT (plotAggregator != nullptr);
-        //plot->SetTitle ("");
-        plotAggregator->SetLegend ("Time (in seconds)",
-                                   "Object PLT (in seconds)");
-        plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
+        m_aggregator = CreateAggregator("ns3::MagisterGnuplotAggregator",
+                                        "OutputPath",
+                                        StringValue(GetOutputPath()),
+                                        "OutputFileName",
+                                        StringValue(GetName()));
+        Ptr<MagisterGnuplotAggregator> plotAggregator =
+            m_aggregator->GetObject<MagisterGnuplotAggregator>();
+        NS_ASSERT(plotAggregator != nullptr);
+        // plot->SetTitle ("");
+        plotAggregator->SetLegend("Time (in seconds)", "Object PLT (in seconds)");
+        plotAggregator->Set2dDatasetDefaultStyle(Gnuplot2dDataset::LINES);
 
         // Setup collectors.
-        m_terminalCollectors.SetType ("ns3::UnitConversionCollector");
-        m_terminalCollectors.SetAttribute ("ConversionType",
-                                           EnumValue (UnitConversionCollector::TRANSPARENT));
-        CreateCollectorPerIdentifier (m_terminalCollectors);
-        for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
-             it != m_terminalCollectors.End (); ++it)
-          {
-            const std::string context = it->second->GetName ();
-            plotAggregator->Add2dDataset (context, context);
-          }
-        m_terminalCollectors.ConnectToAggregator ("OutputTimeValue",
-                                                  m_aggregator,
-                                                  &MagisterGnuplotAggregator::Write2d);
+        m_terminalCollectors.SetType("ns3::UnitConversionCollector");
+        m_terminalCollectors.SetAttribute("ConversionType",
+                                          EnumValue(UnitConversionCollector::TRANSPARENT));
+        CreateCollectorPerIdentifier(m_terminalCollectors);
+        for (CollectorMap::Iterator it = m_terminalCollectors.Begin();
+             it != m_terminalCollectors.End();
+             ++it)
+        {
+            const std::string context = it->second->GetName();
+            plotAggregator->Add2dDataset(context, context);
+        }
+        m_terminalCollectors.ConnectToAggregator("OutputTimeValue",
+                                                 m_aggregator,
+                                                 &MagisterGnuplotAggregator::Write2d);
         break;
-      }
+    }
 
     case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
     case SatStatsHelper::OUTPUT_PDF_PLOT:
-    case SatStatsHelper::OUTPUT_CDF_PLOT:
-      {
+    case SatStatsHelper::OUTPUT_CDF_PLOT: {
         if (m_averagingMode)
-          {
+        {
             // Setup aggregator.
-            m_aggregator = CreateAggregator ("ns3::MagisterGnuplotAggregator",
-                                             "OutputPath", StringValue (GetOutputPath ()),
-                                             "OutputFileName", StringValue (GetName ()));
-            Ptr<MagisterGnuplotAggregator> plotAggregator
-              = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-            NS_ASSERT (plotAggregator != nullptr);
-            //plot->SetTitle ("");
-            plotAggregator->SetLegend ("Object PLT (in seconds)",
-                                       "Frequency");
-            plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
-            plotAggregator->Add2dDataset (GetName (), GetName ());
+            m_aggregator = CreateAggregator("ns3::MagisterGnuplotAggregator",
+                                            "OutputPath",
+                                            StringValue(GetOutputPath()),
+                                            "OutputFileName",
+                                            StringValue(GetName()));
+            Ptr<MagisterGnuplotAggregator> plotAggregator =
+                m_aggregator->GetObject<MagisterGnuplotAggregator>();
+            NS_ASSERT(plotAggregator != nullptr);
+            // plot->SetTitle ("");
+            plotAggregator->SetLegend("Object PLT (in seconds)", "Frequency");
+            plotAggregator->Set2dDatasetDefaultStyle(Gnuplot2dDataset::LINES);
+            plotAggregator->Add2dDataset(GetName(), GetName());
             /// \todo Find a better dataset name.
 
             // Setup the final-level collector.
-            m_averagingCollector = CreateObject<DistributionCollector> ();
-            DistributionCollector::OutputType_t outputType
-              = DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
-            if (GetOutputType () == SatStatsHelper::OUTPUT_PDF_PLOT)
-              {
+            m_averagingCollector = CreateObject<DistributionCollector>();
+            DistributionCollector::OutputType_t outputType =
+                DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
+            if (GetOutputType() == SatStatsHelper::OUTPUT_PDF_PLOT)
+            {
                 outputType = DistributionCollector::OUTPUT_TYPE_PROBABILITY;
-              }
-            else if (GetOutputType () == SatStatsHelper::OUTPUT_CDF_PLOT)
-              {
+            }
+            else if (GetOutputType() == SatStatsHelper::OUTPUT_CDF_PLOT)
+            {
                 outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
-              }
-            m_averagingCollector->SetOutputType (outputType);
-            m_averagingCollector->SetName ("0");
-            m_averagingCollector->TraceConnect ("Output",
-                                                GetName (),
-                                                MakeCallback (&MagisterGnuplotAggregator::Write2d,
-                                                              plotAggregator));
+            }
+            m_averagingCollector->SetOutputType(outputType);
+            m_averagingCollector->SetName("0");
+            m_averagingCollector->TraceConnect(
+                "Output",
+                GetName(),
+                MakeCallback(&MagisterGnuplotAggregator::Write2d, plotAggregator));
             /// \todo Find a better dataset name.
 
             // Setup collectors.
-            m_terminalCollectors.SetType ("ns3::ScalarCollector");
-            m_terminalCollectors.SetAttribute ("InputDataType",
-                                               EnumValue (ScalarCollector::INPUT_DATA_TYPE_DOUBLE));
-            m_terminalCollectors.SetAttribute ("OutputType",
-                                               EnumValue (ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
-            CreateCollectorPerIdentifier (m_terminalCollectors);
-            Callback<void, double> callback
-              = MakeCallback (&DistributionCollector::TraceSinkDouble1,
-                              m_averagingCollector);
-            for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
-                 it != m_terminalCollectors.End (); ++it)
-              {
-                it->second->TraceConnectWithoutContext ("Output", callback);
-              }
-          }
+            m_terminalCollectors.SetType("ns3::ScalarCollector");
+            m_terminalCollectors.SetAttribute("InputDataType",
+                                              EnumValue(ScalarCollector::INPUT_DATA_TYPE_DOUBLE));
+            m_terminalCollectors.SetAttribute(
+                "OutputType",
+                EnumValue(ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
+            CreateCollectorPerIdentifier(m_terminalCollectors);
+            Callback<void, double> callback =
+                MakeCallback(&DistributionCollector::TraceSinkDouble1, m_averagingCollector);
+            for (CollectorMap::Iterator it = m_terminalCollectors.Begin();
+                 it != m_terminalCollectors.End();
+                 ++it)
+            {
+                it->second->TraceConnectWithoutContext("Output", callback);
+            }
+        }
         else
-          {
+        {
             // Setup aggregator.
-            m_aggregator = CreateAggregator ("ns3::MagisterGnuplotAggregator",
-                                             "OutputPath", StringValue (GetOutputPath ()),
-                                             "OutputFileName", StringValue (GetName ()));
-            Ptr<MagisterGnuplotAggregator> plotAggregator
-              = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-            NS_ASSERT (plotAggregator != nullptr);
-            //plot->SetTitle ("");
-            plotAggregator->SetLegend ("Object PLT (in seconds)",
-                                       "Frequency");
-            plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
+            m_aggregator = CreateAggregator("ns3::MagisterGnuplotAggregator",
+                                            "OutputPath",
+                                            StringValue(GetOutputPath()),
+                                            "OutputFileName",
+                                            StringValue(GetName()));
+            Ptr<MagisterGnuplotAggregator> plotAggregator =
+                m_aggregator->GetObject<MagisterGnuplotAggregator>();
+            NS_ASSERT(plotAggregator != nullptr);
+            // plot->SetTitle ("");
+            plotAggregator->SetLegend("Object PLT (in seconds)", "Frequency");
+            plotAggregator->Set2dDatasetDefaultStyle(Gnuplot2dDataset::LINES);
 
             // Setup collectors.
-            m_terminalCollectors.SetType ("ns3::DistributionCollector");
-            DistributionCollector::OutputType_t outputType
-              = DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
-            if (GetOutputType () == SatStatsHelper::OUTPUT_PDF_PLOT)
-              {
+            m_terminalCollectors.SetType("ns3::DistributionCollector");
+            DistributionCollector::OutputType_t outputType =
+                DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
+            if (GetOutputType() == SatStatsHelper::OUTPUT_PDF_PLOT)
+            {
                 outputType = DistributionCollector::OUTPUT_TYPE_PROBABILITY;
-              }
-            else if (GetOutputType () == SatStatsHelper::OUTPUT_CDF_PLOT)
-              {
+            }
+            else if (GetOutputType() == SatStatsHelper::OUTPUT_CDF_PLOT)
+            {
                 outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
-              }
-            m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
-            CreateCollectorPerIdentifier (m_terminalCollectors);
-            for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
-                 it != m_terminalCollectors.End (); ++it)
-              {
-                const std::string context = it->second->GetName ();
-                plotAggregator->Add2dDataset (context, context);
-              }
-            m_terminalCollectors.ConnectToAggregator ("Output",
-                                                      m_aggregator,
-                                                      &MagisterGnuplotAggregator::Write2d);
-          }
+            }
+            m_terminalCollectors.SetAttribute("OutputType", EnumValue(outputType));
+            CreateCollectorPerIdentifier(m_terminalCollectors);
+            for (CollectorMap::Iterator it = m_terminalCollectors.Begin();
+                 it != m_terminalCollectors.End();
+                 ++it)
+            {
+                const std::string context = it->second->GetName();
+                plotAggregator->Add2dDataset(context, context);
+            }
+            m_terminalCollectors.ConnectToAggregator("Output",
+                                                     m_aggregator,
+                                                     &MagisterGnuplotAggregator::Write2d);
+        }
 
         break;
-      }
-
-    default:
-      NS_FATAL_ERROR ("SatStatsPltHelper - Invalid output type");
-      break;
     }
 
-  // Setup probes and connect them to the collectors.
-  InstallProbes ();
+    default:
+        NS_FATAL_ERROR("SatStatsPltHelper - Invalid output type");
+        break;
+    }
+
+    // Setup probes and connect them to the collectors.
+    InstallProbes();
 
 } // end of `void DoInstall ();`
 
-
 void
-SatStatsPltHelper::InstallProbes ()
+SatStatsPltHelper::InstallProbes()
 {
-  // The method below is supposed to be implemented by the child class.
-  DoInstallProbes ();
+    // The method below is supposed to be implemented by the child class.
+    DoInstallProbes();
 }
 
-
 void
-SatStatsPltHelper::RxPltCallback (const Time &plt, const Address &from)
+SatStatsPltHelper::RxPltCallback(const Time& plt, const Address& from)
 {
-  //NS_LOG_FUNCTION (this << plt.GetSeconds () << from);
+    // NS_LOG_FUNCTION (this << plt.GetSeconds () << from);
 
-  if (from.IsInvalid ())
+    if (from.IsInvalid())
     {
-      NS_LOG_WARN (this << " discarding a object PLT of " << plt.GetSeconds ()
-                        << " from statistics collection because of"
-                        << " invalid sender address");
+        NS_LOG_WARN(this << " discarding a object PLT of " << plt.GetSeconds()
+                         << " from statistics collection because of"
+                         << " invalid sender address");
     }
-  else
+    else
     {
-      // Determine the identifier associated with the sender address.
-      std::map<const Address, uint32_t>::const_iterator it = m_identifierMap.find (from);
+        // Determine the identifier associated with the sender address.
+        std::map<const Address, uint32_t>::const_iterator it = m_identifierMap.find(from);
 
-      if (it != m_identifierMap.end ())
+        if (it != m_identifierMap.end())
         {
-          PassSampleToCollector (plt, it->second);
+            PassSampleToCollector(plt, it->second);
         }
-      else
+        else
         {
-          NS_LOG_WARN (this << " discarding a object PLT of " << plt.GetSeconds ()
-                            << " from statistics collection because of"
-                            << " unknown sender address " << from);
+            NS_LOG_WARN(this << " discarding a object PLT of " << plt.GetSeconds()
+                             << " from statistics collection because of"
+                             << " unknown sender address " << from);
         }
     }
 }
 
-
 void
-SatStatsPltHelper::SaveAddressAndIdentifier (Ptr<Node> utNode)
+SatStatsPltHelper::SaveAddressAndIdentifier(Ptr<Node> utNode)
 {
-  NS_LOG_FUNCTION (this << utNode->GetId ());
+    NS_LOG_FUNCTION(this << utNode->GetId());
 
-  const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
-  const Address addr = satIdMapper->GetUtMacWithNode (utNode);
+    const SatIdMapper* satIdMapper = Singleton<SatIdMapper>::Get();
+    const Address addr = satIdMapper->GetUtMacWithNode(utNode);
 
-  if (addr.IsInvalid ())
+    if (addr.IsInvalid())
     {
-      NS_LOG_WARN (this << " Node " << utNode->GetId ()
-                        << " is not a valid UT");
+        NS_LOG_WARN(this << " Node " << utNode->GetId() << " is not a valid UT");
     }
-  else
+    else
     {
-      const uint32_t identifier = GetIdentifierForUt (utNode);
-      m_identifierMap[addr] = identifier;
-      NS_LOG_INFO (this << " associated address " << addr
-                        << " with identifier " << identifier);
-
+        const uint32_t identifier = GetIdentifierForUt(utNode);
+        m_identifierMap[addr] = identifier;
+        NS_LOG_INFO(this << " associated address " << addr << " with identifier " << identifier);
     }
 }
-
 
 bool
-SatStatsPltHelper::ConnectProbeToCollector (Ptr<Probe> probe,
-                                              uint32_t identifier)
+SatStatsPltHelper::ConnectProbeToCollector(Ptr<Probe> probe, uint32_t identifier)
 {
-  NS_LOG_FUNCTION (this << probe << probe->GetName () << identifier);
+    NS_LOG_FUNCTION(this << probe << probe->GetName() << identifier);
 
-  bool ret = false;
-  switch (GetOutputType ())
+    bool ret = false;
+    switch (GetOutputType())
     {
     case SatStatsHelper::OUTPUT_SCALAR_FILE:
     case SatStatsHelper::OUTPUT_SCALAR_PLOT:
-      ret = m_terminalCollectors.ConnectWithProbe (probe,
-                                                   "OutputSeconds",
-                                                   identifier,
-                                                   &ScalarCollector::TraceSinkDouble);
-      break;
+        ret = m_terminalCollectors.ConnectWithProbe(probe,
+                                                    "OutputSeconds",
+                                                    identifier,
+                                                    &ScalarCollector::TraceSinkDouble);
+        break;
 
     case SatStatsHelper::OUTPUT_SCATTER_FILE:
     case SatStatsHelper::OUTPUT_SCATTER_PLOT:
-      ret = m_terminalCollectors.ConnectWithProbe (probe,
-                                                   "OutputSeconds",
-                                                   identifier,
-                                                   &UnitConversionCollector::TraceSinkDouble);
-      break;
+        ret = m_terminalCollectors.ConnectWithProbe(probe,
+                                                    "OutputSeconds",
+                                                    identifier,
+                                                    &UnitConversionCollector::TraceSinkDouble);
+        break;
 
     case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
     case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
@@ -486,70 +492,67 @@ SatStatsPltHelper::ConnectProbeToCollector (Ptr<Probe> probe,
     case SatStatsHelper::OUTPUT_PDF_PLOT:
     case SatStatsHelper::OUTPUT_CDF_FILE:
     case SatStatsHelper::OUTPUT_CDF_PLOT:
-      if (m_averagingMode)
+        if (m_averagingMode)
         {
-          ret = m_terminalCollectors.ConnectWithProbe (probe,
-                                                       "OutputSeconds",
-                                                       identifier,
-                                                       &ScalarCollector::TraceSinkDouble);
+            ret = m_terminalCollectors.ConnectWithProbe(probe,
+                                                        "OutputSeconds",
+                                                        identifier,
+                                                        &ScalarCollector::TraceSinkDouble);
         }
-      else
+        else
         {
-          ret = m_terminalCollectors.ConnectWithProbe (probe,
-                                                       "OutputSeconds",
-                                                       identifier,
-                                                       &DistributionCollector::TraceSinkDouble);
+            ret = m_terminalCollectors.ConnectWithProbe(probe,
+                                                        "OutputSeconds",
+                                                        identifier,
+                                                        &DistributionCollector::TraceSinkDouble);
         }
-      break;
+        break;
 
     default:
-      NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
-      break;
+        NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
+                       << " is not a valid output type for this statistics.");
+        break;
     }
 
-  if (ret)
+    if (ret)
     {
-      NS_LOG_INFO (this << " created probe " << probe->GetName ()
-                        << ", connected to collector " << identifier);
+        NS_LOG_INFO(this << " created probe " << probe->GetName() << ", connected to collector "
+                         << identifier);
     }
-  else
+    else
     {
-      NS_LOG_WARN (this << " unable to connect probe " << probe->GetName ()
-                        << " to collector " << identifier);
+        NS_LOG_WARN(this << " unable to connect probe " << probe->GetName() << " to collector "
+                         << identifier);
     }
 
-  return ret;
+    return ret;
 }
 
-
 void
-SatStatsPltHelper::PassSampleToCollector (const Time &plt, uint32_t identifier)
+SatStatsPltHelper::PassSampleToCollector(const Time& plt, uint32_t identifier)
 {
-  //NS_LOG_FUNCTION (this << plt.GetSeconds () << identifier);
+    // NS_LOG_FUNCTION (this << plt.GetSeconds () << identifier);
 
-  Ptr<DataCollectionObject> collector = m_terminalCollectors.Get (identifier);
-  NS_ASSERT_MSG (collector != nullptr,
-                 "Unable to find collector with identifier " << identifier);
+    Ptr<DataCollectionObject> collector = m_terminalCollectors.Get(identifier);
+    NS_ASSERT_MSG(collector != nullptr, "Unable to find collector with identifier " << identifier);
 
-  switch (GetOutputType ())
+    switch (GetOutputType())
     {
     case SatStatsHelper::OUTPUT_SCALAR_FILE:
-    case SatStatsHelper::OUTPUT_SCALAR_PLOT:
-      {
-        Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
-        NS_ASSERT (c != nullptr);
-        c->TraceSinkDouble (0.0, plt.GetSeconds ());
+    case SatStatsHelper::OUTPUT_SCALAR_PLOT: {
+        Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector>();
+        NS_ASSERT(c != nullptr);
+        c->TraceSinkDouble(0.0, plt.GetSeconds());
         break;
-      }
+    }
 
     case SatStatsHelper::OUTPUT_SCATTER_FILE:
-    case SatStatsHelper::OUTPUT_SCATTER_PLOT:
-      {
-        Ptr<UnitConversionCollector> c = collector->GetObject<UnitConversionCollector> ();
-        NS_ASSERT (c != nullptr);
-        c->TraceSinkDouble (0.0, plt.GetSeconds ());
+    case SatStatsHelper::OUTPUT_SCATTER_PLOT: {
+        Ptr<UnitConversionCollector> c = collector->GetObject<UnitConversionCollector>();
+        NS_ASSERT(c != nullptr);
+        c->TraceSinkDouble(0.0, plt.GetSeconds());
         break;
-      }
+    }
 
     case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
     case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
@@ -557,108 +560,100 @@ SatStatsPltHelper::PassSampleToCollector (const Time &plt, uint32_t identifier)
     case SatStatsHelper::OUTPUT_PDF_PLOT:
     case SatStatsHelper::OUTPUT_CDF_FILE:
     case SatStatsHelper::OUTPUT_CDF_PLOT:
-      if (m_averagingMode)
+        if (m_averagingMode)
         {
-          Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
-          NS_ASSERT (c != nullptr);
-          c->TraceSinkDouble (0.0, plt.GetSeconds ());
+            Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector>();
+            NS_ASSERT(c != nullptr);
+            c->TraceSinkDouble(0.0, plt.GetSeconds());
         }
-      else
+        else
         {
-          Ptr<DistributionCollector> c = collector->GetObject<DistributionCollector> ();
-          NS_ASSERT (c != nullptr);
-          c->TraceSinkDouble (0.0, plt.GetSeconds ());
+            Ptr<DistributionCollector> c = collector->GetObject<DistributionCollector>();
+            NS_ASSERT(c != nullptr);
+            c->TraceSinkDouble(0.0, plt.GetSeconds());
         }
-      break;
+        break;
 
     default:
-      NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
-      break;
+        NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
+                       << " is not a valid output type for this statistics.");
+        break;
 
     } // end of `switch (GetOutputType ())`
 
 } // end of `void PassSampleToCollector (Time, uint32_t)`
 
-
 // FORWARD LINK APPLICATION-LEVEL /////////////////////////////////////////////
 
-NS_OBJECT_ENSURE_REGISTERED (SatStatsFwdAppPltHelper);
+NS_OBJECT_ENSURE_REGISTERED(SatStatsFwdAppPltHelper);
 
-SatStatsFwdAppPltHelper::SatStatsFwdAppPltHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsPltHelper (satHelper)
+SatStatsFwdAppPltHelper::SatStatsFwdAppPltHelper(Ptr<const SatHelper> satHelper)
+    : SatStatsPltHelper(satHelper)
 {
-  NS_LOG_FUNCTION (this << satHelper);
+    NS_LOG_FUNCTION(this << satHelper);
 }
 
-
-SatStatsFwdAppPltHelper::~SatStatsFwdAppPltHelper ()
+SatStatsFwdAppPltHelper::~SatStatsFwdAppPltHelper()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
-
 
 TypeId // static
-SatStatsFwdAppPltHelper::GetTypeId ()
+SatStatsFwdAppPltHelper::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::SatStatsFwdAppPltHelper")
-    .SetParent<SatStatsPltHelper> ()
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::SatStatsFwdAppPltHelper").SetParent<SatStatsPltHelper>();
+    return tid;
 }
 
-
 void
-SatStatsFwdAppPltHelper::DoInstallProbes ()
+SatStatsFwdAppPltHelper::DoInstallProbes()
 {
-  NS_LOG_FUNCTION (this);
-  NodeContainer utUsers = GetSatHelper ()->GetUtUsers ();
+    NS_LOG_FUNCTION(this);
+    NodeContainer utUsers = GetSatHelper()->GetUtUsers();
 
-  for (NodeContainer::Iterator it = utUsers.Begin (); it != utUsers.End (); ++it)
+    for (NodeContainer::Iterator it = utUsers.Begin(); it != utUsers.End(); ++it)
     {
-      const int32_t utUserId = GetUtUserId (*it);
-      NS_ASSERT_MSG (utUserId > 0,
-                     "Node " << (*it)->GetId () << " is not a valid UT user");
-      const uint32_t identifier = GetIdentifierForUtUser (*it);
+        const int32_t utUserId = GetUtUserId(*it);
+        NS_ASSERT_MSG(utUserId > 0, "Node " << (*it)->GetId() << " is not a valid UT user");
+        const uint32_t identifier = GetIdentifierForUtUser(*it);
 
-      for (uint32_t i = 0; i < (*it)->GetNApplications (); i++)
+        for (uint32_t i = 0; i < (*it)->GetNApplications(); i++)
         {
-          Ptr<Application> app = (*it)->GetApplication (i);
-          bool isConnected = false;
+            Ptr<Application> app = (*it)->GetApplication(i);
+            bool isConnected = false;
 
-          if (app->GetInstanceTypeId ().LookupTraceSourceByName ("RxPlt") != nullptr)
+            if (app->GetInstanceTypeId().LookupTraceSourceByName("RxPlt") != nullptr)
             {
-              NS_LOG_INFO (this << " attempt to connect using RxPlt");
+                NS_LOG_INFO(this << " attempt to connect using RxPlt");
 
-              // Create the probe.
-              std::ostringstream probeName;
-              probeName << utUserId << "-" << i;
-              Ptr<ApplicationDelayProbe> probe = CreateObject<ApplicationDelayProbe> ();
-              probe->SetName (probeName.str ());
+                // Create the probe.
+                std::ostringstream probeName;
+                probeName << utUserId << "-" << i;
+                Ptr<ApplicationDelayProbe> probe = CreateObject<ApplicationDelayProbe>();
+                probe->SetName(probeName.str());
 
-              // Connect the object to the probe.
-              if (probe->ConnectByObject ("RxPlt", app))
+                // Connect the object to the probe.
+                if (probe->ConnectByObject("RxPlt", app))
                 {
-                  isConnected = ConnectProbeToCollector (probe, identifier);
-                  m_probes.push_back (probe->GetObject<Probe> ());
+                    isConnected = ConnectProbeToCollector(probe, identifier);
+                    m_probes.push_back(probe->GetObject<Probe>());
                 }
             }
 
-          if (isConnected)
+            if (isConnected)
             {
-              NS_LOG_INFO (this << " successfully connected"
-                                << " with node ID " << (*it)->GetId ()
-                                << " application #" << i);
+                NS_LOG_INFO(this << " successfully connected"
+                                 << " with node ID " << (*it)->GetId() << " application #" << i);
             }
-          else
+            else
             {
-              /*
-               * We're being tolerant here by only logging a warning, because
-               * not every kind of Application is equipped with the expected
-               * RxPlt or Rx trace source.
-               */
-              NS_LOG_WARN (this << " unable to connect"
-                                << " with node ID " << (*it)->GetId ()
-                                << " application #" << i);
+                /*
+                 * We're being tolerant here by only logging a warning, because
+                 * not every kind of Application is equipped with the expected
+                 * RxPlt or Rx trace source.
+                 */
+                NS_LOG_WARN(this << " unable to connect"
+                                 << " with node ID " << (*it)->GetId() << " application #" << i);
             }
 
         } // end of `for (i = 0; i < (*it)->GetNApplications (); i++)`
@@ -669,71 +664,62 @@ SatStatsFwdAppPltHelper::DoInstallProbes ()
 
 // RETURN LINK APPLICATION-LEVEL //////////////////////////////////////////////
 
-NS_OBJECT_ENSURE_REGISTERED (SatStatsRtnAppPltHelper);
+NS_OBJECT_ENSURE_REGISTERED(SatStatsRtnAppPltHelper);
 
-SatStatsRtnAppPltHelper::SatStatsRtnAppPltHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsPltHelper (satHelper)
+SatStatsRtnAppPltHelper::SatStatsRtnAppPltHelper(Ptr<const SatHelper> satHelper)
+    : SatStatsPltHelper(satHelper)
 {
-  NS_LOG_FUNCTION (this << satHelper);
+    NS_LOG_FUNCTION(this << satHelper);
 }
 
-
-SatStatsRtnAppPltHelper::~SatStatsRtnAppPltHelper ()
+SatStatsRtnAppPltHelper::~SatStatsRtnAppPltHelper()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
-
 
 TypeId // static
-SatStatsRtnAppPltHelper::GetTypeId ()
+SatStatsRtnAppPltHelper::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::SatStatsRtnAppPltHelper")
-    .SetParent<SatStatsPltHelper> ()
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::SatStatsRtnAppPltHelper").SetParent<SatStatsPltHelper>();
+    return tid;
 }
 
-
 void
-SatStatsRtnAppPltHelper::DoInstallProbes ()
+SatStatsRtnAppPltHelper::DoInstallProbes()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  // Connect to trace sources at GW user node's applications.
-  NodeContainer gwUsers = GetSatHelper ()->GetGwUsers ();
-  Callback<void, const Time &, const Address &> rxPltCallback
-    = MakeCallback (&SatStatsRtnAppPltHelper::Ipv4Callback, this);
+    // Connect to trace sources at GW user node's applications.
+    NodeContainer gwUsers = GetSatHelper()->GetGwUsers();
+    Callback<void, const Time&, const Address&> rxPltCallback =
+        MakeCallback(&SatStatsRtnAppPltHelper::Ipv4Callback, this);
 
-  for (NodeContainer::Iterator it = gwUsers.Begin ();
-       it != gwUsers.End (); ++it)
+    for (NodeContainer::Iterator it = gwUsers.Begin(); it != gwUsers.End(); ++it)
     {
-      for (uint32_t i = 0; i < (*it)->GetNApplications (); i++)
+        for (uint32_t i = 0; i < (*it)->GetNApplications(); i++)
         {
-          Ptr<Application> app = (*it)->GetApplication (i);
-          bool isConnected = false;
+            Ptr<Application> app = (*it)->GetApplication(i);
+            bool isConnected = false;
 
-          if (app->GetInstanceTypeId ().LookupTraceSourceByName ("RxPlt") != nullptr)
+            if (app->GetInstanceTypeId().LookupTraceSourceByName("RxPlt") != nullptr)
             {
-              isConnected = app->TraceConnectWithoutContext ("RxPlt",
-                                                             rxPltCallback);
+                isConnected = app->TraceConnectWithoutContext("RxPlt", rxPltCallback);
             }
 
-          if (isConnected)
+            if (isConnected)
             {
-              NS_LOG_INFO (this << " successfully connected"
-                                << " with node ID " << (*it)->GetId ()
-                                << " application #" << i);
+                NS_LOG_INFO(this << " successfully connected"
+                                 << " with node ID " << (*it)->GetId() << " application #" << i);
             }
-          else
+            else
             {
-              /*
-               * We're being tolerant here by only logging a warning, because
-               * not every kind of Application is equipped with the expected
-               * RxPlt or Rx trace source.
-               */
-              NS_LOG_WARN (this << " unable to connect"
-                                << " with node ID " << (*it)->GetId ()
-                                << " application #" << i);
+                /*
+                 * We're being tolerant here by only logging a warning, because
+                 * not every kind of Application is equipped with the expected
+                 * RxPlt or Rx trace source.
+                 */
+                NS_LOG_WARN(this << " unable to connect"
+                                 << " with node ID " << (*it)->GetId() << " application #" << i);
             }
 
         } // end of `for (i = 0; i < (*it)->GetNApplications (); i++)`
@@ -742,73 +728,68 @@ SatStatsRtnAppPltHelper::DoInstallProbes ()
 
 } // end of `void DoInstallProbes ();`
 
-
 void
-SatStatsRtnAppPltHelper::Ipv4Callback (const Time &plt, const Address &from)
+SatStatsRtnAppPltHelper::Ipv4Callback(const Time& plt, const Address& from)
 {
-  //NS_LOG_FUNCTION (this << Time.GetSeconds () << from);
+    // NS_LOG_FUNCTION (this << Time.GetSeconds () << from);
 
-  if (InetSocketAddress::IsMatchingType (from))
+    if (InetSocketAddress::IsMatchingType(from))
     {
-      // Determine the identifier associated with the sender address.
-      const Address ipv4Addr = InetSocketAddress::ConvertFrom (from).GetIpv4 ();
-      std::map<const Address, uint32_t>::const_iterator it1 = m_identifierMap.find (ipv4Addr);
+        // Determine the identifier associated with the sender address.
+        const Address ipv4Addr = InetSocketAddress::ConvertFrom(from).GetIpv4();
+        std::map<const Address, uint32_t>::const_iterator it1 = m_identifierMap.find(ipv4Addr);
 
-      if (it1 == m_identifierMap.end ())
+        if (it1 == m_identifierMap.end())
         {
-          NS_LOG_WARN (this << " discarding a object PLT of " << plt.GetSeconds ()
-                            << " from statistics collection because of"
-                            << " unknown sender IPV4 address " << ipv4Addr);
+            NS_LOG_WARN(this << " discarding a object PLT of " << plt.GetSeconds()
+                             << " from statistics collection because of"
+                             << " unknown sender IPV4 address " << ipv4Addr);
         }
-      else
+        else
         {
-          PassSampleToCollector (plt, it1->second);
+            PassSampleToCollector(plt, it1->second);
         }
     }
-  else
+    else
     {
-      NS_LOG_WARN (this << " discarding a object PLT of " << plt.GetSeconds ()
-                        << " from statistics collection"
-                        << " because it comes from sender " << from
-                        << " without valid InetSocketAddress");
+        NS_LOG_WARN(this << " discarding a object PLT of " << plt.GetSeconds()
+                         << " from statistics collection"
+                         << " because it comes from sender " << from
+                         << " without valid InetSocketAddress");
     }
 }
 
-
 void
-SatStatsRtnAppPltHelper::SaveIpv4AddressAndIdentifier (Ptr<Node> utUserNode)
+SatStatsRtnAppPltHelper::SaveIpv4AddressAndIdentifier(Ptr<Node> utUserNode)
 {
-  NS_LOG_FUNCTION (this << utUserNode->GetId ());
+    NS_LOG_FUNCTION(this << utUserNode->GetId());
 
-  Ptr<Ipv4> ipv4 = utUserNode->GetObject<Ipv4> ();
+    Ptr<Ipv4> ipv4 = utUserNode->GetObject<Ipv4>();
 
-  if (ipv4 == nullptr)
+    if (ipv4 == nullptr)
     {
-      NS_LOG_INFO (this << " Node " << utUserNode->GetId ()
-                        << " does not support IPv4 protocol");
+        NS_LOG_INFO(this << " Node " << utUserNode->GetId() << " does not support IPv4 protocol");
     }
-  else if (ipv4->GetNInterfaces () >= 2)
+    else if (ipv4->GetNInterfaces() >= 2)
     {
-      const uint32_t identifier = GetIdentifierForUtUser (utUserNode);
+        const uint32_t identifier = GetIdentifierForUtUser(utUserNode);
 
-      /*
-       * Assuming that #0 is for loopback interface and #1 is for subscriber
-       * network interface.
-       */
-      for (uint32_t i = 0; i < ipv4->GetNAddresses (1); i++)
+        /*
+         * Assuming that #0 is for loopback interface and #1 is for subscriber
+         * network interface.
+         */
+        for (uint32_t i = 0; i < ipv4->GetNAddresses(1); i++)
         {
-          const Address addr = ipv4->GetAddress (1, i).GetLocal ();
-          m_identifierMap[addr] = identifier;
-          NS_LOG_INFO (this << " associated address " << addr
-                            << " with identifier " << identifier);
+            const Address addr = ipv4->GetAddress(1, i).GetLocal();
+            m_identifierMap[addr] = identifier;
+            NS_LOG_INFO(this << " associated address " << addr << " with identifier "
+                             << identifier);
         }
     }
-  else
+    else
     {
-      NS_LOG_WARN (this << " Node " << utUserNode->GetId ()
-                        << " is not a valid UT user");
+        NS_LOG_WARN(this << " Node " << utUserNode->GetId() << " is not a valid UT user");
     }
 }
-
 
 } // end of namespace ns3

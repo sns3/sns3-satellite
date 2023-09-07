@@ -23,14 +23,14 @@
 #ifndef LORA_ADR_COMPONENT_H
 #define LORA_ADR_COMPONENT_H
 
+#include "lora-network-controller-components.h"
+#include "lora-network-status.h"
+
 #include <ns3/object.h>
 #include <ns3/packet.h>
 
-#include "lora-network-status.h"
-#include "lora-network-controller-components.h"
-
-
-namespace ns3 {
+namespace ns3
+{
 
 ////////////////////////////////////////
 // LinkAdrRequest commands management //
@@ -38,91 +38,87 @@ namespace ns3 {
 
 class LoraAdrComponent : public LoraNetworkControllerComponent
 {
-  enum CombiningMethod
-  {
-    AVERAGE,
-    MAXIMUM,
-    MINIMUM,
-  };
+    enum CombiningMethod
+    {
+        AVERAGE,
+        MAXIMUM,
+        MINIMUM,
+    };
 
-public:
-  static TypeId GetTypeId (void);
+  public:
+    static TypeId GetTypeId(void);
 
-  //Constructor
-  LoraAdrComponent ();
-  //Destructor
-  virtual ~LoraAdrComponent ();
+    // Constructor
+    LoraAdrComponent();
+    // Destructor
+    virtual ~LoraAdrComponent();
 
-  void OnReceivedPacket (Ptr<const Packet> packet,
-                         Ptr<LoraEndDeviceStatus> status,
-                         Ptr<LoraNetworkStatus> networkStatus);
+    void OnReceivedPacket(Ptr<const Packet> packet,
+                          Ptr<LoraEndDeviceStatus> status,
+                          Ptr<LoraNetworkStatus> networkStatus);
 
-  void BeforeSendingReply (Ptr<LoraEndDeviceStatus> status,
-                           Ptr<LoraNetworkStatus> networkStatus);
+    void BeforeSendingReply(Ptr<LoraEndDeviceStatus> status, Ptr<LoraNetworkStatus> networkStatus);
 
-  void OnFailedReply (Ptr<LoraEndDeviceStatus> status,
-                      Ptr<LoraNetworkStatus> networkStatus);
-private:
-  void AdrImplementation (uint8_t *newDataRate,
-                          uint8_t *newTxPower,
-                          Ptr<LoraEndDeviceStatus> status);
+    void OnFailedReply(Ptr<LoraEndDeviceStatus> status, Ptr<LoraNetworkStatus> networkStatus);
 
-  uint8_t SfToDr (uint8_t sf);
+  private:
+    void AdrImplementation(uint8_t* newDataRate,
+                           uint8_t* newTxPower,
+                           Ptr<LoraEndDeviceStatus> status);
 
-  double RxPowerToSNR (double transmissionPower);
+    uint8_t SfToDr(uint8_t sf);
 
-  double GetMinTxFromGateways (LoraEndDeviceStatus::GatewayList gwList);
+    double RxPowerToSNR(double transmissionPower);
 
-  double GetMaxTxFromGateways (LoraEndDeviceStatus::GatewayList gwList);
+    double GetMinTxFromGateways(LoraEndDeviceStatus::GatewayList gwList);
 
-  double GetAverageTxFromGateways (LoraEndDeviceStatus::GatewayList gwList);
+    double GetMaxTxFromGateways(LoraEndDeviceStatus::GatewayList gwList);
 
-  double GetReceivedPower (LoraEndDeviceStatus::GatewayList gwList);
+    double GetAverageTxFromGateways(LoraEndDeviceStatus::GatewayList gwList);
 
-  double GetMinSNR (LoraEndDeviceStatus::ReceivedPacketList packetList,
-                    int historyRange);
+    double GetReceivedPower(LoraEndDeviceStatus::GatewayList gwList);
 
-  double GetMaxSNR (LoraEndDeviceStatus::ReceivedPacketList packetList,
-                    int historyRange);
+    double GetMinSNR(LoraEndDeviceStatus::ReceivedPacketList packetList, int historyRange);
 
-  double GetAverageSNR (LoraEndDeviceStatus::ReceivedPacketList packetList,
-                        int historyRange);
+    double GetMaxSNR(LoraEndDeviceStatus::ReceivedPacketList packetList, int historyRange);
 
-  int GetTxPowerIndex (int txPower);
+    double GetAverageSNR(LoraEndDeviceStatus::ReceivedPacketList packetList, int historyRange);
 
-  //TX power from gateways policy
-  enum CombiningMethod tpAveraging;
+    int GetTxPowerIndex(int txPower);
 
-  //Number of previous packets to consider
-  int historyRange;
+    // TX power from gateways policy
+    enum CombiningMethod tpAveraging;
 
-  //Received SNR history policy
-  enum CombiningMethod historyAveraging;
+    // Number of previous packets to consider
+    int historyRange;
 
-  //SF lower limit
-  const int min_spreadingFactor = 7;
+    // Received SNR history policy
+    enum CombiningMethod historyAveraging;
 
-  //Minimum transmission power (dBm) (Europe)
-  const int min_transmissionPower = 2;
+    // SF lower limit
+    const int min_spreadingFactor = 7;
 
-  //Maximum transmission power (dBm) (Europe)
-  const int max_transmissionPower = 14;
+    // Minimum transmission power (dBm) (Europe)
+    const int min_transmissionPower = 2;
 
-  //Device specific SNR margin (dB)
-  // const int offset = 10;
+    // Maximum transmission power (dBm) (Europe)
+    const int max_transmissionPower = 14;
 
-  //Bandwidth (Hz)
-  const int B = 125000;
+    // Device specific SNR margin (dB)
+    //  const int offset = 10;
 
-  //Noise Figure (dB)
-  const int NF = 6;
+    // Bandwidth (Hz)
+    const int B = 125000;
 
-  //Vector containing the required SNR for the 6 allowed SF levels
-  //ranging from 7 to 12 (the SNR values are in dB).
-  double treshold[6] = {-20.0, -17.5, -15.0, -12.5, -10.0, -7.5};
+    // Noise Figure (dB)
+    const int NF = 6;
 
-  bool m_toggleTxPower;
+    // Vector containing the required SNR for the 6 allowed SF levels
+    // ranging from 7 to 12 (the SNR values are in dB).
+    double treshold[6] = {-20.0, -17.5, -15.0, -12.5, -10.0, -7.5};
+
+    bool m_toggleTxPower;
 };
-}
+} // namespace ns3
 
 #endif

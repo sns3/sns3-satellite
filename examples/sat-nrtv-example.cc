@@ -20,13 +20,12 @@
  */
 
 #include "ns3/core-module.h"
-#include "ns3/network-module.h"
 #include "ns3/internet-module.h"
+#include "ns3/network-module.h"
 #include "ns3/satellite-module.h"
 #include "ns3/traffic-module.h"
 
 using namespace ns3;
-
 
 /**
  * \file sat-nrtv-example.cc
@@ -53,88 +52,85 @@ using namespace ns3;
  *     $ ./waf --run "sat-nrtv-example --PrintHelp"
  *
  */
-NS_LOG_COMPONENT_DEFINE ("sat-nrtv-example");
-
+NS_LOG_COMPONENT_DEFINE("sat-nrtv-example");
 
 int
-main (int argc, char *argv[])
+main(int argc, char* argv[])
 {
-  // a workaround to partially resolve weird splitting in lower layer
-  // Config::SetDefault ("ns3::TcpL4Protocol::SocketType",
-  //                     StringValue ("ns3::TcpRfc793"));
+    // a workaround to partially resolve weird splitting in lower layer
+    // Config::SetDefault ("ns3::TcpL4Protocol::SocketType",
+    //                     StringValue ("ns3::TcpRfc793"));
 
-  std::string scenario = "simple";
-  double duration = 100;
-  SatHelper::PreDefinedScenario_t satScenario = SatHelper::SIMPLE;
+    std::string scenario = "simple";
+    double duration = 100;
+    SatHelper::PreDefinedScenario_t satScenario = SatHelper::SIMPLE;
 
-  /// Set simulation output details
-  auto simulationHelper = CreateObject<SimulationHelper> ("example-nrtv");
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
-  Config::SetDefault ("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue (true));
+    /// Set simulation output details
+    auto simulationHelper = CreateObject<SimulationHelper>("example-nrtv");
+    Config::SetDefault("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue(true));
+    Config::SetDefault("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue(true));
 
-  // read command line parameters given by user
-  CommandLine cmd;
-  cmd.AddValue ("scenario", "Test scenario to use. (simple, larger or full)",
-                scenario);
-  cmd.AddValue ("duration", "Simulation duration (in seconds)",
-                duration);
-  simulationHelper->AddDefaultUiArguments (cmd);
-  cmd.Parse (argc, argv);
+    // read command line parameters given by user
+    CommandLine cmd;
+    cmd.AddValue("scenario", "Test scenario to use. (simple, larger or full)", scenario);
+    cmd.AddValue("duration", "Simulation duration (in seconds)", duration);
+    simulationHelper->AddDefaultUiArguments(cmd);
+    cmd.Parse(argc, argv);
 
-  if (scenario == "larger")
+    if (scenario == "larger")
     {
-      satScenario = SatHelper::LARGER;
+        satScenario = SatHelper::LARGER;
     }
-  else if (scenario == "full")
+    else if (scenario == "full")
     {
-      satScenario = SatHelper::FULL;
+        satScenario = SatHelper::FULL;
     }
 
-  /// Set simulation output details
-  simulationHelper->SetOutputTag (scenario);
-  simulationHelper->SetSimulationTime (duration);
+    /// Set simulation output details
+    simulationHelper->SetOutputTag(scenario);
+    simulationHelper->SetSimulationTime(duration);
 
-  //LogComponentEnableAll (LOG_PREFIX_ALL);
-  //LogComponentEnable ("NrtvClient", LOG_LEVEL_ALL);
-  //LogComponentEnable ("NrtvServer", LOG_LEVEL_ALL);
-  LogComponentEnable ("sat-nrtv-example", LOG_LEVEL_INFO);
+    // LogComponentEnableAll (LOG_PREFIX_ALL);
+    // LogComponentEnable ("NrtvClient", LOG_LEVEL_ALL);
+    // LogComponentEnable ("NrtvServer", LOG_LEVEL_ALL);
+    LogComponentEnable("sat-nrtv-example", LOG_LEVEL_INFO);
 
-  // remove next line from comments to run real time simulation
-  // GlobalValue::Bind ("SimulatorImplementationType", StringValue ("ns3::RealtimeSimulatorImpl"));
+    // remove next line from comments to run real time simulation
+    // GlobalValue::Bind ("SimulatorImplementationType", StringValue
+    // ("ns3::RealtimeSimulatorImpl"));
 
-  // Creating the reference system. Note, currently the satellite module supports
-  // only one reference system, which is named as "Scenario72". The string is utilized
-  // in mapping the scenario to the needed reference system configuration files. Arbitrary
-  // scenario name results in fatal error.
-  Ptr<SatHelper> helper = simulationHelper->CreateSatScenario (satScenario);
+    // Creating the reference system. Note, currently the satellite module supports
+    // only one reference system, which is named as "Scenario72". The string is utilized
+    // in mapping the scenario to the needed reference system configuration files. Arbitrary
+    // scenario name results in fatal error.
+    Ptr<SatHelper> helper = simulationHelper->CreateSatScenario(satScenario);
 
-  // get users
-  NodeContainer utUsers = helper->GetUtUsers ();
-  NodeContainer gwUsers = helper->GetGwUsers ();
+    // get users
+    NodeContainer utUsers = helper->GetUtUsers();
+    NodeContainer gwUsers = helper->GetGwUsers();
 
-  NrtvHelper nrtvHelper (TypeId::LookupByName ("ns3::TcpSocketFactory"));
-  nrtvHelper.InstallUsingIpv4 (gwUsers.Get (0), utUsers);
-  nrtvHelper.GetServer ().Start (Seconds (1.0));
+    NrtvHelper nrtvHelper(TypeId::LookupByName("ns3::TcpSocketFactory"));
+    nrtvHelper.InstallUsingIpv4(gwUsers.Get(0), utUsers);
+    nrtvHelper.GetServer().Start(Seconds(1.0));
 
-  auto apps = nrtvHelper.GetClients ();
-  apps.Start (Seconds (3.0));
-  uint32_t i = 0;
-  std::vector<Ptr<ClientRxTracePlot> > plots;
-  for (auto app = apps.Begin (); app != apps.End (); app++, i++)
+    auto apps = nrtvHelper.GetClients();
+    apps.Start(Seconds(3.0));
+    uint32_t i = 0;
+    std::vector<Ptr<ClientRxTracePlot>> plots;
+    for (auto app = apps.Begin(); app != apps.End(); app++, i++)
     {
-      std::stringstream plotName;
-      plotName << "NRTV-TCP-client-" << i << "-trace";
-      plots.push_back (CreateObject<ClientRxTracePlot> (*app, plotName.str ()));
+        std::stringstream plotName;
+        plotName << "NRTV-TCP-client-" << i << "-trace";
+        plots.push_back(CreateObject<ClientRxTracePlot>(*app, plotName.str()));
     }
 
+    NS_LOG_INFO("--- sat-nrtv-example ---");
+    NS_LOG_INFO("  Scenario used: " << scenario);
+    NS_LOG_INFO("  ");
 
-  NS_LOG_INFO ("--- sat-nrtv-example ---");
-  NS_LOG_INFO ("  Scenario used: " << scenario);
-  NS_LOG_INFO ("  ");
+    simulationHelper->RunSimulation();
+    plots.clear();
 
-  simulationHelper->RunSimulation ();
-  plots.clear ();
-
-  return 0;
+    return 0;
 
 } // end of `int main (int argc, char *argv[])`

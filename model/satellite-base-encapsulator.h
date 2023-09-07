@@ -21,19 +21,19 @@
 #ifndef SAT_BASE_ENCAPSULATOR_H
 #define SAT_BASE_ENCAPSULATOR_H
 
-#include <ns3/packet.h>
-#include <ns3/uinteger.h>
-#include <ns3/traced-value.h>
-#include <ns3/trace-source-accessor.h>
-#include <ns3/nstime.h>
-#include <ns3/mac48-address.h>
-#include <ns3/object.h>
-
-#include "satellite-queue.h"
 #include "satellite-control-message.h"
+#include "satellite-queue.h"
 
+#include <ns3/mac48-address.h>
+#include <ns3/nstime.h>
+#include <ns3/object.h>
+#include <ns3/packet.h>
+#include <ns3/trace-source-accessor.h>
+#include <ns3/traced-value.h>
+#include <ns3/uinteger.h>
 
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -49,174 +49,174 @@ namespace ns3 {
  */
 class SatBaseEncapsulator : public Object
 {
+  public:
+    /**
+     * Default constructor not used
+     */
+    SatBaseEncapsulator();
 
-public:
-  /**
-   * Default constructor not used
-   */
-  SatBaseEncapsulator ();
+    /**
+     * Constructor
+     * \param encapAddress MAC addressd of encapsulator
+     * \param decapAddress MAC addressd of decapsulator
+     * \param sourceE2EAddress E2E source MAC addressd of packets (used to set SatAddressE2ETag)
+     * \param destE2EAddress E2E destination MAC addressd of packets (used to set SatAddressE2ETag)
+     * \param flowId Flow identifier
+     * \param additionalHeaderSize Additional value in to take into account when pulling packets to
+     * represent E2E tags
+     */
+    SatBaseEncapsulator(Mac48Address encapAddress,
+                        Mac48Address decapAddress,
+                        Mac48Address sourceE2EAddress,
+                        Mac48Address destE2EAddress,
+                        uint8_t flowId,
+                        uint32_t additionalHeaderSize = 0);
 
-  /**
-   * Constructor
-   * \param encapAddress MAC addressd of encapsulator
-   * \param decapAddress MAC addressd of decapsulator
-   * \param sourceE2EAddress E2E source MAC addressd of packets (used to set SatAddressE2ETag)
-   * \param destE2EAddress E2E destination MAC addressd of packets (used to set SatAddressE2ETag)
-   * \param flowId Flow identifier
-   * \param additionalHeaderSize Additional value in to take into account when pulling packets to represent E2E tags
-   */
-  SatBaseEncapsulator (Mac48Address encapAddress,
-                       Mac48Address decapAddress,
-                       Mac48Address sourceE2EAddress,
-                       Mac48Address destE2EAddress,
-                       uint8_t flowId,
-                       uint32_t additionalHeaderSize = 0);
+    /**
+     * Destructor for SatBaseEncapsulator
+     */
+    virtual ~SatBaseEncapsulator();
 
-  /**
-   * Destructor for SatBaseEncapsulator
-   */
-  virtual ~SatBaseEncapsulator ();
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
+    /**
+     * Dispose of this class instance
+     */
+    virtual void DoDispose();
 
-  /**
-   * Dispose of this class instance
-   */
-  virtual void DoDispose ();
+    /**
+     * Callback to send packet to lower layer.
+     * \param Ptr<Packet> the packet received
+     * \param Mac48Address Source MAC address
+     * \param Mac48Address Destination MAC address
+     */
+    typedef Callback<void, Ptr<Packet>, Mac48Address, Mac48Address> ReceiveCallback;
 
-  /**
-   * Callback to send packet to lower layer.
-    * \param Ptr<Packet> the packet received
-    * \param Mac48Address Source MAC address
-    * \param Mac48Address Destination MAC address
-    */
-  typedef Callback<void, Ptr<Packet>, Mac48Address, Mac48Address> ReceiveCallback;
+    /**
+     * Control msg sending callback
+     * \param msg        the message send
+     * \param address    Packet destination address
+     * \return bool
+     */
+    typedef Callback<bool, Ptr<SatControlMessage>, const Address&> SendCtrlCallback;
 
-  /**
-   * Control msg sending callback
-   * \param msg        the message send
-   * \param address    Packet destination address
-   * \return bool
-   */
-  typedef Callback<bool, Ptr<SatControlMessage>, const Address& > SendCtrlCallback;
+    /**
+     * Set the used queue from outside
+     * \param queue Transmission queue
+     */
+    void SetQueue(Ptr<SatQueue> queue);
 
-  /**
-   * Set the used queue from outside
-   * \param queue Transmission queue
-   */
-  void SetQueue (Ptr<SatQueue> queue);
+    /**
+     * Get the queue instance
+     * \return queue
+     */
+    Ptr<SatQueue> GetQueue();
 
-  /**
-   * Get the queue instance
-   * \return queue
-   */
-  Ptr<SatQueue> GetQueue ();
+    /**
+     * Method to set receive callback.
+     * \param cb callback to invoke whenever a packet has been received and must
+     *        be forwarded to the higher layers.
+     */
+    void SetReceiveCallback(ReceiveCallback cb);
 
-  /**
-   * Method to set receive callback.
-    * \param cb callback to invoke whenever a packet has been received and must
-    *        be forwarded to the higher layers.
-    */
-  void SetReceiveCallback (ReceiveCallback cb);
+    /**
+     * \param cb callback to send control messages.
+     */
+    void SetCtrlMsgCallback(SatBaseEncapsulator::SendCtrlCallback cb);
 
-  /**
-   * \param cb callback to send control messages.
-   */
-  void SetCtrlMsgCallback (SatBaseEncapsulator::SendCtrlCallback cb);
+    /**
+     * Enqueue a packet to txBuffer.
+     * \param p To be buffered packet
+     * \param dest Target MAC address
+     */
+    virtual void EnquePdu(Ptr<Packet> p, Mac48Address dest);
 
-  /**
-   * Enqueue a packet to txBuffer.
-   * \param p To be buffered packet
-   * \param dest Target MAC address
-   */
-  virtual void EnquePdu (Ptr<Packet> p, Mac48Address dest);
+    /**
+     * Notify a Tx opportunity to this base encapsulator. Note, that
+     * this class does not do encapsulator nor do not support fragmentation.
+     *
+     * \param bytes Notified Tx opportunity bytes from lower layer
+     * \param bytesLeft Bytes left after this TxOpportunity in txBuffer
+     * \param &nextMinTxO Minimum TxO after this TxO
+     * \return An raw control PDU
+     */
+    virtual Ptr<Packet> NotifyTxOpportunity(uint32_t bytes,
+                                            uint32_t& bytesLeft,
+                                            uint32_t& nextMinTxO);
 
-  /**
-   * Notify a Tx opportunity to this base encapsulator. Note, that
-   * this class does not do encapsulator nor do not support fragmentation.
-   *
-   * \param bytes Notified Tx opportunity bytes from lower layer
-   * \param bytesLeft Bytes left after this TxOpportunity in txBuffer
-   * \param &nextMinTxO Minimum TxO after this TxO
-   * \return An raw control PDU
-   */
-  virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft, uint32_t &nextMinTxO);
+    /**
+     * Receive a packet. Note, that base encapsulator does not support
+     * packet reception, since it assumes that packet receptions are
+     * terminated already at lower layers.
+     * \param p packet pointer received from lower layer
+     */
+    virtual void ReceivePdu(Ptr<Packet> p);
 
-  /**
-   * Receive a packet. Note, that base encapsulator does not support
-   * packet reception, since it assumes that packet receptions are
-   * terminated already at lower layers.
-   * \param p packet pointer received from lower layer
-   */
-  virtual void ReceivePdu (Ptr<Packet> p);
+    /**
+     * Receive a control message (ARQ ACK)
+     * \param ack Control message received (e.g. ARQ ACK)
+     */
+    virtual void ReceiveAck(Ptr<SatArqAckMessage> ack);
 
-  /**
-   * Receive a control message (ARQ ACK)
-   * \param ack Control message received (e.g. ARQ ACK)
-   */
-  virtual void ReceiveAck (Ptr<SatArqAckMessage> ack);
+    /**
+     * Get the buffered packets for this encapsulator
+     * \return uint32_t buffered bytes
+     */
+    virtual uint32_t GetTxBufferSizeInBytes() const;
 
-  /**
-   * Get the buffered packets for this encapsulator
-   * \return uint32_t buffered bytes
-   */
-  virtual uint32_t GetTxBufferSizeInBytes () const;
+    /**
+     * Get Head-of-Line packet buffering delay.
+     * \return Time HoL buffering delay
+     */
+    virtual Time GetHolDelay() const;
 
-  /**
-   * Get Head-of-Line packet buffering delay.
-   * \return Time HoL buffering delay
-   */
-  virtual Time GetHolDelay () const;
+    /**
+     * Get minimum Tx opportunity in bytes, which takes the
+     * assumed header sizes into account.
+     * \return uint32_t minimum tx opportunity
+     */
+    virtual uint32_t GetMinTxOpportunityInBytes() const;
 
-  /**
-   * Get minimum Tx opportunity in bytes, which takes the
-   * assumed header sizes into account.
-   * \return uint32_t minimum tx opportunity
-   */
-  virtual uint32_t GetMinTxOpportunityInBytes () const;
+  protected:
+    /**
+     * Source and destination mac addresses. Used to tag the Frame PDU
+     * so that lower layers are capable of passing the packet to the
+     * correct destination.
+     */
+    Mac48Address m_encapAddress;
+    Mac48Address m_decapAddress;
+    Mac48Address m_sourceE2EAddress;
+    Mac48Address m_destE2EAddress;
 
-protected:
-  /**
-   * Source and destination mac addresses. Used to tag the Frame PDU
-   * so that lower layers are capable of passing the packet to the
-   * correct destination.
-   */
-  Mac48Address m_encapAddress;
-  Mac48Address m_decapAddress;
-  Mac48Address m_sourceE2EAddress;
-  Mac48Address m_destE2EAddress;
+    /**
+     * Flow identifier
+     */
+    uint8_t m_flowId;
 
-  /**
-   * Flow identifier
-   */
-  uint8_t m_flowId;
+    /**
+     * Used queue in satellite encapsulator
+     */
+    Ptr<SatQueue> m_txQueue;
 
-  /**
-   * Used queue in satellite encapsulator
-   */
-  Ptr<SatQueue> m_txQueue;
+    /**
+     * Additional value in to take into account when pulling packets to represent E2E tags.
+     */
+    uint32_t m_additionalHeaderSize;
 
-  /**
-   * Additional value in to take into account when pulling packets to represent E2E tags.
-   */
-  uint32_t m_additionalHeaderSize;
+    /**
+     * Receive callback
+     */
+    ReceiveCallback m_rxCallback;
 
-  /**
-   * Receive callback
-   */
-  ReceiveCallback m_rxCallback;
-
-  /**
-   * Callback to send control messages.
-  */
-  SendCtrlCallback m_ctrlCallback;
-
+    /**
+     * Callback to send control messages.
+     */
+    SendCtrlCallback m_ctrlCallback;
 };
-
 
 } // namespace ns3
 

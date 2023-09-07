@@ -18,60 +18,52 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include <ns3/log.h>
-
 #include "satellite-node-info.h"
 
+#include <ns3/log.h>
 
-NS_LOG_COMPONENT_DEFINE ("SatNodeInfo");
+NS_LOG_COMPONENT_DEFINE("SatNodeInfo");
 
-namespace ns3 {
-
-
-SatNodeInfo::SatNodeInfo ()
-  : m_nodeId (0),
-  m_nodeType (SatEnums::NT_UNDEFINED),
-  m_macAddress ()
+namespace ns3
 {
 
+SatNodeInfo::SatNodeInfo()
+    : m_nodeId(0),
+      m_nodeType(SatEnums::NT_UNDEFINED),
+      m_macAddress()
+{
 }
 
-SatNodeInfo::SatNodeInfo (SatEnums::SatNodeType_t nodeType, uint32_t nodeId, Mac48Address macAddress)
-  : m_nodeId (nodeId),
-  m_nodeType (nodeType),
-  m_macAddress (macAddress)
+SatNodeInfo::SatNodeInfo(SatEnums::SatNodeType_t nodeType, uint32_t nodeId, Mac48Address macAddress)
+    : m_nodeId(nodeId),
+      m_nodeType(nodeType),
+      m_macAddress(macAddress)
 {
-
 }
 
-SatNodeInfo::~SatNodeInfo ()
+SatNodeInfo::~SatNodeInfo()
 {
-
 }
 
 uint32_t
-SatNodeInfo::GetNodeId () const
+SatNodeInfo::GetNodeId() const
 {
-  NS_LOG_FUNCTION (this);
-  return m_nodeId;
+    NS_LOG_FUNCTION(this);
+    return m_nodeId;
 }
 
-
 SatEnums::SatNodeType_t
-SatNodeInfo::GetNodeType () const
+SatNodeInfo::GetNodeType() const
 {
-  NS_LOG_FUNCTION (this);
-  return m_nodeType;
+    NS_LOG_FUNCTION(this);
+    return m_nodeType;
 }
 
 Mac48Address
-SatNodeInfo::GetMacAddress () const
+SatNodeInfo::GetMacAddress() const
 {
-  NS_LOG_FUNCTION (this);
-  return m_macAddress;
+    NS_LOG_FUNCTION(this);
+    return m_macAddress;
 }
 
 } // namespace ns3
-
-
-

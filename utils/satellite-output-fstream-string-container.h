@@ -21,12 +21,15 @@
 #ifndef SAT_OUTPUT_FSTREAM_STRING_CONTAINER_H
 #define SAT_OUTPUT_FSTREAM_STRING_CONTAINER_H
 
-#include <fstream>
-#include "ns3/object.h"
 #include "satellite-output-fstream-wrapper.h"
+
+#include "ns3/object.h"
 #include <ns3/gnuplot.h>
 
-namespace ns3 {
+#include <fstream>
+
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -37,90 +40,90 @@ namespace ns3 {
  */
 class SatOutputFileStreamStringContainer : public Object
 {
-public:
-  /**
-   * \brief NS-3 function for type id
-   * \return type id
-   */
-  static TypeId GetTypeId (void);
+  public:
+    /**
+     * \brief NS-3 function for type id
+     * \return type id
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * \brief Constructor
-   * \param filename file name
-   * \param filemode file mode
-   */
-  SatOutputFileStreamStringContainer (std::string filename, std::ios::openmode filemode);
+    /**
+     * \brief Constructor
+     * \param filename file name
+     * \param filemode file mode
+     */
+    SatOutputFileStreamStringContainer(std::string filename, std::ios::openmode filemode);
 
-  /**
-   * \brief Constructor
-   */
-  SatOutputFileStreamStringContainer ();
+    /**
+     * \brief Constructor
+     */
+    SatOutputFileStreamStringContainer();
 
-  /**
-   * \brief Destructor
-   */
-  ~SatOutputFileStreamStringContainer ();
+    /**
+     * \brief Destructor
+     */
+    ~SatOutputFileStreamStringContainer();
 
-  /**
-   * \brief Function for writing the container contents to file
-   */
-  void WriteContainerToFile ();
+    /**
+     * \brief Function for writing the container contents to file
+     */
+    void WriteContainerToFile();
 
-  /**
-   * \brief Function for adding the line to container
-   */
-  void AddToContainer (std::string newLine);
+    /**
+     * \brief Function for adding the line to container
+     */
+    void AddToContainer(std::string newLine);
 
-  /**
-   * \brief Do needed dispose actions
-   */
-  void DoDispose ();
+    /**
+     * \brief Do needed dispose actions
+     */
+    void DoDispose();
 
-private:
-  /**
-   * \brief Function for resetting the variables
-   */
-  void Reset ();
+  private:
+    /**
+     * \brief Function for resetting the variables
+     */
+    void Reset();
 
-  /**
-   * \brief Function for resetting the stream
-   */
-  void ResetStream ();
+    /**
+     * \brief Function for resetting the stream
+     */
+    void ResetStream();
 
-  /**
-   * \brief Function for clearing the container
-   */
-  void ClearContainer ();
+    /**
+     * \brief Function for clearing the container
+     */
+    void ClearContainer();
 
-  /**
-   * \brief Function for opening the output file stream
-   */
-  void OpenStream ();
+    /**
+     * \brief Function for opening the output file stream
+     */
+    void OpenStream();
 
-  /**
-   * \brief Pointer to output file stream wrapper
-   */
-  SatOutputFileStreamWrapper* m_outputFileStreamWrapper;
+    /**
+     * \brief Pointer to output file stream wrapper
+     */
+    SatOutputFileStreamWrapper* m_outputFileStreamWrapper;
 
-  /**
-   * \brief Pointer to output file stream
-   */
-  std::ofstream* m_outputFileStream;
+    /**
+     * \brief Pointer to output file stream
+     */
+    std::ofstream* m_outputFileStream;
 
-  /**
-   * \brief Container for lines
-   */
-  std::vector<std::string > m_container;
+    /**
+     * \brief Container for lines
+     */
+    std::vector<std::string> m_container;
 
-  /**
-   * \brief File name
-   */
-  std::string m_fileName;
+    /**
+     * \brief File name
+     */
+    std::string m_fileName;
 
-  /**
-   * \brief File mode
-   */
-  std::ios::openmode m_fileMode;
+    /**
+     * \brief File mode
+     */
+    std::ios::openmode m_fileMode;
 };
 
 } // namespace ns3

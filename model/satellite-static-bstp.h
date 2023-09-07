@@ -21,12 +21,12 @@
 #ifndef SAT_STATIC_BSTP_H
 #define SAT_STATIC_BSTP_H
 
-#include <vector>
-
 #include <ns3/simple-ref-count.h>
 
+#include <vector>
 
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -54,63 +54,62 @@ namespace ns3 {
  */
 class SatStaticBstp : public SimpleRefCount<SatStaticBstp>
 {
-public:
+  public:
+    /**
+     * Default constructor.
+     */
+    SatStaticBstp();
+    SatStaticBstp(std::string fileName);
 
-  /**
-   * Default constructor.
-   */
-  SatStaticBstp ();
-  SatStaticBstp (std::string fileName);
-  virtual ~SatStaticBstp () { }
+    virtual ~SatStaticBstp()
+    {
+    }
 
-  /**
-   * \brief Load BSTP configuration from a file
-   * \param filePathName
-   */
-  void LoadBstp (std::string filePathName);
+    /**
+     * \brief Load BSTP configuration from a file
+     * \param filePathName
+     */
+    void LoadBstp(std::string filePathName);
 
-  /**
-   * \brief Get the next configuration file
-   * \return A unsigned int configuration vector
-   */
-  std::vector<uint32_t> GetNextConf () const;
+    /**
+     * \brief Get the next configuration file
+     * \return A unsigned int configuration vector
+     */
+    std::vector<uint32_t> GetNextConf() const;
 
-  /**
-   * \brief Add the information about which spot-beams are enabled
-   * in this simulation. This information is stored and used to check
-   * the validity of the BSTP.
-   * \param beamId Enabled beam identifier
-   * \param userFreqId User frequency id of the enabled spot-beam
-   * \param feederFreqId Feeder frequency id of the enabled spot-beam
-   * \param gwId GW id of the enabled spot-beam
-   */
-  void AddEnabledBeamInfo (uint32_t beamId,
-                           uint32_t userFreqId,
-                           uint32_t feederFreqId,
-                           uint32_t gwId);
+    /**
+     * \brief Add the information about which spot-beams are enabled
+     * in this simulation. This information is stored and used to check
+     * the validity of the BSTP.
+     * \param beamId Enabled beam identifier
+     * \param userFreqId User frequency id of the enabled spot-beam
+     * \param feederFreqId Feeder frequency id of the enabled spot-beam
+     * \param gwId GW id of the enabled spot-beam
+     */
+    void AddEnabledBeamInfo(uint32_t beamId,
+                            uint32_t userFreqId,
+                            uint32_t feederFreqId,
+                            uint32_t gwId);
 
-  /**
-   * \brief Check validity of the individual BSTP configuration line.
-   * The method is not returning anything, but it crashes to a fatal
-   * message if the BSTP is not considered to be valid!
-   */
-  void CheckValidity ();
+    /**
+     * \brief Check validity of the individual BSTP configuration line.
+     * The method is not returning anything, but it crashes to a fatal
+     * message if the BSTP is not considered to be valid!
+     */
+    void CheckValidity();
 
-private:
+  private:
+    std::vector<std::vector<uint32_t>> m_bstp;
+    mutable uint32_t m_currentIterator;
 
-  std::vector <std::vector <uint32_t> > m_bstp;
-  mutable uint32_t m_currentIterator;
+    // Helpful containers for checking the validity of the BSTP
+    std::map<uint32_t, uint32_t> m_beamGwMap;
+    std::map<uint32_t, uint32_t> m_beamFeederFreqIdMap;
 
-  // Helpful containers for checking the validity of the BSTP
-  std::map<uint32_t, uint32_t> m_beamGwMap;
-  std::map<uint32_t, uint32_t> m_beamFeederFreqIdMap;
-
-  // All enabled spot-beams
-  std::vector<uint32_t> m_enabledBeams;
+    // All enabled spot-beams
+    std::vector<uint32_t> m_enabledBeams;
 };
 
-
 } // namespace ns3
-
 
 #endif /* SAT_STATIC_BSTP_H */

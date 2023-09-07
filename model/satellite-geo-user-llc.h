@@ -23,64 +23,62 @@
 
 #include "satellite-geo-llc.h"
 
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
- * \brief SatGeoUserLlc holds the GEO user implementation of LLC layer. SatGeoUserLlc is inherited from
- * SatGeoLlc base class and implements the needed changes from the base class related to
- * SAT user LLC packet transmissions and receptions.
+ * \brief SatGeoUserLlc holds the GEO user implementation of LLC layer. SatGeoUserLlc is inherited
+ * from SatGeoLlc base class and implements the needed changes from the base class related to SAT
+ * user LLC packet transmissions and receptions.
  */
 class SatGeoUserLlc : public SatGeoLlc
 {
-public:
-  /**
-   * Derived from Object
-   */
-  static TypeId GetTypeId (void);
+  public:
+    /**
+     * Derived from Object
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * Construct a SatGeoUserLlc, should not be used
-   */
-  SatGeoUserLlc ();
+    /**
+     * Construct a SatGeoUserLlc, should not be used
+     */
+    SatGeoUserLlc();
 
-  /**
-   * Construct a SatGeoUserLlc
-   * \param forwardLinkRegenerationMode Forward link regeneration model
-   * \param returnLinkRegenerationMode Return link regeneration model
-   */
-  SatGeoUserLlc (SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
-                 SatEnums::RegenerationMode_t returnLinkRegenerationMode);
+    /**
+     * Construct a SatGeoUserLlc
+     * \param forwardLinkRegenerationMode Forward link regeneration model
+     * \param returnLinkRegenerationMode Return link regeneration model
+     */
+    SatGeoUserLlc(SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                  SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
-  /**
-   * Destroy a SatGeoUserLlc
-   *
-   * This is the destructor for the SatGeoUserLlc.
-   */
-  virtual ~SatGeoUserLlc ();
+    /**
+     * Destroy a SatGeoUserLlc
+     *
+     * This is the destructor for the SatGeoUserLlc.
+     */
+    virtual ~SatGeoUserLlc();
 
-protected:
-  /**
-   * Dispose of this class instance
-   */
-  virtual void DoDispose ();
+  protected:
+    /**
+     * Dispose of this class instance
+     */
+    virtual void DoDispose();
 
-  /**
-   * \brief Virtual method to create a new encapsulator 'on-a-need-basis' dynamically.
-   * \param key Encapsulator key class
-   */
-  virtual void CreateEncap (Ptr<EncapKey> key);
+    /**
+     * \brief Virtual method to create a new encapsulator 'on-a-need-basis' dynamically.
+     * \param key Encapsulator key class
+     */
+    virtual void CreateEncap(Ptr<EncapKey> key);
 
-  /**
-   * \brief Virtual method to create a new decapsulator 'on-a-need-basis' dynamically.
-   * \param key Encapsulator key class
-   */
-  virtual void CreateDecap (Ptr<EncapKey> key);
-
+    /**
+     * \brief Virtual method to create a new decapsulator 'on-a-need-basis' dynamically.
+     * \param key Encapsulator key class
+     */
+    virtual void CreateDecap(Ptr<EncapKey> key);
 };
 
 } // namespace ns3
-
 
 #endif /* SATELLITE_GEO_USER_LLC_H_ */

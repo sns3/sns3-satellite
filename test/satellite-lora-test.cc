@@ -25,35 +25,32 @@
  */
 
 // Include a header file from your module to test.
-#include <iostream>
-#include "ns3/log.h"
-#include "ns3/test.h"
-#include "ns3/simulator.h"
-#include "ns3/config.h"
-#include "ns3/boolean.h"
-#include "ns3/string.h"
-#include "ns3/mobility-helper.h"
 #include "../model/satellite-mobility-model.h"
 #include "../model/satellite-position-allocator.h"
-#include "ns3/singleton.h"
 #include "../utils/satellite-env-variables.h"
 
-#include <ns3/enum.h>
-#include <ns3/uinteger.h>
-
-#include <ns3/satellite-helper.h>
-#include <ns3/satellite-enums.h>
-
-#include <ns3/satellite-lorawan-net-device.h>
-#include <ns3/satellite-lora-conf.h>
-#include <ns3/lorawan-mac-header.h>
-#include <ns3/lora-periodic-sender.h>
-
-
-#include <ns3/packet-sink-helper.h>
-#include <ns3/packet-sink.h>
+#include "ns3/boolean.h"
+#include "ns3/config.h"
+#include "ns3/log.h"
+#include "ns3/mobility-helper.h"
+#include "ns3/simulator.h"
+#include "ns3/singleton.h"
+#include "ns3/string.h"
+#include "ns3/test.h"
 #include <ns3/cbr-application.h>
 #include <ns3/cbr-helper.h>
+#include <ns3/enum.h>
+#include <ns3/lora-periodic-sender.h>
+#include <ns3/lorawan-mac-header.h>
+#include <ns3/packet-sink-helper.h>
+#include <ns3/packet-sink.h>
+#include <ns3/satellite-enums.h>
+#include <ns3/satellite-helper.h>
+#include <ns3/satellite-lora-conf.h>
+#include <ns3/satellite-lorawan-net-device.h>
+#include <ns3/uinteger.h>
+
+#include <iostream>
 
 using namespace ns3;
 
@@ -62,136 +59,154 @@ using namespace ns3;
  * \brief Test case to check if Lora ack arrives in first reception window.
  *
  *  Expected result:
- *    Ack is received and with correct date range, corresponding to first window opening and closing.
+ *    Ack is received and with correct date range, corresponding to first window opening and
+ * closing.
  *
  */
 class SatLoraFirstWindowTestCase : public TestCase
 {
-public:
-  SatLoraFirstWindowTestCase ();
-  virtual ~SatLoraFirstWindowTestCase ();
+  public:
+    SatLoraFirstWindowTestCase();
+    virtual ~SatLoraFirstWindowTestCase();
 
-private:
-  virtual void DoRun (void);
-  void MacTraceCb ( std::string context, Ptr<const Packet> packet, const Address & address);
+  private:
+    virtual void DoRun(void);
+    void MacTraceCb(std::string context, Ptr<const Packet> packet, const Address& address);
 
-  Time m_gwReceiveDate;
-  Time m_edReceiveDate;
+    Time m_gwReceiveDate;
+    Time m_edReceiveDate;
 
-  Address m_gwAddress;
-  Address m_edAddress;
+    Address m_gwAddress;
+    Address m_edAddress;
 };
 
-SatLoraFirstWindowTestCase::SatLoraFirstWindowTestCase ()
-  : TestCase ("Test satellite lorawan with acks sent in first window."),
-  m_gwReceiveDate (Seconds(0)),
-  m_edReceiveDate (Seconds(0))
+SatLoraFirstWindowTestCase::SatLoraFirstWindowTestCase()
+    : TestCase("Test satellite lorawan with acks sent in first window."),
+      m_gwReceiveDate(Seconds(0)),
+      m_edReceiveDate(Seconds(0))
 {
 }
 
-SatLoraFirstWindowTestCase::~SatLoraFirstWindowTestCase ()
+SatLoraFirstWindowTestCase::~SatLoraFirstWindowTestCase()
 {
-}
-
-void
-SatLoraFirstWindowTestCase::MacTraceCb ( std::string context, Ptr<const Packet> packet, const Address & address)
-{
-  if (address == m_edAddress)
-    {
-      m_gwReceiveDate = Simulator::Now ();
-    }
-
-  if (address == m_gwAddress)
-    {
-      m_edReceiveDate = Simulator::Now ();
-    }
 }
 
 void
-SatLoraFirstWindowTestCase::DoRun (void)
+SatLoraFirstWindowTestCase::MacTraceCb(std::string context,
+                                       Ptr<const Packet> packet,
+                                       const Address& address)
 {
-  // Set simulation output details
-  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-lora", "first-window", true);
+    if (address == m_edAddress)
+    {
+        m_gwReceiveDate = Simulator::Now();
+    }
 
-  // Enable Lora
-  Config::SetDefault ("ns3::SatHelper::Standard", EnumValue (SatEnums::LORA));
-  Config::SetDefault ("ns3::LorawanMacEndDevice::DataRate", UintegerValue (5));
-  Config::SetDefault ("ns3::LorawanMacEndDevice::MType", EnumValue (LorawanMacHeader::CONFIRMED_DATA_UP));
-  Config::SetDefault ("ns3::SatLorawanNetDevice::ForwardToUtUsers", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLoraConf::Standard", EnumValue (SatLoraConf::SATELLITE));
+    if (address == m_gwAddress)
+    {
+        m_edReceiveDate = Simulator::Now();
+    }
+}
 
-  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::FirstWindowDelay", TimeValue (MilliSeconds (1500)));
-  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::SecondWindowDelay", TimeValue (Seconds (2)));
-  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::FirstWindowDuration", TimeValue (MilliSeconds (400)));
-  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::SecondWindowDuration", TimeValue (MilliSeconds (400)));
-  Config::SetDefault ("ns3::LoraNetworkScheduler::FirstWindowAnswerDelay", TimeValue (Seconds (1)));
-  Config::SetDefault ("ns3::LoraNetworkScheduler::SecondWindowAnswerDelay", TimeValue (Seconds (2)));
+void
+SatLoraFirstWindowTestCase::DoRun(void)
+{
+    // Set simulation output details
+    Singleton<SatEnvVariables>::Get()->DoInitialize();
+    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-lora", "first-window", true);
 
-  // Superframe configuration
-  Config::SetDefault ("ns3::SatConf::SuperFrameConfForSeq0", EnumValue (SatSuperframeConf::SUPER_FRAME_CONFIG_4));
-  Config::SetDefault ("ns3::SatSuperframeConf4::FrameConfigType", EnumValue (SatSuperframeConf::CONFIG_TYPE_4));
-  Config::SetDefault ("ns3::SatSuperframeConf4::Frame0_AllocatedBandwidthHz", DoubleValue (15000));
-  Config::SetDefault ("ns3::SatSuperframeConf4::Frame0_CarrierAllocatedBandwidthHz", DoubleValue (15000));
+    // Enable Lora
+    Config::SetDefault("ns3::SatHelper::Standard", EnumValue(SatEnums::LORA));
+    Config::SetDefault("ns3::LorawanMacEndDevice::DataRate", UintegerValue(5));
+    Config::SetDefault("ns3::LorawanMacEndDevice::MType",
+                       EnumValue(LorawanMacHeader::CONFIRMED_DATA_UP));
+    Config::SetDefault("ns3::SatLorawanNetDevice::ForwardToUtUsers", BooleanValue(false));
+    Config::SetDefault("ns3::SatLoraConf::Standard", EnumValue(SatLoraConf::SATELLITE));
 
-  // CRDSA only
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue (false));
+    Config::SetDefault("ns3::LorawanMacEndDeviceClassA::FirstWindowDelay",
+                       TimeValue(MilliSeconds(1500)));
+    Config::SetDefault("ns3::LorawanMacEndDeviceClassA::SecondWindowDelay", TimeValue(Seconds(2)));
+    Config::SetDefault("ns3::LorawanMacEndDeviceClassA::FirstWindowDuration",
+                       TimeValue(MilliSeconds(400)));
+    Config::SetDefault("ns3::LorawanMacEndDeviceClassA::SecondWindowDuration",
+                       TimeValue(MilliSeconds(400)));
+    Config::SetDefault("ns3::LoraNetworkScheduler::FirstWindowAnswerDelay", TimeValue(Seconds(1)));
+    Config::SetDefault("ns3::LoraNetworkScheduler::SecondWindowAnswerDelay", TimeValue(Seconds(2)));
 
-  // Configure RA
-  Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_ESSA));
-  Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceEliminationModel", EnumValue (SatPhyRxCarrierConf::SIC_RESIDUAL));
-  Config::SetDefault ("ns3::SatBeamHelper::RaCollisionModel", EnumValue (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
-  Config::SetDefault ("ns3::SatBeamHelper::ReturnLinkLinkResults", EnumValue (SatEnums::LR_LORA));
-  Config::SetDefault ("ns3::SatWaveformConf::DefaultWfId", UintegerValue (2));
-  Config::SetDefault ("ns3::SatHelper::RtnLinkWaveformConfFileName", StringValue("loraWaveforms.txt"));
+    // Superframe configuration
+    Config::SetDefault("ns3::SatConf::SuperFrameConfForSeq0",
+                       EnumValue(SatSuperframeConf::SUPER_FRAME_CONFIG_4));
+    Config::SetDefault("ns3::SatSuperframeConf4::FrameConfigType",
+                       EnumValue(SatSuperframeConf::CONFIG_TYPE_4));
+    Config::SetDefault("ns3::SatSuperframeConf4::Frame0_AllocatedBandwidthHz", DoubleValue(15000));
+    Config::SetDefault("ns3::SatSuperframeConf4::Frame0_CarrierAllocatedBandwidthHz",
+                       DoubleValue(15000));
 
-  // Configure E-SSA
-  Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::WindowDuration", StringValue ("600ms"));
-  Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::WindowStep", StringValue ("200ms"));
-  Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::WindowSICIterations", UintegerValue (5));
-  Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::EnableSIC", BooleanValue (false));
+    // CRDSA only
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided",
+                       BooleanValue(false));
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed",
+                       BooleanValue(false));
 
-  Config::SetDefault ("ns3::SatMac::EnableStatisticsTags", BooleanValue (true));
+    // Configure RA
+    Config::SetDefault("ns3::SatBeamHelper::RandomAccessModel", EnumValue(SatEnums::RA_MODEL_ESSA));
+    Config::SetDefault("ns3::SatBeamHelper::RaInterferenceEliminationModel",
+                       EnumValue(SatPhyRxCarrierConf::SIC_RESIDUAL));
+    Config::SetDefault("ns3::SatBeamHelper::RaCollisionModel",
+                       EnumValue(SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
+    Config::SetDefault("ns3::SatBeamHelper::ReturnLinkLinkResults", EnumValue(SatEnums::LR_LORA));
+    Config::SetDefault("ns3::SatWaveformConf::DefaultWfId", UintegerValue(2));
+    Config::SetDefault("ns3::SatHelper::RtnLinkWaveformConfFileName",
+                       StringValue("loraWaveforms.txt"));
 
-  // Creating the reference system.
-  Ptr<SatHelper> helper = CreateObject<SatHelper> ();
-  helper->CreatePredefinedScenario (SatHelper::SIMPLE);
+    // Configure E-SSA
+    Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::WindowDuration", StringValue("600ms"));
+    Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::WindowStep", StringValue("200ms"));
+    Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::WindowSICIterations", UintegerValue(5));
+    Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::EnableSIC", BooleanValue(false));
 
-  // >>> Start of actual test using Simple scenario >>>
-  Ptr<Node> utNode = helper->UtNodes ().Get (0);
-  Ptr<LoraPeriodicSender> app = Create<LoraPeriodicSender> ();
+    Config::SetDefault("ns3::SatMac::EnableStatisticsTags", BooleanValue(true));
 
-  app->SetInterval (Seconds (10));
+    // Creating the reference system.
+    Ptr<SatHelper> helper = CreateObject<SatHelper>();
+    helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
-  app->SetStartTime (Seconds (1.0));
-  app->SetStopTime (Seconds (10.0));
-  app->SetPacketSize (24);
+    // >>> Start of actual test using Simple scenario >>>
+    Ptr<Node> utNode = helper->UtNodes().Get(0);
+    Ptr<LoraPeriodicSender> app = Create<LoraPeriodicSender>();
 
-  app->SetNode (utNode);
-  utNode->AddApplication (app);
+    app->SetInterval(Seconds(10));
 
-  m_gwAddress = helper->GwNodes ().Get (0)->GetDevice (1)->GetAddress ();
-  m_edAddress = helper->UtNodes ().Get (0)->GetDevice (2)->GetAddress ();
+    app->SetStartTime(Seconds(1.0));
+    app->SetStopTime(Seconds(10.0));
+    app->SetPacketSize(24);
 
-  Config::Connect ("/NodeList/*/DeviceList/*/SatMac/Rx", MakeCallback (&SatLoraFirstWindowTestCase::MacTraceCb, this));
+    app->SetNode(utNode);
+    utNode->AddApplication(app);
 
-  Simulator::Stop (Seconds (10));
-  Simulator::Run ();
+    m_gwAddress = helper->GwNodes().Get(0)->GetDevice(1)->GetAddress();
+    m_edAddress = helper->UtNodes().Get(0)->GetDevice(2)->GetAddress();
 
-  Simulator::Destroy ();
+    Config::Connect("/NodeList/*/DeviceList/*/SatMac/Rx",
+                    MakeCallback(&SatLoraFirstWindowTestCase::MacTraceCb, this));
 
-  Singleton<SatEnvVariables>::Get ()->DoDispose ();
+    Simulator::Stop(Seconds(10));
+    Simulator::Run();
 
-  NS_TEST_ASSERT_MSG_NE (m_gwReceiveDate, Seconds (0), "Packet should be received by Gateway.");
-  NS_TEST_ASSERT_MSG_NE (m_edReceiveDate, Seconds (0), "Ack should be received by End Device.");
-  NS_TEST_ASSERT_MSG_GT (m_edReceiveDate, m_gwReceiveDate, "Ack should be received after packet.");
+    Simulator::Destroy();
 
-  Time difference = m_edReceiveDate - m_gwReceiveDate;
-  Time delay = MilliSeconds (130);
+    Singleton<SatEnvVariables>::Get()->DoDispose();
 
-  NS_TEST_ASSERT_MSG_GT (difference, Seconds (1) + delay, "Ack arrived too early.");
-  NS_TEST_ASSERT_MSG_LT (difference + delay, MilliSeconds (1900) + delay, "Ack arrived too late. First window should be closed.");
+    NS_TEST_ASSERT_MSG_NE(m_gwReceiveDate, Seconds(0), "Packet should be received by Gateway.");
+    NS_TEST_ASSERT_MSG_NE(m_edReceiveDate, Seconds(0), "Ack should be received by End Device.");
+    NS_TEST_ASSERT_MSG_GT(m_edReceiveDate, m_gwReceiveDate, "Ack should be received after packet.");
+
+    Time difference = m_edReceiveDate - m_gwReceiveDate;
+    Time delay = MilliSeconds(130);
+
+    NS_TEST_ASSERT_MSG_GT(difference, Seconds(1) + delay, "Ack arrived too early.");
+    NS_TEST_ASSERT_MSG_LT(difference + delay,
+                          MilliSeconds(1900) + delay,
+                          "Ack arrived too late. First window should be closed.");
 }
 
 /**
@@ -199,136 +214,156 @@ SatLoraFirstWindowTestCase::DoRun (void)
  * \brief Test case to check if Lora ack arrives in second reception window.
  *
  *  Expected result:
- *    Ack is received and with correct date range, corresponding to second window opening and closing.
+ *    Ack is received and with correct date range, corresponding to second window opening and
+ * closing.
  *
  */
 class SatLoraSecondWindowTestCase : public TestCase
 {
-public:
-  SatLoraSecondWindowTestCase ();
-  virtual ~SatLoraSecondWindowTestCase ();
+  public:
+    SatLoraSecondWindowTestCase();
+    virtual ~SatLoraSecondWindowTestCase();
 
-private:
-  virtual void DoRun (void);
-  void MacTraceCb ( std::string context, Ptr<const Packet> packet, const Address & address);
+  private:
+    virtual void DoRun(void);
+    void MacTraceCb(std::string context, Ptr<const Packet> packet, const Address& address);
 
-  Time m_gwReceiveDate;
-  Time m_edReceiveDate;
+    Time m_gwReceiveDate;
+    Time m_edReceiveDate;
 
-  Address m_gwAddress;
-  Address m_edAddress;
+    Address m_gwAddress;
+    Address m_edAddress;
 };
 
-SatLoraSecondWindowTestCase::SatLoraSecondWindowTestCase ()
-  : TestCase ("Test satellite lorawan with acks sent in second window."),
-  m_gwReceiveDate (Seconds(0)),
-  m_edReceiveDate (Seconds(0))
+SatLoraSecondWindowTestCase::SatLoraSecondWindowTestCase()
+    : TestCase("Test satellite lorawan with acks sent in second window."),
+      m_gwReceiveDate(Seconds(0)),
+      m_edReceiveDate(Seconds(0))
 {
 }
 
-SatLoraSecondWindowTestCase::~SatLoraSecondWindowTestCase ()
+SatLoraSecondWindowTestCase::~SatLoraSecondWindowTestCase()
 {
-}
-
-void
-SatLoraSecondWindowTestCase::MacTraceCb ( std::string context, Ptr<const Packet> packet, const Address & address)
-{
-  if (address == m_edAddress)
-    {
-      m_gwReceiveDate = Simulator::Now ();
-    }
-
-  if (address == m_gwAddress)
-    {
-      m_edReceiveDate = Simulator::Now ();
-    }
 }
 
 void
-SatLoraSecondWindowTestCase::DoRun (void)
+SatLoraSecondWindowTestCase::MacTraceCb(std::string context,
+                                        Ptr<const Packet> packet,
+                                        const Address& address)
 {
-  // Set simulation output details
-  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-lora", "second-window", true);
+    if (address == m_edAddress)
+    {
+        m_gwReceiveDate = Simulator::Now();
+    }
 
-  // Enable Lora
-  Config::SetDefault ("ns3::SatHelper::Standard", EnumValue (SatEnums::LORA));
-  Config::SetDefault ("ns3::LorawanMacEndDevice::DataRate", UintegerValue (5));
-  Config::SetDefault ("ns3::LorawanMacEndDevice::MType", EnumValue (LorawanMacHeader::CONFIRMED_DATA_UP));
-  Config::SetDefault ("ns3::SatLorawanNetDevice::ForwardToUtUsers", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLoraConf::Standard", EnumValue (SatLoraConf::SATELLITE));
+    if (address == m_gwAddress)
+    {
+        m_edReceiveDate = Simulator::Now();
+    }
+}
 
-  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::FirstWindowDelay", TimeValue (MilliSeconds (1500)));
-  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::SecondWindowDelay", TimeValue (Seconds (2)));
-  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::FirstWindowDuration", TimeValue (MilliSeconds (400)));
-  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::SecondWindowDuration", TimeValue (MilliSeconds (400)));
-  // Increase answer delay by 500ms compared to SatLoraSecondWindowTestCase to be in second window on End Device
-  Config::SetDefault ("ns3::LoraNetworkScheduler::FirstWindowAnswerDelay", TimeValue (Seconds (1) + MilliSeconds (500)));
-  Config::SetDefault ("ns3::LoraNetworkScheduler::SecondWindowAnswerDelay", TimeValue (Seconds (2)));
+void
+SatLoraSecondWindowTestCase::DoRun(void)
+{
+    // Set simulation output details
+    Singleton<SatEnvVariables>::Get()->DoInitialize();
+    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-lora", "second-window", true);
 
-  // Superframe configuration
-  Config::SetDefault ("ns3::SatConf::SuperFrameConfForSeq0", EnumValue (SatSuperframeConf::SUPER_FRAME_CONFIG_4));
-  Config::SetDefault ("ns3::SatSuperframeConf4::FrameConfigType", EnumValue (SatSuperframeConf::CONFIG_TYPE_4));
-  Config::SetDefault ("ns3::SatSuperframeConf4::Frame0_AllocatedBandwidthHz", DoubleValue (15000));
-  Config::SetDefault ("ns3::SatSuperframeConf4::Frame0_CarrierAllocatedBandwidthHz", DoubleValue (15000));
+    // Enable Lora
+    Config::SetDefault("ns3::SatHelper::Standard", EnumValue(SatEnums::LORA));
+    Config::SetDefault("ns3::LorawanMacEndDevice::DataRate", UintegerValue(5));
+    Config::SetDefault("ns3::LorawanMacEndDevice::MType",
+                       EnumValue(LorawanMacHeader::CONFIRMED_DATA_UP));
+    Config::SetDefault("ns3::SatLorawanNetDevice::ForwardToUtUsers", BooleanValue(false));
+    Config::SetDefault("ns3::SatLoraConf::Standard", EnumValue(SatLoraConf::SATELLITE));
 
-  // CRDSA only
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue (false));
+    Config::SetDefault("ns3::LorawanMacEndDeviceClassA::FirstWindowDelay",
+                       TimeValue(MilliSeconds(1500)));
+    Config::SetDefault("ns3::LorawanMacEndDeviceClassA::SecondWindowDelay", TimeValue(Seconds(2)));
+    Config::SetDefault("ns3::LorawanMacEndDeviceClassA::FirstWindowDuration",
+                       TimeValue(MilliSeconds(400)));
+    Config::SetDefault("ns3::LorawanMacEndDeviceClassA::SecondWindowDuration",
+                       TimeValue(MilliSeconds(400)));
+    // Increase answer delay by 500ms compared to SatLoraSecondWindowTestCase to be in second window
+    // on End Device
+    Config::SetDefault("ns3::LoraNetworkScheduler::FirstWindowAnswerDelay",
+                       TimeValue(Seconds(1) + MilliSeconds(500)));
+    Config::SetDefault("ns3::LoraNetworkScheduler::SecondWindowAnswerDelay", TimeValue(Seconds(2)));
 
-  // Configure RA
-  Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_ESSA));
-  Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceEliminationModel", EnumValue (SatPhyRxCarrierConf::SIC_RESIDUAL));
-  Config::SetDefault ("ns3::SatBeamHelper::RaCollisionModel", EnumValue (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
-  Config::SetDefault ("ns3::SatBeamHelper::ReturnLinkLinkResults", EnumValue (SatEnums::LR_LORA));
-  Config::SetDefault ("ns3::SatWaveformConf::DefaultWfId", UintegerValue (2));
-  Config::SetDefault ("ns3::SatHelper::RtnLinkWaveformConfFileName", StringValue("loraWaveforms.txt"));
+    // Superframe configuration
+    Config::SetDefault("ns3::SatConf::SuperFrameConfForSeq0",
+                       EnumValue(SatSuperframeConf::SUPER_FRAME_CONFIG_4));
+    Config::SetDefault("ns3::SatSuperframeConf4::FrameConfigType",
+                       EnumValue(SatSuperframeConf::CONFIG_TYPE_4));
+    Config::SetDefault("ns3::SatSuperframeConf4::Frame0_AllocatedBandwidthHz", DoubleValue(15000));
+    Config::SetDefault("ns3::SatSuperframeConf4::Frame0_CarrierAllocatedBandwidthHz",
+                       DoubleValue(15000));
 
-  // Configure E-SSA
-  Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::WindowDuration", StringValue ("600ms"));
-  Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::WindowStep", StringValue ("200ms"));
-  Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::WindowSICIterations", UintegerValue (5));
-  Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::EnableSIC", BooleanValue (false));
+    // CRDSA only
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided",
+                       BooleanValue(false));
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed",
+                       BooleanValue(false));
 
-  Config::SetDefault ("ns3::SatMac::EnableStatisticsTags", BooleanValue (true));
+    // Configure RA
+    Config::SetDefault("ns3::SatBeamHelper::RandomAccessModel", EnumValue(SatEnums::RA_MODEL_ESSA));
+    Config::SetDefault("ns3::SatBeamHelper::RaInterferenceEliminationModel",
+                       EnumValue(SatPhyRxCarrierConf::SIC_RESIDUAL));
+    Config::SetDefault("ns3::SatBeamHelper::RaCollisionModel",
+                       EnumValue(SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
+    Config::SetDefault("ns3::SatBeamHelper::ReturnLinkLinkResults", EnumValue(SatEnums::LR_LORA));
+    Config::SetDefault("ns3::SatWaveformConf::DefaultWfId", UintegerValue(2));
+    Config::SetDefault("ns3::SatHelper::RtnLinkWaveformConfFileName",
+                       StringValue("loraWaveforms.txt"));
 
-  // Creating the reference system.
-  Ptr<SatHelper> helper = CreateObject<SatHelper> ();
-  helper->CreatePredefinedScenario (SatHelper::SIMPLE);
+    // Configure E-SSA
+    Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::WindowDuration", StringValue("600ms"));
+    Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::WindowStep", StringValue("200ms"));
+    Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::WindowSICIterations", UintegerValue(5));
+    Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::EnableSIC", BooleanValue(false));
 
-  // >>> Start of actual test using Simple scenario >>>
-  Ptr<Node> utNode = helper->UtNodes ().Get (0);
-  Ptr<LoraPeriodicSender> app = Create<LoraPeriodicSender> ();
+    Config::SetDefault("ns3::SatMac::EnableStatisticsTags", BooleanValue(true));
 
-  app->SetInterval (Seconds (10));
+    // Creating the reference system.
+    Ptr<SatHelper> helper = CreateObject<SatHelper>();
+    helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
-  app->SetStartTime (Seconds (1.0));
-  app->SetStopTime (Seconds (10.0));
-  app->SetPacketSize (24);
+    // >>> Start of actual test using Simple scenario >>>
+    Ptr<Node> utNode = helper->UtNodes().Get(0);
+    Ptr<LoraPeriodicSender> app = Create<LoraPeriodicSender>();
 
-  app->SetNode (utNode);
-  utNode->AddApplication (app);
+    app->SetInterval(Seconds(10));
 
-  m_gwAddress = helper->GwNodes ().Get (0)->GetDevice (1)->GetAddress ();
-  m_edAddress = helper->UtNodes ().Get (0)->GetDevice (2)->GetAddress ();
+    app->SetStartTime(Seconds(1.0));
+    app->SetStopTime(Seconds(10.0));
+    app->SetPacketSize(24);
 
-  Config::Connect ("/NodeList/*/DeviceList/*/SatMac/Rx", MakeCallback (&SatLoraSecondWindowTestCase::MacTraceCb, this));
+    app->SetNode(utNode);
+    utNode->AddApplication(app);
 
-  Simulator::Stop (Seconds (10));
-  Simulator::Run ();
+    m_gwAddress = helper->GwNodes().Get(0)->GetDevice(1)->GetAddress();
+    m_edAddress = helper->UtNodes().Get(0)->GetDevice(2)->GetAddress();
 
-  Simulator::Destroy ();
+    Config::Connect("/NodeList/*/DeviceList/*/SatMac/Rx",
+                    MakeCallback(&SatLoraSecondWindowTestCase::MacTraceCb, this));
 
-  Singleton<SatEnvVariables>::Get ()->DoDispose ();
-  NS_TEST_ASSERT_MSG_NE (m_gwReceiveDate, Seconds (0), "Packet should be received by Gateway.");
-  NS_TEST_ASSERT_MSG_NE (m_edReceiveDate, Seconds (0), "Ack should be received by End Device.");
-  NS_TEST_ASSERT_MSG_GT (m_edReceiveDate, m_gwReceiveDate, "Ack should be received after packet.");
+    Simulator::Stop(Seconds(10));
+    Simulator::Run();
 
-  Time difference = m_edReceiveDate - m_gwReceiveDate;
-  Time delay = MilliSeconds (130);
+    Simulator::Destroy();
 
-  NS_TEST_ASSERT_MSG_GT (difference, Seconds (1.5) + delay, "Ack arrived too early.");
-  NS_TEST_ASSERT_MSG_LT (difference + delay, MilliSeconds (2400) + delay, "Ack arrived too late. Second window should be closed.");
+    Singleton<SatEnvVariables>::Get()->DoDispose();
+    NS_TEST_ASSERT_MSG_NE(m_gwReceiveDate, Seconds(0), "Packet should be received by Gateway.");
+    NS_TEST_ASSERT_MSG_NE(m_edReceiveDate, Seconds(0), "Ack should be received by End Device.");
+    NS_TEST_ASSERT_MSG_GT(m_edReceiveDate, m_gwReceiveDate, "Ack should be received after packet.");
+
+    Time difference = m_edReceiveDate - m_gwReceiveDate;
+    Time delay = MilliSeconds(130);
+
+    NS_TEST_ASSERT_MSG_GT(difference, Seconds(1.5) + delay, "Ack arrived too early.");
+    NS_TEST_ASSERT_MSG_LT(difference + delay,
+                          MilliSeconds(2400) + delay,
+                          "Ack arrived too late. Second window should be closed.");
 }
 
 /**
@@ -341,154 +376,181 @@ SatLoraSecondWindowTestCase::DoRun (void)
  */
 class SatLoraOutOfWindowWindowTestCase : public TestCase
 {
-public:
-  SatLoraOutOfWindowWindowTestCase ();
-  virtual ~SatLoraOutOfWindowWindowTestCase ();
+  public:
+    SatLoraOutOfWindowWindowTestCase();
+    virtual ~SatLoraOutOfWindowWindowTestCase();
 
-private:
-  virtual void DoRun (void);
-  void MacTraceCb ( std::string context, Ptr<const Packet> packet, const Address & address);
-  void PhyTraceCb ( std::string context, Ptr<const Packet> packet, const Address & address);
+  private:
+    virtual void DoRun(void);
+    void MacTraceCb(std::string context, Ptr<const Packet> packet, const Address& address);
+    void PhyTraceCb(std::string context, Ptr<const Packet> packet, const Address& address);
 
-  std::vector<Time> m_gwReceiveDates;
-  Time m_edReceiveDate;
+    std::vector<Time> m_gwReceiveDates;
+    Time m_edReceiveDate;
 
-  Address m_gwAddress;
-  Address m_edAddress;
+    Address m_gwAddress;
+    Address m_edAddress;
 
-  bool m_phyGwReceive;
-  bool m_phyEdReceive;
+    bool m_phyGwReceive;
+    bool m_phyEdReceive;
 };
 
-SatLoraOutOfWindowWindowTestCase::SatLoraOutOfWindowWindowTestCase ()
-  : TestCase ("Test satellite lorawan with acks sent in second window."),
-  m_edReceiveDate (Seconds(0)),
-  m_phyGwReceive (false),
-  m_phyEdReceive (false)
+SatLoraOutOfWindowWindowTestCase::SatLoraOutOfWindowWindowTestCase()
+    : TestCase("Test satellite lorawan with acks sent in second window."),
+      m_edReceiveDate(Seconds(0)),
+      m_phyGwReceive(false),
+      m_phyEdReceive(false)
 {
 }
 
-SatLoraOutOfWindowWindowTestCase::~SatLoraOutOfWindowWindowTestCase ()
+SatLoraOutOfWindowWindowTestCase::~SatLoraOutOfWindowWindowTestCase()
 {
-}
-
-void
-SatLoraOutOfWindowWindowTestCase::MacTraceCb ( std::string context, Ptr<const Packet> packet, const Address & address)
-{
-  if (address == m_edAddress)
-    {
-      m_gwReceiveDates.push_back (Simulator::Now ());
-    }
-
-  if (address == m_gwAddress)
-    {
-      m_edReceiveDate = Simulator::Now ();
-    }
 }
 
 void
-SatLoraOutOfWindowWindowTestCase::PhyTraceCb ( std::string context, Ptr<const Packet> packet, const Address & address)
+SatLoraOutOfWindowWindowTestCase::MacTraceCb(std::string context,
+                                             Ptr<const Packet> packet,
+                                             const Address& address)
 {
-  if (address == m_edAddress)
+    if (address == m_edAddress)
     {
-      m_phyGwReceive = true;
+        m_gwReceiveDates.push_back(Simulator::Now());
     }
 
-  if (address == m_gwAddress)
+    if (address == m_gwAddress)
     {
-      m_phyEdReceive = true;
+        m_edReceiveDate = Simulator::Now();
     }
 }
 
 void
-SatLoraOutOfWindowWindowTestCase::DoRun (void)
+SatLoraOutOfWindowWindowTestCase::PhyTraceCb(std::string context,
+                                             Ptr<const Packet> packet,
+                                             const Address& address)
 {
-  // Set simulation output details
-  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-lora", "out-of-window", true);
+    if (address == m_edAddress)
+    {
+        m_phyGwReceive = true;
+    }
 
-  // Enable Lora
-  Config::SetDefault ("ns3::SatHelper::Standard", EnumValue (SatEnums::LORA));
-  Config::SetDefault ("ns3::LorawanMacEndDevice::DataRate", UintegerValue (5));
-  Config::SetDefault ("ns3::LorawanMacEndDevice::MType", EnumValue (LorawanMacHeader::CONFIRMED_DATA_UP));
-  Config::SetDefault ("ns3::SatLorawanNetDevice::ForwardToUtUsers", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLoraConf::Standard", EnumValue (SatLoraConf::SATELLITE));
+    if (address == m_gwAddress)
+    {
+        m_phyEdReceive = true;
+    }
+}
 
-  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::FirstWindowDelay", TimeValue (MilliSeconds (1500)));
-  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::SecondWindowDelay", TimeValue (Seconds (2)));
-  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::FirstWindowDuration", TimeValue (MilliSeconds (400)));
-  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::SecondWindowDuration", TimeValue (MilliSeconds (400)));
-  // Send answer too early
-  Config::SetDefault ("ns3::LoraNetworkScheduler::FirstWindowAnswerDelay", TimeValue (Seconds (0.1)));
-  Config::SetDefault ("ns3::LoraNetworkScheduler::SecondWindowAnswerDelay", TimeValue (Seconds (2)));
+void
+SatLoraOutOfWindowWindowTestCase::DoRun(void)
+{
+    // Set simulation output details
+    Singleton<SatEnvVariables>::Get()->DoInitialize();
+    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-lora", "out-of-window", true);
 
-  // Superframe configuration
-  Config::SetDefault ("ns3::SatConf::SuperFrameConfForSeq0", EnumValue (SatSuperframeConf::SUPER_FRAME_CONFIG_4));
-  Config::SetDefault ("ns3::SatSuperframeConf4::FrameConfigType", EnumValue (SatSuperframeConf::CONFIG_TYPE_4));
-  Config::SetDefault ("ns3::SatSuperframeConf4::Frame0_AllocatedBandwidthHz", DoubleValue (15000));
-  Config::SetDefault ("ns3::SatSuperframeConf4::Frame0_CarrierAllocatedBandwidthHz", DoubleValue (15000));
+    // Enable Lora
+    Config::SetDefault("ns3::SatHelper::Standard", EnumValue(SatEnums::LORA));
+    Config::SetDefault("ns3::LorawanMacEndDevice::DataRate", UintegerValue(5));
+    Config::SetDefault("ns3::LorawanMacEndDevice::MType",
+                       EnumValue(LorawanMacHeader::CONFIRMED_DATA_UP));
+    Config::SetDefault("ns3::SatLorawanNetDevice::ForwardToUtUsers", BooleanValue(false));
+    Config::SetDefault("ns3::SatLoraConf::Standard", EnumValue(SatLoraConf::SATELLITE));
 
-  // CRDSA only
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue (false));
+    Config::SetDefault("ns3::LorawanMacEndDeviceClassA::FirstWindowDelay",
+                       TimeValue(MilliSeconds(1500)));
+    Config::SetDefault("ns3::LorawanMacEndDeviceClassA::SecondWindowDelay", TimeValue(Seconds(2)));
+    Config::SetDefault("ns3::LorawanMacEndDeviceClassA::FirstWindowDuration",
+                       TimeValue(MilliSeconds(400)));
+    Config::SetDefault("ns3::LorawanMacEndDeviceClassA::SecondWindowDuration",
+                       TimeValue(MilliSeconds(400)));
+    // Send answer too early
+    Config::SetDefault("ns3::LoraNetworkScheduler::FirstWindowAnswerDelay",
+                       TimeValue(Seconds(0.1)));
+    Config::SetDefault("ns3::LoraNetworkScheduler::SecondWindowAnswerDelay", TimeValue(Seconds(2)));
 
-  // Configure RA
-  Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_ESSA));
-  Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceEliminationModel", EnumValue (SatPhyRxCarrierConf::SIC_RESIDUAL));
-  Config::SetDefault ("ns3::SatBeamHelper::RaCollisionModel", EnumValue (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
-  Config::SetDefault ("ns3::SatBeamHelper::ReturnLinkLinkResults", EnumValue (SatEnums::LR_LORA));
-  Config::SetDefault ("ns3::SatWaveformConf::DefaultWfId", UintegerValue (2));
-  Config::SetDefault ("ns3::SatHelper::RtnLinkWaveformConfFileName", StringValue("loraWaveforms.txt"));
+    // Superframe configuration
+    Config::SetDefault("ns3::SatConf::SuperFrameConfForSeq0",
+                       EnumValue(SatSuperframeConf::SUPER_FRAME_CONFIG_4));
+    Config::SetDefault("ns3::SatSuperframeConf4::FrameConfigType",
+                       EnumValue(SatSuperframeConf::CONFIG_TYPE_4));
+    Config::SetDefault("ns3::SatSuperframeConf4::Frame0_AllocatedBandwidthHz", DoubleValue(15000));
+    Config::SetDefault("ns3::SatSuperframeConf4::Frame0_CarrierAllocatedBandwidthHz",
+                       DoubleValue(15000));
 
-  // Configure E-SSA
-  Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::WindowDuration", StringValue ("600ms"));
-  Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::WindowStep", StringValue ("200ms"));
-  Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::WindowSICIterations", UintegerValue (5));
-  Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::EnableSIC", BooleanValue (false));
+    // CRDSA only
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided",
+                       BooleanValue(false));
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed",
+                       BooleanValue(false));
 
-  Config::SetDefault ("ns3::SatMac::EnableStatisticsTags", BooleanValue (true));
-  Config::SetDefault ("ns3::SatPhy::EnableStatisticsTags", BooleanValue (true));
+    // Configure RA
+    Config::SetDefault("ns3::SatBeamHelper::RandomAccessModel", EnumValue(SatEnums::RA_MODEL_ESSA));
+    Config::SetDefault("ns3::SatBeamHelper::RaInterferenceEliminationModel",
+                       EnumValue(SatPhyRxCarrierConf::SIC_RESIDUAL));
+    Config::SetDefault("ns3::SatBeamHelper::RaCollisionModel",
+                       EnumValue(SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
+    Config::SetDefault("ns3::SatBeamHelper::ReturnLinkLinkResults", EnumValue(SatEnums::LR_LORA));
+    Config::SetDefault("ns3::SatWaveformConf::DefaultWfId", UintegerValue(2));
+    Config::SetDefault("ns3::SatHelper::RtnLinkWaveformConfFileName",
+                       StringValue("loraWaveforms.txt"));
 
-  // Creating the reference system.
-  Ptr<SatHelper> helper = CreateObject<SatHelper> ();
-  helper->CreatePredefinedScenario (SatHelper::SIMPLE);
+    // Configure E-SSA
+    Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::WindowDuration", StringValue("600ms"));
+    Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::WindowStep", StringValue("200ms"));
+    Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::WindowSICIterations", UintegerValue(5));
+    Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::EnableSIC", BooleanValue(false));
 
-  // >>> Start of actual test using Simple scenario >>>
-  Ptr<Node> utNode = helper->UtNodes ().Get (0);
-  Ptr<LoraPeriodicSender> app = Create<LoraPeriodicSender> ();
+    Config::SetDefault("ns3::SatMac::EnableStatisticsTags", BooleanValue(true));
+    Config::SetDefault("ns3::SatPhy::EnableStatisticsTags", BooleanValue(true));
 
-  app->SetInterval (Seconds (10));
+    // Creating the reference system.
+    Ptr<SatHelper> helper = CreateObject<SatHelper>();
+    helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
-  app->SetStartTime (Seconds (1.0));
-  app->SetStopTime (Seconds (10.0));
-  app->SetPacketSize (24);
+    // >>> Start of actual test using Simple scenario >>>
+    Ptr<Node> utNode = helper->UtNodes().Get(0);
+    Ptr<LoraPeriodicSender> app = Create<LoraPeriodicSender>();
 
-  app->SetNode (utNode);
-  utNode->AddApplication (app);
+    app->SetInterval(Seconds(10));
 
-  m_gwAddress = helper->GwNodes ().Get (0)->GetDevice (1)->GetAddress ();
-  m_edAddress = helper->UtNodes ().Get (0)->GetDevice (2)->GetAddress ();
+    app->SetStartTime(Seconds(1.0));
+    app->SetStopTime(Seconds(10.0));
+    app->SetPacketSize(24);
 
-  Config::Connect ("/NodeList/*/DeviceList/*/SatMac/Rx", MakeCallback (&SatLoraOutOfWindowWindowTestCase::MacTraceCb, this));
-  Config::Connect ("/NodeList/*/DeviceList/*/SatPhy/Rx", MakeCallback (&SatLoraOutOfWindowWindowTestCase::PhyTraceCb, this));
+    app->SetNode(utNode);
+    utNode->AddApplication(app);
 
-  Simulator::Stop (Seconds (10));
-  Simulator::Run ();
+    m_gwAddress = helper->GwNodes().Get(0)->GetDevice(1)->GetAddress();
+    m_edAddress = helper->UtNodes().Get(0)->GetDevice(2)->GetAddress();
 
-  Simulator::Destroy ();
+    Config::Connect("/NodeList/*/DeviceList/*/SatMac/Rx",
+                    MakeCallback(&SatLoraOutOfWindowWindowTestCase::MacTraceCb, this));
+    Config::Connect("/NodeList/*/DeviceList/*/SatPhy/Rx",
+                    MakeCallback(&SatLoraOutOfWindowWindowTestCase::PhyTraceCb, this));
 
-  Singleton<SatEnvVariables>::Get ()->DoDispose ();
+    Simulator::Stop(Seconds(10));
+    Simulator::Run();
 
-  NS_TEST_ASSERT_MSG_EQ (m_gwReceiveDates.size (), 2, "GW should receive a packet and the first retransmission.");
-  NS_TEST_ASSERT_MSG_EQ (m_edReceiveDate, Seconds (0), "No ack should be received by End Device.");
+    Simulator::Destroy();
 
-  NS_TEST_ASSERT_MSG_EQ (m_phyGwReceive, true, "Phy layer should trace traffic from End Device to Gateway.");
-  NS_TEST_ASSERT_MSG_EQ (m_phyEdReceive, false, "Phy layer should not trace traffic from Gateway to End Device, as phy layer is in SLEEP state.");
+    Singleton<SatEnvVariables>::Get()->DoDispose();
+
+    NS_TEST_ASSERT_MSG_EQ(m_gwReceiveDates.size(),
+                          2,
+                          "GW should receive a packet and the first retransmission.");
+    NS_TEST_ASSERT_MSG_EQ(m_edReceiveDate, Seconds(0), "No ack should be received by End Device.");
+
+    NS_TEST_ASSERT_MSG_EQ(m_phyGwReceive,
+                          true,
+                          "Phy layer should trace traffic from End Device to Gateway.");
+    NS_TEST_ASSERT_MSG_EQ(m_phyEdReceive,
+                          false,
+                          "Phy layer should not trace traffic from Gateway to End Device, as phy "
+                          "layer is in SLEEP state.");
 }
 
 /**
  * \ingroup satellite
- * \brief Test case to check that packet is not retransmitted if ack outside of both windows but no retransmission asked.
+ * \brief Test case to check that packet is not retransmitted if ack outside of both windows but no
+ * retransmission asked.
  *
  *  Expected result:
  *    Ack is not received and packet is not retransmitted.
@@ -496,126 +558,146 @@ SatLoraOutOfWindowWindowTestCase::DoRun (void)
  */
 class SatLoraOutOfWindowWindowNoRetransmissionTestCase : public TestCase
 {
-public:
-  SatLoraOutOfWindowWindowNoRetransmissionTestCase ();
-  virtual ~SatLoraOutOfWindowWindowNoRetransmissionTestCase ();
+  public:
+    SatLoraOutOfWindowWindowNoRetransmissionTestCase();
+    virtual ~SatLoraOutOfWindowWindowNoRetransmissionTestCase();
 
-private:
-  virtual void DoRun (void);
-  void MacTraceCb ( std::string context, Ptr<const Packet> packet, const Address & address);
-  void PhyTraceCb ( std::string context, Ptr<const Packet> packet, const Address & address);
+  private:
+    virtual void DoRun(void);
+    void MacTraceCb(std::string context, Ptr<const Packet> packet, const Address& address);
+    void PhyTraceCb(std::string context, Ptr<const Packet> packet, const Address& address);
 
-  std::vector<Time> m_gwReceiveDates;
-  Time m_edReceiveDate;
+    std::vector<Time> m_gwReceiveDates;
+    Time m_edReceiveDate;
 
-  Address m_gwAddress;
-  Address m_edAddress;
+    Address m_gwAddress;
+    Address m_edAddress;
 };
 
-SatLoraOutOfWindowWindowNoRetransmissionTestCase::SatLoraOutOfWindowWindowNoRetransmissionTestCase ()
-  : TestCase ("Test satellite lorawan with acks sent in second window."),
-  m_edReceiveDate (Seconds(0))
+SatLoraOutOfWindowWindowNoRetransmissionTestCase::SatLoraOutOfWindowWindowNoRetransmissionTestCase()
+    : TestCase("Test satellite lorawan with acks sent in second window."),
+      m_edReceiveDate(Seconds(0))
 {
 }
 
-SatLoraOutOfWindowWindowNoRetransmissionTestCase::~SatLoraOutOfWindowWindowNoRetransmissionTestCase ()
+SatLoraOutOfWindowWindowNoRetransmissionTestCase::
+    ~SatLoraOutOfWindowWindowNoRetransmissionTestCase()
 {
-}
-
-void
-SatLoraOutOfWindowWindowNoRetransmissionTestCase::MacTraceCb ( std::string context, Ptr<const Packet> packet, const Address & address)
-{
-  if (address == m_edAddress)
-    {
-      m_gwReceiveDates.push_back (Simulator::Now ());
-    }
-
-  if (address == m_gwAddress)
-    {
-      m_edReceiveDate = Simulator::Now ();
-    }
 }
 
 void
-SatLoraOutOfWindowWindowNoRetransmissionTestCase::DoRun (void)
+SatLoraOutOfWindowWindowNoRetransmissionTestCase::MacTraceCb(std::string context,
+                                                             Ptr<const Packet> packet,
+                                                             const Address& address)
 {
-  // Set simulation output details
-  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-lora", "out-of-window", true);
+    if (address == m_edAddress)
+    {
+        m_gwReceiveDates.push_back(Simulator::Now());
+    }
 
-  // Enable Lora
-  Config::SetDefault ("ns3::SatHelper::Standard", EnumValue (SatEnums::LORA));
-  Config::SetDefault ("ns3::LorawanMacEndDevice::DataRate", UintegerValue (5));
-  Config::SetDefault ("ns3::LorawanMacEndDevice::MType", EnumValue (LorawanMacHeader::UNCONFIRMED_DATA_UP));
-  Config::SetDefault ("ns3::SatLorawanNetDevice::ForwardToUtUsers", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLoraConf::Standard", EnumValue (SatLoraConf::SATELLITE));
+    if (address == m_gwAddress)
+    {
+        m_edReceiveDate = Simulator::Now();
+    }
+}
 
-  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::FirstWindowDelay", TimeValue (MilliSeconds (1500)));
-  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::SecondWindowDelay", TimeValue (Seconds (2)));
-  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::FirstWindowDuration", TimeValue (MilliSeconds (400)));
-  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::SecondWindowDuration", TimeValue (MilliSeconds (400)));
-  // Send answer too early
-  Config::SetDefault ("ns3::LoraNetworkScheduler::FirstWindowAnswerDelay", TimeValue (Seconds (0.1)));
-  Config::SetDefault ("ns3::LoraNetworkScheduler::SecondWindowAnswerDelay", TimeValue (Seconds (2)));
+void
+SatLoraOutOfWindowWindowNoRetransmissionTestCase::DoRun(void)
+{
+    // Set simulation output details
+    Singleton<SatEnvVariables>::Get()->DoInitialize();
+    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-lora", "out-of-window", true);
 
-  // Superframe configuration
-  Config::SetDefault ("ns3::SatConf::SuperFrameConfForSeq0", EnumValue (SatSuperframeConf::SUPER_FRAME_CONFIG_4));
-  Config::SetDefault ("ns3::SatSuperframeConf4::FrameConfigType", EnumValue (SatSuperframeConf::CONFIG_TYPE_4));
-  Config::SetDefault ("ns3::SatSuperframeConf4::Frame0_AllocatedBandwidthHz", DoubleValue (15000));
-  Config::SetDefault ("ns3::SatSuperframeConf4::Frame0_CarrierAllocatedBandwidthHz", DoubleValue (15000));
+    // Enable Lora
+    Config::SetDefault("ns3::SatHelper::Standard", EnumValue(SatEnums::LORA));
+    Config::SetDefault("ns3::LorawanMacEndDevice::DataRate", UintegerValue(5));
+    Config::SetDefault("ns3::LorawanMacEndDevice::MType",
+                       EnumValue(LorawanMacHeader::UNCONFIRMED_DATA_UP));
+    Config::SetDefault("ns3::SatLorawanNetDevice::ForwardToUtUsers", BooleanValue(false));
+    Config::SetDefault("ns3::SatLoraConf::Standard", EnumValue(SatLoraConf::SATELLITE));
 
-  // CRDSA only
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue (false));
+    Config::SetDefault("ns3::LorawanMacEndDeviceClassA::FirstWindowDelay",
+                       TimeValue(MilliSeconds(1500)));
+    Config::SetDefault("ns3::LorawanMacEndDeviceClassA::SecondWindowDelay", TimeValue(Seconds(2)));
+    Config::SetDefault("ns3::LorawanMacEndDeviceClassA::FirstWindowDuration",
+                       TimeValue(MilliSeconds(400)));
+    Config::SetDefault("ns3::LorawanMacEndDeviceClassA::SecondWindowDuration",
+                       TimeValue(MilliSeconds(400)));
+    // Send answer too early
+    Config::SetDefault("ns3::LoraNetworkScheduler::FirstWindowAnswerDelay",
+                       TimeValue(Seconds(0.1)));
+    Config::SetDefault("ns3::LoraNetworkScheduler::SecondWindowAnswerDelay", TimeValue(Seconds(2)));
 
-  // Configure RA
-  Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_ESSA));
-  Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceEliminationModel", EnumValue (SatPhyRxCarrierConf::SIC_RESIDUAL));
-  Config::SetDefault ("ns3::SatBeamHelper::RaCollisionModel", EnumValue (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
-  Config::SetDefault ("ns3::SatBeamHelper::ReturnLinkLinkResults", EnumValue (SatEnums::LR_LORA));
-  Config::SetDefault ("ns3::SatWaveformConf::DefaultWfId", UintegerValue (2));
-  Config::SetDefault ("ns3::SatHelper::RtnLinkWaveformConfFileName", StringValue("loraWaveforms.txt"));
+    // Superframe configuration
+    Config::SetDefault("ns3::SatConf::SuperFrameConfForSeq0",
+                       EnumValue(SatSuperframeConf::SUPER_FRAME_CONFIG_4));
+    Config::SetDefault("ns3::SatSuperframeConf4::FrameConfigType",
+                       EnumValue(SatSuperframeConf::CONFIG_TYPE_4));
+    Config::SetDefault("ns3::SatSuperframeConf4::Frame0_AllocatedBandwidthHz", DoubleValue(15000));
+    Config::SetDefault("ns3::SatSuperframeConf4::Frame0_CarrierAllocatedBandwidthHz",
+                       DoubleValue(15000));
 
-  // Configure E-SSA
-  Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::WindowDuration", StringValue ("600ms"));
-  Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::WindowStep", StringValue ("200ms"));
-  Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::WindowSICIterations", UintegerValue (5));
-  Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::EnableSIC", BooleanValue (false));
+    // CRDSA only
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided",
+                       BooleanValue(false));
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed",
+                       BooleanValue(false));
 
-  Config::SetDefault ("ns3::SatMac::EnableStatisticsTags", BooleanValue (true));
-  Config::SetDefault ("ns3::SatPhy::EnableStatisticsTags", BooleanValue (true));
+    // Configure RA
+    Config::SetDefault("ns3::SatBeamHelper::RandomAccessModel", EnumValue(SatEnums::RA_MODEL_ESSA));
+    Config::SetDefault("ns3::SatBeamHelper::RaInterferenceEliminationModel",
+                       EnumValue(SatPhyRxCarrierConf::SIC_RESIDUAL));
+    Config::SetDefault("ns3::SatBeamHelper::RaCollisionModel",
+                       EnumValue(SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
+    Config::SetDefault("ns3::SatBeamHelper::ReturnLinkLinkResults", EnumValue(SatEnums::LR_LORA));
+    Config::SetDefault("ns3::SatWaveformConf::DefaultWfId", UintegerValue(2));
+    Config::SetDefault("ns3::SatHelper::RtnLinkWaveformConfFileName",
+                       StringValue("loraWaveforms.txt"));
 
-  // Creating the reference system.
-  Ptr<SatHelper> helper = CreateObject<SatHelper> ();
-  helper->CreatePredefinedScenario (SatHelper::SIMPLE);
+    // Configure E-SSA
+    Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::WindowDuration", StringValue("600ms"));
+    Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::WindowStep", StringValue("200ms"));
+    Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::WindowSICIterations", UintegerValue(5));
+    Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::EnableSIC", BooleanValue(false));
 
-  // >>> Start of actual test using Simple scenario >>>
-  Ptr<Node> utNode = helper->UtNodes ().Get (0);
-  Ptr<LoraPeriodicSender> app = Create<LoraPeriodicSender> ();
+    Config::SetDefault("ns3::SatMac::EnableStatisticsTags", BooleanValue(true));
+    Config::SetDefault("ns3::SatPhy::EnableStatisticsTags", BooleanValue(true));
 
-  app->SetInterval (Seconds (10));
+    // Creating the reference system.
+    Ptr<SatHelper> helper = CreateObject<SatHelper>();
+    helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
-  app->SetStartTime (Seconds (1.0));
-  app->SetStopTime (Seconds (10.0));
-  app->SetPacketSize (24);
+    // >>> Start of actual test using Simple scenario >>>
+    Ptr<Node> utNode = helper->UtNodes().Get(0);
+    Ptr<LoraPeriodicSender> app = Create<LoraPeriodicSender>();
 
-  app->SetNode (utNode);
-  utNode->AddApplication (app);
+    app->SetInterval(Seconds(10));
 
-  m_gwAddress = helper->GwNodes ().Get (0)->GetDevice (1)->GetAddress ();
-  m_edAddress = helper->UtNodes ().Get (0)->GetDevice (2)->GetAddress ();
+    app->SetStartTime(Seconds(1.0));
+    app->SetStopTime(Seconds(10.0));
+    app->SetPacketSize(24);
 
-  Config::Connect ("/NodeList/*/DeviceList/*/SatMac/Rx", MakeCallback (&SatLoraOutOfWindowWindowNoRetransmissionTestCase::MacTraceCb, this));
+    app->SetNode(utNode);
+    utNode->AddApplication(app);
 
-  Simulator::Stop (Seconds (10));
-  Simulator::Run ();
+    m_gwAddress = helper->GwNodes().Get(0)->GetDevice(1)->GetAddress();
+    m_edAddress = helper->UtNodes().Get(0)->GetDevice(2)->GetAddress();
 
-  Simulator::Destroy ();
+    Config::Connect(
+        "/NodeList/*/DeviceList/*/SatMac/Rx",
+        MakeCallback(&SatLoraOutOfWindowWindowNoRetransmissionTestCase::MacTraceCb, this));
 
-  Singleton<SatEnvVariables>::Get ()->DoDispose ();
+    Simulator::Stop(Seconds(10));
+    Simulator::Run();
 
-  NS_TEST_ASSERT_MSG_EQ (m_gwReceiveDates.size (), 1, "GW should receive a packet but no retransmission.");
-  NS_TEST_ASSERT_MSG_EQ (m_edReceiveDate, Seconds (0), "No ack should be received by End Device.");
+    Simulator::Destroy();
+
+    Singleton<SatEnvVariables>::Get()->DoDispose();
+
+    NS_TEST_ASSERT_MSG_EQ(m_gwReceiveDates.size(),
+                          1,
+                          "GW should receive a packet but no retransmission.");
+    NS_TEST_ASSERT_MSG_EQ(m_edReceiveDate, Seconds(0), "No ack should be received by End Device.");
 }
 
 /**
@@ -628,144 +710,161 @@ SatLoraOutOfWindowWindowNoRetransmissionTestCase::DoRun (void)
  */
 class SatLoraCbrTestCase : public TestCase
 {
-public:
-  SatLoraCbrTestCase ();
-  virtual ~SatLoraCbrTestCase ();
+  public:
+    SatLoraCbrTestCase();
+    virtual ~SatLoraCbrTestCase();
 
-private:
-  virtual void DoRun (void);
-  void MacTraceCb ( std::string context, Ptr<const Packet> packet, const Address & address);
+  private:
+    virtual void DoRun(void);
+    void MacTraceCb(std::string context, Ptr<const Packet> packet, const Address& address);
 
-  Time m_gwReceiveDate;
-  Time m_edReceiveDate;
+    Time m_gwReceiveDate;
+    Time m_edReceiveDate;
 
-  Address m_gwAddress;
-  Address m_edAddress;
+    Address m_gwAddress;
+    Address m_edAddress;
 };
 
-SatLoraCbrTestCase::SatLoraCbrTestCase ()
-  : TestCase ("Test satellite lorawan with acks sent in second window."),
-  m_edReceiveDate (Seconds(0))
+SatLoraCbrTestCase::SatLoraCbrTestCase()
+    : TestCase("Test satellite lorawan with acks sent in second window."),
+      m_edReceiveDate(Seconds(0))
 {
 }
 
-SatLoraCbrTestCase::~SatLoraCbrTestCase ()
+SatLoraCbrTestCase::~SatLoraCbrTestCase()
 {
-}
-
-void
-SatLoraCbrTestCase::MacTraceCb ( std::string context, Ptr<const Packet> packet, const Address & address)
-{
-  if (address == m_edAddress)
-    {
-      m_gwReceiveDate = Simulator::Now ();
-    }
-
-  if (address == m_gwAddress)
-    {
-      m_edReceiveDate = Simulator::Now ();
-    }
 }
 
 void
-SatLoraCbrTestCase::DoRun (void)
+SatLoraCbrTestCase::MacTraceCb(std::string context,
+                               Ptr<const Packet> packet,
+                               const Address& address)
 {
-  // Set simulation output details
-  Singleton<SatEnvVariables>::Get ()->DoInitialize ();
-  Singleton<SatEnvVariables>::Get ()->SetOutputVariables ("test-sat-lora", "cbr", true);
+    if (address == m_edAddress)
+    {
+        m_gwReceiveDate = Simulator::Now();
+    }
 
-  // Enable Lora
-  Config::SetDefault ("ns3::SatHelper::Standard", EnumValue (SatEnums::LORA));
-  Config::SetDefault ("ns3::LorawanMacEndDevice::DataRate", UintegerValue (5));
-  Config::SetDefault ("ns3::LorawanMacEndDevice::MType", EnumValue (LorawanMacHeader::CONFIRMED_DATA_UP));
-  Config::SetDefault ("ns3::SatLorawanNetDevice::ForwardToUtUsers", BooleanValue (true));
-  Config::SetDefault ("ns3::SatLoraConf::Standard", EnumValue (SatLoraConf::SATELLITE));
+    if (address == m_gwAddress)
+    {
+        m_edReceiveDate = Simulator::Now();
+    }
+}
 
-  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::FirstWindowDelay", TimeValue (MilliSeconds (1500)));
-  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::SecondWindowDelay", TimeValue (Seconds (2)));
-  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::FirstWindowDuration", TimeValue (MilliSeconds (400)));
-  Config::SetDefault ("ns3::LorawanMacEndDeviceClassA::SecondWindowDuration", TimeValue (MilliSeconds (400)));
-  Config::SetDefault ("ns3::LoraNetworkScheduler::FirstWindowAnswerDelay", TimeValue (Seconds (1)));
-  Config::SetDefault ("ns3::LoraNetworkScheduler::SecondWindowAnswerDelay", TimeValue (Seconds (2)));
+void
+SatLoraCbrTestCase::DoRun(void)
+{
+    // Set simulation output details
+    Singleton<SatEnvVariables>::Get()->DoInitialize();
+    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-lora", "cbr", true);
 
-  // Superframe configuration
-  Config::SetDefault ("ns3::SatConf::SuperFrameConfForSeq0", EnumValue (SatSuperframeConf::SUPER_FRAME_CONFIG_4));
-  Config::SetDefault ("ns3::SatSuperframeConf4::FrameConfigType", EnumValue (SatSuperframeConf::CONFIG_TYPE_4));
-  Config::SetDefault ("ns3::SatSuperframeConf4::Frame0_AllocatedBandwidthHz", DoubleValue (15000));
-  Config::SetDefault ("ns3::SatSuperframeConf4::Frame0_CarrierAllocatedBandwidthHz", DoubleValue (15000));
+    // Enable Lora
+    Config::SetDefault("ns3::SatHelper::Standard", EnumValue(SatEnums::LORA));
+    Config::SetDefault("ns3::LorawanMacEndDevice::DataRate", UintegerValue(5));
+    Config::SetDefault("ns3::LorawanMacEndDevice::MType",
+                       EnumValue(LorawanMacHeader::CONFIRMED_DATA_UP));
+    Config::SetDefault("ns3::SatLorawanNetDevice::ForwardToUtUsers", BooleanValue(true));
+    Config::SetDefault("ns3::SatLoraConf::Standard", EnumValue(SatLoraConf::SATELLITE));
 
-  // CRDSA only
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided", BooleanValue (false));
-  Config::SetDefault ("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed", BooleanValue (false));
+    Config::SetDefault("ns3::LorawanMacEndDeviceClassA::FirstWindowDelay",
+                       TimeValue(MilliSeconds(1500)));
+    Config::SetDefault("ns3::LorawanMacEndDeviceClassA::SecondWindowDelay", TimeValue(Seconds(2)));
+    Config::SetDefault("ns3::LorawanMacEndDeviceClassA::FirstWindowDuration",
+                       TimeValue(MilliSeconds(400)));
+    Config::SetDefault("ns3::LorawanMacEndDeviceClassA::SecondWindowDuration",
+                       TimeValue(MilliSeconds(400)));
+    Config::SetDefault("ns3::LoraNetworkScheduler::FirstWindowAnswerDelay", TimeValue(Seconds(1)));
+    Config::SetDefault("ns3::LoraNetworkScheduler::SecondWindowAnswerDelay", TimeValue(Seconds(2)));
 
-  // Configure RA
-  Config::SetDefault ("ns3::SatBeamHelper::RandomAccessModel", EnumValue (SatEnums::RA_MODEL_ESSA));
-  Config::SetDefault ("ns3::SatBeamHelper::RaInterferenceEliminationModel", EnumValue (SatPhyRxCarrierConf::SIC_RESIDUAL));
-  Config::SetDefault ("ns3::SatBeamHelper::RaCollisionModel", EnumValue (SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
-  Config::SetDefault ("ns3::SatBeamHelper::ReturnLinkLinkResults", EnumValue (SatEnums::LR_LORA));
-  Config::SetDefault ("ns3::SatWaveformConf::DefaultWfId", UintegerValue (2));
-  Config::SetDefault ("ns3::SatHelper::RtnLinkWaveformConfFileName", StringValue("loraWaveforms.txt"));
+    // Superframe configuration
+    Config::SetDefault("ns3::SatConf::SuperFrameConfForSeq0",
+                       EnumValue(SatSuperframeConf::SUPER_FRAME_CONFIG_4));
+    Config::SetDefault("ns3::SatSuperframeConf4::FrameConfigType",
+                       EnumValue(SatSuperframeConf::CONFIG_TYPE_4));
+    Config::SetDefault("ns3::SatSuperframeConf4::Frame0_AllocatedBandwidthHz", DoubleValue(15000));
+    Config::SetDefault("ns3::SatSuperframeConf4::Frame0_CarrierAllocatedBandwidthHz",
+                       DoubleValue(15000));
 
-  // Configure E-SSA
-  Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::WindowDuration", StringValue ("600ms"));
-  Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::WindowStep", StringValue ("200ms"));
-  Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::WindowSICIterations", UintegerValue (5));
-  Config::SetDefault ("ns3::SatPhyRxCarrierPerWindow::EnableSIC", BooleanValue (false));
+    // CRDSA only
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::DaService0_ConstantAssignmentProvided",
+                       BooleanValue(false));
+    Config::SetDefault("ns3::SatLowerLayerServiceConf::DaService3_RbdcAllowed",
+                       BooleanValue(false));
 
-  Config::SetDefault ("ns3::CbrApplication::Interval", StringValue ("10s"));
-  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (24));
+    // Configure RA
+    Config::SetDefault("ns3::SatBeamHelper::RandomAccessModel", EnumValue(SatEnums::RA_MODEL_ESSA));
+    Config::SetDefault("ns3::SatBeamHelper::RaInterferenceEliminationModel",
+                       EnumValue(SatPhyRxCarrierConf::SIC_RESIDUAL));
+    Config::SetDefault("ns3::SatBeamHelper::RaCollisionModel",
+                       EnumValue(SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
+    Config::SetDefault("ns3::SatBeamHelper::ReturnLinkLinkResults", EnumValue(SatEnums::LR_LORA));
+    Config::SetDefault("ns3::SatWaveformConf::DefaultWfId", UintegerValue(2));
+    Config::SetDefault("ns3::SatHelper::RtnLinkWaveformConfFileName",
+                       StringValue("loraWaveforms.txt"));
 
-  Config::SetDefault ("ns3::SatMac::EnableStatisticsTags", BooleanValue (true));
-  // Creating the reference system.
-  Ptr<SatHelper> helper = CreateObject<SatHelper> ();
-  helper->CreatePredefinedScenario (SatHelper::SIMPLE);
+    // Configure E-SSA
+    Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::WindowDuration", StringValue("600ms"));
+    Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::WindowStep", StringValue("200ms"));
+    Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::WindowSICIterations", UintegerValue(5));
+    Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::EnableSIC", BooleanValue(false));
 
-  NodeContainer utUsers = helper->GetUtUsers ();
-  NodeContainer gwUsers = helper->GetGwUsers ();
-  InetSocketAddress gwUserAddr = InetSocketAddress (helper->GetUserAddress (gwUsers.Get (0)), 9);
+    Config::SetDefault("ns3::CbrApplication::Interval", StringValue("10s"));
+    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(24));
 
-  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", Address ());
-  CbrHelper cbrHelper ("ns3::UdpSocketFactory", Address ());
-  ApplicationContainer sinkContainer;
-  ApplicationContainer cbrContainer;
+    Config::SetDefault("ns3::SatMac::EnableStatisticsTags", BooleanValue(true));
+    // Creating the reference system.
+    Ptr<SatHelper> helper = CreateObject<SatHelper>();
+    helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
-  sinkHelper.SetAttribute ("Local", AddressValue (Address (gwUserAddr)));
-  sinkContainer.Add (sinkHelper.Install (gwUsers.Get (0)));
+    NodeContainer utUsers = helper->GetUtUsers();
+    NodeContainer gwUsers = helper->GetGwUsers();
+    InetSocketAddress gwUserAddr = InetSocketAddress(helper->GetUserAddress(gwUsers.Get(0)), 9);
 
-  cbrHelper.SetAttribute ("Remote", AddressValue (Address (gwUserAddr)));
+    PacketSinkHelper sinkHelper("ns3::UdpSocketFactory", Address());
+    CbrHelper cbrHelper("ns3::UdpSocketFactory", Address());
+    ApplicationContainer sinkContainer;
+    ApplicationContainer cbrContainer;
 
-  auto app = cbrHelper.Install (utUsers.Get (0)).Get (0);
-  app->SetStartTime (Seconds (1));
-  cbrContainer.Add (app);
+    sinkHelper.SetAttribute("Local", AddressValue(Address(gwUserAddr)));
+    sinkContainer.Add(sinkHelper.Install(gwUsers.Get(0)));
 
-  sinkContainer.Start (Seconds (1));
-  sinkContainer.Stop (Seconds (20));
+    cbrHelper.SetAttribute("Remote", AddressValue(Address(gwUserAddr)));
 
-  m_gwAddress = helper->GwNodes ().Get (0)->GetDevice (1)->GetAddress ();
-  m_edAddress = helper->UtNodes ().Get (0)->GetDevice (2)->GetAddress ();
+    auto app = cbrHelper.Install(utUsers.Get(0)).Get(0);
+    app->SetStartTime(Seconds(1));
+    cbrContainer.Add(app);
 
-  Ptr<PacketSink> receiver = DynamicCast<PacketSink> (sinkContainer.Get (0));
+    sinkContainer.Start(Seconds(1));
+    sinkContainer.Stop(Seconds(20));
 
-  Config::Connect ("/NodeList/*/DeviceList/*/SatMac/Rx", MakeCallback (&SatLoraCbrTestCase::MacTraceCb, this));
+    m_gwAddress = helper->GwNodes().Get(0)->GetDevice(1)->GetAddress();
+    m_edAddress = helper->UtNodes().Get(0)->GetDevice(2)->GetAddress();
 
-  Simulator::Stop (Seconds (20));
-  Simulator::Run ();
+    Ptr<PacketSink> receiver = DynamicCast<PacketSink>(sinkContainer.Get(0));
 
-  Simulator::Destroy ();
+    Config::Connect("/NodeList/*/DeviceList/*/SatMac/Rx",
+                    MakeCallback(&SatLoraCbrTestCase::MacTraceCb, this));
 
-  Singleton<SatEnvVariables>::Get ()->DoDispose ();
+    Simulator::Stop(Seconds(20));
+    Simulator::Run();
 
-  NS_TEST_ASSERT_MSG_NE (m_gwReceiveDate, Seconds (0), "Packet should be received by Gateway.");
-  NS_TEST_ASSERT_MSG_NE (m_edReceiveDate, Seconds (0), "Ack should be received by End Device.");
-  NS_TEST_ASSERT_MSG_GT (m_edReceiveDate, m_gwReceiveDate, "Ack should be received after packet.");
+    Simulator::Destroy();
 
-  Time difference = m_edReceiveDate - m_gwReceiveDate;
-  Time delay = MilliSeconds (130);
+    Singleton<SatEnvVariables>::Get()->DoDispose();
 
-  NS_TEST_ASSERT_MSG_GT (difference, Seconds (1) + delay, "Ack arrived too early.");
-  NS_TEST_ASSERT_MSG_LT (difference + delay, MilliSeconds (1900) + delay, "Ack arrived too late. First window should be closed.");
+    NS_TEST_ASSERT_MSG_NE(m_gwReceiveDate, Seconds(0), "Packet should be received by Gateway.");
+    NS_TEST_ASSERT_MSG_NE(m_edReceiveDate, Seconds(0), "Ack should be received by End Device.");
+    NS_TEST_ASSERT_MSG_GT(m_edReceiveDate, m_gwReceiveDate, "Ack should be received after packet.");
 
-  NS_TEST_ASSERT_MSG_EQ (receiver->GetTotalRx (), 24, "Sink should receive one packet of 24 bytes");
+    Time difference = m_edReceiveDate - m_gwReceiveDate;
+    Time delay = MilliSeconds(130);
+
+    NS_TEST_ASSERT_MSG_GT(difference, Seconds(1) + delay, "Ack arrived too early.");
+    NS_TEST_ASSERT_MSG_LT(difference + delay,
+                          MilliSeconds(1900) + delay,
+                          "Ack arrived too late. First window should be closed.");
+
+    NS_TEST_ASSERT_MSG_EQ(receiver->GetTotalRx(), 24, "Sink should receive one packet of 24 bytes");
 }
 
 /**
@@ -774,20 +873,19 @@ SatLoraCbrTestCase::DoRun (void)
  */
 class SatLoraTestSuite : public TestSuite
 {
-public:
-  SatLoraTestSuite ();
+  public:
+    SatLoraTestSuite();
 };
 
-SatLoraTestSuite::SatLoraTestSuite ()
-  : TestSuite ("sat-lora-test", UNIT)
+SatLoraTestSuite::SatLoraTestSuite()
+    : TestSuite("sat-lora-test", UNIT)
 {
-  AddTestCase (new SatLoraFirstWindowTestCase, TestCase::QUICK);
-  AddTestCase (new SatLoraSecondWindowTestCase, TestCase::QUICK);
-  AddTestCase (new SatLoraOutOfWindowWindowTestCase, TestCase::QUICK);
-  AddTestCase (new SatLoraOutOfWindowWindowNoRetransmissionTestCase, TestCase::QUICK);
-  AddTestCase (new SatLoraCbrTestCase, TestCase::QUICK);
+    AddTestCase(new SatLoraFirstWindowTestCase, TestCase::QUICK);
+    AddTestCase(new SatLoraSecondWindowTestCase, TestCase::QUICK);
+    AddTestCase(new SatLoraOutOfWindowWindowTestCase, TestCase::QUICK);
+    AddTestCase(new SatLoraOutOfWindowWindowNoRetransmissionTestCase, TestCase::QUICK);
+    AddTestCase(new SatLoraCbrTestCase, TestCase::QUICK);
 }
 
 // Do allocate an instance of this TestSuite
 static SatLoraTestSuite satLoraTestSuite;
-

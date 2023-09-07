@@ -27,8 +27,8 @@
 
 #include <ns3/vector.h>
 
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -46,7 +46,7 @@ namespace ns3 {
  * @param v2 The second vector.
  * @return a vector that is the sum of v1 and v2.
  */
-Vector3D operator+ (const Vector3D &v1, const Vector3D &v2);
+Vector3D operator+(const Vector3D& v1, const Vector3D& v2);
 
 /**
  * @brief Subtraction of Vector3D objects.
@@ -54,7 +54,7 @@ Vector3D operator+ (const Vector3D &v1, const Vector3D &v2);
  * @param v2 The second vector.
  * @return a vector that is the difference between v1 and v2.
  */
-Vector3D operator- (const Vector3D &v1, const Vector3D &v2);
+Vector3D operator-(const Vector3D& v1, const Vector3D& v2);
 
 /**
  * @brief Multiplication between a Vector3D object and a scalar.
@@ -62,7 +62,7 @@ Vector3D operator- (const Vector3D &v1, const Vector3D &v2);
  * @param scalar The scalar.
  * @return a vector that is the product of the vector by the scalar.
  */
-Vector3D operator* (const Vector3D &vector, double scalar);
+Vector3D operator*(const Vector3D& vector, double scalar);
 
 /**
  * @brief Multiplication between a scalar and a Vector3D object.
@@ -70,7 +70,7 @@ Vector3D operator* (const Vector3D &vector, double scalar);
  * @param vector The vector.
  * @return a vector that is the product of the vector by the scalar.
  */
-Vector3D operator* (double scalar, const Vector3D &vector);
+Vector3D operator*(double scalar, const Vector3D& vector);
 
 /**
  * @brief Cross product of two Vector3D objects.
@@ -78,7 +78,7 @@ Vector3D operator* (double scalar, const Vector3D &vector);
  * @param v2 The second vector.
  * @returns a vector that is the cross product of the two vectors.
  */
-Vector3D CrossProduct (const Vector3D &v1, const Vector3D &v2);
+Vector3D CrossProduct(const Vector3D& v1, const Vector3D& v2);
 
 /**
  * @brief Dot product of two Vector3D objects.
@@ -86,22 +86,22 @@ Vector3D CrossProduct (const Vector3D &v1, const Vector3D &v2);
  * @param v2 The second vector.
  * @returns a scalar that is the dot product of the two vectors.
  */
-double DotProduct (const Vector3D &v1, const Vector3D &v2);
+double DotProduct(const Vector3D& v1, const Vector3D& v2);
 
 /**
  * @brief Magnitude of a Vector3D object.
  * @param vector The vector.
  * @returns a scalar that is the magnitude of the vector.
  */
-double Magnitude (const Vector3D &vector);
+double Magnitude(const Vector3D& vector);
 
 /**
  * @brief The square of the magnitude of a Vector3D object.
  * @param vector The vector.
  * @returns a scalar that is the square of the magnitude of the vector.
  */
-double MagnitudeSquared (const Vector3D &vector);
+double MagnitudeSquared(const Vector3D& vector);
 
-}
+} // namespace ns3
 
 #endif /* SATELLITE_VECTOR_EXTENSIONS_H */

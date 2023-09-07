@@ -22,16 +22,16 @@
 #ifndef SATELLITE_STATS_COMPOSITE_SINR_HELPER_H
 #define SATELLITE_STATS_COMPOSITE_SINR_HELPER_H
 
-#include <ns3/satellite-stats-helper.h>
-#include <ns3/ptr.h>
 #include <ns3/address.h>
 #include <ns3/collector-map.h>
+#include <ns3/ptr.h>
+#include <ns3/satellite-stats-helper.h>
+
 #include <list>
 #include <map>
 
-
-namespace ns3 {
-
+namespace ns3
+{
 
 // BASE CLASS /////////////////////////////////////////////////////////////////
 
@@ -41,49 +41,47 @@ class DataCollectionObject;
 
 /**
  * \ingroup satstats
- * \brief Abstract class inherited by SatStatsFwdCompositeSinrHelper and SatStatsRtnCompositeSinrHelper.
+ * \brief Abstract class inherited by SatStatsFwdCompositeSinrHelper and
+ * SatStatsRtnCompositeSinrHelper.
  */
 class SatStatsCompositeSinrHelper : public SatStatsHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsCompositeSinrHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsCompositeSinrHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsCompositeSinrHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsCompositeSinrHelper ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
+    /**
+     * \brief Set up several probes or other means of listeners and connect them
+     *        to the collectors.
+     */
+    void InstallProbes();
 
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
+  protected:
+    // inherited from SatStatsHelper base class
+    void DoInstall();
 
-  /**
-   * \brief Set up several probes or other means of listeners and connect them
-   *        to the collectors.
-   */
-  void InstallProbes ();
+    /**
+     * \brief
+     */
+    virtual void DoInstallProbes() = 0;
 
-protected:
-  // inherited from SatStatsHelper base class
-  void DoInstall ();
+    /// Maintains a list of collectors created by this helper.
+    CollectorMap m_terminalCollectors;
 
-  /**
-   * \brief
-   */
-  virtual void DoInstallProbes () = 0;
-
-  /// Maintains a list of collectors created by this helper.
-  CollectorMap m_terminalCollectors;
-
-  /// The aggregator created by this helper.
-  Ptr<DataCollectionObject> m_aggregator;
+    /// The aggregator created by this helper.
+    Ptr<DataCollectionObject> m_aggregator;
 
 }; // end of class SatStatsCompositeSinrHelper
-
 
 // FORWARD LINK ///////////////////////////////////////////////////////////////
 
@@ -108,32 +106,29 @@ class Probe;
  */
 class SatStatsFwdCompositeSinrHelper : public SatStatsCompositeSinrHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsFwdCompositeSinrHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsFwdCompositeSinrHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsFwdCompositeSinrHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsFwdCompositeSinrHelper ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
+  protected:
+    // inherited from SatStatsCompositeSinrHelper base class
+    void DoInstallProbes();
 
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
-
-protected:
-  // inherited from SatStatsCompositeSinrHelper base class
-  void DoInstallProbes ();
-
-private:
-  /// Maintains a list of probes created by this helper.
-  std::list<Ptr<Probe> > m_probes;
+  private:
+    /// Maintains a list of probes created by this helper.
+    std::list<Ptr<Probe>> m_probes;
 
 }; // end of class SatStatsFwdCompositeSinrHelper
-
 
 // RETURN LINK ////////////////////////////////////////////////////////////////
 
@@ -156,54 +151,50 @@ private:
  */
 class SatStatsRtnCompositeSinrHelper : public SatStatsCompositeSinrHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsRtnCompositeSinrHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsRtnCompositeSinrHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsRtnCompositeSinrHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsRtnCompositeSinrHelper ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
+    /**
+     * \brief Receive inputs from trace sources and determine the right collector
+     *        to forward the inputs to.
+     * \param sinrDb SINR value in dB.
+     * \param from the address of the sender of the packet.
+     */
+    void SinrCallback(double sinrDb, const Address& from);
 
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
+  protected:
+    // inherited from SatStatsCompositeSinrHelper base class
+    void DoInstallProbes();
 
-  /**
-   * \brief Receive inputs from trace sources and determine the right collector
-   *        to forward the inputs to.
-   * \param sinrDb SINR value in dB.
-   * \param from the address of the sender of the packet.
-   */
-  void SinrCallback (double sinrDb, const Address &from);
+  private:
+    /**
+     * \brief Save the address and the proper identifier from the given UT node.
+     * \param utNode a UT node.
+     *
+     * The address of the given node will be saved in the #m_identifierMap
+     * member variable.
+     *
+     * Used in return link statistics. DoInstallProbes() is expected to pass the
+     * the UT node of interest into this method.
+     */
+    void SaveAddressAndIdentifier(Ptr<Node> utNode);
 
-protected:
-  // inherited from SatStatsCompositeSinrHelper base class
-  void DoInstallProbes ();
-
-private:
-  /**
-   * \brief Save the address and the proper identifier from the given UT node.
-   * \param utNode a UT node.
-   *
-   * The address of the given node will be saved in the #m_identifierMap
-   * member variable.
-   *
-   * Used in return link statistics. DoInstallProbes() is expected to pass the
-   * the UT node of interest into this method.
-   */
-  void SaveAddressAndIdentifier (Ptr<Node> utNode);
-
-  /// Map of address and the identifier associated with it (for return link).
-  std::map<const Address, uint32_t> m_identifierMap;
+    /// Map of address and the identifier associated with it (for return link).
+    std::map<const Address, uint32_t> m_identifierMap;
 
 }; // end of class SatStatsRtnCompositeSinrHelper
 
-
 } // end of namespace ns3
-
 
 #endif /* SATELLITE_STATS_COMPOSITE_SINR_HELPER_H */

@@ -21,17 +21,16 @@
 #ifndef SATELLITE_RETURN_LINK_ENCAPSULATOR
 #define SATELLITE_RETURN_LINK_ENCAPSULATOR
 
-
-#include <map>
+#include "satellite-base-encapsulator.h"
+#include "satellite-control-message.h"
 
 #include <ns3/event-id.h>
 #include <ns3/mac48-address.h>
 
-#include "satellite-base-encapsulator.h"
-#include "satellite-control-message.h"
+#include <map>
 
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -48,156 +47,159 @@ namespace ns3 {
  */
 class SatReturnLinkEncapsulator : public SatBaseEncapsulator
 {
-public:
-  /**
-   * Default constructor, not used
-   */
-  SatReturnLinkEncapsulator ();
+  public:
+    /**
+     * Default constructor, not used
+     */
+    SatReturnLinkEncapsulator();
 
-  /**
-   * Constructor
-   * \param encapAddress MAC addressd of encapsulator
-   * \param decapAddress MAC addressd of decapsulator
-   * \param sourceE2EAddress E2E source MAC addressd of packets (used to set SatAddressE2ETag)
-   * \param destE2EAddress E2E destination MAC addressd of packets (used to set SatAddressE2ETag)
-   * \param rcIndex RC index
-   * \param additionalHeaderSize Additional value in to take into account when pulling packets to represent E2E tags
-   */
-  SatReturnLinkEncapsulator (Mac48Address encapAddress,
-                             Mac48Address decapAddress,
-                             Mac48Address sourceE2EAddress,
-                             Mac48Address destE2EAddress,
-                             uint8_t rcIndex,
+    /**
+     * Constructor
+     * \param encapAddress MAC addressd of encapsulator
+     * \param decapAddress MAC addressd of decapsulator
+     * \param sourceE2EAddress E2E source MAC addressd of packets (used to set SatAddressE2ETag)
+     * \param destE2EAddress E2E destination MAC addressd of packets (used to set SatAddressE2ETag)
+     * \param rcIndex RC index
+     * \param additionalHeaderSize Additional value in to take into account when pulling packets to
+     * represent E2E tags
+     */
+    SatReturnLinkEncapsulator(Mac48Address encapAddress,
+                              Mac48Address decapAddress,
+                              Mac48Address sourceE2EAddress,
+                              Mac48Address destE2EAddress,
+                              uint8_t rcIndex,
+                              uint32_t additionalHeaderSize = 0);
+
+    /**
+     * Destructor for SatReturnLinkEncapsulator
+     */
+    virtual ~SatReturnLinkEncapsulator();
+
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
+
+    /**
+     * Dispose of this class instance
+     */
+    virtual void DoDispose();
+
+    /**
+     * Enqueue a Higher Layer packet to txBuffer.
+     * \param p To be buffered packet
+     * \param dest Target MAC address
+     */
+    virtual void EnquePdu(Ptr<Packet> p, Mac48Address dest);
+
+    /**
+     * Notify a Tx opportunity to this encapsulator.
+     * \param bytes Notified tx opportunity bytes from lower layer
+     * \param bytesLeft Bytes left after this TxOpportunity in txBuffer
+     * \param &nextMinTxO Minimum TxO after this TxO
+     * \return Ptr<Packet> a Frame PDU
+     */
+    virtual Ptr<Packet> NotifyTxOpportunity(uint32_t bytes,
+                                            uint32_t& bytesLeft,
+                                            uint32_t& nextMinTxO);
+
+    /**
+     * Receive a packet, thus decapsulate and defragment/deconcatenate
+     * if needed. The decapsulated/defragmented HL PDU is forwarded back to
+     * LLC and to upper layer.
+     * \param p packet pointer received from lower layer
+     */
+    virtual void ReceivePdu(Ptr<Packet> p);
+
+    /**
+     * Receive a control msg (ARQ ACK)
+     * \param ack ACK control message pointer received from lower layer
+     */
+    virtual void ReceiveAck(Ptr<SatArqAckMessage> ack);
+
+    /**
+     * Get minimum Tx opportunity in bytes, which takes the
+     * assumed header sizes into account.
+     * \return Minimum Tx opportunity
+     */
+    virtual uint32_t GetMinTxOpportunityInBytes() const;
+
+  protected:
+    /**
+     * Get new packet performs the RLE fragmentation and encapsulation
+     * for a one single packet. Returns NULL packet if a suitable packet
+     * is not created.
+     * \return A RLE packet
+     */
+    Ptr<Packet> GetNewRlePdu(uint32_t txOpportunityBytes,
+                             uint32_t maxRlePduSize,
                              uint32_t additionalHeaderSize = 0);
 
-  /**
-   * Destructor for SatReturnLinkEncapsulator
-   */
-  virtual ~SatReturnLinkEncapsulator ();
+    /**
+     * Process the reception of individual RLE PDUs
+     * \param p Packet to be received
+     */
+    virtual void ProcessPdu(Ptr<Packet> p);
 
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
+    /**
+     * Method increases the fragment id by one. If the maximum fragment id is
+     * reached, it is reset to zero.
+     */
+    void IncreaseFragmentId();
 
-  /**
-   * Dispose of this class instance
-   */
-  virtual void DoDispose ();
+    /**
+     * Reset defragmentation variables
+     */
+    void Reset();
 
-  /**
-   * Enqueue a Higher Layer packet to txBuffer.
-   * \param p To be buffered packet
-   * \param dest Target MAC address
-   */
-  virtual void EnquePdu (Ptr<Packet> p, Mac48Address dest);
+    /**
+     * Fragment id used in the packet transmissions
+     */
+    uint32_t m_txFragmentId;
+    /**
+     * Current fragment id in the reassembly process
+     */
+    uint32_t m_currRxFragmentId;
 
-  /**
-   * Notify a Tx opportunity to this encapsulator.
-   * \param bytes Notified tx opportunity bytes from lower layer
-   * \param bytesLeft Bytes left after this TxOpportunity in txBuffer
-   * \param &nextMinTxO Minimum TxO after this TxO
-   * \return Ptr<Packet> a Frame PDU
-   */
-  virtual Ptr<Packet> NotifyTxOpportunity (uint32_t bytes, uint32_t &bytesLeft, uint32_t &nextMinTxO);
+    /**
+     * Current packet in the reassembly process
+     */
+    Ptr<Packet> m_currRxPacketFragment;
 
-  /**
-   * Receive a packet, thus decapsulate and defragment/deconcatenate
-   * if needed. The decapsulated/defragmented HL PDU is forwarded back to
-   * LLC and to upper layer.
-   * \param p packet pointer received from lower layer
-   */
-  virtual void ReceivePdu (Ptr<Packet> p);
+    /**
+     * The total size of the ALPDU size reassembly process
+     */
+    uint32_t m_currRxPacketSize;
 
-  /**
-   * Receive a control msg (ARQ ACK)
-   * \param ack ACK control message pointer received from lower layer
-   */
-  virtual void ReceiveAck (Ptr<SatArqAckMessage> ack);
+    /**
+     * Currently received bytes of the fragmented packet
+     */
+    uint32_t m_currRxPacketFragmentBytes;
 
-  /**
-   * Get minimum Tx opportunity in bytes, which takes the
-   * assumed header sizes into account.
-   * \return Minimum Tx opportunity
-   */
-  virtual uint32_t GetMinTxOpportunityInBytes () const;
+    /**
+     * Minimum Tx opportunity
+     */
+    uint32_t m_minTxOpportunity;
 
-protected:
-  /**
-   * Get new packet performs the RLE fragmentation and encapsulation
-   * for a one single packet. Returns NULL packet if a suitable packet
-   * is not created.
-   * \return A RLE packet
-   */
-  Ptr<Packet> GetNewRlePdu (uint32_t txOpportunityBytes, uint32_t maxRlePduSize, uint32_t additionalHeaderSize = 0);
+    /**
+     * The fragment is described with 3 bits, thus the
+     * maximum fragment id is 8.
+     */
+    const uint32_t MAX_FRAGMENT_ID;
 
-  /**
-   * Process the reception of individual RLE PDUs
-   * \param p Packet to be received
-   */
-  virtual void ProcessPdu (Ptr<Packet> p);
+    /**
+     * The maximum PPDU fragment size is described with 11 bits,
+     * thus, the maximum fragment size is 2048 bytes.
+     */
+    const uint32_t MAX_PPDU_PACKET_SIZE;
 
-  /**
-   * Method increases the fragment id by one. If the maximum fragment id is
-   * reached, it is reset to zero.
-   */
-  void IncreaseFragmentId ();
-
-  /**
-   * Reset defragmentation variables
-   */
-  void Reset ();
-
-  /**
-   * Fragment id used in the packet transmissions
-   */
-  uint32_t m_txFragmentId;
-  /**
-   * Current fragment id in the reassembly process
-   */
-  uint32_t m_currRxFragmentId;
-
-  /**
-   * Current packet in the reassembly process
-   */
-  Ptr<Packet> m_currRxPacketFragment;
-
-  /**
-   * The total size of the ALPDU size reassembly process
-   */
-  uint32_t m_currRxPacketSize;
-
-  /**
-   * Currently received bytes of the fragmented packet
-   */
-  uint32_t m_currRxPacketFragmentBytes;
-
-  /**
-   * Minimum Tx opportunity
-   */
-  uint32_t m_minTxOpportunity;
-
-  /**
-   * The fragment is described with 3 bits, thus the
-   * maximum fragment id is 8.
-   */
-  const uint32_t MAX_FRAGMENT_ID;
-
-  /**
-   * The maximum PPDU fragment size is described with 11 bits,
-   * thus, the maximum fragment size is 2048 bytes.
-   */
-  const uint32_t MAX_PPDU_PACKET_SIZE;
-
-  /**
-   * The maximum packet size is described with 12 bits,
-   * thus, the maximum HL packet size is 4096 bytes.
-   */
-  const uint32_t MAX_HL_PDU_PACKET_SIZE;
-
+    /**
+     * The maximum packet size is described with 12 bits,
+     * thus, the maximum HL packet size is 4096 bytes.
+     */
+    const uint32_t MAX_HL_PDU_PACKET_SIZE;
 };
-
 
 } // namespace ns3
 

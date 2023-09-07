@@ -18,283 +18,306 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
+#include "satellite-simple-net-device.h"
+
 #include <ns3/log.h>
 #include <ns3/node.h>
 #include <ns3/pointer.h>
 #include <ns3/uinteger.h>
 
-#include "satellite-simple-net-device.h"
+NS_LOG_COMPONENT_DEFINE("SatSimpleNetDevice");
 
+namespace ns3
+{
 
-NS_LOG_COMPONENT_DEFINE ("SatSimpleNetDevice");
-
-namespace ns3 {
-
-NS_OBJECT_ENSURE_REGISTERED (SatSimpleNetDevice);
+NS_OBJECT_ENSURE_REGISTERED(SatSimpleNetDevice);
 
 TypeId
-SatSimpleNetDevice::GetTypeId (void)
+SatSimpleNetDevice::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatSimpleNetDevice")
-    .SetParent<NetDevice> ()
-    .AddConstructor<SatSimpleNetDevice> ()
-    .AddAttribute ("Mtu",
-                   "The MAC-level Maximum Transmission Unit",
-                   UintegerValue (0xffff),  // 65535 bytes.
-                   MakeUintegerAccessor (&SatSimpleNetDevice::SetMtu,
-                                         &SatSimpleNetDevice::GetMtu),
-                   MakeUintegerChecker<uint16_t> ())
-    .AddAttribute ("ReceiveErrorModel",
-                   "The receiver error model used to simulate packet loss",
-                   PointerValue (),
-                   MakePointerAccessor (&SatSimpleNetDevice::m_receiveErrorModel),
-                   MakePointerChecker<ErrorModel> ())
-    .AddTraceSource ("PhyRxDrop",
-                     "Trace source indicating a packet has been dropped by the device during reception",
-                     MakeTraceSourceAccessor (&SatSimpleNetDevice::m_phyRxDropTrace),
-                     "ns3::Packet::TracedCallback")
-  ;
-  return tid;
+    static TypeId tid =
+        TypeId("ns3::SatSimpleNetDevice")
+            .SetParent<NetDevice>()
+            .AddConstructor<SatSimpleNetDevice>()
+            .AddAttribute(
+                "Mtu",
+                "The MAC-level Maximum Transmission Unit",
+                UintegerValue(0xffff), // 65535 bytes.
+                MakeUintegerAccessor(&SatSimpleNetDevice::SetMtu, &SatSimpleNetDevice::GetMtu),
+                MakeUintegerChecker<uint16_t>())
+            .AddAttribute("ReceiveErrorModel",
+                          "The receiver error model used to simulate packet loss",
+                          PointerValue(),
+                          MakePointerAccessor(&SatSimpleNetDevice::m_receiveErrorModel),
+                          MakePointerChecker<ErrorModel>())
+            .AddTraceSource(
+                "PhyRxDrop",
+                "Trace source indicating a packet has been dropped by the device during reception",
+                MakeTraceSourceAccessor(&SatSimpleNetDevice::m_phyRxDropTrace),
+                "ns3::Packet::TracedCallback");
+    return tid;
 }
 
-SatSimpleNetDevice::SatSimpleNetDevice ()
-  : m_channel (0),
-  m_node (0),
-  m_mtu (0xffff),
-  m_ifIndex (0)
+SatSimpleNetDevice::SatSimpleNetDevice()
+    : m_channel(0),
+      m_node(0),
+      m_mtu(0xffff),
+      m_ifIndex(0)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-SatSimpleNetDevice::~SatSimpleNetDevice ()
+SatSimpleNetDevice::~SatSimpleNetDevice()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
 void
-SatSimpleNetDevice::Receive (Ptr<Packet> packet, uint16_t protocol, Mac48Address to, Mac48Address from)
+SatSimpleNetDevice::Receive(Ptr<Packet> packet,
+                            uint16_t protocol,
+                            Mac48Address to,
+                            Mac48Address from)
 {
-  NS_LOG_FUNCTION (this << packet << protocol << to << from);
-  NetDevice::PacketType packetType;
+    NS_LOG_FUNCTION(this << packet << protocol << to << from);
+    NetDevice::PacketType packetType;
 
-  if (m_receiveErrorModel && m_receiveErrorModel->IsCorrupt (packet) )
+    if (m_receiveErrorModel && m_receiveErrorModel->IsCorrupt(packet))
     {
-      m_phyRxDropTrace (packet);
+        m_phyRxDropTrace(packet);
     }
-  else
+    else
     {
-      if (to == m_address)
+        if (to == m_address)
         {
-          packetType = NetDevice::PACKET_HOST;
+            packetType = NetDevice::PACKET_HOST;
         }
-      else if (to.IsBroadcast ())
+        else if (to.IsBroadcast())
         {
-          packetType = NetDevice::PACKET_HOST;
+            packetType = NetDevice::PACKET_HOST;
         }
-      else if (to.IsGroup ())
+        else if (to.IsGroup())
         {
-          packetType = NetDevice::PACKET_MULTICAST;
+            packetType = NetDevice::PACKET_MULTICAST;
         }
-      else
+        else
         {
-          packetType = NetDevice::PACKET_OTHERHOST;
+            packetType = NetDevice::PACKET_OTHERHOST;
         }
 
-      if (packetType != NetDevice::PACKET_OTHERHOST)
+        if (packetType != NetDevice::PACKET_OTHERHOST)
         {
-          m_rxCallback (this, packet, protocol, from);
+            m_rxCallback(this, packet, protocol, from);
 
-          if (!m_promiscCallback.IsNull ())
+            if (!m_promiscCallback.IsNull())
             {
-              m_promiscCallback (this, packet, protocol, from, to, packetType);
+                m_promiscCallback(this, packet, protocol, from, to, packetType);
             }
         }
     }
 }
 
 void
-SatSimpleNetDevice::SetChannel (Ptr<SatSimpleChannel> channel)
+SatSimpleNetDevice::SetChannel(Ptr<SatSimpleChannel> channel)
 {
-  NS_LOG_FUNCTION (this << channel);
-  m_channel = channel;
-  m_channel->Add (this);
+    NS_LOG_FUNCTION(this << channel);
+    m_channel = channel;
+    m_channel->Add(this);
 }
 
 void
-SatSimpleNetDevice::SetReceiveErrorModel (Ptr<ErrorModel> em)
+SatSimpleNetDevice::SetReceiveErrorModel(Ptr<ErrorModel> em)
 {
-  NS_LOG_FUNCTION (this << em);
-  m_receiveErrorModel = em;
+    NS_LOG_FUNCTION(this << em);
+    m_receiveErrorModel = em;
 }
 
 void
-SatSimpleNetDevice::SetIfIndex (const uint32_t index)
+SatSimpleNetDevice::SetIfIndex(const uint32_t index)
 {
-  NS_LOG_FUNCTION (this << index);
-  m_ifIndex = index;
+    NS_LOG_FUNCTION(this << index);
+    m_ifIndex = index;
 }
+
 uint32_t
-SatSimpleNetDevice::GetIfIndex (void) const
+SatSimpleNetDevice::GetIfIndex(void) const
 {
-  NS_LOG_FUNCTION (this);
-  return m_ifIndex;
+    NS_LOG_FUNCTION(this);
+    return m_ifIndex;
 }
+
 Ptr<Channel>
-SatSimpleNetDevice::GetChannel (void) const
+SatSimpleNetDevice::GetChannel(void) const
 {
-  NS_LOG_FUNCTION (this);
-  return m_channel;
+    NS_LOG_FUNCTION(this);
+    return m_channel;
 }
+
 void
-SatSimpleNetDevice::SetAddress (Address address)
+SatSimpleNetDevice::SetAddress(Address address)
 {
-  NS_LOG_FUNCTION (this << address);
-  m_address = Mac48Address::ConvertFrom (address);
+    NS_LOG_FUNCTION(this << address);
+    m_address = Mac48Address::ConvertFrom(address);
 }
+
 Address
-SatSimpleNetDevice::GetAddress (void) const
+SatSimpleNetDevice::GetAddress(void) const
 {
-  //
-  // Implicit conversion from Mac48Address to Address
-  //
-  NS_LOG_FUNCTION (this);
-  return m_address;
+    //
+    // Implicit conversion from Mac48Address to Address
+    //
+    NS_LOG_FUNCTION(this);
+    return m_address;
 }
+
 bool
-SatSimpleNetDevice::SetMtu (const uint16_t mtu)
+SatSimpleNetDevice::SetMtu(const uint16_t mtu)
 {
-  NS_LOG_FUNCTION (this << mtu);
-  m_mtu = mtu;
-  return true;
+    NS_LOG_FUNCTION(this << mtu);
+    m_mtu = mtu;
+    return true;
 }
+
 uint16_t
-SatSimpleNetDevice::GetMtu (void) const
+SatSimpleNetDevice::GetMtu(void) const
 {
-  NS_LOG_FUNCTION (this);
-  return m_mtu;
+    NS_LOG_FUNCTION(this);
+    return m_mtu;
 }
+
 bool
-SatSimpleNetDevice::IsLinkUp (void) const
+SatSimpleNetDevice::IsLinkUp(void) const
 {
-  NS_LOG_FUNCTION (this);
-  return true;
+    NS_LOG_FUNCTION(this);
+    return true;
 }
+
 void
-SatSimpleNetDevice::AddLinkChangeCallback (Callback<void> callback)
+SatSimpleNetDevice::AddLinkChangeCallback(Callback<void> callback)
 {
-  NS_LOG_FUNCTION (this << &callback);
+    NS_LOG_FUNCTION(this << &callback);
 }
+
 bool
-SatSimpleNetDevice::IsBroadcast (void) const
+SatSimpleNetDevice::IsBroadcast(void) const
 {
-  NS_LOG_FUNCTION (this);
-  return true;
+    NS_LOG_FUNCTION(this);
+    return true;
 }
+
 Address
-SatSimpleNetDevice::GetBroadcast (void) const
+SatSimpleNetDevice::GetBroadcast(void) const
 {
-  NS_LOG_FUNCTION (this);
-  return Mac48Address ("ff:ff:ff:ff:ff:ff");
+    NS_LOG_FUNCTION(this);
+    return Mac48Address("ff:ff:ff:ff:ff:ff");
 }
+
 bool
-SatSimpleNetDevice::IsMulticast (void) const
+SatSimpleNetDevice::IsMulticast(void) const
 {
-  NS_LOG_FUNCTION (this);
-  return true;
+    NS_LOG_FUNCTION(this);
+    return true;
 }
+
 Address
-SatSimpleNetDevice::GetMulticast (Ipv4Address multicastGroup) const
+SatSimpleNetDevice::GetMulticast(Ipv4Address multicastGroup) const
 {
-  NS_LOG_FUNCTION (this << multicastGroup);
-  return Mac48Address::GetMulticast (multicastGroup);
+    NS_LOG_FUNCTION(this << multicastGroup);
+    return Mac48Address::GetMulticast(multicastGroup);
 }
 
-Address SatSimpleNetDevice::GetMulticast (Ipv6Address addr) const
+Address
+SatSimpleNetDevice::GetMulticast(Ipv6Address addr) const
 {
-  NS_LOG_FUNCTION (this << addr);
-  return Mac48Address::GetMulticast (addr);
-}
-
-bool
-SatSimpleNetDevice::IsPointToPoint (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return false;
+    NS_LOG_FUNCTION(this << addr);
+    return Mac48Address::GetMulticast(addr);
 }
 
 bool
-SatSimpleNetDevice::IsBridge (void) const
+SatSimpleNetDevice::IsPointToPoint(void) const
 {
-  NS_LOG_FUNCTION (this);
-  return false;
+    NS_LOG_FUNCTION(this);
+    return false;
 }
 
 bool
-SatSimpleNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
+SatSimpleNetDevice::IsBridge(void) const
 {
-  NS_LOG_FUNCTION (this << packet << dest << protocolNumber);
-  Mac48Address to = Mac48Address::ConvertFrom (dest);
-  m_channel->Send (packet, protocolNumber, to, m_address, this);
-  return true;
+    NS_LOG_FUNCTION(this);
+    return false;
 }
+
 bool
-SatSimpleNetDevice::SendFrom (Ptr<Packet> packet, const Address& source, const Address& dest, uint16_t protocolNumber)
+SatSimpleNetDevice::Send(Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
 {
-  NS_LOG_FUNCTION (this << packet << source << dest << protocolNumber);
-  Mac48Address to = Mac48Address::ConvertFrom (dest);
-  Mac48Address from = Mac48Address::ConvertFrom (source);
-  m_channel->Send (packet, protocolNumber, to, from, this);
-  return true;
+    NS_LOG_FUNCTION(this << packet << dest << protocolNumber);
+    Mac48Address to = Mac48Address::ConvertFrom(dest);
+    m_channel->Send(packet, protocolNumber, to, m_address, this);
+    return true;
+}
+
+bool
+SatSimpleNetDevice::SendFrom(Ptr<Packet> packet,
+                             const Address& source,
+                             const Address& dest,
+                             uint16_t protocolNumber)
+{
+    NS_LOG_FUNCTION(this << packet << source << dest << protocolNumber);
+    Mac48Address to = Mac48Address::ConvertFrom(dest);
+    Mac48Address from = Mac48Address::ConvertFrom(source);
+    m_channel->Send(packet, protocolNumber, to, from, this);
+    return true;
 }
 
 Ptr<Node>
-SatSimpleNetDevice::GetNode (void) const
+SatSimpleNetDevice::GetNode(void) const
 {
-  NS_LOG_FUNCTION (this);
-  return m_node;
-}
-void
-SatSimpleNetDevice::SetNode (Ptr<Node> node)
-{
-  NS_LOG_FUNCTION (this << node);
-  m_node = node;
-}
-bool
-SatSimpleNetDevice::NeedsArp (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return true;
-}
-void
-SatSimpleNetDevice::SetReceiveCallback (NetDevice::ReceiveCallback cb)
-{
-  NS_LOG_FUNCTION (this << &cb);
-  m_rxCallback = cb;
+    NS_LOG_FUNCTION(this);
+    return m_node;
 }
 
 void
-SatSimpleNetDevice::DoDispose (void)
+SatSimpleNetDevice::SetNode(Ptr<Node> node)
 {
-  NS_LOG_FUNCTION (this);
-  m_channel = 0;
-  m_node = 0;
-  m_receiveErrorModel = 0;
-  NetDevice::DoDispose ();
-}
-
-
-void
-SatSimpleNetDevice::SetPromiscReceiveCallback (PromiscReceiveCallback cb)
-{
-  NS_LOG_FUNCTION (this << &cb);
-  m_promiscCallback = cb;
+    NS_LOG_FUNCTION(this << node);
+    m_node = node;
 }
 
 bool
-SatSimpleNetDevice::SupportsSendFrom (void) const
+SatSimpleNetDevice::NeedsArp(void) const
 {
-  NS_LOG_FUNCTION (this);
-  return true;
+    NS_LOG_FUNCTION(this);
+    return true;
+}
+
+void
+SatSimpleNetDevice::SetReceiveCallback(NetDevice::ReceiveCallback cb)
+{
+    NS_LOG_FUNCTION(this << &cb);
+    m_rxCallback = cb;
+}
+
+void
+SatSimpleNetDevice::DoDispose(void)
+{
+    NS_LOG_FUNCTION(this);
+    m_channel = 0;
+    m_node = 0;
+    m_receiveErrorModel = 0;
+    NetDevice::DoDispose();
+}
+
+void
+SatSimpleNetDevice::SetPromiscReceiveCallback(PromiscReceiveCallback cb)
+{
+    NS_LOG_FUNCTION(this << &cb);
+    m_promiscCallback = cb;
+}
+
+bool
+SatSimpleNetDevice::SupportsSendFrom(void) const
+{
+    NS_LOG_FUNCTION(this);
+    return true;
 }
 
 } // namespace ns3

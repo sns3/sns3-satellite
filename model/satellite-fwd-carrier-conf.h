@@ -23,8 +23,8 @@
 
 #include <ns3/simple-ref-count.h>
 
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -33,60 +33,60 @@ namespace ns3 {
 
 class SatFwdCarrierConf : public SimpleRefCount<SatFwdCarrierConf>
 {
-public:
-  /**
-   * Default constructor for SatFwdCarrierConf
-   */
-  SatFwdCarrierConf ();
+  public:
+    /**
+     * Default constructor for SatFwdCarrierConf
+     */
+    SatFwdCarrierConf();
 
-  /**
-   * Constructor for SatFwdCarrierConf
-   *
-   * \param bandwidthInHz     Allocated bandwidth of Forward Link Carrier in hertz
-   * \param rollOff           Roll-off factor
-   * \param spacing           Spacing factor
-   */
-  SatFwdCarrierConf (double bandwidthInHz, double rollOff, double spacing);
+    /**
+     * Constructor for SatFwdCarrierConf
+     *
+     * \param bandwidthInHz     Allocated bandwidth of Forward Link Carrier in hertz
+     * \param rollOff           Roll-off factor
+     * \param spacing           Spacing factor
+     */
+    SatFwdCarrierConf(double bandwidthInHz, double rollOff, double spacing);
 
-  /**
-   * Destructor for SatFwdCarrierConf
-   */
-  ~SatFwdCarrierConf ();
+    /**
+     * Destructor for SatFwdCarrierConf
+     */
+    ~SatFwdCarrierConf();
 
-  /**
-   * Get bandwidth of Forward Link Carrier.
-   *
-   * \return The bandwidth of Forward Link Carrier in hertz.
-   */
-  inline double GetAllocatedBandwidthInHz () const
-  {
-    return m_allocatedBandwidthInHz;
-  }
+    /**
+     * Get bandwidth of Forward Link Carrier.
+     *
+     * \return The bandwidth of Forward Link Carrier in hertz.
+     */
+    inline double GetAllocatedBandwidthInHz() const
+    {
+        return m_allocatedBandwidthInHz;
+    }
 
-  /**
-   * Get occupied bandwidth of Forward Link Carrier.
-   *
-   * \return The occupied bandwidth of Forward Link Carrier in hertz.
-   */
-  inline double GetOccupiedBandwidthInHz () const
-  {
-    return m_occupiedBandwidthInHz;
-  }
+    /**
+     * Get occupied bandwidth of Forward Link Carrier.
+     *
+     * \return The occupied bandwidth of Forward Link Carrier in hertz.
+     */
+    inline double GetOccupiedBandwidthInHz() const
+    {
+        return m_occupiedBandwidthInHz;
+    }
 
-  /**
-   * Get occupied bandwidth of Forward Link Carrier.
-   *
-   * \return The occupied bandwidth of Forward Link Carrier in hertz.
-   */
-  inline double GetEffectiveBandwidthInHz () const
-  {
-    return m_effectiveBandwidthInHz;
-  }
+    /**
+     * Get occupied bandwidth of Forward Link Carrier.
+     *
+     * \return The occupied bandwidth of Forward Link Carrier in hertz.
+     */
+    inline double GetEffectiveBandwidthInHz() const
+    {
+        return m_effectiveBandwidthInHz;
+    }
 
-private:
-  double m_allocatedBandwidthInHz;
-  double m_occupiedBandwidthInHz;
-  double m_effectiveBandwidthInHz;
+  private:
+    double m_allocatedBandwidthInHz;
+    double m_occupiedBandwidthInHz;
+    double m_effectiveBandwidthInHz;
 };
 
 } // namespace ns3

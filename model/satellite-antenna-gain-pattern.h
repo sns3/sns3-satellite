@@ -21,15 +21,18 @@
 #ifndef SATELLITE_ANTENNA_GAIN_PATTERN_H
 #define SATELLITE_ANTENNA_GAIN_PATTERN_H
 
-#include <vector>
-#include <fstream>
-#include <ns3/object.h>
-#include <ns3/traced-callback.h>
-#include <ns3/random-variable-stream.h>
 #include "geo-coordinate.h"
 #include "satellite-mobility-model.h"
 
-namespace ns3 {
+#include <ns3/object.h>
+#include <ns3/random-variable-stream.h>
+#include <ns3/traced-callback.h>
+
+#include <fstream>
+#include <vector>
+
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -49,147 +52,151 @@ namespace ns3 {
  */
 class SatAntennaGainPattern : public Object
 {
-public:
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
+  public:
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * \brief Get the type ID of instance
-   * \return the object TypeId
-   */
-  virtual TypeId GetInstanceTypeId (void) const;
+    /**
+     * \brief Get the type ID of instance
+     * \return the object TypeId
+     */
+    virtual TypeId GetInstanceTypeId(void) const;
 
-  /**
-   * Default constructor.
-   */
-  SatAntennaGainPattern ();
+    /**
+     * Default constructor.
+     */
+    SatAntennaGainPattern();
 
-  /**
-   * Constructor with initialization parameters.
-   * \param filePathName Path of file to read antenna gain patterns
-   * \param defaultSatellitePosition Position of satellite associated to this pattern
-   */
-  SatAntennaGainPattern (std::string filePathName, GeoCoordinate defaultSatellitePosition);
-  ~SatAntennaGainPattern ()
-  {
-  }
+    /**
+     * Constructor with initialization parameters.
+     * \param filePathName Path of file to read antenna gain patterns
+     * \param defaultSatellitePosition Position of satellite associated to this pattern
+     */
+    SatAntennaGainPattern(std::string filePathName, GeoCoordinate defaultSatellitePosition);
 
-  /**
-   * \brief Calculate the antenna gain value for a certain {latitude, longitude} point
-   * \param mobility The mobility model of the associated satellite
-   * \return The gain value in linear format
-   */
-  double GetAntennaGain_lin (GeoCoordinate coord, Ptr<SatMobilityModel> mobility) const;
+    ~SatAntennaGainPattern()
+    {
+    }
 
-  /**
-   * \brief Get a valid random position under this spot-beam coverage.
-   * \param mobility The mobility model of the associated satellite
-   * \return A valid random GeoCoordinate
-   */
-  GeoCoordinate GetValidRandomPosition (Ptr<SatMobilityModel> mobility) const;
+    /**
+     * \brief Calculate the antenna gain value for a certain {latitude, longitude} point
+     * \param mobility The mobility model of the associated satellite
+     * \return The gain value in linear format
+     */
+    double GetAntennaGain_lin(GeoCoordinate coord, Ptr<SatMobilityModel> mobility) const;
 
-  /**
-   * \brief Check if a given position is under this spot-beam coverage.
-   * \param coord The position to check for validity
-   * \param mobility The mobility model of the associated satellite
-   * \return Whether or not the given position is valid for this spot-beam
-   */
-  bool IsValidPosition (GeoCoordinate coord, TracedCallback<double> cb, Ptr<SatMobilityModel> mobility) const;
+    /**
+     * \brief Get a valid random position under this spot-beam coverage.
+     * \param mobility The mobility model of the associated satellite
+     * \return A valid random GeoCoordinate
+     */
+    GeoCoordinate GetValidRandomPosition(Ptr<SatMobilityModel> mobility) const;
 
-  void GetSatelliteOffset (double& latOffset, double& lonOffset, Ptr<SatMobilityModel> mobility) const;
+    /**
+     * \brief Check if a given position is under this spot-beam coverage.
+     * \param coord The position to check for validity
+     * \param mobility The mobility model of the associated satellite
+     * \return Whether or not the given position is valid for this spot-beam
+     */
+    bool IsValidPosition(GeoCoordinate coord,
+                         TracedCallback<double> cb,
+                         Ptr<SatMobilityModel> mobility) const;
 
-private:
-  /**
-   * \brief Read the antenna gain pattern from a file
-   * \param filePathName Path and file name of the antenna pattern file
-   */
-  void ReadAntennaPatternFromFile (std::string filePathName);
+    void GetSatelliteOffset(double& latOffset,
+                            double& lonOffset,
+                            Ptr<SatMobilityModel> mobility) const;
 
-  /**
-   * Container for the antenna pattern from one spot-beam
-   * - Outer vector holds gain values for all latitudes
-   * - Inner vector holds gain values for all longitudes for a certain latitude
-   */
-  std::vector< std::vector <double> > m_antennaPattern;
+  private:
+    /**
+     * \brief Read the antenna gain pattern from a file
+     * \param filePathName Path and file name of the antenna pattern file
+     */
+    void ReadAntennaPatternFromFile(std::string filePathName);
 
-  /**
-   * Container for valid positions
-   * - Latitude
-   * - Longitude
-   */
-  std::vector< std::pair<double, double> > m_validPositions;
+    /**
+     * Container for the antenna pattern from one spot-beam
+     * - Outer vector holds gain values for all latitudes
+     * - Inner vector holds gain values for all longitudes for a certain latitude
+     */
+    std::vector<std::vector<double>> m_antennaPattern;
 
-  /**
-   * Minimum acceptable antenna gain for a serving spot-beam. Used
-   * for beam selection.
-   */
-  double m_minAcceptableAntennaGainInDb;
+    /**
+     * Container for valid positions
+     * - Latitude
+     * - Longitude
+     */
+    std::vector<std::pair<double, double>> m_validPositions;
 
-  /**
-   * Uniform random variable used for beam selection.
-   */
-  Ptr<UniformRandomVariable> m_uniformRandomVariable;
+    /**
+     * Minimum acceptable antenna gain for a serving spot-beam. Used
+     * for beam selection.
+     */
+    double m_minAcceptableAntennaGainInDb;
 
-  /**
-   * All valid latitudes from the file
-   */
-  std::vector<double> m_latitudes;
+    /**
+     * Uniform random variable used for beam selection.
+     */
+    Ptr<UniformRandomVariable> m_uniformRandomVariable;
 
-  /**
-   * All valid latitudes from the file
-   */
-  std::vector<double> m_longitudes;
+    /**
+     * All valid latitudes from the file
+     */
+    std::vector<double> m_latitudes;
 
-  /**
-   * Minimum latitude value of the antenna gain pattern
-   */
-  double m_minLat;
+    /**
+     * All valid latitudes from the file
+     */
+    std::vector<double> m_longitudes;
 
-  /**
-   * Minimum longitude value of the antenna gain pattern
-   */
-  double m_minLon;
+    /**
+     * Minimum latitude value of the antenna gain pattern
+     */
+    double m_minLat;
 
-  /**
-   * Maximum latitude value of the antenna gain pattern
-   */
-  double m_maxLat;
+    /**
+     * Minimum longitude value of the antenna gain pattern
+     */
+    double m_minLon;
 
-  /**
-   * Minimum longitude value of the antenna gain pattern
-   */
-  double m_maxLon;
+    /**
+     * Maximum latitude value of the antenna gain pattern
+     */
+    double m_maxLat;
 
-  /**
-   * Interval between latitudes, must be constant
-   */
-  double m_latInterval;
+    /**
+     * Minimum longitude value of the antenna gain pattern
+     */
+    double m_maxLon;
 
-  /**
-   * Interval between longitudes, must be constant
-   */
-  double m_lonInterval;
+    /**
+     * Interval between latitudes, must be constant
+     */
+    double m_latInterval;
 
-  /**
-   * Latitude of default satellite for antenna gain pattern
-   */
-  double m_latDefaultSatellite;
+    /**
+     * Interval between longitudes, must be constant
+     */
+    double m_lonInterval;
 
-  /**
-   * Longitude of default satellite for antenna gain pattern
-   */
-  double m_lonDefaultSatellite;
+    /**
+     * Latitude of default satellite for antenna gain pattern
+     */
+    double m_latDefaultSatellite;
 
-  /**
-   * Valid Not-a-Number (NaN) strings
-   */
-  static const std::string m_nanStringArray[4];
-  std::vector<std::string> m_nanStrings;
+    /**
+     * Longitude of default satellite for antenna gain pattern
+     */
+    double m_lonDefaultSatellite;
+
+    /**
+     * Valid Not-a-Number (NaN) strings
+     */
+    static const std::string m_nanStringArray[4];
+    std::vector<std::string> m_nanStrings;
 };
-
 
 } // namespace ns3
 

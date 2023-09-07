@@ -23,8 +23,8 @@
 
 #include <ns3/object.h>
 
-
-namespace ns3 {
+namespace ns3
+{
 
 class SatSignalParameters;
 
@@ -34,50 +34,59 @@ class SatSignalParameters;
  */
 class SatInterferenceElimination : public Object
 {
-public:
-  /**
-   * Derived from Object
-   */
-  static TypeId GetTypeId (void);
+  public:
+    /**
+     * Derived from Object
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * Derived from Object
-   */
-  TypeId GetInstanceTypeId (void) const;
+    /**
+     * Derived from Object
+     */
+    TypeId GetInstanceTypeId(void) const;
 
-  /**
-   * Constructor for Satellite interference elimination base class
-   */
-  SatInterferenceElimination ();
+    /**
+     * Constructor for Satellite interference elimination base class
+     */
+    SatInterferenceElimination();
 
-  /**
-   * Destructor for Satellite interference elimination base class
-   */
-  virtual ~SatInterferenceElimination ();
+    /**
+     * Destructor for Satellite interference elimination base class
+     */
+    virtual ~SatInterferenceElimination();
 
-  /**
-   * Calculate residual power of interference for the given packets
-   * \param packetInterferedWith Parameters of the packet whose interference level should be lowered
-   * \param processedPacket Parameters of the packet we want to remove interference from
-   * \param isRegenerative Tell if we are in regenerative configuration. Depending on this value, the computations are made on the GW or on the satellite
-   */
-  virtual void EliminateInterferences (Ptr<SatSignalParameters> packetInterferedWith, Ptr<SatSignalParameters> processedPacket, double EsNo, bool isRegenerative) = 0;
+    /**
+     * Calculate residual power of interference for the given packets
+     * \param packetInterferedWith Parameters of the packet whose interference level should be
+     * lowered \param processedPacket Parameters of the packet we want to remove interference from
+     * \param isRegenerative Tell if we are in regenerative configuration. Depending on this value,
+     * the computations are made on the GW or on the satellite
+     */
+    virtual void EliminateInterferences(Ptr<SatSignalParameters> packetInterferedWith,
+                                        Ptr<SatSignalParameters> processedPacket,
+                                        double EsNo,
+                                        bool isRegenerative) = 0;
 
-  /**
-   * Calculate residual power of interference for the given packets
-   * \param packetInterferedWith Parameters of the packet whose interference level should be lowered
-   * \param processedPacket Parameters of the packet we want to remove interference from
-   * \param isRegenerative Tell if we are in regenerative configuration. Depending on this value, the computations are made on the GW or on the satellite
-   * \param startTime Normalized start time of the interference, with respect to packetInterferedWith
-   * \param startTime Normalized end time of the interference, with respect to packetInterferedWith
-   */
-  virtual void EliminateInterferences (Ptr<SatSignalParameters> packetInterferedWith, Ptr<SatSignalParameters> processedPacket, double EsNo, bool isRegenerative, double startTime, double endTime) = 0;
+    /**
+     * Calculate residual power of interference for the given packets
+     * \param packetInterferedWith Parameters of the packet whose interference level should be
+     * lowered \param processedPacket Parameters of the packet we want to remove interference from
+     * \param isRegenerative Tell if we are in regenerative configuration. Depending on this value,
+     * the computations are made on the GW or on the satellite \param startTime Normalized start
+     * time of the interference, with respect to packetInterferedWith \param startTime Normalized
+     * end time of the interference, with respect to packetInterferedWith
+     */
+    virtual void EliminateInterferences(Ptr<SatSignalParameters> packetInterferedWith,
+                                        Ptr<SatSignalParameters> processedPacket,
+                                        double EsNo,
+                                        bool isRegenerative,
+                                        double startTime,
+                                        double endTime) = 0;
 
-  /**
-   * \brief Calculate the residual power of interference for a given packet
-   */
-  virtual double GetResidualPower (Ptr<SatSignalParameters> processedPacket, double EsNo) = 0;
-
+    /**
+     * \brief Calculate the residual power of interference for a given packet
+     */
+    virtual double GetResidualPower(Ptr<SatSignalParameters> processedPacket, double EsNo) = 0;
 };
 
 } // namespace ns3

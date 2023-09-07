@@ -22,58 +22,60 @@
 
 #include <ns3/onoff-application.h>
 
-namespace ns3 {
+namespace ns3
+{
 
 class Socket;
 
 /**
-* \ingroup satellite
-*
-* \brief This class implements Satellite specific OnOff application.
-*        It subclasses ns-3 'native' OnOffApplication to provide needed support for statics.
-*        Otherwise functionality of original OnOffApplication is not changed.
-*
-*/
+ * \ingroup satellite
+ *
+ * \brief This class implements Satellite specific OnOff application.
+ *        It subclasses ns-3 'native' OnOffApplication to provide needed support for statics.
+ *        Otherwise functionality of original OnOffApplication is not changed.
+ *
+ */
 class SatOnOffApplication : public OnOffApplication
 {
-public:
-  /**
-   */
-  static TypeId GetTypeId (void);
+  public:
+    /**
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * Constructor for Satellite specific on-off application
-   */
-  SatOnOffApplication ();
+    /**
+     * Constructor for Satellite specific on-off application
+     */
+    SatOnOffApplication();
 
-  /**
-   * Destructor Satellite specific on-off application
-   */
-  virtual ~SatOnOffApplication ();
+    /**
+     * Destructor Satellite specific on-off application
+     */
+    virtual ~SatOnOffApplication();
 
-  /**
-   * Enable or disable statistic tags
-   *
-   * \param enableStatus Enable status for statistics
-   */
-  void EnableStatisticTags (bool enableStatus);
+    /**
+     * Enable or disable statistic tags
+     *
+     * \param enableStatus Enable status for statistics
+     */
+    void EnableStatisticTags(bool enableStatus);
 
-  /**
-   * Get enable status of statistic tags.
-   *
-   * \return true if statistics are enabled, false if statistics are disabled
-   */
-  bool IsStatisticTagsEnabled () const;
+    /**
+     * Get enable status of statistic tags.
+     *
+     * \return true if statistics are enabled, false if statistics are disabled
+     */
+    bool IsStatisticTagsEnabled() const;
 
-  /**
-   * Trace callback for on-off application Tx.
-   *
-   * \param packet Packet send by on-off application.
-   */
-  void SendPacketTrace (Ptr<const Packet> packet);
-private:
-  bool  m_isStatisticsTagsEnabled;  ///< `EnableStatisticsTags` attribute.
-  bool  m_isConnectedWithTraceSource;
+    /**
+     * Trace callback for on-off application Tx.
+     *
+     * \param packet Packet send by on-off application.
+     */
+    void SendPacketTrace(Ptr<const Packet> packet);
+
+  private:
+    bool m_isStatisticsTagsEnabled; ///< `EnableStatisticsTags` attribute.
+    bool m_isConnectedWithTraceSource;
 };
 
 } // namespace ns3

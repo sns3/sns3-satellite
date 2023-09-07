@@ -18,190 +18,194 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include <ns3/log.h>
-#include <ns3/object.h>
-#include <ns3/nstime.h>
-
 #include "satellite-superframe-sequence.h"
 
+#include <ns3/log.h>
+#include <ns3/nstime.h>
+#include <ns3/object.h>
 
-NS_LOG_COMPONENT_DEFINE ("SatSuperframeSeq");
+NS_LOG_COMPONENT_DEFINE("SatSuperframeSeq");
 
-namespace ns3 {
+namespace ns3
+{
 
-NS_OBJECT_ENSURE_REGISTERED (SatSuperframeSeq);
+NS_OBJECT_ENSURE_REGISTERED(SatSuperframeSeq);
 
 // Super frame conf
 
-SatSuperframeSeq::SatSuperframeSeq ()
+SatSuperframeSeq::SatSuperframeSeq()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
-SatSuperframeSeq::~SatSuperframeSeq ()
+SatSuperframeSeq::~SatSuperframeSeq()
 {
-  NS_LOG_FUNCTION (this);
-}
-
-TypeId
-SatSuperframeSeq::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::SatSuperframeSeq")
-    .SetParent<Object> ()
-    .AddConstructor<SatSuperframeSeq> ()
-    .AddAttribute ("TargetDuration", "Target duration time.",
-                   TimeValue (MilliSeconds (100)),
-                   MakeTimeAccessor (&SatSuperframeSeq::m_targetDuration),
-                   MakeTimeChecker ())
-  ;
-
-  return tid;
+    NS_LOG_FUNCTION(this);
 }
 
 TypeId
-SatSuperframeSeq::GetInstanceTypeId (void) const
+SatSuperframeSeq::GetTypeId(void)
 {
-  NS_LOG_FUNCTION (this);
+    static TypeId tid = TypeId("ns3::SatSuperframeSeq")
+                            .SetParent<Object>()
+                            .AddConstructor<SatSuperframeSeq>()
+                            .AddAttribute("TargetDuration",
+                                          "Target duration time.",
+                                          TimeValue(MilliSeconds(100)),
+                                          MakeTimeAccessor(&SatSuperframeSeq::m_targetDuration),
+                                          MakeTimeChecker());
 
-  return GetTypeId ();
+    return tid;
+}
+
+TypeId
+SatSuperframeSeq::GetInstanceTypeId(void) const
+{
+    NS_LOG_FUNCTION(this);
+
+    return GetTypeId();
 }
 
 void
-SatSuperframeSeq::AddWaveformConf (Ptr<SatWaveformConf> wfConf)
+SatSuperframeSeq::AddWaveformConf(Ptr<SatWaveformConf> wfConf)
 {
-  NS_LOG_FUNCTION (this);
-  m_wfConf = wfConf;
+    NS_LOG_FUNCTION(this);
+    m_wfConf = wfConf;
 }
 
 Ptr<SatWaveformConf>
-SatSuperframeSeq::GetWaveformConf () const
+SatSuperframeSeq::GetWaveformConf() const
 {
-  NS_LOG_FUNCTION (this);
-  return m_wfConf;
+    NS_LOG_FUNCTION(this);
+    return m_wfConf;
 }
 
 void
-SatSuperframeSeq::AddSuperframe (Ptr<SatSuperframeConf> conf)
+SatSuperframeSeq::AddSuperframe(Ptr<SatSuperframeConf> conf)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  m_superframe.push_back (conf);
+    m_superframe.push_back(conf);
 }
 
 uint32_t
-SatSuperframeSeq::GetCarrierCount () const
+SatSuperframeSeq::GetCarrierCount() const
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  uint32_t carrierCount = 0;
+    uint32_t carrierCount = 0;
 
-  for (uint8_t i = 0; i < m_superframe.size (); i++)
+    for (uint8_t i = 0; i < m_superframe.size(); i++)
     {
-      carrierCount += m_superframe[i]->GetCarrierCount ();
+        carrierCount += m_superframe[i]->GetCarrierCount();
     }
 
-  return carrierCount;
+    return carrierCount;
 }
 
 uint32_t
-SatSuperframeSeq::GetCarrierCount ( uint8_t seqId ) const
+SatSuperframeSeq::GetCarrierCount(uint8_t seqId) const
 {
-  NS_LOG_FUNCTION (this << (uint32_t) seqId);
+    NS_LOG_FUNCTION(this << (uint32_t)seqId);
 
-  if (seqId >= m_superframe.size ())
+    if (seqId >= m_superframe.size())
     {
-      NS_FATAL_ERROR ("SatSuperframeSeq::GetCarrierCount - unsupported sequence id: " << seqId);
+        NS_FATAL_ERROR("SatSuperframeSeq::GetCarrierCount - unsupported sequence id: " << seqId);
     }
 
-  return m_superframe[seqId]->GetCarrierCount ();
+    return m_superframe[seqId]->GetCarrierCount();
 }
 
 Time
-SatSuperframeSeq::GetDuration ( uint8_t seqId ) const
+SatSuperframeSeq::GetDuration(uint8_t seqId) const
 {
-  NS_LOG_FUNCTION (this << (uint32_t) seqId);
+    NS_LOG_FUNCTION(this << (uint32_t)seqId);
 
-  if (seqId >= m_superframe.size ())
+    if (seqId >= m_superframe.size())
     {
-      NS_FATAL_ERROR ("SatSuperframeSeq::GetDuration - unsupported sequence id: " << seqId);
+        NS_FATAL_ERROR("SatSuperframeSeq::GetDuration - unsupported sequence id: " << seqId);
     }
 
-  return m_superframe[seqId]->GetDuration ();
+    return m_superframe[seqId]->GetDuration();
 }
 
 Ptr<SatSuperframeConf>
-SatSuperframeSeq::GetSuperframeConf (uint8_t seqId) const
+SatSuperframeSeq::GetSuperframeConf(uint8_t seqId) const
 {
-  NS_LOG_FUNCTION (this << (uint32_t) seqId);
+    NS_LOG_FUNCTION(this << (uint32_t)seqId);
 
-  if (seqId >= m_superframe.size ())
+    if (seqId >= m_superframe.size())
     {
-      NS_FATAL_ERROR ("SatSuperframeSeq::GetSuperframeConf - unsupported sequence id: " << seqId);
+        NS_FATAL_ERROR("SatSuperframeSeq::GetSuperframeConf - unsupported sequence id: " << seqId);
     }
 
-  return m_superframe[seqId];
+    return m_superframe[seqId];
 }
 
 uint32_t
-SatSuperframeSeq::GetCarrierId ( uint8_t superframeId, uint8_t frameId, uint16_t frameCarrierId ) const
+SatSuperframeSeq::GetCarrierId(uint8_t superframeId, uint8_t frameId, uint16_t frameCarrierId) const
 {
-  NS_LOG_FUNCTION (this << superframeId << frameId << frameCarrierId);
+    NS_LOG_FUNCTION(this << superframeId << frameId << frameCarrierId);
 
-  if (superframeId >= m_superframe.size ())
+    if (superframeId >= m_superframe.size())
     {
-      NS_FATAL_ERROR ("SatSuperframeSeq::GetCarrierCount - unsupported sequence id: " << superframeId);
+        NS_FATAL_ERROR(
+            "SatSuperframeSeq::GetCarrierCount - unsupported sequence id: " << superframeId);
     }
 
-  uint32_t carrierId = m_superframe[superframeId]->GetCarrierId (frameId, frameCarrierId );
+    uint32_t carrierId = m_superframe[superframeId]->GetCarrierId(frameId, frameCarrierId);
 
-  for (uint8_t i = 0; i < superframeId; i++)
+    for (uint8_t i = 0; i < superframeId; i++)
     {
-      carrierId += m_superframe[i]->GetCarrierCount ();
+        carrierId += m_superframe[i]->GetCarrierCount();
     }
 
-  return carrierId;
+    return carrierId;
 }
 
 double
-SatSuperframeSeq::GetCarrierFrequencyHz (uint32_t carrierId) const
+SatSuperframeSeq::GetCarrierFrequencyHz(uint32_t carrierId) const
 {
-  NS_LOG_FUNCTION (this << carrierId);
+    NS_LOG_FUNCTION(this << carrierId);
 
-  double superFrameStartFrequency = 0.0;
-  uint32_t currentSuperframe = 0;
-  uint32_t lastIdInSuperframe = m_superframe[0]->GetCarrierCount () - 1;
-  uint32_t carrierIdInSuperframe = carrierId;
+    double superFrameStartFrequency = 0.0;
+    uint32_t currentSuperframe = 0;
+    uint32_t lastIdInSuperframe = m_superframe[0]->GetCarrierCount() - 1;
+    uint32_t carrierIdInSuperframe = carrierId;
 
-  while ( carrierId > lastIdInSuperframe )
+    while (carrierId > lastIdInSuperframe)
     {
-      carrierIdInSuperframe -= m_superframe[currentSuperframe]->GetCarrierCount ();
-      superFrameStartFrequency += m_superframe[currentSuperframe]->GetBandwidthHz ();
-      currentSuperframe++;
-      lastIdInSuperframe += m_superframe[currentSuperframe]->GetCarrierCount ();
+        carrierIdInSuperframe -= m_superframe[currentSuperframe]->GetCarrierCount();
+        superFrameStartFrequency += m_superframe[currentSuperframe]->GetBandwidthHz();
+        currentSuperframe++;
+        lastIdInSuperframe += m_superframe[currentSuperframe]->GetCarrierCount();
     }
 
-  double carrierFrequencyInSuperframe = m_superframe[currentSuperframe]->GetCarrierFrequencyHz ( carrierIdInSuperframe );
+    double carrierFrequencyInSuperframe =
+        m_superframe[currentSuperframe]->GetCarrierFrequencyHz(carrierIdInSuperframe);
 
-  return superFrameStartFrequency + carrierFrequencyInSuperframe;
+    return superFrameStartFrequency + carrierFrequencyInSuperframe;
 }
 
 double
-SatSuperframeSeq::GetCarrierBandwidthHz (uint32_t carrierId, SatEnums::CarrierBandwidthType_t bandwidthType) const
+SatSuperframeSeq::GetCarrierBandwidthHz(uint32_t carrierId,
+                                        SatEnums::CarrierBandwidthType_t bandwidthType) const
 {
-  NS_LOG_FUNCTION (this << carrierId);
+    NS_LOG_FUNCTION(this << carrierId);
 
-  uint32_t currentSuperframe = 0;
-  uint32_t lastIdInSuperframe = m_superframe[0]->GetCarrierCount () - 1;
-  uint32_t carrierIdInSuperframe = carrierId;
+    uint32_t currentSuperframe = 0;
+    uint32_t lastIdInSuperframe = m_superframe[0]->GetCarrierCount() - 1;
+    uint32_t carrierIdInSuperframe = carrierId;
 
-  while ( carrierId > lastIdInSuperframe )
+    while (carrierId > lastIdInSuperframe)
     {
-      carrierIdInSuperframe -= m_superframe[currentSuperframe]->GetCarrierCount ();
-      currentSuperframe++;
-      lastIdInSuperframe += m_superframe[currentSuperframe]->GetCarrierCount ();
+        carrierIdInSuperframe -= m_superframe[currentSuperframe]->GetCarrierCount();
+        currentSuperframe++;
+        lastIdInSuperframe += m_superframe[currentSuperframe]->GetCarrierCount();
     }
 
-  return m_superframe[currentSuperframe]->GetCarrierBandwidthHz ( carrierIdInSuperframe, bandwidthType );
+    return m_superframe[currentSuperframe]->GetCarrierBandwidthHz(carrierIdInSuperframe,
+                                                                  bandwidthType);
 }
 
-}  // namespace ns3
+} // namespace ns3

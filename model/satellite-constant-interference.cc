@@ -20,103 +20,102 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
-#include <ns3/simulator.h>
-#include <ns3/log.h>
-#include <ns3/double.h>
-
 #include "satellite-constant-interference.h"
 
+#include <ns3/double.h>
+#include <ns3/log.h>
+#include <ns3/simulator.h>
 
-NS_LOG_COMPONENT_DEFINE ("SatConstantInterference");
+NS_LOG_COMPONENT_DEFINE("SatConstantInterference");
 
-namespace ns3 {
+namespace ns3
+{
 
-NS_OBJECT_ENSURE_REGISTERED (SatConstantInterference);
+NS_OBJECT_ENSURE_REGISTERED(SatConstantInterference);
 
 TypeId
-SatConstantInterference::GetTypeId (void)
+SatConstantInterference::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatConstantInterference")
-    .SetParent<SatInterference> ()
-    .AddConstructor<SatConstantInterference> ()
-    .AddAttribute ( "ConstantInterferencePower",
-                    "Constant interference power in linear format.",
-                    DoubleValue (0.0),
-                    MakeDoubleAccessor (&SatConstantInterference::m_power),
-                    MakeDoubleChecker<double_t> ())
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::SatConstantInterference")
+                            .SetParent<SatInterference>()
+                            .AddConstructor<SatConstantInterference>()
+                            .AddAttribute("ConstantInterferencePower",
+                                          "Constant interference power in linear format.",
+                                          DoubleValue(0.0),
+                                          MakeDoubleAccessor(&SatConstantInterference::m_power),
+                                          MakeDoubleChecker<double_t>());
+    return tid;
 }
 
 TypeId
-SatConstantInterference::GetInstanceTypeId (void) const
+SatConstantInterference::GetInstanceTypeId(void) const
 {
-  return GetTypeId ();
+    return GetTypeId();
 }
 
-SatConstantInterference::SatConstantInterference ()
-  : m_power (0.0),
-  m_rxing (false)
+SatConstantInterference::SatConstantInterference()
+    : m_power(0.0),
+      m_rxing(false)
 {
-
 }
 
-SatConstantInterference::~SatConstantInterference ()
+SatConstantInterference::~SatConstantInterference()
 {
-  Reset ();
+    Reset();
 }
 
 Ptr<SatInterference::InterferenceChangeEvent>
-SatConstantInterference::DoAdd (Time duration, double power, Address rxAddress)
+SatConstantInterference::DoAdd(Time duration, double power, Address rxAddress)
 {
-  NS_LOG_FUNCTION (this << duration.GetSeconds () << power << rxAddress);
+    NS_LOG_FUNCTION(this << duration.GetSeconds() << power << rxAddress);
 
-  Ptr<SatInterference::InterferenceChangeEvent> event;
-  event = Create<SatInterference::InterferenceChangeEvent> (0, duration, power, rxAddress);
+    Ptr<SatInterference::InterferenceChangeEvent> event;
+    event = Create<SatInterference::InterferenceChangeEvent>(0, duration, power, rxAddress);
 
-  return event;
+    return event;
 }
 
-std::vector< std::pair<double, double> >
-SatConstantInterference::DoCalculate (Ptr<SatInterference::InterferenceChangeEvent> event)
+std::vector<std::pair<double, double>>
+SatConstantInterference::DoCalculate(Ptr<SatInterference::InterferenceChangeEvent> event)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  if (m_rxing == false)
+    if (m_rxing == false)
     {
-      NS_LOG_WARN ("Most likely two overlapping receptions! With random access carrier"
-                   " this should be fine, but with dedicated access prohibited!");
+        NS_LOG_WARN("Most likely two overlapping receptions! With random access carrier"
+                    " this should be fine, but with dedicated access prohibited!");
     }
 
-  std::vector< std::pair<double, double> > ifPowerPerFragment;
-  ifPowerPerFragment.emplace_back (1.0, m_power);
+    std::vector<std::pair<double, double>> ifPowerPerFragment;
+    ifPowerPerFragment.emplace_back(1.0, m_power);
 
-  return ifPowerPerFragment;
+    return ifPowerPerFragment;
 }
 
 void
-SatConstantInterference::DoReset ()
+SatConstantInterference::DoReset()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  m_rxing = false;
+    m_rxing = false;
 }
 
 void
-SatConstantInterference::DoNotifyRxStart (Ptr<SatInterference::InterferenceChangeEvent> event)
+SatConstantInterference::DoNotifyRxStart(Ptr<SatInterference::InterferenceChangeEvent> event)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  m_rxing = true;
+    m_rxing = true;
 }
 
 void
-SatConstantInterference::DoNotifyRxEnd (Ptr<SatInterference::InterferenceChangeEvent> event)
+SatConstantInterference::DoNotifyRxEnd(Ptr<SatInterference::InterferenceChangeEvent> event)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  m_rxing = false;
+    m_rxing = false;
 }
 
-}
+} // namespace ns3
+
 // namespace ns3

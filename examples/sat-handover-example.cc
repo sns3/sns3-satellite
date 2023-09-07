@@ -19,12 +19,12 @@
  *
  */
 
-#include "ns3/core-module.h"
-#include "ns3/config-store-module.h"
-#include "ns3/network-module.h"
-#include "ns3/internet-module.h"
-#include "ns3/satellite-module.h"
 #include "ns3/applications-module.h"
+#include "ns3/config-store-module.h"
+#include "ns3/core-module.h"
+#include "ns3/internet-module.h"
+#include "ns3/network-module.h"
+#include "ns3/satellite-module.h"
 #include "ns3/traffic-module.h"
 
 using namespace ns3;
@@ -37,56 +37,61 @@ using namespace ns3;
  *
  */
 
-NS_LOG_COMPONENT_DEFINE ("sat-handover-example");
+NS_LOG_COMPONENT_DEFINE("sat-handover-example");
 
 int
-main (int argc, char *argv[])
+main(int argc, char* argv[])
 {
-  /// Set regeneration mode
-  Config::SetDefault ("ns3::SatConf::ForwardLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
-  Config::SetDefault ("ns3::SatConf::ReturnLinkRegenerationMode", EnumValue (SatEnums::REGENERATION_PHY));
+    /// Set regeneration mode
+    Config::SetDefault("ns3::SatConf::ForwardLinkRegenerationMode",
+                       EnumValue(SatEnums::REGENERATION_PHY));
+    Config::SetDefault("ns3::SatConf::ReturnLinkRegenerationMode",
+                       EnumValue(SatEnums::REGENERATION_PHY));
 
-  Config::SetDefault ("ns3::SatGeoFeederPhy::QueueSize", UintegerValue (100000));
+    Config::SetDefault("ns3::SatGeoFeederPhy::QueueSize", UintegerValue(100000));
 
-  /// Set simulation output details
-  Config::SetDefault ("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue (true));
+    /// Set simulation output details
+    Config::SetDefault("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue(true));
 
-  /// Enable packet trace
-  Config::SetDefault ("ns3::SatHelper::PacketTraceEnabled", BooleanValue (true));
-  Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper> ("example-handover");
-  Ptr<SimulationHelperConf> simulationConf = CreateObject<SimulationHelperConf> ();
-  simulationHelper->SetSimulationTime (Seconds (60));
-  simulationHelper->SetGwUserCount (2);
-  simulationHelper->SetUtCountPerBeam (5);
-  simulationHelper->SetUserCountPerUt (1);
-  simulationHelper->SetBeams ("12 13 26 27 38 39");
-  simulationHelper->SetUserCountPerMobileUt (simulationConf->m_utMobileUserCount);
+    /// Enable packet trace
+    Config::SetDefault("ns3::SatHelper::PacketTraceEnabled", BooleanValue(true));
+    Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper>("example-handover");
+    Ptr<SimulationHelperConf> simulationConf = CreateObject<SimulationHelperConf>();
+    simulationHelper->SetSimulationTime(Seconds(60));
+    simulationHelper->SetGwUserCount(2);
+    simulationHelper->SetUtCountPerBeam(5);
+    simulationHelper->SetUserCountPerUt(1);
+    simulationHelper->SetBeams("12 13 26 27 38 39");
+    simulationHelper->SetUserCountPerMobileUt(simulationConf->m_utMobileUserCount);
 
-  std::string mobileUtFolder = Singleton<SatEnvVariables>::Get ()->LocateDataDirectory () + "/utpositions/mobiles/scenario5";
-  Ptr<SatHelper> helper = simulationHelper->CreateSatScenario (SatHelper::NONE, mobileUtFolder);
+    std::string mobileUtFolder =
+        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/utpositions/mobiles/scenario5";
+    Ptr<SatHelper> helper = simulationHelper->CreateSatScenario(SatHelper::NONE, mobileUtFolder);
 
-  Config::SetDefault ("ns3::CbrApplication::Interval", StringValue ("100ms"));
-  Config::SetDefault ("ns3::CbrApplication::PacketSize", UintegerValue (512) );
+    Config::SetDefault("ns3::CbrApplication::Interval", StringValue("100ms"));
+    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(512));
 
-  simulationHelper->InstallTrafficModel (
-    SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
-    Seconds (1.0), Seconds (60.0));
+    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
+                                          SimulationHelper::UDP,
+                                          SimulationHelper::FWD_LINK,
+                                          Seconds(1.0),
+                                          Seconds(60.0));
 
-  // To store attributes to file
-  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("output-attributes.xml"));
-  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
-  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
-  ConfigStore outputConfig;
-  outputConfig.ConfigureDefaults ();
+    // To store attributes to file
+    Config::SetDefault("ns3::ConfigStore::Filename", StringValue("output-attributes.xml"));
+    Config::SetDefault("ns3::ConfigStore::FileFormat", StringValue("Xml"));
+    Config::SetDefault("ns3::ConfigStore::Mode", StringValue("Save"));
+    ConfigStore outputConfig;
+    outputConfig.ConfigureDefaults();
 
-  Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer ();
+    Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer();
 
-  s->AddPerBeamFwdAppThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerBeamFwdUserDevThroughput (SatStatsHelper::OUTPUT_SCATTER_FILE);
-  s->AddPerBeamBeamServiceTime (SatStatsHelper::OUTPUT_SCALAR_FILE);
+    s->AddPerBeamFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    s->AddPerBeamFwdUserDevThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    s->AddPerBeamBeamServiceTime(SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-  simulationHelper->EnableProgressLogs ();
-  simulationHelper->RunSimulation ();
+    simulationHelper->EnableProgressLogs();
+    simulationHelper->RunSimulation();
 
-  return 0;
+    return 0;
 }

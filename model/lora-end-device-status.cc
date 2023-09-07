@@ -21,57 +21,57 @@
  * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include <algorithm>
-
-#include <ns3/log.h>
-#include <ns3/pointer.h>
-#include <ns3/command-line.h>
-#include <ns3/simulator.h>
-#include <ns3/packet.h>
-#include <ns3/simulator.h>
-
 #include "lora-end-device-status.h"
-#include "lorawan-mac-header.h"
+
+#include "lora-beam-tag.h"
 #include "lora-frame-header.h"
 #include "lora-tag.h"
-#include "lora-beam-tag.h"
+#include "lorawan-mac-header.h"
 
+#include <ns3/command-line.h>
+#include <ns3/log.h>
+#include <ns3/packet.h>
+#include <ns3/pointer.h>
+#include <ns3/simulator.h>
 
-namespace ns3 {
+#include <algorithm>
 
-NS_LOG_COMPONENT_DEFINE ("LoraEndDeviceStatus");
+namespace ns3
+{
+
+NS_LOG_COMPONENT_DEFINE("LoraEndDeviceStatus");
 
 TypeId
-LoraEndDeviceStatus::GetTypeId (void)
+LoraEndDeviceStatus::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::LoraEndDeviceStatus")
-                          .SetParent<Object> ()
-                          .AddConstructor<LoraEndDeviceStatus> ();
-  return tid;
+    static TypeId tid = TypeId("ns3::LoraEndDeviceStatus")
+                            .SetParent<Object>()
+                            .AddConstructor<LoraEndDeviceStatus>();
+    return tid;
 }
 
-LoraEndDeviceStatus::LoraEndDeviceStatus (LoraDeviceAddress endDeviceAddress,
-                                  Ptr<LorawanMacEndDeviceClassA> endDeviceMac)
-    : m_reply (LoraEndDeviceStatus::Reply ()),
-      m_endDeviceAddress (endDeviceAddress),
-      m_receivedPacketList (ReceivedPacketList ()),
-      m_mac (endDeviceMac)
+LoraEndDeviceStatus::LoraEndDeviceStatus(LoraDeviceAddress endDeviceAddress,
+                                         Ptr<LorawanMacEndDeviceClassA> endDeviceMac)
+    : m_reply(LoraEndDeviceStatus::Reply()),
+      m_endDeviceAddress(endDeviceAddress),
+      m_receivedPacketList(ReceivedPacketList()),
+      m_mac(endDeviceMac)
 {
-  NS_LOG_FUNCTION (endDeviceAddress);
+    NS_LOG_FUNCTION(endDeviceAddress);
 }
 
-LoraEndDeviceStatus::LoraEndDeviceStatus ()
+LoraEndDeviceStatus::LoraEndDeviceStatus()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 
-  // Initialize data structure
-  m_reply = LoraEndDeviceStatus::Reply ();
-  m_receivedPacketList = ReceivedPacketList ();
+    // Initialize data structure
+    m_reply = LoraEndDeviceStatus::Reply();
+    m_receivedPacketList = ReceivedPacketList();
 }
 
-LoraEndDeviceStatus::~LoraEndDeviceStatus ()
+LoraEndDeviceStatus::~LoraEndDeviceStatus()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 }
 
 ///////////////
@@ -79,191 +79,191 @@ LoraEndDeviceStatus::~LoraEndDeviceStatus ()
 ///////////////
 
 uint8_t
-LoraEndDeviceStatus::GetModcod ()
+LoraEndDeviceStatus::GetModcod()
 {
-  NS_LOG_FUNCTION_NOARGS ();
-  return m_modcod;
+    NS_LOG_FUNCTION_NOARGS();
+    return m_modcod;
 }
 
 uint8_t
-LoraEndDeviceStatus::GetBeamId ()
+LoraEndDeviceStatus::GetBeamId()
 {
-  NS_LOG_FUNCTION_NOARGS ();
-  return m_beamId;
+    NS_LOG_FUNCTION_NOARGS();
+    return m_beamId;
 }
 
 uint8_t
-LoraEndDeviceStatus::GetFirstReceiveWindowSpreadingFactor ()
+LoraEndDeviceStatus::GetFirstReceiveWindowSpreadingFactor()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 
-  return m_firstReceiveWindowSpreadingFactor;
+    return m_firstReceiveWindowSpreadingFactor;
 }
 
 double
-LoraEndDeviceStatus::GetFirstReceiveWindowFrequency ()
+LoraEndDeviceStatus::GetFirstReceiveWindowFrequency()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 
-  return m_firstReceiveWindowFrequency;
+    return m_firstReceiveWindowFrequency;
 }
 
 uint8_t
-LoraEndDeviceStatus::GetSecondReceiveWindowOffset ()
+LoraEndDeviceStatus::GetSecondReceiveWindowOffset()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 
-  return m_secondReceiveWindowOffset;
+    return m_secondReceiveWindowOffset;
 }
 
 double
-LoraEndDeviceStatus::GetSecondReceiveWindowFrequency ()
+LoraEndDeviceStatus::GetSecondReceiveWindowFrequency()
 {
-  NS_LOG_FUNCTION_NOARGS ();
-  return m_secondReceiveWindowFrequency;
+    NS_LOG_FUNCTION_NOARGS();
+    return m_secondReceiveWindowFrequency;
 }
 
 Ptr<Packet>
-LoraEndDeviceStatus::GetCompleteReplyPacket (void)
+LoraEndDeviceStatus::GetCompleteReplyPacket(void)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 
-  // Start from reply payload
-  Ptr<Packet> replyPacket;
-  if (m_reply.payload) // If it has APP data to send
+    // Start from reply payload
+    Ptr<Packet> replyPacket;
+    if (m_reply.payload) // If it has APP data to send
     {
-      NS_LOG_DEBUG ("Crafting reply packet from existing payload");
-      replyPacket = m_reply.payload->Copy ();
+        NS_LOG_DEBUG("Crafting reply packet from existing payload");
+        replyPacket = m_reply.payload->Copy();
     }
-  else // If no APP data needs to be sent, use an empty payload
+    else // If no APP data needs to be sent, use an empty payload
     {
-      NS_LOG_DEBUG ("Crafting reply packet using an empty payload");
-      replyPacket = Create<Packet> (0);
+        NS_LOG_DEBUG("Crafting reply packet using an empty payload");
+        replyPacket = Create<Packet>(0);
     }
 
-  // Add headers
-  m_reply.frameHeader.SetAddress (m_endDeviceAddress);
-  Ptr<Packet> lastPacket = GetLastPacketReceivedFromDevice ()->Copy ();
-  ReceivedPacketInfo lastPacketInfo = GetLastReceivedPacketInfo ();
-  LorawanMacHeader mHdr;
-  LoraFrameHeader fHdr;
-  fHdr.SetAsUplink ();
-  lastPacket->RemoveHeader (mHdr);
-  lastPacket->RemoveHeader (fHdr);
-  m_reply.frameHeader.SetFCnt (fHdr.GetFCnt ());
-  m_reply.macHeader.SetMType (LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
-  replyPacket->AddHeader (m_reply.frameHeader);
-  replyPacket->AddHeader (m_reply.macHeader);
+    // Add headers
+    m_reply.frameHeader.SetAddress(m_endDeviceAddress);
+    Ptr<Packet> lastPacket = GetLastPacketReceivedFromDevice()->Copy();
+    ReceivedPacketInfo lastPacketInfo = GetLastReceivedPacketInfo();
+    LorawanMacHeader mHdr;
+    LoraFrameHeader fHdr;
+    fHdr.SetAsUplink();
+    lastPacket->RemoveHeader(mHdr);
+    lastPacket->RemoveHeader(fHdr);
+    m_reply.frameHeader.SetFCnt(fHdr.GetFCnt());
+    m_reply.macHeader.SetMType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
+    replyPacket->AddHeader(m_reply.frameHeader);
+    replyPacket->AddHeader(m_reply.macHeader);
 
-  NS_LOG_DEBUG ("Added MAC header" << m_reply.macHeader);
-  NS_LOG_DEBUG ("Added frame header" << m_reply.frameHeader);
+    NS_LOG_DEBUG("Added MAC header" << m_reply.macHeader);
+    NS_LOG_DEBUG("Added frame header" << m_reply.frameHeader);
 
-  return replyPacket;
+    return replyPacket;
 }
 
 bool
-LoraEndDeviceStatus::NeedsReply (void)
+LoraEndDeviceStatus::NeedsReply(void)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+    NS_LOG_FUNCTION_NOARGS();
 
-  return m_reply.needsReply;
+    return m_reply.needsReply;
 }
 
 LorawanMacHeader
-LoraEndDeviceStatus::GetReplyMacHeader ()
+LoraEndDeviceStatus::GetReplyMacHeader()
 {
-  NS_LOG_FUNCTION_NOARGS ();
-  return m_reply.macHeader;
+    NS_LOG_FUNCTION_NOARGS();
+    return m_reply.macHeader;
 }
 
 LoraFrameHeader
-LoraEndDeviceStatus::GetReplyFrameHeader ()
+LoraEndDeviceStatus::GetReplyFrameHeader()
 {
-  NS_LOG_FUNCTION_NOARGS ();
-  return m_reply.frameHeader;
+    NS_LOG_FUNCTION_NOARGS();
+    return m_reply.frameHeader;
 }
 
 Ptr<Packet>
-LoraEndDeviceStatus::GetReplyPayload (void)
+LoraEndDeviceStatus::GetReplyPayload(void)
 {
-  NS_LOG_FUNCTION_NOARGS ();
-  return m_reply.payload->Copy ();
+    NS_LOG_FUNCTION_NOARGS();
+    return m_reply.payload->Copy();
 }
 
 Ptr<LorawanMacEndDeviceClassA>
-LoraEndDeviceStatus::GetMac (void)
+LoraEndDeviceStatus::GetMac(void)
 {
-  return m_mac;
+    return m_mac;
 }
 
 LoraEndDeviceStatus::ReceivedPacketList
-LoraEndDeviceStatus::GetReceivedPacketList ()
+LoraEndDeviceStatus::GetReceivedPacketList()
 {
-  NS_LOG_FUNCTION_NOARGS ();
-  return m_receivedPacketList;
+    NS_LOG_FUNCTION_NOARGS();
+    return m_receivedPacketList;
 }
 
 void
-LoraEndDeviceStatus::SetModcod (uint8_t modcod)
+LoraEndDeviceStatus::SetModcod(uint8_t modcod)
 {
-  NS_LOG_FUNCTION (this << modcod);
-  m_modcod = modcod;
+    NS_LOG_FUNCTION(this << modcod);
+    m_modcod = modcod;
 }
 
 void
-LoraEndDeviceStatus::SetBeamId (uint8_t beamId)
+LoraEndDeviceStatus::SetBeamId(uint8_t beamId)
 {
-  NS_LOG_FUNCTION (this << beamId);
-  m_beamId = beamId;
+    NS_LOG_FUNCTION(this << beamId);
+    m_beamId = beamId;
 }
 
 void
-LoraEndDeviceStatus::SetFirstReceiveWindowSpreadingFactor (uint8_t sf)
+LoraEndDeviceStatus::SetFirstReceiveWindowSpreadingFactor(uint8_t sf)
 {
-  NS_LOG_FUNCTION (this << sf);
-  m_firstReceiveWindowSpreadingFactor = sf;
+    NS_LOG_FUNCTION(this << sf);
+    m_firstReceiveWindowSpreadingFactor = sf;
 }
 
 void
-LoraEndDeviceStatus::SetFirstReceiveWindowFrequency (double frequency)
+LoraEndDeviceStatus::SetFirstReceiveWindowFrequency(double frequency)
 {
-  NS_LOG_FUNCTION (this << frequency);
-  m_firstReceiveWindowFrequency = frequency;
+    NS_LOG_FUNCTION(this << frequency);
+    m_firstReceiveWindowFrequency = frequency;
 }
 
 void
-LoraEndDeviceStatus::SetSecondReceiveWindowOffset (uint8_t offset)
+LoraEndDeviceStatus::SetSecondReceiveWindowOffset(uint8_t offset)
 {
-  NS_LOG_FUNCTION (this << offset);
-  m_secondReceiveWindowOffset = offset;
+    NS_LOG_FUNCTION(this << offset);
+    m_secondReceiveWindowOffset = offset;
 }
 
 void
-LoraEndDeviceStatus::SetSecondReceiveWindowFrequency (double frequency)
+LoraEndDeviceStatus::SetSecondReceiveWindowFrequency(double frequency)
 {
-  NS_LOG_FUNCTION (this << frequency);
-  m_secondReceiveWindowFrequency = frequency;
+    NS_LOG_FUNCTION(this << frequency);
+    m_secondReceiveWindowFrequency = frequency;
 }
 
 void
-LoraEndDeviceStatus::SetReplyMacHeader (LorawanMacHeader macHeader)
+LoraEndDeviceStatus::SetReplyMacHeader(LorawanMacHeader macHeader)
 {
-  NS_LOG_FUNCTION_NOARGS ();
-  m_reply.macHeader = macHeader;
+    NS_LOG_FUNCTION_NOARGS();
+    m_reply.macHeader = macHeader;
 }
 
 void
-LoraEndDeviceStatus::SetReplyFrameHeader (LoraFrameHeader frameHeader)
+LoraEndDeviceStatus::SetReplyFrameHeader(LoraFrameHeader frameHeader)
 {
-  NS_LOG_FUNCTION_NOARGS ();
-  m_reply.frameHeader = frameHeader;
+    NS_LOG_FUNCTION_NOARGS();
+    m_reply.frameHeader = frameHeader;
 }
 
 void
-LoraEndDeviceStatus::SetReplyPayload (Ptr<Packet> replyPayload)
+LoraEndDeviceStatus::SetReplyPayload(Ptr<Packet> replyPayload)
 {
-  NS_LOG_FUNCTION (this << replyPayload);
-  m_reply.payload = replyPayload;
+    NS_LOG_FUNCTION(this << replyPayload);
+    m_reply.payload = replyPayload;
 }
 
 ///////////////////////
@@ -271,195 +271,198 @@ LoraEndDeviceStatus::SetReplyPayload (Ptr<Packet> replyPayload)
 ///////////////////////
 
 void
-LoraEndDeviceStatus::InsertReceivedPacket (Ptr<Packet const> receivedPacket, const Address &gwAddress)
+LoraEndDeviceStatus::InsertReceivedPacket(Ptr<const Packet> receivedPacket,
+                                          const Address& gwAddress)
 {
-  NS_LOG_FUNCTION (this << receivedPacket << gwAddress);
+    NS_LOG_FUNCTION(this << receivedPacket << gwAddress);
 
-  // Create a copy of the packet
-  Ptr<Packet> myPacket = receivedPacket->Copy ();
+    // Create a copy of the packet
+    Ptr<Packet> myPacket = receivedPacket->Copy();
 
-  // Update current parameters
-  LoraBeamTag beamTag;
-  myPacket->RemovePacketTag (beamTag);
-  SetBeamId (beamTag.GetBeamId ());
+    // Update current parameters
+    LoraBeamTag beamTag;
+    myPacket->RemovePacketTag(beamTag);
+    SetBeamId(beamTag.GetBeamId());
 
-  // Extract the headers
-  LorawanMacHeader macHdr;
-  myPacket->RemoveHeader (macHdr);
+    // Extract the headers
+    LorawanMacHeader macHdr;
+    myPacket->RemoveHeader(macHdr);
 
-  LoraFrameHeader frameHdr;
-  frameHdr.SetAsUplink ();
-  myPacket->RemoveHeader (frameHdr);
+    LoraFrameHeader frameHdr;
+    frameHdr.SetAsUplink();
+    myPacket->RemoveHeader(frameHdr);
 
-  // Update current parameters
-  LoraTag tag;
-  myPacket->RemovePacketTag (tag);
-  SetFirstReceiveWindowSpreadingFactor (tag.GetSpreadingFactor ());
-  SetFirstReceiveWindowFrequency (tag.GetFrequency ());
-  SetModcod (tag.GetModcod ());
+    // Update current parameters
+    LoraTag tag;
+    myPacket->RemovePacketTag(tag);
+    SetFirstReceiveWindowSpreadingFactor(tag.GetSpreadingFactor());
+    SetFirstReceiveWindowFrequency(tag.GetFrequency());
+    SetModcod(tag.GetModcod());
 
-  // Update Information on the received packet
-  ReceivedPacketInfo info;
-  info.sf = tag.GetSpreadingFactor ();
-  info.frequency = tag.GetFrequency ();
-  info.packet = receivedPacket;
+    // Update Information on the received packet
+    ReceivedPacketInfo info;
+    info.sf = tag.GetSpreadingFactor();
+    info.frequency = tag.GetFrequency();
+    info.packet = receivedPacket;
 
-  double rcvPower = tag.GetReceivePower ();
+    double rcvPower = tag.GetReceivePower();
 
-  // Perform insertion in list, also checking that the packet isn't already in
-  // the list (it could have been received by another GW already)
+    // Perform insertion in list, also checking that the packet isn't already in
+    // the list (it could have been received by another GW already)
 
-  // Start searching from the end
-  auto it = m_receivedPacketList.rbegin ();
-  for (; it != m_receivedPacketList.rend (); it++)
+    // Start searching from the end
+    auto it = m_receivedPacketList.rbegin();
+    for (; it != m_receivedPacketList.rend(); it++)
     {
-      // Get the frame counter of the current packet to compare it with the
-      // newly received one
-      Ptr<Packet> packetCopy = ((*it).first)->Copy ();
-      LorawanMacHeader currentMacHdr;
-      packetCopy->RemoveHeader (currentMacHdr);
-      LoraFrameHeader currentFrameHdr;
-      frameHdr.SetAsUplink ();
-      packetCopy->RemoveHeader (currentFrameHdr);
+        // Get the frame counter of the current packet to compare it with the
+        // newly received one
+        Ptr<Packet> packetCopy = ((*it).first)->Copy();
+        LorawanMacHeader currentMacHdr;
+        packetCopy->RemoveHeader(currentMacHdr);
+        LoraFrameHeader currentFrameHdr;
+        frameHdr.SetAsUplink();
+        packetCopy->RemoveHeader(currentFrameHdr);
 
-      NS_LOG_DEBUG ("Received packet's frame counter: " << unsigned(frameHdr.GetFCnt ())
-                                                        << "\nCurrent packet's frame counter: "
-                                                        << unsigned(currentFrameHdr.GetFCnt ()));
+        NS_LOG_DEBUG("Received packet's frame counter: " << unsigned(frameHdr.GetFCnt())
+                                                         << "\nCurrent packet's frame counter: "
+                                                         << unsigned(currentFrameHdr.GetFCnt()));
 
-      if (frameHdr.GetFCnt () == currentFrameHdr.GetFCnt ())
+        if (frameHdr.GetFCnt() == currentFrameHdr.GetFCnt())
         {
-          NS_LOG_INFO ("Packet was already received by another gateway");
+            NS_LOG_INFO("Packet was already received by another gateway");
 
-          // This packet had already been received from another gateway:
-          // add this gateway's reception information.
-          GatewayList &gwList = it->second.gwList;
+            // This packet had already been received from another gateway:
+            // add this gateway's reception information.
+            GatewayList& gwList = it->second.gwList;
 
-          PacketInfoPerGw gwInfo;
-          gwInfo.receivedTime = Simulator::Now ();
-          gwInfo.rxPower = rcvPower;
-          gwInfo.gwAddress = gwAddress;
-          gwList.insert (std::pair<Address, PacketInfoPerGw> (gwAddress, gwInfo));
+            PacketInfoPerGw gwInfo;
+            gwInfo.receivedTime = Simulator::Now();
+            gwInfo.rxPower = rcvPower;
+            gwInfo.gwAddress = gwAddress;
+            gwList.insert(std::pair<Address, PacketInfoPerGw>(gwAddress, gwInfo));
 
-          NS_LOG_DEBUG ("Size of gateway list: " << gwList.size ());
+            NS_LOG_DEBUG("Size of gateway list: " << gwList.size());
 
-          break; // Exit from the cycle
+            break; // Exit from the cycle
         }
     }
-  if (it == m_receivedPacketList.rend ())
+    if (it == m_receivedPacketList.rend())
     {
-      NS_LOG_INFO ("Packet was received for the first time");
-      PacketInfoPerGw gwInfo;
-      gwInfo.receivedTime = Simulator::Now ();
-      gwInfo.rxPower = rcvPower;
-      gwInfo.gwAddress = gwAddress;
-      info.gwList.insert (std::pair<Address, PacketInfoPerGw> (gwAddress, gwInfo));
-      m_receivedPacketList.push_back (std::pair<Ptr<Packet const>, ReceivedPacketInfo> (receivedPacket, info));
+        NS_LOG_INFO("Packet was received for the first time");
+        PacketInfoPerGw gwInfo;
+        gwInfo.receivedTime = Simulator::Now();
+        gwInfo.rxPower = rcvPower;
+        gwInfo.gwAddress = gwAddress;
+        info.gwList.insert(std::pair<Address, PacketInfoPerGw>(gwAddress, gwInfo));
+        m_receivedPacketList.push_back(
+            std::pair<Ptr<const Packet>, ReceivedPacketInfo>(receivedPacket, info));
     }
-  NS_LOG_DEBUG (*this);
+    NS_LOG_DEBUG(*this);
 }
 
 LoraEndDeviceStatus::ReceivedPacketInfo
-LoraEndDeviceStatus::GetLastReceivedPacketInfo (void)
+LoraEndDeviceStatus::GetLastReceivedPacketInfo(void)
 {
-  NS_LOG_FUNCTION_NOARGS ();
-  auto it = m_receivedPacketList.rbegin ();
-  if (it != m_receivedPacketList.rend ())
+    NS_LOG_FUNCTION_NOARGS();
+    auto it = m_receivedPacketList.rbegin();
+    if (it != m_receivedPacketList.rend())
     {
-      return it->second;
+        return it->second;
     }
-  else
+    else
     {
-      return LoraEndDeviceStatus::ReceivedPacketInfo ();
+        return LoraEndDeviceStatus::ReceivedPacketInfo();
     }
 }
 
-Ptr<Packet const>
-LoraEndDeviceStatus::GetLastPacketReceivedFromDevice (void)
+Ptr<const Packet>
+LoraEndDeviceStatus::GetLastPacketReceivedFromDevice(void)
 {
-  NS_LOG_FUNCTION_NOARGS ();
-  auto it = m_receivedPacketList.rbegin ();
-  if (it != m_receivedPacketList.rend ())
+    NS_LOG_FUNCTION_NOARGS();
+    auto it = m_receivedPacketList.rbegin();
+    if (it != m_receivedPacketList.rend())
     {
-      return it->first;
+        return it->first;
     }
-  else
+    else
     {
-      return 0;
+        return 0;
     }
-}
-
-void
-LoraEndDeviceStatus::InitializeReply ()
-{
-  NS_LOG_FUNCTION_NOARGS ();
-  m_reply = Reply ();
-  m_reply.needsReply = false;
 }
 
 void
-LoraEndDeviceStatus::AddMACCommand (Ptr<LorawanMacCommand> macCommand)
+LoraEndDeviceStatus::InitializeReply()
 {
-  m_reply.frameHeader.AddCommand (macCommand);
+    NS_LOG_FUNCTION_NOARGS();
+    m_reply = Reply();
+    m_reply.needsReply = false;
+}
+
+void
+LoraEndDeviceStatus::AddMACCommand(Ptr<LorawanMacCommand> macCommand)
+{
+    m_reply.frameHeader.AddCommand(macCommand);
 }
 
 bool
-LoraEndDeviceStatus::HasReceiveWindowOpportunityScheduled ()
+LoraEndDeviceStatus::HasReceiveWindowOpportunityScheduled()
 {
-  return m_receiveWindowEvent.IsRunning();
+    return m_receiveWindowEvent.IsRunning();
 }
 
 void
-LoraEndDeviceStatus::SetReceiveWindowOpportunity (EventId event)
+LoraEndDeviceStatus::SetReceiveWindowOpportunity(EventId event)
 {
-  m_receiveWindowEvent = event;
+    m_receiveWindowEvent = event;
 }
 
 void
-LoraEndDeviceStatus::RemoveReceiveWindowOpportunity (void)
+LoraEndDeviceStatus::RemoveReceiveWindowOpportunity(void)
 {
-  Simulator::Cancel(m_receiveWindowEvent);
+    Simulator::Cancel(m_receiveWindowEvent);
 }
 
 std::map<double, Address>
-LoraEndDeviceStatus::GetPowerGatewayMap (void)
+LoraEndDeviceStatus::GetPowerGatewayMap(void)
 {
-  // Create a map of the gateways
-  // Key: received power
-  // Value: address of the corresponding gateway
-  ReceivedPacketInfo info = m_receivedPacketList.back ().second;
-  GatewayList gwList = info.gwList;
+    // Create a map of the gateways
+    // Key: received power
+    // Value: address of the corresponding gateway
+    ReceivedPacketInfo info = m_receivedPacketList.back().second;
+    GatewayList gwList = info.gwList;
 
-  std::map<double, Address> gatewayPowers;
+    std::map<double, Address> gatewayPowers;
 
-  for (auto it = gwList.begin (); it != gwList.end (); it++)
+    for (auto it = gwList.begin(); it != gwList.end(); it++)
     {
-      Address currentGwAddress = (*it).first;
-      double currentRxPower = (*it).second.rxPower;
-      gatewayPowers.insert (std::pair<double, Address> (currentRxPower, currentGwAddress));
+        Address currentGwAddress = (*it).first;
+        double currentRxPower = (*it).second.rxPower;
+        gatewayPowers.insert(std::pair<double, Address>(currentRxPower, currentGwAddress));
     }
 
-  return gatewayPowers;
+    return gatewayPowers;
 }
 
-std::ostream &
-operator<< (std::ostream &os, const LoraEndDeviceStatus &status)
+std::ostream&
+operator<<(std::ostream& os, const LoraEndDeviceStatus& status)
 {
-  os << "Total packets received: " << status.m_receivedPacketList.size () << std::endl;
+    os << "Total packets received: " << status.m_receivedPacketList.size() << std::endl;
 
-  for (auto j = status.m_receivedPacketList.begin (); j != status.m_receivedPacketList.end (); j++)
+    for (auto j = status.m_receivedPacketList.begin(); j != status.m_receivedPacketList.end(); j++)
     {
-      LoraEndDeviceStatus::ReceivedPacketInfo info = (*j).second;
-      LoraEndDeviceStatus::GatewayList gatewayList = info.gwList;
-      Ptr<Packet const> pkt = (*j).first;
-      os << pkt << " " << gatewayList.size () << std::endl;
-      for (LoraEndDeviceStatus::GatewayList::iterator k = gatewayList.begin (); k != gatewayList.end ();
-           k++)
+        LoraEndDeviceStatus::ReceivedPacketInfo info = (*j).second;
+        LoraEndDeviceStatus::GatewayList gatewayList = info.gwList;
+        Ptr<const Packet> pkt = (*j).first;
+        os << pkt << " " << gatewayList.size() << std::endl;
+        for (LoraEndDeviceStatus::GatewayList::iterator k = gatewayList.begin();
+             k != gatewayList.end();
+             k++)
         {
-          LoraEndDeviceStatus::PacketInfoPerGw infoPerGw = (*k).second;
-          os << "  " << infoPerGw.gwAddress << " " << infoPerGw.rxPower << std::endl;
+            LoraEndDeviceStatus::PacketInfoPerGw infoPerGw = (*k).second;
+            os << "  " << infoPerGw.gwAddress << " " << infoPerGw.rxPower << std::endl;
         }
     }
 
-  return os;
+    return os;
 }
 } // namespace ns3

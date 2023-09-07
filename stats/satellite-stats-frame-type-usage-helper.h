@@ -22,15 +22,15 @@
 #ifndef SATELLITE_STATS_FRAME_TYPE_USAGE_HELPER_H
 #define SATELLITE_STATS_FRAME_TYPE_USAGE_HELPER_H
 
-#include <ns3/ptr.h>
-#include <ns3/satellite-stats-helper.h>
 #include <ns3/collector-map.h>
+#include <ns3/ptr.h>
 #include <ns3/satellite-bbframe.h>
+#include <ns3/satellite-stats-helper.h>
+
 #include <map>
 
-
-namespace ns3 {
-
+namespace ns3
+{
 
 class SatHelper;
 class DataCollectionObject;
@@ -41,76 +41,73 @@ class DataCollectionObject;
  */
 class SatStatsFrameTypeUsageHelper : public SatStatsHelper
 {
-public:
-  /**
-   * Constructor.
-   * \param satHelper Satellite helper instance
-   */
-  SatStatsFrameTypeUsageHelper (Ptr<const SatHelper> satHelper);
+  public:
+    /**
+     * Constructor.
+     * \param satHelper Satellite helper instance
+     */
+    SatStatsFrameTypeUsageHelper(Ptr<const SatHelper> satHelper);
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsFrameTypeUsageHelper ();
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsFrameTypeUsageHelper();
 
-  /**
-   * inherited from ObjectBase base class
-   * \return Type ID of the helper
-   */
-  static TypeId GetTypeId ();
+    /**
+     * inherited from ObjectBase base class
+     * \return Type ID of the helper
+     */
+    static TypeId GetTypeId();
 
-  /**
-   * Mapping for frame type IDs to integers, in case
-   * that SatBbFrameType_t enums are assigned.
-   */
-  static const std::map<SatEnums::SatBbFrameType_t, uint32_t> frameTypeIdMap;
+    /**
+     * Mapping for frame type IDs to integers, in case
+     * that SatBbFrameType_t enums are assigned.
+     */
+    static const std::map<SatEnums::SatBbFrameType_t, uint32_t> frameTypeIdMap;
 
-protected:
-  // inherited from SatStatsHelper base class
-  void DoInstall ();
+  protected:
+    // inherited from SatStatsHelper base class
+    void DoInstall();
 
-  /**
-   * Get identifier header for file.
-   * \param dataLabel Label for data column
-   * \return String containing identifier type (global, gw_id, beam_id),
-   * 				 frame_type and data label.
-   */
-  std::string GetIdentifierHeading (std::string dataLabel) const;
+    /**
+     * Get identifier header for file.
+     * \param dataLabel Label for data column
+     * \return String containing identifier type (global, gw_id, beam_id),
+     *               frame_type and data label.
+     */
+    std::string GetIdentifierHeading(std::string dataLabel) const;
 
-private:
-  /**
-   * \param context Beam ID, GW ID or global ID (0) as string
-   * \param frameType Type of the frame
-   */
-  void FrameTypeUsageCallback (std::string context, Ptr<SatBbFrame> bbFrame);
+  private:
+    /**
+     * \param context Beam ID, GW ID or global ID (0) as string
+     * \param frameType Type of the frame
+     */
+    void FrameTypeUsageCallback(std::string context, Ptr<SatBbFrame> bbFrame);
 
-  /**
-   * \brief Get frame type ID.
-   * \param frameType Frame type enum
-   * \return ID as integer
-   */
-  static uint32_t GetFrameTypeId (SatEnums::SatBbFrameType_t frameType);
+    /**
+     * \brief Get frame type ID.
+     * \param frameType Frame type enum
+     * \return ID as integer
+     */
+    static uint32_t GetFrameTypeId(SatEnums::SatBbFrameType_t frameType);
 
-  /**
-   * Flag for using percentage of the frame types in beam/in gw/globally
-   * instead of sum by type.
-   */
-  bool m_usePercentage;
+    /**
+     * Flag for using percentage of the frame types in beam/in gw/globally
+     * instead of sum by type.
+     */
+    bool m_usePercentage;
 
-  /**
-   * \brief Two-dimensional map of collectors, indexed first by the
-   * the frame type identifier and second by the global/gw/beam identifier.
-   */
-  std::map<uint32_t, CollectorMap> m_collectors;
+    /**
+     * \brief Two-dimensional map of collectors, indexed first by the
+     * the frame type identifier and second by the global/gw/beam identifier.
+     */
+    std::map<uint32_t, CollectorMap> m_collectors;
 
-  /// The aggregator created by this helper.
-  Ptr<DataCollectionObject> m_aggregator;
-
+    /// The aggregator created by this helper.
+    Ptr<DataCollectionObject> m_aggregator;
 
 }; // end of class SatStatsFrameTypeUsageHelper
 
-
 } // end of namespace ns3
-
 
 #endif /* SATELLITE_STATS_FRAME_TYPE_USAGE_HELPER_H */

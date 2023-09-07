@@ -18,113 +18,114 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include <cmath>
-
-#include <ns3/log.h>
-#include <ns3/boolean.h>
-#include <ns3/trace-source-accessor.h>
-
 #include "satellite-mobility-model.h"
 
-namespace ns3 {
+#include <ns3/boolean.h>
+#include <ns3/log.h>
+#include <ns3/trace-source-accessor.h>
 
-NS_OBJECT_ENSURE_REGISTERED (SatMobilityModel);
+#include <cmath>
+
+namespace ns3
+{
+
+NS_OBJECT_ENSURE_REGISTERED(SatMobilityModel);
 
 TypeId
-SatMobilityModel::GetTypeId (void)
+SatMobilityModel::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatMobilityModel")
-    .SetParent<MobilityModel> ()
-    .AddAttribute ("SatPosition", "The current position of the mobility model.",
-                   TypeId::ATTR_SET | TypeId::ATTR_GET,
-                   GeoCoordinateValue (GeoCoordinate (0.0, 0.0, 0.0)),
-                   MakeGeoCoordinateAccessor (&SatMobilityModel::SetGeoPosition,
-                                              &SatMobilityModel::GetGeoPosition),
-                   MakeGeoCoordinateChecker ())
-    .AddAttribute ("AsGeoCoordinates",
-                   "SetPosition method takes Geodetic coordinates in given Vector, x=longitude, y=latitude, z=altitude",
-                   BooleanValue (true),
-                   MakeBooleanAccessor (&SatMobilityModel::m_GetAsGeoCoordinates),
-                   MakeBooleanChecker ())
-    .AddTraceSource ("SatCourseChange",
-                     "The value of the position and/or velocity coordinate changed",
-                     MakeTraceSourceAccessor (&SatMobilityModel::m_satCourseChangeTrace),
-                     "ns3::SatMobilityModel::CourseChangeCallback")
-  ;
-  return tid;
+    static TypeId tid =
+        TypeId("ns3::SatMobilityModel")
+            .SetParent<MobilityModel>()
+            .AddAttribute("SatPosition",
+                          "The current position of the mobility model.",
+                          TypeId::ATTR_SET | TypeId::ATTR_GET,
+                          GeoCoordinateValue(GeoCoordinate(0.0, 0.0, 0.0)),
+                          MakeGeoCoordinateAccessor(&SatMobilityModel::SetGeoPosition,
+                                                    &SatMobilityModel::GetGeoPosition),
+                          MakeGeoCoordinateChecker())
+            .AddAttribute("AsGeoCoordinates",
+                          "SetPosition method takes Geodetic coordinates in given Vector, "
+                          "x=longitude, y=latitude, z=altitude",
+                          BooleanValue(true),
+                          MakeBooleanAccessor(&SatMobilityModel::m_GetAsGeoCoordinates),
+                          MakeBooleanChecker())
+            .AddTraceSource("SatCourseChange",
+                            "The value of the position and/or velocity coordinate changed",
+                            MakeTraceSourceAccessor(&SatMobilityModel::m_satCourseChangeTrace),
+                            "ns3::SatMobilityModel::CourseChangeCallback");
+    return tid;
 }
 
 TypeId
-SatMobilityModel::GetInstanceTypeId (void) const
+SatMobilityModel::GetInstanceTypeId(void) const
 {
-  return GetTypeId ();
+    return GetTypeId();
 }
 
-SatMobilityModel::SatMobilityModel ()
-  : m_cartesianPositionOutdated (false),
-  m_GetAsGeoCoordinates (true)
+SatMobilityModel::SatMobilityModel()
+    : m_cartesianPositionOutdated(false),
+      m_GetAsGeoCoordinates(true)
 {
-
 }
 
-SatMobilityModel::~SatMobilityModel ()
+SatMobilityModel::~SatMobilityModel()
 {
 }
 
 GeoCoordinate
-SatMobilityModel::GetGeoPosition (void) const
+SatMobilityModel::GetGeoPosition(void) const
 {
-  return DoGetGeoPosition ();
+    return DoGetGeoPosition();
 }
 
 void
-SatMobilityModel::SetGeoPosition (const GeoCoordinate &position)
+SatMobilityModel::SetGeoPosition(const GeoCoordinate& position)
 {
-  m_cartesianPositionOutdated = true;
-  DoSetGeoPosition (position);
+    m_cartesianPositionOutdated = true;
+    DoSetGeoPosition(position);
 }
 
 void
-SatMobilityModel::NotifyGeoCourseChange (void) const
+SatMobilityModel::NotifyGeoCourseChange(void) const
 {
-  m_satCourseChangeTrace (this);
-  NotifyCourseChange ();
+    m_satCourseChangeTrace(this);
+    NotifyCourseChange();
 }
 
 Vector
-SatMobilityModel::DoGetPosition (void) const
+SatMobilityModel::DoGetPosition(void) const
 {
-  if ( m_cartesianPositionOutdated )
+    if (m_cartesianPositionOutdated)
     {
-      Vector position = DoGetGeoPosition ().ToVector ();
-      DoSetCartesianPosition (position);
+        Vector position = DoGetGeoPosition().ToVector();
+        DoSetCartesianPosition(position);
     }
 
-  return m_cartesianPosition;
+    return m_cartesianPosition;
 }
 
 void
-SatMobilityModel::DoSetPosition (const Vector &position)
+SatMobilityModel::DoSetPosition(const Vector& position)
 {
-  if ( m_GetAsGeoCoordinates )
+    if (m_GetAsGeoCoordinates)
     {
-      m_cartesianPositionOutdated = true;
-      DoSetGeoPosition ( GeoCoordinate (position.x, position.y, position.z) );
+        m_cartesianPositionOutdated = true;
+        DoSetGeoPosition(GeoCoordinate(position.x, position.y, position.z));
     }
-  else
+    else
     {
-      m_cartesianPositionOutdated = false;
-      m_cartesianPosition = position;
-      DoSetGeoPosition ( GeoCoordinate (position) );
+        m_cartesianPositionOutdated = false;
+        m_cartesianPosition = position;
+        DoSetGeoPosition(GeoCoordinate(position));
     }
-
 }
 
 void
-SatMobilityModel::DoSetCartesianPosition (const Vector &position) const
+SatMobilityModel::DoSetCartesianPosition(const Vector& position) const
 {
-  m_cartesianPositionOutdated = false;
-  m_cartesianPosition = position;
+    m_cartesianPositionOutdated = false;
+    m_cartesianPosition = position;
 }
 
 } // namespace ns3

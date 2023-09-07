@@ -20,11 +20,11 @@
 #ifndef SATELLITE_FREE_SPACE_LOSS_H
 #define SATELLITE_FREE_SPACE_LOSS_H
 
-#include <ns3/object.h>
 #include <ns3/mobility-model.h>
+#include <ns3/object.h>
 
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -34,40 +34,40 @@ namespace ns3 {
  */
 class SatFreeSpaceLoss : public Object
 {
-public:
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
+  public:
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * Default constructor.
-   */
-  SatFreeSpaceLoss ();
-  ~SatFreeSpaceLoss ()
-  {
-  }
+    /**
+     * Default constructor.
+     */
+    SatFreeSpaceLoss();
 
-  /**
-   * \brief Calculate the free-space loss in linear format
-   * \param a Mobility model of node a
-   * \param b Mobility model of node b
-   * \param frequencyHz Frequency in Hertz
-   * \return the free space loss as ratio.
-   */
-  virtual double GetFsl (Ptr<MobilityModel> a, Ptr<MobilityModel> b, double frequencyHz) const;
+    ~SatFreeSpaceLoss()
+    {
+    }
 
-  /**
-   * \brief Calculate the free-space loss in dB
-   * \param a Mobility model of node a
-   * \param b Mobility model of node b
-   * \param frequencyHz Frequency in Hertz
-   * \return the free space loss as dBs.
-   */
-  virtual double GetFsldB (Ptr<MobilityModel> a, Ptr<MobilityModel> b, double frequencyHz) const;
+    /**
+     * \brief Calculate the free-space loss in linear format
+     * \param a Mobility model of node a
+     * \param b Mobility model of node b
+     * \param frequencyHz Frequency in Hertz
+     * \return the free space loss as ratio.
+     */
+    virtual double GetFsl(Ptr<MobilityModel> a, Ptr<MobilityModel> b, double frequencyHz) const;
+
+    /**
+     * \brief Calculate the free-space loss in dB
+     * \param a Mobility model of node a
+     * \param b Mobility model of node b
+     * \param frequencyHz Frequency in Hertz
+     * \return the free space loss as dBs.
+     */
+    virtual double GetFsldB(Ptr<MobilityModel> a, Ptr<MobilityModel> b, double frequencyHz) const;
 };
-
 
 } // namespace ns3
 

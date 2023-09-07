@@ -23,8 +23,8 @@
 
 #include "satellite-per-packet-interference.h"
 
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -34,75 +34,76 @@ namespace ns3 {
  */
 class SatPerFragmentInterference : public SatPerPacketInterference
 {
-public:
-  /**
-   * Inherited from ObjectBase base class.
-   */
-  static TypeId GetTypeId ();
+  public:
+    /**
+     * Inherited from ObjectBase base class.
+     */
+    static TypeId GetTypeId();
 
-  /**
-   * Inherited from ObjectBase base class.
-   */
-  TypeId GetInstanceTypeId (void) const;
+    /**
+     * Inherited from ObjectBase base class.
+     */
+    TypeId GetInstanceTypeId(void) const;
 
-  /**
-   * Default constructor
-   */
-  SatPerFragmentInterference ();
+    /**
+     * Default constructor
+     */
+    SatPerFragmentInterference();
 
-  /**
-   * Constructor to listen on a specific SatChannel.
-   */
-  SatPerFragmentInterference (SatEnums::ChannelType_t channelType, double rxBandwidthHz);
+    /**
+     * Constructor to listen on a specific SatChannel.
+     */
+    SatPerFragmentInterference(SatEnums::ChannelType_t channelType, double rxBandwidthHz);
 
-  /**
-   * Destructor
-   */
-  ~SatPerFragmentInterference ();
+    /**
+     * Destructor
+     */
+    ~SatPerFragmentInterference();
 
-protected:
-  /**
-   * Calculates interference power for the given reference
-   * Sets final power at end time to finalPower.
-   *
-   * \param event Reference event which for interference is calculated.
-   *
-   * \return Final calculated power value at end of receiving
-   */
-  std::vector< std::pair<double, double> > DoCalculate (Ptr<SatInterference::InterferenceChangeEvent> event);
+  protected:
+    /**
+     * Calculates interference power for the given reference
+     * Sets final power at end time to finalPower.
+     *
+     * \param event Reference event which for interference is calculated.
+     *
+     * \return Final calculated power value at end of receiving
+     */
+    std::vector<std::pair<double, double>> DoCalculate(
+        Ptr<SatInterference::InterferenceChangeEvent> event);
 
-  /**
-   * Helper function meant for subclasses to override.
-   * Called during DoCalculate when the start of the event whose
-   * interferences are being calculated has been reached.
-   */
-  void onOwnStartReached (double ifPowerW);
+    /**
+     * Helper function meant for subclasses to override.
+     * Called during DoCalculate when the start of the event whose
+     * interferences are being calculated has been reached.
+     */
+    void onOwnStartReached(double ifPowerW);
 
-  /**
-   * Helper function meant for subclasses to override.
-   * Called during DoCalculate after the start of the event whose
-   * interferences are being calculated has been reached.
-   *
-   * Update the current interference power by adding the power of
-   * the event being processed proportional to the remaining time
-   * until the end of the event whose interferences are being calculated.
-   *
-   * \param timeRatio ratio of time compared to an event duration of the
-   * distance between the event being processed and the end of the event
-   * whose interferences are being calculated.
-   * \param interferenceValue the interference value of the event being
-   * processed.
-   * \param ifPowerW the current value of the interference for the event
-   * whose interferences are being calculated; which will be updated.
-   */
-  void onInterferentEvent (long double timeRatio, double interferenceValue, double& ifPowerW);
+    /**
+     * Helper function meant for subclasses to override.
+     * Called during DoCalculate after the start of the event whose
+     * interferences are being calculated has been reached.
+     *
+     * Update the current interference power by adding the power of
+     * the event being processed proportional to the remaining time
+     * until the end of the event whose interferences are being calculated.
+     *
+     * \param timeRatio ratio of time compared to an event duration of the
+     * distance between the event being processed and the end of the event
+     * whose interferences are being calculated.
+     * \param interferenceValue the interference value of the event being
+     * processed.
+     * \param ifPowerW the current value of the interference for the event
+     * whose interferences are being calculated; which will be updated.
+     */
+    void onInterferentEvent(long double timeRatio, double interferenceValue, double& ifPowerW);
 
-private:
-  std::vector<std::pair<double, double>> m_ifPowerAtEventChangeW;
+  private:
+    std::vector<std::pair<double, double>> m_ifPowerAtEventChangeW;
 
-  uint32_t m_maxFragmentsCount;
+    uint32_t m_maxFragmentsCount;
 };
 
-}  // namespace ns3
+} // namespace ns3
 
-#endif  // SATELLITE_PER_FRAGMENT_INTERFERENCE_H
+#endif // SATELLITE_PER_FRAGMENT_INTERFERENCE_H

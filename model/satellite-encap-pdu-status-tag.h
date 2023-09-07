@@ -23,8 +23,8 @@
 
 #include <ns3/tag.h>
 
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -41,77 +41,76 @@ namespace ns3 {
  */
 class SatEncapPduStatusTag : public Tag
 {
-public:
-  /**
-   * Default constructor.
-   */
-  SatEncapPduStatusTag ();
+  public:
+    /**
+     * Default constructor.
+     */
+    SatEncapPduStatusTag();
 
-  /**
-   * \brief Set PDU status
-   * \param status Status of a PDU
-   */
-  void SetStatus (uint8_t status);
+    /**
+     * \brief Set PDU status
+     * \param status Status of a PDU
+     */
+    void SetStatus(uint8_t status);
 
-  /**
-   * \brief Get PDU status
-   * \return PDU status
-   */
-  uint8_t GetStatus (void) const;
+    /**
+     * \brief Get PDU status
+     * \return PDU status
+     */
+    uint8_t GetStatus(void) const;
 
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * \brief Get the type ID of instance
-   * \return the object TypeId
-   */
-  virtual TypeId GetInstanceTypeId (void) const;
+    /**
+     * \brief Get the type ID of instance
+     * \return the object TypeId
+     */
+    virtual TypeId GetInstanceTypeId(void) const;
 
-  /**
-   * Get serialized size of SatEncapPduStatusTag
-   * \return Serialized size in bytes
-   */
-  virtual uint32_t GetSerializedSize (void) const;
+    /**
+     * Get serialized size of SatEncapPduStatusTag
+     * \return Serialized size in bytes
+     */
+    virtual uint32_t GetSerializedSize(void) const;
 
-  /**
-   * Serializes information to buffer from this instance of SatEncapPduStatusTag
-   * \param i Buffer in which the information is serialized
-   */
-  virtual void Serialize (TagBuffer i) const;
+    /**
+     * Serializes information to buffer from this instance of SatEncapPduStatusTag
+     * \param i Buffer in which the information is serialized
+     */
+    virtual void Serialize(TagBuffer i) const;
 
-  /**
-   * Deserializes information from buffer to this instance of SatEncapPduStatusTag
-   * \param i Buffer from which the information is deserialized
-   */
-  virtual void Deserialize (TagBuffer i);
+    /**
+     * Deserializes information from buffer to this instance of SatEncapPduStatusTag
+     * \param i Buffer from which the information is deserialized
+     */
+    virtual void Deserialize(TagBuffer i);
 
-  /**
-   * Print time stamp of this instance of SatEncapPduStatusTag
-   * \param &os Output stream to which tag timestamp is printed.
-   */
-  virtual void Print (std::ostream &os) const;
+    /**
+     * Print time stamp of this instance of SatEncapPduStatusTag
+     * \param &os Output stream to which tag timestamp is printed.
+     */
+    virtual void Print(std::ostream& os) const;
 
-  /**
-   * Fragmentation enums
-   */
-  typedef enum
-  {
-    FULL_PDU          = 0,
-    START_PDU         = 1,
-    CONTINUATION_PDU  = 2,
-    END_PDU           = 3,
-    LAST_ELEMENT       = 4
-  } PduStatus_t;
+    /**
+     * Fragmentation enums
+     */
+    typedef enum
+    {
+        FULL_PDU = 0,
+        START_PDU = 1,
+        CONTINUATION_PDU = 2,
+        END_PDU = 3,
+        LAST_ELEMENT = 4
+    } PduStatus_t;
 
-private:
-  uint8_t m_pduStatus;
+  private:
+    uint8_t m_pduStatus;
 };
 
-
-}  // namespace ns3
+} // namespace ns3
 
 #endif // SATELLITE_ENCAP_PDU_STATUS_TAG_H

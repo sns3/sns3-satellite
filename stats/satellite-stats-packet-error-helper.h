@@ -22,17 +22,17 @@
 #ifndef SATELLITE_STATS_PACKET_ERROR_HELPER_H
 #define SATELLITE_STATS_PACKET_ERROR_HELPER_H
 
-#include <ns3/satellite-stats-helper.h>
-#include <ns3/satellite-enums.h>
-#include <ns3/satellite-phy-rx-carrier.h>
-#include <ns3/ptr.h>
 #include <ns3/address.h>
 #include <ns3/collector-map.h>
+#include <ns3/ptr.h>
+#include <ns3/satellite-enums.h>
+#include <ns3/satellite-phy-rx-carrier.h>
+#include <ns3/satellite-stats-helper.h>
+
 #include <map>
 
-
-namespace ns3 {
-
+namespace ns3
+{
 
 // BASE CLASS /////////////////////////////////////////////////////////////////
 
@@ -47,136 +47,133 @@ class Probe;
  */
 class SatStatsPacketErrorHelper : public SatStatsHelper
 {
-public:
-  // inherited from SatStatsHelper base class
-  SatStatsPacketErrorHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsHelper base class
+    SatStatsPacketErrorHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsPacketErrorHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsPacketErrorHelper ();
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 
+    /**
+     * \brief Receive inputs from trace sources and determine the right collector
+     *        to forward the inputs to.
+     * \param nPackets number of packets in the received packet burst.
+     * \param fromOrTo the source or destination address of the packet.
+     * \param isError whether a PHY error has occurred.
+     *
+     * Used only in return link.
+     */
+    void ErrorRxCallback(uint32_t nPackets, const Address& fromOrTo, bool isError);
 
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
+    /**
+     * \param traceSourceName name of trace source of PHY RX carrier to listen to.
+     */
+    void SetTraceSourceName(std::string traceSourceName);
 
-  /**
-   * \brief Receive inputs from trace sources and determine the right collector
-   *        to forward the inputs to.
-   * \param nPackets number of packets in the received packet burst.
-   * \param fromOrTo the source or destination address of the packet.
-   * \param isError whether a PHY error has occurred.
-   *
-   * Used only in return link.
-   */
-  void ErrorRxCallback (uint32_t nPackets, const Address & fromOrTo, bool isError);
+    /**
+     * \return name of trace source of PHY RX carrier to listen to.
+     */
+    std::string GetTraceSourceName() const;
 
-  /**
-   * \param traceSourceName name of trace source of PHY RX carrier to listen to.
-   */
-  void SetTraceSourceName (std::string traceSourceName);
+    /**
+     * \param channelType link where statistics are gathered from.
+     */
+    void SetChannelType(SatEnums::ChannelType_t channelType);
 
-  /**
-   * \return name of trace source of PHY RX carrier to listen to.
-   */
-  std::string GetTraceSourceName () const;
+    /**
+     * \return link where statistics are gathered from.
+     */
+    SatEnums::ChannelType_t GetChannelType() const;
 
-  /**
-   * \param channelType link where statistics are gathered from.
-   */
-  void SetChannelType (SatEnums::ChannelType_t channelType);
+    /**
+     * \brief Get the valid carrier type
+     * \return the valid carrier type
+     */
+    inline SatPhyRxCarrier::CarrierType GetValidCarrierType() const
+    {
+        return m_carrierType;
+    }
 
-  /**
-   * \return link where statistics are gathered from.
-   */
-  SatEnums::ChannelType_t GetChannelType () const;
+  protected:
+    // inherited from SatStatsHelper base class
+    void DoInstall();
 
-  /**
-   * \brief Get the valid carrier type
-   * \return the valid carrier type
-   */
-  inline SatPhyRxCarrier::CarrierType GetValidCarrierType () const
-  {
-    return m_carrierType;
-  }
+    /**
+     * \brief Set valid carrier type for this statistics helper type.
+     * \param carrierType
+     */
+    inline void SetValidCarrierType(SatPhyRxCarrier::CarrierType carrierType)
+    {
+        m_carrierType = carrierType;
+    }
 
-protected:
-  // inherited from SatStatsHelper base class
-  void DoInstall ();
+  private:
+    /**
+     * \brief Save the address and the proper identifier from the given UT node.
+     * \param utNode a UT node.
+     *
+     * The address of the given node will be saved in the #m_identifierMap
+     * member variable. Used only in return link.
+     */
+    void SaveAddressAndIdentifier(Ptr<Node> utNode);
 
-  /**
-   * \brief Set valid carrier type for this statistics helper type.
-   * \param carrierType
-   */
-  inline void SetValidCarrierType (SatPhyRxCarrier::CarrierType carrierType)
-  {
-    m_carrierType = carrierType;
-  }
+    /**
+     * \brief Set up several listeners on a GW node and connect them to the
+     *        collectors.
+     * \param gwNode
+     */
+    void InstallProbeOnGw(Ptr<Node> gwNode);
 
-private:
-  /**
-   * \brief Save the address and the proper identifier from the given UT node.
-   * \param utNode a UT node.
-   *
-   * The address of the given node will be saved in the #m_identifierMap
-   * member variable. Used only in return link.
-   */
-  void SaveAddressAndIdentifier (Ptr<Node> utNode);
+    /**
+     * \brief Set up several listeners on a SAT feeder node and connect them to the
+     *        collectors.
+     * \param satNode
+     */
+    void InstallProbeOnSatFeeder(Ptr<Node> satNode);
 
-  /**
-   * \brief Set up several listeners on a GW node and connect them to the
-   *        collectors.
-   * \param gwNode
-   */
-  void InstallProbeOnGw (Ptr<Node> gwNode);
+    /**
+     * \brief Set up several listeners on a SAT user node and connect them to the
+     *        collectors.
+     * \param satNode
+     */
+    void InstallProbeOnSatUser(Ptr<Node> satNode);
 
-  /**
-   * \brief Set up several listeners on a SAT feeder node and connect them to the
-   *        collectors.
-   * \param satNode
-   */
-  void InstallProbeOnSatFeeder (Ptr<Node> satNode);
+    /**
+     * \brief Set up several probes on a UT node and connect them to the
+     *        collectors.
+     * \param utNode
+     */
+    void InstallProbeOnUt(Ptr<Node> utNode);
 
-  /**
-   * \brief Set up several listeners on a SAT user node and connect them to the
-   *        collectors.
-   * \param satNode
-   */
-  void InstallProbeOnSatUser (Ptr<Node> satNode);
+    /// Maintains a list of probes created by this helper (for forward link).
+    std::list<Ptr<Probe>> m_probes;
 
-  /**
-   * \brief Set up several probes on a UT node and connect them to the
-   *        collectors.
-   * \param utNode
-   */
-  void InstallProbeOnUt (Ptr<Node> utNode);
+    /// Maintains a list of collectors created by this helper.
+    CollectorMap m_terminalCollectors;
 
-  /// Maintains a list of probes created by this helper (for forward link).
-  std::list<Ptr<Probe> > m_probes;
+    /// The aggregator created by this helper.
+    Ptr<DataCollectionObject> m_aggregator;
 
-  /// Maintains a list of collectors created by this helper.
-  CollectorMap m_terminalCollectors;
+    /// Map of address and the identifier associated with it (for return link).
+    std::map<const Address, uint32_t> m_identifierMap;
 
-  /// The aggregator created by this helper.
-  Ptr<DataCollectionObject> m_aggregator;
+    /// Name of trace source of PHY RX carrier to listen to.
+    std::string m_traceSourceName;
 
-  /// Map of address and the identifier associated with it (for return link).
-  std::map<const Address, uint32_t> m_identifierMap;
+    /// Link where statistics are gathered from.
+    SatEnums::ChannelType_t m_channelType;
 
-  /// Name of trace source of PHY RX carrier to listen to.
-  std::string m_traceSourceName;
-
-  /// Link where statistics are gathered from.
-  SatEnums::ChannelType_t m_channelType;
-
-  /// Valid carrier type
-  SatPhyRxCarrier::CarrierType m_carrierType;
+    /// Valid carrier type
+    SatPhyRxCarrier::CarrierType m_carrierType;
 
 }; // end of class SatStatsPacketErrorHelper
-
 
 // FORWARD FEEDER LINK DEDICATED ACCESS //////////////////////////////////////////////
 
@@ -190,33 +187,28 @@ private:
  *
  * Otherwise, the following example can be used:
  * \code
- * Ptr<SatStatsFwdFeederDaPacketErrorHelper> s = Create<SatStatsFwdFeederDaPacketErrorHelper> (satHelper);
- * s->SetName ("name");
- * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+ * Ptr<SatStatsFwdFeederDaPacketErrorHelper> s = Create<SatStatsFwdFeederDaPacketErrorHelper>
+ * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
  * \endcode
  */
 class SatStatsFwdFeederDaPacketErrorHelper : public SatStatsPacketErrorHelper
 {
-public:
-  // inherited from SatStatsPacketErrorHelper base class
-  SatStatsFwdFeederDaPacketErrorHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsPacketErrorHelper base class
+    SatStatsFwdFeederDaPacketErrorHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsFwdFeederDaPacketErrorHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsFwdFeederDaPacketErrorHelper ();
-
-
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
-
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 };
-
 
 // FORWARD USER LINK DEDICATED ACCESS //////////////////////////////////////////////
 
@@ -230,33 +222,28 @@ public:
  *
  * Otherwise, the following example can be used:
  * \code
- * Ptr<SatStatsFwdUserDaPacketErrorHelper> s = Create<SatStatsFwdUserDaPacketErrorHelper> (satHelper);
- * s->SetName ("name");
- * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+ * Ptr<SatStatsFwdUserDaPacketErrorHelper> s = Create<SatStatsFwdUserDaPacketErrorHelper>
+ * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
  * \endcode
  */
 class SatStatsFwdUserDaPacketErrorHelper : public SatStatsPacketErrorHelper
 {
-public:
-  // inherited from SatStatsPacketErrorHelper base class
-  SatStatsFwdUserDaPacketErrorHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsPacketErrorHelper base class
+    SatStatsFwdUserDaPacketErrorHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsFwdUserDaPacketErrorHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsFwdUserDaPacketErrorHelper ();
-
-
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
-
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 };
-
 
 // RETURN FEEDER LINK DEDICATED ACCESS ///////////////////////////////////////////////
 
@@ -270,33 +257,28 @@ public:
  *
  * Otherwise, the following example can be used:
  * \code
- * Ptr<SatStatsRtnFeederDaPacketErrorHelper> s = Create<SatStatsRtnFeederDaPacketErrorHelper> (satHelper);
- * s->SetName ("name");
- * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+ * Ptr<SatStatsRtnFeederDaPacketErrorHelper> s = Create<SatStatsRtnFeederDaPacketErrorHelper>
+ * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
  * \endcode
  */
 class SatStatsRtnFeederDaPacketErrorHelper : public SatStatsPacketErrorHelper
 {
-public:
-  // inherited from SatStatsPacketErrorHelper base class
-  SatStatsRtnFeederDaPacketErrorHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsPacketErrorHelper base class
+    SatStatsRtnFeederDaPacketErrorHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsRtnFeederDaPacketErrorHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsRtnFeederDaPacketErrorHelper ();
-
-
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
-
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 };
-
 
 // RETURN USER LINK DEDICATED ACCESS ///////////////////////////////////////////////
 
@@ -310,33 +292,28 @@ public:
  *
  * Otherwise, the following example can be used:
  * \code
- * Ptr<SatStatsRtnUserDaPacketErrorHelper> s = Create<SatStatsRtnUserDaPacketErrorHelper> (satHelper);
- * s->SetName ("name");
- * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+ * Ptr<SatStatsRtnUserDaPacketErrorHelper> s = Create<SatStatsRtnUserDaPacketErrorHelper>
+ * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
  * \endcode
  */
 class SatStatsRtnUserDaPacketErrorHelper : public SatStatsPacketErrorHelper
 {
-public:
-  // inherited from SatStatsPacketErrorHelper base class
-  SatStatsRtnUserDaPacketErrorHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsPacketErrorHelper base class
+    SatStatsRtnUserDaPacketErrorHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsRtnUserDaPacketErrorHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsRtnUserDaPacketErrorHelper ();
-
-
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
-
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 };
-
 
 // FEEDER SLOTTED ALOHA //////////////////////////////////////////////////////////////
 
@@ -350,8 +327,8 @@ public:
  *
  * Otherwise, the following example can be used:
  * \code
- * Ptr<SatStatsFeederSlottedAlohaPacketErrorHelper> s = Create<SatStatsFeederSlottedAlohaPacketErrorHelper> (satHelper);
- * s->SetName ("name");
+ * Ptr<SatStatsFeederSlottedAlohaPacketErrorHelper> s =
+ * Create<SatStatsFeederSlottedAlohaPacketErrorHelper> (satHelper); s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
@@ -359,24 +336,20 @@ public:
  */
 class SatStatsFeederSlottedAlohaPacketErrorHelper : public SatStatsPacketErrorHelper
 {
-public:
-  // inherited from SatStatsPacketErrorHelper base class
-  SatStatsFeederSlottedAlohaPacketErrorHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsPacketErrorHelper base class
+    SatStatsFeederSlottedAlohaPacketErrorHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsFeederSlottedAlohaPacketErrorHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsFeederSlottedAlohaPacketErrorHelper ();
-
-
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
-
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 };
-
 
 // USER SLOTTED ALOHA //////////////////////////////////////////////////////////////
 
@@ -390,8 +363,8 @@ public:
  *
  * Otherwise, the following example can be used:
  * \code
- * Ptr<SatStatsUserSlottedAlohaPacketErrorHelper> s = Create<SatStatsUserSlottedAlohaPacketErrorHelper> (satHelper);
- * s->SetName ("name");
+ * Ptr<SatStatsUserSlottedAlohaPacketErrorHelper> s =
+ * Create<SatStatsUserSlottedAlohaPacketErrorHelper> (satHelper); s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
@@ -399,24 +372,20 @@ public:
  */
 class SatStatsUserSlottedAlohaPacketErrorHelper : public SatStatsPacketErrorHelper
 {
-public:
-  // inherited from SatStatsPacketErrorHelper base class
-  SatStatsUserSlottedAlohaPacketErrorHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsPacketErrorHelper base class
+    SatStatsUserSlottedAlohaPacketErrorHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsUserSlottedAlohaPacketErrorHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsUserSlottedAlohaPacketErrorHelper ();
-
-
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
-
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 };
-
 
 // FEEDER CRDSA //////////////////////////////////////////////////////////////////////
 
@@ -430,33 +399,28 @@ public:
  *
  * Otherwise, the following example can be used:
  * \code
- * Ptr<SatStatsFeederCrdsaPacketErrorHelper> s = Create<SatStatsFeederCrdsaPacketErrorHelper> (satHelper);
- * s->SetName ("name");
- * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+ * Ptr<SatStatsFeederCrdsaPacketErrorHelper> s = Create<SatStatsFeederCrdsaPacketErrorHelper>
+ * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
  * \endcode
  */
 class SatStatsFeederCrdsaPacketErrorHelper : public SatStatsPacketErrorHelper
 {
-public:
-  // inherited from SatStatsPacketErrorHelper base class
-  SatStatsFeederCrdsaPacketErrorHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsPacketErrorHelper base class
+    SatStatsFeederCrdsaPacketErrorHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsFeederCrdsaPacketErrorHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsFeederCrdsaPacketErrorHelper ();
-
-
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
-
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 };
-
 
 // USER CRDSA //////////////////////////////////////////////////////////////////////
 
@@ -470,31 +434,27 @@ public:
  *
  * Otherwise, the following example can be used:
  * \code
- * Ptr<SatStatsUserCrdsaPacketErrorHelper> s = Create<SatStatsUserCrdsaPacketErrorHelper> (satHelper);
- * s->SetName ("name");
- * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+ * Ptr<SatStatsUserCrdsaPacketErrorHelper> s = Create<SatStatsUserCrdsaPacketErrorHelper>
+ * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
  * \endcode
  */
 class SatStatsUserCrdsaPacketErrorHelper : public SatStatsPacketErrorHelper
 {
-public:
-  // inherited from SatStatsPacketErrorHelper base class
-  SatStatsUserCrdsaPacketErrorHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsPacketErrorHelper base class
+    SatStatsUserCrdsaPacketErrorHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsUserCrdsaPacketErrorHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsUserCrdsaPacketErrorHelper ();
-
-
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
-
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 };
 
 // FEEDER E-SSA //////////////////////////////////////////////////////////////
@@ -509,31 +469,27 @@ public:
  *
  * Otherwise, the following example can be used:
  * \code
- * Ptr<SatStatsFeederEssaPacketErrorHelper> s = Create<SatStatsFeederEssaPacketErrorHelper> (satHelper);
- * s->SetName ("name");
- * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
+ * Ptr<SatStatsFeederEssaPacketErrorHelper> s = Create<SatStatsFeederEssaPacketErrorHelper>
+ * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
  * \endcode
  */
 class SatStatsFeederEssaPacketErrorHelper : public SatStatsPacketErrorHelper
 {
-public:
-  // inherited from SatStatsPacketErrorHelper base class
-  SatStatsFeederEssaPacketErrorHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsPacketErrorHelper base class
+    SatStatsFeederEssaPacketErrorHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsFeederEssaPacketErrorHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsFeederEssaPacketErrorHelper ();
-
-
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
-
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 };
 
 // USER E-SSA //////////////////////////////////////////////////////////////
@@ -557,26 +513,21 @@ public:
  */
 class SatStatsUserEssaPacketErrorHelper : public SatStatsPacketErrorHelper
 {
-public:
-  // inherited from SatStatsPacketErrorHelper base class
-  SatStatsUserEssaPacketErrorHelper (Ptr<const SatHelper> satHelper);
+  public:
+    // inherited from SatStatsPacketErrorHelper base class
+    SatStatsUserEssaPacketErrorHelper(Ptr<const SatHelper> satHelper);
 
+    /**
+     * / Destructor.
+     */
+    virtual ~SatStatsUserEssaPacketErrorHelper();
 
-  /**
-   * / Destructor.
-   */
-  virtual ~SatStatsUserEssaPacketErrorHelper ();
-
-
-  /**
-   * inherited from ObjectBase base class
-   */
-  static TypeId GetTypeId ();
-
+    /**
+     * inherited from ObjectBase base class
+     */
+    static TypeId GetTypeId();
 };
 
-
 } // end of namespace ns3
-
 
 #endif /* SATELLITE_STATS_PACKET_ERROR_HELPER_H */

@@ -22,13 +22,13 @@
 #ifndef SATELLITE_LOOK_UP_TABLE_H
 #define SATELLITE_LOOK_UP_TABLE_H
 
+#include <ns3/object.h>
+
 #include <fstream>
 #include <vector>
 
-#include <ns3/object.h>
-
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -37,50 +37,50 @@ namespace ns3 {
  */
 class SatLookUpTable : public Object
 {
-public:
-  /**
-   * Constructor with initialization parameters.
-   * \param linkResultPath
-   */
-  SatLookUpTable (std::string linkResultPath);
+  public:
+    /**
+     * Constructor with initialization parameters.
+     * \param linkResultPath
+     */
+    SatLookUpTable(std::string linkResultPath);
 
-  /**
-   * Destructor for SatLookUpTable
-   */
-  virtual ~SatLookUpTable ();
+    /**
+     * Destructor for SatLookUpTable
+     */
+    virtual ~SatLookUpTable();
 
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId ();
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId();
 
-  /**
-   * \brief Get the BLER corresponding to a given SINR
-   * \param sinrDb SINR in logarithmic scale
-   * \return BLER
-   */
-  double GetBler (double sinrDb) const;
+    /**
+     * \brief Get the BLER corresponding to a given SINR
+     * \param sinrDb SINR in logarithmic scale
+     * \return BLER
+     */
+    double GetBler(double sinrDb) const;
 
-  /**
-   * \brief Get Es/No in dB for a given BLER target
-   * \param blerTarget BLER target (0-1)
-   * \return Es/No target in dB
-   */
-  double GetEsNoDb (double blerTarget) const;
+    /**
+     * \brief Get Es/No in dB for a given BLER target
+     * \param blerTarget BLER target (0-1)
+     * \return Es/No target in dB
+     */
+    double GetEsNoDb(double blerTarget) const;
 
-private:
-  virtual void DoDispose ();
+  private:
+    virtual void DoDispose();
 
-  /**
-   * \brief Load the link results
-   * \param linkResultsPath Path to a link results file.
-   */
-  void Load (std::string linkResultPath);
+    /**
+     * \brief Load the link results
+     * \param linkResultsPath Path to a link results file.
+     */
+    void Load(std::string linkResultPath);
 
-  std::vector<double> m_esNoDb;
-  std::vector<double> m_bler;
-  std::ifstream *m_ifs;
+    std::vector<double> m_esNoDb;
+    std::vector<double> m_bler;
+    std::ifstream* m_ifs;
 };
 
 } // end of namespace ns3

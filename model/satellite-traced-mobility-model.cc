@@ -18,128 +18,137 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.com>
  */
 
-#include <ns3/simulator.h>
-#include <ns3/log.h>
-#include <ns3/enum.h>
-#include <ns3/singleton.h>
 #include "satellite-traced-mobility-model.h"
+
 #include "satellite-position-input-trace-container.h"
 
+#include <ns3/enum.h>
+#include <ns3/log.h>
+#include <ns3/simulator.h>
+#include <ns3/singleton.h>
 
-NS_LOG_COMPONENT_DEFINE ("SatTracedMobilityModel");
+NS_LOG_COMPONENT_DEFINE("SatTracedMobilityModel");
 
+namespace ns3
+{
 
-namespace ns3 {
-
-NS_OBJECT_ENSURE_REGISTERED (SatTracedMobilityModel);
+NS_OBJECT_ENSURE_REGISTERED(SatTracedMobilityModel);
 
 TypeId
-SatTracedMobilityModel::GetTypeId (void)
+SatTracedMobilityModel::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatTracedMobilityModel")
-    .SetParent<SatMobilityModel> ()
-    .AddConstructor<SatTracedMobilityModel> ()
-    .AddAttribute ("ReferenceEllipsoid",
-                   "Reference Ellipsoid model to use when reading coordinates",
-                   EnumValue (GeoCoordinate::SPHERE),
-                   MakeEnumAccessor (&SatTracedMobilityModel::m_refEllipsoid),
-                   MakeEnumChecker (GeoCoordinate::SPHERE, "Sphere",
-                                    GeoCoordinate::WGS84, "WGS84",
-                                    GeoCoordinate::GRS80, "GRS80"))
-    .AddAttribute ("UpdateInterval",
-                   "Interval at which the position should update",
-                   TimeValue (MilliSeconds (1)),
-                   MakeTimeAccessor (&SatTracedMobilityModel::m_updateInterval),
-                   MakeTimeChecker (FemtoSeconds (1)))
-  ;
+    static TypeId tid =
+        TypeId("ns3::SatTracedMobilityModel")
+            .SetParent<SatMobilityModel>()
+            .AddConstructor<SatTracedMobilityModel>()
+            .AddAttribute("ReferenceEllipsoid",
+                          "Reference Ellipsoid model to use when reading coordinates",
+                          EnumValue(GeoCoordinate::SPHERE),
+                          MakeEnumAccessor(&SatTracedMobilityModel::m_refEllipsoid),
+                          MakeEnumChecker(GeoCoordinate::SPHERE,
+                                          "Sphere",
+                                          GeoCoordinate::WGS84,
+                                          "WGS84",
+                                          GeoCoordinate::GRS80,
+                                          "GRS80"))
+            .AddAttribute("UpdateInterval",
+                          "Interval at which the position should update",
+                          TimeValue(MilliSeconds(1)),
+                          MakeTimeAccessor(&SatTracedMobilityModel::m_updateInterval),
+                          MakeTimeChecker(FemtoSeconds(1)));
 
-  return tid;
+    return tid;
 }
 
 TypeId
-SatTracedMobilityModel::GetInstanceTypeId (void) const
+SatTracedMobilityModel::GetInstanceTypeId(void) const
 {
-  return GetTypeId ();
+    return GetTypeId();
 }
 
 void
-SatTracedMobilityModel::DoDispose ()
+SatTracedMobilityModel::DoDispose()
 {
-  m_antennaGainPatterns = NULL;
+    m_antennaGainPatterns = NULL;
 
-  Object::DoDispose ();
+    Object::DoDispose();
 }
 
-SatTracedMobilityModel::SatTracedMobilityModel ()
+SatTracedMobilityModel::SatTracedMobilityModel()
 {
-  NS_FATAL_ERROR ("SatTracedMobilityModel default constructor should not be used");
+    NS_FATAL_ERROR("SatTracedMobilityModel default constructor should not be used");
 }
 
-SatTracedMobilityModel::SatTracedMobilityModel (uint32_t satId, const std::string& filename, Ptr<SatAntennaGainPatternContainer> agp)
-  : m_satId (satId),
-  m_traceFilename (filename),
-  m_updateInterval (MilliSeconds (1)),
-  m_refEllipsoid (GeoCoordinate::SPHERE),
-  m_geoPosition (0.0, 0.0, 0.0),
-  m_velocity (0.0, 0.0, 0.0),
-  m_antennaGainPatterns (agp)
+SatTracedMobilityModel::SatTracedMobilityModel(uint32_t satId,
+                                               const std::string& filename,
+                                               Ptr<SatAntennaGainPatternContainer> agp)
+    : m_satId(satId),
+      m_traceFilename(filename),
+      m_updateInterval(MilliSeconds(1)),
+      m_refEllipsoid(GeoCoordinate::SPHERE),
+      m_geoPosition(0.0, 0.0, 0.0),
+      m_velocity(0.0, 0.0, 0.0),
+      m_antennaGainPatterns(agp)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  UpdateGeoPositionFromFile ();
+    UpdateGeoPositionFromFile();
 }
 
-SatTracedMobilityModel::~SatTracedMobilityModel ()
+SatTracedMobilityModel::~SatTracedMobilityModel()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
 
 GeoCoordinate
-SatTracedMobilityModel::DoGetGeoPosition (void) const
+SatTracedMobilityModel::DoGetGeoPosition(void) const
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return m_geoPosition;
+    return m_geoPosition;
 }
 
 void
-SatTracedMobilityModel::DoSetGeoPosition (const GeoCoordinate &position)
+SatTracedMobilityModel::DoSetGeoPosition(const GeoCoordinate& position)
 {
-  NS_LOG_FUNCTION (this << position);
+    NS_LOG_FUNCTION(this << position);
 
-  double time = m_updateInterval.GetSeconds ();
-  Vector distance = position.ToVector () - m_geoPosition.ToVector ();
-  m_velocity = Vector (distance.x / time, distance.y / time, distance.z / time);
+    double time = m_updateInterval.GetSeconds();
+    Vector distance = position.ToVector() - m_geoPosition.ToVector();
+    m_velocity = Vector(distance.x / time, distance.y / time, distance.z / time);
 
-  NS_LOG_INFO ("Changing position from " << m_geoPosition << " to " << position << ". Velocity is " << m_velocity << " (" << m_velocity.GetLength () << ")");
+    NS_LOG_INFO("Changing position from " << m_geoPosition << " to " << position << ". Velocity is "
+                                          << m_velocity << " (" << m_velocity.GetLength() << ")");
 
-  m_geoPosition = position;
-  NotifyGeoCourseChange ();
+    m_geoPosition = position;
+    NotifyGeoCourseChange();
 }
 
 Vector
-SatTracedMobilityModel::DoGetVelocity (void) const
+SatTracedMobilityModel::DoGetVelocity(void) const
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  return m_velocity;
+    return m_velocity;
 }
 
 void
-SatTracedMobilityModel::UpdateGeoPositionFromFile (void)
+SatTracedMobilityModel::UpdateGeoPositionFromFile(void)
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  GeoCoordinate newPosition = Singleton<SatPositionInputTraceContainer>::Get ()->GetPosition (m_traceFilename, m_refEllipsoid);
-  DoSetGeoPosition (newPosition);
+    GeoCoordinate newPosition =
+        Singleton<SatPositionInputTraceContainer>::Get()->GetPosition(m_traceFilename,
+                                                                      m_refEllipsoid);
+    DoSetGeoPosition(newPosition);
 
-  Simulator::Schedule (m_updateInterval, &SatTracedMobilityModel::UpdateGeoPositionFromFile, this);
+    Simulator::Schedule(m_updateInterval, &SatTracedMobilityModel::UpdateGeoPositionFromFile, this);
 }
 
 uint32_t
-SatTracedMobilityModel::GetBestBeamId (void) const
+SatTracedMobilityModel::GetBestBeamId(void) const
 {
-  return m_antennaGainPatterns->GetBestBeamId (m_satId, m_geoPosition, false);
+    return m_antennaGainPatterns->GetBestBeamId(m_satId, m_geoPosition, false);
 }
 
-}
+} // namespace ns3

@@ -19,334 +19,329 @@
  *
  */
 
-#include <ns3/log.h>
-#include <ns3/enum.h>
-#include <ns3/string.h>
-#include <ns3/boolean.h>
-#include <ns3/object-vector.h>
-#include <ns3/callback.h>
-
-#include <ns3/node-container.h>
-#include <ns3/mac48-address.h>
-#include <ns3/satellite-net-device.h>
-#include <ns3/satellite-phy.h>
-#include <ns3/satellite-phy.h>
-#include <ns3/satellite-phy-rx.h>
-#include <ns3/satellite-phy-rx-carrier.h>
-
-#include <ns3/satellite-helper.h>
-#include <ns3/satellite-id-mapper.h>
-#include <ns3/singleton.h>
-
-#include <ns3/data-collection-object.h>
-#include <ns3/probe.h>
-#include <ns3/satellite-sinr-probe.h>
-#include <ns3/unit-conversion-collector.h>
-#include <ns3/distribution-collector.h>
-#include <ns3/scalar-collector.h>
-#include <ns3/multi-file-aggregator.h>
-#include <ns3/magister-gnuplot-aggregator.h>
-
-#include <sstream>
 #include "satellite-stats-composite-sinr-helper.h"
 
-NS_LOG_COMPONENT_DEFINE ("SatStatsCompositeSinrHelper");
+#include <ns3/boolean.h>
+#include <ns3/callback.h>
+#include <ns3/data-collection-object.h>
+#include <ns3/distribution-collector.h>
+#include <ns3/enum.h>
+#include <ns3/log.h>
+#include <ns3/mac48-address.h>
+#include <ns3/magister-gnuplot-aggregator.h>
+#include <ns3/multi-file-aggregator.h>
+#include <ns3/node-container.h>
+#include <ns3/object-vector.h>
+#include <ns3/probe.h>
+#include <ns3/satellite-helper.h>
+#include <ns3/satellite-id-mapper.h>
+#include <ns3/satellite-net-device.h>
+#include <ns3/satellite-phy-rx-carrier.h>
+#include <ns3/satellite-phy-rx.h>
+#include <ns3/satellite-phy.h>
+#include <ns3/satellite-sinr-probe.h>
+#include <ns3/scalar-collector.h>
+#include <ns3/singleton.h>
+#include <ns3/string.h>
+#include <ns3/unit-conversion-collector.h>
 
+#include <sstream>
 
-namespace ns3 {
+NS_LOG_COMPONENT_DEFINE("SatStatsCompositeSinrHelper");
 
-NS_OBJECT_ENSURE_REGISTERED (SatStatsCompositeSinrHelper);
-
-SatStatsCompositeSinrHelper::SatStatsCompositeSinrHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsHelper (satHelper)
+namespace ns3
 {
-  NS_LOG_FUNCTION (this << satHelper);
+
+NS_OBJECT_ENSURE_REGISTERED(SatStatsCompositeSinrHelper);
+
+SatStatsCompositeSinrHelper::SatStatsCompositeSinrHelper(Ptr<const SatHelper> satHelper)
+    : SatStatsHelper(satHelper)
+{
+    NS_LOG_FUNCTION(this << satHelper);
 }
 
-
-SatStatsCompositeSinrHelper::~SatStatsCompositeSinrHelper ()
+SatStatsCompositeSinrHelper::~SatStatsCompositeSinrHelper()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
-
 
 TypeId // static
-SatStatsCompositeSinrHelper::GetTypeId ()
+SatStatsCompositeSinrHelper::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::SatStatsCompositeSinrHelper")
-    .SetParent<SatStatsHelper> ()
-  ;
-  return tid;
+    static TypeId tid = TypeId("ns3::SatStatsCompositeSinrHelper").SetParent<SatStatsHelper>();
+    return tid;
 }
 
-
 void
-SatStatsCompositeSinrHelper::DoInstall ()
+SatStatsCompositeSinrHelper::DoInstall()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  switch (GetOutputType ())
+    switch (GetOutputType())
     {
     case SatStatsHelper::OUTPUT_NONE:
-      NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
-      break;
+        NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
+                       << " is not a valid output type for this statistics.");
+        break;
 
-    case SatStatsHelper::OUTPUT_SCALAR_FILE:
-      {
+    case SatStatsHelper::OUTPUT_SCALAR_FILE: {
         // Setup aggregator.
-        m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetOutputFileName ()),
-                                         "MultiFileMode", BooleanValue (false),
-                                         "EnableContextPrinting", BooleanValue (true),
-                                         "GeneralHeading", StringValue (GetIdentifierHeading ("sinr_db")));
+        m_aggregator = CreateAggregator("ns3::MultiFileAggregator",
+                                        "OutputFileName",
+                                        StringValue(GetOutputFileName()),
+                                        "MultiFileMode",
+                                        BooleanValue(false),
+                                        "EnableContextPrinting",
+                                        BooleanValue(true),
+                                        "GeneralHeading",
+                                        StringValue(GetIdentifierHeading("sinr_db")));
 
         // Setup collectors.
-        m_terminalCollectors.SetType ("ns3::ScalarCollector");
-        m_terminalCollectors.SetAttribute ("InputDataType",
-                                           EnumValue (ScalarCollector::INPUT_DATA_TYPE_DOUBLE));
-        m_terminalCollectors.SetAttribute ("OutputType",
-                                           EnumValue (ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
-        CreateCollectorPerIdentifier (m_terminalCollectors);
-        m_terminalCollectors.ConnectToAggregator ("Output",
-                                                  m_aggregator,
-                                                  &MultiFileAggregator::Write1d);
+        m_terminalCollectors.SetType("ns3::ScalarCollector");
+        m_terminalCollectors.SetAttribute("InputDataType",
+                                          EnumValue(ScalarCollector::INPUT_DATA_TYPE_DOUBLE));
+        m_terminalCollectors.SetAttribute(
+            "OutputType",
+            EnumValue(ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE));
+        CreateCollectorPerIdentifier(m_terminalCollectors);
+        m_terminalCollectors.ConnectToAggregator("Output",
+                                                 m_aggregator,
+                                                 &MultiFileAggregator::Write1d);
         break;
-      }
+    }
 
-    case SatStatsHelper::OUTPUT_SCATTER_FILE:
-      {
+    case SatStatsHelper::OUTPUT_SCATTER_FILE: {
         // Setup aggregator.
-        m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetOutputFileName ()),
-                                         "GeneralHeading", StringValue (GetTimeHeading ("sinr_db")));
+        m_aggregator = CreateAggregator("ns3::MultiFileAggregator",
+                                        "OutputFileName",
+                                        StringValue(GetOutputFileName()),
+                                        "GeneralHeading",
+                                        StringValue(GetTimeHeading("sinr_db")));
 
         // Setup collectors.
-        m_terminalCollectors.SetType ("ns3::UnitConversionCollector");
-        m_terminalCollectors.SetAttribute ("ConversionType",
-                                           EnumValue (UnitConversionCollector::TRANSPARENT));
-        CreateCollectorPerIdentifier (m_terminalCollectors);
-        m_terminalCollectors.ConnectToAggregator ("OutputTimeValue",
-                                                  m_aggregator,
-                                                  &MultiFileAggregator::Write2d);
+        m_terminalCollectors.SetType("ns3::UnitConversionCollector");
+        m_terminalCollectors.SetAttribute("ConversionType",
+                                          EnumValue(UnitConversionCollector::TRANSPARENT));
+        CreateCollectorPerIdentifier(m_terminalCollectors);
+        m_terminalCollectors.ConnectToAggregator("OutputTimeValue",
+                                                 m_aggregator,
+                                                 &MultiFileAggregator::Write2d);
         break;
-      }
+    }
 
     case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
     case SatStatsHelper::OUTPUT_PDF_FILE:
-    case SatStatsHelper::OUTPUT_CDF_FILE:
-      {
+    case SatStatsHelper::OUTPUT_CDF_FILE: {
         // Setup aggregator.
-        m_aggregator = CreateAggregator ("ns3::MultiFileAggregator",
-                                         "OutputFileName", StringValue (GetOutputFileName ()),
-                                         "GeneralHeading", StringValue (GetDistributionHeading ("sinr_db")));
+        m_aggregator = CreateAggregator("ns3::MultiFileAggregator",
+                                        "OutputFileName",
+                                        StringValue(GetOutputFileName()),
+                                        "GeneralHeading",
+                                        StringValue(GetDistributionHeading("sinr_db")));
 
         // Setup collectors.
-        m_terminalCollectors.SetType ("ns3::DistributionCollector");
-        DistributionCollector::OutputType_t outputType
-          = DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
-        if (GetOutputType () == SatStatsHelper::OUTPUT_PDF_FILE)
-          {
+        m_terminalCollectors.SetType("ns3::DistributionCollector");
+        DistributionCollector::OutputType_t outputType =
+            DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
+        if (GetOutputType() == SatStatsHelper::OUTPUT_PDF_FILE)
+        {
             outputType = DistributionCollector::OUTPUT_TYPE_PROBABILITY;
-          }
-        else if (GetOutputType () == SatStatsHelper::OUTPUT_CDF_FILE)
-          {
+        }
+        else if (GetOutputType() == SatStatsHelper::OUTPUT_CDF_FILE)
+        {
             outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
-          }
-        m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
-        CreateCollectorPerIdentifier (m_terminalCollectors);
-        m_terminalCollectors.ConnectToAggregator ("Output",
-                                                  m_aggregator,
-                                                  &MultiFileAggregator::Write2d);
-        m_terminalCollectors.ConnectToAggregator ("OutputString",
-                                                  m_aggregator,
-                                                  &MultiFileAggregator::AddContextHeading);
-        m_terminalCollectors.ConnectToAggregator ("Warning",
-                                                  m_aggregator,
-                                                  &MultiFileAggregator::EnableContextWarning);
+        }
+        m_terminalCollectors.SetAttribute("OutputType", EnumValue(outputType));
+        CreateCollectorPerIdentifier(m_terminalCollectors);
+        m_terminalCollectors.ConnectToAggregator("Output",
+                                                 m_aggregator,
+                                                 &MultiFileAggregator::Write2d);
+        m_terminalCollectors.ConnectToAggregator("OutputString",
+                                                 m_aggregator,
+                                                 &MultiFileAggregator::AddContextHeading);
+        m_terminalCollectors.ConnectToAggregator("Warning",
+                                                 m_aggregator,
+                                                 &MultiFileAggregator::EnableContextWarning);
         break;
-      }
+    }
 
     case SatStatsHelper::OUTPUT_SCALAR_PLOT:
-      /// \todo Add support for boxes in Gnuplot.
-      NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
-      break;
+        /// \todo Add support for boxes in Gnuplot.
+        NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
+                       << " is not a valid output type for this statistics.");
+        break;
 
-    case SatStatsHelper::OUTPUT_SCATTER_PLOT:
-      {
+    case SatStatsHelper::OUTPUT_SCATTER_PLOT: {
         // Setup aggregator.
-        m_aggregator = CreateAggregator ("ns3::MagisterGnuplotAggregator",
-                                         "OutputPath", StringValue (GetOutputPath ()),
-                                         "OutputFileName", StringValue (GetName ()));
-        Ptr<MagisterGnuplotAggregator> plotAggregator
-          = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-        NS_ASSERT (plotAggregator != nullptr);
-        //plot->SetTitle ("");
-        plotAggregator->SetLegend ("Time (in seconds)",
-                                   "SINR (in dB)");
-        plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
+        m_aggregator = CreateAggregator("ns3::MagisterGnuplotAggregator",
+                                        "OutputPath",
+                                        StringValue(GetOutputPath()),
+                                        "OutputFileName",
+                                        StringValue(GetName()));
+        Ptr<MagisterGnuplotAggregator> plotAggregator =
+            m_aggregator->GetObject<MagisterGnuplotAggregator>();
+        NS_ASSERT(plotAggregator != nullptr);
+        // plot->SetTitle ("");
+        plotAggregator->SetLegend("Time (in seconds)", "SINR (in dB)");
+        plotAggregator->Set2dDatasetDefaultStyle(Gnuplot2dDataset::LINES);
 
         // Setup collectors.
-        m_terminalCollectors.SetType ("ns3::UnitConversionCollector");
-        m_terminalCollectors.SetAttribute ("ConversionType",
-                                           EnumValue (UnitConversionCollector::TRANSPARENT));
-        CreateCollectorPerIdentifier (m_terminalCollectors);
-        for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
-             it != m_terminalCollectors.End (); ++it)
-          {
-            const std::string context = it->second->GetName ();
-            plotAggregator->Add2dDataset (context, context);
-          }
-        m_terminalCollectors.ConnectToAggregator ("OutputTimeValue",
-                                                  m_aggregator,
-                                                  &MagisterGnuplotAggregator::Write2d);
+        m_terminalCollectors.SetType("ns3::UnitConversionCollector");
+        m_terminalCollectors.SetAttribute("ConversionType",
+                                          EnumValue(UnitConversionCollector::TRANSPARENT));
+        CreateCollectorPerIdentifier(m_terminalCollectors);
+        for (CollectorMap::Iterator it = m_terminalCollectors.Begin();
+             it != m_terminalCollectors.End();
+             ++it)
+        {
+            const std::string context = it->second->GetName();
+            plotAggregator->Add2dDataset(context, context);
+        }
+        m_terminalCollectors.ConnectToAggregator("OutputTimeValue",
+                                                 m_aggregator,
+                                                 &MagisterGnuplotAggregator::Write2d);
         break;
-      }
+    }
 
     case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
     case SatStatsHelper::OUTPUT_PDF_PLOT:
-    case SatStatsHelper::OUTPUT_CDF_PLOT:
-      {
+    case SatStatsHelper::OUTPUT_CDF_PLOT: {
         // Setup aggregator.
-        m_aggregator = CreateAggregator ("ns3::MagisterGnuplotAggregator",
-                                         "OutputPath", StringValue (GetOutputPath ()),
-                                         "OutputFileName", StringValue (GetName ()));
-        Ptr<MagisterGnuplotAggregator> plotAggregator
-          = m_aggregator->GetObject<MagisterGnuplotAggregator> ();
-        NS_ASSERT (plotAggregator != nullptr);
-        //plot->SetTitle ("");
-        plotAggregator->SetLegend ("SINR (in dB)",
-                                   "Frequency");
-        plotAggregator->Set2dDatasetDefaultStyle (Gnuplot2dDataset::LINES);
+        m_aggregator = CreateAggregator("ns3::MagisterGnuplotAggregator",
+                                        "OutputPath",
+                                        StringValue(GetOutputPath()),
+                                        "OutputFileName",
+                                        StringValue(GetName()));
+        Ptr<MagisterGnuplotAggregator> plotAggregator =
+            m_aggregator->GetObject<MagisterGnuplotAggregator>();
+        NS_ASSERT(plotAggregator != nullptr);
+        // plot->SetTitle ("");
+        plotAggregator->SetLegend("SINR (in dB)", "Frequency");
+        plotAggregator->Set2dDatasetDefaultStyle(Gnuplot2dDataset::LINES);
 
         // Setup collectors.
-        m_terminalCollectors.SetType ("ns3::DistributionCollector");
-        DistributionCollector::OutputType_t outputType
-          = DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
-        if (GetOutputType () == SatStatsHelper::OUTPUT_PDF_PLOT)
-          {
+        m_terminalCollectors.SetType("ns3::DistributionCollector");
+        DistributionCollector::OutputType_t outputType =
+            DistributionCollector::OUTPUT_TYPE_HISTOGRAM;
+        if (GetOutputType() == SatStatsHelper::OUTPUT_PDF_PLOT)
+        {
             outputType = DistributionCollector::OUTPUT_TYPE_PROBABILITY;
-          }
-        else if (GetOutputType () == SatStatsHelper::OUTPUT_CDF_PLOT)
-          {
+        }
+        else if (GetOutputType() == SatStatsHelper::OUTPUT_CDF_PLOT)
+        {
             outputType = DistributionCollector::OUTPUT_TYPE_CUMULATIVE;
-          }
-        m_terminalCollectors.SetAttribute ("OutputType", EnumValue (outputType));
-        CreateCollectorPerIdentifier (m_terminalCollectors);
-        for (CollectorMap::Iterator it = m_terminalCollectors.Begin ();
-             it != m_terminalCollectors.End (); ++it)
-          {
-            const std::string context = it->second->GetName ();
-            plotAggregator->Add2dDataset (context, context);
-          }
-        m_terminalCollectors.ConnectToAggregator ("Output",
-                                                  m_aggregator,
-                                                  &MagisterGnuplotAggregator::Write2d);
+        }
+        m_terminalCollectors.SetAttribute("OutputType", EnumValue(outputType));
+        CreateCollectorPerIdentifier(m_terminalCollectors);
+        for (CollectorMap::Iterator it = m_terminalCollectors.Begin();
+             it != m_terminalCollectors.End();
+             ++it)
+        {
+            const std::string context = it->second->GetName();
+            plotAggregator->Add2dDataset(context, context);
+        }
+        m_terminalCollectors.ConnectToAggregator("Output",
+                                                 m_aggregator,
+                                                 &MagisterGnuplotAggregator::Write2d);
         break;
-      }
-
-    default:
-      NS_FATAL_ERROR ("SatStatsCompositeSinrHelper - Invalid output type");
-      break;
     }
 
-  // Setup probes and connect them to the collectors.
-  InstallProbes ();
+    default:
+        NS_FATAL_ERROR("SatStatsCompositeSinrHelper - Invalid output type");
+        break;
+    }
+
+    // Setup probes and connect them to the collectors.
+    InstallProbes();
 
 } // end of `void DoInstall ();`
 
-
 void
-SatStatsCompositeSinrHelper::InstallProbes ()
+SatStatsCompositeSinrHelper::InstallProbes()
 {
-  // The method below is supposed to be implemented by the child class.
-  DoInstallProbes ();
+    // The method below is supposed to be implemented by the child class.
+    DoInstallProbes();
 }
-
 
 // FORWARD LINK ///////////////////////////////////////////////////////////////
 
-NS_OBJECT_ENSURE_REGISTERED (SatStatsFwdCompositeSinrHelper);
+NS_OBJECT_ENSURE_REGISTERED(SatStatsFwdCompositeSinrHelper);
 
-SatStatsFwdCompositeSinrHelper::SatStatsFwdCompositeSinrHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsCompositeSinrHelper (satHelper)
+SatStatsFwdCompositeSinrHelper::SatStatsFwdCompositeSinrHelper(Ptr<const SatHelper> satHelper)
+    : SatStatsCompositeSinrHelper(satHelper)
 {
-  NS_LOG_FUNCTION (this << satHelper);
+    NS_LOG_FUNCTION(this << satHelper);
 }
 
-
-SatStatsFwdCompositeSinrHelper::~SatStatsFwdCompositeSinrHelper ()
+SatStatsFwdCompositeSinrHelper::~SatStatsFwdCompositeSinrHelper()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
-
 
 TypeId // static
-SatStatsFwdCompositeSinrHelper::GetTypeId ()
+SatStatsFwdCompositeSinrHelper::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::SatStatsFwdCompositeSinrHelper")
-    .SetParent<SatStatsCompositeSinrHelper> ()
-  ;
-  return tid;
+    static TypeId tid =
+        TypeId("ns3::SatStatsFwdCompositeSinrHelper").SetParent<SatStatsCompositeSinrHelper>();
+    return tid;
 }
 
-
 void
-SatStatsFwdCompositeSinrHelper::DoInstallProbes ()
+SatStatsFwdCompositeSinrHelper::DoInstallProbes()
 {
-  NS_LOG_FUNCTION (this);
-  NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
+    NS_LOG_FUNCTION(this);
+    NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
 
-  for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
+    for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
     {
-      const int32_t utId = GetUtId (*it);
-      NS_ASSERT_MSG (utId > 0,
-                     "Node " << (*it)->GetId () << " is not a valid UT");
-      const uint32_t identifier = GetIdentifierForUt (*it);
+        const int32_t utId = GetUtId(*it);
+        NS_ASSERT_MSG(utId > 0, "Node " << (*it)->GetId() << " is not a valid UT");
+        const uint32_t identifier = GetIdentifierForUt(*it);
 
-      // Create the probe.
-      std::ostringstream probeName;
-      probeName << utId;
-      Ptr<SatSinrProbe> probe = CreateObject<SatSinrProbe> ();
-      probe->SetName (probeName.str ());
+        // Create the probe.
+        std::ostringstream probeName;
+        probeName << utId;
+        Ptr<SatSinrProbe> probe = CreateObject<SatSinrProbe>();
+        probe->SetName(probeName.str());
 
-      Ptr<NetDevice> dev = GetUtSatNetDevice (*it);
-      Ptr<SatNetDevice> satDev = dev->GetObject<SatNetDevice> ();
-      NS_ASSERT (satDev != nullptr);
-      Ptr<SatPhy> satPhy = satDev->GetPhy ();
-      NS_ASSERT (satPhy != nullptr);
-      Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx ();
-      NS_ASSERT (satPhyRx != nullptr);
-      ObjectVectorValue carriers;
-      satPhyRx->GetAttribute ("RxCarrierList", carriers);
-      NS_LOG_DEBUG (this << " Node ID " << (*it)->GetId ()
-                         << " device #" << dev->GetIfIndex ()
-                         << " has " << carriers.GetN () << " RX carriers");
+        Ptr<NetDevice> dev = GetUtSatNetDevice(*it);
+        Ptr<SatNetDevice> satDev = dev->GetObject<SatNetDevice>();
+        NS_ASSERT(satDev != nullptr);
+        Ptr<SatPhy> satPhy = satDev->GetPhy();
+        NS_ASSERT(satPhy != nullptr);
+        Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx();
+        NS_ASSERT(satPhyRx != nullptr);
+        ObjectVectorValue carriers;
+        satPhyRx->GetAttribute("RxCarrierList", carriers);
+        NS_LOG_DEBUG(this << " Node ID " << (*it)->GetId() << " device #" << dev->GetIfIndex()
+                          << " has " << carriers.GetN() << " RX carriers");
 
-      for (ObjectVectorValue::Iterator itCarrier = carriers.Begin ();
-           itCarrier != carriers.End (); ++itCarrier)
+        for (ObjectVectorValue::Iterator itCarrier = carriers.Begin(); itCarrier != carriers.End();
+             ++itCarrier)
         {
-          // Connect the object to the probe.
-          if (probe->ConnectByObject ("Sinr", itCarrier->second))
+            // Connect the object to the probe.
+            if (probe->ConnectByObject("Sinr", itCarrier->second))
             {
-              // Connect the probe to the right collector.
-              bool ret = false;
-              switch (GetOutputType ())
+                // Connect the probe to the right collector.
+                bool ret = false;
+                switch (GetOutputType())
                 {
                 case SatStatsHelper::OUTPUT_SCALAR_FILE:
                 case SatStatsHelper::OUTPUT_SCALAR_PLOT:
-                  ret = m_terminalCollectors.ConnectWithProbe (probe->GetObject<Probe> (),
-                                                               "OutputSinr",
-                                                               identifier,
-                                                               &ScalarCollector::TraceSinkDouble);
-                  break;
+                    ret = m_terminalCollectors.ConnectWithProbe(probe->GetObject<Probe>(),
+                                                                "OutputSinr",
+                                                                identifier,
+                                                                &ScalarCollector::TraceSinkDouble);
+                    break;
 
                 case SatStatsHelper::OUTPUT_SCATTER_FILE:
                 case SatStatsHelper::OUTPUT_SCATTER_PLOT:
-                  ret = m_terminalCollectors.ConnectWithProbe (probe->GetObject<Probe> (),
-                                                               "OutputSinr",
-                                                               identifier,
-                                                               &UnitConversionCollector::TraceSinkDouble);
-                  break;
+                    ret = m_terminalCollectors.ConnectWithProbe(
+                        probe->GetObject<Probe>(),
+                        "OutputSinr",
+                        identifier,
+                        &UnitConversionCollector::TraceSinkDouble);
+                    break;
 
                 case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
                 case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
@@ -354,38 +349,39 @@ SatStatsFwdCompositeSinrHelper::DoInstallProbes ()
                 case SatStatsHelper::OUTPUT_PDF_PLOT:
                 case SatStatsHelper::OUTPUT_CDF_FILE:
                 case SatStatsHelper::OUTPUT_CDF_PLOT:
-                  ret = m_terminalCollectors.ConnectWithProbe (probe->GetObject<Probe> (),
-                                                               "OutputSinr",
-                                                               identifier,
-                                                               &DistributionCollector::TraceSinkDouble);
-                  break;
+                    ret = m_terminalCollectors.ConnectWithProbe(
+                        probe->GetObject<Probe>(),
+                        "OutputSinr",
+                        identifier,
+                        &DistributionCollector::TraceSinkDouble);
+                    break;
 
                 default:
-                  NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
-                  break;
+                    NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
+                                   << " is not a valid output type for this statistics.");
+                    break;
 
                 } // end of `switch (GetOutputType ())`
 
-              if (ret)
+                if (ret)
                 {
-                  NS_LOG_INFO (this << " created probe " << probeName.str ()
-                                    << ", connected to collector " << identifier);
-                  m_probes.push_back (probe->GetObject<Probe> ());
+                    NS_LOG_INFO(this << " created probe " << probeName.str()
+                                     << ", connected to collector " << identifier);
+                    m_probes.push_back(probe->GetObject<Probe>());
                 }
-              else
+                else
                 {
-                  NS_LOG_WARN (this << " unable to connect probe " << probeName.str ()
-                                    << " to collector " << identifier);
+                    NS_LOG_WARN(this << " unable to connect probe " << probeName.str()
+                                     << " to collector " << identifier);
                 }
 
             } // end of `if (probe->ConnectByObject ("Sinr", itCarrier->second))`
-          else
+            else
             {
-              NS_FATAL_ERROR ("Error connecting to Sinr trace source"
-                              << " of SatPhyRxCarrier"
-                              << " at node ID " << (*it)->GetId ()
-                              << " device #" << dev->GetIfIndex ()
-                              << " RX carrier #" << itCarrier->first);
+                NS_FATAL_ERROR("Error connecting to Sinr trace source"
+                               << " of SatPhyRxCarrier"
+                               << " at node ID " << (*it)->GetId() << " device #"
+                               << dev->GetIfIndex() << " RX carrier #" << itCarrier->first);
             }
 
         } // end of `for (ObjectVectorValue::Iterator itCarrier = carriers)`
@@ -394,89 +390,82 @@ SatStatsFwdCompositeSinrHelper::DoInstallProbes ()
 
 } // end of `void DoInstallProbes ();`
 
-
 // RETURN LINK ////////////////////////////////////////////////////////////////
 
-NS_OBJECT_ENSURE_REGISTERED (SatStatsRtnCompositeSinrHelper);
+NS_OBJECT_ENSURE_REGISTERED(SatStatsRtnCompositeSinrHelper);
 
-SatStatsRtnCompositeSinrHelper::SatStatsRtnCompositeSinrHelper (Ptr<const SatHelper> satHelper)
-  : SatStatsCompositeSinrHelper (satHelper)
+SatStatsRtnCompositeSinrHelper::SatStatsRtnCompositeSinrHelper(Ptr<const SatHelper> satHelper)
+    : SatStatsCompositeSinrHelper(satHelper)
 {
-  NS_LOG_FUNCTION (this << satHelper);
+    NS_LOG_FUNCTION(this << satHelper);
 }
 
-
-SatStatsRtnCompositeSinrHelper::~SatStatsRtnCompositeSinrHelper ()
+SatStatsRtnCompositeSinrHelper::~SatStatsRtnCompositeSinrHelper()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 }
-
 
 TypeId // static
-SatStatsRtnCompositeSinrHelper::GetTypeId ()
+SatStatsRtnCompositeSinrHelper::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::SatStatsRtnCompositeSinrHelper")
-    .SetParent<SatStatsCompositeSinrHelper> ()
-  ;
-  return tid;
+    static TypeId tid =
+        TypeId("ns3::SatStatsRtnCompositeSinrHelper").SetParent<SatStatsCompositeSinrHelper>();
+    return tid;
 }
 
-
 void
-SatStatsRtnCompositeSinrHelper::DoInstallProbes ()
+SatStatsRtnCompositeSinrHelper::DoInstallProbes()
 {
-  NS_LOG_FUNCTION (this);
+    NS_LOG_FUNCTION(this);
 
-  NodeContainer uts = GetSatHelper ()->GetBeamHelper ()->GetUtNodes ();
-  for (NodeContainer::Iterator it = uts.Begin (); it != uts.End (); ++it)
+    NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+    for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
     {
-      // Create a map of UT addresses and identifiers.
-      SaveAddressAndIdentifier (*it);
+        // Create a map of UT addresses and identifiers.
+        SaveAddressAndIdentifier(*it);
     }
 
-  // Connect to trace sources at GW nodes.
+    // Connect to trace sources at GW nodes.
 
-  NodeContainer gws = GetSatHelper ()->GetBeamHelper ()->GetGwNodes ();
-  Callback<void, double, const Address &> callback
-    = MakeCallback (&SatStatsRtnCompositeSinrHelper::SinrCallback, this);
+    NodeContainer gws = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+    Callback<void, double, const Address&> callback =
+        MakeCallback(&SatStatsRtnCompositeSinrHelper::SinrCallback, this);
 
-  for (NodeContainer::Iterator it = gws.Begin (); it != gws.End (); ++it)
+    for (NodeContainer::Iterator it = gws.Begin(); it != gws.End(); ++it)
     {
-      NetDeviceContainer devs = GetGwSatNetDevice (*it);
+        NetDeviceContainer devs = GetGwSatNetDevice(*it);
 
-      for (NetDeviceContainer::Iterator itDev = devs.Begin ();
-           itDev != devs.End (); ++itDev)
+        for (NetDeviceContainer::Iterator itDev = devs.Begin(); itDev != devs.End(); ++itDev)
         {
-          Ptr<SatNetDevice> satDev = (*itDev)->GetObject<SatNetDevice> ();
-          NS_ASSERT (satDev != nullptr);
-          Ptr<SatPhy> satPhy = satDev->GetPhy ();
-          NS_ASSERT (satPhy != nullptr);
-          Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx ();
-          NS_ASSERT (satPhyRx != nullptr);
-          ObjectVectorValue carriers;
-          satPhyRx->GetAttribute ("RxCarrierList", carriers);
-          NS_LOG_DEBUG (this << " Node ID " << (*it)->GetId ()
-                             << " device #" << (*itDev)->GetIfIndex ()
-                             << " has " << carriers.GetN () << " RX carriers");
+            Ptr<SatNetDevice> satDev = (*itDev)->GetObject<SatNetDevice>();
+            NS_ASSERT(satDev != nullptr);
+            Ptr<SatPhy> satPhy = satDev->GetPhy();
+            NS_ASSERT(satPhy != nullptr);
+            Ptr<SatPhyRx> satPhyRx = satPhy->GetPhyRx();
+            NS_ASSERT(satPhyRx != nullptr);
+            ObjectVectorValue carriers;
+            satPhyRx->GetAttribute("RxCarrierList", carriers);
+            NS_LOG_DEBUG(this << " Node ID " << (*it)->GetId() << " device #"
+                              << (*itDev)->GetIfIndex() << " has " << carriers.GetN()
+                              << " RX carriers");
 
-          for (ObjectVectorValue::Iterator itCarrier = carriers.Begin ();
-               itCarrier != carriers.End (); ++itCarrier)
+            for (ObjectVectorValue::Iterator itCarrier = carriers.Begin();
+                 itCarrier != carriers.End();
+                 ++itCarrier)
             {
-              if (itCarrier->second->TraceConnectWithoutContext ("Sinr",
-                                                                 callback))
+                if (itCarrier->second->TraceConnectWithoutContext("Sinr", callback))
                 {
-                  NS_LOG_INFO (this << " successfully connected with node ID "
-                                    << (*it)->GetId ()
-                                    << " device #" << (*itDev)->GetIfIndex ()
-                                    << " RX carrier #" << itCarrier->first);
+                    NS_LOG_INFO(this << " successfully connected with node ID " << (*it)->GetId()
+                                     << " device #" << (*itDev)->GetIfIndex() << " RX carrier #"
+                                     << itCarrier->first);
                 }
-              else
+                else
                 {
-                  NS_FATAL_ERROR ("Error connecting to Sinr trace source"
-                                  << " of SatPhyRxCarrier"
-                                  << " at node ID " << (*it)->GetId ()
-                                  << " device #" << (*itDev)->GetIfIndex ()
-                                  << " RX carrier #" << itCarrier->first);
+                    NS_FATAL_ERROR("Error connecting to Sinr trace source"
+                                   << " of SatPhyRxCarrier"
+                                   << " at node ID " << (*it)->GetId() << " device #"
+                                   << (*itDev)->GetIfIndex() << " RX carrier #"
+                                   << itCarrier->first);
                 }
 
             } // end of `for (ObjectVectorValue::Iterator itCarrier = carriers)`
@@ -487,72 +476,69 @@ SatStatsRtnCompositeSinrHelper::DoInstallProbes ()
 
 } // end of `void DoInstallProbes ();`
 
-
 void
-SatStatsRtnCompositeSinrHelper::SinrCallback (double sinrDb, const Address &from)
+SatStatsRtnCompositeSinrHelper::SinrCallback(double sinrDb, const Address& from)
 {
-  //NS_LOG_FUNCTION (this << sinrDb << from);
+    // NS_LOG_FUNCTION (this << sinrDb << from);
 
-  if (from.IsInvalid ())
+    if (from.IsInvalid())
     {
-      NS_LOG_WARN (this << " discarding a SINR trace of " << sinrDb << " dB"
-                        << " from statistics collection because of"
-                        << " invalid sender address");
+        NS_LOG_WARN(this << " discarding a SINR trace of " << sinrDb << " dB"
+                         << " from statistics collection because of"
+                         << " invalid sender address");
     }
-  else
+    else
     {
-      // Determine the identifier associated with the sender address.
-      std::map<const Address, uint32_t>::const_iterator it = m_identifierMap.find (from);
+        // Determine the identifier associated with the sender address.
+        std::map<const Address, uint32_t>::const_iterator it = m_identifierMap.find(from);
 
-      if (it == m_identifierMap.end ())
+        if (it == m_identifierMap.end())
         {
-          NS_LOG_WARN (this << " discarding a SINR trace of " << sinrDb << " dB"
-                            << " from statistics collection because of"
-                            << " unknown sender address " << from);
+            NS_LOG_WARN(this << " discarding a SINR trace of " << sinrDb << " dB"
+                             << " from statistics collection because of"
+                             << " unknown sender address " << from);
         }
-      else
+        else
         {
-          // Find the collector with the right identifier.
-          Ptr<DataCollectionObject> collector = m_terminalCollectors.Get (it->second);
-          NS_ASSERT_MSG (collector != nullptr,
-                         "Unable to find collector with identifier " << it->second);
+            // Find the collector with the right identifier.
+            Ptr<DataCollectionObject> collector = m_terminalCollectors.Get(it->second);
+            NS_ASSERT_MSG(collector != nullptr,
+                          "Unable to find collector with identifier " << it->second);
 
-          switch (GetOutputType ())
+            switch (GetOutputType())
             {
             case SatStatsHelper::OUTPUT_SCALAR_FILE:
-            case SatStatsHelper::OUTPUT_SCALAR_PLOT:
-              {
-                Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector> ();
-                NS_ASSERT (c != nullptr);
-                c->TraceSinkDouble (0.0, sinrDb);
+            case SatStatsHelper::OUTPUT_SCALAR_PLOT: {
+                Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector>();
+                NS_ASSERT(c != nullptr);
+                c->TraceSinkDouble(0.0, sinrDb);
                 break;
-              }
+            }
 
             case SatStatsHelper::OUTPUT_SCATTER_FILE:
-            case SatStatsHelper::OUTPUT_SCATTER_PLOT:
-              {
-                Ptr<UnitConversionCollector> c = collector->GetObject<UnitConversionCollector> ();
-                NS_ASSERT (c != nullptr);
-                c->TraceSinkDouble (0.0, sinrDb);
+            case SatStatsHelper::OUTPUT_SCATTER_PLOT: {
+                Ptr<UnitConversionCollector> c = collector->GetObject<UnitConversionCollector>();
+                NS_ASSERT(c != nullptr);
+                c->TraceSinkDouble(0.0, sinrDb);
                 break;
-              }
+            }
 
             case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
             case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
             case SatStatsHelper::OUTPUT_PDF_FILE:
             case SatStatsHelper::OUTPUT_PDF_PLOT:
             case SatStatsHelper::OUTPUT_CDF_FILE:
-            case SatStatsHelper::OUTPUT_CDF_PLOT:
-              {
-                Ptr<DistributionCollector> c = collector->GetObject<DistributionCollector> ();
-                NS_ASSERT (c != nullptr);
-                c->TraceSinkDouble (0.0, sinrDb);
+            case SatStatsHelper::OUTPUT_CDF_PLOT: {
+                Ptr<DistributionCollector> c = collector->GetObject<DistributionCollector>();
+                NS_ASSERT(c != nullptr);
+                c->TraceSinkDouble(0.0, sinrDb);
                 break;
-              }
+            }
 
             default:
-              NS_FATAL_ERROR (GetOutputTypeName (GetOutputType ()) << " is not a valid output type for this statistics.");
-              break;
+                NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
+                               << " is not a valid output type for this statistics.");
+                break;
 
             } // end of `switch (GetOutputType ())`
 
@@ -562,28 +548,24 @@ SatStatsRtnCompositeSinrHelper::SinrCallback (double sinrDb, const Address &from
 
 } // end of `void SinrCallback (double, const Address &);`
 
-
 void
-SatStatsRtnCompositeSinrHelper::SaveAddressAndIdentifier (Ptr<Node> utNode)
+SatStatsRtnCompositeSinrHelper::SaveAddressAndIdentifier(Ptr<Node> utNode)
 {
-  NS_LOG_FUNCTION (this << utNode->GetId ());
+    NS_LOG_FUNCTION(this << utNode->GetId());
 
-  const SatIdMapper * satIdMapper = Singleton<SatIdMapper>::Get ();
-  const Address addr = satIdMapper->GetUtMacWithNode (utNode);
+    const SatIdMapper* satIdMapper = Singleton<SatIdMapper>::Get();
+    const Address addr = satIdMapper->GetUtMacWithNode(utNode);
 
-  if (addr.IsInvalid ())
+    if (addr.IsInvalid())
     {
-      NS_LOG_WARN (this << " Node " << utNode->GetId ()
-                        << " is not a valid UT");
+        NS_LOG_WARN(this << " Node " << utNode->GetId() << " is not a valid UT");
     }
-  else
+    else
     {
-      const uint32_t identifier = GetIdentifierForUt (utNode);
-      m_identifierMap[addr] = identifier;
-      NS_LOG_INFO (this << " associated address " << addr
-                        << " with identifier " << identifier);
+        const uint32_t identifier = GetIdentifierForUt(utNode);
+        m_identifierMap[addr] = identifier;
+        NS_LOG_INFO(this << " associated address " << addr << " with identifier " << identifier);
     }
 }
-
 
 } // end of namespace ns3

@@ -21,7 +21,7 @@
 #
 
 # A script to easily run only the satellite module tests
-# 
+#
 
 cd ../../../;
 

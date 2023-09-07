@@ -18,65 +18,65 @@
  * Author: Jani Puttonen <jani.puttonen@magister.fi>
  */
 
-#include <ns3/log.h>
-#include <ns3/object.h>
-#include <ns3/double.h>
-#include <ns3/string.h>
-
 #include "satellite-propagation-delay-model.h"
 
+#include <ns3/double.h>
+#include <ns3/log.h>
+#include <ns3/object.h>
+#include <ns3/string.h>
 
-NS_LOG_COMPONENT_DEFINE ("SatConstantPropagationDelayModel");
+NS_LOG_COMPONENT_DEFINE("SatConstantPropagationDelayModel");
 
-namespace ns3 {
+namespace ns3
+{
 
-
-NS_OBJECT_ENSURE_REGISTERED (SatConstantPropagationDelayModel);
+NS_OBJECT_ENSURE_REGISTERED(SatConstantPropagationDelayModel);
 
 TypeId
-SatConstantPropagationDelayModel::GetTypeId (void)
+SatConstantPropagationDelayModel::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::SatConstantPropagationDelayModel")
-    .SetParent<PropagationDelayModel> ()
-    .AddConstructor<SatConstantPropagationDelayModel> ()
-    .AddAttribute ("Delay", "The delay",
-                   TimeValue ( Seconds (0.13)),
-                   MakeTimeAccessor (&SatConstantPropagationDelayModel::m_delay),
-                   MakeTimeChecker ())
-  ;
-  return tid;
+    static TypeId tid =
+        TypeId("ns3::SatConstantPropagationDelayModel")
+            .SetParent<PropagationDelayModel>()
+            .AddConstructor<SatConstantPropagationDelayModel>()
+            .AddAttribute("Delay",
+                          "The delay",
+                          TimeValue(Seconds(0.13)),
+                          MakeTimeAccessor(&SatConstantPropagationDelayModel::m_delay),
+                          MakeTimeChecker());
+    return tid;
 }
 
-SatConstantPropagationDelayModel::SatConstantPropagationDelayModel ()
+SatConstantPropagationDelayModel::SatConstantPropagationDelayModel()
 {
 }
 
 Time
-SatConstantPropagationDelayModel::GetDelay (Ptr<MobilityModel> a, Ptr<MobilityModel> b) const
+SatConstantPropagationDelayModel::GetDelay(Ptr<MobilityModel> a, Ptr<MobilityModel> b) const
 {
-  NS_LOG_FUNCTION (this);
-  return m_delay;
+    NS_LOG_FUNCTION(this);
+    return m_delay;
 }
 
 void
-SatConstantPropagationDelayModel::SetDelay (Time delay)
+SatConstantPropagationDelayModel::SetDelay(Time delay)
 {
-  NS_LOG_FUNCTION (this << delay.GetSeconds ());
-  m_delay = delay;
+    NS_LOG_FUNCTION(this << delay.GetSeconds());
+    m_delay = delay;
 }
 
 Time
-SatConstantPropagationDelayModel::GetDelay () const
+SatConstantPropagationDelayModel::GetDelay() const
 {
-  NS_LOG_FUNCTION (this);
-  return m_delay;
+    NS_LOG_FUNCTION(this);
+    return m_delay;
 }
 
 int64_t
-SatConstantPropagationDelayModel::DoAssignStreams (int64_t s)
+SatConstantPropagationDelayModel::DoAssignStreams(int64_t s)
 {
-  NS_LOG_FUNCTION (this);
-  return 0;
+    NS_LOG_FUNCTION(this);
+    return 0;
 }
 
 } // namespace ns3

@@ -21,11 +21,11 @@
 #ifndef SATELLITE_TIME_TAG_H
 #define SATELLITE_TIME_TAG_H
 
-#include <ns3/tag.h>
 #include <ns3/nstime.h>
+#include <ns3/tag.h>
 
-
-namespace ns3 {
+namespace ns3
+{
 
 /*
  * There are 4 classes defined here: SatTimeTag, SatPhyTimeTag, SatMacTimeTag,
@@ -40,144 +40,140 @@ namespace ns3 {
  */
 class SatTimeTag : public Tag
 {
-public:
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId  GetTypeId (void);
+  public:
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * \brief Get the type ID of instance
-   * \return the object TypeId
-   */
-  virtual TypeId  GetInstanceTypeId (void) const;
+    /**
+     * \brief Get the type ID of instance
+     * \return the object TypeId
+     */
+    virtual TypeId GetInstanceTypeId(void) const;
 
-  /**
-   * Default constructor.
-   */
-  SatTimeTag ();
+    /**
+     * Default constructor.
+     */
+    SatTimeTag();
 
-  /**
-   * Constructor with initialization parameters.
-   * \param senderTimestamp
-   */
-  SatTimeTag (Time senderTimestamp);
+    /**
+     * Constructor with initialization parameters.
+     * \param senderTimestamp
+     */
+    SatTimeTag(Time senderTimestamp);
 
-  /**
-   * Serializes information to buffer from this instance of SatTimeTag
-   * \param i Buffer in which the information is serialized
-   */
-  virtual void  Serialize (TagBuffer i) const;
+    /**
+     * Serializes information to buffer from this instance of SatTimeTag
+     * \param i Buffer in which the information is serialized
+     */
+    virtual void Serialize(TagBuffer i) const;
 
-  /**
-   * Deserializes information from buffer to this instance of SatTimeTag
-   * \param i Buffer from which the information is deserialized
-   */
-  virtual void  Deserialize (TagBuffer i);
+    /**
+     * Deserializes information from buffer to this instance of SatTimeTag
+     * \param i Buffer from which the information is deserialized
+     */
+    virtual void Deserialize(TagBuffer i);
 
-  /**
-   * Get serialized size of SatTimeTag
-   * \return Serialized size in bytes
-   */
-  virtual uint32_t  GetSerializedSize () const;
+    /**
+     * Get serialized size of SatTimeTag
+     * \return Serialized size in bytes
+     */
+    virtual uint32_t GetSerializedSize() const;
 
-  /**
-   * Print time stamp of this instance of SatTimeTag
-   * \param &os Output stream to which tag timestamp is printed.
-   */
-  virtual void Print (std::ostream &os) const;
+    /**
+     * Print time stamp of this instance of SatTimeTag
+     * \param &os Output stream to which tag timestamp is printed.
+     */
+    virtual void Print(std::ostream& os) const;
 
-  /**
-   * Get sender time stamp of this tag.
-   * \return Sender timestamp
-   */
-  Time GetSenderTimestamp (void) const;
+    /**
+     * Get sender time stamp of this tag.
+     * \return Sender timestamp
+     */
+    Time GetSenderTimestamp(void) const;
 
-  /**
-   * Set sender time stamp of this tag.
-   * \param senderTimestamp Sender time stamp
-   */
-  void SetSenderTimestamp (Time senderTimestamp);
+    /**
+     * Set sender time stamp of this tag.
+     * \param senderTimestamp Sender time stamp
+     */
+    void SetSenderTimestamp(Time senderTimestamp);
 
-private:
-  Time m_senderTimestamp;
-
+  private:
+    Time m_senderTimestamp;
 };
-
 
 /**
  * \ingroup satellite
- * \brief Time tag used to identify the time when packet is enqueued at PHY on first link between GW and UT
- *        level.
+ * \brief Time tag used to identify the time when packet is enqueued at PHY on first link between GW
+ * and UT level.
  */
 class SatPhyTimeTag : public Tag
 {
-public:
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId  GetTypeId (void);
+  public:
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * \brief Get the type ID of instance
-   * \return the object TypeId
-   */
-  virtual TypeId  GetInstanceTypeId (void) const;
+    /**
+     * \brief Get the type ID of instance
+     * \return the object TypeId
+     */
+    virtual TypeId GetInstanceTypeId(void) const;
 
-  /**
-   * Default constructor.
-   */
-  SatPhyTimeTag ();
+    /**
+     * Default constructor.
+     */
+    SatPhyTimeTag();
 
-  /**
-   * Constructor with initialization parameters.
-   * \param senderTimestamp
-   */
-  SatPhyTimeTag (Time senderTimestamp);
+    /**
+     * Constructor with initialization parameters.
+     * \param senderTimestamp
+     */
+    SatPhyTimeTag(Time senderTimestamp);
 
-  /**
-   * Serializes information to buffer from this instance of SatPhyTimeTag
-   * \param i Buffer in which the information is serialized
-   */
-  virtual void  Serialize (TagBuffer i) const;
+    /**
+     * Serializes information to buffer from this instance of SatPhyTimeTag
+     * \param i Buffer in which the information is serialized
+     */
+    virtual void Serialize(TagBuffer i) const;
 
-  /**
-   * Deserializes information from buffer to this instance of SatPhyTimeTag
-   * \param i Buffer from which the information is deserialized
-   */
-  virtual void  Deserialize (TagBuffer i);
+    /**
+     * Deserializes information from buffer to this instance of SatPhyTimeTag
+     * \param i Buffer from which the information is deserialized
+     */
+    virtual void Deserialize(TagBuffer i);
 
-  /**
-   * Get serialized size of SatPhyTimeTag
-   * \return Serialized size in bytes
-   */
-  virtual uint32_t  GetSerializedSize () const;
+    /**
+     * Get serialized size of SatPhyTimeTag
+     * \return Serialized size in bytes
+     */
+    virtual uint32_t GetSerializedSize() const;
 
-  /**
-   * Print time stamp of this instance of SatPhyTimeTag
-   * \param &os Output stream to which tag timestamp is printed.
-   */
-  virtual void Print (std::ostream &os) const;
+    /**
+     * Print time stamp of this instance of SatPhyTimeTag
+     * \param &os Output stream to which tag timestamp is printed.
+     */
+    virtual void Print(std::ostream& os) const;
 
-  /**
-   * Get sender time stamp of this tag.
-   * \return Sender timestamp
-   */
-  Time GetSenderTimestamp (void) const;
+    /**
+     * Get sender time stamp of this tag.
+     * \return Sender timestamp
+     */
+    Time GetSenderTimestamp(void) const;
 
-  /**
-   * Set sender time stamp of this tag.
-   * \param senderTimestamp Sender time stamp
-   */
-  void SetSenderTimestamp (Time senderTimestamp);
+    /**
+     * Set sender time stamp of this tag.
+     * \param senderTimestamp Sender time stamp
+     */
+    void SetSenderTimestamp(Time senderTimestamp);
 
-private:
-  Time m_senderTimestamp;
-
+  private:
+    Time m_senderTimestamp;
 };
-
 
 /**
  * \ingroup satellite
@@ -186,71 +182,69 @@ private:
  */
 class SatPhyLinkTimeTag : public Tag
 {
-public:
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId  GetTypeId (void);
+  public:
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * \brief Get the type ID of instance
-   * \return the object TypeId
-   */
-  virtual TypeId  GetInstanceTypeId (void) const;
+    /**
+     * \brief Get the type ID of instance
+     * \return the object TypeId
+     */
+    virtual TypeId GetInstanceTypeId(void) const;
 
-  /**
-   * Default constructor.
-   */
-  SatPhyLinkTimeTag ();
+    /**
+     * Default constructor.
+     */
+    SatPhyLinkTimeTag();
 
-  /**
-   * Constructor with initialization parameters.
-   * \param senderTimestamp
-   */
-  SatPhyLinkTimeTag (Time senderTimestamp);
+    /**
+     * Constructor with initialization parameters.
+     * \param senderTimestamp
+     */
+    SatPhyLinkTimeTag(Time senderTimestamp);
 
-  /**
-   * Serializes information to buffer from this instance of SatPhyLinkTimeTag
-   * \param i Buffer in which the information is serialized
-   */
-  virtual void  Serialize (TagBuffer i) const;
+    /**
+     * Serializes information to buffer from this instance of SatPhyLinkTimeTag
+     * \param i Buffer in which the information is serialized
+     */
+    virtual void Serialize(TagBuffer i) const;
 
-  /**
-   * Deserializes information from buffer to this instance of SatPhyLinkTimeTag
-   * \param i Buffer from which the information is deserialized
-   */
-  virtual void  Deserialize (TagBuffer i);
+    /**
+     * Deserializes information from buffer to this instance of SatPhyLinkTimeTag
+     * \param i Buffer from which the information is deserialized
+     */
+    virtual void Deserialize(TagBuffer i);
 
-  /**
-   * Get serialized size of SatPhyLinkTimeTag
-   * \return Serialized size in bytes
-   */
-  virtual uint32_t  GetSerializedSize () const;
+    /**
+     * Get serialized size of SatPhyLinkTimeTag
+     * \return Serialized size in bytes
+     */
+    virtual uint32_t GetSerializedSize() const;
 
-  /**
-   * Print time stamp of this instance of SatPhyLinkTimeTag
-   * \param &os Output stream to which tag timestamp is printed.
-   */
-  virtual void Print (std::ostream &os) const;
+    /**
+     * Print time stamp of this instance of SatPhyLinkTimeTag
+     * \param &os Output stream to which tag timestamp is printed.
+     */
+    virtual void Print(std::ostream& os) const;
 
-  /**
-   * Get sender time stamp of this tag.
-   * \return Sender timestamp
-   */
-  Time GetSenderLinkTimestamp (void) const;
+    /**
+     * Get sender time stamp of this tag.
+     * \return Sender timestamp
+     */
+    Time GetSenderLinkTimestamp(void) const;
 
-  /**
-   * Set sender time stamp of this tag.
-   * \param senderTimestamp Sender time stamp
-   */
-  void SetSenderLinkTimestamp (Time senderLinkTimestamp);
+    /**
+     * Set sender time stamp of this tag.
+     * \param senderTimestamp Sender time stamp
+     */
+    void SetSenderLinkTimestamp(Time senderLinkTimestamp);
 
-private:
-  Time m_senderLinkTimestamp;
-
+  private:
+    Time m_senderLinkTimestamp;
 };
-
 
 /**
  * \ingroup satellite
@@ -259,71 +253,69 @@ private:
  */
 class SatMacTimeTag : public Tag
 {
-public:
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId  GetTypeId (void);
+  public:
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * \brief Get the type ID of instance
-   * \return the object TypeId
-   */
-  virtual TypeId  GetInstanceTypeId (void) const;
+    /**
+     * \brief Get the type ID of instance
+     * \return the object TypeId
+     */
+    virtual TypeId GetInstanceTypeId(void) const;
 
-  /**
-   * Default constructor.
-   */
-  SatMacTimeTag ();
+    /**
+     * Default constructor.
+     */
+    SatMacTimeTag();
 
-  /**
-   * Constructor with initialization parameters.
-   * \param senderTimestamp
-   */
-  SatMacTimeTag (Time senderTimestamp);
+    /**
+     * Constructor with initialization parameters.
+     * \param senderTimestamp
+     */
+    SatMacTimeTag(Time senderTimestamp);
 
-  /**
-   * Serializes information to buffer from this instance of SatMacTimeTag
-   * \param i Buffer in which the information is serialized
-   */
-  virtual void  Serialize (TagBuffer i) const;
+    /**
+     * Serializes information to buffer from this instance of SatMacTimeTag
+     * \param i Buffer in which the information is serialized
+     */
+    virtual void Serialize(TagBuffer i) const;
 
-  /**
-   * Deserializes information from buffer to this instance of SatMacTimeTag
-   * \param i Buffer from which the information is deserialized
-   */
-  virtual void  Deserialize (TagBuffer i);
+    /**
+     * Deserializes information from buffer to this instance of SatMacTimeTag
+     * \param i Buffer from which the information is deserialized
+     */
+    virtual void Deserialize(TagBuffer i);
 
-  /**
-   * Get serialized size of SatMacTimeTag
-   * \return Serialized size in bytes
-   */
-  virtual uint32_t  GetSerializedSize () const;
+    /**
+     * Get serialized size of SatMacTimeTag
+     * \return Serialized size in bytes
+     */
+    virtual uint32_t GetSerializedSize() const;
 
-  /**
-   * Print time stamp of this instance of SatMacTimeTag
-   * \param &os Output stream to which tag timestamp is printed.
-   */
-  virtual void Print (std::ostream &os) const;
+    /**
+     * Print time stamp of this instance of SatMacTimeTag
+     * \param &os Output stream to which tag timestamp is printed.
+     */
+    virtual void Print(std::ostream& os) const;
 
-  /**
-   * Get sender time stamp of this tag.
-   * \return Sender timestamp
-   */
-  Time GetSenderTimestamp (void) const;
+    /**
+     * Get sender time stamp of this tag.
+     * \return Sender timestamp
+     */
+    Time GetSenderTimestamp(void) const;
 
-  /**
-   * Set sender time stamp of this tag.
-   * \param senderTimestamp Sender time stamp
-   */
-  void SetSenderTimestamp (Time senderTimestamp);
+    /**
+     * Set sender time stamp of this tag.
+     * \param senderTimestamp Sender time stamp
+     */
+    void SetSenderTimestamp(Time senderTimestamp);
 
-private:
-  Time m_senderTimestamp;
-
+  private:
+    Time m_senderTimestamp;
 };
-
 
 /**
  * \ingroup satellite
@@ -332,71 +324,69 @@ private:
  */
 class SatMacLinkTimeTag : public Tag
 {
-public:
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId  GetTypeId (void);
+  public:
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * \brief Get the type ID of instance
-   * \return the object TypeId
-   */
-  virtual TypeId  GetInstanceTypeId (void) const;
+    /**
+     * \brief Get the type ID of instance
+     * \return the object TypeId
+     */
+    virtual TypeId GetInstanceTypeId(void) const;
 
-  /**
-   * Default constructor.
-   */
-  SatMacLinkTimeTag ();
+    /**
+     * Default constructor.
+     */
+    SatMacLinkTimeTag();
 
-  /**
-   * Constructor with initialization parameters.
-   * \param senderTimestamp
-   */
-  SatMacLinkTimeTag (Time senderTimestamp);
+    /**
+     * Constructor with initialization parameters.
+     * \param senderTimestamp
+     */
+    SatMacLinkTimeTag(Time senderTimestamp);
 
-  /**
-   * Serializes information to buffer from this instance of SatMacLinkTimeTag
-   * \param i Buffer in which the information is serialized
-   */
-  virtual void  Serialize (TagBuffer i) const;
+    /**
+     * Serializes information to buffer from this instance of SatMacLinkTimeTag
+     * \param i Buffer in which the information is serialized
+     */
+    virtual void Serialize(TagBuffer i) const;
 
-  /**
-   * Deserializes information from buffer to this instance of SatMacLinkTimeTag
-   * \param i Buffer from which the information is deserialized
-   */
-  virtual void  Deserialize (TagBuffer i);
+    /**
+     * Deserializes information from buffer to this instance of SatMacLinkTimeTag
+     * \param i Buffer from which the information is deserialized
+     */
+    virtual void Deserialize(TagBuffer i);
 
-  /**
-   * Get serialized size of SatMacLinkTimeTag
-   * \return Serialized size in bytes
-   */
-  virtual uint32_t  GetSerializedSize () const;
+    /**
+     * Get serialized size of SatMacLinkTimeTag
+     * \return Serialized size in bytes
+     */
+    virtual uint32_t GetSerializedSize() const;
 
-  /**
-   * Print time stamp of this instance of SatMacLinkTimeTag
-   * \param &os Output stream to which tag timestamp is printed.
-   */
-  virtual void Print (std::ostream &os) const;
+    /**
+     * Print time stamp of this instance of SatMacLinkTimeTag
+     * \param &os Output stream to which tag timestamp is printed.
+     */
+    virtual void Print(std::ostream& os) const;
 
-  /**
-   * Get sender time stamp of this tag.
-   * \return Sender timestamp
-   */
-  Time GetSenderLinkTimestamp (void) const;
+    /**
+     * Get sender time stamp of this tag.
+     * \return Sender timestamp
+     */
+    Time GetSenderLinkTimestamp(void) const;
 
-  /**
-   * Set sender time stamp of this tag.
-   * \param senderTimestamp Sender time stamp
-   */
-  void SetSenderLinkTimestamp (Time senderLinkTimestamp);
+    /**
+     * Set sender time stamp of this tag.
+     * \param senderTimestamp Sender time stamp
+     */
+    void SetSenderLinkTimestamp(Time senderLinkTimestamp);
 
-private:
-  Time m_senderLinkTimestamp;
-
+  private:
+    Time m_senderLinkTimestamp;
 };
-
 
 /**
  * \ingroup satellite
@@ -405,71 +395,69 @@ private:
  */
 class SatDevTimeTag : public Tag
 {
-public:
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId  GetTypeId (void);
+  public:
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * \brief Get the type ID of instance
-   * \return the object TypeId
-   */
-  virtual TypeId  GetInstanceTypeId (void) const;
+    /**
+     * \brief Get the type ID of instance
+     * \return the object TypeId
+     */
+    virtual TypeId GetInstanceTypeId(void) const;
 
-  /**
-   * Default constructor.
-   */
-  SatDevTimeTag ();
+    /**
+     * Default constructor.
+     */
+    SatDevTimeTag();
 
-  /**
-   * Constructor with initialization parameters.
-   * \param senderTimestamp
-   */
-  SatDevTimeTag (Time senderTimestamp);
+    /**
+     * Constructor with initialization parameters.
+     * \param senderTimestamp
+     */
+    SatDevTimeTag(Time senderTimestamp);
 
-  /**
-   * Serializes information to buffer from this instance of SatDevTimeTag
-   * \param i Buffer in which the information is serialized
-   */
-  virtual void  Serialize (TagBuffer i) const;
+    /**
+     * Serializes information to buffer from this instance of SatDevTimeTag
+     * \param i Buffer in which the information is serialized
+     */
+    virtual void Serialize(TagBuffer i) const;
 
-  /**
-   * Deserializes information from buffer to this instance of SatDevTimeTag
-   * \param i Buffer from which the information is deserialized
-   */
-  virtual void  Deserialize (TagBuffer i);
+    /**
+     * Deserializes information from buffer to this instance of SatDevTimeTag
+     * \param i Buffer from which the information is deserialized
+     */
+    virtual void Deserialize(TagBuffer i);
 
-  /**
-   * Get serialized size of SatDevTimeTag
-   * \return Serialized size in bytes
-   */
-  virtual uint32_t  GetSerializedSize () const;
+    /**
+     * Get serialized size of SatDevTimeTag
+     * \return Serialized size in bytes
+     */
+    virtual uint32_t GetSerializedSize() const;
 
-  /**
-   * Print time stamp of this instance of SatDevTimeTag
-   * \param &os Output stream to which tag timestamp is printed.
-   */
-  virtual void Print (std::ostream &os) const;
+    /**
+     * Print time stamp of this instance of SatDevTimeTag
+     * \param &os Output stream to which tag timestamp is printed.
+     */
+    virtual void Print(std::ostream& os) const;
 
-  /**
-   * Get sender time stamp of this tag.
-   * \return Sender timestamp
-   */
-  Time GetSenderTimestamp (void) const;
+    /**
+     * Get sender time stamp of this tag.
+     * \return Sender timestamp
+     */
+    Time GetSenderTimestamp(void) const;
 
-  /**
-   * Set sender time stamp of this tag.
-   * \param senderTimestamp Sender time stamp
-   */
-  void SetSenderTimestamp (Time senderTimestamp);
+    /**
+     * Set sender time stamp of this tag.
+     * \param senderTimestamp Sender time stamp
+     */
+    void SetSenderTimestamp(Time senderTimestamp);
 
-private:
-  Time m_senderTimestamp;
-
+  private:
+    Time m_senderTimestamp;
 };
-
 
 /**
  * \ingroup satellite
@@ -478,73 +466,70 @@ private:
  */
 class SatDevLinkTimeTag : public Tag
 {
-public:
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId  GetTypeId (void);
+  public:
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * \brief Get the type ID of instance
-   * \return the object TypeId
-   */
-  virtual TypeId  GetInstanceTypeId (void) const;
+    /**
+     * \brief Get the type ID of instance
+     * \return the object TypeId
+     */
+    virtual TypeId GetInstanceTypeId(void) const;
 
-  /**
-   * Default constructor.
-   */
-  SatDevLinkTimeTag ();
+    /**
+     * Default constructor.
+     */
+    SatDevLinkTimeTag();
 
-  /**
-   * Constructor with initialization parameters.
-   * \param senderTimestamp
-   */
-  SatDevLinkTimeTag (Time senderTimestamp);
+    /**
+     * Constructor with initialization parameters.
+     * \param senderTimestamp
+     */
+    SatDevLinkTimeTag(Time senderTimestamp);
 
-  /**
-   * Serializes information to buffer from this instance of SatDevLinkTimeTag
-   * \param i Buffer in which the information is serialized
-   */
-  virtual void  Serialize (TagBuffer i) const;
+    /**
+     * Serializes information to buffer from this instance of SatDevLinkTimeTag
+     * \param i Buffer in which the information is serialized
+     */
+    virtual void Serialize(TagBuffer i) const;
 
-  /**
-   * Deserializes information from buffer to this instance of SatDevLinkTimeTag
-   * \param i Buffer from which the information is deserialized
-   */
-  virtual void  Deserialize (TagBuffer i);
+    /**
+     * Deserializes information from buffer to this instance of SatDevLinkTimeTag
+     * \param i Buffer from which the information is deserialized
+     */
+    virtual void Deserialize(TagBuffer i);
 
-  /**
-   * Get serialized size of SatDevLinkTimeTag
-   * \return Serialized size in bytes
-   */
-  virtual uint32_t  GetSerializedSize () const;
+    /**
+     * Get serialized size of SatDevLinkTimeTag
+     * \return Serialized size in bytes
+     */
+    virtual uint32_t GetSerializedSize() const;
 
-  /**
-   * Print time stamp of this instance of SatDevLinkTimeTag
-   * \param &os Output stream to which tag timestamp is printed.
-   */
-  virtual void Print (std::ostream &os) const;
+    /**
+     * Print time stamp of this instance of SatDevLinkTimeTag
+     * \param &os Output stream to which tag timestamp is printed.
+     */
+    virtual void Print(std::ostream& os) const;
 
-  /**
-   * Get sender time stamp of this tag.
-   * \return Sender timestamp
-   */
-  Time GetSenderTimestamp (void) const;
+    /**
+     * Get sender time stamp of this tag.
+     * \return Sender timestamp
+     */
+    Time GetSenderTimestamp(void) const;
 
-  /**
-   * Set sender time stamp of this tag.
-   * \param senderTimestamp Sender time stamp
-   */
-  void SetSenderTimestamp (Time senderTimestamp);
+    /**
+     * Set sender time stamp of this tag.
+     * \param senderTimestamp Sender time stamp
+     */
+    void SetSenderTimestamp(Time senderTimestamp);
 
-private:
-  Time m_senderTimestamp;
-
+  private:
+    Time m_senderTimestamp;
 };
 
-
-
-} //namespace ns3
+} // namespace ns3
 
 #endif /* SATELLITE_TIME_TAG_H */

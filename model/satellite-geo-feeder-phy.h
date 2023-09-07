@@ -22,28 +22,27 @@
 #ifndef SATELLITE_GEO_FEEDER_PHY_H
 #define SATELLITE_GEO_FEEDER_PHY_H
 
-#include <queue>
-#include <tuple>
+#include "satellite-frame-conf.h"
+#include "satellite-phy.h"
+#include "satellite-signal-parameters.h"
 
-#include <ns3/ptr.h>
+#include <ns3/address.h>
 #include <ns3/nstime.h>
 #include <ns3/object.h>
 #include <ns3/packet.h>
-#include <ns3/address.h>
+#include <ns3/ptr.h>
 
-#include "satellite-phy.h"
-#include "satellite-signal-parameters.h"
-#include "satellite-frame-conf.h"
+#include <queue>
+#include <tuple>
 
-
-namespace ns3 {
+namespace ns3
+{
 
 class SatPhyRxCarrier;
 class SatPhyRxCarrierUplink;
 class SatPhyRxCarrierPerSlot;
 class SatPhyRxCarrierPerFrame;
 class SatPhyRxCarrierPerWindow;
-
 
 /**
  * \ingroup satellite
@@ -53,174 +52,171 @@ class SatPhyRxCarrierPerWindow;
  */
 class SatGeoFeederPhy : public SatPhy
 {
-public:
-  /**
-   * Default constructor
-   */
-  SatGeoFeederPhy (void);
+  public:
+    /**
+     * Default constructor
+     */
+    SatGeoFeederPhy(void);
 
-  SatGeoFeederPhy (SatPhy::CreateParam_t& params,
-                   Ptr<SatLinkResults> linkResults,
-                   SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
-                   Ptr<SatSuperframeConf> superFrameConf,
-                   SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
-                   SatEnums::RegenerationMode_t returnLinkRegenerationMode);
+    SatGeoFeederPhy(SatPhy::CreateParam_t& params,
+                    Ptr<SatLinkResults> linkResults,
+                    SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
+                    Ptr<SatSuperframeConf> superFrameConf,
+                    SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                    SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
-  /**
-   * Destructor for SatGeoFeederPhy
-   */
-  virtual ~SatGeoFeederPhy ();
+    /**
+     * Destructor for SatGeoFeederPhy
+     */
+    virtual ~SatGeoFeederPhy();
 
+    /**
+     * inherited from Object
+     */
+    static TypeId GetTypeId(void);
+    TypeId GetInstanceTypeId(void) const;
+    virtual void DoInitialize(void);
 
-  /**
-   * inherited from Object
-   */
-  static TypeId GetTypeId (void);
-  TypeId GetInstanceTypeId (void) const;
-  virtual void DoInitialize (void);
+    /**
+     * Dispose of this class instance
+     */
+    virtual void DoDispose(void);
 
-  /**
-   * Dispose of this class instance
-   */
-  virtual void DoDispose (void);
+    /**
+     * \brief Send Pdu to the PHY tx module (for GEO satellite switch packet forwarding)
+     * \param rxParams Transmission parameters
+     */
+    virtual void SendPduWithParams(Ptr<SatSignalParameters> rxParams);
 
-  /**
-   * \brief Send Pdu to the PHY tx module (for GEO satellite switch packet forwarding)
-   * \param rxParams Transmission parameters
-   */
-  virtual void SendPduWithParams (Ptr<SatSignalParameters> rxParams);
+    /**
+     * \brief Receives packets from lower layer.
+     *
+     * \param rxParams Packet reception parameters
+     * \param phyError Boolean indicating whether the packet successfully
+     * received or not? Note, that this parameter is not used in the GEO satellite,
+     * but exists since we are using a general interface defined in the parent
+     * class.
+     */
+    virtual void Receive(Ptr<SatSignalParameters> rxParams, bool phyError);
 
-  /**
-   * \brief Receives packets from lower layer.
-   *
-   * \param rxParams Packet reception parameters
-   * \param phyError Boolean indicating whether the packet successfully
-   * received or not? Note, that this parameter is not used in the GEO satellite,
-   * but exists since we are using a general interface defined in the parent
-   * class.
-   */
-  virtual void Receive (Ptr<SatSignalParameters> rxParams, bool phyError);
+    /**
+     * \brief Get additional interference, used to compute final SINR at RX
+     *
+     * \return Additional interference
+     */
+    virtual double GetAdditionalInterference();
 
-  /**
-   * \brief Get additional interference, used to compute final SINR at RX
-   *
-   * \return Additional interference
-   */
-  virtual double GetAdditionalInterference ();
+    /**
+     * \brief Callback signature for `QueueSizeBytes` and `QueueSizePackets` trace source.
+     * \param size number of bytes or number of packets of queue
+     * \param from The MAC source address of packets
+     */
+    typedef void (*QueueSizeCallback)(uint32_t size, const Address& from);
 
-  /**
-   * \brief Callback signature for `QueueSizeBytes` and `QueueSizePackets` trace source.
-   * \param size number of bytes or number of packets of queue
-   * \param from The MAC source address of packets
-   */
-  typedef void (*QueueSizeCallback)(uint32_t size, const Address &from);
+  protected:
+    /**
+     * \brief Invoke the `Rx` trace source for each received packet.
+     * \param packets Container of the pointers to the packets received.
+     */
+    virtual void RxTraces(SatPhy::PacketContainer_t packets);
 
-protected:
-  /**
-   * \brief Invoke the `Rx` trace source for each received packet.
-   * \param packets Container of the pointers to the packets received.
-   */
-  virtual void RxTraces (SatPhy::PacketContainer_t packets);
+    /**
+     * \brief Get the link TX direction. Must be implemented by child clases.
+     * \return The link TX direction
+     */
+    virtual SatEnums::SatLinkDir_t GetSatLinkTxDir();
 
-  /**
-   * \brief Get the link TX direction. Must be implemented by child clases.
-   * \return The link TX direction
-   */
-  virtual SatEnums::SatLinkDir_t GetSatLinkTxDir ();
+    /**
+     * \brief Get the link RX direction. Must be implemented by child clases.
+     * \return The link RX direction
+     */
+    virtual SatEnums::SatLinkDir_t GetSatLinkRxDir();
 
-  /**
-   * \brief Get the link RX direction. Must be implemented by child clases.
-   * \return The link RX direction
-   */
-  virtual SatEnums::SatLinkDir_t GetSatLinkRxDir ();
+    /**
+     * Traced callback to monitor RTN feeder queue size in bytes.
+     */
+    TracedCallback<uint32_t, const Address&> m_queueSizeBytesTrace;
 
-  /**
-   * Traced callback to monitor RTN feeder queue size in bytes.
-   */
-  TracedCallback<uint32_t, const Address &> m_queueSizeBytesTrace;
+    /**
+     * Traced callback to monitor RTN feeder queue size in packets.
+     */
+    TracedCallback<uint32_t, const Address&> m_queueSizePacketsTrace;
 
-  /**
-   * Traced callback to monitor RTN feeder queue size in packets.
-   */
-  TracedCallback<uint32_t, const Address &> m_queueSizePacketsTrace;
+  private:
+    /**
+     * Send a packet from the queue. Used only in REGENERATION_PHY mode.
+     */
+    void SendFromQueue();
 
-private:
+    /**
+     * Notify a packet has finished being sent. Used only in REGENERATION_PHY mode.
+     */
+    void EndTx();
 
-  /**
-   * Send a packet from the queue. Used only in REGENERATION_PHY mode.
-   */
-  void SendFromQueue ();
+    /**
+     * Get source address of packets.
+     * \brief packets The packets from where extract source
+     * \return The source MAC address
+     */
+    Address GetE2ESourceAddress(SatPhy::PacketContainer_t packets);
 
-  /**
-   * Notify a packet has finished being sent. Used only in REGENERATION_PHY mode.
-   */
-  void EndTx ();
+    /**
+     * Configured external noise power.
+     */
+    double m_extNoisePowerDensityDbwHz;
 
-  /**
-   * Get source address of packets.
-   * \brief packets The packets from where extract source
-   * \return The source MAC address
-   */
-  Address
-  GetE2ESourceAddress (SatPhy::PacketContainer_t packets);
+    /**
+     * Configured Intermodulation interference in dB.
+     */
+    double m_imInterferenceCOverIDb;
 
-  /**
-   * Configured external noise power.
-   */
-  double m_extNoisePowerDensityDbwHz;
+    /**
+     * Intermodulation interference in linear.
+     */
+    double m_imInterferenceCOverI;
 
-  /**
-   * Configured Intermodulation interference in dB.
-   */
-  double m_imInterferenceCOverIDb;
+    /**
+     * Fixed amplification gain used in RTN link at the satellite.
+     */
+    double m_fixedAmplificationGainDb;
 
-  /**
-   * Intermodulation interference in linear.
-   */
-  double m_imInterferenceCOverI;
+    /**
+     * Regeneration mode on forward link.
+     */
+    SatEnums::RegenerationMode_t m_forwardLinkRegenerationMode;
 
-  /**
-   * Fixed amplification gain used in RTN link at the satellite.
-   */
-  double m_fixedAmplificationGainDb;
+    /**
+     * Regeneration mode on return link.
+     */
+    SatEnums::RegenerationMode_t m_returnLinkRegenerationMode;
 
-  /**
-   * Regeneration mode on forward link.
-   */
-  SatEnums::RegenerationMode_t m_forwardLinkRegenerationMode;
+    /**
+     * Simple FIFO queue to avoid collisions on TX in case of REGENERATION_PHY.
+     * Second and third elements are respectively size in bytes and in packets.
+     */
+    std::queue<std::tuple<Ptr<SatSignalParameters>, uint32_t, uint32_t>> m_queue;
 
-  /**
-   * Regeneration mode on return link.
-   */
-  SatEnums::RegenerationMode_t m_returnLinkRegenerationMode;
+    /**
+     * Size of FIFO queue in bytes
+     */
+    uint32_t m_queueSizeBytes;
 
-  /**
-   * Simple FIFO queue to avoid collisions on TX in case of REGENERATION_PHY.
-   * Second and third elements are respectively size in bytes and in packets.
-   */
-  std::queue<std::tuple<Ptr<SatSignalParameters>, uint32_t, uint32_t>> m_queue;
+    /**
+     * Size of FIFO queue in packets
+     */
+    uint32_t m_queueSizePackets;
 
-  /**
-   * Size of FIFO queue in bytes
-   */
-  uint32_t m_queueSizeBytes;
+    /**
+     * Maximum size of FIFO m_queue in bytes.
+     */
+    uint32_t m_queueSizeMax;
 
-  /**
-   * Size of FIFO queue in packets
-   */
-  uint32_t m_queueSizePackets;
-
-  /**
-   * Maximum size of FIFO m_queue in bytes.
-   */
-  uint32_t m_queueSizeMax;
-
-  /**
-   * Indicates if a packet is already being sent.
-   */
-  bool m_isSending;
+    /**
+     * Indicates if a packet is already being sent.
+     */
+    bool m_isSending;
 };
 
-}
+} // namespace ns3
 
 #endif /* SATELLITE_GEO_FEEDER_PHY_H */

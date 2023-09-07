@@ -24,64 +24,67 @@
 #ifndef SATELLITE_ISL_ARBITER_UNICAST_H
 #define SATELLITE_ISL_ARBITER_UNICAST_H
 
-#include <map>
-
 #include <ns3/satellite-isl-arbiter.h>
 
-namespace ns3 {
+#include <map>
+
+namespace ns3
+{
 
 class SatIslArbiterUnicast : public SatIslArbiter
 {
-public:
-  static TypeId GetTypeId (void);
+  public:
+    static TypeId GetTypeId(void);
 
-  /**
-   * Default constructor.
-   */
-  SatIslArbiterUnicast ();
+    /**
+     * Default constructor.
+     */
+    SatIslArbiterUnicast();
 
-  /**
-   * Constructor, without initializing the map of next hops
-   * \param node The satellite node this unicast arbiter is attached
-   */
-  SatIslArbiterUnicast (Ptr<Node> node);
+    /**
+     * Constructor, without initializing the map of next hops
+     * \param node The satellite node this unicast arbiter is attached
+     */
+    SatIslArbiterUnicast(Ptr<Node> node);
 
-  /**
-   * Constructor.
-   * \param node The satellite node this unicast arbiter is attached
-   * \param nextHop The next hop (interface ID) for each destination possible (satellite ID)
-   */
-  SatIslArbiterUnicast (Ptr<Node> node, std::map<uint32_t, uint32_t> nextHopMap);
+    /**
+     * Constructor.
+     * \param node The satellite node this unicast arbiter is attached
+     * \param nextHop The next hop (interface ID) for each destination possible (satellite ID)
+     */
+    SatIslArbiterUnicast(Ptr<Node> node, std::map<uint32_t, uint32_t> nextHopMap);
 
-  /**
-   * Decide how to forward. Implemented in subclasses
-   *
-   * \param sourceSatId                       Satellite ID where the packet originated from
-   * \param targetSatId                       Satellite ID where the packet has to go to
-   * \param pkt                               Packet
-   *
-   * \return ISL interface index, or -1 if routing failed
-   */
-  int32_t Decide (int32_t sourceSatId, int32_t targetSatId, Ptr<Packet> pkt);
+    /**
+     * Decide how to forward. Implemented in subclasses
+     *
+     * \param sourceSatId                       Satellite ID where the packet originated from
+     * \param targetSatId                       Satellite ID where the packet has to go to
+     * \param pkt                               Packet
+     *
+     * \return ISL interface index, or -1 if routing failed
+     */
+    int32_t Decide(int32_t sourceSatId, int32_t targetSatId, Ptr<Packet> pkt);
 
-  /**
-   * Unicast routing table
-   * 
-   * \return string representation of the table
-   */
-  std::string StringReprOfForwardingState ();
+    /**
+     * Unicast routing table
+     *
+     * \return string representation of the table
+     */
+    std::string StringReprOfForwardingState();
 
-  /**
-   * Add an entry on arbiter
-   * \param destinationId Node ID of destination satellite
-   * \param netDeviceIndex ISL Net Device index
-   */
-  void AddNextHopEntry (uint32_t destinationId, uint32_t netDeviceIndex);
+    /**
+     * Add an entry on arbiter
+     * \param destinationId Node ID of destination satellite
+     * \param netDeviceIndex ISL Net Device index
+     */
+    void AddNextHopEntry(uint32_t destinationId, uint32_t netDeviceIndex);
 
-private:
-  std::map<uint32_t, uint32_t> m_nextHopMap;  // Map indicating next hops. Key = satellite destination ID, value = IslNetDevice index to send packet
+  private:
+    std::map<uint32_t, uint32_t>
+        m_nextHopMap; // Map indicating next hops. Key = satellite destination ID, value =
+                      // IslNetDevice index to send packet
 };
 
-}
+} // namespace ns3
 
-#endif //SATELLITE_ISL_ARBITER_UNICAST_H
+#endif // SATELLITE_ISL_ARBITER_UNICAST_H

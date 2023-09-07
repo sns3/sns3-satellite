@@ -23,8 +23,8 @@
 
 #include <ns3/arp-cache.h>
 
-
-namespace ns3 {
+namespace ns3
+{
 
 /**
  * \ingroup satellite
@@ -35,32 +35,31 @@ namespace ns3 {
  */
 class SatArpCache : public ArpCache
 {
-public:
-  /**
-   * \brief Get the type ID
-   * \return the object TypeId
-   */
-  static TypeId GetTypeId (void);
+  public:
+    /**
+     * \brief Get the type ID
+     * \return the object TypeId
+     */
+    static TypeId GetTypeId(void);
 
-  /**
-   * Default constructor.
-   */
-  SatArpCache ();
+    /**
+     * Default constructor.
+     */
+    SatArpCache();
 
-  /**
-   * Destructor for SatArpCache
-   */
-  ~SatArpCache ();
+    /**
+     * Destructor for SatArpCache
+     */
+    ~SatArpCache();
 
-  /**
-   * \brief Add an Ipv4Address - MAC address entry to this ARP cache
-   * \param to IP address
-   * \param macAddress MAC address
-   * \return ArpCache entry
-   */
-  ArpCache::Entry * Add (Ipv4Address to, Address macAddress);
+    /**
+     * \brief Add an Ipv4Address - MAC address entry to this ARP cache
+     * \param to IP address
+     * \param macAddress MAC address
+     * \return ArpCache entry
+     */
+    ArpCache::Entry* Add(Ipv4Address to, Address macAddress);
 };
-
 
 } // namespace ns3
 

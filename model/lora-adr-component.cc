@@ -20,457 +20,465 @@
  * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include <ns3/log.h>
-
 #include "lora-adr-component.h"
 
+#include <ns3/log.h>
 
-namespace ns3 {
+namespace ns3
+{
 
 ////////////////////////////////////////
 // LinkAdrRequest commands management //
 ////////////////////////////////////////
 
-NS_LOG_COMPONENT_DEFINE ("LoraAdrComponent");
+NS_LOG_COMPONENT_DEFINE("LoraAdrComponent");
 
-NS_OBJECT_ENSURE_REGISTERED (LoraAdrComponent);
+NS_OBJECT_ENSURE_REGISTERED(LoraAdrComponent);
 
-TypeId LoraAdrComponent::GetTypeId (void)
+TypeId
+LoraAdrComponent::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::LoraAdrComponent")
-    .AddConstructor<LoraAdrComponent> ()
-    .SetParent<LoraNetworkControllerComponent> ()
-    .AddAttribute ("MultipleGwCombiningMethod",
-                   "Whether to average the received power of gateways or to use the maximum",
-                   EnumValue (LoraAdrComponent::AVERAGE),
-                   MakeEnumAccessor (&LoraAdrComponent::tpAveraging),
-                   MakeEnumChecker (LoraAdrComponent::AVERAGE,
-                                    "avg",
-                                    LoraAdrComponent::MAXIMUM,
-                                    "max",
-                                    LoraAdrComponent::MINIMUM,
-                                    "min"))
-    .AddAttribute ("MultiplePacketsCombiningMethod",
-                   "Whether to average SNRs from multiple packets or to use the maximum",
-                   EnumValue (LoraAdrComponent::AVERAGE),
-                   MakeEnumAccessor (&LoraAdrComponent::historyAveraging),
-                   MakeEnumChecker (LoraAdrComponent::AVERAGE,
-                                    "avg",
-                                    LoraAdrComponent::MAXIMUM,
-                                    "max",
-                                    LoraAdrComponent::MINIMUM,
-                                    "min"))
-    .AddAttribute ("HistoryRange",
-                   "Number of packets to use for averaging",
-                   IntegerValue (4),
-                   MakeIntegerAccessor (&LoraAdrComponent::historyRange),
-                   MakeIntegerChecker<int> (0, 100))
-    .AddAttribute ("ChangeTransmissionPower",
-                   "Whether to toggle the transmission power or not",
-                   BooleanValue (true),
-                   MakeBooleanAccessor (&LoraAdrComponent::m_toggleTxPower),
-                   MakeBooleanChecker ())
-  ;
-  return tid;
+    static TypeId tid =
+        TypeId("ns3::LoraAdrComponent")
+            .AddConstructor<LoraAdrComponent>()
+            .SetParent<LoraNetworkControllerComponent>()
+            .AddAttribute("MultipleGwCombiningMethod",
+                          "Whether to average the received power of gateways or to use the maximum",
+                          EnumValue(LoraAdrComponent::AVERAGE),
+                          MakeEnumAccessor(&LoraAdrComponent::tpAveraging),
+                          MakeEnumChecker(LoraAdrComponent::AVERAGE,
+                                          "avg",
+                                          LoraAdrComponent::MAXIMUM,
+                                          "max",
+                                          LoraAdrComponent::MINIMUM,
+                                          "min"))
+            .AddAttribute("MultiplePacketsCombiningMethod",
+                          "Whether to average SNRs from multiple packets or to use the maximum",
+                          EnumValue(LoraAdrComponent::AVERAGE),
+                          MakeEnumAccessor(&LoraAdrComponent::historyAveraging),
+                          MakeEnumChecker(LoraAdrComponent::AVERAGE,
+                                          "avg",
+                                          LoraAdrComponent::MAXIMUM,
+                                          "max",
+                                          LoraAdrComponent::MINIMUM,
+                                          "min"))
+            .AddAttribute("HistoryRange",
+                          "Number of packets to use for averaging",
+                          IntegerValue(4),
+                          MakeIntegerAccessor(&LoraAdrComponent::historyRange),
+                          MakeIntegerChecker<int>(0, 100))
+            .AddAttribute("ChangeTransmissionPower",
+                          "Whether to toggle the transmission power or not",
+                          BooleanValue(true),
+                          MakeBooleanAccessor(&LoraAdrComponent::m_toggleTxPower),
+                          MakeBooleanChecker());
+    return tid;
 }
 
-LoraAdrComponent::LoraAdrComponent ()
-{
-}
-
-LoraAdrComponent::~LoraAdrComponent ()
+LoraAdrComponent::LoraAdrComponent()
 {
 }
 
-void LoraAdrComponent::OnReceivedPacket (Ptr<const Packet> packet,
-                                     Ptr<LoraEndDeviceStatus> status,
-                                     Ptr<LoraNetworkStatus> networkStatus)
+LoraAdrComponent::~LoraAdrComponent()
 {
-  NS_LOG_FUNCTION (this->GetTypeId () << packet << networkStatus);
-
-  // We will only act just before reply, when all Gateways will have received
-  // the packet, since we need their respective received power.
 }
 
 void
-LoraAdrComponent::BeforeSendingReply (Ptr<LoraEndDeviceStatus> status,
-                                  Ptr<LoraNetworkStatus> networkStatus)
+LoraAdrComponent::OnReceivedPacket(Ptr<const Packet> packet,
+                                   Ptr<LoraEndDeviceStatus> status,
+                                   Ptr<LoraNetworkStatus> networkStatus)
 {
-  NS_LOG_FUNCTION (this << status << networkStatus);
+    NS_LOG_FUNCTION(this->GetTypeId() << packet << networkStatus);
 
-  Ptr<Packet> myPacket = status->GetLastPacketReceivedFromDevice ()->Copy ();
-  LorawanMacHeader mHdr;
-  LoraFrameHeader fHdr;
-  fHdr.SetAsUplink ();
-  myPacket->RemoveHeader (mHdr);
-  myPacket->RemoveHeader (fHdr);
+    // We will only act just before reply, when all Gateways will have received
+    // the packet, since we need their respective received power.
+}
 
-  //Execute the ADR algotithm only if the request bit is set
-  if (fHdr.GetAdr ())
+void
+LoraAdrComponent::BeforeSendingReply(Ptr<LoraEndDeviceStatus> status,
+                                     Ptr<LoraNetworkStatus> networkStatus)
+{
+    NS_LOG_FUNCTION(this << status << networkStatus);
+
+    Ptr<Packet> myPacket = status->GetLastPacketReceivedFromDevice()->Copy();
+    LorawanMacHeader mHdr;
+    LoraFrameHeader fHdr;
+    fHdr.SetAsUplink();
+    myPacket->RemoveHeader(mHdr);
+    myPacket->RemoveHeader(fHdr);
+
+    // Execute the ADR algotithm only if the request bit is set
+    if (fHdr.GetAdr())
     {
-      if (int(status->GetReceivedPacketList ().size ()) < historyRange)
+        if (int(status->GetReceivedPacketList().size()) < historyRange)
         {
-          NS_LOG_ERROR ("Not enough packets received by this device (" << status->GetReceivedPacketList ().size () << ") for the algorithm to work (need " << historyRange << ")");
+            NS_LOG_ERROR("Not enough packets received by this device ("
+                         << status->GetReceivedPacketList().size()
+                         << ") for the algorithm to work (need " << historyRange << ")");
         }
-      else
+        else
         {
-          NS_LOG_DEBUG ("New ADR request");
+            NS_LOG_DEBUG("New ADR request");
 
-          //Get the SF used by the device
-          uint8_t spreadingFactor = status->GetFirstReceiveWindowSpreadingFactor ();
+            // Get the SF used by the device
+            uint8_t spreadingFactor = status->GetFirstReceiveWindowSpreadingFactor();
 
-          //Get the device transmission power (dBm)
-          uint8_t transmissionPower = status->GetMac ()->GetTransmissionPower ();
+            // Get the device transmission power (dBm)
+            uint8_t transmissionPower = status->GetMac()->GetTransmissionPower();
 
-          //New parameters for the end-device
-          uint8_t newDataRate;
-          uint8_t newTxPower;
+            // New parameters for the end-device
+            uint8_t newDataRate;
+            uint8_t newTxPower;
 
-          //ADR Algorithm
-          AdrImplementation (&newDataRate,
-                             &newTxPower,
-                             status);
+            // ADR Algorithm
+            AdrImplementation(&newDataRate, &newTxPower, status);
 
-          // Change the power back to the default if we don't want to change it
-          if (!m_toggleTxPower)
+            // Change the power back to the default if we don't want to change it
+            if (!m_toggleTxPower)
             {
-              newTxPower = transmissionPower;
+                newTxPower = transmissionPower;
             }
 
-          if (newDataRate != SfToDr (spreadingFactor) || newTxPower != transmissionPower)
+            if (newDataRate != SfToDr(spreadingFactor) || newTxPower != transmissionPower)
             {
-              //Create a list with mandatory channel indexes
-              int channels[] = {0, 1, 2};
-              std::list<int> enabledChannels (channels,
-                                              channels + sizeof(channels) /
-                                              sizeof(int));
+                // Create a list with mandatory channel indexes
+                int channels[] = {0, 1, 2};
+                std::list<int> enabledChannels(channels, channels + sizeof(channels) / sizeof(int));
 
-              //Repetitions Setting
-              const int rep = 1;
+                // Repetitions Setting
+                const int rep = 1;
 
-              NS_LOG_DEBUG ("Sending LinkAdrReq with DR = " << (unsigned)newDataRate << " and TP = " << (unsigned)newTxPower << " dBm");
+                NS_LOG_DEBUG("Sending LinkAdrReq with DR = " << (unsigned)newDataRate
+                                                             << " and TP = " << (unsigned)newTxPower
+                                                             << " dBm");
 
-              status->m_reply.frameHeader.AddLinkAdrReq (newDataRate,
-                                                         GetTxPowerIndex (newTxPower),
-                                                         enabledChannels,
-                                                         rep);
-              status->m_reply.frameHeader.SetAsDownlink ();
-              status->m_reply.macHeader.SetMType (LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
+                status->m_reply.frameHeader.AddLinkAdrReq(newDataRate,
+                                                          GetTxPowerIndex(newTxPower),
+                                                          enabledChannels,
+                                                          rep);
+                status->m_reply.frameHeader.SetAsDownlink();
+                status->m_reply.macHeader.SetMType(LorawanMacHeader::UNCONFIRMED_DATA_DOWN);
 
-              status->m_reply.needsReply = true;
+                status->m_reply.needsReply = true;
             }
-          else
+            else
             {
-              NS_LOG_DEBUG ("Skipped request");
+                NS_LOG_DEBUG("Skipped request");
             }
         }
     }
-  else
+    else
     {
-      // Do nothing
+        // Do nothing
     }
 }
 
-void LoraAdrComponent::OnFailedReply (Ptr<LoraEndDeviceStatus> status,
-                                  Ptr<LoraNetworkStatus> networkStatus)
+void
+LoraAdrComponent::OnFailedReply(Ptr<LoraEndDeviceStatus> status,
+                                Ptr<LoraNetworkStatus> networkStatus)
 {
-  NS_LOG_FUNCTION (this->GetTypeId () << networkStatus);
+    NS_LOG_FUNCTION(this->GetTypeId() << networkStatus);
 }
 
-void LoraAdrComponent::AdrImplementation (uint8_t *newDataRate,
-                                      uint8_t *newTxPower,
-                                      Ptr<LoraEndDeviceStatus> status)
+void
+LoraAdrComponent::AdrImplementation(uint8_t* newDataRate,
+                                    uint8_t* newTxPower,
+                                    Ptr<LoraEndDeviceStatus> status)
 {
-  //Compute the maximum or median SNR, based on the boolean value historyAveraging
-  double m_SNR = 0;
-  switch (historyAveraging)
+    // Compute the maximum or median SNR, based on the boolean value historyAveraging
+    double m_SNR = 0;
+    switch (historyAveraging)
     {
     case LoraAdrComponent::AVERAGE:
-      m_SNR = GetAverageSNR (status->GetReceivedPacketList (),
-                             historyRange);
-      break;
+        m_SNR = GetAverageSNR(status->GetReceivedPacketList(), historyRange);
+        break;
     case LoraAdrComponent::MAXIMUM:
-      m_SNR = GetMaxSNR (status->GetReceivedPacketList (),
-                         historyRange);
-      break;
+        m_SNR = GetMaxSNR(status->GetReceivedPacketList(), historyRange);
+        break;
     case LoraAdrComponent::MINIMUM:
-      m_SNR = GetMinSNR (status->GetReceivedPacketList (),
-                         historyRange);
+        m_SNR = GetMinSNR(status->GetReceivedPacketList(), historyRange);
     }
 
-  NS_LOG_DEBUG ("m_SNR = " << m_SNR);
+    NS_LOG_DEBUG("m_SNR = " << m_SNR);
 
-  //Get the SF used by the device
-  uint8_t spreadingFactor = status->GetFirstReceiveWindowSpreadingFactor ();
+    // Get the SF used by the device
+    uint8_t spreadingFactor = status->GetFirstReceiveWindowSpreadingFactor();
 
-  NS_LOG_DEBUG ("SF = " << (unsigned)spreadingFactor);
+    NS_LOG_DEBUG("SF = " << (unsigned)spreadingFactor);
 
-  //Get the device data rate and use it to get the SNR demodulation treshold
-  double req_SNR = treshold[SfToDr (spreadingFactor)];
+    // Get the device data rate and use it to get the SNR demodulation treshold
+    double req_SNR = treshold[SfToDr(spreadingFactor)];
 
-  NS_LOG_DEBUG ("Required SNR = " << req_SNR);
+    NS_LOG_DEBUG("Required SNR = " << req_SNR);
 
-  //Get the device transmission power (dBm)
-  double transmissionPower = status->GetMac ()->GetTransmissionPower ();
+    // Get the device transmission power (dBm)
+    double transmissionPower = status->GetMac()->GetTransmissionPower();
 
-  NS_LOG_DEBUG ("Transmission Power = " << transmissionPower);
+    NS_LOG_DEBUG("Transmission Power = " << transmissionPower);
 
-  //Compute the SNR margin taking into consideration the SNR of
-  //previously received packets
-  double margin_SNR = m_SNR - req_SNR;
+    // Compute the SNR margin taking into consideration the SNR of
+    // previously received packets
+    double margin_SNR = m_SNR - req_SNR;
 
-  NS_LOG_DEBUG ("Margin = " << margin_SNR);
+    NS_LOG_DEBUG("Margin = " << margin_SNR);
 
-  //Number of steps to decrement the SF (thereby increasing the Data Rate)
-  //and the TP.
-  int steps = std::floor (margin_SNR / 3);
+    // Number of steps to decrement the SF (thereby increasing the Data Rate)
+    // and the TP.
+    int steps = std::floor(margin_SNR / 3);
 
-  NS_LOG_DEBUG ("steps = " << steps);
+    NS_LOG_DEBUG("steps = " << steps);
 
-  //If the number of steps is positive (margin_SNR is positive, so its
-  //decimal value is high) increment the data rate, if there are some
-  //leftover steps after reaching the maximum possible data rate
-  //(corresponding to the minimum SF) decrement the transmission power as
-  //well for the number of steps left.
-  //If, on the other hand, the number of steps is negative (margin_SNR is
-  //negative, so its decimal value is low) increase the transmission power
-  //(note that the SF is not incremented as this particular algorithm
-  //expects the node itself to raise its SF whenever necessary).
-  while (steps > 0 && spreadingFactor > min_spreadingFactor)
+    // If the number of steps is positive (margin_SNR is positive, so its
+    // decimal value is high) increment the data rate, if there are some
+    // leftover steps after reaching the maximum possible data rate
+    //(corresponding to the minimum SF) decrement the transmission power as
+    // well for the number of steps left.
+    // If, on the other hand, the number of steps is negative (margin_SNR is
+    // negative, so its decimal value is low) increase the transmission power
+    //(note that the SF is not incremented as this particular algorithm
+    // expects the node itself to raise its SF whenever necessary).
+    while (steps > 0 && spreadingFactor > min_spreadingFactor)
     {
-      spreadingFactor--;
-      steps--;
-      NS_LOG_DEBUG ("Decreased SF by 1");
+        spreadingFactor--;
+        steps--;
+        NS_LOG_DEBUG("Decreased SF by 1");
     }
-  while (steps > 0 && transmissionPower > min_transmissionPower)
+    while (steps > 0 && transmissionPower > min_transmissionPower)
     {
-      transmissionPower -= 2;
-      steps--;
-      NS_LOG_DEBUG ("Decreased Ptx by 2");
+        transmissionPower -= 2;
+        steps--;
+        NS_LOG_DEBUG("Decreased Ptx by 2");
     }
-  while (steps < 0 && transmissionPower < max_transmissionPower)
+    while (steps < 0 && transmissionPower < max_transmissionPower)
     {
-      transmissionPower += 2;
-      steps++;
-      NS_LOG_DEBUG ("Increased Ptx by 2");
+        transmissionPower += 2;
+        steps++;
+        NS_LOG_DEBUG("Increased Ptx by 2");
     }
 
-  *newDataRate = SfToDr (spreadingFactor);
-  *newTxPower = transmissionPower;
+    *newDataRate = SfToDr(spreadingFactor);
+    *newTxPower = transmissionPower;
 }
 
-uint8_t LoraAdrComponent::SfToDr (uint8_t sf)
+uint8_t
+LoraAdrComponent::SfToDr(uint8_t sf)
 {
-  switch (sf)
+    switch (sf)
     {
     case 12:
-      return 0;
-      break;
+        return 0;
+        break;
     case 11:
-      return 1;
-      break;
+        return 1;
+        break;
     case 10:
-      return 2;
-      break;
+        return 2;
+        break;
     case 9:
-      return 3;
-      break;
+        return 3;
+        break;
     case 8:
-      return 4;
-      break;
+        return 4;
+        break;
     default:
-      return 5;
-      break;
+        return 5;
+        break;
     }
-}
-
-double LoraAdrComponent::RxPowerToSNR (double transmissionPower)
-{
-  //The following conversion ignores interfering packets
-  return transmissionPower + 174 - 10 * log10 (B) - NF;
-}
-
-//Get the maximum received power (it considers the values in dB!)
-double LoraAdrComponent::GetMinTxFromGateways (LoraEndDeviceStatus::GatewayList gwList)
-{
-  LoraEndDeviceStatus::GatewayList::iterator it = gwList.begin ();
-  double min = it->second.rxPower;
-
-  for (; it != gwList.end (); it++)
-    {
-      if (it->second.rxPower < min)
-        {
-          min = it->second.rxPower;
-        }
-    }
-
-  return min;
-}
-
-//Get the maximum received power (it considers the values in dB!)
-double LoraAdrComponent::GetMaxTxFromGateways (LoraEndDeviceStatus::GatewayList gwList)
-{
-  LoraEndDeviceStatus::GatewayList::iterator it = gwList.begin ();
-  double max = it->second.rxPower;
-
-  for (; it != gwList.end (); it++)
-    {
-      if (it->second.rxPower > max)
-        {
-          max = it->second.rxPower;
-        }
-    }
-
-  return max;
-}
-
-//Get the maximum received power
-double LoraAdrComponent::GetAverageTxFromGateways (LoraEndDeviceStatus::GatewayList gwList)
-{
-  double sum = 0;
-
-  for (LoraEndDeviceStatus::GatewayList::iterator it = gwList.begin (); it != gwList.end (); it++)
-    {
-      NS_LOG_DEBUG ("Gateway at " << it->first << " has TP " << it->second.rxPower);
-      sum += it->second.rxPower;
-    }
-
-  double average = sum / gwList.size ();
-
-  NS_LOG_DEBUG ("TP (average) = " << average);
-
-  return average;
 }
 
 double
-LoraAdrComponent::GetReceivedPower (LoraEndDeviceStatus::GatewayList gwList)
+LoraAdrComponent::RxPowerToSNR(double transmissionPower)
 {
-  switch (tpAveraging)
+    // The following conversion ignores interfering packets
+    return transmissionPower + 174 - 10 * log10(B) - NF;
+}
+
+// Get the maximum received power (it considers the values in dB!)
+double
+LoraAdrComponent::GetMinTxFromGateways(LoraEndDeviceStatus::GatewayList gwList)
+{
+    LoraEndDeviceStatus::GatewayList::iterator it = gwList.begin();
+    double min = it->second.rxPower;
+
+    for (; it != gwList.end(); it++)
+    {
+        if (it->second.rxPower < min)
+        {
+            min = it->second.rxPower;
+        }
+    }
+
+    return min;
+}
+
+// Get the maximum received power (it considers the values in dB!)
+double
+LoraAdrComponent::GetMaxTxFromGateways(LoraEndDeviceStatus::GatewayList gwList)
+{
+    LoraEndDeviceStatus::GatewayList::iterator it = gwList.begin();
+    double max = it->second.rxPower;
+
+    for (; it != gwList.end(); it++)
+    {
+        if (it->second.rxPower > max)
+        {
+            max = it->second.rxPower;
+        }
+    }
+
+    return max;
+}
+
+// Get the maximum received power
+double
+LoraAdrComponent::GetAverageTxFromGateways(LoraEndDeviceStatus::GatewayList gwList)
+{
+    double sum = 0;
+
+    for (LoraEndDeviceStatus::GatewayList::iterator it = gwList.begin(); it != gwList.end(); it++)
+    {
+        NS_LOG_DEBUG("Gateway at " << it->first << " has TP " << it->second.rxPower);
+        sum += it->second.rxPower;
+    }
+
+    double average = sum / gwList.size();
+
+    NS_LOG_DEBUG("TP (average) = " << average);
+
+    return average;
+}
+
+double
+LoraAdrComponent::GetReceivedPower(LoraEndDeviceStatus::GatewayList gwList)
+{
+    switch (tpAveraging)
     {
     case LoraAdrComponent::AVERAGE:
-      return GetAverageTxFromGateways (gwList);
+        return GetAverageTxFromGateways(gwList);
     case LoraAdrComponent::MAXIMUM:
-      return GetMaxTxFromGateways (gwList);
+        return GetMaxTxFromGateways(gwList);
     case LoraAdrComponent::MINIMUM:
-      return GetMinTxFromGateways (gwList);
+        return GetMinTxFromGateways(gwList);
     default:
-      return -1;
+        return -1;
     }
 }
 
 // TODO Make this more elegant
-double LoraAdrComponent::GetMinSNR (LoraEndDeviceStatus::ReceivedPacketList packetList,
-                                int historyRange)
+double
+LoraAdrComponent::GetMinSNR(LoraEndDeviceStatus::ReceivedPacketList packetList, int historyRange)
 {
-  double m_SNR;
+    double m_SNR;
 
-  //Take elements from the list starting at the end
-  auto it = packetList.rbegin ();
-  double min = RxPowerToSNR (GetReceivedPower (it->second.gwList));
+    // Take elements from the list starting at the end
+    auto it = packetList.rbegin();
+    double min = RxPowerToSNR(GetReceivedPower(it->second.gwList));
 
-  for (int i = 0; i < historyRange; i++, it++)
+    for (int i = 0; i < historyRange; i++, it++)
     {
-      m_SNR = RxPowerToSNR (GetReceivedPower (it->second.gwList));
+        m_SNR = RxPowerToSNR(GetReceivedPower(it->second.gwList));
 
-      NS_LOG_DEBUG ("Received power: " << GetReceivedPower (it->second.gwList));
-      NS_LOG_DEBUG ("m_SNR = " << m_SNR);
+        NS_LOG_DEBUG("Received power: " << GetReceivedPower(it->second.gwList));
+        NS_LOG_DEBUG("m_SNR = " << m_SNR);
 
-      if (m_SNR < min)
+        if (m_SNR < min)
         {
-          min = m_SNR;
+            min = m_SNR;
         }
     }
 
-  NS_LOG_DEBUG ("SNR (min) = " << min);
+    NS_LOG_DEBUG("SNR (min) = " << min);
 
-  return min;
+    return min;
 }
 
-double LoraAdrComponent::GetMaxSNR (LoraEndDeviceStatus::ReceivedPacketList packetList,
-                                int historyRange)
+double
+LoraAdrComponent::GetMaxSNR(LoraEndDeviceStatus::ReceivedPacketList packetList, int historyRange)
 {
-  double m_SNR;
+    double m_SNR;
 
-  //Take elements from the list starting at the end
-  auto it = packetList.rbegin ();
-  double max = RxPowerToSNR (GetReceivedPower (it->second.gwList));
+    // Take elements from the list starting at the end
+    auto it = packetList.rbegin();
+    double max = RxPowerToSNR(GetReceivedPower(it->second.gwList));
 
-  for (int i = 0; i < historyRange; i++, it++)
+    for (int i = 0; i < historyRange; i++, it++)
     {
-      m_SNR = RxPowerToSNR (GetReceivedPower (it->second.gwList));
+        m_SNR = RxPowerToSNR(GetReceivedPower(it->second.gwList));
 
-      NS_LOG_DEBUG ("Received power: " << GetReceivedPower (it->second.gwList));
-      NS_LOG_DEBUG ("m_SNR = " << m_SNR);
+        NS_LOG_DEBUG("Received power: " << GetReceivedPower(it->second.gwList));
+        NS_LOG_DEBUG("m_SNR = " << m_SNR);
 
-      if (m_SNR > max)
+        if (m_SNR > max)
         {
-          max = m_SNR;
+            max = m_SNR;
         }
     }
 
-  NS_LOG_DEBUG ("SNR (max) = " << max);
+    NS_LOG_DEBUG("SNR (max) = " << max);
 
-  return max;
+    return max;
 }
 
-double LoraAdrComponent::GetAverageSNR (LoraEndDeviceStatus::ReceivedPacketList packetList,
-                                    int historyRange)
+double
+LoraAdrComponent::GetAverageSNR(LoraEndDeviceStatus::ReceivedPacketList packetList,
+                                int historyRange)
 {
-  double sum = 0;
-  double m_SNR;
+    double sum = 0;
+    double m_SNR;
 
-  //Take elements from the list starting at the end
-  auto it = packetList.rbegin ();
-  for (int i = 0; i < historyRange; i++, it++)
+    // Take elements from the list starting at the end
+    auto it = packetList.rbegin();
+    for (int i = 0; i < historyRange; i++, it++)
     {
-      m_SNR = RxPowerToSNR (GetReceivedPower (it->second.gwList));
+        m_SNR = RxPowerToSNR(GetReceivedPower(it->second.gwList));
 
-      NS_LOG_DEBUG ("Received power: " << GetReceivedPower (it->second.gwList));
-      NS_LOG_DEBUG ("m_SNR = " << m_SNR);
+        NS_LOG_DEBUG("Received power: " << GetReceivedPower(it->second.gwList));
+        NS_LOG_DEBUG("m_SNR = " << m_SNR);
 
-      sum += m_SNR;
+        sum += m_SNR;
     }
 
-  double average = sum / historyRange;
+    double average = sum / historyRange;
 
-  NS_LOG_DEBUG ("SNR (average) = " << average);
+    NS_LOG_DEBUG("SNR (average) = " << average);
 
-  return average;
+    return average;
 }
 
-int LoraAdrComponent::GetTxPowerIndex (int txPower)
+int
+LoraAdrComponent::GetTxPowerIndex(int txPower)
 {
-  if (txPower >= 16)
+    if (txPower >= 16)
     {
-      return 0;
+        return 0;
     }
-  else if (txPower >= 14)
+    else if (txPower >= 14)
     {
-      return 1;
+        return 1;
     }
-  else if (txPower >= 12)
+    else if (txPower >= 12)
     {
-      return 2;
+        return 2;
     }
-  else if (txPower >= 10)
+    else if (txPower >= 10)
     {
-      return 3;
+        return 3;
     }
-  else if (txPower >= 8)
+    else if (txPower >= 8)
     {
-      return 4;
+        return 4;
     }
-  else if (txPower >= 6)
+    else if (txPower >= 6)
     {
-      return 5;
+        return 5;
     }
-  else if (txPower >= 4)
+    else if (txPower >= 4)
     {
-      return 6;
+        return 6;
     }
-  else
+    else
     {
-      return 7;
+        return 7;
     }
 }
-}
+} // namespace ns3
