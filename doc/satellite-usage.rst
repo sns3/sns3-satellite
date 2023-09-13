@@ -16,95 +16,53 @@ Overview
 
 Setting up a working version of SNS3 requires the following parts:
 
-- Bake
+- CMake and a set of standard compilers tools
 - The simulator (NS-3, satellite modules, etc.)
 - Data package
 
 The steps below will guide you to quickly set up the parts.
 
-Bake
-####
+Compilation tools
+#################
 
-Bake is a small tool that automates the deployment of NS-3, other related modules, and their dependencies.
-Bake is an open source tool, so we shall start by downloading its source. Open a terminal and tell Mercurial
-to download Bake from its official repository.
+In order to be able to get and compile SNS3, it is recommended to install the following tools and
+optional python dependencies
 ::
 
-  $ hg clone http://code.nsnam.org/bake
+  git cmake g++ libxml2-dev python3 python3-lxml
 
-You will be shown an output similar to the following
-::
-
-  destination directory: bake
-  requesting all changes
-  adding changesets
-  adding manifests
-  adding file changes
-  added 358 changesets with 817 changes to 63 files
-  updating to branch default
-  resolving manifests
-  getting .hgignore
-  getting .project
-  ...
-  getting test/test.xml
-  45 files updated, 0 files merged, 0 files removed, 0 files unresolved
-
-Bake is now downloaded to ``bake`` directory.
-::
-
-  $ cd bake
-
-Now go to `the SNS3 wiki`__  and check the `sns3.xml`__ file there, download it, and copy it into
-your ``bake/contrib/`` directory. This ``sns3.xml`` contains information of new modules related to SNS3.
-
-.. _sns3_wiki: https://wiki.net4sat.org/doku.php?id=sns3:index
-
-__ sns3_wiki_
-
-.. _sns3_bakefile: https://wiki.net4sat.org/doku.php?do=export_code&id=sns3:manuals:install:index&codeblock=3
-
-__ sns3_bakefile_
+This will allow you to get, configure and build the necessary parts required for running SNS3.
 
 The simulator
 #############
 
 We can now proceed to download the simulator.
 
-Then we use Bake to take care of the download. In ``bake`` directory, run the following commands.
+First we need to download the base ns-3 simulator.
 ::
 
-  ./bake.py configure --enable ns-3.28 --enable sns3-satellite
-  ./bake.py download
+  $ git clone -b ns-3.39 https://gitlab.com/nsnam/ns-3-dev.git
 
-
-The last command usually takes some time, especially while downloading ns-3.28.
-
-The simulator is now downloaded to the ``bake/source/ns-3.28`` directory.
+Then we download the extraneous modules that compose the SNS3 simulator.
 ::
 
-  $ cd source/ns-3.28
+  $ git clone --recursive https://github.com/sns3/sns3-satellite.git ns-3-dev/contrib/satellite
+  $ git clone https://github.com/sns3/stats.git ns-3-dev/contrib/magiter-stats
+  $ git clone https://github.com/sns3/traffic.git ns-3-dev/contrib/traffic
+
+The simulator is now downloaded to the ``ns-3-dev`` directory.
+::
+
+  $ cd ns-3-dev
 
 You're now in the root directory of NS-3. If you wish, we can proceed to configure and build the simulator
 here.
 ::
 
-  $ ./waf configure --enable-examples --enable-tests
-  $ ./waf build
+  $ ./ns3 configure --enable-examples --enable-tests --enable-modules satellite
+  $ ./ns3 build
 
-The build should take some time. But keep in mind that SNS3 is not functioning yet without the data package.
-This is explained in the next section.
-
-You can also combine both steps (download + build) into a single step by running:
-::
-
-  ./bake.py configure --enable ns-3.28 --enable sns3-satellite
-  ./bake.py deploy
-
-Lastly, you can check your system for missing dependencies before downloading the sources using:
-::
-
-  ./bake.py configure --enable ns-3.28 --enable sns3-satellite
-  ./bake.py check
+The build should take some time. But you will then be able to run examples right off the bat.
 
 
 Data package
@@ -126,15 +84,77 @@ the following information:
 The input files are placed inside the data directory of the satellite module
 (i.e., contrib/satellite/data directory).
 
-Data package is provided as a submodule of the main satellite module. You can ask Git to
-download it using the following command:
+Data package is provided as a submodule of the main satellite module. You should already have
+it downloaded if you provided the `--recursive` option when downloading the satellite module.
+If you forgot to do so, you can ask Git to download it using the following command:
 ::
 
   $ cd contrib/satellite
-  $ git submodule update --init
+  $ git submodule update --init --recursive
 
 SNS3 is now properly initialized.
 
+
+Automation
+##########
+
+Bake is a small tool that automates the deployment of NS-3, other related modules, and their dependencies.
+We can optionally automate the previous steps by using bake and a simple configuration file.
+
+Bake is an open source tool, so we shall start by downloading its source. Open a terminal and tell Mercurial
+to download Bake from its official repository.
+::
+
+  $ git clone https://gitlab.com/nsnam/bake.git
+
+Bake is now downloaded to ``bake`` directory.
+::
+
+  $ cd bake
+
+Now put the following configuration file into a new ``bake/contrib/`` directory:
+::
+
+  $ mkdir contrib
+  $ cat << EOF > contrib/sns3.xml
+  <configuration>
+    <modules>
+      <module name="sns3-stats" type="ns-contrib" min_version="ns-3.37">
+        <source type="git">
+          <attribute name="url" value="https://github.com/sns3/stats.git"/>
+          <attribute name="module_directory" value="magister-stats"/>
+        </source>
+        <build type="none">
+        </build>
+      </module>
+      <module name="sns3-traffic" type="ns-contrib" min_version="ns-3.37">
+        <source type="git">
+          <attribute name="url" value="https://github.com/sns3/traffic.git" />
+          <attribute name="module_directory" value="traffic"/>
+        </source>
+        <build type="none">
+        </build>
+      </module>
+      <module name="sns3-satellite" type="ns-contrib" min_version="ns-3.37">
+        <source type="git">
+          <attribute name="url" value="https://github.com/sns3/sns3-satellite.git"/>
+          <attribute name="module_directory" value="satellite"/>
+          <attribute name="post_download" value="cd $SRCDIR; git submodule update --init --recursive"/>
+        </source>
+        <depends_on name="sns3-stats" optional="False" />
+        <depends_on name="sns3-traffic" optional="False" />
+        <build type="none">
+        </build>
+      </module>
+    </modules>
+  </configuration>
+  EOF
+
+You can now configure bake and download / build the SNS3 module by issuing
+::
+
+  $ ./bake.py configure -e ns-3.39 -e sns3-satellite
+  $ ./bake.py deploy
 
 Helpers
 =======
