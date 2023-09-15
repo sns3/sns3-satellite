@@ -54,7 +54,7 @@ SatGeoMac::GetTypeId(void)
             .AddAttribute("DisableSchedulingIfNoDeviceConnected",
                           "If true, the periodic calls of StartTransmission are not called when no "
                           "devices are connected to this MAC",
-                          BooleanValue(true),
+                          BooleanValue(false),
                           MakeBooleanAccessor(&SatGeoMac::m_disableSchedulingIfNoDeviceConnected),
                           MakeBooleanChecker());
 
@@ -80,7 +80,7 @@ SatGeoMac::SatGeoMac(uint32_t satId,
                      SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                      SatEnums::RegenerationMode_t returnLinkRegenerationMode)
     : SatMac(satId, beamId, forwardLinkRegenerationMode, returnLinkRegenerationMode),
-      m_disableSchedulingIfNoDeviceConnected(true),
+      m_disableSchedulingIfNoDeviceConnected(false),
       m_fwdScheduler(),
       m_guardTime(MicroSeconds(1)),
       m_satId(satId),

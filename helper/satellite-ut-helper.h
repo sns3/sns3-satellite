@@ -23,7 +23,6 @@
 #ifndef SATELLITE_UT_HELPER_H
 #define SATELLITE_UT_HELPER_H
 
-#include <ns3/lorawan-mac-end-device.h>
 #include <ns3/net-device-container.h>
 #include <ns3/node-container.h>
 #include <ns3/object-factory.h>
@@ -31,12 +30,12 @@
 #include <ns3/satellite-channel.h>
 #include <ns3/satellite-link-results.h>
 #include <ns3/satellite-ncc.h>
+#include <ns3/satellite-mac.h>
 #include <ns3/satellite-phy.h>
 #include <ns3/satellite-random-access-container-conf.h>
 #include <ns3/satellite-random-access-container.h>
 #include <ns3/satellite-superframe-sequence.h>
 #include <ns3/satellite-typedefs.h>
-#include <ns3/satellite-ut-mac.h>
 #include <ns3/traced-callback.h>
 
 #include <string>
@@ -158,94 +157,7 @@ class SatUtHelper : public Object
      * a queue for this ns3::NetDevice, and associate the resulting
      * ns3::NetDevice with the ns3::Node and ns3::SatChannel.
      */
-    NetDeviceContainer InstallDvb(NodeContainer c,
-                                  uint32_t satId,
-                                  uint32_t beamId,
-                                  Ptr<SatChannel> fCh,
-                                  Ptr<SatChannel> rCh,
-                                  Ptr<SatNetDevice> gwNd,
-                                  Ptr<SatNcc> ncc,
-                                  Address satUserAddress,
-                                  SatPhy::ChannelPairGetterCallback cbChannel,
-                                  SatMac::RoutingUpdateCallback cbRouting,
-                                  SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
-                                  SatEnums::RegenerationMode_t returnLinkRegenerationMode);
-    /**
-     * \param n node
-     * \param satId  id of the satellite
-     * \param beamId  id of the beam
-     * \param fCh forward channel
-     * \param rCh return channel
-     * \param gwNd satellite netdevice of the GW
-     * \param ncc NCC (Network Control Center)
-     * \param satUserAddress MAC address of satellite user link
-     * \param forwardLinkRegenerationMode The regeneration mode on forward link
-     * \param returnLinkRegenerationMode The regeneration mode on return link
-     * \return Net device installed to node
-     *
-     * Saves you from having to construct a temporary NodeContainer.
-     */
-    Ptr<NetDevice> InstallDvb(Ptr<Node> n,
-                              uint32_t satId,
-                              uint32_t beamId,
-                              Ptr<SatChannel> fCh,
-                              Ptr<SatChannel> rCh,
-                              Ptr<SatNetDevice> gwNd,
-                              Ptr<SatNcc> ncc,
-                              Address satUserAddress,
-                              SatPhy::ChannelPairGetterCallback cbChannel,
-                              SatMac::RoutingUpdateCallback cbRouting,
-                              SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
-                              SatEnums::RegenerationMode_t returnLinkRegenerationMode);
-
-    /**
-     * \param c a set of nodes
-     * \param satId  id of the satellite
-     * \param beamId  id of the beam
-     * \param fCh forward channel
-     * \param rCh return channel
-     * \param gwNd satellite netdevice of the GW
-     * \param ncc NCC (Network Control Center)
-     * \param satUserAddress MAC address of satellite user link
-     * \param forwardLinkRegenerationMode The regeneration mode on forward link
-     * \param returnLinkRegenerationMode The regeneration mode on return link
-     * \return Container of installed net devices
-     *
-     * This method creates a ns3::SatChannel with the
-     * attributes configured by SatUtHelper::SetChannelAttribute,
-     * then, for each node in the input container, we create a
-     * ns3::SatNetDevice with the requested attributes,
-     * a queue for this ns3::SatNetLorawanDevice, and associate the resulting
-     * ns3::SatNetLorawanDevice with the ns3::Node and ns3::SatChannel.
-     */
-    NetDeviceContainer InstallLora(NodeContainer c,
-                                   uint32_t satId,
-                                   uint32_t beamId,
-                                   Ptr<SatChannel> fCh,
-                                   Ptr<SatChannel> rCh,
-                                   Ptr<SatNetDevice> gwNd,
-                                   Ptr<SatNcc> ncc,
-                                   Address satUserAddress,
-                                   SatPhy::ChannelPairGetterCallback cbChannel,
-                                   SatMac::RoutingUpdateCallback cbRouting,
-                                   SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
-                                   SatEnums::RegenerationMode_t returnLinkRegenerationMode);
-    /**
-     * \param n node
-     * \param satId  id of the satellite
-     * \param beamId  id of the beam
-     * \param fCh forward channel
-     * \param rCh return channel
-     * \param gwNd satellite netdevice of the GW
-     * \param ncc NCC (Network Control Center)
-     * \param satUserAddress MAC address of satellite user link
-     * \param forwardLinkRegenerationMode The regeneration mode on forward link
-     * \param returnLinkRegenerationMode The regeneration mode on return link
-     * \return Net device installed to node
-     *
-     * Saves you from having to construct a temporary NodeContainer.
-     */
-    Ptr<NetDevice> InstallLora(Ptr<Node> n,
+    NetDeviceContainer Install(NodeContainer c,
                                uint32_t satId,
                                uint32_t beamId,
                                Ptr<SatChannel> fCh,
@@ -257,6 +169,34 @@ class SatUtHelper : public Object
                                SatMac::RoutingUpdateCallback cbRouting,
                                SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                                SatEnums::RegenerationMode_t returnLinkRegenerationMode);
+    /**
+     * \param n node
+     * \param satId  id of the satellite
+     * \param beamId  id of the beam
+     * \param fCh forward channel
+     * \param rCh return channel
+     * \param gwNd satellite netdevice of the GW
+     * \param ncc NCC (Network Control Center)
+     * \param satUserAddress MAC address of satellite user link
+     * \param forwardLinkRegenerationMode The regeneration mode on forward link
+     * \param returnLinkRegenerationMode The regeneration mode on return link
+     * \return Net device installed to node
+     *
+     * Saves you from having to construct a temporary NodeContainer.
+     * This method is implemented in child classes.
+     */
+    virtual Ptr<NetDevice> Install(Ptr<Node> n,
+                                   uint32_t satId,
+                                   uint32_t beamId,
+                                   Ptr<SatChannel> fCh,
+                                   Ptr<SatChannel> rCh,
+                                   Ptr<SatNetDevice> gwNd,
+                                   Ptr<SatNcc> ncc,
+                                   Address satUserAddress,
+                                   SatPhy::ChannelPairGetterCallback cbChannel,
+                                   SatMac::RoutingUpdateCallback cbRouting,
+                                   SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                                   SatEnums::RegenerationMode_t returnLinkRegenerationMode) = 0;
 
     /**
      * Enables creation traces to be written in given file
@@ -265,7 +205,7 @@ class SatUtHelper : public Object
      */
     void EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase& cb);
 
-  private:
+  protected:
     SatTypedefs::CarrierBandwidthConverter_t m_carrierBandwidthConverter;
     uint32_t m_fwdLinkCarrierCount;
     Ptr<SatSuperframeSeq> m_superframeSeq;

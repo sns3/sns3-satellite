@@ -314,7 +314,8 @@ SatHelper::SatHelper()
     }
 
     m_beamHelper =
-        CreateObject<SatBeamHelper>(geoNodes,
+        CreateObject<SatBeamHelper>(m_standard,
+                                    geoNodes,
                                     isls,
                                     MakeCallback(&SatConf::GetCarrierBandwidthHz, m_satConf),
                                     m_satConf->GetRtnLinkCarrierCount(),
@@ -331,8 +332,6 @@ SatHelper::SatHelper()
         NS_FATAL_ERROR(
             "Must use constant speed propagation delay model if satellite mobility is enabled");
     }
-
-    m_beamHelper->SetStandard(m_standard);
 
     Ptr<SatRtnLinkTime> rtnTime = Singleton<SatRtnLinkTime>::Get();
     rtnTime->Initialize(m_satConf->GetSuperframeSeq());

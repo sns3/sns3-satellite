@@ -199,6 +199,8 @@ set(source_files
     helper/satellite-traffic-helper.cc
     helper/satellite-user-helper.cc
     helper/satellite-ut-helper.cc
+    helper/satellite-ut-helper-dvb.cc
+    helper/satellite-ut-helper-lora.cc
     helper/simulation-helper.cc
     stats/satellite-frame-symbol-load-probe.cc
     stats/satellite-frame-user-load-probe.cc
@@ -442,6 +444,8 @@ set(header_files
     helper/satellite-traffic-helper.h
     helper/satellite-user-helper.h
     helper/satellite-ut-helper.h
+    helper/satellite-ut-helper-dvb.h
+    helper/satellite-ut-helper-lora.h
     helper/simulation-helper.h
     stats/satellite-frame-symbol-load-probe.h
     stats/satellite-frame-user-load-probe.h

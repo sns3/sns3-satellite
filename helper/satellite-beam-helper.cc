@@ -22,6 +22,9 @@
 
 #include "satellite-beam-helper.h"
 
+#include "satellite-ut-helper-dvb.h"
+#include "satellite-ut-helper-lora.h"
+
 #include <ns3/config.h>
 #include <ns3/enum.h>
 #include <ns3/internet-stack-helper.h>
@@ -223,6 +226,7 @@ SatBeamHelper::SatBeamHelper()
       m_raConstantErrorRate(0.0),
       m_enableFwdLinkBeamHopping(false),
       m_bstpController(),
+      m_standard(SatEnums::DVB),
       m_forwardLinkRegenerationMode(SatEnums::TRANSPARENT),
       m_returnLinkRegenerationMode(SatEnums::TRANSPARENT)
 {
@@ -232,7 +236,8 @@ SatBeamHelper::SatBeamHelper()
     NS_FATAL_ERROR("SatBeamHelper::SatBeamHelper - Constructor not in use");
 }
 
-SatBeamHelper::SatBeamHelper(NodeContainer geoNodes,
+SatBeamHelper::SatBeamHelper(SatEnums::Standard_t standard,
+                             NodeContainer geoNodes,
                              std::vector<std::pair<uint32_t, uint32_t>> isls,
                              SatTypedefs::CarrierBandwidthConverter_t bandwidthConverterCb,
                              uint32_t rtnLinkCarrierCount,
@@ -253,6 +258,7 @@ SatBeamHelper::SatBeamHelper(NodeContainer geoNodes,
       m_raConstantErrorRate(0.0),
       m_enableFwdLinkBeamHopping(false),
       m_bstpController(),
+      m_standard(standard),
       m_forwardLinkRegenerationMode(forwardLinkRegenerationMode),
       m_returnLinkRegenerationMode(returnLinkRegenerationMode),
       m_isls(isls)
@@ -334,13 +340,32 @@ SatBeamHelper::SatBeamHelper(NodeContainer geoNodes,
                                            fwdReserveCtrlCb,
                                            fwdSendCtrlCb,
                                            gwRaSettings);
-    m_utHelper = CreateObject<SatUtHelper>(bandwidthConverterCb,
-                                           fwdLinkCarrierCount,
-                                           seq,
-                                           fwdReadCtrlCb,
-                                           rtnReserveCtrlCb,
-                                           rtnSendCtrlCb,
-                                           utRaSettings);
+
+    switch(m_standard)
+    {
+        case SatEnums::DVB: {
+            m_utHelper = CreateObject<SatUtHelperDvb>(bandwidthConverterCb,
+                                                      fwdLinkCarrierCount,
+                                                      seq,
+                                                      fwdReadCtrlCb,
+                                                      rtnReserveCtrlCb,
+                                                      rtnSendCtrlCb,
+                                                      utRaSettings);
+            break;
+        }
+        case SatEnums::LORA: {
+            m_utHelper = CreateObject<SatUtHelperLora>(bandwidthConverterCb,
+                                                       fwdLinkCarrierCount,
+                                                       seq,
+                                                       fwdReadCtrlCb,
+                                                       rtnReserveCtrlCb,
+                                                       rtnSendCtrlCb,
+                                                       utRaSettings);
+            break;
+        }
+        default:
+            NS_FATAL_ERROR("Unknown standard");
+    }
 
     // Two usage of link results is two-fold: on the other hand they are needed in the
     // packet reception for packet decoding, but on the other hand they are utilized in
@@ -485,12 +510,6 @@ SatBeamHelper::Init()
     {
         m_bstpController->Initialize();
     }
-}
-
-void
-SatBeamHelper::SetStandard(SatEnums::Standard_t standard)
-{
-    m_standard = standard;
 }
 
 void
@@ -667,7 +686,7 @@ SatBeamHelper::InstallFeeder(Ptr<SatGeoNetDevice> geoNetDevice,
                              SatChannelPair::ChannelPair_t feederLink,
                              uint32_t rtnFlFreqId,
                              uint32_t fwdFlFreqId,
-                             SatUtMac::RoutingUpdateCallback routingCallback)
+                             SatMac::RoutingUpdateCallback routingCallback)
 {
     NS_LOG_FUNCTION(this << gwNode << gwId << satId << beamId << rtnFlFreqId << fwdFlFreqId);
 
@@ -795,7 +814,7 @@ SatBeamHelper::InstallUser(Ptr<SatGeoNetDevice> geoNetDevice,
                            SatChannelPair::ChannelPair_t userLink,
                            uint32_t rtnUlFreqId,
                            uint32_t fwdUlFreqId,
-                           SatUtMac::RoutingUpdateCallback routingCallback)
+                           SatMac::RoutingUpdateCallback routingCallback)
 {
     NS_LOG_FUNCTION(this << beamId << rtnUlFreqId << fwdUlFreqId);
 
@@ -814,40 +833,18 @@ SatBeamHelper::InstallUser(Ptr<SatGeoNetDevice> geoNetDevice,
     }
 
     // install UTs
-    NetDeviceContainer utNd;
-    switch (m_standard)
-    {
-    case SatEnums::DVB:
-        utNd = m_utHelper->InstallDvb(ut,
-                                      satId,
-                                      beamId,
-                                      userLink.first,
-                                      userLink.second,
-                                      DynamicCast<SatNetDevice>(gwNd),
-                                      m_ncc,
-                                      satUserAddress,
-                                      MakeCallback(&SatChannelPair::GetChannelPair, m_ulChannels),
-                                      routingCallback,
-                                      m_forwardLinkRegenerationMode,
-                                      m_returnLinkRegenerationMode);
-        break;
-    case SatEnums::LORA:
-        utNd = m_utHelper->InstallLora(ut,
-                                       satId,
-                                       beamId,
-                                       userLink.first,
-                                       userLink.second,
-                                       DynamicCast<SatNetDevice>(gwNd),
-                                       m_ncc,
-                                       satUserAddress,
-                                       MakeCallback(&SatChannelPair::GetChannelPair, m_ulChannels),
-                                       routingCallback,
-                                       m_forwardLinkRegenerationMode,
-                                       m_returnLinkRegenerationMode);
-        break;
-    default:
-        NS_FATAL_ERROR("Incorrect standard chosen");
-    }
+    NetDeviceContainer utNd = m_utHelper->Install(ut,
+                                                  satId,
+                                                  beamId,
+                                                  userLink.first,
+                                                  userLink.second,
+                                                  DynamicCast<SatNetDevice>(gwNd),
+                                                  m_ncc,
+                                                  satUserAddress,
+                                                  MakeCallback(&SatChannelPair::GetChannelPair, m_ulChannels),
+                                                  routingCallback,
+                                                  m_forwardLinkRegenerationMode,
+                                                  m_returnLinkRegenerationMode);
 
     // Add satellite addresses UT MAC layers.
     if (m_returnLinkRegenerationMode == SatEnums::REGENERATION_LINK ||

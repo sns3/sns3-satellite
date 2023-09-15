@@ -39,6 +39,7 @@
 #include "ns3/satellite-gw-mac.h"
 #include "ns3/satellite-helper.h"
 #include "ns3/satellite-phy-rx-carrier.h"
+#include "ns3/satellite-phy-tx.h"
 #include "ns3/satellite-ut-mac-state.h"
 #include "ns3/simulation-helper.h"
 #include "ns3/simulator.h"

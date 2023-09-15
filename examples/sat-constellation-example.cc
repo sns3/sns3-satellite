@@ -265,7 +265,7 @@ mainLeo(uint32_t packetSize,
     Config::SetDefault("ns3::SatSGP4MobilityModel::UpdatePositionPeriod",
                        TimeValue(MilliSeconds(10)));
     Config::SetDefault("ns3::SatHelper::GwUsers", UintegerValue(3));
-    Config::SetDefault("ns3::SatGeoMac::DisableSchedulingIfNoDeviceConnected", BooleanValue(true));
+    Config::SetDefault("ns3::SatGeoMac::DisableSchedulingIfNoDeviceConnected", BooleanValue(false));
 
     /// Use constellation with correctly centered beams (used for testing)
     Config::SetDefault("ns3::SatAntennaGainPatternContainer::PatternsFolder",
