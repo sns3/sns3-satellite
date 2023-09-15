@@ -19,96 +19,88 @@
  * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#ifndef SATELLITE_UT_HELPER_LORA_H
-#define SATELLITE_UT_HELPER_LORA_H
+#ifndef SATELLITE_GW_HELPER_DVB_H
+#define SATELLITE_GW_HELPER_DVB_H
 
-#include <ns3/satellite-ut-helper.h>
+#include <ns3/satellite-gw-helper.h>
 
 #include <ns3/satellite-channel.h>
+#include <ns3/satellite-mac.h>
 #include <ns3/satellite-ncc.h>
 #include <ns3/satellite-superframe-sequence.h>
 #include <ns3/satellite-typedefs.h>
-#include <ns3/satellite-ut-mac.h>
+
+#include <string>
 
 namespace ns3
 {
 
 /**
- * \brief Creates needed objects for LORA UT nodes like SatGeoNetDevice objects.
- *        Handles needed configuration for the UT nodes.
+ * \brief Creates needed objects for DVB GW nodes like SatGeoNetDevice objects.
+ *        Handles needed configuration for the GW nodes.
  *
  */
-class SatUtHelperLora : public SatUtHelper
+class SatGwHelperDvb : public SatGwHelper
 {
   public:
     /**
-     * Derived from Object
+     * \brief Get the type ID
+     * \return the object TypeId
      */
     static TypeId GetTypeId(void);
-
-    /**
-     * Derived from Object
-     */
     TypeId GetInstanceTypeId(void) const;
 
     /**
-     * Default constructor
+     * Default constructor.
      */
-    SatUtHelperLora();
+    SatGwHelperDvb();
 
     /**
-     * Create a SatUtHelperLora to make life easier when creating Satellite point to
+     * Create a SatGwHelperDvb to make life easier when creating Satellite point to
      * point network connections.
      */
-    SatUtHelperLora(SatTypedefs::CarrierBandwidthConverter_t carrierBandwidthConverter,
-                    uint32_t rtnLinkCarrierCount,
-                    Ptr<SatSuperframeSeq> seq,
-                    SatMac::ReadCtrlMsgCallback readCb,
-                    SatMac::ReserveCtrlMsgCallback reserveCb,
-                    SatMac::SendCtrlMsgCallback sendCb,
-                    RandomAccessSettings_s randomAccessSettings);
+    SatGwHelperDvb(SatTypedefs::CarrierBandwidthConverter_t carrierBandwidthConverter,
+                   uint32_t fwdLinkCarrierCount,
+                   Ptr<SatSuperframeSeq> seq,
+                   SatMac::ReadCtrlMsgCallback readCb,
+                   SatMac::ReserveCtrlMsgCallback reserveCb,
+                   SatMac::SendCtrlMsgCallback sendCb,
+                   RandomAccessSettings_s randomAccessSettings);
 
-    /**
-     * Destructor
-     */
-    virtual ~SatUtHelperLora()
+    virtual ~SatGwHelperDvb()
     {
     }
 
     /**
      * \param n node
+     * \param gwId  id of the gw
      * \param satId  id of the satellite
      * \param beamId  id of the beam
      * \param fCh forward channel
      * \param rCh return channel
-     * \param gwNd satellite netdevice of the GW
      * \param ncc NCC (Network Control Center)
-     * \param satUserAddress MAC address of satellite user link
      * \param forwardLinkRegenerationMode The regeneration mode on forward link
      * \param returnLinkRegenerationMode The regeneration mode on return link
-     * \return Net device installed to node
      *
      * This method creates a ns3::SatChannel with the
-     * attributes configured by SatUtHelperLora::SetChannelAttribute,
+     * attributes configured by SatGwHelper::SetChannelAttribute,
      * then, for each node in the input container, we create a
      * ns3::SatNetDevice with the requested attributes,
-     * a queue for this ns3::SatNetLorawanDevice, and associate the resulting
-     * ns3::SatNetLorawanDevice with the ns3::Node and ns3::SatChannel.
+     * a queue for this ns3::SatNetDevice, and associate the resulting
+     * ns3::SatNetDevice with the ns3::Node and ns3::SatChannel.
      */
     virtual Ptr<NetDevice> Install(Ptr<Node> n,
+                                   uint32_t gwId,
                                    uint32_t satId,
                                    uint32_t beamId,
                                    Ptr<SatChannel> fCh,
                                    Ptr<SatChannel> rCh,
-                                   Ptr<SatNetDevice> gwNd,
                                    Ptr<SatNcc> ncc,
-                                   Address satUserAddress,
-                                   SatPhy::ChannelPairGetterCallback cbChannel,
-                                   SatMac::RoutingUpdateCallback cbRouting,
+                                   Ptr<SatLowerLayerServiceConf> llsConf,
                                    SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                                    SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 };
 
 } // namespace ns3
 
-#endif /* SATELLITE_UT_HELPER_LORA_H */
+#endif /* SATELLITE_GW_HELPER_DVB_H */

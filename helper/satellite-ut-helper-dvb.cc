@@ -112,7 +112,7 @@ SatUtHelperDvb::Install(Ptr<Node> n,
                         SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                         SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
-    NS_LOG_FUNCTION(this << satId << beamId << fCh << rCh << gwNd << ncc << satUserAddress << forwardLinkRegenerationMode << returnLinkRegenerationMode);
+    NS_LOG_FUNCTION(this << n << satId << beamId << fCh << rCh << gwNd << ncc << satUserAddress << forwardLinkRegenerationMode << returnLinkRegenerationMode);
 
     NetDeviceContainer container;
 

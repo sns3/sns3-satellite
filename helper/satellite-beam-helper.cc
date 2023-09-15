@@ -24,6 +24,8 @@
 
 #include "satellite-ut-helper-dvb.h"
 #include "satellite-ut-helper-lora.h"
+#include "satellite-gw-helper-dvb.h"
+#include "satellite-gw-helper-lora.h"
 
 #include <ns3/config.h>
 #include <ns3/enum.h>
@@ -333,17 +335,17 @@ SatBeamHelper::SatBeamHelper(SatEnums::Standard_t standard,
                                              fwdReadCtrlCb,
                                              rtnReadCtrlCb,
                                              geoRaSettings);
-    m_gwHelper = CreateObject<SatGwHelper>(bandwidthConverterCb,
-                                           rtnLinkCarrierCount,
-                                           seq,
-                                           rtnReadCtrlCb,
-                                           fwdReserveCtrlCb,
-                                           fwdSendCtrlCb,
-                                           gwRaSettings);
 
     switch(m_standard)
     {
         case SatEnums::DVB: {
+            m_gwHelper = CreateObject<SatGwHelperDvb>(bandwidthConverterCb,
+                                                      rtnLinkCarrierCount,
+                                                      seq,
+                                                      rtnReadCtrlCb,
+                                                      fwdReserveCtrlCb,
+                                                      fwdSendCtrlCb,
+                                                      gwRaSettings);
             m_utHelper = CreateObject<SatUtHelperDvb>(bandwidthConverterCb,
                                                       fwdLinkCarrierCount,
                                                       seq,
@@ -354,6 +356,13 @@ SatBeamHelper::SatBeamHelper(SatEnums::Standard_t standard,
             break;
         }
         case SatEnums::LORA: {
+            m_gwHelper = CreateObject<SatGwHelperLora>(bandwidthConverterCb,
+                                                       rtnLinkCarrierCount,
+                                                       seq,
+                                                       rtnReadCtrlCb,
+                                                       fwdReserveCtrlCb,
+                                                       fwdSendCtrlCb,
+                                                       gwRaSettings);
             m_utHelper = CreateObject<SatUtHelperLora>(bandwidthConverterCb,
                                                        fwdLinkCarrierCount,
                                                        seq,
@@ -710,37 +719,16 @@ SatBeamHelper::InstallFeeder(Ptr<SatGeoNetDevice> geoNetDevice,
     // install GW
     PointerValue llsConf;
     m_utHelper->GetAttribute("LowerLayerServiceConf", llsConf);
-    Ptr<NetDevice> gwNd;
-    switch (m_standard)
-    {
-    case SatEnums::DVB:
-        gwNd = m_gwHelper->InstallDvb(gwNode,
-                                      gwId,
-                                      satId,
-                                      beamId,
-                                      feederLink.first,
-                                      feederLink.second,
-                                      m_ncc,
-                                      llsConf.Get<SatLowerLayerServiceConf>(),
-                                      m_forwardLinkRegenerationMode,
-                                      m_returnLinkRegenerationMode);
-        break;
-    case SatEnums::LORA:
-        gwNd = m_gwHelper->InstallLora(gwNode,
-                                       gwId,
-                                       satId,
-                                       beamId,
-                                       feederLink.first,
-                                       feederLink.second,
-                                       m_ncc,
-                                       llsConf.Get<SatLowerLayerServiceConf>(),
-                                       m_forwardLinkRegenerationMode,
-                                       m_returnLinkRegenerationMode);
-
-        break;
-    default:
-        NS_FATAL_ERROR("Incorrect standard chosen");
-    }
+    Ptr<NetDevice> gwNd = m_gwHelper->Install(gwNode,
+                                              gwId,
+                                              satId,
+                                              beamId,
+                                              feederLink.first,
+                                              feederLink.second,
+                                              m_ncc,
+                                              llsConf.Get<SatLowerLayerServiceConf>(),
+                                              m_forwardLinkRegenerationMode,
+                                              m_returnLinkRegenerationMode);
 
     // calculate maximum size of the BB frame with the most robust MODCOD
     Ptr<SatBbFrameConf> bbFrameConf = m_gwHelper->GetBbFrameConf();

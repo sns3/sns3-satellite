@@ -191,6 +191,8 @@ set(source_files
     helper/satellite-geo-helper.cc
     helper/satellite-group-helper.cc
     helper/satellite-gw-helper.cc
+    helper/satellite-gw-helper-dvb.cc
+    helper/satellite-gw-helper-lora.cc
     helper/satellite-helper.cc
     helper/satellite-isl-arbiter-unicast-helper.cc
     helper/satellite-lora-conf.cc
@@ -436,6 +438,8 @@ set(header_files
     helper/satellite-geo-helper.h
     helper/satellite-group-helper.h
     helper/satellite-gw-helper.h
+    helper/satellite-gw-helper-dvb.h
+    helper/satellite-gw-helper-lora.h
     helper/satellite-helper.h
     helper/satellite-isl-arbiter-unicast-helper.h
     helper/satellite-lora-conf.h
