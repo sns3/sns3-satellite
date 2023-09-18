@@ -94,6 +94,31 @@ If you forgot to do so, you can ask Git to download it using the following comma
 
 SNS3 is now properly initialized.
 
+Updating SGP4 data
+------------------
+
+LEO satellites positionning is computed using the SGP4 model. Data for this model is regularly updated
+and can be fetched to be integrated into SNS3 using a simple CMake variable. That variable is always
+overriden in the CMake cache so subsequent CMake runs do not download it again. This lets you control
+exactly when you want to refresh these data.
+
+The CMake switch to use is:
+::
+
+  -DREFRESH_IERS_DATA=TRUE
+
+When using the `ns3` wrapper, you can provide it on the `configure` step using
+::
+
+  $ ./ns3 configure -- -DREFRESH_IERS_DATA=TRUE  # Will reuse all cached values from the previous configure, only updating the SGP4 data
+
+If using `bake` (see below), you can pass this configuration option to the `configure` step using
+::
+
+  $ ./bake.py configure --enable sns3-satellite --enable ns-3.39 --append="ns-3.39:configure_arguments=-DREFRESH_IERS_DATA=TRUE"
+
+Note that this syntax is `broken in Bake <https://gitlab.com/nsnam/bake/-/issues/24>`_ right
+now and you will need to patch your Bake install in order to support it.
 
 Automation
 ##########
@@ -155,6 +180,11 @@ You can now configure bake and download / build the SNS3 module by issuing
 
   $ ./bake.py configure -e ns-3.39 -e sns3-satellite
   $ ./bake.py deploy
+
+Note that there is an `issue in Bake <https://gitlab.com/nsnam/bake/-/issues/23>`_ right
+now that will download the stats and traffic dependencies in the wrong folder. You will
+need to patch your Bake install in order to download all the dependencies in the ns3
+contrib folder.
 
 Helpers
 =======

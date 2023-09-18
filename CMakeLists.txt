@@ -512,12 +512,28 @@ set(test_sources
     test/satellite-waveform-conf-test.cc
 )
 
-if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/data/sgp4)
+MACRO(RESET_IERS_DATA_VARIABLE)
+  set(REFRESH_IERS_DATA FALSE CACHE BOOL "Force a singular CMake invocation to update IERS data for the SGP4 model. Auto-reset to FALSE after each use." FORCE)
+ENDMACRO()
+
+if(NOT DEFINED REFRESH_IERS_DATA)
+  RESET_IERS_DATA_VARIABLE()
+endif()
+
+if(REFRESH_IERS_DATA)
+  if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/data/sgp4)
     if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/data/sgp4/cgen)
-        execute_process(COMMAND ${CMAKE_CXX_COMPILER} ${CMAKE_CXX_FLAGS} ${CMAKE_CURRENT_SOURCE_DIR}/data/sgp4/constants-gen.cc -o ${CMAKE_CURRENT_SOURCE_DIR}/data/sgp4/cgen)
+      execute_process(COMMAND ${CMAKE_CXX_COMPILER} ${CMAKE_CXX_FLAGS} ${CMAKE_CURRENT_SOURCE_DIR}/data/sgp4/constants-gen.cc -o ${CMAKE_CURRENT_SOURCE_DIR}/data/sgp4/cgen)
     endif()
+    file(DOWNLOAD
+      https://datacenter.iers.org/data/latestVersion/finals.data.iau2000.txt
+      ${CMAKE_CURRENT_SOURCE_DIR}/data/sgp4/finals.data)
     execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/data/sgp4/cgen header ${CMAKE_CURRENT_SOURCE_DIR}/model)
     execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/data/sgp4/cgen source ${CMAKE_CURRENT_SOURCE_DIR}/model)
+  else()
+    message(WARNING "Folder ${CMAKE_CURRENT_SOURCE_DIR}/data/sgp4 not found. Cannot refresh IERS data. Ignoring...")
+  endif()
+  RESET_IERS_DATA_VARIABLE()
 endif()
 
 build_lib(
