@@ -22,9 +22,8 @@
 #ifndef SATELLITE_GW_HELPER_DVB_H
 #define SATELLITE_GW_HELPER_DVB_H
 
-#include <ns3/satellite-gw-helper.h>
-
 #include <ns3/satellite-channel.h>
+#include <ns3/satellite-gw-helper.h>
 #include <ns3/satellite-mac.h>
 #include <ns3/satellite-ncc.h>
 #include <ns3/satellite-superframe-sequence.h>

@@ -22,9 +22,9 @@
 
 #include "ns3/satellite-gw-helper.h"
 
+#include <ns3/boolean.h>
 #include <ns3/config.h>
 #include <ns3/double.h>
-#include <ns3/boolean.h>
 #include <ns3/enum.h>
 #include <ns3/log.h>
 #include <ns3/pointer.h>
@@ -230,7 +230,8 @@ SatGwHelper::Install(NodeContainer c,
                      SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                      SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
-    NS_LOG_FUNCTION(this << gwId << satId << beamId << fCh << rCh << ncc << llsConf << forwardLinkRegenerationMode << returnLinkRegenerationMode);
+    NS_LOG_FUNCTION(this << gwId << satId << beamId << fCh << rCh << ncc << llsConf
+                         << forwardLinkRegenerationMode << returnLinkRegenerationMode);
 
     NetDeviceContainer devs;
 

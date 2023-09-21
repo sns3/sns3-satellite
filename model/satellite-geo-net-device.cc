@@ -292,7 +292,7 @@ SatGeoNetDevice::ReceivePacketFeeder(Ptr<Packet> packet, const Address& feederAd
     {
         SendToIsl(packet, destination);
     }
-    if(m_utConnected.count(destination) == 0)
+    if (m_utConnected.count(destination) == 0)
     {
         DynamicCast<SatGeoUserMac>(m_userMac[satUplinkInfoTag.GetBeamId()])
             ->StopPeriodicTransmission();

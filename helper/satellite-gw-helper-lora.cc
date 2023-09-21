@@ -52,9 +52,7 @@ TypeId
 SatGwHelperLora::GetTypeId(void)
 {
     static TypeId tid =
-        TypeId("ns3::SatGwHelperLora")
-            .SetParent<SatGwHelper>()
-            .AddConstructor<SatGwHelperLora>();
+        TypeId("ns3::SatGwHelperLora").SetParent<SatGwHelper>().AddConstructor<SatGwHelperLora>();
     return tid;
 }
 
@@ -77,7 +75,13 @@ SatGwHelperLora::SatGwHelperLora(SatTypedefs::CarrierBandwidthConverter_t carrie
                                  SatMac::ReserveCtrlMsgCallback reserveCb,
                                  SatMac::SendCtrlMsgCallback sendCb,
                                  RandomAccessSettings_s randomAccessSettings)
-    : SatGwHelper(carrierBandwidthConverter, rtnLinkCarrierCount, seq, readCb, reserveCb, sendCb, randomAccessSettings)
+    : SatGwHelper(carrierBandwidthConverter,
+                  rtnLinkCarrierCount,
+                  seq,
+                  readCb,
+                  reserveCb,
+                  sendCb,
+                  randomAccessSettings)
 {
     NS_LOG_FUNCTION(this << rtnLinkCarrierCount << seq);
 }
@@ -94,7 +98,8 @@ SatGwHelperLora::Install(Ptr<Node> n,
                          SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                          SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
-    NS_LOG_FUNCTION(this << n << gwId << satId << beamId << fCh << rCh << ncc << llsConf << forwardLinkRegenerationMode << returnLinkRegenerationMode);
+    NS_LOG_FUNCTION(this << n << gwId << satId << beamId << fCh << rCh << ncc << llsConf
+                         << forwardLinkRegenerationMode << returnLinkRegenerationMode);
 
     NetDeviceContainer container;
 

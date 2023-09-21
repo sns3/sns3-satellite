@@ -29,8 +29,8 @@
 #include <ns3/output-stream-wrapper.h>
 #include <ns3/satellite-channel.h>
 #include <ns3/satellite-link-results.h>
-#include <ns3/satellite-ncc.h>
 #include <ns3/satellite-mac.h>
+#include <ns3/satellite-ncc.h>
 #include <ns3/satellite-phy.h>
 #include <ns3/satellite-random-access-container-conf.h>
 #include <ns3/satellite-random-access-container.h>

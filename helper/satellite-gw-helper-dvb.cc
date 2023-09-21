@@ -66,9 +66,7 @@ TypeId
 SatGwHelperDvb::GetTypeId(void)
 {
     static TypeId tid =
-        TypeId("ns3::SatGwHelperDvb")
-            .SetParent<SatGwHelper>()
-            .AddConstructor<SatGwHelperDvb>();
+        TypeId("ns3::SatGwHelperDvb").SetParent<SatGwHelper>().AddConstructor<SatGwHelperDvb>();
     return tid;
 }
 
@@ -85,13 +83,19 @@ SatGwHelperDvb::SatGwHelperDvb()
 }
 
 SatGwHelperDvb::SatGwHelperDvb(SatTypedefs::CarrierBandwidthConverter_t carrierBandwidthConverter,
-                         uint32_t rtnLinkCarrierCount,
-                         Ptr<SatSuperframeSeq> seq,
-                         SatMac::ReadCtrlMsgCallback readCb,
-                         SatMac::ReserveCtrlMsgCallback reserveCb,
-                         SatMac::SendCtrlMsgCallback sendCb,
-                         RandomAccessSettings_s randomAccessSettings)
-    : SatGwHelper(carrierBandwidthConverter, rtnLinkCarrierCount, seq, readCb, reserveCb, sendCb, randomAccessSettings)
+                               uint32_t rtnLinkCarrierCount,
+                               Ptr<SatSuperframeSeq> seq,
+                               SatMac::ReadCtrlMsgCallback readCb,
+                               SatMac::ReserveCtrlMsgCallback reserveCb,
+                               SatMac::SendCtrlMsgCallback sendCb,
+                               RandomAccessSettings_s randomAccessSettings)
+    : SatGwHelper(carrierBandwidthConverter,
+                  rtnLinkCarrierCount,
+                  seq,
+                  readCb,
+                  reserveCb,
+                  sendCb,
+                  randomAccessSettings)
 {
     NS_LOG_FUNCTION(this << rtnLinkCarrierCount << seq);
 }
@@ -108,7 +112,8 @@ SatGwHelperDvb::Install(Ptr<Node> n,
                         SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                         SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
-    NS_LOG_FUNCTION(this << n << gwId << satId << beamId << fCh << rCh << ncc << llsConf << forwardLinkRegenerationMode << returnLinkRegenerationMode);
+    NS_LOG_FUNCTION(this << n << gwId << satId << beamId << fCh << rCh << ncc << llsConf
+                         << forwardLinkRegenerationMode << returnLinkRegenerationMode);
 
     NetDeviceContainer container;
 

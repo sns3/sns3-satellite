@@ -64,9 +64,7 @@ TypeId
 SatUtHelperDvb::GetTypeId(void)
 {
     static TypeId tid =
-        TypeId("ns3::SatUtHelperDvb")
-            .SetParent<SatUtHelper>()
-            .AddConstructor<SatUtHelperDvb>();
+        TypeId("ns3::SatUtHelperDvb").SetParent<SatUtHelper>().AddConstructor<SatUtHelperDvb>();
     return tid;
 }
 
@@ -93,7 +91,13 @@ SatUtHelperDvb::SatUtHelperDvb(SatTypedefs::CarrierBandwidthConverter_t carrierB
                                SatMac::ReserveCtrlMsgCallback reserveCb,
                                SatMac::SendCtrlMsgCallback sendCb,
                                RandomAccessSettings_s randomAccessSettings)
-    : SatUtHelper(carrierBandwidthConverter, fwdLinkCarrierCount, seq, readCb, reserveCb, sendCb, randomAccessSettings)
+    : SatUtHelper(carrierBandwidthConverter,
+                  fwdLinkCarrierCount,
+                  seq,
+                  readCb,
+                  reserveCb,
+                  sendCb,
+                  randomAccessSettings)
 {
     NS_LOG_FUNCTION(this << fwdLinkCarrierCount << seq);
 }
@@ -112,7 +116,8 @@ SatUtHelperDvb::Install(Ptr<Node> n,
                         SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                         SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
-    NS_LOG_FUNCTION(this << n << satId << beamId << fCh << rCh << gwNd << ncc << satUserAddress << forwardLinkRegenerationMode << returnLinkRegenerationMode);
+    NS_LOG_FUNCTION(this << n << satId << beamId << fCh << rCh << gwNd << ncc << satUserAddress
+                         << forwardLinkRegenerationMode << returnLinkRegenerationMode);
 
     NetDeviceContainer container;
 

@@ -22,10 +22,10 @@
 
 #include "satellite-beam-helper.h"
 
-#include "satellite-ut-helper-dvb.h"
-#include "satellite-ut-helper-lora.h"
 #include "satellite-gw-helper-dvb.h"
 #include "satellite-gw-helper-lora.h"
+#include "satellite-ut-helper-dvb.h"
+#include "satellite-ut-helper-lora.h"
 
 #include <ns3/config.h>
 #include <ns3/enum.h>
@@ -336,44 +336,44 @@ SatBeamHelper::SatBeamHelper(SatEnums::Standard_t standard,
                                              rtnReadCtrlCb,
                                              geoRaSettings);
 
-    switch(m_standard)
+    switch (m_standard)
     {
-        case SatEnums::DVB: {
-            m_gwHelper = CreateObject<SatGwHelperDvb>(bandwidthConverterCb,
-                                                      rtnLinkCarrierCount,
-                                                      seq,
-                                                      rtnReadCtrlCb,
-                                                      fwdReserveCtrlCb,
-                                                      fwdSendCtrlCb,
-                                                      gwRaSettings);
-            m_utHelper = CreateObject<SatUtHelperDvb>(bandwidthConverterCb,
-                                                      fwdLinkCarrierCount,
-                                                      seq,
-                                                      fwdReadCtrlCb,
-                                                      rtnReserveCtrlCb,
-                                                      rtnSendCtrlCb,
-                                                      utRaSettings);
-            break;
-        }
-        case SatEnums::LORA: {
-            m_gwHelper = CreateObject<SatGwHelperLora>(bandwidthConverterCb,
-                                                       rtnLinkCarrierCount,
-                                                       seq,
-                                                       rtnReadCtrlCb,
-                                                       fwdReserveCtrlCb,
-                                                       fwdSendCtrlCb,
-                                                       gwRaSettings);
-            m_utHelper = CreateObject<SatUtHelperLora>(bandwidthConverterCb,
-                                                       fwdLinkCarrierCount,
-                                                       seq,
-                                                       fwdReadCtrlCb,
-                                                       rtnReserveCtrlCb,
-                                                       rtnSendCtrlCb,
-                                                       utRaSettings);
-            break;
-        }
-        default:
-            NS_FATAL_ERROR("Unknown standard");
+    case SatEnums::DVB: {
+        m_gwHelper = CreateObject<SatGwHelperDvb>(bandwidthConverterCb,
+                                                  rtnLinkCarrierCount,
+                                                  seq,
+                                                  rtnReadCtrlCb,
+                                                  fwdReserveCtrlCb,
+                                                  fwdSendCtrlCb,
+                                                  gwRaSettings);
+        m_utHelper = CreateObject<SatUtHelperDvb>(bandwidthConverterCb,
+                                                  fwdLinkCarrierCount,
+                                                  seq,
+                                                  fwdReadCtrlCb,
+                                                  rtnReserveCtrlCb,
+                                                  rtnSendCtrlCb,
+                                                  utRaSettings);
+        break;
+    }
+    case SatEnums::LORA: {
+        m_gwHelper = CreateObject<SatGwHelperLora>(bandwidthConverterCb,
+                                                   rtnLinkCarrierCount,
+                                                   seq,
+                                                   rtnReadCtrlCb,
+                                                   fwdReserveCtrlCb,
+                                                   fwdSendCtrlCb,
+                                                   gwRaSettings);
+        m_utHelper = CreateObject<SatUtHelperLora>(bandwidthConverterCb,
+                                                   fwdLinkCarrierCount,
+                                                   seq,
+                                                   fwdReadCtrlCb,
+                                                   rtnReserveCtrlCb,
+                                                   rtnSendCtrlCb,
+                                                   utRaSettings);
+        break;
+    }
+    default:
+        NS_FATAL_ERROR("Unknown standard");
     }
 
     // Two usage of link results is two-fold: on the other hand they are needed in the
@@ -821,18 +821,19 @@ SatBeamHelper::InstallUser(Ptr<SatGeoNetDevice> geoNetDevice,
     }
 
     // install UTs
-    NetDeviceContainer utNd = m_utHelper->Install(ut,
-                                                  satId,
-                                                  beamId,
-                                                  userLink.first,
-                                                  userLink.second,
-                                                  DynamicCast<SatNetDevice>(gwNd),
-                                                  m_ncc,
-                                                  satUserAddress,
-                                                  MakeCallback(&SatChannelPair::GetChannelPair, m_ulChannels),
-                                                  routingCallback,
-                                                  m_forwardLinkRegenerationMode,
-                                                  m_returnLinkRegenerationMode);
+    NetDeviceContainer utNd =
+        m_utHelper->Install(ut,
+                            satId,
+                            beamId,
+                            userLink.first,
+                            userLink.second,
+                            DynamicCast<SatNetDevice>(gwNd),
+                            m_ncc,
+                            satUserAddress,
+                            MakeCallback(&SatChannelPair::GetChannelPair, m_ulChannels),
+                            routingCallback,
+                            m_forwardLinkRegenerationMode,
+                            m_returnLinkRegenerationMode);
 
     // Add satellite addresses UT MAC layers.
     if (m_returnLinkRegenerationMode == SatEnums::REGENERATION_LINK ||

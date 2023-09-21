@@ -22,12 +22,11 @@
 #ifndef SATELLITE_UT_HELPER_LORA_H
 #define SATELLITE_UT_HELPER_LORA_H
 
-#include <ns3/satellite-ut-helper.h>
-
 #include <ns3/satellite-channel.h>
 #include <ns3/satellite-ncc.h>
 #include <ns3/satellite-superframe-sequence.h>
 #include <ns3/satellite-typedefs.h>
+#include <ns3/satellite-ut-helper.h>
 #include <ns3/satellite-ut-mac.h>
 
 namespace ns3
