@@ -526,8 +526,11 @@ if(REFRESH_IERS_DATA)
       execute_process(COMMAND ${CMAKE_CXX_COMPILER} ${CMAKE_CXX_FLAGS} ${CMAKE_CURRENT_SOURCE_DIR}/data/sgp4/constants-gen.cc -o ${CMAKE_CURRENT_SOURCE_DIR}/data/sgp4/cgen)
     endif()
     file(DOWNLOAD
-      https://datacenter.iers.org/data/latestVersion/finals.data.iau2000.txt
+      https://maia.usno.navy.mil/ser7/finals2000A.data
       ${CMAKE_CURRENT_SOURCE_DIR}/data/sgp4/finals.data)
+    file(DOWNLOAD
+      https://maia.usno.navy.mil/ser7/tai-utc.dat
+      ${CMAKE_CURRENT_SOURCE_DIR}/data/sgp4/tai-utc.dat)
     execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/data/sgp4/cgen header ${CMAKE_CURRENT_SOURCE_DIR}/model)
     execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/data/sgp4/cgen source ${CMAKE_CURRENT_SOURCE_DIR}/model)
   else()
