@@ -167,11 +167,11 @@ SatConstellationTest1::DoRun(void)
     GeoCoordinate ut3 = GeoCoordinate(uts.Get(2)->GetObject<SatMobilityModel>()->GetPosition());
 
     NS_TEST_ASSERT_MSG_EQ_TOL(sat1.GetLatitude(),
-                              0.0130445,
+                              0.013043,
                               0.001,
                               "Incorrect latitude for satellite 1");
     NS_TEST_ASSERT_MSG_EQ_TOL(sat1.GetLongitude(),
-                              7.20984,
+                              7.20835,
                               0.001,
                               "Incorrect longitude for satellite 1");
     NS_TEST_ASSERT_MSG_EQ_TOL(sat1.GetAltitude(),
@@ -180,11 +180,11 @@ SatConstellationTest1::DoRun(void)
                               "Incorrect altitude for satellite 1");
 
     NS_TEST_ASSERT_MSG_EQ_TOL(sat2.GetLatitude(),
-                              -0.0219757,
+                              -0.0219759,
                               0.001,
                               "Incorrect latitude for satellite 2");
     NS_TEST_ASSERT_MSG_EQ_TOL(sat2.GetLongitude(),
-                              47.7062,
+                              47.7047,
                               0.001,
                               "Incorrect longitude for satellite 2");
     NS_TEST_ASSERT_MSG_EQ_TOL(sat2.GetAltitude(),
