@@ -129,6 +129,8 @@ main(int argc, char* argv[])
     Config::SetDefault("ns3::SatUtMac::ClockDrift", IntegerValue(clockDrift));
     Config::SetDefault("ns3::SatGwMac::CmtPeriodMin", TimeValue(MilliSeconds(550)));
 
+    simulationHelper->LoadScenario("geo-33E");
+
     simulationHelper->CreateSatScenario();
 
     Config::SetDefault("ns3::CbrApplication::Interval", StringValue(interval));

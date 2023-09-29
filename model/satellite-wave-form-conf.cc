@@ -202,9 +202,10 @@ SatWaveformConf::SatWaveformConf(std::string filePathName)
       m_burstLength(SatEnums::UNKNOWN_BURST)
 {
     NS_LOG_FUNCTION(this);
-    ReadFromFile(filePathName);
 
     ObjectBase::ConstructSelf(AttributeConstructionList());
+
+    ReadFromFile(filePathName);
 
     switch (m_burstLength)
     {

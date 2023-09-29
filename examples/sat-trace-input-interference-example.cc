@@ -114,10 +114,9 @@ main(int argc, char* argv[])
 
     /// Create satellite helper with given scenario default=simple
 
-    // Creating the reference system. Note, currently the satellite module supports
-    // only one reference system, which is named as "Scenario72". The string is utilized
-    // in mapping the scenario to the needed reference system configuration files. Arbitrary
-    // scenario name results in fatal error.
+    simulationHelper->LoadScenario("geo-33E");
+
+    // Creating the reference system.
     simulationHelper->CreateSatScenario(satScenario);
 
     Config::SetDefault("ns3::CbrApplication::Interval", TimeValue(Time(interval)));

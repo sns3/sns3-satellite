@@ -64,6 +64,8 @@ main(int argc, char* argv[])
     simulationHelper->SetBeams("12 13 26 27 38 39");
     simulationHelper->SetUserCountPerMobileUt(simulationConf->m_utMobileUserCount);
 
+    simulationHelper->LoadScenario("geo-33E");
+
     std::string mobileUtFolder =
         Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/utpositions/mobiles/scenario5";
     Ptr<SatHelper> helper = simulationHelper->CreateSatScenario(SatHelper::NONE, mobileUtFolder);

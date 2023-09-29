@@ -45,16 +45,9 @@ NS_OBJECT_ENSURE_REGISTERED(SatAntennaGainPatternContainer);
 TypeId
 SatAntennaGainPatternContainer::GetTypeId(void)
 {
-    static TypeId tid =
-        TypeId("ns3::SatAntennaGainPatternContainer")
-            .SetParent<Object>()
-            .AddConstructor<SatAntennaGainPatternContainer>()
-            .AddAttribute(
-                "PatternsFolder",
-                "Sub-folder in 'antennapatterns' containing the gains definition for each beam",
-                StringValue("SatAntennaGain72Beams"),
-                MakeStringAccessor(&SatAntennaGainPatternContainer::m_patternsFolder),
-                MakeStringChecker());
+    static TypeId tid = TypeId("ns3::SatAntennaGainPatternContainer")
+                            .SetParent<Object>()
+                            .AddConstructor<SatAntennaGainPatternContainer>();
     return tid;
 }
 
@@ -65,20 +58,25 @@ SatAntennaGainPatternContainer::GetInstanceTypeId() const
     return GetTypeId();
 }
 
-SatAntennaGainPatternContainer::SatAntennaGainPatternContainer(uint32_t nbSats)
+SatAntennaGainPatternContainer::SatAntennaGainPatternContainer()
 {
     NS_LOG_FUNCTION(this);
 
-    ObjectBase::ConstructSelf(AttributeConstructionList());
+    NS_FATAL_ERROR("Constructor not in use");
+}
 
-    std::string dataPath{Singleton<SatEnvVariables>::Get()->LocateDataDirectory()};
-    std::string patternsFolder = dataPath + "/antennapatterns/" + m_patternsFolder;
+SatAntennaGainPatternContainer::SatAntennaGainPatternContainer(uint32_t nbSats,
+                                                               std::string patternsFolder)
+{
+    NS_LOG_FUNCTION(this << nbSats << patternsFolder);
+
+    m_patternsFolder = patternsFolder;
 
     GeoCoordinate geoPos = GetDefaultGeoPosition();
 
-    NS_LOG_INFO(this << " directory for antenna patterns set to " << patternsFolder);
+    NS_LOG_INFO(this << " directory for antenna patterns set to " << m_patternsFolder);
 
-    if (!Singleton<SatEnvVariables>::Get()->IsValidDirectory(patternsFolder))
+    if (!Singleton<SatEnvVariables>::Get()->IsValidDirectory(m_patternsFolder))
     {
         NS_FATAL_ERROR("SatAntennaGainPatternContainer::SatAntennaGainPatternContainer directory "
                        << m_patternsFolder << " not found in antennapatterns folder");
@@ -87,9 +85,9 @@ SatAntennaGainPatternContainer::SatAntennaGainPatternContainer(uint32_t nbSats)
     DIR* dir;
     struct dirent* ent;
     std::string prefix;
-    if ((dir = opendir(patternsFolder.c_str())) != nullptr)
+    if ((dir = opendir(m_patternsFolder.c_str())) != nullptr)
     {
-        /* process all the files and directories within patternsFolder */
+        /* process all the files and directories within m_patternsFolder */
         while ((ent = readdir(dir)) != nullptr)
         {
             std::string filename{ent->d_name};
@@ -125,7 +123,7 @@ SatAntennaGainPatternContainer::SatAntennaGainPatternContainer(uint32_t nbSats)
                             << prefix << " and " << stem);
                     }
 
-                    std::string filePath = patternsFolder + "/" + filename;
+                    std::string filePath = m_patternsFolder + "/" + filename;
                     std::istringstream ss{num};
                     uint32_t beamId;
                     ss >> beamId;
@@ -172,8 +170,7 @@ SatAntennaGainPatternContainer::GetDefaultGeoPosition()
 {
     NS_LOG_FUNCTION(this);
 
-    std::string dataPath{Singleton<SatEnvVariables>::Get()->LocateDataDirectory()};
-    std::string geoPosFilename = dataPath + "/antennapatterns/" + m_patternsFolder + "/GeoPos.in";
+    std::string geoPosFilename = m_patternsFolder + "/GeoPos.in";
 
     // READ FROM THE SPECIFIED INPUT FILE
     std::ifstream* ifs = new std::ifstream(geoPosFilename, std::ifstream::in);

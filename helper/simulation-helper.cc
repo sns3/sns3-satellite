@@ -241,6 +241,7 @@ SimulationHelper::SimulationHelper()
       m_statContainer(NULL),
       m_commonUtPositions(),
       m_utPositionsByBeam(),
+      m_scenarioPath(""),
       m_simulationName(""),
       m_enabledBeamsStr(""),
       m_enabledBeams(),
@@ -251,7 +252,7 @@ SimulationHelper::SimulationHelper()
       m_simTime(0),
       m_numberOfConfiguredFrames(0),
       m_randomAccessConfigured(false),
-      m_enableInputFileUtListPositions(false),
+      m_inputFileUtListPositions(""),
       m_inputFileUtPositionsCheckBeams(true),
       m_gwUserId(0),
       m_progressLoggingEnabled(false),
@@ -276,7 +277,7 @@ SimulationHelper::SimulationHelper(std::string simulationName)
       m_simTime(0),
       m_numberOfConfiguredFrames(0),
       m_randomAccessConfigured(false),
-      m_enableInputFileUtListPositions(false),
+      m_inputFileUtListPositions(""),
       m_inputFileUtPositionsCheckBeams(true),
       m_gwUserId(0),
       m_progressLoggingEnabled(false),
@@ -1078,14 +1079,10 @@ SimulationHelper::ConfigureFwdLinkBeamHopping()
     // Enable flag
     Config::SetDefault("ns3::SatBeamHelper::EnableFwdLinkBeamHopping", BooleanValue(true));
 
-    // Channel configuration for 500 MHz user link bandwidth
-    Config::SetDefault("ns3::SatHelper::SatFwdConfFileName",
-                       StringValue("beamhopping/Scenario72FwdConf_BH.txt"));
-
     Config::SetDefault("ns3::SatBstpController::BeamHoppingMode",
                        EnumValue(SatBstpController::BH_STATIC));
     Config::SetDefault("ns3::SatBstpController::StaticBeamHoppingConfigFileName",
-                       StringValue("beamhopping/SatBstpConf_GW1.txt"));
+                       StringValue(m_scenarioPath + "/beamhopping/SatBstpConf_GW1.txt"));
     Config::SetDefault("ns3::SatBstpController::SuperframeDuration", TimeValue(MilliSeconds(1)));
 
     // Frequency configuration for 500 MHz user link bandwidth
@@ -1213,13 +1210,7 @@ SimulationHelper::EnableUtListPositionsFromInputFile(std::string inputFile, bool
 {
     NS_LOG_FUNCTION(this << inputFile);
 
-    // Set user specific UT position file (UserDefinedUtPos.txt) to be utilized by SatConf.
-    // Given file must locate in /satellite/data folder
-    //
-    // This enables user defined positions used instead of default positions (default position file
-    // UtPos.txt replaced),
-    Config::SetDefault("ns3::SatConf::UtPositionInputFileName", StringValue(inputFile));
-    m_enableInputFileUtListPositions = true;
+    m_inputFileUtListPositions = inputFile;
     m_inputFileUtPositionsCheckBeams = checkBeams;
 }
 
@@ -1319,7 +1310,19 @@ SimulationHelper::CreateSatScenario(SatHelper::PreDefinedScenario_t scenario,
     // Set final output path
     SetupOutputPath();
 
-    m_satHelper = CreateObject<SatHelper>();
+    if (m_scenarioPath == "")
+    {
+        NS_FATAL_ERROR("Must specify a scenario folder name from data submodule");
+    }
+
+    if (Singleton<SatEnvVariables>::Get()->IsValidDirectory(m_scenarioPath + "/beamhopping"))
+    {
+        ConfigureFwdLinkBeamHopping();
+    }
+
+    m_satHelper = CreateObject<SatHelper>(m_scenarioPath);
+
+    ParseScenarioFolder();
 
     m_satHelper->SetGroupHelper(
         GetGroupHelper()); // If not done in user scenario, group helper is created here
@@ -1327,7 +1330,7 @@ SimulationHelper::CreateSatScenario(SatHelper::PreDefinedScenario_t scenario,
     m_satHelper->GetBeamHelper()->SetAntennaGainPatterns(antennaGainPatterns);
 
     // Set UT position allocators, if any
-    if (!m_enableInputFileUtListPositions && !m_satHelper->IsSatConstellationEnabled())
+    if (m_inputFileUtListPositions == "" && !m_satHelper->IsSatConstellationEnabled())
     {
         if (m_commonUtPositions)
         {
@@ -1427,11 +1430,12 @@ SimulationHelper::CreateSatScenario(SatHelper::PreDefinedScenario_t scenario,
 
         // Now, create either a scenario based on list positions in input file
         // or create a generic scenario with UT positions configured by other ways..
-        if (m_enableInputFileUtListPositions)
+        if (m_inputFileUtListPositions != "")
         {
             m_satHelper->CreateUserDefinedScenarioFromListPositions(
                 0,
                 beamInfo,
+                m_inputFileUtListPositions,
                 m_inputFileUtPositionsCheckBeams);
         }
         else
@@ -1909,6 +1913,28 @@ SimulationHelper::DisableProgressLogs()
 
     m_progressLoggingEnabled = false;
     m_progressReportEvent.Cancel();
+}
+
+void
+SimulationHelper::LoadScenario(std::string name)
+{
+    NS_LOG_FUNCTION(this << name);
+
+    std::string path =
+        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/" + name;
+
+    if (!Singleton<SatEnvVariables>::Get()->IsValidFile(path))
+    {
+        NS_FATAL_ERROR("Scenario in " << path << " does not exist");
+    }
+
+    m_scenarioPath = path;
+}
+
+void
+SimulationHelper::ParseScenarioFolder()
+{
+    NS_LOG_FUNCTION(this);
 }
 
 void

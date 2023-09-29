@@ -71,51 +71,6 @@ SatHelper::GetTypeId(void)
                           EnumValue(SatEnums::DVB),
                           MakeEnumAccessor(&SatHelper::m_standard),
                           MakeEnumChecker(SatEnums::DVB, "DVB", SatEnums::LORA, "LORA"))
-            .AddAttribute("SatRtnConfFileName",
-                          "Name of the satellite network RTN link configuration file.",
-                          StringValue("Scenario72RtnConf.txt"),
-                          MakeStringAccessor(&SatHelper::m_rtnConfFileName),
-                          MakeStringChecker())
-            .AddAttribute("SatFwdConfFileName",
-                          "Name of the satellite network FWD link configuration file.",
-                          StringValue("Scenario72FwdConf.txt"),
-                          MakeStringAccessor(&SatHelper::m_fwdConfFileName),
-                          MakeStringChecker())
-            .AddAttribute("GwPosFileName",
-                          "Name of the GW positions configuration file.",
-                          StringValue("Scenario72GwPos.txt"),
-                          MakeStringAccessor(&SatHelper::m_gwPosFileName),
-                          MakeStringChecker())
-            .AddAttribute("SatMobilitySGP4Enabled",
-                          "The satellite moves following a SGP4 model.",
-                          BooleanValue(false),
-                          MakeBooleanAccessor(&SatHelper::m_satMobilitySGP4Enabled),
-                          MakeBooleanChecker())
-            .AddAttribute("SatMobilitySGP4TleFileName",
-                          "TLE input filename used for SGP4 mobility.",
-                          StringValue("tle_iss_zarya.txt"),
-                          MakeStringAccessor(&SatHelper::m_satMobilitySGP4TleFileName),
-                          MakeStringChecker())
-            .AddAttribute("SatConstellationEnabled",
-                          "Use a constellation of satellites.",
-                          BooleanValue(false),
-                          MakeBooleanAccessor(&SatHelper::m_satConstellationEnabled),
-                          MakeBooleanChecker())
-            .AddAttribute("SatConstellationFolder",
-                          "Folder where are stored satellite constellation data.",
-                          StringValue("eutelsat-geo-2-sats"),
-                          MakeStringAccessor(&SatHelper::m_satConstellationFolder),
-                          MakeStringChecker())
-            .AddAttribute("GeoSatPosFileName",
-                          "Name of the geostationary satellite position configuration file.",
-                          StringValue("Scenario72GeoPos.txt"),
-                          MakeStringAccessor(&SatHelper::m_geoPosFileName),
-                          MakeStringChecker())
-            .AddAttribute("RtnLinkWaveformConfFileName",
-                          "Name of the RTN link waveform configuration file.",
-                          StringValue("dvbRcs2Waveforms.txt"),
-                          MakeStringAccessor(&SatHelper::m_waveformConfFileName),
-                          MakeStringChecker())
             .AddAttribute("UtCount",
                           "The count of created UTs in beam (full or user-defined scenario)",
                           UintegerValue(3),
@@ -217,11 +172,14 @@ SatHelper::GetInstanceTypeId(void) const
 }
 
 SatHelper::SatHelper()
-    : m_rtnConfFileName("Scenario72RtnConf.txt"),
-      m_fwdConfFileName("Scenario72FwdConf.txt"),
-      m_gwPosFileName("Scenario72GwPos.txt"),
-      m_geoPosFileName("Scenario72GeoPos.txt"),
-      m_waveformConfFileName("dvbRcs2Waveforms.txt"),
+{
+    NS_LOG_FUNCTION(this);
+
+    NS_FATAL_ERROR("Constructor not in use");
+}
+
+SatHelper::SatHelper(std::string scenarioPath)
+    : m_satConstellationEnabled(false),
       m_scenarioCreated(false),
       m_creationTraces(false),
       m_detailedCreationTraces(false),
@@ -233,7 +191,32 @@ SatHelper::SatHelper()
       m_mobileUtsByBeam(),
       m_mobileUtsUsersByBeam()
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(this << scenarioPath);
+
+    m_scenarioPath = scenarioPath;
+
+    m_rtnConfFileName = m_scenarioPath + "/beams/rtnConf.txt";
+    m_fwdConfFileName = m_scenarioPath + "/beams/fwdConf.txt";
+
+    m_gwPosFileName = m_scenarioPath + "/positions/gw_positions.txt";
+    m_geoPosFileName = m_scenarioPath + "/positions/geo_positions.txt";
+    m_utPosFileName = m_scenarioPath + "/positions/ut_positions.txt";
+
+    m_waveformConfFileName = m_scenarioPath + "/waveforms/waveforms.txt";
+
+    if (Singleton<SatEnvVariables>::Get()->IsValidFile(m_scenarioPath + "/positions/tles.txt"))
+    {
+        NS_ASSERT_MSG(!Singleton<SatEnvVariables>::Get()->IsValidFile(
+                          m_scenarioPath + "/positions/geo_positions.txt"),
+                      "position subfolder of scenario cannot have both contain tles.txt and "
+                      "geo_positions.txt");
+        m_satConstellationEnabled = true;
+    }
+    else if (!Singleton<SatEnvVariables>::Get()->IsValidFile(m_scenarioPath +
+                                                             "/positions/geo_positions.txt"))
+    {
+        NS_FATAL_ERROR("position subfolder of scenario must contain tles.txt or geo_positions.txt");
+    }
 
     // uncomment next line, if attributes are needed already in construction phase
     ObjectBase::ConstructSelf(AttributeConstructionList());
@@ -265,9 +248,11 @@ SatHelper::SatHelper()
 
         std::vector<std::string> tles;
 
-        LoadConstellationTopology(m_satConstellationFolder, tles, isls);
+        LoadConstellationTopology(tles, isls);
 
-        m_antennaGainPatterns = CreateObject<SatAntennaGainPatternContainer>(tles.size());
+        m_antennaGainPatterns =
+            CreateObject<SatAntennaGainPatternContainer>(tles.size(),
+                                                         m_scenarioPath + "/antennapatterns");
 
         for (uint32_t i = 0; i < tles.size(); i++)
         {
@@ -284,7 +269,8 @@ SatHelper::SatHelper()
     }
     else
     {
-        m_antennaGainPatterns = CreateObject<SatAntennaGainPatternContainer>();
+        m_antennaGainPatterns =
+            CreateObject<SatAntennaGainPatternContainer>(1, m_scenarioPath + "/antennapatterns");
 
         // In case of constellations, all satellites have the same features, read in same
         // configuration file
@@ -292,20 +278,13 @@ SatHelper::SatHelper()
                               m_fwdConfFileName,
                               m_gwPosFileName,
                               m_geoPosFileName,
-                              m_waveformConfFileName,
-                              m_satMobilitySGP4TleFileName);
+                              m_utPosFileName,
+                              m_waveformConfFileName);
 
         // create Geo Satellite node, set mobility to it
         Ptr<Node> geoSatNode = CreateObject<Node>();
 
-        if (m_satMobilitySGP4Enabled == true)
-        {
-            SetSatMobility(geoSatNode);
-        }
-        else
-        {
-            SetGeoSatMobility(geoSatNode);
-        }
+        SetGeoSatMobility(geoSatNode);
 
         Ptr<SatMobilityModel> mobility = geoSatNode->GetObject<SatMobilityModel>();
         m_antennaGainPatterns->ConfigureBeamsMobility(0, mobility);
@@ -325,13 +304,6 @@ SatHelper::SatHelper()
                                     m_satConf->GetReturnLinkRegenerationMode());
 
     m_beamHelper->SetAntennaGainPatterns(m_antennaGainPatterns);
-
-    if (m_satMobilitySGP4Enabled == true &&
-        m_beamHelper->GetPropagationDelayModelEnum() != SatEnums::PD_CONSTANT_SPEED)
-    {
-        NS_FATAL_ERROR(
-            "Must use constant speed propagation delay model if satellite mobility is enabled");
-    }
 
     Ptr<SatRtnLinkTime> rtnTime = Singleton<SatRtnLinkTime>::Get();
     rtnTime->Initialize(m_satConf->GetSuperframeSeq());
@@ -404,33 +376,28 @@ SatHelper::EnablePacketTrace()
 }
 
 void
-SatHelper::LoadConstellationTopology(std::string path,
-                                     std::vector<std::string>& tles,
+SatHelper::LoadConstellationTopology(std::vector<std::string>& tles,
                                      std::vector<std::pair<uint32_t, uint32_t>>& isls)
 {
-    NS_LOG_FUNCTION(this << path);
+    NS_LOG_FUNCTION(this);
 
-    std::string dataPath =
-        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/constellations/" + path;
-
-    if (!(Singleton<SatEnvVariables>::Get()->IsValidDirectory(dataPath)))
-    {
-        NS_FATAL_ERROR("Directory '" << dataPath
-                                     << "' does not exist, no constellation can be created.");
-    }
-
-    m_satConf->SetUtPositionInputFileName("constellations/" + path + "/ut_positions.txt");
+    m_scenarioPath + "beams/rtnConf.txt";
 
     m_satConf->Initialize(m_rtnConfFileName,
                           m_fwdConfFileName,
-                          "constellations/" + path + "/gw_positions.txt",
+                          m_gwPosFileName,
                           m_geoPosFileName,
+                          m_utPosFileName,
                           m_waveformConfFileName,
-                          m_satMobilitySGP4TleFileName,
                           true);
 
-    tles = m_satConf->LoadTles(dataPath + "/tles.txt");
-    isls = m_satConf->LoadIsls(dataPath + "/isls.txt");
+    tles = m_satConf->LoadTles(m_scenarioPath + "/positions/tles.txt",
+                               m_scenarioPath + "/positions/start_date.txt");
+
+    if (Singleton<SatEnvVariables>::Get()->IsValidFile(m_scenarioPath + "/positions/isls.txt"))
+    {
+        isls = m_satConf->LoadIsls(m_scenarioPath + "/positions/isls.txt");
+    }
 }
 
 void
@@ -642,6 +609,7 @@ SatHelper::SetUtPositionAllocatorForBeam(uint32_t beamId,
 void
 SatHelper::CreateUserDefinedScenarioFromListPositions(uint32_t satId,
                                                       BeamUserInfoMap_t& infos,
+                                                      std::string inputFileUtListPositions,
                                                       bool checkBeam)
 {
     NS_LOG_FUNCTION(this);
@@ -650,6 +618,10 @@ SatHelper::CreateUserDefinedScenarioFromListPositions(uint32_t satId,
 
     // construct list position allocator and fill it with position
     // configured through SatConf
+
+    m_utPosFileName = inputFileUtListPositions;
+
+    m_satConf->SetUtPositionsPath(m_utPosFileName);
 
     m_utPositions = CreateObject<SatListPositionAllocator>();
 
@@ -1082,6 +1054,14 @@ SatHelper::LoadMobileUTsFromFolder(uint32_t satId,
 Ptr<Node>
 SatHelper::LoadMobileUtFromFile(uint32_t satId, const std::string& filename)
 {
+    NS_LOG_FUNCTION(this << satId << filename);
+
+    if (Singleton<SatEnvVariables>::Get()->IsValidFile(
+            Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/" + filename))
+    {
+        NS_FATAL_ERROR(filename << " is not a valid file name");
+    }
+
     // Create Node, Mobility and aggregate them
     Ptr<SatTracedMobilityModel> mobility =
         CreateObject<SatTracedMobilityModel>(satId, filename, m_antennaGainPatterns);
@@ -1196,11 +1176,17 @@ SatHelper::SetUtMobilityFromPosition(
 Ptr<SatSpotBeamPositionAllocator>
 SatHelper::GetBeamAllocator(uint32_t beamId)
 {
-    GeoCoordinate satPosition = m_satConf->GetGeoSatPosition();
-    if (m_satMobilitySGP4Enabled)
+    NS_LOG_FUNCTION(this << beamId);
+
+    GeoCoordinate satPosition;
+    if (m_satConstellationEnabled)
     {
         satPosition =
             m_beamHelper->GetGeoSatNodes().Get(0)->GetObject<SatMobilityModel>()->GetPosition();
+    }
+    else
+    {
+        satPosition = m_satConf->GetGeoSatPosition();
     }
     Ptr<SatSpotBeamPositionAllocator> beamAllocator =
         CreateObject<SatSpotBeamPositionAllocator>(beamId, m_antennaGainPatterns, satPosition);
@@ -1215,8 +1201,7 @@ SatHelper::GetBeamAllocator(uint32_t beamId)
 void
 SatHelper::SetGeoSatMobility(Ptr<Node> node)
 {
-    NS_LOG_FUNCTION(this);
-
+    NS_LOG_FUNCTION(this << node);
     MobilityHelper mobility;
 
     Ptr<SatListPositionAllocator> geoSatPosAllocator = CreateObject<SatListPositionAllocator>();
@@ -1244,17 +1229,11 @@ SatHelper::SetSatMobility(Ptr<Node> node, std::string tle)
             NS_FATAL_ERROR("The requested mobility model is not a mobility model: \""
                            << mobilityFactory.GetTypeId().GetName() << "\"");
         }
+        model->SetStartDate(m_satConf->GetStartTimeStr());
         object->AggregateObject(model);
     }
 
-    if (tle.empty())
-    {
-        model->SetTleInfo(m_satConf->GetSatTle());
-    }
-    else
-    {
-        model->SetTleInfo(tle);
-    }
+    model->SetTleInfo(tle);
 }
 
 void

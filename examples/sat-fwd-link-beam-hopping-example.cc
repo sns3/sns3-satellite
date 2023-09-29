@@ -46,7 +46,6 @@ int
 main(int argc, char* argv[])
 {
     uint32_t endUsersPerUt(1);
-    bool enableBeamHopping(true);
     Time simLength(Seconds(3.0));
     bool scaleDown(true);
 
@@ -55,7 +54,6 @@ main(int argc, char* argv[])
 
     // read command line parameters given by user
     CommandLine cmd;
-    cmd.AddValue("enableBeamHopping", "Enable FWD link beam hopping", enableBeamHopping);
     cmd.AddValue("simTime", "Length of simulation", simLength);
     cmd.AddValue("scaleDown",
                  "Scale down the bandwidth to see differences with less traffic",
@@ -65,12 +63,10 @@ main(int argc, char* argv[])
 
     simulationHelper->SetDefaultValues();
     simulationHelper->SetUserCountPerUt(endUsersPerUt);
-    if (enableBeamHopping)
-        simulationHelper->ConfigureFwdLinkBeamHopping();
+    simulationHelper->ConfigureFwdLinkBeamHopping();
     if (scaleDown)
     {
-        Config::SetDefault("ns3::SatConf::FwdCarrierAllocatedBandwidth",
-                           DoubleValue(enableBeamHopping ? 1e+08 : 2.5e+07));
+        Config::SetDefault("ns3::SatConf::FwdCarrierAllocatedBandwidth", DoubleValue(1e+08));
     }
     simulationHelper->SetSimulationTime(simLength.GetSeconds());
 
@@ -96,6 +92,8 @@ main(int argc, char* argv[])
     {
         simulationHelper->SetUtCountPerBeam(it.first, it.second);
     }
+
+    simulationHelper->LoadScenario("geo-33E-beam-hopping");
 
     // Create the scenario
     simulationHelper->CreateSatScenario();

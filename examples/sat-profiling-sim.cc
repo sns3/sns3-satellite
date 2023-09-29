@@ -59,6 +59,9 @@ main(int argc, char* argv[])
     simulationHelper->SetSimulationTime(simulationTime);
 
     simulationHelper->SetBeams("48");
+
+    simulationHelper->LoadScenario("geo-33E");
+
     Ptr<SatHelper> helper = simulationHelper->CreateSatScenario();
 
     // ----------------------------------

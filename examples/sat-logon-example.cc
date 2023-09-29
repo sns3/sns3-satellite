@@ -105,6 +105,8 @@ main(int argc, char* argv[])
     Config::SetDefault("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed",
                        BooleanValue(false));
 
+    simulationHelper->LoadScenario("geo-33E");
+
     simulationHelper->CreateSatScenario();
 
     Config::SetDefault("ns3::CbrApplication::Interval", StringValue(interval));

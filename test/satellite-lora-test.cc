@@ -155,8 +155,6 @@ SatLoraFirstWindowTestCase::DoRun(void)
                        EnumValue(SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
     Config::SetDefault("ns3::SatBeamHelper::ReturnLinkLinkResults", EnumValue(SatEnums::LR_LORA));
     Config::SetDefault("ns3::SatWaveformConf::DefaultWfId", UintegerValue(2));
-    Config::SetDefault("ns3::SatHelper::RtnLinkWaveformConfFileName",
-                       StringValue("loraWaveforms.txt"));
 
     // Configure E-SSA
     Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::WindowDuration", StringValue("600ms"));
@@ -167,7 +165,8 @@ SatLoraFirstWindowTestCase::DoRun(void)
     Config::SetDefault("ns3::SatMac::EnableStatisticsTags", BooleanValue(true));
 
     // Creating the reference system.
-    Ptr<SatHelper> helper = CreateObject<SatHelper>();
+    Ptr<SatHelper> helper = CreateObject<SatHelper>(
+        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E-lora");
     helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
     // >>> Start of actual test using Simple scenario >>>
@@ -313,8 +312,6 @@ SatLoraSecondWindowTestCase::DoRun(void)
                        EnumValue(SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
     Config::SetDefault("ns3::SatBeamHelper::ReturnLinkLinkResults", EnumValue(SatEnums::LR_LORA));
     Config::SetDefault("ns3::SatWaveformConf::DefaultWfId", UintegerValue(2));
-    Config::SetDefault("ns3::SatHelper::RtnLinkWaveformConfFileName",
-                       StringValue("loraWaveforms.txt"));
 
     // Configure E-SSA
     Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::WindowDuration", StringValue("600ms"));
@@ -325,7 +322,8 @@ SatLoraSecondWindowTestCase::DoRun(void)
     Config::SetDefault("ns3::SatMac::EnableStatisticsTags", BooleanValue(true));
 
     // Creating the reference system.
-    Ptr<SatHelper> helper = CreateObject<SatHelper>();
+    Ptr<SatHelper> helper = CreateObject<SatHelper>(
+        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E-lora");
     helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
     // >>> Start of actual test using Simple scenario >>>
@@ -489,8 +487,6 @@ SatLoraOutOfWindowWindowTestCase::DoRun(void)
                        EnumValue(SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
     Config::SetDefault("ns3::SatBeamHelper::ReturnLinkLinkResults", EnumValue(SatEnums::LR_LORA));
     Config::SetDefault("ns3::SatWaveformConf::DefaultWfId", UintegerValue(2));
-    Config::SetDefault("ns3::SatHelper::RtnLinkWaveformConfFileName",
-                       StringValue("loraWaveforms.txt"));
 
     // Configure E-SSA
     Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::WindowDuration", StringValue("600ms"));
@@ -502,7 +498,8 @@ SatLoraOutOfWindowWindowTestCase::DoRun(void)
     Config::SetDefault("ns3::SatPhy::EnableStatisticsTags", BooleanValue(true));
 
     // Creating the reference system.
-    Ptr<SatHelper> helper = CreateObject<SatHelper>();
+    Ptr<SatHelper> helper = CreateObject<SatHelper>(
+        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E-lora");
     helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
     // >>> Start of actual test using Simple scenario >>>
@@ -651,8 +648,6 @@ SatLoraOutOfWindowWindowNoRetransmissionTestCase::DoRun(void)
                        EnumValue(SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
     Config::SetDefault("ns3::SatBeamHelper::ReturnLinkLinkResults", EnumValue(SatEnums::LR_LORA));
     Config::SetDefault("ns3::SatWaveformConf::DefaultWfId", UintegerValue(2));
-    Config::SetDefault("ns3::SatHelper::RtnLinkWaveformConfFileName",
-                       StringValue("loraWaveforms.txt"));
 
     // Configure E-SSA
     Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::WindowDuration", StringValue("600ms"));
@@ -664,7 +659,8 @@ SatLoraOutOfWindowWindowNoRetransmissionTestCase::DoRun(void)
     Config::SetDefault("ns3::SatPhy::EnableStatisticsTags", BooleanValue(true));
 
     // Creating the reference system.
-    Ptr<SatHelper> helper = CreateObject<SatHelper>();
+    Ptr<SatHelper> helper = CreateObject<SatHelper>(
+        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E-lora");
     helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
     // >>> Start of actual test using Simple scenario >>>
@@ -799,8 +795,6 @@ SatLoraCbrTestCase::DoRun(void)
                        EnumValue(SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
     Config::SetDefault("ns3::SatBeamHelper::ReturnLinkLinkResults", EnumValue(SatEnums::LR_LORA));
     Config::SetDefault("ns3::SatWaveformConf::DefaultWfId", UintegerValue(2));
-    Config::SetDefault("ns3::SatHelper::RtnLinkWaveformConfFileName",
-                       StringValue("loraWaveforms.txt"));
 
     // Configure E-SSA
     Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::WindowDuration", StringValue("600ms"));
@@ -813,7 +807,8 @@ SatLoraCbrTestCase::DoRun(void)
 
     Config::SetDefault("ns3::SatMac::EnableStatisticsTags", BooleanValue(true));
     // Creating the reference system.
-    Ptr<SatHelper> helper = CreateObject<SatHelper>();
+    Ptr<SatHelper> helper = CreateObject<SatHelper>(
+        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E-lora");
     helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
     NodeContainer utUsers = helper->GetUtUsers();

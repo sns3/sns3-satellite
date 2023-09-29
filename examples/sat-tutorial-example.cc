@@ -131,6 +131,8 @@ main(int argc, char* argv[])
   'To Select super frame configuration, Option 1'
   ******************************************************************************/
 
+    simulationHelper->LoadScenario("geo-33E");
+
     Ptr<SatHelper> helper = simulationHelper->CreateSatScenario(satScenario);
     /**
   -- End --

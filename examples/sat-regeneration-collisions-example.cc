@@ -267,6 +267,9 @@ main(int argc, char* argv[])
     simulationHelper->SetUserCountPerUt(1);
     simulationHelper->SetUtCountPerBeam(50);
     simulationHelper->SetBeamSet({1});
+
+    simulationHelper->LoadScenario("geo-33E");
+
     Ptr<SatHelper> helper = simulationHelper->CreateSatScenario();
 
     Config::SetDefault("ns3::CbrApplication::Interval", StringValue(interval));

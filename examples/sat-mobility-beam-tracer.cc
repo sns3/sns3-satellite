@@ -62,10 +62,12 @@ main(int argc, char* argv[])
     std::string inputFileNameWithPath =
         Singleton<SatEnvVariables>::Get()->LocateDirectory("contrib/satellite/examples") +
         "/generic-input-attributes.xml";
-    std::string mobileUtTraceFile("");
+    std::string mobileUtTraceFile(Singleton<SatEnvVariables>::Get()->LocateDataDirectory() +
+                                  "/additional-input/utpositions/mobiles/scenario0/trajectory");
 
     Ptr<SimulationHelper> simulationHelper =
         CreateObject<SimulationHelper>("sat-mobility-position-generator");
+    simulationHelper->EnableProgressLogs();
     simulationHelper->DisableAllCapacityAssignmentCategories();
     simulationHelper->EnableCrdsa();
 
@@ -76,9 +78,12 @@ main(int argc, char* argv[])
     cmd.Parse(argc, argv);
     simulationHelper->ReadInputAttributesFromFile(inputFileNameWithPath);
 
+    simulationHelper->LoadScenario("geo-33E");
+
     if (mobileUtTraceFile != "")
     {
-        Ptr<SatHelper> satHelper = CreateObject<SatHelper>();
+        Ptr<SatHelper> satHelper =
+            simulationHelper->CreateSatScenario(SatHelper::NONE, mobileUtTraceFile);
         satMobility =
             satHelper->GetBeamHelper()->GetGeoSatNodes().Get(0)->GetObject<SatMobilityModel>();
         Ptr<Node> node = satHelper->LoadMobileUtFromFile(0, mobileUtTraceFile);

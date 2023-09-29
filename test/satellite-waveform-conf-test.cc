@@ -80,7 +80,7 @@ SatDvbRcs2WaveformTableTestCase::DoRun(void)
                                                           true);
 
     std::string path = Singleton<SatEnvVariables>::Get()->GetDataPath() + "/";
-    std::string fileName = "dvbRcs2Waveforms.txt";
+    std::string fileName = "scenarios/geo-33E/waveforms/waveforms.txt";
 
     // Enable ACM
     Config::SetDefault("ns3::SatWaveformConf::AcmEnabled", BooleanValue(true));

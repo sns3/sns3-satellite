@@ -307,7 +307,8 @@ SatPerPacketFwdLinkUserTestCase::DoRun(void)
     Config::SetDefault("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace", BooleanValue(true));
 
     // Creating the reference system.
-    Ptr<SatHelper> helper = CreateObject<SatHelper>();
+    Ptr<SatHelper> helper = CreateObject<SatHelper>(
+        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E");
 
     // create user defined scenario with beams 1 and 5
     SatBeamUserInfo beamInfo = SatBeamUserInfo(1, 1);
@@ -502,7 +503,8 @@ SatPerPacketFwdLinkFullTestCase::DoRun(void)
     Config::SetDefault("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace", BooleanValue(true));
 
     // Creating the reference system.
-    Ptr<SatHelper> helper = CreateObject<SatHelper>();
+    Ptr<SatHelper> helper = CreateObject<SatHelper>(
+        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E");
 
     helper->CreatePredefinedScenario(SatHelper::FULL);
 
@@ -694,7 +696,8 @@ SatPerPacketRtnLinkUserTestCase::DoRun(void)
     Config::SetDefault("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace", BooleanValue(true));
 
     // Creating the reference system.
-    Ptr<SatHelper> helper = CreateObject<SatHelper>();
+    Ptr<SatHelper> helper = CreateObject<SatHelper>(
+        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E");
 
     // create user defined scenario with beams 1 and 5
     SatBeamUserInfo beamInfo = SatBeamUserInfo(1, 1);
@@ -859,7 +862,8 @@ SatPerPacketRtnLinkFullTestCase::DoRun(void)
     Config::SetDefault("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace", BooleanValue(true));
 
     // Creating the reference system.
-    Ptr<SatHelper> helper = CreateObject<SatHelper>();
+    Ptr<SatHelper> helper = CreateObject<SatHelper>(
+        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E");
     helper->CreatePredefinedScenario(SatHelper::FULL);
 
     // set callback traces where we want results out

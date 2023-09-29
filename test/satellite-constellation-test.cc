@@ -111,11 +111,6 @@ SatConstellationTest1::DoRun(void)
                        EnumValue(SatEnums::REGENERATION_NETWORK));
 
     /// Use constellation
-    Config::SetDefault("ns3::SatHelper::SatConstellationEnabled", BooleanValue(true));
-    Config::SetDefault("ns3::SatHelper::SatConstellationFolder",
-                       StringValue("eutelsat-geo-2-sats-no-isls"));
-    Config::SetDefault("ns3::SatSGP4MobilityModel::StartDateStr",
-                       StringValue("2022-11-13 12:00:00"));
     Config::SetDefault("ns3::SatSGP4MobilityModel::UpdatePositionEachRequest", BooleanValue(false));
     Config::SetDefault("ns3::SatSGP4MobilityModel::UpdatePositionPeriod",
                        TimeValue(MilliSeconds(10)));
@@ -127,6 +122,8 @@ SatConstellationTest1::DoRun(void)
     // Creating the reference system.
     simulationHelper->SetBeamSet({43, 30});
     simulationHelper->SetUserCountPerUt(5);
+
+    simulationHelper->LoadScenario("constellation-eutelsat-geo-2-sats-no-isls");
 
     simulationHelper->CreateSatScenario();
     m_helper = simulationHelper->GetSatelliteHelper();
@@ -332,11 +329,6 @@ SatConstellationTest2::DoRun(void)
                        EnumValue(SatEnums::REGENERATION_NETWORK));
 
     /// Use constellation
-    Config::SetDefault("ns3::SatHelper::SatConstellationEnabled", BooleanValue(true));
-    Config::SetDefault("ns3::SatHelper::SatConstellationFolder",
-                       StringValue("eutelsat-geo-2-sats-no-isls"));
-    Config::SetDefault("ns3::SatSGP4MobilityModel::StartDateStr",
-                       StringValue("2022-11-13 12:00:00"));
     Config::SetDefault("ns3::SatSGP4MobilityModel::UpdatePositionEachRequest", BooleanValue(false));
     Config::SetDefault("ns3::SatSGP4MobilityModel::UpdatePositionPeriod",
                        TimeValue(MilliSeconds(10)));
@@ -351,6 +343,8 @@ SatConstellationTest2::DoRun(void)
     // Creating the reference system.
     simulationHelper->SetBeamSet({43, 30});
     simulationHelper->SetUserCountPerUt(5);
+
+    simulationHelper->LoadScenario("constellation-eutelsat-geo-2-sats-no-isls");
 
     simulationHelper->CreateSatScenario();
     m_helper = simulationHelper->GetSatelliteHelper();
@@ -608,11 +602,6 @@ SatConstellationTest3::DoRun(void)
                        EnumValue(SatEnums::REGENERATION_NETWORK));
 
     /// Use constellation
-    Config::SetDefault("ns3::SatHelper::SatConstellationEnabled", BooleanValue(true));
-    Config::SetDefault("ns3::SatHelper::SatConstellationFolder",
-                       StringValue("eutelsat-geo-2-sats-isls"));
-    Config::SetDefault("ns3::SatSGP4MobilityModel::StartDateStr",
-                       StringValue("2022-11-13 12:00:00"));
     Config::SetDefault("ns3::SatSGP4MobilityModel::UpdatePositionEachRequest", BooleanValue(false));
     Config::SetDefault("ns3::SatSGP4MobilityModel::UpdatePositionPeriod",
                        TimeValue(MilliSeconds(10)));
@@ -627,6 +616,8 @@ SatConstellationTest3::DoRun(void)
     // Creating the reference system.
     simulationHelper->SetBeamSet({43, 30});
     simulationHelper->SetUserCountPerUt(5);
+
+    simulationHelper->LoadScenario("constellation-eutelsat-geo-2-sats-isls");
 
     simulationHelper->CreateSatScenario();
     m_helper = simulationHelper->GetSatelliteHelper();
@@ -823,19 +814,11 @@ SatConstellationTest4::DoRun(void)
                        EnumValue(SatEnums::REGENERATION_NETWORK));
 
     /// Use constellation
-    Config::SetDefault("ns3::SatHelper::SatConstellationEnabled", BooleanValue(true));
-    Config::SetDefault("ns3::SatHelper::SatConstellationFolder", StringValue("telesat-351-sats"));
-    Config::SetDefault("ns3::SatSGP4MobilityModel::StartDateStr",
-                       StringValue("2000-01-01 00:00:00"));
     Config::SetDefault("ns3::SatSGP4MobilityModel::UpdatePositionEachRequest", BooleanValue(false));
     Config::SetDefault("ns3::SatSGP4MobilityModel::UpdatePositionPeriod",
                        TimeValue(MilliSeconds(10)));
     Config::SetDefault("ns3::SatGeoHelper::IslArbiterType", EnumValue(SatEnums::UNICAST));
     Config::SetDefault("ns3::SatHelper::GwUsers", UintegerValue(3));
-
-    /// Use constellation with correctly centered beams (used for testing)
-    Config::SetDefault("ns3::SatAntennaGainPatternContainer::PatternsFolder",
-                       StringValue("SatAntennaGain72BeamsShifted"));
 
     /// When using 72 beams, we need a 72*nbSats network addresses for beams, so we take margin
     Config::SetDefault("ns3::SatHelper::BeamNetworkAddress", Ipv4AddressValue("20.1.0.0"));
@@ -848,6 +831,8 @@ SatConstellationTest4::DoRun(void)
     // Creating the reference system.
     simulationHelper->SetBeamSet({1, 43, 60, 64});
     simulationHelper->SetUserCountPerUt(5);
+
+    simulationHelper->LoadScenario("constellation-telesat-351-sats");
 
     simulationHelper->CreateSatScenario();
     m_helper = simulationHelper->GetSatelliteHelper();

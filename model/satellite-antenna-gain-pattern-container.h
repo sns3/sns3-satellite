@@ -53,10 +53,16 @@ class SatAntennaGainPatternContainer : public Object
     TypeId GetInstanceTypeId() const;
 
     /**
-     * Default constructor.
-     * \param nbSats Number of satellites to consider
+     * Default constructor. Not used.
      */
-    SatAntennaGainPatternContainer(uint32_t nbSats = 1);
+    SatAntennaGainPatternContainer();
+
+    /**
+     * SatAntennaGainPatternContainer constructor.
+     * \param nbSats Number of satellites to consider
+     * \param patternsFolder Path to folder containing the gains definition for each beam
+     */
+    SatAntennaGainPatternContainer(uint32_t nbSats, std::string patternsFolder);
     ~SatAntennaGainPatternContainer();
 
     /**

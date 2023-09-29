@@ -31,7 +31,7 @@
 #include <ns3/simulator.h>
 #include <ns3/string.h>
 
-NS_LOG_COMPONENT_DEFINE("sat-sgp4-mobility-model");
+NS_LOG_COMPONENT_DEFINE("SatSGP4MobilityModel");
 
 namespace ns3
 {
@@ -48,11 +48,6 @@ SatSGP4MobilityModel::GetTypeId(void)
         TypeId("ns3::SatSGP4MobilityModel")
             .SetParent<SatMobilityModel>()
             .AddConstructor<SatSGP4MobilityModel>()
-            .AddAttribute("StartDateStr",
-                          "Absolute start time of simulation (UTC)",
-                          StringValue("1992-01-01 00:00:00"),
-                          MakeStringAccessor(&SatSGP4MobilityModel::m_startStr),
-                          MakeStringChecker())
             .AddAttribute("UpdatePositionEachRequest",
                           "Compute position each time a packet is transmitted",
                           BooleanValue(true),
@@ -85,6 +80,15 @@ SatSGP4MobilityModel::SatSGP4MobilityModel()
 
 SatSGP4MobilityModel::~SatSGP4MobilityModel()
 {
+}
+
+void
+SatSGP4MobilityModel::SetStartDate(std::string startStr)
+{
+    NS_LOG_FUNCTION(this << startStr);
+
+    m_startStr = startStr;
+    SetStartTime(JulianDate(m_startStr));
 }
 
 JulianDate

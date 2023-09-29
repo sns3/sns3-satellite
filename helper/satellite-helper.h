@@ -85,14 +85,16 @@ class SatHelper : public Object
     TypeId GetInstanceTypeId(void) const;
 
     /**
-     * \brief Create a base SatHelper for creating customized Satellite topologies.
+     * \brief Default constructor. Not in use.
      */
     SatHelper();
 
     /**
      * \brief Create a base SatHelper for creating customized Satellite topologies.
+     *
+     * \param scenarioPath Scenario folder path
      */
-    SatHelper(std::string scenarioName);
+    SatHelper(std::string scenarioPath);
 
     /**
      * Destructor for SatHelper
@@ -126,11 +128,13 @@ class SatHelper : public Object
      *
      * \param satId The ID of the satellite
      * \param info information of the beams, and beam UTs and users in beams
+     * \param inputFileUtListPositions Path to the list of UT positions
      * \param checkBeam Check that positions (set through SatConf) match with given beam
      * (the beam is the best according to configured antenna patterns).
      */
     void CreateUserDefinedScenarioFromListPositions(uint32_t satId,
                                                     BeamUserInfoMap_t& info,
+                                                    std::string inputFileUtListPositions,
                                                     bool checkBeam);
 
     /**
@@ -321,33 +325,24 @@ class SatHelper : public Object
     typedef SatBeamHelper::MulticastBeamInfo_t MulticastBeamInfo_t;
 
     /**
+     * Scenario folder path
+     */
+    std::string m_scenarioPath;
+
+    /**
      * Configuration file names as attributes of this class
      */
     std::string m_rtnConfFileName;
     std::string m_fwdConfFileName;
     std::string m_gwPosFileName;
     std::string m_geoPosFileName;
+    std::string m_utPosFileName;
     std::string m_waveformConfFileName;
-
-    /**
-     * The satellite moves following a SGP4 model
-     */
-    bool m_satMobilitySGP4Enabled;
-
-    /**
-     * TLE input filename used for SGP4 mobility
-     */
-    std::string m_satMobilitySGP4TleFileName;
 
     /**
      * Use a constellation of satellites
      */
     bool m_satConstellationEnabled;
-
-    /**
-     * Folder where are stored satellite constellation data
-     */
-    std::string m_satConstellationFolder;
 
     /*
      * The global standard used. Can be either DVB or Lora
@@ -528,12 +523,10 @@ class SatHelper : public Object
 
     /**
      * Load a constellation topology.
-     * \param path Folder where configuration files are located
      * \param tles vector to store read TLEs
      * \param isls vector to store read ISLs
      */
-    void LoadConstellationTopology(std::string path,
-                                   std::vector<std::string>& tles,
+    void LoadConstellationTopology(std::vector<std::string>& tles,
                                    std::vector<std::pair<uint32_t, uint32_t>>& isls);
 
     /**
@@ -597,8 +590,9 @@ class SatHelper : public Object
      * Sets SGP4 mobility to created Sat node.
      *
      * \param node node pointer of Satellite to set mobility
+     * \param tle the TLE linked to this satellite
      */
-    void SetSatMobility(Ptr<Node> node, std::string tle = "");
+    void SetSatMobility(Ptr<Node> node, std::string tle);
 
     /**
      * Sets mobility to created UT nodes.

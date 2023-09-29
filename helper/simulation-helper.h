@@ -368,6 +368,18 @@ class SimulationHelper : public Object
     void RunSimulation();
 
     /**
+     * \brief Load a scenario from data submodule.
+     *
+     * \param name The scenario name. Must be a folder located in data/scenarios
+     */
+    void LoadScenario(std::string name);
+
+    /**
+     * \brief parse scenario folder to load all variables that can be
+     */
+    void ParseScenarioFolder();
+
+    /**
      * \brief Create the satellite scenario.
      * \param scenario Kind of scenario to create, if any
      * \param mobileUtsFolder Folder from which to load mobile UT traces, if any
@@ -674,6 +686,7 @@ class SimulationHelper : public Object
     Ptr<SatListPositionAllocator> m_commonUtPositions;
     std::map<uint32_t, Ptr<SatListPositionAllocator>> m_utPositionsByBeam;
 
+    std::string m_scenarioPath;
     std::string m_simulationName;
     std::string m_simulationTag;
     std::string m_enabledBeamsStr;
@@ -687,7 +700,7 @@ class SimulationHelper : public Object
     Time m_simTime;
     uint32_t m_numberOfConfiguredFrames;
     bool m_randomAccessConfigured;
-    bool m_enableInputFileUtListPositions;
+    std::string m_inputFileUtListPositions;
     bool m_inputFileUtPositionsCheckBeams;
     uint32_t m_gwUserId;
 

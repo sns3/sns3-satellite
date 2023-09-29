@@ -54,8 +54,6 @@ main(int argc, char* argv[])
     uint32_t packetSize(100);
     Time interval(Seconds(10.0));
 
-    std::string tleFileName("tle_iss_zarya.txt");
-    std::string startDate("2014-09-29 12:05:48");
     bool updatePositionEachRequest(false);
     Time updatePositionPeriod(Seconds(1));
 
@@ -69,12 +67,6 @@ main(int argc, char* argv[])
     cmd.AddValue("PacketSize", "UDP packet size (in bytes)", packetSize);
     cmd.AddValue("Interval", "CBR interval (in seconds, or add unit)", interval);
     cmd.AddValue("SimLength", "Simulation length (in seconds, or add unit)", simLength);
-    cmd.AddValue("TleFileName",
-                 "Name of TLE file to load (path from data/tle folder)",
-                 tleFileName);
-    cmd.AddValue("StartDate",
-                 "Simulation absolute UTC start time (format: YYYY-MM-DD hh:mm:ss)",
-                 startDate);
     cmd.AddValue("UpdatePositionEachRequest",
                  "Enable position computation each time a packet is sent",
                  updatePositionEachRequest);
@@ -89,12 +81,6 @@ main(int argc, char* argv[])
     Config::SetDefault("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue(true));
     Config::SetDefault("ns3::SatHelper::PacketTraceEnabled", BooleanValue(true));
 
-    Config::SetDefault("ns3::SatAntennaGainPatternContainer::PatternsFolder",
-                       StringValue("SatAntennaGain72BeamsShifted"));
-
-    Config::SetDefault("ns3::SatHelper::SatMobilitySGP4Enabled", BooleanValue(true));
-    Config::SetDefault("ns3::SatHelper::SatMobilitySGP4TleFileName", StringValue(tleFileName));
-    Config::SetDefault("ns3::SatSGP4MobilityModel::StartDateStr", StringValue(startDate));
     Config::SetDefault("ns3::SatSGP4MobilityModel::UpdatePositionEachRequest",
                        BooleanValue(updatePositionEachRequest));
     Config::SetDefault("ns3::SatSGP4MobilityModel::UpdatePositionPeriod",
@@ -108,6 +94,8 @@ main(int argc, char* argv[])
     std::stringstream beamsEnabled;
     beamsEnabled << beamId;
     simulationHelper->SetBeams(beamsEnabled.str());
+
+    simulationHelper->LoadScenario("leo-iss");
 
     // Create reference system
     simulationHelper->CreateSatScenario();
