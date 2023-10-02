@@ -337,7 +337,7 @@ class SatHelper : public Object
     std::string m_gwPosFileName;
     std::string m_geoPosFileName;
     std::string m_utPosFileName;
-    std::string m_waveformConfFileName;
+    std::string m_waveformConfDirectoryName;
 
     /**
      * Use a constellation of satellites

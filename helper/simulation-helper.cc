@@ -766,7 +766,6 @@ SimulationHelper::EnableAcm(SatEnums::SatLinkDir_t dir)
                            StringValue("MinimumValueInWindow"));
         Config::SetDefault("ns3::SatBeamScheduler::CnoEstimationWindow", TimeValue(Seconds(2)));
         Config::SetDefault("ns3::SatWaveformConf::AcmEnabled", BooleanValue(true));
-        Config::SetDefault("ns3::SatWaveformConf::DefaultWfId", UintegerValue(3));
         break;
     }
     default: {
@@ -791,7 +790,6 @@ SimulationHelper::DisableAcm(SatEnums::SatLinkDir_t dir)
     }
     case SatEnums::LD_RETURN: {
         Config::SetDefault("ns3::SatWaveformConf::AcmEnabled", BooleanValue(false));
-        Config::SetDefault("ns3::SatWaveformConf::DefaultWfId", UintegerValue(3));
         break;
     }
     default: {

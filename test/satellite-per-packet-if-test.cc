@@ -688,7 +688,7 @@ SatPerPacketRtnLinkUserTestCase::DoRun(void)
     Config::SetDefault("ns3::SatSuperframeConf0::Frame0_AllocatedBandwidthHz", DoubleValue(1.25e6));
     Config::SetDefault("ns3::SatSuperframeConf0::Frame0_CarrierAllocatedBandwidthHz",
                        DoubleValue(1.25e6));
-    Config::SetDefault("ns3::SatWaveformConf::DefaultWfId", UintegerValue(13));
+    // Config::SetDefault("ns3::SatWaveformConf::DefaultWfId", UintegerValue(13));
     Config::SetDefault("ns3::SatGwHelper::DaRtnLinkInterferenceModel",
                        EnumValue(SatPhyRxCarrierConf::IF_PER_PACKET));
     Config::SetDefault("ns3::SatGeoHelper::DaRtnLinkInterferenceModel",
@@ -854,7 +854,7 @@ SatPerPacketRtnLinkFullTestCase::DoRun(void)
     Config::SetDefault("ns3::SatSuperframeConf0::Frame0_AllocatedBandwidthHz", DoubleValue(1.25e6));
     Config::SetDefault("ns3::SatSuperframeConf0::Frame0_CarrierAllocatedBandwidthHz",
                        DoubleValue(1.25e6));
-    Config::SetDefault("ns3::SatWaveformConf::DefaultWfId", UintegerValue(13));
+    // Config::SetDefault("ns3::SatWaveformConf::DefaultWfId", UintegerValue(13));
     Config::SetDefault("ns3::SatGwHelper::DaRtnLinkInterferenceModel",
                        EnumValue(SatPhyRxCarrierConf::IF_PER_PACKET));
     Config::SetDefault("ns3::SatGeoHelper::DaRtnLinkInterferenceModel",

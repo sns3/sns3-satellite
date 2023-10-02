@@ -393,7 +393,6 @@
  <default name="ns3::SatUtScheduler::StrictPriorityForControl" value="true"/>
  <default name="ns3::SatWaveformConf::TargetBLER" value="1e-05"/>
  <default name="ns3::SatWaveformConf::AcmEnabled" value="true"/>
- <default name="ns3::SatWaveformConf::DefaultWfId" value="3"/>
  <default name="ns3::SatEnvVariables::CurrentWorkingDirectory" value=""/>
  <default name="ns3::SatEnvVariables::PathToExecutable" value=""/>
  <default name="ns3::SatEnvVariables::DataPath" value="contrib/satellite/data"/>

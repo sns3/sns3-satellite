@@ -216,9 +216,6 @@ main(int argc, char* argv[])
                            EnumValue(SatEnums::LR_FSIM));
         Config::SetDefault("ns3::SatGeoHelper::RtnLinkErrorModel",
                            EnumValue(SatPhyRxCarrierConf::EM_AVI));
-        Config::SetDefault("ns3::SatWaveformConf::DefaultWfId", UintegerValue(2));
-        Config::SetDefault("ns3::SatHelper::RtnLinkWaveformConfFileName",
-                           StringValue("fSimWaveforms.txt"));
 
         Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::WindowDuration", StringValue("600ms"));
         Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::WindowStep", StringValue("200ms"));
@@ -228,6 +225,8 @@ main(int argc, char* argv[])
         Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::SpreadingFactor", UintegerValue(1));
         Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::DetectionThreshold", DoubleValue(0));
         Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::EnableSIC", BooleanValue(false));
+
+        simulationHelper->LoadScenario("geo-33E-fsim");
     }
 
     // Disable CRA and DA if RA
@@ -258,6 +257,8 @@ main(int argc, char* argv[])
                            BooleanValue(false));
         Config::SetDefault("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed",
                            BooleanValue(false));
+
+        simulationHelper->LoadScenario("geo-33E");
     }
 
     simulationHelper->SetSimulationTime(Seconds(11));
@@ -267,8 +268,6 @@ main(int argc, char* argv[])
     simulationHelper->SetUserCountPerUt(1);
     simulationHelper->SetUtCountPerBeam(50);
     simulationHelper->SetBeamSet({1});
-
-    simulationHelper->LoadScenario("geo-33E");
 
     Ptr<SatHelper> helper = simulationHelper->CreateSatScenario();
 

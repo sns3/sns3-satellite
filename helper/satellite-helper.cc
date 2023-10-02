@@ -202,7 +202,7 @@ SatHelper::SatHelper(std::string scenarioPath)
     m_geoPosFileName = m_scenarioPath + "/positions/geo_positions.txt";
     m_utPosFileName = m_scenarioPath + "/positions/ut_positions.txt";
 
-    m_waveformConfFileName = m_scenarioPath + "/waveforms/waveforms.txt";
+    m_waveformConfDirectoryName = m_scenarioPath + "/waveforms";
 
     if (Singleton<SatEnvVariables>::Get()->IsValidFile(m_scenarioPath + "/positions/tles.txt"))
     {
@@ -279,7 +279,7 @@ SatHelper::SatHelper(std::string scenarioPath)
                               m_gwPosFileName,
                               m_geoPosFileName,
                               m_utPosFileName,
-                              m_waveformConfFileName);
+                              m_waveformConfDirectoryName);
 
         // create Geo Satellite node, set mobility to it
         Ptr<Node> geoSatNode = CreateObject<Node>();
@@ -388,7 +388,7 @@ SatHelper::LoadConstellationTopology(std::vector<std::string>& tles,
                           m_gwPosFileName,
                           m_geoPosFileName,
                           m_utPosFileName,
-                          m_waveformConfFileName,
+                          m_waveformConfDirectoryName,
                           true);
 
     tles = m_satConf->LoadTles(m_scenarioPath + "/positions/tles.txt",

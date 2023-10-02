@@ -154,7 +154,6 @@ SatLoraFirstWindowTestCase::DoRun(void)
     Config::SetDefault("ns3::SatBeamHelper::RaCollisionModel",
                        EnumValue(SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
     Config::SetDefault("ns3::SatBeamHelper::ReturnLinkLinkResults", EnumValue(SatEnums::LR_LORA));
-    Config::SetDefault("ns3::SatWaveformConf::DefaultWfId", UintegerValue(2));
 
     // Configure E-SSA
     Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::WindowDuration", StringValue("600ms"));
@@ -311,7 +310,6 @@ SatLoraSecondWindowTestCase::DoRun(void)
     Config::SetDefault("ns3::SatBeamHelper::RaCollisionModel",
                        EnumValue(SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
     Config::SetDefault("ns3::SatBeamHelper::ReturnLinkLinkResults", EnumValue(SatEnums::LR_LORA));
-    Config::SetDefault("ns3::SatWaveformConf::DefaultWfId", UintegerValue(2));
 
     // Configure E-SSA
     Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::WindowDuration", StringValue("600ms"));
@@ -486,7 +484,6 @@ SatLoraOutOfWindowWindowTestCase::DoRun(void)
     Config::SetDefault("ns3::SatBeamHelper::RaCollisionModel",
                        EnumValue(SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
     Config::SetDefault("ns3::SatBeamHelper::ReturnLinkLinkResults", EnumValue(SatEnums::LR_LORA));
-    Config::SetDefault("ns3::SatWaveformConf::DefaultWfId", UintegerValue(2));
 
     // Configure E-SSA
     Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::WindowDuration", StringValue("600ms"));
@@ -647,7 +644,6 @@ SatLoraOutOfWindowWindowNoRetransmissionTestCase::DoRun(void)
     Config::SetDefault("ns3::SatBeamHelper::RaCollisionModel",
                        EnumValue(SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
     Config::SetDefault("ns3::SatBeamHelper::ReturnLinkLinkResults", EnumValue(SatEnums::LR_LORA));
-    Config::SetDefault("ns3::SatWaveformConf::DefaultWfId", UintegerValue(2));
 
     // Configure E-SSA
     Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::WindowDuration", StringValue("600ms"));
@@ -794,7 +790,6 @@ SatLoraCbrTestCase::DoRun(void)
     Config::SetDefault("ns3::SatBeamHelper::RaCollisionModel",
                        EnumValue(SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
     Config::SetDefault("ns3::SatBeamHelper::ReturnLinkLinkResults", EnumValue(SatEnums::LR_LORA));
-    Config::SetDefault("ns3::SatWaveformConf::DefaultWfId", UintegerValue(2));
 
     // Configure E-SSA
     Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::WindowDuration", StringValue("600ms"));
