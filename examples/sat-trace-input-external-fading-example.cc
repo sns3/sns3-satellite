@@ -50,7 +50,7 @@ using namespace ns3;
  *         - external fading trace
  *
  *         The input folder is:
- *         {NS-3-root-folder}/contrib/satellite/data/fadingtraces
+ *         {NS-3-root-folder}/contrib/satellite/data/additional-data/fadingtraces
  *
  *         The input data files must be available in the folder stated above for the example
  *         program to read, otherwise the program will fail.

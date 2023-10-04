@@ -66,13 +66,8 @@ SatHelper::GetTypeId(void)
         TypeId("ns3::SatHelper")
             .SetParent<Object>()
             .AddConstructor<SatHelper>()
-            .AddAttribute("Standard",
-                          "The global standard used. Can be either DVB or Lora",
-                          EnumValue(SatEnums::DVB),
-                          MakeEnumAccessor(&SatHelper::m_standard),
-                          MakeEnumChecker(SatEnums::DVB, "DVB", SatEnums::LORA, "LORA"))
             .AddAttribute("UtCount",
-                          "The count of created UTs in beam (full or user-defined scenario)",
+                          "The count of created UTs in beam (full or user-defined GEO scenario)",
                           UintegerValue(3),
                           MakeUintegerAccessor(&SatHelper::m_utsInBeam),
                           MakeUintegerChecker<uint32_t>(1))
@@ -157,9 +152,7 @@ SatHelper::GetTypeId(void)
             .AddTraceSource("CreationSummary",
                             "Creation summary traces",
                             MakeTraceSourceAccessor(&SatHelper::m_creationSummaryTrace),
-                            "ns3::SatTypedefs::CreationCallback")
-
-        ;
+                            "ns3::SatTypedefs::CreationCallback");
     return tid;
 }
 
@@ -203,6 +196,8 @@ SatHelper::SatHelper(std::string scenarioPath)
     m_utPosFileName = m_scenarioPath + "/positions/ut_positions.txt";
 
     m_waveformConfDirectoryName = m_scenarioPath + "/waveforms";
+
+    ReadStandard(m_scenarioPath + "/standard/standard.txt");
 
     if (Singleton<SatEnvVariables>::Get()->IsValidFile(m_scenarioPath + "/positions/tles.txt"))
     {
@@ -1867,6 +1862,47 @@ SatHelper::CheckNetwork(std::string networkName,
     {
         NS_FATAL_ERROR(networkName
                        << "network's initial address number not among of the given addresses");
+    }
+}
+
+void
+SatHelper::ReadStandard(std::string pathName)
+{
+    NS_LOG_FUNCTION(this << pathName);
+
+    // READ FROM THE SPECIFIED INPUT FILE
+    std::ifstream* ifs = new std::ifstream(pathName.c_str(), std::ifstream::in);
+
+    if (!ifs->is_open())
+    {
+        // script might be launched by test.py, try a different base path
+        delete ifs;
+        pathName = "../../" + pathName;
+        ifs = new std::ifstream(pathName.c_str(), std::ifstream::in);
+
+        if (!ifs->is_open())
+        {
+            NS_FATAL_ERROR("The file " << pathName << " is not found.");
+        }
+    }
+
+    std::string standardString;
+    *ifs >> standardString ;
+
+    ifs->close();
+    delete ifs;
+
+    if(standardString == "DVB")
+    {
+        m_standard = SatEnums::DVB;
+    }
+    else if(standardString == "LORA")
+    {
+        m_standard = SatEnums::LORA;
+    }
+    else
+    {
+        NS_FATAL_ERROR("Unknown standard: " << standardString << ". Must be DVB or LORA");
     }
 }
 

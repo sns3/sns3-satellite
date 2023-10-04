@@ -119,7 +119,6 @@ main(int argc, char* argv[])
                        EnumValue(SatEnums::TRANSPARENT));
 
     // Enable Lora
-    Config::SetDefault("ns3::SatHelper::Standard", EnumValue(SatEnums::LORA));
     Config::SetDefault("ns3::LorawanMacEndDevice::DataRate", UintegerValue(5));
     Config::SetDefault("ns3::LorawanMacEndDevice::MType",
                        EnumValue(LorawanMacHeader::CONFIRMED_DATA_UP));

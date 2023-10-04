@@ -698,6 +698,13 @@ class SatHelper : public Object
                       const std::set<uint32_t>& networkAddresses,
                       uint32_t networkCount,
                       uint32_t hostCount) const;
+
+    /**
+     * Read to standard use from file given in path
+     *
+     * \param pathName Path of file containing the standard used
+     */
+    void ReadStandard(std::string pathName);
 };
 
 } // namespace ns3

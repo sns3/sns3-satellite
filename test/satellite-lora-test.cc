@@ -115,7 +115,6 @@ SatLoraFirstWindowTestCase::DoRun(void)
     Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-lora", "first-window", true);
 
     // Enable Lora
-    Config::SetDefault("ns3::SatHelper::Standard", EnumValue(SatEnums::LORA));
     Config::SetDefault("ns3::LorawanMacEndDevice::DataRate", UintegerValue(5));
     Config::SetDefault("ns3::LorawanMacEndDevice::MType",
                        EnumValue(LorawanMacHeader::CONFIRMED_DATA_UP));
@@ -268,7 +267,6 @@ SatLoraSecondWindowTestCase::DoRun(void)
     Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-lora", "second-window", true);
 
     // Enable Lora
-    Config::SetDefault("ns3::SatHelper::Standard", EnumValue(SatEnums::LORA));
     Config::SetDefault("ns3::LorawanMacEndDevice::DataRate", UintegerValue(5));
     Config::SetDefault("ns3::LorawanMacEndDevice::MType",
                        EnumValue(LorawanMacHeader::CONFIRMED_DATA_UP));
@@ -443,7 +441,6 @@ SatLoraOutOfWindowWindowTestCase::DoRun(void)
     Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-lora", "out-of-window", true);
 
     // Enable Lora
-    Config::SetDefault("ns3::SatHelper::Standard", EnumValue(SatEnums::LORA));
     Config::SetDefault("ns3::LorawanMacEndDevice::DataRate", UintegerValue(5));
     Config::SetDefault("ns3::LorawanMacEndDevice::MType",
                        EnumValue(LorawanMacHeader::CONFIRMED_DATA_UP));
@@ -603,7 +600,6 @@ SatLoraOutOfWindowWindowNoRetransmissionTestCase::DoRun(void)
     Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-lora", "out-of-window", true);
 
     // Enable Lora
-    Config::SetDefault("ns3::SatHelper::Standard", EnumValue(SatEnums::LORA));
     Config::SetDefault("ns3::LorawanMacEndDevice::DataRate", UintegerValue(5));
     Config::SetDefault("ns3::LorawanMacEndDevice::MType",
                        EnumValue(LorawanMacHeader::UNCONFIRMED_DATA_UP));
@@ -751,7 +747,6 @@ SatLoraCbrTestCase::DoRun(void)
     Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-lora", "cbr", true);
 
     // Enable Lora
-    Config::SetDefault("ns3::SatHelper::Standard", EnumValue(SatEnums::LORA));
     Config::SetDefault("ns3::LorawanMacEndDevice::DataRate", UintegerValue(5));
     Config::SetDefault("ns3::LorawanMacEndDevice::MType",
                        EnumValue(LorawanMacHeader::CONFIRMED_DATA_UP));
