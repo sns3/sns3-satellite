@@ -655,8 +655,8 @@ SatHelper::CreateUserDefinedScenarioFromListPositions(uint32_t satId,
 }
 
 void
-SatHelper::CreateConstellationScenario(BeamUserInfoMap_t& info,
-                                       GetNextUtUserCountCallback getNextUtUserCountCallback)
+SatHelper::LoadConstellationScenario(BeamUserInfoMap_t& info,
+                                     GetNextUtUserCountCallback getNextUtUserCountCallback)
 {
     NS_LOG_FUNCTION(this);
 
@@ -689,8 +689,6 @@ SatHelper::CreateConstellationScenario(BeamUserInfoMap_t& info,
     }
 
     m_groupHelper->SetSatConstellationEnabled();
-
-    DoCreateScenario(info, m_gwUsers);
 }
 
 void
@@ -1887,16 +1885,16 @@ SatHelper::ReadStandard(std::string pathName)
     }
 
     std::string standardString;
-    *ifs >> standardString ;
+    *ifs >> standardString;
 
     ifs->close();
     delete ifs;
 
-    if(standardString == "DVB")
+    if (standardString == "DVB")
     {
         m_standard = SatEnums::DVB;
     }
-    else if(standardString == "LORA")
+    else if (standardString == "LORA")
     {
         m_standard = SatEnums::LORA;
     }

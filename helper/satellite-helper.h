@@ -138,13 +138,13 @@ class SatHelper : public Object
                                                     bool checkBeam);
 
     /**
-     * Creates satellite objects according to constellation parameters.
+     * Load satellite objects according to constellation parameters.
      *
      * \param infoList information of the enabled beams. UT information is given in parameters
      * files. \param getNextUtUserCountCallback Callback to get number of users per UT.
      */
-    void CreateConstellationScenario(BeamUserInfoMap_t& info,
-                                     GetNextUtUserCountCallback getNextUtUserCountCallback);
+    void LoadConstellationScenario(BeamUserInfoMap_t& info,
+                                   GetNextUtUserCountCallback getNextUtUserCountCallback);
 
     /**
      * Set the value of GW address for each UT.

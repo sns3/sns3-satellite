@@ -1340,6 +1340,7 @@ SimulationHelper::CreateSatScenario(SatHelper::PreDefinedScenario_t scenario,
         }
     }
 
+    // Determine scenario
     if (m_satHelper->IsSatConstellationEnabled())
     {
         SatHelper::BeamUserInfoMap_t beamInfo;
@@ -1356,12 +1357,62 @@ SimulationHelper::CreateSatScenario(SatHelper::PreDefinedScenario_t scenario,
             }
         }
 
-        m_satHelper->CreateConstellationScenario(
+        m_satHelper->LoadConstellationScenario(
             beamInfo,
             MakeCallback(&SimulationHelper::GetNextUtUserCount, this));
-    }
 
-    // Determine scenario
+        std::vector<std::pair<GeoCoordinate, uint32_t>> additionalNodesVector =
+            m_groupHelper->GetAdditionalNodesPerBeam();
+        std::map<uint32_t, std::vector<std::pair<GeoCoordinate, uint32_t>>> additionalNodes;
+        for (std::vector<std::pair<GeoCoordinate, uint32_t>>::iterator it =
+                 additionalNodesVector.begin();
+             it != additionalNodesVector.end();
+             it++)
+        {
+            uint32_t bestBeamId = antennaGainPatterns->GetBestBeamId(0, it->first, false);
+            additionalNodes[bestBeamId].push_back(*it);
+        }
+
+        for (std::map<uint32_t, std::vector<std::pair<GeoCoordinate, uint32_t>>>::iterator it =
+                 additionalNodes.begin();
+             it != additionalNodes.end();
+             it++)
+        {
+            if (!IsBeamEnabled(it->first))
+            {
+                NS_LOG_WARN("Beam ID " << it->first << " is not enabled, cannot add "
+                                       << it->second.size() << " UTs from SatGroupHelper");
+                std::cout << "Beam ID " << it->first << " is not enabled, cannot add "
+                          << it->second.size() << " UTs from SatGroupHelper" << std::endl;
+                continue;
+            }
+            beamInfo[std::make_pair(0, it->first)].SetPositions(it->second);
+            for (uint32_t i = 0; i < it->second.size(); i++)
+            {
+                beamInfo[std::make_pair(0, it->first)].AppendUt(GetNextUtUserCount());
+            }
+        }
+
+        if (mobileUtsFolder != "")
+        {
+            m_satHelper->LoadMobileUTsFromFolder(0, mobileUtsFolder, m_utMobileUserCount);
+        }
+
+        // Now, create either a scenario based on list positions in input file
+        // or create a generic scenario with UT positions configured by other ways..
+        if (m_inputFileUtListPositions != "")
+        {
+            m_satHelper->CreateUserDefinedScenarioFromListPositions(
+                0,
+                beamInfo,
+                m_inputFileUtListPositions,
+                m_inputFileUtPositionsCheckBeams);
+        }
+        else
+        {
+            m_satHelper->CreateUserDefinedScenario(beamInfo);
+        }
+    }
     else if (scenario == SatHelper::NONE)
     {
         // Create beam scenario
