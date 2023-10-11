@@ -152,7 +152,7 @@ SatUtHandoverModule::CheckForHandoverRecommendation(uint32_t satId, uint32_t bea
         (!m_hasPendingRequest || now - m_lastMessageSentAt > m_repeatRequestTimeout))
     {
         NS_LOG_FUNCTION("Sending handover recommendation for beam " << bestBeamId);
-        m_handoverCallback(bestBeamId);
+        m_handoverCallback(bestBeamId, satId);
         m_lastMessageSentAt = now;
         m_hasPendingRequest = true;
         m_askedBeamId = bestBeamId;

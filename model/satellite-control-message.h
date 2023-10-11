@@ -895,6 +895,18 @@ class SatHandoverRecommendationMessage : public SatControlMessage
     void SetRecommendedBeamId(uint32_t beamId);
 
     /**
+     * \brief Get the recommended sat ID
+     * \return Recommended sat ID
+     */
+    uint32_t GetRecommendedSatId() const;
+
+    /**
+     * Set recommended sat ID
+     * \param beamId Recommended sat ID
+     */
+    void SetRecommendedSatId(uint32_t beamId);
+
+    /**
      * \brief Get real size of the random access message, which can be used to e.g. simulate real
      * size. \return Real size of the random access message.
      */
@@ -905,6 +917,11 @@ class SatHandoverRecommendationMessage : public SatControlMessage
      * Recommended beam ID
      */
     uint32_t m_beamId;
+
+    /**
+     * Recommended sat ID
+     */
+    uint32_t m_satId;
 };
 
 /**

@@ -758,7 +758,8 @@ SatHandoverRecommendationMessage::GetInstanceTypeId(void) const
 }
 
 SatHandoverRecommendationMessage::SatHandoverRecommendationMessage()
-    : m_beamId(0)
+    : m_beamId(0),
+    m_satId(0)
 {
     NS_LOG_FUNCTION(this);
 }
@@ -771,7 +772,7 @@ SatHandoverRecommendationMessage::~SatHandoverRecommendationMessage()
 void
 SatHandoverRecommendationMessage::SetRecommendedBeamId(uint32_t beamId)
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(this << beamId);
     m_beamId = beamId;
 }
 
@@ -781,12 +782,25 @@ SatHandoverRecommendationMessage::GetRecommendedBeamId() const
     return m_beamId;
 }
 
+void
+SatHandoverRecommendationMessage::SetRecommendedSatId(uint32_t satId)
+{
+    NS_LOG_FUNCTION(this << satId);
+    m_satId = satId;
+}
+
+uint32_t
+SatHandoverRecommendationMessage::GetRecommendedSatId() const
+{
+    return m_satId;
+}
+
 uint32_t
 SatHandoverRecommendationMessage::GetSizeInBytes() const
 {
     NS_LOG_FUNCTION(this);
 
-    uint32_t size = 1 * sizeof(uint32_t);
+    uint32_t size = 2 * sizeof(uint32_t);
     return size;
 }
 
