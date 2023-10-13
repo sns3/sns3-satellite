@@ -146,9 +146,15 @@ SatTracedMobilityModel::UpdateGeoPositionFromFile(void)
 }
 
 uint32_t
-SatTracedMobilityModel::GetBestBeamId(void) const
+SatTracedMobilityModel::GetSatId(void) const
 {
-    return m_antennaGainPatterns->GetBestBeamId(m_satId, m_geoPosition, false);
+    return m_satId;
+}
+
+uint32_t
+SatTracedMobilityModel::GetBestBeamId(bool ignoreNan) const
+{
+    return m_antennaGainPatterns->GetBestBeamId(m_satId, m_geoPosition, ignoreNan);
 }
 
 } // namespace ns3

@@ -759,7 +759,7 @@ SatHandoverRecommendationMessage::GetInstanceTypeId(void) const
 
 SatHandoverRecommendationMessage::SatHandoverRecommendationMessage()
     : m_beamId(0),
-    m_satId(0)
+      m_satId(0)
 {
     NS_LOG_FUNCTION(this);
 }

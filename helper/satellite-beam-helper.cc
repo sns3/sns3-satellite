@@ -594,6 +594,10 @@ SatBeamHelper::Install(NodeContainer ut,
     // AttachChannels method.
     GeoCoordinate gwPos = gwNode->GetObject<SatMobilityModel>()->GetGeoPosition();
     uint32_t feederBeamId = m_antennaGainPatterns->GetBestBeamId(satId, gwPos, true);
+    if (feederBeamId == 0)
+    {
+        feederBeamId = 1;
+    }
 
     // attach channels to geo satellite device
     m_geoHelper->AttachChannels(geoNode->GetDevice(0),

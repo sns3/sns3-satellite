@@ -1423,7 +1423,19 @@ SimulationHelper::CreateSatScenario(SatHelper::PreDefinedScenario_t scenario,
             if (IsBeamEnabled(i))
             {
                 SatBeamUserInfo info;
-                uint32_t utCount = GetNextUtCount(i);
+
+                uint32_t utCount;
+                std::map<uint32_t, Ptr<RandomVariableStream>>::iterator iti = m_utCount.find(i);
+                std::map<uint32_t, Ptr<RandomVariableStream>>::iterator it0 = m_utCount.find(0);
+                if (iti == m_utCount.end() && it0 == m_utCount.end())
+                {
+                    NS_LOG_WARN("No UT count per beam set. Must be set for GEO scenarios");
+                    utCount = 0;
+                }
+                else
+                {
+                    utCount = GetNextUtCount(i);
+                }
 
                 ss << "  Beam " << i << ": UT count= " << utCount;
 

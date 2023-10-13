@@ -68,9 +68,16 @@ class SatTracedMobilityModel : public SatMobilityModel
     virtual ~SatTracedMobilityModel();
 
     /**
-     * \brief Return the best beam ID based on the current position
+     * \brief Return the satellite ID linked to this node
      */
-    uint32_t GetBestBeamId(void) const;
+    uint32_t GetSatId(void) const;
+
+    /**
+     * \brief Return the best beam ID based on the current position
+     * \param ignoreNan Do not crash if a NaN value is returned
+     * \return best beam id in the specified geo coordinate
+     */
+    uint32_t GetBestBeamId(bool ignoreNan = false) const;
 
   private:
     /**

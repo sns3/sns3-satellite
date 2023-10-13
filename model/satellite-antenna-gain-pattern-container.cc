@@ -268,8 +268,7 @@ SatAntennaGainPatternContainer::GetBestBeamId(uint32_t satelliteId,
     {
         NS_LOG_WARN(
             "SatAntennaGainPatternContainer::GetBestBeamId - did not find any good beam! The "
-            "ground station is probably too far from the satellite. Return 1 by default.");
-        bestId = 1;
+            "ground station is probably too far from the satellite. Return 0 by default.");
     }
 
     return bestId;

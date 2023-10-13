@@ -44,9 +44,9 @@ main(int argc, char* argv[])
 {
     /// Set regeneration mode
     Config::SetDefault("ns3::SatConf::ForwardLinkRegenerationMode",
-                       EnumValue(SatEnums::REGENERATION_PHY));
+                       EnumValue(SatEnums::REGENERATION_NETWORK));
     Config::SetDefault("ns3::SatConf::ReturnLinkRegenerationMode",
-                       EnumValue(SatEnums::REGENERATION_PHY));
+                       EnumValue(SatEnums::REGENERATION_NETWORK));
 
     Config::SetDefault("ns3::SatGeoFeederPhy::QueueSize", UintegerValue(100000));
 
@@ -61,13 +61,18 @@ main(int argc, char* argv[])
     simulationHelper->SetGwUserCount(2);
     simulationHelper->SetUtCountPerBeam(5);
     simulationHelper->SetUserCountPerUt(1);
-    simulationHelper->SetBeams("12 13 26 27 38 39");
+    std::set<uint32_t> beamSetAll = {1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15,
+                                     16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+                                     31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45,
+                                     46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60,
+                                     61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72};
+    simulationHelper->SetBeamSet(beamSetAll);
     simulationHelper->SetUserCountPerMobileUt(simulationConf->m_utMobileUserCount);
 
-    simulationHelper->LoadScenario("geo-33E");
+    simulationHelper->LoadScenario("constellation-eutelsat-geo-2-sats-no-isls");
 
     std::string mobileUtFolder =
-        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/utpositions/mobiles/scenario5";
+        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/utpositions/mobiles/scenario6";
     Ptr<SatHelper> helper = simulationHelper->CreateSatScenario(SatHelper::NONE, mobileUtFolder);
 
     Config::SetDefault("ns3::CbrApplication::Interval", StringValue("100ms"));
