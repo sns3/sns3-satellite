@@ -68,6 +68,11 @@ class SatTracedMobilityModel : public SatMobilityModel
     virtual ~SatTracedMobilityModel();
 
     /**
+     * \brief Set the satellite ID linked to this node
+     */
+    void SetSatId(uint32_t satId);
+
+    /**
      * \brief Return the satellite ID linked to this node
      */
     uint32_t GetSatId(void) const;

@@ -1395,7 +1395,7 @@ SimulationHelper::CreateSatScenario(SatHelper::PreDefinedScenario_t scenario,
 
         if (mobileUtsFolder != "")
         {
-            m_satHelper->LoadMobileUTsFromFolder(0, mobileUtsFolder, m_utMobileUserCount);
+            m_satHelper->LoadMobileUTsFromFolder(mobileUtsFolder, m_utMobileUserCount);
         }
 
         // Now, create either a scenario based on list positions in input file
@@ -1486,7 +1486,7 @@ SimulationHelper::CreateSatScenario(SatHelper::PreDefinedScenario_t scenario,
 
         if (mobileUtsFolder != "")
         {
-            m_satHelper->LoadMobileUTsFromFolder(0, mobileUtsFolder, m_utMobileUserCount);
+            m_satHelper->LoadMobileUTsFromFolder(mobileUtsFolder, m_utMobileUserCount);
         }
 
         // Now, create either a scenario based on list positions in input file

@@ -249,21 +249,18 @@ class SatHelper : public Object
      * \brief Load UTs with a SatTracedMobilityModel associated to them from the
      * files found in the given folder. Each UT will be associated to the beam it
      * is at it's starting position.
-     * \param satId ID of satellite
      * \param folderName Name of the folder to search for mobility trace files
      * \param utUsers Stream to generate the number of users associated to each loaded UT
      */
-    void LoadMobileUTsFromFolder(uint32_t satId,
-                                 const std::string& folderName,
+    void LoadMobileUTsFromFolder(const std::string& folderName,
                                  Ptr<RandomVariableStream> utUsers);
 
     /**
      * \brief Load an UT with a SatTracedMobilityModel associated to
      * them from the given file.
-     * \param satId ID of satellite
      * \param filename Name of the trace file containing UT positions
      */
-    Ptr<Node> LoadMobileUtFromFile(uint32_t satId, const std::string& filename);
+    Ptr<Node> LoadMobileUtFromFile(const std::string& filename);
 
     /**
      * Set multicast group to satellite network and IP router. Add needed routes to net devices.

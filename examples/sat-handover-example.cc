@@ -57,22 +57,16 @@ main(int argc, char* argv[])
     Config::SetDefault("ns3::SatHelper::PacketTraceEnabled", BooleanValue(true));
     Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper>("example-handover");
     Ptr<SimulationHelperConf> simulationConf = CreateObject<SimulationHelperConf>();
-    simulationHelper->SetSimulationTime(Seconds(60));
-    simulationHelper->SetGwUserCount(2);
-    simulationHelper->SetUtCountPerBeam(5);
+    simulationHelper->SetSimulationTime(Seconds(100));
+    simulationHelper->SetGwUserCount(1);
     simulationHelper->SetUserCountPerUt(1);
-    std::set<uint32_t> beamSetAll = {1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15,
-                                     16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-                                     31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45,
-                                     46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60,
-                                     61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72};
-    simulationHelper->SetBeamSet(beamSetAll);
+    simulationHelper->SetBeamSet({10, 11, 12, 26, 27, 28, 41, 42, 43, 57, 62, 68, 71});
     simulationHelper->SetUserCountPerMobileUt(simulationConf->m_utMobileUserCount);
 
     simulationHelper->LoadScenario("constellation-eutelsat-geo-2-sats-no-isls");
 
     std::string mobileUtFolder =
-        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/utpositions/mobiles/scenario6";
+        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/additional-input/utpositions/mobiles/scenario6";
     Ptr<SatHelper> helper = simulationHelper->CreateSatScenario(SatHelper::NONE, mobileUtFolder);
 
     Config::SetDefault("ns3::CbrApplication::Interval", StringValue("100ms"));
@@ -82,7 +76,7 @@ main(int argc, char* argv[])
                                           SimulationHelper::UDP,
                                           SimulationHelper::FWD_LINK,
                                           Seconds(1.0),
-                                          Seconds(60.0));
+                                          Seconds(100.0));
 
     // To store attributes to file
     Config::SetDefault("ns3::ConfigStore::Filename", StringValue("output-attributes.xml"));
@@ -92,6 +86,9 @@ main(int argc, char* argv[])
     outputConfig.ConfigureDefaults();
 
     Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer();
+
+    s->AddPerSatFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    s->AddPerSatFwdUserDevThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
 
     s->AddPerBeamFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
     s->AddPerBeamFwdUserDevThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);

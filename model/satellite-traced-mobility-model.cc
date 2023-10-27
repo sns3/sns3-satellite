@@ -145,6 +145,12 @@ SatTracedMobilityModel::UpdateGeoPositionFromFile(void)
     Simulator::Schedule(m_updateInterval, &SatTracedMobilityModel::UpdateGeoPositionFromFile, this);
 }
 
+void
+SatTracedMobilityModel::SetSatId(uint32_t satId)
+{
+    m_satId = satId;
+}
+
 uint32_t
 SatTracedMobilityModel::GetSatId(void) const
 {
