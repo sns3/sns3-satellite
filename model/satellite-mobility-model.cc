@@ -86,6 +86,14 @@ SatMobilityModel::SetGeoPosition(const GeoCoordinate& position)
     DoSetGeoPosition(position);
 }
 
+double
+SatMobilityModel::GetDistanceFrom(Ptr<const SatMobilityModel> other) const
+{
+    Vector oPosition = other->DoGetGeoPosition().ToVector();
+    Vector position = DoGetGeoPosition().ToVector();
+    return CalculateDistance(position, oPosition);
+}
+
 void
 SatMobilityModel::NotifyGeoCourseChange(void) const
 {

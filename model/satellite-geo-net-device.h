@@ -199,11 +199,25 @@ class SatGeoNetDevice : public NetDevice
     void AddFeederPair(uint32_t beamId, Mac48Address satelliteFeederAddress);
 
     /**
+     * Add an entry in the database to get satellite user address from beam ID
+     * \param beamId Beam ID
+     * \param satelliteUserAddress MAC address on the satellite user
+     */
+    void AddUserPair(uint32_t beamId, Mac48Address satelliteUserAddress);
+
+    /**
      * Get satellite feeder entry from associated beam ID
      * \param beamId Beam ID
      * \return satellite feeder MAC associated to this beam
      */
     Mac48Address GetSatelliteFeederAddress(uint32_t beamId);
+
+    /**
+     * Get satellite user entry from associated beam ID
+     * \param beamId Beam ID
+     * \return satellite user MAC associated to this beam
+     */
+    Mac48Address GetSatelliteUserAddress(uint32_t beamId);
 
     /**
      * Attach a receive ErrorModel to the SatGeoNetDevice.
@@ -360,6 +374,8 @@ class SatGeoNetDevice : public NetDevice
     std::map<uint32_t, Ptr<SatMac>> m_allFeederMac;
 
     std::map<uint32_t, Mac48Address> m_addressMapFeeder;
+
+    std::map<uint32_t, Mac48Address> m_addressMapUser;
 
     SatEnums::RegenerationMode_t m_forwardLinkRegenerationMode;
     SatEnums::RegenerationMode_t m_returnLinkRegenerationMode;

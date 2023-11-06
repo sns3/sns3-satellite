@@ -119,13 +119,13 @@ class SatGeoMac : public SatMac
     /**
      * Callback to get the SatBeamScheduler from the beam ID for handover
      */
-    typedef Callback<Ptr<SatBeamScheduler>, uint32_t, uint32_t> BeamScheculerCallback;
+    typedef Callback<Ptr<SatBeamScheduler>, uint32_t, uint32_t> BeamSchedulerCallback;
 
     /**
      * \brief Set the beam scheduler callback
      * \param cb Callback to get the SatBeamScheduler
      */
-    void SetBeamScheculerCallback(SatGeoMac::BeamScheculerCallback cb);
+    void SetBeamSchedulerCallback(SatGeoMac::BeamSchedulerCallback cb);
 
     /**
      * Stop periodic transmission, until a pacquet in enqued.

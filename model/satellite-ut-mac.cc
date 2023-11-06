@@ -43,6 +43,7 @@
 #include <ns3/random-variable-stream.h>
 #include <ns3/simulator.h>
 #include <ns3/singleton.h>
+#include <ns3/satellite-id-mapper.h>
 
 NS_LOG_COMPONENT_DEFINE("SatUtMac");
 
@@ -148,7 +149,7 @@ SatUtMac::SatUtMac()
       m_sliceSubscriptionCallback(),
       m_sendLogonCallback(),
       m_updateGwAddressCallback(),
-      m_beamScheculerCallback()
+      m_beamSchedulerCallback()
 {
     NS_LOG_FUNCTION(this);
 
@@ -199,7 +200,7 @@ SatUtMac::SatUtMac(uint32_t satId,
       m_sliceSubscriptionCallback(),
       m_sendLogonCallback(),
       m_updateGwAddressCallback(),
-      m_beamScheculerCallback()
+      m_beamSchedulerCallback()
 {
     NS_LOG_FUNCTION(this);
 
@@ -230,7 +231,7 @@ SatUtMac::DoDispose(void)
     m_sliceSubscriptionCallback.Nullify();
     m_sendLogonCallback.Nullify();
     m_updateGwAddressCallback.Nullify();
-    m_beamScheculerCallback.Nullify();
+    m_beamSchedulerCallback.Nullify();
     m_tbtpContainer->DoDispose();
     m_utScheduler->DoDispose();
     m_utScheduler = NULL;
@@ -299,11 +300,11 @@ SatUtMac::SetUpdateGwAddressCallback(SatUtMac::UpdateGwAddressCallback cb)
 }
 
 void
-SatUtMac::SetBeamScheculerCallback(SatUtMac::BeamScheculerCallback cb)
+SatUtMac::SetBeamSchedulerCallback(SatUtMac::BeamSchedulerCallback cb)
 {
     NS_LOG_FUNCTION(this << &cb);
 
-    m_beamScheculerCallback = cb;
+    m_beamSchedulerCallback = cb;
 }
 
 void
@@ -1203,7 +1204,7 @@ SatUtMac::ReceiveSignalingPacket(Ptr<Packet> packet)
             if (m_beamId != beamId)
             {
                 NS_LOG_INFO("Storing TIM-U information internally for later");
-                m_timuInfo = Create<SatTimuInfo>(beamId, timuMsg->GetGwAddress());
+                m_timuInfo = Create<SatTimuInfo>(beamId, timuMsg->GetSatAddress(), timuMsg->GetGwAddress());
             }
         }
         else
@@ -1969,6 +1970,13 @@ SatUtMac::DoFrameStart()
         NS_LOG_INFO("Applying TIM-U parameters received during the previous frame");
 
         m_beamId = m_timuInfo->GetBeamId();
+        Address satAddress = m_timuInfo->GetSatAddress();
+        Mac48Address satAddress48 = Mac48Address::ConvertFrom(satAddress);
+        if (satAddress48 != m_satelliteAddress)
+        {
+            SetSatelliteAddress(satAddress48);
+        }
+
         Address gwAddress = m_timuInfo->GetGwAddress();
         Mac48Address gwAddress48 = Mac48Address::ConvertFrom(gwAddress);
         if (gwAddress48 != m_gwAddress)
@@ -1977,6 +1985,10 @@ SatUtMac::DoFrameStart()
             m_routingUpdateCallback(m_nodeInfo->GetMacAddress(), gwAddress);
         }
         m_handoverCallback(m_beamId);
+
+        SatIdMapper* satIdMapper = Singleton<SatIdMapper>::Get();
+        satIdMapper->UpdateMacToBeamId(m_nodeInfo->GetMacAddress(), m_beamId);
+        m_updateIslCallback();
 
         m_tbtpContainer->Clear();
         m_handoverState = WAITING_FOR_TBTP;
@@ -2010,9 +2022,11 @@ SatUtMac::DoFrameStart()
                     m_handoverMessagesCount = 0;
                     LogOff();
 
+                    // TODO
+
                     m_beamId = m_askedBeamCallback();
 
-                    Address gwAddress = m_beamScheculerCallback(m_satId, m_beamId)->GetGwAddress();
+                    Address gwAddress = m_beamSchedulerCallback(m_satId, m_beamId)->GetGwAddress();
                     Mac48Address gwAddress48 = Mac48Address::ConvertFrom(gwAddress);
                     if (gwAddress48 != m_gwAddress)
                     {
@@ -2084,11 +2098,12 @@ SatUtMac::GetRealSendingTime(Time t)
     return t - deltaTime;
 }
 
-SatUtMac::SatTimuInfo::SatTimuInfo(uint32_t beamId, Address address)
+SatUtMac::SatTimuInfo::SatTimuInfo(uint32_t beamId, Address satAddress, Address gwAddress)
     : m_beamId(beamId),
-      m_gwAddress(address)
+      m_satAddress(satAddress),
+      m_gwAddress(gwAddress)
 {
-    NS_LOG_FUNCTION(this << beamId << address);
+    NS_LOG_FUNCTION(this << beamId << satAddress << gwAddress);
 }
 
 uint32_t
@@ -2096,6 +2111,13 @@ SatUtMac::SatTimuInfo::GetBeamId() const
 {
     NS_LOG_FUNCTION(this);
     return m_beamId;
+}
+
+Address
+SatUtMac::SatTimuInfo::GetSatAddress() const
+{
+    NS_LOG_FUNCTION(this);
+    return m_satAddress;
 }
 
 Address

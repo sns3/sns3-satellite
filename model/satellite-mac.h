@@ -178,6 +178,11 @@ class SatMac : public Object
     typedef Callback<uint32_t, uint32_t> SendCtrlMsgCallback;
 
     /**
+     * \brief Callback to update ISL routes when handovers are performed.
+     */
+    typedef Callback<void> UpdateIslCallback;
+
+    /**
      * \brief Method to set read control message callback.
      * \param cb callback to invoke whenever a control message is wanted to read.
      */
@@ -195,6 +200,12 @@ class SatMac : public Object
      * \param cb callback to invoke whenever a control message is wanted to sent.
      */
     void SetSendCtrlCallback(SatMac::SendCtrlMsgCallback cb);
+
+    /**
+     * \brief Method to set update ISL callback.
+     * \param cb callback to invoke whenever ISL routes need to be updated.
+     */
+    void SetUpdateIslCallback(SatMac::UpdateIslCallback cb);
 
     /**
      * \brief Callback to update routing and ARP tables after handover
@@ -320,6 +331,11 @@ class SatMac : public Object
      * The send control message callback.
      */
     SatMac::SendCtrlMsgCallback m_sendCtrlCallback;
+
+    /**
+     * The update ISL routes callback.
+     */
+    SatMac::UpdateIslCallback m_updateIslCallback;
 
     /**
      * `EnableStatisticsTags` attribute.

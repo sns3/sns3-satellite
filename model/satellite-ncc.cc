@@ -320,6 +320,7 @@ SatNcc::AddBeam(uint32_t satId,
                 SatNcc::SendTbtpCallback tbtpCb,
                 Ptr<SatSuperframeSeq> seq,
                 uint32_t maxFrameSize,
+                Address satAddress,
                 Address gwAddress)
 {
     NS_LOG_FUNCTION(this << satId << beamId << &cb);
@@ -334,7 +335,7 @@ SatNcc::AddBeam(uint32_t satId,
     }
 
     scheduler = CreateObject<SatBeamScheduler>();
-    scheduler->Initialize(beamId, cb, seq, maxFrameSize, gwAddress);
+    scheduler->Initialize(beamId, cb, seq, maxFrameSize, satAddress, gwAddress);
 
     scheduler->SetSendTbtpCallback(tbtpCb);
 

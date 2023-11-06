@@ -27,6 +27,8 @@
 #include <ns3/nstime.h>
 #include <ns3/object.h>
 #include <ns3/ptr.h>
+#include <ns3/node.h>
+#include <ns3/node-container.h>
 
 namespace ns3
 {
@@ -66,9 +68,11 @@ class SatUtHandoverModule : public Object
 
     /**
      * Construct a SatUtHandoverModule
+     * \param node The UT node linked to this module
+     * \param satellites The list of satellites used in the scenario
      * \param agpContainer the antenna gain patterns of the simulation
      */
-    SatUtHandoverModule(Ptr<SatAntennaGainPatternContainer> agpContainer);
+    SatUtHandoverModule(Ptr<Node> utNode, NodeContainer satellites, Ptr<SatAntennaGainPatternContainer> agpContainer);
 
     /**
      * Destroy a SatUtHandoverModule
@@ -97,13 +101,21 @@ class SatUtHandoverModule : public Object
     bool CheckForHandoverRecommendation(uint32_t satId, uint32_t beamId);
 
   private:
+    /**
+     * Get the closest satellite to the UT node
+     */
+    bool GetClosestSat();
+
     HandoverRequestCallback m_handoverCallback;
 
+    Ptr<Node> m_utNode;
+    NodeContainer m_satellites;
     Ptr<SatAntennaGainPatternContainer> m_antennaGainPatterns;
 
     Time m_lastMessageSentAt;
     Time m_repeatRequestTimeout;
     bool m_hasPendingRequest;
+    uint32_t m_askedSatId;
     uint32_t m_askedBeamId;
 
     TracedCallback<double> m_antennaGainTrace;

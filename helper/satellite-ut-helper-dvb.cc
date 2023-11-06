@@ -421,7 +421,7 @@ SatUtHelperDvb::Install(Ptr<Node> n,
             MakeCallback(&SatUtHandoverModule::CheckForHandoverRecommendation, utHandoverModule));
         mac->SetAskedBeamCallback(
             MakeCallback(&SatUtHandoverModule::GetAskedBeamId, utHandoverModule));
-        mac->SetBeamScheculerCallback(MakeCallback(&SatNcc::GetBeamScheduler, ncc));
+        mac->SetBeamSchedulerCallback(MakeCallback(&SatNcc::GetBeamScheduler, ncc));
         mac->SetUpdateGwAddressCallback(MakeCallback(&SatRequestManager::SetGwAddress, rm));
     }
 

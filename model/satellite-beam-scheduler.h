@@ -128,12 +128,14 @@ class SatBeamScheduler : public Object
      *        be forwarded to the Beam UTs.
      * \param seq Superframe sequence.
      * \param maxFrameSizeInBytes Maximum non fragmented BB frame size with most robust ModCod
+     * \param satAddress Mac address of the satellite responsible for this beam
      * \param gwAddress Mac address of the gateway responsible for this beam
      */
     void Initialize(uint32_t beamId,
                     SatBeamScheduler::SendCtrlMsgCallback cb,
                     Ptr<SatSuperframeSeq> seq,
                     uint32_t maxFrameSizeInBytes,
+                    Address satAddress,
                     Address gwAddress);
 
     /**
@@ -277,6 +279,14 @@ class SatBeamScheduler : public Object
     void RemoveUt(Address utId);
 
     void ReserveLogonChannel(uint32_t logonChannelId);
+
+    /**
+     * \brief Return the address of the satellite responsible of this beam
+     */
+    inline Address GetSatAddress(void) const
+    {
+        return m_satAddress;
+    }
 
     /**
      * \brief Return the address of the gateway responsible of this beam
@@ -633,6 +643,8 @@ class SatBeamScheduler : public Object
      * Send an estimation of cno to satellite, if samples have been received
      */
     void SendCnoToSatellite();
+
+    Address m_satAddress;
 
     Address m_gwAddress;
 

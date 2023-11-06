@@ -63,11 +63,13 @@ main(int argc, char* argv[])
     simulationHelper->SetBeamSet({10, 11, 12, 26, 27, 28, 41, 42, 43, 57, 62, 68, 71});
     simulationHelper->SetUserCountPerMobileUt(simulationConf->m_utMobileUserCount);
 
-    simulationHelper->LoadScenario("constellation-eutelsat-geo-2-sats-no-isls");
+    simulationHelper->LoadScenario("constellation-eutelsat-geo-2-sats-isls");
 
     std::string mobileUtFolder =
         Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/additional-input/utpositions/mobiles/scenario6";
     Ptr<SatHelper> helper = simulationHelper->CreateSatScenario(SatHelper::NONE, mobileUtFolder);
+
+    helper->PrintTopology(std::cout);
 
     Config::SetDefault("ns3::CbrApplication::Interval", StringValue("100ms"));
     Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(512));

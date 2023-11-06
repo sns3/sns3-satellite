@@ -134,7 +134,7 @@ PointToPointIslChannel::GetDelay(Ptr<MobilityModel> a, Ptr<MobilityModel> b) con
 {
     NS_LOG_FUNCTION(this << a << b);
 
-    double distance = a->GetDistanceFrom(b);
+    double distance = DynamicCast<SatMobilityModel>(a)->GetDistanceFrom(DynamicCast<SatMobilityModel>(b));
     double seconds = distance / m_propagationSpeed;
     return Seconds(seconds);
 }

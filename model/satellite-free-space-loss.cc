@@ -22,6 +22,7 @@
 
 #include "satellite-const-variables.h"
 #include "satellite-utils.h"
+#include "satellite-mobility-model.h"
 
 #include <ns3/double.h>
 #include <ns3/log.h>
@@ -64,7 +65,7 @@ SatFreeSpaceLoss::GetFsl(Ptr<MobilityModel> a, Ptr<MobilityModel> b, double freq
     NS_LOG_FUNCTION(this << frequencyHz);
 
     double fsl;
-    double distance = a->GetDistanceFrom(b);
+    double distance = DynamicCast<SatMobilityModel>(a)->GetDistanceFrom(DynamicCast<SatMobilityModel>(b));
 
     fsl =
         std::pow(((4.0 * M_PI * distance * frequencyHz) / SatConstVariables::SPEED_OF_LIGHT), 2.0);

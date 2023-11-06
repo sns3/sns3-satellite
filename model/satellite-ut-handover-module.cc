@@ -77,6 +77,7 @@ SatUtHandoverModule::SatUtHandoverModule()
       m_lastMessageSentAt(0),
       m_repeatRequestTimeout(600),
       m_hasPendingRequest(false),
+      m_askedSatId(0),
       m_askedBeamId(0)
 {
     NS_LOG_FUNCTION(this);
@@ -84,8 +85,11 @@ SatUtHandoverModule::SatUtHandoverModule()
     NS_FATAL_ERROR("SatUtHandoverModule default constructor should not be used!");
 }
 
-SatUtHandoverModule::SatUtHandoverModule(Ptr<SatAntennaGainPatternContainer> agpContainer)
-    : m_antennaGainPatterns(agpContainer),
+SatUtHandoverModule::SatUtHandoverModule(Ptr<Node> utNode, NodeContainer satellites, Ptr<SatAntennaGainPatternContainer> agpContainer)
+    : m_utNode(utNode),
+      m_satellites(satellites),
+      m_antennaGainPatterns(agpContainer),
+      m_askedSatId(0),
       m_askedBeamId(0)
 {
     NS_LOG_FUNCTION(this << agpContainer);
@@ -113,9 +117,9 @@ SatUtHandoverModule::GetAskedBeamId()
 bool
 SatUtHandoverModule::CheckForHandoverRecommendation(uint32_t satId, uint32_t beamId)
 {
-    NS_LOG_FUNCTION(this << beamId);
+    NS_LOG_FUNCTION(this << satId << beamId);
 
-    if (m_askedBeamId == beamId)
+    if (m_askedSatId == satId && m_askedBeamId == beamId)
     {
         // In case TIM-U was received successfuly, the last asked beam should
         // match the current beamId. So reset the timeout feature.
@@ -141,25 +145,56 @@ SatUtHandoverModule::CheckForHandoverRecommendation(uint32_t satId, uint32_t bea
     }
 
     // Current beam ID is no longer valid, check for better beam and ask for handover
+    uint32_t bestSatId = m_askedSatId;
     uint32_t bestBeamId = m_askedBeamId;
-    if (!m_hasPendingRequest)
-    {
-        bestBeamId = m_antennaGainPatterns->GetBestBeamId(satId, coords, false);
-    }
 
     Time now = Simulator::Now();
-    if (bestBeamId != beamId &&
+    if (!m_hasPendingRequest || now - m_lastMessageSentAt > m_repeatRequestTimeout)
+    {
+        bestSatId = GetClosestSat();
+        bestBeamId = m_antennaGainPatterns->GetBestBeamId(bestSatId, coords, false);
+    }
+
+    if ((bestSatId != satId || bestBeamId != beamId) &&
         (!m_hasPendingRequest || now - m_lastMessageSentAt > m_repeatRequestTimeout))
     {
-        NS_LOG_FUNCTION("Sending handover recommendation for beam " << bestBeamId);
-        m_handoverCallback(bestBeamId, satId);
+        NS_LOG_FUNCTION("Sending handover recommendation for beam " << bestBeamId << " on sat " << satId);
+        m_handoverCallback(bestBeamId, bestSatId);
         m_lastMessageSentAt = now;
         m_hasPendingRequest = true;
+        m_askedSatId = bestSatId;
         m_askedBeamId = bestBeamId;
         return true;
     }
 
     return false;
+}
+
+bool SatUtHandoverModule::GetClosestSat()
+{
+    NS_LOG_FUNCTION(this);
+
+    Ptr<SatMobilityModel> utMobility = m_utNode->GetObject<SatMobilityModel>();
+    Ptr<SatMobilityModel> satMobility = m_satellites.Get(0)->GetObject<SatMobilityModel>();
+
+    uint32_t closestSatId = m_satellites.Get(0)->GetId();
+    double distanceClosest = utMobility->GetDistanceFrom(satMobility);
+
+    double distance;
+
+    for(uint32_t i = 1; i < m_satellites.GetN(); i++)
+    {
+        satMobility = m_satellites.Get(i)->GetObject<SatMobilityModel>();
+
+        distance = utMobility->GetDistanceFrom(satMobility);
+        if(distance < distanceClosest)
+        {
+            distanceClosest = distance;
+            closestSatId = m_satellites.Get(i)->GetId();
+        }
+    }
+
+    return closestSatId;
 }
 
 } // namespace ns3

@@ -853,6 +853,21 @@ SatHelper::DoCreateScenario(BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
             m_beamHelper->SetIslRoutes();
 
             SetGwAddressInUt();
+
+            for(uint32_t i = 0; i < UtNodes().GetN(); i++)
+            {
+                Ptr<Node> ut = UtNodes().Get(i);
+
+                for (uint32_t j = 0; j < ut->GetNDevices(); j++)
+                {
+                    Ptr<SatNetDevice> netDevice = DynamicCast<SatNetDevice>(ut->GetDevice(j));
+                    if (netDevice)
+                    {
+                        Ptr<SatUtMac> mac = DynamicCast<SatUtMac>(netDevice->GetMac());
+                        mac->SetUpdateIslCallback(MakeCallback(&SatBeamHelper::SetIslRoutes, m_beamHelper));
+                    }
+                }
+            }
         }
 
         if (m_standard == SatEnums::LORA)
@@ -928,7 +943,7 @@ SatHelper::SetGwAddressInUt()
                 satUtMac = DynamicCast<SatUtMac>(utNd->GetMac());
             }
         }
-        NS_ASSERT_MSG(utSatNetDeviceCount == 1, "UT must have exactly on SatNetDevice");
+        NS_ASSERT_MSG(utSatNetDeviceCount == 1, "UT must have exactly one SatNetDevice");
         NS_ASSERT_MSG(satUtMac != nullptr, "UT must have a SatUtMac for beam");
 
         // Get feeder MAC used on sat on GW side, and corresponding beam ID used for downlink (can
@@ -946,7 +961,7 @@ SatHelper::SetGwAddressInUt()
                 usedBeamId = gwNd->GetFeederMac(utBeamId)->GetBeamId();
             }
         }
-        NS_ASSERT_MSG(gwSatGeoNetDeviceCount == 1, "SAT must have exactly on SatGeoNetDevice");
+        NS_ASSERT_MSG(gwSatGeoNetDeviceCount == 1, "SAT must have exactly one SatGeoNetDevice");
         NS_ASSERT_MSG(usedBeamId != 0, "Incorrect beam ID");
 
         // Get GW MAC for usedBeamId, and corresponding MAC address
@@ -963,8 +978,10 @@ SatHelper::SetGwAddressInUt()
             }
         }
         NS_ASSERT_MSG(gwSatNetDeviceCount == 1,
-                      "GW must have exactly on SatNetDevice for beam "
+                      "GW must have exactly one SatNetDevice for beam "
                           << usedBeamId << " and satellite " << gwSatId);
+
+        Singleton<SatIdMapper>::Get()->AttachUtNodeToGwAddress(ut, gwAddress);
 
         satUtMac->SetGwAddress(gwAddress);
     }
@@ -1067,7 +1084,28 @@ SatHelper::LoadMobileUtFromFile(const std::string& filename)
 
     Ptr<Node> utNode = CreateObject<Node>();
     utNode->AggregateObject(mobility);
-    utNode->AggregateObject(CreateObject<SatUtHandoverModule>(m_antennaGainPatterns));
+    utNode->AggregateObject(CreateObject<SatUtHandoverModule>(utNode, GeoSatNodes(), m_antennaGainPatterns));
+    return utNode;
+}
+
+Ptr<Node>
+SatHelper::LoadMobileUtFromFile(uint32_t satId, const std::string& filename)
+{
+    NS_LOG_FUNCTION(this << satId << filename);
+
+    if (Singleton<SatEnvVariables>::Get()->IsValidFile(
+            Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/" + filename))
+    {
+        NS_FATAL_ERROR(filename << " is not a valid file name");
+    }
+
+    // Create Node, Mobility and aggregate them
+    Ptr<SatTracedMobilityModel> mobility =
+        CreateObject<SatTracedMobilityModel>(satId, filename, m_antennaGainPatterns);
+
+    Ptr<Node> utNode = CreateObject<Node>();
+    utNode->AggregateObject(mobility);
+    utNode->AggregateObject(CreateObject<SatUtHandoverModule>(utNode, GeoSatNodes(), m_antennaGainPatterns));
     return utNode;
 }
 

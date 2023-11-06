@@ -135,10 +135,31 @@ class SatIdMapper : public Object
     void AttachMacToSatIdIsl(Mac48Address mac, uint32_t satId);
 
     /**
+     * \brief Attach UT node to associated GW MAC address
+     * \param ut UT node
+     * \param gwMac GW MAC address
+     */
+    void AttachUtNodeToGwAddress(Ptr<Node> ut, Mac48Address gwMac);
+
+    /**
      * \brief Remove GW/UT MAC address to the satellite this node is connected
      * \param mac MAC address
      */
     void RemoveMacToSatIdIsl(Mac48Address mac);
+
+    /**
+     * \brief Update MAC address to the SAT ID maps
+     * \param mac MAC address
+     * \param satId satellite ID
+     */
+    void UpdateMacToSatId(Address mac, uint32_t satId);
+
+    /**
+     * \brief Update MAC address to the beam ID maps
+     * \param mac MAC address
+     * \param beamId beam ID
+     */
+    void UpdateMacToBeamId(Address mac, uint32_t beamId);
 
     /* ID GETTERS */
 
@@ -234,6 +255,12 @@ class SatIdMapper : public Object
      */
     Address GetUtUserMacWithNode(Ptr<Node> utUserNode) const;
 
+    /**
+     * \param UT node
+     * \return GW MAC address associated to this UT.
+     */
+    Address GetGwAddressWithUtNode(Ptr<Node> ut) const;
+
     /* PRINT RELATED METHODS */
 
     /**
@@ -326,6 +353,11 @@ class SatIdMapper : public Object
      * \brief Map for MAC to GW user ID conversion
      */
     std::map<Address, uint32_t> m_macToGwUserIdMap;
+
+    /**
+     * \brief Map between UT nodes and GW address
+     */
+    std::map<Ptr<Node>, Address> m_utNodeToGwAddressMap;
 
     /**
      * \brief Is map printing enabled or not

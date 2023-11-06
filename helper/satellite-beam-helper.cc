@@ -761,6 +761,7 @@ SatBeamHelper::InstallFeeder(Ptr<SatGeoNetDevice> geoNetDevice,
                          DynamicCast<SatGwMac>(DynamicCast<SatNetDevice>(gwNd)->GetMac())),
             m_superframeSeq,
             maxBbFrameDataSizeInBytes,
+            geoNetDevice->GetSatelliteUserAddress(beamId),
             gwNd->GetAddress());
         break;
     case SatEnums::LORA:
@@ -771,6 +772,7 @@ SatBeamHelper::InstallFeeder(Ptr<SatGeoNetDevice> geoNetDevice,
                        MakeNullCallback<void, Ptr<SatTbtpMessage>>(),
                        m_superframeSeq,
                        maxBbFrameDataSizeInBytes,
+                       geoNetDevice->GetSatelliteUserAddress(beamId),
                        gwNd->GetAddress());
         break;
     default:

@@ -146,6 +146,7 @@ class SatNcc : public Object
      * \param tbtpCb callback to invoke whenever a TBTP has been sent
      * \param seq Super frame sequence
      * \param maxFrameSizeInBytes Maximum non fragmented BB frame size with most robust ModCod
+     * \param satAddress Mac address of the satellite responsible for this beam
      * \param gwAddress Mac address of the gateway responsible for this beam
      */
     void AddBeam(uint32_t satId,
@@ -154,6 +155,7 @@ class SatNcc : public Object
                  SatNcc::SendTbtpCallback tbtpCb,
                  Ptr<SatSuperframeSeq> seq,
                  uint32_t maxFrameSizeInBytes,
+                 Address satAddress,
                  Address gwAddress);
 
     /**

@@ -328,6 +328,22 @@ SatIdMapper::AttachMacToSatIdIsl(Mac48Address mac, uint32_t satId)
 }
 
 void
+SatIdMapper::AttachUtNodeToGwAddress(Ptr<Node> ut, Mac48Address gwMac)
+{
+    NS_LOG_FUNCTION(this << ut << gwMac);
+
+    std::pair<std::map<Ptr<Node>, Address>::iterator, bool> resultUtNodeToGwAddress =
+        m_utNodeToGwAddressMap.insert(std::make_pair(ut, gwMac));
+
+    if (resultUtNodeToGwAddress.second == false)
+    {
+        NS_FATAL_ERROR("SatIdMapper::AttachUtNodeToGwAddress - UT to GW MAC failed");
+    }
+
+    NS_LOG_INFO("Added UT " << ut << " with GW MAC " << gwMac);
+}
+
+void
 SatIdMapper::RemoveMacToSatIdIsl(Mac48Address mac)
 {
     NS_LOG_FUNCTION(this << mac);
@@ -338,6 +354,40 @@ SatIdMapper::RemoveMacToSatIdIsl(Mac48Address mac)
     }
 
     NS_LOG_INFO("Removed MAC " << mac << " from ISL IDs");
+}
+
+void
+SatIdMapper::UpdateMacToSatId(Address mac, uint32_t satId)
+{
+    NS_LOG_FUNCTION(this << mac << satId);
+
+    std::map<Address, uint32_t>::iterator iter = m_macToSatIdMap.find(mac);
+
+    if (iter == m_macToSatIdMap.end())
+    {
+        NS_FATAL_ERROR("Mac address " << mac << " not in map");
+    }
+
+    iter->second = satId;
+
+    NS_LOG_INFO("Updated MAC " << mac << " with sat ID " << satId);
+}
+
+void
+SatIdMapper::UpdateMacToBeamId(Address mac, uint32_t beamId)
+{
+    NS_LOG_FUNCTION(this << mac << beamId);
+
+    std::map<Address, uint32_t>::iterator iter = m_macToBeamIdMap.find(mac);
+
+    if (iter == m_macToBeamIdMap.end())
+    {
+        NS_FATAL_ERROR("Mac address " << mac << " not in map");
+    }
+
+    iter->second = beamId;
+
+    NS_LOG_INFO("Updated MAC " << mac << " with beam ID " << beamId);
 }
 
 // ID GETTERS
@@ -623,6 +673,21 @@ SatIdMapper::GetUtUserMacWithNode(Ptr<Node> utUserNode) const
         NS_LOG_WARN(this << " Node " << utUserNode->GetId() << " is not a valid UT user");
         return Address(); // returns an invalid address
     }
+}
+
+Address
+SatIdMapper::GetGwAddressWithUtNode(Ptr<Node> ut) const
+{
+    NS_LOG_FUNCTION(this << ut);
+
+    std::map<Ptr<Node>, Address>::const_iterator iter = m_utNodeToGwAddressMap.find(ut);
+
+    if (iter == m_utNodeToGwAddressMap.end())
+    {
+        return Address();
+    }
+
+    return iter->second;
 }
 
 std::string

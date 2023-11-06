@@ -345,6 +345,7 @@ SatBeamScheduler::Initialize(uint32_t beamId,
                              SatBeamScheduler::SendCtrlMsgCallback cb,
                              Ptr<SatSuperframeSeq> seq,
                              uint32_t maxFrameSizeInBytes,
+                             Address satAddress,
                              Address gwAddress)
 {
     NS_LOG_FUNCTION(this << beamId << &cb);
@@ -355,6 +356,7 @@ SatBeamScheduler::Initialize(uint32_t beamId,
     m_txCallback = cb;
     m_superframeSeq = seq;
     m_maxBbFrameSize = maxFrameSizeInBytes;
+    m_satAddress = satAddress;
     m_gwAddress = gwAddress;
 
     /**
@@ -981,7 +983,7 @@ SatBeamScheduler::TransferUtToBeam(Address utId, Ptr<SatBeamScheduler> destinati
             break;
         }
         case CHECK_GATEWAY: {
-            if (m_gwAddress != destination->m_gwAddress)
+            if (m_satAddress != destination->m_satAddress || m_gwAddress != destination->m_gwAddress)
             {
                 utInfo->ClearCrMsgs();
             }
@@ -1016,6 +1018,7 @@ SatBeamScheduler::CreateTimu() const
 
     Ptr<SatTimuMessage> timuMsg = CreateObject<SatTimuMessage>();
     timuMsg->SetAllocatedBeamId(m_beamId);
+    timuMsg->SetSatAddress(m_satAddress);
     timuMsg->SetGwAddress(m_gwAddress);
     return timuMsg;
 }

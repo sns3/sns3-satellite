@@ -208,13 +208,13 @@ class SatUtMac : public SatMac
     /**
      * Callback to get the SatBeamScheduler from the beam ID for handover
      */
-    typedef Callback<Ptr<SatBeamScheduler>, uint32_t, uint32_t> BeamScheculerCallback;
+    typedef Callback<Ptr<SatBeamScheduler>, uint32_t, uint32_t> BeamSchedulerCallback;
 
     /**
      * \brief Set the beam scheduler callback
      * \param cb Callback to get the SatBeamScheduler
      */
-    void SetBeamScheculerCallback(SatUtMac::BeamScheculerCallback cb);
+    void SetBeamSchedulerCallback(SatUtMac::BeamSchedulerCallback cb);
 
     /**
      * Get Tx time for the next possible superframe.
@@ -749,14 +749,17 @@ class SatUtMac : public SatMac
     class SatTimuInfo : public SimpleRefCount<SatTimuInfo>
     {
       public:
-        SatTimuInfo(uint32_t beamId, Address address);
+        SatTimuInfo(uint32_t beamId, Address satAddress, Address gwAddress);
 
         uint32_t GetBeamId() const;
+
+        Address GetSatAddress() const;
 
         Address GetGwAddress() const;
 
       private:
         uint32_t m_beamId;
+        Address m_satAddress;
         Address m_gwAddress;
     };
 
@@ -848,7 +851,7 @@ class SatUtMac : public SatMac
     /**
      * Callback to get the SatBeamScheduler linked to a beam ID
      */
-    SatUtMac::BeamScheculerCallback m_beamScheculerCallback;
+    SatUtMac::BeamSchedulerCallback m_beamSchedulerCallback;
 };
 
 } // namespace ns3

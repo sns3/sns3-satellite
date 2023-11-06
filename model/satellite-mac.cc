@@ -446,4 +446,11 @@ SatMac::SetRoutingUpdateCallback(SatMac::RoutingUpdateCallback cb)
     m_routingUpdateCallback = cb;
 }
 
+void
+SatMac::SetUpdateIslCallback(SatMac::UpdateIslCallback cb)
+{
+    NS_LOG_FUNCTION(this << &cb);
+    m_updateIslCallback = cb;
+}
+
 } // namespace ns3

@@ -659,6 +659,8 @@ SatGeoHelper::AttachChannelsUser(Ptr<SatGeoNetDevice> dev,
         uMac->SetNodeInfo(niUser);
         uLlc->SetNodeInfo(niUser);
 
+        dev->AddUserPair(userBeamId, userAddress);
+
         break;
     }
     case SatEnums::REGENERATION_NETWORK: {
@@ -677,6 +679,8 @@ SatGeoHelper::AttachChannelsUser(Ptr<SatGeoNetDevice> dev,
         uPhy->SetNodeInfo(niUser);
         uMac->SetNodeInfo(niUser);
         uLlc->SetNodeInfo(niUser);
+
+        dev->AddUserPair(userBeamId, userAddress);
 
         break;
     }
