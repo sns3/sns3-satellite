@@ -24,11 +24,11 @@
 #include "satellite-antenna-gain-pattern-container.h"
 
 #include <ns3/callback.h>
+#include <ns3/node-container.h>
+#include <ns3/node.h>
 #include <ns3/nstime.h>
 #include <ns3/object.h>
 #include <ns3/ptr.h>
-#include <ns3/node.h>
-#include <ns3/node-container.h>
 
 namespace ns3
 {
@@ -72,7 +72,9 @@ class SatUtHandoverModule : public Object
      * \param satellites The list of satellites used in the scenario
      * \param agpContainer the antenna gain patterns of the simulation
      */
-    SatUtHandoverModule(Ptr<Node> utNode, NodeContainer satellites, Ptr<SatAntennaGainPatternContainer> agpContainer);
+    SatUtHandoverModule(Ptr<Node> utNode,
+                        NodeContainer satellites,
+                        Ptr<SatAntennaGainPatternContainer> agpContainer);
 
     /**
      * Destroy a SatUtHandoverModule

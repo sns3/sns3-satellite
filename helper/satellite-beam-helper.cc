@@ -750,6 +750,13 @@ SatBeamHelper::InstallFeeder(Ptr<SatGeoNetDevice> geoNetDevice,
          SatConstVariables::BITS_PER_BYTE) -
         bbFrameConf->GetBbFrameHeaderSizeInBytes();
 
+    Address satelliteUserAddress = Address();
+    if (m_returnLinkRegenerationMode == SatEnums::REGENERATION_LINK ||
+        m_returnLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
+    {
+        satelliteUserAddress = geoNetDevice->GetSatelliteUserAddress(beamId);
+    }
+
     switch (m_standard)
     {
     case SatEnums::DVB:
@@ -761,7 +768,7 @@ SatBeamHelper::InstallFeeder(Ptr<SatGeoNetDevice> geoNetDevice,
                          DynamicCast<SatGwMac>(DynamicCast<SatNetDevice>(gwNd)->GetMac())),
             m_superframeSeq,
             maxBbFrameDataSizeInBytes,
-            geoNetDevice->GetSatelliteUserAddress(beamId),
+            satelliteUserAddress,
             gwNd->GetAddress());
         break;
     case SatEnums::LORA:
@@ -772,7 +779,7 @@ SatBeamHelper::InstallFeeder(Ptr<SatGeoNetDevice> geoNetDevice,
                        MakeNullCallback<void, Ptr<SatTbtpMessage>>(),
                        m_superframeSeq,
                        maxBbFrameDataSizeInBytes,
-                       geoNetDevice->GetSatelliteUserAddress(beamId),
+                       satelliteUserAddress,
                        gwNd->GetAddress());
         break;
     default:

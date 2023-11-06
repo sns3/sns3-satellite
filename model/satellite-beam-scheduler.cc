@@ -983,7 +983,8 @@ SatBeamScheduler::TransferUtToBeam(Address utId, Ptr<SatBeamScheduler> destinati
             break;
         }
         case CHECK_GATEWAY: {
-            if (m_satAddress != destination->m_satAddress || m_gwAddress != destination->m_gwAddress)
+            if (m_satAddress != destination->m_satAddress ||
+                m_gwAddress != destination->m_gwAddress)
             {
                 utInfo->ClearCrMsgs();
             }

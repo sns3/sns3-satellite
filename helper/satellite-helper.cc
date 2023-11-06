@@ -40,6 +40,7 @@
 #include <ns3/satellite-lora-conf.h>
 #include <ns3/satellite-point-to-point-isl-net-device.h>
 #include <ns3/satellite-position-allocator.h>
+#include <ns3/satellite-position-input-trace-container.h>
 #include <ns3/satellite-rtn-link-time.h>
 #include <ns3/satellite-sgp4-mobility-model.h>
 #include <ns3/satellite-traced-mobility-model.h>
@@ -49,8 +50,6 @@
 #include <ns3/string.h>
 #include <ns3/system-path.h>
 #include <ns3/type-id.h>
-
-#include <ns3/satellite-position-input-trace-container.h>
 
 #include <sys/stat.h>
 
@@ -854,7 +853,7 @@ SatHelper::DoCreateScenario(BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
 
             SetGwAddressInUt();
 
-            for(uint32_t i = 0; i < UtNodes().GetN(); i++)
+            for (uint32_t i = 0; i < UtNodes().GetN(); i++)
             {
                 Ptr<Node> ut = UtNodes().Get(i);
 
@@ -864,7 +863,8 @@ SatHelper::DoCreateScenario(BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
                     if (netDevice)
                     {
                         Ptr<SatUtMac> mac = DynamicCast<SatUtMac>(netDevice->GetMac());
-                        mac->SetUpdateIslCallback(MakeCallback(&SatBeamHelper::SetIslRoutes, m_beamHelper));
+                        mac->SetUpdateIslCallback(
+                            MakeCallback(&SatBeamHelper::SetIslRoutes, m_beamHelper));
                     }
                 }
             }
@@ -1014,8 +1014,7 @@ SatHelper::SetBeamRoutingConstellations()
 }
 
 void
-SatHelper::LoadMobileUTsFromFolder(const std::string& folderName,
-                                   Ptr<RandomVariableStream> utUsers)
+SatHelper::LoadMobileUTsFromFolder(const std::string& folderName, Ptr<RandomVariableStream> utUsers)
 {
     NS_LOG_FUNCTION(this << folderName << utUsers);
 
@@ -1075,7 +1074,9 @@ SatHelper::LoadMobileUtFromFile(const std::string& filename)
         NS_FATAL_ERROR(filename << " is not a valid file name");
     }
 
-    GeoCoordinate initialPosition = Singleton<SatPositionInputTraceContainer>::Get()->GetPosition(filename, GeoCoordinate::SPHERE);
+    GeoCoordinate initialPosition =
+        Singleton<SatPositionInputTraceContainer>::Get()->GetPosition(filename,
+                                                                      GeoCoordinate::SPHERE);
     uint32_t satId = m_beamHelper->GetClosestSat(initialPosition);
 
     // Create Node, Mobility and aggregate them
@@ -1084,7 +1085,8 @@ SatHelper::LoadMobileUtFromFile(const std::string& filename)
 
     Ptr<Node> utNode = CreateObject<Node>();
     utNode->AggregateObject(mobility);
-    utNode->AggregateObject(CreateObject<SatUtHandoverModule>(utNode, GeoSatNodes(), m_antennaGainPatterns));
+    utNode->AggregateObject(
+        CreateObject<SatUtHandoverModule>(utNode, GeoSatNodes(), m_antennaGainPatterns));
     return utNode;
 }
 
@@ -1105,7 +1107,8 @@ SatHelper::LoadMobileUtFromFile(uint32_t satId, const std::string& filename)
 
     Ptr<Node> utNode = CreateObject<Node>();
     utNode->AggregateObject(mobility);
-    utNode->AggregateObject(CreateObject<SatUtHandoverModule>(utNode, GeoSatNodes(), m_antennaGainPatterns));
+    utNode->AggregateObject(
+        CreateObject<SatUtHandoverModule>(utNode, GeoSatNodes(), m_antennaGainPatterns));
     return utNode;
 }
 

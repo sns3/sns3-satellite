@@ -65,8 +65,8 @@ main(int argc, char* argv[])
 
     simulationHelper->LoadScenario("constellation-eutelsat-geo-2-sats-isls");
 
-    std::string mobileUtFolder =
-        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/additional-input/utpositions/mobiles/scenario6";
+    std::string mobileUtFolder = Singleton<SatEnvVariables>::Get()->LocateDataDirectory() +
+                                 "/additional-input/utpositions/mobiles/scenario6";
     Ptr<SatHelper> helper = simulationHelper->CreateSatScenario(SatHelper::NONE, mobileUtFolder);
 
     helper->PrintTopology(std::cout);

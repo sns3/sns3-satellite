@@ -748,7 +748,7 @@ SatTimuMessage::GetSizeInBytes() const
 {
     NS_LOG_FUNCTION(this);
 
-    uint32_t size = sizeof(uint32_t) + 2*sizeof(Address);
+    uint32_t size = sizeof(uint32_t) + 2 * sizeof(Address);
     return size;
 }
 

@@ -252,8 +252,7 @@ class SatHelper : public Object
      * \param folderName Name of the folder to search for mobility trace files
      * \param utUsers Stream to generate the number of users associated to each loaded UT
      */
-    void LoadMobileUTsFromFolder(const std::string& folderName,
-                                 Ptr<RandomVariableStream> utUsers);
+    void LoadMobileUTsFromFolder(const std::string& folderName, Ptr<RandomVariableStream> utUsers);
 
     /**
      * \brief Load an UT with a SatTracedMobilityModel associated to

@@ -41,9 +41,9 @@
 #include <ns3/packet.h>
 #include <ns3/pointer.h>
 #include <ns3/random-variable-stream.h>
+#include <ns3/satellite-id-mapper.h>
 #include <ns3/simulator.h>
 #include <ns3/singleton.h>
-#include <ns3/satellite-id-mapper.h>
 
 NS_LOG_COMPONENT_DEFINE("SatUtMac");
 
@@ -1204,7 +1204,8 @@ SatUtMac::ReceiveSignalingPacket(Ptr<Packet> packet)
             if (m_beamId != beamId)
             {
                 NS_LOG_INFO("Storing TIM-U information internally for later");
-                m_timuInfo = Create<SatTimuInfo>(beamId, timuMsg->GetSatAddress(), timuMsg->GetGwAddress());
+                m_timuInfo =
+                    Create<SatTimuInfo>(beamId, timuMsg->GetSatAddress(), timuMsg->GetGwAddress());
             }
         }
         else

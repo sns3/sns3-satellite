@@ -85,7 +85,9 @@ SatUtHandoverModule::SatUtHandoverModule()
     NS_FATAL_ERROR("SatUtHandoverModule default constructor should not be used!");
 }
 
-SatUtHandoverModule::SatUtHandoverModule(Ptr<Node> utNode, NodeContainer satellites, Ptr<SatAntennaGainPatternContainer> agpContainer)
+SatUtHandoverModule::SatUtHandoverModule(Ptr<Node> utNode,
+                                         NodeContainer satellites,
+                                         Ptr<SatAntennaGainPatternContainer> agpContainer)
     : m_utNode(utNode),
       m_satellites(satellites),
       m_antennaGainPatterns(agpContainer),
@@ -158,7 +160,8 @@ SatUtHandoverModule::CheckForHandoverRecommendation(uint32_t satId, uint32_t bea
     if ((bestSatId != satId || bestBeamId != beamId) &&
         (!m_hasPendingRequest || now - m_lastMessageSentAt > m_repeatRequestTimeout))
     {
-        NS_LOG_FUNCTION("Sending handover recommendation for beam " << bestBeamId << " on sat " << satId);
+        NS_LOG_FUNCTION("Sending handover recommendation for beam " << bestBeamId << " on sat "
+                                                                    << satId);
         m_handoverCallback(bestBeamId, bestSatId);
         m_lastMessageSentAt = now;
         m_hasPendingRequest = true;
@@ -170,7 +173,8 @@ SatUtHandoverModule::CheckForHandoverRecommendation(uint32_t satId, uint32_t bea
     return false;
 }
 
-bool SatUtHandoverModule::GetClosestSat()
+bool
+SatUtHandoverModule::GetClosestSat()
 {
     NS_LOG_FUNCTION(this);
 
@@ -182,12 +186,12 @@ bool SatUtHandoverModule::GetClosestSat()
 
     double distance;
 
-    for(uint32_t i = 1; i < m_satellites.GetN(); i++)
+    for (uint32_t i = 1; i < m_satellites.GetN(); i++)
     {
         satMobility = m_satellites.Get(i)->GetObject<SatMobilityModel>();
 
         distance = utMobility->GetDistanceFrom(satMobility);
-        if(distance < distanceClosest)
+        if (distance < distanceClosest)
         {
             distanceClosest = distance;
             closestSatId = m_satellites.Get(i)->GetId();
