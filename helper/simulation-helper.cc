@@ -1344,17 +1344,40 @@ SimulationHelper::CreateSatScenario(SatHelper::PreDefinedScenario_t scenario,
     if (m_satHelper->IsSatConstellationEnabled())
     {
         SatHelper::BeamUserInfoMap_t beamInfo;
-        for (uint32_t satId = 0; satId < m_satHelper->GeoSatNodes().GetN(); satId++)
+        switch (scenario)
         {
-            // Set beamInfo to indicate enabled beams
-            for (uint32_t i = 1; i <= m_satHelper->GetBeamCount(); i++)
+        case SatHelper::NONE: {
+            for (uint32_t satId = 0; satId < m_satHelper->GeoSatNodes().GetN(); satId++)
             {
-                if (IsBeamEnabled(i))
+                // Set beamInfo to indicate enabled beams
+                for (uint32_t i = 1; i <= m_satHelper->GetBeamCount(); i++)
+                {
+                    if (IsBeamEnabled(i))
+                    {
+                        SatBeamUserInfo info;
+                        beamInfo.insert(std::make_pair(std::make_pair(satId, i), info));
+                    }
+                }
+            }
+            break;
+        }
+        case SatHelper::FULL: {
+            for (uint32_t satId = 0; satId < m_satHelper->GeoSatNodes().GetN(); satId++)
+            {
+                // Set beamInfo to indicate enabled beams
+                for (uint32_t i = 1; i <= m_satHelper->GetBeamCount(); i++)
                 {
                     SatBeamUserInfo info;
                     beamInfo.insert(std::make_pair(std::make_pair(satId, i), info));
                 }
             }
+            break;
+        }
+        case SatHelper::SIMPLE:
+        case SatHelper::LARGER:
+        default: {
+            NS_FATAL_ERROR("Incorrect scenario chosen with a constellation");
+        }
         }
 
         m_satHelper->LoadConstellationScenario(

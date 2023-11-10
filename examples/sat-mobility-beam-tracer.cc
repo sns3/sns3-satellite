@@ -85,7 +85,11 @@ main(int argc, char* argv[])
     simulationHelper->ReadInputAttributesFromFile(inputFileNameWithPath);
     simulationHelper->SetSimulationTime(Seconds(100));
 
-    std::set<uint32_t> beamSetAll = {10, 11, 12, 26, 27, 28, 41, 42, 43, 57, 62, 68, 71};
+    std::set<uint32_t> beamSetAll;
+    for (uint32_t i = 1; i < 73; i++)
+    {
+        beamSetAll.insert(i);
+    }
     simulationHelper->SetBeamSet(beamSetAll);
     simulationHelper->SetUserCountPerUt(1);
 
@@ -101,7 +105,7 @@ main(int argc, char* argv[])
         uint32_t satNb = satHelper->GeoSatNodes().GetN();
         for (uint32_t i = 0; i < satNb; i++)
         {
-            Ptr<Node> node = satHelper->LoadMobileUtFromFile(i, mobileUtTraceFile);
+            Ptr<Node> node = satHelper->LoadMobileUtFromFile(mobileUtTraceFile);
             node->GetObject<SatMobilityModel>()->TraceConnect("SatCourseChange",
                                                               "BeamTracer",
                                                               MakeCallback(SatCourseChange));

@@ -11,6 +11,7 @@
 cpp_examples = [
     ("sat-arq-fwd-example", "True", "True"),
     ("sat-arq-rtn-example", "False", "False"),
+    ("sat-beam-position-tracer", "True", "True"),
     ("sat-cbr-example", "True", "True"),
     ("sat-cbr-full-example", "True", "True"),
     ("sat-cbr-stats-example", "True", "True"),

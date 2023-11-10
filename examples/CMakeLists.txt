@@ -1,6 +1,7 @@
 set(base_examples
     sat-arq-fwd-example
     sat-arq-rtn-example
+    sat-beam-position-tracer
     sat-cbr-example
     sat-cbr-full-example
     sat-cbr-stats-example

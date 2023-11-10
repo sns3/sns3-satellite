@@ -139,6 +139,7 @@ SatAntennaGainPatternContainer::SatAntennaGainPatternContainer(uint32_t nbSats,
                         CreateObject<SatAntennaGainPattern>(filePath, geoPos);
                     std::pair<std::map<uint32_t, Ptr<SatAntennaGainPattern>>::iterator, bool> ret;
                     ret = m_antennaPatternMap.insert(std::make_pair(beamId, gainPattern));
+
                     if (ret.second == false)
                     {
                         NS_FATAL_ERROR("SatAntennaGainPatternContainer::"

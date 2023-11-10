@@ -150,7 +150,16 @@ class SatHelper : public Object
      * Set the value of GW address for each UT.
      * This method is called when using constellations.
      */
-    void SetGwAddressInUt();
+    void SetGwAddressInUts();
+
+    /**
+     * Set the value of GW address for a single UT.
+     * This method is called when using constellations, and can be called via callbacks after
+     * handovers
+     *
+     * \param utId ID of UT to
+     */
+    void SetGwAddressInSingleUt(uint32_t utId);
 
     /**
      * Populate the routes, when using constellations.
@@ -499,11 +508,6 @@ class SatHelper : public Object
      * Map of closest satellite for each GW
      */
     std::map<uint32_t, uint32_t> m_gwSats;
-
-    /**
-     * Map indicating the GW node associated to each UT node.
-     */
-    std::map<Ptr<Node>, Ptr<Node>> m_gwDistribution;
 
     /**
      * Map indicating all UT NetDevices associated to each GW NetDevice

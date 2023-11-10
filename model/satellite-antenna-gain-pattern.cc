@@ -125,6 +125,8 @@ SatAntennaGainPattern::ReadAntennaPatternFromFile(std::string filePathName)
     std::string gainString;
     bool firstRowDone(false);
 
+    double bestGain = -100;
+
     // Read a row
     *ifs >> lat >> lon >> gainString;
 
@@ -183,6 +185,13 @@ SatAntennaGainPattern::ReadAntennaPatternFromFile(std::string filePathName)
         else
         {
             m_longitudes.push_back(lon);
+        }
+
+        if (gainDouble > bestGain)
+        {
+            bestGain = gainDouble;
+            m_centerLatitude = lat;
+            m_centerLongitude = lon;
         }
 
         // If this is the first gain entry
@@ -247,6 +256,40 @@ SatAntennaGainPattern::GetSatelliteOffset(double& latOffset,
 
     NS_LOG_DEBUG(this << " Satellite offset (moved from the beginning of the simulation): "
                       << latOffset << " / " << lonOffset);
+}
+
+double
+SatAntennaGainPattern::GetCenterLatitude(Ptr<SatMobilityModel> mobility) const
+{
+    NS_LOG_FUNCTION(this);
+
+    if (!mobility)
+    {
+        NS_FATAL_ERROR("SatAntennaGainPattern::GetCenterLatitude - Called without initializing "
+                       "satellite position first");
+    }
+
+    GeoCoordinate satellite = mobility->GetGeoPosition();
+    double latOffset = m_latDefaultSatellite - satellite.GetLatitude();
+
+    return m_centerLatitude - latOffset;
+}
+
+double
+SatAntennaGainPattern::GetCenterLongitude(Ptr<SatMobilityModel> mobility) const
+{
+    NS_LOG_FUNCTION(this);
+
+    if (!mobility)
+    {
+        NS_FATAL_ERROR("SatAntennaGainPattern::GetCenterLongitude - Called without initializing "
+                       "satellite position first");
+    }
+
+    GeoCoordinate satellite = mobility->GetGeoPosition();
+    double lonOffset = m_lonDefaultSatellite - satellite.GetLongitude();
+
+    return m_centerLongitude - lonOffset;
 }
 
 GeoCoordinate
