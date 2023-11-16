@@ -275,7 +275,8 @@ SatBeamScheduler::GetTypeId(void)
 }
 
 SatBeamScheduler::SatBeamScheduler()
-    : m_beamId(0),
+    : m_satId(0),
+      m_beamId(0),
       m_superframeSeq(0),
       m_superFrameCounter(0),
       m_txCallback(),
@@ -337,11 +338,30 @@ SatBeamScheduler::SendToSatellite(Ptr<SatControlMessage> msg, Address satelliteM
 void
 SatBeamScheduler::SetSendTbtpCallback(SendTbtpCallback cb)
 {
+    NS_LOG_FUNCTION(this << &cb);
+
     m_txTbtpCallback = cb;
 }
 
 void
-SatBeamScheduler::Initialize(uint32_t beamId,
+SatBeamScheduler::SetConnectUtCallback(ConnectUtCallback cb)
+{
+    NS_LOG_FUNCTION(this << &cb);
+
+    m_connectUtCallback = cb;
+}
+
+void
+SatBeamScheduler::SetDisconnectUtCallback(DisconnectUtCallback cb)
+{
+    NS_LOG_FUNCTION(this << &cb);
+
+    m_disconnectUtCallback = cb;
+}
+
+void
+SatBeamScheduler::Initialize(uint32_t satId,
+                             uint32_t beamId,
                              SatBeamScheduler::SendCtrlMsgCallback cb,
                              Ptr<SatSuperframeSeq> seq,
                              uint32_t maxFrameSizeInBytes,
@@ -352,6 +372,7 @@ SatBeamScheduler::Initialize(uint32_t beamId,
 
     m_satelliteCnoEstimator = CreateCnoEstimator();
 
+    m_satId = satId;
     m_beamId = beamId;
     m_txCallback = cb;
     m_superframeSeq = seq;
@@ -960,7 +981,7 @@ SatBeamScheduler::UpdateDamaEntriesWithAllocs(
 void
 SatBeamScheduler::TransferUtToBeam(Address utId, Ptr<SatBeamScheduler> destination)
 {
-    NS_LOG_FUNCTION(this << utId << destination->m_beamId);
+    NS_LOG_FUNCTION(this << utId << destination->m_satId << destination->m_beamId);
 
     UtInfoMap_t::iterator utIterator = m_utInfos.find(utId);
     if (utIterator == m_utInfos.end())
@@ -997,6 +1018,22 @@ SatBeamScheduler::TransferUtToBeam(Address utId, Ptr<SatBeamScheduler> destinati
 }
 
 void
+SatBeamScheduler::ConnectUt(Mac48Address address)
+{
+    NS_LOG_FUNCTION(this << address);
+
+    m_connectUtCallback(address);
+}
+
+void
+SatBeamScheduler::DisconnectUt(Mac48Address address)
+{
+    NS_LOG_FUNCTION(this << address);
+
+    m_disconnectUtCallback(address);
+}
+
+void
 SatBeamScheduler::RemoveUt(Address utId)
 {
     NS_LOG_FUNCTION(this << utId);
@@ -1018,6 +1055,7 @@ SatBeamScheduler::CreateTimu() const
     NS_LOG_FUNCTION(this);
 
     Ptr<SatTimuMessage> timuMsg = CreateObject<SatTimuMessage>();
+    timuMsg->SetAllocatedSatId(m_satId);
     timuMsg->SetAllocatedBeamId(m_beamId);
     timuMsg->SetSatAddress(m_satAddress);
     timuMsg->SetGwAddress(m_gwAddress);

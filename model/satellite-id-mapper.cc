@@ -328,22 +328,6 @@ SatIdMapper::AttachMacToSatIdIsl(Mac48Address mac, uint32_t satId)
 }
 
 void
-SatIdMapper::AttachUtNodeToGwAddress(Ptr<Node> ut, Mac48Address gwMac)
-{
-    NS_LOG_FUNCTION(this << ut << gwMac);
-
-    std::pair<std::map<Ptr<Node>, Address>::iterator, bool> resultUtNodeToGwAddress =
-        m_utNodeToGwAddressMap.insert(std::make_pair(ut, gwMac));
-
-    if (resultUtNodeToGwAddress.second == false)
-    {
-        NS_FATAL_ERROR("SatIdMapper::AttachUtNodeToGwAddress - UT to GW MAC failed");
-    }
-
-    NS_LOG_INFO("Added UT " << ut << " with GW MAC " << gwMac);
-}
-
-void
 SatIdMapper::RemoveMacToSatIdIsl(Mac48Address mac)
 {
     NS_LOG_FUNCTION(this << mac);
@@ -673,21 +657,6 @@ SatIdMapper::GetUtUserMacWithNode(Ptr<Node> utUserNode) const
         NS_LOG_WARN(this << " Node " << utUserNode->GetId() << " is not a valid UT user");
         return Address(); // returns an invalid address
     }
-}
-
-Address
-SatIdMapper::GetGwAddressWithUtNode(Ptr<Node> ut) const
-{
-    NS_LOG_FUNCTION(this << ut);
-
-    std::map<Ptr<Node>, Address>::const_iterator iter = m_utNodeToGwAddressMap.find(ut);
-
-    if (iter == m_utNodeToGwAddressMap.end())
-    {
-        return Address();
-    }
-
-    return iter->second;
 }
 
 std::string

@@ -141,9 +141,10 @@ class SatGwMac : public SatMac
      * \param Address identification of the UT originating the request
      * \param uint32_t satellite ID
      * \param uint32_t source beam ID the UT is still in
+     * \param uint32_t destination sat ID the UT would like to go in
      * \param uint32_t destination beam ID the UT would like to go in
      */
-    typedef Callback<void, Address, uint32_t, uint32_t, uint32_t> HandoverCallback;
+    typedef Callback<void, Address, uint32_t, uint32_t, uint32_t, uint32_t> HandoverCallback;
 
     /**
      * Method to set handover callback

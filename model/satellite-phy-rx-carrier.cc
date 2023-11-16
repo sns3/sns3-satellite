@@ -389,7 +389,7 @@ SatPhyRxCarrier::StartRx(Ptr<SatSignalParameters> rxParams)
     {
     case IDLE:
     case RX: {
-        auto receiveParamTuple = GetReceiveParams(rxParams);
+        std::pair<bool, SatPhyRxCarrier::rxParams_s> receiveParamTuple = GetReceiveParams(rxParams);
 
         bool receivePacket = receiveParamTuple.first;
         rxParams_s rxParamsStruct = receiveParamTuple.second;

@@ -208,7 +208,7 @@ SatUtPhy::GetAdditionalInterference()
 }
 
 void
-SatUtPhy::PerformHandover(uint32_t beamId)
+SatUtPhy::PerformHandover(uint32_t satId, uint32_t beamId)
 {
     NS_LOG_FUNCTION(this << beamId);
 
@@ -218,6 +218,7 @@ SatUtPhy::PerformHandover(uint32_t beamId)
     channels.first->RemoveRx(m_phyRx);
 
     // perform "physical" beam handover
+    SetSatId(satId);
     SetBeamId(beamId);
     Simulator::Schedule(m_antennaReconfigurationDelay, &SatUtPhy::AssignNewSatChannels, this);
 }

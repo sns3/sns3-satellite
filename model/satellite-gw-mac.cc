@@ -566,8 +566,13 @@ SatGwMac::ReceiveSignalingPacket(Ptr<Packet> packet, uint32_t satId, uint32_t be
 
         if (handoverRecommendation != NULL)
         {
+            uint32_t newSatId = handoverRecommendation->GetRecommendedSatId();
             uint32_t newBeamId = handoverRecommendation->GetRecommendedBeamId();
-            m_handoverCallback(addressE2ETag.GetE2ESourceAddress(), satId, beamId, newBeamId);
+            m_handoverCallback(addressE2ETag.GetE2ESourceAddress(),
+                               satId,
+                               beamId,
+                               newSatId,
+                               newBeamId);
         }
         else
         {

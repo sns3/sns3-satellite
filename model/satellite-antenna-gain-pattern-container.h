@@ -106,6 +106,15 @@ class SatAntennaGainPatternContainer : public Object
      */
     uint32_t GetBestBeamId(uint32_t satelliteId, GeoCoordinate coord, bool ignoreNan);
 
+    /**
+     * \brief Get beam gain for given coordinates
+     * \param satelliteId ID of satellite
+     * \param beamId ID of beam
+     * \param coord Geo coordinate
+     * \return gain of this beam
+     */
+    double GetBeamGain(uint32_t satelliteId, uint32_t beamId, GeoCoordinate coord);
+
     void ConfigureBeamsMobility(uint32_t satelliteId, Ptr<SatMobilityModel> mobility);
 
     void SetEnabledBeams(BeamUserInfoMap_t& info);

@@ -102,6 +102,24 @@ class SatMac : public Object
     }
 
     /**
+     * \brief Set sat ID of the object
+     * \param satId sat ID
+     */
+    inline void SetSatId(uint32_t satId)
+    {
+        m_satId = satId;
+    }
+
+    /**
+     * \brief Set beam ID of the object
+     * \param beamId beam ID
+     */
+    inline void SetBeamId(uint32_t beamId)
+    {
+        m_beamId = beamId;
+    }
+
+    /**
      * \brief Get MAC address
      * \return The MAC address
      */

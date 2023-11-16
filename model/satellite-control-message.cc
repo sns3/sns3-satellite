@@ -716,6 +716,20 @@ SatTimuMessage::GetAllocatedBeamId() const
 }
 
 void
+SatTimuMessage::SetAllocatedSatId(uint32_t satId)
+{
+    NS_LOG_FUNCTION(this);
+    m_satId = satId;
+}
+
+uint32_t
+SatTimuMessage::GetAllocatedSatId() const
+{
+    NS_LOG_FUNCTION(this);
+    return m_satId;
+}
+
+void
 SatTimuMessage::SetSatAddress(Address address)
 {
     NS_LOG_FUNCTION(this);

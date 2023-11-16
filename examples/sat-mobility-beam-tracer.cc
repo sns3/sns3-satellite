@@ -85,12 +85,6 @@ main(int argc, char* argv[])
     simulationHelper->ReadInputAttributesFromFile(inputFileNameWithPath);
     simulationHelper->SetSimulationTime(Seconds(100));
 
-    std::set<uint32_t> beamSetAll;
-    for (uint32_t i = 1; i < 73; i++)
-    {
-        beamSetAll.insert(i);
-    }
-    simulationHelper->SetBeamSet(beamSetAll);
     simulationHelper->SetUserCountPerUt(1);
 
     simulationHelper->LoadScenario("constellation-eutelsat-geo-2-sats-no-isls");
@@ -98,7 +92,7 @@ main(int argc, char* argv[])
     if (mobileUtTraceFile != "")
     {
         Ptr<SatHelper> satHelper =
-            simulationHelper->CreateSatScenario(SatHelper::NONE, mobileUtTraceFile);
+            simulationHelper->CreateSatScenario(SatHelper::FULL, mobileUtTraceFile);
         satMobility =
             satHelper->GetBeamHelper()->GetGeoSatNodes().Get(0)->GetObject<SatMobilityModel>();
 
@@ -106,6 +100,7 @@ main(int argc, char* argv[])
         for (uint32_t i = 0; i < satNb; i++)
         {
             Ptr<Node> node = satHelper->LoadMobileUtFromFile(mobileUtTraceFile);
+            DynamicCast<SatTracedMobilityModel>(node->GetObject<SatMobilityModel>())->SetSatId(i);
             node->GetObject<SatMobilityModel>()->TraceConnect("SatCourseChange",
                                                               "BeamTracer",
                                                               MakeCallback(SatCourseChange));

@@ -231,7 +231,8 @@ SatAntennaGainPatternContainer::GetBestBeamId(uint32_t satelliteId,
                                               GeoCoordinate coord,
                                               bool ignoreNan)
 {
-    NS_LOG_FUNCTION(this << satelliteId << coord.GetLatitude() << coord.GetLongitude());
+    NS_LOG_FUNCTION(this << satelliteId << coord.GetLatitude() << coord.GetLongitude()
+                         << ignoreNan);
 
     double bestGain(-100.0);
     uint32_t bestId(0);
@@ -273,6 +274,24 @@ SatAntennaGainPatternContainer::GetBestBeamId(uint32_t satelliteId,
     }
 
     return bestId;
+}
+
+double
+SatAntennaGainPatternContainer::GetBeamGain(uint32_t satelliteId,
+                                            uint32_t beamId,
+                                            GeoCoordinate coord)
+{
+    NS_LOG_FUNCTION(this << satelliteId << beamId << coord.GetLatitude() << coord.GetLongitude());
+
+    Ptr<SatMobilityModel> mobility = m_mobilityModelMap[satelliteId];
+
+    if (m_antennaPatternMap.find(beamId) == m_antennaPatternMap.end())
+    {
+        return std::numeric_limits<double>::quiet_NaN();
+    }
+    Ptr<SatAntennaGainPattern> pattern = m_antennaPatternMap.at(beamId);
+
+    return pattern->GetAntennaGain_lin(coord, mobility);
 }
 
 uint32_t

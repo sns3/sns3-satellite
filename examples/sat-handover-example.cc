@@ -50,6 +50,8 @@ main(int argc, char* argv[])
 
     Config::SetDefault("ns3::SatGeoFeederPhy::QueueSize", UintegerValue(100000));
 
+    Config::SetDefault("ns3::SatUtHandoverModule::NumberClosestSats", UintegerValue(2));
+
     /// Set simulation output details
     Config::SetDefault("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue(true));
 
@@ -60,7 +62,8 @@ main(int argc, char* argv[])
     simulationHelper->SetSimulationTime(Seconds(100));
     simulationHelper->SetGwUserCount(1);
     simulationHelper->SetUserCountPerUt(1);
-    simulationHelper->SetBeamSet({10, 11, 12, 26, 27, 28, 41, 42, 43, 57, 62, 68, 71});
+    simulationHelper->SetBeamSet({0,  20, 21, 22, 32, 33, 34, 35, 36, 37, 44, 45, 46,
+                                  47, 53, 54, 55, 56, 59, 60, 61, 66, 67, 68, 71, 72});
     simulationHelper->SetUserCountPerMobileUt(simulationConf->m_utMobileUserCount);
 
     simulationHelper->LoadScenario("constellation-eutelsat-geo-2-sats-isls");

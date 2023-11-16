@@ -40,6 +40,11 @@ namespace ns3
 class SatUtHandoverModule : public Object
 {
   public:
+    typedef enum
+    {
+        SAT_N_CLOSEST_SAT,
+    } HandoverDecisionAlgorithm_t;
+
     /**
      * \brief Handover recommendation message sending callback
      * \param uint32_t The beam ID this UT want to change to
@@ -94,6 +99,11 @@ class SatUtHandoverModule : public Object
     uint32_t GetAskedBeamId();
 
     /**
+     * \brief Method to call when a handover has been performed.
+     */
+    void HandoverFinished();
+
+    /**
      * \brief Inspect whether or not the given beam is still suitable for
      * the underlying mobility model.
      * \param satId The current satellite ID the underlying mobility model is emitting in
@@ -104,9 +114,30 @@ class SatUtHandoverModule : public Object
 
   private:
     /**
-     * Get the closest satellite to the UT node
+     * Get the N closest satellites to the UT node
+     *
+     * \param numberOfSats Number of satellites to get
+     * \return Closest satellites IDs
      */
-    bool GetClosestSat();
+    std::vector<uint32_t> GetNClosestSats(uint32_t numberOfSats);
+
+    /**
+     * Handover algorithm choosing best beam between N closest satellites
+     *
+     * \param coords Coordiantes of UT
+     * \return A pair containing satellite ID and beam ID
+     */
+    std::pair<uint32_t, uint32_t> AlgorithmNClosest(GeoCoordinate coords);
+
+    /**
+     * Algorithm used to detect if handover is needed
+     */
+    HandoverDecisionAlgorithm_t m_handoverDecisionAlgorithm;
+
+    /**
+     * Number of satellites to consider when using algorithm SAT_N_CLOSEST_SAT
+     */
+    uint32_t m_numberClosestSats;
 
     HandoverRequestCallback m_handoverCallback;
 

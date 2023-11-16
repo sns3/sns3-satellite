@@ -117,6 +117,16 @@ class SatBeamScheduler : public Object
     typedef Callback<void, Ptr<SatTbtpMessage>> SendTbtpCallback;
 
     /**
+     * \param msg        The UT address to connect
+     */
+    typedef Callback<void, Mac48Address> ConnectUtCallback;
+
+    /**
+     * \param msg        The UT address to disconnect
+     */
+    typedef Callback<void, Mac48Address> DisconnectUtCallback;
+
+    /**
      * \param id    Id of the TBTP message to add.
      * \param tbtp  Pointer to the TBTP message to add.
      */
@@ -124,6 +134,7 @@ class SatBeamScheduler : public Object
 
     /**
      * \param beamId ID of the beam which for callback is set
+     * \param satId ID of the satellite using the beam which for callback is set
      * \param cb callback to invoke whenever a TBTP is ready for sending and must
      *        be forwarded to the Beam UTs.
      * \param seq Superframe sequence.
@@ -131,7 +142,8 @@ class SatBeamScheduler : public Object
      * \param satAddress Mac address of the satellite responsible for this beam
      * \param gwAddress Mac address of the gateway responsible for this beam
      */
-    void Initialize(uint32_t beamId,
+    void Initialize(uint32_t satId,
+                    uint32_t beamId,
                     SatBeamScheduler::SendCtrlMsgCallback cb,
                     Ptr<SatSuperframeSeq> seq,
                     uint32_t maxFrameSizeInBytes,
@@ -218,6 +230,16 @@ class SatBeamScheduler : public Object
     void SetSendTbtpCallback(SendTbtpCallback cb);
 
     /**
+     * Set the callback to connect a UT to GeoNetDevice
+     */
+    void SetConnectUtCallback(ConnectUtCallback cb);
+
+    /**
+     * Set the callback to disconnect a UT from a GeoNetDevice
+     */
+    void SetDisconnectUtCallback(DisconnectUtCallback cb);
+
+    /**
      * Callback signature for `BacklogRequestsTrace` trace source.
      *
      * \param trace A string containing the following information:
@@ -271,6 +293,20 @@ class SatBeamScheduler : public Object
      * \param destination the beam that should accept the terminal
      */
     void TransferUtToBeam(Address utId, Ptr<SatBeamScheduler> destination);
+
+    /**
+     * Connect a new UT address to this scheduler
+     *
+     * \param address The UT address to connect
+     */
+    void ConnectUt(Mac48Address address);
+
+    /**
+     * Disconnect a new UT address from this scheduler
+     *
+     * \param address The UT address to disconnect
+     */
+    void DisconnectUt(Mac48Address address);
 
     /**
      * \brief Remove a UT from its SatBeamScheduler
@@ -473,6 +509,11 @@ class SatBeamScheduler : public Object
     };
 
     /**
+     * ID of the satellite using this beam
+     */
+    uint32_t m_satId;
+
+    /**
      * ID of the beam
      */
     uint32_t m_beamId;
@@ -496,6 +537,16 @@ class SatBeamScheduler : public Object
      * The TBTP send callback to inform GW Mac.
      */
     SatBeamScheduler::SendTbtpCallback m_txTbtpCallback;
+
+    /**
+     * Connect UT callback.
+     */
+    SatBeamScheduler::ConnectUtCallback m_connectUtCallback;
+
+    /**
+     * Disconnect UT callback.
+     */
+    SatBeamScheduler::DisconnectUtCallback m_disconnectUtCallback;
 
     /**
      * Map to store UT information in beam for updating purposes.

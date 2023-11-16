@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
+ * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
 #include <ns3/config-store-module.h>

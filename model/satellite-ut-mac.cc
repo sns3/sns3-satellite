@@ -141,10 +141,9 @@ SatUtMac::SatUtMac()
       m_handoverMessagesCount(0),
       m_maxHandoverMessagesSent(20),
       m_firstTransmittableSuperframeId(0),
+      m_utHandoverModule(nullptr),
       m_handoverCallback(),
       m_gatewayUpdateCallback(),
-      m_beamCheckerCallback(),
-      m_askedBeamCallback(),
       m_txCheckCallback(),
       m_sliceSubscriptionCallback(),
       m_sendLogonCallback(),
@@ -192,10 +191,9 @@ SatUtMac::SatUtMac(uint32_t satId,
       m_handoverMessagesCount(0),
       m_maxHandoverMessagesSent(20),
       m_firstTransmittableSuperframeId(0),
+      m_utHandoverModule(nullptr),
       m_handoverCallback(),
       m_gatewayUpdateCallback(),
-      m_beamCheckerCallback(),
-      m_askedBeamCallback(),
       m_txCheckCallback(),
       m_sliceSubscriptionCallback(),
       m_sendLogonCallback(),
@@ -225,8 +223,6 @@ SatUtMac::DoDispose(void)
     m_timingAdvanceCb.Nullify();
     m_handoverCallback.Nullify();
     m_gatewayUpdateCallback.Nullify();
-    m_beamCheckerCallback.Nullify();
-    m_askedBeamCallback.Nullify();
     m_txCheckCallback.Nullify();
     m_sliceSubscriptionCallback.Nullify();
     m_sendLogonCallback.Nullify();
@@ -237,6 +233,14 @@ SatUtMac::DoDispose(void)
     m_utScheduler = NULL;
 
     SatMac::DoDispose();
+}
+
+void
+SatUtMac::SetUtHandoverModule(Ptr<SatUtHandoverModule> utHandoverModule)
+{
+    NS_LOG_INFO(this << utHandoverModule);
+
+    m_utHandoverModule = utHandoverModule;
 }
 
 void
@@ -251,20 +255,6 @@ SatUtMac::SetGatewayUpdateCallback(SatUtMac::GatewayUpdateCallback cb)
 {
     NS_LOG_FUNCTION(this << &cb);
     m_gatewayUpdateCallback = cb;
-}
-
-void
-SatUtMac::SetBeamCheckerCallback(SatUtMac::BeamCheckerCallback cb)
-{
-    NS_LOG_FUNCTION(this << &cb);
-    m_beamCheckerCallback = cb;
-}
-
-void
-SatUtMac::SetAskedBeamCallback(SatUtMac::AskedBeamCallback cb)
-{
-    NS_LOG_FUNCTION(this << &cb);
-    m_askedBeamCallback = cb;
 }
 
 void
@@ -305,6 +295,14 @@ SatUtMac::SetBeamSchedulerCallback(SatUtMac::BeamSchedulerCallback cb)
     NS_LOG_FUNCTION(this << &cb);
 
     m_beamSchedulerCallback = cb;
+}
+
+void
+SatUtMac::SetSetGwAddressInUtCallback(SatUtMac::SetGwAddressInUtCallback cb)
+{
+    NS_LOG_FUNCTION(this << &cb);
+
+    m_setGwAddressInUtCallback = cb;
 }
 
 void
@@ -1199,13 +1197,16 @@ SatUtMac::ReceiveSignalingPacket(Ptr<Packet> packet)
         if (timuMsg != NULL)
         {
             uint32_t beamId = timuMsg->GetAllocatedBeamId();
+            uint32_t satId = timuMsg->GetAllocatedSatId();
             NS_LOG_INFO("UT: " << m_nodeInfo->GetMacAddress() << " switching from beam " << m_beamId
                                << " to beam " << beamId);
             if (m_beamId != beamId)
             {
                 NS_LOG_INFO("Storing TIM-U information internally for later");
-                m_timuInfo =
-                    Create<SatTimuInfo>(beamId, timuMsg->GetSatAddress(), timuMsg->GetGwAddress());
+                m_timuInfo = Create<SatTimuInfo>(beamId,
+                                                 satId,
+                                                 timuMsg->GetSatAddress(),
+                                                 timuMsg->GetGwAddress());
             }
         }
         else
@@ -1970,7 +1971,14 @@ SatUtMac::DoFrameStart()
     {
         NS_LOG_INFO("Applying TIM-U parameters received during the previous frame");
 
+        Ptr<SatBeamScheduler> srcScheduler = m_beamSchedulerCallback(m_satId, m_beamId);
+
         m_beamId = m_timuInfo->GetBeamId();
+        m_satId = m_timuInfo->GetSatId();
+
+        SatMac::SetBeamId(m_beamId);
+        SatMac::SetSatId(m_satId);
+
         Address satAddress = m_timuInfo->GetSatAddress();
         Mac48Address satAddress48 = Mac48Address::ConvertFrom(satAddress);
         if (satAddress48 != m_satelliteAddress)
@@ -1978,18 +1986,29 @@ SatUtMac::DoFrameStart()
             SetSatelliteAddress(satAddress48);
         }
 
-        Address gwAddress = m_timuInfo->GetGwAddress();
+        m_setGwAddressInUtCallback(m_nodeInfo->GetNodeId());
+        m_routingUpdateCallback(m_nodeInfo->GetMacAddress(), m_gwAddress);
+
+        // TODO put gw_address in TIMU instead of m_setGwAddressInUtCallback
+        /*Address gwAddress = m_timuInfo->GetGwAddress();
         Mac48Address gwAddress48 = Mac48Address::ConvertFrom(gwAddress);
         if (gwAddress48 != m_gwAddress)
         {
             SetGwAddress(gwAddress48);
             m_routingUpdateCallback(m_nodeInfo->GetMacAddress(), gwAddress);
-        }
-        m_handoverCallback(m_beamId);
+        }*/
+
+        m_handoverCallback(m_satId, m_beamId);
+
+        Ptr<SatBeamScheduler> dstScheduler = m_beamSchedulerCallback(m_satId, m_beamId);
+        srcScheduler->DisconnectUt(m_nodeInfo->GetMacAddress());
+        dstScheduler->ConnectUt(m_nodeInfo->GetMacAddress());
 
         SatIdMapper* satIdMapper = Singleton<SatIdMapper>::Get();
         satIdMapper->UpdateMacToBeamId(m_nodeInfo->GetMacAddress(), m_beamId);
         m_updateIslCallback();
+
+        m_utHandoverModule->HandoverFinished();
 
         m_tbtpContainer->Clear();
         m_handoverState = WAITING_FOR_TBTP;
@@ -2004,10 +2023,10 @@ SatUtMac::DoFrameStart()
             m_rcstState.SwitchToOffStandby();
         }
 
-        if (m_loggedOn && !m_beamCheckerCallback.IsNull())
+        if (m_loggedOn && m_utHandoverModule != nullptr)
         {
             NS_LOG_INFO("UT checking for beam handover recommendation");
-            if (m_beamCheckerCallback(m_satId, m_beamId))
+            if (m_utHandoverModule->CheckForHandoverRecommendation(m_satId, m_beamId))
             {
                 if (m_handoverState == NO_HANDOVER)
                 {
@@ -2025,7 +2044,7 @@ SatUtMac::DoFrameStart()
 
                     // TODO
 
-                    m_beamId = m_askedBeamCallback();
+                    m_beamId = m_utHandoverModule->GetAskedBeamId();
 
                     Address gwAddress = m_beamSchedulerCallback(m_satId, m_beamId)->GetGwAddress();
                     Mac48Address gwAddress48 = Mac48Address::ConvertFrom(gwAddress);
@@ -2035,7 +2054,7 @@ SatUtMac::DoFrameStart()
                         m_updateGwAddressCallback(gwAddress48);
                         m_routingUpdateCallback(m_nodeInfo->GetMacAddress(), gwAddress);
                     }
-                    m_handoverCallback(m_beamId);
+                    m_handoverCallback(m_satId, m_beamId);
 
                     m_tbtpContainer->Clear();
                     m_handoverState = NO_HANDOVER;
@@ -2099,8 +2118,12 @@ SatUtMac::GetRealSendingTime(Time t)
     return t - deltaTime;
 }
 
-SatUtMac::SatTimuInfo::SatTimuInfo(uint32_t beamId, Address satAddress, Address gwAddress)
+SatUtMac::SatTimuInfo::SatTimuInfo(uint32_t beamId,
+                                   uint32_t satId,
+                                   Address satAddress,
+                                   Address gwAddress)
     : m_beamId(beamId),
+      m_satId(satId),
       m_satAddress(satAddress),
       m_gwAddress(gwAddress)
 {
@@ -2112,6 +2135,13 @@ SatUtMac::SatTimuInfo::GetBeamId() const
 {
     NS_LOG_FUNCTION(this);
     return m_beamId;
+}
+
+uint32_t
+SatUtMac::SatTimuInfo::GetSatId() const
+{
+    NS_LOG_FUNCTION(this);
+    return m_satId;
 }
 
 Address

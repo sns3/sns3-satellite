@@ -135,13 +135,6 @@ class SatIdMapper : public Object
     void AttachMacToSatIdIsl(Mac48Address mac, uint32_t satId);
 
     /**
-     * \brief Attach UT node to associated GW MAC address
-     * \param ut UT node
-     * \param gwMac GW MAC address
-     */
-    void AttachUtNodeToGwAddress(Ptr<Node> ut, Mac48Address gwMac);
-
-    /**
      * \brief Remove GW/UT MAC address to the satellite this node is connected
      * \param mac MAC address
      */
@@ -254,12 +247,6 @@ class SatIdMapper : public Object
      *         invalid address if such device is not found.
      */
     Address GetUtUserMacWithNode(Ptr<Node> utUserNode) const;
-
-    /**
-     * \param UT node
-     * \return GW MAC address associated to this UT.
-     */
-    Address GetGwAddressWithUtNode(Ptr<Node> ut) const;
 
     /* PRINT RELATED METHODS */
 

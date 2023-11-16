@@ -820,6 +820,18 @@ class SatTimuMessage : public SatControlMessage
      */
     void SetAllocatedBeamId(uint32_t beamId);
 
+    /**
+     * \brief Get the allocated sat ID
+     * \return Allocated sat ID
+     */
+    uint32_t GetAllocatedSatId() const;
+
+    /**
+     * Set allocated sat ID
+     * \param satId Allocated sat ID
+     */
+    void SetAllocatedSatId(uint32_t beamId);
+
     Address GetSatAddress() const;
 
     void SetSatAddress(Address address);
@@ -839,6 +851,11 @@ class SatTimuMessage : public SatControlMessage
      * Allocated beam ID
      */
     uint32_t m_beamId;
+
+    /**
+     * Allocated sat ID
+     */
+    uint32_t m_satId;
 
     /**
      * Satellite mac address of the new gateway

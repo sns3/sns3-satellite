@@ -23,8 +23,10 @@
 #include "geo-coordinate.h"
 #include "satellite-mobility-model.h"
 
+#include <ns3/enum.h>
 #include <ns3/log.h>
 #include <ns3/simulator.h>
+#include <ns3/uinteger.h>
 
 NS_LOG_COMPONENT_DEFINE("SatUtHandoverModule");
 
@@ -43,9 +45,19 @@ SatUtHandoverModule::GetTypeId(void)
             .AddAttribute("Timeout",
                           "Amount of time to wait before sending a new handover recommendation if "
                           "no TIM-U is received",
-                          TimeValue(MilliSeconds(600)),
+                          TimeValue(MilliSeconds(1000)),
                           MakeTimeAccessor(&SatUtHandoverModule::m_repeatRequestTimeout),
                           MakeTimeChecker())
+            .AddAttribute("HandoverDecisionAlgorithm",
+                          "Algorithm to use for handovers",
+                          EnumValue(SatUtHandoverModule::SAT_N_CLOSEST_SAT),
+                          MakeEnumAccessor(&SatUtHandoverModule::m_handoverDecisionAlgorithm),
+                          MakeEnumChecker(SatUtHandoverModule::SAT_N_CLOSEST_SAT, "NClosestSats"))
+            .AddAttribute("NumberClosestSats",
+                          "Number of satellites to consider when using algorithm SAT_N_CLOSEST_SAT",
+                          UintegerValue(1),
+                          MakeUintegerAccessor(&SatUtHandoverModule::m_numberClosestSats),
+                          MakeUintegerChecker<uint32_t>())
             .AddTraceSource("AntennaGainTrace",
                             "Trace antenna gains when checking for beam compliance",
                             MakeTraceSourceAccessor(&SatUtHandoverModule::m_antennaGainTrace),
@@ -88,9 +100,14 @@ SatUtHandoverModule::SatUtHandoverModule()
 SatUtHandoverModule::SatUtHandoverModule(Ptr<Node> utNode,
                                          NodeContainer satellites,
                                          Ptr<SatAntennaGainPatternContainer> agpContainer)
-    : m_utNode(utNode),
+    : m_handoverDecisionAlgorithm(SAT_N_CLOSEST_SAT),
+      m_numberClosestSats(1),
+      m_utNode(utNode),
       m_satellites(satellites),
       m_antennaGainPatterns(agpContainer),
+      m_lastMessageSentAt(0),
+      m_repeatRequestTimeout(600),
+      m_hasPendingRequest(false),
       m_askedSatId(0),
       m_askedBeamId(0)
 {
@@ -116,6 +133,14 @@ SatUtHandoverModule::GetAskedBeamId()
     return m_askedBeamId;
 }
 
+void
+SatUtHandoverModule::HandoverFinished()
+{
+    NS_LOG_FUNCTION(this);
+
+    m_hasPendingRequest = false;
+}
+
 bool
 SatUtHandoverModule::CheckForHandoverRecommendation(uint32_t satId, uint32_t beamId)
 {
@@ -125,6 +150,12 @@ SatUtHandoverModule::CheckForHandoverRecommendation(uint32_t satId, uint32_t bea
     {
         // In case TIM-U was received successfuly, the last asked beam should
         // match the current beamId. So reset the timeout feature.
+        // m_hasPendingRequest = false;
+    }
+
+    Time now = Simulator::Now();
+    if (m_hasPendingRequest && (now - m_lastMessageSentAt > m_repeatRequestTimeout))
+    {
         m_hasPendingRequest = false;
     }
 
@@ -142,7 +173,7 @@ SatUtHandoverModule::CheckForHandoverRecommendation(uint32_t satId, uint32_t bea
     if (agp->IsValidPosition(coords, m_antennaGainTrace, mobility))
     {
         NS_LOG_FUNCTION("Current beam is good, do nothing");
-        m_hasPendingRequest = false;
+        // m_hasPendingRequest = false;
         return false;
     }
 
@@ -150,11 +181,19 @@ SatUtHandoverModule::CheckForHandoverRecommendation(uint32_t satId, uint32_t bea
     uint32_t bestSatId = m_askedSatId;
     uint32_t bestBeamId = m_askedBeamId;
 
-    Time now = Simulator::Now();
     if (!m_hasPendingRequest || now - m_lastMessageSentAt > m_repeatRequestTimeout)
     {
-        bestSatId = GetClosestSat();
-        bestBeamId = m_antennaGainPatterns->GetBestBeamId(bestSatId, coords, false);
+        switch (m_handoverDecisionAlgorithm)
+        {
+        case SAT_N_CLOSEST_SAT: {
+            std::pair<uint32_t, uint32_t> bestSatAndBeam = AlgorithmNClosest(coords);
+            bestSatId = bestSatAndBeam.first;
+            bestBeamId = bestSatAndBeam.second;
+            break;
+        }
+        default:
+            NS_FATAL_ERROR("Incorrect handover decision algorithm");
+        }
     }
 
     if ((bestSatId != satId || bestBeamId != beamId) &&
@@ -173,32 +212,71 @@ SatUtHandoverModule::CheckForHandoverRecommendation(uint32_t satId, uint32_t bea
     return false;
 }
 
-bool
-SatUtHandoverModule::GetClosestSat()
+std::vector<uint32_t>
+SatUtHandoverModule::GetNClosestSats(uint32_t numberOfSats)
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(this << numberOfSats);
+
+    std::map<double, uint32_t> satellites;
 
     Ptr<SatMobilityModel> utMobility = m_utNode->GetObject<SatMobilityModel>();
-    Ptr<SatMobilityModel> satMobility = m_satellites.Get(0)->GetObject<SatMobilityModel>();
-
-    uint32_t closestSatId = m_satellites.Get(0)->GetId();
-    double distanceClosest = utMobility->GetDistanceFrom(satMobility);
-
+    Ptr<SatMobilityModel> satMobility;
     double distance;
 
-    for (uint32_t i = 1; i < m_satellites.GetN(); i++)
+    for (uint32_t i = 0; i < m_satellites.GetN(); i++)
     {
         satMobility = m_satellites.Get(i)->GetObject<SatMobilityModel>();
-
         distance = utMobility->GetDistanceFrom(satMobility);
-        if (distance < distanceClosest)
+        satellites.emplace(distance, i);
+    }
+
+    std::vector<uint32_t> closest;
+    uint32_t i = 0;
+    for (auto&& [dist, satId] : satellites)
+    {
+        if (i++ < numberOfSats)
         {
-            distanceClosest = distance;
-            closestSatId = m_satellites.Get(i)->GetId();
+            closest.push_back(satId);
+        }
+        else
+        {
+            break;
         }
     }
 
-    return closestSatId;
+    return closest;
+}
+
+std::pair<uint32_t, uint32_t>
+SatUtHandoverModule::AlgorithmNClosest(GeoCoordinate coords)
+{
+    NS_LOG_FUNCTION(this);
+
+    std::vector<uint32_t> satellites = GetNClosestSats(m_numberClosestSats);
+
+    uint32_t bestSatId = satellites[0];
+    uint32_t bestBeamId = m_antennaGainPatterns->GetBestBeamId(bestSatId, coords, true);
+    double bestGain = m_antennaGainPatterns->GetBeamGain(bestSatId, bestBeamId, coords);
+
+    uint32_t beamId;
+    double gain;
+    for (uint32_t i = 1; i < satellites.size(); i++)
+    {
+        beamId = m_antennaGainPatterns->GetBestBeamId(satellites[i], coords, true);
+        gain = m_antennaGainPatterns->GetBeamGain(satellites[i], beamId, coords);
+
+        if (beamId != 0)
+        {
+            if (gain > bestGain)
+            {
+                bestGain = gain;
+                bestSatId = satellites[i];
+                bestBeamId = beamId;
+            }
+        }
+    }
+
+    return std::make_pair(bestSatId, bestBeamId);
 }
 
 } // namespace ns3
