@@ -66,7 +66,7 @@ main(int argc, char* argv[])
                                   47, 53, 54, 55, 56, 59, 60, 61, 66, 67, 68, 71, 72});
     simulationHelper->SetUserCountPerMobileUt(simulationConf->m_utMobileUserCount);
 
-    simulationHelper->LoadScenario("constellation-eutelsat-geo-2-sats-isls");
+    simulationHelper->LoadScenario("constellation-eutelsat-geo-2-sats-handovers");
 
     std::string mobileUtFolder = Singleton<SatEnvVariables>::Get()->LocateDataDirectory() +
                                  "/additional-input/utpositions/mobiles/scenario6";

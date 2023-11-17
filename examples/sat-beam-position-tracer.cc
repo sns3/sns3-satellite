@@ -57,6 +57,7 @@ main(int argc, char* argv[])
     cmd.Parse(argc, argv);
 
     simulationHelper->LoadScenario(scenario);
+    simulationHelper->SetUserCountPerUt(1);
 
     Ptr<SatHelper> satHelper = simulationHelper->CreateSatScenario(SatHelper::FULL);
     Ptr<SatAntennaGainPatternContainer> antennaGainPatterns = satHelper->GetAntennaGainPatterns();

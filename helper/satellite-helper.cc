@@ -971,7 +971,7 @@ SatHelper::SetGwAddressInSingleUt(uint32_t utId)
     NS_ASSERT_MSG(satUtMac != nullptr, "UT must have a SatUtMac for beam");
 
     std::vector<uint32_t> rtnConf = m_satConf->GetBeamConfiguration(utBeamId, SatEnums::LD_RETURN);
-    Ptr<Node> gw = m_beamHelper->GetGwNodes().Get(rtnConf[SatConf::GW_ID_INDEX] - 1);
+    Ptr<Node> gw = m_beamHelper->GetGwNode(rtnConf[SatConf::GW_ID_INDEX]);
     uint32_t gwSatId =
         GetClosestSat(GeoCoordinate(gw->GetObject<SatMobilityModel>()->GetPosition()));
 
