@@ -1157,7 +1157,12 @@ SatHelper::LoadMobileUtFromFile(uint32_t satId, const std::string& filename)
 void
 SatHelper::SetGwMobility(uint32_t satId, Ptr<Node> gw, uint32_t gwIndex)
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(this << satId << gw << gwIndex);
+
+    if (gw->GetObject<SatHandoverModule>() != nullptr)
+    {
+        return;
+    }
 
     NodeContainer gwNodes = NodeContainer(gw);
     MobilityHelper mobility;
@@ -1171,14 +1176,10 @@ SatHelper::SetGwMobility(uint32_t satId, Ptr<Node> gw, uint32_t gwIndex)
 
     InstallMobilityObserver(satId, gwNodes);
 
-    for (uint32_t i = 0; i < gwNodes.GetN(); ++i)
-    {
-        Ptr<Node> gwNode = gwNodes.Get(i);
-        Ptr<SatHandoverModule> ho =
-            CreateObject<SatHandoverModule>(gwNode, GeoSatNodes(), m_antennaGainPatterns);
-        NS_LOG_DEBUG("Created Handover Module " << ho << " for GW node " << gwNode);
-        gwNode->AggregateObject(ho);
-    }
+    Ptr<SatHandoverModule> ho =
+        CreateObject<SatHandoverModule>(gw, GeoSatNodes(), m_antennaGainPatterns);
+    NS_LOG_DEBUG("Created Handover Module " << ho << " for GW node " << gw);
+    gw->AggregateObject(ho);
 }
 
 void
