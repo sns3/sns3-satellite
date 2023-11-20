@@ -141,7 +141,7 @@ SatUtMac::SatUtMac()
       m_handoverMessagesCount(0),
       m_maxHandoverMessagesSent(20),
       m_firstTransmittableSuperframeId(0),
-      m_utHandoverModule(nullptr),
+      m_handoverModule(nullptr),
       m_handoverCallback(),
       m_gatewayUpdateCallback(),
       m_txCheckCallback(),
@@ -191,7 +191,7 @@ SatUtMac::SatUtMac(uint32_t satId,
       m_handoverMessagesCount(0),
       m_maxHandoverMessagesSent(20),
       m_firstTransmittableSuperframeId(0),
-      m_utHandoverModule(nullptr),
+      m_handoverModule(nullptr),
       m_handoverCallback(),
       m_gatewayUpdateCallback(),
       m_txCheckCallback(),
@@ -236,11 +236,11 @@ SatUtMac::DoDispose(void)
 }
 
 void
-SatUtMac::SetUtHandoverModule(Ptr<SatUtHandoverModule> utHandoverModule)
+SatUtMac::SetHandoverModule(Ptr<SatHandoverModule> handoverModule)
 {
-    NS_LOG_INFO(this << utHandoverModule);
+    NS_LOG_INFO(this << handoverModule);
 
-    m_utHandoverModule = utHandoverModule;
+    m_handoverModule = handoverModule;
 }
 
 void
@@ -2009,7 +2009,7 @@ SatUtMac::DoFrameStart()
         satIdMapper->UpdateMacToBeamId(m_nodeInfo->GetMacAddress(), m_beamId);
         m_updateIslCallback();
 
-        m_utHandoverModule->HandoverFinished();
+        m_handoverModule->HandoverFinished();
 
         m_tbtpContainer->Clear();
         m_handoverState = WAITING_FOR_TBTP;
@@ -2024,10 +2024,10 @@ SatUtMac::DoFrameStart()
             m_rcstState.SwitchToOffStandby();
         }
 
-        if (m_loggedOn && m_utHandoverModule != nullptr)
+        if (m_loggedOn && m_handoverModule != nullptr)
         {
             NS_LOG_INFO("UT checking for beam handover recommendation");
-            if (m_utHandoverModule->CheckForHandoverRecommendation(m_satId, m_beamId))
+            if (m_handoverModule->CheckForHandoverRecommendation(m_satId, m_beamId))
             {
                 if (m_handoverState == NO_HANDOVER)
                 {
@@ -2043,7 +2043,7 @@ SatUtMac::DoFrameStart()
                     m_handoverMessagesCount = 0;
                     LogOff();
 
-                    m_beamId = m_utHandoverModule->GetAskedBeamId();
+                    m_beamId = m_handoverModule->GetAskedBeamId();
 
                     Address gwAddress = m_beamSchedulerCallback(m_satId, m_beamId)->GetGwAddress();
                     Mac48Address gwAddress48 = Mac48Address::ConvertFrom(gwAddress);

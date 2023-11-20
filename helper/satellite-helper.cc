@@ -35,6 +35,7 @@
 #include <ns3/names.h>
 #include <ns3/queue.h>
 #include <ns3/satellite-env-variables.h>
+#include <ns3/satellite-handover-module.h>
 #include <ns3/satellite-id-mapper.h>
 #include <ns3/satellite-log.h>
 #include <ns3/satellite-lora-conf.h>
@@ -45,7 +46,6 @@
 #include <ns3/satellite-sgp4-mobility-model.h>
 #include <ns3/satellite-traced-mobility-model.h>
 #include <ns3/satellite-typedefs.h>
-#include <ns3/satellite-ut-handover-module.h>
 #include <ns3/singleton.h>
 #include <ns3/string.h>
 #include <ns3/system-path.h>
@@ -791,12 +791,12 @@ SatHelper::DoCreateScenario(BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
             {
                 for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); it++)
                 {
-                    if ((*it)->GetObject<SatUtHandoverModule>() == nullptr)
+                    if ((*it)->GetObject<SatHandoverModule>() == nullptr)
                     {
                         (*it)->AggregateObject(
-                            CreateObject<SatUtHandoverModule>(*it,
-                                                              GeoSatNodes(),
-                                                              m_antennaGainPatterns));
+                            CreateObject<SatHandoverModule>(*it,
+                                                            GeoSatNodes(),
+                                                            m_antennaGainPatterns));
                     }
                 }
             }
@@ -1128,7 +1128,7 @@ SatHelper::LoadMobileUtFromFile(const std::string& filename)
     Ptr<Node> utNode = CreateObject<Node>();
     utNode->AggregateObject(mobility);
     utNode->AggregateObject(
-        CreateObject<SatUtHandoverModule>(utNode, GeoSatNodes(), m_antennaGainPatterns));
+        CreateObject<SatHandoverModule>(utNode, GeoSatNodes(), m_antennaGainPatterns));
     return utNode;
 }
 
@@ -1150,7 +1150,7 @@ SatHelper::LoadMobileUtFromFile(uint32_t satId, const std::string& filename)
     Ptr<Node> utNode = CreateObject<Node>();
     utNode->AggregateObject(mobility);
     utNode->AggregateObject(
-        CreateObject<SatUtHandoverModule>(utNode, GeoSatNodes(), m_antennaGainPatterns));
+        CreateObject<SatHandoverModule>(utNode, GeoSatNodes(), m_antennaGainPatterns));
     return utNode;
 }
 
@@ -1170,6 +1170,15 @@ SatHelper::SetGwMobility(uint32_t satId, Ptr<Node> gw, uint32_t gwIndex)
     mobility.Install(gwNodes);
 
     InstallMobilityObserver(satId, gwNodes);
+
+    for (uint32_t i = 0; i < gwNodes.GetN(); ++i)
+    {
+        Ptr<Node> gwNode = gwNodes.Get(i);
+        Ptr<SatHandoverModule> ho =
+            CreateObject<SatHandoverModule>(gwNode, GeoSatNodes(), m_antennaGainPatterns);
+        NS_LOG_DEBUG("Created Handover Module " << ho << " for GW node " << gwNode);
+        gwNode->AggregateObject(ho);
+    }
 }
 
 void

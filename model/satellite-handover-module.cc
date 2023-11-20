@@ -18,7 +18,7 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
-#include "satellite-ut-handover-module.h"
+#include "satellite-handover-module.h"
 
 #include "geo-coordinate.h"
 #include "satellite-mobility-model.h"
@@ -28,45 +28,45 @@
 #include <ns3/simulator.h>
 #include <ns3/uinteger.h>
 
-NS_LOG_COMPONENT_DEFINE("SatUtHandoverModule");
+NS_LOG_COMPONENT_DEFINE("SatHandoverModule");
 
 namespace ns3
 {
 
-NS_OBJECT_ENSURE_REGISTERED(SatUtHandoverModule);
+NS_OBJECT_ENSURE_REGISTERED(SatHandoverModule);
 
 TypeId
-SatUtHandoverModule::GetTypeId(void)
+SatHandoverModule::GetTypeId(void)
 {
     static TypeId tid =
-        TypeId("ns3::SatUtHandoverModule")
+        TypeId("ns3::SatHandoverModule")
             .SetParent<Object>()
-            .AddConstructor<SatUtHandoverModule>()
+            .AddConstructor<SatHandoverModule>()
             .AddAttribute("Timeout",
                           "Amount of time to wait before sending a new handover recommendation if "
                           "no TIM-U is received",
                           TimeValue(MilliSeconds(1000)),
-                          MakeTimeAccessor(&SatUtHandoverModule::m_repeatRequestTimeout),
+                          MakeTimeAccessor(&SatHandoverModule::m_repeatRequestTimeout),
                           MakeTimeChecker())
             .AddAttribute("HandoverDecisionAlgorithm",
                           "Algorithm to use for handovers",
-                          EnumValue(SatUtHandoverModule::SAT_N_CLOSEST_SAT),
-                          MakeEnumAccessor(&SatUtHandoverModule::m_handoverDecisionAlgorithm),
-                          MakeEnumChecker(SatUtHandoverModule::SAT_N_CLOSEST_SAT, "NClosestSats"))
+                          EnumValue(SatHandoverModule::SAT_N_CLOSEST_SAT),
+                          MakeEnumAccessor(&SatHandoverModule::m_handoverDecisionAlgorithm),
+                          MakeEnumChecker(SatHandoverModule::SAT_N_CLOSEST_SAT, "NClosestSats"))
             .AddAttribute("NumberClosestSats",
                           "Number of satellites to consider when using algorithm SAT_N_CLOSEST_SAT",
                           UintegerValue(1),
-                          MakeUintegerAccessor(&SatUtHandoverModule::m_numberClosestSats),
+                          MakeUintegerAccessor(&SatHandoverModule::m_numberClosestSats),
                           MakeUintegerChecker<uint32_t>())
             .AddTraceSource("AntennaGainTrace",
                             "Trace antenna gains when checking for beam compliance",
-                            MakeTraceSourceAccessor(&SatUtHandoverModule::m_antennaGainTrace),
+                            MakeTraceSourceAccessor(&SatHandoverModule::m_antennaGainTrace),
                             "ns3::SatAntennaGainPattern::AntennaGainTrace");
     return tid;
 }
 
 TypeId
-SatUtHandoverModule::GetInstanceTypeId(void) const
+SatHandoverModule::GetInstanceTypeId(void) const
 {
     NS_LOG_FUNCTION(this);
 
@@ -74,7 +74,7 @@ SatUtHandoverModule::GetInstanceTypeId(void) const
 }
 
 void
-SatUtHandoverModule::DoDispose()
+SatHandoverModule::DoDispose()
 {
     NS_LOG_FUNCTION(this);
 
@@ -84,7 +84,7 @@ SatUtHandoverModule::DoDispose()
     Object::DoDispose();
 }
 
-SatUtHandoverModule::SatUtHandoverModule()
+SatHandoverModule::SatHandoverModule()
     : m_antennaGainPatterns(NULL),
       m_lastMessageSentAt(0),
       m_repeatRequestTimeout(600),
@@ -94,12 +94,12 @@ SatUtHandoverModule::SatUtHandoverModule()
 {
     NS_LOG_FUNCTION(this);
 
-    NS_FATAL_ERROR("SatUtHandoverModule default constructor should not be used!");
+    NS_FATAL_ERROR("SatHandoverModule default constructor should not be used!");
 }
 
-SatUtHandoverModule::SatUtHandoverModule(Ptr<Node> utNode,
-                                         NodeContainer satellites,
-                                         Ptr<SatAntennaGainPatternContainer> agpContainer)
+SatHandoverModule::SatHandoverModule(Ptr<Node> utNode,
+                                     NodeContainer satellites,
+                                     Ptr<SatAntennaGainPatternContainer> agpContainer)
     : m_handoverDecisionAlgorithm(SAT_N_CLOSEST_SAT),
       m_numberClosestSats(1),
       m_utNode(utNode),
@@ -114,13 +114,13 @@ SatUtHandoverModule::SatUtHandoverModule(Ptr<Node> utNode,
     NS_LOG_FUNCTION(this << agpContainer);
 }
 
-SatUtHandoverModule::~SatUtHandoverModule()
+SatHandoverModule::~SatHandoverModule()
 {
     NS_LOG_FUNCTION(this);
 }
 
 void
-SatUtHandoverModule::SetHandoverRequestCallback(HandoverRequestCallback cb)
+SatHandoverModule::SetHandoverRequestCallback(HandoverRequestCallback cb)
 {
     NS_LOG_FUNCTION(this << &cb);
 
@@ -128,13 +128,13 @@ SatUtHandoverModule::SetHandoverRequestCallback(HandoverRequestCallback cb)
 }
 
 uint32_t
-SatUtHandoverModule::GetAskedBeamId()
+SatHandoverModule::GetAskedBeamId()
 {
     return m_askedBeamId;
 }
 
 void
-SatUtHandoverModule::HandoverFinished()
+SatHandoverModule::HandoverFinished()
 {
     NS_LOG_FUNCTION(this);
 
@@ -142,7 +142,7 @@ SatUtHandoverModule::HandoverFinished()
 }
 
 bool
-SatUtHandoverModule::CheckForHandoverRecommendation(uint32_t satId, uint32_t beamId)
+SatHandoverModule::CheckForHandoverRecommendation(uint32_t satId, uint32_t beamId)
 {
     NS_LOG_FUNCTION(this << satId << beamId);
 
@@ -213,7 +213,7 @@ SatUtHandoverModule::CheckForHandoverRecommendation(uint32_t satId, uint32_t bea
 }
 
 std::vector<uint32_t>
-SatUtHandoverModule::GetNClosestSats(uint32_t numberOfSats)
+SatHandoverModule::GetNClosestSats(uint32_t numberOfSats)
 {
     NS_LOG_FUNCTION(this << numberOfSats);
 
@@ -248,7 +248,7 @@ SatUtHandoverModule::GetNClosestSats(uint32_t numberOfSats)
 }
 
 std::pair<uint32_t, uint32_t>
-SatUtHandoverModule::AlgorithmNClosest(GeoCoordinate coords)
+SatHandoverModule::AlgorithmNClosest(GeoCoordinate coords)
 {
     NS_LOG_FUNCTION(this);
 

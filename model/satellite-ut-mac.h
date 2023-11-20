@@ -25,12 +25,12 @@
 
 #include "satellite-beam-scheduler.h"
 #include "satellite-enums.h"
+#include "satellite-handover-module.h"
 #include "satellite-mac.h"
 #include "satellite-phy.h"
 #include "satellite-queue.h"
 #include "satellite-random-access-container.h"
 #include "satellite-signal-parameters.h"
-#include "satellite-ut-handover-module.h"
 #include "satellite-ut-mac-state.h"
 #include "satellite-ut-scheduler.h"
 
@@ -140,9 +140,9 @@ class SatUtMac : public SatMac
     /**
      * \brief Set the UT handover module
      *
-     * \param utHandoverModule The UT handover module
+     * \param handoverModule The UT handover module
      */
-    void SetUtHandoverModule(Ptr<SatUtHandoverModule> utHandoverModule);
+    void SetHandoverModule(Ptr<SatHandoverModule> handoverModule);
 
     /**
      * \return Timing advance as Time object.
@@ -807,7 +807,7 @@ class SatUtMac : public SatMac
     /**
      * Module used to perform handovers
      */
-    Ptr<SatUtHandoverModule> m_utHandoverModule;
+    Ptr<SatHandoverModule> m_handoverModule;
 
     /**
      * The physical layer handover callback

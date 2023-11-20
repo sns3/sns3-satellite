@@ -85,6 +85,7 @@ set(source_files
     model/satellite-gw-llc.cc
     model/satellite-gw-mac.cc
     model/satellite-gw-phy.cc
+    model/satellite-handover-module.cc
     model/satellite-id-mapper.cc
     model/satellite-interference.cc
     model/satellite-interference-elimination.cc
@@ -166,7 +167,6 @@ set(source_files
     model/satellite-traced-interference.cc
     model/satellite-traced-mobility-model.cc
     model/satellite-uplink-info-tag.cc
-    model/satellite-ut-handover-module.cc
     model/satellite-ut-llc.cc
     model/satellite-ut-mac.cc
     model/satellite-ut-mac-state.cc
@@ -330,6 +330,7 @@ set(header_files
     model/satellite-gw-llc.h
     model/satellite-gw-mac.h
     model/satellite-gw-phy.h
+    model/satellite-handover-module.h
     model/satellite-id-mapper.h
     model/satellite-interference-elimination.h
     model/satellite-interference.h
@@ -412,7 +413,6 @@ set(header_files
     model/satellite-traced-mobility-model.h
     model/satellite-typedefs.h
     model/satellite-uplink-info-tag.h
-    model/satellite-ut-handover-module.h
     model/satellite-utils.h
     model/satellite-ut-llc.h
     model/satellite-ut-mac.h

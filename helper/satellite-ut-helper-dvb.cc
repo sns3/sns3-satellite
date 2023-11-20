@@ -32,6 +32,7 @@
 #include <ns3/satellite-generic-stream-encapsulator-arq.h>
 #include <ns3/satellite-generic-stream-encapsulator.h>
 #include <ns3/satellite-gw-llc.h>
+#include <ns3/satellite-handover-module.h>
 #include <ns3/satellite-id-mapper.h>
 #include <ns3/satellite-mobility-observer.h>
 #include <ns3/satellite-net-device.h>
@@ -45,7 +46,6 @@
 #include <ns3/satellite-return-link-encapsulator-arq.h>
 #include <ns3/satellite-return-link-encapsulator.h>
 #include <ns3/satellite-typedefs.h>
-#include <ns3/satellite-ut-handover-module.h>
 #include <ns3/satellite-ut-llc.h>
 #include <ns3/satellite-ut-mac.h>
 #include <ns3/satellite-ut-phy.h>
@@ -412,12 +412,12 @@ SatUtHelperDvb::Install(Ptr<Node> n,
         NS_FATAL_ERROR("Cannot simulate logon without a RA frame");
     }
 
-    Ptr<SatUtHandoverModule> utHandoverModule = n->GetObject<SatUtHandoverModule>();
-    if (utHandoverModule != NULL)
+    Ptr<SatHandoverModule> handoverModule = n->GetObject<SatHandoverModule>();
+    if (handoverModule != NULL)
     {
-        utHandoverModule->SetHandoverRequestCallback(
+        handoverModule->SetHandoverRequestCallback(
             MakeCallback(&SatRequestManager::SendHandoverRecommendation, rm));
-        mac->SetUtHandoverModule(utHandoverModule);
+        mac->SetHandoverModule(handoverModule);
         mac->SetBeamSchedulerCallback(MakeCallback(&SatNcc::GetBeamScheduler, ncc));
         mac->SetUpdateGwAddressCallback(MakeCallback(&SatRequestManager::SetGwAddress, rm));
     }

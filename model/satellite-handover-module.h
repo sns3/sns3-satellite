@@ -18,8 +18,8 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
-#ifndef SATELLITE_UT_HANDOVER_MODULE_H
-#define SATELLITE_UT_HANDOVER_MODULE_H
+#ifndef SATELLITE_HANDOVER_MODULE_H
+#define SATELLITE_HANDOVER_MODULE_H
 
 #include "satellite-antenna-gain-pattern-container.h"
 
@@ -37,7 +37,7 @@ namespace ns3
  * \ingroup satellite
  * \brief UT handover module
  */
-class SatUtHandoverModule : public Object
+class SatHandoverModule : public Object
 {
   public:
     typedef enum
@@ -69,28 +69,28 @@ class SatUtHandoverModule : public Object
     /**
      * Default constructor, which is not used.
      */
-    SatUtHandoverModule();
+    SatHandoverModule();
 
     /**
-     * Construct a SatUtHandoverModule
+     * Construct a SatHandoverModule
      * \param node The UT node linked to this module
      * \param satellites The list of satellites used in the scenario
      * \param agpContainer the antenna gain patterns of the simulation
      */
-    SatUtHandoverModule(Ptr<Node> utNode,
-                        NodeContainer satellites,
-                        Ptr<SatAntennaGainPatternContainer> agpContainer);
+    SatHandoverModule(Ptr<Node> utNode,
+                      NodeContainer satellites,
+                      Ptr<SatAntennaGainPatternContainer> agpContainer);
 
     /**
-     * Destroy a SatUtHandoverModule
+     * Destroy a SatHandoverModule
      */
-    ~SatUtHandoverModule();
+    ~SatHandoverModule();
 
     /**
      * \brief Set the handover recommendation message sending callback.
      * \param cb callback to send handover recommendation messages
      */
-    void SetHandoverRequestCallback(SatUtHandoverModule::HandoverRequestCallback cb);
+    void SetHandoverRequestCallback(SatHandoverModule::HandoverRequestCallback cb);
 
     /**
      * \brief Get the best beam ID
@@ -156,4 +156,4 @@ class SatUtHandoverModule : public Object
 
 } // namespace ns3
 
-#endif /* SATELLITE_UT_HANDOVER_MODULE_H */
+#endif /* SATELLITE_HANDOVER_MODULE_H */
