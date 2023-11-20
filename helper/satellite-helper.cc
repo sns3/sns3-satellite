@@ -919,7 +919,7 @@ SatHelper::SetGwAddressInUts()
     for (uint32_t i = 0; i < m_beamHelper->GetUtNodes().GetN(); i++)
     {
         Ptr<Node> ut = m_beamHelper->GetUtNodes().Get(i);
-        SetGwAddressInSingleUt(ut->GetId());
+        Mac48Address gwAddress = GetGwAddressInSingleUt(ut->GetId());
 
         Ptr<SatUtMac> satUtMac;
         for (uint32_t ndId = 0; ndId < ut->GetNDevices(); ndId++)
@@ -928,16 +928,18 @@ SatHelper::SetGwAddressInUts()
             if (utNd)
             {
                 satUtMac = DynamicCast<SatUtMac>(utNd->GetMac());
+                break;
             }
         }
 
-        satUtMac->SetSetGwAddressInUtCallback(
-            MakeCallback(&SatHelper::SetGwAddressInSingleUt, this));
+        satUtMac->SetGwAddress(gwAddress);
+        satUtMac->SetGetGwAddressInUtCallback(
+            MakeCallback(&SatHelper::GetGwAddressInSingleUt, this));
     }
 }
 
-void
-SatHelper::SetGwAddressInSingleUt(uint32_t utId)
+Mac48Address
+SatHelper::GetGwAddressInSingleUt(uint32_t utId)
 {
     NS_LOG_FUNCTION(this << utId);
 
@@ -1010,7 +1012,7 @@ SatHelper::SetGwAddressInSingleUt(uint32_t utId)
                   "GW must have exactly one SatNetDevice for beam "
                       << usedBeamId << " and satellite " << gwSatId);
 
-    satUtMac->SetGwAddress(gwAddress);
+    return gwAddress;
 }
 
 void

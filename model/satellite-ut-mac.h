@@ -225,15 +225,15 @@ class SatUtMac : public SatMac
     void SetBeamSchedulerCallback(SatUtMac::BeamSchedulerCallback cb);
 
     /**
-     * Callback to set the GW address in this UT MAC
+     * Callback to get the GW address in this UT MAC
      */
-    typedef Callback<void, uint32_t> SetGwAddressInUtCallback;
+    typedef Callback<Mac48Address, uint32_t> GetGwAddressInUtCallback;
 
     /**
      * \brief Set GW address in UT MAC callback
-     * \param cb Callback to set the GW address in this UT MAC
+     * \param cb Callback to get the GW address in this UT MAC
      */
-    void SetSetGwAddressInUtCallback(SatUtMac::SetGwAddressInUtCallback cb);
+    void SetGetGwAddressInUtCallback(SatUtMac::GetGwAddressInUtCallback cb);
 
     /**
      * Get Tx time for the next possible superframe.
@@ -845,9 +845,9 @@ class SatUtMac : public SatMac
     SatUtMac::BeamSchedulerCallback m_beamSchedulerCallback;
 
     /**
-     * Callback to set the GW address in this UT MAC
+     * Callback to get the GW address in this UT MAC
      */
-    SatUtMac::SetGwAddressInUtCallback m_setGwAddressInUtCallback;
+    SatUtMac::GetGwAddressInUtCallback m_getGwAddressInUtCallback;
 };
 
 } // namespace ns3

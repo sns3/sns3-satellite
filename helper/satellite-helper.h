@@ -158,8 +158,9 @@ class SatHelper : public Object
      * handovers
      *
      * \param utId ID of UT to
+     * \return MAC address of GW
      */
-    void SetGwAddressInSingleUt(uint32_t utId);
+    Mac48Address GetGwAddressInSingleUt(uint32_t utId);
 
     /**
      * Populate the routes, when using constellations.

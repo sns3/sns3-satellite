@@ -298,11 +298,11 @@ SatUtMac::SetBeamSchedulerCallback(SatUtMac::BeamSchedulerCallback cb)
 }
 
 void
-SatUtMac::SetSetGwAddressInUtCallback(SatUtMac::SetGwAddressInUtCallback cb)
+SatUtMac::SetGetGwAddressInUtCallback(SatUtMac::GetGwAddressInUtCallback cb)
 {
     NS_LOG_FUNCTION(this << &cb);
 
-    m_setGwAddressInUtCallback = cb;
+    m_getGwAddressInUtCallback = cb;
 }
 
 void
@@ -1986,10 +1986,11 @@ SatUtMac::DoFrameStart()
             SetSatelliteAddress(satAddress48);
         }
 
-        m_setGwAddressInUtCallback(m_nodeInfo->GetNodeId());
+        Mac48Address gwAddress = m_getGwAddressInUtCallback(m_nodeInfo->GetNodeId());
+        SetGwAddress(gwAddress);
         m_routingUpdateCallback(m_nodeInfo->GetMacAddress(), m_gwAddress);
 
-        // TODO put gw_address in TIMU instead of m_setGwAddressInUtCallback
+        // TODO put gw_address in TIMU instead of m_getGwAddressInUtCallback
         /*Address gwAddress = m_timuInfo->GetGwAddress();
         Mac48Address gwAddress48 = Mac48Address::ConvertFrom(gwAddress);
         if (gwAddress48 != m_gwAddress)
@@ -2041,8 +2042,6 @@ SatUtMac::DoFrameStart()
                 {
                     m_handoverMessagesCount = 0;
                     LogOff();
-
-                    // TODO
 
                     m_beamId = m_utHandoverModule->GetAskedBeamId();
 
