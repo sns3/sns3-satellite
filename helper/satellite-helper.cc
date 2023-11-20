@@ -787,6 +787,20 @@ SatHelper::DoCreateScenario(BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
 
             SetGwMobility(satId, gwNode, rtnConf[SatConf::GW_ID_INDEX]);
 
+            if (m_satConstellationEnabled)
+            {
+                for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); it++)
+                {
+                    if ((*it)->GetObject<SatUtHandoverModule>() == nullptr)
+                    {
+                        (*it)->AggregateObject(
+                            CreateObject<SatUtHandoverModule>(*it,
+                                                              GeoSatNodes(),
+                                                              m_antennaGainPatterns));
+                    }
+                }
+            }
+
             std::pair<Ptr<NetDevice>, NetDeviceContainer> netDevices =
                 m_beamHelper->Install(uts,
                                       gwNode,
