@@ -121,6 +121,11 @@ SatHelper::GetTypeId(void)
                           Ipv4MaskValue("255.255.0.0"),
                           MakeIpv4MaskAccessor(&SatHelper::m_utNetworkMask),
                           MakeIpv4MaskChecker())
+            .AddAttribute("HandoversEnabled",
+                          "Enable handovers for all UTs and GWs. If false, only moving UTs can perform handovers.",
+                          BooleanValue(false),
+                          MakeBooleanAccessor(&SatHelper::m_handoversEnabled),
+                          MakeBooleanChecker())
             .AddAttribute("PacketTraceEnabled",
                           "Packet tracing enable status.",
                           BooleanValue(false),
@@ -174,6 +179,7 @@ SatHelper::SatHelper()
 
 SatHelper::SatHelper(std::string scenarioPath)
     : m_satConstellationEnabled(false),
+      m_handoversEnabled(false),
       m_scenarioCreated(false),
       m_creationTraces(false),
       m_detailedCreationTraces(false),
@@ -787,17 +793,14 @@ SatHelper::DoCreateScenario(BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
 
             SetGwMobility(satId, gwNode, rtnConf[SatConf::GW_ID_INDEX]);
 
-            if (m_satConstellationEnabled)
+            if (m_handoversEnabled)
             {
                 for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); it++)
                 {
-                    if ((*it)->GetObject<SatHandoverModule>() == nullptr)
-                    {
-                        (*it)->AggregateObject(
-                            CreateObject<SatHandoverModule>(*it,
-                                                            GeoSatNodes(),
-                                                            m_antennaGainPatterns));
-                    }
+                    (*it)->AggregateObject(
+                        CreateObject<SatHandoverModule>(*it,
+                                                        GeoSatNodes(),
+                                                        m_antennaGainPatterns));
                 }
             }
 
@@ -1127,8 +1130,11 @@ SatHelper::LoadMobileUtFromFile(const std::string& filename)
 
     Ptr<Node> utNode = CreateObject<Node>();
     utNode->AggregateObject(mobility);
-    utNode->AggregateObject(
-        CreateObject<SatHandoverModule>(utNode, GeoSatNodes(), m_antennaGainPatterns));
+    if(!m_handoversEnabled)
+    {
+        utNode->AggregateObject(
+            CreateObject<SatHandoverModule>(utNode, GeoSatNodes(), m_antennaGainPatterns));
+    }
     return utNode;
 }
 
@@ -1149,8 +1155,11 @@ SatHelper::LoadMobileUtFromFile(uint32_t satId, const std::string& filename)
 
     Ptr<Node> utNode = CreateObject<Node>();
     utNode->AggregateObject(mobility);
-    utNode->AggregateObject(
-        CreateObject<SatHandoverModule>(utNode, GeoSatNodes(), m_antennaGainPatterns));
+    if(!m_handoversEnabled)
+    {
+        utNode->AggregateObject(
+            CreateObject<SatHandoverModule>(utNode, GeoSatNodes(), m_antennaGainPatterns));
+    }
     return utNode;
 }
 
@@ -1159,6 +1168,7 @@ SatHelper::SetGwMobility(uint32_t satId, Ptr<Node> gw, uint32_t gwIndex)
 {
     NS_LOG_FUNCTION(this << satId << gw << gwIndex);
 
+    // TODO call once this method per GW
     if (gw->GetObject<SatHandoverModule>() != nullptr)
     {
         return;

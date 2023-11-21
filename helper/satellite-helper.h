@@ -420,6 +420,11 @@ class SatHelper : public Object
     Ipv4Mask m_utNetworkMask;   ///< Network mask number of UT and UT users.
 
     /**
+     * Enable handovers for all UTs and GWs. If false, only moving UTs can perform handovers.
+     */
+    bool m_handoversEnabled;
+
+    /**
      * flag to check if scenario is already created.
      */
     bool m_scenarioCreated;
