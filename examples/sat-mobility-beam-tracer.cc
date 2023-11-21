@@ -65,8 +65,8 @@ main(int argc, char* argv[])
         Singleton<SatEnvVariables>::Get()->LocateDirectory("contrib/satellite/examples") +
         "/generic-input-attributes.xml";
     std::string mobileUtTraceFile = "";
-    mobileUtTraceFile = Singleton<SatEnvVariables>::Get()->LocateDataDirectory() +
-                        "/additional-input/utpositions/mobiles/scenario6/trajectory";
+    // mobileUtTraceFile = Singleton<SatEnvVariables>::Get()->LocateDataDirectory() +
+    //                     "/additional-input/utpositions/mobiles/scenario6/trajectory";
 
     Config::SetDefault("ns3::SatConf::ForwardLinkRegenerationMode",
                        EnumValue(SatEnums::REGENERATION_NETWORK));
