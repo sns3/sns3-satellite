@@ -41,6 +41,7 @@ SatCourseChange(std::string context, Ptr<const SatMobilityModel> position)
 
     uint32_t sat = tracedPosition->GetSatId();
     uint32_t beam = tracedPosition->GetBestBeamId(true);
+
     visitedBeams.insert(std::make_pair(sat, beam));
     relativeSpeeds[sat].push_back(tracedPosition->GetRelativeSpeed(satMobility));
 }
@@ -64,8 +65,8 @@ main(int argc, char* argv[])
         Singleton<SatEnvVariables>::Get()->LocateDirectory("contrib/satellite/examples") +
         "/generic-input-attributes.xml";
     std::string mobileUtTraceFile = "";
-    // mobileUtTrace = Singleton<SatEnvVariables>::Get()->LocateDataDirectory() +
-    //                "/additional-input/utpositions/mobiles/scenario6/trajectory";
+    mobileUtTraceFile = Singleton<SatEnvVariables>::Get()->LocateDataDirectory() +
+                        "/additional-input/utpositions/mobiles/scenario6/trajectory";
 
     Config::SetDefault("ns3::SatConf::ForwardLinkRegenerationMode",
                        EnumValue(SatEnums::REGENERATION_NETWORK));

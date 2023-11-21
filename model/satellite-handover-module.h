@@ -93,6 +93,12 @@ class SatHandoverModule : public Object
     void SetHandoverRequestCallback(SatHandoverModule::HandoverRequestCallback cb);
 
     /**
+     * \brief Get the best sat ID
+     * \return The best sat ID
+     */
+    uint32_t GetAskedSatId();
+
+    /**
      * \brief Get the best beam ID
      * \return The best beam ID
      */

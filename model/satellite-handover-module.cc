@@ -128,6 +128,12 @@ SatHandoverModule::SetHandoverRequestCallback(HandoverRequestCallback cb)
 }
 
 uint32_t
+SatHandoverModule::GetAskedSatId()
+{
+    return m_askedSatId;
+}
+
+uint32_t
 SatHandoverModule::GetAskedBeamId()
 {
     return m_askedBeamId;

@@ -41,7 +41,7 @@ NS_LOG_COMPONENT_DEFINE("sat-beam-position-tracer");
 int
 main(int argc, char* argv[])
 {
-    std::string scenario = "constellation-eutelsat-geo-2-sats-no-isls";
+    std::string scenario = "constellation-leo-2-satellites";
 
     Config::SetDefault("ns3::SatConf::ForwardLinkRegenerationMode",
                        EnumValue(SatEnums::REGENERATION_NETWORK));

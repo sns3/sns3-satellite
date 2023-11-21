@@ -122,7 +122,8 @@ SatHelper::GetTypeId(void)
                           MakeIpv4MaskAccessor(&SatHelper::m_utNetworkMask),
                           MakeIpv4MaskChecker())
             .AddAttribute("HandoversEnabled",
-                          "Enable handovers for all UTs and GWs. If false, only moving UTs can perform handovers.",
+                          "Enable handovers for all UTs and GWs. If false, only moving UTs can "
+                          "perform handovers.",
                           BooleanValue(false),
                           MakeBooleanAccessor(&SatHelper::m_handoversEnabled),
                           MakeBooleanChecker())
@@ -677,7 +678,13 @@ SatHelper::LoadConstellationScenario(BeamUserInfoMap_t& info,
 
         uint32_t satId = m_beamHelper->GetClosestSat(position);
 
-        uint32_t bestBeamId = m_antennaGainPatterns->GetBestBeamId(satId, position, false);
+        uint32_t bestBeamId = m_antennaGainPatterns->GetBestBeamId(satId, position, true);
+
+        if (bestBeamId == 0)
+        {
+            NS_LOG_WARN("UT at " << position << " is too far away from any beam");
+            continue;
+        }
 
         std::vector<std::pair<GeoCoordinate, uint32_t>> positions =
             info.at(std::pair(satId, bestBeamId)).GetPositions();
@@ -798,9 +805,7 @@ SatHelper::DoCreateScenario(BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
                 for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); it++)
                 {
                     (*it)->AggregateObject(
-                        CreateObject<SatHandoverModule>(*it,
-                                                        GeoSatNodes(),
-                                                        m_antennaGainPatterns));
+                        CreateObject<SatHandoverModule>(*it, GeoSatNodes(), m_antennaGainPatterns));
                 }
             }
 
@@ -1130,7 +1135,7 @@ SatHelper::LoadMobileUtFromFile(const std::string& filename)
 
     Ptr<Node> utNode = CreateObject<Node>();
     utNode->AggregateObject(mobility);
-    if(!m_handoversEnabled)
+    if (!m_handoversEnabled)
     {
         utNode->AggregateObject(
             CreateObject<SatHandoverModule>(utNode, GeoSatNodes(), m_antennaGainPatterns));
@@ -1155,7 +1160,7 @@ SatHelper::LoadMobileUtFromFile(uint32_t satId, const std::string& filename)
 
     Ptr<Node> utNode = CreateObject<Node>();
     utNode->AggregateObject(mobility);
-    if(!m_handoversEnabled)
+    if (!m_handoversEnabled)
     {
         utNode->AggregateObject(
             CreateObject<SatHandoverModule>(utNode, GeoSatNodes(), m_antennaGainPatterns));
