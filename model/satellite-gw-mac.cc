@@ -450,10 +450,13 @@ SatGwMac::StartNcrTransmission()
 
     SendNcrMessage();
 
-    m_handoverModule->CheckForHandoverRecommendation(m_satId, m_beamId);
+    if (m_handoverModule != nullptr)
+    {
+        m_handoverModule->CheckForHandoverRecommendation(m_satId, m_beamId);
 
-    std::cout << "SatGwMac::StartNcrTransmission " << m_handoverModule->GetAskedSatId() << " "
-              << m_handoverModule->GetAskedBeamId() << std::endl;
+        std::cout << "SatGwMac::StartNcrTransmission " << m_handoverModule->GetAskedSatId() << " "
+                  << m_handoverModule->GetAskedBeamId() << std::endl;
+    }
 
     Simulator::Schedule(m_ncrInterval, &SatGwMac::StartNcrTransmission, this);
 }

@@ -1191,10 +1191,17 @@ SatHelper::SetGwMobility(NodeContainer gwNodes)
     {
         Ptr<Node> gwNode = gwNodes.Get(i);
 
-        uint32_t gwSatId =
-            GetClosestSat(GeoCoordinate(gwNode->GetObject<SatMobilityModel>()->GetPosition()));
-        InstallMobilityObserver(gwSatId, NodeContainer(gwNode));
+        if (m_satConstellationEnabled)
+        {
+            uint32_t gwSatId =
+                GetClosestSat(GeoCoordinate(gwNode->GetObject<SatMobilityModel>()->GetPosition()));
 
+            InstallMobilityObserver(gwSatId, NodeContainer(gwNode));
+        }
+        else
+        {
+            InstallMobilityObserver(0, NodeContainer(gwNode));
+        }
         Ptr<SatHandoverModule> ho =
             CreateObject<SatHandoverModule>(gwNode, GeoSatNodes(), m_antennaGainPatterns);
         NS_LOG_DEBUG("Created Handover Module " << ho << " for GW node " << gwNode);
