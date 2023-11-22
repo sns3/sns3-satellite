@@ -587,11 +587,9 @@ class SatHelper : public Object
     /**
      * Sets mobilities to created GW nodes.
      *
-     * \param satId ID of the satellite link to this GW
-     * \param gw GW to set mobility
-     * \param gwIndex Index of GW in SatConf
+     * \param gwNodes node container of UTs to set mobility
      */
-    void SetGwMobility(uint32_t satId, Ptr<Node> gw, uint32_t gwIndex);
+    void SetGwMobility(NodeContainer gwNodes);
 
     /**
      * Sets mobility to created Sat Geo node.

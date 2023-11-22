@@ -736,6 +736,8 @@ SatHelper::DoCreateScenario(BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
         gwNodes.Create(m_satConf->GetGwCount());
         internet.Install(gwNodes);
 
+        SetGwMobility(gwNodes);
+
         // Create beams explicitly required for this scenario
         for (BeamUserInfoMap_t::iterator info = beamInfos.begin(); info != beamInfos.end(); info++)
         {
@@ -797,8 +799,6 @@ SatHelper::DoCreateScenario(BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
 
             // gw index starts from 1 and we have stored them starting from 0
             Ptr<Node> gwNode = gwNodes.Get(rtnConf[SatConf::GW_ID_INDEX] - 1);
-
-            SetGwMobility(satId, gwNode, rtnConf[SatConf::GW_ID_INDEX]);
 
             if (m_handoversEnabled)
             {
@@ -1169,32 +1169,38 @@ SatHelper::LoadMobileUtFromFile(uint32_t satId, const std::string& filename)
 }
 
 void
-SatHelper::SetGwMobility(uint32_t satId, Ptr<Node> gw, uint32_t gwIndex)
+SatHelper::SetGwMobility(NodeContainer gwNodes)
 {
-    NS_LOG_FUNCTION(this << satId << gw << gwIndex);
+    NS_LOG_FUNCTION(this);
 
-    // TODO call once this method per GW
-    if (gw->GetObject<SatHandoverModule>() != nullptr)
-    {
-        return;
-    }
-
-    NodeContainer gwNodes = NodeContainer(gw);
     MobilityHelper mobility;
+
     Ptr<SatListPositionAllocator> gwPosAllocator = CreateObject<SatListPositionAllocator>();
 
-    gwPosAllocator->Add(m_satConf->GetGwPosition(gwIndex));
+    for (uint32_t i = 0; i < gwNodes.GetN(); i++)
+    {
+        // GW id start from 1
+        gwPosAllocator->Add(m_satConf->GetGwPosition(i + 1));
+    }
 
     mobility.SetPositionAllocator(gwPosAllocator);
     mobility.SetMobilityModel("ns3::SatConstantPositionMobilityModel");
     mobility.Install(gwNodes);
 
-    InstallMobilityObserver(satId, gwNodes);
+    for (uint32_t i = 0; i < gwNodes.GetN(); ++i)
+    {
+        Ptr<Node> gwNode = gwNodes.Get(i);
 
-    Ptr<SatHandoverModule> ho =
-        CreateObject<SatHandoverModule>(gw, GeoSatNodes(), m_antennaGainPatterns);
-    NS_LOG_DEBUG("Created Handover Module " << ho << " for GW node " << gw);
-    gw->AggregateObject(ho);
+        uint32_t gwSatId =
+            GetClosestSat(GeoCoordinate(gwNode->GetObject<SatMobilityModel>()->GetPosition()));
+        InstallMobilityObserver(gwSatId, NodeContainer(gwNode));
+
+        Ptr<SatHandoverModule> ho =
+            CreateObject<SatHandoverModule>(gwNode, GeoSatNodes(), m_antennaGainPatterns);
+        NS_LOG_DEBUG("Created Handover Module " << ho << " for GW node " << gwNode);
+        std::cout << "Created Handover Module " << ho << " for GW node " << gwNode << std::endl;
+        gwNode->AggregateObject(ho);
+    }
 }
 
 void
