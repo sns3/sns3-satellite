@@ -95,6 +95,7 @@ SatMac::SatMac()
       m_ncrV2(false),
       m_routingUpdateCallback(),
       m_nodeInfo(),
+      m_handoverModule(nullptr),
       m_txEnabled(true),
       m_beamEnabledTime(Seconds(0)),
       m_lastDelay(0),
@@ -118,6 +119,7 @@ SatMac::SatMac(uint32_t satId,
       m_nodeInfo(),
       m_satId(satId),
       m_beamId(beamId),
+      m_handoverModule(nullptr),
       m_txEnabled(true),
       m_beamEnabledTime(Seconds(0)),
       m_lastDelay(0),
@@ -395,6 +397,14 @@ SatMac::RxTraces(SatPhy::PacketContainer_t packets)
               // ())`
         }     // end of `for it1 = packets.begin () -> packets.end ()`
     }         // end of `if (m_isStatisticsTagsEnabled)`
+}
+
+void
+SatMac::SetHandoverModule(Ptr<SatHandoverModule> handoverModule)
+{
+    NS_LOG_INFO(this << handoverModule);
+
+    m_handoverModule = handoverModule;
 }
 
 void

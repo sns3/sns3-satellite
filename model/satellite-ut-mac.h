@@ -25,7 +25,6 @@
 
 #include "satellite-beam-scheduler.h"
 #include "satellite-enums.h"
-#include "satellite-handover-module.h"
 #include "satellite-mac.h"
 #include "satellite-phy.h"
 #include "satellite-queue.h"
@@ -136,13 +135,6 @@ class SatUtMac : public SatMac
      * \param packets Pointers to packets received.
      */
     virtual void Receive(SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/);
-
-    /**
-     * \brief Set the UT handover module
-     *
-     * \param handoverModule The UT handover module
-     */
-    void SetHandoverModule(Ptr<SatHandoverModule> handoverModule);
 
     /**
      * \return Timing advance as Time object.
@@ -803,11 +795,6 @@ class SatUtMac : public SatMac
     uint32_t m_maxHandoverMessagesSent;
 
     uint32_t m_firstTransmittableSuperframeId;
-
-    /**
-     * Module used to perform handovers
-     */
-    Ptr<SatHandoverModule> m_handoverModule;
 
     /**
      * The physical layer handover callback

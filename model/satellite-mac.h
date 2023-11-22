@@ -22,6 +22,7 @@
 #define SAT_MAC_H
 
 #include "satellite-control-message.h"
+#include "satellite-handover-module.h"
 #include "satellite-node-info.h"
 #include "satellite-phy.h"
 #include "satellite-queue.h"
@@ -127,6 +128,13 @@ class SatMac : public Object
     {
         return m_nodeInfo->GetMacAddress();
     }
+
+    /**
+     * \brief Set the handover module
+     *
+     * \param handoverModule The handover module
+     */
+    void SetHandoverModule(Ptr<SatHandoverModule> handoverModule);
 
     /**
      * \brief Callback to send packet to lower layer.
@@ -435,6 +443,11 @@ class SatMac : public Object
      * The ID of the beam where mac belongs.
      */
     uint32_t m_beamId;
+
+    /**
+     * Module used to perform handovers
+     */
+    Ptr<SatHandoverModule> m_handoverModule;
 
     /**
      * Flag indicating whether the MAC is enabled, i.e. it is capable/allowed to

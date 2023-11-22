@@ -201,6 +201,13 @@ class SatGwMac : public SatMac
      */
     void SetFwdScheduler(Ptr<SatFwdLinkScheduler> fwdScheduler);
 
+    /**
+     * Method handling beam handover
+     * \param satId New satellite id
+     * \param beamId New satellite beam id
+     */
+    void ChangeBeam(uint32_t satId, uint32_t beamId);
+
   private:
     SatGwMac& operator=(const SatGwMac&);
     SatGwMac(const SatGwMac&);

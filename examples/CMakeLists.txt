@@ -17,6 +17,7 @@ set(base_examples
     sat-fwd-system-test-example
     sat-generic-launcher
     sat-group-example
+    sat-gw-handover-example
     sat-handover-example
     sat-http-example
     sat-iot-example

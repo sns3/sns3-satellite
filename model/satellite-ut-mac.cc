@@ -141,7 +141,6 @@ SatUtMac::SatUtMac()
       m_handoverMessagesCount(0),
       m_maxHandoverMessagesSent(20),
       m_firstTransmittableSuperframeId(0),
-      m_handoverModule(nullptr),
       m_handoverCallback(),
       m_gatewayUpdateCallback(),
       m_txCheckCallback(),
@@ -191,7 +190,6 @@ SatUtMac::SatUtMac(uint32_t satId,
       m_handoverMessagesCount(0),
       m_maxHandoverMessagesSent(20),
       m_firstTransmittableSuperframeId(0),
-      m_handoverModule(nullptr),
       m_handoverCallback(),
       m_gatewayUpdateCallback(),
       m_txCheckCallback(),
@@ -233,14 +231,6 @@ SatUtMac::DoDispose(void)
     m_utScheduler = NULL;
 
     SatMac::DoDispose();
-}
-
-void
-SatUtMac::SetHandoverModule(Ptr<SatHandoverModule> handoverModule)
-{
-    NS_LOG_INFO(this << handoverModule);
-
-    m_handoverModule = handoverModule;
 }
 
 void

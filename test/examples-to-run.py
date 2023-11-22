@@ -27,6 +27,7 @@ cpp_examples = [
     ("sat-fwd-link-beam-hopping-example", "True", "True"),
     ("sat-fwd-system-test-example", "True", "True"),
     ("sat-group-example", "True", "True"),
+    ("sat-gw-handover-example", "True", "True"),
     ("sat-handover-example", "True", "True"),
     ("sat-http-example", "True", "True"),
     ("sat-iot-example", "True", "True"),

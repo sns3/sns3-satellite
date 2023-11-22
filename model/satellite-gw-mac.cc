@@ -450,6 +450,11 @@ SatGwMac::StartNcrTransmission()
 
     SendNcrMessage();
 
+    m_handoverModule->CheckForHandoverRecommendation(m_satId, m_beamId);
+
+    std::cout << "SatGwMac::StartNcrTransmission " << m_handoverModule->GetAskedSatId() << " "
+              << m_handoverModule->GetAskedBeamId() << std::endl;
+
     Simulator::Schedule(m_ncrInterval, &SatGwMac::StartNcrTransmission, this);
 }
 
@@ -798,6 +803,19 @@ SatGwMac::SetFwdScheduler(Ptr<SatFwdLinkScheduler> fwdScheduler)
     {
         m_fwdScheduler->SetDummyFrameSendingEnabled(true);
     }
+}
+
+void
+SatGwMac::ChangeBeam(uint32_t satId, uint32_t beamId)
+{
+    NS_LOG_FUNCTION(this << satId << beamId);
+
+    // TODO
+    /*if (m_beamCallback (beamId))
+    {
+        m_connectionCallback ();
+    }
+    */
 }
 
 } // namespace ns3

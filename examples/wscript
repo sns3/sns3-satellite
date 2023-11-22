@@ -40,6 +40,9 @@ def build(bld):
     obj = bld.create_ns3_program('sat-essa-example', ['satellite'])
     obj.source = 'sat-essa-example.cc'
 
+    obj = bld.create_ns3_program('sat-gw-handover-example', ['satellite'])
+    obj.source = 'sat-gw-handover-example.cc'
+
     obj = bld.create_ns3_program('sat-lora-example', ['satellite'])
     obj.source = 'sat-lora-example.cc'
 
