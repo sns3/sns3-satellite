@@ -99,7 +99,23 @@ class SatGeoUserMac : public SatGeoMac
 
     void ReceiveSignalingPacket(Ptr<Packet> packet);
 
-  protected:
+    /**
+     * Add a remote peer to this MAC
+     *
+     * \param address The MAC address of the peer
+     * \return True if the peer has been added, false otherwise
+     */
+    virtual bool AddPeer(Mac48Address address);
+
+    /**
+     * Remove a remote peer from this MAC
+     *
+     * \param address The MAC address of the peer
+     * \return True if the peer has been removed, false otherwise
+     */
+    virtual bool RemovePeer(Mac48Address address);
+
+  private:
     /**
      * \brief Get the link TX direction. Must be implemented by child clases.
      * \return The link TX direction
@@ -120,7 +136,12 @@ class SatGeoUserMac : public SatGeoMac
      */
     virtual Address GetRxUtAddress(Ptr<Packet> packet);
 
-  private:
+    /**
+     * Indicates if at least one device is connected in this beam.
+     *
+     * \return True if at least a device is connected, false otherwise
+     */
+    virtual bool HasPeer();
 };
 
 } // namespace ns3

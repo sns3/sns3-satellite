@@ -829,15 +829,18 @@ SatHelper::DoCreateScenario(BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
                 uint32_t gwSatId = m_gwSats[gwId];
                 if (satId == gwSatId)
                 {
+                    // TODO change to feeder beam ID
                     DynamicCast<SatGeoNetDevice>(
                         m_beamHelper->GetGeoSatNodes().Get(gwSatId)->GetDevice(0))
-                        ->ConnectGw(Mac48Address::ConvertFrom(netDevices.first->GetAddress()));
+                        ->ConnectGw(Mac48Address::ConvertFrom(netDevices.first->GetAddress()),
+                                    beamId);
                 }
             }
             else
             {
+                // TODO change to feeder beam ID
                 DynamicCast<SatGeoNetDevice>(m_beamHelper->GetGeoSatNodes().Get(0)->GetDevice(0))
-                    ->ConnectGw(Mac48Address::ConvertFrom(netDevices.first->GetAddress()));
+                    ->ConnectGw(Mac48Address::ConvertFrom(netDevices.first->GetAddress()), beamId);
                 m_userHelper->PopulateBeamRoutings(uts,
                                                    netDevices.second,
                                                    gwNode,
@@ -849,7 +852,8 @@ SatHelper::DoCreateScenario(BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
                 DynamicCast<SatGeoNetDevice>(
                     m_beamHelper->GetGeoSatNodes().Get(satId)->GetDevice(0))
                     ->ConnectUt(
-                        Mac48Address::ConvertFrom(netDevices.second.Get(utIndex)->GetAddress()));
+                        Mac48Address::ConvertFrom(netDevices.second.Get(utIndex)->GetAddress()),
+                        beamId);
             }
         }
 
@@ -1205,7 +1209,6 @@ SatHelper::SetGwMobility(NodeContainer gwNodes)
         Ptr<SatHandoverModule> ho =
             CreateObject<SatHandoverModule>(gwNode, GeoSatNodes(), m_antennaGainPatterns);
         NS_LOG_DEBUG("Created Handover Module " << ho << " for GW node " << gwNode);
-        std::cout << "Created Handover Module " << ho << " for GW node " << gwNode << std::endl;
         gwNode->AggregateObject(ho);
     }
 }

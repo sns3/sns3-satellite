@@ -819,21 +819,44 @@ SatGeoNetDevice::GetRxUtAddress(Ptr<Packet> packet, SatEnums::SatLinkDir_t ld)
 }
 
 void
-SatGeoNetDevice::ConnectGw(Mac48Address gwAddress)
+SatGeoNetDevice::ConnectGw(Mac48Address gwAddress, uint32_t beamId)
 {
-    NS_LOG_FUNCTION(this << gwAddress);
+    NS_LOG_FUNCTION(this << gwAddress << beamId);
 
-    m_gwConnected.insert(gwAddress);
+    NS_ASSERT_MSG(m_gwConnected.find(gwAddress) == m_gwConnected.end(),
+                  "Cannot add same GW twice to map");
+
+    m_gwConnected.insert({gwAddress, beamId});
     Singleton<SatIdMapper>::Get()->AttachMacToSatIdIsl(gwAddress, m_nodeId);
+
+    if (m_feederMac.find(beamId) != m_feederMac.end())
+    {
+        Ptr<SatGeoFeederMac> geoFeederMac = DynamicCast<SatGeoFeederMac>(GetFeederMac(beamId));
+        NS_ASSERT(geoFeederMac != nullptr);
+        {
+            geoFeederMac->AddPeer(gwAddress);
+        }
+    }
 }
 
 void
-SatGeoNetDevice::DisconnectGw(Mac48Address gwAddress)
+SatGeoNetDevice::DisconnectGw(Mac48Address gwAddress, uint32_t beamId)
 {
-    NS_LOG_FUNCTION(this << gwAddress);
+    NS_LOG_FUNCTION(this << gwAddress << beamId);
+
+    NS_ASSERT_MSG(m_gwConnected.find(gwAddress) != m_gwConnected.end(), "GW not in map");
 
     m_gwConnected.erase(gwAddress);
     Singleton<SatIdMapper>::Get()->RemoveMacToSatIdIsl(gwAddress);
+
+    if (m_feederMac.find(beamId) != m_feederMac.end())
+    {
+        Ptr<SatGeoFeederMac> geoFeederMac = DynamicCast<SatGeoFeederMac>(GetFeederMac(beamId));
+        NS_ASSERT(geoFeederMac != nullptr);
+        {
+            geoFeederMac->RemovePeer(gwAddress);
+        }
+    }
 }
 
 std::set<Mac48Address>
@@ -841,25 +864,55 @@ SatGeoNetDevice::GetGwConnected()
 {
     NS_LOG_FUNCTION(this);
 
-    return m_gwConnected;
+    std::set<Mac48Address> gws;
+    std::map<Mac48Address, uint32_t>::iterator it;
+    for (it = m_gwConnected.begin(); it != m_gwConnected.end(); it++)
+    {
+        gws.insert(it->first);
+    }
+
+    return gws;
 }
 
 void
-SatGeoNetDevice::ConnectUt(Mac48Address utAddress)
+SatGeoNetDevice::ConnectUt(Mac48Address utAddress, uint32_t beamId)
 {
-    NS_LOG_FUNCTION(this << utAddress);
+    NS_LOG_FUNCTION(this << utAddress << beamId);
 
-    m_utConnected.insert(utAddress);
+    NS_ASSERT_MSG(m_utConnected.find(utAddress) == m_utConnected.end(),
+                  "Cannot add same UT twice to map");
+
+    m_utConnected.insert({utAddress, beamId});
     Singleton<SatIdMapper>::Get()->AttachMacToSatIdIsl(utAddress, m_nodeId);
+
+    if (m_userMac.find(beamId) != m_userMac.end())
+    {
+        Ptr<SatGeoUserMac> geoUserMac = DynamicCast<SatGeoUserMac>(GetUserMac(beamId));
+        NS_ASSERT(geoUserMac != nullptr);
+        {
+            geoUserMac->AddPeer(utAddress);
+        }
+    }
 }
 
 void
-SatGeoNetDevice::DisconnectUt(Mac48Address utAddress)
+SatGeoNetDevice::DisconnectUt(Mac48Address utAddress, uint32_t beamId)
 {
-    NS_LOG_FUNCTION(this << utAddress);
+    NS_LOG_FUNCTION(this << utAddress << beamId);
+
+    NS_ASSERT_MSG(m_utConnected.find(utAddress) != m_utConnected.end(), "UT not in map");
 
     m_utConnected.erase(utAddress);
     Singleton<SatIdMapper>::Get()->RemoveMacToSatIdIsl(utAddress);
+
+    if (m_userMac.find(beamId) != m_userMac.end())
+    {
+        Ptr<SatGeoUserMac> geoUserMac = DynamicCast<SatGeoUserMac>(GetUserMac(beamId));
+        NS_ASSERT(geoUserMac != nullptr);
+        {
+            geoUserMac->RemovePeer(utAddress);
+        }
+    }
 }
 
 std::set<Mac48Address>
@@ -867,7 +920,14 @@ SatGeoNetDevice::GetUtConnected()
 {
     NS_LOG_FUNCTION(this);
 
-    return m_utConnected;
+    std::set<Mac48Address> uts;
+    std::map<Mac48Address, uint32_t>::iterator it;
+    for (it = m_utConnected.begin(); it != m_utConnected.end(); it++)
+    {
+        uts.insert(it->first);
+    }
+
+    return uts;
 }
 
 void

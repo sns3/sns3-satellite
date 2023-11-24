@@ -119,12 +119,12 @@ class SatBeamScheduler : public Object
     /**
      * \param msg        The UT address to connect
      */
-    typedef Callback<void, Mac48Address> ConnectUtCallback;
+    typedef Callback<void, Mac48Address, uint32_t> ConnectUtCallback;
 
     /**
      * \param msg        The UT address to disconnect
      */
-    typedef Callback<void, Mac48Address> DisconnectUtCallback;
+    typedef Callback<void, Mac48Address, uint32_t> DisconnectUtCallback;
 
     /**
      * \param id    Id of the TBTP message to add.

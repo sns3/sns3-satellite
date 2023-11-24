@@ -187,8 +187,8 @@ SatHandoverModule::CheckForHandoverRecommendation(uint32_t satId, uint32_t beamI
     uint32_t bestSatId = m_askedSatId;
     uint32_t bestBeamId = m_askedBeamId;
 
-    std::cout << "SatHandoverModule::CheckForHandoverRecommendation " << bestSatId << " "
-              << bestBeamId << std::endl;
+    // std::cout << "SatHandoverModule::CheckForHandoverRecommendation " << bestSatId << " "
+    //           << bestBeamId << std::endl;
 
     if (!m_hasPendingRequest || now - m_lastMessageSentAt > m_repeatRequestTimeout)
     {

@@ -132,6 +132,22 @@ class SatGeoMac : public SatMac
      */
     virtual void StopPeriodicTransmission();
 
+    /**
+     * Add a remote peer to this MAC
+     *
+     * \param address The MAC address of the peer
+     * \return True if the peer has been added, false otherwise
+     */
+    virtual bool AddPeer(Mac48Address address) = 0;
+
+    /**
+     * Remove a remote peer from this MAC
+     *
+     * \param address The MAC address of the peer
+     * \return True if the peer has been removed, false otherwise
+     */
+    virtual bool RemovePeer(Mac48Address address) = 0;
+
   protected:
     /**
      * Start sending a Packet Down the Wire.
@@ -181,6 +197,13 @@ class SatGeoMac : public SatMac
      * \return The address of associated UT
      */
     virtual Address GetRxUtAddress(Ptr<Packet> packet) = 0;
+
+    /**
+     * Indicates if at least one device is connected in this beam.
+     *
+     * \return True if at least a device is connected, false otherwise
+     */
+    virtual bool HasPeer() = 0;
 
     /**
      * If true, the periodic calls of StartTransmission are not called when no

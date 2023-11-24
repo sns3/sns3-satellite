@@ -309,4 +309,28 @@ SatGeoFeederMac::GetRxUtAddress(Ptr<Packet> packet)
     return utAddr;
 }
 
+bool
+SatGeoFeederMac::AddPeer(Mac48Address address)
+{
+    NS_LOG_FUNCTION(this << address);
+
+    return false;
+}
+
+bool
+SatGeoFeederMac::RemovePeer(Mac48Address address)
+{
+    NS_LOG_FUNCTION(this << address);
+
+    return false;
+}
+
+bool
+SatGeoFeederMac::HasPeer()
+{
+    NS_LOG_FUNCTION(this);
+
+    return false;
+}
+
 } // namespace ns3

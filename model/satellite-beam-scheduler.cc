@@ -1022,7 +1022,7 @@ SatBeamScheduler::ConnectUt(Mac48Address address)
 {
     NS_LOG_FUNCTION(this << address);
 
-    m_connectUtCallback(address);
+    m_connectUtCallback(address, m_beamId);
 }
 
 void
@@ -1030,7 +1030,7 @@ SatBeamScheduler::DisconnectUt(Mac48Address address)
 {
     NS_LOG_FUNCTION(this << address);
 
-    m_disconnectUtCallback(address);
+    m_disconnectUtCallback(address, m_beamId);
 }
 
 void
