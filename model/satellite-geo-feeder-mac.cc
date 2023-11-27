@@ -100,7 +100,13 @@ SatGeoFeederMac::DoInitialize()
 void
 SatGeoFeederMac::EnquePacket(Ptr<Packet> packet)
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(this << packet);
+
+    if(!m_periodicTransmissionEnabled)
+    {
+        NS_LOG_INFO("Do not enque packet to this beam because it is disabled");
+        return;
+    }
 
     SatAddressE2ETag addressE2ETag;
     bool success = packet->PeekPacketTag(addressE2ETag);

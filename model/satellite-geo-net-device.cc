@@ -208,8 +208,6 @@ SatGeoNetDevice::ReceivePacketUser(Ptr<Packet> packet, const Address& userAddres
     }
     else
     {
-        DynamicCast<SatGeoFeederMac>(m_feederMac[satUplinkInfoTag.GetBeamId()])
-            ->StopPeriodicTransmission();
         if (m_islNetDevices.size() > 0)
         {
             SendToIsl(packet, destination);
@@ -291,11 +289,6 @@ SatGeoNetDevice::ReceivePacketFeeder(Ptr<Packet> packet, const Address& feederAd
         m_islNetDevices.size() > 0)
     {
         SendToIsl(packet, destination);
-    }
-    if (m_utConnected.count(destination) == 0)
-    {
-        DynamicCast<SatGeoUserMac>(m_userMac[satUplinkInfoTag.GetBeamId()])
-            ->StopPeriodicTransmission();
     }
 }
 

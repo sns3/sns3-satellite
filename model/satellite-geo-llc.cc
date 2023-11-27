@@ -320,4 +320,18 @@ SatGeoLlc::GetNPacketsInQueue(Mac48Address utAddress) const
     return sum;
 }
 
+void
+SatGeoLlc::ClearQueues()
+{
+    NS_LOG_FUNCTION(this);
+
+    for (EncapContainer_t::const_iterator it = m_encaps.begin(); it != m_encaps.end(); ++it)
+    {
+        NS_ASSERT(it->second != nullptr);
+        Ptr<SatQueue> queue = it->second->GetQueue();
+        NS_ASSERT(queue != nullptr);
+        queue->DequeueAll();
+    }
+}
+
 } // namespace ns3

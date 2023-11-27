@@ -130,7 +130,7 @@ class SatGeoMac : public SatMac
     /**
      * Stop periodic transmission, until a pacquet in enqued.
      */
-    virtual void StopPeriodicTransmission();
+    virtual void StopPeriodicTransmissions();
 
     /**
      * Add a remote peer to this MAC

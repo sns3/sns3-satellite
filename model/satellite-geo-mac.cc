@@ -47,16 +47,16 @@ SatGeoMac::GetTypeId(void)
     static TypeId tid =
         TypeId("ns3::SatGeoMac")
             .SetParent<SatMac>()
-            .AddTraceSource("BBFrameTxTrace",
-                            "Trace for transmitted BB Frames.",
-                            MakeTraceSourceAccessor(&SatGeoMac::m_bbFrameTxTrace),
-                            "ns3::SatBbFrame::BbFrameCallback")
             .AddAttribute("DisableSchedulingIfNoDeviceConnected",
                           "If true, the periodic calls of StartTransmission are not called when no "
                           "devices are connected to this MAC",
                           BooleanValue(false),
                           MakeBooleanAccessor(&SatGeoMac::m_disableSchedulingIfNoDeviceConnected),
-                          MakeBooleanChecker());
+                          MakeBooleanChecker())
+            .AddTraceSource("BBFrameTxTrace",
+                            "Trace for transmitted BB Frames.",
+                            MakeTraceSourceAccessor(&SatGeoMac::m_bbFrameTxTrace),
+                            "ns3::SatBbFrame::BbFrameCallback");
 
     return tid;
 }
@@ -119,13 +119,17 @@ SatGeoMac::StartPeriodicTransmissions()
         NS_FATAL_ERROR("Scheduler not set for GEO FEEDER MAC!!!");
     }
 
+    m_llc->ClearQueues();
+
+    m_periodicTransmissionEnabled = true;
+
     Simulator::Schedule(Seconds(0), &SatGeoMac::StartTransmission, this, 0);
 }
 
 void
 SatGeoMac::StartTransmission(uint32_t carrierId)
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(this << carrierId);
 
     Time txDuration;
 
@@ -165,7 +169,10 @@ SatGeoMac::StartTransmission(uint32_t carrierId)
         txDuration = m_fwdScheduler->GetDefaultFrameDuration();
     }
 
-    Simulator::Schedule(txDuration, &SatGeoMac::StartTransmission, this, 0);
+    if(m_periodicTransmissionEnabled)
+    {
+        Simulator::Schedule(txDuration, &SatGeoMac::StartTransmission, this, 0);
+    }
 }
 
 void
@@ -286,11 +293,13 @@ SatGeoMac::SetReceiveNetDeviceCallback(ReceiveNetDeviceCallback cb)
 }
 
 void
-SatGeoMac::StopPeriodicTransmission()
+SatGeoMac::StopPeriodicTransmissions()
 {
     NS_LOG_FUNCTION(this);
 
     m_periodicTransmissionEnabled = false;
+
+    m_llc->ClearQueues();
 }
 
 } // namespace ns3

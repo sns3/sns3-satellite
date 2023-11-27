@@ -142,6 +142,11 @@ class SatGeoUserMac : public SatGeoMac
      * \return True if at least a device is connected, false otherwise
      */
     virtual bool HasPeer();
+
+    /**
+     * List of UT MAC connected to this MAC.
+     */
+    std::set<Mac48Address> m_peers;
 };
 
 } // namespace ns3

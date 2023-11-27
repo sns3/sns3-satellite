@@ -636,6 +636,7 @@ void
 SatGwMac::SendNcrMessage()
 {
     NS_LOG_FUNCTION(this);
+
     Ptr<SatNcrMessage> ncrMessage = CreateObject<SatNcrMessage>();
     m_fwdScheduler->SendControlMsg(ncrMessage, Mac48Address::GetBroadcast());
     m_ncrMessagesToSend.push(ncrMessage);
