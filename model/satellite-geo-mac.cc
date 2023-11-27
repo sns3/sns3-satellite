@@ -114,9 +114,15 @@ SatGeoMac::StartPeriodicTransmissions()
 {
     NS_LOG_FUNCTION(this);
 
+    if(m_disableSchedulingIfNoDeviceConnected && !HasPeer())
+    {
+        NS_LOG_INFO("Do not start beam " << m_beamId << " because no device is connected");
+        return;
+    }
+
     if (m_fwdScheduler == NULL)
     {
-        NS_FATAL_ERROR("Scheduler not set for GEO FEEDER MAC!!!");
+        NS_FATAL_ERROR("Scheduler not set for GEO MAC!!!");
     }
 
     m_llc->ClearQueues();

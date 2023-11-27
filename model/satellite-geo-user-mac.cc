@@ -76,7 +76,7 @@ SatGeoUserMac::SatGeoUserMac(uint32_t satId,
                              SatEnums::RegenerationMode_t returnLinkRegenerationMode)
     : SatGeoMac(satId, beamId, forwardLinkRegenerationMode, returnLinkRegenerationMode)
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(this << satId << beamId);
 }
 
 SatGeoUserMac::~SatGeoUserMac()
@@ -326,13 +326,16 @@ SatGeoUserMac::AddPeer(Mac48Address address)
 
     NS_ASSERT(m_peers.find(address) == m_peers.end());
 
-    if(!HasPeer())
+    if(m_disableSchedulingIfNoDeviceConnected && !HasPeer())
     {
         NS_LOG_INFO("Start beam " << m_beamId);
+        m_peers.insert(address);
         StartPeriodicTransmissions();
     }
-
-    m_peers.insert(address);
+    else
+    {
+        m_peers.insert(address);
+    }
 
     return true;
 }
@@ -346,7 +349,7 @@ SatGeoUserMac::RemovePeer(Mac48Address address)
 
     m_peers.erase(address);
 
-    if(!HasPeer())
+    if(m_disableSchedulingIfNoDeviceConnected && !HasPeer())
     {
         NS_LOG_INFO("Stop beam " << m_beamId);
         StopPeriodicTransmissions();

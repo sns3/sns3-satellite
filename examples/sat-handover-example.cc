@@ -53,6 +53,8 @@ main(int argc, char* argv[])
     Config::SetDefault("ns3::SatHelper::HandoversEnabled", BooleanValue(true));
     Config::SetDefault("ns3::SatHandoverModule::NumberClosestSats", UintegerValue(2));
 
+    Config::SetDefault("ns3::SatGeoMac::DisableSchedulingIfNoDeviceConnected", BooleanValue(true));
+
     /// Set simulation output details
     Config::SetDefault("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue(true));
 

@@ -75,7 +75,7 @@ SatGeoFeederMac::SatGeoFeederMac(uint32_t satId,
                                  SatEnums::RegenerationMode_t returnLinkRegenerationMode)
     : SatGeoMac(satId, beamId, forwardLinkRegenerationMode, returnLinkRegenerationMode)
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(this << satId << beamId);
 }
 
 SatGeoFeederMac::~SatGeoFeederMac()
@@ -336,7 +336,7 @@ SatGeoFeederMac::HasPeer()
 {
     NS_LOG_FUNCTION(this);
 
-    return false;
+    return true;
 }
 
 } // namespace ns3

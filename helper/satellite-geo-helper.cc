@@ -706,6 +706,7 @@ SatGeoHelper::AttachChannelsUser(Ptr<SatGeoNetDevice> dev,
             CreateObject<SatScpcScheduler>(m_bbFrameConfFwd, userAddress, carrierBandwidth);
         uMac->SetFwdScheduler(fwdScheduler);
         uMac->SetLlc(uLlc);
+        uMac->StartPeriodicTransmissions();
 
         // Attach the LLC Tx opportunity and scheduling context getter callbacks to
         // SatFwdLinkScheduler
