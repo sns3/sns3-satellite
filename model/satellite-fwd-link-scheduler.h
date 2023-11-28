@@ -226,6 +226,11 @@ class SatFwdLinkScheduler : public Object
      */
     void SetDummyFrameSendingEnabled(bool dummyFrameSendingEnabled);
 
+    /**
+     * Remove all packets being treated.
+     */
+    virtual void ClearAllPackets();
+
   protected:
     typedef std::map<Mac48Address, Ptr<SatCnoEstimator>> CnoEstimatorMap_t;
 

@@ -344,24 +344,10 @@ SatBeamScheduler::SetSendTbtpCallback(SendTbtpCallback cb)
 }
 
 void
-SatBeamScheduler::SetConnectUtCallback(ConnectUtCallback cb)
-{
-    NS_LOG_FUNCTION(this << &cb);
-
-    m_connectUtCallback = cb;
-}
-
-void
-SatBeamScheduler::SetDisconnectUtCallback(DisconnectUtCallback cb)
-{
-    NS_LOG_FUNCTION(this << &cb);
-
-    m_disconnectUtCallback = cb;
-}
-
-void
 SatBeamScheduler::Initialize(uint32_t satId,
                              uint32_t beamId,
+                             Ptr<SatNetDevice> gwNetDevice,
+                             Ptr<SatGeoNetDevice> geoNetDevice,
                              SatBeamScheduler::SendCtrlMsgCallback cb,
                              Ptr<SatSuperframeSeq> seq,
                              uint32_t maxFrameSizeInBytes,
@@ -374,6 +360,8 @@ SatBeamScheduler::Initialize(uint32_t satId,
 
     m_satId = satId;
     m_beamId = beamId;
+    m_gwMac = DynamicCast<SatGwMac>(gwNetDevice->GetMac());
+    m_geoNetDevice = geoNetDevice;
     m_txCallback = cb;
     m_superframeSeq = seq;
     m_maxBbFrameSize = maxFrameSizeInBytes;
@@ -1022,7 +1010,8 @@ SatBeamScheduler::ConnectUt(Mac48Address address)
 {
     NS_LOG_FUNCTION(this << address);
 
-    m_connectUtCallback(address, m_beamId);
+    m_geoNetDevice->ConnectUt(address, m_beamId);
+    m_gwMac->ConnectUt(address);
 }
 
 void
@@ -1030,7 +1019,8 @@ SatBeamScheduler::DisconnectUt(Mac48Address address)
 {
     NS_LOG_FUNCTION(this << address);
 
-    m_disconnectUtCallback(address, m_beamId);
+    m_geoNetDevice->DisconnectUt(address, m_beamId);
+    m_gwMac->DisconnectUt(address);
 }
 
 void

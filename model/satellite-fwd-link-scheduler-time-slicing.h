@@ -83,6 +83,11 @@ class SatFwdLinkSchedulerTimeSlicing : public SatFwdLinkScheduler
      */
     virtual std::pair<Ptr<SatBbFrame>, const Time> GetNextFrame();
 
+    /**
+     * Remove all packets being treated.
+     */
+    virtual void ClearAllPackets();
+
   private:
     /**
      * Do dispose actions.

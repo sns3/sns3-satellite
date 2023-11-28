@@ -234,6 +234,18 @@ SatFwdLinkSchedulerTimeSlicing::GetNextFrame()
 }
 
 void
+SatFwdLinkSchedulerTimeSlicing::ClearAllPackets()
+{
+    NS_LOG_FUNCTION(this);
+
+    std::map<uint8_t, Ptr<SatBbFrameContainer>>::iterator it;
+    for (it = m_bbFrameContainers.begin(); it != m_bbFrameContainers.end(); it++)
+    {
+        it->second->ClearAllFrames();
+    }
+}
+
+void
 SatFwdLinkSchedulerTimeSlicing::PeriodicTimerExpired()
 {
     NS_LOG_FUNCTION(this);

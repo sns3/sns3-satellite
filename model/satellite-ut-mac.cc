@@ -494,8 +494,8 @@ SatUtMac::ScheduleTimeSlots(Ptr<SatTbtpMessage> tbtp)
     if (txTime < Simulator::Now())
     {
         NS_FATAL_ERROR("UT: " << m_nodeInfo->GetMacAddress() << " received TBTP "
-                           << tbtp->GetSuperframeCounter()
-                           << ", which should have been sent already in the past");
+                              << tbtp->GetSuperframeCounter()
+                              << ", which should have been sent already in the past");
     }
 
     NS_LOG_INFO("Time to start sending the superframe for this UT: " << txTime.GetSeconds());

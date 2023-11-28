@@ -131,7 +131,7 @@ class SatGeoLlc : public SatLlc
     virtual uint32_t GetNPacketsInQueue(Mac48Address utAddress) const;
 
     /**
-     * Remove all packets from the queues.
+     * Remove all packets from the queues. Called when performing handovers.
      */
     virtual void ClearQueues();
 

@@ -245,6 +245,18 @@ SatBbFrameContainer::GetMaxSymbolRate()
     return m_maxSymbolRate;
 }
 
+void
+SatBbFrameContainer::ClearAllFrames()
+{
+    NS_LOG_FUNCTION(this);
+
+    m_ctrlContainer.clear();
+    for (FrameContainer_t::iterator it = m_container.begin(); it != m_container.end(); ++it)
+    {
+        it->second.clear();
+    }
+}
+
 Ptr<SatBbFrame>
 SatBbFrameContainer::GetNextFrame()
 {

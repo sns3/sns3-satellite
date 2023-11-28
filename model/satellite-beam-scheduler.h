@@ -31,6 +31,9 @@
 #include <ns3/nstime.h>
 #include <ns3/object.h>
 #include <ns3/ptr.h>
+#include <ns3/satellite-geo-net-device.h>
+#include <ns3/satellite-gw-mac.h>
+#include <ns3/satellite-net-device.h>
 #include <ns3/simple-ref-count.h>
 #include <ns3/traced-callback.h>
 
@@ -117,16 +120,6 @@ class SatBeamScheduler : public Object
     typedef Callback<void, Ptr<SatTbtpMessage>> SendTbtpCallback;
 
     /**
-     * \param msg        The UT address to connect
-     */
-    typedef Callback<void, Mac48Address, uint32_t> ConnectUtCallback;
-
-    /**
-     * \param msg        The UT address to disconnect
-     */
-    typedef Callback<void, Mac48Address, uint32_t> DisconnectUtCallback;
-
-    /**
      * \param id    Id of the TBTP message to add.
      * \param tbtp  Pointer to the TBTP message to add.
      */
@@ -135,6 +128,8 @@ class SatBeamScheduler : public Object
     /**
      * \param beamId ID of the beam which for callback is set
      * \param satId ID of the satellite using the beam which for callback is set
+     * \param gwNetDevice GW NetDevice linked to this beam
+     * \param geoNetDevice GeoNetDevice on satellite linked to this beam
      * \param cb callback to invoke whenever a TBTP is ready for sending and must
      *        be forwarded to the Beam UTs.
      * \param seq Superframe sequence.
@@ -144,6 +139,8 @@ class SatBeamScheduler : public Object
      */
     void Initialize(uint32_t satId,
                     uint32_t beamId,
+                    Ptr<SatNetDevice> gwNetDevice,
+                    Ptr<SatGeoNetDevice> geoNetDevice,
                     SatBeamScheduler::SendCtrlMsgCallback cb,
                     Ptr<SatSuperframeSeq> seq,
                     uint32_t maxFrameSizeInBytes,
@@ -228,16 +225,6 @@ class SatBeamScheduler : public Object
      * Set the callback to inform NCC a TBTP has been sent.
      */
     void SetSendTbtpCallback(SendTbtpCallback cb);
-
-    /**
-     * Set the callback to connect a UT to GeoNetDevice
-     */
-    void SetConnectUtCallback(ConnectUtCallback cb);
-
-    /**
-     * Set the callback to disconnect a UT from a GeoNetDevice
-     */
-    void SetDisconnectUtCallback(DisconnectUtCallback cb);
 
     /**
      * Callback signature for `BacklogRequestsTrace` trace source.
@@ -519,6 +506,16 @@ class SatBeamScheduler : public Object
     uint32_t m_beamId;
 
     /**
+     * GW MAC linked to this beam
+     */
+    Ptr<SatGwMac> m_gwMac;
+
+    /**
+     * GeoNetDevice on satellite linked to this beam
+     */
+    Ptr<SatGeoNetDevice> m_geoNetDevice;
+
+    /**
      * Pointer to super frame sequence.
      */
     Ptr<SatSuperframeSeq> m_superframeSeq;
@@ -537,16 +534,6 @@ class SatBeamScheduler : public Object
      * The TBTP send callback to inform GW Mac.
      */
     SatBeamScheduler::SendTbtpCallback m_txTbtpCallback;
-
-    /**
-     * Connect UT callback.
-     */
-    SatBeamScheduler::ConnectUtCallback m_connectUtCallback;
-
-    /**
-     * Disconnect UT callback.
-     */
-    SatBeamScheduler::DisconnectUtCallback m_disconnectUtCallback;
 
     /**
      * Map to store UT information in beam for updating purposes.

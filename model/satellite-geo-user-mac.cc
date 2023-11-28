@@ -106,7 +106,7 @@ SatGeoUserMac::EnquePacket(Ptr<Packet> packet)
 {
     NS_LOG_FUNCTION(this << packet);
 
-    if(!m_periodicTransmissionEnabled)
+    if (!m_periodicTransmissionEnabled)
     {
         NS_LOG_INFO("Do not enque packet to this beam because it is disabled");
         return;
@@ -326,7 +326,7 @@ SatGeoUserMac::AddPeer(Mac48Address address)
 
     NS_ASSERT(m_peers.find(address) == m_peers.end());
 
-    if(m_disableSchedulingIfNoDeviceConnected && !HasPeer())
+    if (m_disableSchedulingIfNoDeviceConnected && !HasPeer())
     {
         NS_LOG_INFO("Start beam " << m_beamId);
         m_peers.insert(address);
@@ -349,7 +349,7 @@ SatGeoUserMac::RemovePeer(Mac48Address address)
 
     m_peers.erase(address);
 
-    if(m_disableSchedulingIfNoDeviceConnected && !HasPeer())
+    if (m_disableSchedulingIfNoDeviceConnected && !HasPeer())
     {
         NS_LOG_INFO("Stop beam " << m_beamId);
         StopPeriodicTransmissions();

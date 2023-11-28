@@ -28,6 +28,7 @@
 #include <ns3/object.h>
 #include <ns3/ptr.h>
 #include <ns3/satellite-geo-net-device.h>
+#include <ns3/satellite-gw-mac.h>
 #include <ns3/traced-callback.h>
 
 #include <map>
@@ -142,7 +143,8 @@ class SatNcc : public Object
      * \brief Function for adding the beam
      * \param satId ID of the satellite which for callback is set
      * \param beamId ID of the beam which for callback is set
-     * \param geoNetDevice Geo NetDevice on satellite linked to this beam
+     * \param gwNetDevice GW NetDevice linked to this beam
+     * \param geoNetDevice GeoNetDevice on satellite linked to this beam
      * \param cb callback to invoke whenever a TBTP is ready for sending and must
      *        be forwarded to the Beam UTs.
      * \param tbtpCb callback to invoke whenever a TBTP has been sent
@@ -153,6 +155,7 @@ class SatNcc : public Object
      */
     void AddBeam(uint32_t satId,
                  uint32_t beamId,
+                 Ptr<SatNetDevice> gwNetDevice,
                  Ptr<SatGeoNetDevice> geoNetDevice,
                  SatNcc::SendCallback cb,
                  SatNcc::SendTbtpCallback tbtpCb,

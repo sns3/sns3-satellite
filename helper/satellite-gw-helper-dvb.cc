@@ -331,6 +331,7 @@ SatGwHelperDvb::Install(Ptr<Node> n,
     mac->SetFwdScheduler(fwdLinkScheduler);
 
     mac->StartPeriodicTransmissions();
+    mac->SetClearQueuesCallback(MakeCallback(&SatGwLlc::ClearQueues, llc));
 
     Ptr<SatHandoverModule> handoverModule = n->GetObject<SatHandoverModule>();
     if (handoverModule != NULL)

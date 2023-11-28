@@ -21,12 +21,11 @@
 #ifndef SAT_GW_MAC_H
 #define SAT_GW_MAC_H
 
-#include "satellite-mac.h"
-#include "satellite-phy.h"
-
 #include <ns3/callback.h>
 #include <ns3/nstime.h>
 #include <ns3/ptr.h>
+#include <ns3/satellite-mac.h>
+#include <ns3/satellite-phy.h>
 #include <ns3/traced-callback.h>
 
 namespace ns3
@@ -196,6 +195,17 @@ class SatGwMac : public SatMac
     void SetRemoveUtCallback(SatGwMac::RemoveUtCallback cb);
 
     /**
+     * Callback to clear LLC queues
+     */
+    typedef Callback<void> ClearQueuesCallback;
+
+    /**
+     * Method to set callback for LLC queues clearing
+     * \param cb callback to invoke whenever queues need to be cleared
+     */
+    void SetClearQueuesCallback(SatGwMac::ClearQueuesCallback cb);
+
+    /**
      * Method to set forward link scheduler
      * \param The scheduler to use
      */
@@ -207,6 +217,18 @@ class SatGwMac : public SatMac
      * \param beamId New satellite beam id
      */
     void ChangeBeam(uint32_t satId, uint32_t beamId);
+
+    /**
+     * Connect a UT to this satellite.
+     * \param utAddress MAC address of the UT to connect
+     */
+    void ConnectUt(Mac48Address utAddress);
+
+    /**
+     * Disconnect a UT to this satellite.
+     * \param utAddress MAC address of the UT to disconnect
+     */
+    void DisconnectUt(Mac48Address utAddress);
 
   private:
     SatGwMac& operator=(const SatGwMac&);
@@ -256,6 +278,18 @@ class SatGwMac : public SatMac
     static void SendLogonResponseHelper(SatGwMac* self, Address utId, uint32_t raChannel);
 
     /**
+     * Stop periodic transmission, until a pacquet in enqued.
+     */
+    virtual void StopPeriodicTransmissions();
+
+    /**
+     * Indicates if at least one device is connected in this beam.
+     *
+     * \return True if at least a device is connected, false otherwise
+     */
+    bool HasPeer();
+
+    /**
      * List of TBTPs sent to UTs. Key is superframe counter, value is TBTP.
      */
     std::map<uint32_t, std::vector<Ptr<SatTbtpMessage>>> m_tbtps;
@@ -297,6 +331,22 @@ class SatGwMac : public SatMac
     bool m_broadcastNcr;
 
     /**
+     * If true, the periodic calls of StartTransmission are not called when no
+     * devices are connected to this MAC
+     */
+    bool m_disableSchedulingIfNoDeviceConnected;
+
+    /**
+     * Indicated if periodic transmission is enabled.
+     */
+    bool m_periodicTransmissionEnabled;
+
+    /**
+     * List of UT MAC connected to this MAC.
+     */
+    std::set<Mac48Address> m_peers;
+
+    /**
      * Trace for transmitted BB frames.
      */
     TracedCallback<Ptr<SatBbFrame>> m_bbFrameTxTrace;
@@ -332,6 +382,11 @@ class SatGwMac : public SatMac
      * Callback to indicate NCC a UT needs to be removed
      */
     SatGwMac::RemoveUtCallback m_removeUtCallback;
+
+    /**
+     * Callback to clear LLC queues
+     */
+    SatGwMac::ClearQueuesCallback m_clearQueuesCallback;
 };
 
 } // namespace ns3

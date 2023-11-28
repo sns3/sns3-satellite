@@ -316,6 +316,7 @@ SatNcc::UtCrReceived(uint32_t satId, uint32_t beamId, Address utId, Ptr<SatCrMes
 void
 SatNcc::AddBeam(uint32_t satId,
                 uint32_t beamId,
+                Ptr<SatNetDevice> gwNetDevice,
                 Ptr<SatGeoNetDevice> geoNetDevice,
                 SatNcc::SendCallback cb,
                 SatNcc::SendTbtpCallback tbtpCb,
@@ -324,7 +325,8 @@ SatNcc::AddBeam(uint32_t satId,
                 Address satAddress,
                 Address gwAddress)
 {
-    NS_LOG_FUNCTION(this << satId << beamId << &cb);
+    NS_LOG_FUNCTION(this << satId << beamId << gwNetDevice << geoNetDevice << &cb << &tbtpCb << seq
+                         << maxFrameSize << satAddress << gwAddress);
 
     Ptr<SatBeamScheduler> scheduler;
     std::map<std::pair<uint32_t, uint32_t>, Ptr<SatBeamScheduler>>::iterator iterator =
@@ -336,16 +338,17 @@ SatNcc::AddBeam(uint32_t satId,
     }
 
     scheduler = CreateObject<SatBeamScheduler>();
-    scheduler->Initialize(satId, beamId, cb, seq, maxFrameSize, satAddress, gwAddress);
+    scheduler->Initialize(satId,
+                          beamId,
+                          gwNetDevice,
+                          geoNetDevice,
+                          cb,
+                          seq,
+                          maxFrameSize,
+                          satAddress,
+                          gwAddress);
 
     scheduler->SetSendTbtpCallback(tbtpCb);
-
-    SatBeamScheduler::ConnectUtCallback connectCb =
-        MakeCallback(&SatGeoNetDevice::ConnectUt, geoNetDevice);
-    SatBeamScheduler::DisconnectUtCallback disconnectCb =
-        MakeCallback(&SatGeoNetDevice::DisconnectUt, geoNetDevice);
-    scheduler->SetConnectUtCallback(connectCb);
-    scheduler->SetDisconnectUtCallback(disconnectCb);
 
     m_beamSchedulers.insert(std::make_pair(std::make_pair(satId, beamId), scheduler));
 }

@@ -85,6 +85,12 @@ SatGwMac::GetTypeId(void)
                           BooleanValue(true),
                           MakeBooleanAccessor(&SatGwMac::m_broadcastNcr),
                           MakeBooleanChecker())
+            .AddAttribute("DisableSchedulingIfNoDeviceConnected",
+                          "If true, the periodic calls of StartTransmission are not called when no "
+                          "devices are connected to this MAC",
+                          BooleanValue(false),
+                          MakeBooleanAccessor(&SatGwMac::m_disableSchedulingIfNoDeviceConnected),
+                          MakeBooleanChecker())
             .AddTraceSource("BBFrameTxTrace",
                             "Trace for transmitted BB Frames.",
                             MakeTraceSourceAccessor(&SatGwMac::m_bbFrameTxTrace),
@@ -108,7 +114,8 @@ SatGwMac::SatGwMac()
       m_useCmt(false),
       m_lastCmtSent(),
       m_cmtPeriodMin(MilliSeconds(550)),
-      m_broadcastNcr(true)
+      m_broadcastNcr(true),
+      m_disableSchedulingIfNoDeviceConnected(false)
 {
     NS_LOG_FUNCTION(this);
 
@@ -126,7 +133,8 @@ SatGwMac::SatGwMac(uint32_t satId,
       m_useCmt(false),
       m_lastCmtSent(),
       m_cmtPeriodMin(MilliSeconds(550)),
-      m_broadcastNcr(true)
+      m_broadcastNcr(true),
+      m_disableSchedulingIfNoDeviceConnected(false)
 {
     NS_LOG_FUNCTION(this);
 }
@@ -155,10 +163,19 @@ SatGwMac::StartPeriodicTransmissions()
 {
     NS_LOG_FUNCTION(this);
 
+    if (m_disableSchedulingIfNoDeviceConnected && !HasPeer())
+    {
+        NS_LOG_INFO("Do not start beam " << m_beamId << " because no device is connected");
+        return;
+    }
+
     if (m_fwdScheduler == NULL)
     {
         NS_FATAL_ERROR("Scheduler not set for GW MAC!!!");
     }
+
+    m_clearQueuesCallback();
+    m_fwdScheduler->ClearAllPackets();
 
     /**
      * It is currently assumed that there is only one carrier in FWD link. This
@@ -351,7 +368,7 @@ SatGwMac::Receive(SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> rx
 void
 SatGwMac::StartTransmission(uint32_t carrierId)
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(this << carrierId);
 
     if (m_nodeInfo->GetNodeType() == SatEnums::NT_GW)
     {
@@ -796,6 +813,13 @@ SatGwMac::SetRemoveUtCallback(SatGwMac::RemoveUtCallback cb)
 }
 
 void
+SatGwMac::SetClearQueuesCallback(SatGwMac::ClearQueuesCallback cb)
+{
+    NS_LOG_FUNCTION(this << &cb);
+    m_clearQueuesCallback = cb;
+}
+
+void
 SatGwMac::SetFwdScheduler(Ptr<SatFwdLinkScheduler> fwdScheduler)
 {
     m_fwdScheduler = fwdScheduler;
@@ -817,6 +841,60 @@ SatGwMac::ChangeBeam(uint32_t satId, uint32_t beamId)
         m_connectionCallback ();
     }
     */
+}
+
+void
+SatGwMac::ConnectUt(Mac48Address utAddress)
+{
+    NS_LOG_FUNCTION(this << utAddress);
+
+    NS_ASSERT(m_peers.find(utAddress) == m_peers.end());
+
+    if (m_disableSchedulingIfNoDeviceConnected && !HasPeer())
+    {
+        NS_LOG_INFO("Start beam " << m_beamId);
+        m_peers.insert(utAddress);
+        StartPeriodicTransmissions();
+    }
+    else
+    {
+        m_peers.insert(utAddress);
+    }
+}
+
+void
+SatGwMac::DisconnectUt(Mac48Address utAddress)
+{
+    NS_LOG_FUNCTION(this << utAddress);
+
+    NS_ASSERT(m_peers.find(utAddress) != m_peers.end());
+
+    m_peers.erase(utAddress);
+
+    if (m_disableSchedulingIfNoDeviceConnected && !HasPeer())
+    {
+        NS_LOG_INFO("Stop beam " << m_beamId);
+        StopPeriodicTransmissions();
+    }
+}
+
+void
+SatGwMac::StopPeriodicTransmissions()
+{
+    NS_LOG_FUNCTION(this);
+
+    m_periodicTransmissionEnabled = false;
+
+    // TODO use callback
+    // m_llc->ClearQueues();
+}
+
+bool
+SatGwMac::HasPeer()
+{
+    NS_LOG_FUNCTION(this);
+
+    return !m_peers.empty();
 }
 
 } // namespace ns3

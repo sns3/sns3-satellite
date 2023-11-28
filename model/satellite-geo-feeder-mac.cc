@@ -102,7 +102,7 @@ SatGeoFeederMac::EnquePacket(Ptr<Packet> packet)
 {
     NS_LOG_FUNCTION(this << packet);
 
-    if(!m_periodicTransmissionEnabled)
+    if (!m_periodicTransmissionEnabled)
     {
         NS_LOG_INFO("Do not enque packet to this beam because it is disabled");
         return;

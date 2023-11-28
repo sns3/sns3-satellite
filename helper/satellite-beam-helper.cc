@@ -763,6 +763,7 @@ SatBeamHelper::InstallFeeder(Ptr<SatGeoNetDevice> geoNetDevice,
         m_ncc->AddBeam(
             satId,
             beamId,
+            DynamicCast<SatNetDevice>(gwNd),
             geoNetDevice,
             MakeCallback(&SatNetDevice::SendControlMsg, DynamicCast<SatNetDevice>(gwNd)),
             MakeCallback(&SatGwMac::TbtpSent,
@@ -775,6 +776,7 @@ SatBeamHelper::InstallFeeder(Ptr<SatGeoNetDevice> geoNetDevice,
     case SatEnums::LORA:
         m_ncc->AddBeam(satId,
                        beamId,
+                       DynamicCast<SatNetDevice>(gwNd),
                        geoNetDevice,
                        MakeCallback(&SatLorawanNetDevice::SendControlMsg,
                                     DynamicCast<SatLorawanNetDevice>(gwNd)),
@@ -869,6 +871,12 @@ SatBeamHelper::InstallUser(Ptr<SatGeoNetDevice> geoNetDevice,
             DynamicCast<SatUtLlc>(DynamicCast<SatNetDevice>(*i)->GetLlc())
                 ->SetSatelliteAddress(Mac48Address::ConvertFrom(satUserAddress));
         }
+    }
+
+    for (NetDeviceContainer::Iterator i = utNd.Begin(); i != utNd.End(); i++)
+    {
+        DynamicCast<SatGwMac>(DynamicCast<SatNetDevice>(gwNd)->GetMac())
+            ->ConnectUt(Mac48Address::ConvertFrom((*i)->GetAddress()));
     }
 
     return utNd;

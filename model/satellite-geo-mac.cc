@@ -114,7 +114,7 @@ SatGeoMac::StartPeriodicTransmissions()
 {
     NS_LOG_FUNCTION(this);
 
-    if(m_disableSchedulingIfNoDeviceConnected && !HasPeer())
+    if (m_disableSchedulingIfNoDeviceConnected && !HasPeer())
     {
         NS_LOG_INFO("Do not start beam " << m_beamId << " because no device is connected");
         return;
@@ -175,7 +175,7 @@ SatGeoMac::StartTransmission(uint32_t carrierId)
         txDuration = m_fwdScheduler->GetDefaultFrameDuration();
     }
 
-    if(m_periodicTransmissionEnabled)
+    if (m_periodicTransmissionEnabled)
     {
         Simulator::Schedule(txDuration, &SatGeoMac::StartTransmission, this, 0);
     }
