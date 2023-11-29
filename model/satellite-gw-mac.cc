@@ -115,7 +115,8 @@ SatGwMac::SatGwMac()
       m_lastCmtSent(),
       m_cmtPeriodMin(MilliSeconds(550)),
       m_broadcastNcr(true),
-      m_disableSchedulingIfNoDeviceConnected(false)
+      m_disableSchedulingIfNoDeviceConnected(false),
+      m_periodicTransmissionEnabled(false)
 {
     NS_LOG_FUNCTION(this);
 
@@ -134,7 +135,8 @@ SatGwMac::SatGwMac(uint32_t satId,
       m_lastCmtSent(),
       m_cmtPeriodMin(MilliSeconds(550)),
       m_broadcastNcr(true),
-      m_disableSchedulingIfNoDeviceConnected(false)
+      m_disableSchedulingIfNoDeviceConnected(false),
+      m_periodicTransmissionEnabled(false)
 {
     NS_LOG_FUNCTION(this);
 }
@@ -168,6 +170,14 @@ SatGwMac::StartPeriodicTransmissions()
         NS_LOG_INFO("Do not start beam " << m_beamId << " because no device is connected");
         return;
     }
+
+    if (m_periodicTransmissionEnabled == true)
+    {
+        NS_LOG_INFO("Beam " << m_beamId << " already enabled");
+        return;
+    }
+
+    m_periodicTransmissionEnabled = true;
 
     if (m_fwdScheduler == NULL)
     {
@@ -370,6 +380,11 @@ SatGwMac::StartTransmission(uint32_t carrierId)
 {
     NS_LOG_FUNCTION(this << carrierId);
 
+    if (m_handoverModule != nullptr)
+    {
+        m_handoverModule->CheckForHandoverRecommendation(m_satId, m_beamId);
+    }
+
     if (m_nodeInfo->GetNodeType() == SatEnums::NT_GW)
     {
         m_lastSOF.push(Simulator::Now());
@@ -382,7 +397,7 @@ SatGwMac::StartTransmission(uint32_t carrierId)
 
     Time txDuration;
 
-    if (m_txEnabled)
+    if (m_txEnabled && (!m_disableSchedulingIfNoDeviceConnected || m_periodicTransmissionEnabled))
     {
         std::pair<Ptr<SatBbFrame>, const Time> bbFrameInfo = m_fwdScheduler->GetNextFrame();
         Ptr<SatBbFrame> bbFrame = bbFrameInfo.first;
@@ -428,14 +443,17 @@ SatGwMac::StartTransmission(uint32_t carrierId)
         txDuration = m_fwdScheduler->GetDefaultFrameDuration();
     }
 
-    /**
-     * It is currently assumed that there is only one carrier in FWD link. This
-     * carrier has a default index of 0.
-     * TODO: When enabling multi-carrier support for FWD link, we need to
-     * modify the FWD link scheduler to schedule separately each FWD link
-     * carrier.
-     */
-    Simulator::Schedule(txDuration, &SatGwMac::StartTransmission, this, 0);
+    if (m_periodicTransmissionEnabled)
+    {
+        /**
+         * It is currently assumed that there is only one carrier in FWD link. This
+         * carrier has a default index of 0.
+         * TODO: When enabling multi-carrier support for FWD link, we need to
+         * modify the FWD link scheduler to schedule separately each FWD link
+         * carrier.
+         */
+        Simulator::Schedule(txDuration, &SatGwMac::StartTransmission, this, 0);
+    }
 }
 
 void
@@ -467,12 +485,10 @@ SatGwMac::StartNcrTransmission()
 
     SendNcrMessage();
 
-    if (m_handoverModule != nullptr)
+    if (m_periodicTransmissionEnabled)
     {
-        m_handoverModule->CheckForHandoverRecommendation(m_satId, m_beamId);
+        Simulator::Schedule(m_ncrInterval, &SatGwMac::StartNcrTransmission, this);
     }
-
-    Simulator::Schedule(m_ncrInterval, &SatGwMac::StartNcrTransmission, this);
 }
 
 void

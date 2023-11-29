@@ -330,8 +330,8 @@ SatGwHelperDvb::Install(Ptr<Node> n,
     // set scheduler to Mac
     mac->SetFwdScheduler(fwdLinkScheduler);
 
-    mac->StartPeriodicTransmissions();
     mac->SetClearQueuesCallback(MakeCallback(&SatGwLlc::ClearQueues, llc));
+    mac->StartPeriodicTransmissions();
 
     Ptr<SatHandoverModule> handoverModule = n->GetObject<SatHandoverModule>();
     if (handoverModule != NULL)

@@ -120,14 +120,20 @@ SatGeoMac::StartPeriodicTransmissions()
         return;
     }
 
+    if (m_periodicTransmissionEnabled == true)
+    {
+        NS_LOG_INFO("Beam " << m_beamId << " already enabled");
+        return;
+    }
+
+    m_periodicTransmissionEnabled = true;
+
     if (m_fwdScheduler == NULL)
     {
         NS_FATAL_ERROR("Scheduler not set for GEO MAC!!!");
     }
 
     m_llc->ClearQueues();
-
-    m_periodicTransmissionEnabled = true;
 
     Simulator::Schedule(Seconds(0), &SatGeoMac::StartTransmission, this, 0);
 }

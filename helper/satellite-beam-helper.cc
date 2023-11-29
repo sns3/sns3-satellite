@@ -873,12 +873,6 @@ SatBeamHelper::InstallUser(Ptr<SatGeoNetDevice> geoNetDevice,
         }
     }
 
-    for (NetDeviceContainer::Iterator i = utNd.Begin(); i != utNd.End(); i++)
-    {
-        DynamicCast<SatGwMac>(DynamicCast<SatNetDevice>(gwNd)->GetMac())
-            ->ConnectUt(Mac48Address::ConvertFrom((*i)->GetAddress()));
-    }
-
     return utNd;
 }
 
