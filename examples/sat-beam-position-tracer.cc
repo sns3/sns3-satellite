@@ -38,15 +38,40 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE("sat-beam-position-tracer");
 
+void
+GetBeamPositions(Ptr<SatHelper> satHelper)
+{
+    Ptr<SatAntennaGainPatternContainer> antennaGainPatterns = satHelper->GetAntennaGainPatterns();
+    NodeContainer satNodes = satHelper->GeoSatNodes();
+    uint32_t beamCount = satHelper->GetBeamCount();
+    for (uint32_t satId = 0; satId < satNodes.GetN(); satId++)
+    {
+        Ptr<SatMobilityModel> mobility = antennaGainPatterns->GetAntennaMobility(satId);
+        for (uint32_t beamId = 0; beamId < beamCount; beamId++)
+        {
+            Ptr<SatAntennaGainPattern> pattern =
+                antennaGainPatterns->GetAntennaGainPattern(beamId + 1);
+            std::cout << Simulator::Now().GetSeconds() << ";" << satId << ";" << beamId << ";"
+                      << pattern->GetCenterLatitude(mobility) << ";"
+                      << pattern->GetCenterLongitude(mobility) << std::endl;
+        }
+    }
+}
+
 int
 main(int argc, char* argv[])
 {
     std::string scenario = "constellation-leo-2-satellites";
+    uint32_t simLength_s = 1000;
+    uint32_t simTraceStep_s = 10;
 
     Config::SetDefault("ns3::SatConf::ForwardLinkRegenerationMode",
                        EnumValue(SatEnums::REGENERATION_NETWORK));
     Config::SetDefault("ns3::SatConf::ReturnLinkRegenerationMode",
                        EnumValue(SatEnums::REGENERATION_NETWORK));
+
+    Config::SetDefault("ns3::SatGwMac::DisableSchedulingIfNoDeviceConnected", BooleanValue(true));
+    Config::SetDefault("ns3::SatGeoMac::DisableSchedulingIfNoDeviceConnected", BooleanValue(true));
 
     Ptr<SimulationHelper> simulationHelper =
         CreateObject<SimulationHelper>("sat-beam-position-tracer");
@@ -57,23 +82,19 @@ main(int argc, char* argv[])
     cmd.Parse(argc, argv);
 
     simulationHelper->LoadScenario(scenario);
+    simulationHelper->SetSimulationTime(simLength_s);
     simulationHelper->SetUserCountPerUt(1);
 
     Ptr<SatHelper> satHelper = simulationHelper->CreateSatScenario(SatHelper::FULL);
-    Ptr<SatAntennaGainPatternContainer> antennaGainPatterns = satHelper->GetAntennaGainPatterns();
 
-    NodeContainer satNodes = satHelper->GeoSatNodes();
-    uint32_t beamCount = satHelper->GetBeamCount();
-    for (uint32_t satId = 0; satId < satNodes.GetN(); satId++)
+    double t = 0.0;
+    while (t <= simLength_s)
     {
-        Ptr<SatMobilityModel> mobility = antennaGainPatterns->GetAntennaMobility(satId);
-        for (uint32_t beamId = 0; beamId < beamCount; beamId++)
-        {
-            Ptr<SatAntennaGainPattern> pattern =
-                antennaGainPatterns->GetAntennaGainPattern(beamId + 1);
-            std::cout << "Center of beam " << beamId << " for satellite " << satId << " is "
-                      << pattern->GetCenterLatitude(mobility) << ";"
-                      << pattern->GetCenterLongitude(mobility) << std::endl;
-        }
+        Simulator::Schedule(Seconds(t), &GetBeamPositions, satHelper);
+        t = t + simTraceStep_s;
     }
+
+    std::cout << "time;satId;beamId;latitude;longitude" << std::endl;
+
+    simulationHelper->RunSimulation();
 }
