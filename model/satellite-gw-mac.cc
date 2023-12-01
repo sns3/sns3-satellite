@@ -382,7 +382,11 @@ SatGwMac::StartTransmission(uint32_t carrierId)
 
     if (m_handoverModule != nullptr)
     {
-        m_handoverModule->CheckForHandoverRecommendation(m_satId, m_beamId);
+        if (m_handoverModule->CheckForHandoverRecommendation(m_satId, m_beamId))
+        {
+            m_satId = m_handoverModule->GetAskedSatId();
+            m_beamId = m_handoverModule->GetAskedBeamId();
+        }
     }
 
     if (m_nodeInfo->GetNodeType() == SatEnums::NT_GW)
@@ -836,6 +840,13 @@ SatGwMac::SetClearQueuesCallback(SatGwMac::ClearQueuesCallback cb)
 }
 
 void
+SatGwMac::SetBeamCallback(SatGwMac::PhyBeamCallback cb)
+{
+    NS_LOG_FUNCTION(this << &cb);
+    m_beamCallback = cb;
+}
+
+void
 SatGwMac::SetFwdScheduler(Ptr<SatFwdLinkScheduler> fwdScheduler)
 {
     m_fwdScheduler = fwdScheduler;
@@ -852,7 +863,7 @@ SatGwMac::ChangeBeam(uint32_t satId, uint32_t beamId)
     NS_LOG_FUNCTION(this << satId << beamId);
 
     // TODO
-    /*if (m_beamCallback (beamId))
+    /*if (m_beamCallback (beamId)) // to
     {
         m_connectionCallback ();
     }
@@ -900,9 +911,6 @@ SatGwMac::StopPeriodicTransmissions()
     NS_LOG_FUNCTION(this);
 
     m_periodicTransmissionEnabled = false;
-
-    // TODO use callback
-    // m_llc->ClearQueues();
 }
 
 bool

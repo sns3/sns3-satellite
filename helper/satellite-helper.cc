@@ -1221,10 +1221,14 @@ SatHelper::SetGwMobility(NodeContainer gwNodes)
         {
             InstallMobilityObserver(0, NodeContainer(gwNode));
         }
-        Ptr<SatHandoverModule> ho =
-            CreateObject<SatHandoverModule>(gwNode, GeoSatNodes(), m_antennaGainPatterns);
-        NS_LOG_DEBUG("Created Handover Module " << ho << " for GW node " << gwNode);
-        gwNode->AggregateObject(ho);
+
+        if (m_handoversEnabled)
+        {
+            Ptr<SatHandoverModule> ho =
+                CreateObject<SatHandoverModule>(gwNode, GeoSatNodes(), m_antennaGainPatterns);
+            NS_LOG_DEBUG("Created Handover Module " << ho << " for GW node " << gwNode);
+            gwNode->AggregateObject(ho);
+        }
     }
 }
 

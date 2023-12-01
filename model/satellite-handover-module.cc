@@ -152,13 +152,6 @@ SatHandoverModule::CheckForHandoverRecommendation(uint32_t satId, uint32_t beamI
 {
     NS_LOG_FUNCTION(this << satId << beamId);
 
-    if (m_askedSatId == satId && m_askedBeamId == beamId)
-    {
-        // In case TIM-U was received successfuly, the last asked beam should
-        // match the current beamId. So reset the timeout feature.
-        // m_hasPendingRequest = false;
-    }
-
     Time now = Simulator::Now();
     if (m_hasPendingRequest && (now - m_lastMessageSentAt > m_repeatRequestTimeout))
     {
@@ -187,9 +180,6 @@ SatHandoverModule::CheckForHandoverRecommendation(uint32_t satId, uint32_t beamI
     uint32_t bestSatId = m_askedSatId;
     uint32_t bestBeamId = m_askedBeamId;
 
-    // std::cout << "SatHandoverModule::CheckForHandoverRecommendation " << bestSatId << " "
-    //           << bestBeamId << std::endl;
-
     if (!m_hasPendingRequest || now - m_lastMessageSentAt > m_repeatRequestTimeout)
     {
         switch (m_handoverDecisionAlgorithm)
@@ -209,8 +199,9 @@ SatHandoverModule::CheckForHandoverRecommendation(uint32_t satId, uint32_t beamI
         (!m_hasPendingRequest || now - m_lastMessageSentAt > m_repeatRequestTimeout))
     {
         NS_LOG_FUNCTION("Sending handover recommendation for beam " << bestBeamId << " on sat "
-                                                                    << satId);
-        m_handoverCallback(bestBeamId, bestSatId);
+                                                                    << bestSatId);
+
+        m_handoverCallback(bestSatId, bestBeamId);
         m_lastMessageSentAt = now;
         m_hasPendingRequest = true;
         m_askedSatId = bestSatId;
@@ -259,7 +250,7 @@ SatHandoverModule::GetNClosestSats(uint32_t numberOfSats)
 std::pair<uint32_t, uint32_t>
 SatHandoverModule::AlgorithmNClosest(GeoCoordinate coords)
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(this << coords);
 
     std::vector<uint32_t> satellites = GetNClosestSats(m_numberClosestSats);
 

@@ -255,6 +255,9 @@ SatGwHelperDvb::Install(Ptr<Node> n,
     // Attach the logon receive callback to SatNcc
     mac->SetLogonCallback(MakeBoundCallback(&logonCallbackHelper, ncc, llsConf));
 
+    // Attach the beam handover callback to SatPhy
+    mac->SetBeamCallback(MakeCallback(&SatPhy::SetBeamId, phy));
+
     // Attach the control burst receive callback to SatNcc
     mac->SetControlMessageReceivedCallback(MakeCallback(&SatNcc::ReceiveControlBurst, ncc));
 

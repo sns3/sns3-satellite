@@ -890,7 +890,7 @@ SatRequestManager::SendCnoReport()
 }
 
 void
-SatRequestManager::SendHandoverRecommendation(uint32_t beamId, uint32_t satId)
+SatRequestManager::SendHandoverRecommendation(uint32_t satId, uint32_t beamId)
 {
     NS_LOG_FUNCTION(this << beamId);
 

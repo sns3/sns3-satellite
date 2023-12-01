@@ -63,7 +63,7 @@ main(int argc, char* argv[])
     Config::SetDefault("ns3::SatHelper::PacketTraceEnabled", BooleanValue(true));
     Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper>("example-gw-handover");
     Ptr<SimulationHelperConf> simulationConf = CreateObject<SimulationHelperConf>();
-    simulationHelper->SetSimulationTime(Seconds(1000));
+    simulationHelper->SetSimulationTime(Seconds(100));
     simulationHelper->SetGwUserCount(1);
     simulationHelper->SetUserCountPerUt(1);
     std::set<uint32_t> beamSetAll = {1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15,
