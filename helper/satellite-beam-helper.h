@@ -209,8 +209,10 @@ class SatBeamHelper : public Object
      * \param geoNetDevice Net device of satellite
      * \param gwNode pointer of GW node
      * \param gwId id of the GW
-     * \param satId ID of the satellite
-     * \param beamId  id of the beam
+     * \param satId ID of the satellite linked to the UT
+     * \param beamId  id of the beam linked to the UT
+     * \param feederSatId ID of the satellite linked to the GW
+     * \param feederBeamId  id of the beam linked to the GW
      * \param feederLink Feeder link channel
      * \param rtnFlFreqId id of the return feeder link frequency
      * \param fwdFlFreqId id of the forward feeder link frequency
@@ -226,6 +228,8 @@ class SatBeamHelper : public Object
                                  uint32_t gwId,
                                  uint32_t satId,
                                  uint32_t beamId,
+                                 uint32_t feederSatId,
+                                 uint32_t feederBeamId,
                                  SatChannelPair::ChannelPair_t feederLink,
                                  uint32_t rtnFlFreqId,
                                  uint32_t fwdFlFreqId,

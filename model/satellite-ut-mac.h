@@ -23,7 +23,6 @@
 #ifndef SATELLITE_UT_MAC_H
 #define SATELLITE_UT_MAC_H
 
-#include "satellite-beam-scheduler.h"
 #include "satellite-enums.h"
 #include "satellite-mac.h"
 #include "satellite-phy.h"
@@ -204,17 +203,6 @@ class SatUtMac : public SatMac
      * \param cb callback to update GW address to SatRequestManager
      */
     void SetUpdateGwAddressCallback(SatUtMac::UpdateGwAddressCallback cb);
-
-    /**
-     * Callback to get the SatBeamScheduler from the beam ID for handover
-     */
-    typedef Callback<Ptr<SatBeamScheduler>, uint32_t, uint32_t> BeamSchedulerCallback;
-
-    /**
-     * \brief Set the beam scheduler callback
-     * \param cb Callback to get the SatBeamScheduler
-     */
-    void SetBeamSchedulerCallback(SatUtMac::BeamSchedulerCallback cb);
 
     /**
      * Callback to get the GW address in this UT MAC
@@ -825,11 +813,6 @@ class SatUtMac : public SatMac
      * Callback for sending a logon message
      */
     SatUtMac::UpdateGwAddressCallback m_updateGwAddressCallback;
-
-    /**
-     * Callback to get the SatBeamScheduler linked to a beam ID
-     */
-    SatUtMac::BeamSchedulerCallback m_beamSchedulerCallback;
 
     /**
      * Callback to get the GW address in this UT MAC

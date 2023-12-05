@@ -72,11 +72,15 @@ class SatGwMac : public SatMac
      *
      * \param satId ID of sat for UT
      * \param beamId ID of beam for UT
+     * \param satId ID of sat for GW
+     * \param beamId ID of beam for GW
      * \param forwardLinkRegenerationMode Forward link regeneration mode
      * \param returnLinkRegenerationMode Return link regeneration mode
      */
     SatGwMac(uint32_t satId,
              uint32_t beamId,
+             uint32_t feederSatId,
+             uint32_t feederBeamId,
              SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
              SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
@@ -104,6 +108,20 @@ class SatGwMac : public SatMac
      * \param tbtp The TBTP sent by the scheduler.
      */
     void TbtpSent(Ptr<SatTbtpMessage> tbtp);
+
+    /**
+     * Get ID of satellite linked to this GW
+     *
+     * \return ID of satellite linked to this GW
+     */
+    uint32_t GetFeederSatId();
+
+    /**
+     * Get ID of beam linked to this GW
+     *
+     * \return ID of beam linked to this GW
+     */
+    uint32_t GetFeederBeamId();
 
     /**
      * Callback to receive capacity request (CR) messages.
@@ -168,10 +186,11 @@ class SatGwMac : public SatMac
 
     /**
      * Callback to change phy-layer beam ID
+     * \param uint32_t New satellite ID to use
      * \param uint32_t New beam ID to use
      * \return whether a connection change should occur
      */
-    typedef Callback<bool, uint32_t> PhyBeamCallback;
+    typedef Callback<void, uint32_t, uint32_t> PhyBeamCallback;
 
     /**
      * Method to set phy-layer beam handover callback
@@ -301,6 +320,16 @@ class SatGwMac : public SatMac
      * \return True if at least a device is connected, false otherwise
      */
     bool HasPeer();
+
+    /**
+     * ID of satellite linked to this GW
+     */
+    uint32_t m_feederSatId;
+
+    /**
+     * ID of beam linked to this GW
+     */
+    uint32_t m_feederBeamId;
 
     /**
      * List of TBTPs sent to UTs. Key is superframe counter, value is TBTP.

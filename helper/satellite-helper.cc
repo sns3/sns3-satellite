@@ -825,6 +825,21 @@ SatHelper::DoCreateScenario(BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
             Ptr<NetDevice> gwNetDevice = netDevices.first;
             NetDeviceContainer utNetDevices = netDevices.second;
 
+            Ptr<SatGwMac> gwMac =
+                DynamicCast<SatGwMac>(DynamicCast<SatNetDevice>(gwNetDevice)->GetMac());
+            uint32_t feederSatId;
+            uint32_t feederBeamId;
+            if (gwMac != nullptr)
+            {
+                feederSatId = gwMac->GetFeederSatId();
+                feederBeamId = gwMac->GetFeederBeamId();
+            }
+            else
+            {
+                feederSatId = 0;
+                feederBeamId = 0;
+            }
+
             NetDeviceContainer::Iterator itNd;
             for (itNd = utNetDevices.Begin(); itNd != utNetDevices.End(); itNd++)
             {
@@ -832,30 +847,23 @@ SatHelper::DoCreateScenario(BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
                     DynamicCast<SatUtMac>(DynamicCast<SatNetDevice>(*itNd)->GetMac());
                 if (utMac != nullptr)
                 {
-                    Ptr<SatGwMac> gwMac =
-                        DynamicCast<SatGwMac>(DynamicCast<SatNetDevice>(gwNetDevice)->GetMac());
                     gwMac->ConnectUt(Mac48Address::ConvertFrom((*itNd)->GetAddress()));
                 }
             }
 
             if (m_satConstellationEnabled)
             {
-                uint32_t gwId = rtnConf[SatConf::GW_ID_INDEX] - 1;
-                uint32_t gwSatId = m_gwSats[gwId];
-                if (satId == gwSatId)
-                {
-                    // TODO change to feeder beam ID
-                    DynamicCast<SatGeoNetDevice>(
-                        m_beamHelper->GetGeoSatNodes().Get(gwSatId)->GetDevice(0))
-                        ->ConnectGw(Mac48Address::ConvertFrom(netDevices.first->GetAddress()),
-                                    beamId);
-                }
+                DynamicCast<SatGeoNetDevice>(
+                    m_beamHelper->GetGeoSatNodes().Get(feederSatId)->GetDevice(0))
+                    ->ConnectGw(Mac48Address::ConvertFrom(netDevices.first->GetAddress()),
+                                feederBeamId);
             }
             else
             {
-                // TODO change to feeder beam ID
-                DynamicCast<SatGeoNetDevice>(m_beamHelper->GetGeoSatNodes().Get(0)->GetDevice(0))
-                    ->ConnectGw(Mac48Address::ConvertFrom(netDevices.first->GetAddress()), beamId);
+                DynamicCast<SatGeoNetDevice>(
+                    m_beamHelper->GetGeoSatNodes().Get(feederSatId)->GetDevice(0))
+                    ->ConnectGw(Mac48Address::ConvertFrom(netDevices.first->GetAddress()),
+                                feederBeamId);
                 m_userHelper->PopulateBeamRoutings(uts,
                                                    netDevices.second,
                                                    gwNode,
@@ -899,6 +907,22 @@ SatHelper::DoCreateScenario(BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
                     if (netDevice)
                     {
                         Ptr<SatUtMac> mac = DynamicCast<SatUtMac>(netDevice->GetMac());
+                        mac->SetUpdateIslCallback(
+                            MakeCallback(&SatBeamHelper::SetIslRoutes, m_beamHelper));
+                    }
+                }
+            }
+
+            for (uint32_t i = 0; i < GwNodes().GetN(); i++)
+            {
+                Ptr<Node> gw = GwNodes().Get(i);
+
+                for (uint32_t j = 0; j < gw->GetNDevices(); j++)
+                {
+                    Ptr<SatNetDevice> netDevice = DynamicCast<SatNetDevice>(gw->GetDevice(j));
+                    if (netDevice)
+                    {
+                        Ptr<SatGwMac> mac = DynamicCast<SatGwMac>(netDevice->GetMac());
                         mac->SetUpdateIslCallback(
                             MakeCallback(&SatBeamHelper::SetIslRoutes, m_beamHelper));
                     }

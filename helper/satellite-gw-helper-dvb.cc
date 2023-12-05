@@ -105,8 +105,11 @@ SatGwHelperDvb::Install(Ptr<Node> n,
                         uint32_t gwId,
                         uint32_t satId,
                         uint32_t beamId,
+                        uint32_t feederSatId,
+                        uint32_t feederBeamId,
                         Ptr<SatChannel> fCh,
                         Ptr<SatChannel> rCh,
+                        SatPhy::ChannelPairGetterCallback cbChannel,
                         Ptr<SatNcc> ncc,
                         Ptr<SatLowerLayerServiceConf> llsConf,
                         SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
@@ -181,6 +184,7 @@ SatGwHelperDvb::Install(Ptr<Node> n,
         parameters,
         m_superframeSeq->GetSuperframeConf(SatConstVariables::SUPERFRAME_SEQUENCE),
         returnLinkRegenerationMode);
+    phy->SetChannelPairGetterCallback(cbChannel);
 
     ncc->SetUseLogon(m_superframeSeq->GetSuperframeConf(SatConstVariables::SUPERFRAME_SEQUENCE)
                          ->IsLogonEnabled());
@@ -191,6 +195,8 @@ SatGwHelperDvb::Install(Ptr<Node> n,
 
     Ptr<SatGwMac> mac = CreateObject<SatGwMac>(satId,
                                                beamId,
+                                               feederSatId,
+                                               feederBeamId,
                                                forwardLinkRegenerationMode,
                                                returnLinkRegenerationMode);
 
@@ -256,7 +262,7 @@ SatGwHelperDvb::Install(Ptr<Node> n,
     mac->SetLogonCallback(MakeBoundCallback(&logonCallbackHelper, ncc, llsConf));
 
     // Attach the beam handover callback to SatPhy
-    mac->SetBeamCallback(MakeCallback(&SatPhy::SetBeamId, phy));
+    mac->SetBeamCallback(MakeCallback(&SatGwPhy::PerformHandover, phy));
 
     // Attach the control burst receive callback to SatNcc
     mac->SetControlMessageReceivedCallback(MakeCallback(&SatNcc::ReceiveControlBurst, ncc));
@@ -340,6 +346,7 @@ SatGwHelperDvb::Install(Ptr<Node> n,
     if (handoverModule != NULL)
     {
         handoverModule->SetHandoverRequestCallback(MakeCallback(&SatGwMac::ChangeBeam, mac));
+        mac->SetBeamSchedulerCallback(MakeCallback(&SatNcc::GetBeamScheduler, ncc));
         mac->SetHandoverModule(handoverModule);
     }
 

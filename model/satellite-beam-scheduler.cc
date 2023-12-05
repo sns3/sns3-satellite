@@ -1024,6 +1024,22 @@ SatBeamScheduler::DisconnectUt(Mac48Address address)
 }
 
 void
+SatBeamScheduler::ConnectGw(Mac48Address address)
+{
+    NS_LOG_FUNCTION(this << address);
+
+    m_geoNetDevice->ConnectGw(address, m_beamId);
+}
+
+void
+SatBeamScheduler::DisconnectGw(Mac48Address address)
+{
+    NS_LOG_FUNCTION(this << address);
+
+    m_geoNetDevice->DisconnectGw(address, m_beamId);
+}
+
+void
 SatBeamScheduler::RemoveUt(Address utId)
 {
     NS_LOG_FUNCTION(this << utId);

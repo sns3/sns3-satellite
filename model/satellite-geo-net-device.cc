@@ -203,6 +203,8 @@ SatGeoNetDevice::ReceivePacketUser(Ptr<Packet> packet, const Address& userAddres
             packet->AddPacketTag(SatDevLinkTimeTag(Simulator::Now()));
         }
 
+        std::cout << "Send packet " << packet->GetUid() << " to " << satUplinkInfoTag.GetBeamId() << std::endl;
+
         DynamicCast<SatGeoFeederMac>(m_feederMac[satUplinkInfoTag.GetBeamId()])
             ->EnquePacket(packet);
     }

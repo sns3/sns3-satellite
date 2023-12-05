@@ -124,7 +124,12 @@ SatGwPhy::GetTypeId(void)
                           "Adjacent channel interference wrt white noise in percents.",
                           DoubleValue(10.0),
                           MakeDoubleAccessor(&SatGwPhy::m_aciIfWrtNoisePercent),
-                          MakeDoubleChecker<double>(0, 100));
+                          MakeDoubleChecker<double>(0, 100))
+            .AddAttribute("AntennaReconfigurationDelay",
+                          "Delay of antenna reconfiguration when performing handover",
+                          TimeValue(Seconds(0.0)),
+                          MakeTimeAccessor(&SatGwPhy::m_antennaReconfigurationDelay),
+                          MakeTimeChecker());
     return tid;
 }
 
@@ -139,7 +144,8 @@ SatGwPhy::GetInstanceTypeId(void) const
 SatGwPhy::SatGwPhy(void)
     : m_aciIfWrtNoisePercent(10.0),
       m_imInterferenceCOverIDb(22.0),
-      m_imInterferenceCOverI(SatUtils::DbToLinear(m_imInterferenceCOverIDb))
+      m_imInterferenceCOverI(SatUtils::DbToLinear(m_imInterferenceCOverIDb)),
+      m_antennaReconfigurationDelay(Seconds(0.0))
 {
     NS_LOG_FUNCTION(this);
     NS_FATAL_ERROR("SatGwPhy default constructor is not allowed to use");
@@ -153,7 +159,8 @@ SatGwPhy::SatGwPhy(SatPhy::CreateParam_t& params,
     : SatPhy(params),
       m_aciIfWrtNoisePercent(10.0),
       m_imInterferenceCOverIDb(22.0),
-      m_imInterferenceCOverI(SatUtils::DbToLinear(m_imInterferenceCOverIDb))
+      m_imInterferenceCOverI(SatUtils::DbToLinear(m_imInterferenceCOverIDb)),
+      m_antennaReconfigurationDelay(Seconds(0.0))
 {
     NS_LOG_FUNCTION(this);
 
@@ -218,6 +225,38 @@ SatEnums::SatLinkDir_t
 SatGwPhy::GetSatLinkRxDir()
 {
     return SatEnums::LD_RETURN;
+}
+
+void
+SatGwPhy::PerformHandover(uint32_t satId, uint32_t beamId)
+{
+    NS_LOG_FUNCTION(this << satId << beamId);
+
+    // disconnect current SatChannels
+    SatChannelPair::ChannelPair_t channels = m_retrieveChannelPair(m_satId, m_beamId);
+    m_phyTx->ClearChannel();
+    channels.first->RemoveRx(m_phyRx);
+
+    // perform "physical" beam handover
+    SetSatId(satId);
+    SetBeamId(beamId);
+    Simulator::Schedule(m_antennaReconfigurationDelay, &SatGwPhy::AssignNewSatChannels, this);
+}
+
+void
+SatGwPhy::AssignNewSatChannels()
+{
+    NS_LOG_FUNCTION(this);
+
+    // Fetch channels for current beam
+    SatChannelPair::ChannelPair_t channels = m_retrieveChannelPair(m_satId, m_beamId);
+    Ptr<SatChannel> forwardLink = channels.first;
+    Ptr<SatChannel> returnLink = channels.second;
+
+    // Assign channels
+    NS_LOG_INFO("Setting new Tx on channel " << returnLink);
+    m_phyTx->SetChannel(returnLink);
+    forwardLink->AddRx(m_phyRx);
 }
 
 } // namespace ns3

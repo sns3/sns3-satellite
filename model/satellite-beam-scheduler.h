@@ -296,6 +296,20 @@ class SatBeamScheduler : public Object
     void DisconnectUt(Mac48Address address);
 
     /**
+     * Connect a new GW address to this scheduler
+     *
+     * \param address The GW address to connect
+     */
+    void ConnectGw(Mac48Address address);
+
+    /**
+     * Disconnect a new GW address from this scheduler
+     *
+     * \param address The GW address to disconnect
+     */
+    void DisconnectGw(Mac48Address address);
+
+    /**
      * \brief Remove a UT from its SatBeamScheduler
      * \param utId the terminal that is leaving this beam
      */

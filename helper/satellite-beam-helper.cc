@@ -592,10 +592,14 @@ SatBeamHelper::Install(NodeContainer ut,
     // Get the position of the GW serving this beam, get the best beam based on antenna patterns
     // for this position, and set the antenna patterns to the feeder PHY objects via
     // AttachChannels method.
+    // TODO incorrect sat ID here ?
     GeoCoordinate gwPos = gwNode->GetObject<SatMobilityModel>()->GetGeoPosition();
-    uint32_t feederBeamId = m_antennaGainPatterns->GetBestBeamId(satId, gwPos, true);
+    uint32_t feederSatId = GetClosestSat(gwPos);
+    uint32_t feederBeamId = m_antennaGainPatterns->GetBestBeamId(feederSatId, gwPos, true);
     if (feederBeamId == 0)
     {
+        // TODO disconnect if no feeder
+        NS_FATAL_ERROR("TODO");
         feederBeamId = 1;
     }
 
@@ -642,6 +646,8 @@ SatBeamHelper::Install(NodeContainer ut,
                                         gwId,
                                         satId,
                                         beamId,
+                                        feederSatId,
+                                        feederBeamId,
                                         feederLink,
                                         rtnFlFreqId,
                                         fwdFlFreqId,
@@ -696,6 +702,8 @@ SatBeamHelper::InstallFeeder(Ptr<SatGeoNetDevice> geoNetDevice,
                              uint32_t gwId,
                              uint32_t satId,
                              uint32_t beamId,
+                             uint32_t feederSatId,
+                             uint32_t feederBeamId,
                              SatChannelPair::ChannelPair_t feederLink,
                              uint32_t rtnFlFreqId,
                              uint32_t fwdFlFreqId,
@@ -727,8 +735,11 @@ SatBeamHelper::InstallFeeder(Ptr<SatGeoNetDevice> geoNetDevice,
                                               gwId,
                                               satId,
                                               beamId,
+                                              feederSatId,
+                                              feederBeamId,
                                               feederLink.first,
                                               feederLink.second,
+                                              MakeCallback(&SatChannelPair::GetChannelPair, m_flChannels),
                                               m_ncc,
                                               llsConf.Get<SatLowerLayerServiceConf>(),
                                               m_forwardLinkRegenerationMode,
@@ -794,17 +805,18 @@ SatBeamHelper::InstallFeeder(Ptr<SatGeoNetDevice> geoNetDevice,
     if (m_forwardLinkRegenerationMode == SatEnums::REGENERATION_LINK ||
         m_forwardLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
     {
+        Ptr<SatGwMac> gwMac = DynamicCast<SatGwMac>(DynamicCast<SatNetDevice>(gwNd)->GetMac());
         Mac48Address satFeederAddress = geoNetDevice->GetSatelliteFeederAddress(beamId);
-        DynamicCast<SatGwMac>(DynamicCast<SatNetDevice>(gwNd)->GetMac())
-            ->SetSatelliteAddress(satFeederAddress);
+        gwMac->SetSatelliteAddress(satFeederAddress);
+        // gwMac->SetSatelliteAddressCallback(MakeCallback(&SatLorawanNetDevice::SendControlMsg, DynamicCast<SatLorawanNetDevice>(gwNd)));
     }
 
     // Add satellite addresses to GW LLC layers.
     if (m_forwardLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
     {
+        Ptr<SatGwLlc> gwLlc = DynamicCast<SatGwLlc>(DynamicCast<SatNetDevice>(gwNd)->GetLlc());
         Mac48Address satFeederAddress = geoNetDevice->GetSatelliteFeederAddress(beamId);
-        DynamicCast<SatGwLlc>(DynamicCast<SatNetDevice>(gwNd)->GetLlc())
-            ->SetSatelliteAddress(satFeederAddress);
+        gwLlc->SetSatelliteAddress(satFeederAddress);
     }
 
     return gwNd;
@@ -1254,8 +1266,7 @@ SatBeamHelper::GetClosestSat(GeoCoordinate position)
 
     for (uint32_t i = 0; i < m_geoNodes.GetN(); i++)
     {
-        GeoCoordinate satPos =
-            m_geoNodes.Get(i)->GetObject<SatSGP4MobilityModel>()->GetGeoPosition();
+        GeoCoordinate satPos = m_geoNodes.Get(i)->GetObject<SatMobilityModel>()->GetGeoPosition();
         double distance = CalculateDistance(position.ToVector(), satPos.ToVector());
         if (distance < distanceMin)
         {

@@ -73,8 +73,10 @@ class SatGwHelperDvb : public SatGwHelper
     /**
      * \param n node
      * \param gwId  id of the gw
-     * \param satId  id of the satellite
-     * \param beamId  id of the beam
+     * \param satId  id of the satellite linked to the UT
+     * \param beamId  id of the beam linked to the UT
+     * \param feederSatId  id of the satellite linked to the GW
+     * \param feederBeamId  id of the beam linked to the GW
      * \param fCh forward channel
      * \param rCh return channel
      * \param ncc NCC (Network Control Center)
@@ -92,8 +94,11 @@ class SatGwHelperDvb : public SatGwHelper
                                    uint32_t gwId,
                                    uint32_t satId,
                                    uint32_t beamId,
+                                   uint32_t feederSatId,
+                                   uint32_t feederBeamId,
                                    Ptr<SatChannel> fCh,
                                    Ptr<SatChannel> rCh,
+                                   SatPhy::ChannelPairGetterCallback cbChannel,
                                    Ptr<SatNcc> ncc,
                                    Ptr<SatLowerLayerServiceConf> llsConf,
                                    SatEnums::RegenerationMode_t forwardLinkRegenerationMode,

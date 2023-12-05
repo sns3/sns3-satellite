@@ -411,6 +411,8 @@ SatNetDevice::Send(Ptr<Packet> packet, const Address& dest, uint16_t protocolNum
 {
     NS_LOG_FUNCTION(this << packet << dest << protocolNumber);
 
+    std::cout << "SatNetDevice::Send packet " << packet->GetUid() << std::endl;
+
     if (m_isStatisticsTagsEnabled)
     {
         // Add a SatAddressTag tag with this device's address as the source address.

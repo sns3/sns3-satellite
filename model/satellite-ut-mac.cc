@@ -22,6 +22,7 @@
 
 #include "satellite-ut-mac.h"
 
+#include "satellite-beam-scheduler.h"
 #include "satellite-const-variables.h"
 #include "satellite-control-message.h"
 #include "satellite-crdsa-replica-tag.h"
@@ -146,8 +147,7 @@ SatUtMac::SatUtMac()
       m_txCheckCallback(),
       m_sliceSubscriptionCallback(),
       m_sendLogonCallback(),
-      m_updateGwAddressCallback(),
-      m_beamSchedulerCallback()
+      m_updateGwAddressCallback()
 {
     NS_LOG_FUNCTION(this);
 
@@ -195,8 +195,7 @@ SatUtMac::SatUtMac(uint32_t satId,
       m_txCheckCallback(),
       m_sliceSubscriptionCallback(),
       m_sendLogonCallback(),
-      m_updateGwAddressCallback(),
-      m_beamSchedulerCallback()
+      m_updateGwAddressCallback()
 {
     NS_LOG_FUNCTION(this);
 
@@ -225,7 +224,6 @@ SatUtMac::DoDispose(void)
     m_sliceSubscriptionCallback.Nullify();
     m_sendLogonCallback.Nullify();
     m_updateGwAddressCallback.Nullify();
-    m_beamSchedulerCallback.Nullify();
     m_tbtpContainer->DoDispose();
     m_utScheduler->DoDispose();
     m_utScheduler = NULL;
@@ -277,14 +275,6 @@ SatUtMac::SetUpdateGwAddressCallback(SatUtMac::UpdateGwAddressCallback cb)
     NS_LOG_FUNCTION(this << &cb);
 
     m_updateGwAddressCallback = cb;
-}
-
-void
-SatUtMac::SetBeamSchedulerCallback(SatUtMac::BeamSchedulerCallback cb)
-{
-    NS_LOG_FUNCTION(this << &cb);
-
-    m_beamSchedulerCallback = cb;
 }
 
 void

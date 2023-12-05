@@ -40,6 +40,7 @@ namespace ns3
 {
 
 class Packet;
+class SatBeamScheduler;
 
 /**
  * \ingroup satellite
@@ -204,6 +205,11 @@ class SatMac : public Object
     typedef Callback<uint32_t, uint32_t> SendCtrlMsgCallback;
 
     /**
+     * Callback to get the SatBeamScheduler from the beam ID for handover
+     */
+    typedef Callback<Ptr<SatBeamScheduler>, uint32_t, uint32_t> BeamSchedulerCallback;
+
+    /**
      * \brief Callback to update ISL routes when handovers are performed.
      */
     typedef Callback<void> UpdateIslCallback;
@@ -226,6 +232,12 @@ class SatMac : public Object
      * \param cb callback to invoke whenever a control message is wanted to sent.
      */
     void SetSendCtrlCallback(SatMac::SendCtrlMsgCallback cb);
+
+    /**
+     * \brief Set the beam scheduler callback
+     * \param cb Callback to get the SatBeamScheduler
+     */
+    void SetBeamSchedulerCallback(SatMac::BeamSchedulerCallback cb);
 
     /**
      * \brief Method to set update ISL callback.
@@ -357,6 +369,11 @@ class SatMac : public Object
      * The send control message callback.
      */
     SatMac::SendCtrlMsgCallback m_sendCtrlCallback;
+
+    /**
+     * Callback to get the SatBeamScheduler linked to a beam ID
+     */
+    SatMac::BeamSchedulerCallback m_beamSchedulerCallback;
 
     /**
      * The update ISL routes callback.

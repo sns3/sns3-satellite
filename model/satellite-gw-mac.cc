@@ -21,6 +21,7 @@
 #include "satellite-gw-mac.h"
 
 #include "satellite-bbframe.h"
+#include "satellite-beam-scheduler.h"
 #include "satellite-control-message.h"
 #include "satellite-fwd-link-scheduler.h"
 #include "satellite-log.h"
@@ -125,9 +126,13 @@ SatGwMac::SatGwMac()
 
 SatGwMac::SatGwMac(uint32_t satId,
                    uint32_t beamId,
+                   uint32_t feederSatId,
+                   uint32_t feederBeamId,
                    SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                    SatEnums::RegenerationMode_t returnLinkRegenerationMode)
     : SatMac(satId, beamId, forwardLinkRegenerationMode, returnLinkRegenerationMode),
+      m_feederSatId(feederSatId),
+      m_feederBeamId(feederBeamId),
       m_fwdScheduler(),
       m_guardTime(MicroSeconds(1)),
       m_ncrInterval(MilliSeconds(100)),
@@ -167,13 +172,13 @@ SatGwMac::StartPeriodicTransmissions()
 
     if (m_disableSchedulingIfNoDeviceConnected && !HasPeer())
     {
-        NS_LOG_INFO("Do not start beam " << m_beamId << " because no device is connected");
+        NS_LOG_INFO("Do not start beam " << m_feederBeamId << " because no device is connected");
         return;
     }
 
     if (m_periodicTransmissionEnabled == true)
     {
-        NS_LOG_INFO("Beam " << m_beamId << " already enabled");
+        NS_LOG_INFO("Beam " << m_feederBeamId << " already enabled");
         return;
     }
 
@@ -206,6 +211,8 @@ void
 SatGwMac::Receive(SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> rxParams)
 {
     NS_LOG_FUNCTION(this);
+
+    std::cout << "SatGwMac::Receive " << m_feederSatId << " " << m_feederBeamId << std::endl;
 
     // Add packet trace entry:
     m_packetTrace(Simulator::Now(),
@@ -382,10 +389,37 @@ SatGwMac::StartTransmission(uint32_t carrierId)
 
     if (m_handoverModule != nullptr)
     {
-        if (m_handoverModule->CheckForHandoverRecommendation(m_satId, m_beamId))
+        if (m_handoverModule->CheckForHandoverRecommendation(m_feederSatId, m_feederBeamId))
         {
-            m_satId = m_handoverModule->GetAskedSatId();
-            m_beamId = m_handoverModule->GetAskedBeamId();
+            NS_LOG_INFO("GW handover, old satellite is " << m_feederSatId << ", old beam is "
+                                                         << m_feederBeamId);
+            std::cout << "GW handover, old satellite is " << m_feederSatId << ", old beam is "
+                                                         << m_feederBeamId << std::endl;
+
+            Ptr<SatBeamScheduler> srcScheduler =
+                m_beamSchedulerCallback(m_feederSatId, m_feederBeamId);
+
+            m_feederSatId = m_handoverModule->GetAskedSatId();
+            m_feederBeamId = m_handoverModule->GetAskedBeamId();
+
+            NS_LOG_INFO("GW handover, new satellite is " << m_feederSatId << ", new beam is "
+                                                         << m_feederBeamId);
+            std::cout << "GW handover, new satellite is " << m_feederSatId << ", new beam is "
+                                                         << m_feederBeamId << std::endl;
+
+            Ptr<SatBeamScheduler> dstScheduler =
+                m_beamSchedulerCallback(m_feederSatId, m_feederBeamId);
+            srcScheduler->DisconnectGw(m_nodeInfo->GetMacAddress());
+            dstScheduler->ConnectGw(m_nodeInfo->GetMacAddress());
+
+            // SatIdMapper* satIdMapper = Singleton<SatIdMapper>::Get();
+            // satIdMapper->UpdateMacToBeamId(m_nodeInfo->GetMacAddress(), m_feederBeamId);
+            m_updateIslCallback();
+
+            m_handoverModule->HandoverFinished();
+            m_beamCallback (m_feederSatId, m_feederBeamId);
+
+            m_handoverModule->HandoverFinished();
         }
     }
 
@@ -474,6 +508,22 @@ SatGwMac::TbtpSent(Ptr<SatTbtpMessage> tbtp)
     m_tbtps[superframeCounter].push_back(tbtp);
 
     Simulator::Schedule(Seconds(10), &SatGwMac::RemoveTbtp, this, superframeCounter);
+}
+
+uint32_t
+SatGwMac::GetFeederSatId()
+{
+    NS_LOG_FUNCTION(this);
+
+    return m_feederSatId;
+}
+
+uint32_t
+SatGwMac::GetFeederBeamId()
+{
+    NS_LOG_FUNCTION(this);
+
+    return m_feederBeamId;
 }
 
 void
@@ -861,13 +911,6 @@ void
 SatGwMac::ChangeBeam(uint32_t satId, uint32_t beamId)
 {
     NS_LOG_FUNCTION(this << satId << beamId);
-
-    // TODO
-    /*if (m_beamCallback (beamId)) // to
-    {
-        m_connectionCallback ();
-    }
-    */
 }
 
 void

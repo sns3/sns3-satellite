@@ -142,7 +142,9 @@ SatMac::DoDispose()
 {
     NS_LOG_FUNCTION(this);
     if (m_txEnabled)
+    {
         m_beamServiceTrace(Simulator::Now() - m_beamEnabledTime);
+    }
 
     m_txCallback.Nullify();
     m_rxCallback.Nullify();
@@ -150,6 +152,7 @@ SatMac::DoDispose()
     m_reserveCtrlCallback.Nullify();
     m_sendCtrlCallback.Nullify();
     m_routingUpdateCallback.Nullify();
+    m_beamSchedulerCallback.Nullify();
 
     Object::DoDispose();
 }
@@ -454,6 +457,14 @@ SatMac::SetRoutingUpdateCallback(SatMac::RoutingUpdateCallback cb)
 {
     NS_LOG_FUNCTION(this << &cb);
     m_routingUpdateCallback = cb;
+}
+
+void
+SatMac::SetBeamSchedulerCallback(SatMac::BeamSchedulerCallback cb)
+{
+    NS_LOG_FUNCTION(this << &cb);
+
+    m_beamSchedulerCallback = cb;
 }
 
 void
