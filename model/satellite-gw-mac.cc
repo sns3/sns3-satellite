@@ -172,13 +172,13 @@ SatGwMac::StartPeriodicTransmissions()
 
     if (m_disableSchedulingIfNoDeviceConnected && !HasPeer())
     {
-        NS_LOG_INFO("Do not start beam " << m_feederBeamId << " because no device is connected");
+        NS_LOG_INFO("Do not start beam " << m_beamId << " because no device is connected");
         return;
     }
 
     if (m_periodicTransmissionEnabled == true)
     {
-        NS_LOG_INFO("Beam " << m_feederBeamId << " already enabled");
+        NS_LOG_INFO("Beam " << m_beamId << " already enabled");
         return;
     }
 
@@ -211,8 +211,6 @@ void
 SatGwMac::Receive(SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> rxParams)
 {
     NS_LOG_FUNCTION(this);
-
-    std::cout << "SatGwMac::Receive " << m_feederSatId << " " << m_feederBeamId << std::endl;
 
     // Add packet trace entry:
     m_packetTrace(Simulator::Now(),
@@ -393,8 +391,6 @@ SatGwMac::StartTransmission(uint32_t carrierId)
         {
             NS_LOG_INFO("GW handover, old satellite is " << m_feederSatId << ", old beam is "
                                                          << m_feederBeamId);
-            std::cout << "GW handover, old satellite is " << m_feederSatId << ", old beam is "
-                                                         << m_feederBeamId << std::endl;
 
             Ptr<SatBeamScheduler> srcScheduler =
                 m_beamSchedulerCallback(m_feederSatId, m_feederBeamId);
@@ -404,8 +400,6 @@ SatGwMac::StartTransmission(uint32_t carrierId)
 
             NS_LOG_INFO("GW handover, new satellite is " << m_feederSatId << ", new beam is "
                                                          << m_feederBeamId);
-            std::cout << "GW handover, new satellite is " << m_feederSatId << ", new beam is "
-                                                         << m_feederBeamId << std::endl;
 
             Ptr<SatBeamScheduler> dstScheduler =
                 m_beamSchedulerCallback(m_feederSatId, m_feederBeamId);
@@ -416,8 +410,16 @@ SatGwMac::StartTransmission(uint32_t carrierId)
             // satIdMapper->UpdateMacToBeamId(m_nodeInfo->GetMacAddress(), m_feederBeamId);
             m_updateIslCallback();
 
-            m_handoverModule->HandoverFinished();
-            m_beamCallback (m_feederSatId, m_feederBeamId);
+            Ptr<SatGeoNetDevice> geoNetDevice =
+                DynamicCast<SatGeoNetDevice>(m_geoNodesCallback().Get(m_feederSatId)->GetDevice(0));
+            Mac48Address satFeederAddress = geoNetDevice->GetSatelliteFeederAddress(m_beamId);
+            SetSatelliteAddress(satFeederAddress);
+            if (m_gwLlcSetSatelliteAddress.IsNull() == false)
+            {
+                m_gwLlcSetSatelliteAddress(satFeederAddress);
+            }
+
+            m_beamCallback(m_feederSatId, m_beamId);
 
             m_handoverModule->HandoverFinished();
         }
@@ -894,6 +896,20 @@ SatGwMac::SetBeamCallback(SatGwMac::PhyBeamCallback cb)
 {
     NS_LOG_FUNCTION(this << &cb);
     m_beamCallback = cb;
+}
+
+void
+SatGwMac::SetGeoNodesCallback(SatGwMac::GeoNodesCallback cb)
+{
+    NS_LOG_FUNCTION(this << &cb);
+    m_geoNodesCallback = cb;
+}
+
+void
+SatGwMac::SetGwLlcSetSatelliteAddress(SatGwMac::GwLlcSetSatelliteAddress cb)
+{
+    NS_LOG_FUNCTION(this << &cb);
+    m_gwLlcSetSatelliteAddress = cb;
 }
 
 void

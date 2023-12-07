@@ -234,8 +234,9 @@ SatGwPhy::PerformHandover(uint32_t satId, uint32_t beamId)
 
     // disconnect current SatChannels
     SatChannelPair::ChannelPair_t channels = m_retrieveChannelPair(m_satId, m_beamId);
+    Ptr<SatChannel> returnLink = channels.second;
     m_phyTx->ClearChannel();
-    channels.first->RemoveRx(m_phyRx);
+    returnLink->RemoveRx(m_phyRx);
 
     // perform "physical" beam handover
     SetSatId(satId);
@@ -254,9 +255,9 @@ SatGwPhy::AssignNewSatChannels()
     Ptr<SatChannel> returnLink = channels.second;
 
     // Assign channels
-    NS_LOG_INFO("Setting new Tx on channel " << returnLink);
-    m_phyTx->SetChannel(returnLink);
-    forwardLink->AddRx(m_phyRx);
+    NS_LOG_INFO("Setting new Tx on channel " << forwardLink);
+    m_phyTx->SetChannel(forwardLink);
+    returnLink->AddRx(m_phyRx);
 }
 
 } // namespace ns3

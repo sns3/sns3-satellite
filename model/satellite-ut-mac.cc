@@ -1953,8 +1953,12 @@ SatUtMac::DoFrameStart()
 
         Ptr<SatBeamScheduler> srcScheduler = m_beamSchedulerCallback(m_satId, m_beamId);
 
+        NS_LOG_INFO("UT handover, old satellite is " << m_satId << ", old beam is " << m_beamId);
+
         m_beamId = m_timuInfo->GetBeamId();
         m_satId = m_timuInfo->GetSatId();
+
+        NS_LOG_INFO("UT handover, new satellite is " << m_satId << ", new beam is " << m_beamId);
 
         SatMac::SetBeamId(m_beamId);
         SatMac::SetSatId(m_satId);

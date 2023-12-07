@@ -731,19 +731,20 @@ SatBeamHelper::InstallFeeder(Ptr<SatGeoNetDevice> geoNetDevice,
     // install GW
     PointerValue llsConf;
     m_utHelper->GetAttribute("LowerLayerServiceConf", llsConf);
-    Ptr<NetDevice> gwNd = m_gwHelper->Install(gwNode,
-                                              gwId,
-                                              satId,
-                                              beamId,
-                                              feederSatId,
-                                              feederBeamId,
-                                              feederLink.first,
-                                              feederLink.second,
-                                              MakeCallback(&SatChannelPair::GetChannelPair, m_flChannels),
-                                              m_ncc,
-                                              llsConf.Get<SatLowerLayerServiceConf>(),
-                                              m_forwardLinkRegenerationMode,
-                                              m_returnLinkRegenerationMode);
+    Ptr<NetDevice> gwNd =
+        m_gwHelper->Install(gwNode,
+                            gwId,
+                            satId,
+                            beamId,
+                            feederSatId,
+                            feederBeamId,
+                            feederLink.first,
+                            feederLink.second,
+                            MakeCallback(&SatChannelPair::GetChannelPair, m_flChannels),
+                            m_ncc,
+                            llsConf.Get<SatLowerLayerServiceConf>(),
+                            m_forwardLinkRegenerationMode,
+                            m_returnLinkRegenerationMode);
 
     // calculate maximum size of the BB frame with the most robust MODCOD
     Ptr<SatBbFrameConf> bbFrameConf = m_gwHelper->GetBbFrameConf();
@@ -807,15 +808,17 @@ SatBeamHelper::InstallFeeder(Ptr<SatGeoNetDevice> geoNetDevice,
     {
         Ptr<SatGwMac> gwMac = DynamicCast<SatGwMac>(DynamicCast<SatNetDevice>(gwNd)->GetMac());
         Mac48Address satFeederAddress = geoNetDevice->GetSatelliteFeederAddress(beamId);
+        gwMac->SetGeoNodesCallback(MakeCallback(&SatBeamHelper::GetGeoSatNodes, this));
         gwMac->SetSatelliteAddress(satFeederAddress);
-        // gwMac->SetSatelliteAddressCallback(MakeCallback(&SatLorawanNetDevice::SendControlMsg, DynamicCast<SatLorawanNetDevice>(gwNd)));
     }
 
     // Add satellite addresses to GW LLC layers.
     if (m_forwardLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
     {
+        Ptr<SatGwMac> gwMac = DynamicCast<SatGwMac>(DynamicCast<SatNetDevice>(gwNd)->GetMac());
         Ptr<SatGwLlc> gwLlc = DynamicCast<SatGwLlc>(DynamicCast<SatNetDevice>(gwNd)->GetLlc());
         Mac48Address satFeederAddress = geoNetDevice->GetSatelliteFeederAddress(beamId);
+        gwMac->SetGwLlcSetSatelliteAddress(MakeCallback(&SatGwLlc::SetSatelliteAddress, gwLlc));
         gwLlc->SetSatelliteAddress(satFeederAddress);
     }
 

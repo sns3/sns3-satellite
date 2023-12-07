@@ -199,6 +199,30 @@ class SatGwMac : public SatMac
     void SetBeamCallback(SatGwMac::PhyBeamCallback cb);
 
     /**
+     * Callback to get all satellite nodes
+     * \return All satellites of the simulation
+     */
+    typedef Callback<NodeContainer> GeoNodesCallback;
+
+    /**
+     * Method to set callback to get all satellite nodes
+     * \param cb callback to invoke to get all satellite nodes
+     */
+    void SetGeoNodesCallback(SatGwMac::GeoNodesCallback cb);
+
+    /**
+     * Callback to set geo satellite feeder address on LLC
+     * \param The new satellite feeder address
+     */
+    typedef Callback<void, Mac48Address> GwLlcSetSatelliteAddress;
+
+    /**
+     * Method to set callback to set geo satellite feeder address
+     * \param cb callback to invoke to set geo satellite feeder address
+     */
+    void SetGwLlcSetSatelliteAddress(SatGwMac::GwLlcSetSatelliteAddress cb);
+
+    /**
      * Callback to inform NCC a control burst has been received.
      * \param Address identification of the UT that sent the burst
      * \param uint32_t satellite ID where the UT is connected
@@ -419,6 +443,16 @@ class SatGwMac : public SatMac
      * Callback to change phy-layer beam ID
      */
     SatGwMac::PhyBeamCallback m_beamCallback;
+
+    /**
+     * Callback to get all satellite nodes
+     */
+    SatGwMac::GeoNodesCallback m_geoNodesCallback;
+
+    /**
+     * Callback to set satellite address on LLC
+     */
+    SatGwMac::GwLlcSetSatelliteAddress m_gwLlcSetSatelliteAddress;
 
     /**
      * Callback to indicate NCC a control burst has been received
