@@ -2027,7 +2027,18 @@ SatUtMac::DoFrameStart()
                     m_handoverMessagesCount = 0;
                     LogOff();
 
+                    Ptr<SatBeamScheduler> srcScheduler = m_beamSchedulerCallback(m_satId, m_beamId);
+
+                    m_satId = m_handoverModule->GetAskedSatId();
                     m_beamId = m_handoverModule->GetAskedBeamId();
+
+                    Address satAddress =
+                        m_beamSchedulerCallback(m_satId, m_beamId)->GetSatAddress();
+                    Mac48Address satAddress48 = Mac48Address::ConvertFrom(satAddress);
+                    if (satAddress48 != m_satelliteAddress)
+                    {
+                        SetSatelliteAddress(satAddress48);
+                    }
 
                     Address gwAddress = m_beamSchedulerCallback(m_satId, m_beamId)->GetGwAddress();
                     Mac48Address gwAddress48 = Mac48Address::ConvertFrom(gwAddress);
@@ -2038,6 +2049,14 @@ SatUtMac::DoFrameStart()
                         m_routingUpdateCallback(m_nodeInfo->GetMacAddress(), gwAddress);
                     }
                     m_handoverCallback(m_satId, m_beamId);
+
+                    Ptr<SatBeamScheduler> dstScheduler = m_beamSchedulerCallback(m_satId, m_beamId);
+                    srcScheduler->DisconnectUt(m_nodeInfo->GetMacAddress());
+                    dstScheduler->ConnectUt(m_nodeInfo->GetMacAddress());
+
+                    SatIdMapper* satIdMapper = Singleton<SatIdMapper>::Get();
+                    satIdMapper->UpdateMacToBeamId(m_nodeInfo->GetMacAddress(), m_beamId);
+                    m_updateIslCallback();
 
                     m_tbtpContainer->Clear();
                     m_handoverState = NO_HANDOVER;
