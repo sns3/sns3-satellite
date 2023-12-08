@@ -683,7 +683,10 @@ SatUserHelper::UpdateUtRoutes(Address utAddress, Address gwAddress)
 
     Ipv4StaticRoutingHelper ipv4RoutingHelper;
     Ptr<Ipv4StaticRouting> routing = ipv4RoutingHelper.GetStaticRouting(protocol);
+    routing->RemoveRoute(routing->GetNRoutes() - 1);
     routing->SetDefaultRoute(ip, utIfIndex);
+
+    NS_LOG_INFO("Set default route on UT to " << ip);
 
     uint32_t satId = gwNd->GetMac()->GetSatId();
     uint32_t beamId = gwNd->GetMac()->GetBeamId();
