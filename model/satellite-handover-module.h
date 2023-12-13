@@ -47,6 +47,7 @@ class SatHandoverModule : public Object
 
     /**
      * \brief Handover recommendation message sending callback
+     * \param uint32_t The satellite ID this UT want to change to
      * \param uint32_t The beam ID this UT want to change to
      */
     typedef Callback<void, uint32_t, uint32_t> HandoverRequestCallback;

@@ -87,11 +87,11 @@ main(int argc, char* argv[])
                                           Seconds(1.0),
                                           Seconds(100.0));
 
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
+    /*simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
                                           SimulationHelper::UDP,
                                           SimulationHelper::RTN_LINK,
                                           Seconds(1.0),
-                                          Seconds(100.0));
+                                          Seconds(100.0));*/
 
     // To store attributes to file
     Config::SetDefault("ns3::ConfigStore::Filename", StringValue("output-attributes.xml"));
@@ -102,16 +102,27 @@ main(int argc, char* argv[])
 
     Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer();
 
-    s->AddPerSatFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-    s->AddPerSatFwdUserDevThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-    s->AddPerUtFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-    s->AddPerGwFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    // s->AddPerSatFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    // s->AddPerUtFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    // s->AddPerGwFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-    s->AddPerSatRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    // s->AddPerSatRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    // s->AddPerUtRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    // s->AddPerGwRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-    s->AddPerBeamFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-    s->AddPerBeamFwdUserDevThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-    s->AddPerBeamBeamServiceTime(SatStatsHelper::OUTPUT_SCALAR_FILE);
+    s->AddPerSatFwdUserMacThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    // s->AddPerUtFwdUserMacThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    // s->AddPerGwFwdUserMacThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+    // s->AddPerSatRtnUserMacThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    // s->AddPerUtRtnUserMacThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    // s->AddPerGwRtnUserMacThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+    // s->AddPerBeamFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    // s->AddPerBeamFwdUserDevThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    // s->AddPerBeamBeamServiceTime(SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+    s->AddPerSatFwdFeederMacThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
 
     simulationHelper->EnableProgressLogs();
     simulationHelper->RunSimulation();

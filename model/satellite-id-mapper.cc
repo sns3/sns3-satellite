@@ -352,7 +352,7 @@ SatIdMapper::UpdateMacToSatId(Address mac, uint32_t satId)
         NS_FATAL_ERROR("Mac address " << mac << " not in map");
     }
 
-    iter->second = satId;
+    iter->second = satId + 1;
 
     NS_LOG_INFO("Updated MAC " << mac << " with sat ID " << satId);
 }
@@ -426,12 +426,16 @@ SatIdMapper::GetSatIdWithMac(Address mac) const
 {
     NS_LOG_FUNCTION(this << mac);
 
+    std::cout << "SatIdMapper::GetSatIdWithMac " << mac << " ";
+
     std::map<Address, uint32_t>::const_iterator iter = m_macToSatIdMap.find(mac);
 
     if (iter == m_macToSatIdMap.end())
     {
         return -1;
     }
+
+    std::cout << iter->second << std::endl;
 
     return iter->second;
 }

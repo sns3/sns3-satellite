@@ -178,21 +178,6 @@ class SatStatsRtnCompositeSinrHelper : public SatStatsCompositeSinrHelper
     void DoInstallProbes();
 
   private:
-    /**
-     * \brief Save the address and the proper identifier from the given UT node.
-     * \param utNode a UT node.
-     *
-     * The address of the given node will be saved in the #m_identifierMap
-     * member variable.
-     *
-     * Used in return link statistics. DoInstallProbes() is expected to pass the
-     * the UT node of interest into this method.
-     */
-    void SaveAddressAndIdentifier(Ptr<Node> utNode);
-
-    /// Map of address and the identifier associated with it (for return link).
-    std::map<const Address, uint32_t> m_identifierMap;
-
 }; // end of class SatStatsRtnCompositeSinrHelper
 
 } // end of namespace ns3

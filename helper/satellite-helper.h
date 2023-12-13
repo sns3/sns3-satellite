@@ -39,6 +39,7 @@
 #include <ns3/satellite-position-allocator.h>
 #include <ns3/satellite-rx-power-input-trace-container.h>
 #include <ns3/satellite-rx-power-output-trace-container.h>
+#include <ns3/satellite-stats-helper-container.h>
 #include <ns3/trace-helper.h>
 
 #include <string>

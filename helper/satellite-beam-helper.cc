@@ -592,14 +592,11 @@ SatBeamHelper::Install(NodeContainer ut,
     // Get the position of the GW serving this beam, get the best beam based on antenna patterns
     // for this position, and set the antenna patterns to the feeder PHY objects via
     // AttachChannels method.
-    // TODO incorrect sat ID here ?
     GeoCoordinate gwPos = gwNode->GetObject<SatMobilityModel>()->GetGeoPosition();
     uint32_t feederSatId = GetClosestSat(gwPos);
     uint32_t feederBeamId = m_antennaGainPatterns->GetBestBeamId(feederSatId, gwPos, true);
     if (feederBeamId == 0)
     {
-        // TODO disconnect if no feeder
-        NS_FATAL_ERROR("TODO");
         feederBeamId = 1;
     }
 

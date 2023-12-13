@@ -180,7 +180,8 @@ SatUtHelperDvb::Install(Ptr<Node> n,
     phy->SetTxFadingContainer(n->GetObject<SatBaseFading>());
     phy->SetRxFadingContainer(n->GetObject<SatBaseFading>());
 
-    Ptr<SatUtMac> mac = CreateObject<SatUtMac>(satId,
+    Ptr<SatUtMac> mac = CreateObject<SatUtMac>(n,
+                                               satId,
                                                beamId,
                                                m_superframeSeq,
                                                forwardLinkRegenerationMode,

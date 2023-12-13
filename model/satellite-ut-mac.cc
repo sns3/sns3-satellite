@@ -155,13 +155,15 @@ SatUtMac::SatUtMac()
     NS_FATAL_ERROR("SatUtMac::SatUtMac - Constructor not in use");
 }
 
-SatUtMac::SatUtMac(uint32_t satId,
+SatUtMac::SatUtMac(Ptr<Node> node,
+                   uint32_t satId,
                    uint32_t beamId,
                    Ptr<SatSuperframeSeq> seq,
                    SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                    SatEnums::RegenerationMode_t returnLinkRegenerationMode,
                    bool crdsaOnlyForControl)
     : SatMac(satId, beamId, forwardLinkRegenerationMode, returnLinkRegenerationMode),
+      m_node(node),
       m_satId(satId),
       m_beamId(beamId),
       m_superframeSeq(seq),
@@ -243,6 +245,13 @@ SatUtMac::SetGatewayUpdateCallback(SatUtMac::GatewayUpdateCallback cb)
 {
     NS_LOG_FUNCTION(this << &cb);
     m_gatewayUpdateCallback = cb;
+}
+
+void
+SatUtMac::SetUpdateAddressAndIdentifierCallback(SatUtMac::UpdateAddressAndIdentifierCallback cb)
+{
+    NS_LOG_FUNCTION(this << &cb);
+    m_updateAddressAndIdentifierCallback = cb;
 }
 
 void
@@ -1954,11 +1963,15 @@ SatUtMac::DoFrameStart()
         Ptr<SatBeamScheduler> srcScheduler = m_beamSchedulerCallback(m_satId, m_beamId);
 
         NS_LOG_INFO("UT handover, old satellite is " << m_satId << ", old beam is " << m_beamId);
+        std::cout << "##### " << Simulator::Now() << " UT handover, old satellite is " << m_satId
+                  << ", old beam is " << m_beamId << std::endl;
 
         m_beamId = m_timuInfo->GetBeamId();
         m_satId = m_timuInfo->GetSatId();
 
         NS_LOG_INFO("UT handover, new satellite is " << m_satId << ", new beam is " << m_beamId);
+        std::cout << "##### " << Simulator::Now() << " UT handover, new satellite is " << m_satId
+                  << ", new beam is " << m_beamId << std::endl;
 
         SatMac::SetBeamId(m_beamId);
         SatMac::SetSatId(m_satId);
@@ -1990,8 +2003,11 @@ SatUtMac::DoFrameStart()
         dstScheduler->ConnectUt(m_nodeInfo->GetMacAddress());
 
         SatIdMapper* satIdMapper = Singleton<SatIdMapper>::Get();
+        satIdMapper->UpdateMacToSatId(m_nodeInfo->GetMacAddress(), m_satId);
         satIdMapper->UpdateMacToBeamId(m_nodeInfo->GetMacAddress(), m_beamId);
         m_updateIslCallback();
+
+        m_updateAddressAndIdentifierCallback(m_node);
 
         m_handoverModule->HandoverFinished();
 
@@ -2055,8 +2071,11 @@ SatUtMac::DoFrameStart()
                     dstScheduler->ConnectUt(m_nodeInfo->GetMacAddress());
 
                     SatIdMapper* satIdMapper = Singleton<SatIdMapper>::Get();
+                    satIdMapper->UpdateMacToSatId(m_nodeInfo->GetMacAddress(), m_satId);
                     satIdMapper->UpdateMacToBeamId(m_nodeInfo->GetMacAddress(), m_beamId);
                     m_updateIslCallback();
+
+                    m_updateAddressAndIdentifierCallback(m_node);
 
                     m_tbtpContainer->Clear();
                     m_handoverState = NO_HANDOVER;

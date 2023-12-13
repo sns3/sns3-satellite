@@ -89,6 +89,7 @@ class SatUtMac : public SatMac
      *
      * This is the constructor for the SatUtMac
      *
+     * \param node Node containing this MAC
      * \param satId ID of sat for UT
      * \param beamId ID of beam for UT
      * \param seq Pointer to superframe sequence.
@@ -96,7 +97,8 @@ class SatUtMac : public SatMac
      * \param returnLinkRegenerationMode Return link regeneration mode
      * \param crdsaOnlyForControl CRDSA buffer operation mode
      */
-    SatUtMac(uint32_t satId,
+    SatUtMac(Ptr<Node> node,
+             uint32_t satId,
              uint32_t beamId,
              Ptr<SatSuperframeSeq> seq,
              SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
@@ -337,6 +339,17 @@ class SatUtMac : public SatMac
      * \param cb callback to invoke to update gateway address
      */
     void SetGatewayUpdateCallback(SatUtMac::GatewayUpdateCallback cb);
+
+    /**
+     * \brief Callback to update addresses in statistics helpers
+     */
+    typedef Callback<void, Ptr<Node>> UpdateAddressAndIdentifierCallback;
+
+    /**
+     * \brief Set the callback to update addresses in statistics helpers.
+     * \param cb Callback to update addresses in statistics helpers
+     */
+    void SetUpdateAddressAndIdentifierCallback(SatUtMac::UpdateAddressAndIdentifierCallback cb);
 
     void LogOff();
 
@@ -592,6 +605,11 @@ class SatUtMac : public SatMac
     SatUtMac(const SatUtMac&);
 
     /**
+     * Node containing this MAC
+     */
+    Ptr<Node> m_node;
+
+    /**
      * ID of sat for UT
      */
     uint32_t m_satId;
@@ -818,6 +836,11 @@ class SatUtMac : public SatMac
      * Callback to get the GW address in this UT MAC
      */
     SatUtMac::GetGwAddressInUtCallback m_getGwAddressInUtCallback;
+
+    /**
+     * Callback to update addresses in statistics helpers
+     */
+    SatUtMac::UpdateAddressAndIdentifierCallback m_updateAddressAndIdentifierCallback;
 };
 
 } // namespace ns3
