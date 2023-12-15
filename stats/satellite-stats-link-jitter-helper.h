@@ -106,6 +106,13 @@ class SatStatsLinkJitterHelper : public SatStatsHelper
     bool ConnectProbeToCollector(Ptr<Probe> probe, uint32_t identifier);
 
     /**
+     * \brief Disconnect the probe from the right collector.
+     * \param probe
+     * \param identifier
+     */
+    bool DisconnectProbeFromCollector(Ptr<Probe> probe, uint32_t identifier);
+
+    /**
      * \brief Find a collector with the right identifier and pass a sample data
      *        to it.
      * \param jitter
@@ -173,10 +180,6 @@ class SatStatsFwdFeederDevLinkJitterHelper : public SatStatsLinkJitterHelper
     // inherited from SatStatsLinkJitterHelper base class
     void DoInstallProbes();
 
-  private:
-    /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
-
 }; // end of class SatStatsFwdFeederDevLinkJitterHelper
 
 // FORWARD USER LINK DEV-LEVEL /////////////////////////////////////////////////////
@@ -213,13 +216,18 @@ class SatStatsFwdUserDevLinkJitterHelper : public SatStatsLinkJitterHelper
      */
     static TypeId GetTypeId();
 
+    /**
+     * Change identifier used on probes, when handovers occur.
+     */
+    virtual void UpdateIdentifierOnProbes();
+
   protected:
     // inherited from SatStatsLinkJitterHelper base class
     void DoInstallProbes();
 
   private:
     /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
+    std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>> m_probes;
 
 }; // end of class SatStatsFwdUserDevLinkJitterHelper
 
@@ -261,10 +269,6 @@ class SatStatsFwdFeederMacLinkJitterHelper : public SatStatsLinkJitterHelper
     // inherited from SatStatsLinkJitterHelper base class
     void DoInstallProbes();
 
-  private:
-    /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
-
 }; // end of class SatStatsFwdFeederMacLinkJitterHelper
 
 // FORWARD USER LINK MAC-LEVEL /////////////////////////////////////////////////////
@@ -301,13 +305,18 @@ class SatStatsFwdUserMacLinkJitterHelper : public SatStatsLinkJitterHelper
      */
     static TypeId GetTypeId();
 
+    /**
+     * Change identifier used on probes, when handovers occur.
+     */
+    virtual void UpdateIdentifierOnProbes();
+
   protected:
     // inherited from SatStatsLinkJitterHelper base class
     void DoInstallProbes();
 
   private:
     /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
+    std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>> m_probes;
 
 }; // end of class SatStatsFwdUserMacLinkJitterHelper
 
@@ -349,10 +358,6 @@ class SatStatsFwdFeederPhyLinkJitterHelper : public SatStatsLinkJitterHelper
     // inherited from SatStatsLinkJitterHelper base class
     void DoInstallProbes();
 
-  private:
-    /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
-
 }; // end of class SatStatsFwdFeederPhyLinkJitterHelper
 
 // FORWARD USER LINK PHY-LEVEL /////////////////////////////////////////////////////
@@ -389,13 +394,18 @@ class SatStatsFwdUserPhyLinkJitterHelper : public SatStatsLinkJitterHelper
      */
     static TypeId GetTypeId();
 
+    /**
+     * Change identifier used on probes, when handovers occur.
+     */
+    virtual void UpdateIdentifierOnProbes();
+
   protected:
     // inherited from SatStatsLinkJitterHelper base class
     void DoInstallProbes();
 
   private:
     /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
+    std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>> m_probes;
 
 }; // end of class SatStatsFwdUserPhyLinkJitterHelper
 
@@ -477,10 +487,6 @@ class SatStatsRtnUserDevLinkJitterHelper : public SatStatsLinkJitterHelper
     // inherited from SatStatsLinkJitterHelper base class
     void DoInstallProbes();
 
-  private:
-    /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
-
 }; // end of class SatStatsRtnUserDevLinkJitterHelper
 
 // RETURN FEEDER LINK MAC-LEVEL //////////////////////////////////////////////
@@ -561,10 +567,6 @@ class SatStatsRtnUserMacLinkJitterHelper : public SatStatsLinkJitterHelper
     // inherited from SatStatsLinkJitterHelper base class
     void DoInstallProbes();
 
-  private:
-    /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
-
 }; // end of class SatStatsRtnUserMacLinkJitterHelper
 
 // RETURN FEEDER LINK PHY-LEVEL //////////////////////////////////////////////
@@ -644,10 +646,6 @@ class SatStatsRtnUserPhyLinkJitterHelper : public SatStatsLinkJitterHelper
   protected:
     // inherited from SatStatsLinkJitterHelper base class
     void DoInstallProbes();
-
-  private:
-    /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
 
 }; // end of class SatStatsRtnUserPhyLinkJitterHelper
 

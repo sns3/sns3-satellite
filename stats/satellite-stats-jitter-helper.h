@@ -105,6 +105,13 @@ class SatStatsJitterHelper : public SatStatsHelper
     bool ConnectProbeToCollector(Ptr<Probe> probe, uint32_t identifier);
 
     /**
+     * \brief Disconnect the probe from the right collector.
+     * \param probe
+     * \param identifier
+     */
+    bool DisconnectProbeFromCollector(Ptr<Probe> probe, uint32_t identifier);
+
+    /**
      * \brief Find a collector with the right identifier and pass a sample data
      *        to it.
      * \param jitter
@@ -169,13 +176,18 @@ class SatStatsFwdAppJitterHelper : public SatStatsJitterHelper
      */
     Time GetAndUpdatePreviousDelay(uint32_t identifier, Time newDelay);
 
+    /**
+     * Change identifier used on probes, when handovers occur.
+     */
+    virtual void UpdateIdentifierOnProbes();
+
   protected:
     // inherited from SatStatsFwdAppJitterHelper base class
     void DoInstallProbes();
 
   private:
     /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
+    std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>> m_probes;
 
     /// Stores the last delay to a UT to compute jitter
     std::map<uint32_t, Time> m_previousDelayMap;
@@ -200,13 +212,18 @@ class SatStatsFwdDevJitterHelper : public SatStatsJitterHelper
      */
     static TypeId GetTypeId();
 
+    /**
+     * Change identifier used on probes, when handovers occur.
+     */
+    virtual void UpdateIdentifierOnProbes();
+
   protected:
     // inherited from SatStatsJitterHelper base class
     void DoInstallProbes();
 
   private:
     /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
+    std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>> m_probes;
 
 }; // end of class SatStatsFwdDevJitterHelper
 
@@ -228,13 +245,18 @@ class SatStatsFwdMacJitterHelper : public SatStatsJitterHelper
      */
     static TypeId GetTypeId();
 
+    /**
+     * Change identifier used on probes, when handovers occur.
+     */
+    virtual void UpdateIdentifierOnProbes();
+
   protected:
     // inherited from SatStatsJitterHelper base class
     void DoInstallProbes();
 
   private:
     /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
+    std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>> m_probes;
 
 }; // end of class SatStatsFwdMacJitterHelper
 
@@ -256,13 +278,18 @@ class SatStatsFwdPhyJitterHelper : public SatStatsJitterHelper
      */
     static TypeId GetTypeId();
 
+    /**
+     * Change identifier used on probes, when handovers occur.
+     */
+    virtual void UpdateIdentifierOnProbes();
+
   protected:
     // inherited from SatStatsJitterHelper base class
     void DoInstallProbes();
 
   private:
     /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
+    std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>> m_probes;
 
 }; // end of class SatStatsFwdPhyJitterHelper
 

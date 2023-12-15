@@ -406,8 +406,6 @@ SatGwMac::StartTransmission(uint32_t carrierId)
             srcScheduler->DisconnectGw(m_nodeInfo->GetMacAddress());
             dstScheduler->ConnectGw(m_nodeInfo->GetMacAddress());
 
-            // SatIdMapper* satIdMapper = Singleton<SatIdMapper>::Get();
-            // satIdMapper->UpdateMacToBeamId(m_nodeInfo->GetMacAddress(), m_feederBeamId);
             m_updateIslCallback();
 
             Ptr<SatGeoNetDevice> geoNetDevice =

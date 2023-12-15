@@ -1963,15 +1963,11 @@ SatUtMac::DoFrameStart()
         Ptr<SatBeamScheduler> srcScheduler = m_beamSchedulerCallback(m_satId, m_beamId);
 
         NS_LOG_INFO("UT handover, old satellite is " << m_satId << ", old beam is " << m_beamId);
-        std::cout << "##### " << Simulator::Now() << " UT handover, old satellite is " << m_satId
-                  << ", old beam is " << m_beamId << std::endl;
 
         m_beamId = m_timuInfo->GetBeamId();
         m_satId = m_timuInfo->GetSatId();
 
         NS_LOG_INFO("UT handover, new satellite is " << m_satId << ", new beam is " << m_beamId);
-        std::cout << "##### " << Simulator::Now() << " UT handover, new satellite is " << m_satId
-                  << ", new beam is " << m_beamId << std::endl;
 
         SatMac::SetBeamId(m_beamId);
         SatMac::SetSatId(m_satId);
@@ -1986,15 +1982,6 @@ SatUtMac::DoFrameStart()
         Mac48Address gwAddress = m_getGwAddressInUtCallback(m_nodeInfo->GetNodeId());
         SetGwAddress(gwAddress);
         m_routingUpdateCallback(m_nodeInfo->GetMacAddress(), m_gwAddress);
-
-        // TODO put gw_address in TIMU instead of m_getGwAddressInUtCallback
-        /*Address gwAddress = m_timuInfo->GetGwAddress();
-        Mac48Address gwAddress48 = Mac48Address::ConvertFrom(gwAddress);
-        if (gwAddress48 != m_gwAddress)
-        {
-            SetGwAddress(gwAddress48);
-            m_routingUpdateCallback(m_nodeInfo->GetMacAddress(), gwAddress);
-        }*/
 
         m_handoverCallback(m_satId, m_beamId);
 

@@ -395,6 +395,127 @@ SatStatsPacketErrorHelper::ErrorRxCallback(uint32_t nPackets, const Address& fro
 
 } // end of `void ErrorRxCallback (uint32_t, const Address &, bool);`
 
+bool
+SatStatsPacketErrorHelper::ConnectProbeToCollector(Ptr<Probe> probe, uint32_t identifier)
+{
+    NS_LOG_FUNCTION(this << probe << probe->GetName() << identifier);
+
+    // Connect the probe to the right collector.
+    bool ret = false;
+    switch (GetOutputType())
+    {
+    case SatStatsHelper::OUTPUT_SCALAR_FILE:
+    case SatStatsHelper::OUTPUT_SCALAR_PLOT:
+        ret = m_terminalCollectors.ConnectWithProbe(probe->GetObject<Probe>(),
+                                                    "OutputBool",
+                                                    identifier,
+                                                    &ScalarCollector::TraceSinkBoolean);
+        break;
+
+    case SatStatsHelper::OUTPUT_SCATTER_FILE:
+    case SatStatsHelper::OUTPUT_SCATTER_PLOT:
+        ret = m_terminalCollectors.ConnectWithProbe(probe->GetObject<Probe>(),
+                                                    "OutputBool",
+                                                    identifier,
+                                                    &IntervalRateCollector::TraceSinkBoolean);
+        break;
+
+    default:
+        NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
+                       << " is not a valid output type for this statistics.");
+        break;
+
+    } // end of `switch (GetOutputType ())`
+
+    if (ret)
+    {
+        NS_LOG_INFO(this << " created probe " << probe->GetName() << ", connected to collector "
+                         << identifier);
+    }
+    else
+    {
+        NS_LOG_WARN(this << " unable to connect probe " << probe->GetName() << " to collector "
+                         << identifier);
+    }
+
+    return ret;
+}
+
+bool
+SatStatsPacketErrorHelper::DisconnectProbeFromCollector(Ptr<Probe> probe, uint32_t identifier)
+{
+    NS_LOG_FUNCTION(this << probe << probe->GetName() << identifier);
+
+    // Connect the probe to the right collector.
+    bool ret = false;
+    switch (GetOutputType())
+    {
+    case SatStatsHelper::OUTPUT_SCALAR_FILE:
+    case SatStatsHelper::OUTPUT_SCALAR_PLOT:
+        ret = m_terminalCollectors.DisconnectWithProbe(probe->GetObject<Probe>(),
+                                                       "OutputBool",
+                                                       identifier,
+                                                       &ScalarCollector::TraceSinkBoolean);
+        break;
+
+    case SatStatsHelper::OUTPUT_SCATTER_FILE:
+    case SatStatsHelper::OUTPUT_SCATTER_PLOT:
+        ret = m_terminalCollectors.DisconnectWithProbe(probe->GetObject<Probe>(),
+                                                       "OutputBool",
+                                                       identifier,
+                                                       &IntervalRateCollector::TraceSinkBoolean);
+        break;
+
+    default:
+        NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
+                       << " is not a valid output type for this statistics.");
+        break;
+
+    } // end of `switch (GetOutputType ())`
+
+    if (ret)
+    {
+        NS_LOG_INFO(this << " probe " << probe->GetName() << ", disconnected from collector "
+                         << identifier);
+    }
+    else
+    {
+        NS_LOG_WARN(this << " unable to disconnect probe " << probe->GetName() << " from collector "
+                         << identifier);
+    }
+
+    return ret;
+}
+
+void
+SatStatsPacketErrorHelper::UpdateIdentifierOnProbes()
+{
+    NS_LOG_FUNCTION(this);
+
+    std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>>::iterator it;
+
+    for (it = m_probes.begin(); it != m_probes.end(); it++)
+    {
+        Ptr<Probe> probe = it->first;
+        Ptr<Node> node = it->second.first;
+        uint32_t identifier = it->second.second;
+
+        if (!DisconnectProbeFromCollector(probe, identifier))
+        {
+            NS_FATAL_ERROR("Error disconnecting trace file on handover");
+        }
+
+        identifier = GetIdentifierForUtUser(node);
+
+        if (!ConnectProbeToCollector(probe, identifier))
+        {
+            NS_FATAL_ERROR("Error connecting trace file on handover");
+        }
+
+        it->second.second = identifier;
+    }
+} // end of `void UpdateIdentifierOnProbes ();`
+
 void
 SatStatsPacketErrorHelper::InstallProbeOnGw(Ptr<Node> gwNode)
 {
@@ -600,47 +721,11 @@ SatStatsPacketErrorHelper::InstallProbeOnUt(Ptr<Node> utNode)
             continue;
         }
         // Connect the object to the probe.
-        if (probe->ConnectByObject(GetTraceSourceName(), itCarrier->second))
+        if (probe->ConnectByObject(GetTraceSourceName(), itCarrier->second) &&
+            ConnectProbeToCollector(probe, identifier))
         {
-            // Connect the probe to the right collector.
-            bool ret = false;
-            switch (GetOutputType())
-            {
-            case SatStatsHelper::OUTPUT_SCALAR_FILE:
-            case SatStatsHelper::OUTPUT_SCALAR_PLOT:
-                ret = m_terminalCollectors.ConnectWithProbe(probe->GetObject<Probe>(),
-                                                            "OutputBool",
-                                                            identifier,
-                                                            &ScalarCollector::TraceSinkBoolean);
-                break;
-
-            case SatStatsHelper::OUTPUT_SCATTER_FILE:
-            case SatStatsHelper::OUTPUT_SCATTER_PLOT:
-                ret =
-                    m_terminalCollectors.ConnectWithProbe(probe->GetObject<Probe>(),
-                                                          "OutputBool",
-                                                          identifier,
-                                                          &IntervalRateCollector::TraceSinkBoolean);
-                break;
-
-            default:
-                NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
-                               << " is not a valid output type for this statistics.");
-                break;
-
-            } // end of `switch (GetOutputType ())`
-
-            if (ret)
-            {
-                NS_LOG_INFO(this << " created probe " << probeName.str()
-                                 << ", connected to collector " << identifier);
-                m_probes.push_back(probe->GetObject<Probe>());
-            }
-            else
-            {
-                NS_LOG_WARN(this << " unable to connect probe " << probeName.str()
-                                 << " to collector " << identifier);
-            }
+            m_probes.insert(
+                std::make_pair(probe->GetObject<Probe>(), std::make_pair(utNode, identifier)));
 
         } // end of `if (probe->ConnectByObject (GetTraceSourceName (), itCarrier->second))`
         else

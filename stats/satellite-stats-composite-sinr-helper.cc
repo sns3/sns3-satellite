@@ -263,6 +263,122 @@ SatStatsCompositeSinrHelper::InstallProbes()
     DoInstallProbes();
 }
 
+bool
+SatStatsCompositeSinrHelper::ConnectProbeToCollector(Ptr<Probe> probe, uint32_t identifier)
+{
+    NS_LOG_FUNCTION(this << probe << probe->GetName() << identifier);
+
+    // Connect the probe to the right collector.
+    bool ret = false;
+    switch (GetOutputType())
+    {
+    case SatStatsHelper::OUTPUT_SCALAR_FILE:
+    case SatStatsHelper::OUTPUT_SCALAR_PLOT:
+        ret = m_terminalCollectors.ConnectWithProbe(probe->GetObject<Probe>(),
+                                                    "OutputSinr",
+                                                    identifier,
+                                                    &ScalarCollector::TraceSinkDouble);
+        break;
+
+    case SatStatsHelper::OUTPUT_SCATTER_FILE:
+    case SatStatsHelper::OUTPUT_SCATTER_PLOT:
+        ret = m_terminalCollectors.ConnectWithProbe(probe->GetObject<Probe>(),
+                                                    "OutputSinr",
+                                                    identifier,
+                                                    &UnitConversionCollector::TraceSinkDouble);
+        break;
+
+    case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
+    case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
+    case SatStatsHelper::OUTPUT_PDF_FILE:
+    case SatStatsHelper::OUTPUT_PDF_PLOT:
+    case SatStatsHelper::OUTPUT_CDF_FILE:
+    case SatStatsHelper::OUTPUT_CDF_PLOT:
+        ret = m_terminalCollectors.ConnectWithProbe(probe->GetObject<Probe>(),
+                                                    "OutputSinr",
+                                                    identifier,
+                                                    &DistributionCollector::TraceSinkDouble);
+        break;
+
+    default:
+        NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
+                       << " is not a valid output type for this statistics.");
+        break;
+
+    } // end of `switch (GetOutputType ())`
+
+    if (ret)
+    {
+        NS_LOG_INFO(this << " created probe " << probe->GetName() << ", connected to collector "
+                         << identifier);
+    }
+    else
+    {
+        NS_LOG_WARN(this << " unable to connect probe " << probe->GetName() << " to collector "
+                         << identifier);
+    }
+
+    return ret;
+}
+
+bool
+SatStatsCompositeSinrHelper::DisconnectProbeFromCollector(Ptr<Probe> probe, uint32_t identifier)
+{
+    NS_LOG_FUNCTION(this << probe << probe->GetName() << identifier);
+
+    // Connect the probe to the right collector.
+    bool ret = false;
+    switch (GetOutputType())
+    {
+    case SatStatsHelper::OUTPUT_SCALAR_FILE:
+    case SatStatsHelper::OUTPUT_SCALAR_PLOT:
+        ret = m_terminalCollectors.DisconnectWithProbe(probe->GetObject<Probe>(),
+                                                       "OutputSinr",
+                                                       identifier,
+                                                       &ScalarCollector::TraceSinkDouble);
+        break;
+
+    case SatStatsHelper::OUTPUT_SCATTER_FILE:
+    case SatStatsHelper::OUTPUT_SCATTER_PLOT:
+        ret = m_terminalCollectors.DisconnectWithProbe(probe->GetObject<Probe>(),
+                                                       "OutputSinr",
+                                                       identifier,
+                                                       &UnitConversionCollector::TraceSinkDouble);
+        break;
+
+    case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
+    case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
+    case SatStatsHelper::OUTPUT_PDF_FILE:
+    case SatStatsHelper::OUTPUT_PDF_PLOT:
+    case SatStatsHelper::OUTPUT_CDF_FILE:
+    case SatStatsHelper::OUTPUT_CDF_PLOT:
+        ret = m_terminalCollectors.DisconnectWithProbe(probe->GetObject<Probe>(),
+                                                       "OutputSinr",
+                                                       identifier,
+                                                       &DistributionCollector::TraceSinkDouble);
+        break;
+
+    default:
+        NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
+                       << " is not a valid output type for this statistics.");
+        break;
+
+    } // end of `switch (GetOutputType ())`
+
+    if (ret)
+    {
+        NS_LOG_INFO(this << " probe " << probe->GetName() << ", disconnected from collector "
+                         << identifier);
+    }
+    else
+    {
+        NS_LOG_WARN(this << " unable to disconnect probe " << probe->GetName() << " from collector "
+                         << identifier);
+    }
+
+    return ret;
+}
+
 // FORWARD LINK ///////////////////////////////////////////////////////////////
 
 NS_OBJECT_ENSURE_REGISTERED(SatStatsFwdCompositeSinrHelper);
@@ -320,61 +436,11 @@ SatStatsFwdCompositeSinrHelper::DoInstallProbes()
              ++itCarrier)
         {
             // Connect the object to the probe.
-            if (probe->ConnectByObject("Sinr", itCarrier->second))
+            if (probe->ConnectByObject("Sinr", itCarrier->second) &&
+                ConnectProbeToCollector(probe, identifier))
             {
-                // Connect the probe to the right collector.
-                bool ret = false;
-                switch (GetOutputType())
-                {
-                case SatStatsHelper::OUTPUT_SCALAR_FILE:
-                case SatStatsHelper::OUTPUT_SCALAR_PLOT:
-                    ret = m_terminalCollectors.ConnectWithProbe(probe->GetObject<Probe>(),
-                                                                "OutputSinr",
-                                                                identifier,
-                                                                &ScalarCollector::TraceSinkDouble);
-                    break;
-
-                case SatStatsHelper::OUTPUT_SCATTER_FILE:
-                case SatStatsHelper::OUTPUT_SCATTER_PLOT:
-                    ret = m_terminalCollectors.ConnectWithProbe(
-                        probe->GetObject<Probe>(),
-                        "OutputSinr",
-                        identifier,
-                        &UnitConversionCollector::TraceSinkDouble);
-                    break;
-
-                case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
-                case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
-                case SatStatsHelper::OUTPUT_PDF_FILE:
-                case SatStatsHelper::OUTPUT_PDF_PLOT:
-                case SatStatsHelper::OUTPUT_CDF_FILE:
-                case SatStatsHelper::OUTPUT_CDF_PLOT:
-                    ret = m_terminalCollectors.ConnectWithProbe(
-                        probe->GetObject<Probe>(),
-                        "OutputSinr",
-                        identifier,
-                        &DistributionCollector::TraceSinkDouble);
-                    break;
-
-                default:
-                    NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
-                                   << " is not a valid output type for this statistics.");
-                    break;
-
-                } // end of `switch (GetOutputType ())`
-
-                if (ret)
-                {
-                    NS_LOG_INFO(this << " created probe " << probeName.str()
-                                     << ", connected to collector " << identifier);
-                    m_probes.push_back(probe->GetObject<Probe>());
-                }
-                else
-                {
-                    NS_LOG_WARN(this << " unable to connect probe " << probeName.str()
-                                     << " to collector " << identifier);
-                }
-
+                m_probes.insert(
+                    std::make_pair(probe->GetObject<Probe>(), std::make_pair(*it, identifier)));
             } // end of `if (probe->ConnectByObject ("Sinr", itCarrier->second))`
             else
             {
@@ -389,6 +455,35 @@ SatStatsFwdCompositeSinrHelper::DoInstallProbes()
     } // end of `for (it = uts.Begin(); it != uts.End (); ++it)`
 
 } // end of `void DoInstallProbes ();`
+
+void
+SatStatsFwdCompositeSinrHelper::UpdateIdentifierOnProbes()
+{
+    NS_LOG_FUNCTION(this);
+
+    std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>>::iterator it;
+
+    for (it = m_probes.begin(); it != m_probes.end(); it++)
+    {
+        Ptr<Probe> probe = it->first;
+        Ptr<Node> node = it->second.first;
+        uint32_t identifier = it->second.second;
+
+        if (!DisconnectProbeFromCollector(probe, identifier))
+        {
+            NS_FATAL_ERROR("Error disconnecting trace file on handover");
+        }
+
+        identifier = GetIdentifierForUtUser(node);
+
+        if (!ConnectProbeToCollector(probe, identifier))
+        {
+            NS_FATAL_ERROR("Error connecting trace file on handover");
+        }
+
+        it->second.second = identifier;
+    }
+} // end of `void UpdateIdentifierOnProbes ();`
 
 // RETURN LINK ////////////////////////////////////////////////////////////////
 

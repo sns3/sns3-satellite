@@ -105,6 +105,13 @@ class SatStatsPltHelper : public SatStatsHelper
     bool ConnectProbeToCollector(Ptr<Probe> probe, uint32_t identifier);
 
     /**
+     * \brief Disconnect the probe from the right collector.
+     * \param probe
+     * \param identifier
+     */
+    bool DisconnectProbeFromCollector(Ptr<Probe> probe, uint32_t identifier);
+
+    /**
      * \brief Find a collector with the right identifier and pass a sample data
      *        to it.
      * \param plt
@@ -146,13 +153,18 @@ class SatStatsFwdAppPltHelper : public SatStatsPltHelper
      */
     static TypeId GetTypeId();
 
+    /**
+     * Change identifier used on probes, when handovers occur.
+     */
+    virtual void UpdateIdentifierOnProbes();
+
   protected:
     // inherited from SatStatsFwdAppPltHelper base class
     void DoInstallProbes();
 
   private:
     /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
+    std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>> m_probes;
 
 }; // end of class SatStatsFwdAppPltHelper
 

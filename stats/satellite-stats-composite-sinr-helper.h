@@ -75,6 +75,20 @@ class SatStatsCompositeSinrHelper : public SatStatsHelper
      */
     virtual void DoInstallProbes() = 0;
 
+    /**
+     * \brief Connect the probe to the right collector.
+     * \param probe
+     * \param identifier
+     */
+    bool ConnectProbeToCollector(Ptr<Probe> probe, uint32_t identifier);
+
+    /**
+     * \brief Disconnect the probe from the right collector.
+     * \param probe
+     * \param identifier
+     */
+    bool DisconnectProbeFromCollector(Ptr<Probe> probe, uint32_t identifier);
+
     /// Maintains a list of collectors created by this helper.
     CollectorMap m_terminalCollectors;
 
@@ -120,13 +134,18 @@ class SatStatsFwdCompositeSinrHelper : public SatStatsCompositeSinrHelper
      */
     static TypeId GetTypeId();
 
+    /**
+     * Change identifier used on probes, when handovers occur.
+     */
+    virtual void UpdateIdentifierOnProbes();
+
   protected:
     // inherited from SatStatsCompositeSinrHelper base class
     void DoInstallProbes();
 
   private:
     /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
+    std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>> m_probes;
 
 }; // end of class SatStatsFwdCompositeSinrHelper
 

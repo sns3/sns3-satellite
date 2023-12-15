@@ -102,25 +102,25 @@ main(int argc, char* argv[])
 
     Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer();
 
-    // s->AddPerSatFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-    // s->AddPerUtFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-    // s->AddPerGwFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    s->AddPerSatFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    s->AddPerUtFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    s->AddPerGwFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-    // s->AddPerSatRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-    // s->AddPerUtRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-    // s->AddPerGwRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    s->AddPerSatRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    s->AddPerUtRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    s->AddPerGwRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
 
     s->AddPerSatFwdUserMacThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-    // s->AddPerUtFwdUserMacThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-    // s->AddPerGwFwdUserMacThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    s->AddPerUtFwdUserMacThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    s->AddPerGwFwdUserMacThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-    // s->AddPerSatRtnUserMacThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-    // s->AddPerUtRtnUserMacThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-    // s->AddPerGwRtnUserMacThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    s->AddPerSatRtnUserMacThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    s->AddPerUtRtnUserMacThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    s->AddPerGwRtnUserMacThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-    // s->AddPerBeamFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-    // s->AddPerBeamFwdUserDevThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-    // s->AddPerBeamBeamServiceTime(SatStatsHelper::OUTPUT_SCALAR_FILE);
+    s->AddPerBeamFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    s->AddPerBeamFwdUserDevThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    s->AddPerBeamBeamServiceTime(SatStatsHelper::OUTPUT_SCALAR_FILE);
 
     s->AddPerSatFwdFeederMacThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
 

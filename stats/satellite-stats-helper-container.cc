@@ -2465,6 +2465,7 @@ SatStatsHelperContainer::UpdateAddressAndIdentifier(Ptr<Node> utNode)
     for (it = m_stats.begin(); it != m_stats.end(); it++)
     {
         (*it)->UpdateAddressAndIdentifier(utNode);
+        (*it)->UpdateIdentifierOnProbes();
     }
 }
 

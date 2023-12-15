@@ -487,7 +487,8 @@ SatStatsFwdAppThroughputHelper::DoInstallProbes()
                 {
                     NS_LOG_INFO(this << " created probe " << probeName.str()
                                      << ", connected to collector " << identifier);
-                    m_probes.push_back(probe->GetObject<Probe>());
+                    m_probes.insert(
+                        std::make_pair(probe->GetObject<Probe>(), std::make_pair(*it, identifier)));
                 }
                 else
                 {
@@ -511,6 +512,34 @@ SatStatsFwdAppThroughputHelper::DoInstallProbes()
     } // end of `for (it = utUsers.Begin(); it != utUsers.End (); ++it)`
 
 } // end of `void DoInstallProbes ();`
+
+void
+SatStatsFwdAppThroughputHelper::UpdateIdentifierOnProbes()
+{
+    NS_LOG_FUNCTION(this);
+
+    std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>>::iterator it;
+
+    for (it = m_probes.begin(); it != m_probes.end(); it++)
+    {
+        Ptr<Probe> probe = it->first;
+        Ptr<Node> node = it->second.first;
+        uint32_t identifier = it->second.second;
+        m_conversionCollectors.DisconnectWithProbe(probe->GetObject<Probe>(),
+                                                   "OutputBytes",
+                                                   identifier,
+                                                   &UnitConversionCollector::TraceSinkUinteger32);
+
+        identifier = GetIdentifierForUtUser(node);
+
+        m_conversionCollectors.ConnectWithProbe(probe->GetObject<Probe>(),
+                                                "OutputBytes",
+                                                identifier,
+                                                &UnitConversionCollector::TraceSinkUinteger32);
+
+        it->second.second = identifier;
+    }
+} // end of `void UpdateIdentifierOnProbes ();`
 
 // FORWARD FEEDER LINK DEVICE-LEVEL //////////////////////////////////////////////////
 
@@ -655,7 +684,8 @@ SatStatsFwdUserDevThroughputHelper::DoInstallProbes()
             {
                 NS_LOG_INFO(this << " created probe " << probeName.str()
                                  << ", connected to collector " << identifier);
-                m_probes.push_back(probe->GetObject<Probe>());
+                m_probes.insert(
+                    std::make_pair(probe->GetObject<Probe>(), std::make_pair(*it, identifier)));
 
                 // Enable statistics-related tags and trace sources on the device.
                 dev->SetAttribute("EnableStatisticsTags", BooleanValue(true));
@@ -689,6 +719,34 @@ SatStatsFwdUserDevThroughputHelper::DoInstallProbes()
     }
 
 } // end of `void DoInstallProbes ();`
+
+void
+SatStatsFwdUserDevThroughputHelper::UpdateIdentifierOnProbes()
+{
+    NS_LOG_FUNCTION(this);
+
+    std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>>::iterator it;
+
+    for (it = m_probes.begin(); it != m_probes.end(); it++)
+    {
+        Ptr<Probe> probe = it->first;
+        Ptr<Node> node = it->second.first;
+        uint32_t identifier = it->second.second;
+        m_conversionCollectors.DisconnectWithProbe(probe->GetObject<Probe>(),
+                                                   "OutputBytes",
+                                                   identifier,
+                                                   &UnitConversionCollector::TraceSinkUinteger32);
+
+        identifier = GetIdentifierForUt(node);
+
+        m_conversionCollectors.ConnectWithProbe(probe->GetObject<Probe>(),
+                                                "OutputBytes",
+                                                identifier,
+                                                &UnitConversionCollector::TraceSinkUinteger32);
+
+        it->second.second = identifier;
+    }
+} // end of `void UpdateIdentifierOnProbes ();`
 
 // FORWARD FEEDER LINK MAC-LEVEL /////////////////////////////////////////////////////
 
@@ -889,7 +947,8 @@ SatStatsFwdUserMacThroughputHelper::DoInstallProbes()
                     identifier,
                     &UnitConversionCollector::TraceSinkUinteger32))
             {
-                m_probes.push_back(probe->GetObject<Probe>());
+                m_probes.insert(
+                    std::make_pair(probe->GetObject<Probe>(), std::make_pair(*it, identifier)));
 
                 // Enable statistics-related tags and trace sources on the device.
                 satDev->SetAttribute("EnableStatisticsTags", BooleanValue(true));
@@ -927,6 +986,34 @@ SatStatsFwdUserMacThroughputHelper::DoInstallProbes()
     }
 
 } // end of `void DoInstallProbes ();`
+
+void
+SatStatsFwdUserMacThroughputHelper::UpdateIdentifierOnProbes()
+{
+    NS_LOG_FUNCTION(this);
+
+    std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>>::iterator it;
+
+    for (it = m_probes.begin(); it != m_probes.end(); it++)
+    {
+        Ptr<Probe> probe = it->first;
+        Ptr<Node> node = it->second.first;
+        uint32_t identifier = it->second.second;
+        m_conversionCollectors.DisconnectWithProbe(probe->GetObject<Probe>(),
+                                                   "OutputBytes",
+                                                   identifier,
+                                                   &UnitConversionCollector::TraceSinkUinteger32);
+
+        identifier = GetIdentifierForUt(node);
+
+        m_conversionCollectors.ConnectWithProbe(probe->GetObject<Probe>(),
+                                                "OutputBytes",
+                                                identifier,
+                                                &UnitConversionCollector::TraceSinkUinteger32);
+
+        it->second.second = identifier;
+    }
+} // end of `void UpdateIdentifierOnProbes ();`
 
 // FORWARD FEEDER LINK PHY-LEVEL /////////////////////////////////////////////////////
 
@@ -1129,7 +1216,8 @@ SatStatsFwdUserPhyThroughputHelper::DoInstallProbes()
                     identifier,
                     &UnitConversionCollector::TraceSinkUinteger32))
             {
-                m_probes.push_back(probe->GetObject<Probe>());
+                m_probes.insert(
+                    std::make_pair(probe->GetObject<Probe>(), std::make_pair(*it, identifier)));
 
                 // Enable statistics-related tags and trace sources on the device.
                 satDev->SetAttribute("EnableStatisticsTags", BooleanValue(true));
@@ -1167,6 +1255,34 @@ SatStatsFwdUserPhyThroughputHelper::DoInstallProbes()
     }
 
 } // end of `void DoInstallProbes ();`
+
+void
+SatStatsFwdUserPhyThroughputHelper::UpdateIdentifierOnProbes()
+{
+    NS_LOG_FUNCTION(this);
+
+    std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>>::iterator it;
+
+    for (it = m_probes.begin(); it != m_probes.end(); it++)
+    {
+        Ptr<Probe> probe = it->first;
+        Ptr<Node> node = it->second.first;
+        uint32_t identifier = it->second.second;
+        m_conversionCollectors.DisconnectWithProbe(probe->GetObject<Probe>(),
+                                                   "OutputBytes",
+                                                   identifier,
+                                                   &UnitConversionCollector::TraceSinkUinteger32);
+
+        identifier = GetIdentifierForUt(node);
+
+        m_conversionCollectors.ConnectWithProbe(probe->GetObject<Probe>(),
+                                                "OutputBytes",
+                                                identifier,
+                                                &UnitConversionCollector::TraceSinkUinteger32);
+
+        it->second.second = identifier;
+    }
+} // end of `void UpdateIdentifierOnProbes ();`
 
 // RETURN LINK APPLICATION-LEVEL //////////////////////////////////////////////
 

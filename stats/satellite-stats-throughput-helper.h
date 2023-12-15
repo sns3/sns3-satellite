@@ -151,13 +151,18 @@ class SatStatsFwdAppThroughputHelper : public SatStatsThroughputHelper
      */
     static TypeId GetTypeId();
 
+    /**
+     * Change identifier used on probes, when handovers occur.
+     */
+    virtual void UpdateIdentifierOnProbes();
+
   protected:
     // inherited from SatStatsThroughputHelper base class
     void DoInstallProbes();
 
   private:
     /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
+    std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>> m_probes;
 
 }; // end of class SatStatsFwdAppThroughputHelper
 
@@ -199,10 +204,6 @@ class SatStatsFwdFeederDevThroughputHelper : public SatStatsThroughputHelper
     // inherited from SatStatsThroughputHelper base class
     void DoInstallProbes();
 
-  private:
-    /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
-
 }; // end of class SatStatsFwdFeederDevThroughputHelper
 
 // FORWARD USER LINK DEVICE-LEVEL //////////////////////////////////////////////////
@@ -239,13 +240,18 @@ class SatStatsFwdUserDevThroughputHelper : public SatStatsThroughputHelper
      */
     static TypeId GetTypeId();
 
+    /**
+     * Change identifier used on probes, when handovers occur.
+     */
+    virtual void UpdateIdentifierOnProbes();
+
   protected:
     // inherited from SatStatsThroughputHelper base class
     void DoInstallProbes();
 
   private:
     /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
+    std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>> m_probes;
 
 }; // end of class SatStatsFwdUserDevThroughputHelper
 
@@ -289,10 +295,6 @@ class SatStatsFwdFeederMacThroughputHelper : public SatStatsThroughputHelper
     // inherited from SatStatsThroughputHelper base class
     void DoInstallProbes();
 
-  private:
-    /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
-
 }; // end of class SatStatsFwdFeederMacThroughputHelper
 
 // FORWARD USER LINK MAC-LEVEL /////////////////////////////////////////////////////
@@ -331,13 +333,18 @@ class SatStatsFwdUserMacThroughputHelper : public SatStatsThroughputHelper
      */
     static TypeId GetTypeId();
 
+    /**
+     * Change identifier used on probes, when handovers occur.
+     */
+    virtual void UpdateIdentifierOnProbes();
+
   protected:
     // inherited from SatStatsThroughputHelper base class
     void DoInstallProbes();
 
   private:
     /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
+    std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>> m_probes;
 
 }; // end of class SatStatsFwdUserMacThroughputHelper
 
@@ -381,10 +388,6 @@ class SatStatsFwdFeederPhyThroughputHelper : public SatStatsThroughputHelper
     // inherited from SatStatsThroughputHelper base class
     void DoInstallProbes();
 
-  private:
-    /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
-
 }; // end of class SatStatsFwdFeederPhyThroughputHelper
 
 // FORWARD USER LINK PHY-LEVEL /////////////////////////////////////////////////////
@@ -423,13 +426,18 @@ class SatStatsFwdUserPhyThroughputHelper : public SatStatsThroughputHelper
      */
     static TypeId GetTypeId();
 
+    /**
+     * Change identifier used on probes, when handovers occur.
+     */
+    virtual void UpdateIdentifierOnProbes();
+
   protected:
     // inherited from SatStatsThroughputHelper base class
     void DoInstallProbes();
 
   private:
     /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
+    std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>> m_probes;
 
 }; // end of class SatStatsFwdUserPhyThroughputHelper
 

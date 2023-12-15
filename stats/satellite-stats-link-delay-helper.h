@@ -105,6 +105,13 @@ class SatStatsLinkDelayHelper : public SatStatsHelper
     bool ConnectProbeToCollector(Ptr<Probe> probe, uint32_t identifier);
 
     /**
+     * \brief Disconnect the probe from the right collector.
+     * \param probe
+     * \param identifier
+     */
+    bool DisconnectProbeFromCollector(Ptr<Probe> probe, uint32_t identifier);
+
+    /**
      * \brief Find a collector with the right identifier and pass a sample data
      *        to it.
      * \param delay
@@ -167,10 +174,6 @@ class SatStatsFwdFeederDevLinkDelayHelper : public SatStatsLinkDelayHelper
     // inherited from SatStatsLinkDelayHelper base class
     void DoInstallProbes();
 
-  private:
-    /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
-
 }; // end of class SatStatsFwdFeederDevLinkDelayHelper
 
 // FORWARD USER LINK DEV-LEVEL /////////////////////////////////////////////////////
@@ -208,13 +211,18 @@ class SatStatsFwdUserDevLinkDelayHelper : public SatStatsLinkDelayHelper
      */
     static TypeId GetTypeId();
 
+    /**
+     * Change identifier used on probes, when handovers occur.
+     */
+    virtual void UpdateIdentifierOnProbes();
+
   protected:
     // inherited from SatStatsLinkDelayHelper base class
     void DoInstallProbes();
 
   private:
     /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
+    std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>> m_probes;
 
 }; // end of class SatStatsFwdUserDevLinkDelayHelper
 
@@ -256,10 +264,6 @@ class SatStatsFwdFeederMacLinkDelayHelper : public SatStatsLinkDelayHelper
     // inherited from SatStatsLinkDelayHelper base class
     void DoInstallProbes();
 
-  private:
-    /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
-
 }; // end of class SatStatsFwdFeederMacLinkDelayHelper
 
 // FORWARD USER LINK MAC-LEVEL /////////////////////////////////////////////////////
@@ -297,13 +301,18 @@ class SatStatsFwdUserMacLinkDelayHelper : public SatStatsLinkDelayHelper
      */
     static TypeId GetTypeId();
 
+    /**
+     * Change identifier used on probes, when handovers occur.
+     */
+    virtual void UpdateIdentifierOnProbes();
+
   protected:
     // inherited from SatStatsLinkDelayHelper base class
     void DoInstallProbes();
 
   private:
     /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
+    std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>> m_probes;
 
 }; // end of class SatStatsFwdUserMacLinkDelayHelper
 
@@ -345,10 +354,6 @@ class SatStatsFwdFeederPhyLinkDelayHelper : public SatStatsLinkDelayHelper
     // inherited from SatStatsLinkDelayHelper base class
     void DoInstallProbes();
 
-  private:
-    /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
-
 }; // end of class SatStatsFwdFeederPhyLinkDelayHelper
 
 // FORWARD USER LINK PHY-LEVEL /////////////////////////////////////////////////////
@@ -386,13 +391,18 @@ class SatStatsFwdUserPhyLinkDelayHelper : public SatStatsLinkDelayHelper
      */
     static TypeId GetTypeId();
 
+    /**
+     * Change identifier used on probes, when handovers occur.
+     */
+    virtual void UpdateIdentifierOnProbes();
+
   protected:
     // inherited from SatStatsLinkDelayHelper base class
     void DoInstallProbes();
 
   private:
     /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
+    std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>> m_probes;
 
 }; // end of class SatStatsFwdUserPhyLinkDelayHelper
 
@@ -475,10 +485,6 @@ class SatStatsRtnUserDevLinkDelayHelper : public SatStatsLinkDelayHelper
     // inherited from SatStatsLinkDelayHelper base class
     void DoInstallProbes();
 
-  private:
-    /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
-
 }; // end of class SatStatsRtnUserDevLinkDelayHelper
 
 // RETURN FEEDER LINK MAC-LEVEL //////////////////////////////////////////////
@@ -560,10 +566,6 @@ class SatStatsRtnUserMacLinkDelayHelper : public SatStatsLinkDelayHelper
     // inherited from SatStatsLinkDelayHelper base class
     void DoInstallProbes();
 
-  private:
-    /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
-
 }; // end of class SatStatsRtnUserMacLinkDelayHelper
 
 // RETURN FEEDER LINK PHY-LEVEL //////////////////////////////////////////////
@@ -644,10 +646,6 @@ class SatStatsRtnUserPhyLinkDelayHelper : public SatStatsLinkDelayHelper
   protected:
     // inherited from SatStatsLinkDelayHelper base class
     void DoInstallProbes();
-
-  private:
-    /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
 
 }; // end of class SatStatsRtnUserPhyLinkDelayHelper
 

@@ -165,10 +165,6 @@ class SatStatsFwdFeederLinkModcodHelper : public SatStatsLinkModcodHelper
     // inherited from SatStatsLinkModcodHelper base class
     void DoInstallProbes();
 
-  private:
-    /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
-
 }; // end of class SatStatsFwdFeederLinkModcodHelper
 
 // FORWARD USER LINK /////////////////////////////////////////////////////
@@ -209,10 +205,6 @@ class SatStatsFwdUserLinkModcodHelper : public SatStatsLinkModcodHelper
   protected:
     // inherited from SatStatsLinkModcodHelper base class
     void DoInstallProbes();
-
-  private:
-    /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
 
 }; // end of class SatStatsFwdUserLinkModcodHelper
 
@@ -295,10 +287,6 @@ class SatStatsRtnUserLinkModcodHelper : public SatStatsLinkModcodHelper
   protected:
     // inherited from SatStatsLinkModcodHelper base class
     void DoInstallProbes();
-
-  private:
-    /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
 
 }; // end of class SatStatsRtnUserLinkModcodHelper
 
