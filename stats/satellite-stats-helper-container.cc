@@ -79,7 +79,7 @@ SatStatsHelperContainer::SatStatsHelperContainer(Ptr<SatHelper> satHelper)
             if (netDevice)
             {
                 Ptr<SatUtMac> utMac = DynamicCast<SatUtMac>(netDevice->GetMac());
-                if(utMac != nullptr)
+                if (utMac != nullptr)
                 {
                     utMac->SetUpdateAddressAndIdentifierCallback(
                         MakeCallback(&SatStatsHelperContainer::UpdateAddressAndIdentifier, this));
@@ -912,22 +912,22 @@ SatStatsHelperContainer::GetTypeId()
 void
 SatStatsHelperContainer::SetName(std::string name)
 {
-  NS_LOG_FUNCTION(this << name);
+    NS_LOG_FUNCTION(this << name);
 
-  // convert all spaces and slashes in the name to underscores
-  for (size_t pos = name.find_first_of(" /"); pos != std::string::npos;
-       pos = name.find_first_of(" /", pos + 1, 1))
-  {
-      name[pos] = '_';
-  }
+    // convert all spaces and slashes in the name to underscores
+    for (size_t pos = name.find_first_of(" /"); pos != std::string::npos;
+         pos = name.find_first_of(" /", pos + 1, 1))
+    {
+        name[pos] = '_';
+    }
 
-  m_name = name;
+    m_name = name;
 }
 
 std::string
 SatStatsHelperContainer::GetName() const
 {
-  return m_name;
+    return m_name;
 }
 
 /*
@@ -2422,38 +2422,38 @@ SAT_STATS_PER_BEAM_METHOD_DEFINITION(RtnFeederWindowLoad, "rtn-feeder-window-loa
 std::string // static
 SatStatsHelperContainer::GetOutputTypeSuffix(SatStatsHelper::OutputType_t outputType)
 {
-  switch (outputType)
-  {
-  case SatStatsHelper::OUTPUT_NONE:
-      return "";
+    switch (outputType)
+    {
+    case SatStatsHelper::OUTPUT_NONE:
+        return "";
 
-  case SatStatsHelper::OUTPUT_SCALAR_FILE:
-  case SatStatsHelper::OUTPUT_SCALAR_PLOT:
-      return "-scalar";
+    case SatStatsHelper::OUTPUT_SCALAR_FILE:
+    case SatStatsHelper::OUTPUT_SCALAR_PLOT:
+        return "-scalar";
 
-  case SatStatsHelper::OUTPUT_SCATTER_FILE:
-  case SatStatsHelper::OUTPUT_SCATTER_PLOT:
-      return "-scatter";
+    case SatStatsHelper::OUTPUT_SCATTER_FILE:
+    case SatStatsHelper::OUTPUT_SCATTER_PLOT:
+        return "-scatter";
 
-  case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
-  case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
-      return "-histogram";
+    case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
+    case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
+        return "-histogram";
 
-  case SatStatsHelper::OUTPUT_PDF_FILE:
-  case SatStatsHelper::OUTPUT_PDF_PLOT:
-      return "-pdf";
+    case SatStatsHelper::OUTPUT_PDF_FILE:
+    case SatStatsHelper::OUTPUT_PDF_PLOT:
+        return "-pdf";
 
-  case SatStatsHelper::OUTPUT_CDF_FILE:
-  case SatStatsHelper::OUTPUT_CDF_PLOT:
-      return "-cdf";
+    case SatStatsHelper::OUTPUT_CDF_FILE:
+    case SatStatsHelper::OUTPUT_CDF_PLOT:
+        return "-cdf";
 
-  default:
-      NS_FATAL_ERROR("SatStatsHelperContainer - Invalid output type");
-      break;
-  }
+    default:
+        NS_FATAL_ERROR("SatStatsHelperContainer - Invalid output type");
+        break;
+    }
 
-  NS_FATAL_ERROR("SatStatsHelperContainer - Invalid output type");
-  return "";
+    NS_FATAL_ERROR("SatStatsHelperContainer - Invalid output type");
+    return "";
 }
 
 void

@@ -281,6 +281,7 @@ def build(bld):
         'test/satellite-fsl-test.cc',
         'test/satellite-geo-coordinate-test.cc',
         'test/satellite-gse-test.cc',
+        'test/satellite-handover-test.cc',
         'test/satellite-interference-test.cc',
         'test/satellite-link-results-test.cc',
         'test/satellite-lora-test.cc',

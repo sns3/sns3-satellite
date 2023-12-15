@@ -500,6 +500,7 @@ set(test_sources
     test/satellite-fading-external-input-trace-test.cc
     test/satellite-frame-allocator-test.cc
     test/satellite-fsl-test.cc
+    test/satellite-handover-test.cc
     test/satellite-geo-coordinate-test.cc
     test/satellite-gse-test.cc
     test/satellite-interference-test.cc
