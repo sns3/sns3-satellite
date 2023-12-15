@@ -211,8 +211,6 @@ SatHandoverTest1::DoRun(void)
                                  "/additional-input/utpositions/mobiles/scenario6";
     Ptr<SatHelper> helper = simulationHelper->CreateSatScenario(SatHelper::NONE, mobileUtFolder);
 
-    helper->PrintTopology(std::cout);
-
     Config::SetDefault("ns3::CbrApplication::Interval", StringValue("100ms"));
     Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(512));
 
@@ -416,6 +414,154 @@ SatHandoverTest1::DoRun(void)
                   40.96);
 }
 
+/**
+ * \ingroup satellite
+ * \brief 'Handover, test 2 test case implementation.
+ *
+ * This case tests that communication remains after GW handover.
+ */
+class SatHandoverTest2 : public TestCase
+{
+  public:
+    SatHandoverTest2();
+    virtual ~SatHandoverTest2();
+
+  private:
+    bool HasSinkInstalled(Ptr<Node> node, uint16_t port);
+    virtual void DoRun(void);
+
+    Ptr<SatHelper> m_helper;
+};
+
+// Add some help text to this case to describe what it is intended to test
+SatHandoverTest2::SatHandoverTest2()
+    : TestCase("This case tests that communication remains after GW handover.")
+{
+}
+
+// This destructor does nothing but we include it as a reminder that
+// the test case should clean up after itself
+SatHandoverTest2::~SatHandoverTest2()
+{
+}
+
+bool
+SatHandoverTest2::HasSinkInstalled(Ptr<Node> node, uint16_t port)
+{
+    for (uint32_t i = 0; i < node->GetNApplications(); i++)
+    {
+        auto sink = DynamicCast<PacketSink>(node->GetApplication(i));
+        if (sink != NULL)
+        {
+            AddressValue av;
+            sink->GetAttribute("Local", av);
+            if (InetSocketAddress::ConvertFrom(av.Get()).GetPort() == port)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+//
+// SatHandoverTest2 TestCase implementation
+//
+void
+SatHandoverTest2::DoRun(void)
+{
+    Config::Reset();
+    Singleton<SatIdMapper>::Get()->Reset();
+
+    // Set simulation output details
+    Singleton<SatEnvVariables>::Get()->DoInitialize();
+    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-handover", "test2", true);
+
+    /// Set regeneration mode
+    Config::SetDefault("ns3::SatConf::ForwardLinkRegenerationMode",
+                       EnumValue(SatEnums::REGENERATION_NETWORK));
+    Config::SetDefault("ns3::SatConf::ReturnLinkRegenerationMode",
+                       EnumValue(SatEnums::REGENERATION_NETWORK));
+
+    Config::SetDefault("ns3::SatGeoFeederPhy::QueueSize", UintegerValue(100000));
+
+    Config::SetDefault("ns3::SatHelper::HandoversEnabled", BooleanValue(true));
+    Config::SetDefault("ns3::SatHandoverModule::NumberClosestSats", UintegerValue(2));
+
+    Config::SetDefault("ns3::SatGwMac::DisableSchedulingIfNoDeviceConnected", BooleanValue(true));
+    Config::SetDefault("ns3::SatGeoMac::DisableSchedulingIfNoDeviceConnected", BooleanValue(true));
+
+    /// Set simulation output details
+    Config::SetDefault("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue(true));
+
+    /// Enable packet trace
+    Config::SetDefault("ns3::SatHelper::PacketTraceEnabled", BooleanValue(true));
+    Ptr<SimulationHelper> simulationHelper =
+        CreateObject<SimulationHelper>("test-sat-handover/test2");
+    Ptr<SimulationHelperConf> simulationConf = CreateObject<SimulationHelperConf>();
+    simulationHelper->SetSimulationTime(Seconds(50));
+    simulationHelper->SetGwUserCount(1);
+    simulationHelper->SetUserCountPerUt(1);
+    std::set<uint32_t> beamSetAll = {1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15,
+                                     16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+                                     31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45,
+                                     46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60,
+                                     61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72};
+    simulationHelper->SetBeamSet(beamSetAll);
+    simulationHelper->SetUserCountPerMobileUt(simulationConf->m_utMobileUserCount);
+
+    simulationHelper->LoadScenario("constellation-leo-2-satellites");
+
+    Ptr<SatHelper> helper = simulationHelper->CreateSatScenario(SatHelper::NONE);
+
+    NodeContainer utUsers = helper->GetUtUsers();
+    NodeContainer gwUsers = helper->GetGwUsers();
+
+    Config::SetDefault("ns3::CbrApplication::Interval", StringValue("100ms"));
+    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(512));
+
+    uint16_t port = 9;
+    PacketSinkHelper sinkHelper("ns3::UdpSocketFactory", Address());
+    CbrHelper cbrHelper("ns3::UdpSocketFactory", Address());
+    ApplicationContainer sinkContainer;
+    ApplicationContainer cbrContainer;
+    // create CBR applications on UT users
+    for (uint32_t i = 0; i < utUsers.GetN(); i++)
+    {
+        InetSocketAddress utUserAddr =
+            InetSocketAddress(helper->GetUserAddress(utUsers.Get(i)), port);
+        if (!HasSinkInstalled(utUsers.Get(i), port))
+        {
+            sinkHelper.SetAttribute("Local", AddressValue(Address(utUserAddr)));
+            sinkContainer.Add(sinkHelper.Install(utUsers.Get(i)));
+        }
+
+        cbrHelper.SetAttribute("Remote", AddressValue(Address(utUserAddr)));
+        auto app = cbrHelper.Install(gwUsers.Get(0)).Get(0);
+        app->SetStartTime(Seconds(1.0));
+        cbrContainer.Add(app);
+    }
+    sinkContainer.Start(Seconds(1.0));
+    sinkContainer.Stop(Seconds(45.0));
+
+    simulationHelper->RunSimulation();
+
+    Simulator::Destroy();
+
+    for (uint32_t i = 0; i < 5; i++)
+    {
+        Ptr<PacketSink> utReceiver = DynamicCast<PacketSink>(sinkContainer.Get(i));
+        Ptr<CbrApplication> gwSender = DynamicCast<CbrApplication>(cbrContainer.Get(i));
+
+        NS_TEST_ASSERT_MSG_NE(gwSender->GetSent(), 0, "Nothing sent by GW app " << i << "!");
+
+        NS_TEST_ASSERT_MSG_EQ_TOL(utReceiver->GetTotalRx(),
+                                  gwSender->GetSent(),
+                                  gwSender->GetSent() / 5,
+                                  "Too many packets were lost to UT!");
+    }
+}
+
 // The TestSuite class names the TestSuite as sat-handover-test, identifies what type of
 // TestSuite (SYSTEM), and enables the TestCases to be run. Typically, only the constructor for this
 // class must be defined
@@ -432,6 +578,8 @@ SatHandoverTestSuite::SatHandoverTestSuite()
     AddTestCase(
         new SatHandoverTest1,
         TestCase::QUICK); // This case tests that a application throughputs PerEntity are correct.
+    AddTestCase(new SatHandoverTest2,
+                TestCase::QUICK); // This case tests that communication remains after GW handover.
 }
 
 // Allocate an instance of this TestSuite

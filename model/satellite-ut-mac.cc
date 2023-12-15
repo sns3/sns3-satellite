@@ -1994,7 +1994,10 @@ SatUtMac::DoFrameStart()
         satIdMapper->UpdateMacToBeamId(m_nodeInfo->GetMacAddress(), m_beamId);
         m_updateIslCallback();
 
-        m_updateAddressAndIdentifierCallback(m_node);
+        if (!m_updateAddressAndIdentifierCallback.IsNull())
+        {
+            m_updateAddressAndIdentifierCallback(m_node);
+        }
 
         m_handoverModule->HandoverFinished();
 
@@ -2062,7 +2065,10 @@ SatUtMac::DoFrameStart()
                     satIdMapper->UpdateMacToBeamId(m_nodeInfo->GetMacAddress(), m_beamId);
                     m_updateIslCallback();
 
-                    m_updateAddressAndIdentifierCallback(m_node);
+                    if (!m_updateAddressAndIdentifierCallback.IsNull())
+                    {
+                        m_updateAddressAndIdentifierCallback(m_node);
+                    }
 
                     m_tbtpContainer->Clear();
                     m_handoverState = NO_HANDOVER;
