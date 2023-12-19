@@ -93,7 +93,8 @@ ScenarioCreationSimple::DoRun(void)
     // Create simple scenario
 
     // Creating the reference system.
-    Ptr<SatHelper> helper = CreateObject<SatHelper>();
+    Ptr<SatHelper> helper = CreateObject<SatHelper>(
+        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E");
 
     // Enable creation traces
     Config::SetDefault("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue(true));
@@ -162,7 +163,8 @@ ScenarioCreationLarger::DoRun(void)
     // Create larger scenario
 
     // Creating the reference system.
-    Ptr<SatHelper> helper = CreateObject<SatHelper>();
+    Ptr<SatHelper> helper = CreateObject<SatHelper>(
+        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E");
 
     // Enable creation traces
     Config::SetDefault("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue(true));
@@ -231,7 +233,8 @@ ScenarioCreationFull::DoRun(void)
     // Create full scenario
 
     // Creating the reference system.
-    Ptr<SatHelper> helper = CreateObject<SatHelper>();
+    Ptr<SatHelper> helper = CreateObject<SatHelper>(
+        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E");
 
     // Enable creation traces
     Config::SetDefault("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue(true));
@@ -310,7 +313,8 @@ ScenarioCreationUser::DoRun(void)
     // Create user scenario
 
     // Creating the reference system.
-    Ptr<SatHelper> helper = CreateObject<SatHelper>();
+    Ptr<SatHelper> helper = CreateObject<SatHelper>(
+        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E");
     SatBeamUserInfo beamInfo = SatBeamUserInfo(1, 1);
     std::map<std::pair<uint32_t, uint32_t>, SatBeamUserInfo> beamMap;
     beamMap[std::make_pair(0, 8)] = beamInfo;

@@ -39,6 +39,7 @@
 #include "ns3/satellite-gw-mac.h"
 #include "ns3/satellite-helper.h"
 #include "ns3/satellite-phy-rx-carrier.h"
+#include "ns3/satellite-phy-tx.h"
 #include "ns3/satellite-ut-mac-state.h"
 #include "ns3/simulation-helper.h"
 #include "ns3/simulator.h"
@@ -149,7 +150,8 @@ SatRegenerationTest1::DoRun(void)
     Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(512));
 
     // Creating the reference system.
-    m_helper = CreateObject<SatHelper>();
+    m_helper = CreateObject<SatHelper>(Singleton<SatEnvVariables>::Get()->LocateDataDirectory() +
+                                       "/scenarios/geo-33E");
     m_helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
     NodeContainer utUsers = m_helper->GetUtUsers();
@@ -450,7 +452,8 @@ SatRegenerationTest2::DoRun(void)
     Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(512));
 
     // Creating the reference system.
-    m_helper = CreateObject<SatHelper>();
+    m_helper = CreateObject<SatHelper>(Singleton<SatEnvVariables>::Get()->LocateDataDirectory() +
+                                       "/scenarios/geo-33E");
     m_helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
     NodeContainer utUsers = m_helper->GetUtUsers();
@@ -792,6 +795,9 @@ SatRegenerationTest3::DoRun(void)
     simulationHelper->SetUserCountPerUt(1);
     simulationHelper->SetUtCountPerBeam(50);
     simulationHelper->SetBeamSet({1});
+
+    simulationHelper->LoadScenario("geo-33E");
+
     simulationHelper->CreateSatScenario();
 
     Config::SetDefault("ns3::CbrApplication::Interval", TimeValue(MilliSeconds(1)));
@@ -973,6 +979,9 @@ SatRegenerationTest4::DoRun(void)
     Ptr<SimulationHelper> simulationHelper =
         CreateObject<SimulationHelper>("test-sat-regeneration");
     simulationHelper->SetSimulationTime(Seconds(20));
+
+    simulationHelper->LoadScenario("geo-33E");
+
     simulationHelper->CreateSatScenario(SatHelper::LARGER);
 
     m_helper = simulationHelper->GetSatelliteHelper();
@@ -1189,6 +1198,9 @@ SatRegenerationTest5::DoRun(void)
     Ptr<SimulationHelper> simulationHelper =
         CreateObject<SimulationHelper>("test-sat-regeneration");
     simulationHelper->SetSimulationTime(Seconds(20));
+
+    simulationHelper->LoadScenario("geo-33E");
+
     simulationHelper->CreateSatScenario(SatHelper::SIMPLE);
 
     m_helper = simulationHelper->GetSatelliteHelper();
@@ -1411,6 +1423,9 @@ SatRegenerationTest6::DoRun(void)
     Ptr<SimulationHelper> simulationHelper =
         CreateObject<SimulationHelper>("test-sat-regeneration");
     simulationHelper->SetSimulationTime(Seconds(20));
+
+    simulationHelper->LoadScenario("geo-33E");
+
     simulationHelper->CreateSatScenario(SatHelper::LARGER);
 
     m_helper = simulationHelper->GetSatelliteHelper();
@@ -1616,6 +1631,9 @@ SatRegenerationTest7::DoRun(void)
     Ptr<SimulationHelper> simulationHelper =
         CreateObject<SimulationHelper>("test-sat-regeneration");
     simulationHelper->SetSimulationTime(Seconds(20));
+
+    simulationHelper->LoadScenario("geo-33E");
+
     simulationHelper->CreateSatScenario(SatHelper::SIMPLE);
 
     m_helper = simulationHelper->GetSatelliteHelper();
@@ -1872,6 +1890,9 @@ SatRegenerationTest8::DoRun(void)
     Ptr<SimulationHelper> simulationHelper =
         CreateObject<SimulationHelper>("test-sat-regeneration");
     simulationHelper->SetSimulationTime(Seconds(20));
+
+    simulationHelper->LoadScenario("geo-33E");
+
     simulationHelper->CreateSatScenario(SatHelper::LARGER);
 
     m_helper = simulationHelper->GetSatelliteHelper();

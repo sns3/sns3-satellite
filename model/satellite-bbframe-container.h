@@ -150,6 +150,11 @@ class SatBbFrameContainer : public Object
      */
     uint32_t GetMaxSymbolRate();
 
+    /**
+     * Remove all frames in containers.
+     */
+    void ClearAllFrames();
+
   private:
     typedef std::map<SatEnums::SatModcod_t, std::deque<Ptr<SatBbFrame>>> FrameContainer_t;
 

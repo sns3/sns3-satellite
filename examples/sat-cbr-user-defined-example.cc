@@ -113,6 +113,8 @@ main(int argc, char* argv[])
     Config::SetDefault("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue(em));
     // Config::SetDefault ("ns3::SatUtMac::CrUpdatePeriod", TimeValue(Seconds(10.0)));
 
+    simulationHelper->LoadScenario("geo-33E");
+
     // Create reference system
     simulationHelper->CreateSatScenario();
 

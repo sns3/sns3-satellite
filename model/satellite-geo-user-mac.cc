@@ -76,7 +76,7 @@ SatGeoUserMac::SatGeoUserMac(uint32_t satId,
                              SatEnums::RegenerationMode_t returnLinkRegenerationMode)
     : SatGeoMac(satId, beamId, forwardLinkRegenerationMode, returnLinkRegenerationMode)
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(this << satId << beamId);
 }
 
 SatGeoUserMac::~SatGeoUserMac()
@@ -88,6 +88,9 @@ void
 SatGeoUserMac::DoDispose()
 {
     NS_LOG_FUNCTION(this);
+
+    m_peers.clear();
+
     Object::DoDispose();
 }
 
@@ -101,7 +104,13 @@ SatGeoUserMac::DoInitialize()
 void
 SatGeoUserMac::EnquePacket(Ptr<Packet> packet)
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(this << packet);
+
+    if (!m_periodicTransmissionEnabled)
+    {
+        NS_LOG_INFO("Do not enque packet to this beam because it is disabled");
+        return;
+    }
 
     SatAddressE2ETag addressE2ETag;
     bool success = packet->PeekPacketTag(addressE2ETag);
@@ -128,6 +137,8 @@ SatGeoUserMac::EnquePacket(Ptr<Packet> packet)
     }
 
     m_llc->Enque(packet, addressE2ETag.GetE2EDestAddress(), flowId);
+
+    m_periodicTransmissionEnabled = true;
 }
 
 void
@@ -306,6 +317,53 @@ SatGeoUserMac::GetRxUtAddress(Ptr<Packet> packet)
     }
 
     return utAddr;
+}
+
+bool
+SatGeoUserMac::AddPeer(Mac48Address address)
+{
+    NS_LOG_FUNCTION(this << address);
+
+    NS_ASSERT(m_peers.find(address) == m_peers.end());
+
+    if (m_disableSchedulingIfNoDeviceConnected && !HasPeer())
+    {
+        NS_LOG_INFO("Start beam " << m_beamId);
+        m_peers.insert(address);
+        StartPeriodicTransmissions();
+    }
+    else
+    {
+        m_peers.insert(address);
+    }
+
+    return true;
+}
+
+bool
+SatGeoUserMac::RemovePeer(Mac48Address address)
+{
+    NS_LOG_FUNCTION(this << address);
+
+    NS_ASSERT(m_peers.find(address) != m_peers.end());
+
+    m_peers.erase(address);
+
+    if (m_disableSchedulingIfNoDeviceConnected && !HasPeer())
+    {
+        NS_LOG_INFO("Stop beam " << m_beamId);
+        StopPeriodicTransmissions();
+    }
+
+    return true;
+}
+
+bool
+SatGeoUserMac::HasPeer()
+{
+    NS_LOG_FUNCTION(this);
+
+    return !m_peers.empty();
 }
 
 } // namespace ns3

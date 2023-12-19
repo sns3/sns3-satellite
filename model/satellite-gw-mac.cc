@@ -21,6 +21,7 @@
 #include "satellite-gw-mac.h"
 
 #include "satellite-bbframe.h"
+#include "satellite-beam-scheduler.h"
 #include "satellite-control-message.h"
 #include "satellite-fwd-link-scheduler.h"
 #include "satellite-log.h"
@@ -85,6 +86,12 @@ SatGwMac::GetTypeId(void)
                           BooleanValue(true),
                           MakeBooleanAccessor(&SatGwMac::m_broadcastNcr),
                           MakeBooleanChecker())
+            .AddAttribute("DisableSchedulingIfNoDeviceConnected",
+                          "If true, the periodic calls of StartTransmission are not called when no "
+                          "devices are connected to this MAC",
+                          BooleanValue(false),
+                          MakeBooleanAccessor(&SatGwMac::m_disableSchedulingIfNoDeviceConnected),
+                          MakeBooleanChecker())
             .AddTraceSource("BBFrameTxTrace",
                             "Trace for transmitted BB Frames.",
                             MakeTraceSourceAccessor(&SatGwMac::m_bbFrameTxTrace),
@@ -108,7 +115,9 @@ SatGwMac::SatGwMac()
       m_useCmt(false),
       m_lastCmtSent(),
       m_cmtPeriodMin(MilliSeconds(550)),
-      m_broadcastNcr(true)
+      m_broadcastNcr(true),
+      m_disableSchedulingIfNoDeviceConnected(false),
+      m_periodicTransmissionEnabled(false)
 {
     NS_LOG_FUNCTION(this);
 
@@ -117,16 +126,22 @@ SatGwMac::SatGwMac()
 
 SatGwMac::SatGwMac(uint32_t satId,
                    uint32_t beamId,
+                   uint32_t feederSatId,
+                   uint32_t feederBeamId,
                    SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                    SatEnums::RegenerationMode_t returnLinkRegenerationMode)
     : SatMac(satId, beamId, forwardLinkRegenerationMode, returnLinkRegenerationMode),
+      m_feederSatId(feederSatId),
+      m_feederBeamId(feederBeamId),
       m_fwdScheduler(),
       m_guardTime(MicroSeconds(1)),
       m_ncrInterval(MilliSeconds(100)),
       m_useCmt(false),
       m_lastCmtSent(),
       m_cmtPeriodMin(MilliSeconds(550)),
-      m_broadcastNcr(true)
+      m_broadcastNcr(true),
+      m_disableSchedulingIfNoDeviceConnected(false),
+      m_periodicTransmissionEnabled(false)
 {
     NS_LOG_FUNCTION(this);
 }
@@ -155,10 +170,27 @@ SatGwMac::StartPeriodicTransmissions()
 {
     NS_LOG_FUNCTION(this);
 
+    if (m_disableSchedulingIfNoDeviceConnected && !HasPeer())
+    {
+        NS_LOG_INFO("Do not start beam " << m_beamId << " because no device is connected");
+        return;
+    }
+
+    if (m_periodicTransmissionEnabled == true)
+    {
+        NS_LOG_INFO("Beam " << m_beamId << " already enabled");
+        return;
+    }
+
+    m_periodicTransmissionEnabled = true;
+
     if (m_fwdScheduler == NULL)
     {
         NS_FATAL_ERROR("Scheduler not set for GW MAC!!!");
     }
+
+    m_clearQueuesCallback();
+    m_fwdScheduler->ClearAllPackets();
 
     /**
      * It is currently assumed that there is only one carrier in FWD link. This
@@ -351,7 +383,45 @@ SatGwMac::Receive(SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> rx
 void
 SatGwMac::StartTransmission(uint32_t carrierId)
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(this << carrierId);
+
+    if (m_handoverModule != nullptr)
+    {
+        if (m_handoverModule->CheckForHandoverRecommendation(m_feederSatId, m_feederBeamId))
+        {
+            NS_LOG_INFO("GW handover, old satellite is " << m_feederSatId << ", old beam is "
+                                                         << m_feederBeamId);
+
+            Ptr<SatBeamScheduler> srcScheduler =
+                m_beamSchedulerCallback(m_feederSatId, m_feederBeamId);
+
+            m_feederSatId = m_handoverModule->GetAskedSatId();
+            m_feederBeamId = m_handoverModule->GetAskedBeamId();
+
+            NS_LOG_INFO("GW handover, new satellite is " << m_feederSatId << ", new beam is "
+                                                         << m_feederBeamId);
+
+            Ptr<SatBeamScheduler> dstScheduler =
+                m_beamSchedulerCallback(m_feederSatId, m_feederBeamId);
+            srcScheduler->DisconnectGw(m_nodeInfo->GetMacAddress());
+            dstScheduler->ConnectGw(m_nodeInfo->GetMacAddress());
+
+            m_updateIslCallback();
+
+            Ptr<SatGeoNetDevice> geoNetDevice =
+                DynamicCast<SatGeoNetDevice>(m_geoNodesCallback().Get(m_feederSatId)->GetDevice(0));
+            Mac48Address satFeederAddress = geoNetDevice->GetSatelliteFeederAddress(m_beamId);
+            SetSatelliteAddress(satFeederAddress);
+            if (m_gwLlcSetSatelliteAddress.IsNull() == false)
+            {
+                m_gwLlcSetSatelliteAddress(satFeederAddress);
+            }
+
+            m_beamCallback(m_feederSatId, m_beamId);
+
+            m_handoverModule->HandoverFinished();
+        }
+    }
 
     if (m_nodeInfo->GetNodeType() == SatEnums::NT_GW)
     {
@@ -365,7 +435,7 @@ SatGwMac::StartTransmission(uint32_t carrierId)
 
     Time txDuration;
 
-    if (m_txEnabled)
+    if (m_txEnabled && (!m_disableSchedulingIfNoDeviceConnected || m_periodicTransmissionEnabled))
     {
         std::pair<Ptr<SatBbFrame>, const Time> bbFrameInfo = m_fwdScheduler->GetNextFrame();
         Ptr<SatBbFrame> bbFrame = bbFrameInfo.first;
@@ -411,14 +481,17 @@ SatGwMac::StartTransmission(uint32_t carrierId)
         txDuration = m_fwdScheduler->GetDefaultFrameDuration();
     }
 
-    /**
-     * It is currently assumed that there is only one carrier in FWD link. This
-     * carrier has a default index of 0.
-     * TODO: When enabling multi-carrier support for FWD link, we need to
-     * modify the FWD link scheduler to schedule separately each FWD link
-     * carrier.
-     */
-    Simulator::Schedule(txDuration, &SatGwMac::StartTransmission, this, 0);
+    if (m_periodicTransmissionEnabled)
+    {
+        /**
+         * It is currently assumed that there is only one carrier in FWD link. This
+         * carrier has a default index of 0.
+         * TODO: When enabling multi-carrier support for FWD link, we need to
+         * modify the FWD link scheduler to schedule separately each FWD link
+         * carrier.
+         */
+        Simulator::Schedule(txDuration, &SatGwMac::StartTransmission, this, 0);
+    }
 }
 
 void
@@ -437,6 +510,22 @@ SatGwMac::TbtpSent(Ptr<SatTbtpMessage> tbtp)
     Simulator::Schedule(Seconds(10), &SatGwMac::RemoveTbtp, this, superframeCounter);
 }
 
+uint32_t
+SatGwMac::GetFeederSatId()
+{
+    NS_LOG_FUNCTION(this);
+
+    return m_feederSatId;
+}
+
+uint32_t
+SatGwMac::GetFeederBeamId()
+{
+    NS_LOG_FUNCTION(this);
+
+    return m_feederBeamId;
+}
+
 void
 SatGwMac::RemoveTbtp(uint32_t superframeCounter)
 {
@@ -450,7 +539,10 @@ SatGwMac::StartNcrTransmission()
 
     SendNcrMessage();
 
-    Simulator::Schedule(m_ncrInterval, &SatGwMac::StartNcrTransmission, this);
+    if (m_periodicTransmissionEnabled)
+    {
+        Simulator::Schedule(m_ncrInterval, &SatGwMac::StartNcrTransmission, this);
+    }
 }
 
 void
@@ -566,8 +658,13 @@ SatGwMac::ReceiveSignalingPacket(Ptr<Packet> packet, uint32_t satId, uint32_t be
 
         if (handoverRecommendation != NULL)
         {
+            uint32_t newSatId = handoverRecommendation->GetRecommendedSatId();
             uint32_t newBeamId = handoverRecommendation->GetRecommendedBeamId();
-            m_handoverCallback(addressE2ETag.GetE2ESourceAddress(), satId, beamId, newBeamId);
+            m_handoverCallback(addressE2ETag.GetE2ESourceAddress(),
+                               satId,
+                               beamId,
+                               newSatId,
+                               newBeamId);
         }
         else
         {
@@ -626,6 +723,7 @@ void
 SatGwMac::SendNcrMessage()
 {
     NS_LOG_FUNCTION(this);
+
     Ptr<SatNcrMessage> ncrMessage = CreateObject<SatNcrMessage>();
     m_fwdScheduler->SendControlMsg(ncrMessage, Mac48Address::GetBroadcast());
     m_ncrMessagesToSend.push(ncrMessage);
@@ -785,6 +883,34 @@ SatGwMac::SetRemoveUtCallback(SatGwMac::RemoveUtCallback cb)
 }
 
 void
+SatGwMac::SetClearQueuesCallback(SatGwMac::ClearQueuesCallback cb)
+{
+    NS_LOG_FUNCTION(this << &cb);
+    m_clearQueuesCallback = cb;
+}
+
+void
+SatGwMac::SetBeamCallback(SatGwMac::PhyBeamCallback cb)
+{
+    NS_LOG_FUNCTION(this << &cb);
+    m_beamCallback = cb;
+}
+
+void
+SatGwMac::SetGeoNodesCallback(SatGwMac::GeoNodesCallback cb)
+{
+    NS_LOG_FUNCTION(this << &cb);
+    m_geoNodesCallback = cb;
+}
+
+void
+SatGwMac::SetGwLlcSetSatelliteAddress(SatGwMac::GwLlcSetSatelliteAddress cb)
+{
+    NS_LOG_FUNCTION(this << &cb);
+    m_gwLlcSetSatelliteAddress = cb;
+}
+
+void
 SatGwMac::SetFwdScheduler(Ptr<SatFwdLinkScheduler> fwdScheduler)
 {
     m_fwdScheduler = fwdScheduler;
@@ -793,6 +919,63 @@ SatGwMac::SetFwdScheduler(Ptr<SatFwdLinkScheduler> fwdScheduler)
     {
         m_fwdScheduler->SetDummyFrameSendingEnabled(true);
     }
+}
+
+void
+SatGwMac::ChangeBeam(uint32_t satId, uint32_t beamId)
+{
+    NS_LOG_FUNCTION(this << satId << beamId);
+}
+
+void
+SatGwMac::ConnectUt(Mac48Address utAddress)
+{
+    NS_LOG_FUNCTION(this << utAddress);
+
+    NS_ASSERT(m_peers.find(utAddress) == m_peers.end());
+
+    if (m_disableSchedulingIfNoDeviceConnected && !HasPeer())
+    {
+        NS_LOG_INFO("Start beam " << m_beamId);
+        m_peers.insert(utAddress);
+        StartPeriodicTransmissions();
+    }
+    else
+    {
+        m_peers.insert(utAddress);
+    }
+}
+
+void
+SatGwMac::DisconnectUt(Mac48Address utAddress)
+{
+    NS_LOG_FUNCTION(this << utAddress);
+
+    NS_ASSERT(m_peers.find(utAddress) != m_peers.end());
+
+    m_peers.erase(utAddress);
+
+    if (m_disableSchedulingIfNoDeviceConnected && !HasPeer())
+    {
+        NS_LOG_INFO("Stop beam " << m_beamId);
+        StopPeriodicTransmissions();
+    }
+}
+
+void
+SatGwMac::StopPeriodicTransmissions()
+{
+    NS_LOG_FUNCTION(this);
+
+    m_periodicTransmissionEnabled = false;
+}
+
+bool
+SatGwMac::HasPeer()
+{
+    NS_LOG_FUNCTION(this);
+
+    return !m_peers.empty();
 }
 
 } // namespace ns3

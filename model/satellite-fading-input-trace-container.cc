@@ -104,14 +104,14 @@ SatFadingInputTraceContainer::AddNode(key_t key)
     {
         if (utId >= 0 && gwId < 0)
         {
-            filename << dataPath << "/fadingtraces/input/BEAM_" << beamId << "_UT_" << utId
-                     << "_channelType_" << SatEnums::GetChannelTypeName(key.second);
+            filename << dataPath << "/additional-input/fadingtraces/input/BEAM_" << beamId << "_UT_"
+                     << utId << "_channelType_" << SatEnums::GetChannelTypeName(key.second);
         }
 
         if (gwId >= 0 && utId < 0)
         {
-            filename << dataPath << "/fadingtraces/input/BEAM_" << beamId << "_GW_" << gwId
-                     << "_channelType_" << SatEnums::GetChannelTypeName(key.second);
+            filename << dataPath << "/additional-input/fadingtraces/input/BEAM_" << beamId << "_GW_"
+                     << gwId << "_channelType_" << SatEnums::GetChannelTypeName(key.second);
         }
         std::pair<container_t::iterator, bool> result = m_container.insert(
             std::make_pair(key,

@@ -716,6 +716,34 @@ SatTimuMessage::GetAllocatedBeamId() const
 }
 
 void
+SatTimuMessage::SetAllocatedSatId(uint32_t satId)
+{
+    NS_LOG_FUNCTION(this);
+    m_satId = satId;
+}
+
+uint32_t
+SatTimuMessage::GetAllocatedSatId() const
+{
+    NS_LOG_FUNCTION(this);
+    return m_satId;
+}
+
+void
+SatTimuMessage::SetSatAddress(Address address)
+{
+    NS_LOG_FUNCTION(this);
+    m_satAddress = address;
+}
+
+Address
+SatTimuMessage::GetSatAddress() const
+{
+    NS_LOG_FUNCTION(this);
+    return m_satAddress;
+}
+
+void
 SatTimuMessage::SetGwAddress(Address address)
 {
     NS_LOG_FUNCTION(this);
@@ -734,7 +762,7 @@ SatTimuMessage::GetSizeInBytes() const
 {
     NS_LOG_FUNCTION(this);
 
-    uint32_t size = sizeof(uint32_t) + sizeof(Address);
+    uint32_t size = sizeof(uint32_t) + 2 * sizeof(Address);
     return size;
 }
 
@@ -758,7 +786,8 @@ SatHandoverRecommendationMessage::GetInstanceTypeId(void) const
 }
 
 SatHandoverRecommendationMessage::SatHandoverRecommendationMessage()
-    : m_beamId(0)
+    : m_beamId(0),
+      m_satId(0)
 {
     NS_LOG_FUNCTION(this);
 }
@@ -771,7 +800,7 @@ SatHandoverRecommendationMessage::~SatHandoverRecommendationMessage()
 void
 SatHandoverRecommendationMessage::SetRecommendedBeamId(uint32_t beamId)
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(this << beamId);
     m_beamId = beamId;
 }
 
@@ -781,12 +810,25 @@ SatHandoverRecommendationMessage::GetRecommendedBeamId() const
     return m_beamId;
 }
 
+void
+SatHandoverRecommendationMessage::SetRecommendedSatId(uint32_t satId)
+{
+    NS_LOG_FUNCTION(this << satId);
+    m_satId = satId;
+}
+
+uint32_t
+SatHandoverRecommendationMessage::GetRecommendedSatId() const
+{
+    return m_satId;
+}
+
 uint32_t
 SatHandoverRecommendationMessage::GetSizeInBytes() const
 {
     NS_LOG_FUNCTION(this);
 
-    uint32_t size = 1 * sizeof(uint32_t);
+    uint32_t size = 2 * sizeof(uint32_t);
     return size;
 }
 

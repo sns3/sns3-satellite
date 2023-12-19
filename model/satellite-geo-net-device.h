@@ -199,11 +199,25 @@ class SatGeoNetDevice : public NetDevice
     void AddFeederPair(uint32_t beamId, Mac48Address satelliteFeederAddress);
 
     /**
+     * Add an entry in the database to get satellite user address from beam ID
+     * \param beamId Beam ID
+     * \param satelliteUserAddress MAC address on the satellite user
+     */
+    void AddUserPair(uint32_t beamId, Mac48Address satelliteUserAddress);
+
+    /**
      * Get satellite feeder entry from associated beam ID
      * \param beamId Beam ID
      * \return satellite feeder MAC associated to this beam
      */
     Mac48Address GetSatelliteFeederAddress(uint32_t beamId);
+
+    /**
+     * Get satellite user entry from associated beam ID
+     * \param beamId Beam ID
+     * \return satellite user MAC associated to this beam
+     */
+    Mac48Address GetSatelliteUserAddress(uint32_t beamId);
 
     /**
      * Attach a receive ErrorModel to the SatGeoNetDevice.
@@ -228,14 +242,16 @@ class SatGeoNetDevice : public NetDevice
     /**
      * Connect a GW to this satellite.
      * \param gwAddress MAC address of the GW to connect
+     * \param beamId beam used by satellite to reach this GW
      */
-    void ConnectGw(Mac48Address gwAddress);
+    void ConnectGw(Mac48Address gwAddress, uint32_t beamId);
 
     /**
      * Disconnect a GW to this satellite.
      * \param gwAddress MAC address of the GW to disconnect
+     * \param beamId beam used by satellite to reach this GW
      */
-    void DisconnectGw(Mac48Address gwAddress);
+    void DisconnectGw(Mac48Address gwAddress, uint32_t beamId);
 
     /**
      * The the list of MAC GW connected to this satellite.
@@ -247,14 +263,16 @@ class SatGeoNetDevice : public NetDevice
     /**
      * Connect a UT to this satellite.
      * \param utAddress MAC address of the UT to connect
+     * \param beamId beam used by satellite to reach this UT
      */
-    void ConnectUt(Mac48Address utAddress);
+    void ConnectUt(Mac48Address utAddress, uint32_t beamId);
 
     /**
      * Disconnect a UT to this satellite.
      * \param utAddress MAC address of the UT to disconnect
+     * \param beamId beam used by satellite to reach this UT
      */
-    void DisconnectUt(Mac48Address utAddress);
+    void DisconnectUt(Mac48Address utAddress, uint32_t beamId);
 
     /**
      * The the list of UT MAC connected to this satellite.
@@ -361,6 +379,8 @@ class SatGeoNetDevice : public NetDevice
 
     std::map<uint32_t, Mac48Address> m_addressMapFeeder;
 
+    std::map<uint32_t, Mac48Address> m_addressMapUser;
+
     SatEnums::RegenerationMode_t m_forwardLinkRegenerationMode;
     SatEnums::RegenerationMode_t m_returnLinkRegenerationMode;
     uint32_t m_nodeId;
@@ -370,14 +390,14 @@ class SatGeoNetDevice : public NetDevice
     std::map<Mac48Address, Time> m_lastDelays;
 
     /**
-     * Set containing all connected GWs
+     * Set containing all connected GWs. Key is GW MAC address, and value is associated beam ID
      */
-    std::set<Mac48Address> m_gwConnected;
+    std::map<Mac48Address, uint32_t> m_gwConnected;
 
     /**
-     * Set containing all connected UTs
+     * Set containing all connected UTs. Key is UT MAC address, and value is associated beam ID
      */
-    std::set<Mac48Address> m_utConnected;
+    std::map<Mac48Address, uint32_t> m_utConnected;
 
     /**
      * List of ISLs starting from this node

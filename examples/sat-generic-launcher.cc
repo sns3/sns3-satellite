@@ -51,6 +51,8 @@ main(int argc, char* argv[])
     simulationHelper->DisableAllCapacityAssignmentCategories();
     simulationHelper->EnableCrdsa();
 
+    simulationHelper->LoadScenario("geo-33E");
+
     CommandLine cmd;
     simulationHelper->AddDefaultUiArguments(cmd, inputFileNameWithPath);
     cmd.Parse(argc, argv);

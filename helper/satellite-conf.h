@@ -68,17 +68,17 @@ class SatConf : public Object
      * \param rtnConf RTN link configuration file name
      * \param fwdConf FWD link configuration file name
      * \param gwPos GW position file name
-     * \param satPos Satellie position file name
+     * \param satPos Satellite position file name
+     * \param satPos UT position file name
      * \param wfConf Waveform configuration file name
-     * \param tle TLE configuration file name
      * \param isConstellation Indicates if SatConf describes a constellation
      */
     void Initialize(std::string rtnConf,
                     std::string fwdConf,
                     std::string gwPos,
                     std::string satPos,
+                    std::string utPos,
                     std::string wfConf,
-                    std::string tle,
                     bool isConstellation = false);
 
     /**
@@ -93,6 +93,12 @@ class SatConf : public Object
      * \return Container of the configuration data
      */
     std::vector<std::vector<uint32_t>> LoadSatConf(std::string filePathName) const;
+
+    /**
+     * Update the list of positions
+     * \param Path of the new file to load
+     */
+    void SetUtPositionsPath(std::string inputFileUtListPositions);
 
     /**
      * Get count of the beams (configurations).
@@ -161,11 +167,11 @@ class SatConf : public Object
     GeoCoordinate GetGeoSatPosition() const;
 
     /**
-     * Get the TLE of the Satellite
+     * Get the simulation start time for scenarios using SGP4 model.
      *
-     * \return TLE satellite information
+     * \return String representation of start time, using format "YYYY-MM-DD hh:mm:ss"
      */
-    std::string GetSatTle() const;
+    std::string GetStartTimeStr() const;
 
     /**
      * Convert carrier id, sequency id and frequency id to real frequency value.
@@ -209,16 +215,12 @@ class SatConf : public Object
     SatEnums::RegenerationMode_t GetReturnLinkRegenerationMode() const;
 
     /**
-     * Set the UT positions file name
-     */
-    void SetUtPositionInputFileName(std::string utPositionInputFileName);
-
-    /**
      * Load a vector of TLE information from a file
-     * \param filePathName
+     * \param filePathName Path to the file containing the TLEs
+     * \param startDatePathName Path to the file containing the simulation start date
      * \return TLE information extracted from file
      */
-    std::vector<std::string> LoadTles(std::string filePathName);
+    std::vector<std::string> LoadTles(std::string filePathName, std::string startDatePathName);
 
     /**
      * Load a vector of ISLs from a file
@@ -288,19 +290,14 @@ class SatConf : public Object
     PositionContainer_t m_geoSatPosition;
 
     /**
-     * TLE information of the Satellite
-     */
-    std::string m_tleSat;
-
-    /**
      * TLE information for a satellite constellation
      */
     std::vector<std::string> m_tles;
 
     /**
-     * File to use when loading UT specific position (for user defined positions)
+     * Start time of simulation, on format "YYYY-MM-DD hh:mm:ss"
      */
-    std::string m_utPositionInputFileName;
+    std::string m_startTimeStr;
 
     /**
      * Superframe sequence configuration
@@ -470,13 +467,6 @@ class SatConf : public Object
      * \param container Container reference to store found positions
      */
     void LoadPositions(std::string filePathName, PositionContainer_t& container);
-
-    /**
-     * Load TLE information from a file
-     * \param filePathName
-     * \param tleInfo TLE information extracted from file
-     */
-    void LoadTle(std::string filePathName, std::string& tleInfo);
 };
 
 } // namespace ns3

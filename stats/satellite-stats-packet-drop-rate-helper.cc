@@ -32,8 +32,8 @@
 #include <ns3/node-container.h>
 #include <ns3/nstime.h>
 #include <ns3/probe.h>
+#include <ns3/satellite-handover-module.h>
 #include <ns3/satellite-helper.h>
-#include <ns3/satellite-ut-handover-module.h>
 #include <ns3/scalar-collector.h>
 #include <ns3/singleton.h>
 #include <ns3/string.h>

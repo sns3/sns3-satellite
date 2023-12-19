@@ -100,6 +100,7 @@ class SatBeamHelper : public Object
     /**
      * Constructor for SatBeamHelper.
      *
+     * \param standard                    The standard to use (DVB or LORA)
      * \param geoNodes                    Container of Geo Satellite node
      * \param isls                        List of all ISLs
      * \param bandwidthConverterCb        Callback to convert bandwidth
@@ -110,7 +111,8 @@ class SatBeamHelper : public Object
      * mode used in satellites for forward link \param returnLinkRegenerationMode  The regeneration
      * mode used in satellites for return link
      */
-    SatBeamHelper(NodeContainer geoNodes,
+    SatBeamHelper(SatEnums::Standard_t standard,
+                  NodeContainer geoNodes,
                   std::vector<std::pair<uint32_t, uint32_t>> isls,
                   SatTypedefs::CarrierBandwidthConverter_t bandwidthConverterCb,
                   uint32_t fwdLinkCarrierCount,
@@ -131,11 +133,6 @@ class SatBeamHelper : public Object
      * have been done by the SatHelper and SatBeamHelper.
      */
     void Init();
-
-    /**
-     * Set the standard to either DVB or Lora
-     */
-    void SetStandard(SatEnums::Standard_t standard);
 
     /**
      * Set the antenna gain patterns to be used when configuring the beams
@@ -206,14 +203,16 @@ class SatBeamHelper : public Object
         uint32_t rtnFlFreqId,
         uint32_t fwdUlFreqId,
         uint32_t fwdFlFreqId,
-        SatUtMac::RoutingUpdateCallback routingCallback);
+        SatMac::RoutingUpdateCallback routingCallback);
 
     /**
      * \param geoNetDevice Net device of satellite
      * \param gwNode pointer of GW node
      * \param gwId id of the GW
-     * \param satId ID of the satellite
-     * \param beamId  id of the beam
+     * \param satId ID of the satellite linked to the UT
+     * \param beamId  id of the beam linked to the UT
+     * \param feederSatId ID of the satellite linked to the GW
+     * \param feederBeamId  id of the beam linked to the GW
      * \param feederLink Feeder link channel
      * \param rtnFlFreqId id of the return feeder link frequency
      * \param fwdFlFreqId id of the forward feeder link frequency
@@ -229,10 +228,12 @@ class SatBeamHelper : public Object
                                  uint32_t gwId,
                                  uint32_t satId,
                                  uint32_t beamId,
+                                 uint32_t feederSatId,
+                                 uint32_t feederBeamId,
                                  SatChannelPair::ChannelPair_t feederLink,
                                  uint32_t rtnFlFreqId,
                                  uint32_t fwdFlFreqId,
-                                 SatUtMac::RoutingUpdateCallback routingCallback);
+                                 SatMac::RoutingUpdateCallback routingCallback);
 
     /**
      * \param geoNetDevice Net device of satellite
@@ -258,7 +259,7 @@ class SatBeamHelper : public Object
                                    SatChannelPair::ChannelPair_t userLink,
                                    uint32_t rtnUlFreqId,
                                    uint32_t fwdUlFreqId,
-                                   SatUtMac::RoutingUpdateCallback routingCallback);
+                                   SatMac::RoutingUpdateCallback routingCallback);
 
     /**
      * Create all the ISLs

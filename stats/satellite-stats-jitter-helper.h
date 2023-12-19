@@ -98,23 +98,18 @@ class SatStatsJitterHelper : public SatStatsHelper
     virtual void DoInstallProbes() = 0;
 
     /**
-     * \brief Save the address and the proper identifier from the given UT node.
-     * \param utNode a UT node.
-     *
-     * The address of the given node will be saved in the #m_identifierMap
-     * member variable.
-     *
-     * Used in return link statistics. DoInstallProbes() is expected to pass the
-     * the UT node of interest into this method.
-     */
-    void SaveAddressAndIdentifier(Ptr<Node> utNode);
-
-    /**
      * \brief Connect the probe to the right collector.
      * \param probe
      * \param identifier
      */
     bool ConnectProbeToCollector(Ptr<Probe> probe, uint32_t identifier);
+
+    /**
+     * \brief Disconnect the probe from the right collector.
+     * \param probe
+     * \param identifier
+     */
+    bool DisconnectProbeFromCollector(Ptr<Probe> probe, uint32_t identifier);
 
     /**
      * \brief Find a collector with the right identifier and pass a sample data
@@ -132,9 +127,6 @@ class SatStatsJitterHelper : public SatStatsHelper
 
     /// The aggregator created by this helper.
     Ptr<DataCollectionObject> m_aggregator;
-
-    /// Map of address and the identifier associated with it (for return link).
-    std::map<const Address, uint32_t> m_identifierMap;
 
   private:
     bool m_averagingMode; ///< `AveragingMode` attribute.
@@ -184,13 +176,18 @@ class SatStatsFwdAppJitterHelper : public SatStatsJitterHelper
      */
     Time GetAndUpdatePreviousDelay(uint32_t identifier, Time newDelay);
 
+    /**
+     * Change identifier used on probes, when handovers occur.
+     */
+    virtual void UpdateIdentifierOnProbes();
+
   protected:
     // inherited from SatStatsFwdAppJitterHelper base class
     void DoInstallProbes();
 
   private:
     /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
+    std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>> m_probes;
 
     /// Stores the last delay to a UT to compute jitter
     std::map<uint32_t, Time> m_previousDelayMap;
@@ -215,13 +212,18 @@ class SatStatsFwdDevJitterHelper : public SatStatsJitterHelper
      */
     static TypeId GetTypeId();
 
+    /**
+     * Change identifier used on probes, when handovers occur.
+     */
+    virtual void UpdateIdentifierOnProbes();
+
   protected:
     // inherited from SatStatsJitterHelper base class
     void DoInstallProbes();
 
   private:
     /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
+    std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>> m_probes;
 
 }; // end of class SatStatsFwdDevJitterHelper
 
@@ -243,13 +245,18 @@ class SatStatsFwdMacJitterHelper : public SatStatsJitterHelper
      */
     static TypeId GetTypeId();
 
+    /**
+     * Change identifier used on probes, when handovers occur.
+     */
+    virtual void UpdateIdentifierOnProbes();
+
   protected:
     // inherited from SatStatsJitterHelper base class
     void DoInstallProbes();
 
   private:
     /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
+    std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>> m_probes;
 
 }; // end of class SatStatsFwdMacJitterHelper
 
@@ -271,13 +278,18 @@ class SatStatsFwdPhyJitterHelper : public SatStatsJitterHelper
      */
     static TypeId GetTypeId();
 
+    /**
+     * Change identifier used on probes, when handovers occur.
+     */
+    virtual void UpdateIdentifierOnProbes();
+
   protected:
     // inherited from SatStatsJitterHelper base class
     void DoInstallProbes();
 
   private:
     /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
+    std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>> m_probes;
 
 }; // end of class SatStatsFwdPhyJitterHelper
 
@@ -321,14 +333,6 @@ class SatStatsRtnAppJitterHelper : public SatStatsJitterHelper
     void DoInstallProbes();
 
   private:
-    /**
-     * \brief Save the IPv4 address and the proper identifier from the given
-     *        UT user node.
-     * \param utUserNode a UT user node.
-     *
-     * Any addresses found in the given node will be saved in the
-     * #m_identifierMap member variable.
-     */
     void SaveIpv4AddressAndIdentifier(Ptr<Node> utUserNode);
 
     /// Stores the last delay to a UT to compute jitter

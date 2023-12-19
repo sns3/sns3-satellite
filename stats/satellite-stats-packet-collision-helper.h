@@ -84,15 +84,6 @@ class SatStatsPacketCollisionHelper : public SatStatsHelper
 
   protected:
     /**
-     * \brief Save the address and the proper identifier from the given UT node.
-     * \param utNode a UT node.
-     *
-     * The address of the given node will be saved in the #m_identifierMap
-     * member variable.
-     */
-    void SaveAddressAndIdentifier(Ptr<Node> utNode);
-
-    /**
      * \param traceSourceName
      */
     void SetTraceSourceName(std::string traceSourceName);
@@ -108,9 +99,6 @@ class SatStatsPacketCollisionHelper : public SatStatsHelper
 
     /// Maintains a list of collectors created by this helper.
     CollectorMap m_terminalCollectors;
-
-    /// Map of address and the identifier associated with it (for forward link).
-    std::map<const Address, uint32_t> m_identifierMap;
 
   private:
     SatPhyRxCarrier::CarrierType m_carrierType;

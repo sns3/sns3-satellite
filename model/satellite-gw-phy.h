@@ -84,6 +84,13 @@ class SatGwPhy : public SatPhy
      */
     virtual double GetAdditionalInterference();
 
+    /**
+     * \brief Change underlying SatChannel to send and receive data from a new satellite and beam
+     * \param satId the new satellite to listen/send to
+     * \param beamId the new beam to listen/send to
+     */
+    void PerformHandover(uint32_t satId, uint32_t beamId);
+
   protected:
     /**
      * \brief Get the link TX direction. Must be implemented by child clases.
@@ -99,6 +106,12 @@ class SatGwPhy : public SatPhy
 
   private:
     /**
+     * \brief Update the underlying SatChannel to send and receive data from
+     * the current beam (as described in the m_beamId attribute).
+     */
+    void AssignNewSatChannels();
+
+    /**
      *  Configured adjacent channel interference wrt noise (percent).
      */
     double m_aciIfWrtNoisePercent;
@@ -112,6 +125,11 @@ class SatGwPhy : public SatPhy
      * Intermodulation interference in linear.
      */
     double m_imInterferenceCOverI;
+
+    /**
+     * Delay of antenna reconfiguration when performing handover
+     */
+    Time m_antennaReconfigurationDelay;
 };
 
 } // namespace ns3

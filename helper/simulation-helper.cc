@@ -241,6 +241,7 @@ SimulationHelper::SimulationHelper()
       m_statContainer(NULL),
       m_commonUtPositions(),
       m_utPositionsByBeam(),
+      m_scenarioPath(""),
       m_simulationName(""),
       m_enabledBeamsStr(""),
       m_enabledBeams(),
@@ -251,7 +252,7 @@ SimulationHelper::SimulationHelper()
       m_simTime(0),
       m_numberOfConfiguredFrames(0),
       m_randomAccessConfigured(false),
-      m_enableInputFileUtListPositions(false),
+      m_inputFileUtListPositions(""),
       m_inputFileUtPositionsCheckBeams(true),
       m_gwUserId(0),
       m_progressLoggingEnabled(false),
@@ -276,7 +277,7 @@ SimulationHelper::SimulationHelper(std::string simulationName)
       m_simTime(0),
       m_numberOfConfiguredFrames(0),
       m_randomAccessConfigured(false),
-      m_enableInputFileUtListPositions(false),
+      m_inputFileUtListPositions(""),
       m_inputFileUtPositionsCheckBeams(true),
       m_gwUserId(0),
       m_progressLoggingEnabled(false),
@@ -765,7 +766,6 @@ SimulationHelper::EnableAcm(SatEnums::SatLinkDir_t dir)
                            StringValue("MinimumValueInWindow"));
         Config::SetDefault("ns3::SatBeamScheduler::CnoEstimationWindow", TimeValue(Seconds(2)));
         Config::SetDefault("ns3::SatWaveformConf::AcmEnabled", BooleanValue(true));
-        Config::SetDefault("ns3::SatWaveformConf::DefaultWfId", UintegerValue(3));
         break;
     }
     default: {
@@ -790,7 +790,6 @@ SimulationHelper::DisableAcm(SatEnums::SatLinkDir_t dir)
     }
     case SatEnums::LD_RETURN: {
         Config::SetDefault("ns3::SatWaveformConf::AcmEnabled", BooleanValue(false));
-        Config::SetDefault("ns3::SatWaveformConf::DefaultWfId", UintegerValue(3));
         break;
     }
     default: {
@@ -1078,14 +1077,10 @@ SimulationHelper::ConfigureFwdLinkBeamHopping()
     // Enable flag
     Config::SetDefault("ns3::SatBeamHelper::EnableFwdLinkBeamHopping", BooleanValue(true));
 
-    // Channel configuration for 500 MHz user link bandwidth
-    Config::SetDefault("ns3::SatHelper::SatFwdConfFileName",
-                       StringValue("beamhopping/Scenario72FwdConf_BH.txt"));
-
     Config::SetDefault("ns3::SatBstpController::BeamHoppingMode",
                        EnumValue(SatBstpController::BH_STATIC));
     Config::SetDefault("ns3::SatBstpController::StaticBeamHoppingConfigFileName",
-                       StringValue("beamhopping/SatBstpConf_GW1.txt"));
+                       StringValue(m_scenarioPath + "/beamhopping/SatBstpConf_GW1.txt"));
     Config::SetDefault("ns3::SatBstpController::SuperframeDuration", TimeValue(MilliSeconds(1)));
 
     // Frequency configuration for 500 MHz user link bandwidth
@@ -1213,13 +1208,7 @@ SimulationHelper::EnableUtListPositionsFromInputFile(std::string inputFile, bool
 {
     NS_LOG_FUNCTION(this << inputFile);
 
-    // Set user specific UT position file (UserDefinedUtPos.txt) to be utilized by SatConf.
-    // Given file must locate in /satellite/data folder
-    //
-    // This enables user defined positions used instead of default positions (default position file
-    // UtPos.txt replaced),
-    Config::SetDefault("ns3::SatConf::UtPositionInputFileName", StringValue(inputFile));
-    m_enableInputFileUtListPositions = true;
+    m_inputFileUtListPositions = inputFile;
     m_inputFileUtPositionsCheckBeams = checkBeams;
 }
 
@@ -1319,7 +1308,19 @@ SimulationHelper::CreateSatScenario(SatHelper::PreDefinedScenario_t scenario,
     // Set final output path
     SetupOutputPath();
 
-    m_satHelper = CreateObject<SatHelper>();
+    if (m_scenarioPath == "")
+    {
+        NS_FATAL_ERROR("Must specify a scenario folder name from data submodule");
+    }
+
+    if (Singleton<SatEnvVariables>::Get()->IsValidDirectory(m_scenarioPath + "/beamhopping"))
+    {
+        ConfigureFwdLinkBeamHopping();
+    }
+
+    m_satHelper = CreateObject<SatHelper>(m_scenarioPath);
+
+    ParseScenarioFolder();
 
     m_satHelper->SetGroupHelper(
         GetGroupHelper()); // If not done in user scenario, group helper is created here
@@ -1327,7 +1328,7 @@ SimulationHelper::CreateSatScenario(SatHelper::PreDefinedScenario_t scenario,
     m_satHelper->GetBeamHelper()->SetAntennaGainPatterns(antennaGainPatterns);
 
     // Set UT position allocators, if any
-    if (!m_enableInputFileUtListPositions && !m_satHelper->IsSatConstellationEnabled())
+    if (m_inputFileUtListPositions == "" && !m_satHelper->IsSatConstellationEnabled())
     {
         if (m_commonUtPositions)
         {
@@ -1339,28 +1340,102 @@ SimulationHelper::CreateSatScenario(SatHelper::PreDefinedScenario_t scenario,
         }
     }
 
+    // Determine scenario
     if (m_satHelper->IsSatConstellationEnabled())
     {
         SatHelper::BeamUserInfoMap_t beamInfo;
-        for (uint32_t satId = 0; satId < m_satHelper->GeoSatNodes().GetN(); satId++)
+        switch (scenario)
         {
-            // Set beamInfo to indicate enabled beams
-            for (uint32_t i = 1; i <= m_satHelper->GetBeamCount(); i++)
+        case SatHelper::NONE: {
+            for (uint32_t satId = 0; satId < m_satHelper->GeoSatNodes().GetN(); satId++)
             {
-                if (IsBeamEnabled(i))
+                // Set beamInfo to indicate enabled beams
+                for (uint32_t i = 1; i <= m_satHelper->GetBeamCount(); i++)
+                {
+                    if (IsBeamEnabled(i))
+                    {
+                        SatBeamUserInfo info;
+                        beamInfo.insert(std::make_pair(std::make_pair(satId, i), info));
+                    }
+                }
+            }
+            break;
+        }
+        case SatHelper::FULL: {
+            for (uint32_t satId = 0; satId < m_satHelper->GeoSatNodes().GetN(); satId++)
+            {
+                // Set beamInfo to indicate enabled beams
+                for (uint32_t i = 1; i <= m_satHelper->GetBeamCount(); i++)
                 {
                     SatBeamUserInfo info;
                     beamInfo.insert(std::make_pair(std::make_pair(satId, i), info));
                 }
             }
+            break;
+        }
+        case SatHelper::SIMPLE:
+        case SatHelper::LARGER:
+        default: {
+            NS_FATAL_ERROR("Incorrect scenario chosen with a constellation");
+        }
         }
 
-        m_satHelper->CreateConstellationScenario(
+        m_satHelper->LoadConstellationScenario(
             beamInfo,
             MakeCallback(&SimulationHelper::GetNextUtUserCount, this));
-    }
 
-    // Determine scenario
+        std::vector<std::pair<GeoCoordinate, uint32_t>> additionalNodesVector =
+            m_groupHelper->GetAdditionalNodesPerBeam();
+        std::map<uint32_t, std::vector<std::pair<GeoCoordinate, uint32_t>>> additionalNodes;
+        for (std::vector<std::pair<GeoCoordinate, uint32_t>>::iterator it =
+                 additionalNodesVector.begin();
+             it != additionalNodesVector.end();
+             it++)
+        {
+            uint32_t bestBeamId = antennaGainPatterns->GetBestBeamId(0, it->first, false);
+            additionalNodes[bestBeamId].push_back(*it);
+        }
+
+        for (std::map<uint32_t, std::vector<std::pair<GeoCoordinate, uint32_t>>>::iterator it =
+                 additionalNodes.begin();
+             it != additionalNodes.end();
+             it++)
+        {
+            if (!IsBeamEnabled(it->first))
+            {
+                NS_LOG_WARN("Beam ID " << it->first << " is not enabled, cannot add "
+                                       << it->second.size() << " UTs from SatGroupHelper");
+                std::cout << "Beam ID " << it->first << " is not enabled, cannot add "
+                          << it->second.size() << " UTs from SatGroupHelper" << std::endl;
+                continue;
+            }
+            beamInfo[std::make_pair(0, it->first)].SetPositions(it->second);
+            for (uint32_t i = 0; i < it->second.size(); i++)
+            {
+                beamInfo[std::make_pair(0, it->first)].AppendUt(GetNextUtUserCount());
+            }
+        }
+
+        if (mobileUtsFolder != "")
+        {
+            m_satHelper->LoadMobileUTsFromFolder(mobileUtsFolder, m_utMobileUserCount);
+        }
+
+        // Now, create either a scenario based on list positions in input file
+        // or create a generic scenario with UT positions configured by other ways..
+        if (m_inputFileUtListPositions != "")
+        {
+            m_satHelper->CreateUserDefinedScenarioFromListPositions(
+                0,
+                beamInfo,
+                m_inputFileUtListPositions,
+                m_inputFileUtPositionsCheckBeams);
+        }
+        else
+        {
+            m_satHelper->CreateUserDefinedScenario(beamInfo);
+        }
+    }
     else if (scenario == SatHelper::NONE)
     {
         // Create beam scenario
@@ -1371,7 +1446,19 @@ SimulationHelper::CreateSatScenario(SatHelper::PreDefinedScenario_t scenario,
             if (IsBeamEnabled(i))
             {
                 SatBeamUserInfo info;
-                uint32_t utCount = GetNextUtCount(i);
+
+                uint32_t utCount;
+                std::map<uint32_t, Ptr<RandomVariableStream>>::iterator iti = m_utCount.find(i);
+                std::map<uint32_t, Ptr<RandomVariableStream>>::iterator it0 = m_utCount.find(0);
+                if (iti == m_utCount.end() && it0 == m_utCount.end())
+                {
+                    NS_LOG_WARN("No UT count per beam set. Must be set for GEO scenarios");
+                    utCount = 0;
+                }
+                else
+                {
+                    utCount = GetNextUtCount(i);
+                }
 
                 ss << "  Beam " << i << ": UT count= " << utCount;
 
@@ -1422,16 +1509,17 @@ SimulationHelper::CreateSatScenario(SatHelper::PreDefinedScenario_t scenario,
 
         if (mobileUtsFolder != "")
         {
-            m_satHelper->LoadMobileUTsFromFolder(0, mobileUtsFolder, m_utMobileUserCount);
+            m_satHelper->LoadMobileUTsFromFolder(mobileUtsFolder, m_utMobileUserCount);
         }
 
         // Now, create either a scenario based on list positions in input file
         // or create a generic scenario with UT positions configured by other ways..
-        if (m_enableInputFileUtListPositions)
+        if (m_inputFileUtListPositions != "")
         {
             m_satHelper->CreateUserDefinedScenarioFromListPositions(
                 0,
                 beamInfo,
+                m_inputFileUtListPositions,
                 m_inputFileUtPositionsCheckBeams);
         }
         else
@@ -1909,6 +1997,28 @@ SimulationHelper::DisableProgressLogs()
 
     m_progressLoggingEnabled = false;
     m_progressReportEvent.Cancel();
+}
+
+void
+SimulationHelper::LoadScenario(std::string name)
+{
+    NS_LOG_FUNCTION(this << name);
+
+    std::string path =
+        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/" + name;
+
+    if (!Singleton<SatEnvVariables>::Get()->IsValidFile(path))
+    {
+        NS_FATAL_ERROR("Scenario in " << path << " does not exist");
+    }
+
+    m_scenarioPath = path;
+}
+
+void
+SimulationHelper::ParseScenarioFolder()
+{
+    NS_LOG_FUNCTION(this);
 }
 
 void

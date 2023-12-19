@@ -75,6 +75,20 @@ class SatStatsCompositeSinrHelper : public SatStatsHelper
      */
     virtual void DoInstallProbes() = 0;
 
+    /**
+     * \brief Connect the probe to the right collector.
+     * \param probe
+     * \param identifier
+     */
+    bool ConnectProbeToCollector(Ptr<Probe> probe, uint32_t identifier);
+
+    /**
+     * \brief Disconnect the probe from the right collector.
+     * \param probe
+     * \param identifier
+     */
+    bool DisconnectProbeFromCollector(Ptr<Probe> probe, uint32_t identifier);
+
     /// Maintains a list of collectors created by this helper.
     CollectorMap m_terminalCollectors;
 
@@ -120,13 +134,18 @@ class SatStatsFwdCompositeSinrHelper : public SatStatsCompositeSinrHelper
      */
     static TypeId GetTypeId();
 
+    /**
+     * Change identifier used on probes, when handovers occur.
+     */
+    virtual void UpdateIdentifierOnProbes();
+
   protected:
     // inherited from SatStatsCompositeSinrHelper base class
     void DoInstallProbes();
 
   private:
     /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
+    std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>> m_probes;
 
 }; // end of class SatStatsFwdCompositeSinrHelper
 
@@ -178,21 +197,6 @@ class SatStatsRtnCompositeSinrHelper : public SatStatsCompositeSinrHelper
     void DoInstallProbes();
 
   private:
-    /**
-     * \brief Save the address and the proper identifier from the given UT node.
-     * \param utNode a UT node.
-     *
-     * The address of the given node will be saved in the #m_identifierMap
-     * member variable.
-     *
-     * Used in return link statistics. DoInstallProbes() is expected to pass the
-     * the UT node of interest into this method.
-     */
-    void SaveAddressAndIdentifier(Ptr<Node> utNode);
-
-    /// Map of address and the identifier associated with it (for return link).
-    std::map<const Address, uint32_t> m_identifierMap;
-
 }; // end of class SatStatsRtnCompositeSinrHelper
 
 } // end of namespace ns3

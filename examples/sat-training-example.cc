@@ -165,6 +165,8 @@ main(int argc, char* argv[])
     simulationHelper->SetBeamSet(coChannelBeams);
     simulationHelper->SetSimulationTime(simDuration);
 
+    simulationHelper->LoadScenario("geo-33E");
+
     simulationHelper->CreateSatScenario();
 
     /**

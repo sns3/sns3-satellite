@@ -444,7 +444,7 @@ class SatPhy : public Object
      * \brief Set the beamId this PHY is connected with
      * \param beamId Satellite beam id
      */
-    void SetBeamId(uint32_t beamId);
+    bool SetBeamId(uint32_t beamId);
 
     /**
      * \brief Receives packets from lower layer.

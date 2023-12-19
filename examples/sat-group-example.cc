@@ -218,6 +218,8 @@ main(int argc, char* argv[])
     // using utsPerBeam) to in this group
     groupHelper->CreateUtNodesFromPosition(5, 10, GeoCoordinate(56.4243, -16.042, 122.427), 100000);
 
+    simulationHelper->LoadScenario("geo-33E");
+
     // Create reference system
     Ptr<SatHelper> satHelper = simulationHelper->CreateSatScenario();
 

@@ -54,6 +54,7 @@
 #include <ns3/satellite-stats-throughput-helper.h>
 #include <ns3/satellite-stats-waveform-usage-helper.h>
 #include <ns3/satellite-stats-window-load-helper.h>
+#include <ns3/satellite-ut-mac.h>
 #include <ns3/string.h>
 
 NS_LOG_COMPONENT_DEFINE("SatStatsHelperContainer");
@@ -63,10 +64,29 @@ namespace ns3
 
 NS_OBJECT_ENSURE_REGISTERED(SatStatsHelperContainer);
 
-SatStatsHelperContainer::SatStatsHelperContainer(Ptr<const SatHelper> satHelper)
+SatStatsHelperContainer::SatStatsHelperContainer(Ptr<SatHelper> satHelper)
     : m_satHelper(satHelper)
 {
     NS_LOG_FUNCTION(this);
+
+    NodeContainer uts = m_satHelper->UtNodes();
+    for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); it++)
+    {
+        Ptr<Node> ut = *it;
+        for (uint32_t i = 0; i < ut->GetNDevices(); i++)
+        {
+            Ptr<SatNetDevice> netDevice = DynamicCast<SatNetDevice>(ut->GetDevice(i));
+            if (netDevice)
+            {
+                Ptr<SatUtMac> utMac = DynamicCast<SatUtMac>(netDevice->GetMac());
+                if (utMac != nullptr)
+                {
+                    utMac->SetUpdateAddressAndIdentifierCallback(
+                        MakeCallback(&SatStatsHelperContainer::UpdateAddressAndIdentifier, this));
+                }
+            }
+        }
+    }
 }
 
 void
@@ -2434,6 +2454,19 @@ SatStatsHelperContainer::GetOutputTypeSuffix(SatStatsHelper::OutputType_t output
 
   NS_FATAL_ERROR("SatStatsHelperContainer - Invalid output type");
   return "";
+}
+
+void
+SatStatsHelperContainer::UpdateAddressAndIdentifier(Ptr<Node> utNode)
+{
+  NS_LOG_FUNCTION(this << utNode->GetId());
+
+  std::list<Ptr<SatStatsHelper>>::iterator it;
+  for (it = m_stats.begin(); it != m_stats.end(); it++)
+  {
+      (*it)->UpdateAddressAndIdentifier(utNode);
+      (*it)->UpdateIdentifierOnProbes();
+  }
 }
 
 } // end of namespace ns3

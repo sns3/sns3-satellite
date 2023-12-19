@@ -27,6 +27,8 @@
 
 #include <ns3/object.h>
 #include <ns3/ptr.h>
+#include <ns3/satellite-geo-net-device.h>
+#include <ns3/satellite-gw-mac.h>
 #include <ns3/traced-callback.h>
 
 #include <map>
@@ -141,19 +143,25 @@ class SatNcc : public Object
      * \brief Function for adding the beam
      * \param satId ID of the satellite which for callback is set
      * \param beamId ID of the beam which for callback is set
+     * \param gwNetDevice GW NetDevice linked to this beam
+     * \param geoNetDevice GeoNetDevice on satellite linked to this beam
      * \param cb callback to invoke whenever a TBTP is ready for sending and must
      *        be forwarded to the Beam UTs.
      * \param tbtpCb callback to invoke whenever a TBTP has been sent
      * \param seq Super frame sequence
      * \param maxFrameSizeInBytes Maximum non fragmented BB frame size with most robust ModCod
+     * \param satAddress Mac address of the satellite responsible for this beam
      * \param gwAddress Mac address of the gateway responsible for this beam
      */
     void AddBeam(uint32_t satId,
                  uint32_t beamId,
+                 Ptr<SatNetDevice> gwNetDevice,
+                 Ptr<SatGeoNetDevice> geoNetDevice,
                  SatNcc::SendCallback cb,
                  SatNcc::SendTbtpCallback tbtpCb,
                  Ptr<SatSuperframeSeq> seq,
                  uint32_t maxFrameSizeInBytes,
+                 Address satAddress,
                  Address gwAddress);
 
     /**
@@ -231,11 +239,16 @@ class SatNcc : public Object
      * \brief Check if a terminal can be moved between two beams. If yes, schedule
      * the actual move at a later point in time.
      * \param utId the UT wanting to move between beams
-     * \param satId the satellite ID. Does not change here
+     * \param srcSatId the sat ID this UT is moving from
      * \param srcBeamId the beam ID this UT is moving from
+     * \param destSatId the sat ID this UT is moving to
      * \param destBeamId the beam ID this UT is moving to
      */
-    void MoveUtBetweenBeams(Address utId, uint32_t satId, uint32_t srcBeamId, uint32_t destBeamId);
+    void MoveUtBetweenBeams(Address utId,
+                            uint32_t srcSatId,
+                            uint32_t srcBeamId,
+                            uint32_t destSatId,
+                            uint32_t destBeamId);
 
     /**
      * \brief Update routes and ARP tables on gateways after a terminal handover
@@ -296,14 +309,16 @@ class SatNcc : public Object
 
     /**
      * \brief Perform terminal handover on the terestrial network
-     * \param utId the UT moving between beams
-     * \param satId the sat ID. Does not change here
+     * \param utId the UT wanting to move between beams
+     * \param srcSatId the sat ID this UT is moving from
      * \param srcBeamId the beam ID this UT is moving from
+     * \param destSatId the sat ID this UT is moving to
      * \param destBeamId the beam ID this UT is moving to
      */
     void DoMoveUtBetweenBeams(Address utId,
-                              uint32_t satId,
+                              uint32_t srcSatId,
                               uint32_t srcBeamId,
+                              uint32_t destSatId,
                               uint32_t destBeamId);
 
     /**

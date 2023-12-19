@@ -166,6 +166,14 @@ SatFwdLinkSchedulerDefault::GetNextFrame()
 }
 
 void
+SatFwdLinkSchedulerDefault::ClearAllPackets()
+{
+    NS_LOG_FUNCTION(this);
+
+    m_bbFrameContainer->ClearAllFrames();
+}
+
+void
 SatFwdLinkSchedulerDefault::PeriodicTimerExpired()
 {
     NS_LOG_FUNCTION(this);

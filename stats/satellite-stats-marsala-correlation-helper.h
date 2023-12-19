@@ -100,23 +100,11 @@ class SatStatsMarsalaCorrelationHelper : public SatStatsHelper
     }
 
   private:
-    /**
-     * \brief Save the address and the proper identifier from the given UT node.
-     * \param utNode a UT node.
-     *
-     * The address of the given node will be saved in the #m_identifierMap
-     * member variable.
-     */
-    void SaveAddressAndIdentifier(Ptr<Node> utNode);
-
     /// Maintains a list of collectors created by this helper.
     CollectorMap m_terminalCollectors;
 
     /// The aggregator created by this helper.
     Ptr<DataCollectionObject> m_aggregator;
-
-    /// Map of address and the identifier associated with it (for forward link).
-    std::map<const Address, uint32_t> m_identifierMap;
 
     std::string m_traceSourceName;
 

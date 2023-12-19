@@ -25,9 +25,9 @@
 #include <ns3/geo-coordinate.h>
 #include <ns3/mobility-helper.h>
 #include <ns3/node-container.h>
+#include <ns3/satellite-handover-module.h>
 #include <ns3/satellite-mobility-model.h>
 #include <ns3/satellite-position-allocator.h>
-#include <ns3/satellite-ut-handover-module.h>
 #include <ns3/vector.h>
 
 #include <algorithm>

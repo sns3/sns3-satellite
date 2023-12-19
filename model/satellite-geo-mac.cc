@@ -44,12 +44,20 @@ NS_OBJECT_ENSURE_REGISTERED(SatGeoMac);
 TypeId
 SatGeoMac::GetTypeId(void)
 {
-    static TypeId tid = TypeId("ns3::SatGeoMac")
-                            .SetParent<SatMac>()
-                            .AddTraceSource("BBFrameTxTrace",
-                                            "Trace for transmitted BB Frames.",
-                                            MakeTraceSourceAccessor(&SatGeoMac::m_bbFrameTxTrace),
-                                            "ns3::SatBbFrame::BbFrameCallback");
+    static TypeId tid =
+        TypeId("ns3::SatGeoMac")
+            .SetParent<SatMac>()
+            .AddAttribute("DisableSchedulingIfNoDeviceConnected",
+                          "If true, the periodic calls of StartTransmission are not called when no "
+                          "devices are connected to this MAC",
+                          BooleanValue(false),
+                          MakeBooleanAccessor(&SatGeoMac::m_disableSchedulingIfNoDeviceConnected),
+                          MakeBooleanChecker())
+            .AddTraceSource("BBFrameTxTrace",
+                            "Trace for transmitted BB Frames.",
+                            MakeTraceSourceAccessor(&SatGeoMac::m_bbFrameTxTrace),
+                            "ns3::SatBbFrame::BbFrameCallback");
+
     return tid;
 }
 
@@ -72,10 +80,12 @@ SatGeoMac::SatGeoMac(uint32_t satId,
                      SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                      SatEnums::RegenerationMode_t returnLinkRegenerationMode)
     : SatMac(satId, beamId, forwardLinkRegenerationMode, returnLinkRegenerationMode),
+      m_disableSchedulingIfNoDeviceConnected(false),
       m_fwdScheduler(),
       m_guardTime(MicroSeconds(1)),
       m_satId(satId),
-      m_beamId(beamId)
+      m_beamId(beamId),
+      m_periodicTransmissionEnabled(false)
 {
     NS_LOG_FUNCTION(this);
 }
@@ -104,10 +114,26 @@ SatGeoMac::StartPeriodicTransmissions()
 {
     NS_LOG_FUNCTION(this);
 
+    if (m_disableSchedulingIfNoDeviceConnected && !HasPeer())
+    {
+        NS_LOG_INFO("Do not start beam " << m_beamId << " because no device is connected");
+        return;
+    }
+
+    if (m_periodicTransmissionEnabled == true)
+    {
+        NS_LOG_INFO("Beam " << m_beamId << " already enabled");
+        return;
+    }
+
+    m_periodicTransmissionEnabled = true;
+
     if (m_fwdScheduler == NULL)
     {
-        NS_FATAL_ERROR("Scheduler not set for GEO FEEDER MAC!!!");
+        NS_FATAL_ERROR("Scheduler not set for GEO MAC!!!");
     }
+
+    m_llc->ClearQueues();
 
     Simulator::Schedule(Seconds(0), &SatGeoMac::StartTransmission, this, 0);
 }
@@ -115,17 +141,17 @@ SatGeoMac::StartPeriodicTransmissions()
 void
 SatGeoMac::StartTransmission(uint32_t carrierId)
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(this << carrierId);
 
     Time txDuration;
 
-    if (m_txEnabled)
+    if (m_txEnabled && (!m_disableSchedulingIfNoDeviceConnected || m_periodicTransmissionEnabled))
     {
         std::pair<Ptr<SatBbFrame>, const Time> bbFrameInfo = m_fwdScheduler->GetNextFrame();
         Ptr<SatBbFrame> bbFrame = bbFrameInfo.first;
         txDuration = bbFrameInfo.second;
 
-        // trace out BB frames sent.
+        // trace out BB frames sent
         m_bbFrameTxTrace(bbFrame);
 
         // Handle both dummy frames and normal frames
@@ -155,7 +181,10 @@ SatGeoMac::StartTransmission(uint32_t carrierId)
         txDuration = m_fwdScheduler->GetDefaultFrameDuration();
     }
 
-    Simulator::Schedule(txDuration, &SatGeoMac::StartTransmission, this, 0);
+    if (m_periodicTransmissionEnabled)
+    {
+        Simulator::Schedule(txDuration, &SatGeoMac::StartTransmission, this, 0);
+    }
 }
 
 void
@@ -273,6 +302,16 @@ SatGeoMac::SetReceiveNetDeviceCallback(ReceiveNetDeviceCallback cb)
 {
     NS_LOG_FUNCTION(this << &cb);
     m_rxNetDeviceCallback = cb;
+}
+
+void
+SatGeoMac::StopPeriodicTransmissions()
+{
+    NS_LOG_FUNCTION(this);
+
+    m_periodicTransmissionEnabled = false;
+
+    m_llc->ClearQueues();
 }
 
 } // namespace ns3

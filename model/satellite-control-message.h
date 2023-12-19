@@ -820,6 +820,22 @@ class SatTimuMessage : public SatControlMessage
      */
     void SetAllocatedBeamId(uint32_t beamId);
 
+    /**
+     * \brief Get the allocated sat ID
+     * \return Allocated sat ID
+     */
+    uint32_t GetAllocatedSatId() const;
+
+    /**
+     * Set allocated sat ID
+     * \param satId Allocated sat ID
+     */
+    void SetAllocatedSatId(uint32_t beamId);
+
+    Address GetSatAddress() const;
+
+    void SetSatAddress(Address address);
+
     Address GetGwAddress() const;
 
     void SetGwAddress(Address address);
@@ -835,6 +851,16 @@ class SatTimuMessage : public SatControlMessage
      * Allocated beam ID
      */
     uint32_t m_beamId;
+
+    /**
+     * Allocated sat ID
+     */
+    uint32_t m_satId;
+
+    /**
+     * Satellite mac address of the new gateway
+     */
+    Address m_satAddress;
 
     /**
      * Mac address of the new gateway
@@ -895,6 +921,18 @@ class SatHandoverRecommendationMessage : public SatControlMessage
     void SetRecommendedBeamId(uint32_t beamId);
 
     /**
+     * \brief Get the recommended sat ID
+     * \return Recommended sat ID
+     */
+    uint32_t GetRecommendedSatId() const;
+
+    /**
+     * Set recommended sat ID
+     * \param beamId Recommended sat ID
+     */
+    void SetRecommendedSatId(uint32_t beamId);
+
+    /**
      * \brief Get real size of the random access message, which can be used to e.g. simulate real
      * size. \return Real size of the random access message.
      */
@@ -905,6 +943,11 @@ class SatHandoverRecommendationMessage : public SatControlMessage
      * Recommended beam ID
      */
     uint32_t m_beamId;
+
+    /**
+     * Recommended sat ID
+     */
+    uint32_t m_satId;
 };
 
 /**

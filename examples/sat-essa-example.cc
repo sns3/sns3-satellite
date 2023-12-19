@@ -152,9 +152,6 @@ main(int argc, char* argv[])
     Config::SetDefault("ns3::SatBeamHelper::RaCollisionModel",
                        EnumValue(SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
     Config::SetDefault("ns3::SatBeamHelper::ReturnLinkLinkResults", EnumValue(SatEnums::LR_FSIM));
-    Config::SetDefault("ns3::SatWaveformConf::DefaultWfId", UintegerValue(2));
-    Config::SetDefault("ns3::SatHelper::RtnLinkWaveformConfFileName",
-                       StringValue("fSimWaveforms.txt"));
 
     Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::WindowDuration", StringValue("600ms"));
     Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::WindowStep", StringValue("200ms"));
@@ -196,6 +193,8 @@ main(int argc, char* argv[])
     simulationHelper->SetUtCountPerBeam(nbUtsPerBeam);
     simulationHelper->SetUserCountPerUt(nbEndUsersPerUt);
     simulationHelper->SetBeams(beams);
+
+    simulationHelper->LoadScenario("geo-33E-fsim");
 
     simulationHelper->CreateSatScenario();
 

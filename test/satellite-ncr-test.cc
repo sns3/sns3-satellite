@@ -36,6 +36,7 @@
 #include "ns3/satellite-gw-mac.h"
 #include "ns3/satellite-helper.h"
 #include "ns3/satellite-ut-mac-state.h"
+#include "ns3/satellite-ut-mac.h"
 #include "ns3/simulator.h"
 #include "ns3/singleton.h"
 #include "ns3/string.h"
@@ -136,7 +137,8 @@ SatNcrTest1::DoRun(void)
     Config::SetDefault("ns3::SatGwMac::CmtPeriodMin", TimeValue(MilliSeconds(550)));
 
     // Creating the reference system.
-    m_helper = CreateObject<SatHelper>();
+    m_helper = CreateObject<SatHelper>(Singleton<SatEnvVariables>::Get()->LocateDataDirectory() +
+                                       "/scenarios/geo-33E");
     m_helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
     NodeContainer gwUsers = m_helper->GetGwUsers();
@@ -315,7 +317,8 @@ SatNcrTest2::DoRun(void)
     Config::SetDefault("ns3::SatGwMac::CmtPeriodMin", TimeValue(MilliSeconds(550)));
 
     // Creating the reference system.
-    m_helper = CreateObject<SatHelper>();
+    m_helper = CreateObject<SatHelper>(Singleton<SatEnvVariables>::Get()->LocateDataDirectory() +
+                                       "/scenarios/geo-33E");
     m_helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
     NodeContainer gwUsers = m_helper->GetGwUsers();
@@ -544,7 +547,8 @@ SatNcrTest3::DoRun(void)
     Config::SetDefault("ns3::SatGwMac::CmtPeriodMin", TimeValue(MilliSeconds(550)));
 
     // Creating the reference system.
-    m_helper = CreateObject<SatHelper>();
+    m_helper = CreateObject<SatHelper>(Singleton<SatEnvVariables>::Get()->LocateDataDirectory() +
+                                       "/scenarios/geo-33E");
     m_helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
     NodeContainer gwUsers = m_helper->GetGwUsers();

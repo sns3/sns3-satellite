@@ -44,11 +44,17 @@ main(int argc, char* argv[])
 {
     /// Set regeneration mode
     Config::SetDefault("ns3::SatConf::ForwardLinkRegenerationMode",
-                       EnumValue(SatEnums::REGENERATION_PHY));
+                       EnumValue(SatEnums::REGENERATION_NETWORK));
     Config::SetDefault("ns3::SatConf::ReturnLinkRegenerationMode",
-                       EnumValue(SatEnums::REGENERATION_PHY));
+                       EnumValue(SatEnums::REGENERATION_NETWORK));
 
     Config::SetDefault("ns3::SatGeoFeederPhy::QueueSize", UintegerValue(100000));
+
+    Config::SetDefault("ns3::SatHelper::HandoversEnabled", BooleanValue(true));
+    Config::SetDefault("ns3::SatHandoverModule::NumberClosestSats", UintegerValue(2));
+
+    Config::SetDefault("ns3::SatGwMac::DisableSchedulingIfNoDeviceConnected", BooleanValue(true));
+    Config::SetDefault("ns3::SatGeoMac::DisableSchedulingIfNoDeviceConnected", BooleanValue(true));
 
     /// Set simulation output details
     Config::SetDefault("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue(true));
@@ -57,16 +63,20 @@ main(int argc, char* argv[])
     Config::SetDefault("ns3::SatHelper::PacketTraceEnabled", BooleanValue(true));
     Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper>("example-handover");
     Ptr<SimulationHelperConf> simulationConf = CreateObject<SimulationHelperConf>();
-    simulationHelper->SetSimulationTime(Seconds(60));
-    simulationHelper->SetGwUserCount(2);
-    simulationHelper->SetUtCountPerBeam(5);
+    simulationHelper->SetSimulationTime(Seconds(100));
+    simulationHelper->SetGwUserCount(1);
     simulationHelper->SetUserCountPerUt(1);
-    simulationHelper->SetBeams("12 13 26 27 38 39");
+    simulationHelper->SetBeamSet({0,  20, 21, 22, 32, 33, 34, 35, 36, 37, 44, 45, 46,
+                                  47, 53, 54, 55, 56, 59, 60, 61, 66, 67, 68, 71, 72});
     simulationHelper->SetUserCountPerMobileUt(simulationConf->m_utMobileUserCount);
 
-    std::string mobileUtFolder =
-        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/utpositions/mobiles/scenario5";
+    simulationHelper->LoadScenario("constellation-eutelsat-geo-2-sats-handovers");
+
+    std::string mobileUtFolder = Singleton<SatEnvVariables>::Get()->LocateDataDirectory() +
+                                 "/additional-input/utpositions/mobiles/scenario6";
     Ptr<SatHelper> helper = simulationHelper->CreateSatScenario(SatHelper::NONE, mobileUtFolder);
+
+    helper->PrintTopology(std::cout);
 
     Config::SetDefault("ns3::CbrApplication::Interval", StringValue("100ms"));
     Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(512));
@@ -75,7 +85,13 @@ main(int argc, char* argv[])
                                           SimulationHelper::UDP,
                                           SimulationHelper::FWD_LINK,
                                           Seconds(1.0),
-                                          Seconds(60.0));
+                                          Seconds(100.0));
+
+    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
+                                          SimulationHelper::UDP,
+                                          SimulationHelper::RTN_LINK,
+                                          Seconds(1.0),
+                                          Seconds(100.0));
 
     // To store attributes to file
     Config::SetDefault("ns3::ConfigStore::Filename", StringValue("output-attributes.xml"));
@@ -86,9 +102,27 @@ main(int argc, char* argv[])
 
     Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer();
 
+    s->AddPerSatFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    s->AddPerUtFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    s->AddPerGwFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+    s->AddPerSatRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    s->AddPerUtRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    s->AddPerGwRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+    s->AddPerSatFwdUserMacThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    s->AddPerUtFwdUserMacThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    s->AddPerGwFwdUserMacThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+    s->AddPerSatRtnUserMacThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    s->AddPerUtRtnUserMacThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+    s->AddPerGwRtnUserMacThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
+
     s->AddPerBeamFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
     s->AddPerBeamFwdUserDevThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
     s->AddPerBeamBeamServiceTime(SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+    s->AddPerSatFwdFeederMacThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
 
     simulationHelper->EnableProgressLogs();
     simulationHelper->RunSimulation();

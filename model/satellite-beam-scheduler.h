@@ -31,6 +31,9 @@
 #include <ns3/nstime.h>
 #include <ns3/object.h>
 #include <ns3/ptr.h>
+#include <ns3/satellite-geo-net-device.h>
+#include <ns3/satellite-gw-mac.h>
+#include <ns3/satellite-net-device.h>
 #include <ns3/simple-ref-count.h>
 #include <ns3/traced-callback.h>
 
@@ -124,16 +127,24 @@ class SatBeamScheduler : public Object
 
     /**
      * \param beamId ID of the beam which for callback is set
+     * \param satId ID of the satellite using the beam which for callback is set
+     * \param gwNetDevice GW NetDevice linked to this beam
+     * \param geoNetDevice GeoNetDevice on satellite linked to this beam
      * \param cb callback to invoke whenever a TBTP is ready for sending and must
      *        be forwarded to the Beam UTs.
      * \param seq Superframe sequence.
      * \param maxFrameSizeInBytes Maximum non fragmented BB frame size with most robust ModCod
+     * \param satAddress Mac address of the satellite responsible for this beam
      * \param gwAddress Mac address of the gateway responsible for this beam
      */
-    void Initialize(uint32_t beamId,
+    void Initialize(uint32_t satId,
+                    uint32_t beamId,
+                    Ptr<SatNetDevice> gwNetDevice,
+                    Ptr<SatGeoNetDevice> geoNetDevice,
                     SatBeamScheduler::SendCtrlMsgCallback cb,
                     Ptr<SatSuperframeSeq> seq,
                     uint32_t maxFrameSizeInBytes,
+                    Address satAddress,
                     Address gwAddress);
 
     /**
@@ -152,6 +163,13 @@ class SatBeamScheduler : public Object
      * \return Whether or not this UT is in this beam
      */
     bool HasUt(Address utId);
+
+    /**
+     * Check whether an UT is handled by this scheduler
+     *
+     * \return Whether or not at least one UT is handled by this beam
+     */
+    bool HasUt();
 
     /**
      * Update UT C/N0 info with the latest value.
@@ -264,12 +282,48 @@ class SatBeamScheduler : public Object
     void TransferUtToBeam(Address utId, Ptr<SatBeamScheduler> destination);
 
     /**
+     * Connect a new UT address to this scheduler
+     *
+     * \param address The UT address to connect
+     */
+    void ConnectUt(Mac48Address address);
+
+    /**
+     * Disconnect a new UT address from this scheduler
+     *
+     * \param address The UT address to disconnect
+     */
+    void DisconnectUt(Mac48Address address);
+
+    /**
+     * Connect a new GW address to this scheduler
+     *
+     * \param address The GW address to connect
+     */
+    void ConnectGw(Mac48Address address);
+
+    /**
+     * Disconnect a new GW address from this scheduler
+     *
+     * \param address The GW address to disconnect
+     */
+    void DisconnectGw(Mac48Address address);
+
+    /**
      * \brief Remove a UT from its SatBeamScheduler
      * \param utId the terminal that is leaving this beam
      */
     void RemoveUt(Address utId);
 
     void ReserveLogonChannel(uint32_t logonChannelId);
+
+    /**
+     * \brief Return the address of the satellite responsible of this beam
+     */
+    inline Address GetSatAddress(void) const
+    {
+        return m_satAddress;
+    }
 
     /**
      * \brief Return the address of the gateway responsible of this beam
@@ -456,9 +510,24 @@ class SatBeamScheduler : public Object
     };
 
     /**
+     * ID of the satellite using this beam
+     */
+    uint32_t m_satId;
+
+    /**
      * ID of the beam
      */
     uint32_t m_beamId;
+
+    /**
+     * GW MAC linked to this beam
+     */
+    Ptr<SatGwMac> m_gwMac;
+
+    /**
+     * GeoNetDevice on satellite linked to this beam
+     */
+    Ptr<SatGeoNetDevice> m_geoNetDevice;
 
     /**
      * Pointer to super frame sequence.
@@ -626,6 +695,8 @@ class SatBeamScheduler : public Object
      * Send an estimation of cno to satellite, if samples have been received
      */
     void SendCnoToSatellite();
+
+    Address m_satAddress;
 
     Address m_gwAddress;
 

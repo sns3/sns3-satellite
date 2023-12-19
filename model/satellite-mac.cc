@@ -95,6 +95,7 @@ SatMac::SatMac()
       m_ncrV2(false),
       m_routingUpdateCallback(),
       m_nodeInfo(),
+      m_handoverModule(nullptr),
       m_txEnabled(true),
       m_beamEnabledTime(Seconds(0)),
       m_lastDelay(0),
@@ -118,6 +119,7 @@ SatMac::SatMac(uint32_t satId,
       m_nodeInfo(),
       m_satId(satId),
       m_beamId(beamId),
+      m_handoverModule(nullptr),
       m_txEnabled(true),
       m_beamEnabledTime(Seconds(0)),
       m_lastDelay(0),
@@ -140,7 +142,9 @@ SatMac::DoDispose()
 {
     NS_LOG_FUNCTION(this);
     if (m_txEnabled)
+    {
         m_beamServiceTrace(Simulator::Now() - m_beamEnabledTime);
+    }
 
     m_txCallback.Nullify();
     m_rxCallback.Nullify();
@@ -148,6 +152,7 @@ SatMac::DoDispose()
     m_reserveCtrlCallback.Nullify();
     m_sendCtrlCallback.Nullify();
     m_routingUpdateCallback.Nullify();
+    m_beamSchedulerCallback.Nullify();
 
     Object::DoDispose();
 }
@@ -398,6 +403,14 @@ SatMac::RxTraces(SatPhy::PacketContainer_t packets)
 }
 
 void
+SatMac::SetHandoverModule(Ptr<SatHandoverModule> handoverModule)
+{
+    NS_LOG_INFO(this << handoverModule);
+
+    m_handoverModule = handoverModule;
+}
+
+void
 SatMac::SetTransmitCallback(SatMac::TransmitCallback cb)
 {
     NS_LOG_FUNCTION(this << &cb);
@@ -444,6 +457,21 @@ SatMac::SetRoutingUpdateCallback(SatMac::RoutingUpdateCallback cb)
 {
     NS_LOG_FUNCTION(this << &cb);
     m_routingUpdateCallback = cb;
+}
+
+void
+SatMac::SetBeamSchedulerCallback(SatMac::BeamSchedulerCallback cb)
+{
+    NS_LOG_FUNCTION(this << &cb);
+
+    m_beamSchedulerCallback = cb;
+}
+
+void
+SatMac::SetUpdateIslCallback(SatMac::UpdateIslCallback cb)
+{
+    NS_LOG_FUNCTION(this << &cb);
+    m_updateIslCallback = cb;
 }
 
 } // namespace ns3

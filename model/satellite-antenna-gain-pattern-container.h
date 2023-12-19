@@ -53,10 +53,16 @@ class SatAntennaGainPatternContainer : public Object
     TypeId GetInstanceTypeId() const;
 
     /**
-     * Default constructor.
-     * \param nbSats Number of satellites to consider
+     * Default constructor. Not used.
      */
-    SatAntennaGainPatternContainer(uint32_t nbSats = 1);
+    SatAntennaGainPatternContainer();
+
+    /**
+     * SatAntennaGainPatternContainer constructor.
+     * \param nbSats Number of satellites to consider
+     * \param patternsFolder Path to folder containing the gains definition for each beam
+     */
+    SatAntennaGainPatternContainer(uint32_t nbSats, std::string patternsFolder);
     ~SatAntennaGainPatternContainer();
 
     /**
@@ -78,7 +84,7 @@ class SatAntennaGainPatternContainer : public Object
     Ptr<SatAntennaGainPattern> GetAntennaGainPattern(uint32_t beamId) const;
 
     /**
-     * \brief Get the mobility model of a specified beam id
+     * \brief Get the mobility model of a specified satellite id
      * \param satelliteId Satellite identifier
      * \return The mobility model
      */
@@ -99,6 +105,15 @@ class SatAntennaGainPatternContainer : public Object
      * \return best beam id in the specified geo coordinate
      */
     uint32_t GetBestBeamId(uint32_t satelliteId, GeoCoordinate coord, bool ignoreNan);
+
+    /**
+     * \brief Get beam gain for given coordinates
+     * \param satelliteId ID of satellite
+     * \param beamId ID of beam
+     * \param coord Geo coordinate
+     * \return gain of this beam
+     */
+    double GetBeamGain(uint32_t satelliteId, uint32_t beamId, GeoCoordinate coord);
 
     void ConfigureBeamsMobility(uint32_t satelliteId, Ptr<SatMobilityModel> mobility);
 

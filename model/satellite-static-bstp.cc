@@ -51,10 +51,8 @@ SatStaticBstp::SatStaticBstp(std::string fileName)
 {
     NS_LOG_FUNCTION(this);
 
-    std::string dataPath = Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/";
-
     // Load satellite configuration file
-    LoadBstp(dataPath + fileName);
+    LoadBstp(fileName);
 }
 
 void

@@ -87,12 +87,9 @@ main(int argc, char* argv[])
     Config::SetDefault("ns3::SatGwHelper::RtnLinkConstantErrorRate", DoubleValue(errorRate));
     Config::SetDefault("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue(em));
 
-    // Create full scenario
+    simulationHelper->LoadScenario("geo-33E");
 
-    // Creating the reference system. Note, currently the satellite module supports
-    // only one reference system, which is named as "Scenario72". The string is utilized
-    // in mapping the scenario to the needed reference system configuration files. Arbitrary
-    // scenario name results in fatal error.
+    // Create full scenario
     simulationHelper->CreateSatScenario(SatHelper::FULL);
 
     // >>> Start of actual test using Full scenario >>>

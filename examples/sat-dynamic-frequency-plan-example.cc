@@ -131,6 +131,9 @@ main(int argc, char* argv[])
     simulationHelper->SetUserCountPerUt(simulationConf->m_utUserCount);
     simulationHelper->SetUserCountPerMobileUt(simulationConf->m_utMobileUserCount);
     simulationHelper->SetSimulationTime(g_simulationTime);
+
+    simulationHelper->LoadScenario("geo-33E");
+
     simulationHelper->CreateSatScenario(SatHelper::NONE, simulationConf->m_mobileUtsFolder);
     if (simulationConf->m_activateProgressLogging)
     {

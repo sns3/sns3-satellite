@@ -21,12 +21,11 @@
 #ifndef SAT_GW_MAC_H
 #define SAT_GW_MAC_H
 
-#include "satellite-mac.h"
-#include "satellite-phy.h"
-
 #include <ns3/callback.h>
 #include <ns3/nstime.h>
 #include <ns3/ptr.h>
+#include <ns3/satellite-mac.h>
+#include <ns3/satellite-phy.h>
 #include <ns3/traced-callback.h>
 
 namespace ns3
@@ -73,11 +72,15 @@ class SatGwMac : public SatMac
      *
      * \param satId ID of sat for UT
      * \param beamId ID of beam for UT
+     * \param satId ID of sat for GW
+     * \param beamId ID of beam for GW
      * \param forwardLinkRegenerationMode Forward link regeneration mode
      * \param returnLinkRegenerationMode Return link regeneration mode
      */
     SatGwMac(uint32_t satId,
              uint32_t beamId,
+             uint32_t feederSatId,
+             uint32_t feederBeamId,
              SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
              SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
@@ -105,6 +108,20 @@ class SatGwMac : public SatMac
      * \param tbtp The TBTP sent by the scheduler.
      */
     void TbtpSent(Ptr<SatTbtpMessage> tbtp);
+
+    /**
+     * Get ID of satellite linked to this GW
+     *
+     * \return ID of satellite linked to this GW
+     */
+    uint32_t GetFeederSatId();
+
+    /**
+     * Get ID of beam linked to this GW
+     *
+     * \return ID of beam linked to this GW
+     */
+    uint32_t GetFeederBeamId();
 
     /**
      * Callback to receive capacity request (CR) messages.
@@ -141,9 +158,10 @@ class SatGwMac : public SatMac
      * \param Address identification of the UT originating the request
      * \param uint32_t satellite ID
      * \param uint32_t source beam ID the UT is still in
+     * \param uint32_t destination sat ID the UT would like to go in
      * \param uint32_t destination beam ID the UT would like to go in
      */
-    typedef Callback<void, Address, uint32_t, uint32_t, uint32_t> HandoverCallback;
+    typedef Callback<void, Address, uint32_t, uint32_t, uint32_t, uint32_t> HandoverCallback;
 
     /**
      * Method to set handover callback
@@ -165,6 +183,44 @@ class SatGwMac : public SatMac
      * \param cb callback to invoke whenever a logon is received
      */
     void SetLogonCallback(SatGwMac::LogonCallback cb);
+
+    /**
+     * Callback to change phy-layer beam ID
+     * \param uint32_t New satellite ID to use
+     * \param uint32_t New beam ID to use
+     * \return whether a connection change should occur
+     */
+    typedef Callback<void, uint32_t, uint32_t> PhyBeamCallback;
+
+    /**
+     * Method to set phy-layer beam handover callback
+     * \param cb callback to invoke whenever a beam handover is considered
+     */
+    void SetBeamCallback(SatGwMac::PhyBeamCallback cb);
+
+    /**
+     * Callback to get all satellite nodes
+     * \return All satellites of the simulation
+     */
+    typedef Callback<NodeContainer> GeoNodesCallback;
+
+    /**
+     * Method to set callback to get all satellite nodes
+     * \param cb callback to invoke to get all satellite nodes
+     */
+    void SetGeoNodesCallback(SatGwMac::GeoNodesCallback cb);
+
+    /**
+     * Callback to set geo satellite feeder address on LLC
+     * \param The new satellite feeder address
+     */
+    typedef Callback<void, Mac48Address> GwLlcSetSatelliteAddress;
+
+    /**
+     * Method to set callback to set geo satellite feeder address
+     * \param cb callback to invoke to set geo satellite feeder address
+     */
+    void SetGwLlcSetSatelliteAddress(SatGwMac::GwLlcSetSatelliteAddress cb);
 
     /**
      * Callback to inform NCC a control burst has been received.
@@ -195,10 +251,40 @@ class SatGwMac : public SatMac
     void SetRemoveUtCallback(SatGwMac::RemoveUtCallback cb);
 
     /**
+     * Callback to clear LLC queues
+     */
+    typedef Callback<void> ClearQueuesCallback;
+
+    /**
+     * Method to set callback for LLC queues clearing
+     * \param cb callback to invoke whenever queues need to be cleared
+     */
+    void SetClearQueuesCallback(SatGwMac::ClearQueuesCallback cb);
+
+    /**
      * Method to set forward link scheduler
      * \param The scheduler to use
      */
     void SetFwdScheduler(Ptr<SatFwdLinkScheduler> fwdScheduler);
+
+    /**
+     * Method handling beam handover
+     * \param satId New satellite id
+     * \param beamId New satellite beam id
+     */
+    void ChangeBeam(uint32_t satId, uint32_t beamId);
+
+    /**
+     * Connect a UT to this satellite.
+     * \param utAddress MAC address of the UT to connect
+     */
+    void ConnectUt(Mac48Address utAddress);
+
+    /**
+     * Disconnect a UT to this satellite.
+     * \param utAddress MAC address of the UT to disconnect
+     */
+    void DisconnectUt(Mac48Address utAddress);
 
   private:
     SatGwMac& operator=(const SatGwMac&);
@@ -248,6 +334,28 @@ class SatGwMac : public SatMac
     static void SendLogonResponseHelper(SatGwMac* self, Address utId, uint32_t raChannel);
 
     /**
+     * Stop periodic transmission, until a pacquet in enqued.
+     */
+    virtual void StopPeriodicTransmissions();
+
+    /**
+     * Indicates if at least one device is connected in this beam.
+     *
+     * \return True if at least a device is connected, false otherwise
+     */
+    bool HasPeer();
+
+    /**
+     * ID of satellite linked to this GW
+     */
+    uint32_t m_feederSatId;
+
+    /**
+     * ID of beam linked to this GW
+     */
+    uint32_t m_feederBeamId;
+
+    /**
      * List of TBTPs sent to UTs. Key is superframe counter, value is TBTP.
      */
     std::map<uint32_t, std::vector<Ptr<SatTbtpMessage>>> m_tbtps;
@@ -289,6 +397,22 @@ class SatGwMac : public SatMac
     bool m_broadcastNcr;
 
     /**
+     * If true, the periodic calls of StartTransmission are not called when no
+     * devices are connected to this MAC
+     */
+    bool m_disableSchedulingIfNoDeviceConnected;
+
+    /**
+     * Indicated if periodic transmission is enabled.
+     */
+    bool m_periodicTransmissionEnabled;
+
+    /**
+     * List of UT MAC connected to this MAC.
+     */
+    std::set<Mac48Address> m_peers;
+
+    /**
      * Trace for transmitted BB frames.
      */
     TracedCallback<Ptr<SatBbFrame>> m_bbFrameTxTrace;
@@ -316,6 +440,21 @@ class SatGwMac : public SatMac
     SatGwMac::LogonCallback m_logonCallback;
 
     /**
+     * Callback to change phy-layer beam ID
+     */
+    SatGwMac::PhyBeamCallback m_beamCallback;
+
+    /**
+     * Callback to get all satellite nodes
+     */
+    SatGwMac::GeoNodesCallback m_geoNodesCallback;
+
+    /**
+     * Callback to set satellite address on LLC
+     */
+    SatGwMac::GwLlcSetSatelliteAddress m_gwLlcSetSatelliteAddress;
+
+    /**
      * Callback to indicate NCC a control burst has been received
      */
     SatGwMac::ControlMessageReceivedCallback m_controlMessageReceivedCallback;
@@ -324,6 +463,11 @@ class SatGwMac : public SatMac
      * Callback to indicate NCC a UT needs to be removed
      */
     SatGwMac::RemoveUtCallback m_removeUtCallback;
+
+    /**
+     * Callback to clear LLC queues
+     */
+    SatGwMac::ClearQueuesCallback m_clearQueuesCallback;
 };
 
 } // namespace ns3

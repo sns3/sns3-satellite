@@ -106,7 +106,8 @@ Pm1::DoRun(void)
     Config::SetDefault("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue(em));
 
     // Creating the reference system.
-    Ptr<SatHelper> helper = CreateObject<SatHelper>();
+    Ptr<SatHelper> helper = CreateObject<SatHelper>(
+        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E");
     helper->CreatePredefinedScenario(SatHelper::FULL);
 
     NodeContainer gwUsers = helper->GetGwUsers();

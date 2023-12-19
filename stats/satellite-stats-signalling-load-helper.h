@@ -87,18 +87,6 @@ class SatStatsSignallingLoadHelper : public SatStatsHelper
      */
     virtual void DoInstallProbes() = 0;
 
-    /**
-     * \brief Save the address and the proper identifier from the given UT node.
-     * \param utNode a UT node.
-     *
-     * The address of the given node will be saved in the #m_identifierMap
-     * member variable.
-     *
-     * Used in forward link statistics. DoInstallProbes() is expected to pass the
-     * the UT node of interest into this method.
-     */
-    void SaveAddressAndIdentifier(Ptr<Node> utNode);
-
     /// Maintains a list of first-level collectors created by this helper.
     CollectorMap m_conversionCollectors;
 
@@ -107,9 +95,6 @@ class SatStatsSignallingLoadHelper : public SatStatsHelper
 
     /// The aggregator created by this helper.
     Ptr<DataCollectionObject> m_aggregator;
-
-    /// Map of address and the identifier associated with it (for forward link).
-    std::map<const Address, uint32_t> m_identifierMap;
 
 }; // end of class SatStatsSignallingLoadHelper
 
@@ -191,13 +176,18 @@ class SatStatsRtnSignallingLoadHelper : public SatStatsSignallingLoadHelper
      */
     static TypeId GetTypeId();
 
+    /**
+     * Change identifier used on probes, when handovers occur.
+     */
+    virtual void UpdateIdentifierOnProbes();
+
   protected:
     // inherited from SatStatsThroughputHelper base class
     void DoInstallProbes();
 
   private:
     /// Maintains a list of probes created by this helper.
-    std::list<Ptr<Probe>> m_probes;
+    std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>> m_probes;
 
 }; // end of class SatStatsRtnSignallingLoadHelper
 

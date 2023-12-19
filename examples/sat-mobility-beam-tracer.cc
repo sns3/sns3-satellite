@@ -30,8 +30,8 @@
 using namespace ns3;
 
 Ptr<SatMobilityModel> satMobility = nullptr;
-std::set<uint32_t> visitedBeams;
-std::vector<double> relativeSpeeds;
+std::set<std::pair<uint32_t, uint32_t>> visitedBeams;
+std::map<uint32_t, std::vector<double>> relativeSpeeds;
 
 static void
 SatCourseChange(std::string context, Ptr<const SatMobilityModel> position)
@@ -39,9 +39,11 @@ SatCourseChange(std::string context, Ptr<const SatMobilityModel> position)
     auto tracedPosition = DynamicCast<const SatTracedMobilityModel>(position);
     NS_ASSERT_MSG(tracedPosition != NULL, "Course changed for a non-mobile UT");
 
-    uint32_t beam = tracedPosition->GetBestBeamId();
-    visitedBeams.insert(beam);
-    relativeSpeeds.push_back(tracedPosition->GetRelativeSpeed(satMobility));
+    uint32_t sat = tracedPosition->GetSatId();
+    uint32_t beam = tracedPosition->GetBestBeamId(true);
+
+    visitedBeams.insert(std::make_pair(sat, beam));
+    relativeSpeeds[sat].push_back(tracedPosition->GetRelativeSpeed(satMobility));
 }
 
 /**
@@ -51,7 +53,7 @@ SatCourseChange(std::string context, Ptr<const SatMobilityModel> position)
  * \brief Simulation script to run example simulation results with
  * a high degree of customization through XML file.
  *
- * execute command -> ./waf --run "sat-mobility-beam-tracer --PrintHelp"
+ * execute command -> ./ns3 run "sat-mobility-beam-tracer --PrintHelp"
  */
 
 NS_LOG_COMPONENT_DEFINE("sat-mobility-beam-tracer");
@@ -62,10 +64,18 @@ main(int argc, char* argv[])
     std::string inputFileNameWithPath =
         Singleton<SatEnvVariables>::Get()->LocateDirectory("contrib/satellite/examples") +
         "/generic-input-attributes.xml";
-    std::string mobileUtTraceFile("");
+    std::string mobileUtTraceFile = "";
+    // mobileUtTraceFile = Singleton<SatEnvVariables>::Get()->LocateDataDirectory() +
+    //                     "/additional-input/utpositions/mobiles/scenario6/trajectory";
+
+    Config::SetDefault("ns3::SatConf::ForwardLinkRegenerationMode",
+                       EnumValue(SatEnums::REGENERATION_NETWORK));
+    Config::SetDefault("ns3::SatConf::ReturnLinkRegenerationMode",
+                       EnumValue(SatEnums::REGENERATION_NETWORK));
 
     Ptr<SimulationHelper> simulationHelper =
         CreateObject<SimulationHelper>("sat-mobility-position-generator");
+    simulationHelper->EnableProgressLogs();
     simulationHelper->DisableAllCapacityAssignmentCategories();
     simulationHelper->EnableCrdsa();
 
@@ -75,46 +85,60 @@ main(int argc, char* argv[])
     simulationHelper->AddDefaultUiArguments(cmd, inputFileNameWithPath);
     cmd.Parse(argc, argv);
     simulationHelper->ReadInputAttributesFromFile(inputFileNameWithPath);
+    simulationHelper->SetSimulationTime(Seconds(100));
+
+    simulationHelper->SetUserCountPerUt(1);
+
+    simulationHelper->LoadScenario("constellation-eutelsat-geo-2-sats-no-isls");
 
     if (mobileUtTraceFile != "")
     {
-        Ptr<SatHelper> satHelper = CreateObject<SatHelper>();
+        Ptr<SatHelper> satHelper =
+            simulationHelper->CreateSatScenario(SatHelper::FULL, mobileUtTraceFile);
         satMobility =
             satHelper->GetBeamHelper()->GetGeoSatNodes().Get(0)->GetObject<SatMobilityModel>();
-        Ptr<Node> node = satHelper->LoadMobileUtFromFile(0, mobileUtTraceFile);
-        node->GetObject<SatMobilityModel>()->TraceConnect("SatCourseChange",
-                                                          "BeamTracer",
-                                                          MakeCallback(SatCourseChange));
 
-        Ptr<SimulationHelperConf> simulationConf = CreateObject<SimulationHelperConf>();
-        Simulator::Stop(simulationConf->m_simTime);
-        Simulator::Run();
+        uint32_t satNb = satHelper->GeoSatNodes().GetN();
+        for (uint32_t i = 0; i < satNb; i++)
+        {
+            Ptr<Node> node = satHelper->LoadMobileUtFromFile(mobileUtTraceFile);
+            DynamicCast<SatTracedMobilityModel>(node->GetObject<SatMobilityModel>())->SetSatId(i);
+            node->GetObject<SatMobilityModel>()->TraceConnect("SatCourseChange",
+                                                              "BeamTracer",
+                                                              MakeCallback(SatCourseChange));
+        }
+
+        simulationHelper->RunSimulation();
         Simulator::Destroy();
 
         std::cout << "Visited beams are:";
-        for (auto& beam : visitedBeams)
+        for (std::pair<uint32_t, uint32_t> satAndBeam : visitedBeams)
         {
-            std::cout << " " << beam;
+            std::cout << " (" << satAndBeam.first << ", " << satAndBeam.second << ")";
         }
         std::cout << std::endl;
 
-        double minSpeed = 0.0, maxSpeed = 0.0, totalSpeed = 0.0;
-        uint32_t valuesCount = 0;
-        for (double& speed : relativeSpeeds)
+        for (uint32_t satId = 0; satId < satNb; satId++)
         {
-            if (!minSpeed)
+            double minSpeed = 0.0, maxSpeed = 0.0, totalSpeed = 0.0;
+            uint32_t valuesCount = 0;
+            for (double& speed : relativeSpeeds[satId])
             {
-                minSpeed = speed;
+                if (!minSpeed)
+                {
+                    minSpeed = speed;
+                }
+                if (speed)
+                {
+                    minSpeed = std::min(minSpeed, speed);
+                    maxSpeed = std::max(maxSpeed, speed);
+                    totalSpeed += speed;
+                    ++valuesCount;
+                }
             }
-            if (speed)
-            {
-                minSpeed = std::min(minSpeed, speed);
-                maxSpeed = std::max(maxSpeed, speed);
-                totalSpeed += speed;
-                ++valuesCount;
-            }
+            std::cout << "Speeding stats (m/s) for  satellite " << satId << ":\n\tmin: " << minSpeed
+                      << "\n\tmax: " << maxSpeed << "\n\tmean: " << totalSpeed / valuesCount
+                      << std::endl;
         }
-        std::cout << "Speeding stats (m/s):\n\tmin: " << minSpeed << "\n\tmax: " << maxSpeed
-                  << "\n\tmean: " << totalSpeed / valuesCount << std::endl;
     }
 }

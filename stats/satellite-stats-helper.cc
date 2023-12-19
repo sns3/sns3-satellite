@@ -1070,4 +1070,50 @@ SatStatsHelper::GetSatSatGeoNetDevice(Ptr<Node> satNode)
     return dev;
 }
 
+void
+SatStatsHelper::SaveAddressAndIdentifier(Ptr<Node> utNode)
+{
+    NS_LOG_FUNCTION(this << utNode->GetId());
+
+    const SatIdMapper* satIdMapper = Singleton<SatIdMapper>::Get();
+    const Address addr = satIdMapper->GetUtMacWithNode(utNode);
+
+    if (addr.IsInvalid())
+    {
+        NS_LOG_WARN(this << " Node " << utNode->GetId() << " is not a valid UT");
+    }
+    else
+    {
+        const uint32_t identifier = GetIdentifierForUt(utNode);
+        m_identifierMap[addr] = identifier;
+        NS_LOG_INFO(this << " associated address " << addr << " with identifier " << identifier);
+    }
+}
+
+void
+SatStatsHelper::UpdateAddressAndIdentifier(Ptr<Node> utNode)
+{
+    NS_LOG_FUNCTION(this << utNode->GetId());
+
+    const SatIdMapper* satIdMapper = Singleton<SatIdMapper>::Get();
+    const Address addr = satIdMapper->GetUtMacWithNode(utNode);
+
+    if (addr.IsInvalid())
+    {
+        NS_LOG_WARN(this << " Node " << utNode->GetId() << " is not a valid UT");
+    }
+    else
+    {
+        const uint32_t identifier = GetIdentifierForUt(utNode);
+        m_identifierMap[addr] = identifier;
+        NS_LOG_INFO(this << " update address " << addr << " to identifier " << identifier);
+    }
+}
+
+void
+SatStatsHelper::UpdateIdentifierOnProbes()
+{
+    NS_LOG_FUNCTION(this);
+}
+
 } // end of namespace ns3

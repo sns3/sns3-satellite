@@ -66,6 +66,13 @@ class SatSGP4MobilityModel : public SatMobilityModel
     virtual ~SatSGP4MobilityModel();
 
     /**
+     * Set the simulation absolute start time in string format.
+     *
+     * \param startStr Start time of simulation, on format "YYYY-MM-DD hh:mm:ss"
+     */
+    void SetStartDate(std::string startStr);
+
+    /**
      * @brief Get the time instant considered as the simulation start.
      * @return a JulianDate object with the time considered as simulation start.
      */

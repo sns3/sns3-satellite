@@ -253,6 +253,8 @@ main(int argc, char* argv[])
     simulationHelper->SetUserCountPerUt(nbEndUsersPerUt);
     simulationHelper->SetBeams(beams);
 
+    simulationHelper->LoadScenario("geo-33E");
+
     simulationHelper->CreateSatScenario();
 
     Ptr<SatHelper> satHelper = simulationHelper->GetSatelliteHelper();

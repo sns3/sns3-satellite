@@ -145,10 +145,22 @@ SatTracedMobilityModel::UpdateGeoPositionFromFile(void)
     Simulator::Schedule(m_updateInterval, &SatTracedMobilityModel::UpdateGeoPositionFromFile, this);
 }
 
-uint32_t
-SatTracedMobilityModel::GetBestBeamId(void) const
+void
+SatTracedMobilityModel::SetSatId(uint32_t satId)
 {
-    return m_antennaGainPatterns->GetBestBeamId(m_satId, m_geoPosition, false);
+    m_satId = satId;
+}
+
+uint32_t
+SatTracedMobilityModel::GetSatId(void) const
+{
+    return m_satId;
+}
+
+uint32_t
+SatTracedMobilityModel::GetBestBeamId(bool ignoreNan) const
+{
+    return m_antennaGainPatterns->GetBestBeamId(m_satId, m_geoPosition, ignoreNan);
 }
 
 } // namespace ns3

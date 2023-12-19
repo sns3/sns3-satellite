@@ -85,6 +85,7 @@ set(source_files
     model/satellite-gw-llc.cc
     model/satellite-gw-mac.cc
     model/satellite-gw-phy.cc
+    model/satellite-handover-module.cc
     model/satellite-id-mapper.cc
     model/satellite-interference.cc
     model/satellite-interference-elimination.cc
@@ -166,7 +167,6 @@ set(source_files
     model/satellite-traced-interference.cc
     model/satellite-traced-mobility-model.cc
     model/satellite-uplink-info-tag.cc
-    model/satellite-ut-handover-module.cc
     model/satellite-ut-llc.cc
     model/satellite-ut-mac.cc
     model/satellite-ut-mac-state.cc
@@ -191,6 +191,8 @@ set(source_files
     helper/satellite-geo-helper.cc
     helper/satellite-group-helper.cc
     helper/satellite-gw-helper.cc
+    helper/satellite-gw-helper-dvb.cc
+    helper/satellite-gw-helper-lora.cc
     helper/satellite-helper.cc
     helper/satellite-isl-arbiter-unicast-helper.cc
     helper/satellite-lora-conf.cc
@@ -199,6 +201,8 @@ set(source_files
     helper/satellite-traffic-helper.cc
     helper/satellite-user-helper.cc
     helper/satellite-ut-helper.cc
+    helper/satellite-ut-helper-dvb.cc
+    helper/satellite-ut-helper-lora.cc
     helper/simulation-helper.cc
     stats/satellite-frame-symbol-load-probe.cc
     stats/satellite-frame-user-load-probe.cc
@@ -326,6 +330,7 @@ set(header_files
     model/satellite-gw-llc.h
     model/satellite-gw-mac.h
     model/satellite-gw-phy.h
+    model/satellite-handover-module.h
     model/satellite-id-mapper.h
     model/satellite-interference-elimination.h
     model/satellite-interference.h
@@ -408,7 +413,6 @@ set(header_files
     model/satellite-traced-mobility-model.h
     model/satellite-typedefs.h
     model/satellite-uplink-info-tag.h
-    model/satellite-ut-handover-module.h
     model/satellite-utils.h
     model/satellite-ut-llc.h
     model/satellite-ut-mac.h
@@ -434,6 +438,8 @@ set(header_files
     helper/satellite-geo-helper.h
     helper/satellite-group-helper.h
     helper/satellite-gw-helper.h
+    helper/satellite-gw-helper-dvb.h
+    helper/satellite-gw-helper-lora.h
     helper/satellite-helper.h
     helper/satellite-isl-arbiter-unicast-helper.h
     helper/satellite-lora-conf.h
@@ -442,6 +448,8 @@ set(header_files
     helper/satellite-traffic-helper.h
     helper/satellite-user-helper.h
     helper/satellite-ut-helper.h
+    helper/satellite-ut-helper-dvb.h
+    helper/satellite-ut-helper-lora.h
     helper/simulation-helper.h
     stats/satellite-frame-symbol-load-probe.h
     stats/satellite-frame-user-load-probe.h
@@ -492,6 +500,7 @@ set(test_sources
     test/satellite-fading-external-input-trace-test.cc
     test/satellite-frame-allocator-test.cc
     test/satellite-fsl-test.cc
+    test/satellite-handover-test.cc
     test/satellite-geo-coordinate-test.cc
     test/satellite-gse-test.cc
     test/satellite-interference-test.cc

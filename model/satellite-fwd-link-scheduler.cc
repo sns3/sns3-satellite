@@ -282,6 +282,14 @@ SatFwdLinkScheduler::SetDummyFrameSendingEnabled(bool dummyFrameSendingEnabled)
 }
 
 void
+SatFwdLinkScheduler::ClearAllPackets()
+{
+    NS_LOG_FUNCTION(this);
+
+    NS_FATAL_ERROR("Must use subclasses");
+}
+
+void
 SatFwdLinkScheduler::PeriodicTimerExpired()
 {
     NS_FATAL_ERROR("SatFwdLinkScheduler::ScheduleBbFrames: should not be here");

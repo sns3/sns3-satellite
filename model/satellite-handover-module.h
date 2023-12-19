@@ -18,12 +18,14 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
-#ifndef SATELLITE_UT_HANDOVER_MODULE_H
-#define SATELLITE_UT_HANDOVER_MODULE_H
+#ifndef SATELLITE_HANDOVER_MODULE_H
+#define SATELLITE_HANDOVER_MODULE_H
 
 #include "satellite-antenna-gain-pattern-container.h"
 
 #include <ns3/callback.h>
+#include <ns3/node-container.h>
+#include <ns3/node.h>
 #include <ns3/nstime.h>
 #include <ns3/object.h>
 #include <ns3/ptr.h>
@@ -35,14 +37,20 @@ namespace ns3
  * \ingroup satellite
  * \brief UT handover module
  */
-class SatUtHandoverModule : public Object
+class SatHandoverModule : public Object
 {
   public:
+    typedef enum
+    {
+        SAT_N_CLOSEST_SAT,
+    } HandoverDecisionAlgorithm_t;
+
     /**
      * \brief Handover recommendation message sending callback
+     * \param uint32_t The satellite ID this UT want to change to
      * \param uint32_t The beam ID this UT want to change to
      */
-    typedef Callback<void, uint32_t> HandoverRequestCallback;
+    typedef Callback<void, uint32_t, uint32_t> HandoverRequestCallback;
 
     /**
      * Derived from Object
@@ -62,30 +70,45 @@ class SatUtHandoverModule : public Object
     /**
      * Default constructor, which is not used.
      */
-    SatUtHandoverModule();
+    SatHandoverModule();
 
     /**
-     * Construct a SatUtHandoverModule
+     * Construct a SatHandoverModule
+     * \param node The UT node linked to this module
+     * \param satellites The list of satellites used in the scenario
      * \param agpContainer the antenna gain patterns of the simulation
      */
-    SatUtHandoverModule(Ptr<SatAntennaGainPatternContainer> agpContainer);
+    SatHandoverModule(Ptr<Node> utNode,
+                      NodeContainer satellites,
+                      Ptr<SatAntennaGainPatternContainer> agpContainer);
 
     /**
-     * Destroy a SatUtHandoverModule
+     * Destroy a SatHandoverModule
      */
-    ~SatUtHandoverModule();
+    ~SatHandoverModule();
 
     /**
      * \brief Set the handover recommendation message sending callback.
      * \param cb callback to send handover recommendation messages
      */
-    void SetHandoverRequestCallback(SatUtHandoverModule::HandoverRequestCallback cb);
+    void SetHandoverRequestCallback(SatHandoverModule::HandoverRequestCallback cb);
+
+    /**
+     * \brief Get the best sat ID
+     * \return The best sat ID
+     */
+    uint32_t GetAskedSatId();
 
     /**
      * \brief Get the best beam ID
      * \return The best beam ID
      */
     uint32_t GetAskedBeamId();
+
+    /**
+     * \brief Method to call when a handover has been performed.
+     */
+    void HandoverFinished();
 
     /**
      * \brief Inspect whether or not the given beam is still suitable for
@@ -97,13 +120,42 @@ class SatUtHandoverModule : public Object
     bool CheckForHandoverRecommendation(uint32_t satId, uint32_t beamId);
 
   private:
+    /**
+     * Get the N closest satellites to the UT node
+     *
+     * \param numberOfSats Number of satellites to get
+     * \return Closest satellites IDs
+     */
+    std::vector<uint32_t> GetNClosestSats(uint32_t numberOfSats);
+
+    /**
+     * Handover algorithm choosing best beam between N closest satellites
+     *
+     * \param coords Coordiantes of UT
+     * \return A pair containing satellite ID and beam ID
+     */
+    std::pair<uint32_t, uint32_t> AlgorithmNClosest(GeoCoordinate coords);
+
+    /**
+     * Algorithm used to detect if handover is needed
+     */
+    HandoverDecisionAlgorithm_t m_handoverDecisionAlgorithm;
+
+    /**
+     * Number of satellites to consider when using algorithm SAT_N_CLOSEST_SAT
+     */
+    uint32_t m_numberClosestSats;
+
     HandoverRequestCallback m_handoverCallback;
 
+    Ptr<Node> m_utNode;
+    NodeContainer m_satellites;
     Ptr<SatAntennaGainPatternContainer> m_antennaGainPatterns;
 
     Time m_lastMessageSentAt;
     Time m_repeatRequestTimeout;
     bool m_hasPendingRequest;
+    uint32_t m_askedSatId;
     uint32_t m_askedBeamId;
 
     TracedCallback<double> m_antennaGainTrace;
@@ -111,4 +163,4 @@ class SatUtHandoverModule : public Object
 
 } // namespace ns3
 
-#endif /* SATELLITE_UT_HANDOVER_MODULE_H */
+#endif /* SATELLITE_HANDOVER_MODULE_H */

@@ -275,7 +275,8 @@ SatBeamScheduler::GetTypeId(void)
 }
 
 SatBeamScheduler::SatBeamScheduler()
-    : m_beamId(0),
+    : m_satId(0),
+      m_beamId(0),
       m_superframeSeq(0),
       m_superFrameCounter(0),
       m_txCallback(),
@@ -337,24 +338,34 @@ SatBeamScheduler::SendToSatellite(Ptr<SatControlMessage> msg, Address satelliteM
 void
 SatBeamScheduler::SetSendTbtpCallback(SendTbtpCallback cb)
 {
+    NS_LOG_FUNCTION(this << &cb);
+
     m_txTbtpCallback = cb;
 }
 
 void
-SatBeamScheduler::Initialize(uint32_t beamId,
+SatBeamScheduler::Initialize(uint32_t satId,
+                             uint32_t beamId,
+                             Ptr<SatNetDevice> gwNetDevice,
+                             Ptr<SatGeoNetDevice> geoNetDevice,
                              SatBeamScheduler::SendCtrlMsgCallback cb,
                              Ptr<SatSuperframeSeq> seq,
                              uint32_t maxFrameSizeInBytes,
+                             Address satAddress,
                              Address gwAddress)
 {
     NS_LOG_FUNCTION(this << beamId << &cb);
 
     m_satelliteCnoEstimator = CreateCnoEstimator();
 
+    m_satId = satId;
     m_beamId = beamId;
+    m_gwMac = DynamicCast<SatGwMac>(gwNetDevice->GetMac());
+    m_geoNetDevice = geoNetDevice;
     m_txCallback = cb;
     m_superframeSeq = seq;
     m_maxBbFrameSize = maxFrameSizeInBytes;
+    m_satAddress = satAddress;
     m_gwAddress = gwAddress;
 
     /**
@@ -525,6 +536,14 @@ SatBeamScheduler::HasUt(Address utId)
 
     UtInfoMap_t::iterator result = m_utInfos.find(utId);
     return result != m_utInfos.end();
+}
+
+bool
+SatBeamScheduler::HasUt()
+{
+    NS_LOG_FUNCTION(this);
+
+    return !m_utInfos.empty();
 }
 
 void
@@ -950,7 +969,7 @@ SatBeamScheduler::UpdateDamaEntriesWithAllocs(
 void
 SatBeamScheduler::TransferUtToBeam(Address utId, Ptr<SatBeamScheduler> destination)
 {
-    NS_LOG_FUNCTION(this << utId << destination->m_beamId);
+    NS_LOG_FUNCTION(this << utId << destination->m_satId << destination->m_beamId);
 
     UtInfoMap_t::iterator utIterator = m_utInfos.find(utId);
     if (utIterator == m_utInfos.end())
@@ -973,7 +992,8 @@ SatBeamScheduler::TransferUtToBeam(Address utId, Ptr<SatBeamScheduler> destinati
             break;
         }
         case CHECK_GATEWAY: {
-            if (m_gwAddress != destination->m_gwAddress)
+            if (m_satAddress != destination->m_satAddress ||
+                m_gwAddress != destination->m_gwAddress)
             {
                 utInfo->ClearCrMsgs();
             }
@@ -983,6 +1003,40 @@ SatBeamScheduler::TransferUtToBeam(Address utId, Ptr<SatBeamScheduler> destinati
             NS_FATAL_ERROR("Unknown handover strategy");
         }
     }
+}
+
+void
+SatBeamScheduler::ConnectUt(Mac48Address address)
+{
+    NS_LOG_FUNCTION(this << address);
+
+    m_geoNetDevice->ConnectUt(address, m_beamId);
+    m_gwMac->ConnectUt(address);
+}
+
+void
+SatBeamScheduler::DisconnectUt(Mac48Address address)
+{
+    NS_LOG_FUNCTION(this << address);
+
+    m_geoNetDevice->DisconnectUt(address, m_beamId);
+    m_gwMac->DisconnectUt(address);
+}
+
+void
+SatBeamScheduler::ConnectGw(Mac48Address address)
+{
+    NS_LOG_FUNCTION(this << address);
+
+    m_geoNetDevice->ConnectGw(address, m_beamId);
+}
+
+void
+SatBeamScheduler::DisconnectGw(Mac48Address address)
+{
+    NS_LOG_FUNCTION(this << address);
+
+    m_geoNetDevice->DisconnectGw(address, m_beamId);
 }
 
 void
@@ -1007,7 +1061,9 @@ SatBeamScheduler::CreateTimu() const
     NS_LOG_FUNCTION(this);
 
     Ptr<SatTimuMessage> timuMsg = CreateObject<SatTimuMessage>();
+    timuMsg->SetAllocatedSatId(m_satId);
     timuMsg->SetAllocatedBeamId(m_beamId);
+    timuMsg->SetSatAddress(m_satAddress);
     timuMsg->SetGwAddress(m_gwAddress);
     return timuMsg;
 }

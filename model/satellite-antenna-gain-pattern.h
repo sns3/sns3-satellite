@@ -109,6 +109,22 @@ class SatAntennaGainPattern : public Object
                             double& lonOffset,
                             Ptr<SatMobilityModel> mobility) const;
 
+    /**
+     * Get latitude of this beam with best gain, based on satellite given in mobility model.
+     *
+     * \param mobility The mobility model of the associated satellite
+     * \return Latitude with best gain.
+     */
+    double GetCenterLatitude(Ptr<SatMobilityModel> mobility) const;
+
+    /**
+     * Get latitude of this beam with best gain, based on satellite given in mobility model.
+     *
+     * \param mobility The mobility model of the associated satellite
+     * \return Longitude with best gain.
+     */
+    double GetCenterLongitude(Ptr<SatMobilityModel> mobility) const;
+
   private:
     /**
      * \brief Read the antenna gain pattern from a file
@@ -150,6 +166,16 @@ class SatAntennaGainPattern : public Object
      * All valid latitudes from the file
      */
     std::vector<double> m_longitudes;
+
+    /**
+     * Latitude with best gain
+     */
+    double m_centerLatitude;
+
+    /**
+     * Longitude with best gain
+     */
+    double m_centerLongitude;
 
     /**
      * Minimum latitude value of the antenna gain pattern

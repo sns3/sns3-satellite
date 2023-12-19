@@ -54,6 +54,8 @@ main(int argc, char* argv[])
     simulationHelper->DisableAllCapacityAssignmentCategories();
     simulationHelper->EnableCrdsa();
 
+    simulationHelper->LoadScenario("geo-33E");
+
     // Parse command-line and XML file
     CommandLine cmd;
     cmd.AddValue("PosCount", "Amount of positions to generate per beam", posCount);

@@ -47,7 +47,8 @@ SatLinkResults::SatLinkResults()
     : m_isInitialized(false)
 {
     std::string dataPath = Singleton<SatEnvVariables>::Get()->GetDataPath();
-    m_inputPath = Singleton<SatEnvVariables>::Get()->LocateDirectory(dataPath + "/linkresults/");
+    m_inputPath = Singleton<SatEnvVariables>::Get()->LocateDirectory(
+        dataPath + "/additional-input/linkresults/");
 }
 
 TypeId

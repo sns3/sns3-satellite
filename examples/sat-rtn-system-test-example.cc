@@ -353,6 +353,8 @@ main(int argc, char* argv[])
     simulationHelper->SetBeamSet({beamId});
     simulationHelper->SetSimulationTime(simLength);
 
+    simulationHelper->LoadScenario("geo-33E");
+
     // Create satellite scenario
     simulationHelper->CreateSatScenario();
 

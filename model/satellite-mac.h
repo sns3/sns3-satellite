@@ -22,6 +22,7 @@
 #define SAT_MAC_H
 
 #include "satellite-control-message.h"
+#include "satellite-handover-module.h"
 #include "satellite-node-info.h"
 #include "satellite-phy.h"
 #include "satellite-queue.h"
@@ -39,6 +40,7 @@ namespace ns3
 {
 
 class Packet;
+class SatBeamScheduler;
 
 /**
  * \ingroup satellite
@@ -102,6 +104,24 @@ class SatMac : public Object
     }
 
     /**
+     * \brief Set sat ID of the object
+     * \param satId sat ID
+     */
+    inline void SetSatId(uint32_t satId)
+    {
+        m_satId = satId;
+    }
+
+    /**
+     * \brief Set beam ID of the object
+     * \param beamId beam ID
+     */
+    inline void SetBeamId(uint32_t beamId)
+    {
+        m_beamId = beamId;
+    }
+
+    /**
      * \brief Get MAC address
      * \return The MAC address
      */
@@ -109,6 +129,13 @@ class SatMac : public Object
     {
         return m_nodeInfo->GetMacAddress();
     }
+
+    /**
+     * \brief Set the handover module
+     *
+     * \param handoverModule The handover module
+     */
+    void SetHandoverModule(Ptr<SatHandoverModule> handoverModule);
 
     /**
      * \brief Callback to send packet to lower layer.
@@ -178,6 +205,16 @@ class SatMac : public Object
     typedef Callback<uint32_t, uint32_t> SendCtrlMsgCallback;
 
     /**
+     * Callback to get the SatBeamScheduler from the beam ID for handover
+     */
+    typedef Callback<Ptr<SatBeamScheduler>, uint32_t, uint32_t> BeamSchedulerCallback;
+
+    /**
+     * \brief Callback to update ISL routes when handovers are performed.
+     */
+    typedef Callback<void> UpdateIslCallback;
+
+    /**
      * \brief Method to set read control message callback.
      * \param cb callback to invoke whenever a control message is wanted to read.
      */
@@ -195,6 +232,18 @@ class SatMac : public Object
      * \param cb callback to invoke whenever a control message is wanted to sent.
      */
     void SetSendCtrlCallback(SatMac::SendCtrlMsgCallback cb);
+
+    /**
+     * \brief Set the beam scheduler callback
+     * \param cb Callback to get the SatBeamScheduler
+     */
+    void SetBeamSchedulerCallback(SatMac::BeamSchedulerCallback cb);
+
+    /**
+     * \brief Method to set update ISL callback.
+     * \param cb callback to invoke whenever ISL routes need to be updated.
+     */
+    void SetUpdateIslCallback(SatMac::UpdateIslCallback cb);
 
     /**
      * \brief Callback to update routing and ARP tables after handover
@@ -322,6 +371,16 @@ class SatMac : public Object
     SatMac::SendCtrlMsgCallback m_sendCtrlCallback;
 
     /**
+     * Callback to get the SatBeamScheduler linked to a beam ID
+     */
+    SatMac::BeamSchedulerCallback m_beamSchedulerCallback;
+
+    /**
+     * The update ISL routes callback.
+     */
+    SatMac::UpdateIslCallback m_updateIslCallback;
+
+    /**
      * `EnableStatisticsTags` attribute.
      */
     bool m_isStatisticsTagsEnabled;
@@ -401,6 +460,11 @@ class SatMac : public Object
      * The ID of the beam where mac belongs.
      */
     uint32_t m_beamId;
+
+    /**
+     * Module used to perform handovers
+     */
+    Ptr<SatHandoverModule> m_handoverModule;
 
     /**
      * Flag indicating whether the MAC is enabled, i.e. it is capable/allowed to

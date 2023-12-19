@@ -31,8 +31,8 @@
 #include <ns3/node-container.h>
 #include <ns3/nstime.h>
 #include <ns3/probe.h>
+#include <ns3/satellite-handover-module.h>
 #include <ns3/satellite-helper.h>
-#include <ns3/satellite-ut-handover-module.h>
 #include <ns3/scalar-collector.h>
 #include <ns3/singleton.h>
 #include <ns3/string.h>
@@ -463,7 +463,7 @@ SatStatsAntennaGainHelper::InstallProbes()
     NodeContainer utUsers = GetSatHelper()->GetBeamHelper()->GetUtNodes();
     for (NodeContainer::Iterator it = utUsers.Begin(); it != utUsers.End(); ++it)
     {
-        Ptr<SatUtHandoverModule> hoModule = (*it)->GetObject<SatUtHandoverModule>();
+        Ptr<SatHandoverModule> hoModule = (*it)->GetObject<SatHandoverModule>();
         if (!hoModule)
         {
             NS_LOG_INFO("UT " << *it << " does not check for antenna gain, bailing out.");

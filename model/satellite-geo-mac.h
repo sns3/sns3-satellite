@@ -21,6 +21,7 @@
 #ifndef SATELLITE_GEO_MAC_H
 #define SATELLITE_GEO_MAC_H
 
+#include "satellite-beam-scheduler.h"
 #include "satellite-fwd-link-scheduler.h"
 #include "satellite-geo-user-llc.h"
 #include "satellite-mac.h"
@@ -115,6 +116,38 @@ class SatGeoMac : public SatMac
 
     void SetReceiveNetDeviceCallback(SatGeoMac::ReceiveNetDeviceCallback cb);
 
+    /**
+     * Callback to get the SatBeamScheduler from the beam ID for handover
+     */
+    typedef Callback<Ptr<SatBeamScheduler>, uint32_t, uint32_t> BeamSchedulerCallback;
+
+    /**
+     * \brief Set the beam scheduler callback
+     * \param cb Callback to get the SatBeamScheduler
+     */
+    void SetBeamSchedulerCallback(SatGeoMac::BeamSchedulerCallback cb);
+
+    /**
+     * Stop periodic transmission, until a pacquet in enqued.
+     */
+    virtual void StopPeriodicTransmissions();
+
+    /**
+     * Add a remote peer to this MAC
+     *
+     * \param address The MAC address of the peer
+     * \return True if the peer has been added, false otherwise
+     */
+    virtual bool AddPeer(Mac48Address address) = 0;
+
+    /**
+     * Remove a remote peer from this MAC
+     *
+     * \param address The MAC address of the peer
+     * \return True if the peer has been removed, false otherwise
+     */
+    virtual bool RemovePeer(Mac48Address address) = 0;
+
   protected:
     /**
      * Start sending a Packet Down the Wire.
@@ -166,6 +199,19 @@ class SatGeoMac : public SatMac
     virtual Address GetRxUtAddress(Ptr<Packet> packet) = 0;
 
     /**
+     * Indicates if at least one device is connected in this beam.
+     *
+     * \return True if at least a device is connected, false otherwise
+     */
+    virtual bool HasPeer() = 0;
+
+    /**
+     * If true, the periodic calls of StartTransmission are not called when no
+     * devices are connected to this MAC
+     */
+    bool m_disableSchedulingIfNoDeviceConnected;
+
+    /**
      * Scheduler for the forward link.
      */
     Ptr<SatFwdLinkScheduler> m_fwdScheduler;
@@ -198,6 +244,11 @@ class SatGeoMac : public SatMac
 
     TransmitCallback m_txCallback;
     ReceiveNetDeviceCallback m_rxNetDeviceCallback;
+
+    /**
+     * Indicated if periodic transmission is enabled.
+     */
+    bool m_periodicTransmissionEnabled;
 };
 
 } // namespace ns3

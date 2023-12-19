@@ -68,6 +68,8 @@ main(int argc, char* argv[])
     sstag << simulationName << "UTs=" << utsPerBeam;
     simulationHelper->SetOutputTag(sstag.str());
 
+    simulationHelper->LoadScenario("geo-33E");
+
     // Create satellite scenario
     simulationHelper->CreateSatScenario();
 

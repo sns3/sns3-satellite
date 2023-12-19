@@ -75,7 +75,7 @@ SatGeoFeederMac::SatGeoFeederMac(uint32_t satId,
                                  SatEnums::RegenerationMode_t returnLinkRegenerationMode)
     : SatGeoMac(satId, beamId, forwardLinkRegenerationMode, returnLinkRegenerationMode)
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(this << satId << beamId);
 }
 
 SatGeoFeederMac::~SatGeoFeederMac()
@@ -100,7 +100,13 @@ SatGeoFeederMac::DoInitialize()
 void
 SatGeoFeederMac::EnquePacket(Ptr<Packet> packet)
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(this << packet);
+
+    if (!m_periodicTransmissionEnabled)
+    {
+        NS_LOG_INFO("Do not enque packet to this beam because it is disabled");
+        return;
+    }
 
     SatAddressE2ETag addressE2ETag;
     bool success = packet->PeekPacketTag(addressE2ETag);
@@ -127,6 +133,8 @@ SatGeoFeederMac::EnquePacket(Ptr<Packet> packet)
     }
 
     m_llc->Enque(packet, addressE2ETag.GetE2EDestAddress(), flowId);
+
+    m_periodicTransmissionEnabled = true;
 }
 
 void
@@ -305,6 +313,30 @@ SatGeoFeederMac::GetRxUtAddress(Ptr<Packet> packet)
     }
 
     return utAddr;
+}
+
+bool
+SatGeoFeederMac::AddPeer(Mac48Address address)
+{
+    NS_LOG_FUNCTION(this << address);
+
+    return false;
+}
+
+bool
+SatGeoFeederMac::RemovePeer(Mac48Address address)
+{
+    NS_LOG_FUNCTION(this << address);
+
+    return false;
+}
+
+bool
+SatGeoFeederMac::HasPeer()
+{
+    NS_LOG_FUNCTION(this);
+
+    return true;
 }
 
 } // namespace ns3

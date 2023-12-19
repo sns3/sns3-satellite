@@ -67,6 +67,12 @@ class SatMobilityModel : public MobilityModel
      */
     void SetGeoPosition(const GeoCoordinate& position);
 
+    /**
+     * \param position a reference to another mobility model
+     * \return the distance between the two objects. Unit is meters.
+     */
+    double GetDistanceFrom(Ptr<const SatMobilityModel> position) const;
+
     void NotifyGeoCourseChange(void) const;
 
     /**

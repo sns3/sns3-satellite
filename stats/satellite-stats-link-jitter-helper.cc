@@ -450,26 +450,6 @@ SatStatsLinkJitterHelper::RxLinkJitterCallback(const Time& jitter, const Address
     }
 }
 
-void
-SatStatsLinkJitterHelper::SaveAddressAndIdentifier(Ptr<Node> utNode)
-{
-    NS_LOG_FUNCTION(this << utNode->GetId());
-
-    const SatIdMapper* satIdMapper = Singleton<SatIdMapper>::Get();
-    const Address addr = satIdMapper->GetUtMacWithNode(utNode);
-
-    if (addr.IsInvalid())
-    {
-        NS_LOG_WARN(this << " Node " << utNode->GetId() << " is not a valid UT");
-    }
-    else
-    {
-        const uint32_t identifier = GetIdentifierForUt(utNode);
-        m_identifierMap[addr] = identifier;
-        NS_LOG_INFO(this << " associated address " << addr << " with identifier " << identifier);
-    }
-}
-
 bool
 SatStatsLinkJitterHelper::ConnectProbeToCollector(Ptr<Probe> probe, uint32_t identifier)
 {
@@ -530,6 +510,72 @@ SatStatsLinkJitterHelper::ConnectProbeToCollector(Ptr<Probe> probe, uint32_t ide
     else
     {
         NS_LOG_WARN(this << " unable to connect probe " << probe->GetName() << " to collector "
+                         << identifier);
+    }
+
+    return ret;
+}
+
+bool
+SatStatsLinkJitterHelper::DisconnectProbeFromCollector(Ptr<Probe> probe, uint32_t identifier)
+{
+    NS_LOG_FUNCTION(this << probe << probe->GetName() << identifier);
+
+    bool ret = false;
+    switch (GetOutputType())
+    {
+    case SatStatsHelper::OUTPUT_SCALAR_FILE:
+    case SatStatsHelper::OUTPUT_SCALAR_PLOT:
+        ret = m_terminalCollectors.DisconnectWithProbe(probe,
+                                                       "OutputSeconds",
+                                                       identifier,
+                                                       &ScalarCollector::TraceSinkDouble);
+        break;
+
+    case SatStatsHelper::OUTPUT_SCATTER_FILE:
+    case SatStatsHelper::OUTPUT_SCATTER_PLOT:
+        ret = m_terminalCollectors.DisconnectWithProbe(probe,
+                                                       "OutputSeconds",
+                                                       identifier,
+                                                       &UnitConversionCollector::TraceSinkDouble);
+        break;
+
+    case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
+    case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
+    case SatStatsHelper::OUTPUT_PDF_FILE:
+    case SatStatsHelper::OUTPUT_PDF_PLOT:
+    case SatStatsHelper::OUTPUT_CDF_FILE:
+    case SatStatsHelper::OUTPUT_CDF_PLOT:
+        if (m_averagingMode)
+        {
+            ret = m_terminalCollectors.DisconnectWithProbe(probe,
+                                                           "OutputSeconds",
+                                                           identifier,
+                                                           &ScalarCollector::TraceSinkDouble);
+        }
+        else
+        {
+            ret = m_terminalCollectors.DisconnectWithProbe(probe,
+                                                           "OutputSeconds",
+                                                           identifier,
+                                                           &DistributionCollector::TraceSinkDouble);
+        }
+        break;
+
+    default:
+        NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
+                       << " is not a valid output type for this statistics.");
+        break;
+    }
+
+    if (ret)
+    {
+        NS_LOG_INFO(this << " probe " << probe->GetName() << ", disconnected from collector "
+                         << identifier);
+    }
+    else
+    {
+        NS_LOG_WARN(this << " unable to disconnect probe " << probe->GetName() << " from collector "
                          << identifier);
     }
 
@@ -742,7 +788,8 @@ SatStatsFwdUserDevLinkJitterHelper::DoInstallProbes()
         if (probe->ConnectByObject("RxLinkJitter", satDev) &&
             ConnectProbeToCollector(probe, identifier))
         {
-            m_probes.push_back(probe->GetObject<Probe>());
+            m_probes.insert(
+                std::make_pair(probe->GetObject<Probe>(), std::make_pair(*it, identifier)));
 
             // Enable statistics-related tags and trace sources on the device.
             satDev->SetAttribute("EnableStatisticsTags", BooleanValue(true));
@@ -771,6 +818,35 @@ SatStatsFwdUserDevLinkJitterHelper::DoInstallProbes()
     }
 
 } // end of `void DoInstallProbes ();`
+
+void
+SatStatsFwdUserDevLinkJitterHelper::UpdateIdentifierOnProbes()
+{
+    NS_LOG_FUNCTION(this);
+
+    std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>>::iterator it;
+
+    for (it = m_probes.begin(); it != m_probes.end(); it++)
+    {
+        Ptr<Probe> probe = it->first;
+        Ptr<Node> node = it->second.first;
+        uint32_t identifier = it->second.second;
+
+        if (!DisconnectProbeFromCollector(probe, identifier))
+        {
+            NS_FATAL_ERROR("Error disconnecting trace file on handover");
+        }
+
+        identifier = GetIdentifierForUtUser(node);
+
+        if (!ConnectProbeToCollector(probe, identifier))
+        {
+            NS_FATAL_ERROR("Error connecting trace file on handover");
+        }
+
+        it->second.second = identifier;
+    }
+} // end of `void UpdateIdentifierOnProbes ();`
 
 // FORWARD FEEDER LINK MAC-LEVEL /////////////////////////////////////////////////////
 
@@ -968,7 +1044,8 @@ SatStatsFwdUserMacLinkJitterHelper::DoInstallProbes()
         if (probe->ConnectByObject("RxLinkJitter", satMac) &&
             ConnectProbeToCollector(probe, identifier))
         {
-            m_probes.push_back(probe->GetObject<Probe>());
+            m_probes.insert(
+                std::make_pair(probe->GetObject<Probe>(), std::make_pair(*it, identifier)));
 
             // Enable statistics-related tags and trace sources on the device.
             satDev->SetAttribute("EnableStatisticsTags", BooleanValue(true));
@@ -1001,6 +1078,35 @@ SatStatsFwdUserMacLinkJitterHelper::DoInstallProbes()
     }
 
 } // end of `void DoInstallProbes ();`
+
+void
+SatStatsFwdUserMacLinkJitterHelper::UpdateIdentifierOnProbes()
+{
+    NS_LOG_FUNCTION(this);
+
+    std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>>::iterator it;
+
+    for (it = m_probes.begin(); it != m_probes.end(); it++)
+    {
+        Ptr<Probe> probe = it->first;
+        Ptr<Node> node = it->second.first;
+        uint32_t identifier = it->second.second;
+
+        if (!DisconnectProbeFromCollector(probe, identifier))
+        {
+            NS_FATAL_ERROR("Error disconnecting trace file on handover");
+        }
+
+        identifier = GetIdentifierForUtUser(node);
+
+        if (!ConnectProbeToCollector(probe, identifier))
+        {
+            NS_FATAL_ERROR("Error connecting trace file on handover");
+        }
+
+        it->second.second = identifier;
+    }
+} // end of `void UpdateIdentifierOnProbes ();`
 
 // FORWARD FEEDER LINK PHY-LEVEL /////////////////////////////////////////////////////
 
@@ -1202,7 +1308,8 @@ SatStatsFwdUserPhyLinkJitterHelper::DoInstallProbes()
         if (probe->ConnectByObject("RxLinkJitter", satPhy) &&
             ConnectProbeToCollector(probe, identifier))
         {
-            m_probes.push_back(probe->GetObject<Probe>());
+            m_probes.insert(
+                std::make_pair(probe->GetObject<Probe>(), std::make_pair(*it, identifier)));
 
             // Enable statistics-related tags and trace sources on the device.
             satDev->SetAttribute("EnableStatisticsTags", BooleanValue(true));
@@ -1235,6 +1342,35 @@ SatStatsFwdUserPhyLinkJitterHelper::DoInstallProbes()
     }
 
 } // end of `void DoInstallProbes ();`
+
+void
+SatStatsFwdUserPhyLinkJitterHelper::UpdateIdentifierOnProbes()
+{
+    NS_LOG_FUNCTION(this);
+
+    std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>>::iterator it;
+
+    for (it = m_probes.begin(); it != m_probes.end(); it++)
+    {
+        Ptr<Probe> probe = it->first;
+        Ptr<Node> node = it->second.first;
+        uint32_t identifier = it->second.second;
+
+        if (!DisconnectProbeFromCollector(probe, identifier))
+        {
+            NS_FATAL_ERROR("Error disconnecting trace file on handover");
+        }
+
+        identifier = GetIdentifierForUtUser(node);
+
+        if (!ConnectProbeToCollector(probe, identifier))
+        {
+            NS_FATAL_ERROR("Error connecting trace file on handover");
+        }
+
+        it->second.second = identifier;
+    }
+} // end of `void UpdateIdentifierOnProbes ();`
 
 // RETURN FEEDER LINK DEV-LEVEL //////////////////////////////////////////////////////
 

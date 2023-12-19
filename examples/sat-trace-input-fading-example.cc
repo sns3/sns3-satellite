@@ -45,7 +45,7 @@ using namespace ns3;
  *         - fading trace
  *
  *         The input folder is:
- *         {NS-3-root-folder}/contrib/satellite/data/fadingtraces/input
+ *         {NS-3-root-folder}/contrib/satellite/data/additional-data/fadingtraces/input
  *
  *         The input data files must be available in the folder stated above for the example
  *         program to read, otherwise the program will fail. Trace output example can be
@@ -106,10 +106,9 @@ main(int argc, char* argv[])
 
     /// Create satellite helper with given scenario default=simple
 
-    // Creating the reference system. Note, currently the satellite module supports
-    // only one reference system, which is named as "Scenario72". The string is utilized
-    // in mapping the scenario to the needed reference system configuration files. Arbitrary
-    // scenario name results in fatal error.
+    simulationHelper->LoadScenario("geo-33E");
+
+    // Creating the reference system.
     simulationHelper->CreateSatScenario(satScenario);
 
     Config::SetDefault("ns3::CbrApplication::Interval", TimeValue(Time(interval)));

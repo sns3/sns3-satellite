@@ -65,8 +65,14 @@ SatAntennaPatternTestCase::DoRun(void)
     Singleton<SatEnvVariables>::Get()->DoInitialize();
     Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-antenna-gain-pattern", "", true);
 
+    std::cout << "SatEnvVariables::GetCurrentWorkingDirectory()"
+              << Singleton<SatEnvVariables>::Get()->GetCurrentWorkingDirectory() << std::endl;
+
     // Create antenna gain container
-    SatAntennaGainPatternContainer gpContainer;
+    SatAntennaGainPatternContainer gpContainer(
+        1,
+        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() +
+            "/scenarios/geo-33E/antennapatterns");
 
     GeoCoordinate geoPos = GeoCoordinate(0.0, 33.0, 35786000);
     Ptr<SatMobilityModel> mobility = CreateObject<SatConstantPositionMobilityModel>();

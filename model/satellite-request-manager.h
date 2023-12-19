@@ -225,9 +225,10 @@ class SatRequestManager : public Object
 
     /**
      * \brief Send a handover recommendation message to the gateway.
+     * \param satId The sat ID to switch to
      * \param beamId The beam ID to switch to
      */
-    void SendHandoverRecommendation(uint32_t beamId);
+    void SendHandoverRecommendation(uint32_t satId, uint32_t beamId);
 
     /**
      * \brief Send a logon message to the gateway.

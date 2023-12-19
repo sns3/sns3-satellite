@@ -124,6 +124,8 @@ main(int argc, char* argv[])
 
     LogComponentEnable("sat-regeneration-example", LOG_LEVEL_INFO);
 
+    simulationHelper->LoadScenario("geo-33E");
+
     Ptr<SatHelper> helper = simulationHelper->CreateSatScenario(satScenario);
 
     Config::SetDefault("ns3::CbrApplication::Interval", StringValue(interval));
