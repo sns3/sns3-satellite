@@ -34,7 +34,7 @@ There are 2 methods to download and build (S)NS-3:
 First you need to download Bake using Git, go to where you want Bake to be installed and call
 
 ```shell
-$ git clone https://gitlab.com/nsnam/bake
+$ git clone https://gitlab.com/nsnam/bake.git
 ```
 
 It is advisable to add bake to your path
@@ -60,15 +60,7 @@ and drop the following file **sns3.xml** in this **contrib** folder:
 ```xml
 <configuration>
   <modules>
-    <module name="sns3-satellite" type="ns-contrib" min_version="ns-3.40">
-      <source type="git">
-        <attribute name="url" value="https://github.com/sns3/sns3-satellite.git"/>
-        <attribute name="module_directory" value="satellite"/>
-      </source>
-      <build type="none">
-      </build>
-    </module>
-    <module name="sns3-stats" type="ns-contrib" min_version="ns-3.40">
+    <module name="sns3-stats" type="ns-contrib" min_version="ns-3.37">
       <source type="git">
         <attribute name="url" value="https://github.com/sns3/stats.git"/>
         <attribute name="module_directory" value="magister-stats"/>
@@ -76,11 +68,22 @@ and drop the following file **sns3.xml** in this **contrib** folder:
       <build type="none">
       </build>
     </module>
-    <module name="sns3-traffic" type="ns-contrib" min_version="ns-3.40">
+    <module name="sns3-traffic" type="ns-contrib" min_version="ns-3.37">
       <source type="git">
         <attribute name="url" value="https://github.com/sns3/traffic.git" />
         <attribute name="module_directory" value="traffic"/>
       </source>
+      <build type="none">
+      </build>
+    </module>
+    <module name="sns3-satellite" type="ns-contrib" min_version="ns-3.37">
+      <source type="git">
+        <attribute name="url" value="https://github.com/sns3/sns3-satellite.git"/>
+        <attribute name="module_directory" value="satellite"/>
+        <attribute name="post_download" value="cd $SRCDIR; git submodule update --init --recursive"/>
+      </source>
+      <depends_on name="sns3-stats" optional="False" />
+      <depends_on name="sns3-traffic" optional="False" />
       <build type="none">
       </build>
     </module>
