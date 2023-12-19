@@ -31,7 +31,7 @@ using namespace ns3;
  * \file sat-beam-position-tracer.cc
  * \ingroup satellite
  *
- * \brief Script used to get center of each beam at simulation start.
+ * \brief Script used to get center of each beam at simulation start and every time step.
  *
  * execute command -> ./ns3 run "sat-beam-position-tracer --PrintHelp"
  */
