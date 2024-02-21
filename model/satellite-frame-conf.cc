@@ -1216,7 +1216,7 @@ SatSuperframeConf::GetIndexAsFrameName(uint32_t index)
                       "The frame configuration type used for super frame.",                        \
                       TypeId::ATTR_CONSTRUCT,                                                      \
                       EnumValue(configType),                                                       \
-                      MakeEnumAccessor(&SatSuperframeConf::SetConfigType,                          \
+                      MakeEnumAccessor<SatSuperframeConf::ConfigType_t>(&SatSuperframeConf::SetConfigType, \
                                        &SatSuperframeConf::GetConfigType),                         \
                       MakeEnumChecker(SatSuperframeConf::CONFIG_TYPE_0,                            \
                                       "ConfigType_0",                                              \

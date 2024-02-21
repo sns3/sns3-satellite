@@ -175,8 +175,8 @@ SatCtrlMsgContDelOnTestCase::DoRun(void)
     // After simulation check that messages are what expected
 
     // ref messages created successfully
-    NS_TEST_ASSERT_MSG_EQ((crMsg == NULL), false, "CR message creation failed");
-    NS_TEST_ASSERT_MSG_EQ((tbtpMsg == NULL), false, "TBTP message failed");
+    NS_TEST_ASSERT_MSG_EQ(!crMsg, false, "CR message creation failed");
+    NS_TEST_ASSERT_MSG_EQ(!tbtpMsg, false, "TBTP message failed");
 
     // container content correct at points messages got
     NS_TEST_ASSERT_MSG_EQ((m_msgsRead[0] == crMsg), true, "first message incorrect");
@@ -278,8 +278,8 @@ SatCtrlMsgContDelOffTestCase::DoRun(void)
     // After simulation check that messages are what expected
 
     // ref messages created successfully
-    NS_TEST_ASSERT_MSG_EQ((crMsg == NULL), false, "CR message creation failed");
-    NS_TEST_ASSERT_MSG_EQ((tbtpMsg == NULL), false, "TBTP message failed");
+    NS_TEST_ASSERT_MSG_EQ(!crMsg, false, "CR message creation failed");
+    NS_TEST_ASSERT_MSG_EQ(!tbtpMsg, false, "TBTP message failed");
 
     // container content correct at points messages got
     NS_TEST_ASSERT_MSG_EQ((m_msgsRead[0] == crMsg), true, "first message incorrect");

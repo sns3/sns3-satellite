@@ -165,7 +165,7 @@ SatBaseTestCase::SendControlMsg(Ptr<SatControlMessage> msg, const Address& dest)
     if (msg->GetMsgType() == SatControlMsgTag::SAT_CR_CTRL_MSG)
     {
         Ptr<SatCrMessage> cr = DynamicCast<SatCrMessage>(msg);
-        if (cr == NULL)
+        if (!cr)
         {
             NS_FATAL_ERROR("Dynamic cast to CR message failed!");
         }

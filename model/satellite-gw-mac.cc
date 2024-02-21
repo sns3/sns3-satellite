@@ -184,7 +184,7 @@ SatGwMac::StartPeriodicTransmissions()
 
     m_periodicTransmissionEnabled = true;
 
-    if (m_fwdScheduler == NULL)
+    if (!m_fwdScheduler)
     {
         NS_FATAL_ERROR("Scheduler not set for GW MAC!!!");
     }
@@ -445,7 +445,7 @@ SatGwMac::StartTransmission(uint32_t carrierId)
         m_bbFrameTxTrace(bbFrame);
 
         // Handle both dummy frames and normal frames
-        if (bbFrame != NULL)
+        if (bbFrame)
         {
             // Add packet trace entry:
             m_packetTrace(Simulator::Now(),
@@ -572,7 +572,7 @@ SatGwMac::ReceiveSignalingPacket(Ptr<Packet> packet, uint32_t satId, uint32_t be
         uint32_t msgId = ctrlTag.GetMsgId();
         Ptr<SatCrMessage> crMsg = DynamicCast<SatCrMessage>(m_readCtrlCallback(msgId));
 
-        if (crMsg != NULL)
+        if (crMsg)
         {
             Mac48Address sourceAddress;
             switch (m_forwardLinkRegenerationMode)
@@ -621,7 +621,7 @@ SatGwMac::ReceiveSignalingPacket(Ptr<Packet> packet, uint32_t satId, uint32_t be
         Ptr<SatCnoReportMessage> cnoReport =
             DynamicCast<SatCnoReportMessage>(m_readCtrlCallback(msgId));
 
-        if (cnoReport != NULL)
+        if (cnoReport)
         {
             m_fwdScheduler->CnoInfoUpdated(addressE2ETag.GetE2ESourceAddress(),
                                            cnoReport->GetCnoEstimate());
@@ -656,7 +656,7 @@ SatGwMac::ReceiveSignalingPacket(Ptr<Packet> packet, uint32_t satId, uint32_t be
         Ptr<SatHandoverRecommendationMessage> handoverRecommendation =
             DynamicCast<SatHandoverRecommendationMessage>(m_readCtrlCallback(msgId));
 
-        if (handoverRecommendation != NULL)
+        if (handoverRecommendation)
         {
             uint32_t newSatId = handoverRecommendation->GetRecommendedSatId();
             uint32_t newBeamId = handoverRecommendation->GetRecommendedBeamId();
@@ -686,7 +686,7 @@ SatGwMac::ReceiveSignalingPacket(Ptr<Packet> packet, uint32_t satId, uint32_t be
         uint32_t msgId = ctrlTag.GetMsgId();
         Ptr<SatLogonMessage> logonMessage = DynamicCast<SatLogonMessage>(m_readCtrlCallback(msgId));
 
-        if (logonMessage != NULL)
+        if (logonMessage)
         {
             Address utId = addressE2ETag.GetE2ESourceAddress();
             Callback<void, uint32_t> raChannelCallback =

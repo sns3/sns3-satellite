@@ -187,7 +187,7 @@ SatCompositeSinrOutputTraceContainer::AddToContainer(key_t key, std::vector<doub
 
     Ptr<SatOutputFileStreamDoubleContainer> node = FindNode(key);
 
-    if (node != NULL)
+    if (node)
     {
         node->AddToContainer(newItem);
     }

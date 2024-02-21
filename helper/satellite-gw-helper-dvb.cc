@@ -343,7 +343,7 @@ SatGwHelperDvb::Install(Ptr<Node> n,
     mac->StartPeriodicTransmissions();
 
     Ptr<SatHandoverModule> handoverModule = n->GetObject<SatHandoverModule>();
-    if (handoverModule != NULL)
+    if (handoverModule)
     {
         handoverModule->SetHandoverRequestCallback(MakeCallback(&SatGwMac::ChangeBeam, mac));
         mac->SetBeamSchedulerCallback(MakeCallback(&SatNcc::GetBeamScheduler, ncc));

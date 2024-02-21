@@ -1271,7 +1271,7 @@ SatHelper::SetUtMobility(NodeContainer uts, uint32_t satId, uint32_t beamId)
     {
         allocator = m_utPositionsByBeam[beamId];
     }
-    else if (m_utPositions != NULL)
+    else if (m_utPositions)
     {
         allocator = m_utPositions;
     }
@@ -1418,8 +1418,8 @@ SatHelper::InstallMobilityObserver(uint32_t satId, NodeContainer nodes) const
             Ptr<SatMobilityModel> satMobility =
                 m_beamHelper->GetGeoSatNodes().Get(satId)->GetObject<SatMobilityModel>();
 
-            NS_ASSERT(ownMobility != NULL);
-            NS_ASSERT(satMobility != NULL);
+            NS_ASSERT(ownMobility);
+            NS_ASSERT(satMobility);
 
             observer = CreateObject<SatMobilityObserver>(
                 ownMobility,

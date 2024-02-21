@@ -196,7 +196,7 @@ SatBeamScheduler::GetTypeId(void)
             .AddAttribute("CnoEstimationMode",
                           "Mode of the C/N0 estimator",
                           EnumValue(SatCnoEstimator::LAST),
-                          MakeEnumAccessor(&SatBeamScheduler::m_cnoEstimatorMode),
+                          MakeEnumAccessor<SatCnoEstimator::EstimationMode_t>(&SatBeamScheduler::m_cnoEstimatorMode),
                           MakeEnumChecker(SatCnoEstimator::LAST,
                                           "LastValueInWindow",
                                           SatCnoEstimator::MINIMUM,
@@ -233,7 +233,7 @@ SatBeamScheduler::GetTypeId(void)
                           "Strategy used when performing handover to transfer capacity requests "
                           "and C/No informations",
                           EnumValue(SatBeamScheduler::BASIC),
-                          MakeEnumAccessor(&SatBeamScheduler::m_handoverStrategy),
+                          MakeEnumAccessor<SatBeamScheduler::HandoverInformationForward_t>(&SatBeamScheduler::m_handoverStrategy),
                           MakeEnumChecker(SatBeamScheduler::BASIC,
                                           "Basic",
                                           SatBeamScheduler::CHECK_GATEWAY,
@@ -241,7 +241,7 @@ SatBeamScheduler::GetTypeId(void)
             .AddAttribute("SuperFrameAllocatorType",
                           "Type of SuperFrameAllocator",
                           EnumValue(SatEnums::DEFAULT_SUPERFRAME_ALLOCATOR),
-                          MakeEnumAccessor(&SatBeamScheduler::m_superframeAllocatorType),
+                          MakeEnumAccessor<SatEnums::SuperframeAllocatorType_t>(&SatBeamScheduler::m_superframeAllocatorType),
                           MakeEnumChecker(SatEnums::DEFAULT_SUPERFRAME_ALLOCATOR, "Default"))
             .AddTraceSource("BacklogRequestsTrace",
                             "Trace for backlog requests done to beam scheduler.",

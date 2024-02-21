@@ -56,7 +56,7 @@ SatUserHelper::GetTypeId(void)
                           "Network used between GW and Router, and between Router and Users in "
                           "operator network",
                           EnumValue(SatUserHelper::NETWORK_TYPE_SAT_SIMPLE),
-                          MakeEnumAccessor(&SatUserHelper::m_backboneNetworkType),
+                          MakeEnumAccessor<SatUserHelper::NetworkType>(&SatUserHelper::m_backboneNetworkType),
                           MakeEnumChecker(SatUserHelper::NETWORK_TYPE_SAT_SIMPLE,
                                           "SatSimple",
                                           SatUserHelper::NETWORK_TYPE_CSMA,
@@ -64,7 +64,7 @@ SatUserHelper::GetTypeId(void)
             .AddAttribute("SubscriberNetworkType",
                           "Network used between UTs and Users in subscriber network",
                           EnumValue(SatUserHelper::NETWORK_TYPE_CSMA),
-                          MakeEnumAccessor(&SatUserHelper::m_subscriberNetworkType),
+                          MakeEnumAccessor<SatUserHelper::NetworkType>(&SatUserHelper::m_subscriberNetworkType),
                           MakeEnumChecker(SatUserHelper::NETWORK_TYPE_SAT_SIMPLE,
                                           "SatSimple",
                                           SatUserHelper::NETWORK_TYPE_CSMA,
@@ -244,7 +244,7 @@ SatUserHelper::InstallGw(NodeContainer gw, uint32_t userCount)
 
     InternetStackHelper internet;
 
-    if (m_router == NULL)
+    if (!m_router)
     {
         m_router = CreateObject<Node>();
         internet.Install(m_router);
@@ -660,7 +660,7 @@ SatUserHelper::UpdateUtRoutes(Address utAddress, Address gwAddress)
     NS_ASSERT_MSG(gwNdIterator != m_gwDevices.end(), "Unknown GW with MAC address " << gwAddress);
 
     Ptr<SatNetDevice> gwNd = DynamicCast<SatNetDevice>(gwNdIterator->second);
-    NS_ASSERT(gwNd != NULL);
+    NS_ASSERT(gwNd);
     Ipv4Address ip =
         gwNd->GetNode()->GetObject<Ipv4L3Protocol>()->GetAddress(gwNd->GetIfIndex(), 0).GetLocal();
 
@@ -673,7 +673,7 @@ SatUserHelper::UpdateUtRoutes(Address utAddress, Address gwAddress)
                   "ARP cache not found to gateway " << gwAddress);
 
     Ptr<SatNetDevice> utNd = DynamicCast<SatNetDevice>(utNdIterator->second);
-    NS_ASSERT(utNd != NULL);
+    NS_ASSERT(utNd);
     Ptr<Ipv4L3Protocol> protocol = utNd->GetNode()->GetObject<Ipv4L3Protocol>();
     uint32_t utIfIndex = utNdIterator->second->GetIfIndex();
 

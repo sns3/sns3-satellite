@@ -131,7 +131,7 @@ SatOutputFileStreamStringContainer::ResetStream()
 {
     NS_LOG_FUNCTION(this);
 
-    if (m_outputFileStreamWrapper != NULL)
+    if (m_outputFileStreamWrapper)
     {
         delete m_outputFileStreamWrapper;
         m_outputFileStreamWrapper = 0;

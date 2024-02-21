@@ -334,7 +334,7 @@ SatInputFileStreamTimeDoubleContainer::ResetStream()
 {
     NS_LOG_FUNCTION(this);
 
-    if (m_inputFileStreamWrapper != NULL)
+    if (m_inputFileStreamWrapper)
     {
         delete m_inputFileStreamWrapper;
         m_inputFileStreamWrapper = 0;

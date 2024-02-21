@@ -114,13 +114,13 @@ SatScpcScheduler::GetNextFrame()
     Ptr<SatBbFrame> frame = m_bbFrameContainer->GetNextFrame();
     Time frameDuration;
 
-    if (frame != NULL)
+    if (frame)
     {
         m_symbolsSent += ceil(frame->GetDuration().GetSeconds() * m_carrierBandwidthInHz);
     }
 
     // create dummy frame
-    if (m_dummyFrameSendingEnabled && frame == NULL)
+    if (m_dummyFrameSendingEnabled && !frame)
     {
         frame = Create<SatBbFrame>(m_bbFrameConf->GetDefaultModCod(),
                                    SatEnums::DUMMY_FRAME,
@@ -147,12 +147,12 @@ SatScpcScheduler::GetNextFrame()
         frameDuration = frame->GetDuration();
     }
     // If no bb frame available and dummy frames disabled
-    else if (frame == NULL)
+    else if (!frame)
     {
         frameDuration = m_bbFrameConf->GetDummyBbFrameDuration();
     }
 
-    if (frame != NULL)
+    if (frame)
     {
         frameDuration = frame->GetDuration();
         frame->SetSliceId(0);

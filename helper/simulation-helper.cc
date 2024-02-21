@@ -74,7 +74,7 @@ NS_OBJECT_ENSURE_REGISTERED(SimulationHelperConf);
         .AddAttribute("Traffic" TOSTRING(index) "Protocol",                                        \
                       "Network protocol that this traffic model will use",                         \
                       EnumValue(a2),                                                               \
-                      MakeEnumAccessor(&SimulationHelperConf::SetTraffic##index##Protocol,         \
+                      MakeEnumAccessor<SimulationHelperConf::TransportLayerProtocol_t>(&SimulationHelperConf::SetTraffic##index##Protocol, \
                                        &SimulationHelperConf::GetTraffic##index##Protocol),        \
                       MakeEnumChecker(SimulationHelperConf::PROTOCOL_UDP,                          \
                                       "UDP",                                                       \
@@ -85,7 +85,7 @@ NS_OBJECT_ENSURE_REGISTERED(SimulationHelperConf);
         .AddAttribute("Traffic" TOSTRING(index) "Direction",                                       \
                       "Satellite link direction that this traffic model will use",                 \
                       EnumValue(a3),                                                               \
-                      MakeEnumAccessor(&SimulationHelperConf::SetTraffic##index##Direction,        \
+                      MakeEnumAccessor<SimulationHelperConf::TrafficDirection_t>(&SimulationHelperConf::SetTraffic##index##Direction, \
                                        &SimulationHelperConf::GetTraffic##index##Direction),       \
                       MakeEnumChecker(SimulationHelperConf::RTN_LINK,                              \
                                       "ReturnLink",                                                \
@@ -1547,7 +1547,7 @@ SimulationHelper::HasSinkInstalled(Ptr<Node> node, uint16_t port)
     for (uint32_t i = 0; i < node->GetNApplications(); i++)
     {
         auto sink = DynamicCast<PacketSink>(node->GetApplication(i));
-        if (sink != NULL)
+        if (sink)
         {
             AddressValue av;
             sink->GetAttribute("Local", av);

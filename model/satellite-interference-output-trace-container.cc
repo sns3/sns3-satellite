@@ -187,7 +187,7 @@ SatInterferenceOutputTraceContainer::AddToContainer(key_t key, std::vector<doubl
 
     Ptr<SatOutputFileStreamDoubleContainer> node = FindNode(key);
 
-    if (node != NULL)
+    if (node)
     {
         node->AddToContainer(newItem);
     }

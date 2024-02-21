@@ -384,7 +384,7 @@ SatCrMessage::GetTypeId(void)
                             .AddAttribute("CrBlockType",
                                           "Capacity request control block size type",
                                           EnumValue(SatCrMessage::CR_BLOCK_SMALL),
-                                          MakeEnumAccessor(&SatCrMessage::m_crBlockSizeType),
+                                          MakeEnumAccessor<SatCrMessage::SatCrBlockSize_t>(&SatCrMessage::m_crBlockSizeType),
                                           MakeEnumChecker(SatCrMessage::CR_BLOCK_SMALL,
                                                           "Small",
                                                           SatCrMessage::CR_BLOCK_LARGE,

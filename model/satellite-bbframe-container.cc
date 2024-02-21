@@ -300,7 +300,7 @@ SatBbFrameContainer::CreateFrameToTail(uint32_t priorityClass, SatEnums::SatModc
 
     Ptr<SatBbFrame> frame = Create<SatBbFrame>(modcod, m_defaultBbFrameType, m_bbFrameConf);
 
-    if (frame != NULL)
+    if (frame)
     {
         if (priorityClass > 0)
         {

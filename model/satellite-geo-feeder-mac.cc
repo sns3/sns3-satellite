@@ -263,7 +263,7 @@ SatGeoFeederMac::ReceiveSignalingPacket(Ptr<Packet> packet)
         Ptr<SatCnoReportMessage> cnoReport =
             DynamicCast<SatCnoReportMessage>(m_readCtrlCallback(msgId));
 
-        if (cnoReport != NULL)
+        if (cnoReport)
         {
             m_fwdScheduler->CnoInfoUpdated(macTag.GetSourceAddress(), cnoReport->GetCnoEstimate());
         }

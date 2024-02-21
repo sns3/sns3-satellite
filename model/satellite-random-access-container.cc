@@ -67,7 +67,7 @@ SatRandomAccess::SatRandomAccess(Ptr<SatRandomAccessConf> randomAccessConf,
 
     m_uniformRandomVariable = CreateObject<UniformRandomVariable>();
 
-    if (m_randomAccessConf == NULL)
+    if (!m_randomAccessConf)
     {
         NS_FATAL_ERROR("SatRandomAccess::SatRandomAccess - Configuration object is NULL");
     }

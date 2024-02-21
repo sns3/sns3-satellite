@@ -197,7 +197,7 @@ SatUtHelperDvb::Install(Ptr<Node> n,
     if (m_raSettings.m_randomAccessModel != SatEnums::RA_MODEL_ESSA)
     {
         Ptr<SatMobilityObserver> observer = n->GetObject<SatMobilityObserver>();
-        NS_ASSERT(observer != NULL);
+        NS_ASSERT(observer);
 
         SatUtMac::TimingAdvanceCallback timingCb =
             MakeCallback(&SatMobilityObserver::GetTimingAdvance, observer);
@@ -414,7 +414,7 @@ SatUtHelperDvb::Install(Ptr<Node> n,
     }
 
     Ptr<SatHandoverModule> handoverModule = n->GetObject<SatHandoverModule>();
-    if (handoverModule != NULL)
+    if (handoverModule)
     {
         handoverModule->SetHandoverRequestCallback(
             MakeCallback(&SatRequestManager::SendHandoverRecommendation, rm));

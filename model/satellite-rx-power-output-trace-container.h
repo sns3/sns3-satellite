@@ -26,6 +26,8 @@
 #include <ns3/mac48-address.h>
 #include <ns3/satellite-output-fstream-double-container.h>
 
+#include <map>
+
 namespace ns3
 {
 

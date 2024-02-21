@@ -377,7 +377,7 @@ SatUtMac::ControlMsgTransmissionPossible() const
     NS_LOG_FUNCTION(this);
 
     bool da = m_tbtpContainer->HasScheduledTimeSlots();
-    bool ra = (m_randomAccess != NULL);
+    bool ra = (m_randomAccess != nullptr);
     if (m_useLogon)
     {
         ra = ra && (m_raChannel != m_logonChannel);
@@ -917,7 +917,7 @@ SatUtMac::ReceiveQueueEvent(SatQueue::QueueEvent_t event, uint8_t rcIndex)
         {
             NS_LOG_INFO("Buffered packet event received");
 
-            if (m_randomAccess != NULL)
+            if (m_randomAccess)
             {
                 NS_LOG_INFO("Doing Slotted ALOHA");
 
@@ -944,7 +944,7 @@ SatUtMac::ReceiveQueueEventEssa(SatQueue::QueueEvent_t event, uint8_t rcIndex)
         {
             NS_LOG_INFO("SatUtMac::ReceiveQueueEventEssa - Buffered packet event received");
 
-            if (m_randomAccess != NULL)
+            if (m_randomAccess)
             {
                 NS_LOG_INFO("SatUtMac::ReceiveQueueEventEssa - Doing ESSA");
 
@@ -1119,7 +1119,7 @@ SatUtMac::ReceiveSignalingPacket(Ptr<Packet> packet)
          * SatBeamHelper::CtrlMsgStoreTimeInFwdLink attribute may be set to too short value
          * or there are something wrong in the FWD link RRM.
          */
-        if (tbtp == NULL)
+        if (!tbtp)
         {
             NS_FATAL_ERROR("TBTP not found, check SatBeamHelper::CtrlMsgStoreTimeInFwdLink "
                            "attribute is long enough!");
@@ -1147,7 +1147,7 @@ SatUtMac::ReceiveSignalingPacket(Ptr<Packet> packet)
         uint32_t raCtrlId = ctrlTag.GetMsgId();
         Ptr<SatRaMessage> raMsg = DynamicCast<SatRaMessage>(m_readCtrlCallback(raCtrlId));
 
-        if (raMsg != NULL)
+        if (raMsg)
         {
             uint32_t allocationChannelId = raMsg->GetAllocationChannelId();
             uint16_t backoffProbability = raMsg->GetBackoffProbability();
@@ -1183,7 +1183,7 @@ SatUtMac::ReceiveSignalingPacket(Ptr<Packet> packet)
         uint32_t timuCtrlId = ctrlTag.GetMsgId();
         Ptr<SatTimuMessage> timuMsg = DynamicCast<SatTimuMessage>(m_readCtrlCallback(timuCtrlId));
 
-        if (timuMsg != NULL)
+        if (timuMsg)
         {
             uint32_t beamId = timuMsg->GetAllocatedBeamId();
             uint32_t satId = timuMsg->GetAllocatedSatId();
@@ -1218,7 +1218,7 @@ SatUtMac::ReceiveSignalingPacket(Ptr<Packet> packet)
         Ptr<SatSliceSubscriptionMessage> sliceMsg =
             DynamicCast<SatSliceSubscriptionMessage>(m_readCtrlCallback(sliceCtrlId));
 
-        if (sliceMsg != NULL)
+        if (sliceMsg)
         {
             if (m_nodeInfo->GetMacAddress() == sliceMsg->GetAddress())
             {
@@ -1245,7 +1245,7 @@ SatUtMac::ReceiveSignalingPacket(Ptr<Packet> packet)
         Ptr<SatLogonResponseMessage> logonMsg =
             DynamicCast<SatLogonResponseMessage>(m_readCtrlCallback(logonId));
 
-        if (logonMsg != NULL)
+        if (logonMsg)
         {
             m_raChannel = logonMsg->GetRaChannel();
             m_loggedOn = true;
@@ -1956,7 +1956,7 @@ SatUtMac::DoFrameStart()
 
     NS_LOG_INFO("UT: " << m_nodeInfo->GetMacAddress());
 
-    if (m_timuInfo != NULL)
+    if (m_timuInfo)
     {
         NS_LOG_INFO("Applying TIM-U parameters received during the previous frame");
 
@@ -2077,7 +2077,7 @@ SatUtMac::DoFrameStart()
             }
         }
 
-        if (m_randomAccess != NULL)
+        if (m_randomAccess)
         {
             if (m_loggedOn)
             {

@@ -573,7 +573,7 @@ SatEnvVariables::ExecuteCommandAndReadOutput(
         char buffer[1024];
         while (!feof(pipe))
         {
-            if (fgets(buffer, 1024, pipe) != NULL)
+            if (fgets(buffer, 1024, pipe))
             {
                 buffer[strlen(buffer) - 1] = '\0';
                 data.append(buffer);

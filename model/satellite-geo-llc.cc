@@ -176,7 +176,7 @@ SatGeoLlc::ReceiveHigherLayerPdu(Ptr<Packet> packet, Mac48Address source, Mac48A
 
         Ptr<SatArqAckMessage> ack = DynamicCast<SatArqAckMessage>(m_readCtrlCallback(ackId));
 
-        if (ack == NULL)
+        if (!ack)
         {
             NS_FATAL_ERROR(
                 "ARQ ACK not found, check that control msg storage time is set long enough!");

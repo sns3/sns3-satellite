@@ -70,7 +70,7 @@ SatPhyRxCarrierPerFrame::BeginEndScheduling()
 
         Time schedulingDelay = nextSuperFrameRxTime - Now();
 
-        if (GetNodeInfo() == NULL)
+        if (!GetNodeInfo())
         {
             NS_FATAL_ERROR("m_nodeInfo not set");
         }

@@ -168,12 +168,12 @@ SatMobilityObserver::ObserveTimingAdvance(Ptr<PropagationDelayModel> ownDelayMod
 {
     NS_LOG_FUNCTION(this << ownDelayModel << anotherDelayModel << anotherMobility);
 
-    NS_ASSERT(ownDelayModel != NULL);
-    NS_ASSERT(anotherDelayModel != NULL);
-    NS_ASSERT(anotherMobility != NULL);
+    NS_ASSERT(ownDelayModel);
+    NS_ASSERT(anotherDelayModel);
+    NS_ASSERT(anotherMobility);
 
     auto cb = MakeCallback(&SatMobilityObserver::PositionChanged, this);
-    if (m_anotherMobility != NULL)
+    if (m_anotherMobility)
     {
         m_anotherMobility->TraceDisconnect("SatCourseChange", "Another", cb);
     }
@@ -225,10 +225,10 @@ SatMobilityObserver::GetTimingAdvance(void)
     NS_LOG_FUNCTION(this);
 
     // update timing advance, if another end is given and update needed
-    if ((m_anotherMobility != NULL) && (m_updateTimingAdvance == true))
+    if ((m_anotherMobility) && (m_updateTimingAdvance == true))
     {
         // another propagation delay is expected to be given
-        NS_ASSERT(m_anotherProgDelayModel != NULL);
+        NS_ASSERT(m_anotherProgDelayModel);
 
         // same reference ellipsoide must be used by mobilities
         NS_ASSERT(m_geoSatMobility->GetGeoPosition().GetRefEllipsoid() ==
@@ -332,8 +332,8 @@ SatMobilityObserver::UpdateTimingAdvance()
 {
     NS_LOG_FUNCTION(this);
 
-    NS_ASSERT(m_ownProgDelayModel != NULL);
-    NS_ASSERT(m_anotherProgDelayModel != NULL);
+    NS_ASSERT(m_ownProgDelayModel);
+    NS_ASSERT(m_anotherProgDelayModel);
 
     if (m_isRegenerative)
     {

@@ -484,7 +484,7 @@ class SimulationHelper : public Object
      */
     inline Ptr<SatHelper> GetSatelliteHelper()
     {
-        NS_ASSERT_MSG(m_satHelper != NULL,
+        NS_ASSERT_MSG(m_satHelper,
                       "CreateSatScenario not called before calling GetSatelliteHelper");
         return m_satHelper;
     }
@@ -662,7 +662,7 @@ class SimulationHelper : public Object
      */
     inline uint32_t GetNextUtUserCount() const
     {
-        NS_ASSERT_MSG(m_utUserCount != NULL, "User count per UT not set");
+        NS_ASSERT_MSG(m_utUserCount, "User count per UT not set");
         return m_utUserCount->GetInteger();
     }
 

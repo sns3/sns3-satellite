@@ -78,7 +78,7 @@ static void
 SatCourseChange(std::string context, Ptr<const SatMobilityModel> position)
 {
     auto tracedPosition = DynamicCast<const SatTracedMobilityModel>(position);
-    NS_ASSERT_MSG(tracedPosition != NULL, "Course changed for a non-mobile UT");
+    NS_ASSERT_MSG(tracedPosition, "Course changed for a non-mobile UT");
 }
 
 int
