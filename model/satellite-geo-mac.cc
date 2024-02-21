@@ -128,7 +128,7 @@ SatGeoMac::StartPeriodicTransmissions()
 
     m_periodicTransmissionEnabled = true;
 
-    if (m_fwdScheduler == NULL)
+    if (m_fwdScheduler == nullptr)
     {
         NS_FATAL_ERROR("Scheduler not set for GEO MAC!!!");
     }
@@ -155,7 +155,7 @@ SatGeoMac::StartTransmission(uint32_t carrierId)
         m_bbFrameTxTrace(bbFrame);
 
         // Handle both dummy frames and normal frames
-        if (bbFrame != NULL)
+        if (bbFrame)
         {
             SatSignalParameters::txInfo_s txInfo;
             txInfo.packetType = SatEnums::PACKET_TYPE_DEDICATED_ACCESS;

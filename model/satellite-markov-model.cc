@@ -89,7 +89,7 @@ SatMarkovModel::Reset()
 {
     NS_LOG_FUNCTION(this);
 
-    if (m_probabilities != NULL)
+    if (m_probabilities)
     {
         delete[] m_probabilities;
         m_probabilities = NULL;

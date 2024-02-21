@@ -72,7 +72,7 @@ SatPhyRxCarrierPerWindow::BeginEndScheduling()
     NS_LOG_FUNCTION(this);
     if (!m_windowEndSchedulingInitialized)
     {
-        if (GetNodeInfo() == NULL)
+        if (!GetNodeInfo())
         {
             NS_FATAL_ERROR("SatPhyRxWindow::BeginWindowEndScheduling - m_nodeInfo not set");
         }
@@ -648,7 +648,7 @@ SatPhyRxCarrierPerWindow::GetEffectiveSnir(
 
     Ptr<SatLinkResultsRtn> satLinkResults = GetLinkResults()->GetObject<SatLinkResultsFSim>();
     Ptr<SatMutualInformationTable> mutualInformationTable;
-    if (satLinkResults != NULL)
+    if (satLinkResults)
     {
         mutualInformationTable =
             (GetLinkResults()->GetObject<SatLinkResultsFSim>())->GetMutualInformationTable();

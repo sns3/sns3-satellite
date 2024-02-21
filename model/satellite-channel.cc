@@ -676,7 +676,7 @@ SatChannel::GetSourceAddress(Ptr<SatSignalParameters> rxParams)
 
     SatSignalParameters::PacketsInBurst_t::const_iterator i = rxParams->m_packetsInBurst.begin();
 
-    if (*i == NULL)
+    if (*i == nullptr)
     {
         NS_FATAL_ERROR("SatChannel::GetSourceAddress - Empty packet list");
     }

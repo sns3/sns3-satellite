@@ -153,7 +153,7 @@ SatLog::AddToLog(LogType_t logType, std::string fileTag, std::string message)
 
     NS_LOG_INFO("Type: " << logType << ", file tag: " << fileTag << ", message: " << message);
 
-    if (log != NULL)
+    if (log)
     {
         log->AddToContainer(message);
     }

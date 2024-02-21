@@ -920,7 +920,7 @@ SatRegenerationTest4::HasSinkInstalled(Ptr<Node> node, uint16_t port)
     for (uint32_t i = 0; i < node->GetNApplications(); i++)
     {
         Ptr<PacketSink> sink = DynamicCast<PacketSink>(node->GetApplication(i));
-        if (sink != NULL)
+        if (sink)
         {
             AddressValue av;
             sink->GetAttribute("Local", av);
@@ -1363,7 +1363,7 @@ SatRegenerationTest6::HasSinkInstalled(Ptr<Node> node, uint16_t port)
     for (uint32_t i = 0; i < node->GetNApplications(); i++)
     {
         Ptr<PacketSink> sink = DynamicCast<PacketSink>(node->GetApplication(i));
-        if (sink != NULL)
+        if (sink)
         {
             AddressValue av;
             sink->GetAttribute("Local", av);
