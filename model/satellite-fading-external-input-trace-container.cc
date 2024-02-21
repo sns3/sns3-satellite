@@ -47,7 +47,7 @@ SatFadingExternalInputTraceContainer::GetTypeId(void)
             .AddAttribute("UtInputMode",
                           "Input mode to read trace source files from given index table.",
                           EnumValue(SatFadingExternalInputTraceContainer::LIST_MODE),
-                          MakeEnumAccessor(&SatFadingExternalInputTraceContainer::m_utInputMode),
+                          MakeEnumAccessor<SatFadingExternalInputTraceContainer::InputMode_t>(&SatFadingExternalInputTraceContainer::m_utInputMode),
                           MakeEnumChecker(SatFadingExternalInputTraceContainer::LIST_MODE,
                                           "ListMode",
                                           SatFadingExternalInputTraceContainer::POSITION_MODE,

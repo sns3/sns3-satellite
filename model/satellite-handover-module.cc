@@ -51,7 +51,7 @@ SatHandoverModule::GetTypeId(void)
             .AddAttribute("HandoverDecisionAlgorithm",
                           "Algorithm to use for handovers",
                           EnumValue(SatHandoverModule::SAT_N_CLOSEST_SAT),
-                          MakeEnumAccessor(&SatHandoverModule::m_handoverDecisionAlgorithm),
+                          MakeEnumAccessor<SatHandoverModule::HandoverDecisionAlgorithm_t>(&SatHandoverModule::m_handoverDecisionAlgorithm),
                           MakeEnumChecker(SatHandoverModule::SAT_N_CLOSEST_SAT, "NClosestSats"))
             .AddAttribute("NumberClosestSats",
                           "Number of satellites to consider when using algorithm SAT_N_CLOSEST_SAT",

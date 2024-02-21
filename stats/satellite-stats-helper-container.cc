@@ -183,7 +183,7 @@ SatStatsHelperContainer::DoDispose()
   .AddAttribute (# id,                                                \
       std::string ("Enable the output of ") + desc,                   \
       EnumValue (SatStatsHelper::OUTPUT_NONE),                        \
-      MakeEnumAccessor (&SatStatsHelperContainer::Add ## id),
+      MakeEnumAccessor<SatStatsHelper::OutputType_t>(&SatStatsHelperContainer::Add ## id),
 
 #define ADD_SAT_STATS_ATTRIBUTES_BASIC_SET(id, desc)                                               \
     ADD_SAT_STATS_ATTRIBUTE_HEAD(Global##id, std::string("global ") + desc)                        \

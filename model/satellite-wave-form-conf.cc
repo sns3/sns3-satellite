@@ -253,7 +253,7 @@ SatWaveformConf::GetTypeId(void)
                             .AddAttribute("BurstLength",
                                           "Default burst length",
                                           EnumValue(SatEnums::SHORT_AND_LONG_BURST),
-                                          MakeEnumAccessor(&SatWaveformConf::m_burstLength),
+                                          MakeEnumAccessor<SatEnums::SatWaveFormBurstLength_t>(&SatWaveformConf::m_burstLength),
                                           MakeEnumChecker(SatEnums::SHORT_BURST,
                                                           "ShortBurst",
                                                           SatEnums::LONG_BURST,

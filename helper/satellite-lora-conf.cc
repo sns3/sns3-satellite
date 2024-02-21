@@ -45,7 +45,7 @@ SatLoraConf::GetTypeId(void)
                             .AddAttribute("Standard",
                                           "Standard used for phy layer configuration",
                                           EnumValue(SatLoraConf::SATELLITE),
-                                          MakeEnumAccessor(&SatLoraConf::m_phyLayerStandard),
+                                          MakeEnumAccessor<SatLoraConf::PhyLayerStandard_t>(&SatLoraConf::m_phyLayerStandard),
                                           MakeEnumChecker(SatLoraConf::SATELLITE,
                                                           "Satellite",
                                                           SatLoraConf::EU863_870,

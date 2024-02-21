@@ -420,7 +420,7 @@ SatBbFrameConf::GetTypeId(void)
             .AddAttribute("BBFrameUsageMode",
                           "Mode for selecting used BB Frames.",
                           EnumValue(SatEnums::NORMAL_FRAMES),
-                          MakeEnumAccessor(&SatBbFrameConf::m_bbFrameUsageMode),
+                          MakeEnumAccessor<SatEnums::BbFrameUsageMode_t>(&SatBbFrameConf::m_bbFrameUsageMode),
                           MakeEnumChecker(SatEnums::SHORT_FRAMES,
                                           "ShortFrames",
                                           SatEnums::NORMAL_FRAMES,

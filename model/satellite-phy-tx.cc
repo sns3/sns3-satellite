@@ -98,7 +98,7 @@ SatPhyTx::GetTypeId(void)
                             .AddAttribute("TxMode",
                                           "Tx mode of this Phy Tx.",
                                           EnumValue(SatPhyTx::NORMAL),
-                                          MakeEnumAccessor(&SatPhyTx::m_txMode),
+                                          MakeEnumAccessor<SatPhyTxMode_t>(&SatPhyTx::m_txMode),
                                           MakeEnumChecker(SatPhyTx::NORMAL,
                                                           "Normal Tx mode",
                                                           SatPhyTx::TRANSPARENT,
