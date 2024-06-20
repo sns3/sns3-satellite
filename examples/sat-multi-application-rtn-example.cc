@@ -199,7 +199,9 @@ main(int argc, char* argv[])
         for (uint32_t i = 0; i < utCbrUsers.GetN(); i++)
         {
             cbrHelper.SetAttribute("Remote", AddressValue(Address(cbrDest)));
+            cbrHelper.SetAttribute("Tos", UintegerValue(cbrTos));
             cbrSinkHelper.SetAttribute("Local", AddressValue(Address(cbrDest)));
+            cbrSinkHelper.SetAttribute("Tos", UintegerValue(cbrTos));
 
             utCbrApps.Add(cbrHelper.Install(utCbrUsers.Get(i)));
 
@@ -252,6 +254,7 @@ main(int argc, char* argv[])
             onOffHelper.SetAttribute("Remote", AddressValue(Address(onOffDest)));
             onOffHelper.SetAttribute("Tos", UintegerValue(onOffTos));
             onOffSinkHelper.SetAttribute("Local", AddressValue(Address(onOffDest)));
+            onOffSinkHelper.SetAttribute("Tos", UintegerValue(onOffTos));
 
             utOnOffApps.Add(onOffHelper.Install(utOnOffUsers.Get(i)));
 

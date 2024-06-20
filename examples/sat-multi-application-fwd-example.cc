@@ -193,6 +193,7 @@ main(int argc, char* argv[])
             cbrHelper.SetAttribute("Remote", AddressValue(Address(cbrDest)));
             cbrHelper.SetAttribute("Tos", UintegerValue(cbrTos));
             cbrSinkHelper.SetAttribute("Local", AddressValue(Address(cbrDest)));
+            cbrSinkHelper.SetAttribute("Tos", UintegerValue(cbrTos));
 
             gwCbrApps.Add(cbrHelper.Install(gwUsers.Get(cbrGwUserId)));
             utCbrSinkApps.Add(cbrSinkHelper.Install(utCbrUsers.Get(i)));
@@ -245,6 +246,7 @@ main(int argc, char* argv[])
             onOffHelper.SetAttribute("Remote", AddressValue(Address(onOffDest)));
             onOffHelper.SetAttribute("Tos", UintegerValue(onOffTos));
             onOffSinkHelper.SetAttribute("Local", AddressValue(Address(onOffDest)));
+            onOffSinkHelper.SetAttribute("Tos", UintegerValue(onOffTos));
 
             gwOnOffApps.Add(onOffHelper.Install(gwUsers.Get(onOffGwUserId)));
             utOnOffSinkApps.Add(onOffSinkHelper.Install(utOnOffUsers.Get(i)));
