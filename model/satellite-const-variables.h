@@ -23,6 +23,8 @@
 #ifndef SATELLITE_CONST_VARIABLES_H
 #define SATELLITE_CONST_VARIABLES_H
 
+#include <cstdint>
+
 namespace ns3
 {
 

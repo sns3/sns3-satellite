@@ -88,7 +88,7 @@ main(int argc, char* argv[])
                                               {41, 15}};
 
     // Set users unevenly in different beams
-    for (const auto it : utsInBeam)
+    for (const auto &it : utsInBeam)
     {
         simulationHelper->SetUtCountPerBeam(it.first, it.second);
     }
