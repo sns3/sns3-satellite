@@ -103,6 +103,16 @@ class SatTracedMobilityModel : public SatMobilityModel
      */
     virtual void DoSetGeoPosition(const GeoCoordinate& position);
 
+    /**
+     * \return cartesian format position as vector
+     */
+    virtual Vector DoGetPosition(void) const;
+
+    /**
+     * \param position position in Cartesian format to set
+     */
+    virtual void DoSetPosition(const Vector& position);
+
     void UpdateGeoPositionFromFile(void);
 
     uint32_t m_satId;

@@ -128,6 +128,22 @@ SatTracedMobilityModel::DoSetGeoPosition(const GeoCoordinate& position)
 }
 
 Vector
+SatTracedMobilityModel::DoGetPosition() const
+{
+    NS_LOG_FUNCTION(this);
+
+    return DoGetGeoPosition().ToVector();
+}
+
+void
+SatTracedMobilityModel::DoSetPosition(const Vector& position)
+{
+    NS_LOG_FUNCTION(this << position);
+
+    DoSetGeoPosition(GeoCoordinate(position));
+}
+
+Vector
 SatTracedMobilityModel::DoGetVelocity(void) const
 {
     NS_LOG_FUNCTION(this);
