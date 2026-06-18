@@ -27,6 +27,9 @@
 #include <ns3/log.h>
 
 #include <algorithm>
+#if __cplusplus >= 201103L
+#include <random>
+#endif
 #include <limits>
 #include <utility>
 #include <vector>
@@ -1364,7 +1367,13 @@ SatFrameAllocator::SortUts()
     }
 
     // sort UTs using random method.
-    std::random_shuffle(uts.begin(), uts.end());
+    #if __cplusplus >= 201103L
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(uts.begin(), uts.end(), g);
+    #else
+        std::random_shuffle(uts.begin(), uts.end());
+    #endif
 
     return uts;
 }
@@ -1382,7 +1391,13 @@ SatFrameAllocator::SortCarriers()
     }
 
     // sort available carriers using random methods.
-    std::random_shuffle(carriers.begin(), carriers.end());
+    #if __cplusplus >= 201103L
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(carriers.begin(), carriers.end(), g);
+    #else
+        std::random_shuffle(carriers.begin(), carriers.end());
+    #endif
 
     return carriers;
 }
@@ -1403,7 +1418,13 @@ SatFrameAllocator::SortUtRcs(Address ut)
     if (rcIndices.size() > 2)
     {
         // sort RCs in UT using random method.
-        std::random_shuffle(rcIndices.begin() + 1, rcIndices.end());
+        #if __cplusplus >= 201103L
+            std::random_device rd;
+            std::mt19937 g(rd());
+            std::shuffle(rcIndices.begin() + 1, rcIndices.end(), g);
+        #else
+            std::random_shuffle(rcIndices.begin() + 1, rcIndices.end());
+        #endif
     }
 
     return rcIndices;

@@ -25,6 +25,9 @@
 #include "ns3/network-module.h"
 #include "ns3/satellite-module.h"
 #include "ns3/traffic-module.h"
+#if __cplusplus >= 201103L
+#include <random>
+#endif
 
 using namespace ns3;
 
@@ -468,7 +471,13 @@ main(int argc, char* argv[])
             }
 
             // randomize users
+#if __cplusplus >= 201103L
+            std::random_device rd;
+            std::mt19937 g(rd());
+            std::shuffle(ids.begin(), ids.end(), g);
+#else
             std::random_shuffle(ids.begin(), ids.end());
+#endif
 
             // set source GW or UT users
             groupSource = users.Get(sources[i]);

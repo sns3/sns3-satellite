@@ -27,6 +27,9 @@
 #include <ns3/log.h>
 
 #include <algorithm>
+#if __cplusplus >= 201103L
+#include <random>
+#endif
 #include <cmath>
 #include <deque>
 #include <utility>
@@ -286,7 +289,13 @@ SatBbFrameContainer::GetNextFrame()
 
         if (nonEmptyQueues.empty() == false)
         {
-            std::random_shuffle(nonEmptyQueues.begin(), nonEmptyQueues.end());
+            #if __cplusplus >= 201103L
+                std::random_device rd;
+                std::mt19937 g(rd());
+                std::shuffle(nonEmptyQueues.begin(), nonEmptyQueues.end(), g);
+            #else
+                std::random_shuffle(nonEmptyQueues.begin(), nonEmptyQueues.end());
+            #endif
 
             nextFrame = (*nonEmptyQueues.begin())->front();
             (*nonEmptyQueues.begin())->pop_front();
