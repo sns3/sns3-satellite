@@ -174,11 +174,13 @@ The main examples are:
  * `sat-lora-regenerative-example.cc`: Create a scenario with Lora configuration and regenerative satellites
 
 
-# Annex - Installation using bake
+# Annex
 
-Warning: this is an old installation method, it has not been tested on latest ns-3 and SNS-3 versions, thus there is no garantee of success.
+## Installation using bake
 
-## Preparations
+:warning: **Warning:** This is an old installation method, it has not been tested on latest ns-3 and SNS-3 versions, thus there is no garantee of success.
+
+### Preparations
 
 [Bake](http://planete.inria.fr/software/bake/index.html) is a tool developed to simplify the download and install process of ns-3. It can be extended to make it aware of external modules to ns-3 such as SNS-3. You will first need to get bake.
 
@@ -255,7 +257,7 @@ $ rm bakefile.xml
 
 Now you’re ready to use bake.
 
-## Installation
+### Installation
 
 Now that everything is in place, you can tell bake that you want to install SNS-3 (i.e.: `ns-3` plus the `sns3-satellite` module):
 
