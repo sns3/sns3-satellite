@@ -1319,10 +1319,14 @@ SatBeamHelper::EnablePacketTrace()
         Config::ConnectWithoutContext("/NodeList/*/DeviceList/*/UserMac/*/PacketTrace",
                                       MakeCallback(&SatPacketTrace::AddTraceEntry, m_packetTrace));
 
-        for(std::pair<uint32_t, uint32_t> p : GetBeams()) {
+        for (std::pair<uint32_t, uint32_t> p : GetBeams())
+        {
             Ptr<Node> orbiter = Singleton<SatTopology>::Get()->GetOrbiterNode(p.first);
-            Ptr<SatOrbiterFeederMac> feederMac = Singleton<SatTopology>::Get()->GetOrbiterFeederMac(orbiter, p.second);
-            feederMac->TraceConnectWithoutContext("PacketTrace", MakeCallback(&SatPacketTrace::AddTraceEntry, m_packetTrace));
+            Ptr<SatOrbiterFeederMac> feederMac =
+                Singleton<SatTopology>::Get()->GetOrbiterFeederMac(orbiter, p.second);
+            feederMac->TraceConnectWithoutContext(
+                "PacketTrace",
+                MakeCallback(&SatPacketTrace::AddTraceEntry, m_packetTrace));
         }
     }
     if (Singleton<SatTopology>::Get()->GetStandard() == SatEnums::DVB)

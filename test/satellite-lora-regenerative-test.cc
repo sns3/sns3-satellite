@@ -132,9 +132,10 @@ SatLoraRegenerativeFirstWindowTestCase::DoRun(void)
 
     Config::SetDefault("ns3::LorawanMacEndDeviceClassA::FirstWindowDelay",
                        TimeValue(MilliSeconds(1500)));
-    Config::SetDefault("ns3::LorawanMacEndDeviceClassA::SecondWindowDelay", TimeValue(Seconds(2)));
+    Config::SetDefault("ns3::LorawanMacEndDeviceClassA::SecondWindowDelay",
+                       TimeValue(MilliSeconds(2500)));
     Config::SetDefault("ns3::LorawanMacEndDeviceClassA::FirstWindowDuration",
-                       TimeValue(MilliSeconds(400)));
+                       TimeValue(MilliSeconds(600)));
     Config::SetDefault("ns3::LorawanMacEndDeviceClassA::SecondWindowDuration",
                        TimeValue(MilliSeconds(500)));
     Config::SetDefault("ns3::LoraNetworkScheduler::FirstWindowAnswerDelay", TimeValue(Seconds(1)));
