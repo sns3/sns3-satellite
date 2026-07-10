@@ -13,7 +13,6 @@ var classns3_1_1_sat_ut_mac_state =
     [ "~SatUtMacState", "classns3_1_1_sat_ut_mac_state.html#a5dd523148af7fa451a9f5286e8541d8e", null ],
     [ "CheckNcrRecoveryTimeout", "classns3_1_1_sat_ut_mac_state.html#acf108840dddc93fb9d566e04e3145f12", null ],
     [ "CheckNcrTimeout", "classns3_1_1_sat_ut_mac_state.html#aa7d69361a1e982e175c30e905b7905f3", null ],
-    [ "GetInstanceTypeId", "classns3_1_1_sat_ut_mac_state.html#a87602759e540e30e9a04c732c7ae782b", null ],
     [ "GetState", "classns3_1_1_sat_ut_mac_state.html#a5cc00f5a1e97c7f165ddbc8c30da2d35", null ],
     [ "GetTypeId", "classns3_1_1_sat_ut_mac_state.html#aef689fd8354fbe3bdd68fcd3f7a09977", null ],
     [ "IsNcrTimeout", "classns3_1_1_sat_ut_mac_state.html#ae5c138c8e7419734ceded5d48866cd65", null ],

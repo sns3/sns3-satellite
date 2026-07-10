@@ -8,7 +8,6 @@ var classns3_1_1_sat_rx_cno_input_trace_container =
     [ "AddNode", "classns3_1_1_sat_rx_cno_input_trace_container.html#a4248231c7e37ebbd2dc89313b350fe96", null ],
     [ "DoDispose", "classns3_1_1_sat_rx_cno_input_trace_container.html#a09b4141a81a9a114227028210af81a3f", null ],
     [ "FindNode", "classns3_1_1_sat_rx_cno_input_trace_container.html#ab3d940188f0879aef137761491a393e5", null ],
-    [ "GetInstanceTypeId", "classns3_1_1_sat_rx_cno_input_trace_container.html#a17c9e41f3cdd2d0ba82f6f91b25a40b2", null ],
     [ "GetRxCno", "classns3_1_1_sat_rx_cno_input_trace_container.html#a996dd355f2a63fe86b37a86d7d08d4f6", null ],
     [ "GetTypeId", "classns3_1_1_sat_rx_cno_input_trace_container.html#ac3bcfa66138677a91edcc83262112538", null ],
     [ "Reset", "classns3_1_1_sat_rx_cno_input_trace_container.html#a24eb7cdf514958575c04eadb35d02671", null ],

@@ -51,7 +51,6 @@ var classns3_1_1_sat_superframe_conf =
     [ "GetFrameCount", "classns3_1_1_sat_superframe_conf.html#a8d30b43e4cf4e7319d2edbf6fe19427d", null ],
     [ "GetFrameGuardTimeSymbols", "classns3_1_1_sat_superframe_conf.html#a6b7f68e5599e394ed45f54843b3d28b9", null ],
     [ "GetIndexAsFrameName", "classns3_1_1_sat_superframe_conf.html#a74000a84918b6c47da69fd730f63951a", null ],
-    [ "GetInstanceTypeId", "classns3_1_1_sat_superframe_conf.html#a2fbc17a37dfcac8ada980cfe6909b1df", null ],
     [ "GetLogonChannelIndex", "classns3_1_1_sat_superframe_conf.html#aed8ed4541f8dbf362a557f32e978e819", null ],
     [ "GetMaxSubdivision", "classns3_1_1_sat_superframe_conf.html#a2d175fcfbf404ecd2d1b61df0323481e", null ],
     [ "GetNumberAsString", "classns3_1_1_sat_superframe_conf.html#a1a465ce631bb1a8499e2b493380b1932", null ],

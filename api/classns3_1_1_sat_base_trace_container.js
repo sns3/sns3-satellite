@@ -2,7 +2,6 @@ var classns3_1_1_sat_base_trace_container =
 [
     [ "SatBaseTraceContainer", "classns3_1_1_sat_base_trace_container.html#aa112866bd8c7f69e1e983358e533ab27", null ],
     [ "~SatBaseTraceContainer", "classns3_1_1_sat_base_trace_container.html#a6bdee32ecb966f898695dec1fba3ae68", null ],
-    [ "GetInstanceTypeId", "classns3_1_1_sat_base_trace_container.html#a1c7497b365ffd69781f90ba6936e7bdb", null ],
     [ "GetTypeId", "classns3_1_1_sat_base_trace_container.html#ada819be601a5ecd98719dc84ae37a654", null ],
     [ "Reset", "classns3_1_1_sat_base_trace_container.html#a2f13978b3d038cfe38eb766cefcc8e6a", null ],
     [ "CSINR_TRACE_DEFAULT_FADING_VALUE_INDEX", "classns3_1_1_sat_base_trace_container.html#a76a5335eb12e0c11d731f449eac984db", null ],

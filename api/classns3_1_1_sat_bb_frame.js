@@ -20,7 +20,7 @@ var classns3_1_1_sat_bb_frame =
     [ "GetSpaceLeftInBytes", "classns3_1_1_sat_bb_frame.html#ab514c54aa8ce00892c7d1098abd7f9fa", null ],
     [ "GetSpaceUsedInBytes", "classns3_1_1_sat_bb_frame.html#abd2fd75f7400d7e74294f15f6be2a877", null ],
     [ "GetSpectralEfficiency", "classns3_1_1_sat_bb_frame.html#a63cc3e705490c59c5b8e7e4d2c488137", null ],
-    [ "MergeWithFrame", "classns3_1_1_sat_bb_frame.html#ac0dada14f92f9d965f5f3845c00de868", null ],
+    [ "MergeWithFrame", "classns3_1_1_sat_bb_frame.html#aa84c97efb1ba510722f9011377c6a79f", null ],
     [ "SetSliceId", "classns3_1_1_sat_bb_frame.html#a693911e139706860fe903a1ef5dd3802", null ],
     [ "Shrink", "classns3_1_1_sat_bb_frame.html#ab71226a7939c9e478686c7693ee42892", null ],
     [ "m_duration", "classns3_1_1_sat_bb_frame.html#af1916b260d96888239051b666d16b4a9", null ],

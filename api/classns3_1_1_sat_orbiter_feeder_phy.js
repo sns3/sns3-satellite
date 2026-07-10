@@ -9,10 +9,10 @@ var classns3_1_1_sat_orbiter_feeder_phy =
     [ "EndTx", "classns3_1_1_sat_orbiter_feeder_phy.html#aeb04db9a0379cdb6206f16787cce066a", null ],
     [ "GetAdditionalInterference", "classns3_1_1_sat_orbiter_feeder_phy.html#a0790ffd34e2b20530ce18e27436d1661", null ],
     [ "GetE2ESourceAddress", "classns3_1_1_sat_orbiter_feeder_phy.html#a70602f05197788b1d379afbf5234c11e", null ],
-    [ "GetInstanceTypeId", "classns3_1_1_sat_orbiter_feeder_phy.html#a799bfd6b94df6ba8a324591166d9d556", null ],
     [ "GetSatLinkRxDir", "classns3_1_1_sat_orbiter_feeder_phy.html#a56fdb00d7b2043140db5df451ee6a75d", null ],
     [ "GetSatLinkTxDir", "classns3_1_1_sat_orbiter_feeder_phy.html#a2d18683751f4b0cdac54d0ce62c71ec6", null ],
     [ "GetTypeId", "classns3_1_1_sat_orbiter_feeder_phy.html#a311ea726116a206b11ed26e0ef61da42", null ],
+    [ "NotifyConstructionCompleted", "classns3_1_1_sat_orbiter_feeder_phy.html#afd24b88a9ad8d9d16ff9b75abc602325", null ],
     [ "Receive", "classns3_1_1_sat_orbiter_feeder_phy.html#a8a31ee922e807596ac140a003f587dd8", null ],
     [ "RxTraces", "classns3_1_1_sat_orbiter_feeder_phy.html#a1d27f727a6cb2eb695aaee3902d616e4", null ],
     [ "SendFromQueue", "classns3_1_1_sat_orbiter_feeder_phy.html#a7b49b3baa55516ee0877b10858252063", null ],
@@ -23,11 +23,14 @@ var classns3_1_1_sat_orbiter_feeder_phy =
     [ "m_imInterferenceCOverI", "classns3_1_1_sat_orbiter_feeder_phy.html#a5fe1b716c7f3863c6e443ee9540c0981", null ],
     [ "m_imInterferenceCOverIDb", "classns3_1_1_sat_orbiter_feeder_phy.html#aa608b6c787978fc86bb810580ab0f6a2", null ],
     [ "m_isSending", "classns3_1_1_sat_orbiter_feeder_phy.html#a76c7c25594e720db4d39ec44aadcfecf", null ],
+    [ "m_linkResults", "classns3_1_1_sat_orbiter_feeder_phy.html#a2746bf8f3f61e046a21783c7c1608cc7", null ],
+    [ "m_parameters", "classns3_1_1_sat_orbiter_feeder_phy.html#aa57db263e2c0d00b057fea4f6c0181f6", null ],
     [ "m_queue", "classns3_1_1_sat_orbiter_feeder_phy.html#a1471553b7e6eb5b475d3c3b62d496b8e", null ],
     [ "m_queueSizeBytes", "classns3_1_1_sat_orbiter_feeder_phy.html#a8ce232abb723e05bee1d0e8da17ef45b", null ],
     [ "m_queueSizeBytesTrace", "classns3_1_1_sat_orbiter_feeder_phy.html#a67bb9bf290767fd52a011119f9743acd", null ],
     [ "m_queueSizeMax", "classns3_1_1_sat_orbiter_feeder_phy.html#aa83528367ee4638b16f04baaece12538", null ],
     [ "m_queueSizePackets", "classns3_1_1_sat_orbiter_feeder_phy.html#aa7e65badf97d0e3e728a76fe6fdd79a8", null ],
     [ "m_queueSizePacketsTrace", "classns3_1_1_sat_orbiter_feeder_phy.html#a6c69e08c51b03e6a24f7f93e5450af0d", null ],
-    [ "m_returnLinkRegenerationMode", "classns3_1_1_sat_orbiter_feeder_phy.html#ad0cfd43ffaac296883d113087a6a2e1f", null ]
+    [ "m_returnLinkRegenerationMode", "classns3_1_1_sat_orbiter_feeder_phy.html#ad0cfd43ffaac296883d113087a6a2e1f", null ],
+    [ "m_superFrameConf", "classns3_1_1_sat_orbiter_feeder_phy.html#a607a9c3a4b757283284e65f267ff3061", null ]
 ];

@@ -5,7 +5,6 @@ var classns3_1_1_sat_timu_message =
     [ "GetAllocatedBeamId", "classns3_1_1_sat_timu_message.html#adaa6746c115b555f943251adf35b25b3", null ],
     [ "GetAllocatedSatId", "classns3_1_1_sat_timu_message.html#acf4ec5d6270c01061811a1436db7287c", null ],
     [ "GetGwAddress", "classns3_1_1_sat_timu_message.html#a50227b3a305bd97bdc7147f96a807044", null ],
-    [ "GetInstanceTypeId", "classns3_1_1_sat_timu_message.html#aa079ed080de6add3b5d4375abaafd4af", null ],
     [ "GetMsgType", "classns3_1_1_sat_timu_message.html#aecca97e5a97765d4c57130bbae76e8e6", null ],
     [ "GetSatAddress", "classns3_1_1_sat_timu_message.html#a2789d5feb53009fc27d35776cacd0730", null ],
     [ "GetSizeInBytes", "classns3_1_1_sat_timu_message.html#a499036df843ade647ca95b8632504663", null ],

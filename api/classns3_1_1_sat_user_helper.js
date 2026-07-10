@@ -9,7 +9,6 @@ var classns3_1_1_sat_user_helper =
     [ "SatUserHelper", "classns3_1_1_sat_user_helper.html#ad693ca35e9b9e5a1b5f0abc9017d6459", null ],
     [ "~SatUserHelper", "classns3_1_1_sat_user_helper.html#a83369618c4dd15462ad55b179eac489c", null ],
     [ "EnableCreationTraces", "classns3_1_1_sat_user_helper.html#a9083c6418ea2e5c23519eae0fbe420d0", null ],
-    [ "GetInstanceTypeId", "classns3_1_1_sat_user_helper.html#ac0689bcded971f575948b4972b627eed", null ],
     [ "GetRouter", "classns3_1_1_sat_user_helper.html#aafc3405aa419d5a349634de80e96a739", null ],
     [ "GetRouterInfo", "classns3_1_1_sat_user_helper.html#a8052b1425d86608130522e38383cb851", null ],
     [ "GetTypeId", "classns3_1_1_sat_user_helper.html#a590b3260069bd05afa2050c8301e6dcb", null ],

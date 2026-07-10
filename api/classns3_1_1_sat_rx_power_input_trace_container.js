@@ -7,7 +7,6 @@ var classns3_1_1_sat_rx_power_input_trace_container =
     [ "AddNode", "classns3_1_1_sat_rx_power_input_trace_container.html#aa13171978131e09a669ef0d2531af945", null ],
     [ "DoDispose", "classns3_1_1_sat_rx_power_input_trace_container.html#a5931ae2ef93a22d3f048c74dbb266ff0", null ],
     [ "FindNode", "classns3_1_1_sat_rx_power_input_trace_container.html#ac3aebe1fc2f95212619d0ec319c450ea", null ],
-    [ "GetInstanceTypeId", "classns3_1_1_sat_rx_power_input_trace_container.html#a15e1bccf2e471d59b289b30f5288278b", null ],
     [ "GetRxPowerDensity", "classns3_1_1_sat_rx_power_input_trace_container.html#ad1a8b45027ce72cfa3b671cdc5b00cc1", null ],
     [ "GetTypeId", "classns3_1_1_sat_rx_power_input_trace_container.html#a26d80768e078b6b08307f1e24b1a93d5", null ],
     [ "Reset", "classns3_1_1_sat_rx_power_input_trace_container.html#a99bedaa26cab30d195af88903b9e6544", null ],

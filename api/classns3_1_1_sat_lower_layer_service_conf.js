@@ -15,7 +15,6 @@ var classns3_1_1_sat_lower_layer_service_conf =
     [ "GetDynamicRatePersistence", "classns3_1_1_sat_lower_layer_service_conf.html#a9d5a74dcae118c59d26504390bf221fb", null ],
     [ "GetIndexAsDaServiceName", "classns3_1_1_sat_lower_layer_service_conf.html#a37636e67bee7a125ba792c3d07651947", null ],
     [ "GetIndexAsRaServiceName", "classns3_1_1_sat_lower_layer_service_conf.html#ab15ce29aa5cb685cb6e0a7b4c5bb8c5b", null ],
-    [ "GetInstanceTypeId", "classns3_1_1_sat_lower_layer_service_conf.html#a74cdc46ec7dd873e1c4a4a30745d4d22", null ],
     [ "GetNumberAsString", "classns3_1_1_sat_lower_layer_service_conf.html#a3a2f3d68cc928e1b3e8dddbc4086c044", null ],
     [ "GetRaAverageNormalizedOfferedLoadThreshold", "classns3_1_1_sat_lower_layer_service_conf.html#a94498d38e5cbb35bcf1bcdc4b0782f42", null ],
     [ "GetRaBackOffProbability", "classns3_1_1_sat_lower_layer_service_conf.html#aa79c95767b425a4c5ddc928120d4acea", null ],

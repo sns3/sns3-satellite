@@ -12,7 +12,6 @@ var classns3_1_1_sat_handover_module =
     [ "DoDispose", "classns3_1_1_sat_handover_module.html#a93217a65350104fc9b6deb9b18ac8a72", null ],
     [ "GetAskedBeamId", "classns3_1_1_sat_handover_module.html#a09e6443c819fe506e258f01ba8d7cbd3", null ],
     [ "GetAskedSatId", "classns3_1_1_sat_handover_module.html#ae20168b7fa5a79d93db19b6a64431b8f", null ],
-    [ "GetInstanceTypeId", "classns3_1_1_sat_handover_module.html#a5915f99a9b94a78fffa9a08599d94ddf", null ],
     [ "GetNClosestSats", "classns3_1_1_sat_handover_module.html#ae8f7d5cce13e148a0f1058c09301ddbd", null ],
     [ "GetTypeId", "classns3_1_1_sat_handover_module.html#af1a533e4c6b842e2e00c37394a472df1", null ],
     [ "HandoverFinished", "classns3_1_1_sat_handover_module.html#a04b36b98ada88fd41069b37fdc31bc60", null ],

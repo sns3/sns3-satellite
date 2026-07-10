@@ -5,7 +5,7 @@ var classns3_1_1_sat_stats_resources_granted_helper =
     [ "DoInstall", "classns3_1_1_sat_stats_resources_granted_helper.html#a625db3d3914a4c86cc0aabab5e41cc62", null ],
     [ "GetTypeId", "classns3_1_1_sat_stats_resources_granted_helper.html#ae91b47b8e10d12d8c51c21467bbfe062", null ],
     [ "InstallProbe", "classns3_1_1_sat_stats_resources_granted_helper.html#a4245f748f78cd1d89bfe5b4b0ab7d177", null ],
-    [ "UpdateIdentifierOnProbes", "classns3_1_1_sat_stats_resources_granted_helper.html#ae62166116ebdb73be526de3d0b714757", null ],
+    [ "UpdateIdentifierOnProbes", "classns3_1_1_sat_stats_resources_granted_helper.html#a587d5274cd0244538501bac11f401374", null ],
     [ "m_aggregator", "classns3_1_1_sat_stats_resources_granted_helper.html#a665119d8cea86c7fe491edad47059859", null ],
     [ "m_probes", "classns3_1_1_sat_stats_resources_granted_helper.html#a3d72eac6491128adf77fae92300023da", null ],
     [ "m_terminalCollectors", "classns3_1_1_sat_stats_resources_granted_helper.html#aead69408e422ef64be6ea0bcfb973e09", null ]

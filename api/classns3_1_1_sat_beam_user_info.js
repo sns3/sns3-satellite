@@ -7,7 +7,7 @@ var classns3_1_1_sat_beam_user_info =
     [ "GetPositions", "classns3_1_1_sat_beam_user_info.html#a5e832588443427d1d7695b0502d9857a", null ],
     [ "GetUtCount", "classns3_1_1_sat_beam_user_info.html#adacacbaa898e330eb6d8435ce1c6e2d0", null ],
     [ "GetUtUserCount", "classns3_1_1_sat_beam_user_info.html#a040b759ff6f461845350e259c0cee954", null ],
-    [ "SetPositions", "classns3_1_1_sat_beam_user_info.html#a87a762eae8682db9a322541731fd9373", null ],
+    [ "SetPositions", "classns3_1_1_sat_beam_user_info.html#a77ec3c4a67f1e54e2f03a4bcc03e8106", null ],
     [ "SetUtUserCount", "classns3_1_1_sat_beam_user_info.html#a81c67790685ed6d80c19997d493441ac", null ],
     [ "m_positions", "classns3_1_1_sat_beam_user_info.html#aa7e0b9cacecdcc577383d0da1417dfd6", null ],
     [ "m_userCount", "classns3_1_1_sat_beam_user_info.html#af32d5ce72891ee58459cda87057a8d35", null ]

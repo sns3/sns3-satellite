@@ -21,7 +21,7 @@ var hierarchy =
     [ "ns3::SatPhy::CreateParam_t", "structns3_1_1_sat_phy_1_1_create_param__t.html", null ],
     [ "ns3::SatTrafficHelper::CustomTrafficInfo_s", "structns3_1_1_sat_traffic_helper_1_1_custom_traffic_info__s.html", null ],
     [ "ns3::DateTime", "structns3_1_1_date_time.html", null ],
-    [ "ns3::DropTailQueue< Item >", "classns3_1_1_drop_tail_queue.html", null ],
+    [ "ns3::DropTailQueue&lt; Item &gt;", "classns3_1_1_drop_tail_queue.html", null ],
     [ "elsetrec", "structelsetrec.html", null ],
     [ "ns3::EncapKeyCompare", "classns3_1_1_encap_key_compare.html", null ],
     [ "ns3::IersData::EopParameters", "structns3_1_1_iers_data_1_1_eop_parameters.html", null ],

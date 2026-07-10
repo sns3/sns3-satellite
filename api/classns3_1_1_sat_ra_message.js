@@ -5,7 +5,6 @@ var classns3_1_1_sat_ra_message =
     [ "GetAllocationChannelId", "classns3_1_1_sat_ra_message.html#a01d41b51541c1322f9caec6efb1c2d76", null ],
     [ "GetBackoffProbability", "classns3_1_1_sat_ra_message.html#a4cf5ebb72435c4cf8ed363b21b00d5f0", null ],
     [ "GetBackoffTime", "classns3_1_1_sat_ra_message.html#a619da08c32ef112ef5dd29f6b601c08c", null ],
-    [ "GetInstanceTypeId", "classns3_1_1_sat_ra_message.html#af11adf1f75e19fa95a465969284b3eb1", null ],
     [ "GetMsgType", "classns3_1_1_sat_ra_message.html#ae9576b09695f44f1901b8f7f22a4288a", null ],
     [ "GetSizeInBytes", "classns3_1_1_sat_ra_message.html#aa801937021be45c4bad304c588ef545c", null ],
     [ "GetTypeId", "classns3_1_1_sat_ra_message.html#a1bb6fba80befa62a540e25fdbc85bc10", null ],

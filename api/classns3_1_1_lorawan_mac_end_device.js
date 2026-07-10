@@ -57,7 +57,7 @@ var classns3_1_1_lorawan_mac_end_device =
     [ "SetRegenerative", "classns3_1_1_lorawan_mac_end_device.html#a5888de0ee3728e7e2df1a86e7c6ba1e6", null ],
     [ "SetSatAddress", "classns3_1_1_lorawan_mac_end_device.html#a2f4b13402a6fe93845820f7c3b315528", null ],
     [ "SetUpdateAddressAndIdentifierCallback", "classns3_1_1_lorawan_mac_end_device.html#a8473ac1d56a45c8fc2090dbdcde00ccf", null ],
-    [ "Shuffle", "classns3_1_1_lorawan_mac_end_device.html#ad4daee9275287b9b319d7e935f1d5f3a", null ],
+    [ "Shuffle", "classns3_1_1_lorawan_mac_end_device.html#ad09ef97fbff4561c8cadc934838e727c", null ],
     [ "TxFinished", "classns3_1_1_lorawan_mac_end_device.html#acc2f7ae970c8de110830975f243f409d", null ],
     [ "m_address", "classns3_1_1_lorawan_mac_end_device.html#ae305e1bc0c5cf8ba4ceac97e50436436", null ],
     [ "m_aggregatedDutyCycle", "classns3_1_1_lorawan_mac_end_device.html#a48572b1271a60c21aa2468dd7ba5d9fb", null ],

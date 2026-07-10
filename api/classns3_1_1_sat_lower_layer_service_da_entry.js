@@ -4,7 +4,7 @@ var classns3_1_1_sat_lower_layer_service_da_entry =
     [ "~SatLowerLayerServiceDaEntry", "classns3_1_1_sat_lower_layer_service_da_entry.html#a7145c6d17b9a8567027b4547d2b5244c", null ],
     [ "GetConstantAssignmentProvided", "classns3_1_1_sat_lower_layer_service_da_entry.html#aeec385ba3569f499b23e0ed8c7862b55", null ],
     [ "GetConstantServiceRateInKbps", "classns3_1_1_sat_lower_layer_service_da_entry.html#ab5371d72dd056255b6f8df3c64a23df8", null ],
-    [ "GetConstantServiceRateStream", "classns3_1_1_sat_lower_layer_service_da_entry.html#a5da9deb6b398515161625c2fec30b894", null ],
+    [ "GetConstantServiceRateStream", "classns3_1_1_sat_lower_layer_service_da_entry.html#aa784698a77f3b2889c52ff89244b3c3b", null ],
     [ "GetMaximumBacklogInKbytes", "classns3_1_1_sat_lower_layer_service_da_entry.html#a9e5f57a37041d2e19893e915da122295", null ],
     [ "GetMaximumServiceRateInKbps", "classns3_1_1_sat_lower_layer_service_da_entry.html#a8f21937f2b302b4af15153ed8c4231f0", null ],
     [ "GetMinimumServiceRateInKbps", "classns3_1_1_sat_lower_layer_service_da_entry.html#a40c559353dc9105bf3d638b363566157", null ],

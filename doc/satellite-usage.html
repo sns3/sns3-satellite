@@ -1,19 +1,17 @@
 
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>User Documentation &#8212; NS3 Satellite Module</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/default.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/default.css?v=fc1ee2df" />
+    <script src="_static/documentation_options.js?v=9aa08746"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Testing Documentation" href="satellite-testing.html" />
     <link rel="prev" title="Design Documentation" href="satellite-design.html" />
@@ -78,7 +76,7 @@
       </div>
     </nav>
 
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -101,15 +99,15 @@
           <div class="body" role="main">
             
   <section id="user-documentation">
-<h1>User Documentation<a class="headerlink" href="#user-documentation" title="Permalink to this headline">¶</a></h1>
+<h1>User Documentation<a class="headerlink" href="#user-documentation" title="Link to this heading">¶</a></h1>
 <section id="usage">
-<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<h2>Usage<a class="headerlink" href="#usage" title="Link to this heading">¶</a></h2>
 <section id="building-satellite-module">
-<h3>Building Satellite Module<a class="headerlink" href="#building-satellite-module" title="Permalink to this headline">¶</a></h3>
+<h3>Building Satellite Module<a class="headerlink" href="#building-satellite-module" title="Link to this heading">¶</a></h3>
 <p>Satellite module uses a distributed ns-3 approach enabled by bake tool.
 Satellite module does not currently support Mac OS X due to SatEnvVariables class using Linux OS specific commands.</p>
 <section id="overview">
-<h4>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h4>
+<h4>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h4>
 <p>Setting up a working version of SNS3 requires the following parts:</p>
 <ul class="simple">
 <li><p>CMake and a set of standard compilers tools</p></li>
@@ -119,7 +117,7 @@ Satellite module does not currently support Mac OS X due to SatEnvVariables clas
 <p>The steps below will guide you to quickly set up the parts.</p>
 </section>
 <section id="compilation-tools">
-<h4>Compilation tools<a class="headerlink" href="#compilation-tools" title="Permalink to this headline">¶</a></h4>
+<h4>Compilation tools<a class="headerlink" href="#compilation-tools" title="Link to this heading">¶</a></h4>
 <p>In order to be able to get and compile SNS3, it is recommended to install the following tools and
 optional python dependencies</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">cmake</span> <span class="n">g</span><span class="o">++</span> <span class="n">libxml2</span><span class="o">-</span><span class="n">dev</span> <span class="n">python3</span> <span class="n">python3</span><span class="o">-</span><span class="n">lxml</span>
@@ -128,7 +126,7 @@ optional python dependencies</p>
 <p>This will allow you to get, configure and build the necessary parts required for running SNS3.</p>
 </section>
 <section id="the-simulator">
-<h4>The simulator<a class="headerlink" href="#the-simulator" title="Permalink to this headline">¶</a></h4>
+<h4>The simulator<a class="headerlink" href="#the-simulator" title="Link to this heading">¶</a></h4>
 <p>We can now proceed to download the simulator.</p>
 <p>First we need to download the base ns-3 simulator.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone -b ns-3.39 https://gitlab.com/nsnam/ns-3-dev.git
@@ -153,7 +151,7 @@ $ ./ns3 build
 <p>The build should take some time. But you will then be able to run examples right off the bat.</p>
 </section>
 <section id="data-package">
-<h4>Data package<a class="headerlink" href="#data-package" title="Permalink to this headline">¶</a></h4>
+<h4>Data package<a class="headerlink" href="#data-package" title="Link to this heading">¶</a></h4>
 <p>Data package is a collection of static configuration-like input files for the satellite module. The files are
 distributed separately from the satellite module because of its huge size (around 1 GB). The data package contains
 the following information:</p>
@@ -178,7 +176,7 @@ $ git submodule update --init --recursive
 </div>
 <p>SNS3 is now properly initialized.</p>
 <section id="updating-sgp4-data">
-<h5>Updating SGP4 data<a class="headerlink" href="#updating-sgp4-data" title="Permalink to this headline">¶</a></h5>
+<h5>Updating SGP4 data<a class="headerlink" href="#updating-sgp4-data" title="Link to this heading">¶</a></h5>
 <p>LEO satellites positionning is computed using the SGP4 model. Data for this model is regularly updated
 and can be fetched to be integrated into SNS3 using a simple CMake variable. That variable is always
 overriden in the CMake cache so subsequent CMake runs do not download it again. This lets you control
@@ -200,7 +198,7 @@ now and you will need to patch your Bake install in order to support it.</p>
 </section>
 </section>
 <section id="automation">
-<h4>Automation<a class="headerlink" href="#automation" title="Permalink to this headline">¶</a></h4>
+<h4>Automation<a class="headerlink" href="#automation" title="Link to this heading">¶</a></h4>
 <p>Bake is a small tool that automates the deployment of NS-3, other related modules, and their dependencies.
 We can optionally automate the previous steps by using bake and a simple configuration file.</p>
 <p>Bake is an open source tool, so we shall start by downloading its source. Open a terminal and tell Mercurial
@@ -261,11 +259,12 @@ contrib folder.</p>
 </section>
 </section>
 <section id="helpers">
-<h3>Helpers<a class="headerlink" href="#helpers" title="Permalink to this headline">¶</a></h3>
+<h3>Helpers<a class="headerlink" href="#helpers" title="Link to this heading">¶</a></h3>
 <figure class="align-center" id="id2">
-<span id="fig-satellite-helper-structure"></span><a class="reference internal image-reference" href="_images/satellite-helper-structure.png"><img alt="_images/satellite-helper-structure.png" src="_images/satellite-helper-structure.png" style="width: 761.5999999999999px; height: 327.59999999999997px;" /></a>
+<span id="fig-satellite-helper-structure"></span><a class="reference internal image-reference" href="_images/satellite-helper-structure.png"><img alt="_images/satellite-helper-structure.png" height="328" src="_images/satellite-helper-structure.png" width="762" />
+</a>
 <figcaption>
-<p><span class="caption-text">Satellite helper structure</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+<p><span class="caption-text">Satellite helper structure</span><a class="headerlink" href="#id2" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>The satellite module adopts a set of hierarchical satellite helper classes, which are used to generate the
@@ -273,7 +272,7 @@ satellite simulation scenario: in relation to the used simulation scenario size 
 number of UTs, terrestrial network access technology, number of terrestrial end users and their
 applications.</p>
 <section id="simulation-helper">
-<h4>Simulation helper<a class="headerlink" href="#simulation-helper" title="Permalink to this headline">¶</a></h4>
+<h4>Simulation helper<a class="headerlink" href="#simulation-helper" title="Link to this heading">¶</a></h4>
 <p>To simplify the process of configuring a custom simulation script, the Satellite module includes a
 <code class="docutils literal notranslate"><span class="pre">SimulationHelper</span></code> class. Its sole purpose is to help create satellite simulation scripts by defining e.g.
 beams utilized, number of users, weather traces, statistics and certain parameter groups by using simple
@@ -284,11 +283,7 @@ However, micromanaging of attributes in NS-3 style using <code class="docutils l
 <code class="docutils literal notranslate"><span class="pre">Object::SetAttribute</span> <span class="pre">(...)</span></code> is also possible at the same time with Simulation helper.</p>
 <p>The key configuration methods are presented in <a class="reference internal" href="#tab-simulation-helper-configuration"><span class="std std-ref">Simulation configuration methods</span></a>:</p>
 <span id="tab-simulation-helper-configuration"></span><table class="docutils align-default" id="id3">
-<caption><span class="caption-text">Simulation configuration methods</span><a class="headerlink" href="#id3" title="Permalink to this table">¶</a></caption>
-<colgroup>
-<col style="width: 33%" />
-<col style="width: 67%" />
-</colgroup>
+<caption><span class="caption-text">Simulation configuration methods</span><a class="headerlink" href="#id3" title="Link to this table">¶</a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>Name of method</p></th>
 <th class="head"><p>Description</p></th>
@@ -380,11 +375,7 @@ methods needed to run the simulation.
 Configuration methods listed in <a class="reference internal" href="#tab-simulation-helper-configuration"><span class="std std-ref">Simulation configuration methods</span></a> must be called before these.</p>
 <p></p>
 <span id="tab-simulation-helper-control"></span><table class="docutils align-default" id="id4">
-<caption><span class="caption-text">Simulation control methods</span><a class="headerlink" href="#id4" title="Permalink to this table">¶</a></caption>
-<colgroup>
-<col style="width: 33%" />
-<col style="width: 67%" />
-</colgroup>
+<caption><span class="caption-text">Simulation control methods</span><a class="headerlink" href="#id4" title="Link to this table">¶</a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>Name of method</p></th>
 <th class="head"><p>Description</p></th>
@@ -417,7 +408,7 @@ For more information about available attributes, see the following chapters’ h
 For advanced usage, see the section <a class="reference internal" href="#advanced-usage-and-attributes">Advanced usage and Attributes</a>.</p>
 </section>
 <section id="satellite-helper">
-<h4>Satellite helper<a class="headerlink" href="#satellite-helper" title="Permalink to this headline">¶</a></h4>
+<h4>Satellite helper<a class="headerlink" href="#satellite-helper" title="Link to this heading">¶</a></h4>
 <p>Satellite helper is a main helper class which abstracts all the complexity inside
 sub-helpers, which are presented below. The satellite helper is by default capable of generating
 three kinds or scenarios: one spot-beam, full reference system and a user-defined subset
@@ -426,11 +417,7 @@ scenario creation always obeys the parameterized reference system. The Satellite
 <a class="reference internal" href="#tab-sat-helper"><span class="std std-ref">Satellite helper attributes</span></a>.</p>
 <p></p>
 <span id="tab-sat-helper"></span><table class="docutils align-default" id="id5">
-<caption><span class="caption-text">Satellite helper attributes</span><a class="headerlink" href="#id5" title="Permalink to this table">¶</a></caption>
-<colgroup>
-<col style="width: 39%" />
-<col style="width: 61%" />
-</colgroup>
+<caption><span class="caption-text">Satellite helper attributes</span><a class="headerlink" href="#id5" title="Link to this table">¶</a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>Name of attribute</p></th>
 <th class="head"><p>Description</p></th>
@@ -489,7 +476,7 @@ scenario creation always obeys the parameterized reference system. The Satellite
 </table>
 </section>
 <section id="beam-helper">
-<h4>Beam helper<a class="headerlink" href="#beam-helper" title="Permalink to this headline">¶</a></h4>
+<h4>Beam helper<a class="headerlink" href="#beam-helper" title="Link to this heading">¶</a></h4>
 <p>Beam helper creates needed <code class="docutils literal notranslate"><span class="pre">SatChannel</span></code> and <code class="docutils literal notranslate"><span class="pre">SatNetDevice</span></code> objects, with help of other lower
 level device helpers, and creates needed GW nodes. The helper assigns IP addresses for
 every node connected to satellite network, sets IP routes to nodes for satellite network and
@@ -497,11 +484,7 @@ fills Address Resolution Protocol (ARP) caches for satellite network. The Beam h
 are presented in <a class="reference internal" href="#tab-beam-helper"><span class="std std-ref">Beam helper attributes</span></a>.</p>
 <p></p>
 <span id="tab-beam-helper"></span><table class="docutils align-default" id="id6">
-<caption><span class="caption-text">Beam helper attributes</span><a class="headerlink" href="#id6" title="Permalink to this table">¶</a></caption>
-<colgroup>
-<col style="width: 44%" />
-<col style="width: 56%" />
-</colgroup>
+<caption><span class="caption-text">Beam helper attributes</span><a class="headerlink" href="#id6" title="Link to this table">¶</a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>Name of attribute</p></th>
 <th class="head"><p>Description</p></th>
@@ -545,16 +528,12 @@ are presented in <a class="reference internal" href="#tab-beam-helper"><span cla
 </table>
 </section>
 <section id="geo-helper">
-<h4>GEO helper<a class="headerlink" href="#geo-helper" title="Permalink to this headline">¶</a></h4>
+<h4>GEO helper<a class="headerlink" href="#geo-helper" title="Link to this heading">¶</a></h4>
 <p>GEO helper creates a <code class="docutils literal notranslate"><span class="pre">SatNetDevice</span></code> object for GEO satellite node and configures the
 satellite switch to deliver packets through satellite node. The GEO helper attributes are presented in <a class="reference internal" href="#tab-geo-helper"><span class="std std-ref">GEO helper attributes</span></a>.</p>
 <p></p>
 <span id="tab-geo-helper"></span><table class="docutils align-default" id="id7">
-<caption><span class="caption-text">GEO helper attributes</span><a class="headerlink" href="#id7" title="Permalink to this table">¶</a></caption>
-<colgroup>
-<col style="width: 44%" />
-<col style="width: 56%" />
-</colgroup>
+<caption><span class="caption-text">GEO helper attributes</span><a class="headerlink" href="#id7" title="Link to this table">¶</a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>Name of attribute</p></th>
 <th class="head"><p>Description</p></th>
@@ -574,16 +553,12 @@ satellite switch to deliver packets through satellite node. The GEO helper attri
 </table>
 </section>
 <section id="gw-helper">
-<h4>GW helper<a class="headerlink" href="#gw-helper" title="Permalink to this headline">¶</a></h4>
+<h4>GW helper<a class="headerlink" href="#gw-helper" title="Link to this heading">¶</a></h4>
 <p>GW helper creates <code class="docutils literal notranslate"><span class="pre">SatNetDevice</span></code> objects for GW nodes and attaches them to proper
 <code class="docutils literal notranslate"><span class="pre">SatChannel</span></code> objects. The GW helper attributes are presented in <a class="reference internal" href="#tab-gw-helper"><span class="std std-ref">GW helper attributes</span></a>.</p>
 <p></p>
 <span id="tab-gw-helper"></span><table class="docutils align-default" id="id8">
-<caption><span class="caption-text">GW helper attributes</span><a class="headerlink" href="#id8" title="Permalink to this table">¶</a></caption>
-<colgroup>
-<col style="width: 44%" />
-<col style="width: 56%" />
-</colgroup>
+<caption><span class="caption-text">GW helper attributes</span><a class="headerlink" href="#id8" title="Link to this table">¶</a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>Name of attribute</p></th>
 <th class="head"><p>Description</p></th>
@@ -606,16 +581,12 @@ satellite switch to deliver packets through satellite node. The GEO helper attri
 </table>
 </section>
 <section id="ut-helper">
-<h4>UT helper<a class="headerlink" href="#ut-helper" title="Permalink to this headline">¶</a></h4>
+<h4>UT helper<a class="headerlink" href="#ut-helper" title="Link to this heading">¶</a></h4>
 <p>UT helper creates <code class="docutils literal notranslate"><span class="pre">SatNetDevice</span></code> objects for UT nodes and attaches them to
 proper <code class="docutils literal notranslate"><span class="pre">SatChannel</span></code> objects. The UT helper attributes are presented in <a class="reference internal" href="#tab-ut-helper"><span class="std std-ref">UT helper attributes</span></a>.</p>
 <p></p>
 <span id="tab-ut-helper"></span><table class="docutils align-default" id="id9">
-<caption><span class="caption-text">UT helper attributes</span><a class="headerlink" href="#id9" title="Permalink to this table">¶</a></caption>
-<colgroup>
-<col style="width: 44%" />
-<col style="width: 56%" />
-</colgroup>
+<caption><span class="caption-text">UT helper attributes</span><a class="headerlink" href="#id9" title="Link to this table">¶</a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>Name of attribute</p></th>
 <th class="head"><p>Description</p></th>
@@ -644,18 +615,14 @@ proper <code class="docutils literal notranslate"><span class="pre">SatChannel</
 </table>
 </section>
 <section id="user-helper">
-<h4>User helper<a class="headerlink" href="#user-helper" title="Permalink to this headline">¶</a></h4>
+<h4>User helper<a class="headerlink" href="#user-helper" title="Link to this heading">¶</a></h4>
 <p>User helper creates needed amount of end user nodes for end user networks (user
 connected to UTs) and for public network (behind GWs), their access technologies,
 channels and IP routes. The helper is also responsible of creating different application
 scenarios. The user helper attributes are presented in <a class="reference internal" href="#tab-user-helper"><span class="std std-ref">User helper attributes</span></a>.</p>
 <p></p>
 <span id="tab-user-helper"></span><table class="docutils align-default" id="id10">
-<caption><span class="caption-text">User helper attributes</span><a class="headerlink" href="#id10" title="Permalink to this table">¶</a></caption>
-<colgroup>
-<col style="width: 43%" />
-<col style="width: 57%" />
-</colgroup>
+<caption><span class="caption-text">User helper attributes</span><a class="headerlink" href="#id10" title="Link to this table">¶</a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>Name of attribute</p></th>
 <th class="head"><p>Description</p></th>
@@ -676,7 +643,7 @@ scenarios. The user helper attributes are presented in <a class="reference inter
 </section>
 </section>
 <section id="output">
-<h3>Output<a class="headerlink" href="#output" title="Permalink to this headline">¶</a></h3>
+<h3>Output<a class="headerlink" href="#output" title="Link to this heading">¶</a></h3>
 <p>Satellite module is able to print class-specific logs by enabling ns-3 <code class="docutils literal notranslate"><span class="pre">LogComponent</span></code>
 objects by different log levels, usually LOG_LEVEL_INFO. For more information about ns-3 log system, please see
 <a class="reference external" href="https://www.nsnam.org/docs/release/3.7/tutorial/tutorial_21.html">the ns-3 logging tutorial</a>.</p>
@@ -684,12 +651,7 @@ objects by different log levels, usually LOG_LEVEL_INFO. For more information ab
 The available statistics are presented in <a class="reference internal" href="#tab-supported-stats"><span class="std std-ref">Supported statistics</span></a>.</p>
 <p></p>
 <span id="tab-supported-stats"></span><table class="docutils align-default" id="id11">
-<caption><span class="caption-text">Supported statistics</span><a class="headerlink" href="#id11" title="Permalink to this table">¶</a></caption>
-<colgroup>
-<col style="width: 42%" />
-<col style="width: 26%" />
-<col style="width: 33%" />
-</colgroup>
+<caption><span class="caption-text">Supported statistics</span><a class="headerlink" href="#id11" title="Link to this table">¶</a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>Statistics name</p></th>
 <th class="head"><p>Applicable link directions</p></th>
@@ -815,18 +777,14 @@ within the same simulation, i.e., allowing users to produce more than one statis
 simulation run.</p>
 </section>
 <section id="advanced-usage-and-attributes">
-<h3>Advanced Usage and Attributes<a class="headerlink" href="#advanced-usage-and-attributes" title="Permalink to this headline">¶</a></h3>
+<h3>Advanced Usage and Attributes<a class="headerlink" href="#advanced-usage-and-attributes" title="Link to this heading">¶</a></h3>
 <section id="user-and-feeder-links">
-<h4>User and feeder links<a class="headerlink" href="#user-and-feeder-links" title="Permalink to this headline">¶</a></h4>
+<h4>User and feeder links<a class="headerlink" href="#user-and-feeder-links" title="Link to this heading">¶</a></h4>
 <p>User and feeder links are configured by attributes of SatConf. Link bandwidth and frequency can be
 set separately per each link. The <a class="reference internal" href="#tab-bandwidth-conf"><span class="std std-ref">FWD and RTN link bandwidth configuration attributes</span></a> describes all these attributes.</p>
 <p></p>
 <span id="tab-bandwidth-conf"></span><table class="docutils align-default" id="id12">
-<caption><span class="caption-text">FWD and RTN link bandwidth configuration attributes</span><a class="headerlink" href="#id12" title="Permalink to this table">¶</a></caption>
-<colgroup>
-<col style="width: 34%" />
-<col style="width: 66%" />
-</colgroup>
+<caption><span class="caption-text">FWD and RTN link bandwidth configuration attributes</span><a class="headerlink" href="#id12" title="Link to this table">¶</a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>Name of the attribute</p></th>
 <th class="head"><p>Description</p></th>
@@ -866,7 +824,7 @@ Satellite module verifies correctness of the configuration by checking that band
 for both links in one direction (forward or return). In case of error simulation is terminated by causing fatal error.</p>
 </section>
 <section id="return-link-frame-configuration">
-<h4>Return link frame configuration<a class="headerlink" href="#return-link-frame-configuration" title="Permalink to this headline">¶</a></h4>
+<h4>Return link frame configuration<a class="headerlink" href="#return-link-frame-configuration" title="Link to this heading">¶</a></h4>
 <p>Superframe structure for the return link is the same for every channel. Currently the satellite module
 supports only superframe sequence 0 (one sequence). Structure for this sequence can be
 selected among the four superframe configurations. Selection is done by attribute
@@ -883,7 +841,7 @@ re-compiling simulator. Configuration of superframe by attributes is described i
 <a class="reference internal" href="#superframe-structure-configuration">Superframe structure configuration</a>.</p>
 </section>
 <section id="forward-link-carrier-configuration">
-<h4>Forward link carrier configuration<a class="headerlink" href="#forward-link-carrier-configuration" title="Permalink to this headline">¶</a></h4>
+<h4>Forward link carrier configuration<a class="headerlink" href="#forward-link-carrier-configuration" title="Link to this heading">¶</a></h4>
 <p>Forward link channels are divided to equal-size carriers using carrier bandwidth defined by attribute
 of the <code class="docutils literal notranslate"><span class="pre">SatConf</span></code> object <code class="docutils literal notranslate"><span class="pre">ns3::SatConf::FwdCarrierAllocatedBandwidth</span></code>. Value of this attribute
 cannot exceed the calculated bandwidth value for forward link channel bandwidths. This ensures that
@@ -894,7 +852,7 @@ carrier is defined by <code class="docutils literal notranslate"><span class="pr
 <code class="docutils literal notranslate"><span class="pre">ns3::SatConf::FwdCarrierRollOff</span></code>.</p>
 </section>
 <section id="superframe-structure-configuration">
-<h4>Superframe structure configuration<a class="headerlink" href="#superframe-structure-configuration" title="Permalink to this headline">¶</a></h4>
+<h4>Superframe structure configuration<a class="headerlink" href="#superframe-structure-configuration" title="Link to this heading">¶</a></h4>
 <p>Superframe structure that is supported by the satellite module is such that all frames in the superframe are
 constructed according to target duration defined by attribute TargetDuration of the SatSuperframeSeq.
 Superframe structure can have in maximum 10 configurable frames. The number of the actually used
@@ -911,7 +869,7 @@ attributes of <code class="docutils literal notranslate"><span class="pre">SatSu
 <span class="xref std std-ref">tab-superframe-conf</span> for Frame0 of
 <code class="docutils literal notranslate"><span class="pre">SatSuperframeConf0</span></code>.</p>
 <p></p>
-<p>Sum of allocated bandwidths of used frames cannot exceed the calculated bandwidth
+<p id="tab-superframe-conf">Sum of allocated bandwidths of used frames cannot exceed the calculated bandwidth
 for the return link channels, see <a class="reference internal" href="#return-link-frame-configuration">Return link frame configuration</a>. <code class="docutils literal notranslate"><span class="pre">Frame0_CarrierAllocatedBandwidthHz</span></code>
 defines bandwidth for each carrier in the frame and also the number of the frames in use in the frame.
 Value of this attribute cannot exceed the value given for attribute <code class="docutils literal notranslate"><span class="pre">Frame0_AllocatedBandwidthHz</span></code> for
@@ -921,7 +879,7 @@ limitation for count of RA or DA frames in the superframe; nor for count of carr
 <a class="reference internal" href="#lls-configuration">LLS configuration</a>.</p>
 </section>
 <section id="waveform-configuration">
-<h4>Waveform configuration<a class="headerlink" href="#waveform-configuration" title="Permalink to this headline">¶</a></h4>
+<h4>Waveform configuration<a class="headerlink" href="#waveform-configuration" title="Link to this heading">¶</a></h4>
 <p>The waveform configuration has influence to time slot configuration of the superframes.
 Frames in supeframe are constructed with timeslots using the waveform defined by the
 attribute ns3:SatWaveformConf::DefaultWfId. The construction means that this timeslot
@@ -947,7 +905,7 @@ is set as true (enabled). Otherwise behavior is same as with configuration 0. If
 is unknown then most robust waveform is used when configuration types 1 or 2 are used.</p>
 </section>
 <section id="lls-configuration">
-<h4>LLS configuration<a class="headerlink" href="#lls-configuration" title="Permalink to this headline">¶</a></h4>
+<h4>LLS configuration<a class="headerlink" href="#lls-configuration" title="Link to this heading">¶</a></h4>
 <p>Lower Layer Service (LLS) can be configured currently to be used for Dedicated Access (DA)
 and Random Access (RA) services. Configuration is done by attributes of the
 <code class="docutils literal notranslate"><span class="pre">SatLowerLayerServiceConf</span></code> class implementation LLS configuration. Attribute
@@ -959,11 +917,7 @@ to use are selected by attribute <code class="docutils literal notranslate"><spa
 <p><a class="reference internal" href="#tab-llserv"><span class="std std-ref">Lower layer service attributes</span></a> shortly introduces attributes
 affecting all used DA or RA services.</p>
 <span id="tab-llserv"></span><table class="docutils align-default" id="id13">
-<caption><span class="caption-text">Lower layer service attributes</span><a class="headerlink" href="#id13" title="Permalink to this table">¶</a></caption>
-<colgroup>
-<col style="width: 30%" />
-<col style="width: 70%" />
-</colgroup>
+<caption><span class="caption-text">Lower layer service attributes</span><a class="headerlink" href="#id13" title="Link to this table">¶</a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>Name of the attribute</p></th>
 <th class="head"><p>Description</p></th>
@@ -1004,11 +958,7 @@ In the table DA service 0 is used as example,
 but configuration for other services has identical structure.</p>
 <p></p>
 <span id="tab-llserv-da"></span><table class="docutils align-default" id="id14">
-<caption><span class="caption-text">Lower layer service attributes for DA services</span><a class="headerlink" href="#id14" title="Permalink to this table">¶</a></caption>
-<colgroup>
-<col style="width: 45%" />
-<col style="width: 55%" />
-</colgroup>
+<caption><span class="caption-text">Lower layer service attributes for DA services</span><a class="headerlink" href="#id14" title="Link to this table">¶</a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>Name of the attribute</p></th>
 <th class="head"><p>Description</p></th>
@@ -1042,11 +992,7 @@ but configuration for other services has identical structure.</p>
 specific attributes. Only one RA service is configurable currently.</p>
 <p></p>
 <span id="tab-llserv-ra"></span><table class="docutils align-default" id="id15">
-<caption><span class="caption-text">Lower layer service attributes for RA services</span><a class="headerlink" href="#id15" title="Permalink to this table">¶</a></caption>
-<colgroup>
-<col style="width: 28%" />
-<col style="width: 72%" />
-</colgroup>
+<caption><span class="caption-text">Lower layer service attributes for RA services</span><a class="headerlink" href="#id15" title="Link to this table">¶</a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>Name of the attribute</p></th>
 <th class="head"><p>Description</p></th>
@@ -1090,7 +1036,7 @@ specific attributes. Only one RA service is configurable currently.</p>
 </table>
 </section>
 <section id="link-budget-configuration">
-<h4>Link Budget configuration<a class="headerlink" href="#link-budget-configuration" title="Permalink to this headline">¶</a></h4>
+<h4>Link Budget configuration<a class="headerlink" href="#link-budget-configuration" title="Link to this heading">¶</a></h4>
 <p>Configuration of the link budget for the satellite module can be best studied from
 Link budget example found from <code class="docutils literal notranslate"><span class="pre">/contrib/satellite/examples</span></code> directory and implemented
 in file <code class="docutils literal notranslate"><span class="pre">sat-link-budget-example.cc</span></code>. Parameters (attributes) affecting link budget are
@@ -1103,12 +1049,12 @@ prefixed attributes are for feeder link PHY in Geo Satellite, <code class="docut
 are for user link PHY in Geo Satellite and <code class="docutils literal notranslate"><span class="pre">SatUtPhy</span></code> prefixed attributes are for PHY in UT.</p>
 </section>
 <section id="interference-configuration">
-<h4>Interference configuration<a class="headerlink" href="#interference-configuration" title="Permalink to this headline">¶</a></h4>
+<h4>Interference configuration<a class="headerlink" href="#interference-configuration" title="Link to this heading">¶</a></h4>
 <p>Used interference model are configured by attributes in Helpers.
 Interference model for DA can configured per each link with the following by attributes.
 Interference attributes are presented in <span class="xref std std-ref">tab-interference</span>.</p>
 <p></p>
-<p>For random access interference can be configured system level (influence in return link only) with
+<p id="tab-interference">For random access interference can be configured system level (influence in return link only) with
 <code class="docutils literal notranslate"><span class="pre">ns3::SatBeamHelper::RaInterferenceModel</span></code> attribute.
 Possible model to configure are <code class="docutils literal notranslate"><span class="pre">Constant</span></code>, <code class="docutils literal notranslate"><span class="pre">Trace</span></code>, <code class="docutils literal notranslate"><span class="pre">PerPacket</span></code> (packet by packet), or
 <code class="docutils literal notranslate"><span class="pre">PerFragment</span></code>. Difference between <code class="docutils literal notranslate"><span class="pre">PerPacket</span></code> and <code class="docutils literal notranslate"><span class="pre">PerFragment</span></code> is that, using <code class="docutils literal notranslate"><span class="pre">PerPacket</span></code>,
@@ -1128,10 +1074,7 @@ power when its influence is removed from the other packets/fragments it is inter
 <p>Interference elimination attributes are presented in <a class="reference internal" href="#tab-interference-elimination"><span class="std std-ref">Interference Elimination attributes</span></a>..</p>
 <p></p>
 <span id="tab-interference-elimination"></span><table class="docutils align-default" id="id16">
-<caption><span class="caption-text">Interference Elimination attributes</span><a class="headerlink" href="#id16" title="Permalink to this table">¶</a></caption>
-<colgroup>
-<col style="width: 100%" />
-</colgroup>
+<caption><span class="caption-text">Interference Elimination attributes</span><a class="headerlink" href="#id16" title="Link to this table">¶</a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>Name of the attribute</p></th>
 </tr>
@@ -1143,18 +1086,18 @@ power when its influence is removed from the other packets/fragments it is inter
 </table>
 </section>
 <section id="bb-frame-configuration">
-<h4>BB Frame configuration<a class="headerlink" href="#bb-frame-configuration" title="Permalink to this headline">¶</a></h4>
+<h4>BB Frame configuration<a class="headerlink" href="#bb-frame-configuration" title="Link to this heading">¶</a></h4>
 <p>Configuration for BB frames and BB frame configuration are done by class <code class="docutils literal notranslate"><span class="pre">SatBbFrameConf</span></code> attributes.
 These attributes can be seen from Doxygen documentation.</p>
 </section>
 <section id="forward-link-scheduler-configuration">
-<h4>Forward link scheduler configuration<a class="headerlink" href="#forward-link-scheduler-configuration" title="Permalink to this headline">¶</a></h4>
+<h4>Forward link scheduler configuration<a class="headerlink" href="#forward-link-scheduler-configuration" title="Link to this heading">¶</a></h4>
 <p>Configuration for forward link scheduler is done by class <code class="docutils literal notranslate"><span class="pre">SatFwdLinkScheduler</span></code> attributes.
 These attributes can be seen from Doxygen documentation. Also BB frame configuration has direct
 influence to forward link scheduler functionality, see <a class="reference internal" href="#bb-frame-configuration">BB Frame configuration</a>.</p>
 </section>
 <section id="return-link-scheduler-configuration">
-<h4>Return link scheduler configuration<a class="headerlink" href="#return-link-scheduler-configuration" title="Permalink to this headline">¶</a></h4>
+<h4>Return link scheduler configuration<a class="headerlink" href="#return-link-scheduler-configuration" title="Link to this heading">¶</a></h4>
 <p>Configuration for return link scheduler is done by class <code class="docutils literal notranslate"><span class="pre">SatBeamScheduler</span></code> and
 <code class="docutils literal notranslate"><span class="pre">SatFrameAllocator</span></code> attributes. These attributes can be seen from Doxygen documentation.
 Also superframe, waveform and lower layer service configurations have influence to return
@@ -1162,7 +1105,7 @@ link scheduling (<code class="docutils literal notranslate"><span class="pre">Sa
 <a class="reference internal" href="#superframe-structure-configuration">Superframe structure configuration</a>, <a class="reference internal" href="#waveform-configuration">Waveform configuration</a> and <a class="reference internal" href="#lls-configuration">LLS configuration</a>.</p>
 </section>
 <section id="request-manager-configuration">
-<h4>Request manager configuration<a class="headerlink" href="#request-manager-configuration" title="Permalink to this headline">¶</a></h4>
+<h4>Request manager configuration<a class="headerlink" href="#request-manager-configuration" title="Link to this heading">¶</a></h4>
 <p>The most important class to be configured for UT request manager is the lower layer service configuration,
 which is already presented in section <a class="reference internal" href="#lls-configuration">LLS configuration</a>. It can be used to enable and disable CRA/VBDC/RBDC and change
 parameters for each RC index individually.</p>
@@ -1170,17 +1113,13 @@ parameters for each RC index individually.</p>
 attribute.</p>
 </section>
 <section id="arq-configuration">
-<h4>ARQ configuration<a class="headerlink" href="#arq-configuration" title="Permalink to this headline">¶</a></h4>
+<h4>ARQ configuration<a class="headerlink" href="#arq-configuration" title="Link to this heading">¶</a></h4>
 <p>ARQ maybe enabled and disabled through SatUtHelper attributes <code class="docutils literal notranslate"><span class="pre">ns3::SatUtHelper::EnableRtnLinkArq</span></code>
 and <code class="docutils literal notranslate"><span class="pre">ns3::SatUtHelper::EnableFwdLinkArq.</span></code> The ARQ specific attributes are described in
 <a class="reference internal" href="#tab-arq"><span class="std std-ref">ARQ configuration attributes</span></a>.</p>
 <p></p>
 <span id="tab-arq"></span><table class="docutils align-default" id="id17">
-<caption><span class="caption-text">ARQ configuration attributes</span><a class="headerlink" href="#id17" title="Permalink to this table">¶</a></caption>
-<colgroup>
-<col style="width: 28%" />
-<col style="width: 72%" />
-</colgroup>
+<caption><span class="caption-text">ARQ configuration attributes</span><a class="headerlink" href="#id17" title="Link to this table">¶</a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>Name of the attribute</p></th>
 <th class="head"><p>Description</p></th>
@@ -1224,7 +1163,7 @@ and <code class="docutils literal notranslate"><span class="pre">ns3::SatUtHelpe
 </table>
 </section>
 <section id="mobility-and-handover-configuration">
-<h4>Mobility and Handover Configuration<a class="headerlink" href="#mobility-and-handover-configuration" title="Permalink to this headline">¶</a></h4>
+<h4>Mobility and Handover Configuration<a class="headerlink" href="#mobility-and-handover-configuration" title="Link to this heading">¶</a></h4>
 <p>The Simulation Helper class defines the attribute <code class="docutils literal notranslate"><span class="pre">MobileUtsFolder</span></code>, which defaults to
 <code class="docutils literal notranslate"><span class="pre">data/utpositions/mobiles/</span></code> to automatically provide trace files for mobile UTs.</p>
 <p>Files in the given folder, if any, are parsed and UTs are created for each of them. These
@@ -1234,14 +1173,11 @@ and not simulated at all.</p>
 </section>
 </section>
 <section id="examples">
-<h3>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h3>
+<h3>Examples<a class="headerlink" href="#examples" title="Link to this heading">¶</a></h3>
 <p>Example scripts are listed in tables <a class="reference internal" href="#tab-ra-examples"><span class="std std-ref">Random access examples</span></a>, <a class="reference internal" href="#tab-systest-examples"><span class="std std-ref">System test examples</span></a>,
 <a class="reference internal" href="#tab-trace-examples"><span class="std std-ref">Trace examples</span></a>, <a class="reference internal" href="#tab-traffic-examples"><span class="std std-ref">Traffic examples</span></a> and <a class="reference internal" href="#tab-training-examples"><span class="std std-ref">Training examples</span></a>.</p>
 <span id="tab-ra-examples"></span><table class="docutils align-default" id="id18">
-<caption><span class="caption-text">Random access examples</span><a class="headerlink" href="#id18" title="Permalink to this table">¶</a></caption>
-<colgroup>
-<col style="width: 100%" />
-</colgroup>
+<caption><span class="caption-text">Random access examples</span><a class="headerlink" href="#id18" title="Link to this table">¶</a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>Example script</p></th>
 </tr>
@@ -1267,10 +1203,7 @@ and not simulated at all.</p>
 </table>
 <p></p>
 <span id="tab-systest-examples"></span><table class="docutils align-default" id="id19">
-<caption><span class="caption-text">System test examples</span><a class="headerlink" href="#id19" title="Permalink to this table">¶</a></caption>
-<colgroup>
-<col style="width: 100%" />
-</colgroup>
+<caption><span class="caption-text">System test examples</span><a class="headerlink" href="#id19" title="Link to this table">¶</a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>Example script</p></th>
 </tr>
@@ -1284,10 +1217,7 @@ and not simulated at all.</p>
 </table>
 <p></p>
 <span id="tab-trace-examples"></span><table class="docutils align-default" id="id20">
-<caption><span class="caption-text">Trace examples</span><a class="headerlink" href="#id20" title="Permalink to this table">¶</a></caption>
-<colgroup>
-<col style="width: 100%" />
-</colgroup>
+<caption><span class="caption-text">Trace examples</span><a class="headerlink" href="#id20" title="Link to this table">¶</a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>Example script</p></th>
 </tr>
@@ -1307,10 +1237,7 @@ and not simulated at all.</p>
 </table>
 <p></p>
 <span id="tab-traffic-examples"></span><table class="docutils align-default" id="id21">
-<caption><span class="caption-text">Traffic examples</span><a class="headerlink" href="#id21" title="Permalink to this table">¶</a></caption>
-<colgroup>
-<col style="width: 100%" />
-</colgroup>
+<caption><span class="caption-text">Traffic examples</span><a class="headerlink" href="#id21" title="Link to this table">¶</a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>Example script</p></th>
 </tr>
@@ -1340,10 +1267,7 @@ and not simulated at all.</p>
 </table>
 <p></p>
 <span id="tab-training-examples"></span><table class="docutils align-default" id="id22">
-<caption><span class="caption-text">Training examples</span><a class="headerlink" href="#id22" title="Permalink to this table">¶</a></caption>
-<colgroup>
-<col style="width: 100%" />
-</colgroup>
+<caption><span class="caption-text">Training examples</span><a class="headerlink" href="#id22" title="Link to this table">¶</a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>Example script</p></th>
 </tr>
@@ -1357,7 +1281,7 @@ and not simulated at all.</p>
 </table>
 </section>
 <section id="troubleshooting">
-<h3>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h3>
+<h3>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Examples run without data package installed will crash to a fatal error.</p></li>
 </ul>
@@ -1370,10 +1294,11 @@ and not simulated at all.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="satellite.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="satellite.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">User Documentation</a><ul>
 <li><a class="reference internal" href="#usage">Usage</a><ul>
 <li><a class="reference internal" href="#building-satellite-module">Building Satellite Module</a><ul>
@@ -1423,12 +1348,17 @@ and not simulated at all.</p>
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="satellite-design.html"
-                        title="previous chapter">Design Documentation</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="satellite-testing.html"
-                        title="next chapter">Testing Documentation</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="satellite-design.html"
+                          title="previous chapter">Design Documentation</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="satellite-testing.html"
+                          title="next chapter">Testing Documentation</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -1436,7 +1366,7 @@ and not simulated at all.</p>
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
@@ -1444,13 +1374,13 @@ and not simulated at all.</p>
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">

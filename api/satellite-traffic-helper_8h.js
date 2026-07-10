@@ -1,8 +1,8 @@
 var satellite_traffic_helper_8h =
 [
-    [ "CustomTrafficInfo_s", "structns3_1_1_sat_traffic_helper_1_1_custom_traffic_info__s.html", "structns3_1_1_sat_traffic_helper_1_1_custom_traffic_info__s" ],
-    [ "SatTrafficHelper", "classns3_1_1_sat_traffic_helper.html", "classns3_1_1_sat_traffic_helper" ],
-    [ "SatTrafficHelperConf", "classns3_1_1_sat_traffic_helper_conf.html", "classns3_1_1_sat_traffic_helper_conf" ],
+    [ "ns3::SatTrafficHelper::CustomTrafficInfo_s", "structns3_1_1_sat_traffic_helper_1_1_custom_traffic_info__s.html", "structns3_1_1_sat_traffic_helper_1_1_custom_traffic_info__s" ],
+    [ "ns3::SatTrafficHelper", "classns3_1_1_sat_traffic_helper.html", "classns3_1_1_sat_traffic_helper" ],
+    [ "ns3::SatTrafficHelperConf", "classns3_1_1_sat_traffic_helper_conf.html", "classns3_1_1_sat_traffic_helper_conf" ],
     [ "TrafficConfiguration_t", "struct_traffic_configuration__t.html", "struct_traffic_configuration__t" ],
     [ "STRINGIFY", "satellite-traffic-helper_8h.html#a6df1d22fb5f09eccc23b9f399670cfd7", null ],
     [ "TOSTRING", "satellite-traffic-helper_8h.html#a9063e80f8777300c93afde6e6f4c9cea", null ],

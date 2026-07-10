@@ -25,7 +25,6 @@ var classns3_1_1_sat_request_manager =
     [ "DoVbdc", "classns3_1_1_sat_request_manager.html#a82311063695097faa7c15171ac31b332", null ],
     [ "DoVbdcLegacy", "classns3_1_1_sat_request_manager.html#a13af6fd797c8af394edf8262bc5b56e6", null ],
     [ "GetAvbdcBytes", "classns3_1_1_sat_request_manager.html#a9d2a78210846a57905fc359bd374bc36", null ],
-    [ "GetInstanceTypeId", "classns3_1_1_sat_request_manager.html#ae2d5be3f250a95926d4717bc6edbbcc4", null ],
     [ "GetPendingRbdcSumKbps", "classns3_1_1_sat_request_manager.html#a70182f84652b4cea769c4e40fb1cefd9", null ],
     [ "GetQuantizedRbdcValue", "classns3_1_1_sat_request_manager.html#a44e2cc78c819185d64de84efae047e83", null ],
     [ "GetQuantizedVbdcValue", "classns3_1_1_sat_request_manager.html#a9e7c3c9234a97bc6e1b37c6ac04fc002", null ],

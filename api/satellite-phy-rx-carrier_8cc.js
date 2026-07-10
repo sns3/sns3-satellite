@@ -1,4 +1,4 @@
 var satellite_phy_rx_carrier_8cc =
 [
-    [ "operator<<", "satellite-phy-rx-carrier_8cc.html#af1b620eedb3e40863ee13cf504e985cb", null ]
+    [ "ns3::operator<<", "namespacens3.html#a4ea176f1a082b96f881b496faf46a58c", null ]
 ];

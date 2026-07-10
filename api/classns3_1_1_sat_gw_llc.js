@@ -11,7 +11,7 @@ var classns3_1_1_sat_gw_llc =
     [ "GetNPacketsInQueue", "classns3_1_1_sat_gw_llc.html#a661ad16e593b3285d9ab31c0cfc294c2", null ],
     [ "GetSatLinkRxDir", "classns3_1_1_sat_gw_llc.html#a56f31d3a7a34a2e326668bc3c646c10d", null ],
     [ "GetSatLinkTxDir", "classns3_1_1_sat_gw_llc.html#ae68452bc8b200addc861d29c60edf8c0", null ],
-    [ "GetSchedulingContexts", "classns3_1_1_sat_gw_llc.html#a6c7b695f4a12ec12d02bc7173b992bf7", null ],
+    [ "GetSchedulingContexts", "classns3_1_1_sat_gw_llc.html#ae5db7ae9bb33f2a87119afe532254a6a", null ],
     [ "GetTypeId", "classns3_1_1_sat_gw_llc.html#a8a7ac90b7fbccad31e4e2795efaae4ab", null ],
     [ "NotifyTxOpportunity", "classns3_1_1_sat_gw_llc.html#a51aa5e4820a687848196b697bd4d262f", null ]
 ];

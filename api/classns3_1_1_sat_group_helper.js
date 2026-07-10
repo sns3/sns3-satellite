@@ -12,7 +12,6 @@ var classns3_1_1_sat_group_helper =
     [ "GetAdditionalNodesPerBeam", "classns3_1_1_sat_group_helper.html#aaf9fdb55ccf1a3e08e91b2ab42018749", null ],
     [ "GetGroupId", "classns3_1_1_sat_group_helper.html#ad4ae9f4a9204f2a21f7eb7cfbd319969", null ],
     [ "GetGroups", "classns3_1_1_sat_group_helper.html#a192a5ec89f1169bf9df12fde5ae00a2b", null ],
-    [ "GetInstanceTypeId", "classns3_1_1_sat_group_helper.html#a94939e5b155def38d91bd059d9d73431", null ],
     [ "GetN", "classns3_1_1_sat_group_helper.html#a492dd608b59ca0823e490986b5730390", null ],
     [ "GetNodesNotAddedFromPosition", "classns3_1_1_sat_group_helper.html#aa1e48e9afa727e4ae1fc7547d328b594", null ],
     [ "GetTypeId", "classns3_1_1_sat_group_helper.html#a6d097449367989b5411fcd3af1001a4e", null ],

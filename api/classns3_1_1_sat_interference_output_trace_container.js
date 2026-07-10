@@ -9,7 +9,6 @@ var classns3_1_1_sat_interference_output_trace_container =
     [ "DoDispose", "classns3_1_1_sat_interference_output_trace_container.html#a5e7253d8623a0c8944d7b007a21e8213", null ],
     [ "EnableFigureOutput", "classns3_1_1_sat_interference_output_trace_container.html#a909dc90755feb6eed0d90f7219f1f474", null ],
     [ "FindNode", "classns3_1_1_sat_interference_output_trace_container.html#a47528a4180fbe501011fb7002d0d0228", null ],
-    [ "GetInstanceTypeId", "classns3_1_1_sat_interference_output_trace_container.html#a0b316b8e6e65ad2bd1c7d554804f0dae", null ],
     [ "GetTypeId", "classns3_1_1_sat_interference_output_trace_container.html#ae2c60f16b20b5c1833ab6f8cdca32fcf", null ],
     [ "Reset", "classns3_1_1_sat_interference_output_trace_container.html#a352c400a170def18602d3e6503c49dd0", null ],
     [ "WriteToFile", "classns3_1_1_sat_interference_output_trace_container.html#ae2c8cbd796f99684cf7bcb02cf1657c9", null ],

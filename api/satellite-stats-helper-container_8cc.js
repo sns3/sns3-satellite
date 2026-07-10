@@ -22,8 +22,8 @@ var satellite_stats_helper_container_8cc =
     [ "SAT_STATS_PER_SLICE_METHOD_DEFINITION", "satellite-stats-helper-container_8cc.html#acbef5cb35963bc565e6835fe09ecf37d", null ],
     [ "SAT_STATS_PER_UT_METHOD_DEFINITION", "satellite-stats-helper-container_8cc.html#a2d47e8a250f14e4adc1a29bade38bb7f", null ],
     [ "SAT_STATS_PER_UT_USER_METHOD_DEFINITION", "satellite-stats-helper-container_8cc.html#a06d7f9a90dfa547e9b7aed1582d60e0e", null ],
-    [ "SAT_STATS_GLOBAL_METHOD_DEFINITION", "satellite-stats-helper-container_8cc.html#a1310477c9e2e4e305fc7f56e8953a9ca", null ],
-    [ "SAT_STATS_PER_BEAM_METHOD_DEFINITION", "satellite-stats-helper-container_8cc.html#a8efb3f8358800e603d2ac39011761335", null ],
-    [ "SAT_STATS_PER_BEAM_METHOD_DEFINITION", "satellite-stats-helper-container_8cc.html#ae542044b8bb1ee9d36572881428be770", null ],
-    [ "SAT_STATS_PER_UT_METHOD_DEFINITION", "satellite-stats-helper-container_8cc.html#aadded834b83accc6f47b7e10ee860ebd", null ]
+    [ "ns3::SAT_STATS_GLOBAL_METHOD_DEFINITION", "namespacens3.html#a1310477c9e2e4e305fc7f56e8953a9ca", null ],
+    [ "ns3::SAT_STATS_PER_BEAM_METHOD_DEFINITION", "namespacens3.html#a8efb3f8358800e603d2ac39011761335", null ],
+    [ "ns3::SAT_STATS_PER_BEAM_METHOD_DEFINITION", "namespacens3.html#ae542044b8bb1ee9d36572881428be770", null ],
+    [ "ns3::SAT_STATS_PER_UT_METHOD_DEFINITION", "namespacens3.html#aadded834b83accc6f47b7e10ee860ebd", null ]
 ];

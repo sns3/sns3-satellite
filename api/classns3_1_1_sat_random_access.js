@@ -12,7 +12,7 @@ var classns3_1_1_sat_random_access =
     [ "CrdsaIncreaseConsecutiveBlocksUsedForAllAllocationChannels", "classns3_1_1_sat_random_access.html#a57317f2a2661c2cc8565a249fb672d61", null ],
     [ "CrdsaIsAllocationChannelFree", "classns3_1_1_sat_random_access.html#a53a5b4ab3f4a0ee50ff0894748f9ab73", null ],
     [ "CrdsaPrepareToTransmit", "classns3_1_1_sat_random_access.html#a523b21f049b4e4873fff0a8d4a4f56d8", null ],
-    [ "CrdsaRandomizeTxOpportunities", "classns3_1_1_sat_random_access.html#a4bd88e838f8acc0818018a4cde6f20c6", null ],
+    [ "CrdsaRandomizeTxOpportunities", "classns3_1_1_sat_random_access.html#a671b614515148b747acbdac66bbd13bc", null ],
     [ "CrdsaReduceIdleBlocks", "classns3_1_1_sat_random_access.html#aef6c572fbb4adf258efa07ff6f731ef4", null ],
     [ "CrdsaReduceIdleBlocksForAllAllocationChannels", "classns3_1_1_sat_random_access.html#ab9b686a5ad45d6df8f76b0405cf1c7f6", null ],
     [ "CrdsaResetConsecutiveBlocksUsed", "classns3_1_1_sat_random_access.html#a522327d93afc8fbdcbe0667b6fdf48a8", null ],

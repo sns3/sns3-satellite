@@ -11,7 +11,6 @@ var classns3_1_1_sat_tbtp_message =
     [ "Dump", "classns3_1_1_sat_tbtp_message.html#a27303c4d731742048897dbdc7de6e7ba", null ],
     [ "GetDaTimeslots", "classns3_1_1_sat_tbtp_message.html#a625377f29acf278406eca7ec6a46b923", null ],
     [ "GetFrameInfoSize", "classns3_1_1_sat_tbtp_message.html#a445983e7a24c540e9f9ef54cb63a7574", null ],
-    [ "GetInstanceTypeId", "classns3_1_1_sat_tbtp_message.html#a6c9dacacf07737de163430decb91136f", null ],
     [ "GetMsgType", "classns3_1_1_sat_tbtp_message.html#ae193c9b2cd2f9f82aa8dc1314da5ca9f", null ],
     [ "GetRaChannels", "classns3_1_1_sat_tbtp_message.html#acd623304cf58cd3e67235b9c89fddd73", null ],
     [ "GetSizeInBytes", "classns3_1_1_sat_tbtp_message.html#ad4eb8f89cd2300b05186bf956caf68e0", null ],

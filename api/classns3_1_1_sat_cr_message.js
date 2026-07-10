@@ -11,7 +11,6 @@ var classns3_1_1_sat_cr_message =
     [ "AddControlElement", "classns3_1_1_sat_cr_message.html#ac8cb707760e4f89a9a0f854afa708b66", null ],
     [ "GetCapacityRequestContent", "classns3_1_1_sat_cr_message.html#aae2cdfdaee37a6379345a88859e9d884", null ],
     [ "GetCnoEstimate", "classns3_1_1_sat_cr_message.html#aed90fedf4f94500210c3b126889c9861", null ],
-    [ "GetInstanceTypeId", "classns3_1_1_sat_cr_message.html#ad09ef35a077942fbabe5bfece7a54935", null ],
     [ "GetMsgType", "classns3_1_1_sat_cr_message.html#a49be98d3c97c2eef74caf7a51fc4ca67", null ],
     [ "GetNumCapacityRequestElements", "classns3_1_1_sat_cr_message.html#a650254e0aeb71672491a0e3d05bb2f37", null ],
     [ "GetSizeInBytes", "classns3_1_1_sat_cr_message.html#a28f57727c06fa7360571b8916820dc9a", null ],

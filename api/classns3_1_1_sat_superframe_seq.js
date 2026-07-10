@@ -12,7 +12,6 @@ var classns3_1_1_sat_superframe_seq =
     [ "GetCarrierFrequencyHz", "classns3_1_1_sat_superframe_seq.html#a0abe566d250ad9e0dbb6bc0d8b6d61dd", null ],
     [ "GetCarrierId", "classns3_1_1_sat_superframe_seq.html#a8453316cdf5b996ea3990f1120b41d95", null ],
     [ "GetDuration", "classns3_1_1_sat_superframe_seq.html#aa9ab04329f8df4dc1b6e8e0a9914962b", null ],
-    [ "GetInstanceTypeId", "classns3_1_1_sat_superframe_seq.html#aeb82bcdb2affab75b32780a0e079810e", null ],
     [ "GetSuperframeConf", "classns3_1_1_sat_superframe_seq.html#a0654b1a34e7334ce4cb2a1240ea49411", null ],
     [ "GetTargetDuration", "classns3_1_1_sat_superframe_seq.html#a592d9509fecf0de51b24e6a230d7659a", null ],
     [ "GetTypeId", "classns3_1_1_sat_superframe_seq.html#a2057099c9581d0af799d9524de2e6edc", null ],

@@ -2,7 +2,6 @@ var classns3_1_1_simulation_helper_conf =
 [
     [ "SimulationHelperConf", "classns3_1_1_simulation_helper_conf.html#ab2b6a9584739dd6f1c9a821aabaaa800", null ],
     [ "~SimulationHelperConf", "classns3_1_1_simulation_helper_conf.html#afb897c2b113b933a3a1844f5ebef5ec9", null ],
-    [ "GetInstanceTypeId", "classns3_1_1_simulation_helper_conf.html#aaa577c79b49cb2dc731a4cbdbb3e19ce", null ],
     [ "GetTypeId", "classns3_1_1_simulation_helper_conf.html#ab69acccd42dc45632826c5dd949b80c3", null ],
     [ "m_activateProgressLogging", "classns3_1_1_simulation_helper_conf.html#ac461e39a221351a93bd690b8a4988b76", null ],
     [ "m_activateStatistics", "classns3_1_1_simulation_helper_conf.html#a5413844a779b6695d97fdb64bed6444b", null ],

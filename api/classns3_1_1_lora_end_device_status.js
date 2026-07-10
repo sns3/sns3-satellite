@@ -41,7 +41,7 @@ var classns3_1_1_lora_end_device_status =
     [ "SetSecondReceiveWindowFrequency", "classns3_1_1_lora_end_device_status.html#a27b0ee3adaf643ada07eef6d0a51adb1", null ],
     [ "SetSecondReceiveWindowOffset", "classns3_1_1_lora_end_device_status.html#a2885feeaffe4965f5d49edb56c577d65", null ],
     [ "UpdateGatewayData", "classns3_1_1_lora_end_device_status.html#a4a4cded7a66cceb039065a3b9c2d8694", null ],
-    [ "operator<<", "classns3_1_1_lora_end_device_status.html#a67aadd6d4435a0c2137cf71ceb198760", null ],
+    [ "operator<<", "classns3_1_1_lora_end_device_status.html#a02468c1460fe87ea08d728cad5ef10f7", null ],
     [ "m_beamId", "classns3_1_1_lora_end_device_status.html#a0371af84659f98f40c256e741acd4425", null ],
     [ "m_endDeviceAddress", "classns3_1_1_lora_end_device_status.html#af75f9213eed4c3df6184f9ae06fea78b", null ],
     [ "m_firstReceiveWindowFrequency", "classns3_1_1_lora_end_device_status.html#a0541a076c40390cf9ac0c6ca1b9df8e4", null ],

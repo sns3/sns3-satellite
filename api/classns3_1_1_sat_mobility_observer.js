@@ -6,7 +6,6 @@ var classns3_1_1_sat_mobility_observer =
     [ "~SatMobilityObserver", "classns3_1_1_sat_mobility_observer.html#a2d547fb4f216f1e2dfb75a2d4acbc3db", null ],
     [ "DoDispose", "classns3_1_1_sat_mobility_observer.html#a35387a6b25c47ab8a30e8e5ccb39107b", null ],
     [ "GetElevationAngle", "classns3_1_1_sat_mobility_observer.html#ac4d398caba3ca8bd1e8dadfd05fabb73", null ],
-    [ "GetInstanceTypeId", "classns3_1_1_sat_mobility_observer.html#af7546a2242d620877cdc4d82ca7925b5", null ],
     [ "GetTimingAdvance", "classns3_1_1_sat_mobility_observer.html#a48710f86140644cfa90639470b6a9584", null ],
     [ "GetTypeId", "classns3_1_1_sat_mobility_observer.html#a8509a33066f2e7b7dd38d346c5cfcb22", null ],
     [ "GetVelocity", "classns3_1_1_sat_mobility_observer.html#a7d053649b5c973c2d501ddf0e6e7f368", null ],

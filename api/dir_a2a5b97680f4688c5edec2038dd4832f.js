@@ -1,21 +1,13 @@
 var dir_a2a5b97680f4688c5edec2038dd4832f =
 [
     [ "satellite-frame-symbol-load-probe.cc", "satellite-frame-symbol-load-probe_8cc.html", null ],
-    [ "satellite-frame-symbol-load-probe.h", "satellite-frame-symbol-load-probe_8h.html", [
-      [ "SatFrameSymbolLoadProbe", "classns3_1_1_sat_frame_symbol_load_probe.html", "classns3_1_1_sat_frame_symbol_load_probe" ]
-    ] ],
+    [ "satellite-frame-symbol-load-probe.h", "satellite-frame-symbol-load-probe_8h.html", "satellite-frame-symbol-load-probe_8h" ],
     [ "satellite-frame-user-load-probe.cc", "satellite-frame-user-load-probe_8cc.html", null ],
-    [ "satellite-frame-user-load-probe.h", "satellite-frame-user-load-probe_8h.html", [
-      [ "SatFrameUserLoadProbe", "classns3_1_1_sat_frame_user_load_probe.html", "classns3_1_1_sat_frame_user_load_probe" ]
-    ] ],
+    [ "satellite-frame-user-load-probe.h", "satellite-frame-user-load-probe_8h.html", "satellite-frame-user-load-probe_8h" ],
     [ "satellite-phy-rx-carrier-packet-probe.cc", "satellite-phy-rx-carrier-packet-probe_8cc.html", null ],
-    [ "satellite-phy-rx-carrier-packet-probe.h", "satellite-phy-rx-carrier-packet-probe_8h.html", [
-      [ "SatPhyRxCarrierPacketProbe", "classns3_1_1_sat_phy_rx_carrier_packet_probe.html", "classns3_1_1_sat_phy_rx_carrier_packet_probe" ]
-    ] ],
+    [ "satellite-phy-rx-carrier-packet-probe.h", "satellite-phy-rx-carrier-packet-probe_8h.html", "satellite-phy-rx-carrier-packet-probe_8h" ],
     [ "satellite-sinr-probe.cc", "satellite-sinr-probe_8cc.html", null ],
-    [ "satellite-sinr-probe.h", "satellite-sinr-probe_8h.html", [
-      [ "SatSinrProbe", "classns3_1_1_sat_sinr_probe.html", "classns3_1_1_sat_sinr_probe" ]
-    ] ],
+    [ "satellite-sinr-probe.h", "satellite-sinr-probe_8h.html", "satellite-sinr-probe_8h" ],
     [ "satellite-stats-antenna-gain-helper.cc", "satellite-stats-antenna-gain-helper_8cc.html", null ],
     [ "satellite-stats-antenna-gain-helper.h", "satellite-stats-antenna-gain-helper_8h.html", null ],
     [ "satellite-stats-backlogged-request-helper.cc", "satellite-stats-backlogged-request-helper_8cc.html", null ],
@@ -41,16 +33,7 @@ var dir_a2a5b97680f4688c5edec2038dd4832f =
     [ "satellite-stats-helper.cc", "satellite-stats-helper_8cc.html", null ],
     [ "satellite-stats-helper.h", "satellite-stats-helper_8h.html", null ],
     [ "satellite-stats-jitter-helper.cc", "satellite-stats-jitter-helper_8cc.html", null ],
-    [ "satellite-stats-jitter-helper.h", "satellite-stats-jitter-helper_8h.html", [
-      [ "SatStatsFwdAppJitterHelper", "classns3_1_1_sat_stats_fwd_app_jitter_helper.html", "classns3_1_1_sat_stats_fwd_app_jitter_helper" ],
-      [ "SatStatsFwdDevJitterHelper", "classns3_1_1_sat_stats_fwd_dev_jitter_helper.html", "classns3_1_1_sat_stats_fwd_dev_jitter_helper" ],
-      [ "SatStatsFwdMacJitterHelper", "classns3_1_1_sat_stats_fwd_mac_jitter_helper.html", "classns3_1_1_sat_stats_fwd_mac_jitter_helper" ],
-      [ "SatStatsFwdPhyJitterHelper", "classns3_1_1_sat_stats_fwd_phy_jitter_helper.html", "classns3_1_1_sat_stats_fwd_phy_jitter_helper" ],
-      [ "SatStatsRtnAppJitterHelper", "classns3_1_1_sat_stats_rtn_app_jitter_helper.html", "classns3_1_1_sat_stats_rtn_app_jitter_helper" ],
-      [ "SatStatsRtnDevJitterHelper", "classns3_1_1_sat_stats_rtn_dev_jitter_helper.html", "classns3_1_1_sat_stats_rtn_dev_jitter_helper" ],
-      [ "SatStatsRtnMacJitterHelper", "classns3_1_1_sat_stats_rtn_mac_jitter_helper.html", "classns3_1_1_sat_stats_rtn_mac_jitter_helper" ],
-      [ "SatStatsRtnPhyJitterHelper", "classns3_1_1_sat_stats_rtn_phy_jitter_helper.html", "classns3_1_1_sat_stats_rtn_phy_jitter_helper" ]
-    ] ],
+    [ "satellite-stats-jitter-helper.h", "satellite-stats-jitter-helper_8h.html", "satellite-stats-jitter-helper_8h" ],
     [ "satellite-stats-link-delay-helper.cc", "satellite-stats-link-delay-helper_8cc.html", null ],
     [ "satellite-stats-link-delay-helper.h", "satellite-stats-link-delay-helper_8h.html", null ],
     [ "satellite-stats-link-jitter-helper.cc", "satellite-stats-link-jitter-helper_8cc.html", null ],
@@ -70,10 +53,7 @@ var dir_a2a5b97680f4688c5edec2038dd4832f =
     [ "satellite-stats-packet-error-helper.cc", "satellite-stats-packet-error-helper_8cc.html", null ],
     [ "satellite-stats-packet-error-helper.h", "satellite-stats-packet-error-helper_8h.html", null ],
     [ "satellite-stats-plt-helper.cc", "satellite-stats-plt-helper_8cc.html", null ],
-    [ "satellite-stats-plt-helper.h", "satellite-stats-plt-helper_8h.html", [
-      [ "SatStatsFwdAppPltHelper", "classns3_1_1_sat_stats_fwd_app_plt_helper.html", "classns3_1_1_sat_stats_fwd_app_plt_helper" ],
-      [ "SatStatsRtnAppPltHelper", "classns3_1_1_sat_stats_rtn_app_plt_helper.html", "classns3_1_1_sat_stats_rtn_app_plt_helper" ]
-    ] ],
+    [ "satellite-stats-plt-helper.h", "satellite-stats-plt-helper_8h.html", "satellite-stats-plt-helper_8h" ],
     [ "satellite-stats-queue-helper.cc", "satellite-stats-queue-helper_8cc.html", null ],
     [ "satellite-stats-queue-helper.h", "satellite-stats-queue-helper_8h.html", null ],
     [ "satellite-stats-rbdc-request-helper.cc", "satellite-stats-rbdc-request-helper_8cc.html", null ],

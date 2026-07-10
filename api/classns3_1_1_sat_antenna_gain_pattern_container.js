@@ -10,7 +10,6 @@ var classns3_1_1_sat_antenna_gain_pattern_container =
     [ "GetBeamGain", "classns3_1_1_sat_antenna_gain_pattern_container.html#a0ba1e8fad15c5c5f73fda6d77ea937e3", null ],
     [ "GetBestBeamId", "classns3_1_1_sat_antenna_gain_pattern_container.html#a598cf153cc4c403fde36c221d9b831a7", null ],
     [ "GetDefaultGeoPosition", "classns3_1_1_sat_antenna_gain_pattern_container.html#a4f2593e8b78a759495253f2dad4f07a5", null ],
-    [ "GetInstanceTypeId", "classns3_1_1_sat_antenna_gain_pattern_container.html#ab3e45f84c6fd655a67f5646451433775", null ],
     [ "GetNAntennaGainPatterns", "classns3_1_1_sat_antenna_gain_pattern_container.html#a6feed4ab7c7bd2a45ace37e162bcd194", null ],
     [ "GetTypeId", "classns3_1_1_sat_antenna_gain_pattern_container.html#a960b6d57270b874a184dccff5ea82e2d", null ],
     [ "SetEnabledBeams", "classns3_1_1_sat_antenna_gain_pattern_container.html#a813bbc1e2c76fc1b123e504efb72aaeb", null ],

@@ -6,7 +6,6 @@ var classns3_1_1_sat_cno_helper =
     [ "~SatCnoHelper", "classns3_1_1_sat_cno_helper.html#a878a27f58e2ef834d6d9a1f2c0e83755", null ],
     [ "ApplyConfiguration", "classns3_1_1_sat_cno_helper.html#a2a6e4c9f85e687af2460d247fd2ad9d1", null ],
     [ "CheckDuplicate", "classns3_1_1_sat_cno_helper.html#a8f390974f7f3f55e9df33bef4c95159e", null ],
-    [ "GetInstanceTypeId", "classns3_1_1_sat_cno_helper.html#adac1db3cc4e2de5d3556e5658a11d918", null ],
     [ "GetTypeId", "classns3_1_1_sat_cno_helper.html#a41eb900e922cab819de12197141550ec", null ],
     [ "SetGwNodeCno", "classns3_1_1_sat_cno_helper.html#a1d3ee6d324908f7ef963a6909aa76b16", null ],
     [ "SetGwNodeCno", "classns3_1_1_sat_cno_helper.html#a8d922fbfa99bf931c9c330fd28b2931a", null ],

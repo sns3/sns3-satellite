@@ -5,7 +5,6 @@ var classns3_1_1_sat_cmt_message =
     [ "GetBurstTimeCorrection", "classns3_1_1_sat_cmt_message.html#afd50e0449bde8f9bc8e8a718f2608f23", null ],
     [ "GetFrequencyCorrection", "classns3_1_1_sat_cmt_message.html#a0676d33cfe88998eb0b64497c9e41e63", null ],
     [ "GetGroupId", "classns3_1_1_sat_cmt_message.html#a3a2b628c00a8e4925f63dfbb3022ac96", null ],
-    [ "GetInstanceTypeId", "classns3_1_1_sat_cmt_message.html#a42273fa4afd48e88388e8f52f9e5fbda", null ],
     [ "GetLogonId", "classns3_1_1_sat_cmt_message.html#abc71318de8419b668d89c3275788a838", null ],
     [ "GetMsgType", "classns3_1_1_sat_cmt_message.html#a0e71b1594d104267f8f434db6b5b4eb0", null ],
     [ "GetPowerCorrection", "classns3_1_1_sat_cmt_message.html#ae66a4530668a5c99b3c242db405b3e7a", null ],

@@ -1,19 +1,17 @@
 
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Design Documentation &#8212; NS3 Satellite Module</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/default.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/default.css?v=fc1ee2df" />
+    <script src="_static/documentation_options.js?v=9aa08746"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="User Documentation" href="satellite-usage.html" />
     <link rel="prev" title="Satellite Module" href="satellite.html" />
@@ -78,7 +76,7 @@
       </div>
     </nav>
 
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -101,7 +99,7 @@
           <div class="body" role="main">
             
   <section id="design-documentation">
-<h1>Design Documentation<a class="headerlink" href="#design-documentation" title="Permalink to this headline">¶</a></h1>
+<h1>Design Documentation<a class="headerlink" href="#design-documentation" title="Link to this heading">¶</a></h1>
 <p>Satellite module models a full interactive multi-spot beam satellite network
 with a geostationary satellite and transparent star (bent-pipe) payload. It
 models DVB-RCS2 (Digital Video Broadcast - Return Channel via Satellite -
@@ -110,10 +108,10 @@ generation) specifications in return and forward link. The module has been
 created within European Space Agency ARTES 5.1 AO6947 project “Development of an Open-Source,
 Modular and Flexible Satellite Network Simulator”.</p>
 <section id="model-description">
-<h2>Model Description<a class="headerlink" href="#model-description" title="Permalink to this headline">¶</a></h2>
+<h2>Model Description<a class="headerlink" href="#model-description" title="Link to this heading">¶</a></h2>
 <p>The source code for the satellite module lives in the directory <code class="docutils literal notranslate"><span class="pre">contrib/satellite</span></code>.</p>
 <section id="design">
-<h3>Design<a class="headerlink" href="#design" title="Permalink to this headline">¶</a></h3>
+<h3>Design<a class="headerlink" href="#design" title="Link to this heading">¶</a></h3>
 <p>As a reference system scenario, a single multi spot-beam satellite at geostationary orbit at about 35786
 km altitude is considered. The system coverage is Europe using a single satellite located at 33 degrees East
 using Ka-band frequency (from 26.5 to 40.0 GHz) on the feeder and user links. The user link coverage
@@ -122,14 +120,14 @@ consists of 72 spot-beams and the user beams are served by 5 gateways. This is i
 <figure class="align-default" id="id1" style="width: 15cm">
 <span id="fig-antenna-gain"></span><img alt="_images/satellite-full72-gain-map.png" src="_images/satellite-full72-gain-map.png" />
 <figcaption>
-<p><span class="caption-text">Antenna gain pattern</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+<p><span class="caption-text">Antenna gain pattern</span><a class="headerlink" href="#id1" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p></p>
 <figure class="align-default" id="id2">
 <span id="fig-sat-frequency-plan"></span><img alt="_images/satellite-freq-plan2.png" src="_images/satellite-freq-plan2.png" />
 <figcaption>
-<p><span class="caption-text">Satellite frequency plan</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+<p><span class="caption-text">Satellite frequency plan</span><a class="headerlink" href="#id2" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>The system allocates 2 GHz to the feeder link: from 27.5 GHz to 29.5 GHz to uplink and from 17.7
@@ -146,7 +144,7 @@ are needed to support them.</p>
 <figure class="align-default" id="id3">
 <span id="fig-satellite-full72-dominance-map-userfreq"></span><img alt="_images/satellite-full72-dominance-map-userfreq.png" src="_images/satellite-full72-dominance-map-userfreq.png" />
 <figcaption>
-<p><span class="caption-text">Dominance map of 72 beam reference system with user frequency IDs</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+<p><span class="caption-text">Dominance map of 72 beam reference system with user frequency IDs</span><a class="headerlink" href="#id3" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>Satellite module is designed to be modular and flexible so that it can be used to simulate different
@@ -160,7 +158,7 @@ or by passing them as command line arguments in NS-3 style. For simpler configur
 simulation script.</p>
 </section>
 <section id="frame-configuration">
-<h3>Frame configuration<a class="headerlink" href="#frame-configuration" title="Permalink to this headline">¶</a></h3>
+<h3>Frame configuration<a class="headerlink" href="#frame-configuration" title="Link to this heading">¶</a></h3>
 <p>Return link uses a Multi-Frequency Time Division Multiple Access (MF-TDMA) which is composed of superframe
 sequences, superframes, frames, time slots and Bandwidth Time Units (BTUs) <a class="reference internal" href="#dvb12-p2">[dvb12-p2]</a>. The used frame structures
 are dynamically configured by the Network Control Center (NCC) by using Superframe Composition Table (SCT),
@@ -174,7 +172,7 @@ forward feeder link 2 GHz bandwidth is divided into 16 125 MHz carriers, where e
 user link frequency color of 125 MHz for a certain beam. Note, that only one carrier per beam is supported.</p>
 </section>
 <section id="architecture">
-<h3>Architecture<a class="headerlink" href="#architecture" title="Permalink to this headline">¶</a></h3>
+<h3>Architecture<a class="headerlink" href="#architecture" title="Link to this heading">¶</a></h3>
 <p>Satellite module architecture consists of models for User Terminal (UT),
 Satellite (SAT), Gateway (GW), Network Control Center (NCC), terrestrial nodes
 (end users) and their interaction. In general, all satellite nodes require a
@@ -194,11 +192,11 @@ coordinate system. New coordinate system is needed for satellite domain nodes
 <figure class="align-default" id="id4" style="width: 15cm">
 <span id="fig-satellite-general-architecture"></span><img alt="_images/satellite-general-architecture.png" src="_images/satellite-general-architecture.png" />
 <figcaption>
-<p><span class="caption-text">General end-to-end architecture</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+<p><span class="caption-text">General end-to-end architecture</span><a class="headerlink" href="#id4" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <section id="user-terminal">
-<h4>User terminal<a class="headerlink" href="#user-terminal" title="Permalink to this headline">¶</a></h4>
+<h4>User terminal<a class="headerlink" href="#user-terminal" title="Link to this heading">¶</a></h4>
 <p>In the UT DVB-RCS2 based burst transmission logic and DVB-S2 based BB frame reception logic has been implemented.
 Incoming IP packets are buffered to LLC layer, which implements a Return Link Encapsulation (RLE) and
 fragmentation/packing functionality for the return link time slots. Request Manager class is observing the
@@ -207,14 +205,15 @@ Category (CC) from NCC; i.e. Rate-Based Dynamic Capacity (RBDC) and Volume-Based
 MAC layer implements the received TBTP processing and time slot scheduling and PHY layer actual
 physical transmission and reception of the packet into the channel. UT structure is presented in <a class="reference internal" href="#fig-satellite-utstructure"><span class="std std-ref">User terminal structure</span></a>.</p>
 <figure class="align-center" id="id5">
-<span id="fig-satellite-utstructure"></span><a class="reference internal image-reference" href="_images/satellite-utstructure.png"><img alt="_images/satellite-utstructure.png" src="_images/satellite-utstructure.png" style="width: 232.5px; height: 283.0px;" /></a>
+<span id="fig-satellite-utstructure"></span><a class="reference internal image-reference" href="_images/satellite-utstructure.png"><img alt="_images/satellite-utstructure.png" height="283" src="_images/satellite-utstructure.png" width="232" />
+</a>
 <figcaption>
-<p><span class="caption-text">User terminal structure</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
+<p><span class="caption-text">User terminal structure</span><a class="headerlink" href="#id5" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="geostationary-satellite">
-<h4>Geostationary satellite<a class="headerlink" href="#geostationary-satellite" title="Permalink to this headline">¶</a></h4>
+<h4>Geostationary satellite<a class="headerlink" href="#geostationary-satellite" title="Link to this heading">¶</a></h4>
 <p>The satellite module supports currently transparent (”bent-pipe”) payload, where user and feeder links are directly
 mapped to each other. Satellite only amplifies the signal without any packet processing. Note, that the GEO satellite
 calculates also SINR, because the two phase SINR calculation has been adopted.
@@ -223,12 +222,12 @@ final receiver <a class="reference internal" href="#link05">[link05]</a>. Satell
 <figure class="align-default" id="id6" style="width: 15cm">
 <span id="fig-satellite-geosatstructure"></span><img alt="_images/satellite-geosatstructure.png" src="_images/satellite-geosatstructure.png" />
 <figcaption>
-<p><span class="caption-text">Geostationary satellite structure</span><a class="headerlink" href="#id6" title="Permalink to this image">¶</a></p>
+<p><span class="caption-text">Geostationary satellite structure</span><a class="headerlink" href="#id6" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="gateway">
-<h4>Gateway<a class="headerlink" href="#gateway" title="Permalink to this headline">¶</a></h4>
+<h4>Gateway<a class="headerlink" href="#gateway" title="Link to this heading">¶</a></h4>
 <p>In the GW DVB-S2 based transmission logic and DVB-RCS2 based reception logic has been implemented.
 Architecture of the <code class="docutils literal notranslate"><span class="pre">SatNetDevice</span></code> of GW is in general level quite similar to UT architecture. However,
 a major difference is that GW has as many <code class="docutils literal notranslate"><span class="pre">SatNetDevices</span></code> as there are spot-beams served by the GW,
@@ -239,15 +238,16 @@ of a BBFrame may be either 16200 or 64800 coded bits, thus the duration to trans
 based on MODCOD. If the GW does not have any data to transmit, it is generating dummy frames.
 Gateway structure is presented in <a class="reference internal" href="#fig-satellite-gwstructure"><span class="std std-ref">Gateway structure</span></a>.</p>
 <figure class="align-center" id="id7">
-<span id="fig-satellite-gwstructure"></span><a class="reference internal image-reference" href="_images/satellite-gwstructure.png"><img alt="_images/satellite-gwstructure.png" src="_images/satellite-gwstructure.png" style="width: 232.5px; height: 283.0px;" /></a>
+<span id="fig-satellite-gwstructure"></span><a class="reference internal image-reference" href="_images/satellite-gwstructure.png"><img alt="_images/satellite-gwstructure.png" height="283" src="_images/satellite-gwstructure.png" width="232" />
+</a>
 <figcaption>
-<p><span class="caption-text">Gateway structure</span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
+<p><span class="caption-text">Gateway structure</span><a class="headerlink" href="#id7" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <p></p>
 </section>
 <section id="network-control-center">
-<h4>Network control center<a class="headerlink" href="#network-control-center" title="Permalink to this headline">¶</a></h4>
+<h4>Network control center<a class="headerlink" href="#network-control-center" title="Link to this heading">¶</a></h4>
 <p>Network Control Centre (NCC) is responsible of return link resource allocations, i.e. admission control,
 packet scheduling, and Adaptive Coding and Modulation (ACM).</p>
 <p>Satellite module implements one global NCC, which has completely separate scheduler (<code class="docutils literal notranslate"><span class="pre">SatBeamScheduler</span></code>) for each
@@ -256,7 +256,7 @@ GW and <code class="docutils literal notranslate"><span class="pre">SatNetDevice
 NCC and GW, and on the other hand is easily changeable to a real protocol later.</p>
 </section>
 <section id="channel">
-<h4>Channel<a class="headerlink" href="#channel" title="Permalink to this headline">¶</a></h4>
+<h4>Channel<a class="headerlink" href="#channel" title="Link to this heading">¶</a></h4>
 <p>The satellite module channel implementation (<code class="docutils literal notranslate"><span class="pre">SatChannel</span></code>) maps into a frequency color (bandwidth).
 The main purpose of a channel is to be able to pass packets within a one frequency band to all
 receivers sharing the same bandwidth. In other words, all the co-channel beams are sharing the
@@ -274,12 +274,12 @@ the full 72-beam scenario is illustrated.</p>
 <figure class="align-default" id="id8" style="width: 10cm">
 <span id="fig-satellite-channels-16beams-fwd"></span><img alt="_images/satellite-channels-16beams-fwd.png" src="_images/satellite-channels-16beams-fwd.png" />
 <figcaption>
-<p><span class="caption-text">Satellite channel structure with 16 beams</span><a class="headerlink" href="#id8" title="Permalink to this image">¶</a></p>
+<p><span class="caption-text">Satellite channel structure with 16 beams</span><a class="headerlink" href="#id8" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="random-access">
-<h4>Random access<a class="headerlink" href="#random-access" title="Permalink to this headline">¶</a></h4>
+<h4>Random access<a class="headerlink" href="#random-access" title="Link to this heading">¶</a></h4>
 <p>There are three supported random access modes: Slotted ALOHA <a class="reference internal" href="#dvb12-p2">[dvb12-p2]</a>, Contention Resolution Diversity Slotted ALOHA (CRDSA) <a class="reference internal" href="#aloha07">[aloha07]</a>,
 and Multi-Replica Decoding using Correlation based Localisation (MARSALA) <a class="reference internal" href="#marsala">[marsala]</a>.</p>
 <p>Slotted ALOHA is utilized only for control
@@ -292,7 +292,7 @@ delays in case where UT does not have any DA resources available.</p>
 <p>MARSALA algorithm is based on <a class="reference internal" href="#marsala">[marsala]</a> and aims at improving CRDSA when its SIC cycle finishes.</p>
 </section>
 <section id="return-link-packet-scheduling">
-<h4>Return link packet scheduling<a class="headerlink" href="#return-link-packet-scheduling" title="Permalink to this headline">¶</a></h4>
+<h4>Return link packet scheduling<a class="headerlink" href="#return-link-packet-scheduling" title="Link to this heading">¶</a></h4>
 <p>Return link packet scheduler functionality is implemented into one global Network Control Center (NCC). NCC holds independent schedulers
 for each spot-beam, which do not have any interaction with each other. Return link scheduler may work in three
 different time slot configuration modes 0-2.</p>
@@ -320,7 +320,7 @@ for each UT and RC index. Fill in the TBTP on-the-fly.</p></li>
 </ul>
 </section>
 <section id="demand-assignment-multiple-access-dama">
-<h4>Demand assignment multiple access (DAMA)<a class="headerlink" href="#demand-assignment-multiple-access-dama" title="Permalink to this headline">¶</a></h4>
+<h4>Demand assignment multiple access (DAMA)<a class="headerlink" href="#demand-assignment-multiple-access-dama" title="Link to this heading">¶</a></h4>
 <p>Demand assignment multiple access (DAMA) evaluation is implemented within request manager <a class="reference internal" href="#icssc16">[ICSSC16]</a>. The DAMA algorithms are based
 on <a class="reference internal" href="#dama13">[dama13]</a>. Request manager is configured through lower layer service configuration,
 where the DAMA configuration may be configured separately for each RC index. Satellite module supports CRA, RBDC, and VBDC
@@ -330,25 +330,25 @@ the UT packet queues for incoming rates and received DA resource from TBTPs. CR 
 with transmission error probability.</p>
 </section>
 <section id="ut-scheduler">
-<h4>UT scheduler<a class="headerlink" href="#ut-scheduler" title="Permalink to this headline">¶</a></h4>
+<h4>UT scheduler<a class="headerlink" href="#ut-scheduler" title="Link to this heading">¶</a></h4>
 <p>UT schedules the transmission opportunities (time slots) to upper layer based on the received TBTP messages from
 the Network Control Center (NCC).
 UT scheduler primarily obeys the RC indices within TBTP, but in case there are no packets available in the certain
 RLE encapsulator/queue for a given RC index, UT scheduler has a freedom of selecting which RC index to serve.</p>
 </section>
 <section id="fwd-link-scheduler">
-<h4>FWD link scheduler<a class="headerlink" href="#fwd-link-scheduler" title="Permalink to this headline">¶</a></h4>
+<h4>FWD link scheduler<a class="headerlink" href="#fwd-link-scheduler" title="Link to this heading">¶</a></h4>
 <p>FWD link scheduler builds periodically a number of BB frames and fills them with GSE packets from LLC in priority order.
 BB frames will be allocated an optimal MODCOD based on UT specific CNo reports. After a scheduling round, scheduler
 tries to optimize the BB frames by down-converting the ModCod on a need basis to minimize the amount of BB frames.</p>
 </section>
 <section id="arq">
-<h4>ARQ<a class="headerlink" href="#arq" title="Permalink to this headline">¶</a></h4>
+<h4>ARQ<a class="headerlink" href="#arq" title="Link to this heading">¶</a></h4>
 <p>ARQ is not a part of DVB-RCS2 specifications. However, for research objectives, selective repeats ARQ was implemented
 to the satellite module. ARQ works at the LLC level and with GSE (FWD link) or RLE (RTN link) packets.</p>
 </section>
 <section id="mobility-and-handover">
-<h4>Mobility and Handover<a class="headerlink" href="#mobility-and-handover" title="Permalink to this headline">¶</a></h4>
+<h4>Mobility and Handover<a class="headerlink" href="#mobility-and-handover" title="Link to this heading">¶</a></h4>
 <p>Two mobility models are implemented for UTs: a static one and one based on trace files of successive positions.
 For moving UTs, intermediate positions are computed as needed by use of a linear interpolation over the two
 closest positions in the file. Once the UT reaches the position described at the end of the file, it stays static
@@ -359,7 +359,7 @@ defined threshold, it will send a message asking the NCC the authorization to pe
 carrier/beam.</p>
 </section>
 <section id="architecture-references">
-<h4>Architecture references<a class="headerlink" href="#architecture-references" title="Permalink to this headline">¶</a></h4>
+<h4>Architecture references<a class="headerlink" href="#architecture-references" title="Link to this heading">¶</a></h4>
 <p id="dama13">[dama13] B. de la Cuesta, L. Albiol, J. M. Aguiar, C. Baladrón, B. Carro, and A. Sánhez-Esguevillas,
 Innovative DAMA algorithm for multimedia DVB-RCS system”, EURASIP Journal on Wireless Communications and Networking, 2013.</p>
 <p></p>
@@ -388,7 +388,7 @@ Université de Toulouse, ISAE, 2016</p>
 </section>
 </section>
 <section id="scope-and-limitations">
-<h3>Scope and Limitations<a class="headerlink" href="#scope-and-limitations" title="Permalink to this headline">¶</a></h3>
+<h3>Scope and Limitations<a class="headerlink" href="#scope-and-limitations" title="Link to this heading">¶</a></h3>
 <p>Satellite module models a full interactive multi-spot beam satellite network with a geostationary
 satellite and transparent star (bent-pipe) payload. The reference satellite system consists
 of 72 spot-beams with an European coverage, 5 gateways and Ka-band frequencies. However, the system
@@ -406,7 +406,7 @@ and satellite module specific input files.</p>
 </ul>
 </section>
 <section id="references">
-<h3>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h3>
+<h3>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h3>
 <p id="simutools14">[SIMUtools14] Jani Puttonen, Sami Rantanen, Frans Laakso, Janne Kurjenniemi, Kari Aho, Guray Acar,
 “Satellite Model for Network Simulator 3”, 7th International ICST Conference on
 Simulation Tools and Techniques (SIMUtools), Lisbon, Portugal, March 2014.</p>
@@ -437,10 +437,11 @@ The 34th AIAA International Communications Satellite Systems Conference (ICSSC),
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="satellite.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="satellite.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">Design Documentation</a><ul>
 <li><a class="reference internal" href="#model-description">Model Description</a><ul>
 <li><a class="reference internal" href="#design">Design</a></li>
@@ -469,12 +470,17 @@ The 34th AIAA International Communications Satellite Systems Conference (ICSSC),
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="satellite.html"
-                        title="previous chapter">Satellite Module</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="satellite-usage.html"
-                        title="next chapter">User Documentation</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="satellite.html"
+                          title="previous chapter">Satellite Module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="satellite-usage.html"
+                          title="next chapter">User Documentation</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -482,7 +488,7 @@ The 34th AIAA International Communications Satellite Systems Conference (ICSSC),
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
@@ -490,13 +496,13 @@ The 34th AIAA International Communications Satellite Systems Conference (ICSSC),
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">

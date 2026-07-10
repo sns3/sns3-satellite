@@ -16,7 +16,6 @@ var classns3_1_1_sat_log =
     [ "DoDispose", "classns3_1_1_sat_log.html#a2946dc6b5d267db20bc1a718d480d0f7", null ],
     [ "FindLog", "classns3_1_1_sat_log.html#a7d88fdb2daea28c4b96c5c1e02e55f0a", null ],
     [ "GetFileTag", "classns3_1_1_sat_log.html#a5e18fb67700507770fed8691f08fc690", null ],
-    [ "GetInstanceTypeId", "classns3_1_1_sat_log.html#ae879cce34a4b8e243b703c1556dc29c9", null ],
     [ "GetTypeId", "classns3_1_1_sat_log.html#adf3a043a7d1b7d692c3e4279b3756312", null ],
     [ "Reset", "classns3_1_1_sat_log.html#a5fbcca76c8241d966bfb31811dc681d8", null ],
     [ "WriteToFile", "classns3_1_1_sat_log.html#a44083386e64c8234b6a959179df94bae", null ],

@@ -12,7 +12,7 @@ var classns3_1_1_lorawan_mac =
     [ "GetNPreambleSymbols", "classns3_1_1_lorawan_mac.html#a362c6d9b80cd1772592f3bae7bc597bf", null ],
     [ "GetOnAirTime", "classns3_1_1_lorawan_mac.html#a3fa622ccb9c526afe6805900d464885e", null ],
     [ "GetPhy", "classns3_1_1_lorawan_mac.html#a43eab3e3d961898c54637a152f7b8339", null ],
-    [ "GetPhyTx", "classns3_1_1_lorawan_mac.html#aba114fd8c3c4ba0010f575cff3358507", null ],
+    [ "GetPhyTx", "classns3_1_1_lorawan_mac.html#aa6eda4ee79110b98dda2ae63678841ab", null ],
     [ "GetSfFromDataRate", "classns3_1_1_lorawan_mac.html#a899f7702fe59aeeea7a7beafc6549c64", null ],
     [ "GetTypeId", "classns3_1_1_lorawan_mac.html#a6b6f2ee44af4808ff156672e23e1b3dd", null ],
     [ "Receive", "classns3_1_1_lorawan_mac.html#ab3d67bf29b41baad210836579630e037", null ],

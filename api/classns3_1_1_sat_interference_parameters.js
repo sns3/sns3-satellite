@@ -1,6 +1,7 @@
 var classns3_1_1_sat_interference_parameters =
 [
     [ "~SatInterferenceParameters", "classns3_1_1_sat_interference_parameters.html#a6b1aec9496b60f5f24ce8c76da53e0f9", null ],
+    [ "GetTypeId", "classns3_1_1_sat_interference_parameters.html#afee7c894dda279a91ed260f68d1548de", null ],
     [ "m_additionalInterference", "classns3_1_1_sat_interference_parameters.html#af76646d6e5a2e7711de84c9fa2be430b", null ],
     [ "m_ifPower_W", "classns3_1_1_sat_interference_parameters.html#a77725fbd77b9fd775c1112c8af69d8eb", null ],
     [ "m_ifPowerInSatellite_W", "classns3_1_1_sat_interference_parameters.html#a8ada37892fea56a88cfbb78066e28510", null ],

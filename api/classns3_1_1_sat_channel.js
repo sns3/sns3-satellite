@@ -24,6 +24,7 @@ var classns3_1_1_sat_channel =
     [ "GetPropagationDelayModel", "classns3_1_1_sat_channel.html#a0c5a265273676634c46103135eb15844", null ],
     [ "GetSourceAddress", "classns3_1_1_sat_channel.html#a74261c55ebff811dc342ef911001ba90", null ],
     [ "GetTypeId", "classns3_1_1_sat_channel.html#a4663b90e16e78b5eef972bb446d77e9f", null ],
+    [ "NotifyConstructionCompleted", "classns3_1_1_sat_channel.html#a4062118f779eed2a51cce720764da5f3", null ],
     [ "RemoveRx", "classns3_1_1_sat_channel.html#a71a3f568ee82a31f45771555b5168f59", null ],
     [ "ScheduleRx", "classns3_1_1_sat_channel.html#aa678b90f891b27460b820569e788201c", null ],
     [ "SetBandwidthConverter", "classns3_1_1_sat_channel.html#a943e433b2d4896cbe0b91db9e8b1c9f6", null ],
@@ -45,5 +46,6 @@ var classns3_1_1_sat_channel =
     [ "m_fwdMode", "classns3_1_1_sat_channel.html#a06fb9f03b075e40e1c58d5410ebcdf54", null ],
     [ "m_phyRxContainer", "classns3_1_1_sat_channel.html#aa5c41216e8fcda6d014cd016aaccfb7b", null ],
     [ "m_propagationDelay", "classns3_1_1_sat_channel.html#ad2b6fa3594ca92a292ea387ea0187705", null ],
-    [ "m_rxPowerCalculationMode", "classns3_1_1_sat_channel.html#add4965b6f8b5fd9e5489a0a846684cd3", null ]
+    [ "m_rxPowerCalculationMode", "classns3_1_1_sat_channel.html#add4965b6f8b5fd9e5489a0a846684cd3", null ],
+    [ "m_satFadingExternalInputTraceContainer", "classns3_1_1_sat_channel.html#a01b492d00aa5b63ac68ad8cccd61024b", null ]
 ];

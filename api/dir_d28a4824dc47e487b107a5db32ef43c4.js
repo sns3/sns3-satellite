@@ -24,9 +24,7 @@ var dir_d28a4824dc47e487b107a5db32ef43c4 =
     [ "sat-http-example.cc", "sat-http-example_8cc.html", null ],
     [ "sat-iot-example.cc", "sat-iot-example_8cc.html", null ],
     [ "sat-link-budget-example.cc", "sat-link-budget-example_8cc.html", "sat-link-budget-example_8cc" ],
-    [ "sat-link-results-plot.cc", "sat-link-results-plot_8cc.html", [
-      [ "SatLinkResultsPlot", "classns3_1_1_sat_link_results_plot.html", "classns3_1_1_sat_link_results_plot" ]
-    ] ],
+    [ "sat-link-results-plot.cc", "sat-link-results-plot_8cc.html", "sat-link-results-plot_8cc" ],
     [ "sat-list-position-ext-fading-example.cc", "sat-list-position-ext-fading-example_8cc.html", "sat-list-position-ext-fading-example_8cc" ],
     [ "sat-log-example.cc", "sat-log-example_8cc.html", null ],
     [ "sat-logon-example.cc", "sat-logon-example_8cc.html", null ],
@@ -35,9 +33,7 @@ var dir_d28a4824dc47e487b107a5db32ef43c4 =
     [ "sat-lora-example.cc", "sat-lora-example_8cc.html", null ],
     [ "sat-lora-handover-example.cc", "sat-lora-handover-example_8cc.html", null ],
     [ "sat-lora-regenerative-example.cc", "sat-lora-regenerative-example_8cc.html", null ],
-    [ "sat-markov-fading-trace-example.cc", "sat-markov-fading-trace-example_8cc.html", [
-      [ "SatMarkovFadingExamplePlot", "classns3_1_1_sat_markov_fading_example_plot.html", "classns3_1_1_sat_markov_fading_example_plot" ]
-    ] ],
+    [ "sat-markov-fading-trace-example.cc", "sat-markov-fading-trace-example_8cc.html", "sat-markov-fading-trace-example_8cc" ],
     [ "sat-markov-logic-example.cc", "sat-markov-logic-example_8cc.html", "sat-markov-logic-example_8cc" ],
     [ "sat-mobility-beam-tracer.cc", "sat-mobility-beam-tracer_8cc.html", "sat-mobility-beam-tracer_8cc" ],
     [ "sat-mobility-example.cc", "sat-mobility-example_8cc.html", null ],

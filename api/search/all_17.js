@@ -1,21 +1,15 @@
 var searchData=
 [
-  ['waiting_5ffor_5ftbtp_6179',['WAITING_FOR_TBTP',['../classns3_1_1_sat_ut_mac.html#a49507ace7b3e7ea3498914c30614b534a88558ed82ab48cc99fdfd960a7bf60ff',1,'ns3::SatUtMac']]],
-  ['waitingack_6180',['waitingAck',['../structns3_1_1_lorawan_mac_end_device_1_1_lora_retx_parameters.html#a188259932933bfe5bde29095763ad928',1,'ns3::LorawanMacEndDevice::LoraRetxParameters']]],
-  ['waveformid_6181',['waveformId',['../structns3_1_1_sat_signal_parameters_1_1tx_info__s.html#af494b415a071e7889d69e1c298421737',1,'ns3::SatSignalParameters::txInfo_s']]],
-  ['waveformmap_5ft_6182',['waveformMap_t',['../classns3_1_1_sat_bb_frame_conf.html#aa31964948778a92c9ffcfd7eea9643e8',1,'ns3::SatBbFrameConf']]],
-  ['waveformtracecallback_6183',['WaveformTraceCallback',['../classns3_1_1_sat_beam_scheduler.html#adb59dcfbee2c2bb6eeef6177ddc5f6e6',1,'ns3::SatBeamScheduler']]],
-  ['waveformusagecallback_6184',['WaveformUsageCallback',['../classns3_1_1_sat_stats_waveform_usage_helper.html#aa73e2611bc14f81d5a91c902a6f3f43c',1,'ns3::SatStatsWaveformUsageHelper']]],
-  ['wgeosys_6185',['WGeoSys',['../classns3_1_1_sat_s_g_p4_mobility_model.html#a22ced08bc528769005d124d944f56953',1,'ns3::SatSGP4MobilityModel']]],
-  ['wgs72_6186',['wgs72',['../satellite-sgp4unit_8h.html#a8b910c09824c4a9d8365e717c31dda5ea5140ee8557e0d26533b36716ceb80aa1',1,'satellite-sgp4unit.h']]],
-  ['wgs72old_6187',['wgs72old',['../satellite-sgp4unit_8h.html#a8b910c09824c4a9d8365e717c31dda5eae8b6ff8a0f50c5ba7f8096476f05568a',1,'satellite-sgp4unit.h']]],
-  ['wgs84_6188',['wgs84',['../satellite-sgp4unit_8h.html#a8b910c09824c4a9d8365e717c31dda5eafa5bcd83f474e0eeb8224057e4e8837d',1,'satellite-sgp4unit.h']]],
-  ['wgs84_6189',['WGS84',['../classns3_1_1_geo_coordinate.html#aec64775277e7535a7842b4b99a4a5fdba881b3cf52a73f42571adfdf9a41ab3ee',1,'ns3::GeoCoordinate']]],
-  ['windowloadcallback_6190',['WindowLoadCallback',['../classns3_1_1_sat_stats_window_load_helper.html#a1d8e1bf880bac61a2015ba673d387685',1,'ns3::SatStatsWindowLoadHelper']]],
-  ['windowloadtracecallback_6191',['WindowLoadTraceCallback',['../classns3_1_1_sat_phy_rx_carrier_per_window.html#aff593d2a2006e952528ad55258c5444b',1,'ns3::SatPhyRxCarrierPerWindow']]],
-  ['wirestate_6192',['WireState',['../classns3_1_1_point_to_point_isl_channel.html#a319e0b704404a06a3eb05888db6bed63',1,'ns3::PointToPointIslChannel']]],
-  ['writecontainertofile_6193',['WriteContainerToFile',['../classns3_1_1_sat_output_file_stream_double_container.html#aed41d06e217aed6535578d1b7ad02c92',1,'ns3::SatOutputFileStreamDoubleContainer::WriteContainerToFile()'],['../classns3_1_1_sat_output_file_stream_long_double_container.html#a521954d575a7406592492ec6593810e8',1,'ns3::SatOutputFileStreamLongDoubleContainer::WriteContainerToFile()'],['../classns3_1_1_sat_output_file_stream_string_container.html#a71e40d6732e346521970ab3cc9e285b8',1,'ns3::SatOutputFileStreamStringContainer::WriteContainerToFile()']]],
-  ['writetofile_6194',['WriteToFile',['../classns3_1_1_sat_composite_sinr_output_trace_container.html#a182cbdab2fdd5b230beeec199e9492f9',1,'ns3::SatCompositeSinrOutputTraceContainer::WriteToFile()'],['../classns3_1_1_sat_fading_output_trace_container.html#ae5734854999cdd57a112e979e501ab0e',1,'ns3::SatFadingOutputTraceContainer::WriteToFile()'],['../classns3_1_1_sat_interference_output_trace_container.html#ae2c8cbd796f99684cf7bcb02cf1657c9',1,'ns3::SatInterferenceOutputTraceContainer::WriteToFile()'],['../classns3_1_1_sat_log.html#a44083386e64c8234b6a959179df94bae',1,'ns3::SatLog::WriteToFile()'],['../classns3_1_1_sat_rx_power_output_trace_container.html#a9f27c8c87d3c65516fe7705f897a96c7',1,'ns3::SatRxPowerOutputTraceContainer::WriteToFile()']]],
-  ['wtodbm_6195',['WToDbm',['../classns3_1_1_sat_utils.html#a23191d8d0e2384fa25876b3323ed2aef',1,'ns3::SatUtils']]],
-  ['wtodbw_6196',['WToDbW',['../classns3_1_1_sat_utils.html#a7df13f1443fbd4d01ec753026666d935',1,'ns3::SatUtils']]]
+  ['validate_0',['Validate',['../class_geo_coordinate_test_case.html#a56ea2796b4f90d47210d3f99272d150d',1,'GeoCoordinateTestCase']]],
+  ['values_20for_20this_20script_1',['Overwrite some attribute values for this script',['..//builds/sns3/satellite/satellite/examples/sat-training-example.cc#autotoc_md11',1,'']]],
+  ['variables_2',['Initialize simulation script variables',['..//builds/sns3/satellite/satellite/examples/sat-training-example.cc#autotoc_md5',1,'']]],
+  ['vbcdrcvdcb_3',['VbcdRcvdCb',['../sat-rtn-system-test-example_8cc.html#ac81007fa1bd785d3278579719dbdb0cf',1,'sat-rtn-system-test-example.cc']]],
+  ['vbdccapacityrequestalgorithm_5ft_4',['VbdcCapacityRequestAlgorithm_t',['../classns3_1_1_sat_enums.html#a92131b88f8d90f1259a39f8255a0c354',1,'ns3::SatEnums']]],
+  ['vbdctracecallback_5',['VbdcTraceCallback',['../classns3_1_1_sat_request_manager.html#a5b699a80410b51361dcdc4ecaa636360',1,'ns3::SatRequestManager']]],
+  ['vector_2dextensions_2ecc_6',['vector-extensions.cc',['../vector-extensions_8cc.html',1,'']]],
+  ['vector_2dextensions_2eh_7',['vector-extensions.h',['../vector-extensions_8h.html',1,'']]],
+  ['velocitycallback_8',['VelocityCallback',['../classns3_1_1_sat_base_fading.html#a9a9da0a0baca9e8da3ae17ff6597e9b5',1,'ns3::SatBaseFading']]],
+  ['visitedbeams_9',['visitedBeams',['../sat-mobility-beam-tracer_8cc.html#ad026685d5b8605eb2bb4d1ae933b6d63',1,'sat-mobility-beam-tracer.cc']]],
+  ['voip_10',['VOIP',['../classns3_1_1_sat_traffic_helper.html#a9f1f9fc294f01a81436278c116b79579a6f92c56a7f9cb108a532b62665854d15',1,'ns3::SatTrafficHelper']]],
+  ['voipcodec_5ft_11',['VoipCodec_t',['../classns3_1_1_sat_traffic_helper.html#a4415ff23364a93c5ebc0a971dd3ad229',1,'ns3::SatTrafficHelper']]]
 ];

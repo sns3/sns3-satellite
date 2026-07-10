@@ -19,7 +19,7 @@ var classns3_1_1_sat_beam_scheduler =
     ] ],
     [ "SatBeamScheduler", "classns3_1_1_sat_beam_scheduler.html#adf699270ed7eda2819c2d229292a724a", null ],
     [ "~SatBeamScheduler", "classns3_1_1_sat_beam_scheduler.html#aa4e1c2e966d3488278e53f3038e0976e", null ],
-    [ "AddRaChannels", "classns3_1_1_sat_beam_scheduler.html#a2867b358cc33a29f1813328b12bf0958", null ],
+    [ "AddRaChannels", "classns3_1_1_sat_beam_scheduler.html#aaaf857ec0fae5c81063256535d0c3159", null ],
     [ "AddUt", "classns3_1_1_sat_beam_scheduler.html#ae70391cfbcb05a7e8a0719211c722a3c", null ],
     [ "AddUtInfo", "classns3_1_1_sat_beam_scheduler.html#a418605ce2a23cc0e78be3449d5727279", null ],
     [ "ConnectGw", "classns3_1_1_sat_beam_scheduler.html#a564ad85ccf967096a604941c848aeb42", null ],

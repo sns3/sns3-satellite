@@ -7,7 +7,6 @@ var classns3_1_1_sat_orbiter_feeder_mac =
     [ "DoDispose", "classns3_1_1_sat_orbiter_feeder_mac.html#a83c0741dd12be9fdf059bfad4355a488", null ],
     [ "DoInitialize", "classns3_1_1_sat_orbiter_feeder_mac.html#ab46f96bb86c4dac8f163a8e2912888d4", null ],
     [ "EnquePacket", "classns3_1_1_sat_orbiter_feeder_mac.html#a965d3018b58b718707f59acbc74deef9", null ],
-    [ "GetInstanceTypeId", "classns3_1_1_sat_orbiter_feeder_mac.html#acbddf8f1ae951fc1a3c26afafe7b58ed", null ],
     [ "GetRxUtAddress", "classns3_1_1_sat_orbiter_feeder_mac.html#a81a04f2c4d88cb19e0457733e6b70e8d", null ],
     [ "GetSatLinkRxDir", "classns3_1_1_sat_orbiter_feeder_mac.html#add0e64bb986e45f066c1a76f1c9d99fa", null ],
     [ "GetSatLinkTxDir", "classns3_1_1_sat_orbiter_feeder_mac.html#ace4b2fee4b603bb7ce2c4e3d40d6f364", null ],

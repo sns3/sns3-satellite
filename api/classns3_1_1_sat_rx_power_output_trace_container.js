@@ -9,7 +9,6 @@ var classns3_1_1_sat_rx_power_output_trace_container =
     [ "DoDispose", "classns3_1_1_sat_rx_power_output_trace_container.html#ab65af62c58c9633c6f65411f30a8b109", null ],
     [ "EnableFigureOutput", "classns3_1_1_sat_rx_power_output_trace_container.html#ac9ff345e9d237d7a8a7abdbf117995de", null ],
     [ "FindNode", "classns3_1_1_sat_rx_power_output_trace_container.html#a6cc2ebd3ab3f59ff0d80c8ec2a41a2a9", null ],
-    [ "GetInstanceTypeId", "classns3_1_1_sat_rx_power_output_trace_container.html#abe77fd10a306c3011f0b7382bf2abc75", null ],
     [ "GetTypeId", "classns3_1_1_sat_rx_power_output_trace_container.html#a4e38a32d96d4858bdfe760a4295f2f22", null ],
     [ "Reset", "classns3_1_1_sat_rx_power_output_trace_container.html#a3dd411cfb256e5c0ca342cc6453ff4f2", null ],
     [ "WriteToFile", "classns3_1_1_sat_rx_power_output_trace_container.html#a9f27c8c87d3c65516fe7705f897a96c7", null ],

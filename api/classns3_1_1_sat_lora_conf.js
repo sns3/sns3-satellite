@@ -6,7 +6,6 @@ var classns3_1_1_sat_lora_conf =
     ] ],
     [ "SatLoraConf", "classns3_1_1_sat_lora_conf.html#a0c70775ef94d49672734ee6e4b24c2c7", null ],
     [ "~SatLoraConf", "classns3_1_1_sat_lora_conf.html#a7d9f9c5585d92e310cb17da8442ce0ef", null ],
-    [ "GetInstanceTypeId", "classns3_1_1_sat_lora_conf.html#af49aeb5992ee513aa4795b76c6ec71f7", null ],
     [ "GetTypeId", "classns3_1_1_sat_lora_conf.html#a63374d706589c4432c83668b4c104a2e", null ],
     [ "SetConf", "classns3_1_1_sat_lora_conf.html#a64600ce71d36f4bb168f9063ba48bc40", null ],
     [ "SetConf", "classns3_1_1_sat_lora_conf.html#a33b2314a386d4682b29c587759dee663", null ],

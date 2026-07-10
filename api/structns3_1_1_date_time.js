@@ -8,7 +8,7 @@ var structns3_1_1_date_time =
       [ "GPST", "structns3_1_1_date_time.html#a64b4d1fa36067e8c4587b88ebf72983aad924a3e4620b4f4db7aaac97817b473d", null ],
       [ "POSIX", "structns3_1_1_date_time.html#a64b4d1fa36067e8c4587b88ebf72983aa075abfec9d4135ed528568fba85b68d8", null ]
     ] ],
-    [ "operator<<", "structns3_1_1_date_time.html#afcef823e00fb3b0c7584f73a0b8e8673", null ],
+    [ "operator<<", "structns3_1_1_date_time.html#a5a9efeec8705c094005282dbdc88081d", null ],
     [ "day", "structns3_1_1_date_time.html#a1a509cf220bfce7ff9fd3bb5eb66cfa7", null ],
     [ "hours", "structns3_1_1_date_time.html#ae68c49dcb456d5cdbb2c1a6ea23e66fb", null ],
     [ "millisecs", "structns3_1_1_date_time.html#afa234bf09e3c8c2531068342fa5e3f49", null ],

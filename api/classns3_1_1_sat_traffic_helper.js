@@ -48,7 +48,6 @@ var classns3_1_1_sat_traffic_helper =
     [ "AddVoipTraffic", "classns3_1_1_sat_traffic_helper.html#a9e90de334af3005ca370fdba5ae9f86c", null ],
     [ "AddVoipTraffic", "classns3_1_1_sat_traffic_helper.html#a60bd15889dffcf3785a26a62fbedb254", null ],
     [ "ChangeCustomTraffic", "classns3_1_1_sat_traffic_helper.html#a178722d2b2d1c96a14ca9218a2af304a", null ],
-    [ "GetInstanceTypeId", "classns3_1_1_sat_traffic_helper.html#a9eea7357e63689cfb0e8b46f64b59cbd", null ],
     [ "GetTypeId", "classns3_1_1_sat_traffic_helper.html#a821856c3b405fac67e3da2980e92e729", null ],
     [ "HasSinkInstalled", "classns3_1_1_sat_traffic_helper.html#a3ddb717aee292e1cca2baa71de8b4d1f", null ],
     [ "UpdateAttribute", "classns3_1_1_sat_traffic_helper.html#ae63833b1ce26b12803978676941b2132", null ],

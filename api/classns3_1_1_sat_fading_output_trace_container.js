@@ -9,7 +9,6 @@ var classns3_1_1_sat_fading_output_trace_container =
     [ "DoDispose", "classns3_1_1_sat_fading_output_trace_container.html#ad23e5c09988cb678da360620a08a6633", null ],
     [ "EnableFigureOutput", "classns3_1_1_sat_fading_output_trace_container.html#a47fd02e33d62c022bea637244bac19d4", null ],
     [ "FindNode", "classns3_1_1_sat_fading_output_trace_container.html#a5fe18e46a9e87e3951b3b230f50593bb", null ],
-    [ "GetInstanceTypeId", "classns3_1_1_sat_fading_output_trace_container.html#aa063e585a83c395d4a20fc910c88dcf0", null ],
     [ "GetTypeId", "classns3_1_1_sat_fading_output_trace_container.html#a073647b0de7bea6a2d899e55e4855342", null ],
     [ "Reset", "classns3_1_1_sat_fading_output_trace_container.html#ae9056b86e5fb3adaeb11be4c0961f2ca", null ],
     [ "WriteToFile", "classns3_1_1_sat_fading_output_trace_container.html#ae5734854999cdd57a112e979e501ab0e", null ],

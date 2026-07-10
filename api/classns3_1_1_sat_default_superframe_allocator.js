@@ -7,7 +7,6 @@ var classns3_1_1_sat_default_superframe_allocator =
     [ "AllocateBasedOnCc", "classns3_1_1_sat_default_superframe_allocator.html#a35acce80421b483af498ead0603b4be5", null ],
     [ "AllocateToFrame", "classns3_1_1_sat_default_superframe_allocator.html#a4f3f85127898577cc22427693f0ffddc", null ],
     [ "GenerateTimeSlots", "classns3_1_1_sat_default_superframe_allocator.html#aa192413bf6aac16d2dbcd545eacd83a7", null ],
-    [ "GetInstanceTypeId", "classns3_1_1_sat_default_superframe_allocator.html#a8da38c75563126143a5bf0c9c3552831", null ],
     [ "GetTypeId", "classns3_1_1_sat_default_superframe_allocator.html#ab9f0bbb61eec97a31273f72e9097091a", null ],
     [ "PreAllocateSymbols", "classns3_1_1_sat_default_superframe_allocator.html#a582b13233fb5716469c2e137eb700d18", null ],
     [ "ReleaseMinimumRate", "classns3_1_1_sat_default_superframe_allocator.html#a6361c517ffd08fe8901fadad25e22abe", null ],

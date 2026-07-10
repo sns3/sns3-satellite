@@ -1,5 +1,24 @@
 var searchData=
 [
-  ['year_6216',['year',['../structns3_1_1_date_time.html#a176569d04f9cd3b85b825e7817989c11',1,'ns3::DateTime']]],
-  ['yp_6217',['yp',['../structns3_1_1_iers_data_1_1_eop_parameters.html#a27769500e7fa3a0387d8d38d04eb62ec',1,'ns3::IersData::EopParameters']]]
+  ['x1mth2_0',['x1mth2',['../structelsetrec.html#a81f0a3127086a1a089e87b3049464fd3',1,'elsetrec']]],
+  ['x7thm1_1',['x7thm1',['../structelsetrec.html#a5632bf76a902210450865d8e9697afa7',1,'elsetrec']]],
+  ['xfact_2',['xfact',['../structelsetrec.html#a923d109b4463a7ce9a8e75293d54f65f',1,'elsetrec']]],
+  ['xgh2_3',['xgh2',['../structelsetrec.html#a6b0eb50a3828ccf233d60d4d857688f1',1,'elsetrec']]],
+  ['xgh3_4',['xgh3',['../structelsetrec.html#ae01e91fe730b973f312321411118db0f',1,'elsetrec']]],
+  ['xgh4_5',['xgh4',['../structelsetrec.html#a843729cb2e79a7e7fdafc24aa453f16b',1,'elsetrec']]],
+  ['xh2_6',['xh2',['../structelsetrec.html#ab7a2a444fddbb88a9b67b55933f6052a',1,'elsetrec']]],
+  ['xh3_7',['xh3',['../structelsetrec.html#a7c2549f38dbd9befb7bcab741961dcd0',1,'elsetrec']]],
+  ['xi2_8',['xi2',['../structelsetrec.html#aa899d58e322aee070314073faf443bb5',1,'elsetrec']]],
+  ['xi3_9',['xi3',['../structelsetrec.html#a4d8fc0ca8c55c338eec1f7343e1a5a5f',1,'elsetrec']]],
+  ['xl2_10',['xl2',['../structelsetrec.html#ad42f9acacb4ee994c43ed5d578956a15',1,'elsetrec']]],
+  ['xl3_11',['xl3',['../structelsetrec.html#a64e66b8a3c574b33a11f04771e8cc584',1,'elsetrec']]],
+  ['xl4_12',['xl4',['../structelsetrec.html#a2f4d69809c3cc172aaf76458d1055a39',1,'elsetrec']]],
+  ['xlamo_13',['xlamo',['../structelsetrec.html#a8ab2940a8db1cc7bf2425bcdb0195996',1,'elsetrec']]],
+  ['xlcof_14',['xlcof',['../structelsetrec.html#a7b08ed7589c205885367fa704ab63c27',1,'elsetrec']]],
+  ['xli_15',['xli',['../structelsetrec.html#ad984ae10ec43a89f4d17c5c68882f26f',1,'elsetrec']]],
+  ['xmcof_16',['xmcof',['../structelsetrec.html#a3a249f09de643b0a5896a42c74e86e61',1,'elsetrec']]],
+  ['xml_20attribute_20file_17',['Read the default attributes from XML attribute file',['..//builds/sns3/satellite/satellite/examples/sat-training-example.cc#autotoc_md9',1,'']]],
+  ['xml_20output_18',['Store attributes into XML output',['..//builds/sns3/satellite/satellite/examples/sat-training-example.cc#autotoc_md18',1,'']]],
+  ['xni_19',['xni',['../structelsetrec.html#a6f0c00cef6a7b9a5457afe5b905a3147',1,'elsetrec']]],
+  ['xp_20',['xp',['../structns3_1_1_iers_data_1_1_eop_parameters.html#a1413247c8211e6bab7fbbc0f0a506a5c',1,'ns3::IersData::EopParameters']]]
 ];

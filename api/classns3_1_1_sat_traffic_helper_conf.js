@@ -13,7 +13,6 @@ var classns3_1_1_sat_traffic_helper_conf =
     [ "SatTrafficHelperConf", "classns3_1_1_sat_traffic_helper_conf.html#a8714c9e1d29b4020885cd650b34b5098", null ],
     [ "SatTrafficHelperConf", "classns3_1_1_sat_traffic_helper_conf.html#a968ede9b4768519e9efc876818bb9d9a", null ],
     [ "~SatTrafficHelperConf", "classns3_1_1_sat_traffic_helper_conf.html#a827d5136131ce0a28846bbc2ee8e6d90", null ],
-    [ "GetInstanceTypeId", "classns3_1_1_sat_traffic_helper_conf.html#a9256fe4e232387b940293312d7f21558", null ],
     [ "GetTrafficCodec", "classns3_1_1_sat_traffic_helper_conf.html#a9672e84c583f8b1df414972ce4a1f133", null ],
     [ "GetTrafficDataRate", "classns3_1_1_sat_traffic_helper_conf.html#ab180f5ed8a921333be5010a06765e399", null ],
     [ "GetTrafficDirection", "classns3_1_1_sat_traffic_helper_conf.html#a1adbde23220815a210a5fb639b97f917", null ],
