@@ -185,14 +185,6 @@ SatConf::GetTypeId(void)
     return tid;
 }
 
-TypeId
-SatConf::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
-}
-
 SatConf::SatConf()
     : m_beamCount(0),
       m_fwdFeederLinkFreqHz(0.0),

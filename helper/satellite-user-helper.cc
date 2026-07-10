@@ -22,22 +22,22 @@
 
 #include "satellite-user-helper.h"
 
-#include <ns3/csma-helper.h>
-#include <ns3/enum.h>
-#include <ns3/internet-stack-helper.h>
-#include <ns3/ipv4-interface.h>
-#include <ns3/ipv4-routing-table-entry.h>
-#include <ns3/ipv4-static-routing-helper.h>
-#include <ns3/log.h>
-#include <ns3/satellite-arp-cache.h>
-#include <ns3/satellite-id-mapper.h>
-#include <ns3/satellite-mac.h>
-#include <ns3/satellite-mobility-observer.h>
-#include <ns3/satellite-net-device.h>
-#include <ns3/satellite-simple-net-device.h>
-#include <ns3/satellite-topology.h>
-#include <ns3/satellite-typedefs.h>
-#include <ns3/singleton.h>
+#include "ns3/csma-helper.h"
+#include "ns3/enum.h"
+#include "ns3/internet-stack-helper.h"
+#include "ns3/ipv4-interface.h"
+#include "ns3/ipv4-routing-table-entry.h"
+#include "ns3/ipv4-static-routing-helper.h"
+#include "ns3/log.h"
+#include "ns3/satellite-arp-cache.h"
+#include "ns3/satellite-id-mapper.h"
+#include "ns3/satellite-mac.h"
+#include "ns3/satellite-mobility-observer.h"
+#include "ns3/satellite-net-device.h"
+#include "ns3/satellite-simple-net-device.h"
+#include "ns3/satellite-topology.h"
+#include "ns3/satellite-typedefs.h"
+#include "ns3/singleton.h"
 
 #include <iostream>
 #include <map>
@@ -89,12 +89,6 @@ SatUserHelper::GetTypeId(void)
                             MakeTraceSourceAccessor(&SatUserHelper::m_creationTrace),
                             "ns3::SatTypedefs::CreationCallback");
     return tid;
-}
-
-TypeId
-SatUserHelper::GetInstanceTypeId(void) const
-{
-    return GetTypeId();
 }
 
 SatUserHelper::SatUserHelper()

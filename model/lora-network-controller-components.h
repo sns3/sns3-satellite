@@ -25,9 +25,9 @@
 
 #include "lora-network-status.h"
 
-#include <ns3/log.h>
-#include <ns3/object.h>
-#include <ns3/packet.h>
+#include "ns3/log.h"
+#include "ns3/object.h"
+#include "ns3/packet.h"
 
 namespace ns3
 {
@@ -58,8 +58,8 @@ class LoraNetworkControllerComponent : public Object
     /**
      * Method that is called when a new packet is received by the NetworkServer.
      *
-     * \param packet The newly received packet
-     * \param networkStatus A pointer to the NetworkStatus object
+     * @param packet The newly received packet
+     * @param networkStatus A pointer to the NetworkStatus object
      */
     virtual void OnReceivedPacket(Ptr<const Packet> packet,
                                   Ptr<LoraEndDeviceStatus> status,
@@ -71,9 +71,9 @@ class LoraNetworkControllerComponent : public Object
     /**
      * Method that is called when a packet cannot be sent in the downlink.
      *
-     * \param status The EndDeviceStatus of the device to which it was
+     * @param status The EndDeviceStatus of the device to which it was
      *               impossible to send a reply.
-     * \param networkStatus A pointer to the NetworkStatus object
+     * @param networkStatus A pointer to the NetworkStatus object
      */
     virtual void OnFailedReply(Ptr<LoraEndDeviceStatus> status,
                                Ptr<LoraNetworkStatus> networkStatus) = 0;
@@ -96,8 +96,8 @@ class LoraConfirmedMessagesComponent : public LoraNetworkControllerComponent
      * This method checks whether the received packet requires an acknowledgment
      * and sets up the appropriate reply in case it does.
      *
-     * \param packet The newly received packet
-     * \param networkStatus A pointer to the NetworkStatus object
+     * @param packet The newly received packet
+     * @param networkStatus A pointer to the NetworkStatus object
      */
     void OnReceivedPacket(Ptr<const Packet> packet,
                           Ptr<LoraEndDeviceStatus> status,
@@ -125,8 +125,8 @@ class LoraLinkCheckComponent : public LoraNetworkControllerComponent
      * This method checks whether the received packet requires an acknowledgment
      * and sets up the appropriate reply in case it does.
      *
-     * \param packet The newly received packet
-     * \param networkStatus A pointer to the NetworkStatus object
+     * @param packet The newly received packet
+     * @param networkStatus A pointer to the NetworkStatus object
      */
     void OnReceivedPacket(Ptr<const Packet> packet,
                           Ptr<LoraEndDeviceStatus> status,

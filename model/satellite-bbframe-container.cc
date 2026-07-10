@@ -23,12 +23,13 @@
 #include "satellite-const-variables.h"
 #include "satellite-utils.h"
 
-#include <ns3/enum.h>
-#include <ns3/log.h>
+#include "ns3/enum.h"
+#include "ns3/log.h"
 
 #include <algorithm>
 #include <cmath>
 #include <deque>
+#include <random>
 #include <utility>
 #include <vector>
 
@@ -286,7 +287,8 @@ SatBbFrameContainer::GetNextFrame()
 
         if (nonEmptyQueues.empty() == false)
         {
-            std::random_shuffle(nonEmptyQueues.begin(), nonEmptyQueues.end());
+            std::default_random_engine rng = std::default_random_engine{};
+            std::shuffle(nonEmptyQueues.begin(), nonEmptyQueues.end(), rng);
 
             nextFrame = (*nonEmptyQueues.begin())->front();
             (*nonEmptyQueues.begin())->pop_front();

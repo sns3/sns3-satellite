@@ -24,7 +24,7 @@
 #include "satellite-antenna-gain-pattern-container.h"
 #include "satellite-mobility-model.h"
 
-#include <ns3/nstime.h>
+#include "ns3/nstime.h"
 
 #include <stdint.h>
 #include <string>
@@ -33,20 +33,19 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief Satellite mobility model for which the current position change
+ * @brief Satellite mobility model for which the current position change
  * based on values read from a file.
  */
 class SatTracedMobilityModel : public SatMobilityModel
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
-    TypeId GetInstanceTypeId(void) const;
 
     /**
      * Dispose of this class instance
@@ -70,38 +69,54 @@ class SatTracedMobilityModel : public SatMobilityModel
      */
     virtual ~SatTracedMobilityModel();
 
+    // Inherited from MobilityModel
+    Ptr<MobilityModel> Copy() const override
+    {
+        return CreateObject<SatTracedMobilityModel>(*this);
+    }
+
     /**
-     * \brief Set the satellite ID linked to this node
+     * @brief Set the satellite ID linked to this node
      */
     void SetSatId(uint32_t satId);
 
     /**
-     * \brief Return the satellite ID linked to this node
+     * @brief Return the satellite ID linked to this node
      */
     uint32_t GetSatId(void) const;
 
     /**
-     * \brief Return the best beam ID based on the current position
-     * \param ignoreNan Do not crash if a NaN value is returned
-     * \return best beam id in the specified geo coordinate
+     * @brief Return the best beam ID based on the current position
+     * @param ignoreNan Do not crash if a NaN value is returned
+     * @return best beam id in the specified geo coordinate
      */
     uint32_t GetBestBeamId(bool ignoreNan = false) const;
 
   private:
     /**
-     * \return the current velocity.
+     * @return the current velocity.
      */
     virtual Vector DoGetVelocity(void) const;
 
     /**
-     * \return the current position.
+     * @return the current position.
      */
     virtual GeoCoordinate DoGetGeoPosition(void) const;
 
     /**
-     * \param position the position to set.
+     * @param position the position to set.
      */
     virtual void DoSetGeoPosition(const GeoCoordinate& position);
+
+    /**
+     * @return cartesian format position as vector
+     */
+    virtual Vector DoGetPosition(void) const;
+
+    /**
+     * @param position position in Cartesian format to set
+     */
+    virtual void DoSetPosition(const Vector& position);
 
     void UpdateGeoPositionFromFile(void);
 

@@ -24,8 +24,8 @@
 #include "satellite-fading-oscillator.h"
 #include "satellite-loo-conf.h"
 
-#include <ns3/random-variable-stream.h>
-#include <ns3/vector.h>
+#include "ns3/random-variable-stream.h"
+#include "ns3/vector.h"
 
 #include <complex>
 #include <stdint.h>
@@ -35,9 +35,9 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief Class for Loo's model fader. The class implements Loo's
+ * @brief Class for Loo's model fader. The class implements Loo's
  * model fader for the Markov -based fading model. The model
  * uses multiple oscillators to form the fading (inspired by Jakes model).
  */
@@ -45,22 +45,22 @@ class SatLooModel : public SatBaseFader
 {
   public:
     /**
-     * \brief NS-3 function for type id
-     * \return type id
+     * @brief NS-3 function for type id
+     * @return type id
      */
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Constructor
+     * @brief Constructor
      */
     SatLooModel();
 
     /**
-     * \brief Constructor
-     * \param looConf Loo's model configuration
-     * \param numOfStates number of states
-     * \param initialSet initial parameter set
-     * \param initialState initial state
+     * @brief Constructor
+     * @param looConf Loo's model configuration
+     * @param numOfStates number of states
+     * @param initialSet initial parameter set
+     * @param initialState initial state
      */
     SatLooModel(Ptr<SatLooConf> looConf,
                 uint32_t numOfStates,
@@ -68,134 +68,134 @@ class SatLooModel : public SatBaseFader
                 uint32_t initialState);
 
     /**
-     * \brief Destructor
+     * @brief Destructor
      */
     ~SatLooModel();
 
     /**
-     *  \brief Do needed dispose actions.
+     *  @brief Do needed dispose actions.
      */
     void DoDispose();
 
     /**
-     * \brief Function for returning the channel gain in dB
-     * \return channel gain in dB
+     * @brief Function for returning the channel gain in dB
+     * @return channel gain in dB
      */
     double GetChannelGainDb();
 
     /**
-     * \brief Function for returning the channel gain
-     * \return channel gain
+     * @brief Function for returning the channel gain
+     * @return channel gain
      */
     double GetChannelGain();
 
     /**
-     * \brief Function for updating the parameter set and state
-     * \param set parameter set
-     * \param state state
+     * @brief Function for updating the parameter set and state
+     * @param set parameter set
+     * @param state state
      */
     void UpdateParameters(uint32_t set, uint32_t state);
 
   private:
     /**
-     * \brief Number of states
+     * @brief Number of states
      */
     uint32_t m_numOfStates;
 
     /**
-     * \brief Current parameter set
+     * @brief Current parameter set
      */
     uint32_t m_currentSet;
 
     /**
-     * \brief Current state
+     * @brief Current state
      */
     uint32_t m_currentState;
 
     /**
-     * \brief Multipath power converted to linear units
+     * @brief Multipath power converted to linear units
      */
     std::vector<double> m_sigma;
 
     /**
-     * \brief Loo's model configuration object
+     * @brief Loo's model configuration object
      */
     Ptr<SatLooConf> m_looConf;
 
     /**
-     * \brief Loo's model parameters
+     * @brief Loo's model parameters
      */
     std::vector<std::vector<double>> m_looParameters;
 
     /**
-     * \brief Normal distribution random variable
+     * @brief Normal distribution random variable
      */
     Ptr<NormalRandomVariable> m_normalRandomVariable;
 
     /**
-     * \brief Uniform distribution random variable
+     * @brief Uniform distribution random variable
      */
     Ptr<UniformRandomVariable> m_uniformVariable;
 
     /**
-     * \brief Direct signal oscillators
+     * @brief Direct signal oscillators
      */
     std::vector<std::vector<Ptr<SatFadingOscillator>>> m_directSignalOscillators;
 
     /**
-     * \brief Multipath oscillators
+     * @brief Multipath oscillators
      */
     std::vector<std::vector<Ptr<SatFadingOscillator>>> m_multipathOscillators;
 
     /**
-     * \brief Function for constructing direct signal oscillators
+     * @brief Function for constructing direct signal oscillators
      */
     void ConstructDirectSignalOscillators();
 
     /**
-     * \brief Function for constructing multipath oscillators
+     * @brief Function for constructing multipath oscillators
      */
     void ConstructMultipathOscillators();
 
     /**
-     * \brief Function for calculating cosine wave oscillator complex sum
-     * \param oscillator oscillator
-     * \param timeInSeconds current time in seconds
-     * \return sum
+     * @brief Function for calculating cosine wave oscillator complex sum
+     * @param oscillator oscillator
+     * @param timeInSeconds current time in seconds
+     * @return sum
      */
     std::complex<double> GetOscillatorCosineWaveSum(
         std::vector<Ptr<SatFadingOscillator>> oscillator,
         double timeInSeconds);
 
     /**
-     * \brief Function for calculating oscillator complex sum
-     * \param oscillator oscillator
-     * \param timeInSeconds current time in seconds
-     * \return sum
+     * @brief Function for calculating oscillator complex sum
+     * @param oscillator oscillator
+     * @param timeInSeconds current time in seconds
+     * @return sum
      */
     std::complex<double> GetOscillatorComplexSum(std::vector<Ptr<SatFadingOscillator>> oscillator,
                                                  double timeInSeconds);
 
     /**
-     * \brief Function for setting the state
-     * \param newState new state
+     * @brief Function for setting the state
+     * @param newState new state
      */
     void ChangeState(uint32_t newState);
 
     /**
-     * \brief Function for setting the parameter set and state
-     * \param newSet new set
-     * \param newState new state
+     * @brief Function for setting the parameter set and state
+     * @param newSet new set
+     * @param newState new state
      */
     void ChangeSet(uint32_t newSet, uint32_t newState);
 
     /**
-     * \brief Function for calculating sigma for different states
+     * @brief Function for calculating sigma for different states
      */
     void CalculateSigma();
 
     /**
-     * \brief Clear used variables
+     * @brief Clear used variables
      */
     void Reset();
 };

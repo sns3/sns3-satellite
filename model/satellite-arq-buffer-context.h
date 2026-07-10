@@ -21,9 +21,9 @@
 #ifndef SATELLITE_ARQ_BUFFER_CONTEXT_H_
 #define SATELLITE_ARQ_BUFFER_CONTEXT_H_
 
-#include <ns3/event-id.h>
-#include <ns3/object.h>
-#include <ns3/packet.h>
+#include "ns3/event-id.h"
+#include "ns3/object.h"
+#include "ns3/packet.h"
 
 #include <stdint.h>
 
@@ -31,8 +31,8 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief ARQ buffer context is holding information related to the ARQ transmission
+ * @ingroup satellite
+ * @brief ARQ buffer context is holding information related to the ARQ transmission
  * or reception depending on whether packet(s) are being transmitted or received.
  * The SatArqBufferContext is used only when ARQ is enabled, i.e. encapsulator is
  * of type SatReturnLinkEncapsulatorArq or SatGenericStreamEncapsulatorArq.
@@ -50,8 +50,8 @@ class SatArqBufferContext : public Object
     }
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId();
 

@@ -30,10 +30,10 @@
 using namespace ns3;
 
 /**
- * \file sat-regeneration-example.cc
- * \ingroup satellite
+ * @file sat-regeneration-example.cc
+ * @ingroup satellite
  *
- * \brief This file gives an example of satellite regeneration.
+ * @brief This file gives an example of satellite regeneration.
  *        It allows to launch a simulation with FWD and RTN CBR traffics,
  *        and different levels of regeneration.
  *         - On FWD link: transparent, physical and network

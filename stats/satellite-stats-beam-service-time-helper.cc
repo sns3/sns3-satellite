@@ -21,24 +21,24 @@
 
 #include "satellite-stats-beam-service-time-helper.h"
 
-#include <ns3/boolean.h>
-#include <ns3/callback.h>
-#include <ns3/data-collection-object.h>
-#include <ns3/distribution-collector.h>
-#include <ns3/enum.h>
-#include <ns3/fatal-error.h>
-#include <ns3/log.h>
-#include <ns3/multi-file-aggregator.h>
-#include <ns3/node-container.h>
-#include <ns3/satellite-beam-helper.h>
-#include <ns3/satellite-beam-scheduler.h>
-#include <ns3/satellite-gw-mac.h>
-#include <ns3/satellite-helper.h>
-#include <ns3/satellite-ncc.h>
-#include <ns3/satellite-topology.h>
-#include <ns3/scalar-collector.h>
-#include <ns3/singleton.h>
-#include <ns3/string.h>
+#include "ns3/boolean.h"
+#include "ns3/callback.h"
+#include "ns3/data-collection-object.h"
+#include "ns3/distribution-collector.h"
+#include "ns3/enum.h"
+#include "ns3/fatal-error.h"
+#include "ns3/log.h"
+#include "ns3/multi-file-aggregator.h"
+#include "ns3/node-container.h"
+#include "ns3/satellite-beam-helper.h"
+#include "ns3/satellite-beam-scheduler.h"
+#include "ns3/satellite-gw-mac.h"
+#include "ns3/satellite-helper.h"
+#include "ns3/satellite-ncc.h"
+#include "ns3/satellite-topology.h"
+#include "ns3/scalar-collector.h"
+#include "ns3/singleton.h"
+#include "ns3/string.h"
 
 #include <list>
 #include <sstream>
@@ -120,10 +120,14 @@ SatStatsBeamServiceTimeHelper::DoInstall()
         {
             Ptr<SatNetDevice> dev = DynamicCast<SatNetDevice>((*node)->GetDevice(i));
             if (dev == nullptr)
+            {
                 continue;
+            }
             Ptr<SatMac> mac = dev->GetMac();
             if (mac == nullptr)
+            {
                 continue;
+            }
 
             // Connect the trace source
             uint32_t beamId = mac->GetBeamId();
@@ -132,8 +136,7 @@ SatStatsBeamServiceTimeHelper::DoInstall()
             const bool ret =
                 mac->TraceConnect("BeamServiceTime", context.str(), beamServiceCallback);
             NS_ASSERT_MSG(ret, "Error connecting to BeamServiceTime of beam " << beamId);
-            NS_LOG_INFO(this << " successfully connected"
-                             << " with beam " << beamId);
+            NS_LOG_INFO(this << " successfully connected" << " with beam " << beamId);
         }
     }
 

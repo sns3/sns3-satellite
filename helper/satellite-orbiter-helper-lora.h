@@ -30,6 +30,7 @@
 #include "ns3/node-container.h"
 #include "ns3/object-factory.h"
 #include "ns3/output-stream-wrapper.h"
+#include "ns3/pointer.h"
 #include "ns3/satellite-bbframe-conf.h"
 #include "ns3/satellite-channel.h"
 #include "ns3/satellite-fwd-link-scheduler.h"
@@ -41,7 +42,6 @@
 #include "ns3/satellite-superframe-sequence.h"
 #include "ns3/satellite-typedefs.h"
 #include "ns3/traced-callback.h"
-#include <ns3/pointer.h>
 
 #include <map>
 #include <stdint.h>
@@ -53,7 +53,7 @@ namespace ns3
 {
 
 /**
- * \brief Creates needed objects for Satellite node like SatorbiterNetDevice objects.
+ * @brief Creates needed objects for Satellite node like SatorbiterNetDevice objects.
  *        Handles needed configuration for the Satellite node.
  *
  */
@@ -61,11 +61,10 @@ class SatOrbiterHelperLora : public SatOrbiterHelper
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
-    TypeId GetInstanceTypeId(void) const;
 
     /**
      * Default constructor.
@@ -91,19 +90,19 @@ class SatOrbiterHelperLora : public SatOrbiterHelper
     /**
      * Create a SatOrbiterNetDevice instance, with correct type infered from child classes.
      *
-     * \return SatOrbiterNetDevice instance
+     * @return SatOrbiterNetDevice instance
      */
     virtual Ptr<SatOrbiterNetDevice> CreateOrbiterNetDevice();
 
     /*
      * Attach the SatChannels for the beam to NetDevice
-     * \param dev NetDevice to attach channels
-     * \param uf user forward channel
-     * \param uf user return channel
-     * \param userAgp user beam antenna gain pattern
-     * \param ncc NCC (Network Control Center)
-     * \param satId ID of satellite associated to this channel
-     * \param userBeamId Id of the beam
+     * @param dev NetDevice to attach channels
+     * @param uf user forward channel
+     * @param uf user return channel
+     * @param userAgp user beam antenna gain pattern
+     * @param ncc NCC (Network Control Center)
+     * @param satId ID of satellite associated to this channel
+     * @param userBeamId Id of the beam
      */
     virtual void AttachChannelsUser(Ptr<SatOrbiterNetDevice> dev,
                                     Ptr<SatChannel> uf,

@@ -20,9 +20,9 @@
 #ifndef GEO_COORDINATE_H
 #define GEO_COORDINATE_H
 
-#include <ns3/attribute-helper.h>
-#include <ns3/attribute.h>
-#include <ns3/vector.h>
+#include "ns3/attribute-helper.h"
+#include "ns3/attribute.h"
+#include "ns3/vector.h"
 
 #include <istream>
 #include <ostream>
@@ -31,9 +31,9 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief GeoCoordinate class is used to store and operate with geodetic coordinates.
+ * @brief GeoCoordinate class is used to store and operate with geodetic coordinates.
  * Latitude is in the degree range (-90, 90) with negative values -> south
  * Longitude is in the degree range (-180, 180) with negative values -> west
  * Altitude is in meters.
@@ -52,10 +52,10 @@ class GeoCoordinate
      * Create GeoCoordinate from given latitude, longitude and altitude decimal degree values.
      * Reference ellipsoid to be used is sphere.
      *
-     * \param latitude latitude of position, -90 ... 90 degrees
-     * \param longitude longitude of position, -180 ... 180 degrees
-     * \param altitude altitude of position, >= -EARTH_RADIUS
-     * \param correctIfInvalid Correct latitude and longitude if outside bounds
+     * @param latitude latitude of position, -90 ... 90 degrees
+     * @param longitude longitude of position, -180 ... 180 degrees
+     * @param altitude altitude of position, >= -EARTH_RADIUS
+     * @param correctIfInvalid Correct latitude and longitude if outside bounds
      */
     GeoCoordinate(double latitude,
                   double longitude,
@@ -65,11 +65,11 @@ class GeoCoordinate
     /**
      * Create GeoCoordinate from given latitude, longitude and altitude decimal degree values
      *
-     * \param latitude latitude of position, -90 ... 90 degrees
-     * \param longitude longitude of position, -180 ... 180 degrees
-     * \param altitude altitude of position, >= -EARTH_RADIUS
-     * \param refEllipsoid Reference ellipsoid to be used
-     * \param correctIfInvalid Correct latitude and longitude if outside bounds
+     * @param latitude latitude of position, -90 ... 90 degrees
+     * @param longitude longitude of position, -180 ... 180 degrees
+     * @param altitude altitude of position, >= -EARTH_RADIUS
+     * @param refEllipsoid Reference ellipsoid to be used
+     * @param correctIfInvalid Correct latitude and longitude if outside bounds
      */
     GeoCoordinate(double latitude,
                   double longitude,
@@ -80,15 +80,15 @@ class GeoCoordinate
     /**
      * Create GeoCoordinate from given vector (x, y, z). Reference ellipsoid to be used is sphere.
      *
-     * \param vector coordinates as Vector (x, y, z) (Cartesian)
+     * @param vector coordinates as Vector (x, y, z) (Cartesian)
      */
     GeoCoordinate(Vector vector);
 
     /**
      * Create GeoCoordinate from given vector (x, y, z) and reference ellipsoid.
      *
-     * \param vector coordinates as Vector (x, y, z) (Cartesian)
-     * \param refEllipsoid Reference ellipsoid to be used
+     * @param vector coordinates as Vector (x, y, z) (Cartesian)
+     * @param refEllipsoid Reference ellipsoid to be used
      */
     GeoCoordinate(Vector vector, ReferenceEllipsoid_t refEllipsoid);
 
@@ -101,7 +101,7 @@ class GeoCoordinate
     /**
      * Gets reference ellipsoid used by GeoCoordinate object.
      *
-     * \return  reference ellipsoid.
+     * @return  reference ellipsoid.
      */
     ReferenceEllipsoid_t GetRefEllipsoid()
     {
@@ -111,42 +111,42 @@ class GeoCoordinate
     /**
      * Gets longitude value of coordinate.
      *
-     * \return longitude
+     * @return longitude
      */
     double GetLongitude() const;
     /**
      * Gets latitude value of coordinate.
      *
-     * \return latitude
+     * @return latitude
      */
     double GetLatitude() const;
     /**
      * Gets altitude value of coordinate.
      *
-     * \return altitude
+     * @return altitude
      */
     double GetAltitude() const;
     /**
      * Sets longitude value of coordinate.
      *
-     * \param longitude longitude to set
+     * @param longitude longitude to set
      */
     void SetLongitude(double longitude);
     /**
      * Sets latitude value of coordinate.
      *
-     * \param latitude longitude to set
+     * @param latitude longitude to set
      */
     void SetLatitude(double latitude);
     /**
      * Sets altitude value of coordinate.
      *
-     * \param altitude longitude to set
+     * @param altitude longitude to set
      */
     void SetAltitude(double altitude);
     /**
      * Converts Geodetic coordinates to Cartesian coordinates
-     * \return Vector containing Cartesian coordinates
+     * @return Vector containing Cartesian coordinates
      */
     Vector ToVector() const;
 
@@ -164,16 +164,16 @@ class GeoCoordinate
   private:
     /**
      * Gets the radius of curvature in the prime vertical
-     * \param latitude latitude in radians at to get the radius of curvature.
-     * \return value of the radius of curvature (meters)
+     * @param latitude latitude in radians at to get the radius of curvature.
+     * @return value of the radius of curvature (meters)
      */
     double GetRadiusCurvature(double latitude) const;
 
     /**
      * Checks if longitude is in valid range
      *
-     * \param longitude to check
-     * \return bool true longitude valid, false invalid
+     * @param longitude to check
+     * @return bool true longitude valid, false invalid
      */
     static inline bool IsValidLongitude(double longitude)
     {
@@ -183,8 +183,8 @@ class GeoCoordinate
     /**
      * Checks if latitude is in valid range
      *
-     * \param latitude to check
-     * \return bool true latitude valid, false invalid
+     * @param latitude to check
+     * @return bool true latitude valid, false invalid
      */
     static inline bool IsValidLatitude(double latitude)
     {
@@ -194,23 +194,23 @@ class GeoCoordinate
     /**
      * Checks if altitude is in valid range
      *
-     * \param altitude to check
-     * \return bool true altitude valid, false invalid.
+     * @param altitude to check
+     * @return bool true altitude valid, false invalid.
      *
      */
     static inline bool IsValidAltitude(double altitude, ReferenceEllipsoid_t refEllipsoide);
     /**
      * Creates Geodetic coordinates from given Cartesian coordinates.
      *
-     * \param vector reference to vector containing Cartesian coordinates for creation.
+     * @param vector reference to vector containing Cartesian coordinates for creation.
      */
     void ConstructFromVector(const Vector& vector);
 
     /**
-     * \param latitude latitude of position
-     * \param longitude longitude of position
-     * \param altitude altitude of position
-     * \param correctIfInvalid Correct latitude and longitude if outside bounds
+     * @param latitude latitude of position
+     * @param longitude longitude of position
+     * @param altitude altitude of position
+     * @param correctIfInvalid Correct latitude and longitude if outside bounds
      *
      * Helper for constructor to create GeoCoordinate from given latitude, longitude and altitude
      * decimal degree values.
@@ -250,8 +250,8 @@ class GeoCoordinate
 };
 
 /**
- * \class ns3::GeoCoordinateValue
- * \brief hold objects of type ns3::GeoCoordinate
+ * @class ns3::GeoCoordinateValue
+ * @brief hold objects of type ns3::GeoCoordinate
  */
 ATTRIBUTE_HELPER_HEADER(GeoCoordinate);
 

@@ -21,8 +21,8 @@
 #ifndef SATELLITE_CHANNEL_ESTIMATION_ERROR_H_
 #define SATELLITE_CHANNEL_ESTIMATION_ERROR_H_
 
-#include <ns3/object.h>
-#include <ns3/random-variable-stream.h>
+#include "ns3/object.h"
+#include "ns3/random-variable-stream.h"
 
 #include <stdint.h>
 #include <string>
@@ -32,8 +32,8 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief SatChannelEstimatorError reads from file and stores the channel
+ * @ingroup satellite
+ * @brief SatChannelEstimatorError reads from file and stores the channel
  * estimation error mean and standard deviation values for a set of SINR values.
  * Channel estimation error mean and standard deviation is dependent on calculated
  * SINR. A proper error for a given SINR is interpolated between two closest SINR
@@ -50,7 +50,7 @@ class SatChannelEstimationError : public Object
 
     /**
      * Constructor
-     * \param filePathName A file containing the gaussian
+     * @param filePathName A file containing the gaussian
      * gaussian distribution mean and STD.
      */
     SatChannelEstimationError(std::string filePathName);
@@ -71,16 +71,16 @@ class SatChannelEstimationError : public Object
     virtual void DoDispose();
 
     /**
-     * \brief Add channel estimation error to SINR.
-     * \param sinrInDb Measured SINR in dB
-     * \return SINR including channel estimation error in dB
+     * @brief Add channel estimation error to SINR.
+     * @param sinrInDb Measured SINR in dB
+     * @return SINR including channel estimation error in dB
      */
     double AddError(double sinrInDb) const;
 
   private:
     /**
-     * \brief Read the distribution mean and STD values from file.
-     * \param filePathName File name
+     * @brief Read the distribution mean and STD values from file.
+     * @param filePathName File name
      */
     void ReadFile(std::string filePathName);
 

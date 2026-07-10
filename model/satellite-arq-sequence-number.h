@@ -21,15 +21,15 @@
 #ifndef SATELLITE_ARQ_SEQUENCE_NUMBER_H_
 #define SATELLITE_ARQ_SEQUENCE_NUMBER_H_
 
-#include <ns3/simple-ref-count.h>
+#include "ns3/simple-ref-count.h"
 
 #include <map>
 #include <stdint.h>
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief SatArqSequenceNumber is handling the sequence numbers for the
+ * @brief SatArqSequenceNumber is handling the sequence numbers for the
  * ARQ process. There may be a total of windowSize sequential sequence numbers
  * in use simultaneously. If all of them are booked, then no new sequence numbers
  * are available for new transmissions until some sequence numbers are released.
@@ -49,7 +49,7 @@ class SatArqSequenceNumber : public SimpleRefCount<SatArqSequenceNumber>
 
     /**
      * Constructor with initialization parameters.
-     * \param windowSize
+     * @param windowSize
      */
     SatArqSequenceNumber(uint8_t windowSize);
 
@@ -58,28 +58,28 @@ class SatArqSequenceNumber : public SimpleRefCount<SatArqSequenceNumber>
     }
 
     /**
-     * \brief Check whether there are free (released) sequence numbers. If a
+     * @brief Check whether there are free (released) sequence numbers. If a
      *        sequence number is not available, ARQ may not send any new packets.
-     *  \return Boolean to indicate whether there are seq no available
+     *  @return Boolean to indicate whether there are seq no available
      */
     bool SeqNoAvailable() const;
 
     /**
-     * \brief   Returns the next free sequence number
-     * \return  Next free sequence number
+     * @brief   Returns the next free sequence number
+     * @return  Next free sequence number
      */
     uint8_t NextSequenceNumber();
 
     /**
-     * \brief Release a sequence number if either ACK is received or
+     * @brief Release a sequence number if either ACK is received or
      *        maximum retransmissions have been reached.
-     * \param seqNo Sequence number to be released
+     * @param seqNo Sequence number to be released
      */
     void Release(uint8_t seqNo);
 
   private:
     /**
-     * \brief Clean ups the sequence number map
+     * @brief Clean ups the sequence number map
      */
     void CleanUp();
 

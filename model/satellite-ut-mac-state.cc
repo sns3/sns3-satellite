@@ -21,7 +21,7 @@
 
 #include "satellite-ut-mac-state.h"
 
-#include <ns3/log.h>
+#include "ns3/log.h"
 
 #include <stdint.h>
 
@@ -50,14 +50,6 @@ SatUtMacState::GetTypeId(void)
                           MakeTimeAccessor(&SatUtMacState::m_ncrRecoveryTimeout),
                           MakeTimeChecker());
     return tid;
-}
-
-TypeId
-SatUtMacState::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
 }
 
 SatUtMacState::SatUtMacState()

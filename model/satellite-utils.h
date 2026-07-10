@@ -23,8 +23,8 @@
 #include "satellite-enums.h"
 #include "satellite-mac-tag.h"
 
-#include <ns3/mac48-address.h>
-#include <ns3/packet.h>
+#include "ns3/mac48-address.h"
+#include "ns3/packet.h"
 
 #include <cmath>
 #include <limits>
@@ -38,19 +38,19 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief SatUtils class is for general conversions used in satellite module.
+ * @brief SatUtils class is for general conversions used in satellite module.
  * This class is not planned to be instantiated or inherited.
  */
 class SatUtils
 {
   public:
     /**
-     * \brief Converts radians to degrees
+     * @brief Converts radians to degrees
      *
-     * \param radian value to convert as radians
-     * \return degrees converted from radians
+     * @param radian value to convert as radians
+     * @return degrees converted from radians
      */
     template <typename T>
     static inline T RadiansToDegrees(T radian)
@@ -59,10 +59,10 @@ class SatUtils
     }
 
     /**
-     * \brief Converts degrees to radians
+     * @brief Converts degrees to radians
      *
-     * \param degree value to convert as degrees
-     * \return radians converted from degrees
+     * @param degree value to convert as degrees
+     * @return radians converted from degrees
      */
     template <typename T>
     static inline T DegreesToRadians(T degree)
@@ -71,9 +71,9 @@ class SatUtils
     }
 
     /**
-     * \brief Get minimum value for linear. (The smallest value greater than zero)
+     * @brief Get minimum value for linear. (The smallest value greater than zero)
      *
-     * \return minimum linear value
+     * @return minimum linear value
      */
     template <typename T>
     static inline T MinLin()
@@ -82,9 +82,9 @@ class SatUtils
     }
 
     /**
-     * \brief Get maximum value for linear
+     * @brief Get maximum value for linear
      *
-     * \return maximum linear value
+     * @return maximum linear value
      */
     template <typename T>
     static inline T MaxLin()
@@ -93,9 +93,9 @@ class SatUtils
     }
 
     /**
-     * \brief Get minimum value for Decibel
+     * @brief Get minimum value for Decibel
      *
-     * \return minimum Decibel value
+     * @return minimum Decibel value
      */
     template <typename T>
     static inline T MinDb()
@@ -104,9 +104,9 @@ class SatUtils
     }
 
     /**
-     * \brief Get maximum value for Decibel
+     * @brief Get maximum value for Decibel
      *
-     * \return maximum Decibel value
+     * @return maximum Decibel value
      */
     template <typename T>
     static inline T MaxDb()
@@ -115,10 +115,10 @@ class SatUtils
     }
 
     /**
-     * \brief Converts Decibel Watts to Watts
+     * @brief Converts Decibel Watts to Watts
      *
-     * \param dbw value in Decibel Watts to convert
-     * \return Watts converted from Decibel Watts
+     * @param dbw value in Decibel Watts to convert
+     * @return Watts converted from Decibel Watts
      */
     template <typename T>
     static inline T DbWToW(T dbw)
@@ -127,10 +127,10 @@ class SatUtils
     }
 
     /**
-     * \brief Converts Watts to Decibel Watts
+     * @brief Converts Watts to Decibel Watts
      *
-     * \param w value in Watts to convert
-     * \return Decibel Watts converted from Watts
+     * @param w value in Watts to convert
+     * @return Decibel Watts converted from Watts
      */
     template <typename T>
     static inline T WToDbW(T w)
@@ -139,13 +139,13 @@ class SatUtils
     }
 
     /**
-     * \brief Converts decibels to linear.
+     * @brief Converts decibels to linear.
      * Accepted values for conversion are between minimum decibel value and
      * maximum decibel value. Negative infinity is also an accepted value
      * and it is converted to zero.
      *
-     * \param db value in Decibels to convert
-     * \return linear converted from Decibels
+     * @param db value in Decibels to convert
+     * @return linear converted from Decibels
      */
     template <typename T>
     static inline T DbToLinear(T db)
@@ -159,12 +159,12 @@ class SatUtils
     }
 
     /**
-     * \brief Converts linear to decibels.
+     * @brief Converts linear to decibels.
      * Accepted values for conversion are between minimum linear value (greater than zero and
      * maximum linear value. Zero is also accepted and it is converted to -INF.
      *
-     * \param linear value to convert
-     * \return Decibels converted from linear
+     * @param linear value to convert
+     * @return Decibels converted from linear
      */
     template <typename T>
     static inline T LinearToDb(T linear)
@@ -178,10 +178,10 @@ class SatUtils
     }
 
     /**
-     * \brief Converts Decibel milli Watts to Watts
+     * @brief Converts Decibel milli Watts to Watts
      *
-     * \param dbm value in Decibel milli Watts to convert
-     * \return Watts converted from Decibel milli Watts
+     * @param dbm value in Decibel milli Watts to convert
+     * @return Watts converted from Decibel milli Watts
      */
     template <typename T>
     static inline T DbmToW(T dbm)
@@ -190,10 +190,10 @@ class SatUtils
     }
 
     /**
-     * \brief Converts Watts to Decibel milli Watts
+     * @brief Converts Watts to Decibel milli Watts
      *
-     * \param w value in Watts to convert
-     * \return Decibel milli Watts converted from Watts
+     * @param w value in Watts to convert
+     * @return Decibel milli Watts converted from Watts
      */
     template <typename T>
     static inline T WToDbm(T w)
@@ -202,10 +202,10 @@ class SatUtils
     }
 
     /**
-     * \brief Get packet information in std::string for printing purposes
+     * @brief Get packet information in std::string for printing purposes
      *
-     * \param p Packet
-     * \return Packet information in std::string
+     * @param p Packet
+     * @return Packet information in std::string
      */
     static inline std::string GetPacketInfo(const Ptr<const Packet> p)
     {
@@ -221,10 +221,10 @@ class SatUtils
     }
 
     /**
-     * \brief Gets packet information in std::string for printing purposes
+     * @brief Gets packet information in std::string for printing purposes
      *
-     * \param packets A vector of packets
-     * \return Packet information in std::string
+     * @param packets A vector of packets
+     * @return Packet information in std::string
      */
     static inline std::string GetPacketInfo(const std::vector<Ptr<Packet>> packets)
     {
@@ -238,10 +238,10 @@ class SatUtils
     }
 
     /**
-     * \brief Get the modulated bits of a certain MODCOD
+     * @brief Get the modulated bits of a certain MODCOD
      *
-     * \param modcod Modulation and coding scheme
-     * \return Modulated bits
+     * @param modcod Modulation and coding scheme
+     * @return Modulated bits
      */
     static inline uint32_t GetModulatedBits(SatEnums::SatModcod_t modcod)
     {
@@ -536,10 +536,10 @@ class SatUtils
     }
 
     /**
-     * \brief Gets the coding rate of a certain MODCOD
+     * @brief Gets the coding rate of a certain MODCOD
      *
-     * \param modcod Modulation and coding scheme
-     * \return double coding rate
+     * @param modcod Modulation and coding scheme
+     * @return double coding rate
      */
     static inline double GetCodingRate(SatEnums::SatModcod_t modcod)
     {
@@ -1151,15 +1151,15 @@ class SatUtils
     }
 
     /**
-     * \brief Simple linear interpolation.
+     * @brief Simple linear interpolation.
      * y = y0 + (y1-y0)*(x-x0)/(x1-x0)
      * http://en.wikipedia.org/wiki/Linear_interpolation
-     * \param x Interpolated x
-     * \param x0 Lower x value
-     * \param x1 Higher x value
-     * \param y0 Lower y value
-     * \param y1 Higher y value
-     * \return Interpolated value
+     * @param x Interpolated x
+     * @param x0 Lower x value
+     * @param x1 Higher x value
+     * @param y0 Lower y value
+     * @param y1 Higher y value
+     * @return Interpolated value
      */
     static inline double Interpolate(double x, double x0, double x1, double y0, double y1)
     {
@@ -1171,9 +1171,9 @@ class SatUtils
     }
 
     /**
-     * \brief Scalar product
-     * \param vector Array of pairs of doubles
-     * \return Sum of the product of each pair elements
+     * @brief Scalar product
+     * @param vector Array of pairs of doubles
+     * @return Sum of the product of each pair elements
      */
     static inline double ScalarProduct(const std::vector<std::pair<double, double>>& vector)
     {

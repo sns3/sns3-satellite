@@ -30,42 +30,42 @@
 #include "satellite-ut-helper-dvb.h"
 #include "satellite-ut-helper-lora.h"
 
-#include <ns3/config.h>
-#include <ns3/enum.h>
-#include <ns3/internet-stack-helper.h>
-#include <ns3/ipv4-interface.h>
-#include <ns3/ipv4-static-routing-helper.h>
-#include <ns3/log.h>
-#include <ns3/mobility-helper.h>
-#include <ns3/pointer.h>
-#include <ns3/satellite-antenna-gain-pattern-container.h>
-#include <ns3/satellite-arp-cache.h>
-#include <ns3/satellite-bstp-controller.h>
-#include <ns3/satellite-channel.h>
-#include <ns3/satellite-const-variables.h>
-#include <ns3/satellite-enums.h>
-#include <ns3/satellite-fading-input-trace-container.h>
-#include <ns3/satellite-fading-input-trace.h>
-#include <ns3/satellite-gw-llc.h>
-#include <ns3/satellite-gw-mac.h>
-#include <ns3/satellite-id-mapper.h>
-#include <ns3/satellite-lorawan-net-device.h>
-#include <ns3/satellite-mobility-model.h>
-#include <ns3/satellite-orbiter-net-device.h>
-#include <ns3/satellite-packet-trace.h>
-#include <ns3/satellite-phy-rx.h>
-#include <ns3/satellite-phy-tx.h>
-#include <ns3/satellite-phy.h>
-#include <ns3/satellite-propagation-delay-model.h>
-#include <ns3/satellite-sgp4-mobility-model.h>
-#include <ns3/satellite-topology.h>
-#include <ns3/satellite-typedefs.h>
-#include <ns3/satellite-ut-llc.h>
-#include <ns3/satellite-ut-mac.h>
-#include <ns3/satellite-utils.h>
-#include <ns3/singleton.h>
-#include <ns3/string.h>
-#include <ns3/traffic-control-helper.h>
+#include "ns3/config.h"
+#include "ns3/enum.h"
+#include "ns3/internet-stack-helper.h"
+#include "ns3/ipv4-interface.h"
+#include "ns3/ipv4-static-routing-helper.h"
+#include "ns3/log.h"
+#include "ns3/mobility-helper.h"
+#include "ns3/pointer.h"
+#include "ns3/satellite-antenna-gain-pattern-container.h"
+#include "ns3/satellite-arp-cache.h"
+#include "ns3/satellite-bstp-controller.h"
+#include "ns3/satellite-channel.h"
+#include "ns3/satellite-const-variables.h"
+#include "ns3/satellite-enums.h"
+#include "ns3/satellite-fading-input-trace-container.h"
+#include "ns3/satellite-fading-input-trace.h"
+#include "ns3/satellite-gw-llc.h"
+#include "ns3/satellite-gw-mac.h"
+#include "ns3/satellite-id-mapper.h"
+#include "ns3/satellite-lorawan-net-device.h"
+#include "ns3/satellite-mobility-model.h"
+#include "ns3/satellite-orbiter-net-device.h"
+#include "ns3/satellite-packet-trace.h"
+#include "ns3/satellite-phy-rx.h"
+#include "ns3/satellite-phy-tx.h"
+#include "ns3/satellite-phy.h"
+#include "ns3/satellite-propagation-delay-model.h"
+#include "ns3/satellite-sgp4-mobility-model.h"
+#include "ns3/satellite-topology.h"
+#include "ns3/satellite-typedefs.h"
+#include "ns3/satellite-ut-llc.h"
+#include "ns3/satellite-ut-mac.h"
+#include "ns3/satellite-utils.h"
+#include "ns3/singleton.h"
+#include "ns3/string.h"
+#include "ns3/traffic-control-helper.h"
 
 #include <algorithm>
 #include <ios>
@@ -228,14 +228,6 @@ SatBeamHelper::GetTypeId(void)
     return tid;
 }
 
-TypeId
-SatBeamHelper::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
-}
-
 SatBeamHelper::SatBeamHelper()
     : m_printDetailedInformationToCreationTraces(false),
       m_fadingModel(),
@@ -261,6 +253,8 @@ SatBeamHelper::SatBeamHelper(std::vector<std::pair<uint32_t, uint32_t>> isls,
                              uint32_t fwdLinkCarrierCount,
                              Ptr<SatSuperframeSeq> seq)
     : m_carrierBandwidthConverter(bandwidthConverterCb),
+      m_rtnLinkCarrierCount(rtnLinkCarrierCount),
+      m_fwdLinkCarrierCount(fwdLinkCarrierCount),
       m_superframeSeq(seq),
       m_printDetailedInformationToCreationTraces(false),
       m_fadingModel(SatEnums::FADING_MARKOV),
@@ -276,16 +270,20 @@ SatBeamHelper::SatBeamHelper(std::vector<std::pair<uint32_t, uint32_t>> isls,
       m_isls(isls)
 {
     NS_LOG_FUNCTION(this << rtnLinkCarrierCount << fwdLinkCarrierCount << seq);
+}
 
-    // uncomment next code line, if attributes are needed already in construction phase.
-    // E.g attributes set by object factory affecting object creation
-    ObjectBase::ConstructSelf(AttributeConstructionList());
+void
+SatBeamHelper::NotifyConstructionCompleted()
+{
+    NS_LOG_FUNCTION(this);
+
+    Object::NotifyConstructionCompleted();
 
     m_channelFactory.SetTypeId("ns3::SatChannel");
 
     // create SatChannel containers
-    m_ulChannels = Create<SatChannelPair>();
-    m_flChannels = Create<SatChannelPair>();
+    m_ulChannels = CreateObject<SatChannelPair>();
+    m_flChannels = CreateObject<SatChannelPair>();
 
     // create link specific control message containers
     Ptr<SatControlMsgContainer> rtnCtrlMsgContainer =
@@ -342,24 +340,24 @@ SatBeamHelper::SatBeamHelper(std::vector<std::pair<uint32_t, uint32_t>> isls,
     switch (Singleton<SatTopology>::Get()->GetStandard())
     {
     case SatEnums::DVB: {
-        m_gwHelper = CreateObject<SatGwHelperDvb>(bandwidthConverterCb,
-                                                  rtnLinkCarrierCount,
-                                                  seq,
+        m_gwHelper = CreateObject<SatGwHelperDvb>(m_carrierBandwidthConverter,
+                                                  m_rtnLinkCarrierCount,
+                                                  m_superframeSeq,
                                                   rtnReadCtrlCb,
                                                   fwdReserveCtrlCb,
                                                   fwdSendCtrlCb,
                                                   gwRaSettings);
-        m_utHelper = CreateObject<SatUtHelperDvb>(bandwidthConverterCb,
-                                                  fwdLinkCarrierCount,
-                                                  seq,
+        m_utHelper = CreateObject<SatUtHelperDvb>(m_carrierBandwidthConverter,
+                                                  m_fwdLinkCarrierCount,
+                                                  m_superframeSeq,
                                                   fwdReadCtrlCb,
                                                   rtnReserveCtrlCb,
                                                   rtnSendCtrlCb,
                                                   utRaSettings);
-        m_orbiterHelper = CreateObject<SatOrbiterHelperDvb>(bandwidthConverterCb,
-                                                            rtnLinkCarrierCount,
-                                                            fwdLinkCarrierCount,
-                                                            seq,
+        m_orbiterHelper = CreateObject<SatOrbiterHelperDvb>(m_carrierBandwidthConverter,
+                                                            m_rtnLinkCarrierCount,
+                                                            m_fwdLinkCarrierCount,
+                                                            m_superframeSeq,
                                                             fwdReadCtrlCb,
                                                             rtnReadCtrlCb,
                                                             orbiterRaSettings);
@@ -369,9 +367,9 @@ SatBeamHelper::SatBeamHelper(std::vector<std::pair<uint32_t, uint32_t>> isls,
         if (Singleton<SatTopology>::Get()->GetForwardLinkRegenerationMode() ==
             SatEnums::TRANSPARENT)
         {
-            m_gwHelper = CreateObject<SatGwHelperLora>(bandwidthConverterCb,
-                                                       rtnLinkCarrierCount,
-                                                       seq,
+            m_gwHelper = CreateObject<SatGwHelperLora>(m_carrierBandwidthConverter,
+                                                       m_rtnLinkCarrierCount,
+                                                       m_superframeSeq,
                                                        rtnReadCtrlCb,
                                                        fwdReserveCtrlCb,
                                                        fwdSendCtrlCb,
@@ -380,25 +378,25 @@ SatBeamHelper::SatBeamHelper(std::vector<std::pair<uint32_t, uint32_t>> isls,
         else
         {
             Config::SetDefault("ns3::SatGwMac::SendNcrBroadcast", BooleanValue(false));
-            m_gwHelper = CreateObject<SatGwHelperDvb>(bandwidthConverterCb,
-                                                      rtnLinkCarrierCount,
-                                                      seq,
+            m_gwHelper = CreateObject<SatGwHelperDvb>(m_carrierBandwidthConverter,
+                                                      m_rtnLinkCarrierCount,
+                                                      m_superframeSeq,
                                                       rtnReadCtrlCb,
                                                       fwdReserveCtrlCb,
                                                       fwdSendCtrlCb,
                                                       gwRaSettings);
         }
-        m_utHelper = CreateObject<SatUtHelperLora>(bandwidthConverterCb,
-                                                   fwdLinkCarrierCount,
-                                                   seq,
+        m_utHelper = CreateObject<SatUtHelperLora>(m_carrierBandwidthConverter,
+                                                   m_fwdLinkCarrierCount,
+                                                   m_superframeSeq,
                                                    fwdReadCtrlCb,
                                                    rtnReserveCtrlCb,
                                                    rtnSendCtrlCb,
                                                    utRaSettings);
-        m_orbiterHelper = CreateObject<SatOrbiterHelperLora>(bandwidthConverterCb,
-                                                             rtnLinkCarrierCount,
-                                                             fwdLinkCarrierCount,
-                                                             seq,
+        m_orbiterHelper = CreateObject<SatOrbiterHelperLora>(m_carrierBandwidthConverter,
+                                                             m_rtnLinkCarrierCount,
+                                                             m_fwdLinkCarrierCount,
+                                                             m_superframeSeq,
                                                              fwdReadCtrlCb,
                                                              rtnReadCtrlCb,
                                                              orbiterRaSettings);
@@ -1320,8 +1318,16 @@ SatBeamHelper::EnablePacketTrace()
     {
         Config::ConnectWithoutContext("/NodeList/*/DeviceList/*/UserMac/*/PacketTrace",
                                       MakeCallback(&SatPacketTrace::AddTraceEntry, m_packetTrace));
-        Config::ConnectWithoutContext("/NodeList/*/DeviceList/*/FeederMac/*/PacketTrace",
-                                      MakeCallback(&SatPacketTrace::AddTraceEntry, m_packetTrace));
+
+        for (std::pair<uint32_t, uint32_t> p : GetBeams())
+        {
+            Ptr<Node> orbiter = Singleton<SatTopology>::Get()->GetOrbiterNode(p.first);
+            Ptr<SatOrbiterFeederMac> feederMac =
+                Singleton<SatTopology>::Get()->GetOrbiterFeederMac(orbiter, p.second);
+            feederMac->TraceConnectWithoutContext(
+                "PacketTrace",
+                MakeCallback(&SatPacketTrace::AddTraceEntry, m_packetTrace));
+        }
     }
     if (Singleton<SatTopology>::Get()->GetStandard() == SatEnums::DVB)
     {
@@ -1336,8 +1342,7 @@ SatBeamHelper::GetBeamInfo() const
     NS_LOG_FUNCTION(this);
 
     std::ostringstream oss;
-    oss << "--- Beam Info, "
-        << "number of created beams: " << m_beam.size() << " ---" << std::endl;
+    oss << "--- Beam Info, " << "number of created beams: " << m_beam.size() << " ---" << std::endl;
 
     if (m_beam.size() > 0)
     {

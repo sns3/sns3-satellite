@@ -19,28 +19,28 @@
  */
 
 /**
- * \file satellite-fsl-test.cc
- * \ingroup satellite
- * \brief Test cases to unit test Satellite Free Space Loss model.
+ * @file satellite-fsl-test.cc
+ * @ingroup satellite
+ * @brief Test cases to unit test Satellite Free Space Loss model.
  */
 
-#include <ns3/log.h>
-#include <ns3/satellite-env-variables.h>
-#include <ns3/satellite-free-space-loss.h>
-#include <ns3/satellite-helper.h>
-#include <ns3/satellite-mobility-model.h>
-#include <ns3/satellite-topology.h>
-#include <ns3/simulator.h>
-#include <ns3/singleton.h>
-#include <ns3/test.h>
+#include "ns3/log.h"
+#include "ns3/satellite-env-variables.h"
+#include "ns3/satellite-free-space-loss.h"
+#include "ns3/satellite-helper.h"
+#include "ns3/satellite-mobility-model.h"
+#include "ns3/satellite-topology.h"
+#include "ns3/simulator.h"
+#include "ns3/singleton.h"
+#include "ns3/test.h"
 
 #include <stdint.h>
 
 using namespace ns3;
 
 /**
- * \ingroup satellite
- * \brief Test case to unit test satellite free space loss (FSL) model.
+ * @ingroup satellite
+ * @brief Test case to unit test satellite free space loss (FSL) model.
  *
  * This case tests that SatFreeSpaceLoss object can be created successfully and free space loss
  * (FSL) is calculates correctly.
@@ -75,8 +75,8 @@ void
 SatFreeSpaceLossTestCase::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-fsl", "", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-fsl", "", true);
 
     SatFreeSpaceLoss fsl;
     double frequency = 17.9 * std::pow(10.0, 9); // reference frequency
@@ -85,7 +85,7 @@ SatFreeSpaceLossTestCase::DoRun(void)
 
     // Creating the reference system.
     Ptr<SatHelper> helper = CreateObject<SatHelper>(
-        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E");
+        SatEnvVariables::GetInstance()->LocateDataDirectory() + "/scenarios/geo-33E");
 
     helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
@@ -127,11 +127,11 @@ SatFreeSpaceLossTestCase::DoRun(void)
 
     Simulator::Destroy();
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 }
 
 /**
- * \brief Test suite for Satellite free space loss unit test cases.
+ * @brief Test suite for Satellite free space loss unit test cases.
  */
 class SatFreeSpaceLossTestSuite : public TestSuite
 {

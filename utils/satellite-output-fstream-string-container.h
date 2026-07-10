@@ -23,8 +23,8 @@
 
 #include "satellite-output-fstream-wrapper.h"
 
+#include "ns3/gnuplot.h"
 #include "ns3/object.h"
-#include <ns3/gnuplot.h>
 
 #include <fstream>
 
@@ -32,9 +32,9 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief Class for output file stream container for strings.
+ * @brief Class for output file stream container for strings.
  * The class implements storing the values and writing the stored
  * values into a file.
  */
@@ -42,86 +42,86 @@ class SatOutputFileStreamStringContainer : public Object
 {
   public:
     /**
-     * \brief NS-3 function for type id
-     * \return type id
+     * @brief NS-3 function for type id
+     * @return type id
      */
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Constructor
-     * \param filename file name
-     * \param filemode file mode
+     * @brief Constructor
+     * @param filename file name
+     * @param filemode file mode
      */
     SatOutputFileStreamStringContainer(std::string filename, std::ios::openmode filemode);
 
     /**
-     * \brief Constructor
+     * @brief Constructor
      */
     SatOutputFileStreamStringContainer();
 
     /**
-     * \brief Destructor
+     * @brief Destructor
      */
     ~SatOutputFileStreamStringContainer();
 
     /**
-     * \brief Function for writing the container contents to file
+     * @brief Function for writing the container contents to file
      */
     void WriteContainerToFile();
 
     /**
-     * \brief Function for adding the line to container
+     * @brief Function for adding the line to container
      */
     void AddToContainer(std::string newLine);
 
     /**
-     * \brief Do needed dispose actions
+     * @brief Do needed dispose actions
      */
     void DoDispose();
 
   private:
     /**
-     * \brief Function for resetting the variables
+     * @brief Function for resetting the variables
      */
     void Reset();
 
     /**
-     * \brief Function for resetting the stream
+     * @brief Function for resetting the stream
      */
     void ResetStream();
 
     /**
-     * \brief Function for clearing the container
+     * @brief Function for clearing the container
      */
     void ClearContainer();
 
     /**
-     * \brief Function for opening the output file stream
+     * @brief Function for opening the output file stream
      */
     void OpenStream();
 
     /**
-     * \brief Pointer to output file stream wrapper
+     * @brief Pointer to output file stream wrapper
      */
     SatOutputFileStreamWrapper* m_outputFileStreamWrapper;
 
     /**
-     * \brief Pointer to output file stream
+     * @brief Pointer to output file stream
      */
     std::ofstream* m_outputFileStream;
 
     /**
-     * \brief Container for lines
+     * @brief Container for lines
      */
     std::vector<std::string> m_container;
 
     /**
-     * \brief File name
+     * @brief File name
      */
     std::string m_fileName;
 
     /**
-     * \brief File mode
+     * @brief File mode
      */
     std::ios::openmode m_fileMode;
 };

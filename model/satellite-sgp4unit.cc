@@ -443,7 +443,9 @@ dpper(double e3,
     zm = zmos + zns * t;
     // be sure that the initial call has time set to zero
     if (init == 'y')
+    {
         zm = zmos;
+    }
     zf = zm + 2.0 * zes * sin(zm);
     sinzf = sin(zf);
     f2 = 0.5 * sinzf * sinzf - 0.25;
@@ -455,7 +457,9 @@ dpper(double e3,
     shs = sh2 * f2 + sh3 * f3;
     zm = zmol + znl * t;
     if (init == 'y')
+    {
         zm = zmol;
+    }
     zf = zm + 2.0 * zel * sin(zm);
     sinzf = sin(zf);
     f2 = 0.5 * sinzf * sinzf - 0.25;
@@ -515,7 +519,9 @@ dpper(double e3,
             //  sgp4fix for afspc written intrinsic functions
             // nodep used without a trigonometric function ahead
             if ((nodep < 0.0) && (opsmode == 'a'))
+            {
                 nodep = nodep + twopi;
+            }
             xls = mp + argpp + cosip * nodep;
             dls = pl + pgh - pinc * nodep * sinip;
             xls = xls + dls;
@@ -524,13 +530,19 @@ dpper(double e3,
             //  sgp4fix for afspc written intrinsic functions
             // nodep used without a trigonometric function ahead
             if ((nodep < 0.0) && (opsmode == 'a'))
+            {
                 nodep = nodep + twopi;
+            }
             if (fabs(xnoh - nodep) > pi)
             {
                 if (nodep < xnoh)
+                {
                     nodep = nodep + twopi;
+                }
                 else
+                {
                     nodep = nodep - twopi;
+                }
             }
             mp = mp + pl;
             argpp = xls - mp - cosip * nodep;
@@ -1059,9 +1071,13 @@ dsinit(gravconsttype whichconst,
     /* -------------------- deep space initialization ------------ */
     irez = 0;
     if ((nm < 0.0052359877) && (nm > 0.0034906585))
+    {
         irez = 1;
+    }
     if ((nm >= 8.26e-3) && (nm <= 9.24e-3) && (em >= 0.5))
+    {
         irez = 2;
+    }
 
     /* ------------------------ do solar terms ------------------- */
     ses = ss1 * zns * ss5;
@@ -1071,9 +1087,13 @@ dsinit(gravconsttype whichconst,
     shs = -zns * ss2 * (sz21 + sz23);
     // sgp4fix for 180 deg incl
     if ((inclm < 5.2359877e-2) || (inclm > pi - 5.2359877e-2))
+    {
         shs = 0.0;
+    }
     if (sinim != 0.0)
+    {
         shs = shs / sinim;
+    }
     sgs = sghs - cosim * shs;
 
     /* ------------------------- do lunar terms ------------------ */
@@ -1084,7 +1104,9 @@ dsinit(gravconsttype whichconst,
     shll = -znl * s2 * (z21 + z23);
     // sgp4fix for 180 deg incl
     if ((inclm < 5.2359877e-2) || (inclm > pi - 5.2359877e-2))
+    {
         shll = 0.0;
+    }
     domdt = sgs + sghl;
     dnodt = shs;
     if (sinim != 0.0)
@@ -1143,9 +1165,13 @@ dsinit(gravconsttype whichconst,
                 g410 = -1052.797 + 4758.686 * em - 7193.992 * emsq + 3651.957 * eoc;
                 g422 = -3581.690 + 16178.110 * em - 24462.770 * emsq + 12422.520 * eoc;
                 if (em > 0.715)
+                {
                     g520 = -5149.66 + 29936.92 * em - 54087.36 * emsq + 31324.56 * eoc;
+                }
                 else
+                {
                     g520 = 1464.74 - 4664.75 * em + 3763.64 * emsq;
+                }
             }
             if (em < 0.7)
             {
@@ -1397,9 +1423,13 @@ dspace(int irez,
         }
         // sgp4fix move check outside loop
         if (t > 0.0)
+        {
             delt = stepp;
+        }
         else
+        {
             delt = stepn;
+        }
 
         iretn = 381; // added for do loop
         while (iretn == 381)
@@ -1602,10 +1632,14 @@ initl(long int satn,
         c1p2p = c1 + twopi;
         gsto = fmod(thgr70 + c1 * ds70 + c1p2p * tfrac + ts70 * ts70 * fk5r, twopi);
         if (gsto < 0.0)
+        {
             gsto = gsto + twopi;
+        }
     }
     else
+    {
         gsto = gstime(epoch + 2433281.5);
+    }
 
 } // end initl
 
@@ -1882,7 +1916,9 @@ sgp4init(gravconsttype whichconst,
     {
         satrec.isimp = 0;
         if (rp < (220.0 / radiusearthkm + 1.0))
+        {
             satrec.isimp = 1;
+        }
         sfour = ss;
         qzms24 = qzms2t;
         perige = (rp - 1.0) * radiusearthkm;
@@ -1892,7 +1928,9 @@ sgp4init(gravconsttype whichconst,
         {
             sfour = perige - 78.0;
             if (perige < 98.0)
+            {
                 sfour = 20.0;
+            }
             // sgp4fix use multiply for speed instead of pow
             qzms24temp = (120.0 - sfour) / radiusearthkm;
             qzms24 = qzms24temp * qzms24temp * qzms24temp * qzms24temp;
@@ -1913,7 +1951,9 @@ sgp4init(gravconsttype whichconst,
         satrec.cc1 = satrec.bstar * cc2;
         cc3 = 0.0;
         if (satrec.ecco > 1.0e-4)
+        {
             cc3 = -2.0 * coef * tsi * j3oj2 * satrec.no * sinio / satrec.ecco;
+        }
         satrec.x1mth2 = 1.0 - cosio2;
         satrec.cc4 = 2.0 * satrec.no * coef1 * ao * omeosq *
                      (satrec.eta * (2.0 + 0.5 * etasq) + satrec.ecco * (0.5 + 2.0 * etasq) -
@@ -1939,14 +1979,20 @@ sgp4init(gravconsttype whichconst,
         satrec.omgcof = satrec.bstar * cc3 * cos(satrec.argpo);
         satrec.xmcof = 0.0;
         if (satrec.ecco > 1.0e-4)
+        {
             satrec.xmcof = -x2o3 * coef * satrec.bstar / eeta;
+        }
         satrec.nodecf = 3.5 * omeosq * xhdot1 * satrec.cc1;
         satrec.t2cof = 1.5 * satrec.cc1;
         // sgp4fix for divide by zero with xinco = 180 deg
         if (fabs(cosio + 1.0) > 1.5e-12)
+        {
             satrec.xlcof = -0.25 * j3oj2 * sinio * (3.0 + 5.0 * cosio) / (1.0 + cosio);
+        }
         else
+        {
             satrec.xlcof = -0.25 * j3oj2 * sinio * (3.0 + 5.0 * cosio) / temp4;
+        }
         satrec.aycof = -0.5 * j3oj2 * sinio;
         // sgp4fix use multiply for speed instead of pow
         delmotemp = 1.0 + satrec.eta * cos(satrec.mo);
@@ -2414,7 +2460,9 @@ sgp4(gravconsttype whichconst, elsetrec& satrec, double tsince, double r[3], dou
     }
     // sgp4fix fix tolerance to avoid a divide by zero
     if (em < 1.0e-6)
+    {
         em = 1.0e-6;
+    }
     mm = mm + satrec.no * templ;
     xlm = mm + argpm + nodem;
     emsq = em * em;
@@ -2501,9 +2549,13 @@ sgp4(gravconsttype whichconst, elsetrec& satrec, double tsince, double r[3], dou
         satrec.aycof = -0.5 * j3oj2 * sinip;
         // sgp4fix for divide by zero for xincp = 180 deg
         if (fabs(cosip + 1.0) > 1.5e-12)
+        {
             satrec.xlcof = -0.25 * j3oj2 * sinip * (3.0 + 5.0 * cosip) / (1.0 + cosip);
+        }
         else
+        {
             satrec.xlcof = -0.25 * j3oj2 * sinip * (3.0 + 5.0 * cosip) / temp4;
+        }
     }
     axnl = ep * cos(argpp);
     temp = 1.0 / (am * (1.0 - ep * ep));
@@ -2524,7 +2576,9 @@ sgp4(gravconsttype whichconst, elsetrec& satrec, double tsince, double r[3], dou
         tem5 = 1.0 - coseo1 * axnl - sineo1 * aynl;
         tem5 = (u - aynl * coseo1 + axnl * sineo1 - eo1) / tem5;
         if (fabs(tem5) >= 0.95)
+        {
             tem5 = tem5 > 0.0 ? 0.95 : -0.95;
+        }
         eo1 = eo1 + tem5;
         ktr = ktr + 1;
     }
@@ -2646,7 +2700,9 @@ gstime(double jdut1)
 
     // ------------------------ check quadrants ---------------------
     if (temp < 0.0)
+    {
         temp += twopi;
+    }
 
     return temp;
 } // end gstime

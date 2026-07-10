@@ -24,10 +24,10 @@
 #include "satellite-mac.h"
 #include "satellite-phy.h"
 
-#include <ns3/callback.h>
-#include <ns3/nstime.h>
-#include <ns3/ptr.h>
-#include <ns3/traced-callback.h>
+#include "ns3/callback.h"
+#include "ns3/nstime.h"
+#include "ns3/ptr.h"
+#include "ns3/traced-callback.h"
 
 #include <map>
 #include <set>
@@ -46,8 +46,8 @@ class SatSignalParameters;
 class SatFwdLinkScheduler;
 
 /**
- * \ingroup satellite
- * \brief GW specific Mac class for Sat Net Devices.
+ * @ingroup satellite
+ * @brief GW specific Mac class for Sat Net Devices.
  *
  * This SatGwMac class specializes the Mac class with GW characteristics.
  */
@@ -56,15 +56,10 @@ class SatGwMac : public SatMac
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
-
-    /**
-     * Derived from Object
-     */
-    TypeId GetInstanceTypeId(void) const;
 
     /**
      * Default constructor, which is not used.
@@ -76,11 +71,11 @@ class SatGwMac : public SatMac
      *
      * This is the constructor for the SatGwMac
      *
-     * \param node Node containing this MAC
-     * \param satId ID of sat for UT
-     * \param beamId ID of beam for UT
-     * \param satId ID of sat for GW
-     * \param beamId ID of beam for GW
+     * @param node Node containing this MAC
+     * @param satId ID of sat for UT
+     * @param beamId ID of beam for UT
+     * @param satId ID of sat for GW
+     * @param beamId ID of beam for GW
      */
     SatGwMac(Ptr<Node> node,
              uint32_t satId,
@@ -103,130 +98,130 @@ class SatGwMac : public SatMac
     /**
      * Receive packet from lower layer.
      *
-     * \param packets Pointers to packets received.
+     * @param packets Pointers to packets received.
      */
     void Receive(SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/);
 
     /**
      * Function called when a TBTP has been sent by the SatBeamScheduler.
-     * \param tbtp The TBTP sent by the scheduler.
+     * @param tbtp The TBTP sent by the scheduler.
      */
     void TbtpSent(Ptr<SatTbtpMessage> tbtp);
 
     /**
      * Get ID of satellite linked to this GW
      *
-     * \return ID of satellite linked to this GW
+     * @return ID of satellite linked to this GW
      */
     uint32_t GetFeederSatId();
 
     /**
      * Get ID of beam linked to this GW
      *
-     * \return ID of beam linked to this GW
+     * @return ID of beam linked to this GW
      */
     uint32_t GetFeederBeamId();
 
     /**
      * Callback to receive capacity request (CR) messages.
-     * \param uint32_t The satellite ID.
-     * \param uint32_t The beam ID.
-     * \param Address Address of the sender UT.
-     * \param Ptr<SatControlMessage> Pointer to the received CR message.
+     * @param uint32_t The satellite ID.
+     * @param uint32_t The beam ID.
+     * @param Address Address of the sender UT.
+     * @param Ptr<SatControlMessage> Pointer to the received CR message.
      */
     typedef Callback<void, uint32_t, uint32_t, Address, Ptr<SatCrMessage>> CrReceiveCallback;
 
     /**
      * Method to set read control message callback.
-     * \param cb callback to invoke whenever a control message is wanted to read.
+     * @param cb callback to invoke whenever a control message is wanted to read.
      */
     void SetCrReceiveCallback(SatGwMac::CrReceiveCallback cb);
 
     /**
      * Callback to notify upper layer about Tx opportunity.
-     * \param uint32_t payload size in bytes
-     * \param Mac48Address address
-     * \return packet Packet to be transmitted to PHY
+     * @param uint32_t payload size in bytes
+     * @param Mac48Address address
+     * @return packet Packet to be transmitted to PHY
      */
     typedef Callback<Ptr<Packet>, uint32_t, Mac48Address, uint32_t&> TxOpportunityCallback;
 
     /**
      * Method to set Tx opportunity callback.
-     * \param cb callback to invoke whenever a packet has been received and must
+     * @param cb callback to invoke whenever a packet has been received and must
      *        be forwarded to the higher layers.
      */
     void SetTxOpportunityCallback(SatGwMac::TxOpportunityCallback cb);
 
     /**
      * Callback to query/apply handover on the terrestrial network
-     * \param Address identification of the UT originating the request
-     * \param uint32_t satellite ID
-     * \param uint32_t source beam ID the UT is still in
-     * \param uint32_t destination sat ID the UT would like to go in
-     * \param uint32_t destination beam ID the UT would like to go in
+     * @param Address identification of the UT originating the request
+     * @param uint32_t satellite ID
+     * @param uint32_t source beam ID the UT is still in
+     * @param uint32_t destination sat ID the UT would like to go in
+     * @param uint32_t destination beam ID the UT would like to go in
      */
     typedef Callback<void, Address, uint32_t, uint32_t, uint32_t, uint32_t> HandoverCallback;
 
     /**
      * Method to set handover callback
-     * \param cb callback to invoke whenever a handover recommendation is received
+     * @param cb callback to invoke whenever a handover recommendation is received
      */
     void SetHandoverCallback(SatGwMac::HandoverCallback cb);
 
     /**
      * Callback to register UT logon
-     * \param Address identification of the UT originating the request
-     * \param uint32_t sat ID the UT is requesting logon on
-     * \param uint32_t beam ID the UT is requesting logon on
-     * \param Callback setRaChannelCallback the callback to call when RA channel has been selected
+     * @param Address identification of the UT originating the request
+     * @param uint32_t sat ID the UT is requesting logon on
+     * @param uint32_t beam ID the UT is requesting logon on
+     * @param Callback setRaChannelCallback the callback to call when RA channel has been selected
      */
     typedef Callback<void, Address, uint32_t, uint32_t, Callback<void, uint32_t>> LogonCallback;
 
     /**
      * Method to set logon callback
-     * \param cb callback to invoke whenever a logon is received
+     * @param cb callback to invoke whenever a logon is received
      */
     void SetLogonCallback(SatGwMac::LogonCallback cb);
 
     /**
      * Callback to change phy-layer beam ID
-     * \param uint32_t New satellite ID to use
-     * \param uint32_t New beam ID to use
-     * \return whether a connection change should occur
+     * @param uint32_t New satellite ID to use
+     * @param uint32_t New beam ID to use
+     * @return whether a connection change should occur
      */
     typedef Callback<void, uint32_t, uint32_t> PhyBeamCallback;
 
     /**
      * Method to set phy-layer beam handover callback
-     * \param cb callback to invoke whenever a beam handover is considered
+     * @param cb callback to invoke whenever a beam handover is considered
      */
     void SetBeamCallback(SatGwMac::PhyBeamCallback cb);
 
     /**
      * Callback to inform NCC a control burst has been received.
-     * \param Address identification of the UT that sent the burst
-     * \param uint32_t satellite ID where the UT is connected
-     * \param uint32_t beam ID where the UT is connected
+     * @param Address identification of the UT that sent the burst
+     * @param uint32_t satellite ID where the UT is connected
+     * @param uint32_t beam ID where the UT is connected
      */
     typedef Callback<void, Address, uint32_t, uint32_t> ControlMessageReceivedCallback;
 
     /**
      * Method to set callback for control burst reception
-     * \param cb callback to invoke whenever a control burst is received
+     * @param cb callback to invoke whenever a control burst is received
      */
     void SetControlMessageReceivedCallback(SatGwMac::ControlMessageReceivedCallback cb);
 
     /**
      * Callback to indicate NCC a UT needs to be removed
-     * \param Address identification of the UT to remove
-     * \param uint32_t satellite ID where the UT is connected
-     * \param uint32_t beam ID where the UT is connected
+     * @param Address identification of the UT to remove
+     * @param uint32_t satellite ID where the UT is connected
+     * @param uint32_t beam ID where the UT is connected
      */
     typedef Callback<void, Address, uint32_t, uint32_t> RemoveUtCallback;
 
     /**
      * Method to set callback for UT removing
-     * \param cb callback to invoke whenever a UT needs to be removed
+     * @param cb callback to invoke whenever a UT needs to be removed
      */
     void SetRemoveUtCallback(SatGwMac::RemoveUtCallback cb);
 
@@ -237,32 +232,32 @@ class SatGwMac : public SatMac
 
     /**
      * Method to set callback for LLC queues clearing
-     * \param cb callback to invoke whenever queues need to be cleared
+     * @param cb callback to invoke whenever queues need to be cleared
      */
     void SetClearQueuesCallback(SatGwMac::ClearQueuesCallback cb);
 
     /**
      * Method to set forward link scheduler
-     * \param The scheduler to use
+     * @param The scheduler to use
      */
     void SetFwdScheduler(Ptr<SatFwdLinkScheduler> fwdScheduler);
 
     /**
      * Method handling beam handover
-     * \param satId New satellite id
-     * \param beamId New satellite beam id
+     * @param satId New satellite id
+     * @param beamId New satellite beam id
      */
     void ChangeBeam(uint32_t satId, uint32_t beamId);
 
     /**
      * Connect a UT to this satellite.
-     * \param utAddress MAC address of the UT to connect
+     * @param utAddress MAC address of the UT to connect
      */
     void ConnectUt(Mac48Address utAddress);
 
     /**
      * Disconnect a UT to this satellite.
-     * \param utAddress MAC address of the UT to disconnect
+     * @param utAddress MAC address of the UT to disconnect
      */
     void DisconnectUt(Mac48Address utAddress);
 
@@ -278,8 +273,8 @@ class SatGwMac : public SatMac
      * The StartTransmission method is used internally in the
      * SatGwMac to begin the process of sending a packet out on the PHY layer.
      *
-     * \param carrierId id of the carrier.
-     * \returns true if success, false on failure
+     * @param carrierId id of the carrier.
+     * @returns true if success, false on failure
      */
     void StartTransmission(uint32_t carrierId);
 
@@ -291,8 +286,8 @@ class SatGwMac : public SatMac
     /**
      * Signaling packet receiver, which handles all the signaling packet
      * receptions.
-     * \param packet Received signaling packet
-     * \param beamId ID of beam on UT
+     * @param packet Received signaling packet
+     * @param beamId ID of beam on UT
      */
     void ReceiveSignalingPacket(Ptr<Packet> packet, uint32_t satId, uint32_t beamId);
 
@@ -300,7 +295,7 @@ class SatGwMac : public SatMac
 
     /**
      * Function used to clear old TBTP.
-     * \param superframeCounter The SuperFrame counter to erase.
+     * @param superframeCounter The SuperFrame counter to erase.
      */
     void RemoveTbtp(uint32_t superframeCounter);
 
@@ -321,7 +316,7 @@ class SatGwMac : public SatMac
     /**
      * Indicates if at least one device is connected in this beam.
      *
-     * \return True if at least a device is connected, false otherwise
+     * @return True if at least a device is connected, false otherwise
      */
     bool HasPeer();
 

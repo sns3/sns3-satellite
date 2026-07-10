@@ -25,8 +25,8 @@
 #include "satellite-frame-conf.h"
 #include "satellite-wave-form-conf.h"
 
-#include <ns3/object.h>
-#include <ns3/ptr.h>
+#include "ns3/object.h"
+#include "ns3/ptr.h"
 
 #include <map>
 #include <stdint.h>
@@ -36,8 +36,8 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief This class implements super frame sequence.
+ * @ingroup satellite
+ * @brief This class implements super frame sequence.
  *  It consists information of the super frames in sequence.
  *
  */
@@ -50,16 +50,10 @@ class SatSuperframeSeq : public Object
     typedef std::vector<Ptr<SatSuperframeConf>> SatSuperframeConfList;
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
-
-    /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
-     */
-    virtual TypeId GetInstanceTypeId(void) const;
 
     /**
      * Default constructor for SatSuperframeConf
@@ -72,91 +66,91 @@ class SatSuperframeSeq : public Object
     ~SatSuperframeSeq();
 
     /**
-     * \brief Add waveform configuration class instance to this superframe sequence
-     * \param wfConf Waveform conf to add
+     * @brief Add waveform configuration class instance to this superframe sequence
+     * @param wfConf Waveform conf to add
      */
     void AddWaveformConf(Ptr<SatWaveformConf> wfConf);
 
     /**
-     * \brief Get waveform configuration
-     * \return SatWaveformConf Waveform configuration class instance
+     * @brief Get waveform configuration
+     * @return SatWaveformConf Waveform configuration class instance
      */
     Ptr<SatWaveformConf> GetWaveformConf() const;
 
     /**
-     * \brief Add super frame (configuration) to super frame sequence
-     * \param conf Super frame configuration to add. (id of the sequence is order number of addition
+     * @brief Add super frame (configuration) to super frame sequence
+     * @param conf Super frame configuration to add. (id of the sequence is order number of addition
      * starting from 0)
      */
     void AddSuperframe(Ptr<SatSuperframeConf> conf);
 
     /**
-     * \brief Get superframe conf of the sequence.
+     * @brief Get superframe conf of the sequence.
      *
-     * \param seqId    Id of the super frame sequence requested.
-     * \return The requested super frame conf of the sequence.
+     * @param seqId    Id of the super frame sequence requested.
+     * @return The requested super frame conf of the sequence.
      */
     Ptr<SatSuperframeConf> GetSuperframeConf(uint8_t seqId) const;
 
     /**
-     * \brief Get global carrier id. Converts super frame specific id to global carrier id.
+     * @brief Get global carrier id. Converts super frame specific id to global carrier id.
      *
-     * \param superframeId       Id of the super frame requested.
-     * \param frameId            Id of the frame inside super frame requested.
-     * \param frameCarrierId     Id of the carrier inside frame requested.
+     * @param superframeId       Id of the super frame requested.
+     * @param frameId            Id of the frame inside super frame requested.
+     * @param frameCarrierId     Id of the carrier inside frame requested.
      *
-     * \return The requested carrier id of the super frame.
+     * @return The requested carrier id of the super frame.
      */
     uint32_t GetCarrierId(uint8_t superframeId, uint8_t frameId, uint16_t frameCarrierId) const;
 
     /**
-     * \brief Get carrier count of the super frame sequence.
+     * @brief Get carrier count of the super frame sequence.
      *
-     * \return The super frame sequence carrier count.
+     * @return The super frame sequence carrier count.
      */
     uint32_t GetCarrierCount() const;
 
     /**
-     * \brief Get carrier count in the super frame.
+     * @brief Get carrier count in the super frame.
      *
-     * \param seqId Sequence id of the super frame which carrier count is requested.
+     * @param seqId Sequence id of the super frame which carrier count is requested.
      *
-     * \return The super frame carrier count.
+     * @return The super frame carrier count.
      */
     uint32_t GetCarrierCount(uint8_t seqId) const;
 
     /**
-     * \brief Get duration of the super frame.
+     * @brief Get duration of the super frame.
      *
-     * \param seqId Sequence id of the super frame which duration is requested.
+     * @param seqId Sequence id of the super frame which duration is requested.
      *
-     * \return The super frame duration.
+     * @return The super frame duration.
      */
     Time GetDuration(uint8_t seqId) const;
 
     /**
-     * \brief Get the center frequency of the requested carrier.
+     * @brief Get the center frequency of the requested carrier.
      *
-     * \param carrierId  Id of the carrier inside super frame which center frequency is requested.
+     * @param carrierId  Id of the carrier inside super frame which center frequency is requested.
      *
-     * \return The center frequency of the requested carrier.
+     * @return The center frequency of the requested carrier.
      */
     double GetCarrierFrequencyHz(uint32_t carrierId) const;
 
     /**
-     * \brief Get the bandwidth of the requested carrier.
+     * @brief Get the bandwidth of the requested carrier.
      *
-     * \param carrierId  Id of the carrier inside super frame which bandwidth is requested.
-     * \param bandwidthType Type of bandwidth requested.
+     * @param carrierId  Id of the carrier inside super frame which bandwidth is requested.
+     * @param bandwidthType Type of bandwidth requested.
      *
-     * \return The bandwidth of the requested carrier.
+     * @return The bandwidth of the requested carrier.
      */
     double GetCarrierBandwidthHz(uint32_t carrierId,
                                  SatEnums::CarrierBandwidthType_t bandwidthType) const;
 
     /**
-     * \brief Get target duration for sequence.
-     * \return target duration for sequence
+     * @brief Get target duration for sequence.
+     * @return target duration for sequence
      */
     inline Time GetTargetDuration() const
     {

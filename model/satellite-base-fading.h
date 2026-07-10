@@ -22,18 +22,18 @@
 
 #include "satellite-enums.h"
 
-#include <ns3/mac48-address.h>
-#include <ns3/object.h>
-#include <ns3/simulator.h>
-#include <ns3/uinteger.h>
+#include "ns3/mac48-address.h"
+#include "ns3/object.h"
+#include "ns3/simulator.h"
+#include "ns3/uinteger.h"
 
 namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief Base class for fading models such as Markov-based fading
+ * @brief Base class for fading models such as Markov-based fading
  * or fading trace. This class defines the functions which all the
  * different fading models must implement for the fading
  * interface. This base class itself is abstract and will not
@@ -43,45 +43,45 @@ class SatBaseFading : public Object
 {
   public:
     /**
-     * \brief Gets elevation angle in degrees
+     * @brief Gets elevation angle in degrees
      */
     typedef Callback<double> ElevationCallback;
 
     /**
-     * \brief Gets velocity in m/s
+     * @brief Gets velocity in m/s
      */
     typedef Callback<double> VelocityCallback;
 
     /**
-     * \brief Constructor
+     * @brief Constructor
      */
     SatBaseFading();
 
     /**
-     * \brief Destructor
+     * @brief Destructor
      */
     virtual ~SatBaseFading();
 
     /**
-     * \brief NS-3 type id function
-     * \return type id
+     * @brief NS-3 type id function
+     * @return type id
      */
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Function for getting the fading value.
-     * \param macAddress
-     * \param channelType channel type
-     * \return fading value
+     * @brief Function for getting the fading value.
+     * @param macAddress
+     * @param channelType channel type
+     * @return fading value
      */
     double GetFading(Address macAddress, SatEnums::ChannelType_t channelType);
 
     /**
-     * \brief Function for getting the fading value. This is an abstract method,
+     * @brief Function for getting the fading value. This is an abstract method,
      * thus it is implemented in the inherited fading classes.
-     * \param macAddress
-     * \param channelType channel type
-     * \return fading value
+     * @param macAddress
+     * @param channelType channel type
+     * @return fading value
      */
     virtual double DoGetFading(Address macAddress, SatEnums::ChannelType_t channelType) = 0;
 

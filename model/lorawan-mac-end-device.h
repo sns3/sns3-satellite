@@ -33,8 +33,8 @@
 #include "lorawan-mac.h"
 #include "satellite-ut-mac.h"
 
-#include <ns3/random-variable-stream.h>
-#include <ns3/traced-value.h>
+#include "ns3/random-variable-stream.h"
+#include "ns3/traced-value.h"
 
 #include <list>
 #include <stdint.h>
@@ -64,7 +64,7 @@ class LorawanMacEndDevice : public LorawanMac
      *
      * The MAC layer of the ED will take care of using the right parameters.
      *
-     * \param packet the packet to send
+     * @param packet the packet to send
      */
     virtual void Send(Ptr<Packet> packet);
 
@@ -72,14 +72,14 @@ class LorawanMacEndDevice : public LorawanMac
      * Checking if we are performing the transmission of a new packet or a retransmission, and call
      * SendToPhy function.
      *
-     * \param packet the packet to send
+     * @param packet the packet to send
      */
     virtual void DoSend(Ptr<Packet> packet);
 
     /**
      * Add headers and send a packet with the sending function of the physical layer.
      *
-     * \param packet the packet to send
+     * @param packet the packet to send
      */
     virtual void SendToPhy(Ptr<Packet> packet);
 
@@ -87,7 +87,7 @@ class LorawanMacEndDevice : public LorawanMac
      * Postpone transmission to the specified time and delete previously scheduled transmissions if
      * present.
      *
-     * \param nextTxDelay Delay at which the transmission will be performed.
+     * @param nextTxDelay Delay at which the transmission will be performed.
      */
     virtual void postponeTransmission(Time nextTxDelay, Ptr<Packet>);
 
@@ -101,7 +101,7 @@ class LorawanMacEndDevice : public LorawanMac
      * This method is typically registered as a callback in the underlying PHY
      * layer so that it's called when a packet is going up the stack.
      *
-     * \param packet the received packet.
+     * @param packet the received packet.
      */
     virtual void Receive(Ptr<Packet> packet) = 0;
     virtual void Receive(SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/);
@@ -127,7 +127,7 @@ class LorawanMacEndDevice : public LorawanMac
     /**
      * Enable data rate adaptation in the retransmitting procedure.
      *
-     * \param adapt If the data rate adaptation is enabled or not.
+     * @param adapt If the data rate adaptation is enabled or not.
      */
     void SetDataRateAdaptation(bool adapt);
 
@@ -139,7 +139,7 @@ class LorawanMacEndDevice : public LorawanMac
     /**
      * Set the maximum number of transmissions allowed.
      *
-     * \param maxNumbTx The maximum number of transmissions allowed
+     * @param maxNumbTx The maximum number of transmissions allowed
      */
     void SetMaxNumberOfTransmissions(uint8_t maxNumbTx);
 
@@ -153,35 +153,35 @@ class LorawanMacEndDevice : public LorawanMac
      * Devices, this value is assumed to be fixed, and can be modified via MAC
      * commands issued by the GW.
      *
-     * \param dataRate The dataRate to use when transmitting.
+     * @param dataRate The dataRate to use when transmitting.
      */
     void SetDataRate(uint8_t dataRate);
 
     /**
      * Get the data rate this end device is set to use.
      *
-     * \return The data rate this device uses when transmitting.
+     * @return The data rate this device uses when transmitting.
      */
     uint8_t GetDataRate(void);
 
     /**
      * Get the transmission power this end device is set to use.
      *
-     * \return The transmission power this device uses when transmitting.
+     * @return The transmission power this device uses when transmitting.
      */
     virtual uint8_t GetTransmissionPower(void);
 
     /**
      * Set the network address of this device.
      *
-     * \param address The address to set.
+     * @param address The address to set.
      */
     void SetDeviceAddress(LoraDeviceAddress address);
 
     /**
      * Get the network address of this device.
      *
-     * \return This device's address.
+     * @return This device's address.
      */
     LoraDeviceAddress GetDeviceAddress(void);
 
@@ -192,21 +192,21 @@ class LorawanMacEndDevice : public LorawanMac
      * downlink transmission during the first receive window from the
      * replyDataRateMatrix.
      *
-     * \param rx1DrOffset The value to set for the offset.
+     * @param rx1DrOffset The value to set for the offset.
      */
     // void SetRx1DrOffset (uint8_t rx1DrOffset);
 
     /**
      * Get the value of the RX1DROffset parameter.
      *
-     * \return The value of the RX1DROffset parameter.
+     * @return The value of the RX1DROffset parameter.
      */
     // uint8_t GetRx1DrOffset (void);
 
     /**
      * Get the aggregated duty cycle.
      *
-     * \return A time instance containing the aggregated duty cycle in fractional
+     * @return A time instance containing the aggregated duty cycle in fractional
      * form.
      */
     double GetAggregatedDutyCycle(void);
@@ -218,14 +218,14 @@ class LorawanMacEndDevice : public LorawanMac
     /**
      * Add the necessary options and MAC commands to the LoraFrameHeader.
      *
-     * \param frameHeader The frame header on which to apply the options.
+     * @param frameHeader The frame header on which to apply the options.
      */
     void ApplyNecessaryOptions(LoraFrameHeader& frameHeader);
 
     /**
      * Add the necessary options and MAC commands to the LorawanMacHeader.
      *
-     * \param macHeader The mac header on which to apply the options.
+     * @param macHeader The mac header on which to apply the options.
      */
     void ApplyNecessaryOptions(LorawanMacHeader& macHeader);
 
@@ -247,18 +247,18 @@ class LorawanMacEndDevice : public LorawanMac
     /**
      * Perform the actions that need to be taken when receiving a LinkCheckAns command.
      *
-     * \param margin The margin value of the command.
-     * \param gwCnt The gateway count value of the command.
+     * @param margin The margin value of the command.
+     * @param gwCnt The gateway count value of the command.
      */
     void OnLinkCheckAns(uint8_t margin, uint8_t gwCnt);
 
     /**
      * Perform the actions that need to be taken when receiving a LinkAdrReq command.
      *
-     * \param dataRate The data rate value of the command.
-     * \param txPower The transmission power value of the command.
-     * \param enabledChannels A list of the enabled channels.
-     * \param repetitions The number of repetitions prescribed by the command.
+     * @param dataRate The data rate value of the command.
+     * @param txPower The transmission power value of the command.
+     * @param enabledChannels A list of the enabled channels.
+     * @param repetitions The number of repetitions prescribed by the command.
      */
     void OnLinkAdrReq(uint8_t dataRate,
                       uint8_t txPower,
@@ -268,7 +268,7 @@ class LorawanMacEndDevice : public LorawanMac
     /**
      * Perform the actions that need to be taken when receiving a DutyCycleReq command.
      *
-     * \param dutyCycle The aggregate duty cycle prescribed by the command, in
+     * @param dutyCycle The aggregate duty cycle prescribed by the command, in
      * fraction form.
      */
     void OnDutyCycleReq(double dutyCycle);
@@ -276,7 +276,7 @@ class LorawanMacEndDevice : public LorawanMac
     /**
      * Perform the actions that need to be taken when receiving a RxParamSetupReq command.
      *
-     * \param rxParamSetupReq The Parameter Setup Request
+     * @param rxParamSetupReq The Parameter Setup Request
      */
     void OnRxParamSetupReq(Ptr<RxParamSetupReq> rxParamSetupReq);
 
@@ -284,7 +284,7 @@ class LorawanMacEndDevice : public LorawanMac
      * Perform the actions that need to be taken when receiving a RxParamSetupReq
      * command based on the Device's Class Type.
      *
-     * \param rxParamSetupReq The Parameter Setup Request
+     * @param rxParamSetupReq The Parameter Setup Request
      */
     virtual void OnRxClassParamSetupReq(Ptr<RxParamSetupReq> rxParamSetupReq);
 
@@ -308,17 +308,17 @@ class LorawanMacEndDevice : public LorawanMac
     /**
      * Add a logical channel to the helper.
      *
-     * \param frequency The channel's center frequency.
+     * @param frequency The channel's center frequency.
      */
     void AddLogicalChannel(double frequency);
 
     /**
      * Set a new logical channel in the helper.
      *
-     * \param chIndex The channel's new index.
-     * \param frequency The channel's center frequency.
-     * \param minDataRate The minimum data rate allowed on the channel.
-     * \param maxDataRate The maximum data rate allowed on the channel.
+     * @param chIndex The channel's new index.
+     * @param frequency The channel's center frequency.
+     * @param minDataRate The minimum data rate allowed on the channel.
+     * @param maxDataRate The maximum data rate allowed on the channel.
      */
     void SetLogicalChannel(uint8_t chIndex,
                            double frequency,
@@ -328,17 +328,17 @@ class LorawanMacEndDevice : public LorawanMac
     /**
      * Add a logical channel to the helper.
      *
-     * \param frequency The channel's center frequency.
+     * @param frequency The channel's center frequency.
      */
     void AddLogicalChannel(Ptr<LoraLogicalChannel> logicalChannel);
 
     /**
      * Add a subband to the logical channel helper.
      *
-     * \param startFrequency The LoraSubBand's lowest frequency.
-     * \param endFrequency The LoraSubBand's highest frequency.
-     * \param dutyCycle The LoraSubBand's duty cycle, in fraction form.
-     * \param maxTxPowerDbm The maximum transmission power allowed on the LoraSubBand.
+     * @param startFrequency The LoraSubBand's lowest frequency.
+     * @param endFrequency The LoraSubBand's highest frequency.
+     * @param dutyCycle The LoraSubBand's duty cycle, in fraction form.
+     * @param maxTxPowerDbm The maximum transmission power allowed on the LoraSubBand.
      */
     void AddLoraSubBand(double startFrequency,
                         double endFrequency,
@@ -352,37 +352,37 @@ class LorawanMacEndDevice : public LorawanMac
     void AddLorawanMacCommand(Ptr<LorawanMacCommand> macCommand);
 
     /**
-     * \brief Callback to update gateway address after handover
-     * \param Mac48Address the address of the new gateway
+     * @brief Callback to update gateway address after handover
+     * @param Mac48Address the address of the new gateway
      */
     typedef Callback<void, Mac48Address> GatewayUpdateCallback;
 
     /**
-     * \brief Method to set the gateway address update callback
-     * \param cb callback to invoke to update gateway address
+     * @brief Method to set the gateway address update callback
+     * @param cb callback to invoke to update gateway address
      */
     void SetGatewayUpdateCallback(LorawanMacEndDevice::GatewayUpdateCallback cb);
 
     /**
-     * \brief Callback to reconfigure physical layer during handover.
-     * \param uint32_t new beam Id
+     * @brief Callback to reconfigure physical layer during handover.
+     * @param uint32_t new beam Id
      */
     typedef Callback<void, uint32_t, uint32_t> HandoverCallback;
 
     /**
-     * \brief Method to set handover callback.
-     * \param cb callback to invoke whenever a TIM-U is received prompting us to switch beams
+     * @brief Method to set handover callback.
+     * @param cb callback to invoke whenever a TIM-U is received prompting us to switch beams
      */
     void SetHandoverCallback(LorawanMacEndDevice::HandoverCallback cb);
 
     /**
-     * \brief Callback to update addresses in statistics helpers
+     * @brief Callback to update addresses in statistics helpers
      */
     typedef Callback<void, Ptr<Node>> UpdateAddressAndIdentifierCallback;
 
     /**
-     * \brief Set the callback to update addresses in statistics helpers.
-     * \param cb Callback to update addresses in statistics helpers
+     * @brief Set the callback to update addresses in statistics helpers.
+     * @param cb Callback to update addresses in statistics helpers
      */
     void SetUpdateAddressAndIdentifierCallback(
         LorawanMacEndDevice::UpdateAddressAndIdentifierCallback cb);
@@ -390,28 +390,28 @@ class LorawanMacEndDevice : public LorawanMac
     /**
      * Set address of the GW (or its MAC) serving this UT.
      *
-     * \param gwAddress Address of the GW.
+     * @param gwAddress Address of the GW.
      */
     void SetGwAddress(Mac48Address gwAddress);
 
     /**
      * Set address of the Lorawan GW (or its MAC) serving this UT.
      *
-     * \param satAddress Address of the GW.
+     * @param satAddress Address of the GW.
      */
     void SetSatAddress(Mac48Address satAddress);
 
     /**
      * Set if associated satellite is regenerative.
      *
-     * \param isRegenerative Set to true if satellite is regenerative.
+     * @param isRegenerative Set to true if satellite is regenerative.
      */
     void SetRegenerative(bool isRegenerative);
 
     /**
      * Set RA channel assigned for this UT.
      *
-     * \param raChannel RA channel assigned to this UT.
+     * @param raChannel RA channel assigned to this UT.
      */
     void SetRaChannel(uint32_t raChannel);
 
@@ -421,8 +421,8 @@ class LorawanMacEndDevice : public LorawanMac
 
     /**
      * Method handling beam handover
-     * \param satId New satellite id
-     * \param beamId New satellite beam id
+     * @param satId New satellite id
+     * @param beamId New satellite beam id
      */
     void ChangeBeam(uint32_t satId, uint32_t beamId);
 
@@ -482,7 +482,7 @@ class LorawanMacEndDevice : public LorawanMac
     /**
      * Check for UT handovers and perform it if necessary
      *
-     * \return true if a handover has been performed
+     * @return true if a handover has been performed
      */
     bool CheckHandovers();
 
@@ -534,7 +534,7 @@ class LorawanMacEndDevice : public LorawanMac
     /**
      * The trace source fired when the transmission procedure is finished.
      *
-     * \see class CallBackTraceSource
+     * @see class CallBackTraceSource
      */
     TracedCallback<uint8_t, bool, Time, Ptr<Packet>> m_requiredTxCallback;
 

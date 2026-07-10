@@ -30,10 +30,10 @@
 using namespace ns3;
 
 /**
- * \file sat-group-example.cc
- * \ingroup satellite
+ * @file sat-group-example.cc
+ * @ingroup satellite
  *
- * \brief Simulation script to run example simulation with a several groups of UTs
+ * @brief Simulation script to run example simulation with a several groups of UTs
  *
  * Stats using groups:
  * - [Fwd, Rtn] AppDelay

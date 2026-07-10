@@ -24,9 +24,9 @@
 
 #include "satellite-stats-helper.h"
 
-#include <ns3/address.h>
-#include <ns3/collector-map.h>
-#include <ns3/ptr.h>
+#include "ns3/address.h"
+#include "ns3/collector-map.h"
+#include "ns3/ptr.h"
 
 #include <list>
 #include <map>
@@ -42,8 +42,8 @@ class Node;
 class DataCollectionObject;
 
 /**
- * \ingroup satstats
- * \brief Abstract class inherited by SatStatsFwdCompositeSinrHelper and
+ * @ingroup satstats
+ * @brief Abstract class inherited by SatStatsFwdCompositeSinrHelper and
  * SatStatsRtnCompositeSinrHelper.
  */
 class SatStatsCompositeSinrHelper : public SatStatsHelper
@@ -63,7 +63,7 @@ class SatStatsCompositeSinrHelper : public SatStatsHelper
     static TypeId GetTypeId();
 
     /**
-     * \brief Set up several probes or other means of listeners and connect them
+     * @brief Set up several probes or other means of listeners and connect them
      *        to the collectors.
      */
     void InstallProbes();
@@ -73,21 +73,21 @@ class SatStatsCompositeSinrHelper : public SatStatsHelper
     void DoInstall();
 
     /**
-     * \brief
+     * @brief
      */
     virtual void DoInstallProbes() = 0;
 
     /**
-     * \brief Connect the probe to the right collector.
-     * \param probe
-     * \param identifier
+     * @brief Connect the probe to the right collector.
+     * @param probe
+     * @param identifier
      */
     bool ConnectProbeToCollector(Ptr<Probe> probe, uint32_t identifier);
 
     /**
-     * \brief Disconnect the probe from the right collector.
-     * \param probe
-     * \param identifier
+     * @brief Disconnect the probe from the right collector.
+     * @param probe
+     * @param identifier
      */
     bool DisconnectProbeFromCollector(Ptr<Probe> probe, uint32_t identifier);
 
@@ -104,21 +104,21 @@ class SatStatsCompositeSinrHelper : public SatStatsHelper
 class Probe;
 
 /**
- * \ingroup satstats
- * \brief Produce forward link composite SINR statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce forward link composite SINR statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFwdCompositeSinrHelper> s = Create<SatStatsFwdCompositeSinrHelper> (satHelper);
  * s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFwdCompositeSinrHelper : public SatStatsCompositeSinrHelper
 {
@@ -154,21 +154,21 @@ class SatStatsFwdCompositeSinrHelper : public SatStatsCompositeSinrHelper
 // RETURN LINK ////////////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce return link composite SINR statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce return link composite SINR statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnCompositeSinrHelper> s = Create<SatStatsRtnCompositeSinrHelper> (satHelper);
  * s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsRtnCompositeSinrHelper : public SatStatsCompositeSinrHelper
 {
@@ -187,10 +187,10 @@ class SatStatsRtnCompositeSinrHelper : public SatStatsCompositeSinrHelper
     static TypeId GetTypeId();
 
     /**
-     * \brief Receive inputs from trace sources and determine the right collector
+     * @brief Receive inputs from trace sources and determine the right collector
      *        to forward the inputs to.
-     * \param sinrDb SINR value in dB.
-     * \param from the address of the sender of the packet.
+     * @param sinrDb SINR value in dB.
+     * @param from the address of the sender of the packet.
      */
     void SinrCallback(double sinrDb, const Address& from);
 

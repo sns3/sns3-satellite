@@ -25,8 +25,8 @@
 
 #include "satellite-stats-helper.h"
 
-#include <ns3/object.h>
-#include <ns3/ptr.h>
+#include "ns3/object.h"
+#include "ns3/ptr.h"
 
 #include <list>
 #include <set>
@@ -115,8 +115,8 @@ namespace ns3
 class SatHelper;
 
 /**
- * \ingroup satstats
- * \brief Container of SatStatsHelper instances.
+ * @ingroup satstats
+ * @brief Container of SatStatsHelper instances.
  *
  * The container is initially empty upon creation. SatStatsHelper instances can
  * be added into the container using attributes or class methods.
@@ -139,8 +139,8 @@ class SatStatsHelperContainer : public Object
 {
   public:
     /**
-     * \brief Creates a new instance of container.
-     * \param satHelper the satellite module helper which would be used to learn
+     * @brief Creates a new instance of container.
+     * @param satHelper the satellite module helper which would be used to learn
      *                  the topology of the simulation.
      */
     SatStatsHelperContainer(Ptr<SatHelper> satHelper);
@@ -151,12 +151,12 @@ class SatStatsHelperContainer : public Object
     static TypeId GetTypeId();
 
     /**
-     * \param name a string prefix to be prepended on every output file name.
+     * @param name a string prefix to be prepended on every output file name.
      */
     void SetName(std::string name);
 
     /**
-     * \return a string prefix prepended on every output file name.
+     * @return a string prefix prepended on every output file name.
      */
     std::string GetName() const;
 
@@ -782,15 +782,15 @@ class SatStatsHelperContainer : public Object
     void AddPerIslPacketDropRate(SatStatsHelper::OutputType_t outputType);
 
     /**
-     * \param outputType an arbitrary output type.
-     * \return a string suffix to be appended at the end of the corresponding
+     * @param outputType an arbitrary output type.
+     * @return a string suffix to be appended at the end of the corresponding
      *         output file for this output type.
      */
     static std::string GetOutputTypeSuffix(SatStatsHelper::OutputType_t outputType);
 
     /**
-     * \brief Update the address and the proper identifier from the given UT node.
-     * \param utNode a UT node.
+     * @brief Update the address and the proper identifier from the given UT node.
+     * @param utNode a UT node.
      *
      * Used for UT handovers. Do it for all statistic instances.
      */

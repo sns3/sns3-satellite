@@ -28,10 +28,10 @@
 using namespace ns3;
 
 /**
- * \file sat-onoff-example.cc
- * \ingroup satellite
+ * @file sat-onoff-example.cc
+ * @ingroup satellite
  *
- * \brief  OnOff example application to use satellite network.
+ * @brief  OnOff example application to use satellite network.
  *         Data rate, packet size, sender(s), on/off times, test scenario and
  *         creation log file name can be given in command line as user argument.
  *         To see help for user arguments:

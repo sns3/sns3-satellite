@@ -24,14 +24,14 @@
 
 #include "satellite-utils.h"
 
-#include <ns3/boolean.h>
-#include <ns3/double.h>
-#include <ns3/log.h>
-#include <ns3/object.h>
-#include <ns3/pointer.h>
-#include <ns3/random-variable-stream.h>
-#include <ns3/string.h>
-#include <ns3/uinteger.h>
+#include "ns3/boolean.h"
+#include "ns3/double.h"
+#include "ns3/log.h"
+#include "ns3/object.h"
+#include "ns3/pointer.h"
+#include "ns3/random-variable-stream.h"
+#include "ns3/string.h"
+#include "ns3/uinteger.h"
 
 #include <limits>
 #include <string>
@@ -127,16 +127,16 @@ SatLowerLayerServiceConf::GetIndexAsRaServiceName(uint8_t index)
  * SAT_ADD_DA_SERVICE_ATTRIBUTES macro helps defining service specific attributes
  * for SatLowerLayerServiceConf in method GetTypeId.
  *
- * \param index Index of the service which attributes are added to configuration.
- * \param a1    'Constant assignment provided' attribute value [true or false]
- * \param a2    'RBDC allowed' attribute value [true or false]
- * \param a3    'Volume allowed' attribute value [true or false]
- * \param a4    'Constant service rate' attribute value [Kbps]
- * \param a5    'Maximum service rate' attribute value [Kbps]
- * \param a6    'Minimum service rate' attribute value [Kbps]
- * \param a7    'Maximum backlog size' attribute value [KBytes]
+ * @param index Index of the service which attributes are added to configuration.
+ * @param a1    'Constant assignment provided' attribute value [true or false]
+ * @param a2    'RBDC allowed' attribute value [true or false]
+ * @param a3    'Volume allowed' attribute value [true or false]
+ * @param a4    'Constant service rate' attribute value [Kbps]
+ * @param a5    'Maximum service rate' attribute value [Kbps]
+ * @param a6    'Minimum service rate' attribute value [Kbps]
+ * @param a7    'Maximum backlog size' attribute value [KBytes]
  *
- * \return TypeId
+ * @return TypeId
  */
 #define SAT_ADD_DA_SERVICE_ATTRIBUTES(index, a1, a2, a3, a4, a5, a6, a7)                           \
     AddAttribute(GetIndexAsDaServiceName(index) + "_ConstantAssignmentProvided",                   \
@@ -195,21 +195,21 @@ SatLowerLayerServiceConf::GetIndexAsRaServiceName(uint8_t index)
  * SAT_ADD_RA_SERVICE_ATTRIBUTES macro helps defining RA service specific attributes
  * for SatLowerLayerServiceConf in method GetTypeId.
  *
- * \param index Index of the service which attributes are added to configuration.
- * \param a1    'Maximum unique payload per block' attribute value
- * \param a2    'Maximum consecutive block accessed' attribute value
- * \param a3    'Minimum idle block' attribute value
- * \param a4    'Back off time in milliseconds' attribute value
- * \param a5    'High load back off time in milliseconds' attribute value
- * \param a6    'Back off probability' attribute value
- * \param a7    'High load back off probability' attribute value
- * \param a8    'Number of instances' attribute value
- * \param a9    'Average normalized offered load threshold' attribute value
- * \param a10   'Is Slotted Aloha allowed' attribute value
- * \param a11   'Is CRDSA allowed' attribute value
- * \param a12   'Is ESSA allowed' attribute value
+ * @param index Index of the service which attributes are added to configuration.
+ * @param a1    'Maximum unique payload per block' attribute value
+ * @param a2    'Maximum consecutive block accessed' attribute value
+ * @param a3    'Minimum idle block' attribute value
+ * @param a4    'Back off time in milliseconds' attribute value
+ * @param a5    'High load back off time in milliseconds' attribute value
+ * @param a6    'Back off probability' attribute value
+ * @param a7    'High load back off probability' attribute value
+ * @param a8    'Number of instances' attribute value
+ * @param a9    'Average normalized offered load threshold' attribute value
+ * @param a10   'Is Slotted Aloha allowed' attribute value
+ * @param a11   'Is CRDSA allowed' attribute value
+ * @param a12   'Is ESSA allowed' attribute value
  *
- * \return TypeId
+ * @return TypeId
  */
 #define SAT_ADD_RA_SERVICE_ATTRIBUTES(index, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12)    \
     AddAttribute(GetIndexAsRaServiceName(index) + "_MaximumUniquePayloadPerBlock",                 \
@@ -403,14 +403,6 @@ SatLowerLayerServiceConf::GetTypeId(void)
                                            false);
 
     return tid;
-}
-
-TypeId
-SatLowerLayerServiceConf::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
 }
 
 bool

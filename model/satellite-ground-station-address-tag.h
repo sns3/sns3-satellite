@@ -21,8 +21,8 @@
 #ifndef SATELLITE_GROUND_STATION_ADDRESS_TAG_H
 #define SATELLITE_GROUND_STATION_ADDRESS_TAG_H
 
-#include <ns3/mac48-address.h>
-#include <ns3/tag.h>
+#include "ns3/mac48-address.h"
+#include "ns3/tag.h"
 
 #include <ostream>
 #include <stdint.h>
@@ -31,21 +31,21 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief Tag to store ground station destination address. Use for routing in constellations
+ * @ingroup satellite
+ * @brief Tag to store ground station destination address. Use for routing in constellations
  */
 class SatGroundStationAddressTag : public Tag
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
+     * @brief Get the type ID of instance
+     * @return the object TypeId
      */
     virtual TypeId GetInstanceTypeId(void) const;
 
@@ -56,43 +56,43 @@ class SatGroundStationAddressTag : public Tag
 
     /**
      * Constructor with initialization parameters.
-     * \param groundStationAddress
+     * @param groundStationAddress
      */
     SatGroundStationAddressTag(Mac48Address groundStationAddress);
 
     /**
      * Serializes information to buffer from this instance of SatGroundStationAddressTag
-     * \param i Buffer in which the information is serialized
+     * @param i Buffer in which the information is serialized
      */
     virtual void Serialize(TagBuffer i) const;
 
     /**
      * Deserializes information from buffer to this instance of SatGroundStationAddressTag
-     * \param i Buffer from which the information is deserialized
+     * @param i Buffer from which the information is deserialized
      */
     virtual void Deserialize(TagBuffer i);
 
     /**
      * Get serialized size of SatGroundStationAddressTag
-     * \return Serialized size in bytes
+     * @return Serialized size in bytes
      */
     virtual uint32_t GetSerializedSize() const;
 
     /**
      * Print time stamp of this instance of SatGroundStationAddressTag
-     * \param &os Output stream to which tag timestamp is printed.
+     * @param &os Output stream to which tag timestamp is printed.
      */
     virtual void Print(std::ostream& os) const;
 
     /**
      * Get the ground station MAC address
-     * \return ground station MAC address
+     * @return ground station MAC address
      */
     Mac48Address GetGroundStationAddress(void) const;
 
     /**
      * Set the ground station MAC address
-     * \param groundStationAddress ground station MAC address
+     * @param groundStationAddress ground station MAC address
      */
     void SetGroundStationAddress(Mac48Address groundStationAddress);
 

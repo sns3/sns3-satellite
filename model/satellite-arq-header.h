@@ -21,7 +21,7 @@
 #ifndef SATELLITE_ARQ_HEADER_H
 #define SATELLITE_ARQ_HEADER_H
 
-#include <ns3/header.h>
+#include "ns3/header.h"
 
 #include <ostream>
 #include <stdint.h>
@@ -31,9 +31,9 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief ARQ header implementation contains the sequence number related
+ * @brief ARQ header implementation contains the sequence number related
  * to the packet in question. Sequence number is identified with one byte, thus
  * it may range between 0 - 255.
  */
@@ -52,51 +52,51 @@ class SatArqHeader : public Header
     ~SatArqHeader();
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
+     * @brief Get the type ID of instance
+     * @return the object TypeId
      */
     virtual TypeId GetInstanceTypeId(void) const;
 
     /**
      * Get serialized size of SatArqHeader
-     * \return Serialized size in bytes
+     * @return Serialized size in bytes
      */
     virtual uint32_t GetSerializedSize(void) const;
 
     /**
      * Serializes information to buffer from this instance of SatArqHeader
-     * \param start Buffer in which the information is serialized
+     * @param start Buffer in which the information is serialized
      */
     virtual void Serialize(Buffer::Iterator start) const;
 
     /**
      * Deserializes information from buffer to this instance of SatArqHeader
-     * \param start Buffer from which the information is deserialized
-     * \return Serialized size of the buffer
+     * @param start Buffer from which the information is deserialized
+     * @return Serialized size of the buffer
      */
     virtual uint32_t Deserialize(Buffer::Iterator start);
 
     /**
      * Print time stamp of this instance of SatArqHeader
-     * \param &os Output stream to which tag timestamp is printed.
+     * @param &os Output stream to which tag timestamp is printed.
      */
     virtual void Print(std::ostream& os) const;
 
     /**
-     * \brief Get sequence number
-     * \return Sequence number
+     * @brief Get sequence number
+     * @return Sequence number
      */
     uint8_t GetSeqNo() const;
 
     /**
-     * \brief Set sequence number
-     * \param seqNo Sequence number
+     * @brief Set sequence number
+     * @param seqNo Sequence number
      */
     void SetSeqNo(uint8_t seqNo);
 

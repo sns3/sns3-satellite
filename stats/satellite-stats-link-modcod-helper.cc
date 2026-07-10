@@ -21,34 +21,34 @@
 
 #include "satellite-stats-link-modcod-helper.h"
 
-#include <ns3/application-packet-probe.h>
-#include <ns3/application.h>
-#include <ns3/boolean.h>
-#include <ns3/callback.h>
-#include <ns3/data-collection-object.h>
-#include <ns3/distribution-collector.h>
-#include <ns3/enum.h>
-#include <ns3/inet-socket-address.h>
-#include <ns3/ipv4.h>
-#include <ns3/log.h>
-#include <ns3/mac48-address.h>
-#include <ns3/magister-gnuplot-aggregator.h>
-#include <ns3/multi-file-aggregator.h>
-#include <ns3/net-device.h>
-#include <ns3/node-container.h>
-#include <ns3/nstime.h>
-#include <ns3/probe.h>
-#include <ns3/satellite-helper.h>
-#include <ns3/satellite-id-mapper.h>
-#include <ns3/satellite-net-device.h>
-#include <ns3/satellite-orbiter-net-device.h>
-#include <ns3/satellite-phy.h>
-#include <ns3/satellite-topology.h>
-#include <ns3/scalar-collector.h>
-#include <ns3/singleton.h>
-#include <ns3/string.h>
-#include <ns3/traffic-time-tag.h>
-#include <ns3/unit-conversion-collector.h>
+#include "ns3/application-packet-probe.h"
+#include "ns3/application.h"
+#include "ns3/boolean.h"
+#include "ns3/callback.h"
+#include "ns3/data-collection-object.h"
+#include "ns3/distribution-collector.h"
+#include "ns3/enum.h"
+#include "ns3/inet-socket-address.h"
+#include "ns3/ipv4.h"
+#include "ns3/log.h"
+#include "ns3/mac48-address.h"
+#include "ns3/magister-gnuplot-aggregator.h"
+#include "ns3/multi-file-aggregator.h"
+#include "ns3/net-device.h"
+#include "ns3/node-container.h"
+#include "ns3/nstime.h"
+#include "ns3/probe.h"
+#include "ns3/satellite-helper.h"
+#include "ns3/satellite-id-mapper.h"
+#include "ns3/satellite-net-device.h"
+#include "ns3/satellite-orbiter-net-device.h"
+#include "ns3/satellite-phy.h"
+#include "ns3/satellite-topology.h"
+#include "ns3/scalar-collector.h"
+#include "ns3/singleton.h"
+#include "ns3/string.h"
+#include "ns3/traffic-time-tag.h"
+#include "ns3/unit-conversion-collector.h"
 
 #include <map>
 #include <sstream>
@@ -261,7 +261,7 @@ SatStatsLinkModcodHelper::DoInstall()
     }
 
     case SatStatsHelper::OUTPUT_SCALAR_PLOT:
-        /// \todo Add support for boxes in Gnuplot.
+        /// @todo Add support for boxes in Gnuplot.
         NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
                        << " is not a valid output type for this statistics.");
         break;
@@ -316,7 +316,7 @@ SatStatsLinkModcodHelper::DoInstall()
             plotAggregator->SetLegend("MODCOD ID", "Frequency");
             plotAggregator->Set2dDatasetDefaultStyle(Gnuplot2dDataset::LINES);
             plotAggregator->Add2dDataset(GetName(), GetName());
-            /// \todo Find a better dataset name.
+            /// @todo Find a better dataset name.
 
             // Setup the final-level collector.
             m_averagingCollector = CreateObject<DistributionCollector>();
@@ -336,7 +336,7 @@ SatStatsLinkModcodHelper::DoInstall()
                 "Output",
                 GetName(),
                 MakeCallback(&MagisterGnuplotAggregator::Write2d, plotAggregator));
-            /// \todo Find a better dataset name.
+            /// @todo Find a better dataset name.
 
             // Setup collectors.
             m_terminalCollectors.SetType("ns3::ScalarCollector");
@@ -422,8 +422,7 @@ SatStatsLinkModcodHelper::RxLinkModcodCallback(uint32_t modcod, const Address& f
     if (from.IsInvalid())
     {
         NS_LOG_WARN(this << " discarding a packet MODCOD ID " << modcod
-                         << " from statistics collection because of"
-                         << " invalid sender address");
+                         << " from statistics collection because of" << " invalid sender address");
     }
     else if (Mac48Address::ConvertFrom(from).IsBroadcast())
     {

@@ -31,10 +31,10 @@
 using namespace ns3;
 
 /**
- * \file sat-generic-launcher.cc
- * \ingroup satellite
+ * @file sat-generic-launcher.cc
+ * @ingroup satellite
  *
- * \brief Simulation script to run example simulation results with
+ * @brief Simulation script to run example simulation results with
  * a high degree of customization through XML file.
  *
  * execute command -> ./waf --run "sat-generic-launcher --PrintHelp"
@@ -46,7 +46,7 @@ int
 main(int argc, char* argv[])
 {
     std::string inputFileNameWithPath =
-        Singleton<SatEnvVariables>::Get()->LocateDirectory("contrib/satellite/examples") +
+        SatEnvVariables::GetInstance()->LocateDirectory("contrib/satellite/examples") +
         "/generic-input-attributes.xml";
 
     Ptr<SimulationHelper> simulationHelper = CreateObject<SimulationHelper>("generic-launcher");

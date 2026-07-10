@@ -19,9 +19,9 @@
  */
 
 /**
- * \ingroup satellite
- * \file satellite-mobility-test.cc
- * \brief Test cases to unit test Satellite Mobility.
+ * @ingroup satellite
+ * @file satellite-mobility-test.cc
+ * @brief Test cases to unit test Satellite Mobility.
  */
 
 // Include a header file from your module to test.
@@ -57,8 +57,8 @@ SatCourseChange(std::string context, Ptr<const SatMobilityModel> position)
 }
 
 /**
- * \ingroup satellite
- * \brief Test case to unit test satellite mobility's position
+ * @ingroup satellite
+ * @brief Test case to unit test satellite mobility's position
  *        setting from random box position allocator.
  *        (Constant position mobility model used).
  *
@@ -96,8 +96,8 @@ void
 SatMobilityRandomTestCase::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-mobility", "random", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-mobility", "random", true);
 
     MobilityHelper mobility;
     mobility.SetPositionAllocator("ns3::SatRandomBoxPositionAllocator",
@@ -134,12 +134,12 @@ SatMobilityRandomTestCase::DoRun(void)
 
     Simulator::Destroy();
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 }
 
 /**
- * \ingroup satellite
- * \brief Test case to unit test satellite mobility's position
+ * @ingroup satellite
+ * @brief Test case to unit test satellite mobility's position
  *        setting from list position allocator. No conversion expected to happen.
  *        (Constant position mobility model used).
  *
@@ -184,8 +184,8 @@ void
 SatMobilityList1TestCase::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-mobility", "list1", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-mobility", "list1", true);
 
     MobilityHelper mobility;
     Ptr<SatListPositionAllocator> positionAlloc = CreateObject<SatListPositionAllocator>();
@@ -227,12 +227,12 @@ SatMobilityList1TestCase::DoRun(void)
 
     Simulator::Destroy();
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 }
 
 /**
- * \ingroup satellite
- * \brief Test case to unit test satellite mobility's position
+ * @ingroup satellite
+ * @brief Test case to unit test satellite mobility's position
  *        setting from list position allocator. Conversion expected to happen.
  *        (Constant position mobility model used).
  *
@@ -280,8 +280,8 @@ void
 SatMobilityList2TestCase::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-mobility", "list2", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-mobility", "list2", true);
 
     // now do same with Cartesian coordinates used by SatMobilityModel SetPosition
     // and SatPositionAllocator GetNext
@@ -323,12 +323,12 @@ SatMobilityList2TestCase::DoRun(void)
 
     Simulator::Destroy();
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 }
 
 /**
- * \ingroup satellite
- * \brief Test suite for Satellite mobility unit test cases.
+ * @ingroup satellite
+ * @brief Test suite for Satellite mobility unit test cases.
  */
 class SatMobilityTestSuite : public TestSuite
 {

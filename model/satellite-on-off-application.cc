@@ -20,12 +20,12 @@
 
 #include "satellite-on-off-application.h"
 
-#include <ns3/boolean.h>
-#include <ns3/log.h>
-#include <ns3/packet.h>
-#include <ns3/simulator.h>
-#include <ns3/traced-callback.h>
-#include <ns3/traffic-time-tag.h>
+#include "ns3/boolean.h"
+#include "ns3/log.h"
+#include "ns3/packet.h"
+#include "ns3/simulator.h"
+#include "ns3/traced-callback.h"
+#include "ns3/traffic-time-tag.h"
 
 #include <stdint.h>
 

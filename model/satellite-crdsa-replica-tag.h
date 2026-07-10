@@ -21,7 +21,7 @@
 #ifndef SATELLITE_CRDSA_REPLICA_TAG_H
 #define SATELLITE_CRDSA_REPLICA_TAG_H
 
-#include <ns3/tag.h>
+#include "ns3/tag.h"
 
 #include <ostream>
 #include <stdint.h>
@@ -31,8 +31,8 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief This class implements a tag that carries information
+ * @ingroup satellite
+ * @brief This class implements a tag that carries information
  * about the slot IDs of CRDSA packet replicas. This information
  * is used to determine the CRDSA replicas within the CRDSA frame.
  * The tag is added to each created CRDSA packet on the
@@ -56,38 +56,38 @@ class SatCrdsaReplicaTag : public Tag
     std::vector<uint16_t> GetSlotIds(void);
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
+     * @brief Get the type ID of instance
+     * @return the object TypeId
      */
     virtual TypeId GetInstanceTypeId(void) const;
 
     /**
      * Get serialized size of SatCrdsaReplicaTag
-     * \return Serialized size in bytes
+     * @return Serialized size in bytes
      */
     virtual uint32_t GetSerializedSize(void) const;
 
     /**
      * Serializes information to buffer from this instance of SatCrdsaReplicaTag
-     * \param buffer Buffer in which the information is serialized
+     * @param buffer Buffer in which the information is serialized
      */
     virtual void Serialize(TagBuffer buffer) const;
 
     /**
      * Deserializes information from buffer to this instance of SatCrdsaReplicaTag
-     * \param buffer Buffer from which the information is deserialized
+     * @param buffer Buffer from which the information is deserialized
      */
     virtual void Deserialize(TagBuffer buffer);
 
     /**
      * Print time stamp of this instance of SatCrdsaReplicaTag
-     * \param &os Output stream to which tag timestamp is printed.
+     * @param &os Output stream to which tag timestamp is printed.
      */
     virtual void Print(std::ostream& os) const;
 

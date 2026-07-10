@@ -20,9 +20,9 @@
 #ifndef SATELLITE_BASE_FADER_H
 #define SATELLITE_BASE_FADER_H
 
-#include <ns3/object.h>
-#include <ns3/simulator.h>
-#include <ns3/uinteger.h>
+#include "ns3/object.h"
+#include "ns3/simulator.h"
+#include "ns3/uinteger.h"
 
 #include <stdint.h>
 
@@ -30,9 +30,9 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief Base class for faders such as the Rayleigh fader.
+ * @brief Base class for faders such as the Rayleigh fader.
  * This class defines the functions which all the inherited
  * faders must implement for the Markov-fading model. This
  * base class itself is abstract and will not implement
@@ -42,37 +42,37 @@ class SatBaseFader : public Object
 {
   public:
     /**
-     * \brief Constructor
+     * @brief Constructor
      */
     SatBaseFader();
 
     /**
-     * \brief Destructor
+     * @brief Destructor
      */
     virtual ~SatBaseFader();
 
     /**
-     * \brief NS-3 type id function
-     * \return type id
+     * @brief NS-3 type id function
+     * @return type id
      */
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Returns channel gain in dB
-     * \return channel gain in dB
+     * @brief Returns channel gain in dB
+     * @return channel gain in dB
      */
     virtual double GetChannelGainDb(void) = 0;
 
     /**
-     * \brief Returns channel gain
-     * \return channel gain
+     * @brief Returns channel gain
+     * @return channel gain
      */
     virtual double GetChannelGain(void) = 0;
 
     /**
-     * \brief Function for updating the fader angle set and state
-     * \param newSet new angle set
-     * \param newState new state
+     * @brief Function for updating the fader angle set and state
+     * @param newSet new angle set
+     * @param newState new state
      */
     virtual void UpdateParameters(uint32_t newSet, uint32_t newState) = 0;
 

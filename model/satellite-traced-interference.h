@@ -34,28 +34,22 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief Satellite traced interference. Interference values is based on trace file.
+ * @ingroup satellite
+ * @brief Satellite traced interference. Interference values is based on trace file.
  */
 class SatTracedInterference : public SatInterference
 {
   public:
     /**
      * Derived from Object
-     * \return TypeId of class
+     * @return TypeId of class
      */
     static TypeId GetTypeId(void);
 
     /**
-     * Derived from Object
-     * \return TypeId of instance
-     */
-    TypeId GetInstanceTypeId(void) const;
-
-    /**
      * Constructor
-     * \param channeltype
-     * \param rxBandwidth
+     * @param channeltype
+     * @param rxBandwidth
      */
     SatTracedInterference(SatEnums::ChannelType_t channeltype, double rxBandwidth);
 
@@ -76,7 +70,7 @@ class SatTracedInterference : public SatInterference
 
     /**
      * Set Rx bandwidth
-     * \param rxBandwidth
+     * @param rxBandwidth
      */
     void SetRxBandwidth(double rxBandwidth);
 
@@ -85,11 +79,11 @@ class SatTracedInterference : public SatInterference
      * Adds interference power to interference object.
      * No effect in this implementation.
      *
-     * \param rxDuration Duration of the receiving.
-     * \param rxPower Receiving power.
-     * \param rxAddress
+     * @param rxDuration Duration of the receiving.
+     * @param rxPower Receiving power.
+     * @param rxAddress
      *
-     * \return the pointer to interference event as a reference of the addition
+     * @return the pointer to interference event as a reference of the addition
      */
     virtual Ptr<SatInterference::InterferenceChangeEvent> DoAdd(Time rxDuration,
                                                                 double rxPower,
@@ -101,9 +95,9 @@ class SatTracedInterference : public SatInterference
      * Just return next value from trace input.
      * finalPower is set to returned value.
      *
-     * \param event Reference event which for interference is calculated.
+     * @param event Reference event which for interference is calculated.
      *
-     * \return Final power value at end of receiving
+     * @return Final power value at end of receiving
      */
     virtual std::vector<std::pair<double, double>> DoCalculate(
         Ptr<SatInterference::InterferenceChangeEvent> event);
@@ -116,27 +110,27 @@ class SatTracedInterference : public SatInterference
     /**
      * Notifies that RX is started by a receiver.
      *
-     * \param event Interference reference event of receiver (ignored in this implementation)
+     * @param event Interference reference event of receiver (ignored in this implementation)
      */
     virtual void DoNotifyRxStart(Ptr<SatInterference::InterferenceChangeEvent> event);
 
     /**
      * Notifies that RX is ended by a receiver.
      *
-     * \param event Interference reference event of receiver (ignored in this implementation)
+     * @param event Interference reference event of receiver (ignored in this implementation)
      */
     virtual void DoNotifyRxEnd(Ptr<SatInterference::InterferenceChangeEvent> event);
 
     /**
      *
-     * \param o
+     * @param o
      */
     SatTracedInterference(const SatTracedInterference& o);
 
     /**
      *
-     * \param o
-     * \return
+     * @param o
+     * @return
      */
     SatTracedInterference& operator=(const SatTracedInterference& o);
 
@@ -156,7 +150,7 @@ class SatTracedInterference : public SatInterference
     SatEnums::ChannelType_t m_channelType;
 
     /**
-     * \brief RX Bandwidth in Hz
+     * @brief RX Bandwidth in Hz
      */
     double m_rxBandwidth_Hz;
 };

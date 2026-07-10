@@ -26,9 +26,9 @@
 
 #include "satellite-orbiter-net-device.h"
 
-#include <ns3/mac48-address.h>
-#include <ns3/node.h>
-#include <ns3/packet.h>
+#include "ns3/mac48-address.h"
+#include "ns3/node.h"
+#include "ns3/packet.h"
 
 #include <stdint.h>
 #include <string>
@@ -48,28 +48,28 @@ class SatIslArbiter : public Object
 
     /**
      * Constructor.
-     * \param node The satellite node this arbiter is attached
+     * @param node The satellite node this arbiter is attached
      */
     SatIslArbiter(Ptr<Node> node);
 
     /**
      * Base decide how to forward
      *
-     * \param pkt                               Packet
-     * \param destination                       IP header of the packet
+     * @param pkt                               Packet
+     * @param destination                       IP header of the packet
      *
-     * \return ISL interface index, or -1 if routing failed
+     * @return ISL interface index, or -1 if routing failed
      */
     int32_t BaseDecide(Ptr<Packet> pkt, Mac48Address destination);
 
     /**
      * Decide how to forward. Implemented in subclasses
      *
-     * \param sourceSatId                       Satellite ID where the packet originated from
-     * \param targetSatId                       Satellite ID where the packet has to go to
-     * \param pkt                               Packet
+     * @param sourceSatId                       Satellite ID where the packet originated from
+     * @param targetSatId                       Satellite ID where the packet has to go to
+     * @param pkt                               Packet
      *
-     * \return ISL interface index, or -1 if routing failed
+     * @return ISL interface index, or -1 if routing failed
      */
     virtual int32_t Decide(int32_t sourceSatId, int32_t targetSatId, Ptr<Packet> pkt) = 0;
 

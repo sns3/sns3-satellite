@@ -24,10 +24,10 @@
 
 #include "satellite-enums.h"
 
-#include <ns3/address-utils.h>
-#include <ns3/enum.h>
-#include <ns3/log.h>
-#include <ns3/uinteger.h>
+#include "ns3/address-utils.h"
+#include "ns3/enum.h"
+#include "ns3/log.h"
+#include "ns3/uinteger.h"
 
 #include <iostream>
 #include <map>
@@ -180,14 +180,6 @@ SatTbtpMessage::GetTypeId(void)
                                           MakeUintegerAccessor(&SatTbtpMessage::m_assignmentFormat),
                                           MakeUintegerChecker<uint8_t>());
     return tid;
-}
-
-TypeId
-SatTbtpMessage::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
 }
 
 const SatTbtpMessage::DaTimeSlotInfoItem_t&
@@ -396,14 +388,6 @@ SatCrMessage::GetTypeId(void)
     return tid;
 }
 
-TypeId
-SatCrMessage::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
-}
-
 SatCrMessage::SatCrMessage()
     : m_crBlockSizeType(SatCrMessage::CR_BLOCK_SMALL),
       m_forwardLinkCNo(NAN)
@@ -486,14 +470,6 @@ SatCnoReportMessage::GetTypeId(void)
     return tid;
 }
 
-TypeId
-SatCnoReportMessage::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
-}
-
 SatCnoReportMessage::SatCnoReportMessage()
     : m_linkCNo(NAN)
 {
@@ -534,14 +510,6 @@ SatRaMessage::GetTypeId(void)
     static TypeId tid =
         TypeId("ns3::SatRaMessage").SetParent<SatControlMessage>().AddConstructor<SatRaMessage>();
     return tid;
-}
-
-TypeId
-SatRaMessage::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
 }
 
 SatRaMessage::SatRaMessage()
@@ -620,14 +588,6 @@ SatArqAckMessage::GetTypeId(void)
     return tid;
 }
 
-TypeId
-SatArqAckMessage::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
-}
-
 SatArqAckMessage::SatArqAckMessage()
     : m_sequenceNumber(0),
       m_flowId(0)
@@ -684,14 +644,6 @@ SatTimuMessage::GetTypeId(void)
                             .SetParent<SatControlMessage>()
                             .AddConstructor<SatTimuMessage>();
     return tid;
-}
-
-TypeId
-SatTimuMessage::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
 }
 
 SatTimuMessage::SatTimuMessage()
@@ -781,14 +733,6 @@ SatHandoverRecommendationMessage::GetTypeId(void)
     return tid;
 }
 
-TypeId
-SatHandoverRecommendationMessage::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
-}
-
 SatHandoverRecommendationMessage::SatHandoverRecommendationMessage()
     : m_beamId(0),
       m_satId(0)
@@ -847,14 +791,6 @@ SatSliceSubscriptionMessage::GetTypeId(void)
     return tid;
 }
 
-TypeId
-SatSliceSubscriptionMessage::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
-}
-
 SatSliceSubscriptionMessage::SatSliceSubscriptionMessage()
     : m_sliceId(0)
 {
@@ -911,14 +847,6 @@ SatLogonMessage::GetTypeId(void)
     return tid;
 }
 
-TypeId
-SatLogonMessage::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
-}
-
 SatLogonMessage::SatLogonMessage()
 {
     NS_LOG_FUNCTION(this);
@@ -947,14 +875,6 @@ SatLogonResponseMessage::GetTypeId(void)
                             .SetParent<SatControlMessage>()
                             .AddConstructor<SatLogonResponseMessage>();
     return tid;
-}
-
-TypeId
-SatLogonResponseMessage::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
 }
 
 SatLogonResponseMessage::SatLogonResponseMessage()
@@ -1001,14 +921,6 @@ SatLogoffMessage::GetTypeId(void)
     return tid;
 }
 
-TypeId
-SatLogoffMessage::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
-}
-
 SatLogoffMessage::SatLogoffMessage()
 {
     NS_LOG_FUNCTION(this);
@@ -1036,14 +948,6 @@ SatNcrMessage::GetTypeId(void)
     static TypeId tid =
         TypeId("ns3::SatNcrMessage").SetParent<SatControlMessage>().AddConstructor<SatNcrMessage>();
     return tid;
-}
-
-TypeId
-SatNcrMessage::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
 }
 
 SatNcrMessage::SatNcrMessage()
@@ -1089,14 +993,6 @@ SatCmtMessage::GetTypeId(void)
     static TypeId tid =
         TypeId("ns3::SatCmtMessage").SetParent<SatControlMessage>().AddConstructor<SatCmtMessage>();
     return tid;
-}
-
-TypeId
-SatCmtMessage::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
 }
 
 SatCmtMessage::SatCmtMessage()

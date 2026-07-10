@@ -22,7 +22,7 @@
 #ifndef SATELLITE_MUTUAL_INFORMATION_TABLE_H
 #define SATELLITE_MUTUAL_INFORMATION_TABLE_H
 
-#include <ns3/object.h>
+#include "ns3/object.h"
 
 #include <fstream>
 #include <string>
@@ -32,16 +32,16 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief Loads a mutual information file and provide query service.
+ * @brief Loads a mutual information file and provide query service.
  */
 class SatMutualInformationTable : public Object
 {
   public:
     /**
      * Constructor with initialization parameters.
-     * \param mutualInformationPath
+     * @param mutualInformationPath
      */
     SatMutualInformationTable(std::string mutualInformationPath);
 
@@ -51,27 +51,27 @@ class SatMutualInformationTable : public Object
     virtual ~SatMutualInformationTable();
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId();
 
     /**
-     * \brief Get the Normalized Symbol Information corresponding to a given SNIR
-     * \param snirDb SNIR in logarithmic scale
-     * \return NormaizedSymbolInformation
+     * @brief Get the Normalized Symbol Information corresponding to a given SNIR
+     * @param snirDb SNIR in logarithmic scale
+     * @return NormaizedSymbolInformation
      */
     double GetNormalizedSymbolInformation(double snirDb) const;
 
     /**
-     * \brief Get the SNIR in dB for a given Normalized Symbol Information target
-     * \param Normalized Symbol Information target (0-1)
-     * \return Es/No target in dB
+     * @brief Get the SNIR in dB for a given Normalized Symbol Information target
+     * @param Normalized Symbol Information target (0-1)
+     * @return Es/No target in dB
      */
     double GetSnirDb(double symbolInformationTarget) const;
 
     /**
-     * \brief Get the value of beta
+     * @brief Get the value of beta
      */
     inline double GetBeta() const
     {
@@ -82,8 +82,8 @@ class SatMutualInformationTable : public Object
     virtual void DoDispose();
 
     /**
-     * \brief Load the mutual information
-     * \param mutualInformationPath Path to a mutual information file.
+     * @brief Load the mutual information
+     * @param mutualInformationPath Path to a mutual information file.
      */
     void Load(std::string mutualInformationPath);
 
@@ -92,7 +92,7 @@ class SatMutualInformationTable : public Object
     std::ifstream* m_ifs;
 
     /**
-     * \brief The adjusting factor beta.
+     * @brief The adjusting factor beta.
      */
     double m_beta;
 };

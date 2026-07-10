@@ -24,7 +24,7 @@
 #include "satellite-control-message.h"
 #include "satellite-enums.h"
 
-#include <ns3/simple-ref-count.h>
+#include "ns3/simple-ref-count.h"
 
 #include <stdint.h>
 
@@ -34,7 +34,7 @@ namespace ns3
 class Packet;
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
  * SatPacketClassifier is responsible of classifying packets into certain
  * flow identifier. Classification is done based on IP header DSCP field
@@ -59,20 +59,20 @@ class SatPacketClassifier : public SimpleRefCount<SatPacketClassifier>
     virtual ~SatPacketClassifier();
 
     /**
-     * \brief Classify control message
-     * \param type Control msg type
-     * \param dest Destination address
-     * \return uint8_t Flow identifier
+     * @brief Classify control message
+     * @param type Control msg type
+     * @param dest Destination address
+     * @return uint8_t Flow identifier
      */
     uint8_t Classify(SatControlMsgTag::SatControlMsgType_t type, const Address& dest) const;
 
     /**
-     * \brief Classify a packet based on IP header DSCP to a lower layer
+     * @brief Classify a packet based on IP header DSCP to a lower layer
      * flow id.
-     * \param packet Packet to be classified
-     * \param dest Destination address
-     * \param protocolNumber Protocol number
-     * \return uint8_t Flow identifier
+     * @param packet Packet to be classified
+     * @param dest Destination address
+     * @param protocolNumber Protocol number
+     * @return uint8_t Flow identifier
      */
     uint8_t Classify(const Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber) const;
 

@@ -24,10 +24,10 @@
 #include "satellite-node-info.h"
 #include "satellite-scheduling-object.h"
 
-#include <ns3/boolean.h>
-#include <ns3/log.h>
-#include <ns3/packet.h>
-#include <ns3/uinteger.h>
+#include "ns3/boolean.h"
+#include "ns3/log.h"
+#include "ns3/packet.h"
+#include "ns3/uinteger.h"
 
 #include <algorithm>
 #include <vector>
@@ -59,14 +59,6 @@ SatUtScheduler::GetTypeId(void)
     return tid;
 }
 
-TypeId
-SatUtScheduler::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
-}
-
 SatUtScheduler::SatUtScheduler()
     : m_schedContextCallback(),
       m_txOpportunityCallback(),
@@ -86,8 +78,14 @@ SatUtScheduler::SatUtScheduler(Ptr<SatLowerLayerServiceConf> lls)
       m_nodeInfo()
 {
     NS_LOG_FUNCTION(this);
+}
 
-    ObjectBase::ConstructSelf(AttributeConstructionList());
+void
+SatUtScheduler::NotifyConstructionCompleted()
+{
+    NS_LOG_FUNCTION(this);
+
+    Object::NotifyConstructionCompleted();
 
     m_utScheduledByteCounters = std::vector<uint32_t>(m_llsConf->GetDaServiceCount(), 0);
 

@@ -24,10 +24,10 @@
 
 #include "satellite-stats-helper.h"
 
-#include <ns3/callback.h>
-#include <ns3/collector-map.h>
-#include <ns3/ptr.h>
-#include <ns3/satellite-enums.h>
+#include "ns3/callback.h"
+#include "ns3/collector-map.h"
+#include "ns3/ptr.h"
+#include "ns3/satellite-enums.h"
 
 namespace ns3
 {
@@ -40,8 +40,8 @@ class Time;
 class DataCollectionObject;
 
 /**
- * \ingroup satstats
- * \brief Helper for forward link scheduler symbol rate statistic. Base class.
+ * @ingroup satstats
+ * @brief Helper for forward link scheduler symbol rate statistic. Base class.
  */
 class SatStatsFwdLinkSchedulerSymbolRateHelper : public SatStatsHelper
 {
@@ -60,20 +60,20 @@ class SatStatsFwdLinkSchedulerSymbolRateHelper : public SatStatsHelper
     static TypeId GetTypeId();
 
     /**
-     * \brief Set up several probes or other means of listeners and connect them
+     * @brief Set up several probes or other means of listeners and connect them
      *        to the collectors.
      */
     void InstallProbes();
 
     /**
-     * \brief Receive inputs from trace sources and forward them to the collector.
-     * \param sliceId the sliceId ID of the BBFrame.
-     * \param symbolRate the symbol rate during the allocation cycle.
+     * @brief Receive inputs from trace sources and forward them to the collector.
+     * @param sliceId the sliceId ID of the BBFrame.
+     * @param symbolRate the symbol rate during the allocation cycle.
      */
     void SymbolRateCallback(uint8_t sliceId, double symbolRate);
 
     /**
-     * \return
+     * @return
      */
     Callback<void, uint8_t, double> GetTraceSinkCallback() const;
 

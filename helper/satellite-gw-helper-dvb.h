@@ -24,11 +24,11 @@
 
 #include "satellite-gw-helper.h"
 
-#include <ns3/satellite-channel.h>
-#include <ns3/satellite-mac.h>
-#include <ns3/satellite-ncc.h>
-#include <ns3/satellite-superframe-sequence.h>
-#include <ns3/satellite-typedefs.h>
+#include "ns3/satellite-channel.h"
+#include "ns3/satellite-mac.h"
+#include "ns3/satellite-ncc.h"
+#include "ns3/satellite-superframe-sequence.h"
+#include "ns3/satellite-typedefs.h"
 
 #include <stdint.h>
 #include <string>
@@ -37,7 +37,7 @@ namespace ns3
 {
 
 /**
- * \brief Creates needed objects for DVB GW nodes like SatOrbiterNetDevice objects.
+ * @brief Creates needed objects for DVB GW nodes like SatOrbiterNetDevice objects.
  *        Handles needed configuration for the GW nodes.
  *
  */
@@ -45,11 +45,10 @@ class SatGwHelperDvb : public SatGwHelper
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
-    TypeId GetInstanceTypeId(void) const;
 
     /**
      * Default constructor.
@@ -73,15 +72,15 @@ class SatGwHelperDvb : public SatGwHelper
     }
 
     /**
-     * \param n node
-     * \param gwId  id of the gw
-     * \param satId  id of the satellite linked to the UT
-     * \param beamId  id of the beam linked to the UT
-     * \param feederSatId  id of the satellite linked to the GW
-     * \param feederBeamId  id of the beam linked to the GW
-     * \param fCh forward channel
-     * \param rCh return channel
-     * \param ncc NCC (Network Control Center)
+     * @param n node
+     * @param gwId  id of the gw
+     * @param satId  id of the satellite linked to the UT
+     * @param beamId  id of the beam linked to the UT
+     * @param feederSatId  id of the satellite linked to the GW
+     * @param feederBeamId  id of the beam linked to the GW
+     * @param fCh forward channel
+     * @param rCh return channel
+     * @param ncc NCC (Network Control Center)
      *
      * This method creates a ns3::SatChannel with the
      * attributes configured by SatGwHelper::SetChannelAttribute,

@@ -20,9 +20,9 @@
 #ifndef SATELLITE_BASE_FADER_CONF_H
 #define SATELLITE_BASE_FADER_CONF_H
 
-#include <ns3/object.h>
-#include <ns3/simulator.h>
-#include <ns3/uinteger.h>
+#include "ns3/object.h"
+#include "ns3/simulator.h"
+#include "ns3/uinteger.h"
 
 #include <stdint.h>
 #include <vector>
@@ -31,9 +31,9 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief Base class for fader configuration classes. This class
+ * @brief Base class for fader configuration classes. This class
  * defines the functions which all the inherited fader
  * configuration classes must implement for the Markov-fading
  * model faders. This base class itself is abstract and will not
@@ -43,25 +43,25 @@ class SatBaseFaderConf : public Object
 {
   public:
     /**
-     * \brief Constructor
+     * @brief Constructor
      */
     SatBaseFaderConf();
 
     /**
-     * \brief Destructor
+     * @brief Destructor
      */
     virtual ~SatBaseFaderConf();
 
     /**
-     * \brief NS-3 type id function
-     * \return type id
+     * @brief NS-3 type id function
+     * @return type id
      */
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Function for getting the fading value
-     * \param set parameter set
-     * \return fading value
+     * @brief Function for getting the fading value
+     * @param set parameter set
+     * @return fading value
      */
     virtual std::vector<std::vector<double>> GetParameters(uint32_t set) = 0;
 

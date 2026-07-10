@@ -20,7 +20,7 @@
 
 #include "satellite-base-fader.h"
 
-#include <ns3/log.h>
+#include "ns3/log.h"
 
 #include <stdint.h>
 

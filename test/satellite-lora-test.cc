@@ -19,36 +19,36 @@
  */
 
 /**
- * \ingroup satellite
- * \file satellite-mobility-test.cc
- * \brief Test cases to unit test Satellite Mobility.
+ * @ingroup satellite
+ * @file satellite-mobility-test.cc
+ * @brief Test cases to unit test Satellite Mobility.
  */
 
 // Include a header file from your module to test.
 #include "ns3/boolean.h"
+#include "ns3/cbr-application.h"
+#include "ns3/cbr-helper.h"
 #include "ns3/config.h"
+#include "ns3/enum.h"
 #include "ns3/log.h"
+#include "ns3/lora-periodic-sender.h"
+#include "ns3/lorawan-mac-header.h"
 #include "ns3/mobility-helper.h"
+#include "ns3/packet-sink-helper.h"
+#include "ns3/packet-sink.h"
+#include "ns3/satellite-enums.h"
 #include "ns3/satellite-env-variables.h"
+#include "ns3/satellite-helper.h"
+#include "ns3/satellite-lora-conf.h"
+#include "ns3/satellite-lorawan-net-device.h"
 #include "ns3/satellite-mobility-model.h"
 #include "ns3/satellite-position-allocator.h"
+#include "ns3/satellite-topology.h"
 #include "ns3/simulator.h"
 #include "ns3/singleton.h"
 #include "ns3/string.h"
 #include "ns3/test.h"
-#include <ns3/cbr-application.h>
-#include <ns3/cbr-helper.h>
-#include <ns3/enum.h>
-#include <ns3/lora-periodic-sender.h>
-#include <ns3/lorawan-mac-header.h>
-#include <ns3/packet-sink-helper.h>
-#include <ns3/packet-sink.h>
-#include <ns3/satellite-enums.h>
-#include <ns3/satellite-helper.h>
-#include <ns3/satellite-lora-conf.h>
-#include <ns3/satellite-lorawan-net-device.h>
-#include <ns3/satellite-topology.h>
-#include <ns3/uinteger.h>
+#include "ns3/uinteger.h"
 
 #include <iostream>
 #include <stdint.h>
@@ -56,8 +56,8 @@
 using namespace ns3;
 
 /**
- * \ingroup satellite
- * \brief Test case to check if Lora ack arrives in first reception window.
+ * @ingroup satellite
+ * @brief Test case to check if Lora ack arrives in first reception window.
  *
  *  Expected result:
  *    Ack is received and with correct date range, corresponding to first window opening and
@@ -112,8 +112,8 @@ void
 SatLoraFirstWindowTestCase::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-lora", "first-window", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-lora", "first-window", true);
 
     // Enable Lora
     Config::SetDefault("ns3::LorawanMacEndDevice::DataRate", UintegerValue(5));
@@ -165,12 +165,12 @@ SatLoraFirstWindowTestCase::DoRun(void)
 
     // Creating the reference system.
     Ptr<SatHelper> helper = CreateObject<SatHelper>(
-        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E-lora");
+        SatEnvVariables::GetInstance()->LocateDataDirectory() + "/scenarios/geo-33E-lora");
     helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
     // >>> Start of actual test using Simple scenario >>>
     Ptr<Node> utNode = Singleton<SatTopology>::Get()->GetUtNode(0);
-    Ptr<LoraPeriodicSender> app = Create<LoraPeriodicSender>();
+    Ptr<LoraPeriodicSender> app = CreateObject<LoraPeriodicSender>();
 
     app->SetInterval(Seconds(10));
 
@@ -192,7 +192,7 @@ SatLoraFirstWindowTestCase::DoRun(void)
 
     Simulator::Destroy();
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 
     NS_TEST_ASSERT_MSG_NE(m_gwReceiveDate, Seconds(0), "Packet should be received by Gateway.");
     NS_TEST_ASSERT_MSG_NE(m_edReceiveDate, Seconds(0), "Ack should be received by End Device.");
@@ -208,8 +208,8 @@ SatLoraFirstWindowTestCase::DoRun(void)
 }
 
 /**
- * \ingroup satellite
- * \brief Test case to check if Lora ack arrives in second reception window.
+ * @ingroup satellite
+ * @brief Test case to check if Lora ack arrives in second reception window.
  *
  *  Expected result:
  *    Ack is received and with correct date range, corresponding to second window opening and
@@ -264,8 +264,8 @@ void
 SatLoraSecondWindowTestCase::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-lora", "second-window", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-lora", "second-window", true);
 
     // Enable Lora
     Config::SetDefault("ns3::LorawanMacEndDevice::DataRate", UintegerValue(5));
@@ -320,12 +320,12 @@ SatLoraSecondWindowTestCase::DoRun(void)
 
     // Creating the reference system.
     Ptr<SatHelper> helper = CreateObject<SatHelper>(
-        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E-lora");
+        SatEnvVariables::GetInstance()->LocateDataDirectory() + "/scenarios/geo-33E-lora");
     helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
     // >>> Start of actual test using Simple scenario >>>
     Ptr<Node> utNode = Singleton<SatTopology>::Get()->GetUtNode(0);
-    Ptr<LoraPeriodicSender> app = Create<LoraPeriodicSender>();
+    Ptr<LoraPeriodicSender> app = CreateObject<LoraPeriodicSender>();
 
     app->SetInterval(Seconds(10));
 
@@ -347,7 +347,7 @@ SatLoraSecondWindowTestCase::DoRun(void)
 
     Simulator::Destroy();
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
     NS_TEST_ASSERT_MSG_NE(m_gwReceiveDate, Seconds(0), "Packet should be received by Gateway.");
     NS_TEST_ASSERT_MSG_NE(m_edReceiveDate, Seconds(0), "Ack should be received by End Device.");
     NS_TEST_ASSERT_MSG_GT(m_edReceiveDate, m_gwReceiveDate, "Ack should be received after packet.");
@@ -362,8 +362,8 @@ SatLoraSecondWindowTestCase::DoRun(void)
 }
 
 /**
- * \ingroup satellite
- * \brief Test case to check if packet retransmitted if ack outside of both windows.
+ * @ingroup satellite
+ * @brief Test case to check if packet retransmitted if ack outside of both windows.
  *
  *  Expected result:
  *    Ack is not received and packet is retransmitted.
@@ -438,8 +438,8 @@ void
 SatLoraOutOfWindowWindowTestCase::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-lora", "out-of-window", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-lora", "out-of-window", true);
 
     // Enable Lora
     Config::SetDefault("ns3::LorawanMacEndDevice::DataRate", UintegerValue(5));
@@ -494,12 +494,12 @@ SatLoraOutOfWindowWindowTestCase::DoRun(void)
 
     // Creating the reference system.
     Ptr<SatHelper> helper = CreateObject<SatHelper>(
-        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E-lora");
+        SatEnvVariables::GetInstance()->LocateDataDirectory() + "/scenarios/geo-33E-lora");
     helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
     // >>> Start of actual test using Simple scenario >>>
     Ptr<Node> utNode = Singleton<SatTopology>::Get()->GetUtNode(0);
-    Ptr<LoraPeriodicSender> app = Create<LoraPeriodicSender>();
+    Ptr<LoraPeriodicSender> app = CreateObject<LoraPeriodicSender>();
 
     app->SetInterval(Seconds(10));
 
@@ -523,7 +523,7 @@ SatLoraOutOfWindowWindowTestCase::DoRun(void)
 
     Simulator::Destroy();
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 
     NS_TEST_ASSERT_MSG_EQ(m_gwReceiveDates.size(),
                           2,
@@ -540,8 +540,8 @@ SatLoraOutOfWindowWindowTestCase::DoRun(void)
 }
 
 /**
- * \ingroup satellite
- * \brief Test case to check that packet is not retransmitted if ack outside of both windows but no
+ * @ingroup satellite
+ * @brief Test case to check that packet is not retransmitted if ack outside of both windows but no
  * retransmission asked.
  *
  *  Expected result:
@@ -598,8 +598,8 @@ void
 SatLoraOutOfWindowWindowNoRetransmissionTestCase::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-lora", "out-of-window", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-lora", "out-of-window", true);
 
     // Enable Lora
     Config::SetDefault("ns3::LorawanMacEndDevice::DataRate", UintegerValue(5));
@@ -654,12 +654,12 @@ SatLoraOutOfWindowWindowNoRetransmissionTestCase::DoRun(void)
 
     // Creating the reference system.
     Ptr<SatHelper> helper = CreateObject<SatHelper>(
-        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E-lora");
+        SatEnvVariables::GetInstance()->LocateDataDirectory() + "/scenarios/geo-33E-lora");
     helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
     // >>> Start of actual test using Simple scenario >>>
     Ptr<Node> utNode = Singleton<SatTopology>::Get()->GetUtNode(0);
-    Ptr<LoraPeriodicSender> app = Create<LoraPeriodicSender>();
+    Ptr<LoraPeriodicSender> app = CreateObject<LoraPeriodicSender>();
 
     app->SetInterval(Seconds(10));
 
@@ -682,7 +682,7 @@ SatLoraOutOfWindowWindowNoRetransmissionTestCase::DoRun(void)
 
     Simulator::Destroy();
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 
     NS_TEST_ASSERT_MSG_EQ(m_gwReceiveDates.size(),
                           1,
@@ -691,8 +691,8 @@ SatLoraOutOfWindowWindowNoRetransmissionTestCase::DoRun(void)
 }
 
 /**
- * \ingroup satellite
- * \brief Test case to check if packet is received on App layer.
+ * @ingroup satellite
+ * @brief Test case to check if packet is received on App layer.
  *
  *  Expected result:
  *    Rx and Sink callbacks have data.
@@ -745,8 +745,8 @@ void
 SatLoraCbrTestCase::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-lora", "cbr", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-lora", "cbr", true);
 
     // Enable Lora
     Config::SetDefault("ns3::LorawanMacEndDevice::DataRate", UintegerValue(5));
@@ -801,7 +801,7 @@ SatLoraCbrTestCase::DoRun(void)
 
     // Creating the reference system.
     Ptr<SatHelper> helper = CreateObject<SatHelper>(
-        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E-lora");
+        SatEnvVariables::GetInstance()->LocateDataDirectory() + "/scenarios/geo-33E-lora");
     helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
     NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
@@ -838,7 +838,7 @@ SatLoraCbrTestCase::DoRun(void)
 
     Simulator::Destroy();
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 
     NS_TEST_ASSERT_MSG_NE(m_gwReceiveDate, Seconds(0), "Packet should be received by Gateway.");
     NS_TEST_ASSERT_MSG_NE(m_edReceiveDate, Seconds(0), "Ack should be received by End Device.");
@@ -856,8 +856,8 @@ SatLoraCbrTestCase::DoRun(void)
 }
 
 /**
- * \ingroup satellite
- * \brief Test suite for Satellite mobility unit test cases.
+ * @ingroup satellite
+ * @brief Test suite for Satellite mobility unit test cases.
  */
 class SatLoraTestSuite : public TestSuite
 {

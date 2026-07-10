@@ -49,12 +49,6 @@ SatFwdLinkSchedulerTimeSlicing::GetTypeId(void)
     return tid;
 }
 
-TypeId
-SatFwdLinkSchedulerTimeSlicing::GetInstanceTypeId() const
-{
-    return GetTypeId();
-}
-
 SatFwdLinkSchedulerTimeSlicing::SatFwdLinkSchedulerTimeSlicing()
     : SatFwdLinkScheduler()
 {
@@ -69,11 +63,17 @@ SatFwdLinkSchedulerTimeSlicing::SatFwdLinkSchedulerTimeSlicing(Ptr<SatBbFrameCon
       m_lastSliceAssigned(1),
       m_lastSliceDequeued(1)
 {
+    NS_LOG_FUNCTION(this << conf << address << carrierBandwidthInHz);
+}
+
+void
+SatFwdLinkSchedulerTimeSlicing::NotifyConstructionCompleted()
+{
     NS_LOG_FUNCTION(this);
 
-    ObjectBase::ConstructSelf(AttributeConstructionList());
+    SatFwdLinkScheduler::NotifyConstructionCompleted();
 
-    std::vector<SatEnums::SatModcod_t> modCods = conf->GetModCodsUsed();
+    std::vector<SatEnums::SatModcod_t> modCods = m_bbFrameConf->GetModCodsUsed();
 
     // Create control and broadcast container
     m_bbFrameContainers.insert(std::pair<uint8_t, Ptr<SatBbFrameContainer>>(
@@ -127,10 +127,6 @@ SatFwdLinkSchedulerTimeSlicing::SatFwdLinkSchedulerTimeSlicing(Ptr<SatBbFrameCon
                            " Baud");
         }
     }
-
-    Simulator::Schedule(m_periodicInterval,
-                        &SatFwdLinkSchedulerTimeSlicing::PeriodicTimerExpired,
-                        this);
 }
 
 SatFwdLinkSchedulerTimeSlicing::~SatFwdLinkSchedulerTimeSlicing()
@@ -248,19 +244,6 @@ SatFwdLinkSchedulerTimeSlicing::ClearAllPackets()
     {
         it->second->ClearAllFrames();
     }
-}
-
-void
-SatFwdLinkSchedulerTimeSlicing::PeriodicTimerExpired()
-{
-    NS_LOG_FUNCTION(this);
-
-    SendAndClearSymbolsSentStat();
-    ScheduleBbFrames();
-
-    Simulator::Schedule(m_periodicInterval,
-                        &SatFwdLinkSchedulerTimeSlicing::PeriodicTimerExpired,
-                        this);
 }
 
 void

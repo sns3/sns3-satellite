@@ -23,9 +23,9 @@
 
 #include "satellite-enums.h"
 
-#include <ns3/callback.h>
-#include <ns3/mac48-address.h>
-#include <ns3/ptr.h>
+#include "ns3/callback.h"
+#include "ns3/mac48-address.h"
+#include "ns3/ptr.h"
 
 #include <stdint.h>
 #include <string>
@@ -38,62 +38,62 @@ class Address;
 class Time;
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief SatTypedefs class is for general typedefs used in satellite module.
+ * @brief SatTypedefs class is for general typedefs used in satellite module.
  */
 class SatTypedefs
 {
   public:
     /**
-     * \brief Callback for carrier bandwidths
-     * \param channelType     The type of the channel
-     * \param carrierId       The id of the carrier
-     * \param bandwidthType   The type of the bandwidth
+     * @brief Callback for carrier bandwidths
+     * @param channelType     The type of the channel
+     * @param carrierId       The id of the carrier
+     * @param bandwidthType   The type of the bandwidth
      *
-     * \return The bandwidth of the carrier.
+     * @return The bandwidth of the carrier.
      */
     typedef Callback<double, SatEnums::ChannelType_t, uint32_t, SatEnums::CarrierBandwidthType_t>
         CarrierBandwidthConverter_t;
 
     /**
-     * \brief Common callback signature of a packet and a destination address.
-     * \param packet the packet
-     * \param destinationAddress the destination address
+     * @brief Common callback signature of a packet and a destination address.
+     * @param packet the packet
+     * @param destinationAddress the destination address
      */
     typedef void (*PacketDestinationAddressCallback)(Ptr<const Packet> packet,
                                                      const Address& destinationAddress);
 
     /**
-     * \brief Common callback signature of a packet and a source address.
-     * \param packet the packet
-     * \param sourceAddress the source address
+     * @brief Common callback signature of a packet and a source address.
+     * @param packet the packet
+     * @param sourceAddress the source address
      */
     typedef void (*PacketSenderAddressCallback)(Ptr<const Packet> packet,
                                                 const Address& sourceAddress);
 
     /**
-     * \brief Common callback signature for packet delay and address.
-     * \param delay the packet delay
-     * \param sourceAddress the source address
+     * @brief Common callback signature for packet delay and address.
+     * @param delay the packet delay
+     * @param sourceAddress the source address
      */
     typedef void (*PacketDelayAddressCallback)(const Time& delay, const Address& sourceAddress);
 
     /**
-     * \brief Common callback signature for `PacketTrace` trace sources.
-     * \param now the current simulation time
-     * \param eventType the type of this trace e.g., PACKET_SENT, PACKET_RECV,
+     * @brief Common callback signature for `PacketTrace` trace sources.
+     * @param now the current simulation time
+     * @param eventType the type of this trace e.g., PACKET_SENT, PACKET_RECV,
      *                  PACKET_ENQUE, or PACKET_DROP
-     * \param nodeType the type of the node where the event occured, e.g., NT_UT,
+     * @param nodeType the type of the node where the event occured, e.g., NT_UT,
      *                 NT_SAT, NT_GW, NT_NCC, or NT_TER
-     * \param nodeId the identifier of the node where the event occured
-     * \param nodeMacAddress the MAC address of the node where the event occured
-     * \param logLevel the log level used
-     * \param linkDirection link direction, e.g., LD_FORWARD or LD_RETURN
-     * \param packetInfo packet information in std::string for printing purpose,
+     * @param nodeId the identifier of the node where the event occured
+     * @param nodeMacAddress the MAC address of the node where the event occured
+     * @param logLevel the log level used
+     * @param linkDirection link direction, e.g., LD_FORWARD or LD_RETURN
+     * @param packetInfo packet information in std::string for printing purpose,
      *                   typically contains the packet's Uid, source address,
      *                   and destination address
-     * \todo Use const-reference for Time argument.
+     * @todo Use const-reference for Time argument.
      */
     typedef void (*PacketTraceCallback)(Time now,
                                         SatEnums::SatPacketEvent_t eventType,
@@ -105,9 +105,9 @@ class SatTypedefs
                                         std::string packetInfo);
 
     /**
-     * \brief Common callback signature for scenario creation trace sources by
+     * @brief Common callback signature for scenario creation trace sources by
      *        helpers.
-     * \param trace textual description of the creation being done
+     * @param trace textual description of the creation being done
      */
     typedef void (*CreationCallback)(std::string trace);
 

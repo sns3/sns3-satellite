@@ -28,10 +28,10 @@
 #include "lorawan-mac-end-device-class-a.h"
 #include "lorawan-mac-header.h"
 
-#include <ns3/ipv4-header.h>
-#include <ns3/net-device.h>
-#include <ns3/object.h>
-#include <ns3/pointer.h>
+#include "ns3/ipv4-header.h"
+#include "ns3/net-device.h"
+#include "ns3/object.h"
+#include "ns3/pointer.h"
 
 #include <iostream>
 #include <list>
@@ -119,35 +119,35 @@ class LoraEndDeviceStatus : public Object
      * This is determined by looking at headers and payload of the Reply
      * structure: if they are empty, no reply should be needed.
      *
-     * \return A boolean value signaling if the end device needs a reply.
+     * @return A boolean value signaling if the end device needs a reply.
      */
     bool NeedsReply(void);
 
     /**
      * Get the reply packet.
      *
-     * \return A pointer to the packet reply (data + headers).
+     * @return A pointer to the packet reply (data + headers).
      */
     Ptr<Packet> GetCompleteReplyPacket(void);
 
     /**
      * Get the reply packet mac header.
      *
-     * \return The packet reply mac header.
+     * @return The packet reply mac header.
      */
     LorawanMacHeader GetReplyMacHeader(void);
 
     /**
      * Get the reply packet frame header.
      *
-     * \return The packet reply frame header.
+     * @return The packet reply frame header.
      */
     LoraFrameHeader GetReplyFrameHeader(void);
 
     /**
      * Get the data of the reply packet.
      *
-     * \return A pointer to the packet reply.
+     * @return A pointer to the packet reply.
      */
     Ptr<Packet> GetReplyPayload(void);
 
@@ -197,21 +197,21 @@ class LoraEndDeviceStatus : public Object
     /**
      * Get the modcod this device is using.
      *
-     * \return An unsigned 8-bit integer containing the modcod index.
+     * @return An unsigned 8-bit integer containing the modcod index.
      */
     uint8_t GetModcod(void);
 
     /**
      * Get the beam ID this device is using.
      *
-     * \return An unsigned 8-bit integer containing the beam ID index.
+     * @return An unsigned 8-bit integer containing the beam ID index.
      */
     uint8_t GetBeamId(void);
 
     /**
      * Get the spreading factor this device is using in the first receive window.
      *
-     * \return An unsigned 8-bit integer containing the spreading factor.
+     * @return An unsigned 8-bit integer containing the spreading factor.
      */
     uint8_t GetFirstReceiveWindowSpreadingFactor(void);
 
@@ -224,7 +224,7 @@ class LoraEndDeviceStatus : public Object
      * Get the offset of spreading factor this device is using in the second
      * receive window with respect to the first receive window.
      *
-     * \return An unsigned 8-bit integer containing the spreading factor.
+     * @return An unsigned 8-bit integer containing the spreading factor.
      */
     uint8_t GetSecondReceiveWindowOffset(void);
 
@@ -237,7 +237,7 @@ class LoraEndDeviceStatus : public Object
     /**
      * Get the received packet list.
      *
-     * \return The received packet list.
+     * @return The received packet list.
      */
     ReceivedPacketList GetReceivedPacketList(void);
 

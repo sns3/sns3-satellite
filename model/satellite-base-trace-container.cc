@@ -20,7 +20,7 @@
 
 #include "satellite-base-trace-container.h"
 
-#include <ns3/log.h>
+#include "ns3/log.h"
 
 NS_LOG_COMPONENT_DEFINE("SatBaseTraceContainer");
 
@@ -49,14 +49,6 @@ SatBaseTraceContainer::GetTypeId(void)
 {
     static TypeId tid = TypeId("ns3::SatBaseTraceContainer").SetParent<Object>();
     return tid;
-}
-
-TypeId
-SatBaseTraceContainer::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
 }
 
 SatBaseTraceContainer::SatBaseTraceContainer()

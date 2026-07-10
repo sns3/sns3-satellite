@@ -30,10 +30,10 @@
 using namespace ns3;
 
 /**
- * \file sat-lora-constellation-example.cc
- * \ingroup satellite
+ * @file sat-lora-constellation-example.cc
+ * @ingroup satellite
  *
- * \brief This file allows to create a scenario with Lora configuration
+ * @brief This file allows to create a scenario with Lora configuration
  */
 
 NS_LOG_COMPONENT_DEFINE("sat-lora-constellation-example");
@@ -273,7 +273,7 @@ main(int argc, char* argv[])
     // Outputs
     simulationHelper->EnableProgressLogs();
 
-    std::string outputPath = Singleton<SatEnvVariables>::Get()->LocateDirectory(
+    std::string outputPath = SatEnvVariables::GetInstance()->LocateDirectory(
         "contrib/satellite/data/sims/example-lora-constellation");
     Config::SetDefault("ns3::ConfigStore::Filename",
                        StringValue(outputPath + "/output-attributes.xml"));

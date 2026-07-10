@@ -27,9 +27,9 @@
 #include "satellite-gw-mac.h"
 #include "satellite-orbiter-net-device.h"
 
-#include <ns3/object.h>
-#include <ns3/ptr.h>
-#include <ns3/traced-callback.h>
+#include "ns3/object.h"
+#include "ns3/ptr.h"
+#include "ns3/traced-callback.h"
 
 #include <map>
 #include <stdint.h>
@@ -46,8 +46,8 @@ class SatSuperframeSeq;
 class SatLowerLayerServiceConf;
 
 /**
- * \ingroup satellite
- * \brief class for module NCC used as shared module among Gateways (GWs).
+ * @ingroup satellite
+ * @brief class for module NCC used as shared module among Gateways (GWs).
  *
  * This SatNcc class implements NCC functionality in Satellite network. It is shared
  * module among GWs. Communication between NCC and GW is handled by callback functions.
@@ -57,16 +57,10 @@ class SatNcc : public Object
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
-
-    /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
-     */
-    virtual TypeId GetInstanceTypeId(void) const;
 
     /**
      * Construct a SatNcc
@@ -84,17 +78,17 @@ class SatNcc : public Object
     ~SatNcc();
 
     /**
-     * \brief Update UT specific C/N0 information.
+     * @brief Update UT specific C/N0 information.
      *
      * The SatNcc receives C/N0 information of packet receptions from UTs
      * to take into account when making schedule decisions.
      *
-     * \param satId  The id of the satellite where C/N0 is from.
-     * \param beamId  The id of the beam where C/N0 is from.
-     * \param sourceMac  The MAC of the UT or SAT. (sender address)
-     * \param gwId  The id (address) of the GW. (receiver address)
-     * \param cno Value of the C/N0.
-     * \param isSatelliteMac If true, cno corresponds to link SAT to GW; if false, cno corresponds
+     * @param satId  The id of the satellite where C/N0 is from.
+     * @param beamId  The id of the beam where C/N0 is from.
+     * @param sourceMac  The MAC of the UT or SAT. (sender address)
+     * @param gwId  The id (address) of the GW. (receiver address)
+     * @param cno Value of the C/N0.
+     * @param isSatelliteMac If true, cno corresponds to link SAT to GW; if false, cno corresponds
      * to link UT to GW
      */
     void UtCnoUpdated(uint32_t satId,
@@ -105,12 +99,12 @@ class SatNcc : public Object
                       bool isSatelliteMac);
 
     /**
-     * \brief Function for adjusting the random access allocation channel specific load
-     * \param satId Satellite ID
-     * \param beamId Beam ID
-     * \param carrierId Carrier ID
-     * \param allocationChannelId Allocation channel ID
-     * \param averageNormalizedOfferedLoad Measured average normalized offered load
+     * @brief Function for adjusting the random access allocation channel specific load
+     * @param satId Satellite ID
+     * @param beamId Beam ID
+     * @param carrierId Carrier ID
+     * @param allocationChannelId Allocation channel ID
+     * @param averageNormalizedOfferedLoad Measured average normalized offered load
      */
     void DoRandomAccessDynamicLoadControl(uint32_t satId,
                                           uint32_t beamId,
@@ -119,15 +113,15 @@ class SatNcc : public Object
                                           double averageNormalizedOfferedLoad);
 
     /**
-     * \brief Capacity request receiver.
+     * @brief Capacity request receiver.
      *
      * The SatNcc receives Capacity Rrequest (CR) messages from UTs
      * to take into account when making schedule decisions.
      *
-     * \param satId  The id of the satellite where C/N0 is from.
-     * \param beamId  The id of the beam where C/N0 is from.
-     * \param utId  The id of the UT. (sender address)
-     * \param crMsg Pointer to received Capacity Request
+     * @param satId  The id of the satellite where C/N0 is from.
+     * @param beamId  The id of the beam where C/N0 is from.
+     * @param utId  The id of the UT. (sender address)
+     * @param crMsg Pointer to received Capacity Request
      */
     void UtCrReceived(uint32_t satId, uint32_t beamId, Address utId, Ptr<SatCrMessage> crMsg);
 
@@ -137,23 +131,23 @@ class SatNcc : public Object
     typedef SatBeamScheduler::SendCtrlMsgCallback SendCallback;
 
     /**
-     * \param msg        the TBTP sent
+     * @param msg        the TBTP sent
      */
     typedef Callback<void, Ptr<SatTbtpMessage>> SendTbtpCallback;
 
     /**
-     * \brief Function for adding the beam
-     * \param satId ID of the satellite which for callback is set
-     * \param beamId ID of the beam which for callback is set
-     * \param gwNetDevice GW NetDevice linked to this beam
-     * \param orbiterNetDevice OrbiterNetDevice on satellite linked to this beam
-     * \param cb callback to invoke whenever a TBTP is ready for sending and must
+     * @brief Function for adding the beam
+     * @param satId ID of the satellite which for callback is set
+     * @param beamId ID of the beam which for callback is set
+     * @param gwNetDevice GW NetDevice linked to this beam
+     * @param orbiterNetDevice OrbiterNetDevice on satellite linked to this beam
+     * @param cb callback to invoke whenever a TBTP is ready for sending and must
      *        be forwarded to the Beam UTs.
-     * \param tbtpCb callback to invoke whenever a TBTP has been sent
-     * \param seq Super frame sequence
-     * \param maxFrameSizeInBytes Maximum non fragmented BB frame size with most robust ModCod
-     * \param satAddress Mac address of the satellite responsible for this beam
-     * \param gwAddress Mac address of the gateway responsible for this beam
+     * @param tbtpCb callback to invoke whenever a TBTP has been sent
+     * @param seq Super frame sequence
+     * @param maxFrameSizeInBytes Maximum non fragmented BB frame size with most robust ModCod
+     * @param satAddress Mac address of the satellite responsible for this beam
+     * @param gwAddress Mac address of the gateway responsible for this beam
      */
     void AddBeam(uint32_t satId,
                  uint32_t beamId,
@@ -167,12 +161,12 @@ class SatNcc : public Object
                  Address gwAddress);
 
     /**
-     * \brief Function for adding the UT
-     * \param utId ID (mac address) of the UT to be added
-     * \param llsConf Lower layer service configuration for the UT to be added.
-     * \param satId ID of the satellite where UT is connected.
-     * \param beamId ID of the beam where UT is connected.
-     * \param setRaChannelCallback  callback to invoke whenever the UT to be
+     * @brief Function for adding the UT
+     * @param utId ID (mac address) of the UT to be added
+     * @param llsConf Lower layer service configuration for the UT to be added.
+     * @param satId ID of the satellite where UT is connected.
+     * @param beamId ID of the beam where UT is connected.
+     * @param setRaChannelCallback  callback to invoke whenever the UT to be
      *        added should change its RA allocation channel
      */
     void AddUt(Ptr<SatLowerLayerServiceConf> llsConf,
@@ -184,14 +178,14 @@ class SatNcc : public Object
 
     /**
      * Remove a UT
-     * \param utId ID (mac address) of the UT to be removed
-     * \param satId ID of the satellite where UT is connected
-     * \param beamId ID of the beam where UT is connected
+     * @param utId ID (mac address) of the UT to be removed
+     * @param satId ID of the satellite where UT is connected
+     * @param beamId ID of the beam where UT is connected
      */
     void RemoveUt(Address utId, uint32_t satId, uint32_t beamId);
 
     /**
-     * \brief Function for setting the random access allocation channel specific high load backoff
+     * @brief Function for setting the random access allocation channel specific high load backoff
      * probabilities \param allocationChannelId Allocation channel ID \param threshold Average
      * normalized offered load threshold
      */
@@ -199,7 +193,7 @@ class SatNcc : public Object
                                                               double threshold);
 
     /**
-     * \brief Function for setting the random access allocation channel specific high load backoff
+     * @brief Function for setting the random access allocation channel specific high load backoff
      * probabilities \param allocationChannelId Allocation channel ID \param
      * lowLoadBackOffProbability Low load backoff probability
      */
@@ -207,7 +201,7 @@ class SatNcc : public Object
                                                   uint16_t lowLoadBackOffProbability);
 
     /**
-     * \brief Function for setting the random access allocation channel specific high load backoff
+     * @brief Function for setting the random access allocation channel specific high load backoff
      * probabilities \param allocationChannelId Allocation channel ID \param
      * highLoadBackOffProbability High load backoff probability
      */
@@ -215,7 +209,7 @@ class SatNcc : public Object
                                                    uint16_t highLoadBackOffProbability);
 
     /**
-     * \brief Function for setting the random access allocation channel specific high load backoff
+     * @brief Function for setting the random access allocation channel specific high load backoff
      * time \param allocationChannelId Allocation channel ID \param lowLoadBackOffTime Low load
      * backoff time
      */
@@ -223,7 +217,7 @@ class SatNcc : public Object
                                            uint16_t lowLoadBackOffTime);
 
     /**
-     * \brief Function for setting the random access allocation channel specific high load backoff
+     * @brief Function for setting the random access allocation channel specific high load backoff
      * time \param allocationChannelId Allocation channel ID \param highLoadBackOffTime High load
      * backoff time
      */
@@ -231,20 +225,20 @@ class SatNcc : public Object
                                             uint16_t highLoadBackOffTime);
 
     /**
-     * \param satId the ID of the satellite.
-     * \param beamId the ID of the beam.
-     * \return pointer to the beam scheduler, or zero if the beam is not found.
+     * @param satId the ID of the satellite.
+     * @param beamId the ID of the beam.
+     * @return pointer to the beam scheduler, or zero if the beam is not found.
      */
     Ptr<SatBeamScheduler> GetBeamScheduler(uint32_t satId, uint32_t beamId) const;
 
     /**
-     * \brief Check if a terminal can be moved between two beams. If yes, schedule
+     * @brief Check if a terminal can be moved between two beams. If yes, schedule
      * the actual move at a later point in time.
-     * \param utId the UT wanting to move between beams
-     * \param srcSatId the sat ID this UT is moving from
-     * \param srcBeamId the beam ID this UT is moving from
-     * \param destSatId the sat ID this UT is moving to
-     * \param destBeamId the beam ID this UT is moving to
+     * @param utId the UT wanting to move between beams
+     * @param srcSatId the sat ID this UT is moving from
+     * @param srcBeamId the beam ID this UT is moving from
+     * @param destSatId the sat ID this UT is moving to
+     * @param destBeamId the beam ID this UT is moving to
      */
     void MoveUtBetweenBeams(Address utId,
                             uint32_t srcSatId,
@@ -253,16 +247,16 @@ class SatNcc : public Object
                             uint32_t destBeamId);
 
     /**
-     * \brief Update routes and ARP tables on gateways after a terminal handover
-     * \param Address address of the UT whose handover is completed
-     * \param Address address of the GW handling this UT before handover
-     * \param Address address of the GW handling this UT after handover
+     * @brief Update routes and ARP tables on gateways after a terminal handover
+     * @param Address address of the UT whose handover is completed
+     * @param Address address of the GW handling this UT before handover
+     * @param Address address of the GW handling this UT after handover
      */
     typedef Callback<void, Address, Address, Address> UpdateRoutingCallback;
 
     /**
-     * \brief Set the callback used to update routes and APR tables after a terminal handover
-     * \param cb the routing update callback
+     * @brief Set the callback used to update routes and APR tables after a terminal handover
+     * @param cb the routing update callback
      */
     void SetUpdateRoutingCallback(SatNcc::UpdateRoutingCallback cb);
 
@@ -270,21 +264,21 @@ class SatNcc : public Object
 
     /**
      * Function to call when a control burst has been received.
-     * \param utId The address of the sending UT
-     * \param satId The satellite ID
-     * \param beamId The beam ID
+     * @param utId The address of the sending UT
+     * @param satId The satellite ID
+     * @param beamId The beam ID
      */
     void ReceiveControlBurst(Address utId, uint32_t satId, uint32_t beamId);
 
     /**
      * Set if logon is used in this simulation. Logoff is disbled if logon is not used.
-     * \param useLogon boolean indicating if logon is used.
+     * @param useLogon boolean indicating if logon is used.
      */
     void SetUseLogon(bool useLogon);
 
     /**
      * Set if SNS-3 is used with Lora standard. TBTPs are not sent in this mode.
-     * \param useLora boolean indicating if lora is used.
+     * @param useLora boolean indicating if lora is used.
      */
     void SetUseLora(bool useLora);
 
@@ -295,13 +289,13 @@ class SatNcc : public Object
     void DoDispose(void);
 
     /**
-     * \brief Function for creating the random access control message
-     * \param backoffProbability Backoff probability
-     * \param backoffProbability Backoff Time
-     * \param satId Satellite ID
-     * \param satId Satellite ID
-     * \param beamId Beam ID
-     * \param allocationChannelId Allocation channel ID
+     * @brief Function for creating the random access control message
+     * @param backoffProbability Backoff probability
+     * @param backoffProbability Backoff Time
+     * @param satId Satellite ID
+     * @param satId Satellite ID
+     * @param beamId Beam ID
+     * @param allocationChannelId Allocation channel ID
      */
     void CreateRandomAccessLoadControlMessage(uint16_t backoffProbability,
                                               uint16_t backoffTime,
@@ -310,12 +304,12 @@ class SatNcc : public Object
                                               uint8_t allocationChannelId);
 
     /**
-     * \brief Perform terminal handover on the terestrial network
-     * \param utId the UT wanting to move between beams
-     * \param srcSatId the sat ID this UT is moving from
-     * \param srcBeamId the beam ID this UT is moving from
-     * \param destSatId the sat ID this UT is moving to
-     * \param destBeamId the beam ID this UT is moving to
+     * @brief Perform terminal handover on the terestrial network
+     * @param utId the UT wanting to move between beams
+     * @param srcSatId the sat ID this UT is moving from
+     * @param srcBeamId the beam ID this UT is moving from
+     * @param destSatId the sat ID this UT is moving to
+     * @param destBeamId the beam ID this UT is moving to
      */
     void DoMoveUtBetweenBeams(Address utId,
                               uint32_t srcSatId,
@@ -324,10 +318,10 @@ class SatNcc : public Object
                               uint32_t destBeamId);
 
     /**
-     * \brief Check if a UT has not been receiving control bursts, and then need to logoff
-     * \param utId The UT to check
-     * \param satId The satellite ID
-     * \param beamId The beam ID
+     * @brief Check if a UT has not been receiving control bursts, and then need to logoff
+     * @param utId The UT to check
+     * @param satId The satellite ID
+     * @param beamId The beam ID
      */
     void CheckTimeout(Address utId, uint32_t satId, uint32_t beamId);
 
@@ -339,14 +333,14 @@ class SatNcc : public Object
     /**
      * The trace source fired for Capacity Requests (CRs) received by the NCC.
      *
-     * \see class CallBackTraceSource
+     * @see class CallBackTraceSource
      */
     TracedCallback<Ptr<const Packet>> m_nccRxTrace;
 
     /**
      * The trace source fired for TBTPs sent by the NCC.
      *
-     * \see class CallBackTraceSource
+     * @see class CallBackTraceSource
      */
     TracedCallback<Ptr<const Packet>> m_nccTxTrace;
 

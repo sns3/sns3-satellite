@@ -20,7 +20,7 @@
 
 #include "satellite-fwd-link-scheduler-default.h"
 
-#include <ns3/log.h>
+#include "ns3/log.h"
 
 #include <utility>
 #include <vector>
@@ -61,14 +61,6 @@ SatFwdLinkSchedulerDefault::GetTypeId(void)
     return tid;
 }
 
-TypeId
-SatFwdLinkSchedulerDefault::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
-}
-
 SatFwdLinkSchedulerDefault::SatFwdLinkSchedulerDefault()
     : SatFwdLinkScheduler()
 {
@@ -82,17 +74,19 @@ SatFwdLinkSchedulerDefault::SatFwdLinkSchedulerDefault(Ptr<SatBbFrameConf> conf,
     : SatFwdLinkScheduler(conf, address, carrierBandwidthInHz),
       m_symbolsSent(0)
 {
+    NS_LOG_FUNCTION(this << conf << address << carrierBandwidthInHz);
+}
+
+void
+SatFwdLinkSchedulerDefault::NotifyConstructionCompleted()
+{
     NS_LOG_FUNCTION(this);
 
-    ObjectBase::ConstructSelf(AttributeConstructionList());
+    SatFwdLinkScheduler::NotifyConstructionCompleted();
 
-    std::vector<SatEnums::SatModcod_t> modCods = conf->GetModCodsUsed();
+    std::vector<SatEnums::SatModcod_t> modCods = m_bbFrameConf->GetModCodsUsed();
 
     m_bbFrameContainer = CreateObject<SatBbFrameContainer>(modCods, m_bbFrameConf);
-
-    Simulator::Schedule(m_periodicInterval,
-                        &SatFwdLinkSchedulerDefault::PeriodicTimerExpired,
-                        this);
 }
 
 SatFwdLinkSchedulerDefault::~SatFwdLinkSchedulerDefault()
@@ -174,19 +168,6 @@ SatFwdLinkSchedulerDefault::ClearAllPackets()
     NS_LOG_FUNCTION(this);
 
     m_bbFrameContainer->ClearAllFrames();
-}
-
-void
-SatFwdLinkSchedulerDefault::PeriodicTimerExpired()
-{
-    NS_LOG_FUNCTION(this);
-
-    SendAndClearSymbolsSentStat();
-    ScheduleBbFrames();
-
-    Simulator::Schedule(m_periodicInterval,
-                        &SatFwdLinkSchedulerDefault::PeriodicTimerExpired,
-                        this);
 }
 
 void

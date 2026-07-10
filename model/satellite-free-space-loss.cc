@@ -24,9 +24,9 @@
 #include "satellite-mobility-model.h"
 #include "satellite-utils.h"
 
-#include <ns3/double.h>
-#include <ns3/log.h>
-#include <ns3/string.h>
+#include "ns3/double.h"
+#include "ns3/log.h"
+#include "ns3/string.h"
 
 #include <cmath>
 #include <stdint.h>

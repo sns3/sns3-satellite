@@ -29,9 +29,9 @@
 #include <stdint.h>
 
 /**
- * \file sat-link-results-plot.cc
- * \ingroup satellite
- * \brief Example for plotting satellite link results data.
+ * @file sat-link-results-plot.cc
+ * @ingroup satellite
+ * @brief Example for plotting satellite link results data.
  *
  * \sa SatLinkResultsPlot
  */
@@ -41,8 +41,8 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief Example for plotting satellite link results data.
+ * @ingroup satellite
+ * @brief Example for plotting satellite link results data.
  *
  * This example can be run as it is, without any argument, i.e.:
  *
@@ -91,8 +91,7 @@ SatLinkResultsPlot::SatLinkResultsPlot()
     m_resolutionDb = 0.01;
     m_minSinrDb = 0.0;
     m_maxSinrDb = 20.0;
-    m_inputPath =
-        Singleton<SatEnvVariables>::Get()->GetDataPath() + "/additional-input/linkresults/";
+    m_inputPath = SatEnvVariables::GetInstance()->GetDataPath() + "/additional-input/linkresults/";
 }
 
 void

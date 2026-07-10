@@ -31,12 +31,12 @@
 #include "satellite-topology.h"
 #include "satellite-utils.h"
 
-#include <ns3/double.h>
-#include <ns3/log.h>
-#include <ns3/pointer.h>
-#include <ns3/simulator.h>
-#include <ns3/singleton.h>
-#include <ns3/uinteger.h>
+#include "ns3/double.h"
+#include "ns3/log.h"
+#include "ns3/pointer.h"
+#include "ns3/simulator.h"
+#include "ns3/singleton.h"
+#include "ns3/uinteger.h"
 
 NS_LOG_COMPONENT_DEFINE("SatUtPhy");
 
@@ -132,13 +132,6 @@ SatUtPhy::GetTypeId(void)
     return tid;
 }
 
-TypeId
-SatUtPhy::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-    return GetTypeId();
-}
-
 SatUtPhy::SatUtPhy(void)
     : m_otherSysInterferenceCOverIDb(24.7),
       m_otherSysInterferenceCOverI(SatUtils::DbToLinear(m_otherSysInterferenceCOverIDb)),
@@ -153,33 +146,42 @@ SatUtPhy::SatUtPhy(SatPhy::CreateParam_t& params,
                    SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
                    Ptr<SatSuperframeConf> superFrameConf)
     : SatPhy(params),
+      m_linkResults(linkResults),
+      m_parameters(parameters),
+      m_superFrameConf(superFrameConf),
       m_antennaReconfigurationDelay(Seconds(0.0))
+{
+    NS_LOG_FUNCTION(this << linkResults << superFrameConf);
+}
+
+void
+SatUtPhy::NotifyConstructionCompleted()
 {
     NS_LOG_FUNCTION(this);
 
-    ObjectBase::ConstructSelf(AttributeConstructionList());
+    SatPhy::NotifyConstructionCompleted();
 
     m_otherSysInterferenceCOverI = SatUtils::DbToLinear(m_otherSysInterferenceCOverIDb);
 
-    parameters.m_rxTemperatureK = SatUtils::DbToLinear(SatPhy::GetRxNoiseTemperatureDbk());
-    parameters.m_aciIfWrtNoiseFactor = 0.0;
-    parameters.m_extNoiseDensityWhz = 0.0;
-    parameters.m_rxMode = SatPhyRxCarrierConf::NORMAL;
-    parameters.m_linkRegenerationMode =
+    m_parameters.m_rxTemperatureK = SatUtils::DbToLinear(SatPhy::GetRxNoiseTemperatureDbk());
+    m_parameters.m_aciIfWrtNoiseFactor = 0.0;
+    m_parameters.m_extNoiseDensityWhz = 0.0;
+    m_parameters.m_rxMode = SatPhyRxCarrierConf::NORMAL;
+    m_parameters.m_linkRegenerationMode =
         Singleton<SatTopology>::Get()->GetForwardLinkRegenerationMode();
-    parameters.m_chType = SatEnums::FORWARD_USER_CH;
+    m_parameters.m_chType = SatEnums::FORWARD_USER_CH;
 
-    Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf>(parameters);
+    Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf>(m_parameters);
 
-    if (linkResults)
+    if (m_linkResults)
     {
-        carrierConf->SetLinkResults(linkResults);
+        carrierConf->SetLinkResults(m_linkResults);
     }
 
     carrierConf->SetAdditionalInterferenceCb(
         MakeCallback(&SatUtPhy::GetAdditionalInterference, this));
 
-    SatPhy::ConfigureRxCarriers(carrierConf, superFrameConf);
+    SatPhy::ConfigureRxCarriers(carrierConf, m_superFrameConf);
 }
 
 SatUtPhy::~SatUtPhy()

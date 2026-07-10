@@ -20,7 +20,7 @@
 
 #include "satellite-encap-pdu-status-tag.h"
 
-#include <ns3/log.h>
+#include "ns3/log.h"
 
 #include <ostream>
 

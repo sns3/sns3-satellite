@@ -25,8 +25,8 @@
 
 #include "lora-logical-channel.h"
 
-#include <ns3/nstime.h>
-#include <ns3/object.h>
+#include "ns3/nstime.h"
+#include "ns3/object.h"
 
 namespace ns3
 {
@@ -47,10 +47,10 @@ class LoraSubBand : public Object
     /**
      * Create a new LoraSubBand by specifying all of its properties.
      *
-     * \param firstFrequency The LoraSubBand's lowest frequency.
-     * \param lastFrequency The LoraSubBand's highest frequency.
-     * \param dutyCycle The duty cycle (as a fraction) allowed on this LoraSubBand.
-     * \param maxTxPowerDbm The maximum transmission power [dBm] allowed on this LoraSubBand.
+     * @param firstFrequency The LoraSubBand's lowest frequency.
+     * @param lastFrequency The LoraSubBand's highest frequency.
+     * @param dutyCycle The duty cycle (as a fraction) allowed on this LoraSubBand.
+     * @param maxTxPowerDbm The maximum transmission power [dBm] allowed on this LoraSubBand.
      */
     LoraSubBand(double firstFrequency,
                 double lastFrequency,
@@ -62,21 +62,21 @@ class LoraSubBand : public Object
     /**
      * Get the lowest frequency of the LoraSubBand.
      *
-     * \return The lowest frequency of the LoraSubBand.
+     * @return The lowest frequency of the LoraSubBand.
      */
     double GetFirstFrequency(void);
 
     /**
      * Get the last frequency of the LoraSubBand.
      *
-     * \return The lowest frequency of the LoraSubBand.
+     * @return The lowest frequency of the LoraSubBand.
      */
     // double GetLastFrequency (void);
 
     /**
      * Get the duty cycle of the LoraSubBand.
      *
-     * \return The duty cycle (as a fraction) that needs to be enforced on this
+     * @return The duty cycle (as a fraction) that needs to be enforced on this
      * LoraSubBand.
      */
     double GetDutyCycle(void);
@@ -87,7 +87,7 @@ class LoraSubBand : public Object
      * This function is used by LoraLogicalChannelHelper, which computes the time
      * based on the LoraSubBand's duty cycle and on the transmission duration.
      *
-     * \param nextTime The future time from which transmission should be allowed
+     * @param nextTime The future time from which transmission should be allowed
      * again.
      */
     void SetNextTransmissionTime(Time nextTime);
@@ -96,7 +96,7 @@ class LoraSubBand : public Object
      * Returns the next time from which transmission on this LoraSubBand will be
      * possible.
      *
-     * \return The next time at which transmission in this LoraSubBand will be
+     * @return The next time at which transmission in this LoraSubBand will be
      * allowed.
      */
     Time GetNextTransmissionTime(void);
@@ -104,8 +104,8 @@ class LoraSubBand : public Object
     /**
      * Return whether or not a frequency belongs to this LoraSubBand.
      *
-     * \param frequency the frequency we want to test against the current LoraSubBand
-     * \return True if the frequency is between firstFrequency and lastFrequency,
+     * @param frequency the frequency we want to test against the current LoraSubBand
+     * @return True if the frequency is between firstFrequency and lastFrequency,
      * false otherwise.
      */
     bool BelongsToLoraSubBand(double frequency);
@@ -113,8 +113,8 @@ class LoraSubBand : public Object
     /**
      * Return whether or not a channel belongs to this LoraSubBand.
      *
-     * \param channel the channel we want to test against the current LoraSubBand
-     * \return True if the channel's center frequency is between firstFrequency
+     * @param channel the channel we want to test against the current LoraSubBand
+     * @return True if the channel's center frequency is between firstFrequency
      * and lastFrequency, false otherwise.
      */
     bool BelongsToLoraSubBand(Ptr<LoraLogicalChannel> channel);
@@ -122,14 +122,14 @@ class LoraSubBand : public Object
     /**
      * Set the maximum transmission power that is allowed on this LoraSubBand.
      *
-     * \param maxTxPowerDbm The maximum transmission power [dBm] to set.
+     * @param maxTxPowerDbm The maximum transmission power [dBm] to set.
      */
     void SetMaxTxPowerDbm(double maxTxPowerDbm);
 
     /**
      * Return the maximum transmission power that is allowed on this LoraSubBand
      *
-     * \return The maximum transmission power, in dBm.
+     * @return The maximum transmission power, in dBm.
      */
     double GetMaxTxPowerDbm(void);
 

@@ -31,16 +31,16 @@
 #include "satellite-scheduling-object.h"
 #include "satellite-signal-parameters.h"
 
-#include <ns3/address.h>
-#include <ns3/callback.h>
-#include <ns3/mac48-address.h>
-#include <ns3/node.h>
-#include <ns3/nstime.h>
-#include <ns3/packet.h>
-#include <ns3/ptr.h>
-#include <ns3/random-variable-stream.h>
-#include <ns3/timer.h>
-#include <ns3/traced-callback.h>
+#include "ns3/address.h"
+#include "ns3/callback.h"
+#include "ns3/mac48-address.h"
+#include "ns3/node.h"
+#include "ns3/nstime.h"
+#include "ns3/packet.h"
+#include "ns3/ptr.h"
+#include "ns3/random-variable-stream.h"
+#include "ns3/timer.h"
+#include "ns3/traced-callback.h"
 
 #include <cstring>
 #include <map>
@@ -53,8 +53,8 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief SatFwdLinkScheduler schedules BB frames for forward link. In every GW MAC is assigned own
+ * @ingroup satellite
+ * @brief SatFwdLinkScheduler schedules BB frames for forward link. In every GW MAC is assigned own
  *        instance of the SatFwdLinkScheduler. To handle BB frames and maintain queues for the them,
  *        it utilizes BB frame container given as attribute.
  *
@@ -83,9 +83,9 @@ class SatFwdLinkScheduler : public Object
     /**
      * Compares to scheduling objects priorities
      *
-     * \param obj1 First object to compare
-     * \param obj2 Second object to compare
-     * \return true if first object priority is considered to be higher that second object, false
+     * @param obj1 First object to compare
+     * @param obj2 Second object to compare
+     * @return true if first object priority is considered to be higher that second object, false
      * otherwise
      */
     static bool CompareSoFlowId(Ptr<SatSchedulingObject> obj1, Ptr<SatSchedulingObject> obj2);
@@ -93,9 +93,9 @@ class SatFwdLinkScheduler : public Object
     /**
      * Compares to scheduling objects priorities and load
      *
-     * \param obj1 First object to compare
-     * \param obj2 Second object to compare
-     * \return true if first object priority is considered to be higher that second object or
+     * @param obj1 First object to compare
+     * @param obj2 Second object to compare
+     * @return true if first object priority is considered to be higher that second object or
      *         if priorities are same first object load is considered to be higher, false otherwise
      */
     static bool CompareSoPriorityLoad(Ptr<SatSchedulingObject> obj1, Ptr<SatSchedulingObject> obj2);
@@ -103,24 +103,18 @@ class SatFwdLinkScheduler : public Object
     /**
      * Compares to scheduling objects priorities and HOL
      *
-     * \param obj1 First object to compare
-     * \param obj2 Second object to compare
-     * \return true if first object priority is considered to be higher that second object or
+     * @param obj1 First object to compare
+     * @param obj2 Second object to compare
+     * @return true if first object priority is considered to be higher that second object or
      *         if priorities are same first object HOL is considered to be higher, false otherwise
      */
     static bool CompareSoPriorityHol(Ptr<SatSchedulingObject> obj1, Ptr<SatSchedulingObject> obj2);
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
-
-    /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
-     */
-    virtual TypeId GetInstanceTypeId(void) const;
 
     /**
      * Construct a SatFwdLinkScheduler
@@ -133,13 +127,23 @@ class SatFwdLinkScheduler : public Object
     /**
      * Actual constructor of a SatFwdLinkScheduler
      *
-     * \param conf BB Frame configuration
-     * \param address MAC address
-     * \param carrierBandwidthInHz Carrier bandwidth where scheduler is associated to [Hz].
+     * @param conf BB Frame configuration
+     * @param address MAC address
+     * @param carrierBandwidthInHz Carrier bandwidth where scheduler is associated to [Hz].
      */
     SatFwdLinkScheduler(Ptr<SatBbFrameConf> conf,
                         Mac48Address address,
                         double carrierBandwidthInHz);
+
+    /**
+     * Notifier called once the ObjectBase is fully constructed.
+     *
+     * This method is invoked once all member attributes have been
+     * initialized. Subclasses can override this method to be notified
+     * of this event but if they do this, they must chain up to their
+     * parent's NotifyConstructionCompleted method.
+     */
+    virtual void NotifyConstructionCompleted() override;
 
     /**
      * Destroy a SatFwdLinkScheduler
@@ -151,39 +155,39 @@ class SatFwdLinkScheduler : public Object
     /**
      * Get next frame to be transmitted.
      *
-     * \return Pointer to frame
+     * @return Pointer to frame
      */
     virtual std::pair<Ptr<SatBbFrame>, const Time> GetNextFrame();
 
     /**
      * Callback to get scheduling contexts from upper layer
-     * \param vector of scheduling contexts
+     * @param vector of scheduling contexts
      */
     typedef Callback<void, std::vector<Ptr<SatSchedulingObject>>&> SchedContextCallback;
 
     /**
      * Callback to notify upper layer about Tx opportunity.
-     * \param Mac48Address address
-     * \param uint32_t payload size in bytes
-     * \param uint8_t Flow identifier
-     * \param uint32_t& Bytes left
-     * \param uint32_t& Next min TxO
-     * \return packet Packet to be transmitted to PHY
+     * @param Mac48Address address
+     * @param uint32_t payload size in bytes
+     * @param uint8_t Flow identifier
+     * @param uint32_t& Bytes left
+     * @param uint32_t& Next min TxO
+     * @return packet Packet to be transmitted to PHY
      */
     typedef Callback<Ptr<Packet>, uint32_t, Mac48Address, uint8_t, uint32_t&, uint32_t&>
         TxOpportunityCallback;
 
     /**
      * Callback to notify upper layer about Tx opportunity.
-     * \param Ptr<SatControlMessage> The control message to send.
-     * \param Address& the destination MAC address.
-     * \return True
+     * @param Ptr<SatControlMessage> The control message to send.
+     * @param Address& the destination MAC address.
+     * @return True
      */
     typedef Callback<bool, Ptr<SatControlMessage>, const Address&> SendControlMsgCallback;
 
     /**
      * Method to set Tx opportunity callback.
-     * \param cb callback to invoke whenever a packet has been received and must
+     * @param cb callback to invoke whenever a packet has been received and must
      *        be forwarded to the higher layers.
      *
      */
@@ -191,42 +195,42 @@ class SatFwdLinkScheduler : public Object
 
     /**
      * Method to set Tx opportunity callback.
-     * \param cb callback to invoke whenever a packet has been received and must
+     * @param cb callback to invoke whenever a packet has been received and must
      *        be forwarded to the higher layers.
      */
     void SetTxOpportunityCallback(SatFwdLinkScheduler::TxOpportunityCallback cb);
 
     /**
      * Method to set the control message sender callback.
-     * \param cb callback to invoke whenever a control packet has to be sent.
+     * @param cb callback to invoke whenever a control packet has to be sent.
      */
     void SetSendControlMsgCallback(SatFwdLinkScheduler::SendControlMsgCallback cb);
 
     /**
      * Method te send a control message to a destination
-     * \param message The control message to send
-     * \param dest The destination mac address
+     * @param message The control message to send
+     * @param dest The destination mac address
      */
     bool SendControlMsg(Ptr<SatControlMessage> message, const Address& dest) const;
 
     /**
      * Called when UT's C/N0 estimation is updated.
      *
-     * \param utAddress Address of the UT updated C/N0 info.
-     * \param cnoEstimate Value of the estimated C/N0.
+     * @param utAddress Address of the UT updated C/N0 info.
+     * @param cnoEstimate Value of the estimated C/N0.
      */
     void CnoInfoUpdated(Mac48Address utAddress, double cnoEstimate);
 
     /**
-     * \brief Return the BB frame duration of the default frame format, i.e.
+     * @brief Return the BB frame duration of the default frame format, i.e.
      * default MODCOD and NORMAL frame type. This is used by the GW MAC to
      * schedule next txop events if it is disabled.
-     * \return Default frame duration in Time
+     * @return Default frame duration in Time
      */
     Time GetDefaultFrameDuration() const;
 
     /**
-     * \brief Set the value of m_dummyFrameSendingEnabled.
+     * @brief Set the value of m_dummyFrameSendingEnabled.
      */
     void SetDummyFrameSendingEnabled(bool dummyFrameSendingEnabled);
 
@@ -249,28 +253,28 @@ class SatFwdLinkScheduler : public Object
     /**
      * Schedule BB Frames.
      */
-    void ScheduleBbFrames();
+    virtual void ScheduleBbFrames() = 0;
 
     /**
      * Check if given estimated C/N0 match with given frame.
      *
-     * \param cno Estimated C/N0 value.
-     * \param frame Frame to match
-     * \return True if C/N0 match with frame false otherwise.
+     * @param cno Estimated C/N0 value.
+     * @param frame Frame to match
+     * @return True if C/N0 match with frame false otherwise.
      */
     bool CnoMatchWithFrame(double cno, Ptr<SatBbFrame> frame) const;
 
     /**
      *
-     * \param Scheduling object
-     * \return C/N0 estimated for object. NAN, if estimate is not available.
+     * @param Scheduling object
+     * @return C/N0 estimated for object. NAN, if estimate is not available.
      */
     double GetSchedulingObjectCno(Ptr<SatSchedulingObject> ob);
 
     /**
      * Send stats and reset all the symbols sent count for each slice to zero.
      */
-    virtual void SendAndClearSymbolsSentStat();
+    virtual void SendAndClearSymbolsSentStat() = 0;
 
     /**
      *  Handles periodic timer timeouts.
@@ -280,7 +284,7 @@ class SatFwdLinkScheduler : public Object
     /**
      * Gets scheduling object in sorted order according to configured sorting criteria.
      *
-     * \param output reference to a vector which will be filled with pointers to
+     * @param output reference to a vector which will be filled with pointers to
      *               the scheduling objects available for scheduling.
      */
     void GetSchedulingObjects(std::vector<Ptr<SatSchedulingObject>>& output);
@@ -288,13 +292,13 @@ class SatFwdLinkScheduler : public Object
     /**
      * Sorts given scheduling objects according to configured sorting criteria.
      *
-     * \param so Scheduling objects to sort.
+     * @param so Scheduling objects to sort.
      */
     void SortSchedulingObjects(std::vector<Ptr<SatSchedulingObject>>& so);
 
     /**
      * Create estimator for the UT according to set attributes.
-     * \return pointer to created estimator
+     * @return pointer to created estimator
      */
     Ptr<SatCnoEstimator> CreateCnoEstimator();
 

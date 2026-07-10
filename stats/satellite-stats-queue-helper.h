@@ -24,9 +24,9 @@
 
 #include "satellite-stats-helper.h"
 
-#include <ns3/collector-map.h>
-#include <ns3/nstime.h>
-#include <ns3/ptr.h>
+#include "ns3/collector-map.h"
+#include "ns3/nstime.h"
+#include "ns3/ptr.h"
 
 #include <list>
 #include <string>
@@ -42,15 +42,15 @@ class Mac48Address;
 class DataCollectionObject;
 
 /**
- * \ingroup satstats
- * \brief Helper for queue statistics. Base class.
+ * @ingroup satstats
+ * @brief Helper for queue statistics. Base class.
  */
 class SatStatsQueueHelper : public SatStatsHelper
 {
   public:
     /**
-     * \enum UnitType_t
-     * \brief
+     * @enum UnitType_t
+     * @brief
      */
     typedef enum
     {
@@ -59,8 +59,8 @@ class SatStatsQueueHelper : public SatStatsHelper
     } UnitType_t;
 
     /**
-     * \param unitType
-     * \return
+     * @param unitType
+     * @return
      */
     static std::string GetUnitTypeName(UnitType_t unitType);
 
@@ -78,32 +78,32 @@ class SatStatsQueueHelper : public SatStatsHelper
     static TypeId GetTypeId();
 
     /**
-     * \param pollInterval
+     * @param pollInterval
      */
     void SetPollInterval(Time pollInterval);
 
     /**
-     * \return
+     * @return
      */
     Time GetPollInterval() const;
 
     /**
-     * \param unitType
+     * @param unitType
      */
     void SetUnitType(UnitType_t unitType);
 
     /**
-     * \return
+     * @return
      */
     UnitType_t GetUnitType() const;
 
     /**
-     * \brief Identify the list of source of queue events.
+     * @brief Identify the list of source of queue events.
      */
     void EnlistSource();
 
     /**
-     * \brief Retrieve the queue size of every relevant encapsulator and push the
+     * @brief Retrieve the queue size of every relevant encapsulator and push the
      *        values to the right collectors.
      */
     void Poll();
@@ -113,19 +113,19 @@ class SatStatsQueueHelper : public SatStatsHelper
     void DoInstall();
 
     /**
-     * \brief
+     * @brief
      */
     virtual void DoEnlistSource() = 0;
 
     /**
-     * \brief Retrieve the queue size of every relevant encapsulator and push the
+     * @brief Retrieve the queue size of every relevant encapsulator and push the
      *        values to the right collectors.
      */
     virtual void DoPoll() = 0;
 
     /**
-     * \param identifier
-     * \param value
+     * @param identifier
+     * @param value
      */
     void PushToCollector(uint32_t identifier, uint32_t value);
 
@@ -148,8 +148,8 @@ class SatStatsQueueHelper : public SatStatsHelper
 class SatLlc;
 
 /**
- * \ingroup satstats
- * \brief Helper for forward link queue statistics. Base class for forward link.
+ * @ingroup satstats
+ * @brief Helper for forward link queue statistics. Base class for forward link.
  */
 class SatStatsFwdQueueHelper : public SatStatsQueueHelper
 {
@@ -182,8 +182,8 @@ class SatStatsFwdQueueHelper : public SatStatsQueueHelper
 }; // end of class SatStatsFwdQueueHelper
 
 /**
- * \ingroup satstats
- * \brief Helper for forward link queue statistics using byte as unit.
+ * @ingroup satstats
+ * @brief Helper for forward link queue statistics using byte as unit.
  */
 class SatStatsFwdQueueBytesHelper : public SatStatsFwdQueueHelper
 {
@@ -204,8 +204,8 @@ class SatStatsFwdQueueBytesHelper : public SatStatsFwdQueueHelper
 }; // end of class SatStatsFwdQueueBytesHelper
 
 /**
- * \ingroup satstats
- * \brief Helper for forward link queue statistics using packet as unit.
+ * @ingroup satstats
+ * @brief Helper for forward link queue statistics using packet as unit.
  */
 class SatStatsFwdQueuePacketsHelper : public SatStatsFwdQueueHelper
 {
@@ -228,8 +228,8 @@ class SatStatsFwdQueuePacketsHelper : public SatStatsFwdQueueHelper
 // RETURN LINK ////////////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Helper for return link queue statistics. Base class for return link.
+ * @ingroup satstats
+ * @brief Helper for return link queue statistics. Base class for return link.
  */
 class SatStatsRtnQueueHelper : public SatStatsQueueHelper
 {
@@ -259,8 +259,8 @@ class SatStatsRtnQueueHelper : public SatStatsQueueHelper
 }; // end of class SatStatsRtnQueueHelper
 
 /**
- * \ingroup satstats
- * \brief Helper for return link queue statistics using byte as unit.
+ * @ingroup satstats
+ * @brief Helper for return link queue statistics using byte as unit.
  */
 class SatStatsRtnQueueBytesHelper : public SatStatsRtnQueueHelper
 {
@@ -281,8 +281,8 @@ class SatStatsRtnQueueBytesHelper : public SatStatsRtnQueueHelper
 }; // end of class SatStatsRtnQueueBytesHelper
 
 /**
- * \ingroup satstats
- * \brief Helper for return link queue statistics using packet as unit.
+ * @ingroup satstats
+ * @brief Helper for return link queue statistics using packet as unit.
  */
 class SatStatsRtnQueuePacketsHelper : public SatStatsRtnQueueHelper
 {

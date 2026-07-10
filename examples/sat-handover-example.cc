@@ -32,10 +32,10 @@
 using namespace ns3;
 
 /**
- * \file sat-handover-example.cc
- * \ingroup satellite
+ * @file sat-handover-example.cc
+ * @ingroup satellite
  *
- * \brief  Test handover for UTs
+ * @brief  Test handover for UTs
  *
  */
 
@@ -75,7 +75,7 @@ main(int argc, char* argv[])
 
     simulationHelper->LoadScenario("constellation-eutelsat-geo-2-sats-handovers");
 
-    std::string mobileUtFolder = Singleton<SatEnvVariables>::Get()->LocateDataDirectory() +
+    std::string mobileUtFolder = SatEnvVariables::GetInstance()->LocateDataDirectory() +
                                  "/additional-input/utpositions/mobiles/scenario6";
     simulationHelper->CreateSatScenario(SatHelper::NONE, mobileUtFolder);
 

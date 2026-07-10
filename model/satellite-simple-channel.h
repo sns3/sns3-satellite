@@ -20,8 +20,8 @@
 #ifndef SATELLITE_SIMPLE_CHANNEL_H
 #define SATELLITE_SIMPLE_CHANNEL_H
 
-#include <ns3/channel.h>
-#include <ns3/mac48-address.h>
+#include "ns3/channel.h"
+#include "ns3/mac48-address.h"
 
 #include <cstddef>
 #include <stdint.h>
@@ -34,8 +34,8 @@ class SatSimpleNetDevice;
 class Packet;
 
 /**
- * \ingroup satellite
- * \brief The satellite simple channel, for satellite public and backbone networks.
+ * @ingroup satellite
+ * @brief The satellite simple channel, for satellite public and backbone networks.
  *        Based on ns-3 SimpleChannel (implementation is identically same than in SimpleChannel,
  *        but needed to re-implemented in order to use by SatSimpleNetDevice)
  */
@@ -43,8 +43,8 @@ class SatSimpleChannel : public Channel
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
 
@@ -58,11 +58,11 @@ class SatSimpleChannel : public Channel
      * scheduled for all net device connected to the channel other
      * than the net device who sent the packet
      *
-     * \param p packet to be sent
-     * \param protocol protocol number
-     * \param to address to send packet to
-     * \param from address the packet is coming from
-     * \param sender net device who sent the packet
+     * @param p packet to be sent
+     * @param protocol protocol number
+     * @param to address to send packet to
+     * @param from address the packet is coming from
+     * @param sender net device who sent the packet
      *
      */
     virtual void Send(Ptr<Packet> p,
@@ -74,7 +74,7 @@ class SatSimpleChannel : public Channel
     /**
      * Attached a net device to the channel.
      *
-     * \param device the device to attach to the channel
+     * @param device the device to attach to the channel
      */
     virtual void Add(Ptr<SatSimpleNetDevice> device);
 

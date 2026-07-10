@@ -19,9 +19,9 @@
  */
 
 /**
- * \file satellite-cno-estimator.cc
- * \ingroup satellite
- * \brief Test cases to unit test Satellite C/N0 estimator.
+ * @file satellite-cno-estimator.cc
+ * @ingroup satellite
+ * @brief Test cases to unit test Satellite C/N0 estimator.
  */
 
 // Include a header file from your module to test.
@@ -92,8 +92,8 @@ SatEstimatorBaseTestCase::CreateEstimator(SatCnoEstimator::EstimationMode_t mode
 }
 
 /**
- * \ingroup satellite
- * \brief Test case to unit test satellite C/N0 estimator with mode LAST.
+ * @ingroup satellite
+ * @brief Test case to unit test satellite C/N0 estimator with mode LAST.
  *
  * This case tests that SatBasicCnoEstimator can be created in mode LAST and
  * C/N0 is estimated correctly in set window.
@@ -129,10 +129,8 @@ void
 SatBasicEstimatorLastTestCase::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-cno-estimator-unit",
-                                                          "last",
-                                                          true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-cno-estimator-unit", "last", true);
 
     // create estimator with window 100 ms
     Simulator::Schedule(Seconds(0.05),
@@ -216,12 +214,12 @@ SatBasicEstimatorLastTestCase::DoRun(void)
 
     Simulator::Destroy();
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 }
 
 /**
- * \ingroup satellite
- * \brief Test case to unit test satellite C/N0 estimator with mode MINIMUM.
+ * @ingroup satellite
+ * @brief Test case to unit test satellite C/N0 estimator with mode MINIMUM.
  *
  * This case tests that SatBasicCnoEstimator can be created in mode MINIMUM and
  * C/N0 is estimated correctly in set window.
@@ -256,10 +254,8 @@ void
 SatBasicEstimatorMinTestCase::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-cno-estimator-unit",
-                                                          "min",
-                                                          true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-cno-estimator-unit", "min", true);
 
     // create estimator with window 200 ms
     Simulator::Schedule(Seconds(0.05),
@@ -308,12 +304,12 @@ SatBasicEstimatorMinTestCase::DoRun(void)
 
     Simulator::Destroy();
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 }
 
 /**
- * \ingroup satellite
- * \brief Test case to unit test satellite C/N0 estimator with mode AVERAGE.
+ * @ingroup satellite
+ * @brief Test case to unit test satellite C/N0 estimator with mode AVERAGE.
  *
  * This case tests that SatBasicCnoEstimator can be created in mode AVERAGE and
  * C/N0 is estimated correctly in set window.
@@ -348,10 +344,10 @@ void
 SatBasicEstimatorAverageTestCase::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-cno-estimator-unit",
-                                                          "average",
-                                                          true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-cno-estimator-unit",
+                                                       "average",
+                                                       true);
 
     // create estimator with window 200 ms
     Simulator::Schedule(Seconds(0.05),
@@ -406,12 +402,12 @@ SatBasicEstimatorAverageTestCase::DoRun(void)
 
     Simulator::Destroy();
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 }
 
 /**
- * \ingroup satellite
- * \brief Test suite for Satellite C/N0 estimator unit test cases.
+ * @ingroup satellite
+ * @brief Test suite for Satellite C/N0 estimator unit test cases.
  */
 class SatBasicCnoEstimatorTestSuite : public TestSuite
 {

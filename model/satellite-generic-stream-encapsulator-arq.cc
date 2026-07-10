@@ -27,9 +27,9 @@
 #include "satellite-mac-tag.h"
 #include "satellite-queue.h"
 
-#include <ns3/log.h>
-#include <ns3/mac48-address.h>
-#include <ns3/simulator.h>
+#include "ns3/log.h"
+#include "ns3/mac48-address.h"
+#include "ns3/simulator.h"
 
 #include <algorithm>
 #include <limits>
@@ -86,9 +86,16 @@ SatGenericStreamEncapsulatorArq::SatGenericStreamEncapsulatorArq(Mac48Address en
       m_arqHeaderSize(1),
       m_nextExpectedSeqNo(0)
 {
+    NS_LOG_FUNCTION(this << encapAddress << decapAddress << sourceE2EAddress << destE2EAddress
+                         << flowId << additionalHeaderSize);
+}
+
+void
+SatGenericStreamEncapsulatorArq::NotifyConstructionCompleted()
+{
     NS_LOG_FUNCTION(this);
 
-    ObjectBase::ConstructSelf(AttributeConstructionList());
+    SatGenericStreamEncapsulator::NotifyConstructionCompleted();
 
     // ARQ sequence number generator
     m_seqNo = Create<SatArqSequenceNumber>(m_arqWindowSize);
@@ -137,12 +144,6 @@ SatGenericStreamEncapsulatorArq::GetTypeId(void)
                           MakeTimeAccessor(&SatGenericStreamEncapsulatorArq::m_rxWaitingTimer),
                           MakeTimeChecker());
     return tid;
-}
-
-TypeId
-SatGenericStreamEncapsulatorArq::GetInstanceTypeId() const
-{
-    return GetTypeId();
 }
 
 void
@@ -673,7 +674,7 @@ SatGenericStreamEncapsulatorArq::SendAck(uint8_t seqNo) const
      */
     if (!m_ctrlCallback.IsNull())
     {
-        Ptr<SatArqAckMessage> ack = Create<SatArqAckMessage>();
+        Ptr<SatArqAckMessage> ack = CreateObject<SatArqAckMessage>();
         ack->SetSequenceNumber(seqNo);
         ack->SetFlowId(m_flowId);
 

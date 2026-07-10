@@ -20,7 +20,7 @@
 
 #include "satellite-constant-position-mobility-model.h"
 
-#include <ns3/log.h>
+#include "ns3/log.h"
 
 #include <stdint.h>
 

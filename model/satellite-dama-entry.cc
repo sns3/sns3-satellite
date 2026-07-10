@@ -23,7 +23,7 @@
 #include "satellite-const-variables.h"
 #include "satellite-utils.h"
 
-#include <ns3/log.h>
+#include "ns3/log.h"
 
 #include <algorithm>
 #include <vector>

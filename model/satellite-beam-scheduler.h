@@ -30,12 +30,12 @@
 #include "satellite-net-device.h"
 #include "satellite-orbiter-net-device.h"
 
-#include <ns3/callback.h>
-#include <ns3/nstime.h>
-#include <ns3/object.h>
-#include <ns3/ptr.h>
-#include <ns3/simple-ref-count.h>
-#include <ns3/traced-callback.h>
+#include "ns3/callback.h"
+#include "ns3/nstime.h"
+#include "ns3/object.h"
+#include "ns3/ptr.h"
+#include "ns3/simple-ref-count.h"
+#include "ns3/traced-callback.h"
 
 #include <cmath>
 #include <list>
@@ -60,8 +60,8 @@ class SatLowerLayerServiceConf;
 class SatDamaEntry;
 
 /**
- * \ingroup satellite
- * \brief class for module Beam Scheduler.
+ * @ingroup satellite
+ * @brief class for module Beam Scheduler.
  *
  * This SatBeamScheduler class implements scheduler used to for one specific beam.
  * It's is created and used by NCC.
@@ -81,8 +81,8 @@ class SatBeamScheduler : public Object
 {
   public:
     /**
-     * \enum HandoverInformationForward_t
-     * \brief Strategies to exchange informations between beams
+     * @enum HandoverInformationForward_t
+     * @brief Strategies to exchange informations between beams
      */
     typedef enum
     {
@@ -91,8 +91,8 @@ class SatBeamScheduler : public Object
     } HandoverInformationForward_t;
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
 
@@ -112,34 +112,34 @@ class SatBeamScheduler : public Object
     ~SatBeamScheduler();
 
     /**
-     * \param msg        the message send
-     * \param address    Packet destination address
-     * \return Result of sending, true success or false failure
+     * @param msg        the message send
+     * @param address    Packet destination address
+     * @return Result of sending, true success or false failure
      */
     typedef Callback<bool, Ptr<SatControlMessage>, const Address&> SendCtrlMsgCallback;
 
     /**
-     * \param msg        the TBTP sent
+     * @param msg        the TBTP sent
      */
     typedef Callback<void, Ptr<SatTbtpMessage>> SendTbtpCallback;
 
     /**
-     * \param id    Id of the TBTP message to add.
-     * \param tbtp  Pointer to the TBTP message to add.
+     * @param id    Id of the TBTP message to add.
+     * @param tbtp  Pointer to the TBTP message to add.
      */
     typedef Callback<void, uint32_t, Ptr<SatTbtpMessage>> TbtpAddCallback;
 
     /**
-     * \param beamId ID of the beam which for callback is set
-     * \param satId ID of the satellite using the beam which for callback is set
-     * \param gwNetDevice GW NetDevice linked to this beam
-     * \param orbiterNetDevice OrbiterNetDevice on satellite linked to this beam
-     * \param cb callback to invoke whenever a TBTP is ready for sending and must
+     * @param beamId ID of the beam which for callback is set
+     * @param satId ID of the satellite using the beam which for callback is set
+     * @param gwNetDevice GW NetDevice linked to this beam
+     * @param orbiterNetDevice OrbiterNetDevice on satellite linked to this beam
+     * @param cb callback to invoke whenever a TBTP is ready for sending and must
      *        be forwarded to the Beam UTs.
-     * \param seq Superframe sequence.
-     * \param maxFrameSizeInBytes Maximum non fragmented BB frame size with most robust ModCod
-     * \param satAddress Mac address of the satellite responsible for this beam
-     * \param gwAddress Mac address of the gateway responsible for this beam
+     * @param seq Superframe sequence.
+     * @param maxFrameSizeInBytes Maximum non fragmented BB frame size with most robust ModCod
+     * @param satAddress Mac address of the satellite responsible for this beam
+     * @param gwAddress Mac address of the gateway responsible for this beam
      */
     void Initialize(uint32_t satId,
                     uint32_t beamId,
@@ -154,74 +154,74 @@ class SatBeamScheduler : public Object
     /**
      * Add UT to scheduler.
      *
-     * \param utId ID (mac address) of the UT to be added
-     * \param llsConf Lower layer service configuration for the UT.
-     * \return Index of the RA channel allocated to added UT
+     * @param utId ID (mac address) of the UT to be added
+     * @param llsConf Lower layer service configuration for the UT.
+     * @return Index of the RA channel allocated to added UT
      */
     uint32_t AddUt(Address utId, Ptr<SatLowerLayerServiceConf> llsConf);
 
     /**
      * Check whether an UT is handled by this scheduler
      *
-     * \param utId ID (mac address) of the UT to be searched for
-     * \return Whether or not this UT is in this beam
+     * @param utId ID (mac address) of the UT to be searched for
+     * @return Whether or not this UT is in this beam
      */
     bool HasUt(Address utId);
 
     /**
      * Check whether an UT is handled by this scheduler
      *
-     * \return Whether or not at least one UT is handled by this beam
+     * @return Whether or not at least one UT is handled by this beam
      */
     bool HasUt();
 
     /**
      * Update UT C/N0 info with the latest value.
      *
-     * \param utId Id of the UT (address).
-     * \param cno C/N0 value
+     * @param utId Id of the UT (address).
+     * @param cno C/N0 value
      */
     void UpdateUtCno(Address utId, double cno);
 
     /**
      * Update satellite C/N0 info with the latest value.
      *
-     * \param satelliteMac MAC of the SAT (address).
-     * \param cno C/N0 value
+     * @param satelliteMac MAC of the SAT (address).
+     * @param cno C/N0 value
      */
     void UpdateSatelliteCno(Address satelliteMac, double cno);
 
     /**
      * Receive capacity requests from UTs.
      *
-     * \param utId Id of the UT (address).
-     * \param crMsg Pointer to the CR message
+     * @param utId Id of the UT (address).
+     * @param crMsg Pointer to the CR message
      */
     void UtCrReceived(Address utId, Ptr<SatCrMessage> crMsg);
 
     /**
      * Send control messages to the beam.
      *
-     * \param message Pointer or control message to send.
-     * \return true if sending is success, false otherwise.
+     * @param message Pointer or control message to send.
+     * @return true if sending is success, false otherwise.
      */
     bool Send(Ptr<SatControlMessage> message);
 
     /**
      * Send control message to an UT into the beam.
      *
-     * \param message Pointer of control message to send.
-     * \param utId Address of the UT to send the message to.
-     * \return true if sending is success, false otherwise.
+     * @param message Pointer of control message to send.
+     * @param utId Address of the UT to send the message to.
+     * @return true if sending is success, false otherwise.
      */
     bool SendTo(Ptr<SatControlMessage> message, Address utId);
 
     /**
      * Send control message to the satellite.
      *
-     * \param message Pointer of control message to send.
-     * \param satelliteMac Address of the feeder SAT to send the message to.
-     * \return true if sending is success, false otherwise.
+     * @param message Pointer of control message to send.
+     * @param satelliteMac Address of the feeder SAT to send the message to.
+     * @return true if sending is success, false otherwise.
      */
     bool SendToSatellite(Ptr<SatControlMessage> msg, Address satelliteMac);
 
@@ -233,7 +233,7 @@ class SatBeamScheduler : public Object
     /**
      * Callback signature for `BacklogRequestsTrace` trace source.
      *
-     * \param trace A string containing the following information:
+     * @param trace A string containing the following information:
      *                 - the current simulation time (in seconds),
      *                 - beam ID,
      *                 - UT ID,
@@ -245,21 +245,21 @@ class SatBeamScheduler : public Object
     /**
      * Callback signature for `WaveformTrace` trace source.
      *
-     * \param waveformId The first waveform scheduled for a UT.
+     * @param waveformId The first waveform scheduled for a UT.
      */
     typedef void (*WaveformTraceCallback)(uint32_t waveformId);
 
     /**
      * Callback signature for the `UsableCapacityTrace` trace source.
      *
-     * \param usableCapacity The amount of capacity allocated, in kbps.
+     * @param usableCapacity The amount of capacity allocated, in kbps.
      */
     typedef void (*UsableCapacityTraceCallback)(uint32_t usableCapacity);
 
     /**
      * Callback signature for the `UnmetCapacityTrace` trace source.
      *
-     * \param unmetCapacity The amount of capacity requested but not used,
+     * @param unmetCapacity The amount of capacity requested but not used,
      *                      in kbps.
      */
     typedef void (*UnmetCapacityTraceCallback)(uint32_t unmetCapacity);
@@ -267,62 +267,62 @@ class SatBeamScheduler : public Object
     /**
      * Callback signature for the `ExceedingCapacityTrace` trace source.
      *
-     * \param exceedingCapacity The amount capacity offered exceeds capacity
+     * @param exceedingCapacity The amount capacity offered exceeds capacity
      *                          requested, in kbps.
      */
     typedef void (*ExceedingCapacityTraceCallback)(uint32_t exceedingCapacity);
 
     /**
-     * \brief Create a TIM unicast message containing enough data for a
+     * @brief Create a TIM unicast message containing enough data for a
      * terminal to connect to the beam handled by this SatBeamScheduler
      */
     Ptr<SatTimuMessage> CreateTimu() const;
 
     /**
-     * \brief Transfer ownership of a terminal to the given SatBeamScheduler
-     * \param utId the terminal that is leaving this beam
-     * \param destination the beam that should accept the terminal
+     * @brief Transfer ownership of a terminal to the given SatBeamScheduler
+     * @param utId the terminal that is leaving this beam
+     * @param destination the beam that should accept the terminal
      */
     void TransferUtToBeam(Address utId, Ptr<SatBeamScheduler> destination);
 
     /**
      * Connect a new UT address to this scheduler
      *
-     * \param address The UT address to connect
+     * @param address The UT address to connect
      */
     void ConnectUt(Mac48Address address);
 
     /**
      * Disconnect a new UT address from this scheduler
      *
-     * \param address The UT address to disconnect
+     * @param address The UT address to disconnect
      */
     void DisconnectUt(Mac48Address address);
 
     /**
      * Connect a new GW address to this scheduler
      *
-     * \param address The GW address to connect
+     * @param address The GW address to connect
      */
     void ConnectGw(Mac48Address address);
 
     /**
      * Disconnect a new GW address from this scheduler
      *
-     * \param address The GW address to disconnect
+     * @param address The GW address to disconnect
      */
     void DisconnectGw(Mac48Address address);
 
     /**
-     * \brief Remove a UT from its SatBeamScheduler
-     * \param utId the terminal that is leaving this beam
+     * @brief Remove a UT from its SatBeamScheduler
+     * @param utId the terminal that is leaving this beam
      */
     void RemoveUt(Address utId);
 
     void ReserveLogonChannel(uint32_t logonChannelId);
 
     /**
-     * \brief Return the address of the satellite responsible of this beam
+     * @brief Return the address of the satellite responsible of this beam
      */
     inline Address GetSatAddress(void) const
     {
@@ -330,7 +330,7 @@ class SatBeamScheduler : public Object
     }
 
     /**
-     * \brief Return the address of the gateway responsible of this beam
+     * @brief Return the address of the gateway responsible of this beam
      */
     inline Address GetGwAddress(void) const
     {
@@ -339,13 +339,13 @@ class SatBeamScheduler : public Object
 
     /**
      * Set if SNS-3 is used with Lora standard. TBTPs are not sent in this mode.
-     * \param useLora boolean indicating if lora is used.
+     * @param useLora boolean indicating if lora is used.
      */
     void SetUseLora(bool useLora);
 
   private:
     /**
-     * \brief UT information helper class for SatBeamScheduler.
+     * @brief UT information helper class for SatBeamScheduler.
      *
      * Stores capacity request and C/N0 estimation information of the UT.
      */
@@ -355,10 +355,10 @@ class SatBeamScheduler : public Object
         /**
          * Construct SatUtInfo.
          *
-         * \param damaEntry DamaEntry for created UT info.
-         * \param cnoEstimator C/N0 estimator for the UT info.
-         * \param controlSlotOffset Offset of the current moment to generate control slot.
-         * \param controlSlotsEnabled Flag to tell if control slots generation is enabled according
+         * @param damaEntry DamaEntry for created UT info.
+         * @param cnoEstimator C/N0 estimator for the UT info.
+         * @param controlSlotOffset Offset of the current moment to generate control slot.
+         * @param controlSlotsEnabled Flag to tell if control slots generation is enabled according
          * to controlSlotOffset
          */
         SatUtInfo(Ptr<SatDamaEntry> damaEntry,
@@ -369,7 +369,7 @@ class SatBeamScheduler : public Object
         /**
          * Get damaEntry of the UT info.
          *
-         * \return Pointer to DamEntry of the UT info.
+         * @return Pointer to DamEntry of the UT info.
          */
         Ptr<SatDamaEntry> GetDamaEntry();
 
@@ -381,14 +381,14 @@ class SatBeamScheduler : public Object
         /**
          * Add C/N0 sample to UT info's estimator.
          *
-         * \param sample C/N0 sample value to add.
+         * @param sample C/N0 sample value to add.
          */
         void AddCnoSample(double sample);
 
         /**
          * Get estimated C/N0 value based on added samples.
          *
-         * \return C/N0 estimation.
+         * @return C/N0 estimation.
          */
         double GetCnoEstimation();
 
@@ -396,7 +396,7 @@ class SatBeamScheduler : public Object
          * Add CR message to UT info to be used when capacity request is calculated
          * next time (method UpdateDamaEntryFromCrs is called).
          *
-         * \param crMsg
+         * @param crMsg
          */
         void AddCrMsg(Ptr<SatCrMessage> crMsg);
 
@@ -409,14 +409,14 @@ class SatBeamScheduler : public Object
         /**
          * Check if time is expired to send control slot.
          *
-         * \return Status of control slot generation time.
+         * @return Status of control slot generation time.
          */
         bool IsControlSlotGenerationTime() const;
 
         /**
          * Set time for next time slot generation for this UT.
          *
-         * \param offset Offset of the current moment to generate control slot.
+         * @param offset Offset of the current moment to generate control slot.
          */
         void SetControlSlotGenerationTime(Time offset);
 
@@ -468,7 +468,7 @@ class SatBeamScheduler : public Object
     typedef std::list<UtReqInfoItem_t> UtReqInfoContainer_t;
 
     /**
-     * \brief CnoCompare class to sort UT request according to C/N0 information
+     * @brief CnoCompare class to sort UT request according to C/N0 information
      */
     class CnoCompare
     {
@@ -476,7 +476,7 @@ class SatBeamScheduler : public Object
         /**
          * Construct CnoCompare object
          *
-         * \param utInfoMap Reference to map container for the UT information
+         * @param utInfoMap Reference to map container for the UT information
          */
         CnoCompare(const UtInfoMap_t& utInfoMap)
             : m_utInfoMap(utInfoMap)
@@ -486,9 +486,9 @@ class SatBeamScheduler : public Object
         /**
          * Compare operator to compare request information of the two UTs.
          *
-         * \param utReqInfo1 Request information for UT 1
-         * \param utReqInfo2 Request information for UT 2
-         * \return true if first UT's C/N0 is more robust than second UT's
+         * @param utReqInfo1 Request information for UT 1
+         * @param utReqInfo2 Request information for UT 2
+         * @return true if first UT's C/N0 is more robust than second UT's
          */
         bool operator()(UtReqInfoItem_t utReqInfo1, UtReqInfoItem_t utReqInfo2)
         {
@@ -676,7 +676,7 @@ class SatBeamScheduler : public Object
     /**
      * Update dama entries with given allocations at end of the scheduling.
      *
-     * \param utAllocContainer Reference to container including granted allocations per UT.
+     * @param utAllocContainer Reference to container including granted allocations per UT.
      */
     uint32_t UpdateDamaEntriesWithAllocs(
         SatFrameAllocator::UtAllocInfoContainer_t& utAllocContainer);
@@ -688,7 +688,7 @@ class SatBeamScheduler : public Object
 
     /**
      * Add RA channel information to TBTP(s).
-     * \param tbtpContainer Reference to container including TBTPs already and to be added.
+     * @param tbtpContainer Reference to container including TBTPs already and to be added.
      */
     void AddRaChannels(std::vector<Ptr<SatTbtpMessage>>& tbtpContainer);
 
@@ -697,7 +697,7 @@ class SatBeamScheduler : public Object
 
     /**
      * Create estimator for the UT according to set attributes.
-     * \return pointer to created estimator
+     * @return pointer to created estimator
      */
     Ptr<SatCnoEstimator> CreateCnoEstimator();
 

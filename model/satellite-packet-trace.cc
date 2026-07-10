@@ -22,13 +22,13 @@
 
 #include "../utils/satellite-env-variables.h"
 
-#include <ns3/log.h>
-#include <ns3/mac48-address.h>
-#include <ns3/object.h>
-#include <ns3/output-stream-wrapper.h>
-#include <ns3/singleton.h>
-#include <ns3/string.h>
-#include <ns3/trace-helper.h>
+#include "ns3/log.h"
+#include "ns3/mac48-address.h"
+#include "ns3/object.h"
+#include "ns3/output-stream-wrapper.h"
+#include "ns3/singleton.h"
+#include "ns3/string.h"
+#include "ns3/trace-helper.h"
 
 #include <iostream>
 #include <sstream>
@@ -43,12 +43,20 @@ NS_OBJECT_ENSURE_REGISTERED(SatPacketTrace);
 
 SatPacketTrace::SatPacketTrace()
 {
-    ObjectBase::ConstructSelf(AttributeConstructionList());
+    NS_LOG_FUNCTION(this);
+}
+
+void
+SatPacketTrace::NotifyConstructionCompleted()
+{
+    NS_LOG_FUNCTION(this);
+
+    Object::NotifyConstructionCompleted();
 
     AsciiTraceHelper asciiTraceHelper;
 
     std::stringstream outputPath;
-    outputPath << Singleton<SatEnvVariables>::Get()->GetOutputPath() << "/" << m_fileName << ".log";
+    outputPath << SatEnvVariables::GetInstance()->GetOutputPath() << "/" << m_fileName << ".log";
 
     m_packetTraceStream = asciiTraceHelper.CreateFileStream(outputPath.str());
 
@@ -58,13 +66,6 @@ SatPacketTrace::SatPacketTrace()
 SatPacketTrace::~SatPacketTrace()
 {
     NS_LOG_FUNCTION(this);
-}
-
-TypeId
-SatPacketTrace::GetInstanceTypeId() const
-{
-    NS_LOG_FUNCTION(this);
-    return GetTypeId();
 }
 
 TypeId

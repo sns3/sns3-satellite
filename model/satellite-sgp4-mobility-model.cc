@@ -26,10 +26,10 @@
 
 #include "vector-extensions.h"
 
-#include <ns3/boolean.h>
-#include <ns3/log.h>
-#include <ns3/simulator.h>
-#include <ns3/string.h>
+#include "ns3/boolean.h"
+#include "ns3/log.h"
+#include "ns3/simulator.h"
+#include "ns3/string.h"
 
 #include <string>
 #include <utility>
@@ -65,19 +65,20 @@ SatSGP4MobilityModel::GetTypeId(void)
     return tid;
 }
 
-TypeId
-SatSGP4MobilityModel::GetInstanceTypeId(void) const
-{
-    return GetTypeId();
-}
-
 SatSGP4MobilityModel::SatSGP4MobilityModel()
     : m_startStr("1992-01-01 00:00:00"),
       m_timeLastUpdate(Time::Min())
 {
     NS_LOG_FUNCTION(this);
+}
 
-    ObjectBase::ConstructSelf(AttributeConstructionList());
+void
+SatSGP4MobilityModel::NotifyConstructionCompleted()
+{
+    NS_LOG_FUNCTION(this);
+
+    SatMobilityModel::NotifyConstructionCompleted();
+
     SetStartTime(JulianDate(m_startStr));
 }
 
@@ -121,12 +122,16 @@ SatSGP4MobilityModel::DoGetVelocity() const
     double delta = (cur - GetTleEpoch()).GetMinutes();
 
     if (!IsInitialized())
+    {
         return Vector3D();
+    }
 
     sgp4(WGeoSys, m_sgp4_record, delta, r, v);
 
     if (m_sgp4_record.error != 0)
+    {
         return Vector3D();
+    }
 
     // velocity vector is in km/s so it needs to be converted to m/s
     return 1000 * rvTemeTovItrf(Vector3D(r[0], r[1], r[2]), Vector3D(v[0], v[1], v[2]), cur);
@@ -166,12 +171,16 @@ SatSGP4MobilityModel::DoGetGeoPosition() const
     double delta = (cur - GetTleEpoch()).GetMinutes();
 
     if (!IsInitialized())
+    {
         return Vector3D();
+    }
 
     sgp4(WGeoSys, m_sgp4_record, delta, r, v);
 
     if (m_sgp4_record.error != 0)
+    {
         return Vector3D();
+    }
 
     // vector r is in km so it needs to be converted to meters
     m_lastPosition = rTemeTorItrf(Vector3D(r[0], r[1], r[2]), cur) * 1000;
@@ -202,7 +211,9 @@ SatSGP4MobilityModel::GetTleEpoch(void) const
     NS_LOG_FUNCTION(this);
 
     if (IsInitialized())
+    {
         return JulianDate(m_sgp4_record.jdsatepoch);
+    }
 
     return JulianDate();
 }

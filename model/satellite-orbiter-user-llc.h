@@ -27,8 +27,8 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief SatOrbiterUserLlc holds the orbiter user implementation of LLC layer. SatOrbiterUserLlc is
+ * @ingroup satellite
+ * @brief SatOrbiterUserLlc holds the orbiter user implementation of LLC layer. SatOrbiterUserLlc is
  * inherited from SatOrbiterLlc base class and implements the needed changes from the base class
  * related to SAT user LLC packet transmissions and receptions.
  */
@@ -59,14 +59,14 @@ class SatOrbiterUserLlc : public SatOrbiterLlc
     virtual void DoDispose();
 
     /**
-     * \brief Virtual method to create a new encapsulator 'on-a-need-basis' dynamically.
-     * \param key Encapsulator key class
+     * @brief Virtual method to create a new encapsulator 'on-a-need-basis' dynamically.
+     * @param key Encapsulator key class
      */
     virtual void CreateEncap(Ptr<EncapKey> key);
 
     /**
-     * \brief Virtual method to create a new decapsulator 'on-a-need-basis' dynamically.
-     * \param key Encapsulator key class
+     * @brief Virtual method to create a new decapsulator 'on-a-need-basis' dynamically.
+     * @param key Encapsulator key class
      */
     virtual void CreateDecap(Ptr<EncapKey> key);
 };

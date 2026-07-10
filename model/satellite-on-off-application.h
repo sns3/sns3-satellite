@@ -20,7 +20,7 @@
 #ifndef SAT_ONOFF_APPLICATION_H
 #define SAT_ONOFF_APPLICATION_H
 
-#include <ns3/onoff-application.h>
+#include "ns3/onoff-application.h"
 
 namespace ns3
 {
@@ -28,9 +28,9 @@ namespace ns3
 class Socket;
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief This class implements Satellite specific OnOff application.
+ * @brief This class implements Satellite specific OnOff application.
  *        It subclasses ns-3 'native' OnOffApplication to provide needed support for statics.
  *        Otherwise functionality of original OnOffApplication is not changed.
  *
@@ -55,21 +55,21 @@ class SatOnOffApplication : public OnOffApplication
     /**
      * Enable or disable statistic tags
      *
-     * \param enableStatus Enable status for statistics
+     * @param enableStatus Enable status for statistics
      */
     void EnableStatisticTags(bool enableStatus);
 
     /**
      * Get enable status of statistic tags.
      *
-     * \return true if statistics are enabled, false if statistics are disabled
+     * @return true if statistics are enabled, false if statistics are disabled
      */
     bool IsStatisticTagsEnabled() const;
 
     /**
      * Trace callback for on-off application Tx.
      *
-     * \param packet Packet send by on-off application.
+     * @param packet Packet send by on-off application.
      */
     void SendPacketTrace(Ptr<const Packet> packet);
 

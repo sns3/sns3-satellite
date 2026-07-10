@@ -179,7 +179,7 @@ LoraLinkCheckComponent::BeforeSendingReply(Ptr<LoraEndDeviceStatus> status,
         // margin
         uint8_t gwCount = status->GetLastReceivedPacketInfo().gwList.size();
 
-        Ptr<LinkCheckAns> replyCommand = Create<LinkCheckAns>();
+        Ptr<LinkCheckAns> replyCommand = CreateObject<LinkCheckAns>();
         replyCommand->SetGwCnt(gwCount);
         status->m_reply.frameHeader.SetAsDownlink();
         status->m_reply.frameHeader.AddCommand(replyCommand);

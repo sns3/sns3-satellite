@@ -30,15 +30,15 @@
 #include "satellite-typedefs.h"
 #include "satellite-utils.h"
 
-#include <ns3/boolean.h>
-#include <ns3/channel.h>
-#include <ns3/error-model.h>
-#include <ns3/ipv4-l3-protocol.h>
-#include <ns3/log.h>
-#include <ns3/node.h>
-#include <ns3/packet.h>
-#include <ns3/pointer.h>
-#include <ns3/trace-source-accessor.h>
+#include "ns3/boolean.h"
+#include "ns3/channel.h"
+#include "ns3/error-model.h"
+#include "ns3/ipv4-l3-protocol.h"
+#include "ns3/log.h"
+#include "ns3/node.h"
+#include "ns3/packet.h"
+#include "ns3/pointer.h"
+#include "ns3/trace-source-accessor.h"
 
 NS_LOG_COMPONENT_DEFINE("SatNetDevice");
 
@@ -169,8 +169,8 @@ SatNetDevice::Receive(Ptr<const Packet> packet)
 
             if (item.GetTypeId() == SatAddressTag::GetTypeId())
             {
-                NS_LOG_DEBUG(this << " contains a SatAddressTag tag:"
-                                  << " start=" << item.GetStart() << " end=" << item.GetEnd());
+                NS_LOG_DEBUG(this << " contains a SatAddressTag tag:" << " start="
+                                  << item.GetStart() << " end=" << item.GetEnd());
                 SatAddressTag addrTag;
                 item.GetTag(addrTag);
                 addr = addrTag.GetSourceAddress();

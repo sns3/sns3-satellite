@@ -24,12 +24,12 @@
 
 #include "satellite-helper.h"
 
-#include <ns3/application-container.h>
-#include <ns3/cbr-application.h>
-#include <ns3/config.h>
-#include <ns3/object.h>
-#include <ns3/satellite-stats-helper-container.h>
-#include <ns3/string.h>
+#include "ns3/application-container.h"
+#include "ns3/cbr-application.h"
+#include "ns3/config.h"
+#include "ns3/object.h"
+#include "ns3/satellite-stats-helper-container.h"
+#include "ns3/string.h"
 
 #include <map>
 #include <stdint.h>
@@ -41,13 +41,13 @@
 namespace ns3
 {
 /**
- * \brief Creates pre-defined trafics.
+ * @brief Creates pre-defined trafics.
  */
 class SatTrafficHelper : public Object
 {
   public:
     /**
-     * \brief List of available traffics
+     * @brief List of available traffics
      */
     typedef enum
     {
@@ -84,24 +84,18 @@ class SatTrafficHelper : public Object
     } VoipCodec_t;
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Get the type ID of object instance
-     * \return the TypeId of object instance
-     */
-    TypeId GetInstanceTypeId(void) const;
-
-    /**
-     * \brief Default constructor. Not used.
+     * @brief Default constructor. Not used.
      */
     SatTrafficHelper();
 
     /**
-     * \brief Create a base SatTrafficHelper for creating customized traffics.
+     * @brief Create a base SatTrafficHelper for creating customized traffics.
      */
     SatTrafficHelper(Ptr<SatHelper> satHelper,
                      Ptr<SatStatsHelperContainer> satStatsHelperContainer);
@@ -115,12 +109,12 @@ class SatTrafficHelper : public Object
 
     /**
      * Add Lora periodic traffic between chosen GWs and UTs
-     * \param interval Wait time between transmission of two packets
-     * \param packetSize Packet size in bytes
-     * \param uts The User Terminals
-     * \param startTime Application Start time
-     * \param stopTime Application stop time
-     * \param startDelay application start delay between each user
+     * @param interval Wait time between transmission of two packets
+     * @param packetSize Packet size in bytes
+     * @param uts The User Terminals
+     * @param startTime Application Start time
+     * @param stopTime Application stop time
+     * @param startDelay application start delay between each user
      */
     void AddLoraPeriodicTraffic(Time interval,
                                 uint32_t packetSize,
@@ -131,13 +125,13 @@ class SatTrafficHelper : public Object
 
     /**
      * Add Lora periodic traffic between chosen GWs and UTs
-     * \param interval Wait time between transmission of two packets
-     * \param packetSize Packet size in bytes
-     * \param uts The User Terminals
-     * \param startTime Application Start time
-     * \param stopTime Application stop time
-     * \param startDelay application start delay between each user
-     * \param percentage Percentage of UT users having the traffic installed
+     * @param interval Wait time between transmission of two packets
+     * @param packetSize Packet size in bytes
+     * @param uts The User Terminals
+     * @param startTime Application Start time
+     * @param stopTime Application stop time
+     * @param startDelay application start delay between each user
+     * @param percentage Percentage of UT users having the traffic installed
      */
     void AddLoraPeriodicTraffic(Time interval,
                                 uint32_t packetSize,
@@ -149,13 +143,13 @@ class SatTrafficHelper : public Object
 
     /**
      * Add Lora CBR traffic between chosen GWs and UTs
-     * \param interval Wait time between transmission of two packets
-     * \param packetSize Packet size in bytes
-     * \param gwUsers The Gateway Users
-     * \param utUsers The UT Users
-     * \param startTime Application Start time
-     * \param stopTime Application stop time
-     * \param startDelay application start delay between each user
+     * @param interval Wait time between transmission of two packets
+     * @param packetSize Packet size in bytes
+     * @param gwUsers The Gateway Users
+     * @param utUsers The UT Users
+     * @param startTime Application Start time
+     * @param stopTime Application stop time
+     * @param startDelay application start delay between each user
      */
     void AddLoraCbrTraffic(Time interval,
                            uint32_t packetSize,
@@ -167,14 +161,14 @@ class SatTrafficHelper : public Object
 
     /**
      * Add Lora CBR traffic between chosen GWs and UTs
-     * \param interval Wait time between transmission of two packets
-     * \param packetSize Packet size in bytes
-     * \param gwUsers The Gateway Users
-     * \param utUsers The UT Users
-     * \param startTime Application Start time
-     * \param stopTime Application stop time
-     * \param startDelay application start delay between each user
-     * \param percentage Percentage of UT users having the traffic installed
+     * @param interval Wait time between transmission of two packets
+     * @param packetSize Packet size in bytes
+     * @param gwUsers The Gateway Users
+     * @param utUsers The UT Users
+     * @param startTime Application Start time
+     * @param stopTime Application stop time
+     * @param startDelay application start delay between each user
+     * @param percentage Percentage of UT users having the traffic installed
      */
     void AddLoraCbrTraffic(Time interval,
                            uint32_t packetSize,
@@ -187,15 +181,15 @@ class SatTrafficHelper : public Object
 
     /**
      * Add a new CBR traffic between chosen GWs and UTs
-     * \param direction Direction of traffic
-     * \param protocol Transport layer protocol
-     * \param interval Wait time between transmission of two packets
-     * \param packetSize Packet size in bytes
-     * \param gwUsers The Gateway Users
-     * \param utUsers The UT Users
-     * \param startTime Application Start time
-     * \param stopTime Application stop time
-     * \param startDelay application start delay between each user
+     * @param direction Direction of traffic
+     * @param protocol Transport layer protocol
+     * @param interval Wait time between transmission of two packets
+     * @param packetSize Packet size in bytes
+     * @param gwUsers The Gateway Users
+     * @param utUsers The UT Users
+     * @param startTime Application Start time
+     * @param stopTime Application stop time
+     * @param startDelay application start delay between each user
      */
     void AddCbrTraffic(TrafficDirection_t direction,
                        TransportLayerProtocol_t protocol,
@@ -209,16 +203,16 @@ class SatTrafficHelper : public Object
 
     /**
      * Add a new CBR traffic between chosen GWs and UTs
-     * \param direction Direction of traffic
-     * \param protocol Transport layer protocol
-     * \param interval Wait time between transmission of two packets
-     * \param packetSize Packet size in bytes
-     * \param gwUsers The Gateway Users
-     * \param utUsers The UT Users
-     * \param startTime Application Start time
-     * \param stopTime Application stop time
-     * \param startDelay application start delay between each user
-     * \param percentage Percentage of UT users having the traffic installed
+     * @param direction Direction of traffic
+     * @param protocol Transport layer protocol
+     * @param interval Wait time between transmission of two packets
+     * @param packetSize Packet size in bytes
+     * @param gwUsers The Gateway Users
+     * @param utUsers The UT Users
+     * @param startTime Application Start time
+     * @param stopTime Application stop time
+     * @param startDelay application start delay between each user
+     * @param percentage Percentage of UT users having the traffic installed
      */
     void AddCbrTraffic(TrafficDirection_t direction,
                        TransportLayerProtocol_t protocol,
@@ -233,17 +227,17 @@ class SatTrafficHelper : public Object
 
     /**
      * Add a new ONOFF traffic between chosen GWs and UTs
-     * \param direction Direction of traffic
-     * \param protocol Transport layer protocol
-     * \param dataRate Data rate in ON state
-     * \param packetSize Packet size in bytes
-     * \param gwUsers The Gateway Users
-     * \param utUsers The UT Users
-     * \param onTimePattern Pattern for ON state duration
-     * \param offTimePattern Pattern for OFF state duration
-     * \param startTime Application Start time
-     * \param stopTime Application stop time
-     * \param startDelay application start delay between each user
+     * @param direction Direction of traffic
+     * @param protocol Transport layer protocol
+     * @param dataRate Data rate in ON state
+     * @param packetSize Packet size in bytes
+     * @param gwUsers The Gateway Users
+     * @param utUsers The UT Users
+     * @param onTimePattern Pattern for ON state duration
+     * @param offTimePattern Pattern for OFF state duration
+     * @param startTime Application Start time
+     * @param stopTime Application stop time
+     * @param startDelay application start delay between each user
      */
     void AddOnOffTraffic(TrafficDirection_t direction,
                          TransportLayerProtocol_t protocol,
@@ -259,18 +253,18 @@ class SatTrafficHelper : public Object
 
     /**
      * Add a new ONOFF traffic between chosen GWs and UTs
-     * \param direction Direction of traffic
-     * \param protocol Transport layer protocol
-     * \param dataRate Data rate in ON state
-     * \param packetSize Packet size in bytes
-     * \param gwUsers The Gateway Users
-     * \param utUsers The UT Users
-     * \param onTimePattern Pattern for ON state duration
-     * \param offTimePattern Pattern for OFF state duration
-     * \param startTime Application Start time
-     * \param stopTime Application stop time
-     * \param startDelay application start delay between each user
-     * \param percentage Percentage of UT users having the traffic installed
+     * @param direction Direction of traffic
+     * @param protocol Transport layer protocol
+     * @param dataRate Data rate in ON state
+     * @param packetSize Packet size in bytes
+     * @param gwUsers The Gateway Users
+     * @param utUsers The UT Users
+     * @param onTimePattern Pattern for ON state duration
+     * @param offTimePattern Pattern for OFF state duration
+     * @param startTime Application Start time
+     * @param stopTime Application stop time
+     * @param startDelay application start delay between each user
+     * @param percentage Percentage of UT users having the traffic installed
      */
     void AddOnOffTraffic(TrafficDirection_t direction,
                          TransportLayerProtocol_t protocol,
@@ -287,12 +281,12 @@ class SatTrafficHelper : public Object
 
     /**
      * Add a new TCP/HTTP traffic between chosen GWs and UTs
-     * \param direction Direction of traffic
-     * \param gwUsers The Gateway Users
-     * \param utUsers The UT Users
-     * \param startTime Application Start time
-     * \param stopTime Application stop time
-     * \param startDelay application start delay between each user
+     * @param direction Direction of traffic
+     * @param gwUsers The Gateway Users
+     * @param utUsers The UT Users
+     * @param startTime Application Start time
+     * @param stopTime Application stop time
+     * @param startDelay application start delay between each user
      */
     void AddHttpTraffic(TrafficDirection_t direction,
                         NodeContainer gwUsers,
@@ -303,13 +297,13 @@ class SatTrafficHelper : public Object
 
     /**
      * Add a new TCP/HTTP traffic between chosen GWs and UTs
-     * \param direction Direction of traffic
-     * \param gwUsers The Gateway Users
-     * \param utUsers The UT Users
-     * \param startTime Application Start time
-     * \param stopTime Application stop time
-     * \param startDelay application start delay between each user
-     * \param percentage Percentage of UT users having the traffic installed
+     * @param direction Direction of traffic
+     * @param gwUsers The Gateway Users
+     * @param utUsers The UT Users
+     * @param startTime Application Start time
+     * @param stopTime Application stop time
+     * @param startDelay application start delay between each user
+     * @param percentage Percentage of UT users having the traffic installed
      */
     void AddHttpTraffic(TrafficDirection_t direction,
                         NodeContainer gwUsers,
@@ -321,12 +315,12 @@ class SatTrafficHelper : public Object
 
     /**
      * Add a new TCP/NRTV traffic between chosen GWs and UTs
-     * \param direction Direction of traffic
-     * \param gwUsers The Gateway Users
-     * \param utUsers The UT Users
-     * \param startTime Application Start time
-     * \param stopTime Application stop time
-     * \param startDelay application start delay between each user
+     * @param direction Direction of traffic
+     * @param gwUsers The Gateway Users
+     * @param utUsers The UT Users
+     * @param startTime Application Start time
+     * @param stopTime Application stop time
+     * @param startDelay application start delay between each user
      */
     void AddNrtvTraffic(TrafficDirection_t direction,
                         NodeContainer gwUsers,
@@ -337,13 +331,13 @@ class SatTrafficHelper : public Object
 
     /**
      * Add a new TCP/NRTV traffic between chosen GWs and UTs
-     * \param direction Direction of traffic
-     * \param gwUsers The Gateway Users
-     * \param utUsers The UT Users
-     * \param startTime Application Start time
-     * \param stopTime Application stop time
-     * \param startDelay application start delay between each user
-     * \param percentage Percentage of UT users having the traffic installed
+     * @param direction Direction of traffic
+     * @param gwUsers The Gateway Users
+     * @param utUsers The UT Users
+     * @param startTime Application Start time
+     * @param stopTime Application stop time
+     * @param startDelay application start delay between each user
+     * @param percentage Percentage of UT users having the traffic installed
      */
     void AddNrtvTraffic(TrafficDirection_t direction,
                         NodeContainer gwUsers,
@@ -355,15 +349,15 @@ class SatTrafficHelper : public Object
 
     /**
      * Add a new Poisson traffic between chosen GWs and UTs
-     * \param direction Direction of traffic
-     * \param onTime On time duration in seconds
-     * \param offTimeExpMean Off time mean in seconds. The off time follows an exponential law of
+     * @param direction Direction of traffic
+     * @param onTime On time duration in seconds
+     * @param offTimeExpMean Off time mean in seconds. The off time follows an exponential law of
      * mean offTimeExpMean \param rate The rate with the unit \param packetSize Packet size in bytes
-     * \param gwUsers The Gateway Users
-     * \param utUsers The UT Users
-     * \param startTime Application Start time
-     * \param stopTime Application stop time
-     * \param startDelay application start delay between each user
+     * @param gwUsers The Gateway Users
+     * @param utUsers The UT Users
+     * @param startTime Application Start time
+     * @param stopTime Application stop time
+     * @param startDelay application start delay between each user
      */
     void AddPoissonTraffic(TrafficDirection_t direction,
                            Time onTime,
@@ -378,16 +372,16 @@ class SatTrafficHelper : public Object
 
     /**
      * Add a new Poisson traffic between chosen GWs and UTs
-     * \param direction Direction of traffic
-     * \param onTime On time duration in seconds
-     * \param offTimeExpMean Off time mean in seconds. The off time follows an exponential law of
+     * @param direction Direction of traffic
+     * @param onTime On time duration in seconds
+     * @param offTimeExpMean Off time mean in seconds. The off time follows an exponential law of
      * mean offTimeExpMean \param rate The rate with the unit \param packetSize Packet size in bytes
-     * \param gwUsers The Gateway Users
-     * \param utUsers The UT Users
-     * \param startTime Application Start time
-     * \param stopTime Application stop time
-     * \param startDelay application start delay between each user
-     * \param percentage Percentage of UT users having the traffic installed
+     * @param gwUsers The Gateway Users
+     * @param utUsers The UT Users
+     * @param startTime Application Start time
+     * @param stopTime Application stop time
+     * @param startDelay application start delay between each user
+     * @param percentage Percentage of UT users having the traffic installed
      */
     void AddPoissonTraffic(TrafficDirection_t direction,
                            Time onTime,
@@ -403,13 +397,13 @@ class SatTrafficHelper : public Object
 
     /**
      * Add a new Poisson traffic between chosen GWs and UTs
-     * \param direction Direction of traffic
-     * \param codec the Codec used
-     * \param gwUsers The Gateway Users
-     * \param utUsers The UT Users
-     * \param startTime Application Start time
-     * \param stopTime Application stop time
-     * \param startDelay application start delay between each user
+     * @param direction Direction of traffic
+     * @param codec the Codec used
+     * @param gwUsers The Gateway Users
+     * @param utUsers The UT Users
+     * @param startTime Application Start time
+     * @param stopTime Application stop time
+     * @param startDelay application start delay between each user
      */
     void AddVoipTraffic(TrafficDirection_t direction,
                         VoipCodec_t codec,
@@ -421,14 +415,14 @@ class SatTrafficHelper : public Object
 
     /**
      * Add a new Poisson traffic between chosen GWs and UTs
-     * \param direction Direction of traffic
-     * \param codec the Codec used
-     * \param gwUsers The Gateway Users
-     * \param utUsers The UT Users
-     * \param startTime Application Start time
-     * \param stopTime Application stop time
-     * \param startDelay application start delay between each user
-     * \param percentage Percentage of UT users having the traffic installed
+     * @param direction Direction of traffic
+     * @param codec the Codec used
+     * @param gwUsers The Gateway Users
+     * @param utUsers The UT Users
+     * @param startTime Application Start time
+     * @param stopTime Application stop time
+     * @param startDelay application start delay between each user
+     * @param percentage Percentage of UT users having the traffic installed
      */
     void AddVoipTraffic(TrafficDirection_t direction,
                         VoipCodec_t codec,
@@ -441,14 +435,14 @@ class SatTrafficHelper : public Object
 
     /**
      * Add a new CBR traffic between chosen GWs and UTs that can be customized
-     * \param direction Direction of traffic
-     * \param interval Initial wait time between transmission of two packets
-     * \param packetSize Packet size in bytes
-     * \param gwUsers The Gateway Users
-     * \param utUsers The UT Users
-     * \param startTime Application Start time
-     * \param stopTime Application stop time
-     * \param startDelay application start delay between each user
+     * @param direction Direction of traffic
+     * @param interval Initial wait time between transmission of two packets
+     * @param packetSize Packet size in bytes
+     * @param gwUsers The Gateway Users
+     * @param utUsers The UT Users
+     * @param startTime Application Start time
+     * @param stopTime Application stop time
+     * @param startDelay application start delay between each user
      */
     void AddCustomTraffic(TrafficDirection_t direction,
                           std::string interval,
@@ -461,15 +455,15 @@ class SatTrafficHelper : public Object
 
     /**
      * Change the parameters of the last custom traffic created
-     * \param delay Delay after traffic launch to apply the changes
-     * \param interval New wait time between transmission of two packets
-     * \param packetSize New packet size in bytes
+     * @param delay Delay after traffic launch to apply the changes
+     * @param interval New wait time between transmission of two packets
+     * @param packetSize New packet size in bytes
      */
     void ChangeCustomTraffic(Time delay, std::string interval, uint32_t packetSize);
 
   private:
     /**
-     * \brief Struct for info on last custom trafic created
+     * @brief Struct for info on last custom trafic created
      */
     typedef struct
     {
@@ -489,16 +483,16 @@ class SatTrafficHelper : public Object
 
     /**
      * Update the chosen attribute of a custom traffic
-     * \param application The CBR application to update
-     * \param interval The new interval
-     * \param packetSize the new packet size
+     * @param application The CBR application to update
+     * @param interval The new interval
+     * @param packetSize the new packet size
      */
     void UpdateAttribute(Ptr<CbrApplication> application,
                          std::string interval,
                          uint32_t packetSize);
 
     /**
-     * \brief Check if node has a PacketSink installed at certain port.
+     * @brief Check if node has a PacketSink installed at certain port.
      */
     bool HasSinkInstalled(Ptr<Node> node, uint16_t port);
 };
@@ -514,28 +508,23 @@ class SatTrafficHelperConf : public Object
     /**
      * Custom constructor.
      *
-     * \param trafficHelper Pointer to the traffic helper
-     * \param simTime Simulation time
+     * @param trafficHelper Pointer to the traffic helper
+     * @param simTime Simulation time
      */
     SatTrafficHelperConf(Ptr<SatTrafficHelper> trafficHelper, Time simTime);
 
     /**
-     * \brief Destructor.
+     * @brief Destructor.
      */
     virtual ~SatTrafficHelperConf();
 
     /**
-     * \brief Derived from Object.
+     * @brief Derived from Object.
      */
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Derived from Object.
-     */
-    TypeId GetInstanceTypeId(void) const;
-
-    /**
-     * \brief Install traffic models from configuration files
+     * @brief Install traffic models from configuration files
      */
     void InstallTrafficModels();
 

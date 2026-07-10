@@ -29,10 +29,10 @@
 using namespace ns3;
 
 /**
- * \file sat-multicast-example.cc
- * \ingroup satellite
+ * @file sat-multicast-example.cc
+ * @ingroup satellite
  *
- * \brief  Multicast example application to test multicasting in satellite network.
+ * @brief  Multicast example application to test multicasting in satellite network.
  *         Test scenario (larger of full), pre-defined multicast for larger scenario
  *         can be given in command line as user argument.
  *
@@ -45,7 +45,7 @@ NS_LOG_COMPONENT_DEFINE("sat-multicast-example");
 /**
  * Receive RX traces from packet sinks
  *
- * \param context Context of the receive (multicast group and UT/GW user info)
+ * @param context Context of the receive (multicast group and UT/GW user info)
  */
 static void
 SinkReceive(std::string context, Ptr<const Packet>, const Address&)
@@ -56,9 +56,9 @@ SinkReceive(std::string context, Ptr<const Packet>, const Address&)
 /**
  * Construct information of the given user node.
  *
- * \param helper Pointer to satellite helper
- * \param node Pointer to user node connected to UT or GW
- * \return Information of the user (UT or GW node connected user with user index in the node)
+ * @param helper Pointer to satellite helper
+ * @param node Pointer to user node connected to UT or GW
+ * @return Information of the user (UT or GW node connected user with user index in the node)
  */
 static std::string
 GetUserInfo(Ptr<SatHelper> helper, Ptr<Node> node)
@@ -108,14 +108,14 @@ LogEmptyLine()
 /**
  * Establish multicast group and generate traffic in that group.
  *
- * \param helper Pointer to satellite helper
- * \param source Pointer to source node of the multicast group
- * \param groupReceivers Container of the receiver node pointers of the multicast group
- * \param groupAddress Address of the multicast group
- * \param port Port of the multicast group
- * \param startTime Time to start group traffic (sending start with some delay).
- * \param sinkToAll Add packet sink to all users for multicast group.
- * \return Time when all group packets should have been received by group receivers.
+ * @param helper Pointer to satellite helper
+ * @param source Pointer to source node of the multicast group
+ * @param groupReceivers Container of the receiver node pointers of the multicast group
+ * @param groupAddress Address of the multicast group
+ * @param port Port of the multicast group
+ * @param startTime Time to start group traffic (sending start with some delay).
+ * @param sinkToAll Add packet sink to all users for multicast group.
+ * @return Time when all group packets should have been received by group receivers.
  */
 static Time
 EstablishMulticastGroup(Ptr<SatHelper> helper,
@@ -468,7 +468,8 @@ main(int argc, char* argv[])
             }
 
             // randomize users
-            std::random_shuffle(ids.begin(), ids.end());
+            Ptr<UniformRandomVariable> r = CreateObject<UniformRandomVariable>();
+            Shuffle(ids.begin(), ids.end(), r);
 
             // set source GW or UT users
             groupSource = users.Get(sources[i]);

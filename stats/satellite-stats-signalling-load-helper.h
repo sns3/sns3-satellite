@@ -24,9 +24,9 @@
 
 #include "satellite-stats-helper.h"
 
-#include <ns3/address.h>
-#include <ns3/collector-map.h>
-#include <ns3/ptr.h>
+#include "ns3/address.h"
+#include "ns3/collector-map.h"
+#include "ns3/ptr.h"
 
 #include <list>
 #include <map>
@@ -43,8 +43,8 @@ class Packet;
 class DataCollectionObject;
 
 /**
- * \ingroup satstats
- * \brief Abstract class inherited by SatStatsFwdSignallingLoadHelper and
+ * @ingroup satstats
+ * @brief Abstract class inherited by SatStatsFwdSignallingLoadHelper and
  * SatStatsRtnSignallingLoadHelper.
  */
 class SatStatsSignallingLoadHelper : public SatStatsHelper
@@ -64,16 +64,16 @@ class SatStatsSignallingLoadHelper : public SatStatsHelper
     static TypeId GetTypeId();
 
     /**
-     * \brief Set up several probes or other means of listeners and connect them
+     * @brief Set up several probes or other means of listeners and connect them
      *        to the first-level collectors.
      */
     void InstallProbes();
 
     /**
-     * \brief Receive inputs from trace sources and determine the right collector
+     * @brief Receive inputs from trace sources and determine the right collector
      *        to forward the inputs to.
-     * \param packet control message packet transmitted.
-     * \param to the destination address of the packet.
+     * @param packet control message packet transmitted.
+     * @param to the destination address of the packet.
      *
      * Used in return link statistics. DoInstallProbes() is expected to connect
      * the right trace sources to this method.
@@ -85,7 +85,7 @@ class SatStatsSignallingLoadHelper : public SatStatsHelper
     void DoInstall();
 
     /**
-     * \brief
+     * @brief
      */
     virtual void DoInstallProbes() = 0;
 
@@ -103,21 +103,21 @@ class SatStatsSignallingLoadHelper : public SatStatsHelper
 // FORWARD LINK ///////////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce forward link signalling load statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce forward link signalling load statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFwdSignallingLoadHelper> s = Create<SatStatsFwdSignallingLoadHelper> (satHelper);
  * s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFwdSignallingLoadHelper : public SatStatsSignallingLoadHelper
 {
@@ -146,21 +146,21 @@ class SatStatsFwdSignallingLoadHelper : public SatStatsSignallingLoadHelper
 class Probe;
 
 /**
- * \ingroup satstats
- * \brief Produce return link signalling load statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce return link signalling load statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnSignallingLoadHelper> s = Create<SatStatsRtnSignallingLoadHelper> (satHelper);
  * s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsRtnSignallingLoadHelper : public SatStatsSignallingLoadHelper
 {

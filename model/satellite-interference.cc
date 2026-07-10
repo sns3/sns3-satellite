@@ -20,8 +20,8 @@
 
 #include "satellite-interference.h"
 
-#include <ns3/log.h>
-#include <ns3/simulator.h>
+#include "ns3/log.h"
+#include "ns3/simulator.h"
 
 #include <map>
 #include <utility>
@@ -108,12 +108,6 @@ SatInterference::GetTypeId(void)
     static TypeId tid = TypeId("ns3::SatInterference").SetParent<Object>();
 
     return tid;
-}
-
-TypeId
-SatInterference::GetInstanceTypeId(void) const
-{
-    return GetTypeId();
 }
 
 SatInterference::SatInterference()

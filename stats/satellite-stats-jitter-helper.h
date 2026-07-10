@@ -24,9 +24,9 @@
 
 #include "satellite-stats-helper.h"
 
-#include <ns3/address.h>
-#include <ns3/collector-map.h>
-#include <ns3/ptr.h>
+#include "ns3/address.h"
+#include "ns3/collector-map.h"
+#include "ns3/ptr.h"
 
 #include <list>
 #include <map>
@@ -44,8 +44,8 @@ class DataCollectionObject;
 class DistributionCollector;
 
 /**
- * \ingroup satstats
- * \brief Base class for jitter statistics helpers.
+ * @ingroup satstats
+ * @brief Base class for jitter statistics helpers.
  */
 class SatStatsJitterHelper : public SatStatsHelper
 {
@@ -64,26 +64,26 @@ class SatStatsJitterHelper : public SatStatsHelper
     static TypeId GetTypeId();
 
     /**
-     * \param averagingMode average all samples before passing them to aggregator.
+     * @param averagingMode average all samples before passing them to aggregator.
      */
     void SetAveragingMode(bool averagingMode);
 
     /**
-     * \return the currently active averaging mode.
+     * @return the currently active averaging mode.
      */
     bool GetAveragingMode() const;
 
     /**
-     * \brief Set up several probes or other means of listeners and connect them
+     * @brief Set up several probes or other means of listeners and connect them
      *        to the collectors.
      */
     void InstallProbes();
 
     /**
-     * \brief Receive inputs from trace sources and determine the right collector
+     * @brief Receive inputs from trace sources and determine the right collector
      *        to forward the inputs to.
-     * \param jitter packet jitter.
-     * \param from the address of the sender of the packet.
+     * @param jitter packet jitter.
+     * @param from the address of the sender of the packet.
      *
      * Used in return link statistics. DoInstallProbes() is expected to connect
      * the right trace sources to this method.
@@ -95,29 +95,29 @@ class SatStatsJitterHelper : public SatStatsHelper
     void DoInstall();
 
     /**
-     * \brief
+     * @brief
      */
     virtual void DoInstallProbes() = 0;
 
     /**
-     * \brief Connect the probe to the right collector.
-     * \param probe
-     * \param identifier
+     * @brief Connect the probe to the right collector.
+     * @param probe
+     * @param identifier
      */
     bool ConnectProbeToCollector(Ptr<Probe> probe, uint32_t identifier);
 
     /**
-     * \brief Disconnect the probe from the right collector.
-     * \param probe
-     * \param identifier
+     * @brief Disconnect the probe from the right collector.
+     * @param probe
+     * @param identifier
      */
     bool DisconnectProbeFromCollector(Ptr<Probe> probe, uint32_t identifier);
 
     /**
-     * \brief Find a collector with the right identifier and pass a sample data
+     * @brief Find a collector with the right identifier and pass a sample data
      *        to it.
-     * \param jitter
-     * \param identifier
+     * @param jitter
+     * @param identifier
      */
     void PassSampleToCollector(const Time& jitter, uint32_t identifier);
 
@@ -156,13 +156,13 @@ class SatStatsFwdAppJitterHelper : public SatStatsJitterHelper
     static TypeId GetTypeId();
 
     /**
-     * \brief Receive inputs from trace sources and determine the right collector
+     * @brief Receive inputs from trace sources and determine the right collector
      *        to forward the inputs to.
-     * \param helper Pointer to the jitter statistics collector helper
-     * \param identifier Identifier used to group statistics.
-     * \param packet the received packet, expected to have been tagged with
+     * @param helper Pointer to the jitter statistics collector helper
+     * @param identifier Identifier used to group statistics.
+     * @param packet the received packet, expected to have been tagged with
      *               TrafficTimeTag.
-     * \param from the InetSocketAddress of the sender of the packet.
+     * @param from the InetSocketAddress of the sender of the packet.
      */
     static void RxCallback(Ptr<SatStatsFwdAppJitterHelper> helper,
                            uint32_t identifier,
@@ -170,11 +170,11 @@ class SatStatsFwdAppJitterHelper : public SatStatsJitterHelper
                            const Address& from);
 
     /**
-     * \brief Returns the previous delay mesurment for given identifier,
+     * @brief Returns the previous delay mesurment for given identifier,
      *        and update with new value measured
-     * \param identifier Identifier used to group statistics.
-     * \param newDelay new delay measurement
-     * \return Previous delay measurement or zero if not value is stored
+     * @param identifier Identifier used to group statistics.
+     * @param newDelay new delay measurement
+     * @return Previous delay measurement or zero if not value is stored
      */
     Time GetAndUpdatePreviousDelay(uint32_t identifier, Time newDelay);
 
@@ -314,19 +314,19 @@ class SatStatsRtnAppJitterHelper : public SatStatsJitterHelper
     static TypeId GetTypeId();
 
     /**
-     * \brief Receive inputs from trace sources and determine the right collector
+     * @brief Receive inputs from trace sources and determine the right collector
      *        to forward the inputs to.
-     * \param packet the received packet, expected to have been tagged with
+     * @param packet the received packet, expected to have been tagged with
      *               TrafficTimeTag.
-     * \param from the InetSocketAddress of the sender of the packet.
+     * @param from the InetSocketAddress of the sender of the packet.
      */
     void RxCallback(Ptr<const Packet> packet, const Address& from);
 
     /**
-     * \brief Receive inputs from trace sources and determine the right collector
+     * @brief Receive inputs from trace sources and determine the right collector
      *        to forward the inputs to.
-     * \param jitter packet jitter.
-     * \param from the InetSocketAddress of the sender of the packet.
+     * @param jitter packet jitter.
+     * @param from the InetSocketAddress of the sender of the packet.
      */
     void Ipv4Callback(const Time& jitter, const Address& from);
 
@@ -340,7 +340,7 @@ class SatStatsRtnAppJitterHelper : public SatStatsJitterHelper
     /// Stores the last delay to a UT to compute jitter
     std::map<const Address, Time> m_previousDelayMap;
 
-    /// \todo Write SaveIpv6Address() method.
+    /// @todo Write SaveIpv6Address() method.
 
 }; // end of class SatStatsRtnAppJitterHelper
 

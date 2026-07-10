@@ -22,9 +22,9 @@
 
 #include "../utils/satellite-env-variables.h"
 
-#include <ns3/log.h>
-#include <ns3/singleton.h>
-#include <ns3/string.h>
+#include "ns3/log.h"
+#include "ns3/singleton.h"
+#include "ns3/string.h"
 
 #include <ios>
 #include <sstream>
@@ -46,19 +46,9 @@ SatLog::GetTypeId(void)
     return tid;
 }
 
-TypeId
-SatLog::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
-}
-
 SatLog::SatLog()
 {
     NS_LOG_FUNCTION(this);
-
-    ObjectBase::ConstructSelf(AttributeConstructionList());
 }
 
 SatLog::~SatLog()
@@ -95,7 +85,7 @@ SatLog::CreateLog(LogType_t logType, std::string fileTag)
     NS_LOG_FUNCTION(this);
 
     std::stringstream filename;
-    std::string dataPath = Singleton<SatEnvVariables>::Get()->GetOutputPath();
+    std::string dataPath = SatEnvVariables::GetInstance()->GetOutputPath();
 
     filename << dataPath << "/log" << fileTag;
 

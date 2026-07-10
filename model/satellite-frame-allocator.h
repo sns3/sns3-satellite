@@ -24,9 +24,9 @@
 #include "satellite-control-message.h"
 #include "satellite-frame-conf.h"
 
-#include <ns3/address.h>
-#include <ns3/simple-ref-count.h>
-#include <ns3/traced-callback.h>
+#include "ns3/address.h"
+#include "ns3/simple-ref-count.h"
+#include "ns3/traced-callback.h"
 
 #include <list>
 #include <map>
@@ -38,8 +38,8 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief helper class for Satellite Superframe Allocator.
+ * @ingroup satellite
+ * @brief helper class for Satellite Superframe Allocator.
  *
  * SatFrameAllocator class is used by SatSuperframeAllocator to maintain information
  * of the pre-allocated symbols per Capacity Category (CC) in a frame.
@@ -130,7 +130,7 @@ class SatFrameAllocator : public SimpleRefCount<SatFrameAllocator>
         /**
          * Construct SatFrameAllocReq
          *
-         * \param req Allocation request per RC/CC
+         * @param req Allocation request per RC/CC
          */
         SatFrameAllocReq(SatFrameAllocReqItemContainer_t req)
             : m_generateCtrlSlot(false),
@@ -172,10 +172,10 @@ class SatFrameAllocator : public SimpleRefCount<SatFrameAllocator>
     /**
      * Construct frame info
      *
-     * \param frameConf Frame configuration for the frame info
-     * \param frameId Id of the frame
-     * \param m_configType Type of the configuration (0-2 supported)
-     * \param parent Parent allocator in case this one holds configuration for a split frame
+     * @param frameConf Frame configuration for the frame info
+     * @param frameId Id of the frame
+     * @param m_configType Type of the configuration (0-2 supported)
+     * @param parent Parent allocator in case this one holds configuration for a split frame
      */
     SatFrameAllocator(Ptr<SatFrameConf> frameConf,
                       uint8_t frameId,
@@ -185,7 +185,7 @@ class SatFrameAllocator : public SimpleRefCount<SatFrameAllocator>
     /**
      * Get minimum payload of a carrier in bytes
      *
-     * \return minimum payload of a carrier in bytes
+     * @return minimum payload of a carrier in bytes
      */
     inline uint32_t GetCarrierMinPayloadInBytes() const
     {
@@ -195,7 +195,7 @@ class SatFrameAllocator : public SimpleRefCount<SatFrameAllocator>
     /**
      * Get the most robust waveform used by this frame allocator.
      *
-     * \return the most robust waveform
+     * @return the most robust waveform
      */
     inline Ptr<SatWaveform> GetMostRobustWaveform() const
     {
@@ -205,7 +205,7 @@ class SatFrameAllocator : public SimpleRefCount<SatFrameAllocator>
     /**
      * Get the amount of carriers used in this frame.
      *
-     * \return The carrier count of the frame.
+     * @return The carrier count of the frame.
      */
     inline uint16_t GetCarrierCount() const
     {
@@ -215,7 +215,7 @@ class SatFrameAllocator : public SimpleRefCount<SatFrameAllocator>
     /**
      * Set the amount of carriers used in this frame.
      *
-     * \param amount   number of carriers to select in this frame. This parameter may be updated to
+     * @param amount   number of carriers to select in this frame. This parameter may be updated to
      * include padding to round to an even number of selected carriers. \param offset   number of
      * carriers already selected for subdivided versions of the frame.
      */
@@ -224,7 +224,9 @@ class SatFrameAllocator : public SimpleRefCount<SatFrameAllocator>
     inline double GetCarrierBandwidthHz(bool checkParent = false) const
     {
         if (checkParent && m_frameConf->IsSubdivided())
+        {
             return 0.0;
+        }
         return m_frameConf->GetCarrierBandwidthHz(SatEnums::EFFECTIVE_BANDWIDTH);
     }
 
@@ -246,33 +248,33 @@ class SatFrameAllocator : public SimpleRefCount<SatFrameAllocator>
     /**
      * Get the best waveform supported by this allocator based on given C/N0.
      *
-     *  \param cno C/N0 value used to find the best waveform
-     *  \param waveFormId variable to store the best waveform id
-     *  \param cnoThreshold variable to store the C/N0 threshold of the selected waveform
-     *  \return true if allocator can support given C/N0
+     *  @param cno C/N0 value used to find the best waveform
+     *  @param waveFormId variable to store the best waveform id
+     *  @param cnoThreshold variable to store the C/N0 threshold of the selected waveform
+     *  @return true if allocator can support given C/N0
      **/
     bool GetBestWaveform(double cno, uint32_t& waveFormId, double& cnoThreshold) const;
 
     /**
      * Get frame load by requested CC
-     * \param ccLevel CC of the request
-     * \return Load of the requested CC.
+     * @param ccLevel CC of the request
+     * @return Load of the requested CC.
      */
     double GetCcLoad(CcLevel_t ccLevel);
 
     /**
      * Allocate symbols to this frame, if criteria are fulfilled
      *
-     * \param ccLevel CC level of the request
-     * \param allocReq Requested information
-     * \param waveformId Waveform id selected
-     * \return true allocation done, otherwise false
+     * @param ccLevel CC level of the request
+     * @param allocReq Requested information
+     * @param waveformId Waveform id selected
+     * @return true allocation done, otherwise false
      */
     bool Allocate(CcLevel_t ccLevel, SatFrameAllocReq* allocReq, uint32_t waveformId);
 
     /**
      * Preallocate symbols for all UTs with RCs allocated to the frame.
-     * \param targetLoad Target load limits upper bound of the symbols in the frame. Valid values in
+     * @param targetLoad Target load limits upper bound of the symbols in the frame. Valid values in
      * range 0 and 1. \param fcaEnabled FCA (free capacity allocation) enable status
      */
     void PreAllocateSymbols(double targetLoad, bool fcaEnabled);
@@ -280,9 +282,9 @@ class SatFrameAllocator : public SimpleRefCount<SatFrameAllocator>
     /**
      * Generate time slots for UT/RCs i.e. do actual allocation based on preallocation.
      *
-     * \param tbtpContainer TBTP message container to add/fill TBTPs.
-     * \param maxSizeInBytes Maximum size for a TBTP message.
-     * \param utAllocContainer Reference to UT allocation container to fill in info of the
+     * @param tbtpContainer TBTP message container to add/fill TBTPs.
+     * @param maxSizeInBytes Maximum size for a TBTP message.
+     * @param utAllocContainer Reference to UT allocation container to fill in info of the
      * allocation \param rcBasedAllocationEnabled If time slot generated per RC \param waveformTrace
      * Wave form trace callback \param utLoadTrace UT load per the frame trace callback \param
      * loadTrace Load per the frame trace callback
@@ -322,7 +324,7 @@ class SatFrameAllocator : public SimpleRefCount<SatFrameAllocator>
         /**
          * Get symbols allocated/requested by this item.
          *
-         * \return Total symbols allocated/requested.
+         * @return Total symbols allocated/requested.
          */
         double GetTotalSymbols()
         {
@@ -367,9 +369,9 @@ class SatFrameAllocator : public SimpleRefCount<SatFrameAllocator>
         /**
          * Construct SatFrameAllocInfo from SatFrameAllocReqItem items.
          *
-         * \param req Reference to container having SatFrameAllocReqItem items.
-         * \param waveForm  Waveform to use in allocation for TRC slots.
-         * \param ctrlSlotLength Slot length in symbols for control slots.
+         * @param req Reference to container having SatFrameAllocReqItem items.
+         * @param waveForm  Waveform to use in allocation for TRC slots.
+         * @param ctrlSlotLength Slot length in symbols for control slots.
          */
         SatFrameAllocInfo(SatFrameAllocReqItemContainer_t& req,
                           Ptr<SatWaveform> trcWaveForm,
@@ -379,13 +381,13 @@ class SatFrameAllocator : public SimpleRefCount<SatFrameAllocator>
         /**
          * Update total count of SatFrameAllocInfo from RCs.
          *
-         * \return SatFrameAllocInfoItem holding information of the total request per category.
+         * @return SatFrameAllocInfoItem holding information of the total request per category.
          */
         SatFrameAllocInfoItem UpdateTotalCounts();
 
         /**
          * Get total symbols of the item.
-         * \return
+         * @return
          */
         double GetTotalSymbols();
     };
@@ -436,8 +438,8 @@ class SatFrameAllocator : public SimpleRefCount<SatFrameAllocator>
         /**
          * Construct CcReqCompare.
          *
-         * \param utAllocContainer Reference to UT allocation container.
-         * \param ccReqType Type used for comparisons.
+         * @param utAllocContainer Reference to UT allocation container.
+         * @param ccReqType Type used for comparisons.
          */
         CcReqCompare(const UtAllocContainer_t& utAllocContainer,
                      CcReqCompare::CcReqType_t ccReqType);
@@ -445,9 +447,9 @@ class SatFrameAllocator : public SimpleRefCount<SatFrameAllocator>
         /**
          * Comparison operator to compare two RC allocations.
          *
-         * \param rcAlloc1
-         * \param rcAlloc2
-         * \return false if first RC allocation is smaller than second.
+         * @param rcAlloc1
+         * @param rcAlloc2
+         * @return false if first RC allocation is smaller than second.
          */
         bool operator()(RcAllocItem_t rcAlloc1, RcAllocItem_t rcAlloc2);
 
@@ -525,18 +527,18 @@ class SatFrameAllocator : public SimpleRefCount<SatFrameAllocator>
     /**
      * Share symbols between all UTs and RCs allocated to the frame.
      *
-     * \param fcaEnabled FCA (free capacity allocation) enable status
+     * @param fcaEnabled FCA (free capacity allocation) enable status
      */
     void ShareSymbols(bool fcaEnabled);
 
     /**
      * Get optimal burst length in symbols.
      *
-     * \param symbolsToUse Symbols can be used for time slot.
-     * \param symbolsLeft Symbols left for RC or UT.
-     * \param cno C/N0 to use for selection
-     * \param waveformId Variable to store id of the wave form of optimal length burst
-     * \return Optimal burst length for the symbols to allocate.
+     * @param symbolsToUse Symbols can be used for time slot.
+     * @param symbolsLeft Symbols left for RC or UT.
+     * @param cno C/N0 to use for selection
+     * @param waveformId Variable to store id of the wave form of optimal length burst
+     * @return Optimal burst length for the symbols to allocate.
      */
     uint32_t GetOptimalBurtsLengthInSymbols(int64_t symbolsToUse,
                                             int64_t symbolsLeft,
@@ -546,14 +548,14 @@ class SatFrameAllocator : public SimpleRefCount<SatFrameAllocator>
     /**
      * Create time slot according to configuration type.
      *
-     * \param carrierId Id of the carrier into create time slot
-     * \param utSymbolsToUse Symbols possible to allocated for the UT
-     * \param carrierSymbolsToUse Symbols possible to allocate to carrier
-     * \param utSymbolsLeft Symbols left for the UT
-     * \param rcSymbolsLeft Symbols left for RC
-     * \param cno Estimated C/N0 of the UT.
-     * \param rcBasedAllocationEnabled If time slot generated per RC
-     * \return Create time slot configuration
+     * @param carrierId Id of the carrier into create time slot
+     * @param utSymbolsToUse Symbols possible to allocated for the UT
+     * @param carrierSymbolsToUse Symbols possible to allocate to carrier
+     * @param utSymbolsLeft Symbols left for the UT
+     * @param rcSymbolsLeft Symbols left for RC
+     * @param cno Estimated C/N0 of the UT.
+     * @param rcBasedAllocationEnabled If time slot generated per RC
+     * @return Create time slot configuration
      */
     Ptr<SatTimeSlotConf> CreateTimeSlot(uint16_t carrierId,
                                         int64_t& utSymbolsToUse,
@@ -566,13 +568,13 @@ class SatFrameAllocator : public SimpleRefCount<SatFrameAllocator>
     /**
      * Create control time slot.
      *
-     * \param carrierId Id of the carrier into create time slot
-     * \param utSymbolsToUse Symbols possible to allocated for the UT
-     * \param carrierSymbolsToUse Symbols possible to allocate to carrier
-     * \param utSymbolsLeft Symbols left for the UT
-     * \param rcSymbolsLeft Symbols left for RC
-     * \param rcBasedAllocationEnabled If time slot generated per RC
-     * \return Create time slot configuration
+     * @param carrierId Id of the carrier into create time slot
+     * @param utSymbolsToUse Symbols possible to allocated for the UT
+     * @param carrierSymbolsToUse Symbols possible to allocate to carrier
+     * @param utSymbolsLeft Symbols left for the UT
+     * @param rcSymbolsLeft Symbols left for RC
+     * @param rcBasedAllocationEnabled If time slot generated per RC
+     * @return Create time slot configuration
      */
     Ptr<SatTimeSlotConf> CreateCtrlTimeSlot(uint16_t carrierId,
                                             int64_t& utSymbolsToUse,
@@ -583,38 +585,38 @@ class SatFrameAllocator : public SimpleRefCount<SatFrameAllocator>
 
     /**
      * Update RC/CC requested according to carrier limit
-     * \param address Address of the UT which allocation is associated.
-     * \param cno C/N0 value estimated for the UT.
-     * \param req Allocation request to update
+     * @param address Address of the UT which allocation is associated.
+     * @param cno C/N0 value estimated for the UT.
+     * @param req Allocation request to update
      */
     void UpdateAndStoreAllocReq(Address address, double cno, SatFrameAllocInfo& req);
 
     /**
      * Accept UT/RC requests of the frame according to given CC level.
      *
-     * \param ccLevel CC level for the acceptance
+     * @param ccLevel CC level for the acceptance
      */
     void AcceptRequests(CcLevel_t ccLevel);
 
     /**
      * Sort UTs allocated to this frame.
      *
-     * \return Addressed of the UTs in sorted order.
+     * @return Addressed of the UTs in sorted order.
      */
     std::vector<Address> SortUts();
 
     /**
      * Sort carriers belonging to this frame.
      *
-     * \return Ids of the carriers in sorted order.
+     * @return Ids of the carriers in sorted order.
      */
     std::vector<uint16_t> SortCarriers();
 
     /**
      * Sort RCs in given UT.
      *
-     * \param ut Address of the UT which RCs is needed to sort
-     * \return Indices of the UT RC indices in sorted order.
+     * @param ut Address of the UT which RCs is needed to sort
+     * @return Indices of the UT RC indices in sorted order.
      */
     std::vector<uint32_t> SortUtRcs(Address ut);
 
@@ -622,9 +624,9 @@ class SatFrameAllocator : public SimpleRefCount<SatFrameAllocator>
      *  Get UT allocation item from given container. If UT not available in the
      *  container new UT specific item is added to container.
      *
-     * \param allocContainer Container to check
-     * \param ut Address of the UT
-     * \return Iterator to UT specific allocation item
+     * @param allocContainer Container to check
+     * @param ut Address of the UT
+     * @return Iterator to UT specific allocation item
      */
     SatFrameAllocator::UtAllocInfoContainer_t::iterator GetUtAllocItem(
         UtAllocInfoContainer_t& allocContainer,
@@ -634,8 +636,8 @@ class SatFrameAllocator : public SimpleRefCount<SatFrameAllocator>
      *  Creates new TBTP to given container with information of the
      *  last TBTP in container.
      *
-     * \param tbtpContainer TBTP container
-     * \return Pointer to created TBTP
+     * @param tbtpContainer TBTP container
+     * @return Pointer to created TBTP
      */
     Ptr<SatTbtpMessage> CreateNewTbtp(TbtpMsgContainer_t& tbtpContainer);
 };

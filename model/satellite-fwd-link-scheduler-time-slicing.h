@@ -23,7 +23,7 @@
 
 #include "satellite-fwd-link-scheduler.h"
 
-#include <ns3/pointer.h>
+#include "ns3/pointer.h"
 
 #include <map>
 #include <stdint.h>
@@ -34,8 +34,8 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief SatFwdLinkSchedulerTimeSlicing schedules BB frames for forward link. It classifies the
+ * @ingroup satellite
+ * @brief SatFwdLinkSchedulerTimeSlicing schedules BB frames for forward link. It classifies the
  * packets into different time slices depending on its destination MAC address.
  *
  *        SatFwdLinkSchedulerTimeSlicing communicated through callback functions to request
@@ -49,11 +49,10 @@ class SatFwdLinkSchedulerTimeSlicing : public SatFwdLinkScheduler
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
-    TypeId GetInstanceTypeId(void) const;
 
     /**
      * Construct a SatFwdLinkScheduler
@@ -66,13 +65,23 @@ class SatFwdLinkSchedulerTimeSlicing : public SatFwdLinkScheduler
     /**
      * Actual constructor of a SatFwdLinkScheduler
      *
-     * \param conf BB Frame configuration
-     * \param address MAC address
-     * \param carrierBandwidthInHz Carrier bandwidth where scheduler is associated to [Hz].
+     * @param conf BB Frame configuration
+     * @param address MAC address
+     * @param carrierBandwidthInHz Carrier bandwidth where scheduler is associated to [Hz].
      */
     SatFwdLinkSchedulerTimeSlicing(Ptr<SatBbFrameConf> conf,
                                    Mac48Address address,
                                    double carrierBandwidthInHz);
+
+    /**
+     * Notifier called once the ObjectBase is fully constructed.
+     *
+     * This method is invoked once all member attributes have been
+     * initialized. Subclasses can override this method to be notified
+     * of this event but if they do this, they must chain up to their
+     * parent's NotifyConstructionCompleted method.
+     */
+    virtual void NotifyConstructionCompleted() override;
 
     /**
      * Destroy a SatFwdLinkScheduler
@@ -84,7 +93,7 @@ class SatFwdLinkSchedulerTimeSlicing : public SatFwdLinkScheduler
     /**
      * Get next frame to be transmitted.
      *
-     * \return Pointer to frame
+     * @return Pointer to frame
      */
     virtual std::pair<Ptr<SatBbFrame>, const Time> GetNextFrame();
 
@@ -105,11 +114,6 @@ class SatFwdLinkSchedulerTimeSlicing : public SatFwdLinkScheduler
     void ScheduleBbFrames();
 
     /**
-     *  Handles periodic timer timeouts.
-     */
-    void PeriodicTimerExpired();
-
-    /**
      * Send stats and reset all the symbols sent count for each slice to zero.
      */
     void SendAndClearSymbolsSentStat();
@@ -117,37 +121,37 @@ class SatFwdLinkSchedulerTimeSlicing : public SatFwdLinkScheduler
     /**
      * Gets scheduling object in sorted order according to configured sorting criteria.
      *
-     * \param output reference to a vector which will be filled with pointers to
+     * @param output reference to a vector which will be filled with pointers to
      *               the scheduling objects available for scheduling.
      */
     void GetSchedulingObjects(std::vector<Ptr<SatSchedulingObject>>& output);
 
     /*
      * Give the total sending time of all the BBFrames in all the slices.
-     * \return The total duration.
+     * @return The total duration.
      */
     Time GetTotalDuration();
 
     /*
      * Send a control packet to the UT to inform which slices to subscribe
-     * \param address The MAC address of the UT
-     * \param slices The slices id the destination must subscribe to.
+     * @param address The MAC address of the UT
+     * @param slices The slices id the destination must subscribe to.
      */
     void SendTimeSliceSubscription(Mac48Address address, std::vector<uint8_t> slices);
 
     /*
      * Compute if a new BBFrame can be openned while respecting symbol rate constraints.
-     * \param address The MAC destination address of the BBFrame
-     * \param priorityClass The priority class of the new BBFrame
-     * \param modcod The modcod of the new BBFrame
-     * \return true if a new BBFrame can be openned
+     * @param address The MAC destination address of the BBFrame
+     * @param priorityClass The priority class of the new BBFrame
+     * @param modcod The modcod of the new BBFrame
+     * @return true if a new BBFrame can be openned
      */
     bool CanOpenBbFrame(Mac48Address address, uint32_t priorityClass, SatEnums::SatModcod_t modcod);
 
     /*
      * Compute the number of symbols to send for a slice, including a new BBFrame to be open
-     * \param sliceId The slice tested.
-     * \param modcod The modcod of the new BBFrame. If is SAT_NONVALID_MODCOD, the new BBFrame is
+     * @param sliceId The slice tested.
+     * @param modcod The modcod of the new BBFrame. If is SAT_NONVALID_MODCOD, the new BBFrame is
      * ignored. \return The total number of symbols for all the BBFrames.
      */
     uint32_t GetSymbols(uint8_t sliceId, SatEnums::SatModcod_t modcod);

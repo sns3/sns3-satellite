@@ -21,28 +21,28 @@
 
 #include "satellite-stats-packet-collision-helper.h"
 
-#include <ns3/boolean.h>
-#include <ns3/callback.h>
-#include <ns3/data-collection-object.h>
-#include <ns3/enum.h>
-#include <ns3/interval-rate-collector.h>
-#include <ns3/log.h>
-#include <ns3/mac48-address.h>
-#include <ns3/magister-gnuplot-aggregator.h>
-#include <ns3/multi-file-aggregator.h>
-#include <ns3/node-container.h>
-#include <ns3/object-vector.h>
-#include <ns3/satellite-helper.h>
-#include <ns3/satellite-id-mapper.h>
-#include <ns3/satellite-net-device.h>
-#include <ns3/satellite-orbiter-net-device.h>
-#include <ns3/satellite-phy-rx-carrier.h>
-#include <ns3/satellite-phy-rx.h>
-#include <ns3/satellite-phy.h>
-#include <ns3/satellite-topology.h>
-#include <ns3/scalar-collector.h>
-#include <ns3/singleton.h>
-#include <ns3/string.h>
+#include "ns3/boolean.h"
+#include "ns3/callback.h"
+#include "ns3/data-collection-object.h"
+#include "ns3/enum.h"
+#include "ns3/interval-rate-collector.h"
+#include "ns3/log.h"
+#include "ns3/mac48-address.h"
+#include "ns3/magister-gnuplot-aggregator.h"
+#include "ns3/multi-file-aggregator.h"
+#include "ns3/node-container.h"
+#include "ns3/object-vector.h"
+#include "ns3/satellite-helper.h"
+#include "ns3/satellite-id-mapper.h"
+#include "ns3/satellite-net-device.h"
+#include "ns3/satellite-orbiter-net-device.h"
+#include "ns3/satellite-phy-rx-carrier.h"
+#include "ns3/satellite-phy-rx.h"
+#include "ns3/satellite-phy.h"
+#include "ns3/satellite-topology.h"
+#include "ns3/scalar-collector.h"
+#include "ns3/singleton.h"
+#include "ns3/string.h"
 
 #include <map>
 #include <sstream>
@@ -98,8 +98,7 @@ SatStatsPacketCollisionHelper::CollisionRxCallback(uint32_t nPackets,
     if (from.IsInvalid())
     {
         NS_LOG_WARN(this << " discarding " << nPackets << " packets"
-                         << " from statistics collection because of"
-                         << " invalid sender address");
+                         << " from statistics collection because of" << " invalid sender address");
     }
     else
     {
@@ -246,7 +245,7 @@ SatStatsFeederPacketCollisionHelper::DoInstall()
         break;
 
     case SatStatsHelper::OUTPUT_SCALAR_PLOT:
-        /// \todo Add support for boxes in Gnuplot.
+        /// @todo Add support for boxes in Gnuplot.
         NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
                        << " is not a valid output type for this statistics.");
         break;
@@ -351,11 +350,11 @@ SatStatsFeederPacketCollisionHelper::DoInstall()
                 }
                 else
                 {
-                    NS_FATAL_ERROR("Error connecting to " << GetTraceSourceName() << " trace source"
-                                                          << " of SatPhyRxCarrier"
-                                                          << " at node ID " << (*it)->GetId()
-                                                          << " device #" << (*itDev)->GetIfIndex()
-                                                          << " RX carrier #" << itCarrier->first);
+                    NS_FATAL_ERROR("Error connecting to "
+                                   << GetTraceSourceName() << " trace source"
+                                   << " of SatPhyRxCarrier" << " at node ID " << (*it)->GetId()
+                                   << " device #" << (*itDev)->GetIfIndex() << " RX carrier #"
+                                   << itCarrier->first);
                 }
 
             } // end of `for (ObjectVectorValue::Iterator itCarrier = carriers)`
@@ -461,7 +460,7 @@ SatStatsUserPacketCollisionHelper::DoInstall()
         break;
 
     case SatStatsHelper::OUTPUT_SCALAR_PLOT:
-        /// \todo Add support for boxes in Gnuplot.
+        /// @todo Add support for boxes in Gnuplot.
         NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
                        << " is not a valid output type for this statistics.");
         break;
@@ -571,10 +570,10 @@ SatStatsUserPacketCollisionHelper::DoInstall()
                 else
                 {
                     NS_FATAL_ERROR("Error connecting to " << GetTraceSourceName() << " trace source"
-                                                          << " of SatPhyRxCarrier"
-                                                          << " at node ID " << (*it)->GetId()
-                                                          << " device #" << dev->GetIfIndex()
-                                                          << " RX carrier #" << itCarrier->first);
+                                                          << " of SatPhyRxCarrier" << " at node ID "
+                                                          << (*it)->GetId() << " device #"
+                                                          << dev->GetIfIndex() << " RX carrier #"
+                                                          << itCarrier->first);
                 }
 
             } // end of `for (ObjectVectorValue::Iterator itCarrier = carriers)`

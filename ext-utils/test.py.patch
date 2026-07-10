@@ -1,0 +1,141 @@
+# Copyright (c) 2025
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation;
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+# Author: Bastien TAURAN <bastien.tauran@viveris.fr>
+#
+# This patch can be applied to test.py script to allow launching only examples
+# and tests from a specific module.
+# For example: python3 test.py --jobs=8 --module-only=satellite
+#
+# TO apply this patch: patch < test.py.patch
+
+diff --git a/test.py b/test.py
+index 941987840..7994782a6 100755
+--- a/test.py
++++ b/test.py
+@@ -15,6 +15,7 @@ import sys
+ import threading
+ import time
+ import xml.etree.ElementTree as ET
++import re
+ 
+ from utils import get_list_from_file
+ 
+@@ -1205,6 +1206,21 @@ def load_previously_successful_tests():
+     return previously_run_tests_to_skip
+ 
+ 
++def get_all_tests_from_module(module_name):
++    tests_of_module = []
++    tests_directory = os.path.join(os.getcwd(), "contrib", module_name, "test")
++    cmd = ["grep", "-rnI", "TestSuite", tests_directory]
++    result = subprocess.run(cmd, capture_output=True, text=True).stdout.split('\n')
++
++    for value in result:
++        match = re.match(r'.*TestSuite\s*\(\s*\"\s*([a-zA-Z_-]+)\s*\"\s*,\s*[a-zA-Z:]*Type::\w+\s*\).*', value)
++        if match:
++            first_arg = match.group(1)
++            tests_of_module.append(first_arg)
++
++    return tests_of_module
++
++
+ #
+ # This is the main function that does the work of interacting with the
+ # test-runner itself.
+@@ -1297,27 +1313,31 @@ def run_tests():
+     example_tests = []
+     example_names_original = []
+     python_tests = []
+-    for directory in EXAMPLE_DIRECTORIES:
+-        # Set the directories and paths for this example.
+-        example_directory = os.path.join("examples", directory)
+-        examples_to_run_path = os.path.join(example_directory, "examples-to-run.py")
+-        cpp_executable_dir = os.path.join(NS3_BUILDDIR, example_directory)
+-        python_script_dir = os.path.join(example_directory)
+-
+-        # Parse this example directory's file.
+-        parse_examples_to_run_file(
+-            examples_to_run_path,
+-            cpp_executable_dir,
+-            python_script_dir,
+-            example_tests,
+-            example_names_original,
+-            python_tests,
+-        )
++    if not args.module_only:
++        for directory in EXAMPLE_DIRECTORIES:
++            # Set the directories and paths for this example.
++            example_directory = os.path.join("examples", directory)
++            examples_to_run_path = os.path.join(example_directory, "examples-to-run.py")
++            cpp_executable_dir = os.path.join(NS3_BUILDDIR, example_directory)
++            python_script_dir = os.path.join(example_directory)
++
++            # Parse this example directory's file.
++            parse_examples_to_run_file(
++                examples_to_run_path,
++                cpp_executable_dir,
++                python_script_dir,
++                example_tests,
++                example_names_original,
++                python_tests,
++            )
+ 
+     for module in NS3_ENABLED_MODULES:
+         # Remove the "ns3-" from the module name.
+         module = module[len("ns3-") :]
+ 
++        if args.module_only and args.module_only != module:
++            continue
++
+         # Set the directories and paths for this example.
+         module_directory = os.path.join("src", module)
+         example_directory = os.path.join(module_directory, "examples")
+@@ -1339,6 +1359,9 @@ def run_tests():
+         # Remove the "ns3-" from the module name.
+         module = module[len("ns3-") :]
+ 
++        if args.module_only and args.module_only != module:
++            continue
++
+         # Set the directories and paths for this example.
+         module_directory = os.path.join("contrib", module)
+         example_directory = os.path.join(module_directory, "examples")
+@@ -1543,6 +1566,9 @@ def run_tests():
+     else:
+         suites = ""
+ 
++    if args.module_only:
++        suites = "\n".join(get_all_tests_from_module(args.module_only))
++
+     #
+     # suite_list will either a single test suite name that the user has
+     # indicated she wants to run or a list of test suites provided by
+@@ -2426,6 +2452,15 @@ def main(argv):
+         help="rerun failed tests",
+     )
+ 
++    parser.add_argument(
++        "--module-only",
++        action="store",
++        type=str,
++        dest="module_only",
++        default="",
++        help="execute only tests from one module",
++    )
++
+     global args
+     args = parser.parse_args()
+     signal.signal(signal.SIGINT, sigint_hook)

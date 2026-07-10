@@ -23,9 +23,9 @@
 #include "satellite-net-device.h"
 #include "satellite-orbiter-net-device.h"
 
-#include <ns3/address.h>
-#include <ns3/log.h>
-#include <ns3/node.h>
+#include "ns3/address.h"
+#include "ns3/log.h"
+#include "ns3/node.h"
 
 #include <iostream>
 #include <map>

@@ -39,7 +39,7 @@ namespace ns3
 {
 
 /**
- * \brief A configuration class for the satellite reference system
+ * @brief A configuration class for the satellite reference system
  *
  */
 class SatConf : public Object
@@ -55,11 +55,10 @@ class SatConf : public Object
     }
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
-    TypeId GetInstanceTypeId(void) const;
 
     inline Ptr<SatSuperframeSeq> GetSuperframeSeq()
     {
@@ -68,13 +67,13 @@ class SatConf : public Object
 
     /**
      * Initialize the configuration
-     * \param rtnConf RTN link configuration file name
-     * \param fwdConf FWD link configuration file name
-     * \param gwPos GW position file name
-     * \param satPos Satellite position file name
-     * \param satPos UT position file name
-     * \param wfConf Waveform configuration file name
-     * \param isConstellation Indicates if SatConf describes a constellation
+     * @param rtnConf RTN link configuration file name
+     * @param fwdConf FWD link configuration file name
+     * @param gwPos GW position file name
+     * @param satPos Satellite position file name
+     * @param satPos UT position file name
+     * @param wfConf Waveform configuration file name
+     * @param isConstellation Indicates if SatConf describes a constellation
      */
     void Initialize(std::string rtnConf,
                     std::string fwdConf,
@@ -86,103 +85,103 @@ class SatConf : public Object
 
     /**
      * Try to open a file from a given path
-     * \param filePathName
+     * @param filePathName
      */
     std::ifstream* OpenFile(std::string filePathName) const;
 
     /**
      * Load satellite configuration from a file
-     * \param filePathName
-     * \return Container of the configuration data
+     * @param filePathName
+     * @return Container of the configuration data
      */
     std::vector<std::vector<uint32_t>> LoadSatConf(std::string filePathName) const;
 
     /**
      * Update the list of positions
-     * \param Path of the new file to load
+     * @param Path of the new file to load
      */
     void SetUtPositionsPath(std::string inputFileUtListPositions);
 
     /**
      * Get count of the beams (configurations).
      *
-     * \return beam count
+     * @return beam count
      */
     uint32_t GetBeamCount() const;
 
     /**
      * Get the configuration vector for a given satellite beam id
      *
-     * \param beamId id of the beam
-     * \return the configuration vector for a given satellite beam id
+     * @param beamId id of the beam
+     * @return the configuration vector for a given satellite beam id
      */
     std::vector<uint32_t> GetBeamConfiguration(uint32_t beamId, SatEnums::SatLinkDir_t dir) const;
 
     /**
-     * \return The number of the carriers in return link.
+     * @return The number of the carriers in return link.
      */
     uint32_t GetRtnLinkCarrierCount() const;
 
     /**
      * Get count of the GWs (positions).
      *
-     * \return GW count
+     * @return GW count
      */
     uint32_t GetGwCount() const;
 
     /**
      * Get count of the UTs (positions).
      *
-     * \return UT count
+     * @return UT count
      */
     uint32_t GetUtCount() const;
 
     /**
      * Get count of the SATs (positions).
      *
-     * \return SAT count
+     * @return SAT count
      */
     uint32_t GetSatCount() const;
 
     /**
      * Get the position of the GW for a given GW id
      *
-     * \param gwId id of the GW
+     * @param gwId id of the GW
      *
-     * \return Requested GW's position.
+     * @return Requested GW's position.
      */
     GeoCoordinate GetGwPosition(uint32_t gwId) const;
 
     /**
      * Get the position of the GW for a given UT id
      *
-     * \param utId id of the UT (from SatIdMapper)
+     * @param utId id of the UT (from SatIdMapper)
      *
-     * \return Requested UT's position.
+     * @return Requested UT's position.
      */
     GeoCoordinate GetUtPosition(uint32_t utId) const;
 
     /**
      * Get the position of the Satellite
      *
-     * \return satellite position.
+     * @return satellite position.
      */
     GeoCoordinate GetSatPosition() const;
 
     /**
      * Get the simulation start time for scenarios using SGP4 model.
      *
-     * \return String representation of start time, using format "YYYY-MM-DD hh:mm:ss"
+     * @return String representation of start time, using format "YYYY-MM-DD hh:mm:ss"
      */
     std::string GetStartTimeStr() const;
 
     /**
      * Convert carrier id, sequency id and frequency id to real frequency value.
      *
-     * \param chType    Type of channel.
-     * \param freqId    Id of the frequency.
-     * \param carrierId Id of the carrier.
-     * \return real frequency value
+     * @param chType    Type of channel.
+     * @param freqId    Id of the frequency.
+     * @param carrierId Id of the carrier.
+     * @return real frequency value
      */
     double GetCarrierFrequencyHz(SatEnums::ChannelType_t chType,
                                  uint32_t freqId,
@@ -191,32 +190,32 @@ class SatConf : public Object
     /**
      * Convert carrier id and sequence id to to bandwidth value.
      *
-     * \param chType    Type of channel.
-     * \param carrierId Id of the carrier.
-     * \param bandwidthType Type of the bandwidth.
-     * \return bandwidth value
+     * @param chType    Type of channel.
+     * @param carrierId Id of the carrier.
+     * @param bandwidthType Type of the bandwidth.
+     * @return bandwidth value
      */
     double GetCarrierBandwidthHz(SatEnums::ChannelType_t chType,
                                  uint32_t carrierId,
                                  SatEnums::CarrierBandwidthType_t bandwidthType);
 
     /**
-     * \return The number of the carriers in return link.
+     * @return The number of the carriers in return link.
      */
     uint32_t GetFwdLinkCarrierCount() const;
 
     /**
      * Load a vector of TLE information from a file
-     * \param filePathName Path to the file containing the TLEs
-     * \param startDatePathName Path to the file containing the simulation start date
-     * \return TLE information extracted from file
+     * @param filePathName Path to the file containing the TLEs
+     * @param startDatePathName Path to the file containing the simulation start date
+     * @return TLE information extracted from file
      */
     std::vector<std::string> LoadTles(std::string filePathName, std::string startDatePathName);
 
     /**
      * Load a vector of ISLs from a file
-     * \param filePathName
-     * \return ISLs information extracted from file. This corresponds to satellite pairs linked by
+     * @param filePathName
+     * @return ISLs information extracted from file. This corresponds to satellite pairs linked by
      * ISLs
      */
     std::vector<std::pair<uint32_t, uint32_t>> LoadIsls(std::string filePathName);
@@ -412,9 +411,9 @@ class SatConf : public Object
     /**
      * Get bandwidth of the forward link carrier.
      *
-     * \param carrierId Id of the carrier.
-     * \param bandwidthType Type of the bandwidth.
-     * \return Requested carrier bandwidth.
+     * @param carrierId Id of the carrier.
+     * @param bandwidthType Type of the bandwidth.
+     * @return Requested carrier bandwidth.
      */
     double GetFwdLinkCarrierBandwidthHz(uint32_t carrierId,
                                         SatEnums::CarrierBandwidthType_t bandwidthType) const;
@@ -422,40 +421,40 @@ class SatConf : public Object
     /**
      * Get bandwidth of the return link carrier.
      *
-     * \param carrierId Id of the carrier.
-     * \param bandwidthType Type of the bandwidth.
-     * \return Requested carrier bandwidth.
+     * @param carrierId Id of the carrier.
+     * @param bandwidthType Type of the bandwidth.
+     * @return Requested carrier bandwidth.
      */
     double GetRtnLinkCarrierBandwidthHz(uint32_t carrierId,
                                         SatEnums::CarrierBandwidthType_t bandwidthType) const;
 
     /**
      * Configures itself with default values. Creates configuration storages as needed.
-     * \param wfConf path+filename of the waveform configuration
+     * @param wfConf path+filename of the waveform configuration
      */
     void Configure(std::string wfConf);
 
     /**
-     * \param carrierId  Global carrier ID across all superframe sequences.
-     * \param seqId      Pointer to variable to store seqId of the super frame sequence
+     * @param carrierId  Global carrier ID across all superframe sequences.
+     * @param seqId      Pointer to variable to store seqId of the super frame sequence
      *                   where global id belongs to
      *
-     * \return Carrier id relative to the superframe
+     * @return Carrier id relative to the superframe
      */
     uint32_t GetSuperframeCarrierId(uint32_t carrierId, uint32_t* seqId);
 
     /**
-     * \param seqId      Sequence of the superframe.
-     * \param carrierId  Carrier ID inside requested superframe.
+     * @param seqId      Sequence of the superframe.
+     * @param carrierId  Carrier ID inside requested superframe.
      *
-     * \return Global carrier id  across all superframe sequences.
+     * @return Global carrier id  across all superframe sequences.
      */
     uint32_t GetGlobalCarrierId(uint32_t seqId, uint32_t carrierId);
 
     /**
      * Load node positions from a file
-     * \param filePathName
-     * \param container Container reference to store found positions
+     * @param filePathName
+     * @param container Container reference to store found positions
      */
     void LoadPositions(std::string filePathName, PositionContainer_t& container);
 };

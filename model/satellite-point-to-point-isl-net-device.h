@@ -51,9 +51,9 @@ class ErrorModel;
 class SatOrbiterNetDevice;
 
 /**
- * \ingroup point-to-point
- * \class PointToPoinIsltNetDevice
- * \brief A Device for a Point to Point ISL Network Link.
+ * @ingroup point-to-point
+ * @class PointToPoinIsltNetDevice
+ * @brief A Device for a Point to Point ISL Network Link.
  *
  * This PointToPointIslNetDevice class specializes the NetDevice abstract
  * base class.  Together with a PointToPointIslChannel (and a peer
@@ -67,9 +67,9 @@ class PointToPointIslNetDevice : public NetDevice
 {
   public:
     /**
-     * \brief Get the TypeId
+     * @brief Get the TypeId
      *
-     * \return The TypeId for this class
+     * @return The TypeId for this class
      */
     static TypeId GetTypeId(void);
 
@@ -92,7 +92,7 @@ class PointToPointIslNetDevice : public NetDevice
      * set in the Attach () method from the corresponding field in the channel
      * to which the device is attached.  It can be overridden using this method.
      *
-     * \param bps the data rate at which this object operates
+     * @param bps the data rate at which this object operates
      */
     void SetDataRate(DataRate bps);
 
@@ -100,15 +100,15 @@ class PointToPointIslNetDevice : public NetDevice
      * Set the interframe gap used to separate packets.  The interframe gap
      * defines the minimum space required between packets sent by this device.
      *
-     * \param t the interframe gap time
+     * @param t the interframe gap time
      */
     void SetInterframeGap(Time t);
 
     /**
      * Attach the device to a channel.
      *
-     * \param ch Ptr to the channel to which this object is being attached.
-     * \return true if the operation was successful (always true actually)
+     * @param ch Ptr to the channel to which this object is being attached.
+     * @return true if the operation was successful (always true actually)
      */
     bool Attach(Ptr<PointToPointIslChannel> ch);
 
@@ -118,14 +118,14 @@ class PointToPointIslNetDevice : public NetDevice
      * The PointToPointIslNetDevice "owns" a queue that implements a queueing
      * method such as DropTailQueue or RedQueue
      *
-     * \param queue Ptr to the new queue.
+     * @param queue Ptr to the new queue.
      */
     void SetQueue(Ptr<DropTailQueue<Packet>> queue);
 
     /**
      * Get a copy of the attached Queue.
      *
-     * \returns Ptr to the queue.
+     * @returns Ptr to the queue.
      */
     Ptr<DropTailQueue<Packet>> GetQueue(void) const;
 
@@ -135,7 +135,7 @@ class PointToPointIslNetDevice : public NetDevice
      * The PointToPointNetLaserDevice may optionally include an ErrorModel in
      * the packet receive chain.
      *
-     * \param em Ptr to the ErrorModel.
+     * @param em Ptr to the ErrorModel.
      */
     void SetReceiveErrorModel(Ptr<ErrorModel> em);
 
@@ -147,13 +147,13 @@ class PointToPointIslNetDevice : public NetDevice
      * used by the channel to indicate that the last bit of a packet has
      * arrived at the device.
      *
-     * \param p Ptr to the received packet.
+     * @param p Ptr to the received packet.
      */
     void Receive(Ptr<Packet> p);
 
     /**
      * Set the associated OrbiterNetDevice
-     * \param orbiterNetDevice The device to attach to this instance
+     * @param orbiterNetDevice The device to attach to this instance
      */
     void SetOrbiterNetDevice(Ptr<SatOrbiterNetDevice> orbiterNetDevice);
 
@@ -206,31 +206,31 @@ class PointToPointIslNetDevice : public NetDevice
 
   private:
     /**
-     * \brief Assign operator
+     * @brief Assign operator
      *
      * The method is private, so it is DISABLED.
      *
-     * \param o Other NetDevice
-     * \return New instance of the NetDevice
+     * @param o Other NetDevice
+     * @return New instance of the NetDevice
      */
     PointToPointIslNetDevice& operator=(const PointToPointIslNetDevice& o);
 
     /**
-     * \brief Copy constructor
+     * @brief Copy constructor
      *
      * The method is private, so it is DISABLED.
 
-     * \param o Other NetDevice
+     * @param o Other NetDevice
      */
     PointToPointIslNetDevice(const PointToPointIslNetDevice& o);
 
     /**
-     * \brief Dispose of the object
+     * @brief Dispose of the object
      */
     virtual void DoDispose(void);
 
     /**
-     * \returns the address of the remote device connected to this device
+     * @returns the address of the remote device connected to this device
      * through the point to point channel.
      */
     Address GetRemote(void) const;
@@ -238,17 +238,17 @@ class PointToPointIslNetDevice : public NetDevice
     /**
      * Adds the necessary headers and trailers to a packet of data in order to
      * respect the protocol implemented by the agent.
-     * \param p packet
-     * \param protocolNumber protocol number
+     * @param p packet
+     * @param protocolNumber protocol number
      */
     void AddHeader(Ptr<Packet> p, uint16_t protocolNumber);
 
     /**
      * Removes, from a packet of data, all headers and trailers that
      * relate to the protocol implemented by the agent
-     * \param p Packet whose headers need to be processed
-     * \param param An integer parameter that can be set by the function
-     * \return Returns true if the packet should be forwarded up the
+     * @param p Packet whose headers need to be processed
+     * @param param An integer parameter that can be set by the function
+     * @return Returns true if the packet should be forwarded up the
      * protocol stack.
      */
     bool ProcessHeader(Ptr<Packet> p, uint16_t& param);
@@ -263,10 +263,10 @@ class PointToPointIslNetDevice : public NetDevice
      * started sending signals.  An event is scheduled for the time at which
      * the bits have been completely transmitted.
      *
-     * \see PointToPointIslChannel::TransmitStart ()
-     * \see TransmitComplete()
-     * \param p a reference to the packet to send
-     * \returns true if success, false on failure
+     * @see PointToPointIslChannel::TransmitStart ()
+     * @see TransmitComplete()
+     * @param p a reference to the packet to send
+     * @returns true if success, false on failure
      */
     bool TransmitStart(Ptr<Packet> p);
 
@@ -279,7 +279,7 @@ class PointToPointIslNetDevice : public NetDevice
     void TransmitComplete(void);
 
     /**
-     * \brief Make the link up and running
+     * @brief Make the link up and running
      *
      * It calls also the linkChange callback.
      */
@@ -323,16 +323,16 @@ class PointToPointIslNetDevice : public NetDevice
         m_orbiterNetDevice; //!< Satellite Orbiter Net Device associated to this instance
 
     /**
-     * \brief PPP to Ethernet protocol number mapping
-     * \param protocol A PPP protocol number
-     * \return The corresponding Ethernet protocol number
+     * @brief PPP to Ethernet protocol number mapping
+     * @param protocol A PPP protocol number
+     * @return The corresponding Ethernet protocol number
      */
     static uint16_t PppToEther(uint16_t protocol);
 
     /**
-     * \brief Ethernet to PPP protocol number mapping
-     * \param protocol An Ethernet protocol number
-     * \return The corresponding PPP protocol number
+     * @brief Ethernet to PPP protocol number mapping
+     * @param protocol An Ethernet protocol number
+     * @return The corresponding PPP protocol number
      */
     static uint16_t EtherToPpp(uint16_t protocol);
 

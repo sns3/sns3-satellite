@@ -21,25 +21,25 @@
 
 #include "satellite-stats-helper.h"
 
-#include <ns3/address.h>
-#include <ns3/collector-map.h>
-#include <ns3/data-collection-object.h>
-#include <ns3/enum.h>
-#include <ns3/log.h>
-#include <ns3/mac48-address.h>
-#include <ns3/node-container.h>
-#include <ns3/object-factory.h>
-#include <ns3/satellite-beam-helper.h>
-#include <ns3/satellite-const-variables.h>
-#include <ns3/satellite-env-variables.h>
-#include <ns3/satellite-helper.h>
-#include <ns3/satellite-id-mapper.h>
-#include <ns3/satellite-orbiter-net-device.h>
-#include <ns3/satellite-topology.h>
-#include <ns3/satellite-user-helper.h>
-#include <ns3/singleton.h>
-#include <ns3/string.h>
-#include <ns3/type-id.h>
+#include "ns3/address.h"
+#include "ns3/collector-map.h"
+#include "ns3/data-collection-object.h"
+#include "ns3/enum.h"
+#include "ns3/log.h"
+#include "ns3/mac48-address.h"
+#include "ns3/node-container.h"
+#include "ns3/object-factory.h"
+#include "ns3/satellite-beam-helper.h"
+#include "ns3/satellite-const-variables.h"
+#include "ns3/satellite-env-variables.h"
+#include "ns3/satellite-helper.h"
+#include "ns3/satellite-id-mapper.h"
+#include "ns3/satellite-orbiter-net-device.h"
+#include "ns3/satellite-topology.h"
+#include "ns3/satellite-user-helper.h"
+#include "ns3/singleton.h"
+#include "ns3/string.h"
+#include "ns3/type-id.h"
 
 #include <list>
 #include <sstream>
@@ -246,8 +246,8 @@ SatStatsHelper::SetIdentifierType(SatStatsHelper::IdentifierType_t identifierTyp
 
     if (m_isInstalled && (m_identifierType != identifierType))
     {
-        NS_LOG_WARN(this << " cannot modify the current identifier type"
-                         << " (" << GetIdentifierTypeName(m_identifierType) << ")"
+        NS_LOG_WARN(this << " cannot modify the current identifier type" << " ("
+                         << GetIdentifierTypeName(m_identifierType) << ")"
                          << " because this instance have already been installed");
     }
     else
@@ -269,8 +269,8 @@ SatStatsHelper::SetOutputType(SatStatsHelper::OutputType_t outputType)
 
     if (m_isInstalled && (m_outputType != outputType))
     {
-        NS_LOG_WARN(this << " cannot modify the current output type"
-                         << " (" << GetIdentifierTypeName(m_identifierType) << ")"
+        NS_LOG_WARN(this << " cannot modify the current output type" << " ("
+                         << GetIdentifierTypeName(m_identifierType) << ")"
                          << " because this instance have already been installed");
     }
     else
@@ -470,8 +470,8 @@ SatStatsHelper::CreateCollectorPerIdentifier(CollectorMap& collectorMap) const
         break;
     }
 
-    NS_LOG_INFO(this << " created " << n << " instance(s)"
-                     << " of " << collectorMap.GetType().GetName() << " for "
+    NS_LOG_INFO(this << " created " << n << " instance(s)" << " of "
+                     << collectorMap.GetType().GetName() << " for "
                      << GetIdentifierTypeName(GetIdentifierType()));
 
     return n;
@@ -481,7 +481,7 @@ SatStatsHelper::CreateCollectorPerIdentifier(CollectorMap& collectorMap) const
 std::string
 SatStatsHelper::GetOutputPath() const
 {
-    return Singleton<SatEnvVariables>::Get()->GetOutputPath();
+    return SatEnvVariables::GetInstance()->GetOutputPath();
 }
 
 std::string
@@ -889,8 +889,7 @@ SatStatsHelper::GetIdentifierForUt(Ptr<Node> utNode) const
 
     default:
         NS_LOG_WARN(this << " Identifier type " << GetIdentifierTypeName(m_identifierType)
-                         << " is not valid for a UT."
-                         << " Assigning identifier 0 to this UT.");
+                         << " is not valid for a UT." << " Assigning identifier 0 to this UT.");
         break;
     }
 
@@ -927,8 +926,7 @@ SatStatsHelper::GetIdentifierForBeam(uint32_t satId, uint32_t beamId) const
 
     default:
         NS_LOG_WARN(this << " Identifier type " << GetIdentifierTypeName(m_identifierType)
-                         << " is not valid for a beam."
-                         << " Assigning identifier 0 to this beam.");
+                         << " is not valid for a beam." << " Assigning identifier 0 to this beam.");
         break;
     }
 
@@ -974,8 +972,7 @@ SatStatsHelper::GetIdentifierForGw(Ptr<Node> gwNode) const
     else
     {
         NS_LOG_WARN(this << " Identifier type " << GetIdentifierTypeName(m_identifierType)
-                         << " is not valid for a GW."
-                         << " Assigning identifier 0 to this GW.");
+                         << " is not valid for a GW." << " Assigning identifier 0 to this GW.");
         return 0;
     }
 }
@@ -994,8 +991,7 @@ SatStatsHelper::GetIdentifierForSat(Ptr<Node> satNode) const
     else
     {
         NS_LOG_WARN(this << " Identifier type " << GetIdentifierTypeName(m_identifierType)
-                         << " is not valid for a SAT."
-                         << " Assigning identifier 0 to this SAT.");
+                         << " is not valid for a SAT." << " Assigning identifier 0 to this SAT.");
         return 0;
     }
 }
@@ -1014,8 +1010,7 @@ SatStatsHelper::GetIdentifierForIsl(Ptr<Node> satNodeSrc, Ptr<Node> satNodeDst) 
     else
     {
         NS_LOG_WARN(this << " Identifier type " << GetIdentifierTypeName(m_identifierType)
-                         << " is not valid for a ISL."
-                         << " Assigning identifier 0 to this ISL.");
+                         << " is not valid for a ISL." << " Assigning identifier 0 to this ISL.");
         return 0;
     }
 }

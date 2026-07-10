@@ -164,11 +164,15 @@ angle(double vec1[3], double vec2[3])
     {
         temp = dot(vec1, vec2) / (magv1 * magv2);
         if (fabs(temp) > 1.0)
+        {
             temp = sgn(temp) * 1.0;
+        }
         return acos(temp);
     }
     else
+    {
         return undefined;
+    }
 } // end angle
 
 /* -----------------------------------------------------------------------------
@@ -281,7 +285,9 @@ newtonnu(double ecc, double nu, double& e0, double& m)
     {
         m = fmod(m, 2.0 * pi);
         if (m < 0.0)
+        {
             m = m + 2.0 * pi;
+        }
         e0 = fmod(e0, 2.0 * pi);
     }
 } // end newtonnu
@@ -387,15 +393,21 @@ rv2coe(double r[3],
         c1 = magv * magv - mu / magr;
         rdotv = dot(r, v);
         for (i = 0; i <= 2; i++)
+        {
             ebar[i] = (c1 * r[i] - rdotv * v[i]) / mu;
+        }
         ecc = mag(ebar);
 
         // ------------  find a e and semi-latus rectum   ----------
         sme = (magv * magv * 0.5) - (mu / magr);
         if (fabs(sme) > small)
+        {
             a = -mu / (2.0 * sme);
+        }
         else
+        {
             a = infinite;
+        }
         p = magh * magh / mu;
 
         // -----------------  find inclination   -------------------
@@ -409,16 +421,22 @@ rv2coe(double r[3],
         {
             // ----------------  circular equatorial ---------------
             if ((incl < small) | (fabs(incl - pi) < small))
+            {
                 strcpy(typeorbit, "ce");
+            }
             else
+            {
                 // --------------  circular inclined ---------------
                 strcpy(typeorbit, "ci");
+            }
         }
         else
         {
             // - elliptical, parabolic, hyperbolic equatorial --
             if ((incl < small) | (fabs(incl - pi) < small))
+            {
                 strcpy(typeorbit, "ee");
+            }
         }
 
         // ----------  find longitude of ascending node ------------
@@ -426,79 +444,115 @@ rv2coe(double r[3],
         {
             temp = nbar[0] / magn;
             if (fabs(temp) > 1.0)
+            {
                 temp = sgn(temp);
+            }
             omega = acos(temp);
             if (nbar[1] < 0.0)
+            {
                 omega = twopi - omega;
+            }
         }
         else
+        {
             omega = undefined;
+        }
 
         // ---------------- find argument of perigee ---------------
         if (strcmp(typeorbit, "ei") == 0)
         {
             argp = angle(nbar, ebar);
             if (ebar[2] < 0.0)
+            {
                 argp = twopi - argp;
+            }
         }
         else
+        {
             argp = undefined;
+        }
 
         // ------------  find true anomaly at epoch    -------------
         if (typeorbit[0] == 'e')
         {
             nu = angle(ebar, r);
             if (rdotv < 0.0)
+            {
                 nu = twopi - nu;
+            }
         }
         else
+        {
             nu = undefined;
+        }
 
         // ----  find argument of latitude - circular inclined -----
         if (strcmp(typeorbit, "ci") == 0)
         {
             arglat = angle(nbar, r);
             if (r[2] < 0.0)
+            {
                 arglat = twopi - arglat;
+            }
             m = arglat;
         }
         else
+        {
             arglat = undefined;
+        }
 
         // -- find longitude of perigee - elliptical equatorial ----
         if ((ecc > small) && (strcmp(typeorbit, "ee") == 0))
         {
             temp = ebar[0] / ecc;
             if (fabs(temp) > 1.0)
+            {
                 temp = sgn(temp);
+            }
             lonper = acos(temp);
             if (ebar[1] < 0.0)
+            {
                 lonper = twopi - lonper;
+            }
             if (incl > halfpi)
+            {
                 lonper = twopi - lonper;
+            }
         }
         else
+        {
             lonper = undefined;
+        }
 
         // -------- find true longitude - circular equatorial ------
         if ((magr > small) && (strcmp(typeorbit, "ce") == 0))
         {
             temp = r[0] / magr;
             if (fabs(temp) > 1.0)
+            {
                 temp = sgn(temp);
+            }
             truelon = acos(temp);
             if (r[1] < 0.0)
+            {
                 truelon = twopi - truelon;
+            }
             if (incl > halfpi)
+            {
                 truelon = twopi - truelon;
+            }
             m = truelon;
         }
         else
+        {
             truelon = undefined;
+        }
 
         // ------------ find mean anomaly for all orbits -----------
         if (typeorbit[0] == 'e')
+        {
             newtonnu(ecc, nu, e, m);
+        }
     }
     else
     {
@@ -604,7 +658,9 @@ days2mdhms(int year, double days, int& mon, int& day, int& hr, int& minute, doub
     dayofyr = (int)floor(days);
     /* ----------------- find month and day of month ---------------- */
     if ((year % 4) == 0)
+    {
         lmonth[1] = 29;
+    }
 
     i = 1;
     inttemp = 0;

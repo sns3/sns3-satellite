@@ -29,10 +29,10 @@
 using namespace ns3;
 
 /**
- * \file sat-multi-application-rtn-example.cc
- * \ingroup satellite
+ * @file sat-multi-application-rtn-example.cc
+ * @ingroup satellite
  *
- * \brief  MultiApplicationRtn-example using satellite network in the RTN link. The
+ * @brief  MultiApplicationRtn-example using satellite network in the RTN link. The
  *         example utilizes OnOff and CBR application and presents how to sent the
  *         ToS field values for them.
  *

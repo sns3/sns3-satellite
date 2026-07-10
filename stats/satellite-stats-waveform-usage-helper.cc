@@ -21,22 +21,22 @@
 
 #include "satellite-stats-waveform-usage-helper.h"
 
-#include <ns3/boolean.h>
-#include <ns3/callback.h>
-#include <ns3/data-collection-object.h>
-#include <ns3/enum.h>
-#include <ns3/fatal-error.h>
-#include <ns3/log.h>
-#include <ns3/multi-file-aggregator.h>
-#include <ns3/node-container.h>
-#include <ns3/satellite-beam-helper.h>
-#include <ns3/satellite-beam-scheduler.h>
-#include <ns3/satellite-helper.h>
-#include <ns3/satellite-ncc.h>
-#include <ns3/satellite-topology.h>
-#include <ns3/scalar-collector.h>
-#include <ns3/singleton.h>
-#include <ns3/string.h>
+#include "ns3/boolean.h"
+#include "ns3/callback.h"
+#include "ns3/data-collection-object.h"
+#include "ns3/enum.h"
+#include "ns3/fatal-error.h"
+#include "ns3/log.h"
+#include "ns3/multi-file-aggregator.h"
+#include "ns3/node-container.h"
+#include "ns3/satellite-beam-helper.h"
+#include "ns3/satellite-beam-scheduler.h"
+#include "ns3/satellite-helper.h"
+#include "ns3/satellite-ncc.h"
+#include "ns3/satellite-topology.h"
+#include "ns3/scalar-collector.h"
+#include "ns3/singleton.h"
+#include "ns3/string.h"
 
 #include <list>
 #include <map>
@@ -119,8 +119,7 @@ SatStatsWaveformUsageHelper::DoInstall()
         NS_ASSERT_MSG(s != nullptr, "Error finding beam " << it->second);
         const bool ret = s->TraceConnect("WaveformTrace", context.str(), waveformUsageCallback);
         NS_ASSERT_MSG(ret, "Error connecting to WaveformTrace of beam " << it->second);
-        NS_LOG_INFO(this << " successfully connected"
-                         << " with beam " << it->second);
+        NS_LOG_INFO(this << " successfully connected" << " with beam " << it->second);
     }
 
 } // end of `void DoInstall ();`
@@ -227,8 +226,8 @@ SatStatsWaveformUsageHelper::WaveformUsageCallback(std::string context, uint32_t
         }
 
         collectorMap.ConnectToAggregator("Output", m_aggregator, &MultiFileAggregator::Write1d);
-        NS_LOG_INFO(this << " created " << n << " instance(s)"
-                         << " of " << collectorMap.GetType().GetName() << " for "
+        NS_LOG_INFO(this << " created " << n << " instance(s)" << " of "
+                         << collectorMap.GetType().GetName() << " for "
                          << GetIdentifierTypeName(GetIdentifierType()));
 
         std::pair<std::map<uint32_t, CollectorMap>::iterator, bool> ret;

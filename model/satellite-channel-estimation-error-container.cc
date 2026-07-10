@@ -22,8 +22,8 @@
 
 #include "../utils/satellite-env-variables.h"
 
-#include <ns3/log.h>
-#include <ns3/singleton.h>
+#include "ns3/log.h"
+#include "ns3/singleton.h"
 
 #include <sstream>
 #include <string>
@@ -88,7 +88,7 @@ SatFwdLinkChannelEstimationErrorContainer::SatFwdLinkChannelEstimationErrorConta
      * Currently only one set of channel estimation error parameters
      * for forward link are created.
      */
-    std::string dataPath = Singleton<SatEnvVariables>::Get()->LocateDataDirectory();
+    std::string dataPath = SatEnvVariables::GetInstance()->LocateDataDirectory();
     std::string filePathName =
         dataPath + "/additional-input/sinrmeaserror/ChannelEstimationErrorFwdLink.txt";
     m_channelEstimationError = CreateObject<SatChannelEstimationError>(filePathName);
@@ -121,7 +121,7 @@ SatRtnLinkChannelEstimationErrorContainer::SatRtnLinkChannelEstimationErrorConta
      * parameters than longer burst waveforms 13-22.
      */
     std::string filePathName;
-    std::string dataPath = Singleton<SatEnvVariables>::Get()->LocateDataDirectory();
+    std::string dataPath = SatEnvVariables::GetInstance()->LocateDataDirectory();
     Ptr<SatChannelEstimationError> ce;
 
     for (uint32_t i = minWfId; i <= maxWfId; ++i)

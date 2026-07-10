@@ -21,7 +21,7 @@
 #ifndef LORA_BEAM_TAG_H
 #define LORA_BEAM_TAG_H
 
-#include <ns3/tag.h>
+#include "ns3/tag.h"
 
 #include <ostream>
 #include <stdint.h>
@@ -42,7 +42,7 @@ class LoraBeamTag : public Tag
     /**
      * Create a LoraBeamTag with a given beam ID.
      *
-     * \param beamId The beam ID associated to this packet
+     * @param beamId The beam ID associated to this packet
      */
     LoraBeamTag(uint8_t beamId = 0);
 
@@ -56,14 +56,14 @@ class LoraBeamTag : public Tag
     /**
      * Read which beam ID this packet was transmitted with.
      *
-     * \return This tag's packet's beam ID.
+     * @return This tag's packet's beam ID.
      */
     uint8_t GetBeamId() const;
 
     /**
      * Set which beamId this packet was transmitted with.
      *
-     * \param beamId The beam ID.
+     * @param beamId The beam ID.
      */
     void SetBeamId(uint8_t beamId);
 

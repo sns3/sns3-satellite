@@ -20,7 +20,7 @@
 
 #include "satellite-topology.h"
 
-#include <ns3/log.h>
+#include "ns3/log.h"
 
 #include <iostream>
 #include <limits>

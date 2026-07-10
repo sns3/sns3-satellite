@@ -28,11 +28,11 @@
 #include "satellite-phy.h"
 #include "satellite-signal-parameters.h"
 
-#include <ns3/address.h>
-#include <ns3/nstime.h>
-#include <ns3/object.h>
-#include <ns3/packet.h>
-#include <ns3/ptr.h>
+#include "ns3/address.h"
+#include "ns3/nstime.h"
+#include "ns3/object.h"
+#include "ns3/packet.h"
+#include "ns3/ptr.h"
 
 #include <set>
 #include <stdint.h>
@@ -47,7 +47,7 @@ class SatPhyRxCarrierPerFrame;
 class SatPhyRxCarrierPerWindow;
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
  * The SatUtPhy models the physical layer of the User Terminal of the satellite system.
  */
@@ -61,15 +61,25 @@ class SatUtPhy : public SatPhy
 
     /**
      * Constructor.
-     * \param params Creation parameters
-     * \param linkResults Link results
-     * \param parameters Rx carrier creation parameters
-     * \param superFrameConf Superframe configuration
+     * @param params Creation parameters
+     * @param linkResults Link results
+     * @param parameters Rx carrier creation parameters
+     * @param superFrameConf Superframe configuration
      */
     SatUtPhy(SatPhy::CreateParam_t& params,
              Ptr<SatLinkResults> linkResults,
              SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
              Ptr<SatSuperframeConf> superFrameConf);
+
+    /**
+     * Notifier called once the ObjectBase is fully constructed.
+     *
+     * This method is invoked once all member attributes have been
+     * initialized. Subclasses can override this method to be notified
+     * of this event but if they do this, they must chain up to their
+     * parent's NotifyConstructionCompleted method.
+     */
+    virtual void NotifyConstructionCompleted() override;
 
     /**
      * Destructor
@@ -80,7 +90,6 @@ class SatUtPhy : public SatPhy
      * inherited from Object
      */
     static TypeId GetTypeId(void);
-    TypeId GetInstanceTypeId(void) const;
     /**
      * Initialization of SatUtPhy
      */
@@ -92,56 +101,71 @@ class SatUtPhy : public SatPhy
     virtual void DoDispose(void);
 
     /**
-     * \brief Get additional interference, used to compute final SINR at RX
+     * @brief Get additional interference, used to compute final SINR at RX
      *
-     * \return Additional interference
+     * @return Additional interference
      */
     virtual double GetAdditionalInterference();
 
     /**
-     * \brief Change underlying SatChannel to send and receive data from a new satellite and beam
-     * \param satId the new satellite to listen/send to
-     * \param beamId the new beam to listen/send to
+     * @brief Change underlying SatChannel to send and receive data from a new satellite and beam
+     * @param satId the new satellite to listen/send to
+     * @param beamId the new beam to listen/send to
      */
     void PerformHandover(uint32_t satId, uint32_t beamId);
 
     /**
-     * \brief Inform whether or not the underlying Tx channel is properly configured for
+     * @brief Inform whether or not the underlying Tx channel is properly configured for
      * transmission
      */
     bool IsTxPossible(void) const;
 
     /**
-     * \brief Receives packets from lower layer.
-     * \param rxParams Packet reception parameters
-     * \param phyError Boolean indicating whether the packet successfully
+     * @brief Receives packets from lower layer.
+     * @param rxParams Packet reception parameters
+     * @param phyError Boolean indicating whether the packet successfully
      * received or not?
      */
     void Receive(Ptr<SatSignalParameters> rxParams, bool phyError);
 
     /**
-     * \brief Updates the slices subscription list.
-     * \param slice The new slice to subscribe. If zero, reset the subscription list
+     * @brief Updates the slices subscription list.
+     * @param slice The new slice to subscribe. If zero, reset the subscription list
      * (except slice zero used for control messages).
      */
     void UpdateSliceSubscription(uint8_t slice);
 
   private:
     /**
-     * \brief Update the underlying SatChannel to send and receive data from
+     *  Link results used for this physical layer.
+     */
+    Ptr<SatLinkResults> m_linkResults;
+
+    /**
+     *  RX carrier configuration parameters.
+     */
+    SatPhyRxCarrierConf::RxCarrierCreateParams_s m_parameters;
+
+    /**
+     *  Super frame cofiguration.
+     */
+    Ptr<SatSuperframeConf> m_superFrameConf;
+
+    /**
+     * @brief Update the underlying SatChannel to send and receive data from
      * the current beam (as described in the m_beamId attribute).
      */
     void AssignNewSatChannels();
 
     /**
-     * \brief Get the link TX direction. Must be implemented by child clases.
-     * \return The link TX direction
+     * @brief Get the link TX direction. Must be implemented by child clases.
+     * @return The link TX direction
      */
     virtual SatEnums::SatLinkDir_t GetSatLinkTxDir();
 
     /**
-     * \brief Get the link RX direction. Must be implemented by child clases.
-     * \return The link RX direction
+     * @brief Get the link RX direction. Must be implemented by child clases.
+     * @return The link RX direction
      */
     virtual SatEnums::SatLinkDir_t GetSatLinkRxDir();
 

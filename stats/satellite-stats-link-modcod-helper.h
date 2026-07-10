@@ -24,9 +24,9 @@
 
 #include "satellite-stats-helper.h"
 
-#include <ns3/address.h>
-#include <ns3/collector-map.h>
-#include <ns3/ptr.h>
+#include "ns3/address.h"
+#include "ns3/collector-map.h"
+#include "ns3/ptr.h"
 
 #include <list>
 #include <map>
@@ -43,8 +43,8 @@ class DataCollectionObject;
 class DistributionCollector;
 
 /**
- * \ingroup satstats
- * \brief Base class for MODCOD statistics helpers.
+ * @ingroup satstats
+ * @brief Base class for MODCOD statistics helpers.
  */
 class SatStatsLinkModcodHelper : public SatStatsHelper
 {
@@ -63,26 +63,26 @@ class SatStatsLinkModcodHelper : public SatStatsHelper
     static TypeId GetTypeId();
 
     /**
-     * \param averagingMode average all samples before passing them to aggregator.
+     * @param averagingMode average all samples before passing them to aggregator.
      */
     void SetAveragingMode(bool averagingMode);
 
     /**
-     * \return the currently active averaging mode.
+     * @return the currently active averaging mode.
      */
     bool GetAveragingMode() const;
 
     /**
-     * \brief Set up several probes or other means of listeners and connect them
+     * @brief Set up several probes or other means of listeners and connect them
      *        to the collectors.
      */
     void InstallProbes();
 
     /**
-     * \brief Receive inputs from trace sources and determine the right collector
+     * @brief Receive inputs from trace sources and determine the right collector
      *        to forward the inputs to.
-     * \param modcod MODCOD ID
-     * \param from the address of the sender of the packet.
+     * @param modcod MODCOD ID
+     * @param from the address of the sender of the packet.
      *
      * Used in return link statistics. DoInstallProbes() is expected to connect
      * the right trace sources to this method.
@@ -94,22 +94,22 @@ class SatStatsLinkModcodHelper : public SatStatsHelper
     void DoInstall();
 
     /**
-     * \brief
+     * @brief
      */
     virtual void DoInstallProbes() = 0;
 
     /**
-     * \brief Connect the probe to the right collector.
-     * \param probe
-     * \param identifier
+     * @brief Connect the probe to the right collector.
+     * @param probe
+     * @param identifier
      */
     bool ConnectProbeToCollector(Ptr<Probe> probe, uint32_t identifier);
 
     /**
-     * \brief Find a collector with the right identifier and pass a sample data
+     * @brief Find a collector with the right identifier and pass a sample data
      *        to it.
-     * \param modcod
-     * \param identifier
+     * @param modcod
+     * @param identifier
      */
     void PassSampleToCollector(uint32_t modcod, uint32_t identifier);
 
@@ -130,21 +130,21 @@ class SatStatsLinkModcodHelper : public SatStatsHelper
 // FORWARD FEEDER LINK /////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce forward feeder link modcod statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce forward feeder link modcod statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFwdFeederLinkModcodHelper> s = Create<SatStatsFwdFeederLinkModcodHelper> (satHelper);
  * s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFwdFeederLinkModcodHelper : public SatStatsLinkModcodHelper
 {
@@ -171,21 +171,21 @@ class SatStatsFwdFeederLinkModcodHelper : public SatStatsLinkModcodHelper
 // FORWARD USER LINK /////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce forward user link modcod statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce forward user link modcod statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFwdUserLinkModcodHelper> s = Create<SatStatsFwdUserLinkModcodHelper> (satHelper);
  * s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFwdUserLinkModcodHelper : public SatStatsLinkModcodHelper
 {
@@ -212,21 +212,21 @@ class SatStatsFwdUserLinkModcodHelper : public SatStatsLinkModcodHelper
 // RETURN FEEDER LINK //////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce return feeder link modcod statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce return feeder link modcod statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnFeederLinkModcodHelper> s = Create<SatStatsRtnFeederLinkModcodHelper> (satHelper);
  * s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsRtnFeederLinkModcodHelper : public SatStatsLinkModcodHelper
 {
@@ -253,21 +253,21 @@ class SatStatsRtnFeederLinkModcodHelper : public SatStatsLinkModcodHelper
 // RETURN USER LINK //////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce return user link modcod statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce return user link modcod statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnUserLinkModcodHelper> s = Create<SatStatsRtnUserLinkModcodHelper> (satHelper);
  * s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsRtnUserLinkModcodHelper : public SatStatsLinkModcodHelper
 {

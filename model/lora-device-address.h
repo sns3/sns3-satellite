@@ -23,7 +23,7 @@
 #ifndef LORA_DEVICE_ADDRESS_H
 #define LORA_DEVICE_ADDRESS_H
 
-#include <ns3/address.h>
+#include "ns3/address.h"
 
 #include <ostream>
 #include <stdint.h>
@@ -47,14 +47,14 @@ class NwkID
      * means that all arguments such that nwkId > 127 will actually be
      * considered as nwkId mod 127.
      *
-     * \param nwkId The Network Id value to set.
+     * @param nwkId The Network Id value to set.
      */
     void Set(uint8_t nwkId);
 
     /**
      * Get an uint8_t representation of the 7-bit network ID.
      *
-     * \return The Network Id.
+     * @return The Network Id.
      */
     uint8_t Get(void) const;
 
@@ -78,14 +78,14 @@ class NwkAddr
      * means that all arguments such that nwkAddr > 2^25 will actually be
      * considered as nwkAddr mod 2^25.
      *
-     * \param nwkAddr The Network Address to set.
+     * @param nwkAddr The Network Address to set.
      */
     void Set(uint32_t nwkAddr);
 
     /**
      * Get an uint32_t representation of the 25-bit network address.
      *
-     * \return The Network Address.
+     * @return The Network Address.
      */
     uint32_t Get(void) const;
 
@@ -154,47 +154,47 @@ class LoraDeviceAddress
     /**
      * Get the NwkID of this device.
      *
-     * \remark The NwkID bit-by-bit representation will be contained in the 7
+     * @remark The NwkID bit-by-bit representation will be contained in the 7
      * least significant bits of the returned uint8_t.
      *
-     * \return An 8-bit representation of the Network Id of this Device Address.
+     * @return An 8-bit representation of the Network Id of this Device Address.
      */
     uint8_t GetNwkID(void);
 
     /**
      * Set the NwkID of this device.
      *
-     * \remark The NwkID is expected to be contained on the 7 least significant
+     * @remark The NwkID is expected to be contained on the 7 least significant
      * bits of the uint8_t.
      *
-     * \param nwkId The network id to set.
+     * @param nwkId The network id to set.
      */
     void SetNwkID(uint8_t nwkId);
 
     /**
      * Get the NwkAddr of this device.
      *
-     * \remark The NwkAddr will be contained on the 25 least significant bits of
+     * @remark The NwkAddr will be contained on the 25 least significant bits of
      * the uint32_t.
      *
-     * \return A 32-bit representation of the Network Address of this Device Address.
+     * @return A 32-bit representation of the Network Address of this Device Address.
      */
     uint32_t GetNwkAddr(void);
 
     /**
      * Set the NwkAddr of this device.
      *
-     * \remark The NwkAddr is expected to be contained on the least significant
+     * @remark The NwkAddr is expected to be contained on the least significant
      * bits of the uint32_t.
      *
-     * \param nwkAddr The network address to set.
+     * @param nwkAddr The network address to set.
      */
     void SetNwkAddr(uint32_t nwkAddr);
 
     /**
      * Print the address bit-by-bit to a human-readable string.
      *
-     * \return The string containing the network address.
+     * @return The string containing the network address.
      */
     std::string Print(void) const;
 

@@ -30,10 +30,10 @@
 using namespace ns3;
 
 /**
- * \file sat-essa-example.cc
- * \ingroup satellite
+ * @file sat-essa-example.cc
+ * @ingroup satellite
  *
- * \brief This file allows to create a E-SSA scenario
+ * @brief This file allows to create a E-SSA scenario
  */
 
 NS_LOG_COMPONENT_DEFINE("sat-essa-example");
@@ -214,8 +214,8 @@ main(int argc, char* argv[])
     // Outputs
     simulationHelper->EnableProgressLogs();
 
-    std::string outputPath = Singleton<SatEnvVariables>::Get()->LocateDirectory(
-        "contrib/satellite/data/sims/example-essa");
+    std::string outputPath =
+        SatEnvVariables::GetInstance()->LocateDirectory("contrib/satellite/data/sims/example-essa");
     Config::SetDefault("ns3::ConfigStore::Filename",
                        StringValue(outputPath + "/output-attributes.xml"));
     Config::SetDefault("ns3::ConfigStore::FileFormat", StringValue("Xml"));

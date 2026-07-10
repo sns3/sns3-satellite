@@ -29,10 +29,10 @@
 #include "satellite-net-device.h"
 #include "satellite-signal-parameters.h"
 
-#include <ns3/mac48-address.h>
-#include <ns3/mobility-model.h>
-#include <ns3/nstime.h>
-#include <ns3/packet.h>
+#include "ns3/mac48-address.h"
+#include "ns3/mobility-model.h"
+#include "ns3/nstime.h"
+#include "ns3/packet.h"
 
 #include <map>
 #include <stdint.h>
@@ -43,9 +43,9 @@ namespace ns3
 class SatChannel;
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief The SatellitePhyTx models the physical layer transmitter of satellite system
+ * @brief The SatellitePhyTx models the physical layer transmitter of satellite system
  *
  */
 class SatPhyTx : public Object
@@ -96,14 +96,14 @@ class SatPhyTx : public Object
 
     /*
      * Set the transmit antenna gain pattern.
-     * \param agp antenna gain pattern
-     * \param mobility mobility model of satellite
+     * @param agp antenna gain pattern
+     * @param mobility mobility model of satellite
      */
     void SetAntennaGainPattern(Ptr<SatAntennaGainPattern> agp, Ptr<SatMobilityModel> mobility);
 
     /**
      * Set the maximum Antenna gain in Db
-     * \param gain_db maximum antenna gain in Dbs
+     * @param gain_db maximum antenna gain in Dbs
      */
     void SetMaxAntennaGain_Db(double gain_db);
 
@@ -111,46 +111,46 @@ class SatPhyTx : public Object
      * Get antenna gain based on position
      * or in case that antenna pattern is not configured, maximum configured gain is return
      *
-     * \param mobility  Mobility used to get gain from antenna pattern
-     * \return antenna gain
+     * @param mobility  Mobility used to get gain from antenna pattern
+     * @return antenna gain
      */
     double GetAntennaGain(Ptr<MobilityModel> mobility);
 
     /**
-     * \brief Function for setting the default fading value
-     * \param fadingValue default fading value
+     * @brief Function for setting the default fading value
+     * @param fadingValue default fading value
      */
     void SetDefaultFadingValue(double fadingValue);
 
     /**
-     * \brief Get fading value
-     * \param macAddress MAC address
-     * \param channelType channel type
-     * \return
+     * @brief Get fading value
+     * @param macAddress MAC address
+     * @param channelType channel type
+     * @return
      */
     double GetFadingValue(Address macAddress, SatEnums::ChannelType_t channelType);
 
     /**
-     * \brief Set fading container
-     * \param fadingContainer fading container
+     * @brief Set fading container
+     * @param fadingContainer fading container
      */
     void SetFadingContainer(Ptr<SatBaseFading> fadingContainer);
 
     /**
      * Start packet transmission to the channel.
-     * \param txParams Transmission parameters for a packet
+     * @param txParams Transmission parameters for a packet
      */
     virtual void StartTx(Ptr<SatSignalParameters> txParams);
 
     /**
      * Set the satellite id for all the transmissions from this SatPhyTx
-     * \param satId the satellite Identifier
+     * @param satId the satellite Identifier
      */
     void SetSatId(uint32_t satId);
 
     /**
      * Set the beam id for all the transmissions from this SatPhyTx
-     * \param beamId the Beam Identifier
+     * @param beamId the Beam Identifier
      */
     void SetBeamId(uint32_t beamId);
 
@@ -194,12 +194,12 @@ class SatPhyTx : public Object
     SatPhyTxMode_t m_txMode;
 
     /**
-     * \brief Fading container for fading model
+     * @brief Fading container for fading model
      */
     Ptr<SatBaseFading> m_fadingContainer;
 
     /**
-     * \brief Default fading value
+     * @brief Default fading value
      */
     double m_defaultFadingValue;
 };

@@ -20,7 +20,7 @@
 
 #include "satellite-arq-sequence-number.h"
 
-#include <ns3/log.h>
+#include "ns3/log.h"
 
 #include <limits>
 #include <map>

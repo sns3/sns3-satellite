@@ -21,10 +21,10 @@
 
 #include "satellite-group-helper.h"
 
-#include <ns3/log.h>
-#include <ns3/satellite-id-mapper.h>
-#include <ns3/satellite-topology.h>
-#include <ns3/singleton.h>
+#include "ns3/log.h"
+#include "ns3/satellite-id-mapper.h"
+#include "ns3/satellite-topology.h"
+#include "ns3/singleton.h"
 
 #include <algorithm>
 #include <list>
@@ -46,14 +46,6 @@ SatGroupHelper::GetTypeId(void)
     static TypeId tid =
         TypeId("ns3::SatGroupHelper").SetParent<Object>().AddConstructor<SatGroupHelper>();
     return tid;
-}
-
-TypeId
-SatGroupHelper::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
 }
 
 SatGroupHelper::SatGroupHelper()

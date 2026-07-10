@@ -30,10 +30,10 @@
 using namespace ns3;
 
 /**
- * \file sat-regeneration-collisions-example.cc
- * \ingroup satellite
+ * @file sat-regeneration-collisions-example.cc
+ * @ingroup satellite
  *
- * \brief This file gives an example of satellite regeneration with collisions.
+ * @brief This file gives an example of satellite regeneration with collisions.
  *        User can specify regeneration level on FWD and RTN link, and Random Access algorithm.
  *        It generates several statistics to check collisions and errors where there are supposed to
  * occur.

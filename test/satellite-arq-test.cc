@@ -19,9 +19,9 @@
  */
 
 /**
- * \file satellite-arq-test.cc
- * \ingroup satellite
- * \brief Automatic Repeat reQuest test suite. Test suite holds two test cases:
+ * @file satellite-arq-test.cc
+ * @ingroup satellite
+ * @brief Automatic Repeat reQuest test suite. Test suite holds two test cases:
  * - RTN link ARQ
  * - FWD link ARQ
  *
@@ -56,8 +56,8 @@
 using namespace ns3;
 
 /**
- * \ingroup satellite
- * \brief RTN link ARQ test case
+ * @ingroup satellite
+ * @brief RTN link ARQ test case
  */
 
 class SatRtnArqTestCase : public TestCase
@@ -68,7 +68,7 @@ class SatRtnArqTestCase : public TestCase
 
     /**
      * Transmit/enque a number of packets to RLE/SatQueue
-     * \param numPackets Number of packets
+     * @param numPackets Number of packets
      */
     void TransmitPdus(uint32_t numPackets);
 
@@ -79,29 +79,29 @@ class SatRtnArqTestCase : public TestCase
 
     /**
      * Receive packet
-     * \param p Packet
+     * @param p Packet
      */
     void ReceivePdu(Ptr<Packet> p);
 
     /**
      * Send ARQ ACK message to the sender (source)
-     * \param msg Control message
-     * \param dest Destination MAC address
-     * \return bool Whether sending was successfull
+     * @param msg Control message
+     * @param dest Destination MAC address
+     * @return bool Whether sending was successfull
      */
     bool SendAck(Ptr<SatControlMessage> msg, const Address& dest);
 
     /**
      * Receive ARQ ACK message
-     * \param ack Acknowledgement
+     * @param ack Acknowledgement
      */
     void ReceiveAck(Ptr<SatArqAckMessage> ack);
 
     /**
      * Receive packet and check that it is of correct size
-     * \param p Ptr to packet
-     * \param source Source MAC address
-     * \param dest Destination MAC address
+     * @param p Ptr to packet
+     * @param source Source MAC address
+     * @param dest Destination MAC address
      */
     void Receive(Ptr<Packet> p, Mac48Address source, Mac48Address dest);
 
@@ -236,8 +236,8 @@ void
 SatRtnArqTestCase::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-arq", "rtn", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-arq", "rtn", true);
 
     Initialize();
 
@@ -261,7 +261,7 @@ SatRtnArqTestCase::DoRun(void)
 
     Simulator::Destroy();
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 }
 
 void
@@ -363,8 +363,8 @@ SatRtnArqTestCase::Receive(Ptr<Packet> p, Mac48Address source, Mac48Address dest
 }
 
 /**
- * \ingroup satellite
- * \brief FWD link ARQ test case
+ * @ingroup satellite
+ * @brief FWD link ARQ test case
  */
 class SatFwdArqTestCase : public TestCase
 {
@@ -374,7 +374,7 @@ class SatFwdArqTestCase : public TestCase
 
     /**
      * Transmit/enque a number of packets to GSE/SatQueue
-     * \param numPackets Number of packets
+     * @param numPackets Number of packets
      */
     void TransmitPdus(uint32_t numPackets);
 
@@ -385,29 +385,29 @@ class SatFwdArqTestCase : public TestCase
 
     /**
      * Receive packet
-     * \param p Packet
+     * @param p Packet
      */
     void ReceivePdu(Ptr<Packet> p);
 
     /**
      * Send ARQ ACK message to the sender (source)
-     * \param msg Control message
-     * \param dest Destination MAC address
-     * \return bool Whether sending was successfull
+     * @param msg Control message
+     * @param dest Destination MAC address
+     * @return bool Whether sending was successfull
      */
     bool SendAck(Ptr<SatControlMessage> msg, const Address& dest);
 
     /**
      * Receive ARQ ACK message
-     * \param ack Acknowledgement
+     * @param ack Acknowledgement
      */
     void ReceiveAck(Ptr<SatArqAckMessage> ack);
 
     /**
      * Receive packet and check that it is of correct size
-     * \param p Ptr to packet
-     * \param source Source MAC address
-     * \param dest Destination MAC address
+     * @param p Ptr to packet
+     * @param source Source MAC address
+     * @param dest Destination MAC address
      */
     void Receive(Ptr<Packet> p, Mac48Address source, Mac48Address dest);
 
@@ -538,8 +538,8 @@ void
 SatFwdArqTestCase::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-arq", "fwd", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-arq", "fwd", true);
 
     Initialize();
 
@@ -564,7 +564,7 @@ SatFwdArqTestCase::DoRun(void)
 
     Simulator::Destroy();
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 }
 
 void
@@ -684,8 +684,8 @@ SatFwdArqTestCase::Receive(Ptr<Packet> p, Mac48Address source, Mac48Address dest
 }
 
 /**
- * \ingroup satellite
- * \brief Test suite for ARQ.
+ * @ingroup satellite
+ * @brief Test suite for ARQ.
  */
 class SatArqTestSuite : public TestSuite
 {

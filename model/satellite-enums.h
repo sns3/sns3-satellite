@@ -23,7 +23,7 @@
 #ifndef SATELLITE_ENUMS_H
 #define SATELLITE_ENUMS_H
 
-#include <ns3/fatal-error.h>
+#include "ns3/fatal-error.h"
 
 #include <string>
 #include <vector>
@@ -32,9 +32,9 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief SatEnums class is for simplifying the use of enumerators
+ * @brief SatEnums class is for simplifying the use of enumerators
  * in the satellite module. The enums specified in this class mainly
  * consist of enums used in multiple classes.
  */
@@ -42,8 +42,8 @@ class SatEnums
 {
   public:
     /**
-     * \enum ChannelType_t
-     * \brief Types of channel.
+     * @enum ChannelType_t
+     * @brief Types of channel.
      */
     typedef enum
     {
@@ -55,8 +55,8 @@ class SatEnums
     } ChannelType_t;
 
     /**
-     * \enum PropagationDelayModel_t
-     * \brief Propagation delay model.
+     * @enum PropagationDelayModel_t
+     * @brief Propagation delay model.
      */
     typedef enum
     {
@@ -65,8 +65,8 @@ class SatEnums
     } PropagationDelayModel_t;
 
     /**
-     * \enum CarrierBandwidthType_t
-     * \brief Types of bandwidth.
+     * @enum CarrierBandwidthType_t
+     * @brief Types of bandwidth.
      */
     typedef enum
     {
@@ -76,8 +76,8 @@ class SatEnums
     } CarrierBandwidthType_t;
 
     /**
-     * \enum FadingModel_t
-     * \brief Fading models
+     * @enum FadingModel_t
+     * @brief Fading models
      */
     typedef enum
     {
@@ -87,8 +87,8 @@ class SatEnums
     } FadingModel_t;
 
     /**
-     * \enum RegenerationMode_t
-     * \brief The regeneration mode used in satellites.
+     * @enum RegenerationMode_t
+     * @brief The regeneration mode used in satellites.
      * It can be set for each link with different values.
      */
     typedef enum
@@ -103,8 +103,8 @@ class SatEnums
     } RegenerationMode_t;
 
     /**
-     * \enum IslArbiterType_t
-     * \brief Choose the arbiter to use to route packets on ISLs
+     * @enum IslArbiterType_t
+     * @brief Choose the arbiter to use to route packets on ISLs
      */
     typedef enum
     {
@@ -115,8 +115,8 @@ class SatEnums
     } IslArbiterType_t;
 
     /**
-     * \enum Standard_t
-     * \brief The global standard used. Can be either DVB or Lora
+     * @enum Standard_t
+     * @brief The global standard used. Can be either DVB or Lora
      */
     typedef enum
     {
@@ -125,8 +125,8 @@ class SatEnums
     } Standard_t;
 
     /**
-     * \enum SatLoraNodeType_t
-     * \brief Specifies standard used and the king of node
+     * @enum SatLoraNodeType_t
+     * @brief Specifies standard used and the king of node
      */
     typedef enum
     {
@@ -139,8 +139,8 @@ class SatEnums
     } SatLoraNodeType_t;
 
     /**
-     * \enum DvbVersion_t
-     * \brief The scheduling algorithm used to fill the BBFrames.
+     * @enum DvbVersion_t
+     * @brief The scheduling algorithm used to fill the BBFrames.
      */
     typedef enum
     {
@@ -149,8 +149,8 @@ class SatEnums
     } DvbVersion_t;
 
     /**
-     * \enum FwdSchedulingAlgorithm_t
-     * \brief The scheduling algorithm used to fill the BBFrames.
+     * @enum FwdSchedulingAlgorithm_t
+     * @brief The scheduling algorithm used to fill the BBFrames.
      */
     typedef enum
     {
@@ -169,8 +169,8 @@ class SatEnums
     } BbFrameUsageMode_t;
 
     /**
-     * \enum SatModcod_t
-     * \brief Modulation scheme and coding rate for DVB-S2.
+     * @enum SatModcod_t
+     * @brief Modulation scheme and coding rate for DVB-S2.
      */
     typedef enum
     {
@@ -1248,499 +1248,983 @@ class SatEnums
     static inline SatModcod_t GetModcodFromName(const std::string name)
     {
         if (name == "SAT_NONVALID_MODCOD")
+        {
             return SAT_NONVALID_MODCOD;
+        }
         // DVB-S2X ModCods
         if (name == "SAT_MODCOD_S2X_QPSK_11_TO_45_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_11_TO_45_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_11_TO_45_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_11_TO_45_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_1_TO_4_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_1_TO_4_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_1_TO_4_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_1_TO_4_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_1_TO_4_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_1_TO_4_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_1_TO_4_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_1_TO_4_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_4_TO_15_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_4_TO_15_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_4_TO_15_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_4_TO_15_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_13_TO_45_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_13_TO_45_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_13_TO_45_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_13_TO_45_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_14_TO_45_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_14_TO_45_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_14_TO_45_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_14_TO_45_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_1_TO_3_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_1_TO_3_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_1_TO_3_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_1_TO_3_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_1_TO_3_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_1_TO_3_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_1_TO_3_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_1_TO_3_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_2_TO_5_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_2_TO_5_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_2_TO_5_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_2_TO_5_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_2_TO_5_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_2_TO_5_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_2_TO_5_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_2_TO_5_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_9_TO_20_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_9_TO_20_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_9_TO_20_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_9_TO_20_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_7_TO_15_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_7_TO_15_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_7_TO_15_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_7_TO_15_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_1_TO_2_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_1_TO_2_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_1_TO_2_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_1_TO_2_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_1_TO_2_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_1_TO_2_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_1_TO_2_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_1_TO_2_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_8_TO_15_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_8_TO_15_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_8_TO_15_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_8_TO_15_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_11_TO_20_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_11_TO_20_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_11_TO_20_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_11_TO_20_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_3_TO_5_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_3_TO_5_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_3_TO_5_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_3_TO_5_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_3_TO_5_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_3_TO_5_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_3_TO_5_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_3_TO_5_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_2_TO_3_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_2_TO_3_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_2_TO_3_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_2_TO_3_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_2_TO_3_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_2_TO_3_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_2_TO_3_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_2_TO_3_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_32_TO_45_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_32_TO_45_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_32_TO_45_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_32_TO_45_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_3_TO_4_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_3_TO_4_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_3_TO_4_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_3_TO_4_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_3_TO_4_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_3_TO_4_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_3_TO_4_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_3_TO_4_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_4_TO_5_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_4_TO_5_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_4_TO_5_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_4_TO_5_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_4_TO_5_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_4_TO_5_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_4_TO_5_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_4_TO_5_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_5_TO_6_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_5_TO_6_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_5_TO_6_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_5_TO_6_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_5_TO_6_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_5_TO_6_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_5_TO_6_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_5_TO_6_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_8_TO_9_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_8_TO_9_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_8_TO_9_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_8_TO_9_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_8_TO_9_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_8_TO_9_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_8_TO_9_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_8_TO_9_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_9_TO_10_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_9_TO_10_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_QPSK_9_TO_10_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_QPSK_9_TO_10_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_7_TO_15_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_7_TO_15_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_7_TO_15_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_7_TO_15_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_8_TO_15_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_8_TO_15_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_8_TO_15_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_8_TO_15_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_26_TO_45_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_26_TO_45_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_26_TO_45_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_26_TO_45_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_3_TO_5_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_3_TO_5_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_3_TO_5_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_3_TO_5_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_3_TO_5_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_3_TO_5_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_3_TO_5_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_3_TO_5_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_23_TO_36_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_23_TO_36_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_23_TO_36_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_23_TO_36_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_2_TO_3_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_2_TO_3_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_2_TO_3_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_2_TO_3_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_2_TO_3_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_2_TO_3_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_2_TO_3_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_2_TO_3_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_25_TO_36_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_25_TO_36_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_25_TO_36_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_25_TO_36_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_32_TO_45_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_32_TO_45_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_32_TO_45_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_32_TO_45_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_13_TO_18_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_13_TO_18_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_13_TO_18_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_13_TO_18_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_3_TO_4_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_3_TO_4_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_3_TO_4_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_3_TO_4_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_3_TO_4_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_3_TO_4_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_3_TO_4_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_3_TO_4_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_5_TO_6_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_5_TO_6_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_5_TO_6_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_5_TO_6_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_5_TO_6_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_5_TO_6_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_5_TO_6_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_5_TO_6_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_8_TO_9_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_8_TO_9_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_8_TO_9_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_8_TO_9_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_8_TO_9_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_8_TO_9_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_8_TO_9_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_8_TO_9_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_9_TO_10_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_9_TO_10_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8PSK_9_TO_10_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_8PSK_9_TO_10_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8APSK_5_TO_9_L_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_8APSK_5_TO_9_L_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8APSK_5_TO_9_L_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_8APSK_5_TO_9_L_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8APSK_26_TO_45_L_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_8APSK_26_TO_45_L_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_8APSK_26_TO_45_L_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_8APSK_26_TO_45_L_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_7_TO_15_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_7_TO_15_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_7_TO_15_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_7_TO_15_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_1_TO_2_L_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_1_TO_2_L_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_1_TO_2_L_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_1_TO_2_L_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_8_TO_15_L_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_8_TO_15_L_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_8_TO_15_L_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_8_TO_15_L_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_8_TO_15_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_8_TO_15_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_8_TO_15_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_8_TO_15_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_5_TO_9_L_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_5_TO_9_L_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_5_TO_9_L_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_5_TO_9_L_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_26_TO_45_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_26_TO_45_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_26_TO_45_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_26_TO_45_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_26_TO_45_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_26_TO_45_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_26_TO_45_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_26_TO_45_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_3_TO_5_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_3_TO_5_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_3_TO_5_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_3_TO_5_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_3_TO_5_L_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_3_TO_5_L_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_3_TO_5_L_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_3_TO_5_L_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_3_TO_5_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_3_TO_5_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_3_TO_5_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_3_TO_5_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_28_TO_45_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_28_TO_45_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_28_TO_45_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_28_TO_45_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_23_TO_36_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_23_TO_36_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_23_TO_36_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_23_TO_36_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_2_TO_3_L_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_2_TO_3_L_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_2_TO_3_L_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_2_TO_3_L_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_2_TO_3_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_2_TO_3_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_2_TO_3_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_2_TO_3_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_2_TO_3_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_2_TO_3_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_2_TO_3_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_2_TO_3_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_25_TO_36_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_25_TO_36_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_25_TO_36_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_25_TO_36_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_32_TO_45_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_32_TO_45_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_32_TO_45_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_32_TO_45_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_13_TO_18_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_13_TO_18_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_13_TO_18_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_13_TO_18_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_3_TO_4_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_3_TO_4_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_3_TO_4_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_3_TO_4_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_3_TO_4_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_3_TO_4_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_3_TO_4_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_3_TO_4_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_7_TO_9_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_7_TO_9_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_7_TO_9_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_7_TO_9_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_4_TO_5_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_4_TO_5_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_4_TO_5_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_4_TO_5_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_4_TO_5_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_4_TO_5_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_4_TO_5_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_4_TO_5_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_5_TO_6_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_5_TO_6_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_5_TO_6_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_5_TO_6_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_5_TO_6_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_5_TO_6_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_5_TO_6_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_5_TO_6_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_77_TO_90_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_77_TO_90_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_77_TO_90_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_77_TO_90_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_8_TO_9_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_8_TO_9_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_8_TO_9_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_8_TO_9_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_8_TO_9_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_8_TO_9_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_8_TO_9_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_8_TO_9_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_9_TO_10_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_9_TO_10_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_16APSK_9_TO_10_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_16APSK_9_TO_10_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_32APSK_2_TO_3_L_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_32APSK_2_TO_3_L_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_32APSK_2_TO_3_L_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_32APSK_2_TO_3_L_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_32APSK_2_TO_3_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_32APSK_2_TO_3_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_32APSK_2_TO_3_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_32APSK_2_TO_3_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_32APSK_32_TO_45_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_32APSK_32_TO_45_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_32APSK_32_TO_45_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_32APSK_32_TO_45_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_32APSK_32_TO_45_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_32APSK_32_TO_45_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_32APSK_32_TO_45_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_32APSK_32_TO_45_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_32APSK_11_TO_15_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_32APSK_11_TO_15_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_32APSK_11_TO_15_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_32APSK_11_TO_15_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_32APSK_3_TO_4_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_32APSK_3_TO_4_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_32APSK_3_TO_4_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_32APSK_3_TO_4_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_32APSK_3_TO_4_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_32APSK_3_TO_4_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_32APSK_3_TO_4_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_32APSK_3_TO_4_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_32APSK_7_TO_9_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_32APSK_7_TO_9_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_32APSK_7_TO_9_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_32APSK_7_TO_9_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_32APSK_4_TO_5_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_32APSK_4_TO_5_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_32APSK_4_TO_5_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_32APSK_4_TO_5_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_32APSK_4_TO_5_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_32APSK_4_TO_5_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_32APSK_4_TO_5_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_32APSK_4_TO_5_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_32APSK_5_TO_6_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_32APSK_5_TO_6_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_32APSK_5_TO_6_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_32APSK_5_TO_6_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_32APSK_5_TO_6_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_32APSK_5_TO_6_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_32APSK_5_TO_6_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_32APSK_5_TO_6_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_32APSK_8_TO_9_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_32APSK_8_TO_9_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_32APSK_8_TO_9_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_32APSK_8_TO_9_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_32APSK_8_TO_9_SHORT_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_32APSK_8_TO_9_SHORT_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_32APSK_8_TO_9_SHORT_PILOTS")
+        {
             return SAT_MODCOD_S2X_32APSK_8_TO_9_SHORT_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_32APSK_9_TO_10_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_32APSK_9_TO_10_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_32APSK_9_TO_10_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_32APSK_9_TO_10_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_64APSK_32_TO_45_L_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_64APSK_32_TO_45_L_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_64APSK_32_TO_45_L_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_64APSK_32_TO_45_L_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_64APSK_11_TO_15_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_64APSK_11_TO_15_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_64APSK_11_TO_15_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_64APSK_11_TO_15_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_64APSK_7_TO_9_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_64APSK_7_TO_9_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_64APSK_7_TO_9_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_64APSK_7_TO_9_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_64APSK_4_TO_5_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_64APSK_4_TO_5_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_64APSK_4_TO_5_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_64APSK_4_TO_5_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_64APSK_5_TO_6_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_64APSK_5_TO_6_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_64APSK_5_TO_6_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_64APSK_5_TO_6_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_128APSK_3_TO_4_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_128APSK_3_TO_4_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_128APSK_3_TO_4_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_128APSK_3_TO_4_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_128APSK_7_TO_9_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_128APSK_7_TO_9_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_128APSK_7_TO_9_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_128APSK_7_TO_9_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_256APSK_29_TO_45_L_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_256APSK_29_TO_45_L_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_256APSK_29_TO_45_L_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_256APSK_29_TO_45_L_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_256APSK_2_TO_3_L_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_256APSK_2_TO_3_L_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_256APSK_2_TO_3_L_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_256APSK_2_TO_3_L_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_256APSK_31_TO_45_L_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_256APSK_31_TO_45_L_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_256APSK_31_TO_45_L_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_256APSK_31_TO_45_L_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_256APSK_32_TO_45_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_256APSK_32_TO_45_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_256APSK_32_TO_45_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_256APSK_32_TO_45_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_256APSK_11_TO_15_L_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_256APSK_11_TO_15_L_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_256APSK_11_TO_15_L_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_256APSK_11_TO_15_L_NORMAL_PILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_256APSK_3_TO_4_NORMAL_NOPILOTS")
+        {
             return SAT_MODCOD_S2X_256APSK_3_TO_4_NORMAL_NOPILOTS;
+        }
         if (name == "SAT_MODCOD_S2X_256APSK_3_TO_4_NORMAL_PILOTS")
+        {
             return SAT_MODCOD_S2X_256APSK_3_TO_4_NORMAL_PILOTS;
+        }
         // DVB-S2 ModCods
         if (name == "SAT_MODCOD_QPSK_1_TO_3")
+        {
             return SAT_MODCOD_QPSK_1_TO_3;
+        }
         if (name == "SAT_MODCOD_QPSK_1_TO_2")
+        {
             return SAT_MODCOD_QPSK_1_TO_2;
+        }
         if (name == "SAT_MODCOD_QPSK_2_TO_3")
+        {
             return SAT_MODCOD_QPSK_2_TO_3;
+        }
         if (name == "SAT_MODCOD_QPSK_3_TO_4")
+        {
             return SAT_MODCOD_QPSK_3_TO_4;
+        }
         if (name == "SAT_MODCOD_QPSK_3_TO_5")
+        {
             return SAT_MODCOD_QPSK_3_TO_5;
+        }
         if (name == "SAT_MODCOD_QPSK_4_TO_5")
+        {
             return SAT_MODCOD_QPSK_4_TO_5;
+        }
         if (name == "SAT_MODCOD_QPSK_5_TO_6")
+        {
             return SAT_MODCOD_QPSK_5_TO_6;
+        }
         if (name == "SAT_MODCOD_QPSK_8_TO_9")
+        {
             return SAT_MODCOD_QPSK_8_TO_9;
+        }
         if (name == "SAT_MODCOD_QPSK_9_TO_10")
+        {
             return SAT_MODCOD_QPSK_9_TO_10;
+        }
         if (name == "SAT_MODCOD_8PSK_2_TO_3")
+        {
             return SAT_MODCOD_8PSK_2_TO_3;
+        }
         if (name == "SAT_MODCOD_8PSK_3_TO_4")
+        {
             return SAT_MODCOD_8PSK_3_TO_4;
+        }
         if (name == "SAT_MODCOD_8PSK_3_TO_5")
+        {
             return SAT_MODCOD_8PSK_3_TO_5;
+        }
         if (name == "SAT_MODCOD_8PSK_5_TO_6")
+        {
             return SAT_MODCOD_8PSK_5_TO_6;
+        }
         if (name == "SAT_MODCOD_8PSK_8_TO_9")
+        {
             return SAT_MODCOD_8PSK_8_TO_9;
+        }
         if (name == "SAT_MODCOD_8PSK_9_TO_10")
+        {
             return SAT_MODCOD_8PSK_9_TO_10;
+        }
         if (name == "SAT_MODCOD_16APSK_2_TO_3")
+        {
             return SAT_MODCOD_16APSK_2_TO_3;
+        }
         if (name == "SAT_MODCOD_16APSK_3_TO_4")
+        {
             return SAT_MODCOD_16APSK_3_TO_4;
+        }
         if (name == "SAT_MODCOD_16APSK_4_TO_5")
+        {
             return SAT_MODCOD_16APSK_4_TO_5;
+        }
         if (name == "SAT_MODCOD_16APSK_5_TO_6")
+        {
             return SAT_MODCOD_16APSK_5_TO_6;
+        }
         if (name == "SAT_MODCOD_16APSK_8_TO_9")
+        {
             return SAT_MODCOD_16APSK_8_TO_9;
+        }
         if (name == "SAT_MODCOD_16APSK_9_TO_10")
+        {
             return SAT_MODCOD_16APSK_9_TO_10;
+        }
         if (name == "SAT_MODCOD_16QAM_3_TO_4")
+        {
             return SAT_MODCOD_16QAM_3_TO_4;
+        }
         if (name == "SAT_MODCOD_16QAM_5_TO_6")
+        {
             return SAT_MODCOD_16QAM_5_TO_6;
+        }
         if (name == "SAT_MODCOD_32APSK_3_TO_4")
+        {
             return SAT_MODCOD_32APSK_3_TO_4;
+        }
         if (name == "SAT_MODCOD_32APSK_4_TO_5")
+        {
             return SAT_MODCOD_32APSK_4_TO_5;
+        }
         if (name == "SAT_MODCOD_32APSK_5_TO_6")
+        {
             return SAT_MODCOD_32APSK_5_TO_6;
+        }
         if (name == "SAT_MODCOD_32APSK_8_TO_9")
+        {
             return SAT_MODCOD_32APSK_8_TO_9;
+        }
         NS_FATAL_ERROR("Cannot fing ModCod: " + name);
         return SAT_NONVALID_MODCOD;
     }
 
     /**
-     * \enum SatBbFrameType_t
+     * @enum SatBbFrameType_t
      *
-     * \brief BB frame type used in DVB-S2 FWD link
+     * @brief BB frame type used in DVB-S2 FWD link
      */
     typedef enum
     {
@@ -1777,9 +2261,9 @@ class SatEnums
     }
 
     /**
-     * \enum SatFlowId_t
+     * @enum SatFlowId_t
      *
-     * \brief Lower layer flow identifiers
+     * @brief Lower layer flow identifiers
      */
     typedef enum
     {
@@ -1791,7 +2275,7 @@ class SatEnums
     } SatFlowId_t;
 
     /**
-     * \brief Definition for different types of Capacity Request (CR) messages.
+     * @brief Definition for different types of Capacity Request (CR) messages.
      */
     typedef enum
     {
@@ -1802,7 +2286,7 @@ class SatEnums
     } SatWaveFormBurstLength_t;
 
     /**
-     * \brief Definition for different types of Capacity Request (CR) messages.
+     * @brief Definition for different types of Capacity Request (CR) messages.
      */
     typedef enum
     {
@@ -1844,8 +2328,8 @@ class SatEnums
     }
 
     /**
-     * \enum RxPowerCalculationMode_t
-     * \brief Modes of Rx power calculation.
+     * @enum RxPowerCalculationMode_t
+     * @brief Modes of Rx power calculation.
      */
     typedef enum
     {
@@ -1883,9 +2367,9 @@ class SatEnums
     }
 
     /**
-     * \enum SatPacketEvent_t
+     * @enum SatPacketEvent_t
      *
-     * \brief Packet event used for packet tracing
+     * @brief Packet event used for packet tracing
      */
     typedef enum
     {
@@ -1921,9 +2405,9 @@ class SatEnums
     }
 
     /**
-     * \enum SatNodeType_t
+     * @enum SatNodeType_t
      *
-     * \brief Node type used for packet tracing
+     * @brief Node type used for packet tracing
      */
     typedef enum
     {
@@ -1967,9 +2451,9 @@ class SatEnums
     }
 
     /**
-     * \enum SatLinkDir_t
+     * @enum SatLinkDir_t
      *
-     * \brief Link direction used for packet tracing
+     * @brief Link direction used for packet tracing
      */
     typedef enum
     {
@@ -2001,9 +2485,9 @@ class SatEnums
     }
 
     /**
-     * \enum SatLogLevel_t
+     * @enum SatLogLevel_t
      *
-     * \brief Log level used for packet tracing
+     * @brief Log level used for packet tracing
      */
     typedef enum
     {
@@ -2043,8 +2527,8 @@ class SatEnums
     }
 
     /**
-     * \enum RandomAccessTriggerType_t
-     * \brief The defined random access trigger types. These help determine
+     * @enum RandomAccessTriggerType_t
+     * @brief The defined random access trigger types. These help determine
      * which algorithm to use if multiple algorithms are enabled
      */
     typedef enum
@@ -2077,8 +2561,8 @@ class SatEnums
     }
 
     /**
-     * \enum RandomAccessModel_t
-     * \brief The defined random access models. These define the implemented algorithms
+     * @enum RandomAccessModel_t
+     * @brief The defined random access models. These define the implemented algorithms
      */
     typedef enum
     {
@@ -2119,8 +2603,8 @@ class SatEnums
     }
 
     /**
-     * \enum RandomAccessTxOpportunityType_t
-     * \brief Random access Tx opportunity types. These are used to define to which algorithm
+     * @enum RandomAccessTxOpportunityType_t
+     * @brief Random access Tx opportunity types. These are used to define to which algorithm
      * the results provided by this module applies to
      */
     typedef enum
@@ -2159,8 +2643,8 @@ class SatEnums
     }
 
     /**
-     * \enum PacketType_t
-     * \brief Packet types. These are used determine Rx side actions
+     * @enum PacketType_t
+     * @brief Packet types. These are used determine Rx side actions
      */
     typedef enum
     {
@@ -2197,8 +2681,8 @@ class SatEnums
     }
 
     /**
-     * \enum RbcdCapacityRequestAlgorithm_t
-     * \brief The defined RBDC capacity request algorithms. These help determine
+     * @enum RbcdCapacityRequestAlgorithm_t
+     * @brief The defined RBDC capacity request algorithms. These help determine
      * which algorithm to use when calculating RBDC requests.
      */
     typedef enum
@@ -2225,8 +2709,8 @@ class SatEnums
     }
 
     /**
-     * \enum VbcdCapacityRequestAlgorithm_t
-     * \brief The defined VBDC capacity request algorithms. These help determine
+     * @enum VbcdCapacityRequestAlgorithm_t
+     * @brief The defined VBDC capacity request algorithms. These help determine
      * which algorithm to use when calculating VBDC requests.
      */
     typedef enum
@@ -2253,8 +2737,8 @@ class SatEnums
     }
 
     /**
-     * \enum SatSuperframeAllocatorType_t
-     * \brief SuperframeAllocator type to use
+     * @enum SatSuperframeAllocatorType_t
+     * @brief SuperframeAllocator type to use
      */
     typedef enum
     {
@@ -2262,8 +2746,8 @@ class SatEnums
     } SuperframeAllocatorType_t;
 
     /**
-     * \enum LinkResults_t
-     * \brief Return link Link result types. These are used to define which type of
+     * @enum LinkResults_t
+     * @brief Return link Link result types. These are used to define which type of
      * waveforms are used to check link results on the return link.
      */
     typedef enum

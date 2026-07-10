@@ -19,36 +19,36 @@
  */
 
 /**
- * \file satellite-constellation-test.cc
- * \ingroup satellite
- * \brief Constellation test case implementations.
+ * @file satellite-constellation-test.cc
+ * @ingroup satellite
+ * @brief Constellation test case implementations.
  *
  * In this module implements the Constellation Test Cases.
  */
 
-#include <ns3/cbr-application.h>
-#include <ns3/cbr-helper.h>
-#include <ns3/config.h>
-#include <ns3/log.h>
-#include <ns3/packet-sink-helper.h>
-#include <ns3/packet-sink.h>
-#include <ns3/satellite-env-variables.h>
-#include <ns3/satellite-gw-mac.h>
-#include <ns3/satellite-helper.h>
-#include <ns3/satellite-id-mapper.h>
-#include <ns3/satellite-isl-arbiter-unicast.h>
-#include <ns3/satellite-isl-arbiter.h>
-#include <ns3/satellite-orbiter-feeder-phy.h>
-#include <ns3/satellite-orbiter-net-device.h>
-#include <ns3/satellite-orbiter-user-phy.h>
-#include <ns3/satellite-phy-rx-carrier.h>
-#include <ns3/satellite-topology.h>
-#include <ns3/satellite-ut-mac-state.h>
-#include <ns3/simulation-helper.h>
-#include <ns3/simulator.h>
-#include <ns3/singleton.h>
-#include <ns3/string.h>
-#include <ns3/test.h>
+#include "ns3/cbr-application.h"
+#include "ns3/cbr-helper.h"
+#include "ns3/config.h"
+#include "ns3/log.h"
+#include "ns3/packet-sink-helper.h"
+#include "ns3/packet-sink.h"
+#include "ns3/satellite-env-variables.h"
+#include "ns3/satellite-gw-mac.h"
+#include "ns3/satellite-helper.h"
+#include "ns3/satellite-id-mapper.h"
+#include "ns3/satellite-isl-arbiter-unicast.h"
+#include "ns3/satellite-isl-arbiter.h"
+#include "ns3/satellite-orbiter-feeder-phy.h"
+#include "ns3/satellite-orbiter-net-device.h"
+#include "ns3/satellite-orbiter-user-phy.h"
+#include "ns3/satellite-phy-rx-carrier.h"
+#include "ns3/satellite-topology.h"
+#include "ns3/satellite-ut-mac-state.h"
+#include "ns3/simulation-helper.h"
+#include "ns3/simulator.h"
+#include "ns3/singleton.h"
+#include "ns3/string.h"
+#include "ns3/test.h"
 
 #include <fstream>
 #include <iostream>
@@ -56,8 +56,8 @@
 using namespace ns3;
 
 /**
- * \ingroup satellite
- * \brief 'Constellation, test 1' test case implementation.
+ * @ingroup satellite
+ * @brief 'Constellation, test 1' test case implementation.
  *
  * This case tests that a topology is correctly loaded.
  * It load the eutelsat-geo-2-sats configuration
@@ -100,8 +100,8 @@ SatConstellationTest1::DoRun(void)
     Config::Reset();
 
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-constellation", "test1", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-constellation", "test1", true);
 
     /// Set regeneration mode
     Config::SetDefault("ns3::SatConf::ForwardLinkRegenerationMode",
@@ -213,8 +213,8 @@ SatConstellationTest1::DoRun(void)
 }
 
 /**
- * \ingroup satellite
- * \brief 'Constellation, test 2 test case implementation.
+ * @ingroup satellite
+ * @brief 'Constellation, test 2 test case implementation.
  *
  * This case tests that a application throughputs PerEntity are correct.
  * It generates a conf with 2 satellites, 2 GWs, 3 UTs and 3 UT users per UT.
@@ -317,8 +317,8 @@ SatConstellationTest2::DoRun(void)
     Singleton<SatIdMapper>::Get()->Reset();
 
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-constellation", "test2", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-constellation", "test2", true);
 
     /// Set regeneration mode
     Config::SetDefault("ns3::SatConf::ForwardLinkRegenerationMode",
@@ -491,8 +491,8 @@ SatConstellationTest2::DoRun(void)
 }
 
 /**
- * \ingroup satellite
- * \brief 'Constellation, test 3 test case implementation.
+ * @ingroup satellite
+ * @brief 'Constellation, test 3 test case implementation.
  *
  * This case tests that a application throughputs PerEntity are correct, with one ISL link.
  * It generates a conf with 2 satellites, 2 GWs, 3 UTs and 3 UT users per UT.
@@ -595,8 +595,8 @@ SatConstellationTest3::DoRun(void)
     Singleton<SatIdMapper>::Get()->Reset();
 
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-constellation", "test3", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-constellation", "test3", true);
 
     /// Set regeneration mode
     Config::SetDefault("ns3::SatConf::ForwardLinkRegenerationMode",
@@ -769,8 +769,8 @@ SatConstellationTest3::DoRun(void)
 }
 
 /**
- * \ingroup satellite
- * \brief 'Constellation, test 4' test case implementation.
+ * @ingroup satellite
+ * @brief 'Constellation, test 4' test case implementation.
  *
  * This case tests that a topology with hundreds of LEO satellites is correctly loaded.
  * It load the telesat-351-sats configuration
@@ -812,8 +812,8 @@ SatConstellationTest4::DoRun(void)
     Config::Reset();
 
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-constellation", "test4", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-constellation", "test4", true);
 
     /// Set regeneration mode
     Config::SetDefault("ns3::SatConf::ForwardLinkRegenerationMode",

@@ -28,7 +28,7 @@
 #include "satellite-link-results.h"
 #include "satellite-typedefs.h"
 
-#include <ns3/object.h>
+#include "ns3/object.h"
 
 #include <stdint.h>
 
@@ -36,9 +36,9 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief Information of beam users liken UTs and their users.
+ * @brief Information of beam users liken UTs and their users.
  * Used e.g. when creating beams.
  *
  */
@@ -46,13 +46,13 @@ class SatPhyRxCarrierConf : public Object
 {
   public:
     /**
-     * \brief Callback to get additional interference from PHY layer
-     * \return Interference to add
+     * @brief Callback to get additional interference from PHY layer
+     * @return Interference to add
      */
     typedef Callback<double> AdditionalInterferenceCallback;
 
     /**
-     *  \brief RX mode enum
+     *  @brief RX mode enum
      *
      *  TRANSPARENT   Only beam Id is checked for receiving
      *  NORMAL        Beam Id and valid address (own or broadcast) is checked for receiving
@@ -64,7 +64,7 @@ class SatPhyRxCarrierConf : public Object
     };
 
     /**
-     * \brief Error model enum
+     * @brief Error model enum
      */
     enum ErrorModel
     {
@@ -74,7 +74,7 @@ class SatPhyRxCarrierConf : public Object
     };
 
     /**
-     * \brief Interference model enum
+     * @brief Interference model enum
      */
     enum InterferenceModel
     {
@@ -85,7 +85,7 @@ class SatPhyRxCarrierConf : public Object
     };
 
     /**
-     * \brief Interference cancelation model enum
+     * @brief Interference cancelation model enum
      */
     enum InterferenceEliminationModel
     {
@@ -95,7 +95,7 @@ class SatPhyRxCarrierConf : public Object
     };
 
     /**
-     * \brief Random access collision model enum
+     * @brief Random access collision model enum
      */
     enum RandomAccessCollisionModel
     {
@@ -106,18 +106,18 @@ class SatPhyRxCarrierConf : public Object
     };
 
     /**
-     * \brief Struct for storing the information for SatPhyRxCarrierConf.
-     * \param rxTemperatureK RX noise temperature in Kelvins
-     * \param m_aciIfWrtNoiseFactor Adjacent channel interference wrt noise factor
-     * \param errorModel Used error model
-     * \param daIfModel Used interference model for dedicated access
-     * \param raIfModel Used interference model for random access
-     * \param raIfEliminateModel Used interference elimination model for random access
-     * \param rxMode RX mode used in carrier
-     * \param chType RX channel type
-     * \param converter Bandwidth converter
-     * \param carrierCount carrier count
-     * \param cec Channel estimation error container
+     * @brief Struct for storing the information for SatPhyRxCarrierConf.
+     * @param rxTemperatureK RX noise temperature in Kelvins
+     * @param m_aciIfWrtNoiseFactor Adjacent channel interference wrt noise factor
+     * @param errorModel Used error model
+     * @param daIfModel Used interference model for dedicated access
+     * @param raIfModel Used interference model for random access
+     * @param raIfEliminateModel Used interference elimination model for random access
+     * @param rxMode RX mode used in carrier
+     * @param chType RX channel type
+     * @param converter Bandwidth converter
+     * @param carrierCount carrier count
+     * @param cec Channel estimation error container
      */
     typedef struct RxCarrierCreateParams_s
     {
@@ -164,7 +164,7 @@ class SatPhyRxCarrierConf : public Object
 
     /**
      * Default constructor for SatPhyRxCarrierConf
-     * \param params Rx carrier parameters
+     * @param params Rx carrier parameters
      */
     SatPhyRxCarrierConf(RxCarrierCreateParams_s params);
 
@@ -181,113 +181,113 @@ class SatPhyRxCarrierConf : public Object
     }
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Dispose function
+     * @brief Dispose function
      */
     virtual void DoDispose();
 
     /**
-     * \brief Set link results for the carrier configuration, either DVB-RCS2 or DVB-S2
+     * @brief Set link results for the carrier configuration, either DVB-RCS2 or DVB-S2
      */
     void SetLinkResults(Ptr<SatLinkResults> linkResults);
 
     /**
-     * \brief Get the number of configured carriers
-     * \return the number of configured carriers
+     * @brief Get the number of configured carriers
+     * @return the number of configured carriers
      */
     uint32_t GetCarrierCount() const;
 
     /**
-     * \brief Get configured error model
-     * \return configured error model
+     * @brief Get configured error model
+     * @return configured error model
      */
     ErrorModel GetErrorModel() const;
 
     /**
-     * \brief Get constant error rate for dedicated access
-     * \return configured constant error rate
+     * @brief Get constant error rate for dedicated access
+     * @return configured constant error rate
      */
     double GetConstantDaErrorRate() const;
 
     /**
-     * \brief Get configured interference model
-     * \param isRandomAccessCarrier Do we want RA or DA IF model
-     * \return configured interference model
+     * @brief Get configured interference model
+     * @param isRandomAccessCarrier Do we want RA or DA IF model
+     * @return configured interference model
      */
     InterferenceModel GetInterferenceModel(bool isRandomAccessCarrier) const;
 
     /**
-     * \brief Get configured interference cancelation model
-     * \param isRandomAccessCarrier Do we want RA or DA SIC model
-     * \return configured interference cancelation model
+     * @brief Get configured interference cancelation model
+     * @param isRandomAccessCarrier Do we want RA or DA SIC model
+     * @return configured interference cancelation model
      */
     InterferenceEliminationModel GetInterferenceEliminationModel(bool isRandomAccessCarrier) const;
 
     /**
-     * \brief Get configured link results
-     * \return configured link results
+     * @brief Get configured link results
+     * @return configured link results
      */
     Ptr<SatLinkResults> GetLinkResults() const;
 
     /**
-     * \brief Get configured bandwidth
-     * \param carrierId   Id of the carrier
-     * \param bandwidthType Type of the bandwidth
-     * \return Bandwidth of the requested carrier.
+     * @brief Get configured bandwidth
+     * @param carrierId   Id of the carrier
+     * @param bandwidthType Type of the bandwidth
+     * @return Bandwidth of the requested carrier.
      */
     double GetCarrierBandwidthHz(uint32_t carrierId,
                                  SatEnums::CarrierBandwidthType_t bandwidthType) const;
 
     /**
-     * \brief Get configured RX noise temperature
-     * \return configured RX noise temperature
+     * @brief Get configured RX noise temperature
+     * @return configured RX noise temperature
      */
     double GetRxTemperatureK() const;
 
     /**
-     * \brief Get other system RX noise
-     * \return other system RX noise
+     * @brief Get other system RX noise
+     * @return other system RX noise
      */
     double GetExtPowerDensityWhz() const;
 
     /**
-     * \brief Get adjacent channel interference wrt noise (factor)
-     * \return adjacent channel interference wrt noise (factor)
+     * @brief Get adjacent channel interference wrt noise (factor)
+     * @return adjacent channel interference wrt noise (factor)
      */
     double GetRxAciInterferenceWrtNoiseFactor() const;
 
     /**
-     * \brief Get configured RX mode
-     * \return configured RX mode
+     * @brief Get configured RX mode
+     * @return configured RX mode
      */
     RxMode GetRxMode() const;
 
     /**
-     * \brief Get channel type
-     * \return channel type
+     * @brief Get channel type
+     * @return channel type
      */
     SatEnums::ChannelType_t GetChannelType() const;
 
     /**
-     * \brief Get link regeneration mode
-     * \return link regeneration mode
+     * @brief Get link regeneration mode
+     * @return link regeneration mode
      */
     SatEnums::RegenerationMode_t GetLinkRegenerationMode() const;
 
     /**
-     * \brief Is interference output trace enabled
-     * \return true or false
+     * @brief Is interference output trace enabled
+     * @return true or false
      */
     bool IsIntfOutputTraceEnabled() const;
 
     /**
-     * \brief Get additional interference callback
-     * \return The additional interference callback
+     * @brief Get additional interference callback
+     * @return The additional interference callback
      */
     inline AdditionalInterferenceCallback GetAdditionalInterferenceCb()
     {
@@ -295,8 +295,8 @@ class SatPhyRxCarrierConf : public Object
     }
 
     /**
-     * \brief Set additional interference callback
-     * \param additionalInterferenceCallback The additional interference callback
+     * @brief Set additional interference callback
+     * @param additionalInterferenceCallback The additional interference callback
      */
     inline void SetAdditionalInterferenceCb(
         AdditionalInterferenceCallback additionalInterferenceCallback)
@@ -305,33 +305,33 @@ class SatPhyRxCarrierConf : public Object
     }
 
     /**
-     * \brief Get channel estimator container
-     * \return channel estimator container
+     * @brief Get channel estimator container
+     * @return channel estimator container
      */
     Ptr<SatChannelEstimationErrorContainer> GetChannelEstimatorErrorContainer() const;
 
     /**
-     * \brief Get random access collision model
-     * \return random access collision model
+     * @brief Get random access collision model
+     * @return random access collision model
      */
     RandomAccessCollisionModel GetRandomAccessCollisionModel() const;
 
     /**
-     * \brief Get random access constant error rate. Used if
+     * @brief Get random access constant error rate. Used if
      * collision model is RA_CONSTANT_COLLISION_PROBABILITY.
-     * \return constant error rate
+     * @return constant error rate
      */
     double GetRandomAccessConstantErrorRate() const;
 
     /**
-     * \brief Get random access average normalized offered load measurement window size
-     * \return average normalized offered load measurement window size
+     * @brief Get random access average normalized offered load measurement window size
+     * @return average normalized offered load measurement window size
      */
     uint32_t GetRandomAccessAverageNormalizedOfferedLoadMeasurementWindowSize() const;
 
     /**
-     * \brief Function for checking if random access dynamic load control is enabled
-     * \return Is random access dynamic load control enabled
+     * @brief Function for checking if random access dynamic load control is enabled
+     * @return Is random access dynamic load control enabled
      */
     bool IsRandomAccessDynamicLoadControlEnabled() const;
 

@@ -23,8 +23,8 @@
 
 #include "satellite-base-encapsulator.h"
 
-#include <ns3/event-id.h>
-#include <ns3/mac48-address.h>
+#include "ns3/event-id.h"
+#include "ns3/mac48-address.h"
 
 #include <map>
 #include <stdint.h>
@@ -33,16 +33,16 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief SatGenericStreamEncapsulator class is used in the FWD link for GSE
+ * @brief SatGenericStreamEncapsulator class is used in the FWD link for GSE
  * encapsulation and fragmentation of higher layer packets. SatGenericStreamEncapsulator
  * object is flow (UT address - flow id) specific and its entities are located at both
  * GW (encapsulation, fragmentation) and UT (decapsulation, defragmentation).
  * Generic stream encapsulators/decapsulators are created dynamically when first
  * needed (when a packet is received for this flow).
  *
- * \see ETSI TS 102 606 V1.1.1 Digital Video Broadcasting (DVB);
+ * @see ETSI TS 102 606 V1.1.1 Digital Video Broadcasting (DVB);
  * Generic Stream Encapsulation (GSE) Protocol
  */
 class SatGenericStreamEncapsulator : public SatBaseEncapsulator
@@ -55,12 +55,12 @@ class SatGenericStreamEncapsulator : public SatBaseEncapsulator
 
     /**
      * Constructor
-     * \param encapAddress MAC addressd of encapsulator
-     * \param decapAddress MAC addressd of decapsulator
-     * \param sourceE2EAddress E2E source MAC addressd of packets (used to set SatAddressE2ETag)
-     * \param destE2EAddress E2E destination MAC addressd of packets (used to set SatAddressE2ETag)
-     * \param flowId Flow identifier
-     * \param additionalHeaderSize Additional value in to take into account when pulling packets to
+     * @param encapAddress MAC addressd of encapsulator
+     * @param decapAddress MAC addressd of decapsulator
+     * @param sourceE2EAddress E2E source MAC addressd of packets (used to set SatAddressE2ETag)
+     * @param destE2EAddress E2E destination MAC addressd of packets (used to set SatAddressE2ETag)
+     * @param flowId Flow identifier
+     * @param additionalHeaderSize Additional value in to take into account when pulling packets to
      * represent E2E tags
      */
     SatGenericStreamEncapsulator(Mac48Address encapAddress,
@@ -76,8 +76,8 @@ class SatGenericStreamEncapsulator : public SatBaseEncapsulator
     virtual ~SatGenericStreamEncapsulator();
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
 
@@ -88,17 +88,17 @@ class SatGenericStreamEncapsulator : public SatBaseEncapsulator
 
     /**
      * Enqueue a Higher Layer packet to txBuffer.
-     * \param p To be buffered packet
-     * \param dest Target MAC address
+     * @param p To be buffered packet
+     * @param dest Target MAC address
      */
     virtual void EnquePdu(Ptr<Packet> p, Mac48Address dest);
 
     /**
      * Notify a Tx opportunity to this encapsulator.
-     * \param bytes Notified tx opportunity bytes from lower layer
-     * \param bytesLeft Bytes left after this TxOpportunity in SatQueue
-     * \param &nextMinTxO Minimum TxO after this TxO
-     * \return A GSE PDU
+     * @param bytes Notified tx opportunity bytes from lower layer
+     * @param bytesLeft Bytes left after this TxOpportunity in SatQueue
+     * @param &nextMinTxO Minimum TxO after this TxO
+     * @return A GSE PDU
      */
     virtual Ptr<Packet> NotifyTxOpportunity(uint32_t bytes,
                                             uint32_t& bytesLeft,
@@ -108,14 +108,14 @@ class SatGenericStreamEncapsulator : public SatBaseEncapsulator
      * Receive a packet, thus decapsulate and defragment/deconcatenate
      * if needed. The decapsulated/defragmented HL PDU is forwarded back
      * to LLC and to upper layer.
-     * \param p packet pointer received from lower layer
+     * @param p packet pointer received from lower layer
      */
     virtual void ReceivePdu(Ptr<Packet> p);
 
     /**
      * Get minimum Tx opportunity in bytes, which takes the
      * assumed header sizes into account.
-     * \return uint32_t minimum tx opportunity
+     * @return uint32_t minimum tx opportunity
      */
     virtual uint32_t GetMinTxOpportunityInBytes() const;
 
@@ -124,7 +124,7 @@ class SatGenericStreamEncapsulator : public SatBaseEncapsulator
      * Get new packet performs the GSE fragmentation and encapsulation
      * for a one single packet. Returns NULL packet if a suitable packet
      * is not created.
-     * \return Ptr<Packet> GSE packet
+     * @return Ptr<Packet> GSE packet
      */
     Ptr<Packet> GetNewGsePdu(uint32_t txOpportunityBytes,
                              uint32_t maxGsePduSize,
@@ -138,7 +138,7 @@ class SatGenericStreamEncapsulator : public SatBaseEncapsulator
 
     /**
      * Process the reception of individual GSE PDUs
-     * \param p Packet to be received
+     * @param p Packet to be received
      */
     virtual void ProcessPdu(Ptr<Packet> p);
 

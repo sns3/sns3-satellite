@@ -20,8 +20,8 @@
 
 #include "satellite-cno-estimator.h"
 
-#include <ns3/log.h>
-#include <ns3/simulator.h>
+#include "ns3/log.h"
+#include "ns3/simulator.h"
 
 #include <cmath>
 #include <math.h>

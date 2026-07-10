@@ -22,8 +22,8 @@
 
 #include "satellite-enums.h"
 
-#include <ns3/object.h>
-#include <ns3/simulator.h>
+#include "ns3/object.h"
+#include "ns3/simulator.h"
 
 #include <stdint.h>
 
@@ -31,9 +31,9 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief Base class for trace containers such as interference or fading traces.
+ * @brief Base class for trace containers such as interference or fading traces.
  * This class defines the functions which all the different trace models must
  * implement for the trace interface. This base class itself is abstract and will not
  * implement any real functionality.
@@ -43,98 +43,92 @@ class SatBaseTraceContainer : public Object
 {
   public:
     /**
-     * \brief Default Rx C/N0 index for C/N0 traces
+     * @brief Default Rx C/N0 index for C/N0 traces
      */
     static const uint32_t RX_POWER_TRACE_DEFAULT_RX_POWER_DENSITY_INDEX = 1;
 
     /**
-     * \brief Default Rx C/N0 index for C/N0 traces
+     * @brief Default Rx C/N0 index for C/N0 traces
      */
     static const uint32_t RX_POWER_TRACE_DEFAULT_NUMBER_OF_COLUMNS = 2;
     /**
-     * \brief Default Rx power density index for Rx power traces
+     * @brief Default Rx power density index for Rx power traces
      */
     static const uint32_t RX_CNO_TRACE_DEFAULT_RX_POWER_DENSITY_INDEX = 1;
 
     /**
-     * \brief Default Rx power density index for Rx power traces
+     * @brief Default Rx power density index for Rx power traces
      */
     static const uint32_t RX_CNO_TRACE_DEFAULT_NUMBER_OF_COLUMNS = 2;
 
     /**
-     * \brief Default interference density index for interference traces
+     * @brief Default interference density index for interference traces
      */
     static const uint32_t INTF_TRACE_DEFAULT_INTF_DENSITY_INDEX = 1;
 
     /**
-     * \brief Default number of columns for interference traces
+     * @brief Default number of columns for interference traces
      */
     static const uint32_t INTF_TRACE_DEFAULT_NUMBER_OF_COLUMNS = 2;
 
     /**
-     * \brief Default fading value index for fading traces
+     * @brief Default fading value index for fading traces
      */
     static const uint32_t FADING_TRACE_DEFAULT_FADING_VALUE_INDEX = 1;
 
     /**
-     * \brief Default number of columns for fading traces
+     * @brief Default number of columns for fading traces
      */
     static const uint32_t FADING_TRACE_DEFAULT_NUMBER_OF_COLUMNS = 2;
 
     /**
-     * \brief Default sinr value index for composite sinr traces
+     * @brief Default sinr value index for composite sinr traces
      */
     static const uint32_t CSINR_TRACE_DEFAULT_FADING_VALUE_INDEX = 1;
 
     /**
-     * \brief Default number of columns for composite sinr traces
+     * @brief Default number of columns for composite sinr traces
      */
     static const uint32_t CSINR_TRACE_DEFAULT_NUMBER_OF_COLUMNS = 2;
 
     /**
-     * \brief Default latitude value index for positions traces
+     * @brief Default latitude value index for positions traces
      */
     static const uint32_t POSITION_TRACE_DEFAULT_LATITUDE_INDEX = 1;
 
     /**
-     * \brief Default longitude value index for positions traces
+     * @brief Default longitude value index for positions traces
      */
     static const uint32_t POSITION_TRACE_DEFAULT_LONGITUDE_INDEX = 2;
 
     /**
-     * \brief Default altitude value index for positions traces
+     * @brief Default altitude value index for positions traces
      */
     static const uint32_t POSITION_TRACE_DEFAULT_ALTITUDE_INDEX = 3;
 
     /**
-     * \brief Default number of columns for position traces
+     * @brief Default number of columns for position traces
      */
     static const uint32_t POSITION_TRACE_DEFAULT_NUMBER_OF_COLUMNS = 4;
 
     /**
-     * \brief Constructor
+     * @brief Constructor
      */
     SatBaseTraceContainer();
 
     /**
-     * \brief Destructor
+     * @brief Destructor
      */
     virtual ~SatBaseTraceContainer();
 
     /**
-     * \brief NS-3 type id function
-     * \return type id
+     * @brief NS-3 type id function
+     * @return type id
      */
     static TypeId GetTypeId(void);
 
     /**
-     * \brief NS-3 instance type id function
-     * \return Instance type is
-     */
-    TypeId GetInstanceTypeId(void) const;
-
-    /**
-     * \brief Function for resetting the trace
+     * @brief Function for resetting the trace
      */
     virtual void Reset() = 0;
 

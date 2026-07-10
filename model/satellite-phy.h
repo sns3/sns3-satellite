@@ -30,11 +30,11 @@
 #include "satellite-phy-rx-carrier-conf.h"
 #include "satellite-signal-parameters.h"
 
-#include <ns3/address.h>
-#include <ns3/nstime.h>
-#include <ns3/object.h>
-#include <ns3/packet.h>
-#include <ns3/ptr.h>
+#include "ns3/address.h"
+#include "ns3/nstime.h"
+#include "ns3/object.h"
+#include "ns3/packet.h"
+#include "ns3/ptr.h"
 
 #include <stdint.h>
 #include <string>
@@ -48,7 +48,7 @@ class SatChannel;
 class SatMac;
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
  * The SatPhy models the basic physical layer of the satellite system. SatPhy
  * is the base class implementing the commonalities between different satellite
@@ -79,32 +79,32 @@ class SatPhy : public Object
     typedef SatSignalParameters::PacketsInBurst_t PacketContainer_t;
 
     /**
-     * \param  the container of pointers to packets received
-     * \param  the id of the beam where packet is from
+     * @param  the container of pointers to packets received
+     * @param  the id of the beam where packet is from
      */
     typedef Callback<void, PacketContainer_t, Ptr<SatSignalParameters>> ReceiveCallback;
 
     /**
-     * \param The id of the satellite.
-     * \param The id of the beam.
-     * \param The id (address) of the source or sender
-     * \param The id (address) of the destination or receiver
-     * \param C/N0 value
+     * @param The id of the satellite.
+     * @param The id of the beam.
+     * @param The id (address) of the source or sender
+     * @param The id (address) of the destination or receiver
+     * @param C/N0 value
      */
     typedef Callback<void, uint32_t, uint32_t, Address, Address, double, bool> CnoCallback;
 
     /**
-     * \param satellite Id
-     * \param beam Id
-     * \param carrier Id
-     * \param allocation channel Id
-     * \param average normalized offered load
+     * @param satellite Id
+     * @param beam Id
+     * @param carrier Id
+     * @param allocation channel Id
+     * @param average normalized offered load
      */
     typedef Callback<void, uint32_t, uint32_t, uint32_t, uint8_t, double>
         AverageNormalizedOfferedLoadCallback;
 
     /**
-     * \brief Creation parameters for base PHY object
+     * @brief Creation parameters for base PHY object
      */
     typedef struct
     {
@@ -124,7 +124,17 @@ class SatPhy : public Object
     /**
      * Constructor to create PHY objects with parameters.
      */
-    SatPhy(CreateParam_t& params);
+    SatPhy(CreateParam_t params);
+
+    /**
+     * Notifier called once the ObjectBase is fully constructed.
+     *
+     * This method is invoked once all member attributes have been
+     * initialized. Subclasses can override this method to be notified
+     * of this event but if they do this, they must chain up to their
+     * parent's NotifyConstructionCompleted method.
+     */
+    virtual void NotifyConstructionCompleted() override;
 
     /**
      * Destructor
@@ -135,10 +145,7 @@ class SatPhy : public Object
      * Derived from Object
      */
     static TypeId GetTypeId(void);
-    /**
-     * Derived from Object
-     */
-    TypeId GetInstanceTypeId(void) const;
+
     /**
      * Initialization of SatPhy
      */
@@ -150,30 +157,30 @@ class SatPhy : public Object
     virtual void DoDispose(void);
 
     /**
-     * \brief Get additional interference, used to compute final SINR at RX
+     * @brief Get additional interference, used to compute final SINR at RX
      *
-     * \return Additional interference
+     * @return Additional interference
      */
     virtual double GetAdditionalInterference() = 0;
 
     /**
-     * \brief Calculate final SINR with PHY specific parameters and given calculated SINR.
+     * @brief Calculate final SINR with PHY specific parameters and given calculated SINR.
      * Additional interference value is added.
      *
-     * \param sinr Calculated SINR
-     * \param otherInterference Interference to add to the sinr
-     * \return Final SINR
+     * @param sinr Calculated SINR
+     * @param otherInterference Interference to add to the sinr
+     * @return Final SINR
      */
     double CalculateSinr(double sinr, double otherInterference);
 
     /**
-     * \brief Initialize phy.
+     * @brief Initialize phy.
      */
     void Initialize();
 
     /**
-     * \brief Get the noise temperature of the receiver in dbK.
-     * \return the receiver noise temperature in dbK.
+     * @brief Get the noise temperature of the receiver in dbK.
+     * @return the receiver noise temperature in dbK.
      */
     inline double GetRxNoiseTemperatureDbk() const
     {
@@ -181,8 +188,8 @@ class SatPhy : public Object
     }
 
     /**
-     * \brief Set the noise temperature of the receiver in dbK.
-     * \param temperatureDbk the receiver noise temperature in dbK.
+     * @brief Set the noise temperature of the receiver in dbK.
+     * @param temperatureDbk the receiver noise temperature in dbK.
      */
     inline void SetRxNoiseTemperatureDbk(double temperatureDbk)
     {
@@ -190,8 +197,8 @@ class SatPhy : public Object
     }
 
     /**
-     * \brief Get the maximum antenna gain of the receiver in dB.
-     * \return the receiver noise temperature in dB.
+     * @brief Get the maximum antenna gain of the receiver in dB.
+     * @return the receiver noise temperature in dB.
      */
     inline double GetRxAntennaGainDb() const
     {
@@ -199,8 +206,8 @@ class SatPhy : public Object
     }
 
     /**
-     * \brief Set the maximum antenna gain of the receiver in dB.
-     * \param gainDb the receiver antenna gain in dB.
+     * @brief Set the maximum antenna gain of the receiver in dB.
+     * @param gainDb the receiver antenna gain in dB.
      */
     inline void SetRxAntennaGainDb(double gainDb)
     {
@@ -208,8 +215,8 @@ class SatPhy : public Object
     }
 
     /**
-     * \brief Get the antenna loss of the receiver in dB.
-     * \return the receiver antenna loss in dB.
+     * @brief Get the antenna loss of the receiver in dB.
+     * @return the receiver antenna loss in dB.
      */
     inline double GetRxAntennaLossDb() const
     {
@@ -217,8 +224,8 @@ class SatPhy : public Object
     }
 
     /**
-     * \brief Set the antenna loss of the receiver in dB.
-     * \param lossDb the receiver antenna loss in dB.
+     * @brief Set the antenna loss of the receiver in dB.
+     * @param lossDb the receiver antenna loss in dB.
      */
     inline void SetRxAntennaLossDb(double lossDb)
     {
@@ -226,8 +233,8 @@ class SatPhy : public Object
     }
 
     /**
-     * \brief Get the maximum antenna gain of the transmitter in dB.
-     * \return the transmitter noise temperature in dB.
+     * @brief Get the maximum antenna gain of the transmitter in dB.
+     * @return the transmitter noise temperature in dB.
      */
     inline double GetTxAntennaGainDb() const
     {
@@ -235,8 +242,8 @@ class SatPhy : public Object
     }
 
     /**
-     * \brief Set the maximum antenna gain of the transmitter in dB.
-     * \param gainDb the transmitter antenna gain in dB.
+     * @brief Set the maximum antenna gain of the transmitter in dB.
+     * @param gainDb the transmitter antenna gain in dB.
      */
     inline void SetTxAntennaGainDb(double gainDb)
     {
@@ -244,8 +251,8 @@ class SatPhy : public Object
     }
 
     /**
-     * \brief Get the maximum transmit power of the transmitter in dB.
-     * \return the transmitter transmit power in dB.
+     * @brief Get the maximum transmit power of the transmitter in dB.
+     * @return the transmitter transmit power in dB.
      */
     inline double GetTxMaxPowerDbw() const
     {
@@ -253,8 +260,8 @@ class SatPhy : public Object
     }
 
     /**
-     * \brief Set the maximum transmit power of the transmitter in dB.
-     * \param powerDb the transmitter transmit power in dB.
+     * @brief Set the maximum transmit power of the transmitter in dB.
+     * @param powerDb the transmitter transmit power in dB.
      */
     inline void SetTxMaxPowerDbw(double powerDb)
     {
@@ -262,8 +269,8 @@ class SatPhy : public Object
     }
 
     /**
-     * \brief Get the output loss of the transmitter in dB.
-     * \return the transmitter output loss in dB.
+     * @brief Get the output loss of the transmitter in dB.
+     * @return the transmitter output loss in dB.
      */
     inline double GetTxOutputLossDb() const
     {
@@ -271,8 +278,8 @@ class SatPhy : public Object
     }
 
     /**
-     * \brief Set the output loss of the transmitter in dB.
-     * \param lossDb the transmitter output loss in dB.
+     * @brief Set the output loss of the transmitter in dB.
+     * @param lossDb the transmitter output loss in dB.
      */
     inline void SetTxOutputLossDb(double lossDb)
     {
@@ -280,8 +287,8 @@ class SatPhy : public Object
     }
 
     /**
-     * \brief Get the pointing loss of the transmitter in dB.
-     * \return the transmitter pointing loss in dB.
+     * @brief Get the pointing loss of the transmitter in dB.
+     * @return the transmitter pointing loss in dB.
      */
     inline double GetTxPointingLossDb() const
     {
@@ -289,8 +296,8 @@ class SatPhy : public Object
     }
 
     /**
-     * \brief Set the pointing loss of the transmitter in dB.
-     * \param lossDb the transmitter pointing loss in dB.
+     * @brief Set the pointing loss of the transmitter in dB.
+     * @param lossDb the transmitter pointing loss in dB.
      */
     inline void SetTxPointingLossDb(double lossDb)
     {
@@ -298,8 +305,8 @@ class SatPhy : public Object
     }
 
     /**
-     * \brief Get the OBO loss of the transmitter in dB.
-     * \return the transmitter OBO loss in dB.
+     * @brief Get the OBO loss of the transmitter in dB.
+     * @return the transmitter OBO loss in dB.
      */
     inline double GetTxOboLossDb() const
     {
@@ -307,8 +314,8 @@ class SatPhy : public Object
     }
 
     /**
-     * \brief Set the OBO loss of the transmitter in dB.
-     * \param lossDb the transmitter OBO loss in dB.
+     * @brief Set the OBO loss of the transmitter in dB.
+     * @param lossDb the transmitter OBO loss in dB.
      */
     inline void SetTxOboLossDb(double lossDb)
     {
@@ -316,8 +323,8 @@ class SatPhy : public Object
     }
 
     /**
-     * \brief Get the antenna loss of the transmitter in dB.
-     * \return the transmitter antenna loss in dB.
+     * @brief Get the antenna loss of the transmitter in dB.
+     * @return the transmitter antenna loss in dB.
      */
     inline double GetTxAntennaLossDb() const
     {
@@ -325,8 +332,8 @@ class SatPhy : public Object
     }
 
     /**
-     * \brief Set the antenna loss of the transmitter in dB.
-     * \param lossDb the transmitter antenna loss in dB.
+     * @brief Set the antenna loss of the transmitter in dB.
+     * @param lossDb the transmitter antenna loss in dB.
      */
     inline void SetTxAntennaLossDb(double lossDb)
     {
@@ -334,8 +341,8 @@ class SatPhy : public Object
     }
 
     /**
-     * \brief Get the default fading of the PHY.
-     * \return the default fading of the PHY.
+     * @brief Get the default fading of the PHY.
+     * @return the default fading of the PHY.
      */
     inline double GetDefaultFading() const
     {
@@ -343,8 +350,8 @@ class SatPhy : public Object
     }
 
     /**
-     * \brief Set the default fading of the PHY.
-     * \param fading the default fading of the PHY.
+     * @brief Set the default fading of the PHY.
+     * @param fading the default fading of the PHY.
      */
     inline void SetDefaultFading(double fading)
     {
@@ -352,77 +359,77 @@ class SatPhy : public Object
     }
 
     /**
-     * \brief Set the transmit antenna gain pattern.
-     * \param agp antenna gain pattern
-     * \param mobility mobility model of satellite
+     * @brief Set the transmit antenna gain pattern.
+     * @param agp antenna gain pattern
+     * @param mobility mobility model of satellite
      */
     virtual void SetTxAntennaGainPattern(Ptr<SatAntennaGainPattern> agp,
                                          Ptr<SatMobilityModel> satelliteMobility);
 
     /**
-     * \brief Set the receive antenna gain pattern.
-     * \param agp antenna gain pattern
-     * \param mobility mobility model of satellite
+     * @brief Set the receive antenna gain pattern.
+     * @param agp antenna gain pattern
+     * @param mobility mobility model of satellite
      */
     virtual void SetRxAntennaGainPattern(Ptr<SatAntennaGainPattern> agp,
                                          Ptr<SatMobilityModel> satelliteMobility);
 
     /**
-     * \brief Configure Rx carriers
-     * \param carrierConf Carrier configuration class
-     * \param superFrameConf Superframe configuration
+     * @brief Configure Rx carriers
+     * @param carrierConf Carrier configuration class
+     * @param superFrameConf Superframe configuration
      */
     void ConfigureRxCarriers(Ptr<SatPhyRxCarrierConf> carrierConf,
                              Ptr<SatSuperframeConf> superFrameConf);
 
     /**
-     * \brief Set fading container
-     * \param fadingContainer fading container
+     * @brief Set fading container
+     * @param fadingContainer fading container
      */
     void SetRxFadingContainer(Ptr<SatBaseFading> fadingContainer);
 
     /**
-     * \brief Set fading container
-     * \param fadingContainer fading container
+     * @brief Set fading container
+     * @param fadingContainer fading container
      */
     void SetTxFadingContainer(Ptr<SatBaseFading> fadingContainer);
 
     /**
-     * \brief Get the SatPhyTx pointer
-     * \return a pointer to the SatPhyTx instance
+     * @brief Get the SatPhyTx pointer
+     * @return a pointer to the SatPhyTx instance
      */
     virtual Ptr<SatPhyTx> GetPhyTx() const;
 
     /**
-     * \brief Get the SatPhyRx pointer
-     * \return a pointer to the SatPhyRx instance
+     * @brief Get the SatPhyRx pointer
+     * @return a pointer to the SatPhyRx instance
      */
     virtual Ptr<SatPhyRx> GetPhyRx() const;
 
     /**
-     * \brief Set the SatPhyTx module
-     * \param phyTx Transmitter PHY module
+     * @brief Set the SatPhyTx module
+     * @param phyTx Transmitter PHY module
      */
     virtual void SetPhyTx(Ptr<SatPhyTx> phyTx);
 
     /**
-     * \brief Set the SatPhyRx module
-     * \param phyRx Receiver PHY module
+     * @brief Set the SatPhyRx module
+     * @param phyRx Receiver PHY module
      */
     virtual void SetPhyRx(Ptr<SatPhyRx> phyRx);
 
     /**
-     * \brief Get the Tx satellite channel
-     * \return the Tx channel
+     * @brief Get the Tx satellite channel
+     * @return the Tx channel
      */
     Ptr<SatChannel> GetTxChannel();
 
     /**
-     * \brief Send Pdu to the PHY tx module (for initial transmissions from either UT or GW)
-     * \param p packet to be sent
-     * \param carrierId Carrier id for the packet transmission
-     * \param duration the packet transmission duration (from MAC layer)
-     * \param txInfo Tx information (e.g. packet type, modcod, waveform ID)
+     * @brief Send Pdu to the PHY tx module (for initial transmissions from either UT or GW)
+     * @param p packet to be sent
+     * @param carrierId Carrier id for the packet transmission
+     * @param duration the packet transmission duration (from MAC layer)
+     * @param txInfo Tx information (e.g. packet type, modcod, waveform ID)
      */
     virtual void SendPdu(PacketContainer_t,
                          uint32_t carrierId,
@@ -430,38 +437,38 @@ class SatPhy : public Object
                          SatSignalParameters::txInfo_s txInfo);
 
     /**
-     * \brief Send Pdu to the PHY tx module (for satellite switch packet forwarding)
-     * \param rxParams Transmission parameters
+     * @brief Send Pdu to the PHY tx module (for satellite switch packet forwarding)
+     * @param rxParams Transmission parameters
      */
     virtual void SendPduWithParams(Ptr<SatSignalParameters> rxParams);
 
     /**
-     * \brief Set the satId this PHY is connected with
-     * \param satId Satellite ID
+     * @brief Set the satId this PHY is connected with
+     * @param satId Satellite ID
      */
     void SetSatId(uint32_t satId);
 
     /**
-     * \brief Set the beamId this PHY is connected with
-     * \param beamId Satellite beam id
+     * @brief Set the beamId this PHY is connected with
+     * @param beamId Satellite beam id
      */
     bool SetBeamId(uint32_t beamId);
 
     /**
-     * \brief Receives packets from lower layer.
-     * \param rxParams Packet reception parameters
-     * \param phyError Boolean indicating whether the packet successfully
+     * @brief Receives packets from lower layer.
+     * @param rxParams Packet reception parameters
+     * @param phyError Boolean indicating whether the packet successfully
      * received or not?
      */
     virtual void Receive(Ptr<SatSignalParameters> rxParams, bool phyError);
 
     /**
-     * \brief Function for getting the C/NO information
-     * \param beamId Beam id of C/N0 is received
-     * \param source Id (address) of the source (sender)
-     * \param destination Id (address) of the destination
-     * \param cno Value of the C/N0
-     * \param isSatelliteMac If true, cno corresponds to link SAT to GW; if false, cno corresponds
+     * @brief Function for getting the C/NO information
+     * @param beamId Beam id of C/N0 is received
+     * @param source Id (address) of the source (sender)
+     * @param destination Id (address) of the destination
+     * @param cno Value of the C/N0
+     * @param isSatelliteMac If true, cno corresponds to link SAT to GW; if false, cno corresponds
      * to link UT to GW
      */
     void CnoInfo(uint32_t satId,
@@ -472,7 +479,7 @@ class SatPhy : public Object
                  bool isSatelliteMac);
 
     /**
-     * \brief Function for getting the normalized offered load of the specific random access
+     * @brief Function for getting the normalized offered load of the specific random access
      * allocation channel \param satId Satellite id of average normalized load is received \param
      * beamId Beam id of average normalized load is received \param carrierId Carrier id of average
      * normalized load is received \param allocationChannelId allocation channel ID \param
@@ -485,57 +492,57 @@ class SatPhy : public Object
                                                       double averageNormalizedOfferedLoad);
 
     /**
-     * \brief Set the node info class
-     * \param nodeInfo Node information related to this SatPhy
+     * @brief Set the node info class
+     * @param nodeInfo Node information related to this SatPhy
      */
     void SetNodeInfo(const Ptr<SatNodeInfo> nodeInfo);
 
     /**
-     * \brief Begin frame/window end scheduling for processes utilizing frame length as interval
+     * @brief Begin frame/window end scheduling for processes utilizing frame length as interval
      */
     void BeginEndScheduling();
 
     /**
-     * \brief Callback for retrieving a pair of SatChannel associated to a beam
-     * \param uint32_t  beam ID
-     * \return A pair of SatChannel to use as communication channel in this beam
+     * @brief Callback for retrieving a pair of SatChannel associated to a beam
+     * @param uint32_t  beam ID
+     * @return A pair of SatChannel to use as communication channel in this beam
      */
     typedef Callback<SatChannelPair::ChannelPair_t, uint32_t, uint32_t> ChannelPairGetterCallback;
 
     /**
-     * \brief Set the channel pair getter callback
-     * \param cb callback to invoke whenever a SatChannel pair for a beam is required.
+     * @brief Set the channel pair getter callback
+     * @param cb callback to invoke whenever a SatChannel pair for a beam is required.
      */
     void SetChannelPairGetterCallback(SatPhy::ChannelPairGetterCallback cb);
 
   protected:
     /**
-     * \brief Invoke the `Rx` trace source for each received packet.
-     * \param packets Container of the pointers to the packets received.
+     * @brief Invoke the `Rx` trace source for each received packet.
+     * @param packets Container of the pointers to the packets received.
      */
     virtual void RxTraces(SatPhy::PacketContainer_t packets);
 
     /**
-     * \brief Invoke the `RxLinkModcod` trace source for each received packet.
-     * \param rxParams Pointer to SatSignalParameters of packets received.
+     * @brief Invoke the `RxLinkModcod` trace source for each received packet.
+     * @param rxParams Pointer to SatSignalParameters of packets received.
      */
     void ModcodTrace(Ptr<SatSignalParameters> rxParams);
 
     /**
-     * \brief Set SatPhyTimeTag of packets
-     * \param packets Container of the pointers to the packets to tag.
+     * @brief Set SatPhyTimeTag of packets
+     * @param packets Container of the pointers to the packets to tag.
      */
     void SetTimeTag(SatPhy::PacketContainer_t packets);
 
     /**
-     * \brief Get the link TX direction. Must be implemented by child clases.
-     * \return The link TX direction
+     * @brief Get the link TX direction. Must be implemented by child clases.
+     * @return The link TX direction
      */
     virtual SatEnums::SatLinkDir_t GetSatLinkTxDir();
 
     /**
-     * \brief Get the link RX direction. Must be implemented by child clases.
-     * \return The link RX direction
+     * @brief Get the link RX direction. Must be implemented by child clases.
+     * @return The link RX direction
      */
     virtual SatEnums::SatLinkDir_t GetSatLinkRxDir();
 
@@ -613,6 +620,11 @@ class SatPhy : public Object
      * Pointer to internal SatPhyRx instance
      */
     Ptr<SatPhyRx> m_phyRx;
+
+    /**
+     * Satellite physical layer construction parameters
+     */
+    CreateParam_t m_params;
 
     /**
      * Satellite ID
@@ -701,7 +713,7 @@ class SatPhy : public Object
     double m_txAntennaLossDb;
 
     /**
-     * \brief Default fading value
+     * @brief Default fading value
      */
     double m_defaultFadingValue;
 };

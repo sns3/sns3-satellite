@@ -23,9 +23,9 @@
 
 #include "satellite-stats-helper.h"
 
-#include <ns3/address.h>
-#include <ns3/collector-map.h>
-#include <ns3/ptr.h>
+#include "ns3/address.h"
+#include "ns3/collector-map.h"
+#include "ns3/ptr.h"
 
 #include <list>
 #include <map>
@@ -41,8 +41,8 @@ class DataCollectionObject;
 class DistributionCollector;
 
 /**
- * \ingroup satstats
- * \brief Base class for RBDC requests statistics helpers.
+ * @ingroup satstats
+ * @brief Base class for RBDC requests statistics helpers.
  */
 class SatStatsRbdcRequestHelper : public SatStatsHelper
 {
@@ -61,25 +61,25 @@ class SatStatsRbdcRequestHelper : public SatStatsHelper
     static TypeId GetTypeId();
 
     /**
-     * \param averagingMode average all samples before passing them to aggregator.
+     * @param averagingMode average all samples before passing them to aggregator.
      */
     void SetAveragingMode(bool averagingMode);
 
     /**
-     * \return the currently active averaging mode.
+     * @return the currently active averaging mode.
      */
     bool GetAveragingMode() const;
 
     /**
-     * \brief Set up several probes or other means of listeners
+     * @brief Set up several probes or other means of listeners
      *        and connect them to the collectors.
      */
     void InstallProbes();
 
     /**
-     * \brief Receive inputs from trace sources
-     * \param identifier the source ID as a context string.
-     * \param rbdcTraceKbps the requested RBDC capacity collected.
+     * @brief Receive inputs from trace sources
+     * @param identifier the source ID as a context string.
+     * @param rbdcTraceKbps the requested RBDC capacity collected.
      */
     void RbdcRateCallback(std::string identifier, uint32_t rbdcTraceKbps);
 

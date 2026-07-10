@@ -24,9 +24,9 @@
 
 #include "satellite-stats-helper.h"
 
-#include <ns3/collector-map.h>
-#include <ns3/ptr.h>
-#include <ns3/satellite-bbframe.h>
+#include "ns3/collector-map.h"
+#include "ns3/ptr.h"
+#include "ns3/satellite-bbframe.h"
 
 #include <map>
 #include <string>
@@ -38,15 +38,15 @@ class SatHelper;
 class DataCollectionObject;
 
 /**
- * \ingroup satstats
- * \brief
+ * @ingroup satstats
+ * @brief
  */
 class SatStatsFrameTypeUsageHelper : public SatStatsHelper
 {
   public:
     /**
      * Constructor.
-     * \param satHelper Satellite helper instance
+     * @param satHelper Satellite helper instance
      */
     SatStatsFrameTypeUsageHelper(Ptr<const SatHelper> satHelper);
 
@@ -57,7 +57,7 @@ class SatStatsFrameTypeUsageHelper : public SatStatsHelper
 
     /**
      * inherited from ObjectBase base class
-     * \return Type ID of the helper
+     * @return Type ID of the helper
      */
     static TypeId GetTypeId();
 
@@ -73,23 +73,23 @@ class SatStatsFrameTypeUsageHelper : public SatStatsHelper
 
     /**
      * Get identifier header for file.
-     * \param dataLabel Label for data column
-     * \return String containing identifier type (global, gw_id, beam_id),
+     * @param dataLabel Label for data column
+     * @return String containing identifier type (global, gw_id, beam_id),
      *               frame_type and data label.
      */
     std::string GetIdentifierHeading(std::string dataLabel) const;
 
   private:
     /**
-     * \param context Beam ID, GW ID or global ID (0) as string
-     * \param frameType Type of the frame
+     * @param context Beam ID, GW ID or global ID (0) as string
+     * @param frameType Type of the frame
      */
     void FrameTypeUsageCallback(std::string context, Ptr<SatBbFrame> bbFrame);
 
     /**
-     * \brief Get frame type ID.
-     * \param frameType Frame type enum
-     * \return ID as integer
+     * @brief Get frame type ID.
+     * @param frameType Frame type enum
+     * @return ID as integer
      */
     static uint32_t GetFrameTypeId(SatEnums::SatBbFrameType_t frameType);
 
@@ -100,7 +100,7 @@ class SatStatsFrameTypeUsageHelper : public SatStatsHelper
     bool m_usePercentage;
 
     /**
-     * \brief Two-dimensional map of collectors, indexed first by the
+     * @brief Two-dimensional map of collectors, indexed first by the
      * the frame type identifier and second by the global/gw/beam identifier.
      */
     std::map<uint32_t, CollectorMap> m_collectors;

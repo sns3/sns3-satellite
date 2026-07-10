@@ -21,7 +21,7 @@
 #ifndef SAT_BEAM_USER_INFO_H
 #define SAT_BEAM_USER_INFO_H
 
-#include <ns3/geo-coordinate.h>
+#include "ns3/geo-coordinate.h"
 
 #include <stdint.h>
 #include <utility>
@@ -31,7 +31,7 @@ namespace ns3
 {
 
 /**
- * \brief Class that holds information for each beam regarding UTs and their users camped in each
+ * @brief Class that holds information for each beam regarding UTs and their users camped in each
  * beam.
  *
  * Default constructor enables creating an empty information structure.
@@ -54,8 +54,8 @@ class SatBeamUserInfo
      * Constructor for SatBeamUserInfo which allows creating a group of UT information
      * structures with each UT having the same number of users.
      *
-     * \param utCount UT count of the beam (can be added later by method AddUt)
-     * \param userCountPerUt User count of the UTs (can be changed for the specific UT by method
+     * @param utCount UT count of the beam (can be added later by method AddUt)
+     * @param userCountPerUt User count of the UTs (can be changed for the specific UT by method
      * SetUtUserCount)
      */
     SatBeamUserInfo(uint32_t utCount, uint32_t userCountPerUt);
@@ -68,22 +68,22 @@ class SatBeamUserInfo
     }
 
     /**
-     * \return number of UTs in beam.
+     * @return number of UTs in beam.
      */
     uint32_t GetUtCount() const;
 
     /**
-     * \param utIndex index of the UT. Possible indexes are 0  to value -1 returned by GetUtCount
+     * @param utIndex index of the UT. Possible indexes are 0  to value -1 returned by GetUtCount
      *
-     * \return number of users in a UT.
+     * @return number of users in a UT.
      */
     uint32_t GetUtUserCount(uint32_t utIndex) const;
 
     /**
      * Sets user count for the UT with given uIndex.
      *
-     * \param utIndex index of the UT. Possible indexes are 0 to value -1 returned by GetUtCount.
-     * \param userCount Number of users under the UT of with given utIndex. Minimum value is 1.
+     * @param utIndex index of the UT. Possible indexes are 0 to value -1 returned by GetUtCount.
+     * @param userCount Number of users under the UT of with given utIndex. Minimum value is 1.
      *                  If this is not called for the UT then default value (1) is used for the UT.
      *
      */
@@ -92,17 +92,17 @@ class SatBeamUserInfo
     /**
      * Appends new UT to end of the list with given user count for the appended UT.
      *
-     * \param userCount Number of users under the appended UT. Minimum value is 1.
+     * @param userCount Number of users under the appended UT. Minimum value is 1.
      */
     void AppendUt(uint32_t userCount);
 
     /**
-     * \return Get the list of custom positions to create, and associated group
+     * @return Get the list of custom positions to create, and associated group
      */
     std::vector<std::pair<GeoCoordinate, uint32_t>> GetPositions();
 
     /**
-     * \brief Set the list of custom positions to create, and associated group
+     * @brief Set the list of custom positions to create, and associated group
      */
     void SetPositions(std::vector<std::pair<GeoCoordinate, uint32_t>> positions);
 

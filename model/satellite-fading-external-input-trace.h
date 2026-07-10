@@ -21,7 +21,7 @@
 #ifndef SATELLITE_FADING_EXTERNAL_INPUT_TRACE_H
 #define SATELLITE_FADING_EXTERNAL_INPUT_TRACE_H
 
-#include <ns3/simple-ref-count.h>
+#include "ns3/simple-ref-count.h"
 
 #include <stdint.h>
 #include <string>
@@ -31,8 +31,8 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief The class for satellite fading external input trace. The class reads
+ * @ingroup satellite
+ * @brief The class for satellite fading external input trace. The class reads
  * fading trace input samples from a file and provides the current fading value
  * for this specific fading file.
  */
@@ -52,8 +52,8 @@ class SatFadingExternalInputTrace : public SimpleRefCount<SatFadingExternalInput
 
     /**
      * Constructor with initialization parameters.
-     * \param type
-     * \param filePathName
+     * @param type
+     * @param filePathName
      */
     SatFadingExternalInputTrace(TraceFileType_e type, std::string filePathName);
 
@@ -64,21 +64,21 @@ class SatFadingExternalInputTrace : public SimpleRefCount<SatFadingExternalInput
 
     /**
      * Get the current fading value for this specific fading file
-     * \return fading value in linear format
+     * @return fading value in linear format
      */
     double GetFading() const;
 
     /**
      * A method to test that the fading trace is according to
      * assumptions.
-     * \return boolean value indicating success or failure
+     * @return boolean value indicating success or failure
      */
     bool TestFadingTrace() const;
 
   private:
     /**
      * Read the fading trace from a binary file
-     * \param filePathName Path and file name of the fading file
+     * @param filePathName Path and file name of the fading file
      */
     void ReadTrace(std::string filePathName);
 

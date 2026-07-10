@@ -23,7 +23,7 @@
 
 #include "satellite-fwd-link-scheduler.h"
 
-#include <ns3/pointer.h>
+#include "ns3/pointer.h"
 
 #include <stdint.h>
 #include <utility>
@@ -33,8 +33,8 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief SatFwdLinkSchedulerDefault schedules BB frames for forward link. This is the reference
+ * @ingroup satellite
+ * @brief SatFwdLinkSchedulerDefault schedules BB frames for forward link. This is the reference
  * case of the scheduler, without separation between slices. It uses only one instance of
  * BbFrameContainer.
  *
@@ -49,16 +49,10 @@ class SatScpcScheduler : public SatFwdLinkScheduler
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
-
-    /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
-     */
-    virtual TypeId GetInstanceTypeId(void) const;
 
     /**
      * Construct a SatFwdLinkScheduler
@@ -71,11 +65,21 @@ class SatScpcScheduler : public SatFwdLinkScheduler
     /**
      * Actual constructor of a SatFwdLinkScheduler
      *
-     * \param conf BB Frame configuration
-     * \param address MAC address
-     * \param carrierBandwidthInHz Carrier bandwidth where scheduler is associated to [Hz].
+     * @param conf BB Frame configuration
+     * @param address MAC address
+     * @param carrierBandwidthInHz Carrier bandwidth where scheduler is associated to [Hz].
      */
     SatScpcScheduler(Ptr<SatBbFrameConf> conf, Mac48Address address, double carrierBandwidthInHz);
+
+    /**
+     * Notifier called once the ObjectBase is fully constructed.
+     *
+     * This method is invoked once all member attributes have been
+     * initialized. Subclasses can override this method to be notified
+     * of this event but if they do this, they must chain up to their
+     * parent's NotifyConstructionCompleted method.
+     */
+    virtual void NotifyConstructionCompleted() override;
 
     /**
      * Destroy a SatFwdLinkScheduler
@@ -87,7 +91,7 @@ class SatScpcScheduler : public SatFwdLinkScheduler
     /**
      * Get next frame to be transmitted.
      *
-     * \return Pointer to frame
+     * @return Pointer to frame
      */
     virtual std::pair<Ptr<SatBbFrame>, const Time> GetNextFrame();
 
@@ -103,11 +107,6 @@ class SatScpcScheduler : public SatFwdLinkScheduler
     void ScheduleBbFrames();
 
     /**
-     *  Handles periodic timer timeouts.
-     */
-    void PeriodicTimerExpired();
-
-    /**
      * Send stats and reset all the symbols sent count for each slice to zero.
      */
     void SendAndClearSymbolsSentStat();
@@ -115,7 +114,7 @@ class SatScpcScheduler : public SatFwdLinkScheduler
     /**
      * Gets scheduling object in sorted order according to configured sorting criteria.
      *
-     * \param output reference to a vector which will be filled with pointers to
+     * @param output reference to a vector which will be filled with pointers to
      *               the scheduling objects available for scheduling.
      */
     void GetSchedulingObjects(std::vector<Ptr<SatSchedulingObject>>& output);

@@ -30,10 +30,10 @@
 using namespace ns3;
 
 /**
- * \file sat-profiling-sim.cc
- * \ingroup satellite
+ * @file sat-profiling-sim.cc
+ * @ingroup satellite
  *
- * \brief
+ * @brief
  *         To see help for user arguments:
  *         execute command -> ./waf --run "sat-profiling-sim --PrintHelp"
  *

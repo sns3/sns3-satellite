@@ -22,20 +22,20 @@
 
 #include "satellite-gw-helper.h"
 
-#include <ns3/boolean.h>
-#include <ns3/config.h>
-#include <ns3/double.h>
-#include <ns3/enum.h>
-#include <ns3/log.h>
-#include <ns3/pointer.h>
-#include <ns3/satellite-channel-estimation-error-container.h>
-#include <ns3/satellite-channel.h>
-#include <ns3/satellite-enums.h>
-#include <ns3/satellite-link-results.h>
-#include <ns3/satellite-lower-layer-service.h>
-#include <ns3/satellite-net-device.h>
-#include <ns3/satellite-orbiter-net-device.h>
-#include <ns3/satellite-typedefs.h>
+#include "ns3/boolean.h"
+#include "ns3/config.h"
+#include "ns3/double.h"
+#include "ns3/enum.h"
+#include "ns3/log.h"
+#include "ns3/pointer.h"
+#include "ns3/satellite-channel-estimation-error-container.h"
+#include "ns3/satellite-channel.h"
+#include "ns3/satellite-enums.h"
+#include "ns3/satellite-link-results.h"
+#include "ns3/satellite-lower-layer-service.h"
+#include "ns3/satellite-net-device.h"
+#include "ns3/satellite-orbiter-net-device.h"
+#include "ns3/satellite-typedefs.h"
 
 #include <string>
 
@@ -100,12 +100,6 @@ SatGwHelper::GetTypeId(void)
                             MakeTraceSourceAccessor(&SatGwHelper::m_creationTrace),
                             "ns3::SatTypedefs::CreationCallback");
     return tid;
-}
-
-TypeId
-SatGwHelper::GetInstanceTypeId(void) const
-{
-    return GetTypeId();
 }
 
 SatGwHelper::SatGwHelper()

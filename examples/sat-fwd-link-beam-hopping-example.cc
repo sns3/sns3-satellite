@@ -29,8 +29,8 @@
 using namespace ns3;
 
 /**
- * \file sat-fwd-link-beam-hopping-example.cc
- * \ingroup satellite
+ * @file sat-fwd-link-beam-hopping-example.cc
+ * @ingroup satellite
  *
  * This simulation script is an example of FWD link beam hopping
  * configuration. All spot-beams of GW-1 are enabled and a proper

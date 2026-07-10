@@ -25,7 +25,7 @@
 
 #include "lora-device-address.h"
 
-#include <ns3/object.h>
+#include "ns3/object.h"
 
 #include <stdint.h>
 
@@ -46,8 +46,8 @@ class LoraDeviceAddressGenerator : public Object
      *
      * The first call to NextAddress() or GetAddress() will return these values.
      *
-     * \param nwkId The first network id.
-     * \param nwkAddr The first address.
+     * @param nwkId The first network id.
+     * @param nwkAddr The first address.
      */
     LoraDeviceAddressGenerator(const uint8_t nwkId = 0, const uint32_t nwkAddr = 0);
 
@@ -57,7 +57,7 @@ class LoraDeviceAddressGenerator : public Object
      * This resets the address to the base address that was used for
      * initialization.
      *
-     * \return the LoraDeviceAddress address of the next network
+     * @return the LoraDeviceAddress address of the next network
      */
     LoraDeviceAddress NextNetwork(void);
 
@@ -69,7 +69,7 @@ class LoraDeviceAddressGenerator : public Object
      *
      * This keeps the nwkId constant, only incrementing nwkAddr.
      *
-     * \return the LoraDeviceAddress address
+     * @return the LoraDeviceAddress address
      */
     LoraDeviceAddress NextAddress(void);
 
@@ -80,7 +80,7 @@ class LoraDeviceAddressGenerator : public Object
      * Does not change the internal state; is just used to peek at the next
      * address that will be allocated upon a call to NextAddress
      *
-     * \return the LoraDeviceAddress
+     * @return the LoraDeviceAddress
      */
     LoraDeviceAddress GetNextAddress(void);
 

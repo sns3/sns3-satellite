@@ -23,14 +23,14 @@
 
 #include "geo-coordinate.h"
 
-#include <ns3/mobility-model.h>
+#include "ns3/mobility-model.h"
 
 namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief Keep track of the current position and velocity of an object in satellite network.
+ * @ingroup satellite
+ * @brief Keep track of the current position and velocity of an object in satellite network.
  *
  * All space coordinates in this class and its subclasses are
  * treated as geodetic coordinates. Support for setting and getting information
@@ -42,11 +42,10 @@ class SatMobilityModel : public MobilityModel
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
-    TypeId GetInstanceTypeId(void) const;
 
     /**
      * Default constructor.
@@ -59,17 +58,26 @@ class SatMobilityModel : public MobilityModel
     virtual ~SatMobilityModel() = 0;
 
     /**
-     * \return the current satellite position
+     * Copy function allows one to copy the underlying MobilityModel
+     * from a MobilityModel pointer, by calling each children Copy implementation.
+     * This is primarily used by wraparound models for the spectrum channel.
+     *
+     * @return a copy of the current mobility model
+     */
+    virtual Ptr<MobilityModel> Copy() const = 0;
+
+    /**
+     * @return the current satellite position
      */
     GeoCoordinate GetGeoPosition(void) const;
     /**
-     * \param position the satellite position to set.
+     * @param position the satellite position to set.
      */
     void SetGeoPosition(const GeoCoordinate& position);
 
     /**
-     * \param position a reference to another mobility model
-     * \return the distance between the two objects. Unit is meters.
+     * @param position a reference to another mobility model
+     * @return the distance between the two objects. Unit is meters.
      */
     double GetDistanceFrom(Ptr<const SatMobilityModel> position) const;
 
@@ -78,20 +86,20 @@ class SatMobilityModel : public MobilityModel
     /**
      * Callback signature for `SatCourseChange` trace source.
      *
-     * \param model the SatMobilityModel which is changing course
+     * @param model the SatMobilityModel which is changing course
      */
     typedef void (*CourseChangeCallback)(const Ptr<const SatMobilityModel> model);
 
   private:
     /**
-     * \return the current position.
+     * @return the current position.
      *
      * Concrete subclasses of this base class must
      * implement this method.
      */
     virtual GeoCoordinate DoGetGeoPosition(void) const = 0;
     /**
-     * \param position the position to set.
+     * @param position the position to set.
      *
      * Concrete subclasses of this base class must
      * implement this method.
@@ -103,20 +111,20 @@ class SatMobilityModel : public MobilityModel
      * In case that position is updated by method DoSetGeoPosition cartesian position is
      * updated only if it is requested by method DoGetPosition.
      *
-     * \param position position in cartesian format to set
+     * @param position position in cartesian format to set
      *
      */
     void DoSetCartesianPosition(const Vector& position) const;
 
     /**
-     * \return cartesian format position as vector
+     * @return cartesian format position as vector
      *
      * Implementation for method defined by MobilityModel
      */
     virtual Vector DoGetPosition(void) const;
 
     /**
-     * \param position position in Cartesian format to set
+     * @param position position in Cartesian format to set
      *
      * Implementation for method defined by MobilityModel
      */

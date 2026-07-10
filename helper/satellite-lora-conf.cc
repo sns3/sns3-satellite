@@ -57,19 +57,9 @@ SatLoraConf::GetTypeId(void)
     return tid;
 }
 
-TypeId
-SatLoraConf::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
-}
-
 SatLoraConf::SatLoraConf()
 {
     NS_LOG_FUNCTION(this);
-
-    ObjectBase::ConstructSelf(AttributeConstructionList());
 }
 
 void

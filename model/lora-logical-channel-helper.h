@@ -26,9 +26,9 @@
 #include "lora-logical-channel.h"
 #include "lora-sub-band.h"
 
-#include <ns3/nstime.h>
-#include <ns3/object.h>
-#include <ns3/packet.h>
+#include "ns3/nstime.h"
+#include "ns3/object.h"
+#include "ns3/packet.h"
 
 #include <iterator>
 #include <list>
@@ -59,7 +59,7 @@ class LoraLogicalChannelHelper : public Object
      * Get the time it is necessary to wait before transmitting again, according
      * to the aggregate duty cycle timer.
      *
-     * \return The aggregate waiting time.
+     * @return The aggregate waiting time.
      */
     Time GetAggregatedWaitingTime(void);
 
@@ -67,12 +67,12 @@ class LoraLogicalChannelHelper : public Object
      * Get the time it is necessary to wait for before transmitting on a given
      * channel.
      *
-     * \remark This function does not take into account aggregate waiting time.
+     * @remark This function does not take into account aggregate waiting time.
      * Check on this should be performed before calling this function.
      *
-     * \param channel A pointer to the channel we want to know the waiting time
+     * @param channel A pointer to the channel we want to know the waiting time
      * for.
-     * \return A Time instance containing the waiting time before transmission is
+     * @return A Time instance containing the waiting time before transmission is
      * allowed on the channel.
      */
     Time GetWaitingTime(Ptr<LoraLogicalChannel> channel);
@@ -80,15 +80,15 @@ class LoraLogicalChannelHelper : public Object
     /**
      * Register the transmission of a packet.
      *
-     * \param duration The duration of the transmission event.
-     * \param channel The channel the transmission was made on.
+     * @param duration The duration of the transmission event.
+     * @param channel The channel the transmission was made on.
      */
     void AddEvent(Time duration, Ptr<LoraLogicalChannel> channel);
 
     /**
      * Get the list of LoraLogicalChannels currently registered on this helper.
      *
-     * \return A list of the managed channels.
+     * @return A list of the managed channels.
      */
     std::vector<Ptr<LoraLogicalChannel>> GetChannelList(void);
 
@@ -96,39 +96,39 @@ class LoraLogicalChannelHelper : public Object
      * Get the list of LoraLogicalChannels currently registered on this helper
      * that have been enabled for Uplink transmission with the channel mask.
      *
-     * \return A list of the managed channels enabled for Uplink transmission.
+     * @return A list of the managed channels enabled for Uplink transmission.
      */
     std::vector<Ptr<LoraLogicalChannel>> GetEnabledChannelList(void);
 
     /**
      * Add a new channel to the list.
      *
-     * \param frequency The frequency of the channel to create.
+     * @param frequency The frequency of the channel to create.
      */
     void AddChannel(double frequency);
 
     /**
      * Add a new channel to the list.
      *
-     * \param logicalChannel A pointer to the channel to add to the list.
+     * @param logicalChannel A pointer to the channel to add to the list.
      */
     void AddChannel(Ptr<LoraLogicalChannel> logicalChannel);
 
     /**
      * Set a new channel at a fixed index.
      *
-     * \param chIndex The index of the channel to substitute.
-     * \param logicalChannel A pointer to the channel to add to the list.
+     * @param chIndex The index of the channel to substitute.
+     * @param logicalChannel A pointer to the channel to add to the list.
      */
     void SetChannel(uint8_t chIndex, Ptr<LoraLogicalChannel> logicalChannel);
 
     /**
      * Add a new LoraSubBand to this helper.
      *
-     * \param firstFrequency The first frequency of the subband, in MHz.
-     * \param lastFrequency The last frequency of the subband, in MHz.
-     * \param dutyCycle The duty cycle that needs to be enforced on this subband.
-     * \param maxTxPowerDbm The maximum transmission power [dBm] that can be used
+     * @param firstFrequency The first frequency of the subband, in MHz.
+     * @param lastFrequency The last frequency of the subband, in MHz.
+     * @param dutyCycle The duty cycle that needs to be enforced on this subband.
+     * @param maxTxPowerDbm The maximum transmission power [dBm] that can be used
      * on this LoraSubBand.
      */
     void AddLoraSubBand(double firstFrequency,
@@ -139,46 +139,46 @@ class LoraLogicalChannelHelper : public Object
     /**
      * Add a new LoraSubBand.
      *
-     * \param subBand A pointer to the LoraSubBand that needs to be added.
+     * @param subBand A pointer to the LoraSubBand that needs to be added.
      */
     void AddLoraSubBand(Ptr<LoraSubBand> subBand);
 
     /**
      * Remove a channel.
      *
-     * \param channel A pointer to the channel we want to remove.
+     * @param channel A pointer to the channel we want to remove.
      */
     void RemoveChannel(Ptr<LoraLogicalChannel> channel);
 
     /**
      * Returns the maximum transmission power [dBm] that is allowed on a channel.
      *
-     * \param logicalChannel The power for which to check the maximum allowed
+     * @param logicalChannel The power for which to check the maximum allowed
      * transmission power.
-     * \return The power in dBm.
+     * @return The power in dBm.
      */
     double GetTxPowerForChannel(Ptr<LoraLogicalChannel> logicalChannel);
 
     /**
      * Get the LoraSubBand a channel belongs to.
      *
-     * \param channel The channel whose LoraSubBand we want to get.
-     * \return The LoraSubBand the channel belongs to.
+     * @param channel The channel whose LoraSubBand we want to get.
+     * @return The LoraSubBand the channel belongs to.
      */
     Ptr<LoraSubBand> GetLoraSubBandFromChannel(Ptr<LoraLogicalChannel> channel);
 
     /**
      * Get the LoraSubBand a frequency belongs to.
      *
-     * \param frequency The frequency we want to check.
-     * \return The LoraSubBand the frequency belongs to.
+     * @param frequency The frequency we want to check.
+     * @return The LoraSubBand the frequency belongs to.
      */
     Ptr<LoraSubBand> GetLoraSubBandFromFrequency(double frequency);
 
     /**
      * Disable the channel at a specified index.
      *
-     * \param index The index of the channel to disable.
+     * @param index The index of the channel to disable.
      */
     void DisableChannel(int index);
 

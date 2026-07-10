@@ -23,14 +23,14 @@
 
 #include "satellite-conf.h"
 
-#include <ns3/lorawan-mac-end-device-class-a.h>
-#include <ns3/lorawan-mac-gateway.h>
+#include "ns3/lorawan-mac-end-device-class-a.h"
+#include "ns3/lorawan-mac-gateway.h"
 
 namespace ns3
 {
 
 /**
- * \brief A configuration class for the satellite reference system
+ * @brief A configuration class for the satellite reference system
  *
  */
 class SatLoraConf : public Object
@@ -52,11 +52,10 @@ class SatLoraConf : public Object
     }
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
-    TypeId GetInstanceTypeId(void) const;
 
     void SetConf(Ptr<LorawanMacGateway> gatewayMac);
     void SetConf(Ptr<LorawanMacEndDeviceClassA> endDeviceMac);

@@ -19,9 +19,9 @@
  */
 
 /**
- * \ingroup satellite
- * \file satellite-rle-test.cc
- * \brief Return Link Encapsulator test suite
+ * @ingroup satellite
+ * @file satellite-rle-test.cc
+ * @brief Return Link Encapsulator test suite
  */
 
 #include "../model/satellite-queue.h"
@@ -41,8 +41,8 @@
 using namespace ns3;
 
 /**
- * \ingroup satellite
- * \brief Return Link Encapsulation (RLE) test case implementation.
+ * @ingroup satellite
+ * @brief Return Link Encapsulation (RLE) test case implementation.
  *
  * Expected results
  * - 100 packets of random size (in bytes) are generated and enqued to RLE
@@ -61,9 +61,9 @@ class SatRleTestCase : public TestCase
 
     /**
      * Receive packet and check that it is of correct size
-     * \param p Ptr to packet
-     * \param source Source MAC address
-     * \param dest Destination MAC address
+     * @param p Ptr to packet
+     * @param source Source MAC address
+     * @param dest Destination MAC address
      */
     void Receive(Ptr<Packet> p, Mac48Address source, Mac48Address dest);
 
@@ -94,8 +94,8 @@ void
 SatRleTestCase::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-rle", "", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-rle", "", true);
 
     Mac48Address source = Mac48Address::Allocate();
     Mac48Address dest = Mac48Address::Allocate();
@@ -145,7 +145,7 @@ SatRleTestCase::DoRun(void)
 
     Simulator::Destroy();
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 }
 
 void
@@ -165,8 +165,8 @@ SatRleTestCase::Receive(Ptr<Packet> p, Mac48Address source, Mac48Address dest)
 }
 
 /**
- * \ingroup satellite
- * \brief Test suite for RLE.
+ * @ingroup satellite
+ * @brief Test suite for RLE.
  */
 class SatRleTraceSuite : public TestSuite
 {

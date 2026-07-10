@@ -22,7 +22,7 @@
 
 #include "lorawan-mac.h"
 
-#include <ns3/log.h>
+#include "ns3/log.h"
 
 #include <algorithm>
 #include <cmath>

@@ -28,12 +28,12 @@
 
 #include "satellite-phy-rx-carrier-packet-probe.h"
 
-#include <ns3/callback.h>
-#include <ns3/config.h>
-#include <ns3/log.h>
-#include <ns3/names.h>
-#include <ns3/simulator.h>
-#include <ns3/traced-value.h>
+#include "ns3/callback.h"
+#include "ns3/config.h"
+#include "ns3/log.h"
+#include "ns3/names.h"
+#include "ns3/simulator.h"
+#include "ns3/traced-value.h"
 
 #include <string>
 

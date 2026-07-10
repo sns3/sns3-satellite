@@ -21,8 +21,8 @@
 #ifndef SATELLITE_UPLINK_INFO_TAG_H
 #define SATELLITE_UPLINK_INFO_TAG_H
 
-#include <ns3/nstime.h>
-#include <ns3/tag.h>
+#include "ns3/nstime.h"
+#include "ns3/tag.h"
 
 #include <ostream>
 #include <stdint.h>
@@ -31,21 +31,21 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief Tag to store uplink phy info that need to be forwarded to the downlink.
+ * @ingroup satellite
+ * @brief Tag to store uplink phy info that need to be forwarded to the downlink.
  */
 class SatUplinkInfoTag : public Tag
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
+     * @brief Get the type ID of instance
+     * @return the object TypeId
      */
     virtual TypeId GetInstanceTypeId(void) const;
 
@@ -56,12 +56,12 @@ class SatUplinkInfoTag : public Tag
 
     /**
      * Constructor with initialization parameters.
-     * \param satelliteReceptionTime
-     * \param sinr
-     * \param additionalInterference additional interference to add to compute final SINR
-     * \param satId Satellite ID of the UT
-     * \param beamId Beam ID of the UT
-     * \param isControl This is a control packet
+     * @param satelliteReceptionTime
+     * @param sinr
+     * @param additionalInterference additional interference to add to compute final SINR
+     * @param satId Satellite ID of the UT
+     * @param beamId Beam ID of the UT
+     * @param isControl This is a control packet
      */
     SatUplinkInfoTag(Time satelliteReceptionTime,
                      double sinr,
@@ -72,98 +72,98 @@ class SatUplinkInfoTag : public Tag
 
     /**
      * Serializes information to buffer from this instance of SatUplinkInfoTag
-     * \param i Buffer in which the information is serialized
+     * @param i Buffer in which the information is serialized
      */
     virtual void Serialize(TagBuffer i) const;
 
     /**
      * Deserializes information from buffer to this instance of SatUplinkInfoTag
-     * \param i Buffer from which the information is deserialized
+     * @param i Buffer from which the information is deserialized
      */
     virtual void Deserialize(TagBuffer i);
 
     /**
      * Get serialized size of SatUplinkInfoTag
-     * \return Serialized size in bytes
+     * @return Serialized size in bytes
      */
     virtual uint32_t GetSerializedSize() const;
 
     /**
      * Print time stamp of this instance of SatUplinkInfoTag
-     * \param &os Output stream to which tag timestamp is printed.
+     * @param &os Output stream to which tag timestamp is printed.
      */
     virtual void Print(std::ostream& os) const;
 
     /**
      * Get satellite reception time of packet
-     * \return Satellite reception time
+     * @return Satellite reception time
      */
     Time GetSatelliteReceptionTime(void) const;
 
     /**
      * Set satellite reception time of packet
-     * \param satelliteReceptionTime Satellite reception time
+     * @param satelliteReceptionTime Satellite reception time
      */
     void SetSatelliteReceptionTime(Time satelliteReceptionTime);
 
     /**
      * Get uplink SINR
-     * \return Uplink SINR
+     * @return Uplink SINR
      */
     double GetSinr(void) const;
 
     /**
      * Set uplink SINR
-     * \param sinr Uplink SINR
-     * \param additionalInterference additional interference to add to compute final SINR
+     * @param sinr Uplink SINR
+     * @param additionalInterference additional interference to add to compute final SINR
      */
     void SetSinr(double sinr, double additionalInterference);
 
     /**
      * Get additional interference to add to compute final SINR
-     * \return The interference to add
+     * @return The interference to add
      */
     double GetAdditionalInterference(void) const;
 
     /**
      * Tell if SINR already computed
-     * \return true if already computed
+     * @return true if already computed
      */
     bool IsSinrComputed(void) const;
 
     /**
      * Get the UT sat ID
-     * \return Sat ID
+     * @return Sat ID
      */
     uint32_t GetSatId(void) const;
 
     /**
      * Set the UT sat ID
-     * \param satId Sat ID
+     * @param satId Sat ID
      */
     void SetSatId(uint32_t satId);
 
     /**
      * Get the UT beam ID
-     * \return Beam ID
+     * @return Beam ID
      */
     uint32_t GetBeamId(void) const;
 
     /**
      * Set the UT beam ID
-     * \param beamId Beam ID
+     * @param beamId Beam ID
      */
     void SetBeamId(uint32_t beamId);
 
     /**
      * Get if packet is a control packet
-     * \return True if this is a control packet
+     * @return True if this is a control packet
      */
     bool IsControl(void) const;
 
     /**
      * Set if packet is a control packet
-     * \param isControl True if this is a control packet
+     * @param isControl True if this is a control packet
      */
     void SetIsControl(bool isControl);
 

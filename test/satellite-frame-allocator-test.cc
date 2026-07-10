@@ -21,9 +21,9 @@
  */
 
 /**
- * \file satellite-frame-allocator-test.cc
- * \ingroup satellite
- * \brief Test cases to unit test Satellite Frame Allocator and its related objects.
+ * @file satellite-frame-allocator-test.cc
+ * @ingroup satellite
+ * @brief Test cases to unit test Satellite Frame Allocator and its related objects.
  */
 
 #include "../model/satellite-superframe-allocator.h"
@@ -43,8 +43,8 @@
 using namespace ns3;
 
 /**
- * \ingroup satellite
- * \brief Test case to unit test Satellite Frame Allocator.
+ * @ingroup satellite
+ * @brief Test case to unit test Satellite Frame Allocator.
  *
  * This case tests that SatFrameAllocator object allocates symbols (time slots)
  * for UT/RCs correctly with different configurations.
@@ -137,7 +137,7 @@ SatFrameAllocatorTestCase::SatFrameAllocatorTestCase()
     m_cnoValues[8] = std::numeric_limits<double>::quiet_NaN();
     m_cnoValues[9] = SatUtils::DbToLinear(60.0);
 
-    std::string dataPath = Singleton<SatEnvVariables>::Get()->GetDataPath();
+    std::string dataPath = SatEnvVariables::GetInstance()->GetDataPath();
     std::string folderNameWithPath = dataPath + "/scenarios/geo-33E/waveforms";
     m_waveFormConf = CreateObject<SatWaveformConf>(folderNameWithPath);
 }
@@ -768,8 +768,8 @@ void
 SatFrameAllocatorTestCase::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("sat-frame-allocator", "", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("sat-frame-allocator", "", true);
 
     // test single UT with all configuration types, ACM and FCA disabled
     RunSingleUtTest(SatSuperframeConf::CONFIG_TYPE_0, false, false);
@@ -794,11 +794,11 @@ SatFrameAllocatorTestCase::DoRun(void)
     // test with two and three UTs
     RunMultiUtTest();
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 }
 
 /**
- * \brief Test suite for Satellite Frame Allocator unit test cases.
+ * @brief Test suite for Satellite Frame Allocator unit test cases.
  */
 class SatFrameAllocatorTestSuite : public TestSuite
 {

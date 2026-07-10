@@ -21,38 +21,38 @@
 
 #include "satellite-ut-helper-dvb.h"
 
-#include <ns3/callback.h>
-#include <ns3/log.h>
-#include <ns3/pointer.h>
-#include <ns3/satellite-base-encapsulator.h>
-#include <ns3/satellite-channel-estimation-error-container.h>
-#include <ns3/satellite-channel.h>
-#include <ns3/satellite-const-variables.h>
-#include <ns3/satellite-enums.h>
-#include <ns3/satellite-generic-stream-encapsulator-arq.h>
-#include <ns3/satellite-generic-stream-encapsulator.h>
-#include <ns3/satellite-gw-llc.h>
-#include <ns3/satellite-handover-module.h>
-#include <ns3/satellite-id-mapper.h>
-#include <ns3/satellite-mobility-observer.h>
-#include <ns3/satellite-net-device.h>
-#include <ns3/satellite-node-info.h>
-#include <ns3/satellite-packet-classifier.h>
-#include <ns3/satellite-phy-rx-carrier-conf.h>
-#include <ns3/satellite-phy-rx.h>
-#include <ns3/satellite-phy-tx.h>
-#include <ns3/satellite-queue.h>
-#include <ns3/satellite-request-manager.h>
-#include <ns3/satellite-return-link-encapsulator-arq.h>
-#include <ns3/satellite-return-link-encapsulator.h>
-#include <ns3/satellite-topology.h>
-#include <ns3/satellite-typedefs.h>
-#include <ns3/satellite-ut-llc.h>
-#include <ns3/satellite-ut-mac.h>
-#include <ns3/satellite-ut-phy.h>
-#include <ns3/satellite-ut-scheduler.h>
-#include <ns3/satellite-utils.h>
-#include <ns3/singleton.h>
+#include "ns3/callback.h"
+#include "ns3/log.h"
+#include "ns3/pointer.h"
+#include "ns3/satellite-base-encapsulator.h"
+#include "ns3/satellite-channel-estimation-error-container.h"
+#include "ns3/satellite-channel.h"
+#include "ns3/satellite-const-variables.h"
+#include "ns3/satellite-enums.h"
+#include "ns3/satellite-generic-stream-encapsulator-arq.h"
+#include "ns3/satellite-generic-stream-encapsulator.h"
+#include "ns3/satellite-gw-llc.h"
+#include "ns3/satellite-handover-module.h"
+#include "ns3/satellite-id-mapper.h"
+#include "ns3/satellite-mobility-observer.h"
+#include "ns3/satellite-net-device.h"
+#include "ns3/satellite-node-info.h"
+#include "ns3/satellite-packet-classifier.h"
+#include "ns3/satellite-phy-rx-carrier-conf.h"
+#include "ns3/satellite-phy-rx.h"
+#include "ns3/satellite-phy-tx.h"
+#include "ns3/satellite-queue.h"
+#include "ns3/satellite-request-manager.h"
+#include "ns3/satellite-return-link-encapsulator-arq.h"
+#include "ns3/satellite-return-link-encapsulator.h"
+#include "ns3/satellite-topology.h"
+#include "ns3/satellite-typedefs.h"
+#include "ns3/satellite-ut-llc.h"
+#include "ns3/satellite-ut-mac.h"
+#include "ns3/satellite-ut-phy.h"
+#include "ns3/satellite-ut-scheduler.h"
+#include "ns3/satellite-utils.h"
+#include "ns3/singleton.h"
 
 NS_LOG_COMPONENT_DEFINE("SatUtHelperDvb");
 
@@ -67,14 +67,6 @@ SatUtHelperDvb::GetTypeId(void)
     static TypeId tid =
         TypeId("ns3::SatUtHelperDvb").SetParent<SatUtHelper>().AddConstructor<SatUtHelperDvb>();
     return tid;
-}
-
-TypeId
-SatUtHelperDvb::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
 }
 
 SatUtHelperDvb::SatUtHelperDvb()

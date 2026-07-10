@@ -30,10 +30,10 @@
 using namespace ns3;
 
 /**
- * \file sat-constellation-example.cc
- * \ingroup satellite
+ * @file sat-constellation-example.cc
+ * @ingroup satellite
  *
- * \brief This file gives an example of satellite constellations.
+ * @brief This file gives an example of satellite constellations.
  *        User must choose which constellation to simulate from all available in
  *        satellite/data/scenarios.
  */

@@ -24,8 +24,8 @@
 
 #include "satellite-phy-tx.h"
 
-#include <ns3/log.h>
-#include <ns3/ptr.h>
+#include "ns3/log.h"
+#include "ns3/ptr.h"
 
 #include <stdint.h>
 
@@ -117,6 +117,15 @@ SatSignalParameters::SetSinr(double sinr, double additionalInterference)
     m_ifParams->m_sinr = sinr;
     m_ifParams->m_additionalInterference = additionalInterference;
     m_ifParams->m_sinrComputed = true;
+}
+
+TypeId
+SatInterferenceParameters::GetTypeId(void)
+{
+    static TypeId tid = TypeId("ns3::SatInterferenceParameters")
+                            .SetParent<Object>()
+                            .AddConstructor<SatInterferenceParameters>();
+    return tid;
 }
 
 SatInterferenceParameters::~SatInterferenceParameters()

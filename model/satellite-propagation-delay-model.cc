@@ -20,10 +20,10 @@
 
 #include "satellite-propagation-delay-model.h"
 
-#include <ns3/double.h>
-#include <ns3/log.h>
-#include <ns3/object.h>
-#include <ns3/string.h>
+#include "ns3/double.h"
+#include "ns3/log.h"
+#include "ns3/object.h"
+#include "ns3/string.h"
 
 NS_LOG_COMPONENT_DEFINE("SatConstantPropagationDelayModel");
 

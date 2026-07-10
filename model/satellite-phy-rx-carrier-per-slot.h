@@ -25,10 +25,10 @@
 
 #include "satellite-phy-rx-carrier.h"
 
-#include <ns3/mac48-address.h>
-#include <ns3/object.h>
-#include <ns3/ptr.h>
-#include <ns3/traced-callback.h>
+#include "ns3/mac48-address.h"
+#include "ns3/object.h"
+#include "ns3/ptr.h"
+#include "ns3/traced-callback.h"
 
 #include <deque>
 #include <list>
@@ -42,8 +42,8 @@ namespace ns3
 class SatPhyRxCarrier;
 
 /**
- * \ingroup satellite
- * \brief Inherited the base functionality of SatPhyRxCarriers for ground
+ * @ingroup satellite
+ * @brief Inherited the base functionality of SatPhyRxCarriers for ground
  *        station nodes.
  */
 class SatPhyRxCarrierPerSlot : public SatPhyRxCarrier
@@ -51,10 +51,10 @@ class SatPhyRxCarrierPerSlot : public SatPhyRxCarrier
   public:
     /**
      * Constructor.
-     * \param carrierId ID of the carrier
-     * \param carrierConf Carrier configuration
-     * \param waveformConf Waveform configuration
-     * \param randomAccessEnabled Is this a RA carrier
+     * @param carrierId ID of the carrier
+     * @param carrierConf Carrier configuration
+     * @param waveformConf Waveform configuration
+     * @param randomAccessEnabled Is this a RA carrier
      */
     SatPhyRxCarrierPerSlot(uint32_t carrierId,
                            Ptr<SatPhyRxCarrierConf> carrierConf,
@@ -62,24 +62,24 @@ class SatPhyRxCarrierPerSlot : public SatPhyRxCarrier
                            bool randomAccessEnabled);
 
     /**
-     * \brief Destructor
+     * @brief Destructor
      */
     virtual ~SatPhyRxCarrierPerSlot();
 
     /**
      * Get the TypeId of the class.
-     * \return TypeId
+     * @return TypeId
      */
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Function for initializing the frame/window end scheduling
+     * @brief Function for initializing the frame/window end scheduling
      */
     virtual void BeginEndScheduling();
 
     /**
-     * \brief Function for setting the random access allocation channel ID
-     * \param randomAccessAllocationChannelId
+     * @brief Function for setting the random access allocation channel ID
+     * @param randomAccessAllocationChannelId
      */
     inline void SetRandomAccessAllocationChannelId(uint8_t randomAccessAllocationChannelId)
     {
@@ -87,8 +87,8 @@ class SatPhyRxCarrierPerSlot : public SatPhyRxCarrier
     }
 
     /**
-     * \brief Function for getting the random access allocation channel ID
-     * \return randomAccessAllocationChannelId
+     * @brief Function for getting the random access allocation channel ID
+     * @return randomAccessAllocationChannelId
      */
     inline uint8_t GetRandomAccessAllocationChannelId() const
     {
@@ -96,7 +96,7 @@ class SatPhyRxCarrierPerSlot : public SatPhyRxCarrier
     }
 
     /**
-     * \brief Method for querying the type of the carrier
+     * @brief Method for querying the type of the carrier
      */
     inline virtual CarrierType GetCarrierType()
     {
@@ -106,13 +106,13 @@ class SatPhyRxCarrierPerSlot : public SatPhyRxCarrier
 
   protected:
     /**
-     * \brief Function for ending the packet reception from the SatChannel
-     * \param key Key for Rx params map
+     * @brief Function for ending the packet reception from the SatChannel
+     * @param key Key for Rx params map
      */
     virtual void EndRxData(uint32_t key);
 
     /**
-     * \brief Dispose implementation.
+     * @brief Dispose implementation.
      */
     virtual void DoDispose();
 
@@ -122,7 +122,7 @@ class SatPhyRxCarrierPerSlot : public SatPhyRxCarrier
     virtual void ReceiveSlot(SatPhyRxCarrier::rxParams_s packetRxParams, const uint32_t nPackets);
 
     /**
-     * \brief Get the random access collision model of the carrier
+     * @brief Get the random access collision model of the carrier
      */
     inline SatPhyRxCarrierConf::RandomAccessCollisionModel GetRandomAccessCollisionModel() const
     {
@@ -130,7 +130,7 @@ class SatPhyRxCarrierPerSlot : public SatPhyRxCarrier
     }
 
     /**
-     * \brief Check if random access dynamic load control is enabled.
+     * @brief Check if random access dynamic load control is enabled.
      */
     inline bool IsRandomAccessDynamicLoadControlEnabled() const
     {
@@ -138,35 +138,35 @@ class SatPhyRxCarrierPerSlot : public SatPhyRxCarrier
     }
 
     /**
-     * \brief Function for calculating the average normalized offered random access load
-     * \return Average normalized offered load
+     * @brief Function for calculating the average normalized offered random access load
+     * @return Average normalized offered load
      */
     double CalculateAverageNormalizedOfferedRandomAccessLoad();
 
     /**
-     * \brief Function for saving the measured random access load
-     * \param measuredRandomAccessLoad Measured random access load
+     * @brief Function for saving the measured random access load
+     * @param measuredRandomAccessLoad Measured random access load
      */
     void SaveMeasuredRandomAccessLoad(double measuredRandomAccessLoad);
 
     /**
-     * \brief Create an interference event based on Rx parameters and address.
+     * @brief Create an interference event based on Rx parameters and address.
      *
-     * \return Pointer to the interference event.
+     * @return Pointer to the interference event.
      */
     virtual Ptr<SatInterference::InterferenceChangeEvent> CreateInterference(
         Ptr<SatSignalParameters> rxParams,
         Address rxAddress);
 
     /**
-     * \brief The number of random access bits in current frame.
+     * @brief The number of random access bits in current frame.
      *                            Protected so that child classes are able to alter this.
      */
     uint32_t m_randomAccessBitsInFrame;
 
     ////////// TRACED CALLBACKS /////////
     /**
-     * \brief `SlottedAlohaRxCollision` trace source.
+     * @brief `SlottedAlohaRxCollision` trace source.
      *
      * Fired when a packet burst is received through Random Access Slotted ALOHA.
      *
@@ -178,7 +178,7 @@ class SatPhyRxCarrierPerSlot : public SatPhyRxCarrier
     TracedCallback<uint32_t, const Address&, bool> m_slottedAlohaRxCollisionTrace;
 
     /**
-     * \brief `SlottedAlohaRxError` trace source.
+     * @brief `SlottedAlohaRxError` trace source.
      *
      * Fired when a packet burst is received through Random Access Slotted ALOHA.
      *
@@ -191,11 +191,11 @@ class SatPhyRxCarrierPerSlot : public SatPhyRxCarrier
 
   private:
     /**
-     * \brief Function for processing the Slotted ALOHA collisions
-     * \param cSinr Composite SINR
-     * \param rxParams Rx parameters of the packet
-     * \param interferenceEvent Interference event details
-     * \return PHY error
+     * @brief Function for processing the Slotted ALOHA collisions
+     * @param cSinr Composite SINR
+     * @param rxParams Rx parameters of the packet
+     * @param interferenceEvent Interference event details
+     * @return PHY error
      */
     bool ProcessSlottedAlohaCollisions(
         double cSinr,

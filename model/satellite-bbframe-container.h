@@ -24,7 +24,7 @@
 #include "satellite-bbframe.h"
 #include "satellite-enums.h"
 
-#include <ns3/simple-ref-count.h>
+#include "ns3/simple-ref-count.h"
 
 #include <deque>
 #include <map>
@@ -35,9 +35,9 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief BB Frame container class.
+ * @brief BB Frame container class.
  * Holds information of BB Frames for forward link scheduling.
  *
  * SatBbFrameContainer implements own queues (container) for every used MODCODs.
@@ -51,8 +51,8 @@ class SatBbFrameContainer : public Object
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
 
@@ -63,8 +63,8 @@ class SatBbFrameContainer : public Object
 
     /**
      * Actual constructor for SatBbFrameContainer.
-     * \param modcodsInUse MODCODs in use.
-     * \param conf Pointer to BB Frame configuration.
+     * @param modcodsInUse MODCODs in use.
+     * @param conf Pointer to BB Frame configuration.
      */
     SatBbFrameContainer(std::vector<SatEnums::SatModcod_t>& modcodsInUse, Ptr<SatBbFrameConf> conf);
 
@@ -76,17 +76,17 @@ class SatBbFrameContainer : public Object
     /**
      * Indicates if the container for a ModCod and priority is empty (no BBFrame).
      *
-     * \param priorityClass Priority class of the container
-     * \param modcod MODCOD of the container. MODCOD is ignored when priorityClass is 0.
-     * \param true if a BBFrame is already open
+     * @param priorityClass Priority class of the container
+     * @param modcod MODCOD of the container. MODCOD is ignored when priorityClass is 0.
+     * @param true if a BBFrame is already open
      */
     bool IsEmpty(uint32_t priorityClass, SatEnums::SatModcod_t modcod);
 
     /**
      * Add data according to given priority class and MODCOD to container.
      *
-     * \param priorityClass Priority class of the data (packet) to be added
-     * \param modcod MODCOD of the data (packet) to be added. MODCOD is ignored when priorityClass
+     * @param priorityClass Priority class of the data (packet) to be added
+     * @param modcod MODCOD of the data (packet) to be added. MODCOD is ignored when priorityClass
      * is 0. \param data Data (packet) to be added to container
      */
     void AddData(uint32_t priorityClass, SatEnums::SatModcod_t modcod, Ptr<Packet> data);
@@ -94,33 +94,33 @@ class SatBbFrameContainer : public Object
     /**
      * Get bytes left in last frame of the queue with the given priority class and MODCOD.
      *
-     * \param priorityClass Priority class of the queue requested
-     * \param modcod MODOCOD of the queue requested. MODCOD is ignored when priorityClass is 0.
-     * \return Bytes left in last frame in requested queue.
+     * @param priorityClass Priority class of the queue requested
+     * @param modcod MODOCOD of the queue requested. MODCOD is ignored when priorityClass is 0.
+     * @return Bytes left in last frame in requested queue.
      */
     uint32_t GetBytesLeftInTailFrame(uint32_t priorityClass, SatEnums::SatModcod_t modcod);
 
     /**
      * Get maximum payload bytes of a frame with the given priority class and MODCOD.
      *
-     * \param priorityClass Priority class of the frame payload requested
-     * \param modcod MODOCOD of the queue requested. MODCOD is ignored when priorityClass is 0.
-     * \return Maximum payload bytes.
+     * @param priorityClass Priority class of the frame payload requested
+     * @param modcod MODOCOD of the queue requested. MODCOD is ignored when priorityClass is 0.
+     * @return Maximum payload bytes.
      */
     uint32_t GetMaxFramePayloadInBytes(uint32_t priorityClass, SatEnums::SatModcod_t modcod);
 
     /**
      * Get maximum MODCOD with the given priority class and C/N0.
      *
-     * \param priorityClass Priority class of the MODCOD requested
-     * \param cno C/N0 value of the MODCOD requested
-     * \return MODCOD fulfills given criteria.
+     * @param priorityClass Priority class of the MODCOD requested
+     * @param cno C/N0 value of the MODCOD requested
+     * @return MODCOD fulfills given criteria.
      */
     SatEnums::SatModcod_t GetModcod(uint32_t priorityClass, double cno);
 
     /**
      * Get next frame from container to transmit.
-     * \return BB Frame
+     * @return BB Frame
      */
     Ptr<SatBbFrame> GetNextFrame();
 
@@ -128,27 +128,27 @@ class SatBbFrameContainer : public Object
 
     /**
      * Get total transmission duration of the frames in container.
-     * \return Total transmission duration of the frames.
+     * @return Total transmission duration of the frames.
      */
     Time GetTotalDuration() const;
 
     /**
      * Get the total number of symbols, incuding headers, when creating a new BBFrame.
      *
-     * \param modcod MODOCOD of the queue requested.
-     * \return The number of symbols in the BBFrame.
+     * @param modcod MODOCOD of the queue requested.
+     * @return The number of symbols in the BBFrame.
      */
     uint32_t GetFrameSymbols(SatEnums::SatModcod_t modcod);
 
     /**
      * Set the maximum symbol rate of this container, used for time-slicing.
-     * \param maxSymbolRate The new symbol rate.
+     * @param maxSymbolRate The new symbol rate.
      */
     void SetMaxSymbolRate(uint32_t maxSymbolRate);
 
     /**
      * Set the maximum symbol rate of this container, used for time-slicing.
-     * \return The maximum symbol rate.
+     * @return The maximum symbol rate.
      */
     uint32_t GetMaxSymbolRate();
 
@@ -169,8 +169,8 @@ class SatBbFrameContainer : public Object
 
     /**
      * Trace for merged BB frames.
-     * \param BB frame merge to
-     * \parma BB frame merge from
+     * @param BB frame merge to
+     * @parma BB frame merge from
      */
     TracedCallback<Ptr<SatBbFrame>, Ptr<SatBbFrame>> m_bbFrameMergeTrace;
 
@@ -178,8 +178,8 @@ class SatBbFrameContainer : public Object
      * Create short or normal frame according to MODCOD and member #m_bbFrameUsageMode.
      * Created frame is added back of appropriate container.
      *
-     * \param priorityClass Priority for created frame
-     * \param modcod MODCOD for created frame
+     * @param priorityClass Priority for created frame
+     * @param modcod MODCOD for created frame
      */
     void CreateFrameToTail(uint32_t priorityClass, SatEnums::SatModcod_t modcod);
 };

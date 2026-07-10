@@ -18,20 +18,20 @@
  * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include <ns3/config-store-module.h>
-#include <ns3/core-module.h>
-#include <ns3/internet-module.h>
-#include <ns3/network-module.h>
-#include <ns3/satellite-module.h>
-#include <ns3/traffic-module.h>
+#include "ns3/config-store-module.h"
+#include "ns3/core-module.h"
+#include "ns3/internet-module.h"
+#include "ns3/network-module.h"
+#include "ns3/satellite-module.h"
+#include "ns3/traffic-module.h"
 
 using namespace ns3;
 
 /**
- * \file sat-beam-position-tracer.cc
- * \ingroup satellite
+ * @file sat-beam-position-tracer.cc
+ * @ingroup satellite
  *
- * \brief Script used to get center of each beam at simulation start and every time step.
+ * @brief Script used to get center of each beam at simulation start and every time step.
  *
  * execute command -> ./ns3 run "sat-beam-position-tracer --PrintHelp"
  */

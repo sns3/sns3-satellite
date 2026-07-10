@@ -26,8 +26,8 @@
 #include "satellite-look-up-table.h"
 #include "satellite-mutual-information-table.h"
 
-#include <ns3/object.h>
-#include <ns3/ptr.h>
+#include "ns3/object.h"
+#include "ns3/ptr.h"
 
 #include <map>
 #include <stdint.h>
@@ -37,9 +37,9 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief Abstract class for storing link results.
+ * @brief Abstract class for storing link results.
  *
  * This class cannot be instantiated. Use the child classes instead.
  *
@@ -63,13 +63,13 @@ class SatLinkResults : public Object
     SatLinkResults();
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId();
 
     /**
-     * \brief Initialize look up tables.
+     * @brief Initialize look up tables.
      *
      * Must be called before any SatLinkResults::GetBler can be invoked.
      *
@@ -79,7 +79,7 @@ class SatLinkResults : public Object
 
   protected:
     /**
-     * \brief Initialize look up tables.
+     * @brief Initialize look up tables.
      *
      * Child classes must implement this function to initialize
      * m_table member variable. This is typically done by loading
@@ -89,21 +89,21 @@ class SatLinkResults : public Object
     virtual void DoInitialize() = 0;
 
     /**
-     * \brief The base path where the text
+     * @brief The base path where the text
      *        files containing link results data can be found.
      */
     std::string m_inputPath;
 
     /**
-     * \brief Indicates if SatLinkResults::Initialize has been called.
+     * @brief Indicates if SatLinkResults::Initialize has been called.
      */
     bool m_isInitialized;
 };
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief Link results for DVB-RCS2.
+ * @brief Link results for DVB-RCS2.
  *
  * Loads and maintains multiple SatLookUpTable. Provides query service based on
  * waveform id.
@@ -123,17 +123,17 @@ class SatLinkResultsRtn : public SatLinkResults
     }
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId();
 
     /**
-     * \brief Get a BLER value from link results.
+     * @brief Get a BLER value from link results.
      *
-     * \param waveformId (which determines burst length and MODCOD)
-     * \param ebNoDb the received Eb/No in dB
-     * \return BLER value, which is a `double` ranging between [0..1]
+     * @param waveformId (which determines burst length and MODCOD)
+     * @param ebNoDb the received Eb/No in dB
+     * @return BLER value, which is a `double` ranging between [0..1]
      *
      * Must be run after SatLinkResults::Initialize is called.
      *
@@ -141,11 +141,11 @@ class SatLinkResultsRtn : public SatLinkResults
     double GetBler(uint32_t waveformId, double ebNoDb) const;
 
     /**
-     * \brief Get a Eb/No requirement for a given BLER target from link results.
+     * @brief Get a Eb/No requirement for a given BLER target from link results.
      *
-     * \param waveformId (which determines burst length and MODCOD)
-     * \param blerTarget Target BLER for the system
-     * \return Eb/No value
+     * @param waveformId (which determines burst length and MODCOD)
+     * @param blerTarget Target BLER for the system
+     * @return Eb/No value
      *
      * Must be run after SatLinkResults::Initialize is called.
      *
@@ -154,12 +154,12 @@ class SatLinkResultsRtn : public SatLinkResults
 
   protected:
     /**
-     * \brief Initialize by loading DVB-RCS2 look up tables.
+     * @brief Initialize by loading DVB-RCS2 look up tables.
      */
     virtual void DoInitialize() = 0;
 
     /**
-     * \brief Map of satellite link result look up tables.
+     * @brief Map of satellite link result look up tables.
      * - key = uint32_t, i.e. waveform id
      * - value = Ptr<SatLookUpTable>, i.e. look-up table containing the link results
      */
@@ -167,9 +167,9 @@ class SatLinkResultsRtn : public SatLinkResults
 };
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief Link results for DVB-RCS2.
+ * @brief Link results for DVB-RCS2.
  *
  * Loads and maintains multiple SatLookUpTable. Provides query service based on
  * waveform id.
@@ -189,22 +189,22 @@ class SatLinkResultsDvbRcs2 : public SatLinkResultsRtn
     }
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId();
 
   protected:
     /**
-     * \brief Initialize by loading DVB-RCS2 look up tables.
+     * @brief Initialize by loading DVB-RCS2 look up tables.
      */
     virtual void DoInitialize();
 };
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief Link results for F-SIM.
+ * @brief Link results for F-SIM.
  *
  * Loads and maintains multiple SatLookUpTable. Provides query service based on
  * waveform id. Loads and maintains a Mutual Information table.
@@ -224,15 +224,15 @@ class SatLinkResultsFSim : public SatLinkResultsRtn
     }
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId();
 
     /**
-     * \brief Get the Normalized Symbol Information corresponding to a given SNIR
-     * \param snirDb SNIR in logarithmic scale
-     * \return Normalized  Symbol Information
+     * @brief Get the Normalized Symbol Information corresponding to a given SNIR
+     * @param snirDb SNIR in logarithmic scale
+     * @return Normalized  Symbol Information
      */
     inline double GetNormalizedSymbolInformation(double snirDb) const
     {
@@ -240,9 +240,9 @@ class SatLinkResultsFSim : public SatLinkResultsRtn
     }
 
     /**
-     * \brief Get the SNIR in dB for a given Normalized Symbol Information target
-     * \param Normalizd Symbol Information target (0-1)
-     * \return Snir target in dB
+     * @brief Get the SNIR in dB for a given Normalized Symbol Information target
+     * @param Normalizd Symbol Information target (0-1)
+     * @return Snir target in dB
      */
     inline double GetSnirDb(double symbolInformationTarget) const
     {
@@ -250,7 +250,7 @@ class SatLinkResultsFSim : public SatLinkResultsRtn
     }
 
     /**
-     * \brief Get the Mutual Information Table
+     * @brief Get the Mutual Information Table
      */
     inline Ptr<SatMutualInformationTable> GetMutualInformationTable() const
     {
@@ -259,21 +259,21 @@ class SatLinkResultsFSim : public SatLinkResultsRtn
 
   protected:
     /**
-     * \brief Initialize by loading F-SIM look up tables.
+     * @brief Initialize by loading F-SIM look up tables.
      */
     void DoInitialize();
 
   private:
     /**
-     * \brief Mutual information table.
+     * @brief Mutual information table.
      */
     Ptr<SatMutualInformationTable> m_mutualInformationTable;
 };
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief Link results for F-SIM.
+ * @brief Link results for F-SIM.
  *
  * Loads and maintains multiple SatLookUpTable. Provides query service based on
  * waveform id. Loads and maintains a Mutual Information table.
@@ -293,15 +293,15 @@ class SatLinkResultsLora : public SatLinkResultsRtn
     }
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId();
 
     /**
-     * \brief Get the Normalized Symbol Information corresponding to a given SNIR
-     * \param snirDb SNIR in logarithmic scale
-     * \return Normalized  Symbol Information
+     * @brief Get the Normalized Symbol Information corresponding to a given SNIR
+     * @param snirDb SNIR in logarithmic scale
+     * @return Normalized  Symbol Information
      */
     inline double GetNormalizedSymbolInformation(double snirDb) const
     {
@@ -309,9 +309,9 @@ class SatLinkResultsLora : public SatLinkResultsRtn
     }
 
     /**
-     * \brief Get the SNIR in dB for a given Normalized Symbol Information target
-     * \param Normalizd Symbol Information target (0-1)
-     * \return Snir target in dB
+     * @brief Get the SNIR in dB for a given Normalized Symbol Information target
+     * @param Normalizd Symbol Information target (0-1)
+     * @return Snir target in dB
      */
     inline double GetSnirDb(double symbolInformationTarget) const
     {
@@ -319,7 +319,7 @@ class SatLinkResultsLora : public SatLinkResultsRtn
     }
 
     /**
-     * \brief Get the Mutual Information Table
+     * @brief Get the Mutual Information Table
      */
     inline Ptr<SatMutualInformationTable> GetMutualInformationTable() const
     {
@@ -328,21 +328,21 @@ class SatLinkResultsLora : public SatLinkResultsRtn
 
   protected:
     /**
-     * \brief Initialize by loading F-SIM look up tables.
+     * @brief Initialize by loading F-SIM look up tables.
      */
     void DoInitialize();
 
   private:
     /**
-     * \brief Mutual information table.
+     * @brief Mutual information table.
      */
     Ptr<SatMutualInformationTable> m_mutualInformationTable;
 };
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief Link results for forward link.
+ * @brief Link results for forward link.
  *
  * The instance will be SatLinkResultsDvbS2 or SatLinkResultsDvbS2X.
  *
@@ -364,18 +364,18 @@ class SatLinkResultsFwd : public SatLinkResults
     }
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId();
 
     /**
-     * \brief Get a BLER value from link results.
+     * @brief Get a BLER value from link results.
      *
-     * \param modcod Modulation and coding scheme
-     * \param frameType BB frame type (short, long)
-     * \param esNoDb the received Es/No in dB
-     * \return BLER value, which is a `double` ranging between [0..1]
+     * @param modcod Modulation and coding scheme
+     * @param frameType BB frame type (short, long)
+     * @param esNoDb the received Es/No in dB
+     * @return BLER value, which is a `double` ranging between [0..1]
      *
      * Must be run after SatLinkResults::Initialize is called.
      *
@@ -385,12 +385,12 @@ class SatLinkResultsFwd : public SatLinkResults
                    double esNoDb) const;
 
     /**
-     * \brief Get a Es/No requirement for a given BLER target from link results.
+     * @brief Get a Es/No requirement for a given BLER target from link results.
      *
-     * \param modcod Modulation and coding scheme
-     * \param frameType BB frame type (short, long)
-     * \param blerTarget Target BLER for the system
-     * \return Es/No value
+     * @param modcod Modulation and coding scheme
+     * @param frameType BB frame type (short, long)
+     * @param blerTarget Target BLER for the system
+     * @return Es/No value
      *
      * Must be run after SatLinkResults::Initialize is called.
      *
@@ -401,7 +401,7 @@ class SatLinkResultsFwd : public SatLinkResults
 
   protected:
     /**
-     * \brief Initialize look up tables.
+     * @brief Initialize look up tables.
      *
      * Child classes must implement this function to initialize
      * m_table member variable. This is typically done by loading
@@ -411,7 +411,7 @@ class SatLinkResultsFwd : public SatLinkResults
     virtual void DoInitialize() = 0;
 
     /**
-     * \brief Map of satellite link result look up tables.
+     * @brief Map of satellite link result look up tables.
      * - key = SatModcod_e, i.e. modulation and coding scheme
      * - value = Ptr<SatLookUpTable>, i.e. look-up table containing the link results
      */
@@ -421,9 +421,9 @@ class SatLinkResultsFwd : public SatLinkResults
 };
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief Link results for DVB-S2.
+ * @brief Link results for DVB-S2.
  *
  * Loads and maintains multiple SatLookUpTable. Provides query service based on
  * modulation and coding scheme.
@@ -443,22 +443,22 @@ class SatLinkResultsDvbS2 : public SatLinkResultsFwd
     }
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId();
 
   private:
     /**
-     * \brief Initialize by loading DVB-S2 look up tables.
+     * @brief Initialize by loading DVB-S2 look up tables.
      */
     void DoInitialize();
 };
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief Link results for DVB-S2X.
+ * @brief Link results for DVB-S2X.
  *
  * Loads and maintains multiple SatLookUpTable. Provides query service based on
  * modulation and coding scheme.
@@ -478,14 +478,14 @@ class SatLinkResultsDvbS2X : public SatLinkResultsFwd
     }
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId();
 
   private:
     /**
-     * \brief Initialize by loading DVB-S2 look up tables.
+     * @brief Initialize by loading DVB-S2 look up tables.
      */
     void DoInitialize();
 };

@@ -44,7 +44,7 @@ struct LoraTxParameters
 };
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Class adding methods linked to Lora, needed to be used in a satellite context
  */
@@ -78,7 +78,7 @@ class SatLoraPhyTx : public SatPhyTx
 
     /**
      * Start packet transmission to the channel.
-     * \param txParams Transmission parameters for a packet
+     * @param txParams Transmission parameters for a packet
      */
     void StartTx(Ptr<SatSignalParameters> txParams);
 

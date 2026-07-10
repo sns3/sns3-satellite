@@ -20,7 +20,7 @@
 #ifndef SATELLITE_LOG_H
 #define SATELLITE_LOG_H
 
-#include <ns3/satellite-output-fstream-string-container.h>
+#include "ns3/satellite-output-fstream-string-container.h"
 
 #include <map>
 #include <string>
@@ -30,9 +30,9 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief Class for simulator output logging such as warnings and error messages.
+ * @brief Class for simulator output logging such as warnings and error messages.
  *
  * The format for messages is (type, custom file tag, message). Custom file tag
  * is in effect only with LOG_CUSTOM. With other types it does not matter and can
@@ -57,7 +57,7 @@ class SatLog : public Object
 {
   public:
     /**
-     * \brief Enum for log types
+     * @brief Enum for log types
      */
     typedef enum
     {
@@ -69,86 +69,80 @@ class SatLog : public Object
     } LogType_t;
 
     /**
-     * \brief typedef for container key
+     * @brief typedef for container key
      */
     typedef std::pair<LogType_t, std::string> key_t;
 
     /**
-     * \brief typedef for map of containers
+     * @brief typedef for map of containers
      */
     typedef std::map<key_t, Ptr<SatOutputFileStreamStringContainer>> container_t;
 
     /**
-     * \brief Constructor
+     * @brief Constructor
      */
     SatLog();
 
     /**
-     * \brief Destructor
+     * @brief Destructor
      */
     ~SatLog();
 
     /**
-     * \brief NS-3 type id function
-     * \return type id
+     * @brief NS-3 type id function
+     * @return type id
      */
     static TypeId GetTypeId(void);
 
     /**
-     * \brief NS-3 instance type id function
-     * \return Instance type is
-     */
-    TypeId GetInstanceTypeId(void) const;
-
-    /**
-     * \brief Do needed dispose actions.
+     * @brief Do needed dispose actions.
      */
     void DoDispose();
 
     /**
-     * \brief Function for adding a line to a specific log
-     * \param logType log type
-     * \param fileTag file tag for the filename
-     * \param message line to be added
+     * @brief Function for adding a line to a specific log
+     * @param logType log type
+     * @param fileTag file tag for the filename
+     * @param message line to be added
      */
     void AddToLog(LogType_t logType, std::string fileTag, std::string message);
 
     /**
-     * \brief Function for resetting the variables
+     * @brief Function for resetting the variables
      */
     void Reset();
 
   private:
     /**
-     * \brief Function for getting the file tag for predefined log types
-     * \param logType log type
-     * \return file tag
+     * @brief Function for getting the file tag for predefined log types
+     * @param logType log type
+     * @return file tag
      */
     std::string GetFileTag(LogType_t logType);
 
     /**
-     * \brief Function for creating a log
-     * \param logType log type
-     * \param fileTag file tag for the filename
-     * \return the created log
+     * @brief Function for creating a log
+     * @param logType log type
+     * @param fileTag file tag for the filename
+     * @return the created log
      */
     Ptr<SatOutputFileStreamStringContainer> CreateLog(LogType_t logType, std::string fileTag);
 
     /**
-     * \brief Function for finding a log based on the key
-     * \param logType log type
-     * \param fileTag file tag for the filename
-     * \return the log
+     * @brief Function for finding a log based on the key
+     * @param logType log type
+     * @param fileTag file tag for the filename
+     * @return the log
      */
     Ptr<SatOutputFileStreamStringContainer> FindLog(LogType_t logType, std::string fileTag);
 
     /**
-     * \brief Write the contents of a container matching to the key into a file
+     * @brief Write the contents of a container matching to the key into a file
      */
     void WriteToFile();
 
     /**
-     * \brief Map for containers
+     * @brief Map for containers
      */
     container_t m_container;
 };

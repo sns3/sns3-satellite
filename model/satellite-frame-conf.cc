@@ -22,12 +22,12 @@
 
 #include "satellite-frame-conf.h"
 
-#include <ns3/boolean.h>
-#include <ns3/double.h>
-#include <ns3/enum.h>
-#include <ns3/log.h>
-#include <ns3/object.h>
-#include <ns3/uinteger.h>
+#include "ns3/boolean.h"
+#include "ns3/double.h"
+#include "ns3/enum.h"
+#include "ns3/log.h"
+#include "ns3/object.h"
+#include "ns3/uinteger.h"
 
 #include <algorithm>
 #include <cmath>
@@ -469,13 +469,6 @@ SatSuperframeConf::GetTypeId(void)
     static TypeId tid = TypeId("ns3::SatSuperframeConf").SetParent<Object>();
 
     return tid;
-}
-
-TypeId
-SatSuperframeConf::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-    return GetTypeId();
 }
 
 void
@@ -1378,13 +1371,6 @@ SatSuperframeConf0::GetTypeId(void)
     return tid;
 }
 
-TypeId
-SatSuperframeConf0::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-    return GetTypeId();
-}
-
 void
 SatSuperframeConf0::DoConfigure()
 {
@@ -1477,13 +1463,6 @@ SatSuperframeConf1::GetTypeId(void)
                                                                                  0);
 
     return tid;
-}
-
-TypeId
-SatSuperframeConf1::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-    return GetTypeId();
 }
 
 void
@@ -1580,13 +1559,6 @@ SatSuperframeConf2::GetTypeId(void)
     return tid;
 }
 
-TypeId
-SatSuperframeConf2::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-    return GetTypeId();
-}
-
 void
 SatSuperframeConf2::DoConfigure()
 {
@@ -1681,13 +1653,6 @@ SatSuperframeConf3::GetTypeId(void)
     return tid;
 }
 
-TypeId
-SatSuperframeConf3::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-    return GetTypeId();
-}
-
 void
 SatSuperframeConf3::DoConfigure()
 {
@@ -1729,13 +1694,6 @@ SatSuperframeConf4::GetTypeId(void)
         ;
 
     return tid;
-}
-
-TypeId
-SatSuperframeConf4::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-    return GetTypeId();
 }
 
 void

@@ -30,10 +30,10 @@
 using namespace ns3;
 
 /**
- * \file sat-list-position-ext-fading-example.cc
- * \ingroup satellite
+ * @file sat-list-position-ext-fading-example.cc
+ * @ingroup satellite
  *
- * \brief  List position external fading example demonstrates how to set user defined (list)
+ * @brief  List position external fading example demonstrates how to set user defined (list)
  *         positions with external fading. The example is useful when new list positions and
  *         external fading trace sources are taken into use.
  *
@@ -80,7 +80,7 @@ main(int argc, char* argv[])
     uint32_t usersPerUt = 1;
     uint32_t beamId = 1;
     bool checkBeam = false;
-    std::string extUtPositions = Singleton<SatEnvVariables>::Get()->LocateDataDirectory() +
+    std::string extUtPositions = SatEnvVariables::GetInstance()->LocateDataDirectory() +
                                  "/additional-input/utpositions/BeamId-1_256_UT_Positions.txt";
 
     Config::SetDefault("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue(true));

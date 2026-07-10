@@ -46,14 +46,6 @@ SatCnoHelper::GetTypeId(void)
     return tid;
 }
 
-TypeId
-SatCnoHelper::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
-}
-
 SatCnoHelper::SatCnoHelper()
     : m_satHelper(nullptr),
       m_useTraces(false)

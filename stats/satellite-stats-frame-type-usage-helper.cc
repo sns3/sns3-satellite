@@ -21,24 +21,24 @@
 
 #include "satellite-stats-frame-type-usage-helper.h"
 
-#include <ns3/boolean.h>
-#include <ns3/callback.h>
-#include <ns3/data-collection-object.h>
-#include <ns3/distribution-collector.h>
-#include <ns3/enum.h>
-#include <ns3/fatal-error.h>
-#include <ns3/log.h>
-#include <ns3/multi-file-aggregator.h>
-#include <ns3/node-container.h>
-#include <ns3/satellite-beam-helper.h>
-#include <ns3/satellite-beam-scheduler.h>
-#include <ns3/satellite-gw-mac.h>
-#include <ns3/satellite-helper.h>
-#include <ns3/satellite-ncc.h>
-#include <ns3/satellite-topology.h>
-#include <ns3/scalar-collector.h>
-#include <ns3/singleton.h>
-#include <ns3/string.h>
+#include "ns3/boolean.h"
+#include "ns3/callback.h"
+#include "ns3/data-collection-object.h"
+#include "ns3/distribution-collector.h"
+#include "ns3/enum.h"
+#include "ns3/fatal-error.h"
+#include "ns3/log.h"
+#include "ns3/multi-file-aggregator.h"
+#include "ns3/node-container.h"
+#include "ns3/satellite-beam-helper.h"
+#include "ns3/satellite-beam-scheduler.h"
+#include "ns3/satellite-gw-mac.h"
+#include "ns3/satellite-helper.h"
+#include "ns3/satellite-ncc.h"
+#include "ns3/satellite-topology.h"
+#include "ns3/scalar-collector.h"
+#include "ns3/singleton.h"
+#include "ns3/string.h"
 
 #include <list>
 #include <map>
@@ -106,9 +106,13 @@ SatStatsFrameTypeUsageHelper::DoInstall()
     // Setup aggregator.
     std::string dataLabel;
     if (m_usePercentage)
+    {
         dataLabel = "usage_percentage";
+    }
     else
+    {
         dataLabel = "usage_count";
+    }
 
     m_aggregator = CreateAggregator("ns3::MultiFileAggregator",
                                     "OutputFileName",
@@ -130,9 +134,13 @@ SatStatsFrameTypeUsageHelper::DoInstall()
         CollectorMap collectorMap;
         ScalarCollector::OutputType_t opType;
         if (m_usePercentage)
+        {
             opType = ScalarCollector::OUTPUT_TYPE_AVERAGE_PER_SAMPLE;
+        }
         else
+        {
             opType = ScalarCollector::OUTPUT_TYPE_SUM;
+        }
 
         collectorMap.SetType("ns3::ScalarCollector");
         collectorMap.SetAttribute("OutputType", EnumValue(opType));
@@ -196,8 +204,8 @@ SatStatsFrameTypeUsageHelper::DoInstall()
 
         collectorMap.ConnectToAggregator("Output", m_aggregator, &MultiFileAggregator::Write1d);
 
-        NS_LOG_INFO(this << " created " << n << " instance(s)"
-                         << " of " << collectorMap.GetType().GetName() << " for "
+        NS_LOG_INFO(this << " created " << n << " instance(s)" << " of "
+                         << collectorMap.GetType().GetName() << " for "
                          << GetIdentifierTypeName(GetIdentifierType()));
 
         std::pair<std::map<uint32_t, CollectorMap>::iterator, bool> ret;
@@ -217,10 +225,14 @@ SatStatsFrameTypeUsageHelper::DoInstall()
         {
             Ptr<SatNetDevice> dev = DynamicCast<SatNetDevice>((*node)->GetDevice(i));
             if (dev == nullptr)
+            {
                 continue;
+            }
             Ptr<SatGwMac> mac = DynamicCast<SatGwMac>(dev->GetMac());
             if (mac == nullptr)
+            {
                 continue;
+            }
 
             // Connect the trace source
             uint32_t beamId = mac->GetBeamId();
@@ -230,8 +242,7 @@ SatStatsFrameTypeUsageHelper::DoInstall()
             const bool ret =
                 mac->TraceConnect("BBFrameTxTrace", context.str(), frameTypeUsageCallback);
             NS_ASSERT_MSG(ret, "Error connecting to BBFrameTxTrace of beam " << beamId);
-            NS_LOG_INFO(this << " successfully connected"
-                             << " with beam " << beamId);
+            NS_LOG_INFO(this << " successfully connected" << " with beam " << beamId);
         }
     }
 
@@ -311,9 +322,13 @@ SatStatsFrameTypeUsageHelper::FrameTypeUsageCallback(std::string context, Ptr<Sa
             Ptr<ScalarCollector> c = collector->GetObject<ScalarCollector>();
             NS_ASSERT(c != nullptr);
             if (it.first == frameTypeId)
+            {
                 c->TraceSinkUinteger32(0, 1);
+            }
             else
+            {
                 c->TraceSinkUinteger32(0, 0);
+            }
         }
     }
 

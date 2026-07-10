@@ -25,7 +25,7 @@
 #include "satellite-mobility-model.h"
 #include "satellite-propagation-delay-model.h"
 
-#include <ns3/object.h>
+#include "ns3/object.h"
 
 #include <string>
 
@@ -33,8 +33,8 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief Observes given mobilities and keeps track of certain wanted properties.
+ * @ingroup satellite
+ * @brief Observes given mobilities and keeps track of certain wanted properties.
  * Properties can be observed currently are; the timing advance and elevation angle.
  *
  * Observing of timing advance is set by method ObserveTimingAdvance
@@ -46,19 +46,18 @@ class SatMobilityObserver : public Object
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
-    TypeId GetInstanceTypeId(void) const;
 
     /**
-     * \brief Default constructor of the mobility observer (should not be called)
+     * @brief Default constructor of the mobility observer (should not be called)
      */
     SatMobilityObserver();
 
     /**
-     * \brief Constructor for mobility observer
+     * @brief Constructor for mobility observer
      *
      * @param ownMobility Own mobility to observe
      * @param geoSatMobility Satellite mobility to observe
@@ -69,7 +68,7 @@ class SatMobilityObserver : public Object
                         bool isRegenerative = false);
 
     /**
-     * \brief Destructor of the mobility observer
+     * @brief Destructor of the mobility observer
      */
     virtual ~SatMobilityObserver();
 
@@ -79,48 +78,48 @@ class SatMobilityObserver : public Object
     virtual void DoDispose(void);
 
     /**
-     * \brief Enable observing of the timing advance.
+     * @brief Enable observing of the timing advance.
      *
-     * \param ownDelayModel Own propagation delay model.
-     * \param anotherDelayModel Propagation delay model of the another end.
-     * \param anotherMobility Mobility of the another end.
+     * @param ownDelayModel Own propagation delay model.
+     * @param anotherDelayModel Propagation delay model of the another end.
+     * @param anotherMobility Mobility of the another end.
      */
     void ObserveTimingAdvance(Ptr<PropagationDelayModel> ownDelayModel,
                               Ptr<PropagationDelayModel> anotherDelayModel,
                               Ptr<SatMobilityModel> anotherMobility);
 
     /**
-     * \brief Get elevation angle.
+     * @brief Get elevation angle.
      *
-     * \return the current elevation angle as degrees.
+     * @return the current elevation angle as degrees.
      */
     double GetElevationAngle(void);
 
     /**
-     * \brief Get velocity of own movement (speed).
+     * @brief Get velocity of own movement (speed).
      *
-     * \return the current velocity.
+     * @return the current velocity.
      */
     double GetVelocity(void);
 
     /**
-     * \brief Get timing advance.
+     * @brief Get timing advance.
      *
-     * \return the current timing advance.
+     * @return the current timing advance.
      */
     Time GetTimingAdvance(void);
 
     /**
-     * \brief Callback signature for `PropertyChanged` trace source.
+     * @brief Callback signature for `PropertyChanged` trace source.
      *
-     * \param mobilityObserver An instance of SatMobilityObserver which property
+     * @param mobilityObserver An instance of SatMobilityObserver which property
      *                         has changed.
      */
     typedef void (*PropertyChangedCallback)(Ptr<const SatMobilityObserver> mobilityObserver);
 
   private:
     /**
-     * \brief Notify listeners about some property is changed
+     * @brief Notify listeners about some property is changed
      */
     void NotifyPropertyChange(void) const;
 
@@ -130,17 +129,17 @@ class SatMobilityObserver : public Object
     void UpdateElevationAngle();
 
     /**
-     * \brief Update timing advance.
+     * @brief Update timing advance.
      */
     void UpdateTimingAdvance();
 
     /**
-     * \brief Do actions needed when satellite position is changed.
+     * @brief Do actions needed when satellite position is changed.
      */
     void SatelliteStatusChanged();
 
     /**
-     * \brief Listener (callback) for mobility position changes
+     * @brief Listener (callback) for mobility position changes
      *
      * @param context Context of the mobility whose position is changed
      * @param position Mobility whose position is changed

@@ -28,8 +28,8 @@
 #include "satellite-sgp4ext.h"
 #include "satellite-sgp4unit.h"
 
-#include <ns3/assert.h>
-#include <ns3/nstime.h>
+#include "ns3/assert.h"
+#include "ns3/nstime.h"
 
 #include <algorithm>
 #include <cmath>
@@ -115,7 +115,9 @@ JulianDate::GetDouble(TimeSystem ts) const
     double base = m_days + m_ms_day / static_cast<double>(DayToMs);
 
     if (ts != DateTime::POSIX)
+    {
         return base += PosixEpoch;
+    }
 
     // transform base into Julian date, and add offset (if any)
     return base + OffsetFromUtc(m_days, ts).GetDays();
@@ -165,7 +167,9 @@ JulianDate::GetPolarMotion(void) const
 
     // if there is data available
     if (pos < v.size())
+    {
         return std::make_pair(v[pos].xp, v[pos].yp);
+    }
 
     return std::make_pair(0, 0);
 }
@@ -275,7 +279,9 @@ JulianDate::operator+(const Time& t) const
 
     // if time is negative, call operator- with a positive time
     if (t.IsStrictlyNegative())
+    {
         return *this - MilliSeconds(-t.GetMilliSeconds());
+    }
 
     jd.m_days = static_cast<uint32_t>(t.GetDays());
     jd.m_ms_day = static_cast<uint32_t>(t.GetMilliSeconds() % DayToMs);
@@ -301,7 +307,9 @@ JulianDate::operator-(const Time& t) const
 
     // if time is negative, call operator+ with a positive time
     if (t.IsStrictlyNegative())
+    {
         return *this + MilliSeconds(-t.GetMilliSeconds());
+    }
 
     jd.m_days = static_cast<uint32_t>(t.GetDays());
     jd.m_ms_day = static_cast<uint32_t>(t.GetMilliSeconds() % DayToMs);
@@ -312,7 +320,9 @@ JulianDate::operator-(const Time& t) const
         jd.m_days += 1;
     }
     else
+    {
         jd.m_ms_day = m_ms_day - jd.m_ms_day;
+    }
 
     jd.m_days = m_days - jd.m_days;
     jd.m_time_scale = m_time_scale;
@@ -339,7 +349,9 @@ bool
 JulianDate::operator<(const JulianDate& jd) const
 {
     if (m_days != jd.m_days)
+    {
         return m_days < jd.m_days;
+    }
 
     return m_ms_day < jd.m_ms_day;
 }
@@ -348,7 +360,9 @@ bool
 JulianDate::operator<=(const JulianDate& jd) const
 {
     if (m_days != jd.m_days)
+    {
         return m_days < jd.m_days;
+    }
 
     return m_ms_day <= jd.m_ms_day;
 }
@@ -357,7 +371,9 @@ bool
 JulianDate::operator>(const JulianDate& jd) const
 {
     if (m_days != jd.m_days)
+    {
         return m_days > jd.m_days;
+    }
 
     return m_ms_day > jd.m_ms_day;
 }
@@ -366,7 +382,9 @@ bool
 JulianDate::operator>=(const JulianDate& jd) const
 {
     if (m_days != jd.m_days)
+    {
         return m_days > jd.m_days;
+    }
 
     return m_ms_day >= jd.m_ms_day;
 }
@@ -375,7 +393,9 @@ bool
 JulianDate::operator==(const JulianDate& jd) const
 {
     if (m_days != jd.m_days)
+    {
         return false;
+    }
 
     return m_ms_day == jd.m_ms_day;
 }
@@ -384,7 +404,9 @@ bool
 JulianDate::operator!=(const JulianDate& jd) const
 {
     if (m_days != jd.m_days)
+    {
         return true;
+    }
 
     return m_ms_day != jd.m_ms_day;
 }
@@ -451,7 +473,9 @@ JulianDate::GregorianDate(uint32_t days, uint32_t ms_day)
 
     // if it is a leap year, February has 29 days
     if (IsLeapYear(dt.year))
+    {
         month_days[1] += 1;
+    }
 
     for (uint32_t i = 0; i < 12; ++i)
     {
@@ -525,14 +549,18 @@ JulianDate::OffsetToUtc(uint32_t daysInPosix, uint32_t ms_day, TimeSystem ts)
 {
     // already in sync
     if (ts == DateTime::UTC || ts == DateTime::POSIX)
+    {
         return MilliSeconds(0);
+    }
 
     Time tai_utc = TaiMinusUtc(daysInPosix);
     Time offset = (ts == DateTime::TT ? TtToTai : MilliSeconds(0));
 
     // if it is not the same day in UTC, check the leap secs for the previous day
     if (ms_day < (offset + tai_utc).GetMilliSeconds())
+    {
         tai_utc = TaiMinusUtc(daysInPosix - 1);
+    }
 
     switch (ts)
     {

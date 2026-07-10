@@ -29,10 +29,10 @@
 using namespace ns3;
 
 /**
- * \file sat-dama-http-sim-tn9.cc
- * \ingroup satellite
+ * @file sat-dama-http-sim-tn9.cc
+ * @ingroup satellite
  *
- * \brief Simulation script to run example simulation results with HTTP traffic
+ * @brief Simulation script to run example simulation results with HTTP traffic
  * model. Currently only one beam is simulated with one user and
  * and DAMA configuration.
  *
@@ -61,7 +61,7 @@ main(int argc, char* argv[])
 
     // To read attributes from file
     std::string inputFileNameWithPath =
-        Singleton<SatEnvVariables>::Get()->LocateDirectory("contrib/satellite/examples") +
+        SatEnvVariables::GetInstance()->LocateDirectory("contrib/satellite/examples") +
         "/tn9-dama-input-attributes.xml";
 
     /**

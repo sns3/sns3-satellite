@@ -32,9 +32,9 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief Class for input file stream container for storing double values.
+ * @brief Class for input file stream container for storing double values.
  * The class implements reading the values from a file, storing the values
  * and iterating the stored values.
  *
@@ -44,81 +44,81 @@ class SatInputFileStreamTimeDoubleContainer : public Object
 {
   public:
     /**
-     * \brief NS-3 function for type id
-     * \return type id
+     * @brief NS-3 function for type id
+     * @return type id
      */
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Constructor
-     * \param filename file name
-     * \param filemode file mode
-     * \param valuesInRow number of values in a row
+     * @brief Constructor
+     * @param filename file name
+     * @param filemode file mode
+     * @param valuesInRow number of values in a row
      */
     SatInputFileStreamTimeDoubleContainer(std::string filename,
                                           std::ios::openmode filemode,
                                           uint32_t valuesInRow);
 
     /**
-     * \brief Constructor
+     * @brief Constructor
      */
     SatInputFileStreamTimeDoubleContainer();
 
     /**
-     * \brief Destructor
+     * @brief Destructor
      */
     ~SatInputFileStreamTimeDoubleContainer();
 
     /**
-     * \brief Function for updating the container
-     * \param filename file name
-     * \param filemode file mode
-     * \param valuesInRow number of values in a row
+     * @brief Function for updating the container
+     * @param filename file name
+     * @param filemode file mode
+     * @param valuesInRow number of values in a row
      */
     void UpdateContainer(std::string filename, std::ios::openmode filemode, uint32_t valuesInRow);
 
     /**
-     * \brief Function for locating the next closest time sample and returning the values related to
+     * @brief Function for locating the next closest time sample and returning the values related to
      * it \return matching values
      */
     std::vector<double> ProceedToNextClosestTimeSample();
 
     /**
-     * \brief Function for locating time samples enclosing the current time and a linear
+     * @brief Function for locating time samples enclosing the current time and a linear
      * interpolation between these samples \return linear interpolation of the current time value
      * between the two closest time samples
      */
     std::vector<double> InterpolateBetweenClosestTimeSamples();
 
     /**
-     * \brief Do needed dispose actions
+     * @brief Do needed dispose actions
      */
     void DoDispose();
 
   private:
     /**
-     * \brief Function for resetting the variables
+     * @brief Function for resetting the variables
      */
     void Reset();
 
     /**
-     * \brief Function for resetting the stream
+     * @brief Function for resetting the stream
      */
     void ResetStream();
 
     /**
-     * \brief Function for clearing the container
+     * @brief Function for clearing the container
      */
     void ClearContainer();
 
     /**
-     * \brief Function for reading a row from file
-     * \return the row
+     * @brief Function for reading a row from file
+     * @return the row
      */
     std::vector<double> ReadRow();
 
     /**
-     * \brief Function for locating the next closest value index. This locator loops the samples if
+     * @brief Function for locating the next closest value index. This locator loops the samples if
      * the container does not have enough samples. Next closest index value is saved to a separate
      * member variable. \param lastValidPosition position of last matching value \param shiftValue
      * value to shift the time if needed \param comparisonValue value which next closest match to
@@ -129,57 +129,57 @@ class SatInputFileStreamTimeDoubleContainer : public Object
                          double comparisonTimeValue);
 
     /**
-     * \brief Check container time sample sanity
+     * @brief Check container time sample sanity
      */
     void CheckContainerSanity();
 
     /**
-     * \brief Pointer to input file stream wrapper
+     * @brief Pointer to input file stream wrapper
      */
     SatInputFileStreamWrapper* m_inputFileStreamWrapper;
 
     /**
-     * \brief Pointer to input file stream
+     * @brief Pointer to input file stream
      */
     std::ifstream* m_inputFileStream;
 
     /**
-     * \brief Container for value rows
+     * @brief Container for value rows
      */
     std::vector<std::vector<double>> m_container;
 
     /**
-     * \brief File name
+     * @brief File name
      */
     std::string m_fileName;
 
     /**
-     * \brief File mode
+     * @brief File mode
      */
     std::ios::openmode m_fileMode;
 
     /**
-     * \brief Number of values in a row
+     * @brief Number of values in a row
      */
     uint32_t m_valuesInRow;
 
     /**
-     * \brief Last valid position
+     * @brief Last valid position
      */
     uint32_t m_lastValidPosition;
 
     /**
-     * \brief Number for how many times the available samples have been looped over
+     * @brief Number for how many times the available samples have been looped over
      */
     uint32_t m_numOfPasses;
 
     /**
-     * \brief Shift value for sample time
+     * @brief Shift value for sample time
      */
     double m_timeShiftValue;
 
     /**
-     * \brief Index for column which contains time information
+     * @brief Index for column which contains time information
      */
     uint32_t m_timeColumn;
 };

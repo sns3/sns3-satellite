@@ -32,10 +32,10 @@ namespace ns3
 {
 
 /**
- * \file sat-markov-fading-trace-example.cc
- * \ingroup satellite
+ * @file sat-markov-fading-trace-example.cc
+ * @ingroup satellite
  *
- * \brief Example for Markov fading calculations. Can be used to produce simple fading traces.
+ * @brief Example for Markov fading calculations. Can be used to produce simple fading traces.
  *
  * This example can be run as it is, without any argument, i.e.:
  *

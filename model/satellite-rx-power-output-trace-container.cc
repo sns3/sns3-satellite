@@ -23,9 +23,9 @@
 #include "../utils/satellite-env-variables.h"
 #include "satellite-id-mapper.h"
 
-#include <ns3/boolean.h>
-#include <ns3/singleton.h>
-#include <ns3/string.h>
+#include "ns3/boolean.h"
+#include "ns3/singleton.h"
+#include "ns3/string.h"
 
 #include <ios>
 #include <sstream>
@@ -48,14 +48,6 @@ SatRxPowerOutputTraceContainer::GetTypeId(void)
                             .SetParent<SatBaseTraceContainer>()
                             .AddConstructor<SatRxPowerOutputTraceContainer>();
     return tid;
-}
-
-TypeId
-SatRxPowerOutputTraceContainer::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
 }
 
 SatRxPowerOutputTraceContainer::SatRxPowerOutputTraceContainer()
@@ -101,7 +93,7 @@ SatRxPowerOutputTraceContainer::AddNode(key_t key)
     NS_LOG_FUNCTION(this);
 
     std::stringstream filename;
-    std::string dataPath = Singleton<SatEnvVariables>::Get()->GetOutputPath();
+    std::string dataPath = SatEnvVariables::GetInstance()->GetOutputPath();
 
     int32_t gwId = Singleton<SatIdMapper>::Get()->GetGwIdWithMac(key.first);
     int32_t utId = Singleton<SatIdMapper>::Get()->GetUtIdWithMac(key.first);

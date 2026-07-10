@@ -19,9 +19,9 @@
  */
 
 /**
- * \file satellite-control-msg-container-test.cc
- * \ingroup satellite
- * \brief Test cases to unit test satellite control message container.
+ * @file satellite-control-msg-container-test.cc
+ * @ingroup satellite
+ * @brief Test cases to unit test satellite control message container.
  */
 
 // Include a header file from your module to test.
@@ -87,8 +87,8 @@ SatCtrlMsgContBaseTestCase::GetMessage(uint32_t msgId)
 }
 
 /**
- * \ingroup satellite
- * \brief Test case to unit test satellite control message container with flag deletedOnRead set.
+ * @ingroup satellite
+ * @brief Test case to unit test satellite control message container with flag deletedOnRead set.
  *
  * This case tests that SatControlMsgContainer can be created with flag deletedOnRead set and
  * messages can be read correctly in set store window time.
@@ -124,15 +124,15 @@ void
 SatCtrlMsgContDelOnTestCase::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-ctrl-msg-container-unit",
-                                                          "delon",
-                                                          true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-ctrl-msg-container-unit",
+                                                       "delon",
+                                                       true);
 
     // create container with store time 100 ms and flag deletedOnRead set
     m_container = Create<SatControlMsgContainer>(Seconds(0.10), true);
-    Ptr<SatControlMessage> crMsg = Create<SatCrMessage>();
-    Ptr<SatControlMessage> tbtpMsg = Create<SatTbtpMessage>();
+    Ptr<SatControlMessage> crMsg = CreateObject<SatCrMessage>();
+    Ptr<SatControlMessage> tbtpMsg = CreateObject<SatTbtpMessage>();
 
     // simulate message additions
     Simulator::Schedule(Seconds(0.09),
@@ -186,12 +186,12 @@ SatCtrlMsgContDelOnTestCase::DoRun(void)
 
     Simulator::Destroy();
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 }
 
 /**
- * \ingroup satellite
- * \brief Test case to unit test satellite control message container with flag deletedOnRead not
+ * @ingroup satellite
+ * @brief Test case to unit test satellite control message container with flag deletedOnRead not
  * set.
  *
  * This case tests that SatControlMsgContainer can be created with flag deletedOnRead not set and
@@ -227,15 +227,15 @@ void
 SatCtrlMsgContDelOffTestCase::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-ctrl-msg-container-unit",
-                                                          "deloff",
-                                                          true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-ctrl-msg-container-unit",
+                                                       "deloff",
+                                                       true);
 
     // create container with store time 100 ms and flag deletedOnRead NOT set
     m_container = Create<SatControlMsgContainer>(Seconds(0.10), false);
-    Ptr<SatControlMessage> crMsg = Create<SatCrMessage>();
-    Ptr<SatControlMessage> tbtpMsg = Create<SatTbtpMessage>();
+    Ptr<SatControlMessage> crMsg = CreateObject<SatCrMessage>();
+    Ptr<SatControlMessage> tbtpMsg = CreateObject<SatTbtpMessage>();
 
     // simulate message additions
     Simulator::Schedule(Seconds(0.09),
@@ -289,12 +289,12 @@ SatCtrlMsgContDelOffTestCase::DoRun(void)
 
     Simulator::Destroy();
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 }
 
 /**
- * \ingroup satellite
- * \brief Test suite for Satellite control message container unit test cases.
+ * @ingroup satellite
+ * @brief Test suite for Satellite control message container unit test cases.
  */
 class SatCtrlMsgContainerTestSuite : public TestSuite
 {

@@ -26,23 +26,23 @@
 
 #include "satellite-on-off-helper.h"
 
-#include <ns3/address.h>
-#include <ns3/cbr-helper.h>
-#include <ns3/config-store.h>
-#include <ns3/config.h>
-#include <ns3/enum.h>
-#include <ns3/log.h>
-#include <ns3/nrtv-helper.h>
-#include <ns3/packet-sink-helper.h>
-#include <ns3/packet-sink.h>
-#include <ns3/pointer.h>
-#include <ns3/random-variable-stream.h>
-#include <ns3/satellite-env-variables.h>
-#include <ns3/satellite-topology.h>
-#include <ns3/singleton.h>
-#include <ns3/string.h>
-#include <ns3/three-gpp-http-satellite-helper.h>
-#include <ns3/uinteger.h>
+#include "ns3/address.h"
+#include "ns3/cbr-helper.h"
+#include "ns3/config-store.h"
+#include "ns3/config.h"
+#include "ns3/enum.h"
+#include "ns3/log.h"
+#include "ns3/nrtv-helper.h"
+#include "ns3/packet-sink-helper.h"
+#include "ns3/packet-sink.h"
+#include "ns3/pointer.h"
+#include "ns3/random-variable-stream.h"
+#include "ns3/satellite-env-variables.h"
+#include "ns3/satellite-topology.h"
+#include "ns3/singleton.h"
+#include "ns3/string.h"
+#include "ns3/three-gpp-http-satellite-helper.h"
+#include "ns3/uinteger.h"
 
 #include <iostream>
 #include <map>
@@ -103,20 +103,12 @@ SimulationHelperConf::GetTypeId(void)
                           MakeBooleanChecker())
             .AddAttribute("MobileUtsFolder",
                           "Select the folder where mobile UTs traces should be found",
-                          StringValue(Singleton<SatEnvVariables>::Get()->LocateDataDirectory() +
+                          StringValue(SatEnvVariables::GetInstance()->LocateDataDirectory() +
                                       "/utpositions/mobiles/"),
                           MakeStringAccessor(&SimulationHelperConf::m_mobileUtsFolder),
                           MakeStringChecker());
 
     return tid;
-}
-
-TypeId
-SimulationHelperConf::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
 }
 
 SimulationHelperConf::SimulationHelperConf()
@@ -144,14 +136,6 @@ SimulationHelper::GetTypeId(void)
     static TypeId tid =
         TypeId("ns3::SimulationHelper").SetParent<Object>().AddConstructor<SimulationHelper>();
     return tid;
-}
-
-TypeId
-SimulationHelper::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
 }
 
 SimulationHelper::SimulationHelper()
@@ -199,9 +183,7 @@ SimulationHelper::SimulationHelper(std::string simulationName)
       m_progressLoggingEnabled(false),
       m_progressUpdateInterval(Seconds(0.5))
 {
-    NS_LOG_FUNCTION(this);
-
-    ObjectBase::ConstructSelf(AttributeConstructionList());
+    NS_LOG_FUNCTION(this << simulationName);
 
     m_simulationName = simulationName;
     Config::SetDefault("ns3::SatEnvVariables::SimulationCampaignName",
@@ -1189,12 +1171,12 @@ SimulationHelper::SetupOutputPath()
     NS_LOG_FUNCTION(this);
     if (m_outputPath == "")
     {
-        m_outputPath = Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/sims/" +
+        m_outputPath = SatEnvVariables::GetInstance()->LocateDataDirectory() + "/sims/" +
                        m_simulationName + "/";
         // Create the simulation campaign output directory in data/sims/
-        if (!Singleton<SatEnvVariables>::Get()->IsValidDirectory(m_outputPath))
+        if (!SatEnvVariables::GetInstance()->IsValidDirectory(m_outputPath))
         {
-            Singleton<SatEnvVariables>::Get()->CreateDirectory(m_outputPath);
+            SatEnvVariables::GetInstance()->CreateDirectory(m_outputPath);
         }
         if (m_simulationTag != "")
         {
@@ -1203,13 +1185,13 @@ SimulationHelper::SetupOutputPath()
 
             // Create the simulation output directory by tag name in
             // data/sims/simulation-campaign-directory/
-            if (!Singleton<SatEnvVariables>::Get()->IsValidDirectory(m_outputPath))
+            if (!SatEnvVariables::GetInstance()->IsValidDirectory(m_outputPath))
             {
-                Singleton<SatEnvVariables>::Get()->CreateDirectory(m_outputPath);
+                SatEnvVariables::GetInstance()->CreateDirectory(m_outputPath);
             }
         }
     }
-    Singleton<SatEnvVariables>::Get()->SetOutputPath(m_outputPath);
+    SatEnvVariables::GetInstance()->SetOutputPath(m_outputPath);
 }
 
 Ptr<SatHelper>
@@ -1229,7 +1211,7 @@ SimulationHelper::CreateSatScenario(SatHelper::PreDefinedScenario_t scenario,
         NS_FATAL_ERROR("Must specify a scenario folder name from data submodule");
     }
 
-    if (Singleton<SatEnvVariables>::Get()->IsValidDirectory(m_scenarioPath + "/beamhopping"))
+    if (SatEnvVariables::GetInstance()->IsValidDirectory(m_scenarioPath + "/beamhopping"))
     {
         ConfigureFwdLinkBeamHopping();
     }
@@ -1638,10 +1620,9 @@ SimulationHelper::LoadScenario(std::string name)
 {
     NS_LOG_FUNCTION(this << name);
 
-    std::string path =
-        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/" + name;
+    std::string path = SatEnvVariables::GetInstance()->LocateDataDirectory() + "/scenarios/" + name;
 
-    if (!Singleton<SatEnvVariables>::Get()->IsValidFile(path))
+    if (!SatEnvVariables::GetInstance()->IsValidFile(path))
     {
         NS_FATAL_ERROR("Scenario in " << path << " does not exist");
     }
@@ -1706,7 +1687,7 @@ SimulationHelper::StoreAttributesToFile(std::string fileName, bool outputAttribu
     NS_LOG_FUNCTION(this);
 
     std::string outputPath;
-    outputPath = Singleton<SatEnvVariables>::Get()->GetOutputPath();
+    outputPath = SatEnvVariables::GetInstance()->GetOutputPath();
 
     //  Store set attribute values to XML output file
     Config::SetDefault("ns3::ConfigStore::Filename", StringValue(outputPath + "/" + fileName));

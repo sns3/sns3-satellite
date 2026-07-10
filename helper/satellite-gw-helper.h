@@ -23,17 +23,17 @@
 #ifndef SATELLITE_GW_HELPER_H
 #define SATELLITE_GW_HELPER_H
 
-#include <ns3/net-device-container.h>
-#include <ns3/node-container.h>
-#include <ns3/object-factory.h>
-#include <ns3/satellite-bbframe-conf.h>
-#include <ns3/satellite-channel.h>
-#include <ns3/satellite-link-results.h>
-#include <ns3/satellite-mac.h>
-#include <ns3/satellite-ncc.h>
-#include <ns3/satellite-superframe-sequence.h>
-#include <ns3/satellite-typedefs.h>
-#include <ns3/traced-callback.h>
+#include "ns3/net-device-container.h"
+#include "ns3/node-container.h"
+#include "ns3/object-factory.h"
+#include "ns3/satellite-bbframe-conf.h"
+#include "ns3/satellite-channel.h"
+#include "ns3/satellite-link-results.h"
+#include "ns3/satellite-mac.h"
+#include "ns3/satellite-ncc.h"
+#include "ns3/satellite-superframe-sequence.h"
+#include "ns3/satellite-typedefs.h"
+#include "ns3/traced-callback.h"
 
 #include <stdint.h>
 #include <string>
@@ -44,7 +44,7 @@ namespace ns3
 class OutputStreamWrapper;
 
 /**
- * \brief Creates needed objects for GW nodes like SatOrbiterNetDevice objects.
+ * @brief Creates needed objects for GW nodes like SatOrbiterNetDevice objects.
  *        Handles needed configuration for the GW nodes.
  *
  */
@@ -64,11 +64,10 @@ class SatGwHelper : public Object
     } RandomAccessSettings_s;
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
-    TypeId GetInstanceTypeId(void) const;
 
     /**
      * Default constructor.
@@ -93,10 +92,10 @@ class SatGwHelper : public Object
 
     /*
      * Initializes the GW helper based on attributes
-     * \param lrRcs2 return link results
-     * \param lrFwd DVB-S2 or DVB-S2X link results
-     * \param dvbVersion The DVB version chosen
-     * \param useScpc Use SCPC on return feeder (and then lrFwd link results)
+     * @param lrRcs2 return link results
+     * @param lrFwd DVB-S2 or DVB-S2X link results
+     * @param dvbVersion The DVB version chosen
+     * @param useScpc Use SCPC on return feeder (and then lrFwd link results)
      */
     void Initialize(Ptr<SatLinkResultsRtn> lrRcs2,
                     Ptr<SatLinkResultsFwd> lrFwd,
@@ -106,7 +105,7 @@ class SatGwHelper : public Object
     /**
      * Get BB frame configuration.
      *
-     * \return BB frame configuration create by helper.
+     * @return BB frame configuration create by helper.
      */
     Ptr<SatBbFrameConf> GetBbFrameConf() const;
 
@@ -114,8 +113,8 @@ class SatGwHelper : public Object
      * Set an attribute value to be propagated to each NetDevice created by the
      * helper.
      *
-     * \param name the name of the attribute to set
-     * \param value the value of the attribute to set
+     * @param name the name of the attribute to set
+     * @param value the value of the attribute to set
      *
      * Set these attributes on each ns3::SatNetDevice created
      * by SatGwHelper::Install
@@ -126,8 +125,8 @@ class SatGwHelper : public Object
      * Set an attribute value to be propagated to each Channel created by the
      * helper.
      *
-     * \param name the name of the attribute to set
-     * \param value the value of the attribute to set
+     * @param name the name of the attribute to set
+     * @param value the value of the attribute to set
      *
      * Set these attribute on each ns3::SatChannel created
      * by SatGwHelper::Install
@@ -137,8 +136,8 @@ class SatGwHelper : public Object
     /**
      * Set an attribute value to be propagated to each Phy created by the helper.
      *
-     * \param name the name of the attribute to set
-     * \param value the value of the attribute to set
+     * @param name the name of the attribute to set
+     * @param value the value of the attribute to set
      *
      * Set these attributes on each ns3::SatNetDevice created
      * by SatGwHelper::Install
@@ -146,15 +145,15 @@ class SatGwHelper : public Object
     void SetPhyAttribute(std::string name, const AttributeValue& value);
 
     /**
-     * \param c a set of nodes
-     * \param gwId  id of the gw
-     * \param satId  id of the satellite linked to the UT
-     * \param beamId  id of the beam linked to the UT
-     * \param feederSatId  id of the satellite linked to the GW
-     * \param feederBeamId  id of the beam linked to the GW
-     * \param fCh forward channel
-     * \param rCh return channel
-     * \param ncc NCC (Network Control Center)
+     * @param c a set of nodes
+     * @param gwId  id of the gw
+     * @param satId  id of the satellite linked to the UT
+     * @param beamId  id of the beam linked to the UT
+     * @param feederSatId  id of the satellite linked to the GW
+     * @param feederBeamId  id of the beam linked to the GW
+     * @param fCh forward channel
+     * @param rCh return channel
+     * @param ncc NCC (Network Control Center)
      *
      * This method creates a ns3::SatChannel with the
      * attributes configured by SatGwHelper::SetChannelAttribute,
@@ -176,15 +175,15 @@ class SatGwHelper : public Object
                                Ptr<SatLowerLayerServiceConf> llsConf);
 
     /**
-     * \param n node
-     * \param gwId  id of the gw
-     * \param satId  id of the satellite linked to the UT
-     * \param beamId  id of the beam linked to the UT
-     * \param feederSatId  id of the satellite linked to the GW
-     * \param feederBeamId  id of the beam linked to the GW
-     * \param fCh forward channel
-     * \param rCh return channel
-     * \param ncc NCC (Network Control Center)
+     * @param n node
+     * @param gwId  id of the gw
+     * @param satId  id of the satellite linked to the UT
+     * @param beamId  id of the beam linked to the UT
+     * @param feederSatId  id of the satellite linked to the GW
+     * @param feederBeamId  id of the beam linked to the GW
+     * @param fCh forward channel
+     * @param rCh return channel
+     * @param ncc NCC (Network Control Center)
      *
      * Saves you from having to construct a temporary NodeContainer.
      * This method is implemented in child classes.
@@ -203,8 +202,8 @@ class SatGwHelper : public Object
 
     /**
      * Enables creation traces to be written in given file
-     * \param stream  stream for creation trace outputs
-     * \param cb  callback to connect traces
+     * @param stream  stream for creation trace outputs
+     * @param cb  callback to connect traces
      */
     void EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase& cb);
 
@@ -246,7 +245,7 @@ class SatGwHelper : public Object
     Ptr<SatLinkResults> m_linkResults;
 
     /**
-     * \brief Trace callback for creation traces
+     * @brief Trace callback for creation traces
      */
     TracedCallback<std::string> m_creationTrace;
 
@@ -259,12 +258,12 @@ class SatGwHelper : public Object
     bool m_enableChannelEstimationError;
 
     /**
-     * \brief The used random access model settings
+     * @brief The used random access model settings
      */
     RandomAccessSettings_s m_raSettings;
 
     /**
-     * \brief The forward link algorithm used
+     * @brief The forward link algorithm used
      */
     SatEnums::FwdSchedulingAlgorithm_t m_fwdSchedulingAlgorithm;
 };

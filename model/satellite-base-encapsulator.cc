@@ -24,8 +24,8 @@
 #include "satellite-queue.h"
 #include "satellite-time-tag.h"
 
-#include <ns3/log.h>
-#include <ns3/simulator.h>
+#include "ns3/log.h"
+#include "ns3/simulator.h"
 
 NS_LOG_COMPONENT_DEFINE("SatBaseEncapsulator");
 

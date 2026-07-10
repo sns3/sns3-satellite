@@ -31,12 +31,12 @@
 #include "lora-network-status.h"
 #include "lorawan-mac-end-device-class-a.h"
 
-#include <ns3/application.h>
-#include <ns3/net-device.h>
-#include <ns3/node-container.h>
-#include <ns3/object.h>
-#include <ns3/packet.h>
-#include <ns3/point-to-point-net-device.h>
+#include "ns3/application.h"
+#include "ns3/net-device.h"
+#include "ns3/node-container.h"
+#include "ns3/object.h"
+#include "ns3/packet.h"
+#include "ns3/point-to-point-net-device.h"
 
 #include <stdint.h>
 
@@ -96,7 +96,7 @@ class LoraNetworkServer : public Application
 
     /**
      * Receive a packet from a gateway.
-     * \param packet the received packet
+     * @param packet the received packet
      */
     bool Receive(Ptr<NetDevice> device,
                  Ptr<const Packet> packet,

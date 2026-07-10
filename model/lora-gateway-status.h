@@ -25,9 +25,9 @@
 
 #include "lorawan-mac-gateway.h"
 
-#include <ns3/address.h>
-#include <ns3/net-device.h>
-#include <ns3/object.h>
+#include "ns3/address.h"
+#include "ns3/net-device.h"
+#include "ns3/object.h"
 
 namespace ns3
 {
@@ -75,9 +75,9 @@ class LoraGatewayStatus : public Object
      * Query whether or not this gateway is available for immediate transmission
      * on this frequency.
      *
-     * \param frequency The frequency at which the gateway's availability should
+     * @param frequency The frequency at which the gateway's availability should
      * be queried.
-     * \return True if the gateway's available, false otherwise.
+     * @return True if the gateway's available, false otherwise.
      */
     bool IsAvailableForTransmission(double frequency);
 

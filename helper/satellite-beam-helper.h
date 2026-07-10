@@ -27,18 +27,18 @@
 #include "satellite-orbiter-helper.h"
 #include "satellite-ut-helper.h"
 
-#include <ns3/ipv4-address-helper.h>
-#include <ns3/node-container.h>
-#include <ns3/satellite-antenna-gain-pattern-container.h>
-#include <ns3/satellite-beam-channel-pair.h>
-#include <ns3/satellite-bstp-controller.h>
-#include <ns3/satellite-markov-container.h>
-#include <ns3/satellite-mobility-observer.h>
-#include <ns3/satellite-ncc.h>
-#include <ns3/satellite-packet-trace.h>
-#include <ns3/satellite-phy-rx-carrier-conf.h>
-#include <ns3/satellite-superframe-sequence.h>
-#include <ns3/satellite-typedefs.h>
+#include "ns3/ipv4-address-helper.h"
+#include "ns3/node-container.h"
+#include "ns3/satellite-antenna-gain-pattern-container.h"
+#include "ns3/satellite-beam-channel-pair.h"
+#include "ns3/satellite-bstp-controller.h"
+#include "ns3/satellite-markov-container.h"
+#include "ns3/satellite-mobility-observer.h"
+#include "ns3/satellite-ncc.h"
+#include "ns3/satellite-packet-trace.h"
+#include "ns3/satellite-phy-rx-carrier-conf.h"
+#include "ns3/satellite-superframe-sequence.h"
+#include "ns3/satellite-typedefs.h"
 
 #include <list>
 #include <map>
@@ -54,7 +54,7 @@ namespace ns3
 class PropagationDelayModel;
 
 /**
- * \brief SatBeamHelper builds a set Satellite beams with needed objects and configuration.
+ * @brief SatBeamHelper builds a set Satellite beams with needed objects and configuration.
  *        It utilizes SatUtHelper, SatGwHelper and SatOrbiterHelper to create needed objects.
  *
  *        SatBeamHelper creates needed routes between nodes inside satellite network.
@@ -83,16 +83,10 @@ class SatBeamHelper : public Object
         MulticastBeamInfo_t; // key = beam ID, value = receiving UT nodes in beam
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
-
-    /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
-     */
-    virtual TypeId GetInstanceTypeId(void) const;
 
     /**
      * Default constructor for SatBeamHelper (should not be used).
@@ -102,11 +96,11 @@ class SatBeamHelper : public Object
     /**
      * Constructor for SatBeamHelper.
      *
-     * \param isls                        List of all ISLs
-     * \param bandwidthConverterCb        Callback to convert bandwidth
-     * \param fwdLinkCarrierCount         Number of carriers used in forward link
-     * \param rtnLinkCarrierCount         Number of carriers used in return link
-     * \param seq                         Pointer to used superframe sequence configuration
+     * @param isls                        List of all ISLs
+     * @param bandwidthConverterCb        Callback to convert bandwidth
+     * @param fwdLinkCarrierCount         Number of carriers used in forward link
+     * @param rtnLinkCarrierCount         Number of carriers used in return link
+     * @param seq                         Pointer to used superframe sequence configuration
      * mode used in satellites for return link
      */
     SatBeamHelper(std::vector<std::pair<uint32_t, uint32_t>> isls,
@@ -116,6 +110,16 @@ class SatBeamHelper : public Object
                   Ptr<SatSuperframeSeq> seq);
 
     /**
+     * Notifier called once the ObjectBase is fully constructed.
+     *
+     * This method is invoked once all member attributes have been
+     * initialized. Subclasses can override this method to be notified
+     * of this event but if they do this, they must chain up to their
+     * parent's NotifyConstructionCompleted method.
+     */
+    virtual void NotifyConstructionCompleted() override;
+
+    /**
      * Destructor for SatBeamHelper.
      */
     virtual ~SatBeamHelper()
@@ -123,7 +127,7 @@ class SatBeamHelper : public Object
     }
 
     /**
-     * \brief Init method is called after all the initial configurations
+     * @brief Init method is called after all the initial configurations
      * have been done by the SatHelper and SatBeamHelper.
      */
     void Init();
@@ -135,7 +139,7 @@ class SatBeamHelper : public Object
      * and user forward (Tx gain) links. Antenna gain patterns are not utilized
      * in feeder link at all.
      *
-     * \param antennaPatterns to antenna gain pattern container
+     * @param antennaPatterns to antenna gain pattern container
      */
     void SetAntennaGainPatterns(Ptr<SatAntennaGainPatternContainer> antennaPatterns);
 
@@ -143,8 +147,8 @@ class SatBeamHelper : public Object
      * Set an attribute value to be propagated to each NetDevice created by the
      * helper.
      *
-     * \param name the name of the attribute to set
-     * \param value the value of the attribute to set
+     * @param name the name of the attribute to set
+     * @param value the value of the attribute to set
      *
      * Set these attributes on each ns3::SatNetDevice created
      * by SatBeamHelper::Install
@@ -155,8 +159,8 @@ class SatBeamHelper : public Object
      * Set an attribute value to be propagated to each Channel created by the
      * helper.
      *
-     * \param name the name of the attribute to set
-     * \param value the value of the attribute to set
+     * @param name the name of the attribute to set
+     * @param value the value of the attribute to set
      *
      * Set these attribute on each ns3::SatChannel created
      * by SatBeamHelper::Install
@@ -164,27 +168,27 @@ class SatBeamHelper : public Object
     void SetChannelAttribute(std::string name, const AttributeValue& value);
 
     /**
-     * \brief Attach an update routing callback to the NCC of this simulation
-     * \param cb the callback to update routing after a terminal handover
+     * @brief Attach an update routing callback to the NCC of this simulation
+     * @param cb the callback to update routing after a terminal handover
      */
     void SetNccRoutingCallback(SatNcc::UpdateRoutingCallback cb);
 
     /**
-     * \param ut a set of UT nodes
-     * \param gwNode pointer of GW node
-     * \param gwId id of the GW
-     * \param satId ID of the satellite
-     * \param beamId  id of the beam
-     * \param rtnUlFreqId id of the return user link frequency
-     * \param rtnFlFreqId id of the return feeder link frequency
-     * \param fwdUlFreqId id of the forward user link frequency
-     * \param fwdFlFreqId id of the forward feeder link frequency
-     * \param routingCallback the callback UT mac layers should
+     * @param ut a set of UT nodes
+     * @param gwNode pointer of GW node
+     * @param gwId id of the GW
+     * @param satId ID of the satellite
+     * @param beamId  id of the beam
+     * @param rtnUlFreqId id of the return user link frequency
+     * @param rtnFlFreqId id of the return feeder link frequency
+     * @param fwdUlFreqId id of the forward user link frequency
+     * @param fwdFlFreqId id of the forward feeder link frequency
+     * @param routingCallback the callback UT mac layers should
      * call to update the node routes when receiving handover orders
      *
      * This method creates a beam  with the requested attributes
      * and associate the resulting ns3::NetDevices with the ns3::Nodes.
-     * \return a pair containing the new SatNetDevice of the gateway
+     * @return a pair containing the new SatNetDevice of the gateway
      * and a NetDeviceContainer of all SatNetDevice for the UTs
      */
     std::pair<Ptr<NetDevice>, NetDeviceContainer> Install(
@@ -200,22 +204,22 @@ class SatBeamHelper : public Object
         SatMac::RoutingUpdateCallback routingCallback);
 
     /**
-     * \param orbiterNetDevice Net device of satellite
-     * \param gwNode pointer of GW node
-     * \param gwId id of the GW
-     * \param satId ID of the satellite linked to the UT
-     * \param beamId  id of the beam linked to the UT
-     * \param feederSatId ID of the satellite linked to the GW
-     * \param feederBeamId  id of the beam linked to the GW
-     * \param feederLink Feeder link channel
-     * \param rtnFlFreqId id of the return feeder link frequency
-     * \param fwdFlFreqId id of the forward feeder link frequency
-     * \param routingCallback the callback UT mac layers should
+     * @param orbiterNetDevice Net device of satellite
+     * @param gwNode pointer of GW node
+     * @param gwId id of the GW
+     * @param satId ID of the satellite linked to the UT
+     * @param beamId  id of the beam linked to the UT
+     * @param feederSatId ID of the satellite linked to the GW
+     * @param feederBeamId  id of the beam linked to the GW
+     * @param feederLink Feeder link channel
+     * @param rtnFlFreqId id of the return feeder link frequency
+     * @param fwdFlFreqId id of the forward feeder link frequency
+     * @param routingCallback the callback UT mac layers should
      * call to update the node routes when receiving handover orders
      *
      * This method creates a beam on feeder side with the requested attributes
      * and associate the resulting ns3::NetDevices with the ns3::Nodes.
-     * \return the new SatNetDevice of the gateway
+     * @return the new SatNetDevice of the gateway
      */
     Ptr<NetDevice> InstallFeeder(Ptr<SatOrbiterNetDevice> orbiterNetDevice,
                                  Ptr<Node> gwNode,
@@ -230,20 +234,20 @@ class SatBeamHelper : public Object
                                  SatMac::RoutingUpdateCallback routingCallback);
 
     /**
-     * \param orbiterNetDevice Net device of satellite
-     * \param ut a set of UT nodes
-     * \param gwNd Net Device of GW
-     * \param satId ID of the satellite
-     * \param beamId  id of the beam
-     * \param userLink User link channel
-     * \param rtnUlFreqId id of the return user link frequency
-     * \param fwdUlFreqId id of the forward user link frequency
-     * \param routingCallback the callback UT mac layers should
+     * @param orbiterNetDevice Net device of satellite
+     * @param ut a set of UT nodes
+     * @param gwNd Net Device of GW
+     * @param satId ID of the satellite
+     * @param beamId  id of the beam
+     * @param userLink User link channel
+     * @param rtnUlFreqId id of the return user link frequency
+     * @param fwdUlFreqId id of the forward user link frequency
+     * @param routingCallback the callback UT mac layers should
      * call to update the node routes when receiving handover orders
      *
      * This method creates a beam on user side with the requested attributes
      * and associate the resulting ns3::NetDevices with the ns3::Nodes.
-     * \return a NetDeviceContainer of all SatNetDevice for the UTs
+     * @return a NetDeviceContainer of all SatNetDevice for the UTs
      */
     NetDeviceContainer InstallUser(Ptr<SatOrbiterNetDevice> orbiterNetDevice,
                                    NodeContainer ut,
@@ -266,40 +270,40 @@ class SatBeamHelper : public Object
     void SetIslRoutes();
 
     /**
-     * \param beamId beam ID
-     * \param satId satellite ID
-     * \return the ID of the GW serving the specified beam, or zero if the ID is
+     * @param beamId beam ID
+     * @param satId satellite ID
+     * @return the ID of the GW serving the specified beam, or zero if the ID is
      *         invalid
      */
     uint32_t GetGwId(uint32_t satId, uint32_t beamId) const;
 
     /**
-     * \param satId satellite ID
-     * \param beamId beam ID
-     * \return container having all UT nodes of a specific beam.
+     * @param satId satellite ID
+     * @param beamId beam ID
+     * @return container having all UT nodes of a specific beam.
      */
     NodeContainer GetUtNodes(uint32_t satId, uint32_t beamId) const;
 
     /**
-     * \param satId satellite ID
-     * \return a list of pair satellite ID / beam ID which are currently activated.
+     * @param satId satellite ID
+     * @return a list of pair satellite ID / beam ID which are currently activated.
      */
     std::list<std::pair<uint32_t, uint32_t>> GetBeams() const;
 
     /**
      * Enables creation traces to be written in given file
-     * \param stream  stream for creation trace outputs
-     * \param cb  callback to connect traces
+     * @param stream  stream for creation trace outputs
+     * @param cb  callback to connect traces
      */
     void EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase& cb);
 
     /**
-     * \return info of created beams as std::string with GW info..
+     * @return info of created beams as std::string with GW info..
      */
     std::string GetBeamInfo() const;
 
     /**
-     * \return Information of UTs.
+     * @return Information of UTs.
      */
     std::string GetUtInfo() const;
 
@@ -307,42 +311,42 @@ class SatBeamHelper : public Object
      * Gets GW node according to given id.
      * In case that GW is not found NULL is returned.
      *
-     * \param gwId ID of the GW
-     * \return pointer to found GW node or NULL.
+     * @param gwId ID of the GW
+     * @return pointer to found GW node or NULL.
      */
     Ptr<Node> GetGwNode(uint32_t gwId) const;
 
     /**
-     * \return pointer to UT helper.
+     * @return pointer to UT helper.
      */
     Ptr<SatUtHelper> GetUtHelper() const;
 
     /**
-     * \return pointer to GW helper.
+     * @return pointer to GW helper.
      */
     Ptr<SatGwHelper> GetGwHelper() const;
 
     /**
-     * \return pointer to Orbiter helper.
+     * @return pointer to Orbiter helper.
      */
     Ptr<SatOrbiterHelper> GetOrbiterHelper() const;
 
     /**
-     * \return pointer to the NCC.
+     * @return pointer to the NCC.
      */
     Ptr<SatNcc> GetNcc() const;
 
     /**
      * Get beam Id of the given UT.
      *
-     * \param utNode Pointer to UT node
+     * @param utNode Pointer to UT node
      * return Id of the beam of the requested UT. O in case that given node is not UT node.
      */
     uint32_t GetUtBeamId(Ptr<Node> utNode) const;
 
     /**
      *
-     * \param beamInfo Multicast info for the beams. Receiver UTs in a  beam for the multicast
+     * @param beamInfo Multicast info for the beams. Receiver UTs in a  beam for the multicast
      * group. \param sourceUtNode Source UT node. (NULL in case that source is behind
      * gateway/backbone network) \param sourceAddress Source address of the group. \param
      * groupAddress Address of the multicast group. \param routeToGwUsers Flag indicating if there
@@ -380,6 +384,9 @@ class SatBeamHelper : public Object
   private:
     CarrierFreqConverter m_carrierFreqConverter;
     SatTypedefs::CarrierBandwidthConverter_t m_carrierBandwidthConverter;
+
+    uint32_t m_rtnLinkCarrierCount;
+    uint32_t m_fwdLinkCarrierCount;
 
     Ptr<SatSuperframeSeq> m_superframeSeq;
 
@@ -501,17 +508,17 @@ class SatBeamHelper : public Object
 
     /**
      * Creates info of the beam.
-     * \return info for beams as std::string.
+     * @return info for beams as std::string.
      */
     std::string CreateBeamInfo() const;
 
     /**
      * Gets satellite channel pair from requested map.
      * In case that channel pair is not found, new is created and returned.
-     * \param fwdFrequencyId ID of the frequency
-     * \param rtnFrequencyId ID of the frequency
-     * \param isUserLink flag indicating if link user link is requested (otherwise feeder link).
-     * \return satellite channel pair from requested SatChannelPair
+     * @param fwdFrequencyId ID of the frequency
+     * @param rtnFrequencyId ID of the frequency
+     * @param isUserLink flag indicating if link user link is requested (otherwise feeder link).
+     * @return satellite channel pair from requested SatChannelPair
      */
     SatChannelPair::ChannelPair_t GetChannelPair(uint32_t satId,
                                                  uint32_t beamId,
@@ -522,28 +529,28 @@ class SatBeamHelper : public Object
     /**
      * Creates GW node according to given id and stores GW to map.
      *
-     * \param id ID of the GW
-     * \param node pointer to the GW
+     * @param id ID of the GW
+     * @param node pointer to the GW
      *
-     * \return result of storing
+     * @return result of storing
      */
     bool StoreGwNode(uint32_t id, Ptr<Node> node);
 
     /**
      * Install fading model to node, if fading model doesn't exist already in node
      *
-     * \param node Pointer to node
-     * \return Pointer to fading container
+     * @param node Pointer to node
+     * @return Pointer to fading container
      */
     Ptr<SatBaseFading> InstallFadingContainer(Ptr<Node> node) const;
 
     /**
      * Add multicast route to UT node.
      *
-     * \param utNode Pointer to UT node where to add route.
-     * \param sourceAddress Source address of the multicast group.
-     * \param groupAddress Address of the multicast group.
-     * \param routeToSatellite Flag indicating if traffic is going toward satellite network.
+     * @param utNode Pointer to UT node where to add route.
+     * @param sourceAddress Source address of the multicast group.
+     * @param groupAddress Address of the multicast group.
+     * @param routeToSatellite Flag indicating if traffic is going toward satellite network.
      */
     void AddMulticastRouteToUt(Ptr<Node> utNode,
                                Ipv4Address sourceAddress,

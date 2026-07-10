@@ -24,11 +24,11 @@
 #include "../utils/satellite-env-variables.h"
 #include "satellite-enums.h"
 
-#include <ns3/double.h>
-#include <ns3/log.h>
-#include <ns3/object.h>
-#include <ns3/singleton.h>
-#include <ns3/string.h>
+#include "ns3/double.h"
+#include "ns3/log.h"
+#include "ns3/object.h"
+#include "ns3/singleton.h"
+#include "ns3/string.h"
 
 #include <sstream>
 #include <string>
@@ -48,9 +48,9 @@ NS_OBJECT_ENSURE_REGISTERED(SatLinkResults);
 SatLinkResults::SatLinkResults()
     : m_isInitialized(false)
 {
-    std::string dataPath = Singleton<SatEnvVariables>::Get()->GetDataPath();
-    m_inputPath = Singleton<SatEnvVariables>::Get()->LocateDirectory(
-        dataPath + "/additional-input/linkresults/");
+    std::string dataPath = SatEnvVariables::GetInstance()->GetDataPath();
+    m_inputPath = SatEnvVariables::GetInstance()->LocateDirectory(dataPath +
+                                                                  "/additional-input/linkresults/");
 }
 
 TypeId

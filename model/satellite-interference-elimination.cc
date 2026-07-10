@@ -22,8 +22,8 @@
 
 #include "satellite-signal-parameters.h"
 
-#include <ns3/log.h>
-#include <ns3/simulator.h>
+#include "ns3/log.h"
+#include "ns3/simulator.h"
 
 #include <stdint.h>
 
@@ -40,12 +40,6 @@ SatInterferenceElimination::GetTypeId(void)
     static TypeId tid = TypeId("ns3::SatInterferenceElimination").SetParent<Object>();
 
     return tid;
-}
-
-TypeId
-SatInterferenceElimination::GetInstanceTypeId(void) const
-{
-    return GetTypeId();
 }
 
 SatInterferenceElimination::SatInterferenceElimination()

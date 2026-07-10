@@ -20,9 +20,9 @@
 
 #include "satellite-superframe-sequence.h"
 
-#include <ns3/log.h>
-#include <ns3/nstime.h>
-#include <ns3/object.h>
+#include "ns3/log.h"
+#include "ns3/nstime.h"
+#include "ns3/object.h"
 
 NS_LOG_COMPONENT_DEFINE("SatSuperframeSeq");
 
@@ -56,14 +56,6 @@ SatSuperframeSeq::GetTypeId(void)
                                           MakeTimeChecker());
 
     return tid;
-}
-
-TypeId
-SatSuperframeSeq::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
 }
 
 void

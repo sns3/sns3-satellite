@@ -24,8 +24,8 @@
 
 #include "satellite-stats-helper.h"
 
-#include <ns3/callback.h>
-#include <ns3/ptr.h>
+#include "ns3/callback.h"
+#include "ns3/ptr.h"
 
 namespace ns3
 {
@@ -37,8 +37,8 @@ class Node;
 class DataCollectionObject;
 
 /**
- * \ingroup satstats
- * \brief Abstract class inherited by SatStatsRtnFeederWindowLoadHelper.
+ * @ingroup satstats
+ * @brief Abstract class inherited by SatStatsRtnFeederWindowLoadHelper.
  */
 class SatStatsWindowLoadHelper : public SatStatsHelper
 {
@@ -57,19 +57,19 @@ class SatStatsWindowLoadHelper : public SatStatsHelper
     static TypeId GetTypeId();
 
     /**
-     * \brief Set up several probes or other means of listeners and connect them
+     * @brief Set up several probes or other means of listeners and connect them
      *        to the collectors.
      */
     void InstallProbes();
 
     /**
-     * \brief Receive inputs from trace sources and forward them to the collector.
-     * \param windowLoad the normalized window load in bps/Hz.
+     * @brief Receive inputs from trace sources and forward them to the collector.
+     * @param windowLoad the normalized window load in bps/Hz.
      */
     void WindowLoadCallback(double windowLoad);
 
     /**
-     * \return
+     * @return
      */
     Callback<void, double> GetTraceSinkCallback() const;
 
@@ -78,7 +78,7 @@ class SatStatsWindowLoadHelper : public SatStatsHelper
     void DoInstall();
 
     /**
-     * \brief
+     * @brief
      */
     virtual void DoInstallProbes() = 0;
 
@@ -97,20 +97,20 @@ class SatStatsWindowLoadHelper : public SatStatsHelper
 // RETURN FEEDER LINK /////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce return feeder window load statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce return feeder window load statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnFeederWindowLoadHelper> s = Create<SatStatsRtnFeederWindowLoadHelper> (satHelper);
  * s->SetName ("name");
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsRtnFeederWindowLoadHelper : public SatStatsWindowLoadHelper
 {

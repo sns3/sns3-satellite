@@ -22,8 +22,8 @@
 
 #include "satellite-utils.h"
 
-#include <ns3/fatal-error.h>
-#include <ns3/log.h>
+#include "ns3/fatal-error.h"
+#include "ns3/log.h"
 
 #include <cmath>
 #include <ios>

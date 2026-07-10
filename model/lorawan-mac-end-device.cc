@@ -31,10 +31,10 @@
 #include "satellite-time-tag.h"
 #include "satellite-topology.h"
 
-#include <ns3/ipv4-header.h>
-#include <ns3/log.h>
-#include <ns3/simulator.h>
-#include <ns3/singleton.h>
+#include "ns3/ipv4-header.h"
+#include "ns3/log.h"
+#include "ns3/simulator.h"
+#include "ns3/singleton.h"
 
 #include <algorithm>
 #include <cmath>
@@ -872,10 +872,9 @@ LorawanMacEndDevice::OnLinkAdrReq(uint8_t dataRate,
         txPowerOk = false;
     }
 
-    NS_LOG_DEBUG("Finished checking. "
-                 << "ChannelMaskOk: " << channelMaskOk << ", "
-                 << "DataRateOk: " << dataRateOk << ", "
-                 << "txPowerOk: " << txPowerOk);
+    NS_LOG_DEBUG("Finished checking. " << "ChannelMaskOk: " << channelMaskOk << ", "
+                                       << "DataRateOk: " << dataRateOk << ", "
+                                       << "txPowerOk: " << txPowerOk);
 
     // If all checks are successful, set parameters up
     //////////////////////////////////////////////////

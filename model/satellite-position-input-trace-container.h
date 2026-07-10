@@ -25,7 +25,7 @@
 #include "satellite-antenna-gain-pattern-container.h"
 #include "satellite-base-trace-container.h"
 
-#include <ns3/satellite-input-fstream-time-double-container.h>
+#include "ns3/satellite-input-fstream-time-double-container.h"
 
 #include <map>
 #include <string>
@@ -34,76 +34,70 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief Class for Rx power input trace container. The class contains
+ * @brief Class for Rx power input trace container. The class contains
  * multiple Rx power input sample traces and provides an interface to them.
  */
 class SatPositionInputTraceContainer : public SatBaseTraceContainer
 {
   public:
     /**
-     * \brief typedef for map of containers
+     * @brief typedef for map of containers
      */
     typedef std::map<std::string, Ptr<SatInputFileStreamTimeDoubleContainer>> container_t;
 
     /**
-     * \brief Constructor
+     * @brief Constructor
      */
     SatPositionInputTraceContainer();
 
     /**
-     * \brief Destructor
+     * @brief Destructor
      */
     ~SatPositionInputTraceContainer();
 
     /**
-     * \brief NS-3 type id function
-     * \return type id
+     * @brief NS-3 type id function
+     * @return type id
      */
     static TypeId GetTypeId(void);
 
     /**
-     * \brief NS-3 instance type id function
-     * \return Instance type is
-     */
-    TypeId GetInstanceTypeId(void) const;
-
-    /**
-     *  \brief Do needed dispose actions.
+     *  @brief Do needed dispose actions.
      */
     void DoDispose();
 
     /**
-     * \brief Function for getting the Rx power density
-     * \param key key
-     * \return Rx power density
+     * @brief Function for getting the Rx power density
+     * @param key key
+     * @return Rx power density
      */
     GeoCoordinate GetPosition(const std::string& key,
                               GeoCoordinate::ReferenceEllipsoid_t refEllipsoid);
 
     /**
-     * \brief Function for resetting the variables
+     * @brief Function for resetting the variables
      */
     void Reset();
 
   private:
     /**
-     * \brief Function for adding the node to the map
-     * \param key filename to read positions from
-     * \return pointer to the added container
+     * @brief Function for adding the node to the map
+     * @param key filename to read positions from
+     * @return pointer to the added container
      */
     Ptr<SatInputFileStreamTimeDoubleContainer> AddNode(const std::string& key);
 
     /**
-     * \brief Function for finding the container matching the key
-     * \param key key
-     * \return matching container
+     * @brief Function for finding the container matching the key
+     * @param key key
+     * @return matching container
      */
     Ptr<SatInputFileStreamTimeDoubleContainer> FindNode(const std::string& key);
 
     /**
-     * \brief Map for containers
+     * @brief Map for containers
      */
     container_t m_container;
 };

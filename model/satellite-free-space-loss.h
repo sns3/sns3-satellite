@@ -20,24 +20,24 @@
 #ifndef SATELLITE_FREE_SPACE_LOSS_H
 #define SATELLITE_FREE_SPACE_LOSS_H
 
-#include <ns3/mobility-model.h>
-#include <ns3/object.h>
+#include "ns3/mobility-model.h"
+#include "ns3/object.h"
 
 namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief This class is responsible of calculating the free space loss (FSL)
+ * @brief This class is responsible of calculating the free space loss (FSL)
  * based on two given node positions and used (center) frequency.
  */
 class SatFreeSpaceLoss : public Object
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
 
@@ -51,20 +51,20 @@ class SatFreeSpaceLoss : public Object
     }
 
     /**
-     * \brief Calculate the free-space loss in linear format
-     * \param a Mobility model of node a
-     * \param b Mobility model of node b
-     * \param frequencyHz Frequency in Hertz
-     * \return the free space loss as ratio.
+     * @brief Calculate the free-space loss in linear format
+     * @param a Mobility model of node a
+     * @param b Mobility model of node b
+     * @param frequencyHz Frequency in Hertz
+     * @return the free space loss as ratio.
      */
     virtual double GetFsl(Ptr<MobilityModel> a, Ptr<MobilityModel> b, double frequencyHz) const;
 
     /**
-     * \brief Calculate the free-space loss in dB
-     * \param a Mobility model of node a
-     * \param b Mobility model of node b
-     * \param frequencyHz Frequency in Hertz
-     * \return the free space loss as dBs.
+     * @brief Calculate the free-space loss in dB
+     * @param a Mobility model of node a
+     * @param b Mobility model of node b
+     * @param frequencyHz Frequency in Hertz
+     * @return the free space loss as dBs.
      */
     virtual double GetFsldB(Ptr<MobilityModel> a, Ptr<MobilityModel> b, double frequencyHz) const;
 };

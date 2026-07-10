@@ -30,10 +30,10 @@
 using namespace ns3;
 
 /**
- * \file sat-profiling-sim-tn8.cc
- * \ingroup satellite
+ * @file sat-profiling-sim-tn8.cc
+ * @ingroup satellite
  *
- *\brief An example used for running the performance profiling simulations
+ *@brief An example used for running the performance profiling simulations
  * presented in TN8. The example supports a selection between a single beam
  * simulation and a full scenario. Additionally, it is possible to select
  * the number of UTs per beam.

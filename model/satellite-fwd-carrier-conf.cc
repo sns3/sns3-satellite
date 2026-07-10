@@ -20,8 +20,8 @@
 
 #include "satellite-fwd-carrier-conf.h"
 
-#include <ns3/fatal-error.h>
-#include <ns3/log.h>
+#include "ns3/fatal-error.h"
+#include "ns3/log.h"
 
 #include <stdint.h>
 

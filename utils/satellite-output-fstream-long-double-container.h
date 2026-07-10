@@ -23,8 +23,8 @@
 
 #include "satellite-output-fstream-wrapper.h"
 
+#include "ns3/gnuplot.h"
 #include "ns3/object.h"
-#include <ns3/gnuplot.h>
 
 #include <fstream>
 #include <stdint.h>
@@ -33,9 +33,9 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief Class for output file stream container for long double values.
+ * @brief Class for output file stream container for long double values.
  * The class implements storing the values and writing the stored
  * values into a file. A figure output in two dimensions is also supported.
  */
@@ -50,53 +50,53 @@ class SatOutputFileStreamLongDoubleContainer : public Object
     } FigureUnitConversion_t;
 
     /**
-     * \brief NS-3 function for type id
-     * \return type id
+     * @brief NS-3 function for type id
+     * @return type id
      */
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Constructor
-     * \param filename file name
-     * \param filemode file mode
-     * \param valuesInRow number of values in a row
+     * @brief Constructor
+     * @param filename file name
+     * @param filemode file mode
+     * @param valuesInRow number of values in a row
      */
     SatOutputFileStreamLongDoubleContainer(std::string filename,
                                            std::ios::openmode filemode,
                                            uint32_t valuesInRow);
 
     /**
-     * \brief Constructor
+     * @brief Constructor
      */
     SatOutputFileStreamLongDoubleContainer();
 
     /**
-     * \brief Destructor
+     * @brief Destructor
      */
     ~SatOutputFileStreamLongDoubleContainer();
 
     /**
-     * \brief Function for writing the container contents to file
+     * @brief Function for writing the container contents to file
      */
     void WriteContainerToFile();
 
     /**
-     * \brief Function for adding the values to container
+     * @brief Function for adding the values to container
      */
     void AddToContainer(std::vector<long double> newItem);
 
     /**
-     * \brief Do needed dispose actions
+     * @brief Do needed dispose actions
      */
     void DoDispose();
 
     /**
-     * \brief Function for enabling the figure output
-     * \param title title text
-     * \param legendY Y-axis title
-     * \param legendX X-axis title
-     * \param keyPosition Legend position
-     * \param figureUnitConversionType Conversion type for units in the figure
+     * @brief Function for enabling the figure output
+     * @param title title text
+     * @param legendY Y-axis title
+     * @param legendX X-axis title
+     * @param keyPosition Legend position
+     * @param figureUnitConversionType Conversion type for units in the figure
      */
     void EnableFigureOutput(std::string title,
                             std::string legendY,
@@ -106,106 +106,106 @@ class SatOutputFileStreamLongDoubleContainer : public Object
 
   private:
     /**
-     * \brief Function for resetting the variables
+     * @brief Function for resetting the variables
      */
     void Reset();
 
     /**
-     * \brief Function for resetting the stream
+     * @brief Function for resetting the stream
      */
     void ResetStream();
 
     /**
-     * \brief Function for clearing the container
+     * @brief Function for clearing the container
      */
     void ClearContainer();
 
     /**
-     * \brief Function for opening the output file stream
+     * @brief Function for opening the output file stream
      */
     void OpenStream();
 
     /**
-     * \brief Function for printing the container contents into a figure
+     * @brief Function for printing the container contents into a figure
      */
     void PrintFigure();
 
     /**
-     * \brief Function for converting the container data samples
-     * \param value original data sample value
-     * \return converted data sample value
+     * @brief Function for converting the container data samples
+     * @param value original data sample value
+     * @return converted data sample value
      */
     long double ConvertValue(long double value);
 
     /**
-     * \brief Function for creating Gnuplot datasets
-     * \return dataset
+     * @brief Function for creating Gnuplot datasets
+     * @return dataset
      */
     Gnuplot2dDataset GetGnuplotDataset();
 
     /**
-     * \brief Function for creating Gnuplots
-     * \return Gnuplot
+     * @brief Function for creating Gnuplots
+     * @return Gnuplot
      */
     Gnuplot GetGnuplot();
 
     /**
-     * \brief Pointer to output file stream wrapper
+     * @brief Pointer to output file stream wrapper
      */
     SatOutputFileStreamWrapper* m_outputFileStreamWrapper;
 
     /**
-     * \brief Pointer to output file stream
+     * @brief Pointer to output file stream
      */
     std::ofstream* m_outputFileStream;
 
     /**
-     * \brief Container for value rows
+     * @brief Container for value rows
      */
     std::vector<std::vector<long double>> m_container;
 
     /**
-     * \brief File name
+     * @brief File name
      */
     std::string m_fileName;
 
     /**
-     * \brief File mode
+     * @brief File mode
      */
     std::ios::openmode m_fileMode;
 
     /**
-     * \brief Number of values in a row
+     * @brief Number of values in a row
      */
     uint32_t m_valuesInRow;
 
     /**
-     * \brief Enable / disable printing of container contents into a figure
+     * @brief Enable / disable printing of container contents into a figure
      */
     bool m_printFigure;
 
     /**
-     * \brief Figure title
+     * @brief Figure title
      */
     std::string m_title;
 
     /**
-     * \brief  Figure Y-axis title
+     * @brief  Figure Y-axis title
      */
     std::string m_legendY;
 
     /**
-     * \brief Figure X-axis title
+     * @brief Figure X-axis title
      */
     std::string m_legendX;
 
     /**
-     * \brief Figure legend position
+     * @brief Figure legend position
      */
     std::string m_keyPosition;
 
     /**
-     * \brief Describes which unit conversion should be used with the figure
+     * @brief Describes which unit conversion should be used with the figure
      */
     FigureUnitConversion_t m_figureUnitConversionType;
 };

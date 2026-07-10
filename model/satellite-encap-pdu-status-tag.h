@@ -21,7 +21,7 @@
 #ifndef SATELLITE_ENCAP_PDU_STATUS_TAG_H
 #define SATELLITE_ENCAP_PDU_STATUS_TAG_H
 
-#include <ns3/tag.h>
+#include "ns3/tag.h"
 
 #include <ostream>
 #include <stdint.h>
@@ -30,9 +30,9 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief SatEncapPduStatusTag is used temporarily to tag packets with the
+ * @brief SatEncapPduStatusTag is used temporarily to tag packets with the
  * fragmentation status in the encapsulation and fragmentation process.
  * The same generic tag is used in both RLE (SatReturnLinkEncapsulator) and
  * GSE (SatGenericStreamEncapsulator). There are four possible status
@@ -51,50 +51,50 @@ class SatEncapPduStatusTag : public Tag
     SatEncapPduStatusTag();
 
     /**
-     * \brief Set PDU status
-     * \param status Status of a PDU
+     * @brief Set PDU status
+     * @param status Status of a PDU
      */
     void SetStatus(uint8_t status);
 
     /**
-     * \brief Get PDU status
-     * \return PDU status
+     * @brief Get PDU status
+     * @return PDU status
      */
     uint8_t GetStatus(void) const;
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
+     * @brief Get the type ID of instance
+     * @return the object TypeId
      */
     virtual TypeId GetInstanceTypeId(void) const;
 
     /**
      * Get serialized size of SatEncapPduStatusTag
-     * \return Serialized size in bytes
+     * @return Serialized size in bytes
      */
     virtual uint32_t GetSerializedSize(void) const;
 
     /**
      * Serializes information to buffer from this instance of SatEncapPduStatusTag
-     * \param i Buffer in which the information is serialized
+     * @param i Buffer in which the information is serialized
      */
     virtual void Serialize(TagBuffer i) const;
 
     /**
      * Deserializes information from buffer to this instance of SatEncapPduStatusTag
-     * \param i Buffer from which the information is deserialized
+     * @param i Buffer from which the information is deserialized
      */
     virtual void Deserialize(TagBuffer i);
 
     /**
      * Print time stamp of this instance of SatEncapPduStatusTag
-     * \param &os Output stream to which tag timestamp is printed.
+     * @param &os Output stream to which tag timestamp is printed.
      */
     virtual void Print(std::ostream& os) const;
 

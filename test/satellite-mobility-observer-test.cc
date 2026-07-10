@@ -19,9 +19,9 @@
  */
 
 /**
- * \file satellite-mobility-observer-test.cc
- * \ingroup satellite
- * \brief Test cases to unit test Satellite Mobility Observer model.
+ * @file satellite-mobility-observer-test.cc
+ * @ingroup satellite
+ * @brief Test cases to unit test Satellite Mobility Observer model.
  */
 
 #include "../model/satellite-constant-position-mobility-model.h"
@@ -266,8 +266,8 @@ static const double g_refElAngles[g_latitudeCount][g_longitudeCount] = {
     }};
 
 /**
- * \ingroup satellite
- * \brief Test case to unit test Satellite Mobility Observer.
+ * @ingroup satellite
+ * @brief Test case to unit test Satellite Mobility Observer.
  *
  * This case tests that SatMobilityObserver object can be created successfully and it calculates
  * correctly.
@@ -314,8 +314,8 @@ void
 SatMobilityObserverTestCase::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-mobility-observer", "", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-mobility-observer", "", true);
 
     // create mobilities
     Ptr<SatConstantPositionMobilityModel> gwMob = CreateObject<SatConstantPositionMobilityModel>();
@@ -473,8 +473,7 @@ SatMobilityObserverTestCase::DoRun(void)
                 NS_TEST_ASSERT_MSG_EQ(std::isnan(gwEl),
                                       false,
                                       "UT elevation angle incorrect (NAN): lat-> "
-                                          << lat << " lon-> "
-                                          << " alt" << alt);
+                                          << lat << " lon-> " << " alt" << alt);
                 NS_TEST_ASSERT_MSG_EQ_TOL(gwEl,
                                           refValue,
                                           0.00001,
@@ -486,11 +485,11 @@ SatMobilityObserverTestCase::DoRun(void)
 
     Simulator::Destroy();
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 }
 
 /**
- * \brief Test suite for Satellite mobility observer unit test cases.
+ * @brief Test suite for Satellite mobility observer unit test cases.
  */
 class SatMobilityObserverTestSuite : public TestSuite
 {

@@ -61,12 +61,6 @@ SatAntennaGainPattern::GetTypeId(void)
     return tid;
 }
 
-TypeId
-SatAntennaGainPattern::GetInstanceTypeId(void) const
-{
-    return GetTypeId();
-}
-
 SatAntennaGainPattern::SatAntennaGainPattern()
     : m_antennaPattern(),
       m_validPositions(),
@@ -84,23 +78,30 @@ SatAntennaGainPattern::SatAntennaGainPattern()
       m_lonDefaultSatellite(0.0),
       m_nanStrings()
 {
-    // Do nothing here
+    NS_FATAL_ERROR("Default constructor not in use");
 }
 
 SatAntennaGainPattern::SatAntennaGainPattern(std::string filePathName,
                                              GeoCoordinate defaultSatellitePosition)
     : m_nanStrings(m_nanStringArray,
-                   m_nanStringArray + (sizeof m_nanStringArray / sizeof m_nanStringArray[0]))
+                   m_nanStringArray + (sizeof m_nanStringArray / sizeof m_nanStringArray[0])),
+      m_filePathName(filePathName),
+      m_defaultSatellitePosition(defaultSatellitePosition)
 {
-    // Attributes are needed already in construction phase:
-    // - ConstructSelf call in constructor
-    // - GetInstanceTypeId is needed to be implemented
-    ObjectBase::ConstructSelf(AttributeConstructionList());
+    NS_LOG_FUNCTION(this << filePathName << defaultSatellitePosition);
+}
 
-    m_latDefaultSatellite = defaultSatellitePosition.GetLatitude();
-    m_lonDefaultSatellite = defaultSatellitePosition.GetLongitude();
+void
+SatAntennaGainPattern::NotifyConstructionCompleted()
+{
+    NS_LOG_FUNCTION(this);
 
-    ReadAntennaPatternFromFile(filePathName);
+    Object::NotifyConstructionCompleted();
+
+    m_latDefaultSatellite = m_defaultSatellitePosition.GetLatitude();
+    m_lonDefaultSatellite = m_defaultSatellitePosition.GetLongitude();
+
+    ReadAntennaPatternFromFile(m_filePathName);
     m_uniformRandomVariable = CreateObject<UniformRandomVariable>();
 }
 

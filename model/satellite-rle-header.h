@@ -21,7 +21,7 @@
 #ifndef SATELLITE_RLE_HEADER_H
 #define SATELLITE_RLE_HEADER_H
 
-#include <ns3/header.h>
+#include "ns3/header.h"
 
 #include <ostream>
 #include <stdint.h>
@@ -31,9 +31,9 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief SatPPduHeader implementation. RLE header is added to each
+ * @brief SatPPduHeader implementation. RLE header is added to each
  * of the transmitted RLE packets at the UT in RTN link direction. The header
  * is detached and interpreted at the RLE receiver at the GW. Based on the
  * content the receiver can do the defragmentation of the higher layer packet.
@@ -41,7 +41,7 @@ namespace ns3
  * methods. The RLE header has the proper content and size according to
  * specification.
  *
- * \see ETSI TS 103 179 V1.1.1 Satellite Earth Stations and Systems (SES);
+ * @see ETSI TS 103 179 V1.1.1 Satellite Earth Stations and Systems (SES);
  * Return Link Encapsulation (RLE) protocol
  */
 class SatPPduHeader : public Header
@@ -58,112 +58,112 @@ class SatPPduHeader : public Header
     ~SatPPduHeader();
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
+     * @brief Get the type ID of instance
+     * @return the object TypeId
      */
     virtual TypeId GetInstanceTypeId(void) const;
 
     /**
      * Get serialized size of SatPPduHeader
-     * \return Serialized size in bytes
+     * @return Serialized size in bytes
      */
     virtual uint32_t GetSerializedSize(void) const;
 
     /**
      * Serializes information to buffer from this instance of SatPPduHeader
-     * \param start Buffer in which the information is serialized
+     * @param start Buffer in which the information is serialized
      */
     virtual void Serialize(Buffer::Iterator start) const;
 
     /**
      * Deserializes information from buffer to this instance of SatPPduHeader
-     * \param start Buffer from which the information is deserialized
-     * \return Serialized size of the buffer
+     * @param start Buffer from which the information is deserialized
+     * @return Serialized size of the buffer
      */
     virtual uint32_t Deserialize(Buffer::Iterator start);
 
     /**
      * Print time stamp of this instance of SatPPduHeader
-     * \param &os Output stream to which tag timestamp is printed.
+     * @param &os Output stream to which tag timestamp is printed.
      */
     virtual void Print(std::ostream& os) const;
 
     /**
-     * \brief Get start indicator of PPDU header
-     * \return Start indicator
+     * @brief Get start indicator of PPDU header
+     * @return Start indicator
      */
     uint8_t GetStartIndicator() const;
 
     /**
-     * \brief Get end indicator of PPDU header
-     * \return End indicator
+     * @brief Get end indicator of PPDU header
+     * @return End indicator
      */
     uint8_t GetEndIndicator() const;
 
     /**
-     * \brief Get PPDU fragment length in bytes
-     * \return PPDU length in bytes
+     * @brief Get PPDU fragment length in bytes
+     * @return PPDU length in bytes
      */
     uint16_t GetPPduLength() const;
 
     /**
-     * \brief Get PPDU fragment id
-     * \return Fragment id
+     * @brief Get PPDU fragment id
+     * @return Fragment id
      */
     uint8_t GetFragmentId() const;
 
     /**
-     * \brief Get total length of higher layer PDU. Set in
+     * @brief Get total length of higher layer PDU. Set in
      * START_PPDU status type.
-     * \return Total length of HL PDU
+     * @return Total length of HL PDU
      */
     uint16_t GetTotalLength() const;
 
     /**
-     * \brief Set start indicator to PPDU header
+     * @brief Set start indicator to PPDU header
      */
     void SetStartIndicator();
 
     /**
-     * \brief Set end indicator to PPDU header
+     * @brief Set end indicator to PPDU header
      */
     void SetEndIndicator();
 
     /**
-     * \brief Set PPDU fragment length to PPDU header
-     * \param bytes PPDU length in bytes
+     * @brief Set PPDU fragment length to PPDU header
+     * @param bytes PPDU length in bytes
      */
     void SetPPduLength(uint16_t bytes);
 
     /**
-     * \brief Set fragment id to PPDU header
-     * \param id Fragment id
+     * @brief Set fragment id to PPDU header
+     * @param id Fragment id
      */
     void SetFragmentId(uint8_t id);
 
     /**
      * Set total length of higher layer PDU. Set in
      * START_PPDU status type.
-     * \param bytes Total HL packet size
+     * @param bytes Total HL packet size
      */
     void SetTotalLength(uint16_t bytes);
 
     /**
-     * \brief Get the maximum RLE header size
-     * \param type Header type
-     * \return Header size
+     * @brief Get the maximum RLE header size
+     * @param type Header type
+     * @return Header size
      */
     uint32_t GetHeaderSizeInBytes(uint8_t type) const;
 
     /**
-     * \brief Get maximum RLE header size
-     * \return Maximum header size
+     * @brief Get maximum RLE header size
+     * @return Maximum header size
      */
     uint32_t GetMaxHeaderSizeInBytes() const;
 

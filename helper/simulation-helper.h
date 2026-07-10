@@ -28,10 +28,10 @@
 #include "satellite-helper.h"
 #include "satellite-traffic-helper.h"
 
-#include <ns3/command-line.h>
-#include <ns3/random-variable-stream.h>
-#include <ns3/satellite-enums.h>
-#include <ns3/satellite-stats-helper-container.h>
+#include "ns3/command-line.h"
+#include "ns3/random-variable-stream.h"
+#include "ns3/satellite-enums.h"
+#include "ns3/satellite-stats-helper-container.h"
 
 #include <map>
 #include <set>
@@ -42,8 +42,8 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief A helper to make it easier to create example simulation cases.
+ * @ingroup satellite
+ * @brief A helper to make it easier to create example simulation cases.
  *
  * Example usage:
  *
@@ -70,49 +70,44 @@ class SimulationHelper : public Object
     SimulationHelper();
 
     /**
-     * \brief Contructor for simulation helper.
-     * \param simulationName Name of the simulation.
+     * @brief Contructor for simulation helper.
+     * @param simulationName Name of the simulation.
      */
     SimulationHelper(std::string simulationName);
 
     /**
-     * \brief Destructor.
+     * @brief Destructor.
      */
     virtual ~SimulationHelper();
 
     /**
-     * \brief Disposing.
+     * @brief Disposing.
      */
     void DoDispose(void);
 
     /**
-     * \brief Derived from Object.
+     * @brief Derived from Object.
      */
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Derived from Object.
-     */
-    TypeId GetInstanceTypeId(void) const;
-
-    /**
-     * \brief Set default values shared by all examples using
+     * @brief Set default values shared by all examples using
      * SimulationHelper. Adjust to your needs.
      */
     void SetDefaultValues();
 
     /**
-     * \brief Set enabled beams (1-72) as a string.
-     * \param beamList List of beams.
-     * \example simulationHelper->SetBeams ("1 5 20 71")
+     * @brief Set enabled beams (1-72) as a string.
+     * @param beamList List of beams.
+     * @example simulationHelper->SetBeams ("1 5 20 71")
      *          enables beams 1, 5, 20 and 71.
      */
     void SetBeams(const std::string& beamList);
 
     /**
-     * \brief Set enabled beams (1-72) as a set.
-     * \param beamSet List of beams.
-     * \example simulationHelper->SetBeams ({1,2,3})
+     * @brief Set enabled beams (1-72) as a set.
+     * @param beamSet List of beams.
+     * @example simulationHelper->SetBeams ({1,2,3})
      *          enables beams 1, 2 and 3..
      */
     void SetBeamSet(std::set<uint32_t> beamSet);
@@ -123,75 +118,75 @@ class SimulationHelper : public Object
     }
 
     /**
-     * \brief Get enabled beams in integer format.
-     * \return const set of integers representing beam ids
+     * @brief Get enabled beams in integer format.
+     * @return const set of integers representing beam ids
      */
     const std::set<uint32_t>& GetBeams();
 
     /**
-     * \brief Set UT count per beam.
-     * \param count Number of UTs per beam.
+     * @brief Set UT count per beam.
+     * @param count Number of UTs per beam.
      */
     void SetUtCountPerBeam(uint32_t count);
 
     /**
-     * \brief Set UT count per beam to be taken from a random variable stream.
-     * \param rs RandomVariableStream to be used, must implement GetInteger.
+     * @brief Set UT count per beam to be taken from a random variable stream.
+     * @param rs RandomVariableStream to be used, must implement GetInteger.
      */
     void SetUtCountPerBeam(Ptr<RandomVariableStream> rs);
 
     /**
-     * \brief Set UT count per beam.
-     * \param count Number of UTs per beam.
+     * @brief Set UT count per beam.
+     * @param count Number of UTs per beam.
      */
     void SetUtCountPerBeam(uint32_t beamId, uint32_t count);
 
     /**
-     * \brief Set UT count per beam to be taken from a random variable stream.
-     * \param rs RandomVariableStream to be used, must implement GetInteger.
+     * @brief Set UT count per beam to be taken from a random variable stream.
+     * @param rs RandomVariableStream to be used, must implement GetInteger.
      */
     void SetUtCountPerBeam(uint32_t beamId, Ptr<RandomVariableStream> rs);
 
     /**
-     * \brief Set user count per UT.
-     * \param count Number of users per UT.
+     * @brief Set user count per UT.
+     * @param count Number of users per UT.
      */
     void SetUserCountPerUt(uint32_t count);
 
     /**
-     * \brief Set UT count per beam to be taken from a random variable stream.
-     * \param rs RandomVariableStream to be used, must implement GetInteger.
+     * @brief Set UT count per beam to be taken from a random variable stream.
+     * @param rs RandomVariableStream to be used, must implement GetInteger.
      */
     void SetUserCountPerUt(Ptr<RandomVariableStream> rs);
 
     /**
-     * \brief Set user count per mobile UT.
-     * \param count Number of users per mobile UT.
+     * @brief Set user count per mobile UT.
+     * @param count Number of users per mobile UT.
      */
     void SetUserCountPerMobileUt(uint32_t count);
 
     /**
-     * \brief Set mobile UT count per beam to be taken from a random variable stream.
-     * \param rs RandomVariableStream to be used, must implement GetInteger.
+     * @brief Set mobile UT count per beam to be taken from a random variable stream.
+     * @param rs RandomVariableStream to be used, must implement GetInteger.
      */
     void SetUserCountPerMobileUt(Ptr<RandomVariableStream> rs);
 
     /**
-     * \brief Set the number of GW users in the scenario.
+     * @brief Set the number of GW users in the scenario.
      * Must be called before creation of satellite scenario.
-     * \param gwUserCount
+     * @param gwUserCount
      */
     void SetGwUserCount(uint32_t gwUserCount);
 
     /**
-     * \brief Set simulation time in seconds.
-     * \param seconds
+     * @brief Set simulation time in seconds.
+     * @param seconds
      */
     void SetSimulationTime(double seconds);
 
     /**
-     * \brief Set simulation time
-     * \param time
+     * @brief Set simulation time
+     * @param time
      */
     inline void SetSimulationTime(Time time)
     {
@@ -199,89 +194,89 @@ class SimulationHelper : public Object
     }
 
     /**
-     * \brief Set ideal channel/physical layer parameterization.
+     * @brief Set ideal channel/physical layer parameterization.
      */
     void SetIdealPhyParameterization();
 
     /**
-     * \brief Enable ACM for a simulation direction.
-     * \param dir Direction
+     * @brief Enable ACM for a simulation direction.
+     * @param dir Direction
      */
     void EnableAcm(SatEnums::SatLinkDir_t dir);
 
     /**
-     * \brief Disable ACM for a simulation direction.
-     * \param dir Direction
+     * @brief Disable ACM for a simulation direction.
+     * @param dir Direction
      */
     void DisableAcm(SatEnums::SatLinkDir_t dir);
 
     /**
-     * \brief Disable all capacity allocation categories: CRA/VBDC/RBDC
+     * @brief Disable all capacity allocation categories: CRA/VBDC/RBDC
      */
     void DisableAllCapacityAssignmentCategories();
 
     /**
-     * \brief Enable only CRA for a given RC index
-     * \param rcIndex Request class index
-     * \param rateKbps CRA rate in kbps
+     * @brief Enable only CRA for a given RC index
+     * @param rcIndex Request class index
+     * @param rateKbps CRA rate in kbps
      */
     void EnableOnlyConstantRate(uint32_t rcIndex, double rateKbps);
 
     /**
-     * \brief Enable only RBDC for a given RC index
-     * \param rcIndex Request class index
+     * @brief Enable only RBDC for a given RC index
+     * @param rcIndex Request class index
      */
     void EnableOnlyRbdc(uint32_t rcIndex);
 
     /**
-     * \brief Enable only VBDC for a given RC index
-     * \param rcIndex Request class index
+     * @brief Enable only VBDC for a given RC index
+     * @param rcIndex Request class index
      */
     void EnableOnlyVbdc(uint32_t rcIndex);
 
     /**
-     * \brief Enable free capacity allocation
+     * @brief Enable free capacity allocation
      */
     void EnableFca();
 
     /**
-     * \brief Disable free capacity allocation
+     * @brief Disable free capacity allocation
      */
     void DisableFca();
 
     /**
-     * \brief Enable periodical control slots
+     * @brief Enable periodical control slots
      */
     void EnablePeriodicalControlSlots(Time periodicity);
 
     /**
-     * \brief Enable ARQ
+     * @brief Enable ARQ
      */
     void EnableArq(SatEnums::SatLinkDir_t dir);
 
     /**
-     * \brief Disable random access
+     * @brief Disable random access
      */
     void DisableRandomAccess();
 
     /**
-     * \brief Enable slotted ALOHA random access
+     * @brief Enable slotted ALOHA random access
      */
     void EnableSlottedAloha();
 
     /**
-     * \brief Enable CRDSA random access
+     * @brief Enable CRDSA random access
      */
     void EnableCrdsa();
 
     /**
-     * \brief Configure a frame for a certain superframe id.
-     * \param superFrameId Superframe id (currently always 0)
-     * \param bw Frame bandwidth
-     * \param carrierBw Bandwidth of the carriers within frame
-     * \param rollOff Roll-off
-     * \param carrierSpacing Carrier spacing between frames
-     * \param isRandomAccess Is this a RA or DA frame
+     * @brief Configure a frame for a certain superframe id.
+     * @param superFrameId Superframe id (currently always 0)
+     * @param bw Frame bandwidth
+     * @param carrierBw Bandwidth of the carriers within frame
+     * @param rollOff Roll-off
+     * @param carrierSpacing Carrier spacing between frames
+     * @param isRandomAccess Is this a RA or DA frame
      */
     void ConfigureFrame(uint32_t superFrameId,
                         double bw,
@@ -291,13 +286,13 @@ class SimulationHelper : public Object
                         bool isRandomAccess = false);
 
     /**
-     * \brief Configure the default setting for the forward
+     * @brief Configure the default setting for the forward
      * and return link frequencies.
      */
     void ConfigureFrequencyBands();
 
     /**
-     * \brief Configure the beam hopping functionality for
+     * @brief Configure the beam hopping functionality for
      * the FWD link. This includes also setup of the proper
      * frequency configuration related to reuse one in
      * FWD link beam hopping.
@@ -305,58 +300,58 @@ class SimulationHelper : public Object
     void ConfigureFwdLinkBeamHopping();
 
     /**
-     * \brief Enable external fading input.
+     * @brief Enable external fading input.
      */
     void EnableExternalFadingInputTrace();
 
     /**
-     * \brief Enable all output traces
+     * @brief Enable all output traces
      */
     void EnableOutputTraces();
 
     /**
-     * \brief Configure all link budget related attributes
+     * @brief Configure all link budget related attributes
      */
     void ConfigureLinkBudget();
 
     /**
-     * \brief Set simulation error model.
-     * \param em Error model.
-     * \param errorRate Static error rate if constant error model used
+     * @brief Set simulation error model.
+     * @param em Error model.
+     * @param errorRate Static error rate if constant error model used
      */
     void SetErrorModel(SatPhyRxCarrierConf::ErrorModel em, double errorRate = 0.0);
 
     /**
-     * \brief Set simulation interference model.
-     * \param ifModel Interference model.
-     * \param ifEliminationModel Interference elimination model.
-     * \param constantIf Static interference if constant interference model used
-     * \param residualSamplingError Sampling error if residual interference elimination model used
+     * @brief Set simulation interference model.
+     * @param ifModel Interference model.
+     * @param ifEliminationModel Interference elimination model.
+     * @param constantIf Static interference if constant interference model used
+     * @param residualSamplingError Sampling error if residual interference elimination model used
      */
     void SetInterferenceModel(SatPhyRxCarrierConf::InterferenceModel ifModel,
                               double constantIf = 0.0);
 
     /**
-     * \brief Enables simulation progress logging.
+     * @brief Enables simulation progress logging.
      * Progress is logged to stdout in form of 'Progress: (current simulation time)/(simulation
      * length)'.
      */
     void EnableProgressLogs();
 
     /**
-     * \brief Disables simulation progress logs.
+     * @brief Disables simulation progress logs.
      */
     void DisableProgressLogs();
 
     /**
-     * \brief Add default command line arguments for the simulation.
+     * @brief Add default command line arguments for the simulation.
      * This method must be called between creation of the CommandLine helper and CommandLine::Parse
      * () call. \param cmd Reference to CommandLine helper instance
      */
     void AddDefaultUiArguments(CommandLine& cmd);
 
     /**
-     * \brief Add default command line arguments for the simulation.
+     * @brief Add default command line arguments for the simulation.
      * This method must be called between creation of the CommandLine helper and CommandLine::Parse
      * () call. \param cmd Reference to CommandLine helper instance \param xmlInputFile Reference to
      * string containing XML input file name
@@ -364,89 +359,89 @@ class SimulationHelper : public Object
     void AddDefaultUiArguments(CommandLine& cmd, std::string& xmlInputFile);
 
     /**
-     * \brief Run the simulation
+     * @brief Run the simulation
      */
     void RunSimulation();
 
     /**
-     * \brief Load a scenario from data submodule.
+     * @brief Load a scenario from data submodule.
      *
-     * \param name The scenario name. Must be a folder located in data/scenarios
+     * @param name The scenario name. Must be a folder located in data/scenarios
      */
     void LoadScenario(std::string name);
 
     /**
-     * \brief parse scenario folder to load all variables that can be
+     * @brief parse scenario folder to load all variables that can be
      */
     void ParseScenarioFolder();
 
     /**
-     * \brief Create the satellite scenario.
-     * \param scenario Kind of scenario to create, if any
-     * \param mobileUtsFolder Folder from which to load mobile UT traces, if any
-     * \return satHelper Satellite helper, which provides e.g. nodes for application installation.
+     * @brief Create the satellite scenario.
+     * @param scenario Kind of scenario to create, if any
+     * @param mobileUtsFolder Folder from which to load mobile UT traces, if any
+     * @return satHelper Satellite helper, which provides e.g. nodes for application installation.
      */
     Ptr<SatHelper> CreateSatScenario(SatHelper::PreDefinedScenario_t scenario = SatHelper::NONE,
                                      const std::string& mobileUtsFolder = "");
 
     /**
-     * \brief Create stats collectors and set default statistics settings
+     * @brief Create stats collectors and set default statistics settings
      * for both FWD and RTN links.
      */
     void CreateDefaultStats();
 
     /**
-     * \brief Create stats collectors if needed and set default statistics settings
+     * @brief Create stats collectors if needed and set default statistics settings
      * for both FWD link. Adjust this method to your needs.
      */
     void CreateDefaultFwdLinkStats();
 
     /**
-     * \brief Create stats collectors if needed and set default statistics settings
+     * @brief Create stats collectors if needed and set default statistics settings
      * for both RTN link. Adjust this method to your needs.
      */
     void CreateDefaultRtnLinkStats();
 
     /**
-     * \brief Set simulation output tag, which is the basename of the directory where
+     * @brief Set simulation output tag, which is the basename of the directory where
      * output files are stored.
-     * \param tag Simulation tag.
+     * @param tag Simulation tag.
      */
     void SetOutputTag(std::string tag);
 
     /**
-     * \brief Force a output file path to this simulation instead of default
+     * @brief Force a output file path to this simulation instead of default
      * satellite/data/sims/.
-     * \param path Output file path.
+     * @param path Output file path.
      */
     void SetOutputPath(std::string path);
 
     /**
-     * \brief Configure this instance after reading input attributes from XML file
-     * \param filePath full path to an Input XML file
-     * \param overrideManualConfiguration whether or not to read some configuration (beams,
+     * @brief Configure this instance after reading input attributes from XML file
+     * @param filePath full path to an Input XML file
+     * @param overrideManualConfiguration whether or not to read some configuration (beams,
      * UT count per beam, user count per UT, simulation time) from XML file
      */
     void ConfigureAttributesFromFile(std::string filePath, bool overrideManualConfiguration = true);
 
     /**
-     * \brief Read input attributes from XML file
-     * \param filePath full path to an Input XML file
+     * @brief Read input attributes from XML file
+     * @param filePath full path to an Input XML file
      */
     void ReadInputAttributesFromFile(std::string filePath);
 
     /**
-     * \brief Store all used attributes
-     * \param fileName Output filename
-     * \param outputAttributes Whether or not to store
+     * @brief Store all used attributes
+     * @param fileName Output filename
+     * @param outputAttributes Whether or not to store
      *   individual objects attributes to file
-     * \return string Output path
+     * @return string Output path
      */
     std::string StoreAttributesToFile(std::string fileName, bool outputAttributes = false);
 
     /**
-     * \brief Get simulation time
-     * \return errorRate Simulation time
+     * @brief Get simulation time
+     * @return errorRate Simulation time
      */
 
     inline Time& GetSimTime()
@@ -455,32 +450,32 @@ class SimulationHelper : public Object
     }
 
     /**
-     * \brief Set common UT position allocator for all beams.
+     * @brief Set common UT position allocator for all beams.
      * The position allocator is used to draw UT position geocoordinates
      * in order of the beam IDs and number of UTs configured.
      * No validation is done.
-     * \param posAllocator
+     * @param posAllocator
      */
     void SetCommonUtPositionAllocator(Ptr<SatListPositionAllocator> posAllocator);
 
     /**
-     * \brief Set a list position allocator for UTs of a specific beam.
+     * @brief Set a list position allocator for UTs of a specific beam.
      * The position allocator is used to draw UT position geocoordinates
      * when UTs are created for that specific beam-
-     * \param beamId Beam ID
-     * \param posAllocator List of UT positions, *must* match the number of UTs configured
+     * @param beamId Beam ID
+     * @param posAllocator List of UT positions, *must* match the number of UTs configured
      */
     void SetUtPositionAllocatorForBeam(uint32_t beamId, Ptr<SatListPositionAllocator> posAllocator);
 
     /**
-     * \brief Enable reading UT list positions from input file
-     * \param inputFile List postion file path (starting from data/)
-     * \param checkBeam
+     * @brief Enable reading UT list positions from input file
+     * @param inputFile List postion file path (starting from data/)
+     * @param checkBeam
      */
     void EnableUtListPositionsFromInputFile(std::string inputFile, bool checkBeams = true);
 
     /**
-     * \brief If lower layer API access is required, use this to access SatHelper.
+     * @brief If lower layer API access is required, use this to access SatHelper.
      * You MUST have called CreateSatScenario before calling this method.
      */
     inline Ptr<SatHelper> GetSatelliteHelper()
@@ -491,25 +486,25 @@ class SimulationHelper : public Object
     }
 
     /**
-     * \brief Get the statistics container of this helper. If does not exist, one is created.
-     * \return Statistics helper container
+     * @brief Get the statistics container of this helper. If does not exist, one is created.
+     * @return Statistics helper container
      */
     Ptr<SatStatsHelperContainer> GetStatisticsContainer();
 
     /**
-     * \brief Get the traffic helper to create more complex traffics. If does not exist, one is
+     * @brief Get the traffic helper to create more complex traffics. If does not exist, one is
      * created. \return Traffic Helper
      */
     Ptr<SatTrafficHelper> GetTrafficHelper();
 
     /**
-     * \brief Get the group helper. If does not exist, one is created.
-     * \return Group Helper
+     * @brief Get the group helper. If does not exist, one is created.
+     * @return Group Helper
      */
     Ptr<SatGroupHelper> GetGroupHelper();
 
     /**
-     * \brief Get the C/N0 helper to customize C/N0 on some nodes. If does not exist, one is
+     * @brief Get the C/N0 helper to customize C/N0 on some nodes. If does not exist, one is
      * created. \return C/N0 Helper
      */
     Ptr<SatCnoHelper> GetCnoHelper();
@@ -526,27 +521,27 @@ class SimulationHelper : public Object
 
   protected:
     /**
-     * \brief Enable random access
+     * @brief Enable random access
      */
     void EnableRandomAccess();
 
     /**
-     * \brief Callback that prints simulation progress to stdout.
+     * @brief Callback that prints simulation progress to stdout.
      */
     void ProgressCb();
 
     /**
-     * \brief Check if a beam is enabled.
+     * @brief Check if a beam is enabled.
      */
     bool IsBeamEnabled(uint32_t beamId) const;
 
     /**
-     * \brief Get next UT count from internal random variable stream.
+     * @brief Get next UT count from internal random variable stream.
      */
     uint32_t GetNextUtCount(uint32_t beamId = 0) const;
 
     /**
-     * \brief Get next UT user count from internal random variable stream.
+     * @brief Get next UT user count from internal random variable stream.
      */
     inline uint32_t GetNextUtUserCount() const
     {
@@ -555,12 +550,12 @@ class SimulationHelper : public Object
     }
 
     /**
-     * \brief Check if node has a PacketSink installed at certain port.
+     * @brief Check if node has a PacketSink installed at certain port.
      */
     bool HasSinkInstalled(Ptr<Node> node, uint16_t port);
 
     /**
-     * \brief Check if output path has been set. If not, then create a default
+     * @brief Check if output path has been set. If not, then create a default
      * output directory inside satellite/data/sims/campaign-name/tag-name.
      */
     void SetupOutputPath();
@@ -605,19 +600,14 @@ class SimulationHelperConf : public Object
     SimulationHelperConf();
 
     /**
-     * \brief Destructor.
+     * @brief Destructor.
      */
     virtual ~SimulationHelperConf();
 
     /**
-     * \brief Derived from Object.
+     * @brief Derived from Object.
      */
     static TypeId GetTypeId(void);
-
-    /**
-     * \brief Derived from Object.
-     */
-    TypeId GetInstanceTypeId(void) const;
 
     Time m_simTime;
     std::string m_enabledBeams;

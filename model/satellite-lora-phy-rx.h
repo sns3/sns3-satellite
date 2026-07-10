@@ -24,9 +24,9 @@
 #include "satellite-lora-phy-tx.h"
 #include "satellite-phy-rx.h"
 
-#include <ns3/nstime.h>
-#include <ns3/object.h>
-#include <ns3/packet.h>
+#include "ns3/nstime.h"
+#include "ns3/object.h"
+#include "ns3/packet.h"
 
 #include <stdint.h>
 
@@ -34,7 +34,7 @@ namespace ns3
 {
 
 /**
- * \ingroup lorawan
+ * @ingroup lorawan
  *
  * Class adding methods linked to Lora, needed to be used in a satellite context
  */
@@ -83,14 +83,14 @@ class SatLoraPhyRx : public SatPhyRx
     /**
      * Start receiving a packet. Set a few actions then call mother class method.
      *
-     * \param rxParams All the info needed.
+     * @param rxParams All the info needed.
      */
     virtual void StartRx(Ptr<SatSignalParameters> rxParams);
 
     /**
      * Whether this device is transmitting or not.
      *
-     * \returns true if the device is currently transmitting a packet, false
+     * @returns true if the device is currently transmitting a packet, false
      * otherwise.
      */
     bool IsTransmitting(void);
@@ -98,8 +98,8 @@ class SatLoraPhyRx : public SatPhyRx
     /**
      * Whether this device is listening on the specified frequency or not.
      *
-     * \param frequency The frequency to query.
-     * \returns true if the device is listening on that frequency, false
+     * @param frequency The frequency to query.
+     * @returns true if the device is listening on that frequency, false
      * otherwise.
      */
     bool IsOnFrequency(double frequency);
@@ -130,7 +130,7 @@ class SatLoraPhyRx : public SatPhyRx
      * Should a packet be transmitted on a frequency different than that the
      * EndDeviceLoraPhy is listening on, the packet will be discarded.
      *
-     * \param The frequency [MHz] to listen to.
+     * @param The frequency [MHz] to listen to.
      */
     void SetFrequency(double frequencyMHz);
 
@@ -140,7 +140,7 @@ class SatLoraPhyRx : public SatPhyRx
      * The EndDeviceLoraPhy object will not be able to lock on transmissions that
      * use a different SF than the one it's listening for.
      *
-     * \param sf The spreading factor to listen for.
+     * @param sf The spreading factor to listen for.
      */
     void SetSpreadingFactor(uint8_t sf);
 

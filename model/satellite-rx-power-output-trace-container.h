@@ -23,8 +23,8 @@
 #include "satellite-base-trace-container.h"
 #include "satellite-enums.h"
 
-#include <ns3/mac48-address.h>
-#include <ns3/satellite-output-fstream-double-container.h>
+#include "ns3/mac48-address.h"
+#include "ns3/satellite-output-fstream-double-container.h"
 
 #include <map>
 #include <utility>
@@ -34,61 +34,55 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief Class for Rx power output trace container. The class contains
+ * @brief Class for Rx power output trace container. The class contains
  * multiple Rx power output sample traces and provides an interface to them.
  */
 class SatRxPowerOutputTraceContainer : public SatBaseTraceContainer
 {
   public:
     /**
-     * \brief typedef for map key
+     * @brief typedef for map key
      */
     typedef std::pair<Address, SatEnums::ChannelType_t> key_t;
 
     /**
-     * \brief typedef for map of containers
+     * @brief typedef for map of containers
      */
     typedef std::map<key_t, Ptr<SatOutputFileStreamDoubleContainer>> container_t;
 
     /**
-     * \brief Constructor
+     * @brief Constructor
      */
     SatRxPowerOutputTraceContainer();
 
     /**
-     * \brief Destructor
+     * @brief Destructor
      */
     ~SatRxPowerOutputTraceContainer();
 
     /**
-     * \brief NS-3 type id function
-     * \return type id
+     * @brief NS-3 type id function
+     * @return type id
      */
     static TypeId GetTypeId(void);
 
     /**
-     * \brief NS-3 instance type id function
-     * \return Instance type is
-     */
-    TypeId GetInstanceTypeId(void) const;
-
-    /**
-     *  \brief Do needed dispose actions.
+     *  @brief Do needed dispose actions.
      */
     void DoDispose();
 
     /**
-     * \brief Add the vector containing the values to container matching the key
-     * \param key key
-     * \param newItem vector of values
+     * @brief Add the vector containing the values to container matching the key
+     * @param key key
+     * @param newItem vector of values
      */
     void AddToContainer(key_t key, std::vector<double> newItem);
 
     /**
      * Function for enabling / disabling figure output
-     * \param enableFigureOutput
+     * @param enableFigureOutput
      */
     void EnableFigureOutput(bool enableFigureOutput)
     {
@@ -96,38 +90,38 @@ class SatRxPowerOutputTraceContainer : public SatBaseTraceContainer
     }
 
     /**
-     * \brief Function for resetting the variables
+     * @brief Function for resetting the variables
      */
     void Reset();
 
   private:
     /**
-     * \brief Function for adding the node to the map
-     * \param key key
-     * \return pointer to the added container
+     * @brief Function for adding the node to the map
+     * @param key key
+     * @return pointer to the added container
      */
     Ptr<SatOutputFileStreamDoubleContainer> AddNode(
         std::pair<Address, SatEnums::ChannelType_t> key);
 
     /**
-     * \brief Function for finding the container matching the key
-     * \param key key
-     * \return matching container
+     * @brief Function for finding the container matching the key
+     * @param key key
+     * @return matching container
      */
     Ptr<SatOutputFileStreamDoubleContainer> FindNode(key_t key);
 
     /**
-     * \brief Write the contents of a container matching to the key into a file
+     * @brief Write the contents of a container matching to the key into a file
      */
     void WriteToFile();
 
     /**
-     * \brief Map for containers
+     * @brief Map for containers
      */
     container_t m_container;
 
     /**
-     * \brief Switch for figure output
+     * @brief Switch for figure output
      */
     bool m_enableFigureOutput;
 };

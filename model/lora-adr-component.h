@@ -26,8 +26,8 @@
 #include "lora-network-controller-components.h"
 #include "lora-network-status.h"
 
-#include <ns3/object.h>
-#include <ns3/packet.h>
+#include "ns3/object.h"
+#include "ns3/packet.h"
 
 #include <stdint.h>
 

@@ -21,18 +21,18 @@
 
 #include "satellite-stats-capacity-request-helper.h"
 
-#include <ns3/data-collection-object.h>
-#include <ns3/fatal-error.h>
-#include <ns3/log.h>
-#include <ns3/multi-file-aggregator.h>
-#include <ns3/node-container.h>
-#include <ns3/satellite-helper.h>
-#include <ns3/satellite-net-device.h>
-#include <ns3/satellite-request-manager.h>
-#include <ns3/satellite-topology.h>
-#include <ns3/satellite-ut-llc.h>
-#include <ns3/singleton.h>
-#include <ns3/string.h>
+#include "ns3/data-collection-object.h"
+#include "ns3/fatal-error.h"
+#include "ns3/log.h"
+#include "ns3/multi-file-aggregator.h"
+#include "ns3/node-container.h"
+#include "ns3/satellite-helper.h"
+#include "ns3/satellite-net-device.h"
+#include "ns3/satellite-request-manager.h"
+#include "ns3/satellite-topology.h"
+#include "ns3/satellite-ut-llc.h"
+#include "ns3/singleton.h"
+#include "ns3/string.h"
 
 #include <sstream>
 #include <string>
@@ -129,8 +129,7 @@ SatStatsCapacityRequestHelper::DoInstall()
 
         const bool ret = requestManager->TraceConnect("CrTraceLog", context.str(), aggregatorSink);
         NS_ASSERT_MSG(ret, "Error connecting to CrTraceLog of node " << (*it)->GetId());
-        NS_LOG_INFO(this << " successfully connected"
-                         << " with node ID " << (*it)->GetId());
+        NS_LOG_INFO(this << " successfully connected" << " with node ID " << (*it)->GetId());
 
     } // end of `for (NodeContainer::Iterator it = uts.Begin () -> uts.End ())`
 

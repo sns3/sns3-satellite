@@ -30,10 +30,10 @@
 using namespace ns3;
 
 /**
- * \file sat-cbr-example.cc
- * \ingroup satellite
+ * @file sat-cbr-example.cc
+ * @ingroup satellite
  *
- * \brief  Cbr example application to use satellite network.
+ * @brief  Cbr example application to use satellite network.
  *          Interval, packet size and test scenario can be given
  *         in command line as user argument.
  *         To see help for user arguments:

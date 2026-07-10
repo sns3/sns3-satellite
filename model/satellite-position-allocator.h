@@ -25,9 +25,9 @@
 #include "geo-coordinate.h"
 #include "satellite-antenna-gain-pattern-container.h"
 
-#include <ns3/object.h>
-#include <ns3/position-allocator.h>
-#include <ns3/random-variable-stream.h>
+#include "ns3/object.h"
+#include "ns3/position-allocator.h"
+#include "ns3/random-variable-stream.h"
 
 #include <stdint.h>
 #include <vector>
@@ -36,8 +36,8 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief Allocate a set of satellite positions. The allocation strategy is implemented in
+ * @ingroup satellite
+ * @brief Allocate a set of satellite positions. The allocation strategy is implemented in
  * inherited classes.
  *
  * This is a pure abstract base class.
@@ -46,8 +46,8 @@ class SatPositionAllocator : public PositionAllocator
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
 
@@ -62,8 +62,8 @@ class SatPositionAllocator : public PositionAllocator
     virtual ~SatPositionAllocator();
 
     /**
-     * \brief Get next position
-     * \return The next chosen position.
+     * @brief Get next position
+     * @return The next chosen position.
      */
     virtual GeoCoordinate GetNextGeoPosition(uint32_t satId = 0) const = 0;
 
@@ -82,8 +82,8 @@ class SatPositionAllocator : public PositionAllocator
 };
 
 /**
- * \ingroup satellite
- * \brief Allocate positions from a deterministic list specified by the user.
+ * @ingroup satellite
+ * @brief Allocate positions from a deterministic list specified by the user.
  *
  * The first call to SatListPositionAllocator::GetNext  will return the
  * first element of the list, the second call, the second element, and so on.
@@ -92,8 +92,8 @@ class SatListPositionAllocator : public SatPositionAllocator
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
 
@@ -103,15 +103,15 @@ class SatListPositionAllocator : public SatPositionAllocator
     SatListPositionAllocator();
 
     /**
-     * \param coordinate the position to append at the end of the list of positions to return from
+     * @param coordinate the position to append at the end of the list of positions to return from
      * GetNext.
      */
     void Add(GeoCoordinate coordinate);
 
     /**
-     * \brief Get next position
-     * \param satId ID of satellite
-     * \return The next chosen position.
+     * @brief Get next position
+     * @param satId ID of satellite
+     * @return The next chosen position.
      */
     virtual GeoCoordinate GetNextGeoPosition(uint32_t satId = 0) const;
 
@@ -131,16 +131,16 @@ class SatListPositionAllocator : public SatPositionAllocator
 };
 
 /**
- * \ingroup satellite
- * \brief Allocate random positions within a 3D box according to a set of three random variables
+ * @ingroup satellite
+ * @brief Allocate random positions within a 3D box according to a set of three random variables
  * (longitude, latitude, altitude).
  */
 class SatRandomBoxPositionAllocator : public SatPositionAllocator
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
 
@@ -159,8 +159,8 @@ class SatRandomBoxPositionAllocator : public SatPositionAllocator
     void SetAltitude(Ptr<RandomVariableStream> altitude);
 
     /**
-     * \brief Get next position
-     * \return The next chosen position.
+     * @brief Get next position
+     * @return The next chosen position.
      */
     virtual GeoCoordinate GetNextGeoPosition(uint32_t satId = 0) const;
     virtual int64_t AssignStreams(int64_t stream);
@@ -172,15 +172,15 @@ class SatRandomBoxPositionAllocator : public SatPositionAllocator
 };
 
 /**
- * \ingroup satellite
- * \brief Allocate random positions within a circle (center and radius), uniformly distributed
+ * @ingroup satellite
+ * @brief Allocate random positions within a circle (center and radius), uniformly distributed
  */
 class SatRandomCirclePositionAllocator : public SatPositionAllocator
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
 
@@ -191,8 +191,8 @@ class SatRandomCirclePositionAllocator : public SatPositionAllocator
 
     /**
      * Constructor with parameters.
-     * \param center Center of the circle
-     * \param radius Radius in meters
+     * @param center Center of the circle
+     * @param radius Radius in meters
      */
     SatRandomCirclePositionAllocator(GeoCoordinate center, uint32_t radius);
 
@@ -205,8 +205,8 @@ class SatRandomCirclePositionAllocator : public SatPositionAllocator
     void SetRadius(uint32_t radius);
 
     /**
-     * \brief Get next position
-     * \return The next chosen position.
+     * @brief Get next position
+     * @return The next chosen position.
      */
     virtual GeoCoordinate GetNextGeoPosition(uint32_t satId = 0) const;
     virtual int64_t AssignStreams(int64_t stream);
@@ -218,15 +218,15 @@ class SatRandomCirclePositionAllocator : public SatPositionAllocator
 };
 
 /**
- * \ingroup satellite
- * \brief Allocate random positions within the area of a certain spot-beam.
+ * @ingroup satellite
+ * @brief Allocate random positions within the area of a certain spot-beam.
  */
 class SatSpotBeamPositionAllocator : public SatPositionAllocator
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
 
@@ -237,9 +237,9 @@ class SatSpotBeamPositionAllocator : public SatPositionAllocator
 
     /**
      * SatSpotBeamPositionAllocator constructor
-     * \param beamId Beam id to which we are placing an UT
-     * \param patternContainer Container holding the antenna patterns
-     * \param geoPos GEO coordinate of the satellite for elevation angle calculations
+     * @param beamId Beam id to which we are placing an UT
+     * @param patternContainer Container holding the antenna patterns
+     * @param geoPos GEO coordinate of the satellite for elevation angle calculations
      */
     SatSpotBeamPositionAllocator(uint32_t beamId,
                                  Ptr<SatAntennaGainPatternContainer> patternContainer,
@@ -253,8 +253,8 @@ class SatSpotBeamPositionAllocator : public SatPositionAllocator
     void SetAltitude(Ptr<RandomVariableStream> altitude);
 
     /**
-     * \brief Get next position
-     * \return The next chosen position.
+     * @brief Get next position
+     * @return The next chosen position.
      */
     virtual GeoCoordinate GetNextGeoPosition(uint32_t satId) const;
     virtual int64_t AssignStreams(int64_t stream);

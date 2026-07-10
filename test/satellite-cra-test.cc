@@ -19,9 +19,9 @@
  */
 
 /**
- * \file satellite-cra-test.cc
- * \ingroup satellite
- * \brief CRA test case implementations.
+ * @file satellite-cra-test.cc
+ * @ingroup satellite
+ * @brief CRA test case implementations.
  *
  * In this module implements the CRA Test Cases
  * defined in TN6.
@@ -45,8 +45,8 @@
 using namespace ns3;
 
 /**
- * \ingroup satellite
- * \brief 'CRA, test 1' test case implementation.
+ * @ingroup satellite
+ * @brief 'CRA, test 1' test case implementation.
  *
  * This case tests successful transmission of UDP packets from UT connected user
  * to GW connected user in simple scenario and using CRA only.
@@ -88,8 +88,8 @@ void
 SatCraTest1::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-cra", "", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-cra", "", true);
 
     // Create simple scenario
 
@@ -129,7 +129,7 @@ SatCraTest1::DoRun(void)
 
     // Creating the reference system.
     Ptr<SatHelper> helper = CreateObject<SatHelper>(
-        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E");
+        SatEnvVariables::GetInstance()->LocateDataDirectory() + "/scenarios/geo-33E");
     helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
     // >>> Start of actual test using Simple scenario >>>
@@ -169,7 +169,7 @@ SatCraTest1::DoRun(void)
     NS_TEST_ASSERT_MSG_NE(sender->GetSent(), (uint32_t)0, "Nothing sent !");
     NS_TEST_ASSERT_MSG_EQ(receiver->GetTotalRx(), sender->GetSent(), "Packets were lost !");
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 
     // <<< End of actual test using Simple scenario <<<
 }

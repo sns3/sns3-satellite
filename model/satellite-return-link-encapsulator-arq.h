@@ -26,8 +26,8 @@
 #include "satellite-control-message.h"
 #include "satellite-return-link-encapsulator.h"
 
-#include <ns3/event-id.h>
-#include <ns3/mac48-address.h>
+#include "ns3/event-id.h"
+#include "ns3/mac48-address.h"
 
 #include <map>
 #include <stdint.h>
@@ -36,9 +36,9 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief SatReturnLinkEncapsulatorArq class is inherited from the
+ * @brief SatReturnLinkEncapsulatorArq class is inherited from the
  * SatReturnLinkEncapsulator class, which is used in RTN link for
  * encapsulation and fragmentation of higher layer packets. This class
  * implements the ARQ retransmission logic in both transmission and
@@ -60,12 +60,12 @@ class SatReturnLinkEncapsulatorArq : public SatReturnLinkEncapsulator
 
     /**
      * Constructor
-     * \param encapAddress MAC addressd of encapsulator
-     * \param decapAddress MAC addressd of decapsulator
-     * \param sourceE2EAddress E2E source MAC addressd of packets (used to set SatAddressE2ETag)
-     * \param destE2EAddress E2E destination MAC addressd of packets (used to set SatAddressE2ETag)
-     * \param rcIndex RC index
-     * \param additionalHeaderSize Additional value in to take into account when pulling packets to
+     * @param encapAddress MAC addressd of encapsulator
+     * @param decapAddress MAC addressd of decapsulator
+     * @param sourceE2EAddress E2E source MAC addressd of packets (used to set SatAddressE2ETag)
+     * @param destE2EAddress E2E destination MAC addressd of packets (used to set SatAddressE2ETag)
+     * @param rcIndex RC index
+     * @param additionalHeaderSize Additional value in to take into account when pulling packets to
      * represent E2E tags
      */
     SatReturnLinkEncapsulatorArq(Mac48Address encapAddress,
@@ -76,16 +76,25 @@ class SatReturnLinkEncapsulatorArq : public SatReturnLinkEncapsulator
                                  uint32_t additionalHeaderSize = 0);
 
     /**
+     * Notifier called once the ObjectBase is fully constructed.
+     *
+     * This method is invoked once all member attributes have been
+     * initialized. Subclasses can override this method to be notified
+     * of this event but if they do this, they must chain up to their
+     * parent's NotifyConstructionCompleted method.
+     */
+    virtual void NotifyConstructionCompleted() override;
+
+    /**
      * Destructor for SatReturnLinkEncapsulatorArq
      */
     virtual ~SatReturnLinkEncapsulatorArq();
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
-    TypeId GetInstanceTypeId(void) const;
 
     /**
      * Dispose of this class instance
@@ -93,72 +102,72 @@ class SatReturnLinkEncapsulatorArq : public SatReturnLinkEncapsulator
     virtual void DoDispose();
 
     /**
-     * \brief Notify a Tx opportunity to this encapsulator.
-     * \param bytes Notified tx opportunity bytes from lower layer
-     * \param &bytesLeft Bytes left after this TxOpportunity in txBuffer
-     * \param &nextMinTxO Minimum TxO after this TxO
-     * \return A RLE PDU pointer
+     * @brief Notify a Tx opportunity to this encapsulator.
+     * @param bytes Notified tx opportunity bytes from lower layer
+     * @param &bytesLeft Bytes left after this TxOpportunity in txBuffer
+     * @param &nextMinTxO Minimum TxO after this TxO
+     * @return A RLE PDU pointer
      */
     virtual Ptr<Packet> NotifyTxOpportunity(uint32_t bytes,
                                             uint32_t& bytesLeft,
                                             uint32_t& nextMinTxO);
 
     /**
-     * \brief Receive a packet, thus decapsulate and defragment/deconcatenate
+     * @brief Receive a packet, thus decapsulate and defragment/deconcatenate
      * if needed. The decapsuled/defragmented HL PDU is forwarded back to
      * LLC and to upper layer.
-     * \param p packet pointer received from lower layer
+     * @param p packet pointer received from lower layer
      */
     virtual void ReceivePdu(Ptr<Packet> p);
 
     /**
-     * \brief Receive a control message (ARQ ACK)
-     * \param ack ACK control message pointer received from lower layer
+     * @brief Receive a control message (ARQ ACK)
+     * @param ack ACK control message pointer received from lower layer
      */
     virtual void ReceiveAck(Ptr<SatArqAckMessage> ack);
 
     /**
-     * \brief Get the buffered packets for this encapsulator
-     * \return uint32_t buffered bytes
+     * @brief Get the buffered packets for this encapsulator
+     * @return uint32_t buffered bytes
      */
     virtual uint32_t GetTxBufferSizeInBytes() const;
 
   private:
     /**
-     * \brief ARQ Tx timer has expired. The PDU will be flushed, if the maximum
+     * @brief ARQ Tx timer has expired. The PDU will be flushed, if the maximum
      * retransmissions has been reached. Otherwise the packet will be resent.
-     * \param seqNo Sequence number
+     * @param seqNo Sequence number
      */
     void ArqReTxTimerExpired(uint8_t seqNo);
 
     /**
-     * \brief Clean-up a certain sequence number
-     * \param sequenceNumber Sequence number
+     * @brief Clean-up a certain sequence number
+     * @param sequenceNumber Sequence number
      */
     void CleanUp(uint8_t sequenceNumber);
 
     /**
-     * \brief Convert the 8-bit sequence number value from ARQ header into
+     * @brief Convert the 8-bit sequence number value from ARQ header into
      * 32-bit continuous sequence number stream at the receiver.
-     * \param seqNo 8-bit sequence number
-     * \return 32-bit sequence number
+     * @param seqNo 8-bit sequence number
+     * @return 32-bit sequence number
      */
     uint32_t ConvertSeqNo(uint8_t seqNo) const;
 
     /**
-     * \brief Reassemble and receive the received PDUs if possible
+     * @brief Reassemble and receive the received PDUs if possible
      */
     void ReassembleAndReceive();
 
     /**
-     * \brief Rx waiting timer for a PDU has expired
-     * \param sn Sequence number
+     * @brief Rx waiting timer for a PDU has expired
+     * @param sn Sequence number
      */
     void RxWaitingTimerExpired(uint32_t sn);
 
     /**
-     * \brief Send ACK for a given sequence number
-     * \param seqNo Sequence number
+     * @brief Send ACK for a given sequence number
+     * @param seqNo Sequence number
      */
     void SendAck(uint8_t seqNo) const;
 

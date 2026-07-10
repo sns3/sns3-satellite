@@ -24,8 +24,8 @@
 
 #include "satellite-stats-helper.h"
 
-#include <ns3/collector-map.h>
-#include <ns3/ptr.h>
+#include "ns3/collector-map.h"
+#include "ns3/ptr.h"
 
 #include <list>
 #include <map>
@@ -38,8 +38,8 @@ class SatHelper;
 class DataCollectionObject;
 
 /**
- * \ingroup satstats
- * \brief
+ * @ingroup satstats
+ * @brief
  */
 class SatStatsResourcesGrantedHelper : public SatStatsHelper
 {
@@ -60,7 +60,7 @@ class SatStatsResourcesGrantedHelper : public SatStatsHelper
     /**
      * Change identifier used on probes, when handovers occur.
      */
-    template <typename R, typename C, typename P>
+    // template <typename R, typename C, typename P>
     void UpdateIdentifierOnProbes();
 
   protected:
@@ -69,8 +69,8 @@ class SatStatsResourcesGrantedHelper : public SatStatsHelper
 
   private:
     /**
-     * \param utNode
-     * \param collectorTraceSink
+     * @param utNode
+     * @param collectorTraceSink
      */
     template <typename R, typename C, typename P>
     void InstallProbe(Ptr<Node> utNode, R (C::*collectorTraceSink)(P, P));

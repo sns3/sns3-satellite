@@ -22,16 +22,16 @@
 #ifndef SATELLITE_UT_MAC_STATE_H
 #define SATELLITE_UT_MAC_STATE_H
 
-#include <ns3/nstime.h>
-#include <ns3/object.h>
-#include <ns3/simulator.h>
+#include "ns3/nstime.h"
+#include "ns3/object.h"
+#include "ns3/simulator.h"
 
 namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief Class handling UT Mac states and transitions.
+ * @ingroup satellite
+ * @brief Class handling UT Mac states and transitions.
  *
  */
 class SatUtMacState : public Object
@@ -51,10 +51,6 @@ class SatUtMacState : public Object
      * Derived from Object
      */
     static TypeId GetTypeId(void);
-    /**
-     * Derived from Object
-     */
-    virtual TypeId GetInstanceTypeId(void) const;
 
     /**
      * Default constructor, which is not used.
@@ -81,7 +77,7 @@ class SatUtMacState : public Object
     /**
      * Get the current state.
      *
-     * \return The current state.
+     * @return The current state.
      */
     RcstState_t GetState() const;
 
@@ -127,7 +123,7 @@ class SatUtMacState : public Object
 
     /**
      * Check if NCR m_ncrSyncTimeout has been reached.
-     * \return true if Now () > m_lastNcrDateReceived + m_ncrSyncTimeout
+     * @return true if Now () > m_lastNcrDateReceived + m_ncrSyncTimeout
      */
     bool IsNcrTimeout() const;
 

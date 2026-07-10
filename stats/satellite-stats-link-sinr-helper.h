@@ -24,9 +24,9 @@
 
 #include "satellite-stats-helper.h"
 
-#include <ns3/callback.h>
-#include <ns3/collector-map.h>
-#include <ns3/ptr.h>
+#include "ns3/callback.h"
+#include "ns3/collector-map.h"
+#include "ns3/ptr.h"
 
 namespace ns3
 {
@@ -39,8 +39,8 @@ class DataCollectionObject;
 class DistributionCollector;
 
 /**
- * \ingroup satstats
- * \brief Base class for link SINR statistics helpers.
+ * @ingroup satstats
+ * @brief Base class for link SINR statistics helpers.
  */
 class SatStatsLinkSinrHelper : public SatStatsHelper
 {
@@ -59,25 +59,25 @@ class SatStatsLinkSinrHelper : public SatStatsHelper
     static TypeId GetTypeId();
 
     /**
-     * \param averagingMode average all samples before passing them to aggregator.
+     * @param averagingMode average all samples before passing them to aggregator.
      */
     void SetAveragingMode(bool averagingMode);
 
     /**
-     * \brief Set up several probes or other means of listeners and connect them
+     * @brief Set up several probes or other means of listeners and connect them
      *        to the collectors.
      */
     void InstallProbes();
 
     /**
-     * \brief Receive inputs from trace sources and forward them to the collector.
-     * \param sinrDb SINR value in dB.
-     * \param addr Address of UT
+     * @brief Receive inputs from trace sources and forward them to the collector.
+     * @param sinrDb SINR value in dB.
+     * @param addr Address of UT
      */
     void SinrCallback(double sinrDb, const Address& addr);
 
     /**
-     * \return
+     * @return
      */
     Callback<void, double, const Address&> GetTraceSinkCallback() const;
 
@@ -86,22 +86,22 @@ class SatStatsLinkSinrHelper : public SatStatsHelper
     void DoInstall();
 
     /**
-     * \brief
+     * @brief
      */
     virtual void DoInstallProbes() = 0;
 
     /**
-     * \brief Connect the probe to the right collector.
-     * \param probe
-     * \param identifier
+     * @brief Connect the probe to the right collector.
+     * @param probe
+     * @param identifier
      */
     bool ConnectProbeToCollector(Ptr<Probe> probe, uint32_t identifier);
 
     /**
-     * \brief Find a collector with the right identifier and pass a sample data
+     * @brief Find a collector with the right identifier and pass a sample data
      *        to it.
-     * \param sinrDb
-     * \param identifier
+     * @param sinrDb
+     * @param identifier
      */
     void PassSampleToCollector(double sinrDb, uint32_t identifier);
 
@@ -128,20 +128,20 @@ class SatStatsLinkSinrHelper : public SatStatsHelper
 // FORWARD FEEDER LINK ////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce forward feeder link SINR statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce forward feeder link SINR statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFwdFeederLinkSinrHelper> s = Create<SatStatsFwdFeederLinkSinrHelper> (satHelper);
  * s->SetName ("name");
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFwdFeederLinkSinrHelper : public SatStatsLinkSinrHelper
 {
@@ -168,20 +168,20 @@ class SatStatsFwdFeederLinkSinrHelper : public SatStatsLinkSinrHelper
 // FORWARD USER LINK //////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce forward user link SINR statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce forward user link SINR statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFwdUserLinkSinrHelper> s = Create<SatStatsFwdUserLinkSinrHelper> (satHelper);
  * s->SetName ("name");
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFwdUserLinkSinrHelper : public SatStatsLinkSinrHelper
 {
@@ -208,20 +208,20 @@ class SatStatsFwdUserLinkSinrHelper : public SatStatsLinkSinrHelper
 // RETURN FEEDER LINK /////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce return feeder link SINR statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce return feeder link SINR statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnFeederLinkSinrHelper> s = Create<SatStatsRtnFeederLinkSinrHelper> (satHelper);
  * s->SetName ("name");
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsRtnFeederLinkSinrHelper : public SatStatsLinkSinrHelper
 {
@@ -248,20 +248,20 @@ class SatStatsRtnFeederLinkSinrHelper : public SatStatsLinkSinrHelper
 // RETURN USER LINK ///////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce return user link SINR statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce return user link SINR statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnUserLinkSinrHelper> s = Create<SatStatsRtnUserLinkSinrHelper> (satHelper);
  * s->SetName ("name");
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsRtnUserLinkSinrHelper : public SatStatsLinkSinrHelper
 {

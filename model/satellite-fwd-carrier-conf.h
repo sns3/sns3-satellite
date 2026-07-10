@@ -21,14 +21,14 @@
 #ifndef SATELLITE_FWD_CARRIER_CONF_H
 #define SATELLITE_FWD_CARRIER_CONF_H
 
-#include <ns3/simple-ref-count.h>
+#include "ns3/simple-ref-count.h"
 
 namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief This class implements configuration for forward link carrier .
+ * @ingroup satellite
+ * @brief This class implements configuration for forward link carrier .
  */
 
 class SatFwdCarrierConf : public SimpleRefCount<SatFwdCarrierConf>
@@ -42,9 +42,9 @@ class SatFwdCarrierConf : public SimpleRefCount<SatFwdCarrierConf>
     /**
      * Constructor for SatFwdCarrierConf
      *
-     * \param bandwidthInHz     Allocated bandwidth of Forward Link Carrier in hertz
-     * \param rollOff           Roll-off factor
-     * \param spacing           Spacing factor
+     * @param bandwidthInHz     Allocated bandwidth of Forward Link Carrier in hertz
+     * @param rollOff           Roll-off factor
+     * @param spacing           Spacing factor
      */
     SatFwdCarrierConf(double bandwidthInHz, double rollOff, double spacing);
 
@@ -56,7 +56,7 @@ class SatFwdCarrierConf : public SimpleRefCount<SatFwdCarrierConf>
     /**
      * Get bandwidth of Forward Link Carrier.
      *
-     * \return The bandwidth of Forward Link Carrier in hertz.
+     * @return The bandwidth of Forward Link Carrier in hertz.
      */
     inline double GetAllocatedBandwidthInHz() const
     {
@@ -66,7 +66,7 @@ class SatFwdCarrierConf : public SimpleRefCount<SatFwdCarrierConf>
     /**
      * Get occupied bandwidth of Forward Link Carrier.
      *
-     * \return The occupied bandwidth of Forward Link Carrier in hertz.
+     * @return The occupied bandwidth of Forward Link Carrier in hertz.
      */
     inline double GetOccupiedBandwidthInHz() const
     {
@@ -76,7 +76,7 @@ class SatFwdCarrierConf : public SimpleRefCount<SatFwdCarrierConf>
     /**
      * Get occupied bandwidth of Forward Link Carrier.
      *
-     * \return The occupied bandwidth of Forward Link Carrier in hertz.
+     * @return The occupied bandwidth of Forward Link Carrier in hertz.
      */
     inline double GetEffectiveBandwidthInHz() const
     {

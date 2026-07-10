@@ -22,8 +22,8 @@
 
 #include "lora-tag.h"
 
-#include <ns3/tag.h>
-#include <ns3/uinteger.h>
+#include "ns3/tag.h"
+#include "ns3/uinteger.h"
 
 #include <ostream>
 

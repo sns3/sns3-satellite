@@ -43,7 +43,7 @@ class NetDevice;
 class Node;
 
 /**
- * \brief Build a set of user nodes and links channels between user nodes and satellite nodes.
+ * @brief Build a set of user nodes and links channels between user nodes and satellite nodes.
  *
  */
 class SatUserHelper : public Object
@@ -69,10 +69,6 @@ class SatUserHelper : public Object
     static TypeId GetTypeId(void);
 
     /**
-     * Derived from Object
-     */
-    TypeId GetInstanceTypeId(void) const;
-    /**
      * Create a SatUserHelper to make life easier when creating Users and their connections to
      * satellite network.
      */
@@ -80,18 +76,18 @@ class SatUserHelper : public Object
     virtual ~SatUserHelper();
 
     /**
-     * \brief Set the type and the attribute values to be associated with each
+     * @brief Set the type and the attribute values to be associated with each
      * Queue object in each CsmaNetDevice created by the helper.
      *
-     * \param type the type of queue
-     * \param name1 the name of the attribute to set on the queue
-     * \param value1 the value of the attribute to set on the queue
-     * \param name2 the name of the attribute to set on the queue
-     * \param value2 the value of the attribute to set on the queue
-     * \param name3 the name of the attribute to set on the queue
-     * \param value3 the value of the attribute to set on the queue
-     * \param name4 the name of the attribute to set on the queue
-     * \param value4 the value of the attribute to set on the queue
+     * @param type the type of queue
+     * @param name1 the name of the attribute to set on the queue
+     * @param value1 the value of the attribute to set on the queue
+     * @param name2 the name of the attribute to set on the queue
+     * @param value2 the value of the attribute to set on the queue
+     * @param name3 the name of the attribute to set on the queue
+     * @param value3 the value of the attribute to set on the queue
+     * @param name4 the name of the attribute to set on the queue
+     * @param value4 the value of the attribute to set on the queue
      *
      * Set these attributes on each ns3::Queue created
      * by SatUserHelper::Install().
@@ -107,11 +103,11 @@ class SatUserHelper : public Object
                       const AttributeValue& value4 = EmptyAttributeValue());
 
     /**
-     * \brief Set an attribute value to be propagated to each CsmaNetDevice
+     * @brief Set an attribute value to be propagated to each CsmaNetDevice
      * object created by the helper.
      *
-     * \param name the name of the attribute to set
-     * \param value the value of the attribute to set
+     * @param name the name of the attribute to set
+     * @param value the value of the attribute to set
      *
      * Set these attributes on each ns3::CsmaNetDevice created
      * by SatUserHelper::Install().
@@ -119,11 +115,11 @@ class SatUserHelper : public Object
     void SetCsmaDeviceAttribute(std::string name, const AttributeValue& value);
 
     /**
-     * \brief Set an attribute value to be propagated to each CsmaChannel object
+     * @brief Set an attribute value to be propagated to each CsmaChannel object
      * created by the helper.
      *
-     * \param name the name of the attribute to set
-     * \param value the value of the attribute to set
+     * @param name the name of the attribute to set
+     * @param value the value of the attribute to set
      *
      * Set these attribute on each ns3::CsmaChannel created
      * by SatUserHelper::Install().
@@ -131,13 +127,13 @@ class SatUserHelper : public Object
     void SetCsmaChannelAttribute(std::string name, const AttributeValue& value);
 
     /**
-     * \param network The Ipv4Address containing the initial network number to
+     * @param network The Ipv4Address containing the initial network number to
      * use for satellite network allocation. The bits outside the network mask are not used.
      *
-     * \param mask The Ipv4Mask containing one bits in each bit position of the
+     * @param mask The Ipv4Mask containing one bits in each bit position of the
      * network number.
      *
-     * \param base An optional Ipv4Address containing the initial address used for
+     * @param base An optional Ipv4Address containing the initial address used for
      * IP address allocation.  Will be combined (ORed) with the network number to
      * generate the first IP address.  Defaults to 0.0.0.1.
      */
@@ -146,13 +142,13 @@ class SatUserHelper : public Object
                           Ipv4Address base = "0.0.0.1");
 
     /**
-     * \param network The Ipv4Address containing the initial network number to
+     * @param network The Ipv4Address containing the initial network number to
      * use for satellite network allocation. The bits outside the network mask are not used.
      *
-     * \param mask The Ipv4Mask containing one bits in each bit position of the
+     * @param mask The Ipv4Mask containing one bits in each bit position of the
      * network number.
      *
-     * \param base An optional Ipv4Address containing the initial address used for
+     * @param base An optional Ipv4Address containing the initial address used for
      * IP address allocation.  Will be combined (ORed) with the network number to
      * generate the first IP address.  Defaults to 0.0.0.1.
      */
@@ -161,13 +157,13 @@ class SatUserHelper : public Object
                           Ipv4Address base = "0.0.0.1");
 
     /**
-     * \param network The Ipv4Address containing the initial network number to
+     * @param network The Ipv4Address containing the initial network number to
      * use for satellite network allocation. The bits outside the network mask are not used.
      *
-     * \param mask The Ipv4Mask containing one bits in each bit position of the
+     * @param mask The Ipv4Mask containing one bits in each bit position of the
      * network number.
      *
-     * \param base An optional Ipv4Address containing the initial address used for
+     * @param base An optional Ipv4Address containing the initial address used for
      * IP address allocation.  Will be combined (ORed) with the network number to
      * generate the first IP address.  Defaults to 0.0.0.1.
      */
@@ -176,33 +172,33 @@ class SatUserHelper : public Object
                             Ipv4Address base = "0.0.0.1");
 
     /**
-     * \param ut a set of UT nodes
-     * \param users number of users to install for every UT
+     * @param ut a set of UT nodes
+     * @param users number of users to install for every UT
      *
      * This method creates users with the requested attributes
      * to satellite network and add csma netdevice on them and csma channel between UTs/GW and their
      * users.
      *
-     * \return  node container of created users for the UT.
+     * @return  node container of created users for the UT.
      *
      */
     NodeContainer InstallUt(NodeContainer ut, uint32_t users);
 
     /**
-     * \param ut a UT node
-     * \param users number of users to install for the UT
+     * @param ut a UT node
+     * @param users number of users to install for the UT
      *
      * This method creates users with the requested attributes
      * to satellite network and add csma netdevice on them and csma channel between UT/GW and their
      * users.
      *
-     * \return  node container of created users for the UTs.
+     * @return  node container of created users for the UTs.
      *
      */
     NodeContainer InstallUt(Ptr<Node> ut, uint32_t users);
 
     /**
-     * \param users number of users to install for GWs. If gw has more than one GWs then
+     * @param users number of users to install for GWs. If gw has more than one GWs then
      * IP router is added between GWs and users.
      *
      * This method creates users with the requested attributes
@@ -216,37 +212,37 @@ class SatUserHelper : public Object
     /**
      * Check if node is GW user or not.
      *
-     * \param node Pointer to node checked if it is GW user or not
-     * \return true when requested node is GW user node, false in other case.
+     * @param node Pointer to node checked if it is GW user or not
+     * @return true when requested node is GW user node, false in other case.
      */
     bool IsGwUser(Ptr<Node> node) const;
 
     /**
      * Enables creation traces to be written in given file
      *
-     * \param stream  stream for creation trace outputs
-     * \param cb  callback to connect traces
+     * @param stream  stream for creation trace outputs
+     * @param cb  callback to connect traces
      */
     void EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase& cb);
 
     /**
      * Get router information.
      *
-     * \return Information of router used between GWs and users.
+     * @return Information of router used between GWs and users.
      */
     std::string GetRouterInfo() const;
 
     /**
-     * \return pointer to the router.
+     * @return pointer to the router.
      */
     Ptr<Node> GetRouter() const;
 
     /**
      * Set needed routings of satellite network and fill ARP cache for the network.
-     * \param ut    container having UTs of the beam
-     * \param utNd  container having UT netdevices of the beam
-     * \param gw    pointer to gateway node
-     * \param gwNd  pointer to gateway netdevice
+     * @param ut    container having UTs of the beam
+     * @param utNd  container having UT netdevices of the beam
+     * @param gw    pointer to gateway node
+     * @param gwNd  pointer to gateway netdevice
      */
     void PopulateBeamRoutings(NodeContainer ut,
                               NetDeviceContainer utNd,
@@ -254,21 +250,21 @@ class SatUserHelper : public Object
                               Ptr<NetDevice> gwNd);
 
     /**
-     * \brief Update ARP cache and default route on an UT
+     * @brief Update ARP cache and default route on an UT
      * so packets are properly routed to the new GW as their
      * next hop.
-     * \param ut Address of the UT for which tables should be updated
-     * \param newGateway Address of the newly assigned GW for this UT
-     * \param ulDelayModel The delay model used by the UT return link
+     * @param ut Address of the UT for which tables should be updated
+     * @param newGateway Address of the newly assigned GW for this UT
+     * @param ulDelayModel The delay model used by the UT return link
      */
     void UpdateUtRoutes(Address ut, Address newGateway);
 
     /**
-     * \brief Update ARP cache and default route on the terrestrial
+     * @brief Update ARP cache and default route on the terrestrial
      * network so packets are properly routed to the UT handed over.
-     * \param ut Address of the UT which was just handed over
-     * \param oldGateway Address of the GW the UT was assigned to
-     * \param newGateway Address of the GW the UT is newly assigned to
+     * @param ut Address of the UT which was just handed over
+     * @param oldGateway Address of the GW the UT was assigned to
+     * @param newGateway Address of the GW the UT is newly assigned to
      */
     void UpdateGwRoutes(Address ut, Address oldGateway, Address newGateway);
 
@@ -279,31 +275,31 @@ class SatUserHelper : public Object
     /**
      * Install network between UT and its users
      *
-     * \param c node container having UT and its users
-     * \return container of the installed net devices
+     * @param c node container having UT and its users
+     * @return container of the installed net devices
      */
     NetDeviceContainer InstallSubscriberNetwork(const NodeContainer& c) const;
 
     /**
      * Install network between GW and Router (or users) or Router and its users.
      *
-     * \param c node container having UT and its users
-     * \return container of the installed net devices
+     * @param c node container having UT and its users
+     * @return container of the installed net devices
      */
     NetDeviceContainer InstallBackboneNetwork(const NodeContainer& c) const;
 
     /**
      * Install satellite simple network.
      *
-     * \param c node container having UT and its users
-     * \return container of the installed net devices
+     * @param c node container having UT and its users
+     * @return container of the installed net devices
      */
     NetDeviceContainer InstallSatSimpleNetwork(const NodeContainer& c) const;
 
     /**
      * Install IP router to to Gateways. Creates csma link between gateways and router.
      *
-     * \param router  pointer to IP router
+     * @param router  pointer to IP router
      */
     void InstallRouter(Ptr<Node> router);
 
@@ -318,7 +314,7 @@ class SatUserHelper : public Object
     Ptr<Node> m_router;
 
     /**
-     * \brief Container of UT users and their corresponding UT.
+     * @brief Container of UT users and their corresponding UT.
      *
      * The data structure is a map which each key is a pointer to the UT user
      * node. The corresponding value is a pointer to the UT node which serves the
@@ -337,21 +333,21 @@ class SatUserHelper : public Object
     TracedCallback<std::string> m_creationTrace;
 
     /**
-     * \brief Container of UT SatNetDevice accessible by MAC address
+     * @brief Container of UT SatNetDevice accessible by MAC address
      *
      * Used to update routing during handover
      */
     std::map<Address, Ptr<NetDevice>> m_utDevices;
 
     /**
-     * \brief Container of GW SatNetDevice accessible by MAC address
+     * @brief Container of GW SatNetDevice accessible by MAC address
      *
      * Used to update routing during handover
      */
     std::map<Address, Ptr<NetDevice>> m_gwDevices;
 
     /**
-     * \brief Container of ARP tables to reach a gateway accessible by MAC address
+     * @brief Container of ARP tables to reach a gateway accessible by MAC address
      *
      * Used to update routing during handover
      */

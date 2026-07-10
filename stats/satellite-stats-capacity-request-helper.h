@@ -24,7 +24,7 @@
 
 #include "satellite-stats-helper.h"
 
-#include <ns3/ptr.h>
+#include "ns3/ptr.h"
 
 namespace ns3
 {
@@ -33,8 +33,8 @@ class SatHelper;
 class DataCollectionObject;
 
 /**
- * \ingroup satstats
- * \brief Produce capacity request statistics of Random Access Slotted ALOHA
+ * @ingroup satstats
+ * @brief Produce capacity request statistics of Random Access Slotted ALOHA
  *        from a satellite module simulation.
  *
  * Statistics logs every capacity request made in a simulation.

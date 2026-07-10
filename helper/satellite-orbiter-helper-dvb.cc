@@ -72,14 +72,6 @@ SatOrbiterHelperDvb::GetTypeId(void)
     return tid;
 }
 
-TypeId
-SatOrbiterHelperDvb::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
-}
-
 SatOrbiterHelperDvb::SatOrbiterHelperDvb()
     : SatOrbiterHelper()
 {

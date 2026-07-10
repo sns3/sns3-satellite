@@ -32,11 +32,11 @@
 #include "satellite-ut-mac-state.h"
 #include "satellite-ut-scheduler.h"
 
-#include <ns3/callback.h>
-#include <ns3/nstime.h>
-#include <ns3/ptr.h>
-#include <ns3/traced-callback.h>
-#include <ns3/traced-value.h>
+#include "ns3/callback.h"
+#include "ns3/nstime.h"
+#include "ns3/ptr.h"
+#include "ns3/traced-callback.h"
+#include "ns3/traced-value.h"
 
 #include <map>
 #include <queue>
@@ -59,8 +59,8 @@ class SatTbtpContainer;
 class UniformRandomVariable;
 
 /**
- * \ingroup satellite
- * \brief UT specific Mac class for Sat Net Devices.
+ * @ingroup satellite
+ * @brief UT specific Mac class for Sat Net Devices.
  *
  * This SatUtMac class specializes the MAC class with UT characteristics. UT MAC
  * receives BB frames intended for it (including at least one packet intended for it)
@@ -78,10 +78,6 @@ class SatUtMac : public SatMac
      * Derived from Object
      */
     static TypeId GetTypeId(void);
-    /**
-     * Derived from Object
-     */
-    virtual TypeId GetInstanceTypeId(void) const;
 
     /**
      * Default constructor, which is not used.
@@ -93,11 +89,11 @@ class SatUtMac : public SatMac
      *
      * This is the constructor for the SatUtMac
      *
-     * \param node Node containing this MAC
-     * \param satId ID of sat for UT
-     * \param beamId ID of beam for UT
-     * \param seq Pointer to superframe sequence.
-     * \param crdsaOnlyForControl CRDSA buffer operation mode
+     * @param node Node containing this MAC
+     * @param satId ID of sat for UT
+     * @param beamId ID of beam for UT
+     * @param seq Pointer to superframe sequence.
+     * @param crdsaOnlyForControl CRDSA buffer operation mode
      */
     SatUtMac(Ptr<Node> node,
              uint32_t satId,
@@ -113,8 +109,8 @@ class SatUtMac : public SatMac
     ~SatUtMac();
 
     /**
-     * \brief Get sat ID of the object
-     * \return sat ID
+     * @brief Get sat ID of the object
+     * @return sat ID
      */
     inline uint32_t GetSatId() const
     {
@@ -122,8 +118,8 @@ class SatUtMac : public SatMac
     }
 
     /**
-     * \brief Get beam ID of the object
-     * \return beam ID
+     * @brief Get beam ID of the object
+     * @return beam ID
      */
     inline uint32_t GetBeamId() const
     {
@@ -133,32 +129,32 @@ class SatUtMac : public SatMac
     /**
      * Receive packet from lower layer.
      *
-     * \param packets Pointers to packets received.
+     * @param packets Pointers to packets received.
      */
     virtual void Receive(SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> /*rxParams*/);
 
     /**
-     * \return Timing advance as Time object.
+     * @return Timing advance as Time object.
      */
     typedef Callback<Time> TimingAdvanceCallback;
 
     /**
-     * \brief Set the timing advance callback
-     * \param cb callback to invoke whenever a timing advance is needed by SatUtMac object.
+     * @brief Set the timing advance callback
+     * @param cb callback to invoke whenever a timing advance is needed by SatUtMac object.
      */
     void SetTimingAdvanceCallback(SatUtMac::TimingAdvanceCallback cb);
 
     /**
      * Callback for informing the amount of dedicated access
      * bytes received from TBTP
-     * \param uint8_t   RC index
-     * \param uint32_t  Sum of bytes in this superframe
+     * @param uint8_t   RC index
+     * @param uint32_t  Sum of bytes in this superframe
      */
     typedef Callback<void, uint8_t, uint32_t> AssignedDaResourcesCallback;
 
     /**
-     * \brief Set the assigned DA resources callback
-     * \param cb callback to invoke whenever TBTP is received.
+     * @brief Set the assigned DA resources callback
+     * @param cb callback to invoke whenever TBTP is received.
      */
     void SetAssignedDaResourcesCallback(SatUtMac::AssignedDaResourcesCallback cb);
 
@@ -168,8 +164,8 @@ class SatUtMac : public SatMac
     typedef Callback<bool> TxCheckCallback;
 
     /**
-     * \brief Set the TX check callback
-     * \param cb callback to invoke when checking if TX is enabled
+     * @brief Set the TX check callback
+     * @param cb callback to invoke when checking if TX is enabled
      */
     void SetTxCheckCallback(SatUtMac::TxCheckCallback cb);
 
@@ -179,8 +175,8 @@ class SatUtMac : public SatMac
     typedef Callback<void, uint8_t> SliceSubscriptionCallback;
 
     /**
-     * \brief Get sliec subscription info from MAC layer
-     * \param cb callback to invoke slices subscription changes
+     * @brief Get sliec subscription info from MAC layer
+     * @param cb callback to invoke slices subscription changes
      */
     void SetSliceSubscriptionCallback(SatUtMac::SliceSubscriptionCallback cb);
 
@@ -190,8 +186,8 @@ class SatUtMac : public SatMac
     typedef Callback<void> SendLogonCallback;
 
     /**
-     * \brief Set the logon callback
-     * \param cb callback to invoke when sending a logon message
+     * @brief Set the logon callback
+     * @param cb callback to invoke when sending a logon message
      */
     void SetSendLogonCallback(SatUtMac::SendLogonCallback cb);
 
@@ -201,15 +197,15 @@ class SatUtMac : public SatMac
     typedef Callback<void, Mac48Address> UpdateGwAddressCallback;
 
     /**
-     * \brief Set the gw update callback
-     * \param cb callback to update GW address to SatRequestManager
+     * @brief Set the gw update callback
+     * @param cb callback to update GW address to SatRequestManager
      */
     void SetUpdateGwAddressCallback(SatUtMac::UpdateGwAddressCallback cb);
 
     /**
      * Get Tx time for the next possible superframe.
-     * \param superFrameSeqId Superframe sequence id
-     * \return Time Time to transmit
+     * @param superFrameSeqId Superframe sequence id
+     * @return Time Time to transmit
      */
     Time GetNextSuperFrameTxTime(uint8_t superFrameSeqId) const;
 
@@ -245,98 +241,98 @@ class SatUtMac : public SatMac
     /**
      * Get address of the GW (or its MAC) serving this UT.
      *
-     * \return Address of the GW.
+     * @return Address of the GW.
      */
     Mac48Address GetGwAddress();
 
     /**
      * Set address of the GW (or its MAC) serving this UT.
      *
-     * \param gwAddress Address of the GW.
+     * @param gwAddress Address of the GW.
      */
     void SetGwAddress(Mac48Address gwAddress);
 
     /**
      * Set the node info
-     * \param nodeInfo containing node specific information
+     * @param nodeInfo containing node specific information
      */
     virtual void SetNodeInfo(Ptr<SatNodeInfo> nodeInfo);
 
     /**
      * Set RA channel assigned for this UT.
      *
-     * \param raChannel RA channel assigned to this UT.
+     * @param raChannel RA channel assigned to this UT.
      */
     void SetRaChannel(uint32_t raChannel);
 
     /**
      * Get RA channel assigned for this UT.
      *
-     * \return RA channel assigned to this UT.
+     * @return RA channel assigned to this UT.
      */
     uint32_t GetRaChannel() const;
 
     /**
-     * \brief Set the random access module
-     * \param randomAccess
+     * @brief Set the random access module
+     * @param randomAccess
      */
     void SetRandomAccess(Ptr<SatRandomAccess> randomAccess);
 
     /**
-     * \brief Method to check whether a transmission of a control msg
+     * @brief Method to check whether a transmission of a control msg
      * is somewhat possible. Transmission cannot be guaranteed, but at least
      * the possibility to do so (e.g. random access / CRDSA enabled, TBTP with
      * time slots received).
-     * \return Boolean to indicate whether a control msg transmission is possible
+     * @return Boolean to indicate whether a control msg transmission is possible
      */
     bool ControlMsgTransmissionPossible() const;
 
     /**
-     * \brief Method to check whether a transmission of a logon msg
+     * @brief Method to check whether a transmission of a logon msg
      * is somewhat possible.
-     * \return Boolean to indicate whether a logon msg transmission is possible
+     * @return Boolean to indicate whether a logon msg transmission is possible
      */
     bool LogonMsgTransmissionPossible() const;
 
     /**
-     * \brief Callback signature for `DaResourcesTrace` trace source.
-     * \param size the amount of assigned TBTP resources (in bytes) in the
+     * @brief Callback signature for `DaResourcesTrace` trace source.
+     * @param size the amount of assigned TBTP resources (in bytes) in the
      *             superframe for this UT
      */
     typedef void (*TbtpResourcesTraceCallback)(uint32_t size);
 
     /**
-     * \brief Callback to reconfigure physical layer during handover.
-     * \param uint32_t new beam Id
+     * @brief Callback to reconfigure physical layer during handover.
+     * @param uint32_t new beam Id
      */
     typedef Callback<void, uint32_t, uint32_t> HandoverCallback;
 
     /**
-     * \brief Method to set handover callback.
-     * \param cb callback to invoke whenever a TIM-U is received prompting us to switch beams
+     * @brief Method to set handover callback.
+     * @param cb callback to invoke whenever a TIM-U is received prompting us to switch beams
      */
     void SetHandoverCallback(SatUtMac::HandoverCallback cb);
 
     /**
-     * \brief Callback to update gateway address after handover
-     * \param Mac48Address the address of the new gateway
+     * @brief Callback to update gateway address after handover
+     * @param Mac48Address the address of the new gateway
      */
     typedef Callback<void, Mac48Address> GatewayUpdateCallback;
 
     /**
-     * \brief Method to set the gateway address update callback
-     * \param cb callback to invoke to update gateway address
+     * @brief Method to set the gateway address update callback
+     * @param cb callback to invoke to update gateway address
      */
     void SetGatewayUpdateCallback(SatUtMac::GatewayUpdateCallback cb);
 
     /**
-     * \brief Callback to update addresses in statistics helpers
+     * @brief Callback to update addresses in statistics helpers
      */
     typedef Callback<void, Ptr<Node>> UpdateAddressAndIdentifierCallback;
 
     /**
-     * \brief Set the callback to update addresses in statistics helpers.
-     * \param cb Callback to update addresses in statistics helpers
+     * @brief Set the callback to update addresses in statistics helpers.
+     * @param cb Callback to update addresses in statistics helpers
      */
     void SetUpdateAddressAndIdentifierCallback(SatUtMac::UpdateAddressAndIdentifierCallback cb);
 
@@ -354,42 +350,42 @@ class SatUtMac : public SatMac
 
   private:
     /**
-     * \brief Get start time for the current superframe.
-     * \param superFrameSeqId Superframe sequence id
-     * \return Time Time to transmit
+     * @brief Get start time for the current superframe.
+     * @param superFrameSeqId Superframe sequence id
+     * @return Time Time to transmit
      */
     Time GetCurrentSuperFrameStartTime(uint8_t superFrameSeqId) const;
 
     uint32_t GetCurrentSuperFrameId(uint8_t superFrameSeqId) const;
 
     /**
-     * \brief Do random access evaluation for Tx opportunities
-     * \param randomAccessTriggerType
+     * @brief Do random access evaluation for Tx opportunities
+     * @param randomAccessTriggerType
      */
     void DoRandomAccess(SatEnums::RandomAccessTriggerType_t randomAccessTriggerType);
 
     /**
-     * \brief Function for selecting the allocation channel for the current RA evaluation
-     * \return allocation channel ID
+     * @brief Function for selecting the allocation channel for the current RA evaluation
+     * @return allocation channel ID
      */
     uint32_t GetNextRandomAccessAllocationChannel();
 
     /**
-     * \brief Function for scheduling the Slotted ALOHA transmissions
-     * \param allocationChannel allocation channel
+     * @brief Function for scheduling the Slotted ALOHA transmissions
+     * @param allocationChannel allocation channel
      */
     void ScheduleSlottedAlohaTransmission(uint32_t allocationChannel);
 
     /**
-     * \brief Function for scheduling the ESSA transmissions
-     * \param allocationChannel RA allocation channel
+     * @brief Function for scheduling the ESSA transmissions
+     * @param allocationChannel RA allocation channel
      */
     void ScheduleEssaTransmission(uint32_t allocationChannel);
 
     /**
-     * \brief Function for scheduling the CRDSA transmissions
-     * \param allocationChannel RA allocation channel
-     * \param txOpportunities Tx opportunities
+     * @brief Function for scheduling the CRDSA transmissions
+     * @param allocationChannel RA allocation channel
+     * @param txOpportunities Tx opportunities
      */
     void ScheduleCrdsaTransmission(uint32_t allocationChannel,
                                    SatRandomAccess::RandomAccessTxOpportunities_s txOpportunities);
@@ -400,17 +396,17 @@ class SatUtMac : public SatMac
     void CreateCrdsaPacketInstances(uint32_t allocationChannel, std::set<uint32_t> slots);
 
     /**
-     * \brief Function for removing the past used RA slots
-     * \param superFrameId super frame ID
+     * @brief Function for removing the past used RA slots
+     * @param superFrameId super frame ID
      */
     void RemovePastRandomAccessSlots(uint32_t superFrameId);
 
     /**
-     * \brief Function for updating the used RA slots
-     * \param superFrameId super frame ID
-     * \param allocationChannel allocation channel
-     * \param slot RA slot
-     * \return was the update successful
+     * @brief Function for updating the used RA slots
+     * @param superFrameId super frame ID
+     * @param allocationChannel allocation channel
+     * @param slot RA slot
+     * @return was the update successful
      */
     bool UpdateUsedRandomAccessSlots(uint32_t superFrameId,
                                      uint32_t allocationChannel,
@@ -418,12 +414,12 @@ class SatUtMac : public SatMac
 
     /**
      *
-     * \param opportunityOffset
-     * \param frameConf
-     * \param timeSlotCount
-     * \param superFrameId
-     * \param allocationChannel
-     * \return
+     * @param opportunityOffset
+     * @param frameConf
+     * @param timeSlotCount
+     * @param superFrameId
+     * @param allocationChannel
+     * @return
      */
     std::pair<bool, uint32_t> FindNextAvailableRandomAccessSlot(Time opportunityOffset,
                                                                 Ptr<SatFrameConf> frameConf,
@@ -433,12 +429,12 @@ class SatUtMac : public SatMac
 
     /**
      *
-     * \param superframeStartTime
-     * \param frameConf
-     * \param timeSlotCount
-     * \param superFrameId
-     * \param allocationChannel
-     * \return
+     * @param superframeStartTime
+     * @param frameConf
+     * @param timeSlotCount
+     * @param superFrameId
+     * @param allocationChannel
+     * @return
      */
     std::pair<bool, uint32_t> SearchFrameForAvailableSlot(Time superframeStartTime,
                                                           Ptr<SatFrameConf> frameConf,
@@ -448,10 +444,10 @@ class SatUtMac : public SatMac
 
     /**
      *
-     * \param superFrameId
-     * \param allocationChannelId
-     * \param slotId
-     * \return
+     * @param superFrameId
+     * @param allocationChannelId
+     * @param slotId
+     * @return
      */
     bool IsRandomAccessSlotAvailable(uint32_t superFrameId,
                                      uint32_t allocationChannelId,
@@ -465,17 +461,17 @@ class SatUtMac : public SatMac
     /**
      *  Schedules time slots according to received TBTP message.
      *
-     * \param tbtp Pointer to TBTP message.
+     * @param tbtp Pointer to TBTP message.
      */
     void ScheduleTimeSlots(Ptr<SatTbtpMessage> tbtp);
 
     /**
      * Schdules one Tx opportunity, i.e. time slot.
-     * \param transmitDelay time when transmit possibility starts
-     * \param duration duration of the burst
-     * \param wf waveform
-     * \param tsConf Time slot conf
-     * \param carrierId Carrier id used for the transmission
+     * @param transmitDelay time when transmit possibility starts
+     * @param duration duration of the burst
+     * @param wf waveform
+     * @param tsConf Time slot conf
+     * @param carrierId Carrier id used for the transmission
      */
     void ScheduleDaTxOpportunity(Time transmitDelay,
                                  Time duration,
@@ -487,11 +483,11 @@ class SatUtMac : public SatMac
      * Notify the upper layer about the Tx opportunity. If upper layer
      * returns a PDU, send it to lower layer.
      *
-     * \param duration duration of the burst
-     * \param carrierId Carrier id used for the transmission
-     * \param wf waveform
-     * \param tsConf Time slot conf
-     * \param policy UT scheduler policy
+     * @param duration duration of the burst
+     * @param carrierId Carrier id used for the transmission
+     * @param wf waveform
+     * @param tsConf Time slot conf
+     * @param policy UT scheduler policy
      */
     void DoTransmit(Time duration,
                     uint32_t carrierId,
@@ -503,10 +499,10 @@ class SatUtMac : public SatMac
      * Notify the upper layer about the Slotted ALOHA Tx opportunity. If upper layer
      * returns a PDU, send it to lower layer.
      *
-     * \param duration duration of the burst
-     * \param waveform waveform
-     * \param carrierId Carrier id used for the transmission
-     * \param rcIndex RC index
+     * @param duration duration of the burst
+     * @param waveform waveform
+     * @param carrierId Carrier id used for the transmission
+     * @param rcIndex RC index
      */
     void DoSlottedAlohaTransmit(
         Time duration,
@@ -519,10 +515,10 @@ class SatUtMac : public SatMac
      * Notify the upper layer about the ESSA Tx opportunity. If upper layer
      * returns a PDU, send it to lower layer.
      *
-     * \param duration duration of the burst
-     * \param waveform waveform
-     * \param carrierId Carrier id used for the transmission
-     * \param rcIndex RC index
+     * @param duration duration of the burst
+     * @param waveform waveform
+     * @param carrierId Carrier id used for the transmission
+     * @param rcIndex RC index
      */
     void DoEssaTransmit(Time duration,
                         Ptr<SatWaveform> waveform,
@@ -532,11 +528,11 @@ class SatUtMac : public SatMac
 
     /**
      *
-     * \param payloadBytes Tx opportunity payload
-     * \param type Time slot type
-     * \param rcIndex RC index
-     * \param policy Scheduler policy
-     * \return
+     * @param payloadBytes Tx opportunity payload
+     * @param type Time slot type
+     * @param rcIndex RC index
+     * @param policy Scheduler policy
+     * @return
      */
     SatPhy::PacketContainer_t FetchPackets(uint32_t payloadBytes,
                                            SatTimeSlotConf::SatTimeSlotType_t type,
@@ -544,13 +540,13 @@ class SatUtMac : public SatMac
                                            SatUtScheduler::SatCompliancePolicy_t policy);
 
     /**
-     * \brief Extract packets from the underlying queue and put them in the provided container
-     * \param packets Container for the packets to extract
-     * \param payloadBytes Tx opportunity payload
-     * \param type Time slot type
-     * \param rcIndex RC index
-     * \param policy Scheduler policy
-     * \param randomAccessChannel whether the packets are to be sent on RA or DA
+     * @brief Extract packets from the underlying queue and put them in the provided container
+     * @param packets Container for the packets to extract
+     * @param payloadBytes Tx opportunity payload
+     * @param type Time slot type
+     * @param rcIndex RC index
+     * @param policy Scheduler policy
+     * @param randomAccessChannel whether the packets are to be sent on RA or DA
      */
     void ExtractPacketsToSchedule(SatPhy::PacketContainer_t& packets,
                                   uint32_t payloadBytes,
@@ -561,10 +557,10 @@ class SatUtMac : public SatMac
 
     /**
      *
-     * \param packets
-     * \param duration
-     * \param carrierId
-     * \param txInfo
+     * @param packets
+     * @param duration
+     * @param carrierId
+     * @param txInfo
      */
     void TransmitPackets(SatPhy::PacketContainer_t packets,
                          Time duration,
@@ -574,19 +570,19 @@ class SatUtMac : public SatMac
     /**
      * Signaling packet receiver, which handles all the signaling packet
      * receptions.
-     * \param packet Received signaling packet
+     * @param packet Received signaling packet
      */
     void ReceiveSignalingPacket(Ptr<Packet> packet);
 
     /**
-     * \brief Function which is executed at every frame start.
+     * @brief Function which is executed at every frame start.
      */
     void DoFrameStart();
 
     /**
-     * \brief Compute real sending time of UT based on last NCR reception date and clock drift
-     * \param t Sending time if clock is perfect (relative time from Simulator::Now ())
-     * \return Corrected time (relative time from Simulator::Now ())
+     * @brief Compute real sending time of UT based on last NCR reception date and clock drift
+     * @param t Sending time if clock is perfect (relative time from Simulator::Now ())
+     * @return Corrected time (relative time from Simulator::Now ())
      */
     Time GetRealSendingTime(Time t);
 
@@ -624,7 +620,7 @@ class SatUtMac : public SatMac
     AssignedDaResourcesCallback m_assignedDaResourcesCallback;
 
     /**
-     * \brief RA main module
+     * @brief RA main module
      */
     Ptr<SatRandomAccess> m_randomAccess;
 
@@ -640,12 +636,12 @@ class SatUtMac : public SatMac
     Ptr<SatTbtpContainer> m_tbtpContainer;
 
     /**
-     * \brief Uniform random variable distribution generator
+     * @brief Uniform random variable distribution generator
      */
     Ptr<UniformRandomVariable> m_uniformRandomVariable;
 
     /**
-     * \brief A container for storing the used RA slots in each frame and allocation channel
+     * @brief A container for storing the used RA slots in each frame and allocation channel
      */
     std::map<std::pair<uint32_t, uint32_t>, std::set<uint32_t>> m_usedRandomAccessSlots;
 

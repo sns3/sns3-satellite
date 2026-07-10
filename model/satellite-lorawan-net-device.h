@@ -31,9 +31,9 @@
 #include "satellite-phy.h"
 #include "satellite-time-tag.h"
 
-#include <ns3/error-model.h>
-#include <ns3/ipv4-l3-protocol.h>
-#include <ns3/node.h>
+#include "ns3/error-model.h"
+#include "ns3/ipv4-l3-protocol.h"
+#include "ns3/node.h"
 
 #include <stdint.h>
 
@@ -41,15 +41,15 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  * SatLorawanNetDevice to be utilized in the UT and GW nodes for IoT configuration.
  */
 class SatLorawanNetDevice : public SatNetDevice
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
 
@@ -59,8 +59,8 @@ class SatLorawanNetDevice : public SatNetDevice
     SatLorawanNetDevice();
 
     /*
-     * \brief Receive the packet from mac layer
-     * \param packet Pointer to the packet to be received.
+     * @brief Receive the packet from mac layer
+     * @param packet Pointer to the packet to be received.
      */
     void Receive(Ptr<const Packet> packet);
 

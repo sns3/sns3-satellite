@@ -22,11 +22,11 @@
 
 #include "../utils/satellite-env-variables.h"
 
-#include <ns3/double.h>
-#include <ns3/enum.h>
-#include <ns3/log.h>
-#include <ns3/singleton.h>
-#include <ns3/string.h>
+#include "ns3/double.h"
+#include "ns3/enum.h"
+#include "ns3/log.h"
+#include "ns3/singleton.h"
+#include "ns3/string.h"
 
 #include <cstdlib>
 #include <fstream>
@@ -94,21 +94,22 @@ SatFadingExternalInputTraceContainer::GetTypeId(void)
     return tid;
 }
 
-TypeId
-SatFadingExternalInputTraceContainer::GetInstanceTypeId(void) const
-{
-    return GetTypeId();
-}
-
 SatFadingExternalInputTraceContainer::SatFadingExternalInputTraceContainer()
     : m_utInputMode(LIST_MODE),
       m_indexFilesLoaded(false),
       m_maxDistanceToFading(0)
 {
     NS_LOG_FUNCTION(this);
+}
 
-    ObjectBase::ConstructSelf(AttributeConstructionList());
-    m_dataPath = Singleton<SatEnvVariables>::Get()->LocateDataDirectory() +
+void
+SatFadingExternalInputTraceContainer::NotifyConstructionCompleted()
+{
+    NS_LOG_FUNCTION(this);
+
+    Object::NotifyConstructionCompleted();
+
+    m_dataPath = SatEnvVariables::GetInstance()->LocateDataDirectory() +
                  "/additional-input/ext-fadingtraces/input/";
 }
 
@@ -259,7 +260,7 @@ SatFadingExternalInputTraceContainer::GetFadingTrace(uint32_t nodeId,
 bool
 SatFadingExternalInputTraceContainer::TestFadingTraces(uint32_t numOfUts, uint32_t numOfGws)
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(this << numOfUts << numOfGws);
     NS_ASSERT(numOfUts > 0);
     NS_ASSERT(numOfGws > 0);
 

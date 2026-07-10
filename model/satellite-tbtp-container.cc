@@ -24,11 +24,11 @@
 #include "satellite-control-message.h"
 #include "satellite-superframe-sequence.h"
 
-#include <ns3/log.h>
-#include <ns3/mac48-address.h>
-#include <ns3/nstime.h>
-#include <ns3/simulator.h>
-#include <ns3/uinteger.h>
+#include "ns3/log.h"
+#include "ns3/mac48-address.h"
+#include "ns3/nstime.h"
+#include "ns3/simulator.h"
+#include "ns3/uinteger.h"
 
 #include <algorithm>
 #include <iostream>

@@ -25,7 +25,7 @@
 #ifndef JULIANDATE_H
 #define JULIANDATE_H
 
-#include <ns3/nstime.h>
+#include "ns3/nstime.h"
 
 #include <functional>
 #include <ostream>

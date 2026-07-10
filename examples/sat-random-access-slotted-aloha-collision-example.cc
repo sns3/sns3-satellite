@@ -29,10 +29,10 @@
 using namespace ns3;
 
 /**
- * \file sat-random-access-slotted-aloha-collision-example.cc
- * \ingroup satellite
+ * @file sat-random-access-slotted-aloha-collision-example.cc
+ * @ingroup satellite
  *
- * \brief  This is an example of Random Access usage in satellite network. This
+ * @brief  This is an example of Random Access usage in satellite network. This
  *         example uses only the Slotted ALOHA model regardless of the number of instances
  *         parameter. CRA is disabled in this example. The example allows to
  *         set various RA parameters such as the maximum rate limitation related

@@ -20,7 +20,7 @@
 
 #include "satellite-fading-oscillator.h"
 
-#include <ns3/log.h>
+#include "ns3/log.h"
 
 #include <cmath>
 #include <complex>

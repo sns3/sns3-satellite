@@ -29,8 +29,8 @@
 #include "satellite-node-info.h"
 #include "satellite-queue.h"
 
-#include <ns3/callback.h>
-#include <ns3/object.h>
+#include "ns3/callback.h"
+#include "ns3/object.h"
 
 #include <deque>
 #include <map>
@@ -43,8 +43,8 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief SatRequestManager analyzes periodically or on-a-need-basis UT's buffer status for
+ * @ingroup satellite
+ * @brief SatRequestManager analyzes periodically or on-a-need-basis UT's buffer status for
  * different RC indices (= queues), and sends Capacity Requests to NCC according to need and
  * lower layer service configuration. Request manager supports currently RBDC, AVBDC and VBDC
  * request classes. However, RBDC and VBDC may not be configured in the same simulation for
@@ -71,12 +71,6 @@ class SatRequestManager : public Object
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
-     */
-    virtual TypeId GetInstanceTypeId(void) const;
-
-    /**
      * Dispose of this class instance
      */
     virtual void DoDispose();
@@ -87,22 +81,22 @@ class SatRequestManager : public Object
     typedef Callback<SatQueue::QueueStats_t, bool> QueueCallback;
 
     /**
-     * \brief Control message sending callback
-     * \param Ptr<SatControlMessage> The message to be sent
-     * \param Address Packet destination address
-     * \return boolean indicating whether the send was successful
+     * @brief Control message sending callback
+     * @param Ptr<SatControlMessage> The message to be sent
+     * @param Address Packet destination address
+     * @return boolean indicating whether the send was successful
      */
     typedef Callback<bool, Ptr<SatControlMessage>, const Address&> SendCtrlCallback;
 
     /**
-     * \brief Callback to check whether control msg transmission is possible
-     * \return boolean indicating whether control msg transmission is possible
+     * @brief Callback to check whether control msg transmission is possible
+     * @return boolean indicating whether control msg transmission is possible
      */
     typedef Callback<bool> CtrlMsgTxPossibleCallback;
 
     /**
-     * \brief Callback to check whether logon msg transmission is possible
-     * \return boolean indicating whether logon msg transmission is possible
+     * @brief Callback to check whether logon msg transmission is possible
+     * @return boolean indicating whether logon msg transmission is possible
      */
     typedef Callback<bool> LogonMsgTxPossibleCallback;
 
@@ -112,63 +106,63 @@ class SatRequestManager : public Object
     typedef std::vector<std::deque<std::pair<Time, uint32_t>>> PendingRbdcRequestsContainer_t;
 
     /**
-     * \brief Receive a queue event
-     * \param event Queue event from SatQueue
-     * \param rcIndex RC identifier of the queue
+     * @brief Receive a queue event
+     * @param event Queue event from SatQueue
+     * @param rcIndex RC identifier of the queue
      */
     void ReceiveQueueEvent(SatQueue::QueueEvent_t event, uint8_t rcIndex);
 
     /**
-     * \brief Add a callback to fetch queue statistics
-     * \param rcIndex RC identifier
-     * \param cb Callback
+     * @brief Add a callback to fetch queue statistics
+     * @param rcIndex RC identifier
+     * @param cb Callback
      */
     void AddQueueCallback(uint8_t rcIndex, SatRequestManager::QueueCallback cb);
 
     /**
-     * \brief Set the control message sending callback.
-     * \param cb callback to send control messages.
+     * @brief Set the control message sending callback.
+     * @param cb callback to send control messages.
      */
     void SetCtrlMsgCallback(SatRequestManager::SendCtrlCallback cb);
 
     /**
-     * \brief Set the callback to check the possibility of sending a
+     * @brief Set the callback to check the possibility of sending a
      * control message.
-     * \param cb callback to check whether ctrl message sending is possible.
+     * @param cb callback to check whether ctrl message sending is possible.
      */
     void SetCtrlMsgTxPossibleCallback(SatRequestManager::CtrlMsgTxPossibleCallback cb);
 
     /**
-     * \brief Set the callback to check the possibility of sending a
+     * @brief Set the callback to check the possibility of sending a
      * control message.
-     * \param cb callback to check whether ctrl message sending is possible.
+     * @param cb callback to check whether ctrl message sending is possible.
      */
     void SetLogonMsgTxPossibleCallback(SatRequestManager::LogonMsgTxPossibleCallback cb);
 
     /**
-     * \brief Set the GW address needed for CR transmission.
-     * \param address GW MAC address
+     * @brief Set the GW address needed for CR transmission.
+     * @param address GW MAC address
      */
     void SetGwAddress(Mac48Address address);
 
     /**
-     * \brief Set the node info of this UT
-     * \param nodeInfo Node information pointer
+     * @brief Set the node info of this UT
+     * @param nodeInfo Node information pointer
      */
     void SetNodeInfo(Ptr<SatNodeInfo> nodeInfo);
 
     /**
-     * \brief Update C/N0 information from lower layer.
+     * @brief Update C/N0 information from lower layer.
      *
      * The SatUtMac receives C/N0 information of packet receptions from GW
      * to update this information to serving GW periodically.
      *
-     * \param satId The id of the satellite where C/N0 is from.
-     * \param beamId The id of the beam where C/N0 is from.
-     * \param sourceMac The MAC address of the source from where we measured C/N0.
-     * \param gwId The id of the GW.
-     * \param cno Value of the C/N0.
-     * \param isSatelliteMac If true, cno corresponds to link SAT to UT; if false, cno corresponds
+     * @param satId The id of the satellite where C/N0 is from.
+     * @param beamId The id of the beam where C/N0 is from.
+     * @param sourceMac The MAC address of the source from where we measured C/N0.
+     * @param gwId The id of the GW.
+     * @param cno Value of the C/N0.
+     * @param isSatelliteMac If true, cno corresponds to link SAT to UT; if false, cno corresponds
      * to link GW to UT
      */
     void CnoUpdated(uint32_t satId,
@@ -179,26 +173,26 @@ class SatRequestManager : public Object
                     bool isSatelliteMac);
 
     /**
-     * \brief Sat UT MAC informs that certain amount of resources have been received
+     * @brief Sat UT MAC informs that certain amount of resources have been received
      * in TBTP.
-     * \param rcIndex RC index
-     * \param bytes Amount of bytes assigned to this UT in TBTP.
+     * @param rcIndex RC index
+     * @param bytes Amount of bytes assigned to this UT in TBTP.
      */
     void AssignedDaResources(uint8_t rcIndex, uint32_t bytes);
 
     /**
-     * \brief Callback signature for `CrTrace` trace source.
-     * \param time the current simulation time.
-     * \param address the MAC address of the current node.
-     * \param message the CR message to be transmitted.
+     * @brief Callback signature for `CrTrace` trace source.
+     * @param time the current simulation time.
+     * @param address the MAC address of the current node.
+     * @param message the CR message to be transmitted.
      */
     typedef void (*CapacityRequestTraceCallback)(Time time,
                                                  Mac48Address address,
                                                  Ptr<SatCrMessage> message);
 
     /**
-     * \brief Callback signature for `CrLogTrace` trace source.
-     * \param traceLog A string containing the following information:
+     * @brief Callback signature for `CrLogTrace` trace source.
+     * @param traceLog A string containing the following information:
      *                    - the current simulation time (in seconds),
      *                    - node ID,
      *                    - RC index,
@@ -211,38 +205,38 @@ class SatRequestManager : public Object
     typedef void (*CapacityRequestTraceLogCallback)(std::string traceLog);
 
     /**
-     * \brief Callback signature for `RbdcTrace` trace source.
-     * \param requestSize amount of requested size via RBDC (in kbps).
+     * @brief Callback signature for `RbdcTrace` trace source.
+     * @param requestSize amount of requested size via RBDC (in kbps).
      */
     typedef void (*RbdcTraceCallback)(uint32_t requestSize);
 
     /**
-     * \brief Callback signature for `VbdcTrace` trace source.
-     * \param requestSize amount of requested size via VBDC (in bytes).
+     * @brief Callback signature for `VbdcTrace` trace source.
+     * @param requestSize amount of requested size via VBDC (in bytes).
      */
     typedef void (*VbdcTraceCallback)(uint32_t requestSize);
 
     /**
-     * \brief Callback signature for `AvbdcTrace` trace source.
-     * \param requestSize amount of requested size via AVBDC (in bytes).
+     * @brief Callback signature for `AvbdcTrace` trace source.
+     * @param requestSize amount of requested size via AVBDC (in bytes).
      */
     typedef void (*AvbdcTraceCallback)(uint32_t requestSize);
 
     /**
-     * \brief Send a handover recommendation message to the gateway.
-     * \param satId The sat ID to switch to
-     * \param beamId The beam ID to switch to
+     * @brief Send a handover recommendation message to the gateway.
+     * @param satId The sat ID to switch to
+     * @param beamId The beam ID to switch to
      */
     void SendHandoverRecommendation(uint32_t satId, uint32_t beamId);
 
     /**
-     * \brief Send a logon message to the gateway.
+     * @brief Send a logon message to the gateway.
      */
     void SendLogonMessage();
 
     /**
      * Update the value of header offset
-     * \param headerOffsetVbcd The new value of header offset
+     * @param headerOffsetVbcd The new value of header offset
      */
     void SetHeaderOffsetVbdc(double headerOffsetVbcd);
 
@@ -250,68 +244,68 @@ class SatRequestManager : public Object
     typedef std::map<uint8_t, QueueCallback> CallbackContainer_t;
 
     /**
-     * \brief Periodically check the buffer status and whether
+     * @brief Periodically check the buffer status and whether
      * a new CR is needed to be sent.
      */
     void DoPeriodicalEvaluation();
 
     /**
-     * \brief Do evaluation of the buffer status and decide whether or not
+     * @brief Do evaluation of the buffer status and decide whether or not
      * to send CRs.
      */
     void DoEvaluation();
 
     /**
-     * \brief Do RBDC calculation for a RC
-     * \param rc Request class index
-     * \param stats Queue statistics
-     * \return uint32_t Requested bytes
+     * @brief Do RBDC calculation for a RC
+     * @param rc Request class index
+     * @param stats Queue statistics
+     * @return uint32_t Requested bytes
      */
     uint32_t DoRbdc(uint8_t rc, const SatQueue::QueueStats_t& stats);
 
     /**
-     * \brief Legacy algorithm to do RBDC calculation for a RC
-     * \param rc Request class index
-     * \param stats Queue statistics
-     * \return uint32_t Requested bytes
+     * @brief Legacy algorithm to do RBDC calculation for a RC
+     * @param rc Request class index
+     * @param stats Queue statistics
+     * @return uint32_t Requested bytes
      */
     uint32_t DoRbdcLegacy(uint8_t rc, const SatQueue::QueueStats_t& stats);
 
     /**
-     * \brief Do VBDC calculation for a RC
-     * \param rc Request class index
-     * \param stats Queue statistics
-     * \param &vbdcBytes Reference to vbdcBytes
-     * \return SatCapacityAllocationCategory_t Capacity allocation category
+     * @brief Do VBDC calculation for a RC
+     * @param rc Request class index
+     * @param stats Queue statistics
+     * @param &vbdcBytes Reference to vbdcBytes
+     * @return SatCapacityAllocationCategory_t Capacity allocation category
      */
     SatEnums::SatCapacityAllocationCategory_t DoVbdc(uint8_t rc,
                                                      const SatQueue::QueueStats_t& stats,
                                                      uint32_t& rcVbdcBytes);
 
     /**
-     * \brief Legacy algorithm to do VBDC calculation for a RC
-     * \param rc Request class index
-     * \param stats Queue statistics
-     * \param &vbdcBytes Reference to vbdcBytes
-     * \return SatCapacityAllocationCategory_t Capacity allocation category
+     * @brief Legacy algorithm to do VBDC calculation for a RC
+     * @param rc Request class index
+     * @param stats Queue statistics
+     * @param &vbdcBytes Reference to vbdcBytes
+     * @return SatCapacityAllocationCategory_t Capacity allocation category
      */
     SatEnums::SatCapacityAllocationCategory_t DoVbdcLegacy(uint8_t rc,
                                                            const SatQueue::QueueStats_t& stats,
                                                            uint32_t& rcVbdcBytes);
 
     /**
-     * \brief Calculate the needed VBDC bytes for a RC
-     * \param rc Request class index
-     * \param stats Queue statistics
-     * \return Requested VBDC kilobytes
+     * @brief Calculate the needed VBDC bytes for a RC
+     * @param rc Request class index
+     * @param stats Queue statistics
+     * @return Requested VBDC kilobytes
      */
     uint32_t GetVbdcBytes(uint8_t rc, const SatQueue::QueueStats_t& stats);
 
     /**
-     * \brief Calculate the needed AVBDC bytes for a RC
-     * \param rc Request class index
-     * \param stats Queue statistics
-     * \return Requested AVBDC kilobytes
+     * @brief Calculate the needed AVBDC bytes for a RC
+     * @param rc Request class index
+     * @param stats Queue statistics
+     * @return Requested AVBDC kilobytes
      */
     uint32_t GetAvbdcBytes(uint8_t rc, const SatQueue::QueueStats_t& stats);
 
@@ -322,22 +316,22 @@ class SatRequestManager : public Object
     void CheckForVolumeBacklogPersistence();
 
     /**
-     * \brief Calculate the pending RBDC requests related to a specific RC.
-     * \param rc Request class index
-     * \return Pending sum in kbps or Bytes
+     * @brief Calculate the pending RBDC requests related to a specific RC.
+     * @param rc Request class index
+     * @return Pending sum in kbps or Bytes
      */
     uint32_t GetPendingRbdcSumKbps(uint8_t rc);
 
     /**
-     * \brief Update the pending RBDC counters with new request information
-     * \param rc Request class index
-     * \param kbps Requested value in kbps or Bytes
+     * @brief Update the pending RBDC counters with new request information
+     * @param rc Request class index
+     * @param kbps Requested value in kbps or Bytes
      */
     void UpdatePendingRbdcCounters(uint8_t rc, uint32_t kbps);
 
     /**
      * Clean-up the pending RBDC container from old samples.
-     * \param rc Request class index
+     * @param rc Request class index
      */
     void RemoveOldEntriesFromPendingRbdcContainer(uint8_t rc);
 
@@ -347,31 +341,31 @@ class SatRequestManager : public Object
     void UpdatePendingVbdcCounters();
 
     /**
-     * \brief Update the pending VBDC counters with new request information
-     * \param rc Request class index
+     * @brief Update the pending VBDC counters with new request information
+     * @param rc Request class index
      */
     void UpdatePendingVbdcCounters(uint8_t rc);
 
     /**
-     * \brief Send the capacity request control msg via txCallback to
+     * @brief Send the capacity request control msg via txCallback to
      * SatNetDevice
-     * \param crMsg Created capacity request
+     * @param crMsg Created capacity request
      */
     void SendCapacityRequest(Ptr<SatCrMessage> crMsg);
 
     /**
-     * \brief Send the C/N0 report message via txCallback to SatNetDevice.
+     * @brief Send the C/N0 report message via txCallback to SatNetDevice.
      */
     void SendCnoReport();
 
     /**
-     * \brief Reset the assigned resources counter
+     * @brief Reset the assigned resources counter
      */
     void ResetAssignedResources();
 
     /**
-     * \brief Reset RC index counters
-     * \param rc RC index
+     * @brief Reset RC index counters
+     * @param rc RC index
      */
     void Reset(uint8_t rc);
 
@@ -379,9 +373,9 @@ class SatRequestManager : public Object
      * The RBDC value is signalled with 8 bits, which means that to be able to signal
      * larger than 256 values, we need to use quantization and coding to convert the
      * raw values into defined discrete values.
-     * \param index RC index
-     * \param reqRbdcKbps Raw RBDC request
-     * \return uint16_t Quantized RBDC value
+     * @param index RC index
+     * @param reqRbdcKbps Raw RBDC request
+     * @return uint16_t Quantized RBDC value
      */
     uint16_t GetQuantizedRbdcValue(uint8_t index, uint16_t reqRbdcKbps) const;
 
@@ -389,9 +383,9 @@ class SatRequestManager : public Object
      * The RBDC value is signalled with 8 bits, which means that to be able to signal
      * larger than 256 values, we need to use quantization and coding to convert the
      * raw values into defined discrete values.
-     * \param index RC index
-     * \param reqVbdcBytes Raw VBDC request in Bytes
-     * \return uint16_t Quantized VBDC value
+     * @param index RC index
+     * @param reqVbdcBytes Raw VBDC request in Bytes
+     * @return uint16_t Quantized VBDC value
      */
     uint16_t GetQuantizedVbdcValue(uint8_t index, uint16_t reqVbdcBytes) const;
 

@@ -24,9 +24,9 @@
 
 #include "satellite-stats-helper.h"
 
-#include <ns3/collector-map.h>
-#include <ns3/ptr.h>
-#include <ns3/satellite-enums.h>
+#include "ns3/collector-map.h"
+#include "ns3/ptr.h"
+#include "ns3/satellite-enums.h"
 
 #include <map>
 #include <string>
@@ -38,15 +38,15 @@ class SatHelper;
 class DataCollectionObject;
 
 /**
- * \ingroup satstats
- * \brief
+ * @ingroup satstats
+ * @brief
  */
 class SatStatsBeamServiceTimeHelper : public SatStatsHelper
 {
   public:
     /**
      * Constructor.
-     * \param satHelper Satellite helper instance
+     * @param satHelper Satellite helper instance
      */
     SatStatsBeamServiceTimeHelper(Ptr<const SatHelper> satHelper);
 
@@ -57,7 +57,7 @@ class SatStatsBeamServiceTimeHelper : public SatStatsHelper
 
     /**
      * inherited from ObjectBase base class
-     * \return Type ID of the helper
+     * @return Type ID of the helper
      */
     static TypeId GetTypeId();
 
@@ -67,13 +67,13 @@ class SatStatsBeamServiceTimeHelper : public SatStatsHelper
 
   private:
     /**
-     * \param context Beam ID, GW ID or global ID (0) as string
-     * \param time The time beam was enabled
+     * @param context Beam ID, GW ID or global ID (0) as string
+     * @param time The time beam was enabled
      */
     void BeamServiceCallback(std::string context, Time time);
 
     /**
-     * \brief Two-dimensional map of collectors, indexed first by the
+     * @brief Two-dimensional map of collectors, indexed first by the
      * the frame type identifier and second by the global/gw/beam identifier.
      */
     CollectorMap m_collectorMap;

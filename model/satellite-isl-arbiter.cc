@@ -26,7 +26,7 @@
 #include "satellite-id-mapper.h"
 #include "satellite-topology.h"
 
-#include <ns3/singleton.h>
+#include "ns3/singleton.h"
 
 NS_LOG_COMPONENT_DEFINE("SatIslArbiter");
 

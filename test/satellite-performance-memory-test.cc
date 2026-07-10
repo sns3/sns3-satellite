@@ -19,9 +19,9 @@
  */
 
 /**
- * \file satellite-performance-memory-test.cc
- * \ingroup satellite
- * \brief 'Performance and Memory Consumption Test Cases' implementation of TN4.
+ * @file satellite-performance-memory-test.cc
+ * @ingroup satellite
+ * @brief 'Performance and Memory Consumption Test Cases' implementation of TN4.
  *
  * In this module are implemented all 'Performance and Memory Consumption' Test Cases
  * defined in document TN4.
@@ -46,8 +46,8 @@
 using namespace ns3;
 
 /**
- * \ingroup satellite
- * \brief 'Performance and memory tracking' test case implementation, id: pm-1 / TN4.
+ * @ingroup satellite
+ * @brief 'Performance and memory tracking' test case implementation, id: pm-1 / TN4.
  *
  * Full scenario created with helper
  * 1.  GW connected user sends single packet to UT connected user.
@@ -95,8 +95,8 @@ void
 Pm1::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-perf-mem", "", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-perf-mem", "", true);
 
     // Create simple scenario
 
@@ -107,7 +107,7 @@ Pm1::DoRun(void)
 
     // Creating the reference system.
     Ptr<SatHelper> helper = CreateObject<SatHelper>(
-        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E");
+        SatEnvVariables::GetInstance()->LocateDataDirectory() + "/scenarios/geo-33E");
     helper->CreatePredefinedScenario(SatHelper::FULL);
 
     NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
@@ -165,7 +165,7 @@ Pm1::DoRun(void)
                           gwSender->GetSent(),
                           "Packets were lost between GW and UT!");
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
     // <<< End of actual test using Simple scenario <<<
 }
 

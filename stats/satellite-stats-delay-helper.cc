@@ -21,36 +21,36 @@
 
 #include "satellite-stats-delay-helper.h"
 
-#include <ns3/application-delay-probe.h>
-#include <ns3/application.h>
-#include <ns3/boolean.h>
-#include <ns3/callback.h>
-#include <ns3/data-collection-object.h>
-#include <ns3/distribution-collector.h>
-#include <ns3/enum.h>
-#include <ns3/inet-socket-address.h>
-#include <ns3/ipv4.h>
-#include <ns3/log.h>
-#include <ns3/mac48-address.h>
-#include <ns3/magister-gnuplot-aggregator.h>
-#include <ns3/multi-file-aggregator.h>
-#include <ns3/net-device.h>
-#include <ns3/node-container.h>
-#include <ns3/nstime.h>
-#include <ns3/probe.h>
-#include <ns3/satellite-helper.h>
-#include <ns3/satellite-id-mapper.h>
-#include <ns3/satellite-mac.h>
-#include <ns3/satellite-net-device.h>
-#include <ns3/satellite-orbiter-net-device.h>
-#include <ns3/satellite-phy.h>
-#include <ns3/satellite-time-tag.h>
-#include <ns3/satellite-topology.h>
-#include <ns3/scalar-collector.h>
-#include <ns3/singleton.h>
-#include <ns3/string.h>
-#include <ns3/traffic-time-tag.h>
-#include <ns3/unit-conversion-collector.h>
+#include "ns3/application-delay-probe.h"
+#include "ns3/application.h"
+#include "ns3/boolean.h"
+#include "ns3/callback.h"
+#include "ns3/data-collection-object.h"
+#include "ns3/distribution-collector.h"
+#include "ns3/enum.h"
+#include "ns3/inet-socket-address.h"
+#include "ns3/ipv4.h"
+#include "ns3/log.h"
+#include "ns3/mac48-address.h"
+#include "ns3/magister-gnuplot-aggregator.h"
+#include "ns3/multi-file-aggregator.h"
+#include "ns3/net-device.h"
+#include "ns3/node-container.h"
+#include "ns3/nstime.h"
+#include "ns3/probe.h"
+#include "ns3/satellite-helper.h"
+#include "ns3/satellite-id-mapper.h"
+#include "ns3/satellite-mac.h"
+#include "ns3/satellite-net-device.h"
+#include "ns3/satellite-orbiter-net-device.h"
+#include "ns3/satellite-phy.h"
+#include "ns3/satellite-time-tag.h"
+#include "ns3/satellite-topology.h"
+#include "ns3/scalar-collector.h"
+#include "ns3/singleton.h"
+#include "ns3/string.h"
+#include "ns3/traffic-time-tag.h"
+#include "ns3/unit-conversion-collector.h"
 
 #include <map>
 #include <sstream>
@@ -263,7 +263,7 @@ SatStatsDelayHelper::DoInstall()
     }
 
     case SatStatsHelper::OUTPUT_SCALAR_PLOT:
-        /// \todo Add support for boxes in Gnuplot.
+        /// @todo Add support for boxes in Gnuplot.
         NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
                        << " is not a valid output type for this statistics.");
         break;
@@ -318,7 +318,7 @@ SatStatsDelayHelper::DoInstall()
             plotAggregator->SetLegend("Packet delay (in seconds)", "Frequency");
             plotAggregator->Set2dDatasetDefaultStyle(Gnuplot2dDataset::LINES);
             plotAggregator->Add2dDataset(GetName(), GetName());
-            /// \todo Find a better dataset name.
+            /// @todo Find a better dataset name.
 
             // Setup the final-level collector.
             m_averagingCollector = CreateObject<DistributionCollector>();
@@ -338,7 +338,7 @@ SatStatsDelayHelper::DoInstall()
                 "Output",
                 GetName(),
                 MakeCallback(&MagisterGnuplotAggregator::Write2d, plotAggregator));
-            /// \todo Find a better dataset name.
+            /// @todo Find a better dataset name.
 
             // Setup collectors.
             m_terminalCollectors.SetType("ns3::ScalarCollector");
@@ -426,8 +426,7 @@ SatStatsDelayHelper::RxDelayCallback(const Time& delay, const Address& from)
     if (from.IsInvalid())
     {
         NS_LOG_WARN(this << " discarding a packet delay of " << delay.GetSeconds()
-                         << " from statistics collection because of"
-                         << " invalid sender address");
+                         << " from statistics collection because of" << " invalid sender address");
     }
     else
     {
@@ -705,8 +704,8 @@ SatStatsFwdAppDelayHelper::DoInstallProbes()
 
             if (isConnected)
             {
-                NS_LOG_INFO(this << " successfully connected"
-                                 << " with node ID " << (*it)->GetId() << " application #" << i);
+                NS_LOG_INFO(this << " successfully connected" << " with node ID " << (*it)->GetId()
+                                 << " application #" << i);
             }
             else
             {
@@ -715,8 +714,8 @@ SatStatsFwdAppDelayHelper::DoInstallProbes()
                  * not every kind of Application is equipped with the expected
                  * RxDelay or Rx trace source.
                  */
-                NS_LOG_WARN(this << " unable to connect"
-                                 << " with node ID " << (*it)->GetId() << " application #" << i);
+                NS_LOG_WARN(this << " unable to connect" << " with node ID " << (*it)->GetId()
+                                 << " application #" << i);
             }
 
         } // end of `for (i = 0; i < (*it)->GetNApplications (); i++)`
@@ -1228,11 +1227,10 @@ SatStatsRtnAppDelayHelper::DoInstallProbes()
 
             if (!app->SetAttributeFailSafe("EnableStatisticsTags", BooleanValue(true)))
             {
-                NS_LOG_WARN(this << " node ID " << (*it)->GetId() << " application #" << i
-                                 << " might not produce the required tags"
-                                 << " in the transmitted packets,"
-                                 << " thus preventing delay statistics"
-                                 << " from this sender application");
+                NS_LOG_WARN(
+                    this << " node ID " << (*it)->GetId() << " application #" << i
+                         << " might not produce the required tags" << " in the transmitted packets,"
+                         << " thus preventing delay statistics" << " from this sender application");
             }
 
         } // end of `for (i = 0; i < (*it)->GetNApplications (); i++)`
@@ -1269,8 +1267,8 @@ SatStatsRtnAppDelayHelper::DoInstallProbes()
 
             if (isConnected)
             {
-                NS_LOG_INFO(this << " successfully connected"
-                                 << " with node ID " << (*it)->GetId() << " application #" << i);
+                NS_LOG_INFO(this << " successfully connected" << " with node ID " << (*it)->GetId()
+                                 << " application #" << i);
             }
             else
             {
@@ -1279,8 +1277,8 @@ SatStatsRtnAppDelayHelper::DoInstallProbes()
                  * not every kind of Application is equipped with the expected
                  * RxDelay or Rx trace source.
                  */
-                NS_LOG_WARN(this << " unable to connect"
-                                 << " with node ID " << (*it)->GetId() << " application #" << i);
+                NS_LOG_WARN(this << " unable to connect" << " with node ID " << (*it)->GetId()
+                                 << " application #" << i);
             }
 
         } // end of `for (i = 0; i < (*it)->GetNApplications (); i++)`
@@ -1361,9 +1359,8 @@ SatStatsRtnAppDelayHelper::Ipv4Callback(const Time& delay, const Address& from)
     else
     {
         NS_LOG_WARN(this << " discarding a packet delay of " << delay.GetSeconds()
-                         << " from statistics collection"
-                         << " because it comes from sender " << from
-                         << " without valid InetSocketAddress");
+                         << " from statistics collection" << " because it comes from sender "
+                         << from << " without valid InetSocketAddress");
     }
 }
 

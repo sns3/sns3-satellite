@@ -18,12 +18,12 @@
  * Author: Mathias Ettinger <mettinger@toulouse.viveris.fr>
  */
 
-#include <ns3/config-store-module.h>
-#include <ns3/core-module.h>
-#include <ns3/internet-module.h>
-#include <ns3/network-module.h>
-#include <ns3/satellite-module.h>
-#include <ns3/traffic-module.h>
+#include "ns3/config-store-module.h"
+#include "ns3/core-module.h"
+#include "ns3/internet-module.h"
+#include "ns3/network-module.h"
+#include "ns3/satellite-module.h"
+#include "ns3/traffic-module.h"
 
 #include <iostream>
 
@@ -47,10 +47,10 @@ SatCourseChange(std::string context, Ptr<const SatMobilityModel> position)
 }
 
 /**
- * \file sat-mobility-beam-tracer.cc
- * \ingroup satellite
+ * @file sat-mobility-beam-tracer.cc
+ * @ingroup satellite
  *
- * \brief Simulation script to run example simulation results with
+ * @brief Simulation script to run example simulation results with
  * a high degree of customization through XML file.
  *
  * execute command -> ./ns3 run "sat-mobility-beam-tracer --PrintHelp"
@@ -62,10 +62,10 @@ int
 main(int argc, char* argv[])
 {
     std::string inputFileNameWithPath =
-        Singleton<SatEnvVariables>::Get()->LocateDirectory("contrib/satellite/examples") +
+        SatEnvVariables::GetInstance()->LocateDirectory("contrib/satellite/examples") +
         "/generic-input-attributes.xml";
     std::string mobileUtTraceFile = "";
-    // mobileUtTraceFile = Singleton<SatEnvVariables>::Get()->LocateDataDirectory() +
+    // mobileUtTraceFile = SatEnvVariables::GetInstance()->LocateDataDirectory() +
     //                     "/additional-input/utpositions/mobiles/scenario6/trajectory";
 
     Config::SetDefault("ns3::SatConf::ForwardLinkRegenerationMode",

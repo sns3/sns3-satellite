@@ -23,9 +23,9 @@
 #ifndef SATELLITE_LOWER_LAYER_SERIVICE_H
 #define SATELLITE_LOWER_LAYER_SERIVICE_H
 
-#include <ns3/nstime.h>
-#include <ns3/object.h>
-#include <ns3/random-variable-stream.h>
+#include "ns3/nstime.h"
+#include "ns3/object.h"
+#include "ns3/random-variable-stream.h"
 
 #include <sstream>
 #include <stdint.h>
@@ -37,7 +37,7 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
  * The SatLowerLayerService class holds information of a satellite lower layer service DA entry.
  *
@@ -68,7 +68,7 @@ class SatLowerLayerServiceDaEntry
     /**
      * Get state, if constant assignment is provided.
      *
-     * \return Is constant assignment provided [true or false]
+     * @return Is constant assignment provided [true or false]
      */
     inline bool GetConstantAssignmentProvided() const
     {
@@ -78,7 +78,7 @@ class SatLowerLayerServiceDaEntry
     /**
      * Set state, if constant assignment is provided.
      *
-     * \param constAssignmentProvided Constant assignment provided state [true or false]
+     * @param constAssignmentProvided Constant assignment provided state [true or false]
      */
     inline void SetConstantAssignmentProvided(bool constAssignmentProvided)
     {
@@ -88,7 +88,7 @@ class SatLowerLayerServiceDaEntry
     /**
      * Get state, if RBDC is allowed.
      *
-     * \return Is RBDC allowed [true or false]
+     * @return Is RBDC allowed [true or false]
      */
     inline bool GetRbdcAllowed() const
     {
@@ -98,7 +98,7 @@ class SatLowerLayerServiceDaEntry
     /**
      * Set state, if RBDC is allowed.
      *
-     * \param bdcAllowed RBDC allowed state [true or false]
+     * @param bdcAllowed RBDC allowed state [true or false]
      */
     inline void SetRbdcAllowed(bool bdcAllowed)
     {
@@ -108,7 +108,7 @@ class SatLowerLayerServiceDaEntry
     /**
      * Get state, if volume is allowed.
      *
-     * \return Is volume allowed [true or false]
+     * @return Is volume allowed [true or false]
      */
     inline bool GetVolumeAllowed() const
     {
@@ -118,7 +118,7 @@ class SatLowerLayerServiceDaEntry
     /**
      * Set state, if volume is allowed.
      *
-     * \param volumeAllowed Volume allowed state [true or false]
+     * @param volumeAllowed Volume allowed state [true or false]
      */
     inline void SetVolumeAllowed(bool volumeAllowed)
     {
@@ -128,7 +128,7 @@ class SatLowerLayerServiceDaEntry
     /**
      * Get constant service rate.
      *
-     * \return Constant service rate [KBps]
+     * @return Constant service rate [KBps]
      */
     inline uint16_t GetConstantServiceRateInKbps() const
     {
@@ -138,7 +138,7 @@ class SatLowerLayerServiceDaEntry
     /**
      * Get constant service rate stream.
      *
-     * \return Constant service rate stream.
+     * @return Constant service rate stream.
      */
     inline Ptr<RandomVariableStream> GetConstantServiceRateStream() const
     {
@@ -148,7 +148,7 @@ class SatLowerLayerServiceDaEntry
     /**
      * Set constant service rate stream.
      *
-     * \param constantServiceRateKbps Constant service rate [KBps]
+     * @param constantServiceRateKbps Constant service rate [KBps]
      */
     inline void SetConstantServiceRateStream(Ptr<RandomVariableStream> constantServiceRateStream)
     {
@@ -158,7 +158,7 @@ class SatLowerLayerServiceDaEntry
     /**
      * Get maximum service rate.
      *
-     * \return Maximum service rate [KBps]
+     * @return Maximum service rate [KBps]
      */
     inline uint16_t GetMaximumServiceRateInKbps() const
     {
@@ -168,7 +168,7 @@ class SatLowerLayerServiceDaEntry
     /**
      * Set maximum service rate.
      *
-     * \param maximumServiceRateKbps Maximum service rate [KBps]
+     * @param maximumServiceRateKbps Maximum service rate [KBps]
      */
     inline void SetMaximumServiceRateInKbps(uint16_t maximumServiceRateKbps)
     {
@@ -178,7 +178,7 @@ class SatLowerLayerServiceDaEntry
     /**
      * Get minimum service rate.
      *
-     * \return Minimum service rate [KBps]
+     * @return Minimum service rate [KBps]
      */
     inline uint16_t GetMinimumServiceRateInKbps() const
     {
@@ -188,7 +188,7 @@ class SatLowerLayerServiceDaEntry
     /**
      * Set minimum service rate.
      *
-     * \param minimumServiceRateKbps Minimum service rate [KBps]
+     * @param minimumServiceRateKbps Minimum service rate [KBps]
      */
     inline void SetMinimumServiceRateInKbps(uint16_t minimumServiceRateKbps)
     {
@@ -198,7 +198,7 @@ class SatLowerLayerServiceDaEntry
     /**
      * Get maximum backlog size.
      *
-     * \return Maximum backlog size [KBytes]
+     * @return Maximum backlog size [KBytes]
      */
     inline uint16_t GetMaximumBacklogInKbytes() const
     {
@@ -208,7 +208,7 @@ class SatLowerLayerServiceDaEntry
     /**
      * Set maximum backlog size.
      *
-     * \param maximumBacklogInBytes Maximum backlog size [KBytes]
+     * @param maximumBacklogInBytes Maximum backlog size [KBytes]
      */
     inline void SetMaximumBacklogInKbytes(uint16_t maximumBacklogInKbytes)
     {
@@ -217,7 +217,7 @@ class SatLowerLayerServiceDaEntry
 };
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
  * The SatLowerLayerService class holds information of a satellite lower layer service RA entry.
  */
@@ -251,7 +251,7 @@ class SatLowerLayerServiceRaEntry
     /**
      * Get maximum unique payload per block.
      *
-     * \return Maximum unique payload per block
+     * @return Maximum unique payload per block
      */
     inline uint8_t GetMaximumUniquePayloadPerBlock() const
     {
@@ -261,7 +261,7 @@ class SatLowerLayerServiceRaEntry
     /**
      * Set maximum unique payload per block.
      *
-     * \param maxUniquePayloadPerBlock Maximum unique payload per block
+     * @param maxUniquePayloadPerBlock Maximum unique payload per block
      */
     inline void SetMaximumUniquePayloadPerBlock(uint8_t maxUniquePayloadPerBlock)
     {
@@ -271,7 +271,7 @@ class SatLowerLayerServiceRaEntry
     /**
      * Get maximum consecutive block accessed.
      *
-     * \return Maximum consecutive block accessed
+     * @return Maximum consecutive block accessed
      */
     inline uint8_t GetMaximumConsecutiveBlockAccessed() const
     {
@@ -281,7 +281,7 @@ class SatLowerLayerServiceRaEntry
     /**
      * Set maximum consecutive block accessed.
      *
-     * \param maxConsecutiveBlockAccessed Maximum consecutive block accessed
+     * @param maxConsecutiveBlockAccessed Maximum consecutive block accessed
      */
     inline void SetMaximumConsecutiveBlockAccessed(uint8_t maxConsecutiveBlockAccessed)
     {
@@ -291,7 +291,7 @@ class SatLowerLayerServiceRaEntry
     /**
      * Get minimum idle block.
      *
-     * \return Minimum idle block
+     * @return Minimum idle block
      */
     inline uint8_t GetMinimumIdleBlock() const
     {
@@ -301,7 +301,7 @@ class SatLowerLayerServiceRaEntry
     /**
      * Set minimum idle block.
      *
-     * \param minimumIdleBlock Minimum idle block
+     * @param minimumIdleBlock Minimum idle block
      */
     inline void SetMinimumIdleBlock(uint8_t minimumIdleBlock)
     {
@@ -311,7 +311,7 @@ class SatLowerLayerServiceRaEntry
     /**
      * Get back off time in milliseconds.
      *
-     * \return Back off time
+     * @return Back off time
      */
     inline uint16_t GetBackOffTimeInMilliSeconds() const
     {
@@ -321,7 +321,7 @@ class SatLowerLayerServiceRaEntry
     /**
      * Set back off time in milliseconds.
      *
-     * \param backOffTimeInMilliSeconds Back off time
+     * @param backOffTimeInMilliSeconds Back off time
      */
     inline void SetBackOffTimeInMilliSeconds(uint16_t backOffTimeInMilliSeconds)
     {
@@ -331,7 +331,7 @@ class SatLowerLayerServiceRaEntry
     /**
      * Get high load back off time in milliseconds.
      *
-     * \return Back off time
+     * @return Back off time
      */
     inline uint16_t GetHighLoadBackOffTimeInMilliSeconds() const
     {
@@ -341,7 +341,7 @@ class SatLowerLayerServiceRaEntry
     /**
      * Set high load back off time in milliseconds.
      *
-     * \param backOffTimeInMilliSeconds Back off time
+     * @param backOffTimeInMilliSeconds Back off time
      */
     inline void SetHighLoadBackOffTimeInMilliSeconds(uint16_t backOffTimeInMilliSeconds)
     {
@@ -351,7 +351,7 @@ class SatLowerLayerServiceRaEntry
     /**
      * Get back off probability.
      *
-     * \return Back off probability
+     * @return Back off probability
      */
     inline uint16_t GetBackOffProbability() const
     {
@@ -361,7 +361,7 @@ class SatLowerLayerServiceRaEntry
     /**
      * Set back off probability.
      *
-     * \param backOffProbability Back off probability
+     * @param backOffProbability Back off probability
      */
     inline void SetBackOffProbability(uint16_t backOffProbability)
     {
@@ -371,7 +371,7 @@ class SatLowerLayerServiceRaEntry
     /**
      * Get high load back off probability.
      *
-     * \return High load back off probability
+     * @return High load back off probability
      */
     inline uint16_t GetHighLoadBackOffProbability() const
     {
@@ -381,7 +381,7 @@ class SatLowerLayerServiceRaEntry
     /**
      * Set high load back off probability.
      *
-     * \param highLoadBackOffProbability High load back off probability
+     * @param highLoadBackOffProbability High load back off probability
      */
     inline void SetHighLoadBackOffProbability(uint16_t highLoadBackOffProbability)
     {
@@ -391,7 +391,7 @@ class SatLowerLayerServiceRaEntry
     /**
      * Get number of instances.
      *
-     * \return Number of instances
+     * @return Number of instances
      */
     inline uint8_t GetNumberOfInstances() const
     {
@@ -401,7 +401,7 @@ class SatLowerLayerServiceRaEntry
     /**
      * Set number of instances.
      *
-     * \param numberOfInstances Number of instances
+     * @param numberOfInstances Number of instances
      */
     inline void SetNumberOfInstances(uint8_t numberOfInstances)
     {
@@ -411,7 +411,7 @@ class SatLowerLayerServiceRaEntry
     /**
      * Get average normalized offered load threshold.
      *
-     * \return Average normalized offered load threshold
+     * @return Average normalized offered load threshold
      */
     inline double GetAverageNormalizedOfferedLoadThreshold() const
     {
@@ -421,7 +421,7 @@ class SatLowerLayerServiceRaEntry
     /**
      * Set average normalized offered load threshold.
      *
-     * \param averageNormalizedOfferedLoadThreshold Average normalized offered load threshold
+     * @param averageNormalizedOfferedLoadThreshold Average normalized offered load threshold
      */
     inline void SetAverageNormalizedOfferedLoadThreshold(
         double averageNormalizedOfferedLoadThreshold)
@@ -432,7 +432,7 @@ class SatLowerLayerServiceRaEntry
     /**
      * Get Slotted Aloha allowance
      *
-     * \return Is Slotted Aloha allowed
+     * @return Is Slotted Aloha allowed
      */
     inline bool GetIsSlottedAlohaAllowed() const
     {
@@ -442,7 +442,7 @@ class SatLowerLayerServiceRaEntry
     /**
      * Set Slotted Aloha allowance
      *
-     * \param isSlottedAlohaAllowed Is Slotted Aloha allowed
+     * @param isSlottedAlohaAllowed Is Slotted Aloha allowed
      */
     inline void SetIsSlottedAlohaAllowed(bool isSlottedAlohaAllowed)
     {
@@ -452,7 +452,7 @@ class SatLowerLayerServiceRaEntry
     /**
      * Get CRDSA allowance
      *
-     * \return Is CRDSA allowed
+     * @return Is CRDSA allowed
      */
     inline bool GetIsCrdsaAllowed() const
     {
@@ -462,7 +462,7 @@ class SatLowerLayerServiceRaEntry
     /**
      * Set CRDSA allowance
      *
-     * \param isCrdsaAllowed Is CRDSA allowed
+     * @param isCrdsaAllowed Is CRDSA allowed
      */
     inline void SetIsCrdsaAllowed(bool isCrdsaAllowed)
     {
@@ -472,7 +472,7 @@ class SatLowerLayerServiceRaEntry
     /**
      * Get ESSA allowance
      *
-     * \return Is ESSA allowed
+     * @return Is ESSA allowed
      */
     inline bool GetIsEssaAllowed() const
     {
@@ -482,7 +482,7 @@ class SatLowerLayerServiceRaEntry
     /**
      * Set ESSA allowance
      *
-     * \param isEssaAllowed Is ESSA allowed
+     * @param isEssaAllowed Is ESSA allowed
      */
     inline void SetIsEssaAllowed(bool isEssaAllowed)
     {
@@ -491,7 +491,7 @@ class SatLowerLayerServiceRaEntry
 };
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
  * The SatLowerLayerServiceConf class holds information of all configures lower layer service
  * entries.
@@ -523,15 +523,9 @@ class SatLowerLayerServiceConf : public Object
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
-     */
-    virtual TypeId GetInstanceTypeId(void) const;
-
-    /**
      * Get count of configured RA services.
      *
-     * \return count of configured RA services.
+     * @return count of configured RA services.
      */
     inline uint8_t GetRaServiceCount() const
     {
@@ -541,7 +535,7 @@ class SatLowerLayerServiceConf : public Object
     /**
      * Get count of configured DA services.
      *
-     * \return count of configured DA services.
+     * @return count of configured DA services.
      */
     inline uint8_t GetDaServiceCount() const
     {
@@ -551,7 +545,7 @@ class SatLowerLayerServiceConf : public Object
     /**
      * Get configured dynamic rate persistence.
      *
-     * \return Dynamic rate persistence
+     * @return Dynamic rate persistence
      */
     uint8_t GetDynamicRatePersistence() const
     {
@@ -561,7 +555,7 @@ class SatLowerLayerServiceConf : public Object
     /**
      * Get configured volume backlog persistence.
      *
-     * \return Volume backlog persistence
+     * @return Volume backlog persistence
      */
     uint8_t GetVolumeBacklogPersistence() const
     {
@@ -571,7 +565,7 @@ class SatLowerLayerServiceConf : public Object
     /**
      * Get configured default control randomization interval.
      *
-     * \return Default control randomization interval
+     * @return Default control randomization interval
      */
     Time GetDefaultControlRandomizationInterval() const
     {
@@ -581,7 +575,7 @@ class SatLowerLayerServiceConf : public Object
     /**
      * Get index of default RA service.
      *
-     * \return index of default RA service.
+     * @return index of default RA service.
      */
     inline uint8_t GetRaDefaultService() const
     {
@@ -591,160 +585,160 @@ class SatLowerLayerServiceConf : public Object
     /**
      * Get state, if constant assignment is provided for a DA service.
      *
-     * \param index Index of the service
-     * \return Is constant assignment provided [true or false]
+     * @param index Index of the service
+     * @return Is constant assignment provided [true or false]
      */
     bool GetDaConstantAssignmentProvided(uint8_t index) const;
 
     /**
      * Get state, if RBDC is allowed for a DA service.
      *
-     * \param index Index of the service
-     * \return Is RBDC allowed [true or false]
+     * @param index Index of the service
+     * @return Is RBDC allowed [true or false]
      */
     bool GetDaRbdcAllowed(uint8_t index) const;
 
     /**
      * Get state, if volume is allowed for a DA service.
      *
-     * \param index Index of the service
-     * \return Is volume allowed [true or false]
+     * @param index Index of the service
+     * @return Is volume allowed [true or false]
      */
     bool GetDaVolumeAllowed(uint8_t index) const;
 
     /**
      * Get constant service rate for a DA service.
      *
-     * \param index Index of the service
-     * \return Constant service rate [KBps]
+     * @param index Index of the service
+     * @return Constant service rate [KBps]
      */
     uint16_t GetDaConstantServiceRateInKbps(uint8_t index) const;
 
     /**
      * Get constant service rate stream for a DA service.
      *
-     * \param index Index of the service
-     * \return Constant service rate stream [KBps]
+     * @param index Index of the service
+     * @return Constant service rate stream [KBps]
      */
     Ptr<RandomVariableStream> GetDaConstantServiceRateStream(uint8_t index) const;
 
     /**
      * Get maximum service rate for a DA service.
      *
-     * \param index Index of the service
-     * \return Maximum service rate [KBps]
+     * @param index Index of the service
+     * @return Maximum service rate [KBps]
      */
     uint16_t GetDaMaximumServiceRateInKbps(uint8_t index) const;
 
     /**
      * Get minimum service rate for a DA service.
      *
-     * \param index Index of the service
-     * \return Minimum service rate [KBps]
+     * @param index Index of the service
+     * @return Minimum service rate [KBps]
      */
     uint16_t GetDaMinimumServiceRateInKbps(uint8_t index) const;
 
     /**
      * Get maximum backlog size for a DA service.
      *
-     * \param index Index of the service
-     * \return Maximum backlog size [KBytes]
+     * @param index Index of the service
+     * @return Maximum backlog size [KBytes]
      */
     uint16_t GetDaMaximumBacklogInKbytes(uint8_t index) const;
 
     /**
      * Get maximum unique payload per block for a RA service.
      *
-     * \param index Index of the service
-     * \return Maximum unique payload per block
+     * @param index Index of the service
+     * @return Maximum unique payload per block
      */
     uint8_t GetRaMaximumUniquePayloadPerBlock(uint8_t index) const;
 
     /**
      * Get maximum consecutive block accessed  for a RA service.
      *
-     * \param index Index of the service
-     * \return Maximum consecutive block accessed
+     * @param index Index of the service
+     * @return Maximum consecutive block accessed
      */
     uint8_t GetRaMaximumConsecutiveBlockAccessed(uint8_t index) const;
 
     /**
      * Get minimum idle block for a RA service.
      *
-     * \param index Index of the service
-     * \return Minimum idle block
+     * @param index Index of the service
+     * @return Minimum idle block
      */
     uint8_t GetRaMinimumIdleBlock(uint8_t index) const;
 
     /**
      * Get back off time in milliseconds.
      *
-     * \param index Index of the service
-     * \return Back off time
+     * @param index Index of the service
+     * @return Back off time
      */
     uint16_t GetRaBackOffTimeInMilliSeconds(uint8_t index) const;
 
     /**
      * Get high load back off time in milliseconds.
      *
-     * \param index Index of the service
-     * \return Back off time
+     * @param index Index of the service
+     * @return Back off time
      */
     uint16_t GetRaHighLoadBackOffTimeInMilliSeconds(uint8_t index) const;
 
     /**
      * Get back off probability.
      *
-     * \param index Index of the service
-     * \return Back off probability
+     * @param index Index of the service
+     * @return Back off probability
      */
     uint16_t GetRaBackOffProbability(uint8_t index) const;
 
     /**
      * Get high load back off probability.
      *
-     * \param index Index of the service
-     * \return High load back off probability
+     * @param index Index of the service
+     * @return High load back off probability
      */
     uint16_t GetRaHighLoadBackOffProbability(uint8_t index) const;
 
     /**
      * Get number of instances.
      *
-     * \param index Index of the service
-     * \return Number of instances
+     * @param index Index of the service
+     * @return Number of instances
      */
     uint8_t GetRaNumberOfInstances(uint8_t index) const;
 
     /**
      * Get average normalized offeredLoad Threshold.
      *
-     * \param index Index of the service
-     * \return Average normalized offered load threshold
+     * @param index Index of the service
+     * @return Average normalized offered load threshold
      */
     double GetRaAverageNormalizedOfferedLoadThreshold(uint8_t index) const;
 
     /**
      * Get Slotted Aloha allowance
      *
-     * \param index Index of the service
-     * \return Is Slotted Aloha allowed
+     * @param index Index of the service
+     * @return Is Slotted Aloha allowed
      */
     bool GetRaIsSlottedAlohaAllowed(uint8_t index) const;
 
     /**
      * Get CRDSA allowance
      *
-     * \param index Index of the service
-     * \return Is CRDSA allowed
+     * @param index Index of the service
+     * @return Is CRDSA allowed
      */
     bool GetRaIsCrdsaAllowed(uint8_t index) const;
 
     /**
      * Get E-SSA allowance
      *
-     * \param index Index of the service
-     * \return Is E-SSA allowed
+     * @param index Index of the service
+     * @return Is E-SSA allowed
      */
     bool GetRaIsEssaAllowed(uint8_t index) const;
 
@@ -760,8 +754,8 @@ class SatLowerLayerServiceConf : public Object
 
     /**
      * Template method to convert number to string
-     * \param number number to convert as string
-     * \return number as string
+     * @param number number to convert as string
+     * @return number as string
      */
     template <class T>
     static std::string GetNumberAsString(T number)
@@ -776,48 +770,48 @@ class SatLowerLayerServiceConf : public Object
     /**
      * Method to convert DA service index to service name.
      *
-     * \param index index to convert as service name
-     * \return service name
+     * @param index index to convert as service name
+     * @return service name
      */
     static std::string GetIndexAsDaServiceName(uint8_t index);
 
     /**
      * Method to convert RA service index to service name.
      *
-     * \param index index to convert as service name
-     * \return service name
+     * @param index index to convert as service name
+     * @return service name
      */
     static std::string GetIndexAsRaServiceName(uint8_t index);
 
     /**
      * Set state, if constant assignment is provided for a DA service.
      *
-     * \param index Index of the service
-     * \param constAssignmentProvided Constant assignment provided state [true or false]
+     * @param index Index of the service
+     * @param constAssignmentProvided Constant assignment provided state [true or false]
      */
     void SetDaConstantAssignmentProvided(uint8_t index, bool constAssignmentProvided);
 
     /**
      * Set state, if RBDC is allowed for a DA service.
      *
-     * \param index Index of the service
-     * \param bdcAllowed RBDC allowed state [true or false]
+     * @param index Index of the service
+     * @param bdcAllowed RBDC allowed state [true or false]
      */
     void SetDaRbdcAllowed(uint8_t index, bool bdcAllowed);
 
     /**
      * Set state, if volume is allowed for a DA service.
      *
-     * \param index Index of the service
-     * \param volumeAllowed Volume allowed state [true or false]
+     * @param index Index of the service
+     * @param volumeAllowed Volume allowed state [true or false]
      */
     void SetDaVolumeAllowed(uint8_t index, bool volumeAllowed);
 
     /**
      * Set constant service rate stream for a DA service.
      *
-     * \param index Index of the service
-     * \param constantServiceRateStream Constant service rate stream [KBps]
+     * @param index Index of the service
+     * @param constantServiceRateStream Constant service rate stream [KBps]
      */
     void SetDaConstantServiceRateStream(uint8_t index,
                                         Ptr<RandomVariableStream> constantServiceRateStream);
@@ -825,96 +819,96 @@ class SatLowerLayerServiceConf : public Object
     /**
      * Set maximum service rate for a DA service.
      *
-     * \param index Index of the service
-     * \param maximumServiceRateKbps Maximum service rate [KBps]
+     * @param index Index of the service
+     * @param maximumServiceRateKbps Maximum service rate [KBps]
      */
     void SetDaMaximumServiceRateInKbps(uint8_t index, uint16_t maximumServiceRateKbps);
 
     /**
      * Set minimum service rate for a DA service.
      *
-     * \param index Index of the service
-     * \param minimumServiceRateKbps Minimum service rate [KBps]
+     * @param index Index of the service
+     * @param minimumServiceRateKbps Minimum service rate [KBps]
      */
     void SetDaMinimumServiceRateInKbps(uint8_t index, uint16_t minimumServiceRateKbps);
 
     /**
      * Set maximum backlog size for a DA service.
      *
-     * \param index Index of the service
-     * \param maximumBacklogInKbytes Maximum backlog size [KBytes]
+     * @param index Index of the service
+     * @param maximumBacklogInKbytes Maximum backlog size [KBytes]
      */
     void SetDaMaximumBacklogInKbytes(uint8_t index, uint16_t maximumBacklogInKbytes);
 
     /**
      * Set maximum unique payload per block for a RA service.
      *
-     * \param index Index of the service
-     * \param maxUniquePayloadPerBlock Maximum unique payload per block
+     * @param index Index of the service
+     * @param maxUniquePayloadPerBlock Maximum unique payload per block
      */
     void SetRaMaximumUniquePayloadPerBlock(uint8_t index, uint8_t maxUniquePayloadPerBlock);
 
     /**
      * Set maximum consecutive block accessed for a RA service.
      *
-     * \param index Index of the service
-     * \param maxConsecutiveBlockAccessed Maximum consecutive block accessed
+     * @param index Index of the service
+     * @param maxConsecutiveBlockAccessed Maximum consecutive block accessed
      */
     void SetRaMaximumConsecutiveBlockAccessed(uint8_t index, uint8_t maxConsecutiveBlockAccessed);
 
     /**
      * Set minimum idle block for a RA service.
      *
-     * \param index Index of the service
-     * \param minimumIdleBlock Minimum idle block
+     * @param index Index of the service
+     * @param minimumIdleBlock Minimum idle block
      */
     void SetRaMinimumIdleBlock(uint8_t index, uint8_t minimumIdleBlock);
 
     /**
      * Set back off time in milliseconds.
      *
-     * \param index Index of the service
-     * \param backOffTimeInMilliSeconds Back off time
+     * @param index Index of the service
+     * @param backOffTimeInMilliSeconds Back off time
      */
     void SetRaBackOffTimeInMilliSeconds(uint8_t index, uint16_t backOffTimeInMilliSeconds);
 
     /**
      * Set high load back off time in milliseconds.
      *
-     * \param index Index of the service
-     * \param backOffTimeInMilliSeconds Back off time
+     * @param index Index of the service
+     * @param backOffTimeInMilliSeconds Back off time
      */
     void SetRaHighLoadBackOffTimeInMilliSeconds(uint8_t index, uint16_t backOffTimeInMilliSeconds);
 
     /**
      * Set back off probability.
      *
-     * \param index Index of the service
-     * \param backOffProbability Back off probability
+     * @param index Index of the service
+     * @param backOffProbability Back off probability
      */
     void SetRaBackOffProbability(uint8_t index, uint16_t backOffProbability);
 
     /**
      * Set high load back off probability.
      *
-     * \param index Index of the service
-     * \param highLoadBackOffProbability High load back off probability
+     * @param index Index of the service
+     * @param highLoadBackOffProbability High load back off probability
      */
     void SetRaHighLoadBackOffProbability(uint8_t index, uint16_t highLoadBackOffProbability);
 
     /**
      * Set number of instances.
      *
-     * \param index Index of the service
-     * \param numberOfInstances Number of instances
+     * @param index Index of the service
+     * @param numberOfInstances Number of instances
      */
     void SetRaNumberOfInstances(uint8_t index, uint8_t numberOfInstances);
 
     /**
      * Set average normalized offeredLoad Threshold.
      *
-     * \param index Index of the service
-     * \param Average normalized offered load threshold
+     * @param index Index of the service
+     * @param Average normalized offered load threshold
      */
     void SetRaAverageNormalizedOfferedLoadThreshold(uint8_t index,
                                                     double averageNormalizedOfferedLoadThreshold);
@@ -922,24 +916,24 @@ class SatLowerLayerServiceConf : public Object
     /**
      * Set Slotted Aloha allowance
      *
-     * \param index Index of the service
-     * \param isSlottedAlohaAllowed Is Slotted Aloha allowed
+     * @param index Index of the service
+     * @param isSlottedAlohaAllowed Is Slotted Aloha allowed
      */
     void SetRaIsSlottedAlohaAllowed(uint8_t index, bool isSlottedAlohaAllowed);
 
     /**
      * Set CRDSA allowance
      *
-     * \param index Index of the service
-     * \param isCrdsaAllowed Is CRDSA allowed
+     * @param index Index of the service
+     * @param isCrdsaAllowed Is CRDSA allowed
      */
     void SetRaIsCrdsaAllowed(uint8_t index, bool isCrdsaAllowed);
 
     /**
      * Set ESSA allowance
      *
-     * \param index Index of the service
-     * \param isEssaAllowed Is ESSA allowed
+     * @param index Index of the service
+     * @param isEssaAllowed Is ESSA allowed
      */
     void SetRaIsEssaAllowed(uint8_t index, bool isEssaAllowed);
 
@@ -974,7 +968,7 @@ class SatLowerLayerServiceConf : public Object
  *  - GetDaServ0MaximumBacklogSizeInBytes, see
  * @SatLowerLayerServiceEntry::GetMaximumBacklogSizeInKbytes
  *
- * \param index Index of the service which attribute access methods are defined
+ * @param index Index of the service which attribute access methods are defined
  */
 #define SAT_DA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(index)                                            \
     inline void SetDaServ##index##ConstantAssignmentProvided(bool value)                           \
@@ -1077,7 +1071,7 @@ class SatLowerLayerServiceConf : public Object
  *  - SetRaServ0IsEssaAllowed, see @SatLowerLayerServiceRaEntry::SetIsEssaAllowed
  *  - GetRaServ0IsEssaAllowed, see @SatLowerLayerServiceRaEntry::GetIsEssaAllowed
  *
- * \param index Index of the service which attribute access methods are defined
+ * @param index Index of the service which attribute access methods are defined
  */
 #define SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(index)                                            \
     inline void SetRaServ##index##MaximumUniquePayloadPerBlock(uint8_t value)                      \

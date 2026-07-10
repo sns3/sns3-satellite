@@ -20,7 +20,7 @@
 
 #include "satellite-superframe-allocator.h"
 
-#include <ns3/log.h>
+#include "ns3/log.h"
 
 #include <map>
 #include <stdint.h>
@@ -37,14 +37,6 @@ SatSuperframeAllocator::GetTypeId(void)
 {
     static TypeId tid = TypeId("ns3::SatSuperframeAllocator").SetParent<Object>();
     return tid;
-}
-
-TypeId
-SatSuperframeAllocator::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
 }
 
 SatSuperframeAllocator::SatSuperframeAllocator(Ptr<SatSuperframeConf> superFrameConf)

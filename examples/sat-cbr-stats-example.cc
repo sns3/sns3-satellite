@@ -72,10 +72,10 @@ using namespace ns3;
     s->AddAverageUt##id(SatStatsHelper::OUTPUT_CDF_PLOT);
 
 /**
- * \file sat-cbr-stats-example.cc
- * \ingroup satellite
+ * @file sat-cbr-stats-example.cc
+ * @ingroup satellite
  *
- * \brief  Cbr example application to use satellite network and to produce
+ * @brief  Cbr example application to use satellite network and to produce
  *         the full range of statistics. Only some of the statistics are enabled
  *         by default.
  *         Interval, packet size and test scenario can be given

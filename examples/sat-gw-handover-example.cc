@@ -30,10 +30,10 @@
 using namespace ns3;
 
 /**
- * \file sat-gw-handover-example.cc
- * \ingroup satellite
+ * @file sat-gw-handover-example.cc
+ * @ingroup satellite
  *
- * \brief  Test handover for both GW and UT
+ * @brief  Test handover for both GW and UT
  *
  */
 

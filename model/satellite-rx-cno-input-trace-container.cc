@@ -24,7 +24,7 @@
 #include "../utils/satellite-env-variables.h"
 #include "satellite-id-mapper.h"
 
-#include <ns3/singleton.h>
+#include "ns3/singleton.h"
 
 #include <ios>
 #include <sstream>
@@ -46,14 +46,6 @@ SatRxCnoInputTraceContainer::GetTypeId(void)
                             .SetParent<SatBaseTraceContainer>()
                             .AddConstructor<SatRxCnoInputTraceContainer>();
     return tid;
-}
-
-TypeId
-SatRxCnoInputTraceContainer::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
 }
 
 SatRxCnoInputTraceContainer::SatRxCnoInputTraceContainer()
@@ -100,7 +92,7 @@ SatRxCnoInputTraceContainer::AddNode(key_t key)
     NS_LOG_FUNCTION(this);
 
     std::stringstream filename;
-    std::string dataPath = Singleton<SatEnvVariables>::Get()->LocateDataDirectory();
+    std::string dataPath = SatEnvVariables::GetInstance()->LocateDataDirectory();
 
     int32_t gwId = Singleton<SatIdMapper>::Get()->GetGwIdWithMac(key.first);
     int32_t utId = Singleton<SatIdMapper>::Get()->GetUtIdWithMac(key.first);

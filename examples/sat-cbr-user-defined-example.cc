@@ -29,10 +29,10 @@
 using namespace ns3;
 
 /**
- * \file sat-cbr-user-defined-example.cc
- * \ingroup satellite
+ * @file sat-cbr-user-defined-example.cc
+ * @ingroup satellite
  *
- * \brief  Another example of CBR application usage in satellite network.
+ * @brief  Another example of CBR application usage in satellite network.
  *         The scripts is using user defined scenario, which means that user
  *         can change the scenario size quite to be whatever between 1 and
  *         full scenario (72 beams). Currently it is configured to using only

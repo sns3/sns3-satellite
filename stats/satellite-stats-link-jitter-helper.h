@@ -24,10 +24,10 @@
 
 #include "satellite-stats-helper.h"
 
-#include <ns3/address.h>
-#include <ns3/collector-map.h>
-#include <ns3/ptr.h>
-#include <ns3/satellite-enums.h>
+#include "ns3/address.h"
+#include "ns3/collector-map.h"
+#include "ns3/ptr.h"
+#include "ns3/satellite-enums.h"
 
 #include <list>
 #include <map>
@@ -45,8 +45,8 @@ class DataCollectionObject;
 class DistributionCollector;
 
 /**
- * \ingroup satstats
- * \brief Base class for jitter statistics helpers.
+ * @ingroup satstats
+ * @brief Base class for jitter statistics helpers.
  */
 class SatStatsLinkJitterHelper : public SatStatsHelper
 {
@@ -65,26 +65,26 @@ class SatStatsLinkJitterHelper : public SatStatsHelper
     static TypeId GetTypeId();
 
     /**
-     * \param averagingMode average all samples before passing them to aggregator.
+     * @param averagingMode average all samples before passing them to aggregator.
      */
     void SetAveragingMode(bool averagingMode);
 
     /**
-     * \return the currently active averaging mode.
+     * @return the currently active averaging mode.
      */
     bool GetAveragingMode() const;
 
     /**
-     * \brief Set up several probes or other means of listeners and connect them
+     * @brief Set up several probes or other means of listeners and connect them
      *        to the collectors.
      */
     void InstallProbes();
 
     /**
-     * \brief Receive inputs from trace sources and determine the right collector
+     * @brief Receive inputs from trace sources and determine the right collector
      *        to forward the inputs to.
-     * \param jitter packet jitter.
-     * \param from the address of the sender of the packet.
+     * @param jitter packet jitter.
+     * @param from the address of the sender of the packet.
      *
      * Used in return link statistics. DoInstallProbes() is expected to connect
      * the right trace sources to this method.
@@ -96,35 +96,35 @@ class SatStatsLinkJitterHelper : public SatStatsHelper
     void DoInstall();
 
     /**
-     * \brief
+     * @brief
      */
     virtual void DoInstallProbes() = 0;
 
     /**
-     * \brief Connect the probe to the right collector.
-     * \param probe
-     * \param identifier
+     * @brief Connect the probe to the right collector.
+     * @param probe
+     * @param identifier
      */
     bool ConnectProbeToCollector(Ptr<Probe> probe, uint32_t identifier);
 
     /**
-     * \brief Disconnect the probe from the right collector.
-     * \param probe
-     * \param identifier
+     * @brief Disconnect the probe from the right collector.
+     * @param probe
+     * @param identifier
      */
     bool DisconnectProbeFromCollector(Ptr<Probe> probe, uint32_t identifier);
 
     /**
-     * \brief Find a collector with the right identifier and pass a sample data
+     * @brief Find a collector with the right identifier and pass a sample data
      *        to it.
-     * \param jitter
-     * \param identifier
+     * @param jitter
+     * @param identifier
      */
     void PassSampleToCollector(const Time& jitter, uint32_t identifier);
 
     /**
-     * \brief Set the channel used by this probe.
-     * \param channelLink The channel used.
+     * @brief Set the channel used by this probe.
+     * @param channelLink The channel used.
      */
     void SetChannelLink(SatEnums::ChannelType_t channelLink);
 
@@ -147,20 +147,20 @@ class SatStatsLinkJitterHelper : public SatStatsHelper
 // FORWARD FEEDER LINK DEV-LEVEL /////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce forward feeder link DEV-level jitter statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce forward feeder link DEV-level jitter statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFwdFeederDevLinkJitterHelper> s = Create<SatStatsFwdFeederDevLinkJitterHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFwdFeederDevLinkJitterHelper : public SatStatsLinkJitterHelper
 {
@@ -187,20 +187,20 @@ class SatStatsFwdFeederDevLinkJitterHelper : public SatStatsLinkJitterHelper
 // FORWARD USER LINK DEV-LEVEL /////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce forward user link DEV-level jitter statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce forward user link DEV-level jitter statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFwdUserDevLinkJitterHelper> s = Create<SatStatsFwdUserDevLinkJitterHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFwdUserDevLinkJitterHelper : public SatStatsLinkJitterHelper
 {
@@ -236,20 +236,20 @@ class SatStatsFwdUserDevLinkJitterHelper : public SatStatsLinkJitterHelper
 // FORWARD FEEDER LINK MAC-LEVEL /////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce forward feeder link MAC-level jitter statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce forward feeder link MAC-level jitter statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFwdFeederMacLinkJitterHelper> s = Create<SatStatsFwdFeederMacLinkJitterHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFwdFeederMacLinkJitterHelper : public SatStatsLinkJitterHelper
 {
@@ -276,20 +276,20 @@ class SatStatsFwdFeederMacLinkJitterHelper : public SatStatsLinkJitterHelper
 // FORWARD USER LINK MAC-LEVEL /////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce forward user link MAC-level jitter statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce forward user link MAC-level jitter statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFwdUserMacLinkJitterHelper> s = Create<SatStatsFwdUserMacLinkJitterHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFwdUserMacLinkJitterHelper : public SatStatsLinkJitterHelper
 {
@@ -325,20 +325,20 @@ class SatStatsFwdUserMacLinkJitterHelper : public SatStatsLinkJitterHelper
 // FORWARD FEEDER LINK PHY-LEVEL /////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce forward feeder link PHY-level jitter statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce forward feeder link PHY-level jitter statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFwdFeederPhyLinkJitterHelper> s = Create<SatStatsFwdFeederPhyLinkJitterHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFwdFeederPhyLinkJitterHelper : public SatStatsLinkJitterHelper
 {
@@ -365,20 +365,20 @@ class SatStatsFwdFeederPhyLinkJitterHelper : public SatStatsLinkJitterHelper
 // FORWARD USER LINK PHY-LEVEL /////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce forward user link PHY-level jitter statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce forward user link PHY-level jitter statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFwdUserPhyLinkJitterHelper> s = Create<SatStatsFwdUserPhyLinkJitterHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFwdUserPhyLinkJitterHelper : public SatStatsLinkJitterHelper
 {
@@ -414,20 +414,20 @@ class SatStatsFwdUserPhyLinkJitterHelper : public SatStatsLinkJitterHelper
 // RETURN FEEDER LINK DEV-LEVEL //////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce return feeder link DEV-level jitter statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce return feeder link DEV-level jitter statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnFeederDevLinkJitterHelper> s = Create<SatStatsRtnFeederDevLinkJitterHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsRtnFeederDevLinkJitterHelper : public SatStatsLinkJitterHelper
 {
@@ -454,20 +454,20 @@ class SatStatsRtnFeederDevLinkJitterHelper : public SatStatsLinkJitterHelper
 // RETURN USER LINK DEV-LEVEL //////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce return user link DEV-level jitter statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce return user link DEV-level jitter statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnUserDevLinkJitterHelper> s = Create<SatStatsRtnUserDevLinkJitterHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsRtnUserDevLinkJitterHelper : public SatStatsLinkJitterHelper
 {
@@ -494,20 +494,20 @@ class SatStatsRtnUserDevLinkJitterHelper : public SatStatsLinkJitterHelper
 // RETURN FEEDER LINK MAC-LEVEL //////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce return feeder link MAC-level jitter statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce return feeder link MAC-level jitter statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnFeederMacLinkJitterHelper> s = Create<SatStatsRtnFeederMacLinkJitterHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsRtnFeederMacLinkJitterHelper : public SatStatsLinkJitterHelper
 {
@@ -534,20 +534,20 @@ class SatStatsRtnFeederMacLinkJitterHelper : public SatStatsLinkJitterHelper
 // RETURN USER LINK MAC-LEVEL //////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce return user link MAC-level jitter statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce return user link MAC-level jitter statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnUserMacLinkJitterHelper> s = Create<SatStatsRtnUserMacLinkJitterHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsRtnUserMacLinkJitterHelper : public SatStatsLinkJitterHelper
 {
@@ -574,20 +574,20 @@ class SatStatsRtnUserMacLinkJitterHelper : public SatStatsLinkJitterHelper
 // RETURN FEEDER LINK PHY-LEVEL //////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce return feeder link PHY-level jitter statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce return feeder link PHY-level jitter statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnFeederPhyLinkJitterHelper> s = Create<SatStatsRtnFeederPhyLinkJitterHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsRtnFeederPhyLinkJitterHelper : public SatStatsLinkJitterHelper
 {
@@ -614,20 +614,20 @@ class SatStatsRtnFeederPhyLinkJitterHelper : public SatStatsLinkJitterHelper
 // RETURN USER LINK PHY-LEVEL //////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce return user link PHY-level jitter statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce return user link PHY-level jitter statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnUserPhyLinkJitterHelper> s = Create<SatStatsRtnUserPhyLinkJitterHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsRtnUserPhyLinkJitterHelper : public SatStatsLinkJitterHelper
 {

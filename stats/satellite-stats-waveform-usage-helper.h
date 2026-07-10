@@ -24,8 +24,8 @@
 
 #include "satellite-stats-helper.h"
 
-#include <ns3/collector-map.h>
-#include <ns3/ptr.h>
+#include "ns3/collector-map.h"
+#include "ns3/ptr.h"
 
 #include <map>
 #include <string>
@@ -37,8 +37,8 @@ class SatHelper;
 class DataCollectionObject;
 
 /**
- * \ingroup satstats
- * \brief
+ * @ingroup satstats
+ * @brief
  */
 class SatStatsWaveformUsageHelper : public SatStatsHelper
 {
@@ -63,13 +63,13 @@ class SatStatsWaveformUsageHelper : public SatStatsHelper
 
   private:
     /**
-     * \param context
-     * \param waveformId
+     * @param context
+     * @param waveformId
      */
     void WaveformUsageCallback(std::string context, uint32_t waveformId);
 
     /**
-     * \brief Two-dimensional map of collectors, indexed by the waveform ID and
+     * @brief Two-dimensional map of collectors, indexed by the waveform ID and
      *        then by the identifier.
      */
     std::map<uint32_t, CollectorMap> m_collectors;

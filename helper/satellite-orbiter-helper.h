@@ -50,7 +50,7 @@ namespace ns3
 {
 
 /**
- * \brief Creates needed objects for Satellite node like SatorbiterNetDevice objects.
+ * @brief Creates needed objects for Satellite node like SatorbiterNetDevice objects.
  *        Handles needed configuration for the Satellite node.
  *
  */
@@ -70,11 +70,10 @@ class SatOrbiterHelper : public Object
     } RandomAccessSettings_s;
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
-    TypeId GetInstanceTypeId(void) const;
 
     /**
      * Default constructor.
@@ -100,8 +99,8 @@ class SatOrbiterHelper : public Object
     /*
      * Initializes the orbiter helper based on attributes.
      * Link results are used only if satellite is regenerative.
-     * \param lrFwd DVB-S2 or DVB-S2X link results
-     * \param lrRcs2 return link results
+     * @param lrFwd DVB-S2 or DVB-S2X link results
+     * @param lrRcs2 return link results
      */
     void Initialize(Ptr<SatLinkResultsFwd> lrFwd, Ptr<SatLinkResultsRtn> lrRcs2);
 
@@ -109,8 +108,8 @@ class SatOrbiterHelper : public Object
      * Set an attribute value to be propagated to each NetDevice created by the
      * helper.
      *
-     * \param name the name of the attribute to set
-     * \param value the value of the attribute to set
+     * @param name the name of the attribute to set
+     * @param value the value of the attribute to set
      *
      * Set these attributes on each ns3::SatOrbiterNetDevice created
      * by SatOrbiterHelper::Install
@@ -120,8 +119,8 @@ class SatOrbiterHelper : public Object
     /**
      * Set an attribute value to be propagated to each User Phy created by the helper.
      *
-     * \param name the name of the attribute to set
-     * \param value the value of the attribute to set
+     * @param name the name of the attribute to set
+     * @param value the value of the attribute to set
      *
      * Set these attributes on each ns3::SatPhy (user) created
      * by SatOrbiterHelper::Install
@@ -131,8 +130,8 @@ class SatOrbiterHelper : public Object
     /**
      * Set an attribute value to be propagated to each Feeder Phy created by the helper.
      *
-     * \param name the name of the attribute to set
-     * \param value the value of the attribute to set
+     * @param name the name of the attribute to set
+     * @param value the value of the attribute to set
      *
      * Set these attributes on each ns3::SatPhy (feeder) created
      * by SatOrbiterHelper::Install
@@ -144,49 +143,49 @@ class SatOrbiterHelper : public Object
      * and associate the resulting ns3::NetDevices with the ns3::Nodes corresponding to the
      * orbiters.
      *
-     * \return container to the created devices
+     * @return container to the created devices
      */
     NetDeviceContainer InstallAllOrbiters();
 
     /**
-     * \param n a node
+     * @param n a node
      *
      * This method creates a ns3::SatOrbiterNetDevice with the requested attributes
      * and associate the resulting ns3::NetDevice with the ns3::Node.
      *
-     * \return pointer to the created device
+     * @return pointer to the created device
      */
     Ptr<NetDevice> Install(Ptr<Node> n);
 
     /**
-     * \param aName name of a node
+     * @param aName name of a node
      *
      * This method creates a ns3::SatOrbiterNetDevice with the requested attributes
      * and associate the resulting ns3::NetDevice with the ns3::Node.
      *
-     * \return pointer to the created device
+     * @return pointer to the created device
      */
     Ptr<NetDevice> Install(std::string aName);
 
     /**
      * Create a SatOrbiterNetDevice instance, with correct type infered from child classes.
      *
-     * \return SatOrbiterNetDevice instance
+     * @return SatOrbiterNetDevice instance
      */
     virtual Ptr<SatOrbiterNetDevice> CreateOrbiterNetDevice() = 0;
 
     /*
      * Attach the SatChannels for the beam to NetDevice
-     * \param dev NetDevice to attach channels
-     * \param fr feeder return channel
-     * \param uf user forward channel
-     * \param uf user return channel
-     * \param userAgp user beam antenna gain pattern
-     * \param feederAgp feeder beam antenna gain pattern
-     * \param ncc NCC (Network Control Center)
-     * \param satId ID of satellite associated to this channel
-     * \param gwId ID of GW associated to this channel
-     * \param userBeamId Id of the user beam
+     * @param dev NetDevice to attach channels
+     * @param fr feeder return channel
+     * @param uf user forward channel
+     * @param uf user return channel
+     * @param userAgp user beam antenna gain pattern
+     * @param feederAgp feeder beam antenna gain pattern
+     * @param ncc NCC (Network Control Center)
+     * @param satId ID of satellite associated to this channel
+     * @param gwId ID of GW associated to this channel
+     * @param userBeamId Id of the user beam
      */
     void AttachChannels(Ptr<NetDevice> dev,
                         Ptr<SatChannel> ff,
@@ -202,14 +201,14 @@ class SatOrbiterHelper : public Object
 
     /*
      * Attach the SatChannels for the beam to NetDevice
-     * \param dev NetDevice to attach channels
-     * \param fr feeder forward channel
-     * \param fr feeder return channel
-     * \param feederAgp feeder beam antenna gain pattern
-     * \param ncc NCC (Network Control Center)
-     * \param satId ID of satellite associated to this channel
-     * \param gwId ID of GW associated to this channel
-     * \param userBeamId Id of the user beam
+     * @param dev NetDevice to attach channels
+     * @param fr feeder forward channel
+     * @param fr feeder return channel
+     * @param feederAgp feeder beam antenna gain pattern
+     * @param ncc NCC (Network Control Center)
+     * @param satId ID of satellite associated to this channel
+     * @param gwId ID of GW associated to this channel
+     * @param userBeamId Id of the user beam
      */
     void AttachChannelsFeeder(Ptr<SatOrbiterNetDevice> dev,
                               Ptr<SatChannel> ff,
@@ -222,13 +221,13 @@ class SatOrbiterHelper : public Object
 
     /*
      * Attach the SatChannels for the beam to NetDevice
-     * \param dev NetDevice to attach channels
-     * \param uf user forward channel
-     * \param uf user return channel
-     * \param userAgp user beam antenna gain pattern
-     * \param ncc NCC (Network Control Center)
-     * \param satId ID of satellite associated to this channel
-     * \param userBeamId Id of the beam
+     * @param dev NetDevice to attach channels
+     * @param uf user forward channel
+     * @param uf user return channel
+     * @param userAgp user beam antenna gain pattern
+     * @param ncc NCC (Network Control Center)
+     * @param satId ID of satellite associated to this channel
+     * @param userBeamId Id of the beam
      */
     virtual void AttachChannelsUser(Ptr<SatOrbiterNetDevice> dev,
                                     Ptr<SatChannel> uf,
@@ -240,15 +239,15 @@ class SatOrbiterHelper : public Object
 
     /**
      * Enables creation traces to be written in given file
-     * \param stream  stream for creation trace outputs
-     * \param cb  callback to connect traces
+     * @param stream  stream for creation trace outputs
+     * @param cb  callback to connect traces
      */
     void EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase& cb);
 
     /**
      * Set ISL routes
      *
-     * \param isls List of all ISLs
+     * @param isls List of all ISLs
      */
     void SetIslRoutes(std::vector<std::pair<uint32_t, uint32_t>> isls);
 
@@ -306,17 +305,17 @@ class SatOrbiterHelper : public Object
     Ptr<SatBbFrameConf> m_bbFrameConfFwd;
 
     /**
-     * \brief Trace callback for creation traces
+     * @brief Trace callback for creation traces
      */
     TracedCallback<std::string> m_creationTrace;
 
     /**
-     * \brief Superframe sequence
+     * @brief Superframe sequence
      */
     Ptr<SatSuperframeSeq> m_superframeSeq;
 
     /**
-     * \brief The used random access model settings
+     * @brief The used random access model settings
      */
     RandomAccessSettings_s m_raSettings;
 

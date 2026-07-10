@@ -24,7 +24,7 @@
 #include "satellite-channel.h"
 #include "satellite-typedefs.h"
 
-#include <ns3/object.h>
+#include "ns3/object.h"
 
 #include <map>
 #include <stdint.h>
@@ -34,7 +34,7 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
  * Container of Satellite channels pairs. As a Satellite channel is mapped into
  * a frequency band and act as data transmitter in a single direction, a pair of
@@ -63,36 +63,36 @@ class SatChannelPair : public Object
     virtual ~SatChannelPair();
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Retrieve the channel pair associated to a beam
-     * \param satId the ID of the satellite
-     * \param beamId the ID of the beam
-     * \return a pair of SatChannel that has been associated to this beam
+     * @brief Retrieve the channel pair associated to a beam
+     * @param satId the ID of the satellite
+     * @param beamId the ID of the beam
+     * @return a pair of SatChannel that has been associated to this beam
      */
     ChannelPair_t GetChannelPair(uint32_t satId, uint32_t beamId) const;
     Ptr<SatChannel> GetForwardChannel(uint32_t satId, uint32_t frequencyId) const;
     Ptr<SatChannel> GetReturnChannel(uint32_t satId, uint32_t frequencyId) const;
 
     /**
-     * \brief Test if a channel pair has been stored for a given color
-     * \param satId the ID of the satellite
-     * \param frequencyId the ID of the color
-     * \return whether or not this color already stores a pair of SatChannel
+     * @brief Test if a channel pair has been stored for a given color
+     * @param satId the ID of the satellite
+     * @param frequencyId the ID of the color
+     * @return whether or not this color already stores a pair of SatChannel
      */
     // bool HasChannelPair (uint32_t frequencyId);
     bool HasFwdChannel(uint32_t satId, uint32_t frequencyId) const;
     bool HasRtnChannel(uint32_t satId, uint32_t frequencyId) const;
 
     /**
-     * \brief Associate a new beam to a given color
-     * \param satId the ID of the satellite
-     * \param beamId the ID of the beam
-     * \param frequencyId the ID of the color
+     * @brief Associate a new beam to a given color
+     * @param satId the ID of the satellite
+     * @param beamId the ID of the beam
+     * @param frequencyId the ID of the color
      */
     // void UpdateBeamsForFrequency (uint32_t beamdId, uint32_t frequencyId);
     void UpdateBeamsForFrequency(uint32_t satId,
@@ -101,12 +101,12 @@ class SatChannelPair : public Object
                                  uint32_t rtnFrequencyId);
 
     /**
-     * \brief Store a pair of SatChannel for the given color
+     * @brief Store a pair of SatChannel for the given color
      * and associate the given beam to said color
-     * \param satId the ID of the satellite
-     * \param beamId the ID of the beam
-     * \param frequencyId the ID of the color
-     * \param channels the SatChannel pair to store
+     * @param satId the ID of the satellite
+     * @param beamId the ID of the beam
+     * @param frequencyId the ID of the color
+     * @param channels the SatChannel pair to store
      */
     // void StoreChannelPair (uint32_t beamId, uint32_t frequencyId, ChannelPair_t channels);
     void StoreChannelPair(uint32_t satId,

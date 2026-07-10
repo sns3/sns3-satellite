@@ -23,26 +23,26 @@
 
 #include "satellite-lora-conf.h"
 
-#include <ns3/callback.h>
-#include <ns3/log.h>
-#include <ns3/lorawan-mac-end-device-class-a.h>
-#include <ns3/pointer.h>
-#include <ns3/satellite-channel-estimation-error-container.h>
-#include <ns3/satellite-channel.h>
-#include <ns3/satellite-const-variables.h>
-#include <ns3/satellite-enums.h>
-#include <ns3/satellite-id-mapper.h>
-#include <ns3/satellite-lorawan-net-device.h>
-#include <ns3/satellite-net-device.h>
-#include <ns3/satellite-node-info.h>
-#include <ns3/satellite-phy-rx-carrier-conf.h>
-#include <ns3/satellite-phy-rx.h>
-#include <ns3/satellite-phy-tx.h>
-#include <ns3/satellite-queue.h>
-#include <ns3/satellite-topology.h>
-#include <ns3/satellite-typedefs.h>
-#include <ns3/satellite-ut-phy.h>
-#include <ns3/singleton.h>
+#include "ns3/callback.h"
+#include "ns3/log.h"
+#include "ns3/lorawan-mac-end-device-class-a.h"
+#include "ns3/pointer.h"
+#include "ns3/satellite-channel-estimation-error-container.h"
+#include "ns3/satellite-channel.h"
+#include "ns3/satellite-const-variables.h"
+#include "ns3/satellite-enums.h"
+#include "ns3/satellite-id-mapper.h"
+#include "ns3/satellite-lorawan-net-device.h"
+#include "ns3/satellite-net-device.h"
+#include "ns3/satellite-node-info.h"
+#include "ns3/satellite-phy-rx-carrier-conf.h"
+#include "ns3/satellite-phy-rx.h"
+#include "ns3/satellite-phy-tx.h"
+#include "ns3/satellite-queue.h"
+#include "ns3/satellite-topology.h"
+#include "ns3/satellite-typedefs.h"
+#include "ns3/satellite-ut-phy.h"
+#include "ns3/singleton.h"
 
 #include <vector>
 
@@ -59,14 +59,6 @@ SatUtHelperLora::GetTypeId(void)
     static TypeId tid =
         TypeId("ns3::SatUtHelperLora").SetParent<SatUtHelper>().AddConstructor<SatUtHelperLora>();
     return tid;
-}
-
-TypeId
-SatUtHelperLora::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
 }
 
 SatUtHelperLora::SatUtHelperLora()
@@ -173,8 +165,8 @@ SatUtHelperLora::Install(Ptr<Node> n,
     // TODO configuration for EU only
     mac->SetTxDbmForTxPower(std::vector<double>{16, 14, 12, 10, 8, 6, 4, 2});
 
-    SatLoraConf satLoraConf;
-    satLoraConf.SetConf(mac);
+    Ptr<SatLoraConf> satLoraConf = CreateObject<SatLoraConf>();
+    satLoraConf->SetConf(mac);
 
     // Attach the Mac layer receiver to Phy
     SatPhy::ReceiveCallback recCb = MakeCallback(&LorawanMac::Receive, mac);

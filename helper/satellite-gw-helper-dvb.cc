@@ -21,30 +21,30 @@
 
 #include "satellite-gw-helper-dvb.h"
 
-#include <ns3/log.h>
-#include <ns3/pointer.h>
-#include <ns3/satellite-channel-estimation-error-container.h>
-#include <ns3/satellite-channel.h>
-#include <ns3/satellite-const-variables.h>
-#include <ns3/satellite-enums.h>
-#include <ns3/satellite-fwd-link-scheduler-default.h>
-#include <ns3/satellite-fwd-link-scheduler-time-slicing.h>
-#include <ns3/satellite-fwd-link-scheduler.h>
-#include <ns3/satellite-gw-llc.h>
-#include <ns3/satellite-gw-mac.h>
-#include <ns3/satellite-gw-phy.h>
-#include <ns3/satellite-id-mapper.h>
-#include <ns3/satellite-link-results.h>
-#include <ns3/satellite-lorawan-net-device.h>
-#include <ns3/satellite-lower-layer-service.h>
-#include <ns3/satellite-net-device.h>
-#include <ns3/satellite-node-info.h>
-#include <ns3/satellite-orbiter-net-device.h>
-#include <ns3/satellite-packet-classifier.h>
-#include <ns3/satellite-phy-rx-carrier-conf.h>
-#include <ns3/satellite-topology.h>
-#include <ns3/satellite-typedefs.h>
-#include <ns3/singleton.h>
+#include "ns3/log.h"
+#include "ns3/pointer.h"
+#include "ns3/satellite-channel-estimation-error-container.h"
+#include "ns3/satellite-channel.h"
+#include "ns3/satellite-const-variables.h"
+#include "ns3/satellite-enums.h"
+#include "ns3/satellite-fwd-link-scheduler-default.h"
+#include "ns3/satellite-fwd-link-scheduler-time-slicing.h"
+#include "ns3/satellite-fwd-link-scheduler.h"
+#include "ns3/satellite-gw-llc.h"
+#include "ns3/satellite-gw-mac.h"
+#include "ns3/satellite-gw-phy.h"
+#include "ns3/satellite-id-mapper.h"
+#include "ns3/satellite-link-results.h"
+#include "ns3/satellite-lorawan-net-device.h"
+#include "ns3/satellite-lower-layer-service.h"
+#include "ns3/satellite-net-device.h"
+#include "ns3/satellite-node-info.h"
+#include "ns3/satellite-orbiter-net-device.h"
+#include "ns3/satellite-packet-classifier.h"
+#include "ns3/satellite-phy-rx-carrier-conf.h"
+#include "ns3/satellite-topology.h"
+#include "ns3/satellite-typedefs.h"
+#include "ns3/singleton.h"
 
 NS_LOG_COMPONENT_DEFINE("SatGwHelperDvb");
 
@@ -70,12 +70,6 @@ SatGwHelperDvb::GetTypeId(void)
     static TypeId tid =
         TypeId("ns3::SatGwHelperDvb").SetParent<SatGwHelper>().AddConstructor<SatGwHelperDvb>();
     return tid;
-}
-
-TypeId
-SatGwHelperDvb::GetInstanceTypeId(void) const
-{
-    return GetTypeId();
 }
 
 SatGwHelperDvb::SatGwHelperDvb()

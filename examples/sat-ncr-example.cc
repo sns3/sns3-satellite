@@ -30,8 +30,8 @@
 using namespace ns3;
 
 /**
- * \file sat-ncr-example.cc
- * \ingroup satellite *
+ * @file sat-ncr-example.cc
+ * @ingroup satellite *
  */
 
 NS_LOG_COMPONENT_DEFINE("sat-ncr-example");

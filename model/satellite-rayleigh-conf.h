@@ -30,9 +30,9 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief A configuration class for Rayleigh model fader. The class provides
+ * @brief A configuration class for Rayleigh model fader. The class provides
  * configuration parameters for Rayleigh fader used with Markov-based
  * fading model.
  */
@@ -40,56 +40,56 @@ class SatRayleighConf : public SatBaseFaderConf
 {
   public:
     /**
-     * \brief Default Rayleigh parameter count
+     * @brief Default Rayleigh parameter count
      */
     static const uint32_t DEFAULT_RAYLEIGH_PARAMETER_COUNT = 2;
 
     /**
-     * \brief NS-3 function for type id
-     * \return
+     * @brief NS-3 function for type id
+     * @return
      */
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Constructor
+     * @brief Constructor
      */
     SatRayleighConf();
 
     /**
-     * \brief Destructor
+     * @brief Destructor
      */
     ~SatRayleighConf();
 
     /**
-     * \brief Function for getting the Rayleigh parameters
-     * \param set parameter set
-     * \return Rayleigh parameter values
+     * @brief Function for getting the Rayleigh parameters
+     * @param set parameter set
+     * @return Rayleigh parameter values
      */
     std::vector<std::vector<double>> GetParameters(uint32_t set);
 
     /**
-     * \brief Do needed dispose actions
+     * @brief Do needed dispose actions
      */
     void DoDispose();
 
   private:
     /**
-     * \brief Clear used variables
+     * @brief Clear used variables
      */
     void Reset();
 
     /**
-     * \brief Number of parameters sets
+     * @brief Number of parameters sets
      */
     uint32_t m_elevationCount;
 
     /**
-     * \brief Number of states
+     * @brief Number of states
      */
     uint32_t m_stateCount;
 
     /**
-     * \brief Rayleigh model parameters
+     * @brief Rayleigh model parameters
      */
     std::vector<std::vector<std::vector<double>>> m_rayleighParameters;
 };

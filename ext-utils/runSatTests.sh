@@ -1,7 +1,5 @@
 #!/bin/bash
 
-#!/bin/bash
-
 # Copyright (c) 2016 Magister Solutions Ltd
 #
 # This program is free software; you can redistribute it and/or modify
@@ -25,29 +23,37 @@
 
 cd ../../../;
 
+./test.py -s geo-coordinate-test --fullness=TAKES_FOREVER
 ./test.py -s sat-antenna-gain-pattern-test --fullness=TAKES_FOREVER
 ./test.py -s sat-arq-seqno-test --fullness=TAKES_FOREVER
 ./test.py -s sat-arq-test --fullness=TAKES_FOREVER
 ./test.py -s sat-channel-estimation-error-test --fullness=TAKES_FOREVER
 ./test.py -s sat-cno-estimator-unit-test --fullness=TAKES_FOREVER
+./test.py -s sat-constellation-test --fullness=TAKES_FOREVER
 ./test.py -s sat-cra-test --fullness=TAKES_FOREVER
 ./test.py -s sat-ctrl-msg-container-unit-test --fullness=TAKES_FOREVER
 ./test.py -s sat-fading-external-input-trace-test --fullness=TAKES_FOREVER
 ./test.py -s sat-frame-allocator-test --fullness=TAKES_FOREVER
 ./test.py -s sat-fsl-test --fullness=TAKES_FOREVER
-./test.py -s geo-coordinate-test --fullness=TAKES_FOREVER
 ./test.py -s sat-gse-test --fullness=TAKES_FOREVER
+./test.py -s sat-handover-test --fullness=TAKES_FOREVER
 ./test.py -s sat-if-unit-test --fullness=TAKES_FOREVER
+./test.py -s sat-interference-test --fullness=TAKES_FOREVER
 ./test.py -s sat-link-results-test --fullness=TAKES_FOREVER
+./test.py -s sat-lora-regenerative-test --fullness=TAKES_FOREVER
+./test.py -s sat-lora-test --fullness=TAKES_FOREVER
 ./test.py -s sat-mobility-observer-test --fullness=TAKES_FOREVER
-./test.py -s sat-perf-mem --fullness=TAKES_FOREVER
-./test.py -s sat-periodic-control-message-test --fullness=TAKES_FOREVER
-./test.py -s sat-per-packet-if-test --fullness=TAKES_FOREVER
-./test.py -s sat-random-access-test --fullness=TAKES_FOREVER
 ./test.py -s sat-mobility-test --fullness=TAKES_FOREVER
+./test.py -s sat-ncr-test --fullness=TAKES_FOREVER
+./test.py -s sat-per-packet-if-test --fullness=TAKES_FOREVER
+./test.py -s sat-perf-mem --fullness=TAKES_FOREVER
+./test.py -s sat-performance-memory-test --fullness=TAKES_FOREVER
+./test.py -s sat-periodic-control-message-test --fullness=TAKES_FOREVER
+./test.py -s sat-random-access-test --fullness=TAKES_FOREVER
+./test.py -s sat-regeneration-test --fullness=TAKES_FOREVER
+./test.py -s sat-request-manager-test --fullness=TAKES_FOREVER
 ./test.py -s sat-rle-test --fullness=TAKES_FOREVER
 ./test.py -s sat-rm-test --fullness=TAKES_FOREVER
-./test.py -s sat-waveform-conf-test --fullness=TAKES_FOREVER
 ./test.py -s sat-scenario-creation --fullness=TAKES_FOREVER
 ./test.py -s sat-simple-unicast --fullness=TAKES_FOREVER
-
+./test.py -s sat-waveform-conf-test --fullness=TAKES_FOREVER

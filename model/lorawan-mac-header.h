@@ -21,7 +21,7 @@
 #ifndef LORAWAN_MAC_HEADER_H
 #define LORAWAN_MAC_HEADER_H
 
-#include <ns3/header.h>
+#include "ns3/header.h"
 
 #include <ostream>
 #include <stdint.h>
@@ -66,7 +66,7 @@ class LorawanMacHeader : public Header
      *
      * See Page 15 of LoRaWAN specification for a representation of fields.
      *
-     * \param start A pointer to the buffer that will be filled with the
+     * @param start A pointer to the buffer that will be filled with the
      * serialization.
      */
     virtual void Serialize(Buffer::Iterator start) const;
@@ -74,50 +74,50 @@ class LorawanMacHeader : public Header
     /**
      * Deserialize the header.
      *
-     * \param start A pointer to the buffer we need to deserialize.
-     * \return The number of consumed bytes.
+     * @param start A pointer to the buffer we need to deserialize.
+     * @return The number of consumed bytes.
      */
     virtual uint32_t Deserialize(Buffer::Iterator start);
 
     /**
      * Print the header in a human readable format.
      *
-     * \param os The std::ostream on which to print the header.
+     * @param os The std::ostream on which to print the header.
      */
     virtual void Print(std::ostream& os) const;
 
     /**
      * Set the message type.
      *
-     * \param mtype The message type of this header.
+     * @param mtype The message type of this header.
      */
     void SetMType(enum MType mtype);
 
     /**
      * Get the message type from the header.
      *
-     * \return The uint8_t corresponding to this header's message type.
+     * @return The uint8_t corresponding to this header's message type.
      */
     uint8_t GetMType(void) const;
 
     /**
      * Set the major version of this header.
      *
-     * \param major The uint8_t corresponding to this header's major version.
+     * @param major The uint8_t corresponding to this header's major version.
      */
     void SetMajor(uint8_t major);
 
     /**
      * Get the major version from the header.
      *
-     * \return The uint8_t corresponding to this header's major version.
+     * @return The uint8_t corresponding to this header's major version.
      */
     uint8_t GetMajor(void) const;
 
     /**
      * Check whether this header is for an uplink message
      *
-     * \return True if the message is meant to be sent from an ED to a GW, false
+     * @return True if the message is meant to be sent from an ED to a GW, false
      * otherwise.
      */
     bool IsUplink(void) const;

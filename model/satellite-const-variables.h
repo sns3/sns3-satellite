@@ -30,55 +30,55 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief SatConstVariables is used for const variable definitions in satellite module.
+ * @brief SatConstVariables is used for const variable definitions in satellite module.
  */
 namespace SatConstVariables
 {
 
 /**
- * \brief Constant definition for the speed of light in m/s
+ * @brief Constant definition for the speed of light in m/s
  */
 constexpr double SPEED_OF_LIGHT = 299792458.0;
 
 /**
- * \brief Number of bits in a byte
+ * @brief Number of bits in a byte
  */
 constexpr uint32_t BITS_PER_BYTE = 8;
 
 /**
- * \brief Number of bytes consisting a kilobyte
+ * @brief Number of bytes consisting a kilobyte
  */
 constexpr uint32_t BYTES_IN_KBYTE = 1024;
 
 /**
- * \brief Number of bits consisting a kilobit
+ * @brief Number of bits consisting a kilobit
  */
 constexpr uint32_t BITS_IN_KBIT = 1000;
 
 /**
- * \brief Boltzmann Constant
+ * @brief Boltzmann Constant
  */
 constexpr double BOLTZMANN_CONSTANT = 1.3806488e-23;
 
 /**
- * \brief Used superframe sequence in the RTN link.
+ * @brief Used superframe sequence in the RTN link.
  */
 constexpr uint8_t SUPERFRAME_SEQUENCE = 0;
 
 /**
- * \brief Maximum value for time slot ID as specified in ETSI EN 301 542-2, chapter 7.5.1.3.
+ * @brief Maximum value for time slot ID as specified in ETSI EN 301 542-2, chapter 7.5.1.3.
  */
 constexpr uint16_t MAXIMUM_TIME_SLOT_ID = 2047;
 
 /**
- * \brief Maximum number of beams per satellite
+ * @brief Maximum number of beams per satellite
  */
 constexpr uint32_t MAX_BEAMS_PER_SATELLITE = 1000;
 
 /**
- * \brief Maximum number of satellites in constellation
+ * @brief Maximum number of satellites in constellation
  */
 constexpr uint32_t MAX_SATELLITES = 10000;
 

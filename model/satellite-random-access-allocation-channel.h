@@ -22,9 +22,9 @@
 #ifndef SATELLITE_RANDOM_ACCESS_ALLOCATION_CHANNEL_H
 #define SATELLITE_RANDOM_ACCESS_ALLOCATION_CHANNEL_H
 
-#include <ns3/object.h>
-#include <ns3/simulator.h>
-#include <ns3/uinteger.h>
+#include "ns3/object.h"
+#include "ns3/simulator.h"
+#include "ns3/uinteger.h"
 
 #include <cmath>
 #include <stdint.h>
@@ -33,9 +33,9 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief Class for random access allocation channel configuration.
+ * @brief Class for random access allocation channel configuration.
  * This class holds the allocation channel specific variables and
  * the configuration parameters used by the random access module
  */
@@ -43,24 +43,24 @@ class SatRandomAccessAllocationChannel : public Object
 {
   public:
     /**
-     * \brief Constructor
+     * @brief Constructor
      */
     SatRandomAccessAllocationChannel();
 
     /**
-     * \brief Destructor
+     * @brief Destructor
      */
     virtual ~SatRandomAccessAllocationChannel();
 
     /**
-     * \brief NS-3 type id function
-     * \return type id
+     * @brief NS-3 type id function
+     * @return type id
      */
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Function for getting the status of Slotted Aloha allowance
-     * \return Is Slotted Aloha allowed
+     * @brief Function for getting the status of Slotted Aloha allowance
+     * @return Is Slotted Aloha allowed
      */
     bool GetSlottedAlohaAllowed()
     {
@@ -68,8 +68,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for setting the status of Slotted Aloha allowance
-     * \param isSlottedAlohaAllowed Is Slotted Aloha allowed
+     * @brief Function for setting the status of Slotted Aloha allowance
+     * @param isSlottedAlohaAllowed Is Slotted Aloha allowed
      */
     void SetSlottedAlohaAllowed(bool isSlottedAlohaAllowed)
     {
@@ -77,8 +77,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for getting the status of CRDSA allowance
-     * \return Is CRDSA allowed
+     * @brief Function for getting the status of CRDSA allowance
+     * @return Is CRDSA allowed
      */
     bool GetCrdsaAllowed()
     {
@@ -86,8 +86,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for setting the status of CRDSA allowance
-     * \param isCrdsaAllowed Is CRDSA allowed
+     * @brief Function for setting the status of CRDSA allowance
+     * @param isCrdsaAllowed Is CRDSA allowed
      */
     void SetCrdsaAllowed(bool isCrdsaAllowed)
     {
@@ -95,8 +95,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for getting the status of ESSA allowance
-     * \return Is ESSA allowed
+     * @brief Function for getting the status of ESSA allowance
+     * @return Is ESSA allowed
      */
     bool GetEssaAllowed()
     {
@@ -104,8 +104,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for setting the status of ESSA allowance
-     * \param isEssaAllowed Is ESSA allowed
+     * @brief Function for setting the status of ESSA allowance
+     * @param isEssaAllowed Is ESSA allowed
      */
     void SetEssaAllowed(bool isEssaAllowed)
     {
@@ -113,8 +113,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for getting the CRDSA backoff time
-     * \return CRDSA  backoff time
+     * @brief Function for getting the CRDSA backoff time
+     * @return CRDSA  backoff time
      */
     uint32_t GetCrdsaBackoffTimeInMilliSeconds()
     {
@@ -122,8 +122,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for setting the CRDSA backoff time
-     * \param crdsaBackoffTimeInMilliSeconds CRDSA backoff time in milliseconds
+     * @brief Function for setting the CRDSA backoff time
+     * @param crdsaBackoffTimeInMilliSeconds CRDSA backoff time in milliseconds
      */
     void SetCrdsaBackoffTimeInMilliSeconds(uint32_t crdsaBackoffTimeInMilliSeconds)
     {
@@ -131,8 +131,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for getting the F-SIM backoff time
-     * \return F-SIM backoff time
+     * @brief Function for getting the F-SIM backoff time
+     * @return F-SIM backoff time
      */
     uint32_t GetFSimBackoffTimeInMilliSeconds()
     {
@@ -140,8 +140,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for setting the F-SIM backoff time
-     * \param fSimBackoffTimeInFrames F-SIM backoff time in milliseconds
+     * @brief Function for setting the F-SIM backoff time
+     * @param fSimBackoffTimeInFrames F-SIM backoff time in milliseconds
      */
     void SetFSimBackoffTimeInMilliSeconds(uint32_t fSimBackoffTimeInMilliSeconds)
     {
@@ -149,8 +149,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for setting the F-SIM backoff time
-     * \param fSimBackoffTimeInFrames F-SIM backoff time in frames
+     * @brief Function for setting the F-SIM backoff time
+     * @param fSimBackoffTimeInFrames F-SIM backoff time in frames
      */
     void SetFSimBackoffTimeInFrames(uint32_t fSimBackoffTimeInFrames)
     {
@@ -159,8 +159,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for getting the CRDSA backoff release time
-     * \return CRDSA backoff release time
+     * @brief Function for getting the CRDSA backoff release time
+     * @return CRDSA backoff release time
      */
     Time GetCrdsaBackoffReleaseTime()
     {
@@ -168,8 +168,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for setting the F-SIM physical layer frame duration
-     * \param fSimPhysicalLayerFrameInMilliSeconds F-SIM physical layer frame in milliseconds
+     * @brief Function for setting the F-SIM physical layer frame duration
+     * @param fSimPhysicalLayerFrameInMilliSeconds F-SIM physical layer frame in milliseconds
      */
     void SetFSimPhysicalLayerFrameInMilliSeconds(uint32_t fSimPhysicalLayerFrameInMilliSeconds)
     {
@@ -177,8 +177,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for setting the CRDSA backoff release time
-     * \param crdsaBackoffReleaseTime CRDSA  backoff time
+     * @brief Function for setting the CRDSA backoff release time
+     * @param crdsaBackoffReleaseTime CRDSA  backoff time
      */
     void SetCrdsaBackoffReleaseTime(Time crdsaBackoffReleaseTime)
     {
@@ -186,8 +186,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for getting the CRDSA backoff probability
-     * \return CRDSA backoff probability
+     * @brief Function for getting the CRDSA backoff probability
+     * @return CRDSA backoff probability
      */
     double GetCrdsaBackoffProbability()
     {
@@ -195,8 +195,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for setting the CRDSA backoff probability
-     * \param crdsaBackoffProbability CRDSA backoff probability
+     * @brief Function for setting the CRDSA backoff probability
+     * @param crdsaBackoffProbability CRDSA backoff probability
      */
     void SetCrdsaBackoffProbability(uint16_t crdsaBackoffProbability)
     {
@@ -204,8 +204,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for getting the F-SIM backoff probability
-     * \return F-SIM backoff probability
+     * @brief Function for getting the F-SIM backoff probability
+     * @return F-SIM backoff probability
      */
     double GetFSimBackoffProbability()
     {
@@ -213,8 +213,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for setting the F-SIM backoff probability
-     * \param fSimPersistence F-SIM persistence
+     * @brief Function for setting the F-SIM backoff probability
+     * @param fSimPersistence F-SIM persistence
      */
     void SetFSimBackoffProbability(uint16_t fSimPersistence)
     {
@@ -222,8 +222,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for getting the CRDSA minimum randomization value
-     * \return CRDSA minimum randomization value
+     * @brief Function for getting the CRDSA minimum randomization value
+     * @return CRDSA minimum randomization value
      */
     uint32_t GetCrdsaMinRandomizationValue()
     {
@@ -231,8 +231,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for setting the CRDSA minimum randomization value
-     * \param minRandomizationValue CRDSA minimum randomization value
+     * @brief Function for setting the CRDSA minimum randomization value
+     * @param minRandomizationValue CRDSA minimum randomization value
      */
     void SetCrdsaMinRandomizationValue(uint32_t minRandomizationValue)
     {
@@ -240,8 +240,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for getting the CRDSA maximum randomization value
-     * \return CRDSA maximum randomization value
+     * @brief Function for getting the CRDSA maximum randomization value
+     * @return CRDSA maximum randomization value
      */
     uint32_t GetCrdsaMaxRandomizationValue()
     {
@@ -249,8 +249,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for setting the CRDSA maximum randomization value
-     * \param maxRandomizationValue CRDSA maximum randomization value
+     * @brief Function for setting the CRDSA maximum randomization value
+     * @param maxRandomizationValue CRDSA maximum randomization value
      */
     void SetCrdsaMaxRandomizationValue(uint32_t maxRandomizationValue)
     {
@@ -258,8 +258,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for getting the CRDSA number of packet instances (replicas)
-     * \return CRDSA number of instances
+     * @brief Function for getting the CRDSA number of packet instances (replicas)
+     * @return CRDSA number of instances
      */
     uint32_t GetCrdsaNumOfInstances()
     {
@@ -267,8 +267,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for setting the CRDSA number of packet instances (replicas)
-     * \param numOfInstances CRDSA number of instances
+     * @brief Function for setting the CRDSA number of packet instances (replicas)
+     * @param numOfInstances CRDSA number of instances
      */
     void SetCrdsaNumOfInstances(uint32_t numOfInstances)
     {
@@ -276,8 +276,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for getting the CRDSA minimum number of idle blocks
-     * \return CRDSA minimum idle blocks
+     * @brief Function for getting the CRDSA minimum number of idle blocks
+     * @return CRDSA minimum idle blocks
      */
     uint32_t GetCrdsaMinIdleBlocks()
     {
@@ -285,8 +285,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for setting the CRDSA minimum number of idle blocks
-     * \param minIdleBlocks CRDSA minimum idle blocks
+     * @brief Function for setting the CRDSA minimum number of idle blocks
+     * @param minIdleBlocks CRDSA minimum idle blocks
      */
     void SetCrdsaMinIdleBlocks(uint32_t minIdleBlocks)
     {
@@ -294,8 +294,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for getting the CRDSA number of idle blocks left
-     * \return CRDSA number of idle blocks left
+     * @brief Function for getting the CRDSA number of idle blocks left
+     * @return CRDSA number of idle blocks left
      */
     uint32_t GetCrdsaIdleBlocksLeft()
     {
@@ -303,8 +303,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for setting the CRDSA number of idle blocks left
-     * \param idleBlocksLeft CRDSA number of idle blocks left
+     * @brief Function for setting the CRDSA number of idle blocks left
+     * @param idleBlocksLeft CRDSA number of idle blocks left
      */
     void SetCrdsaIdleBlocksLeft(uint32_t idleBlocksLeft)
     {
@@ -312,8 +312,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for getting the CRDSA maximum number of unique payloads per block
-     * \return CRDSA maximum number of unique payloads per block
+     * @brief Function for getting the CRDSA maximum number of unique payloads per block
+     * @return CRDSA maximum number of unique payloads per block
      */
     uint32_t GetCrdsaMaxUniquePayloadPerBlock()
     {
@@ -321,8 +321,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for setting the CRDSA maximum number of unique payloads per block
-     * \param maxUniquePayloadPerBlock CRDSA maximum number of unique payloads per block
+     * @brief Function for setting the CRDSA maximum number of unique payloads per block
+     * @param maxUniquePayloadPerBlock CRDSA maximum number of unique payloads per block
      */
     void SetCrdsaMaxUniquePayloadPerBlock(uint32_t maxUniquePayloadPerBlock)
     {
@@ -330,8 +330,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for getting the CRDSA number of consecutive blocks accessed
-     * \return CRDSA number of consecutive blocks accessed
+     * @brief Function for getting the CRDSA number of consecutive blocks accessed
+     * @return CRDSA number of consecutive blocks accessed
      */
     uint32_t GetCrdsaMaxConsecutiveBlocksAccessed()
     {
@@ -339,8 +339,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for setting the CRDSA maximum number of consecutive blocks accessed
-     * \param maxConsecutiveBlocksAccessed CRDSA maximum number of consecutive blocks accessed
+     * @brief Function for setting the CRDSA maximum number of consecutive blocks accessed
+     * @param maxConsecutiveBlocksAccessed CRDSA maximum number of consecutive blocks accessed
      */
     void SetCrdsaMaxConsecutiveBlocksAccessed(uint32_t maxConsecutiveBlocksAccessed)
     {
@@ -348,8 +348,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for getting the CRDSA number of consecutive blocks used
-     * \return CRDSA number of consecutive blocks used
+     * @brief Function for getting the CRDSA number of consecutive blocks used
+     * @return CRDSA number of consecutive blocks used
      */
     uint32_t GetCrdsaNumOfConsecutiveBlocksUsed()
     {
@@ -357,8 +357,8 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for setting the CRDSA number of consecutive blocks used
-     * \param numOfConsecutiveBlocksUsed CRDSA number of consecutive blocks used
+     * @brief Function for setting the CRDSA number of consecutive blocks used
+     * @param numOfConsecutiveBlocksUsed CRDSA number of consecutive blocks used
      */
     void SetCrdsaNumOfConsecutiveBlocksUsed(uint32_t numOfConsecutiveBlocksUsed)
     {
@@ -366,93 +366,93 @@ class SatRandomAccessAllocationChannel : public Object
     }
 
     /**
-     * \brief Function for checking the CRDSA parameter sanity
+     * @brief Function for checking the CRDSA parameter sanity
      */
     void DoCrdsaVariableSanityCheck();
 
   private:
     /**
-     * \brief Slotted Aloha allowed
+     * @brief Slotted Aloha allowed
      */
     bool m_slottedAlohaAllowed;
 
     /**
-     * \brief CRDSA allowed
+     * @brief CRDSA allowed
      */
     bool m_crdsaAllowed;
 
     /**
-     * \brief ESSA allowed
+     * @brief ESSA allowed
      */
     bool m_essaAllowed;
 
     /**
-     * \brief CRDSA minimum randomization value
+     * @brief CRDSA minimum randomization value
      */
     uint32_t m_crdsaMinRandomizationValue;
 
     /**
-     * \brief CRDSA maximum randomization value
+     * @brief CRDSA maximum randomization value
      */
     uint32_t m_crdsaMaxRandomizationValue;
 
     /**
-     * \brief CRDSA number of packet instances (replicas)
+     * @brief CRDSA number of packet instances (replicas)
      */
     uint32_t m_crdsaNumOfInstances;
 
     /**
-     * \brief CRDSA minimum number of idle blocks
+     * @brief CRDSA minimum number of idle blocks
      */
     uint32_t m_crdsaMinIdleBlocks;
 
     /**
-     * \brief CRDSA number of idle blocks left
+     * @brief CRDSA number of idle blocks left
      */
     uint32_t m_crdsaIdleBlocksLeft;
 
     /**
-     * \brief CRDSA backoff time
+     * @brief CRDSA backoff time
      */
     uint32_t m_crdsaBackoffTimeInMilliSeconds;
 
     /**
-     * \brief CRDSA backoff probability
+     * @brief CRDSA backoff probability
      */
     double m_crdsaBackoffProbability;
 
     /**
-     * \brief CRDSA maximum number of unique payloads per block
+     * @brief CRDSA maximum number of unique payloads per block
      */
     uint32_t m_crdsaMaxUniquePayloadPerBlock;
 
     /**
-     * \brief CRDSA maximum number of consecutive blocks accessed
+     * @brief CRDSA maximum number of consecutive blocks accessed
      */
     uint32_t m_crdsaMaxConsecutiveBlocksAccessed;
 
     /**
-     * \brief CRDSA number of consecutive blocks used
+     * @brief CRDSA number of consecutive blocks used
      */
     uint32_t m_crdsaNumOfConsecutiveBlocksUsed;
 
     /**
-     * \brief CRDSA backoff release time
+     * @brief CRDSA backoff release time
      */
     Time m_crdsaBackoffReleaseTime;
 
     /**
-     * \brief F-SIM Backoff Time in physical layer frame units
+     * @brief F-SIM Backoff Time in physical layer frame units
      */
     uint32_t m_fSimBackoffTimeInMilliSeconds;
 
     /**
-     * \brief F-SIM Backoff Probability
+     * @brief F-SIM Backoff Probability
      */
     double m_fSimBackoffProbability;
 
     /**
-     * \brief F-SIM physical layer frame duration in milliseconds
+     * @brief F-SIM physical layer frame duration in milliseconds
      *        TODO: maybe this shouldn't be here
      */
     uint32_t m_fSimPhysicalLayerFrameInMilliSeconds;

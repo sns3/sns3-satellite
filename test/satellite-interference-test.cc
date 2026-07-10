@@ -21,9 +21,9 @@
  */
 
 /**
- * \file satellite-interference-test.cc
- * \ingroup satellite
- * \brief Test cases to unit test Satellite Interference Models.
+ * @file satellite-interference-test.cc
+ * @ingroup satellite
+ * @brief Test cases to unit test Satellite Interference Models.
  */
 
 // Include a header file from your module to test.
@@ -45,8 +45,8 @@
 using namespace ns3;
 
 /**
- * \ingroup satellite
- * \brief Test case to unit test satellite constant interference model.
+ * @ingroup satellite
+ * @brief Test case to unit test satellite constant interference model.
  *
  * This case tests that SatConstantInterference object can be created successfully and interference
  * value set is correct.
@@ -82,8 +82,8 @@ void
 SatConstantInterferenceTestCase::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-if-unit", "constant", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-if-unit", "constant", true);
 
     Ptr<SatConstantInterference> interference = CreateObject<SatConstantInterference>();
     interference->SetAttribute("ConstantInterferencePower", DoubleValue(100.0));
@@ -121,12 +121,12 @@ SatConstantInterferenceTestCase::DoRun(void)
     NS_TEST_ASSERT_MSG_EQ(1.0, power[0].first, "Calculated power does not span the whole packet");
     NS_TEST_ASSERT_MSG_EQ(50, power[0].second, "Calculated power not correct");
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 }
 
 /**
- * \ingroup satellite
- * \brief Test case to unit test satellite per packet interference model.
+ * @ingroup satellite
+ * @brief Test case to unit test satellite per packet interference model.
  *
  * This case tests that SatPerPacketInterference object can be created successfully and interference
  * value calculated correctly.
@@ -219,8 +219,8 @@ void
 SatPerPacketInterferenceTestCase::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-if-unit", "perpacket", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-if-unit", "perpacket", true);
 
     // simulate interferences and receiving (4 receivers), adding and calculation done in callback
     // routines
@@ -298,12 +298,12 @@ SatPerPacketInterferenceTestCase::DoRun(void)
     NS_TEST_ASSERT_MSG_LT(finalDiff, 0.00000000000001, "Final power incorrect");
 
     Simulator::Destroy();
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 }
 
 /**
- * \ingroup satellite
- * \brief Test suite for Satellite interference unit test cases.
+ * @ingroup satellite
+ * @brief Test suite for Satellite interference unit test cases.
  */
 class SatInterferenceTestSuite : public TestSuite
 {

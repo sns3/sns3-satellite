@@ -32,8 +32,8 @@
 #include "satellite-lorawan-net-device.h"
 #include "satellite-topology.h"
 
+#include "ns3/log.h"
 #include "ns3/singleton.h"
-#include <ns3/log.h>
 
 namespace ns3
 {
@@ -58,9 +58,9 @@ LoraNetworkServer::GetTypeId(void)
 }
 
 LoraNetworkServer::LoraNetworkServer()
-    : m_status(Create<LoraNetworkStatus>()),
-      m_controller(Create<LoraNetworkController>(m_status)),
-      m_scheduler(Create<LoraNetworkScheduler>(m_status, m_controller))
+    : m_status(CreateObject<LoraNetworkStatus>()),
+      m_controller(CreateObject<LoraNetworkController>(m_status)),
+      m_scheduler(CreateObject<LoraNetworkScheduler>(m_status, m_controller))
 {
     NS_LOG_FUNCTION_NOARGS();
 }
@@ -111,14 +111,14 @@ LoraNetworkServer::AddGateway(Ptr<Node> gateway, Ptr<NetDevice> netDevice)
         Ptr<LorawanMacGateway> gwMac = DynamicCast<LorawanMacGateway>(satLoraNetDevice->GetMac());
         // Create new gatewayStatus
         Ptr<LoraGatewayStatus> gwStatus =
-            Create<LoraGatewayStatus>(gatewayAddress, netDevice, gwMac);
+            CreateObject<LoraGatewayStatus>(gatewayAddress, netDevice, gwMac);
         m_status->AddGateway(gateway, gatewayAddress, gwStatus);
         break;
     }
     case SatEnums::REGENERATION_NETWORK: {
         // Create new gatewayStatus
         Ptr<LoraGatewayStatus> gwStatus =
-            Create<LoraGatewayStatus>(gatewayAddress, netDevice, nullptr);
+            CreateObject<LoraGatewayStatus>(gatewayAddress, netDevice, nullptr);
         m_status->AddGateway(gateway, gatewayAddress, gwStatus);
         break;
     }

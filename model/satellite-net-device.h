@@ -24,11 +24,11 @@
 #include "satellite-enums.h"
 #include "satellite-packet-classifier.h"
 
-#include <ns3/mac48-address.h>
-#include <ns3/net-device.h>
-#include <ns3/nstime.h>
-#include <ns3/simulator.h>
-#include <ns3/traced-callback.h>
+#include "ns3/mac48-address.h"
+#include "ns3/net-device.h"
+#include "ns3/nstime.h"
+#include "ns3/simulator.h"
+#include "ns3/traced-callback.h"
 
 #include <stdint.h>
 #include <string>
@@ -45,15 +45,15 @@ class SatNodeInfo;
 class SatControlMessage;
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  * SatNetDevice to be utilized in the UT and GW nodes.
  */
 class SatNetDevice : public NetDevice
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
 
@@ -63,67 +63,67 @@ class SatNetDevice : public NetDevice
     SatNetDevice();
 
     /*
-     * \brief Receive the packet from mac layer
-     * \param packet Pointer to the packet to be received.
+     * @brief Receive the packet from mac layer
+     * @param packet Pointer to the packet to be received.
      */
     virtual void Receive(Ptr<const Packet> packet);
 
     /*
-     * \brief Attach the SatPhy physical layer to this netdevice.
-     * \param phy SatPhy pointer to be added
+     * @brief Attach the SatPhy physical layer to this netdevice.
+     * @param phy SatPhy pointer to be added
      */
     void SetPhy(Ptr<SatPhy> phy);
 
     /**
-     * \brief Get a Phy pointer
+     * @brief Get a Phy pointer
      *
-     * \returns Ptr to the SatPhy object.
+     * @returns Ptr to the SatPhy object.
      */
     Ptr<SatPhy> GetPhy(void) const;
 
     /*
-     * \brief Attach the SatMac mac layer to this netdevice.
-     * \param mac SatMac pointer to be added
+     * @brief Attach the SatMac mac layer to this netdevice.
+     * @param mac SatMac pointer to be added
      */
     void SetMac(Ptr<SatMac> mac);
 
     /**
-     * \brief Get a Mac pointer
+     * @brief Get a Mac pointer
      *
-     * \returns Ptr to the SatMac object.
+     * @returns Ptr to the SatMac object.
      */
     Ptr<SatMac> GetMac(void) const;
 
     /**
-     * \brief Attach the SatLlc llc layer to this netdevice.
-     * \param llc SatLlc pointer to be added
+     * @brief Attach the SatLlc llc layer to this netdevice.
+     * @param llc SatLlc pointer to be added
      */
     void SetLlc(Ptr<SatLlc> llc);
 
     /**
-     * \brief Get Llc pointer
+     * @brief Get Llc pointer
      *
-     * \returns Ptr to the SatLlc object.
+     * @returns Ptr to the SatLlc object.
      */
     Ptr<SatLlc> GetLlc(void) const;
 
     /**
-     * \brief Set the packet classifier class
-     * \param classifier
+     * @brief Set the packet classifier class
+     * @param classifier
      */
     void SetPacketClassifier(Ptr<SatPacketClassifier> classifier);
 
     /**
-     * \brief Get a pointer to packet classifier class
-     * \return Ptr<SatPacketClassifier Packet classifier
+     * @brief Get a pointer to packet classifier class
+     * @return Ptr<SatPacketClassifier Packet classifier
      */
     Ptr<SatPacketClassifier> GetPacketClassifier() const;
 
     /**
-     * \brief Attach a receive ErrorModel to the SatNetDevice. Note,
+     * @brief Attach a receive ErrorModel to the SatNetDevice. Note,
      * that this method is not used in the satellite module, since the error
      * model is located within the implemented sublayers (PHY).
-     * \param em Ptr to the ErrorModel.
+     * @param em Ptr to the ErrorModel.
      */
     void SetReceiveErrorModel(Ptr<ErrorModel> em);
 
@@ -160,15 +160,15 @@ class SatNetDevice : public NetDevice
     virtual Ptr<Channel> GetChannel(void) const;
 
     /**
-     * \brief Set the node info
-     * \param nodeInfo containing node specific information
+     * @brief Set the node info
+     * @param nodeInfo containing node specific information
      */
     void SetNodeInfo(Ptr<SatNodeInfo> nodeInfo);
 
     /**
-     * \brief Toggle the state of the device. This is used for beam hopping
+     * @brief Toggle the state of the device. This is used for beam hopping
      * purposes only, thus by default the netdevice is assumed to be enabled.
-     * \param enabled Flag indicating whether the ND is considered enabled or disabled
+     * @param enabled Flag indicating whether the ND is considered enabled or disabled
      */
     void ToggleState(bool enabled);
 

@@ -19,9 +19,9 @@
  */
 
 /**
- * \file satellite-channel-estimation-error-test.cc
- * \ingroup satellite
- * \brief Channel estimation error test suite
+ * @file satellite-channel-estimation-error-test.cc
+ * @ingroup satellite
+ * @brief Channel estimation error test suite
  */
 
 #include "../model/satellite-channel-estimation-error-container.h"
@@ -37,8 +37,8 @@
 using namespace ns3;
 
 /**
- * \ingroup satellite
- * \brief Test case for FWD link channel estimation error
+ * @ingroup satellite
+ * @brief Test case for FWD link channel estimation error
  */
 
 class SatFwdChannelEstimationErrorTestCase : public TestCase
@@ -64,10 +64,10 @@ void
 SatFwdChannelEstimationErrorTestCase::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-channel-estimation-error",
-                                                          "fwd",
-                                                          true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-channel-estimation-error",
+                                                       "fwd",
+                                                       true);
 
     Ptr<SatChannelEstimationErrorContainer> ceError =
         Create<SatFwdLinkChannelEstimationErrorContainer>();
@@ -79,12 +79,12 @@ SatFwdChannelEstimationErrorTestCase::DoRun(void)
         std::cout << "SINR in: " << in << ", SINR out: " << out << std::endl;
     }
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 }
 
 /**
- * \ingroup satellite
- * \brief Test case for RTN link channel estimation error
+ * @ingroup satellite
+ * @brief Test case for RTN link channel estimation error
  */
 class SatRtnChannelEstimationErrorTestCase : public TestCase
 {
@@ -109,10 +109,10 @@ void
 SatRtnChannelEstimationErrorTestCase::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-channel-estimation-error",
-                                                          "rtn",
-                                                          true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-channel-estimation-error",
+                                                       "rtn",
+                                                       true);
 
     Ptr<SatChannelEstimationErrorContainer> ceError =
         Create<SatFwdLinkChannelEstimationErrorContainer>();
@@ -127,12 +127,12 @@ SatRtnChannelEstimationErrorTestCase::DoRun(void)
             std::cout << "SINR in: " << in << ", SINR out: " << out << std::endl;
         }
     }
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 }
 
 /**
- * \ingroup satellite
- * \brief Test suite for satellite channel estimation error
+ * @ingroup satellite
+ * @brief Test suite for satellite channel estimation error
  */
 class SatChannelEstimationErrorTestSuite : public TestSuite
 {

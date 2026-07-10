@@ -31,18 +31,18 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief Bite
+ * @ingroup satellite
+ * @brief Bite
  */
 class SatPhyRxCarrierMarsala : public SatPhyRxCarrierPerFrame
 {
   public:
     /**
-     * \brief Constructor.
-     * \param carrierId ID of the carrier
-     * \param carrierConf Carrier configuration
-     * \param waveformConf Waveform configuration
-     * \param randomAccessEnabled Is this a RA carrier
+     * @brief Constructor.
+     * @param carrierId ID of the carrier
+     * @param carrierConf Carrier configuration
+     * @param waveformConf Waveform configuration
+     * @param randomAccessEnabled Is this a RA carrier
      */
     SatPhyRxCarrierMarsala(uint32_t carrierId,
                            Ptr<SatPhyRxCarrierConf> carrierConf,
@@ -50,22 +50,22 @@ class SatPhyRxCarrierMarsala : public SatPhyRxCarrierPerFrame
                            bool randomAccessEnabled);
 
     /**
-     * \brief Destructor
+     * @brief Destructor
      */
     ~SatPhyRxCarrierMarsala();
 
     /**
      * Get the TypeId of the class.
-     * \return TypeId
+     * @return TypeId
      */
     static TypeId GetTypeId(void);
 
   protected:
     /**
-     * \brief Function for receiving decodable packets and removing their
+     * @brief Function for receiving decodable packets and removing their
      * interference from the other packets in the slots they’re in; perform
      * as many cycles as needed to try to decode each packet.
-     * \param combinedPacketsForFrame  container to store packets
+     * @param combinedPacketsForFrame  container to store packets
      * as they are decoded and removed from the frame
      */
     void PerformSicCycles(
@@ -73,25 +73,25 @@ class SatPhyRxCarrierMarsala : public SatPhyRxCarrierPerFrame
 
   private:
     /**
-     * \brief Function for performing MARSALA corelation on remaining packets in the frame
-     * \param combinedPacketsForFrame  container to store packets as they are decoded and removed
+     * @brief Function for performing MARSALA corelation on remaining packets in the frame
+     * @param combinedPacketsForFrame  container to store packets as they are decoded and removed
      * from the frame \return Whether or not a packet was decoded
      */
     bool PerformMarsala(
         std::vector<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s>& combinedPacketsForFrame);
 
     /**
-     * \brief Function for verifying if a replica of a given packet is found in the given slot
-     * \param slotContent  The slot in which to search for replica
-     * \param packet  The packet whose replica should be searched for
-     * \return Whether or not a replica of the packet has been found in the slot
+     * @brief Function for verifying if a replica of a given packet is found in the given slot
+     * @param slotContent  The slot in which to search for replica
+     * @param packet  The packet whose replica should be searched for
+     * @return Whether or not a replica of the packet has been found in the slot
      */
     SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s FindReplicaInSlot(
         const std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s>& slotContent,
         const SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s& packet) const;
 
     /**
-     * \brief `MarsalaCorrelationRx` trace source.
+     * @brief `MarsalaCorrelationRx` trace source.
      *
      * Fired when a unique CRDSA payload is correlated using MARSALA
      *

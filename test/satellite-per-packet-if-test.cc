@@ -19,9 +19,9 @@
  */
 
 /**
- * \file satellite-per-packet-if-test.cc
- * \ingroup satellite
- * \brief System test cases for Satellite Per-Packet Interference Model.
+ * @file satellite-per-packet-if-test.cc
+ * @ingroup satellite
+ * @brief System test cases for Satellite Per-Packet Interference Model.
  */
 
 // Include a header file from your module to test.
@@ -179,8 +179,8 @@ SatPerPacketBaseTestCase::PrintTraceInfo()
 }
 
 /**
- * \ingroup satellite
- * \brief Per-packet interference, Forward Link System test case.
+ * @ingroup satellite
+ * @brief Per-packet interference, Forward Link System test case.
  *        User defined scenario created without fading and dummy frame sending.
  *
  *  Pre-conditions:
@@ -280,14 +280,12 @@ SatPerPacketFwdLinkUserTestCase::~SatPerPacketFwdLinkUserTestCase()
 void
 SatPerPacketFwdLinkUserTestCase::DoRun(void)
 {
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
+    SatEnvVariables::GetInstance()->DoInitialize();
 
     InitOutput(true);
 
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-per-packet-if",
-                                                          m_extName,
-                                                          true);
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-per-packet-if", m_extName, true);
 
     // Configure a static error probability
     SatPhyRxCarrierConf::ErrorModel em(SatPhyRxCarrierConf::EM_NONE);
@@ -308,7 +306,7 @@ SatPerPacketFwdLinkUserTestCase::DoRun(void)
 
     // Creating the reference system.
     Ptr<SatHelper> helper = CreateObject<SatHelper>(
-        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E");
+        SatEnvVariables::GetInstance()->LocateDataDirectory() + "/scenarios/geo-33E");
 
     // create user defined scenario with beams 1 and 5
     SatBeamUserInfo beamInfo = SatBeamUserInfo(1, 1);
@@ -376,12 +374,12 @@ SatPerPacketFwdLinkUserTestCase::DoRun(void)
 
     Simulator::Destroy();
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 }
 
 /**
- * \ingroup satellite
- * \brief Per-packet interference, Forward Link System test case.
+ * @ingroup satellite
+ * @brief Per-packet interference, Forward Link System test case.
  *        Full scenario created without fading and dummy frame sending.
  *
  *  Pre-conditions:
@@ -481,14 +479,12 @@ SatPerPacketFwdLinkFullTestCase::~SatPerPacketFwdLinkFullTestCase()
 void
 SatPerPacketFwdLinkFullTestCase::DoRun(void)
 {
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
+    SatEnvVariables::GetInstance()->DoInitialize();
 
     InitOutput(false);
 
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-per-packet-if",
-                                                          m_extName,
-                                                          true);
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-per-packet-if", m_extName, true);
 
     Config::SetDefault("ns3::SatBeamHelper::FadingModel", EnumValue(m_fading));
     Config::SetDefault("ns3::SatFwdLinkScheduler::DummyFrameSendingEnabled",
@@ -504,7 +500,7 @@ SatPerPacketFwdLinkFullTestCase::DoRun(void)
 
     // Creating the reference system.
     Ptr<SatHelper> helper = CreateObject<SatHelper>(
-        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E");
+        SatEnvVariables::GetInstance()->LocateDataDirectory() + "/scenarios/geo-33E");
 
     helper->CreatePredefinedScenario(SatHelper::FULL);
 
@@ -566,12 +562,12 @@ SatPerPacketFwdLinkFullTestCase::DoRun(void)
 
     Simulator::Destroy();
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 }
 
 /**
- * \ingroup satellite
- * \brief Per-packet interference, Return Link System test case.
+ * @ingroup satellite
+ * @brief Per-packet interference, Return Link System test case.
  *
  *  Pre-conditions:
  *    Network is configured to use only one carrier in return link.
@@ -665,14 +661,12 @@ SatPerPacketRtnLinkUserTestCase::~SatPerPacketRtnLinkUserTestCase()
 void
 SatPerPacketRtnLinkUserTestCase::DoRun(void)
 {
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
+    SatEnvVariables::GetInstance()->DoInitialize();
 
     InitOutput(false);
 
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-per-packet-if",
-                                                          m_extName,
-                                                          true);
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-per-packet-if", m_extName, true);
 
     Config::SetDefault("ns3::SatBeamHelper::FadingModel", EnumValue(m_fading));
     Config::SetDefault("ns3::SatFwdLinkScheduler::DummyFrameSendingEnabled",
@@ -697,7 +691,7 @@ SatPerPacketRtnLinkUserTestCase::DoRun(void)
 
     // Creating the reference system.
     Ptr<SatHelper> helper = CreateObject<SatHelper>(
-        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E");
+        SatEnvVariables::GetInstance()->LocateDataDirectory() + "/scenarios/geo-33E");
 
     // create user defined scenario with beams 1 and 5
     SatBeamUserInfo beamInfo = SatBeamUserInfo(1, 1);
@@ -756,7 +750,7 @@ SatPerPacketRtnLinkUserTestCase::DoRun(void)
 
     Simulator::Destroy();
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 }
 
 // Default name to show for test. When the second constructor is used, the text to append this name
@@ -831,14 +825,12 @@ SatPerPacketRtnLinkFullTestCase::~SatPerPacketRtnLinkFullTestCase()
 void
 SatPerPacketRtnLinkFullTestCase::DoRun(void)
 {
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
+    SatEnvVariables::GetInstance()->DoInitialize();
 
     InitOutput(false);
 
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-per-packet-if",
-                                                          m_extName,
-                                                          true);
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-per-packet-if", m_extName, true);
 
     Config::SetDefault("ns3::SatBeamHelper::FadingModel", EnumValue(m_fading));
     Config::SetDefault("ns3::SatFwdLinkScheduler::DummyFrameSendingEnabled",
@@ -863,7 +855,7 @@ SatPerPacketRtnLinkFullTestCase::DoRun(void)
 
     // Creating the reference system.
     Ptr<SatHelper> helper = CreateObject<SatHelper>(
-        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E");
+        SatEnvVariables::GetInstance()->LocateDataDirectory() + "/scenarios/geo-33E");
     helper->CreatePredefinedScenario(SatHelper::FULL);
 
     // set callback traces where we want results out
@@ -915,12 +907,12 @@ SatPerPacketRtnLinkFullTestCase::DoRun(void)
 
     Simulator::Destroy();
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 }
 
 /**
- * \ingroup satellite
- * \brief Test suite for Satellite interference unit test cases.
+ * @ingroup satellite
+ * @brief Test suite for Satellite interference unit test cases.
  */
 class SatPerPacketIfTestSuite : public TestSuite
 {

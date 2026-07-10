@@ -24,9 +24,9 @@
 
 #include "satellite-stats-helper.h"
 
-#include <ns3/address.h>
-#include <ns3/collector-map.h>
-#include <ns3/ptr.h>
+#include "ns3/address.h"
+#include "ns3/collector-map.h"
+#include "ns3/ptr.h"
 
 #include <list>
 #include <map>
@@ -44,8 +44,8 @@ class DataCollectionObject;
 class DistributionCollector;
 
 /**
- * \ingroup satstats
- * \brief Base class for delay statistics helpers.
+ * @ingroup satstats
+ * @brief Base class for delay statistics helpers.
  */
 class SatStatsLinkDelayHelper : public SatStatsHelper
 {
@@ -64,26 +64,26 @@ class SatStatsLinkDelayHelper : public SatStatsHelper
     static TypeId GetTypeId();
 
     /**
-     * \param averagingMode average all samples before passing them to aggregator.
+     * @param averagingMode average all samples before passing them to aggregator.
      */
     void SetAveragingMode(bool averagingMode);
 
     /**
-     * \return the currently active averaging mode.
+     * @return the currently active averaging mode.
      */
     bool GetAveragingMode() const;
 
     /**
-     * \brief Set up several probes or other means of listeners and connect them
+     * @brief Set up several probes or other means of listeners and connect them
      *        to the collectors.
      */
     void InstallProbes();
 
     /**
-     * \brief Receive inputs from trace sources and determine the right collector
+     * @brief Receive inputs from trace sources and determine the right collector
      *        to forward the inputs to.
-     * \param delay packet delay.
-     * \param from the address of the sender of the packet.
+     * @param delay packet delay.
+     * @param from the address of the sender of the packet.
      *
      * Used in return link statistics. DoInstallProbes() is expected to connect
      * the right trace sources to this method.
@@ -95,29 +95,29 @@ class SatStatsLinkDelayHelper : public SatStatsHelper
     void DoInstall();
 
     /**
-     * \brief
+     * @brief
      */
     virtual void DoInstallProbes() = 0;
 
     /**
-     * \brief Connect the probe to the right collector.
-     * \param probe
-     * \param identifier
+     * @brief Connect the probe to the right collector.
+     * @param probe
+     * @param identifier
      */
     bool ConnectProbeToCollector(Ptr<Probe> probe, uint32_t identifier);
 
     /**
-     * \brief Disconnect the probe from the right collector.
-     * \param probe
-     * \param identifier
+     * @brief Disconnect the probe from the right collector.
+     * @param probe
+     * @param identifier
      */
     bool DisconnectProbeFromCollector(Ptr<Probe> probe, uint32_t identifier);
 
     /**
-     * \brief Find a collector with the right identifier and pass a sample data
+     * @brief Find a collector with the right identifier and pass a sample data
      *        to it.
-     * \param delay
-     * \param identifier
+     * @param delay
+     * @param identifier
      */
     void PassSampleToCollector(const Time& delay, uint32_t identifier);
 
@@ -141,20 +141,20 @@ class SatStatsLinkDelayHelper : public SatStatsHelper
 // FORWARD FEEDER LINK DEV-LEVEL /////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce forward feeder link DEV-level delay statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce forward feeder link DEV-level delay statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFwdFeederDevLinkDelayHelper> s = Create<SatStatsFwdFeederDevLinkDelayHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFwdFeederDevLinkDelayHelper : public SatStatsLinkDelayHelper
 {
@@ -181,21 +181,21 @@ class SatStatsFwdFeederDevLinkDelayHelper : public SatStatsLinkDelayHelper
 // FORWARD USER LINK DEV-LEVEL /////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce forward user link DEV-level delay statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce forward user link DEV-level delay statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFwdUserDevLinkDelayHelper> s = Create<SatStatsFwdUserDevLinkDelayHelper> (satHelper);
  * s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFwdUserDevLinkDelayHelper : public SatStatsLinkDelayHelper
 {
@@ -231,20 +231,20 @@ class SatStatsFwdUserDevLinkDelayHelper : public SatStatsLinkDelayHelper
 // FORWARD FEEDER LINK MAC-LEVEL /////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce forward feeder link MAC-level delay statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce forward feeder link MAC-level delay statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFwdFeederMacLinkDelayHelper> s = Create<SatStatsFwdFeederMacLinkDelayHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFwdFeederMacLinkDelayHelper : public SatStatsLinkDelayHelper
 {
@@ -271,21 +271,21 @@ class SatStatsFwdFeederMacLinkDelayHelper : public SatStatsLinkDelayHelper
 // FORWARD USER LINK MAC-LEVEL /////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce forward user link MAC-level delay statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce forward user link MAC-level delay statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFwdUserMacLinkDelayHelper> s = Create<SatStatsFwdUserMacLinkDelayHelper> (satHelper);
  * s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFwdUserMacLinkDelayHelper : public SatStatsLinkDelayHelper
 {
@@ -321,20 +321,20 @@ class SatStatsFwdUserMacLinkDelayHelper : public SatStatsLinkDelayHelper
 // FORWARD FEEDER LINK PHY-LEVEL /////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce forward feeder link PHY-level delay statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce forward feeder link PHY-level delay statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFwdFeederPhyLinkDelayHelper> s = Create<SatStatsFwdFeederPhyLinkDelayHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFwdFeederPhyLinkDelayHelper : public SatStatsLinkDelayHelper
 {
@@ -361,21 +361,21 @@ class SatStatsFwdFeederPhyLinkDelayHelper : public SatStatsLinkDelayHelper
 // FORWARD USER LINK PHY-LEVEL /////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce forward user link PHY-level delay statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce forward user link PHY-level delay statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFwdUserPhyLinkDelayHelper> s = Create<SatStatsFwdUserPhyLinkDelayHelper> (satHelper);
  * s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFwdUserPhyLinkDelayHelper : public SatStatsLinkDelayHelper
 {
@@ -411,20 +411,20 @@ class SatStatsFwdUserPhyLinkDelayHelper : public SatStatsLinkDelayHelper
 // RETURN FEEDER LINK DEV-LEVEL //////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce return feeder link DEV-level delay statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce return feeder link DEV-level delay statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnFeederDevLinkDelayHelper> s = Create<SatStatsRtnFeederDevLinkDelayHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsRtnFeederDevLinkDelayHelper : public SatStatsLinkDelayHelper
 {
@@ -451,21 +451,21 @@ class SatStatsRtnFeederDevLinkDelayHelper : public SatStatsLinkDelayHelper
 // RETURN USER LINK DEV-LEVEL //////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce return user link DEV-level delay statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce return user link DEV-level delay statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnUserDevLinkDelayHelper> s = Create<SatStatsRtnUserDevLinkDelayHelper> (satHelper);
  * s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsRtnUserDevLinkDelayHelper : public SatStatsLinkDelayHelper
 {
@@ -492,20 +492,20 @@ class SatStatsRtnUserDevLinkDelayHelper : public SatStatsLinkDelayHelper
 // RETURN FEEDER LINK MAC-LEVEL //////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce return feeder link MAC-level delay statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce return feeder link MAC-level delay statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnFeederMacLinkDelayHelper> s = Create<SatStatsRtnFeederMacLinkDelayHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsRtnFeederMacLinkDelayHelper : public SatStatsLinkDelayHelper
 {
@@ -532,21 +532,21 @@ class SatStatsRtnFeederMacLinkDelayHelper : public SatStatsLinkDelayHelper
 // RETURN USER LINK MAC-LEVEL //////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce return user link MAC-level delay statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce return user link MAC-level delay statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnUserMacLinkDelayHelper> s = Create<SatStatsRtnUserMacLinkDelayHelper> (satHelper);
  * s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsRtnUserMacLinkDelayHelper : public SatStatsLinkDelayHelper
 {
@@ -573,20 +573,20 @@ class SatStatsRtnUserMacLinkDelayHelper : public SatStatsLinkDelayHelper
 // RETURN FEEDER LINK PHY-LEVEL //////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce return feeder link PHY-level delay statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce return feeder link PHY-level delay statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnFeederPhyLinkDelayHelper> s = Create<SatStatsRtnFeederPhyLinkDelayHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsRtnFeederPhyLinkDelayHelper : public SatStatsLinkDelayHelper
 {
@@ -613,21 +613,21 @@ class SatStatsRtnFeederPhyLinkDelayHelper : public SatStatsLinkDelayHelper
 // RETURN USER LINK PHY-LEVEL //////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce return user link PHY-level delay statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce return user link PHY-level delay statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnUserPhyLinkDelayHelper> s = Create<SatStatsRtnUserPhyLinkDelayHelper> (satHelper);
  * s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsRtnUserPhyLinkDelayHelper : public SatStatsLinkDelayHelper
 {

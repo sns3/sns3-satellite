@@ -30,8 +30,8 @@
 using namespace ns3;
 
 /**
- * \file sat-logon-example.cc
- * \ingroup satellite *
+ * @file sat-logon-example.cc
+ * @ingroup satellite *
  */
 
 NS_LOG_COMPONENT_DEFINE("sat-logon-example");

@@ -20,9 +20,9 @@
 
 #include "satellite-mobility-model.h"
 
-#include <ns3/boolean.h>
-#include <ns3/log.h>
-#include <ns3/trace-source-accessor.h>
+#include "ns3/boolean.h"
+#include "ns3/log.h"
+#include "ns3/trace-source-accessor.h"
 
 #include <cmath>
 #include <stdint.h>
@@ -56,12 +56,6 @@ SatMobilityModel::GetTypeId(void)
                             MakeTraceSourceAccessor(&SatMobilityModel::m_satCourseChangeTrace),
                             "ns3::SatMobilityModel::CourseChangeCallback");
     return tid;
-}
-
-TypeId
-SatMobilityModel::GetInstanceTypeId(void) const
-{
-    return GetTypeId();
 }
 
 SatMobilityModel::SatMobilityModel()

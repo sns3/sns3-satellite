@@ -27,11 +27,11 @@
 #include "satellite-frame-conf.h"
 #include "satellite-mac-tag.h"
 
-#include <ns3/header.h>
-#include <ns3/mac48-address.h>
-#include <ns3/nstime.h>
-#include <ns3/object.h>
-#include <ns3/simulator.h>
+#include "ns3/header.h"
+#include "ns3/mac48-address.h"
+#include "ns3/nstime.h"
+#include "ns3/object.h"
+#include "ns3/simulator.h"
 
 #include <map>
 #include <ostream>
@@ -44,15 +44,15 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief This class implements a tag that is used to identify
+ * @ingroup satellite
+ * @brief This class implements a tag that is used to identify
  * control messages (packages).
  */
 class SatControlMsgTag : public Tag
 {
   public:
     /**
-     * \brief Definition for different types of control messages
+     * @brief Definition for different types of control messages
      */
     typedef enum
     {
@@ -83,27 +83,27 @@ class SatControlMsgTag : public Tag
     ~SatControlMsgTag();
 
     /**
-     * \brief Set type of the control message. In construction phase initialized
+     * @brief Set type of the control message. In construction phase initialized
      * to value SAT_UNKNOWN_CTRL_MSG.
-     * \param type The type of the control message
+     * @param type The type of the control message
      */
     void SetMsgType(SatControlMsgType_t type);
 
     /**
-     * \brief Get type of the control message.
-     * \return The type of the control message
+     * @brief Get type of the control message.
+     * @return The type of the control message
      */
     SatControlMsgType_t GetMsgType(void) const;
 
     /**
-     * \brief Set message type specific identifier.
-     * \param msgId Message type specific identifier. May be ignored by some message types.
+     * @brief Set message type specific identifier.
+     * @param msgId Message type specific identifier. May be ignored by some message types.
      */
     virtual void SetMsgId(uint32_t msgId);
 
     /**
-     * \brief Get message type specific identifier.
-     * \return Message type specific identifier.
+     * @brief Get message type specific identifier.
+     * @return Message type specific identifier.
      */
     virtual uint32_t GetMsgId() const;
 
@@ -113,32 +113,32 @@ class SatControlMsgTag : public Tag
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
+     * @brief Get the type ID of instance
+     * @return the object TypeId
      */
     virtual TypeId GetInstanceTypeId(void) const;
 
     /**
      * Get serialized size of methods
-     * \return Serialized size in bytes
+     * @return Serialized size in bytes
      */
     virtual uint32_t GetSerializedSize(void) const;
 
     /**
      * Serializes information to buffer from this instance of methods
-     * \param i Buffer in which the information is serialized
+     * @param i Buffer in which the information is serialized
      */
     virtual void Serialize(TagBuffer i) const;
 
     /**
      * Deserializes information from buffer to this instance of methods
-     * \param i Buffer from which the information is deserialized
+     * @param i Buffer from which the information is deserialized
      */
     virtual void Deserialize(TagBuffer i);
 
     /**
      * Print time stamp of this instance of methods
-     * \param &os Output stream to which tag timestamp is printed.
+     * @param &os Output stream to which tag timestamp is printed.
      */
     virtual void Print(std::ostream& os) const;
 
@@ -148,8 +148,8 @@ class SatControlMsgTag : public Tag
 };
 
 /**
- * \ingroup satellite
- * \brief Abstract satellite control message class. The real
+ * @ingroup satellite
+ * @brief Abstract satellite control message class. The real
  * control messages are inherited from it.
  */
 
@@ -179,14 +179,14 @@ class SatControlMessage : public Object
      * Get real size of the control message. This can be used to
      * simulate real packet size.
      *
-     * \return Real size of the control message.
+     * @return Real size of the control message.
      */
     virtual uint32_t GetSizeInBytes() const = 0;
 
     /**
      * Get message specific type.
      *
-     * \return Message specific type
+     * @return Message specific type
      */
     virtual SatControlMsgTag::SatControlMsgType_t GetMsgType() const = 0;
 
@@ -194,8 +194,8 @@ class SatControlMessage : public Object
 };
 
 /**
- * \ingroup satellite
- * \brief The packet for the Terminal Burst Time Plan (TBTP) messages.
+ * @ingroup satellite
+ * @brief The packet for the Terminal Burst Time Plan (TBTP) messages.
  * (Tagged by SatControlMsgTag with type value SAT_TBTP_CTRL_MSG)
  * NOTE! Message implementation doesn't follow specification (ETSI EN 301 542-2).
  * However it implements method GetSizeInBytes, which can be used to simulate
@@ -256,19 +256,13 @@ class SatTbtpMessage : public SatControlMessage
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
-     */
-    virtual TypeId GetInstanceTypeId(void) const;
-
-    /**
      * Default constructor for SatTbtpHeader. Set sequence id to 0.
      */
     SatTbtpMessage();
 
     /**
      * Constructor for SatTbtpHeader to construct TBTP with given sequence id.
-     * \param seqId sequence id
+     * @param seqId sequence id
      */
     SatTbtpMessage(uint8_t seqId);
 
@@ -280,7 +274,7 @@ class SatTbtpMessage : public SatControlMessage
     /**
      * Get type of the message.
      *
-     * \return SatControlMsgTag::SAT_TBTP_CTRL_MSG
+     * @return SatControlMsgTag::SAT_TBTP_CTRL_MSG
      */
     inline SatControlMsgTag::SatControlMsgType_t GetMsgType() const
     {
@@ -290,7 +284,7 @@ class SatTbtpMessage : public SatControlMessage
     /**
      * Set counter of the super frame in this TBTP message.
      *
-     * \param counter The super frame counter.
+     * @param counter The super frame counter.
      */
     inline void SetSuperframeCounter(uint32_t counter)
     {
@@ -300,7 +294,7 @@ class SatTbtpMessage : public SatControlMessage
     /**
      * Get sequence id of the super frame in this TBTP message.
      *
-     * \return The super frame sequence id.
+     * @return The super frame sequence id.
      */
     inline uint8_t GetSuperframeSeqId()
     {
@@ -310,7 +304,7 @@ class SatTbtpMessage : public SatControlMessage
     /**
      * Get counter of the super frame in this TBTP message.
      *
-     * \return The super frame counter.
+     * @return The super frame counter.
      */
     inline uint32_t GetSuperframeCounter()
     {
@@ -320,7 +314,7 @@ class SatTbtpMessage : public SatControlMessage
     /**
      * Get size of frame info size in this TBTP message.
      *
-     * \return Frame info size.
+     * @return Frame info size.
      */
     inline uint32_t GetFrameInfoSize() const
     {
@@ -330,47 +324,47 @@ class SatTbtpMessage : public SatControlMessage
     /**
      * Get the information of the DA time slots.
      *
-     * \param utId  id of the UT which time slot information is requested
-     * \return vector containing DA time slot info
+     * @param utId  id of the UT which time slot information is requested
+     * @return vector containing DA time slot info
      */
     const DaTimeSlotInfoItem_t& GetDaTimeslots(Address utId);
 
     /**
      * Set a DA time slot information
      *
-     * \param utId id of the UT which time slot information is set
-     * \param frameId Frame ID of the time slot
-     * \param conf Pointer to time slot configuration
+     * @param utId id of the UT which time slot information is set
+     * @param frameId Frame ID of the time slot
+     * @param conf Pointer to time slot configuration
      */
     void SetDaTimeslot(Mac48Address utId, uint8_t frameId, Ptr<SatTimeSlotConf> conf);
 
     /**
      * Get the information of the RA channels.
      *
-     * \return vector containing RA channels.
+     * @return vector containing RA channels.
      */
     const RaChannelInfoContainer_t GetRaChannels() const;
 
     /**
      * Set a RA time slot information
      *
-     * \param raChannel raChannel index
-     * \param frameId Frame ID of RA channel
-     * \param timeSlotCount Timeslots in channel
+     * @param raChannel raChannel index
+     * @param frameId Frame ID of RA channel
+     * @param timeSlotCount Timeslots in channel
      */
     void SetRaChannel(uint32_t raChannel, uint8_t frameId, uint16_t timeSlotCount);
 
     /**
      * Get real size of the TBTP message, which can be used to e.g. simulate real size.
      *
-     * \return Real size of the TBTP message.
+     * @return Real size of the TBTP message.
      */
     virtual uint32_t GetSizeInBytes() const;
 
     /**
      * Get size of the time slot in bytes.
      *
-     * \return Size of the time slot in bytes.
+     * @return Size of the time slot in bytes.
      */
     uint32_t GetTimeSlotInfoSizeInBytes() const;
 
@@ -397,8 +391,8 @@ class SatTbtpMessage : public SatControlMessage
 };
 
 /**
- * \ingroup satellite
- * \brief The packet for the Capacity Request (CR) messages.
+ * @ingroup satellite
+ * @brief The packet for the Capacity Request (CR) messages.
  * (Tagged by SatControlMsgTag with type value SAT_CR_CTRL_MSG)
  * NOTE! Message implementation doesn't follow specification (ETSI EN 301 542-2).
  * However it implements method GetSizeInBytes, which can be used to simulate
@@ -429,12 +423,6 @@ class SatCrMessage : public SatControlMessage
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
-     */
-    virtual TypeId GetInstanceTypeId(void) const;
-
-    /**
      * Define type RequestDescriptor_t
      */
     typedef std::pair<uint8_t, SatEnums::SatCapacityAllocationCategory_t> RequestDescriptor_t;
@@ -445,8 +433,8 @@ class SatCrMessage : public SatControlMessage
     typedef std::map<RequestDescriptor_t, uint16_t> RequestContainer_t;
 
     /**
-     * \brief Get type of the message.
-     * \return SatControlMsgTag::SAT_CR_CTRL_MSG
+     * @brief Get type of the message.
+     * @return SatControlMsgTag::SAT_CR_CTRL_MSG
      */
     inline SatControlMsgTag::SatControlMsgType_t GetMsgType() const
     {
@@ -454,45 +442,45 @@ class SatCrMessage : public SatControlMessage
     }
 
     /**
-     * \brief Add a control element to capacity request
+     * @brief Add a control element to capacity request
      */
     void AddControlElement(uint8_t rcIndex,
                            SatEnums::SatCapacityAllocationCategory_t cac,
                            uint32_t value);
 
     /**
-     * \brief Get the capacity request content
-     * \return RequestContainer_t Capacity request container
+     * @brief Get the capacity request content
+     * @return RequestContainer_t Capacity request container
      */
     const RequestContainer_t GetCapacityRequestContent() const;
 
     /**
-     * \brief The number of capacity request elements
-     * \return uint32_t Number of CR elements
+     * @brief The number of capacity request elements
+     * @return uint32_t Number of CR elements
      */
     uint32_t GetNumCapacityRequestElements() const;
 
     /**
-     * \brief Get C/N0 estimate.
-     * \return Estimate of the C/N0.
+     * @brief Get C/N0 estimate.
+     * @return Estimate of the C/N0.
      */
     double GetCnoEstimate() const;
 
     /**
-     * \brief Set C/N0 estimate.
-     * \param cno The estimate of the C/N0.
+     * @brief Set C/N0 estimate.
+     * @param cno The estimate of the C/N0.
      */
     void SetCnoEstimate(double cno);
 
     /**
-     * \brief Get real size of the CR message, which can be used to e.g. simulate real size.
-     * \return Real size of the CR message.
+     * @brief Get real size of the CR message, which can be used to e.g. simulate real size.
+     * @return Real size of the CR message.
      */
     virtual uint32_t GetSizeInBytes() const;
 
     /**
-     * \brief Has the CR non-zero content
-     * \return bool Flag to indicate whether the CR has non-zero content
+     * @brief Has the CR non-zero content
+     * @return bool Flag to indicate whether the CR has non-zero content
      */
     bool IsNotEmpty() const;
 
@@ -526,8 +514,8 @@ class SatCrMessage : public SatControlMessage
 };
 
 /**
- * \ingroup satellite
- * \brief The packet for the Automatic Repeat reQuest (ARQ)
+ * @ingroup satellite
+ * @brief The packet for the Automatic Repeat reQuest (ARQ)
  * acknowledgment (ACK) messages.
  * (Tagged by SatControlMsgTag with type value SAT_ARQ_ACK)
  */
@@ -551,14 +539,8 @@ class SatArqAckMessage : public SatControlMessage
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
-     */
-    virtual TypeId GetInstanceTypeId(void) const;
-
-    /**
-     * \brief Get type of the message.
-     * \return SatControlMsgTag::SAT_ARQ_ACK
+     * @brief Get type of the message.
+     * @return SatControlMsgTag::SAT_ARQ_ACK
      */
     inline SatControlMsgTag::SatControlMsgType_t GetMsgType() const
     {
@@ -566,32 +548,32 @@ class SatArqAckMessage : public SatControlMessage
     }
 
     /**
-     * \brief Set the sequence number to be ACK'ed
-     * \param sn Sequence number
+     * @brief Set the sequence number to be ACK'ed
+     * @param sn Sequence number
      */
     void SetSequenceNumber(uint8_t sn);
 
     /**
-     * \brief Get the sequence number to be ACK'ed
-     * \return uint32_t Sequence number
+     * @brief Get the sequence number to be ACK'ed
+     * @return uint32_t Sequence number
      */
     uint8_t GetSequenceNumber() const;
 
     /**
-     * \brief Set the flow id to be ACK'ed
-     * \param sn Sequence number
+     * @brief Set the flow id to be ACK'ed
+     * @param sn Sequence number
      */
     void SetFlowId(uint8_t sn);
 
     /**
-     * \brief Get the sequence number to be ACK'ed
-     * \return uint32_t Sequence number
+     * @brief Get the sequence number to be ACK'ed
+     * @return uint32_t Sequence number
      */
     uint8_t GetFlowId() const;
 
     /**
-     * \brief Get real size of the ACK message, which can be used to e.g. simulate real size.
-     * \return Real size of the ARQ ACK
+     * @brief Get real size of the ACK message, which can be used to e.g. simulate real size.
+     * @return Real size of the ARQ ACK
      */
     virtual uint32_t GetSizeInBytes() const;
 
@@ -601,8 +583,8 @@ class SatArqAckMessage : public SatControlMessage
 };
 
 /**
- * \ingroup satellite
- * \brief C/N0 (CNI) estimation report message.
+ * @ingroup satellite
+ * @brief C/N0 (CNI) estimation report message.
  * (Tagged by SatControlMsgTag with type value SAT_CN0_REPORT)
  *
  * This message is sent periodically by UT to GW. Or by ground entities to SAT
@@ -627,15 +609,9 @@ class SatCnoReportMessage : public SatControlMessage
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
-     */
-    virtual TypeId GetInstanceTypeId(void) const;
-
-    /**
-     * \brief Get type of the message.
+     * @brief Get type of the message.
      *
-     * \return SatControlMsgTag::SAT_CN0_REPORT
+     * @return SatControlMsgTag::SAT_CN0_REPORT
      */
     inline SatControlMsgTag::SatControlMsgType_t GetMsgType() const
     {
@@ -643,20 +619,20 @@ class SatCnoReportMessage : public SatControlMessage
     }
 
     /**
-     * \brief Get C/N0 estimate.
-     * \return Estimate of the C/N0.
+     * @brief Get C/N0 estimate.
+     * @return Estimate of the C/N0.
      */
     double GetCnoEstimate() const;
 
     /**
-     * \brief Set C/N0 estimate.
-     * \param cno The estimate of the C/N0.
+     * @brief Set C/N0 estimate.
+     * @param cno The estimate of the C/N0.
      */
     void SetCnoEstimate(double cno);
 
     /**
-     * \brief Get real size of the CR message, which can be used to e.g. simulate real size.
-     * \return Real size of the CR message.
+     * @brief Get real size of the CR message, which can be used to e.g. simulate real size.
+     * @return Real size of the CR message.
      */
     virtual uint32_t GetSizeInBytes() const;
 
@@ -668,8 +644,8 @@ class SatCnoReportMessage : public SatControlMessage
 };
 
 /**
- * \ingroup satellite
- * \brief Random access load control message
+ * @ingroup satellite
+ * @brief Random access load control message
  * (Tagged by SatControlMsgTag with type value SAT_RA_CTRL_MSG)
  */
 
@@ -692,15 +668,9 @@ class SatRaMessage : public SatControlMessage
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
-     */
-    virtual TypeId GetInstanceTypeId(void) const;
-
-    /**
-     * \brief Get type of the message.
+     * @brief Get type of the message.
      *
-     * \return SatControlMsgTag::SAT_RA_CTRL_MSG
+     * @return SatControlMsgTag::SAT_RA_CTRL_MSG
      */
     inline SatControlMsgTag::SatControlMsgType_t GetMsgType() const
     {
@@ -708,43 +678,43 @@ class SatRaMessage : public SatControlMessage
     }
 
     /**
-     * \brief Get backoff probability
-     * \return backoff probability
+     * @brief Get backoff probability
+     * @return backoff probability
      */
     uint16_t GetBackoffProbability() const;
 
     /**
-     * \brief Set backoff probability
-     * \param backoffProbability Backoff probability
+     * @brief Set backoff probability
+     * @param backoffProbability Backoff probability
      */
     void SetBackoffProbability(uint16_t backoffProbability);
 
     /**
-     * \brief Get backoff time
-     * \return backoff time
+     * @brief Get backoff time
+     * @return backoff time
      */
     uint16_t GetBackoffTime() const;
 
     /**
-     * \brief Set backoff time
-     * \param backoffTime Backoff time
+     * @brief Set backoff time
+     * @param backoffTime Backoff time
      */
     void SetBackoffTime(uint16_t backoffTime);
 
     /**
-     * \brief Get allocation chanel ID
-     * \return Allocation channel ID
+     * @brief Get allocation chanel ID
+     * @return Allocation channel ID
      */
     uint8_t GetAllocationChannelId() const;
 
     /**
      * Set allocation channel ID
-     * \param allocationChannel Allocation channel ID
+     * @param allocationChannel Allocation channel ID
      */
     void SetAllocationChannelId(uint8_t allocationChannel);
 
     /**
-     * \brief Get real size of the random access message, which can be used to e.g. simulate real
+     * @brief Get real size of the random access message, which can be used to e.g. simulate real
      * size. \return Real size of the random access message.
      */
     virtual uint32_t GetSizeInBytes() const;
@@ -772,8 +742,8 @@ class SatRaMessage : public SatControlMessage
 };
 
 /**
- * \ingroup satellite
- * \brief TIM unicast control message
+ * @ingroup satellite
+ * @brief TIM unicast control message
  * (Tagged by SatControlMsgTag with type value SAT_TIMU_CTRL_MSG)
  */
 
@@ -796,15 +766,9 @@ class SatTimuMessage : public SatControlMessage
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
-     */
-    virtual TypeId GetInstanceTypeId(void) const;
-
-    /**
-     * \brief Get type of the message.
+     * @brief Get type of the message.
      *
-     * \return SatControlMsgTag::SAT_TIMU_CTRL_MSG
+     * @return SatControlMsgTag::SAT_TIMU_CTRL_MSG
      */
     inline SatControlMsgTag::SatControlMsgType_t GetMsgType() const
     {
@@ -812,26 +776,26 @@ class SatTimuMessage : public SatControlMessage
     }
 
     /**
-     * \brief Get the allocated beam ID
-     * \return Allocated beam ID
+     * @brief Get the allocated beam ID
+     * @return Allocated beam ID
      */
     uint32_t GetAllocatedBeamId() const;
 
     /**
      * Set allocated beam ID
-     * \param beamId Allocated beam ID
+     * @param beamId Allocated beam ID
      */
     void SetAllocatedBeamId(uint32_t beamId);
 
     /**
-     * \brief Get the allocated sat ID
-     * \return Allocated sat ID
+     * @brief Get the allocated sat ID
+     * @return Allocated sat ID
      */
     uint32_t GetAllocatedSatId() const;
 
     /**
      * Set allocated sat ID
-     * \param satId Allocated sat ID
+     * @param satId Allocated sat ID
      */
     void SetAllocatedSatId(uint32_t beamId);
 
@@ -844,7 +808,7 @@ class SatTimuMessage : public SatControlMessage
     void SetGwAddress(Address address);
 
     /**
-     * \brief Get real size of the random access message, which can be used to e.g. simulate real
+     * @brief Get real size of the random access message, which can be used to e.g. simulate real
      * size. \return Real size of the random access message.
      */
     virtual uint32_t GetSizeInBytes() const;
@@ -872,8 +836,8 @@ class SatTimuMessage : public SatControlMessage
 };
 
 /**
- * \ingroup satellite
- * \brief Handover recommendation control message
+ * @ingroup satellite
+ * @brief Handover recommendation control message
  * (Tagged by SatControlMsgTag with type value SAT_HR_CTRL_MSG)
  */
 
@@ -896,15 +860,9 @@ class SatHandoverRecommendationMessage : public SatControlMessage
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
-     */
-    virtual TypeId GetInstanceTypeId(void) const;
-
-    /**
-     * \brief Get type of the message.
+     * @brief Get type of the message.
      *
-     * \return SatControlMsgTag::SAT_HR_CTRL_MSG
+     * @return SatControlMsgTag::SAT_HR_CTRL_MSG
      */
     inline SatControlMsgTag::SatControlMsgType_t GetMsgType() const
     {
@@ -912,31 +870,31 @@ class SatHandoverRecommendationMessage : public SatControlMessage
     }
 
     /**
-     * \brief Get the recommended beam ID
-     * \return Recommended beam ID
+     * @brief Get the recommended beam ID
+     * @return Recommended beam ID
      */
     uint32_t GetRecommendedBeamId() const;
 
     /**
      * Set recommended beam ID
-     * \param beamId Recommended beam ID
+     * @param beamId Recommended beam ID
      */
     void SetRecommendedBeamId(uint32_t beamId);
 
     /**
-     * \brief Get the recommended sat ID
-     * \return Recommended sat ID
+     * @brief Get the recommended sat ID
+     * @return Recommended sat ID
      */
     uint32_t GetRecommendedSatId() const;
 
     /**
      * Set recommended sat ID
-     * \param beamId Recommended sat ID
+     * @param beamId Recommended sat ID
      */
     void SetRecommendedSatId(uint32_t beamId);
 
     /**
-     * \brief Get real size of the random access message, which can be used to e.g. simulate real
+     * @brief Get real size of the random access message, which can be used to e.g. simulate real
      * size. \return Real size of the random access message.
      */
     virtual uint32_t GetSizeInBytes() const;
@@ -954,8 +912,8 @@ class SatHandoverRecommendationMessage : public SatControlMessage
 };
 
 /**
- * \ingroup satellite
- * \brief This control message is used to inform the UT it has to subscribe to a new slice.
+ * @ingroup satellite
+ * @brief This control message is used to inform the UT it has to subscribe to a new slice.
  * (Tagged by SatControlMsgTag with type value SAT_SLICE_CTRL_MSG)
  */
 class SatSliceSubscriptionMessage : public SatControlMessage
@@ -977,15 +935,9 @@ class SatSliceSubscriptionMessage : public SatControlMessage
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
-     */
-    virtual TypeId GetInstanceTypeId(void) const;
-
-    /**
-     * \brief Get type of the message.
+     * @brief Get type of the message.
      *
-     * \return SatControlMsgTag::SAT_SLICE_CTRL_MSG
+     * @return SatControlMsgTag::SAT_SLICE_CTRL_MSG
      */
     inline SatControlMsgTag::SatControlMsgType_t GetMsgType() const
     {
@@ -993,32 +945,32 @@ class SatSliceSubscriptionMessage : public SatControlMessage
     }
 
     /**
-     * \brief Get the new slice to subscribe. Zero means reset the slices already subscribed.
-     * \return The new slice id
+     * @brief Get the new slice to subscribe. Zero means reset the slices already subscribed.
+     * @return The new slice id
      */
     uint32_t GetSliceId() const;
 
     /**
      * Set the new slice to subscribe. Zero means reset the slices already subscribed.
-     * \param sliceId The new slice id
+     * @param sliceId The new slice id
      */
     void SetSliceId(uint8_t sliceId);
 
     /**
-     * \brief Get the ddress associated to this slice.
-     * \return The MAC address
+     * @brief Get the ddress associated to this slice.
+     * @return The MAC address
      */
     Mac48Address GetAddress() const;
 
     /**
      * Set the address associated to this slice.
-     * \param address The MAC address
+     * @param address The MAC address
      */
     void SetAddress(Mac48Address address);
 
     /**
-     * \brief Get real size of the message.
-     * \return Real size of the message.
+     * @brief Get real size of the message.
+     * @return Real size of the message.
      */
     virtual uint32_t GetSizeInBytes() const;
 
@@ -1035,8 +987,8 @@ class SatSliceSubscriptionMessage : public SatControlMessage
 };
 
 /**
- * \ingroup satellite
- * \brief This control message is used to inform the GW that a UT wants to connect
+ * @ingroup satellite
+ * @brief This control message is used to inform the GW that a UT wants to connect
  * (Tagged by SatControlMsgTag with type value SAT_LOGON_CTRL_MSG)
  */
 class SatLogonMessage : public SatControlMessage
@@ -1058,15 +1010,9 @@ class SatLogonMessage : public SatControlMessage
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
-     */
-    virtual TypeId GetInstanceTypeId(void) const;
-
-    /**
-     * \brief Get type of the message.
+     * @brief Get type of the message.
      *
-     * \return SatControlMsgTag::SAT_LOGON_CTRL_MSG
+     * @return SatControlMsgTag::SAT_LOGON_CTRL_MSG
      */
     inline SatControlMsgTag::SatControlMsgType_t GetMsgType() const
     {
@@ -1074,8 +1020,8 @@ class SatLogonMessage : public SatControlMessage
     }
 
     /**
-     * \brief Get real size of the message.
-     * \return Real size of the message.
+     * @brief Get real size of the message.
+     * @return Real size of the message.
      */
     virtual uint32_t GetSizeInBytes() const;
 
@@ -1083,8 +1029,8 @@ class SatLogonMessage : public SatControlMessage
 };
 
 /**
- * \ingroup satellite
- * \brief This control message is used to inform the UT of a connection success
+ * @ingroup satellite
+ * @brief This control message is used to inform the UT of a connection success
  * (Tagged by SatControlMsgTag with type value SAT_LOGON_RESPONSE_CTRL_MSG)
  */
 class SatLogonResponseMessage : public SatControlMessage
@@ -1106,15 +1052,9 @@ class SatLogonResponseMessage : public SatControlMessage
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
-     */
-    virtual TypeId GetInstanceTypeId(void) const;
-
-    /**
-     * \brief Get type of the message.
+     * @brief Get type of the message.
      *
-     * \return SatControlMsgTag::SAT_LOGON_RESPONSE_CTRL_MSG
+     * @return SatControlMsgTag::SAT_LOGON_RESPONSE_CTRL_MSG
      */
     inline SatControlMsgTag::SatControlMsgType_t GetMsgType() const
     {
@@ -1122,20 +1062,20 @@ class SatLogonResponseMessage : public SatControlMessage
     }
 
     /**
-     * \brief Get the RA channel to talk into.
-     * \return The RA channel
+     * @brief Get the RA channel to talk into.
+     * @return The RA channel
      */
     uint32_t GetRaChannel() const;
 
     /**
      * Set the RA channel to talk into.
-     * \param raChannel The new RA channel
+     * @param raChannel The new RA channel
      */
     void SetRaChannel(uint32_t raChannel);
 
     /**
-     * \brief Get real size of the message.
-     * \return Real size of the message.
+     * @brief Get real size of the message.
+     * @return Real size of the message.
      */
     virtual uint32_t GetSizeInBytes() const;
 
@@ -1145,8 +1085,8 @@ class SatLogonResponseMessage : public SatControlMessage
 };
 
 /**
- * \ingroup satellite
- * \brief This control message is used to inform the UT that it has been deconnected by GW
+ * @ingroup satellite
+ * @brief This control message is used to inform the UT that it has been deconnected by GW
  * (Tagged by SatControlMsgTag with type value SAT_LOGOFF_CTRL_MSG)
  */
 class SatLogoffMessage : public SatControlMessage
@@ -1168,15 +1108,9 @@ class SatLogoffMessage : public SatControlMessage
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
-     */
-    virtual TypeId GetInstanceTypeId(void) const;
-
-    /**
-     * \brief Get type of the message.
+     * @brief Get type of the message.
      *
-     * \return SatControlMsgTag::SAT_LOGOFF_CTRL_MSG
+     * @return SatControlMsgTag::SAT_LOGOFF_CTRL_MSG
      */
     inline SatControlMsgTag::SatControlMsgType_t GetMsgType() const
     {
@@ -1184,8 +1118,8 @@ class SatLogoffMessage : public SatControlMessage
     }
 
     /**
-     * \brief Get real size of the message.
-     * \return Real size of the message.
+     * @brief Get real size of the message.
+     * @return Real size of the message.
      */
     virtual uint32_t GetSizeInBytes() const;
 
@@ -1193,8 +1127,8 @@ class SatLogoffMessage : public SatControlMessage
 };
 
 /**
- * \ingroup satellite
- * \brief This control message is used to broadcast NCR date to UTs
+ * @ingroup satellite
+ * @brief This control message is used to broadcast NCR date to UTs
  */
 class SatNcrMessage : public SatControlMessage
 {
@@ -1215,15 +1149,9 @@ class SatNcrMessage : public SatControlMessage
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
-     */
-    virtual TypeId GetInstanceTypeId(void) const;
-
-    /**
-     * \brief Get type of the message.
+     * @brief Get type of the message.
      *
-     * \return SatControlMsgTag::SAT_NCR_CTRL_MSG
+     * @return SatControlMsgTag::SAT_NCR_CTRL_MSG
      */
     inline SatControlMsgTag::SatControlMsgType_t GetMsgType() const
     {
@@ -1231,20 +1159,20 @@ class SatNcrMessage : public SatControlMessage
     }
 
     /**
-     * \brief Get the NCR date (ticks 27MHz).
-     * \return The NCR date
+     * @brief Get the NCR date (ticks 27MHz).
+     * @return The NCR date
      */
     uint64_t GetNcrDate() const;
 
     /**
      * Set the NCR date (ticks 27MHz).
-     * \param ncr The new NCR date
+     * @param ncr The new NCR date
      */
     void SetNcrDate(uint64_t ncr);
 
     /**
-     * \brief Get real size of the message.
-     * \return Real size of the message.
+     * @brief Get real size of the message.
+     * @return Real size of the message.
      */
     virtual uint32_t GetSizeInBytes() const;
 
@@ -1254,7 +1182,7 @@ class SatNcrMessage : public SatControlMessage
 };
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  * This control message is used to give time, power and frequency correction to UTs.
  * Flags are not used here, if no information is needed for a field, leave it to zero.
  */
@@ -1277,15 +1205,9 @@ class SatCmtMessage : public SatControlMessage
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
-     */
-    virtual TypeId GetInstanceTypeId(void) const;
-
-    /**
-     * \brief Get type of the message.
+     * @brief Get type of the message.
      *
-     * \return SatControlMsgTag::SAT_CMT_CTRL_MSG
+     * @return SatControlMsgTag::SAT_CMT_CTRL_MSG
      */
     inline SatControlMsgTag::SatControlMsgType_t GetMsgType() const
     {
@@ -1293,72 +1215,72 @@ class SatCmtMessage : public SatControlMessage
     }
 
     /**
-     * \brief Get the group ID.
-     * \return The group ID
+     * @brief Get the group ID.
+     * @return The group ID
      */
     uint8_t GetGroupId() const;
 
     /**
      * Set the group ID.
-     * \param groupId The group ID
+     * @param groupId The group ID
      */
     void SetGroupId(uint8_t groupId);
 
     /**
-     * \brief Get the logon ID.
-     * \return The logon ID
+     * @brief Get the logon ID.
+     * @return The logon ID
      */
     uint8_t GetLogonId() const;
 
     /**
      * Set the logon ID.
-     * \param logonId The logon ID
+     * @param logonId The logon ID
      */
     void SetLogonId(uint8_t logonId);
 
     /**
-     * \brief Get the burst time correction.
-     * \return The burst time correction
+     * @brief Get the burst time correction.
+     * @return The burst time correction
      */
     int16_t GetBurstTimeCorrection() const;
 
     /**
      * Set the burst time correction.
-     * \param burstTimeCorrection The burst time correction
+     * @param burstTimeCorrection The burst time correction
      */
     void SetBurstTimeCorrection(int32_t burstTimeCorrection);
 
     /**
-     * \brief Get the powercorrection.
+     * @brief Get the powercorrection.
      * Information of power control flag is the MSB of the result.
      * The 7 remaining bits are the power correction (if flag is 1) or EsN0 (otherwise).
-     * \return The power correction
+     * @return The power correction
      */
     uint8_t GetPowerCorrection() const;
 
     /**
      * Set the power correction.
-     * \param powerCorrection The power correction. Information of power control flag is the MSB of
+     * @param powerCorrection The power correction. Information of power control flag is the MSB of
      * the parameter. The 7 remaining bits are the power correction (if flag is 1) or EsN0
      * (otherwise).
      */
     void SetPowerCorrection(uint8_t powerCorrection);
 
     /**
-     * \brief Get the frequency correction.
-     * \return The frequency correction
+     * @brief Get the frequency correction.
+     * @return The frequency correction
      */
     int16_t GetFrequencyCorrection() const;
 
     /**
      * Set the frequency correction.
-     * \param frequencyCorrection The frequency correction
+     * @param frequencyCorrection The frequency correction
      */
     void SetFrequencyCorrection(int16_t frequencyCorrection);
 
     /**
-     * \brief Get real size of the message.
-     * \return Real size of the message.
+     * @brief Get real size of the message.
+     * @return Real size of the message.
      */
     virtual uint32_t GetSizeInBytes() const;
 
@@ -1372,8 +1294,8 @@ class SatCmtMessage : public SatControlMessage
 };
 
 /**
- * \ingroup satellite
- * \brief The container to store control messages. Container assigns two sequences of IDs
+ * @ingroup satellite
+ * @brief The container to store control messages. Container assigns two sequences of IDs
  * for added messages.
  * - Send/buffered IDs - used during buffering period between ND and MAC.
  * - Receive IDs - used to indicate the receiver the id for the control PDU
@@ -1408,40 +1330,40 @@ class SatControlMsgContainer : public SimpleRefCount<SatControlMsgContainer>
     ~SatControlMsgContainer();
 
     /**
-     * \brief Reserve an id and store a control message.
+     * @brief Reserve an id and store a control message.
      *
-     * \param controlMsg Pointer to message to be added.
-     * \return Reserved send ID of the created added message.
+     * @param controlMsg Pointer to message to be added.
+     * @return Reserved send ID of the created added message.
      */
     uint32_t ReserveIdAndStore(Ptr<SatControlMessage> controlMsg);
 
     /**
-     * \brief Add a control message.
+     * @brief Add a control message.
      *
-     * \param sendId of the message to add.
-     * \return Receive id given by the container.
+     * @param sendId of the message to add.
+     * @return Receive id given by the container.
      */
     uint32_t Send(uint32_t sendId);
 
     /**
-     * \brief Read a control message.
+     * @brief Read a control message.
      *
-     * \param recvId Id of the message to read.
-     * \return Pointer to message.
+     * @param recvId Id of the message to read.
+     * @return Pointer to message.
      */
     Ptr<SatControlMessage> Read(uint32_t recvId);
 
   private:
     /**
-     * \brief Erase first item from container. Schedules a new erase call to this function with time
+     * @brief Erase first item from container. Schedules a new erase call to this function with time
      * left for next item in list (if container is not empty).
      */
     void EraseFirst();
 
     /**
-     * \brief Do clean up for the Ctrl msg id map. Currently it needs to erase
+     * @brief Do clean up for the Ctrl msg id map. Currently it needs to erase
      * a map entry based on value, which is not very efficient.
-     * \param recvId Ctrl msg id
+     * @param recvId Ctrl msg id
      */
     void CleanUpIdMap(uint32_t recvId);
 

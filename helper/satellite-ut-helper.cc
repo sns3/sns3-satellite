@@ -22,19 +22,19 @@
 
 #include "satellite-ut-helper.h"
 
-#include <ns3/boolean.h>
-#include <ns3/callback.h>
-#include <ns3/config.h>
-#include <ns3/double.h>
-#include <ns3/enum.h>
-#include <ns3/log.h>
-#include <ns3/pointer.h>
-#include <ns3/satellite-channel-estimation-error-container.h>
-#include <ns3/satellite-channel.h>
-#include <ns3/satellite-enums.h>
-#include <ns3/satellite-net-device.h>
-#include <ns3/satellite-phy-rx-carrier-conf.h>
-#include <ns3/satellite-typedefs.h>
+#include "ns3/boolean.h"
+#include "ns3/callback.h"
+#include "ns3/config.h"
+#include "ns3/double.h"
+#include "ns3/enum.h"
+#include "ns3/log.h"
+#include "ns3/pointer.h"
+#include "ns3/satellite-channel-estimation-error-container.h"
+#include "ns3/satellite-channel.h"
+#include "ns3/satellite-enums.h"
+#include "ns3/satellite-net-device.h"
+#include "ns3/satellite-phy-rx-carrier-conf.h"
+#include "ns3/satellite-typedefs.h"
 
 #include <string>
 
@@ -105,14 +105,6 @@ SatUtHelper::GetTypeId(void)
                             MakeTraceSourceAccessor(&SatUtHelper::m_creationTrace),
                             "ns3::SatTypedefs::CreationCallback");
     return tid;
-}
-
-TypeId
-SatUtHelper::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
 }
 
 SatUtHelper::SatUtHelper()

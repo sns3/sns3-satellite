@@ -37,9 +37,9 @@ namespace ns3
 class SatMobilityModel;
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief Antenna gain pattern container holds all antenna patterns
+ * @brief Antenna gain pattern container holds all antenna patterns
  * related to a satellite system. Current reference system consists
  * of 72 spot-beams. It is assumed that all links use the same set of
  * antenna patterns (forward feeder and user, return feeder and user).
@@ -51,11 +51,10 @@ class SatAntennaGainPatternContainer : public Object
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
-    TypeId GetInstanceTypeId() const;
 
     /**
      * Default constructor. Not used.
@@ -64,8 +63,8 @@ class SatAntennaGainPatternContainer : public Object
 
     /**
      * SatAntennaGainPatternContainer constructor.
-     * \param nbSats Number of satellites to consider
-     * \param patternsFolder Path to folder containing the gains definition for each beam
+     * @param nbSats Number of satellites to consider
+     * @param patternsFolder Path to folder containing the gains definition for each beam
      */
     SatAntennaGainPatternContainer(uint32_t nbSats, std::string patternsFolder);
     ~SatAntennaGainPatternContainer();
@@ -76,47 +75,47 @@ class SatAntennaGainPatternContainer : public Object
     typedef std::map<std::pair<uint32_t, uint32_t>, SatBeamUserInfo> BeamUserInfoMap_t;
 
     /**
-     * \brief Load the default satellite position associated to these traces. Must be in GeoPos.in
-     * \return The satellite position
+     * @brief Load the default satellite position associated to these traces. Must be in GeoPos.in
+     * @return The satellite position
      */
     GeoCoordinate GetDefaultGeoPosition();
 
     /**
-     * \brief Get the antenna pattern of a specified beam id
-     * \param beamId Beam identifier
-     * \return The antenna gain pattern instance of the specified beam id
+     * @brief Get the antenna pattern of a specified beam id
+     * @param beamId Beam identifier
+     * @return The antenna gain pattern instance of the specified beam id
      */
     Ptr<SatAntennaGainPattern> GetAntennaGainPattern(uint32_t beamId) const;
 
     /**
-     * \brief Get the mobility model of a specified satellite id
-     * \param satelliteId Satellite identifier
-     * \return The mobility model
+     * @brief Get the mobility model of a specified satellite id
+     * @param satelliteId Satellite identifier
+     * @return The mobility model
      */
     Ptr<SatMobilityModel> GetAntennaMobility(uint32_t satelliteId) const;
 
     /**
-     * \brief Get the number of stored antenna pattern
-     * \return The total number of antenna gain pattern instance
+     * @brief Get the number of stored antenna pattern
+     * @return The total number of antenna gain pattern instance
      */
     uint32_t GetNAntennaGainPatterns() const;
 
     /**
-     * \brief Get the best beam id based on the antenna patterns in a
+     * @brief Get the best beam id based on the antenna patterns in a
      * specified geo coordinate
-     * \param satelliteId ID of satellite to search
-     * \param coord Geo coordinate
-     * \param ignoreNan Do not crash if a NaN value is returned
-     * \return best beam id in the specified geo coordinate
+     * @param satelliteId ID of satellite to search
+     * @param coord Geo coordinate
+     * @param ignoreNan Do not crash if a NaN value is returned
+     * @return best beam id in the specified geo coordinate
      */
     uint32_t GetBestBeamId(uint32_t satelliteId, GeoCoordinate coord, bool ignoreNan);
 
     /**
-     * \brief Get beam gain for given coordinates
-     * \param satelliteId ID of satellite
-     * \param beamId ID of beam
-     * \param coord Geo coordinate
-     * \return gain of this beam
+     * @brief Get beam gain for given coordinates
+     * @param satelliteId ID of satellite
+     * @param beamId ID of beam
+     * @param coord Geo coordinate
+     * @return gain of this beam
      */
     double GetBeamGain(uint32_t satelliteId, uint32_t beamId, GeoCoordinate coord);
 

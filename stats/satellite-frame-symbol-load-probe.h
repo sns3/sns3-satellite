@@ -39,7 +39,7 @@ namespace ns3
 {
 
 /**
- * \brief Probe to translate from a FrameLoadTrace trace source.
+ * @brief Probe to translate from a FrameLoadTrace trace source.
  *
  * This class is designed to probe an underlying ns3 TraceSource exporting a
  * frame load information.  This probe exports a trace source "Output" with two
@@ -51,8 +51,8 @@ class SatFrameSymbolLoadProbe : public Probe
 {
   public:
     /**
-     * \brief Get the type ID.
-     * \return the object TypeId
+     * @brief Get the type ID.
+     * @return the object TypeId
      */
     static TypeId GetTypeId();
 
@@ -67,35 +67,35 @@ class SatFrameSymbolLoadProbe : public Probe
     virtual ~SatFrameSymbolLoadProbe();
 
     /**
-     * \brief Set a probe value
+     * @brief Set a probe value
      *
-     * \param frameId set the frame number equal to this
-     * \param loadRatio set the traced ratio of allocated symbols equal to this
+     * @param frameId set the frame number equal to this
+     * @param loadRatio set the traced ratio of allocated symbols equal to this
      */
     void SetValue(uint32_t frameId, double loadRatio);
 
     /**
-     * \brief Set a probe value by its name in the Config system
+     * @brief Set a probe value by its name in the Config system
      *
-     * \param path config path to access the probe
-     * \param frameId set the frame number equal to this
-     * \param loadRatio set the traced ratio of allocated symbols equal to this
+     * @param path config path to access the probe
+     * @param frameId set the frame number equal to this
+     * @param loadRatio set the traced ratio of allocated symbols equal to this
      */
     static void SetValueByPath(std::string path, uint32_t frameId, double loadRatio);
 
     /**
-     * \brief connect to a trace source attribute provided by a given object
+     * @brief connect to a trace source attribute provided by a given object
      *
-     * \param traceSource the name of the attribute TraceSource to connect to
-     * \param obj ns3::Object to connect to
-     * \return true if the trace source was successfully connected
+     * @param traceSource the name of the attribute TraceSource to connect to
+     * @param obj ns3::Object to connect to
+     * @return true if the trace source was successfully connected
      */
     virtual bool ConnectByObject(std::string traceSource, Ptr<Object> obj);
 
     /**
-     * \brief connect to a trace source provided by a config path
+     * @brief connect to a trace source provided by a config path
      *
-     * \param path Config path to bind to
+     * @param path Config path to bind to
      *
      * Note, if an invalid path is provided, the probe will not be connected
      * to anything.
@@ -103,21 +103,21 @@ class SatFrameSymbolLoadProbe : public Probe
     virtual void ConnectByPath(std::string path);
 
     /**
-     * \brief Callback signature for frame load in unit of symbols.
+     * @brief Callback signature for frame load in unit of symbols.
      *
-     * \param frameId The current frame number.
-     * \param loadRatio the ratio of allocated symbols over the total number of
+     * @param frameId The current frame number.
+     * @param loadRatio the ratio of allocated symbols over the total number of
      *                  symbols in the frame.
      */
     typedef void (*FrameSymbolLoadCallback)(uint32_t frameId, double loadRatio);
 
   private:
     /**
-     * \brief Method to connect to an underlying ns3::TraceSource with
+     * @brief Method to connect to an underlying ns3::TraceSource with
      * arguments of type double and const Address&
      *
-     * \param frameId frame number
-     * \param loadRatio the traced ratio of allocated symbols
+     * @param frameId frame number
+     * @param loadRatio the traced ratio of allocated symbols
      */
     void TraceSink(uint32_t frameId, double loadRatio);
 

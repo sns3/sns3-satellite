@@ -22,10 +22,10 @@
 
 #include "satellite-position-input-trace-container.h"
 
-#include <ns3/enum.h>
-#include <ns3/log.h>
-#include <ns3/simulator.h>
-#include <ns3/singleton.h>
+#include "ns3/enum.h"
+#include "ns3/log.h"
+#include "ns3/simulator.h"
+#include "ns3/singleton.h"
 
 #include <string>
 
@@ -61,12 +61,6 @@ SatTracedMobilityModel::GetTypeId(void)
                           MakeTimeChecker(FemtoSeconds(1)));
 
     return tid;
-}
-
-TypeId
-SatTracedMobilityModel::GetInstanceTypeId(void) const
-{
-    return GetTypeId();
 }
 
 void
@@ -125,6 +119,22 @@ SatTracedMobilityModel::DoSetGeoPosition(const GeoCoordinate& position)
 
     m_geoPosition = position;
     NotifyGeoCourseChange();
+}
+
+Vector
+SatTracedMobilityModel::DoGetPosition() const
+{
+    NS_LOG_FUNCTION(this);
+
+    return DoGetGeoPosition().ToVector();
+}
+
+void
+SatTracedMobilityModel::DoSetPosition(const Vector& position)
+{
+    NS_LOG_FUNCTION(this << position);
+
+    DoSetGeoPosition(GeoCoordinate(position));
 }
 
 Vector

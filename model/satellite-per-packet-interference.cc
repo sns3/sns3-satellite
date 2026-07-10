@@ -22,9 +22,9 @@
 
 #include "satellite-per-packet-interference.h"
 
-#include <ns3/log.h>
-#include <ns3/simulator.h>
-#include <ns3/singleton.h>
+#include "ns3/log.h"
+#include "ns3/simulator.h"
+#include "ns3/singleton.h"
 
 #include <algorithm>
 #include <cmath>
@@ -50,14 +50,6 @@ SatPerPacketInterference::GetTypeId(void)
                             .AddConstructor<SatPerPacketInterference>();
 
     return tid;
-}
-
-TypeId
-SatPerPacketInterference::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
 }
 
 SatPerPacketInterference::SatPerPacketInterference()

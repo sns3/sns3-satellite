@@ -29,12 +29,12 @@
 #include "satellite-topology.h"
 #include "satellite-utils.h"
 
-#include <ns3/double.h>
-#include <ns3/log.h>
-#include <ns3/pointer.h>
-#include <ns3/simulator.h>
-#include <ns3/singleton.h>
-#include <ns3/uinteger.h>
+#include "ns3/double.h"
+#include "ns3/log.h"
+#include "ns3/pointer.h"
+#include "ns3/simulator.h"
+#include "ns3/singleton.h"
+#include "ns3/uinteger.h"
 
 NS_LOG_COMPONENT_DEFINE("SatGwPhy");
 
@@ -135,14 +135,6 @@ SatGwPhy::GetTypeId(void)
     return tid;
 }
 
-TypeId
-SatGwPhy::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
-}
-
 SatGwPhy::SatGwPhy(void)
     : m_aciIfWrtNoisePercent(10.0),
       m_imInterferenceCOverIDb(22.0),
@@ -158,36 +150,45 @@ SatGwPhy::SatGwPhy(SatPhy::CreateParam_t& params,
                    SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
                    Ptr<SatSuperframeConf> superFrameConf)
     : SatPhy(params),
+      m_linkResults(linkResults),
+      m_parameters(parameters),
+      m_superFrameConf(superFrameConf),
       m_aciIfWrtNoisePercent(10.0),
       m_imInterferenceCOverIDb(22.0),
       m_imInterferenceCOverI(SatUtils::DbToLinear(m_imInterferenceCOverIDb)),
       m_antennaReconfigurationDelay(Seconds(0.0))
 {
+    NS_LOG_FUNCTION(this << linkResults << superFrameConf);
+}
+
+void
+SatGwPhy::NotifyConstructionCompleted()
+{
     NS_LOG_FUNCTION(this);
 
-    ObjectBase::ConstructSelf(AttributeConstructionList());
+    SatPhy::NotifyConstructionCompleted();
 
     m_imInterferenceCOverI = SatUtils::DbToLinear(m_imInterferenceCOverIDb);
 
-    parameters.m_rxTemperatureK = SatUtils::DbToLinear(SatPhy::GetRxNoiseTemperatureDbk());
-    parameters.m_aciIfWrtNoiseFactor = m_aciIfWrtNoisePercent / 100.0;
-    parameters.m_extNoiseDensityWhz = 0.0;
-    parameters.m_rxMode = SatPhyRxCarrierConf::NORMAL;
-    parameters.m_linkRegenerationMode =
+    m_parameters.m_rxTemperatureK = SatUtils::DbToLinear(SatPhy::GetRxNoiseTemperatureDbk());
+    m_parameters.m_aciIfWrtNoiseFactor = m_aciIfWrtNoisePercent / 100.0;
+    m_parameters.m_extNoiseDensityWhz = 0.0;
+    m_parameters.m_rxMode = SatPhyRxCarrierConf::NORMAL;
+    m_parameters.m_linkRegenerationMode =
         Singleton<SatTopology>::Get()->GetReturnLinkRegenerationMode();
-    parameters.m_chType = SatEnums::RETURN_FEEDER_CH;
+    m_parameters.m_chType = SatEnums::RETURN_FEEDER_CH;
 
-    Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf>(parameters);
+    Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf>(m_parameters);
 
-    if (linkResults)
+    if (m_linkResults)
     {
-        carrierConf->SetLinkResults(linkResults);
+        carrierConf->SetLinkResults(m_linkResults);
     }
 
     carrierConf->SetAdditionalInterferenceCb(
         MakeCallback(&SatGwPhy::GetAdditionalInterference, this));
 
-    SatPhy::ConfigureRxCarriers(carrierConf, superFrameConf);
+    SatPhy::ConfigureRxCarriers(carrierConf, m_superFrameConf);
 }
 
 SatGwPhy::~SatGwPhy()

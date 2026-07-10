@@ -38,8 +38,8 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief Packet by packet interference. Interference is calculated
+ * @ingroup satellite
+ * @brief Packet by packet interference. Interference is calculated
  * separately for each packet by listening to all transmissions within
  * the same SatChannel.
  */
@@ -48,15 +48,9 @@ class SatPerPacketInterference : public SatInterference
   public:
     /**
      *
-     * \return
+     * @return
      */
     static TypeId GetTypeId(void);
-
-    /**
-     *
-     * \return
-     */
-    TypeId GetInstanceTypeId(void) const;
 
     /**
      *
@@ -65,8 +59,8 @@ class SatPerPacketInterference : public SatInterference
 
     /**
      *
-     * \param channelType
-     * \param rxBandwidthHz Receiver bandwidth in Hertz
+     * @param channelType
+     * @param rxBandwidthHz Receiver bandwidth in Hertz
      */
     SatPerPacketInterference(SatEnums::ChannelType_t channelType, double rxBandwidthHz);
 
@@ -82,7 +76,7 @@ class SatPerPacketInterference : public SatInterference
 
     /**
      *
-     * \param rxBandwidth
+     * @param rxBandwidth
      */
     void SetRxBandwidth(double rxBandwidth);
 
@@ -91,9 +85,9 @@ class SatPerPacketInterference : public SatInterference
      * Calculates interference power for the given reference
      * Sets final power at end time to finalPower.
      *
-     * \param event Reference event which for interference is calculated.
+     * @param event Reference event which for interference is calculated.
      *
-     * \return Final calculated power value at end of receiving
+     * @return Final calculated power value at end of receiving
      */
     virtual std::vector<std::pair<double, double>> DoCalculate(
         Ptr<SatInterference::InterferenceChangeEvent> event);
@@ -114,12 +108,12 @@ class SatPerPacketInterference : public SatInterference
      * the event being processed proportional to the remaining time
      * until the end of the event whose interferences are being calculated.
      *
-     * \param timeRatio ratio of time compared to an event duration of the
+     * @param timeRatio ratio of time compared to an event duration of the
      * distance between the event being processed and the end of the event
      * whose interferences are being calculated.
-     * \param interferenceValue the interference value of the event being
+     * @param interferenceValue the interference value of the event being
      * processed.
-     * \param ifPowerW the current value of the interference for the event
+     * @param ifPowerW the current value of the interference for the event
      * whose interferences are being calculated; which will be updated.
      */
     virtual void onInterferentEvent(long double timeRatio,
@@ -130,10 +124,10 @@ class SatPerPacketInterference : public SatInterference
     /**
      * Adds interference power to interference object.
      *
-     * \param rxDuration Duration of the receiving.
-     * \param rxPower Receiving power.
+     * @param rxDuration Duration of the receiving.
+     * @param rxPower Receiving power.
      *
-     * \return the pointer to interference event as a reference of the addition
+     * @return the pointer to interference event as a reference of the addition
      */
     virtual Ptr<SatInterference::InterferenceChangeEvent> DoAdd(Time rxDuration,
                                                                 double rxPower,
@@ -147,14 +141,14 @@ class SatPerPacketInterference : public SatInterference
     /**
      * Notifies that RX is started by a receiver.
      *
-     * \param event Interference reference event of receiver
+     * @param event Interference reference event of receiver
      */
     virtual void DoNotifyRxStart(Ptr<SatInterference::InterferenceChangeEvent> event);
 
     /**
      * Notifies that RX is ended by a receiver.
      *
-     * \param event Interference reference event of receiver
+     * @param event Interference reference event of receiver
      */
     virtual void DoNotifyRxEnd(Ptr<SatInterference::InterferenceChangeEvent> event);
 
@@ -170,40 +164,40 @@ class SatPerPacketInterference : public SatInterference
 
     /**
      *
-     * \param o
+     * @param o
      */
     SatPerPacketInterference(const SatPerPacketInterference& o);
 
     /**
      *
-     * \param o
-     * \return
+     * @param o
+     * @return
      */
     SatPerPacketInterference& operator=(const SatPerPacketInterference& o);
 
     /**
-     * \brief interference change list
+     * @brief interference change list
      */
     InterferenceChanges m_interferenceChanges;
 
     /**
-     * \brief notified interference event IDs
+     * @brief notified interference event IDs
      */
     std::set<uint32_t> m_rxEventIds;
 
     /**
-     * \brief Residual power value for interference.
+     * @brief Residual power value for interference.
      * Sum of negative values in list m_changes, which positive value is not in list.
      */
     long double m_residualPowerW;
 
     /**
-     * \brief flag to indicate that at least one receiving is on
+     * @brief flag to indicate that at least one receiving is on
      */
     bool m_rxing;
 
     /**
-     * \brief event id for Events
+     * @brief event id for Events
      */
     uint32_t m_nextEventId;
 
@@ -218,7 +212,7 @@ class SatPerPacketInterference : public SatInterference
     SatEnums::ChannelType_t m_channelType;
 
     /**
-     * \brief RX Bandwidth in Hz
+     * @brief RX Bandwidth in Hz
      */
     double m_rxBandwidth_Hz;
 };

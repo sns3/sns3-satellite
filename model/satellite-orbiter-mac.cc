@@ -27,12 +27,12 @@
 #include "satellite-uplink-info-tag.h"
 #include "satellite-utils.h"
 
-#include <ns3/double.h>
-#include <ns3/enum.h>
-#include <ns3/log.h>
-#include <ns3/pointer.h>
-#include <ns3/simulator.h>
-#include <ns3/uinteger.h>
+#include "ns3/double.h"
+#include "ns3/enum.h"
+#include "ns3/log.h"
+#include "ns3/pointer.h"
+#include "ns3/simulator.h"
+#include "ns3/uinteger.h"
 
 #include <utility>
 
@@ -62,14 +62,6 @@ SatOrbiterMac::GetTypeId(void)
                             "ns3::SatBbFrame::BbFrameCallback");
 
     return tid;
-}
-
-TypeId
-SatOrbiterMac::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
 }
 
 SatOrbiterMac::SatOrbiterMac(void)
@@ -208,7 +200,7 @@ SatOrbiterMac::SendPacket(SatPhy::PacketContainer_t packets,
                   GetSatLinkTxDir(),
                   SatUtils::GetPacketInfo(packets));
 
-    Ptr<SatSignalParameters> txParams = Create<SatSignalParameters>();
+    Ptr<SatSignalParameters> txParams = CreateObject<SatSignalParameters>();
     txParams->m_duration = duration;
     txParams->m_packetsInBurst = packets;
     txParams->m_satId = m_satId;
@@ -262,8 +254,8 @@ SatOrbiterMac::RxTraces(SatPhy::PacketContainer_t packets)
                 }
             } // end of `if (destAddress == m_nodeInfo->GetMacAddress () || destAddress.IsBroadcast
               // ())`
-        }     // end of `for it1 = packets.begin () -> packets.end ()`
-    }         // end of `if (m_isStatisticsTagsEnabled)`
+        } // end of `for it1 = packets.begin () -> packets.end ()`
+    } // end of `if (m_isStatisticsTagsEnabled)`
 }
 
 void

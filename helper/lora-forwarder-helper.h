@@ -23,13 +23,13 @@
 #ifndef LORA_FORWARDER_HELPER_H
 #define LORA_FORWARDER_HELPER_H
 
-#include <ns3/address.h>
-#include <ns3/application-container.h>
-#include <ns3/attribute.h>
-#include <ns3/lora-forwarder.h>
-#include <ns3/net-device.h>
-#include <ns3/node-container.h>
-#include <ns3/object-factory.h>
+#include "ns3/address.h"
+#include "ns3/application-container.h"
+#include "ns3/attribute.h"
+#include "ns3/lora-forwarder.h"
+#include "ns3/net-device.h"
+#include "ns3/node-container.h"
+#include "ns3/object-factory.h"
 
 #include <stdint.h>
 #include <string>
@@ -45,8 +45,8 @@ class LoraForwarderHelper : public Object
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
 
@@ -64,18 +64,18 @@ class LoraForwarderHelper : public Object
     /**
      * Install if ground GW is a Lora GW
      *
-     * \param node GW node where the forwarder is installed
+     * @param node GW node where the forwarder is installed
      *
-     * \return LoraForwarder application
+     * @return LoraForwarder application
      */
     Ptr<Application> InstallPrivGwLora(Ptr<Node> node) const;
 
     /**
      * Install if ground GW is a DVB GW. Lora GW is on a satellite
      *
-     * \param node Ground GW node where the forwarder is installed
+     * @param node Ground GW node where the forwarder is installed
      *
-     * \return LoraForwarder application
+     * @return LoraForwarder application
      */
     Ptr<Application> InstallPrivGwDvb(Ptr<Node> node) const;
 

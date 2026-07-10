@@ -20,7 +20,7 @@
 
 #include "satellite-fading-input-trace.h"
 
-#include <ns3/log.h>
+#include "ns3/log.h"
 
 #include <stdint.h>
 #include <utility>

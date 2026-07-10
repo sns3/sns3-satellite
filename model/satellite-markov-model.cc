@@ -20,8 +20,8 @@
 
 #include "satellite-markov-model.h"
 
-#include <ns3/log.h>
-#include <ns3/simulator.h>
+#include "ns3/log.h"
+#include "ns3/simulator.h"
 
 #include <cstdlib>
 #include <limits>

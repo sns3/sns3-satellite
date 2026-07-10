@@ -36,8 +36,8 @@ namespace ns3
 class DataRate;
 
 /**
- * \ingroup satellite
- * \brief A helper to make it easier to instantiate an ns3::SatOnOffApplication
+ * @ingroup satellite
+ * @brief A helper to make it easier to instantiate an ns3::SatOnOffApplication
  * on a set of nodes.
  */
 class SatOnOffHelper
@@ -46,19 +46,19 @@ class SatOnOffHelper
     /**
      * Create an SatOnOffHelper to make it easier to work with SatOnOffApplications
      *
-     * \param protocol the name of the protocol to use to send traffic
+     * @param protocol the name of the protocol to use to send traffic
      *        by the applications. This string identifies the socket
      *        factory type used to create sockets for the applications.
      *        A typical value would be ns3::UdpSocketFactory.
-     * \param address the address of the remote node to send traffic to.
+     * @param address the address of the remote node to send traffic to.
      */
     SatOnOffHelper(std::string protocol, Address address);
 
     /**
      * Helper function used to set the underlying application attributes.
      *
-     * \param name the name of the application attribute to set
-     * \param value the value of the application attribute to set
+     * @param name the name of the application attribute to set
+     * @param value the value of the application attribute to set
      */
     void SetAttribute(std::string name, const AttributeValue& value);
 
@@ -67,8 +67,8 @@ class SatOnOffHelper
      * setting the attributes OnTime to constant 1000 seconds, OffTime to
      * constant 0 seconds, and the DataRate and PacketSize set accordingly
      *
-     * \param dataRate DataRate object for the sending rate
-     * \param packetSize size in bytes of the packet payloads generated
+     * @param dataRate DataRate object for the sending rate
+     * @param packetSize size in bytes of the packet payloads generated
      */
     void SetConstantRate(DataRate dataRate, uint32_t packetSize = 512);
 
@@ -76,9 +76,9 @@ class SatOnOffHelper
      * Install an ns3::SatOnOffApplication on each node of the input container
      * configured with all the attributes set with SetAttribute.
      *
-     * \param c NodeContainer of the set of nodes on which an SatOnOffApplication
+     * @param c NodeContainer of the set of nodes on which an SatOnOffApplication
      * will be installed.
-     * \returns Container of Ptr to the applications installed.
+     * @returns Container of Ptr to the applications installed.
      */
     ApplicationContainer Install(NodeContainer c) const;
 
@@ -86,8 +86,8 @@ class SatOnOffHelper
      * Install an ns3::SatOnOffApplication on the node configured with all the
      * attributes set with SetAttribute.
      *
-     * \param node The node on which an SatOnOffApplication will be installed.
-     * \returns Container of Ptr to the applications installed.
+     * @param node The node on which an SatOnOffApplication will be installed.
+     * @returns Container of Ptr to the applications installed.
      */
     ApplicationContainer Install(Ptr<Node> node) const;
 
@@ -96,8 +96,8 @@ class SatOnOffHelper
      * Install an ns3::SatOnOffApplication on the node configured with all the
      * attributes set with SetAttribute.
      *
-     * \param node The node on which an SatOnOffApplication will be installed.
-     * \returns Ptr to the application installed.
+     * @param node The node on which an SatOnOffApplication will be installed.
+     * @returns Ptr to the application installed.
      */
     Ptr<Application> InstallPriv(Ptr<Node> node) const;
 

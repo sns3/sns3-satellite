@@ -28,11 +28,11 @@
 #include "satellite-phy.h"
 #include "satellite-signal-parameters.h"
 
-#include <ns3/address.h>
-#include <ns3/nstime.h>
-#include <ns3/object.h>
-#include <ns3/packet.h>
-#include <ns3/ptr.h>
+#include "ns3/address.h"
+#include "ns3/nstime.h"
+#include "ns3/object.h"
+#include "ns3/packet.h"
+#include "ns3/ptr.h"
 
 #include <stdint.h>
 
@@ -40,7 +40,7 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
  * The SatOrbiterFeederMac models the user link MAC layer of the
  * satellite node.
@@ -58,8 +58,8 @@ class SatOrbiterFeederMac : public SatOrbiterMac
      *
      * This is the constructor for the SatOrbiterFeederMac
      *
-     * \param satId ID of sat for UT
-     * \param beamid ID of beam for UT
+     * @param satId ID of sat for UT
+     * @param beamid ID of beam for UT
      */
     SatOrbiterFeederMac(uint32_t satId, uint32_t beamId);
 
@@ -72,7 +72,6 @@ class SatOrbiterFeederMac : public SatOrbiterMac
      * inherited from Object
      */
     static TypeId GetTypeId(void);
-    TypeId GetInstanceTypeId(void) const;
     virtual void DoInitialize(void);
 
     /**
@@ -81,15 +80,15 @@ class SatOrbiterFeederMac : public SatOrbiterMac
     virtual void DoDispose(void);
 
     /**
-     * \brief Add new packet to the LLC queue.
-     * \param packet Packets to be sent.
+     * @brief Add new packet to the LLC queue.
+     * @param packet Packets to be sent.
      */
     virtual void EnquePacket(Ptr<Packet> packet);
 
     /**
      * Receive packet from lower layer.
      *
-     * \param packets Pointers to packets received.
+     * @param packets Pointers to packets received.
      */
     void Receive(SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> rxParams);
 
@@ -98,44 +97,44 @@ class SatOrbiterFeederMac : public SatOrbiterMac
     /**
      * Add a remote peer to this MAC
      *
-     * \param address The MAC address of the peer
-     * \return True if the peer has been added, false otherwise
+     * @param address The MAC address of the peer
+     * @return True if the peer has been added, false otherwise
      */
     virtual bool AddPeer(Mac48Address address);
 
     /**
      * Remove a remote peer from this MAC
      *
-     * \param address The MAC address of the peer
-     * \return True if the peer has been removed, false otherwise
+     * @param address The MAC address of the peer
+     * @return True if the peer has been removed, false otherwise
      */
     virtual bool RemovePeer(Mac48Address address);
 
   private:
     /**
-     * \brief Get the link TX direction. Must be implemented by child clases.
-     * \return The link TX direction
+     * @brief Get the link TX direction. Must be implemented by child clases.
+     * @return The link TX direction
      */
     virtual SatEnums::SatLinkDir_t GetSatLinkTxDir();
 
     /**
-     * \brief Get the link RX direction. Must be implemented by child clases.
-     * \return The link RX direction
+     * @brief Get the link RX direction. Must be implemented by child clases.
+     * @return The link RX direction
      */
     virtual SatEnums::SatLinkDir_t GetSatLinkRxDir();
 
     /**
-     * \brief Get the UT address associated to this RX packet.
+     * @brief Get the UT address associated to this RX packet.
      *        In this class, this is the destination address
-     * \param packet The packet to consider
-     * \return The address of associated UT
+     * @param packet The packet to consider
+     * @return The address of associated UT
      */
     virtual Address GetRxUtAddress(Ptr<Packet> packet);
 
     /**
      * Indicates if at least one device is connected in this beam.
      *
-     * \return True if at least a device is connected, false otherwise
+     * @return True if at least a device is connected, false otherwise
      */
     virtual bool HasPeer();
 };

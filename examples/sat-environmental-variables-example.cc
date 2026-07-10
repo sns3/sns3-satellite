@@ -27,10 +27,10 @@
 using namespace ns3;
 
 /**
- * \file sat-environmental-variables-example.cc
- * \ingroup satellite
+ * @file sat-environmental-variables-example.cc
+ * @ingroup satellite
  *
- * \brief Example for environmental variables class.
+ * @brief Example for environmental variables class.
  * Demonstrates various functions for locating directories
  * used by the satellite module.
  *

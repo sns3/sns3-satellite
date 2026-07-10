@@ -22,7 +22,7 @@
 
 #include "satellite-random-access-container.h"
 
-#include <ns3/log.h>
+#include "ns3/log.h"
 
 #include <map>
 #include <set>

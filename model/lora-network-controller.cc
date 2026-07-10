@@ -34,8 +34,9 @@ NS_OBJECT_ENSURE_REGISTERED(LoraNetworkController);
 TypeId
 LoraNetworkController::GetTypeId(void)
 {
-    static TypeId tid =
-        TypeId("ns3::LoraNetworkController").AddConstructor<LoraNetworkController>();
+    static TypeId tid = TypeId("ns3::LoraNetworkController")
+                            .SetParent<Object>()
+                            .AddConstructor<LoraNetworkController>();
     return tid;
 }
 

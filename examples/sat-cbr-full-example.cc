@@ -30,10 +30,10 @@
 using namespace ns3;
 
 /**
- * \file sat-cbr-full-example.cc
- * \ingroup satellite
+ * @file sat-cbr-full-example.cc
+ * @ingroup satellite
  *
- * \brief  An example to run CBR application in full satellite scenario and FWD link.
+ * @brief  An example to run CBR application in full satellite scenario and FWD link.
  *
  *         execute command -> ./waf --run "sat-cbr-full-example --PrintHelp"
  */

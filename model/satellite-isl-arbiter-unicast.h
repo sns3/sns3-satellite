@@ -45,39 +45,39 @@ class SatIslArbiterUnicast : public SatIslArbiter
 
     /**
      * Constructor, without initializing the map of next hops
-     * \param node The satellite node this unicast arbiter is attached
+     * @param node The satellite node this unicast arbiter is attached
      */
     SatIslArbiterUnicast(Ptr<Node> node);
 
     /**
      * Constructor.
-     * \param node The satellite node this unicast arbiter is attached
-     * \param nextHop The next hop (interface ID) for each destination possible (satellite ID)
+     * @param node The satellite node this unicast arbiter is attached
+     * @param nextHop The next hop (interface ID) for each destination possible (satellite ID)
      */
     SatIslArbiterUnicast(Ptr<Node> node, std::map<uint32_t, uint32_t> nextHopMap);
 
     /**
      * Decide how to forward. Implemented in subclasses
      *
-     * \param sourceSatId                       Satellite ID where the packet originated from
-     * \param targetSatId                       Satellite ID where the packet has to go to
-     * \param pkt                               Packet
+     * @param sourceSatId                       Satellite ID where the packet originated from
+     * @param targetSatId                       Satellite ID where the packet has to go to
+     * @param pkt                               Packet
      *
-     * \return ISL interface index, or -1 if routing failed
+     * @return ISL interface index, or -1 if routing failed
      */
     int32_t Decide(int32_t sourceSatId, int32_t targetSatId, Ptr<Packet> pkt);
 
     /**
      * Unicast routing table
      *
-     * \return string representation of the table
+     * @return string representation of the table
      */
     std::string StringReprOfForwardingState();
 
     /**
      * Add an entry on arbiter
-     * \param destinationId Node ID of destination satellite
-     * \param netDeviceIndex ISL Net Device index
+     * @param destinationId Node ID of destination satellite
+     * @param netDeviceIndex ISL Net Device index
      */
     void AddNextHopEntry(uint32_t destinationId, uint32_t netDeviceIndex);
 

@@ -19,9 +19,9 @@
  */
 
 /**
- * \ingroup satellite
- * \file satellite-waveform-conf-test.cc
- * \brief Waveform conf test suite
+ * @ingroup satellite
+ * @file satellite-waveform-conf-test.cc
+ * @brief Waveform conf test suite
  */
 
 #include "../model/satellite-bbframe-conf.h"
@@ -41,9 +41,9 @@
 using namespace ns3;
 
 /**
- * \file satellite-waveform-conf-test.cc
- * \ingroup satellite
- * \brief Test case to unit test the waveform configuration table for DVB-RCS2
+ * @file satellite-waveform-conf-test.cc
+ * @ingroup satellite
+ * @brief Test case to unit test the waveform configuration table for DVB-RCS2
  *
  * Expected result:
  * - Creates link results and waveform config instances for DVB-RCS2
@@ -74,12 +74,10 @@ void
 SatDvbRcs2WaveformTableTestCase::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-waveform-conf",
-                                                          "dvbrcs2",
-                                                          true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-waveform-conf", "dvbrcs2", true);
 
-    std::string path = Singleton<SatEnvVariables>::Get()->GetDataPath() + "/";
+    std::string path = SatEnvVariables::GetInstance()->GetDataPath() + "/";
     std::string folderName = "scenarios/geo-33E/waveforms";
 
     // Enable ACM
@@ -116,12 +114,12 @@ SatDvbRcs2WaveformTableTestCase::DoRun(void)
         NS_TEST_ASSERT_MSG_EQ(wfid, refResults[i], "Not expected waveform id");
         ++i;
     }
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 }
 
 /**
- * \ingroup satellite
- * \brief Test case to unit test to create BBFrame conf and its public methods.
+ * @ingroup satellite
+ * @brief Test case to unit test to create BBFrame conf and its public methods.
  *
  * Expected result:
  * - Creates SatBbFrameConf
@@ -151,8 +149,8 @@ void
 SatDvbS2BbFrameConfTestCase::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-waveform-conf", "dvbs2", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-waveform-conf", "dvbs2", true);
 
     // Tested symbol rate in baud
     double symbolRate(93750000);
@@ -199,12 +197,12 @@ SatDvbS2BbFrameConfTestCase::DoRun(void)
                       << ", payload [b]: " << p << std::endl;
         }
     }
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 }
 
 /**
- * \ingroup satellite
- * \brief Test suite for Satellite free space loss unit test cases.
+ * @ingroup satellite
+ * @brief Test suite for Satellite free space loss unit test cases.
  */
 class SatWaveformConfTestSuite : public TestSuite
 {

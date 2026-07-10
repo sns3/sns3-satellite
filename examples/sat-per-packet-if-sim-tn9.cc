@@ -32,10 +32,10 @@
 using namespace ns3;
 
 /**
- * \file sat-per-packet-if-sim-tn9.cc
- * \ingroup satellite
+ * @file sat-per-packet-if-sim-tn9.cc
+ * @ingroup satellite
  *
- * \brief Simulation script to run example simulation results related to per-packet
+ * @brief Simulation script to run example simulation results related to per-packet
  * interference performance.
  *
  * execute command -> ./waf --run "sat-per-packet-if-sim-tn9 --PrintHelp"
@@ -61,7 +61,7 @@ main(int argc, char* argv[])
     Config::SetDefault("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue(true));
 
     // To read attributes from file
-    std::string pathToFile = Singleton<SatEnvVariables>::Get()->LocateFile(
+    std::string pathToFile = SatEnvVariables::GetInstance()->LocateFile(
         "contrib/satellite/examples/tn9-dama-input-attributes.xml");
 
     /**

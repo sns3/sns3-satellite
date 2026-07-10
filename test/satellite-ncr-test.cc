@@ -19,9 +19,9 @@
  */
 
 /**
- * \file satellite-ncr-test.cc
- * \ingroup satellite
- * \brief NCR test case implementations.
+ * @file satellite-ncr-test.cc
+ * @ingroup satellite
+ * @brief NCR test case implementations.
  *
  * In this module implements the NCR Test Cases.
  */
@@ -46,8 +46,8 @@
 using namespace ns3;
 
 /**
- * \ingroup satellite
- * \brief 'NCR, test 1' test case implementation.
+ * @ingroup satellite
+ * @brief 'NCR, test 1' test case implementation.
  *
  * This case tests logon mechanism, and that no data is sent by UT before entering TDMA_SYNC state.
  *
@@ -93,8 +93,8 @@ void
 SatNcrTest1::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-ncr", "", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-ncr", "", true);
 
     // Set 2 RA frames including one for logon
     Config::SetDefault("ns3::SatConf::SuperFrameConfForSeq0",
@@ -138,7 +138,7 @@ SatNcrTest1::DoRun(void)
     Config::SetDefault("ns3::SatGwMac::CmtPeriodMin", TimeValue(MilliSeconds(550)));
 
     // Creating the reference system.
-    m_helper = CreateObject<SatHelper>(Singleton<SatEnvVariables>::Get()->LocateDataDirectory() +
+    m_helper = CreateObject<SatHelper>(SatEnvVariables::GetInstance()->LocateDataDirectory() +
                                        "/scenarios/geo-33E");
     m_helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
@@ -172,7 +172,7 @@ SatNcrTest1::DoRun(void)
 
     Simulator::Destroy();
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 
     uint32_t indexSwitchTdmaSync = 0;
     for (uint32_t i = 0; i < m_states.size(); i++)
@@ -222,8 +222,8 @@ SatNcrTest1::GetData(Ptr<CbrApplication> sender, Ptr<PacketSink> receiver)
 }
 
 /**
- * \ingroup satellite
- * \brief 'NCR, test 2' test case implementation.
+ * @ingroup satellite
+ * @brief 'NCR, test 2' test case implementation.
  *
  * This case tests ncr recovery mechanism.
  *
@@ -270,8 +270,8 @@ void
 SatNcrTest2::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-ncr", "", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-ncr", "", true);
 
     // Configure a static error probability
     SatPhyRxCarrierConf::ErrorModel em(SatPhyRxCarrierConf::EM_NONE);
@@ -319,7 +319,7 @@ SatNcrTest2::DoRun(void)
     Config::SetDefault("ns3::SatGwMac::CmtPeriodMin", TimeValue(MilliSeconds(550)));
 
     // Creating the reference system.
-    m_helper = CreateObject<SatHelper>(Singleton<SatEnvVariables>::Get()->LocateDataDirectory() +
+    m_helper = CreateObject<SatHelper>(SatEnvVariables::GetInstance()->LocateDataDirectory() +
                                        "/scenarios/geo-33E");
     m_helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
@@ -357,7 +357,7 @@ SatNcrTest2::DoRun(void)
 
     Simulator::Destroy();
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 
     uint32_t indexSwitchTdmaSync = 0;
     for (uint32_t i = 0; i < m_states.size(); i++)
@@ -448,8 +448,8 @@ SatNcrTest2::ChangeTxStatus(bool enable)
 }
 
 /**
- * \ingroup satellite
- * \brief 'NCR, test 3' test case implementation.
+ * @ingroup satellite
+ * @brief 'NCR, test 3' test case implementation.
  *
  * This case tests ncr recovery timeout mechanism and logoff.
  *
@@ -501,8 +501,8 @@ void
 SatNcrTest3::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-ncr", "", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-ncr", "", true);
 
     // Configure a static error probability
     SatPhyRxCarrierConf::ErrorModel em(SatPhyRxCarrierConf::EM_NONE);
@@ -552,7 +552,7 @@ SatNcrTest3::DoRun(void)
     Config::SetDefault("ns3::SatGwMac::CmtPeriodMin", TimeValue(MilliSeconds(550)));
 
     // Creating the reference system.
-    m_helper = CreateObject<SatHelper>(Singleton<SatEnvVariables>::Get()->LocateDataDirectory() +
+    m_helper = CreateObject<SatHelper>(SatEnvVariables::GetInstance()->LocateDataDirectory() +
                                        "/scenarios/geo-33E");
     m_helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
@@ -590,7 +590,7 @@ SatNcrTest3::DoRun(void)
 
     Simulator::Destroy();
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 
     uint32_t indexSwitchTdmaSync = 0;
     uint32_t indexSwitchNcrRecovery = 0;

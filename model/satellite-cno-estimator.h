@@ -23,8 +23,8 @@
 
 #include "satellite-cno-estimator.h"
 
-#include <ns3/nstime.h>
-#include <ns3/simple-ref-count.h>
+#include "ns3/nstime.h"
+#include "ns3/simple-ref-count.h"
 
 #include <cmath>
 #include <map>
@@ -34,8 +34,8 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief SatCnoEstimator class defines interface for C/N0 estimators.
+ * @ingroup satellite
+ * @brief SatCnoEstimator class defines interface for C/N0 estimators.
  *
  */
 class SatCnoEstimator : public SimpleRefCount<SatCnoEstimator>
@@ -67,7 +67,7 @@ class SatCnoEstimator : public SimpleRefCount<SatCnoEstimator>
      * Add a C/N0 sample to estimator.
      * Calls the method DoAddSample.
      *
-     * \param cno C/N0 sample value
+     * @param cno C/N0 sample value
      */
     void AddSample(double cno);
 
@@ -75,7 +75,7 @@ class SatCnoEstimator : public SimpleRefCount<SatCnoEstimator>
      * Estimate C/N0 value of the samples.
      * Calls the method DoAddSample.
      *
-     * \return Estimated value of the C/N0,
+     * @return Estimated value of the C/N0,
      * in case that estimation cannot be done (e.g. no samples) NAN is returned.
      */
     double GetCnoEstimation();
@@ -85,7 +85,7 @@ class SatCnoEstimator : public SimpleRefCount<SatCnoEstimator>
      * Add a C/N0 sample to estimator.
      * Method must be implemented by inheriting classes.
      *
-     * \param cno C/N0 sample value
+     * @param cno C/N0 sample value
      */
     virtual void DoAddSample(double cno) = 0;
 
@@ -93,15 +93,15 @@ class SatCnoEstimator : public SimpleRefCount<SatCnoEstimator>
      * Estimate C/N0 value of the samples.
      * Method must be implemented by inheriting classes.
      *
-     * \return Estimated value of the C/N0,
+     * @return Estimated value of the C/N0,
      * in case that estimation cannot be done (e.g. no samples) NAN is returned.
      */
     virtual double DoGetCnoEstimation() = 0;
 };
 
 /**
- * \ingroup satellite
- * \brief class for module SatCnoEstimator.
+ * @ingroup satellite
+ * @brief class for module SatCnoEstimator.
  *
  * This SatCnoEstimator class holds information of a satellite DAMA entry.
  * It's is created and used by NCC.
@@ -118,9 +118,9 @@ class SatBasicCnoEstimator : public SatCnoEstimator
     /**
      * Method to add a sample value to current sum.
      *
-     * \param currentSum
-     * \param sample
-     * \return New sum after addition.
+     * @param currentSum
+     * @param sample
+     * @return New sum after addition.
      */
     static inline double AddToSum(double currentSum, const std::pair<Time, double>& sample)
     {
@@ -161,14 +161,14 @@ class SatBasicCnoEstimator : public SatCnoEstimator
     /**
      * Add a C/N0 sample to estimator.
      *
-     * \param cno C/N0 sample value
+     * @param cno C/N0 sample value
      */
     virtual void DoAddSample(double cno);
 
     /**
      * Estimate C/N0 value of the samples in window.
      *
-     * \return Estimated value of the C/N0,
+     * @return Estimated value of the C/N0,
      * in case that estimation cannot be done (e.g. no samples) NAN is returned.
      */
     virtual double DoGetCnoEstimation();

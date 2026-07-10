@@ -26,9 +26,9 @@
 #include "satellite-lower-layer-service.h"
 #include "satellite-superframe-sequence.h"
 
-#include <ns3/address.h>
-#include <ns3/log.h>
-#include <ns3/packet.h>
+#include "ns3/address.h"
+#include "ns3/log.h"
+#include "ns3/packet.h"
 
 #include <map>
 #include <tuple>
@@ -70,14 +70,6 @@ SatNcc::GetTypeId(void)
                           MakeTimeAccessor(&SatNcc::m_utTimeout),
                           MakeTimeChecker());
     return tid;
-}
-
-TypeId
-SatNcc::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
 }
 
 SatNcc::SatNcc()

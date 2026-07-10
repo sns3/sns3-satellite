@@ -22,9 +22,9 @@
 
 #include "satellite-constant-interference.h"
 
-#include <ns3/double.h>
-#include <ns3/log.h>
-#include <ns3/simulator.h>
+#include "ns3/double.h"
+#include "ns3/log.h"
+#include "ns3/simulator.h"
 
 #include <stdint.h>
 #include <utility>
@@ -49,12 +49,6 @@ SatConstantInterference::GetTypeId(void)
                                           MakeDoubleAccessor(&SatConstantInterference::m_power),
                                           MakeDoubleChecker<double_t>());
     return tid;
-}
-
-TypeId
-SatConstantInterference::GetInstanceTypeId(void) const
-{
-    return GetTypeId();
 }
 
 SatConstantInterference::SatConstantInterference()

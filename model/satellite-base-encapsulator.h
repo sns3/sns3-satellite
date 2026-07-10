@@ -24,13 +24,13 @@
 #include "satellite-control-message.h"
 #include "satellite-queue.h"
 
-#include <ns3/mac48-address.h>
-#include <ns3/nstime.h>
-#include <ns3/object.h>
-#include <ns3/packet.h>
-#include <ns3/trace-source-accessor.h>
-#include <ns3/traced-value.h>
-#include <ns3/uinteger.h>
+#include "ns3/mac48-address.h"
+#include "ns3/nstime.h"
+#include "ns3/object.h"
+#include "ns3/packet.h"
+#include "ns3/trace-source-accessor.h"
+#include "ns3/traced-value.h"
+#include "ns3/uinteger.h"
 
 #include <stdint.h>
 
@@ -38,8 +38,8 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief A base encapsulator implementation which does not support
+ * @ingroup satellite
+ * @brief A base encapsulator implementation which does not support
  * encapsulation, fragmentation or packing. Base encapsulator is used
  * for flows which do not need encapsulation or fragmentation, such as
  * lower layer control flows. Base encapsulator basically just stores
@@ -59,12 +59,12 @@ class SatBaseEncapsulator : public Object
 
     /**
      * Constructor
-     * \param encapAddress MAC addressd of encapsulator
-     * \param decapAddress MAC addressd of decapsulator
-     * \param sourceE2EAddress E2E source MAC addressd of packets (used to set SatAddressE2ETag)
-     * \param destE2EAddress E2E destination MAC addressd of packets (used to set SatAddressE2ETag)
-     * \param flowId Flow identifier
-     * \param additionalHeaderSize Additional value in to take into account when pulling packets to
+     * @param encapAddress MAC addressd of encapsulator
+     * @param decapAddress MAC addressd of decapsulator
+     * @param sourceE2EAddress E2E source MAC addressd of packets (used to set SatAddressE2ETag)
+     * @param destE2EAddress E2E destination MAC addressd of packets (used to set SatAddressE2ETag)
+     * @param flowId Flow identifier
+     * @param additionalHeaderSize Additional value in to take into account when pulling packets to
      * represent E2E tags
      */
     SatBaseEncapsulator(Mac48Address encapAddress,
@@ -80,8 +80,8 @@ class SatBaseEncapsulator : public Object
     virtual ~SatBaseEncapsulator();
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
 
@@ -92,48 +92,48 @@ class SatBaseEncapsulator : public Object
 
     /**
      * Callback to send packet to lower layer.
-     * \param Ptr<Packet> the packet received
-     * \param Mac48Address Source MAC address
-     * \param Mac48Address Destination MAC address
+     * @param Ptr<Packet> the packet received
+     * @param Mac48Address Source MAC address
+     * @param Mac48Address Destination MAC address
      */
     typedef Callback<void, Ptr<Packet>, Mac48Address, Mac48Address> ReceiveCallback;
 
     /**
      * Control msg sending callback
-     * \param msg        the message send
-     * \param address    Packet destination address
-     * \return bool
+     * @param msg        the message send
+     * @param address    Packet destination address
+     * @return bool
      */
     typedef Callback<bool, Ptr<SatControlMessage>, const Address&> SendCtrlCallback;
 
     /**
      * Set the used queue from outside
-     * \param queue Transmission queue
+     * @param queue Transmission queue
      */
     void SetQueue(Ptr<SatQueue> queue);
 
     /**
      * Get the queue instance
-     * \return queue
+     * @return queue
      */
     Ptr<SatQueue> GetQueue();
 
     /**
      * Method to set receive callback.
-     * \param cb callback to invoke whenever a packet has been received and must
+     * @param cb callback to invoke whenever a packet has been received and must
      *        be forwarded to the higher layers.
      */
     void SetReceiveCallback(ReceiveCallback cb);
 
     /**
-     * \param cb callback to send control messages.
+     * @param cb callback to send control messages.
      */
     void SetCtrlMsgCallback(SatBaseEncapsulator::SendCtrlCallback cb);
 
     /**
      * Enqueue a packet to txBuffer.
-     * \param p To be buffered packet
-     * \param dest Target MAC address
+     * @param p To be buffered packet
+     * @param dest Target MAC address
      */
     virtual void EnquePdu(Ptr<Packet> p, Mac48Address dest);
 
@@ -141,10 +141,10 @@ class SatBaseEncapsulator : public Object
      * Notify a Tx opportunity to this base encapsulator. Note, that
      * this class does not do encapsulator nor do not support fragmentation.
      *
-     * \param bytes Notified Tx opportunity bytes from lower layer
-     * \param bytesLeft Bytes left after this TxOpportunity in txBuffer
-     * \param &nextMinTxO Minimum TxO after this TxO
-     * \return An raw control PDU
+     * @param bytes Notified Tx opportunity bytes from lower layer
+     * @param bytesLeft Bytes left after this TxOpportunity in txBuffer
+     * @param &nextMinTxO Minimum TxO after this TxO
+     * @return An raw control PDU
      */
     virtual Ptr<Packet> NotifyTxOpportunity(uint32_t bytes,
                                             uint32_t& bytesLeft,
@@ -154,32 +154,32 @@ class SatBaseEncapsulator : public Object
      * Receive a packet. Note, that base encapsulator does not support
      * packet reception, since it assumes that packet receptions are
      * terminated already at lower layers.
-     * \param p packet pointer received from lower layer
+     * @param p packet pointer received from lower layer
      */
     virtual void ReceivePdu(Ptr<Packet> p);
 
     /**
      * Receive a control message (ARQ ACK)
-     * \param ack Control message received (e.g. ARQ ACK)
+     * @param ack Control message received (e.g. ARQ ACK)
      */
     virtual void ReceiveAck(Ptr<SatArqAckMessage> ack);
 
     /**
      * Get the buffered packets for this encapsulator
-     * \return uint32_t buffered bytes
+     * @return uint32_t buffered bytes
      */
     virtual uint32_t GetTxBufferSizeInBytes() const;
 
     /**
      * Get Head-of-Line packet buffering delay.
-     * \return Time HoL buffering delay
+     * @return Time HoL buffering delay
      */
     virtual Time GetHolDelay() const;
 
     /**
      * Get minimum Tx opportunity in bytes, which takes the
      * assumed header sizes into account.
-     * \return uint32_t minimum tx opportunity
+     * @return uint32_t minimum tx opportunity
      */
     virtual uint32_t GetMinTxOpportunityInBytes() const;
 

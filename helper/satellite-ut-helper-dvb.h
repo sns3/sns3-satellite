@@ -24,11 +24,11 @@
 
 #include "satellite-ut-helper.h"
 
-#include <ns3/satellite-channel.h>
-#include <ns3/satellite-ncc.h>
-#include <ns3/satellite-superframe-sequence.h>
-#include <ns3/satellite-typedefs.h>
-#include <ns3/satellite-ut-mac.h>
+#include "ns3/satellite-channel.h"
+#include "ns3/satellite-ncc.h"
+#include "ns3/satellite-superframe-sequence.h"
+#include "ns3/satellite-typedefs.h"
+#include "ns3/satellite-ut-mac.h"
 
 #include <stdint.h>
 
@@ -36,7 +36,7 @@ namespace ns3
 {
 
 /**
- * \brief Creates needed objects for DVB UT nodes like SatOrbiterNetDevice objects.
+ * @brief Creates needed objects for DVB UT nodes like SatOrbiterNetDevice objects.
  *        Handles needed configuration for the UT nodes.
  *
  */
@@ -47,11 +47,6 @@ class SatUtHelperDvb : public SatUtHelper
      * Derived from Object
      */
     static TypeId GetTypeId(void);
-
-    /**
-     * Derived from Object
-     */
-    TypeId GetInstanceTypeId(void) const;
 
     /**
      * Default constructor
@@ -78,15 +73,15 @@ class SatUtHelperDvb : public SatUtHelper
     }
 
     /**
-     * \param n node
-     * \param satId  id of the satellite
-     * \param beamId  id of the beam
-     * \param fCh forward channel
-     * \param rCh return channel
-     * \param gwNd satellite netdevice of the GW
-     * \param ncc NCC (Network Control Center)
-     * \param satUserAddress MAC address of satellite user link
-     * \return Net device installed to node
+     * @param n node
+     * @param satId  id of the satellite
+     * @param beamId  id of the beam
+     * @param fCh forward channel
+     * @param rCh return channel
+     * @param gwNd satellite netdevice of the GW
+     * @param ncc NCC (Network Control Center)
+     * @param satUserAddress MAC address of satellite user link
+     * @return Net device installed to node
      *
      * This method creates a ns3::SatChannel with the
      * attributes configured by SatUtHelper::SetChannelAttribute,

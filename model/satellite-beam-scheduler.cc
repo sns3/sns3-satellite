@@ -34,14 +34,14 @@
 #include "satellite-superframe-allocator.h"
 #include "satellite-superframe-sequence.h"
 
-#include <ns3/address.h>
-#include <ns3/boolean.h>
-#include <ns3/double.h>
-#include <ns3/enum.h>
-#include <ns3/ipv4-address.h>
-#include <ns3/log.h>
-#include <ns3/mac48-address.h>
-#include <ns3/singleton.h>
+#include "ns3/address.h"
+#include "ns3/boolean.h"
+#include "ns3/double.h"
+#include "ns3/enum.h"
+#include "ns3/ipv4-address.h"
+#include "ns3/log.h"
+#include "ns3/mac48-address.h"
+#include "ns3/singleton.h"
 
 #include <algorithm>
 #include <map>

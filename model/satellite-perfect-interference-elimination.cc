@@ -22,8 +22,8 @@
 
 #include "satellite-signal-parameters.h"
 
-#include <ns3/log.h>
-#include <ns3/simulator.h>
+#include "ns3/log.h"
+#include "ns3/simulator.h"
 
 #include <cmath>
 #include <limits>
@@ -46,12 +46,6 @@ SatPerfectInterferenceElimination::GetTypeId(void)
                             .AddConstructor<SatPerfectInterferenceElimination>();
 
     return tid;
-}
-
-TypeId
-SatPerfectInterferenceElimination::GetInstanceTypeId(void) const
-{
-    return GetTypeId();
 }
 
 SatPerfectInterferenceElimination::SatPerfectInterferenceElimination()

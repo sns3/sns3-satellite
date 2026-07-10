@@ -23,10 +23,10 @@
 
 #include "satellite-stats-helper.h"
 
-#include <ns3/address.h>
-#include <ns3/collector-map.h>
-#include <ns3/ptr.h>
-#include <ns3/satellite-phy-rx-carrier.h>
+#include "ns3/address.h"
+#include "ns3/collector-map.h"
+#include "ns3/ptr.h"
+#include "ns3/satellite-phy-rx-carrier.h"
 
 #include <map>
 #include <string>
@@ -41,8 +41,8 @@ class Node;
 class DataCollectionObject;
 
 /**
- * \ingroup satstats
- * \brief
+ * @ingroup satstats
+ * @brief
  */
 class SatStatsCarrierIdHelper : public SatStatsHelper
 {
@@ -61,21 +61,21 @@ class SatStatsCarrierIdHelper : public SatStatsHelper
     static TypeId GetTypeId();
 
     /**
-     * \brief Receive inputs from trace sources and determine the right collector
+     * @brief Receive inputs from trace sources and determine the right collector
      *        to forward the inputs to.
-     * \param carrierId carrier used by the received packet burst.
-     * \param from the source address of the packet.
+     * @param carrierId carrier used by the received packet burst.
+     * @param from the source address of the packet.
      */
     void CarrierIdRxCallback(uint32_t carrierId, const Address& from);
 
     /**
-     * \return
+     * @return
      */
     std::string GetTraceSourceName() const;
 
     /**
-     * \brief Get the valid carrier type
-     * \return the valid carrier type
+     * @brief Get the valid carrier type
+     * @return the valid carrier type
      */
     inline SatPhyRxCarrier::CarrierType GetValidCarrierType() const
     {
@@ -87,13 +87,13 @@ class SatStatsCarrierIdHelper : public SatStatsHelper
     void DoInstall();
 
     /**
-     * \param traceSourceName
+     * @param traceSourceName
      */
     void SetTraceSourceName(std::string traceSourceName);
 
     /**
-     * \brief Set valid carrier type for this statistics helper type.
-     * \param carrierType
+     * @brief Set valid carrier type for this statistics helper type.
+     * @param carrierType
      */
     inline void SetValidCarrierType(SatPhyRxCarrier::CarrierType carrierType)
     {

@@ -61,7 +61,7 @@ class LorawanMacGateway : public LorawanMac
     /**
      * Return the next time at which we will be able to transmit.
      *
-     * \return The next transmission time.
+     * @return The next transmission time.
      */
     Time GetWaitingTime(double frequency);
 

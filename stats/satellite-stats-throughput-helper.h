@@ -24,9 +24,9 @@
 
 #include "satellite-stats-helper.h"
 
-#include <ns3/address.h>
-#include <ns3/collector-map.h>
-#include <ns3/ptr.h>
+#include "ns3/address.h"
+#include "ns3/collector-map.h"
+#include "ns3/ptr.h"
 
 #include <list>
 #include <map>
@@ -44,8 +44,8 @@ class DataCollectionObject;
 class DistributionCollector;
 
 /**
- * \ingroup satstats
- * \brief
+ * @ingroup satstats
+ * @brief
  */
 class SatStatsThroughputHelper : public SatStatsHelper
 {
@@ -64,26 +64,26 @@ class SatStatsThroughputHelper : public SatStatsHelper
     static TypeId GetTypeId();
 
     /**
-     * \param averagingMode average all samples before passing them to aggregator.
+     * @param averagingMode average all samples before passing them to aggregator.
      */
     void SetAveragingMode(bool averagingMode);
 
     /**
-     * \return the currently active averaging mode.
+     * @return the currently active averaging mode.
      */
     bool GetAveragingMode() const;
 
     /**
-     * \brief Set up several probes or other means of listeners and connect them
+     * @brief Set up several probes or other means of listeners and connect them
      *        to the first-level collectors.
      */
     void InstallProbes();
 
     /**
-     * \brief Receive inputs from trace sources and determine the right collector
+     * @brief Receive inputs from trace sources and determine the right collector
      *        to forward the inputs to.
-     * \param packet received packet data.
-     * \param from the address of the sender of the packet.
+     * @param packet received packet data.
+     * @param from the address of the sender of the packet.
      *
      * Used in return link statistics. DoInstallProbes() is expected to connect
      * the right trace sources to this method.
@@ -95,7 +95,7 @@ class SatStatsThroughputHelper : public SatStatsHelper
     void DoInstall();
 
     /**
-     * \brief
+     * @brief
      */
     virtual void DoInstallProbes() = 0;
 
@@ -121,21 +121,21 @@ class SatStatsThroughputHelper : public SatStatsHelper
 class Probe;
 
 /**
- * \ingroup satstats
- * \brief Produce forward link application-level throughput statistics from a
+ * @ingroup satstats
+ * @brief Produce forward link application-level throughput statistics from a
  *        satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFwdAppThroughputHelper> s = Create<SatStatsFwdAppThroughputHelper> (satHelper);
  * s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFwdAppThroughputHelper : public SatStatsThroughputHelper
 {
@@ -171,20 +171,20 @@ class SatStatsFwdAppThroughputHelper : public SatStatsThroughputHelper
 // FORWARD FEEDER LINK DEVICE-LEVEL //////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce forward feeder link device-level throughput statistics from a
+ * @ingroup satstats
+ * @brief Produce forward feeder link device-level throughput statistics from a
  *        satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFwdFeederDevThroughputHelper> s = Create<SatStatsFwdFeederDevThroughputHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFwdFeederDevThroughputHelper : public SatStatsThroughputHelper
 {
@@ -211,20 +211,20 @@ class SatStatsFwdFeederDevThroughputHelper : public SatStatsThroughputHelper
 // FORWARD USER LINK DEVICE-LEVEL //////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce forward user link device-level throughput statistics from a
+ * @ingroup satstats
+ * @brief Produce forward user link device-level throughput statistics from a
  *        satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFwdUserDevThroughputHelper> s = Create<SatStatsFwdUserDevThroughputHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFwdUserDevThroughputHelper : public SatStatsThroughputHelper
 {
@@ -260,22 +260,22 @@ class SatStatsFwdUserDevThroughputHelper : public SatStatsThroughputHelper
 // FORWARD FEEDER LINK MAC-LEVEL /////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce forward feeder link MAC-level throughput statistics from a
+ * @ingroup satstats
+ * @brief Produce forward feeder link MAC-level throughput statistics from a
  *        satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFwdFeederMacThroughputHelper> s = Create<SatStatsFwdFeederMacThroughputHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  *
- * \todo This statistics include control messages.
+ * @todo This statistics include control messages.
  */
 class SatStatsFwdFeederMacThroughputHelper : public SatStatsThroughputHelper
 {
@@ -302,22 +302,22 @@ class SatStatsFwdFeederMacThroughputHelper : public SatStatsThroughputHelper
 // FORWARD USER LINK MAC-LEVEL /////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce forward user link MAC-level throughput statistics from a
+ * @ingroup satstats
+ * @brief Produce forward user link MAC-level throughput statistics from a
  *        satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFwdUserMacThroughputHelper> s = Create<SatStatsFwdUserMacThroughputHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  *
- * \todo This statistics include control messages.
+ * @todo This statistics include control messages.
  */
 class SatStatsFwdUserMacThroughputHelper : public SatStatsThroughputHelper
 {
@@ -353,22 +353,22 @@ class SatStatsFwdUserMacThroughputHelper : public SatStatsThroughputHelper
 // FORWARD FEEDER LINK PHY-LEVEL /////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce forward feeder link PHY-level throughput statistics from a
+ * @ingroup satstats
+ * @brief Produce forward feeder link PHY-level throughput statistics from a
  *        satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFwdFeederPhyThroughputHelper> s = Create<SatStatsFwdFeederPhyThroughputHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  *
- * \todo This statistics include control messages.
+ * @todo This statistics include control messages.
  */
 class SatStatsFwdFeederPhyThroughputHelper : public SatStatsThroughputHelper
 {
@@ -395,22 +395,22 @@ class SatStatsFwdFeederPhyThroughputHelper : public SatStatsThroughputHelper
 // FORWARD USER LINK PHY-LEVEL /////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce forward user link PHY-level throughput statistics from a
+ * @ingroup satstats
+ * @brief Produce forward user link PHY-level throughput statistics from a
  *        satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFwdUserPhyThroughputHelper> s = Create<SatStatsFwdUserPhyThroughputHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  *
- * \todo This statistics include control messages.
+ * @todo This statistics include control messages.
  */
 class SatStatsFwdUserPhyThroughputHelper : public SatStatsThroughputHelper
 {
@@ -446,21 +446,21 @@ class SatStatsFwdUserPhyThroughputHelper : public SatStatsThroughputHelper
 // RETURN LINK APPLICATION-LEVEL //////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce return link application-level throughput statistics from a
+ * @ingroup satstats
+ * @brief Produce return link application-level throughput statistics from a
  *        satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnAppThroughputHelper> s = Create<SatStatsRtnAppThroughputHelper> (satHelper);
  * s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsRtnAppThroughputHelper : public SatStatsThroughputHelper
 {
@@ -479,10 +479,10 @@ class SatStatsRtnAppThroughputHelper : public SatStatsThroughputHelper
     static TypeId GetTypeId();
 
     /**
-     * \brief Receive inputs from trace sources and determine the right collector
+     * @brief Receive inputs from trace sources and determine the right collector
      *        to forward the inputs to.
-     * \param packet received packet data.
-     * \param from the InetSocketAddress of the sender of the packet.
+     * @param packet received packet data.
+     * @param from the InetSocketAddress of the sender of the packet.
      */
     void Ipv4Callback(Ptr<const Packet> packet, const Address& from);
 
@@ -492,36 +492,36 @@ class SatStatsRtnAppThroughputHelper : public SatStatsThroughputHelper
 
   private:
     /**
-     * \brief Save the IPv4 address and the proper identifier from the given
+     * @brief Save the IPv4 address and the proper identifier from the given
      *        UT user node.
-     * \param utUserNode a UT user node.
+     * @param utUserNode a UT user node.
      *
      * Any addresses found in the given node will be saved in the
      * #m_identifierMap member variable.
      */
     void SaveIpv4AddressAndIdentifier(Ptr<Node> utUserNode);
 
-    /// \todo Write SaveIpv6Address() method.
+    /// @todo Write SaveIpv6Address() method.
 
 }; // end of class SatStatsRtnAppThroughputHelper
 
 // RETURN FEEDER LINK DEVICE-LEVEL ///////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce return feeder link device-level throughput statistics from a
+ * @ingroup satstats
+ * @brief Produce return feeder link device-level throughput statistics from a
  *        satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnFeederDevThroughputHelper> s = Create<SatStatsRtnFeederDevThroughputHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsRtnFeederDevThroughputHelper : public SatStatsThroughputHelper
 {
@@ -548,20 +548,20 @@ class SatStatsRtnFeederDevThroughputHelper : public SatStatsThroughputHelper
 // RETURN USER LINK DEVICE-LEVEL ///////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce return user link device-level throughput statistics from a
+ * @ingroup satstats
+ * @brief Produce return user link device-level throughput statistics from a
  *        satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnUserDevThroughputHelper> s = Create<SatStatsRtnUserDevThroughputHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsRtnUserDevThroughputHelper : public SatStatsThroughputHelper
 {
@@ -588,22 +588,22 @@ class SatStatsRtnUserDevThroughputHelper : public SatStatsThroughputHelper
 // RETURN FEEDER LINK MAC-LEVEL //////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce return feeder link MAC-level throughput statistics from a
+ * @ingroup satstats
+ * @brief Produce return feeder link MAC-level throughput statistics from a
  *        satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnFeederMacThroughputHelper> s = Create<SatStatsRtnFeederMacThroughputHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  *
- * \todo This statistics does not include control messages.
+ * @todo This statistics does not include control messages.
  */
 class SatStatsRtnFeederMacThroughputHelper : public SatStatsThroughputHelper
 {
@@ -630,22 +630,22 @@ class SatStatsRtnFeederMacThroughputHelper : public SatStatsThroughputHelper
 // RETURN USER LINK MAC-LEVEL //////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce return user link MAC-level throughput statistics from a
+ * @ingroup satstats
+ * @brief Produce return user link MAC-level throughput statistics from a
  *        satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnUserMacThroughputHelper> s = Create<SatStatsRtnUserMacThroughputHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  *
- * \todo This statistics does not include control messages.
+ * @todo This statistics does not include control messages.
  */
 class SatStatsRtnUserMacThroughputHelper : public SatStatsThroughputHelper
 {
@@ -672,22 +672,22 @@ class SatStatsRtnUserMacThroughputHelper : public SatStatsThroughputHelper
 // RETURN FEEDER LINK PHY-LEVEL //////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce return feeder link PHY-level throughput statistics from a
+ * @ingroup satstats
+ * @brief Produce return feeder link PHY-level throughput statistics from a
  *        satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnFeederPhyThroughputHelper> s = Create<SatStatsRtnFeederPhyThroughputHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  *
- * \todo This statistics does not include control messages.
+ * @todo This statistics does not include control messages.
  */
 class SatStatsRtnFeederPhyThroughputHelper : public SatStatsThroughputHelper
 {
@@ -714,22 +714,22 @@ class SatStatsRtnFeederPhyThroughputHelper : public SatStatsThroughputHelper
 // RETURN USER LINK PHY-LEVEL //////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce return user link PHY-level throughput statistics from a
+ * @ingroup satstats
+ * @brief Produce return user link PHY-level throughput statistics from a
  *        satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnUserPhyThroughputHelper> s = Create<SatStatsRtnUserPhyThroughputHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  *
- * \todo This statistics does not include control messages.
+ * @todo This statistics does not include control messages.
  */
 class SatStatsRtnUserPhyThroughputHelper : public SatStatsThroughputHelper
 {

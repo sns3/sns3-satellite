@@ -19,9 +19,9 @@
  */
 
 /**
- * \file satellite-handover-test.cc
- * \ingroup satellite
- * \brief Handover test case implementations.
+ * @file satellite-handover-test.cc
+ * @ingroup satellite
+ * @brief Handover test case implementations.
  *
  * In this module implements the Handover Test Cases.
  */
@@ -56,8 +56,8 @@
 using namespace ns3;
 
 /**
- * \ingroup satellite
- * \brief 'Handover, test 1 test case implementation.
+ * @ingroup satellite
+ * @brief 'Handover, test 1 test case implementation.
  *
  * This case tests that a application throughputs PerEntity are correct.
  * It generates a conf with 2 GEO satellites, 2 GWs, 4 UTs (3 static and 1 moving) and 1 UT users
@@ -173,8 +173,8 @@ SatHandoverTest1::DoRun(void)
     Singleton<SatIdMapper>::Get()->Reset();
 
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-handover", "test1", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-handover", "test1", true);
 
     /// Set regeneration mode
     Config::SetDefault("ns3::SatConf::ForwardLinkRegenerationMode",
@@ -207,7 +207,7 @@ SatHandoverTest1::DoRun(void)
 
     simulationHelper->LoadScenario("constellation-eutelsat-geo-2-sats-handovers");
 
-    std::string mobileUtFolder = Singleton<SatEnvVariables>::Get()->LocateDataDirectory() +
+    std::string mobileUtFolder = SatEnvVariables::GetInstance()->LocateDataDirectory() +
                                  "/additional-input/utpositions/mobiles/scenario6";
     simulationHelper->CreateSatScenario(SatHelper::NONE, mobileUtFolder);
 
@@ -417,8 +417,8 @@ SatHandoverTest1::DoRun(void)
 }
 
 /**
- * \ingroup satellite
- * \brief 'Handover, test 2 test case implementation.
+ * @ingroup satellite
+ * @brief 'Handover, test 2 test case implementation.
  *
  * This case tests that communication remains after GW handover.
  */
@@ -474,8 +474,8 @@ SatHandoverTest2::DoRun(void)
     Singleton<SatIdMapper>::Get()->Reset();
 
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-handover", "test2", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-handover", "test2", true);
 
     /// Set regeneration mode
     Config::SetDefault("ns3::SatConf::ForwardLinkRegenerationMode",

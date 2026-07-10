@@ -34,13 +34,13 @@
 #include "satellite-uplink-info-tag.h"
 #include "satellite-utils.h"
 
-#include <ns3/double.h>
-#include <ns3/enum.h>
-#include <ns3/log.h>
-#include <ns3/pointer.h>
-#include <ns3/simulator.h>
-#include <ns3/singleton.h>
-#include <ns3/uinteger.h>
+#include "ns3/double.h"
+#include "ns3/enum.h"
+#include "ns3/log.h"
+#include "ns3/pointer.h"
+#include "ns3/simulator.h"
+#include "ns3/singleton.h"
+#include "ns3/uinteger.h"
 
 #include <limits>
 #include <queue>
@@ -153,14 +153,6 @@ SatOrbiterUserPhy::GetTypeId(void)
     return tid;
 }
 
-TypeId
-SatOrbiterUserPhy::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
-}
-
 SatOrbiterUserPhy::SatOrbiterUserPhy(void)
     : m_aciInterferenceCOverIDb(17.0),
       m_otherSysInterferenceCOverIDb(27.5),
@@ -178,10 +170,13 @@ SatOrbiterUserPhy::SatOrbiterUserPhy(SatPhy::CreateParam_t& params,
                                      SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
                                      Ptr<SatSuperframeConf> superFrameConf)
     : SatPhy(params),
+      m_linkResults(linkResults),
+      m_parameters(parameters),
+      m_superFrameConf(superFrameConf),
       m_queueSizeBytes(0),
       m_queueSizePackets(0)
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(this << linkResults << superFrameConf);
 
     m_forwardLinkRegenerationMode = Singleton<SatTopology>::Get()->GetForwardLinkRegenerationMode();
     m_returnLinkRegenerationMode = Singleton<SatTopology>::Get()->GetReturnLinkRegenerationMode();
@@ -202,37 +197,43 @@ SatOrbiterUserPhy::SatOrbiterUserPhy(SatPhy::CreateParam_t& params,
     {
         SatPhy::GetPhyTx()->SetAttribute("TxMode", EnumValue(SatPhyTx::NORMAL));
     }
+}
 
-    ObjectBase::ConstructSelf(AttributeConstructionList());
+void
+SatOrbiterUserPhy::NotifyConstructionCompleted()
+{
+    NS_LOG_FUNCTION(this);
+
+    SatPhy::NotifyConstructionCompleted();
 
     m_aciInterferenceCOverI = SatUtils::DbToLinear(m_aciInterferenceCOverIDb);
     m_otherSysInterferenceCOverI = SatUtils::DbToLinear(m_otherSysInterferenceCOverIDb);
 
-    parameters.m_rxTemperatureK = SatUtils::DbToLinear(SatPhy::GetRxNoiseTemperatureDbk());
-    parameters.m_aciIfWrtNoiseFactor = 0.0;
-    parameters.m_extNoiseDensityWhz = 0.0;
+    m_parameters.m_rxTemperatureK = SatUtils::DbToLinear(SatPhy::GetRxNoiseTemperatureDbk());
+    m_parameters.m_aciIfWrtNoiseFactor = 0.0;
+    m_parameters.m_extNoiseDensityWhz = 0.0;
     if (m_returnLinkRegenerationMode == SatEnums::TRANSPARENT)
     {
-        parameters.m_rxMode = SatPhyRxCarrierConf::TRANSPARENT;
+        m_parameters.m_rxMode = SatPhyRxCarrierConf::TRANSPARENT;
     }
     else
     {
-        parameters.m_rxMode = SatPhyRxCarrierConf::NORMAL;
+        m_parameters.m_rxMode = SatPhyRxCarrierConf::NORMAL;
     }
-    parameters.m_linkRegenerationMode = m_returnLinkRegenerationMode;
-    parameters.m_chType = SatEnums::RETURN_USER_CH;
+    m_parameters.m_linkRegenerationMode = m_returnLinkRegenerationMode;
+    m_parameters.m_chType = SatEnums::RETURN_USER_CH;
 
-    Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf>(parameters);
+    Ptr<SatPhyRxCarrierConf> carrierConf = CreateObject<SatPhyRxCarrierConf>(m_parameters);
 
-    if (linkResults)
+    if (m_linkResults)
     {
-        carrierConf->SetLinkResults(linkResults);
+        carrierConf->SetLinkResults(m_linkResults);
     }
 
     carrierConf->SetAdditionalInterferenceCb(
         MakeCallback(&SatOrbiterUserPhy::GetAdditionalInterference, this));
 
-    SatPhy::ConfigureRxCarriers(carrierConf, superFrameConf);
+    SatPhy::ConfigureRxCarriers(carrierConf, m_superFrameConf);
 }
 
 SatOrbiterUserPhy::~SatOrbiterUserPhy()
@@ -388,8 +389,8 @@ SatOrbiterUserPhy::RxTraces(SatPhy::PacketContainer_t packets)
 
                 if (item.GetTypeId() == SatAddressTag::GetTypeId())
                 {
-                    NS_LOG_DEBUG(this << " contains a SatAddressTag tag:"
-                                      << " start=" << item.GetStart() << " end=" << item.GetEnd());
+                    NS_LOG_DEBUG(this << " contains a SatAddressTag tag:" << " start="
+                                      << item.GetStart() << " end=" << item.GetEnd());
                     SatAddressTag addrTag;
                     item.GetTag(addrTag);
                     addr = addrTag.GetSourceAddress();

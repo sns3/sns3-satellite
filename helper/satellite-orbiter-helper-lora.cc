@@ -75,14 +75,6 @@ SatOrbiterHelperLora::GetTypeId(void)
     return tid;
 }
 
-TypeId
-SatOrbiterHelperLora::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
-}
-
 SatOrbiterHelperLora::SatOrbiterHelperLora()
     : SatOrbiterHelper()
 {
@@ -235,8 +227,8 @@ SatOrbiterHelperLora::AttachChannelsUser(Ptr<SatOrbiterNetDevice> dev,
 
         uRegenerationMac->SetReadCtrlCallback(m_rtnReadCtrlCb);
 
-        SatLoraConf satLoraConf;
-        satLoraConf.SetConf(uRegenerationMac);
+        Ptr<SatLoraConf> satLoraConf = CreateObject<SatLoraConf>();
+        satLoraConf->SetConf(uRegenerationMac);
 
         // Attach the Mac layer receiver to Phy
         SatPhy::ReceiveCallback recCb = MakeCallback(&LorawanMac::Receive, uRegenerationMac);

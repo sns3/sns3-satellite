@@ -26,11 +26,11 @@
 #include "satellite-phy.h"
 #include "satellite-signal-parameters.h"
 
-#include <ns3/address.h>
-#include <ns3/nstime.h>
-#include <ns3/object.h>
-#include <ns3/packet.h>
-#include <ns3/ptr.h>
+#include "ns3/address.h"
+#include "ns3/nstime.h"
+#include "ns3/object.h"
+#include "ns3/packet.h"
+#include "ns3/ptr.h"
 
 #include <queue>
 #include <stdint.h>
@@ -46,7 +46,7 @@ class SatPhyRxCarrierPerFrame;
 class SatPhyRxCarrierPerWindow;
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
  * The SatOrbiterFeederPhy models the feeder link physical layer of the
  * satellite node.
@@ -65,6 +65,16 @@ class SatOrbiterFeederPhy : public SatPhy
                         Ptr<SatSuperframeConf> superFrameConf);
 
     /**
+     * Notifier called once the ObjectBase is fully constructed.
+     *
+     * This method is invoked once all member attributes have been
+     * initialized. Subclasses can override this method to be notified
+     * of this event but if they do this, they must chain up to their
+     * parent's NotifyConstructionCompleted method.
+     */
+    virtual void NotifyConstructionCompleted() override;
+
+    /**
      * Destructor for SatOrbiterFeederPhy
      */
     virtual ~SatOrbiterFeederPhy();
@@ -73,7 +83,6 @@ class SatOrbiterFeederPhy : public SatPhy
      * inherited from Object
      */
     static TypeId GetTypeId(void);
-    TypeId GetInstanceTypeId(void) const;
     virtual void DoInitialize(void);
 
     /**
@@ -82,16 +91,16 @@ class SatOrbiterFeederPhy : public SatPhy
     virtual void DoDispose(void);
 
     /**
-     * \brief Send Pdu to the PHY tx module (for satellite switch packet forwarding)
-     * \param rxParams Transmission parameters
+     * @brief Send Pdu to the PHY tx module (for satellite switch packet forwarding)
+     * @param rxParams Transmission parameters
      */
     virtual void SendPduWithParams(Ptr<SatSignalParameters> rxParams);
 
     /**
-     * \brief Receives packets from lower layer.
+     * @brief Receives packets from lower layer.
      *
-     * \param rxParams Packet reception parameters
-     * \param phyError Boolean indicating whether the packet successfully
+     * @param rxParams Packet reception parameters
+     * @param phyError Boolean indicating whether the packet successfully
      * received or not? Note, that this parameter is not used in the satellite,
      * but exists since we are using a general interface defined in the parent
      * class.
@@ -99,35 +108,35 @@ class SatOrbiterFeederPhy : public SatPhy
     virtual void Receive(Ptr<SatSignalParameters> rxParams, bool phyError);
 
     /**
-     * \brief Get additional interference, used to compute final SINR at RX
+     * @brief Get additional interference, used to compute final SINR at RX
      *
-     * \return Additional interference
+     * @return Additional interference
      */
     virtual double GetAdditionalInterference();
 
     /**
-     * \brief Callback signature for `QueueSizeBytes` and `QueueSizePackets` trace source.
-     * \param size number of bytes or number of packets of queue
-     * \param from The MAC source address of packets
+     * @brief Callback signature for `QueueSizeBytes` and `QueueSizePackets` trace source.
+     * @param size number of bytes or number of packets of queue
+     * @param from The MAC source address of packets
      */
     typedef void (*QueueSizeCallback)(uint32_t size, const Address& from);
 
   protected:
     /**
-     * \brief Invoke the `Rx` trace source for each received packet.
-     * \param packets Container of the pointers to the packets received.
+     * @brief Invoke the `Rx` trace source for each received packet.
+     * @param packets Container of the pointers to the packets received.
      */
     virtual void RxTraces(SatPhy::PacketContainer_t packets);
 
     /**
-     * \brief Get the link TX direction. Must be implemented by child clases.
-     * \return The link TX direction
+     * @brief Get the link TX direction. Must be implemented by child clases.
+     * @return The link TX direction
      */
     virtual SatEnums::SatLinkDir_t GetSatLinkTxDir();
 
     /**
-     * \brief Get the link RX direction. Must be implemented by child clases.
-     * \return The link RX direction
+     * @brief Get the link RX direction. Must be implemented by child clases.
+     * @return The link RX direction
      */
     virtual SatEnums::SatLinkDir_t GetSatLinkRxDir();
 
@@ -143,6 +152,21 @@ class SatOrbiterFeederPhy : public SatPhy
 
   private:
     /**
+     *  Link results used for this physical layer.
+     */
+    Ptr<SatLinkResults> m_linkResults;
+
+    /**
+     *  RX carrier configuration parameters.
+     */
+    SatPhyRxCarrierConf::RxCarrierCreateParams_s m_parameters;
+
+    /**
+     *  Super frame cofiguration.
+     */
+    Ptr<SatSuperframeConf> m_superFrameConf;
+
+    /**
      * Send a packet from the queue. Used only in REGENERATION_PHY mode.
      */
     void SendFromQueue();
@@ -154,8 +178,8 @@ class SatOrbiterFeederPhy : public SatPhy
 
     /**
      * Get source address of packets.
-     * \brief packets The packets from where extract source
-     * \return The source MAC address
+     * @brief packets The packets from where extract source
+     * @return The source MAC address
      */
     Address GetE2ESourceAddress(SatPhy::PacketContainer_t packets);
 

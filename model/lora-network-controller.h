@@ -26,8 +26,8 @@
 #include "lora-network-controller-components.h"
 #include "lora-network-status.h"
 
-#include <ns3/object.h>
-#include <ns3/packet.h>
+#include "ns3/object.h"
+#include "ns3/packet.h"
 
 #include <list>
 
@@ -59,7 +59,7 @@ class LoraNetworkController : public Object
     /**
      * Method that is called by the NetworkServer when a new packet is received.
      *
-     * \param packet The newly received packet.
+     * @param packet The newly received packet.
      */
     void OnNewPacket(Ptr<const Packet> packet);
 

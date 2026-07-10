@@ -23,9 +23,9 @@
 
 #include "satellite-frame-conf.h"
 
-#include <ns3/callback.h>
-#include <ns3/mac48-address.h>
-#include <ns3/object.h>
+#include "ns3/callback.h"
+#include "ns3/mac48-address.h"
+#include "ns3/object.h"
 
 #include <stdint.h>
 #include <vector>
@@ -39,9 +39,9 @@ class SatLowerLayerServiceConf;
 class SatSchedulingObject;
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief Sort metric which sorts a vector available RC indices based on "unallocated load".
+ * @brief Sort metric which sorts a vector available RC indices based on "unallocated load".
  * Unallocated load is a the amount of bytes scheduled for UT which was not indicated
  * by NCC scheduler in TBTP. The UT scheduler tries to obey the scheduling decisions made
  * by NCC, and otherwise it tries to be byte-wise fair.
@@ -53,7 +53,7 @@ class SortByMetric
   public:
     /**
      * Sort a vector available RC indices based on unallocated load.
-     * \param m Vector to be sorted.
+     * @param m Vector to be sorted.
      */
     SortByMetric(const std::vector<uint32_t>& m)
         : m_cont(m)
@@ -62,9 +62,9 @@ class SortByMetric
 
     /**
      * Operator overload for function call
-     * \param p1 Index of value in vector
-     * \param p2 Index of value in vector
-     * \return True, if value at first index was smaller than value at second index, otherwise
+     * @param p1 Index of value in vector
+     * @param p2 Index of value in vector
+     * @return True, if value at first index was smaller than value at second index, otherwise
      * false.
      */
     bool operator()(uint8_t p1, uint8_t p2)
@@ -77,7 +77,7 @@ class SortByMetric
 };
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
  * The SatUtScheduler is responsible of getting a packet of proper size from higher
  * protocol layer. Two callbacks to LLC layer have been configured:
@@ -95,9 +95,19 @@ class SatUtScheduler : public Object
 
     /**
      * Used constructor
-     * \param lls Lower layer service conf
+     * @param lls Lower layer service conf
      */
     SatUtScheduler(Ptr<SatLowerLayerServiceConf> lls);
+
+    /**
+     * Notifier called once the ObjectBase is fully constructed.
+     *
+     * This method is invoked once all member attributes have been
+     * initialized. Subclasses can override this method to be notified
+     * of this event but if they do this, they must chain up to their
+     * parent's NotifyConstructionCompleted method.
+     */
+    virtual void NotifyConstructionCompleted() override;
 
     /**
      * Destructor
@@ -119,10 +129,7 @@ class SatUtScheduler : public Object
      * Derived from Object
      */
     static TypeId GetTypeId(void);
-    /**
-     * Derived from Object
-     */
-    virtual TypeId GetInstanceTypeId(void) const;
+
     /**
      * Dispose of SatUtScheduler
      */
@@ -130,54 +137,54 @@ class SatUtScheduler : public Object
 
     /**
      * Callback to get scheduling contexts from upper layer
-     * \param vector of scheduling contexts
+     * @param vector of scheduling contexts
      */
     typedef Callback<void, std::vector<Ptr<SatSchedulingObject>>&> SchedContextCallback;
 
     /**
      * Callback to notify upper layer about Tx opportunity.
-     * \param   uint32_t payload size in bytes
-     * \param   Mac48Address address
-     * \param   uint8_t RC index
-     * \param   uint32_t& Bytes left
-     * \param   uint32_t& Next min TxO
-     * \return  packet Packet to be transmitted to PHY
+     * @param   uint32_t payload size in bytes
+     * @param   Mac48Address address
+     * @param   uint8_t RC index
+     * @param   uint32_t& Bytes left
+     * @param   uint32_t& Next min TxO
+     * @return  packet Packet to be transmitted to PHY
      */
     typedef Callback<Ptr<Packet>, uint32_t, Mac48Address, uint8_t, uint32_t&, uint32_t&>
         TxOpportunityCallback;
 
     /**
      * Byte counter container
-     * \param uint8_t RC index
-     * \param uint32_t Byte counter
+     * @param uint8_t RC index
+     * @param uint32_t Byte counter
      */
     typedef std::vector<uint32_t> ByteCounterContainer_t;
 
     /**
-     * \brief Method to set Tx opportunity callback.
-     * \param cb callback to invoke whenever a packet has been received and must
+     * @brief Method to set Tx opportunity callback.
+     * @param cb callback to invoke whenever a packet has been received and must
      *        be forwarded to the higher layers.
      *
      */
     void SetSchedContextCallback(SatUtScheduler::SchedContextCallback cb);
 
     /**
-     * \brief Method to set Tx opportunity callback.
-     * \param cb callback to invoke whenever a packet has been received and must
+     * @brief Method to set Tx opportunity callback.
+     * @param cb callback to invoke whenever a packet has been received and must
      *        be forwarded to the higher layers.
      */
     void SetTxOpportunityCallback(SatUtScheduler::TxOpportunityCallback cb);
 
     /**
-     * \brief UT scheduling is responsible of selecting with which RC index to
+     * @brief UT scheduling is responsible of selecting with which RC index to
      * use when requesting packets from higher layer. If RC index is set,
      * then it just utilizes it.
-     * \param   packets Vector of packets to be sent in a time slot
-     * \param   payloadBytes Maximum payload of a time slot
-     * \param   type Time slot type
-     * \param   rcIndex RC index
-     * \param   policy Compliance policy of the scheduling process
-     * \return  Ptr<Packet> Packet fetched from higher layer
+     * @param   packets Vector of packets to be sent in a time slot
+     * @param   payloadBytes Maximum payload of a time slot
+     * @param   type Time slot type
+     * @param   rcIndex RC index
+     * @param   policy Compliance policy of the scheduling process
+     * @return  Ptr<Packet> Packet fetched from higher layer
      */
     void DoScheduling(std::vector<Ptr<Packet>>& packets,
                       uint32_t payloadBytes,
@@ -186,27 +193,27 @@ class SatUtScheduler : public Object
                       SatCompliancePolicy_t policy);
 
     /**
-     * \brief Set the node info
-     * \param nodeInfo containing node specific information
+     * @brief Set the node info
+     * @param nodeInfo containing node specific information
      */
     virtual void SetNodeInfo(Ptr<SatNodeInfo> nodeInfo);
 
   private:
     /**
-     * \brief Do scheduling for a given RC index
-     * \param packets       Reference to a vector of packets to be sent
-     * \param payloadBytes  Payload bytes available for this time slot
-     * \param rcIndex       RC index to be scheduled
-     * \return              Scheduled bytes
+     * @brief Do scheduling for a given RC index
+     * @param packets       Reference to a vector of packets to be sent
+     * @param payloadBytes  Payload bytes available for this time slot
+     * @param rcIndex       RC index to be scheduled
+     * @return              Scheduled bytes
      */
     uint32_t DoSchedulingForRcIndex(std::vector<Ptr<Packet>>& packets,
                                     uint32_t& payloadBytes,
                                     uint8_t rcIndex);
 
     /**
-     * \brief Get a prioritized order of the available RC indices for
+     * @brief Get a prioritized order of the available RC indices for
      * LOOSE policy UT scheduling.
-     * \return Vector of RC indices
+     * @return Vector of RC indices
      */
     std::vector<uint8_t> GetPrioritizedRcIndexOrder();
 

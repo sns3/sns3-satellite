@@ -30,10 +30,11 @@
 using namespace ns3;
 
 /**
- * \file sat-mobility-example.cc
- * \ingroup satellite
+ * @file sat-mobility-example.cc
+ * @ingroup satellite
  *
- * \brief Simulation script to run example simulation with a moving satellite.
+ * @brief Simulation script to run example simulation with a moving satellite.
+ *        This example is not used anymore
  *
  * execute command -> ./waf --run "sat-mobility-example --PrintHelp"
  */
@@ -47,7 +48,6 @@ main(int argc, char* argv[])
     LogComponentEnable("sat-mobility-example", LOG_LEVEL_INFO);
 
     // Variables
-    uint32_t beamId = 17;
     uint32_t endUsersPerUt(1);
     uint32_t utsPerBeam(1);
 
@@ -77,6 +77,12 @@ main(int argc, char* argv[])
     simulationHelper->AddDefaultUiArguments(cmd);
     cmd.Parse(argc, argv);
 
+    /// Set regeneration mode
+    Config::SetDefault("ns3::SatConf::ForwardLinkRegenerationMode",
+                       EnumValue(SatEnums::REGENERATION_NETWORK));
+    Config::SetDefault("ns3::SatConf::ReturnLinkRegenerationMode",
+                       EnumValue(SatEnums::REGENERATION_NETWORK));
+
     /// Set default values
     Config::SetDefault("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue(true));
     Config::SetDefault("ns3::SatHelper::PacketTraceEnabled", BooleanValue(true));
@@ -86,14 +92,21 @@ main(int argc, char* argv[])
     Config::SetDefault("ns3::SatSGP4MobilityModel::UpdatePositionPeriod",
                        TimeValue(updatePositionPeriod));
 
+    Config::SetDefault("ns3::SatGwMac::DisableSchedulingIfNoDeviceConnected", BooleanValue(true));
+    Config::SetDefault("ns3::SatOrbiterMac::DisableSchedulingIfNoDeviceConnected",
+                       BooleanValue(true));
+
     simulationHelper->SetSimulationTime(simLength);
     simulationHelper->SetUserCountPerUt(endUsersPerUt);
     simulationHelper->SetUtCountPerBeam(utsPerBeam);
 
     // Set beam ID
-    std::stringstream beamsEnabled;
-    beamsEnabled << beamId;
-    simulationHelper->SetBeams(beamsEnabled.str());
+    std::set<uint32_t> beamSetAll = {1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15,
+                                     16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+                                     31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45,
+                                     46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60,
+                                     61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72};
+    simulationHelper->SetBeamSet(beamSetAll);
 
     simulationHelper->LoadScenario("leo-iss");
 

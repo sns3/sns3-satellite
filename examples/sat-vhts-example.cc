@@ -30,10 +30,10 @@
 using namespace ns3;
 
 /**
- * \file sat-vhts-example.cc
- * \ingroup satellite
+ * @file sat-vhts-example.cc
+ * @ingroup satellite
  *
- * \brief This file allows to create a VHTS scenario
+ * @brief This file allows to create a VHTS scenario
  */
 
 NS_LOG_COMPONENT_DEFINE("sat-vhts-example");

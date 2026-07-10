@@ -41,7 +41,7 @@ class PointToPointIslNetDevice;
 class Packet;
 
 /**
- * \brief Point to Point ISL Channel
+ * @brief Point to Point ISL Channel
  *
  * Channel connecting two satellites
  *
@@ -61,33 +61,33 @@ class PointToPointIslChannel : public Channel
 {
   public:
     /**
-     * \brief Get the TypeId
+     * @brief Get the TypeId
      *
-     * \return The TypeId for this class
+     * @return The TypeId for this class
      */
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Create a PointToPointIslChannel
+     * @brief Create a PointToPointIslChannel
      *
      */
     PointToPointIslChannel();
 
     /**
-     * \brief Attach a given netdevice to this channel
+     * @brief Attach a given netdevice to this channel
      *
-     * \param device pointer to the netdevice to attach to the channel
+     * @param device pointer to the netdevice to attach to the channel
      */
     void Attach(Ptr<PointToPointIslNetDevice> device);
 
     /**
-     * \brief Transmit a packet over this channel
+     * @brief Transmit a packet over this channel
      *
-     * \param p Packet to transmit
-     * \param src source PointToPointIslNetDevice
-     * \param dst node at the other end of the channel
-     * \param txTime transmission time
-     * \returns true if successful (always true)
+     * @param p Packet to transmit
+     * @param src source PointToPointIslNetDevice
+     * @param dst node at the other end of the channel
+     * @param txTime transmission time
+     * @returns true if successful (always true)
      */
     virtual bool TransmitStart(Ptr<const Packet> p,
                                Ptr<PointToPointIslNetDevice> src,
@@ -95,63 +95,63 @@ class PointToPointIslChannel : public Channel
                                Time txTime);
 
     /**
-     * \brief Get number of devices on this channel
+     * @brief Get number of devices on this channel
      *
-     * \returns number of devices on this channel
+     * @returns number of devices on this channel
      */
     virtual std::size_t GetNDevices(void) const;
 
     /**
-     * \brief Get PointToPointIslNetDevice corresponding to index i on this channel
+     * @brief Get PointToPointIslNetDevice corresponding to index i on this channel
      *
-     * \param i Index number of the device requested
+     * @param i Index number of the device requested
      *
-     * \returns Ptr to PointToPointIslNetDevice requested
+     * @returns Ptr to PointToPointIslNetDevice requested
      */
     Ptr<PointToPointIslNetDevice> GetPointToPointIslDevice(std::size_t i) const;
 
     /**
-     * \brief Get NetDevice corresponding to index i on this channel
+     * @brief Get NetDevice corresponding to index i on this channel
      *
-     * \param i Index number of the device requested
+     * @param i Index number of the device requested
      *
-     * \returns Ptr to NetDevice requested
+     * @returns Ptr to NetDevice requested
      */
     virtual Ptr<NetDevice> GetDevice(std::size_t i) const;
 
   protected:
     /**
-     * \brief Get the delay between two nodes on this channel
+     * @brief Get the delay between two nodes on this channel
      *
-     * \param senderMobility location of the sender
-     * \param receiverMobility location of the receiver
+     * @param senderMobility location of the sender
+     * @param receiverMobility location of the receiver
      *
-     * \returns Time delay
+     * @returns Time delay
      */
     Time GetDelay(Ptr<MobilityModel> senderMobility, Ptr<MobilityModel> receiverMobility) const;
 
     /**
-     * \brief Check to make sure the link is initialized
+     * @brief Check to make sure the link is initialized
      *
-     * \returns true if initialized, asserts otherwise
+     * @returns true if initialized, asserts otherwise
      */
     bool IsInitialized(void) const;
 
     /**
-     * \brief Get the source net-device
+     * @brief Get the source net-device
      *
-     * \param i the link (direction) requested
+     * @param i the link (direction) requested
      *
-     * \returns Ptr to source PointToPointIslNetDevice for the
+     * @returns Ptr to source PointToPointIslNetDevice for the
      *          specified link
      */
     Ptr<PointToPointIslNetDevice> GetSource(uint32_t i) const;
 
     /**
-     * \brief Get the destination net-device
+     * @brief Get the destination net-device
      *
-     * \param i the link requested
-     * \returns Ptr to destination PointToPointIslNetDevice for
+     * @param i the link requested
+     * @returns Ptr to destination PointToPointIslNetDevice for
      *          the specified link
      */
     Ptr<PointToPointIslNetDevice> GetDestination(uint32_t i) const;
@@ -163,7 +163,7 @@ class PointToPointIslChannel : public Channel
     double m_propagationSpeed; //!< propagation speed on the channel
     std::size_t m_nDevices;    //!< Devices of this channel
 
-    /** \brief Wire states
+    /** @brief Wire states
      *
      */
     enum WireState
@@ -179,12 +179,12 @@ class PointToPointIslChannel : public Channel
     };
 
     /**
-     * \brief Wire model for the PointToPointIslChannel
+     * @brief Wire model for the PointToPointIslChannel
      */
     class Link
     {
       public:
-        /** \brief Create the link, it will be in INITIALIZING state
+        /** @brief Create the link, it will be in INITIALIZING state
          *
          */
         Link()

@@ -24,10 +24,10 @@
 
 #include "satellite-stats-helper.h"
 
-#include <ns3/address.h>
-#include <ns3/collector-map.h>
-#include <ns3/ptr.h>
-#include <ns3/satellite-phy-rx-carrier.h>
+#include "ns3/address.h"
+#include "ns3/collector-map.h"
+#include "ns3/ptr.h"
+#include "ns3/satellite-phy-rx-carrier.h"
 
 #include <map>
 #include <string>
@@ -42,8 +42,8 @@ class Node;
 class DataCollectionObject;
 
 /**
- * \ingroup satstats
- * \brief
+ * @ingroup satstats
+ * @brief
  */
 class SatStatsPacketCollisionHelper : public SatStatsHelper
 {
@@ -62,22 +62,22 @@ class SatStatsPacketCollisionHelper : public SatStatsHelper
     static TypeId GetTypeId();
 
     /**
-     * \brief Receive inputs from trace sources and determine the right collector
+     * @brief Receive inputs from trace sources and determine the right collector
      *        to forward the inputs to.
-     * \param nPackets number of packets in the received packet burst.
-     * \param from the source address of the packet.
-     * \param isCollided whether a collision has occurred.
+     * @param nPackets number of packets in the received packet burst.
+     * @param from the source address of the packet.
+     * @param isCollided whether a collision has occurred.
      */
     void CollisionRxCallback(uint32_t nPackets, const Address& from, bool isCollided);
 
     /**
-     * \return
+     * @return
      */
     std::string GetTraceSourceName() const;
 
     /**
-     * \brief Get the valid carrier type
-     * \return the valid carrier type
+     * @brief Get the valid carrier type
+     * @return the valid carrier type
      */
     inline SatPhyRxCarrier::CarrierType GetValidCarrierType() const
     {
@@ -86,13 +86,13 @@ class SatStatsPacketCollisionHelper : public SatStatsHelper
 
   protected:
     /**
-     * \param traceSourceName
+     * @param traceSourceName
      */
     void SetTraceSourceName(std::string traceSourceName);
 
     /**
-     * \brief Set valid carrier type for this statistics helper type.
-     * \param carrierType
+     * @brief Set valid carrier type for this statistics helper type.
+     * @param carrierType
      */
     inline void SetValidCarrierType(SatPhyRxCarrier::CarrierType carrierType)
     {
@@ -112,8 +112,8 @@ class SatStatsPacketCollisionHelper : public SatStatsHelper
 // BASE CLASS FEEDER /////////////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief
+ * @ingroup satstats
+ * @brief
  */
 class SatStatsFeederPacketCollisionHelper : public SatStatsPacketCollisionHelper
 {
@@ -144,8 +144,8 @@ class SatStatsFeederPacketCollisionHelper : public SatStatsPacketCollisionHelper
 // BASE CLASS USER /////////////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief
+ * @ingroup satstats
+ * @brief
  */
 class SatStatsUserPacketCollisionHelper : public SatStatsPacketCollisionHelper
 {
@@ -176,21 +176,21 @@ class SatStatsUserPacketCollisionHelper : public SatStatsPacketCollisionHelper
 // SLOTTED ALOHA FEEDER //////////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce packet collision statistics of Random Access Slotted ALOHA
+ * @ingroup satstats
+ * @brief Produce packet collision statistics of Random Access Slotted ALOHA
  *        from a satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFeederSlottedAlohaPacketCollisionHelper> s =
  * Create<SatStatsFeederSlottedAlohaPacketCollisionHelper> (satHelper); s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFeederSlottedAlohaPacketCollisionHelper : public SatStatsFeederPacketCollisionHelper
 {
@@ -212,21 +212,21 @@ class SatStatsFeederSlottedAlohaPacketCollisionHelper : public SatStatsFeederPac
 // CRDSA FEEDER //////////////////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce packet collision statistics of Random Access CRDSA
+ * @ingroup satstats
+ * @brief Produce packet collision statistics of Random Access CRDSA
  *        from a satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFeederCrdsaPacketCollisionHelper> s =
  * Create<SatStatsFeederCrdsaPacketCollisionHelper> (satHelper); s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFeederCrdsaPacketCollisionHelper : public SatStatsFeederPacketCollisionHelper
 {
@@ -248,20 +248,20 @@ class SatStatsFeederCrdsaPacketCollisionHelper : public SatStatsFeederPacketColl
 // E-SSA FEEDER //////////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce packet collision statistics of Random Access E-SSA
+ * @ingroup satstats
+ * @brief Produce packet collision statistics of Random Access E-SSA
  *        from a satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFeederEssaPacketCollisionHelper> s = Create<SatStatsFeederEssaPacketCollisionHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFeederEssaPacketCollisionHelper : public SatStatsFeederPacketCollisionHelper
 {
@@ -283,21 +283,21 @@ class SatStatsFeederEssaPacketCollisionHelper : public SatStatsFeederPacketColli
 // SLOTTED ALOHA USER //////////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce packet collision statistics of Random Access Slotted ALOHA
+ * @ingroup satstats
+ * @brief Produce packet collision statistics of Random Access Slotted ALOHA
  *        from a satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsUserSlottedAlohaPacketCollisionHelper> s =
  * Create<SatStatsUserSlottedAlohaPacketCollisionHelper> (satHelper); s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsUserSlottedAlohaPacketCollisionHelper : public SatStatsUserPacketCollisionHelper
 {
@@ -319,20 +319,20 @@ class SatStatsUserSlottedAlohaPacketCollisionHelper : public SatStatsUserPacketC
 // CRDSA USER //////////////////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce packet collision statistics of Random Access CRDSA
+ * @ingroup satstats
+ * @brief Produce packet collision statistics of Random Access CRDSA
  *        from a satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsUserCrdsaPacketCollisionHelper> s = Create<SatStatsUserCrdsaPacketCollisionHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsUserCrdsaPacketCollisionHelper : public SatStatsUserPacketCollisionHelper
 {
@@ -354,20 +354,20 @@ class SatStatsUserCrdsaPacketCollisionHelper : public SatStatsUserPacketCollisio
 // E-SSA USER //////////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce packet collision statistics of Random Access E-SSA
+ * @ingroup satstats
+ * @brief Produce packet collision statistics of Random Access E-SSA
  *        from a satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsUserEssaPacketCollisionHelper> s = Create<SatStatsUserEssaPacketCollisionHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsUserEssaPacketCollisionHelper : public SatStatsUserPacketCollisionHelper
 {

@@ -19,9 +19,9 @@
  */
 
 /**
- * \ingroup satellite
- * \file satellite-gse-test.cc
- * \brief Generic Stream Encapsulator test suite
+ * @ingroup satellite
+ * @file satellite-gse-test.cc
+ * @brief Generic Stream Encapsulator test suite
  */
 
 #include "../model/satellite-generic-stream-encapsulator.h"
@@ -40,8 +40,8 @@
 using namespace ns3;
 
 /**
- * \ingroup satellite
- * \brief Generic Stream Encapsulation (GSE) test case implementation.
+ * @ingroup satellite
+ * @brief Generic Stream Encapsulation (GSE) test case implementation.
  *
  * Expected results
  * - 100 packets of random size (in bytes) are generated and enqued to GSE
@@ -60,9 +60,9 @@ class SatGseTestCase : public TestCase
 
     /**
      * Receive packet and check that it is of correct size
-     * \param p Ptr to packet
-     * \param source Source MAC address
-     * \param dest Destination MAC address
+     * @param p Ptr to packet
+     * @param source Source MAC address
+     * @param dest Destination MAC address
      */
     void Receive(Ptr<Packet> p, Mac48Address source, Mac48Address dest);
 
@@ -93,8 +93,8 @@ void
 SatGseTestCase::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-gse", "", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-gse", "", true);
 
     Mac48Address source = Mac48Address::Allocate();
     Mac48Address dest = Mac48Address::Allocate();
@@ -156,7 +156,7 @@ SatGseTestCase::DoRun(void)
 
     Simulator::Destroy();
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 }
 
 void
@@ -176,8 +176,8 @@ SatGseTestCase::Receive(Ptr<Packet> p, Mac48Address source, Mac48Address dest)
 }
 
 /**
- * \ingroup satellite
- * \brief Test suite for GSE.
+ * @ingroup satellite
+ * @brief Test suite for GSE.
  */
 class SatGseTraceSuite : public TestSuite
 {

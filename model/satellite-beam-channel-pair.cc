@@ -22,8 +22,8 @@
 
 #include "satellite-enums.h"
 
-#include <ns3/fatal-error.h>
-#include <ns3/log.h>
+#include "ns3/fatal-error.h"
+#include "ns3/log.h"
 
 #include <map>
 #include <utility>

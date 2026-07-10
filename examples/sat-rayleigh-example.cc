@@ -25,10 +25,10 @@
 using namespace ns3;
 
 /**
- * \file sat-rayleigh-example.cc
- * \ingroup satellite
+ * @file sat-rayleigh-example.cc
+ * @ingroup satellite
  *
- * \brief Example for Rayleigh fader class. Demonstrates the functionality
+ * @brief Example for Rayleigh fader class. Demonstrates the functionality
  * of the Rayleigh fader used by the Markov-fading. The example creates
  * a single Rayleigh fader and outputs the fading values in time.
  */

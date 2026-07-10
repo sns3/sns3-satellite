@@ -28,8 +28,8 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief Satellite perfect interference elimination. Interference values are removed without
+ * @ingroup satellite
+ * @brief Satellite perfect interference elimination. Interference values are removed without
  * residual power.
  */
 class SatPerfectInterferenceElimination : public SatInterferenceElimination
@@ -39,11 +39,6 @@ class SatPerfectInterferenceElimination : public SatInterferenceElimination
      * Derived from Object
      */
     static TypeId GetTypeId(void);
-
-    /**
-     * Derived from Object
-     */
-    TypeId GetInstanceTypeId(void) const;
 
     /**
      * Default constructor
@@ -57,9 +52,9 @@ class SatPerfectInterferenceElimination : public SatInterferenceElimination
 
     /**
      * Calculate residual power of interference for the given packets
-     * \param packetInterferedWith Parameters of the packet whose interference level should be
+     * @param packetInterferedWith Parameters of the packet whose interference level should be
      * lowered \param processedPacket Parameters of the packet we want to remove interference from
-     * \param isRegenerative Tell if we are in regenerative configuration. Depending on this value,
+     * @param isRegenerative Tell if we are in regenerative configuration. Depending on this value,
      * the computations are made on the GW or on the satellite
      */
     void EliminateInterferences(Ptr<SatSignalParameters> packetInterferedWith,
@@ -69,9 +64,9 @@ class SatPerfectInterferenceElimination : public SatInterferenceElimination
 
     /**
      * Calculate residual power of interference for the given packets
-     * \param packetInterferedWith Parameters of the packet whose interference level should be
+     * @param packetInterferedWith Parameters of the packet whose interference level should be
      * lowered \param processedPacket Parameters of the packet we want to remove interference from
-     * \param isRegenerative Tell if we are in regenerative configuration. Depending on this value,
+     * @param isRegenerative Tell if we are in regenerative configuration. Depending on this value,
      * the computations are made on the GW or on the satellite \param startTime Normalized start
      * time of the interference, with respect to packetInterferedWith \param endTime Normalized end
      * time of the interference, with respect to packetInterferedWith
@@ -84,7 +79,7 @@ class SatPerfectInterferenceElimination : public SatInterferenceElimination
                                 double endTime);
 
     /**
-     * \brief Calculate the residual power of interference for a given packet
+     * @brief Calculate the residual power of interference for a given packet
      */
     double GetResidualPower(Ptr<SatSignalParameters> processedPacket, double EsNo);
 };

@@ -30,10 +30,10 @@
 using namespace ns3;
 
 /**
- * \file sat-link-budget-example.cc
- * \ingroup satellite
+ * @file sat-link-budget-example.cc
+ * @ingroup satellite
  *
- * \brief  Link budget example application for link budget calculation purposes in satellite
+ * @brief  Link budget example application for link budget calculation purposes in satellite
  * network. Some parameter can be set as command line arguments. To see help for user arguments:
  *         execute command -> ./waf --run "sat-link-budget-example --PrintHelp"
  *
@@ -81,7 +81,7 @@ main(int argc, char* argv[])
     auto simulationHelper = CreateObject<SimulationHelper>("example-link-budget");
     Config::SetDefault("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue(true));
     std::string inputFileNameWithPath =
-        Singleton<SatEnvVariables>::Get()->LocateDirectory("contrib/satellite/examples") +
+        SatEnvVariables::GetInstance()->LocateDirectory("contrib/satellite/examples") +
         "/sat-link-budget-input-attributes.xml";
 
     // read command line parameters can be given by user

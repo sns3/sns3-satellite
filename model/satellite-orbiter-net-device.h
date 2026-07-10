@@ -28,11 +28,11 @@
 #include "satellite-point-to-point-isl-net-device.h"
 #include "satellite-signal-parameters.h"
 
-#include <ns3/error-model.h>
-#include <ns3/mac48-address.h>
-#include <ns3/net-device.h>
-#include <ns3/output-stream-wrapper.h>
-#include <ns3/traced-callback.h>
+#include "ns3/error-model.h"
+#include "ns3/mac48-address.h"
+#include "ns3/net-device.h"
+#include "ns3/output-stream-wrapper.h"
+#include "ns3/traced-callback.h"
 
 #include <map>
 #include <set>
@@ -47,8 +47,8 @@ class PointToPointIslNetDevice;
 class SatIslArbiter;
 
 /**
- * \ingroup satellite
- * \brief SatOrbiterNetDevice to be utilized in geostationary satellite.
+ * @ingroup satellite
+ * @brief SatOrbiterNetDevice to be utilized in geostationary satellite.
  * SatOrbiterNetDevice holds a set of phy layers towards user and feeder
  * links; one pair of phy layers for each spot-beam. The SatNetDevice
  * implements a simple switching between all user and feeder links
@@ -58,8 +58,8 @@ class SatOrbiterNetDevice : public NetDevice
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
 
@@ -69,39 +69,39 @@ class SatOrbiterNetDevice : public NetDevice
     SatOrbiterNetDevice();
 
     /**
-     * \brief Receive the packet from the lower layers, in network regeneration on return link
-     * \param packet Packet received
-     * \param userAddress MAC address of user that received this packet
+     * @brief Receive the packet from the lower layers, in network regeneration on return link
+     * @param packet Packet received
+     * @param userAddress MAC address of user that received this packet
      */
     virtual void ReceivePacketUser(Ptr<Packet> packet, const Address& userAddress) = 0;
 
     /**
-     * \brief Receive the packet from the lower layers, in network regeneration on forward link
-     * \param packet Packet received
-     * \param feederAddress MAC address of feeder that received this packet
+     * @brief Receive the packet from the lower layers, in network regeneration on forward link
+     * @param packet Packet received
+     * @param feederAddress MAC address of feeder that received this packet
      */
     virtual void ReceivePacketFeeder(Ptr<Packet> packet, const Address& feederAddress) = 0;
 
     /**
-     * \brief Receive the packet from the lower layers
-     * \param packets Container of pointers to the packets to be received.
-     * \param rxParams Packet transmission parameters
+     * @brief Receive the packet from the lower layers
+     * @param packets Container of pointers to the packets to be received.
+     * @param rxParams Packet transmission parameters
      */
     void ReceiveUser(SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> rxParams);
 
     /**
      * Receive the packet from the lower layers
-     * \param packets Container of pointers to the packets to be received.
-     * \param rxParams Packet transmission parameters
+     * @param packets Container of pointers to the packets to be received.
+     * @param rxParams Packet transmission parameters
      */
     void ReceiveFeeder(SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> rxParams);
 
     /**
-     * \brief Send a control packet on the feeder link
-     * \param msg The control message to send
-     * \param dest The MAC destination
-     * \param rxParams Strucutre storing additional parameters
-     * \return True if success
+     * @brief Send a control packet on the feeder link
+     * @param msg The control message to send
+     * @param dest The MAC destination
+     * @param rxParams Strucutre storing additional parameters
+     * @return True if success
      */
     virtual bool SendControlMsgToFeeder(Ptr<SatControlMessage> msg,
                                         const Address& dest,
@@ -109,134 +109,134 @@ class SatOrbiterNetDevice : public NetDevice
 
     /**
      * Add the User Phy object for the beam
-     * \param phy user phy object to add.
-     * \param beamId the id of the beam to use phy for
+     * @param phy user phy object to add.
+     * @param beamId the id of the beam to use phy for
      */
     void AddUserPhy(Ptr<SatPhy> phy, uint32_t beamId);
 
     /**
      * Add the Feeder Phy object for the beam
-     * \param phy feeder phy object to add.
-     * \param beamId the id of the beam to use phy for
+     * @param phy feeder phy object to add.
+     * @param beamId the id of the beam to use phy for
      */
     void AddFeederPhy(Ptr<SatPhy> phy, uint32_t beamId);
 
     /**
      * Get the User Phy object for the beam
-     * \param beamId the id of the beam to use phy for
-     * \return The User Phy
+     * @param beamId the id of the beam to use phy for
+     * @return The User Phy
      */
     Ptr<SatPhy> GetUserPhy(uint32_t beamId);
 
     /**
      * Get the Feeder Phy object for the beam
-     * \param beamId the id of the beam to use phy for
-     * \return The Feeder Phy
+     * @param beamId the id of the beam to use phy for
+     * @return The Feeder Phy
      */
     Ptr<SatPhy> GetFeederPhy(uint32_t beamId);
 
     /**
      * Get all User Phy objects attached to this satellite
-     * \return All the User Phy
+     * @return All the User Phy
      */
     std::map<uint32_t, Ptr<SatPhy>> GetUserPhy();
 
     /**
      * Get all Feeder Phy objects attached to this satellite
-     * \return All the Feeder Phy
+     * @return All the Feeder Phy
      */
     std::map<uint32_t, Ptr<SatPhy>> GetFeederPhy();
 
     /**
      * Add the User MAC object for the beam
-     * \param mac user MAC object to add.
-     * \param beamId the id of the beam to use MAC for
+     * @param mac user MAC object to add.
+     * @param beamId the id of the beam to use MAC for
      */
     void AddUserMac(Ptr<SatMac> mac, uint32_t beamId);
 
     /**
      * Add the Feeder MAC object for the beam
-     * \param mac feeder MAC created for this beam
-     * \param macUsed feeder MAC that will be used to send data
-     * \param beamId the id of the beam to use MAC for
+     * @param mac feeder MAC created for this beam
+     * @param macUsed feeder MAC that will be used to send data
+     * @param beamId the id of the beam to use MAC for
      */
     void AddFeederMac(Ptr<SatMac> mac, Ptr<SatMac> macUsed, uint32_t beamId);
 
     /**
      * Get the User MAC object for the beam
-     * \param beamId the id of the beam to use MAC for
-     * \return The User MAC
+     * @param beamId the id of the beam to use MAC for
+     * @return The User MAC
      */
     Ptr<SatMac> GetUserMac(uint32_t beamId);
 
     /**
      * Get the Feeder MAC object for the beam
-     * \param beamId the id of the beam to use MAC for
-     * \return The Feeder MAC
+     * @param beamId the id of the beam to use MAC for
+     * @return The Feeder MAC
      */
     Ptr<SatMac> GetFeederMac(uint32_t beamId);
 
     /**
      * Get all User MAC objects attached to this satellite
-     * \return All the User MAC
+     * @return All the User MAC
      */
     std::map<uint32_t, Ptr<SatMac>> GetUserMac();
 
     /**
      * Get all Feeder MAC objects attached to this satellite that are in use
-     * \return All the Feeder MAC used to send on return feeder link
+     * @return All the Feeder MAC used to send on return feeder link
      */
     std::map<uint32_t, Ptr<SatMac>> GetFeederMac();
 
     /**
      * Get all Feeder MAC objects attached to this satellite
-     * \return All the Feeder MAC. They may or not be used to send on return feeder
+     * @return All the Feeder MAC. They may or not be used to send on return feeder
      */
     std::map<uint32_t, Ptr<SatMac>> GetAllFeederMac();
 
     /**
      * Add an entry in the database to get satellite feeder address from beam ID
-     * \param beamId Beam ID
-     * \param satelliteFeederAddress MAC address on the satellite feeder
+     * @param beamId Beam ID
+     * @param satelliteFeederAddress MAC address on the satellite feeder
      */
     void AddFeederPair(uint32_t beamId, Mac48Address satelliteFeederAddress);
 
     /**
      * Add an entry in the database to get satellite user address from beam ID
-     * \param beamId Beam ID
-     * \param satelliteUserAddress MAC address on the satellite user
+     * @param beamId Beam ID
+     * @param satelliteUserAddress MAC address on the satellite user
      */
     void AddUserPair(uint32_t beamId, Mac48Address satelliteUserAddress);
 
     /**
      * Get satellite feeder entry from associated beam ID
-     * \param beamId Beam ID
-     * \return satellite feeder MAC associated to this beam
+     * @param beamId Beam ID
+     * @return satellite feeder MAC associated to this beam
      */
     Mac48Address GetSatelliteFeederAddress(uint32_t beamId);
 
     /**
      * Get satellite user entry from associated beam ID
-     * \param beamId Beam ID
-     * \return satellite user MAC associated to this beam
+     * @param beamId Beam ID
+     * @return satellite user MAC associated to this beam
      */
     Mac48Address GetSatelliteUserAddress(uint32_t beamId);
 
     /**
      * Attach a receive ErrorModel to the SatOrbiterNetDevice.
-     * \param em Ptr to the ErrorModel.
+     * @param em Ptr to the ErrorModel.
      */
     void SetReceiveErrorModel(Ptr<ErrorModel> em);
 
     /**
      * Set the forward link regeneration mode.
-     * \param forwardLinkRegenerationMode The regeneration mode.
+     * @param forwardLinkRegenerationMode The regeneration mode.
      */
     void SetForwardLinkRegenerationMode(SatEnums::RegenerationMode_t forwardLinkRegenerationMode);
 
     /**
      * Set the return link regeneration mode.
-     * \param returnLinkRegenerationMode The regeneration mode.
+     * @param returnLinkRegenerationMode The regeneration mode.
      */
     void SetReturnLinkRegenerationMode(SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
@@ -244,15 +244,15 @@ class SatOrbiterNetDevice : public NetDevice
 
     /**
      * Connect a GW to this satellite.
-     * \param gwAddress MAC address of the GW to connect
-     * \param beamId beam used by satellite to reach this GW
+     * @param gwAddress MAC address of the GW to connect
+     * @param beamId beam used by satellite to reach this GW
      */
     void ConnectGw(Mac48Address gwAddress, uint32_t beamId);
 
     /**
      * Disconnect a GW to this satellite.
-     * \param gwAddress MAC address of the GW to disconnect
-     * \param beamId beam used by satellite to reach this GW
+     * @param gwAddress MAC address of the GW to disconnect
+     * @param beamId beam used by satellite to reach this GW
      */
     void DisconnectGw(Mac48Address gwAddress, uint32_t beamId);
 
@@ -265,15 +265,15 @@ class SatOrbiterNetDevice : public NetDevice
 
     /**
      * Connect a UT to this satellite.
-     * \param utAddress MAC address of the UT to connect
-     * \param beamId beam used by satellite to reach this UT
+     * @param utAddress MAC address of the UT to connect
+     * @param beamId beam used by satellite to reach this UT
      */
     virtual void ConnectUt(Mac48Address utAddress, uint32_t beamId) = 0;
 
     /**
      * Disconnect a UT to this satellite.
-     * \param utAddress MAC address of the UT to disconnect
-     * \param beamId beam used by satellite to reach this UT
+     * @param utAddress MAC address of the UT to disconnect
+     * @param beamId beam used by satellite to reach this UT
      */
     virtual void DisconnectUt(Mac48Address utAddress, uint32_t beamId) = 0;
 
@@ -286,39 +286,39 @@ class SatOrbiterNetDevice : public NetDevice
 
     /**
      * Add a ISL Net Device to this satellite.
-     * \param islNetDevices ISL Net Device to add.
+     * @param islNetDevices ISL Net Device to add.
      */
     void AddIslsNetDevice(Ptr<PointToPointIslNetDevice> islNetDevices);
 
     /**
      * Get all the ISL Net devices
-     * \return Vector of all ISL Net Devices
+     * @return Vector of all ISL Net Devices
      */
     std::vector<Ptr<PointToPointIslNetDevice>> GetIslsNetDevices();
 
     /**
      * Set the arbiter for ISL routing
-     * \param arbiter The arbiter to set
+     * @param arbiter The arbiter to set
      */
     void SetArbiter(Ptr<SatIslArbiter> arbiter);
 
     /**
      * Get the arbiter for ISL routing
-     * \return The arbiter used on this satellite
+     * @return The arbiter used on this satellite
      */
     Ptr<SatIslArbiter> GetArbiter();
 
     /**
      * Send a packet to ISL.
-     * \param packet The packet to send
-     * \param destination The MAC address of ground station that will receive the packet
+     * @param packet The packet to send
+     * @param destination The MAC address of ground station that will receive the packet
      */
     void SendToIsl(Ptr<Packet> packet, Mac48Address destination);
 
     /**
      * Receive a packet from ISL.
-     * \param packet The packet to send
-     * \param destination The MAC address of ground station that will receive the packet
+     * @param packet The packet to send
+     * @param destination The MAC address of ground station that will receive the packet
      */
     virtual void ReceiveFromIsl(Ptr<Packet> packet, Mac48Address destination) = 0;
 

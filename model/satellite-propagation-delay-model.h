@@ -21,8 +21,8 @@
 #ifndef SATELLITE_PROPAGATION_DELAY_MODEL_H
 #define SATELLITE_PROPAGATION_DELAY_MODEL_H
 
-#include <ns3/mobility-model.h>
-#include <ns3/propagation-delay-model.h>
+#include "ns3/mobility-model.h"
+#include "ns3/propagation-delay-model.h"
 
 #include <stdint.h>
 
@@ -30,16 +30,16 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief The propagation delay is constant in time.
+ * @brief The propagation delay is constant in time.
  */
 class SatConstantPropagationDelayModel : public PropagationDelayModel
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
 
@@ -49,22 +49,22 @@ class SatConstantPropagationDelayModel : public PropagationDelayModel
     SatConstantPropagationDelayModel();
 
     /**
-     * \brief Get the propagation delay in Time
-     * \param a the source
-     * \param b the destination
-     * \returns Propagation delay.
+     * @brief Get the propagation delay in Time
+     * @param a the source
+     * @param b the destination
+     * @returns Propagation delay.
      */
     virtual Time GetDelay(Ptr<MobilityModel> a, Ptr<MobilityModel> b) const;
 
     /**
-     * \brief Get the propagation delay in Time
-     * \returns Propagation delay.
+     * @brief Get the propagation delay in Time
+     * @returns Propagation delay.
      */
     virtual Time GetDelay(void) const;
 
     /**
      * Set constant propagation delay.
-     * \param delay Delay in Time.
+     * @param delay Delay in Time.
      */
     void SetDelay(Time delay);
 

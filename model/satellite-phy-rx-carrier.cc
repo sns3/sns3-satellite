@@ -38,11 +38,11 @@
 #include "satellite-traced-interference.h"
 #include "satellite-utils.h"
 
-#include <ns3/address.h>
-#include <ns3/boolean.h>
-#include <ns3/log.h>
-#include <ns3/simulator.h>
-#include <ns3/singleton.h>
+#include "ns3/address.h"
+#include "ns3/boolean.h"
+#include "ns3/log.h"
+#include "ns3/simulator.h"
+#include "ns3/singleton.h"
 
 #include <algorithm>
 #include <limits>

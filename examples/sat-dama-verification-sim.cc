@@ -30,10 +30,10 @@
 using namespace ns3;
 
 /**
- * \file sat-dama-verification-sim.cc
- * \ingroup satellite
+ * @file sat-dama-verification-sim.cc
+ * @ingroup satellite
  *
- * \brief Simulation script to run example simulation results related to
+ * @brief Simulation script to run example simulation results related to
  * satellite RTN link performance.
  *
  * execute command -> ./waf --run "sat-dama-verification-sim --PrintHelp"
@@ -63,7 +63,7 @@ main(int argc, char* argv[])
     Config::SetDefault("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue(true));
 
     // Find the input xml file in case example is run from other than ns-3 root directory
-    std::string pathToFile = Singleton<SatEnvVariables>::Get()->LocateFile(
+    std::string pathToFile = SatEnvVariables::GetInstance()->LocateFile(
         "contrib/satellite/examples/tn9-dama-input-attributes.xml");
 
     // read command line parameters given by user

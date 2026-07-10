@@ -25,13 +25,13 @@
 #ifndef SATELLITE_VECTOR_EXTENSIONS_H
 #define SATELLITE_VECTOR_EXTENSIONS_H
 
-#include <ns3/vector.h>
+#include "ns3/vector.h"
 
 namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
  * @brief extensions to ns3::Vector3D to support additional operations
  *

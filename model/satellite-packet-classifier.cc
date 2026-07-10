@@ -23,9 +23,9 @@
 #include "satellite-control-message.h"
 #include "satellite-enums.h"
 
-#include <ns3/ipv4-header.h>
-#include <ns3/ipv4-l3-protocol.h>
-#include <ns3/log.h>
+#include "ns3/ipv4-header.h"
+#include "ns3/ipv4-l3-protocol.h"
+#include "ns3/log.h"
 
 NS_LOG_COMPONENT_DEFINE("SatPacketClassifier");
 

@@ -28,10 +28,10 @@
 using namespace ns3;
 
 /**
- * \file sat-ra-sim-tn9.cc
- * \ingroup satellite
+ * @file sat-ra-sim-tn9.cc
+ * @ingroup satellite
  *
- * \brief Simulation script to run example simulation results related to satellite RTN
+ * @brief Simulation script to run example simulation results related to satellite RTN
  * link performance. Currently only one beam is simulated with variable amount of users
  * and RA-DAMA configuration. The script supports three different setups: SA + VBDC,
  * CRDSA + VBDC and CRDSA only. As output, the example provides statistics about RA
@@ -63,7 +63,7 @@ main(int argc, char* argv[])
 
     // To read attributes from file
     std::string inputFileNameWithPath =
-        Singleton<SatEnvVariables>::Get()->LocateDirectory("contrib/satellite/examples") +
+        SatEnvVariables::GetInstance()->LocateDirectory("contrib/satellite/examples") +
         "/tn9-ra-input-attributes.xml";
 
     // read command line parameters given by user

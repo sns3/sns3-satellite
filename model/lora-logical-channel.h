@@ -23,7 +23,7 @@
 #ifndef LORA_LOGICAL_CHANNEL_H
 #define LORA_LOGICAL_CHANNEL_H
 
-#include <ns3/object.h>
+#include "ns3/object.h"
 
 #include <stdint.h>
 
@@ -52,23 +52,23 @@ class LoraLogicalChannel : public Object
     /**
      * Constructor providing initialization of frequency and data rate limits.
      *
-     * \param frequency This channel's frequency.
-     * \param minDataRate This channel's minimum data rate.
-     * \param maxDataRate This channel's maximum data rate.
+     * @param frequency This channel's frequency.
+     * @param minDataRate This channel's minimum data rate.
+     * @param maxDataRate This channel's maximum data rate.
      */
     LoraLogicalChannel(double frequency, uint8_t minDataRate, uint8_t maxDataRate);
 
     /**
      * Get the frequency (MHz).
      *
-     * \return The center frequency of this channel.
+     * @return The center frequency of this channel.
      */
     double GetFrequency(void) const;
 
     /**
      * Set the frequency (MHz).
      *
-     * \param frequencyMHz The center frequency this channel should be at.
+     * @param frequencyMHz The center frequency this channel should be at.
      */
     // void SetFrequency (double frequencyMHz);
 

@@ -27,9 +27,9 @@
 #include "satellite-enums.h"
 #include "satellite-wave-form-conf.h"
 
-#include <ns3/ptr.h>
-#include <ns3/random-variable-stream.h>
-#include <ns3/simple-ref-count.h>
+#include "ns3/ptr.h"
+#include "ns3/random-variable-stream.h"
+#include "ns3/simple-ref-count.h"
 
 #include <map>
 #include <sstream>
@@ -42,8 +42,8 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief This class implements configuration for Bandwidth Time Unit (BTU).
+ * @ingroup satellite
+ * @brief This class implements configuration for Bandwidth Time Unit (BTU).
  */
 
 class SatBtuConf : public SimpleRefCount<SatBtuConf>
@@ -57,10 +57,10 @@ class SatBtuConf : public SimpleRefCount<SatBtuConf>
     /**
      * Constructor for SatBtuConf
      *
-     * \param bandwidthInHz     Allocated bandwidth of BTU in Hertz
-     * \param rollOff           Roll-off factor
-     * \param spacing           Spacing factor
-     * \param spreadingFactor   Spreading factor
+     * @param bandwidthInHz     Allocated bandwidth of BTU in Hertz
+     * @param rollOff           Roll-off factor
+     * @param spacing           Spacing factor
+     * @param spreadingFactor   Spreading factor
      */
     SatBtuConf(double bandwidthInHz, double rollOff, double spacing, uint32_t spreadingFactor);
 
@@ -72,7 +72,7 @@ class SatBtuConf : public SimpleRefCount<SatBtuConf>
     /**
      * Get bandwidth of BTU.
      *
-     * \return The bandwidth of BTU in hertz.
+     * @return The bandwidth of BTU in hertz.
      */
     inline double GetAllocatedBandwidthInHz() const
     {
@@ -82,7 +82,7 @@ class SatBtuConf : public SimpleRefCount<SatBtuConf>
     /**
      * Get occupied bandwidth of BTU.
      *
-     * \return The occupied bandwidth of BTU in hertz.
+     * @return The occupied bandwidth of BTU in hertz.
      */
     inline double GetOccupiedBandwidthInHz() const
     {
@@ -92,7 +92,7 @@ class SatBtuConf : public SimpleRefCount<SatBtuConf>
     /**
      * Get occupied bandwidth of BTU.
      *
-     * \return The occupied bandwidth of BTU in hertz.
+     * @return The occupied bandwidth of BTU in hertz.
      */
     inline double GetEffectiveBandwidthInHz() const
     {
@@ -102,7 +102,7 @@ class SatBtuConf : public SimpleRefCount<SatBtuConf>
     /**
      * Get spreading factor of BTU.
      *
-     * \return The spreading factor of BTU.
+     * @return The spreading factor of BTU.
      */
     inline double GetSpreadingFactor() const
     {
@@ -112,7 +112,7 @@ class SatBtuConf : public SimpleRefCount<SatBtuConf>
     /**
      * Get symbol rate of BTU.
      *
-     * \return The symbol rate of BTU in bauds.
+     * @return The symbol rate of BTU in bauds.
      */
     inline double GetSymbolRateInBauds() const
     {
@@ -128,8 +128,8 @@ class SatBtuConf : public SimpleRefCount<SatBtuConf>
 };
 
 /**
- * \ingroup satellite
- * \brief This class implements configuration for time slots (for super frames / frames)
+ * @ingroup satellite
+ * @brief This class implements configuration for time slots (for super frames / frames)
  */
 
 class SatTimeSlotConf : public SimpleRefCount<SatTimeSlotConf>
@@ -154,10 +154,10 @@ class SatTimeSlotConf : public SimpleRefCount<SatTimeSlotConf>
     /**
      * Constructor for SatTimeSlotConf
      *
-     * \param startTime       Start time of time slot in side frame.
-     * \param waveFormId      Wave form id of time slot
-     * \param carrierId       Carrier id of time slot
-     * \param slotType        Time slot type
+     * @param startTime       Start time of time slot in side frame.
+     * @param waveFormId      Wave form id of time slot
+     * @param carrierId       Carrier id of time slot
+     * @param slotType        Time slot type
      */
     SatTimeSlotConf(Time startTime,
                     uint32_t waveFormId,
@@ -172,7 +172,7 @@ class SatTimeSlotConf : public SimpleRefCount<SatTimeSlotConf>
     /**
      * Get start time of time slot. (inside frame)
      *
-     * \return The start time of time slot.
+     * @return The start time of time slot.
      */
     inline Time GetStartTime() const
     {
@@ -182,7 +182,7 @@ class SatTimeSlotConf : public SimpleRefCount<SatTimeSlotConf>
     /**
      * Get wave form id of time slot.
      *
-     * \return The wave form id of time slot.
+     * @return The wave form id of time slot.
      */
     inline uint32_t GetWaveFormId() const
     {
@@ -192,7 +192,7 @@ class SatTimeSlotConf : public SimpleRefCount<SatTimeSlotConf>
     /**
      * Get carrier id of time slot (inside frame).
      *
-     * \return The carrier id of time slot.
+     * @return The carrier id of time slot.
      */
     inline uint16_t GetCarrierId() const
     {
@@ -202,7 +202,7 @@ class SatTimeSlotConf : public SimpleRefCount<SatTimeSlotConf>
     /**
      * Set RC index of the time slot.
      *
-     * \param rcIndex RC index of the time slot.
+     * @param rcIndex RC index of the time slot.
      */
     inline void SetRcIndex(uint8_t rcIndex)
     {
@@ -212,7 +212,7 @@ class SatTimeSlotConf : public SimpleRefCount<SatTimeSlotConf>
     /**
      * Get RC index of the time slot.
      *
-     * \return RC index of the time slot.
+     * @return RC index of the time slot.
      */
     inline uint8_t GetRcIndex()
     {
@@ -222,7 +222,7 @@ class SatTimeSlotConf : public SimpleRefCount<SatTimeSlotConf>
     /**
      * Get time slot type.
      *
-     * \return Type of the time slot.
+     * @return Type of the time slot.
      */
     inline SatTimeSlotConf::SatTimeSlotType_t GetSlotType() const
     {
@@ -232,7 +232,7 @@ class SatTimeSlotConf : public SimpleRefCount<SatTimeSlotConf>
     /**
      * Set time slot type.
      *
-     * \param slotType Type of the time slot to set.
+     * @param slotType Type of the time slot to set.
      */
     inline void SetSlotType(SatTimeSlotConf::SatTimeSlotType_t slotType)
     {
@@ -249,8 +249,8 @@ class SatTimeSlotConf : public SimpleRefCount<SatTimeSlotConf>
 };
 
 /**
- * \ingroup satellite
- * \brief This class implements configuration for frames (for super frames)
+ * @ingroup satellite
+ * @brief This class implements configuration for frames (for super frames)
  */
 
 class SatFrameConf : public SimpleRefCount<SatFrameConf>
@@ -264,19 +264,19 @@ class SatFrameConf : public SimpleRefCount<SatFrameConf>
     static const uint16_t m_maxTimeSlotCount = SatConstVariables::MAXIMUM_TIME_SLOT_ID + 1;
 
     /**
-     * \brief Helper struct to reduce the number of parameters
+     * @brief Helper struct to reduce the number of parameters
      * fed into the SatFrameConf constructor
      *
-     * \param bandwidthHz           Bandwidth of the frame in hertz
-     * \param targetDuration        Target duration of the frame
-     * \param btuConf               BTU configuration of the frame
-     * \param waveformConf          Waveform configuration
-     * \param allocationChannel     Lower layer service configuration ID
-     * \param guardTimeSymbols      Number of symbols used for guard time
-     * \param isRandomAccess        Flag telling if random access frame
-     * \param m_isLogon             Flag telling if logon frame
-     * \param defaultWaveformInUse  Flag telling if default waveform should be used with frame
-     * \param checkSlotLimit        Flag telling if slot limit should be checked already in frame
+     * @param bandwidthHz           Bandwidth of the frame in hertz
+     * @param targetDuration        Target duration of the frame
+     * @param btuConf               BTU configuration of the frame
+     * @param waveformConf          Waveform configuration
+     * @param allocationChannel     Lower layer service configuration ID
+     * @param guardTimeSymbols      Number of symbols used for guard time
+     * @param isRandomAccess        Flag telling if random access frame
+     * @param m_isLogon             Flag telling if logon frame
+     * @param defaultWaveformInUse  Flag telling if default waveform should be used with frame
+     * @param checkSlotLimit        Flag telling if slot limit should be checked already in frame
      * creation phase
      */
     typedef struct
@@ -302,7 +302,7 @@ class SatFrameConf : public SimpleRefCount<SatFrameConf>
     /**
      * Constructor for SatFrameConf.
      *
-     * \param parameters  Parameters to construct the frame configuration with
+     * @param parameters  Parameters to construct the frame configuration with
      */
     SatFrameConf(SatFrameConfParams_t parameters);
 
@@ -314,24 +314,24 @@ class SatFrameConf : public SimpleRefCount<SatFrameConf>
     /**
      * Get time slot configuration of the frame. Possible values for id are from 0 to 2047.
      *
-     * \param index Id of the time slot requested in frame.
-     * \return      The requested time slot configuration of frame.
+     * @param index Id of the time slot requested in frame.
+     * @return      The requested time slot configuration of frame.
      */
     Ptr<SatTimeSlotConf> GetTimeSlotConf(uint16_t index) const;
 
     /**
      * Get time slot conf of the frame. Possible values for id are from 0 to Carrier count - 1.
      *
-     * \param carrierId Id of carrier which time slot is requested.
-     * \param index Id of the time slot requested in the carrier of the frame.
-     * \return The requested time slot configuration of frame.
+     * @param carrierId Id of carrier which time slot is requested.
+     * @param index Id of the time slot requested in the carrier of the frame.
+     * @return The requested time slot configuration of frame.
      */
     Ptr<SatTimeSlotConf> GetTimeSlotConf(uint16_t carrierId, uint16_t index) const;
 
     /**
      * Get bandwidth of the frame.
      *
-     * \return The bandwidth of frame in Hertz.
+     * @return The bandwidth of frame in Hertz.
      */
     inline double GetBandwidthHz() const
     {
@@ -341,7 +341,7 @@ class SatFrameConf : public SimpleRefCount<SatFrameConf>
     /**
      * Get duration of frame.
      *
-     * \return The duration of frame.
+     * @return The duration of frame.
      */
     inline Time GetDuration() const
     {
@@ -351,7 +351,7 @@ class SatFrameConf : public SimpleRefCount<SatFrameConf>
     /**
      * Get maximum symbols in carrier
      *
-     * \return maximum symbols in carrier
+     * @return maximum symbols in carrier
      */
     inline uint32_t GetCarrierMaxSymbols() const
     {
@@ -361,7 +361,7 @@ class SatFrameConf : public SimpleRefCount<SatFrameConf>
     /**
      * Get minimum payload of a carrier in bytes
      *
-     * \return minimum payload of a carrier in bytes
+     * @return minimum payload of a carrier in bytes
      */
     inline uint32_t GetCarrierMinPayloadInBytes() const
     {
@@ -371,22 +371,22 @@ class SatFrameConf : public SimpleRefCount<SatFrameConf>
     /**
      * Get carrier center frequency in frame.
      *
-     * \return The carrier bandwidth in frame in hertz.
+     * @return The carrier bandwidth in frame in hertz.
      */
     double GetCarrierFrequencyHz(uint16_t carrierId) const;
 
     /**
      * Get carrier bandwidth in frame.
      *
-     * \param bandwidthType Type of bandwidth requested.
-     * \return The carrier bandwidth in frame in hertz.
+     * @param bandwidthType Type of bandwidth requested.
+     * @return The carrier bandwidth in frame in hertz.
      */
     double GetCarrierBandwidthHz(SatEnums::CarrierBandwidthType_t bandwidthType) const;
 
     /**
      * Get wether this frame is subdivided or not.
      *
-     * \return true if this frame is subdivided, false otherwise.
+     * @return true if this frame is subdivided, false otherwise.
      */
     inline bool IsSubdivided() const
     {
@@ -397,7 +397,7 @@ class SatFrameConf : public SimpleRefCount<SatFrameConf>
     /**
      * Get the subdivision level of this frame.
      *
-     * \return the amount of time this frame add its carriers split in two.
+     * @return the amount of time this frame add its carriers split in two.
      */
     uint8_t GetSubdivisionLevel() const;
 
@@ -409,7 +409,7 @@ class SatFrameConf : public SimpleRefCount<SatFrameConf>
     /**
      * Get BTU conf of the frame.
      *
-     * \return The BTU conf of frame.
+     * @return The BTU conf of frame.
      */
     inline Ptr<SatBtuConf> GetBtuConf() const
     {
@@ -419,7 +419,7 @@ class SatFrameConf : public SimpleRefCount<SatFrameConf>
     /**
      * Get carrier count of the frame.
      *
-     * \return The carrier count of the frame.
+     * @return The carrier count of the frame.
      */
     inline uint16_t GetCarrierCount() const
     {
@@ -429,22 +429,22 @@ class SatFrameConf : public SimpleRefCount<SatFrameConf>
     /**
      * Get time slot count of the frame.
      *
-     * \return      The requested time slot count of frame.
+     * @return      The requested time slot count of frame.
      */
     uint16_t GetTimeSlotCount() const;
 
     /**
      * Get time slot of the specific carrier.
      *
-     * \param carrierId Id of the carrier which time slots are requested.
-     * \return  Container containing time slots.
+     * @param carrierId Id of the carrier which time slots are requested.
+     * @return  Container containing time slots.
      */
     SatTimeSlotConfContainer_t GetTimeSlotConfs(uint16_t carrierId) const;
 
     /**
      * Get state if frame is random access frame.
      *
-     * \return Is frame random access frame [true or false]
+     * @return Is frame random access frame [true or false]
      */
     inline bool IsRandomAccess() const
     {
@@ -454,7 +454,7 @@ class SatFrameConf : public SimpleRefCount<SatFrameConf>
     /**
      * Get state if frame is logon frame.
      *
-     * \return Is frame logon frame [true or false]
+     * @return Is frame logon frame [true or false]
      */
     inline bool IsLogon() const
     {
@@ -506,15 +506,15 @@ class SatFrameConf : public SimpleRefCount<SatFrameConf>
     /**
      * Add time slot.
      *
-     * \param conf  Time slot configuration added.
-     * \return ID of the added time slot.
+     * @param conf  Time slot configuration added.
+     * @return ID of the added time slot.
      */
     uint16_t AddTimeSlotConf(Ptr<SatTimeSlotConf> conf);
 };
 
 /**
- * \ingroup satellite
- * \brief This abstract class defines and implements interface of configuration for super frames
+ * @ingroup satellite
+ * @brief This abstract class defines and implements interface of configuration for super frames
  */
 class SatSuperframeConf : public Object
 {
@@ -553,15 +553,15 @@ class SatSuperframeConf : public Object
     /**
      * Create pre-configured super frame configuration-
      *
-     * \param conf Pre-configured super frame configuration to create
-     * \return Pointer to created super frame configuration
+     * @param conf Pre-configured super frame configuration to create
+     * @return Pointer to created super frame configuration
      */
     static Ptr<SatSuperframeConf> CreateSuperframeConf(SuperFrameConfiguration_t conf);
 
     /**
      * Template method to convert number to string
-     * \param number number to convert as string
-     * \return number as string
+     * @param number number to convert as string
+     * @return number as string
      */
     template <class T>
     static std::string GetNumberAsString(T number)
@@ -575,22 +575,16 @@ class SatSuperframeConf : public Object
     /**
      * Method to convert frame index to frame name.
      *
-     * \param index index to convert as frame name
-     * \return frame name
+     * @param index index to convert as frame name
+     * @return frame name
      */
     static std::string GetIndexAsFrameName(uint32_t index);
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
-
-    /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
-     */
-    virtual TypeId GetInstanceTypeId(void) const;
 
     /**
      * Default constructor for SatSuperframeConf
@@ -605,7 +599,7 @@ class SatSuperframeConf : public Object
     /**
      * Get bandwidth of the super frame.
      *
-     * \return The bandwidth of super frame in hertz.
+     * @return The bandwidth of super frame in hertz.
      */
     inline double GetBandwidthHz() const
     {
@@ -615,7 +609,7 @@ class SatSuperframeConf : public Object
     /**
      * Get duration of super frame.
      *
-     * \return The duration of super frame in seconds.
+     * @return The duration of super frame in seconds.
      */
     inline Time GetDuration() const
     {
@@ -625,44 +619,44 @@ class SatSuperframeConf : public Object
     /**
      * Get frame conf of the super frame.
      *
-     * \param id    Id of the frame requested.
-     * \return      The requested frame conf of the super frame.
+     * @param id    Id of the frame requested.
+     * @return      The requested frame conf of the super frame.
      */
     Ptr<SatFrameConf> GetFrameConf(uint8_t id) const;
 
     /**
      * Get carrier id of the super frame. Converts frame specific id to super frame specific id.
      *
-     * \param frameId         Id of the frame requested.
-     * \param frameCarrierId  Id of the carrier inside frame requested.
+     * @param frameId         Id of the frame requested.
+     * @param frameCarrierId  Id of the carrier inside frame requested.
      *
-     * \return The requested carrier id of the super frame.
+     * @return The requested carrier id of the super frame.
      */
     uint32_t GetCarrierId(uint8_t frameId, uint16_t frameCarrierId) const;
 
     /**
      * Get carrier count in the super frame.
      *
-     * \return The super frame carrier count.
+     * @return The super frame carrier count.
      */
     uint32_t GetCarrierCount() const;
 
     /**
      * Get the center frequency of the requested carrier.
      *
-     * \param carrierId  Id of the carrier inside super frame which center frequency is requested.
+     * @param carrierId  Id of the carrier inside super frame which center frequency is requested.
      *
-     * \return The center frequency of the requested carrier.
+     * @return The center frequency of the requested carrier.
      */
     double GetCarrierFrequencyHz(uint32_t carrierId) const;
 
     /**
      * Get the bandwidth of the requested carrier.
      *
-     * \param carrierId  Id of the carrier inside super frame which bandwidth is requested.
-     * \param bandwidthType Type of bandwidth requested.
+     * @param carrierId  Id of the carrier inside super frame which bandwidth is requested.
+     * @param bandwidthType Type of bandwidth requested.
      *
-     * \return The bandwidth of the requested carrier.
+     * @return The bandwidth of the requested carrier.
      */
     double GetCarrierBandwidthHz(uint32_t carrierId,
                                  SatEnums::CarrierBandwidthType_t bandwidthType) const;
@@ -670,17 +664,17 @@ class SatSuperframeConf : public Object
     /**
      * Get the frame configuration of the requested carrier.
      *
-     * \param carrierId  Id of the carrier inside super frame which frame configuration is
+     * @param carrierId  Id of the carrier inside super frame which frame configuration is
      * requested.
      *
-     * \return The SatFrameConf of the requested carrier.
+     * @return The SatFrameConf of the requested carrier.
      */
     Ptr<SatFrameConf> GetCarrierFrameConf(uint32_t carrierId) const;
 
     /**
      * Check if given carrier is random access carrier.
      *
-     * \param carrierId Id of the carrier inside super frame which is requested.
+     * @param carrierId Id of the carrier inside super frame which is requested.
      * @return true if carrier is random access, false otherwise
      */
     bool IsRandomAccessCarrier(uint32_t carrierId) const;
@@ -688,9 +682,9 @@ class SatSuperframeConf : public Object
     /**
      * Configures super frame configuration according to set attributes.
      *
-     * \param allocatedBandwidthHz Allocated bandwidth for super frame.
-     * \param targetDuration Target duration for super frame sequence
-     * \param waveformConf Wave Form Configuration
+     * @param allocatedBandwidthHz Allocated bandwidth for super frame.
+     * @param targetDuration Target duration for super frame sequence
+     * @param waveformConf Wave Form Configuration
      */
     void Configure(double allocatedBandwidthHz,
                    Time targetDuration,
@@ -705,23 +699,23 @@ class SatSuperframeConf : public Object
     /**
      * Get RA channel time slots
      *
-     * \param raChannel RA channel, which slot are requested
-     * \return RA channel time slots
+     * @param raChannel RA channel, which slot are requested
+     * @return RA channel time slots
      */
     SatFrameConf::SatTimeSlotConfContainer_t GetRaSlots(uint8_t raChannel);
 
     /**
      * Get RA channel time slot count
      *
-     * \param raChannel RA channel, which slot count is requested
-     * \return RA channel time slot count
+     * @param raChannel RA channel, which slot count is requested
+     * @return RA channel time slot count
      */
     uint16_t GetRaSlotCount(uint8_t raChannel);
 
     /**
      * Get the number of the RA channels in super frame configuration.
      *
-     * \return Number of the RA channels
+     * @return Number of the RA channels
      */
     uint8_t GetRaChannelCount() const;
 
@@ -729,38 +723,38 @@ class SatSuperframeConf : public Object
      * Get the RA channel id (index) corresponding to given (global) carrier id.
      * Note! In case that carrier id requested does not belong to RA frame, is O eturned.
      *
-     * \param carrierId
-     * \return RA channel id
+     * @param carrierId
+     * @return RA channel id
      */
     uint8_t GetRaChannel(uint32_t carrierId) const;
 
     /**
      * Get RA channel frame ID.
      *
-     * \param raChannel RA channel, which frame ID is requested
-     * \return RA channel frame ID
+     * @param raChannel RA channel, which frame ID is requested
+     * @return RA channel frame ID
      */
     uint8_t GetRaChannelFrameId(uint8_t raChannel) const;
 
     /**
      * Get RA channel allocation channel ID.
      *
-     * \param raChannel RA channel, which allocation channel ID is requested
-     * \return allocation channel ID
+     * @param raChannel RA channel, which allocation channel ID is requested
+     * @return allocation channel ID
      */
     uint8_t GetRaChannelAllocationChannelId(uint8_t raChannel) const;
 
     /**
      * Get the payload of the RA channel time slot in bytes.
      *
-     * \return Payload of the RA channel time slot [bytes]
+     * @return Payload of the RA channel time slot [bytes]
      */
     uint32_t GetRaChannelTimeSlotPayloadInBytes(uint8_t raChannel) const;
 
     /**
      * Set number of frames to be used in super frame.
      *
-     * \param frameCount Number of the frames in use
+     * @param frameCount Number of the frames in use
      */
     inline void SetFrameCount(uint8_t frameCount)
     {
@@ -770,7 +764,7 @@ class SatSuperframeConf : public Object
     /**
      * Get number of frames to be used in super frame.
      *
-     * \return Number of the frames in use
+     * @return Number of the frames in use
      */
     inline uint8_t GetFrameCount() const
     {
@@ -780,7 +774,7 @@ class SatSuperframeConf : public Object
     /**
      * Set frame configuration type to be used in super frame.
      *
-     * \param type Index of the frame configuration type
+     * @param type Index of the frame configuration type
      */
     inline void SetConfigType(SatSuperframeConf::ConfigType_t type)
     {
@@ -789,7 +783,7 @@ class SatSuperframeConf : public Object
 
     /**
      * Get frame configuration type to be used in super frame.
-     * \return the frame configuration type
+     * @return the frame configuration type
      */
     inline SatSuperframeConf::ConfigType_t GetConfigType() const
     {
@@ -860,15 +854,15 @@ class SatSuperframeConf : public Object
     /**
      * Get frame id where given global carrier ID belongs to.
      *
-     * \param carrierId Carried ID which frame ID is requested.
-     * \return frame id where given global carrier ID belongs to.
+     * @param carrierId Carried ID which frame ID is requested.
+     * @return frame id where given global carrier ID belongs to.
      */
     uint8_t GetCarrierFrame(uint32_t carrierId) const;
 
     /**
      * Add frame configuration to super frame configuration.
      *
-     * \param conf  Frame configuration to add super frame configuration
+     * @param conf  Frame configuration to add super frame configuration
      */
     void AddFrameConf(SatFrameConf::SatFrameConfParams_t frameConfParameters,
                       double bandwidthInHz,
@@ -968,23 +962,17 @@ class SatSuperframeConf : public Object
 };
 
 /**
- * \ingroup satellite
- * \brief This class implements super frame configuration 0
+ * @ingroup satellite
+ * @brief This class implements super frame configuration 0
  */
 class SatSuperframeConf0 : public SatSuperframeConf
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
-
-    /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
-     */
-    virtual TypeId GetInstanceTypeId(void) const;
 
     /**
      * Default constructor for SatSuperframeConf
@@ -1002,23 +990,17 @@ class SatSuperframeConf0 : public SatSuperframeConf
 };
 
 /**
- * \ingroup satellite
- * \brief This class implements super frame configuration 1
+ * @ingroup satellite
+ * @brief This class implements super frame configuration 1
  */
 class SatSuperframeConf1 : public SatSuperframeConf
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
-
-    /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
-     */
-    virtual TypeId GetInstanceTypeId(void) const;
 
     /**
      * Default constructor for SatSuperframeConf
@@ -1036,24 +1018,18 @@ class SatSuperframeConf1 : public SatSuperframeConf
 };
 
 /**
- * \ingroup satellite
- * \brief This class implements sup./ns3/satellite-frame-conf.h: In member function ‘double
+ * @ingroup satellite
+ * @brief This class implements sup./ns3/satellite-frame-conf.h: In member function ‘double
  * ns3::SatSuperframeConf::GetFrame0RandomAccess() const’: er frame configuration 2
  */
 class SatSuperframeConf2 : public SatSuperframeConf
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
-
-    /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
-     */
-    virtual TypeId GetInstanceTypeId(void) const;
 
     /**
      * Default constructor for SatSuperframeConf
@@ -1071,23 +1047,17 @@ class SatSuperframeConf2 : public SatSuperframeConf
 };
 
 /**
- * \ingroup satellite
- * \brief This class implements super frame configuration 3
+ * @ingroup satellite
+ * @brief This class implements super frame configuration 3
  */
 class SatSuperframeConf3 : public SatSuperframeConf
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
-
-    /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
-     */
-    virtual TypeId GetInstanceTypeId(void) const;
 
     /**
      * Default constructor for SatSuperframeConf
@@ -1105,23 +1075,17 @@ class SatSuperframeConf3 : public SatSuperframeConf
 };
 
 /**
- * \ingroup satellite
- * \brief This class implements super frame configuration 4
+ * @ingroup satellite
+ * @brief This class implements super frame configuration 4
  */
 class SatSuperframeConf4 : public SatSuperframeConf
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
-
-    /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
-     */
-    virtual TypeId GetInstanceTypeId(void) const;
 
     /**
      * Default constructor for SatSuperframeConf

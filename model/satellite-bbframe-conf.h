@@ -24,10 +24,10 @@
 #include "satellite-enums.h"
 #include "satellite-link-results.h"
 
-#include <ns3/nstime.h>
-#include <ns3/object.h>
-#include <ns3/ptr.h>
-#include <ns3/simple-ref-count.h>
+#include "ns3/nstime.h"
+#include "ns3/object.h"
+#include "ns3/ptr.h"
+#include "ns3/simple-ref-count.h"
 
 #include <map>
 #include <stdint.h>
@@ -41,9 +41,9 @@ namespace ns3
 class SatLinkResultsDvbS2;
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief This class implements the content of one individual DVB-S2 waveform.
+ * @brief This class implements the content of one individual DVB-S2 waveform.
  * Waveform is defined by modulation scheme, coding rate, payload size in bytes and
  * frame duration in Time.
  */
@@ -57,11 +57,11 @@ class SatDvbS2Waveform : public SimpleRefCount<SatDvbS2Waveform>
     SatDvbS2Waveform();
 
     /**
-     * \brief Constructor for SatWaveform
-     * \param modcod MODCOD
-     * \param fType BB frame type (short, normal)
-     * \param frameLen BB frame length in Time
-     * \param payloadBits Payload in bits
+     * @brief Constructor for SatWaveform
+     * @param modcod MODCOD
+     * @param fType BB frame type (short, normal)
+     * @param frameLen BB frame length in Time
+     * @param payloadBits Payload in bits
      */
     SatDvbS2Waveform(SatEnums::SatModcod_t modcod,
                      SatEnums::SatBbFrameType_t fType,
@@ -69,44 +69,44 @@ class SatDvbS2Waveform : public SimpleRefCount<SatDvbS2Waveform>
                      uint32_t payloadBits);
 
     /**
-     * \brief Get MODCOD of this waveform
-     * \return MODCOD enum
+     * @brief Get MODCOD of this waveform
+     * @return MODCOD enum
      */
     SatEnums::SatModcod_t GetModcod() const;
 
     /**
-     * \brief Get BB frame type
-     * \return BB frame type enum
+     * @brief Get BB frame type
+     * @return BB frame type enum
      */
     SatEnums::SatBbFrameType_t GetBbFrameType() const;
 
     /**
-     * \brief Get payload of this waveform in bits
-     * \return Payload in bits
+     * @brief Get payload of this waveform in bits
+     * @return Payload in bits
      */
     uint32_t GetPayloadInBits() const;
 
     /**
-     * \brief Get the frame duration in Time
-     * \return Frame duration in Time
+     * @brief Get the frame duration in Time
+     * @return Frame duration in Time
      */
     Time GetFrameDuration() const;
 
     /**
-     * \brief Set the C/No requirement of the waveform  in linear domain.
+     * @brief Set the C/No requirement of the waveform  in linear domain.
      * based on the used link results.
-     * \param cnoRequirement C/No Requirement
+     * @param cnoRequirement C/No Requirement
      */
     void SetCNoRequirement(double cnoRequirement);
 
     /**
-     * \brief Get C/No requirement corresponding a given BLER target.
-     * \return C/No threshold in linear format
+     * @brief Get C/No requirement corresponding a given BLER target.
+     * @return C/No threshold in linear format
      */
     double GetCNoRequirement() const;
 
     /**
-     * \brief Dump the contents of the waveform.
+     * @brief Dump the contents of the waveform.
      */
     void Dump() const;
 
@@ -139,9 +139,9 @@ class SatDvbS2Waveform : public SimpleRefCount<SatDvbS2Waveform>
 };
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief This class implements the BB Frame configurations for DVB-S2. Available
+ * @brief This class implements the BB Frame configurations for DVB-S2. Available
  * waveforms are for two BB frame types (short and normal) and for all supported
  * DVB-S2 MODCODs defined in SatEnums.
  */
@@ -155,9 +155,19 @@ class SatBbFrameConf : public Object
 
     /**
      * SatBbFrameConf constructor
-     * \param symbolRate Symbol rate in baud
+     * @param symbolRate Symbol rate in baud
      */
     SatBbFrameConf(double symbolRate, SatEnums::DvbVersion_t dvbVersion);
+
+    /**
+     * Notifier called once the ObjectBase is fully constructed.
+     *
+     * This method is invoked once all member attributes have been
+     * initialized. Subclasses can override this method to be notified
+     * of this event but if they do this, they must chain up to their
+     * parent's NotifyConstructionCompleted method.
+     */
+    virtual void NotifyConstructionCompleted() override;
 
     /**
      * Destructor for SatBbFrameConf
@@ -165,16 +175,10 @@ class SatBbFrameConf : public Object
     virtual ~SatBbFrameConf();
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
-
-    /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
-     */
-    virtual TypeId GetInstanceTypeId(void) const;
 
     /**
      * Define type waveformMap_t
@@ -184,9 +188,9 @@ class SatBbFrameConf : public Object
         waveformMap_t;
 
     /**
-     * \brief Get BB frame header size in bytes.
+     * @brief Get BB frame header size in bytes.
      *
-     * \return BB frame header size in bytes
+     * @return BB frame header size in bytes
      */
     inline uint32_t GetBbFrameHeaderSizeInBytes() const
     {
@@ -194,9 +198,9 @@ class SatBbFrameConf : public Object
     }
 
     /**
-     * \brief Get configured BB frame high occupancy threshold.
+     * @brief Get configured BB frame high occupancy threshold.
      *
-     * \return BB frame high occupancy threshold
+     * @return BB frame high occupancy threshold
      */
     inline double GetBbFrameHighOccupancyThreshold() const
     {
@@ -204,9 +208,9 @@ class SatBbFrameConf : public Object
     }
 
     /**
-     * \brief Get configured BB frame low occupancy threshold.
+     * @brief Get configured BB frame low occupancy threshold.
      *
-     * \return BB frame low occupancy threshold
+     * @return BB frame low occupancy threshold
      */
     inline double GetBbFrameLowOccupancyThreshold() const
     {
@@ -216,7 +220,7 @@ class SatBbFrameConf : public Object
     /**
      * Get configured BB frame usage mode.
      *
-     * \return BB frame usage mode
+     * @return BB frame usage mode
      */
     inline SatEnums::BbFrameUsageMode_t GetBbFrameUsageMode() const
     {
@@ -224,111 +228,111 @@ class SatBbFrameConf : public Object
     }
 
     /**
-     * \brief Initialize the C/No requirements for a given BLER target.
+     * @brief Initialize the C/No requirements for a given BLER target.
      *
-     * \param linkResults DVB-S2, DVB-S2X or DVB-RCS2 link results
+     * @param linkResults DVB-S2, DVB-S2X or DVB-RCS2 link results
      */
     void InitializeCNoRequirements(Ptr<SatLinkResultsFwd> linkResults);
 
     /**
-     * \brief Get the dummy frame duration in Time.
+     * @brief Get the dummy frame duration in Time.
      *
-     * \return The dummy BBFrame length in Time
+     * @return The dummy BBFrame length in Time
      */
     Time GetDummyBbFrameDuration() const;
 
     /**
-     * \brief Get the BB frame frame duration.
+     * @brief Get the BB frame frame duration.
      *
-     * \param modcod MODCOD
-     * \param frameType BB frame type: short, normal
+     * @param modcod MODCOD
+     * @param frameType BB frame type: short, normal
      */
     Time GetBbFrameDuration(SatEnums::SatModcod_t modcod,
                             SatEnums::SatBbFrameType_t frameType) const;
 
     /**
-     * \brief Symbol rate in baud
+     * @brief Symbol rate in baud
      *
-     * \return Symbol rate in baud
+     * @return Symbol rate in baud
      */
     double GetSymbolRate();
 
     /**
-     * \brief Get the BB frame payload in bits.
-     * \param modcod MODCOD
-     * \param frameType BB frame type: short, normal
+     * @brief Get the BB frame payload in bits.
+     * @param modcod MODCOD
+     * @param frameType BB frame type: short, normal
      */
     uint32_t GetBbFramePayloadBits(SatEnums::SatModcod_t modcod,
                                    SatEnums::SatBbFrameType_t frameType) const;
 
     /**
-     * \brief Get the best MODCOD with a given BB frame type.
-     * \param cNo C/No of the UT to be scheduled
-     * \param frameType Used BBFrame type (short OR normal)
-     * \return SatModcod_t The best MODCOD
+     * @brief Get the best MODCOD with a given BB frame type.
+     * @param cNo C/No of the UT to be scheduled
+     * @param frameType Used BBFrame type (short OR normal)
+     * @return SatModcod_t The best MODCOD
      */
     SatEnums::SatModcod_t GetBestModcod(double cNo, SatEnums::SatBbFrameType_t frameType) const;
 
     /**
      * Get the default MODCOD for short DVB-S2X frames
-     * \return SatModcod_t The default MODCOD for short DVB-S2X frames
+     * @return SatModcod_t The default MODCOD for short DVB-S2X frames
      */
     SatEnums::SatModcod_t GetDefaultModCodDummyFramesS2X() const;
 
     /**
      * Get the default MODCOD
-     * \return SatModcod_t The default MODCOD
+     * @return SatModcod_t The default MODCOD
      */
     SatEnums::SatModcod_t GetDefaultModCod() const;
 
     /**
-     * \brief Get the most robust MODCOD with a given BB frame type.
-     * \param frameType Used BBFrame type (short OR normal)
-     * \return SatModcod_t The most robust MODCOD
+     * @brief Get the most robust MODCOD with a given BB frame type.
+     * @param frameType Used BBFrame type (short OR normal)
+     * @return SatModcod_t The most robust MODCOD
      */
     SatEnums::SatModcod_t GetMostRobustModcod(SatEnums::SatBbFrameType_t frameType) const;
 
     /**
-     * \brief Dump waveform details for debugging purposes
+     * @brief Dump waveform details for debugging purposes
      */
     void DumpWaveforms() const;
 
     /**
-     * \brief Indicates if using DVB-S2 or DVB-S2X
+     * @brief Indicates if using DVB-S2 or DVB-S2X
      *
-     * \return The DVB version chosen
+     * @return The DVB version chosen
      */
     SatEnums::DvbVersion_t GetDvbVersion();
 
     /**
-     * \brief Get the list of ModCods used.
+     * @brief Get the list of ModCods used.
      *
-     * \return All the ModCods used in this conf.
+     * @return All the ModCods used in this conf.
      */
     std::vector<SatEnums::SatModcod_t> GetModCodsUsed();
 
   private:
     /**
-     * \brief Calculate the BBrame higher layer payload in bits.
-     * \param modcod Used MODCOD in the BBFrame
-     * \param frameType Used BBFrame type (short OR normal)
-     * \return The maximum payload in bits
+     * @brief Calculate the BBrame higher layer payload in bits.
+     * @param modcod Used MODCOD in the BBFrame
+     * @param frameType Used BBFrame type (short OR normal)
+     * @return The maximum payload in bits
      */
     uint32_t CalculateBbFramePayloadBits(SatEnums::SatModcod_t modcod,
                                          SatEnums::SatBbFrameType_t frameType) const;
 
     /**
-     * \brief Calculate the BBFrame duration in Time
-     * \param modcod Used MODCOD in the BBFrame
-     * \param frameType Used BBFrame type (short OR normal)
-     * \param symbolRate The symbol rate of the scheduled carrier
-     * \return The BBFrame duration in Time
+     * @brief Calculate the BBFrame duration in Time
+     * @param modcod Used MODCOD in the BBFrame
+     * @param frameType Used BBFrame type (short OR normal)
+     * @param symbolRate The symbol rate of the scheduled carrier
+     * @return The BBFrame duration in Time
      */
     Time CalculateBbFrameDuration(SatEnums::SatModcod_t modcod,
                                   SatEnums::SatBbFrameType_t frameType) const;
 
     /**
-     * \brief Get the list of ModCods from their string representation.
+     * @brief Get the list of ModCods from their string representation.
      */
     void GetModCodsList();
 

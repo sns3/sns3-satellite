@@ -32,19 +32,18 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief Satellite constant interference.
+ * @ingroup satellite
+ * @brief Satellite constant interference.
  *        Interference is constant until set again by an attribute.
  */
 class SatConstantInterference : public SatInterference
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
-    TypeId GetInstanceTypeId(void) const;
 
     /**
      * Default constructor.
@@ -61,11 +60,11 @@ class SatConstantInterference : public SatInterference
      * Adds interference power to interference object.
      * No effect in this implementation.
      *
-     * \param rxDuration Duration of the receiving.
-     * \param rxPower Receiving power.
-     * \param rxAddress
+     * @param rxDuration Duration of the receiving.
+     * @param rxPower Receiving power.
+     * @param rxAddress
      *
-     * \return the pointer to interference event as a reference of the addition
+     * @return the pointer to interference event as a reference of the addition
      */
     virtual Ptr<SatInterference::InterferenceChangeEvent> DoAdd(Time rxDuration,
                                                                 double rxPower,
@@ -77,9 +76,9 @@ class SatConstantInterference : public SatInterference
      * Just return constant value set by Set method in this implementation.
      * finalPower is set to returned value.
      *
-     * \param event Reference event which for interference is calculated.
+     * @param event Reference event which for interference is calculated.
      *
-     * \return Final power value at end of receiving
+     * @return Final power value at end of receiving
      */
     virtual std::vector<std::pair<double, double>> DoCalculate(
         Ptr<SatInterference::InterferenceChangeEvent> event);
@@ -92,14 +91,14 @@ class SatConstantInterference : public SatInterference
     /**
      * Notifies that RX is started by a receiver.
      *
-     * \param event Interference reference event of receiver (ignored in this implementation)
+     * @param event Interference reference event of receiver (ignored in this implementation)
      */
     virtual void DoNotifyRxStart(Ptr<SatInterference::InterferenceChangeEvent> event);
 
     /**
      * Notifies that RX is ended by a receiver.
      *
-     * \param event Interference reference event of receiver (ignored in this implementation)
+     * @param event Interference reference event of receiver (ignored in this implementation)
      */
     virtual void DoNotifyRxEnd(Ptr<SatInterference::InterferenceChangeEvent> event);
 

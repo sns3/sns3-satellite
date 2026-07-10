@@ -28,9 +28,9 @@
 using namespace ns3;
 
 /**
- * \file sat-nrtv-example.cc
- * \ingroup satellite
- * \brief Example of using NRTV traffic model in a satellite network.
+ * @file sat-nrtv-example.cc
+ * @ingroup satellite
+ * @brief Example of using NRTV traffic model in a satellite network.
  *
  * One NRTV server application is installed in the first GW user. Then one NRTV
  * client application is installed in each UT user, configured to point to the

@@ -20,7 +20,7 @@
 #ifndef SATELLITE_MARKOV_MODEL_H
 #define SATELLITE_MARKOV_MODEL_H
 
-#include <ns3/object.h>
+#include "ns3/object.h"
 
 #include <stdint.h>
 
@@ -28,9 +28,9 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief Class for Markov state machine. This class implements the state machine
+ * @brief Class for Markov state machine. This class implements the state machine
  * for Markov-model and is responsible for evaluating the state changes within
  * the state machine.
  */
@@ -38,77 +38,77 @@ class SatMarkovModel : public Object
 {
   public:
     /**
-     * \brief NS-3 function for type id
-     * \return type id
+     * @brief NS-3 function for type id
+     * @return type id
      */
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Constructor
+     * @brief Constructor
      */
     SatMarkovModel();
 
     /**
-     * \brief Constructor
-     * \param numOfStates Number of states.
-     * \param initialState Initial state of the model.
+     * @brief Constructor
+     * @param numOfStates Number of states.
+     * @param initialState Initial state of the model.
      */
     SatMarkovModel(uint32_t numOfStates, uint32_t initialState);
 
     /**
-     * \brief Destructor
+     * @brief Destructor
      */
     ~SatMarkovModel();
 
     /**
-     * \brief Function for setting the probability values
-     * \param from start state
-     * \param to end state
-     * \param probability change probability
+     * @brief Function for setting the probability values
+     * @param from start state
+     * @param to end state
+     * @param probability change probability
      */
     void SetProbability(uint32_t from, uint32_t to, double probability);
 
     /**
-     * \brief Function for evaluating the state change
-     * \return new state
+     * @brief Function for evaluating the state change
+     * @return new state
      */
     uint32_t DoTransition();
 
     /**
-     * \brief Function for returning the current state
-     * \return current state
+     * @brief Function for returning the current state
+     * @return current state
      */
     uint32_t GetState() const;
 
     /**
-     * \brief Function for setting the state
-     * \param newState new state
+     * @brief Function for setting the state
+     * @param newState new state
      */
     void SetState(uint32_t newState);
 
     /**
-     *  \brief Do needed dispose actions.
+     *  @brief Do needed dispose actions.
      */
     void DoDispose();
 
   private:
     /**
-     * \brief Markov state change probabilities
+     * @brief Markov state change probabilities
      */
     double* m_probabilities;
 
     /**
-     * \brief Number of states
+     * @brief Number of states
      */
     uint32_t m_numOfStates;
 
     /**
-     * \brief Current state
+     * @brief Current state
      */
     uint32_t m_currentState;
 
     /**
-     * \brief Clear used variables
+     * @brief Clear used variables
      */
     void Reset();
 };

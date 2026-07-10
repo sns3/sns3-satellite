@@ -27,17 +27,17 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief Satellite mobility model for which the current position does not change
+ * @brief Satellite mobility model for which the current position does not change
  * once it has been set and until it is set again explicitly to a new value.
  */
 class SatConstantPositionMobilityModel : public SatMobilityModel
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
     /**
@@ -49,6 +49,12 @@ class SatConstantPositionMobilityModel : public SatMobilityModel
      * Destructor for SatConstantPositionMobilityModel
      */
     virtual ~SatConstantPositionMobilityModel();
+
+    // Inherited from MobilityModel
+    Ptr<MobilityModel> Copy() const override
+    {
+        return CreateObject<SatConstantPositionMobilityModel>(*this);
+    }
 
   private:
     Vector DoGetVelocity(void) const;

@@ -21,10 +21,10 @@
 #ifndef SATELLITE_INTERFERENCE_H
 #define SATELLITE_INTERFERENCE_H
 
-#include <ns3/mac48-address.h>
-#include <ns3/nstime.h>
-#include <ns3/object.h>
-#include <ns3/simple-ref-count.h>
+#include "ns3/mac48-address.h"
+#include "ns3/nstime.h"
+#include "ns3/object.h"
+#include "ns3/simple-ref-count.h"
 
 #include <map>
 #include <stdint.h>
@@ -35,8 +35,8 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief Abstract class defining interface for interference calculations objects
+ * @ingroup satellite
+ * @brief Abstract class defining interface for interference calculations objects
  */
 class SatInterference : public Object
 {
@@ -49,10 +49,10 @@ class SatInterference : public Object
       public:
         /**
          * Constructor of Event for satellite interference
-         * \param id identifier of the event
-         * \param duration duration of the interference event
-         * \param rxPower  RX power of interference
-         * \param satEarthStationAddress Address of the related earth station
+         * @param id identifier of the event
+         * @param duration duration of the interference event
+         * @param rxPower  RX power of interference
+         * @param satEarthStationAddress Address of the related earth station
          */
         InterferenceChangeEvent(uint32_t id,
                                 Time duration,
@@ -65,32 +65,32 @@ class SatInterference : public Object
         ~InterferenceChangeEvent();
 
         /**
-         * \return id identifier of the event
+         * @return id identifier of the event
          */
         uint32_t GetId(void) const;
 
         /**
-         * \return duration of the interference event
+         * @return duration of the interference event
          */
         Time GetDuration(void) const;
 
         /**
-         * \return start time of the interference event
+         * @return start time of the interference event
          */
         Time GetStartTime(void) const;
 
         /**
-         * \return end time of the interference event
+         * @return end time of the interference event
          */
         Time GetEndTime(void) const;
 
         /**
-         * \return RX power of the interference event
+         * @return RX power of the interference event
          */
         double GetRxPower(void) const;
 
         /**
-         * \return Terrestrial node MAC address of the interference event
+         * @return Terrestrial node MAC address of the interference event
          */
         Address GetSatEarthStationAddress(void) const;
 
@@ -108,11 +108,6 @@ class SatInterference : public Object
     static TypeId GetTypeId(void);
 
     /**
-     * Derived from Object
-     */
-    TypeId GetInstanceTypeId(void) const;
-
-    /**
      * Constructor for Satellite interference base class
      */
     SatInterference();
@@ -126,11 +121,11 @@ class SatInterference : public Object
      * Adds interference power to interference object.
      * Behavior depends on class actually implementing interference.
      *
-     * \param rxDuration Duration of the receiving.
-     * \param rxPower Receiving power.
-     * \param rxAddress MAC address.
+     * @param rxDuration Duration of the receiving.
+     * @param rxPower Receiving power.
+     * @param rxAddress MAC address.
      *
-     * \return the pointer to interference event as a reference of the addition
+     * @return the pointer to interference event as a reference of the addition
      */
     Ptr<SatInterference::InterferenceChangeEvent> Add(Time rxDuration,
                                                       double rxPower,
@@ -139,8 +134,8 @@ class SatInterference : public Object
     /**
      * Calculates interference power for the given reference
      *
-     * \param event Reference event which for interference is calculated.
-     * \return Calculated power value at end of receiving
+     * @param event Reference event which for interference is calculated.
+     * @return Calculated power value at end of receiving
      */
     std::vector<std::pair<double, double>> Calculate(
         Ptr<SatInterference::InterferenceChangeEvent> event);
@@ -152,20 +147,20 @@ class SatInterference : public Object
 
     /**
      * Notifies that RX is started by a receiver.
-     * \param event Interference reference event of receiver
+     * @param event Interference reference event of receiver
      */
     virtual void NotifyRxStart(Ptr<SatInterference::InterferenceChangeEvent> event);
 
     /**
      * Notifies that RX is ended by a receiver.
-     * \param event Interference reference event of receiver
+     * @param event Interference reference event of receiver
      */
     virtual void NotifyRxEnd(Ptr<SatInterference::InterferenceChangeEvent> event);
 
     /**
      * Checks whether the packet has collided. Used by random access
-     * \param event Interference reference event of receiver
-     * \return has the packet collided
+     * @param event Interference reference event of receiver
+     * @return has the packet collided
      */
     virtual bool HasCollision(Ptr<SatInterference::InterferenceChangeEvent> event);
 
@@ -173,11 +168,11 @@ class SatInterference : public Object
     /**
      * Adds interference power to interference object.
      *
-     * \param rxDuration Duration of the receiving.
-     * \param rxPower Receiving power.
-     * \param rxAddress MAC address.
+     * @param rxDuration Duration of the receiving.
+     * @param rxPower Receiving power.
+     * @param rxAddress MAC address.
      *
-     * \return the pointer to interference event as a reference of the addition
+     * @return the pointer to interference event as a reference of the addition
      *
      * Concrete subclasses of this base class must implement this method.
      */
@@ -189,8 +184,8 @@ class SatInterference : public Object
      * Calculates interference power for the given reference
      * Sets final power at end time to finalPower.
      *
-     * \param event Reference event which for interference is calculated.
-     * \return Final power value at end of receiving
+     * @param event Reference event which for interference is calculated.
+     * @return Final power value at end of receiving
      *
      * Concrete subclasses of this base class must implement this method.
      */
@@ -209,7 +204,7 @@ class SatInterference : public Object
      *
      * Concrete subclasses of this base class must implement this method.
      *
-     * \param event Interference reference event of receiver
+     * @param event Interference reference event of receiver
      */
     virtual void DoNotifyRxStart(Ptr<SatInterference::InterferenceChangeEvent> event) = 0;
 
@@ -218,7 +213,7 @@ class SatInterference : public Object
      *
      * Concrete subclasses of this base class must implement this method.
      *
-     * \param event Interference reference event of receiver
+     * @param event Interference reference event of receiver
      */
     virtual void DoNotifyRxEnd(Ptr<SatInterference::InterferenceChangeEvent> event) = 0;
 

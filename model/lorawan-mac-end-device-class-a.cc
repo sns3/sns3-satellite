@@ -31,8 +31,8 @@
 #include "satellite-lorawan-net-device.h"
 #include "satellite-phy.h"
 
-#include <ns3/log.h>
-#include <ns3/pointer.h>
+#include "ns3/log.h"
+#include "ns3/pointer.h"
 
 #include <algorithm>
 
@@ -75,12 +75,6 @@ LorawanMacEndDeviceClassA::GetTypeId(void)
     return tid;
 }
 
-TypeId
-LorawanMacEndDeviceClassA::GetInstanceTypeId(void) const
-{
-    return GetTypeId();
-}
-
 LorawanMacEndDeviceClassA::LorawanMacEndDeviceClassA()
 {
     NS_FATAL_ERROR("Default constructor not in use");
@@ -99,8 +93,14 @@ LorawanMacEndDeviceClassA::LorawanMacEndDeviceClassA(Ptr<Node> node,
       m_rx1DrOffset(0)
 {
     NS_LOG_FUNCTION(this);
+}
 
-    ObjectBase::ConstructSelf(AttributeConstructionList());
+void
+LorawanMacEndDeviceClassA::NotifyConstructionCompleted()
+{
+    NS_LOG_FUNCTION(this);
+
+    LorawanMacEndDevice::NotifyConstructionCompleted();
 
     NS_ASSERT_MSG(m_secondWindowDelay > m_firstWindowDelay + m_firstWindowDuration,
                   "Second window must open after first one is closed");
@@ -495,8 +495,7 @@ LorawanMacEndDeviceClassA::CloseFirstReceiveWindow(void)
     switch (m_phyRx->GetState())
     {
     case SatLoraPhyRx::TX:
-        NS_ABORT_MSG("PHY was in TX mode when attempting to "
-                     << "close a receive window.");
+        NS_ABORT_MSG("PHY was in TX mode when attempting to " << "close a receive window.");
         break;
     case SatLoraPhyRx::RX:
         // PHY is receiving: let it finish. The Receive method will switch it back to SLEEP.
@@ -624,8 +623,8 @@ LorawanMacEndDeviceClassA::GetNextClassTransmissionDelay(Time waitingTime)
         if (!m_closeFirstWindow.IsExpired() || !m_closeSecondWindow.IsExpired() ||
             !m_secondReceiveWindow.IsExpired())
         {
-            NS_LOG_WARN("Attempting to send when there are receive windows:"
-                        << " Transmission postponed.");
+            NS_LOG_WARN(
+                "Attempting to send when there are receive windows:" << " Transmission postponed.");
             // Compute the duration of a single symbol for the second receive window DR
             double tSym = pow(2, GetSfFromDataRate(GetSecondReceiveWindowDataRate())) /
                           GetBandwidthFromDataRate(GetSecondReceiveWindowDataRate());

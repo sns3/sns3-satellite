@@ -24,11 +24,11 @@
 
 #include "satellite-stats-helper.h"
 
-#include <ns3/address.h>
-#include <ns3/collector-map.h>
-#include <ns3/ptr.h>
-#include <ns3/satellite-enums.h>
-#include <ns3/satellite-phy-rx-carrier.h>
+#include "ns3/address.h"
+#include "ns3/collector-map.h"
+#include "ns3/ptr.h"
+#include "ns3/satellite-enums.h"
+#include "ns3/satellite-phy-rx-carrier.h"
 
 #include <map>
 #include <string>
@@ -45,8 +45,8 @@ class DataCollectionObject;
 class Probe;
 
 /**
- * \ingroup satstats
- * \brief Base class for packet error statistics helpers.
+ * @ingroup satstats
+ * @brief Base class for packet error statistics helpers.
  */
 class SatStatsPacketErrorHelper : public SatStatsHelper
 {
@@ -65,27 +65,27 @@ class SatStatsPacketErrorHelper : public SatStatsHelper
     static TypeId GetTypeId();
 
     /**
-     * \brief Receive inputs from trace sources and determine the right collector
+     * @brief Receive inputs from trace sources and determine the right collector
      *        to forward the inputs to.
-     * \param nPackets number of packets in the received packet burst.
-     * \param fromOrTo the source or destination address of the packet.
-     * \param isError whether a PHY error has occurred.
+     * @param nPackets number of packets in the received packet burst.
+     * @param fromOrTo the source or destination address of the packet.
+     * @param isError whether a PHY error has occurred.
      *
      * Used only in return link.
      */
     void ErrorRxCallback(uint32_t nPackets, const Address& fromOrTo, bool isError);
 
     /**
-     * \brief Connect the probe to the right collector.
-     * \param probe
-     * \param identifier
+     * @brief Connect the probe to the right collector.
+     * @param probe
+     * @param identifier
      */
     bool ConnectProbeToCollector(Ptr<Probe> probe, uint32_t identifier);
 
     /**
-     * \brief Disconnect the probe from the right collector.
-     * \param probe
-     * \param identifier
+     * @brief Disconnect the probe from the right collector.
+     * @param probe
+     * @param identifier
      */
     bool DisconnectProbeFromCollector(Ptr<Probe> probe, uint32_t identifier);
 
@@ -95,28 +95,28 @@ class SatStatsPacketErrorHelper : public SatStatsHelper
     virtual void UpdateIdentifierOnProbes();
 
     /**
-     * \param traceSourceName name of trace source of PHY RX carrier to listen to.
+     * @param traceSourceName name of trace source of PHY RX carrier to listen to.
      */
     void SetTraceSourceName(std::string traceSourceName);
 
     /**
-     * \return name of trace source of PHY RX carrier to listen to.
+     * @return name of trace source of PHY RX carrier to listen to.
      */
     std::string GetTraceSourceName() const;
 
     /**
-     * \param channelType link where statistics are gathered from.
+     * @param channelType link where statistics are gathered from.
      */
     void SetChannelType(SatEnums::ChannelType_t channelType);
 
     /**
-     * \return link where statistics are gathered from.
+     * @return link where statistics are gathered from.
      */
     SatEnums::ChannelType_t GetChannelType() const;
 
     /**
-     * \brief Get the valid carrier type
-     * \return the valid carrier type
+     * @brief Get the valid carrier type
+     * @return the valid carrier type
      */
     inline SatPhyRxCarrier::CarrierType GetValidCarrierType() const
     {
@@ -128,8 +128,8 @@ class SatStatsPacketErrorHelper : public SatStatsHelper
     void DoInstall();
 
     /**
-     * \brief Set valid carrier type for this statistics helper type.
-     * \param carrierType
+     * @brief Set valid carrier type for this statistics helper type.
+     * @param carrierType
      */
     inline void SetValidCarrierType(SatPhyRxCarrier::CarrierType carrierType)
     {
@@ -138,30 +138,30 @@ class SatStatsPacketErrorHelper : public SatStatsHelper
 
   private:
     /**
-     * \brief Set up several listeners on a GW node and connect them to the
+     * @brief Set up several listeners on a GW node and connect them to the
      *        collectors.
-     * \param gwNode
+     * @param gwNode
      */
     void InstallProbeOnGw(Ptr<Node> gwNode);
 
     /**
-     * \brief Set up several listeners on a SAT feeder node and connect them to the
+     * @brief Set up several listeners on a SAT feeder node and connect them to the
      *        collectors.
-     * \param satNode
+     * @param satNode
      */
     void InstallProbeOnSatFeeder(Ptr<Node> satNode);
 
     /**
-     * \brief Set up several listeners on a SAT user node and connect them to the
+     * @brief Set up several listeners on a SAT user node and connect them to the
      *        collectors.
-     * \param satNode
+     * @param satNode
      */
     void InstallProbeOnSatUser(Ptr<Node> satNode);
 
     /**
-     * \brief Set up several probes on a UT node and connect them to the
+     * @brief Set up several probes on a UT node and connect them to the
      *        collectors.
-     * \param utNode
+     * @param utNode
      */
     void InstallProbeOnUt(Ptr<Node> utNode);
 
@@ -188,20 +188,20 @@ class SatStatsPacketErrorHelper : public SatStatsHelper
 // FORWARD FEEDER LINK DEDICATED ACCESS //////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce packet error statistics of Dedicated Access in forward feeder link
+ * @ingroup satstats
+ * @brief Produce packet error statistics of Dedicated Access in forward feeder link
  *        from a satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFwdFeederDaPacketErrorHelper> s = Create<SatStatsFwdFeederDaPacketErrorHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFwdFeederDaPacketErrorHelper : public SatStatsPacketErrorHelper
 {
@@ -223,20 +223,20 @@ class SatStatsFwdFeederDaPacketErrorHelper : public SatStatsPacketErrorHelper
 // FORWARD USER LINK DEDICATED ACCESS //////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce packet error statistics of Dedicated Access in forward user link
+ * @ingroup satstats
+ * @brief Produce packet error statistics of Dedicated Access in forward user link
  *        from a satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFwdUserDaPacketErrorHelper> s = Create<SatStatsFwdUserDaPacketErrorHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFwdUserDaPacketErrorHelper : public SatStatsPacketErrorHelper
 {
@@ -258,20 +258,20 @@ class SatStatsFwdUserDaPacketErrorHelper : public SatStatsPacketErrorHelper
 // RETURN FEEDER LINK DEDICATED ACCESS ///////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce packet error statistics of Dedicated Access in return feeder link
+ * @ingroup satstats
+ * @brief Produce packet error statistics of Dedicated Access in return feeder link
  *        from a satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnFeederDaPacketErrorHelper> s = Create<SatStatsRtnFeederDaPacketErrorHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsRtnFeederDaPacketErrorHelper : public SatStatsPacketErrorHelper
 {
@@ -293,20 +293,20 @@ class SatStatsRtnFeederDaPacketErrorHelper : public SatStatsPacketErrorHelper
 // RETURN USER LINK DEDICATED ACCESS ///////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce packet error statistics of Dedicated Access in return user link
+ * @ingroup satstats
+ * @brief Produce packet error statistics of Dedicated Access in return user link
  *        from a satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnUserDaPacketErrorHelper> s = Create<SatStatsRtnUserDaPacketErrorHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsRtnUserDaPacketErrorHelper : public SatStatsPacketErrorHelper
 {
@@ -328,21 +328,21 @@ class SatStatsRtnUserDaPacketErrorHelper : public SatStatsPacketErrorHelper
 // FEEDER SLOTTED ALOHA //////////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce packet error statistics of Random Access Slotted ALOHA on feeder link
+ * @ingroup satstats
+ * @brief Produce packet error statistics of Random Access Slotted ALOHA on feeder link
  *        from a satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFeederSlottedAlohaPacketErrorHelper> s =
  * Create<SatStatsFeederSlottedAlohaPacketErrorHelper> (satHelper); s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFeederSlottedAlohaPacketErrorHelper : public SatStatsPacketErrorHelper
 {
@@ -364,21 +364,21 @@ class SatStatsFeederSlottedAlohaPacketErrorHelper : public SatStatsPacketErrorHe
 // USER SLOTTED ALOHA //////////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce packet error statistics of Random Access Slotted ALOHA on user link
+ * @ingroup satstats
+ * @brief Produce packet error statistics of Random Access Slotted ALOHA on user link
  *        from a satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsUserSlottedAlohaPacketErrorHelper> s =
  * Create<SatStatsUserSlottedAlohaPacketErrorHelper> (satHelper); s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsUserSlottedAlohaPacketErrorHelper : public SatStatsPacketErrorHelper
 {
@@ -400,20 +400,20 @@ class SatStatsUserSlottedAlohaPacketErrorHelper : public SatStatsPacketErrorHelp
 // FEEDER CRDSA //////////////////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce packet error statistics of Random Access CRDSA on feeder link
+ * @ingroup satstats
+ * @brief Produce packet error statistics of Random Access CRDSA on feeder link
  *        from a satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFeederCrdsaPacketErrorHelper> s = Create<SatStatsFeederCrdsaPacketErrorHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFeederCrdsaPacketErrorHelper : public SatStatsPacketErrorHelper
 {
@@ -435,20 +435,20 @@ class SatStatsFeederCrdsaPacketErrorHelper : public SatStatsPacketErrorHelper
 // USER CRDSA //////////////////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce packet error statistics of Random Access CRDSA on user link
+ * @ingroup satstats
+ * @brief Produce packet error statistics of Random Access CRDSA on user link
  *        from a satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsUserCrdsaPacketErrorHelper> s = Create<SatStatsUserCrdsaPacketErrorHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsUserCrdsaPacketErrorHelper : public SatStatsPacketErrorHelper
 {
@@ -470,20 +470,20 @@ class SatStatsUserCrdsaPacketErrorHelper : public SatStatsPacketErrorHelper
 // FEEDER E-SSA //////////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce packet error statistics of Random Access E-SSA on feeder link
+ * @ingroup satstats
+ * @brief Produce packet error statistics of Random Access E-SSA on feeder link
  *        from a satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFeederEssaPacketErrorHelper> s = Create<SatStatsFeederEssaPacketErrorHelper>
  * (satHelper); s->SetName ("name"); s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFeederEssaPacketErrorHelper : public SatStatsPacketErrorHelper
 {
@@ -505,21 +505,21 @@ class SatStatsFeederEssaPacketErrorHelper : public SatStatsPacketErrorHelper
 // USER E-SSA //////////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce packet error statistics of Random Access E-SSA on user link
+ * @ingroup satstats
+ * @brief Produce packet error statistics of Random Access E-SSA on user link
  *        from a satellite module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsUserEssaPacketErrorHelper> s = Create<SatStatsUserEssaPacketErrorHelper> (satHelper);
  * s->SetName ("name");
  * s->SetIdentifierType (SatStatsHelper::IDENTIFIER_GLOBAL);
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsUserEssaPacketErrorHelper : public SatStatsPacketErrorHelper
 {

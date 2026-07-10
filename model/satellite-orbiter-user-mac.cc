@@ -27,12 +27,12 @@
 #include "satellite-uplink-info-tag.h"
 #include "satellite-utils.h"
 
-#include <ns3/double.h>
-#include <ns3/enum.h>
-#include <ns3/log.h>
-#include <ns3/pointer.h>
-#include <ns3/simulator.h>
-#include <ns3/uinteger.h>
+#include "ns3/double.h"
+#include "ns3/enum.h"
+#include "ns3/log.h"
+#include "ns3/pointer.h"
+#include "ns3/simulator.h"
+#include "ns3/uinteger.h"
 
 NS_LOG_COMPONENT_DEFINE("SatOrbiterUserMac");
 
@@ -54,14 +54,6 @@ SatOrbiterUserMac::GetTypeId(void)
                                                            &SatOrbiterMac::SetGuardTime),
                                           MakeTimeChecker());
     return tid;
-}
-
-TypeId
-SatOrbiterUserMac::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
 }
 
 SatOrbiterUserMac::SatOrbiterUserMac(void)

@@ -28,7 +28,7 @@
 #include "satellite-phy-rx-carrier.h"
 #include "satellite-rtn-link-time.h"
 
-#include <ns3/singleton.h>
+#include "ns3/singleton.h"
 
 #include <list>
 #include <map>
@@ -49,15 +49,15 @@ class SatPhyRxCarrierPerSlot;
 class SatCrdsaReplicaTag;
 
 /**
- * \ingroup satellite
- * \brief Inherited the functionality of ground station SatPhyRxCarriers
+ * @ingroup satellite
+ * @brief Inherited the functionality of ground station SatPhyRxCarriers
  *                              and extended it with CRDSA functionality.
  */
 class SatPhyRxCarrierPerFrame : public SatPhyRxCarrierPerSlot
 {
   public:
     /**
-     * \brief Struct for storing the CRDSA packet specific Rx parameters
+     * @brief Struct for storing the CRDSA packet specific Rx parameters
      */
     typedef struct
     {
@@ -75,10 +75,10 @@ class SatPhyRxCarrierPerFrame : public SatPhyRxCarrierPerSlot
 
     /**
      * Constructor.
-     * \param carrierId ID of the carrier
-     * \param carrierConf Carrier configuration
-     * \param waveformConf Waveform configuration
-     * \param randomAccessEnabled Is this a RA carrier
+     * @param carrierId ID of the carrier
+     * @param carrierConf Carrier configuration
+     * @param waveformConf Waveform configuration
+     * @param randomAccessEnabled Is this a RA carrier
      */
     SatPhyRxCarrierPerFrame(uint32_t carrierId,
                             Ptr<SatPhyRxCarrierConf> carrierConf,
@@ -86,32 +86,32 @@ class SatPhyRxCarrierPerFrame : public SatPhyRxCarrierPerSlot
                             bool randomAccessEnabled);
 
     /**
-     * \brief Destructor
+     * @brief Destructor
      */
     virtual ~SatPhyRxCarrierPerFrame();
 
     /**
      * Get the TypeId of the class.
-     * \return TypeId
+     * @return TypeId
      */
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Function for comparing the CRDSA unique packet IDs
-     * \param obj1 Comparison object 1
-     * \param obj2 Comparison object 2
-     * \return Comparison result
+     * @brief Function for comparing the CRDSA unique packet IDs
+     * @param obj1 Comparison object 1
+     * @param obj2 Comparison object 2
+     * @return Comparison result
      */
     static bool CompareCrdsaPacketId(SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s obj1,
                                      SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s obj2);
 
     /**
-     * \brief Function for initializing the frame end scheduling
+     * @brief Function for initializing the frame end scheduling
      */
     void BeginEndScheduling();
 
     /**
-     * \brief Method for querying the type of the carrier
+     * @brief Method for querying the type of the carrier
      */
     inline virtual CarrierType GetCarrierType()
     {
@@ -125,38 +125,38 @@ class SatPhyRxCarrierPerFrame : public SatPhyRxCarrierPerSlot
     virtual void ReceiveSlot(SatPhyRxCarrier::rxParams_s packetRxParams, const uint32_t nPackets);
 
     /**
-     * \brief Dispose implementation
+     * @brief Dispose implementation
      */
     virtual void DoDispose();
 
     /**
-     * \brief Function for receiving decodable packets and removing their
+     * @brief Function for receiving decodable packets and removing their
      * interference from the other packets in the slots they’re in; perform
      * as many cycles as needed to try to decode each packet.
-     * \param combinedPacketsForFrame  container to store packets
+     * @param combinedPacketsForFrame  container to store packets
      * as they are decoded and removed from the frame
      */
     virtual void PerformSicCycles(
         std::vector<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s>& combinedPacketsForFrame);
 
     /**
-     * \brief Function for identifying whether the packet is a replica of another packet
-     * \param packet A packet
-     * \param otherPacket A packet that we want to check if it is a duplicate
-     * \return Is the packet a replica
+     * @brief Function for identifying whether the packet is a replica of another packet
+     * @param packet A packet
+     * @param otherPacket A packet that we want to check if it is a duplicate
+     * @return Is the packet a replica
      */
     bool IsReplica(const SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s& packet,
                    const SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s& otherPacket) const;
 
     /**
-     * \brief Function for computing the composite SINR of the given packet
-     * \param packet  The packet whose composite SINR should be updated
-     * \return SINR for the given packet
+     * @brief Function for computing the composite SINR of the given packet
+     * @param packet  The packet whose composite SINR should be updated
+     * @return SINR for the given packet
      */
     double CalculatePacketCompositeSinr(crdsaPacketRxParams_s& packet);
 
     /**
-     * \brief Function for eliminating the interference to other packets in the slot from the
+     * @brief Function for eliminating the interference to other packets in the slot from the
      * correctly received packet \param iter Packets in the slot \param processedPacket Correctly
      * received processed packet
      */
@@ -166,8 +166,8 @@ class SatPhyRxCarrierPerFrame : public SatPhyRxCarrierPerSlot
         SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s processedPacket);
 
     /**
-     * \brief Function for finding and removing the replicas of the CRDSA packet
-     * \param packet CRDSA packet
+     * @brief Function for finding and removing the replicas of the CRDSA packet
+     * @param packet CRDSA packet
      */
     void FindAndRemoveReplicas(SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s packet);
 
@@ -179,13 +179,13 @@ class SatPhyRxCarrierPerFrame : public SatPhyRxCarrierPerSlot
 
   private:
     /**
-     * \brief Function for storing the received CRDSA packets
-     * \param Rx parameters of the packet
+     * @brief Function for storing the received CRDSA packets
+     * @param Rx parameters of the packet
      */
     void AddCrdsaPacket(SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s crdsaPacketParams);
 
     /**
-     * \brief `CrdsaReplicaRx` trace source.
+     * @brief `CrdsaReplicaRx` trace source.
      *
      * Fired when a CRDSA packet replica is received through Random Access CRDSA.
      *
@@ -197,7 +197,7 @@ class SatPhyRxCarrierPerFrame : public SatPhyRxCarrierPerSlot
     TracedCallback<uint32_t, const Address&, bool> m_crdsaReplicaRxTrace;
 
     /**
-     * \brief `CrdsaUniquePayloadRx` trace source.
+     * @brief `CrdsaUniquePayloadRx` trace source.
      *
      * Fired when a unique CRDSA payload is received (after frame processing)
      * through Random Access CRDSA.
@@ -210,33 +210,33 @@ class SatPhyRxCarrierPerFrame : public SatPhyRxCarrierPerSlot
     TracedCallback<uint32_t, const Address&, bool> m_crdsaUniquePayloadRxTrace;
 
     /**
-     * \brief Function for processing the CRDSA frame
-     * \return Processed packets
+     * @brief Function for processing the CRDSA frame
+     * @return Processed packets
      */
     std::vector<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s> ProcessFrame();
 
     /**
-     * \brief Function for checking do the packets have identical slots
-     * \param packet A packet
-     * \param otherPacket A packet that we want to check if it has identical slots
-     * \return Have the packets identical slots
+     * @brief Function for checking do the packets have identical slots
+     * @param packet A packet
+     * @param otherPacket A packet that we want to check if it has identical slots
+     * @return Have the packets identical slots
      */
     bool HaveSameSlotIds(const SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s& packet,
                          const SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s& otherPacket) const;
 
     /**
-     * \brief Function for calculating the normalized offered random access load
-     * \return Normalized offered load
+     * @brief Function for calculating the normalized offered random access load
+     * @return Normalized offered load
      */
     double CalculateNormalizedOfferedRandomAccessLoad();
 
     /**
-     * \brief Function for processing the frame interval operations
+     * @brief Function for processing the frame interval operations
      */
     void DoFrameEnd();
 
     /**
-     * \brief Function for measuring the random access load
+     * @brief Function for measuring the random access load
      */
     void MeasureRandomAccessLoad();
 
@@ -254,13 +254,13 @@ class SatPhyRxCarrierPerFrame : public SatPhyRxCarrierPerSlot
         uint32_t numOfPacketsForThisSlot);
 
     /**
-     * \brief CRDSA packet container
+     * @brief CRDSA packet container
      */
     std::map<uint32_t, std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s>>
         m_crdsaPacketContainer;
 
     /**
-     * \brief Has the frame end scheduling been initialized
+     * @brief Has the frame end scheduling been initialized
      */
     bool m_frameEndSchedulingInitialized;
 };

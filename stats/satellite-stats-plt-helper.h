@@ -24,9 +24,9 @@
 
 #include "satellite-stats-helper.h"
 
-#include <ns3/address.h>
-#include <ns3/collector-map.h>
-#include <ns3/ptr.h>
+#include "ns3/address.h"
+#include "ns3/collector-map.h"
+#include "ns3/ptr.h"
 
 #include <list>
 #include <map>
@@ -44,8 +44,8 @@ class DataCollectionObject;
 class DistributionCollector;
 
 /**
- * \ingroup satstats
- * \brief Base class for PLT statistics helpers.
+ * @ingroup satstats
+ * @brief Base class for PLT statistics helpers.
  */
 class SatStatsPltHelper : public SatStatsHelper
 {
@@ -64,26 +64,26 @@ class SatStatsPltHelper : public SatStatsHelper
     static TypeId GetTypeId();
 
     /**
-     * \param averagingMode average all samples before passing them to aggregator.
+     * @param averagingMode average all samples before passing them to aggregator.
      */
     void SetAveragingMode(bool averagingMode);
 
     /**
-     * \return the currently active averaging mode.
+     * @return the currently active averaging mode.
      */
     bool GetAveragingMode() const;
 
     /**
-     * \brief Set up several probes or other means of listeners and connect them
+     * @brief Set up several probes or other means of listeners and connect them
      *        to the collectors.
      */
     void InstallProbes();
 
     /**
-     * \brief Receive inputs from trace sources and determine the right collector
+     * @brief Receive inputs from trace sources and determine the right collector
      *        to forward the inputs to.
-     * \param plt object PLT.
-     * \param from the address of the sender of the object.
+     * @param plt object PLT.
+     * @param from the address of the sender of the object.
      *
      * Used in return link statistics. DoInstallProbes() is expected to connect
      * the right trace sources to this method.
@@ -95,29 +95,29 @@ class SatStatsPltHelper : public SatStatsHelper
     void DoInstall();
 
     /**
-     * \brief
+     * @brief
      */
     virtual void DoInstallProbes() = 0;
 
     /**
-     * \brief Connect the probe to the right collector.
-     * \param probe
-     * \param identifier
+     * @brief Connect the probe to the right collector.
+     * @param probe
+     * @param identifier
      */
     bool ConnectProbeToCollector(Ptr<Probe> probe, uint32_t identifier);
 
     /**
-     * \brief Disconnect the probe from the right collector.
-     * \param probe
-     * \param identifier
+     * @brief Disconnect the probe from the right collector.
+     * @param probe
+     * @param identifier
      */
     bool DisconnectProbeFromCollector(Ptr<Probe> probe, uint32_t identifier);
 
     /**
-     * \brief Find a collector with the right identifier and pass a sample data
+     * @brief Find a collector with the right identifier and pass a sample data
      *        to it.
-     * \param plt
-     * \param identifier
+     * @param plt
+     * @param identifier
      */
     void PassSampleToCollector(const Time& plt, uint32_t identifier);
 
@@ -189,10 +189,10 @@ class SatStatsRtnAppPltHelper : public SatStatsPltHelper
     static TypeId GetTypeId();
 
     /**
-     * \brief Receive inputs from trace sources and determine the right collector
+     * @brief Receive inputs from trace sources and determine the right collector
      *        to forward the inputs to.
-     * \param plt object PLT.
-     * \param from the InetSocketAddress of the sender of the object.
+     * @param plt object PLT.
+     * @param from the InetSocketAddress of the sender of the object.
      */
     void Ipv4Callback(const Time& plt, const Address& from);
 
@@ -202,16 +202,16 @@ class SatStatsRtnAppPltHelper : public SatStatsPltHelper
 
   private:
     /**
-     * \brief Save the IPv4 address and the proper identifier from the given
+     * @brief Save the IPv4 address and the proper identifier from the given
      *        UT user node.
-     * \param utUserNode a UT user node.
+     * @param utUserNode a UT user node.
      *
      * Any addresses found in the given node will be saved in the
      * #m_identifierMap member variable.
      */
     void SaveIpv4AddressAndIdentifier(Ptr<Node> utUserNode);
 
-    /// \todo Write SaveIpv6Address() method.
+    /// @todo Write SaveIpv6Address() method.
 
 }; // end of class SatStatsRtnAppPltHelper
 

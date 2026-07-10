@@ -21,35 +21,35 @@
 
 #include "satellite-stats-throughput-helper.h"
 
-#include <ns3/application-packet-probe.h>
-#include <ns3/application.h>
-#include <ns3/boolean.h>
-#include <ns3/callback.h>
-#include <ns3/data-collection-object.h>
-#include <ns3/distribution-collector.h>
-#include <ns3/enum.h>
-#include <ns3/inet-socket-address.h>
-#include <ns3/interval-rate-collector.h>
-#include <ns3/ipv4.h>
-#include <ns3/log.h>
-#include <ns3/mac48-address.h>
-#include <ns3/magister-gnuplot-aggregator.h>
-#include <ns3/multi-file-aggregator.h>
-#include <ns3/net-device.h>
-#include <ns3/node-container.h>
-#include <ns3/packet.h>
-#include <ns3/probe.h>
-#include <ns3/satellite-helper.h>
-#include <ns3/satellite-id-mapper.h>
-#include <ns3/satellite-mac.h>
-#include <ns3/satellite-net-device.h>
-#include <ns3/satellite-orbiter-net-device.h>
-#include <ns3/satellite-phy.h>
-#include <ns3/satellite-topology.h>
-#include <ns3/scalar-collector.h>
-#include <ns3/singleton.h>
-#include <ns3/string.h>
-#include <ns3/unit-conversion-collector.h>
+#include "ns3/application-packet-probe.h"
+#include "ns3/application.h"
+#include "ns3/boolean.h"
+#include "ns3/callback.h"
+#include "ns3/data-collection-object.h"
+#include "ns3/distribution-collector.h"
+#include "ns3/enum.h"
+#include "ns3/inet-socket-address.h"
+#include "ns3/interval-rate-collector.h"
+#include "ns3/ipv4.h"
+#include "ns3/log.h"
+#include "ns3/mac48-address.h"
+#include "ns3/magister-gnuplot-aggregator.h"
+#include "ns3/multi-file-aggregator.h"
+#include "ns3/net-device.h"
+#include "ns3/node-container.h"
+#include "ns3/packet.h"
+#include "ns3/probe.h"
+#include "ns3/satellite-helper.h"
+#include "ns3/satellite-id-mapper.h"
+#include "ns3/satellite-mac.h"
+#include "ns3/satellite-net-device.h"
+#include "ns3/satellite-orbiter-net-device.h"
+#include "ns3/satellite-phy.h"
+#include "ns3/satellite-topology.h"
+#include "ns3/scalar-collector.h"
+#include "ns3/singleton.h"
+#include "ns3/string.h"
+#include "ns3/unit-conversion-collector.h"
 
 #include <map>
 #include <sstream>
@@ -259,7 +259,7 @@ SatStatsThroughputHelper::DoInstall()
     }
 
     case SatStatsHelper::OUTPUT_SCALAR_PLOT:
-        /// \todo Add support for boxes in Gnuplot.
+        /// @todo Add support for boxes in Gnuplot.
         NS_FATAL_ERROR(GetOutputTypeName(GetOutputType())
                        << " is not a valid output type for this statistics.");
         break;
@@ -327,7 +327,7 @@ SatStatsThroughputHelper::DoInstall()
         plotAggregator->SetLegend("Received throughput (in kilobits per second)", "Frequency");
         plotAggregator->Set2dDatasetDefaultStyle(Gnuplot2dDataset::LINES);
         plotAggregator->Add2dDataset(GetName(), GetName());
-        /// \todo Find a better dataset name.
+        /// @todo Find a better dataset name.
 
         // Setup the final-level collector.
         m_averagingCollector = CreateObject<DistributionCollector>();
@@ -347,7 +347,7 @@ SatStatsThroughputHelper::DoInstall()
             "Output",
             GetName(),
             MakeCallback(&MagisterGnuplotAggregator::Write2d, plotAggregator));
-        /// \todo Find a better dataset name.
+        /// @todo Find a better dataset name.
 
         // Setup second-level collectors.
         m_terminalCollectors.SetType("ns3::ScalarCollector");
@@ -404,8 +404,7 @@ SatStatsThroughputHelper::RxCallback(Ptr<const Packet> packet, const Address& fr
     if (from.IsInvalid())
     {
         NS_LOG_WARN(this << " discarding packet " << packet << " (" << packet->GetSize()
-                         << " bytes)"
-                         << " from statistics collection because of"
+                         << " bytes)" << " from statistics collection because of"
                          << " invalid sender address");
     }
     else
@@ -416,8 +415,7 @@ SatStatsThroughputHelper::RxCallback(Ptr<const Packet> packet, const Address& fr
         if (it == m_identifierMap.end())
         {
             NS_LOG_WARN(this << " discarding packet " << packet << " (" << packet->GetSize()
-                             << " bytes)"
-                             << " from statistics collection because of"
+                             << " bytes)" << " from statistics collection because of"
                              << " unknown sender address " << from);
         }
         else
@@ -1369,8 +1367,7 @@ SatStatsRtnAppThroughputHelper::Ipv4Callback(Ptr<const Packet> packet, const Add
         if (it1 == m_identifierMap.end())
         {
             NS_LOG_WARN(this << " discarding packet " << packet << " (" << packet->GetSize()
-                             << " bytes)"
-                             << " from statistics collection because of"
+                             << " bytes)" << " from statistics collection because of"
                              << " unknown sender IPv4 address " << ipv4Addr);
         }
         else
@@ -1388,10 +1385,10 @@ SatStatsRtnAppThroughputHelper::Ipv4Callback(Ptr<const Packet> packet, const Add
     }
     else
     {
-        NS_LOG_WARN(
-            this << " discarding packet " << packet << " (" << packet->GetSize() << " bytes)"
-                 << " from statistics collection"
-                 << " because it comes from sender " << from << " without valid InetSocketAddress");
+        NS_LOG_WARN(this << " discarding packet " << packet << " (" << packet->GetSize()
+                         << " bytes)" << " from statistics collection"
+                         << " because it comes from sender " << from
+                         << " without valid InetSocketAddress");
     }
 
 } // end of `void Ipv4Callback (Ptr<const Packet>, const Address);`

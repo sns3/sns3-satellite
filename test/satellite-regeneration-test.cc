@@ -19,40 +19,40 @@
  */
 
 /**
- * \file satellite-regeneration-test.cc
- * \ingroup satellite
- * \brief Regeneration test case implementations.
+ * @file satellite-regeneration-test.cc
+ * @ingroup satellite
+ * @brief Regeneration test case implementations.
  *
  * In this module implements the Regeneration Test Cases.
  */
 
-#include <ns3/cbr-application.h>
-#include <ns3/cbr-helper.h>
-#include <ns3/config.h>
-#include <ns3/log.h>
-#include <ns3/packet-sink-helper.h>
-#include <ns3/packet-sink.h>
-#include <ns3/satellite-env-variables.h>
-#include <ns3/satellite-gw-mac.h>
-#include <ns3/satellite-helper.h>
-#include <ns3/satellite-orbiter-feeder-phy.h>
-#include <ns3/satellite-orbiter-net-device.h>
-#include <ns3/satellite-orbiter-user-phy.h>
-#include <ns3/satellite-phy-rx-carrier.h>
-#include <ns3/satellite-phy-tx.h>
-#include <ns3/satellite-topology.h>
-#include <ns3/satellite-ut-mac-state.h>
-#include <ns3/simulation-helper.h>
-#include <ns3/simulator.h>
-#include <ns3/singleton.h>
-#include <ns3/string.h>
-#include <ns3/test.h>
+#include "ns3/cbr-application.h"
+#include "ns3/cbr-helper.h"
+#include "ns3/config.h"
+#include "ns3/log.h"
+#include "ns3/packet-sink-helper.h"
+#include "ns3/packet-sink.h"
+#include "ns3/satellite-env-variables.h"
+#include "ns3/satellite-gw-mac.h"
+#include "ns3/satellite-helper.h"
+#include "ns3/satellite-orbiter-feeder-phy.h"
+#include "ns3/satellite-orbiter-net-device.h"
+#include "ns3/satellite-orbiter-user-phy.h"
+#include "ns3/satellite-phy-rx-carrier.h"
+#include "ns3/satellite-phy-tx.h"
+#include "ns3/satellite-topology.h"
+#include "ns3/satellite-ut-mac-state.h"
+#include "ns3/simulation-helper.h"
+#include "ns3/simulator.h"
+#include "ns3/singleton.h"
+#include "ns3/string.h"
+#include "ns3/test.h"
 
 using namespace ns3;
 
 /**
- * \ingroup satellite
- * \brief 'Regeneration, test 1' test case implementation.
+ * @ingroup satellite
+ * @brief 'Regeneration, test 1' test case implementation.
  *
  * This case tests that delay of packets takes into account regeneration in satellite
  *
@@ -129,8 +129,8 @@ SatRegenerationTest1::DoRun(void)
     Config::Reset();
 
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-regeneration", "test1", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-regeneration", "test1", true);
 
     /// Set regeneration mode
     Config::SetDefault("ns3::SatConf::ForwardLinkRegenerationMode",
@@ -151,7 +151,7 @@ SatRegenerationTest1::DoRun(void)
     Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(512));
 
     // Creating the reference system.
-    m_helper = CreateObject<SatHelper>(Singleton<SatEnvVariables>::Get()->LocateDataDirectory() +
+    m_helper = CreateObject<SatHelper>(SatEnvVariables::GetInstance()->LocateDataDirectory() +
                                        "/scenarios/geo-33E");
     m_helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
@@ -273,8 +273,8 @@ SatRegenerationTest1::DoRun(void)
 }
 
 /**
- * \ingroup satellite
- * \brief 'Regeneration, test 2' test case implementation.
+ * @ingroup satellite
+ * @brief 'Regeneration, test 2' test case implementation.
  *
  * This case tests physical regeneration on satellite. It is based on a SIMPLE scenario, with losses
  * on uplink, forward and return.
@@ -426,8 +426,8 @@ SatRegenerationTest2::DoRun(void)
     Config::Reset();
 
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-regeneration", "test2", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-regeneration", "test2", true);
 
     /// Set regeneration mode
     Config::SetDefault("ns3::SatConf::ForwardLinkRegenerationMode",
@@ -456,7 +456,7 @@ SatRegenerationTest2::DoRun(void)
     Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(512));
 
     // Creating the reference system.
-    m_helper = CreateObject<SatHelper>(Singleton<SatEnvVariables>::Get()->LocateDataDirectory() +
+    m_helper = CreateObject<SatHelper>(SatEnvVariables::GetInstance()->LocateDataDirectory() +
                                        "/scenarios/geo-33E");
     m_helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
@@ -548,8 +548,8 @@ SatRegenerationTest2::DoRun(void)
 }
 
 /**
- * \ingroup satellite
- * \brief 'Regeneration, test 3' test case implementation.
+ * @ingroup satellite
+ * @brief 'Regeneration, test 3' test case implementation.
  *
  * This case tests physical regeneration on satellite. It is based on a LARGER scenario, with
  * collisions on return uplink.
@@ -706,8 +706,8 @@ SatRegenerationTest3::DoRun(void)
     Config::Reset();
 
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-regeneration", "test3", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-regeneration", "test3", true);
 
     /// Set regeneration mode
     Config::SetDefault("ns3::SatConf::ForwardLinkRegenerationMode",
@@ -874,8 +874,8 @@ SatRegenerationTest3::DoRun(void)
 }
 
 /**
- * \ingroup satellite
- * \brief 'Regeneration, test 4' test case implementation.
+ * @ingroup satellite
+ * @brief 'Regeneration, test 4' test case implementation.
  *
  * This case tests link regeneration on satellite. It is based on a LARGER scenario.
  *
@@ -973,8 +973,8 @@ SatRegenerationTest4::DoRun(void)
     Config::Reset();
 
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-regeneration", "test4", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-regeneration", "test4", true);
 
     /// Set regeneration mode
     Config::SetDefault("ns3::SatConf::ForwardLinkRegenerationMode",
@@ -1074,8 +1074,8 @@ SatRegenerationTest4::DoRun(void)
 }
 
 /**
- * \ingroup satellite
- * \brief 'Regeneration, test 5' test case implementation.
+ * @ingroup satellite
+ * @brief 'Regeneration, test 5' test case implementation.
  *
  * This case tests ACM on all links.
  * It is based on a SIMPLE scenario, with PHY regeneration on FWD and LINK regeneration on RTN.
@@ -1189,8 +1189,8 @@ SatRegenerationTest5::DoRun(void)
     Config::Reset();
 
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-regeneration", "test5", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-regeneration", "test5", true);
 
     /// Set regeneration mode
     Config::SetDefault("ns3::SatConf::ForwardLinkRegenerationMode",
@@ -1322,8 +1322,8 @@ SatRegenerationTest5::DoRun(void)
 }
 
 /**
- * \ingroup satellite
- * \brief 'Regeneration, test 6' test case implementation.
+ * @ingroup satellite
+ * @brief 'Regeneration, test 6' test case implementation.
  *
  * This case tests network regeneration on satellite. It is based on a LARGER scenario.
  *
@@ -1422,8 +1422,8 @@ SatRegenerationTest6::DoRun(void)
     Config::Reset();
 
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-regeneration", "test6", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-regeneration", "test6", true);
 
     /// Set regeneration mode
     Config::SetDefault("ns3::SatConf::ForwardLinkRegenerationMode",
@@ -1511,8 +1511,8 @@ SatRegenerationTest6::DoRun(void)
 }
 
 /**
- * \ingroup satellite
- * \brief 'Regeneration, test 7' test case implementation.
+ * @ingroup satellite
+ * @brief 'Regeneration, test 7' test case implementation.
  *
  * This case tests ACM on all links.
  * It is based on a SIMPLE scenario, with network regeneration on FWD and RTN.
@@ -1626,8 +1626,8 @@ SatRegenerationTest7::DoRun(void)
     Config::Reset();
 
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-regeneration", "test7", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-regeneration", "test7", true);
 
     /// Set regeneration mode
     Config::SetDefault("ns3::SatConf::ForwardLinkRegenerationMode",
@@ -1759,8 +1759,8 @@ SatRegenerationTest7::DoRun(void)
 }
 
 /**
- * \ingroup satellite
- * \brief 'Regeneration, test 8' test case implementation.
+ * @ingroup satellite
+ * @brief 'Regeneration, test 8' test case implementation.
  *
  * This test is launched several time to test every regeneration combination.
  * We measure if packets are seen on sat traces, and should have (for RX):
@@ -1890,8 +1890,8 @@ SatRegenerationTest8::DoRun(void)
     Config::Reset();
 
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-regeneration", "test8", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-regeneration", "test8", true);
 
     /// Set regeneration mode
     Config::SetDefault("ns3::SatConf::ForwardLinkRegenerationMode",

@@ -23,9 +23,9 @@
 #ifndef LORAWAN_MAC_COMMAND_H
 #define LORAWAN_MAC_COMMAND_H
 
-#include <ns3/buffer.h>
-#include <ns3/nstime.h>
-#include <ns3/object.h>
+#include "ns3/buffer.h"
+#include "ns3/nstime.h"
+#include "ns3/object.h"
 
 #include <list>
 #include <ostream>
@@ -79,43 +79,43 @@ class LorawanMacCommand : public Object
      * Serialize the contents of this MAC command into a buffer, according to the
      * LoRaWAN standard.
      *
-     * \param start A pointer to the buffer into which to serialize the command.
+     * @param start A pointer to the buffer into which to serialize the command.
      */
     virtual void Serialize(Buffer::Iterator& start) const = 0;
 
     /**
      * Deserialize the buffer into a MAC command.
      *
-     * \param start A pointer to the buffer that contains the serialized command.
-     * \return the number of bytes that were consumed.
+     * @param start A pointer to the buffer that contains the serialized command.
+     * @return the number of bytes that were consumed.
      */
     virtual uint8_t Deserialize(Buffer::Iterator& start) = 0;
 
     /**
      * Print the contents of this MAC command in human-readable format.
      *
-     * \param os The std::ostream instance on which to print the MAC command.
+     * @param os The std::ostream instance on which to print the MAC command.
      */
     virtual void Print(std::ostream& os) const = 0;
 
     /**
      * Get serialized length of this MAC command.
      *
-     * \return The number of bytes the MAC command takes up.
+     * @return The number of bytes the MAC command takes up.
      */
     virtual uint8_t GetSerializedSize(void) const;
 
     /**
      * Get the commandType of this MAC command.
      *
-     * \return The type of MAC command this object represents.
+     * @return The type of MAC command this object represents.
      */
     virtual enum MacCommandType GetCommandType(void) const;
 
     /**
      * Get the CID that corresponds to this MAC command.
      *
-     * \return The CID as a uint8_t type.
+     * @return The CID as a uint8_t type.
      */
     static uint8_t GetCIDFromLorawanMacCommand(enum MacCommandType commandType);
 
@@ -165,28 +165,28 @@ class LinkCheckAns : public LorawanMacCommand
     /**
      * Set the demodulation margin value.
      *
-     * \param margin The demodulation margin to set.
+     * @param margin The demodulation margin to set.
      */
     void SetMargin(uint8_t margin);
 
     /**
      * Get the demodulation margin value.
      *
-     * \return The demodulation margin value.
+     * @return The demodulation margin value.
      */
     uint8_t GetMargin(void) const;
 
     /**
      * Set the gateway count value.
      *
-     * \param gwCnt The count value to set.
+     * @param gwCnt The count value to set.
      */
     void SetGwCnt(uint8_t gwCnt);
 
     /**
      * Get the gateway count value.
      *
-     * \return The gateway count value.
+     * @return The gateway count value.
      */
     uint8_t GetGwCnt(void) const;
 
@@ -232,7 +232,7 @@ class LinkAdrReq : public LorawanMacCommand
     /**
      * Return the data rate prescribed by this MAC command.
      *
-     * \return An unsigned 8-bit integer containing the data rate.
+     * @return An unsigned 8-bit integer containing the data rate.
      */
     uint8_t GetDataRate(void);
 
@@ -243,7 +243,7 @@ class LinkAdrReq : public LorawanMacCommand
      * dBm when communicating it to the PHY, and the translation will vary based
      * on the region of the device.
      *
-     * \return The TX power, encoded as an unsigned 8-bit integer.
+     * @return The TX power, encoded as an unsigned 8-bit integer.
      */
     uint8_t GetTxPower(void);
 
@@ -251,14 +251,14 @@ class LinkAdrReq : public LorawanMacCommand
      * Get the list of enabled channels. This method takes the 16-bit channel mask
      * and translates it to a list of integers that can be more easily parsed.
      *
-     * \return The list of enabled channels.
+     * @return The list of enabled channels.
      */
     std::list<int> GetEnabledChannelsList(void);
 
     /**
      * Get the number of repetitions prescribed by this MAC command.
      *
-     * \return The number of repetitions.
+     * @return The number of repetitions.
      */
     int GetRepetitions(void);
 
@@ -306,7 +306,7 @@ class DutyCycleReq : public LorawanMacCommand
     /**
      * Constructor providing initialization of all parameters.
      *
-     * \param dutyCycle The duty cycle as a 8-bit unsigned integer.
+     * @param dutyCycle The duty cycle as a 8-bit unsigned integer.
      */
     DutyCycleReq(uint8_t dutyCycle);
 
@@ -317,7 +317,7 @@ class DutyCycleReq : public LorawanMacCommand
     /**
      * Get the maximum duty cycle prescribed by this Mac command, in fraction form.
      *
-     * \return The maximum duty cycle.
+     * @return The maximum duty cycle.
      */
     double GetMaximumAllowedDutyCycle(void) const;
 
@@ -351,9 +351,9 @@ class RxParamSetupReq : public LorawanMacCommand
     /**
      * Constructor providing initialization of all fields.
      *
-     * \param rx1DrOffset The Data Rate offset to use for the first receive window.
-     * \param rx2DataRate The Data Rate to use for the second receive window.
-     * \param frequency The frequency in Hz to use for the second receive window.
+     * @param rx1DrOffset The Data Rate offset to use for the first receive window.
+     * @param rx2DataRate The Data Rate to use for the second receive window.
+     * @param frequency The frequency in Hz to use for the second receive window.
      */
     RxParamSetupReq(uint8_t rx1DrOffset, uint8_t rx2DataRate, double frequency);
 
@@ -364,21 +364,21 @@ class RxParamSetupReq : public LorawanMacCommand
     /**
      * Get this command's Rx1DrOffset parameter.
      *
-     * \return The Rx1DrOffset parameter.
+     * @return The Rx1DrOffset parameter.
      */
     uint8_t GetRx1DrOffset(void);
 
     /**
      * Get this command's Rx2DataRate parameter.
      *
-     * \return The Rx2DataRate parameter.
+     * @return The Rx2DataRate parameter.
      */
     uint8_t GetRx2DataRate(void);
 
     /**
      * Get this command's frequency.
      *
-     * \return The frequency parameter, in Hz.
+     * @return The frequency parameter, in Hz.
      */
     double GetFrequency(void);
 
@@ -398,9 +398,9 @@ class RxParamSetupAns : public LorawanMacCommand
     /**
      * Constructor with initialization of all parameters.
      *
-     * \param rx1DrOffsetAck Whether or not the offset was correctly set.
-     * \param rx2DataRateAck Whether or not the second slot data rate was correctly set.
-     * \param channelAck Whether or not the second slot frequency was correctly set.
+     * @param rx1DrOffsetAck Whether or not the offset was correctly set.
+     * @param rx2DataRateAck Whether or not the second slot data rate was correctly set.
+     * @param channelAck Whether or not the second slot frequency was correctly set.
      */
     RxParamSetupAns(bool rx1DrOffsetAck, bool rx2DataRateAck, bool channelAck);
 
@@ -437,8 +437,8 @@ class DevStatusAns : public LorawanMacCommand
     /**
      * Constructor with initialization of all parameters.
      *
-     * \param battery The battery level in [0, 255].
-     * \param margin The demodulation margin of the last received DevStatusReq packet.
+     * @param battery The battery level in [0, 255].
+     * @param margin The demodulation margin of the last received DevStatusReq packet.
      */
     DevStatusAns(uint8_t battery, uint8_t margin);
 
@@ -449,14 +449,14 @@ class DevStatusAns : public LorawanMacCommand
     /**
      * Get the battery information contained in this MAC command.
      *
-     * \return The battery level.
+     * @return The battery level.
      */
     uint8_t GetBattery(void);
 
     /**
      * Get the demodulation margin contained in this MAC command.
      *
-     * \return The margin.
+     * @return The margin.
      */
     uint8_t GetMargin(void);
 
@@ -476,10 +476,10 @@ class NewChannelReq : public LorawanMacCommand
     /**
      * Constructor providing initialization of all parameters.
      *
-     * \param chIndex The index of the channel this command wants to operate on.
-     * \param frequency The new frequency for this channel.
-     * \param minDataRate The minimum data rate allowed on this channel.
-     * \param maxDataRate The minimum data rate allowed on this channel.
+     * @param chIndex The index of the channel this command wants to operate on.
+     * @param frequency The new frequency for this channel.
+     * @param minDataRate The minimum data rate allowed on this channel.
+     * @param maxDataRate The minimum data rate allowed on this channel.
      */
     NewChannelReq(uint8_t chIndex, double frequency, uint8_t minDataRate, uint8_t maxDataRate);
 
@@ -510,9 +510,9 @@ class NewChannelAns : public LorawanMacCommand
     /**
      * Constructor providing initialization of all parameters.
      *
-     * \param dataRateRangeOk Whether or not the requested data rate range was set
+     * @param dataRateRangeOk Whether or not the requested data rate range was set
      * correctly.
-     * \param channelFrequencyOk Whether or not the requested channel frequency
+     * @param channelFrequencyOk Whether or not the requested channel frequency
      * was set correctly.
      */
     NewChannelAns(bool dataRateRangeOk, bool channelFrequencyOk);
@@ -537,7 +537,7 @@ class RxTimingSetupReq : public LorawanMacCommand
     /**
      * Constructor providing initialization of all parameters.
      *
-     * \param delay The delay encoded in this MAC command.
+     * @param delay The delay encoded in this MAC command.
      */
     RxTimingSetupReq(uint8_t delay);
 
@@ -548,7 +548,7 @@ class RxTimingSetupReq : public LorawanMacCommand
     /**
      * Get the first window delay as a Time instance.
      *
-     * \return The delay.
+     * @return The delay.
      */
     Time GetDelay(void);
 

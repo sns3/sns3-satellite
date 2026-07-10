@@ -28,11 +28,11 @@
 #include "satellite-phy.h"
 #include "satellite-signal-parameters.h"
 
-#include <ns3/address.h>
-#include <ns3/nstime.h>
-#include <ns3/object.h>
-#include <ns3/packet.h>
-#include <ns3/ptr.h>
+#include "ns3/address.h"
+#include "ns3/nstime.h"
+#include "ns3/object.h"
+#include "ns3/packet.h"
+#include "ns3/ptr.h"
 
 #include <stdint.h>
 
@@ -40,7 +40,7 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
  * The SatOrbiterMac models the global link MAC layer of the satellite node.
  */
@@ -57,8 +57,8 @@ class SatOrbiterMac : public SatMac
      *
      * This is the constructor for the SatOrbiterMac
      *
-     * \param satId ID of sat for UT
-     * \param beamId ID of beam for UT
+     * @param satId ID of sat for UT
+     * @param beamId ID of beam for UT
      */
     SatOrbiterMac(uint32_t satId, uint32_t beamId);
 
@@ -71,7 +71,6 @@ class SatOrbiterMac : public SatMac
      * inherited from Object
      */
     static TypeId GetTypeId(void);
-    TypeId GetInstanceTypeId(void) const;
     virtual void DoInitialize(void);
 
     /**
@@ -85,14 +84,14 @@ class SatOrbiterMac : public SatMac
     void StartPeriodicTransmissions();
 
     /**
-     * \brief Add new packet to the LLC queue.
-     * \param packet Packets to be sent.
+     * @brief Add new packet to the LLC queue.
+     * @param packet Packets to be sent.
      */
     virtual void EnquePacket(Ptr<Packet> packet) = 0;
 
     /**
      * Method to set link scheduler (forward or SCPC)
-     * \param The scheduler to use
+     * @param The scheduler to use
      */
     void SetFwdScheduler(Ptr<SatFwdLinkScheduler> fwdScheduler);
 
@@ -119,8 +118,8 @@ class SatOrbiterMac : public SatMac
     typedef Callback<Ptr<SatBeamScheduler>, uint32_t, uint32_t> BeamSchedulerCallback;
 
     /**
-     * \brief Set the beam scheduler callback
-     * \param cb Callback to get the SatBeamScheduler
+     * @brief Set the beam scheduler callback
+     * @param cb Callback to get the SatBeamScheduler
      */
     void SetBeamSchedulerCallback(SatOrbiterMac::BeamSchedulerCallback cb);
 
@@ -132,16 +131,16 @@ class SatOrbiterMac : public SatMac
     /**
      * Add a remote peer to this MAC
      *
-     * \param address The MAC address of the peer
-     * \return True if the peer has been added, false otherwise
+     * @param address The MAC address of the peer
+     * @return True if the peer has been added, false otherwise
      */
     virtual bool AddPeer(Mac48Address address) = 0;
 
     /**
      * Remove a remote peer from this MAC
      *
-     * \param address The MAC address of the peer
-     * \return True if the peer has been removed, false otherwise
+     * @param address The MAC address of the peer
+     * @return True if the peer has been removed, false otherwise
      */
     virtual bool RemovePeer(Mac48Address address) = 0;
 
@@ -152,17 +151,17 @@ class SatOrbiterMac : public SatMac
      * The StartTransmission method is used internally in the
      * SatOrbiterMac to begin the process of sending a packet out on the PHY layer.
      *
-     * \param carrierId id of the carrier.
-     * \returns true if success, false on failure
+     * @param carrierId id of the carrier.
+     * @returns true if success, false on failure
      */
     void StartTransmission(uint32_t carrierId);
 
     /**
-     * \brief Send packets to lower layer by using a callback
-     * \param packets Packets to be sent.
-     * \param carrierId ID of the carrier used for transmission.
-     * \param duration Duration of the physical layer transmission.
-     * \param txInfo Additional parameterization for burst transmission.
+     * @brief Send packets to lower layer by using a callback
+     * @param packets Packets to be sent.
+     * @param carrierId ID of the carrier used for transmission.
+     * @param duration Duration of the physical layer transmission.
+     * @param txInfo Additional parameterization for burst transmission.
      */
     virtual void SendPacket(SatPhy::PacketContainer_t packets,
                             uint32_t carrierId,
@@ -170,35 +169,35 @@ class SatOrbiterMac : public SatMac
                             SatSignalParameters::txInfo_s txInfo);
 
     /**
-     * \brief Invoke the `Rx` trace source for each received packet.
-     * \param packets Container of the pointers to the packets received.
+     * @brief Invoke the `Rx` trace source for each received packet.
+     * @param packets Container of the pointers to the packets received.
      */
     virtual void RxTraces(SatPhy::PacketContainer_t packets);
 
     /**
-     * \brief Get the link TX direction. Must be implemented by child clases.
-     * \return The link TX direction
+     * @brief Get the link TX direction. Must be implemented by child clases.
+     * @return The link TX direction
      */
     virtual SatEnums::SatLinkDir_t GetSatLinkTxDir() = 0;
 
     /**
-     * \brief Get the link RX direction. Must be implemented by child clases.
-     * \return The link RX direction
+     * @brief Get the link RX direction. Must be implemented by child clases.
+     * @return The link RX direction
      */
     virtual SatEnums::SatLinkDir_t GetSatLinkRxDir() = 0;
 
     /**
-     * \brief Get the UT address associated to this RX packet.
+     * @brief Get the UT address associated to this RX packet.
      *        May be source or destination address depending on link used
-     * \param packet The packet to consider
-     * \return The address of associated UT
+     * @param packet The packet to consider
+     * @return The address of associated UT
      */
     virtual Address GetRxUtAddress(Ptr<Packet> packet) = 0;
 
     /**
      * Indicates if at least one device is connected in this beam.
      *
-     * \return True if at least a device is connected, false otherwise
+     * @return True if at least a device is connected, false otherwise
      */
     virtual bool HasPeer() = 0;
 

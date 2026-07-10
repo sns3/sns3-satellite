@@ -24,10 +24,10 @@
 #include "satellite-bbframe-conf.h"
 #include "satellite-enums.h"
 
-#include <ns3/nstime.h>
-#include <ns3/packet.h>
-#include <ns3/simple-ref-count.h>
-#include <ns3/traced-callback.h>
+#include "ns3/nstime.h"
+#include "ns3/packet.h"
+#include "ns3/simple-ref-count.h"
+#include "ns3/traced-callback.h"
 
 #include <stdint.h>
 #include <vector>
@@ -36,9 +36,9 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief SatBbFrame class implements functionality for BB frames.
+ * @brief SatBbFrame class implements functionality for BB frames.
  * Holds information of a BB Frame for forward link scheduling.
  * It also provides methods to query information of the frame and methods
  * to modify frames like shrink, extend and merge.
@@ -61,9 +61,9 @@ class SatBbFrame : public SimpleRefCount<SatBbFrame>
      * Constructor to create BB frame according to given type and MODCOD, type and BB frame
      * configuration.
      *
-     * \param modCod Used ModCod
-     * \param type Type of the frame
-     * \param conf Pointer to BBFrame configuration
+     * @param modCod Used ModCod
+     * @param type Type of the frame
+     * @param conf Pointer to BBFrame configuration
      */
     SatBbFrame(SatEnums::SatModcod_t modCod,
                SatEnums::SatBbFrameType_t type,
@@ -76,64 +76,64 @@ class SatBbFrame : public SimpleRefCount<SatBbFrame>
 
     /**
      * Get the data in the BB Frame info as container of the packet pointers.
-     * \return Container having data as packet pointers.
+     * @return Container having data as packet pointers.
      */
     const SatBbFramePayload_t& GetPayload();
 
     /**
      * Add payload (packet) to transmit buffer of this BB Frame info
      *
-     * \param packet  Pointer to packet wanted to add to transmit buffer
-     * \return Space left bytes in transmit buffer after addition
+     * @param packet  Pointer to packet wanted to add to transmit buffer
+     * @return Space left bytes in transmit buffer after addition
      */
     uint32_t AddPayload(Ptr<Packet> packet);
 
     /**
      * Get space left in BB frame transmit buffer in bytes.
-     * \return space left in bytes in transmit buffer
+     * @return space left in bytes in transmit buffer
      */
     uint32_t GetSpaceLeftInBytes() const;
 
     /**
      * Get space used in BB frame transmit buffer in bytes.
-     * \return space used in bytes in transmit buffer
+     * @return space used in bytes in transmit buffer
      */
     uint32_t GetSpaceUsedInBytes() const;
 
     /**
      * Get the maximum size of the BB Frame transmit buffer in bytes.
-     * \return the maximum size of the BB Frame transmit buffer in bytes
+     * @return the maximum size of the BB Frame transmit buffer in bytes
      */
     uint32_t GetMaxSpaceInBytes() const;
 
     /**
      * Get the occupancy of the of the BB Frame.
-     * \return the occupancy of the BB Frame 0 - 1.
+     * @return the occupancy of the BB Frame 0 - 1.
      */
     double GetOccupancy() const;
 
     /**
      * Get spectra efficiency of the frame.
      *
-     * \param carrierBandwidthInHz Carrier bandwidth in hertz.
-     * \return
+     * @param carrierBandwidthInHz Carrier bandwidth in hertz.
+     * @return
      */
     double GetSpectralEfficiency(double carrierBandwidthInHz) const;
 
     /**
      * Checks occupancy of the frame if given frame would been merged with this frame.
      *
-     * \param mergedFrame Another frame wanted to merge with this frame.
-     * \return O, if frames cannot be merged, occupancy of the merged frame in otherwise.
+     * @param mergedFrame Another frame wanted to merge with this frame.
+     * @return O, if frames cannot be merged, occupancy of the merged frame in otherwise.
      */
     double GetOccupancyIfMerged(Ptr<SatBbFrame> mergedFrame) const;
 
     /**
      * Merge given frame with this frame.
      *
-     * \param mergedFrame Another frame to be merged with this frame.
-     * \param mergeTraceCb Logging trace source for BB frame optimization.
-     * \return true if merging done, false otherwise.
+     * @param mergedFrame Another frame to be merged with this frame.
+     * @param mergeTraceCb Logging trace source for BB frame optimization.
+     * @return true if merging done, false otherwise.
      */
     bool MergeWithFrame(Ptr<SatBbFrame> mergedFrame,
                         TracedCallback<Ptr<SatBbFrame>, Ptr<SatBbFrame>> mergeTraceCb);
@@ -141,21 +141,21 @@ class SatBbFrame : public SimpleRefCount<SatBbFrame>
     /**
      * Shrink BB frame to the shortest type possible according to
      * current load in the frame.
-     * \param conf Pointer to BB frame configuration
-     * \return Decrease of the frame duration after shrinking it
+     * @param conf Pointer to BB frame configuration
+     * @return Decrease of the frame duration after shrinking it
      */
     Time Shrink(Ptr<SatBbFrameConf> conf);
 
     /**
      * Extent BB frame to the longest type.
-     * \param conf Pointer to BB frame configuration
-     * \return Increase of the frame duration after extending it
+     * @param conf Pointer to BB frame configuration
+     * @return Increase of the frame duration after extending it
      */
     Time Extend(Ptr<SatBbFrameConf> conf);
 
     /**
      * Get duration of the frame transmission.
-     * \return duration of the frame transmission
+     * @return duration of the frame transmission
      */
     inline Time GetDuration() const
     {
@@ -164,7 +164,7 @@ class SatBbFrame : public SimpleRefCount<SatBbFrame>
 
     /**
      * Get type of the frame.
-     * \return Type of the frame
+     * @return Type of the frame
      */
     inline SatEnums::SatBbFrameType_t GetFrameType() const
     {
@@ -173,7 +173,7 @@ class SatBbFrame : public SimpleRefCount<SatBbFrame>
 
     /**
      * Get type of the frame.
-     * \return Type of the frame
+     * @return Type of the frame
      */
     inline SatEnums::SatModcod_t GetModcod() const
     {
@@ -182,7 +182,7 @@ class SatBbFrame : public SimpleRefCount<SatBbFrame>
 
     /**
      * Get the slice ID of the BBFrame
-     * \return The slice ID of the BBFrame
+     * @return The slice ID of the BBFrame
      */
     inline uint8_t GetSliceId() const
     {
@@ -191,7 +191,7 @@ class SatBbFrame : public SimpleRefCount<SatBbFrame>
 
     /**
      * Set the slice ID of the BBFrame
-     * \param sliceId The slice ID of the BBFrame
+     * @param sliceId The slice ID of the BBFrame
      */
     void SetSliceId(uint8_t sliceId)
     {
@@ -200,7 +200,7 @@ class SatBbFrame : public SimpleRefCount<SatBbFrame>
 
     /**
      * Get header size of the frame.
-     * \return Header size in bytes.
+     * @return Header size in bytes.
      */
     inline uint32_t GetFrameHeaderSize() const
     {
@@ -209,14 +209,14 @@ class SatBbFrame : public SimpleRefCount<SatBbFrame>
 
     /**
      * Callback signature for Ptr<SatBbFrame>.
-     * \param bbFrame The BB frame.
+     * @param bbFrame The BB frame.
      */
     typedef void (*BbFrameCallback)(Ptr<SatBbFrame> bbFrame);
 
     /**
      * Callback signature for merging of two instances of SatBbFrame.
-     * \param to The frame merged to.
-     * \param to The frame merged from.
+     * @param to The frame merged to.
+     * @param to The frame merged from.
      */
     typedef void (*BbFrameMergeCallback)(Ptr<SatBbFrame> to, Ptr<SatBbFrame> from);
 

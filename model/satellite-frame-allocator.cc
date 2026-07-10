@@ -22,12 +22,13 @@
 
 #include "satellite-utils.h"
 
-#include <ns3/boolean.h>
-#include <ns3/double.h>
-#include <ns3/log.h>
+#include "ns3/boolean.h"
+#include "ns3/double.h"
+#include "ns3/log.h"
 
 #include <algorithm>
 #include <limits>
+#include <random>
 #include <utility>
 #include <vector>
 
@@ -193,7 +194,9 @@ SatFrameAllocator::BandwidthComparator::operator()(const Ptr<SatFrameAllocator>&
     double bandwidthB = b->m_frameConf->GetBandwidthHz();
 
     if (bandwidthA == bandwidthB)
+    {
         return a > b;
+    }
     return bandwidthA > bandwidthB;
 }
 
@@ -335,7 +338,9 @@ SatFrameAllocator::SelectCarriers(uint16_t& count, uint16_t offset)
     {
         // Ensure that we get an even number of carriers on subdivided frames
         if (total % 2)
+        {
             ++count;
+        }
     }
     else
     {
@@ -1364,7 +1369,8 @@ SatFrameAllocator::SortUts()
     }
 
     // sort UTs using random method.
-    std::random_shuffle(uts.begin(), uts.end());
+    std::default_random_engine rng = std::default_random_engine{};
+    std::shuffle(uts.begin(), uts.end(), rng);
 
     return uts;
 }
@@ -1382,7 +1388,8 @@ SatFrameAllocator::SortCarriers()
     }
 
     // sort available carriers using random methods.
-    std::random_shuffle(carriers.begin(), carriers.end());
+    std::default_random_engine rng = std::default_random_engine{};
+    std::shuffle(carriers.begin(), carriers.end(), rng);
 
     return carriers;
 }
@@ -1403,7 +1410,8 @@ SatFrameAllocator::SortUtRcs(Address ut)
     if (rcIndices.size() > 2)
     {
         // sort RCs in UT using random method.
-        std::random_shuffle(rcIndices.begin() + 1, rcIndices.end());
+        std::default_random_engine rng = std::default_random_engine{};
+        std::shuffle(rcIndices.begin() + 1, rcIndices.end(), rng);
     }
 
     return rcIndices;

@@ -28,9 +28,9 @@
 using namespace ns3;
 
 /**
- * \file sat-http-example.cc
- * \ingroup satellite
- * \brief Example of using HTTP traffic model in a satellite network.
+ * @file sat-http-example.cc
+ * @ingroup satellite
+ * @brief Example of using HTTP traffic model in a satellite network.
  *
  * One HTTP server application is installed in the first GW user. Then one HTTP
  * client application is installed in each UT user, configured to point to the

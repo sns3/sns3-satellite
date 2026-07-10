@@ -23,10 +23,10 @@
 #include "geo-coordinate.h"
 #include "satellite-mobility-model.h"
 
-#include <ns3/enum.h>
-#include <ns3/log.h>
-#include <ns3/simulator.h>
-#include <ns3/uinteger.h>
+#include "ns3/enum.h"
+#include "ns3/log.h"
+#include "ns3/simulator.h"
+#include "ns3/uinteger.h"
 
 #include <map>
 #include <utility>
@@ -68,14 +68,6 @@ SatHandoverModule::GetTypeId(void)
                             MakeTraceSourceAccessor(&SatHandoverModule::m_antennaGainTrace),
                             "ns3::SatAntennaGainPattern::AntennaGainTrace");
     return tid;
-}
-
-TypeId
-SatHandoverModule::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
 }
 
 void

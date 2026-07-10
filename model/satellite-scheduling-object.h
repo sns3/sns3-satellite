@@ -21,9 +21,9 @@
 #ifndef SATELLITE_SCHEDULING_OBJECT_H_
 #define SATELLITE_SCHEDULING_OBJECT_H_
 
-#include <ns3/mac48-address.h>
-#include <ns3/nstime.h>
-#include <ns3/simple-ref-count.h>
+#include "ns3/mac48-address.h"
+#include "ns3/nstime.h"
+#include "ns3/simple-ref-count.h"
 
 #include <stdint.h>
 
@@ -31,8 +31,8 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief SatSchedulingObject is on object which passes the LLC/encapsulator
+ * @ingroup satellite
+ * @brief SatSchedulingObject is on object which passes the LLC/encapsulator
  * layer related information for MAC layer to be used by the scheduler (either
  * at GW by the forward link scheduler or at the UT by the RTN link UT scheduler).
  * One scheduling object holds information from one single LLC encapsulator (MAC
@@ -49,12 +49,12 @@ class SatSchedulingObject : public SimpleRefCount<SatSchedulingObject>
 
     /**
      * Default constructor
-     * \param addr MAC address of an UT
-     * \param bytes Amount of bytes at an encapsulator
-     * \param minTxOpportunity Minimum size of the Tx opportunity to be
+     * @param addr MAC address of an UT
+     * @param bytes Amount of bytes at an encapsulator
+     * @param minTxOpportunity Minimum size of the Tx opportunity to be
      *        able to create a packet.
-     * \param holDelay Head of line queuing delay
-     * \param flowId Flow identifier
+     * @param holDelay Head of line queuing delay
+     * @param flowId Flow identifier
      */
     SatSchedulingObject(Mac48Address addr,
                         uint32_t bytes,
@@ -68,33 +68,33 @@ class SatSchedulingObject : public SimpleRefCount<SatSchedulingObject>
     virtual ~SatSchedulingObject();
 
     /**
-     * \brief Get the MAC address of this object
-     * \return Mac48Address MAC address
+     * @brief Get the MAC address of this object
+     * @return Mac48Address MAC address
      */
     Mac48Address GetMacAddress() const;
 
     /**
-     * \brief Get buffered bytes of this object
-     * \return Buffered bytes
+     * @brief Get buffered bytes of this object
+     * @return Buffered bytes
      */
     uint32_t GetBufferedBytes() const;
 
     /**
-     * \brief Get minimum Tx opportunity in bytes
-     * \return Minimum Tx opportunity in bytes
+     * @brief Get minimum Tx opportunity in bytes
+     * @return Minimum Tx opportunity in bytes
      */
     uint32_t GetMinTxOpportunityInBytes() const;
 
     /**
-     * \brief Get the flow identifier of the scheduling object.
+     * @brief Get the flow identifier of the scheduling object.
      * This may be used as priority as well.
-     * \return Flow identifier
+     * @return Flow identifier
      */
     uint8_t GetFlowId() const;
 
     /**
-     * \brief Get HOL delay of the object.
-     * \return HOL delay of the object in Time.
+     * @brief Get HOL delay of the object.
+     * @return HOL delay of the object in Time.
      */
     Time GetHolDelay() const;
 

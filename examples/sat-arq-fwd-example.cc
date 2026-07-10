@@ -30,10 +30,10 @@
 using namespace ns3;
 
 /**
- * \file sat-arq-fwd-example.cc
- * \ingroup satellite
+ * @file sat-arq-fwd-example.cc
+ * @ingroup satellite
  *
- * \brief  An example to test FWD link ARQ functionality
+ * @brief  An example to test FWD link ARQ functionality
  *
  *         execute command -> ./waf --run "sat-arq-fwd-example --PrintHelp"
  */

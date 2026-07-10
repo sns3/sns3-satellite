@@ -30,10 +30,10 @@
 using namespace ns3;
 
 /**
- * \file sat-tutorial-example.cc
- * \ingroup satellite
+ * @file sat-tutorial-example.cc
+ * @ingroup satellite
  *
- * \brief  Tutorial example application guides how to build up different scenarios of satellite
+ * @brief  Tutorial example application guides how to build up different scenarios of satellite
  * network. It also guides how to configure the satellite network e.g. modifying attributes.
  *         Interval, packet size and test scenario can be given
  *         in command line as user argument.

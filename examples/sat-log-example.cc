@@ -27,10 +27,10 @@
 using namespace ns3;
 
 /**
- * \file sat-log-example.cc
- * \ingroup satellite
+ * @file sat-log-example.cc
+ * @ingroup satellite
  *
- * \brief Example for message log class.
+ * @brief Example for message log class.
  *
  * The format for messages is (type, custom file tag, message). Custom file tag
  * is in effect only with LOG_CUSTOM. With other types it does not matter and can

@@ -30,12 +30,12 @@
 #include "satellite-ground-station-address-tag.h"
 #include "satellite-topology.h"
 
-#include <ns3/command-line.h>
-#include <ns3/log.h>
-#include <ns3/packet.h>
-#include <ns3/pointer.h>
-#include <ns3/simulator.h>
-#include <ns3/singleton.h>
+#include "ns3/command-line.h"
+#include "ns3/log.h"
+#include "ns3/packet.h"
+#include "ns3/pointer.h"
+#include "ns3/simulator.h"
+#include "ns3/singleton.h"
 
 #include <algorithm>
 #include <iostream>

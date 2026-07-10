@@ -19,9 +19,9 @@
  */
 
 /**
- * \file satellite-geo-coordinate-test.cc
- * \ingroup satellite
- * \brief Test cases to unit test GeoCoordinate class.
+ * @file satellite-geo-coordinate-test.cc
+ * @ingroup satellite
+ * @brief Test cases to unit test GeoCoordinate class.
  *
  */
 #include "../utils/satellite-env-variables.h"
@@ -57,7 +57,7 @@ PrintPositionInfo(GeoCoordinate pos)
 #endif
 
 /**
- * \brief Test case to unit test that GeoCoordinate can be created with valid values.
+ * @brief Test case to unit test that GeoCoordinate can be created with valid values.
  */
 class GeoCoordinateTestCase : public TestCase
 {
@@ -86,8 +86,8 @@ GeoCoordinateTestCase::DoRun(void)
     GeoCoordinate position2;
 
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-geo-coordinate", "", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-geo-coordinate", "", true);
 
     for (int i = -180; i <= 180; i += 30)
     {
@@ -112,7 +112,7 @@ GeoCoordinateTestCase::DoRun(void)
         Validate(position1, position2);
     }
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 }
 
 void
@@ -145,7 +145,7 @@ GeoCoordinateTestCase::Validate(GeoCoordinate& position1, GeoCoordinate& positio
 }
 
 /**
- * \brief Test suite for GeoCoordinate unit test cases.
+ * @brief Test suite for GeoCoordinate unit test cases.
  */
 class GeoCoordinateTestSuite : public TestSuite
 {

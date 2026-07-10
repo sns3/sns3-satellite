@@ -102,32 +102,58 @@ twoline2rv(char longstr1[130],
     // set the implied decimal points since doing a formated read
     // fixes for bad input data values (missing, ...)
     for (j = 10; j <= 15; j++)
+    {
         if (longstr1[j] == ' ')
+        {
             longstr1[j] = '_';
+        }
+    }
 
     if (longstr1[44] != ' ')
+    {
         longstr1[43] = longstr1[44];
+    }
     longstr1[44] = '.';
     if (longstr1[7] == ' ')
+    {
         longstr1[7] = 'U';
+    }
     if (longstr1[9] == ' ')
+    {
         longstr1[9] = '.';
+    }
     for (j = 45; j <= 49; j++)
+    {
         if (longstr1[j] == ' ')
+        {
             longstr1[j] = '0';
+        }
+    }
     if (longstr1[51] == ' ')
+    {
         longstr1[51] = '0';
+    }
     if (longstr1[53] != ' ')
+    {
         longstr1[52] = longstr1[53];
+    }
     longstr1[53] = '.';
     longstr2[25] = '.';
     for (j = 26; j <= 32; j++)
+    {
         if (longstr2[j] == ' ')
+        {
             longstr2[j] = '0';
+        }
+    }
     if (longstr1[62] == ' ')
+    {
         longstr1[62] = '0';
+    }
     if (longstr1[68] == ' ')
+    {
         longstr1[68] = '0';
+    }
 
     sscanf(longstr1,
            "%2d %5ld %1c %10s %2d %12lf %11lf %7lf %2d %7lf %2d %2d %6ld ",
@@ -148,6 +174,7 @@ twoline2rv(char longstr1[130],
     if (typerun == 'v') // run for specified times from the file
     {
         if (longstr2[52] == ' ')
+        {
             sscanf(longstr2,
                    "%2d %5ld %9lf %9lf %8lf %9lf %9lf %10lf %6ld %lf %lf %lf \n",
                    &cardnumb,
@@ -162,7 +189,9 @@ twoline2rv(char longstr1[130],
                    &startmfe,
                    &stopmfe,
                    &deltamin);
+        }
         else
+        {
             sscanf(longstr2,
                    "%2d %5ld %9lf %9lf %8lf %9lf %9lf %11lf %6ld %lf %lf %lf \n",
                    &cardnumb,
@@ -177,10 +206,12 @@ twoline2rv(char longstr1[130],
                    &startmfe,
                    &stopmfe,
                    &deltamin);
+        }
     }
     else // simply run -1 day to +1 day or user input times
     {
         if (longstr2[52] == ' ')
+        {
             sscanf(longstr2,
                    "%2d %5ld %9lf %9lf %8lf %9lf %9lf %10lf %6ld \n",
                    &cardnumb,
@@ -192,7 +223,9 @@ twoline2rv(char longstr1[130],
                    &satrec.mo,
                    &satrec.no,
                    &revnum);
+        }
         else
+        {
             sscanf(longstr2,
                    "%2d %5ld %9lf %9lf %8lf %9lf %9lf %11lf %6ld \n",
                    &cardnumb,
@@ -204,6 +237,7 @@ twoline2rv(char longstr1[130],
                    &satrec.mo,
                    &satrec.no,
                    &revnum);
+        }
     }
 
     // ---- find no, ndot, nddot ----
@@ -234,9 +268,13 @@ twoline2rv(char longstr1[130],
     // ---------------- temp fix for years from 1957-2056 -------------------
     // --------- correct fix will occur when year is 4-digit in tle ---------
     if (satrec.epochyr < 57)
+    {
         year = satrec.epochyr + 2000;
+    }
     else
+    {
         year = satrec.epochyr + 1900;
+    }
 
     days2mdhms(year, satrec.epochdays, mon, day, hr, minute, sec);
     jday(year, mon, day, hr, minute, sec, satrec.jdsatepoch);

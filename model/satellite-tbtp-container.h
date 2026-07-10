@@ -25,8 +25,8 @@
 #include "satellite-frame-conf.h"
 #include "satellite-superframe-sequence.h"
 
-#include <ns3/mac48-address.h>
-#include <ns3/object.h>
+#include "ns3/mac48-address.h"
+#include "ns3/object.h"
 
 #include <map>
 #include <stdint.h>
@@ -35,7 +35,7 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  * This class sorts time slots within TBTP into increasing order based
  * on start time.
  */
@@ -48,9 +48,9 @@ class SortTimeSlots
 
     /**
      * Operator overload for sorting function
-     * \param p1 Time slot configuration
-     * \param p2 Time slot configuration
-     * \return Start time of p1 < Start time of p2
+     * @param p1 Time slot configuration
+     * @param p2 Time slot configuration
+     * @return Start time of p1 < Start time of p2
      */
     bool operator()(Ptr<SatTimeSlotConf> p1, Ptr<SatTimeSlotConf> p2)
     {
@@ -59,8 +59,8 @@ class SortTimeSlots
 };
 
 /**
- * \ingroup satellite
- * \brief A container of received TBTPs. All the received TBTPs with
+ * @ingroup satellite
+ * @brief A container of received TBTPs. All the received TBTPs with
  * the calculated transmit time are stored here. The container may be
  * used to check whether the UT has known scheduled time slots in the
  * future.
@@ -75,7 +75,7 @@ class SatTbtpContainer : public Object
 
     /**
      * Constructor with initialization parameters.
-     * \param seq
+     * @param seq
      */
     SatTbtpContainer(Ptr<SatSuperframeSeq> seq);
 
@@ -85,8 +85,8 @@ class SatTbtpContainer : public Object
     ~SatTbtpContainer();
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
 
@@ -96,31 +96,31 @@ class SatTbtpContainer : public Object
     virtual void DoDispose();
 
     /**
-     * \brief Set the MAC address of this node
-     * \param address MAC address of this node
+     * @brief Set the MAC address of this node
+     * @param address MAC address of this node
      */
     void SetMacAddress(Mac48Address address);
 
     /**
-     * \brief Add a TBTP message to the container
-     * \param startTime TBTP superframe transmit start time
-     * \param tbtp TBTP message
+     * @brief Add a TBTP message to the container
+     * @param startTime TBTP superframe transmit start time
+     * @param tbtp TBTP message
      */
     void Add(Time startTime, Ptr<SatTbtpMessage> tbtp);
 
     void Clear();
 
     /**
-     * \brief Method of checking whether the UT has been scheduled time
+     * @brief Method of checking whether the UT has been scheduled time
      * slots into the future.
-     * \return bool Boolean indicating whether UT has been scheduled
+     * @return bool Boolean indicating whether UT has been scheduled
      * time slots into the future.
      */
     bool HasScheduledTimeSlots();
 
   private:
     /**
-     * \brief Function for removing the TBTPs which are in the past.
+     * @brief Function for removing the TBTPs which are in the past.
      */
     void RemovePastTbtps();
 

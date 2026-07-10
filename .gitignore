@@ -2,6 +2,7 @@ __pycache__
 ext-utils/.uncrustifyignore
 *.xz
 .hgignore
+.vscode
 
 cmake-cache/
 cmake-build-debug/

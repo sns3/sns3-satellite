@@ -30,9 +30,9 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief A configuration class for Loo's model fader. The class provides
+ * @brief A configuration class for Loo's model fader. The class provides
  * configuration parameters for Loo's fader used with Markov-based
  * fading model.
  */
@@ -40,56 +40,56 @@ class SatLooConf : public SatBaseFaderConf
 {
   public:
     /**
-     * \brief Default Loo parameter count
+     * @brief Default Loo parameter count
      */
     static const uint32_t DEFAULT_LOO_PARAMETER_COUNT = 7;
 
     /**
-     * \brief NS-3 function for type id
-     * \return
+     * @brief NS-3 function for type id
+     * @return
      */
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Constructor
+     * @brief Constructor
      */
     SatLooConf();
 
     /**
-     * \brief Destructor
+     * @brief Destructor
      */
     ~SatLooConf();
 
     /**
-     * \brief Function for getting the Loo parameters
-     * \param set parameter set
-     * \return Loo parameter values
+     * @brief Function for getting the Loo parameters
+     * @param set parameter set
+     * @return Loo parameter values
      */
     std::vector<std::vector<double>> GetParameters(uint32_t set);
 
     /**
-     * \brief Do needed dispose actions
+     * @brief Do needed dispose actions
      */
     void DoDispose();
 
   private:
     /**
-     * \brief Number of parameters sets
+     * @brief Number of parameters sets
      */
     uint32_t m_elevationCount;
 
     /**
-     * \brief Number of states
+     * @brief Number of states
      */
     uint32_t m_stateCount;
 
     /**
-     * \brief Loo's model parameters
+     * @brief Loo's model parameters
      */
     std::vector<std::vector<std::vector<double>>> m_looParameters;
 
     /**
-     * \brief Clear used variables
+     * @brief Clear used variables
      */
     void Reset();
 };

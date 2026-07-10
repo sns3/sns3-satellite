@@ -24,8 +24,8 @@
 #ifndef SATELLITE_ISL_ARBITER_UNICAST_HELPER_H
 #define SATELLITE_ISL_ARBITER_UNICAST_HELPER_H
 
-#include <ns3/node-container.h>
-#include <ns3/satellite-isl-arbiter-unicast.h>
+#include "ns3/node-container.h"
+#include "ns3/satellite-isl-arbiter-unicast.h"
 
 #include <map>
 #include <stdint.h>
@@ -48,7 +48,7 @@ class SatIslArbiterUnicastHelper : public Object
     /**
      * Constructor
      *
-     * \param isls List of all ISLs
+     * @param isls List of all ISLs
      */
     SatIslArbiterUnicastHelper(std::vector<std::pair<uint32_t, uint32_t>> isls);
 

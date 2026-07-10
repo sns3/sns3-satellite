@@ -29,10 +29,10 @@
 using namespace ns3;
 
 /**
- * \file sat-trace-input-interference-example.cc
- * \ingroup satellite
+ * @file sat-trace-input-interference-example.cc
+ * @ingroup satellite
  *
- * \brief  Trace input interference example application based on CBR example for satellite network.
+ * @brief  Trace input interference example application based on CBR example for satellite network.
  *         Interval, packet size and test scenario can be given in command line as user argument.
  *         To see help for user arguments, execute the command
  *

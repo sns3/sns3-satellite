@@ -19,9 +19,9 @@
  */
 
 /**
- * \file satellite-simple-unicast.cc
- * \ingroup satellite
- * \brief 'Simple Point-to-Point Test Cases' implementation of TN4.
+ * @file satellite-simple-unicast.cc
+ * @ingroup satellite
+ * @brief 'Simple Point-to-Point Test Cases' implementation of TN4.
  *
  * In this module are implemented all 'Simple Point-to-Point' Test Cases
  * defined in document TN4.
@@ -46,8 +46,8 @@
 using namespace ns3;
 
 /**
- * \ingroup satellite
- * \brief 'Forward Link Unicast, Simple' test case implementation, id: simple_unicast-1 / TN4.
+ * @ingroup satellite
+ * @brief 'Forward Link Unicast, Simple' test case implementation, id: simple_unicast-1 / TN4.
  *
  * This case tests successful transmission of a single UDP packet from GW connected user
  * to UT connected user in simple scenario.
@@ -91,10 +91,8 @@ void
 SimpleUnicast1::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-simple-unicast",
-                                                          "unicast1",
-                                                          true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-simple-unicast", "unicast1", true);
 
     // Create simple scenario
 
@@ -105,7 +103,7 @@ SimpleUnicast1::DoRun(void)
 
     // Creating the reference system.
     Ptr<SatHelper> helper = CreateObject<SatHelper>(
-        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E");
+        SatEnvVariables::GetInstance()->LocateDataDirectory() + "/scenarios/geo-33E");
     helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
     NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
@@ -145,13 +143,13 @@ SimpleUnicast1::DoRun(void)
     NS_TEST_ASSERT_MSG_NE(sender->GetSent(), (uint32_t)0, "Nothing sent!");
     NS_TEST_ASSERT_MSG_EQ(receiver->GetTotalRx(), sender->GetSent(), "Packets were lost!");
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
     // <<< End of actual test using Simple scenario <<<
 }
 
 /**
- * \ingroup satellite
- * \brief 'Forward Link Unicast, Larger' test case implementation, id: simple_unicast-2 / TN4.
+ * @ingroup satellite
+ * @brief 'Forward Link Unicast, Larger' test case implementation, id: simple_unicast-2 / TN4.
  *
  * This case tests successful transmission of a single UDP packet from GW connected user
  * to UT connected users in larger scenario.
@@ -196,10 +194,8 @@ void
 SimpleUnicast2::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-simple-unicast",
-                                                          "unicast2",
-                                                          true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-simple-unicast", "unicast2", true);
 
     // Create larger scenario
 
@@ -210,7 +206,7 @@ SimpleUnicast2::DoRun(void)
 
     // Creating the reference system.
     Ptr<SatHelper> helper = CreateObject<SatHelper>(
-        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E");
+        SatEnvVariables::GetInstance()->LocateDataDirectory() + "/scenarios/geo-33E");
     helper->CreatePredefinedScenario(SatHelper::LARGER);
 
     NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
@@ -279,13 +275,13 @@ SimpleUnicast2::DoRun(void)
                           sender2->GetSent(),
                           "Packets were lost between sender 2 and receiver 2!");
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
     // <<< End of actual test using Larger scenario <<<
 }
 
 /**
- * \ingroup satellite
- * \brief 'Forward Link Unicast, Full' test case implementation, id: simple_unicast-3 / TN4.
+ * @ingroup satellite
+ * @brief 'Forward Link Unicast, Full' test case implementation, id: simple_unicast-3 / TN4.
  *
  * This case tests successful transmission of a single UDP packet from GW connected user
  * to UT connected user in full scenario.
@@ -330,10 +326,8 @@ void
 SimpleUnicast3::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-simple-unicast",
-                                                          "unicast3",
-                                                          true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-simple-unicast", "unicast3", true);
 
     // Create full scenario
 
@@ -344,7 +338,7 @@ SimpleUnicast3::DoRun(void)
 
     // Creating the reference system.
     Ptr<SatHelper> helper = CreateObject<SatHelper>(
-        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E");
+        SatEnvVariables::GetInstance()->LocateDataDirectory() + "/scenarios/geo-33E");
     helper->CreatePredefinedScenario(SatHelper::FULL);
 
     NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
@@ -417,13 +411,13 @@ SimpleUnicast3::DoRun(void)
                               "Packets were lost between sender and receiver" << i << "!");
     }
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
     // <<< End of actual test using Full scenario <<<
 }
 
 /**
- * \ingroup satellite
- * \brief 'Return Link Unicast, Simple' test case implementation, id: simple_unicast-4 / TN4.
+ * @ingroup satellite
+ * @brief 'Return Link Unicast, Simple' test case implementation, id: simple_unicast-4 / TN4.
  *
  * This case tests successful transmission of a single UDP packet from UT connected user
  * to GW connected user in simple scenario.
@@ -467,10 +461,8 @@ void
 SimpleUnicast4::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-simple-unicast",
-                                                          "unicast4",
-                                                          true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-simple-unicast", "unicast4", true);
 
     // Create simple scenario
 
@@ -481,7 +473,7 @@ SimpleUnicast4::DoRun(void)
 
     // Creating the reference system.
     Ptr<SatHelper> helper = CreateObject<SatHelper>(
-        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E");
+        SatEnvVariables::GetInstance()->LocateDataDirectory() + "/scenarios/geo-33E");
     helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
     // >>> Start of actual test using Simple scenario >>>
@@ -521,13 +513,13 @@ SimpleUnicast4::DoRun(void)
     NS_TEST_ASSERT_MSG_NE(sender->GetSent(), (uint32_t)0, "Nothing sent !");
     NS_TEST_ASSERT_MSG_EQ(receiver->GetTotalRx(), sender->GetSent(), "Packets were lost !");
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
     // <<< End of actual test using Simple scenario <<<
 }
 
 /**
- * \ingroup satellite
- * \brief 'Return Link Unicast, Larger' test case implementation, id: simple_unicast-5 / TN4.
+ * @ingroup satellite
+ * @brief 'Return Link Unicast, Larger' test case implementation, id: simple_unicast-5 / TN4.
  *
  * This case tests successful transmission of a single UDP packet from UT connected user
  * to GW connected user in larger scenario.
@@ -572,10 +564,8 @@ void
 SimpleUnicast5::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-simple-unicast",
-                                                          "unicast5",
-                                                          true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-simple-unicast", "unicast5", true);
 
     // Create larger scenario
 
@@ -586,7 +576,7 @@ SimpleUnicast5::DoRun(void)
 
     // Creating the reference system.
     Ptr<SatHelper> helper = CreateObject<SatHelper>(
-        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E");
+        SatEnvVariables::GetInstance()->LocateDataDirectory() + "/scenarios/geo-33E");
     helper->CreatePredefinedScenario(SatHelper::LARGER);
 
     // >>> Start of actual test using Larger scenario >>>
@@ -638,13 +628,13 @@ SimpleUnicast5::DoRun(void)
                           sender1->GetSent() + sender2->GetSent(),
                           "Packets were lost!");
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
     // <<< End of actual test using Larger scenario <<<
 }
 
 /**
- * \ingroup satellite
- * \brief 'Return Link Unicast, Full' test case implementation, id: simple_unicast-6 / TN4.
+ * @ingroup satellite
+ * @brief 'Return Link Unicast, Full' test case implementation, id: simple_unicast-6 / TN4.
  *
  * This case tests successful transmission of a single UDP packet from UT connected user
  * to GW connected user in full scenario.
@@ -688,10 +678,8 @@ void
 SimpleUnicast6::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-simple-unicast",
-                                                          "unicast6",
-                                                          true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-simple-unicast", "unicast6", true);
 
     // Create full scenario
 
@@ -702,7 +690,7 @@ SimpleUnicast6::DoRun(void)
 
     // Creating the reference system.
     Ptr<SatHelper> helper = CreateObject<SatHelper>(
-        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E");
+        SatEnvVariables::GetInstance()->LocateDataDirectory() + "/scenarios/geo-33E");
     helper->CreatePredefinedScenario(SatHelper::FULL);
 
     // >>> Start of actual test using Full scenario >>>
@@ -771,13 +759,13 @@ SimpleUnicast6::DoRun(void)
 
     NS_TEST_ASSERT_MSG_EQ(receiver->GetTotalRx(), totalTxBytes, "Packets were lost!");
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
     // <<< End of actual test using Full scenario <<<
 }
 
 /**
- * \ingroup satellite
- * \brief 'Forward Link Unicast, Simple' test case implementation, id: simple_unicast-1 / TN4.
+ * @ingroup satellite
+ * @brief 'Forward Link Unicast, Simple' test case implementation, id: simple_unicast-1 / TN4.
  *
  * This case tests successful transmission of a single TCP packet from GW and UT connected
  * users to each other’s in simple scenario.
@@ -823,10 +811,8 @@ void
 SimpleUnicast7::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-simple-unicast",
-                                                          "unicast7",
-                                                          true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-simple-unicast", "unicast7", true);
 
     // Create simple scenario
 
@@ -837,7 +823,7 @@ SimpleUnicast7::DoRun(void)
 
     // Creating the reference system.
     Ptr<SatHelper> helper = CreateObject<SatHelper>(
-        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E");
+        SatEnvVariables::GetInstance()->LocateDataDirectory() + "/scenarios/geo-33E");
     helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
     NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
@@ -906,13 +892,13 @@ SimpleUnicast7::DoRun(void)
                           utSender->GetSent(),
                           "Packets were lost to GW!");
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
     // <<< End of actual test using Simple scenario <<<
 }
 
 /**
- * \ingroup satellite
- * \brief 'Forward Link Unicast, Simple' test case implementation, id: simple_unicast-1 / TN4.
+ * @ingroup satellite
+ * @brief 'Forward Link Unicast, Simple' test case implementation, id: simple_unicast-1 / TN4.
  *
  * This case tests successful transmission of a single TCP packet from GW and UT connected
  * users to each other’s in simple scenario.
@@ -958,10 +944,8 @@ void
 SimpleUnicast8::DoRun(void)
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-simple-unicast",
-                                                          "unicast8",
-                                                          true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-simple-unicast", "unicast8", true);
 
     // Create Larger scenario
 
@@ -972,7 +956,7 @@ SimpleUnicast8::DoRun(void)
 
     // Creating the reference system.
     Ptr<SatHelper> helper = CreateObject<SatHelper>(
-        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E");
+        SatEnvVariables::GetInstance()->LocateDataDirectory() + "/scenarios/geo-33E");
     helper->CreatePredefinedScenario(SatHelper::LARGER);
 
     NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
@@ -1065,7 +1049,7 @@ SimpleUnicast8::DoRun(void)
                           utSender1->GetSent() + utSender2->GetSent(),
                           "Packets were lost to GW!");
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
     // <<< End of actual test using Larger scenario <<<
 }
 

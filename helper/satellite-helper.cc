@@ -24,34 +24,34 @@
 #include "lora-network-server-helper.h"
 #include "satellite-lora-conf.h"
 
-#include <ns3/arp-cache.h>
-#include <ns3/csma-helper.h>
-#include <ns3/double.h>
-#include <ns3/internet-stack-helper.h>
-#include <ns3/ipv4-interface.h>
-#include <ns3/ipv4-routing-table-entry.h>
-#include <ns3/ipv4-static-routing-helper.h>
-#include <ns3/log.h>
-#include <ns3/lora-device-address-generator.h>
-#include <ns3/mobility-helper.h>
-#include <ns3/names.h>
-#include <ns3/queue.h>
-#include <ns3/satellite-env-variables.h>
-#include <ns3/satellite-handover-module.h>
-#include <ns3/satellite-id-mapper.h>
-#include <ns3/satellite-log.h>
-#include <ns3/satellite-point-to-point-isl-net-device.h>
-#include <ns3/satellite-position-allocator.h>
-#include <ns3/satellite-position-input-trace-container.h>
-#include <ns3/satellite-rtn-link-time.h>
-#include <ns3/satellite-sgp4-mobility-model.h>
-#include <ns3/satellite-topology.h>
-#include <ns3/satellite-traced-mobility-model.h>
-#include <ns3/satellite-typedefs.h>
-#include <ns3/singleton.h>
-#include <ns3/string.h>
-#include <ns3/system-path.h>
-#include <ns3/type-id.h>
+#include "ns3/arp-cache.h"
+#include "ns3/csma-helper.h"
+#include "ns3/double.h"
+#include "ns3/internet-stack-helper.h"
+#include "ns3/ipv4-interface.h"
+#include "ns3/ipv4-routing-table-entry.h"
+#include "ns3/ipv4-static-routing-helper.h"
+#include "ns3/log.h"
+#include "ns3/lora-device-address-generator.h"
+#include "ns3/mobility-helper.h"
+#include "ns3/names.h"
+#include "ns3/queue.h"
+#include "ns3/satellite-env-variables.h"
+#include "ns3/satellite-handover-module.h"
+#include "ns3/satellite-id-mapper.h"
+#include "ns3/satellite-log.h"
+#include "ns3/satellite-point-to-point-isl-net-device.h"
+#include "ns3/satellite-position-allocator.h"
+#include "ns3/satellite-position-input-trace-container.h"
+#include "ns3/satellite-rtn-link-time.h"
+#include "ns3/satellite-sgp4-mobility-model.h"
+#include "ns3/satellite-topology.h"
+#include "ns3/satellite-traced-mobility-model.h"
+#include "ns3/satellite-typedefs.h"
+#include "ns3/singleton.h"
+#include "ns3/string.h"
+#include "ns3/system-path.h"
+#include "ns3/type-id.h"
 
 #include <cmath>
 #include <fstream>
@@ -174,14 +174,6 @@ SatHelper::GetTypeId(void)
     return tid;
 }
 
-TypeId
-SatHelper::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
-}
-
 SatHelper::SatHelper()
 {
     NS_LOG_FUNCTION(this);
@@ -218,24 +210,29 @@ SatHelper::SatHelper(std::string scenarioPath)
 
     ReadStandard(m_scenarioPath + "/standard/standard.txt");
 
-    if (Singleton<SatEnvVariables>::Get()->IsValidFile(m_scenarioPath + "/positions/tles.txt"))
+    if (SatEnvVariables::GetInstance()->IsValidFile(m_scenarioPath + "/positions/tles.txt"))
     {
-        NS_ASSERT_MSG(!Singleton<SatEnvVariables>::Get()->IsValidFile(
-                          m_scenarioPath + "/positions/sat_positions.txt"),
+        NS_ASSERT_MSG(!SatEnvVariables::GetInstance()->IsValidFile(m_scenarioPath +
+                                                                   "/positions/sat_positions.txt"),
                       "position subfolder of scenario cannot have both contain tles.txt and "
                       "sat_positions.txt");
         m_satConstellationEnabled = true;
     }
-    else if (!Singleton<SatEnvVariables>::Get()->IsValidFile(m_scenarioPath +
-                                                             "/positions/sat_positions.txt"))
+    else if (!SatEnvVariables::GetInstance()->IsValidFile(m_scenarioPath +
+                                                          "/positions/sat_positions.txt"))
     {
         NS_FATAL_ERROR("position subfolder of scenario must contain tles.txt or sat_positions.txt");
     }
+}
 
-    // uncomment next line, if attributes are needed already in construction phase
-    ObjectBase::ConstructSelf(AttributeConstructionList());
+void
+SatHelper::NotifyConstructionCompleted()
+{
+    NS_LOG_FUNCTION(this);
 
-    Singleton<SatEnvVariables>::Get()->Initialize();
+    Object::NotifyConstructionCompleted();
+
+    SatEnvVariables::GetInstance()->Initialize();
     Singleton<SatIdMapper>::Get()->Reset();
     Singleton<SatTopology>::Get()->Reset();
 
@@ -243,8 +240,8 @@ SatHelper::SatHelper(std::string scenarioPath)
 
     if (m_standard == SatEnums::LORA)
     {
-        SatLoraConf satLoraConf;
-        satLoraConf.setSatConfAttributes(m_satConf);
+        Ptr<SatLoraConf> satLoraConf = CreateObject<SatLoraConf>();
+        satLoraConf->setSatConfAttributes(m_satConf);
     }
 
     std::vector<std::pair<uint32_t, uint32_t>> isls;
@@ -364,10 +361,10 @@ SatHelper::EnableCreationTraces()
 
     std::stringstream outputPathCreation;
     std::stringstream outputPathUt;
-    outputPathCreation << Singleton<SatEnvVariables>::Get()->GetOutputPath() << "/"
+    outputPathCreation << SatEnvVariables::GetInstance()->GetOutputPath() << "/"
                        << m_scenarioCreationFileName << ".log";
-    outputPathUt << Singleton<SatEnvVariables>::Get()->GetOutputPath() << "/"
-                 << m_utCreationFileName << ".log";
+    outputPathUt << SatEnvVariables::GetInstance()->GetOutputPath() << "/" << m_utCreationFileName
+                 << ".log";
 
     m_creationTraceStream = asciiTraceHelper.CreateFileStream(outputPathCreation.str());
     m_utTraceStream = asciiTraceHelper.CreateFileStream(outputPathUt.str());
@@ -393,8 +390,6 @@ SatHelper::LoadConstellationTopology(std::vector<std::string>& tles,
 {
     NS_LOG_FUNCTION(this);
 
-    m_scenarioPath + "beams/rtnConf.txt";
-
     m_satConf->Initialize(m_rtnConfFileName,
                           m_fwdConfFileName,
                           m_gwPosFileName,
@@ -406,7 +401,7 @@ SatHelper::LoadConstellationTopology(std::vector<std::string>& tles,
     tles = m_satConf->LoadTles(m_scenarioPath + "/positions/tles.txt",
                                m_scenarioPath + "/positions/start_date.txt");
 
-    if (Singleton<SatEnvVariables>::Get()->IsValidFile(m_scenarioPath + "/positions/isls.txt"))
+    if (SatEnvVariables::GetInstance()->IsValidFile(m_scenarioPath + "/positions/isls.txt"))
     {
         isls = m_satConf->LoadIsls(m_scenarioPath + "/positions/isls.txt");
     }
@@ -1041,7 +1036,7 @@ SatHelper::LoadMobileUTsFromFolder(const std::string& folderName, Ptr<RandomVari
 {
     NS_LOG_FUNCTION(this << folderName << utUsers);
 
-    if (!(Singleton<SatEnvVariables>::Get()->IsValidDirectory(folderName)))
+    if (!(SatEnvVariables::GetInstance()->IsValidDirectory(folderName)))
     {
         NS_LOG_INFO("Directory '" << folderName
                                   << "' does not exist, no mobile UTs will be created.");
@@ -1051,7 +1046,7 @@ SatHelper::LoadMobileUTsFromFolder(const std::string& folderName, Ptr<RandomVari
     for (std::string& filename : SystemPath::ReadFiles(folderName))
     {
         std::string filepath = folderName + "/" + filename;
-        if (Singleton<SatEnvVariables>::Get()->IsValidDirectory(filepath))
+        if (SatEnvVariables::GetInstance()->IsValidDirectory(filepath))
         {
             NS_LOG_INFO("Skipping directory '" << filename << "'");
             continue;
@@ -1091,8 +1086,8 @@ SatHelper::LoadMobileUtFromFile(const std::string& filename)
 {
     NS_LOG_FUNCTION(this << filename);
 
-    if (Singleton<SatEnvVariables>::Get()->IsValidFile(
-            Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/" + filename))
+    if (SatEnvVariables::GetInstance()->IsValidFile(
+            SatEnvVariables::GetInstance()->LocateDataDirectory() + "/" + filename))
     {
         NS_FATAL_ERROR(filename << " is not a valid file name");
     }
@@ -1123,8 +1118,8 @@ SatHelper::LoadMobileUtFromFile(uint32_t satId, const std::string& filename)
 {
     NS_LOG_FUNCTION(this << satId << filename);
 
-    if (Singleton<SatEnvVariables>::Get()->IsValidFile(
-            Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/" + filename))
+    if (SatEnvVariables::GetInstance()->IsValidFile(
+            SatEnvVariables::GetInstance()->LocateDataDirectory() + "/" + filename))
     {
         NS_FATAL_ERROR(filename << " is not a valid file name");
     }

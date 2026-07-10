@@ -20,8 +20,8 @@
 
 #include "satellite-per-fragment-interference.h"
 
-#include <ns3/log.h>
-#include <ns3/simulator.h>
+#include "ns3/log.h"
+#include "ns3/simulator.h"
 
 #include <cstddef>
 #include <stdint.h>
@@ -43,13 +43,6 @@ SatPerFragmentInterference::GetTypeId(void)
                             .AddConstructor<SatPerFragmentInterference>();
 
     return tid;
-}
-
-TypeId
-SatPerFragmentInterference::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-    return GetTypeId();
 }
 
 SatPerFragmentInterference::SatPerFragmentInterference()

@@ -23,8 +23,8 @@
 
 #include "satellite-enums.h"
 
-#include <ns3/mac48-address.h>
-#include <ns3/simple-ref-count.h>
+#include "ns3/mac48-address.h"
+#include "ns3/simple-ref-count.h"
 
 #include <stdint.h>
 
@@ -32,9 +32,9 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief The SatNodeInfo implements a container for all needed node related information.
+ * @brief The SatNodeInfo implements a container for all needed node related information.
  * It may be passed to all entities which need node specific information, e.g. LLC,
  * MAC and PHY layers.
  */
@@ -49,9 +49,9 @@ class SatNodeInfo : public SimpleRefCount<SatNodeInfo>
 
     /**
      * Constructor with initialization parameters.
-     * \param nodeType
-     * \param nodeId
-     * \param macAddress
+     * @param nodeType
+     * @param nodeId
+     * @param macAddress
      */
     SatNodeInfo(SatEnums::SatNodeType_t nodeType, uint32_t nodeId, Mac48Address macAddress);
 
@@ -61,20 +61,20 @@ class SatNodeInfo : public SimpleRefCount<SatNodeInfo>
     virtual ~SatNodeInfo();
 
     /**
-     * \brief Get node identifier
-     * \return Node identifier
+     * @brief Get node identifier
+     * @return Node identifier
      */
     uint32_t GetNodeId() const;
 
     /**
-     * \brief Get Node type (UT, SAT, GW, NCC, TER)
-     * \return Node type enum
+     * @brief Get Node type (UT, SAT, GW, NCC, TER)
+     * @return Node type enum
      */
     SatEnums::SatNodeType_t GetNodeType() const;
 
     /**
-     * \brief Get MAC address
-     * \return Node (SatNetDevice) MAC address
+     * @brief Get MAC address
+     * @return Node (SatNetDevice) MAC address
      */
     Mac48Address GetMacAddress() const;
 

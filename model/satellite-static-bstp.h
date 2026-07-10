@@ -21,7 +21,7 @@
 #ifndef SAT_STATIC_BSTP_H
 #define SAT_STATIC_BSTP_H
 
-#include <ns3/simple-ref-count.h>
+#include "ns3/simple-ref-count.h"
 
 #include <map>
 #include <stdint.h>
@@ -32,8 +32,8 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief SatStaticBstp class models the static beam switching
+ * @ingroup satellite
+ * @brief SatStaticBstp class models the static beam switching
  * time plan (BSTP) configuration, which is defined in an external
  * file read by this class.
  *
@@ -69,25 +69,25 @@ class SatStaticBstp : public SimpleRefCount<SatStaticBstp>
     }
 
     /**
-     * \brief Load BSTP configuration from a file
-     * \param filePathName
+     * @brief Load BSTP configuration from a file
+     * @param filePathName
      */
     void LoadBstp(std::string filePathName);
 
     /**
-     * \brief Get the next configuration file
-     * \return A unsigned int configuration vector
+     * @brief Get the next configuration file
+     * @return A unsigned int configuration vector
      */
     std::vector<uint32_t> GetNextConf() const;
 
     /**
-     * \brief Add the information about which spot-beams are enabled
+     * @brief Add the information about which spot-beams are enabled
      * in this simulation. This information is stored and used to check
      * the validity of the BSTP.
-     * \param beamId Enabled beam identifier
-     * \param userFreqId User frequency id of the enabled spot-beam
-     * \param feederFreqId Feeder frequency id of the enabled spot-beam
-     * \param gwId GW id of the enabled spot-beam
+     * @param beamId Enabled beam identifier
+     * @param userFreqId User frequency id of the enabled spot-beam
+     * @param feederFreqId Feeder frequency id of the enabled spot-beam
+     * @param gwId GW id of the enabled spot-beam
      */
     void AddEnabledBeamInfo(uint32_t beamId,
                             uint32_t userFreqId,
@@ -95,7 +95,7 @@ class SatStaticBstp : public SimpleRefCount<SatStaticBstp>
                             uint32_t gwId);
 
     /**
-     * \brief Check validity of the individual BSTP configuration line.
+     * @brief Check validity of the individual BSTP configuration line.
      * The method is not returning anything, but it crashes to a fatal
      * message if the BSTP is not considered to be valid!
      */

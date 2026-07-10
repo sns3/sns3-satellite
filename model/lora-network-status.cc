@@ -30,12 +30,12 @@
 #include "satellite-lorawan-net-device.h"
 #include "satellite-topology.h"
 
-#include <ns3/log.h>
-#include <ns3/net-device.h>
-#include <ns3/node-container.h>
-#include <ns3/packet.h>
-#include <ns3/pointer.h>
-#include <ns3/singleton.h>
+#include "ns3/log.h"
+#include "ns3/net-device.h"
+#include "ns3/node-container.h"
+#include "ns3/packet.h"
+#include "ns3/pointer.h"
+#include "ns3/singleton.h"
 
 #include <map>
 #include <stdint.h>
@@ -51,7 +51,8 @@ NS_OBJECT_ENSURE_REGISTERED(LoraNetworkStatus);
 TypeId
 LoraNetworkStatus::GetTypeId(void)
 {
-    static TypeId tid = TypeId("ns3::LoraNetworkStatus").AddConstructor<LoraNetworkStatus>();
+    static TypeId tid =
+        TypeId("ns3::LoraNetworkStatus").SetParent<Object>().AddConstructor<LoraNetworkStatus>();
     return tid;
 }
 

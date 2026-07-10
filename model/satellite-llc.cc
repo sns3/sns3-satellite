@@ -30,10 +30,10 @@
 #include "satellite-typedefs.h"
 #include "satellite-utils.h"
 
-#include <ns3/log.h>
-#include <ns3/nstime.h>
-#include <ns3/simulator.h>
-#include <ns3/singleton.h>
+#include "ns3/log.h"
+#include "ns3/nstime.h"
+#include "ns3/simulator.h"
+#include "ns3/singleton.h"
 
 #include <utility>
 

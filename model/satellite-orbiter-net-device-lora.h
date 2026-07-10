@@ -29,11 +29,11 @@
 #include "satellite-point-to-point-isl-net-device.h"
 #include "satellite-signal-parameters.h"
 
-#include <ns3/error-model.h>
-#include <ns3/mac48-address.h>
-#include <ns3/net-device.h>
-#include <ns3/output-stream-wrapper.h>
-#include <ns3/traced-callback.h>
+#include "ns3/error-model.h"
+#include "ns3/mac48-address.h"
+#include "ns3/net-device.h"
+#include "ns3/output-stream-wrapper.h"
+#include "ns3/traced-callback.h"
 
 #include <map>
 #include <set>
@@ -45,8 +45,8 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief SatOrbiterNetDeviceLora to be utilized in geostationary satellite.
+ * @ingroup satellite
+ * @brief SatOrbiterNetDeviceLora to be utilized in geostationary satellite.
  * SatOrbiterNetDeviceLora holds a set of phy layers towards user and feeder
  * links; one pair of phy layers for each spot-beam. The SatNetDevice
  * implements a simple switching between all user and feeder links
@@ -56,8 +56,8 @@ class SatOrbiterNetDeviceLora : public SatOrbiterNetDevice
 {
   public:
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
 
@@ -67,32 +67,32 @@ class SatOrbiterNetDeviceLora : public SatOrbiterNetDevice
     SatOrbiterNetDeviceLora();
 
     /**
-     * \brief Receive the packet from the lower layers, in network regeneration on return link
-     * \param packet Packet received
-     * \param userAddress MAC address of user that received this packet
+     * @brief Receive the packet from the lower layers, in network regeneration on return link
+     * @param packet Packet received
+     * @param userAddress MAC address of user that received this packet
      */
     void ReceivePacketUser(Ptr<Packet> packet, const Address& userAddress);
 
     /**
-     * \brief Receive the packet from the lower layers, in network regeneration on forward link
-     * \param packet Packet received
-     * \param feederAddress MAC address of feeder that received this packet
+     * @brief Receive the packet from the lower layers, in network regeneration on forward link
+     * @param packet Packet received
+     * @param feederAddress MAC address of feeder that received this packet
      */
     void ReceivePacketFeeder(Ptr<Packet> packet, const Address& feederAddress);
 
     /**
      * Receive a packet from ISL.
-     * \param packet The packet to send
-     * \param destination The MAC address of ground station that will receive the packet
+     * @param packet The packet to send
+     * @param destination The MAC address of ground station that will receive the packet
      */
     void ReceiveFromIsl(Ptr<Packet> packet, Mac48Address destination);
 
     /**
-     * \brief Send a control packet on the feeder link
-     * \param msg The control message to send
-     * \param dest The MAC destination
-     * \param rxParams Strucutre storing additional parameters
-     * \return True if success
+     * @brief Send a control packet on the feeder link
+     * @param msg The control message to send
+     * @param dest The MAC destination
+     * @param rxParams Strucutre storing additional parameters
+     * @return True if success
      */
     virtual bool SendControlMsgToFeeder(Ptr<SatControlMessage> msg,
                                         const Address& dest,
@@ -100,15 +100,15 @@ class SatOrbiterNetDeviceLora : public SatOrbiterNetDevice
 
     /**
      * Connect a UT to this satellite.
-     * \param utAddress MAC address of the UT to connect
-     * \param beamId beam used by satellite to reach this UT
+     * @param utAddress MAC address of the UT to connect
+     * @param beamId beam used by satellite to reach this UT
      */
     virtual void ConnectUt(Mac48Address utAddress, uint32_t beamId);
 
     /**
      * Disconnect a UT to this satellite.
-     * \param utAddress MAC address of the UT to disconnect
-     * \param beamId beam used by satellite to reach this UT
+     * @param utAddress MAC address of the UT to disconnect
+     * @param beamId beam used by satellite to reach this UT
      */
     virtual void DisconnectUt(Mac48Address utAddress, uint32_t beamId);
 };

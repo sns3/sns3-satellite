@@ -27,46 +27,46 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief Class for fading input trace. The class implements the fading
+ * @brief Class for fading input trace. The class implements the fading
  * interface and provides access to the container of input fading files.
  */
 class SatFadingInputTrace : public SatBaseFading
 {
   public:
     /**
-     * \brief Constructor
+     * @brief Constructor
      */
     SatFadingInputTrace();
 
     /**
-     * \brief Constructor
+     * @brief Constructor
      */
     SatFadingInputTrace(Ptr<SatFadingInputTraceContainer> satFadingInputTraceContainer);
 
     /**
-     * \brief Destructor
+     * @brief Destructor
      */
     ~SatFadingInputTrace();
 
     /**
-     * \brief NS-3 type id function
-     * \return type id
+     * @brief NS-3 type id function
+     * @return type id
      */
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Function for getting the fading value
-     * \param macAddress MAC address
-     * \param channelType channel type
-     * \return fading value
+     * @brief Function for getting the fading value
+     * @param macAddress MAC address
+     * @param channelType channel type
+     * @return fading value
      */
     double DoGetFading(Address macAddress, SatEnums::ChannelType_t channelType);
 
   private:
     /**
-     * \brief Pointer to input trace container
+     * @brief Pointer to input trace container
      */
     Ptr<SatFadingInputTraceContainer> m_satFadingInputTraceContainer;
 };

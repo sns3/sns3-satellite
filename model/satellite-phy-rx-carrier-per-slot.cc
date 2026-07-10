@@ -24,10 +24,10 @@
 
 #include "satellite-uplink-info-tag.h"
 
-#include <ns3/address.h>
-#include <ns3/boolean.h>
-#include <ns3/log.h>
-#include <ns3/simulator.h>
+#include "ns3/address.h"
+#include "ns3/boolean.h"
+#include "ns3/log.h"
+#include "ns3/simulator.h"
 
 #include <algorithm>
 #include <deque>

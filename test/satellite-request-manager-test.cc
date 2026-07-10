@@ -19,9 +19,9 @@
  */
 
 /**
- * \file satellite-request-manager-test.cc
- * \ingroup satellite
- * \brief Test cases to test the UT request manager. Test cases:
+ * @file satellite-request-manager-test.cc
+ * @ingroup satellite
+ * @brief Test cases to test the UT request manager. Test cases:
  * - SatBaseTestCase is testing CRA. If DAMA is not configured at all
  * RM should not send CRs at all.
  */
@@ -41,8 +41,8 @@
 using namespace ns3;
 
 /**
- * \ingroup satellite
- * \brief Test case to unit test the UT request manager.
+ * @ingroup satellite
+ * @brief Test case to unit test the UT request manager.
  *
  */
 class SatBaseTestCase : public TestCase
@@ -54,23 +54,23 @@ class SatBaseTestCase : public TestCase
     /**
      * Send control message called with a callback from request manager. In
      * this test the method is used to analyze the sent requests from  RM.
-     * \param msg Control msg (CR, or CNo report)
-     * \param dest Destination MAC address
-     * \return Boolean whether the send was successfull.
+     * @param msg Control msg (CR, or CNo report)
+     * @param dest Destination MAC address
+     * @return Boolean whether the send was successfull.
      */
     bool SendControlMsg(Ptr<SatControlMessage> msg, const Address& dest);
 
     /**
      * Get queue statistics for request manager. This comes really from the
      * SatQueue, but here we send some known information as KPIs for RM.
-     * \param reset Flag to reset queue statistics (not used here)
-     * \return Queue statistics struct
+     * @param reset Flag to reset queue statistics (not used here)
+     * @return Queue statistics struct
      */
     SatQueue::QueueStats_t GetQueueStatistics(bool reset);
 
     /**
      * Check whether a control message transmission is possible.
-     * \return Boolean indicating the possibility
+     * @return Boolean indicating the possibility
      */
     bool ControlMsgTxPossible() const;
 
@@ -96,8 +96,8 @@ void
 SatBaseTestCase::DoRun()
 {
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-sat-rm", "", true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-sat-rm", "", true);
 
     // Base test case tests that no Capacity Requests are generated when CRA, RBDC
     // and VBDC are disabled for all lower layer service RC indices.
@@ -156,7 +156,7 @@ SatBaseTestCase::DoRun()
 
     Simulator::Destroy();
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 }
 
 bool
@@ -199,7 +199,7 @@ SatBaseTestCase::ControlMsgTxPossible() const
 }
 
 /**
- * \brief Test suite for Satellite Request Manager unit test cases.
+ * @brief Test suite for Satellite Request Manager unit test cases.
  */
 class SatRequestManagerTestSuite : public TestSuite
 {

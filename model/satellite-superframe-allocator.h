@@ -25,9 +25,9 @@
 #include "satellite-frame-allocator.h"
 #include "satellite-frame-conf.h"
 
-#include <ns3/address.h>
-#include <ns3/simple-ref-count.h>
-#include <ns3/traced-callback.h>
+#include "ns3/address.h"
+#include "ns3/simple-ref-count.h"
+#include "ns3/traced-callback.h"
 
 #include <stdint.h>
 
@@ -35,8 +35,8 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief helper class for Satellite Beam Scheduler.
+ * @ingroup satellite
+ * @brief helper class for Satellite Beam Scheduler.
  *
  * SatSuperframeAllocator class is used by SatBeamScheduler to maintain information
  * of the pre-allocated symbols per Capacity Category (CC) in frame.
@@ -49,8 +49,8 @@ class SatSuperframeAllocator : public Object
 {
   public:
     /**
-     * \brief Construct SatSuperframeAllocator
-     * \param superFrameConf Super frame configuration
+     * @brief Construct SatSuperframeAllocator
+     * @param superFrameConf Super frame configuration
      */
     SatSuperframeAllocator(Ptr<SatSuperframeConf> superFrameConf);
 
@@ -65,15 +65,9 @@ class SatSuperframeAllocator : public Object
     static TypeId GetTypeId(void);
 
     /**
-     * \brief Get the type ID of instance
-     * \return the object TypeId
-     */
-    virtual TypeId GetInstanceTypeId(void) const;
-
-    /**
-     * \brief Get super frame duration.
+     * @brief Get super frame duration.
      *
-     *  \return Super frame duration.
+     *  @return Super frame duration.
      **/
     inline Time GetSuperframeDuration() const
     {
@@ -81,35 +75,35 @@ class SatSuperframeAllocator : public Object
     }
 
     /**
-     * \brief Reserve minimum rate from the allocator. This method is called to perform CAC
+     * @brief Reserve minimum rate from the allocator. This method is called to perform CAC
      * functionality.
      *
-     * \param minimumRateBytes Minimum rate based bytes needed to reserve
-     * \param controlSlotsEnabled Flag indicating if control slot generation is enabled
+     * @param minimumRateBytes Minimum rate based bytes needed to reserve
+     * @param controlSlotsEnabled Flag indicating if control slot generation is enabled
      */
     virtual void ReserveMinimumRate(uint32_t minimumRateBytes, bool controlSlotsEnabled) = 0;
 
     /**
-     * \brief Release minimum rate from the allocator. This method is called when a UT leaves the
+     * @brief Release minimum rate from the allocator. This method is called when a UT leaves the
      * beam using this allocator.
      *
-     * \param minimumRateBytes Minimum rate based bytes needed to reserve
-     * \param controlSlotsEnabled Flag indicating if control slot generation is enabled
+     * @param minimumRateBytes Minimum rate based bytes needed to reserve
+     * @param controlSlotsEnabled Flag indicating if control slot generation is enabled
      */
     virtual void ReleaseMinimumRate(uint32_t minimumRateBytes, bool controlSlotsEnabled) = 0;
 
     /**
-     * \brief Preallocate symbols for given to UTs in superframe.
+     * @brief Preallocate symbols for given to UTs in superframe.
      * Pre-allocation is done in fairly manner between UTs and RCs.
      */
     virtual void PreAllocateSymbols(SatFrameAllocator::SatFrameAllocContainer_t& allocReqs) = 0;
 
     /**
-     * \brief Generate time slots in TBTP(s) for the UT/RC.
+     * @brief Generate time slots in TBTP(s) for the UT/RC.
      *
-     * \param tbtpContainer TBTP message container to add/fill TBTPs.
-     * \param maxSizeInBytes Maximum size for a TBTP message.
-     * \param utAllocContainer Reference to UT allocation container to fill in info of the
+     * @param tbtpContainer TBTP message container to add/fill TBTPs.
+     * @param maxSizeInBytes Maximum size for a TBTP message.
+     * @param utAllocContainer Reference to UT allocation container to fill in info of the
      * allocation \param waveformTrace Wave form trace callback \param utLoadTrace UT load per the
      * frame trace callback \param loadTrace Load per the frame trace callback
      */

@@ -34,13 +34,13 @@
 #include "satellite-typedefs.h"
 #include "satellite-utils.h"
 
-#include <ns3/boolean.h>
-#include <ns3/double.h>
-#include <ns3/log.h>
-#include <ns3/node.h>
-#include <ns3/pointer.h>
-#include <ns3/simulator.h>
-#include <ns3/uinteger.h>
+#include "ns3/boolean.h"
+#include "ns3/double.h"
+#include "ns3/log.h"
+#include "ns3/node.h"
+#include "ns3/pointer.h"
+#include "ns3/simulator.h"
+#include "ns3/uinteger.h"
 
 NS_LOG_COMPONENT_DEFINE("SatPhy");
 
@@ -71,8 +71,9 @@ SatPhy::SatPhy(void)
     NS_FATAL_ERROR("SatPhy default constructor is not allowed to use");
 }
 
-SatPhy::SatPhy(CreateParam_t& params)
-    : m_satId(0),
+SatPhy::SatPhy(CreateParam_t params)
+    : m_params(params),
+      m_satId(0),
       m_beamId(0),
       m_eirpWoGainW(0),
       m_isStatisticsTagsEnabled(false),
@@ -89,12 +90,9 @@ SatPhy::SatPhy(CreateParam_t& params)
       m_txAntennaLossDb(0),
       m_defaultFadingValue(1.0)
 {
-    NS_LOG_FUNCTION(this << params.m_satId << params.m_beamId);
-    ObjectBase::ConstructSelf(AttributeConstructionList());
+    NS_LOG_FUNCTION(this << m_params.m_satId << m_params.m_beamId);
 
-    Ptr<MobilityModel> mobility = params.m_device->GetNode()->GetObject<MobilityModel>();
-
-    switch (params.m_standard)
+    switch (m_params.m_standard)
     {
     case SatEnums::DVB_ORBITER:
     case SatEnums::DVB_UT:
@@ -119,15 +117,25 @@ SatPhy::SatPhy(CreateParam_t& params)
         break;
     }
     default:
-        NS_FATAL_ERROR("Standard not implemented yet: " << params.m_standard);
+        NS_FATAL_ERROR("Standard not implemented yet: " << m_params.m_standard);
     }
+}
 
-    m_phyTx->SetChannel(params.m_txCh);
-    m_satId = params.m_satId;
-    m_beamId = params.m_beamId;
+void
+SatPhy::NotifyConstructionCompleted()
+{
+    NS_LOG_FUNCTION(this);
 
-    params.m_rxCh->AddRx(m_phyRx);
-    m_phyRx->SetDevice(params.m_device);
+    Object::NotifyConstructionCompleted();
+
+    Ptr<MobilityModel> mobility = m_params.m_device->GetNode()->GetObject<MobilityModel>();
+
+    m_phyTx->SetChannel(m_params.m_txCh);
+    m_satId = m_params.m_satId;
+    m_beamId = m_params.m_beamId;
+
+    m_params.m_rxCh->AddRx(m_phyRx);
+    m_phyRx->SetDevice(m_params.m_device);
     m_phyTx->SetMobility(mobility);
     m_phyRx->SetMobility(mobility);
 }
@@ -188,13 +196,6 @@ SatPhy::GetTypeId(void)
                             MakeTraceSourceAccessor(&SatPhy::m_rxLinkModcodTrace),
                             "ns3::SatTypedefs::PacketModcodAddressCallback");
     return tid;
-}
-
-TypeId
-SatPhy::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-    return GetTypeId();
 }
 
 void
@@ -397,7 +398,7 @@ SatPhy::SendPdu(PacketContainer_t p,
                   SatUtils::GetPacketInfo(p));
 
     // Create a new SatSignalParameters related to this packet transmission
-    Ptr<SatSignalParameters> txParams = Create<SatSignalParameters>();
+    Ptr<SatSignalParameters> txParams = CreateObject<SatSignalParameters>();
     txParams->m_duration = duration;
     txParams->m_phyTx = m_phyTx;
     txParams->m_packetsInBurst = p;
@@ -502,8 +503,8 @@ SatPhy::RxTraces(SatPhy::PacketContainer_t packets)
 
                 if (item.GetTypeId() == SatAddressTag::GetTypeId())
                 {
-                    NS_LOG_DEBUG(this << " contains a SatAddressTag tag:"
-                                      << " start=" << item.GetStart() << " end=" << item.GetEnd());
+                    NS_LOG_DEBUG(this << " contains a SatAddressTag tag:" << " start="
+                                      << item.GetStart() << " end=" << item.GetEnd());
                     SatAddressTag addrTag;
                     item.GetTag(addrTag);
                     addr = addrTag.GetSourceAddress();

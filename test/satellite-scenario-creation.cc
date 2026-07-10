@@ -19,9 +19,9 @@
  */
 
 /**
- * \file satellite-scenario-creation.cc
- * \ingroup satellite
- * \brief 'Scenario Creation Test Cases' implementation of TN4.
+ * @file satellite-scenario-creation.cc
+ * @ingroup satellite
+ * @brief 'Scenario Creation Test Cases' implementation of TN4.
  *
  * In this module are implemented all 'Scenario Creation' Test Cases
  * defined in document TN4.
@@ -41,7 +41,7 @@
 using namespace ns3;
 
 /**
- * \brief 'Scenario Creation, Simple' test case implementation, id: sc-1 / TN4.
+ * @brief 'Scenario Creation, Simple' test case implementation, id: sc-1 / TN4.
  *
  * This case tests successful creation of the simple scenario creation of the reference system.
  *  1.  Simple test scenario created with helper
@@ -85,16 +85,16 @@ ScenarioCreationSimple::DoRun(void)
     Singleton<SatIdMapper>::Get()->Reset();
 
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-scenario-creation",
-                                                          "simple-scenario",
-                                                          true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-scenario-creation",
+                                                       "simple-scenario",
+                                                       true);
 
     // Create simple scenario
 
     // Creating the reference system.
     Ptr<SatHelper> helper = CreateObject<SatHelper>(
-        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E");
+        SatEnvVariables::GetInstance()->LocateDataDirectory() + "/scenarios/geo-33E");
 
     // Enable creation traces
     Config::SetDefault("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue(true));
@@ -109,13 +109,13 @@ ScenarioCreationSimple::DoRun(void)
                           1,
                           "UT User count is not what expected!");
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 
     Simulator::Destroy();
 }
 
 /**
- * \brief 'Scenario Creation, Larger' test case implementation, id: sc-2 / TN4.
+ * @brief 'Scenario Creation, Larger' test case implementation, id: sc-2 / TN4.
  *
  * This case tests successful creation of the larger scenario creation of the reference system.
  *  1.  Larger test scenario created with helper
@@ -159,16 +159,16 @@ ScenarioCreationLarger::DoRun(void)
     Singleton<SatIdMapper>::Get()->Reset();
 
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-scenario-creation",
-                                                          "larger-scenario",
-                                                          true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-scenario-creation",
+                                                       "larger-scenario",
+                                                       true);
 
     // Create larger scenario
 
     // Creating the reference system.
     Ptr<SatHelper> helper = CreateObject<SatHelper>(
-        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E");
+        SatEnvVariables::GetInstance()->LocateDataDirectory() + "/scenarios/geo-33E");
 
     // Enable creation traces
     Config::SetDefault("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue(true));
@@ -183,13 +183,13 @@ ScenarioCreationLarger::DoRun(void)
                           5,
                           "UT User count is not what expected!");
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 
     Simulator::Destroy();
 }
 
 /**
- * \brief 'Scenario Creation, Full' test case implementation, id: sc-3 / TN4.
+ * @brief 'Scenario Creation, Full' test case implementation, id: sc-3 / TN4.
  *
  * This case tests successful creation of the full scenario creation of the reference system.
  *  1.  Full test scenario created with helper
@@ -233,16 +233,16 @@ ScenarioCreationFull::DoRun(void)
     Singleton<SatIdMapper>::Get()->Reset();
 
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-scenario-creation",
-                                                          "full-scenario",
-                                                          true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-scenario-creation",
+                                                       "full-scenario",
+                                                       true);
 
     // Create full scenario
 
     // Creating the reference system.
     Ptr<SatHelper> helper = CreateObject<SatHelper>(
-        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E");
+        SatEnvVariables::GetInstance()->LocateDataDirectory() + "/scenarios/geo-33E");
 
     // Enable creation traces
     Config::SetDefault("ns3::SatHelper::ScenarioCreationTraceEnabled", BooleanValue(true));
@@ -262,13 +262,13 @@ ScenarioCreationFull::DoRun(void)
                           72 * 3 * 3,
                           "UT User count is not what expected!");
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 
     Simulator::Destroy();
 }
 
 /**
- * \brief 'Scenario Creation, User Defined' test case implementation, id: tbd / TN4.
+ * @brief 'Scenario Creation, User Defined' test case implementation, id: tbd / TN4.
  *
  * This case tests successful creation of the user defined scenario creation of the reference
  * system.
@@ -315,16 +315,16 @@ ScenarioCreationUser::DoRun(void)
     Singleton<SatIdMapper>::Get()->Reset();
 
     // Set simulation output details
-    Singleton<SatEnvVariables>::Get()->DoInitialize();
-    Singleton<SatEnvVariables>::Get()->SetOutputVariables("test-scenario-creation",
-                                                          "user-scenario",
-                                                          true);
+    SatEnvVariables::GetInstance()->DoInitialize();
+    SatEnvVariables::GetInstance()->SetOutputVariables("test-scenario-creation",
+                                                       "user-scenario",
+                                                       true);
 
     // Create user scenario
 
     // Creating the reference system.
     Ptr<SatHelper> helper = CreateObject<SatHelper>(
-        Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E");
+        SatEnvVariables::GetInstance()->LocateDataDirectory() + "/scenarios/geo-33E");
     SatBeamUserInfo beamInfo = SatBeamUserInfo(1, 1);
     std::map<std::pair<uint32_t, uint32_t>, SatBeamUserInfo> beamMap;
     beamMap[std::make_pair(0, 8)] = beamInfo;
@@ -345,7 +345,7 @@ ScenarioCreationUser::DoRun(void)
                           5,
                           "UT User count is not what expected!");
 
-    Singleton<SatEnvVariables>::Get()->DoDispose();
+    SatEnvVariables::GetInstance()->DoDispose();
 
     Simulator::Destroy();
 }

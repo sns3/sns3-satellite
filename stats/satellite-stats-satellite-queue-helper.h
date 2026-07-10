@@ -24,9 +24,9 @@
 
 #include "satellite-stats-helper.h"
 
-#include <ns3/callback.h>
-#include <ns3/collector-map.h>
-#include <ns3/ptr.h>
+#include "ns3/callback.h"
+#include "ns3/collector-map.h"
+#include "ns3/ptr.h"
 
 #include <string>
 
@@ -41,15 +41,15 @@ class DataCollectionObject;
 class DistributionCollector;
 
 /**
- * \ingroup satstats
- * \brief Base class for sat queue statistics helpers.
+ * @ingroup satstats
+ * @brief Base class for sat queue statistics helpers.
  */
 class SatStatsSatelliteQueueHelper : public SatStatsHelper
 {
   public:
     /**
-     * \enum UnitType_t
-     * \brief
+     * @enum UnitType_t
+     * @brief
      */
     typedef enum
     {
@@ -58,8 +58,8 @@ class SatStatsSatelliteQueueHelper : public SatStatsHelper
     } UnitType_t;
 
     /**
-     * \param unitType
-     * \return
+     * @param unitType
+     * @return
      */
     static std::string GetUnitTypeName(UnitType_t unitType);
 
@@ -77,25 +77,25 @@ class SatStatsSatelliteQueueHelper : public SatStatsHelper
     static TypeId GetTypeId();
 
     /**
-     * \param unitType
+     * @param unitType
      */
     void SetUnitType(UnitType_t unitType);
 
     /**
-     * \param averagingMode average all samples before passing them to aggregator.
+     * @param averagingMode average all samples before passing them to aggregator.
      */
     void SetAveragingMode(bool averagingMode);
 
     /**
-     * \brief Set up several probes or other means of listeners and connect them
+     * @brief Set up several probes or other means of listeners and connect them
      *        to the collectors.
      */
     void InstallProbes();
 
     /**
-     * \brief Receive inputs from trace sources and forward them to the collector.
-     * \param size Queue size (in bytes or packets)
-     * \param addr Address of UT
+     * @brief Receive inputs from trace sources and forward them to the collector.
+     * @param size Queue size (in bytes or packets)
+     * @param addr Address of UT
      */
     void QueueSizeCallback(uint32_t size, const Address& addr);
 
@@ -104,22 +104,22 @@ class SatStatsSatelliteQueueHelper : public SatStatsHelper
     void DoInstall();
 
     /**
-     * \brief
+     * @brief
      */
     virtual void DoInstallProbes() = 0;
 
     /**
-     * \brief Connect the probe to the right collector.
-     * \param probe
-     * \param identifier
+     * @brief Connect the probe to the right collector.
+     * @param probe
+     * @param identifier
      */
     bool ConnectProbeToCollector(Ptr<Probe> probe, uint32_t identifier);
 
     /**
-     * \brief Find a collector with the right identifier and pass a sample data
+     * @brief Find a collector with the right identifier and pass a sample data
      *        to it.
-     * \param size
-     * \param identifier
+     * @param size
+     * @param identifier
      */
     void PassSampleToCollector(uint32_t size, uint32_t identifier);
 
@@ -146,18 +146,18 @@ class SatStatsSatelliteQueueHelper : public SatStatsHelper
 // RTN FEEDER QUEUE IN PACKETS ////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce queue size statistics in packets for return feeder link.
+ * @ingroup satstats
+ * @brief Produce queue size statistics in packets for return feeder link.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnFeederQueuePacketsHelper> s = Create<SatStatsRtnFeederQueuePacketsHelper>
  * (satHelper); s->SetName ("name"); s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsRtnFeederQueuePacketsHelper : public SatStatsSatelliteQueueHelper
 {
@@ -184,19 +184,19 @@ class SatStatsRtnFeederQueuePacketsHelper : public SatStatsSatelliteQueueHelper
 // RTN FEEDER QUEUE IN BYTES ////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce queue size statistics in packets for return feeder link.
+ * @ingroup satstats
+ * @brief Produce queue size statistics in packets for return feeder link.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnFeederQueueBytesHelper> s = Create<SatStatsRtnFeederQueueBytesHelper> (satHelper);
  * s->SetName ("name");
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsRtnFeederQueueBytesHelper : public SatStatsSatelliteQueueHelper
 {
@@ -223,19 +223,19 @@ class SatStatsRtnFeederQueueBytesHelper : public SatStatsSatelliteQueueHelper
 // FWD USER QUEUE IN PACKETS ////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce queue size statistics in packets for return feeder link.
+ * @ingroup satstats
+ * @brief Produce queue size statistics in packets for return feeder link.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFwdUserQueuePacketsHelper> s = Create<SatStatsFwdUserQueuePacketsHelper> (satHelper);
  * s->SetName ("name");
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFwdUserQueuePacketsHelper : public SatStatsSatelliteQueueHelper
 {
@@ -262,19 +262,19 @@ class SatStatsFwdUserQueuePacketsHelper : public SatStatsSatelliteQueueHelper
 // FWD USER QUEUE IN BYTES ////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce queue size statistics in packets for return feeder link.
+ * @ingroup satstats
+ * @brief Produce queue size statistics in packets for return feeder link.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFwdUserQueueBytesHelper> s = Create<SatStatsFwdUserQueueBytesHelper> (satHelper);
  * s->SetName ("name");
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFwdUserQueueBytesHelper : public SatStatsSatelliteQueueHelper
 {

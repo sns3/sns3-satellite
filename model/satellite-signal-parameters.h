@@ -26,10 +26,10 @@
 #include "satellite-enums.h"
 #include "satellite-utils.h"
 
-#include <ns3/nstime.h>
-#include <ns3/object.h>
-#include <ns3/packet.h>
-#include <ns3/ptr.h>
+#include "ns3/nstime.h"
+#include "ns3/object.h"
+#include "ns3/packet.h"
+#include "ns3/ptr.h"
 
 #include <stdint.h>
 #include <utility>
@@ -43,6 +43,12 @@ class SatPhyTx;
 class SatInterferenceParameters : public Object
 {
   public:
+    /**
+     * @brief Get the type ID
+     * @return the object TypeId
+     */
+    static TypeId GetTypeId(void);
+
     ~SatInterferenceParameters();
 
     /**
@@ -114,8 +120,8 @@ class SatInterferenceParameters : public Object
 };
 
 /**
- * \ingroup satellite
- * \brief Actual physical layer transmission container. SatSignalParameters is passed
+ * @ingroup satellite
+ * @brief Actual physical layer transmission container. SatSignalParameters is passed
  * through the SatChannel from the transmitter to the receiver. It includes e.g. the packet
  * container (BBFrame in FWD link, FPDU in RTN link) as well as all the transmission related
  * information (MODCODs, frequency, tx power, etc.).
@@ -124,7 +130,7 @@ class SatSignalParameters : public Object
 {
   public:
     /**
-     * \brief Struct for storing the packet specific Tx information
+     * @brief Struct for storing the packet specific Tx information
      */
     typedef struct
     {
@@ -157,8 +163,8 @@ class SatSignalParameters : public Object
     Ptr<SatSignalParameters> Copy();
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
 
@@ -223,8 +229,8 @@ class SatSignalParameters : public Object
     txInfo_s m_txInfo;
 
     /**
-     * \brief Set interference power based on packet fragment
-     * \param ifPowerPerFragment
+     * @brief Set interference power based on packet fragment
+     * @param ifPowerPerFragment
      */
     inline void SetInterferencePower(std::vector<std::pair<double, double>> ifPowerPerFragment)
     {
@@ -233,7 +239,7 @@ class SatSignalParameters : public Object
     }
 
     /**
-     * \brief Get interference power (I)
+     * @brief Get interference power (I)
      */
     inline double GetInterferencePower()
     {
@@ -241,7 +247,7 @@ class SatSignalParameters : public Object
     }
 
     /**
-     * \brief Get interference power per packet fragment
+     * @brief Get interference power per packet fragment
      */
     inline std::vector<std::pair<double, double>> GetInterferencePowerPerFragment()
     {
@@ -249,8 +255,8 @@ class SatSignalParameters : public Object
     }
 
     /**
-     * \brief Set interference power in satellite based on packet fragment
-     * \param ifPowerPerFragment
+     * @brief Set interference power in satellite based on packet fragment
+     * @param ifPowerPerFragment
      */
     inline void SetInterferencePowerInSatellite(
         std::vector<std::pair<double, double>> ifPowerPerFragment)
@@ -260,7 +266,7 @@ class SatSignalParameters : public Object
     }
 
     /**
-     * \brief Get interference power in satellite (I)
+     * @brief Get interference power in satellite (I)
      */
     inline double GetInterferencePowerInSatellite()
     {
@@ -268,7 +274,7 @@ class SatSignalParameters : public Object
     }
 
     /**
-     * \brief Get interference power in satellite per packet fragment
+     * @brief Get interference power in satellite per packet fragment
      */
     inline std::vector<std::pair<double, double>> GetInterferencePowerInSatellitePerFragment()
     {
@@ -276,7 +282,7 @@ class SatSignalParameters : public Object
     }
 
     /**
-     * \brief Set various power after receiving the packet in the satellite
+     * @brief Set various power after receiving the packet in the satellite
      */
     void SetRxPowersInSatellite(double rxPowerW,
                                 double rxNoisePowerW,
@@ -304,7 +310,7 @@ class SatSignalParameters : public Object
     }
 
     /**
-     * \brief Set computed SINR
+     * @brief Set computed SINR
      */
     void SetSinr(double sinr, double additionalInterference);
 

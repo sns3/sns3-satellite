@@ -24,16 +24,16 @@
 #include "satellite-on-off-helper.h"
 #include "simulation-helper.h"
 
-#include <ns3/cbr-helper.h>
-#include <ns3/log.h>
-#include <ns3/lora-periodic-sender.h>
-#include <ns3/nrtv-helper.h>
-#include <ns3/packet-sink-helper.h>
-#include <ns3/packet-sink.h>
-#include <ns3/satellite-topology.h>
-#include <ns3/singleton.h>
-#include <ns3/three-gpp-http-satellite-helper.h>
-#include <ns3/type-id.h>
+#include "ns3/cbr-helper.h"
+#include "ns3/log.h"
+#include "ns3/lora-periodic-sender.h"
+#include "ns3/nrtv-helper.h"
+#include "ns3/packet-sink-helper.h"
+#include "ns3/packet-sink.h"
+#include "ns3/satellite-topology.h"
+#include "ns3/singleton.h"
+#include "ns3/three-gpp-http-satellite-helper.h"
+#include "ns3/type-id.h"
 
 #include <string>
 #include <utility>
@@ -50,10 +50,10 @@ NS_OBJECT_ENSURE_REGISTERED(SatTrafficHelperConf);
  * .SIM_ADD_TRAFFIC_MODEL_ATTRIBUTES macro helps defining specific attribute
  * for traffic models in method GetTypeId.
  *
- * \param index Name of the traffic model which attributes are added to the configuration.
- * \param value Attribute value
+ * @param index Name of the traffic model which attributes are added to the configuration.
+ * @param value Attribute value
  *
- * \return TypeId
+ * @return TypeId
  */
 #define SIM_ADD_TRAFFIC_MODEL_PROTOCOL_ATTRIBUTE(index, value)                                     \
     AddAttribute("Traffic" TOSTRING(index) "Protocol",                                             \
@@ -267,14 +267,6 @@ SatTrafficHelperConf::GetTypeId(void)
     return tid;
 }
 
-TypeId
-SatTrafficHelperConf::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
-}
-
 SatTrafficHelperConf::SatTrafficHelperConf()
     : m_simTime(Seconds(0)),
       m_trafficHelper(nullptr)
@@ -311,14 +303,6 @@ SatTrafficHelper::GetTypeId(void)
                           MakeBooleanAccessor(&SatTrafficHelper::m_enableDefaultStatistics),
                           MakeBooleanChecker());
     return tid;
-}
-
-TypeId
-SatTrafficHelper::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
 }
 
 SatTrafficHelper::SatTrafficHelper()
@@ -364,7 +348,7 @@ SatTrafficHelper::AddLoraPeriodicTraffic(Time interval,
     for (uint32_t i = 0; i < uts.GetN(); i++)
     {
         node = uts.Get(i);
-        Ptr<LoraPeriodicSender> app = Create<LoraPeriodicSender>();
+        Ptr<LoraPeriodicSender> app = CreateObject<LoraPeriodicSender>();
 
         app->SetInterval(interval);
         NS_LOG_DEBUG("Created an application with interval = " << interval.GetHours() << " hours");

@@ -22,7 +22,7 @@
 #ifndef SATELLITE_LOOK_UP_TABLE_H
 #define SATELLITE_LOOK_UP_TABLE_H
 
-#include <ns3/object.h>
+#include "ns3/object.h"
 
 #include <fstream>
 #include <string>
@@ -32,16 +32,16 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
- * \brief Loads a link result file and provide query service for BLER.
+ * @brief Loads a link result file and provide query service for BLER.
  */
 class SatLookUpTable : public Object
 {
   public:
     /**
      * Constructor with initialization parameters.
-     * \param linkResultPath
+     * @param linkResultPath
      */
     SatLookUpTable(std::string linkResultPath);
 
@@ -51,22 +51,22 @@ class SatLookUpTable : public Object
     virtual ~SatLookUpTable();
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId();
 
     /**
-     * \brief Get the BLER corresponding to a given SINR
-     * \param sinrDb SINR in logarithmic scale
-     * \return BLER
+     * @brief Get the BLER corresponding to a given SINR
+     * @param sinrDb SINR in logarithmic scale
+     * @return BLER
      */
     double GetBler(double sinrDb) const;
 
     /**
-     * \brief Get Es/No in dB for a given BLER target
-     * \param blerTarget BLER target (0-1)
-     * \return Es/No target in dB
+     * @brief Get Es/No in dB for a given BLER target
+     * @param blerTarget BLER target (0-1)
+     * @return Es/No target in dB
      */
     double GetEsNoDb(double blerTarget) const;
 
@@ -74,8 +74,8 @@ class SatLookUpTable : public Object
     virtual void DoDispose();
 
     /**
-     * \brief Load the link results
-     * \param linkResultsPath Path to a link results file.
+     * @brief Load the link results
+     * @param linkResultsPath Path to a link results file.
      */
     void Load(std::string linkResultPath);
 

@@ -29,8 +29,8 @@
 using namespace ns3;
 
 /**
- * \file sat-rtn-link-ra-example.cc
- * \ingroup satellite
+ * @file sat-rtn-link-ra-example.cc
+ * @ingroup satellite
  *
  *         execute command -> ./waf --run "sat-rtn-link-ra-example --PrintHelp"
  */

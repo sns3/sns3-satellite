@@ -57,12 +57,6 @@ LoraNetworkScheduler::GetTypeId(void)
     return tid;
 }
 
-TypeId
-LoraNetworkScheduler::GetInstanceTypeId(void) const
-{
-    return GetTypeId();
-}
-
 LoraNetworkScheduler::LoraNetworkScheduler()
 {
 }
@@ -74,7 +68,15 @@ LoraNetworkScheduler::LoraNetworkScheduler(Ptr<LoraNetworkStatus> status,
       m_firstWindowAnswerDelay(Seconds(1)),
       m_secondWindowAnswerDelay(Seconds(2))
 {
-    ObjectBase::ConstructSelf(AttributeConstructionList());
+    NS_LOG_FUNCTION(this << status << controller);
+}
+
+void
+LoraNetworkScheduler::NotifyConstructionCompleted()
+{
+    NS_LOG_FUNCTION(this);
+
+    Object::NotifyConstructionCompleted();
 
     NS_ASSERT_MSG(m_firstWindowAnswerDelay < m_secondWindowAnswerDelay,
                   "First window answer delay must be lower than second window answer delay");

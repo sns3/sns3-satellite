@@ -24,9 +24,9 @@
 
 #include "satellite-stats-helper.h"
 
-#include <ns3/callback.h>
-#include <ns3/collector-map.h>
-#include <ns3/ptr.h>
+#include "ns3/callback.h"
+#include "ns3/collector-map.h"
+#include "ns3/ptr.h"
 
 namespace ns3
 {
@@ -39,8 +39,8 @@ class DataCollectionObject;
 class DistributionCollector;
 
 /**
- * \ingroup satstats
- * \brief Base class for link RX power statistics helpers.
+ * @ingroup satstats
+ * @brief Base class for link RX power statistics helpers.
  */
 class SatStatsLinkRxPowerHelper : public SatStatsHelper
 {
@@ -59,25 +59,25 @@ class SatStatsLinkRxPowerHelper : public SatStatsHelper
     static TypeId GetTypeId();
 
     /**
-     * \param averagingMode average all samples before passing them to aggregator.
+     * @param averagingMode average all samples before passing them to aggregator.
      */
     void SetAveragingMode(bool averagingMode);
 
     /**
-     * \brief Set up several probes or other means of listeners and connect them
+     * @brief Set up several probes or other means of listeners and connect them
      *        to the collectors.
      */
     void InstallProbes();
 
     /**
-     * \brief Receive inputs from trace sources and forward them to the collector.
-     * \param rxPowerDb RX power value in dB.
-     * \param addr Address of UT
+     * @brief Receive inputs from trace sources and forward them to the collector.
+     * @param rxPowerDb RX power value in dB.
+     * @param addr Address of UT
      */
     void RxPowerCallback(double rxPowerDb, const Address& addr);
 
     /**
-     * \return
+     * @return
      */
     Callback<void, double, const Address&> GetTraceSinkCallback() const;
 
@@ -86,22 +86,22 @@ class SatStatsLinkRxPowerHelper : public SatStatsHelper
     void DoInstall();
 
     /**
-     * \brief
+     * @brief
      */
     virtual void DoInstallProbes() = 0;
 
     /**
-     * \brief Connect the probe to the right collector.
-     * \param probe
-     * \param identifier
+     * @brief Connect the probe to the right collector.
+     * @param probe
+     * @param identifier
      */
     bool ConnectProbeToCollector(Ptr<Probe> probe, uint32_t identifier);
 
     /**
-     * \brief Find a collector with the right identifier and pass a sample data
+     * @brief Find a collector with the right identifier and pass a sample data
      *        to it.
-     * \param rxPowerDb
-     * \param identifier
+     * @param rxPowerDb
+     * @param identifier
      */
     void PassSampleToCollector(double rxPowerDb, uint32_t identifier);
 
@@ -128,19 +128,19 @@ class SatStatsLinkRxPowerHelper : public SatStatsHelper
 // FORWARD FEEDER LINK ////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce forward feeder link RX power statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce forward feeder link RX power statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFwdFeederLinkRxPowerHelper> s = Create<SatStatsFwdFeederLinkRxPowerHelper>
  * (satHelper); s->SetName ("name"); s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFwdFeederLinkRxPowerHelper : public SatStatsLinkRxPowerHelper
 {
@@ -167,20 +167,20 @@ class SatStatsFwdFeederLinkRxPowerHelper : public SatStatsLinkRxPowerHelper
 // FORWARD USER LINK //////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce forward user link RX power statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce forward user link RX power statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsFwdUserLinkRxPowerHelper> s = Create<SatStatsFwdUserLinkRxPowerHelper> (satHelper);
  * s->SetName ("name");
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsFwdUserLinkRxPowerHelper : public SatStatsLinkRxPowerHelper
 {
@@ -207,19 +207,19 @@ class SatStatsFwdUserLinkRxPowerHelper : public SatStatsLinkRxPowerHelper
 // RETURN FEEDER LINK /////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce return feeder link RX power statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce return feeder link RX power statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnFeederLinkRxPowerHelper> s = Create<SatStatsRtnFeederLinkRxPowerHelper>
  * (satHelper); s->SetName ("name"); s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsRtnFeederLinkRxPowerHelper : public SatStatsLinkRxPowerHelper
 {
@@ -246,20 +246,20 @@ class SatStatsRtnFeederLinkRxPowerHelper : public SatStatsLinkRxPowerHelper
 // RETURN USER LINK ///////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Produce return user link RX power statistics from a satellite
+ * @ingroup satstats
+ * @brief Produce return user link RX power statistics from a satellite
  *        module simulation.
  *
  * For a more convenient usage in simulation script, it is recommended to use
  * the corresponding methods in SatStatsHelperContainer class.
  *
  * Otherwise, the following example can be used:
- * \code
+ * @code
  * Ptr<SatStatsRtnUserLinkRxPowerHelper> s = Create<SatStatsRtnUserLinkRxPowerHelper> (satHelper);
  * s->SetName ("name");
  * s->SetOutputType (SatStatsHelper::OUTPUT_SCATTER_FILE);
  * s->Install ();
- * \endcode
+ * @endcode
  */
 class SatStatsRtnUserLinkRxPowerHelper : public SatStatsLinkRxPowerHelper
 {

@@ -30,10 +30,10 @@
 using namespace ns3;
 
 /**
- * \file sat-training-example.cc
- * \ingroup satellite
+ * @file sat-training-example.cc
+ * @ingroup satellite
  *
- * \brief Simulation script to be utilized in SNS3 training. The script illustrates
+ * @brief Simulation script to be utilized in SNS3 training. The script illustrates
  * the simulation script process starting from command line arguments to running the
  * actual simulation.
  *
@@ -82,7 +82,7 @@ main(int argc, char* argv[])
     auto simulationHelper = CreateObject<SimulationHelper>(simulationName);
 
     // Find the input xml file in case example is run from other than ns-3 root directory
-    std::string pathToFile = Singleton<SatEnvVariables>::Get()->LocateFile(
+    std::string pathToFile = SatEnvVariables::GetInstance()->LocateFile(
         "contrib/satellite/examples/training-input-attributes.xml");
 
     /**

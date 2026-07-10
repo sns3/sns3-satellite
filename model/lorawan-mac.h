@@ -28,8 +28,8 @@
 #include "satellite-mac.h"
 #include "satellite-phy.h"
 
-#include <ns3/object.h>
-#include <ns3/packet.h>
+#include "ns3/object.h"
+#include "ns3/packet.h"
 
 #include <array>
 #include <stdint.h>
@@ -59,49 +59,49 @@ class LorawanMac : public SatMac
     /**
      * Get the underlying PHY layer
      *
-     * \return The PHY layer that this MAC is connected to.
+     * @return The PHY layer that this MAC is connected to.
      */
     Ptr<SatPhy> GetPhy(void);
 
     /**
      * Set the underlying PHY layer
      *
-     * \param phy the phy layer
+     * @param phy the phy layer
      */
     void SetPhy(Ptr<SatPhy> phy);
 
     /**
      * Get the underlying PHY TX layer
      *
-     * \return The PHY TX layer that this MAC is connected to.
+     * @return The PHY TX layer that this MAC is connected to.
      */
     Ptr<SatLoraPhyTx> GetPhyTx(void);
 
     /**
      * Set the underlying PHY TX layer
      *
-     * \param phy the phy tx layer
+     * @param phy the phy tx layer
      */
     void SetPhyTx(Ptr<SatLoraPhyTx> phyTx);
 
     /**
      * Send a packet.
      *
-     * \param packet The packet to send.
+     * @param packet The packet to send.
      */
     virtual void Send(Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber);
 
     /**
      * Send a packet.
      *
-     * \param packet The packet to send.
+     * @param packet The packet to send.
      */
     virtual void Send(Ptr<Packet> packet) = 0;
 
     /**
      * Receive a packet from the lower layer.
      *
-     * \param packets the received packets
+     * @param packets the received packets
      */
     virtual void Receive(SatPhy::PacketContainer_t packets,
                          Ptr<SatSignalParameters> /*rxParams*/) = 0;
@@ -110,7 +110,7 @@ class LorawanMac : public SatMac
      * Function called by lower layers to inform this layer that reception of a
      * packet we were locked on failed.
      *
-     * \param packet the packet we failed to receive
+     * @param packet the packet we failed to receive
      */
     virtual void FailedReception(Ptr<const Packet> packet) = 0;
 
@@ -122,37 +122,37 @@ class LorawanMac : public SatMac
     /**
      * Set the device this MAC layer is installed on.
      *
-     * \param device The NetDevice this MAC layer will refer to.
+     * @param device The NetDevice this MAC layer will refer to.
      */
     void SetDevice(Ptr<NetDevice> device);
 
     /**
      * Get the device this MAC layer is installed on.
      *
-     * \return The NetDevice this MAC layer will refer to.
+     * @return The NetDevice this MAC layer will refer to.
      */
     Ptr<NetDevice> GetDevice(void);
 
     /**
      * Get the logical lora channel helper associated with this MAC.
      *
-     * \return The instance of LoraLogicalChannelHelper that this MAC is using.
+     * @return The instance of LoraLogicalChannelHelper that this MAC is using.
      */
     LoraLogicalChannelHelper GetLoraLogicalChannelHelper(void);
 
     /**
      * Set the LoraLogicalChannelHelper this MAC instance will use.
      *
-     * \param helper The instance of the helper to use.
+     * @param helper The instance of the helper to use.
      */
     void SetLoraLogicalChannelHelper(LoraLogicalChannelHelper helper);
 
     /**
      * Get the SF corresponding to a data rate, based on this MAC's region.
      *
-     * \param dataRate The Data Rate we need to convert to a Spreading Factor
+     * @param dataRate The Data Rate we need to convert to a Spreading Factor
      * value.
-     * \return The SF that corresponds to a Data Rate in this MAC's region, or 0
+     * @return The SF that corresponds to a Data Rate in this MAC's region, or 0
      * if the dataRate is not valid.
      */
     uint8_t GetSfFromDataRate(uint8_t dataRate);
@@ -160,8 +160,8 @@ class LorawanMac : public SatMac
     /**
      * Get the BW corresponding to a data rate, based on this MAC's region
      *
-     * \param dataRate The Data Rate we need to convert to a bandwidth value.
-     * \return The bandwidth that corresponds to the parameter Data Rate in this
+     * @param dataRate The Data Rate we need to convert to a bandwidth value.
+     * @return The bandwidth that corresponds to the parameter Data Rate in this
      * MAC's region, or 0 if the dataRate is not valid.
      */
     double GetBandwidthFromDataRate(uint8_t dataRate);
@@ -170,9 +170,9 @@ class LorawanMac : public SatMac
      * Get the transmission power in dBm that corresponds, in this region, to the
      * encoded 8-bit txPower.
      *
-     * \param txPower The 8-bit encoded txPower to convert.
+     * @param txPower The 8-bit encoded txPower to convert.
      *
-     * \return The corresponding transmission power in dBm, or 0 if the encoded
+     * @return The corresponding transmission power in dBm, or 0 if the encoded
      * power was not recognized as valid.
      */
     double GetDbmForTxPower(uint8_t txPower);
@@ -185,16 +185,16 @@ class LorawanMac : public SatMac
      * (obtained through a GetSize () call to accout for the presence of Headers
      * and Trailers, too) also influences the packet transmit time.
      *
-     * \param packet The packet that needs to be transmitted.
-     * \param txParams The set of parameters that will be used for transmission.
-     * \return The time necessary to transmit the packet.
+     * @param packet The packet that needs to be transmitted.
+     * @param txParams The set of parameters that will be used for transmission.
+     * @return The time necessary to transmit the packet.
      */
     Time GetOnAirTime(Ptr<Packet> packet, LoraTxParameters txParams);
 
     /**
      * Set the vector to use to check up correspondence between SF and DataRate.
      *
-     * \param sfForDataRate A vector that contains at position i the SF that
+     * @param sfForDataRate A vector that contains at position i the SF that
      * should correspond to DR i.
      */
     void SetSfForDataRate(std::vector<uint8_t> sfForDataRate);
@@ -203,7 +203,7 @@ class LorawanMac : public SatMac
      * Set the vector to use to check up correspondence between bandwidth and
      * DataRate.
      *
-     * \param bandwidthForDataRate A vector that contains at position i the
+     * @param bandwidthForDataRate A vector that contains at position i the
      * bandwidth that should correspond to DR i in this MAC's region.
      */
     void SetBandwidthForDataRate(std::vector<double> bandwidthForDataRate);
@@ -211,7 +211,7 @@ class LorawanMac : public SatMac
     /**
      * Set the maximum App layer payload for a set DataRate.
      *
-     * \param maxAppPayloadForDataRate A vector that contains at position i the
+     * @param maxAppPayloadForDataRate A vector that contains at position i the
      * maximum Application layer payload that should correspond to DR i in this
      * MAC's region.
      */
@@ -221,7 +221,7 @@ class LorawanMac : public SatMac
      * Set the vector to use to check up which transmission power in Dbm
      * corresponds to a certain TxPower value in this MAC's region.
      *
-     * \param txDbmForTxPower A vector that contains at position i the
+     * @param txDbmForTxPower A vector that contains at position i the
      * transmission power in dBm that should correspond to a TXPOWER value of i in
      * this MAC's region.
      */
@@ -231,7 +231,7 @@ class LorawanMac : public SatMac
      * Set the matrix to use when deciding with which DataRate to respond. Region
      * based.
      *
-     * \param replyDataRateMatrix A matrix containing the reply DataRates, based
+     * @param replyDataRateMatrix A matrix containing the reply DataRates, based
      * on the sending DataRate and on the value of the RX1DROffset parameter.
      */
     void SetReplyDataRateMatrix(ReplyDataRateMatrix replyDataRateMatrix);
@@ -239,19 +239,19 @@ class LorawanMac : public SatMac
     /**
      * Set the number of PHY preamble symbols this MAC is set to use.
      *
-     * \param nPreambleSymbols The number of preamble symbols to use (typically 8).
+     * @param nPreambleSymbols The number of preamble symbols to use (typically 8).
      */
     void SetNPreambleSymbols(int nPreambleSymbols);
 
     /**
      * Get the number of PHY preamble symbols this MAC is set to use.
      *
-     * \return The number of preamble symbols to use (typically 8).
+     * @return The number of preamble symbols to use (typically 8).
      */
     int GetNPreambleSymbols(void);
 
     /**
-     * \brief Indicates if the satellite is regenerative on the link this layer is sending packets.
+     * @brief Indicates if the satellite is regenerative on the link this layer is sending packets.
      */
     void setRegenerative(bool isRegenerative);
 
@@ -260,7 +260,7 @@ class LorawanMac : public SatMac
      * The trace source that is fired when a packet cannot be sent because of duty
      * cycle limitations.
      *
-     * \see class CallBackTraceSource
+     * @see class CallBackTraceSource
      */
     TracedCallback<Ptr<const Packet>> m_cannotSendBecauseDutyCycle;
 

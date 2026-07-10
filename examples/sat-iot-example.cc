@@ -30,10 +30,10 @@
 using namespace ns3;
 
 /**
- * \file sat-iot-example.cc
- * \ingroup satellite
+ * @file sat-iot-example.cc
+ * @ingroup satellite
  *
- * \brief This file allows to create an IoT scenario
+ * @brief This file allows to create an IoT scenario
  */
 
 NS_LOG_COMPONENT_DEFINE("sat-iot-example");

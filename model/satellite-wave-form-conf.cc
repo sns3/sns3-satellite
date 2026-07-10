@@ -24,13 +24,13 @@
 #include "satellite-link-results.h"
 #include "satellite-utils.h"
 
-#include <ns3/boolean.h>
-#include <ns3/double.h>
-#include <ns3/enum.h>
-#include <ns3/log.h>
-#include <ns3/satellite-env-variables.h>
-#include <ns3/singleton.h>
-#include <ns3/uinteger.h>
+#include "ns3/boolean.h"
+#include "ns3/double.h"
+#include "ns3/enum.h"
+#include "ns3/log.h"
+#include "ns3/satellite-env-variables.h"
+#include "ns3/singleton.h"
+#include "ns3/uinteger.h"
 
 #include <algorithm>
 #include <cmath>
@@ -206,11 +206,9 @@ SatWaveformConf::SatWaveformConf(std::string directoryPathName)
       m_maxWfId(23),
       m_burstLength(SatEnums::UNKNOWN_BURST)
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(this << directoryPathName);
 
-    ObjectBase::ConstructSelf(AttributeConstructionList());
-
-    if (!Singleton<SatEnvVariables>::Get()->IsValidDirectory(directoryPathName))
+    if (!SatEnvVariables::GetInstance()->IsValidDirectory(directoryPathName))
     {
         NS_FATAL_ERROR("No such directory: " << directoryPathName);
     }
@@ -220,6 +218,14 @@ SatWaveformConf::SatWaveformConf(std::string directoryPathName)
 
     ReadFromFile(waveformsFilePathName);
     ReadFromFileDefaultWaveform(defaultWaveform);
+}
+
+void
+SatWaveformConf::NotifyConstructionCompleted()
+{
+    NS_LOG_FUNCTION(this);
+
+    Object::NotifyConstructionCompleted();
 
     switch (m_burstLength)
     {
@@ -266,14 +272,6 @@ SatWaveformConf::GetTypeId(void)
                                                           "ShortAndLongBurst"))
                             .AddConstructor<SatWaveformConf>();
     return tid;
-}
-
-TypeId
-SatWaveformConf::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
 }
 
 SatWaveformConf::~SatWaveformConf()

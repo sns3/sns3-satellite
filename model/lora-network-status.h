@@ -30,7 +30,7 @@
 #include "lora-network-scheduler.h"
 #include "lorawan-mac-end-device-class-a.h"
 
-#include <ns3/point-to-point-net-device.h>
+#include "ns3/point-to-point-net-device.h"
 
 #include <iterator>
 #include <map>
@@ -70,15 +70,15 @@ class LoraNetworkStatus : public Object
     /**
      * Update network status on the received packet.
      *
-     * \param packet the received packet.
-     * \param address the gateway this packet was received from.
+     * @param packet the received packet.
+     * @param address the gateway this packet was received from.
      */
     void OnReceivedPacket(Ptr<const Packet> packet, const Address& gwaddress);
 
     /**
      * Return whether the specified device needs a reply.
      *
-     * \param deviceAddress the address of the device we are interested in.
+     * @param deviceAddress the address of the device we are interested in.
      */
     bool NeedsReply(LoraDeviceAddress deviceAddress);
 
@@ -86,7 +86,7 @@ class LoraNetworkStatus : public Object
      * Return whether we have a gateway that is available to send a reply to the
      * specified device.
      *
-     * \param deviceAddress the address of the device we are interested in.
+     * @param deviceAddress the address of the device we are interested in.
      */
     Address GetBestGatewayForDevice(LoraDeviceAddress deviceAddress, int window);
 

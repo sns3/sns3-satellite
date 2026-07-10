@@ -22,17 +22,18 @@
 #define SATELLITE_CHANNEL_H
 
 #include "satellite-enums.h"
+#include "satellite-fading-external-input-trace-container.h"
 #include "satellite-free-space-loss.h"
 #include "satellite-phy-rx-carrier-conf.h"
 #include "satellite-phy-rx.h"
 #include "satellite-signal-parameters.h"
 #include "satellite-typedefs.h"
 
-#include <ns3/channel.h>
-#include <ns3/nstime.h>
-#include <ns3/object.h>
-#include <ns3/propagation-delay-model.h>
-#include <ns3/traced-callback.h>
+#include "ns3/channel.h"
+#include "ns3/nstime.h"
+#include "ns3/object.h"
+#include "ns3/propagation-delay-model.h"
+#include "ns3/traced-callback.h"
 
 #include <cstddef>
 #include <stdint.h>
@@ -42,7 +43,7 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
+ * @ingroup satellite
  *
  * Satellite channel implementation. Satellite channel is responsible of
  * passing through packets from the transmitter to the receiver. One SatChannel
@@ -72,6 +73,16 @@ class SatChannel : public Channel
     SatChannel();
 
     /**
+     * Notifier called once the ObjectBase is fully constructed.
+     *
+     * This method is invoked once all member attributes have been
+     * initialized. Subclasses can override this method to be notified
+     * of this event but if they do this, they must chain up to their
+     * parent's NotifyConstructionCompleted method.
+     */
+    virtual void NotifyConstructionCompleted() override;
+
+    /**
      * Destructor for SatChannel
      */
     virtual ~SatChannel();
@@ -89,8 +100,8 @@ class SatChannel : public Channel
     };
 
     /**
-     * \brief Get the type ID
-     * \return the object TypeId
+     * @brief Get the type ID
+     * @return the object TypeId
      */
     static TypeId GetTypeId(void);
 
@@ -100,99 +111,99 @@ class SatChannel : public Channel
     typedef std::vector<Ptr<SatPhyRx>> PhyRxContainer;
 
     /**
-     * \brief
-     * \param channelType     The type of channel
-     * \param freqId          The id of the carrier
-     * \param carrierId       The id of the carrier
-     * \return The center frequency of the carrier.
+     * @brief
+     * @param channelType     The type of channel
+     * @param freqId          The id of the carrier
+     * @param carrierId       The id of the carrier
+     * @return The center frequency of the carrier.
      */
     typedef Callback<double, SatEnums::ChannelType_t, uint32_t, uint32_t> CarrierFreqConverter;
 
     /**
-     * \brief Set the  propagation delay model to be used in the SatChannel
-     * \param delay Ptr to the propagation delay model to be used.
+     * @brief Set the  propagation delay model to be used in the SatChannel
+     * @param delay Ptr to the propagation delay model to be used.
      */
     virtual void SetPropagationDelayModel(Ptr<PropagationDelayModel> delay);
 
     /**
-     * \brief Get the  propagation delay model to be used in the SatChannel
-     * \return Ptr to the propagation delay model to be used.
+     * @brief Get the  propagation delay model to be used in the SatChannel
+     * @return Ptr to the propagation delay model to be used.
      */
     virtual Ptr<PropagationDelayModel> GetPropagationDelayModel();
 
     /**
-     * \brief Set the type of the channel.
-     * \param chType Type of the channel.
+     * @brief Set the type of the channel.
+     * @param chType Type of the channel.
      */
     virtual void SetChannelType(SatEnums::ChannelType_t chType);
 
     /**
-     * \brief Set the frequency id of the channel.
-     * \param freqId The frequency id of the channel.
+     * @brief Set the frequency id of the channel.
+     * @param freqId The frequency id of the channel.
      */
     virtual void SetFrequencyId(uint32_t freqId);
 
     /**
-     * \brief Set the frequency converter callback.
+     * @brief Set the frequency converter callback.
      *
-     * \param converter The frequency converter callback.
+     * @param converter The frequency converter callback.
      */
     virtual void SetFrequencyConverter(CarrierFreqConverter converter);
 
     /**
-     * \brief Set the bandwidth converter callback.
+     * @brief Set the bandwidth converter callback.
      *
-     * \param converter The bandwidth converter callback.
+     * @param converter The bandwidth converter callback.
      */
     virtual void SetBandwidthConverter(SatTypedefs::CarrierBandwidthConverter_t converter);
 
     /**
-     * \brief Get the type of the channel.
-     * \return Type of the channel.
+     * @brief Get the type of the channel.
+     * @return Type of the channel.
      */
     virtual SatEnums::ChannelType_t GetChannelType();
 
     /**
-     * \brief Set the  propagation delay model to be used in the SatChannel
-     * \param delay Ptr to the propagation delay model to be used.
+     * @brief Set the  propagation delay model to be used in the SatChannel
+     * @param delay Ptr to the propagation delay model to be used.
      */
     virtual void SetFreeSpaceLoss(Ptr<SatFreeSpaceLoss> delay);
 
     /**
-     * \brief Get the  propagation delay model used in the SatChannel
-     * \return Ptr to the propagation delay model used.
+     * @brief Get the  propagation delay model used in the SatChannel
+     * @return Ptr to the propagation delay model used.
      */
     virtual Ptr<SatFreeSpaceLoss> GetFreeSpaceLoss() const;
 
     /**
-     * \brief Used by attached SatPhyTx instances to transmit signals to the channel
-     * \param params the parameters of the signals being transmitted
+     * @brief Used by attached SatPhyTx instances to transmit signals to the channel
+     * @param params the parameters of the signals being transmitted
      */
     virtual void StartTx(Ptr<SatSignalParameters> params);
 
     /**
-     * \brief This method is used to attach the receiver entity SatPhyRx instance to a
+     * @brief This method is used to attach the receiver entity SatPhyRx instance to a
      * SatChannel instance, so that the SatPhyRx can receive packets sent on that channel.
-     * \param phyRx the SatPhyRx instance to be added to the channel as a receiver.
+     * @param phyRx the SatPhyRx instance to be added to the channel as a receiver.
      */
     virtual void AddRx(Ptr<SatPhyRx> phyRx);
 
     /**
-     * \brief This method is used to remove a SatPhyRx instance from a
+     * @brief This method is used to remove a SatPhyRx instance from a
      * SatChannel instance, e.g. due to a spot-beam handover
-     * \param phyRx the SatPhyRx instance to be removed from the channel.
+     * @param phyRx the SatPhyRx instance to be removed from the channel.
      */
     virtual void RemoveRx(Ptr<SatPhyRx> phyRx);
 
     /**
-     * \return Number of receivers in the channel
+     * @return Number of receivers in the channel
      */
     virtual std::size_t GetNDevices(void) const;
 
     /**
-     * \brief Get a device for a certain receiver index
-     * \param i Index
-     * \return A netdevice attached to this channel
+     * @brief Get a device for a certain receiver index
+     * @param i Index
+     * @return A netdevice attached to this channel
      */
     virtual Ptr<NetDevice> GetDevice(std::size_t i) const;
 
@@ -205,59 +216,64 @@ class SatChannel : public Channel
     SatChannelFwdMode_e m_fwdMode;
 
     /**
-     * \brief Container of SatPhyRx instances attached to the channel
+     * @brief Container of SatPhyRx instances attached to the channel
      */
     PhyRxContainer m_phyRxContainer;
 
     /**
-     * \brief Type of the channel
+     * @brief Type of the channel
      */
     SatEnums::ChannelType_t m_channelType;
 
     /**
-     * \brief Frequency converter callback.
+     * @brief Frequency converter callback.
      */
     CarrierFreqConverter m_carrierFreqConverter;
 
     /**
-     * \brief Bandwidth converter callback.
+     * @brief Bandwidth converter callback.
      */
     SatTypedefs::CarrierBandwidthConverter_t m_carrierBandwidthConverter;
 
     /**
-     * \brief Frequency id of the channel
+     * @brief Frequency id of the channel
      */
     uint32_t m_freqId;
 
     /**
-     * \brief Propagation delay model to be used with this channel
+     * @brief Propagation delay model to be used with this channel
      */
     Ptr<PropagationDelayModel> m_propagationDelay;
 
     /**
-     * \brief Free space loss model to be used with this channel.
+     * @brief Free space loss model to be used with this channel.
      */
     Ptr<SatFreeSpaceLoss> m_freeSpaceLoss;
 
     /**
-     * \brief Defines the mode used for Rx power calculation
+     * @brief Defines the mode used for Rx power calculation
      */
     SatEnums::RxPowerCalculationMode_t m_rxPowerCalculationMode;
 
     /**
-     * \brief Defines whether Rx power output tracing is in use or not
+     * @brief Defines whether Rx power output tracing is in use or not
      */
     bool m_enableRxPowerOutputTrace;
 
     /**
-     * \brief Defines whether fading output tracing is in use or not
+     * @brief Defines whether fading output tracing is in use or not
      */
     bool m_enableFadingOutputTrace;
 
     /**
-     * \brief Defines whether external fading input tracing is in use or not
+     * @brief Defines whether external fading input tracing is in use or not
      */
     bool m_enableExternalFadingInputTrace;
+
+    /**
+     * @brief External fading input tracing container
+     */
+    Ptr<SatFadingExternalInputTraceContainer> m_satFadingExternalInputTraceContainer;
 
     /**
      * Dispose SatChannel.
@@ -265,70 +281,70 @@ class SatChannel : public Channel
     virtual void DoDispose();
 
     /**
-     * \brief Used internally to schedule the StartRx method call after the propagation delay.
-     * \param rxParams Parameters of the signal being received
-     * \param phyRx The receiver SatPhyRx entity
+     * @brief Used internally to schedule the StartRx method call after the propagation delay.
+     * @param rxParams Parameters of the signal being received
+     * @param phyRx The receiver SatPhyRx entity
      */
     void ScheduleRx(Ptr<SatSignalParameters> txParams, Ptr<SatPhyRx> phyRx);
 
     /**
-     * \brief Used internally to start the packet reception of at the phyRx.
+     * @brief Used internally to start the packet reception of at the phyRx.
      *
-     * \param rxParams Parameters of the signal being received
-     * \param phyRx The receiver SatPhyRx entity
+     * @param rxParams Parameters of the signal being received
+     * @param phyRx The receiver SatPhyRx entity
      */
     void StartRx(Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx);
 
     /**
-     * \brief Function for Rx power output trace
-     * \param rxParams Rx parameters
-     * \param phyRx The receiver SatPhyRx entity
+     * @brief Function for Rx power output trace
+     * @param rxParams Rx parameters
+     * @param phyRx The receiver SatPhyRx entity
      */
     void DoRxPowerOutputTrace(Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx);
 
     /**
-     * \brief Function for Rx power input trace
-     * \param rxParams Rx parameters
-     * \param phyRx The receiver SatPhyRx entity
+     * @brief Function for Rx power input trace
+     * @param rxParams Rx parameters
+     * @param phyRx The receiver SatPhyRx entity
      */
     void DoRxPowerInputTrace(Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx);
 
     /**
-     * \brief Function for Rx power input trace from C/N0 values
-     * \param rxParams Rx parameters
-     * \param phyRx The receiver SatPhyRx entity
+     * @brief Function for Rx power input trace from C/N0 values
+     * @param rxParams Rx parameters
+     * @param phyRx The receiver SatPhyRx entity
      */
     void DoRxCnoInputTrace(Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx);
 
     /**
-     * \brief Function for fading output trace
-     * \param rxParams Rx parameters
-     * \param phyRx The receiver SatPhyRx entity
-     * \param fadingValue fading value
+     * @brief Function for fading output trace
+     * @param rxParams Rx parameters
+     * @param phyRx The receiver SatPhyRx entity
+     * @param fadingValue fading value
      */
     void DoFadingOutputTrace(Ptr<SatSignalParameters> rxParams,
                              Ptr<SatPhyRx> phyRx,
                              double fadingValue);
 
     /**
-     * \brief Function for calculating the Rx power
-     * \param rxParams Rx parameters
-     * \param phyRx The receiver SatPhyRx entity
+     * @brief Function for calculating the Rx power
+     * @param rxParams Rx parameters
+     * @param phyRx The receiver SatPhyRx entity
      */
     void DoRxPowerCalculation(Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx);
 
     /**
-     * \brief Function for getting the external source fading value
-     * \param rxParams Rx parameters
-     * \param phyRx The receiver SatPhyRx entity
-     * \return fading value
+     * @brief Function for getting the external source fading value
+     * @param rxParams Rx parameters
+     * @param phyRx The receiver SatPhyRx entity
+     * @return fading value
      */
     double GetExternalFadingTrace(Ptr<SatSignalParameters> rxParams, Ptr<SatPhyRx> phyRx);
 
     /**
-     * \brief Function for getting the source MAC address from Rx parameters
-     * \param rxParams Rx parameters
-     * \return source MAC address
+     * @brief Function for getting the source MAC address from Rx parameters
+     * @param rxParams Rx parameters
+     * @return source MAC address
      */
     Mac48Address GetSourceAddress(Ptr<SatSignalParameters> rxParams);
 };

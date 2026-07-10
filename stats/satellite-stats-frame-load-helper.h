@@ -24,8 +24,8 @@
 
 #include "satellite-stats-helper.h"
 
-#include <ns3/collector-map.h>
-#include <ns3/ptr.h>
+#include "ns3/collector-map.h"
+#include "ns3/ptr.h"
 
 #include <list>
 #include <map>
@@ -42,15 +42,15 @@ class DataCollectionObject;
 class ScalarCollector;
 
 /**
- * \ingroup satstats
- * \brief Helper for frame load statistics. Base class.
+ * @ingroup satstats
+ * @brief Helper for frame load statistics. Base class.
  */
 class SatStatsFrameLoadHelper : public SatStatsHelper
 {
   public:
     /**
-     * \enum UnitType_t
-     * \brief
+     * @enum UnitType_t
+     * @brief
      */
     typedef enum
     {
@@ -61,8 +61,8 @@ class SatStatsFrameLoadHelper : public SatStatsHelper
     } UnitType_t;
 
     /**
-     * \param unitType
-     * \return
+     * @param unitType
+     * @return
      */
     static std::string GetUnitTypeName(UnitType_t unitType);
 
@@ -80,12 +80,12 @@ class SatStatsFrameLoadHelper : public SatStatsHelper
     static TypeId GetTypeId();
 
     /**
-     * \param unitType
+     * @param unitType
      */
     void SetUnitType(UnitType_t unitType);
 
     /**
-     * \return
+     * @return
      */
     UnitType_t GetUnitType() const;
 
@@ -96,10 +96,10 @@ class SatStatsFrameLoadHelper : public SatStatsHelper
 
   private:
     /**
-     * \param object
-     * \param identifier
-     * \param traceSink
-     * \return
+     * @param object
+     * @param identifier
+     * @param traceSink
+     * @return
      */
     template <typename P, typename V>
     bool SetupProbe(Ptr<Object> object,
@@ -107,23 +107,23 @@ class SatStatsFrameLoadHelper : public SatStatsHelper
                     void (SatStatsFrameLoadHelper::*traceSink)(std::string, uint32_t, V));
 
     /**
-     * \param context
-     * \param frameId
-     * \param loadRatio
+     * @param context
+     * @param frameId
+     * @param loadRatio
      */
     void FrameSymbolLoadCallback(std::string context, uint32_t frameId, double loadRatio);
 
     /**
-     * \param context
-     * \param frameId
-     * \param utCount
+     * @param context
+     * @param frameId
+     * @param utCount
      */
     void FrameUserLoadCallback(std::string context, uint32_t frameId, uint32_t utCount);
 
     /**
-     * \param frameId
-     * \param identifier
-     * \return
+     * @param frameId
+     * @param identifier
+     * @return
      */
     Ptr<ScalarCollector> GetCollector(uint32_t frameId, std::string identifier);
 
@@ -137,7 +137,7 @@ class SatStatsFrameLoadHelper : public SatStatsHelper
     std::list<Ptr<Probe>> m_probes;
 
     /**
-     * \brief Two-dimensional map of collectors, indexed by the frame ID and then
+     * @brief Two-dimensional map of collectors, indexed by the frame ID and then
      *        by the identifier.
      */
     std::map<uint32_t, CollectorMap> m_collectors;
@@ -180,8 +180,8 @@ SatStatsFrameLoadHelper::SetupProbe(Ptr<Object> object,
 // IN SYMBOL UNIT /////////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Helper for frame symbol load statistics.
+ * @ingroup satstats
+ * @brief Helper for frame symbol load statistics.
  */
 class SatStatsFrameSymbolLoadHelper : public SatStatsFrameLoadHelper
 {
@@ -204,8 +204,8 @@ class SatStatsFrameSymbolLoadHelper : public SatStatsFrameLoadHelper
 // IN USER UNIT ///////////////////////////////////////////////////////////////
 
 /**
- * \ingroup satstats
- * \brief Helper for frame user load statistics.
+ * @ingroup satstats
+ * @brief Helper for frame user load statistics.
  */
 class SatStatsFrameUserLoadHelper : public SatStatsFrameLoadHelper
 {

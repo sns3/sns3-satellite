@@ -23,9 +23,9 @@
 
 #include "satellite-stats-helper.h"
 
-#include <ns3/address.h>
-#include <ns3/collector-map.h>
-#include <ns3/ptr.h>
+#include "ns3/address.h"
+#include "ns3/collector-map.h"
+#include "ns3/ptr.h"
 
 #include <list>
 #include <map>
@@ -40,8 +40,8 @@ class DataCollectionObject;
 class DistributionCollector;
 
 /**
- * \ingroup satstats
- * \brief Base class for antenna gain statistics helpers.
+ * @ingroup satstats
+ * @brief Base class for antenna gain statistics helpers.
  */
 class SatStatsPacketDropRateHelper : public SatStatsHelper
 {
@@ -60,18 +60,18 @@ class SatStatsPacketDropRateHelper : public SatStatsHelper
     static TypeId GetTypeId();
 
     /**
-     * \brief Set up several probes or other means of listeners
+     * @brief Set up several probes or other means of listeners
      *        and connect them to the collectors.
      */
     void InstallProbes();
 
     /**
-     * \brief Receive inputs from trace sources and determine the right collector
+     * @brief Receive inputs from trace sources and determine the right collector
      *        to forward the inputs to.
-     * \param nPackets number of packets in the received packet burst.
-     * \param satSrc Satellite src
-     * \param satDst Satellite dst
-     * \param isError whether a PHY error has occurred.
+     * @param nPackets number of packets in the received packet burst.
+     * @param satSrc Satellite src
+     * @param satDst Satellite dst
+     * @param isError whether a PHY error has occurred.
      *
      * Used only in return link.
      */

@@ -22,7 +22,7 @@
 
 #include "../utils/satellite-env-variables.h"
 
-#include <ns3/log.h>
+#include "ns3/log.h"
 
 #include <ios>
 #include <stdint.h>
@@ -44,14 +44,6 @@ SatPositionInputTraceContainer::GetTypeId(void)
                             .SetParent<SatBaseTraceContainer>()
                             .AddConstructor<SatPositionInputTraceContainer>();
     return tid;
-}
-
-TypeId
-SatPositionInputTraceContainer::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
 }
 
 SatPositionInputTraceContainer::SatPositionInputTraceContainer()

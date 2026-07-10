@@ -30,8 +30,8 @@
 #include "satellite-sgp4io.h"
 #include "satellite-sgp4unit.h"
 
-#include <ns3/nstime.h>
-#include <ns3/vector.h>
+#include "ns3/nstime.h"
+#include "ns3/vector.h"
 
 #include <stdint.h>
 #include <string>
@@ -40,8 +40,8 @@ namespace ns3
 {
 
 /**
- * \ingroup satellite
- * \brief Keep track of the current position and velocity of satellite using SGP4 model.
+ * @ingroup satellite
+ * @brief Keep track of the current position and velocity of satellite using SGP4 model.
  */
 class SatSGP4MobilityModel : public SatMobilityModel
 {
@@ -56,7 +56,6 @@ class SatSGP4MobilityModel : public SatMobilityModel
      * @return the object TypeId.
      */
     static TypeId GetTypeId(void);
-    TypeId GetInstanceTypeId(void) const;
 
     /**
      * @brief Default constructor.
@@ -64,14 +63,30 @@ class SatSGP4MobilityModel : public SatMobilityModel
     SatSGP4MobilityModel();
 
     /**
+     * Notifier called once the ObjectBase is fully constructed.
+     *
+     * This method is invoked once all member attributes have been
+     * initialized. Subclasses can override this method to be notified
+     * of this event but if they do this, they must chain up to their
+     * parent's NotifyConstructionCompleted method.
+     */
+    virtual void NotifyConstructionCompleted() override;
+
+    /**
      * @brief Destructor.
      */
     virtual ~SatSGP4MobilityModel();
 
+    // Inherited from MobilityModel
+    Ptr<MobilityModel> Copy() const override
+    {
+        return CreateObject<SatSGP4MobilityModel>(*this);
+    }
+
     /**
      * Set the simulation absolute start time in string format.
      *
-     * \param startStr Start time of simulation, on format "YYYY-MM-DD hh:mm:ss"
+     * @param startStr Start time of simulation, on format "YYYY-MM-DD hh:mm:ss"
      */
     void SetStartDate(std::string startStr);
 

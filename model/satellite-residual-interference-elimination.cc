@@ -23,9 +23,9 @@
 #include "satellite-signal-parameters.h"
 #include "satellite-utils.h"
 
-#include <ns3/double.h>
-#include <ns3/log.h>
-#include <ns3/simulator.h>
+#include "ns3/double.h"
+#include "ns3/log.h"
+#include "ns3/simulator.h"
 
 #include <cmath>
 #include <limits>
@@ -54,12 +54,6 @@ SatResidualInterferenceElimination::GetTypeId(void)
                 MakeDoubleChecker<double>());
 
     return tid;
-}
-
-TypeId
-SatResidualInterferenceElimination::GetInstanceTypeId(void) const
-{
-    return GetTypeId();
 }
 
 SatResidualInterferenceElimination::SatResidualInterferenceElimination()

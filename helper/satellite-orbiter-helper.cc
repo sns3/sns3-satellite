@@ -139,14 +139,6 @@ SatOrbiterHelper::GetTypeId(void)
     return tid;
 }
 
-TypeId
-SatOrbiterHelper::GetInstanceTypeId(void) const
-{
-    NS_LOG_FUNCTION(this);
-
-    return GetTypeId();
-}
-
 SatOrbiterHelper::SatOrbiterHelper()
     : m_carrierBandwidthConverter(),
       m_fwdLinkCarrierCount(),
