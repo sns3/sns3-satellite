@@ -1,3 +1,43 @@
+set(SNS3_DATA ON)
+list(APPEND SNS3_DATA_FOLDER data sns3-data-master)
+
+function(search_data_path FOLDER_NAME OUTPUT_VARIABLE)
+  find_path(
+    DATA_FOLDER
+    NAMES "${FOLDER_NAME}"
+    HINTS ${SNS3_DATA_FOLDER}
+    OPTIONAL  # Just so we do not get a FATAL_ERROR but a module skip instead
+    NO_CACHE)
+  if((NOT DATA_FOLDER) AND (NOT ${DATA_FOLDER}))
+    message(${HIGHLIGHTED_STATUS} "SNS3: data/${FOLDER_NAME} folder not found")
+    set(SNS3_DATA OFF PARENT_SCOPE)
+  else()
+    cmake_path(APPEND DATA_FOLDER "${FOLDER_NAME}")
+    message(VERBOSE "SNS3: ${FOLDER_NAME} folder: ${DATA_FOLDER}")
+    set(${OUTPUT_VARIABLE} "${DATA_FOLDER}" PARENT_SCOPE)
+  endif()
+endfunction(search_data_path)
+
+search_data_path(additional-input SNS3_DATA_INPUT)
+search_data_path(scenarios SNS3_DATA_SCENARIOS)
+search_data_path(sgp4 SNS3_DATA_SGP4)
+
+if(NOT SNS3_DATA)
+  list(LENGTH NS3_ENABLED_MODULES SNS3_MODULES_LENGTH)
+  list(FIND NS3_ENABLED_MODULES satellite SNS3_MODULES_SATELLITE)
+  if((SNS3_MODULES_LENGTH EQUAL 0) OR (SNS3_MODULES_SATELLITE EQUAL -1))
+    message(${HIGHLIGHTED_STATUS} "Skipping contrib/satellite")
+    return()
+  else()
+    message(
+      FATAL_ERROR
+      "SNS3 module has been explicitly requested but it cannot be run"
+      "without its associated data directory. Make sure to download and"
+      "install it under contrib/satellite first if you want to use the"
+      "satellite module.")
+  endif()
+endif()
+
 set(source_files
     model/geo-coordinate.cc
     model/iers-data.cc
@@ -536,32 +576,52 @@ set(test_sources
     test/satellite-waveform-conf-test.cc
 )
 
-MACRO(RESET_IERS_DATA_VARIABLE)
-  set(REFRESH_IERS_DATA FALSE CACHE BOOL "Force a singular CMake invocation to update IERS data for the SGP4 model. Auto-reset to FALSE after each use." FORCE)
-ENDMACRO()
-
-if(NOT DEFINED REFRESH_IERS_DATA)
-  RESET_IERS_DATA_VARIABLE()
-endif()
-
-if(REFRESH_IERS_DATA)
-  if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/data/sgp4)
-    if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/data/sgp4/cgen)
-      execute_process(COMMAND ${CMAKE_CXX_COMPILER} ${CMAKE_CXX_FLAGS} ${CMAKE_CURRENT_SOURCE_DIR}/data/sgp4/constants-gen.cc -o ${CMAKE_CURRENT_SOURCE_DIR}/data/sgp4/cgen)
-    endif()
-    file(DOWNLOAD
-      https://maia.usno.navy.mil/ser7/finals2000A.data
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/sgp4/finals.data)
-    file(DOWNLOAD
-      https://maia.usno.navy.mil/ser7/tai-utc.dat
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/sgp4/tai-utc.dat)
-    execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/data/sgp4/cgen header ${CMAKE_CURRENT_SOURCE_DIR}/model)
-    execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/data/sgp4/cgen source ${CMAKE_CURRENT_SOURCE_DIR}/model)
-  else()
-    message(WARNING "Folder ${CMAKE_CURRENT_SOURCE_DIR}/data/sgp4 not found. Cannot refresh IERS data. Ignoring...")
+set(SNS3_IERS_DATA ON)
+function(download_file DOWNLOAD_URL DOWNLOAD_PATH)
+  file(DOWNLOAD "${DOWNLOAD_URL}" "${DOWNLOAD_PATH}" STATUS DOWNLOAD_STATUS)
+  list(GET DOWNLOAD_STATUS 0 DOWNLOAD_STATUS_CODE)
+  list(GET DOWNLOAD_STATUS 1 DOWNLOAD_STATUS_REASON)
+  if(NOT DOWNLOAD_STATUS_CODE EQUAL 0)
+    message(${HIGHLIGHTED_STATUS} "SNS3: downloading ${DOWNLOAD_URL} failed: ${DOWNLOAD_STATUS_REASON}")
+    set(SNS3_IERS_DATA OFF PARENT_SCOPE)
   endif()
-  RESET_IERS_DATA_VARIABLE()
+endfunction(download_file)
+
+if(SNS3_REFRESH_IERS_DATA)
+  if(IS_DIRECTORY "${SNS3_DATA_SGP4}")
+    cmake_path(APPEND SNS3_DATA_SGP4 cgen OUTPUT_VARIABLE SNS3_DATA_CGEN)
+    cmake_path(APPEND SNS3_DATA_SGP4 constants-gen.cc OUTPUT_VARIABLE SNS3_DATA_CGEN_SOURCE)
+    cmake_path(APPEND SNS3_DATA_SGP4 finals.data OUTPUT_VARIABLE SNS3_DATA_FINALS)
+    cmake_path(APPEND SNS3_DATA_SGP4 tai-utc.dat OUTPUT_VARIABLE SNS3_DATA_TAI)
+    cmake_path(APPEND CMAKE_CURRENT_SOURCE_DIR model OUTPUT_VARIABLE SNS3_MODEL)
+
+    if("${SNS3_DATA_CGEN_SOURCE}" IS_NEWER_THAN "${SNS3_DATA_CGEN}")
+      message(VERBOSE "SNS3: compiling cgen")
+      execute_process(COMMAND "${CMAKE_CXX_COMPILER}" ${CMAKE_CXX_FLAGS} "${SNS3_DATA_CGEN_SOURCE}" -o "${SNS3_DATA_CGEN}")
+    endif()
+
+    message(STATUS "SNS3: downloading new IERS data")
+    download_file(https://maia.usno.navy.mil/ser7/finals2000A.data "${SNS3_DATA_FINALS}")
+    download_file(https://maia.usno.navy.mil/ser7/tai-utc.dat "${SNS3_DATA_TAI}")
+
+    if(NOT SNS3_IERS_DATA)
+      message(${HIGHLIGHTED_STATUS} "SNS3: skipping model/iers-data.cc generation")
+    else()
+      message(VERBOSE "SNS3: compiling new IERS data")
+      execute_process(COMMAND "${SNS3_DATA_CGEN}" "${SNS3_DATA_TAI}" "${SNS3_DATA_FINALS}" "${SNS3_MODEL}")
+    endif()
+  else()
+    message(${HIGHLIGHTED_STATUS}
+            "Folder ${SNS3_DATA_SGP4} not found."
+            "Cannot refresh IERS data. Ignoring...")
+  endif()
 endif()
+
+# Force auto-reset to FALSE
+set(SNS3_REFRESH_IERS_DATA OFF
+    CACHE BOOL
+    "Force a singular CMake invocation to update IERS data for the SGP4 model. Auto-reset to FALSE after each use."
+    FORCE)
 
 build_lib(
   LIBNAME satellite
