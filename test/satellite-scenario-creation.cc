@@ -38,7 +38,10 @@
 #include "ns3/string.h"
 #include "ns3/test.h"
 
-using namespace ns3;
+namespace ns3
+{
+namespace satellite
+{
 
 /**
  * @brief 'Scenario Creation, Simple' test case implementation, id: sc-1 / TN4.
@@ -376,5 +379,8 @@ ScenarioCreationTestSuite::ScenarioCreationTestSuite()
     AddTestCase(new ScenarioCreationUser, TestCase::Duration::QUICK);
 }
 
+}
+} // namespace ns3
+
 // Allocate an instance of this TestSuite
-static ScenarioCreationTestSuite scenarioCreationTestSuite;
+static ns3::satellite::ScenarioCreationTestSuite scenarioCreationTestSuite;

@@ -27,10 +27,12 @@
 #include <fstream>
 #include <stdint.h>
 
-NS_LOG_COMPONENT_DEFINE("SatOutputFileStreamWrapper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatOutputFileStreamWrapper");
 
 SatOutputFileStreamWrapper::SatOutputFileStreamWrapper(std::string filename,
                                                        std::ios::openmode filemode)
@@ -69,4 +71,5 @@ SatOutputFileStreamWrapper::GetStream(void)
     return m_ofstream;
 }
 
+}
 } // namespace ns3

@@ -49,10 +49,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatBeamScheduler");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatBeamScheduler");
 
 // UtInfo class declarations for SatBeamScheduler
 SatBeamScheduler::SatUtInfo::SatUtInfo(Ptr<SatDamaEntry> damaEntry,
@@ -1109,4 +1111,5 @@ SatBeamScheduler::SetUseLora(bool useLora)
     m_useLora = useLora;
 }
 
+}
 } // namespace ns3

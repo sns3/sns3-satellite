@@ -25,6 +25,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -71,6 +73,7 @@ class SatFadingInputTrace : public SatBaseFading
     Ptr<SatFadingInputTraceContainer> m_satFadingInputTraceContainer;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_FADING_INPUT_TRACE_H */

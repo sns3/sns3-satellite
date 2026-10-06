@@ -34,13 +34,18 @@
 namespace ns3
 {
 
+class Node;
+class Time;
+
+class DataCollectionObject;
+class DistributionCollector;
+
+namespace satellite
+{
+
 // BASE CLASS /////////////////////////////////////////////////////////////////
 
 class SatHelper;
-class Node;
-class Time;
-class DataCollectionObject;
-class DistributionCollector;
 
 /**
  * @ingroup satstats
@@ -291,6 +296,7 @@ class SatStatsRtnUserLinkModcodHelper : public SatStatsLinkModcodHelper
 
 }; // end of class SatStatsRtnUserLinkModcodHelper
 
+}
 } // end of namespace ns3
 
 #endif /* SATELLITE_STATS_LINK_MODCOD_HELPER_H */

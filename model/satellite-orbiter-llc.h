@@ -30,6 +30,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -171,6 +173,7 @@ class SatOrbiterLlc : public SatLlc
     ReceiveSatelliteCallback m_rxSatelliteCallback;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_ORBITER_LLC_H */

@@ -31,10 +31,12 @@
 #include <stdint.h>
 #include <string>
 
-NS_LOG_COMPONENT_DEFINE("SatLookUpTable");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatLookUpTable");
 
 NS_OBJECT_ENSURE_REGISTERED(SatLookUpTable);
 
@@ -248,4 +250,5 @@ SatLookUpTable::Load(std::string linkResultPath)
 
 } // end of void Load (std::string linkResultPath)
 
+}
 } // end of namespace ns3

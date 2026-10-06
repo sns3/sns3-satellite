@@ -46,8 +46,12 @@ namespace ns3
 
 template <typename Item>
 class DropTailQueue;
-class PointToPointIslChannel;
 class ErrorModel;
+
+namespace satellite
+{
+
+class PointToPointIslChannel;
 class SatOrbiterNetDevice;
 
 /**
@@ -342,6 +346,7 @@ class PointToPointIslNetDevice : public NetDevice
     TracedCallback<uint32_t, Ptr<Node>, Ptr<Node>, bool> m_packetDropRateTrace;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_POINT_TO_POINT_ISL_NET_DEVICE_H */

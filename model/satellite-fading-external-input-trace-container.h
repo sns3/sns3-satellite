@@ -36,6 +36,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -245,6 +247,7 @@ class SatFadingExternalInputTraceContainer : public Object
                                           Ptr<MobilityModel> mobility);
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_FADING_EXTERNAL_INPUT_TRACE_CONTAINER_H_ */

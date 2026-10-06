@@ -36,10 +36,12 @@
 #include <limits>
 #include <string>
 
-NS_LOG_COMPONENT_DEFINE("SatLowerLayerServiceConf");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatLowerLayerServiceConf");
 
 SatLowerLayerServiceDaEntry::SatLowerLayerServiceDaEntry()
     : m_constantAssignmentProvided(false),
@@ -926,4 +928,5 @@ SatLowerLayerServiceConf::SetRaIsEssaAllowed(uint8_t index, bool isEssaAllowed)
     m_raServiceEntries[index].SetIsEssaAllowed(isEssaAllowed);
 }
 
+}
 } // namespace ns3

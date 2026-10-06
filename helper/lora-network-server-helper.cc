@@ -35,10 +35,12 @@
 #include <stdint.h>
 #include <string>
 
-NS_LOG_COMPONENT_DEFINE("LoraNetworkServerHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("LoraNetworkServerHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(LoraNetworkServerHelper);
 
@@ -160,5 +162,7 @@ LoraNetworkServerHelper::InstallComponents(Ptr<LoraNetworkServer> netServer)
     {
         netServer->AddComponent(m_adrSupportFactory.Create<LoraNetworkControllerComponent>());
     }
+}
+
 }
 } // namespace ns3

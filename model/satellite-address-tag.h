@@ -29,6 +29,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -99,6 +101,7 @@ class SatAddressTag : public Tag
     Address m_sourceAddress; ///< The source address.
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_ADDRESS_TAG_H */

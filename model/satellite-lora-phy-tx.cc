@@ -24,6 +24,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 NS_LOG_COMPONENT_DEFINE("SatLoraPhyTx");
 
@@ -81,4 +83,5 @@ SatLoraPhyTx::IsTransmitting()
     return m_isTransmitting && SatPhyTx::IsTransmitting();
 }
 
+}
 } // namespace ns3

@@ -28,10 +28,12 @@
 #include <algorithm>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatDamaEntry");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatDamaEntry");
 
 SatDamaEntry::SatDamaEntry()
     : m_dynamicRatePersistence(0),
@@ -330,4 +332,5 @@ SatDamaEntry::DecrementVolumeBacklogPersistence()
     }
 }
 
+}
 } // namespace ns3

@@ -32,6 +32,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 class SatIslArbiterUnicast : public SatIslArbiter
 {
@@ -87,6 +89,7 @@ class SatIslArbiterUnicast : public SatIslArbiter
                       // IslNetDevice index to send packet
 };
 
+}
 } // namespace ns3
 
 #endif // SATELLITE_ISL_ARBITER_UNICAST_H

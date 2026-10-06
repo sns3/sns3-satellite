@@ -26,10 +26,12 @@
 
 #include <stdint.h>
 
-NS_LOG_COMPONENT_DEFINE("LoraGatewayStatus");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("LoraGatewayStatus");
 
 NS_OBJECT_ENSURE_REGISTERED(LoraGatewayStatus);
 
@@ -136,5 +138,7 @@ LoraGatewayStatus::SetNextTransmissionTime(Time nextTransmissionTime)
     NS_LOG_FUNCTION(this << nextTransmissionTime);
 
     m_nextTransmissionTime = nextTransmissionTime;
+}
+
 }
 } // namespace ns3

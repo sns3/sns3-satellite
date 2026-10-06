@@ -42,6 +42,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 class PointToPointIslNetDevice;
 class SatIslArbiter;
@@ -474,6 +476,7 @@ class SatOrbiterNetDevice : public NetDevice
     TracedCallback<const Time&, const Address&> m_rxUserLinkJitterTrace;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_ORBITER_NET_DEVICE_H */

@@ -37,6 +37,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 class SatPhyTx;
 
@@ -333,6 +335,7 @@ class SatSignalParameters : public Object
     Ptr<SatInterferenceParameters> m_ifParams;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_SIGNAL_PARAMETERS_H */

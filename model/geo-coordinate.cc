@@ -32,10 +32,12 @@
 #include <sstream>
 #include <stdint.h>
 
-NS_LOG_COMPONENT_DEFINE("geo-coordinate");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("geo-coordinate");
 
 ATTRIBUTE_HELPER_CPP(GeoCoordinate);
 
@@ -379,4 +381,5 @@ operator>>(std::istream& is, GeoCoordinate& coordinate)
     return is;
 }
 
+}
 } // namespace ns3

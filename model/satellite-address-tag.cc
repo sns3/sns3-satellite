@@ -24,10 +24,12 @@
 
 #include <ostream>
 
-NS_LOG_COMPONENT_DEFINE("SatAddressTag");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatAddressTag");
 
 NS_OBJECT_ENSURE_REGISTERED(SatAddressTag);
 
@@ -100,4 +102,5 @@ SatAddressTag::GetSourceAddress() const
     return m_sourceAddress;
 }
 
+}
 } // namespace ns3

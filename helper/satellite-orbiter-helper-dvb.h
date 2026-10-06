@@ -51,6 +51,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @brief Creates needed objects for Satellite node like SatorbiterNetDevice objects.
@@ -113,6 +115,7 @@ class SatOrbiterHelperDvb : public SatOrbiterHelper
                                     uint32_t userBeamId);
 };
 
+}
 } // namespace ns3
 
 #endif /* SAT_ORBITER_HELPER_DVB_H */

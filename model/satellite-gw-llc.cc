@@ -37,10 +37,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatGwLlc");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatGwLlc");
 
 NS_OBJECT_ENSURE_REGISTERED(SatGwLlc);
 
@@ -383,4 +385,5 @@ SatGwLlc::ClearQueues()
     }
 }
 
+}
 } // namespace ns3

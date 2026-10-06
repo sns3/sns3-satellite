@@ -38,6 +38,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -406,6 +408,7 @@ class SatRandomAccess : public Object
     AreBuffersEmptyCallback m_areBuffersEmptyCb;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_RANDOM_ACCESS_H */

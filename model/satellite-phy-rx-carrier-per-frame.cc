@@ -37,10 +37,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatPhyRxCarrierPerFrame");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatPhyRxCarrierPerFrame");
 
 NS_OBJECT_ENSURE_REGISTERED(SatPhyRxCarrierPerFrame);
 
@@ -897,4 +899,5 @@ SatPhyRxCarrierPerFrame::CompareCrdsaPacketId(SatPhyRxCarrierPerFrame::crdsaPack
                   obj2.rxParams->m_txInfo.crdsaUniquePacketId);
 }
 
+}
 } // namespace ns3

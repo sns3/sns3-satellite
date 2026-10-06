@@ -31,14 +31,16 @@
 #include "ns3/satellite-look-up-table.h"
 #include "ns3/test.h"
 
-NS_LOG_COMPONENT_DEFINE("TestLinkResult");
-
 #define SAT_LINK_RESULTS_PRECISION 0.00011
 
 // TODO precision loss occurs somewhere, causing the test to fail if this is set to 0.00010
 
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("TestLinkResult");
 
 /*
  * DVB-RCS2 TEST CASE
@@ -1989,4 +1991,5 @@ static class LinkResultTestSuite : public TestSuite
 
 // end of static class LinkResultTestSuite
 
+}
 } // end of namespace ns3

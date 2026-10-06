@@ -32,10 +32,12 @@
 
 #include <algorithm>
 
-NS_LOG_COMPONENT_DEFINE("SatGenericStreamEncapsulator");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatGenericStreamEncapsulator");
 
 NS_OBJECT_ENSURE_REGISTERED(SatGenericStreamEncapsulator);
 
@@ -501,4 +503,5 @@ SatGenericStreamEncapsulator::GetMinTxOpportunityInBytes() const
     return m_minGseTxOpportunity;
 }
 
+}
 } // namespace ns3

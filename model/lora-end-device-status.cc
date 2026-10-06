@@ -45,6 +45,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 NS_LOG_COMPONENT_DEFINE("LoraEndDeviceStatus");
 
@@ -481,5 +483,7 @@ operator<<(std::ostream& os, const LoraEndDeviceStatus& status)
     }
 
     return os;
+}
+
 }
 } // namespace ns3

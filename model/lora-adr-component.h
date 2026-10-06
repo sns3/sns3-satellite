@@ -33,6 +33,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 ////////////////////////////////////////
 // LinkAdrRequest commands management //
@@ -121,6 +123,8 @@ class LoraAdrComponent : public LoraNetworkControllerComponent
 
     bool m_toggleTxPower;
 };
+
+}
 } // namespace ns3
 
 #endif

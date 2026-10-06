@@ -34,10 +34,12 @@
 #include <string>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatSGP4MobilityModel");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatSGP4MobilityModel");
 
 NS_OBJECT_ENSURE_REGISTERED(SatSGP4MobilityModel);
 
@@ -361,4 +363,5 @@ SatSGP4MobilityModel::Matrix::operator*(const Vector3D& v) const
                     m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z);
 }
 
+}
 } // namespace ns3

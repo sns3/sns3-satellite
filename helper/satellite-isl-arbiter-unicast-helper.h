@@ -34,6 +34,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 class SatIslArbiterUnicastHelper : public Object
 {
@@ -71,6 +73,7 @@ class SatIslArbiterUnicastHelper : public Object
     std::vector<std::pair<uint32_t, uint32_t>> m_isls; // List of all ISLs
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_ISL_ARBITER_UNICAST_HELPER_H */

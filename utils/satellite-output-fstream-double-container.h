@@ -31,6 +31,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -217,6 +219,7 @@ class SatOutputFileStreamDoubleContainer : public Object
     Gnuplot2dDataset::Style m_style;
 };
 
+}
 } // namespace ns3
 
 #endif /* SAT_OUTPUT_FSTREAM_DOUBLE_CONTAINER_H */

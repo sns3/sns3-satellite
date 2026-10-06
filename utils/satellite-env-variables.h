@@ -30,6 +30,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -324,6 +326,7 @@ class SatEnvVariables : public Object
     static Ptr<SatEnvVariables> m_instance;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_ENV_VARIABLES_H */

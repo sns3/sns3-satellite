@@ -37,10 +37,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatConf");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatConf");
 
 NS_OBJECT_ENSURE_REGISTERED(SatConf);
 
@@ -800,4 +802,5 @@ SatConf::GetStartTimeStr() const
     return m_startTimeStr;
 }
 
+}
 } // namespace ns3

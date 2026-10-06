@@ -31,6 +31,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -106,6 +108,7 @@ class SatRxPowerInputTraceContainer : public SatBaseTraceContainer
     container_t m_container;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_RX_POWER_INPUT_TRACE_CONTAINER_H */

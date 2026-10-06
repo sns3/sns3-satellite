@@ -35,11 +35,16 @@
 namespace ns3
 {
 
+class Node;
+class Probe;
+class DataCollectionObject;
+
+namespace satellite
+{
+
 // BASE CLASS /////////////////////////////////////////////////////////////////
 
 class SatHelper;
-class Node;
-class DataCollectionObject;
 
 /**
  * @ingroup satstats
@@ -100,8 +105,6 @@ class SatStatsCompositeSinrHelper : public SatStatsHelper
 }; // end of class SatStatsCompositeSinrHelper
 
 // FORWARD LINK ///////////////////////////////////////////////////////////////
-
-class Probe;
 
 /**
  * @ingroup satstats
@@ -201,6 +204,7 @@ class SatStatsRtnCompositeSinrHelper : public SatStatsCompositeSinrHelper
   private:
 }; // end of class SatStatsRtnCompositeSinrHelper
 
+}
 } // end of namespace ns3
 
 #endif /* SATELLITE_STATS_COMPOSITE_SINR_HELPER_H */

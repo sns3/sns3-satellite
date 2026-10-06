@@ -59,10 +59,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatOrbiterHelperLora");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatOrbiterHelperLora");
 
 NS_OBJECT_ENSURE_REGISTERED(SatOrbiterHelperLora);
 
@@ -267,4 +269,5 @@ SatOrbiterHelperLora::AttachChannelsUser(Ptr<SatOrbiterNetDevice> dev,
     }
 }
 
+}
 } // namespace ns3

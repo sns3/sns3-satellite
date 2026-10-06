@@ -28,6 +28,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * This class represents the Mac header of a LoRaWAN packet.
@@ -135,6 +137,8 @@ class LorawanMacHeader : public Header
      */
     uint8_t m_major;
 };
+
+}
 } // namespace ns3
 
 #endif

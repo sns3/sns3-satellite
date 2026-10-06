@@ -28,10 +28,12 @@
 #include <set>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatRandomAccess");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatRandomAccess");
 
 NS_OBJECT_ENSURE_REGISTERED(SatRandomAccess);
 
@@ -1097,4 +1099,5 @@ SatRandomAccess::SetAreBuffersEmptyCallback(SatRandomAccess::AreBuffersEmptyCall
     m_areBuffersEmptyCb = callback;
 }
 
+}
 } // namespace ns3

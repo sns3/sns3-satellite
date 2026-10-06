@@ -38,6 +38,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -139,6 +141,7 @@ class SatOrbiterFeederMac : public SatOrbiterMac
     virtual bool HasPeer();
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_ORBITER_FEEDER_MAC_H */

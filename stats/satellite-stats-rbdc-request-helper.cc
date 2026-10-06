@@ -43,10 +43,12 @@
 #include <sstream>
 #include <string>
 
-NS_LOG_COMPONENT_DEFINE("SatStatsRbdcRequestHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatStatsRbdcRequestHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(SatStatsRbdcRequestHelper);
 
@@ -497,4 +499,5 @@ SatStatsRbdcRequestHelper::InstallProbes()
     }
 }
 
+}
 } // namespace ns3

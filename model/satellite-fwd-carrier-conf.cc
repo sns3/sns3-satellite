@@ -25,10 +25,12 @@
 
 #include <stdint.h>
 
-NS_LOG_COMPONENT_DEFINE("SatFwdCarrierConf");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatFwdCarrierConf");
 
 // Forward Link Carrier conf
 
@@ -60,4 +62,5 @@ SatFwdCarrierConf::~SatFwdCarrierConf()
     NS_LOG_FUNCTION(this);
 }
 
+}
 } // namespace ns3

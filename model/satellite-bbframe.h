@@ -34,6 +34,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -231,6 +233,7 @@ class SatBbFrame : public SimpleRefCount<SatBbFrame>
     SatEnums::SatBbFrameType_t m_frameType;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_BBFRAME_H_ */

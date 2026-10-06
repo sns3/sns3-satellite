@@ -43,10 +43,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatWaveformConf");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatWaveformConf");
 
 SatWaveform::SatWaveform()
     : m_waveformId(0),
@@ -665,4 +667,5 @@ SatWaveformConf::ConvertToModCod(uint32_t modulatedBits,
     return SatEnums::SAT_NONVALID_MODCOD;
 }
 
+}
 } // namespace ns3

@@ -26,6 +26,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 NS_LOG_COMPONENT_DEFINE("LoraLogicalChannel");
 
@@ -133,5 +135,7 @@ bool
 operator!=(const Ptr<LoraLogicalChannel>& first, const Ptr<LoraLogicalChannel>& second)
 {
     return !(first == second);
+}
+
 }
 } // namespace ns3

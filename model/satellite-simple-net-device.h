@@ -32,6 +32,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -156,6 +158,7 @@ class SatSimpleNetDevice : public NetDevice
     TracedCallback<Ptr<const Packet>> m_phyRxDropTrace;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_SIMPLE_NET_DEVICE_H */

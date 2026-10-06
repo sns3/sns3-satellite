@@ -22,10 +22,12 @@
 
 #include "ns3/log.h"
 
-NS_LOG_COMPONENT_DEFINE("SatNodeInfo");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatNodeInfo");
 
 SatNodeInfo::SatNodeInfo()
     : m_nodeId(0),
@@ -66,4 +68,5 @@ SatNodeInfo::GetMacAddress() const
     return m_macAddress;
 }
 
+}
 } // namespace ns3

@@ -28,6 +28,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -78,6 +80,7 @@ class SatConstantPropagationDelayModel : public PropagationDelayModel
     Time m_delay;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_PROPAGATION_DELAY_MODEL_H */

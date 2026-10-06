@@ -38,10 +38,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatPhyRxCarrierPerWindow");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatPhyRxCarrierPerWindow");
 
 NS_OBJECT_ENSURE_REGISTERED(SatPhyRxCarrierPerWindow);
 
@@ -865,4 +867,5 @@ SatPhyRxCarrierPerWindow::CalculateNormalizedOfferedRandomAccessLoad()
     return normalizedOfferedLoad;
 }
 
+}
 } // namespace ns3

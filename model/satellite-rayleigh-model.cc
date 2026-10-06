@@ -27,9 +27,12 @@
 
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatRayleighModel");
 
 NS_OBJECT_ENSURE_REGISTERED(SatRayleighModel);
-NS_LOG_COMPONENT_DEFINE("SatRayleighModel");
 
 TypeId
 SatRayleighModel::GetTypeId(void)
@@ -169,4 +172,5 @@ SatRayleighModel::UpdateParameters(uint32_t newSet, uint32_t newState)
     m_currentState = newState;
 }
 
+}
 } // namespace ns3

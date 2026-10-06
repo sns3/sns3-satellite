@@ -36,6 +36,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -642,6 +644,7 @@ class SatFrameAllocator : public SimpleRefCount<SatFrameAllocator>
     Ptr<SatTbtpMessage> CreateNewTbtp(TbtpMsgContainer_t& tbtpContainer);
 };
 
+}
 } // namespace ns3
 
 #endif /* SAT_FRAME_ALLOCATOR_H */

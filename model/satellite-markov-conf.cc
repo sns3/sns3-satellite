@@ -29,9 +29,12 @@
 
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatMarkovConf");
 
 NS_OBJECT_ENSURE_REGISTERED(SatMarkovConf);
-NS_LOG_COMPONENT_DEFINE("SatMarkovConf");
 
 static const double g_MarkovElevationStateChangeProbabilities
     [SatMarkovConf::DEFAULT_ELEVATION_COUNT][SatMarkovConf::DEFAULT_STATE_COUNT]
@@ -320,4 +323,5 @@ SatMarkovConf::AreDecibelsUsed()
     return m_useDecibels;
 }
 
+}
 } // namespace ns3

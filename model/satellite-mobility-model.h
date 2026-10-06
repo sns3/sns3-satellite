@@ -27,6 +27,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -152,6 +154,7 @@ class SatMobilityModel : public MobilityModel
     bool m_GetAsGeoCoordinates;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_MOBILITY_MODEL_H */

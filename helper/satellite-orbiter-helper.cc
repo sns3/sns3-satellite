@@ -55,10 +55,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatOrbiterHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatOrbiterHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(SatOrbiterHelper);
 
@@ -580,4 +582,5 @@ SatOrbiterHelper::SetIslRoutes(std::vector<std::pair<uint32_t, uint32_t>> isls)
     }
 }
 
+}
 } // namespace ns3

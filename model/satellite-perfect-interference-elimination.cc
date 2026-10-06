@@ -31,10 +31,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatPerfectInterferenceElimination");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatPerfectInterferenceElimination");
 
 NS_OBJECT_ENSURE_REGISTERED(SatPerfectInterferenceElimination);
 
@@ -149,4 +151,5 @@ SatPerfectInterferenceElimination::GetResidualPower(Ptr<SatSignalParameters> pro
     return 0.0;
 }
 
+}
 } // namespace ns3

@@ -38,6 +38,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -246,6 +248,7 @@ class SatSGP4MobilityModel : public SatMobilityModel
     mutable Time m_timeLastUpdate;
 };
 
+}
 } // namespace ns3
 
 #endif /* SAT_SGP4_MOBILITY_MODEL_H */

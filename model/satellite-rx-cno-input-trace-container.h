@@ -34,6 +34,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -135,6 +137,7 @@ class SatRxCnoInputTraceContainer : public SatBaseTraceContainer
     containerConstantCno_t m_containerConstantCno;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_RX_CNO_INPUT_TRACE_CONTAINER_H */

@@ -52,10 +52,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SimulationHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SimulationHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(SimulationHelperConf);
 
@@ -1704,4 +1706,5 @@ SimulationHelper::StoreAttributesToFile(std::string fileName, bool outputAttribu
     return outputPath;
 }
 
+}
 } // namespace ns3

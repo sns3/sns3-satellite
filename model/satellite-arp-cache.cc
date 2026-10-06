@@ -25,10 +25,12 @@
 
 #include <stdint.h>
 
-NS_LOG_COMPONENT_DEFINE("SatArpCache");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatArpCache");
 
 NS_OBJECT_ENSURE_REGISTERED(SatArpCache);
 
@@ -65,4 +67,5 @@ SatArpCache::Add(Ipv4Address to, Address macAddress)
     return entry;
 }
 
+}
 } // namespace ns3

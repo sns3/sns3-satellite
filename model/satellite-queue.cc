@@ -33,10 +33,12 @@
 
 #include <sstream>
 
-NS_LOG_COMPONENT_DEFINE("SatQueue");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatQueue");
 
 NS_OBJECT_ENSURE_REGISTERED(SatQueue);
 
@@ -428,4 +430,5 @@ SatQueue::GetNumSmallerPackets(uint32_t maxPacketSizeBytes) const
     return packets;
 }
 
+}
 } // namespace ns3

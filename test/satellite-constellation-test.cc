@@ -53,7 +53,10 @@
 #include <fstream>
 #include <iostream>
 
-using namespace ns3;
+namespace ns3
+{
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -924,5 +927,8 @@ SatConstellationTestSuite::SatConstellationTestSuite()
                 TestCase::Duration::QUICK); // Test topology loading with huge constellation
 }
 
+}
+} // namespace ns3
+
 // Allocate an instance of this TestSuite
-static SatConstellationTestSuite satConstellationTestSuite;
+static ns3::satellite::SatConstellationTestSuite satConstellationTestSuite;

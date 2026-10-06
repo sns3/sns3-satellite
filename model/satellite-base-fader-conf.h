@@ -29,6 +29,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -68,6 +70,7 @@ class SatBaseFaderConf : public Object
   private:
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_BASE_FADER_CONF_H */

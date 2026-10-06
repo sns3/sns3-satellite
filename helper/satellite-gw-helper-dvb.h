@@ -35,6 +35,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @brief Creates needed objects for DVB GW nodes like SatOrbiterNetDevice objects.
@@ -102,6 +104,7 @@ class SatGwHelperDvb : public SatGwHelper
                                    Ptr<SatLowerLayerServiceConf> llsConf);
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_GW_HELPER_DVB_H */

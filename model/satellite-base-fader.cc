@@ -24,10 +24,12 @@
 
 #include <stdint.h>
 
-NS_LOG_COMPONENT_DEFINE("SatBaseFader");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatBaseFader");
 
 NS_OBJECT_ENSURE_REGISTERED(SatBaseFader);
 
@@ -48,4 +50,5 @@ SatBaseFader::~SatBaseFader()
     NS_LOG_FUNCTION(this);
 }
 
+}
 } // namespace ns3

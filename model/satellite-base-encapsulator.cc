@@ -27,10 +27,12 @@
 #include "ns3/log.h"
 #include "ns3/simulator.h"
 
-NS_LOG_COMPONENT_DEFINE("SatBaseEncapsulator");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatBaseEncapsulator");
 
 NS_OBJECT_ENSURE_REGISTERED(SatBaseEncapsulator);
 
@@ -271,4 +273,5 @@ SatBaseEncapsulator::GetMinTxOpportunityInBytes() const
     return m_txQueue->Peek()->GetSize();
 }
 
+}
 } // namespace ns3

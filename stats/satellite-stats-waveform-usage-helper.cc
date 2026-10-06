@@ -44,10 +44,12 @@
 #include <string>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatStatsWaveformUsageHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatStatsWaveformUsageHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(SatStatsWaveformUsageHelper);
 
@@ -250,4 +252,5 @@ SatStatsWaveformUsageHelper::WaveformUsageCallback(std::string context, uint32_t
 
 } // end of `void WaveformUsageCallback (std::string, uint32_t)`
 
+}
 } // end of namespace ns3

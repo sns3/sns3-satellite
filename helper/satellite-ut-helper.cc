@@ -38,10 +38,12 @@
 
 #include <string>
 
-NS_LOG_COMPONENT_DEFINE("SatUtHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatUtHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(SatUtHelper);
 
@@ -226,4 +228,5 @@ SatUtHelper::EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase&
     TraceConnect("Creation", "SatUtHelper", cb);
 }
 
+}
 } // namespace ns3

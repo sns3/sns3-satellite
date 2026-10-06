@@ -36,6 +36,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -217,6 +219,7 @@ class SatPerPacketInterference : public SatInterference
     double m_rxBandwidth_Hz;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_PER_PACKET_INTERFERENCE_H */

@@ -32,6 +32,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 NS_LOG_COMPONENT_DEFINE("LoraLogicalChannelHelper");
 
@@ -273,5 +275,7 @@ LoraLogicalChannelHelper::DisableChannel(int index)
     NS_LOG_FUNCTION(this << index);
 
     m_channelList.at(index)->DisableForUplink();
+}
+
 }
 } // namespace ns3

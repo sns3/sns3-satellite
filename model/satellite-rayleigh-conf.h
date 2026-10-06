@@ -28,6 +28,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -94,6 +96,7 @@ class SatRayleighConf : public SatBaseFaderConf
     std::vector<std::vector<std::vector<double>>> m_rayleighParameters;
 };
 
+}
 } // namespace ns3
 
 #endif /* SAT_RAYLEIGH_CONF_H */

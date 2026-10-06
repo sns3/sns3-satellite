@@ -54,10 +54,12 @@
 #include "ns3/satellite-utils.h"
 #include "ns3/singleton.h"
 
-NS_LOG_COMPONENT_DEFINE("SatUtHelperDvb");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatUtHelperDvb");
 
 NS_OBJECT_ENSURE_REGISTERED(SatUtHelperDvb);
 
@@ -415,4 +417,5 @@ SatUtHelperDvb::Install(Ptr<Node> n,
     return dev;
 }
 
+}
 } // namespace ns3

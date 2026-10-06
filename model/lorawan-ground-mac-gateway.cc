@@ -33,6 +33,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 NS_LOG_COMPONENT_DEFINE("LorawanGroundMacGateway");
 
@@ -192,5 +194,7 @@ LorawanGroundMacGateway::Receive(SatPhy::PacketContainer_t packets,
             NS_LOG_DEBUG("Not forwarding downlink message to NetDevice");
         }
     }
+}
+
 }
 } // namespace ns3

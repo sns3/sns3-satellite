@@ -31,6 +31,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -147,6 +149,7 @@ class SatFwdLinkSchedulerDefault : public SatFwdLinkScheduler
     uint32_t m_symbolsSent;
 };
 
+}
 } // namespace ns3
 
 #endif /* SAT_FWD_LINK_SCHEDULER_DEFAULT_H */

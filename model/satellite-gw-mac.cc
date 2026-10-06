@@ -47,10 +47,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatGwMac");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatGwMac");
 
 NS_OBJECT_ENSURE_REGISTERED(SatGwMac);
 
@@ -965,4 +967,5 @@ SatGwMac::HasPeer()
     return !m_peers.empty();
 }
 
+}
 } // namespace ns3

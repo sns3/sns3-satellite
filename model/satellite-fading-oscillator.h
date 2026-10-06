@@ -28,6 +28,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -113,6 +115,7 @@ class SatFadingOscillator : public Object
     double m_omega;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_FADING_OSCILLATOR_H */

@@ -29,6 +29,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -107,6 +109,7 @@ class SatArqHeader : public Header
     uint8_t m_seqNo;
 };
 
+}
 } // namespace ns3
 
 #endif // SATELLITE_ARQ_HEADER_H

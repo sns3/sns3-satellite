@@ -29,6 +29,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -103,6 +105,7 @@ class SatPhyRxCarrierMarsala : public SatPhyRxCarrierPerFrame
     TracedCallback<uint32_t, const Address&, bool> m_marsalaCorrelationRxTrace;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_PHY_RX_CARRIER_MARSALA_H */

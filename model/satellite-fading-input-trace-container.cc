@@ -32,10 +32,12 @@
 #include <string>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatFadingInputTraceContainer");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatFadingInputTraceContainer");
 
 NS_OBJECT_ENSURE_REGISTERED(SatFadingInputTraceContainer);
 
@@ -156,4 +158,5 @@ SatFadingInputTraceContainer::GetFadingValue(key_t key)
         SatBaseTraceContainer::FADING_TRACE_DEFAULT_FADING_VALUE_INDEX);
 }
 
+}
 } // namespace ns3

@@ -38,6 +38,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -247,6 +249,7 @@ class SatOrbiterMac : public SatMac
     bool m_periodicTransmissionEnabled;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_ORBITER_MAC_H */

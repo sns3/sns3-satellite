@@ -29,6 +29,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -184,6 +186,7 @@ class SatPPduHeader : public Header
     const uint32_t m_continuationPpduHeaderSize;
 };
 
+}
 } // namespace ns3
 
 #endif // SATELLITE_RLE_HEADER_H

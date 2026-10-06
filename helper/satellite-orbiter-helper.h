@@ -48,6 +48,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @brief Creates needed objects for Satellite node like SatorbiterNetDevice objects.
@@ -352,6 +354,7 @@ class SatOrbiterHelper : public Object
     SatMac::ReadCtrlMsgCallback m_rtnReadCtrlCb;
 };
 
+}
 } // namespace ns3
 
 #endif /* SAT_ORBITER_HELPER_H */

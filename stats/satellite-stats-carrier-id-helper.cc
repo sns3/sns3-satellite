@@ -47,10 +47,12 @@
 #include <sstream>
 #include <string>
 
-NS_LOG_COMPONENT_DEFINE("SatStatsCarrierIdHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatStatsCarrierIdHelper");
 
 // BASE CLASS /////////////////////////////////////////////////////////////////
 
@@ -340,4 +342,5 @@ SatStatsCarrierIdHelper::CarrierIdRxCallback(uint32_t carrierId, const Address& 
     }
 }
 
+}
 } // end of namespace ns3

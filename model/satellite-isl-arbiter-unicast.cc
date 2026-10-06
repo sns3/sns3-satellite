@@ -30,10 +30,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatIslArbiterUnicast");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatIslArbiterUnicast");
 
 NS_OBJECT_ENSURE_REGISTERED(SatIslArbiterUnicast);
 
@@ -130,4 +132,5 @@ SatIslArbiterUnicast::AddNextHopEntry(uint32_t destinationId, uint32_t netDevice
     m_nextHopMap.insert(std::make_pair(destinationId, netDeviceIndex));
 }
 
+}
 } // namespace ns3

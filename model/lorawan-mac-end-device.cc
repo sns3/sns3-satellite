@@ -43,6 +43,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 NS_LOG_COMPONENT_DEFINE("LorawanMacEndDevice");
 
@@ -1099,4 +1101,5 @@ LorawanMacEndDevice::GetPhyRx()
     return m_phyRx;
 }
 
+}
 } // namespace ns3

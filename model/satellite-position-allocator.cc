@@ -37,10 +37,12 @@
 #include <cmath>
 #include <limits>
 
-NS_LOG_COMPONENT_DEFINE("SatPositionAllocator");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatPositionAllocator");
 
 NS_OBJECT_ENSURE_REGISTERED(SatPositionAllocator);
 
@@ -412,4 +414,5 @@ SatSpotBeamPositionAllocator::AssignStreams(int64_t stream)
     return 3;
 }
 
+}
 } // namespace ns3

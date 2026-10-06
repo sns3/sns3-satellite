@@ -30,6 +30,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 NS_LOG_COMPONENT_DEFINE("LorawanMac");
 
@@ -256,5 +258,7 @@ void
 LorawanMac::SetReplyDataRateMatrix(ReplyDataRateMatrix replyDataRateMatrix)
 {
     m_replyDataRateMatrix = replyDataRateMatrix;
+}
+
 }
 } // namespace ns3

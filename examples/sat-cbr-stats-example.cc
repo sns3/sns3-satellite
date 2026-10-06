@@ -27,6 +27,7 @@
 #include "ns3/traffic-module.h"
 
 using namespace ns3;
+using namespace ns3::satellite;
 
 #define CALL_SAT_STATS_BASIC_ELEMENT(id)                                                           \
     s->Add##id(SatStatsHelper::OUTPUT_SCALAR_FILE);                                                \

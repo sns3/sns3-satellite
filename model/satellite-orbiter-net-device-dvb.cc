@@ -54,10 +54,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatOrbiterNetDeviceDvb");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatOrbiterNetDeviceDvb");
 
 NS_OBJECT_ENSURE_REGISTERED(SatOrbiterNetDeviceDvb);
 
@@ -406,4 +408,5 @@ SatOrbiterNetDeviceDvb::DisconnectUt(Mac48Address utAddress, uint32_t beamId)
     }
 }
 
+}
 } // namespace ns3

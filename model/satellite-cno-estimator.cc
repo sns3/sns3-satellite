@@ -29,10 +29,12 @@
 #include <stdint.h>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatCnoEstimator");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatCnoEstimator");
 
 // interface class for C/N0 estimators
 
@@ -170,4 +172,5 @@ SatBasicCnoEstimator::ClearOutdatedSamples()
     m_samples.erase(m_samples.begin(), itLastValid);
 }
 
+}
 } // namespace ns3

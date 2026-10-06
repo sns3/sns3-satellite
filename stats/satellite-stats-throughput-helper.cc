@@ -56,10 +56,12 @@
 #include <string>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatStatsThroughputHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatStatsThroughputHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(SatStatsThroughputHelper);
 
@@ -2040,4 +2042,5 @@ SatStatsRtnUserPhyThroughputHelper::DoInstallProbes()
 
 } // end of `void DoInstallProbes ();`
 
+}
 } // end of namespace ns3

@@ -34,6 +34,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -228,6 +230,7 @@ class SatReturnLinkEncapsulatorArq : public SatReturnLinkEncapsulator
     std::map<uint32_t, Ptr<SatArqBufferContext>> m_reorderingBuffer;
 };
 
+}
 } // namespace ns3
 
 #endif // SATELLITE_RETURN_LINK_ENCAPSULATOR_ARQ

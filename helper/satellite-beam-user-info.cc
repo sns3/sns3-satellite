@@ -26,10 +26,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatBeamUserInfo");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatBeamUserInfo");
 
 SatBeamUserInfo::SatBeamUserInfo()
 {
@@ -99,4 +101,5 @@ SatBeamUserInfo::GetPositions()
     return m_positions;
 }
 
+}
 } // namespace ns3

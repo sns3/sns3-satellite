@@ -34,10 +34,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatBstpController");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatBstpController");
 
 NS_OBJECT_ENSURE_REGISTERED(SatBstpController);
 
@@ -203,4 +205,5 @@ SatBstpController::DoBstpConfiguration()
     Simulator::Schedule(nextConfigurationDuration, &SatBstpController::DoBstpConfiguration, this);
 }
 
+}
 } // namespace ns3

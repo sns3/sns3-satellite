@@ -37,6 +37,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * This class represents the knowledge about the state of the network that is
@@ -130,5 +132,7 @@ class LoraNetworkStatus : public Object
     Ptr<UniformRandomVariable> m_uniform;
 };
 
+}
 } // namespace ns3
+
 #endif /* LORA_NETWORK_STATUS_H */

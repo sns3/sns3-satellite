@@ -36,10 +36,12 @@
 #include <map>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatGenericStreamEncapsulatorArq");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatGenericStreamEncapsulatorArq");
 
 NS_OBJECT_ENSURE_REGISTERED(SatGenericStreamEncapsulatorArq);
 
@@ -688,4 +690,5 @@ SatGenericStreamEncapsulatorArq::SendAck(uint8_t seqNo) const
     }
 }
 
+}
 } // namespace ns3

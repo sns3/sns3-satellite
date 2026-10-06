@@ -31,6 +31,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 NS_LOG_COMPONENT_DEFINE("LoraPeriodicSender");
 
@@ -167,4 +169,5 @@ LoraPeriodicSender::StopApplication(void)
     Simulator::Cancel(m_sendEvent);
 }
 
+}
 } // namespace ns3

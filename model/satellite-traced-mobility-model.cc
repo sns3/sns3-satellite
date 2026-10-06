@@ -29,10 +29,12 @@
 
 #include <string>
 
-NS_LOG_COMPONENT_DEFINE("SatTracedMobilityModel");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatTracedMobilityModel");
 
 NS_OBJECT_ENSURE_REGISTERED(SatTracedMobilityModel);
 
@@ -176,4 +178,5 @@ SatTracedMobilityModel::GetBestBeamId(bool ignoreNan) const
     return m_antennaGainPatterns->GetBestBeamId(m_satId, m_geoPosition, ignoreNan);
 }
 
+}
 } // namespace ns3

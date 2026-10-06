@@ -48,10 +48,12 @@
 #include <string>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatStatsSignallingLoadHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatStatsSignallingLoadHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(SatStatsSignallingLoadHelper);
 
@@ -466,4 +468,5 @@ SatStatsRtnSignallingLoadHelper::UpdateIdentifierOnProbes()
     }
 } // end of `void UpdateIdentifierOnProbes ();`
 
+}
 } // end of namespace ns3

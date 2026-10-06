@@ -35,10 +35,12 @@
 #include <stdint.h>
 #include <string>
 
-NS_LOG_COMPONENT_DEFINE("LoraForwarderHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("LoraForwarderHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(LoraForwarderHelper);
 
@@ -166,4 +168,5 @@ LoraForwarderHelper::InstallPrivGwDvb(Ptr<Node> node) const
     return app;
 }
 
+}
 } // namespace ns3

@@ -28,6 +28,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @brief A class encapsulating an STL input stream.
@@ -71,6 +73,7 @@ class SatInputFileStreamWrapper : public SimpleRefCount<SatInputFileStreamWrappe
     bool m_destroyable;
 };
 
+}
 } // namespace ns3
 
 #endif /* SAT_INPUT_FSTREAM_WRAPPER_H */

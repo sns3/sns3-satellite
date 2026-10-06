@@ -25,10 +25,12 @@
 #include "ns3/pointer.h"
 #include "ns3/uinteger.h"
 
-NS_LOG_COMPONENT_DEFINE("SatSimpleNetDevice");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatSimpleNetDevice");
 
 NS_OBJECT_ENSURE_REGISTERED(SatSimpleNetDevice);
 
@@ -320,4 +322,5 @@ SatSimpleNetDevice::SupportsSendFrom(void) const
     return true;
 }
 
+}
 } // namespace ns3

@@ -37,7 +37,10 @@
 #include "ns3/test.h"
 #include "ns3/timer.h"
 
-using namespace ns3;
+namespace ns3
+{
+namespace satellite
+{
 
 class SatCtrlMsgContBaseTestCase : public TestCase
 {
@@ -309,5 +312,8 @@ SatCtrlMsgContainerTestSuite::SatCtrlMsgContainerTestSuite()
     AddTestCase(new SatCtrlMsgContDelOffTestCase, TestCase::Duration::QUICK);
 }
 
+}
+} // namespace ns3
+
 // Do allocate an instance of this TestSuite
-static SatCtrlMsgContainerTestSuite satCtrlMsgContUnit;
+static ns3::satellite::SatCtrlMsgContainerTestSuite satCtrlMsgContUnit;

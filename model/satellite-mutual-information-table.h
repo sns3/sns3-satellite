@@ -30,6 +30,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -97,6 +99,7 @@ class SatMutualInformationTable : public Object
     double m_beta;
 };
 
+}
 } // end of namespace ns3
 
 #endif /* SATELLITE_MUTUAL_INFORMATION_TABLE_H */

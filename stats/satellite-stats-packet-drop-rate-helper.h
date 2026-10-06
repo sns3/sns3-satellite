@@ -33,11 +33,16 @@
 namespace ns3
 {
 
-class SatHelper;
 class Node;
 class Time;
+
 class DataCollectionObject;
 class DistributionCollector;
+
+namespace satellite
+{
+
+class SatHelper;
 
 /**
  * @ingroup satstats
@@ -92,6 +97,7 @@ class SatStatsPacketDropRateHelper : public SatStatsHelper
 
 }; // end of class SatStatsPacketDropRateHelper
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_STATS_PACKET_DROP_RATE_HELPER_H */

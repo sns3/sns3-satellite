@@ -31,10 +31,12 @@
 #include <string>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatelliteCnoHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatelliteCnoHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(SatCnoHelper);
 
@@ -300,4 +302,5 @@ SatCnoHelper::CheckDuplicate(Ptr<Node> node, SatEnums::ChannelType_t channel)
     return false;
 }
 
+}
 } // namespace ns3

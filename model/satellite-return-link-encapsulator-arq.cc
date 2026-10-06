@@ -37,10 +37,12 @@
 #include <map>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatReturnLinkEncapsulatorArq");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatReturnLinkEncapsulatorArq");
 
 NS_OBJECT_ENSURE_REGISTERED(SatReturnLinkEncapsulatorArq);
 
@@ -694,4 +696,5 @@ SatReturnLinkEncapsulatorArq::SendAck(uint8_t seqNo) const
     }
 }
 
+}
 } // namespace ns3

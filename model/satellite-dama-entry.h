@@ -31,6 +31,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -188,6 +190,7 @@ class SatDamaEntry : public SimpleRefCount<SatDamaEntry>
     std::vector<uint32_t> m_volumeBacklogRequestedInBytes;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_DAMA_ENTRY_H */

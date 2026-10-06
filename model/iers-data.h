@@ -37,6 +37,8 @@
  */
 namespace ns3
 {
+namespace satellite
+{
 
 class IersData
 {
@@ -57,6 +59,7 @@ class IersData
     static const uint32_t __leap_secs[];
 };
 
+}
 } // namespace ns3
 
 #endif // IERS_DATA_H

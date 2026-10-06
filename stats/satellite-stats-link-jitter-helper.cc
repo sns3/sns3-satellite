@@ -57,10 +57,12 @@
 #include <string>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatStatsLinkJitterHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatStatsLinkJitterHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(SatStatsLinkJitterHelper);
 
@@ -2008,4 +2010,5 @@ SatStatsRtnUserPhyLinkJitterHelper::DoInstallProbes()
 
 } // end of `void DoInstallProbes ();`
 
+}
 } // end of namespace ns3

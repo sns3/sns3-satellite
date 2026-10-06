@@ -34,10 +34,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatRxPowerOutputTraceContainer");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatRxPowerOutputTraceContainer");
 
 NS_OBJECT_ENSURE_REGISTERED(SatRxPowerOutputTraceContainer);
 
@@ -190,4 +192,5 @@ SatRxPowerOutputTraceContainer::AddToContainer(key_t key, std::vector<double> ne
     }
 }
 
+}
 } // namespace ns3

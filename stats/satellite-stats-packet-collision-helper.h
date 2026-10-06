@@ -35,11 +35,16 @@
 namespace ns3
 {
 
+class Node;
+
+class DataCollectionObject;
+
+namespace satellite
+{
+
 // BASE CLASS /////////////////////////////////////////////////////////////////
 
 class SatHelper;
-class Node;
-class DataCollectionObject;
 
 /**
  * @ingroup satstats
@@ -386,6 +391,7 @@ class SatStatsUserEssaPacketCollisionHelper : public SatStatsUserPacketCollision
     static TypeId GetTypeId();
 };
 
+}
 } // end of namespace ns3
 
 #endif /* SATELLITE_STATS_PACKET_COLLISION_HELPER_H */

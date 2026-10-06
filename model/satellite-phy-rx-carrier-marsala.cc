@@ -30,10 +30,12 @@
 #include <map>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatPhyRxCarrierMarsala");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatPhyRxCarrierMarsala");
 
 NS_OBJECT_ENSURE_REGISTERED(SatPhyRxCarrierMarsala);
 
@@ -260,4 +262,5 @@ SatPhyRxCarrierMarsala::PerformMarsala(
     return false;
 }
 
+}
 } // namespace ns3

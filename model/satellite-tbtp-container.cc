@@ -34,10 +34,12 @@
 #include <iostream>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatTbtpContainer");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatTbtpContainer");
 
 NS_OBJECT_ENSURE_REGISTERED(SatTbtpContainer);
 
@@ -219,4 +221,5 @@ SatTbtpContainer::HasScheduledTimeSlots()
     return hasScheduledTimeSlots;
 }
 
+}
 } // namespace ns3

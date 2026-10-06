@@ -26,10 +26,12 @@
 
 #include <stdint.h>
 
-NS_LOG_COMPONENT_DEFINE("SatOutputFileStreamStringContainer");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatOutputFileStreamStringContainer");
 
 TypeId
 SatOutputFileStreamStringContainer::GetTypeId(void)
@@ -155,4 +157,5 @@ SatOutputFileStreamStringContainer::ClearContainer()
     }
 }
 
+}
 } // namespace ns3

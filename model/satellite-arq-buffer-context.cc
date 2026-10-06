@@ -24,10 +24,12 @@
 
 #include <stdint.h>
 
-NS_LOG_COMPONENT_DEFINE("SatArqBufferContext");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatArqBufferContext");
 
 NS_OBJECT_ENSURE_REGISTERED(SatArqBufferContext);
 
@@ -56,4 +58,5 @@ SatArqBufferContext::DoDispose()
     m_waitingTimer.Cancel();
 }
 
+}
 } // namespace ns3

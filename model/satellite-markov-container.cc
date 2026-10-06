@@ -28,9 +28,12 @@
 
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatMarkovContainer");
 
 NS_OBJECT_ENSURE_REGISTERED(SatMarkovContainer);
-NS_LOG_COMPONENT_DEFINE("SatMarkovContainer");
 
 TypeId
 SatMarkovContainer::GetTypeId(void)
@@ -476,4 +479,5 @@ SatMarkovContainer::CalculateDistanceSinceLastStateChange()
     return (Now().GetSeconds() - m_latestStateChangeTime.GetSeconds()) * m_velocity();
 }
 
+}
 } // namespace ns3

@@ -44,10 +44,12 @@
 
 #include <sstream>
 
-NS_LOG_COMPONENT_DEFINE("SatStatsWindowLoadHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatStatsWindowLoadHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(SatStatsWindowLoadHelper);
 
@@ -384,4 +386,5 @@ SatStatsRtnFeederWindowLoadHelper::DoInstallProbes()
 
 } // end of `void DoInstallProbes ();`
 
+}
 } // end of namespace ns3

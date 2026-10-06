@@ -35,13 +35,19 @@
 namespace ns3
 {
 
+class Node;
+class Time;
+class Probe;
+class DataCollectionObject;
+
+class DistributionCollector;
+
+namespace satellite
+{
+
 // BASE CLASS /////////////////////////////////////////////////////////////////
 
 class SatHelper;
-class Node;
-class Time;
-class DataCollectionObject;
-class DistributionCollector;
 
 /**
  * @ingroup satstats
@@ -136,8 +142,6 @@ class SatStatsJitterHelper : public SatStatsHelper
 }; // end of class SatStatsJitterHelper
 
 // FORWARD LINK APPLICATION-LEVEL /////////////////////////////////////////////
-
-class Probe;
 
 class SatStatsFwdAppJitterHelper : public SatStatsJitterHelper
 {
@@ -416,6 +420,7 @@ class SatStatsRtnPhyJitterHelper : public SatStatsJitterHelper
 
 }; // end of class SatStatsRtnPhyJitterHelper
 
+}
 } // end of namespace ns3
 
 #endif /* SATELLITE_STATS_JITTER_HELPER_H */

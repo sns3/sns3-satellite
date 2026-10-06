@@ -31,6 +31,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -129,6 +131,7 @@ class SatTracedMobilityModel : public SatMobilityModel
     Ptr<SatAntennaGainPatternContainer> m_antennaGainPatterns;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_TRACED_MOBILITY_MODEL_H */

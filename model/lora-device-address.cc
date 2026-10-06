@@ -30,6 +30,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 NS_LOG_COMPONENT_DEFINE("LoraDeviceAddress");
 
@@ -276,5 +278,7 @@ operator<<(std::ostream& os, const LoraDeviceAddress& address)
 {
     os << address.Print();
     return os;
+}
+
 }
 } // namespace ns3

@@ -29,6 +29,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @brief Class that holds information for each beam regarding UTs and their users camped in each
@@ -114,6 +116,7 @@ class SatBeamUserInfo
     std::vector<std::pair<GeoCoordinate, uint32_t>> m_positions;
 };
 
+}
 } // namespace ns3
 
 #endif /* SAT_BEAM_USER_INFO_H */

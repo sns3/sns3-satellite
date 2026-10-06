@@ -52,10 +52,12 @@
 #include <string>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatStatsSatelliteQueueHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatStatsSatelliteQueueHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(SatStatsSatelliteQueueHelper);
 
@@ -882,4 +884,5 @@ SatStatsFwdUserQueuePacketsHelper::DoInstallProbes()
 
 } // end of `void DoInstallProbes ();`
 
+}
 } // end of namespace ns3

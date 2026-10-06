@@ -31,6 +31,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -171,6 +173,7 @@ class SatMobilityObserver : public Object
     bool m_isRegenerative;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_MOBILITY_OBSERVER_H */

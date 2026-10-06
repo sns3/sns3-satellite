@@ -28,10 +28,12 @@
 #include <fstream>
 #include <string>
 
-NS_LOG_COMPONENT_DEFINE("SatChannelEstimationError");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatChannelEstimationError");
 
 NS_OBJECT_ENSURE_REGISTERED(SatChannelEstimationError);
 
@@ -193,4 +195,5 @@ SatChannelEstimationError::AddError(double sinrInDb) const
     return sinrOutDb;
 }
 
+}
 } // namespace ns3

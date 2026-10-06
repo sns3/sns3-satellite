@@ -40,6 +40,9 @@
 
 namespace ns3
 {
+namespace satellite
+{
+
 /**
  * @brief Creates pre-defined trafics.
  */
@@ -1181,6 +1184,7 @@ class SatTrafficHelperConf : public Object
     Ptr<SatTrafficHelper> m_trafficHelper;
 };
 
+}
 } // namespace ns3
 
 #endif /* __SATELLITE_TRAFFIC_HELPER_H__ */

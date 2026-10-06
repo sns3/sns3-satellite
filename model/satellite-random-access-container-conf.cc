@@ -30,10 +30,12 @@
 #include <map>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatRandomAccessConf");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatRandomAccessConf");
 
 NS_OBJECT_ENSURE_REGISTERED(SatRandomAccessConf);
 
@@ -202,4 +204,5 @@ SatRandomAccessConf::GetAllocationChannelConfigurationId(uint32_t allocationChan
     return m_configurationIdPerAllocationChannel[allocationChannel];
 }
 
+}
 } // namespace ns3

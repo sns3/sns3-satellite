@@ -42,6 +42,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * Class representing the MAC layer of a LoRaWAN device.
@@ -638,6 +640,7 @@ class LorawanMacEndDevice : public LorawanMac
     LorawanMacEndDevice::UpdateAddressAndIdentifierCallback m_updateAddressAndIdentifierCallback;
 };
 
+}
 } /* namespace ns3 */
 
 #endif /* LORAWAN_MAC_END_DEVICE_H */

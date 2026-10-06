@@ -28,6 +28,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -147,6 +149,7 @@ class SatLog : public Object
     container_t m_container;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_LOG_H */

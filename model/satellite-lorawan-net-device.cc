@@ -29,10 +29,12 @@
 #include "ns3/log.h"
 #include "ns3/singleton.h"
 
-NS_LOG_COMPONENT_DEFINE("SatLorawanNetDevice");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatLorawanNetDevice");
 
 NS_OBJECT_ENSURE_REGISTERED(SatLorawanNetDevice);
 
@@ -227,4 +229,5 @@ SatLorawanNetDevice::DoDispose(void)
     SatNetDevice::DoDispose();
 }
 
+}
 } // namespace ns3

@@ -28,9 +28,12 @@
 
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatMarkovModel");
 
 NS_OBJECT_ENSURE_REGISTERED(SatMarkovModel);
-NS_LOG_COMPONENT_DEFINE("SatMarkovModel");
 
 TypeId
 SatMarkovModel::GetTypeId(void)
@@ -169,4 +172,5 @@ SatMarkovModel::SetProbability(uint32_t from, uint32_t to, double probability)
     m_probabilities[from * m_numOfStates + to] = probability;
 }
 
+}
 } // namespace ns3

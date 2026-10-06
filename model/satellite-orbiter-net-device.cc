@@ -54,10 +54,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatOrbiterNetDevice");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatOrbiterNetDevice");
 
 NS_OBJECT_ENSURE_REGISTERED(SatOrbiterNetDevice);
 
@@ -735,4 +737,5 @@ SatOrbiterNetDevice::SendToIsl(Ptr<Packet> packet, Mac48Address destination)
     }
 }
 
+}
 } // namespace ns3

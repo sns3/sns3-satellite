@@ -39,6 +39,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 class SatPhyRxCarrier;
 class SatPhyRxCarrierUplink;
@@ -190,6 +192,7 @@ class SatUtPhy : public SatPhy
     std::set<uint8_t> m_slicesSubscribed;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_UT_PHY_H */

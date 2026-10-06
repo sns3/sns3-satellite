@@ -39,10 +39,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatelliteTrafficHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatelliteTrafficHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(SatTrafficHelperConf);
 
@@ -2288,4 +2290,5 @@ SatTrafficHelperConf::InstallTrafficModels()
     }
 }
 
+}
 } // namespace ns3

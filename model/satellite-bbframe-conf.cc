@@ -37,10 +37,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatBbFrameConf");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatBbFrameConf");
 
 /**
  * 1st col = modulated bits
@@ -720,4 +722,5 @@ SatBbFrameConf::GetDefaultModCodDummyFramesS2X() const
     return m_defaultModCodDummyFramesS2X;
 }
 
+}
 } // namespace ns3

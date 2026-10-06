@@ -39,7 +39,10 @@
 
 #include <stdint.h>
 
-using namespace ns3;
+namespace ns3
+{
+namespace satellite
+{
 
 class SatEstimatorBaseTestCase : public TestCase
 {
@@ -423,5 +426,8 @@ SatBasicCnoEstimatorTestSuite::SatBasicCnoEstimatorTestSuite()
     AddTestCase(new SatBasicEstimatorAverageTestCase, TestCase::Duration::QUICK);
 }
 
+}
+} // namespace ns3
+
 // Do allocate an instance of this TestSuite
-static SatBasicCnoEstimatorTestSuite satCnoEstimatorUnit;
+static ns3::satellite::SatBasicCnoEstimatorTestSuite satCnoEstimatorUnit;

@@ -46,10 +46,12 @@
 #include <string>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatStatsFrameTypeUsageHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatStatsFrameTypeUsageHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(SatStatsFrameTypeUsageHelper);
 
@@ -334,4 +336,5 @@ SatStatsFrameTypeUsageHelper::FrameTypeUsageCallback(std::string context, Ptr<Sa
 
 } // end of `void FrameTypeUsageCallback (std::string, uint32_t)`
 
+}
 } // end of namespace ns3

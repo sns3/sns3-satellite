@@ -33,6 +33,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -231,6 +233,7 @@ class SatInterference : public Object
     uint32_t m_currentlyReceiving;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_INTERFERENCE_H */

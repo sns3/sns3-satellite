@@ -52,10 +52,12 @@
 #include <string>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatStatsCompositeSinrHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatStatsCompositeSinrHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(SatStatsCompositeSinrHelper);
 
@@ -646,4 +648,5 @@ SatStatsRtnCompositeSinrHelper::SinrCallback(double sinrDb, const Address& from)
 
 } // end of `void SinrCallback (double, const Address &);`
 
+}
 } // end of namespace ns3

@@ -43,6 +43,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @brief Creates needed objects for UT nodes like SatOrbiterNetDevice objects.
@@ -264,6 +266,7 @@ class SatUtHelper : public Object
     RandomAccessSettings_s m_raSettings;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_UT_HELPER_H */

@@ -28,10 +28,12 @@
 #include <stdint.h>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatOrbiterFeederLlc");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatOrbiterFeederLlc");
 
 NS_OBJECT_ENSURE_REGISTERED(SatOrbiterFeederLlc);
 
@@ -167,4 +169,5 @@ SatOrbiterFeederLlc::CreateDecap(Ptr<EncapKey> key)
     }
 }
 
+}
 } // namespace ns3

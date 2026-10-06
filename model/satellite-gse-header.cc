@@ -29,10 +29,12 @@
 #include <iostream>
 #include <ostream>
 
-NS_LOG_COMPONENT_DEFINE("SatGseHeader");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatGseHeader");
 
 NS_OBJECT_ENSURE_REGISTERED(SatGseHeader);
 
@@ -307,4 +309,5 @@ SatGseHeader::GetMaxGseHeaderSizeInBytes() const
                     (std::max(m_endGseHeaderSize, m_continuationGseHeaderSize)));
 }
 
+}
 } // namespace ns3

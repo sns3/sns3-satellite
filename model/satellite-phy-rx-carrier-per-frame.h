@@ -39,6 +39,10 @@ namespace ns3
 {
 
 class Address;
+
+namespace satellite
+{
+
 class SatPhy;
 class SatSignalParameters;
 class SatLinkResults;
@@ -265,8 +269,8 @@ class SatPhyRxCarrierPerFrame : public SatPhyRxCarrierPerSlot
     bool m_frameEndSchedulingInitialized;
 };
 
-//////////////////////////////////////////////////////////
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_PHY_RX_CARRIER_PER_FRAME_H */

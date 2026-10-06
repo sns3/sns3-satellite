@@ -35,6 +35,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @brief The DateTime struct.
@@ -373,6 +375,7 @@ class JulianDate
     TimeSystem m_time_scale; //!< external time system.
 };
 
+}
 } // namespace ns3
 
 #endif /* JULIANDATE_H */

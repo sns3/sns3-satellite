@@ -28,9 +28,12 @@
 
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatFadingOscillator");
 
 NS_OBJECT_ENSURE_REGISTERED(SatFadingOscillator);
-NS_LOG_COMPONENT_DEFINE("SatFadingOscillator");
 
 TypeId
 SatFadingOscillator::GetTypeId(void)
@@ -103,4 +106,5 @@ SatFadingOscillator::DoDispose()
     Object::DoDispose();
 }
 
+}
 } // namespace ns3

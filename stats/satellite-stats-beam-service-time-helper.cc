@@ -45,10 +45,12 @@
 #include <string>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatStatsBeamServiceTimeHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatStatsBeamServiceTimeHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(SatStatsBeamServiceTimeHelper);
 
@@ -180,4 +182,5 @@ SatStatsBeamServiceTimeHelper::BeamServiceCallback(std::string context, Time tim
 
 } // end of `void BeamServiceCallback (std::string, uint32_t)`
 
+}
 } // end of namespace ns3

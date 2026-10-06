@@ -35,10 +35,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatInterferenceOutputTraceContainer");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatInterferenceOutputTraceContainer");
 
 NS_OBJECT_ENSURE_REGISTERED(SatInterferenceOutputTraceContainer);
 
@@ -192,4 +194,5 @@ SatInterferenceOutputTraceContainer::AddToContainer(key_t key, std::vector<doubl
     }
 }
 
+}
 } // namespace ns3

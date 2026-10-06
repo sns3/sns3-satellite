@@ -25,10 +25,12 @@
 #include "ns3/object.h"
 #include "ns3/string.h"
 
-NS_LOG_COMPONENT_DEFINE("SatConstantPropagationDelayModel");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatConstantPropagationDelayModel");
 
 NS_OBJECT_ENSURE_REGISTERED(SatConstantPropagationDelayModel);
 
@@ -79,4 +81,5 @@ SatConstantPropagationDelayModel::DoAssignStreams(int64_t s)
     return 0;
 }
 
+}
 } // namespace ns3

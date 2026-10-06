@@ -39,6 +39,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -188,6 +190,7 @@ class SatDefaultSuperframeAllocator : public SatSuperframeAllocator
     Ptr<SatFrameAllocator> SelectBestCarrier(double cno, uint32_t& bestWaveFormId);
 };
 
+}
 } // namespace ns3
 
 #endif /* SAT_DEFAULT_SUPERFRAME_ALLOCATOR_H */

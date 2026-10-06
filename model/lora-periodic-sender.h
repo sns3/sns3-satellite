@@ -33,6 +33,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 class LoraPeriodicSender : public Application
 {
@@ -116,6 +118,7 @@ class LoraPeriodicSender : public Application
     Ptr<RandomVariableStream> m_pktSizeRV;
 };
 
+}
 } // namespace ns3
 
 #endif /* LORA_SENDER_APPLICATION */

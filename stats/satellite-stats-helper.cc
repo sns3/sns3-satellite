@@ -47,10 +47,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatStatsHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatStatsHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(SatStatsHelper);
 
@@ -1118,4 +1120,5 @@ SatStatsHelper::UpdateIdentifierOnProbes()
     NS_LOG_FUNCTION(this);
 }
 
+}
 } // end of namespace ns3

@@ -48,6 +48,10 @@ namespace ns3
 {
 
 class Address;
+
+namespace satellite
+{
+
 class SatPhy;
 class SatSignalParameters;
 class SatLinkResults;
@@ -726,6 +730,7 @@ class SatPhyRxCarrier : public Object
     Ptr<SatChannelEstimationErrorContainer> m_channelEstimationError;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_PHY_RX_CARRIER_H */

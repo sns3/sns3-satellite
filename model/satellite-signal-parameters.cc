@@ -29,10 +29,12 @@
 
 #include <stdint.h>
 
-NS_LOG_COMPONENT_DEFINE("SatSignalParameters");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatSignalParameters");
 
 SatSignalParameters::SatSignalParameters()
     : m_satId(),
@@ -132,4 +134,5 @@ SatInterferenceParameters::~SatInterferenceParameters()
 {
 }
 
+}
 } // namespace ns3

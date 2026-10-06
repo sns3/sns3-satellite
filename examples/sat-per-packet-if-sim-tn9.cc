@@ -30,6 +30,7 @@
 #include <unistd.h>
 
 using namespace ns3;
+using namespace ns3::satellite;
 
 /**
  * @file sat-per-packet-if-sim-tn9.cc

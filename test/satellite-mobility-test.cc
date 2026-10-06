@@ -40,7 +40,10 @@
 
 #include <iostream>
 
-using namespace ns3;
+namespace ns3
+{
+namespace satellite
+{
 
 static void
 SatCourseChange(std::string context, Ptr<const SatMobilityModel> position)
@@ -344,5 +347,8 @@ SatMobilityTestSuite::SatMobilityTestSuite()
     AddTestCase(new SatMobilityList2TestCase, TestCase::Duration::QUICK);
 }
 
+}
+} // namespace ns3
+
 // Do allocate an instance of this TestSuite
-static SatMobilityTestSuite satSatMobilityTestSuite;
+static ns3::satellite::SatMobilityTestSuite satSatMobilityTestSuite;

@@ -32,6 +32,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -179,6 +181,7 @@ class SatBasicCnoEstimator : public SatCnoEstimator
     void ClearOutdatedSamples();
 };
 
+}
 } // namespace ns3
 
 #endif /* SAT_CNO_ESTIMATOR */

@@ -28,10 +28,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatPerFragmentInterference");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatPerFragmentInterference");
 
 NS_OBJECT_ENSURE_REGISTERED(SatPerFragmentInterference);
 
@@ -131,4 +133,5 @@ SatPerFragmentInterference::onInterferentEvent(long double timeRatio,
     m_ifPowerAtEventChangeW.emplace_back(1.0 - timeRatio, ifPowerW);
 }
 
+}
 } // namespace ns3

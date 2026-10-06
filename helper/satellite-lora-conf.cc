@@ -32,10 +32,12 @@
 #include <stdint.h>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatLoraConf");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatLoraConf");
 
 NS_OBJECT_ENSURE_REGISTERED(SatLoraConf);
 
@@ -285,4 +287,5 @@ SatLoraConf::SetSatelliteConf(Ptr<LorawanMacEndDeviceClassA> endDeviceMac)
     endDeviceMac->SetSecondReceiveWindowFrequency(869.525);
 }
 
+}
 } // namespace ns3

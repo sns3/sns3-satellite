@@ -30,6 +30,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -113,6 +115,7 @@ class SatStaticBstp : public SimpleRefCount<SatStaticBstp>
     std::vector<uint32_t> m_enabledBeams;
 };
 
+}
 } // namespace ns3
 
 #endif /* SAT_STATIC_BSTP_H */

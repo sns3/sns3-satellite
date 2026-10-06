@@ -36,10 +36,12 @@
 
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatOrbiterMac");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatOrbiterMac");
 
 NS_OBJECT_ENSURE_REGISTERED(SatOrbiterMac);
 
@@ -306,4 +308,5 @@ SatOrbiterMac::StopPeriodicTransmissions()
     m_llc->ClearQueues();
 }
 
+}
 } // namespace ns3

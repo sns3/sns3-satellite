@@ -28,6 +28,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @brief A configuration class for the satellite reference system
@@ -72,6 +74,7 @@ class SatLoraConf : public Object
     PhyLayerStandard_t m_phyLayerStandard;
 };
 
+}
 } // namespace ns3
 
 #endif /* SAT_LORA_CONF_H */

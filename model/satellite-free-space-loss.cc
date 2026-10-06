@@ -31,10 +31,12 @@
 #include <cmath>
 #include <stdint.h>
 
-NS_LOG_COMPONENT_DEFINE("SatFreeSpaceLoss");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatFreeSpaceLoss");
 
 NS_OBJECT_ENSURE_REGISTERED(SatFreeSpaceLoss);
 
@@ -77,4 +79,5 @@ SatFreeSpaceLoss::GetFsl(Ptr<MobilityModel> a, Ptr<MobilityModel> b, double freq
     return fsl;
 }
 
+}
 } // namespace ns3

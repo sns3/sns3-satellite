@@ -37,6 +37,10 @@ namespace ns3
 {
 
 class Address;
+
+namespace satellite
+{
+
 class SatPhy;
 class SatSignalParameters;
 class SatLinkResults;
@@ -299,8 +303,7 @@ class SatPhyRxCarrierPerWindow : public SatPhyRxCarrierPerSlot
     uint32_t m_sicEnabled;
 };
 
-//////////////////////////////////////////////////////////
-
+}
 } // namespace ns3
 
 #endif /* SATELLITE_PHY_RX_CARRIER_PER_WINDOW_H */

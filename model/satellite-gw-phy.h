@@ -36,6 +36,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 class SatPhyRxCarrier;
 class SatPhyRxCarrierUplink;
@@ -157,6 +159,7 @@ class SatGwPhy : public SatPhy
     Time m_antennaReconfigurationDelay;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_GW_PHY_H */

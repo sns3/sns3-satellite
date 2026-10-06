@@ -42,10 +42,12 @@
 
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatPhyRx");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatPhyRx");
 
 NS_OBJECT_ENSURE_REGISTERED(SatPhyRx);
 
@@ -536,4 +538,5 @@ SatPhyRx::StartRx(Ptr<SatSignalParameters> rxParams)
     m_rxCarriers[cId]->StartRx(rxParams);
 }
 
+}
 } // namespace ns3

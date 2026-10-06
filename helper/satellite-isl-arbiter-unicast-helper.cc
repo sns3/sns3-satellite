@@ -32,10 +32,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatIslArbiterUnicastHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatIslArbiterUnicastHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(SatIslArbiterUnicastHelper);
 
@@ -236,4 +238,5 @@ SatIslArbiterUnicastHelper::CalculateGlobalState()
     return returnList;
 }
 
+}
 } // namespace ns3

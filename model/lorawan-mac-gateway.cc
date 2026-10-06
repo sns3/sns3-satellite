@@ -32,6 +32,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 NS_LOG_COMPONENT_DEFINE("LorawanMacGateway");
 
@@ -211,5 +213,7 @@ LorawanMacGateway::GetWaitingTime(double frequency)
     NS_LOG_FUNCTION(this << frequency);
 
     return m_channelHelper.GetWaitingTime(CreateObject<LoraLogicalChannel>(frequency));
+}
+
 }
 } // namespace ns3

@@ -33,10 +33,12 @@
 #include "ns3/simulator.h"
 #include "ns3/uinteger.h"
 
-NS_LOG_COMPONENT_DEFINE("SatOrbiterFeederMac");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatOrbiterFeederMac");
 
 NS_OBJECT_ENSURE_REGISTERED(SatOrbiterFeederMac);
 
@@ -328,4 +330,5 @@ SatOrbiterFeederMac::HasPeer()
     return true;
 }
 
+}
 } // namespace ns3

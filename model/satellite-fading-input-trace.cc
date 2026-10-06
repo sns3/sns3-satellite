@@ -25,10 +25,12 @@
 #include <stdint.h>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatFadingInputTrace");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatFadingInputTrace");
 
 NS_OBJECT_ENSURE_REGISTERED(SatFadingInputTrace);
 
@@ -69,4 +71,5 @@ SatFadingInputTrace::DoGetFading(Address macAddress, SatEnums::ChannelType_t cha
     return m_satFadingInputTraceContainer->GetFadingValue(std::make_pair(macAddress, channelType));
 }
 
+}
 } // namespace ns3

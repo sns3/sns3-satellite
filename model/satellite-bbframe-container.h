@@ -33,6 +33,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -184,6 +186,7 @@ class SatBbFrameContainer : public Object
     void CreateFrameToTail(uint32_t priorityClass, SatEnums::SatModcod_t modcod);
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_BBFRAME_CONTAINER_H */

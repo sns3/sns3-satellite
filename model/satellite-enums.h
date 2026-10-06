@@ -30,6 +30,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -2767,6 +2769,7 @@ class SatEnums
     virtual ~SatEnums() = 0;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_ENUMS_H */

@@ -35,6 +35,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -490,6 +492,7 @@ class SatLinkResultsDvbS2X : public SatLinkResultsFwd
     void DoInitialize();
 };
 
+}
 } // end of namespace ns3
 
 #endif /* SATELLITE_LINK_RESULTS_H */

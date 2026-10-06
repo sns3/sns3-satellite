@@ -39,6 +39,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 class SatPhyRxCarrierConf;
 class SatPhyRxCarrier;
@@ -284,6 +286,7 @@ class SatPhyRx : public Object
     double m_defaultFadingValue;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_PHY_RX_H */

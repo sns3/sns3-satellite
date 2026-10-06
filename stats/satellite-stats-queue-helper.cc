@@ -50,10 +50,12 @@
 #include <string>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatStatsQueueHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatStatsQueueHelper");
 
 // BASE CLASS /////////////////////////////////////////////////////////////////
 
@@ -674,4 +676,5 @@ SatStatsRtnQueuePacketsHelper::GetTypeId()
     return tid;
 }
 
+}
 } // end of namespace ns3

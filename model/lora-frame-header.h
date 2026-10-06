@@ -32,6 +32,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * This class represents the Frame header (FHDR) used in a LoraWAN network.
@@ -347,6 +349,8 @@ LoraFrameHeader::GetLorawanMacCommand()
 
     // If no command was found, return 0
     return 0;
+}
+
 }
 } // namespace ns3
 

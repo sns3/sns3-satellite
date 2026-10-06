@@ -35,6 +35,10 @@ namespace ns3
 class Packet;
 class Address;
 class Mac48Address;
+
+namespace satellite
+{
+
 class SatRequestManager;
 class SatSchedulingObject;
 class SatNodeInfo;
@@ -216,6 +220,7 @@ class SatUtLlc : public SatLlc
     SatQueue::QueueEventCallback m_macQueueEventCb;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_UT_LLC_H */

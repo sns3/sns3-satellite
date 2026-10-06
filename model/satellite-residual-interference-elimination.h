@@ -29,6 +29,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -100,6 +102,7 @@ class SatResidualInterferenceElimination : public SatInterferenceElimination
     double m_samplingError;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_RESIDUAL_INTERFERENCE_ELIMINATION_H */

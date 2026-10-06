@@ -32,10 +32,12 @@
 #include <algorithm>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatUtScheduler");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatUtScheduler");
 
 NS_OBJECT_ENSURE_REGISTERED(SatUtScheduler);
 
@@ -267,4 +269,5 @@ SatUtScheduler::GetPrioritizedRcIndexOrder()
     return m_rcIndices;
 }
 
+}
 } // namespace ns3

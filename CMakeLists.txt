@@ -94,6 +94,7 @@ set(source_files
     model/satellite-constant-interference.cc
     model/satellite-constant-position-mobility-model.cc
     model/satellite-control-message.cc
+    model/satellite-control-message-container.cc
     model/satellite-crdsa-replica-tag.cc
     model/satellite-dama-entry.cc
     model/satellite-default-superframe-allocator.cc

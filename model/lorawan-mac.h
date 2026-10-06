@@ -37,6 +37,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * Class representing the LoRaWAN MAC layer.
@@ -333,6 +335,7 @@ class LorawanMac : public SatMac
     bool m_isRegenerative;
 };
 
+}
 } /* namespace ns3 */
 
 #endif /* LORAWAN_MAC_H */

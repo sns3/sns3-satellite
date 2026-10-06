@@ -39,6 +39,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -146,6 +148,7 @@ class SatOrbiterUserMac : public SatOrbiterMac
     std::set<Mac48Address> m_peers;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_ORBITER_USER_MAC_H */

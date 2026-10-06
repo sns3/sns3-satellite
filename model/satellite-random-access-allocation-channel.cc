@@ -26,10 +26,12 @@
 
 #include <stdint.h>
 
-NS_LOG_COMPONENT_DEFINE("SatRandomAccessAllocationChannel");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatRandomAccessAllocationChannel");
 
 NS_OBJECT_ENSURE_REGISTERED(SatRandomAccessAllocationChannel);
 
@@ -111,4 +113,5 @@ SatRandomAccessAllocationChannel::DoCrdsaVariableSanityCheck()
     NS_LOG_INFO("Variable sanity check done");
 }
 
+}
 } // namespace ns3

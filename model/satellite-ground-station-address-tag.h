@@ -29,6 +29,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -102,6 +104,7 @@ class SatGroundStationAddressTag : public Tag
     Mac48Address m_groundStationAddress;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_GROUND_STATION_ADDRESS_TAG_H */

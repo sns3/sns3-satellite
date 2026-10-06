@@ -29,6 +29,7 @@
 #include <stdint.h>
 
 using namespace ns3;
+using namespace ns3::satellite;
 
 /**
  * @file sat-generic-launcher.cc

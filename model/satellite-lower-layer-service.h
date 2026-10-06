@@ -35,6 +35,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -1181,6 +1183,7 @@ class SatLowerLayerServiceConf : public Object
     SAT_RA_SERVICE_ATTRIBUTE_ACCESSOR_DEFINE(2);
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_LOWER_LAYER_SERIVICE_H */

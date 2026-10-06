@@ -54,10 +54,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatUtMac");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatUtMac");
 
 NS_OBJECT_ENSURE_REGISTERED(SatUtMac);
 
@@ -2230,4 +2232,5 @@ SatUtMac::ExtractPacketsToSchedule(SatPhy::PacketContainer_t& packets,
     }
 }
 
+}
 } // namespace ns3

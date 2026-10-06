@@ -30,6 +30,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -274,6 +276,7 @@ class SatFlowIdTag : public Tag
     uint8_t m_flowId;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_MAC_TAG_H */

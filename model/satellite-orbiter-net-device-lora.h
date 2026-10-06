@@ -43,6 +43,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -113,6 +115,7 @@ class SatOrbiterNetDeviceLora : public SatOrbiterNetDevice
     virtual void DisconnectUt(Mac48Address utAddress, uint32_t beamId);
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_ORBITER_NET_DEVICE_LORA_H */

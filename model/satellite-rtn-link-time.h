@@ -27,6 +27,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -136,6 +138,7 @@ class SatRtnLinkTime : public SimpleRefCount<SatRtnLinkTime>
     Ptr<SatSuperframeSeq> m_superframeSeq;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_RTN_LINK_TIME_H_ */

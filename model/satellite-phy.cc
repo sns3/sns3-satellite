@@ -42,10 +42,12 @@
 #include "ns3/simulator.h"
 #include "ns3/uinteger.h"
 
-NS_LOG_COMPONENT_DEFINE("SatPhy");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatPhy");
 
 NS_OBJECT_ENSURE_REGISTERED(SatPhy);
 
@@ -666,4 +668,5 @@ SatPhy::SetChannelPairGetterCallback(SatPhy::ChannelPairGetterCallback cb)
     m_retrieveChannelPair = cb;
 }
 
+}
 } // namespace ns3

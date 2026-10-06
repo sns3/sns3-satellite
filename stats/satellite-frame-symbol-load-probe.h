@@ -37,6 +37,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @brief Probe to translate from a FrameLoadTrace trace source.
@@ -125,6 +127,7 @@ class SatFrameSymbolLoadProbe : public Probe
     TracedCallback<uint32_t, double> m_output;
 };
 
+}
 } // namespace ns3
 
 #endif // SATELLITE_FRAME_SYMBOL_LOAD_PROBE_H

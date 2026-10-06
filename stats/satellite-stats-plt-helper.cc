@@ -56,10 +56,12 @@
 #include <string>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatStatsPltHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatStatsPltHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(SatStatsPltHelper);
 
@@ -870,4 +872,5 @@ SatStatsRtnAppPltHelper::SaveIpv4AddressAndIdentifier(Ptr<Node> utUserNode)
     }
 }
 
+}
 } // end of namespace ns3

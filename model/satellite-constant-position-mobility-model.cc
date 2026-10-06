@@ -24,10 +24,12 @@
 
 #include <stdint.h>
 
-NS_LOG_COMPONENT_DEFINE("SatConstMobilityModel");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatConstMobilityModel");
 
 NS_OBJECT_ENSURE_REGISTERED(SatConstantPositionMobilityModel);
 
@@ -75,4 +77,5 @@ SatConstantPositionMobilityModel::DoGetVelocity(void) const
     return Vector(0.0, 0.0, 0.0);
 }
 
+}
 } // namespace ns3

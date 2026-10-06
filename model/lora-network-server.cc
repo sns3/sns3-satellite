@@ -37,6 +37,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 NS_LOG_COMPONENT_DEFINE("LoraNetworkServer");
 
@@ -202,4 +204,5 @@ LoraNetworkServer::GetNetworkStatus(void)
     return m_status;
 }
 
+}
 } // namespace ns3

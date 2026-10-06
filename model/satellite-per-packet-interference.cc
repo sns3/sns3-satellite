@@ -35,10 +35,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatPerPacketInterference");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatPerPacketInterference");
 
 NS_OBJECT_ENSURE_REGISTERED(SatPerPacketInterference);
 
@@ -305,6 +307,5 @@ SatPerPacketInterference::SetRxBandwidth(double rxBandwidth)
     m_rxBandwidth_Hz = rxBandwidth;
 }
 
+}
 } // namespace ns3
-
-// namespace ns3

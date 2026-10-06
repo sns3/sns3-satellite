@@ -35,6 +35,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -233,6 +235,7 @@ class SatAntennaGainPattern : public Object
     GeoCoordinate m_defaultSatellitePosition;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_ANTENNA_GAIN_PATTERN_H */

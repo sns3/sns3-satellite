@@ -33,6 +33,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -153,6 +155,7 @@ class SatTbtpContainer : public Object
     Time m_superFrameDuration;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_TBTP_CONTAINER_H_ */

@@ -30,10 +30,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatPositionInputTraceContainer");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatPositionInputTraceContainer");
 
 NS_OBJECT_ENSURE_REGISTERED(SatPositionInputTraceContainer);
 
@@ -127,4 +129,5 @@ SatPositionInputTraceContainer::GetPosition(const std::string& key,
                          refEllipsoid);
 }
 
+}
 } // namespace ns3

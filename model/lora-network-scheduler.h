@@ -35,6 +35,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 class LoraNetworkStatus;     // Forward declaration
 class LoraNetworkController; // Forward declaration
@@ -90,6 +92,7 @@ class LoraNetworkScheduler : public Object
     Time m_secondWindowAnswerDelay;
 };
 
+}
 } /* namespace ns3 */
 
 #endif /* LORA_NETWORK_SCHEDULER_H */

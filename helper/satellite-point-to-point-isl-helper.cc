@@ -32,10 +32,12 @@
 #include "ns3/satellite-point-to-point-isl-channel.h"
 #include "ns3/string.h"
 
-NS_LOG_COMPONENT_DEFINE("PointToPointIslHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("PointToPointIslHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(PointToPointIslHelper);
 
@@ -120,4 +122,5 @@ PointToPointIslHelper::Install(Ptr<Node> a, Ptr<Node> b)
     return container;
 }
 
+}
 } // namespace ns3

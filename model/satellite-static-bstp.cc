@@ -34,10 +34,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatStaticBstp");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatStaticBstp");
 
 SatStaticBstp::SatStaticBstp()
     : m_bstp(),
@@ -248,4 +250,5 @@ SatStaticBstp::CheckValidity()
     }
 }
 
+}
 } // namespace ns3

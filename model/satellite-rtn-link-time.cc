@@ -26,10 +26,12 @@
 
 #include <math.h>
 
-NS_LOG_COMPONENT_DEFINE("SatRtnLinkTime");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatRtnLinkTime");
 
 SatRtnLinkTime::SatRtnLinkTime()
     : m_superframeSeq()
@@ -151,4 +153,5 @@ SatRtnLinkTime::GetNextSuperFrameTxTime(uint8_t superFrameSeqId, Time timingAdva
     return transmitStart;
 }
 
+}
 } // namespace ns3

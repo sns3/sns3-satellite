@@ -35,11 +35,15 @@
 namespace ns3
 {
 
+class DataCollectionObject;
+class ScalarCollector;
+
+namespace satellite
+{
+
 // BASE CLASS /////////////////////////////////////////////////////////////////
 
 class SatHelper;
-class DataCollectionObject;
-class ScalarCollector;
 
 /**
  * @ingroup satstats
@@ -225,6 +229,7 @@ class SatStatsFrameUserLoadHelper : public SatStatsFrameLoadHelper
 
 }; // end of class SatStatsFrameUserLoadHelper
 
+}
 } // end of namespace ns3
 
 #endif /* SATELLITE_STATS_FRAME_LOAD_HELPER_H */

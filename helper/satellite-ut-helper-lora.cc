@@ -46,10 +46,12 @@
 
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatUtHelperLora");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatUtHelperLora");
 
 NS_OBJECT_ENSURE_REGISTERED(SatUtHelperLora);
 
@@ -238,4 +240,5 @@ SatUtHelperLora::Install(Ptr<Node> n,
     return dev;
 }
 
+}
 } // namespace ns3

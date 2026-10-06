@@ -29,6 +29,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /*
  * There are 4 classes defined here: SatTimeTag, SatPhyTimeTag, SatMacTimeTag,
@@ -533,6 +535,7 @@ class SatDevLinkTimeTag : public Tag
     Time m_senderTimestamp;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_TIME_TAG_H */

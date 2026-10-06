@@ -37,10 +37,12 @@
 
 #include <string>
 
-NS_LOG_COMPONENT_DEFINE("SatPhyRxCarrierPacketProbe");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatPhyRxCarrierPacketProbe");
 
 NS_OBJECT_ENSURE_REGISTERED(SatPhyRxCarrierPacketProbe);
 
@@ -109,7 +111,7 @@ SatPhyRxCarrierPacketProbe::ConnectByObject(std::string traceSource, Ptr<Object>
     NS_LOG_DEBUG("Name of probe (if any) in names database: " << Names::FindPath(obj));
     bool connected = obj->TraceConnectWithoutContext(
         traceSource,
-        MakeCallback(&ns3::SatPhyRxCarrierPacketProbe::TraceSink, this));
+        MakeCallback(&ns3::satellite::SatPhyRxCarrierPacketProbe::TraceSink, this));
     return connected;
 }
 
@@ -119,7 +121,7 @@ SatPhyRxCarrierPacketProbe::ConnectByPath(std::string path)
     NS_LOG_FUNCTION(this << path);
     NS_LOG_DEBUG("Name of probe to search for in config database: " << path);
     Config::ConnectWithoutContext(path,
-                                  MakeCallback(&ns3::SatPhyRxCarrierPacketProbe::TraceSink, this));
+                                  MakeCallback(&ns3::satellite::SatPhyRxCarrierPacketProbe::TraceSink, this));
 }
 
 void
@@ -137,4 +139,5 @@ SatPhyRxCarrierPacketProbe::TraceSink(uint32_t nPackets, const Address& address,
     }
 }
 
+}
 } // namespace ns3

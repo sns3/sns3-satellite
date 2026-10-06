@@ -34,6 +34,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @brief This helper allows to set customs C/N0 values for some GW or UT nodes.
@@ -196,6 +198,7 @@ class SatCnoHelper : public Object
     bool CheckDuplicate(Ptr<Node> node, SatEnums::ChannelType_t channel);
 };
 
+}
 } // namespace ns3
 
 #endif /* __SATELLITE_CNO_HELPER_H__ */

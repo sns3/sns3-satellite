@@ -35,10 +35,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatFadingOutputTraceContainer");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatFadingOutputTraceContainer");
 
 NS_OBJECT_ENSURE_REGISTERED(SatFadingOutputTraceContainer);
 
@@ -191,4 +193,5 @@ SatFadingOutputTraceContainer::AddToContainer(key_t key, std::vector<double> new
     }
 }
 
+}
 } // namespace ns3

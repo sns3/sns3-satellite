@@ -35,6 +35,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 class SatLinkResultsRtn;
 
@@ -424,6 +426,7 @@ class SatWaveformConf : public Object
     BurstLengthContainer_t m_supportedBurstLengthsInSymbols;
 };
 
+}
 } // namespace ns3
 
 #endif // SATELLITE_WAVE_FORM_CONF_H

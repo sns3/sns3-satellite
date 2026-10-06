@@ -32,6 +32,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -189,6 +191,7 @@ class SatFwdLinkSchedulerTimeSlicing : public SatFwdLinkScheduler
     uint8_t m_lastSliceDequeued;
 };
 
+}
 } // namespace ns3
 
 #endif /* SAT_FWD_LINK_SCHEDULER_TIME_SLICING_H */

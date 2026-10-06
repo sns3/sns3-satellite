@@ -36,10 +36,12 @@
 #include <string>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatFadingExternalInputTraceContainer");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatFadingExternalInputTraceContainer");
 
 NS_OBJECT_ENSURE_REGISTERED(SatFadingExternalInputTraceContainer);
 
@@ -477,4 +479,5 @@ SatFadingExternalInputTraceContainer::FindSourceBasedOnPosition(TraceFileContain
     return fileName;
 }
 
+}
 } // namespace ns3

@@ -40,6 +40,10 @@ namespace ns3
 class Packet;
 class Address;
 class Mac48Address;
+
+namespace satellite
+{
+
 class SatBbFrame;
 class SatCrMessage;
 class SatSignalParameters;
@@ -440,6 +444,7 @@ class SatGwMac : public SatMac
     SatGwMac::ClearQueuesCallback m_clearQueuesCallback;
 };
 
+}
 } // namespace ns3
 
 #endif /* SAT_GW_MAC_H */

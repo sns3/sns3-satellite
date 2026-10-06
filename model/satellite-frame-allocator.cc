@@ -32,10 +32,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatFrameAllocator");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatFrameAllocator");
 
 // helper classes defined inside SatFrameAllocator
 
@@ -1466,4 +1468,5 @@ SatFrameAllocator::CreateNewTbtp(TbtpMsgContainer_t& tbtpContainer)
     return newTbtp;
 }
 
+}
 } // namespace ns3

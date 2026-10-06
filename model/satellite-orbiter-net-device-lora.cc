@@ -55,10 +55,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatOrbiterNetDeviceLora");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatOrbiterNetDeviceLora");
 
 NS_OBJECT_ENSURE_REGISTERED(SatOrbiterNetDeviceLora);
 
@@ -325,4 +327,5 @@ SatOrbiterNetDeviceLora::DisconnectUt(Mac48Address utAddress, uint32_t beamId)
     Singleton<SatIdMapper>::Get()->RemoveMacToSatIdIsl(utAddress);
 }
 
+}
 } // namespace ns3

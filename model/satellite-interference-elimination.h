@@ -25,6 +25,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 class SatSignalParameters;
 
@@ -84,6 +86,7 @@ class SatInterferenceElimination : public Object
     virtual double GetResidualPower(Ptr<SatSignalParameters> processedPacket, double EsNo) = 0;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_INTERFERENCE_ELIMINATION_H */

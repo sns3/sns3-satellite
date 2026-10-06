@@ -26,6 +26,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 NS_LOG_COMPONENT_DEFINE("LoraNetworkControllerComponent");
 
@@ -196,5 +198,7 @@ LoraLinkCheckComponent::OnFailedReply(Ptr<LoraEndDeviceStatus> status,
                                       Ptr<LoraNetworkStatus> networkStatus)
 {
     NS_LOG_FUNCTION(this->GetTypeId() << networkStatus);
+}
+
 }
 } // namespace ns3

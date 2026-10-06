@@ -30,8 +30,12 @@
 namespace ns3
 {
 
-class SatSimpleNetDevice;
 class Packet;
+
+namespace satellite
+{
+
+class SatSimpleNetDevice;
 
 /**
  * @ingroup satellite
@@ -86,6 +90,7 @@ class SatSimpleChannel : public Channel
     std::vector<Ptr<SatSimpleNetDevice>> m_devices;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_SIMPLE_CHANNEL_H */

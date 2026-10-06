@@ -42,7 +42,10 @@
 #include "ns3/string.h"
 #include "ns3/test.h"
 
-using namespace ns3;
+namespace ns3
+{
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -415,5 +418,8 @@ SatRandomAccessTestSuite::SatRandomAccessTestSuite()
     AddTestCase(new SatSlottedAlohaTest1, TestCase::Duration::QUICK);
 }
 
+}
+} // namespace ns3
+
 // Allocate an instance of this TestSuite
-static SatRandomAccessTestSuite satRandomAccessTestSuite;
+static ns3::satellite::SatRandomAccessTestSuite satRandomAccessTestSuite;

@@ -51,6 +51,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -377,6 +379,7 @@ class SatFwdLinkScheduler : public Object
     TracedCallback<uint8_t, double> m_schedulingSymbolRateTrace;
 };
 
+}
 } // namespace ns3
 
 #endif /* SAT_FWD_LINK_SCHEDULER_H */

@@ -24,6 +24,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 NS_LOG_COMPONENT_DEFINE("SatLoraPhyRx");
 
@@ -145,4 +147,5 @@ SatLoraPhyRx::SwitchToSleep(void)
     m_state = SLEEP;
 }
 
+}
 } // namespace ns3

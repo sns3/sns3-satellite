@@ -37,6 +37,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 class SatLinkResultsDvbS2;
 
@@ -472,6 +474,7 @@ class SatBbFrameConf : public Object
     std::string m_modCodsUsedStr;
 };
 
+}
 } // namespace ns3
 
 #endif // SATELLITE_BBFRAME_CONF_H

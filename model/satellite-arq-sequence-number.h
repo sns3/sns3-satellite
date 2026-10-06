@@ -38,6 +38,8 @@
  */
 namespace ns3
 {
+namespace satellite
+{
 
 class SatArqSequenceNumber : public SimpleRefCount<SatArqSequenceNumber>
 {
@@ -89,6 +91,7 @@ class SatArqSequenceNumber : public SimpleRefCount<SatArqSequenceNumber>
     uint32_t m_maxSn;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_ARQ_SEQUENCE_NUMBER_H_ */

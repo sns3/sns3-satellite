@@ -24,10 +24,12 @@
 
 #include <ostream>
 
-NS_LOG_COMPONENT_DEFINE("SatEncapPduStatusTag");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatEncapPduStatusTag");
 
 NS_OBJECT_ENSURE_REGISTERED(SatEncapPduStatusTag);
 
@@ -92,4 +94,5 @@ SatEncapPduStatusTag::Print(std::ostream& os) const
     os << "PPDU Status=" << (uint32_t)m_pduStatus;
 }
 
+}
 } // namespace ns3

@@ -27,6 +27,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * Structure to collect all parameters that are used to compute the duration of
@@ -96,6 +98,7 @@ class SatLoraPhyTx : public SatPhyTx
     bool m_isTransmitting;
 };
 
+}
 } /* namespace ns3 */
 
 #endif /* SAT_LORA_PHY_TX_H */

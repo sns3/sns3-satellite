@@ -32,6 +32,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 NS_LOG_COMPONENT_DEFINE("LorawanLorawanMacCommand");
 
@@ -1219,4 +1221,5 @@ TxParamSetupAns::Print(std::ostream& os) const
     os << "TxParamSetupAns" << std::endl;
 }
 
+}
 } // namespace ns3

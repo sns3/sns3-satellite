@@ -34,10 +34,12 @@
 #include <sstream>
 #include <string>
 
-NS_LOG_COMPONENT_DEFINE("SatPacketTrace");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatPacketTrace");
 
 NS_OBJECT_ENSURE_REGISTERED(SatPacketTrace);
 
@@ -140,4 +142,5 @@ SatPacketTrace::AddTraceEntry(Time now,
     *m_packetTraceStream->GetStream() << oss.str() << std::endl;
 }
 
+}
 } // namespace ns3

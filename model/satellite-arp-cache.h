@@ -25,6 +25,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -61,6 +63,7 @@ class SatArpCache : public ArpCache
     ArpCache::Entry* Add(Ipv4Address to, Address macAddress);
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_ARP_CACHE_H */

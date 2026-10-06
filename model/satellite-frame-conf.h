@@ -40,6 +40,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -1102,6 +1104,7 @@ class SatSuperframeConf4 : public SatSuperframeConf
   private:
 };
 
+}
 } // namespace ns3
 
 #endif // SATELLITE_FRAME_CONF_H

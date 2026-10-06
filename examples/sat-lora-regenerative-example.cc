@@ -28,6 +28,7 @@
 #include "ns3/traffic-module.h"
 
 using namespace ns3;
+using namespace ns3::satellite;
 
 /**
  * @file sat-lora-regenerative-example.cc

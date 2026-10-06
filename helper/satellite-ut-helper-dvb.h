@@ -34,6 +34,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @brief Creates needed objects for DVB UT nodes like SatOrbiterNetDevice objects.
@@ -102,6 +104,7 @@ class SatUtHelperDvb : public SatUtHelper
                                    SatMac::RoutingUpdateCallback cbRouting);
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_UT_HELPER_DVB_H */

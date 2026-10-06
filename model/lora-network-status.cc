@@ -43,6 +43,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 NS_LOG_COMPONENT_DEFINE("LoraNetworkStatus");
 
@@ -313,5 +315,7 @@ LoraNetworkStatus::CountEndDevices(void)
     NS_LOG_FUNCTION(this);
 
     return m_endDeviceStatuses.size();
+}
+
 }
 } // namespace ns3

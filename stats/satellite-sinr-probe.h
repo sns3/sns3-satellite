@@ -38,6 +38,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @brief Probe to translate from a TraceSource to two more easily parsed TraceSources.
@@ -134,6 +136,7 @@ class SatSinrProbe : public Probe
     Address m_address;
 };
 
+}
 } // namespace ns3
 
 #endif // SATELLITE_SINR_PROBE_H

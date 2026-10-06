@@ -29,6 +29,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -68,6 +70,7 @@ class SatArqBufferContext : public Object
     bool m_rxStatus;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_ARQ_BUFFER_CONTEXT_H_ */

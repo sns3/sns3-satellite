@@ -35,6 +35,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * This application forwards packets between NetDevices:
@@ -105,6 +107,7 @@ class LoraForwarder : public Application
     //! communicate with the NS
 };
 
+}
 } // namespace ns3
 
 #endif /* LORA_FORWARDER_H */

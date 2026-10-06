@@ -32,6 +32,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -102,6 +104,7 @@ class SatPositionInputTraceContainer : public SatBaseTraceContainer
     container_t m_container;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_POSITION_INPUT_TRACE_CONTAINER_H */

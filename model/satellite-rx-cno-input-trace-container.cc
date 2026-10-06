@@ -32,10 +32,12 @@
 #include <string>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatRxCnoInputTraceContainer");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatRxCnoInputTraceContainer");
 
 NS_OBJECT_ENSURE_REGISTERED(SatRxCnoInputTraceContainer);
 
@@ -230,4 +232,5 @@ SatRxCnoInputTraceContainer::SetRxCnoFile(key_t key, std::string path)
     }
 }
 
+}
 } // namespace ns3

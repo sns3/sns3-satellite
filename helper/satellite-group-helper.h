@@ -40,6 +40,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 class SatHelper;
 
@@ -209,6 +211,7 @@ class SatGroupHelper : public Object
     bool m_satConstellationEnabled;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_GROUP_HELPER_H */

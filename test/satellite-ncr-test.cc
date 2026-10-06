@@ -43,7 +43,10 @@
 #include "ns3/string.h"
 #include "ns3/test.h"
 
-using namespace ns3;
+namespace ns3
+{
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -729,5 +732,8 @@ SatNcrTestSuite::SatNcrTestSuite()
     AddTestCase(new SatNcrTest3(SatEnums::REGENERATION_NETWORK), TestCase::Duration::QUICK);
 }
 
+}
+} // namespace ns3
+
 // Allocate an instance of this TestSuite
-static SatNcrTestSuite satNcrTestSuite;
+static ns3::satellite::SatNcrTestSuite satNcrTestSuite;

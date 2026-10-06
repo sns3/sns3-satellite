@@ -26,6 +26,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 NS_LOG_COMPONENT_DEFINE("LoraDeviceAddressGenerator");
 
@@ -74,5 +76,7 @@ LoraDeviceAddressGenerator::GetNextAddress(void)
     NS_LOG_FUNCTION_NOARGS();
 
     return LoraDeviceAddress(m_currentNwkId.Get(), m_currentNwkAddr.Get() + 1);
+}
+
 }
 } // namespace ns3

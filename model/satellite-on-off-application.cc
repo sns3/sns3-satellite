@@ -29,10 +29,12 @@
 
 #include <stdint.h>
 
-NS_LOG_COMPONENT_DEFINE("SatOnOffApplication");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatOnOffApplication");
 
 NS_OBJECT_ENSURE_REGISTERED(SatOnOffApplication);
 
@@ -106,4 +108,5 @@ SatOnOffApplication::SendPacketTrace(Ptr<const Packet> packet)
     packet->AddPacketTag(TrafficTimeTag(Simulator::Now()));
 }
 
-} // Namespace ns3
+}
+} // namespace ns3

@@ -29,6 +29,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 NS_OBJECT_ENSURE_REGISTERED(LoraTag);
 
@@ -168,4 +170,5 @@ LoraTag::SetModcod(uint8_t modcod)
     m_modcod = modcod;
 }
 
+}
 } // namespace ns3

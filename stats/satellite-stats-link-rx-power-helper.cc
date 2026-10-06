@@ -53,10 +53,12 @@
 #include <string>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatStatsLinkRxPowerHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatStatsLinkRxPowerHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(SatStatsLinkRxPowerHelper);
 
@@ -867,4 +869,5 @@ SatStatsRtnUserLinkRxPowerHelper::DoInstallProbes()
 
 } // end of `void DoInstallProbes ();`
 
+}
 } // end of namespace ns3

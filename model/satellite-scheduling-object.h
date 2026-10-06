@@ -29,6 +29,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -106,6 +108,7 @@ class SatSchedulingObject : public SimpleRefCount<SatSchedulingObject>
     uint8_t m_flowId;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_SCHEDULING_OBJECT_H_ */

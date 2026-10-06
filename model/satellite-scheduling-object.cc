@@ -23,10 +23,12 @@
 #include "ns3/log.h"
 #include "ns3/mac48-address.h"
 
-NS_LOG_COMPONENT_DEFINE("SatSchedulingObject");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatSchedulingObject");
 
 SatSchedulingObject::SatSchedulingObject()
     : m_macAddress(),
@@ -96,4 +98,5 @@ SatSchedulingObject::GetHolDelay() const
     return m_holDelay;
 }
 
+}
 } // namespace ns3

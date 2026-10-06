@@ -29,6 +29,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -103,6 +105,7 @@ class SatPerFragmentInterference : public SatPerPacketInterference
     uint32_t m_maxFragmentsCount;
 };
 
+}
 } // namespace ns3
 
 #endif // SATELLITE_PER_FRAGMENT_INTERFERENCE_H

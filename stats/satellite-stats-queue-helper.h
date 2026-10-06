@@ -35,11 +35,16 @@
 namespace ns3
 {
 
+class Mac48Address;
+
+class DataCollectionObject;
+
+namespace satellite
+{
+
 // BASE CLASS /////////////////////////////////////////////////////////////////
 
 class SatHelper;
-class Mac48Address;
-class DataCollectionObject;
 
 /**
  * @ingroup satstats
@@ -302,6 +307,7 @@ class SatStatsRtnQueuePacketsHelper : public SatStatsRtnQueueHelper
 
 }; // end of class SatStatsRtnQueuePacketsHelper
 
+}
 } // end of namespace ns3
 
 #endif /* SATELLITE_STATS_QUEUE_HELPER_H */

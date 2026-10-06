@@ -37,6 +37,9 @@ class Packet;
 class Address;
 class Time;
 
+namespace satellite
+{
+
 /**
  * @ingroup satellite
  *
@@ -125,6 +128,7 @@ class SatTypedefs
     virtual ~SatTypedefs() = 0;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_TYPEDEFS_H_ */

@@ -30,6 +30,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -84,6 +86,7 @@ class SatNodeInfo : public SimpleRefCount<SatNodeInfo>
     Mac48Address m_macAddress;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_NODE_INFO_H_ */

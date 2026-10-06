@@ -42,6 +42,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * This class represents the Network Server's knowledge about an End Device in
@@ -360,6 +362,8 @@ class LoraEndDeviceStatus : public Object
     // synchronization between the info at the device and at the network server
     Ptr<LorawanMacEndDeviceClassA> m_mac; //!< Pointer to the MAC layer of this device
 };
+
+}
 } // namespace ns3
 
 #endif /* LORA_END_DEVICE_STATUS_H */

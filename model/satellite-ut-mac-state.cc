@@ -25,10 +25,12 @@
 
 #include <stdint.h>
 
-NS_LOG_COMPONENT_DEFINE("SatUtMacState");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatUtMacState");
 
 NS_OBJECT_ENSURE_REGISTERED(SatUtMacState);
 
@@ -224,4 +226,5 @@ SatUtMacState::CheckNcrRecoveryTimeout()
     }
 }
 
+}
 } // namespace ns3

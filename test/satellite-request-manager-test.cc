@@ -38,7 +38,10 @@
 #include "ns3/singleton.h"
 #include "ns3/test.h"
 
-using namespace ns3;
+namespace ns3
+{
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -213,5 +216,8 @@ SatRequestManagerTestSuite::SatRequestManagerTestSuite()
     AddTestCase(new SatBaseTestCase, TestCase::Duration::QUICK);
 }
 
+}
+} // namespace ns3
+
 // Do allocate an instance of this TestSuite
-static SatRequestManagerTestSuite satRmTestSuite;
+static ns3::satellite::SatRequestManagerTestSuite satRmTestSuite;

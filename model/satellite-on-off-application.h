@@ -27,6 +27,9 @@ namespace ns3
 
 class Socket;
 
+namespace satellite
+{
+
 /**
  * @ingroup satellite
  *
@@ -78,6 +81,7 @@ class SatOnOffApplication : public OnOffApplication
     bool m_isConnectedWithTraceSource;
 };
 
+}
 } // namespace ns3
 
 #endif /* SAT_ONOFF_APPLICATION_H */

@@ -41,6 +41,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 class SatPhyTx;
 class SatPhyRx;
@@ -718,6 +720,7 @@ class SatPhy : public Object
     double m_defaultFadingValue;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_PHY_H */

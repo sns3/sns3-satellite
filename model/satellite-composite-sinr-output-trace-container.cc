@@ -35,10 +35,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatCompositeSinrOutputTraceContainer");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatCompositeSinrOutputTraceContainer");
 
 NS_OBJECT_ENSURE_REGISTERED(SatCompositeSinrOutputTraceContainer);
 
@@ -192,4 +194,5 @@ SatCompositeSinrOutputTraceContainer::AddToContainer(key_t key, std::vector<doub
     }
 }
 
+}
 } // namespace ns3

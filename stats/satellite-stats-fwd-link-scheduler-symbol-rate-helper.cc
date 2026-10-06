@@ -47,10 +47,12 @@
 #include <sstream>
 #include <string>
 
-NS_LOG_COMPONENT_DEFINE("SatStatsFwdLinkSchedulerSymbolRateHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatStatsFwdLinkSchedulerSymbolRateHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(SatStatsFwdLinkSchedulerSymbolRateHelper);
 
@@ -368,4 +370,5 @@ SatStatsFwdLinkSchedulerSymbolRateHelper::InstallProbes()
     } // end of `for (it = gws.Begin (); it != gws.End (); ++it)`
 }
 
+}
 } // end of namespace ns3

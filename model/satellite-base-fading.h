@@ -29,6 +29,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -88,6 +90,7 @@ class SatBaseFading : public Object
   private:
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_BASE_FADING_H */

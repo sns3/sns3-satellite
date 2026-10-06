@@ -37,8 +37,12 @@
 namespace ns3
 {
 
-class PointToPointIslNetDevice;
 class Packet;
+
+namespace satellite
+{
+
+class PointToPointIslNetDevice;
 
 /**
  * @brief Point to Point ISL Channel
@@ -202,6 +206,7 @@ class PointToPointIslChannel : public Channel
     Link m_link[N_DEVICES]; //!< Link model
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_POINT_TO_POINT_ISL_CHANNEL_H */

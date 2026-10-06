@@ -36,10 +36,12 @@
 #include "ns3/trace-source-accessor.h"
 #include "ns3/uinteger.h"
 
-NS_LOG_COMPONENT_DEFINE("SatMac");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatMac");
 
 NS_OBJECT_ENSURE_REGISTERED(SatMac);
 
@@ -478,4 +480,5 @@ SatMac::SetUpdateIslCallback(SatMac::UpdateIslCallback cb)
     m_updateIslCallback = cb;
 }
 
+}
 } // namespace ns3

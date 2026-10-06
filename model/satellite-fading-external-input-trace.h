@@ -29,6 +29,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -116,6 +118,7 @@ class SatFadingExternalInputTrace : public SimpleRefCount<SatFadingExternalInput
     std::vector<std::vector<float>> m_traceVector;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_FADING_EXTERNAL_INPUT_TRACE_H */

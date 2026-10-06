@@ -32,10 +32,12 @@
 #include <string>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatLog");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatLog");
 
 NS_OBJECT_ENSURE_REGISTERED(SatLog);
 
@@ -190,4 +192,5 @@ SatLog::GetFileTag(LogType_t logType)
     return fileTag;
 }
 
+}
 } // namespace ns3

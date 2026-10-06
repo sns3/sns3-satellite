@@ -24,10 +24,12 @@
 
 #include <ostream>
 
-NS_LOG_COMPONENT_DEFINE("SatGroundStationAddressTag");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatGroundStationAddressTag");
 
 NS_OBJECT_ENSURE_REGISTERED(SatGroundStationAddressTag);
 
@@ -103,4 +105,5 @@ SatGroundStationAddressTag::SetGroundStationAddress(Mac48Address groundStationAd
     m_groundStationAddress = groundStationAddress;
 }
 
+}
 } // namespace ns3

@@ -25,10 +25,12 @@
 #include <map>
 #include <stdint.h>
 
-NS_LOG_COMPONENT_DEFINE("SatSuperframeAllocator");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatSuperframeAllocator");
 
 NS_OBJECT_ENSURE_REGISTERED(SatSuperframeAllocator);
 
@@ -50,4 +52,5 @@ SatSuperframeAllocator::~SatSuperframeAllocator()
     NS_LOG_FUNCTION(this);
 }
 
+}
 } // namespace ns3

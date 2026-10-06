@@ -42,6 +42,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * The LoraNetworkServer is an application standing on top of a node equipped with
@@ -113,5 +115,7 @@ class LoraNetworkServer : public Application
     TracedCallback<Ptr<const Packet>> m_receivedPacket;
 };
 
+}
 } // namespace ns3
+
 #endif /* LORA_NETWORK_SERVER_H */

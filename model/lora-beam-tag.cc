@@ -24,10 +24,12 @@
 
 #include <ostream>
 
-NS_LOG_COMPONENT_DEFINE("LoraBeamTag");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("LoraBeamTag");
 
 NS_OBJECT_ENSURE_REGISTERED(LoraBeamTag);
 
@@ -89,4 +91,5 @@ LoraBeamTag::SetBeamId(uint8_t beamId)
     m_beamId = beamId;
 }
 
+}
 } // namespace ns3

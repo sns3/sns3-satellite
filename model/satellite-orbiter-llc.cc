@@ -27,10 +27,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatOrbiterLlc");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatOrbiterLlc");
 
 NS_OBJECT_ENSURE_REGISTERED(SatOrbiterLlc);
 
@@ -330,4 +332,5 @@ SatOrbiterLlc::ClearQueues()
     }
 }
 
+}
 } // namespace ns3

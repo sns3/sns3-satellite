@@ -38,6 +38,9 @@ namespace ns3
 class NetDevice;
 class Node;
 
+namespace satellite
+{
+
 class PointToPointIslHelper : public Object
 {
   public:
@@ -63,6 +66,7 @@ class PointToPointIslHelper : public Object
     uint32_t m_maxBytes;   //!< The maximum number of bytes accepted by ISL queues
 };
 
+}
 } // namespace ns3
 
 #endif /* POINT_TO_POINT_ISL_HELPER_H */

@@ -35,10 +35,13 @@
  *
  * \sa SatLinkResultsPlot
  */
-NS_LOG_COMPONENT_DEFINE("SatLinkResultsPlot");
 
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatLinkResultsPlot");
 
 /**
  * @ingroup satellite
@@ -428,13 +431,14 @@ SatLinkResultsPlot::GetGnuplot(std::string outputName, std::string title)
     return ret;
 }
 
+}
 } // end of namespace ns3
 
 int
 main(int argc, char* argv[])
 {
-    ns3::Ptr<ns3::SatLinkResultsPlot> stub;
-    stub = ns3::Create<ns3::SatLinkResultsPlot>();
+    ns3::Ptr<ns3::satellite::SatLinkResultsPlot> stub;
+    stub = ns3::Create<ns3::satellite::SatLinkResultsPlot>();
     stub->Run();
 
     return 0;

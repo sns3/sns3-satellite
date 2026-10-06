@@ -43,6 +43,9 @@ namespace ns3
 
 class OutputStreamWrapper;
 
+namespace satellite
+{
+
 /**
  * @brief Creates needed objects for GW nodes like SatOrbiterNetDevice objects.
  *        Handles needed configuration for the GW nodes.
@@ -268,6 +271,7 @@ class SatGwHelper : public Object
     SatEnums::FwdSchedulingAlgorithm_t m_fwdSchedulingAlgorithm;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_GW_HELPER_H */

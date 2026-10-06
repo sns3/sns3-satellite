@@ -34,6 +34,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -301,6 +303,7 @@ class SatSpotBeamPositionAllocator : public SatPositionAllocator
     Ptr<RandomVariableStream> m_altitude;
 };
 
+}
 } // namespace ns3
 
 #endif /* POSITION_ALLOCATOR_H */

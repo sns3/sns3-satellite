@@ -37,10 +37,12 @@
 
 #include <string>
 
-NS_LOG_COMPONENT_DEFINE("SatSinrProbe");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatSinrProbe");
 
 NS_OBJECT_ENSURE_REGISTERED(SatSinrProbe);
 
@@ -99,7 +101,7 @@ SatSinrProbe::ConnectByObject(std::string traceSource, Ptr<Object> obj)
     NS_LOG_DEBUG("Name of probe (if any) in names database: " << Names::FindPath(obj));
     bool connected =
         obj->TraceConnectWithoutContext(traceSource,
-                                        MakeCallback(&ns3::SatSinrProbe::TraceSink, this));
+                                        MakeCallback(&ns3::satellite::SatSinrProbe::TraceSink, this));
     return connected;
 }
 
@@ -108,7 +110,7 @@ SatSinrProbe::ConnectByPath(std::string path)
 {
     NS_LOG_FUNCTION(this << path);
     NS_LOG_DEBUG("Name of probe to search for in config database: " << path);
-    Config::ConnectWithoutContext(path, MakeCallback(&ns3::SatSinrProbe::TraceSink, this));
+    Config::ConnectWithoutContext(path, MakeCallback(&ns3::satellite::SatSinrProbe::TraceSink, this));
 }
 
 void
@@ -124,4 +126,5 @@ SatSinrProbe::TraceSink(double sinrDb, const Address& address)
     }
 }
 
+}
 } // namespace ns3

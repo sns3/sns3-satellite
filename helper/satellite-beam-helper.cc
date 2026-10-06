@@ -78,10 +78,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatBeamHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatBeamHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(SatBeamHelper);
 
@@ -1767,4 +1769,5 @@ SatBeamHelper::GetPropagationDelayModelEnum()
     return m_propagationDelayModel;
 }
 
+}
 } // namespace ns3

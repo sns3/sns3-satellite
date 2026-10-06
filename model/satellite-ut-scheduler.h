@@ -34,6 +34,10 @@ namespace ns3
 {
 
 class Packet;
+
+namespace satellite
+{
+
 class SatNodeInfo;
 class SatLowerLayerServiceConf;
 class SatSchedulingObject;
@@ -264,6 +268,7 @@ class SatUtScheduler : public Object
     std::vector<uint8_t> m_rcIndices;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_UT_SCHEDULER_H_ */

@@ -33,6 +33,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -113,6 +115,7 @@ class SatPacketTrace : public Object
     Ptr<OutputStreamWrapper> m_packetTraceStream;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_PACKET_TRACE_H_ */

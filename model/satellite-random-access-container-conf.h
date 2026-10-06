@@ -37,6 +37,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -172,6 +174,7 @@ class SatRandomAccessConf : public Object
     uint32_t m_slottedAlohaSignalingOverheadInBytes;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_RANDOM_ACCESS_CONF_H */

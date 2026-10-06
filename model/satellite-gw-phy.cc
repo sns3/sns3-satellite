@@ -36,10 +36,12 @@
 #include "ns3/singleton.h"
 #include "ns3/uinteger.h"
 
-NS_LOG_COMPONENT_DEFINE("SatGwPhy");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatGwPhy");
 
 NS_OBJECT_ENSURE_REGISTERED(SatGwPhy);
 
@@ -263,4 +265,5 @@ SatGwPhy::AssignNewSatChannels()
     returnLink->AddRx(m_phyRx);
 }
 
+}
 } // namespace ns3

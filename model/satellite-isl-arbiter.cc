@@ -28,10 +28,12 @@
 
 #include "ns3/singleton.h"
 
-NS_LOG_COMPONENT_DEFINE("SatIslArbiter");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatIslArbiter");
 
 NS_OBJECT_ENSURE_REGISTERED(SatIslArbiter);
 
@@ -71,4 +73,5 @@ SatIslArbiter::BaseDecide(Ptr<Packet> pkt, Mac48Address destination)
     return Decide(m_nodeId, targetId, pkt);
 }
 
+}
 } // namespace ns3

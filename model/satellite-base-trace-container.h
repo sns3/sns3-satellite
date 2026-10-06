@@ -29,6 +29,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -135,6 +137,7 @@ class SatBaseTraceContainer : public Object
   private:
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_BASE_TRACE_CONTAINER_H */

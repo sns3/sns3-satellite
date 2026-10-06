@@ -28,6 +28,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 NS_LOG_COMPONENT_DEFINE("LorawanMacHeader");
 
@@ -159,5 +161,7 @@ LorawanMacHeader::IsConfirmed(void) const
     NS_LOG_FUNCTION_NOARGS();
 
     return (m_mtype == CONFIRMED_DATA_DOWN) || (m_mtype == CONFIRMED_DATA_UP);
+}
+
 }
 } // namespace ns3

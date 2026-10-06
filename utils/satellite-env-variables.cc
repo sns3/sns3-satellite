@@ -35,10 +35,12 @@
 #include <mach-o/dyld.h>
 #endif
 
-NS_LOG_COMPONENT_DEFINE("SatEnvVariables");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatEnvVariables");
 
 NS_OBJECT_ENSURE_REGISTERED(SatEnvVariables);
 
@@ -672,4 +674,5 @@ SatEnvVariables::DumpRevisionDiff(std::string dataPath)
     outputContainer->WriteContainerToFile();
 }
 
+}
 } // namespace ns3

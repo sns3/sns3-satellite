@@ -28,6 +28,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -84,6 +86,7 @@ constexpr uint32_t MAX_SATELLITES = 10000;
 
 } // namespace SatConstVariables
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_CONST_VARIABLES_H */

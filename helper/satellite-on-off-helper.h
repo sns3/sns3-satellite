@@ -35,6 +35,9 @@ namespace ns3
 
 class DataRate;
 
+namespace satellite
+{
+
 /**
  * @ingroup satellite
  * @brief A helper to make it easier to instantiate an ns3::SatOnOffApplication
@@ -104,6 +107,7 @@ class SatOnOffHelper
     ObjectFactory m_factory; //!< Object factory.
 };
 
+}
 } // namespace ns3
 
 #endif /* SAT_ON_OFF_HELPER_H */

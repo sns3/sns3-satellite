@@ -33,10 +33,12 @@
 #include <string>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatIdMapper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatIdMapper");
 
 NS_OBJECT_ENSURE_REGISTERED(SatIdMapper);
 
@@ -746,4 +748,5 @@ SatIdMapper::PrintTraceMap() const
     }
 }
 
+}
 } // namespace ns3

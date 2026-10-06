@@ -50,10 +50,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatPhyRxCarrier");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatPhyRxCarrier");
 
 NS_OBJECT_ENSURE_REGISTERED(SatPhyRxCarrier);
 
@@ -774,4 +776,5 @@ SatPhyRxCarrier::SetAverageNormalizedOfferedLoadCallback(
     m_avgNormalizedOfferedLoadCallback = callback;
 }
 
+}
 } // namespace ns3

@@ -34,6 +34,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * Class representing the MAC layer of a Class A LoRaWAN device.
@@ -254,5 +256,8 @@ class LorawanMacEndDeviceClassA : public LorawanMacEndDevice
     uint8_t m_rx1DrOffset;
 
 }; /* LorawanMacEndDeviceClassA */
+
+}
 } /* namespace ns3 */
+
 #endif /* LORAWAN_MAC_END_DEVICE_CLASS_A_H */

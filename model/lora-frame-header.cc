@@ -29,6 +29,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 NS_LOG_COMPONENT_DEFINE("LoraFrameHeader");
 
@@ -589,4 +591,5 @@ LoraFrameHeader::AddCommand(Ptr<LorawanMacCommand> macCommand)
     m_fOptsLen += macCommand->GetSerializedSize();
 }
 
+}
 } // namespace ns3

@@ -24,10 +24,12 @@
 #include "ns3/log.h"
 #include "ns3/simulator.h"
 
-NS_LOG_COMPONENT_DEFINE("SatOutputFileStreamLongDoubleContainer");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatOutputFileStreamLongDoubleContainer");
 
 TypeId
 SatOutputFileStreamLongDoubleContainer::GetTypeId(void)
@@ -318,4 +320,5 @@ SatOutputFileStreamLongDoubleContainer::EnableFigureOutput(
     m_figureUnitConversionType = figureUnitConversionType;
 }
 
+}
 } // namespace ns3

@@ -28,6 +28,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -151,6 +153,7 @@ class SatUtMacState : public Object
     void CheckNcrRecoveryTimeout();
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_UT_MAC_STATE_H */

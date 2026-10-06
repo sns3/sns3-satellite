@@ -53,6 +53,9 @@ namespace ns3
 
 class PropagationDelayModel;
 
+namespace satellite
+{
+
 /**
  * @brief SatBeamHelper builds a set Satellite beams with needed objects and configuration.
  *        It utilizes SatUtHelper, SatGwHelper and SatOrbiterHelper to create needed objects.
@@ -573,6 +576,7 @@ class SatBeamHelper : public Object
     std::vector<std::pair<uint32_t, uint32_t>> m_isls;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_BEAM_HELPER_H */

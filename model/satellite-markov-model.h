@@ -26,6 +26,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -113,6 +115,7 @@ class SatMarkovModel : public Object
     void Reset();
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_MARKOV_MODEL_H */

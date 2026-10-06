@@ -32,6 +32,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -155,6 +157,7 @@ class SatTracedInterference : public SatInterference
     double m_rxBandwidth_Hz;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_TRACED_INTERFERENCE_H */

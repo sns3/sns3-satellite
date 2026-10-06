@@ -48,10 +48,12 @@
 #include <sstream>
 #include <string>
 
-NS_LOG_COMPONENT_DEFINE("SatStatsPacketCollisionHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatStatsPacketCollisionHelper");
 
 // BASE CLASS /////////////////////////////////////////////////////////////////
 
@@ -740,4 +742,5 @@ SatStatsUserEssaPacketCollisionHelper::GetTypeId()
     return tid;
 }
 
+}
 } // end of namespace ns3

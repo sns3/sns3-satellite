@@ -25,6 +25,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -65,6 +67,7 @@ class SatConstantPositionMobilityModel : public SatMobilityModel
     mutable GeoCoordinate m_geoPosition;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_CONSTANT_POSITION_MOBILITY_MODEL_H */

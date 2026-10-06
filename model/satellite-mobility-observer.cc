@@ -32,10 +32,12 @@
 #include <stdint.h>
 #include <string>
 
-NS_LOG_COMPONENT_DEFINE("SatMobilityObserver");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatMobilityObserver");
 
 NS_OBJECT_ENSURE_REGISTERED(SatMobilityObserver);
 
@@ -361,4 +363,5 @@ SatMobilityObserver::SatelliteStatusChanged()
     m_radiusRatio = m_earthRadius / satelliteRadius;
 }
 
+}
 } // namespace ns3

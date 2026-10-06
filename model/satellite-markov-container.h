@@ -34,6 +34,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -295,6 +297,7 @@ class SatMarkovContainer : public SatBaseFading
     void Reset();
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_MARKOV_CONTAINER_H */

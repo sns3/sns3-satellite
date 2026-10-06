@@ -25,6 +25,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -71,6 +73,7 @@ class SatOrbiterFeederLlc : public SatOrbiterLlc
     virtual void CreateDecap(Ptr<EncapKey> key);
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_ORBITER_FEEDER_LLC_H */

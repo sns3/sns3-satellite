@@ -46,10 +46,12 @@
 #include "ns3/satellite-typedefs.h"
 #include "ns3/singleton.h"
 
-NS_LOG_COMPONENT_DEFINE("SatGwHelperDvb");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatGwHelperDvb");
 
 void
 logonCallbackHelper(Ptr<SatNcc> ncc,
@@ -360,4 +362,5 @@ SatGwHelperDvb::Install(Ptr<Node> n,
     return dev;
 }
 
+}
 } // namespace ns3

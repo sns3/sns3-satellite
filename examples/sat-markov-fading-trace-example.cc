@@ -26,10 +26,12 @@
 #include <fstream>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("sat-markov-trace-example");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("sat-markov-trace-example");
 
 /**
  * @file sat-markov-fading-trace-example.cc
@@ -228,13 +230,14 @@ SatMarkovFadingExamplePlot::Run()
     Simulator::Destroy();
 }
 
+}
 } // namespace ns3
 
 int
 main(int argc, char* argv[])
 {
-    ns3::Ptr<ns3::SatMarkovFadingExamplePlot> stub;
-    stub = ns3::CreateObject<ns3::SatMarkovFadingExamplePlot>();
+    ns3::Ptr<ns3::satellite::SatMarkovFadingExamplePlot> stub;
+    stub = ns3::CreateObject<ns3::satellite::SatMarkovFadingExamplePlot>();
     ns3::Config::RegisterRootNamespaceObject(stub);
     stub->Run();
 

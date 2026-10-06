@@ -40,10 +40,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatRequestManager");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatRequestManager");
 
 NS_OBJECT_ENSURE_REGISTERED(SatRequestManager);
 
@@ -1022,4 +1024,5 @@ SatRequestManager::GetQuantizedVbdcValue(uint8_t index, uint16_t reqVbdcBytes) c
     return quantValue;
 }
 
+}
 } // namespace ns3

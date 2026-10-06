@@ -28,10 +28,12 @@
 #include <map>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatChannelPair");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatChannelPair");
 
 NS_OBJECT_ENSURE_REGISTERED(SatChannelPair);
 
@@ -176,4 +178,5 @@ SatChannelPair::StoreChannelPair(uint32_t satId,
     UpdateBeamsForFrequency(satId, beamId, fwdFrequencyId, rtnFrequencyId);
 }
 
+}
 } // namespace ns3

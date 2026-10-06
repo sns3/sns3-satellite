@@ -38,6 +38,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 class SatPhyRxCarrier;
 class SatPhyRxCarrierUplink;
@@ -240,6 +242,7 @@ class SatOrbiterFeederPhy : public SatPhy
     bool m_isSending;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_ORBITER_FEEDER_PHY_H */

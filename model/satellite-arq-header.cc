@@ -24,10 +24,12 @@
 
 #include <ostream>
 
-NS_LOG_COMPONENT_DEFINE("SatArqHeader");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatArqHeader");
 
 NS_OBJECT_ENSURE_REGISTERED(SatArqHeader);
 
@@ -99,4 +101,5 @@ SatArqHeader::SetSeqNo(uint8_t seqNo)
     m_seqNo = seqNo;
 }
 
+}
 } // namespace ns3

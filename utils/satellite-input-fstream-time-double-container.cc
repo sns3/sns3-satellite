@@ -24,10 +24,12 @@
 #include "ns3/log.h"
 #include "ns3/simulator.h"
 
-NS_LOG_COMPONENT_DEFINE("SatInputFileStreamTimeDoubleContainer");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatInputFileStreamTimeDoubleContainer");
 
 TypeId
 SatInputFileStreamTimeDoubleContainer::GetTypeId(void)
@@ -365,4 +367,5 @@ SatInputFileStreamTimeDoubleContainer::ClearContainer()
     m_timeShiftValue = 0;
 }
 
+}
 } // namespace ns3

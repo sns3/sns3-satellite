@@ -32,6 +32,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup lorawan
@@ -158,6 +160,7 @@ class SatLoraPhyRx : public SatPhyRx
     uint8_t m_sf;
 };
 
+}
 } /* namespace ns3 */
 
 #endif /* SAT_LORA_PHY_RX_H */

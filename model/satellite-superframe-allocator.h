@@ -33,6 +33,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -119,6 +121,7 @@ class SatSuperframeAllocator : public Object
     Ptr<SatSuperframeConf> m_superframeConf;
 };
 
+}
 } // namespace ns3
 
 #endif /* SAT_SUPERFRAME_ALLOCATOR_H */

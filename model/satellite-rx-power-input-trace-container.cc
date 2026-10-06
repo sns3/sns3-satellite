@@ -32,10 +32,12 @@
 #include <string>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatRxPowerInputTraceContainer");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatRxPowerInputTraceContainer");
 
 NS_OBJECT_ENSURE_REGISTERED(SatRxPowerInputTraceContainer);
 
@@ -158,4 +160,5 @@ SatRxPowerInputTraceContainer::GetRxPowerDensity(key_t key)
         SatBaseTraceContainer::RX_POWER_TRACE_DEFAULT_RX_POWER_DENSITY_INDEX);
 }
 
+}
 } // namespace ns3

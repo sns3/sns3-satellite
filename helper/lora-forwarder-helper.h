@@ -36,6 +36,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * This class can be used to install LoraForwarder applications on a set of
@@ -82,6 +84,7 @@ class LoraForwarderHelper : public Object
     ObjectFactory m_factory;
 };
 
+}
 } // namespace ns3
 
 #endif /* LORA_FORWARDER_HELPER_H */

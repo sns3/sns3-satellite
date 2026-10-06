@@ -42,10 +42,12 @@
 #include <sstream>
 #include <string>
 
-NS_LOG_COMPONENT_DEFINE("SatStatsAntennaGainHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatStatsAntennaGainHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(SatStatsAntennaGainHelper);
 
@@ -487,4 +489,5 @@ SatStatsAntennaGainHelper::InstallProbes()
     }
 }
 
+}
 } // namespace ns3

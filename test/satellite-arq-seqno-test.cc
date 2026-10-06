@@ -35,7 +35,10 @@
 #include <deque>
 #include <vector>
 
-using namespace ns3;
+namespace ns3
+{
+namespace satellite
+{
 
 /**
  * @file satellite-arq-seqno-test.cc
@@ -114,5 +117,8 @@ SatArqSeqNoTraceSuite::SatArqSeqNoTraceSuite()
     AddTestCase(new SatSeqNoTestCase, TestCase::Duration::QUICK);
 }
 
+}
+} // namespace ns3
+
 // Do allocate an instance of this TestSuite
-static SatArqSeqNoTraceSuite SatSeqNoTestSuite;
+static ns3::satellite::SatArqSeqNoTraceSuite SatSeqNoTestSuite;

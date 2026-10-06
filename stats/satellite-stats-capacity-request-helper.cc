@@ -37,10 +37,12 @@
 #include <sstream>
 #include <string>
 
-NS_LOG_COMPONENT_DEFINE("SatStatsCapacityRequestHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatStatsCapacityRequestHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(SatStatsCapacityRequestHelper);
 
@@ -135,4 +137,5 @@ SatStatsCapacityRequestHelper::DoInstall()
 
 } // end of `void DoInstall ();`
 
+}
 } // end of namespace ns3

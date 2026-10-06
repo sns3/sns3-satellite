@@ -34,7 +34,10 @@
 
 #include <stdint.h>
 
-using namespace ns3;
+namespace ns3
+{
+namespace satellite
+{
 
 // #define PRINT_POSITION_INFO // uncomment to see info while executing test
 
@@ -159,5 +162,8 @@ GeoCoordinateTestSuite::GeoCoordinateTestSuite()
     AddTestCase(new GeoCoordinateTestCase, TestCase::Duration::QUICK);
 }
 
+}
+} // namespace ns3
+
 // Do allocate an instance of this TestSuite
-static GeoCoordinateTestSuite geoCoordinateTestSuite;
+static ns3::satellite::GeoCoordinateTestSuite geoCoordinateTestSuite;

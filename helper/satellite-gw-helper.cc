@@ -39,10 +39,12 @@
 
 #include <string>
 
-NS_LOG_COMPONENT_DEFINE("SatGwHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatGwHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(SatGwHelper);
 
@@ -260,4 +262,5 @@ SatGwHelper::EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase&
     TraceConnect("Creation", "SatGwHelper", cb);
 }
 
+}
 } // namespace ns3

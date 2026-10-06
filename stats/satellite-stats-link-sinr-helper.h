@@ -31,12 +31,17 @@
 namespace ns3
 {
 
+class Node;
+
+class DataCollectionObject;
+class DistributionCollector;
+
+namespace satellite
+{
+
 // BASE CLASS /////////////////////////////////////////////////////////////////
 
 class SatHelper;
-class Node;
-class DataCollectionObject;
-class DistributionCollector;
 
 /**
  * @ingroup satstats
@@ -285,6 +290,7 @@ class SatStatsRtnUserLinkSinrHelper : public SatStatsLinkSinrHelper
 
 }; // end of class SatStatsRtnUserLinkSinrHelper
 
+}
 } // end of namespace ns3
 
 #endif /* SATELLITE_STATS_LINK_SINR_HELPER_H */

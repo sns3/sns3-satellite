@@ -53,7 +53,10 @@
 
 #include <vector>
 
-using namespace ns3;
+namespace ns3
+{
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -700,5 +703,8 @@ SatArqTestSuite::SatArqTestSuite()
     AddTestCase(new SatFwdArqTestCase, TestCase::Duration::QUICK);
 }
 
+}
+} // namespace ns3
+
 // Do allocate an instance of this TestSuite
-static SatArqTestSuite satArqTestSuite;
+static ns3::satellite::SatArqTestSuite satArqTestSuite;

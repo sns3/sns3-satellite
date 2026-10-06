@@ -34,6 +34,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /*
  * The macro definitions following this comment block are used to declare the
@@ -817,6 +819,7 @@ class SatStatsHelperContainer : public Object
 
 }; // end of class StatStatsHelperContainer
 
+}
 } // end of namespace ns3
 
 #endif /* SATELLITE_STATS_HELPER_CONTAINER_H */

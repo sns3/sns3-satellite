@@ -33,6 +33,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -305,6 +307,7 @@ class SatQueue : public Object
     LogonCallback m_logonCallback;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_QUEUE_H_ */
@@ -340,6 +343,8 @@ class SatQueue : public Object
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -612,6 +617,7 @@ class SatQueue : public Object
     LogonCallback m_logonCallback;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_QUEUE_H_ */
@@ -647,6 +653,8 @@ class SatQueue : public Object
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -919,6 +927,7 @@ class SatQueue : public Object
     LogonCallback m_logonCallback;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_QUEUE_H_ */

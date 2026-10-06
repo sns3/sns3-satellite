@@ -30,6 +30,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -126,6 +128,7 @@ class SatOutputFileStreamStringContainer : public Object
     std::ios::openmode m_fileMode;
 };
 
+}
 } // namespace ns3
 
 #endif /* SAT_OUTPUT_FSTREAM_STRING_CONTAINER_H */

@@ -39,12 +39,14 @@
 #include <string>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatAntennaGainPatternContainer");
-
 const std::string numbers{"0123456789"};
 
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatAntennaGainPatternContainer");
 
 NS_OBJECT_ENSURE_REGISTERED(SatAntennaGainPatternContainer);
 
@@ -340,4 +342,5 @@ SatAntennaGainPatternContainer::SetEnabledBeams(BeamUserInfoMap_t& info)
     }
 }
 
+}
 } // namespace ns3

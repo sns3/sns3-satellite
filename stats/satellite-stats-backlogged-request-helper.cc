@@ -36,10 +36,12 @@
 #include <string>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatStatsBackloggedRequestHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatStatsBackloggedRequestHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(SatStatsBackloggedRequestHelper);
 
@@ -127,4 +129,5 @@ SatStatsBackloggedRequestHelper::DoInstall()
 
 } // end of `void DoInstall ();`
 
+}
 } // end of namespace ns3

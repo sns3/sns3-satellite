@@ -29,6 +29,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * This class represents a logical LoRaWAN channel.
@@ -139,6 +141,7 @@ bool operator==(const Ptr<LoraLogicalChannel>& first, const Ptr<LoraLogicalChann
  */
 bool operator!=(const Ptr<LoraLogicalChannel>& first, const Ptr<LoraLogicalChannel>& second);
 
+}
 } // namespace ns3
 
 #endif /* LORA_LOGICAL_CHANNEL_H */

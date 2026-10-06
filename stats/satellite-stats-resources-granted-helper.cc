@@ -47,10 +47,12 @@
 #include <string>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatStatsResourcesGrantedHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatStatsResourcesGrantedHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(SatStatsResourcesGrantedHelper);
 
@@ -503,4 +505,5 @@ SatStatsResourcesGrantedHelper::UpdateIdentifierOnProbes()
     }
 } // end of `void UpdateIdentifierOnProbes ();`
 
+}
 } // end of namespace ns3

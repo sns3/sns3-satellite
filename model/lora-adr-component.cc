@@ -29,6 +29,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 ////////////////////////////////////////
 // LinkAdrRequest commands management //
@@ -485,5 +487,7 @@ LoraAdrComponent::GetTxPowerIndex(int txPower)
     {
         return 7;
     }
+}
+
 }
 } // namespace ns3

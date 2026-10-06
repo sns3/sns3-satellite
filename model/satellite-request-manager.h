@@ -41,6 +41,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -562,6 +564,7 @@ class SatRequestManager : public Object
     double m_headerOffsetVbcd;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_REQUEST_MANAGER_H_ */

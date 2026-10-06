@@ -36,7 +36,10 @@
 
 #include <stdint.h>
 
-using namespace ns3;
+namespace ns3
+{
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -145,5 +148,8 @@ SatFreeSpaceLossTestSuite::SatFreeSpaceLossTestSuite()
     AddTestCase(new SatFreeSpaceLossTestCase, TestCase::Duration::QUICK);
 }
 
+}
+} // namespace ns3
+
 // Do allocate an instance of this TestSuite
-static SatFreeSpaceLossTestSuite satFslTestSuite;
+static ns3::satellite::SatFreeSpaceLossTestSuite satFslTestSuite;

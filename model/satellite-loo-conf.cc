@@ -27,9 +27,12 @@
 
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatLooConf");
 
 NS_OBJECT_ENSURE_REGISTERED(SatLooConf);
-NS_LOG_COMPONENT_DEFINE("SatLooConf");
 
 static const double g_LooParameters
     [SatMarkovConf::DEFAULT_ELEVATION_COUNT][SatMarkovConf::DEFAULT_STATE_COUNT]
@@ -137,4 +140,5 @@ SatLooConf::DoDispose()
     SatBaseFaderConf::DoDispose();
 }
 
+}
 } // namespace ns3

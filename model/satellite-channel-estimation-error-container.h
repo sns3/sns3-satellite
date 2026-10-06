@@ -30,6 +30,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -164,6 +166,7 @@ class SatRtnLinkChannelEstimationErrorContainer : public SatChannelEstimationErr
     std::map<uint32_t, Ptr<SatChannelEstimationError>> m_channelEstimationErrors;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_CHANNEL_ESTIMATION_ERROR_CONTAINER_H_ */

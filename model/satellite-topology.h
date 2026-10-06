@@ -50,6 +50,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -880,6 +882,7 @@ class SatTopology : public Object
     bool m_enableMapPrint; // Is map printing enabled or not
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_TOPOLOGY_H */

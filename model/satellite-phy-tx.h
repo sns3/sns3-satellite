@@ -39,6 +39,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 class SatChannel;
 
@@ -204,6 +206,7 @@ class SatPhyTx : public Object
     double m_defaultFadingValue;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_PHY_TX_H */

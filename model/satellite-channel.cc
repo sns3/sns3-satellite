@@ -48,10 +48,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatChannel");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatChannel");
 
 NS_OBJECT_ENSURE_REGISTERED(SatChannel);
 
@@ -795,4 +797,5 @@ SatChannel::GetDevice(std::size_t i) const
     return m_phyRxContainer.at(i)->GetDevice()->GetObject<NetDevice>();
 }
 
+}
 } // namespace ns3

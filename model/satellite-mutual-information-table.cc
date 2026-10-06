@@ -32,10 +32,12 @@
 #include <stdint.h>
 #include <string>
 
-NS_LOG_COMPONENT_DEFINE("SatMutualInformationTable");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatMutualInformationTable");
 
 NS_OBJECT_ENSURE_REGISTERED(SatMutualInformationTable);
 
@@ -266,4 +268,5 @@ SatMutualInformationTable::Load(std::string mutualInformationPath)
 
 } // end of void Load (std::string mutualInformationPath)
 
+}
 } // end of namespace ns3

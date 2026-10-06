@@ -48,7 +48,10 @@
 #include "ns3/string.h"
 #include "ns3/test.h"
 
-using namespace ns3;
+namespace ns3
+{
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -2087,5 +2090,8 @@ SatRegenerationTestSuite::SatRegenerationTestSuite()
         TestCase::Duration::QUICK);
 }
 
+}
+} // namespace ns3
+
 // Allocate an instance of this TestSuite
-static SatRegenerationTestSuite satRegenerationTestSuite;
+static ns3::satellite::SatRegenerationTestSuite satRegenerationTestSuite;

@@ -33,10 +33,12 @@
 #include <string>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatFadingExternalInputTrace");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatFadingExternalInputTrace");
 
 SatFadingExternalInputTrace::SatFadingExternalInputTrace()
     : m_traceFileType(),
@@ -195,4 +197,5 @@ SatFadingExternalInputTrace::TestFadingTrace() const
     return true;
 }
 
+}
 } // namespace ns3

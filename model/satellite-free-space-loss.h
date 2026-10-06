@@ -25,6 +25,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -69,6 +71,7 @@ class SatFreeSpaceLoss : public Object
     virtual double GetFsldB(Ptr<MobilityModel> a, Ptr<MobilityModel> b, double frequencyHz) const;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_FREE_SPACE_LOSS_H */

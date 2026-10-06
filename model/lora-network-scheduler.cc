@@ -24,10 +24,12 @@
 
 #include <stdint.h>
 
-NS_LOG_COMPONENT_DEFINE("LoraNetworkScheduler");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("LoraNetworkScheduler");
 
 NS_OBJECT_ENSURE_REGISTERED(LoraNetworkScheduler);
 
@@ -177,5 +179,7 @@ LoraNetworkScheduler::OnReceiveWindowOpportunity(LoraDeviceAddress deviceAddress
             m_status->GetEndDeviceStatus(deviceAddress)->InitializeReply();
         }
     }
+}
+
 }
 } // namespace ns3

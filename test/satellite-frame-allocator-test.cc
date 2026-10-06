@@ -40,7 +40,10 @@
 
 #include <algorithm>
 
-using namespace ns3;
+namespace ns3
+{
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -812,5 +815,8 @@ SatFrameAllocatorTestSuite::SatFrameAllocatorTestSuite()
     AddTestCase(new SatFrameAllocatorTestCase, TestCase::Duration::QUICK);
 }
 
+}
+} // namespace ns3
+
 // Do allocate an instance of this TestSuite
-static SatFrameAllocatorTestSuite satFrameAllocatorTestSuite;
+static ns3::satellite::SatFrameAllocatorTestSuite satFrameAllocatorTestSuite;

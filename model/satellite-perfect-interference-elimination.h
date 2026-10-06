@@ -26,6 +26,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -84,6 +86,7 @@ class SatPerfectInterferenceElimination : public SatInterferenceElimination
     double GetResidualPower(Ptr<SatSignalParameters> processedPacket, double EsNo);
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_TRACED_INTERFERENCE_ELIMINATION_H */

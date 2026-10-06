@@ -25,6 +25,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -89,6 +91,7 @@ class SatFwdCarrierConf : public SimpleRefCount<SatFwdCarrierConf>
     double m_effectiveBandwidthInHz;
 };
 
+}
 } // namespace ns3
 
 #endif // SATELLITE_FWD_CARRIER_CONF_H

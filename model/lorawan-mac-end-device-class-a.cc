@@ -38,6 +38,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 NS_LOG_COMPONENT_DEFINE("LorawanMacEndDeviceClassA");
 
@@ -725,4 +727,5 @@ LorawanMacEndDeviceClassA::OnRxClassParamSetupReq(Ptr<RxParamSetupReq> rxParamSe
     m_macCommandList.push_back(CreateObject<RxParamSetupAns>(offsetOk, dataRateOk, true));
 }
 
+}
 } /* namespace ns3 */

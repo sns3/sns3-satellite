@@ -32,6 +32,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -202,6 +204,7 @@ class SatReturnLinkEncapsulator : public SatBaseEncapsulator
     const uint32_t MAX_HL_PDU_PACKET_SIZE;
 };
 
+}
 } // namespace ns3
 
 #endif // SATELLITE_RETURN_LINK_ENCAPSULATOR

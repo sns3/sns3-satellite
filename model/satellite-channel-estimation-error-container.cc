@@ -29,10 +29,12 @@
 #include <string>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatFwdLinkChannelEstimationErrorContainer");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatFwdLinkChannelEstimationErrorContainer");
 
 /**
  * SatChannelEstimationErrorContainer
@@ -156,4 +158,5 @@ SatRtnLinkChannelEstimationErrorContainer::DoAddError(double sinrIn, uint32_t wf
     return 0.0;
 }
 
+}
 } // namespace ns3

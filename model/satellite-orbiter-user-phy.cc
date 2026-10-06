@@ -46,10 +46,12 @@
 #include <queue>
 #include <tuple>
 
-NS_LOG_COMPONENT_DEFINE("SatOrbiterUserPhy");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatOrbiterUserPhy");
 
 NS_OBJECT_ENSURE_REGISTERED(SatOrbiterUserPhy);
 
@@ -545,4 +547,5 @@ SatOrbiterUserPhy::SetSendControlMsgToFeederCallback(SendControlMsgToFeederCallb
     m_txCtrlFeederCallback = cb;
 }
 
+}
 } // namespace ns3

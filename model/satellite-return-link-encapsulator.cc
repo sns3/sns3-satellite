@@ -33,10 +33,12 @@
 
 #include <algorithm>
 
-NS_LOG_COMPONENT_DEFINE("SatReturnLinkEncapsulator");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatReturnLinkEncapsulator");
 
 NS_OBJECT_ENSURE_REGISTERED(SatReturnLinkEncapsulator);
 
@@ -539,4 +541,5 @@ SatReturnLinkEncapsulator::GetMinTxOpportunityInBytes() const
     return m_minTxOpportunity;
 }
 
+}
 } // namespace ns3

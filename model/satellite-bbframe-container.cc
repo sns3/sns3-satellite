@@ -33,10 +33,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatBbFrameContainer");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatBbFrameContainer");
 
 NS_OBJECT_ENSURE_REGISTERED(SatBbFrameContainer);
 
@@ -451,4 +453,5 @@ SatBbFrameContainer::MergeBbFrames(double carrierBandwidthInHz)
     }
 }
 
+}
 } // namespace ns3

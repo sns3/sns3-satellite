@@ -24,10 +24,12 @@
 #include "ns3/nstime.h"
 #include "ns3/object.h"
 
-NS_LOG_COMPONENT_DEFINE("SatSuperframeSeq");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatSuperframeSeq");
 
 NS_OBJECT_ENSURE_REGISTERED(SatSuperframeSeq);
 
@@ -200,4 +202,5 @@ SatSuperframeSeq::GetCarrierBandwidthHz(uint32_t carrierId,
                                                                   bandwidthType);
 }
 
+}
 } // namespace ns3

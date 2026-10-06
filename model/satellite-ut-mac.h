@@ -49,6 +49,11 @@ namespace ns3
 
 class Packet;
 class Mac48Address;
+class UniformRandomVariable;
+
+namespace satellite
+{
+
 class SatSuperframeSeq;
 class SatNodeInfo;
 class SatFrameConf;
@@ -56,7 +61,6 @@ class SatTbtpMessage;
 class SatWaveform;
 class SatTimeSlotConf;
 class SatTbtpContainer;
-class UniformRandomVariable;
 
 /**
  * @ingroup satellite
@@ -823,6 +827,7 @@ class SatUtMac : public SatMac
     SatUtMac::UpdateAddressAndIdentifierCallback m_updateAddressAndIdentifierCallback;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_UT_MAC_H */

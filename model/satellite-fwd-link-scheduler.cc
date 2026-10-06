@@ -42,10 +42,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatFwdLinkScheduler");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatFwdLinkScheduler");
 
 NS_OBJECT_ENSURE_REGISTERED(SatFwdLinkScheduler);
 
@@ -406,4 +408,5 @@ SatFwdLinkScheduler::CreateCnoEstimator()
     return estimator;
 }
 
+}
 } // namespace ns3

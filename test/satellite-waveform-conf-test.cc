@@ -38,7 +38,10 @@
 #include "ns3/singleton.h"
 #include "ns3/test.h"
 
-using namespace ns3;
+namespace ns3
+{
+namespace satellite
+{
 
 /**
  * @file satellite-waveform-conf-test.cc
@@ -217,5 +220,8 @@ SatWaveformConfTestSuite::SatWaveformConfTestSuite()
     AddTestCase(new SatDvbS2BbFrameConfTestCase, TestCase::Duration::QUICK);
 }
 
+}
+} // namespace ns3
+
 // Do allocate an instance of this TestSuite
-static SatWaveformConfTestSuite satWaveformConfTestSuite;
+static ns3::satellite::SatWaveformConfTestSuite satWaveformConfTestSuite;

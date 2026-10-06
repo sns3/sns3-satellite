@@ -28,6 +28,7 @@
 #include <iostream>
 
 using namespace ns3;
+using namespace ns3::satellite;
 
 Ptr<SatMobilityModel> satMobility = nullptr;
 std::set<std::pair<uint32_t, uint32_t>> visitedBeams;

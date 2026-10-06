@@ -38,6 +38,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 class SatPhyRxCarrier;
 
@@ -223,6 +225,7 @@ class SatPhyRxCarrierPerSlot : public SatPhyRxCarrier
                                              // less precise
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_PHY_RX_CARRIER_PER_SLOT_H */

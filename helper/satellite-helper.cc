@@ -64,10 +64,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(SatHelper);
 
@@ -612,7 +614,7 @@ SatHelper::CreateUserDefinedScenarioFromListPositions(uint32_t satId,
 
                 if (bestBeamId != it->first.second)
                 {
-                    NS_FATAL_ERROR("The beam: " << it->first << " is not the best beam ("
+                    NS_FATAL_ERROR("The beam: " << it->first.first << " is not the best beam ("
                                                 << bestBeamId
                                                 << ") for the position: " << position);
                 }
@@ -1891,4 +1893,5 @@ SatHelper::ReadStandard(std::string pathName)
     Singleton<SatTopology>::Get()->SetStandard(m_standard);
 }
 
+}
 } // namespace ns3

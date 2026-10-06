@@ -37,6 +37,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * This class can install Network Server applications on multiple nodes at once.
@@ -85,6 +87,7 @@ class LoraNetworkServerHelper : public Object
     ObjectFactory m_adrSupportFactory;
 };
 
+}
 } // namespace ns3
 
 #endif /* LORA_NETWORK_SERVER_HELPER_H */

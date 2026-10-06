@@ -33,6 +33,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 class SatPhyRxCarrierConf;
 class SatPhyRxCarrier;
@@ -107,6 +109,7 @@ class SatPhyRxCarrierUplink : public SatPhyRxCarrier
         Address rxAddress);
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_PHY_RX_CARRIER_UPLINK_H */

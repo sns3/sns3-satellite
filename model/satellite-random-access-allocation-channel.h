@@ -31,6 +31,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -458,6 +460,7 @@ class SatRandomAccessAllocationChannel : public Object
     uint32_t m_fSimPhysicalLayerFrameInMilliSeconds;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_RANDOM_ACCESS_ALLOCATION_CHANNEL_H */

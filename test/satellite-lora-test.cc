@@ -53,7 +53,10 @@
 #include <iostream>
 #include <stdint.h>
 
-using namespace ns3;
+namespace ns3
+{
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -875,5 +878,8 @@ SatLoraTestSuite::SatLoraTestSuite()
     AddTestCase(new SatLoraCbrTestCase, TestCase::Duration::QUICK);
 }
 
+}
+} // namespace ns3
+
 // Do allocate an instance of this TestSuite
-static SatLoraTestSuite satLoraTestSuite;
+static ns3::satellite::SatLoraTestSuite satLoraTestSuite;

@@ -40,10 +40,12 @@
 #include "ns3/pointer.h"
 #include "ns3/trace-source-accessor.h"
 
-NS_LOG_COMPONENT_DEFINE("SatNetDevice");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatNetDevice");
 
 NS_OBJECT_ENSURE_REGISTERED(SatNetDevice);
 
@@ -608,4 +610,5 @@ SatNetDevice::GetChannel(void) const
     return 0;
 }
 
+}
 } // namespace ns3

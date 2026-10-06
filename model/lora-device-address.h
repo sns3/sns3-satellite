@@ -31,6 +31,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * Class representing the NetworkId component of a LoraDeviceAddress (7 bits).
@@ -219,6 +221,7 @@ class LoraDeviceAddress
  */
 std::ostream& operator<<(std::ostream& os, const LoraDeviceAddress& address);
 
+}
 } // namespace ns3
 
 #endif

@@ -32,12 +32,17 @@
 namespace ns3
 {
 
+class Node;
+class Time;
+
+class DataCollectionObject;
+
+namespace satellite
+{
+
 // BASE CLASS /////////////////////////////////////////////////////////////////
 
 class SatHelper;
-class Node;
-class Time;
-class DataCollectionObject;
 
 /**
  * @ingroup satstats
@@ -93,6 +98,7 @@ class SatStatsFwdLinkSchedulerSymbolRateHelper : public SatStatsHelper
 
 }; // end of class SatStatsFwdLinkSchedulerSymbolRateHelper
 
+}
 } // end of namespace ns3
 
 #endif /* SATELLITE_STATS_FWD_LINK_SCHEDULER_SYMBOL_RATE_HELPER_H */

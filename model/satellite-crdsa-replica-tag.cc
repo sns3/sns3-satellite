@@ -25,10 +25,12 @@
 #include <ostream>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatCrdsaReplicaTag");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatCrdsaReplicaTag");
 
 NS_OBJECT_ENSURE_REGISTERED(SatCrdsaReplicaTag);
 
@@ -123,4 +125,5 @@ SatCrdsaReplicaTag::Print(std::ostream& os) const
     }
 }
 
+}
 } // namespace ns3

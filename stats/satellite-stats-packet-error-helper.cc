@@ -51,10 +51,12 @@
 #include <string>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatStatsPacketErrorHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatStatsPacketErrorHelper");
 
 // BASE CLASS /////////////////////////////////////////////////////////////////
 
@@ -1011,4 +1013,5 @@ SatStatsUserEssaPacketErrorHelper::GetTypeId()
     return tid;
 }
 
+}
 } // end of namespace ns3

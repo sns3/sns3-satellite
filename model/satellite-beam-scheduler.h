@@ -50,6 +50,10 @@ namespace ns3
 
 class Address;
 class Ipv4Address;
+
+namespace satellite
+{
+
 class SatControlMessage;
 class SatCrMessage;
 class SatTbtpMessage;
@@ -738,6 +742,7 @@ class SatBeamScheduler : public Object
     bool m_useLora;
 };
 
+}
 } // namespace ns3
 
 #endif /* SAT_BEAM_SCHEDULER_H */

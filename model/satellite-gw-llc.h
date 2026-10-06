@@ -30,6 +30,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -149,6 +151,7 @@ class SatGwLlc : public SatLlc
     virtual SatEnums::SatLinkDir_t GetSatLinkRxDir();
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_GW_LLC_H_ */

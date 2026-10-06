@@ -39,6 +39,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -96,6 +98,7 @@ class SatLorawanNetDevice : public SatNetDevice
     ReceiveCallback m_rxNetworkServerCallback;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_LORAWAN_NET_DEVICE_H */

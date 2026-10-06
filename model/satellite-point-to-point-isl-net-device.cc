@@ -39,10 +39,12 @@
 
 #include <cstddef>
 
-NS_LOG_COMPONENT_DEFINE("PointToPointIslNetDevice");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("PointToPointIslNetDevice");
 
 NS_OBJECT_ENSURE_REGISTERED(PointToPointIslNetDevice);
 
@@ -551,4 +553,5 @@ PointToPointIslNetDevice::EtherToPpp(uint16_t proto)
     return 0;
 }
 
+}
 } // namespace ns3

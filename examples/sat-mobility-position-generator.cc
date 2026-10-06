@@ -28,6 +28,7 @@
 #include <iostream>
 
 using namespace ns3;
+using namespace ns3::satellite;
 
 /**
  * @file sat-mobility-position-generator.cc

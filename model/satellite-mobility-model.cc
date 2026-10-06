@@ -29,6 +29,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 NS_OBJECT_ENSURE_REGISTERED(SatMobilityModel);
 
@@ -131,4 +133,5 @@ SatMobilityModel::DoSetCartesianPosition(const Vector& position) const
     m_cartesianPosition = position;
 }
 
+}
 } // namespace ns3

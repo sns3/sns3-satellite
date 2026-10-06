@@ -34,10 +34,12 @@
 #include <tuple>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatNcc");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatNcc");
 
 NS_OBJECT_ENSURE_REGISTERED(SatNcc);
 
@@ -619,4 +621,5 @@ SatNcc::CheckTimeout(Address utId, uint32_t satId, uint32_t beamId)
     }
 }
 
+}
 } // namespace ns3

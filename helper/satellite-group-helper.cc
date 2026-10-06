@@ -33,10 +33,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatGroupHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatGroupHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(SatGroupHelper);
 
@@ -360,4 +362,5 @@ SatGroupHelper::GetNodesNotAddedFromPosition(NodeContainer nodes)
     return nodesFiltered;
 }
 
+}
 } // namespace ns3

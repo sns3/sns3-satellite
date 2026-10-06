@@ -40,6 +40,10 @@ namespace ns3
 class Time;
 class Address;
 class Packet;
+
+namespace satellite
+{
+
 class SatControlMessage;
 class SatSchedulingObject;
 class SatNodeInfo;
@@ -466,6 +470,7 @@ class SatLlc : public Object
     SatEnums::RegenerationMode_t m_returnLinkRegenerationMode;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_LLC_H_ */

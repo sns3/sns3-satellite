@@ -33,6 +33,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 class SatMobilityModel;
 
@@ -137,6 +139,7 @@ class SatAntennaGainPatternContainer : public Object
     std::map<uint32_t, Ptr<SatMobilityModel>> m_mobilityModelMap;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_ANTENNA_GAIN_PATTERN_CONTAINER_H_ */

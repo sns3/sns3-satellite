@@ -40,6 +40,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -620,6 +622,7 @@ class SimulationHelperConf : public Object
     std::string m_mobileUtsFolder;
 };
 
+}
 } // namespace ns3
 
 #endif /* TEST_SCRIPT_INPUT_HELPER_H */

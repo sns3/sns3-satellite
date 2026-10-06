@@ -31,6 +31,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 class LoraGatewayStatus : public Object
 {
@@ -95,6 +97,8 @@ class LoraGatewayStatus : public Object
 
     Time m_nextTransmissionTime; //!< This gateway's next transmission time
 };
+
+}
 } // namespace ns3
 
 #endif /* LORA_GATEWAY_STATUS_H */

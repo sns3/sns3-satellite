@@ -45,10 +45,12 @@
 #include <string>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatStatsPacketDropRateHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatStatsPacketDropRateHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(SatStatsPacketDropRateHelper);
 
@@ -272,4 +274,5 @@ SatStatsPacketDropRateHelper::InstallProbes()
     }
 }
 
+}
 } // namespace ns3

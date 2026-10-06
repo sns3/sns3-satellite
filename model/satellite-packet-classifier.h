@@ -33,6 +33,9 @@ namespace ns3
 
 class Packet;
 
+namespace satellite
+{
+
 /**
  * @ingroup satellite
  *
@@ -79,6 +82,7 @@ class SatPacketClassifier : public SimpleRefCount<SatPacketClassifier>
   private:
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_PACKET_CLASSIFIER_H_ */

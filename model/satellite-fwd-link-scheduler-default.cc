@@ -25,10 +25,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatFwdLinkSchedulerDefault");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatFwdLinkSchedulerDefault");
 
 NS_OBJECT_ENSURE_REGISTERED(SatFwdLinkSchedulerDefault);
 
@@ -259,4 +261,5 @@ SatFwdLinkSchedulerDefault::GetSchedulingObjects(std::vector<Ptr<SatSchedulingOb
     }
 }
 
+}
 } // namespace ns3

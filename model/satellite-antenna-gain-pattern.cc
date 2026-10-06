@@ -36,10 +36,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatAntennaGainPattern");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatAntennaGainPattern");
 
 const std::string SatAntennaGainPattern::m_nanStringArray[4] = {"nan", "NaN", "Nan", "NAN"};
 
@@ -460,4 +462,5 @@ SatAntennaGainPattern::GetAntennaGain_lin(GeoCoordinate coord, Ptr<SatMobilityMo
     return gain;
 }
 
+}
 } // namespace ns3

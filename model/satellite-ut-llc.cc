@@ -42,10 +42,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatUtLlc");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatUtLlc");
 
 NS_OBJECT_ENSURE_REGISTERED(SatLlc);
 
@@ -508,4 +510,5 @@ SatUtLlc::SetGwAddress(Mac48Address address)
     m_requestManager->SetGwAddress(address);
 }
 
+}
 } // namespace ns3

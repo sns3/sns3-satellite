@@ -30,6 +30,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -111,6 +113,7 @@ class SatChannelEstimationError : public Object
     std::vector<double> m_stdCesDb;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_CHANNEL_ESTIMATION_ERROR_H_ */

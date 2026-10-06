@@ -37,10 +37,12 @@
 #include <tuple>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatFrameConf");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatFrameConf");
 
 // BTU conf
 
@@ -1302,7 +1304,7 @@ SatSuperframeConf0::GetTypeId(void)
 {
     static TypeId tid =
         TypeId("ns3::SatSuperframeConf0")
-            .SetParent<ns3::SatSuperframeConf>()
+            .SetParent<ns3::satellite::SatSuperframeConf>()
             .AddConstructor<SatSuperframeConf0>() ADD_SUPER_FRAME_ATTRIBUTES(
                 10,
                 SatSuperframeConf::CONFIG_TYPE_0,
@@ -1396,7 +1398,7 @@ SatSuperframeConf1::GetTypeId(void)
 {
     static TypeId tid =
         TypeId("ns3::SatSuperframeConf1")
-            .SetParent<ns3::SatSuperframeConf>()
+            .SetParent<ns3::satellite::SatSuperframeConf>()
             .AddConstructor<SatSuperframeConf1>() ADD_SUPER_FRAME_ATTRIBUTES(
                 10,
                 SatSuperframeConf::CONFIG_TYPE_1,
@@ -1490,7 +1492,7 @@ SatSuperframeConf2::GetTypeId(void)
 {
     static TypeId tid =
         TypeId("ns3::SatSuperframeConf2")
-            .SetParent<ns3::SatSuperframeConf>()
+            .SetParent<ns3::satellite::SatSuperframeConf>()
             .AddConstructor<SatSuperframeConf2>() ADD_SUPER_FRAME_ATTRIBUTES(
                 10,
                 SatSuperframeConf::CONFIG_TYPE_2,
@@ -1584,7 +1586,7 @@ SatSuperframeConf3::GetTypeId(void)
 {
     static TypeId tid =
         TypeId("ns3::SatSuperframeConf3")
-            .SetParent<ns3::SatSuperframeConf>()
+            .SetParent<ns3::satellite::SatSuperframeConf>()
             .AddConstructor<SatSuperframeConf3>() ADD_SUPER_FRAME_ATTRIBUTES(
                 10,
                 SatSuperframeConf::CONFIG_TYPE_3,
@@ -1678,7 +1680,7 @@ SatSuperframeConf4::GetTypeId(void)
 {
     static TypeId tid =
         TypeId("ns3::SatSuperframeConf4")
-            .SetParent<ns3::SatSuperframeConf>()
+            .SetParent<ns3::satellite::SatSuperframeConf>()
             .AddConstructor<SatSuperframeConf4>()
                 ADD_SUPER_FRAME_ATTRIBUTES(1, SatSuperframeConf::CONFIG_TYPE_4, 0)
                     ADD_FRAME_ATTRIBUTES(0,
@@ -1702,4 +1704,5 @@ SatSuperframeConf4::DoConfigure()
     NS_LOG_FUNCTION(this);
 }
 
+}
 } // namespace ns3

@@ -36,13 +36,17 @@
 namespace ns3
 {
 
+class Node;
+class ErrorModel;
+
+namespace satellite
+{
+
+class SatNodeInfo;
+class SatControlMessage;
 class SatPhy;
 class SatMac;
 class SatLlc;
-class Node;
-class ErrorModel;
-class SatNodeInfo;
-class SatControlMessage;
 
 /**
  * @ingroup satellite
@@ -255,6 +259,7 @@ class SatNetDevice : public NetDevice
     TracedCallback<const Time&, const Address&> m_rxLinkJitterTrace;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_NET_DEVICE_H */

@@ -47,10 +47,12 @@
 #include <string>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatStatsFrameLoadHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatStatsFrameLoadHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(SatStatsFrameLoadHelper);
 
@@ -413,4 +415,5 @@ SatStatsFrameUserLoadHelper::GetTypeId()
     return tid;
 }
 
+}
 } // end of namespace ns3

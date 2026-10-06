@@ -31,6 +31,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * This class generates sequential LoraDeviceAddress instances.
@@ -88,5 +90,7 @@ class LoraDeviceAddressGenerator : public Object
     NwkID m_currentNwkId;     //!< The current Network Id value
     NwkAddr m_currentNwkAddr; //!< The current Network Address value
 };
+
+}
 } // namespace ns3
 #endif

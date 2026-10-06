@@ -42,7 +42,10 @@
 #include "ns3/test.h"
 #include "ns3/timer.h"
 
-using namespace ns3;
+namespace ns3
+{
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -318,5 +321,8 @@ SatInterferenceTestSuite::SatInterferenceTestSuite()
     AddTestCase(new SatPerPacketInterferenceTestCase, TestCase::Duration::QUICK);
 }
 
+}
+} // namespace ns3
+
 // Do allocate an instance of this TestSuite
-static SatInterferenceTestSuite satSatInterferenceTestSuite;
+static ns3::satellite::SatInterferenceTestSuite satSatInterferenceTestSuite;

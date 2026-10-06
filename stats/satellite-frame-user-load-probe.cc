@@ -36,10 +36,12 @@
 
 #include <string>
 
-NS_LOG_COMPONENT_DEFINE("SatFrameUserLoadProbe");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatFrameUserLoadProbe");
 
 NS_OBJECT_ENSURE_REGISTERED(SatFrameUserLoadProbe);
 
@@ -91,7 +93,7 @@ SatFrameUserLoadProbe::ConnectByObject(std::string traceSource, Ptr<Object> obj)
     NS_LOG_DEBUG("Name of probe (if any) in names database: " << Names::FindPath(obj));
     bool connected =
         obj->TraceConnectWithoutContext(traceSource,
-                                        MakeCallback(&ns3::SatFrameUserLoadProbe::TraceSink, this));
+                                        MakeCallback(&ns3::satellite::SatFrameUserLoadProbe::TraceSink, this));
     return connected;
 }
 
@@ -100,7 +102,7 @@ SatFrameUserLoadProbe::ConnectByPath(std::string path)
 {
     NS_LOG_FUNCTION(this << path);
     NS_LOG_DEBUG("Name of probe to search for in config database: " << path);
-    Config::ConnectWithoutContext(path, MakeCallback(&ns3::SatFrameUserLoadProbe::TraceSink, this));
+    Config::ConnectWithoutContext(path, MakeCallback(&ns3::satellite::SatFrameUserLoadProbe::TraceSink, this));
 }
 
 void
@@ -113,4 +115,5 @@ SatFrameUserLoadProbe::TraceSink(uint32_t frameId, uint32_t utCount)
     }
 }
 
+}
 } // namespace ns3

@@ -57,10 +57,12 @@
 #include <string>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatStatsDelayHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatStatsDelayHelper");
 
 NS_OBJECT_ENSURE_REGISTERED(SatStatsDelayHelper);
 
@@ -1664,4 +1666,5 @@ SatStatsRtnPhyDelayHelper::DoInstallProbes()
 
 } // end of `void DoInstallProbes ();`
 
+}
 } // end of namespace ns3

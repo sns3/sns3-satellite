@@ -28,10 +28,12 @@
 #include <complex>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatLooModel");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatLooModel");
 
 NS_OBJECT_ENSURE_REGISTERED(SatLooModel);
 
@@ -345,4 +347,5 @@ SatLooModel::CalculateSigma()
     }
 }
 
+}
 } // namespace ns3

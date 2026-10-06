@@ -27,10 +27,12 @@
 
 #include <stdint.h>
 
-NS_LOG_COMPONENT_DEFINE("SatInterferenceElimination");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatInterferenceElimination");
 
 NS_OBJECT_ENSURE_REGISTERED(SatInterferenceElimination);
 
@@ -50,4 +52,5 @@ SatInterferenceElimination::~SatInterferenceElimination()
 {
 }
 
+}
 } // namespace ns3

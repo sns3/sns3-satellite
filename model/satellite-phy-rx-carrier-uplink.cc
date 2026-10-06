@@ -27,10 +27,12 @@
 #include "ns3/log.h"
 #include "ns3/simulator.h"
 
-NS_LOG_COMPONENT_DEFINE("SatPhyRxCarrierUplink");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatPhyRxCarrierUplink");
 
 NS_OBJECT_ENSURE_REGISTERED(SatPhyRxCarrierUplink);
 
@@ -148,4 +150,5 @@ SatPhyRxCarrierUplink::EndRxData(uint32_t key)
     RemoveStoredRxParams(key);
 }
 
+}
 } // namespace ns3

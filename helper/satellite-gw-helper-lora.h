@@ -34,6 +34,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @brief Creates needed objects for LORA GW nodes like SatorbiterNetDevice objects.
@@ -101,6 +103,7 @@ class SatGwHelperLora : public SatGwHelper
                                    Ptr<SatLowerLayerServiceConf> llsConf);
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_GW_HELPER_LORA_H */

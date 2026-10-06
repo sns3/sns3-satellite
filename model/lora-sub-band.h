@@ -30,6 +30,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 class LoraLogicalChannel;
 
@@ -141,5 +143,8 @@ class LoraSubBand : public Object
                                  //!< LoraSubBand
     double m_maxTxPowerDbm; //!< The maximum transmission power that is admitted on this LoraSubBand
 };
+
+}
 } /* namespace ns3 */
+
 #endif /* LORA_SUB_BAND_H */

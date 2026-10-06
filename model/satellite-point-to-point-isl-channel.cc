@@ -29,10 +29,12 @@
 
 #include <cstddef>
 
-NS_LOG_COMPONENT_DEFINE("PointToPointIslChannel");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("PointToPointIslChannel");
 
 NS_OBJECT_ENSURE_REGISTERED(PointToPointIslChannel);
 
@@ -169,4 +171,5 @@ PointToPointIslChannel::IsInitialized(void) const
     return true;
 }
 
+}
 } // namespace ns3

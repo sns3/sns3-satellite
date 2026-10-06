@@ -38,6 +38,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @brief Probe to translate from a TraceSource to two more easily parsed TraceSources.
@@ -146,6 +148,7 @@ class SatPhyRxCarrierPacketProbe : public Probe
     bool m_statusFlag;
 };
 
+}
 } // namespace ns3
 
 #endif // SATELLITE_PHY_RX_CARRIER_PACKET_PROBE_H

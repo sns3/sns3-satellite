@@ -33,10 +33,15 @@
 namespace ns3
 {
 
-class SatHelper;
 class Node;
+
 class CollectorMap;
 class DataCollectionObject;
+
+namespace satellite
+{
+
+class SatHelper;
 
 /**
  * @ingroup satellite
@@ -430,6 +435,7 @@ class SatStatsHelper : public Object
 
 }; // end of class SatStatsHelper
 
+}
 } // end of namespace ns3
 
 #endif /* SATELLITE_STATS_HELPER_H */

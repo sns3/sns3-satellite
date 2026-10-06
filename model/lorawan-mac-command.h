@@ -33,6 +33,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * Enum for every possible command type
@@ -618,6 +620,7 @@ class DlChannelAns : public LorawanMacCommand
   private:
 };
 
+}
 } // namespace ns3
 
 #endif /* LORAWAN_MAC_COMMAND_H */

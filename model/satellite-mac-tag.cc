@@ -25,10 +25,12 @@
 
 #include <ostream>
 
-NS_LOG_COMPONENT_DEFINE("SatMacTag");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatMacTag");
 
 NS_OBJECT_ENSURE_REGISTERED(SatMacTag);
 
@@ -300,4 +302,5 @@ SatFlowIdTag::Print(std::ostream& os) const
     os << "FlowId=" << m_flowId;
 }
 
+}
 } // namespace ns3

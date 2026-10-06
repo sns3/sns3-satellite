@@ -28,7 +28,10 @@
 #include "ns3/singleton.h"
 #include "ns3/test.h"
 
-using namespace ns3;
+namespace ns3
+{
+namespace satellite
+{
 
 /**
  * @file satellite-antenna-pattern-test.cc
@@ -152,5 +155,8 @@ SatAntennaPatternTestSuite::SatAntennaPatternTestSuite()
     AddTestCase(new SatAntennaPatternTestCase, TestCase::Duration::QUICK);
 }
 
+}
+} // namespace ns3
+
 // Do allocate an instance of this TestSuite
-static SatAntennaPatternTestSuite satSatInterferenceTestSuite;
+static ns3::satellite::SatAntennaPatternTestSuite satSatInterferenceTestSuite;

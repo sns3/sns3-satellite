@@ -33,6 +33,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -200,6 +202,7 @@ class SatLooModel : public SatBaseFader
     void Reset();
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_LOO_MODEL_H */

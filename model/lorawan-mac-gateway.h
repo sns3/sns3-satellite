@@ -31,6 +31,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 class LorawanMacGateway : public LorawanMac
 {
@@ -70,6 +72,7 @@ class LorawanMacGateway : public LorawanMac
   protected:
 };
 
+}
 } /* namespace ns3 */
 
 #endif /* LORAWAN_MAC_GATEWAY_H */

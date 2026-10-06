@@ -33,8 +33,12 @@
 namespace ns3
 {
 
-class SatHelper;
 class DataCollectionObject;
+
+namespace satellite
+{
+
+class SatHelper;
 
 /**
  * @ingroup satstats
@@ -79,6 +83,7 @@ class SatStatsWaveformUsageHelper : public SatStatsHelper
 
 }; // end of class SatStatsWaveformUsageHelper
 
+}
 } // end of namespace ns3
 
 #endif /* SATELLITE_STATS_WAVEFORM_HELPER_H */

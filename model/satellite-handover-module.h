@@ -36,6 +36,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -160,6 +162,7 @@ class SatHandoverModule : public Object
     TracedCallback<double> m_antennaGainTrace;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_HANDOVER_MODULE_H */

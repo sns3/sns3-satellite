@@ -33,12 +33,17 @@
 namespace ns3
 {
 
+class Node;
+
+class DataCollectionObject;
+class DistributionCollector;
+
+namespace satellite
+{
+
 // BASE CLASS /////////////////////////////////////////////////////////////////
 
 class SatHelper;
-class Node;
-class DataCollectionObject;
-class DistributionCollector;
 
 /**
  * @ingroup satstats
@@ -298,6 +303,7 @@ class SatStatsFwdUserQueueBytesHelper : public SatStatsSatelliteQueueHelper
 
 }; // end of class SatStatsFwdUserQueueBytesHelper
 
+}
 } // end of namespace ns3
 
 #endif /* SATELLITE_STATS_SAT_QUEUE_HELPER_H */

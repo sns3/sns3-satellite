@@ -26,6 +26,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 NS_LOG_COMPONENT_DEFINE("LoraNetworkController");
 
@@ -91,4 +93,5 @@ LoraNetworkController::BeforeSendingReply(Ptr<LoraEndDeviceStatus> endDeviceStat
     }
 }
 
+}
 } // namespace ns3

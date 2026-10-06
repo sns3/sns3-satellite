@@ -38,10 +38,12 @@
 #include <cmath>
 #include <ostream>
 
-NS_LOG_COMPONENT_DEFINE("SatPhyTx");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatPhyTx");
 
 NS_OBJECT_ENSURE_REGISTERED(SatPhyTx);
 
@@ -325,4 +327,5 @@ SatPhyTx::CanTransmit(void) const
     return m_state != RECONFIGURING;
 }
 
+}
 } // namespace ns3

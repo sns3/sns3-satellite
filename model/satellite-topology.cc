@@ -29,10 +29,12 @@
 #include <set>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatTopology");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatTopology");
 
 NS_OBJECT_ENSURE_REGISTERED(SatTopology);
 
@@ -1338,4 +1340,5 @@ SatTopology::GetClosestSat(GeoCoordinate position)
     return indexDistanceMin;
 }
 
+}
 } // namespace ns3

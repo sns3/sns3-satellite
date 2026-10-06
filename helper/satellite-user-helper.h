@@ -38,9 +38,13 @@ namespace ns3
 {
 
 class PropagationDelayModel;
-class SatArpCache;
 class NetDevice;
 class Node;
+
+namespace satellite
+{
+
+class SatArpCache;
 
 /**
  * @brief Build a set of user nodes and links channels between user nodes and satellite nodes.
@@ -356,6 +360,7 @@ class SatUserHelper : public Object
     SatUserHelper::PropagationDelayCallback m_propagationDelayCallback;
 };
 
+}
 } // namespace ns3
 
 #endif /* SAT_USER_HELPER_H */

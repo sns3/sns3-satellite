@@ -43,6 +43,10 @@ namespace ns3
 {
 
 class Packet;
+
+namespace satellite
+{
+
 class SatBeamScheduler;
 
 /**
@@ -517,6 +521,7 @@ class SatMac : public Object
     Time m_lastLinkDelay;
 };
 
+}
 } // namespace ns3
 
 #endif /* SAT_MAC_H */

@@ -24,6 +24,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 NS_OBJECT_ENSURE_REGISTERED(SatUplinkInfoTag);
 
@@ -185,4 +187,5 @@ SatUplinkInfoTag::SetIsControl(bool isControl)
     m_isControl = isControl;
 }
 
+}
 } // namespace ns3

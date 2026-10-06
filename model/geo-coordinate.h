@@ -29,6 +29,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -260,6 +262,7 @@ std::istream& operator>>(std::istream& is, GeoCoordinate& coordinate);
 
 Ptr<const AttributeChecker> MakeGeoCoordinateChecker(void);
 
+}
 } // namespace ns3
 
 #endif /* GEO_COORDINATE_H */

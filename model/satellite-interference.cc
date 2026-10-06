@@ -27,10 +27,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatInterference");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatInterference");
 
 SatInterference::InterferenceChangeEvent::InterferenceChangeEvent(uint32_t id,
                                                                   Time rxDuration,
@@ -214,6 +216,5 @@ SatInterference::HasCollision(Ptr<SatInterference::InterferenceChangeEvent> even
     return result->second;
 }
 
+}
 } // namespace ns3
-
-// namespace ns3

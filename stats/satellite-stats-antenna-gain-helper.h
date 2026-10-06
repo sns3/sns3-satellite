@@ -34,11 +34,16 @@
 namespace ns3
 {
 
-class SatHelper;
 class Node;
 class Time;
+
 class DataCollectionObject;
 class DistributionCollector;
+
+namespace satellite
+{
+
+class SatHelper;
 
 /**
  * @ingroup satstats
@@ -101,6 +106,7 @@ class SatStatsAntennaGainHelper : public SatStatsHelper
 
 }; // end of class SatStatsAntennaGainHelper
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_STATS_ANTENNA_GAIN_HELPER_H */

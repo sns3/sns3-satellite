@@ -27,6 +27,7 @@
 #include "ns3/satellite-module.h"
 
 using namespace ns3;
+using namespace ns3::satellite;
 
 /**
  * @file sat-dama-onoff-sim-tn9.cc

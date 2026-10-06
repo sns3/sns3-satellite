@@ -30,6 +30,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -116,6 +118,7 @@ class SatConstantInterference : public SatInterference
     bool m_rxing;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_CONSTANT_INTERFERENCE_H */

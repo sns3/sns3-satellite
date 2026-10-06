@@ -22,10 +22,12 @@
 
 #include "ns3/log.h"
 
-NS_LOG_COMPONENT_DEFINE("SatBaseTraceContainer");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatBaseTraceContainer");
 
 NS_OBJECT_ENSURE_REGISTERED(SatBaseTraceContainer);
 
@@ -61,4 +63,5 @@ SatBaseTraceContainer::~SatBaseTraceContainer()
     NS_LOG_FUNCTION(this);
 }
 
+}
 } // namespace ns3

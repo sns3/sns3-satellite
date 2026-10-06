@@ -25,6 +25,7 @@
 #include <stdint.h>
 
 using namespace ns3;
+using namespace ns3::satellite;
 
 /**
  * @file sat-markov-logic-example.cc

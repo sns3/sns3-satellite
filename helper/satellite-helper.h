@@ -51,6 +51,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 class SatGroupHelper;
 
@@ -664,6 +666,7 @@ class SatHelper : public Object
     void ReadStandard(std::string pathName);
 };
 
+}
 } // namespace ns3
 
 #endif /* __SATELLITE_HELPER_H__ */

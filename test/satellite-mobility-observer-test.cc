@@ -36,7 +36,10 @@
 #include "ns3/singleton.h"
 #include "ns3/test.h"
 
-using namespace ns3;
+namespace ns3
+{
+namespace satellite
+{
 
 // definitions for reference elevation angle table, g_refElAngles
 static const uint32_t g_latitudeCount = 19;
@@ -503,5 +506,8 @@ SatMobilityObserverTestSuite::SatMobilityObserverTestSuite()
     AddTestCase(new SatMobilityObserverTestCase, TestCase::Duration::QUICK);
 }
 
+}
+} // namespace ns3
+
 // Do allocate an instance of this TestSuite
-static SatMobilityObserverTestSuite satSatMobilityObserverTestSuite;
+static ns3::satellite::SatMobilityObserverTestSuite satSatMobilityObserverTestSuite;

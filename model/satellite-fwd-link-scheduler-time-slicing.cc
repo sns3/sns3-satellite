@@ -27,10 +27,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatFwdLinkSchedulerTimeSlicing");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatFwdLinkSchedulerTimeSlicing");
 
 NS_OBJECT_ENSURE_REGISTERED(SatFwdLinkSchedulerTimeSlicing);
 
@@ -489,4 +491,5 @@ SatFwdLinkSchedulerTimeSlicing::GetSymbols(uint8_t sliceId, SatEnums::SatModcod_
     return symbols;
 }
 
+}
 } // namespace ns3

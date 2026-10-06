@@ -30,6 +30,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -184,6 +186,7 @@ class SatInputFileStreamTimeDoubleContainer : public Object
     uint32_t m_timeColumn;
 };
 
+}
 } // namespace ns3
 
 #endif /* SAT_INPUT_FSTREAM_TIME_DOUBLE_CONTAINER_H */

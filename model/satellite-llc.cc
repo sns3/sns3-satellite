@@ -37,10 +37,12 @@
 
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatLlc");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatLlc");
 
 NS_OBJECT_ENSURE_REGISTERED(SatLlc);
 
@@ -476,4 +478,5 @@ SatLlc::SetAdditionalHeaderSize(uint32_t additionalHeaderSize)
     m_additionalHeaderSize = additionalHeaderSize;
 }
 
+}
 } // namespace ns3

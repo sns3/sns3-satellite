@@ -25,10 +25,12 @@
 
 #include "ns3/log.h"
 
-NS_LOG_COMPONENT_DEFINE("SatBbFrame");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatBbFrame");
 
 SatBbFrame::SatBbFrame()
     : m_modCod(SatEnums::SAT_MODCOD_QPSK_1_TO_2),
@@ -256,4 +258,5 @@ SatBbFrame::Extend(Ptr<SatBbFrameConf> conf)
     return durationIncrease;
 }
 
+}
 } // namespace ns3

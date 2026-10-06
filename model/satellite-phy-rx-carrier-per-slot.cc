@@ -35,10 +35,12 @@
 #include <ostream>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatPhyRxCarrierPerSlot");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatPhyRxCarrierPerSlot");
 
 NS_OBJECT_ENSURE_REGISTERED(SatPhyRxCarrierPerSlot);
 
@@ -567,4 +569,5 @@ SatPhyRxCarrierPerSlot::CalculateAverageNormalizedOfferedRandomAccessLoad()
     return averageNormalizedOfferedLoad;
 }
 
+}
 } // namespace ns3

@@ -41,6 +41,10 @@ namespace ns3
 
 class Packet;
 class Address;
+
+namespace satellite
+{
+
 class SatCrMessage;
 class SatSuperframeSeq;
 class SatLowerLayerServiceConf;
@@ -408,6 +412,7 @@ class SatNcc : public Object
     UpdateRoutingCallback m_updateRoutingCallback;
 };
 
+}
 } // namespace ns3
 
 #endif /* SAT_NCC_H */

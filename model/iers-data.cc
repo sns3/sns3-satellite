@@ -36,6 +36,8 @@
  */
 namespace ns3
 {
+namespace satellite
+{
 
 const IersData::EopParameters IersData::__eop_params[] = {
     {8.87146e-07, 8.18244e-07, -0.125166, 1.8335},
@@ -12002,4 +12004,5 @@ const uint32_t IersData::__leap_secs[] = {
 // Modified Julian Date for when leap seconds were added in UTC
 const std::vector<uint32_t> IersData::LeapSeconds(__leap_secs, __leap_secs + 27);
 
+}
 } // namespace ns3

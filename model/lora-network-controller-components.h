@@ -31,6 +31,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 class LoraNetworkStatus;
 
@@ -140,5 +142,7 @@ class LoraLinkCheckComponent : public LoraNetworkControllerComponent
     void UpdateLinkCheckAns(Ptr<const Packet> packet, Ptr<LoraEndDeviceStatus> status);
 };
 
+}
 } // namespace ns3
+
 #endif

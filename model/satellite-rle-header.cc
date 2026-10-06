@@ -27,10 +27,12 @@
 #include <algorithm>
 #include <ostream>
 
-NS_LOG_COMPONENT_DEFINE("SatPPduHeader");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatPPduHeader");
 
 NS_OBJECT_ENSURE_REGISTERED(SatPPduHeader);
 
@@ -295,4 +297,5 @@ SatPPduHeader::GetMaxHeaderSizeInBytes() const
                     std::max(m_endPpduHeaderSize, m_fullPpduHeaderSize));
 }
 
+}
 } // namespace ns3

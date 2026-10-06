@@ -31,6 +31,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -195,6 +197,7 @@ class SatGenericStreamEncapsulator : public SatBaseEncapsulator
     static const uint32_t MAX_HL_PACKET_SIZE = 65536;
 };
 
+}
 } // namespace ns3
 
 #endif // SATELLITE_GENERIC_STREAM_ENCAPSULATOR

@@ -36,7 +36,10 @@
 
 #include <vector>
 
-using namespace ns3;
+namespace ns3
+{
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -160,5 +163,8 @@ SatFadingExternalInputTraceTestSuite::SatFadingExternalInputTraceTestSuite()
     AddTestCase(new SatFadingExternalInputTraceTestCase, TestCase::Duration::QUICK);
 }
 
+}
+} // namespace ns3
+
 // Do allocate an instance of this TestSuite
-static SatFadingExternalInputTraceTestSuite satSatInterferenceTestSuite;
+static ns3::satellite::SatFadingExternalInputTraceTestSuite satSatInterferenceTestSuite;

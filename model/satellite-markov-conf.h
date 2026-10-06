@@ -37,6 +37,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -219,6 +221,7 @@ class SatMarkovConf : public Object
     void Reset();
 };
 
+}
 } // namespace ns3
 
 #endif /* SAT_MARKOV_CONF_H */

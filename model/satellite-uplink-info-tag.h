@@ -29,6 +29,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -177,6 +179,7 @@ class SatUplinkInfoTag : public Tag
     bool m_isControl;                // Uplink burst is control and has been sent using WF02
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_UPLINK_INFO_TAG_H */

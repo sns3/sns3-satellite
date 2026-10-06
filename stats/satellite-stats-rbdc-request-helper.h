@@ -34,11 +34,16 @@
 namespace ns3
 {
 
-class SatHelper;
 class Node;
 class Time;
+
 class DataCollectionObject;
 class DistributionCollector;
+
+namespace satellite
+{
+
+class SatHelper;
 
 /**
  * @ingroup satstats
@@ -101,6 +106,7 @@ class SatStatsRbdcRequestHelper : public SatStatsHelper
 
 }; // end of class SatStatsRbdcRequestHelper
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_STATS_RBDC_REQUEST_HELPER_H */

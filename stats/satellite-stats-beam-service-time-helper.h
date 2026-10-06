@@ -34,8 +34,12 @@
 namespace ns3
 {
 
-class SatHelper;
 class DataCollectionObject;
+
+namespace satellite
+{
+
+class SatHelper;
 
 /**
  * @ingroup satstats
@@ -83,6 +87,7 @@ class SatStatsBeamServiceTimeHelper : public SatStatsHelper
 
 }; // end of class SatStatsBeamServiceTimeHelper
 
+}
 } // end of namespace ns3
 
 #endif /* SATELLITE_STATS_BEAM_SERVICE_TIME_HELPER_H */

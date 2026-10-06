@@ -34,6 +34,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -371,6 +373,7 @@ class SatPhyRxCarrierConf : public Object
     SatEnums::RandomAccessModel_t m_randomAccessModel;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_PHY_RX_CARRIER_CONF_H_ */

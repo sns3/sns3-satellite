@@ -44,6 +44,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 const uint32_t JulianDate::PosixYear = 1970;           //!< POSIX epoch year
 const uint32_t JulianDate::MinYear = 1992;             //!< IERS data since
@@ -584,4 +586,5 @@ JulianDate::OffsetToUtc(uint32_t daysInPosix, uint32_t ms_day, TimeSystem ts)
     return MilliSeconds(-offset.GetMilliSeconds());
 }
 
+}
 } // namespace ns3

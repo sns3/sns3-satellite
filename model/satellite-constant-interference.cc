@@ -30,10 +30,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatConstantInterference");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatConstantInterference");
 
 NS_OBJECT_ENSURE_REGISTERED(SatConstantInterference);
 
@@ -114,6 +116,5 @@ SatConstantInterference::DoNotifyRxEnd(Ptr<SatInterference::InterferenceChangeEv
     m_rxing = false;
 }
 
+}
 } // namespace ns3
-
-// namespace ns3

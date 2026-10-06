@@ -34,6 +34,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -179,6 +181,7 @@ class SatSuperframeSeq : public Object
     Time m_targetDuration;
 };
 
+}
 } // namespace ns3
 
 #endif // SATELLITE_SUPERFRAME_SEQUENCE_H

@@ -26,10 +26,12 @@
 
 #include "ns3/log.h"
 
-NS_LOG_COMPONENT_DEFINE("LoraForwarder");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("LoraForwarder");
 
 NS_OBJECT_ENSURE_REGISTERED(LoraForwarder);
 
@@ -118,4 +120,5 @@ LoraForwarder::StopApplication(void)
     // TODO Get rid of callbacks
 }
 
+}
 } // namespace ns3

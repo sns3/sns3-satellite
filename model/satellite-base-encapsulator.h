@@ -36,6 +36,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -220,6 +222,7 @@ class SatBaseEncapsulator : public Object
     SendCtrlCallback m_ctrlCallback;
 };
 
+}
 } // namespace ns3
 
 #endif // SAT_BASE_ENCAPSULATOR_H

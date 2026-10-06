@@ -32,10 +32,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatHandoverModule");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatHandoverModule");
 
 NS_OBJECT_ENSURE_REGISTERED(SatHandoverModule);
 
@@ -276,4 +278,5 @@ SatHandoverModule::AlgorithmNClosest(GeoCoordinate coords)
     return std::make_pair(bestSatId, bestBeamId);
 }
 
+}
 } // namespace ns3

@@ -29,6 +29,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -96,6 +98,7 @@ class SatCrdsaReplicaTag : public Tag
     uint8_t m_numOfIds;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_CRDSA_REPLICA_TAG_H */

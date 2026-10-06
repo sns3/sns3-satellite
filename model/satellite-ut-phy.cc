@@ -38,10 +38,12 @@
 #include "ns3/singleton.h"
 #include "ns3/uinteger.h"
 
-NS_LOG_COMPONENT_DEFINE("SatUtPhy");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatUtPhy");
 
 NS_OBJECT_ENSURE_REGISTERED(SatUtPhy);
 
@@ -299,4 +301,5 @@ SatUtPhy::UpdateSliceSubscription(uint8_t slice)
     }
 }
 
+}
 } // namespace ns3

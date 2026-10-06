@@ -45,10 +45,12 @@
 #include <queue>
 #include <tuple>
 
-NS_LOG_COMPONENT_DEFINE("SatOrbiterFeederPhy");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatOrbiterFeederPhy");
 
 NS_OBJECT_ENSURE_REGISTERED(SatOrbiterFeederPhy);
 
@@ -533,4 +535,5 @@ SatOrbiterFeederPhy::GetE2ESourceAddress(SatPhy::PacketContainer_t packets)
     return Mac48Address();
 }
 
+}
 } // namespace ns3

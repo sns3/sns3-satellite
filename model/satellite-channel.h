@@ -41,6 +41,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -349,6 +351,7 @@ class SatChannel : public Channel
     Mac48Address GetSourceAddress(Ptr<SatSignalParameters> rxParams);
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_CHANNEL_H */

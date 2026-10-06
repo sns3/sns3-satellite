@@ -34,6 +34,9 @@ class Node;
 class Address;
 class Mac48Address;
 
+namespace satellite
+{
+
 /**
  * @ingroup satellite
  *
@@ -359,6 +362,7 @@ class SatIdMapper : public Object
     std::map<Mac48Address, uint32_t> m_macToSatIdIslMap;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_ID_MAPPER_H */

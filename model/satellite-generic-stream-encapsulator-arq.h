@@ -34,6 +34,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -222,6 +224,7 @@ class SatGenericStreamEncapsulatorArq : public SatGenericStreamEncapsulator
     std::map<uint32_t, Ptr<SatArqBufferContext>> m_reorderingBuffer;
 };
 
+}
 } // namespace ns3
 
 #endif // SATELLITE_GENERIC_STREAM_ENCAPSULATOR_ARQ

@@ -42,6 +42,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -1393,6 +1395,7 @@ class SatControlMsgContainer : public SimpleRefCount<SatControlMsgContainer>
     bool m_deleteOnRead;
 };
 
+}
 } // namespace ns3
 
 #endif // SATELLITE_CONTROL_MESSAGE_H

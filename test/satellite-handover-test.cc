@@ -53,7 +53,10 @@
 #include <fstream>
 #include <iostream>
 
-using namespace ns3;
+namespace ns3
+{
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -584,5 +587,8 @@ SatHandoverTestSuite::SatHandoverTestSuite()
         TestCase::Duration::QUICK); // This case tests that communication remains after GW handover.
 }
 
+}
+} // namespace ns3
+
 // Allocate an instance of this TestSuite
-static SatHandoverTestSuite satHandoverTestSuite;
+static ns3::satellite::SatHandoverTestSuite satHandoverTestSuite;

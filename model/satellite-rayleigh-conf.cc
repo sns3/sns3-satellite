@@ -27,9 +27,12 @@
 
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatRayleighConf");
 
 NS_OBJECT_ENSURE_REGISTERED(SatRayleighConf);
-NS_LOG_COMPONENT_DEFINE("SatRayleighConf");
 
 static const double g_RayleighParameters[SatMarkovConf::DEFAULT_ELEVATION_COUNT]
                                         [SatMarkovConf::DEFAULT_STATE_COUNT]
@@ -132,4 +135,5 @@ SatRayleighConf::DoDispose()
     SatBaseFaderConf::DoDispose();
 }
 
+}
 } // namespace ns3

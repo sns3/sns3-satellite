@@ -39,7 +39,10 @@
 
 #include <iomanip>
 
-using namespace ns3;
+namespace ns3
+{
+namespace satellite
+{
 
 static void
 LinkBudgetTraceCb(std::string context,
@@ -947,5 +950,8 @@ SatPerPacketIfTestSuite::SatPerPacketIfTestSuite()
                 TestCase::Duration::QUICK);
 }
 
+}
+} // namespace ns3
+
 // Do allocate an instance of this TestSuite
-static SatPerPacketIfTestSuite satSatPerPacketIfTestSuite;
+static ns3::satellite::SatPerPacketIfTestSuite satSatPerPacketIfTestSuite;

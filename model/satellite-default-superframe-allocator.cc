@@ -33,10 +33,12 @@
 #include <map>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatDefaultSuperframeAllocator");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatDefaultSuperframeAllocator");
 
 NS_OBJECT_ENSURE_REGISTERED(SatDefaultSuperframeAllocator);
 
@@ -486,4 +488,5 @@ SatDefaultSuperframeAllocator::AllocateBasedOnCc(SatFrameAllocator::CcLevel_t cc
     return selectedFrame->first->Allocate(ccLevel, allocReq, selectedFrame->second);
 }
 
+}
 } // namespace ns3

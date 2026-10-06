@@ -27,10 +27,12 @@
 #include "ns3/ipv4-l3-protocol.h"
 #include "ns3/log.h"
 
-NS_LOG_COMPONENT_DEFINE("SatPacketClassifier");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatPacketClassifier");
 
 SatPacketClassifier::SatPacketClassifier()
 {
@@ -111,4 +113,5 @@ SatPacketClassifier::Classify(const Ptr<Packet> packet,
     return SatEnums::BE_FID;
 }
 
+}
 } // namespace ns3

@@ -35,12 +35,17 @@
 namespace ns3
 {
 
+class Node;
+class Packet;
+class Probe;
+class DataCollectionObject;
+
+namespace satellite
+{
+
 // BASE CLASS /////////////////////////////////////////////////////////////////
 
 class SatHelper;
-class Node;
-class Packet;
-class DataCollectionObject;
 
 /**
  * @ingroup satstats
@@ -143,8 +148,6 @@ class SatStatsFwdSignallingLoadHelper : public SatStatsSignallingLoadHelper
 
 // RETURN LINK ////////////////////////////////////////////////////////////////
 
-class Probe;
-
 /**
  * @ingroup satstats
  * @brief Produce return link signalling load statistics from a satellite
@@ -193,6 +196,7 @@ class SatStatsRtnSignallingLoadHelper : public SatStatsSignallingLoadHelper
 
 }; // end of class SatStatsRtnSignallingLoadHelper
 
+}
 } // end of namespace ns3
 
 #endif /* SATELLITE_STATS_SIGNALLING_LOAD_HELPER_H */

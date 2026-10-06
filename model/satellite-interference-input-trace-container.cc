@@ -32,10 +32,12 @@
 #include <string>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatInterferenceInputTraceContainer");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatInterferenceInputTraceContainer");
 
 NS_OBJECT_ENSURE_REGISTERED(SatInterferenceInputTraceContainer);
 
@@ -158,4 +160,5 @@ SatInterferenceInputTraceContainer::GetInterferenceDensity(key_t key)
         SatBaseTraceContainer::INTF_TRACE_DEFAULT_INTF_DENSITY_INDEX);
 }
 
+}
 } // namespace ns3

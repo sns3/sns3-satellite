@@ -30,10 +30,12 @@
 #include <cstddef>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatSimpleChannel");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatSimpleChannel");
 
 NS_OBJECT_ENSURE_REGISTERED(SatSimpleChannel);
 
@@ -99,4 +101,5 @@ SatSimpleChannel::GetDevice(std::size_t i) const
     return m_devices[i];
 }
 
+}
 } // namespace ns3

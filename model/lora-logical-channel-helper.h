@@ -37,6 +37,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * This class supports LorawanMac instances by managing a list of the logical
@@ -205,6 +207,8 @@ class LoraLogicalChannelHelper : public Object
     //! according to the aggregated
     //! transmission timer
 };
+
+}
 } // namespace ns3
 
 #endif /* LORA_LOGICAL_CHANNEL_HELPER_H */

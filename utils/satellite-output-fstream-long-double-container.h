@@ -31,6 +31,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -210,6 +212,7 @@ class SatOutputFileStreamLongDoubleContainer : public Object
     FigureUnitConversion_t m_figureUnitConversionType;
 };
 
+}
 } // namespace ns3
 
 #endif /* SAT_OUTPUT_FSTREAM_LONG_DOUBLE_CONTAINER_H */

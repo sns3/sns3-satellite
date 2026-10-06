@@ -28,6 +28,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * Tag used to save various data about a packet, like its Spreading Factor and
@@ -70,6 +72,8 @@ class LoraBeamTag : public Tag
   private:
     uint8_t m_beamId; //!< The beam ID used by the packet.
 };
+
+}
 } // namespace ns3
 
 #endif // LORA_BEAM_TAG_H

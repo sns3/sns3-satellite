@@ -32,6 +32,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -123,6 +125,7 @@ class SatChannelPair : public Object
     std::map<std::pair<uint32_t, uint32_t>, Ptr<SatChannel>> m_rtnChannels;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_BEAM_CHANNEL_PAIR_H */

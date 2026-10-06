@@ -34,10 +34,12 @@
 #include <string>
 #include <utility>
 
-NS_LOG_COMPONENT_DEFINE("SatLinkResults");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatLinkResults");
 
 /*
  * SATLINKRESULTS PARENT ABSTRACT CLASS
@@ -847,4 +849,5 @@ SatLinkResultsDvbS2X::DoInitialize()
 
 } // end of void SatLinkResultsDvbS2X::DoInitialize
 
+}
 } // end of namespace ns3

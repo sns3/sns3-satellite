@@ -37,12 +37,16 @@
 namespace ns3
 {
 
+class Node;
+class Probe;
+class DataCollectionObject;
+
+namespace satellite
+{
+
 // BASE CLASS /////////////////////////////////////////////////////////////////
 
 class SatHelper;
-class Node;
-class DataCollectionObject;
-class Probe;
 
 /**
  * @ingroup satstats
@@ -538,6 +542,7 @@ class SatStatsUserEssaPacketErrorHelper : public SatStatsPacketErrorHelper
     static TypeId GetTypeId();
 };
 
+}
 } // end of namespace ns3
 
 #endif /* SATELLITE_STATS_PACKET_ERROR_HELPER_H */

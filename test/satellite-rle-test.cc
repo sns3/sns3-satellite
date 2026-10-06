@@ -38,7 +38,10 @@
 
 #include <vector>
 
-using namespace ns3;
+namespace ns3
+{
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -180,5 +183,8 @@ SatRleTraceSuite::SatRleTraceSuite()
     AddTestCase(new SatRleTestCase, TestCase::Duration::QUICK);
 }
 
+}
+} // namespace ns3
+
 // Do allocate an instance of this TestSuite
-static SatRleTraceSuite SatRleTestSuite;
+static ns3::satellite::SatRleTraceSuite SatRleTestSuite;

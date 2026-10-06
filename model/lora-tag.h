@@ -32,6 +32,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * Tag used to save various data about a packet, like its Spreading Factor and
@@ -153,6 +155,8 @@ class LoraTag : public Tag
     //! packet.
     double m_frequency; //!< The frequency of this packet
 };
+
+}
 } // namespace ns3
 
 #endif

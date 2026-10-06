@@ -32,6 +32,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -126,6 +128,7 @@ class SatInterferenceOutputTraceContainer : public SatBaseTraceContainer
     bool m_enableFigureOutput;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_INTERFERENCE_OUTPUT_TRACE_CONTAINER_H */

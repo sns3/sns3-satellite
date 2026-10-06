@@ -28,6 +28,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -114,6 +116,7 @@ class SatEncapPduStatusTag : public Tag
     uint8_t m_pduStatus;
 };
 
+}
 } // namespace ns3
 
 #endif // SATELLITE_ENCAP_PDU_STATUS_TAG_H

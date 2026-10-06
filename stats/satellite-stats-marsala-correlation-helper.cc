@@ -47,10 +47,12 @@
 #include <sstream>
 #include <string>
 
-NS_LOG_COMPONENT_DEFINE("SatStatsMarsalaCorrelationHelper");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatStatsMarsalaCorrelationHelper");
 
 // BASE CLASS /////////////////////////////////////////////////////////////////
 
@@ -342,4 +344,5 @@ SatStatsMarsalaCorrelationHelper::CorrelationRxCallback(uint32_t nCorrelations,
     }
 }
 
+}
 } // end of namespace ns3

@@ -56,10 +56,12 @@
 #include <utility>
 #include <vector>
 
-NS_LOG_COMPONENT_DEFINE("SatOrbiterHelperDvb");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatOrbiterHelperDvb");
 
 NS_OBJECT_ENSURE_REGISTERED(SatOrbiterHelperDvb);
 
@@ -314,4 +316,5 @@ SatOrbiterHelperDvb::AttachChannelsUser(Ptr<SatOrbiterNetDevice> dev,
         ->AddOrbiterUserLayersDvb(dev->GetNode(), satId, userBeamId, dev, uLlc, uMac, uPhy);
 }
 
+}
 } // namespace ns3

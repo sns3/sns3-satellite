@@ -29,6 +29,8 @@ NS_LOG_COMPONENT_DEFINE("SatArqSequenceNumber");
 
 namespace ns3
 {
+namespace satellite
+{
 
 SatArqSequenceNumber::SatArqSequenceNumber()
     : m_seqNoMap(),
@@ -112,4 +114,5 @@ SatArqSequenceNumber::CleanUp()
     }
 }
 
+}
 } // namespace ns3

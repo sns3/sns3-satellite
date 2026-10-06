@@ -35,6 +35,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 class SatIslArbiter : public Object
 {
@@ -84,6 +86,7 @@ class SatIslArbiter : public Object
     uint32_t m_nodeId; // ID of node where this arbiter is installed.
 };
 
+}
 } // namespace ns3
 
 #endif // SATELLITE_ISL_ARBITER_H

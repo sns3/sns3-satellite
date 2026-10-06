@@ -34,6 +34,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @brief Creates needed objects for LORA UT nodes like SatOrbiterNetDevice objects.
@@ -102,6 +104,7 @@ class SatUtHelperLora : public SatUtHelper
                                    SatMac::RoutingUpdateCallback cbRouting);
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_UT_HELPER_LORA_H */

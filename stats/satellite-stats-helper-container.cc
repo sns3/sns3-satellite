@@ -63,10 +63,12 @@
 #include <list>
 #include <string>
 
-NS_LOG_COMPONENT_DEFINE("SatStatsHelperContainer");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatStatsHelperContainer");
 
 NS_OBJECT_ENSURE_REGISTERED(SatStatsHelperContainer);
 
@@ -2475,4 +2477,5 @@ SatStatsHelperContainer::UpdateAddressAndIdentifier(Ptr<Node> utNode)
     }
 }
 
+}
 } // end of namespace ns3

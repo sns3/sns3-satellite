@@ -33,6 +33,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 class LoraNetworkStatus;
 class LoraNetworkControllerComponent;
@@ -74,6 +76,7 @@ class LoraNetworkController : public Object
     std::list<Ptr<LoraNetworkControllerComponent>> m_components;
 };
 
+}
 } /* namespace ns3 */
 
 #endif /* LORA_NETWORK_CONTROLLER_H */

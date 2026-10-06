@@ -36,6 +36,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -1195,6 +1197,7 @@ class SatUtils
     virtual ~SatUtils() = 0;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_UTILS_H */

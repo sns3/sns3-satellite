@@ -33,6 +33,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -137,6 +139,7 @@ class SatBstpController : public Object
     Ptr<SatStaticBstp> m_staticBstp;
 };
 
+}
 } // namespace ns3
 
 #endif /* SATELLITE_BSTP_CONTROLLER_H_ */

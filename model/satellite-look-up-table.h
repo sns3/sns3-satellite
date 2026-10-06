@@ -30,6 +30,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 /**
  * @ingroup satellite
@@ -84,6 +86,7 @@ class SatLookUpTable : public Object
     std::ifstream* m_ifs;
 };
 
+}
 } // end of namespace ns3
 
 #endif /* SATELLITE_LOOK_UP_TABLE_H */

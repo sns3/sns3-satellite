@@ -28,6 +28,8 @@
 
 namespace ns3
 {
+namespace satellite
+{
 
 NS_LOG_COMPONENT_DEFINE("LoraSubBand");
 
@@ -110,5 +112,7 @@ double
 LoraSubBand::GetMaxTxPowerDbm(void)
 {
     return m_maxTxPowerDbm;
+}
+
 }
 } // namespace ns3

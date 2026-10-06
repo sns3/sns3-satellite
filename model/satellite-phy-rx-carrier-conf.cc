@@ -31,10 +31,12 @@
 #include "ns3/log.h"
 #include "ns3/uinteger.h"
 
-NS_LOG_COMPONENT_DEFINE("SatPhyRxCarrierConf");
-
 namespace ns3
 {
+namespace satellite
+{
+
+NS_LOG_COMPONENT_DEFINE("SatPhyRxCarrierConf");
 
 NS_OBJECT_ENSURE_REGISTERED(SatPhyRxCarrierConf);
 
@@ -274,4 +276,5 @@ SatPhyRxCarrierConf::IsRandomAccessDynamicLoadControlEnabled() const
     return m_enableRandomAccessDynamicLoadControl;
 }
 
+}
 } // namespace ns3
