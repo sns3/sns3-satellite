@@ -80,7 +80,7 @@ class SatStatsBeamServiceTimeHelper : public SatStatsHelper
      * @brief Two-dimensional map of collectors, indexed first by the
      * the frame type identifier and second by the global/gw/beam identifier.
      */
-    CollectorMap m_collectorMap;
+    stats_extensions::CollectorMap m_collectorMap;
 
     /// The aggregator created by this helper.
     Ptr<DataCollectionObject> m_aggregator;

@@ -111,7 +111,7 @@ SatPhyRxCarrierPacketProbe::ConnectByObject(std::string traceSource, Ptr<Object>
     NS_LOG_DEBUG("Name of probe (if any) in names database: " << Names::FindPath(obj));
     bool connected = obj->TraceConnectWithoutContext(
         traceSource,
-        MakeCallback(&ns3::satellite::SatPhyRxCarrierPacketProbe::TraceSink, this));
+        MakeCallback(&SatPhyRxCarrierPacketProbe::TraceSink, this));
     return connected;
 }
 
@@ -121,7 +121,7 @@ SatPhyRxCarrierPacketProbe::ConnectByPath(std::string path)
     NS_LOG_FUNCTION(this << path);
     NS_LOG_DEBUG("Name of probe to search for in config database: " << path);
     Config::ConnectWithoutContext(path,
-                                  MakeCallback(&ns3::satellite::SatPhyRxCarrierPacketProbe::TraceSink, this));
+                                  MakeCallback(&SatPhyRxCarrierPacketProbe::TraceSink, this));
 }
 
 void

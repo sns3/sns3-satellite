@@ -40,7 +40,10 @@ class Time;
 class Probe;
 class DataCollectionObject;
 
+namespace stats_extensions
+{
 class DistributionCollector;
+}
 
 namespace satellite
 {
@@ -128,10 +131,10 @@ class SatStatsPltHelper : public SatStatsHelper
     void PassSampleToCollector(const Time& plt, uint32_t identifier);
 
     /// Maintains a list of collectors created by this helper.
-    CollectorMap m_terminalCollectors;
+    stats_extensions::CollectorMap m_terminalCollectors;
 
     /// The final collector utilized in averaged output (histogram, PDF, and CDF).
-    Ptr<DistributionCollector> m_averagingCollector;
+    Ptr<stats_extensions::DistributionCollector> m_averagingCollector;
 
     /// The aggregator created by this helper.
     Ptr<DataCollectionObject> m_aggregator;

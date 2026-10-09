@@ -53,6 +53,9 @@
 #include <fstream>
 #include <iostream>
 
+using ns3::traffic_extensions::CbrHelper;
+using ns3::traffic_extensions::CbrApplication;
+
 namespace ns3
 {
 namespace satellite

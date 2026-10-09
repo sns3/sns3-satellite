@@ -48,6 +48,8 @@
 #include "ns3/string.h"
 #include "ns3/test.h"
 
+using ns3::traffic_extensions::CbrHelper;
+
 namespace ns3
 {
 namespace satellite

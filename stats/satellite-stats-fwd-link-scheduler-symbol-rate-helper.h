@@ -34,7 +34,6 @@ namespace ns3
 
 class Node;
 class Time;
-
 class DataCollectionObject;
 
 namespace satellite
@@ -87,7 +86,7 @@ class SatStatsFwdLinkSchedulerSymbolRateHelper : public SatStatsHelper
     void DoInstall();
 
     /// Maintains a list of collectors created by this helper.
-    CollectorMap m_collectors;
+    stats_extensions::CollectorMap m_collectors;
 
     /// The aggregator created by this helper.
     Ptr<DataCollectionObject> m_aggregator;

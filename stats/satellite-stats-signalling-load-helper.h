@@ -95,10 +95,10 @@ class SatStatsSignallingLoadHelper : public SatStatsHelper
     virtual void DoInstallProbes() = 0;
 
     /// Maintains a list of first-level collectors created by this helper.
-    CollectorMap m_conversionCollectors;
+    stats_extensions::CollectorMap m_conversionCollectors;
 
     /// Maintains a list of second-level collectors created by this helper.
-    CollectorMap m_terminalCollectors;
+    stats_extensions::CollectorMap m_terminalCollectors;
 
     /// The aggregator created by this helper.
     Ptr<DataCollectionObject> m_aggregator;

@@ -36,7 +36,6 @@ namespace ns3
 {
 
 class Node;
-
 class DataCollectionObject;
 
 namespace satellite
@@ -105,7 +104,7 @@ class SatStatsPacketCollisionHelper : public SatStatsHelper
     }
 
     /// Maintains a list of collectors created by this helper.
-    CollectorMap m_terminalCollectors;
+    stats_extensions::CollectorMap m_terminalCollectors;
 
   private:
     SatPhyRxCarrier::CarrierType m_carrierType;

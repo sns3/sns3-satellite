@@ -38,6 +38,8 @@
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
 
+using ns3::traffic_extensions::CbrApplication;
+
 namespace ns3
 {
 namespace satellite

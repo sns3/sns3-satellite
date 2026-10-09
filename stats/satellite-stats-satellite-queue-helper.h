@@ -34,9 +34,12 @@ namespace ns3
 {
 
 class Node;
-
 class DataCollectionObject;
+
+namespace stats_extensions
+{
 class DistributionCollector;
+}
 
 namespace satellite
 {
@@ -129,7 +132,7 @@ class SatStatsSatelliteQueueHelper : public SatStatsHelper
     void PassSampleToCollector(uint32_t size, uint32_t identifier);
 
     /// Maintains a list of collectors created by this helper.
-    CollectorMap m_terminalCollectors;
+    stats_extensions::CollectorMap m_terminalCollectors;
 
     /// The collector created by this helper.
     Ptr<DataCollectionObject> m_collector;
@@ -138,7 +141,7 @@ class SatStatsSatelliteQueueHelper : public SatStatsHelper
     Ptr<DataCollectionObject> m_aggregator;
 
     /// The final collector utilized in averaged output (histogram, PDF, and CDF).
-    Ptr<DistributionCollector> m_averagingCollector;
+    Ptr<stats_extensions::DistributionCollector> m_averagingCollector;
 
   private:
     bool m_averagingMode;     ///< `AveragingMode` attribute.

@@ -47,6 +47,8 @@
 #include <utility>
 #include <vector>
 
+using ns3::stats_extensions::CollectorMap;
+
 namespace ns3
 {
 namespace satellite

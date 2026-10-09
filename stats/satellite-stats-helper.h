@@ -34,9 +34,12 @@ namespace ns3
 {
 
 class Node;
-
-class CollectorMap;
 class DataCollectionObject;
+
+namespace stats_extensions
+{
+class CollectorMap;
+}
 
 namespace satellite
 {
@@ -319,7 +322,7 @@ class SatStatsHelper : public Object
      * collector instance for it, assigns the collector instance a meaningful
      * name, and put the collector instance into the CollectorMap.
      */
-    uint32_t CreateCollectorPerIdentifier(CollectorMap& collectorMap) const;
+    uint32_t CreateCollectorPerIdentifier(stats_extensions::CollectorMap& collectorMap) const;
 
     // IDENTIFIER RELATED METHODS ///////////////////////////////////////////////
 

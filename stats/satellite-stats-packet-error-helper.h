@@ -173,7 +173,7 @@ class SatStatsPacketErrorHelper : public SatStatsHelper
     std::map<Ptr<Probe>, std::pair<Ptr<Node>, uint32_t>> m_probes;
 
     /// Maintains a list of collectors created by this helper.
-    CollectorMap m_terminalCollectors;
+    stats_extensions::CollectorMap m_terminalCollectors;
 
     /// The aggregator created by this helper.
     Ptr<DataCollectionObject> m_aggregator;

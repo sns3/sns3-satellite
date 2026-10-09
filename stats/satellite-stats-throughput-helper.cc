@@ -56,6 +56,14 @@
 #include <string>
 #include <utility>
 
+using ns3::stats_extensions::CollectorMap;
+using ns3::stats_extensions::MultiFileAggregator;
+using ns3::stats_extensions::MagisterGnuplotAggregator;
+using ns3::stats_extensions::ScalarCollector;
+using ns3::stats_extensions::UnitConversionCollector;
+using ns3::stats_extensions::IntervalRateCollector;
+using ns3::stats_extensions::DistributionCollector;
+
 namespace ns3
 {
 namespace satellite
@@ -164,7 +172,7 @@ SatStatsThroughputHelper::DoInstall()
         // Setup second-level collectors.
         m_terminalCollectors.SetType("ns3::IntervalRateCollector");
         m_terminalCollectors.SetAttribute("InputDataType",
-                                          EnumValue(IntervalRateCollector::INPUT_DATA_TYPE_DOUBLE));
+                                          EnumValue(IntervalRateCollector::INPUT_DATA_TYPE_DOUBLE));;
         CreateCollectorPerIdentifier(m_terminalCollectors);
         m_terminalCollectors.ConnectToAggregator("OutputWithTime",
                                                  m_aggregator,

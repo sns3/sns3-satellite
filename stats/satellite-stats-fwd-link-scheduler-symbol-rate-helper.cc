@@ -47,6 +47,13 @@
 #include <sstream>
 #include <string>
 
+using ns3::stats_extensions::CollectorMap;
+using ns3::stats_extensions::MultiFileAggregator;
+using ns3::stats_extensions::MagisterGnuplotAggregator;
+using ns3::stats_extensions::ScalarCollector;
+using ns3::stats_extensions::IntervalRateCollector;
+using ns3::stats_extensions::DistributionCollector;
+
 namespace ns3
 {
 namespace satellite

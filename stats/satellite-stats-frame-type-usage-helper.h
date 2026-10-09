@@ -107,7 +107,7 @@ class SatStatsFrameTypeUsageHelper : public SatStatsHelper
      * @brief Two-dimensional map of collectors, indexed first by the
      * the frame type identifier and second by the global/gw/beam identifier.
      */
-    std::map<uint32_t, CollectorMap> m_collectors;
+    std::map<uint32_t, stats_extensions::CollectorMap> m_collectors;
 
     /// The aggregator created by this helper.
     Ptr<DataCollectionObject> m_aggregator;

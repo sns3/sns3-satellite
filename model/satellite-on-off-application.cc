@@ -25,9 +25,11 @@
 #include "ns3/packet.h"
 #include "ns3/simulator.h"
 #include "ns3/traced-callback.h"
-#include "ns3/traffic-time-tag.h"
+#include "ns3/time-tag.h"
 
 #include <stdint.h>
+
+using ns3::stats_extensions::TrafficTimeTag;
 
 namespace ns3
 {

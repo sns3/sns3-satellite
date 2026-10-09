@@ -26,7 +26,9 @@ delegate_to_build_job:
   variables:
     BRANCH_NAME: $CI_COMMIT_REF_NAME
     REPO_NAME: satellite
-    TRAFFIC_REF: master
-    STATS_REF: master
+    TRAFFIC_REF: dev
+    STATS_REF: dev
+    STATS_MODULE: stats-extensions
+    TRAFFIC_MODULE: traffic-extensions
   stage: delegate
   trigger: sns3/sns3-ci

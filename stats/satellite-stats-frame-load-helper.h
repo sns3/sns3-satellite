@@ -36,7 +36,11 @@ namespace ns3
 {
 
 class DataCollectionObject;
+
+namespace stats_extensions
+{
 class ScalarCollector;
+}
 
 namespace satellite
 {
@@ -129,7 +133,7 @@ class SatStatsFrameLoadHelper : public SatStatsHelper
      * @param identifier
      * @return
      */
-    Ptr<ScalarCollector> GetCollector(uint32_t frameId, std::string identifier);
+    Ptr<stats_extensions::ScalarCollector> GetCollector(uint32_t frameId, std::string identifier);
 
     UnitType_t m_unitType;               ///<
     std::string m_shortLabel;            ///<
@@ -144,7 +148,7 @@ class SatStatsFrameLoadHelper : public SatStatsHelper
      * @brief Two-dimensional map of collectors, indexed by the frame ID and then
      *        by the identifier.
      */
-    std::map<uint32_t, CollectorMap> m_collectors;
+    std::map<uint32_t, stats_extensions::CollectorMap> m_collectors;
 
     /// The aggregator created by this helper.
     Ptr<DataCollectionObject> m_aggregator;

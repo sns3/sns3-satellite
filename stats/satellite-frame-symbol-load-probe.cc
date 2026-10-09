@@ -93,7 +93,7 @@ SatFrameSymbolLoadProbe::ConnectByObject(std::string traceSource, Ptr<Object> ob
     NS_LOG_DEBUG("Name of probe (if any) in names database: " << Names::FindPath(obj));
     bool connected = obj->TraceConnectWithoutContext(
         traceSource,
-        MakeCallback(&ns3::satellite::SatFrameSymbolLoadProbe::TraceSink, this));
+        MakeCallback(&SatFrameSymbolLoadProbe::TraceSink, this));
     return connected;
 }
 
@@ -103,7 +103,7 @@ SatFrameSymbolLoadProbe::ConnectByPath(std::string path)
     NS_LOG_FUNCTION(this << path);
     NS_LOG_DEBUG("Name of probe to search for in config database: " << path);
     Config::ConnectWithoutContext(path,
-                                  MakeCallback(&ns3::satellite::SatFrameSymbolLoadProbe::TraceSink, this));
+                                  MakeCallback(&SatFrameSymbolLoadProbe::TraceSink, this));
 }
 
 void

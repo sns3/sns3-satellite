@@ -35,9 +35,7 @@ namespace ns3
 
 class Node;
 class Time;
-
 class DataCollectionObject;
-class DistributionCollector;
 
 namespace satellite
 {
@@ -90,7 +88,7 @@ class SatStatsPacketDropRateHelper : public SatStatsHelper
     void DoInstall();
 
     /// Maintains a list of collectors created by this helper.
-    CollectorMap m_terminalCollectors;
+    stats_extensions::CollectorMap m_terminalCollectors;
 
     /// The aggregator created by this helper.
     Ptr<DataCollectionObject> m_aggregator;

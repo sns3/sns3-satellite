@@ -23,7 +23,7 @@
 #include "ns3/internet-module.h"
 #include "ns3/network-module.h"
 #include "ns3/satellite-module.h"
-#include "ns3/traffic-module.h"
+#include "ns3/traffic-extensions-module.h"
 
 #include <iostream>
 

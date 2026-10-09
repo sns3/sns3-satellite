@@ -48,13 +48,20 @@
 #include "ns3/scalar-collector.h"
 #include "ns3/singleton.h"
 #include "ns3/string.h"
-#include "ns3/traffic-time-tag.h"
 #include "ns3/unit-conversion-collector.h"
 
 #include <map>
 #include <sstream>
 #include <string>
 #include <utility>
+
+using ns3::stats_extensions::MultiFileAggregator;
+using ns3::stats_extensions::DistributionCollector;
+using ns3::stats_extensions::ScalarCollector;
+using ns3::stats_extensions::UnitConversionCollector;
+using ns3::stats_extensions::CollectorMap;
+using ns3::stats_extensions::MagisterGnuplotAggregator;
+using ns3::stats_extensions::ApplicationDelayProbe;
 
 namespace ns3
 {

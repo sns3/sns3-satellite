@@ -35,9 +35,11 @@
 #include "ns3/string.h"
 #include "ns3/test.h"
 #include "ns3/timer.h"
-#include "ns3/traffic-module.h"
+#include "ns3/traffic-extensions-module.h"
 
 #include <iomanip>
+
+using ns3::traffic_extensions::CbrHelper;
 
 namespace ns3
 {

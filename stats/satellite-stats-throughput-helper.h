@@ -40,7 +40,10 @@ class Packet;
 class Probe;
 class DataCollectionObject;
 
+namespace stats_extensions
+{
 class DistributionCollector;
+}
 
 namespace satellite
 {
@@ -106,13 +109,13 @@ class SatStatsThroughputHelper : public SatStatsHelper
     virtual void DoInstallProbes() = 0;
 
     /// Maintains a list of first-level collectors created by this helper.
-    CollectorMap m_conversionCollectors;
+    stats_extensions::CollectorMap m_conversionCollectors;
 
     /// Maintains a list of second-level collectors created by this helper.
-    CollectorMap m_terminalCollectors;
+    stats_extensions::CollectorMap m_terminalCollectors;
 
     /// The final collector utilized in averaged output (histogram, PDF, and CDF).
-    Ptr<DistributionCollector> m_averagingCollector;
+    Ptr<stats_extensions::DistributionCollector> m_averagingCollector;
 
     /// The aggregator created by this helper.
     Ptr<DataCollectionObject> m_aggregator;

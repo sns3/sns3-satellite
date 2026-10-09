@@ -24,10 +24,11 @@
 #include "ns3/ipv4-l3-protocol.h"
 #include "ns3/network-module.h"
 #include "ns3/satellite-module.h"
-#include "ns3/traffic-module.h"
+#include "ns3/traffic-extensions-module.h"
 
 using namespace ns3;
 using namespace ns3::satellite;
+using ns3::traffic_extensions::CbrHelper;
 
 /**
  * @file sat-multi-application-rtn-example.cc

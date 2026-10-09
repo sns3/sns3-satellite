@@ -44,6 +44,10 @@
 #include <string>
 #include <utility>
 
+using ns3::stats_extensions::CollectorMap;
+using ns3::stats_extensions::MultiFileAggregator;
+using ns3::stats_extensions::ScalarCollector;
+
 namespace ns3
 {
 namespace satellite

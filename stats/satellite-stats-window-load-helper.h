@@ -31,7 +31,6 @@ namespace ns3
 {
 
 class Node;
-
 class DataCollectionObject;
 
 namespace satellite

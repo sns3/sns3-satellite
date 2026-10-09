@@ -39,6 +39,11 @@
 #include <utility>
 #include <vector>
 
+using ns3::traffic_extensions::CbrApplication;
+using ns3::traffic_extensions::CbrHelper;
+using ns3::traffic_extensions::ThreeGppHttpHelper;
+using ns3::traffic_extensions::NrtvHelper;
+
 namespace ns3
 {
 namespace satellite

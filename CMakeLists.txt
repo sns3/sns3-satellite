@@ -634,7 +634,8 @@ build_lib(
     ${libantenna}
     ${libcsma}
     ${libstats}
-    ${libtraffic}
+    ${libstats-extensions}
+    ${libtraffic-extensions}
     ${libflow-monitor}
     ${libapplications}
     ${libconfig-store}

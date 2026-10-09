@@ -36,6 +36,8 @@
 #include <string>
 #include <utility>
 
+using ns3::stats_extensions::MultiFileAggregator;
+
 namespace ns3
 {
 namespace satellite
