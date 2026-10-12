@@ -32,7 +32,6 @@
 #include "satellite-time-tag.h"
 
 #include "ns3/error-model.h"
-#include "ns3/ipv4-l3-protocol.h"
 #include "ns3/node.h"
 
 #include <stdint.h>

@@ -26,6 +26,7 @@
 #include "satellite-topology.h"
 
 #include "ns3/ipv4-header.h"
+#include "ns3/iana-ieee802-numbers.h"
 #include "ns3/log.h"
 #include "ns3/singleton.h"
 
@@ -131,7 +132,7 @@ SatLorawanNetDevice::Receive(Ptr<const Packet> packet)
     if (m_nodeInfo->GetNodeType() == SatEnums::NT_GW)
     {
         Ptr<Packet> pktCopy = packet->Copy();
-        m_rxNetworkServerCallback(this, pktCopy, Ipv4L3Protocol::PROT_NUMBER, Address());
+        m_rxNetworkServerCallback(this, pktCopy, iana::ieee802numbers::IPV4, Address());
     }
 
     // Pass the packet to the upper layer if IP header in packet (GW or UT side)
@@ -143,7 +144,7 @@ SatLorawanNetDevice::Receive(Ptr<const Packet> packet)
     pktCopy->RemoveHeader(fHdr);
     if (pktCopy->PeekHeader(ipv4Header))
     {
-        m_rxCallback(this, pktCopy, Ipv4L3Protocol::PROT_NUMBER, Address());
+        m_rxCallback(this, pktCopy, iana::ieee802numbers::IPV4, Address());
     }
 }
 

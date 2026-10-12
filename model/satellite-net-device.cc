@@ -33,7 +33,7 @@
 #include "ns3/boolean.h"
 #include "ns3/channel.h"
 #include "ns3/error-model.h"
-#include "ns3/ipv4-l3-protocol.h"
+#include "ns3/iana-ieee802-numbers.h"
 #include "ns3/log.h"
 #include "ns3/node.h"
 #include "ns3/packet.h"
@@ -212,7 +212,7 @@ SatNetDevice::Receive(Ptr<const Packet> packet)
     }
 
     // Pass the packet to the upper layer.
-    m_rxCallback(this, packet, Ipv4L3Protocol::PROT_NUMBER, Address());
+    m_rxCallback(this, packet, iana::ieee802numbers::IPV4, Address());
 }
 
 void
