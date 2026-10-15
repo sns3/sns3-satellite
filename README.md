@@ -5,13 +5,13 @@ SNS-3 was initially developed by Magister Solutions under ESA contact.
 
 # License
 
-SNS-3 is distributed under the GPLv3 license.
+SNS-3 is distributed under the GPLv2-only license.
 
 Some external modules have been partially or totally integrated to SNS-3:
 
- * [lorawan](https://github.com/signetlabdei/lorawan), with license GPLv2
- * [SGP4 satellite movement](https://gitlab.inesctec.pt/pmms/ns3-satellite/), with license GPLv2
- * [ISL routing](https://github.com/snkas/hypatia/), with license GPLv2
+ * [lorawan](https://github.com/signetlabdei/lorawan), with license GPLv2-only
+ * [SGP4 satellite movement](https://gitlab.inesctec.pt/pmms/ns3-satellite/), with license GPLv2-only
+ * [ISL routing](https://github.com/snkas/hypatia/), with licenses GPLv2 and MIT
 
 # Prerequisites
 
