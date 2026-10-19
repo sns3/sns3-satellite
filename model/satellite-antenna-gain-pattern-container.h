@@ -89,6 +89,11 @@ class SatAntennaGainPatternContainer : public Object
     Ptr<SatAntennaGainPattern> GetAntennaGainPattern(uint32_t beamId) const;
 
     /**
+     * \brief Whether a pattern was loaded for this SNS3 beam id.
+     */
+    bool HasAntennaGainPattern(uint32_t beamId) const;
+
+    /**
      * \brief Get the mobility model of a specified satellite id
      * \param satelliteId Satellite identifier
      * \return The mobility model

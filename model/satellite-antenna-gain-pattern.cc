@@ -280,7 +280,7 @@ SatAntennaGainPattern::GetCenterLatitude(Ptr<SatMobilityModel> mobility) const
     GeoCoordinate satellite = mobility->GetGeoPosition();
     double latOffset = m_latDefaultSatellite - satellite.GetLatitude();
 
-    return m_centerLatitude - latOffset;
+    return m_centerLatitude - latOffset - m_pointingLatShift;
 }
 
 double
@@ -297,7 +297,7 @@ SatAntennaGainPattern::GetCenterLongitude(Ptr<SatMobilityModel> mobility) const
     GeoCoordinate satellite = mobility->GetGeoPosition();
     double lonOffset = m_lonDefaultSatellite - satellite.GetLongitude();
 
-    return m_centerLongitude - lonOffset;
+    return m_centerLongitude - lonOffset - m_pointingLonShift;
 }
 
 GeoCoordinate
@@ -356,8 +356,8 @@ SatAntennaGainPattern::GetValidRandomPosition(Ptr<SatMobilityModel> mobility) co
     double latOffset = m_uniformRandomVariable->GetValue(0.0, m_latInterval - 0.001);
     double lonOffset = m_uniformRandomVariable->GetValue(0.0, m_lonInterval - 0.001);
 
-    double latitude = lowerLeftCoord.first + latOffset - satLatOffset;
-    double longitude = lowerLeftCoord.second + lonOffset - satLonOffset;
+    double latitude = lowerLeftCoord.first + latOffset - satLatOffset - m_pointingLatShift;
+    double longitude = lowerLeftCoord.second + lonOffset - satLonOffset - m_pointingLonShift;
 
     GeoCoordinate coord(latitude, longitude, 0.0, true);
 
@@ -385,8 +385,8 @@ SatAntennaGainPattern::GetAntennaGain_lin(GeoCoordinate coord, Ptr<SatMobilityMo
     GetSatelliteOffset(satLatOffset, satLonOffset, mobility);
 
     // Get the requested position {latitude, longitude}
-    double latitude = coord.GetLatitude() + satLatOffset;
-    double longitude = coord.GetLongitude() + satLonOffset;
+    double latitude = coord.GetLatitude() + satLatOffset + m_pointingLatShift;
+    double longitude = coord.GetLongitude() + satLonOffset + m_pointingLonShift;
 
     // Given {latitude, longitude} has to be inside the min/max latitude/longitude values
     if (m_minLat > latitude || latitude > m_maxLat || m_minLon > longitude || longitude > m_maxLon)
@@ -457,6 +457,26 @@ SatAntennaGainPattern::GetAntennaGain_lin(GeoCoordinate coord, Ptr<SatMobilityMo
         ", interpolated gain: " << gain << std::endl;
      */
     return gain;
+}
+
+void
+SatAntennaGainPattern::SetPointingShift(double latShiftDeg, double lonShiftDeg)
+{
+    NS_LOG_FUNCTION(this << latShiftDeg << lonShiftDeg);
+    m_pointingLatShift = latShiftDeg;
+    m_pointingLonShift = lonShiftDeg;
+}
+
+double
+SatAntennaGainPattern::GetPointingLatShift() const
+{
+    return m_pointingLatShift;
+}
+
+double
+SatAntennaGainPattern::GetPointingLonShift() const
+{
+    return m_pointingLonShift;
 }
 
 } // namespace ns3

@@ -215,6 +215,12 @@ SatAntennaGainPatternContainer::GetAntennaGainPattern(uint32_t beamId) const
     return agp->second;
 }
 
+bool
+SatAntennaGainPatternContainer::HasAntennaGainPattern(uint32_t beamId) const
+{
+    return m_antennaPatternMap.find(beamId) != m_antennaPatternMap.end();
+}
+
 Ptr<SatMobilityModel>
 SatAntennaGainPatternContainer::GetAntennaMobility(uint32_t satelliteId) const
 {

@@ -127,6 +127,18 @@ class SatAntennaGainPattern : public Object
      */
     double GetCenterLongitude(Ptr<SatMobilityModel> mobility) const;
 
+    /**
+     * \brief Shift the geographic lookup so the stored peak covers a new target.
+     *
+     * The pattern file stays the snapshot written at scenario build. A positive
+     * latitude shift moves the peak toward smaller latitudes of the queried
+     * terminal: shift = (pattern peak) − (desired target).
+     */
+    void SetPointingShift(double latShiftDeg, double lonShiftDeg);
+
+    double GetPointingLatShift() const;
+    double GetPointingLonShift() const;
+
   private:
     /**
      * \brief Read the antenna gain pattern from a file
@@ -224,6 +236,13 @@ class SatAntennaGainPattern : public Object
      */
     static const std::string m_nanStringArray[4];
     std::vector<std::string> m_nanStrings;
+
+    /**
+     * Added to the queried latitude/longitude inside GetAntennaGain_lin.
+     * Zero keeps the pattern peak where the file stored it.
+     */
+    double m_pointingLatShift{0.0};
+    double m_pointingLonShift{0.0};
 };
 
 } // namespace ns3
