@@ -47,7 +47,7 @@ function print_test_case (link_results_path, dvb_type, modcod, burst_length)
     printf ("(linkResults%s, ", dvb_type);
     printf ("SatLinkResults::SAT_MODCOD_%s, %d, ", modcod, burst_length);
     printf ("%f, %e)", sinr_db, get_bler (sinr_list_db, bler_list, sinr_db));
-    printf (", TestCase::QUICK);\n");
+    printf (", TestCase::Duration::QUICK);\n");
   endfor
 
   printf ("\n");
