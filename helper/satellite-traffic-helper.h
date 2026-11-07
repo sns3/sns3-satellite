@@ -398,8 +398,14 @@ class SatTrafficHelper : public Object
                            NodeContainer utUsers,
                            Time startTime,
                            Time stopTime,
-                           Time startDelay,
-                           double percentage);
+                       Time startDelay,
+                       double percentage);
+
+    /**
+     * Статистика CBR, которую AddCbrTraffic ставит при EnableDefaultStatistics.
+     * Вынесена отдельно, чтобы захват можно было начать позже создания трафика.
+     */
+    void InstallDefaultStatistics(TrafficDirection_t direction);
 
     /**
      * Add a new Poisson traffic between chosen GWs and UTs

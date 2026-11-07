@@ -492,84 +492,11 @@ SatTrafficHelper::AddLoraCbrTraffic(Time interval,
 }
 
 void
-SatTrafficHelper::AddCbrTraffic(TrafficDirection_t direction,
-                                TransportLayerProtocol_t protocol,
-                                Time interval,
-                                uint32_t packetSize,
-                                NodeContainer gwUsers,
-                                NodeContainer utUsers,
-                                Time startTime,
-                                Time stopTime,
-                                Time startDelay)
+SatTrafficHelper::InstallDefaultStatistics(TrafficDirection_t direction)
 {
-    NS_LOG_FUNCTION(this << interval << packetSize << startTime << stopTime << startDelay);
+    NS_LOG_FUNCTION(this << direction);
 
-    if (gwUsers.GetN() == 0)
-    {
-        NS_LOG_WARN("Gateway users container is empty");
-        return;
-    }
-    if (utUsers.GetN() == 0)
-    {
-        NS_LOG_WARN("UT users container is empty");
-        return;
-    }
-
-    std::string socketFactory =
-        (protocol == SatTrafficHelper::TCP ? "ns3::TcpSocketFactory" : "ns3::UdpSocketFactory");
-    uint16_t port = 9;
-
-    PacketSinkHelper sinkHelper(socketFactory, Address());
-    CbrHelper cbrHelper(socketFactory, Address());
-    ApplicationContainer sinkContainer;
-    ApplicationContainer cbrContainer;
-
-    // create CBR applications from GWs to UT users
-    for (uint32_t j = 0; j < gwUsers.GetN(); j++)
-    {
-        for (uint32_t i = 0; i < utUsers.GetN(); i++)
-        {
-            if (direction == RTN_LINK)
-            {
-                InetSocketAddress gwUserAddr =
-                    InetSocketAddress(m_satHelper->GetUserAddress(gwUsers.Get(j)), port);
-                if (!HasSinkInstalled(gwUsers.Get(j), port))
-                {
-                    sinkHelper.SetAttribute("Local", AddressValue(Address(gwUserAddr)));
-                    sinkContainer.Add(sinkHelper.Install(gwUsers.Get(j)));
-                }
-
-                cbrHelper.SetConstantTraffic(interval, packetSize);
-                cbrHelper.SetAttribute("Remote", AddressValue(Address(gwUserAddr)));
-                auto app = cbrHelper.Install(utUsers.Get(i)).Get(0);
-                app->SetStartTime(startTime + (i + j * gwUsers.GetN() + 1) * startDelay);
-                cbrContainer.Add(app);
-            }
-            else if (direction == FWD_LINK)
-            {
-                InetSocketAddress utUserAddr =
-                    InetSocketAddress(m_satHelper->GetUserAddress(utUsers.Get(i)), port);
-                if (!HasSinkInstalled(utUsers.Get(i), port))
-                {
-                    sinkHelper.SetAttribute("Local", AddressValue(Address(utUserAddr)));
-                    sinkContainer.Add(sinkHelper.Install(utUsers.Get(i)));
-                }
-
-                cbrHelper.SetConstantTraffic(interval, packetSize);
-                cbrHelper.SetAttribute("Remote", AddressValue(Address(utUserAddr)));
-                auto app = cbrHelper.Install(gwUsers.Get(j)).Get(0);
-                app->SetStartTime(startTime + (i + j * gwUsers.GetN() + 1) * startDelay);
-                cbrContainer.Add(app);
-            }
-        }
-    }
-
-    sinkContainer.Start(startTime);
-    sinkContainer.Stop(stopTime);
-
-    if (m_enableDefaultStatistics)
-    {
-        // Add throuhgput statistics
+    // Add throuhgput statistics
         if (direction == FWD_LINK)
         {
             // Global scalar
@@ -666,6 +593,87 @@ SatTrafficHelper::AddCbrTraffic(TrafficDirection_t direction,
             m_satStatsHelperContainer->AddPerGwRtnUserMacThroughput(
                 SatStatsHelper::OUTPUT_SCATTER_FILE);
         }
+}
+
+void
+SatTrafficHelper::AddCbrTraffic(TrafficDirection_t direction,
+                                TransportLayerProtocol_t protocol,
+                                Time interval,
+                                uint32_t packetSize,
+                                NodeContainer gwUsers,
+                                NodeContainer utUsers,
+                                Time startTime,
+                                Time stopTime,
+                                Time startDelay)
+{
+    NS_LOG_FUNCTION(this << interval << packetSize << startTime << stopTime << startDelay);
+
+    if (gwUsers.GetN() == 0)
+    {
+        NS_LOG_WARN("Gateway users container is empty");
+        return;
+    }
+    if (utUsers.GetN() == 0)
+    {
+        NS_LOG_WARN("UT users container is empty");
+        return;
+    }
+
+    std::string socketFactory =
+        (protocol == SatTrafficHelper::TCP ? "ns3::TcpSocketFactory" : "ns3::UdpSocketFactory");
+    uint16_t port = 9;
+
+    PacketSinkHelper sinkHelper(socketFactory, Address());
+    CbrHelper cbrHelper(socketFactory, Address());
+    ApplicationContainer sinkContainer;
+    ApplicationContainer cbrContainer;
+
+    // create CBR applications from GWs to UT users
+    for (uint32_t j = 0; j < gwUsers.GetN(); j++)
+    {
+        for (uint32_t i = 0; i < utUsers.GetN(); i++)
+        {
+            if (direction == RTN_LINK)
+            {
+                InetSocketAddress gwUserAddr =
+                    InetSocketAddress(m_satHelper->GetUserAddress(gwUsers.Get(j)), port);
+                if (!HasSinkInstalled(gwUsers.Get(j), port))
+                {
+                    sinkHelper.SetAttribute("Local", AddressValue(Address(gwUserAddr)));
+                    sinkContainer.Add(sinkHelper.Install(gwUsers.Get(j)));
+                }
+
+                cbrHelper.SetConstantTraffic(interval, packetSize);
+                cbrHelper.SetAttribute("Remote", AddressValue(Address(gwUserAddr)));
+                auto app = cbrHelper.Install(utUsers.Get(i)).Get(0);
+                app->SetStartTime(startTime + (i + j * gwUsers.GetN() + 1) * startDelay);
+                cbrContainer.Add(app);
+            }
+            else if (direction == FWD_LINK)
+            {
+                InetSocketAddress utUserAddr =
+                    InetSocketAddress(m_satHelper->GetUserAddress(utUsers.Get(i)), port);
+                if (!HasSinkInstalled(utUsers.Get(i), port))
+                {
+                    sinkHelper.SetAttribute("Local", AddressValue(Address(utUserAddr)));
+                    sinkContainer.Add(sinkHelper.Install(utUsers.Get(i)));
+                }
+
+                cbrHelper.SetConstantTraffic(interval, packetSize);
+                cbrHelper.SetAttribute("Remote", AddressValue(Address(utUserAddr)));
+                auto app = cbrHelper.Install(gwUsers.Get(j)).Get(0);
+                app->SetStartTime(startTime + (i + j * gwUsers.GetN() + 1) * startDelay);
+                cbrContainer.Add(app);
+            }
+        }
+    }
+
+    sinkContainer.Start(startTime);
+    sinkContainer.Stop(stopTime);
+
+    if (m_enableDefaultStatistics)
+    {
+        InstallDefaultStatistics(direction);
     }
 }
 

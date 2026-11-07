@@ -277,6 +277,11 @@ class SatHelper : public Object
         return m_satConstellationEnabled;
     }
 
+    /**
+     * Подключает трассировку пакетов к уже созданным устройствам.
+     */
+    void EnablePacketTrace();
+
   private:
     static const uint16_t MIN_ADDRESS_PREFIX_LENGTH = 1;
     static const uint16_t MAX_ADDRESS_PREFIX_LENGTH = 31;
@@ -471,11 +476,6 @@ class SatHelper : public Object
      * Enables creation traces in sub-helpers.
      */
     void EnableDetailedCreationTraces();
-
-    /**
-     * Enable packet traces
-     */
-    void EnablePacketTrace();
 
     /**
      * Load a constellation topology.
